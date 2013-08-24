@@ -7,7 +7,7 @@ class Entry < ActiveRecord::Base
   has_many :starred_entries
   
   before_create :ensure_published
-  before_create :cache_public_id
+  before_create :cache_public_id, unless: -> { Rails.env.test? }
   before_create :create_summary
   after_commit :mark_as_unread, on: :create
   

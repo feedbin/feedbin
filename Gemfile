@@ -13,10 +13,6 @@ group :development do
   gem 'capistrano-unicorn', github: 'sosedoff/capistrano-unicorn', ref: '52376ad', require: false
 end
 
-group :test do
-  gem 'factory_girl_rails'
-end
-
 group :production do
   gem "therubyracer", require: 'v8'
 end
