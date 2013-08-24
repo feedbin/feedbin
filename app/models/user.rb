@@ -52,9 +52,7 @@ class User < ActiveRecord::Base
   end
   
   def plan_type_valid
-    coupon_record = Coupon.find_by_coupon_code(coupon_code)
-    coupon_record_valid = (coupon_record.present? && !coupon_record.redeemed)
-    if coupon_record_valid || free_ok
+    if free_ok
       valid_plans = Plan.where(price_tier: plan.price_tier).pluck(:id)
     else
       valid_plans = Plan.where(price_tier: plan.price_tier).where.not(stripe_id: 'free').pluck(:id)

@@ -20,9 +20,21 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     @user.update_auth_token = true
+
+    coupon_valid = false
+    if user_params['coupon_code']
+      coupon = Coupon.find_by_coupon_code(user_params['coupon_code'])
+      coupon_valid = (coupon.present? && !coupon.redeemed)
+    end
+    
+    if coupon_valid || !ENV['STRIPE_API_KEY']
+      @user.free_ok = true
+    end
+    
     if params[:user] && params[:user][:password]
       @user.password_confirmation = params[:user][:password]
     end
+    
     if @user.save
       sign_in @user
       redirect_to root_url
