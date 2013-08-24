@@ -1,6 +1,7 @@
 <h2>Import/Export</h2>
+
+<h3>Import</h3>
 <% if ENV['AWS_ACCESS_KEY_ID'] %>
-  <h3>Import</h3>
   <%= direct_upload_form_for @uploader do |f| %>
     <p><%= f.file_field :upload %></p>
     <p><%= f.submit "Import", class: 'button' %></p>
@@ -10,7 +11,7 @@
 
   <hr />
 <% else %>
-<p>Import disabled. <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> and <code>AWS_S3_BUCKET</code> are missing.</p>
+  <p>Import disabled. <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> and <code>AWS_S3_BUCKET</code> are missing.</p>
 <% end %>
 
 <h3>Export</h3>
