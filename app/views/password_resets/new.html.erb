@@ -1,0 +1,21 @@
+<% @class = 'login' %>
+<div class="login-wrap">
+  <a href="/"><%= render partial: "shared/svg/logo" %></a>
+  
+  <h3 class="box-header">Reset Password</h3>
+  <div class="box">
+    
+    <%= render partial: 'shared/flash', locals: {flash: flash} %>
+
+    <%= form_tag password_resets_path do %>
+      <p>
+        <%= email_field_tag :email, params[:email], placeholder: 'Email' %>
+      </p>    
+      <div class="text-right">
+        <%= submit_tag "Reset Password", class: 'button' %>
+      </div>
+      
+    <% end %>
+    
+  </div>
+</div>

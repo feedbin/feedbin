@@ -1,0 +1,17 @@
+<h2>Import/Export</h2>
+<% if ENV['AWS_ACCESS_KEY_ID'] %>
+  <h3>Import</h3>
+  <%= direct_upload_form_for @uploader do |f| %>
+    <p><%= f.file_field :upload %></p>
+    <p><%= f.submit "Import", class: 'button' %></p>
+  <% end %>
+
+  <p><small>You can import OPML or starred.json files. Import is done in the background so you may not see every subscription or starred item right away.</small></p>
+
+  <hr />
+<% else %>
+<p>Import disabled. <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> and <code>AWS_S3_BUCKET</code> are missing.</p>
+<% end %>
+
+<h3>Export</h3>
+<p><%= link_to "Download Subscriptions", subscriptions_path(format: :xml), class: "button" %></p>

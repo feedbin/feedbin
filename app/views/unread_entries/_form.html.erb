@@ -1,0 +1,10 @@
+<%= form_tag unread_entries_entry_path(entry.id), remote: true, data: {behavior: 'toggle_read', entry_id: entry.id}, class: 'entry-button-wrap' do %>
+  <%= hidden_field_tag 'read', !read %>
+  <button class="entry-button button-toggle-read" title="Mark as read/unread">
+    <% if read %>
+      <span class="circle-empty"></span>
+    <% else %>
+      <span class="circle-filled"></span>
+    <% end %>
+  </button>
+<% end %>

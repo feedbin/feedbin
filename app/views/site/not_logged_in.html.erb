@@ -1,0 +1,16 @@
+<% @class = 'login' %>
+<div class="login-wrap pad-bottom">
+  <a href="/"><%= render partial: "shared/svg/logo" %></a>
+  
+  <h3 class="box-header">Welcome to Feedbin</h3>
+  <div class="box x-large">
+    
+    <p>You have successfully installed Feedbin.</p>
+    <ul>
+      <li><a href="https://github.com/feedbin/feedbin#readme">Documentation</a></li>
+      <li><%= link_to "Create an Account", signup_path %></li>
+      <li><%= link_to "Login", login_path %></li>
+    </ul>
+
+  </div>
+</div>

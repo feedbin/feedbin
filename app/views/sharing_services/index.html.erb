@@ -1,0 +1,50 @@
+<h2>Sharing</h2>
+
+<p class="muted">There are a lot of sharing services. Chances are your favorites support sharing through a special URL.</p>
+
+<p class="muted">For example to share something on <a href="https://app.net">App.net</a>, you can craft a URL like this and your post will be populated with the info you pass in:</p>
+
+<pre><code>https://alpha.app.net/intent/post?text=<span class="label label-info">${title}</span>+<span class="label label-info">${url}</span></code></pre>
+
+<p>Available tokens:</p>
+
+<table class="table table-bordered">
+  <tr>
+    <th>Token</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>${title}</code></td>
+    <td>The entry title</td>
+  </tr>
+  <tr>
+    <td><code>${url}</code></td>
+    <td>The entry URL</td>
+  </tr>
+  <tr>
+    <td><code>${source}</code></td>
+    <td>The feed name</td>
+  </tr>
+</table>
+
+<p class="muted">Add your sharing services below and they will be available in the share menu.</p>
+
+<%= form_for @user, url: sharing_services_update_user_path(@user), html: {novalidate: 'novalidate'} do |f| %>
+  <table class="table table-condensed form-table" data-behavior="add_fields_target">
+    <tbody>
+      <%= f.fields_for :sharing_services do |builder| %>
+        <%= render 'sharing_service_fields', f: builder %>
+      <% end %>
+      <tr>
+        <td colspan="3">
+          <%= f.submit 'Save', class: 'button button-primary' %>
+          <%= link_to_add_fields "Add Service", f, :sharing_services %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+<% end %>
+
+<hr>
+
+<p class="muted">A collection of sharing service URLs is <a href="https://github.com/feedbin/support/blob/master/sharing-services.md#sharing-services">available on GitHub</a>. Please feel free to add yours.</p>

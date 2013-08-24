@@ -1,0 +1,63 @@
+<h3>Update Billing</h3>
+<% if ENV['STRIPE_API_KEY'] %>
+  <% if @user.last_4_digits %>
+    <p class="billing-promo"><span class="cc"><span class="cc-stripe"></span></span>Your current card **** **** **** <%= @user.last_4_digits %></p>
+  <% end %>
+  <div data-behavior="stripe_error" class="alert alert-error hide"></div>
+  <%= form_tag settings_update_credit_card_path, data: { behavior: 'credit_card_form' } do %>
+    <%= hidden_field_tag :stripe_token, nil, data: { behavior: 'stripe_token' } %>
+    <%= render partial: 'shared/credit_card_form' %>
+    <%= submit_tag "Update", class: 'button' %>    
+  <% end %>
+
+  <h3>Change your Plan</h3>
+  <table class="table table-bordered" style="margin-bottom: 0;">
+    <tr>
+      <th>Plan</th>
+      <th>Price</th>
+      <th>&nbsp;</th>
+    </tr>
+    <% @plans.each do |plan| %>
+      <tr>
+          <td><%= plan.name %></td>
+          <td><%= number_to_currency(plan.price) %>/<%= plan.name %></td>
+          <td>
+            <% if @user.plan.id == plan.id %>
+              Your plan
+            <% else %>
+              <%= form_tag settings_update_plan_path, data: { behavior: 'change_plan' }, class: 'no-margin' do %>
+                <%= hidden_field_tag 'plan', plan.id %>
+                <%= button_tag 'Switch', data: { confirm: 'Are you sure you want to change plans?' }, class: 'button' %>
+              <% end %>    
+            <% end %>    
+          </td>
+      </tr>
+    <% end %>
+  </table>
+
+  <p><small>Plan changes are pro-rated.</small></p>
+
+  <h3 class="por">
+    Payment History
+    <% if @next_payment %>
+      <p class="inline-subhead"><small>Next payment: <time datetime="<%= @next_payment.to_s(:datetime) %>"><%= @next_payment.to_s(:feed) %> UTC</time></small></p>
+    <% end %>
+  </h3>
+
+  <table class="table table-bordered">
+    <tr>
+      <th>Date</th>
+      <th>Receipt</th>
+      <th>Amount</th>
+    </tr>
+    <% @billing_events.each do |invoice| %>
+    <tr>
+      <td><%= Time.at(invoice.details.data.object.date).to_s(:date) %></td>
+      <td><%= link_to 'Receipt', invoice %></td>
+      <td><%= invoice.details.data.object.currency.upcase %> <%= number_to_currency(invoice.details.data.object.total.to_f / 100) %></td>
+    </tr>
+    <% end %>
+  </table>
+<% else %>
+  <p>Billing disabled. <code>STRIPE_API_KEY</code> and <code>STRIPE_PUBLIC_KEY</code> are missing.</p>
+<% end %>

@@ -1,0 +1,14 @@
+Hi <%= @user.email %>,
+
+This is a receipt for your Feedbin account. Please send any questions to support@feedbin.me.
+
+Thanks for being a Feedbin customer.
+
+-------------------------------------------------
+Feedbin Receipt - <%= Time.at(@billing_event.details.data.object.date).to_s(:date) %>
+
+User: <%= @user.email %>
+Amount: <%= @billing_event.details.data.object.currency.upcase %> <%= number_to_currency(@billing_event.details.data.object.total.to_f / 100) %>
+
+Feedbin, LLC
+-------------------------------------------------

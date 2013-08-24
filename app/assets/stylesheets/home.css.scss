@@ -1,0 +1,22 @@
+.public-page {
+	/*------------------------------------------------------------------------------
+		Layout
+	------------------------------------------------------------------------------*/
+	background-color: #959697;
+	h1.alt {
+		color: #333;
+	}
+	p {
+		font-size: 16px;
+		color: #999999;
+	}
+	.bar {
+		border-bottom: 1px solid #CCC;
+	}
+	.logo {
+		display: inline-block !important;
+	}
+}
+.sub-page {
+	background-color: #eaeaea;
+}

@@ -1,0 +1,11 @@
+feedbin.updateFeeds('<%= j render partial: 'feeds/feeds', locals: {collections: @collections, tags: @tags, feeds: @feeds} %>');
+
+$('[data-behavior~=view_all]').replaceWith('<%= j render partial: 'shared/buttons/view_all' %>');
+$('[data-behavior~=view_unread]').replaceWith('<%= j render partial: 'shared/buttons/view_unread' %>');
+
+feedbin.data.viewMode = "<%= @view_mode.to_s %>";
+feedbin.updateTitle('<%= j @user.title_with_count %>');
+
+<% if @clear_hide_queue %>
+  feedbin.hideQueue = [];
+<% end %>

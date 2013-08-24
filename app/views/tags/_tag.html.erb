@@ -1,0 +1,19 @@
+<% hide_drawer = (session[:view_mode] == 'view_unread' && tag.unread_count == 0 && !tag.user_feeds.any?) ? true : false %>
+<li data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" class="<%= selected("tag_#{tag.id}") %>">
+  <%= link_to tag_path(tag.id), remote: true, class: 'feed-link tag-link', data: { behavior: 'selectable reset_entry_position show_entries open_item' } do %>
+    <span class="favicon-wrap">
+      <span class="favicon favicon-tag"></span>
+    </span>
+    <%= content_tag :span, tag.unread_count, class: 'count' + hide_count(tag.unread_count) %>
+    <% unless hide_drawer %>
+      <%= render partial: 'tags/tag_visibility', locals: {user: @user, tag: tag} %>
+    <% end %>
+    <%= tag.name %>
+  <% end %>
+  <div class="drawer <%= hide_drawer ? ' hide' : '' %>" data-hidden="<%= drawer_visible?(tag.id) ? 'false' : 'true' %>" style="<%= drawer_visible?(tag.id) ? '' : 'height: 0;' %>">
+    <ul>
+      <%= render tag.user_feeds %>
+    </ul>
+    <i class="drawer-arrow"></i>
+  </div>
+</li>

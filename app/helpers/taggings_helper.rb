@@ -1,0 +1,2 @@
+module TaggingsHelper
+end

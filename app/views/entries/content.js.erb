@@ -1,0 +1,3 @@
+$('[data-entry-id=<%= @entry.id %>] [data-behavior~=entry_content_wrap]').html("<%= j @content.html_safe %>")
+$('[data-entry-id=<%= @entry.id %>] [data-behavior~=toggle_content_view]').replaceWith("<%= j render partial: "entries/toggle_content", locals: {content_view: @content_view, entry: @entry} %>");
+feedbin.formatEntryContent(false)

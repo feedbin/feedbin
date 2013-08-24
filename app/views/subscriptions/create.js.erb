@@ -1,0 +1,10 @@
+<% if @results[:options].any? %>
+  feedbin.modalBox('<%= j render partial: "choices", locals: { options: @results[:options].first } %>');
+<% elsif @results[:success].any? %>
+  feedbin.updateFeeds('<%= j render partial: 'feeds/feeds', locals: {collections: @collections, tags: @tags, feeds: @feeds} %>');
+  feedbin.subscribeStatus('You have subscribed.');
+  $("[data-feed-id=<%= @click_feed %>] a").click();
+  feedbin.updateTitle('<%= j @user.title_with_count %>')
+<% else %>
+  feedbin.subscribeStatus('No feed found.');
+<% end %>

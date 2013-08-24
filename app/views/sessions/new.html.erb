@@ -1,0 +1,26 @@
+<% @class = 'login' %>
+<div class="login-wrap pad-bottom">
+  <a href="/"><%= render partial: "shared/svg/logo" %></a>
+  
+  <h3 class="box-header">Log In</h3>
+  <div class="box">
+    <%= render partial: 'shared/flash', locals: {flash: flash} %>
+
+    <%= form_tag sessions_path do %>
+      <%= email_field_tag :email, params[:email], autofocus: true, tabindex: '1', placeholder: 'Email' %>
+
+      <%= password_field_tag :password, nil, tabindex: '2', placeholder: 'Password' %>
+    
+      <div class="clearfix">
+        <div class="half">
+          <%= link_to "Forgot Password?", new_password_reset_path, class: 'large forgot-link' %>
+        </div>
+        <div class="half text-right">
+          <%= submit_tag "Log in", class: 'button', tabindex: '3' %>
+        </div>
+      </div>
+      
+    <% end %>
+  </div>
+  <p class="align-center x-large muted">Don’t have an account? <%= link_to "Sign up", signup_path %></p>
+</div>

@@ -1,0 +1,60 @@
+<% @class = 'app' %>
+<% content_for :head do %>
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<% end %>
+
+<table class="app-wrap" cellpadding="0">
+  <tbody>
+    <tr>
+      <td class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
+        <div class="feeds-wrap full-height">
+          <div class="view-toolbar">
+            <%= render partial: 'shared/buttons/view_unread' %>
+            <%= render partial: 'shared/buttons/view_all' %>
+          </div>
+          <div class="feeds">
+            <ul data-behavior="feeds_target">
+              <%= render partial: 'feeds/feeds', locals: {collections: @collections, tags: @tags, feeds: @feeds} %>
+            </ul>
+          </div>
+          <div class="feeds-toolbar">
+            <table cellpadding="0">
+              <tbody>
+                <tr>
+                  <td>
+                    <%= render partial: 'shared/buttons/tag', locals: {feed: nil, tags: nil, tag: nil} %>
+                  </td>
+                  <td>
+                    <%= render partial: 'shared/buttons/mark_all_as_read', locals: {type: nil, data: nil} %>
+                  </td>
+                  <td>
+                    <%= render partial: 'shared/buttons/unsubscribe', locals: {feed: nil} %>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </td>
+      <td class="entries-column app-panel" data-behavior="content_column" <%= resizable 'entries' %>>
+        <div class="full-height entries-wrap">
+          <div class="entries">
+          	<ul data-behavior="entries_target"></ul>
+          </div>
+        </div>
+      </td>
+      <td class="app-panel" data-behavior="content_column">
+        <div class="full-height entry-wrap">
+        	<div class="entry-content-wrap full-height" data-behavior="entry_content_target">
+            
+        	</div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="hide" data-behavior="pagination"></div>
+<%= render partial: "shared/keyboard_shortcuts_wrap" %>
+<%= render partial: "shared/data", locals: {mobile: false} %>
+<%= render partial: "shared/resizable_form" %>

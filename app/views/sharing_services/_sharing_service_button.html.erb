@@ -1,0 +1,14 @@
+<% if services.any? %>
+<div class="entry-button-wrap">
+  <div class="dropdown-wrap button-toggle-share-menu entry-button">
+    <a class="entry-button" data-behavior="toggle_share_menu" href="#" title="Share">
+      <%= render partial: "shared/svg/share" %>
+    </a>
+    <ul>
+      <% services.each do |service| %>
+        <li><a href="<%= service[:url] %>" target="<%= service[:target] %>"><%= service[:label] %></a></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+<% end %>

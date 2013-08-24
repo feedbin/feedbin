@@ -1,0 +1,14 @@
+<%= form_tag content_entry_path(entry), remote: true, data: {behavior: 'toggle_content_view', feed_id: entry.feed_id}, class: 'entry-button-wrap' do %>
+  <%= hidden_field_tag 'content_view', !content_view %>
+  <button class="entry-button button-toggle-content" title="View original inline">
+    <% if content_view %>
+      <span class="active">
+        <%= render partial: "shared/svg/readability" %>
+      </span>
+    <% else %>
+      <span>
+        <%= render partial: "shared/svg/readability" %>
+      </span>
+    <% end %>
+  </button>
+<% end %>

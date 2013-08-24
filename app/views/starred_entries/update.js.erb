@@ -1,0 +1,10 @@
+<% if @starred %>
+  $("[data-entry-id=<%= @entry.id %>]").addClass('starred');
+  countAction = 'increment'
+<% else %>
+  $("[data-entry-id=<%= @entry.id %>]").removeClass('starred');
+  countAction = 'decrement'
+<% end %>
+
+$('[data-behavior~=toggle_starred]').replaceWith('<%= j render partial: "starred_entries/form", locals: {entry: @entry, starred: @starred} %>');
+feedbin.CountInstance.updateStarredCount(countAction)

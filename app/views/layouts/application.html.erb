@@ -1,0 +1,37 @@
+<% content_for :content do %>
+  <%= yield(:sidebar) %>
+
+  <div class="modal-target"></div>
+  <header class="bar">
+		<a href="/" class="logo"><%= render partial: 'shared/svg/logo' %></a>
+			
+    <% if signed_in? %>
+    <div class="subscribe-wrap">
+      
+      <%= render partial: "subscriptions/form" %>
+      <div class="popover right hide">
+        <div class="arrow"></div>
+        <div class="popover-content">
+        </div>
+      </div>
+    </div>
+    <% end %>
+
+    <div class="account-buttons">
+      <% if signed_in? %>
+        <%= link_to 'Settings', settings_path %>
+        <%= link_to "Log Out", logout_path, method: "delete" %>
+      <% else %>
+        <%= link_to 'Sign Up', signup_path %>
+        <%= link_to 'Log In', login_path %>
+      <% end %>
+    </div>
+
+  </header>
+	
+  <div class="content">
+    <%= content_for?(:app_content) ? yield(:app_content) : yield %>
+  </div>
+
+<% end %>
+<%= render template: 'layouts/wrap' %>

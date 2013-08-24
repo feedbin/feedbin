@@ -1,0 +1,24 @@
+<% @class = 'login' %>
+<div class="login-wrap">
+  <a href="/"><%= render partial: "shared/svg/logo" %></a>
+  
+  <h3 class="box-header">Reset Password</h3>
+  <div class="box">
+    
+    <%= render partial: 'shared/flash', locals: {flash: flash} %>
+
+    <%= form_for @user, url: password_reset_path(params[:id]) do |f| %>
+      <% if @user.errors.any? %>
+        <div class="alert alert-error">
+          <%= @user.errors.full_messages.join('. ') %>.
+        </div>
+      <% end %>
+      <%= f.password_field :password, placeholder: 'Password' %>
+
+      <div class="text-right">
+        <%= f.submit "Reset Password", class: 'button' %>
+      </div>
+    <% end %>
+    
+  </div>
+</div>

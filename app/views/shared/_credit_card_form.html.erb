@@ -1,0 +1,9 @@
+<p>
+  <%= text_field_tag :card_number, nil, name: nil, placeholder: "Credit Card Number" %>
+
+  <%= text_field_tag :card_code, nil, name: nil, placeholder: "Card Security Code (CVV)" %>
+
+  <%= label_tag :card_month, "Card Expiration" %>
+  <%= select_month nil, {add_month_numbers: true}, {name: nil, id: "card_month"} %>
+  <%= select_year nil, {start_year: Date.today.year, end_year: Date.today.year + 10}, {name: nil, id: "card_year"} %>
+</p>

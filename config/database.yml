@@ -1,0 +1,17 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: feedbin_development
+  pool: 19
+  username: <%= ENV['POSTGRES_USERNAME'] %>
+  password:
+  host: localhost
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: feedbin_test
+  pool: 19
+  username: <%= ENV['POSTGRES_USERNAME'] %>
+  password:
+  host: localhost

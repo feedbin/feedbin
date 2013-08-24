@@ -1,0 +1,27 @@
+var entries = '<%= j render partial: "entries/entry", collection: @entries %>';
+
+<% if @append %>
+	feedbin.appendEntries(entries);
+<% else %>
+	feedbin.updateEntries(entries);
+<% end %>
+
+feedbin.localizeTime($('[data-behavior~=entries_target]'))
+
+feedbin.applyUserTitles()
+
+$('[data-behavior~=show_tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {feed: @feed || nil, tags: @tags, tag: @tag || nil} %>');
+
+<% if @type && @type == 'tag' %>
+  $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_tag", locals: {tag: @tag} %>');
+<% else %>
+  $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/unsubscribe", locals: {feed: @feed || nil} %>');
+<% end %>
+
+$('[data-behavior~=mark_all_as_read]').replaceWith('<%= j render partial: "shared/buttons/mark_all_as_read", locals: {type: @type, data: @data} %>');
+
+feedbin.updatePager('<%= j will_paginate(@page_query) %>');
+
+feedbin.data.viewMode = "<%= j session[:view_mode] %>";
+
+feedbin.preloadEntries(<%= @entries.map{ |entry| entry.id }.to_json.html_safe %>);

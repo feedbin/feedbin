@@ -1,0 +1,9 @@
+<%= content_tag :li, class: selected(collection[:id]), data: collection[:parent_data] do %>
+  <%= link_to collection[:path], remote: true, class: 'feed-link', data: collection[:data] do %>
+    <span class="favicon-wrap">
+      <span class="favicon <%= collection[:favicon_class] %>"></span>
+    </span>
+    <%= content_tag :span, collection[:count], class: 'count' + hide_count(collection[:count]) %>
+    <%= collection[:title] %>
+  <% end %>
+<% end %>

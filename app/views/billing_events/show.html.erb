@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%= stylesheet_link_tag "application", media: 'all' %>
+    <style type="text/css" media="screen">
+    body {
+      margin: 20px;
+    }
+    </style>
+  </head>
+  <body>
+    <h2>Receipt</h2>
+    
+    <p>Account: <%= @user.email %></p>
+    
+    <table class="table table-bordered">
+      <tr>
+        <th>Date</th>
+        <th>Amount</th>
+      </tr>
+      <tr>
+        <td><%= Time.at(@billing_event.details.data.object.date).to_s(:date) %></td>
+        <td><%= @billing_event.details.data.object.currency.upcase %> <%= number_to_currency(@billing_event.details.data.object.total.to_f / 100) %></td>
+      </tr>
+    </table>
+    
+    <p>
+      Feedbin, LLC
+    </p>
+    
+  </body>
+</html>
+

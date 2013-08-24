@@ -1,0 +1,3 @@
+feedbin.updateFeeds('<%= j render partial: 'feeds/feeds', locals: {collections: @collections, tags: @tags, feeds: @feeds} %>');
+$('#feed_tag_list').autocomplete('close');
+feedbin.hideTagsForm();
