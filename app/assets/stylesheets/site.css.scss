@@ -1197,7 +1197,8 @@ li.selected {
 				padding: 3px 5px;
 				box-sizing: border-box;
 			}
-			a:hover {
+			a:hover,
+			&.selected a {
 				background-color: $list-background;
 			}
 			&:first-child a {
@@ -1228,7 +1229,8 @@ li.selected {
 			border-left: 6px solid rgba(0, 0, 0, 0);
 			content: '';
 		}
-		li:first-child:hover:after {
+		li:first-child:hover:after,
+		li.selected:first-child:after {
 			border-bottom-color: $list-background;
 		}
 	}

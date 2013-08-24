@@ -159,6 +159,9 @@ $.extend feedbin,
   refresh: ->
     if feedbin.data != null
       $.get(feedbin.data.autoUpdatePath)
+
+  shareOpen: ->
+    $('.dropdown-wrap').hasClass('open')
       
   hideQueue: []
 
@@ -338,10 +341,12 @@ $.extend feedbin,
     dropdown: ->
       $(document).on 'click', (event) ->
         dropdown = $('.dropdown-wrap')
-        if dropdown.hasClass('open')
+        if feedbin.shareOpen()
           dropdown.removeClass('open')
 
       $(document).on 'click', '[data-behavior~=toggle_share_menu]', (event) ->
+        $(".dropdown-wrap li").removeClass('selected')
+        $(".dropdown-wrap li:first-child").addClass('selected')
         parent = $(@).closest('.dropdown-wrap')
         if parent.hasClass('open')
           parent.removeClass('open')

@@ -34,6 +34,28 @@ class feedbin.Keyboard
 
   bindKeys: ->
     Mousetrap.bind ['up', 'down', 'left', 'right', 'j', 'k', 'h', 'l'], (event, combo) =>
+      
+      # If share menu is showing intercept up down
+      dropdown = $('.dropdown-wrap')
+      if feedbin.shareOpen()
+        nextShare = false
+        selectedShare = $('li.selected', dropdown)
+        if 'down' == combo
+          nextShare = selectedShare.next()
+          if nextShare.length == 0
+            nextShare = $('li:first-child', dropdown)
+        else if 'up' == combo
+          nextShare = selectedShare.prev()
+          if nextShare.length == 0
+            nextShare = $('li:last-child', dropdown)
+        
+        if nextShare
+          $('li.selected', dropdown).removeClass('selected')
+          nextShare.addClass('selected')
+
+        event.preventDefault()
+        return false
+
       @setEnvironment()
       
       if 'down' == combo || 'j' == combo
@@ -150,13 +172,32 @@ class feedbin.Keyboard
     # refresh
     Mousetrap.bind 'r', (event, combo) =>
       feedbin.refresh()
+      event.preventDefault()
+      
+    # share menu
+    Mousetrap.bind 'f', (event, combo) =>
+      shareButton = $("[data-behavior~=toggle_share_menu]")
+      if shareButton.length > 0
+        shareButton.click()
+        event.preventDefault()
+
+    Mousetrap.bind 'enter', (event, combo) =>
+      if feedbin.shareOpen()
+        dropdown = $('.dropdown-wrap')
+        $('li.selected a', dropdown)[0].click()
+        event.preventDefault()
       
     # Unfocus field, 
     Mousetrap.bindGlobal 'escape', (event, combo) =>
       if feedbin.modalShowing == true
         $('.modal').modal('hide')
+        event.preventDefault()
       if $('[name="subscription[feeds][feed_url]"]').is(':focus')
         $('[name="subscription[feeds][feed_url]"]').blur()
+        event.preventDefault()
+      if feedbin.shareOpen()
+        dropdown = $('.dropdown-wrap')
+        dropdown.removeClass('open')
         event.preventDefault()
 
   setEnvironment: ->
