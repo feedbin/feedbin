@@ -135,6 +135,10 @@ Make sure to follow post install instructions.
 
     rake db:setup
 		
+**Start scheduled tasks and background workers**
+
+    bundle exec foreman start
+		
 **[pow](http://pow.cx)**
   
     curl get.pow.cx | sh
