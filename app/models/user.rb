@@ -25,19 +25,24 @@ class User < ActiveRecord::Base
   
   before_save :update_billing, unless: -> user { user.admin || !ENV['STRIPE_API_KEY'] }
   before_destroy :cancel_billing, unless: -> user { user.admin }
+  before_save :strip_email
   before_save { reset_auth_token }
   before_create { generate_token(:starred_token) }
   before_create { generate_token(:inbound_email_token) }
 
   validates_presence_of :password, on: :create
   validates_presence_of :email
-  validates_uniqueness_of :email
+  validates_uniqueness_of :email, case_sensitive: false
   validate :changed_password, on: :update, unless: -> user { user.password_reset }
   validate :coupon_code_valid, on: :create, if: -> user { user.coupon_code }
   validate :plan_type_valid
   
   def to_param
     email
+  end
+  
+  def strip_email
+    self.email.strip!
   end
   
   def feed_tags

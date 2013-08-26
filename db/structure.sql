@@ -962,17 +962,17 @@ CREATE UNIQUE INDEX index_users_on_customer_id ON users USING btree (customer_id
 
 
 --
--- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_users_on_email ON users USING btree (email);
-
-
---
 -- Name: index_users_on_inbound_email_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE UNIQUE INDEX index_users_on_inbound_email_token ON users USING btree (inbound_email_token);
+
+
+--
+-- Name: index_users_on_lower_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_users_on_lower_email ON users USING btree (lower((email)::text));
 
 
 --
@@ -1157,3 +1157,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130731234248');
 INSERT INTO schema_migrations (version) VALUES ('20130801194304');
 
 INSERT INTO schema_migrations (version) VALUES ('20130820123435');
+
+INSERT INTO schema_migrations (version) VALUES ('20130826053351');
