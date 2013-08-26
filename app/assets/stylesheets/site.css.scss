@@ -762,13 +762,13 @@ Structure
 				top: 8px;
 			}
 			.toggle-drawer {
-				position: absolute;
-				right: 45px;
-				top: 7px;
 				padding: 0;
 				margin: 0;
 			}
 			.toggle-drawer-button {
+				position: absolute;
+				right: 45px;
+				top: 0;
 				font-weight: bold;
 				color: #666666;
 				font-size: 11px;
@@ -776,8 +776,9 @@ Structure
 				-webkit-appearance: none;
 				background: none;
 				border: none;
-				padding: 0;
+				padding: 7px 3px 5px 3px;
 				margin: 0;
+				display: block;
 			}
 			&.selected {
 				> a .count {
