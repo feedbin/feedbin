@@ -32,6 +32,7 @@ module Feedbin
     config.middleware.use Rack::ContentLength
     
     config.exceptions_app = self.routes
-    
+
+    config.active_record.schema_format = :sql
   end
 end
