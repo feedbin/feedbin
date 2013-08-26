@@ -8,7 +8,7 @@ class SessionsController < ApplicationController
   
   def create
     @track = true
-    user = User.where('lower(email) = ?', params[:email].try(:strip)).take
+    user = User.where('lower(email) = ?', params[:email].try(:strip).try(:downcase)).take
     if user && user.authenticate(params[:password])
       sign_in user, params[:remember_me]
       redirect_back_or root_url

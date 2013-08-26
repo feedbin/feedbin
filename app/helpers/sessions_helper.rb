@@ -20,7 +20,7 @@ module SessionsHelper
     end
     case params[:controller]
     when %r|^api/|
-      if user = authenticate_with_http_basic { |username, password| User.where('lower(email) = ?', username).take.try(:authenticate, password) }
+      if user = authenticate_with_http_basic { |username, password| User.where('lower(email) = ?', username.try(:downcase)).take.try(:authenticate, password) }
         @current_user = user
       else
         request_http_basic_authentication
