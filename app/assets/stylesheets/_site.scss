@@ -273,8 +273,6 @@ input[type="checkbox"] {
 }
 
 input[type="search"] {
-	-webkit-box-sizing: content-box;
-	-moz-box-sizing: content-box;
 	box-sizing: content-box;
 	-webkit-appearance: textfield;
 }
@@ -741,7 +739,7 @@ Structure
 				white-space: nowrap;
 				width: 100%;
 				padding: 7px 40px 6px 35px;
-				@include box-sizing(border-box);
+				box-sizing: border-box;
 				display: block;
 				line-height: 1;
 				&:hover {
@@ -1106,7 +1104,7 @@ li.selected > a .favicon-wrap {
 	width: 200px;
 	height: 36px;
 	z-index: 1;
-	@include background-image(linear-gradient(left, rgba(#FFFFFF, 0) 0%, rgba(#FFFFFF, 1) 10%, rgba(#FFFFFF, 1) 100%));
+	background-image: linear-gradient(to right, rgba(#fff, 0) 0%, #fff 10%);
 	form {
 		margin: 0;
 	}
@@ -1477,16 +1475,13 @@ Settings
 	.split-bg {
 		height: 100%;
 		width: 100;
-		@include background-image(linear-gradient(left, #efefef 0%, #efefef 50%, #FFF 50%, #FFF 100%));
+		background-image: linear-gradient(to right, #efefef 50%, #fff 50%);
 	}
 	.split-bg-inner {
 		width: 960px;
 		height: 100%;
 		margin: 0 auto;
-		@include background-image(
-			image-url("border.png"),
-			linear-gradient(left, #efefef 0px, #efefef 330px, #FFF 330px)
-		);
+		background-image: image-url("border.png"), linear-gradient(to right, #efefef 330px, #fff 330px);
 		background-position: 330px 0, top left;
 		background-repeat: repeat-y, no-repeat;
 	}
@@ -1845,9 +1840,6 @@ Buttons
 
 .modal.fade {
 	top: -25%;
-	-webkit-transition: opacity 0.3s linear, top 0.3s ease-out;
-	-moz-transition: opacity 0.3s linear, top 0.3s ease-out;
-	-o-transition: opacity 0.3s linear, top 0.3s ease-out;
 	transition: opacity 0.3s linear, top 0.3s ease-out;
 }
 
@@ -2226,10 +2218,7 @@ input:focus:invalid, textarea:focus:invalid, select:focus:invalid {
 
 .fade {
   opacity: 0;
-  -webkit-transition: opacity 0.15s linear;
-     -moz-transition: opacity 0.15s linear;
-       -o-transition: opacity 0.15s linear;
-          transition: opacity 0.15s linear;
+  transition: opacity 0.15s linear;
 }
 
 .fade.in {
@@ -2320,7 +2309,7 @@ Mobile
 		top: 0;
 	}
 	.sliding-panel {
-		-webkit-transform: translate3d(0,0,0);
+		transform: translate3d(0,0,0);
 	}
 	.button-panel-feeds {
 		top: 0;

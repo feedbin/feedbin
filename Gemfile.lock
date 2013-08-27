@@ -92,13 +92,12 @@ GEM
     aggregate (0.2.2)
     arel (4.0.0)
     atomic (1.1.13)
+    autoprefixer-rails (0.7.20130824)
+      execjs
     bcrypt-ruby (3.0.1)
     better_errors (0.9.0)
       coderay (>= 1.0.0)
       erubis (>= 2.6.6)
-    bourbon (3.1.8)
-      sass (>= 3.2.0)
-      thor
     builder (3.1.4)
     bust_rails_etags (0.0.5)
     capistrano (2.15.5)
@@ -314,9 +313,9 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import!
   addressable
+  autoprefixer-rails (~> 0.7)
   bcrypt-ruby (~> 3.0.0)
   better_errors
-  bourbon
   bust_rails_etags
   capistrano-unicorn!
   carrierwave
