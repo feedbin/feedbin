@@ -6,9 +6,6 @@
   <link rel="apple-touch-icon-precomposed" href="<%= asset_path('apple-touch-icon-precomposed.png') %>" />
   <link rel="apple-touch-startup-image" href="<%= asset_path('apple-touch-startup-image-iphone.png') %>" sizes="640x920" />
   <link rel="apple-touch-startup-image" href="<%= asset_path('apple-touch-startup-image-iphone-large.png') %>" sizes="640x1096" />
-  <% if defined?(FeedbinHomepage) && @home_page %>
-    <%= stylesheet_link_tag "feedbin_homepage/application.css" %>
-  <% end %>
   <%= stylesheet_link_tag "application"  %>
   <%= javascript_include_tag "https://js.stripe.com/v1/", "application" %>
   <%= csrf_meta_tags %>

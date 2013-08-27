@@ -61,14 +61,6 @@ GIT
     capistrano-unicorn (0.1.9)
       capistrano
 
-GIT
-  remote: https://31428c0a277250173ffb8d676e1e9ea8fcbb5c6d:x-oauth-basic@github.com/feedbin/feedbin-homepage.git
-  revision: abf99d5a739ecf041f7ba30c4fef54a520060a14
-  branch: master
-  specs:
-    feedbin_homepage (0.0.1)
-      rails (~> 4.0.0)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -332,7 +324,6 @@ DEPENDENCIES
   clockwork
   coffee-rails (~> 4.0.0)
   dalli
-  feedbin_homepage!
   feedzirra!
   fog
   foreman

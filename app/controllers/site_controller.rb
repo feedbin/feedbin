@@ -24,13 +24,8 @@ class SiteController < ApplicationController
   end
   
   def home
-    if defined?(FeedbinHomepage)
-      @track = true
-      @home_page = true
-      render template: "feedbin_homepage/application/index", layout: 'wrap'
-    else
-      render action: 'not_logged_in'
-    end
+    @track = true
+    render action: 'not_logged_in', layout: 'wrap'
   end
   
   def privacy_policy

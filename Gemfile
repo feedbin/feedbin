@@ -3,10 +3,6 @@ ruby '2.0.0'
 
 gem 'rails', '~>4.0.0'
 
-if ENV['FEEDBIN_HOMEPAGE_REPO']
-  gem 'feedbin_homepage', git: ENV['FEEDBIN_HOMEPAGE_REPO'], branch: 'master'
-end
-
 group :development do
   gem 'better_errors'
   gem 'quiet_assets'
