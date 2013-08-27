@@ -63,7 +63,7 @@ GIT
 
 GIT
   remote: https://31428c0a277250173ffb8d676e1e9ea8fcbb5c6d:x-oauth-basic@github.com/feedbin/feedbin-homepage.git
-  revision: 575c3218e4da837e4414e28f16c74a3706408f54
+  revision: abf99d5a739ecf041f7ba30c4fef54a520060a14
   branch: master
   specs:
     feedbin_homepage (0.0.1)
