@@ -981,6 +981,14 @@ li.selected > a .favicon-wrap {
 					color: #999;
 				}
 			}
+			&.selected {
+				border-color: $selected;
+				border-top: 1px solid $selected;
+				margin-top: -1px;
+				.icon-star-filled {
+					color: #FFF;
+				}
+			}
 		}
 	}
 }
@@ -996,12 +1004,6 @@ li.selected > a .favicon-wrap {
 		font-size: 11px;
 		color: #666;
 		display: none;
-	}
-}
-
-li.selected {
-	.icon-star-filled {
-		color: #FFF;
 	}
 }
 
