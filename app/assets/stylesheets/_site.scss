@@ -289,7 +289,7 @@ textarea {
 	vertical-align: top;
 }
 
-textarea, 
+textarea,
 input[type="text"],
 input[type="password"],
 input[type="datetime"],
@@ -527,8 +527,6 @@ table th[class^="col-"] {
 	border-color: #f8e5be;
 }
 
-
-
 /*------------------------------------------------------------------------------
 Structure
 ------------------------------------------------------------------------------*/
@@ -604,7 +602,7 @@ Structure
 	height: auto;
 	bottom: 0;
 	top: 49px;
-	right: 0;	
+	right: 0;
 	left: 0;
 }
 
@@ -636,8 +634,8 @@ Structure
 	.feeds-column {
 		position: relative;
 		height: auto !important;
-		width: 250px;	
-		@include respond-to(ipad) { 
+		width: 250px;
+		@include respond-to(ipad) {
 			width: 200px;
 		}
 	}
@@ -645,7 +643,7 @@ Structure
 		position: relative;
 		height: auto !important;
 		width: 300px;
-		@include respond-to(ipad) { 
+		@include respond-to(ipad) {
 			width: 270px;
 		}
 	}
@@ -712,7 +710,6 @@ Structure
 		text-align: center;
 		vertical-align: middle;
 	}
-	
 }
 
 .feeds {
@@ -1119,7 +1116,7 @@ li.selected > a .favicon-wrap {
 		z-index: 2;
 		-webkit-appearance: none;
 		border: none;
-		background: none;			
+		background: none;
 		width: 45px;
 		height: 37px;
 		padding: 0;
@@ -1250,16 +1247,16 @@ li.selected > a .favicon-wrap {
 	font-size: 1.15em;
 	line-height: 1.6;
 	color: #000;
-	
+
 	strong {
 		font-weight: 700;
 		font-style: normal;
 	}
-	
+
 	em {
 		font-style: italic;
 	}
-	
+
 	h1, h2, h3, h4, h5, h6 {
 		font-weight: 700;
 		font-style: normal;
@@ -1269,7 +1266,7 @@ li.selected > a .favicon-wrap {
 	h1, h2 {
 		font-size: 22px;
 	}
-	
+
 	h3, h4, h5, h6 {
 		font-size: 18px;
 	}
@@ -1279,16 +1276,16 @@ li.selected > a .favicon-wrap {
 	ol {
 		margin: 0 0 1.1em 0;
 	}
-	
+
 	blockquote {
 		margin: 0 0 1.3em 0;
 	}
-	
+
 	li {
 		line-height: 1.5;
 		margin: 0 0 .1em 0;
 	}
-		
+
 	img {
 		padding: 3px;
 		display: block;
@@ -1313,45 +1310,45 @@ li.selected > a .favicon-wrap {
 	code {
 		color: #333;
 	}
-		
+
 	pre {
 		display: block;
 		overflow-x: scroll;
 		white-space: pre;
 		word-wrap: normal;
 	}
-	
+
 	pre code {
 		background-color: transparent;
 	}
-	
+
 	tt, code, kbd, samp {
 		font-family: Consolas, Monaco, monospace;
 		overflow-x: scroll;
 	}
-	
+
 	blockquote {
 		padding: 0 0 0 15px;
 		border-left: 5px solid #CCC;
 	}
-	
+
 	blockquote,
 	blockquote p {
 		color: #666;
-	}	
+	}
 
 	blockquote p:last-child {
 		margin-bottom: 0;
-	}	
-	
+	}
+
 	iframe {
 		background-color: #000;
 	}
-	
+
 	iframe[src*='w.soundcloud.com'] {
 		background-color: transparent;
 	}
-	
+
 	a[title*='Permanent'] {
 		text-decoration: none;
 	}
@@ -1540,7 +1537,6 @@ table.small td {
 	input.span2 {
 		width: 140px;
 	}
-	
 }
 .feed-form {
 	td {
@@ -1587,10 +1583,10 @@ Buttons
 }
 
 .button::-moz-focus-inner {
-	border: 0; 
-	padding: 0; 
-	margin-top:-3px; 
-	margin-bottom: -3px; 
+	border: 0;
+	padding: 0;
+	margin-top:-3px;
+	margin-bottom: -3px;
 }
 
 .button-white {
@@ -1637,9 +1633,9 @@ Buttons
 		font-size: 16px;
 		height: 16px;
 		width: 16px;
-		
+
 	}
-	&:hover [class^="icon-"], 
+	&:hover [class^="icon-"],
 	&:hover [class*=" icon-"],
 	&.selected [class^="icon-"],
 	&.selected [class*=" icon-"] {
@@ -1845,7 +1841,6 @@ Buttons
 		right: 10px;
 		top: 10px;
 	}
-	
 }
 
 .modal.fade {
