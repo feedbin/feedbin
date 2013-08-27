@@ -1,13 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 16.0.4, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="14px" height="25px" viewBox="0 0 14 25" enable-background="new 0 0 14 25" xml:space="preserve">
-<g id="flash_1_">
-	<g id="flash">
-		<path fill="#7eaabc" d="M5.316,14.355C5.395,14.092,5.234,14,4.959,14H0.273c-0.275,0-0.355-0.297-0.18-0.508L10.102,0.199
-			c0.176-0.212,0.24-0.205,0.141,0.051L8.049,9.549C7.949,9.806,8.094,10,8.369,10h4.686c0.275,0,0.363,0.178,0.195,0.396
-			L3.238,23.901c-0.166,0.217-0.243,0.246-0.162-0.021L5.316,14.355z"/>
-	</g>
-</g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="14" height="25"><path fill="#7eaabc" d="M5.316 14.355c.079-.263-.082-.355-.357-.355h-4.686c-.275 0-.355-.297-.18-.508l10.009-13.293c.176-.212.24-.205.141.051l-2.194 9.299c-.1.257.045.451.32.451h4.686c.275 0 .363.178.195.396l-10.012 13.505c-.166.217-.243.246-.162-.021l2.24-9.525z"/></svg>
