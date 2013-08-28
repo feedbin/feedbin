@@ -1,5 +1,5 @@
 class EntriesController < ApplicationController
-  
+
   def index
     @user = current_user
     update_selected_feed!("collection_all")
@@ -10,23 +10,23 @@ class EntriesController < ApplicationController
     else
       @entries = @entries.order("published DESC")
     end
-    
+
     @entries = update_with_state(@entries)
     @page_query = @entries
-    
+
     @append = !params[:page].nil?
-    
+
     @type = 'all'
     @data = nil
-    
+
     respond_to do |format|
       format.js { render partial: 'shared/entries' }
     end
   end
-  
+
   def unread
     @user = current_user
-    update_selected_feed!("collection_unread")
+    update_selected_feed!('collection_unread')
 
     unread_entries = @user.unread_entries.select(:entry_id).page(params[:page])
     if @user.entry_sort == 'ASC'
@@ -35,26 +35,21 @@ class EntriesController < ApplicationController
       unread_entries = unread_entries.order("published DESC")
     end
 
-    @entries = Entry.where(id: unread_entries.map {|unread_entry| unread_entry.entry_id }).includes(:feed)
-    if @user.entry_sort == 'ASC'
-      @entries = @entries.order("published ASC")
-    else
-      @entries = @entries.order("published DESC")
-    end
+    @entries = Entry.entries_with_feed(unread_entries,@user.entry_sort)
 
     @entries = update_with_state(@entries)
     @page_query = unread_entries
-    
-    @append = !params[:page].nil?
-    
+
+    @append = params[:page].present?
+
     @type = 'unread'
     @data = nil
-    
+
     respond_to do |format|
       format.js { render partial: 'shared/entries' }
     end
   end
-  
+
   def starred
     @user = current_user
     update_selected_feed!("collection_starred")
@@ -66,21 +61,16 @@ class EntriesController < ApplicationController
       starred_entries = starred_entries.order("published DESC")
     end
 
-    @entries = Entry.where(id: starred_entries.map {|starred_entry| starred_entry.entry_id }).includes(:feed)
-    if @user.entry_sort == 'ASC'
-      @entries = @entries.order("published ASC")
-    else
-      @entries = @entries.order("published DESC")
-    end
+    @entries = Entry.entries_with_feed(starred_entries,@user.entry_sort)
 
     @entries = update_with_state(@entries)
     @page_query = starred_entries
 
-    @append = !params[:page].nil?
-    
+    @append = params[:page].present?
+
     @type = 'starred'
     @data = nil
-        
+
     respond_to do |format|
       format.js { render partial: 'shared/entries' }
     end
@@ -101,7 +91,7 @@ class EntriesController < ApplicationController
         @entry.content = @content
       end
     end
-    
+
     @decrement = UnreadEntry.where(user_id: @user.id, entry_id: @entry.id).delete_all > 0 ? true : false
 
     @read = true
@@ -114,9 +104,9 @@ class EntriesController < ApplicationController
       format.js
     end
   end
-  
+
   def content
-    @user = current_user    
+    @user = current_user
     @entry = Entry.find params[:id]
 
     if 'true' == params[:content_view]
@@ -124,19 +114,19 @@ class EntriesController < ApplicationController
     else
       @content_view = false
     end
-    
+
     if @user.sticky_view_inline == '1'
       subscription = Subscription.where(user: @user, feed_id: @entry.feed_id).first
       if subscription.present?
         subscription.update_attributes(view_inline: @content_view)
       end
     end
-    
+
     view_inline
     @content = ContentFormatter.format!(@content, @entry)
-    
+
   end
-  
+
   def mark_all_as_read
     @user = current_user
 
@@ -151,26 +141,26 @@ class EntriesController < ApplicationController
     elsif  %w{unread all}.include?(params[:type])
       UnreadEntry.where(user_id: @user.id).delete_all
     end
-    
+
     @mark_selected = true
     get_feeds_list
-    
+
     respond_to do |format|
-      format.js 
+      format.js
     end
   end
-  
+
   def preload
     @user = current_user
     ids = params[:ids].split(',').map {|i| i.to_i }
     @entries = Entry.where(id: ids).includes(:feed)
     @entries = update_with_state(@entries)
-    
+
     # View inline setting
     view_inline_settings = {}
     subscriptions = Subscription.where(user: @user).pluck(:feed_id, :view_inline)
     subscriptions.each { |feed_id, setting| view_inline_settings[feed_id] = setting }
-    
+
     tags = {}
     taggings = @user.taggings.pluck(:feed_id, :tag_id)
     taggings.each do |feed_id, tag_id|
@@ -180,12 +170,12 @@ class EntriesController < ApplicationController
         tags[feed_id] = [tag_id]
       end
     end
-    
+
     result = {}
     @entries.each do |entry|
       readability = (@user.sticky_view_inline == '1' && view_inline_settings[entry.feed_id] == true)
       locals = {
-        entry: entry, 
+        entry: entry,
         services: sharing_services(entry),
         read: true, # will always be marked as read when viewing
         starred: entry.starred,
@@ -199,12 +189,12 @@ class EntriesController < ApplicationController
         feed_id: entry.feed_id
       }
     end
-      
+
     respond_to do |format|
       format.json { render json: result.to_json }
     end
   end
-  
+
   def mark_as_read
     @user = current_user
     UnreadEntry.where(user: @user, entry_id: params[:id]).delete_all
@@ -212,7 +202,7 @@ class EntriesController < ApplicationController
   end
 
   private
-  
+
   def sharing_services(entry)
     @user_sharing_services ||= @user.sharing_services
     services = []
@@ -237,7 +227,7 @@ class EntriesController < ApplicationController
     end
     services
   end
-  
+
   def view_inline
     begin
       if @content_view
@@ -252,7 +242,7 @@ class EntriesController < ApplicationController
     rescue => e
       @content = '(no content)'
     end
-    
+
   end
-    
+
 end
