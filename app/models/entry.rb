@@ -1,18 +1,18 @@
-class Entry < ActiveRecord::Base  
-  
+class Entry < ActiveRecord::Base
+
   attr_accessor :fully_qualified_url, :read, :starred, :skip_mark_as_unread
-  
+
   belongs_to :feed
   has_many :unread_entries, dependent: :delete_all
   has_many :starred_entries
-  
+
   before_create :ensure_published
   before_create :cache_public_id, unless: -> { Rails.env.test? }
   before_create :create_summary
   after_commit :mark_as_unread, on: :create
-  
+
   validates_uniqueness_of :public_id
-    
+
   def entry=(entry)
     self.author    = entry.author
     self.content   = entry.content
@@ -25,32 +25,47 @@ class Entry < ActiveRecord::Base
 
     self.public_id     = entry._public_id_
     self.old_public_id = entry._old_public_id_
-  end  
-  
-  def self.include_unread_entries(user_id)
-    joins("LEFT OUTER JOIN unread_entries ON entries.id = unread_entries.entry_id AND unread_entries.user_id = #{user_id}")
   end
-  
-  def self.unread_new
-    where("unread_entries.entry_id IS NOT NULL")
+
+  class << self
+
+
+    def entries_with_feed(array,sort)
+        ids = unread_entries.map(&:entry_id)
+        @entries = Entry.where(id: ids ).includes(:feed)
+        if sort == 'ASC'
+            @entries = @entries.order('published ASC')
+        else
+            @entries = @entries.order('published DESC')
+        end
+        return @entries
+    end
+
+    def include_unread_entries(user_id)
+      joins("LEFT OUTER JOIN unread_entries ON entries.id = unread_entries.entry_id AND unread_entries.user_id = #{user_id.to_i}")
+    end
+
+    def unread_new
+      where('unread_entries.entry_id IS NOT NULL')
+    end
+
+    def read_new
+      where('unread_entries.entry_id IS NULL')
+    end
+
+    def include_starred_entries(user_id)
+      joins("LEFT OUTER JOIN starred_entries ON entries.id = starred_entries.entry_id AND starred_entries.user_id = #{user_id.to_i}")
+    end
+
+    def starred_new
+      where("starred_entries.entry_id IS NOT NULL")
+    end
+
+    def unstarred_new
+      where("starred_entries.entry_id IS NULL")
+    end
   end
-  
-  def self.read_new
-    where("unread_entries.entry_id IS NULL")
-  end
-  
-  def self.include_starred_entries(user_id)
-    joins("LEFT OUTER JOIN starred_entries ON entries.id = starred_entries.entry_id AND starred_entries.user_id = #{user_id}")
-  end
-  
-  def self.starred_new
-    where("starred_entries.entry_id IS NOT NULL")
-  end
-  
-  def self.unstarred_new
-    where("starred_entries.entry_id IS NULL")
-  end
-    
+
   def cache_key
     additions = []
     if defined?(read) && read
@@ -61,7 +76,7 @@ class Entry < ActiveRecord::Base
     end
     super + additions.join('')
   end
-  
+
   def fully_qualified_url
     entry_url = self.url
     if entry_url
@@ -82,17 +97,17 @@ class Entry < ActiveRecord::Base
   end
 
   private
-  
+
   def ensure_published
     if self[:published].nil?
       self[:published] = DateTime.now
     end
   end
-  
+
   def cache_public_id
     Sidekiq.redis { |client| client.hset("entry:public_ids:#{self.public_id[0..4]}", self.public_id, 1) }
   end
-  
+
   def mark_as_unread
     unless skip_mark_as_unread
       unread_entries = []
@@ -103,9 +118,9 @@ class Entry < ActiveRecord::Base
       UnreadEntry.import(unread_entries, validate: false)
     end
   end
-  
+
   def create_summary
     self.summary = ContentFormatter.summary(self.content)
   end
-  
+
 end
