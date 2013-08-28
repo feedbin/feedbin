@@ -27,28 +27,43 @@ class Entry < ActiveRecord::Base
     self.old_public_id = entry._old_public_id_
   end
 
-  def self.include_unread_entries(user_id)
-    joins("LEFT OUTER JOIN unread_entries ON entries.id = unread_entries.entry_id AND unread_entries.user_id = #{user_id.to_i}")
-  end
+  class << self
 
-  def self.unread_new
-    where('unread_entries.entry_id IS NOT NULL')
-  end
 
-  def self.read_new
-    where('unread_entries.entry_id IS NULL')
-  end
+    def entries_with_feed(array,sort)
+        ids = unread_entries.map(&:entry_id)
+        @entries = Entry.where(id: ids ).includes(:feed)
+        if sort == 'ASC'
+            @entries = @entries.order('published ASC')
+        else
+            @entries = @entries.order('published DESC')
+        end
+        return @entries
+    end
 
-  def self.include_starred_entries(user_id)
-    joins("LEFT OUTER JOIN starred_entries ON entries.id = starred_entries.entry_id AND starred_entries.user_id = #{user_id.to_i}")
-  end
+    def include_unread_entries(user_id)
+      joins("LEFT OUTER JOIN unread_entries ON entries.id = unread_entries.entry_id AND unread_entries.user_id = #{user_id.to_i}")
+    end
 
-  def self.starred_new
-    where("starred_entries.entry_id IS NOT NULL")
-  end
+    def unread_new
+      where('unread_entries.entry_id IS NOT NULL')
+    end
 
-  def self.unstarred_new
-    where("starred_entries.entry_id IS NULL")
+    def read_new
+      where('unread_entries.entry_id IS NULL')
+    end
+
+    def include_starred_entries(user_id)
+      joins("LEFT OUTER JOIN starred_entries ON entries.id = starred_entries.entry_id AND starred_entries.user_id = #{user_id.to_i}")
+    end
+
+    def starred_new
+      where("starred_entries.entry_id IS NOT NULL")
+    end
+
+    def unstarred_new
+      where("starred_entries.entry_id IS NULL")
+    end
   end
 
   def cache_key

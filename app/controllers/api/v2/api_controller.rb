@@ -1,15 +1,15 @@
 module Api
   module V2
-    
+
     class ApiController < ApplicationController
-      
+
       skip_before_action :verify_authenticity_token
-      
+
       def entries_response(path_helper)
-                
+
         if params.has_key?(:read)
           @entries = @entries.include_unread_entries(@user.id)
-          
+
           if 'true' == params[:read]
             @entries = @entries.read_new
           elsif 'false' == params[:read]
@@ -21,26 +21,26 @@ module Api
           @entries = @entries.include_starred_entries(@user.id)
           @entries = @entries.unstarred_new
         end
-        
+
         if params.has_key?(:since)
           time = Time.iso8601(params[:since])
           @entries = @entries.where("entries.created_at > :time", {time: time})
         end
-        
+
         if @starred_entries
           page_query = @starred_entries
         else
           page_query = @entries
         end
-        
+
         if page_query.out_of_bounds?
           status_not_found
         elsif !@entries.present?
           @entries = []
         else
-          @entries.map { |entry| 
-            entry.content = ContentFormatter.api_format(entry.content, entry) 
-            entry 
+          @entries.map { |entry|
+            entry.content = ContentFormatter.api_format(entry.content, entry)
+            entry
           }
           links_header(page_query, path_helper, params[:feed_id])
           fresh_when(etag: @entries, last_modified: @entries.maximum(:created_at))
@@ -54,44 +54,44 @@ module Api
         end
         render partial: 'api/v2/shared/api_error', status: 400
         Honeybadger.notify(exception)
-      end      
+      end
 
       rescue_from ActiveRecord::RecordNotFound do |exception|
         @error = {status: 404, message: 'Not Found', errors: []}
         render partial: 'api/v2/shared/api_error', status: 404
         Honeybadger.notify(exception)
-      end      
-      
+      end
+
       rescue_from MultiJson::DecodeError do |exception|
         @error = {status: 400, message: 'Problem parsing JSON', errors: []}
         render partial: 'api/v2/shared/api_error', status: 400
         Honeybadger.notify(exception)
-      end      
+      end
 
-      private 
-      
+      private
+
       def status_not_found
         @error = {status: 404, errors: []}
         render partial: 'api/v2/shared/api_error', status: :not_found
       end
-      
+
       def status_forbidden
         @error = {status: 403, errors: []}
         render partial: 'api/v2/shared/api_error', status: :forbidden
       end
-      
+
       def status_bad_request(errors = [])
         @error = {status: 400, errors: errors}
         render partial: 'api/v2/shared/api_error', status: :bad_request
       end
-      
+
       def validate_content_type
         unless request.content_type == 'application/json'
           @error = {status: 415, message: 'Please use the "Content-Type: application/json; charset=utf-8" header', errors: []}
           render partial: 'api/v2/shared/api_error', status: 415
         end
       end
-            
+
       def needs(*keys)
         missing = keys.reject { |key| params.has_key? key }
         if missing.any?
@@ -100,7 +100,7 @@ module Api
           render partial: 'api/v2/shared/api_error', status: 400 and return
         end
       end
-      
+
       def links_header(collection, url_helper, resource = nil)
         links = []
         link_template = '<%s>; rel="%s"'
@@ -111,7 +111,7 @@ module Api
         options[:starred]  = params[:starred] if params[:starred]
         options[:ids]      = params[:ids] if params[:ids]
         options[:per_page] = params[:per_page] if params[:per_page]
-        
+
 
         if collection.total_pages > 1
           unless collection.previous_page.nil?
@@ -127,7 +127,7 @@ module Api
           headers['Links'] = links.join(', ')
         end
       end
-      
+
     end
   end
 end

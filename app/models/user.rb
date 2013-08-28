@@ -65,7 +65,7 @@ class User < ActiveRecord::Base
       valid_plans = Plan.where(price_tier: plan.price_tier).where.not(stripe_id: 'free').pluck(:id)
     end
     unless valid_plans.include?(plan.id)
-      errors.add(:plan_id, "is invalid")
+      errors.add(:plan_id, 'is invalid')
     end
   end
 
