@@ -276,15 +276,16 @@ $.extend feedbin,
           event.stopPropagation()
     
     resize: () ->
-      if !(navigator.userAgent.toLowerCase().indexOf('firefox') > -1)
-        $('.feeds-column, .entries-column').resizable
-          handles: "e"
-          minWidth: 200
-          stop: (event, ui) ->
-            form = $('[data-behavior~=resizable_form]')
-            $('[name=column]', form).val($(ui.element).data('resizable-name'))
-            $('[name=width]', form).val(ui.size.width)
-            form.submit()
+      defaults = 
+        handles: "e"
+        minWidth: 200
+        stop: (event, ui) ->
+          form = $('[data-behavior~=resizable_form]')
+          $('[name=column]', form).val($(ui.element).parents('td').data('resizable-name'))
+          $('[name=width]', form).val(ui.size.width)
+          form.submit()
+      $('.entries-wrap').resizable($.extend(defaults, {alsoResize: $('.entries-column')}))
+      $('.feeds-wrap').resizable($.extend(defaults, {alsoResize: $('.feeds-column')}))
 
     processHideQueue: ->
       $(document).on 'click', '[data-behavior~=show_entries]', ->
