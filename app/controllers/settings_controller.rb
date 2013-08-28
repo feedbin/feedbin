@@ -1,25 +1,25 @@
 class SettingsController < ApplicationController
 
   before_action :plan_exists, only: [:update_plan]
-  
+
   def help; end
-  
+
   def settings
     @user = current_user
   end
-  
+
   def sharing
     @user = current_user
   end
-  
+
   def account
     @user = current_user
   end
-  
+
   def feeds
     @user = current_user
     @subscriptions = @user.subscriptions.select('subscriptions.*, feeds.title AS original_title, feeds.feed_url, feeds.site_url').joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}")
-    @subscriptions = @subscriptions.map {|subscription| 
+    @subscriptions = @subscriptions.map {|subscription|
       if subscription.title
         subscription.title = subscription.title
       elsif subscription.original_title
@@ -31,7 +31,7 @@ class SettingsController < ApplicationController
     }
     @subscriptions = @subscriptions.sort_by {|subscription| subscription.title.downcase}
   end
-  
+
   def billing
     @user = current_user
     @billing_events = @user.billing_events.where(event_type: 'invoice.payment_succeeded')
@@ -55,7 +55,7 @@ class SettingsController < ApplicationController
   def import_export
     @uploader = Import.new.upload
     @uploader.success_action_redirect = settings_import_export_url
-    
+
     if params[:key]
       @user = current_user
       @import = Import.new(key: params[:key], user: @user)
@@ -74,7 +74,7 @@ class SettingsController < ApplicationController
     session[:favicon_complete] = true
     render nothing: true
   end
-  
+
   def update_plan
     plan = Plan.find(params[:plan])
     @user = current_user
@@ -84,13 +84,13 @@ class SettingsController < ApplicationController
     customer.update_subscription(plan: plan.stripe_id)
     redirect_to settings_billing_path
   end
-  
+
   def update_credit_card
     @user = current_user
     @user.stripe_token = params[:stripe_token]
     @user.suspended = false
     @user.free_ok = (@user.plan.stripe_id == 'free')
-    
+
     respond_to do |format|
       if @user.save
         format.html { redirect_to settings_billing_url, notice: 'Your credit card has been updated.' }
@@ -99,7 +99,7 @@ class SettingsController < ApplicationController
       end
     end
   end
-  
+
   def settings_update
     @user = current_user
     @user.attributes = user_settings_params
@@ -121,20 +121,20 @@ class SettingsController < ApplicationController
         session[:tag_visibility][tag_id] = false
       end
     end
-    
+
     if params[:column_widths]
       session[:column_widths] ||= {}
       session[:column_widths][params[:column]] = params[:width]
     end
     render nothing: true
   end
-  
+
   private
-  
+
   def plan_exists
-    render_404 unless Plan.exists?(params[:plan])
+    render_404 unless Plan.exists?(params[:plan].to_i)
   end
-  
+
   def user_settings_params
     params.require(:user).permit(:entry_sort, :starred_feed_enabled, :hide_tagged_feeds, :precache_images, :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation)
   end
