@@ -108,6 +108,8 @@ Feedbin::Application.routes.draw do
     post :entry_width
   end
 
+  get 'manifest.webapp', to: 'site#manifest.webapp'
+
   constraints subdomain: 'api' do
     namespace :api, path: nil do
       namespace :v1 do
