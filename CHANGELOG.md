@@ -1,6 +1,7 @@
 August 2013
 -----------
 
+- 2013-08-27 Added column resize for FireFox.
 - 2013-08-26 Case insensitive login
 - 2013-08-24 Added keyboard shortcut for sharing menu (f to activate ↑ ↓ to navigate)
 - 2013-08-23 Moved feedbin-homepage to gem 
