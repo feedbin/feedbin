@@ -716,7 +716,7 @@ Structure
 	bottom: 52px;
 	left: 0;
 	right: 0;
-	overflow-y: scroll;
+	overflow-y: auto;
 	overflow-x: hidden;
 	-webkit-overflow-scrolling: touch;
 	ul {
@@ -918,7 +918,7 @@ li.selected > a .favicon-wrap {
 	bottom: 0;
 	left: 0;
 	right: 0;
-	overflow-y: scroll;
+	overflow-y: auto;
 	overflow-x: hidden;
 	-webkit-overflow-scrolling: touch;
 	ul {
@@ -1054,7 +1054,7 @@ li.selected > a .favicon-wrap {
 	left:0;
 	right:0;
 	margin: 0;
-	overflow-y: scroll;
+	overflow-y: auto;
 	overflow-x: hidden;
 	-webkit-overflow-scrolling: touch;
 }
