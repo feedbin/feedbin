@@ -108,26 +108,11 @@ class ApplicationController < ActionController::Base
   def feeds_response
     if 'view_all' == session[:view_mode]
       # Get all entries 100 at a time, then get unread info
-      @entries = Entry.where(feed_id: @feed_ids).page(params[:page]).includes(:feed)
-      if @user.entry_sort == 'ASC'
-        @entries = @entries.order("published ASC")
-      else
-        @entries = @entries.order("published DESC")
-      end
+      @entries = Entry.where(feed_id: @feed_ids).page(params[:page]).includes(:feed).sort_preference(@user.entry_sort)
     else
       # Get unread info, then get entries
-      unread_entries = @user.unread_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page])
-      if @user.entry_sort == 'ASC'
-        unread_entries = unread_entries.order("published ASC")
-      else
-        unread_entries = unread_entries.order("published DESC")
-      end
-      @entries = Entry.where(id: unread_entries.map {|unread_entry| unread_entry.entry_id }).includes(:feed)
-      if @user.entry_sort == 'ASC'
-        @entries = @entries.order("published ASC")
-      else
-        @entries = @entries.order("published DESC")
-      end
+      unread_entries = @user.unread_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).sort_preference(@user.entry_sort)
+      @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort)
     end
     
     @entries = update_with_state(@entries)

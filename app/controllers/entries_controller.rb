@@ -4,13 +4,7 @@ class EntriesController < ApplicationController
     @user = current_user
     update_selected_feed!("collection_all")
 
-    @entries = @user.entries.page(params[:page]).includes(:feed)
-    if @user.entry_sort == 'ASC'
-      @entries = @entries.order("published ASC")
-    else
-      @entries = @entries.order("published DESC")
-    end
-
+    @entries = @user.entries.page(params[:page]).includes(:feed).sort_preference(@user.entry_sort)
     @entries = update_with_state(@entries)
     @page_query = @entries
 
@@ -28,14 +22,8 @@ class EntriesController < ApplicationController
     @user = current_user
     update_selected_feed!('collection_unread')
 
-    unread_entries = @user.unread_entries.select(:entry_id).page(params[:page])
-    if @user.entry_sort == 'ASC'
-      unread_entries = unread_entries.order("published ASC")
-    else
-      unread_entries = unread_entries.order("published DESC")
-    end
-
-    @entries = Entry.entries_with_feed(unread_entries,@user.entry_sort)
+    unread_entries = @user.unread_entries.select(:entry_id).page(params[:page]).sort_preference(@user.entry_sort)
+    @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort)
 
     @entries = update_with_state(@entries)
     @page_query = unread_entries
@@ -54,14 +42,8 @@ class EntriesController < ApplicationController
     @user = current_user
     update_selected_feed!("collection_starred")
 
-    starred_entries = @user.starred_entries.select(:entry_id).page(params[:page])
-    if @user.entry_sort == 'ASC'
-      starred_entries = starred_entries.order("published ASC")
-    else
-      starred_entries = starred_entries.order("published DESC")
-    end
-
-    @entries = Entry.entries_with_feed(starred_entries,@user.entry_sort)
+    starred_entries = @user.starred_entries.select(:entry_id).page(params[:page]).sort_preference(@user.entry_sort)
+    @entries = Entry.entries_with_feed(starred_entries, @user.entry_sort)
 
     @entries = update_with_state(@entries)
     @page_query = starred_entries
