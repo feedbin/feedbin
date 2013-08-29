@@ -2363,7 +2363,7 @@ Login
 		display: none;
 	}
 	.login-wrap {
-		width: 512px;
+		max-width: 512px;
 		margin: 0 auto;
 	}
 	svg {
@@ -2377,7 +2377,9 @@ Login
 	}
 	input[type="email"],
 	input[type="password"] {
-		width: 428px;
+		width: 94%;
+		padding-left: 3%;
+		padding-right: 3%;
 	}
 	input[type="submit"] {
 		padding: 10px 25px;
