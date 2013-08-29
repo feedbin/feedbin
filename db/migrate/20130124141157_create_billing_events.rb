@@ -4,7 +4,7 @@ class CreateBillingEvents < ActiveRecord::Migration
       t.text :details
       t.string :event_type
       t.belongs_to :billable, polymorphic: true
-      
+
       t.timestamps
     end
     add_index :billing_events, :event_type

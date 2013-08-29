@@ -1,10 +1,10 @@
 class StarredEntriesController < ApplicationController
-  
+
   def update
     @user = current_user
     @entry = Entry.find(params[:id])
     starred_entry = StarredEntry.where(user: @user, entry: @entry)
-    
+
     if params[:starred] == 'true'
       @starred = true
       unless starred_entry.present?
@@ -19,5 +19,5 @@ class StarredEntriesController < ApplicationController
       format.js
     end
   end
-    
+
 end

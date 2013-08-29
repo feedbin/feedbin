@@ -8,6 +8,6 @@ class RemoveEntryIdFromEntries < ActiveRecord::Migration
     add_column :entries, :entry_id, :string
     add_index :entries, :entry_id
   end
-  
-  
+
+
 end

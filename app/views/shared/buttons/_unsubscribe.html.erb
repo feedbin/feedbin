@@ -4,7 +4,7 @@
   		<i class="icon-trash"></i>
   	</div>
   <% else %>
-  	<%= link_to subscription_path(feed.subscription_id), 
+  	<%= link_to subscription_path(feed.subscription_id),
           method: :delete, remote: true, class: 'sidebar-button button-unsubscribe', title: 'Unsubscribe',
           data: { behavior: 'unsubscribe', confirm: "Are you sure you want to unsubscribe from #{feed.title}?" } do %>
   		<i class="icon-trash"></i>
@@ -19,7 +19,7 @@
       Delete
   	</div>
   <% else %>
-  	<%= link_to subscription_path(feed.subscription_id), 
+  	<%= link_to subscription_path(feed.subscription_id),
           method: :delete, remote: true, class: 'toolbar-button', title: 'Unsubscribe',
           data: { behavior: 'unsubscribe', confirm: "Are you sure you want to unsubscribe from #{feed.title}?" } do %>
       <span class="toolbar-button-inner">
