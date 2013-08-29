@@ -23,14 +23,14 @@ module Feedbin
     config.assets.version = '1.0'
     config.assets.initialize_on_precompile = true
     config.serve_static_assets = true
-    
+
     config.action_mailer.delivery_method   = :postmark
     config.action_mailer.postmark_settings = { api_key: ENV['POSTMARK_API_KEY'] }
-    
+
     config.action_view.sanitized_allowed_tags = 'table', 'tr', 'td', 'th', 'thead', 'tbody'
-    
+
     config.middleware.use Rack::ContentLength
-    
+
     config.exceptions_app = self.routes
 
     config.active_record.schema_format = :sql

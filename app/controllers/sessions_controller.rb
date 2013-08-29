@@ -5,7 +5,7 @@ class SessionsController < ApplicationController
   def new
     @track = true
   end
-  
+
   def create
     @track = true
     user = User.where('lower(email) = ?', params[:email].try(:strip).try(:downcase)).take
@@ -21,5 +21,5 @@ class SessionsController < ApplicationController
   def destroy
     sign_out
     redirect_to root_url
-  end  
+  end
 end

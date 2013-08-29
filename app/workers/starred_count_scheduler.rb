@@ -6,7 +6,7 @@ class StarredCountScheduler
     StarredEntry.select(:id, :entry_id).find_in_batches(batch_size: 10_000) do |entries|
       Sidekiq::Client.push_bulk(
         'args'  => entries.map{ |entry| [entry.entry_id] },
-        'class' => 'StarredCount', 
+        'class' => 'StarredCount',
         'queue' => 'worker_slow',
         'retry' => false
       )

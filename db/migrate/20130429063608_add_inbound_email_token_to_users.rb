@@ -8,7 +8,7 @@ class AddInboundEmailTokenToUsers < ActiveRecord::Migration
       user.save
     end
   end
-  
+
   def down
     remove_index :users, :inbound_email_token
     remove_column :users, :inbound_email_token, :string
