@@ -1,12 +1,12 @@
 module Api
   module V2
     class SubscriptionsController < ApiController
-      
+
       respond_to :json
-      
+
       before_action :validate_content_type, only: [:create]
       before_action :validate_create, only: [:create]
-      
+
       def index
         @user = current_user
         @subscriptions = @user.subscriptions.includes(:feed).order("subscriptions.created_at DESC")
@@ -20,7 +20,7 @@ module Api
           @subscriptions = []
         end
       end
-      
+
       def show
         @user = current_user
         @subscription = @user.subscriptions.where(id: params[:id]).first
@@ -30,7 +30,7 @@ module Api
           status_forbidden
         end
       end
-      
+
       def create
         @user = current_user
         begin
@@ -50,7 +50,7 @@ module Api
           Honeybadger.notify(e)
         end
       end
-      
+
       def destroy
         @user = current_user
         @subscription = @user.subscriptions.find(params[:id])
@@ -62,7 +62,7 @@ module Api
           status_forbidden
         end
       end
-      
+
       def update
         @user = current_user
         @subscription = @user.subscriptions.find(params[:id])
@@ -73,17 +73,17 @@ module Api
           status_forbidden
         end
       end
-      
-      private 
-      
+
+      private
+
       def subscription_params
         params.require(:subscription).permit(:title)
       end
-      
+
       def validate_create
         needs 'feed_url'
       end
-      
+
     end
   end
 end

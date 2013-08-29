@@ -52,8 +52,8 @@ CREATE TABLE billing_events (
     event_type character varying(255),
     billable_id integer,
     billable_type character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     event_id character varying(255)
 );
 
@@ -125,8 +125,8 @@ CREATE TABLE entries (
     content text,
     published timestamp without time zone,
     updated timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     entry_id text,
     public_id character varying(255),
     old_public_id character varying(255),
@@ -163,8 +163,8 @@ CREATE TABLE feeds (
     feed_url text,
     site_url text,
     etag text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     last_modified timestamp without time zone,
     subscriptions_count integer DEFAULT 0 NOT NULL
 );
@@ -197,8 +197,8 @@ CREATE TABLE import_items (
     id integer NOT NULL,
     import_id integer,
     details text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     item_type character varying(255)
 );
 
@@ -230,8 +230,8 @@ CREATE TABLE imports (
     id integer NOT NULL,
     user_id integer,
     complete boolean DEFAULT false,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     upload character varying(255)
 );
 
@@ -264,8 +264,8 @@ CREATE TABLE plans (
     stripe_id character varying(255),
     name character varying(255),
     price numeric,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     price_tier integer
 );
 
@@ -373,8 +373,8 @@ CREATE TABLE subscriptions (
     id integer NOT NULL,
     user_id integer,
     feed_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     title text,
     view_inline boolean DEFAULT false
 );
@@ -405,11 +405,11 @@ ALTER SEQUENCE subscriptions_id_seq OWNED BY subscriptions.id;
 
 CREATE TABLE taggings (
     id integer NOT NULL,
+    tag_id integer,
     feed_id integer,
     user_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    tag_id integer
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -430,37 +430,6 @@ CREATE SEQUENCE taggings_id_seq
 --
 
 ALTER SEQUENCE taggings_id_seq OWNED BY taggings.id;
-
-
---
--- Name: tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE tags (
-    id integer NOT NULL,
-    name character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: tags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE tags_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE tags_id_seq OWNED BY tags.id;
 
 
 --
@@ -511,8 +480,8 @@ CREATE TABLE users (
     plan_id integer,
     admin boolean DEFAULT false,
     suspended boolean DEFAULT false,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
     auth_token character varying(255),
     password_reset_token character varying(255),
     password_reset_sent_at timestamp without time zone,
@@ -622,13 +591,6 @@ ALTER TABLE ONLY taggings ALTER COLUMN id SET DEFAULT nextval('taggings_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY unread_entries ALTER COLUMN id SET DEFAULT nextval('unread_entries_id_seq'::regclass);
 
 
@@ -728,14 +690,6 @@ ALTER TABLE ONLY taggings
 
 
 --
--- Name: tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY tags
-    ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
-
-
---
 -- Name: unread_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -763,6 +717,20 @@ CREATE INDEX index_billing_events_on_billable_id_and_billable_type ON billing_ev
 --
 
 CREATE UNIQUE INDEX index_billing_events_on_event_id ON billing_events USING btree (event_id);
+
+
+--
+-- Name: index_billing_events_on_event_id_and_event_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_billing_events_on_event_id_and_event_type ON billing_events USING btree (event_id, event_type);
+
+
+--
+-- Name: index_billing_events_on_event_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_billing_events_on_event_type ON billing_events USING btree (event_type);
 
 
 --
@@ -798,6 +766,13 @@ CREATE UNIQUE INDEX index_feeds_on_feed_url ON feeds USING btree (feed_url);
 --
 
 CREATE INDEX index_import_items_on_import_id ON import_items USING btree (import_id);
+
+
+--
+-- Name: index_imports_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_imports_on_user_id ON imports USING btree (user_id);
 
 
 --
@@ -899,13 +874,6 @@ CREATE INDEX index_taggings_on_user_id_and_tag_id ON taggings USING btree (user_
 
 
 --
--- Name: index_tags_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_tags_on_name ON tags USING btree (name);
-
-
---
 -- Name: index_unread_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -980,6 +948,13 @@ CREATE UNIQUE INDEX index_users_on_lower_email ON users USING btree (lower((emai
 --
 
 CREATE UNIQUE INDEX index_users_on_password_reset_token ON users USING btree (password_reset_token);
+
+
+--
+-- Name: index_users_on_plan_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_users_on_plan_id ON users USING btree (plan_id);
 
 
 --
@@ -1159,3 +1134,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130801194304');
 INSERT INTO schema_migrations (version) VALUES ('20130820123435');
 
 INSERT INTO schema_migrations (version) VALUES ('20130826053351');
+
+INSERT INTO schema_migrations (version) VALUES ('20130829092539');

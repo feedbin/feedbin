@@ -4,10 +4,10 @@
   <div class="modal-target"></div>
   <header class="bar">
 		<a href="/" class="logo"><%= render partial: 'shared/svg/logo' %></a>
-			
+
     <% if signed_in? %>
     <div class="subscribe-wrap">
-      
+
       <%= render partial: "subscriptions/form" %>
       <div class="popover right hide">
         <div class="arrow"></div>
@@ -28,7 +28,7 @@
     </div>
 
   </header>
-	
+
   <div class="content">
     <%= content_for?(:app_content) ? yield(:app_content) : yield %>
   </div>

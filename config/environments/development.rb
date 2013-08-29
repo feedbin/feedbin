@@ -27,9 +27,9 @@ Feedbin::Application.configure do
 
   # Debug mode disables concatenation and preprocessing of assets.
   config.assets.debug = true
-  
+
   config.action_mailer.default_url_options = { host: 'feedbin.dev' }
-  
+
   # Log strong_parameters unpermitted
   config.action_controller.action_on_unpermitted_parameters = :log
 end
