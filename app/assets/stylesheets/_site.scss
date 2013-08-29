@@ -1378,11 +1378,6 @@ li.selected > a .favicon-wrap {
 	}
 }
 
-.signup-container {
-	margin: 0 auto;
-	width: 548px;
-}
-
 /*------------------------------------------------------------------------------
 Settings
 ------------------------------------------------------------------------------*/
@@ -2355,15 +2350,19 @@ Mobile
 }
 
 /*------------------------------------------------------------------------------
-Login
+Login and Sign Up
 ------------------------------------------------------------------------------*/
-.login {
+.login, .signup {
 	background-color: #efefef;
 	.bar {
 		display: none;
 	}
 	.login-wrap {
 		max-width: 512px;
+		margin: 0 auto;
+	}
+	.signup-wrap {
+		max-width: 548px;
 		margin: 0 auto;
 	}
 	svg {
@@ -2376,7 +2375,8 @@ Login
 		}
 	}
 	input[type="email"],
-	input[type="password"] {
+	input[type="password"],
+	input[type="text"] {
 		width: 94%;
 		padding-left: 3%;
 		padding-right: 3%;
@@ -2389,43 +2389,14 @@ Login
 		display: block;
 		margin: 15px 0 0 0;
 	}
-}
-
-
-/*------------------------------------------------------------------------------
-Sign Up
-------------------------------------------------------------------------------*/
-.signup {
-	background-color: #efefef;
-	font-size: 18px;
-	.bar {
-		display: none;
-	}
-	.login-wrap {
-		width: 512px;
-		margin: 0 auto;
-	}
-	svg {
-		width: 78px;
-		height: 65px;
-		display: block;
-		margin: 0 auto 29px auto;
-		* {
-			fill: #cccccc;
-		}
-	}
-	input[type="submit"] {
-		padding: 10px 25px;
-		font-size: 18px;
-	}
 	.form-wrap {
 		margin-left: 20px;
-		width: 327px;
+		max-width: 327px;
 		float: left;
 	}
 	.promo-wrap {
 		margin-left: 20px;
-		width: 139px;
+		max-width: 139px;
 		float: left;
 	}
 	.radio {
@@ -2434,5 +2405,15 @@ Sign Up
 	}
 	hr {
 		margin: 20px 0;
+	}
+}
+
+.signup {
+	input[type="email"],
+	input[type="password"] {
+		width: 94%;
+		max-width: 300px;
+		padding-left: 3%;
+		padding-right: 3%;
 	}
 }
