@@ -7,7 +7,7 @@
   <%= form_tag settings_update_credit_card_path, data: { behavior: 'credit_card_form' } do %>
     <%= hidden_field_tag :stripe_token, nil, data: { behavior: 'stripe_token' } %>
     <%= render partial: 'shared/credit_card_form' %>
-    <%= submit_tag "Update", class: 'button' %>    
+    <%= submit_tag "Update", class: 'button' %>
   <% end %>
 
   <h3>Change your Plan</h3>
@@ -28,8 +28,8 @@
               <%= form_tag settings_update_plan_path, data: { behavior: 'change_plan' }, class: 'no-margin' do %>
                 <%= hidden_field_tag 'plan', plan.id %>
                 <%= button_tag 'Switch', data: { confirm: 'Are you sure you want to change plans?' }, class: 'button' %>
-              <% end %>    
-            <% end %>    
+              <% end %>
+            <% end %>
           </td>
       </tr>
     <% end %>

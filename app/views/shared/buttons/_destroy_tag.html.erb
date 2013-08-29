@@ -6,7 +6,7 @@
   Delete
 </div>
 <% else %>
-  <%= link_to tag_path(tag), 
+  <%= link_to tag_path(tag),
         method: :delete, remote: true, class: 'toolbar-button', title: 'Delete tag',
         data: { behavior: 'unsubscribe', confirm: "Are you sure you want to delete #{tag.name}?" } do %>
     <span class="toolbar-button-inner">

@@ -10,9 +10,9 @@
   </head>
   <body>
     <h2>Receipt</h2>
-    
+
     <p>Account: <%= @user.email %></p>
-    
+
     <table class="table table-bordered">
       <tr>
         <th>Date</th>
@@ -23,11 +23,11 @@
         <td><%= @billing_event.details.data.object.currency.upcase %> <%= number_to_currency(@billing_event.details.data.object.total.to_f / 100) %></td>
       </tr>
     </table>
-    
+
     <p>
       Feedbin, LLC
     </p>
-    
+
   </body>
 </html>
 

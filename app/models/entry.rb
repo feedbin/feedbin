@@ -61,7 +61,7 @@ class Entry < ActiveRecord::Base
   def self.unstarred_new
     where("starred_entries.entry_id IS NULL")
   end
-  
+
   def self.sort_preference(sort)
     if sort == 'ASC'
       order("published ASC")

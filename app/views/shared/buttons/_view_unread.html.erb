@@ -1,12 +1,12 @@
 <% if mobile_device? %>
-  <%= link_to view_unread_feeds_path, 
+  <%= link_to view_unread_feeds_path,
         remote: true, class: "sidebar-button button-view-unread #{view_mode_selected('view_unread')}",
         title: 'View unread',
   			data: { behavior: 'view_unread' } do %>
       	<i class="icon-circle-filled"></i>
   <% end %>
 <% else %>
-  <%= link_to "Unread", view_unread_feeds_path, 
+  <%= link_to "Unread", view_unread_feeds_path,
         remote: true, class: "view-button #{view_mode_selected('view_unread')}",
         title: 'View unread',
   			data: { behavior: 'view_unread' } %>

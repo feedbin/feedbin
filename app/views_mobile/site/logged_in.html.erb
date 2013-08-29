@@ -6,18 +6,18 @@
 <% content_for :sidebar do %>
 <div class="side-toolbar-wrap">
   <div class="side-toolbar">
-		
+
     <%= content_tag :button, '<i class="icon-feeds"></i>'.html_safe, class: 'sidebar-button panel-nav button-panel-feeds active', data: {behavior: 'feeds_panel panel_nav', panel: 'feeds'}  %>
     <%= content_tag :button, '<i class="icon-entries"></i>'.html_safe, class: 'sidebar-button panel-nav button-panel-entries', data: {behavior: 'entries_panel panel_nav', panel: 'entries'}  %>
     <%= content_tag :button, '<i class="icon-entry-content"></i>'.html_safe, class: 'sidebar-button panel-nav button-panel-entry-wrap', data: {behavior: 'entry_content_panel panel_nav', panel: 'entry-wrap'}  %>
-    
+
     <div class="landscape-hide">
       <%= render partial: 'shared/buttons/view_all' %>
       <%= render partial: 'shared/buttons/view_unread' %>
       <%= render partial: 'shared/buttons/mark_all_as_read', locals: {type: nil, data: nil} %>
       <%= render partial: 'shared/buttons/unsubscribe', locals: {feed: nil} %>
     </div>
-    
+
   </div>
 </div>
 <% end %>

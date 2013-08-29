@@ -9,7 +9,7 @@ class EntryDeleter
       entries_to_keep = Entry.where(feed_id: feed_id).order('published DESC').limit(entry_limit).pluck('entries.id')
       entries_to_delete = Entry.select(:id).where(feed_id: feed_id, starred_entries_count: 0).where.not(id: entries_to_keep)
       entries_to_delete_ids = entries_to_delete.map {|entry| entry.id }
-      
+
       # Delete records
       UnreadEntry.where(entry_id: entries_to_delete_ids).delete_all
       entries_to_delete.delete_all

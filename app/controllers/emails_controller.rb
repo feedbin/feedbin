@@ -2,9 +2,9 @@ class EmailsController < ApplicationController
 
   skip_before_action :verify_authenticity_token
   skip_before_action :authorize
-  
+
   respond_to :json
-  
+
   def create
     user = User.where(inbound_email_token: params[:MailboxHash]).first
     if user.present?
