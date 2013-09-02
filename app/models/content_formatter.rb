@@ -118,6 +118,10 @@ class ContentFormatter
         /^
           (?:https?:\/\/|\/\/)
           (?:mpora\.com)
+        /x,
+        /^
+          (?:https?:\/\/|\/\/)
+          (?:embed\.ted\.com)
         /x
       ]
 
