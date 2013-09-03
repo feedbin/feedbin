@@ -128,8 +128,55 @@ class SettingsController < ApplicationController
     end
     render nothing: true
   end
+  
+  def font_increase
+    change_font_size('increase')
+  end
+
+  def font_decrease
+    change_font_size('decrease')
+  end
+  
+  def font
+    @user = current_user
+    if Feedbin::Application.config.fonts.has_value?(params[:font])
+      @user.font = params[:font]
+      @user.save
+    end
+    render nothing: true
+  end
+  
+  def entry_width
+    @user = current_user
+    if @user.entry_width.blank?
+      new_width = 'fluid'
+    else
+      new_width = ''
+    end
+    @user.entry_width = new_width
+    @user.save
+    render nothing: true
+  end
 
   private
+  
+  def change_font_size(direction)
+    @user = current_user
+    
+    current_font_size = @user.font_size.try(:to_i) || 5
+    if direction == 'increase'
+      new_font_size = current_font_size + 1
+    else
+      new_font_size = current_font_size - 1
+    end
+    
+    if Feedbin::Application.config.font_sizes[new_font_size] && new_font_size >= 0
+      @user.font_size = new_font_size
+      @user.save
+    end
+    
+    render nothing: true
+  end
 
   def plan_exists
     render_404 unless Plan.exists?(params[:plan].to_i)

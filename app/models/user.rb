@@ -6,8 +6,8 @@ class User < ActiveRecord::Base
 
   store_accessor :settings, :entry_sort, :previous_read_count, :starred_feed_enabled,
                  :hide_tagged_feeds, :precache_images, :show_unread_count, :sticky_view_inline,
-                 :mark_as_read_confirmation
-
+                 :mark_as_read_confirmation, :font_size, :font, :entry_width
+    
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
   has_many :feeds, through: :subscriptions

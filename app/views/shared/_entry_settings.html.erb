@@ -1,0 +1,16 @@
+<div class="entry-settings">
+  <div class="setting-wrap">
+    <%= form_tag settings_font_path, remote: true do %>
+      <%= select_tag "font", options_for_select(Feedbin::Application.config.fonts, @user.font || 'default'), data: {behavior: 'change_font'} %>
+    <% end %>
+  </div>
+  <div class="setting-wrap">
+    <%= link_to "", settings_font_decrease_path, remote: true, method: :post, class: 'button-decrease-font', data: {behavior: 'decrease_font'} %>
+  </div>
+  <div class="setting-wrap">
+    <%= link_to "", settings_font_increase_path, remote: true, method: :post, class: 'button-increase-font', data: {behavior: 'increase_font'} %>
+  </div>
+  <div class="setting-wrap">
+    <%= link_to "", settings_entry_width_path, remote: true, method: :post, class: 'button-entry-width', data: {behavior: 'entry_width'} %>
+  </div>
+</div>

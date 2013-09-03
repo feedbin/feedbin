@@ -4,12 +4,14 @@
     <%= entry_presenter.favicon %> 
     <%= link_to strip_tags(entry.feed.title), entry.feed.site_url, class: 'entry-feed-title', data: {behavior: 'user_title', feed_id: entry.feed.id}, target: '_blank' %>
     <div class="entry-buttons">
+      <%= render partial: "shared/entry_settings_button" %>
       <%= render partial: "unread_entries/form", locals: {entry: entry, read: read} %>
       <%= render partial: "starred_entries/form", locals: {entry: entry, starred: starred} %>
       <%= render partial: "entries/toggle_content", locals: {content_view: content_view, entry: entry} %>
       <%= render partial: "sharing_services/sharing_service_button", locals: {services: services} %>
     </div>
   </div>
+  <div class="entry-settings-wrap" data-behavior="entry_settings_target"></div>
   <div class="entry-content">
     <div class="entry-inner">
       <header class="entry-header">

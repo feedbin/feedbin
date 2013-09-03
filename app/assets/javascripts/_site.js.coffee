@@ -162,6 +162,18 @@ $.extend feedbin,
 
   shareOpen: ->
     $('.dropdown-wrap').hasClass('open')
+
+  updateFontSize: (direction) ->
+    fontContainer = $("[data-font-size]")
+    currentFontSize = fontContainer.data('font-size')
+    if direction == 'increase'
+      newFontSize = currentFontSize + 1
+    else
+      newFontSize = currentFontSize - 1
+    if feedbin.data.fontSizes[newFontSize]
+      fontContainer.removeClass("font-size-#{currentFontSize}")
+      fontContainer.addClass("font-size-#{newFontSize}")
+      fontContainer.data('font-size', newFontSize)
       
   hideQueue: []
 
@@ -453,6 +465,44 @@ $.extend feedbin,
       setInterval ( ->
         feedbin.refresh()
       ), 300000
+
+    entrySettings: ->
+      $(document).on 'click', (event, xhr) ->
+        if ($(event.target).hasClass('entry-settings') || $(event.target).parents('.entry-settings').length > 0)
+          false
+        else if ($(event.target).hasClass('button-settings') || $(event.target).parents('.button-settings').length > 0) && !$('.entry-settings').hasClass('open')
+          top = $('.entry-toolbar').outerHeight() + $('.entry-settings').outerHeight()
+          $('.entry-settings').addClass('open')
+          $('[data-behavior="entry_settings_target"]').html($('[data-behavior="entry_settings_content"]').html())
+          $('[data-behavior~=change_font]').val($("[data-font]").data('font'))
+          $('[data-behavior~=change_font]').change ->
+            fontContainer = $("[data-font]")
+            currentFont = fontContainer.data('font')
+            fontContainer.removeClass("font-#{currentFont}")
+            fontContainer.addClass("font-#{$(@).val()}")
+            fontContainer.data('font', $(@).val())
+            $(@).parents('form').submit()
+          
+        else
+          top = $('.entry-toolbar').outerHeight()
+          $('.entry-settings').removeClass('open')
+        $('.entry-content').animate {
+          top: top
+        }, 100
+      
+    fontSize: ->
+      $(document).on 'click', '[data-behavior~=increase_font]', (event) ->
+        feedbin.updateFontSize('increase')
+
+      $(document).on 'click', '[data-behavior~=decrease_font]', (event) ->
+        feedbin.updateFontSize('decrease')
+        
+    entryWidth: ->
+      $(document).on 'click', '[data-behavior~=entry_width]', (event) ->
+        if $('[data-behavior~=entry_content_target]').hasClass('fluid')
+          $('[data-behavior~=entry_content_target]').removeClass('fluid')
+        else
+          $('[data-behavior~=entry_content_target]').addClass('fluid')
 
 jQuery ->
   $.each feedbin.init, (i, item) ->

@@ -1008,11 +1008,6 @@ li.selected > a .favicon-wrap {
 	}
 }
 
-.entry-wrap {
-	position: relative;
-	background: #FFF;
-}
-
 .entry-toolbar {
 	background-color: #FFF;
 	position: absolute;
@@ -1036,12 +1031,106 @@ li.selected > a .favicon-wrap {
 	}
 }
 
-.entry-content-wrap {
+.entry-settings-wrap {
+	position: absolute;
+	top: 37px;
+	left: 0;
+	width: 100%;
+}
+.entry-settings {
+	height: 48px;
+	width: 100%;
+	border-bottom: 1px solid #CCC;
+	background-color: #efefef;
+	&:before {
+		visibility: hidden;
+		position: absolute;
+		top: -1px;
+		right: 21px;
+		display: inline-block;
+		border-right: 6px solid rgba(0, 0, 0, 0);
+		border-top: 6px solid #bababa;
+		border-left: 6px solid rgba(0, 0, 0, 0);
+		border-bottom-color: rgba(0, 0, 0, 1);
+		content: '';
+	}
+	&:after {
+		visibility: hidden;
+		position: absolute;
+		top: -1px;
+		right: 22px;
+		display: inline-block;
+		border-right: 5px solid rgba(0, 0, 0, 0);
+		border-top: 5px solid #FFF;
+		border-left: 5px solid rgba(0, 0, 0, 0);
+		content: '';
+	}
+	&.open:after,
+	&.open:before {
+		visibility: visible;
+	}
+	.setting-wrap {
+		border-right: 1px solid #CCC;
+		height: 100%;
+		display: block;
+		padding: 0;
+		float: left;
+	}
+	select {
+		background: #FFF image-url("icon-dropdown-arrow.svg") 107px 5px no-repeat;
+		width: 128px;
+		padding: 5px;
+		font-size: 13px;
+		line-height: 1;
+		border: 1px solid #CCC;
+		border-radius: 0;
+		height: 28px;
+		-webkit-appearance: none;
+		margin: 11px 10px 0 10px;
+	}
+	.button-increase-font {
+		height: 48px;
+		width: 48px;
+		background: image-url("icon-larger-text.svg") 0 0 no-repeat;
+		display: block;
+	}
+	.button-decrease-font {
+		height: 48px;
+		width: 48px;
+		background: image-url("icon-smaller-text.svg") 0 0 no-repeat;
+		display: block;
+	}
+	.button-entry-width {
+		height: 48px;
+		width: 48px;
+		position: relative;
+		display: block;
+		&:after {
+			display: block;
+			height: 24px;
+			width: 34px;
+			background: image-url("icon-entry-width.svg") 0 -24px no-repeat;
+			content: "";
+			position: absolute;
+			top: 12px;
+			left: 7px;
+		}
+		.fluid &:after {
+			background-position: 0px 0px;
+		}
+	}
+}
+
+.entry-wrap {
 	position: relative;
 	background-image: image-url("logo.svg");
 	background-position: 50% 50%;
 	background-repeat: no-repeat;
 	background-color: $list-background;
+}
+
+.entry-content-wrap {
+	position: relative;
 }
 
 .entry-content {
@@ -1069,39 +1158,12 @@ li.selected > a .favicon-wrap {
 	max-width: 100%;
 }
 
-.entry-header {
-	padding: 0 0 5px;
-	margin-bottom: 10px;
-	position: relative;
-	a {
-		display: block;
-		text-decoration: none;
-		color: #333;
-	}
-	h1 {
-		font-size: 34px;
-		line-height: 1.1;
-		color: #000;
-		margin: 0 0 6px 0;
-		padding: 0;
-		font-weight: normal;
-	}
-}
-.post-meta {
-	font-size: 14px;
-	color: #999;
-	line-height: 1.2;
-	margin: 0;
-	time {
-		font-weight: bold;
-	}
-}
 .entry-buttons {
 	display: block;
 	position: absolute;
 	top: 0;
 	right: 0px;
-	width: 200px;
+	width: 225px;
 	height: 36px;
 	z-index: 1;
 	background-image: linear-gradient(to right, rgba(#fff, 0) 0%, #fff 10%);
@@ -1120,7 +1182,7 @@ li.selected > a .favicon-wrap {
 		padding: 0;
 		position: relative;
 		svg * {
-			fill: #333;
+			fill: #999;
 		}
 	}
 	.entry-button-wrap {
@@ -1128,14 +1190,14 @@ li.selected > a .favicon-wrap {
 	}
 	.button-toggle-read {
 		.circle-filled, .circle-empty {
-			border: 1px solid #333;
-			background-color: #333;
+			border: 1px solid #999;
+			background-color: #999;
 			height: 13px;
 			width: 13px;
-			border-radius: 8px;
+			border-radius: 13px;
 			position: absolute;
 			top: 11px;
-			left: 10px;
+			left: 14px;
 		}
 		.circle-empty {
 			background-color: #FFF;
@@ -1161,6 +1223,14 @@ li.selected > a .favicon-wrap {
 			position: absolute;
 			top: 9px;
 			left: 10px;
+		}
+	}
+	.button-settings {
+		color: #333;
+		svg {
+			position: absolute;
+			top: 10px;
+			left: 9px;
 		}
 	}
 }
@@ -1239,6 +1309,34 @@ li.selected > a .favicon-wrap {
 	}
 }
 
+.entry-header {
+	padding: 0 0 5px;
+	margin-bottom: 10px;
+	position: relative;
+	a {
+		display: block;
+		text-decoration: none;
+		color: #333;
+	}
+	h1 {
+		font-size: 2.4em;
+		line-height: 1.1;
+		color: #000;
+		margin: 0 0 .2em 0;
+		padding: 0;
+		font-weight: normal;
+	}
+	.post-meta {
+		font-size: 1em;
+		color: #999;
+		line-height: 1.2;
+		margin: 0;
+		time {
+			font-weight: bold;
+		}
+	}
+}
+
 .content-styles {
 	font-weight: 400;
 	font-style: normal;
@@ -1262,11 +1360,11 @@ li.selected > a .favicon-wrap {
 	}
 
 	h1, h2 {
-		font-size: 22px;
+		font-size: 1.3em;
 	}
 
 	h3, h4, h5, h6 {
-		font-size: 18px;
+		font-size: 1.1em;
 	}
 
 	p,
@@ -1350,6 +1448,67 @@ li.selected > a .favicon-wrap {
 	a[title*='Permanent'] {
 		text-decoration: none;
 	}
+}
+
+.font-serif-1 {
+	font-family: "Sentinel SSm A", "Sentinel SSm B", $font-stack;
+	font-weight: 400;
+	font-style: normal;
+	strong {
+		font-weight: 700;
+	}
+	em {
+		font-style: italic;
+	}
+	.post-meta, .entry-feed-title {
+		font-family: $font-stack;
+	}
+}
+
+.font-sans-serif-1 {
+	font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
+	font-weight: 400;
+	font-style: normal;
+	strong {
+		font-weight: 700;
+	}
+	em {
+		font-style: italic;
+	}
+	.post-meta, .entry-feed-title {
+		font-family: $font-stack;
+	}
+}
+
+.font-size-0 {
+	font-size: 70%;/*11px*/
+}
+.font-size-1 {
+	font-size: 77%;/*12px*/
+}
+.font-size-2 {
+	font-size: 83%;/*13px*/
+}
+.font-size-3 {
+	font-size: 90%;/*14px*/
+}
+.font-size-4 {
+	font-size: 96%;/*15px*/
+}
+.font-size-5 {
+	font-size: 100%;/*16px*/
+}
+.font-size-6 {
+	font-size: 110%;/*18px*/
+}
+.font-size-7 {
+	font-size: 123%;/*20px*/
+}
+.font-size-8 {
+	font-size: 135%;/*22px*/
+}
+.font-size-9 {
+	font-size: 147%;/*24px*/
 }
 
 .modal form {
