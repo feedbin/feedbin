@@ -454,6 +454,23 @@ $.extend feedbin,
         feedbin.refresh()
       ), 300000
 
+    entrySettings: ->
+      $(document).on 'click', (event, xhr) ->
+        if ($(event.target).hasClass('entry-settings') || $(event.target).parents('.entry-settings').length > 0)
+          false
+        else if ($(event.target).hasClass('button-settings') || $(event.target).parents('.button-settings').length > 0) && !$('.entry-settings').hasClass('open')
+          top = $('.entry-toolbar').outerHeight() + $('.entry-settings').outerHeight()
+          $('.entry-settings').addClass('open')
+        else
+          top = $('.entry-toolbar').outerHeight()
+          $('.entry-settings').removeClass('open')
+        $('.entry-content').animate {
+          top: top
+        }, 100
+      
+        
+        
+
 jQuery ->
   $.each feedbin.init, (i, item) ->
     item()

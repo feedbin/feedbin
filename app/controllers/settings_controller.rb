@@ -128,8 +128,20 @@ class SettingsController < ApplicationController
     end
     render nothing: true
   end
+  
+  def font_increase
+    change_font_size('increase')
+  end
+
+  def font_decrease
+    change_font_size('decrease')
+  end
 
   private
+  
+  def change_font_size(direction)
+    
+  end
 
   def plan_exists
     render_404 unless Plan.exists?(params[:plan].to_i)

@@ -1036,6 +1036,90 @@ li.selected > a .favicon-wrap {
 	}
 }
 
+.entry-settings {
+	position: absolute;
+	top: 37px;
+	left: 0;
+	width: 100%;
+	height: 48px;
+	background-color: #efefef;
+	border-bottom: 1px solid #CCC;
+	&:before {
+		visibility: hidden;
+		position: absolute;
+		top: -1px;
+		right: 21px;
+		display: inline-block;
+		border-right: 6px solid rgba(0, 0, 0, 0);
+		border-top: 6px solid #bababa;
+		border-left: 6px solid rgba(0, 0, 0, 0);
+		border-bottom-color: rgba(0, 0, 0, 1);
+		content: '';
+	}
+	&:after {
+		visibility: hidden;
+		position: absolute;
+		top: -1px;
+		right: 22px;
+		display: inline-block;
+		border-right: 5px solid rgba(0, 0, 0, 0);
+		border-top: 5px solid #FFF;
+		border-left: 5px solid rgba(0, 0, 0, 0);
+		content: '';
+	}
+	&.open:after,
+	&.open:before {
+		visibility: visible;
+	}
+	.setting-wrap {
+		border-right: 1px solid #CCC;
+		height: 100%;
+		display: block;
+		padding: 0;
+		float: left;
+	}
+	select {
+		background: #FFF image-url("icon-dropdown-arrow.svg") 177px 4px no-repeat;
+		width: 200px;
+		padding: 5px;
+		font-size: 13px;
+		line-height: 1;
+		border: 1px solid #CCC;
+		border-radius: 0;
+		height: 25px;
+		-webkit-appearance: none;
+		margin: 11px 10px 0 10px;
+	}
+	.button-increase-font {
+		height: 48px;
+		width: 48px;
+		background: image-url("icon-larger-text.svg") 0 0 no-repeat;
+		display: block;
+	}
+	.button-decrease-font {
+		height: 48px;
+		width: 48px;
+		background: image-url("icon-smaller-text.svg") 0 0 no-repeat;
+		display: block;
+	}
+	.button-entry-width {
+		height: 48px;
+		width: 48px;
+		position: relative;
+		display: block;
+		&:after {
+			display: block;
+			height: 24px;
+			width: 34px;
+			background: image-url("icon-entry-width.svg") 0 -24px no-repeat;
+			content: "";
+			position: absolute;
+			top: 12px;
+			left: 7px;
+		}
+	}
+}
+
 .entry-content-wrap {
 	position: relative;
 	background-image: image-url("logo.svg");
@@ -1101,7 +1185,7 @@ li.selected > a .favicon-wrap {
 	position: absolute;
 	top: 0;
 	right: 0px;
-	width: 200px;
+	width: 225px;
 	height: 36px;
 	z-index: 1;
 	background-image: linear-gradient(to right, rgba(#fff, 0) 0%, #fff 10%);
@@ -1120,7 +1204,7 @@ li.selected > a .favicon-wrap {
 		padding: 0;
 		position: relative;
 		svg * {
-			fill: #333;
+			fill: #999;
 		}
 	}
 	.entry-button-wrap {
@@ -1128,14 +1212,14 @@ li.selected > a .favicon-wrap {
 	}
 	.button-toggle-read {
 		.circle-filled, .circle-empty {
-			border: 1px solid #333;
-			background-color: #333;
+			border: 1px solid #999;
+			background-color: #999;
 			height: 13px;
 			width: 13px;
-			border-radius: 8px;
+			border-radius: 13px;
 			position: absolute;
 			top: 11px;
-			left: 10px;
+			left: 14px;
 		}
 		.circle-empty {
 			background-color: #FFF;
@@ -1161,6 +1245,14 @@ li.selected > a .favicon-wrap {
 			position: absolute;
 			top: 9px;
 			left: 10px;
+		}
+	}
+	.button-settings {
+		color: #333;
+		svg {
+			position: absolute;
+			top: 10px;
+			left: 9px;
 		}
 	}
 }

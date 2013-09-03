@@ -1,0 +1,18 @@
+<div class="entry-settings">
+  <div class="setting-wrap">
+    <select name="fonts">
+      <option value="default">Helvetica Nueue/Default</option>
+      <option value="serif-1">Sentinel</option>
+      <option value="sans-serif-1">Whitney</option>
+    </select>
+  </div>
+  <div class="setting-wrap">
+    <%= link_to "", settings_font_decrease_path, method: :post, class: 'button-decrease-font' %>
+  </div>
+  <div class="setting-wrap">
+    <%= link_to "", settings_font_increase_path, method: :post, class: 'button-increase-font' %>
+  </div>
+  <div class="setting-wrap">
+    <%= link_to "", settings_entry_width_path, method: :post, class: 'button-entry-width' %>
+  </div>
+</div>
