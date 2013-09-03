@@ -1,10 +1,8 @@
 <div class="entry-settings">
   <div class="setting-wrap">
-    <select name="fonts">
-      <option value="default">Helvetica Nueue/Default</option>
-      <option value="serif-1">Sentinel</option>
-      <option value="sans-serif-1">Whitney</option>
-    </select>
+    <%= form_tag settings_font_path, remote: true do %>
+      <%= select_tag "font", options_for_select(Feedbin::Application.config.fonts, @user.font || 'default'), data: {behavior: 'change_font'} %>
+    <% end %>
   </div>
   <div class="setting-wrap">
     <%= link_to "", settings_font_decrease_path, remote: true, method: :post, class: 'button-decrease-font', data: {behavior: 'decrease_font'} %>
@@ -13,6 +11,6 @@
     <%= link_to "", settings_font_increase_path, remote: true, method: :post, class: 'button-increase-font', data: {behavior: 'increase_font'} %>
   </div>
   <div class="setting-wrap">
-    <%= link_to "", settings_entry_width_path, remote: true, method: :post, class: 'button-entry-width' %>
+    <%= link_to "", settings_entry_width_path, remote: true, method: :post, class: 'button-entry-width', data: {behavior: 'entry_width'} %>
   </div>
 </div>

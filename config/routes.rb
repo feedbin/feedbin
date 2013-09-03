@@ -79,6 +79,7 @@ Feedbin::Application.routes.draw do
     post :update_credit_card
     post :mark_favicon_complete
     post :update_plan
+    post :font
     post :font_increase
     post :font_decrease
     post :entry_width

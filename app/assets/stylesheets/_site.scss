@@ -1008,11 +1008,6 @@ li.selected > a .favicon-wrap {
 	}
 }
 
-.entry-wrap {
-	position: relative;
-	background: #FFF;
-}
-
 .entry-toolbar {
 	background-color: #FFF;
 	position: absolute;
@@ -1036,14 +1031,17 @@ li.selected > a .favicon-wrap {
 	}
 }
 
-.entry-settings {
+.entry-settings-wrap {
 	position: absolute;
 	top: 37px;
 	left: 0;
 	width: 100%;
+}
+.entry-settings {
 	height: 48px;
-	background-color: #efefef;
+	width: 100%;
 	border-bottom: 1px solid #CCC;
+	background-color: #efefef;
 	&:before {
 		visibility: hidden;
 		position: absolute;
@@ -1079,8 +1077,8 @@ li.selected > a .favicon-wrap {
 		float: left;
 	}
 	select {
-		background: #FFF image-url("icon-dropdown-arrow.svg") 177px 4px no-repeat;
-		width: 200px;
+		background: #FFF image-url("icon-dropdown-arrow.svg") 107px 5px no-repeat;
+		width: 128px;
 		padding: 5px;
 		font-size: 13px;
 		line-height: 1;
@@ -1117,15 +1115,22 @@ li.selected > a .favicon-wrap {
 			top: 12px;
 			left: 7px;
 		}
+		.fluid &:after {
+			background-position: 0px 0px;
+		}
 	}
 }
 
-.entry-content-wrap {
+.entry-wrap {
 	position: relative;
 	background-image: image-url("logo.svg");
 	background-position: 50% 50%;
 	background-repeat: no-repeat;
 	background-color: $list-background;
+}
+
+.entry-content-wrap {
+	position: relative;
 }
 
 .entry-content {
@@ -1442,6 +1447,36 @@ li.selected > a .favicon-wrap {
 
 	a[title*='Permanent'] {
 		text-decoration: none;
+	}
+}
+
+.font-serif-1 {
+	font-family: "Sentinel SSm A", "Sentinel SSm B", $font-stack;
+	font-weight: 400;
+	font-style: normal;
+	strong {
+		font-weight: 700;
+	}
+	em {
+		font-style: italic;
+	}
+	.post-meta, .entry-feed-title {
+		font-family: $font-stack;
+	}
+}
+
+.font-sans-serif-1 {
+	font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
+	font-weight: 400;
+	font-style: normal;
+	strong {
+		font-weight: 700;
+	}
+	em {
+		font-style: italic;
+	}
+	.post-meta, .entry-feed-title {
+		font-family: $font-stack;
 	}
 }
 

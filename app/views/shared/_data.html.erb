@@ -18,7 +18,7 @@ content_tag :div, '',
     show_unread_count:  (@user.show_unread_count == '1'),
     precache_images: (@user.precache_images == '1'),
     auto_update_path: auto_update_feeds_path, 
-    font_sizes: User::FONT_SIZES.to_json
+    font_sizes: Feedbin::Application.config.font_sizes.to_json
   },
   class: 'hide', 
   id: 'feedbin-data'
