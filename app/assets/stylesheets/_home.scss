@@ -133,8 +133,11 @@
 			margin-right: -51px;
 			right: -30px;
 			margin-bottom: -54px;
+			max-width: none;
 			@media (max-width: 601px) {
 				margin-bottom: 15px;
+				right: -30px;
+				margin-right: -151px;
 			}
 		}
 	}
