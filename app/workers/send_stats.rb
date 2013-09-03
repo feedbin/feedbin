@@ -5,9 +5,11 @@ class SendStats
   MEGABYTE = 1024.0 * 1024.0
 
   def perform
-    memcached_stats
-    redis_stats
-    postgres_stats
+    if ENV['LIBRATO_TOKEN']
+      memcached_stats
+      redis_stats
+      postgres_stats
+    end
   end
   
   def memcached_stats
