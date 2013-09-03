@@ -7,12 +7,12 @@
     </select>
   </div>
   <div class="setting-wrap">
-    <%= link_to "", settings_font_decrease_path, method: :post, class: 'button-decrease-font' %>
+    <%= link_to "", settings_font_decrease_path, remote: true, method: :post, class: 'button-decrease-font', data: {behavior: 'decrease_font'} %>
   </div>
   <div class="setting-wrap">
-    <%= link_to "", settings_font_increase_path, method: :post, class: 'button-increase-font' %>
+    <%= link_to "", settings_font_increase_path, remote: true, method: :post, class: 'button-increase-font', data: {behavior: 'increase_font'} %>
   </div>
   <div class="setting-wrap">
-    <%= link_to "", settings_entry_width_path, method: :post, class: 'button-entry-width' %>
+    <%= link_to "", settings_entry_width_path, remote: true, method: :post, class: 'button-entry-width' %>
   </div>
 </div>

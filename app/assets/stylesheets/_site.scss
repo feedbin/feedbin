@@ -1086,7 +1086,7 @@ li.selected > a .favicon-wrap {
 		line-height: 1;
 		border: 1px solid #CCC;
 		border-radius: 0;
-		height: 25px;
+		height: 28px;
 		-webkit-appearance: none;
 		margin: 11px 10px 0 10px;
 	}
@@ -1153,33 +1153,6 @@ li.selected > a .favicon-wrap {
 	max-width: 100%;
 }
 
-.entry-header {
-	padding: 0 0 5px;
-	margin-bottom: 10px;
-	position: relative;
-	a {
-		display: block;
-		text-decoration: none;
-		color: #333;
-	}
-	h1 {
-		font-size: 34px;
-		line-height: 1.1;
-		color: #000;
-		margin: 0 0 6px 0;
-		padding: 0;
-		font-weight: normal;
-	}
-}
-.post-meta {
-	font-size: 14px;
-	color: #999;
-	line-height: 1.2;
-	margin: 0;
-	time {
-		font-weight: bold;
-	}
-}
 .entry-buttons {
 	display: block;
 	position: absolute;
@@ -1331,6 +1304,34 @@ li.selected > a .favicon-wrap {
 	}
 }
 
+.entry-header {
+	padding: 0 0 5px;
+	margin-bottom: 10px;
+	position: relative;
+	a {
+		display: block;
+		text-decoration: none;
+		color: #333;
+	}
+	h1 {
+		font-size: 2.4em;
+		line-height: 1.1;
+		color: #000;
+		margin: 0 0 .2em 0;
+		padding: 0;
+		font-weight: normal;
+	}
+	.post-meta {
+		font-size: 1em;
+		color: #999;
+		line-height: 1.2;
+		margin: 0;
+		time {
+			font-weight: bold;
+		}
+	}
+}
+
 .content-styles {
 	font-weight: 400;
 	font-style: normal;
@@ -1354,11 +1355,11 @@ li.selected > a .favicon-wrap {
 	}
 
 	h1, h2 {
-		font-size: 22px;
+		font-size: 1.3em;
 	}
 
 	h3, h4, h5, h6 {
-		font-size: 18px;
+		font-size: 1.1em;
 	}
 
 	p,
@@ -1442,6 +1443,37 @@ li.selected > a .favicon-wrap {
 	a[title*='Permanent'] {
 		text-decoration: none;
 	}
+}
+
+.font-size-0 {
+	font-size: 70%;/*11px*/
+}
+.font-size-1 {
+	font-size: 77%;/*12px*/
+}
+.font-size-2 {
+	font-size: 83%;/*13px*/
+}
+.font-size-3 {
+	font-size: 90%;/*14px*/
+}
+.font-size-4 {
+	font-size: 96%;/*15px*/
+}
+.font-size-5 {
+	font-size: 100%;/*16px*/
+}
+.font-size-6 {
+	font-size: 110%;/*18px*/
+}
+.font-size-7 {
+	font-size: 123%;/*20px*/
+}
+.font-size-8 {
+	font-size: 135%;/*22px*/
+}
+.font-size-9 {
+	font-size: 147%;/*24px*/
 }
 
 .modal form {

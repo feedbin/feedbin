@@ -140,7 +140,21 @@ class SettingsController < ApplicationController
   private
   
   def change_font_size(direction)
+    @user = current_user
     
+    current_font_size = @user.font_size.try(:to_i) || 5
+    if direction == 'increase'
+      new_font_size = current_font_size + 1
+    else
+      new_font_size = current_font_size - 1
+    end
+    
+    if User::FONT_SIZES[new_font_size] && new_font_size >= 0
+      @user.font_size = new_font_size
+      @user.save
+    end
+    
+    render nothing: true
   end
 
   def plan_exists

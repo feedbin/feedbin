@@ -162,6 +162,18 @@ $.extend feedbin,
 
   shareOpen: ->
     $('.dropdown-wrap').hasClass('open')
+
+  updateFontSize: (direction) ->
+    fontContainer = $("[data-font-size]")
+    currentFontSize = fontContainer.data('font-size')
+    if direction == 'increase'
+      newFontSize = currentFontSize + 1
+    else
+      newFontSize = currentFontSize - 1
+    if feedbin.data.fontSizes[newFontSize]
+      fontContainer.removeClass("font-size-#{currentFontSize}")
+      fontContainer.addClass("font-size-#{newFontSize}")
+      fontContainer.data('font-size', newFontSize)
       
   hideQueue: []
 
@@ -468,7 +480,12 @@ $.extend feedbin,
           top: top
         }, 100
       
-        
+    fontSize: ->
+      $(document).on 'click', '[data-behavior~=increase_font]', (event, xhr) ->
+        feedbin.updateFontSize('increase')
+
+      $(document).on 'click', '[data-behavior~=decrease_font]', (event, xhr) ->
+        feedbin.updateFontSize('decrease')
         
 
 jQuery ->
