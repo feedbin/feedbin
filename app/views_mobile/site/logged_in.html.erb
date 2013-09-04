@@ -1,6 +1,9 @@
 <% @class = 'app mobile' %>
 <% content_for :head do %>
-	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+  <% if ENV['FONT_STYLESHEET'] %>
+  <link rel="stylesheet" type="text/css" href="<%= ENV['FONT_STYLESHEET'] %>" />
+  <% end %>
 <% end %>
 
 <% content_for :sidebar do %>
@@ -33,7 +36,10 @@
 </div>
 
 <div class="full-height entry-wrap panel">
-	<div class="entry-content-wrap full-height" data-behavior="entry_content_target"></div>
+	<div class="entry-content-wrap full-height <%= @user.entry_width %> font-size-<%= @user.font_size || 5 %> font-<%= @user.font || 'default' %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target"></div>
+</div>
+<div class="hide" data-behavior="entry_settings_content">
+  <%= render partial: 'shared/entry_settings' %>
 </div>
 <%= render partial: "shared/data", locals: {mobile: true} %>
 
