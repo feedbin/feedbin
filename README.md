@@ -81,19 +81,19 @@ export AWS_ACCESS_KEY_ID=aoisjf3j23oij23f
 ...
 ```
 
-###Mac OS X Install
+### Mac OS X Install
 
 This will get Feedbin running on a fresh Mountain Lion install. If you already have a ruby environment configured you can skip most of these steps.
 
-**Command Line Tools (OS X Mountain Lion)**
+#### Command Line Tools (OS X Mountain Lion)
  
- These can be downloaded from the [Apple Developer website](https://developer.apple.com/downloads/index.action), or in XCode preferences.
+These can be downloaded from the [Apple Developer website](https://developer.apple.com/downloads/index.action), or in XCode preferences.
 		
-**Homebrew**
+#### Homebrew
  
     ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"
 
-**rbenv**
+#### rbenv
  
     brew update
     brew install rbenv
@@ -101,52 +101,52 @@ This will get Feedbin running on a fresh Mountain Lion install. If you already h
     echo 'if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi' >> ~/.bash_profile
     source ~/.bash_profile
 
-**Ruby 2.0**
+#### Ruby 2.0
  
     rbenv install 2.0.0-p247
     rbenv global 2.0.0-p247
 
-**Bundler**
+#### Bundler
  
     gem install bundler
 
-**Postgres 9.2.4**
-   
+#### Postgres 9.2.4
+
     cd ~/Downloads
     curl -L http://postgresapp.com/download > postgres.zip
     unzip postgres.zip
     mv Postgres.app /Applications/
     open /Applications/Postgres.app
    
-**Redis 2.6.14**
- 
+#### Redis 2.6.14
+
     brew update
     brew install redis
 
 Make sure to follow post install instructions.
 	 
-**Clone Feedbin**
- 
+#### Clone Feedbin
+
     git clone https://github.com/feedbin/feedbin.git
     cd feedbin
     bundle
 
-**Setup the database**
+#### Setup the database
 
     rake db:setup
-		
-**Start scheduled tasks and background workers**
+
+#### Start scheduled tasks and background workers
 
     bundle exec foreman start
 		
-**[pow](http://pow.cx)**
-  
+#### [pow](http://pow.cx)
+
     curl get.pow.cx | sh
     ln -nfs /path/to/feedbin ~/.pow/feedbin
 
 At this point you should be able to load [feedbin.dev](http://feedbin.dev/) in your browser.
 
-###Ubuntu 12.04 Dependencies
+### Ubuntu 12.04 Dependencies
  
     apt-get install -y python-software-properties
     add-apt-repository -y ppa:pitti/postgresql
@@ -156,9 +156,9 @@ At this point you should be able to load [feedbin.dev](http://feedbin.dev/) in y
 
 TODO: Getting the Ruby environment setup on Ubuntu and running Feedbin
 
-###Fedora 19 Install
+### Fedora 19 Install
 
-####Feedbin Dependencies
+#### Feedbin Dependencies
 
 Install a bunch of dependencies:
 
@@ -173,7 +173,7 @@ Install Ruby dependencies:
     cd feedbin
     bundle
 
-####PostgreSQL Server
+#### PostgreSQL Server
 
 Make sure your locale uses UTF-8 or you'll get errors at the rake db:setup step:
 
@@ -226,7 +226,7 @@ Setup databases:
     # In the feedbin directory
     rake db:setup
 
-####Redis Server
+#### Redis Server
 
 Install:
 
@@ -241,7 +241,7 @@ Start the service:
 
 Note: Redis doesn't seem to work on Fedora, but Feedbin works without it.
 
-####Run Feedbin
+#### Run Feedbin
 
 Run these in the `feedbin` directory:
 
