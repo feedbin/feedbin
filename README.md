@@ -81,19 +81,19 @@ export AWS_ACCESS_KEY_ID=aoisjf3j23oij23f
 ...
 ```
 
-###Mac OS X Install
+### Mac OS X Install
 
 This will get Feedbin running on a fresh Mountain Lion install. If you already have a ruby environment configured you can skip most of these steps.
 
-**Command Line Tools (OS X Mountain Lion)**
+#### Command Line Tools (OS X Mountain Lion)
  
- These can be downloaded from the [Apple Developer website](https://developer.apple.com/downloads/index.action), or in XCode preferences.
+These can be downloaded from the [Apple Developer website](https://developer.apple.com/downloads/index.action), or in XCode preferences.
 		
-**Homebrew**
+#### Homebrew
  
     ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"
 
-**rbenv**
+#### rbenv
  
     brew update
     brew install rbenv
@@ -101,52 +101,52 @@ This will get Feedbin running on a fresh Mountain Lion install. If you already h
     echo 'if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi' >> ~/.bash_profile
     source ~/.bash_profile
 
-**Ruby 2.0**
+#### Ruby 2.0
  
     rbenv install 2.0.0-p247
     rbenv global 2.0.0-p247
 
-**Bundler**
+#### Bundler
  
     gem install bundler
 
-**Postgres 9.2.4**
-   
+#### Postgres 9.2.4
+
     cd ~/Downloads
     curl -L http://postgresapp.com/download > postgres.zip
     unzip postgres.zip
     mv Postgres.app /Applications/
     open /Applications/Postgres.app
    
-**Redis 2.6.14**
- 
+#### Redis 2.6.14
+
     brew update
     brew install redis
 
 Make sure to follow post install instructions.
 	 
-**Clone Feedbin**
- 
+#### Clone Feedbin
+
     git clone https://github.com/feedbin/feedbin.git
     cd feedbin
     bundle
 
-**Setup the database**
+#### Setup the database
 
     rake db:setup
-		
-**Start scheduled tasks and background workers**
+
+#### Start scheduled tasks and background workers
 
     bundle exec foreman start
 		
-**[pow](http://pow.cx)**
-  
+#### [pow](http://pow.cx)
+
     curl get.pow.cx | sh
     ln -nfs /path/to/feedbin ~/.pow/feedbin
 
 At this point you should be able to load [feedbin.dev](http://feedbin.dev/) in your browser.
 
-###Ubuntu 12.04 Dependencies
+### Ubuntu 12.04 Dependencies
  
     apt-get install -y python-software-properties
     add-apt-repository -y ppa:pitti/postgresql
@@ -155,3 +155,99 @@ At this point you should be able to load [feedbin.dev](http://feedbin.dev/) in y
     apt-get install -y build-essential curl libreadline-dev libcurl4-gnutls-dev libpq-dev libxml2-dev libxslt1-dev libcurl4-gnutls-dev zlib1g-dev libssl-dev postgresql-client-9.2
 
 TODO: Getting the Ruby environment setup on Ubuntu and running Feedbin
+
+### Fedora 19 Install
+
+#### Feedbin Dependencies
+
+Install a bunch of dependencies:
+
+    sudo yum -y install gcc gcc-c++ git libcurl-devel libxml2-devel libxslt-devel postgresql postgresql-devel rubygems ruby-devel rubygem-bundler
+
+Get Feedbin:
+
+    git clone https://github.com/feedbin/feedbin.git
+
+Install Ruby dependencies:
+
+    cd feedbin
+    bundle
+
+#### PostgreSQL Server
+
+Make sure your locale uses UTF-8 or you'll get errors at the rake db:setup step:
+
+    sudo nano /etc/locale.conf
+    # Make sure the LANG ends with .UTF-8
+    # For example, mine looks like:
+    #
+    #     LANG="en_US.UTF-8"
+
+After changing this file, it's probably a good idea to open a new terminal to make sure the changes get picked up.
+
+Install PostgreSQL:
+
+    sudo yum -y install postgresql-server postgresql-contrib
+    sudo postgresql-setup initdb
+
+Remove all authentication by changing `/var/lib/pgsql/data/pg_hba.conf` so
+the `127.0.0.1/32` and `::1/128` lines look like this:
+
+    # IPv4 local connections:
+    host    all             all             127.0.0.1/32            trust
+    # IPv6 local connections:
+    host    all             all             ::1/128                 trust
+
+**On a real server, you should *not* do this, as it removes *all* security
+from PostgreSQL.** For a real server, change those lines to end with `md5` and
+use passwords. You can setup database passwords in config/database.yml.
+
+You can open the file as an admin by running `sudo nano /var/lib/pgsql/data/pg_hba.conf` or `sudo gedit /var/lib/pgsql/data/pg_hba.conf`.
+
+Start the service:
+
+    sudo systemctl start postgresql
+
+    # If you want PostgreSQL to auto-start:
+    sudo systemctl enable postgresql
+
+Create a PostgreSQL users:
+
+    sudo -u postgres createuser feedbin
+    # You might get output like:
+    # could not change directory to "/home/brendan/feedbin"
+    # You can safely ignore this.
+
+    # Make yourself a PostgreSQL admin
+    sudo -u postgres createuser -s $USER
+
+Setup databases:
+
+    # In the feedbin directory
+    rake db:setup
+
+#### Redis Server
+
+Install:
+
+    sudo yum install redis
+
+Start the service:
+
+    sudo systemctl start redis
+
+    # If you want it to auto-start:
+    sudo systemctl enable redis
+
+Note: Redis doesn't seem to work on Fedora, but Feedbin works without it.
+
+#### Run Feedbin
+
+Run these in the `feedbin` directory:
+
+    bundle exec foreman start
+
+    # In a separate terminal:
+    rackup
+
+You should see Feedbin at [localhost:9292](http://localhost:9292).
