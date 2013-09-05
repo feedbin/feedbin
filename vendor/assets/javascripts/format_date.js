@@ -42,7 +42,12 @@
   }
   
   function tweleveHour(d) {
-    return d.getHours() > 12 ? d.getHours() - 12 : d.getHours();
+    if (d.getHours() == 0) {
+      return 12;
+    }
+    else {
+      return d.getHours() > 12 ? d.getHours() - 12 : d.getHours();
+    }
   }
   
   function timeZoneOffset(d) {
