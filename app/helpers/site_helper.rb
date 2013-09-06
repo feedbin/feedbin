@@ -5,7 +5,7 @@ module SiteHelper
     replacements = [sanitize(column)]
     if session[:column_widths][column]
       template << ' style="width: %ipx"'
-      replacements << sanitize(session[:column_widths][column])
+      replacements << session[:column_widths][column].to_i
     end
     result = template % replacements
     result.html_safe
