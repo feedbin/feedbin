@@ -50,10 +50,12 @@ module ApplicationHelper
   end
   
   def rtl?(string)
-    rtl_test = /[\u0600-\u06FF]|[\u0750-\u077F]|[\u0590-\u05FF]|[\uFE70-\uFEFF]/m
-    rtl_length = string.scan(rtl_test).size
-    percentage = (rtl_length.to_f / string.length.to_f) * 100
-    percentage > 50
+    unless string.blank?
+      rtl_test = /[\u0600-\u06FF]|[\u0750-\u077F]|[\u0590-\u05FF]|[\uFE70-\uFEFF]/m
+      rtl_length = string.scan(rtl_test).size
+      percentage = (rtl_length.to_f / string.length.to_f) * 100
+      percentage > 50
+    end
   end
   
   def rtl(string)
