@@ -2576,3 +2576,19 @@ Login and Sign Up
 		padding-right: 3%;
 	}
 }
+
+
+/*------------------------------------------------------------------------------
+Right-to-left
+------------------------------------------------------------------------------*/
+[dir="rtl"] {
+	text-align: right;
+	.content-styles {
+		font-size: 1.25em;
+	}
+	blockquote {
+		padding: 0 15px 0 0;
+		border-right: 5px solid #CCC;
+		border-left: none;
+	}
+}
