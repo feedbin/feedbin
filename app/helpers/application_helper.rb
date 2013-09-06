@@ -49,4 +49,17 @@ module ApplicationHelper
     link_to(name, '#', class: "button button-text", data: {id: id, fields: fields.gsub("\n", ""), behavior: 'add_fields'})
   end
   
+  def rtl?(string)
+    rtl_test = /[\u0600-\u06FF]|[\u0750-\u077F]|[\u0590-\u05FF]|[\uFE70-\uFEFF]/m
+    rtl_length = string.scan(rtl_test).size
+    percentage = (rtl_length.to_f / string.length.to_f) * 100
+    percentage > 50
+  end
+  
+  def rtl(string)
+    if rtl?(string)
+      'dir="rtl"'.html_safe
+    end
+  end
+  
 end
