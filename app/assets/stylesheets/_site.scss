@@ -972,8 +972,11 @@ li.selected > a .favicon-wrap {
 				display: block;
 			}
 			&.read {
-				.title, .body, .feed-title {
+				.title {
 					color: #999;
+				}
+				.body, .feed-title {
+					color: #CCC;
 				}
 			}
 			&.selected {
