@@ -15,11 +15,11 @@
   <div class="entry-content">
     <div class="entry-inner" <%= rtl(entry_presenter.content) %>>
       <header class="entry-header">
-        <p class="post-meta"><time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time></p>
         <%= link_to entry.fully_qualified_url, target: '_blank' do  %>
         <h1><%= entry_presenter.title %></h1>
         <% end %>
         <p class="post-meta"><% if entry.author %> by <%= entry_presenter.author %> | <% end %> <span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
+        <p class="post-meta"><time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time></p>
       </header>
       <div data-behavior="entry_content_wrap" class="content-styles">
         <%= raw entry_presenter.content %>

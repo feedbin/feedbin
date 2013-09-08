@@ -1317,8 +1317,8 @@ li.selected > a .favicon-wrap {
 }
 
 .entry-header {
-	padding: 0 0 5px;
-	margin-bottom: 10px;
+	padding: 0;
+	margin-bottom: 1.1em;
 	position: relative;
 	a {
 		display: block;
@@ -1334,13 +1334,9 @@ li.selected > a .favicon-wrap {
 		font-weight: normal;
 	}
 	.post-meta {
-		font-size: 1em;
 		color: #999;
 		line-height: 1.2;
-		margin: 0;
-		time {
-			font-weight: bold;
-		}
+		margin: .2em;
 	}
 }
 
@@ -1484,6 +1480,9 @@ li.selected > a .favicon-wrap {
 	}
 	.post-meta, .entry-feed-title {
 		font-family: $font-stack;
+	}
+	.entry-header h1 {
+		font-weight: 700;
 	}
 }
 
