@@ -977,12 +977,16 @@ li.selected > a .favicon-wrap {
 				}
 			}
 			&.selected {
-				border-color: $selected;
-				border-top: 1px solid $selected;
+				border-color: #666;
+				border-top: 1px solid #666;
 				margin-top: -1px;
 				.icon-star-filled {
 					color: #FFF;
 				}
+			}
+			.selected &.selected {
+				border-color: $selected;
+				border-top: 1px solid $selected;
 			}
 		}
 	}
