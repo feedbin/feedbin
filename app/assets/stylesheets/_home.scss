@@ -50,6 +50,7 @@
 		display: block;
 		background-image: image-url("logo.png");
 		background-size: 135px 26px;
+		float: left;
 	}
 	.header-nav {
 		font-family: 'Open Sans Light', Helvetica, sans-serif;
@@ -57,6 +58,7 @@
 		font-weight: 300;
 		font-size: 18px;
 		margin: 0;
+		overflow: auto;
 	}
 	.header-nav li {
 		list-style-type: none;
@@ -76,12 +78,8 @@
 		padding: 10px 20px;
 		background-color: #3399ff;
 	}
-	.tagline-wrap {
-		padding-bottom: 35px;
-	}
 	.tagline {
-		float: left;
-		width: 770px;
+		max-width: 770px;
 	}
 	.pricing {
 		width: 140px;
@@ -90,7 +88,7 @@
 		font-weight: 300;
 		height: 92px;
 		border-left: 3px solid rgba(255,255,255,.2);
-		float: left;
+		float: right;
 		margin-left: 27px;
 		font-size: 23px;
 		line-height: 1;
@@ -121,16 +119,27 @@
 	}
 	.main-content {
 		background-image: linear-gradient( #eeeeee 1%,white 60%);
-		padding: 60px 0 90px 0;
+		padding: 45px 0 90px 0;
 		border-top: 1px solid #FFF;
 	}
 	.callout {
-		background: image-url("api-promo.png") no-repeat;
-		background-size: 270px 152.5px;
-		background-position: 720px 52px;
 		background-color: #292929;
 		border: 1px solid #cccccc;
-		padding: 20px 250px 20px 30px;
+		padding: 20px 30px;
+		overflow: hidden;
+		img {
+			float: right;
+			position: relative;
+			margin-right: -51px;
+			right: -30px;
+			margin-bottom: -54px;
+			max-width: none;
+			@media (max-width: 601px) {
+				margin-bottom: 15px;
+				right: -30px;
+				margin-right: -151px;
+			}
+		}
 	}
 	.callout h2 {
 		color: #FFF;
@@ -138,9 +147,40 @@
 	.callout p {
 		color: #999999;
 	}
+	.features, .apps {
+		margin-left: -20px;
+		/* fixes automatic height with floats, see: http://quirksmode.org/css/clearing.html */
+		overflow: auto;
+		.feature, .app {
+			height: auto;
+			float: left;
+			margin-left: 20px;
+		}
+		.app {
+			min-height: 205px;
+			max-width: 360px;
+			width: 100%;
+			h3, p {
+				margin-left: 80px;
+			}
+			img {
+				float: left;
+			}
+			margin-top: 35px;
+			margin-right: 100px;
+		}
+		.feature {
+			max-width: 300px;
+			min-height: 155px;
+			margin-top: 15px;
+			margin-bottom: 10px;
+		}
+	}
 	.apps-promo {
+		margin-top: 50px;
 		padding-top: 15px;
 		background-image: linear-gradient( #e5e5e5,#cacaca);
+		clear: both;
 	}
 	.round-icon {
 		border-radius: 9px;
@@ -166,14 +206,17 @@
 		margin: 0;
 		padding: 0;
 		list-style: none;
+		/* fixes automatic height with floats, see: http://quirksmode.org/css/clearing.html */
+		overflow: auto;
 	}
 	.screenshot-nav li {
 		float: left;
 		margin: 0;
 		padding: 0;
+		margin: 0 0 15px;
 	}
-	.screenshot-nav li:first-child 	a {
-		margin-left: 0;
+	.screenshot-nav li:last-child 	a {
+		margin-right: 0;
 	}
 	.screenshot-nav li.active a {
 		background-color: #3399ff;
@@ -182,7 +225,7 @@
 	}
 	.screenshot-nav a {
 		display: block;
-		margin-left: 10px;
+		margin-right: 10px;
 		font-size: 14px;
 		font-weight: bold;
 		border: 1px solid transparent;
@@ -199,6 +242,12 @@
 		clip: rect(0px 0px 0px 0px);
 		height: 0;
 		width: 0;
+	}
+	.screenshots {
+		margin-top: 50px;
+		img {
+			width: 100%;
+		}
 	}
 	.inner-promo {
 		position: relative;
@@ -242,6 +291,7 @@
 		font-family: 'Open Sans Light', Helvetica, sans-serif;
 		font-style: normal;
 		font-weight: 300;
+		margin-top: 20px;
 	}
 	/*------------------------------------------------------------------------------
 		Helpers

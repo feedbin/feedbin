@@ -66,7 +66,11 @@ Grid
 .navbar-static-top .container,
 .navbar-fixed-top .container,
 .navbar-fixed-bottom .container {
-	width: 940px;
+	max-width: 940px;
+	@media (max-width: 970px) {
+	    margin-left: 15px;
+	    margin-right: 15px;
+	}
 }
 
 .span12 {
