@@ -15,7 +15,7 @@ The main Feedbin project is a [Rails 4.0](http://rubyonrails.org/) application. 
  - [**refresher:**](https://github.com/feedbin/refresher)
    Refresher is the service that does feed refreshing. Feed refreshes are scheduled as background jobs using [Sidekiq](https://github.com/mperham/sidekiq). Refresher is kept separate so it can be scaled independently. It's also a benefit to not have to load all of Rails for this service.
  - [**polyptych:**](https://github.com/feedbin/polyptych)
-   Polyptych is an API for fetching favicons. Favicons are compiled into a singe CSS file as base64 encoded background images. Polyptych is another Rails App. 
+   Polyptych is an API for fetching favicons. Favicons are compiled into a single CSS file as base64 encoded background images. Polyptych is another Rails App. 
  - [**camo:**](https://github.com/atmos/camo)
    Camo is an https image proxy. In production Feedbin is SSL only. One issue with SSL is all assets must be served over SSL as well or the browser will show insecure content warnings. Camo proxies all image requests through an SSL enabled host to prevent this.
 
