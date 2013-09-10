@@ -683,6 +683,9 @@ Structure
 			 * breaks things. */
 			.entries-column, .entries-column > * {
 				width: auto !important;
+				.ui-resizable-handle {
+					width: 0;
+				}
 			}
 			.entry-column {
 				display: none;
@@ -691,6 +694,9 @@ Structure
 		@media (max-width: 420px) {
 			.feeds-column, .feeds-column > * {
 				width: auto !important;
+				.ui-resizable-handle {
+					width: 0;
+				}
 			}
 			.entries-column {
 				display: none;
@@ -704,6 +710,9 @@ Structure
 			}
 			.entries-column, .entries-column > * {
 				width: auto !important;
+				.ui-resizable-handle {
+					width: 0;
+				}
 			}
 		}
 		@media (max-width: 420px) {
