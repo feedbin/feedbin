@@ -13,6 +13,9 @@ class EntriesController < ApplicationController
     @type = 'all'
     @data = nil
 
+    @collection_title = 'All'
+    @collection_favicon = 'favicon-all'
+
     respond_to do |format|
       format.js { render partial: 'shared/entries' }
     end
@@ -33,6 +36,9 @@ class EntriesController < ApplicationController
     @type = 'unread'
     @data = nil
 
+    @collection_title = 'Unread'
+    @collection_favicon = 'favicon-unread'
+
     respond_to do |format|
       format.js { render partial: 'shared/entries' }
     end
@@ -52,6 +58,9 @@ class EntriesController < ApplicationController
 
     @type = 'starred'
     @data = nil
+
+    @collection_title = 'Starred'
+    @collection_favicon = 'favicon-star'
 
     respond_to do |format|
       format.js { render partial: 'shared/entries' }

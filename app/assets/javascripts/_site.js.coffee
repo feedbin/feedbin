@@ -14,11 +14,13 @@ $.extend feedbin,
       button.val(originalText)
     ), 3000
 
-  updateEntries: (html) ->
-    $('.entries ul').html(html)
+  updateEntries: (entries, header) ->
+    $('.entries ul').html(entries)
+    $('.entries-header').html(header)
 
-  appendEntries: (html) ->
-    $('.entries ul').append(html)
+  appendEntries: (entries, header) ->
+    $('.entries ul').append(entries)
+    $('.entries-header').html(header)
 
   updatePager: (html) ->
     $('[data-behavior~=pagination]').html(html)

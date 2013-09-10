@@ -972,9 +972,58 @@ li.selected > a .favicon-wrap {
 	background-image: image-url("favicon-star.svg");
 }
 
+.back-button {
+	background-color: transparent;
+	background-size: 11px 18px;
+	background-repeat: no-repeat;
+	background-image: image-url("icon-left-arrow.svg");
+	background-position: center center;
+	display: block;
+	-webkit-appearance: none;
+	border: none;
+	height: 16px;
+	width: 11px;
+	padding: 0;
+}
+
 .entries-wrap {
 	position: relative;
 	border-right: 1px solid $list-border;
+}
+
+.entries-header {
+	color: #999;
+	display: none;
+	border-bottom: 1px solid #CCC;
+	line-height: 36px;
+	height: 36px;
+	text-align: center;
+	overflow: auto;
+	padding-right: 45px;
+	> * {
+		display: inline-block;
+	}
+	.back-button {
+		float: left;
+		height: 36px;
+		width: 36px;
+	}
+	.favicon-wrap {
+		position: static;
+	}
+	.favicon {
+		margin-top: 4px;
+	}
+	@media (max-width: 420px) {
+		.feed-selected & {
+			display: block;
+		}
+	}
+	@media (max-width: 720px) and (min-width: 621px) {
+		.entry-selected & {
+			display: block;
+		}
+	}
 }
 
 .entries {
@@ -1058,6 +1107,16 @@ li.selected > a .favicon-wrap {
 			}
 		}
 	}
+	@media (max-width: 420px) {
+		.feed-selected & {
+			top: 36px;
+		}
+	}
+	@media (max-width: 720px) {
+		.entry-selected & {
+			top: 36px;
+		}
+	}
 }
 
 .state-indicators {
@@ -1088,6 +1147,10 @@ li.selected > a .favicon-wrap {
 	width: 100%;
 	height: 36px;
 	border-bottom: 1px solid #CCC;
+	.back-button {
+		height: 36px;
+		width: 36px;
+	}
 	.favicon-wrap {
 		top: 8px;
 		left: 13px;
@@ -1100,6 +1163,16 @@ li.selected > a .favicon-wrap {
 		font-size: 14px;
 		color: #999999;
 		text-decoration: none;
+	}
+	@media (min-width: 621px) {
+		.back-button {
+			display: none;
+		}
+	}
+	@media (max-width: 720px) {
+		.favicon-wrap, .entry-feed-title {
+			display: none;
+		}
 	}
 }
 

@@ -1,9 +1,10 @@
 var entries = '<%= j render partial: "entries/entry", collection: @entries %>';
+var header = '<%= j render partial: "entries/entries_header", locals: {feed: @feed || nil} %>';
 
 <% if @append %>
-	feedbin.appendEntries(entries);
+	feedbin.appendEntries(entries, header);
 <% else %>
-	feedbin.updateEntries(entries);
+	feedbin.updateEntries(entries, header);
 <% end %>
 
 feedbin.localizeTime($('[data-behavior~=entries_target]'))
