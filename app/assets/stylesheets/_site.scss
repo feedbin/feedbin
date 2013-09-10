@@ -552,6 +552,7 @@ Structure
 		display: none;
 	}
 	@media (max-width: 720px) {
+		border-top-style: none;
 		.entry-selected & {
 			display: none;
 		}
@@ -624,6 +625,7 @@ Structure
 	right: 0;
 	left: 0;
 	@media (max-width: 720px) {
+		top: 46px;
 		.entry-selected & {
 			top: 0;
 		}
@@ -720,12 +722,24 @@ Structure
 	&.selected {
 		border-color: $selected;
 	}
+	@media (max-width: 720px) {
+		.entry-selected & {
+			border-top-style: none;
+		}
+	}
+	@media (max-width: 420px) {
+		.feed-selected & {
+			border-top-style: none;
+		}
+	}
 }
 
 .feeds-wrap {
 	background-color: $list-background;
 	position: relative;
-	border-right: 1px solid $list-border;
+	@media (min-width: 421px) {
+		border-right: 1px solid $list-border;
+	}
 }
 
 .view-toolbar {
@@ -989,6 +1003,11 @@ li.selected > a .favicon-wrap {
 .entries-wrap {
 	position: relative;
 	border-right: 1px solid $list-border;
+	@media (max-width: 720px) {
+		.feed-selected &, .nothing-selected & {
+			border-right-style: none;
+		}
+	}
 }
 
 .entries-header {
