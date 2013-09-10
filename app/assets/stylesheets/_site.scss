@@ -678,11 +678,20 @@ Structure
 	}
 	.nothing-selected & {
 		@media (max-width: 720px) {
+			/* Disable resizing the entries column when we remove the entry column.
+			 * The feeds column is still resizable, but allowing both to be resized
+			 * breaks things. */
+			.entries-column, .entries-column > * {
+				width: auto !important;
+			}
 			.entry-column {
 				display: none;
 			}
 		}
 		@media (max-width: 420px) {
+			.feeds-column, .feeds-column > * {
+				width: auto !important;
+			}
 			.entries-column {
 				display: none;
 			}
@@ -692,6 +701,9 @@ Structure
 		@media (max-width: 720px) {
 			.entry-column {
 				display: none;
+			}
+			.entries-column, .entries-column > * {
+				width: auto !important;
 			}
 		}
 		@media (max-width: 420px) {
