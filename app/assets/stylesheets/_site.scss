@@ -565,6 +565,9 @@ Structure
 			margin-bottom: 0;
 			padding: 5px;
 			font-size: 14px;
+			@media (max-width: 520px) {
+				width: 100px;
+			}
 		}
 	}
 	.app & {
@@ -587,6 +590,14 @@ Structure
 		padding: 0 15px 0 0;
 		border-right: 1px solid #cccccc;
 		&:last-child {
+			border: none;
+			margin-right: 0;
+			padding-right: 8px;
+		}
+		@media (max-width: 400px) {
+			&.logout-link {
+				display: none;
+			}
 			border: none;
 			margin-right: 0;
 			padding-right: 8px;
