@@ -332,11 +332,16 @@ $.extend feedbin,
         event.preventDefault()
         
     feedSelected: ->
+      $(document).on 'click', '[data-behavior~=back_to_feeds]', ->
+        $('.app').addClass('nothing-selected').removeClass('feed-selected entry-selected')
+
       $(document).on 'click', '[data-behavior~=show_entries]', ->
         feedbin.surface('entries', true)
+        $('.app').addClass('feed-selected').removeClass('nothing-selected entry-selected')
 
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
         feedbin.surface('entry-wrap', true)
+        $('.app').addClass('entry-selected').removeClass('nothing-selected feed-selected')
         
     addFields: ->
       $(document).on 'click', '[data-behavior~=add_fields]', (event) ->
