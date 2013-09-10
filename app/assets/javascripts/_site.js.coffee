@@ -46,20 +46,6 @@ $.extend feedbin,
   syntaxHighlight: ->
     $('[data-behavior~=entry_content_target] pre').each (i, e) ->
       hljs.highlightBlock(e)
-  
-  surface: (panel, clear) ->
-    if feedbin.data.mobile
-      if clear
-        if 'entries' == panel
-          feedbin.clearEntries()
-        else if 'entry-wrap' == panel
-          feedbin.clearEntry()
-      $(".panel-nav").removeClass('active')
-      $(".button-panel-#{panel}").addClass('active')
-      $(".mobile .panel").css
-        display: 'none'
-      $(".mobile .#{panel}").css
-        display: 'block'
     
   hideTagsForm: ->
     $('.tags-form-wrap').animate
@@ -338,11 +324,9 @@ $.extend feedbin,
         $('.app').addClass('nothing-selected').removeClass('feed-selected entry-selected')
 
       $(document).on 'click', '[data-behavior~=show_entries]', ->
-        feedbin.surface('entries', true)
         $('.app').addClass('feed-selected').removeClass('nothing-selected entry-selected')
 
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
-        feedbin.surface('entry-wrap', true)
         $('.app').addClass('entry-selected').removeClass('nothing-selected feed-selected')
         
     addFields: ->

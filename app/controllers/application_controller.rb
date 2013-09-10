@@ -7,7 +7,6 @@ class ApplicationController < ActionController::Base
   before_action :authorize
   before_action :set_view_mode
   before_action :honeybadger_context
-  before_action :prepare_for_mobile
   before_action :block_if_maintenance_mode
   
   etag { current_user.try :id }
@@ -135,15 +134,6 @@ class ApplicationController < ActionController::Base
         render 'errors/service_unavailable', status: 503, layout: 'application'
       end
     end
-  end
-  
-  def mobile_device?
-    request.user_agent =~ /android|blackberry|iphone|ipod|iemobile|mobile|webos/i  && !(request.user_agent =~ /ipad/i)
-  end
-  helper_method :mobile_device?
-  
-  def prepare_for_mobile
-    prepend_view_path Rails.root + 'app' + 'views_mobile' if mobile_device?
   end
 
   def honeybadger_context

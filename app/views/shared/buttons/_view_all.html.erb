@@ -1,13 +1,4 @@
-<% if mobile_device? %>
-  <%= link_to view_all_feeds_path, 
-        remote: true, class: "sidebar-button button-view-all #{view_mode_selected('view_all')}",
-        title: 'View all',
-  			data: { behavior: 'view_all' } do %>
-      	<i class="icon-list"></i>
-  <% end %>
-<% else %>
-  <%= link_to "All", view_all_feeds_path, 
-        remote: true, class: "view-button #{view_mode_selected('view_all')}",
-        title: 'View all',
-  			data: { behavior: 'view_all' } %>
-<% end %>
+<%= link_to "All", view_all_feeds_path,
+      remote: true, class: "view-button #{view_mode_selected('view_all')}",
+      title: 'View all',
+			data: { behavior: 'view_all' } %>

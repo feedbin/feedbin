@@ -1,31 +1,17 @@
-<% if mobile_device? %>
-  <% if feed.blank? %>
-  	<div class="sidebar-button button-unsubscribe" data-behavior="unsubscribe" disabled="disabled">
-  		<i class="icon-trash"></i>
-  	</div>
-  <% else %>
-  	<%= link_to subscription_path(feed.subscription_id), 
-          method: :delete, remote: true, class: 'sidebar-button button-unsubscribe', title: 'Unsubscribe',
-          data: { behavior: 'unsubscribe', confirm: "Are you sure you want to unsubscribe from #{feed.title}?" } do %>
-  		<i class="icon-trash"></i>
-  	<% end %>
-  <% end %>
+<% if feed.blank? %>
+	<div class="toolbar-button" data-behavior="unsubscribe" disabled="disabled">
+    <div class="toolbar-button-inner">
+      <%= render partial: "shared/svg/trash" %>
+    </div>
+    Delete
+	</div>
 <% else %>
-  <% if feed.blank? %>
-  	<div class="toolbar-button" data-behavior="unsubscribe" disabled="disabled">
-      <div class="toolbar-button-inner">
-        <%= render partial: "shared/svg/trash" %>
-      </div>
-      Delete
-  	</div>
-  <% else %>
-  	<%= link_to subscription_path(feed.subscription_id), 
-          method: :delete, remote: true, class: 'toolbar-button', title: 'Unsubscribe',
-          data: { behavior: 'unsubscribe', confirm: "Are you sure you want to unsubscribe from #{feed.title}?" } do %>
-      <span class="toolbar-button-inner">
-        <%= render partial: "shared/svg/trash" %>
-      </span>
-      Delete
-  	<% end %>
-  <% end %>
+	<%= link_to subscription_path(feed.subscription_id),
+        method: :delete, remote: true, class: 'toolbar-button', title: 'Unsubscribe',
+        data: { behavior: 'unsubscribe', confirm: "Are you sure you want to unsubscribe from #{feed.title}?" } do %>
+    <span class="toolbar-button-inner">
+      <%= render partial: "shared/svg/trash" %>
+    </span>
+    Delete
+	<% end %>
 <% end %>
