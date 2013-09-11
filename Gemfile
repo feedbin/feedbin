@@ -19,7 +19,7 @@ gem 'unicorn'
 gem 'nokogiri', '1.5.10'
 
 gem 'opml_saw',              github: 'feedbin/opml_saw',              ref: '61d8c2d'
-gem 'feedzirra',             github: 'feedbin/feedzirra',             ref: 'c782e93'
+gem 'feedzirra',             github: 'feedbin/feedzirra',             ref: 'c9a2188'
 gem 'html-pipeline',         github: 'benubois/html-pipeline',        ref: '652162b'
 gem 'activerecord-import',   github: 'feedbin/activerecord-import',   ref: 'b7851b1'
 gem 'multi_fetch_fragments', github: 'feedbin/multi_fetch_fragments', ref: 'e99b6f7'
