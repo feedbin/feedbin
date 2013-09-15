@@ -551,7 +551,7 @@ Structure
 	.logo {
 		display: none;
 	}
-	@media (max-width: 720px) {
+	@media (max-width: 768px) {
 		border-top-style: none;
 		.entry-selected & {
 			display: none;
@@ -624,7 +624,7 @@ Structure
 	top: 49px;
 	right: 0;
 	left: 0;
-	@media (max-width: 720px) {
+	@media (max-width: 768px) {
 		top: 46px;
 		.entry-selected & {
 			top: 0;
@@ -677,7 +677,7 @@ Structure
 		}
 	}
 	.nothing-selected & {
-		@media (max-width: 720px) {
+		@media (max-width: 768px) {
 			/* Disable resizing the entries column when we remove the entry column.
 			 * The feeds column is still resizable, but allowing both to be resized
 			 * breaks things. */
@@ -704,7 +704,7 @@ Structure
 		}
 	}
 	.feed-selected & {
-		@media (max-width: 720px) {
+		@media (max-width: 768px) {
 			.entry-column {
 				display: none;
 			}
@@ -722,7 +722,7 @@ Structure
 		}
 	}
 	.entry-selected & {
-		@media (max-width: 720px) {
+		@media (max-width: 768px) {
 			.feeds-column {
 				display: none;
 			}
@@ -743,7 +743,7 @@ Structure
 	&.selected {
 		border-color: $selected;
 	}
-	@media (max-width: 720px) {
+	@media (max-width: 768px) {
 		.entry-selected & {
 			border-top-style: none;
 		}
@@ -1024,7 +1024,7 @@ li.selected > a .favicon-wrap {
 .entries-wrap {
 	position: relative;
 	border-right: 1px solid $list-border;
-	@media (max-width: 720px) {
+	@media (max-width: 768px) {
 		.feed-selected &, .nothing-selected & {
 			border-right-style: none;
 		}
@@ -1059,7 +1059,7 @@ li.selected > a .favicon-wrap {
 			display: block;
 		}
 	}
-	@media (max-width: 720px) and (min-width: 621px) {
+	@media (max-width: 768px) and (min-width: 621px) {
 		.entry-selected & {
 			display: block;
 		}
@@ -1152,7 +1152,7 @@ li.selected > a .favicon-wrap {
 			top: 36px;
 		}
 	}
-	@media (max-width: 720px) {
+	@media (max-width: 768px) {
 		.entry-selected & {
 			top: 36px;
 		}
@@ -1209,7 +1209,7 @@ li.selected > a .favicon-wrap {
 			display: none;
 		}
 	}
-	@media (max-width: 720px) {
+	@media (max-width: 768px) {
 		.favicon-wrap, .entry-feed-title {
 			display: none;
 		}
