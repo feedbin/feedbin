@@ -41,7 +41,7 @@ $.extend feedbin,
     $('[data-behavior~=entries_target]').html('')
 
   clearEntry: ->
-    $('[data-behavior~=toolbar_target_entry], [data-behavior~=entry_content_target]' ).html('')
+    $('[data-behavior~=entry_content_target]' ).html('')
     
   syntaxHighlight: ->
     $('[data-behavior~=entry_content_target] pre').each (i, e) ->
@@ -323,7 +323,9 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=back_to_feeds]', ->
         $('.app').addClass('nothing-selected').removeClass('feed-selected entry-selected')
 
-      $(document).on 'click', '[data-behavior~=show_entries]', ->
+      $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
+        unless $(event.target).hasClass('back-button')
+          feedbin.clearEntries()
         $('.app').addClass('feed-selected').removeClass('nothing-selected entry-selected')
 
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
@@ -421,7 +423,7 @@ $.extend feedbin,
       $(document).on 'ajax:beforeSend', '[data-behavior~=open_item]', (event, xhr) ->
         id = $(@).parents('li').data('entry-id')
         entry = feedbin.entries[id]
-        if entry && false == feedbin.data.mobile
+        if entry
           xhr.abort()
           feedbin.updateEntryContent(entry.content)
           feedbin.formatEntryContent()
