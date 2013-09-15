@@ -1,6 +1,7 @@
 September 2013
 --------------
 
+- 2013-09-06 Right-to-left script support
 - 2013-09-03 Added format toolbar
 
 August 2013
