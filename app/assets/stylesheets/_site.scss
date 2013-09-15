@@ -2670,6 +2670,33 @@ Login and Sign Up
 
 
 /*------------------------------------------------------------------------------
+Mobile
+------------------------------------------------------------------------------*/
+@media (max-width: 420px) {
+	.entry-selected {
+		.entry-header h1 {
+			font-size: 1.6em;
+		}
+	}
+	.button-entry-width {
+		display: none !important;
+	}
+	.entry-inner {
+		padding: 20px;
+	}
+	.feeds {
+		.feed-link {
+			padding: 11px 40px 10px 35px !important;
+		
+		}
+		.favicon-wrap {
+			top: 7px;
+		}
+	}
+}
+
+
+/*------------------------------------------------------------------------------
 Right-to-left
 ------------------------------------------------------------------------------*/
 [dir="rtl"] {
