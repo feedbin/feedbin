@@ -24,12 +24,11 @@ class SiteController < ApplicationController
   end
   
   def home
-    @track = true
+    @page_view = '/home'
     render action: 'not_logged_in', layout: 'wrap'
   end
   
   def privacy_policy
-    @track = true
   end
   
   private

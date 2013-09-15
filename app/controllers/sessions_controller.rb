@@ -3,11 +3,9 @@ class SessionsController < ApplicationController
   skip_before_action :authorize
 
   def new
-    @track = true
   end
   
   def create
-    @track = true
     user = User.where('lower(email) = ?', params[:email].try(:strip).try(:downcase)).take
     if user && user.authenticate(params[:password])
       sign_in user, params[:remember_me]

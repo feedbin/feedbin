@@ -14,6 +14,6 @@
 </head>
 <body class="<%= @class %>">
   <%= yield(:content) %>
-  <%= render partial: 'shared/tracking' if @track %>
+  <%= render partial: 'shared/tracking' %>
 </body>
 </html>
