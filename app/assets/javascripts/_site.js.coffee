@@ -141,7 +141,8 @@ $.extend feedbin,
         else
           title = "Feedbin (#{count})"
 
-        $('title').text(title)
+        docTitle = $('title')
+        docTitle.text(title) unless docTitle.text() is title
     
   readability: (target) ->
     feedId = $('[data-feed-id]', target).data('feed-id')
