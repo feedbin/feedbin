@@ -551,6 +551,17 @@ Structure
 	.logo {
 		display: none;
 	}
+	@media (max-width: 720px) {
+		border-top-style: none;
+		.entry-selected & {
+			display: none;
+		}
+	}
+	@media (max-width: 420px) {
+		.feed-selected & {
+			display: none;
+		}
+	}
 }
 
 .subscribe-wrap {
@@ -565,6 +576,9 @@ Structure
 			margin-bottom: 0;
 			padding: 5px;
 			font-size: 14px;
+			@media (max-width: 520px) {
+				width: 100px;
+			}
 		}
 	}
 	.app & {
@@ -591,6 +605,14 @@ Structure
 			margin-right: 0;
 			padding-right: 8px;
 		}
+		@media (max-width: 400px) {
+			&.logout-link {
+				display: none;
+			}
+			border: none;
+			margin-right: 0;
+			padding-right: 8px;
+		}
 	}
 }
 
@@ -602,6 +624,17 @@ Structure
 	top: 49px;
 	right: 0;
 	left: 0;
+	@media (max-width: 720px) {
+		top: 46px;
+		.entry-selected & {
+			top: 0;
+		}
+	}
+	@media (max-width: 420px) {
+		.feed-selected & {
+			top: 0;
+		}
+	}
 }
 
 .side-toolbar-wrap {
@@ -631,7 +664,6 @@ Structure
 	border: none;
 	.feeds-column {
 		position: relative;
-		height: auto !important;
 		width: 250px;
 		@include respond-to(ipad) {
 			width: 200px;
@@ -639,10 +671,66 @@ Structure
 	}
 	.entries-column {
 		position: relative;
-		height: auto !important;
 		width: 300px;
 		@include respond-to(ipad) {
 			width: 270px;
+		}
+	}
+	.nothing-selected & {
+		@media (max-width: 720px) {
+			/* Disable resizing the entries column when we remove the entry column.
+			 * The feeds column is still resizable, but allowing both to be resized
+			 * breaks things. */
+			.entries-column, .entries-column > * {
+				width: auto !important;
+				.ui-resizable-handle {
+					width: 0;
+				}
+			}
+			.entry-column {
+				display: none;
+			}
+		}
+		@media (max-width: 420px) {
+			.feeds-column, .feeds-column > * {
+				width: auto !important;
+				.ui-resizable-handle {
+					width: 0;
+				}
+			}
+			.entries-column {
+				display: none;
+			}
+		}
+	}
+	.feed-selected & {
+		@media (max-width: 720px) {
+			.entry-column {
+				display: none;
+			}
+			.entries-column, .entries-column > * {
+				width: auto !important;
+				.ui-resizable-handle {
+					width: 0;
+				}
+			}
+		}
+		@media (max-width: 420px) {
+			.feeds-column {
+				display: none;
+			}
+		}
+	}
+	.entry-selected & {
+		@media (max-width: 720px) {
+			.feeds-column {
+				display: none;
+			}
+		}
+		@media (max-width: 620px) {
+			.entries-column {
+				display: none;
+			}
 		}
 	}
 }
@@ -655,12 +743,24 @@ Structure
 	&.selected {
 		border-color: $selected;
 	}
+	@media (max-width: 720px) {
+		.entry-selected & {
+			border-top-style: none;
+		}
+	}
+	@media (max-width: 420px) {
+		.feed-selected & {
+			border-top-style: none;
+		}
+	}
 }
 
 .feeds-wrap {
 	background-color: $list-background;
 	position: relative;
-	border-right: 1px solid $list-border;
+	@media (min-width: 421px) {
+		border-right: 1px solid $list-border;
+	}
 }
 
 .view-toolbar {
@@ -907,9 +1007,63 @@ li.selected > a .favicon-wrap {
 	background-image: image-url("favicon-star.svg");
 }
 
+.back-button {
+	background-color: transparent;
+	background-size: 11px 18px;
+	background-repeat: no-repeat;
+	background-image: image-url("icon-left-arrow.svg");
+	background-position: center center;
+	display: block;
+	-webkit-appearance: none;
+	border: none;
+	height: 16px;
+	width: 11px;
+	padding: 0;
+}
+
 .entries-wrap {
 	position: relative;
 	border-right: 1px solid $list-border;
+	@media (max-width: 720px) {
+		.feed-selected &, .nothing-selected & {
+			border-right-style: none;
+		}
+	}
+}
+
+.entries-header {
+	color: #999;
+	display: none;
+	border-bottom: 1px solid #CCC;
+	line-height: 36px;
+	height: 36px;
+	text-align: center;
+	overflow: auto;
+	padding-right: 45px;
+	> * {
+		display: inline-block;
+	}
+	.back-button {
+		float: left;
+		height: 36px;
+		width: 36px;
+	}
+	.favicon-wrap {
+		position: static;
+	}
+	.favicon {
+		margin-top: 4px;
+	}
+	@media (max-width: 420px) {
+		.feed-selected & {
+			display: block;
+		}
+	}
+	@media (max-width: 720px) and (min-width: 621px) {
+		.entry-selected & {
+			display: block;
+		}
+	}
 }
 
 .entries {
@@ -993,6 +1147,16 @@ li.selected > a .favicon-wrap {
 			}
 		}
 	}
+	@media (max-width: 420px) {
+		.feed-selected & {
+			top: 36px;
+		}
+	}
+	@media (max-width: 720px) {
+		.entry-selected & {
+			top: 36px;
+		}
+	}
 }
 
 .state-indicators {
@@ -1023,6 +1187,10 @@ li.selected > a .favicon-wrap {
 	width: 100%;
 	height: 36px;
 	border-bottom: 1px solid #CCC;
+	.back-button {
+		height: 36px;
+		width: 36px;
+	}
 	.favicon-wrap {
 		top: 8px;
 		left: 13px;
@@ -1035,6 +1203,16 @@ li.selected > a .favicon-wrap {
 		font-size: 14px;
 		color: #999999;
 		text-decoration: none;
+	}
+	@media (min-width: 621px) {
+		.back-button {
+			display: none;
+		}
+	}
+	@media (max-width: 720px) {
+		.favicon-wrap, .entry-feed-title {
+			display: none;
+		}
 	}
 }
 
@@ -2418,100 +2596,6 @@ input:focus:invalid, textarea:focus:invalid, select:focus:invalid {
 	margin-bottom: 15px;
 	.alert {
 		margin-top: 0;
-	}
-}
-
-
-
-/*------------------------------------------------------------------------------
-Mobile
-------------------------------------------------------------------------------*/
-.mobile {
-	.content {
-		left: 40px;
-	}
-	.bar {
-		display: none;
-	}
-	.panel {
-		z-index: 1;
-	}
-	.feeds {
-		top: 0;
-		bottom: 0;
-		display: block;
-	}
-	.entries,
-	.entry-wrap {
-		display: none;
-	}
-	.feeds {
-		background-color: $list-background;
-	}
-	.entry-wrap {
-		.entry-inner {
-			padding: 10px;
-			max-width: 100%;
-		}
-	}
-	.entry-content {
-		h1 {
-			font-size: 24px;
-			line-height: 26px;
-		}
-	}
-	.entry-toolbar .favicon-wrap {
-		left: 10px;
-	}
-	.entry-toolbar .entry-feed-title {
-		left: 35px;
-	}
-	.content {
-		top: 0;
-	}
-	.sliding-panel {
-		transform: translate3d(0,0,0);
-	}
-	.button-panel-feeds {
-		top: 0;
-	}
-	.button-panel-entries {
-		top: 40px;
-	}
-	.button-panel-entry-wrap {
-		top: 80px;
-	}
-	.button-view-all {
-		top: 160px;
-	}
-	.button-view-unread {
-		top: 200px;
-	}
-	.panel-nav {
-		background-color: #242424;
-		border-top: 1px solid #464646;
-		border-bottom: 1px solid #000000;
-		box-shadow: inset -1px 0 0 0 rgba(0,0,0,.4), inset -2px 0 0 0 rgba(0,0,0,.2), inset -3px 0 0 0 rgba(0,0,0,.1);
-		i {
-			text-shadow: none;
-		}
-		&.active {
-			box-shadow: none;
-			background-color: $list-background;
-			i {
-				color: #000;
-			}
-		}
-	}
-	.side-toolbar {
-		.panel-nav:first-child {
-			border-top: none;
-		}
-	}
-	@media all and (orientation:landscape) {
-		.landscape-hide {
-			display: none;
-		}
 	}
 }
 

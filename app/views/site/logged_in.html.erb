@@ -1,4 +1,4 @@
-<% @class = 'app' %>
+<% @class = 'app nothing-selected' %>
 <% content_for :head do %>
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
   <% if ENV['FONT_STYLESHEET'] %>
@@ -41,12 +41,13 @@
       </td>
       <td class="entries-column app-panel" data-behavior="content_column" <%= resizable 'entries' %>>
         <div class="full-height entries-wrap">
+          <div class="entries-header" data-behavior="entries-header"></div>
           <div class="entries">
-          	<ul data-behavior="entries_target"></ul>
+            <ul data-behavior="entries_target"></ul>
           </div>
         </div>
       </td>
-      <td class="app-panel" data-behavior="content_column">
+      <td class="entry-column app-panel" data-behavior="content_column">
         <div class="full-height entry-wrap">
         	<div class="entry-content-wrap full-height <%= @user.entry_width %> font-size-<%= @user.font_size || 5 %> font-<%= @user.font || 'default' %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
             

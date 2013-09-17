@@ -20,7 +20,7 @@
     <div class="account-buttons">
       <% if signed_in? %>
         <%= link_to 'Settings', settings_path %>
-        <%= link_to "Log Out", logout_path, method: "delete" %>
+        <%= link_to "Log Out", logout_path, method: "delete", class: 'logout-link' %>
       <% else %>
         <%= link_to 'Sign Up', signup_path %>
         <%= link_to 'Log In', login_path %>
