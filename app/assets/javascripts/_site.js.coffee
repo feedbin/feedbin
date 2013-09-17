@@ -330,6 +330,22 @@ $.extend feedbin,
         $("[data-behavior~=screenshots] img").addClass('hide')
         $("[data-behavior~=screenshots] img[src='#{src}']").removeClass('hide')
         event.preventDefault()
+
+      $(document).on 'click', '[data-behavior~=screenshot_previous], [data-behavior~=screenshot_next]', (event) ->
+        selectedScreenshot = $('[data-behavior~=screenshot_nav] li.active')
+        button = $(event.target).data('behavior')
+        if button.match(/screenshot_next/)
+          nextScreenshot = selectedScreenshot.next()
+          if nextScreenshot.length == 0
+            nextScreenshot = $('li:first-child', $('[data-behavior~=screenshot_nav]'))
+        else
+          nextScreenshot = selectedScreenshot.prev()
+          if nextScreenshot.length == 0
+            nextScreenshot = $('li:last-child', $('[data-behavior~=screenshot_nav]'))
+        
+        nextScreenshot.find('a').click()
+        event.preventDefault()
+      
         
     feedSelected: ->
       $(document).on 'click', '[data-behavior~=show_entries]', ->
