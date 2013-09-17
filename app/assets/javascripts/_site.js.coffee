@@ -107,7 +107,8 @@ $.extend feedbin,
     anchor.dispatchEvent event
 
   updateTitle: (title) ->
-    $('title').text(title)
+    docTitle = $('title')
+    docTitle.text(title) unless docTitle.text() is title
 
   autocomplete: ->
     $("#feed_tag_list").autocomplete
@@ -141,7 +142,7 @@ $.extend feedbin,
         else
           title = "Feedbin (#{count})"
 
-        $('title').text(title)
+        feedbin.updateTitle(title)
     
   readability: (target) ->
     feedId = $('[data-feed-id]', target).data('feed-id')
