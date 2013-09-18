@@ -17,16 +17,15 @@
 		-ms-interpolation-mode: bicubic;
 	}
 	.home-logo {
-		margin-top: 6px;
-		background: image-url('logo.png') no-repeat scroll top left;
+		background: image-url('logo-full.svg') no-repeat scroll top left;
 		display: block;
-		width: 130px;
-		height: 27px;
-		background-size: 130px 27px;
+		width: 140px;
+		height: 30px;
+		background-size: 130px 40px;
 		@include respond-to(screen-xs) {
 			width: 167px;
-			height: 35px;
-			background-size: 167px 35px;
+			height: 36px;
+			background-size: 167px 36px;
 		}
 	}
 	.header {
@@ -52,7 +51,7 @@
 	}
 	.tagline, .tagline-small {
 		text-align: center;
-		font-size: 24px;
+		font-size: 28px;
 		font-weight: 300;
 		max-width: 900px;
 		margin: 0 auto 25px auto;
@@ -68,7 +67,7 @@
 	}
 	.tagline-small {
 		color: #000;
-		font-size: 20px;
+		font-size: 24px;
 		margin-bottom: 20px;
 		@include respond-to(screen-sm) {
 			font-size: 36px;
@@ -76,7 +75,7 @@
 		}
 	}
 	.sub-head {
-		font-size: 14px;
+		font-size: 16px;
 		color: #999999;
 		max-width: 900px;
 		margin: 0 auto 30px auto;
@@ -94,26 +93,27 @@
 		em {
 			font-weight: normal;
 		}
-		
 	}
 	.button-login {
 		display: inline-block;
-		padding: 12px 25px;
+		padding: 8px 17px;
 		border: 1px solid #999;
 		color: #666;
-		font-size: 18px;
+		font-size: 14px;
 		font-weight: bold;
 		border-radius: 4px;
 		line-height: 1;
+		margin-top: 5px;
 		&:hover {
 			color: #FFF;
 			background-color: #3399ff;
 			border-color: #3399ff;
 			text-decoration: none;
 		}
-		@include respond-to(screen-sm) {
-			padding-left: 49px;
-			padding-right: 49px;
+		@include respond-to(screen-xs) {
+			margin-top: 0;
+			font-size: 18px;
+			padding: 12px 49px;
 		}
 	}
 	.button-get-started {
@@ -138,7 +138,7 @@
 			padding: 10px 15px 0 15px;
 		img {
 			margin: 0 auto;
-			box-shadow: 0px 0px 10px 1px rgba(0,0,0,.5);
+			box-shadow: 0px 0px 15px 1px rgba(0,0,0,.1);
 		}
 		@include respond-to(screen-sm) {
 			margin-top: 40px;
@@ -153,9 +153,14 @@
 		}
 	}
 	.app {
+		display: block;
 		margin-bottom: 15px;
-		border-bottom: 1px solid #CCC;
+		border-bottom: 1px solid #ededed;
 		padding-bottom: 15px;
+		&:first-child {
+			border-top: 1px solid #ededed;
+			padding-top: 15px;
+		}
 		.icon {
 			float: left;
 			margin: 0;
@@ -179,12 +184,19 @@
 			color: #999999;
 			margin: 0;
 		}
+		&:hover {
+			text-decoration: none;
+		}
 		@include respond-to(screen-sm) {
 			text-align: left;
 			position: relative;
 			border-bottom: none;
 			display: inline-block;
 			width: 150px;
+			&:first-child {
+				border-top: none;
+				padding-top: 0;
+			}
 			.icon-wrap {
 				display: block;
 				position: absolute;
@@ -208,16 +220,26 @@
 		}
 	}
 	.feature {
+		margin-bottom: 40px;
 		h3 {
-			font-size: 24px;
+			font-size: 20px;
 			font-weight: normal;
 			color: #333;
+			@include respond-to(screen-sm) {
+				font-size: 24px;
+			}
 		}
 		p {
-			font-size: 16px;
+			max-width: 300px;
+			margin-left: auto;
+			margin-right: auto;
+			font-size: 14px;
 			color: #666;
+			line-height: 1.5;
+			@include respond-to(screen-sm) {
+				font-size: 16px;
+			}
 		}
-		margin-bottom: 20px;
 	}
 	.screenshots-wrap {
 		background-color: #333;
@@ -303,11 +325,11 @@
 			text-align: left;
 			max-width: 100%;
 		}
-		.api-promo {
-			box-shadow: 0px 0px 10px 1px rgba(0,0,0,.5);
-		}
 		@include respond-to(screen-sm) {
 			padding: 80px 0;
+		}
+		.api-promo {
+			margin: 0 auto;
 		}
 	}
 	footer {
