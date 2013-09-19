@@ -174,6 +174,17 @@ $.extend feedbin,
       fontContainer.removeClass("font-size-#{currentFontSize}")
       fontContainer.addClass("font-size-#{newFontSize}")
       fontContainer.data('font-size', newFontSize)
+
+  matchHeights: (elements) ->
+    height = 0
+    $.each elements, (index, element) ->
+      $(element).css({'height': ''})
+      outerHeight = $(element).outerHeight()
+      if outerHeight > height
+        height = outerHeight
+
+    elements.css
+      height: height
       
   hideQueue: []
 
@@ -519,6 +530,24 @@ $.extend feedbin,
           $('[data-behavior~=entry_content_target]').removeClass('fluid')
         else
           $('[data-behavior~=entry_content_target]').addClass('fluid')
+        
+    filterList: ->
+      feedbin.matchHeights($('.app-detail'))
+      $(window).on 'resize', () ->
+        feedbin.matchHeights($('.app-detail'))
+      
+      
+      $(document).on 'click', '[data-filter]', (event) ->
+        $('[data-filter]').removeClass('active')
+        $(@).addClass('active')
+
+        filter = $(@).data('filter')
+        if filter == 'all'
+          $("[data-platforms]").removeClass('hide')
+        else
+          $("[data-behavior~=filter_target]").addClass('hide')
+          $("[data-platforms~=#{filter}]").removeClass('hide')
+
 
 jQuery ->
   $.each feedbin.init, (i, item) ->

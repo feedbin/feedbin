@@ -1,6 +1,6 @@
 class SiteController < ApplicationController
   
-  skip_before_action :authorize, only: [:index, :home, :privacy_policy]
+  skip_before_action :authorize, only: [:index, :home, :privacy_policy, :apps]
   before_action :suspended_user, if: :signed_in?
   
   def index
@@ -29,6 +29,11 @@ class SiteController < ApplicationController
   end
   
   def privacy_policy
+    render layout: 'sub_page'
+  end
+  
+  def apps
+    render layout: 'sub_page'
   end
   
   private

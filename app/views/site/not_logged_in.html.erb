@@ -1,4 +1,4 @@
-<% @class = 'public-page home' %>
+<% @class = 'public-page' %>
 <% content_for :head do %>
   <meta name="description" content="A fast, simple RSS feed reader that delivers a great reading experience."/>
 <% end %>
@@ -16,13 +16,13 @@
       <p class="align-center"><%= link_to "Get started", signup_path, class: "button-get-started" %></p>
     </div>
     <div class="screenshot-mask">
-      <%= image_tag "screenshots/_main.png" %>
+      <%= image_tag "screenshots/_main.png", class: "responsive" %>
     </div>
   </div>
-  <div class="features">
+  <div class="main-content">
     <div class="container">
       
-      <h2 class="tagline-small">Feedbin syncs with these apps <em><a href="XX">and more</a></em></h2>
+      <h2 class="tagline-small">Feedbin syncs with these apps <em><a href="<%= apps_path %>">and more</a></em></h2>
       <div class="apps">
         <a href="https://itunes.apple.com/app/reeder-2/id697846300" class="app clearfix">
           <span class="icon-wrap">
@@ -56,7 +56,7 @@
           <p>By Balazs Varkonyi</p>
         </a>
       
-        <p class="sm-hide align-center"><%= link_to "See all apps", "XX" %></p>
+        <p class="sm-show align-center"><%= link_to "See all apps", apps_path %></p>
       </div>
                 
     </div>
@@ -107,62 +107,62 @@
       <ul class="screenshot-nav" data-behavior="screenshot_nav">
         <li>
           <a href="#">
-            <%= image_tag 'screenshots/settings.png' %>
+            <%= image_tag "screenshots/settings.png", class: "responsive" %>
             Settings
           </a>
         </li>
         <li>
           <a href="#" class="active">
-            <%= image_tag 'screenshots/tags.png' %>
+            <%= image_tag "screenshots/tags.png", class: "responsive" %>
             Tags
           </a>
         </li>
         <li>
           <a href="#">
-            <%= image_tag 'screenshots/feed-management.png' %>
+            <%= image_tag "screenshots/feed-management.png", class: "responsive" %>
             Feed Management
           </a>
         </li>
         <li>
           <a href="#">
-            <%= image_tag 'screenshots/multiple-feeds.png' %>
+            <%= image_tag "screenshots/multiple-feeds.png", class: "responsive" %>
             Multiple Feeds
           </a>
         </li>
         <li>
           <a href="#">
-            <%= image_tag 'screenshots/account.png' %>
+            <%= image_tag "screenshots/account.png", class: "responsive" %>
             Account
           </a>
         </li>
         <li>
           <a href="#">
-            <%= image_tag 'screenshots/import-export.png' %>
+            <%= image_tag "screenshots/import-export.png", class: "responsive" %>
             Import/Export
           </a>
         </li>
         <li>
           <a href="#">
-            <%= image_tag 'screenshots/share-menu.png' %>
+            <%= image_tag "screenshots/share-menu.png", class: "responsive" %>
             Share Menu
           </a>
         </li>
         <li>
           <a href="#">
-            <%= image_tag 'screenshots/configure-sharing.png' %>
+            <%= image_tag "screenshots/configure-sharing.png", class: "responsive" %>
             Configure Sharing
           </a>
         </li>
       </ul>
       <div data-behavior="screenshots" class="screenshots">
-        <%= image_tag 'screenshots/settings.png' %>
-        <%= image_tag 'screenshots/tags.png', class: 'hide' %>
-        <%= image_tag 'screenshots/multiple-feeds.png', class: 'hide' %>
-        <%= image_tag 'screenshots/account.png', class: 'hide' %>
-        <%= image_tag 'screenshots/import-export.png', class: 'hide' %>
-        <%= image_tag 'screenshots/share-menu.png', class: 'hide' %>
-        <%= image_tag 'screenshots/configure-sharing.png', class: 'hide' %>
-        <%= image_tag 'screenshots/feed-management.png', class: 'hide' %>
+        <%= image_tag "screenshots/settings.png", class: "responsive" %>
+        <%= image_tag "screenshots/tags.png", class: "hide responsive" %>
+        <%= image_tag "screenshots/multiple-feeds.png", class: "hide responsive" %>
+        <%= image_tag "screenshots/account.png", class: "hide responsive" %>
+        <%= image_tag "screenshots/import-export.png", class: "hide responsive" %>
+        <%= image_tag "screenshots/share-menu.png", class: "hide responsive" %>
+        <%= image_tag "screenshots/configure-sharing.png", class: "hide responsive" %>
+        <%= image_tag "screenshots/feed-management.png", class: "hide responsive" %>
       </div>
     </div>
   </div>
@@ -176,24 +176,12 @@
           <p class="sub-head"><a href="https://github.com/feedbin/feedbin-api#readme">Check out the documentation</a> to get started</p>
         </div>
         <div class="col-md-5 col-md-offset-1">
-          <%= image_tag 'api-promo.svg', class: 'api-promo' %>
+          <%= image_tag 'api-promo.svg', class: 'api-promo responsive' %>
         </div>
       </div>
     </div>
   </div>
   
-  <footer>
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-6">
-          <p><a href="http://blog.feedbin.me">Blog</a> | <a href="XX">Apps</a> | <a href="https://github.com/feedbin/support#readme">Support</a> | <a href="https://github.com/feedbin/feedbin-api#readme">API</a> | <a href="<%= privacy_policy_path %>">Privacy Policy</a></p>
-        </div>
-        <div class="col-sm-6 text-right">
-          <p><a href="https://twitter.com/feedbin">Twitter</a> | <a href="https://github.com/feedbin/feedbin">GitHub</a></p>
-        </div>
-      </div>
-      <hr class="space-small" />
-      <p class="copy">© <%= Time.now.year %> Feedbin, LLC</p>
-    </div>
-  </footer>
+  <%= render partial: "shared/public_footer" %>
+
 <% end %>

@@ -13,6 +13,7 @@ Feedbin::Application.routes.draw do
   get :health_check, to: proc {|env| [200, {}, ["OK"]] }
 
   get :home, to: 'site#home'
+  get :apps, to: 'site#apps'
   
   post '/emails' => 'emails#create'
   

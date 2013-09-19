@@ -2,9 +2,9 @@
 <% content_for :app_content do %>
 <div class="split-bg">
   <div class="split-bg-inner">
-    <div class="container">
-      <div class="row">
-        <div class="span2 offset2">
+    <div class="settings-wrap clearfix">
+      
+        <div class="settings-nav">
           <div class="pad-top">
             <ul class="nav">
               <li><%= link_to 'Settings', settings_path, class: is_active?('settings', 'settings') %></li>
@@ -26,13 +26,13 @@
             <li><a href="https://twitter.com/feedbin">@feedbin</a></li>
           </ul>
         </div>
-        <div class="span8">
+        <div class="settings-content">
           <div class="content-inner">
             <%= render partial: 'shared/flash', locals: {flash: flash} %>
             <%= yield %>
           </div>
         </div>
-      </div>
+
     </div>
   </div>
 </div>

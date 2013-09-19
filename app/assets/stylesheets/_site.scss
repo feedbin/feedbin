@@ -2033,6 +2033,21 @@ Settings
 }
 
 .settings {
+	.settings-wrap {
+		width: 940px;
+		margin: 0 auto;
+	}
+	.settings-nav {
+		float: left;
+		width: 140px;
+		margin-left: 160px;
+	}
+	.settings-content {
+		margin-left: 20px;
+		width: 620px;
+		float: left;
+	}
+	
 	.content {
 		position: static;
 		height: 100%;
@@ -2555,6 +2570,10 @@ Helpers
 	text-align: right;
 }
 
+.align-left {
+	text-align: left !important;
+}
+
 .align-center {
 	text-align: center;
 }
@@ -2901,24 +2920,56 @@ input:focus:invalid, textarea:focus:invalid, select:focus:invalid {
 }
 
 .xs-hide {
+	display: none;
+	@include respond-to(screen-xs) {
+		display: block;
+	}
+}
+
+.sm-hide {
+	display: none;
+	@include respond-to(screen-sm) {
+		display: block;
+	}
+}
+
+.md-hide {
+	display: none;
+	@include respond-to(screen-md) {
+		display: block;
+	}
+}
+
+.lg-hide {
+	display: none;
+	@include respond-to(screen-lg) {
+		display: block;
+	}
+}
+
+.xs-show {
+	display: block;
 	@include respond-to(screen-xs) {
 		display: none;
 	}
 }
 
-.sm-hide {
+.sm-show {
+	display: block;
 	@include respond-to(screen-sm) {
 		display: none;
 	}
 }
 
-.md-hide {
+.md-show {
+	display: block;
 	@include respond-to(screen-md) {
 		display: none;
 	}
 }
 
-.lg-hide {
+.lg-show {
+	display: block;
 	@include respond-to(screen-lg) {
 		display: none;
 	}
