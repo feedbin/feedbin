@@ -808,6 +808,16 @@ Structure
 		text-align: center;
 		vertical-align: middle;
 	}
+	@media (min-width: 421px) {
+		.entries-column & {
+			display: none;
+		}
+	}
+	@media (max-width: 420px) {
+		.feeds-column & {
+			display: none;
+		}
+	}
 }
 
 .feeds {
@@ -1148,9 +1158,8 @@ li.selected > a .favicon-wrap {
 		}
 	}
 	@media (max-width: 420px) {
-		.feed-selected & {
-			top: 36px;
-		}
+		top: 36px; /* entries header */
+		bottom: 51px; /* feeds-toolbar */
 	}
 	@media (max-width: 768px) {
 		.entry-selected & {

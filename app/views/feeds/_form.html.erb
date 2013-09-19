@@ -6,7 +6,7 @@
     <%= submit_tag 'Update', class: 'button button-white button-text', name: 'commit' %>
   <% else %>
     <div class="tag-field-wrap">
-      <%= text_field_tag 'feed[tag_list]', tags.join(', '), autocomplete: 'off' %>
+      <%= text_field_tag 'feed[tag_list]', tags.join(', '), autocomplete: 'off', class: 'feed_tag_list' %>
     </div>
     <%= submit_tag 'Tag', class: 'button button-white button-text', name: 'commit' %>
   <% end %>

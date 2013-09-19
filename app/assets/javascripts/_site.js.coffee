@@ -47,8 +47,10 @@ $.extend feedbin,
     $('[data-behavior~=entry_content_target] pre').each (i, e) ->
       hljs.highlightBlock(e)
     
-  hideTagsForm: ->
-    $('.tags-form-wrap').animate
+  hideTagsForm: (form) ->
+    if not form
+      form = $('.tags-form-wrap')
+    form.animate
       height: 0
     
   blogContent: (content) ->
@@ -97,10 +99,10 @@ $.extend feedbin,
   updateTitle: (title) ->
     $('title').text(title)
 
-  autocomplete: ->
-    $("#feed_tag_list").autocomplete
+  autocomplete: (element) ->
+    element.autocomplete
       serviceUrl: feedbin.data.tagsPath
-      appendTo: "[data-behavior=tag_completions]"
+      appendTo: $(element).closest(".tags-form").children("[data-behavior=tag_completions]")
       delimiter: /(,)\s*/
 
   autoHeight: ->
@@ -255,25 +257,26 @@ $.extend feedbin,
 
     tagsForm: ->
       $(document).on 'click', (event) ->
-        isForm = ($(event.target).parents('.tags-form-wrap').length > 0)
-        unless isForm
-          feedbin.hideTagsForm()
+        target = $(event.target)
+        if not target.hasClass('toolbar-button')
+          target = target.parents('.toolbar-button')
+        wrap = target.find('.tags-form-wrap')
+        feedbin.hideTagsForm($('.tags-form-wrap').not(wrap))
 
       $(document).on 'click', '[data-behavior~=show_tags_form]', (event) ->
-        isForm = ($(event.target).parents('.tags-form-wrap').length > 0)
-        unless isForm || $(@).attr('disabled') == 'disabled'
-          wrap = $('.tags-form-wrap')
+        target = $(event.target)
+        if not target.hasClass('toolbar-button')
+          target = target.parentsUntil('.toolbar-button')
+        wrap = target.find('.tags-form-wrap')
+        unless $(@).attr('disabled') == 'disabled'
           if '0px' == wrap.css('height')
             wrap.animate
               height: '138px'
-            field = $('#feed_tag_list')
+            field = wrap.find('.feed_tag_list')
             field.focus()
             value = field.val()
             field.val(value)
-            feedbin.autocomplete()
-          else
-            feedbin.hideTagsForm()
-          event.stopPropagation()
+            feedbin.autocomplete(field)
     
     resize: () ->
       defaults = 
