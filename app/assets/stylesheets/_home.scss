@@ -176,6 +176,9 @@
 		margin-bottom: 15px;
 		border-bottom: 1px solid #ededed;
 		padding-bottom: 15px;
+		img {
+			display: block;
+		}
 		&:first-child {
 			border-top: 1px solid #ededed;
 			padding-top: 15px;
