@@ -28,11 +28,11 @@
 		display: block;
 		width: 140px;
 		height: 30px;
-		background-size: 130px 40px;
+		background-size: 140px 30px !important;
 		@include respond-to(screen-xs) {
 			width: 167px;
 			height: 36px;
-			background-size: 167px 36px;
+			background-size: 167px 36px !important;
 		}
 	}
 	.header {
