@@ -90,6 +90,19 @@
 			margin-bottom: 25px;
 		}
 	}
+	h1.sub-page {
+		font-size: 28px;
+		color: #333;
+		font-weight: 300;
+		margin: 0 0 20px 0;
+		&.with-subhead {
+			margin-bottom: 10px;
+		}
+		@include respond-to(screen-sm) {
+			font-size: 48px;
+			margin-bottom: 35px;
+		}
+	}
 	.sub-head {
 		font-size: 16px;
 		color: #999999;
@@ -106,6 +119,10 @@
 		font-size: 16px;
 		text-align: center;
 		margin-bottom: 6px;
+		&.align-right {
+			text-align: right;
+			padding-right: 20px;
+		}
 		em {
 			font-weight: normal;
 		}
@@ -258,6 +275,9 @@
 			@include respond-to(screen-sm) {
 				font-size: 16px;
 			}
+		}
+		.feature-icon-readability {
+			margin-top: 8px;
 		}
 	}
 	.screenshots-wrap {
@@ -436,6 +456,9 @@
 			font-size: 16px;
 			line-height: 1.5;
 			color: #666666;
+		}
+		img {
+			margin-bottom: 15px;
 		}
 		.platforms {
 			font-size: 12px;
