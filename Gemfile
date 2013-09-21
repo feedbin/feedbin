@@ -46,7 +46,7 @@ gem 'request_exception_handler'
 gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'honeybadger'
 gem 'addressable', require: 'addressable/uri'
-gem 'librato-rails'
+gem 'librato-rails', '= 0.9.0'
 gem 'foreman'
 gem 'yajl-ruby', require: nil
 gem 'readability_parser'

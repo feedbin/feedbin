@@ -173,10 +173,8 @@ GEM
       aggregate (~> 0.2.2)
       faraday (~> 0.7)
       multi_json
-    librato-rack (0.4.3)
-      librato-metrics (~> 1.1.1)
-    librato-rails (0.10.1)
-      librato-rack (~> 0.4.2)
+    librato-rails (0.9.0)
+      librato-metrics (~> 1.1.0)
       rails (>= 3.0)
     libv8 (3.16.14.3)
     lograge (0.2.2)
@@ -332,7 +330,7 @@ DEPENDENCIES
   html-pipeline!
   jbuilder
   jquery-rails
-  librato-rails
+  librato-rails (= 0.9.0)
   lograge
   longurl
   multi_fetch_fragments!
