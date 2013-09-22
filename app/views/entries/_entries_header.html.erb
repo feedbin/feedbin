@@ -1,10 +1,8 @@
 <button class="back-button" data-behavior="back_to_feeds"></button>
 <% if @feed %>
   <% present feed do |feed_presenter| %>
-    <% if @feed %>
-      <%= feed_presenter.favicon %>
-      <span data-behavior="user_title" data-feed-id="<%= @feed.id %>"><%= @feed.title %></span>
-    <% end %>
+    <%= feed_presenter.favicon %>
+    <span data-behavior="user_title" data-feed-id="<%= @feed.id %>"><%= @feed.title %></span>
   <% end %>
 <% else %>
   <span class="favicon-wrap">
