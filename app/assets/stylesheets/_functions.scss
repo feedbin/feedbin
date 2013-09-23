@@ -1,13 +1,3 @@
-@mixin retina-image($image, $width, $height) {
-	$image-retina: "2x/" + $image;
-	$image: "1x/" + $image;
-	background-image: image-url($image);
-	@include respond-to(hidpi) {
-		background-image: image-url($image-retina);
-		background-size: round($width / 2) round($height / 2);
-	}
-}
-
 @mixin respond-to($media, $ratio: 1.3) {
 	@if $media == ipad {
 		@media only screen and (max-width: 1024px) { @content; }

@@ -1439,7 +1439,7 @@ li.selected > a .favicon-wrap {
 
 .favicon {
 	background-repeat: no-repeat;
-	@include retina-image("favicon-feed.png", 32px, 32px);
+	background: url("favicon-feed.svg") 0 0 no-repeat;
 }
 
 .favicon-tag {
@@ -2887,7 +2887,8 @@ h3 .inline-subhead {
 	display: block;
 	height: 26px;
 	width: 119px;
-	@include retina-image("logo-stripe.png", 238px, 52px);
+	background: url("logo-stripe.svg") 0 0 no-repeat;
+	background-size: 119px 26px;
 }
 
 .payment-promo {
