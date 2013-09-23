@@ -2,11 +2,12 @@
 <html>
 <head>
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no" />
   <title><%= @title || 'Feedbin' %></title>
   <link rel="apple-touch-icon-precomposed" href="<%= asset_path('apple-touch-icon-precomposed.png') %>" />
   <link rel="apple-touch-startup-image" href="<%= asset_path('apple-touch-startup-image-iphone.png') %>" sizes="640x920" />
   <link rel="apple-touch-startup-image" href="<%= asset_path('apple-touch-startup-image-iphone-large.png') %>" sizes="640x1096" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <%= stylesheet_link_tag "application"  %>
   <%= javascript_include_tag "https://js.stripe.com/v1/", "application" %>
   <%= csrf_meta_tags %>
