@@ -1306,6 +1306,9 @@ Structure
 	overflow-y: auto;
 	overflow-x: hidden;
 	-webkit-overflow-scrolling: touch;
+	@media (max-width: 420px) {
+		bottom: 0;
+	}
 	ul {
 		margin: 0;
 		padding: 0;
