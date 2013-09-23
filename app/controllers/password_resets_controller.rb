@@ -2,7 +2,6 @@ class PasswordResetsController < ApplicationController
   skip_before_action :authorize
 
   def new
-    @track = true
   end
   
   def create

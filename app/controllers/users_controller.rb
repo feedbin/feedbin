@@ -5,7 +5,6 @@ class UsersController < ApplicationController
   before_action :ensure_permission, only: [:update, :destroy]
 
   def new
-    @track = true
     @user = User.new
     if params[:coupon]
       @coupon = Coupon.where(coupon_code: params[:coupon]).first

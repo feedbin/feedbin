@@ -97,7 +97,8 @@ $.extend feedbin,
     anchor.dispatchEvent event
 
   updateTitle: (title) ->
-    $('title').text(title)
+    docTitle = $('title')
+    docTitle.text(title) unless docTitle.text() is title
 
   autocomplete: (element) ->
     element.autocomplete
@@ -131,7 +132,7 @@ $.extend feedbin,
         else
           title = "Feedbin (#{count})"
 
-        $('title').text(title)
+        feedbin.updateTitle(title)
     
   readability: (target) ->
     feedId = $('[data-feed-id]', target).data('feed-id')
@@ -164,6 +165,17 @@ $.extend feedbin,
       fontContainer.removeClass("font-size-#{currentFontSize}")
       fontContainer.addClass("font-size-#{newFontSize}")
       fontContainer.data('font-size', newFontSize)
+
+  matchHeights: (elements) ->
+    height = 0
+    $.each elements, (index, element) ->
+      $(element).css({'height': ''})
+      outerHeight = $(element).outerHeight()
+      if outerHeight > height
+        height = outerHeight
+
+    elements.css
+      height: height
       
   hideQueue: []
 
@@ -321,6 +333,22 @@ $.extend feedbin,
         $("[data-behavior~=screenshots] img").addClass('hide')
         $("[data-behavior~=screenshots] img[src='#{src}']").removeClass('hide')
         event.preventDefault()
+
+      $(document).on 'click', '[data-behavior~=screenshot_previous], [data-behavior~=screenshot_next]', (event) ->
+        selectedScreenshot = $('[data-behavior~=screenshot_nav] li.active')
+        button = $(event.target).data('behavior')
+        if button.match(/screenshot_next/)
+          nextScreenshot = selectedScreenshot.next()
+          if nextScreenshot.length == 0
+            nextScreenshot = $('li:first-child', $('[data-behavior~=screenshot_nav]'))
+        else
+          nextScreenshot = selectedScreenshot.prev()
+          if nextScreenshot.length == 0
+            nextScreenshot = $('li:last-child', $('[data-behavior~=screenshot_nav]'))
+        
+        nextScreenshot.find('a').click()
+        event.preventDefault()
+      
         
     feedSelected: ->
       $(document).on 'click', '[data-behavior~=back_to_feeds]', ->
@@ -499,6 +527,24 @@ $.extend feedbin,
           $('[data-behavior~=entry_content_target]').removeClass('fluid')
         else
           $('[data-behavior~=entry_content_target]').addClass('fluid')
+        
+    filterList: ->
+      feedbin.matchHeights($('.app-detail'))
+      $(window).on 'resize', () ->
+        feedbin.matchHeights($('.app-detail'))
+      
+      
+      $(document).on 'click', '[data-filter]', (event) ->
+        $('[data-filter]').removeClass('active')
+        $(@).addClass('active')
+
+        filter = $(@).data('filter')
+        if filter == 'all'
+          $("[data-platforms]").removeClass('hide')
+        else
+          $("[data-behavior~=filter_target]").addClass('hide')
+          $("[data-platforms~=#{filter}]").removeClass('hide')
+
 
 jQuery ->
   $.each feedbin.init, (i, item) ->

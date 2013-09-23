@@ -3,363 +3,194 @@
   <meta name="description" content="A fast, simple RSS feed reader that delivers a great reading experience."/>
 <% end %>
 <% content_for :content do %>
-  <div class="header-wrap">
-    <div class="header-bar">
-      <div class="container">
+  <div class="header">
+    <div class="container">
+      <div class="super-header-wrap">
         <div class="row">
-          <div class="span6">
-            <a href="/" class="home-logo hide-text">Feedbin</a>
-          </div>
-          <div class="span6">
-            <ul class="header-nav">
-              <li><%= link_to "Sign Up", signup_path, class: 'button-signup' %></li>
-              <li><%= link_to "Log In", login_path %></li>
-            </ul>
-          </div>
+          <div class="col-xs-6"><a href="/" class="home-logo hide-text">Feedbin</a></div>
+          <div class="col-xs-6 align-right"><%= link_to "Login", login_path, class: "button-login" %></div>
         </div>
       </div>
+      <h1 class="tagline"><strong>A fast, simple RSS reader</strong> that delivers a great reading experience.</h1>
+      <p class="pricing-promo"><sup>$</sup>3 per month <em>or</em> <sup>$</sup>30 a year</p>
+      <p class="align-center"><%= link_to "Get started", signup_path, class: "button-get-started" %></p>
     </div>
-  
-    <div class="tagline-wrap">
+    <div class="screenshot-mask">
       <div class="container">
-        <div class="tagline">
-          <h1>A fast, simple RSS feed reader that delivers a great reading experience.</h1>
-        </div>
-        <div class="pricing">
-          <sup>$</sup><strong>3</strong>/mo
-        </div>
-      </div>
-    </div>
-  
-    <%= image_tag 'screenshots/_main.png', class: 'center-block', size: '1000x573' %> 
-    <div class="header-promo">
-      <div class="container">
-        <p>New blog post: <a href="http://blog.feedbin.me/2013/09/03/format-toolbar/">Format Toolbar</a></p>
+        <%= image_tag "screenshots/_main.png", class: "responsive" %>
       </div>
     </div>
   </div>
-
   <div class="main-content">
     <div class="container">
-      <div class="row">
       
-        <div class="span4">
-          <div class="content-icon content-icon-rss">
-            <h2>Subscribe</h2>
-            <p>Subscribe easily by domain or by feed url. Feedbin will give you a choice of feeds if a website offers more than one.</p>
-          </div>
-        </div>
-        <div class="span4">
-          <div class="content-icon content-icon-readability">
-            <h2>Readability</h2>
-            <p>Truncated feed content? Built in <a href="http://www.readability.com/">Readability</a> gets you the full content. Make it sticky to always use Readability for a feed.</p>
-          </div>
-        </div>
-        <div class="span4">
-          <div class="content-icon content-icon-share">
-            <h2>Sharing</h2>
-            <p><a href="http://blog.feedbin.me/2013/04/25/sharing/">Configurable sharing services</a> let you decide what services you want to use.</p>
-          </div>
-        </div>
-
-        <hr class="space" />
+      <h2 class="tagline-small">Feedbin syncs with these apps <em><a href="<%= apps_path %>">and more</a></em></h2>
+      <div class="apps">
+        <a href="https://itunes.apple.com/app/reeder-2/id697846300" class="app clearfix">
+          <span class="icon-wrap">
+            <%= image_tag 'apps/reeder-iphone.jpg', class: 'icon rounded-icon' %>
+          </span>
+          <h3>Reeder 2</h3>
+          <p>By Silvio Rizzi</p>
+        </a>
+        
+        <a href="https://play.google.com/store/apps/details?id=com.twentyfivesquares.press" class="app clearfix">
+          <span class="icon-wrap">
+            <%= image_tag 'apps/press-android.png', class: 'icon' %>
+          </span>
+          <h3>Press</h3>
+          <p>By TwentyFive Squares</p>
+        </a>
+        
+        <a href="https://itunes.apple.com/app/mr.-reader/id412874834" class="app clearfix">
+          <span class="icon-wrap">
+            <%= image_tag 'apps/mr-reader-ipad.jpg', class: 'icon rounded-icon' %>
+          </span>
+          <h3>Mr. Reader</h3>
+          <p>By Oliver Fürniß</p>
+        </a>
+        
+        <a href="https://itunes.apple.com/app/readkit/id588726889" class="app clearfix">
+          <span class="icon-wrap">
+            <%= image_tag 'apps/readkit-mac.png', class: 'icon' %>
+          </span>
+          <h3>ReadKit</h3>
+          <p>By Balazs Varkonyi</p>
+        </a>
       
-        <div class="span4">
-          <div class="content-icon content-icon-edit">
-            <h2>Feed Renaming</h2>
-            <p>Use the feed management page to rename feeds or bulk unsubscribe.</p>
-          </div>
-        </div>
-        <div class="span4">
-          <div class="content-icon content-icon-lightning">
-            <h2>Speed</h2>
-            <p>Get through your river of news quickly using <a href="https://github.com/feedbin/support/blob/master/keyboard-shortcuts.md#keyboard-shortcuts">keyboard shortcuts</a>.</p>
-          </div>
-        </div>
-        <div class="span4">
-          <div class="content-icon content-icon-tags">
-            <h2>Tags</h2>
-            <p>Organize your feeds. Feeds can have as many tags as you need. See all your tagged feeds in <a href="http://blog.feedbin.me/2013/04/19/tag-drawers/">Tag Drawers</a>.</p>
-          </div>
-        </div>
-
-        <hr class="space" />
-
-        <div class="span4">
-          <div class="content-icon content-icon-arrows">
-            <h2>Import/Export</h2>
-            <p>Use the import feature to subscribe to all your feeds and import starred items. Export subscription list at any time.</p>
-          </div>
-        </div>
-        <div class="span4">
-          <div class="content-icon content-icon-layout">
-            <h2>Layout</h2>
-            <p>See all your feed, summaries and article content side-by-side.</p>
-          </div>
-        </div>      
-        <div class="span4">
-          <div class="content-icon content-icon-lock">
-            <h2>Privacy</h2>
-            <p>Your subscriptions and reading habits are your own. Your data is never shared.</p>
-          </div>
-        </div>
-            
+        <p class="sm-show align-center"><%= link_to "See all apps", apps_path %></p>
       </div>
-    </div>
-
-    <hr class="space" />
-
-    <div class="apps-promo">
-      <div class="container">
-        <h2>App Support</h2>
-        <p class="large">Use these great apps with Feedbin.</p>
-        <hr class="space" />
-      
-        <div class="row">
-          <div class="span1">
-            <a href="https://itunes.apple.com/app/reeder-2/id697846300"><%= image_tag 'apps/reeder-iphone.jpg', class: 'round-icon', size: '60x60' %></a>
-          </div>
-          <div class="span4">
-            <h3 class="inner-promo">Reeder 2</h3>
-            <p><small>By <a href="http://reederapp.com/">Silvio Rizzi</a></small></p>
-            <p>Reeder is a RSS reader and client for Feedbin, Feedly, Feed Wrangler, Fever, and Readability.</p>
-            <p class="loud"><small>Available for <a href="https://itunes.apple.com/app/reeder-2/id697846300">iPhone, iPad</a></small></p>
-          </div>
-        
-          <div class="span1 offset1">
-            <a href="https://itunes.apple.com/app/mr.-reader/id412874834"><%= image_tag 'apps/mr-reader-ipad.jpg', class: 'round-icon', size: '60x60' %></a>
-          </div>
-          <div class="span4">
-            <h3 class="inner-promo">Mr. Reader</h3>
-            <p><small>By <a href="http://www.curioustimes.de/mrreader/">Oliver Fürniß</a></small></p>
-            <p>Mr. Reader is a RSS News Reader for your iPad that synchronizes with Feedbin, Feedly, BazQux Reader, FeedHQ, Feed Wrangler and Fever.</p>
-            <p class="loud"><small>Available for <a href="https://itunes.apple.com/app/mr.-reader/id412874834">iPad</a></small></p>
-          </div>
-        
-          <hr class="space" />
-        
-          <div class="span1">
-            <a href="https://itunes.apple.com/app/readkit/id588726889"><%= image_tag 'apps/readkit-mac.png', width: '60' %></a>
-          </div>
-          <div class="span4">
-            <h3 class="inner-promo">ReadKit</h3>
-            <p><small>By <a href="http://readkitapp.com/">Balazs Varkonyi</a></small></p>
-            <p>ReadKit is a full-featured read later and RSS client that supports many services and has built-in RSS capabilities.</p>
-            <p class="loud"><small>Available for <a href="https://itunes.apple.com/app/readkit/id588726889">Mac</a></small></p>
-          </div>
-        
-          <div class="span1 offset1">
-            <a href="https://play.google.com/store/apps/details?id=com.twentyfivesquares.press"><%= image_tag 'apps/press-android.png', width: '60' %></a>
-          </div>
-          <div class="span4">
-            <h3 class="inner-promo">Press</h3>
-            <p><small>By <a href="http://twentyfivesquares.com/">TwentyFive Squares</a></small></p>
-            <p>Press is a simple and elegant RSS client for popular syncing services. It’s fast and clean, giving you the freedom to enjoy your favorite news.</p>
-            <p class="loud"><small>Available for <a href="https://play.google.com/store/apps/details?id=com.twentyfivesquares.press">Android</a></small></p>
-          </div>
-        
-          <hr class="space" />
-
-          <div class="span1">
-            <a href="https://itunes.apple.com/app/slow-feeds/id511900080"><%= image_tag 'apps/slow-feeds-iphone.jpg', class: 'round-icon', size: '60x60' %></a>
-          </div>
-          <div class="span4">
-            <h3 class="inner-promo">Slow Feeds</h3>
-            <p><small>By <a href="http://zoziapps.ch/">Stefan Pauwels</a></small></p>
-            <p>Rediscover your feeds with this unique and smart RSS client for iOS.</p>
-            <p class="loud"><small>Available for <a href="https://itunes.apple.com/app/slow-feeds/id511900080">iPhone, iPad</a></small></p>
-          </div>
-
-          <div class="span1 offset1">
-            <a href="https://itunes.apple.com/app/favs/id436962003"><%= image_tag 'apps/favs-iphone.jpg', class: 'round-icon', size: '60x60' %></a>
-          </div>
-          <div class="span4">
-            <h3 class="inner-promo">Favs</h3>
-            <p><small>By <a href="http://www.favsapp.com/">Dirk Holtwick</a></small></p>
-            <p>The app for your likes, stars, social bookmarks and favorites.</p>
-            <p class="loud"><small>Available for <a href="https://itunes.apple.com/app/favs/id436962003">iPhone, iPad</a>, <a href="https://itunes.apple.com/app/favs/id436961703">Mac</a></small></p>
-          </div>
-
-          <hr class="space" />
-
-          <div class="span1">
-            <a href="http://apps.microsoft.com/windows/app/tafiti/0959bc4f-5d1e-401d-b636-b0f5e1db78cd"><%= image_tag 'apps/tafiti-windows.png', size: '60x60' %></a>
-          </div>
-          <div class="span4">
-            <h3 class="inner-promo">Tafiti</h3>
-            <p><small>By <a href="http://www.tafitiapp.com/mx">Sameer Vartak</a></small></p>
-            <p>Tafiti is a new take on news reading on Windows! It's simple and clean user interface makes news reading a delightful experience.</p>
-            <p class="loud"><small>Available for <a href="http://apps.microsoft.com/windows/app/tafiti/0959bc4f-5d1e-401d-b636-b0f5e1db78cd">Windows 8, Windows RT</a></small></p>
-          </div>
-
-          <div class="span1 offset1">
-            <a href="https://itunes.apple.com/app/readlines-for-feedbin/id416953125"><%= image_tag 'apps/readlines-iphone.jpg', class: 'round-icon', size: '60x60' %></a>
-          </div>
-          <div class="span4">
-            <h3 class="inner-promo">Readlines for Feedbin</h3>
-            <p><small>By <a href="http://www.conceptcache.com/">Concept Cache LLC</a></small></p>
-            <p>Minimalist RSS reader that syncs with your Feedbin account. It simply displays a random headline from your unread items.</p>
-            <p class="loud"><small>Available for <a href="https://itunes.apple.com/app/readlines-for-feedbin/id416953125">iPhone</a></small></p>
-          </div>
-        
-          <hr class="space" />
-        
-          <div class="span1">
-            <a href="https://itunes.apple.com/us/app/bulletin-for-feedbin/id328547010"><%= image_tag 'apps/bulletin-iphone.jpg', class: 'round-icon', size: '60x60' %></a>
-          </div>
-          <div class="span4">
-            <h3 class="inner-promo">Bulletin for Feedbin</h3>
-            <p><small>By <a href="http://www.conceptcache.com/">Concept Cache LLC</a></small></p>
-            <p>Read all of the latest news from your Feedbin account while on the move. Bulletin allows you to carry up to 1,000 unread items on your device.</p>
-            <p class="loud"><small>Available for <a href="https://itunes.apple.com/app/bulletin-for-feedbin/id328547010">iPhone</a></small></p>
-          </div>
-        
-          <div class="span1 offset1">
-            <a href="https://play.google.com/store/apps/details?id=com.neogb.feedbinreader"><%= image_tag 'apps/feedbin-reader-android.png', class: 'round-icon', size: '60x60' %></a>
-          </div>
-          <div class="span4">
-            <h3 class="inner-promo">Feedbin Reader BETA</h3>
-            <p><small>By <a href="https://play.google.com/store/apps/developer?id=Guillaume+BOUERAT">Guillaume BOUERAT</a></small></p>
-            <p>Beta version lets you read your RSS feeds offline after you have synchronized them.</p>
-            <p class="loud"><small>Available for <a href="https://play.google.com/store/apps/details?id=com.neogb.feedbinreader">Android</a></small></p>
-          </div>
-
-          <hr class="space" />
-        
-          <div class="span1">
-            <a href="https://play.google.com/store/apps/details?id=com.reindeercrafts.deerreader"><%= image_tag 'apps/deer-reader-android.png', size: '60x60' %></a>
-          </div>
-          <div class="span4">
-            <h3 class="inner-promo">Deer Reader</h3>
-            <p><small>By <a href="https://play.google.com/store/apps/developer?id=Reindeer+Crafts">Reindeer Crafts</a></small></p>
-            <p>Deer Reader is a nice RSS client.</p>
-            <p class="loud"><small>Available for <a href="https://play.google.com/store/apps/details?id=com.reindeercrafts.deerreader">Android</a></small></p>
-          </div>
-        
-          <div class="span1 offset1">
-            <a href="https://play.google.com/store/apps/details?id=com.piaci.listener.app"><%= image_tag 'apps/listener-launcher-android.png', style: 'height: 60px;' %></a>
-          </div>
-          <div class="span4">
-            <h3 class="inner-promo">Listener Launcher</h3>
-            <p><small>By <a href="https://play.google.com/store/apps/developer?id=piaci.mosca">piaci.mosca</a></small></p>
-            <p>Alternative launcher that puts a variety of information on your home screen including RSS feeds.</p>
-            <p class="loud"><small>Available for <a href="https://play.google.com/store/apps/details?id=com.piaci.listener.app">Android</a></small></p>
-          </div>
-
-          <hr class="space" />
-        
-          <div class="span1">
-            <a href="http://shanegowland.com/metroreader-for-feedbin/"><%= image_tag 'apps/metroreader-windows.png', size: '60x60' %></a>
-          </div>
-          <div class="span4">
-            <h3 class="inner-promo">MetroReader for Feedbin</h3>
-            <p><small>By <a href="http://shanegowland.com/">Shane Gowland</a></small></p>
-            <p>A metro style Feedbin client for the Windows desktop.</p>
-            <p class="loud"><small>Available for <a href="http://shanegowland.com/metroreader-for-feedbin/">Windows</a></small></p>
-          </div>
                 
-        </div>
+    </div>
+    
+    <div class="container align-center">
+      <h2 class="tagline-small no-margin">Just what you need in a reader</h2>
+      <p class="sub-head">Feedbin is lightweight, you can read for hours on end and it stays out of the way. Feedbin is built for speed with an intuitive layout and keyboard shortcuts to get you where you want to be.</p>
+      
+      <div class="col-sm-4 col-sm-push-2 feature">
+        <%= image_tag 'icon-home-readability.svg', width: '36', class: 'feature-icon-readability' %>
+        <h3>Readability</h3>
+        <p>Truncated feed content? Built in Readability gets you the full content. Make it sticky to always use Readability for a feed.</p>
       </div>
-      <hr class="space" />
-
+      
+      <div class="col-sm-4 col-sm-push-2 feature">
+        <%= image_tag 'icon-home-edit.svg', width: '34' %>
+        <h3>Feed Renaming</h3>
+        <p>Use the feed management page to rename feeds or bulk unsubscribe.</p>
+      </div>
+      
+      <hr class="nospace" />
+      
+      <div class="col-sm-4 col-sm-push-2 feature">
+        <%= image_tag 'icon-home-share.svg', width: '36' %>
+        <h3>Sharing</h3>
+        <p>Configurable sharing services let you decide what services you want to use.</p>
+      </div>
+      
+      <div class="col-sm-4 col-sm-push-2 feature">
+        <%= image_tag 'icon-home-tag.svg', width: '36' %>
+        <h3>Tags</h3>
+        <p>Organize your feeds. Feeds can have as many tags as you need. See all your tagged feeds in Tag Drawers.</p>
+      </div>
+      
     </div>
 
-    <hr class="space" />
-
+  </div>
+  
+  <div class="screenshots-wrap">
     <div class="container">
-      <h2>Screenshots</h2>
-      <p data-behavior="screenshots" class="screenshots">
-        <%= image_tag 'screenshots/settings.png' %>
-        <%= image_tag 'screenshots/tags.png', class: 'hide' %>
-        <%= image_tag 'screenshots/multiple-feeds.png', class: 'hide' %>
-        <%= image_tag 'screenshots/account.png', class: 'hide' %>
-        <%= image_tag 'screenshots/import-export.png', class: 'hide' %>
-        <%= image_tag 'screenshots/share-menu.png', class: 'hide' %>
-        <%= image_tag 'screenshots/configure-sharing.png', class: 'hide' %>
-        <%= image_tag 'screenshots/feed-management.png', class: 'hide' %>
-      </p>
+      <h2 class="tagline-small por">
+        Screenshots
+        <ul class="screenshot-arrow-nav">
+          <li data-behavior="screenshot_next" class="icon-next"></li>
+          <li data-behavior="screenshot_previous" class="icon-previous"></li>
+        </ul>
+      </h2>
       <ul class="screenshot-nav" data-behavior="screenshot_nav">
         <li>
           <a href="#">
-            <%= image_tag 'screenshots/settings.png' %>
+            <%= image_tag "screenshots/settings.png", class: "responsive" %>
             Settings
           </a>
         </li>
         <li>
           <a href="#" class="active">
-            <%= image_tag 'screenshots/tags.png' %>
+            <%= image_tag "screenshots/tags.png", class: "responsive" %>
             Tags
           </a>
         </li>
         <li>
+          <a href="#" class="active">
+            <%= image_tag "screenshots/format-toolbar.png", class: "responsive" %>
+            Format Toolbar
+          </a>
+        </li>
+        <li>
           <a href="#">
-            <%= image_tag 'screenshots/feed-management.png' %>
+            <%= image_tag "screenshots/feed-management.png", class: "responsive" %>
             Feed Management
           </a>
         </li>
         <li>
           <a href="#">
-            <%= image_tag 'screenshots/multiple-feeds.png' %>
+            <%= image_tag "screenshots/multiple-feeds.png", class: "responsive" %>
             Multiple Feeds
           </a>
         </li>
         <li>
           <a href="#">
-            <%= image_tag 'screenshots/account.png' %>
+            <%= image_tag "screenshots/account.png", class: "responsive" %>
             Account
           </a>
         </li>
         <li>
           <a href="#">
-            <%= image_tag 'screenshots/import-export.png' %>
+            <%= image_tag "screenshots/import-export.png", class: "responsive" %>
             Import/Export
           </a>
         </li>
         <li>
           <a href="#">
-            <%= image_tag 'screenshots/share-menu.png' %>
+            <%= image_tag "screenshots/share-menu.png", class: "responsive" %>
             Share Menu
           </a>
         </li>
         <li>
           <a href="#">
-            <%= image_tag 'screenshots/configure-sharing.png' %>
+            <%= image_tag "screenshots/configure-sharing.png", class: "responsive" %>
             Configure Sharing
           </a>
         </li>
       </ul>
-    </div>
-
-    <hr class="space" />
-
-    <div class="container">
-      <div class="callout">
-        <h2>API</h2>
-        <p>Fully featured, <a href="https://github.com/feedbin/feedbin-api#readme">documented API</a>. Feedbin provides access to all your data through a simple JSON API. Get subscriptions, articles and read/starred states and more. Check out the documentation to get started.</p>
+      <div data-behavior="screenshots" class="screenshots">
+        <%= image_tag "screenshots/settings.png", class: "responsive" %>
+        <%= image_tag "screenshots/tags.png", class: "hide responsive" %>
+        <%= image_tag "screenshots/format-toolbar.png", class: "hide responsive" %>
+        <%= image_tag "screenshots/multiple-feeds.png", class: "hide responsive" %>
+        <%= image_tag "screenshots/account.png", class: "hide responsive" %>
+        <%= image_tag "screenshots/import-export.png", class: "hide responsive" %>
+        <%= image_tag "screenshots/share-menu.png", class: "hide responsive" %>
+        <%= image_tag "screenshots/configure-sharing.png", class: "hide responsive" %>
+        <%= image_tag "screenshots/feed-management.png", class: "hide responsive" %>
       </div>
     </div>
-
   </div>
-
-  <div class="about">
-    <div class="container">
-      <h2>About</h2>
-      <p>Feedbin is built by <a href="http://benubois.com">Ben Ubois</a>. A San Francisco based web developer. Ben works for <a href="http://www.flickerbox.com">Flickerbox, Inc.</a> and loves RSS. Additional Design by Todd J. Collins and Jeff Buczek. Feedbin is <a href="https://github.com/feedbin">open source</a>. </p>
-    </div>
-  </div>
-
-  <footer>
+  
+  <div class="developers">
     <div class="container">
       <div class="row">
-        <div class="span6">
-          © <%= Time.now.year %> Feedbin, LLC | <a href="<%= privacy_policy_path %>">Privacy Policy</a> | <a href="http://blog.feedbin.me">Blog</a> | <a href="https://github.com/feedbin/feedbin-api#readme">API</a>
+        <div class="col-md-5">
+          <h2 class="tagline-small">API</h2>
+          <p class="sub-head">Fully featured, documented API. Feedbin provides access to all your data through a simple JSON API. Get subscriptions, articles and read/starred states and more. </p>
+          <p class="sub-head"><a href="https://github.com/feedbin/feedbin-api#readme">Check out the documentation</a> to get started</p>
         </div>
-        <div class="span6 text-right">
-          <a href="https://github.com/feedbin/support#readme">Contact & Support</a> | <a href="https://twitter.com/feedbin">@feedbin</a>
+        <div class="col-md-5 col-md-offset-1">
+          <%= image_tag 'api-promo.svg', class: 'api-promo responsive' %>
         </div>
       </div>
-      <hr class="space-small" />
-      <p class="text-right footer-tagline">Rediscover RSS</p>
     </div>
-  </footer>
+  </div>
+  
+  <%= render partial: "shared/public_footer" %>
+
 <% end %>

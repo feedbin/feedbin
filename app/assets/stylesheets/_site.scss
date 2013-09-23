@@ -35,134 +35,611 @@ Grid
 	clear: both;
 }
 
-.row {
-	margin-left: -20px;
-	*zoom: 1;
+.container {
+	box-sizing: border-box;
+	margin-right: auto;
+	margin-left: auto;
+	padding-left: 15px;
+	padding-right: 15px;
 }
-
+.container:before,
+.container:after {
+	content: " ";/* 1 */
+	display:table;/* 2 */
+}
+.container:after {
+	clear: both;
+}
+.row {
+	margin-left: -15px;
+	margin-right: -15px;
+}
 .row:before,
 .row:after {
-	display: table;
-	line-height: 0;
-	content: "";
+	content: " ";/* 1 */
+	display:table;/* 2 */
 }
-
 .row:after {
 	clear: both;
 }
-
-.span12,.span11,.span10,.span9,.span8,.span7,.span6,.span5,.span4,.span3,.span2,.span1 {
-	float: left;
+.col-xs-1,
+.col-xs-2,
+.col-xs-3,
+.col-xs-4,
+.col-xs-5,
+.col-xs-6,
+.col-xs-7,
+.col-xs-8,
+.col-xs-9,
+.col-xs-10,
+.col-xs-11,
+.col-xs-12,
+.col-sm-1,
+.col-sm-2,
+.col-sm-3,
+.col-sm-4,
+.col-sm-5,
+.col-sm-6,
+.col-sm-7,
+.col-sm-8,
+.col-sm-9,
+.col-sm-10,
+.col-sm-11,
+.col-sm-12,
+.col-md-1,
+.col-md-2,
+.col-md-3,
+.col-md-4,
+.col-md-5,
+.col-md-6,
+.col-md-7,
+.col-md-8,
+.col-md-9,
+.col-md-10,
+.col-md-11,
+.col-md-12,
+.col-lg-1,
+.col-lg-2,
+.col-lg-3,
+.col-lg-4,
+.col-lg-5,
+.col-lg-6,
+.col-lg-7,
+.col-lg-8,
+.col-lg-9,
+.col-lg-10,
+.col-lg-11,
+.col-lg-12 {
+	position: relative;
 	min-height: 1px;
-	margin-left: 20px;
+	padding-left: 15px;
+	padding-right: 15px;
 }
-
-.container {
-	margin-left: auto;
-	margin-right: auto;
+.col-xs-1,
+.col-xs-2,
+.col-xs-3,
+.col-xs-4,
+.col-xs-5,
+.col-xs-6,
+.col-xs-7,
+.col-xs-8,
+.col-xs-9,
+.col-xs-10,
+.col-xs-11 {
+	float: left;
 }
-
-.container,
-.navbar-static-top .container,
-.navbar-fixed-top .container,
-.navbar-fixed-bottom .container {
-	width: 940px;
+.col-xs-1 {
+	width: 8.333333333333332%;
 }
-
-.span12 {
-	width: 940px;
+.col-xs-2 {
+	width: 16.666666666666664%;
 }
-
-.span11 {
-	width: 860px;
+.col-xs-3 {
+	width: 25%;
 }
-
-.span10 {
-	width: 780px;
+.col-xs-4 {
+	width: 33.33333333333333%;
 }
-
-.span9 {
-	width: 700px;
+.col-xs-5 {
+	width: 41.66666666666667%;
 }
-
-.span8 {
-	width: 620px;
+.col-xs-6 {
+	width: 50%;
 }
-
-.span7 {
-	width: 540px;
+.col-xs-7 {
+	width: 58.333333333333336%;
 }
-
-.span6 {
-	width: 460px;
+.col-xs-8 {
+	width: 66.66666666666666%;
 }
-
-.span5 {
-	width: 380px;
+.col-xs-9 {
+	width: 75%;
 }
-
-.span4 {
-	width: 300px;
+.col-xs-10 {
+	width: 83.33333333333334%;
 }
-
-.span3 {
-	width: 220px;
+.col-xs-11 {
+	width: 91.66666666666666%;
 }
-
-.span2 {
-	width: 140px;
+.col-xs-12 {
+	width: 100%;
 }
-
-.span1 {
-	width: 60px;
+@media (min-width:768px) {
+	.container {
+		max-width: 750px;
+	}
+	.col-sm-1,
+	.col-sm-2,
+	.col-sm-3,
+	.col-sm-4,
+	.col-sm-5,
+	.col-sm-6,
+	.col-sm-7,
+	.col-sm-8,
+	.col-sm-9,
+	.col-sm-10,
+	.col-sm-11 {
+		float: left;
+	}
+	.col-sm-1 {
+		width: 8.333333333333332%;
+	}
+	.col-sm-2 {
+		width: 16.666666666666664%;
+	}
+	.col-sm-3 {
+		width: 25%;
+	}
+	.col-sm-4 {
+		width: 33.33333333333333%;
+	}
+	.col-sm-5 {
+		width: 41.66666666666667%;
+	}
+	.col-sm-6 {
+		width: 50%;
+	}
+	.col-sm-7 {
+		width: 58.333333333333336%;
+	}
+	.col-sm-8 {
+		width: 66.66666666666666%;
+	}
+	.col-sm-9 {
+		width: 75%;
+	}
+	.col-sm-10 {
+		width: 83.33333333333334%;
+	}
+	.col-sm-11 {
+		width: 91.66666666666666%;
+	}
+	.col-sm-12 {
+		width: 100%;
+	}
+	.col-sm-push-1 {
+		left: 8.333333333333332%;
+	}
+	.col-sm-push-2 {
+		left: 16.666666666666664%;
+	}
+	.col-sm-push-3 {
+		left: 25%;
+	}
+	.col-sm-push-4 {
+		left: 33.33333333333333%;
+	}
+	.col-sm-push-5 {
+		left: 41.66666666666667%;
+	}
+	.col-sm-push-6 {
+		left: 50%;
+	}
+	.col-sm-push-7 {
+		left: 58.333333333333336%;
+	}
+	.col-sm-push-8 {
+		left: 66.66666666666666%;
+	}
+	.col-sm-push-9 {
+		left: 75%;
+	}
+	.col-sm-push-10 {
+		left: 83.33333333333334%;
+	}
+	.col-sm-push-11 {
+		left: 91.66666666666666%;
+	}
+	.col-sm-pull-1 {
+		right: 8.333333333333332%;
+	}
+	.col-sm-pull-2 {
+		right: 16.666666666666664%;
+	}
+	.col-sm-pull-3 {
+		right: 25%;
+	}
+	.col-sm-pull-4 {
+		right: 33.33333333333333%;
+	}
+	.col-sm-pull-5 {
+		right: 41.66666666666667%;
+	}
+	.col-sm-pull-6 {
+		right: 50%;
+	}
+	.col-sm-pull-7 {
+		right: 58.333333333333336%;
+	}
+	.col-sm-pull-8 {
+		right: 66.66666666666666%;
+	}
+	.col-sm-pull-9 {
+		right: 75%;
+	}
+	.col-sm-pull-10 {
+		right: 83.33333333333334%;
+	}
+	.col-sm-pull-11 {
+		right: 91.66666666666666%;
+	}
+	.col-sm-offset-1 {
+		margin-left: 8.333333333333332%;
+	}
+	.col-sm-offset-2 {
+		margin-left: 16.666666666666664%;
+	}
+	.col-sm-offset-3 {
+		margin-left: 25%;
+	}
+	.col-sm-offset-4 {
+		margin-left: 33.33333333333333%;
+	}
+	.col-sm-offset-5 {
+		margin-left: 41.66666666666667%;
+	}
+	.col-sm-offset-6 {
+		margin-left: 50%;
+	}
+	.col-sm-offset-7 {
+		margin-left: 58.333333333333336%;
+	}
+	.col-sm-offset-8 {
+		margin-left: 66.66666666666666%;
+	}
+	.col-sm-offset-9 {
+		margin-left: 75%;
+	}
+	.col-sm-offset-10 {
+		margin-left: 83.33333333333334%;
+	}
+	.col-sm-offset-11 {
+		margin-left: 91.66666666666666%;
+	}
 }
-
-.offset12 {
-	margin-left: 980px;
+@media (min-width:992px) {
+	.container {
+		max-width: 970px;
+	}
+	.col-md-1,
+	.col-md-2,
+	.col-md-3,
+	.col-md-4,
+	.col-md-5,
+	.col-md-6,
+	.col-md-7,
+	.col-md-8,
+	.col-md-9,
+	.col-md-10,
+	.col-md-11 {
+		float: left;
+	}
+	.col-md-1 {
+		width: 8.333333333333332%;
+	}
+	.col-md-2 {
+		width: 16.666666666666664%;
+	}
+	.col-md-3 {
+		width: 25%;
+	}
+	.col-md-4 {
+		width: 33.33333333333333%;
+	}
+	.col-md-5 {
+		width: 41.66666666666667%;
+	}
+	.col-md-6 {
+		width: 50%;
+	}
+	.col-md-7 {
+		width: 58.333333333333336%;
+	}
+	.col-md-8 {
+		width: 66.66666666666666%;
+	}
+	.col-md-9 {
+		width: 75%;
+	}
+	.col-md-10 {
+		width: 83.33333333333334%;
+	}
+	.col-md-11 {
+		width: 91.66666666666666%;
+	}
+	.col-md-12 {
+		width: 100%;
+	}
+	.col-md-push-0 {
+		left: auto;
+	}
+	.col-md-push-1 {
+		left: 8.333333333333332%;
+	}
+	.col-md-push-2 {
+		left: 16.666666666666664%;
+	}
+	.col-md-push-3 {
+		left: 25%;
+	}
+	.col-md-push-4 {
+		left: 33.33333333333333%;
+	}
+	.col-md-push-5 {
+		left: 41.66666666666667%;
+	}
+	.col-md-push-6 {
+		left: 50%;
+	}
+	.col-md-push-7 {
+		left: 58.333333333333336%;
+	}
+	.col-md-push-8 {
+		left: 66.66666666666666%;
+	}
+	.col-md-push-9 {
+		left: 75%;
+	}
+	.col-md-push-10 {
+		left: 83.33333333333334%;
+	}
+	.col-md-push-11 {
+		left: 91.66666666666666%;
+	}
+	.col-md-pull-0 {
+		right: auto;
+	}
+	.col-md-pull-1 {
+		right: 8.333333333333332%;
+	}
+	.col-md-pull-2 {
+		right: 16.666666666666664%;
+	}
+	.col-md-pull-3 {
+		right: 25%;
+	}
+	.col-md-pull-4 {
+		right: 33.33333333333333%;
+	}
+	.col-md-pull-5 {
+		right: 41.66666666666667%;
+	}
+	.col-md-pull-6 {
+		right: 50%;
+	}
+	.col-md-pull-7 {
+		right: 58.333333333333336%;
+	}
+	.col-md-pull-8 {
+		right: 66.66666666666666%;
+	}
+	.col-md-pull-9 {
+		right: 75%;
+	}
+	.col-md-pull-10 {
+		right: 83.33333333333334%;
+	}
+	.col-md-pull-11 {
+		right: 91.66666666666666%;
+	}
+	.col-md-offset-0 {
+		margin-left: 0;
+	}
+	.col-md-offset-1 {
+		margin-left: 8.333333333333332%;
+	}
+	.col-md-offset-2 {
+		margin-left: 16.666666666666664%;
+	}
+	.col-md-offset-3 {
+		margin-left: 25%;
+	}
+	.col-md-offset-4 {
+		margin-left: 33.33333333333333%;
+	}
+	.col-md-offset-5 {
+		margin-left: 41.66666666666667%;
+	}
+	.col-md-offset-6 {
+		margin-left: 50%;
+	}
+	.col-md-offset-7 {
+		margin-left: 58.333333333333336%;
+	}
+	.col-md-offset-8 {
+		margin-left: 66.66666666666666%;
+	}
+	.col-md-offset-9 {
+		margin-left: 75%;
+	}
+	.col-md-offset-10 {
+		margin-left: 83.33333333333334%;
+	}
+	.col-md-offset-11 {
+		margin-left: 91.66666666666666%;
+	}
 }
-
-.offset11 {
-	margin-left: 900px;
-}
-
-.offset10 {
-	margin-left: 820px;
-}
-
-.offset9 {
-	margin-left: 740px;
-}
-
-.offset8 {
-	margin-left: 660px;
-}
-
-.offset7 {
-	margin-left: 580px;
-}
-
-.offset6 {
-	margin-left: 500px;
-}
-
-.offset5 {
-	margin-left: 420px;
-}
-
-.offset4 {
-	margin-left: 340px;
-}
-
-.offset3 {
-	margin-left: 260px;
-}
-
-.offset2 {
-	margin-left: 180px;
-}
-
-.offset1 {
-	margin-left: 100px;
+@media (min-width:1200px) {
+	.container {
+		max-width: 1170px;
+	}
+	.col-lg-1,
+	.col-lg-2,
+	.col-lg-3,
+	.col-lg-4,
+	.col-lg-5,
+	.col-lg-6,
+	.col-lg-7,
+	.col-lg-8,
+	.col-lg-9,
+	.col-lg-10,
+	.col-lg-11 {
+		float: left;
+	}
+	.col-lg-1 {
+		width: 8.333333333333332%;
+	}
+	.col-lg-2 {
+		width: 16.666666666666664%;
+	}
+	.col-lg-3 {
+		width: 25%;
+	}
+	.col-lg-4 {
+		width: 33.33333333333333%;
+	}
+	.col-lg-5 {
+		width: 41.66666666666667%;
+	}
+	.col-lg-6 {
+		width: 50%;
+	}
+	.col-lg-7 {
+		width: 58.333333333333336%;
+	}
+	.col-lg-8 {
+		width: 66.66666666666666%;
+	}
+	.col-lg-9 {
+		width: 75%;
+	}
+	.col-lg-10 {
+		width: 83.33333333333334%;
+	}
+	.col-lg-11 {
+		width: 91.66666666666666%;
+	}
+	.col-lg-12 {
+		width: 100%;
+	}
+	.col-lg-push-0 {
+		left: auto;
+	}
+	.col-lg-push-1 {
+		left: 8.333333333333332%;
+	}
+	.col-lg-push-2 {
+		left: 16.666666666666664%;
+	}
+	.col-lg-push-3 {
+		left: 25%;
+	}
+	.col-lg-push-4 {
+		left: 33.33333333333333%;
+	}
+	.col-lg-push-5 {
+		left: 41.66666666666667%;
+	}
+	.col-lg-push-6 {
+		left: 50%;
+	}
+	.col-lg-push-7 {
+		left: 58.333333333333336%;
+	}
+	.col-lg-push-8 {
+		left: 66.66666666666666%;
+	}
+	.col-lg-push-9 {
+		left: 75%;
+	}
+	.col-lg-push-10 {
+		left: 83.33333333333334%;
+	}
+	.col-lg-push-11 {
+		left: 91.66666666666666%;
+	}
+	.col-lg-pull-0 {
+		right: auto;
+	}
+	.col-lg-pull-1 {
+		right: 8.333333333333332%;
+	}
+	.col-lg-pull-2 {
+		right: 16.666666666666664%;
+	}
+	.col-lg-pull-3 {
+		right: 25%;
+	}
+	.col-lg-pull-4 {
+		right: 33.33333333333333%;
+	}
+	.col-lg-pull-5 {
+		right: 41.66666666666667%;
+	}
+	.col-lg-pull-6 {
+		right: 50%;
+	}
+	.col-lg-pull-7 {
+		right: 58.333333333333336%;
+	}
+	.col-lg-pull-8 {
+		right: 66.66666666666666%;
+	}
+	.col-lg-pull-9 {
+		right: 75%;
+	}
+	.col-lg-pull-10 {
+		right: 83.33333333333334%;
+	}
+	.col-lg-pull-11 {
+		right: 91.66666666666666%;
+	}
+	.col-lg-offset-0 {
+		margin-left: 0;
+	}
+	.col-lg-offset-1 {
+		margin-left: 8.333333333333332%;
+	}
+	.col-lg-offset-2 {
+		margin-left: 16.666666666666664%;
+	}
+	.col-lg-offset-3 {
+		margin-left: 25%;
+	}
+	.col-lg-offset-4 {
+		margin-left: 33.33333333333333%;
+	}
+	.col-lg-offset-5 {
+		margin-left: 41.66666666666667%;
+	}
+	.col-lg-offset-6 {
+		margin-left: 50%;
+	}
+	.col-lg-offset-7 {
+		margin-left: 58.333333333333336%;
+	}
+	.col-lg-offset-8 {
+		margin-left: 66.66666666666666%;
+	}
+	.col-lg-offset-9 {
+		margin-left: 75%;
+	}
+	.col-lg-offset-10 {
+		margin-left: 83.33333333333334%;
+	}
+	.col-lg-offset-11 {
+		margin-left: 91.66666666666666%;
+	}
 }
 
 /*------------------------------------------------------------------------------
@@ -1458,6 +1935,7 @@ li.selected > a .favicon-wrap {
 				width: 100%;
 				padding: 3px 5px;
 				box-sizing: border-box;
+				font-family: $font-stack;
 			}
 			a:hover,
 			&.selected a {
@@ -1743,6 +2221,21 @@ Settings
 }
 
 .settings {
+	.settings-wrap {
+		width: 940px;
+		margin: 0 auto;
+	}
+	.settings-nav {
+		float: left;
+		width: 140px;
+		margin-left: 160px;
+	}
+	.settings-content {
+		margin-left: 20px;
+		width: 620px;
+		float: left;
+	}
+	
 	.content {
 		position: static;
 		height: 100%;
@@ -2265,6 +2758,10 @@ Helpers
 	text-align: right;
 }
 
+.align-left {
+	text-align: left !important;
+}
+
 .align-center {
 	text-align: center;
 }
@@ -2381,10 +2878,6 @@ select {
 		display: block;
 		background-color: #999;
 	}
-}
-
-#card_code {
-	width: 230px;
 }
 
 .ui-helper-hidden-accessible {
@@ -2587,13 +3080,16 @@ input:focus:invalid, textarea:focus:invalid, select:focus:invalid {
 
 .box-header {
 	background-color: $selected;
-	padding: 20px 30px;
 	color: #fff;
 	font-weight: normal;
 	font-size: 24px;
 	border-radius: 4px 4px 0 0;
 	margin: 0;
 	-webkit-font-smoothing: antialiased;
+	padding: 15px 15px;
+	@include respond-to(screen-xs) {
+		padding: 20px 30px;
+	}
 }
 
 .box {
@@ -2601,10 +3097,69 @@ input:focus:invalid, textarea:focus:invalid, select:focus:invalid {
 	border-top: none;
 	border-radius: 0 0 4px 4px;
 	background-color: #FFF;
-	padding: 30px;
 	margin-bottom: 15px;
 	.alert {
 		margin-top: 0;
+	}
+	padding: 15px;
+	@include respond-to(screen-xs) {
+		padding: 30px;
+	}
+}
+
+.xs-hide {
+	display: none;
+	@include respond-to(screen-xs) {
+		display: block;
+	}
+}
+
+.sm-hide {
+	display: none;
+	@include respond-to(screen-sm) {
+		display: block;
+	}
+}
+
+.md-hide {
+	display: none;
+	@include respond-to(screen-md) {
+		display: block;
+	}
+}
+
+.lg-hide {
+	display: none;
+	@include respond-to(screen-lg) {
+		display: block;
+	}
+}
+
+.xs-show {
+	display: block;
+	@include respond-to(screen-xs) {
+		display: none;
+	}
+}
+
+.sm-show {
+	display: block;
+	@include respond-to(screen-sm) {
+		display: none;
+	}
+}
+
+.md-show {
+	display: block;
+	@include respond-to(screen-md) {
+		display: none;
+	}
+}
+
+.lg-show {
+	display: block;
+	@include respond-to(screen-lg) {
+		display: none;
 	}
 }
 
@@ -2613,14 +3168,14 @@ Login and Sign Up
 ------------------------------------------------------------------------------*/
 .login, .signup {
 	background-color: #efefef;
+	*,*:before,*:after {
+	  box-sizing: border-box;
+	}
 	.bar {
 		display: none;
 	}
-	.login-wrap {
-		max-width: 512px;
-		margin: 0 auto;
-	}
-	.signup-wrap {
+	.signup-wrap, .login-wrap {
+		padding: 0 15px 10px 15px;
 		max-width: 548px;
 		margin: 0 auto;
 	}
@@ -2636,9 +3191,11 @@ Login and Sign Up
 	input[type="email"],
 	input[type="password"],
 	input[type="text"] {
-		width: 94%;
-		padding-left: 3%;
-		padding-right: 3%;
+		width: 100%;
+		padding: 12px 10px 10px 10px;
+		@include respond-to(screen-xs) {
+			max-width: 300px;
+		}
 	}
 	input[type="submit"] {
 		padding: 10px 25px;
@@ -2649,14 +3206,22 @@ Login and Sign Up
 		margin: 15px 0 0 0;
 	}
 	.form-wrap {
-		margin-left: 20px;
-		max-width: 327px;
-		float: left;
+		padding: 0 15px;
+		@include respond-to(screen-xs) {
+			margin-left: 15px;
+			max-width: 312px;
+			float: left;
+			padding: 0;
+		}
 	}
 	.promo-wrap {
 		margin-left: 20px;
 		max-width: 139px;
 		float: left;
+		display: none;
+		@include respond-to(screen-xs) {
+			display: block;
+		}
 	}
 	.radio {
 		margin-right: 15px;
@@ -2664,16 +3229,6 @@ Login and Sign Up
 	}
 	hr {
 		margin: 20px 0;
-	}
-}
-
-.signup {
-	input[type="email"],
-	input[type="password"] {
-		width: 94%;
-		max-width: 300px;
-		padding-left: 3%;
-		padding-right: 3%;
 	}
 }
 
