@@ -29,6 +29,7 @@
 		width: 140px;
 		height: 30px;
 		background-size: 140px 30px !important;
+		margin-top: 6px;
 		@include respond-to(screen-xs) {
 			width: 167px;
 			height: 36px;
