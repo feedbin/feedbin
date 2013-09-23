@@ -8,16 +8,6 @@ $selected: #3399ff;
 $font-stack: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
 /*------------------------------------------------------------------------------
-Icons
-------------------------------------------------------------------------------*/
-
-[class^="icon-"],
-[class*=" icon-"] {
-	display: block;
-	line-height: 1;
-}
-
-/*------------------------------------------------------------------------------
 Grid
 ------------------------------------------------------------------------------*/
 .clearfix {
@@ -1114,27 +1104,6 @@ Structure
 	}
 }
 
-.side-toolbar-wrap {
-	background-color: #3c3c3c;
-	width: $toolbar-width;
-	float: left;
-	position: relative;
-	border-right: 1px solid #b4b7bd;
-	height: 100%;
-	box-shadow: inset -1px 0 0 0 rgba(0,0,0,.4), inset -2px 0 0 0 rgba(0,0,0,.2), inset -3px 0 0 0 rgba(0,0,0,.1);
-	.logo {
-		background-color: #000;
-	}
-}
-
-.side-toolbar {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-}
-
 .app-wrap {
 	height: 100%;
 	width: 100%;
@@ -1615,6 +1584,20 @@ li.selected > a .favicon-wrap {
 				color: #999;
 				display: block;
 			}
+			.icon-star {
+				background: image-url("icon-star.svg") 0 0 no-repeat;
+				height: 10px;
+				width: 11px;
+				position: absolute;
+				right: 11px;
+				top: 11px;
+				display: none;
+			}
+			&.starred {
+				.icon-star {
+					display: block;
+				}
+			}
 			&.read {
 				.title {
 					color: #999;
@@ -1627,8 +1610,8 @@ li.selected > a .favicon-wrap {
 				border-color: #666;
 				border-top: 1px solid #666;
 				margin-top: -1px;
-				.icon-star-filled {
-					color: #FFF;
+				.icon-star {
+					background-position: 0 -10px;
 				}
 			}
 			.selected &.selected {
@@ -1645,26 +1628,6 @@ li.selected > a .favicon-wrap {
 		.entry-selected & {
 			top: 36px;
 		}
-	}
-}
-
-.state-indicators {
-	position: absolute;
-	top: 11px;
-	right: 11px;
-	.icon-star-filled {
-		position: absolute;
-		right: 0;
-		top: 0;
-		font-size: 11px;
-		color: #666;
-		display: none;
-	}
-}
-
-.starred {
-	.icon-star-filled {
-		display: block;
 	}
 }
 
@@ -2450,43 +2413,6 @@ Buttons
 	padding: 4px 5px;
 }
 
-.sidebar-button {
-	-webkit-appearance: none;
-	border: none;
-	background: none;
-	$button-color: #CCC;
-	height: 40px;
-	width: 40px;
-	cursor: pointer;
-	position: absolute;
-	left: 0;
-	&[disabled] {
-		cursor: default;
-	}
-	[class^="icon-"], [class*=" icon-"] {
-		color: rgba($button-color, 1);
-		text-shadow: 0 2px 0 rgba(#000,.2);
-		position: absolute;
-		top: 12px;
-		left: 11px;
-		font-size: 16px;
-		height: 16px;
-		width: 16px;
-
-	}
-	&:hover [class^="icon-"],
-	&:hover [class*=" icon-"],
-	&.selected [class^="icon-"],
-	&.selected [class*=" icon-"] {
-		color: #FFF;
-	}
-	&[disabled] [class^="icon-"], &[disabled] [class*=" icon-"],
-	&[disabled]:hover [class^="icon-"], &[disabled]:hover [class*=" icon-"] {
-		color: rgba($button-color, .3);
-		text-shadow: 0 2px 0 rgba(#000,.1);
-	}
-}
-
 .tags-form-wrap {
 	height: 0;
 	width: 100%;
@@ -2560,26 +2486,6 @@ Buttons
 	&:hover, &.autocomplete-selected {
 		background-color: rgba(#FFF, .1);
 	}
-}
-
-.button-view-all {
-	top: 40px;
-}
-
-.button-view-unread {
-	top: 80px;
-}
-
-.button-unsubscribe {
-	bottom: 10px;
-}
-
-.button-mark-all-as-read {
-	bottom: 50px;
-}
-
-.button-tag {
-	bottom: 90px;
 }
 
 .toolbar-button {
@@ -2803,45 +2709,55 @@ select {
 	border: 1px solid #fbeed5;
 	border-radius: 4px;
 }
+
 .alert,
 .alert h4 {
 	color: #c09853;
 }
+
 .alert h4 {
 	margin: 0;
 }
+
 .alert .close {
 	position: relative;
 	top: -2px;
 	right: -21px;
 	line-height: 20px;
 }
+
 .alert-success {
 	color: #468847;
 	background-color: #dff0d8;
 	border-color: #d6e9c6;
 }
+
 .alert-success h4 {
 	color: #468847;
 }
+
 .alert-danger,
 .alert-error {
 	color: #b94a48;
 	background-color: #f2dede;
 	border-color: #eed3d7;
 }
+
 .alert-danger h4,
 .alert-error h4 {
 	color: #b94a48;
 }
+
 .alert-info {
 	color: #3a87ad;
 	background-color: #d9edf7;
 	border-color: #bce8f1;
 }
+
 .alert-info h4 {
 	color: #3a87ad;
 }
+
 .alert-block {
 	padding-top: 14px;
 	padding-bottom: 14px;
