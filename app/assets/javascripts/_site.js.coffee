@@ -197,11 +197,6 @@ $.extend feedbin,
         $(@).parents('ul').find('.selected').removeClass('selected')
         $(@).parent('li').addClass('selected')
 
-    panelNav: ->
-      $(document).on 'click', '[data-behavior~=panel_nav]', ->
-        panel = $(@).data('panel')
-        feedbin.surface(panel, false)
-
     choicesSubmit: ->
       $(document).on 'ajax:beforeSend', '[data-choice-form]', ->
         $('.modal').modal('hide')
@@ -240,9 +235,6 @@ $.extend feedbin,
       $(document).on 'ajax:beforeSend', '[data-behavior~=mark_all_as_read]', ->
         $('.entries li').addClass('read')
 
-      $(document).on 'ajax:complete', '[data-behavior~=mark_all_as_read]', ->
-        feedbin.surface('feeds', false)
-        
     clearEntry: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event) ->
         unless $(event.target).is('.toggle-drawer')
