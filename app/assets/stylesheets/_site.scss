@@ -2339,19 +2339,32 @@ Settings
 }
 
 .settings {
-	.settings-wrap {
-		width: 940px;
-		margin: 0 auto;
+	.content {
+		display: table;
+		border-collapse: collapse;
+		width: 100%;
 	}
 	.settings-nav {
-		float: left;
-		width: 140px;
-		margin-left: 160px;
+		display: table-cell;
+		max-width: 40%;
+		width: 100%;
+		padding-top: 20px;
+		> * {
+			margin-right: 20px;
+			margin-left: auto;
+		}
 	}
 	.settings-content {
-		margin-left: 20px;
-		width: 620px;
-		float: left;
+		display: table-cell;
+		border-left: 1px solid #CCC;
+		background-color: white;
+		vertical-align: top;
+		padding-top: 4px;
+		padding-left: 19px;
+		padding-right: 19px;
+		> * {
+			max-width: 580px;
+		}
 	}
 	
 	.content {
@@ -2370,8 +2383,7 @@ Settings
 		padding: 0;
 	}
 	.nav {
-		padding: 0;
-		margin: 58px 0 0 0;
+		margin-top: 58px;
 		list-style: none;
 		a {
 			text-align: right;
@@ -2390,7 +2402,9 @@ Settings
 		}
 	}
 	.nav-small {
+		max-width: 140px;
 		padding-top: 10px;
+		padding-left: 0;
 		border-top: 1px solid #cccccc;
 		a {
 			font-size: 14px;
