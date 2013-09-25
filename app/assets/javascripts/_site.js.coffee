@@ -375,7 +375,6 @@ $.extend feedbin,
 
       $(document).on 'click', '[data-behavior~=toggle_share_menu]', (event) ->
         $(".dropdown-wrap li").removeClass('selected')
-        $(".dropdown-wrap li:first-child").addClass('selected')
         parent = $(@).closest('.dropdown-wrap')
         if parent.hasClass('open')
           parent.removeClass('open')
@@ -383,6 +382,10 @@ $.extend feedbin,
           parent.addClass('open')
           return false
         event.preventDefault()
+
+      $(document).on 'mouseover', '.dropdown-wrap li', (event) ->
+        console.log 'hover'
+        $('.dropdown-wrap li').not(@).removeClass('selected')
 
     drawer: ->
       $(document).on 'click', '[data-behavior~=toggle_drawer]', (event) =>
