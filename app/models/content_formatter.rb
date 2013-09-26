@@ -10,12 +10,6 @@ class ContentFormatter
     }
     filters = [HTML::Pipeline::SanitizationFilter]
     
-    if ENV['CAMO_HOST'] && ENV['CAMO_KEY']
-      context[:asset_proxy] = ENV['CAMO_HOST']
-      context[:asset_proxy_secret_key] = ENV['CAMO_KEY']
-      filters = filters << HTML::Pipeline::CamoFilter
-    end
-    
     if entry
       filters.unshift(HTML::Pipeline::AbsoluteSourceFilter)
       filters.unshift(HTML::Pipeline::AbsoluteHrefFilter)
