@@ -15,13 +15,13 @@ class EntryDeleter
       UnreadEntry.where(entry_id: entries_to_delete_ids).delete_all
       entries_to_delete.delete_all
       
-      Sidekiq.redis do |conn| 
-        conn.pipelined do
-          entries_to_delete_public_ids.each do |public_id|
-            conn.hdel("entry:public_ids:#{public_id[0..4]}", public_id)
-          end
-        end
-      end
+      # Sidekiq.redis do |conn| 
+      #   conn.pipelined do
+      #     entries_to_delete_public_ids.each do |public_id|
+      #       conn.hdel("entry:public_ids:#{public_id[0..4]}", public_id)
+      #     end
+      #   end
+      # end
       
     end
   end
