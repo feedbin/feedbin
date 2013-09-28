@@ -1,24 +1,6 @@
-<% if type.nil? && data.nil? %>
 <div class="toolbar-button" disabled="disabled" data-behavior="mark_all_as_read">
   <div class="toolbar-button-inner">
     <%= render partial: "shared/svg/check" %>
   </div>
   Mark Read
 </div>
-<% else %>
-  <%
-  options = {title: 'Mark all as read', class: 'hide', data: {}}
-  if current_user.mark_as_read_confirmation == '1' 
-    options[:data][:confirm] = "Are you sure you want to mark all as read?"
-  end
-  %>
-  <%= form_tag mark_all_as_read_entries_path, remote: true, data: { behavior: 'mark_all_as_read' }, class: 'toolbar-button' do %>
-    <div class="toolbar-button-inner">
-      <%= hidden_field_tag 'type', type %>
-      <%= hidden_field_tag 'data', data %>
-      <%= render partial: "shared/svg/check" %>
-      <%= submit_tag "", options %>
-    </div>
-    Mark Read
-  <% end %>
-<% end %>

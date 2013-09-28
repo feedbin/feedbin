@@ -3,7 +3,7 @@ class FeedPresenter < BasePresenter
   presents :feed
   
   def feed_link(&block)
-    @template.link_to @template.feed_entries_path(feed), remote: true, class: 'feed-link', data: { behavior: 'selectable reset_entry_position show_entries open_item' } do
+    @template.link_to @template.feed_entries_path(feed), remote: true, class: 'feed-link', data: { behavior: 'selectable reset_entry_position show_entries open_item', mark_read: {type: 'feed', data: feed.id, message: "Mark #{feed.title} as read?"}.to_json } do
       yield
     end
   end

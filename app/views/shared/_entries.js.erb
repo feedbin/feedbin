@@ -19,8 +19,6 @@ $('[data-behavior~=show_tags_form]').replaceWith('<%= j render partial: "shared/
   $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/unsubscribe", locals: {feed: @feed || nil} %>');
 <% end %>
 
-$('[data-behavior~=mark_all_as_read]').replaceWith('<%= j render partial: "shared/buttons/mark_all_as_read", locals: {type: @type, data: @data} %>');
-
 feedbin.updatePager('<%= j will_paginate(@page_query) %>');
 
 feedbin.data.viewMode = "<%= j session[:view_mode] %>";
