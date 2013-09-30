@@ -3134,7 +3134,7 @@ input:focus:invalid, textarea:focus:invalid, select:focus:invalid {
 .break-word {
 	text-overflow: ellipsis;
 	overflow: hidden;
-	width: 530px;
+	max-width: 530px;
 	display: block;
 }
 
