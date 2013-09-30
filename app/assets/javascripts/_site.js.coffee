@@ -363,8 +363,6 @@ $.extend feedbin,
         $('.app').addClass('nothing-selected').removeClass('feed-selected entry-selected')
 
       $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
-        unless $(event.target).hasClass('back-button')
-          feedbin.clearEntries()
         $('.app').addClass('feed-selected').removeClass('nothing-selected entry-selected')
 
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
