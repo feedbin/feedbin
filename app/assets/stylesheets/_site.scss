@@ -1129,14 +1129,48 @@ Structure
 			margin-right: 0;
 			padding-right: 8px;
 		}
-		@media (max-width: 400px) {
-			&.logout-link {
-				display: none;
-			}
-			border: none;
-			margin-right: 0;
-			padding-right: 8px;
+	}
+	@media (max-width: 527px) {
+		display: none;
+	}
+}
+
+.bar .menu {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	z-index: 1;
+	.menu-button {
+		background: image-url("icon-menu.svg") center center no-repeat;
+		width: 46px;
+		height: 46px;
+		margin-left: auto;
+		overflow: auto;
+	}
+	.settings-nav {
+		padding: 20px 30px;
+		background-color: #efefef;
+		border: 1px solid #ccc;
+		display: none;
+		ul {
+			padding: 0;
+			margin: 0;
 		}
+		li {
+			padding-top: 4px;
+			padding-bottom: 4px;
+		}
+		.home-link, .blog-link, .api-link, .twitter-link {
+			display: none;
+		}
+	}
+	&:hover .settings-nav {
+		display: block;
+	}
+	@media (min-width: 528px) {
+		display: none;
 	}
 }
 
@@ -2338,32 +2372,72 @@ Settings
 	border-radius: 4px;
 }
 
+.nav {
+	margin-top: 58px;
+	list-style: none;
+	a {
+		text-align: right;
+		padding: 4px 0;
+		display: block;
+		font-size: 18px;
+		color: #666666;
+		&:hover {
+			color: #000;
+			text-decoration: none;
+		}
+		&.active {
+			font-weight: bold;
+			color: #000;
+		}
+	}
+}
+.nav-small {
+	max-width: 140px;
+	padding-top: 10px;
+	padding-left: 0;
+	border-top: 1px solid #cccccc;
+	margin-left: auto;
+	a {
+		font-size: 14px;
+		color: #999999;
+	}
+}
+
 .settings {
 	.content {
 		display: table;
 		border-collapse: collapse;
 		width: 100%;
-	}
-	.settings-nav {
-		display: table-cell;
-		max-width: 40%;
-		width: 100%;
-		padding-top: 20px;
-		> * {
-			margin-right: 20px;
-			margin-left: auto;
+		.settings-nav {
+			list-style-type: none;
+			display: table-cell;
+			max-width: 40%;
+			width: 100%;
+			padding-top: 20px;
+			> * {
+				margin-right: 20px;
+				margin-left: auto;
+			}
+			@media (max-width: 527px) {
+				display: none;
+			}
+			.logout-link {
+				display: none;
+			}
 		}
-	}
-	.settings-content {
-		display: table-cell;
-		border-left: 1px solid #CCC;
-		background-color: white;
-		vertical-align: top;
-		padding-top: 4px;
-		padding-left: 19px;
-		padding-right: 19px;
-		> * {
-			max-width: 580px;
+		.settings-content {
+			display: table-cell;
+			background-color: white;
+			vertical-align: top;
+			padding-top: 4px;
+			padding-left: 19px;
+			padding-right: 19px;
+			> * {
+				max-width: 580px;
+			}
+			@media (min-width: 528px) {
+				border-left: 1px solid #CCC;
+			}
 		}
 	}
 	
@@ -2381,35 +2455,6 @@ Settings
 	code {
 		font-size: 15px;
 		padding: 0;
-	}
-	.nav {
-		margin-top: 58px;
-		list-style: none;
-		a {
-			text-align: right;
-			padding: 4px 0;
-			display: block;
-			font-size: 18px;
-			color: #666666;
-			&:hover {
-				color: #000;
-				text-decoration: none;
-			}
-			&.active {
-				font-weight: bold;
-				color: #000;
-			}
-		}
-	}
-	.nav-small {
-		max-width: 140px;
-		padding-top: 10px;
-		padding-left: 0;
-		border-top: 1px solid #cccccc;
-		a {
-			font-size: 14px;
-			color: #999999;
-		}
 	}
 	.alert {
 		margin-top: 20px;
