@@ -50,16 +50,12 @@ class TagsController < ApplicationController
         @taggings.update_all(tag_id: @new_tag.id)
       end
       update_selected_feed!("tag", @new_tag.try(:id))
-      @type = 'tag'
-      @data = @new_tag.id
       
       session[:tag_visibility] ||= {}
       session[:tag_visibility][@new_tag.id.to_s] = session[:tag_visibility][tag.id.to_s] ? session[:tag_visibility][tag.id.to_s] : false
     else
       # Tag is empty, delete taggings
       @taggings.destroy_all
-      @type = nil
-      @data = nil
     end
     
     get_feeds_list
@@ -74,8 +70,6 @@ class TagsController < ApplicationController
     tag = Tag.find(params[:id])
     Tagging.where(tag_id: tag, user_id: @user).destroy_all
 
-    @type = nil
-    @data = nil
     get_feeds_list
     
     respond_to do |format|

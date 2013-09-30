@@ -3,4 +3,3 @@ $('[data-behavior~=feeds_target] [data-tag-id~=<%= @new_tag.id %>] .tag-link').c
 feedbin.hideTagsForm();
 $('[data-behavior~=show_tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {feed: nil, tags: nil, tag: @new_tag} %>');
 $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_tag", locals: {tag: @new_tag} %>');
-$('[data-behavior~=mark_all_as_read]').replaceWith('<%= j render partial: "shared/buttons/mark_all_as_read", locals: {type: @type, data: @data} %>');

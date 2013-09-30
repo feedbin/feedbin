@@ -134,7 +134,7 @@ class feedbin.Keyboard
       @alternateEntryCandidates.push currentEntry.next() if currentEntry.next().length
       @alternateEntryCandidates.push currentEntry.prev() if currentEntry.prev().length
         
-      $('[data-behavior~=mark_all_as_read]').first().find('[type=submit]').click()
+      $('[data-behavior~=mark_all_as_read]').first().click()
       event.preventDefault()
       
     # Add subscription

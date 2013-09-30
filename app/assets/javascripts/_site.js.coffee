@@ -176,6 +176,14 @@ $.extend feedbin,
 
     elements.css
       height: height
+
+  disableMarkRead: () ->
+    feedbin.markReadData = null
+    $('[data-behavior~=mark_all_as_read]').attr('disabled', 'disabled')
+      
+  markRead: () ->
+    $('.entries li').addClass('read')
+    $.post feedbin.data.markAsReadPath, feedbin.markReadData
       
   hideQueue: []
 
@@ -186,12 +194,28 @@ $.extend feedbin,
   images: []
   
   feedXhr: null
+  
+  markReadData: null
 
 $.extend feedbin,
   init:
     setData: ->
       feedbin.data = $('#feedbin-data').data()
     
+    markRead: ->
+      $(document).on 'click', '[data-mark-read]', ->
+        feedbin.markReadData = $(@).data('mark-read')
+        $('[data-behavior~=mark_all_as_read]').removeAttr('disabled')
+
+      $(document).on 'click', '[data-behavior~=mark_all_as_read]', ->
+        unless $(@).attr('disabled')
+          if feedbin.data.markAsReadConfirmation
+            result = confirm(feedbin.markReadData.message)
+            if result
+              feedbin.markRead()
+          else
+            feedbin.markRead()
+      
     selectable: ->
       $(document).on 'click', '[data-behavior~=selectable]', ->
         $(@).parents('ul').find('.selected').removeClass('selected')
@@ -226,14 +250,6 @@ $.extend feedbin,
     entryLinks: ->
       $(document).on 'click', '[data-behavior~=entry_content_wrap] a', ->
         $(this).attr('target', '_blank')
-
-    markAsRead: ->
-      $(document).on 'click', '[data-behavior~=mark_all_as_read]', (event)->
-        unless $(event.target).hasClass('hide')
-          $(@).find('input[type="submit"]').click()
-        
-      $(document).on 'ajax:beforeSend', '[data-behavior~=mark_all_as_read]', ->
-        $('.entries li').addClass('read')
 
     clearEntry: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event) ->
