@@ -779,7 +779,8 @@ input[type="color"],
 	border: 1px solid #CCC;
 	font-size: 18px;
 	padding: 12px 12px 10px 12px;
-	width: 300px;
+	max-width: 300px;
+	width: 90%;
 	border-radius: 4px;
 	color: #333;
 	display: inline-block;
