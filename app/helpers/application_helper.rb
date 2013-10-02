@@ -64,4 +64,8 @@ module ApplicationHelper
     end
   end
 
+  def get_protocol
+    Feedbin::Application.config.force_ssl ? "https:" : "http:"
+  end
+
 end
