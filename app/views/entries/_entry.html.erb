@@ -1,5 +1,7 @@
 <% present entry do |entry_presenter| %>
 <li class="<%= entry_presenter.classes %>" data-entry-id="<%= entry.id %>" <%= rtl(entry.summary) %>>
+    <div class="mark-above-read" data-behavior="mark_above_read"><span><i>Mark Above as Read</i></span></div>
+    <div class="mark-below-read" data-behavior="mark_below_read"><span><i>Mark Below as Read</i></span></div>
     <%= entry_presenter.entry_link do %>
       <%= entry_presenter.favicon %>
       <i class="icon-star"></i>
@@ -9,6 +11,7 @@
       <% if entry_presenter.has_content? %>
         <p class="body"><%= entry.summary.html_safe %></p>
       <% end %>
+      <span class="entry-actions" data-behavior="show_entry_actions"></span>
     <% end %>
   </li>
 <% end %>

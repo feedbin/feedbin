@@ -20,7 +20,8 @@ content_tag :div, '',
     auto_update_path: auto_update_feeds_path, 
     font_sizes: Feedbin::Application.config.font_sizes.to_json,
     mark_as_read_path: mark_all_as_read_entries_path,
-    mark_as_read_confirmation: (@user.mark_as_read_confirmation == '1')
+    mark_as_read_confirmation: (@user.mark_as_read_confirmation == '1'),
+    mark_direction_as_read_entries: mark_direction_as_read_entries_path
   },
   class: 'hide', 
   id: 'feedbin-data'

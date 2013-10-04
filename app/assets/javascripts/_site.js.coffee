@@ -553,6 +553,40 @@ $.extend feedbin,
         else
           $("[data-behavior~=filter_target]").addClass('hide')
           $("[data-platforms~=#{filter}]").removeClass('hide')
+        
+    showEntryActions: ->
+      $(document).on 'click', '[data-behavior~=show_entry_actions]', (event) ->
+        parent = $(@).parents('li')
+        if parent.hasClass('show-actions')
+          $('.entries li').removeClass('show-actions')
+        else
+          $('.entries li').removeClass('show-actions')
+          parent.addClass('show-actions')
+
+      $(document).on 'click', (event) ->
+        $('.entries li').removeClass('show-actions')
+
+      $(document).on 'click', '[data-behavior~=show_entry_content]', (event) ->
+        unless $(event.target).is('[data-behavior~=show_entry_actions]')
+          $('.entries li').removeClass('show-actions')
+        
+    markDirectionAsRead: ->
+      $(document).on 'click', '[data-behavior~=mark_below_read], [data-behavior~=mark_above_read]', (event) ->
+        data = feedbin.markReadData
+        if data
+          data['ids'] = $(@).parents('li').prevAll().map(() ->
+            $(@).data('entry-id')
+          ).get().join()
+          
+          if $(@).is('[data-behavior~=mark_below_read]')
+            $(@).parents('li').nextAll().addClass('read')
+            data['direction'] = 'below'
+          else
+            $(@).parents('li').prevAll().addClass('read')
+            data['direction'] = 'above'
+            
+        $.post feedbin.data.markDirectionAsReadEntries, data
+      
 
 
 jQuery ->

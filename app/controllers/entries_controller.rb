@@ -192,6 +192,33 @@ class EntriesController < ApplicationController
     render nothing: true
   end
 
+  def mark_direction_as_read
+    @user = current_user
+    ids = params[:ids].split(',').map {|i| i.to_i }
+    if params[:direction] == 'above'
+      UnreadEntry.where(user: @user, entry_id: ids).delete_all
+    else
+      if params[:type] == 'feed'
+        UnreadEntry.where(user: @user, feed_id: params[:data]).where.not(entry_id: ids).delete_all
+      elsif params[:type] == 'tag'
+        feed_ids = @user.taggings.where(tag_id: params[:data]).pluck(:feed_id)
+        UnreadEntry.where(user: @user, feed_id: feed_ids).where.not(entry_id: ids).delete_all
+      elsif params[:type] == 'starred'
+        starred = @user.starred_entries.pluck(:entry_id)
+        UnreadEntry.where(user: @user, entry_id: starred).where.not(entry_id: ids).delete_all
+      elsif  %w{unread all}.include?(params[:type])
+        UnreadEntry.where(user: @user).where.not(entry_id: ids).delete_all
+      end
+    end
+
+    @mark_selected = true
+    get_feeds_list
+
+    respond_to do |format|
+      format.js
+    end
+  end
+
   private
 
   def sharing_services(entry)

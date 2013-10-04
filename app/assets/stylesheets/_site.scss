@@ -1387,27 +1387,6 @@ Structure
 	background: $selected;
 }
 
-.entries .selected,
-.selected .entries .selected {
-	background: #666666;
-	.time {
-		color: rgba(255,255,255, .8) !important;
-	}
-	.title {
-		color: rgba(255,255,255, 1) !important;
-	}
-	.feed-title {
-		color: rgba(255,255,255, .8) !important;
-	}
-	.body {
-		color: rgba(255,255,255, .5) !important;
-	}
-}
-
-.selected .entries .selected {
-	background: $selected;
-}
-
 li.selected .drawer .drawer-arrow:after {
 	border-top-color: #666;
 }
@@ -1539,9 +1518,10 @@ li.selected > a .favicon-wrap {
 		padding: 0 0 17px 0;
 		list-style: none;
 		li {
-			border-bottom: 1px solid #CCC;
+			display: table;
 			position: relative;
 			word-wrap: break-word;
+			background-color: #666;
 			.favicon-wrap {
 				top: 21px;
 				left: 7px;
@@ -1550,12 +1530,28 @@ li.selected > a .favicon-wrap {
 				text-decoration: none;
 			}
 			.wrap {
+				border-bottom: 1px solid #CCC;
+				position: relative;
+				background-color: #FFF;
 				display: block;
 				padding: 8px 10px 8px 31px;
 				color: #000;
+				left: 0;
+				transition:left .3s ease;
 				&:hover {
 					text-decoration: none;
 				}
+			}
+			.entry-actions {
+				cursor: pointer;
+				position: absolute;
+				top: 10px;
+				right: 11px;
+				height: 12px;
+				width: 12px;
+				background: image-url("icon-gear.svg") no-repeat;
+				background-size: 12px 12px;
+				display: none;
 			}
 			.time {
 				font-size: 12px;
@@ -1607,16 +1603,89 @@ li.selected > a .favicon-wrap {
 				}
 			}
 			&.selected {
-				border-color: #666;
-				border-top: 1px solid #666;
-				margin-top: -1px;
+				.wrap {
+					border-color: #666;
+					border-top: 1px solid #666;
+					margin-top: -1px;
+					background: #666666;
+				}
 				.icon-star {
 					background-position: 0 -10px;
 				}
+				.time {
+					color: rgba(255,255,255, .8) !important;
+				}
+				.title {
+					color: rgba(255,255,255, 1) !important;
+				}
+				.feed-title {
+					color: rgba(255,255,255, .8) !important;
+				}
+				.body {
+					color: rgba(255,255,255, .5) !important;
+				}
 			}
 			.selected &.selected {
-				border-color: $selected;
-				border-top: 1px solid $selected;
+				.wrap {
+					border-color: $selected;
+					border-top: 1px solid $selected;
+					background: $selected;
+				}
+			}
+			&:hover {
+				.entry-actions {
+					display: block;
+				}
+				.icon-star {
+					display: none;
+				}
+			}
+			&.show-actions {
+				a {
+					left: -70%;
+				}
+			}
+			.mark-above-read,
+			.mark-below-read {
+				position: absolute;
+				height: 50%;
+				color: #FFF;
+				width: 100%;
+				text-align: right;
+				cursor: pointer;
+				&:hover {
+					background-color: #999;
+				}
+				span {
+					font-size: 12px;
+					display: block;
+					height: 12px;
+					overflow: auto;
+					margin: auto;
+					position: absolute;
+					top: 0;
+					left: 0;
+					bottom: 0;
+					right: 8px;
+					line-height: 1;
+				}
+				i {
+					font-style: normal;
+				}
+				i:before {
+					font-style: normal;
+					content: "↑";
+					padding-right: 4px;
+					font-weight: bold;
+				}
+			}
+			.mark-below-read {
+				bottom: 0;
+				border-top: 1px solid rgba(255,255,255,.5);
+				i:before {
+					content: "↓";
+					top: -2px;
+				}
 			}
 		}
 	}
