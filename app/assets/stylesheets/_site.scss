@@ -3246,6 +3246,12 @@ Mobile
 			top: 7px;
 		}
 	}
+	.entries ul li .entry-actions {
+		display: none !important;
+	}
+	.entries ul li:hover.starred .icon-star {
+		display: block !important;
+	}
 }
 
 
