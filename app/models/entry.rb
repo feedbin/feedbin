@@ -1,5 +1,7 @@
 class Entry < ActiveRecord::Base
-
+  include Tire::Model::Search
+  include Tire::Model::AsyncCallbacks
+  
   attr_accessor :fully_qualified_url, :read, :starred, :skip_mark_as_unread
 
   belongs_to :feed
@@ -10,8 +12,17 @@ class Entry < ActiveRecord::Base
   before_create :cache_public_id, unless: -> { Rails.env.test? }
   before_create :create_summary
   after_commit :mark_as_unread, on: :create
-
+  
   validates_uniqueness_of :public_id
+  
+  
+  def self.search(params, user)
+    tire.search(page: params[:page], per_page: WillPaginate.per_page) do
+      query { string params[:query] } if params[:query].present?
+      filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
+                  { ids: { values: user.starred_entries.pluck(:entry_id) } }
+    end      
+  end
 
   def entry=(entry)
     self.author    = entry.author

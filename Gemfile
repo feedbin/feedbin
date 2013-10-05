@@ -51,6 +51,8 @@ gem 'foreman'
 gem 'yajl-ruby', require: nil
 gem 'readability_parser'
 gem 'lograge'
+gem 'tire'
+gem 'tire_async_index'
 
 # Sidekiq
 gem 'sidekiq'
