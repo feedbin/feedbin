@@ -690,6 +690,10 @@ sub {
 	bottom: -0.25em;
 }
 
+pre {
+	white-space: pre-wrap;
+}
+
 pre code {
 	background-color: transparent;
 }
