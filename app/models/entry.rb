@@ -1,6 +1,5 @@
 class Entry < ActiveRecord::Base
   include Tire::Model::Search
-  include Tire::Model::AsyncCallbacks
   
   attr_accessor :fully_qualified_url, :read, :starred, :skip_mark_as_unread
 
@@ -11,18 +10,11 @@ class Entry < ActiveRecord::Base
   before_create :ensure_published
   before_create :cache_public_id, unless: -> { Rails.env.test? }
   before_create :create_summary
-  after_commit :mark_as_unread, on: :create
+  after_commit :mark_as_unread, on: :create  
+  after_create :search_index_store
+  after_destroy :search_index_remove
   
   validates_uniqueness_of :public_id
-  
-  
-  def self.search(params, user)
-    tire.search(page: params[:page], per_page: WillPaginate.per_page) do
-      query { string params[:query] } if params[:query].present?
-      filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
-                  { ids: { values: user.starred_entries.pluck(:entry_id) } }
-    end      
-  end
 
   def entry=(entry)
     self.author    = entry.author
@@ -36,6 +28,14 @@ class Entry < ActiveRecord::Base
 
     self.public_id     = entry._public_id_
     self.old_public_id = entry._old_public_id_
+  end
+  
+  def self.search(params, user)
+    tire.search(page: params[:page], per_page: WillPaginate.per_page) do
+      query { string params[:query] } if params[:query].present?
+      filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
+                  { ids: { values: user.starred_entries.pluck(:entry_id) } }
+    end      
   end
 
   def self.entries_with_feed(entry_ids, sort)
@@ -136,6 +136,14 @@ class Entry < ActiveRecord::Base
 
   def create_summary
     self.summary = ContentFormatter.summary(self.content)
+  end
+    
+  def search_index_store
+    SearchIndexStore.perform_async(self.class.name, self.id)
+  end
+  
+  def search_index_remove
+    SearchIndexRemove.perform_async(self.class.name, self.id)
   end
 
 end

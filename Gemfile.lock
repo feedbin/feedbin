@@ -302,8 +302,6 @@ GEM
       multi_json (~> 1.3)
       rake
       rest-client (~> 1.6)
-    tire_async_index (0.3.0)
-      tire
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
@@ -364,7 +362,6 @@ DEPENDENCIES
   stripe_event
   therubyracer
   tire
-  tire_async_index
   uglifier (>= 1.0.3)
   unicorn
   will_paginate
