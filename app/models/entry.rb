@@ -10,11 +10,58 @@ class Entry < ActiveRecord::Base
   before_create :ensure_published
   before_create :cache_public_id, unless: -> { Rails.env.test? }
   before_create :create_summary
-  after_commit :mark_as_unread, on: :create  
-  after_create :search_index_store
+  after_commit :mark_as_unread, on: :create
+  after_commit :search_index_store, on: :create
   after_destroy :search_index_remove
   
   validates_uniqueness_of :public_id
+  
+  tire_settings = {
+    analysis: {
+      filter: {
+        url_stop: {
+          "type" => "stop",
+          "stopwords" => ["http", "https"]
+        },
+        url_ngram: {
+          "type"     => "nGram",
+          "max_gram" => 5,
+          "min_gram" => 3 
+        }
+      },
+      analyzer: {
+        url_analyzer: {
+          "tokenizer" => "lowercase",
+          "filter"    => ["stop", "url_stop", "url_ngram"],
+          "type"      => "custom" 
+        }
+      }
+    } 
+  }
+  
+  tire.settings tire_settings do
+    tire.mapping do
+      indexes :id,        index: :not_analyzed
+      indexes :title,     analyzer: 'snowball', boost: 100
+      indexes :content,   analyzer: 'snowball'
+      indexes :author,    analyzer: 'keyword'
+      indexes :url,       as: -> entry { entry.fully_qualified_url }, analyzer: 'url_analyzer'
+      indexes :feed_id,   index: :not_analyzed, include_in_all: false
+      indexes :published, type: 'date', include_in_all: false
+      indexes :updated,   type: 'date', include_in_all: false
+    end
+  end
+  
+  def self.search(params, user)
+    tire.search(page: params[:page], per_page: WillPaginate.per_page) do
+      query { string params[:query] } if params[:query].present?
+      filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
+                  { ids: { values: user.starred_entries.pluck(:entry_id) } }
+      facet "feeds" do
+        terms :feed_id
+      end
+    end      
+  end
 
   def entry=(entry)
     self.author    = entry.author
@@ -28,14 +75,6 @@ class Entry < ActiveRecord::Base
 
     self.public_id     = entry._public_id_
     self.old_public_id = entry._old_public_id_
-  end
-  
-  def self.search(params, user)
-    tire.search(page: params[:page], per_page: WillPaginate.per_page) do
-      query { string params[:query] } if params[:query].present?
-      filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
-                  { ids: { values: user.starred_entries.pluck(:entry_id) } }
-    end      
   end
 
   def self.entries_with_feed(entry_ids, sort)

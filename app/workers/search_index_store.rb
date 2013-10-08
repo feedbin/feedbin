@@ -4,7 +4,7 @@ class SearchIndexStore
   def perform(klass, id)
     klass = klass.constantize
     record = klass.find(id)
-    record.tire.index.store record
+    record.tire.index.store(record)
   end
   
 end
