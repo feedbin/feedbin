@@ -1038,7 +1038,8 @@ Structure
 	top: 7px;
 	form {
 		margin: 0;
-		input[type="url"] {
+		input[type="url"],
+		input[type="text"] {
 			width: 230px;
 			margin-bottom: 0;
 			padding: 5px;

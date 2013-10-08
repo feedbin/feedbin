@@ -66,6 +66,7 @@ Feedbin::Application.routes.draw do
       get :starred
       get :unread
       get :preload
+      get :search
       post :mark_all_as_read
       post :mark_direction_as_read
     end

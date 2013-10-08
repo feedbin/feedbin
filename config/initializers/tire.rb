@@ -1,1 +1,3 @@
-Tire.configure { logger 'elasticsearch.log' }
+if Rails.env.development?
+  Tire.configure { logger 'log/elasticsearch.log' }
+end

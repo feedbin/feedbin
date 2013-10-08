@@ -53,13 +53,24 @@ class Entry < ActiveRecord::Base
   end
   
   def self.search(params, user)
-    tire.search(page: params[:page], per_page: WillPaginate.per_page) do
+    tire.search(page: params[:page], per_page: WillPaginate.per_page, load: true) do
       query { string params[:query] } if params[:query].present?
-      filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
-                  { ids: { values: user.starred_entries.pluck(:entry_id) } }
-      facet "feeds" do
-        terms :feed_id
+      if params[:unread] == true
+        filter :ids, values: user.unread_entries.pluck(:entry_id)
+      elsif params[:read] == true
+        filter :not, { ids: { values: user.unread_entries.pluck(:entry_id) } }
+        filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
+                    { ids: { values: user.starred_entries.pluck(:entry_id) } }
+      elsif params[:starred] == true
+        filter :ids, values: user.starred_entries.pluck(:entry_id)
+      else
+        filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
+                    { ids: { values: user.starred_entries.pluck(:entry_id) } }
       end
+      sort { by :published, "desc" } if params[:query].blank?
+      # facet "feeds" do
+      #   terms :feed_id
+      # end
     end      
   end
 
