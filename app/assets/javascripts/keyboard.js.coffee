@@ -25,12 +25,14 @@ class feedbin.Keyboard
         @selectColumn('entries')
       else if parent.hasClass('feeds')
         @selectColumn('feeds')
+      return
     
     $(document).on 'ajax:complete', '[data-behavior~=show_entries]', =>
       @rightLock = false
       if @waitingForEntries
         @openFirstItem()
         @waitingForEntries = false
+      return
 
   bindKeys: ->
     Mousetrap.bind ['up', 'down', 'left', 'right', 'j', 'k', 'h', 'l'], (event, combo) =>
@@ -53,8 +55,8 @@ class feedbin.Keyboard
           $('li.selected', dropdown).removeClass('selected')
           nextShare.addClass('selected')
 
+        event.stopPropagation()
         event.preventDefault()
-        return false
 
       @setEnvironment()
       
