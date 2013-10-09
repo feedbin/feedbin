@@ -698,6 +698,11 @@ iframe {
 	border: none;
 }
 
+:focus {
+  outline-color: transparent;
+  outline-style: none;
+}
+
 button,
 input,
 select,
@@ -1007,7 +1012,6 @@ Structure
 }
 .bar {
 	height: 46px;
-	border-top: 3px solid #333;
 	color: #333;
 	text-shadow: 0 1px 0 rgba(255, 255, 255, .2), 0 0 30px rgba(255, 255, 255, .3);
 	position: relative;
@@ -1031,7 +1035,7 @@ Structure
 	}
 }
 
-.subscribe-wrap {
+.header-form-wrap {
 	display: none;
 	position: absolute;
 	left: 8px;
@@ -1040,10 +1044,11 @@ Structure
 		margin: 0;
 		input[type="url"],
 		input[type="text"] {
-			width: 230px;
+			width: 224px;
 			margin-bottom: 0;
-			padding: 5px;
+			padding: 5px 5px 5px 74px;
 			font-size: 14px;
+			border-radius: 4px;
 			@media (max-width: 520px) {
 				width: 100px;
 			}
@@ -1052,6 +1057,50 @@ Structure
 	.app & {
 		display: block;
 	}
+}
+
+.header-form-option {
+	display: none;
+	&.selected {
+		display: block;
+	}
+}
+
+.form-select {
+	position: absolute;
+	left: 1px;
+	top: 1px;
+	height: 30px;
+	.form-select-button {
+		line-height: 30px;
+		font-weight: bold;
+		font-size: 12px;
+		border-right: 1px solid #CCC;
+		border-radius: 2px 0 0 2px;
+		background-color: #EFEFEF;
+		padding: 0 20px 0 6px;
+		user-select: none;
+		&:hover {
+			background-color: #CCC;
+			cursor: pointer;
+		}
+	}
+	&:before {
+		position: absolute;
+		top: 13px;
+		right: 6px;
+		display: inline-block;
+		border-right: 4px solid rgba(0, 0, 0, 0);
+		border-top: 4px solid #999;
+		border-left: 4px solid rgba(0, 0, 0, 0);
+		border-bottom-color: #000;
+		content: '';
+	}
+	ul {
+		top: 37px;
+		left: -1px;
+	}
+	
 }
 
 .account-buttons {
@@ -1089,11 +1138,10 @@ Structure
 	position: absolute;
 	height: auto;
 	bottom: 0;
-	top: 49px;
+	top: 46px;
 	right: 0;
 	left: 0;
 	@media (max-width: 768px) {
-		top: 46px;
 		.entry-selected & {
 			top: 0;
 		}
@@ -1690,12 +1738,12 @@ li.selected > a .favicon-wrap {
 		}
 	}
 	@media (max-width: 420px) {
-		top: 36px; /* entries header */
+		top: 37px; /* entries header */
 		bottom: 51px; /* feeds-toolbar */
 	}
 	@media (max-width: 768px) {
 		.entry-selected & {
-			top: 36px;
+			top: 37px;
 		}
 	}
 }
@@ -1930,6 +1978,10 @@ li.selected > a .favicon-wrap {
 			top: 9px;
 			left: 10px;
 		}
+		ul {
+			left: -5px;
+			top: 35px;
+		}
 	}
 	.button-settings {
 		color: #333;
@@ -1945,21 +1997,19 @@ li.selected > a .favicon-wrap {
 	ul {
 		margin: 0;
 		padding: 0;
-		display: none;
+/*		display: none;*/
 		width: 140px;
 		list-style: none;
-		border: 1px solid #B4B7BD;
+		border: 1px solid #CCC;
 		background-color: #FFF;
 		position: absolute;
 		z-index: 10000;
-		left: -5px;
-		top: 35px;
-		border-radius: 2px;
-		box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.3);
+		border-radius: 4px;
+		box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.2);
 		li {
 			margin: 0;
 			padding: 0;
-			a {
+			a,span {
 				text-decoration: none;
 				display: block;
 				font-size: 13px;
@@ -1968,19 +2018,28 @@ li.selected > a .favicon-wrap {
 				text-overflow: ellipsis;
 				white-space: nowrap;
 				width: 100%;
-				padding: 3px 5px;
+				padding: 6px 5px;
 				box-sizing: border-box;
 				font-family: $font-stack;
+				border-bottom: 1px solid #CCC;
+				cursor: pointer;
 			}
 			a:hover,
-			&.selected a {
+			span:hover,
+			&.selected a,
+			&.selected span {
 				background-color: $list-background;
 			}
-			&:first-child a {
-				padding-top: 4px;
+			&:first-child a,
+			&:first-child span {
+				padding-top: 7px;
+				border-radius: 3px 3px 0 0;
 			}
-			&:last-child a {
-				padding-bottom: 4px;
+			&:last-child a,
+			&:last-child span {
+				padding-bottom: 6px;
+				border-radius: 0 0 3px 3px;
+				border-bottom: none;
 			}
 		}
 		li:first-child:before {

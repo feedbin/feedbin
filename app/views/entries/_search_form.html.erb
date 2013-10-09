@@ -1,6 +1,3 @@
 <%= form_tag search_entries_path, remote: true, method: :get do %>
-  <div class="input-append">
-    <%= text_field_tag :query, params[:query], placeholder: 'Search' %>
-    <%= submit_tag "Search", class: 'button button-primary button-text', name: nil %>
-  </div>
+  <%= text_field_tag :query, params[:query] %>
 <% end %>

@@ -152,7 +152,7 @@ $.extend feedbin,
       $.get(feedbin.data.autoUpdatePath)
 
   shareOpen: ->
-    $('.dropdown-wrap').hasClass('open')
+    $('[data-behavior~=toggle_share_menu]').parents('.dropdown-wrap').hasClass('open')
 
   updateFontSize: (direction) ->
     fontContainer = $("[data-font-size]")
@@ -215,7 +215,7 @@ $.extend feedbin,
               feedbin.markRead()
           else
             feedbin.markRead()
-      
+
     selectable: ->
       $(document).on 'click', '[data-behavior~=selectable]', ->
         $(@).parents('ul').find('.selected').removeClass('selected')
@@ -384,7 +384,7 @@ $.extend feedbin,
     dropdown: ->
       $(document).on 'click', (event) ->
         dropdown = $('.dropdown-wrap')
-        if feedbin.shareOpen()
+        unless $(event.target).is('[data-behavior~=toggle_dropdown]')
           dropdown.removeClass('open')
 
       $(document).on 'click', '[data-behavior~=toggle_share_menu]', (event) ->
@@ -398,7 +398,6 @@ $.extend feedbin,
         event.preventDefault()
 
       $(document).on 'mouseover', '.dropdown-wrap li', (event) ->
-        console.log 'hover'
         $('.dropdown-wrap li').not(@).removeClass('selected')
 
     drawer: ->
@@ -586,8 +585,21 @@ $.extend feedbin,
             data['direction'] = 'above'
             
         $.post feedbin.data.markDirectionAsReadEntries, data
-      
 
+    formOptions: ->
+      $(document).on 'click', '[data-behavior~=show_form_options]', (event) ->
+        wrap = $(@).parents('.dropdown-wrap')
+        if wrap.hasClass('open')
+          wrap.removeClass('open')
+        else
+          wrap.addClass('open')
+      
+      $(document).on 'click', '[data-behavior~=show_form_options] li', (event) ->
+        console.log 'click'
+        $('.header-form-option').removeClass('selected')
+        selectOption = $(@).data('select-option')
+        $("[data-behavior~=#{selectOption}]").addClass('selected')
+        $("[data-behavior~=show_form_options]").text($(@).text())
 
 jQuery ->
   $.each feedbin.init, (i, item) ->
