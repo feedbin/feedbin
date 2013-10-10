@@ -1,16 +1,15 @@
 <% content_for :content do %>
-  <%= yield(:sidebar) %>
-
+  <div class="application-messages"><div class="message-content" data-behavior="messages">You have subscribed</div></div>
   <div class="modal-target"></div>
   <header class="bar">
 		<a href="/" class="logo"><%= render partial: 'shared/svg/logo' %></a>
 			
     <% if signed_in? %>
     <div class="header-form-wrap">
-      <div class="header-form-option selected" data-behavior="header_form_option search_form">
+      <div class="header-form-option selected" data-behavior="header_form_option search_form_wrap">
         <%= render partial: "entries/search_form" %>
       </div>
-      <div class="header-form-option" data-behavior="header_form_option subscribe_form">
+      <div class="header-form-option" data-behavior="header_form_option subscribe_form_wrap">
         <%= render partial: "subscriptions/form" %>
       </div>
       <div class="form-select dropdown-wrap" data-behavior="form_select">
@@ -18,8 +17,8 @@
           Search
         </div>
         <ul>
-          <li data-select-option="search_form"><span>Search</span></li>
-          <li data-select-option="subscribe_form"><span>Subscribe</span></li>
+          <li data-select-option="search_form_wrap"><span>Search</span></li>
+          <li data-select-option="subscribe_form_wrap"><span>Subscribe</span></li>
         </ul>
       </div>
     </div>

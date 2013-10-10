@@ -1046,7 +1046,7 @@ Structure
 		input[type="text"] {
 			width: 224px;
 			margin-bottom: 0;
-			padding: 5px 5px 5px 74px;
+			padding: 5px 5px 5px 86px;
 			font-size: 14px;
 			border-radius: 4px;
 			@media (max-width: 520px) {
@@ -1078,8 +1078,9 @@ Structure
 		border-right: 1px solid #CCC;
 		border-radius: 2px 0 0 2px;
 		background-color: #EFEFEF;
-		padding: 0 20px 0 6px;
+		padding: 0 0 0 6px;
 		user-select: none;
+		width: 75px;
 		&:hover {
 			background-color: #CCC;
 			cursor: pointer;
@@ -1997,7 +1998,7 @@ li.selected > a .favicon-wrap {
 	ul {
 		margin: 0;
 		padding: 0;
-/*		display: none;*/
+		display: none;
 		width: 140px;
 		list-style: none;
 		border: 1px solid #CCC;
@@ -2289,17 +2290,31 @@ li.selected > a .favicon-wrap {
 	margin-top: 2px;
 }
 
-.popover {
-	display: block;
-	left: 350px;
-	top: -1px;
-	margin-left: 0;
-	width: 200px;
-	.popover-content {
-		padding: 4px 10px;
-	}
-	&.hide {
-		display: none;
+.application-messages {
+	position: absolute;
+	z-index: 10000;
+	width: 100%;
+	height: 0;
+	.message-content {
+		box-sizing: border-box;
+		position: relative;
+		width: 500px;
+		height: 32px;
+		background-color: rgba(0,0,0,.9);
+		line-height: 32px;
+		color: #fff;
+		font-size: 12px;
+		padding: 0 10px;
+		margin: 0 auto;
+		transition:top .3s ease;
+		top: -32px;
+		&.show {
+			top: 0;
+		}
+		
+		@media (max-width: 500px) {
+			width: 100%;
+		}
 	}
 }
 

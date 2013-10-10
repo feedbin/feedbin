@@ -38,8 +38,8 @@ class feedbin.Keyboard
     Mousetrap.bind ['up', 'down', 'left', 'right', 'j', 'k', 'h', 'l'], (event, combo) =>
       
       # If share menu is showing intercept up down
-      dropdown = $('.dropdown-wrap')
-      if feedbin.shareOpen()
+      dropdown = $('[data-behavior~=toggle_share_menu]').parents('.dropdown-wrap')
+      if dropdown.hasClass('open')
         nextShare = false
         selectedShare = $('li.selected', dropdown)
         if 'down' == combo
@@ -55,8 +55,8 @@ class feedbin.Keyboard
           $('li.selected', dropdown).removeClass('selected')
           nextShare.addClass('selected')
 
-        event.stopPropagation()
         event.preventDefault()
+        return null
 
       @setEnvironment()
       

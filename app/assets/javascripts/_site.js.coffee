@@ -7,12 +7,12 @@ window.addEventListener "load", (->
 
 $.extend feedbin,
   
-  subscribeStatus: (text) ->
-    button = $('[data-behavior~=subscription_form] input[type=submit]')
-    originalText = button.val()
-    button.val(text)
+  showNotification: (text) ->
+    messages = $('[data-behavior~=messages]')
+    messages.text(text)
+    messages.addClass('show')
     setTimeout ( ->
-      button.val(originalText)
+      messages.removeClass('show')
     ), 3000
 
   updateEntries: (entries, header) ->
@@ -457,12 +457,6 @@ $.extend feedbin,
         event.preventDefault()
         return
 
-    subscribe: ->
-      subscription = feedbin.queryString('subscribe')
-      if subscription?
-        field = $('#subscription_feeds_feed_url').val(subscription)
-        field.closest('form').submit()
-
     checkBoxToggle: ->
       $(document).on 'click', '[data-behavior~=check_all]', (event) =>
         $('[type="checkbox"]').prop('checked', true)
@@ -640,12 +634,23 @@ $.extend feedbin,
         return
       
       $(document).on 'click', '[data-behavior~=form_select] li', (event) ->
-        console.log 'click'
         $('.header-form-option').removeClass('selected')
         selectOption = $(@).data('select-option')
         $("[data-behavior~=#{selectOption}]").addClass('selected')
         $("[data-behavior~=show_form_options]").text($(@).text())
         return
+
+    subscribe: ->
+      # This needs to come after "[data-behavior~=form_select] li" click event
+      subscription = feedbin.queryString('subscribe')
+      if subscription?
+        $('[data-behavior~=form_select] [data-select-option=subscribe_form]').click()
+        field = $('#subscription_feeds_feed_url').val(subscription)
+        field.parents('form').submit()
+
+    searchError: ->
+      $(document).on 'ajax:error', '[data-behavior~=search_form]', (event, xhr) ->
+        feedbin.showNotification('Search error.');
 
 jQuery ->
   $.each feedbin.init, (i, item) ->
