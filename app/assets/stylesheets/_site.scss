@@ -1693,6 +1693,9 @@ li.selected > a .favicon-wrap {
 				.icon-star {
 					display: none;
 				}
+				.touch & .entry-actions {
+					display: none;
+				}
 			}
 			&.show-actions {
 				a {

@@ -203,6 +203,10 @@ $.extend feedbin,
     setData: ->
       feedbin.data = $('#feedbin-data').data()
     
+    hasTouch: ->
+      if ('ontouchstart' in document)
+        $('body').addClass('touch')
+        
     markRead: ->
       $(document).on 'click', '[data-mark-read]', ->
         feedbin.markReadData = $(@).data('mark-read')
