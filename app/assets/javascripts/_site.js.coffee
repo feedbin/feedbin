@@ -651,6 +651,7 @@ $.extend feedbin,
     searchError: ->
       $(document).on 'ajax:error', '[data-behavior~=search_form]', (event, xhr) ->
         feedbin.showNotification('Search error.');
+        return
 
 jQuery ->
   $.each feedbin.init, (i, item) ->
