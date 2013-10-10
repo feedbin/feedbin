@@ -1054,6 +1054,11 @@ Structure
 			}
 		}
 	}
+	&.small-form {
+		input[type="url"] {
+			padding-left: 5px;
+		}
+	}
 	.app & {
 		display: block;
 	}

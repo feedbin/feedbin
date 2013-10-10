@@ -68,9 +68,6 @@ class Entry < ActiveRecord::Base
                     { ids: { values: user.starred_entries.pluck(:entry_id) } }
       end
       sort { by :published, "desc" } if params[:query].blank?
-      # facet "feeds" do
-      #   terms :feed_id
-      # end
     end      
   end
 

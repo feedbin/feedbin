@@ -5,23 +5,29 @@
 		<a href="/" class="logo"><%= render partial: 'shared/svg/logo' %></a>
 			
     <% if signed_in? %>
-    <div class="header-form-wrap">
-      <div class="header-form-option selected" data-behavior="header_form_option search_form_wrap">
-        <%= render partial: "entries/search_form" %>
-      </div>
-      <div class="header-form-option" data-behavior="header_form_option subscribe_form_wrap">
-        <%= render partial: "subscriptions/form" %>
-      </div>
-      <div class="form-select dropdown-wrap" data-behavior="form_select">
-        <div class="form-select-button" data-behavior="show_form_options toggle_dropdown">
-          Search
+      <% if current_user.try(:admin) == true %>
+      <div class="header-form-wrap">
+        <div class="header-form-option selected" data-behavior="header_form_option search_form_wrap">
+          <%= render partial: "entries/search_form" %>
         </div>
-        <ul>
-          <li data-select-option="search_form_wrap"><span>Search</span></li>
-          <li data-select-option="subscribe_form_wrap"><span>Subscribe</span></li>
-        </ul>
+        <div class="header-form-option" data-behavior="header_form_option subscribe_form_wrap">
+          <%= render partial: "subscriptions/form" %>
+        </div>
+        <div class="form-select dropdown-wrap" data-behavior="form_select">
+          <div class="form-select-button" data-behavior="show_form_options toggle_dropdown">
+            Search
+          </div>
+          <ul>
+            <li data-select-option="search_form_wrap"><span>Search</span></li>
+            <li data-select-option="subscribe_form_wrap"><span>Subscribe</span></li>
+          </ul>
+        </div>
       </div>
-    </div>
+      <% else %>
+        <div class="header-form-wrap small-form">
+          <%= render partial: "subscriptions/form" %>
+        </div>
+      <% end %>
     <% end %>
 
     <div class="account-buttons">
