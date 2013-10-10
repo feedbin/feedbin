@@ -1,6 +1,12 @@
+October 2013
+------------
+
+- 2013-10-04 Mark above/below as read
+
 September 2013
 --------------
 
+- 2013-09-22 New mobile site thanks to @brendanlong
 - 2013-09-06 Right-to-left script support
 - 2013-09-03 Added format toolbar
 
