@@ -5,7 +5,7 @@
 		<a href="/" class="logo"><%= render partial: 'shared/svg/logo' %></a>
 			
     <% if signed_in? %>
-      <% if current_user.try(:admin) == true %>
+      <% if current_user.admin || current_user.id % 4 == 0 %>
       <div class="header-form-wrap">
         <div class="header-form-option selected" data-behavior="header_form_option search_form_wrap">
           <%= render partial: "entries/search_form" %>
