@@ -414,7 +414,7 @@ $.extend feedbin,
     dropdown: ->
       $(document).on 'click', (event) ->
         dropdown = $('.dropdown-wrap')
-        unless $(event.target).is('[data-behavior~=toggle_dropdown]')
+        unless $(event.target).is('[data-behavior~=toggle_dropdown]') || $(event.target).parents('[data-behavior~=toggle_dropdown]').length > 0
           dropdown.removeClass('open')
         return
 
