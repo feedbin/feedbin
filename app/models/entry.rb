@@ -67,7 +67,12 @@ class Entry < ActiveRecord::Base
         filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
                     { ids: { values: user.starred_entries.pluck(:entry_id) } }
       end
-      sort { by :published, "desc" } if params[:query].blank?
+      if params[:sort]
+        sort { by :published, params[:sort] }
+      else
+        sort { by :published, "desc" } if params[:query].blank?
+      end
+      
     end      
   end
 
