@@ -45,6 +45,7 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | CAMO_KEY                 | Used to rewrite assets to use https - https://github.com/atmos/camo                |
 | DATABASE_URL             | Database connection string - postgres://USER:PASS@IP:PORT/DATABASE                 |
 | DEFAULT_URL_OPTIONS_HOST | Mailer host - feedbin.me                                                           |
+| ELASTICSEARCH_URL        | search endpoint - http://localhost:9200                                            |
 | FEEDBIN_HOMEPAGE_REPO    | Git URL to a Rails engine that provides a custom homepage                          |
 | FROM_ADDRESS             | Used as a reply-to email address                                                   |
 | GAUGES_SITE_ID           | [gaug.es](http://gaug.es) analytics identifier                                     |
