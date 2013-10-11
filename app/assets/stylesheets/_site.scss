@@ -1502,6 +1502,12 @@ li.selected > a .favicon-wrap {
 	background-image: image-url("favicon-star.svg");
 }
 
+.favicon-search {
+	background-size: 16px 16px;
+	background-repeat: no-repeat;
+	background-image: image-url("favicon-search.svg");
+}
+
 .back-button {
 	background-color: transparent;
 	background-size: 11px 18px;

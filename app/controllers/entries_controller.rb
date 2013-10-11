@@ -222,26 +222,7 @@ class EntriesController < ApplicationController
   def search
     @user = current_user
     
-    unread_regex = /(?<=\s|^)is:\s*unread(?=\s|$)/
-    read_regex = /(?<=\s|^)is:\s*read(?=\s|$)/
-    starred_regex = /(?<=\s|^)is:\s*starred(?=\s|$)/
-    sort_regex = /(?<=\s|^)sort:\s*(asc|desc)(?=\s|$)/i
-    
-    if params[:query] =~ unread_regex
-      params[:query] = params[:query].gsub(unread_regex, '')
-      params[:unread] = true
-    elsif params[:query] =~ read_regex
-      params[:query] = params[:query].gsub(read_regex, '')
-      params[:read] = true
-    elsif params[:query] =~ starred_regex
-      params[:query] = params[:query].gsub(starred_regex, '')
-      params[:starred] = true
-    end
-    
-    if params[:query] =~ sort_regex
-      params[:sort] = params[:query].match(sort_regex)[1].downcase
-      params[:query] = params[:query].gsub(sort_regex, '')
-    end
+    search_params = build_search(params)
 
     @entries = Entry.search(params, @user)
     @entries = update_with_state(@entries)

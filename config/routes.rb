@@ -31,7 +31,8 @@ Feedbin::Application.routes.draw do
   resources :sessions
   resources :password_resets
   resources :sharing_services, path: 'settings/sharing', only: [:index]
-
+  resources :saved_searches
+  
   resources :subscriptions,  only: [:index, :create, :destroy] do
     collection do
       patch :update_multiple
