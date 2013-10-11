@@ -290,6 +290,39 @@ ALTER SEQUENCE plans_id_seq OWNED BY plans.id;
 
 
 --
+-- Name: saved_searches; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE saved_searches (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    name text NOT NULL,
+    query text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: saved_searches_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE saved_searches_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: saved_searches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE saved_searches_id_seq OWNED BY saved_searches.id;
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -594,6 +627,13 @@ ALTER TABLE ONLY plans ALTER COLUMN id SET DEFAULT nextval('plans_id_seq'::regcl
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY saved_searches ALTER COLUMN id SET DEFAULT nextval('saved_searches_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY sharing_services ALTER COLUMN id SET DEFAULT nextval('sharing_services_id_seq'::regclass);
 
 
@@ -693,6 +733,14 @@ ALTER TABLE ONLY imports
 
 ALTER TABLE ONLY plans
     ADD CONSTRAINT plans_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: saved_searches_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY saved_searches
+    ADD CONSTRAINT saved_searches_pkey PRIMARY KEY (id);
 
 
 --
@@ -798,6 +846,13 @@ CREATE UNIQUE INDEX index_feeds_on_feed_url ON feeds USING btree (feed_url);
 --
 
 CREATE INDEX index_import_items_on_import_id ON import_items USING btree (import_id);
+
+
+--
+-- Name: index_saved_searches_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_saved_searches_on_user_id ON saved_searches USING btree (user_id);
 
 
 --
@@ -1159,3 +1214,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130801194304');
 INSERT INTO schema_migrations (version) VALUES ('20130820123435');
 
 INSERT INTO schema_migrations (version) VALUES ('20130826053351');
+
+INSERT INTO schema_migrations (version) VALUES ('20131011204115');
