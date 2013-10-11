@@ -1,0 +1,12 @@
+language: ruby
+rvm:
+  - 2.0.0
+env:
+  - DB=postgresql
+before_script:
+  - psql -c 'create database feedbin_test;' -U postgres
+script:
+  - export POSTGRES_USERNAME=postgres
+  - export RAILS_ENV=test
+  - bundle exec rake db:setup
+  - bundle exec rake db:test:prepare
