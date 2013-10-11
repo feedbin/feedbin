@@ -1102,6 +1102,7 @@ Structure
 		border-left: 4px solid rgba(0, 0, 0, 0);
 		border-bottom-color: #000;
 		content: '';
+		pointer-events: none;
 	}
 	ul {
 		top: 37px;
