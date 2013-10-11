@@ -115,7 +115,7 @@ GEM
       carrierwave
       fog
       uuidtools
-    celluloid (0.15.1)
+    celluloid (0.15.2)
       timers (~> 1.1.0)
     clockwork (0.6.0)
       activesupport
@@ -257,8 +257,8 @@ GEM
       sprockets-rails (~> 2.0.0)
     sax-machine (0.2.0.rc1)
       nokogiri (~> 1.5.2)
-    sidekiq (2.14.1)
-      celluloid (>= 0.14.1)
+    sidekiq (2.15.1)
+      celluloid (>= 0.15.1)
       connection_pool (>= 1.0.0)
       json
       redis (>= 3.0.4)
