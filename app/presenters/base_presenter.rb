@@ -28,7 +28,6 @@ class BasePresenter
     favicon = Base64.urlsafe_encode64(verifier.generate(host))
     uri = URI::HTTP.build(
       host: ENV["FAVICON_HOST"],
-      port: 9292,
       path: "/favicon/#{favicon}"
     )
     uri.scheme = Feedbin::Application.config.force_ssl ? "https" : "http"
