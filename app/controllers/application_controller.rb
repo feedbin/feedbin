@@ -38,7 +38,7 @@ class ApplicationController < ActionController::Base
         id: 'collection_unread',
         favicon_class: 'favicon-unread',
         parent_data: { behavior: 'all_unread', feed_id: 'collection_unread' },
-        data: { behavior: 'selectable reset_entry_position show_entries open_item', mark_read: {type: 'unread', message: 'Mark all items as read?'}.to_json } 
+        data: { behavior: 'selectable reset_entry_position show_entries open_item feed_link', mark_read: {type: 'unread', message: 'Mark all items as read?'}.to_json } 
       }
     end
     if types.include? 'view_all'
@@ -49,7 +49,7 @@ class ApplicationController < ActionController::Base
         id: 'collection_all',
         favicon_class: 'favicon-all',
         parent_data: { behavior: 'all_unread', feed_id: 'collection_all' },
-        data: { behavior: 'selectable reset_entry_position show_entries open_item', mark_read: {type: 'all', message: 'Mark all items as read?'}.to_json } 
+        data: { behavior: 'selectable reset_entry_position show_entries open_item feed_link', mark_read: {type: 'all', message: 'Mark all items as read?'}.to_json } 
       }
     end
     collections << { 
@@ -59,7 +59,7 @@ class ApplicationController < ActionController::Base
       id: 'collection_starred',
       favicon_class: 'favicon-star',
       parent_data: { behavior: 'starred', feed_id: 'collection_starred' },
-      data: { behavior: 'selectable reset_entry_position show_entries open_item', mark_read: {type: 'starred', message: 'Mark starred items as read?'}.to_json } 
+      data: { behavior: 'selectable reset_entry_position show_entries open_item feed_link', mark_read: {type: 'starred', message: 'Mark starred items as read?'}.to_json } 
     }
     collections
   end

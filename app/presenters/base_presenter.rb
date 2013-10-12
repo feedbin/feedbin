@@ -27,12 +27,12 @@ class BasePresenter
     verifier = ActiveSupport::MessageVerifier.new(ENV['FAVICON_KEY'] || 'secret')
     favicon = Base64.urlsafe_encode64(verifier.generate(host))
     uri = URI::HTTP.build(
-      scheme: "https",
       host: ENV["FAVICON_HOST"],
+      port: 9292,
       path: "/favicon/#{favicon}"
     )
-    uri.scheme = "https"
-    uri
+    uri.scheme = Feedbin::Application.config.force_ssl ? "https" : "http"
+    uri.to_s
   end
 
   private
