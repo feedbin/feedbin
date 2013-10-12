@@ -138,12 +138,18 @@ class feedbin.Keyboard
         
       $('[data-behavior~=mark_all_as_read]').first().click()
       event.preventDefault()
-      
+
     # Add subscription
     Mousetrap.bind 'a', (event, combo) =>
+      feedbin.showForm('subscribe_form_wrap')
       $('[name="subscription[feeds][feed_url]"]').focus()
       event.preventDefault()
 
+    # Focus search
+    Mousetrap.bind '/', (event, combo) =>
+      $('[name="query"]').focus()
+      event.preventDefault()
+    
     # Show Keyboard shortcuts
     Mousetrap.bind '?', (event, combo) =>
       if feedbin.modalShowing == true
@@ -194,9 +200,15 @@ class feedbin.Keyboard
       if feedbin.modalShowing == true
         $('.modal').modal('hide')
         event.preventDefault()
+
       if $('[name="subscription[feeds][feed_url]"]').is(':focus')
         $('[name="subscription[feeds][feed_url]"]').blur()
         event.preventDefault()
+
+      if $('[name=query]').is(':focus')
+        $('[name=query]').blur()
+        event.preventDefault()
+
       if feedbin.shareOpen()
         dropdown = $('.dropdown-wrap')
         dropdown.removeClass('open')
