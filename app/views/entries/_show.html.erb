@@ -2,7 +2,7 @@
 <div data-entry-id="<%= entry.id %>">
   <div class="entry-toolbar">
     <button class="back-button" data-behavior="show_entries"></button>
-    <%= entry_presenter.favicon %> 
+    <%= entry_presenter.favicon(entry.feed.site_url) %> 
     <%= link_to strip_tags(entry.feed.title), entry.feed.site_url, class: 'entry-feed-title', data: {behavior: 'user_title', feed_id: entry.feed.id}, target: '_blank' %>
     <div class="entry-buttons">
       <%= render partial: "shared/entry_settings_button" %>

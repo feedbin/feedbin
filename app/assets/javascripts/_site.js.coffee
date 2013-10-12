@@ -656,7 +656,16 @@ $.extend feedbin,
       $(document).on 'ajax:error', '[data-behavior~=search_form]', (event, xhr) ->
         feedbin.showNotification('Search error.');
         return
-
+    
+    loadProgress: ->
+      $(document).on 'click', '[data-behavior~=feed_link]', (event, xhr) ->
+        $(@).find('.favicon').addClass('favicon-progress')
+        return
+        
+      $(document).on 'ajax:complete', '[data-behavior~=feed_link]', (event, xhr) ->
+        $('.favicon-progress').removeClass("favicon-progress")
+        return
+      
 jQuery ->
   $.each feedbin.init, (i, item) ->
     item()

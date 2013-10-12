@@ -3,7 +3,7 @@
     <div class="mark-above-read" data-behavior="mark_above_read"><span><i>Mark Above as Read</i></span></div>
     <div class="mark-below-read" data-behavior="mark_below_read"><span><i>Mark Below as Read</i></span></div>
     <%= entry_presenter.entry_link do %>
-      <%= entry_presenter.favicon %>
+      <%= entry_presenter.favicon(entry.feed.site_url) %>
       <i class="icon-star"></i>
       <time datetime="<%= entry_presenter.datetime %>" class="time"><%= entry_presenter.published_date %></time>
       <h2 class="title"><%= entry_presenter.title %></h2>
