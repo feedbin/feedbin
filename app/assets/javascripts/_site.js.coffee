@@ -668,6 +668,15 @@ $.extend feedbin,
       $(document).on 'ajax:complete', '[data-behavior~=feed_link]', (event, xhr) ->
         $('.favicon-progress').removeClass("favicon-progress")
         return
+    
+    formProcessing: ->
+      $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
+        $(@).find('input').addClass('processing')
+        return
+        
+      $(document).on 'ajax:complete', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
+        $(@).find('input').removeClass('processing')
+        return
 
 jQuery ->
   $.each feedbin.init, (i, item) ->
