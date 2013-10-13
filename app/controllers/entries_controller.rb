@@ -251,9 +251,11 @@ class EntriesController < ApplicationController
 
     @type = 'all'
     @data = nil
+    
+    @search = true
 
-    @collection_title = 'All'
-    @collection_favicon = 'favicon-all'
+    @collection_title = 'Search'
+    @collection_favicon = 'favicon-search'
 
     respond_to do |format|
       format.js { render partial: 'shared/entries' }
