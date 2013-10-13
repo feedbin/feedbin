@@ -147,6 +147,7 @@ class feedbin.Keyboard
 
     # Focus search
     Mousetrap.bind '/', (event, combo) =>
+      feedbin.showForm('search_form_wrap')
       $('[name="query"]').focus()
       event.preventDefault()
     
