@@ -1,10 +1,7 @@
 <%=
-# TODO: Look at broke ass favicons
 content_tag :div, '',
   data: {
     login_url: login_url,
-    polyptych_url: ENV['POLYPTYCH_URL'],
-    polyptych_cdn: ENV['POLYPTYCH_CDN'],
     feed_hostnames_hash: @feed_hostnames[:hash],
     favicon_complete: false,
     mark_favicon_complete_path: settings_mark_favicon_complete_path,

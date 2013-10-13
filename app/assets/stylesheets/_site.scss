@@ -1466,6 +1466,7 @@ li.selected .drawer .drawer-arrow:after {
 		height: 16px;
 		width: 16px;
 		display: block;
+		background-size: 16px 16px;
 	}
 }
 
@@ -1506,6 +1507,10 @@ li.selected > a .favicon-wrap {
 	background-size: 16px 16px;
 	background-repeat: no-repeat;
 	background-image: image-url("favicon-search.svg");
+}
+
+.favicon-progress {
+	background-image: image-url("favicon-progress.gif") !important;
 }
 
 .back-button {

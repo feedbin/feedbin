@@ -186,6 +186,11 @@ $.extend feedbin,
     $('.entries li').addClass('read')
     $.post feedbin.data.markAsReadPath, feedbin.markReadData
       
+  showForm: (selectOption) ->
+    $('.header-form-option').removeClass('selected')
+    $("[data-behavior~=#{selectOption}]").addClass('selected')
+    $("[data-behavior~=show_form_options]").text($("[data-select-option=#{selectOption}]").text())
+    
   hideQueue: []
 
   feedCandidates: []
@@ -638,23 +643,30 @@ $.extend feedbin,
         return
       
       $(document).on 'click', '[data-behavior~=form_select] li', (event) ->
-        $('.header-form-option').removeClass('selected')
         selectOption = $(@).data('select-option')
-        $("[data-behavior~=#{selectOption}]").addClass('selected')
-        $("[data-behavior~=show_form_options]").text($(@).text())
+        feedbin.showForm(selectOption)
         return
 
     subscribe: ->
       # This needs to come after "[data-behavior~=form_select] li" click event
       subscription = feedbin.queryString('subscribe')
       if subscription?
-        $('[data-behavior~=form_select] [data-select-option=subscribe_form]').click()
+        feedbin.showForm('subscribe_form_wrap')
         field = $('#subscription_feeds_feed_url').val(subscription)
         field.parents('form').submit()
 
     searchError: ->
       $(document).on 'ajax:error', '[data-behavior~=search_form]', (event, xhr) ->
         feedbin.showNotification('Search error.');
+        return
+    
+    loadProgress: ->
+      $(document).on 'click', '[data-behavior~=feed_link]', (event, xhr) ->
+        $(@).find('.favicon').addClass('favicon-progress')
+        return
+        
+      $(document).on 'ajax:complete', '[data-behavior~=feed_link]', (event, xhr) ->
+        $('.favicon-progress').removeClass("favicon-progress")
         return
 
 jQuery ->

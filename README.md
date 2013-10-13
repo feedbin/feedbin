@@ -16,8 +16,8 @@ The main Feedbin project is a [Rails 4.0](http://rubyonrails.org/) application. 
 
  - [**refresher:**](https://github.com/feedbin/refresher)
    Refresher is the service that does feed refreshing. Feed refreshes are scheduled as background jobs using [Sidekiq](https://github.com/mperham/sidekiq). Refresher is kept separate so it can be scaled independently. It's also a benefit to not have to load all of Rails for this service.
- - [**polyptych:**](https://github.com/feedbin/polyptych)
-   Polyptych is an API for fetching favicons. Favicons are compiled into a single CSS file as base64 encoded background images. Polyptych is another Rails App. 
+ - [**favicon:**](https://github.com/feedbin/favicon)
+   Polyptych is an proxy for fetching favicons. Favicon is a sinatra app that can be run easily on a Heroku machine
  - [**camo:**](https://github.com/atmos/camo)
    Camo is an https image proxy. In production Feedbin is SSL only. One issue with SSL is all assets must be served over SSL as well or the browser will show insecure content warnings. Camo proxies all image requests through an SSL enabled host to prevent this.
 
@@ -46,6 +46,8 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | DATABASE_URL             | Database connection string - postgres://USER:PASS@IP:PORT/DATABASE                 |
 | DEFAULT_URL_OPTIONS_HOST | Mailer host - feedbin.me                                                           |
 | ELASTICSEARCH_URL        | search endpoint - http://localhost:9200                                            |
+| FAVICON_KEY              | Encryption key for favicon requests                                                |
+| FAVICON_URL              | Website of favicon service                                                         |
 | FEEDBIN_HOMEPAGE_REPO    | Git URL to a Rails engine that provides a custom homepage                          |
 | FROM_ADDRESS             | Used as a reply-to email address                                                   |
 | GAUGES_SITE_ID           | [gaug.es](http://gaug.es) analytics identifier                                     |
@@ -54,8 +56,6 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | LIBRATO_TOKEN            | Used for reporting stats - http://metrics.librato.com                              |
 | LIBRATO_USER             | Used for reporting stats - http://metrics.librato.com                              |
 | MEMCACHED_HOSTS          | Comma separated memcached hosts/ports - 192.168.1.2:11121                          |
-| POLYPTYCH_CDN            | Used for retrieving and serving favicons - https://github.com/feedbin/polyptych    |
-| POLYPTYCH_URL            | Used for retrieving and serving favicons - https://github.com/feedbin/polyptych    |
 | POSTGRES_USERNAME        | Used for connecting to database                                                    |
 | POSTMARK_API_KEY         | Used for sending email - http://postmarkapp.com                                    |
 | RACK_ENV                 | Environment - production                                                           |

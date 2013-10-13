@@ -62,16 +62,4 @@ class EntryPresenter < BasePresenter
     @template.strip_tags(entry.author)
   end
   
-  def favicon
-    begin
-      host = URI::parse(entry.feed.site_url).host.parameterize
-    rescue Exception => e
-      host = 'none'
-    end
-    @template.content_tag :span, '', class: "favicon-wrap" do
-      @template.content_tag(:span, '', class: "favicon-default") + 
-      @template.content_tag(:span, '', class: "favicon favicon-#{host}")
-    end
-  end
-  
 end
