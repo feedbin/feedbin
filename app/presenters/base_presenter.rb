@@ -8,18 +8,13 @@ class BasePresenter
   
   def favicon(host)
     begin
-      host = URI::parse(host).host
+      host = URI::parse(host).host.parameterize
     rescue Exception => e
       host = nil
     end
-    if host
-      style = "background-image: url(#{favicon_url(host)});"
-    else
-      style = nil
-    end
     @template.content_tag :span, '', class: "favicon-wrap" do
       @template.content_tag(:span, '', class: "favicon-default") + 
-      @template.content_tag(:span, '', class: "favicon", style: style)
+      @template.content_tag(:span, '', class: "favicon favicon-#{host}")
     end
   end
   
