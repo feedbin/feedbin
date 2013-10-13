@@ -1,4 +1,4 @@
-<%= form_for(@saved_search) do |f| %>
+<%= form_for(@saved_search, remote: true) do |f| %>
   <%= f.hidden_field :query %>
   <%= f.text_field :name, placeholder: 'Name' %>
   <%= f.submit class: 'button button-white button-text' %>

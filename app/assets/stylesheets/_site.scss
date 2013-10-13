@@ -1142,31 +1142,20 @@ Structure
 }
 
 .save-search-link {
-	font-size: 12px;
+	font-size: 11px;
+	text-transform: uppercase;
 	font-weight: bold;
 	position: absolute;
-	left: 348px;
-	top: 15px;
+	right: -35px;
+	top: 9px;
+	cursor: pointer;
+	color: $selected;
+	&[disabled] {
+		display: none;
+	}
 	&:hover {
 		text-decoration: none;
-	}
-	
-	&:after {
-		height: 13px;
-		width: 10px;
-		border-radius: 5px;
-		background-color: #CCC;
-		padding: 0 0 0 3px;
-		content: "×";
-		font-weight: bold;
-		font-size: 12px;
-		line-height: 12px;
-		display: block;
-		right: 5px;
-		color: #000;
-		position: absolute;
-		left: -18px;
-		top: 2px;
+		color: #2877c6;
 	}
 }
 

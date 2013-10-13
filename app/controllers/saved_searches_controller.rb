@@ -25,7 +25,13 @@ class SavedSearchesController < ApplicationController
     respond_to do |format|
       format.js { render partial: 'shared/entries' }
     end
-    
+  end
+  
+  def create
+    logger.info { "-----------------------" }
+    logger.info { params.inspect }
+    logger.info { "-----------------------" }
+    render nothing: true
   end
   
 end

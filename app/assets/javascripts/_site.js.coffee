@@ -677,6 +677,22 @@ $.extend feedbin,
       $(document).on 'ajax:complete', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
         $(@).find('input').removeClass('processing')
         return
+    
+    savedSearch: ->
+      $(document).on 'keypress', '[data-behavior~=search_form_wrap] #query', ->
+        $('[data-behavior~=save_search_link]').attr('disabled', 'disabled')
+        $('.saved-search-wrap').removeClass('show')
+        return
+
+      $(document).on 'click', '[data-behavior~=save_search_link]', ->
+        savedSearchWrap = $('.saved-search-wrap')
+        if savedSearchWrap.hasClass('show')
+          savedSearchWrap.removeClass('show')
+        else
+          query = $('#query').val()
+          $('#new_saved_search #saved_search_query').val(query)
+          savedSearchWrap.addClass('show')
+        return
 
 jQuery ->
   $.each feedbin.init, (i, item) ->

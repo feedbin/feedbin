@@ -8,9 +8,11 @@
       <% if ENV['ELASTICSEARCH_URL'] || Rails.env.development? %>
       <div class="header-form-wrap">
         <div class="header-form-option selected" data-behavior="header_form_option search_form_wrap">
+          <span class="save-search-link" data-behavior="save_search_link" disabled="disabled">Save</span>
           <%= render partial: "entries/search_form" %>
           <div class="saved-search-wrap">
             <div class="saved-inner" data-behavior="saved_search_form_target">
+              <%= render 'saved_searches/form' %>
             </div>
           </div>
         </div>
@@ -27,8 +29,6 @@
           </ul>
         </div>
       </div>
-      
-      <%= link_to "Save Search", new_saved_search_path, remote: true, class: 'save-search-link' %>
       <% else %>
         <div class="header-form-wrap small-form">
           <%= render partial: "subscriptions/form" %>
