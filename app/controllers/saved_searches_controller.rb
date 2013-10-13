@@ -1,5 +1,9 @@
 class SavedSearchesController < ApplicationController
-
+  
+  def new
+    @saved_search = SavedSearch.new
+  end
+  
   def show
     @user = current_user
     saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
@@ -22,6 +26,6 @@ class SavedSearchesController < ApplicationController
       format.js { render partial: 'shared/entries' }
     end
     
-  end  
-
+  end
+  
 end
