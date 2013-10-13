@@ -1046,13 +1046,19 @@ Structure
 		input[type="url"],
 		input[type="text"] {
 			height: 20px;
-			width: 224px;
+			width: 204px;
 			margin-bottom: 0;
-			padding: 5px 5px 5px 86px;
+			padding: 5px 25px 5px 86px;
 			font-size: 14px;
 			border-radius: 0;
+			background-position: 97% 7px;
+			background-repeat: no-repeat;
+			background-size: 16px 16px;
+			&.processing {
+				background-image: image-url("favicon-progress.gif");
+			}
 			@media (max-width: 520px) {
-				width: 100px;
+				width: 120px;
 			}
 		}
 	}

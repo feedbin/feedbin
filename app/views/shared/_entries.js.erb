@@ -24,3 +24,7 @@ feedbin.updatePager('<%= j will_paginate(@page_query) %>');
 feedbin.data.viewMode = "<%= j session[:view_mode] %>";
 
 feedbin.preloadEntries(<%= @entries.map{ |entry| entry.id }.to_json.html_safe %>);
+
+<% if @search %>
+$('.app').addClass('feed-selected').removeClass('nothing-selected entry-selected')
+<% end %>
