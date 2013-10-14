@@ -15,6 +15,8 @@ $('[data-behavior~=show_tags_form]').replaceWith('<%= j render partial: "shared/
 
 <% if @type && @type == 'tag' %>
   $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_tag", locals: {tag: @tag} %>');
+<% elsif @type && @type == 'saved_search' %>
+  $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_saved_search", locals: {saved_search: @saved_search} %>');
 <% else %>
   $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/unsubscribe", locals: {feed: @feed || nil} %>');
 <% end %>

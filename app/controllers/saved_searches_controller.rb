@@ -2,11 +2,11 @@ class SavedSearchesController < ApplicationController
   
   def show
     @user = current_user
-    saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
+    @saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
 
     update_selected_feed!("saved_search", params[:id])
 
-    params[:query] = saved_search.query
+    params[:query] = @saved_search.query
     search_params = build_search(params)
     
     @entries = Entry.search(search_params, @user)
@@ -15,10 +15,10 @@ class SavedSearchesController < ApplicationController
 
     @append = !params[:page].nil?
 
-    @type = 'all'
+    @type = 'saved_search'
     @data = nil
 
-    @collection_title = saved_search.name
+    @collection_title = @saved_search.name
     @collection_favicon = 'favicon-search'
 
     respond_to do |format|
@@ -29,6 +29,7 @@ class SavedSearchesController < ApplicationController
   def create
     @user = current_user
     @saved_search = @user.saved_searches.create(saved_search_params)
+    update_selected_feed!("saved_search", @saved_search.id)
     @mark_selected = true
     get_feeds_list
   end
@@ -43,6 +44,13 @@ class SavedSearchesController < ApplicationController
     @saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
     @saved_search.update(saved_search_params)
     @mark_selected = true
+    get_feeds_list
+  end
+  
+  def destroy
+    @user = current_user
+    @saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
+    @saved_search.destroy
     get_feeds_list
   end
   

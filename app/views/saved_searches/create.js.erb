@@ -1,3 +1,4 @@
 feedbin.updateFeeds('<%= j render partial: 'feeds/feeds', locals: {collections: @collections, saved_searches: @saved_searches, tags: @tags, feeds: @feeds} %>');
 $('.saved-search-wrap').removeClass('show');
-
+$('[data-behavior~=save_search_link]').attr('disabled', 'disabled');
+$('#query').val('');
