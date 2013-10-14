@@ -5,9 +5,6 @@
 	@include respond-to(screen-sm) {
 		padding-top: 56px;
 	}
-	*,*:before,*:after {
-	  box-sizing: border-box;
-	}
 	img.responsive {
 		display: block;
 		width: auto\9;
