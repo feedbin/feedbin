@@ -54,6 +54,7 @@ class Entry < ActiveRecord::Base
   
   def self.search(params, user)
     tire.search(page: params[:page], per_page: WillPaginate.per_page, load: { include: :feed }) do
+      fields ['id']
       query { string params[:query] } if params[:query].present?
       if params[:unread] == true
         filter :ids, values: user.unread_entries.pluck(:entry_id)
