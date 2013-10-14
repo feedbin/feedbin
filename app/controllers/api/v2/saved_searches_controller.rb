@@ -31,7 +31,7 @@ module Api
             search_params[:load] = false
             entries = Entry.search(search_params, @user)
             links_header(entries, 'api_v2_saved_search_url', saved_search.id)
-            render json: entries.results.map(&:id).to_json
+            render json: entries.results.map {|entry| entry.id.to_i}.to_json
           end
         else
           status_forbidden
