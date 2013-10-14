@@ -131,6 +131,23 @@ class EntriesController < ApplicationController
       UnreadEntry.where(user_id: @user.id, entry_id: starred).delete_all
     elsif  %w{unread all}.include?(params[:type])
       UnreadEntry.where(user_id: @user.id).delete_all
+    elsif params[:type] == 'saved_search'
+      saved_search = @user.saved_searches.where(id: params[:data]).first
+      if saved_search.present?
+        params[:query] = saved_search.query
+        search_params = build_search(params)
+        search_params[:load] = false
+        entries = Entry.search(search_params, @user)
+        ids = entries.results.map {|entry| entry.id.to_i}
+        if entries.total_pages > 1
+          2.upto(entries.total_pages) do |page|
+            search_params[:page] = page
+            entries = Entry.search(search_params, @user)
+            ids = ids.concat(entries.results.map {|entry| entry.id.to_i})
+          end
+        end
+      end
+      UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
     end
 
     @mark_selected = true
@@ -222,26 +239,7 @@ class EntriesController < ApplicationController
   def search
     @user = current_user
     
-    unread_regex = /(?<=\s|^)is:\s*unread(?=\s|$)/
-    read_regex = /(?<=\s|^)is:\s*read(?=\s|$)/
-    starred_regex = /(?<=\s|^)is:\s*starred(?=\s|$)/
-    sort_regex = /(?<=\s|^)sort:\s*(asc|desc)(?=\s|$)/i
-    
-    if params[:query] =~ unread_regex
-      params[:query] = params[:query].gsub(unread_regex, '')
-      params[:unread] = true
-    elsif params[:query] =~ read_regex
-      params[:query] = params[:query].gsub(read_regex, '')
-      params[:read] = true
-    elsif params[:query] =~ starred_regex
-      params[:query] = params[:query].gsub(starred_regex, '')
-      params[:starred] = true
-    end
-    
-    if params[:query] =~ sort_regex
-      params[:sort] = params[:query].match(sort_regex)[1].downcase
-      params[:query] = params[:query].gsub(sort_regex, '')
-    end
+    search_params = build_search(params)
 
     @entries = Entry.search(params, @user)
     @entries = update_with_state(@entries)
@@ -256,6 +254,8 @@ class EntriesController < ApplicationController
 
     @collection_title = 'Search'
     @collection_favicon = 'favicon-search'
+    
+    @saved_search = SavedSearch.new
 
     respond_to do |format|
       format.js { render partial: 'shared/entries' }

@@ -677,7 +677,32 @@ $.extend feedbin,
       $(document).on 'ajax:complete', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
         $(@).find('input').removeClass('processing')
         return
-
+    
+    savedSearch: ->
+      $(document).on 'click', (event) ->
+        unless $(event.target).is('[data-behavior~=save_search_link]') || $(event.target).parents('.header-form-wrap').length > 0
+          savedSearchWrap = $('.saved-search-wrap')
+          if savedSearchWrap.hasClass('show')
+            savedSearchWrap.removeClass('show')
+        return
+        
+      $(document).on 'click', '[data-behavior~=saved_search_form_target] input[type=submit]', ->
+        console.log 'click'
+        query = $('#query').val()
+        $('#saved_search_query').val(query)
+        
+      $(document).on 'click', '[data-behavior~=save_search_link]', ->
+        savedSearchWrap = $('.saved-search-wrap')
+        if savedSearchWrap.hasClass('show')
+          savedSearchWrap.removeClass('show')
+        else
+          savedSearchWrap.addClass('show')
+        return
+        
+      $(document).on 'click', '[data-behavior~=feed_link]', ->
+        $('#query').val('')
+        $('[data-behavior~=save_search_link]').attr('disabled', 'disabled');
+        
 jQuery ->
   $.each feedbin.init, (i, item) ->
     item()

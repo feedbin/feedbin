@@ -31,7 +31,8 @@ Feedbin::Application.routes.draw do
   resources :sessions
   resources :password_resets
   resources :sharing_services, path: 'settings/sharing', only: [:index]
-
+  resources :saved_searches
+  
   resources :subscriptions,  only: [:index, :create, :destroy] do
     collection do
       patch :update_multiple
@@ -115,6 +116,9 @@ Feedbin::Application.routes.draw do
         resources :starred_entries, only: [:index, :show, :create]
         delete 'starred_entries', to: 'starred_entries#destroy'
         post 'starred_entries/delete', to: 'starred_entries#destroy'
+
+        resources :saved_searches,  only: [:index, :show, :create, :destroy, :update]
+        post "saved_searches/:id/update", to: 'saved_searches#update'
       end
     end
   end

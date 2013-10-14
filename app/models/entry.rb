@@ -53,7 +53,14 @@ class Entry < ActiveRecord::Base
   end
   
   def self.search(params, user)
-    tire.search(page: params[:page], per_page: WillPaginate.per_page, load: { include: :feed }) do
+    search_options = {
+      page: params[:page], 
+      per_page: WillPaginate.per_page
+    }
+    unless params[:load] == false
+      search_options[:load] = { include: :feed }
+    end
+    tire.search(search_options) do
       fields ['id']
       query { string params[:query] } if params[:query].present?
       if params[:unread] == true

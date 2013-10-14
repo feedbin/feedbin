@@ -1051,7 +1051,7 @@ Structure
 			margin-bottom: 0;
 			padding: 5px 25px 5px 86px;
 			font-size: 14px;
-			border-radius: 4px;
+			border-radius: 0;
 			background-position: 97% 7px;
 			background-repeat: no-repeat;
 			background-size: 16px 16px;
@@ -1075,6 +1075,7 @@ Structure
 
 .header-form-option {
 	display: none;
+	position: relative;
 	&.selected {
 		display: block;
 	}
@@ -1090,7 +1091,6 @@ Structure
 		font-weight: bold;
 		font-size: 12px;
 		border-right: 1px solid #CCC;
-		border-radius: 2px 0 0 2px;
 		background-color: #EFEFEF;
 		padding: 0 0 0 6px;
 		user-select: none;
@@ -1116,7 +1116,62 @@ Structure
 		top: 37px;
 		left: -1px;
 	}
-	
+}
+
+.saved-search-wrap {
+	background-color: #FFF;
+	width: 315px;
+	position: absolute;
+	top: 32px;
+	left: 0;
+	z-index: 100;
+	overflow: hidden;
+	height: 0;
+	transition: height .3s ease;
+	&.show {
+		height: 48px;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+		border: 1px solid #CCC;
+		border-top: none;
+	}
+	.saved-inner {
+		padding: 8px 0 0 8px;
+		input[type="text"] {
+			border-radius: 0;
+			font-size: 14px;
+			width: 239px;
+			padding: 5px;
+			height: 30px;
+		}
+		.edit_saved_search {
+			input[type="text"] {
+				width: 218px;
+			}
+		}
+		input[type="submit"] {
+			position: absolute;
+			right: 8px;
+			top: 8px;
+		}
+	}
+}
+
+.save-search-link {
+	font-size: 11px;
+	text-transform: uppercase;
+	font-weight: bold;
+	position: absolute;
+	right: -35px;
+	top: 9px;
+	cursor: pointer;
+	color: $selected;
+	&[disabled] {
+		display: none;
+	}
+	&:hover {
+		text-decoration: none;
+		color: #2877c6;
+	}
 }
 
 .account-buttons {
@@ -1383,26 +1438,11 @@ Structure
 				padding: 0;
 				margin: 0;
 			}
-			.toggle-drawer-button {
-				position: absolute;
-				right: 45px;
-				top: 0;
-				font-weight: bold;
-				color: #999;
-				font-size: 11px;
-				display: block;
-				-webkit-appearance: none;
-				background: none;
-				border: none;
-				padding: 7px 3px 5px 3px;
-				margin: 0;
-				display: block;
-			}
 			&.selected {
 				> a .count {
 					color: rgba(255,255,255,.7);
 				}
-				.toggle-drawer-button {
+				.feed-action-button {
 					color: rgba(255,255,255,.9);
 				}
 			}
@@ -1439,6 +1479,25 @@ Structure
 			border-left: 5px solid rgba(0, 0, 0, 0);
 			content: '';
 		}
+	}
+}
+
+.feed-action-button {
+	position: absolute;
+	right: 45px;
+	top: 0;
+	font-weight: bold;
+	color: #999;
+	font-size: 11px;
+	display: block;
+	-webkit-appearance: none;
+	background: none;
+	border: none;
+	padding: 7px 3px 5px 3px;
+	margin: 0;
+	display: block;
+	&:hover {
+		color: #999;
 	}
 }
 
@@ -1508,6 +1567,12 @@ li.selected > a .favicon-wrap {
 	background-size: 16px 16px;
 	background-repeat: no-repeat;
 	background-image: image-url("favicon-star.svg");
+}
+
+.favicon-search {
+	background-size: 16px 16px;
+	background-repeat: no-repeat;
+	background-image: image-url("favicon-search.svg");
 }
 
 .favicon-progress {

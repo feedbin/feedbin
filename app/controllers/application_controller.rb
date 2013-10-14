@@ -78,6 +78,7 @@ class ApplicationController < ActionController::Base
     @feeds = @user.feed_count(session[:view_mode], @feeds, session[:selected_feed], @keep_selected)
     @collections = get_collections(session[:view_mode], @user.total_unread)
     @tags = @user.owned_tags_with_count(session[:view_mode], session[:selected_feed], @keep_selected)
+    @saved_searches = @user.saved_searches.order("lower(name)")
     
     @feed_hostnames = @user.feed_hostnames
   end
@@ -120,6 +121,30 @@ class ApplicationController < ActionController::Base
     else
       @page_query = unread_entries
     end
+  end
+  
+  def build_search(search_params)
+    unread_regex = /(?<=\s|^)is:\s*unread(?=\s|$)/
+    read_regex = /(?<=\s|^)is:\s*read(?=\s|$)/
+    starred_regex = /(?<=\s|^)is:\s*starred(?=\s|$)/
+    sort_regex = /(?<=\s|^)sort:\s*(asc|desc)(?=\s|$)/i
+    
+    if search_params[:query] =~ unread_regex
+      search_params[:query] = search_params[:query].gsub(unread_regex, '')
+      search_params[:unread] = true
+    elsif search_params[:query] =~ read_regex
+      search_params[:query] = search_params[:query].gsub(read_regex, '')
+      search_params[:read] = true
+    elsif search_params[:query] =~ starred_regex
+      search_params[:query] = search_params[:query].gsub(starred_regex, '')
+      search_params[:starred] = true
+    end
+    
+    if search_params[:query] =~ sort_regex
+      search_params[:sort] = search_params[:query].match(sort_regex)[1].downcase
+      search_params[:query] = search_params[:query].gsub(sort_regex, '')
+    end
+    search_params
   end
   
   def set_view_mode

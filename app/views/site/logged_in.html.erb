@@ -16,7 +16,7 @@
           </div>
           <div class="feeds">
             <ul data-behavior="feeds_target">
-              <%= render partial: 'feeds/feeds', locals: {collections: @collections, tags: @tags, feeds: @feeds} %>
+              <%= render partial: 'feeds/feeds', locals: {collections: @collections, saved_searches: @saved_searches, tags: @tags, feeds: @feeds} %>
             </ul>
           </div>
           <%= render partial: 'shared/feeds_toolbar' %>
