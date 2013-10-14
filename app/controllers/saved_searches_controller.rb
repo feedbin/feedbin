@@ -29,8 +29,6 @@ class SavedSearchesController < ApplicationController
   def create
     @user = current_user
     @saved_search = @user.saved_searches.create(saved_search_params)
-    update_selected_feed!("saved_search", @saved_search.id)
-    @mark_selected = true
     get_feeds_list
   end
   
@@ -43,7 +41,6 @@ class SavedSearchesController < ApplicationController
     @user = current_user
     @saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
     @saved_search.update(saved_search_params)
-    @mark_selected = true
     get_feeds_list
   end
   

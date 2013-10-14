@@ -698,7 +698,11 @@ $.extend feedbin,
         else
           savedSearchWrap.addClass('show')
         return
-
+        
+      $(document).on 'click', '[data-behavior~=feed_link]', ->
+        $('#query').val('')
+        $('[data-behavior~=save_search_link]').attr('disabled', 'disabled');
+        
 jQuery ->
   $.each feedbin.init, (i, item) ->
     item()
