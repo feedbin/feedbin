@@ -147,7 +147,7 @@ class EntriesController < ApplicationController
           end
         end
       end
-      UnreadEntry.where(user_id: @user.id, id: ids).delete_all
+      UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
     end
 
     @mark_selected = true

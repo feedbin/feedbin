@@ -3,6 +3,9 @@ class SavedSearchesController < ApplicationController
   def show
     @user = current_user
     saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
+
+    update_selected_feed!("saved_search", params[:id])
+
     params[:query] = saved_search.query
     search_params = build_search(params)
     
