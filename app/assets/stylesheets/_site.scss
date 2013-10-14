@@ -1011,9 +1011,8 @@ Structure
 	}
 }
 .bar {
-	height: 46px;
+	height: 48px;
 	color: #333;
-	text-shadow: 0 1px 0 rgba(255, 255, 255, .2), 0 0 30px rgba(255, 255, 255, .3);
 	position: relative;
 	background-color: #FFF;
 	.input-append {
@@ -1039,7 +1038,7 @@ Structure
 	display: none;
 	position: absolute;
 	left: 8px;
-	top: 7px;
+	top: 8px;
 	form {
 		margin: 0;
 		input[type="url"],
@@ -1152,7 +1151,7 @@ Structure
 	position: absolute;
 	height: auto;
 	bottom: 0;
-	top: 46px;
+	top: 48px;
 	right: 0;
 	left: 0;
 	@media (max-width: 768px) {
