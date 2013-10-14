@@ -24,10 +24,14 @@ module Api
         if saved_search.present?
           params[:query] = saved_search.query
           search_params = build_search(params)
-          @entries = Entry.search(search_params, @user)
-          links_header(@entries, 'api_v2_saved_search_url', saved_search.id)
-          unless params[:include_entries] && params[:include_entries] == "true"
-            render json: @entries.map(&:id).to_json
+          if params[:include_entries] && params[:include_entries] == "true"
+            @entries = Entry.search(search_params, @user)
+            links_header(@entries, 'api_v2_saved_search_url', saved_search.id)
+          else
+            search_params[:load] = false
+            entries = Entry.search(search_params, @user)
+            links_header(entries, 'api_v2_saved_search_url', saved_search.id)
+            render json: entries.results.map(&:id).to_json
           end
         else
           status_forbidden
