@@ -24,15 +24,29 @@ class SavedSearchesController < ApplicationController
   end
   
   def create
-    logger.info { "-----------------------" }
-    logger.info { params.inspect }
-    logger.info { "-----------------------" }
-    render nothing: true
+    @user = current_user
+    @saved_search = @user.saved_searches.create(saved_search_params)
+    @mark_selected = true
+    get_feeds_list
   end
   
   def edit
     @user = current_user
     @saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
+  end
+  
+  def update
+    @user = current_user
+    @saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
+    @saved_search.update(saved_search_params)
+    @mark_selected = true
+    get_feeds_list
+  end
+  
+  private
+  
+  def saved_search_params
+    params.require(:saved_search).permit(:query, :name)
   end
   
 end

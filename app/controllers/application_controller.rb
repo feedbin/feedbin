@@ -78,7 +78,7 @@ class ApplicationController < ActionController::Base
     @feeds = @user.feed_count(session[:view_mode], @feeds, session[:selected_feed], @keep_selected)
     @collections = get_collections(session[:view_mode], @user.total_unread)
     @tags = @user.owned_tags_with_count(session[:view_mode], session[:selected_feed], @keep_selected)
-    @saved_searches = @user.saved_searches
+    @saved_searches = @user.saved_searches.order("lower(name)")
     
     @feed_hostnames = @user.feed_hostnames
   end

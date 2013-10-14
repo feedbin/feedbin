@@ -687,6 +687,7 @@ $.extend feedbin,
         return
         
       $(document).on 'click', '[data-behavior~=saved_search_form_target] input[type=submit]', ->
+        console.log 'click'
         query = $('#query').val()
         $('#saved_search_query').val(query)
         
