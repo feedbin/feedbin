@@ -131,6 +131,23 @@ class EntriesController < ApplicationController
       UnreadEntry.where(user_id: @user.id, entry_id: starred).delete_all
     elsif  %w{unread all}.include?(params[:type])
       UnreadEntry.where(user_id: @user.id).delete_all
+    elsif params[:type] == 'saved_search'
+      saved_search = @user.saved_searches.where(id: params[:data]).first
+      if saved_search.present?
+        params[:query] = saved_search.query
+        search_params = build_search(params)
+        search_params[:load] = false
+        entries = Entry.search(search_params, @user)
+        ids = entries.results.map {|entry| entry.id.to_i}
+        if entries.total_pages > 1
+          2.upto(entries.total_pages) do |page|
+            search_params[:page] = page
+            entries = Entry.search(search_params, @user)
+            ids = ids.concat(entries.results.map {|entry| entry.id.to_i})
+          end
+        end
+      end
+      UnreadEntry.where(user_id: @user.id, id: ids).delete_all
     end
 
     @mark_selected = true
