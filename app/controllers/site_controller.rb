@@ -17,8 +17,6 @@ class SiteController < ApplicationController
       
       @title = @user.title_with_count
       
-      @saved_search = SavedSearch.new
-      
       render action: 'logged_in'
     else
       home

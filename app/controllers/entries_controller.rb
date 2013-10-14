@@ -237,6 +237,8 @@ class EntriesController < ApplicationController
 
     @collection_title = 'Search'
     @collection_favicon = 'favicon-search'
+    
+    @saved_search = SavedSearch.new
 
     respond_to do |format|
       format.js { render partial: 'shared/entries' }

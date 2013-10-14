@@ -1,9 +1,5 @@
 class SavedSearchesController < ApplicationController
   
-  def new
-    @saved_search = SavedSearch.new
-  end
-  
   def show
     @user = current_user
     saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
@@ -32,6 +28,11 @@ class SavedSearchesController < ApplicationController
     logger.info { params.inspect }
     logger.info { "-----------------------" }
     render nothing: true
+  end
+  
+  def edit
+    @user = current_user
+    @saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
   end
   
 end
