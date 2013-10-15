@@ -13,6 +13,8 @@ class UsersController < ApplicationController
     end
     if !ENV['STRIPE_API_KEY'] || params[:coupon]
       @user.plan_id = Plan.find_by_stripe_id('free').id
+    else
+      @user.plan_id = Plan.find_by_stripe_id('trial').id
     end
   end
   

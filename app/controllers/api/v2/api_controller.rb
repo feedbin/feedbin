@@ -4,6 +4,7 @@ module Api
     class ApiController < ApplicationController
 
       skip_before_action :verify_authenticity_token
+      before_action :valid_user, if: :signed_in?
 
       def entries_response(path_helper)
 
@@ -125,6 +126,16 @@ module Api
         end
         if links.any?
           headers['Links'] = links.join(', ')
+        end
+      end
+      
+      def valid_user
+        @user = current_user
+        if @user.suspended
+          status_forbidden
+        end
+        if @user.plan.stripe_id == 'trial' && @user.days_left <= 0
+          status_forbidden
         end
       end
 

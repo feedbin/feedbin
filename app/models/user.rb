@@ -1,6 +1,6 @@
 class User < ActiveRecord::Base
 
-  attr_accessor :stripe_token, :old_password_valid, :update_auth_token, :password_reset, :coupon_code, :free_ok
+  attr_accessor :stripe_token, :old_password_valid, :update_auth_token, :password_reset, :coupon_code, :free_ok, :is_trialing
 
   has_secure_password
 
@@ -97,7 +97,7 @@ class User < ActiveRecord::Base
 
   def update_billing
     if customer_id.nil?
-      if !stripe_token.present? && !coupon_code.present?
+      if !stripe_token.present? && !coupon_code.present? && plan.stripe_id != 'trial'
         raise "Stripe token not present. Can't create account."
       end
       customer = {
@@ -272,7 +272,12 @@ class User < ActiveRecord::Base
   def self.search(query)
     where("email like ?", "%#{query}%")
   end
-
+  
+  def days_left
+    expires = (self.created_at + 14.days).to_date
+    start = self.created_at.to_date
+    (expires - start).to_i
+  end
 
   private
 

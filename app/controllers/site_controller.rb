@@ -1,7 +1,7 @@
 class SiteController < ApplicationController
   
   skip_before_action :authorize, only: [:index, :home, :privacy_policy, :apps]
-  before_action :suspended_user, if: :signed_in?
+  before_action :valid_user, if: :signed_in?
   
   def index
     if signed_in?
@@ -38,10 +38,13 @@ class SiteController < ApplicationController
   
   private
   
-  def suspended_user
+  def valid_user
     @user = current_user
     if @user.suspended
       redirect_to settings_billing_url, alert: 'Please update your credit card to use Feedbin.'
+    end
+    if @user.days_left <= 0
+      redirect_to settings_billing_url, alert: 'Please subscribe to use Feedbin.'
     end
   end
   

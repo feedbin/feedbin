@@ -1204,6 +1204,18 @@ Structure
 	}
 }
 
+.subscribe-promo {
+	position: absolute;
+	right: 200px;
+	top: 16px;
+	color: #66a35b;
+	font-size: 12px;
+	font-weight: bold;
+	&:hover {
+		color: #418037;
+	}
+}
+
 .content {
 	display: block;
 	position: absolute;
@@ -2525,6 +2537,17 @@ Settings
 		border: none;
 		background-color: transparent;
 	}
+	.plan-options {
+		border-top: 1px solid #CCC;
+		border-bottom: 1px solid #CCC;
+		padding: 15px 0;
+		overflow: hidden;
+		margin-bottom: 15px;
+		.radio {
+			margin-left: 10px;
+			float: left;
+		}
+	}
 }
 
 .key {
@@ -3235,8 +3258,21 @@ input:focus:invalid, textarea:focus:invalid, select:focus:invalid {
 	margin: 0;
 	-webkit-font-smoothing: antialiased;
 	padding: 15px 15px;
+	position: relative;
 	@include respond-to(screen-xs) {
 		padding: 20px 30px;
+	}
+	.trial-promo {
+		position: absolute;
+		right: 15px;
+		top: 22px;
+		color: #FFF;
+		font-size: 16px;
+		font-style: italic;
+		@include respond-to(screen-xs) {
+			right: 20px;
+			top: 27px;
+		}
 	}
 }
 
@@ -3321,7 +3357,7 @@ Login and Sign Up
 	}
 	.signup-wrap, .login-wrap {
 		padding: 0 15px 10px 15px;
-		max-width: 548px;
+		max-width: 450px;
 		margin: 0 auto;
 	}
 	svg {
@@ -3338,9 +3374,6 @@ Login and Sign Up
 	input[type="text"] {
 		width: 100%;
 		padding: 12px 10px 10px 10px;
-		@include respond-to(screen-xs) {
-			max-width: 300px;
-		}
 	}
 	input[type="submit"] {
 		padding: 10px 25px;
