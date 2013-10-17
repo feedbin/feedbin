@@ -80,7 +80,7 @@ class User < ActiveRecord::Base
   
   def trial_plan_valid
     trial_plan = Plan.find_by_stripe_id('trial')
-    if plan_id_was != trial_plan.id && !plan_id_was.nil?
+    if plan_id == trial_plan.id && plan_id_was != trial_plan.id && !plan_id_was.nil?
       errors.add(:plan_id, 'is invalid')
     end
   end
