@@ -17,4 +17,9 @@ class UserMailer < ActionMailer::Base
     mail to: @user.email, subject: '[Feedbin] Password Reset'
   end
 
+  def trial_expiration(user_id)
+    @user = User.find(user_id)
+    mail to: @user.email, subject: '[Feedbin] Your Trial is About to End'
+  end
+
 end

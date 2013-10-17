@@ -88,7 +88,6 @@ class SettingsController < ApplicationController
   def update_credit_card
     @user = current_user
     @user.stripe_token = params[:stripe_token]
-    @user.suspended = false
     @user.free_ok = (@user.plan.stripe_id == 'free')
 
     respond_to do |format|

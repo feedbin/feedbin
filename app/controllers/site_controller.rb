@@ -39,12 +39,8 @@ class SiteController < ApplicationController
   private
   
   def valid_user
-    @user = current_user
-    if @user.suspended
-      redirect_to settings_billing_url, alert: 'Please update your credit card to use Feedbin.'
-    end
-    if @user.plan.stripe_id == 'trial' && @user.days_left <= 0
-      redirect_to settings_billing_url, alert: 'Please subscribe to use Feedbin.'
+    if current_user.suspended
+      redirect_to settings_billing_url, alert: 'Please update your billing information to use Feedbin.'
     end
   end
   

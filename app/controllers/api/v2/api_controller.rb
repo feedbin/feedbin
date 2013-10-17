@@ -129,12 +129,10 @@ module Api
         end
       end
       
+      private
+            
       def valid_user
-        @user = current_user
-        if @user.suspended
-          status_forbidden
-        end
-        if @user.plan.stripe_id == 'trial' && @user.days_left <= 0
+        if current_user.suspended
           status_forbidden
         end
       end

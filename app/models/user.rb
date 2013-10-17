@@ -97,16 +97,7 @@ class User < ActiveRecord::Base
 
   def update_billing
     if customer_id.nil?
-      if !stripe_token.present? && !coupon_code.present? && plan.stripe_id != 'trial'
-        raise "Stripe token not present. Can't create account."
-      end
-      customer = {
-        email: email,
-        plan: plan.stripe_id
-      }
-      customer[:card] = stripe_token unless stripe_token.blank?
-      customer = Stripe::Customer.create(customer)
-
+      customer = Stripe::Customer.create({email: email, plan: plan.stripe_id})
       if coupon_code
         coupon_record = Coupon.find_by_coupon_code(coupon_code)
         coupon_record.redeemed = true
@@ -118,12 +109,12 @@ class User < ActiveRecord::Base
         customer = Stripe::Customer.retrieve(customer_id)
         if stripe_token.present?
           customer.card = stripe_token
+          self.suspended = false
         end
         customer.email = email
         customer.save
       end
     end
-
     unless customer.nil?
       self.last_4_digits = customer.try(:active_card).try(:last4)
       self.customer_id = customer.id
@@ -145,7 +136,7 @@ class User < ActiveRecord::Base
     errors.add :base, "#{e.message}."
     CancelBilling.perform_async(customer_id)
   end
-
+  
   def total_unread
     @total_unread_count ||= unread_count.inject(0) {|sum, (feed_id, count)| sum += count}
   end
@@ -274,7 +265,7 @@ class User < ActiveRecord::Base
   end
   
   def days_left
-    expires = (self.created_at + 14.days).to_date
+    expires = (self.created_at + Feedbin::Application.config.trial_days.days).to_date
     start = self.created_at.to_date
     (expires - start).to_i
   end

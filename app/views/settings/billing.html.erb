@@ -4,7 +4,7 @@
     <% if @user.days_left <= 0 %>
       <p>Your trial has ended. Subscribe now to continue using Feedbin.</p>
     <% else %>
-      <p>Your trial period will end in <%= @user.days_left %> day<%= @user.days_left == 1 ? '' : 's' %>. Subscribe now to continue using Feedbin uninterrupted.</p>
+      <p>Your trial period will end in <%= pluralize(@user.days_left, 'day') %>. Subscribe now to continue using Feedbin uninterrupted.</p>
     <% end %>
     
     <%= form_for @user, html: { data: { behavior: 'credit_card_form' } } do |f| %>

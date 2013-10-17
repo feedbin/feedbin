@@ -36,7 +36,9 @@
     <% end %>
     
     <% if signed_in? && current_user.plan.stripe_id == 'trial' %>
-      <%= link_to "Subscribe to Feedbin", settings_billing_path, class: 'subscribe-promo' %>
+      <%= link_to settings_billing_path, class: 'subscribe-promo' do %>
+        <%= pluralize(@user.days_left, 'day') %> left, subscribe now
+      <% end %>
     <% end %>
     
     <div class="account-buttons">
