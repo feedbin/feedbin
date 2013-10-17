@@ -43,7 +43,7 @@ class SiteController < ApplicationController
     if @user.suspended
       redirect_to settings_billing_url, alert: 'Please update your credit card to use Feedbin.'
     end
-    if @user.days_left <= 0
+    if @user.plan.stripe_id == 'trial' && @user.days_left <= 0
       redirect_to settings_billing_url, alert: 'Please subscribe to use Feedbin.'
     end
   end
