@@ -1214,6 +1214,9 @@ Structure
 	&:hover {
 		color: #418037;
 	}
+	@media (max-width: 685px) {
+		display: none;
+	}
 }
 
 .content {
