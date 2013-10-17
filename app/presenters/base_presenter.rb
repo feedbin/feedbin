@@ -20,10 +20,11 @@ class BasePresenter
   
   def favicon_url(host)
     uri = URI::HTTP.build(
-      scheme: 'https',
-      host: 'd34k41xev839cc.cloudfront.net',
+      scheme: "https",
+      host: "d34k41xev839cc.cloudfront.net",
       path: "/#{host}"
     )
+    uri.scheme = "https"
     uri.to_s
   end
 
