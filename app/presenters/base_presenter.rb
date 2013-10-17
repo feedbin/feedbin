@@ -8,24 +8,22 @@ class BasePresenter
   
   def favicon(host)
     begin
-      host = URI::parse(host).host.parameterize
+      host = URI::parse(host).host
     rescue Exception => e
       host = nil
     end
     @template.content_tag :span, '', class: "favicon-wrap" do
       @template.content_tag(:span, '', class: "favicon-default") + 
-      @template.content_tag(:span, '', class: "favicon favicon-#{host}")
+      @template.content_tag(:span, '', class: "favicon", style: "background-image: url(#{favicon_url(host)});")
     end
   end
   
   def favicon_url(host)
-    verifier = ActiveSupport::MessageVerifier.new(ENV['FAVICON_KEY'] || 'secret')
-    favicon = Base64.urlsafe_encode64(verifier.generate(host))
     uri = URI::HTTP.build(
-      host: ENV["FAVICON_HOST"],
-      path: "/favicon/#{favicon}"
+      scheme: 'https',
+      host: 'd34k41xev839cc.cloudfront.net',
+      path: "/#{host}"
     )
-    uri.scheme = Feedbin::Application.config.force_ssl ? "https" : "http"
     uri.to_s
   end
 
