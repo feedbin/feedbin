@@ -7,7 +7,10 @@
       <p>Your trial period will end in <%= pluralize(@user.days_left, 'day') %>. Subscribe now to continue using Feedbin uninterrupted.</p>
     <% end %>
     
+    <div data-behavior="stripe_error" class="alert alert-error hide"></div>
     <%= form_for @user, html: { data: { behavior: 'credit_card_form' } } do |f| %>
+      <%= f.hidden_field :stripe_token, data: { behavior: 'stripe_token' } %>
+      <%= hidden_field_tag :redirect_to, settings_billing_url %>
       <div class="form-wrap">
         <% if @user.stripe_token %>
           <p>Credit card acceptance is pending.</p>

@@ -2,7 +2,9 @@ class SettingsController < ApplicationController
 
   before_action :plan_exists, only: [:update_plan]
 
-  def help; end
+  def help
+    @user = current_user
+  end
 
   def settings
     @user = current_user
@@ -53,11 +55,11 @@ class SettingsController < ApplicationController
   end
 
   def import_export
+    @user = current_user
     @uploader = Import.new.upload
     @uploader.success_action_redirect = settings_import_export_url
 
     if params[:key]
-      @user = current_user
       @import = Import.new(key: params[:key], user: @user)
 
       if @import.save

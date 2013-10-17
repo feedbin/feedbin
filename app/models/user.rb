@@ -29,6 +29,7 @@ class User < ActiveRecord::Base
   before_save :update_billing, unless: -> user { user.admin || !ENV['STRIPE_API_KEY'] }
   before_destroy :cancel_billing, unless: -> user { user.admin }
   before_save :strip_email
+  before_save :activate_subscriptions
   before_save { reset_auth_token }
   before_create { generate_token(:starred_token) }
   before_create { generate_token(:inbound_email_token) }
@@ -39,9 +40,16 @@ class User < ActiveRecord::Base
   validate :changed_password, on: :update, unless: -> user { user.password_reset }
   validate :coupon_code_valid, on: :create, if: -> user { user.coupon_code }
   validate :plan_type_valid
+  validate :trial_plan_valid
 
   def to_param
     email
+  end
+  
+  def activate_subscriptions
+    if plan_id_changed? && plan_id_was == Plan.find_by_stripe_id('trial').id
+      subscriptions.update_all(active: true)
+    end
   end
 
   def strip_email
@@ -66,6 +74,13 @@ class User < ActiveRecord::Base
       valid_plans = Plan.where(price_tier: plan.price_tier).where.not(stripe_id: 'free').pluck(:id)
     end
     unless valid_plans.include?(plan.id)
+      errors.add(:plan_id, 'is invalid')
+    end
+  end
+  
+  def trial_plan_valid
+    trial_plan = Plan.find_by_stripe_id('trial')
+    if plan_id_was != trial_plan.id && !plan_id_was.nil?
       errors.add(:plan_id, 'is invalid')
     end
   end
@@ -105,12 +120,13 @@ class User < ActiveRecord::Base
         self.coupon = coupon_record
       end
     else
-      if email_changed? || stripe_token.present?
+      if email_changed? || stripe_token.present? || plan_id_changed?
         customer = Stripe::Customer.retrieve(customer_id)
         if stripe_token.present?
           customer.card = stripe_token
           self.suspended = false
         end
+        customer.plan = plan.stripe_id
         customer.email = email
         customer.save
       end

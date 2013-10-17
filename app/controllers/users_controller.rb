@@ -63,7 +63,11 @@ class UsersController < ApplicationController
     end
     if @user.save
       sign_in @user
-      redirect_to settings_account_path, notice: 'Account updated.'
+      if params[:redirect_to]
+        redirect_to params[:redirect_to], notice: 'Account updated.'
+      else
+        redirect_to settings_account_path, notice: 'Account updated.'
+      end
     else
       redirect_to settings_account_path, alert: @user.errors.full_messages.join('. ') + '.'
     end
