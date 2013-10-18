@@ -262,20 +262,6 @@ class User < ActiveRecord::Base
     subscriptions.where(feed_id: feed_id).present?
   end
 
-  def feed_hostnames
-    hostnames = feeds.pluck(:site_url).map { |site_url|
-      begin
-        URI::parse(site_url).host
-      rescue
-        nil
-      end
-    }.compact.uniq
-
-    hash = Digest::SHA1.hexdigest hostnames.sort.join
-
-    {hostnames: hostnames, hash: hash}
-  end
-
   def self.search(query)
     where("email like ?", "%#{query}%")
   end
