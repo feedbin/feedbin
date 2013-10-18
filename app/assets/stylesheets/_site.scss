@@ -1820,6 +1820,9 @@ li.selected > a .favicon-wrap {
 				.entry-actions {
 					display: block;
 				}
+				.icon-star {
+					display: none;
+				}
 				.wrap {
 					border-color: $selected;
 					border-top: 1px solid $selected;
@@ -1827,9 +1830,6 @@ li.selected > a .favicon-wrap {
 				}
 			}
 			&:hover {
-				.icon-star {
-					display: none;
-				}
 				.touch & .entry-actions {
 					display: none;
 				}
