@@ -203,6 +203,8 @@ $.extend feedbin,
 
   markReadData: null
 
+  closeSubcription: false
+
 $.extend feedbin,
   init:
     setData: ->
@@ -237,22 +239,6 @@ $.extend feedbin,
     choicesSubmit: ->
       $(document).on 'ajax:beforeSend', '[data-choice-form]', ->
         $('.modal').modal('hide')
-        return
-
-    subscribeSubmit: ->
-      form = $('[data-behavior~=subscription_form]')
-      textField = form.find('[name="subscription[feeds][feed_url]"]')
-      submit = form.find('[name="commit"]')
-
-      $(document).on 'ajax:beforeSend', '[data-behavior~=subscription_form]', ->
-        textField.attr('disabled', 'disabled')
-        submit.attr('disabled', 'disabled')
-        textField.blur()
-        return
-
-      $(document).on 'ajax:complete', '[data-behavior~=subscription_form]', ->
-        textField.val('').removeAttr('disabled')
-        submit.removeAttr('disabled')
         return
 
     resetEntryPostion: ->
@@ -633,27 +619,43 @@ $.extend feedbin,
         $.post feedbin.data.markDirectionAsReadEntries, data
         return
 
-    formOptions: ->
-      $(document).on 'click', '[data-behavior~=show_form_options]', (event) ->
-        wrap = $(@).parents('.dropdown-wrap')
-        if wrap.hasClass('open')
-          wrap.removeClass('open')
-        else
-          wrap.addClass('open')
+    formProcessing: ->
+      $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
+        console.log 'submit'
+        $(@).find('input').addClass('processing')
         return
 
-      $(document).on 'click', '[data-behavior~=form_select] li', (event) ->
-        selectOption = $(@).data('select-option')
-        feedbin.showForm(selectOption)
+      $(document).on 'ajax:complete', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
+        $(@).find('input').removeClass('processing')
+        if feedbin.closeSubcription
+          setTimeout ( ->
+            $('.feeds').removeClass('show-subscribe')
+          ), 600
+          feedbin.closeSubcription = false
         return
 
     subscribe: ->
-      # This needs to come after "[data-behavior~=form_select] li" click event
+      $(document).on 'click', '[data-behavior~=show_subscribe]', (event) ->
+        feeds = $(".feeds")
+        if feeds.hasClass('show-subscribe')
+          feeds.removeClass('show-subscribe')
+        else
+          $('.subscribe-wrap input').val('')
+          $('.subscribe-wrap input').focus()
+          feeds.addClass('show-subscribe')
+        return
+
+      $(document).on 'click', (event) ->
+        unless $(event.target).is('[data-behavior~=show_subscribe]')
+          $('.feeds').removeClass('show-subscribe')
+
       subscription = feedbin.queryString('subscribe')
       if subscription?
-        feedbin.showForm('subscribe_form_wrap')
-        field = $('#subscription_feeds_feed_url').val(subscription)
-        field.parents('form').submit()
+        $('[data-behavior~=show_subscribe]').click()
+        $('[data-behavior~=subscription_form] input').val(subscription)
+        $('[data-behavior~=subscription_form]').submit()
+        $('[data-behavior~=subscription_form] input').blur()
+        feedbin.closeSubcription = true
 
     searchError: ->
       $(document).on 'ajax:error', '[data-behavior~=search_form]', (event, xhr) ->
@@ -667,15 +669,6 @@ $.extend feedbin,
 
       $(document).on 'ajax:complete', '[data-behavior~=feed_link]', (event, xhr) ->
         $('.favicon-progress').removeClass("favicon-progress")
-        return
-
-    formProcessing: ->
-      $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
-        $(@).find('input').addClass('processing')
-        return
-
-      $(document).on 'ajax:complete', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
-        $(@).find('input').removeClass('processing')
         return
 
     savedSearch: ->

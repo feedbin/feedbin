@@ -11,8 +11,12 @@
       <td class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
         <div class="feeds-wrap full-height">
           <div class="view-toolbar">
-            <%= render partial: 'shared/buttons/view_unread' %>
             <%= render partial: 'shared/buttons/view_all' %>
+            <%= render partial: 'shared/buttons/view_unread' %>
+            <%= render partial: 'shared/buttons/subscribe' %>
+          </div>
+          <div class="subscribe-wrap">
+            <%= render partial: "subscriptions/form" %>
           </div>
           <div class="feeds">
             <ul data-behavior="feeds_target">

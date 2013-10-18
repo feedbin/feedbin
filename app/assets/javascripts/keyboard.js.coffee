@@ -141,13 +141,11 @@ class feedbin.Keyboard
 
     # Add subscription
     Mousetrap.bind 'a', (event, combo) =>
-      feedbin.showForm('subscribe_form_wrap')
-      $('[name="subscription[feeds][feed_url]"]').focus()
+      $('[data-behavior~=show_subscribe]').click()
       event.preventDefault()
 
     # Focus search
     Mousetrap.bind '/', (event, combo) =>
-      feedbin.showForm('search_form_wrap')
       $('[name="query"]').focus()
       event.preventDefault()
 
@@ -198,6 +196,7 @@ class feedbin.Keyboard
 
     # Unfocus field,
     Mousetrap.bindGlobal 'escape', (event, combo) =>
+      $('.feeds').removeClass('show-subscribe')
       if feedbin.modalShowing == true
         $('.modal').modal('hide')
         event.preventDefault()
