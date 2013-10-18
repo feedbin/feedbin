@@ -1782,6 +1782,9 @@ li.selected > a .favicon-wrap {
 				}
 			}
 			.selected &.selected {
+				.entry-actions {
+					display: block;
+				}
 				.wrap {
 					border-color: $selected;
 					border-top: 1px solid $selected;
@@ -1789,9 +1792,6 @@ li.selected > a .favicon-wrap {
 				}
 			}
 			&:hover {
-				.entry-actions {
-					display: block;
-				}
 				.icon-star {
 					display: none;
 				}
