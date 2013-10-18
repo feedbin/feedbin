@@ -644,7 +644,7 @@ $.extend feedbin,
         return
 
       $(document).on 'click', (event) ->
-        unless $(event.target).is('[data-behavior~=show_subscribe]')
+        unless $(event.target).is('[data-behavior~=show_subscribe]') || $(event.target).is('.subscribe-wrap') || $(event.target).parents('.subscribe-wrap').length > 0
           $('.feeds').removeClass('show-subscribe')
 
       subscription = feedbin.queryString('subscribe')
