@@ -272,14 +272,4 @@ class User < ActiveRecord::Base
     (expires - start).to_i
   end
 
-  private
-
-  def subtract_hash(hash1, hash2)
-    hash1.each do |key, value|
-      difference = hash2.has_key?(key) ? value - hash2[key] : value
-      hash1[key] = difference
-    end
-  end
-
-
 end
