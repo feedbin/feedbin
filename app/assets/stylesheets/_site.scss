@@ -728,6 +728,10 @@ input::-moz-focus-inner {
 	border: 0;
 }
 
+input {
+	-webkit-appearance: none;
+}
+
 button,
 html input[type="button"],
 input[type="reset"],
