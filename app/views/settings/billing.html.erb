@@ -36,7 +36,7 @@
     <% end %>
   <% else %>
     <% if @user.last_4_digits %>
-      <p class="billing-promo"><span class="cc"><span class="cc-stripe"></span></span>Your current card **** **** **** <%= @user.last_4_digits %></p>
+      <p class="billing-promo">Your current card **** **** **** <%= @user.last_4_digits %></p>
     <% end %>
     <div data-behavior="stripe_error" class="alert alert-error hide"></div>
     <%= form_tag settings_update_credit_card_path, data: { behavior: 'credit_card_form' } do %>

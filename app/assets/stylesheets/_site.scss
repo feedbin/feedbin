@@ -3037,27 +3037,29 @@ select {
 	border: 1px solid #CCC;
 	padding: 10px 10px 10px 35px;
 	font-size: 14px;
-	position: relative;
 	color: #333;
 	border-radius: 4px;
-	.cc {
+	position: relative;
+	&:after {
 		position: absolute;
-		left: 6px;
-		top: 11px;
-		width: 17px;
-		height: 11px;
+		left: 8px;
+		top: 12px;
+		width: 18px;
+		height: 12px;
 		display: block;
 		border: 1px solid #999;
 		border-radius: 2px;
+		content: "";
 	}
-	.cc-stripe {
+	&:before {
 		position: absolute;
-		left: 0;
-		top: 1px;
-		width: 17px;
+		left: 9px;
+		top: 14px;
+		width: 16px;
 		height: 3px;
 		display: block;
 		background-color: #999;
+		content: "";
 	}
 }
 
