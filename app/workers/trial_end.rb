@@ -9,5 +9,5 @@ class TrialEnd
       user.save
     end
   end
-  
+
 end

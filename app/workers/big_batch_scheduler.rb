@@ -1,7 +1,7 @@
 class BigBatchScheduler
   include Sidekiq::Worker
   sidekiq_options queue: :worker_slow
-  
+
   def perform
     total_records = 180_000_000
     batch_size = 1000

@@ -1,7 +1,7 @@
 class FeedRefresherReceiver
   include Sidekiq::Worker
   sidekiq_options queue: :feed_refresher_receiver
-  
+
   def perform(update)
     feed = Feed.find(update['feed']['id'])
     if update['entries'].any?
@@ -17,5 +17,5 @@ class FeedRefresherReceiver
     feed.last_modified = update['feed']['last_modified']
     feed.save
   end
-  
+
 end

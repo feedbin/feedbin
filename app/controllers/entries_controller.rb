@@ -235,10 +235,10 @@ class EntriesController < ApplicationController
       format.js
     end
   end
-  
+
   def search
     @user = current_user
-    
+
     search_params = build_search(params)
 
     @entries = Entry.search(params, @user)
@@ -249,12 +249,12 @@ class EntriesController < ApplicationController
 
     @type = 'all'
     @data = nil
-    
+
     @search = true
 
     @collection_title = 'Search'
     @collection_favicon = 'favicon-search'
-    
+
     @saved_search = SavedSearch.new
 
     respond_to do |format|

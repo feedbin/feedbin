@@ -2,7 +2,7 @@ window.feedbin ?= {}
 
 jQuery ->
   new feedbin.Registration()
-  
+
 class feedbin.Registration
   constructor: ->
     Stripe.setPublishableKey($('meta[name="stripe-key"]').attr('content'))
@@ -14,7 +14,7 @@ class feedbin.Registration
         event.preventDefault()
       else
         true
-  
+
   processCard: ->
     card =
       number: $('#card_number').val()
@@ -22,7 +22,7 @@ class feedbin.Registration
       expMonth: $('#card_month').val()
       expYear: $('#card_year').val()
     Stripe.createToken(card, @handleStripeResponse)
-  
+
   handleStripeResponse: (status, response) ->
     if status == 200
       $('[data-behavior~=stripe_token]').val(response.id)

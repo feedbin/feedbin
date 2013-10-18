@@ -8,5 +8,5 @@ class TrialDeactivateSubscriptions
       user.subscriptions.update_all(active: false)
     end
   end
-  
+
 end

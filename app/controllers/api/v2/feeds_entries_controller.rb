@@ -1,10 +1,10 @@
 module Api
   module V2
     class FeedsEntriesController < ApiController
-      
+
       respond_to :json
       before_action :correct_user
-      
+
       def index
         @user = current_user
         @entries = Entry.where(feed_id: params[:feed_id]).includes(:feed).order("entries.created_at DESC").page(params[:page])
@@ -13,13 +13,13 @@ module Api
         end
         entries_response 'api_v2_feed_entries_url'
       end
-      
+
       def show
         fresh_when(@entry)
       end
-      
+
       private
-      
+
       def correct_user
         if 'index' == params[:action]
           if !Feed.where(id: params[:feed_id]).present?
@@ -36,7 +36,7 @@ module Api
           end
         end
       end
-      
+
     end
   end
 end

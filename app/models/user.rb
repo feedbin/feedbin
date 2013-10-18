@@ -7,7 +7,7 @@ class User < ActiveRecord::Base
   store_accessor :settings, :entry_sort, :previous_read_count, :starred_feed_enabled,
                  :hide_tagged_feeds, :precache_images, :show_unread_count, :sticky_view_inline,
                  :mark_as_read_confirmation, :font_size, :font, :entry_width
-    
+
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
   has_many :feeds, through: :subscriptions
@@ -45,7 +45,7 @@ class User < ActiveRecord::Base
   def to_param
     email
   end
-  
+
   def activate_subscriptions
     if plan_id_changed? && plan_id_was == Plan.find_by_stripe_id('trial').id
       subscriptions.update_all(active: true)
@@ -77,7 +77,7 @@ class User < ActiveRecord::Base
       errors.add(:plan_id, 'is invalid')
     end
   end
-  
+
   def trial_plan_valid
     trial_plan = Plan.find_by_stripe_id('trial')
     if plan_id == trial_plan.id && plan_id_was != trial_plan.id && !plan_id_was.nil?
@@ -152,7 +152,7 @@ class User < ActiveRecord::Base
     errors.add :base, "#{e.message}."
     CancelBilling.perform_async(customer_id)
   end
-  
+
   def total_unread
     @total_unread_count ||= unread_count.inject(0) {|sum, (feed_id, count)| sum += count}
   end
@@ -265,7 +265,7 @@ class User < ActiveRecord::Base
   def self.search(query)
     where("email like ?", "%#{query}%")
   end
-  
+
   def days_left
     expires = (self.created_at + Feedbin::Application.config.trial_days.days).to_date
     start = self.created_at.to_date

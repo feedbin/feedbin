@@ -128,9 +128,9 @@ module Api
           headers['Links'] = links.join(', ')
         end
       end
-      
+
       private
-            
+
       def valid_user
         if current_user.suspended
           status_forbidden

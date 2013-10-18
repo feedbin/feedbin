@@ -1,11 +1,11 @@
 module Api
   module V2
     class EntriesController < ApiController
-      
+
       respond_to :json
       before_action :correct_user, only: [:show]
       before_action :limit_ids, only: [:index]
-      
+
       def index
         @user = current_user
         if params.has_key?(:ids)
@@ -24,7 +24,7 @@ module Api
             @starred_entries = @starred_entries.per_page(params[:per_page].to_i)
           end
           @entries = Entry.where(id: @starred_entries.map {|starred_entry| starred_entry.entry_id }).includes(:feed)
-        else          
+        else
           @entries = @user.entries.includes(:feed).order("entries.created_at DESC").page(params[:page])
           if params.has_key?(:per_page)
             @entries = @entries.per_page(params[:per_page])
@@ -32,13 +32,13 @@ module Api
         end
         entries_response 'api_v2_entries_url'
       end
-      
+
       def show
         fresh_when(@entry)
       end
-      
+
       private
-      
+
       def limit_ids
         if params.has_key?(:ids)
           @ids = params[:ids].split(',').map {|i| i.to_i }
@@ -49,7 +49,7 @@ module Api
           end
         end
       end
-      
+
       def correct_user
         @user = current_user
         @entry = Entry.find(params[:id])
@@ -59,7 +59,7 @@ module Api
           status_forbidden
         end
       end
-      
+
     end
   end
 end

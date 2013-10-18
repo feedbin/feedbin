@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   skip_before_action :authorize, only: [:new, :create]
-  
+
   before_action :set_user, only: [:update, :destroy]
   before_action :ensure_permission, only: [:update, :destroy]
 
@@ -17,7 +17,7 @@ class UsersController < ApplicationController
       @user.plan_id = Plan.find_by_stripe_id('trial').id
     end
   end
-  
+
   def create
     @user = User.new(user_params)
     @user.update_auth_token = true
@@ -27,15 +27,15 @@ class UsersController < ApplicationController
       coupon = Coupon.find_by_coupon_code(user_params['coupon_code'])
       coupon_valid = (coupon.present? && !coupon.redeemed)
     end
-    
+
     if coupon_valid || !ENV['STRIPE_API_KEY']
       @user.free_ok = true
     end
-    
+
     if params[:user] && params[:user][:password]
       @user.password_confirmation = params[:user][:password]
     end
-    
+
     if @user.save
       deactivate_subscriptions = Feedbin::Application.config.trial_days + 6
       send_notice = Feedbin::Application.config.trial_days - 1
@@ -67,28 +67,28 @@ class UsersController < ApplicationController
     else
       redirect_to settings_account_path, alert: @user.errors.full_messages.join('. ') + '.'
     end
-  end  
-  
+  end
+
   def destroy
     @user.destroy
     redirect_to root_url
   end
-  
+
   private
 
   def set_user
     @user = current_user
   end
-  
+
   def ensure_permission
     unless @user.id == current_user.id || current_user.admin
       render_404
     end
   end
-  
+
   def user_params
     params.require(:user).permit(:email, :password, :stripe_token, :coupon_code, :plan_id)
   end
-  
-    
+
+
 end

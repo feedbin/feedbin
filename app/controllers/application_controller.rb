@@ -3,14 +3,14 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
   include SessionsHelper
-  
+
   before_action :authorize
   before_action :set_view_mode
   before_action :honeybadger_context
   before_action :block_if_maintenance_mode
-  
+
   etag { current_user.try :id }
-  
+
   def update_selected_feed!(type, data = nil)
     if data.nil?
       selected_feed = type
@@ -21,68 +21,68 @@ class ApplicationController < ActionController::Base
     session[:selected_feed_type] = type
     session[:selected_feed] = selected_feed
   end
-  
+
   def render_404
     render 'errors/not_found', status: 404, layout: 'application', formats: [:html]
   end
-  
+
   def get_collections(*types, count)
     @user = current_user
     types = [*types]
     collections = []
     if types.include? 'view_unread'
-      collections << { 
-        title: 'Unread', 
-        path: unread_entries_path, 
-        count: count, 
+      collections << {
+        title: 'Unread',
+        path: unread_entries_path,
+        count: count,
         id: 'collection_unread',
         favicon_class: 'favicon-unread',
         parent_data: { behavior: 'all_unread', feed_id: 'collection_unread' },
-        data: { behavior: 'selectable reset_entry_position show_entries open_item feed_link', mark_read: {type: 'unread', message: 'Mark all items as read?'}.to_json } 
+        data: { behavior: 'selectable reset_entry_position show_entries open_item feed_link', mark_read: {type: 'unread', message: 'Mark all items as read?'}.to_json }
       }
     end
     if types.include? 'view_all'
-      collections << { 
-        title: 'All', 
-        path: entries_path, 
-        count: count, 
+      collections << {
+        title: 'All',
+        path: entries_path,
+        count: count,
         id: 'collection_all',
         favicon_class: 'favicon-all',
         parent_data: { behavior: 'all_unread', feed_id: 'collection_all' },
-        data: { behavior: 'selectable reset_entry_position show_entries open_item feed_link', mark_read: {type: 'all', message: 'Mark all items as read?'}.to_json } 
+        data: { behavior: 'selectable reset_entry_position show_entries open_item feed_link', mark_read: {type: 'all', message: 'Mark all items as read?'}.to_json }
       }
     end
-    collections << { 
-      title: 'Starred', 
-      path: starred_entries_path, 
-      count: @user.total_starred, 
+    collections << {
+      title: 'Starred',
+      path: starred_entries_path,
+      count: @user.total_starred,
       id: 'collection_starred',
       favicon_class: 'favicon-star',
       parent_data: { behavior: 'starred', feed_id: 'collection_starred' },
-      data: { behavior: 'selectable reset_entry_position show_entries open_item feed_link', mark_read: {type: 'starred', message: 'Mark starred items as read?'}.to_json } 
+      data: { behavior: 'selectable reset_entry_position show_entries open_item feed_link', mark_read: {type: 'starred', message: 'Mark starred items as read?'}.to_json }
     }
     collections
   end
-  
+
   def get_feeds_list
     @mark_selected = true
     @user = current_user
-    
+
     if @user.hide_tagged_feeds == '1'
       excluded_feeds = @user.taggings.pluck(:feed_id).uniq
       @feeds = @user.feeds.where.not(id: excluded_feeds).include_user_title
     else
       @feeds = @user.feeds.include_user_title
-    end    
-    
+    end
+
     @feeds = @user.feed_count(session[:view_mode], @feeds, session[:selected_feed], @keep_selected)
     @collections = get_collections(session[:view_mode], @user.total_unread)
     @tags = @user.owned_tags_with_count(session[:view_mode], session[:selected_feed], @keep_selected)
     @saved_searches = @user.saved_searches.order("lower(name)")
   end
-  
+
   private
-  
+
   def update_with_state(entries)
     user = current_user
     entry_ids = entries.map {|entry| entry.id }
@@ -102,7 +102,7 @@ class ApplicationController < ActionController::Base
     end
     entries
   end
-  
+
   def feeds_response
     if 'view_all' == session[:view_mode]
       # Get all entries 100 at a time, then get unread info
@@ -112,7 +112,7 @@ class ApplicationController < ActionController::Base
       unread_entries = @user.unread_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).sort_preference(@user.entry_sort)
       @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort)
     end
-    
+
     @entries = update_with_state(@entries)
     if 'view_all' == session[:view_mode]
       @page_query = @entries
@@ -120,13 +120,13 @@ class ApplicationController < ActionController::Base
       @page_query = unread_entries
     end
   end
-  
+
   def build_search(search_params)
     unread_regex = /(?<=\s|^)is:\s*unread(?=\s|$)/
     read_regex = /(?<=\s|^)is:\s*read(?=\s|$)/
     starred_regex = /(?<=\s|^)is:\s*starred(?=\s|$)/
     sort_regex = /(?<=\s|^)sort:\s*(asc|desc)(?=\s|$)/i
-    
+
     if search_params[:query] =~ unread_regex
       search_params[:query] = search_params[:query].gsub(unread_regex, '')
       search_params[:unread] = true
@@ -137,18 +137,18 @@ class ApplicationController < ActionController::Base
       search_params[:query] = search_params[:query].gsub(starred_regex, '')
       search_params[:starred] = true
     end
-    
+
     if search_params[:query] =~ sort_regex
       search_params[:sort] = search_params[:query].match(sort_regex)[1].downcase
       search_params[:query] = search_params[:query].gsub(sort_regex, '')
     end
     search_params
   end
-  
+
   def set_view_mode
     session[:view_mode] ||= 'view_unread'
   end
-  
+
   def block_if_maintenance_mode
     if ENV['FEEDBIN_MAINTENANCE_MODE']
       if request.format.json?
@@ -162,5 +162,5 @@ class ApplicationController < ActionController::Base
   def honeybadger_context
     Honeybadger.context(user_id: current_user.id) if current_user
   end
-  
+
 end

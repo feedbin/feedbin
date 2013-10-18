@@ -1,4 +1,4 @@
-require "bundler/capistrano" 
+require "bundler/capistrano"
 require 'capistrano-unicorn'
 
 set :user,        'app'
@@ -52,12 +52,12 @@ namespace :foreman do
   task :restart_worker, roles: :worker  do
     run "sudo start #{application} || sudo restart #{application} || true"
   end
-  
+
   desc "Zero-downtime restart of Unicorn"
   task :restart_web, roles: :web  do
     unicorn.restart
   end
-  
+
 end
 
 namespace :deploy do

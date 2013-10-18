@@ -3,7 +3,7 @@ Feedbin
 [![Code Climate](https://codeclimate.com/github/feedbin/feedbin.png)](https://codeclimate.com/github/feedbin/feedbin)
 [![Build Status](https://travis-ci.org/feedbin/feedbin.png?branch=master)](https://travis-ci.org/feedbin/feedbin)
 
-Feedbin is a simple, fast and nice looking RSS reader. 
+Feedbin is a simple, fast and nice looking RSS reader.
 
 ![Feedbin Screenshot](https://raw.github.com/feedbin/feedbin/master/app/assets/images/screenshots/_main.png)
 
@@ -75,7 +75,7 @@ export $(cat .env)
 
 This is necessary so the environment variables can be read by both Pow and Unicorn.
 
-In production environment variables are set in the `app` users ~/.bash_profile like: 
+In production environment variables are set in the `app` users ~/.bash_profile like:
 
 ```shell
 export AWS_ACCESS_KEY_ID=aoisjf3j23oij23f

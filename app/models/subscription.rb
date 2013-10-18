@@ -1,10 +1,10 @@
 class Subscription < ActiveRecord::Base
   belongs_to :user
   belongs_to :feed, counter_cache: true
-  
+
   before_create :mark_as_unread
   before_destroy :mark_as_read
-  
+
   def mark_as_unread
     entries = Entry.select(:id, :published, :created_at).where(feed_id: self.feed_id).where('published > ?', Time.now.ago(2.weeks))
     if entries.length == 0
@@ -16,9 +16,9 @@ class Subscription < ActiveRecord::Base
     end
     UnreadEntry.import(unread_entries, validate: false)
   end
-  
+
   def mark_as_read
     UnreadEntry.delete_all(user_id: self.user_id, feed_id: self.feed_id)
   end
-  
+
 end

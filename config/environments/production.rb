@@ -2,7 +2,7 @@ require 'rack_headers'
 
 Feedbin::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
-     
+
   # Code is not reloaded between requests.
   config.cache_classes = true
 
@@ -23,9 +23,9 @@ Feedbin::Application.configure do
 
   # Compress JavaScripts and CSS
   config.assets.compress = true
-  
+
   config.assets.js_compressor = :uglifier
-  
+
   # Whether to fallback to assets pipeline if a precompiled asset is missed.
   config.assets.compile = false
 
@@ -34,14 +34,14 @@ Feedbin::Application.configure do
 
   # Version of your assets, change this if you want to expire all your assets.
   config.assets.version = '1.0'
-  
+
   # Rack Headers
   # Set HTTP Headers on static assets
   config.assets.header_rules = [
     # Cache all static files in public caches (e.g. Rack::Cache)
     #  as well as in the browser
     [:all,   {'Cache-Control' => 'public, max-age=31536000'}],
-  
+
     # Provide web fonts with cross-origin access-control-headers
     #  Firefox requires this when serving assets using a Content Delivery Network
     [:fonts, {'Access-Control-Allow-Origin' => '*'}]
@@ -57,13 +57,13 @@ Feedbin::Application.configure do
 
   # Less verbose logs
   config.lograge.enabled = true
-  
+
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
-  
+
   # Set to :debug to see everything in the log.
   config.log_level = :info
-  config.logger = Logger.new(STDOUT) 
+  config.logger = Logger.new(STDOUT)
 
   # Recommended by http://help.papertrailapp.com/kb/configuration/unicorn
   config.logger.level = Logger.const_get('INFO')
@@ -95,5 +95,5 @@ Feedbin::Application.configure do
   config.active_support.deprecation = :notify
 
   config.action_mailer.default_url_options = { host: ENV['DEFAULT_URL_OPTIONS_HOST'], protocol: 'https' }
-  
+
 end

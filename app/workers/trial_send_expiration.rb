@@ -8,5 +8,5 @@ class TrialSendExpiration
       UserMailer.trial_expiration(user_id).deliver
     end
   end
-  
+
 end

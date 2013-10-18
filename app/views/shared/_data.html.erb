@@ -12,12 +12,12 @@ content_tag :div, '',
     readability_settings: @readability_settings.to_json,
     show_unread_count:  (@user.show_unread_count == '1'),
     precache_images: (@user.precache_images == '1'),
-    auto_update_path: auto_update_feeds_path, 
+    auto_update_path: auto_update_feeds_path,
     font_sizes: Feedbin::Application.config.font_sizes.to_json,
     mark_as_read_path: mark_all_as_read_entries_path,
     mark_as_read_confirmation: (@user.mark_as_read_confirmation == '1'),
     mark_direction_as_read_entries: mark_direction_as_read_entries_path
   },
-  class: 'hide', 
+  class: 'hide',
   id: 'feedbin-data'
 %>

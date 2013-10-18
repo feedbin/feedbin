@@ -3,7 +3,7 @@
   <div class="modal-target"></div>
   <header class="bar">
 		<a href="/" class="logo"><%= render partial: 'shared/svg/logo' %></a>
-			
+
     <% if signed_in? %>
       <% if ENV['ELASTICSEARCH_URL'] || Rails.env.development? %>
       <div class="header-form-wrap">
@@ -34,13 +34,13 @@
         </div>
       <% end %>
     <% end %>
-    
+
     <% if signed_in? && current_user.plan.stripe_id == 'trial' %>
       <%= link_to settings_billing_path, class: 'subscribe-promo' do %>
         <%= pluralize(@user.days_left, 'day') %> left, subscribe now
       <% end %>
     <% end %>
-    
+
     <div class="account-buttons">
       <% if signed_in? %>
         <%= link_to 'Settings', settings_path %>
@@ -52,7 +52,7 @@
     </div>
 
   </header>
-	
+
   <div class="content">
     <%= content_for?(:app_content) ? yield(:app_content) : yield %>
   </div>

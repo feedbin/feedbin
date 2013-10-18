@@ -16,7 +16,7 @@ August 2013
 - 2013-08-27 Added column resize for FireFox
 - 2013-08-26 Case insensitive login
 - 2013-08-24 Added keyboard shortcut for sharing menu (f to activate ↑ ↓ to navigate)
-- 2013-08-23 Moved feedbin-homepage to gem 
+- 2013-08-23 Moved feedbin-homepage to gem
 - 2013-08-23 Added LICENSE
 - 2013-08-20 Added coupon code support
 - 2013-08-18 Added install instructions
@@ -91,7 +91,7 @@ May 2013
 - 2013-05-22 Added Librato for tracking metrics
 - 2013-05-20 Feed renaming support Initial rename support
 - 2013-05-19 Updated feeds_entries to use unread entries
-- 2013-05-15 Rewrote starred items to use starred_entries 
+- 2013-05-15 Rewrote starred items to use starred_entries
 - 2013-05-15 Rewrote unread tracking to use unread_entries
 - 2013-05-11 Switched to bourbon
 - 2013-05-09 FireFox fix for Favicons

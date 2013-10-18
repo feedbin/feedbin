@@ -1,17 +1,17 @@
 class FeedImporter
   include Sidekiq::Worker
   sidekiq_options queue: :critical, retry: false
-  
+
   def perform(import_item_id)
     import_item = ImportItem.find(import_item_id)
-    
+
     if import_item.item_type == 'starred'
       import_starred(import_item)
     else
       import_feed(import_item)
     end
   end
-  
+
   def import_feed(import_item)
     user = import_item.import.user
     result = FeedFetcher.new(import_item.details[:xml_url], import_item.details[:html_url]).create_feed!
@@ -28,14 +28,14 @@ class FeedImporter
   rescue ActiveRecord::RecordNotFound
     # Ignore not found
   end
-  
+
   def import_starred(import_item)
     item = import_item.details
     user = import_item.import.user
-    
+
     public_id = Digest::SHA1.hexdigest(item[:id])
     entry = Entry.where(public_id: public_id).first
-    
+
     unless entry.present?
       feed_url = item[:origin][:streamId].sub('feed/', '')
       feed = Feed.where(feed_url: feed_url).first_or_create!(
@@ -51,7 +51,7 @@ class FeedImporter
       else
         content = nil
       end
-      
+
       if feed.present?
         entry = Entry.where(feed_id: feed.id, url: url).first_or_create!(
           author:        item[:author],
@@ -65,13 +65,13 @@ class FeedImporter
           skip_mark_as_unread: true
         )
       end
-      
+
     end
-    
+
     if entry.present?
       StarredEntry.create_from_owners(user, entry)
     end
-    
+
   end
-  
+
 end

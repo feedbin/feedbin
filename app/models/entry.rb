@@ -1,6 +1,6 @@
 class Entry < ActiveRecord::Base
   include Tire::Model::Search
-  
+
   attr_accessor :fully_qualified_url, :read, :starred, :skip_mark_as_unread
 
   belongs_to :feed
@@ -13,9 +13,9 @@ class Entry < ActiveRecord::Base
   after_commit :mark_as_unread, on: :create
   after_commit :search_index_store, on: :create
   after_destroy :search_index_remove
-  
+
   validates_uniqueness_of :public_id
-  
+
   tire_settings = {
     analysis: {
       filter: {
@@ -26,19 +26,19 @@ class Entry < ActiveRecord::Base
         url_ngram: {
           "type"     => "nGram",
           "max_gram" => 5,
-          "min_gram" => 3 
+          "min_gram" => 3
         }
       },
       analyzer: {
         url_analyzer: {
           "tokenizer" => "lowercase",
           "filter"    => ["stop", "url_stop", "url_ngram"],
-          "type"      => "custom" 
+          "type"      => "custom"
         }
       }
-    } 
+    }
   }
-  
+
   tire.settings tire_settings do
     tire.mapping do
       indexes :id,        index: :not_analyzed
@@ -51,10 +51,10 @@ class Entry < ActiveRecord::Base
       indexes :updated,   type: 'date', include_in_all: false
     end
   end
-  
+
   def self.search(params, user)
     search_options = {
-      page: params[:page], 
+      page: params[:page],
       per_page: WillPaginate.per_page
     }
     unless params[:load] == false
@@ -80,8 +80,8 @@ class Entry < ActiveRecord::Base
       else
         sort { by :published, "desc" } if params[:query].blank?
       end
-      
-    end      
+
+    end
   end
 
   def entry=(entry)
@@ -132,7 +132,7 @@ class Entry < ActiveRecord::Base
   def self.unstarred_new
     where("starred_entries.entry_id IS NULL")
   end
-  
+
   def self.sort_preference(sort)
     if sort == 'ASC'
       order("published ASC")
@@ -197,11 +197,11 @@ class Entry < ActiveRecord::Base
   def create_summary
     self.summary = ContentFormatter.summary(self.content)
   end
-    
+
   def search_index_store
     SearchIndexStore.perform_async(self.class.name, self.id)
   end
-  
+
   def search_index_remove
     SearchIndexRemove.perform_async(self.class.name, self.id)
   end
