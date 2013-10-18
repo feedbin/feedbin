@@ -538,13 +538,11 @@ $.extend feedbin,
             fontContainer.addClass("font-#{$(@).val()}")
             fontContainer.data('font', $(@).val())
             $(@).parents('form').submit()
-
         else
           top = $('.entry-toolbar').outerHeight()
           $('.entry-settings').removeClass('open')
-        $('.entry-content').animate {
+        $('.entry-content').css
           top: top
-        }, 100
       return
 
     fontSize: ->
