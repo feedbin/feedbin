@@ -3,6 +3,7 @@ class SessionsController < ApplicationController
   skip_before_action :authorize
 
   def new
+    @user = current_user
   end
   
   def create
