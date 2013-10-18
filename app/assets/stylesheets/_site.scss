@@ -1064,6 +1064,10 @@ Structure
 			border-radius: 0;
 			background: image-url("favicon-search.svg") 5px 7px no-repeat;
 			background-size: 16px 16px;
+			&.processing {
+				background-image: image-url("favicon-search.svg"), image-url("favicon-progress.gif");
+				background-position: 5px 7px, 97% 7px;
+			}
 			@media (max-width: 520px) {
 				width: 204px;
 			}
