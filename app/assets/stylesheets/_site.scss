@@ -1049,6 +1049,7 @@ Structure
 }
 
 .header-form-wrap {
+	display: none;
 	position: absolute;
 	left: 8px;
 	top: 8px;
@@ -1067,6 +1068,9 @@ Structure
 				width: 204px;
 			}
 		}
+	}
+	.app & {
+		display: block;
 	}
 }
 
