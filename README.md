@@ -12,12 +12,12 @@ Introduction
 
 Feedbin is a web based RSS reader. It provides a user interface for reading and managing feeds as well as a [REST-like API](https://github.com/feedbin/feedbin-api) for clients to connect to.
 
+If you would like to try Feedbin out you can [sign up](https://feedbin.me/) for an account.
+
 The main Feedbin project is a [Rails 4.0](http://rubyonrails.org/) application. In addition to the main project there are several other services that provide additional functionality. None of these services are required to get Feedbin running locally, but they all provide important functionality that you would want for a production install.
 
  - [**refresher:**](https://github.com/feedbin/refresher)
    Refresher is the service that does feed refreshing. Feed refreshes are scheduled as background jobs using [Sidekiq](https://github.com/mperham/sidekiq). Refresher is kept separate so it can be scaled independently. It's also a benefit to not have to load all of Rails for this service.
- - [**favicon:**](https://github.com/feedbin/favicon)
-   Polyptych is an proxy for fetching favicons. Favicon is a sinatra app that can be run easily on a Heroku machine
  - [**camo:**](https://github.com/atmos/camo)
    Camo is an https image proxy. In production Feedbin is SSL only. One issue with SSL is all assets must be served over SSL as well or the browser will show insecure content warnings. Camo proxies all image requests through an SSL enabled host to prevent this.
 
@@ -46,8 +46,6 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | DATABASE_URL             | Database connection string - postgres://USER:PASS@IP:PORT/DATABASE                 |
 | DEFAULT_URL_OPTIONS_HOST | Mailer host - feedbin.me                                                           |
 | ELASTICSEARCH_URL        | search endpoint - http://localhost:9200                                            |
-| FAVICON_KEY              | Encryption key for favicon requests                                                |
-| FAVICON_URL              | Website of favicon service                                                         |
 | FEEDBIN_HOMEPAGE_REPO    | Git URL to a Rails engine that provides a custom homepage                          |
 | FROM_ADDRESS             | Used as a reply-to email address                                                   |
 | GAUGES_SITE_ID           | [gaug.es](http://gaug.es) analytics identifier                                     |
