@@ -728,7 +728,11 @@ input::-moz-focus-inner {
 	border: 0;
 }
 
-input {
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"] {
 	-webkit-appearance: none;
 }
 
