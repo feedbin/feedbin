@@ -21,6 +21,8 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     @user.update_auth_token = true
+    @user.mark_as_read_confirmation = 1
+    @user.hide_tagged_feeds = 1
 
     coupon_valid = false
     if user_params['coupon_code']
