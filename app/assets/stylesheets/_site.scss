@@ -1981,7 +1981,7 @@ li.selected > a .favicon-wrap {
 		width: 128px;
 		padding: 5px;
 		font-size: 13px;
-		line-height: 1;
+		line-height: 1.1;
 		border: 1px solid #CCC;
 		border-radius: 0;
 		height: 28px;
@@ -2237,6 +2237,7 @@ li.selected > a .favicon-wrap {
 		margin: 0 0 .2em 0;
 		padding: 0;
 		font-weight: normal;
+		text-rendering: optimizeLegibility;
 	}
 	.post-meta {
 		font-size: 1em;
@@ -2266,6 +2267,7 @@ li.selected > a .favicon-wrap {
 		font-weight: 700;
 		font-style: normal;
 		margin: 0 0 .5em 0;
+		text-rendering: optimizeLegibility;
 	}
 
 	h1, h2 {
@@ -2374,6 +2376,36 @@ li.selected > a .favicon-wrap {
 	}
 }
 
+.font-serif-2 {
+	font-family: "Mercury SSm A", "Mercury SSm B", $font-stack;
+	font-weight: 400;
+	font-style: normal;
+	strong {
+		font-weight: 700;
+	}
+	em {
+		font-style: italic;
+	}
+	.post-meta, .entry-feed-title {
+		font-family: $font-stack;
+	}
+}
+
+.font-serif-3 {
+	font-family: Georgia, $font-stack;
+	font-weight: 400;
+	font-style: normal;
+	strong {
+		font-weight: 700;
+	}
+	em {
+		font-style: italic;
+	}
+	.post-meta, .entry-feed-title {
+		font-family: $font-stack;
+	}
+}
+
 .font-sans-serif-1 {
 	font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
 	font-weight: 400;
@@ -2389,6 +2421,21 @@ li.selected > a .favicon-wrap {
 	}
 	.entry-header h1 {
 		font-weight: 700;
+	}
+}
+
+.font-sans-serif-2 {
+	font-family: "Ideal Sans A", "Ideal Sans B", $font-stack;
+	font-weight: 300;
+	font-style: normal;
+	strong {
+		font-weight: 600;
+	}
+	em {
+		font-style: italic;
+	}
+	.post-meta, .entry-feed-title {
+		font-family: $font-stack;
 	}
 }
 
