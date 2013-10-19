@@ -2253,6 +2253,7 @@ li.selected > a .favicon-wrap {
 	font-size: 1.15em;
 	line-height: 1.6;
 	color: #000;
+	text-rendering: optimizeLegibility;
 
 	strong {
 		font-weight: 700;
