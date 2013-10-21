@@ -32,13 +32,6 @@ GIT
       sax-machine (~> 0.2.0.rc1)
 
 GIT
-  remote: git://github.com/feedbin/multi_fetch_fragments.git
-  revision: e99b6f7d82d1cca35969d999c60985fcaa583b9b
-  ref: e99b6f7
-  specs:
-    multi_fetch_fragments (0.0.16)
-
-GIT
   remote: git://github.com/feedbin/opml_saw.git
   revision: 61d8c2dd3d46e9cae38178754469dd9da7c8bd6a
   ref: 61d8c2d
@@ -267,9 +260,6 @@ GEM
       rack (~> 1.4)
       rack-protection (~> 1.4)
       tilt (~> 1.3, >= 1.3.4)
-    slim (2.0.1)
-      temple (~> 0.6.6)
-      tilt (>= 1.3.3, < 2.1)
     sprockets (2.10.0)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -285,7 +275,6 @@ GEM
     stripe_event (0.6.1)
       rails (>= 3.1)
       stripe (~> 1.6)
-    temple (0.6.6)
     therubyracer (0.12.0)
       libv8 (~> 3.16.14.0)
       ref
@@ -343,7 +332,6 @@ DEPENDENCIES
   librato-rails (= 0.9.0)
   lograge
   longurl
-  multi_fetch_fragments!
   nokogiri (= 1.5.10)
   opml_saw!
   pg
@@ -357,7 +345,6 @@ DEPENDENCIES
   sass-rails (~> 4.0.0)
   sidekiq
   sinatra
-  slim
   stripe
   stripe_event
   therubyracer

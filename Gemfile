@@ -22,7 +22,6 @@ gem 'opml_saw',              github: 'feedbin/opml_saw',              ref: '61d8
 gem 'feedzirra',             github: 'feedbin/feedzirra',             ref: 'c9a2188'
 gem 'html-pipeline',         github: 'benubois/html-pipeline',        ref: '652162b'
 gem 'activerecord-import',   github: 'feedbin/activerecord-import',   ref: 'b7851b1'
-gem 'multi_fetch_fragments', github: 'feedbin/multi_fetch_fragments', ref: 'e99b6f7'
 gem 'redis',                 github: 'redis/redis-rb',                ref: '77c2a99'
 
 gem 'sass-rails', '~>4.0.0'
@@ -55,7 +54,6 @@ gem 'tire'
 
 # Sidekiq
 gem 'sidekiq'
-gem 'slim'
 gem 'sinatra', require: nil
 
 # Stripe
