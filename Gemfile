@@ -6,6 +6,7 @@ gem 'rails', '~>4.0.0'
 group :development do
   gem 'better_errors'
   gem 'quiet_assets'
+  gem 'capistrano', '~> 2.15.5'
   gem 'capistrano-unicorn', github: 'sosedoff/capistrano-unicorn', ref: '52376ad', require: false
 end
 
@@ -21,14 +22,14 @@ gem 'nokogiri', '1.5.10'
 gem 'opml_saw',              github: 'feedbin/opml_saw',              ref: '61d8c2d'
 gem 'feedzirra',             github: 'feedbin/feedzirra',             ref: 'c9a2188'
 gem 'html-pipeline',         github: 'benubois/html-pipeline',        ref: '652162b'
-gem 'activerecord-import',   github: 'feedbin/activerecord-import',   ref: 'b7851b1'
-gem 'redis',                 github: 'redis/redis-rb',                ref: '77c2a99'
 
 gem 'sass-rails', '~>4.0.0'
 gem 'coffee-rails', '~>4.0.0'
 gem 'uglifier', '>= 1.0.3'
 gem 'autoprefixer-rails', '~> 0.7'
 
+gem 'activerecord-import', '>= 0.4.1'
+gem 'redis', '>= 3.0.5'
 gem 'jquery-rails'
 gem 'postmark-rails'
 gem 'dalli'
