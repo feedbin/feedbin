@@ -14,9 +14,8 @@
             <td width="15"><%= check_box_tag "subscription_ids[]", subscription.id %></td>
             <td>
               <%= f.text_field :title %>
-              <br /><small title="Original title"><%= subscription.original_title %></small>
+              <br /><small title="Original title"><%= link_to subscription.original_title, subscription.site_url %></small>
               <small class="highlight break-word" title="Feed URL"><%= subscription.feed_url %></small>
-              <small class="highlight break-word" title="Site URL"><%= subscription.site_url %></small>
             </td>
           </tr>
         <% end %>
