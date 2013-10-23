@@ -39,11 +39,13 @@ class UsersController < ApplicationController
     end
 
     if @user.save
-      deactivate_subscriptions = Feedbin::Application.config.trial_days + 6
-      send_notice = Feedbin::Application.config.trial_days - 1
-      TrialDeactivateSubscriptions.perform_in(deactivate_subscriptions.days, @user.id)
-      TrialSendExpiration.perform_in(send_notice.days, @user.id)
-      TrialEnd.perform_in(Feedbin::Application.config.trial_days.days, @user.id)
+      unless @user.plan.stripe_id == 'free'
+        deactivate_subscriptions = Feedbin::Application.config.trial_days + 6
+        send_notice = Feedbin::Application.config.trial_days - 1
+        TrialDeactivateSubscriptions.perform_in(deactivate_subscriptions.days, @user.id)
+        TrialSendExpiration.perform_in(send_notice.days, @user.id)
+        TrialEnd.perform_in(Feedbin::Application.config.trial_days.days, @user.id)
+      end
       sign_in @user
       redirect_to root_url
     else
