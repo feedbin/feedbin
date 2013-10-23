@@ -25,6 +25,22 @@ Feedbin::Application.routes.draw do
   get    :privacy_policy, to: 'site#privacy_policy', as: 'privacy_policy'
   delete :logout,         to: 'sessions#destroy',    as: 'logout'
 
+  # Apple Push
+
+  # When a user allows permission to receive push notifications
+  post 'apple_push_notifications/:version/pushPackages/:website_push_id', as: :apple_push_notifications_package, to: 'apple_push_notifications#create', website_push_id: /.*/
+
+  # POST When users first grant permission, or later change their permission
+  # levels for your website
+  post 'apple_push_notifications/:version/devices/:device_token/registrations/:website_push_id', as: :apple_push_notifications_update, to: 'apple_push_notifications#update', website_push_id: /.*/
+
+  # DELETE If a user removes permission of a website in Safari preferences, a
+  # DELETE request is sent
+  delete 'apple_push_notifications/:version/devices/:device_token/registrations/:website_push_id', as: :apple_push_notifications_delete, to: 'apple_push_notifications#delete', website_push_id: /.*/
+
+  # Error log
+  post 'apple_push_notifications/:version/log', as: :apple_push_notifications_log, to: 'apple_push_notifications#log'
+
   resources :tags,           only: [:index, :show, :update, :destroy]
   resources :billing_events, only: [:show]
   resources :imports
