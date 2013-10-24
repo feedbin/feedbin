@@ -5,12 +5,7 @@ class ApplePushNotificationsController < ApplicationController
   before_action :find_user, only: [:update, :delete]
 
   def create
-
     user_info = JSON.parse(request.body.read)
-    logger.info { "-----------------------------------" }
-    logger.info { user_info['authentication_token'].inspect }
-    logger.info { "-----------------------------------" }
-
     user_id = verify_push_token(user_info['authentication_token'])
     @user = User.find(user_id)
 

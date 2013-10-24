@@ -214,3 +214,10 @@ class Entry < ActiveRecord::Base
   end
 
 end
+
+
+# push_notification_user_ids = []
+# subscriptions = Subscription.where(feed_id: 1, active: true).pluck(:user_id, :push)
+# subscriptions.each { |user_id, push| push_notification_user_ids.push(user_id) if push }
+# push_notification_user_ids.any?
+# PushNotificationSend.perform_async(1, push_notification_user_ids)
