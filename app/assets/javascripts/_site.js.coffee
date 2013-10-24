@@ -706,15 +706,16 @@ $.extend feedbin,
 
     showPushOptions: ->
       if "safari" of window and "pushNotification" of window.safari
-        $('.push-options').removeClass('hide')
-        websiteId = $('#push-data').data('website-id')
-        permissionData = window.safari.pushNotification.permission(websiteId)
-        if (permissionData.permission == 'default')
-          $('.push-enable').removeClass('hide')
-        else if (permissionData.permission == 'granted')
-          $('.push-disable').removeClass('hide')
-        else if (permissionData.permission == 'denied')
-          $('.push-disabled').removeClass('hide')
+        if $('#push-data').length > 0
+          $('.push-options').removeClass('hide')
+          websiteId = $('#push-data').data('website-id')
+          permissionData = window.safari.pushNotification.permission(websiteId)
+          if (permissionData.permission == 'default')
+            $('.push-enable').removeClass('hide')
+          else if (permissionData.permission == 'granted')
+            $('.push-disable').removeClass('hide')
+          else if (permissionData.permission == 'denied')
+            $('.push-disabled').removeClass('hide')
 
     enablePush: ->
       $(document).on 'click', '[data-behavior~=enable_push]', ->
