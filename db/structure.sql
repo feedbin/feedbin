@@ -410,7 +410,8 @@ CREATE TABLE subscriptions (
     updated_at timestamp without time zone NOT NULL,
     title text,
     view_inline boolean DEFAULT false,
-    active boolean DEFAULT true
+    active boolean DEFAULT true,
+    push boolean DEFAULT false
 );
 
 
@@ -1219,3 +1220,5 @@ INSERT INTO schema_migrations (version) VALUES ('20130826053351');
 INSERT INTO schema_migrations (version) VALUES ('20131011204115');
 
 INSERT INTO schema_migrations (version) VALUES ('20131017013531');
+
+INSERT INTO schema_migrations (version) VALUES ('20131024055750');
