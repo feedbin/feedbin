@@ -27,7 +27,7 @@ class PushNotificationSend
               alert: {
                 title: title,
                 body: feed_title,
-                action: "read"
+                action: "Read"
               },
               :"url-args" => [entry.id.to_s, CGI::escape(verifier.generate(user.id))]
             }
@@ -43,6 +43,7 @@ class PushNotificationSend
       notifications.each do |notification|
         results = pusher.push(notification)
       end
+      Librato.increment 'push_notifications_sent', by: notifications.length
     end
 
   end
