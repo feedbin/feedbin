@@ -1,5 +1,8 @@
 class EntriesController < ApplicationController
 
+  skip_before_action :verify_authenticity_token, only: [:push_view]
+  skip_before_action :authorize, only: [:push_view]
+
   def index
     @user = current_user
     update_selected_feed!("collection_all")
@@ -260,6 +263,14 @@ class EntriesController < ApplicationController
     respond_to do |format|
       format.js { render partial: 'shared/entries' }
     end
+  end
+
+  def push_view
+    user_id = verify_push_token(params[:user])
+    @user = User.find(user_id)
+    @entry = Entry.find(params[:id])
+    UnreadEntry.where(user: @user, entry: @entry).delete_all
+    redirect_to @entry.fully_qualified_url, status: :found
   end
 
   private

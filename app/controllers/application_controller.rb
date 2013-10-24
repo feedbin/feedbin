@@ -163,4 +163,10 @@ class ApplicationController < ActionController::Base
     Honeybadger.context(user_id: current_user.id) if current_user
   end
 
+  def verify_push_token(authentication_token)
+    authentication_token = CGI::unescape(authentication_token)
+    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
+    verifier.verify(authentication_token)
+  end
+
 end
