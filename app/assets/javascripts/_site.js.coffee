@@ -108,7 +108,10 @@ $.extend feedbin,
       delimiter: /(,)\s*/
 
   autoHeight: ->
-    $('.collection-edit-wrapper').height($(window).height() - 210)
+    if "safari" of window and "pushNotification" of window.safari
+      $('.collection-edit-wrapper').height($(window).height() - 410)
+    else
+      $('.collection-edit-wrapper').height($(window).height() - 210)
 
   entries: {}
 
