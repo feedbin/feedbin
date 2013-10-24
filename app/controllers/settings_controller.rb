@@ -32,6 +32,10 @@ class SettingsController < ApplicationController
       subscription
     }
     @subscriptions = @subscriptions.sort_by {|subscription| subscription.title.downcase}
+
+    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
+    @authentication_token = CGI::escape(verifier.generate(@user.id))
+    @web_service_url = "#{ENV['PUSH_URL']}/apple_push_notifications"
   end
 
   def billing
@@ -106,7 +110,11 @@ class SettingsController < ApplicationController
     @user.attributes = user_settings_params
     @user.free_ok = (@user.plan.stripe_id == 'free')
     if @user.save
-      redirect_to settings_path, notice: 'Settings updated.'
+      if params[:redirect_to]
+        redirect_to params[:redirect_to], notice: 'Settings updated.'
+      else
+        redirect_to settings_path, notice: 'Settings updated.'
+      end
     else
       redirect_to settings_path, alert: @user.errors.full_messages.join('. ') + '.'
     end
@@ -184,7 +192,7 @@ class SettingsController < ApplicationController
   end
 
   def user_settings_params
-    params.require(:user).permit(:entry_sort, :starred_feed_enabled, :hide_tagged_feeds, :precache_images, :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation)
+    params.require(:user).permit(:entry_sort, :starred_feed_enabled, :hide_tagged_feeds, :precache_images, :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation, :apple_push_notification_device_token)
   end
 
 end

@@ -1,5 +1,28 @@
 <h2>Feeds</h2>
 
+<div class="push-options hide" id="push-data" data-website-id="<%= ENV['APPLE_PUSH_WEBSITE_ID'] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>">
+  <h3>Push Notifications</h3>
+
+  <div class="push-enable hide">
+    <p>New articles can be pushed to your Mac on a feed-by-feed basis.</p>
+    <button class="button button-primary" data-behavior="enable_push">Enable Push Notifications</button>
+  </div>
+
+  <div class="push-disable hide">
+    <p>Push notifications are <span class="highlight-positive">enabled</span>. Choose the feeds you would like to receive push notifications for below.</p>
+    <p>You can disable notifications in Safari preferences under Notifications.</p>
+  </div>
+
+  <div class="push-disabled hide">
+    <p>Push notifications are <span class="highlight-negative">disabled</span>.</p>
+    <p>You can enable them in Safari preferences under Notifications.</p>
+  </div>
+
+
+  <h3>Feed Settings</h3>
+</div>
+
+
 <div class="clearfix">
   <div class="half">
     <small>Select: <a href="#" data-behavior="check_all">All</a> / <a href="#" data-behavior="check_none">None</a></small>
@@ -12,10 +35,27 @@
         <%= fields_for "subscriptions[]", subscription do |f| %>
           <tr>
             <td width="15"><%= check_box_tag "subscription_ids[]", subscription.id %></td>
-            <td>
+            <td width="100">
               <%= f.text_field :title %>
-              <br /><small title="Original title"><%= link_to subscription.site_url, subscription.site_url, target: '_blank' %></small>
-              <small class="highlight break-word" title="Feed URL"><%= link_to subscription.feed_url, subscription.feed_url, target: '_blank' %></small>
+            </td>
+            <td>
+              <div class="push-options push-feed-settings hide">
+                Push Notifications
+                <hr class="nospace">
+                <label class="radio">
+                  <%= f.radio_button :push, true %> On
+                </label>
+                <label class="radio">
+                  <%= f.radio_button :push, false %> Off
+                </label>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td colspan="2">
+              <small title="Original title"><%= link_to subscription.site_url, subscription.site_url, target: '_blank' %></small>
+              <br /><small class="highlight break-word" title="Feed URL"><%= link_to subscription.feed_url, subscription.feed_url, target: '_blank' %></small>
             </td>
           </tr>
         <% end %>

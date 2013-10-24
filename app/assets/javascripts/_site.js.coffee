@@ -191,6 +191,14 @@ $.extend feedbin,
     $("[data-behavior~=#{selectOption}]").addClass('selected')
     $("[data-behavior~=show_form_options]").text($("[data-select-option=#{selectOption}]").text())
 
+  checkPushPermission: (permissionData) ->
+    if (permissionData.permission == 'granted')
+      $('.push-enable, .push-disabled').addClass('hide')
+      $('.push-disable').removeClass('hide')
+    else if (permissionData.permission == 'denied')
+      $('.push-enable, .push-disable').addClass('hide')
+      $('.push-disabled').removeClass('hide')
+
   hideQueue: []
 
   feedCandidates: []
@@ -692,6 +700,23 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=feed_link]', ->
         $('#query').val('')
         $('[data-behavior~=save_search_link]').attr('disabled', 'disabled');
+
+    showPushOptions: ->
+      if "safari" of window and "pushNotification" of window.safari
+        $('.push-options').removeClass('hide')
+        websiteId = $('#push-data').data('website-id')
+        permissionData = window.safari.pushNotification.permission(websiteId)
+        if (permissionData.permission == 'default')
+          $('.push-enable').removeClass('hide')
+        else if (permissionData.permission == 'granted')
+          $('.push-disable').removeClass('hide')
+        else if (permissionData.permission == 'denied')
+          $('.push-disabled').removeClass('hide')
+
+    enablePush: ->
+      $(document).on 'click', '[data-behavior~=enable_push]', ->
+        data = $('#push-data').data()
+        window.safari.pushNotification.requestPermission(data.webServiceUrl, data.websiteId, {authentication_token: data.authenticationToken}, feedbin.checkPushPermission)
 
 jQuery ->
   $.each feedbin.init, (i, item) ->
