@@ -2687,9 +2687,22 @@ table.small td {
 		width: 140px;
 	}
 }
+
 .feed-form {
 	td {
 		line-height: 1.2;
+		border-color: transparent !important;
+	}
+	tr:nth-child(odd) {
+		td {
+			border-color: #ccc !important;
+			padding-bottom: 0;
+		}
+	}
+	tr:nth-child(even) {
+		td {
+			padding-top: 0;
+		}
 	}
 	.highlight {
 		color: #6AB042;
@@ -2699,6 +2712,17 @@ table.small td {
 	}
 }
 
+.push-feed-settings {
+	font-size: 14px;
+	line-height: 1.5;
+	.radio {
+		float: left;
+		margin-right: 15px;
+		input {
+			margin-top: 2px;
+		}
+	}
+}
 .highlight-positive {
 	color: #6AB042;
 	font-weight: bold;

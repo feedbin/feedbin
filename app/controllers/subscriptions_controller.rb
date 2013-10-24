@@ -107,7 +107,7 @@ class SubscriptionsController < ApplicationController
         params[:subscriptions].delete(index)
       end
     end
-    params[:subscriptions].map {|index, fields| params[:subscriptions][index] = fields.slice(:title) }
+    params[:subscriptions].map {|index, fields| params[:subscriptions][index] = fields.slice(:title, :push) }
     params.require(:subscriptions).permit!
   end
 

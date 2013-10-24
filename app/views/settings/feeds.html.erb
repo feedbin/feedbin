@@ -35,10 +35,27 @@
         <%= fields_for "subscriptions[]", subscription do |f| %>
           <tr>
             <td width="15"><%= check_box_tag "subscription_ids[]", subscription.id %></td>
-            <td>
+            <td width="100">
               <%= f.text_field :title %>
-              <br /><small title="Original title"><%= link_to subscription.site_url, subscription.site_url, target: '_blank' %></small>
-              <small class="highlight break-word" title="Feed URL"><%= link_to subscription.feed_url, subscription.feed_url, target: '_blank' %></small>
+            </td>
+            <td>
+              <div class="push-options push-feed-settings hide">
+                Push Notifications
+                <hr class="nospace">
+                <label class="radio">
+                  <%= f.radio_button :push, true %> On
+                </label>
+                <label class="radio">
+                  <%= f.radio_button :push, false %> Off
+                </label>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+            <td colspan="2">
+              <small title="Original title"><%= link_to subscription.site_url, subscription.site_url, target: '_blank' %></small>
+              <br /><small class="highlight break-word" title="Feed URL"><%= link_to subscription.feed_url, subscription.feed_url, target: '_blank' %></small>
             </td>
           </tr>
         <% end %>
