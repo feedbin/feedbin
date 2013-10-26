@@ -14,8 +14,8 @@ GIT
 
 GIT
   remote: git://github.com/feedbin/feedzirra.git
-  revision: c9a21883e3069e986d0e1d2401fcd63f2d9995d5
-  ref: c9a2188
+  revision: bb5376c2b3c77061b0d75546fc231115676d0b03
+  ref: bb5376c
   specs:
     feedzirra (0.2.0.rc2)
       curb (~> 0.8.1)
@@ -117,7 +117,7 @@ GEM
       execjs
     coffee-script-source (1.6.3)
     connection_pool (1.1.0)
-    curb (0.8.4)
+    curb (0.8.5)
     dalli (2.6.4)
     dotenv (0.9.0)
     erubis (2.7.0)
@@ -179,6 +179,9 @@ GEM
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
+    mediaelement_rails (0.5.1)
+      jquery-rails (>= 1.0)
+      railties (>= 3.1)
     mime-types (1.25)
     minitest (4.7.5)
     multi_json (1.7.9)
@@ -333,6 +336,7 @@ DEPENDENCIES
   librato-rails (= 0.9.0)
   lograge
   longurl
+  mediaelement_rails
   nokogiri (= 1.5.10)
   opml_saw!
   pg

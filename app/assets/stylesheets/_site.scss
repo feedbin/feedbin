@@ -2360,6 +2360,22 @@ li.selected > a .favicon-wrap {
 	a[title*='Permanent'] {
 		text-decoration: none;
 	}
+
+	.media-container {
+		margin: 0 0 1.1em 0;
+	}
+
+	.download-link {
+		font-size: 12px;
+		font-family: $font-stack;
+	}
+
+	video, audio {
+		display: block;
+		width: auto\9;
+		height: auto;
+		max-width: 100%;
+	}
 }
 
 .font-serif-1 {

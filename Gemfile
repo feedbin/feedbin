@@ -20,7 +20,7 @@ gem 'unicorn'
 gem 'nokogiri', '1.5.10'
 
 gem 'opml_saw',              github: 'feedbin/opml_saw',            ref: '61d8c2d'
-gem 'feedzirra',             github: 'feedbin/feedzirra',           ref: 'c9a2188'
+gem 'feedzirra',             github: 'feedbin/feedzirra',           ref: 'bb5376c'
 gem 'html-pipeline',         github: 'benubois/html-pipeline',      ref: '652162b'
 gem 'grocer-pushpackager',   github: 'feedbin/grocer-pushpackager', ref: 'e190796', require: 'grocer/pushpackager'
 
@@ -54,6 +54,7 @@ gem 'readability_parser'
 gem 'lograge'
 gem 'tire'
 gem 'grocer'
+gem 'mediaelement_rails'
 
 # Sidekiq
 gem 'sidekiq'
