@@ -23,12 +23,6 @@
         <p class="post-meta"><time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time></p>
       </header>
       <div data-behavior="entry_content_wrap" class="content-styles">
-        <% if entry.data %>
-          <div class="media-container">
-            <%= entry_presenter.media.html_safe %>
-          </div>
-          <script>$('video, audio').mediaelementplayer();</script>
-        <% end %>
         <%= raw entry_presenter.content %>
       </div>
     </div>
