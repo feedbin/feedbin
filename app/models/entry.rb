@@ -96,6 +96,10 @@ class Entry < ActiveRecord::Base
 
     self.public_id     = entry._public_id_
     self.old_public_id = entry._old_public_id_
+
+    if entry.try(:_data_)
+      self.data = entry._data_
+    end
   end
 
   def self.entries_with_feed(entry_ids, sort)

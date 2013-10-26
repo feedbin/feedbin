@@ -151,6 +151,14 @@ class FeedFetcher
         entry.entry_id        = entry.entry_id ? entry.entry_id.strip : nil
         entry._public_id_     = build_public_id(entry, feedzirra, saved_feed_url)
         entry._old_public_id_ = build_public_id(entry, feedzirra)
+        if entry.try(:enclosure_type) && entry.try(:enclosure_url)
+          data = {}
+          data[:enclosure_type] = entry.enclosure_type ? entry.enclosure_type : nil
+          data[:enclosure_url] = entry.enclosure_url ? entry.enclosure_url : nil
+          data[:enclosure_length] = entry.enclosure_length ? entry.enclosure_length : nil
+          data[:itunes_duration] = entry.itunes_duration ? entry.itunes_duration : nil
+          entry._data_ = data
+        end
       end
       if feedzirra.entries.any?
         feedzirra.entries = feedzirra.entries.uniq { |entry| entry._public_id_ }

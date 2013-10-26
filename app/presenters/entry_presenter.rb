@@ -62,4 +62,22 @@ class EntryPresenter < BasePresenter
     @template.strip_tags(entry.author)
   end
 
+  def media
+    output = ''
+    begin
+      size = Integer(entry.data['enclosure_length'])
+      size = @template.number_to_human_size(size)
+      size = "(#{size})"
+    rescue Exception
+      size = ''
+    end
+    if entry.data['enclosure_type'] == 'video/mp4'
+      output += @template.video_tag entry.data['enclosure_url']
+    elsif entry.data['enclosure_type'] == 'audio/mpeg'
+      output += @template.audio_tag entry.data['enclosure_url']
+    end
+    output += @template.link_to "Download #{size}", entry.data['enclosure_url'], class: 'download-link'
+    output
+  end
+
 end
