@@ -1132,7 +1132,7 @@ Structure
 	z-index: 100;
 	overflow: hidden;
 	height: 0;
-	transition: height .3s ease;
+	transition: height .2s ease;
 	&.show {
 		height: 48px;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -1464,7 +1464,7 @@ Structure
 	overflow-x: hidden;
 	-webkit-overflow-scrolling: touch;
 	top: 37px;
-	transition: top .3s ease;
+	transition: top .2s ease;
 	&.show-subscribe {
 		top: 86px;
 	}
@@ -1743,7 +1743,7 @@ li.selected > a .favicon-wrap {
 				padding: 8px 10px 8px 31px;
 				color: #000;
 				left: 0;
-				transition:left .3s ease;
+				transition:left .2s ease;
 				&:hover {
 					text-decoration: none;
 				}
@@ -2061,7 +2061,7 @@ li.selected > a .favicon-wrap {
 	overflow-y: auto;
 	overflow-x: hidden;
 	-webkit-overflow-scrolling: touch;
-	transition: top .3s ease;
+	transition: top .2s ease;
 }
 
 .entry-inner {
@@ -2530,7 +2530,7 @@ li.selected > a .favicon-wrap {
 		font-size: 12px;
 		padding: 0 10px;
 		margin: 0 auto;
-		transition:top .3s ease;
+		transition:top .2s ease;
 		top: -32px;
 		&.show {
 			top: 0;
@@ -3002,7 +3002,7 @@ Buttons
 
 .modal.fade {
 	top: -25%;
-	transition: opacity 0.3s linear, top 0.3s ease-out;
+	transition: opacity 0.2s linear, top 0.2s ease-out;
 }
 
 .modal.fade.in {

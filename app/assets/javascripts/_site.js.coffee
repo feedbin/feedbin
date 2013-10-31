@@ -310,8 +310,9 @@ $.extend feedbin,
         wrap = target.find('.tags-form-wrap')
         unless $(@).attr('disabled') == 'disabled'
           if '0px' == wrap.css('height')
-            wrap.animate
+            wrap.animate {
               height: '138px'
+            }, 200
             field = wrap.find('.feed_tag_list')
             field.focus()
             value = field.val()
@@ -450,7 +451,7 @@ $.extend feedbin,
 
         drawer.animate {
           height: height
-        }, 300, ->
+        }, 200, ->
           if height > 0
             drawer.css
               height: 'auto'
