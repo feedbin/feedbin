@@ -1388,20 +1388,20 @@ Structure
 		position: relative;
 		&:before {
 			background-color: $selected;
-			height: 16px;
+			height: 14px;
 			width: 2px;
 			position: absolute;
 			left: 17px;
-			top: 10px;
+			top: 12px;
 			content: "";
 		}
 		&:after {
 			background-color: $selected;
 			height: 2px;
-			width: 16px;
+			width: 14px;
 			position: absolute;
-			top: 17px;
-			left: 10px;
+			top: 18px;
+			left: 11px;
 			content: "";
 		}
 	}
