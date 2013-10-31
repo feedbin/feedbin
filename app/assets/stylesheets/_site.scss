@@ -1359,14 +1359,13 @@ Structure
 	.view-button {
 		color: #999999;
 		text-decoration: none;
-		margin: 12px 8px 0 0;
+		margin: 13px 8px 0 0;
 		line-height: 1;
 		padding-left: 10px;
 		border-left: 1px solid #999;
-		font-weight: bold;
 		display: block;
 		float: right;
-		font-size: 14px;
+		font-size: 13px;
 		user-select: none;
 		&.selected {
 			color: #000;
@@ -1382,13 +1381,29 @@ Structure
 		line-height: 1;
 		line-height: 39px;
 		height: 36px;
-		font-size: 12px;
-		font-weight: bold;
+		font-size: 13px;
 		float: left;
-		padding: 0 0 0 8px;
+		padding: 0 0 0 35px;
 		cursor: pointer;
-		text-transform: uppercase;
 		position: relative;
+		&:before {
+			background-color: $selected;
+			height: 16px;
+			width: 2px;
+			position: absolute;
+			left: 17px;
+			top: 10px;
+			content: "";
+		}
+		&:after {
+			background-color: $selected;
+			height: 2px;
+			width: 16px;
+			position: absolute;
+			top: 17px;
+			left: 10px;
+			content: "";
+		}
 	}
 }
 
