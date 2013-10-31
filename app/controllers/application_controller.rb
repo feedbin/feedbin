@@ -125,17 +125,23 @@ class ApplicationController < ActionController::Base
     unread_regex = /(?<=\s|^)is:\s*unread(?=\s|$)/
     read_regex = /(?<=\s|^)is:\s*read(?=\s|$)/
     starred_regex = /(?<=\s|^)is:\s*starred(?=\s|$)/
+    unstarred_regex = /(?<=\s|^)is:\s*unstarred(?=\s|$)/
     sort_regex = /(?<=\s|^)sort:\s*(asc|desc)(?=\s|$)/i
 
     if search_params[:query] =~ unread_regex
       search_params[:query] = search_params[:query].gsub(unread_regex, '')
-      search_params[:unread] = true
+      search_params[:read] = false
     elsif search_params[:query] =~ read_regex
       search_params[:query] = search_params[:query].gsub(read_regex, '')
       search_params[:read] = true
-    elsif search_params[:query] =~ starred_regex
+    end
+
+    if search_params[:query] =~ starred_regex
       search_params[:query] = search_params[:query].gsub(starred_regex, '')
       search_params[:starred] = true
+    elsif search_params[:query] =~ unstarred_regex
+      search_params[:query] = search_params[:query].gsub(unstarred_regex, '')
+      search_params[:starred] = false
     end
 
     if search_params[:query] =~ sort_regex

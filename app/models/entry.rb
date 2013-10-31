@@ -60,28 +60,40 @@ class Entry < ActiveRecord::Base
     unless params[:load] == false
       search_options[:load] = { include: :feed }
     end
+
     tire.search(search_options) do
       fields ['id']
       query { string params[:query] } if params[:query].present?
-      if params[:unread] == true
-        filter :ids, values: user.unread_entries.pluck(:entry_id)
+      ids = []
+
+      if params[:read] == false
+        ids << user.unread_entries.pluck(:entry_id)
       elsif params[:read] == true
         filter :not, { ids: { values: user.unread_entries.pluck(:entry_id) } }
-        filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
-                    { ids: { values: user.starred_entries.pluck(:entry_id) } }
-      elsif params[:starred] == true
-        filter :ids, values: user.starred_entries.pluck(:entry_id)
-      else
-        filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
-                    { ids: { values: user.starred_entries.pluck(:entry_id) } }
       end
+
+      if params[:starred] == true
+        ids << user.starred_entries.pluck(:entry_id)
+      elsif params[:starred] == false
+        filter :not, { ids: { values: user.starred_entries.pluck(:entry_id) } }
+      end
+
       if params[:sort]
         sort { by :published, params[:sort] }
       else
         sort { by :published, "desc" } if params[:query].blank?
       end
 
+      if ids.any?
+        ids = ids.inject(:&) # intersect
+        filter :ids, values: ids
+      end
+
+      # Always limit searches to subscriptions and starred items
+      filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
+                  { ids: { values: user.starred_entries.pluck(:entry_id) } }
     end
+
   end
 
   def entry=(entry)
