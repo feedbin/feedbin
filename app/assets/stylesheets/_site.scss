@@ -2719,6 +2719,73 @@ table.small td {
 	}
 }
 
+.actions-table {
+	td {
+		line-height: 1.2;
+		border-color: transparent !important;
+	}
+	td.action {
+		width: 60px;
+	}
+	tr:nth-child(odd) {
+		td {
+			border-color: #ccc !important;
+		}
+	}
+	tr:nth-child(even) {
+		td {
+			padding-top: 0;
+		}
+	}
+	[type="search"] {
+		width: 100%;
+		background: image-url("favicon-search.svg") 5px 14px no-repeat;
+		padding-left: 25px;
+
+	}
+	.checkbox {
+		font-size: 13px;
+		float: left;
+		margin-right: 15px;
+		padding-left: 16px;
+		input {
+			margin-top: 2px;
+			margin-left: -16px;
+		}
+	}
+	select {
+		font-size: 13px;
+		width: 150px;
+		overflow: hidden;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		option {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+	.feed-ids {
+		width: 150px;
+		overflow-x: hidden;
+		overflow-y: auto;
+		height: 78px;
+		.checkbox {
+			float: none;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			width: 100%;
+			display: block;
+			line-height: 1;
+			input {
+				margin-top: 0;
+			}
+		}
+	}
+}
+
 .feed-form {
 	td {
 		line-height: 1.2;

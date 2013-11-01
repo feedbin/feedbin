@@ -21,11 +21,14 @@ class User < ActiveRecord::Base
   has_many :unread_entries, dependent: :delete_all
   has_many :starred_entries, dependent: :delete_all
   has_many :saved_searches, dependent: :delete_all
+  has_many :actions, dependent: :delete_all
   belongs_to :plan
 
   accepts_nested_attributes_for :sharing_services,
                                 allow_destroy: true,
                                 reject_if: -> attributes { attributes['label'].blank? || attributes['url'].blank? }
+
+  accepts_nested_attributes_for :actions, allow_destroy: true
 
   before_save :update_billing, unless: -> user { user.admin || !ENV['STRIPE_API_KEY'] }
   before_destroy :cancel_billing, unless: -> user { user.admin }

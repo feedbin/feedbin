@@ -52,6 +52,14 @@ class Entry < ActiveRecord::Base
     end
   end
 
+  def self.action_search(query, id)
+    tire.search do
+      fields ['id']
+      filter :ids, values: [id]
+      query { string query }
+    end
+  end
+
   def self.search(params, user)
     search_options = {
       page: params[:page],
