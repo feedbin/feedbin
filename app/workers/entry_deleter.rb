@@ -3,6 +3,13 @@ class EntryDeleter
   sidekiq_options queue: :worker_slow
 
   def perform(feed_id)
+    feed = Feed.find(feed_id)
+    unless feed.protected
+      delete_entries(feed_id)
+    end
+  end
+
+  def delete_entries(feed_id)
     entry_limit = 500
     entry_count = Entry.where(feed_id: feed_id).count
     if entry_count > entry_limit

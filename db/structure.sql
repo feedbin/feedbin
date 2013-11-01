@@ -167,7 +167,8 @@ CREATE TABLE feeds (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     last_modified timestamp without time zone,
-    subscriptions_count integer DEFAULT 0 NOT NULL
+    subscriptions_count integer DEFAULT 0 NOT NULL,
+    protected boolean DEFAULT false
 );
 
 
@@ -1225,3 +1226,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131017013531');
 INSERT INTO schema_migrations (version) VALUES ('20131024055750');
 
 INSERT INTO schema_migrations (version) VALUES ('20131025172652');
+
+INSERT INTO schema_migrations (version) VALUES ('20131101024758');
