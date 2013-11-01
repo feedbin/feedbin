@@ -72,9 +72,9 @@ class EntryPresenter < BasePresenter
       size = ''
     end
     if entry.data['enclosure_type'] == 'video/mp4'
-      output += @template.video_tag entry.data['enclosure_url']
+      output += @template.video_tag entry.data['enclosure_url'], preload: 'none'
     elsif entry.data['enclosure_type'] == 'audio/mpeg'
-      output += @template.audio_tag entry.data['enclosure_url']
+      output += @template.audio_tag entry.data['enclosure_url'], preload: 'none'
     end
     output += @template.link_to "Download #{size}", entry.data['enclosure_url'], class: 'download-link'
     output

@@ -2387,8 +2387,8 @@ li.selected > a .favicon-wrap {
 
 	video, audio {
 		display: block;
-		width: auto\9;
-		height: auto;
+		width: 100%;
+		background-color: #000;
 		max-width: 100%;
 	}
 }
