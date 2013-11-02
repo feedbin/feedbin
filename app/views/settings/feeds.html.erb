@@ -35,7 +35,7 @@
         <%= fields_for "subscriptions[]", subscription do |f| %>
           <tr>
             <td width="15"><%= check_box_tag "subscription_ids[]", subscription.id %></td>
-            <td width="100">
+            <td width="300">
               <%= f.text_field :title %>
             </td>
             <td>

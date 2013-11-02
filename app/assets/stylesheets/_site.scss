@@ -791,7 +791,7 @@ input[type="color"],
 	font-size: 18px;
 	padding: 12px 12px 10px 12px;
 	max-width: 300px;
-	width: 90%;
+	width: 100%;
 	border-radius: 4px;
 	color: #333;
 	display: inline-block;
@@ -1072,9 +1072,6 @@ Structure
 			&.processing {
 				background-image: image-url("favicon-search.svg"), image-url("favicon-progress.gif");
 				background-position: 5px 7px, 97% 7px;
-			}
-			@media (max-width: 520px) {
-				width: 204px;
 			}
 		}
 	}
@@ -2804,9 +2801,9 @@ table.small td {
 	}
 	[type="search"] {
 		width: 100%;
+		max-width: 100%;
 		background: image-url("favicon-search.svg") 5px 14px no-repeat;
 		padding-left: 25px;
-
 	}
 	.checkbox {
 		font-size: 13px;
@@ -3675,6 +3672,7 @@ Login and Sign Up
 	input[type="password"],
 	input[type="text"] {
 		width: 100%;
+		max-width: 100%;
 		padding: 12px 10px 10px 10px;
 	}
 	input[type="submit"] {
