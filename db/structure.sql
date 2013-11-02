@@ -43,6 +43,41 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: actions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE actions (
+    id integer NOT NULL,
+    user_id integer,
+    query text,
+    actions text[] DEFAULT '{}'::text[],
+    feed_ids text[] DEFAULT '{}'::text[],
+    all_feeds boolean DEFAULT true,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: actions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE actions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: actions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE actions_id_seq OWNED BY actions.id;
+
+
+--
 -- Name: billing_events; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -582,6 +617,13 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY actions ALTER COLUMN id SET DEFAULT nextval('actions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY billing_events ALTER COLUMN id SET DEFAULT nextval('billing_events_id_seq'::regclass);
 
 
@@ -681,6 +723,14 @@ ALTER TABLE ONLY unread_entries ALTER COLUMN id SET DEFAULT nextval('unread_entr
 --
 
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
+
+
+--
+-- Name: actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY actions
+    ADD CONSTRAINT actions_pkey PRIMARY KEY (id);
 
 
 --
@@ -801,6 +851,13 @@ ALTER TABLE ONLY unread_entries
 
 ALTER TABLE ONLY users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_actions_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_actions_on_user_id ON actions USING btree (user_id);
 
 
 --
@@ -1228,3 +1285,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131024055750');
 INSERT INTO schema_migrations (version) VALUES ('20131025172652');
 
 INSERT INTO schema_migrations (version) VALUES ('20131101024758');
+
+INSERT INTO schema_migrations (version) VALUES ('20131101063139');
