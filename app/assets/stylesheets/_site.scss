@@ -2786,6 +2786,13 @@ table.small td {
 	}
 }
 
+[data-behavior="action_send_push_notification"] {
+	display: none;
+	.supports-push & {
+		display: block;
+	}
+}
+
 .feed-form {
 	td {
 		line-height: 1.2;

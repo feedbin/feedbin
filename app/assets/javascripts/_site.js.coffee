@@ -716,6 +716,7 @@ $.extend feedbin,
 
     showPushOptions: ->
       if "safari" of window and "pushNotification" of window.safari
+        $('body').addClass('supports-push')
         if $('#push-data').length > 0
           $('.push-options').removeClass('hide')
           websiteId = $('#push-data').data('website-id')
