@@ -480,7 +480,6 @@ $.extend feedbin,
         feedIds = $('.feed-ids', cell)
         if $(@).is(':checked')
           feedIds.addClass('hide')
-          $('[type="checkbox"]', cell).prop('checked', true)
         else
           feedIds.removeClass('hide')
           $('[type="checkbox"]', cell).prop('checked', false)
@@ -642,7 +641,6 @@ $.extend feedbin,
 
     formProcessing: ->
       $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
-        console.log 'submit'
         $(@).find('input').addClass('processing')
         return
 

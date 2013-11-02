@@ -20,6 +20,7 @@ class ActionsController < ApplicationController
   private
 
   def actions_update_params
+    all_feeds = @user.subscriptions.pluck(:feed_id)
     if params[:user][:actions_attributes]
       owned_actions = @user.actions.pluck(:id)
       requested_actions = params[:user][:actions_attributes].collect { |index, actions| {index: index, id: actions['id']} }
@@ -29,7 +30,12 @@ class ActionsController < ApplicationController
           params[:user][:actions_attributes].delete(service[:index])
         end
       end
-      params[:user][:actions_attributes].map {|index, actions| params[:user][:actions_attributes][index] = actions.slice(:id, :query, :actions, :feed_ids, :_destroy) }
+      params[:user][:actions_attributes].map do |index, actions|
+        params[:user][:actions_attributes][index] = actions.slice(:id, :query, :actions, :feed_ids, :all_feeds, :_destroy)
+        if actions[:all_feeds] == '1'
+          params[:user][:actions_attributes][index][:feed_ids] = all_feeds
+        end
+      end
     end
     params.require(:user).permit!
   end

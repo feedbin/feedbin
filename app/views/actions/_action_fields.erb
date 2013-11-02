@@ -1,14 +1,10 @@
 <tr>
-  <td rowspan="2" width="150">
+  <td rowspan="2" width="160">
     <label class="checkbox">
-      <% if f.object.feed_ids.any? %>
-        <input type="checkbox" name="include_all" data-behavior="check_feeds">
-      <% else %>
-        <input type="checkbox" name="include_all" checked="checked" data-behavior="check_feeds">
-      <% end %>
+      <%= f.check_box :all_feeds, data: {behavior: 'check_feeds'} %>
       Include all Feeds
     </label>
-    <div class="feed-ids <%= 'hide' unless f.object.feed_ids.any? %>">
+    <div class="feed-ids <%= 'hide' if f.object.all_feeds %>">
       <%=
         f.collection_check_boxes(:feed_ids, @user.feeds.include_user_title, :string_id, :title) do |b|
           b.label(class: "checkbox") { b.check_box + b.text }
@@ -26,8 +22,8 @@
 <tr>
   <td colspan="2">
     <%=
-      f.collection_check_boxes(:actions, ['Mark as Read', 'Star', 'Send Push Notification'], :to_s, :to_s) do |b|
-        b.label(class: "checkbox") { b.check_box + b.text }
+      f.collection_check_boxes(:actions, Feedbin::Application.config.action_names, :value, :label) do |b|
+        b.label(class: "checkbox", data: {behavior: "action_#{b.value}"}) { b.check_box + b.text }
       end
     %>
   </td>

@@ -52,11 +52,15 @@ class Entry < ActiveRecord::Base
     end
   end
 
-  def self.action_search(query, id)
-    tire.search do
-      fields ['id']
-      filter :ids, values: [id]
-      query { string query }
+  def self.action_search(entry_id, queries)
+    tire.multi_search do
+      queries.each do |search_query|
+        search do
+          fields ['id']
+          filter :ids, values: [entry_id]
+          query { string search_query } if search_query
+        end
+      end
     end
   end
 

@@ -52,6 +52,7 @@ CREATE TABLE actions (
     query text,
     actions text[] DEFAULT '{}'::text[],
     feed_ids text[] DEFAULT '{}'::text[],
+    all_feeds boolean DEFAULT true,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
