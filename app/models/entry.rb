@@ -58,7 +58,7 @@ class Entry < ActiveRecord::Base
         search do
           fields ['id']
           filter :ids, values: [entry_id]
-          query { string search_query } if search_query
+          query { string search_query } if search_query.present?
         end
       end
     end
