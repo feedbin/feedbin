@@ -1,17 +1,17 @@
 module Api
   module V2
     class TaggingsController < ApiController
-      
+
       respond_to :json
       before_action :validate_create, only: [:create]
       before_action :validate_content_type, only: [:create]
-      
+
       def index
         @user = current_user
         @taggings = @user.taggings.includes(:tag)
         fresh_when last_modified: @taggings.maximum(:created_at), etag: @taggings
       end
-      
+
       def show
         @user = current_user
         @tagging = @user.taggings.where(id: params[:id]).first
@@ -21,7 +21,7 @@ module Api
           status_forbidden
         end
       end
-      
+
       def create
         @user = current_user
         @feed = @user.feeds.where(id: params[:feed_id]).first
@@ -38,7 +38,7 @@ module Api
           status_forbidden
         end
       end
-      
+
       def destroy
         @user = current_user
         @tagging = @user.taggings.where(id: params[:id]).first
@@ -49,13 +49,13 @@ module Api
           status_forbidden
         end
       end
-      
+
       private
-      
+
       def validate_create
         needs 'feed_id', 'name'
       end
-            
+
     end
   end
 end

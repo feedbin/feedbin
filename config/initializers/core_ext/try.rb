@@ -1,6 +1,6 @@
 class Object
   # Backport from rails 4.0 https://raw.github.com/rails/rails/master/activesupport/lib/active_support/core_ext/object/try.rb
-  
+
   # Invokes the public method whose name goes as first argument just like
   # +public_send+ does, except that if the receiver does not respond to it the
   # call returns +nil+ rather than raising an exception.

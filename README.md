@@ -3,7 +3,7 @@ Feedbin
 [![Code Climate](https://codeclimate.com/github/feedbin/feedbin.png)](https://codeclimate.com/github/feedbin/feedbin)
 [![Build Status](https://travis-ci.org/feedbin/feedbin.png?branch=master)](https://travis-ci.org/feedbin/feedbin)
 
-Feedbin is a simple, fast and nice looking RSS reader. 
+Feedbin is a simple, fast and nice looking RSS reader.
 
 ![Feedbin Screenshot](https://raw.github.com/feedbin/feedbin/master/app/assets/images/screenshots/_main.png)
 
@@ -12,12 +12,12 @@ Introduction
 
 Feedbin is a web based RSS reader. It provides a user interface for reading and managing feeds as well as a [REST-like API](https://github.com/feedbin/feedbin-api) for clients to connect to.
 
+If you would like to try Feedbin out you can [sign up](https://feedbin.me/) for an account.
+
 The main Feedbin project is a [Rails 4.0](http://rubyonrails.org/) application. In addition to the main project there are several other services that provide additional functionality. None of these services are required to get Feedbin running locally, but they all provide important functionality that you would want for a production install.
 
  - [**refresher:**](https://github.com/feedbin/refresher)
    Refresher is the service that does feed refreshing. Feed refreshes are scheduled as background jobs using [Sidekiq](https://github.com/mperham/sidekiq). Refresher is kept separate so it can be scaled independently. It's also a benefit to not have to load all of Rails for this service.
- - [**polyptych:**](https://github.com/feedbin/polyptych)
-   Polyptych is an API for fetching favicons. Favicons are compiled into a single CSS file as base64 encoded background images. Polyptych is another Rails App. 
  - [**camo:**](https://github.com/atmos/camo)
    Camo is an https image proxy. In production Feedbin is SSL only. One issue with SSL is all assets must be served over SSL as well or the browser will show insecure content warnings. Camo proxies all image requests through an SSL enabled host to prevent this.
 
@@ -54,8 +54,6 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | LIBRATO_TOKEN            | Used for reporting stats - http://metrics.librato.com                              |
 | LIBRATO_USER             | Used for reporting stats - http://metrics.librato.com                              |
 | MEMCACHED_HOSTS          | Comma separated memcached hosts/ports - 192.168.1.2:11121                          |
-| POLYPTYCH_CDN            | Used for retrieving and serving favicons - https://github.com/feedbin/polyptych    |
-| POLYPTYCH_URL            | Used for retrieving and serving favicons - https://github.com/feedbin/polyptych    |
 | POSTGRES_USERNAME        | Used for connecting to database                                                    |
 | POSTMARK_API_KEY         | Used for sending email - http://postmarkapp.com                                    |
 | RACK_ENV                 | Environment - production                                                           |
@@ -77,7 +75,7 @@ export $(cat .env)
 
 This is necessary so the environment variables can be read by both Pow and Unicorn.
 
-In production environment variables are set in the `app` users ~/.bash_profile like: 
+In production environment variables are set in the `app` users ~/.bash_profile like:
 
 ```shell
 export AWS_ACCESS_KEY_ID=aoisjf3j23oij23f

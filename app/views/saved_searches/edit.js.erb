@@ -1,0 +1,3 @@
+$('[data-behavior~=saved_search_form_target]').html('<%= j render partial: "saved_searches/form", locals: {saved_search: @saved_search} %>');
+$('.saved-search-wrap').addClass('show');
+$('#query').val('<%= @saved_search.query.html_safe %>')

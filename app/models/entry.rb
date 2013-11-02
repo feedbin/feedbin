@@ -1,6 +1,6 @@
 class Entry < ActiveRecord::Base
   include Tire::Model::Search
-  
+
   attr_accessor :fully_qualified_url, :read, :starred, :skip_mark_as_unread
 
   belongs_to :feed
@@ -13,9 +13,9 @@ class Entry < ActiveRecord::Base
   after_commit :mark_as_unread, on: :create
   after_commit :search_index_store, on: :create
   after_destroy :search_index_remove
-  
+
   validates_uniqueness_of :public_id
-  
+
   tire_settings = {
     analysis: {
       filter: {
@@ -26,19 +26,19 @@ class Entry < ActiveRecord::Base
         url_ngram: {
           "type"     => "nGram",
           "max_gram" => 5,
-          "min_gram" => 3 
+          "min_gram" => 3
         }
       },
       analyzer: {
         url_analyzer: {
           "tokenizer" => "lowercase",
           "filter"    => ["stop", "url_stop", "url_ngram"],
-          "type"      => "custom" 
+          "type"      => "custom"
         }
       }
-    } 
+    }
   }
-  
+
   tire.settings tire_settings do
     tire.mapping do
       indexes :id,        index: :not_analyzed
@@ -51,29 +51,61 @@ class Entry < ActiveRecord::Base
       indexes :updated,   type: 'date', include_in_all: false
     end
   end
-  
+
+  def self.action_search(entry_id, queries)
+    tire.multi_search do
+      queries.each do |search_query|
+        search do
+          fields ['id']
+          filter :ids, values: [entry_id]
+          query { string search_query } if search_query.present?
+        end
+      end
+    end
+  end
+
   def self.search(params, user)
-    tire.search(page: params[:page], per_page: WillPaginate.per_page, load: true) do
+    search_options = {
+      page: params[:page],
+      per_page: WillPaginate.per_page
+    }
+    unless params[:load] == false
+      search_options[:load] = { include: :feed }
+    end
+
+    tire.search(search_options) do
+      fields ['id']
       query { string params[:query] } if params[:query].present?
-      if params[:unread] == true
-        filter :ids, values: user.unread_entries.pluck(:entry_id)
+      ids = []
+
+      if params[:read] == false
+        ids << user.unread_entries.pluck(:entry_id)
       elsif params[:read] == true
         filter :not, { ids: { values: user.unread_entries.pluck(:entry_id) } }
-        filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
-                    { ids: { values: user.starred_entries.pluck(:entry_id) } }
-      elsif params[:starred] == true
-        filter :ids, values: user.starred_entries.pluck(:entry_id)
-      else
-        filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
-                    { ids: { values: user.starred_entries.pluck(:entry_id) } }
       end
+
+      if params[:starred] == true
+        ids << user.starred_entries.pluck(:entry_id)
+      elsif params[:starred] == false
+        filter :not, { ids: { values: user.starred_entries.pluck(:entry_id) } }
+      end
+
       if params[:sort]
         sort { by :published, params[:sort] }
       else
         sort { by :published, "desc" } if params[:query].blank?
       end
-      
-    end      
+
+      if ids.any?
+        ids = ids.inject(:&) # intersect
+        filter :ids, values: ids
+      end
+
+      # Always limit searches to subscriptions and starred items
+      filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
+                  { ids: { values: user.starred_entries.pluck(:entry_id) } }
+    end
+
   end
 
   def entry=(entry)
@@ -88,6 +120,10 @@ class Entry < ActiveRecord::Base
 
     self.public_id     = entry._public_id_
     self.old_public_id = entry._old_public_id_
+
+    if entry.try(:_data_)
+      self.data = entry._data_
+    end
   end
 
   def self.entries_with_feed(entry_ids, sort)
@@ -124,7 +160,7 @@ class Entry < ActiveRecord::Base
   def self.unstarred_new
     where("starred_entries.entry_id IS NULL")
   end
-  
+
   def self.sort_preference(sort)
     if sort == 'ASC'
       order("published ASC")
@@ -178,22 +214,29 @@ class Entry < ActiveRecord::Base
   def mark_as_unread
     unless skip_mark_as_unread
       unread_entries = []
-      user_ids = Subscription.where(feed_id: self.feed_id).pluck(:user_id)
-      user_ids.each do |user_id|
+      push_notification_user_ids = []
+      subscriptions = Subscription.where(feed_id: self.feed_id, active: true).pluck(:user_id, :push)
+      subscriptions.each do |user_id, push|
         unread_entries << UnreadEntry.new(user_id: user_id, feed_id: self.feed_id, entry_id: self.id, published: self.published, entry_created_at: self.created_at)
+        if push
+          push_notification_user_ids << user_id
+        end
       end
       UnreadEntry.import(unread_entries, validate: false)
+      if push_notification_user_ids.any?
+        PushNotificationSend.perform_async(self.id, push_notification_user_ids)
+      end
     end
   end
 
   def create_summary
     self.summary = ContentFormatter.summary(self.content)
   end
-    
+
   def search_index_store
     SearchIndexStore.perform_async(self.class.name, self.id)
   end
-  
+
   def search_index_remove
     SearchIndexRemove.perform_async(self.class.name, self.id)
   end

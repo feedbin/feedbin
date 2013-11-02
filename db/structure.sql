@@ -43,6 +43,41 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: actions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE actions (
+    id integer NOT NULL,
+    user_id integer,
+    query text,
+    actions text[] DEFAULT '{}'::text[],
+    feed_ids text[] DEFAULT '{}'::text[],
+    all_feeds boolean DEFAULT true,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: actions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE actions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: actions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE actions_id_seq OWNED BY actions.id;
+
+
+--
 -- Name: billing_events; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -130,7 +165,8 @@ CREATE TABLE entries (
     entry_id text,
     public_id character varying(255),
     old_public_id character varying(255),
-    starred_entries_count integer DEFAULT 0 NOT NULL
+    starred_entries_count integer DEFAULT 0 NOT NULL,
+    data json
 );
 
 
@@ -166,7 +202,8 @@ CREATE TABLE feeds (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     last_modified timestamp without time zone,
-    subscriptions_count integer DEFAULT 0 NOT NULL
+    subscriptions_count integer DEFAULT 0 NOT NULL,
+    protected boolean DEFAULT false
 );
 
 
@@ -290,6 +327,39 @@ ALTER SEQUENCE plans_id_seq OWNED BY plans.id;
 
 
 --
+-- Name: saved_searches; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE saved_searches (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    name text NOT NULL,
+    query text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: saved_searches_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE saved_searches_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: saved_searches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE saved_searches_id_seq OWNED BY saved_searches.id;
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -376,7 +446,9 @@ CREATE TABLE subscriptions (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     title text,
-    view_inline boolean DEFAULT false
+    view_inline boolean DEFAULT false,
+    active boolean DEFAULT true,
+    push boolean DEFAULT false
 );
 
 
@@ -545,6 +617,13 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY actions ALTER COLUMN id SET DEFAULT nextval('actions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY billing_events ALTER COLUMN id SET DEFAULT nextval('billing_events_id_seq'::regclass);
 
 
@@ -594,6 +673,13 @@ ALTER TABLE ONLY plans ALTER COLUMN id SET DEFAULT nextval('plans_id_seq'::regcl
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY saved_searches ALTER COLUMN id SET DEFAULT nextval('saved_searches_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY sharing_services ALTER COLUMN id SET DEFAULT nextval('sharing_services_id_seq'::regclass);
 
 
@@ -637,6 +723,14 @@ ALTER TABLE ONLY unread_entries ALTER COLUMN id SET DEFAULT nextval('unread_entr
 --
 
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
+
+
+--
+-- Name: actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY actions
+    ADD CONSTRAINT actions_pkey PRIMARY KEY (id);
 
 
 --
@@ -696,6 +790,14 @@ ALTER TABLE ONLY plans
 
 
 --
+-- Name: saved_searches_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY saved_searches
+    ADD CONSTRAINT saved_searches_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: sharing_services_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -752,6 +854,13 @@ ALTER TABLE ONLY users
 
 
 --
+-- Name: index_actions_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_actions_on_user_id ON actions USING btree (user_id);
+
+
+--
 -- Name: index_billing_events_on_billable_id_and_billable_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -798,6 +907,13 @@ CREATE UNIQUE INDEX index_feeds_on_feed_url ON feeds USING btree (feed_url);
 --
 
 CREATE INDEX index_import_items_on_import_id ON import_items USING btree (import_id);
+
+
+--
+-- Name: index_saved_searches_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_saved_searches_on_user_id ON saved_searches USING btree (user_id);
 
 
 --
@@ -1159,3 +1275,15 @@ INSERT INTO schema_migrations (version) VALUES ('20130801194304');
 INSERT INTO schema_migrations (version) VALUES ('20130820123435');
 
 INSERT INTO schema_migrations (version) VALUES ('20130826053351');
+
+INSERT INTO schema_migrations (version) VALUES ('20131011204115');
+
+INSERT INTO schema_migrations (version) VALUES ('20131017013531');
+
+INSERT INTO schema_migrations (version) VALUES ('20131024055750');
+
+INSERT INTO schema_migrations (version) VALUES ('20131025172652');
+
+INSERT INTO schema_migrations (version) VALUES ('20131101024758');
+
+INSERT INTO schema_migrations (version) VALUES ('20131101063139');

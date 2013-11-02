@@ -4,7 +4,7 @@ class SharingServicesController < ApplicationController
     @user = current_user
     render layout: 'settings'
   end
-  
+
   def sharing_services_update
     @user = current_user
     @user.free_ok = (@user.plan.stripe_id == 'free')
@@ -16,9 +16,9 @@ class SharingServicesController < ApplicationController
       redirect_to sharing_services_url
     end
   end
-  
+
   private
-  
+
   def sharing_services_params
     if params[:user][:sharing_services_attributes]
       owned_services = @user.sharing_services.pluck(:id)
@@ -33,6 +33,6 @@ class SharingServicesController < ApplicationController
     end
     params.require(:user).permit!
   end
-  
+
 
 end

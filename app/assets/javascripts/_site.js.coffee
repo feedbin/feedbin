@@ -6,7 +6,7 @@ window.addEventListener "load", (->
 ), false
 
 $.extend feedbin,
-  
+
   showNotification: (text) ->
     messages = $('[data-behavior~=messages]')
     messages.text(text)
@@ -43,17 +43,17 @@ $.extend feedbin,
 
   clearEntry: ->
     $('[data-behavior~=entry_content_target]' ).html('')
-    
+
   syntaxHighlight: ->
     $('[data-behavior~=entry_content_target] pre').each (i, e) ->
       hljs.highlightBlock(e)
-    
+
   hideTagsForm: (form) ->
     if not form
       form = $('.tags-form-wrap')
     form.animate
       height: 0
-    
+
   blogContent: (content) ->
     content = $.parseJSON(content)
     $('.blog-post').text(content.title);
@@ -108,7 +108,10 @@ $.extend feedbin,
       delimiter: /(,)\s*/
 
   autoHeight: ->
-    $('.collection-edit-wrapper').height($(window).height() - 210)
+    if "safari" of window and "pushNotification" of window.safari
+      $('.collection-edit-wrapper').height($(window).height() - 410)
+    else
+      $('.collection-edit-wrapper').height($(window).height() - 210)
 
   entries: {}
 
@@ -116,14 +119,14 @@ $.extend feedbin,
     $.getJSON feedbin.data.preloadEntriesPath, {ids: entry_ids.join(',')}, (data) ->
       $.extend feedbin.entries, data
       feedbin.precacheImages(data)
-    
+
   updateReadCount: (id, entry, target) ->
     if entry.read == false
       $.post $(target).data('mark-as-read-path')
       feedbin.CountInstance.updateCount(entry.feed_id, entry.tags, 'decrement')
       $("[data-entry-id=#{id}]").addClass('read')
       feedbin.entries[id].read = true
-      
+
       if feedbin.data.showUnreadCount
         count = $('[data-behavior~=all_unread]').find('.count').text() * 1
         if count == 0
@@ -134,20 +137,20 @@ $.extend feedbin,
           title = "Feedbin (#{count})"
 
         feedbin.updateTitle(title)
-    
+
   readability: (target) ->
     feedId = $('[data-feed-id]', target).data('feed-id')
     if feedbin.data.readabilitySettings[feedId] == true && feedbin.data.stickyReadability
       $('.button-toggle-content').find('span').addClass('active')
       $('[data-behavior~=entry_content_wrap]').html('Loading Readability&hellip;')
       $('[data-behavior~=toggle_content_view]').submit()
-    
+
   formatEntryContent: (resetScroll = true) ->
     if resetScroll
       $('.entry-content').prop('scrollTop', 0)
     $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='view.vzaar.com']"});
     feedbin.syntaxHighlight()
-    
+
   refresh: ->
     if feedbin.data != null
       $.get(feedbin.data.autoUpdatePath)
@@ -181,38 +184,53 @@ $.extend feedbin,
   disableMarkRead: () ->
     feedbin.markReadData = null
     $('[data-behavior~=mark_all_as_read]').attr('disabled', 'disabled')
-      
+
   markRead: () ->
     $('.entries li').addClass('read')
     $.post feedbin.data.markAsReadPath, feedbin.markReadData
-      
+
+  showForm: (selectOption) ->
+    $('.header-form-option').removeClass('selected')
+    $("[data-behavior~=#{selectOption}]").addClass('selected')
+    $("[data-behavior~=show_form_options]").text($("[data-select-option=#{selectOption}]").text())
+
+  checkPushPermission: (permissionData) ->
+    if (permissionData.permission == 'granted')
+      $('.push-enable, .push-disabled').addClass('hide')
+      $('.push-disable').removeClass('hide')
+    else if (permissionData.permission == 'denied')
+      $('.push-enable, .push-disable').addClass('hide')
+      $('.push-disabled').removeClass('hide')
+
   hideQueue: []
 
   feedCandidates: []
-  
+
   modalShowing: false
-  
+
   images: []
-  
+
   feedXhr: null
-  
+
   markReadData: null
+
+  closeSubcription: false
 
 $.extend feedbin,
   init:
     setData: ->
       feedbin.data = $('#feedbin-data').data()
-    
+
     hasTouch: ->
       if ('ontouchstart' in document)
         $('body').addClass('touch')
-        
+
     markRead: ->
       $(document).on 'click', '[data-mark-read]', ->
         feedbin.markReadData = $(@).data('mark-read')
         $('[data-behavior~=mark_all_as_read]').removeAttr('disabled')
         return
-        
+
       $(document).on 'click', '[data-behavior~=mark_all_as_read]', ->
         unless $(@).attr('disabled')
           if feedbin.data.markAsReadConfirmation
@@ -232,22 +250,6 @@ $.extend feedbin,
     choicesSubmit: ->
       $(document).on 'ajax:beforeSend', '[data-choice-form]', ->
         $('.modal').modal('hide')
-        return
-
-    subscribeSubmit: ->
-      form = $('[data-behavior~=subscription_form]')
-      textField = form.find('[name="subscription[feeds][feed_url]"]')
-      submit = form.find('[name="commit"]')
-
-      $(document).on 'ajax:beforeSend', '[data-behavior~=subscription_form]', ->
-        textField.attr('disabled', 'disabled')
-        submit.attr('disabled', 'disabled')
-        textField.blur()
-        return
-
-      $(document).on 'ajax:complete', '[data-behavior~=subscription_form]', ->
-        textField.val('').removeAttr('disabled')
-        submit.removeAttr('disabled')
         return
 
     resetEntryPostion: ->
@@ -270,14 +272,14 @@ $.extend feedbin,
         unless $(event.target).is('.toggle-drawer')
           feedbin.clearEntry()
         return
-        
+
     cancelFeedRequest: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event, xhr) ->
         if feedbin.feedXhr
           feedbin.feedXhr.abort()
         feedbin.feedXhr = xhr
         return
-        
+
     tooltips: ->
       $(document).on 'mouseenter mouseleave', '[data-behavior~=tooltip]', (event) ->
         tooltip = $(this).tooltip
@@ -308,17 +310,18 @@ $.extend feedbin,
         wrap = target.find('.tags-form-wrap')
         unless $(@).attr('disabled') == 'disabled'
           if '0px' == wrap.css('height')
-            wrap.animate
+            wrap.animate {
               height: '138px'
+            }, 200
             field = wrap.find('.feed_tag_list')
             field.focus()
             value = field.val()
             field.val(value)
             feedbin.autocomplete(field)
         return
-    
+
     resize: () ->
-      defaults = 
+      defaults =
         handles: "e"
         minWidth: 200
         stop: (event, ui) ->
@@ -348,7 +351,7 @@ $.extend feedbin,
         feedbin.feedCandidates.push clickedItem.next().data('feed-id') if clickedItem.next().length
         feedbin.feedCandidates.push clickedItem.prev().data('feed-id') if clickedItem.prev().length
         return
-        
+
     unauthorizedResponse: ->
       $(document).on 'ajax:complete', (event, response, status) ->
         if response.status == 401
@@ -377,12 +380,12 @@ $.extend feedbin,
           nextScreenshot = selectedScreenshot.prev()
           if nextScreenshot.length == 0
             nextScreenshot = $('li:last-child', $('[data-behavior~=screenshot_nav]'))
-        
+
         nextScreenshot.find('a').click()
         event.preventDefault()
         return
-      
-        
+
+
     feedSelected: ->
       $(document).on 'click', '[data-behavior~=back_to_feeds]', ->
         $('.app').addClass('nothing-selected').removeClass('feed-selected entry-selected')
@@ -395,7 +398,7 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
         $('.app').addClass('entry-selected').removeClass('nothing-selected feed-selected')
         return
-        
+
     addFields: ->
       $(document).on 'click', '[data-behavior~=add_fields]', (event) ->
         time = new Date().getTime() + '_insert'
@@ -403,14 +406,14 @@ $.extend feedbin,
         $(@).parents('[data-behavior~=add_fields_target]').find('tr:last').before($(@).data('fields').replace(regexp, time))
         event.preventDefault()
         return
-        
+
     removeFields: ->
       $(document).on 'click', '[data-behavior~=remove_fields]', (event) ->
         $(@).prev('input[type=hidden]').val(1)
         $(@).closest('tr').addClass('hide')
         event.preventDefault()
         return
-        
+
     dropdown: ->
       $(document).on 'click', (event) ->
         dropdown = $('.dropdown-wrap')
@@ -445,17 +448,17 @@ $.extend feedbin,
           height = 0
           hidden = true
           text = 'show'
-      
+
         drawer.animate {
           height: height
-        }, 300, ->
+        }, 200, ->
           if height > 0
             drawer.css
               height: 'auto'
-        
+
         drawer.data('hidden', hidden)
         button.text(text)
-      
+
         button.parent('form').submit()
         event.stopPropagation()
         event.preventDefault()
@@ -472,12 +475,22 @@ $.extend feedbin,
         event.preventDefault()
         return
 
+      $(document).on 'click', '[data-behavior~=check_feeds]', (event) ->
+        cell = $(@).parents('td')
+        feedIds = $('.feed-ids', cell)
+        if $(@).is(':checked')
+          feedIds.addClass('hide')
+        else
+          feedIds.removeClass('hide')
+          $('[type="checkbox"]', cell).prop('checked', false)
+        return
+
     validateFile: ->
       form = $('.new_import_uploader')
       input = form.find("input:file")
       unless input.val()
         form.find('[type=submit]').attr('disabled','disabled')
-      
+
       input.on 'change', ()->
         if $(this).val()
           form.find('[type=submit]').removeAttr('disabled')
@@ -547,15 +560,13 @@ $.extend feedbin,
             fontContainer.addClass("font-#{$(@).val()}")
             fontContainer.data('font', $(@).val())
             $(@).parents('form').submit()
-          
         else
           top = $('.entry-toolbar').outerHeight()
           $('.entry-settings').removeClass('open')
-        $('.entry-content').animate {
+        $('.entry-content').css
           top: top
-        }, 100
       return
-      
+
     fontSize: ->
       $(document).on 'click', '[data-behavior~=increase_font]', (event) ->
         feedbin.updateFontSize('increase')
@@ -564,7 +575,7 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=decrease_font]', (event) ->
         feedbin.updateFontSize('decrease')
         return
-        
+
     entryWidth: ->
       $(document).on 'click', '[data-behavior~=entry_width]', (event) ->
         if $('[data-behavior~=entry_content_target]').hasClass('fluid')
@@ -572,13 +583,13 @@ $.extend feedbin,
         else
           $('[data-behavior~=entry_content_target]').addClass('fluid')
         return
-        
+
     filterList: ->
       feedbin.matchHeights($('.app-detail'))
       $(window).on 'resize', () ->
         feedbin.matchHeights($('.app-detail'))
         return
-      
+
       $(document).on 'click', '[data-filter]', (event) ->
         $('[data-filter]').removeClass('active')
         $(@).addClass('active')
@@ -590,7 +601,7 @@ $.extend feedbin,
           $("[data-behavior~=filter_target]").addClass('hide')
           $("[data-platforms~=#{filter}]").removeClass('hide')
         return
-        
+
     showEntryActions: ->
       $(document).on 'click', '[data-behavior~=show_entry_actions]', (event) ->
         parent = $(@).parents('li')
@@ -609,7 +620,7 @@ $.extend feedbin,
         unless $(event.target).is('[data-behavior~=show_entry_actions]')
           $('.entries li').removeClass('show-actions')
         return
-        
+
     markDirectionAsRead: ->
       $(document).on 'click', '[data-behavior~=mark_below_read], [data-behavior~=mark_above_read]', (event) ->
         data = feedbin.markReadData
@@ -617,45 +628,110 @@ $.extend feedbin,
           data['ids'] = $(@).parents('li').prevAll().map(() ->
             $(@).data('entry-id')
           ).get().join()
-          
+
           if $(@).is('[data-behavior~=mark_below_read]')
             $(@).parents('li').nextAll().addClass('read')
             data['direction'] = 'below'
           else
             $(@).parents('li').prevAll().addClass('read')
             data['direction'] = 'above'
-            
+
         $.post feedbin.data.markDirectionAsReadEntries, data
         return
 
-    formOptions: ->
-      $(document).on 'click', '[data-behavior~=show_form_options]', (event) ->
-        wrap = $(@).parents('.dropdown-wrap')
-        if wrap.hasClass('open')
-          wrap.removeClass('open')
-        else
-          wrap.addClass('open')
+    formProcessing: ->
+      $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
+        $(@).find('input').addClass('processing')
         return
-      
-      $(document).on 'click', '[data-behavior~=form_select] li', (event) ->
-        $('.header-form-option').removeClass('selected')
-        selectOption = $(@).data('select-option')
-        $("[data-behavior~=#{selectOption}]").addClass('selected')
-        $("[data-behavior~=show_form_options]").text($(@).text())
+
+      $(document).on 'ajax:complete', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
+        $(@).find('input').removeClass('processing')
+        if feedbin.closeSubcription
+          setTimeout ( ->
+            $('.feeds').removeClass('show-subscribe')
+          ), 600
+          feedbin.closeSubcription = false
         return
 
     subscribe: ->
-      # This needs to come after "[data-behavior~=form_select] li" click event
+      $(document).on 'click', '[data-behavior~=show_subscribe]', (event) ->
+        feeds = $(".feeds")
+        if feeds.hasClass('show-subscribe')
+          feeds.removeClass('show-subscribe')
+        else
+          $('.subscribe-wrap input').val('')
+          $('.subscribe-wrap input').focus()
+          feeds.addClass('show-subscribe')
+        return
+
+      $(document).on 'click', (event) ->
+        unless $(event.target).is('[data-behavior~=show_subscribe]') || $(event.target).is('.subscribe-wrap') || $(event.target).parents('.subscribe-wrap').length > 0
+          $('.feeds').removeClass('show-subscribe')
+
       subscription = feedbin.queryString('subscribe')
       if subscription?
-        $('[data-behavior~=form_select] [data-select-option=subscribe_form]').click()
-        field = $('#subscription_feeds_feed_url').val(subscription)
-        field.parents('form').submit()
+        $('[data-behavior~=show_subscribe]').click()
+        $('[data-behavior~=subscription_form] input').val(subscription)
+        $('[data-behavior~=subscription_form]').submit()
+        $('[data-behavior~=subscription_form] input').blur()
+        feedbin.closeSubcription = true
 
     searchError: ->
       $(document).on 'ajax:error', '[data-behavior~=search_form]', (event, xhr) ->
         feedbin.showNotification('Search error.');
         return
+
+    loadProgress: ->
+      $(document).on 'click', '[data-behavior~=feed_link]', (event, xhr) ->
+        $(@).find('.favicon').addClass('favicon-progress')
+        return
+
+      $(document).on 'ajax:complete', '[data-behavior~=feed_link]', (event, xhr) ->
+        $('.favicon-progress').removeClass("favicon-progress")
+        return
+
+    savedSearch: ->
+      $(document).on 'click', (event) ->
+        unless $(event.target).is('[data-behavior~=save_search_link]') || $(event.target).parents('.header-form-wrap').length > 0
+          savedSearchWrap = $('.saved-search-wrap')
+          if savedSearchWrap.hasClass('show')
+            savedSearchWrap.removeClass('show')
+        return
+
+      $(document).on 'click', '[data-behavior~=saved_search_form_target] input[type=submit]', ->
+        query = $('#query').val()
+        $('#saved_search_query').val(query)
+
+      $(document).on 'click', '[data-behavior~=save_search_link]', ->
+        savedSearchWrap = $('.saved-search-wrap')
+        if savedSearchWrap.hasClass('show')
+          savedSearchWrap.removeClass('show')
+        else
+          savedSearchWrap.addClass('show')
+        return
+
+      $(document).on 'click', '[data-behavior~=feed_link]', ->
+        $('#query').val('')
+        $('[data-behavior~=save_search_link]').attr('disabled', 'disabled');
+
+    showPushOptions: ->
+      if "safari" of window and "pushNotification" of window.safari
+        $('body').addClass('supports-push')
+        if $('#push-data').length > 0
+          $('.push-options').removeClass('hide')
+          websiteId = $('#push-data').data('website-id')
+          permissionData = window.safari.pushNotification.permission(websiteId)
+          if (permissionData.permission == 'default')
+            $('.push-enable').removeClass('hide')
+          else if (permissionData.permission == 'granted')
+            $('.push-disable').removeClass('hide')
+          else if (permissionData.permission == 'denied')
+            $('.push-disabled').removeClass('hide')
+
+    enablePush: ->
+      $(document).on 'click', '[data-behavior~=enable_push]', ->
+        data = $('#push-data').data()
+        window.safari.pushNotification.requestPermission(data.webServiceUrl, data.websiteId, {authentication_token: data.authenticationToken}, feedbin.checkPushPermission)
 
 jQuery ->
   $.each feedbin.init, (i, item) ->

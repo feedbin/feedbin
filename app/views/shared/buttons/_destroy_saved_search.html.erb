@@ -1,0 +1,8 @@
+<%= link_to saved_search_path(saved_search),
+      method: :delete, remote: true, class: 'toolbar-button', title: 'Delete saved search',
+      data: { behavior: 'unsubscribe', confirm: "Are you sure you want to delete #{saved_search.name}?" } do %>
+  <span class="toolbar-button-inner">
+    <%= render partial: "shared/svg/trash" %>
+  </span>
+  Delete
+<% end %>

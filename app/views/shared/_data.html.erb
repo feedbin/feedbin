@@ -1,28 +1,23 @@
 <%=
-# TODO: Look at broke ass favicons
 content_tag :div, '',
   data: {
     login_url: login_url,
-    polyptych_url: ENV['POLYPTYCH_URL'],
-    polyptych_cdn: ENV['POLYPTYCH_CDN'],
-    feed_hostnames_hash: @feed_hostnames[:hash],
     favicon_complete: false,
     mark_favicon_complete_path: settings_mark_favicon_complete_path,
     tags_path: tags_path(format: :json),
     mobile: mobile,
-    feed_hostnames: @feed_hostnames[:hostnames].join(',').html_safe,
     user_titles: @user_titles.to_json,
     preload_entries_path: preload_entries_path(format: :json),
     sticky_readability: (@user.sticky_view_inline == '1'),
     readability_settings: @readability_settings.to_json,
     show_unread_count:  (@user.show_unread_count == '1'),
     precache_images: (@user.precache_images == '1'),
-    auto_update_path: auto_update_feeds_path, 
+    auto_update_path: auto_update_feeds_path,
     font_sizes: Feedbin::Application.config.font_sizes.to_json,
     mark_as_read_path: mark_all_as_read_entries_path,
     mark_as_read_confirmation: (@user.mark_as_read_confirmation == '1'),
     mark_direction_as_read_entries: mark_direction_as_read_entries_path
   },
-  class: 'hide', 
+  class: 'hide',
   id: 'feedbin-data'
 %>

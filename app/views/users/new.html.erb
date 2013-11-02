@@ -1,8 +1,8 @@
 <% @class = 'signup' %>
 <div class="signup-wrap pad-bottom">
   <a href="/"><%= render partial: "shared/svg/logo" %></a>
-  
-  <h3 class="box-header">Sign Up</h3>
+
+  <h3 class="box-header">Sign Up <span class="trial-promo">14 day free trial</span></h3>
   <div class="box">
     <div data-behavior="stripe_error" class="alert alert-error hide"></div>
 
@@ -27,52 +27,20 @@
           Invalid coupon.
         </div>
       <% end %>
-      
-    
+
+
       <%= f.hidden_field :stripe_token, data: { behavior: 'stripe_token' } %>
-      
-      <%= f.email_field :email, autofocus: true, placeholder: 'Email' %>
 
-      <%= f.password_field :password, placeholder: 'Password' %>
-    
-      <% if !@coupon_valid && ENV['STRIPE_API_KEY'] %>
-        <hr />
-      
-        <div class="row">
-            <div class="form-wrap">
-              <% if @user.stripe_token %>
-                <p>Credit card acceptance is pending.</p>
-              <% else %>
-                <%= render partial: 'shared/credit_card_form' %>
-              <% end %>
-            </div>
-            <div class="promo-wrap">
-              <div class="payment-promo">
-                <p><a href="https://stripe.com" class="stripe-badge" target="_blank"></a></p>
-                <p><small>Payment is handled securely through <a href="https://stripe.com" target="_blank">Stripe</a>. You will not be billed if you cancel within three days.</small></p>
-              </div>
-            </div>
-        </div>
+      <%= f.email_field :email, autofocus: true, placeholder: 'Email', tabindex: 1 %>
 
-        <hr />
+      <%= f.password_field :password, placeholder: 'Password', tabindex: 2 %>
 
-        <div class="clearfix">
-          <% Plan.where(price_tier: Feedbin::Application.config.price_tier).where.not(stripe_id: 'free').each do |plan| %>
-            <% options = plan.stripe_id =~ /^basic-monthly/ ? {checked: true} : {} %>
-            <%= label_tag nil, class: 'radio' do %>
-              <%= f.radio_button :plan_id, plan.id, options %>
-              <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.name.gsub(/ly$/, '').downcase %>
-            <% end %>
-          <% end %>
-        </div>
-      <% end %>
+      <div class="text-right">
+        <%= f.submit "Sign up", class: 'button', tabindex: 3 %>
+      </div>
 
-      <hr />
-
-      <%= f.submit "Sign up", class: 'button' %>
-  
     <% end %>
   </div>
-  
+
   <p class="align-center x-large muted">Already have an account? <%= link_to "Log In", login_path %></p>
 </div>

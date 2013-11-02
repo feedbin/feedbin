@@ -1,7 +1,7 @@
 class SendStats
   include Sidekiq::Worker
   sidekiq_options queue: :critical, retry: false
-  
+
   MEGABYTE = 1024.0 * 1024.0
 
   def perform
@@ -11,7 +11,7 @@ class SendStats
       postgres_stats
     end
   end
-  
+
   def memcached_stats
     if Rails.cache.respond_to?(:stats)
       servers = Rails.cache.stats
@@ -27,7 +27,7 @@ class SendStats
       end
     end
   end
-  
+
   def redis_stats
     redis_info = Sidekiq.redis {|c| c.info}
     Librato.group "redis" do |group|
@@ -36,7 +36,7 @@ class SendStats
       group.measure('operations', redis_info['instantaneous_ops_per_sec'].to_f)
     end
   end
-  
+
   def postgres_stats
     stats = []
     stats.concat(cache_hit)
@@ -46,7 +46,7 @@ class SendStats
       Librato.measure("postgres.#{stat[:name]}", stat[:value], source: stat[:source])
     end
   end
-  
+
   def cache_hit
     stats = []
     sql = %q(
@@ -66,12 +66,12 @@ class SendStats
     end
     stats
   end
-  
+
   def index_size
     stats = []
     sql = %q(
-      SELECT 
-        relname AS name, 
+      SELECT
+        relname AS name,
         sum(relpages) AS size
       FROM pg_class
       WHERE reltype = 0
@@ -87,7 +87,7 @@ class SendStats
     end
     stats
   end
-  
+
   def database_size
     stats = []
     database   = ActiveRecord::Base.connection_config[:database]
@@ -98,7 +98,7 @@ class SendStats
     stats << {name: 'database_size', value: results[0]['size'].to_f / MEGABYTE}
     stats
   end
-  
+
   def query(sql)
     rows = []
     result = ActiveRecord::Base.connection.execute(sql)

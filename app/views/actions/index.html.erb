@@ -1,0 +1,19 @@
+<h2>Actions</h2>
+
+<p>Actions can be performed on articles when they are published. Start by selecting the feeds to include. Then write your query, just like you would when searching for something. Finally check the actions you would like to perform on the matched incoming articles.</p>
+
+<%= form_for @user, url: actions_update_user_path(@user), html: {novalidate: 'novalidate'} do |f| %>
+  <table class="table table-condensed form-table actions-table" data-behavior="add_fields_target">
+    <tbody>
+      <%= f.fields_for :actions do |builder| %>
+        <%= render 'action_fields', f: builder %>
+      <% end %>
+      <tr>
+        <td colspan="3">
+          <%= f.submit 'Save', class: 'button button-primary' %>
+          <%= link_to_add_fields "Add Action", f, :actions %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+<% end %>

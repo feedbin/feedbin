@@ -10,5 +10,5 @@ Feedbin Receipt - <%= Time.at(@billing_event.details.data.object.date).to_s(:dat
 User: <%= @user.email %>
 Amount: <%= @billing_event.details.data.object.currency.upcase %> <%= number_to_currency(@billing_event.details.data.object.total.to_f / 100) %>
 
-Feedbin, LLC
+Feedbin, Inc.
 -------------------------------------------------

@@ -12,5 +12,6 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require mediaelement_rails
 //= require_tree ../../../vendor/assets/javascripts/.
 //= require_tree .

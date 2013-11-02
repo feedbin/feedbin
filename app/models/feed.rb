@@ -4,12 +4,12 @@ class Feed < ActiveRecord::Base
   has_many :users, through: :subscriptions
   has_many :unread_entries
   has_many :starred_entries
-  
+
   has_many :taggings
   has_many :tags, through: :taggings
 
   attr_accessor :unread_count, :tags
-  
+
   def tag(names, user, delete_existing = true)
     taggings = []
     if delete_existing
@@ -24,10 +24,10 @@ class Feed < ActiveRecord::Base
     end
     taggings
   end
-  
+
   def self.create_from_feedzirra(feed, site_url)
     feed.url = site_url
-    feed_record = self.create!(feed: feed)        
+    feed_record = self.create!(feed: feed)
     ActiveRecord::Base.transaction do
       feed.entries.each do |entry|
         feed_record.entries.create!(entry: entry)
@@ -35,7 +35,7 @@ class Feed < ActiveRecord::Base
     end
     feed_record
   end
-  
+
   def feed=(feed)
     self.etag          = feed.etag
     self.last_modified = feed.last_modified
@@ -43,7 +43,7 @@ class Feed < ActiveRecord::Base
     self.feed_url      = feed.feed_url
     self.site_url      = feed.url
   end
-    
+
   def cache_key
     additions = []
     if unread_count
@@ -51,7 +51,7 @@ class Feed < ActiveRecord::Base
     end
     super + additions.join('')
   end
-  
+
   def check
     options = {}
     unless last_modified.blank?
@@ -63,10 +63,10 @@ class Feed < ActiveRecord::Base
     feed_fetcher = FeedFetcher.new(feed_url)
     feed_fetcher.fetch_and_parse(options, feed_url)
   end
-  
+
   def self.include_user_title
     select('feeds.*, subscriptions.title AS user_title').
-      map {|feed| 
+      map {|feed|
         if feed.user_title
           feed.title = feed.user_title
         elsif feed.title
@@ -78,5 +78,8 @@ class Feed < ActiveRecord::Base
       }.
       sort_by {|feed| feed.title.try(:downcase)}
   end
-  
+
+  def string_id
+    self.id.to_s
+  end
 end

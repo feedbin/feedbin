@@ -3,30 +3,23 @@
   <div class="modal-target"></div>
   <header class="bar">
 		<a href="/" class="logo"><%= render partial: 'shared/svg/logo' %></a>
-			
+
     <% if signed_in? %>
-      <% if ENV['ELASTICSEARCH_URL'] || Rails.env.development? %>
       <div class="header-form-wrap">
         <div class="header-form-option selected" data-behavior="header_form_option search_form_wrap">
+          <span class="save-search-link" data-behavior="save_search_link" disabled="disabled">Save</span>
           <%= render partial: "entries/search_form" %>
-        </div>
-        <div class="header-form-option" data-behavior="header_form_option subscribe_form_wrap">
-          <%= render partial: "subscriptions/form" %>
-        </div>
-        <div class="form-select dropdown-wrap" data-behavior="form_select">
-          <div class="form-select-button" data-behavior="show_form_options toggle_dropdown">
-            Search
+          <div class="saved-search-wrap">
+            <div class="saved-inner" data-behavior="saved_search_form_target">
+            </div>
           </div>
-          <ul>
-            <li data-select-option="search_form_wrap"><span>Search</span></li>
-            <li data-select-option="subscribe_form_wrap"><span>Subscribe</span></li>
-          </ul>
         </div>
       </div>
-      <% else %>
-        <div class="header-form-wrap small-form">
-          <%= render partial: "subscriptions/form" %>
-        </div>
+    <% end %>
+
+    <% if signed_in? && current_user.plan.stripe_id == 'trial' %>
+      <%= link_to settings_billing_path, class: 'subscribe-promo' do %>
+        <%= pluralize(current_user.days_left, 'day') %> left, subscribe now
       <% end %>
     <% end %>
 
@@ -46,7 +39,7 @@
       </div>
     <% end %>
   </header>
-	
+
   <div class="content">
     <%= content_for?(:app_content) ? yield(:app_content) : yield %>
   </div>

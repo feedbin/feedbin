@@ -1,13 +1,14 @@
 class User < ActiveRecord::Base
 
-  attr_accessor :stripe_token, :old_password_valid, :update_auth_token, :password_reset, :coupon_code, :free_ok
+  attr_accessor :stripe_token, :old_password_valid, :update_auth_token, :password_reset, :coupon_code, :free_ok, :is_trialing
 
   has_secure_password
 
   store_accessor :settings, :entry_sort, :previous_read_count, :starred_feed_enabled,
                  :hide_tagged_feeds, :precache_images, :show_unread_count, :sticky_view_inline,
-                 :mark_as_read_confirmation, :font_size, :font, :entry_width
-    
+                 :mark_as_read_confirmation, :font_size, :font, :entry_width, :apple_push_notification_device_token,
+                 :mark_as_read_push_view, :keep_unread_entries
+
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
   has_many :feeds, through: :subscriptions
@@ -19,15 +20,20 @@ class User < ActiveRecord::Base
   has_many :sharing_services, dependent: :delete_all
   has_many :unread_entries, dependent: :delete_all
   has_many :starred_entries, dependent: :delete_all
+  has_many :saved_searches, dependent: :delete_all
+  has_many :actions, dependent: :delete_all
   belongs_to :plan
 
   accepts_nested_attributes_for :sharing_services,
                                 allow_destroy: true,
                                 reject_if: -> attributes { attributes['label'].blank? || attributes['url'].blank? }
 
+  accepts_nested_attributes_for :actions, allow_destroy: true
+
   before_save :update_billing, unless: -> user { user.admin || !ENV['STRIPE_API_KEY'] }
   before_destroy :cancel_billing, unless: -> user { user.admin }
   before_save :strip_email
+  before_save :activate_subscriptions
   before_save { reset_auth_token }
   before_create { generate_token(:starred_token) }
   before_create { generate_token(:inbound_email_token) }
@@ -38,9 +44,16 @@ class User < ActiveRecord::Base
   validate :changed_password, on: :update, unless: -> user { user.password_reset }
   validate :coupon_code_valid, on: :create, if: -> user { user.coupon_code }
   validate :plan_type_valid
+  validate :trial_plan_valid
 
   def to_param
     email
+  end
+
+  def activate_subscriptions
+    if plan_id_changed? && plan_id_was == Plan.find_by_stripe_id('trial').id
+      subscriptions.update_all(active: true)
+    end
   end
 
   def strip_email
@@ -65,6 +78,13 @@ class User < ActiveRecord::Base
       valid_plans = Plan.where(price_tier: plan.price_tier).where.not(stripe_id: 'free').pluck(:id)
     end
     unless valid_plans.include?(plan.id)
+      errors.add(:plan_id, 'is invalid')
+    end
+  end
+
+  def trial_plan_valid
+    trial_plan = Plan.find_by_stripe_id('trial')
+    if plan_id == trial_plan.id && plan_id_was != trial_plan.id && !plan_id_was.nil?
       errors.add(:plan_id, 'is invalid')
     end
   end
@@ -96,16 +116,7 @@ class User < ActiveRecord::Base
 
   def update_billing
     if customer_id.nil?
-      if !stripe_token.present? && !coupon_code.present?
-        raise "Stripe token not present. Can't create account."
-      end
-      customer = {
-        email: email,
-        plan: plan.stripe_id
-      }
-      customer[:card] = stripe_token unless stripe_token.blank?
-      customer = Stripe::Customer.create(customer)
-
+      customer = Stripe::Customer.create({email: email, plan: plan.stripe_id})
       if coupon_code
         coupon_record = Coupon.find_by_coupon_code(coupon_code)
         coupon_record.redeemed = true
@@ -113,16 +124,17 @@ class User < ActiveRecord::Base
         self.coupon = coupon_record
       end
     else
-      if email_changed? || stripe_token.present?
+      if email_changed? || stripe_token.present? || plan_id_changed?
         customer = Stripe::Customer.retrieve(customer_id)
         if stripe_token.present?
           customer.card = stripe_token
+          self.suspended = false
         end
+        customer.plan = plan.stripe_id
         customer.email = email
         customer.save
       end
     end
-
     unless customer.nil?
       self.last_4_digits = customer.try(:active_card).try(:last4)
       self.customer_id = customer.id
@@ -254,33 +266,14 @@ class User < ActiveRecord::Base
     subscriptions.where(feed_id: feed_id).present?
   end
 
-  def feed_hostnames
-    hostnames = feeds.pluck(:site_url).map { |site_url|
-      begin
-        URI::parse(site_url).host
-      rescue
-        nil
-      end
-    }.compact.uniq
-
-    hash = Digest::SHA1.hexdigest hostnames.sort.join
-
-    {hostnames: hostnames, hash: hash}
-  end
-
   def self.search(query)
     where("email like ?", "%#{query}%")
   end
 
-
-  private
-
-  def subtract_hash(hash1, hash2)
-    hash1.each do |key, value|
-      difference = hash2.has_key?(key) ? value - hash2[key] : value
-      hash1[key] = difference
-    end
+  def days_left
+    expires = (self.created_at + Feedbin::Application.config.trial_days.days).to_date
+    start = self.created_at.to_date
+    (expires - start).to_i
   end
-
 
 end

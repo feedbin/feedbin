@@ -1,2 +1,2 @@
-feedbin.updateFeeds('<%= j render partial: 'feeds/feeds', locals: {collections: @collections, tags: @tags, feeds: @feeds} %>');
+feedbin.updateFeeds('<%= j render partial: 'feeds/feeds', locals: {collections: @collections, saved_searches: @saved_searches, tags: @tags, feeds: @feeds} %>');
 feedbin.updateTitle('<%= j @user.title_with_count %>')
