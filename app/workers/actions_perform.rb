@@ -33,6 +33,8 @@ class ActionsPerform
         end
       end
 
+      Librato.increment 'actions_performed', by: 1
+
     end
   end
 end
