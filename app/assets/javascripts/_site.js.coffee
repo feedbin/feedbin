@@ -475,6 +475,16 @@ $.extend feedbin,
         event.preventDefault()
         return
 
+      $(document).on 'click', '[data-behavior~=check_feeds]', (event) ->
+        cell = $(@).parents('td')
+        feedIds = $('.feed-ids', cell)
+        if $(@).is(':checked')
+          feedIds.addClass('hide')
+        else
+          feedIds.removeClass('hide')
+          $('[type="checkbox"]', cell).prop('checked', false)
+        return
+
     validateFile: ->
       form = $('.new_import_uploader')
       input = form.find("input:file")
@@ -631,7 +641,6 @@ $.extend feedbin,
 
     formProcessing: ->
       $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
-        console.log 'submit'
         $(@).find('input').addClass('processing')
         return
 

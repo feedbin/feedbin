@@ -52,6 +52,18 @@ class Entry < ActiveRecord::Base
     end
   end
 
+  def self.action_search(entry_id, queries)
+    tire.multi_search do
+      queries.each do |search_query|
+        search do
+          fields ['id']
+          filter :ids, values: [entry_id]
+          query { string search_query } if search_query.present?
+        end
+      end
+    end
+  end
+
   def self.search(params, user)
     search_options = {
       page: params[:page],

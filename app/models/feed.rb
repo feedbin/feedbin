@@ -79,4 +79,7 @@ class Feed < ActiveRecord::Base
       sort_by {|feed| feed.title.try(:downcase)}
   end
 
+  def string_id
+    self.id.to_s
+  end
 end
