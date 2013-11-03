@@ -46,6 +46,8 @@ class UsersController < ApplicationController
         TrialSendExpiration.perform_in(send_notice.days, @user.id)
         TrialEnd.perform_in(Feedbin::Application.config.trial_days.days, @user.id)
       end
+      @analytics_event = {eventCategory: 'customer', eventAction: 'new', eventLabel: 'trial', eventValue: 0}
+      flash[:analytics_event] = render_to_string(partial: "shared/analytics_event").html_safe
       sign_in @user
       redirect_to root_url
     else
@@ -54,6 +56,7 @@ class UsersController < ApplicationController
   end
 
   def update
+    old_plan_name = @user.plan.stripe_id
     @user.update_auth_token = true
     @user.old_password_valid = @user.authenticate(params[:user][:old_password])
     @user.free_ok = (@user.plan.stripe_id == 'free')
@@ -62,6 +65,11 @@ class UsersController < ApplicationController
       @user.password_confirmation = params[:user][:password]
     end
     if @user.save
+      new_plan_name = @user.plan.stripe_id
+      if old_plan_name == 'trial' && new_plan_name != 'trial'
+        @analytics_event = {eventCategory: 'customer', eventAction: 'upgrade', eventLabel: @user.plan.stripe_id, eventValue: @user.plan.price.to_i}
+        flash[:analytics_event] = render_to_string(partial: "shared/analytics_event").html_safe
+      end
       sign_in @user
       if params[:redirect_to]
         redirect_to params[:redirect_to], notice: 'Account updated.'
