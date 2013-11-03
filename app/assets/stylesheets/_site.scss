@@ -2641,6 +2641,7 @@ Settings
 			}
 		}
 		.settings-content {
+			border-top: 1px solid #CCC;
 			display: table-cell;
 			background-color: white;
 			vertical-align: top;
@@ -2675,7 +2676,6 @@ Settings
 		margin-top: 20px;
 	}
 	.bar {
-		border-bottom: 1px solid #CCC;
 		.logo {
 			display: inline-block;
 		}
