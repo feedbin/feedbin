@@ -681,15 +681,6 @@ $.extend feedbin,
         feedbin.showNotification('Search error.');
         return
 
-    loadProgress: ->
-      $(document).on 'click', '[data-behavior~=feed_link]', (event, xhr) ->
-        $(@).find('.favicon').addClass('favicon-progress')
-        return
-
-      $(document).on 'ajax:complete', '[data-behavior~=feed_link]', (event, xhr) ->
-        $('.favicon-progress').removeClass("favicon-progress")
-        return
-
     savedSearch: ->
       $(document).on 'click', (event) ->
         unless $(event.target).is('[data-behavior~=save_search_link]') || $(event.target).parents('.header-form-wrap').length > 0
