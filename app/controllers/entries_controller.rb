@@ -138,18 +138,12 @@ class EntriesController < ApplicationController
       saved_search = @user.saved_searches.where(id: params[:data]).first
       if saved_search.present?
         params[:query] = saved_search.query
-        search_params = build_search(params)
-        search_params[:load] = false
-        entries = Entry.search(search_params, @user)
-        ids = entries.results.map {|entry| entry.id.to_i}
-        if entries.total_pages > 1
-          2.upto(entries.total_pages) do |page|
-            search_params[:page] = page
-            entries = Entry.search(search_params, @user)
-            ids = ids.concat(entries.results.map {|entry| entry.id.to_i})
-          end
-        end
+        ids = matched_search_ids(params)
+        UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
       end
+    elsif params[:type] == 'search'
+      params[:query] = params[:data]
+      ids = matched_search_ids(params)
       UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
     end
 
@@ -228,6 +222,19 @@ class EntriesController < ApplicationController
         UnreadEntry.where(user: @user, entry_id: starred).where.not(entry_id: ids).delete_all
       elsif  %w{unread all}.include?(params[:type])
         UnreadEntry.where(user: @user).where.not(entry_id: ids).delete_all
+      elsif params[:type] == 'saved_search'
+        saved_search = @user.saved_searches.where(id: params[:data]).first
+        if saved_search.present?
+          params[:query] = saved_search.query
+          search_ids = matched_search_ids(params)
+          ids = search_ids - ids
+          UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
+        end
+      elsif params[:type] == 'search'
+        params[:query] = params[:data]
+        search_ids = matched_search_ids(params)
+        ids = search_ids - ids
+        UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
       end
     end
 
@@ -259,6 +266,8 @@ class EntriesController < ApplicationController
     @collection_favicon = 'favicon-search'
 
     @saved_search = SavedSearch.new
+
+    @escaped_query = params[:query].gsub("\"", "'").html_safe if params[:query]
 
     respond_to do |format|
       format.js { render partial: 'shared/entries' }
@@ -315,6 +324,21 @@ class EntriesController < ApplicationController
       @content = '(no content)'
     end
 
+  end
+
+  def matched_search_ids(params)
+    search_params = build_search(params)
+    search_params[:load] = false
+    entries = Entry.search(search_params, @user)
+    ids = entries.results.map {|entry| entry.id.to_i}
+    if entries.total_pages > 1
+      2.upto(entries.total_pages) do |page|
+        search_params[:page] = page
+        entries = Entry.search(search_params, @user)
+        ids = ids.concat(entries.results.map {|entry| entry.id.to_i})
+      end
+    end
+    ids
   end
 
 end
