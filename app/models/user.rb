@@ -271,7 +271,7 @@ class User < ActiveRecord::Base
   end
 
   def days_left
-    expires = (user.created_at + Feedbin::Application.config.trial_days.days).to_i
+    expires = (self.created_at + Feedbin::Application.config.trial_days.days).to_i
     now = Time.now.to_i
     seconds_left = expires - now
     (seconds_left.to_f / 86400.to_f).ceil
