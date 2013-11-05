@@ -6,7 +6,6 @@
 
     <h4>Keywords</h4>
     <p><%= f.search_field :query %></p>
-
     <h4>Feeds</h4>
     <p class="half-margin">
       <label class="checkbox">
@@ -17,7 +16,11 @@
     <div class="feed-ids">
       <%=
         f.collection_check_boxes(:feed_ids, @user.feeds.include_user_title, :string_id, :title) do |b|
-          b.label(class: "checkbox") { b.check_box + b.text }
+          options = {}
+          if f.object.all_feeds == true
+            options[:disabled] = 'disabled'
+          end
+          b.label(class: "checkbox") { b.check_box(options) + b.text }
         end
       %>
     </div>
