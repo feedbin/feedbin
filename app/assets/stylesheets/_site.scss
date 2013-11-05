@@ -786,13 +786,11 @@ input[type="search"],
 input[type="tel"],
 input[type="color"],
 .uneditable-input {
-	border-radius: 4px;
 	border: 1px solid #CCC;
 	font-size: 18px;
 	padding: 12px 12px 10px 12px;
 	max-width: 300px;
 	width: 100%;
-	border-radius: 4px;
 	color: #333;
 	display: inline-block;
 	margin-bottom: 15px;
@@ -1030,7 +1028,7 @@ Structure
 	}
 }
 .bar {
-	height: 48px;
+	height: 43px;
 	color: #333;
 	position: relative;
 	background-color: #FFF;
@@ -1061,13 +1059,12 @@ Structure
 	form {
 		margin: 0;
 		input[type="search"] {
-			height: 32px;
+			height: 27px;
 			width: 242px;
 			margin-bottom: 0;
-			padding: 5px 5px 5px 25px;
+			padding: 3px 5px 3px 25px;
 			font-size: 14px;
-			border-radius: 0;
-			background: image-url("favicon-search.svg") 5px 7px no-repeat;
+			background: image-url("favicon-search.svg") 5px 5px no-repeat;
 			background-size: 16px 16px;
 			&.processing {
 				background-image: image-url("favicon-search.svg"), image-url("favicon-progress.gif");
@@ -1129,7 +1126,7 @@ Structure
 	background-color: #FFF;
 	width: 242px;
 	position: absolute;
-	top: 32px;
+	top: 27px;
 	left: 0;
 	z-index: 100;
 	overflow: hidden;
@@ -1144,7 +1141,6 @@ Structure
 	.saved-inner {
 		padding: 8px 0 0 8px;
 		input[type="text"] {
-			border-radius: 0;
 			font-size: 14px;
 			width: 167px;
 			padding: 5px;
@@ -1184,16 +1180,15 @@ Structure
 .account-buttons {
 	position: absolute;
 	right: 8px;
-	top: 16px;
+	top: 14px;
 	a {
 		color: #666666;
-		font-size: 12px;
+		font-size: 13px;
 		display: block;
 		float: left;
 		text-decoration: none;
-		font-weight: bold;
-		margin: 0 15px 0 0;
-		padding: 0 15px 0 0;
+		margin: 0 10px 0 0;
+		padding: 0 10px 0 0;
 		border-right: 1px solid #cccccc;
 		&:last-child {
 			border: none;
@@ -1215,8 +1210,8 @@ Structure
 	z-index: 1;
 	.menu-button {
 		background: image-url("icon-menu.svg") center center no-repeat;
-		width: 48px;
-		height: 48px;
+		width: 43px;
+		height: 43px;
 		margin-left: auto;
 		overflow: auto;
 	}
@@ -1264,7 +1259,7 @@ Structure
 	position: absolute;
 	height: auto;
 	bottom: 0;
-	top: 48px;
+	top: 43px;
 	right: 0;
 	left: 0;
 	@media (max-width: 768px) {
@@ -1485,7 +1480,6 @@ Structure
 		margin-bottom: 0;
 		padding: 5px 25px 5px 5px;
 		font-size: 14px;
-		border-radius: 0;
 	}
 }
 
@@ -2596,13 +2590,12 @@ Settings
 		padding: 4px 0;
 		display: block;
 		font-size: 18px;
-		color: #666666;
+		color: #999;
 		&:hover {
 			color: #000;
 			text-decoration: none;
 		}
 		&.active {
-			font-weight: bold;
 			color: #000;
 		}
 	}
@@ -2620,6 +2613,9 @@ Settings
 }
 
 .settings {
+	font-size: 16px;
+	background-color: #efefef;
+	color: #333;
 	.content {
 		display: table;
 		border-collapse: collapse;
@@ -2641,6 +2637,7 @@ Settings
 			}
 		}
 		.settings-content {
+			line-height: 1.4;
 			display: table-cell;
 			background-color: white;
 			vertical-align: top;
@@ -2655,17 +2652,13 @@ Settings
 			}
 		}
 	}
-
 	.content {
 		position: static;
 		height: 100%;
 	}
-	font-size: 18px;
-	background-color: #efefef;
-	color: #333;
 	small {
 		font-size: 13px;
-		color: #666666;
+		color: #999;
 	}
 	code {
 		font-size: 15px;
@@ -2693,17 +2686,22 @@ Settings
 		-webkit-font-smoothing: antialiased;
 	}
 	h3 {
-		font-size: 24px;
-		margin: 15px 0 15px 0;
+		font-size: 20px;
+		margin: 18px 0 15px 0;
 		&.no-margin {
 			margin-bottom: 0;
 		}
+	}
+	h4 {
+		font-size: 18px;
+		margin: 0 0 10px 0;
 	}
 	h3.box-header {
 		margin: 0;
 	}
 	.button {
-		padding: 10px 25px;
+		padding: 7px 17px;
+		font-size: 16px;
 	}
 	.button-mini {
 		padding: 7px 10px;
@@ -2740,6 +2738,27 @@ Settings
 			float: left;
 		}
 	}
+	textarea,
+	input[type="text"],
+	input[type="password"],
+	input[type="datetime"],
+	input[type="datetime-local"],
+	input[type="date"],
+	input[type="month"],
+	input[type="time"],
+	input[type="week"],
+	input[type="number"],
+	input[type="email"],
+	input[type="url"],
+	input[type="search"],
+	input[type="tel"],
+	input[type="color"] {
+		padding: 5px;
+		font-size: 16px;
+	}
+	.checkbox input {
+		margin-top: 2px;
+	}
 }
 
 .key {
@@ -2765,7 +2784,7 @@ table.small td {
 		margin: 0;
 	}
 	.action {
-		padding-top: 14px;
+		padding-top: 11px;
 	}
 	[type="url"] {
 		width: 297px;
@@ -2773,49 +2792,41 @@ table.small td {
 	[type="checkbox"] {
 		margin-top: 10px;
 	}
-	[class^="button"] {
-		float: right;
-	}
 	[class*=" button-primary"] {
-		margin-left: 5px;
+		margin-right: 5px;
 	}
 	input.span2 {
 		width: 140px;
+	}
+	td:first-child {
+		padding-left: 0;
+	}
+	td:last-child {
+		padding-right: 0;
 	}
 }
 
 .actions-table {
 	td {
 		line-height: 1.2;
-		border-color: transparent !important;
+		position: relative;
+	}
+	.button-danger {
+		position: absolute;
+		right: 5px;
+		top: 11px;
 	}
 	td.action {
 		width: 60px;
 	}
-	tr:nth-child(odd) {
-		td {
-			border-color: #ccc !important;
-		}
-	}
-	tr:nth-child(even) {
-		td {
-			padding-top: 0;
-		}
-	}
 	[type="search"] {
-		width: 100%;
-		max-width: 100%;
-		background: image-url("favicon-search.svg") 5px 14px no-repeat;
-		padding-left: 25px;
+		max-width: 300px;
 	}
 	.checkbox {
 		font-size: 13px;
-		float: left;
-		margin-right: 15px;
-		padding-left: 16px;
 		input {
 			margin-top: 2px;
-			margin-left: -16px;
+			margin-left: -20px;
 		}
 	}
 	select {
@@ -2832,10 +2843,12 @@ table.small td {
 		}
 	}
 	.feed-ids {
-		width: 150px;
-		overflow-x: hidden;
 		overflow-y: auto;
-		height: 78px;
+		max-height: 78px;
+		border: 1px solid #CCC;
+		background: $list-background;
+		margin-bottom: 15px;
+		padding: 8px 6px;
 		.checkbox {
 			float: none;
 			overflow: hidden;
@@ -2879,6 +2892,9 @@ table.small td {
 	}
 	[class^="button"] {
 		float: none;
+	}
+	a {
+		color: #999;
 	}
 }
 
@@ -2962,6 +2978,36 @@ Buttons
 .button-mini {
 	font-size: 12px;
 	padding: 4px 5px;
+}
+
+.button-link {
+	font-weight: normal;
+	padding: 0 !important;
+	border: none;
+	font-size: 16px;
+	&:hover {
+		background: transparent;
+	}
+	&.button {
+		&:hover {
+			color: $selected;
+		}
+	}
+	&.button-danger {
+		&:hover {
+			color: red;
+		}
+	}
+}
+
+.add-button {
+	color: $selected;
+	position: relative;
+	display: block;
+	margin-bottom: 5px;
+	&:hover {
+		text-decoration: none;
+	}
 }
 
 .tags-form-wrap {
@@ -3375,6 +3421,10 @@ select {
 
 .no-margin {
 	margin: 0;
+}
+
+.half-margin {
+	margin-bottom: 8px;
 }
 
 hr {

@@ -1,26 +1,28 @@
 <tr>
-  <td rowspan="2" width="160">
-    <label class="checkbox">
-      <%= f.check_box :all_feeds, data: {behavior: 'check_feeds'} %>
-      Include all Feeds
-    </label>
-    <div class="feed-ids <%= 'hide' if f.object.all_feeds %>">
+  <td>
+    <%= f.hidden_field :id %>
+    <%= f.hidden_field :_destroy %>
+    <%= link_to 'Delete', '#', class: 'button button-text button-danger button-link', data: {behavior: 'remove_fields'} %>
+
+    <h4>Keywords</h4>
+    <p><%= f.search_field :query %></p>
+
+    <h4>Feeds</h4>
+    <p class="half-margin">
+      <label class="checkbox">
+        <%= f.check_box :all_feeds, data: {behavior: 'check_feeds'} %>
+        Include All Feeds
+      </label>
+    </p>
+    <div class="feed-ids">
       <%=
         f.collection_check_boxes(:feed_ids, @user.feeds.include_user_title, :string_id, :title) do |b|
           b.label(class: "checkbox") { b.check_box + b.text }
         end
       %>
     </div>
-  </td>
-  <td><%= f.search_field :query %></td>
-  <td class="action">
-    <%= f.hidden_field :id %>
-    <%= f.hidden_field :_destroy %>
-    <%= link_to 'Delete', '#', class: 'button button-mini button-text button-danger', data: {behavior: 'remove_fields'} %>
-  </td>
-</tr>
-<tr>
-  <td colspan="2">
+
+    <h4>Actions</h4>
     <%=
       f.collection_check_boxes(:actions, Feedbin::Application.config.action_names, :value, :label) do |b|
         b.label(class: "checkbox", data: {behavior: "action_#{b.value}"}) { b.check_box + b.text }

@@ -403,7 +403,7 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=add_fields]', (event) ->
         time = new Date().getTime() + '_insert'
         regexp = new RegExp($(@).data('id'), 'g')
-        $(@).parents('[data-behavior~=add_fields_target]').find('tr:last').before($(@).data('fields').replace(regexp, time))
+        $('[data-behavior~=add_fields_target]').find('tr:first').before($(@).data('fields').replace(regexp, time))
         event.preventDefault()
         return
 
@@ -479,10 +479,11 @@ $.extend feedbin,
         cell = $(@).parents('td')
         feedIds = $('.feed-ids', cell)
         if $(@).is(':checked')
-          feedIds.addClass('hide')
+          $('[type="checkbox"]', feedIds ).prop('checked', true)
+          $('[type="checkbox"]', feedIds ).attr('disabled', 'disabled')
         else
-          feedIds.removeClass('hide')
-          $('[type="checkbox"]', cell).prop('checked', false)
+          $('[type="checkbox"]', feedIds ).prop('checked', false)
+          $('[type="checkbox"]', feedIds ).removeAttr('disabled')
         return
 
     validateFile: ->

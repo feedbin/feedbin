@@ -23,14 +23,10 @@
 </div>
 
 
-<div class="clearfix">
-  <div class="half">
-    <small>Select: <a href="#" data-behavior="check_all">All</a> / <a href="#" data-behavior="check_none">None</a></small>
-  </div>
-</div>
+<p class="half-margin">Select: <a href="#" data-behavior="check_all">All</a> / <a href="#" data-behavior="check_none">None</a></p>
 <%= form_tag update_multiple_subscriptions_path, method: :patch do %>
   <div class="collection-edit-wrapper">
-    <table class="table table-condensed form-table feed-form">
+    <table class="table form-table feed-form">
       <% @subscriptions.each do |subscription| %>
         <%= fields_for "subscriptions[]", subscription do |f| %>
           <tr>
@@ -62,14 +58,14 @@
       <% end %>
     </table>
   </div>
-  <table class="table table-condensed form-table feed-form">
+  <table class="table form-table feed-form">
     <tr>
       <td colspan="2">
         <div class="half text-right float-right">
           <%= submit_tag "Save", class: 'button button-primary' %>
         </div>
         <div class="half">
-          <%= submit_tag 'Unsubscribe', class: 'button button-danger', name: 'unsubscribe' %>
+          <%= submit_tag 'Unsubscribe', class: 'button button-danger button-link', name: 'unsubscribe', style: 'margin-top: 11px;' %>
         </div>
       </td>
     </tr>
