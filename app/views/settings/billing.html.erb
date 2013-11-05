@@ -75,7 +75,7 @@
     <h3 class="por">
       Payment History
       <% if @next_payment %>
-        <p class="inline-subhead"><small>Next payment: <time datetime="<%= @next_payment.to_s(:datetime) %>"><%= @next_payment.to_s(:feed) %> UTC</time></small></p>
+        <p class="inline-subhead"><small>Next payment: <time datetime="<%= @next_payment.to_s(:date) %>"><%= @next_payment.to_s(:date) %></time></small></p>
       <% end %>
     </h3>
 
@@ -87,12 +87,22 @@
       </tr>
       <% @billing_events.each do |invoice| %>
       <tr>
-        <td><%= Time.at(invoice.details.data.object.date).to_s(:date) %></td>
+        <td><%= Time.at(invoice.details.data.object.created).to_s(:date) %></td>
         <td><%= link_to 'Receipt', invoice %></td>
-        <td><%= invoice.details.data.object.currency.upcase %> <%= number_to_currency(invoice.details.data.object.total.to_f / 100) %></td>
+        <td><%= invoice.details.data.object.currency.upcase %> <%= number_to_currency(invoice.details.data.object.amount.to_f / 100) %></td>
       </tr>
       <% end %>
     </table>
+
+    <h3 class="no-margin">Receipt Info</h3>
+    <p><small>This will show up on your receipt. Useful for VAT, address etc...</small></p>
+
+    <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
+      <%= hidden_field_tag :redirect_to, settings_billing_url %>
+      <%= f.text_area :receipt_info, rows: 3 %>
+      <p><%= f.submit "Save", class: 'button' %></p>
+    <% end %>
+
   <% end %>
 <% else %>
   <p>Billing disabled. <code>STRIPE_API_KEY</code> and <code>STRIPE_PUBLIC_KEY</code> are missing.</p>

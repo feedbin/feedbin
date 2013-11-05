@@ -2695,6 +2695,9 @@ Settings
 	h3 {
 		font-size: 24px;
 		margin: 15px 0 15px 0;
+		&.no-margin {
+			margin-bottom: 0;
+		}
 	}
 	h3.box-header {
 		margin: 0;
@@ -3427,6 +3430,7 @@ h3 .inline-subhead {
 	bottom: 0;
 	right: 0;
 	margin: 0;
+	font-weight: normal;
 	small {
 		font-size: 12px;
 		color: #333;
@@ -3741,6 +3745,23 @@ Mobile
 	.entries ul li:hover.starred .icon-star {
 		display: block !important;
 	}
+}
+
+
+/*------------------------------------------------------------------------------
+Receipt
+------------------------------------------------------------------------------*/
+.company-info, .customer-info {
+  display: inline-block;
+}
+.company-info {
+  float: right;
+  background: image-url("logo.svg") 0 5px no-repeat;
+  background-size: auto 50px;
+  padding-left: 80px;
+}
+.customer-info {
+  float: left;
 }
 
 

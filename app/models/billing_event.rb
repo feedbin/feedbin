@@ -26,11 +26,9 @@ class BillingEvent < ActiveRecord::Base
 
   def process_event
     case event_type
-    when 'invoice.payment_succeeded'
+    when 'charge.succeeded'
       billable.update_attributes(suspended: false)
-      unless details.data.object.total == 0
-        UserMailer.delay(queue: :critical).payment_receipt(id)
-      end
+      UserMailer.delay(queue: :critical).payment_receipt(id)
     when 'invoice.payment_failed'
       billable.update_attributes(suspended: true)
       UserMailer.delay(queue: :critical).payment_failed(id)

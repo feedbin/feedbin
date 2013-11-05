@@ -40,17 +40,18 @@ class SettingsController < ApplicationController
 
   def billing
     @user = current_user
-    @billing_events = @user.billing_events.where(event_type: 'invoice.payment_succeeded')
-    @billing_events = @billing_events.to_a.sort_by {|billing_event| -billing_event.details.data.object.date }
-    @next_payment = nil
-    if @billing_events.present?
-      @billing_events.first.details.data.object.lines.data.each do |event|
+    @next_payment = @user.billing_events.where(event_type: 'invoice.payment_succeeded')
+    @next_payment = @next_payment.to_a.sort_by {|next_payment| -next_payment.details.data.object.date }
+    if @next_payment.present?
+      @next_payment.first.details.data.object.lines.data.each do |event|
         event = event.to_hash
         if event[:type] && event[:type] == 'subscription'
           @next_payment = Time.at(event[:period].end).utc.to_datetime
         end
       end
     end
+    @billing_events = @user.billing_events.where(event_type: 'charge.succeeded')
+    @billing_events = @billing_events.to_a.sort_by {|billing_event| -billing_event.details.data.object.created }
     if @user.plan.stripe_id == 'free'
       @plans = Plan.where(price_tier: @user.plan.price_tier)
     else
@@ -192,7 +193,7 @@ class SettingsController < ApplicationController
   end
 
   def user_settings_params
-    params.require(:user).permit(:entry_sort, :starred_feed_enabled, :hide_tagged_feeds, :precache_images, :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation, :apple_push_notification_device_token)
+    params.require(:user).permit(:entry_sort, :starred_feed_enabled, :hide_tagged_feeds, :precache_images, :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation, :apple_push_notification_device_token, :receipt_info)
   end
 
 end
