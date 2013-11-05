@@ -1160,12 +1160,10 @@ Structure
 }
 
 .save-search-link {
-	font-size: 11px;
-	text-transform: uppercase;
-	font-weight: bold;
+	font-size: 13px;
 	position: absolute;
-	right: -35px;
-	top: 9px;
+	right: -37px;
+	top: 7px;
 	cursor: pointer;
 	color: $selected;
 	&[disabled] {
