@@ -2,6 +2,18 @@
 
 <p class="muted">Actions can be performed on articles when they are published. Start by writing the keywords to match, just like you would when searching for something. Then select the feeds to include. Finally check the actions you would like to perform on the matched incoming articles.</p>
 
+<div class="push-options hide" id="push-data" data-website-id="<%= ENV['APPLE_PUSH_WEBSITE_ID'] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>">
+  <div class="push-enable hide">
+    <p>Push notifications can be enabled as an action. <a href="#" data-behavior="enable_push">Enable push notifications</a>.</p>
+  </div>
+  <div class="push-disable hide">
+    <p>Push notifications are <span class="highlight-positive">enabled</span>. You can disable notifications in preferences under Notifications.</p>
+  </div>
+  <div class="push-disabled hide">
+    <p>Push notifications are <span class="highlight-negative">disabled</span>. You can enable them in Safari preferences under Notifications.</p>
+  </div>
+</div>
+
 <%= form_for @user, url: actions_update_user_path(@user), html: {novalidate: 'novalidate'} do |f| %>
   <p class="half-margin"><%= link_to_add_fields "Add Action", f, :actions %></p>
   <table class="table form-table actions-table" data-behavior="add_fields_target">
@@ -17,3 +29,5 @@
     </tbody>
   </table>
 <% end %>
+
+<div class="hide" id="push-data" data-website-id="<%= ENV['APPLE_PUSH_WEBSITE_ID'] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>"></div>

@@ -2814,8 +2814,18 @@ table.small td {
 		right: 5px;
 		top: 11px;
 	}
+	.edit-action {
+		position: absolute;
+		right: 68px;
+		top: 11px;
+	}
 	td.action {
 		width: 60px;
+	}
+	.persisted .action-form {
+		border-top: 1px solid #eaeaea;
+		margin-top: 10px;
+		padding-top: 10px;
 	}
 	[type="search"] {
 		max-width: 300px;
@@ -2865,6 +2875,44 @@ table.small td {
 [data-behavior="action_send_push_notification"] {
 	display: none;
 	.supports-push & {
+		display: block;
+	}
+	.push-off &, .push-disabled & {
+		display: none;
+	}
+}
+
+.push-options {
+	font-size: 13px;
+	color: #999;
+	line-height: 1.2;
+	border: 1px solid #CCC;
+	background: $list-background;
+	margin: 0 0 15px 0;
+	padding: 8px 6px;
+	button {
+		font-size: 13px !important;
+		display: inline !important;
+	}
+	p {
+		margin-bottom: 0;
+	}
+}
+
+.push-off {
+	.push-enable {
+		display: block;
+	}
+}
+
+.push-on {
+	.push-disable {
+		display: block;
+	}
+}
+
+.push-disabled {
+	.push-disabled {
 		display: block;
 	}
 }

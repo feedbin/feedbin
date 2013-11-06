@@ -1,0 +1,3 @@
+<div style="padding-right: 100px;"><strong>Matches:</strong> <% if action.query.blank? %> Anything <% else %> <%= action.query %> <% end %></div>
+<strong>Feeds:</strong> <%= action_feed_names(action) %>
+<br /><strong>Actions:</strong> <%= action_names(action) %>

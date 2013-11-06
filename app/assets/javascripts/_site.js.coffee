@@ -108,10 +108,7 @@ $.extend feedbin,
       delimiter: /(,)\s*/
 
   autoHeight: ->
-    if "safari" of window and "pushNotification" of window.safari
-      $('.collection-edit-wrapper').height($(window).height() - 410)
-    else
-      $('.collection-edit-wrapper').height($(window).height() - 210)
+    $('.collection-edit-wrapper').height($(window).height() - 210)
 
   entries: {}
 
@@ -195,12 +192,18 @@ $.extend feedbin,
     $("[data-behavior~=show_form_options]").text($("[data-select-option=#{selectOption}]").text())
 
   checkPushPermission: (permissionData) ->
-    if (permissionData.permission == 'granted')
-      $('.push-enable, .push-disabled').addClass('hide')
-      $('.push-disable').removeClass('hide')
+    if (permissionData.permission == 'default')
+      $('body').removeClass('push-on')
+      $('body').removeClass('push-disabled')
+      $('body').addClass('push-off')
+    else if (permissionData.permission == 'granted')
+      $('body').removeClass('push-off')
+      $('body').removeClass('push-disabled')
+      $('body').addClass('push-on')
     else if (permissionData.permission == 'denied')
-      $('.push-enable, .push-disable').addClass('hide')
-      $('.push-disabled').removeClass('hide')
+      $('body').removeClass('push-on')
+      $('body').removeClass('push-off')
+      $('body').addClass('push-disabled')
 
   hideQueue: []
 
@@ -711,19 +714,25 @@ $.extend feedbin,
         $('body').addClass('supports-push')
         if $('#push-data').length > 0
           $('.push-options').removeClass('hide')
-          websiteId = $('#push-data').data('website-id')
-          permissionData = window.safari.pushNotification.permission(websiteId)
-          if (permissionData.permission == 'default')
-            $('.push-enable').removeClass('hide')
-          else if (permissionData.permission == 'granted')
-            $('.push-disable').removeClass('hide')
-          else if (permissionData.permission == 'denied')
-            $('.push-disabled').removeClass('hide')
+          data = $('#push-data').data()
+          permissionData = window.safari.pushNotification.permission(data.websiteId)
+          feedbin.checkPushPermission(permissionData )
 
     enablePush: ->
       $(document).on 'click', '[data-behavior~=enable_push]', ->
         data = $('#push-data').data()
         window.safari.pushNotification.requestPermission(data.webServiceUrl, data.websiteId, {authentication_token: data.authenticationToken}, feedbin.checkPushPermission)
+
+    editAction: ->
+      $(document).on 'click', '[data-behavior~=edit_action]', (event) ->
+        actionForm = $(@).parents('td').find('.action-form')
+        if actionForm.hasClass('hide')
+          actionForm.removeClass('hide')
+        else
+          actionForm.addClass('hide')
+        event.stopPropagation()
+        event.preventDefault()
+        return
 
 jQuery ->
   $.each feedbin.init, (i, item) ->

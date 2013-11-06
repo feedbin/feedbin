@@ -214,18 +214,11 @@ class Entry < ActiveRecord::Base
   def mark_as_unread
     unless skip_mark_as_unread
       unread_entries = []
-      push_notification_user_ids = []
-      subscriptions = Subscription.where(feed_id: self.feed_id, active: true).pluck(:user_id, :push)
-      subscriptions.each do |user_id, push|
+      subscriptions = Subscription.where(feed_id: self.feed_id, active: true).pluck(:user_id)
+      subscriptions.each do |user_id|
         unread_entries << UnreadEntry.new(user_id: user_id, feed_id: self.feed_id, entry_id: self.id, published: self.published, entry_created_at: self.created_at)
-        if push
-          push_notification_user_ids << user_id
-        end
       end
       UnreadEntry.import(unread_entries, validate: false)
-      if push_notification_user_ids.any?
-        PushNotificationSend.perform_async(self.id, push_notification_user_ids)
-      end
     end
   end
 
