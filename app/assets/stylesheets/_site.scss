@@ -1018,7 +1018,7 @@ table th[class^="col-"] {
 Structure
 ------------------------------------------------------------------------------*/
 .logo {
-	margin: 9px 0 0 8px;
+	margin: 7px 0 0 8px;
 	svg {
 		width: 32px;
 		height: 27px;
@@ -1240,10 +1240,9 @@ Structure
 .subscribe-promo {
 	position: absolute;
 	right: 200px;
-	top: 16px;
+	top: 14px;
 	color: #66a35b;
-	font-size: 12px;
-	font-weight: bold;
+	font-size: 13px;
 	&:hover {
 		color: #418037;
 	}
