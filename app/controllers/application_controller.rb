@@ -150,6 +150,14 @@ class ApplicationController < ActionController::Base
       search_params[:sort] = search_params[:query].match(sort_regex)[1].downcase
       search_params[:query] = search_params[:query].gsub(sort_regex, '')
     end
+
+    colon_regex = /(?<!title|feed_id):(?=.*)/
+    search_params[:query] = search_params[:query].gsub(colon_regex, '\:')
+
+    special_characters_regex = /([\+\-\!\{\}\[\]\^\~\?\\])/
+    escape = '\ '.sub(' ', '')
+    search_params[:query] = search_params[:query].gsub(special_characters_regex) { |character| escape + character }
+
     search_params
   end
 
