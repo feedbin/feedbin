@@ -1065,10 +1065,10 @@ Structure
 			padding: 3px 5px 3px 25px;
 			font-size: 14px;
 			background: image-url("favicon-search.svg") 5px 5px no-repeat;
-			background-size: 16px 16px;
+			background-size: 14px 14px, 16px 16px;
 			&.processing {
 				background-image: image-url("favicon-search.svg"), image-url("favicon-progress.gif");
-				background-position: 5px 7px, 97% 7px;
+				background-position: 5px 6px, 97% 5px;
 			}
 		}
 	}
@@ -2754,7 +2754,7 @@ Settings
 		font-size: 16px;
 	}
 	.checkbox input {
-		margin-top: 2px;
+		margin-top: 3px;
 	}
 }
 
