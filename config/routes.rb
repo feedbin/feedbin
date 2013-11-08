@@ -15,6 +15,9 @@ Feedbin::Application.routes.draw do
   get :home, to: 'site#home'
   get :apps, to: 'site#apps'
 
+  # FireFox OS manifest
+  get :manifest, to: 'site#manifest'
+
   post '/emails' => 'emails#create'
 
   match '/404', to: 'errors#not_found', via: :all
