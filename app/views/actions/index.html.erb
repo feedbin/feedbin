@@ -18,6 +18,13 @@
   <p class="half-margin"><%= link_to_add_fields "Add Action", f, :actions %></p>
   <table class="table form-table actions-table" data-behavior="add_fields_target">
     <tbody>
+      <% if @user.actions.count > 3 %>
+        <tr>
+          <td>
+            <%= f.submit 'Save', class: 'button button-primary' %>
+          </td>
+        </tr>
+      <% end %>
       <%= f.fields_for :actions do |builder| %>
         <%= render 'action_fields', f: builder %>
       <% end %>
