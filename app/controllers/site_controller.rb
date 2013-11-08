@@ -1,6 +1,6 @@
 class SiteController < ApplicationController
 
-  skip_before_action :authorize, only: [:index, :home, :privacy_policy, :apps]
+  skip_before_action :authorize, only: [:index, :home, :privacy_policy, :apps, 'manifest.webapp']
   before_action :valid_user, if: :signed_in?
 
   def index
