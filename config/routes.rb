@@ -15,6 +15,9 @@ Feedbin::Application.routes.draw do
   get :home, to: 'site#home'
   get :apps, to: 'site#apps'
 
+  # FireFox OS manifest
+  get :manifest, to: 'site#manifest'
+
   post '/emails' => 'emails#create'
 
   match '/404', to: 'errors#not_found', via: :all
@@ -107,8 +110,6 @@ Feedbin::Application.routes.draw do
     post :font_decrease
     post :entry_width
   end
-
-  get 'manifest.webapp', to: 'site#manifest.webapp'
 
   constraints subdomain: 'api' do
     namespace :api, path: nil do

@@ -1,6 +1,6 @@
 class SiteController < ApplicationController
 
-  skip_before_action :authorize, only: [:index, :home, :privacy_policy, :apps, 'manifest.webapp']
+  skip_before_action :authorize, only: [:index, :home, :privacy_policy, :apps, :manifest]
   before_action :valid_user, if: :signed_in?
 
   def index
@@ -35,6 +35,8 @@ class SiteController < ApplicationController
   def apps
     render layout: 'sub_page'
   end
+
+  def manifest; end
 
   private
 
