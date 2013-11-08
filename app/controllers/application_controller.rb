@@ -151,7 +151,7 @@ class ApplicationController < ActionController::Base
       search_params[:query] = search_params[:query].gsub(sort_regex, '')
     end
 
-    colon_regex = /(?<!title|feed_id):(?=.*)/
+    colon_regex = /(?<!title|feed_id|body|author):(?=.*)/
     search_params[:query] = search_params[:query].gsub(colon_regex, '\:')
 
     special_characters_regex = /([\+\-\!\{\}\[\]\^\~\?\\])/
