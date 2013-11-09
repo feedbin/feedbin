@@ -1,4 +1,12 @@
 class Action < ActiveRecord::Base
-    attr_accessor :include_all_feeds
     belongs_to :user
+
+    validate :validate_query
+
+    private
+
+    def validate_query
+      # errors.add(:query, 'is invalid')
+    end
+
 end

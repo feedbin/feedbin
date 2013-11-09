@@ -108,6 +108,7 @@ GEM
     clockwork (0.7.0)
       activesupport
       tzinfo (~> 0.3.35)
+    cocoon (1.2.1)
     coderay (1.1.0)
     coffee-rails (4.0.1)
       coffee-script (>= 2.2.0)
@@ -323,6 +324,7 @@ DEPENDENCIES
   carrierwave
   carrierwave_direct
   clockwork
+  cocoon
   coffee-rails (~> 4.0.0)
   dalli
   feedzirra!

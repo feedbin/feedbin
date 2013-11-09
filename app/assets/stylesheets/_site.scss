@@ -833,6 +833,10 @@ label select {
 	margin-bottom: 0;
 }
 
+.field_with_errors input {
+	border: 1px solid red;
+}
+
 table {
 	max-width: 100%;
 	background-color: transparent;
@@ -2803,11 +2807,17 @@ table.small td {
 	}
 }
 
-.actions-table {
-	td {
-		line-height: 1.2;
-		position: relative;
-	}
+.add-record-link {
+	border-bottom: 1px solid #CCC;
+	margin-bottom: 8px;
+	padding-bottom: 8px;
+}
+
+.action-form {
+	position: relative;
+	border-bottom: 1px solid #CCC;
+	margin-bottom: 8px;
+	padding-bottom: 8px;
 	.button-danger {
 		position: absolute;
 		right: 5px;
@@ -2818,10 +2828,7 @@ table.small td {
 		right: 68px;
 		top: 3px;
 	}
-	td.action {
-		width: 60px;
-	}
-	.persisted .action-form {
+	&.persisted .action-edit-form {
 		border-top: 1px solid #eaeaea;
 		margin-top: 10px;
 		padding-top: 10px;

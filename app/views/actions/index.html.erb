@@ -15,19 +15,11 @@
 </div>
 
 <%= form_for @user, url: actions_update_user_path(@user), html: {novalidate: 'novalidate'} do |f| %>
-  <p class="half-margin"><%= link_to_add_fields "Add Action", f, :actions %></p>
-  <table class="table form-table actions-table" data-behavior="add_fields_target">
-    <tbody>
-      <%= f.fields_for :actions do |builder| %>
-        <%= render 'action_fields', f: builder %>
-      <% end %>
-      <tr>
-        <td>
-          <%= f.submit 'Save', class: 'button button-primary' %>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <p class="add-record-link"><%= link_to_add_association "Add Action", f, :actions, data: {association_insertion_node: '[data-behavior~=association_insertion_node]' } %></p>
+  <div data-behavior="association_insertion_node">
+    <%= f.fields_for :actions do |builder| %>
+      <%= render 'action_fields', f: builder %>
+    <% end %>
+  </div>
+  <%= f.submit 'Save', class: 'button button-primary' %>
 <% end %>
-
-<div class="hide" id="push-data" data-website-id="<%= ENV['APPLE_PUSH_WEBSITE_ID'] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>"></div>

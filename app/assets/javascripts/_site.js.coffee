@@ -723,9 +723,13 @@ $.extend feedbin,
         data = $('#push-data').data()
         window.safari.pushNotification.requestPermission(data.webServiceUrl, data.websiteId, {authentication_token: data.authenticationToken}, feedbin.checkPushPermission)
 
+    deleteAssociatedRecord: ->
+      $(document).on 'click', '.remove_fields', (event) ->
+        $(@).parents('[data-behavior~=associated_record]').hide(200)
+
     editAction: ->
       $(document).on 'click', '[data-behavior~=edit_action]', (event) ->
-        actionForm = $(@).parents('td').find('.action-form')
+        actionForm = $(@).parents('.action-form').find('.action-edit-form')
         if actionForm.hasClass('hide')
           actionForm.removeClass('hide')
         else
