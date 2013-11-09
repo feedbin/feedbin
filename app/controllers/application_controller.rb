@@ -123,44 +123,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def build_search(search_params)
-    unread_regex = /(?<=\s|^)is:\s*unread(?=\s|$)/
-    read_regex = /(?<=\s|^)is:\s*read(?=\s|$)/
-    starred_regex = /(?<=\s|^)is:\s*starred(?=\s|$)/
-    unstarred_regex = /(?<=\s|^)is:\s*unstarred(?=\s|$)/
-    sort_regex = /(?<=\s|^)sort:\s*(asc|desc)(?=\s|$)/i
-
-    if search_params[:query] =~ unread_regex
-      search_params[:query] = search_params[:query].gsub(unread_regex, '')
-      search_params[:read] = false
-    elsif search_params[:query] =~ read_regex
-      search_params[:query] = search_params[:query].gsub(read_regex, '')
-      search_params[:read] = true
-    end
-
-    if search_params[:query] =~ starred_regex
-      search_params[:query] = search_params[:query].gsub(starred_regex, '')
-      search_params[:starred] = true
-    elsif search_params[:query] =~ unstarred_regex
-      search_params[:query] = search_params[:query].gsub(unstarred_regex, '')
-      search_params[:starred] = false
-    end
-
-    if search_params[:query] =~ sort_regex
-      search_params[:sort] = search_params[:query].match(sort_regex)[1].downcase
-      search_params[:query] = search_params[:query].gsub(sort_regex, '')
-    end
-
-    colon_regex = /(?<!title|feed_id|body|author):(?=.*)/
-    search_params[:query] = search_params[:query].gsub(colon_regex, '\:')
-
-    special_characters_regex = /([\+\-\!\{\}\[\]\^\~\?\\])/
-    escape = '\ '.sub(' ', '')
-    search_params[:query] = search_params[:query].gsub(special_characters_regex) { |character| escape + character }
-
-    search_params
-  end
-
   def set_view_mode
     session[:view_mode] ||= 'view_unread'
   end

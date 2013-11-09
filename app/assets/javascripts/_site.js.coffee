@@ -479,7 +479,7 @@ $.extend feedbin,
         return
 
       $(document).on 'click', '[data-behavior~=check_feeds]', (event) ->
-        cell = $(@).parents('td')
+        cell = $(@).parents('[data-behavior~=associated_record]')
         feedIds = $('.feed-ids', cell)
         if $(@).is(':checked')
           $('[type="checkbox"]', feedIds ).prop('checked', true)

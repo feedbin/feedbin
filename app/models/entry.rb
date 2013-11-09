@@ -52,19 +52,8 @@ class Entry < ActiveRecord::Base
     end
   end
 
-  def self.action_search(entry_id, queries)
-    tire.multi_search do
-      queries.each do |search_query|
-        search do
-          fields ['id']
-          filter :ids, values: [entry_id]
-          query { string search_query } if search_query.present?
-        end
-      end
-    end
-  end
-
   def self.search(params, user)
+    params = build_search(params)
     search_options = {
       page: params[:page],
       per_page: WillPaginate.per_page
@@ -107,6 +96,52 @@ class Entry < ActiveRecord::Base
     end
 
   end
+
+  def self.build_search(params)
+    unread_regex = /(?<=\s|^)is:\s*unread(?=\s|$)/
+    read_regex = /(?<=\s|^)is:\s*read(?=\s|$)/
+    starred_regex = /(?<=\s|^)is:\s*starred(?=\s|$)/
+    unstarred_regex = /(?<=\s|^)is:\s*unstarred(?=\s|$)/
+    sort_regex = /(?<=\s|^)sort:\s*(asc|desc)(?=\s|$)/i
+
+    if params[:query] =~ unread_regex
+      params[:query] = params[:query].gsub(unread_regex, '')
+      params[:read] = false
+    elsif params[:query] =~ read_regex
+      params[:query] = params[:query].gsub(read_regex, '')
+      params[:read] = true
+    end
+
+    if params[:query] =~ starred_regex
+      params[:query] = params[:query].gsub(starred_regex, '')
+      params[:starred] = true
+    elsif params[:query] =~ unstarred_regex
+      params[:query] = params[:query].gsub(unstarred_regex, '')
+      params[:starred] = false
+    end
+
+    if params[:query] =~ sort_regex
+      params[:sort] = params[:query].match(sort_regex)[1].downcase
+      params[:query] = params[:query].gsub(sort_regex, '')
+    end
+
+    params[:query] = escape_search(params[:query])
+
+    params
+  end
+
+  def self.escape_search(query)
+    if query.present? && query.respond_to?(:gsub)
+      special_characters_regex = /([\+\-\!\{\}\[\]\^\~\?\\])/
+      escape = '\ '.sub(' ', '')
+      query = query.gsub(special_characters_regex) { |character| escape + character }
+
+      colon_regex = /(?<!title|feed_id|body|author):(?=.*)/
+      query = query.gsub(colon_regex, '\:')
+      query
+    end
+  end
+
 
   def entry=(entry)
     self.author    = entry.author

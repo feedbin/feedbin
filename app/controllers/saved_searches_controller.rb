@@ -7,9 +7,8 @@ class SavedSearchesController < ApplicationController
     update_selected_feed!("saved_search", params[:id])
 
     params[:query] = @saved_search.query
-    search_params = build_search(params)
 
-    @entries = Entry.search(search_params, @user)
+    @entries = Entry.search(params, @user)
     @entries = update_with_state(@entries)
     @page_query = @entries
 

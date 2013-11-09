@@ -21,7 +21,7 @@ class User < ActiveRecord::Base
   has_many :unread_entries, dependent: :delete_all
   has_many :starred_entries, dependent: :delete_all
   has_many :saved_searches, dependent: :delete_all
-  has_many :actions, dependent: :delete_all
+  has_many :actions, dependent: :destroy
   belongs_to :plan
 
   accepts_nested_attributes_for :sharing_services,

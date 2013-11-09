@@ -249,8 +249,6 @@ class EntriesController < ApplicationController
   def search
     @user = current_user
 
-    search_params = build_search(params)
-
     @entries = Entry.search(params, @user)
     @entries = update_with_state(@entries)
     @page_query = @entries
@@ -327,9 +325,8 @@ class EntriesController < ApplicationController
   end
 
   def matched_search_ids(params)
-    search_params = build_search(params)
-    search_params[:load] = false
-    entries = Entry.search(search_params, @user)
+    params[:load] = false
+    entries = Entry.search(params, @user)
     ids = entries.results.map {|entry| entry.id.to_i}
     if entries.total_pages > 1
       2.upto(entries.total_pages) do |page|

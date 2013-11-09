@@ -23,13 +23,12 @@ module Api
 
         if saved_search.present?
           params[:query] = saved_search.query
-          search_params = build_search(params)
           if params[:include_entries] && params[:include_entries] == "true"
-            @entries = Entry.search(search_params, @user)
+            @entries = Entry.search(params, @user)
             links_header(@entries, 'api_v2_saved_search_url', saved_search.id)
           else
-            search_params[:load] = false
-            entries = Entry.search(search_params, @user)
+            params[:load] = false
+            entries = Entry.search(params, @user)
             links_header(entries, 'api_v2_saved_search_url', saved_search.id)
             render json: entries.results.map {|entry| entry.id.to_i}.to_json
           end

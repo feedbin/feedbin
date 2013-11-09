@@ -1,22 +1,18 @@
 class ActionsPerform
   include Sidekiq::Worker
+  sidekiq_options queue: :critical
 
-  def perform(entry_id, feed_id)
-    actions = Rails.cache.fetch("actions:all", expires_in: 5.minutes) { Action.all.all }
-    actions = actions.keep_if { |action| action.feed_ids.include?(feed_id.to_s) }
+  def perform(entry_id, matched_saved_search_ids)
+    # Looks like [[8, 1, ["mark_read", "star"]], [7, 1, ["mark_read"]]]
+    actions = Rails.cache.fetch("actions:all:array", expires_in: 5.minutes) { Action.all.pluck(:id, :user_id, :actions) }
+    actions = actions.keep_if { |action_id, user_id, actions| matched_saved_search_ids.include?(action_id) }
 
     if actions.present?
-      queries = actions.map {|action| action.query }
-      entries = Entry.action_search(entry_id, queries)
-
       queues = {}
-      entries.each_with_index do |entry, index|
-        unless entry.results.empty?
-          action = actions[index]
-          action.actions.each do |action_name|
-            queues[action_name] ||= Set.new
-            queues[action_name] << action.user_id
-          end
+      actions.each do |action_id, user_id, action_names|
+        action_names.each do |action_name|
+          queues[action_name] ||= Set.new
+          queues[action_name] << user_id
         end
       end
 

@@ -4,10 +4,10 @@ class SearchIndexStore
   def perform(klass, id)
     klass = klass.constantize
     record = klass.find(id)
-    record.tire.index.store(record)
-    if record.respond_to?(:feed_id)
-      # Wait a bit to make sure it's indexed
-      ActionsPerform.perform_in(5.seconds, id, record.feed_id)
+    result = record.tire.index.store(record, {percolate: true})
+    if result['matches'].present?
+      matched_saved_search_ids = result['matches'].map{|match| match.to_i}
+      ActionsPerform.perform_async(id, matched_saved_search_ids)
     end
   end
 
