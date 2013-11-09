@@ -1,4 +1,4 @@
-class ActionUpdatePercolate
+class ActionsUpdatePercolate
   include Sidekiq::Worker
 
   def perform
