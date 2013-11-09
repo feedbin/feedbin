@@ -11,7 +11,6 @@ class Entry < ActiveRecord::Base
   before_create :cache_public_id, unless: -> { Rails.env.test? }
   before_create :create_summary
   after_commit :mark_as_unread, on: :create
-  after_commit :search_index_store, on: :create
   after_destroy :search_index_remove
 
   validates_uniqueness_of :public_id
@@ -255,6 +254,7 @@ class Entry < ActiveRecord::Base
       end
       UnreadEntry.import(unread_entries, validate: false)
     end
+    search_index_store
   end
 
   def create_summary

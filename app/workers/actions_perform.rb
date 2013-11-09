@@ -1,6 +1,5 @@
 class ActionsPerform
   include Sidekiq::Worker
-  sidekiq_options queue: :critical
 
   def perform(entry_id, matched_saved_search_ids)
     # Looks like [[8, 1, ["mark_read", "star"]], [7, 1, ["mark_read"]]]
