@@ -17,6 +17,13 @@ class Action < ActiveRecord::Base
           filter :terms, feed_id: action_feed_ids.map(&:to_i)
         end
       end
+      if result.nil?
+        Honeybadger.notify(
+          error_class: "Action Percolate Save",
+          error_message: "Action Percolate Save Failure",
+          parameters: {id: self.id}
+        )
+      end
     end
 
     def search_percolate_remove
