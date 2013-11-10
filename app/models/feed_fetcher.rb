@@ -117,7 +117,7 @@ class FeedFetcher
   end
 
   def is_feed?(feed)
-    feed.respond_to?(:entries) && feed.entries.length > 0
+    feed.class.name.starts_with?('Feedzirra')
   end
 
   # Fetch and normalize feed
