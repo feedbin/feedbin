@@ -13,10 +13,10 @@ class PushNotificationSend
 
     notifications = []
     title = CGI.unescapeHTML(entry.title)
-    title = ApplicationController.helpers.sanitize(title, tags: []).squish.truncate(36)
+    title = ApplicationController.helpers.sanitize(title, tags: []).squish.mb_chars.limit(36).to_s
 
     feed_title = CGI.unescapeHTML(entry.feed.title)
-    feed_title = ApplicationController.helpers.sanitize(feed_title, tags: []).squish.truncate(36)
+    feed_title = ApplicationController.helpers.sanitize(feed_title, tags: []).squish.mb_chars.limit(36).to_s
 
     users.each do |user|
       unless user.apple_push_notification_device_token.blank?
