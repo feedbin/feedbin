@@ -2807,26 +2807,22 @@ table.small td {
 	}
 }
 
-.add-record-link {
-	border-bottom: 1px solid #CCC;
-	margin-bottom: 8px;
-	padding-bottom: 8px;
-}
-
 .action-form {
 	position: relative;
-	border-bottom: 1px solid #CCC;
-	margin-bottom: 8px;
-	padding-bottom: 8px;
+	border-top: 1px solid #CCC;
+	padding: 8px 0;
+	&:last-child {
+		border-bottom: none;
+	}
 	.button-danger {
 		position: absolute;
 		right: 5px;
-		top: 3px;
+		top: 8px;
 	}
 	.edit-action {
 		position: absolute;
 		right: 68px;
-		top: 3px;
+		top: 8px;
 	}
 	&.persisted .action-edit-form {
 		border-top: 1px solid #eaeaea;
@@ -2858,12 +2854,15 @@ table.small td {
 	}
 	.feed-ids {
 		overflow-y: auto;
-		max-height: 78px;
+		resize: vertical;
+		height: 78px;
 		border: 1px solid #CCC;
 		background: $list-background;
 		margin-bottom: 15px;
 		padding: 8px 6px;
+		hei
 		.checkbox {
+			resize: none;
 			float: none;
 			overflow: hidden;
 			text-overflow: ellipsis;
@@ -2926,18 +2925,6 @@ table.small td {
 .feed-form {
 	td {
 		line-height: 1.2;
-		border-color: transparent !important;
-	}
-	tr:nth-child(odd) {
-		td {
-			border-color: #ccc !important;
-			padding-bottom: 0;
-		}
-	}
-	tr:nth-child(even) {
-		td {
-			padding-top: 0;
-		}
 	}
 	.highlight {
 		color: #6AB042;
@@ -3590,7 +3577,12 @@ input:focus:invalid, textarea:focus:invalid, select:focus:invalid {
 
 .collection-edit-wrapper {
 	overflow-y: scroll;
-	min-height: 150px;
+	min-height: 50px;
+}
+
+.collection-edit-controls {
+	padding: 8px 0;
+	border-top: 1px solid #CCC;
 }
 
 .pull-right {

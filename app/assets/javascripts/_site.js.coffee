@@ -108,7 +108,11 @@ $.extend feedbin,
       delimiter: /(,)\s*/
 
   autoHeight: ->
-    $('.collection-edit-wrapper').height($(window).height() - 210)
+    windowHeight = $(window).height()
+    controlsHeight = $('.collection-edit-controls').outerHeight()
+    collectionOffset = $('.collection-edit-wrapper').offset().top
+    collectionHeight = windowHeight - controlsHeight - collectionOffset
+    $('.collection-edit-wrapper').css({'max-height': "#{collectionHeight}px"})
 
   entries: {}
 

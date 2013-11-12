@@ -15,11 +15,13 @@
 </div>
 
 <%= form_for @user, url: actions_update_user_path(@user), html: {novalidate: 'novalidate'} do |f| %>
-  <p class="add-record-link"><%= link_to_add_association "Add Action", f, :actions, data: {association_insertion_node: '[data-behavior~=association_insertion_node]' } %></p>
-  <div data-behavior="association_insertion_node">
+  <p class="half-margin"><%= link_to_add_association "Add Action", f, :actions, data: {association_insertion_node: '[data-behavior~=association_insertion_node]', association_insertion_method: 'prepend' } %></p>
+  <div data-behavior="association_insertion_node" class="collection-edit-wrapper">
     <%= f.fields_for :actions do |builder| %>
       <%= render 'action_fields', f: builder %>
     <% end %>
   </div>
-  <p><%= f.submit 'Save', class: 'button button-primary' %></p>
+  <div class="collection-edit-controls clearfix">
+    <%= f.submit 'Save', class: 'button button-primary' %>
+  </div>
 <% end %>
