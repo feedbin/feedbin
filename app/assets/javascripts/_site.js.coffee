@@ -733,11 +733,17 @@ $.extend feedbin,
 
     editAction: ->
       $(document).on 'click', '[data-behavior~=edit_action]', (event) ->
-        actionForm = $(@).parents('.action-form').find('.action-edit-form')
-        if actionForm.hasClass('hide')
-          actionForm.removeClass('hide')
+        actionForm = $(@).parents('.action-form')
+        editForm = actionForm.find('.action-edit-form')
+        actionDescription = $(@).parents('.action-form').find('.action-description')
+        if editForm.hasClass('hide')
+          editForm.removeClass('hide')
+          actionForm.addClass('selected')
+          actionDescription.addClass('hide')
         else
-          actionForm.addClass('hide')
+          editForm.addClass('hide')
+          actionForm.removeClass('selected')
+          actionDescription.removeClass('hide')
         event.stopPropagation()
         event.preventDefault()
         return

@@ -1,3 +1,30 @@
-<div style="padding-right: 100px;"><strong>Matches:</strong> <% if action.query.blank? %> Anything <% else %> <%= action.query %> <% end %></div>
-<strong>Feeds:</strong> <%= action_feed_names(action) %>
-<br /><strong>Actions:</strong> <%= action_names(action) %>
+<div class="action-description">
+  <div class="description-item clearfix">
+    <div class="action-label">
+      Keywords:
+    </div>
+    <div class="action-data">
+      <% if action.query.blank? %>
+        Anything
+      <% else %>
+        <%= action.query %>
+      <% end %>
+    </div>
+  </div>
+  <div class="description-item clearfix">
+    <div class="action-label">
+      Feeds:
+    </div>
+    <div class="action-data">
+      <%= action_feed_names(action) %>
+    </div>
+  </div>
+  <div class="description-item clearfix">
+    <div class="action-label">
+      Actions:
+    </div>
+    <div class="action-data">
+      <%= action_names(action) %>
+    </div>
+  </div>
+</div>

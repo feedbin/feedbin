@@ -16,7 +16,7 @@
 
 <%= form_for @user, url: actions_update_user_path(@user), html: {novalidate: 'novalidate'} do |f| %>
   <p class="half-margin"><%= link_to_add_association "Add Action", f, :actions, data: {association_insertion_node: '[data-behavior~=association_insertion_node]', association_insertion_method: 'prepend' } %></p>
-  <div data-behavior="association_insertion_node" class="collection-edit-wrapper">
+  <div data-behavior="association_insertion_node" class="collection-edit-wrapper actions-wrap">
     <%= f.fields_for :actions do |builder| %>
       <%= render 'action_fields', f: builder %>
     <% end %>

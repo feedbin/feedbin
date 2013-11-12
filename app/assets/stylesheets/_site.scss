@@ -2621,6 +2621,7 @@ Settings
 		display: table;
 		border-collapse: collapse;
 		width: 100%;
+		border-top: 1px solid #CCC;
 		.settings-nav {
 			list-style-type: none;
 			display: table-cell;
@@ -2807,30 +2808,49 @@ table.small td {
 	}
 }
 
+.actions-wrap {
+	background: $list-background;
+	padding: 10px;
+	border: 1px solid #CCC;
+	border-bottom: none;
+}
+
 .action-form {
+	font-size: 14px;
 	position: relative;
-	border-top: 1px solid #CCC;
+	border: 1px solid #CCC;
+	border-left-width: 5px;
 	padding: 8px 0;
+	background: #FFF;
+	padding: 8px;
+	margin-bottom: 10px;
+	&.selected {
+		border-color: $selected;
+	}
 	&:last-child {
 		border-bottom: none;
 	}
-	.button-danger {
+	.delete-action {
 		position: absolute;
-		right: 5px;
-		top: 8px;
+		right: 10px;
+		top: 4px;
+		font-size: 20px;
+		line-height: 1;
+		font-weight: bold;
+		color: #999;
+		&:hover {
+			text-decoration: none;
+		}
 	}
 	.edit-action {
 		position: absolute;
-		right: 68px;
+		right: 35px;
 		top: 8px;
-	}
-	&.persisted .action-edit-form {
-		border-top: 1px solid #eaeaea;
-		margin-top: 10px;
-		padding-top: 10px;
+		font-size: 13px;
 	}
 	[type="search"] {
 		max-width: 300px;
+		margin-bottom: 0;
 	}
 	.checkbox {
 		font-size: 13px;
@@ -2854,13 +2874,14 @@ table.small td {
 	}
 	.feed-ids {
 		overflow-y: auto;
+		overflow-x: hidden;
 		resize: vertical;
 		height: 78px;
 		border: 1px solid #CCC;
 		background: $list-background;
 		margin-bottom: 15px;
 		padding: 8px 6px;
-		hei
+		width: 300px;
 		.checkbox {
 			resize: none;
 			float: none;
@@ -2874,6 +2895,22 @@ table.small td {
 				margin-top: 0;
 			}
 		}
+	}
+
+	.description-item {
+		padding-bottom: 8px;
+	}
+	.action-label {
+		width: 80px;
+		margin-right: 10px;
+		text-align: right;
+		font-weight: bold;
+		float: left;
+	}
+	.action-data {
+		padding-top: 1px;
+		float: left;
+		width: 390px;
 	}
 }
 
