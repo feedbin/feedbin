@@ -2810,7 +2810,7 @@ table.small td {
 
 .actions-wrap {
 	background: $list-background;
-	padding: 10px;
+	padding: 8px 8px 1px 8px;
 	border: 1px solid #CCC;
 	border-bottom: none;
 }
@@ -2823,7 +2823,7 @@ table.small td {
 	padding: 8px 0;
 	background: #FFF;
 	padding: 8px;
-	margin-bottom: 10px;
+	margin-bottom: 7px;
 	&.selected {
 		border-color: $selected;
 	}
@@ -2851,6 +2851,7 @@ table.small td {
 	[type="search"] {
 		max-width: 300px;
 		margin-bottom: 0;
+		font-size: 14px !important;
 	}
 	.checkbox {
 		font-size: 13px;
@@ -2900,6 +2901,9 @@ table.small td {
 	.description-item {
 		padding-bottom: 8px;
 	}
+	.action-description .action-data {
+		color: #999;
+	}
 	.action-label {
 		width: 80px;
 		margin-right: 10px;
@@ -2911,6 +2915,9 @@ table.small td {
 		padding-top: 1px;
 		float: left;
 		width: 390px;
+	}
+	.action-keywords {
+		padding-top: 7px;
 	}
 }
 
