@@ -248,6 +248,7 @@ class EntriesController < ApplicationController
 
   def search
     @user = current_user
+    @escaped_query = params[:query].gsub("\"", "'").html_safe if params[:query]
 
     @entries = Entry.search(params, @user)
     @entries = update_with_state(@entries)
@@ -264,8 +265,6 @@ class EntriesController < ApplicationController
     @collection_favicon = 'favicon-search'
 
     @saved_search = SavedSearch.new
-
-    @escaped_query = params[:query].gsub("\"", "'").html_safe if params[:query]
 
     respond_to do |format|
       format.js { render partial: 'shared/entries' }
@@ -326,11 +325,13 @@ class EntriesController < ApplicationController
 
   def matched_search_ids(params)
     params[:load] = false
+    query = params[:query]
     entries = Entry.search(params, @user)
     ids = entries.results.map {|entry| entry.id.to_i}
     if entries.total_pages > 1
       2.upto(entries.total_pages) do |page|
         params[:page] = page
+        params[:query] = query
         entries = Entry.search(params, @user)
         ids = ids.concat(entries.results.map {|entry| entry.id.to_i})
       end
