@@ -330,8 +330,8 @@ class EntriesController < ApplicationController
     ids = entries.results.map {|entry| entry.id.to_i}
     if entries.total_pages > 1
       2.upto(entries.total_pages) do |page|
-        search_params[:page] = page
-        entries = Entry.search(search_params, @user)
+        params[:page] = page
+        entries = Entry.search(params, @user)
         ids = ids.concat(entries.results.map {|entry| entry.id.to_i})
       end
     end
