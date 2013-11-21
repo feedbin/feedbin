@@ -240,6 +240,11 @@ $.extend feedbin,
 
       $(document).on 'click', '[data-behavior~=mark_all_as_read]', ->
         unless $(@).attr('disabled')
+          $('.entries li').map ->
+            entry_id = $(@).data('entry-id') * 1
+            if entry_id of feedbin.entries
+              feedbin.entries[entry_id].read = true
+
           if feedbin.data.markAsReadConfirmation
             result = confirm(feedbin.markReadData.message)
             if result
