@@ -1,6 +1,21 @@
+November 2013
+-------------
+
+- 2013-11-09 Action design update
+- 2013-11-09 Rewrote actions to use elasticsearch percolate
+- 2013-11-06 Actions - Workflows for your RSS feeds
+- 2013-11-02 Mobile settings page (thanks to @brendanlong)
+- 2013-11-02 Rails 4.0.1 bump
+
 October 2013
 ------------
 
+- 2013-10-31 Enclosure/podcast feed support
+- 2013-10-24 Push Notifications
+- 2013-10-17 New favicon backend
+- 2013-10-16 Free trial support
+- 2013-10-14 Saved Searches / Saved search API
+- 2013-10-10 Search
 - 2013-10-04 Mark above/below as read
 
 September 2013
