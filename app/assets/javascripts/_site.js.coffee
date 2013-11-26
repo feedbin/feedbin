@@ -70,9 +70,15 @@ $.extend feedbin,
   localizeTime: (container) ->
     $('time', container).each ->
       date = $(@).attr('datetime')
-      if date
+      format = $(@).data('format') || 'long'
+      if date && format != 'none'
         date = new Date(date)
-        $(@).text(date.format("%B %d, %Y - %l:%M %p"))
+        if format == 'long'
+          $(@).text(date.format("%B %d, %Y at %l:%M %p"))
+        else if format == 'time'
+          $(@).text(date.format("%l:%M %p"))
+        else if format == 'day'
+          $(@).text(date.format("%d %b"))
 
   applyUserTitles: ->
     $('[data-behavior~=user_title]').each ->

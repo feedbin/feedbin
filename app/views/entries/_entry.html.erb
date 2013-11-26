@@ -4,14 +4,14 @@
     <div class="mark-below-read" data-behavior="mark_below_read"><span><i>Mark Below as Read</i></span></div>
     <%= entry_presenter.entry_link do %>
       <%= entry_presenter.favicon(entry.feed.site_url) %>
-      <i class="icon-star"></i>
-      <time datetime="<%= entry_presenter.datetime %>" class="time"><%= entry_presenter.published_date %></time>
-      <h2 class="title"><%= entry_presenter.title %></h2>
       <p class="feed-title" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= entry.feed.title %></p>
+      <%= entry_presenter.abbr_time %>
+      <h2 class="title"><%= entry_presenter.title %></h2>
       <% if entry_presenter.has_content? %>
         <p class="body"><%= entry.summary.html_safe %></p>
       <% end %>
-      <span class="entry-actions" data-behavior="show_entry_actions"></span>
+      <i class="icon-star"></i>
+      <i class="icon-gear" data-behavior="show_entry_actions"></i>
     <% end %>
   </li>
 <% end %>

@@ -44,6 +44,23 @@ class EntryPresenter < BasePresenter
     end
   end
 
+  def abbr_time
+    seconds_since_published = Time.now.utc - entry.published
+    if seconds_since_published > 86400
+      format = 'day'
+      string = entry.published.to_s(:datetime)
+    elsif seconds_since_published < 3600
+      format = 'none'
+      string = (seconds_since_published / 60).round
+      string = "#{string}m"
+    else
+      format = 'none'
+      string = (seconds_since_published / 60 / 60).round
+      string = "#{string}h"
+    end
+    @template.time_tag(entry.published, string, class: 'time', data: {format: format})
+  end
+
   def content
     ContentFormatter.format!(entry.content, entry)
   rescue HTML::Pipeline::Filter::InvalidDocumentException

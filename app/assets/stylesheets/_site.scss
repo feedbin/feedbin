@@ -1760,8 +1760,8 @@ li.selected > a .favicon-wrap {
 			word-wrap: break-word;
 			background-color: #666;
 			.favicon-wrap {
-				top: 21px;
-				left: 7px;
+				top: 23px;
+				left: 6px;
 			}
 			a {
 				text-decoration: none;
@@ -1771,7 +1771,7 @@ li.selected > a .favicon-wrap {
 				position: relative;
 				background-color: #FFF;
 				display: block;
-				padding: 8px 10px 8px 31px;
+				padding: 10px 10px 8px 31px;
 				color: #000;
 				left: 0;
 				transition:left .2s ease;
@@ -1779,10 +1779,10 @@ li.selected > a .favicon-wrap {
 					text-decoration: none;
 				}
 			}
-			.entry-actions {
+			.icon-gear {
 				cursor: pointer;
 				position: absolute;
-				top: 10px;
+				top: 11px;
 				right: 11px;
 				height: 12px;
 				width: 12px;
@@ -1795,6 +1795,9 @@ li.selected > a .favicon-wrap {
 				color: #999;
 				margin-bottom: 1px;
 				display: block;
+				position: absolute;
+				right: 11px;
+				top: 11px;
 			}
 			.title {
 				font-weight: bold;
@@ -1807,8 +1810,8 @@ li.selected > a .favicon-wrap {
 			.feed-title {
 				font-size: 12px;
 				line-height: 1.3;
-				margin: 0 0 3px 0;
-				color: #666;
+				margin: 0 0 1px 0;
+				color: #999;
 			}
 			.body {
 				line-height: 1.3;
@@ -1818,13 +1821,37 @@ li.selected > a .favicon-wrap {
 				display: block;
 			}
 			.icon-star {
-				background: image-url("icon-star.svg") 0 0 no-repeat;
-				height: 10px;
-				width: 11px;
+				width: 30px;
+				height: 21px;
 				position: absolute;
-				right: 11px;
-				top: 11px;
+				left: 0;
+				top: 0;
+				overflow: hidden;
 				display: none;
+				&:before {
+				    position: absolute;
+				    top: 0;
+				    left: 0;
+				    background-color: $selected;
+					background-image: image-url("icon-star.svg"), linear-gradient(to bottom, #3399ff 0%, #2c85dd 100%);
+					background-position: 2px 2px, 0 0;
+					background-repeat: no-repeat, no-repeat;
+					width: 30px;
+					height: 21px;
+				    content: '';
+					z-index: 1;
+				}
+				&:after {
+					position: absolute;
+					top: 0px;
+					left: 9px;
+					background-color: #FFF;
+					height: 44px;
+					width: 27px;
+					content: '';
+					-webkit-transform: rotate(56deg);
+					z-index: 2;
+				}
 			}
 			&.starred {
 				.icon-star {
@@ -1835,7 +1862,7 @@ li.selected > a .favicon-wrap {
 				.title {
 					color: #999;
 				}
-				.body, .feed-title {
+				.body {
 					color: #CCC;
 				}
 			}
@@ -1847,7 +1874,16 @@ li.selected > a .favicon-wrap {
 					background: #666666;
 				}
 				.icon-star {
-					background-position: 0 -10px;
+					&:before {
+						background-color: rgba(255,255,255,.4);
+						background-image: image-url("icon-star.svg"), none;
+					}
+					&:after {
+						background: $selected;
+					}
+				}
+				.feed-title {
+					color: rgba(255,255,255, .8) !important;
 				}
 				.time {
 					color: rgba(255,255,255, .8) !important;
@@ -1855,18 +1891,15 @@ li.selected > a .favicon-wrap {
 				.title {
 					color: rgba(255,255,255, 1) !important;
 				}
-				.feed-title {
-					color: rgba(255,255,255, .8) !important;
-				}
 				.body {
 					color: rgba(255,255,255, .5) !important;
 				}
 			}
 			.selected &.selected {
-				.entry-actions {
+				.icon-gear {
 					display: block;
 				}
-				.icon-star {
+				.time {
 					display: none;
 				}
 				.wrap {
@@ -1876,7 +1909,7 @@ li.selected > a .favicon-wrap {
 				}
 			}
 			&:hover {
-				.touch & .entry-actions {
+				.touch & .icon-gear {
 					display: none;
 				}
 			}
@@ -3919,7 +3952,7 @@ Mobile
 			top: 7px;
 		}
 	}
-	.entries ul li .entry-actions {
+	.entries ul li .icon-gear {
 		display: none !important;
 	}
 	.entries ul li:hover.starred .icon-star {
