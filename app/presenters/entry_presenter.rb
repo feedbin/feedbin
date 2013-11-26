@@ -59,7 +59,11 @@ class EntryPresenter < BasePresenter
   end
 
   def author
-    @template.strip_tags(entry.author)
+    if entry.author
+      "by " + @template.strip_tags(entry.author)
+    else
+      ''
+    end
   end
 
   def media

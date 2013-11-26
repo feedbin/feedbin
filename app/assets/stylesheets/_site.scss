@@ -2290,6 +2290,14 @@ li.selected > a .favicon-wrap {
 		color: #999;
 		line-height: 1.2;
 		margin: .2em;
+		.icon-clock {
+			float: left;
+			margin-right: 5px;
+		}
+		time {
+			display: inline-block;
+			line-height: 16px;
+		}
 	}
 }
 
@@ -3002,6 +3010,38 @@ table.small td {
 .highlight-negative {
 	color: red;
 	font-weight: bold;
+}
+
+/*------------------------------------------------------------------------------
+Icons
+------------------------------------------------------------------------------*/
+.icon-clock {
+	height: 16px;
+	width: 16px;
+	border-radius: 12px;
+	border: 2px solid #CCC;
+	display: inline-block;
+	position: relative;
+	&:before {
+		position: absolute;
+		left: 5px;
+		top: 6px;
+		width: 5px;
+		height: 1px;
+		display: block;
+		background-color: #CCC;
+		content: "";
+	}
+	&:after {
+		position: absolute;
+		left: 5px;
+		top: 2px;
+		width: 1px;
+		height: 5px;
+		background-color: #CCC;
+		display: block;
+		content: "";
+	}
 }
 
 /*------------------------------------------------------------------------------
