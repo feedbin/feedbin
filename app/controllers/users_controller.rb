@@ -40,12 +40,9 @@ class UsersController < ApplicationController
 
     if @user.save
       unless @user.plan.stripe_id == 'free'
-        deactivate_subscriptions = Feedbin::Application.config.trial_days + 6
-        send_notice = Feedbin::Application.config.trial_days - 1
-        TrialDeactivateSubscriptions.perform_in(deactivate_subscriptions.days, @user.id)
-        TrialSendExpiration.perform_in(send_notice.days, @user.id)
-        TrialEnd.perform_in(Feedbin::Application.config.trial_days.days, @user.id)
+        schedule_trial_jobs
       end
+      Librato.increment('user.trial.signup')
       @analytics_event = {eventCategory: 'customer', eventAction: 'new', eventLabel: 'trial', eventValue: 0}
       flash[:analytics_event] = render_to_string(partial: "shared/analytics_event").html_safe
       sign_in @user
@@ -67,6 +64,7 @@ class UsersController < ApplicationController
     if @user.save
       new_plan_name = @user.plan.stripe_id
       if old_plan_name == 'trial' && new_plan_name != 'trial'
+        Librato.increment('user.paid.signup')
         @analytics_event = {eventCategory: 'customer', eventAction: 'upgrade', eventLabel: @user.plan.stripe_id, eventValue: @user.plan.price.to_i}
         flash[:analytics_event] = render_to_string(partial: "shared/analytics_event").html_safe
       end
@@ -82,11 +80,24 @@ class UsersController < ApplicationController
   end
 
   def destroy
+    if @user.plan.stripe_id == 'trial'
+      Librato.increment('user.trial.cancel')
+    else
+      Librato.increment('user.paid.cancel')
+    end
     @user.destroy
     redirect_to root_url
   end
 
   private
+
+  def schedule_trial_jobs
+    deactivate_subscriptions = Feedbin::Application.config.trial_days + 6
+    send_notice = Feedbin::Application.config.trial_days - 1
+    TrialDeactivateSubscriptions.perform_in(deactivate_subscriptions.days, @user.id)
+    TrialSendExpiration.perform_in(send_notice.days, @user.id)
+    TrialEnd.perform_in(Feedbin::Application.config.trial_days.days, @user.id)
+  end
 
   def set_user
     @user = current_user
