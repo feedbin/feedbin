@@ -79,6 +79,8 @@ $.extend feedbin,
           $(@).text(date.format("%l:%M %p"))
         else if format == 'day'
           $(@).text(date.format("%d %b"))
+        else if format == 'day_year'
+          $(@).text(date.format("%d %b %Y"))
 
   applyUserTitles: ->
     $('[data-behavior~=user_title]').each ->

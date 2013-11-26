@@ -1797,7 +1797,7 @@ li.selected > a .favicon-wrap {
 				display: block;
 				position: absolute;
 				right: 11px;
-				top: 11px;
+				top: 10px;
 			}
 			.title {
 				font-weight: bold;
@@ -1812,6 +1812,7 @@ li.selected > a .favicon-wrap {
 				line-height: 1.3;
 				margin: 0 0 1px 0;
 				color: #999;
+				padding-right: 75px;
 			}
 			.body {
 				line-height: 1.3;

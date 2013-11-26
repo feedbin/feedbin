@@ -47,8 +47,18 @@ class EntryPresenter < BasePresenter
   def abbr_time
     seconds_since_published = Time.now.utc - entry.published
     if seconds_since_published > 86400
-      format = 'day'
+      if Time.now.strftime("%Y") != entry.published.strftime("%Y")
+        format = 'day_year'
+      else
+        format = 'day'
+      end
       string = entry.published.to_s(:datetime)
+    elsif seconds_since_published < 0
+      format = 'none'
+      string = "the future"
+    elsif seconds_since_published < 60
+      format = 'none'
+      string = "now"
     elsif seconds_since_published < 3600
       format = 'none'
       string = (seconds_since_published / 60).round
