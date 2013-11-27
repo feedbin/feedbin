@@ -1826,7 +1826,7 @@ li.selected > a .favicon-wrap {
 				height: 21px;
 				position: absolute;
 				left: 0;
-				top: 0;
+				top: -1px;
 				overflow: hidden;
 				display: none;
 				&:before {
@@ -1880,7 +1880,7 @@ li.selected > a .favicon-wrap {
 						background-image: image-url("icon-star.svg"), none;
 					}
 					&:after {
-						background: $selected;
+						background: #666;
 					}
 				}
 				.feed-title {
@@ -1897,6 +1897,11 @@ li.selected > a .favicon-wrap {
 				}
 			}
 			.selected &.selected {
+				.icon-star {
+					&:after {
+						background: $selected;
+					}
+				}
 				.icon-gear {
 					display: block;
 				}
