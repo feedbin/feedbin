@@ -1813,6 +1813,9 @@ li.selected > a .favicon-wrap {
 				margin: 0 0 1px 0;
 				color: #999;
 				padding-right: 75px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 			.body {
 				line-height: 1.3;
