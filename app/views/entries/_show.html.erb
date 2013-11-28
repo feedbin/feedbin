@@ -20,9 +20,10 @@
         <h1><%= entry_presenter.title %></h1>
         <% end %>
         <p class="post-meta">
-          <span class="icon-clock"></span><time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time>
+          <time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time>
           <%= entry_presenter.author %>
         </p>
+        <p class="post-meta feed-title"><span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
       </header>
       <div data-behavior="entry_content_wrap" class="content-styles">
         <% if entry.data %>

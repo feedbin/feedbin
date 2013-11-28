@@ -1348,6 +1348,10 @@ Structure
 			.entries-column {
 				display: none;
 			}
+			.entry-header .feed-title {
+				display: block !important;
+			}
+
 		}
 	}
 }
@@ -2340,6 +2344,9 @@ li.selected > a .favicon-wrap {
 			display: inline-block;
 			line-height: 16px;
 		}
+	}
+	.feed-title {
+		display: none;
 	}
 }
 
@@ -3999,5 +4006,46 @@ Right-to-left
 		padding: 0 15px 0 0;
 		border-right: 5px solid #CCC;
 		border-left: none;
+	}
+}
+
+
+
+/*------------------------------------------------------------------------------
+Print
+------------------------------------------------------------------------------*/
+@media print {
+	body {
+		font-family: Georgia, sans-serif;
+		font-weight: 400;
+		font-style: normal;
+	}
+	h1,h2,h3,h4,h5,h6 {
+		font-family: $font-stack;
+	}
+	hr {
+		background: none;
+		border-top: 1px solid #333;
+	}
+	.app .bar,
+	.app .feeds-column,
+	.app .entries-column,
+	.app .entry-toolbar,
+	.icon-clock {
+		display: none !important;
+	}
+	.app .content,
+	.app .entry-content {
+		position: static;
+	}
+	.app .entry-inner {
+		max-width: 100%;
+		padding: 0;
+	}
+	.feed-title {
+		display: block !important;
+	}
+	a[href^="http://"]:after, a[href^="https://"]:after {
+		content: " (" attr(href) ")";
 	}
 }
