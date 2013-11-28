@@ -4016,7 +4016,7 @@ Print
 ------------------------------------------------------------------------------*/
 @media print {
 	body {
-		font-family: Georgia, sans-serif;
+		font-family: "Mercury SSm A", "Mercury SSm B", $font-stack;
 		font-weight: 400;
 		font-style: normal;
 	}
@@ -4031,7 +4031,7 @@ Print
 	.app .feeds-column,
 	.app .entries-column,
 	.app .entry-toolbar,
-	.icon-clock {
+	.entry-settings-wrap {
 		display: none !important;
 	}
 	.app .content,
