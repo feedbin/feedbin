@@ -8,6 +8,7 @@ class PushNotificationSend
   # 157 bytes
   def perform(entry_id, user_ids)
     entry = Entry.find(entry_id)
+    feed = Feed.find(entry.feed_id)
     users = User.where(id: user_ids)
 
     verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
@@ -15,12 +16,19 @@ class PushNotificationSend
     certificate = StringIO.new(p12.certificate.to_pem + p12.key.to_pem)
     pusher = Grocer.pusher(certificate: certificate)
 
+    # Use user specified feed titles where available
+    titles = Subscription.where(feed: feed).pluck(:user_id, :title).inject({}) do |hash, (user_id, feed_title)|
+      hash[user_id] = feed_title
+      hash
+    end
+
     notifications = []
     users.each do |user|
       unless user.apple_push_notification_device_token.blank?
+        title = titles[user.id] || feed.title
         notifications << Grocer::SafariNotification.new(
           device_token: user.apple_push_notification_device_token,
-          title: format_string(entry.feed.title, 36),
+          title: format_string(title, 36),
           body: format_string(entry.title, 90),
           url_args: [entry.id.to_s, CGI::escape(verifier.generate(user.id))]
         )
