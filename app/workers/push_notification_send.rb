@@ -12,11 +12,8 @@ class PushNotificationSend
     cert = [p12.certificate.to_pem, p12.key.to_pem]
 
     notifications = []
-    title = CGI.unescapeHTML(entry.title)
-    title = ApplicationController.helpers.sanitize(title, tags: []).squish.mb_chars.limit(36).to_s
-
-    feed_title = CGI.unescapeHTML(entry.feed.title)
-    feed_title = ApplicationController.helpers.sanitize(feed_title, tags: []).squish.mb_chars.limit(36).to_s
+    title = format_string(entry.title)
+    feed_title = format_string(entry.feed.title)
 
     users.each do |user|
       unless user.apple_push_notification_device_token.blank?
@@ -48,4 +45,15 @@ class PushNotificationSend
 
   end
 
+  def format_string(string)
+    string = CGI.unescapeHTML(string)
+    string = ApplicationController.helpers.sanitize(string, tags: []).squish
+    if string.length > 36
+      omission = '...'
+    else
+      omission = ''
+    end
+    string = string.mb_chars.limit(36).to_s
+    string + omission
+  end
 end
