@@ -3,57 +3,46 @@ class PushNotificationSend
   sidekiq_options retry: false
 
   # ENV['RAILS_ENV'] = 'production'; reload!; p = PushNotificationSend.new; p.perform(1, [1])
+  #
+  # Payload must be less than 256 bytes a payload without the body is about
+  # 157 bytes
   def perform(entry_id, user_ids)
-
-    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
     entry = Entry.find(entry_id)
     users = User.where(id: user_ids)
+
+    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
     p12 = OpenSSL::PKCS12.new(File.read(ENV['APPLE_PUSH_CERT']))
-    cert = [p12.certificate.to_pem, p12.key.to_pem]
+    certificate = StringIO.new(p12.certificate.to_pem + p12.key.to_pem)
+    pusher = Grocer.pusher(certificate: certificate)
 
     notifications = []
-    title = format_string(entry.title)
-    feed_title = format_string(entry.feed.title)
-
     users.each do |user|
       unless user.apple_push_notification_device_token.blank?
-        notifications << Grocer::Notification.new(
+        notifications << Grocer::SafariNotification.new(
           device_token: user.apple_push_notification_device_token,
-          custom: {
-            aps: {
-              alert: {
-                title: title,
-                body: feed_title,
-                action: "Read"
-              },
-              :"url-args" => [entry.id.to_s, CGI::escape(verifier.generate(user.id))]
-            }
-          }
+          title: format_string(entry.feed.title, 36),
+          body: format_string(entry.title, 90),
+          url_args: [entry.id.to_s, CGI::escape(verifier.generate(user.id))]
         )
       end
     end
 
     if notifications.any?
-      pusher = Grocer.pusher(
-        certificate: StringIO.new(cert.join("\n")),
-      )
-      notifications.each do |notification|
-        results = pusher.push(notification)
-      end
+      notifications.each { |notification| pusher.push(notification) }
       Librato.increment 'push_notifications_sent', by: notifications.length
     end
 
   end
 
-  def format_string(string)
+  def format_string(string, max_bytes)
     string = CGI.unescapeHTML(string)
-    string = ApplicationController.helpers.sanitize(string, tags: []).squish
-    if string.length > 36
+    string = ApplicationController.helpers.sanitize(string, tags: []).squish.mb_chars
+    if string.length > max_bytes
       omission = '...'
     else
       omission = ''
     end
-    string = string.mb_chars.limit(36).to_s
+    string = string.limit(max_bytes).to_s
     string + omission
   end
 end

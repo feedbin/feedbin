@@ -145,7 +145,7 @@ GEM
     formatador (0.2.4)
     gemoji (1.4.0)
     github-markdown (0.6.1)
-    grocer (0.4.1)
+    grocer (0.5.0)
     hashie (1.2.0)
     hashr (0.0.22)
     highline (1.6.20)
