@@ -1,7 +1,7 @@
 class SearchIndexStore
   include Sidekiq::Worker
 
-  def perform(klass, id, percolate)
+  def perform(klass, id, percolate = true)
     klass = klass.constantize
     record = klass.find(id)
     if percolate
