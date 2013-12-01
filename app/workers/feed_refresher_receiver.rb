@@ -10,9 +10,10 @@ class FeedRefresherReceiver
           if entry['update'] == true
             entry = Entry.find_by_public_id(entry['public_id'])
             entry.update_attributes(updated_content: entry['content'], updated: entry['updated'])
-            Librato.increment('entry_update')
+            Librato.increment('entry.update')
           else
             feed.entries.create!(entry)
+            Librato.increment('entry.create')
           end
         rescue Exception
           Sidekiq.redis { |client| client.hset("entry:public_ids:#{entry['public_id'][0..4]}", entry['public_id'], 1) }

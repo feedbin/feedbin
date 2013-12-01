@@ -34,6 +34,8 @@ class EntryDeleter
         end
       end
 
+      Librato.increment('entry.destroy', by: entries_to_delete_ids.count)
+
     end
   end
 
