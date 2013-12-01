@@ -242,7 +242,12 @@ class Entry < ActiveRecord::Base
   end
 
   def cache_public_id
-    Sidekiq.redis { |client| client.hset("entry:public_ids:#{self.public_id[0..4]}", self.public_id, 1) }
+    if self.updated
+      date = self.updated.to_s
+    else
+      date = 1
+    end
+    Sidekiq.redis { |client| client.hset("entry:public_ids:#{self.public_id[0..4]}", self.public_id, date) }
   end
 
   def mark_as_unread
