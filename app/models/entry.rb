@@ -11,6 +11,7 @@ class Entry < ActiveRecord::Base
   before_create :cache_public_id, unless: -> { Rails.env.test? }
   before_create :create_summary
   after_commit :mark_as_unread, on: :create
+  after_commit :updated_entry, on: :update
   after_destroy :search_index_remove
 
   validates_uniqueness_of :public_id
@@ -262,12 +263,17 @@ class Entry < ActiveRecord::Base
     search_index_store
   end
 
+  def updated_entry
+    Sidekiq.redis { |client| client.hset("entry:public_ids:#{self.public_id[0..4]}", self.public_id, self.updated.to_s) }
+    search_index_store(false)
+  end
+
   def create_summary
     self.summary = ContentFormatter.summary(self.content)
   end
 
-  def search_index_store
-    SearchIndexStore.perform_async(self.class.name, self.id)
+  def search_index_store(percolate = true)
+    SearchIndexStore.perform_async(self.class.name, self.id, percolate)
   end
 
   def search_index_remove

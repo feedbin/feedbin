@@ -166,7 +166,8 @@ CREATE TABLE entries (
     public_id character varying(255),
     old_public_id character varying(255),
     starred_entries_count integer DEFAULT 0 NOT NULL,
-    data json
+    data json,
+    updated_content text
 );
 
 
@@ -1291,3 +1292,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131101063139');
 INSERT INTO schema_migrations (version) VALUES ('20131105035905');
 
 INSERT INTO schema_migrations (version) VALUES ('20131106060451');
+
+INSERT INTO schema_migrations (version) VALUES ('20131201051809');
