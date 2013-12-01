@@ -6,25 +6,25 @@ Feedbin::Application.routes.draw do
   # See how all your routes lay out with "rake routes".
 
   root to: 'site#index'
-  
+
   mount Sidekiq::Web, at: '/sidekiq'
   mount StripeEvent::Engine, at: '/stripe'
-  
+
   get :health_check, to: proc {|env| [200, {}, ["OK"]] }
 
   get :home, to: 'site#home'
   get :apps, to: 'site#apps'
-  
+
   post '/emails' => 'emails#create'
-  
+
   match '/404', to: 'errors#not_found', via: :all
   get '/starred/:starred_token', to: 'starred#index', as: 'starred'
-  
+
   get    :signup,         to: 'users#new',           as: 'signup'
   get    :login,          to: 'sessions#new',        as: 'login'
   get    :privacy_policy, to: 'site#privacy_policy', as: 'privacy_policy'
   delete :logout,         to: 'sessions#destroy',    as: 'logout'
-  
+
   resources :tags,           only: [:index, :show, :update, :destroy]
   resources :billing_events, only: [:show]
   resources :imports
@@ -45,13 +45,16 @@ Feedbin::Application.routes.draw do
       patch :sharing_services_update, controller: :sharing_services
     end
   end
-  
+
   resources :feeds, only: [:index, :edit, :create, :update] do
     resources :entries, only: [:index], controller: :feeds_entries
     collection do
       get :view_unread
       get :view_all
       get :auto_update
+    end
+    member do
+      match :push, via: [:post, :get]
     end
   end
 
@@ -69,7 +72,7 @@ Feedbin::Application.routes.draw do
       post :mark_all_as_read
     end
   end
-  
+
   get :settings, to: 'settings#settings'
   namespace :settings do
     get :account
@@ -84,8 +87,8 @@ Feedbin::Application.routes.draw do
     post :font_increase
     post :font_decrease
     post :entry_width
-  end  
-  
+  end
+
   constraints subdomain: 'api' do
     namespace :api, path: nil do
       namespace :v1 do
@@ -93,7 +96,7 @@ Feedbin::Application.routes.draw do
       end
     end
   end
-  
+
   constraints subdomain: 'api' do
     namespace :api, path: nil do
       namespace :v2 do
@@ -102,7 +105,7 @@ Feedbin::Application.routes.draw do
         end
         resources :subscriptions,  only: [:index, :show, :create, :destroy, :update]
         post "subscriptions/:id/update", to: 'subscriptions#update'
-        
+
         resources :taggings,       only: [:index, :show, :create, :destroy]
         resources :entries,        only: [:index, :show]
 
@@ -116,5 +119,5 @@ Feedbin::Application.routes.draw do
       end
     end
   end
-  
+
 end

@@ -22,8 +22,8 @@ GIT
 
 GIT
   remote: git://github.com/feedbin/feedzirra.git
-  revision: c9a21883e3069e986d0e1d2401fcd63f2d9995d5
-  ref: c9a2188
+  revision: be2f8adcf3a45921e6ec8bd27610a0f7276b7459
+  ref: be2f8ad
   specs:
     feedzirra (0.2.0.rc2)
       curb (~> 0.8.1)
