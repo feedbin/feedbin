@@ -1,5 +1,8 @@
 class EntriesController < ApplicationController
 
+  skip_before_action :verify_authenticity_token, only: [:push_view]
+  skip_before_action :authorize, only: [:push_view]
+
   def index
     @user = current_user
     update_selected_feed!("collection_all")
@@ -131,6 +134,17 @@ class EntriesController < ApplicationController
       UnreadEntry.where(user_id: @user.id, entry_id: starred).delete_all
     elsif  %w{unread all}.include?(params[:type])
       UnreadEntry.where(user_id: @user.id).delete_all
+    elsif params[:type] == 'saved_search'
+      saved_search = @user.saved_searches.where(id: params[:data]).first
+      if saved_search.present?
+        params[:query] = saved_search.query
+        ids = matched_search_ids(params)
+        UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
+      end
+    elsif params[:type] == 'search'
+      params[:query] = params[:data]
+      ids = matched_search_ids(params)
+      UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
     end
 
     @mark_selected = true
@@ -192,6 +206,79 @@ class EntriesController < ApplicationController
     render nothing: true
   end
 
+  def mark_direction_as_read
+    @user = current_user
+    ids = params[:ids].split(',').map {|i| i.to_i }
+    if params[:direction] == 'above'
+      UnreadEntry.where(user: @user, entry_id: ids).delete_all
+    else
+      if params[:type] == 'feed'
+        UnreadEntry.where(user: @user, feed_id: params[:data]).where.not(entry_id: ids).delete_all
+      elsif params[:type] == 'tag'
+        feed_ids = @user.taggings.where(tag_id: params[:data]).pluck(:feed_id)
+        UnreadEntry.where(user: @user, feed_id: feed_ids).where.not(entry_id: ids).delete_all
+      elsif params[:type] == 'starred'
+        starred = @user.starred_entries.pluck(:entry_id)
+        UnreadEntry.where(user: @user, entry_id: starred).where.not(entry_id: ids).delete_all
+      elsif  %w{unread all}.include?(params[:type])
+        UnreadEntry.where(user: @user).where.not(entry_id: ids).delete_all
+      elsif params[:type] == 'saved_search'
+        saved_search = @user.saved_searches.where(id: params[:data]).first
+        if saved_search.present?
+          params[:query] = saved_search.query
+          search_ids = matched_search_ids(params)
+          ids = search_ids - ids
+          UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
+        end
+      elsif params[:type] == 'search'
+        params[:query] = params[:data]
+        search_ids = matched_search_ids(params)
+        ids = search_ids - ids
+        UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
+      end
+    end
+
+    @mark_selected = true
+    get_feeds_list
+
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def search
+    @user = current_user
+    @escaped_query = params[:query].gsub("\"", "'").html_safe if params[:query]
+
+    @entries = Entry.search(params, @user)
+    @entries = update_with_state(@entries)
+    @page_query = @entries
+
+    @append = !params[:page].nil?
+
+    @type = 'all'
+    @data = nil
+
+    @search = true
+
+    @collection_title = 'Search'
+    @collection_favicon = 'favicon-search'
+
+    @saved_search = SavedSearch.new
+
+    respond_to do |format|
+      format.js { render partial: 'shared/entries' }
+    end
+  end
+
+  def push_view
+    user_id = verify_push_token(params[:user])
+    @user = User.find(user_id)
+    @entry = Entry.find(params[:id])
+    UnreadEntry.where(user: @user, entry: @entry).delete_all
+    redirect_to @entry.fully_qualified_url, status: :found
+  end
+
   private
 
   def sharing_services(entry)
@@ -234,6 +321,22 @@ class EntriesController < ApplicationController
       @content = '(no content)'
     end
 
+  end
+
+  def matched_search_ids(params)
+    params[:load] = false
+    query = params[:query]
+    entries = Entry.search(params, @user)
+    ids = entries.results.map {|entry| entry.id.to_i}
+    if entries.total_pages > 1
+      2.upto(entries.total_pages) do |page|
+        params[:page] = page
+        params[:query] = query
+        entries = Entry.search(params, @user)
+        ids = ids.concat(entries.results.map {|entry| entry.id.to_i})
+      end
+    end
+    ids
   end
 
 end

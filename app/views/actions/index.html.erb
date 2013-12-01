@@ -1,0 +1,27 @@
+<h2>Actions</h2>
+
+<p class="muted">Actions can be performed on articles when they are published. Start by writing the keywords to match, just like you would when <a href="http://help.feedbin.me/search-syntax/">searching</a> for something. Then select the feeds to include. Finally check the actions you would like to perform on the matched incoming articles.</p>
+
+<div class="push-options hide" id="push-data" data-website-id="<%= ENV['APPLE_PUSH_WEBSITE_ID'] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>">
+  <div class="push-enable hide">
+    <p>Push notifications can be enabled as an action. <a href="#" data-behavior="enable_push">Enable push notifications</a>.</p>
+  </div>
+  <div class="push-disable hide">
+    <p>Push notifications are <span class="highlight-positive">enabled</span>. You can disable them in preferences under Notifications.</p>
+  </div>
+  <div class="push-disabled hide">
+    <p>Push notifications are <span class="highlight-negative">disabled</span>. You can enable them in Safari preferences under Notifications.</p>
+  </div>
+</div>
+
+<%= form_for @user, url: actions_update_user_path(@user), html: {novalidate: 'novalidate'} do |f| %>
+  <p class="half-margin"><%= link_to_add_association "Add Action", f, :actions, data: {association_insertion_node: '[data-behavior~=association_insertion_node]', association_insertion_method: 'prepend' } %></p>
+  <div data-behavior="association_insertion_node" class="collection-edit-wrapper actions-wrap">
+    <%= f.fields_for :actions do |builder| %>
+      <%= render 'action_fields', f: builder %>
+    <% end %>
+  </div>
+  <div class="collection-edit-controls clearfix">
+    <%= f.submit 'Save', class: 'button button-primary' %>
+  </div>
+<% end %>

@@ -1,0 +1,11 @@
+<% present saved_search do |saved_search_presenter| %>
+  <li data-saved-search-id="<%= saved_search.id %>" data-feed-id="saved-search-<%= saved_search.id %>" class="<%= selected("saved_search_#{saved_search.id}") %>">
+    <%= link_to saved_search_path(saved_search.id), remote: true, class: 'feed-link saved-search-link', data: { behavior: 'selectable reset_entry_position show_entries open_item feed_link', mark_read: {type: 'saved_search', data: saved_search.id, message: "Mark #{saved_search.name} as read?"}.to_json } do %>
+      <span class="favicon-wrap">
+        <span class="favicon favicon-search"></span>
+      </span>
+      <%= saved_search_presenter.name %>
+      <%= link_to "edit", edit_saved_search_path(saved_search.id), remote: true, class: 'feed-action-button' %>
+    <% end %>
+  </li>
+<% end %>

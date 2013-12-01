@@ -1,18 +1,20 @@
 <h2>Help</h2>
 
 <p>
-  <strong>Email support:</strong> 
+  <strong>Email support:</strong>
   <% if ENV['FROM_ADDRESS'] %>
     <a href="mailto:<%= ENV['FROM_ADDRESS'] %>"><%= ENV['FROM_ADDRESS'] %></a>
   <% end %>
 </p>
 <p>
-  <strong>Issue tracker:</strong> 
+  <strong>Issue tracker:</strong>
   <% if ENV['SUPPORT_URL'] %>
     <a href="<%= ENV['SUPPORT_URL'] %>">Open a new support request</a>
   <% end %>
 </p>
 <p><strong>Public homepage:</strong> <a href="/home">feedbin.me/home</a></p>
+
+<hr />
 
 <h3>Keyboard Shortcuts</h3>
 <p class="muted">You can bring this up in the app by pressing <span class="key">?</span></p>

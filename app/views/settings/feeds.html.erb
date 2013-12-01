@@ -1,38 +1,30 @@
 <h2>Feeds</h2>
 
-<div class="clearfix">
-  <div class="half">
-    <small>Select: <a href="#" data-behavior="check_all">All</a> / <a href="#" data-behavior="check_none">None</a></small>
-  </div>
-</div>
+<p class="half-margin">Select: <a href="#" data-behavior="check_all">All</a> / <a href="#" data-behavior="check_none">None</a></p>
 <%= form_tag update_multiple_subscriptions_path, method: :patch do %>
   <div class="collection-edit-wrapper">
-    <table class="table table-condensed form-table feed-form">
+    <table class="table form-table feed-form">
       <% @subscriptions.each do |subscription| %>
         <%= fields_for "subscriptions[]", subscription do |f| %>
           <tr>
             <td width="15"><%= check_box_tag "subscription_ids[]", subscription.id %></td>
             <td>
               <%= f.text_field :title %>
-              <br /><small title="Original title"><%= subscription.original_title %></small>
-              <small class="highlight break-word" title="Feed URL"><%= subscription.feed_url %></small>
-              <small class="highlight break-word" title="Site URL"><%= subscription.site_url %></small>
+              <br /><small title="Original title"><%= link_to subscription.site_url, subscription.site_url, target: '_blank' %></small>
+              <br /><small class="highlight break-word" title="Feed URL"><%= link_to subscription.feed_url, subscription.feed_url, target: '_blank' %></small>
             </td>
           </tr>
         <% end %>
       <% end %>
     </table>
   </div>
-  <table class="table table-condensed form-table feed-form">
-    <tr>
-      <td colspan="2">
-        <div class="half text-right float-right">
-          <%= submit_tag "Save", class: 'button button-primary' %>
-        </div>
-        <div class="half">
-          <%= submit_tag 'Unsubscribe', class: 'button button-danger', name: 'unsubscribe' %>
-        </div>
-      </td>
-    </tr>
-  </table>
+  <div class="collection-edit-controls clearfix">
+    <div class="half text-right float-right">
+      <%= submit_tag "Save", class: 'button button-primary' %>
+    </div>
+    <div class="half">
+      <%= submit_tag 'Unsubscribe', class: 'button button-danger button-link', name: 'unsubscribe', style: 'margin-top: 11px;' %>
+    </div>
+  </div>
+
 <% end %>

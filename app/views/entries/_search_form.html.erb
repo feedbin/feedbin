@@ -1,0 +1,3 @@
+<%= form_tag search_entries_path, remote: true, method: :get, data: {behavior: 'search_form'} do %>
+  <%= search_field_tag :query, params[:query] %>
+<% end %>

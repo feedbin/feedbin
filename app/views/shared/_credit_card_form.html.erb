@@ -1,7 +1,7 @@
 <p>
   <%= text_field_tag :card_number, nil, name: nil, placeholder: "Credit Card Number" %>
 
-  <%= text_field_tag :card_code, nil, name: nil, placeholder: "Card Security Code (CVV)" %>
+  <%= text_field_tag :card_code, nil, name: nil, placeholder: "Card Security Code (CVC)" %>
 
   <%= label_tag :card_month, "Card Expiration" %>
   <%= select_month nil, {add_month_numbers: true}, {name: nil, id: "card_month"} %>

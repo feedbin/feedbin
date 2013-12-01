@@ -2,7 +2,9 @@ class SettingsController < ApplicationController
 
   before_action :plan_exists, only: [:update_plan]
 
-  def help; end
+  def help
+    @user = current_user
+  end
 
   def settings
     @user = current_user
@@ -30,34 +32,39 @@ class SettingsController < ApplicationController
       subscription
     }
     @subscriptions = @subscriptions.sort_by {|subscription| subscription.title.downcase}
+
+    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
+    @authentication_token = CGI::escape(verifier.generate(@user.id))
+    @web_service_url = "#{ENV['PUSH_URL']}/apple_push_notifications"
   end
 
   def billing
     @user = current_user
-    @billing_events = @user.billing_events.where(event_type: 'invoice.payment_succeeded')
-    @billing_events = @billing_events.to_a.sort_by {|billing_event| -billing_event.details.data.object.date }
-    @next_payment = nil
-    if @billing_events.present?
-      @billing_events.first.details.data.object.lines.data.each do |event|
+    @next_payment = @user.billing_events.where(event_type: 'invoice.payment_succeeded')
+    @next_payment = @next_payment.to_a.sort_by {|next_payment| -next_payment.details.data.object.date }
+    if @next_payment.present?
+      @next_payment.first.details.data.object.lines.data.each do |event|
         event = event.to_hash
         if event[:type] && event[:type] == 'subscription'
           @next_payment = Time.at(event[:period].end).utc.to_datetime
         end
       end
     end
+    @billing_events = @user.billing_events.where(event_type: 'charge.succeeded')
+    @billing_events = @billing_events.to_a.sort_by {|billing_event| -billing_event.details.data.object.created }
     if @user.plan.stripe_id == 'free'
       @plans = Plan.where(price_tier: @user.plan.price_tier)
     else
-      @plans = Plan.where(price_tier: @user.plan.price_tier).where.not(stripe_id: 'free')
+      @plans = Plan.where(price_tier: @user.plan.price_tier).where.not(stripe_id: ['free', 'trial'])
     end
   end
 
   def import_export
+    @user = current_user
     @uploader = Import.new.upload
     @uploader.success_action_redirect = settings_import_export_url
 
     if params[:key]
-      @user = current_user
       @import = Import.new(key: params[:key], user: @user)
 
       if @import.save
@@ -88,7 +95,6 @@ class SettingsController < ApplicationController
   def update_credit_card
     @user = current_user
     @user.stripe_token = params[:stripe_token]
-    @user.suspended = false
     @user.free_ok = (@user.plan.stripe_id == 'free')
 
     respond_to do |format|
@@ -105,7 +111,11 @@ class SettingsController < ApplicationController
     @user.attributes = user_settings_params
     @user.free_ok = (@user.plan.stripe_id == 'free')
     if @user.save
-      redirect_to settings_path, notice: 'Settings updated.'
+      if params[:redirect_to]
+        redirect_to params[:redirect_to], notice: 'Settings updated.'
+      else
+        redirect_to settings_path, notice: 'Settings updated.'
+      end
     else
       redirect_to settings_path, alert: @user.errors.full_messages.join('. ') + '.'
     end
@@ -128,7 +138,7 @@ class SettingsController < ApplicationController
     end
     render nothing: true
   end
-  
+
   def font_increase
     change_font_size('increase')
   end
@@ -136,7 +146,7 @@ class SettingsController < ApplicationController
   def font_decrease
     change_font_size('decrease')
   end
-  
+
   def font
     @user = current_user
     if Feedbin::Application.config.fonts.has_value?(params[:font])
@@ -145,7 +155,7 @@ class SettingsController < ApplicationController
     end
     render nothing: true
   end
-  
+
   def entry_width
     @user = current_user
     if @user.entry_width.blank?
@@ -159,22 +169,22 @@ class SettingsController < ApplicationController
   end
 
   private
-  
+
   def change_font_size(direction)
     @user = current_user
-    
+
     current_font_size = @user.font_size.try(:to_i) || 5
     if direction == 'increase'
       new_font_size = current_font_size + 1
     else
       new_font_size = current_font_size - 1
     end
-    
+
     if Feedbin::Application.config.font_sizes[new_font_size] && new_font_size >= 0
       @user.font_size = new_font_size
       @user.save
     end
-    
+
     render nothing: true
   end
 
@@ -183,7 +193,7 @@ class SettingsController < ApplicationController
   end
 
   def user_settings_params
-    params.require(:user).permit(:entry_sort, :starred_feed_enabled, :hide_tagged_feeds, :precache_images, :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation)
+    params.require(:user).permit(:entry_sort, :starred_feed_enabled, :hide_tagged_feeds, :precache_images, :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation, :apple_push_notification_device_token, :receipt_info)
   end
 
 end

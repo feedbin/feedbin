@@ -6,8 +6,8 @@ class CreateImportItems < ActiveRecord::Migration
 
       t.timestamps
     end
-    
+
     add_index :import_items, :import_id
-    
+
   end
 end

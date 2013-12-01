@@ -20,6 +20,10 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
+  helpers:
+    submit:
+      create: "Save"
+      update: "Update"
   activerecord:
     attributes:
       user:

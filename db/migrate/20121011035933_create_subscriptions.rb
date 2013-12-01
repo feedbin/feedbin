@@ -7,10 +7,10 @@ class CreateSubscriptions < ActiveRecord::Migration
 
       t.timestamps
     end
-    
+
     add_index :subscriptions, :user_id
     add_index :subscriptions, :feed_id
     add_index :subscriptions, [:user_id, :feed_id], unique: true
   end
-  
+
 end

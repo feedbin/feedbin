@@ -11,12 +11,16 @@
       <td class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
         <div class="feeds-wrap full-height">
           <div class="view-toolbar">
-            <%= render partial: 'shared/buttons/view_unread' %>
             <%= render partial: 'shared/buttons/view_all' %>
+            <%= render partial: 'shared/buttons/view_unread' %>
+            <%= render partial: 'shared/buttons/subscribe' %>
+          </div>
+          <div class="subscribe-wrap">
+            <%= render partial: "subscriptions/form" %>
           </div>
           <div class="feeds">
             <ul data-behavior="feeds_target">
-              <%= render partial: 'feeds/feeds', locals: {collections: @collections, tags: @tags, feeds: @feeds} %>
+              <%= render partial: 'feeds/feeds', locals: {collections: @collections, saved_searches: @saved_searches, tags: @tags, feeds: @feeds} %>
             </ul>
           </div>
           <%= render partial: 'shared/feeds_toolbar' %>
@@ -50,5 +54,5 @@
 <%= render partial: "shared/data", locals: {mobile: false} %>
 <%= render partial: "shared/resizable_form" %>
 
-<iframe src="https://www.subtome.com/register-no-ui.html?name=Feedbin&url=<%= "#{get_protocol}//#{request.host}" %>/?subscribe={feed}" />
+<iframe src="https://www.subtome.com/register-no-ui.html?name=Feedbin&url=<%= "#{get_protocol}//#{request.host}" %>/?subscribe={feed}" class="hide"></iframe>
 

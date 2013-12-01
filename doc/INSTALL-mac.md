@@ -4,15 +4,15 @@ Feedbin Installation on Mac OS X Mountain Lion
 This will get Feedbin running on a fresh Mountain Lion install. If you already have a ruby environment configured you can skip most of these steps.
 
 #### Command Line Tools (OS X Mountain Lion)
- 
+
 These can be downloaded from the [Apple Developer website](https://developer.apple.com/downloads/index.action), or in XCode preferences.
-		
+
 #### Homebrew
- 
+
     ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"
 
 #### rbenv
- 
+
     brew update
     brew install rbenv
     brew install ruby-build
@@ -20,12 +20,12 @@ These can be downloaded from the [Apple Developer website](https://developer.app
     source ~/.bash_profile
 
 #### Ruby 2.0
- 
+
     rbenv install 2.0.0-p247
     rbenv global 2.0.0-p247
 
 #### Bundler
- 
+
     gem install bundler
 
 #### Postgres 9.2.4
@@ -35,14 +35,14 @@ These can be downloaded from the [Apple Developer website](https://developer.app
     unzip postgres.zip
     mv Postgres.app /Applications/
     open /Applications/Postgres.app
-   
+
 #### Redis 2.6.14
 
     brew update
     brew install redis
 
 Make sure to follow post install instructions.
-	 
+
 #### Clone Feedbin
 
     git clone https://github.com/feedbin/feedbin.git
@@ -56,7 +56,7 @@ Make sure to follow post install instructions.
 #### Start scheduled tasks and background workers
 
     bundle exec foreman start
-		
+
 #### [pow](http://pow.cx)
 
     curl get.pow.cx | sh

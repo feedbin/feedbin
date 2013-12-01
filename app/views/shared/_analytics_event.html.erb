@@ -1,0 +1,1 @@
+ga('send', <%= {hitType: 'event'}.merge(@analytics_event).to_json.html_safe %>);

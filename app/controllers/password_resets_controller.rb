@@ -3,7 +3,7 @@ class PasswordResetsController < ApplicationController
 
   def new
   end
-  
+
   def create
     user = User.find_by_email(params[:email])
     user.send_password_reset if user
@@ -13,7 +13,7 @@ class PasswordResetsController < ApplicationController
   def edit
     @user = User.find_by_password_reset_token!(params[:id])
   end
-  
+
   def update
     @user = User.find_by_password_reset_token!(params[:id])
     @user.password_reset = true
@@ -26,11 +26,11 @@ class PasswordResetsController < ApplicationController
       render :edit
     end
   end
-  
+
   private
-  
+
   def user_params
     params.require(:user).permit(:password)
   end
-  
+
 end
