@@ -11,51 +11,51 @@
   <p>
     <label class="checkbox">
       <%= f.check_box :precache_images %> Pre-load images
-    </label>  
+    </label>
     <small>Images for unread entries will be loaded in the background when viewing a feed. Not recommended with limited data/bandwidth.</small>
   </p>
 
   <p>
     <label class="checkbox">
       <%= f.check_box :sticky_view_inline %> Sticky Readability
-    </label>  
+    </label>
     <small>Use last Readability setting per feed (this will make loading entries slower).</small>
   </p>
 
   <p>
     <label class="checkbox">
       <%= f.check_box :mark_as_read_confirmation %> Ask before marking all as read
-    </label>  
+    </label>
   </p>
-  
+
   <h3>Tags</h3>
-  
+
   <p>
     <label class="checkbox">
       <%= f.check_box :hide_tagged_feeds %> Hide tagged feeds
-    </label>  
+    </label>
     <small>Tagged feeds will only show up in tag drawers</small>
   </p>
-  
+
   <h3>Extras</h3>
-  
+
   <p>
     <label class="checkbox">
       <%= f.check_box :show_unread_count %> Show unread count in title
-    </label>  
+    </label>
   </p>
-  
+
   <p>
     <label class="checkbox">
       <%= f.check_box :starred_feed_enabled %> Enable starred entry feed
-    </label>  
+    </label>
     <% if @user.starred_feed_enabled == '1' %>
       <small><%= link_to 'Starred Feed', starred_url(@user.starred_token, format: :xml) %></small>
     <% else %>
       <small>Link shown here when enabled</small>
     <% end %>
   </p>
-  
+
 
   <%= f.submit "Save", class: 'button' %>
 <% end %>
@@ -65,4 +65,4 @@
 <h3>Subscribe via Email</h3>
 <p class="muted">You can subscribe to any website that publishes a feed by sending an email to this secret address. The body of the email should only contain the URL to the website or feed.</p>
 
-<p><a href="mailto:subscribe+<%= @user.inbound_email_token %>@subscribe.feedbin.me">subscribe+<%= @user.inbound_email_token %>@subscribe.feedbin.me</a></p>
+<p class="subscribe-email"><a href="mailto:subscribe+<%= @user.inbound_email_token %>@subscribe.feedbin.me">subscribe+<%= @user.inbound_email_token %>@subscribe.feedbin.me</a></p>

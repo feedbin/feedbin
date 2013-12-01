@@ -1,0 +1,70 @@
+<div data-behavior="associated_record" class="action-form <%= action_class(f.object.persisted?) %>">
+
+  <%= link_to_remove_association "×", f, class: 'delete-action' %>
+  <% if f.object.persisted? %>
+    <a href="#" data-behavior="edit_action" class="edit-action">Edit</a>
+  <% end %>
+
+  <% if f.object.errors.any? %>
+    <div class="alert alert-error">
+      <% f.object.errors.full_messages.each do |message| %>
+        <%= message %>.
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if f.object.persisted? %>
+    <%= render partial: 'actions/text_description', locals: {action: f.object} %>
+  <% end %>
+
+  <div class="action-edit-form <% if f.object.persisted? && !f.object.errors.any? %>hide<% end %>">
+
+    <div class="description-item clearfix">
+      <div class="action-label action-keywords">
+        Keywords:
+      </div>
+      <div class="action-data">
+        <%= f.search_field :query %>
+      </div>
+    </div>
+
+    <div class="description-item clearfix">
+      <div class="action-label">
+        Feeds:
+      </div>
+      <div class="action-data">
+        <p class="half-margin">
+          <label class="checkbox">
+            <%= f.check_box :all_feeds, data: {behavior: 'check_feeds'} %>
+            Include All Feeds
+          </label>
+        </p>
+        <div class="feed-ids">
+          <%=
+            f.collection_check_boxes(:feed_ids, @user.feeds.include_user_title, :string_id, :title) do |b|
+              options = {}
+              if f.object.all_feeds == true
+                options[:disabled] = 'disabled'
+              end
+              b.label(class: "checkbox") { b.check_box(options) + b.text }
+            end
+          %>
+        </div>
+      </div>
+    </div>
+
+    <div class="description-item clearfix">
+      <div class="action-label">
+        Actions:
+      </div>
+      <div class="action-data">
+        <%=
+          f.collection_check_boxes(:actions, Feedbin::Application.config.action_names, :value, :label) do |b|
+            b.label(class: "checkbox", data: {behavior: "action_#{b.value}"}) { b.check_box + b.text }
+          end
+        %>
+      </div>
+    </div>
+
+  </div>
+</div>

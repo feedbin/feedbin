@@ -29,7 +29,7 @@ module SessionsHelper
       @current_user = User.find_by_auth_token(cookies.signed[:auth_token]) if cookies.signed[:auth_token]
     end
   end
-        
+
   def authorize
     unless signed_in?
       flash[:error] = "Please log in."
@@ -41,7 +41,7 @@ module SessionsHelper
       end
     end
   end
-  
+
   def sign_out
     current_user = nil
     cookies.delete(:auth_token)

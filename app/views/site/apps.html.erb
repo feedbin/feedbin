@@ -9,11 +9,11 @@
       <div class="col-sm-6">
         <div class="sm-hide">
           <p class="pricing-promo align-right"><sup>$</sup>3 per month <em>or</em> <sup>$</sup>30 a year</p>
-          <p class="align-right"><%= link_to "Get started", signup_path, class: "button-get-started" %></p>
+          <p class="align-right"><%= link_to "Try it Free", signup_path, class: "button-get-started" %></p>
         </div>
       </div>
     </div>
-    
+
     <ul class="apps-nav" data-behavior="filter_list">
       <li class="active" data-filter="all">All</li>
       <li data-filter="iphone">iPhone</li>
@@ -22,18 +22,22 @@
       <li data-filter="mac">Mac</li>
       <li data-filter="windows">Windows</li>
     </ul>
-    
+
     <hr class="space">
-    
+
     <div class="row">
 
       <div class="col-sm-4" data-behavior="filter_target" data-platforms="iphone ipad">
         <div class="app-detail">
           <div class="inner">
-            <a href="https://itunes.apple.com/app/reeder-2/id697846300"><%= image_tag 'apps/reeder-iphone.jpg', class: 'rounded-icon', size: '60x60' %></a>
-            <h3 class="inner-promo">Reeder 2</h3>
-            <p><small>By <a href="http://reederapp.com/">Silvio Rizzi</a></small></p>
-            <p>Reeder is a RSS reader and client for Feedbin, Feedly, Feed Wrangler, Fever, and Readability.</p>
+            <div class="app-icon">
+              <a href="https://itunes.apple.com/app/reeder-2/id697846300"><%= image_tag 'apps/reeder-iphone.jpg', class: 'rounded-icon', size: '60x60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">Reeder 2</h3>
+              <p><small>By <a href="http://reederapp.com/">Silvio Rizzi</a></small></p>
+              <p>Reeder is a RSS reader and client for Feedbin, Feedly, Feed Wrangler, Fever, and Readability.</p>
+            </div>
           </div>
           <p class="platforms">Available for <a href="https://itunes.apple.com/app/reeder-2/id697846300">iPhone, iPad</a></p>
         </div>
@@ -42,10 +46,46 @@
       <div class="col-sm-4" data-behavior="filter_target" data-platforms="iphone ipad">
         <div class="app-detail">
           <div class="inner">
-            <a href="https://itunes.apple.com/app/slow-feeds/id511900080"><%= image_tag 'apps/slow-feeds-iphone.jpg', class: 'rounded-icon', size: '60x60' %></a>
-            <h3 class="inner-promo">Slow Feeds</h3>
-            <p><small>By <a href="http://zoziapps.ch/">Stefan Pauwels</a></small></p>
-            <p>Rediscover your feeds with this unique and smart RSS client for iOS.</p>
+            <div class="app-icon">
+              <a href="https://itunes.apple.com/us/app/aradais-reader/id725655669"><%= image_tag 'apps/aradais-reader-iphone.png', size: '60x60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">Aradais Reader</h3>
+              <p><small>By <a href="http://aradaisreader.com/">Aradais Corporation</a></small></p>
+              <p>Aradais Reader is a RSS reader for iPhone and iPad with a clean, gesture-based UI.</p>
+            </div>
+          </div>
+          <p class="platforms">Available for <a href="https://itunes.apple.com/us/app/aradais-reader/id725655669">iPhone, iPad</a></p>
+        </div>
+      </div>
+
+      <div class="col-sm-4" data-behavior="filter_target" data-platforms="iphone ipad">
+        <div class="app-detail">
+          <div class="inner">
+            <div class="app-icon">
+              <a href="https://itunes.apple.com/app/fiery-rss-client-for-feedbin/id692742195"><%= image_tag 'apps/fiery-rss-iphone.jpg', class: 'rounded-icon', size: '60x60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">Fiery</h3>
+              <p><small>By <a href="http://cocoacake.net/">Lukas Burgstaller</a></small></p>
+              <p>Fiery is a multi-account RSS client designed for iOS 7.</p>
+            </div>
+          </div>
+          <p class="platforms">Available for <a href="https://itunes.apple.com/app/fiery-rss-client-for-feedbin/id692742195">iPhone</a>, <a href="https://itunes.apple.com/app/fiery-rss-for-ipad-client/id692752069">iPad</a></p>
+        </div>
+      </div>
+
+      <div class="col-sm-4" data-behavior="filter_target" data-platforms="iphone ipad">
+        <div class="app-detail">
+          <div class="inner">
+            <div class="app-icon">
+              <a href="https://itunes.apple.com/app/slow-feeds/id511900080"><%= image_tag 'apps/slow-feeds-iphone.jpg', class: 'rounded-icon', size: '60x60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">Slow Feeds</h3>
+              <p><small>By <a href="http://zoziapps.ch/">Stefan Pauwels</a></small></p>
+              <p>Rediscover your feeds with this unique and smart RSS client for iOS.</p>
+            </div>
           </div>
           <p class="platforms">Available for <a href="https://itunes.apple.com/app/slow-feeds/id511900080">iPhone, iPad</a></p>
         </div>
@@ -54,10 +94,14 @@
       <div class="col-sm-4" data-behavior="filter_target" data-platforms="iphone">
         <div class="app-detail">
           <div class="inner">
-            <a href="https://itunes.apple.com/app/newsfeeds/id683971004"><%= image_tag 'apps/newsfeeds-iphone.jpg', class: 'rounded-icon', size: '60x60' %></a>
-            <h3 class="inner-promo">NewsFeeds</h3>
-            <p><small>By <a href="http://newsfeedsapp.com/">Josh Williams</a></small></p>
-            <p>NewsFeeds is a simple yet powerful RSS client for FeedBin and FeedWrangler.</p>
+            <div class="app-icon">
+              <a href="https://itunes.apple.com/app/newsfeeds/id683971004"><%= image_tag 'apps/newsfeeds-iphone.jpg', class: 'rounded-icon', size: '60x60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">NewsFeeds</h3>
+              <p><small>By <a href="http://newsfeedsapp.com/">Josh Williams</a></small></p>
+              <p>NewsFeeds is a simple yet powerful RSS client for FeedBin and FeedWrangler.</p>
+            </div>
           </div>
           <p class="platforms">Available for <a href="https://itunes.apple.com/app/newsfeeds/id683971004">iPhone</a></p>
         </div>
@@ -66,10 +110,14 @@
       <div class="col-sm-4" data-behavior="filter_target" data-platforms="iphone ipad mac">
         <div class="app-detail">
           <div class="inner">
-            <a href="https://itunes.apple.com/app/favs/id436962003"><%= image_tag 'apps/favs-iphone.jpg', class: 'rounded-icon', size: '60x60' %></a>
-            <h3 class="inner-promo">Favs</h3>
-            <p><small>By <a href="http://www.favsapp.com/">Dirk Holtwick</a></small></p>
-            <p>The app for your likes, stars, social bookmarks and favorites.</p>
+            <div class="app-icon">
+              <a href="https://itunes.apple.com/app/favs/id436962003"><%= image_tag 'apps/favs-iphone.jpg', class: 'rounded-icon', size: '60x60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">Favs</h3>
+              <p><small>By <a href="http://www.favsapp.com/">Dirk Holtwick</a></small></p>
+              <p>The app for your likes, stars, social bookmarks and favorites.</p>
+            </div>
           </div>
           <p class="platforms">Available for <a href="https://itunes.apple.com/app/favs/id436962003">iPhone, iPad</a>, <a href="https://itunes.apple.com/app/favs/id436961703">Mac</a></p>
         </div>
@@ -78,10 +126,14 @@
       <div class="col-sm-4" data-behavior="filter_target" data-platforms="iphone">
         <div class="app-detail">
           <div class="inner">
-            <a href="https://itunes.apple.com/app/readlines-for-feedbin/id416953125"><%= image_tag 'apps/readlines-iphone.jpg', class: 'rounded-icon', size: '60x60' %></a>
-            <h3 class="inner-promo">Readlines for Feedbin</h3>
-            <p><small>By <a href="http://www.conceptcache.com/">Concept Cache LLC</a></small></p>
-            <p>Minimalist RSS reader that syncs with your Feedbin account. It simply displays a random headline from your unread items.</p>
+            <div class="app-icon">
+              <a href="https://itunes.apple.com/app/readlines-for-feedbin/id416953125"><%= image_tag 'apps/readlines-iphone.jpg', class: 'rounded-icon', size: '60x60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">Readlines for Feedbin</h3>
+              <p><small>By <a href="http://www.conceptcache.com/">Concept Cache LLC</a></small></p>
+              <p>Minimalist RSS reader that syncs with your Feedbin account. It simply displays a random headline from your unread items.</p>
+            </div>
           </div>
           <p class="platforms">Available for <a href="https://itunes.apple.com/app/readlines-for-feedbin/id416953125">iPhone</a></p>
         </div>
@@ -90,10 +142,14 @@
       <div class="col-sm-4" data-behavior="filter_target" data-platforms="iphone">
         <div class="app-detail">
           <div class="inner">
-            <a href="https://itunes.apple.com/us/app/bulletin-for-feedbin/id328547010"><%= image_tag 'apps/bulletin-iphone.jpg', class: 'rounded-icon', size: '60x60' %></a>
-            <h3 class="inner-promo">Bulletin for Feedbin</h3>
-            <p><small>By <a href="http://www.conceptcache.com/">Concept Cache LLC</a></small></p>
-            <p>Read all of the latest news from your Feedbin account while on the move. Bulletin allows you to carry up to 1,000 unread items on your device.</p>
+            <div class="app-icon">
+              <a href="https://itunes.apple.com/us/app/bulletin-for-feedbin/id328547010"><%= image_tag 'apps/bulletin-iphone.jpg', class: 'rounded-icon', size: '60x60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">Bulletin for Feedbin</h3>
+              <p><small>By <a href="http://www.conceptcache.com/">Concept Cache LLC</a></small></p>
+              <p>Read all of the latest news from your Feedbin account while on the move. Bulletin allows you to carry up to 1,000 unread items on your device.</p>
+            </div>
           </div>
           <p class="platforms">Available for <a href="https://itunes.apple.com/app/bulletin-for-feedbin/id328547010">iPhone</a></p>
         </div>
@@ -102,10 +158,14 @@
       <div class="col-sm-4" data-behavior="filter_target" data-platforms="ipad">
         <div class="app-detail">
           <div class="inner">
-            <a href="https://itunes.apple.com/app/mr.-reader/id412874834"><%= image_tag 'apps/mr-reader-ipad.jpg', class: 'rounded-icon', size: '60x60' %></a>
-            <h3 class="inner-promo">Mr. Reader</h3>
-            <p><small>By <a href="http://www.curioustimes.de/mrreader/">Oliver Fürniß</a></small></p>
-            <p>Mr. Reader is a RSS News Reader for your iPad that synchronizes with Feedbin, Feedly, BazQux Reader, FeedHQ, Feed Wrangler and Fever.</p>
+            <div class="app-icon">
+              <a href="https://itunes.apple.com/app/mr.-reader/id412874834"><%= image_tag 'apps/mr-reader-ipad.jpg', class: 'rounded-icon', size: '60x60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">Mr. Reader</h3>
+              <p><small>By <a href="http://www.curioustimes.de/mrreader/">Oliver Fürniß</a></small></p>
+              <p>Mr. Reader is a RSS News Reader for your iPad that synchronizes with Feedbin, Feedly, BazQux Reader, FeedHQ, Feed Wrangler and Fever.</p>
+            </div>
           </div>
           <p class="platforms">Available for <a href="https://itunes.apple.com/app/mr.-reader/id412874834">iPad</a></p>
         </div>
@@ -114,10 +174,14 @@
       <div class="col-sm-4" data-behavior="filter_target" data-platforms="android">
         <div class="app-detail">
           <div class="inner">
-            <a href="https://play.google.com/store/apps/details?id=com.twentyfivesquares.press"><%= image_tag 'apps/press-android.png', width: '60' %></a>
-            <h3 class="inner-promo">Press</h3>
-            <p><small>By <a href="http://twentyfivesquares.com/">TwentyFive Squares</a></small></p>
-            <p>Press is a simple and elegant RSS client for popular syncing services. It’s fast and clean, giving you the freedom to enjoy your favorite news.</p>
+            <div class="app-icon">
+              <a href="https://play.google.com/store/apps/details?id=com.twentyfivesquares.press"><%= image_tag 'apps/press-android.png', width: '60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">Press</h3>
+              <p><small>By <a href="http://twentyfivesquares.com/">TwentyFive Squares</a></small></p>
+              <p>Press is a simple and elegant RSS client for popular syncing services. It’s fast and clean, giving you the freedom to enjoy your favorite news.</p>
+            </div>
           </div>
           <p class="platforms">Available for <a href="https://play.google.com/store/apps/details?id=com.twentyfivesquares.press">Android</a></p>
         </div>
@@ -126,10 +190,30 @@
       <div class="col-sm-4" data-behavior="filter_target" data-platforms="android">
         <div class="app-detail">
           <div class="inner">
-            <a href="https://play.google.com/store/apps/details?id=com.neogb.feedbinreader"><%= image_tag 'apps/feedbin-reader-android.png', class: 'rounded-icon', size: '60x60' %></a>
-            <h3 class="inner-promo">Feedbin Reader BETA</h3>
-            <p><small>By <a href="https://play.google.com/store/apps/developer?id=Guillaume+BOUERAT">Guillaume BOUERAT</a></small></p>
-            <p>Beta version lets you read your RSS feeds offline after you have synchronized them.</p>
+            <div class="app-icon">
+              <a href="https://play.google.com/store/apps/details?id=com.salvadordalvik.binfeed"><%= image_tag 'apps/binfeed-android.png', width: '60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo"><div>binfeed</div></h3>
+              <p><small>By <a href="https://play.google.com/store/apps/developer?id=2fast2fourier">2fast2fourier</a></small></p>
+              <p>Feedbin App for Android</p>
+            </div>
+          </div>
+          <p class="platforms">Available for <a href="https://play.google.com/store/apps/details?id=com.salvadordalvik.binfeed">Android</a></p>
+        </div>
+      </div>
+
+      <div class="col-sm-4" data-behavior="filter_target" data-platforms="android">
+        <div class="app-detail">
+          <div class="inner">
+            <div class="app-icon">
+              <a href="https://play.google.com/store/apps/details?id=com.neogb.feedbinreader"><%= image_tag 'apps/feedbin-reader-android.png', class: 'rounded-icon', size: '60x60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">Feedbin Reader BETA</h3>
+              <p><small>By <a href="https://play.google.com/store/apps/developer?id=Guillaume+BOUERAT">Guillaume BOUERAT</a></small></p>
+              <p>Beta version lets you read your RSS feeds offline after you have synchronized them.</p>
+            </div>
           </div>
           <p class="platforms">Available for <a href="https://play.google.com/store/apps/details?id=com.neogb.feedbinreader">Android</a></p>
         </div>
@@ -138,10 +222,14 @@
       <div class="col-sm-4" data-behavior="filter_target" data-platforms="android">
         <div class="app-detail">
           <div class="inner">
-            <a href="https://play.google.com/store/apps/details?id=com.reindeercrafts.deerreader"><%= image_tag 'apps/deer-reader-android.png', size: '60x60' %></a>
-            <h3 class="inner-promo">Deer Reader</h3>
-            <p><small>By <a href="https://play.google.com/store/apps/developer?id=Reindeer+Crafts">Reindeer Crafts</a></small></p>
-            <p>Deer Reader is a nice RSS client.</p>
+            <div class="app-icon">
+              <a href="https://play.google.com/store/apps/details?id=com.reindeercrafts.deerreader"><%= image_tag 'apps/deer-reader-android.png', size: '60x60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">Deer Reader</h3>
+              <p><small>By <a href="https://play.google.com/store/apps/developer?id=Reindeer+Crafts">Reindeer Crafts</a></small></p>
+              <p>Deer Reader is a nice RSS client.</p>
+            </div>
           </div>
           <p class="platforms">Available for <a href="https://play.google.com/store/apps/details?id=com.reindeercrafts.deerreader">Android</a></p>
         </div>
@@ -150,10 +238,14 @@
       <div class="col-sm-4" data-behavior="filter_target" data-platforms="android">
         <div class="app-detail">
           <div class="inner">
-            <a href="https://play.google.com/store/apps/details?id=com.piaci.listener.app"><%= image_tag 'apps/listener-launcher-android.png', style: 'height: 60px;' %></a>
-            <h3 class="inner-promo">Listener Launcher</h3>
-            <p><small>By <a href="https://play.google.com/store/apps/developer?id=piaci.mosca">piaci.mosca</a></small></p>
-            <p>Alternative launcher that puts a variety of information on your home screen including RSS feeds.</p>
+            <div class="app-icon">
+              <a href="https://play.google.com/store/apps/details?id=com.piaci.listener.app"><%= image_tag 'apps/listener-launcher-android.png', style: 'height: 60px;' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">Listener Launcher</h3>
+              <p><small>By <a href="https://play.google.com/store/apps/developer?id=piaci.mosca">piaci.mosca</a></small></p>
+              <p>Alternative launcher that puts a variety of information on your home screen including RSS feeds.</p>
+            </div>
           </div>
           <p class="platforms">Available for <a href="https://play.google.com/store/apps/details?id=com.piaci.listener.app">Android</a></p>
         </div>
@@ -162,10 +254,14 @@
       <div class="col-sm-4" data-behavior="filter_target" data-platforms="mac">
         <div class="app-detail">
           <div class="inner">
-            <a href="https://itunes.apple.com/app/readkit/id588726889"><%= image_tag 'apps/readkit-mac.png', width: '60' %></a>
-            <h3 class="inner-promo">ReadKit</h3>
-            <p><small>By <a href="http://readkitapp.com/">Balazs Varkonyi</a></small></p>
-            <p>ReadKit is a full-featured read later and RSS client that supports many services and has built-in RSS capabilities.</p>
+            <div class="app-icon">
+              <a href="https://itunes.apple.com/app/readkit/id588726889"><%= image_tag 'apps/readkit-mac.png', width: '60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">ReadKit</h3>
+              <p><small>By <a href="http://readkitapp.com/">Balazs Varkonyi</a></small></p>
+              <p>ReadKit is a full-featured read later and RSS client that supports many services and has built-in RSS capabilities.</p>
+            </div>
           </div>
           <p class="platforms">Available for <a href="https://itunes.apple.com/app/readkit/id588726889">Mac</a></p>
         </div>
@@ -174,10 +270,14 @@
       <div class="col-sm-4" data-behavior="filter_target" data-platforms="windows">
         <div class="app-detail">
           <div class="inner">
-            <a href="http://apps.microsoft.com/windows/app/tafiti/0959bc4f-5d1e-401d-b636-b0f5e1db78cd"><%= image_tag 'apps/tafiti-windows.png', size: '60x60' %></a>
-            <h3 class="inner-promo">Tafiti</h3>
-            <p><small>By <a href="http://www.tafitiapp.com/mx">Sameer Vartak</a></small></p>
-            <p>Tafiti is a new take on news reading on Windows! It's simple and clean user interface makes news reading a delightful experience.</p>
+            <div class="app-icon">
+              <a href="http://apps.microsoft.com/windows/app/tafiti/0959bc4f-5d1e-401d-b636-b0f5e1db78cd"><%= image_tag 'apps/tafiti-windows.png', size: '60x60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">Tafiti</h3>
+              <p><small>By <a href="http://www.tafitiapp.com/mx">Sameer Vartak</a></small></p>
+              <p>Tafiti is a new take on news reading on Windows! It's simple and clean user interface makes news reading a delightful experience.</p>
+            </div>
           </div>
           <p class="platforms">Available for <a href="http://apps.microsoft.com/windows/app/tafiti/0959bc4f-5d1e-401d-b636-b0f5e1db78cd">Windows 8, Windows RT</a></p>
         </div>
@@ -186,16 +286,20 @@
       <div class="col-sm-4" data-behavior="filter_target" data-platforms="windows">
         <div class="app-detail">
           <div class="inner">
-            <a href="http://shanegowland.com/metroreader-for-feedbin/"><%= image_tag 'apps/metroreader-windows.png', size: '60x60' %></a>
-            <h3 class="inner-promo">MetroReader for Feedbin</h3>
-            <p><small>By <a href="http://shanegowland.com/">Shane Gowland</a></small></p>
-            <p>A metro style Feedbin client for the Windows desktop.</p>
+            <div class="app-icon">
+              <a href="http://shanegowland.com/metroreader-for-feedbin/"><%= image_tag 'apps/metroreader-windows.png', size: '60x60' %></a>
+            </div>
+            <div class="app-info">
+              <h3 class="inner-promo">MetroReader for Feedbin</h3>
+              <p><small>By <a href="http://shanegowland.com/">Shane Gowland</a></small></p>
+              <p>A metro style Feedbin client for the Windows desktop.</p>
+            </div>
           </div>
           <p class="platforms">Available for <a href="http://shanegowland.com/metroreader-for-feedbin/">Windows</a></p>
         </div>
       </div>
 
     </div>
-    
+
   </div>
 </div>

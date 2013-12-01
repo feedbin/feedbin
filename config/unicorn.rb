@@ -4,7 +4,7 @@ app_name = "feedbin"
 app_dir  = "/srv/apps/#{app_name}"
 working_directory "#{app_dir}/current"
 
-user 'app', 'app' 
+user 'app', 'app'
 
 rails_env = ENV['RAILS_ENV'] || 'production'
 
@@ -29,7 +29,7 @@ after_fork do |server, worker|
   Sidekiq.configure_client do |config|
     config.redis = { size: 1 }
   end
-  
+
   defined?(ActiveRecord::Base) and ActiveRecord::Base.establish_connection
 
   # Kill off the new master after forking

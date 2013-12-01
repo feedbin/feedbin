@@ -1,9 +1,9 @@
 <tr>
+  <td><%= f.text_field :label, class: 'span2', placeholder: 'Label' %></td>
+  <td><%= f.url_field :url, placeholder: 'URL' %></td>
   <td class="action">
     <%= f.hidden_field :id %>
     <%= f.hidden_field :_destroy %>
-    <%= link_to 'Delete', '#', class: 'button button-mini button-text button-danger', data: {behavior: 'remove_fields'} %>
+    <%= link_to 'Delete', '#', class: 'button button-text button-danger button-link', data: {behavior: 'remove_fields'} %>
   </td>
-  <td><%= f.text_field :label, class: 'span2', placeholder: 'Label' %></td>
-  <td><%= f.url_field :url, placeholder: 'URL' %></td>
 </tr>

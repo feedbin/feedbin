@@ -1,0 +1,30 @@
+<div class="action-description">
+  <div class="description-item clearfix">
+    <div class="action-label action-keywords">
+      Keywords:
+    </div>
+    <div class="action-data action-keywords">
+      <% if action.query.blank? %>
+        Anything
+      <% else %>
+        <%= action.query %>
+      <% end %>
+    </div>
+  </div>
+  <div class="description-item clearfix">
+    <div class="action-label">
+      Feeds:
+    </div>
+    <div class="action-data">
+      <%= action_feed_names(action) %>
+    </div>
+  </div>
+  <div class="description-item clearfix">
+    <div class="action-label">
+      Actions:
+    </div>
+    <div class="action-data">
+      <%= action_names(action) %>
+    </div>
+  </div>
+</div>

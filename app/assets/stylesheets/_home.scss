@@ -5,9 +5,6 @@
 	@include respond-to(screen-sm) {
 		padding-top: 56px;
 	}
-	*,*:before,*:after {
-	  box-sizing: border-box;
-	}
 	img.responsive {
 		display: block;
 		width: auto\9;
@@ -409,7 +406,6 @@
 		margin: 0;
 		padding: 0;
 		list-style: none;
-		text-align: center;
 		li {
 			display: inline-block;
 			line-height: 1;
@@ -437,44 +433,68 @@
 	}
 	.app-detail {
 		text-align: center;
-		margin-bottom: 37px;
+		margin-bottom: 25px;
 		position: relative;
-		@media (max-width: 768px) {
-			height: auto !important;
+		border-bottom: 1px solid #CCC;
+		padding-bottom: 10px;
+		.app-icon {
+			float: left;
+			width: 60px;
 		}
-		@include respond-to(screen-sm) {
-			border: 1px solid #CCC;
-		}
-		.inner {
-			@include respond-to(screen-sm) {
-				padding: 65px 35px;
+		.app-info {
+			text-align: left;
+			padding-left: 75px;
+			p {
+				margin-bottom: 8px;
+				font-size: 14px;
 			}
+
 		}
 		h3 {
 			font-size: 18px;
 			margin: 0;
 		}
-		p {
-			font-size: 16px;
-			line-height: 1.5;
-			color: #666666;
-		}
 		img {
 			margin-bottom: 15px;
 		}
 		.platforms {
+			display: none;
 			font-size: 12px;
 			color: #cccccc;
-			@include respond-to(screen-sm) {
-				bottom: 0;
-				width: 100%;
-				position: absolute;
-			}
 		}
 		small {
 			color: #999;
 			font-size: 14px;
 		}
-		
+		@include respond-to(screen-sm) {
+			border: 1px solid #CCC;
+			.inner {
+				padding: 65px 35px;
+			}
+			.platforms {
+				bottom: 0;
+				width: 100%;
+				position: absolute;
+			}
+			.app-icon {
+				float: none;
+				width: auto;
+			}
+			.app-info {
+				text-align: center;
+				padding: 0;
+				p {
+					font-size: 16px;
+					line-height: 1.5;
+					color: #666666;
+				}
+			}
+			.platforms {
+				display: block;
+			}
+		}
+		@media (max-width: 768px) {
+			height: auto !important;
+		}
 	}
 }

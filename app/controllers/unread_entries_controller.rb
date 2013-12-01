@@ -1,10 +1,10 @@
 class UnreadEntriesController < ApplicationController
-  
+
   def update
     @user = current_user
     @entry = Entry.find(params[:id])
     unread_entry = UnreadEntry.where(user: @user, entry: @entry)
-    
+
     if params[:read] == 'true'
       @read = true
       unread_entry.destroy_all
@@ -20,5 +20,5 @@ class UnreadEntriesController < ApplicationController
       format.js
     end
   end
-    
+
 end

@@ -10,7 +10,7 @@
       <% options.each do |option| %>
         <label class="checkbox">
           <%= check_box_tag "subscription[feeds][feed_url][]", option[:href] %> <%= option[:title] %>
-        </label>  
+        </label>
       <% end %>
     </div>
     <div class="modal-footer">

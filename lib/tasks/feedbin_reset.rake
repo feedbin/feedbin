@@ -8,5 +8,6 @@ namespace :feedbin  do
     Kernel.system "rake --trace db:reset"
     Kernel.system "redis-cli 'flushdb'"
     Kernel.system "echo 'flush_all' | nc localhost 11211"
+    Kernel.system "curl -XDELETE 'http://localhost:9200/_all/'"
   end
 end

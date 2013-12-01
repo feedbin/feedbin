@@ -1,7 +1,7 @@
 class SubscriptionsController < ApplicationController
 
   before_action :correct_user, only: :destroy
-  
+
   # GET subscriptions.xml
   def index
     @user = current_user
@@ -22,11 +22,11 @@ class SubscriptionsController < ApplicationController
   # POST /subscriptions.json
   def create
     @user = current_user
-    
+
     feeds = [*params[:subscription][:feeds][:feed_url]]
     site_url = params[:subscription][:site_url]
     @results = { success: [], options: [], failed: [] }
-    
+
     feeds.each do |feed|
       begin
         result = FeedFetcher.new(feed, site_url).create_feed!
@@ -44,14 +44,14 @@ class SubscriptionsController < ApplicationController
         @results[:failed].push(feed)
       end
     end
-    
+
     if @results[:success].any?
       session[:favicon_complete] = false
       @mark_selected = true
       @click_feed = @results[:success].first.id
       get_feeds_list
     end
-    
+
     respond_to do |format|
       format.js
     end
@@ -66,7 +66,7 @@ class SubscriptionsController < ApplicationController
 
     # Remove tags on this feed before destorying subscription
     @subscription.feed.tag('', @user)
-    
+
     # Get rid of the subscription relationship
     @subscription.destroy
 
@@ -75,7 +75,7 @@ class SubscriptionsController < ApplicationController
       format.js
     end
   end
-  
+
   def update_multiple
     @user = current_user
     if params[:unsubscribe]
@@ -94,12 +94,12 @@ class SubscriptionsController < ApplicationController
   end
 
   private
-  
+
   def destroy_subscription_params
     owned_subscriptions = @user.subscriptions.pluck(:id)
     params[:subscription_ids].reject {|id| !owned_subscriptions.include?(id.to_i) }
   end
-  
+
   def subscription_params
     owned_subscriptions = @user.subscriptions.pluck(:id)
     params[:subscriptions].each do |index, fields|
@@ -107,7 +107,7 @@ class SubscriptionsController < ApplicationController
         params[:subscriptions].delete(index)
       end
     end
-    params[:subscriptions].map {|index, fields| params[:subscriptions][index] = fields.slice(:title) }
+    params[:subscriptions].map {|index, fields| params[:subscriptions][index] = fields.slice(:title, :push) }
     params.require(:subscriptions).permit!
   end
 
@@ -115,5 +115,5 @@ class SubscriptionsController < ApplicationController
     @subscription = current_user.subscriptions.find_by_id(params[:id])
     render_404 if @subscription.nil?
   end
-        
+
 end

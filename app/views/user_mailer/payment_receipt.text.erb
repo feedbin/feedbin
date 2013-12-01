@@ -2,13 +2,19 @@ Hi <%= @user.email %>,
 
 This is a receipt for your Feedbin account. Please send any questions to support@feedbin.me.
 
+You can view a detailed printable receipt here: <%= billing_event_url(@billing_event) %>
+
 Thanks for being a Feedbin customer.
 
 -------------------------------------------------
-Feedbin Receipt - <%= Time.at(@billing_event.details.data.object.date).to_s(:date) %>
+Feedbin Receipt - <%= Time.at(@billing_event.details.data.object.created).to_s(:date) %>
 
+Item: <%= @user.plan.name %> Subscription
 User: <%= @user.email %>
-Amount: <%= @billing_event.details.data.object.currency.upcase %> <%= number_to_currency(@billing_event.details.data.object.total.to_f / 100) %>
+Amount: <%= @billing_event.details.data.object.currency.upcase %> <%= number_to_currency(@billing_event.details.data.object.amount.to_f / 100) %>
 
-Feedbin, LLC
+Feedbin, Inc.
+1535 Green St.
+Suite 205
+San Francisco, CA 94123
 -------------------------------------------------

@@ -1,7 +1,7 @@
 @mixin respond-to($media, $ratio: 1.3) {
 	@if $media == ipad {
 		@media only screen and (max-width: 1024px) { @content; }
-	} 
+	}
 	@else if $media == hidpi {
 		@media only screen and (-webkit-min-device-pixel-ratio: $ratio),
 		       only screen and (min-resolution: $ratio * 96dpi) {
@@ -27,5 +27,28 @@
 		@media (min-width: 1200px) {
 			@content;
 		}
+	}
+}
+
+@mixin hairline($position) {
+	@if $position == bottom {
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1' height='1'><rect fill='#CCC' x='0' y='0' width='1' height='0.5'/></svg>");
+		background-position: 0 100%;
+		background-repeat: repeat-x;
+	}
+	@else if $position == top {
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1' height='1'><rect fill='#CCC' x='0' y='0' width='1' height='0.5'/></svg>");
+		background-position: 0 0;
+		background-repeat: repeat-x;
+	}
+	@else if $position == right {
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1' height='1'><rect fill='#CCC' x='0' y='0' width='0.5' height='1'/></svg>");
+		background-position: 100% 0;
+		background-repeat: repeat-y;
+	}
+	@else if $position == left {
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1' height='1'><rect fill='#CCC' x='0' y='0' width='0.5' height='1'/></svg>");
+		background-position: 0 0;
+		background-repeat: repeat-y;
 	}
 }

@@ -46,7 +46,7 @@ module ApplicationHelper
     fields = f.fields_for(association, new_object, child_index: id) do |builder|
       render(association.to_s.singularize + "_fields", f: builder)
     end
-    link_to(name, '#', class: "button button-text", data: {id: id, fields: fields.gsub("\n", ""), behavior: 'add_fields'})
+    link_to(name, '#', data: {id: id, fields: fields.gsub("\n", ""), behavior: 'add_fields'})
   end
 
   def rtl?(string)

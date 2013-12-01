@@ -11,11 +11,6 @@ class FeedFetcher
     @feed_options = []
   end
 
-  def dummy_setup
-    @parsed_feed = fetch_and_parse
-    @feed = Feed.last
-  end
-
   def create_feed!
     unless feed_exists?
       create_or_get_options
@@ -102,6 +97,7 @@ class FeedFetcher
         push_subscribe
       end
     end
+
   end
 
   def push_subscribe
@@ -141,7 +137,7 @@ class FeedFetcher
   end
 
   def is_feed?(feed)
-    feed.respond_to?(:entries) && feed.entries.length > 0
+    feed.class.name.starts_with?('Feedzirra')
   end
 
   # Fetch and normalize feed
@@ -175,6 +171,14 @@ class FeedFetcher
         entry.entry_id        = entry.entry_id ? entry.entry_id.strip : nil
         entry._public_id_     = build_public_id(entry, feedzirra, saved_feed_url)
         entry._old_public_id_ = build_public_id(entry, feedzirra)
+        if entry.try(:enclosure_type) && entry.try(:enclosure_url)
+          data = {}
+          data[:enclosure_type] = entry.enclosure_type ? entry.enclosure_type : nil
+          data[:enclosure_url] = entry.enclosure_url ? entry.enclosure_url : nil
+          data[:enclosure_length] = entry.enclosure_length ? entry.enclosure_length : nil
+          data[:itunes_duration] = entry.itunes_duration ? entry.itunes_duration : nil
+          entry._data_ = data
+        end
       end
       if feedzirra.entries.any?
         feedzirra.entries = feedzirra.entries.uniq { |entry| entry._public_id_ }

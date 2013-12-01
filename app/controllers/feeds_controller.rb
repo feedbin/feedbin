@@ -91,4 +91,5 @@ class FeedsController < ApplicationController
       render_404
     end
   end
+
 end

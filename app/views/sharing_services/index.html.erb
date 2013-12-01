@@ -30,7 +30,8 @@
 <p class="muted">Add your sharing services below and they will be available in the share menu.</p>
 
 <%= form_for @user, url: sharing_services_update_user_path(@user), html: {novalidate: 'novalidate'} do |f| %>
-  <table class="table table-condensed form-table" data-behavior="add_fields_target">
+  <p class="half-margin"><%= link_to_add_fields "Add Service", f, :sharing_services %></p>
+  <table class="table form-table" data-behavior="add_fields_target">
     <tbody>
       <%= f.fields_for :sharing_services do |builder| %>
         <%= render 'sharing_service_fields', f: builder %>
@@ -38,7 +39,6 @@
       <tr>
         <td colspan="3">
           <%= f.submit 'Save', class: 'button button-primary' %>
-          <%= link_to_add_fields "Add Service", f, :sharing_services %>
         </td>
       </tr>
     </tbody>
@@ -47,4 +47,4 @@
 
 <hr>
 
-<p class="muted">A collection of sharing service URLs is <a href="https://github.com/feedbin/support/blob/master/sharing-services.md#sharing-services">available on GitHub</a>. Please feel free to add yours.</p>
+<p class="muted">A collection of sharing service URLs is <a href="http://help.feedbin.me/sharing-read-it-later-services/#list_of_urls">available</a>. Please feel free to <a href="https://github.com/feedbin/feedbin-help/blob/master/_posts/2013-11-28-sharing-read-it-later-services.md">add yours</a>.</p>

@@ -1,6 +1,27 @@
+November 2013
+-------------
+
+- 2013-11-09 Action design update
+- 2013-11-09 Rewrote actions to use elasticsearch percolate
+- 2013-11-06 Actions - Workflows for your RSS feeds
+- 2013-11-02 Mobile settings page (thanks to @brendanlong)
+- 2013-11-02 Rails 4.0.1 bump
+
+October 2013
+------------
+
+- 2013-10-31 Enclosure/podcast feed support
+- 2013-10-24 Push Notifications
+- 2013-10-17 New favicon backend
+- 2013-10-16 Free trial support
+- 2013-10-14 Saved Searches / Saved search API
+- 2013-10-10 Search
+- 2013-10-04 Mark above/below as read
+
 September 2013
 --------------
 
+- 2013-09-22 New mobile site thanks to @brendanlong
 - 2013-09-06 Right-to-left script support
 - 2013-09-03 Added format toolbar
 
@@ -10,7 +31,7 @@ August 2013
 - 2013-08-27 Added column resize for FireFox
 - 2013-08-26 Case insensitive login
 - 2013-08-24 Added keyboard shortcut for sharing menu (f to activate ↑ ↓ to navigate)
-- 2013-08-23 Moved feedbin-homepage to gem 
+- 2013-08-23 Moved feedbin-homepage to gem
 - 2013-08-23 Added LICENSE
 - 2013-08-20 Added coupon code support
 - 2013-08-18 Added install instructions
@@ -85,7 +106,7 @@ May 2013
 - 2013-05-22 Added Librato for tracking metrics
 - 2013-05-20 Feed renaming support Initial rename support
 - 2013-05-19 Updated feeds_entries to use unread entries
-- 2013-05-15 Rewrote starred items to use starred_entries 
+- 2013-05-15 Rewrote starred items to use starred_entries
 - 2013-05-15 Rewrote unread tracking to use unread_entries
 - 2013-05-11 Switched to bourbon
 - 2013-05-09 FireFox fix for Favicons

@@ -1,7 +1,7 @@
 <button class="back-button" data-behavior="back_to_feeds"></button>
 <% if @feed %>
   <% present feed do |feed_presenter| %>
-    <%= feed_presenter.favicon %>
+    <%= feed_presenter.favicon(feed.site_url) %>
     <span data-behavior="user_title" data-feed-id="<%= @feed.id %>"><%= @feed.title %></span>
   <% end %>
 <% else %>

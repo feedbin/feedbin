@@ -19,3 +19,4 @@
 .powenv
 .env
 .env-tmp
+elasticsearch.log

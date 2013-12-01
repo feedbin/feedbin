@@ -1,4 +1,4 @@
-feedbin.updateFeeds('<%= j render partial: 'feeds/feeds', locals: {collections: @collections, tags: @tags, feeds: @feeds} %>');
+feedbin.updateFeeds('<%= j render partial: 'feeds/feeds', locals: {collections: @collections, saved_searches: @saved_searches, tags: @tags, feeds: @feeds} %>');
 
 $('[data-behavior~=view_all]').replaceWith('<%= j render partial: 'shared/buttons/view_all' %>');
 $('[data-behavior~=view_unread]').replaceWith('<%= j render partial: 'shared/buttons/view_unread' %>');
