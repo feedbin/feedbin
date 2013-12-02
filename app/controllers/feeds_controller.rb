@@ -48,8 +48,7 @@ class FeedsController < ApplicationController
         if @feed.feed_url != params['hub.topic']
           render_404
         else
-          # TODO keep track of params[hub.lease_seconds] and save that along woith the feed so we know when to resubscribe.
-          # Mark feed has subscribed until xxx (params[hub.lease_seconds])
+          @feed.update_attributes(:push_expiration => Time.now + (params['hub.lease_seconds'].to_i/2).seconds)
           render :text => params['hub.challenge']
         end
       else
@@ -58,15 +57,18 @@ class FeedsController < ApplicationController
       end
     else
       @feed = Feed.find(params[:id])
-      ## Compute signature TODO
-      if true # TODO
-        # We should also look for fat ping later. TODO
+      secret = Digest::SHA1.hexdigest([@feed.id, ENV["SECRET_KEY_BASE"]].join('-'))
+      body = request.body.read
+      signature = OpenSSL::HMAC.hexdigest('sha1', secret, body)
+      if request.headers['HTTP_X_HUB_SIGNATURE'] == ["sha1", signature].join('=')
         Sidekiq::Client.push_bulk(
-                                  'args'  => [[@feed.id, @feed.feed_url, nil, nil, @feed.subscriptions_count]],
+                                  'args'  => [[@feed.id, @feed.feed_url, nil, nil, @feed.subscriptions_count, body]],
                                   'class' => 'FeedRefresherFetcher',
                                   'queue' => 'feed_refresher_fetcher',
                                   'retry' => false
                                   )
+      else
+        logger.error("Non matching signature on PubsubHubbub notification. We get #{request.headers['HTTP_X_HUB_SIGNATURE']} when we expected #{["sha1", signature].join('=')}")
       end
       render :nothing => true
     end

@@ -3,6 +3,7 @@
 --
 
 SET statement_timeout = 0;
+SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
@@ -204,7 +205,8 @@ CREATE TABLE feeds (
     updated_at timestamp without time zone NOT NULL,
     last_modified timestamp without time zone,
     subscriptions_count integer DEFAULT 0 NOT NULL,
-    protected boolean DEFAULT false
+    protected boolean DEFAULT false,
+    push_expiration timestamp without time zone
 );
 
 
@@ -1294,3 +1296,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131105035905');
 INSERT INTO schema_migrations (version) VALUES ('20131106060451');
 
 INSERT INTO schema_migrations (version) VALUES ('20131201051809');
+
+INSERT INTO schema_migrations (version) VALUES ('20131202012915');

@@ -91,27 +91,21 @@ class FeedFetcher
     # now that we have a feed url recheck if a feed exists
     unless @feed
       @feed = Feed.create_from_feedzirra(@parsed_feed, @site_url)
-
-      # Do the PuSH subscription
-      unless @parsed_feed.hubs.blank?
-        push_subscribe
-      end
     end
 
   end
 
-  def push_subscribe
-    @parsed_feed.hubs.each do |hub|
+  def push_subscribe(feed_id, parsed_feed, push_callback)
+    parsed_feed.hubs.each do |hub|
       uri = URI(hub)
-      # We want to make sure we use the https URL if available.
+      # We want to make sure we use the https URL if available. TODO
       result = Net::HTTP.post_form(uri,
                                    'hub.mode' => 'subscribe',
-                                   'hub.topic' => @parsed_feed.feed_url,
-                                   'hub.callback' => Rails.application.routes.url_helpers.push_feed_url(@feed, :protocol => Feedbin::Application.config.force_ssl ? "https" : "http" , :host => ENV['DEFAULT_URL_OPTIONS_HOST']),
+                                   'hub.topic' => parsed_feed.feed_url,
+                                   'hub.secret' => Digest::SHA1.hexdigest([feed_id, ENV["SECRET_KEY_BASE"]].join('-')),
+                                   'hub.callback' => push_callback,
                                    'hub.verify' => 'async'
                                    )
-      log(result.code)
-      log(result.body)
     end
   end
 
@@ -148,6 +142,18 @@ class FeedFetcher
     Timeout::timeout(20) do
       feedzirra = Feedzirra::Feed.fetch_and_parse(@url, options)
     end
+    if !feedzirra.hubs.blank? && options[:push_callback]
+      push_subscribe(options[:feed_id], feedzirra, options[:push_callback])
+    end
+    normalize(feedzirra, options, saved_feed_url)
+  end
+
+  def parse(xml_string)
+    feedzirra = Feedzirra::Feed.parse(xml_string)
+    normalize(feedzirra)
+  end
+
+  def normalize(feedzirra, options = {}, saved_feed_url = nil)
     if feedzirra && feedzirra.respond_to?(:feed_url)
       feedzirra.etag          = feedzirra.etag ? feedzirra.etag.strip.gsub(/^"/, '').gsub(/"$/, '') : nil
       feedzirra.last_modified = feedzirra.last_modified
