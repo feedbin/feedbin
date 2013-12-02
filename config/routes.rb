@@ -75,6 +75,9 @@ Feedbin::Application.routes.draw do
       get :view_all
       get :auto_update
     end
+    member do
+      match :push, via: [:post, :get]
+    end
   end
 
   resources :entries, only: [:show, :index] do
