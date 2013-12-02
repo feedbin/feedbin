@@ -64,4 +64,3 @@ gem 'sinatra', require: nil
 # Stripe
 gem 'stripe'
 gem 'stripe_event'
-

@@ -48,8 +48,8 @@ class FeedsController < ApplicationController
         if @feed.feed_url != params['hub.topic']
           render_404
         else
-          @feed.update_attributes(:push_expiration => Time.now + (params['hub.lease_seconds'].to_i/2).seconds)
-          render :text => params['hub.challenge']
+          @feed.update_attributes(push_expiration: Time.now + (params['hub.lease_seconds'].to_i/2).seconds)
+          render text: params['hub.challenge']
         end
       else
         # Handle unsubscriptions confirmation
@@ -60,17 +60,17 @@ class FeedsController < ApplicationController
       secret = Digest::SHA1.hexdigest([@feed.id, ENV["SECRET_KEY_BASE"]].join('-'))
       body = request.body.read
       signature = OpenSSL::HMAC.hexdigest('sha1', secret, body)
-      if request.headers['HTTP_X_HUB_SIGNATURE'] == ["sha1", signature].join('=')
+      if request.headers['HTTP_X_HUB_SIGNATURE'] == "sha1=#{signature}"
         Sidekiq::Client.push_bulk(
-                                  'args'  => [[@feed.id, @feed.feed_url, nil, nil, @feed.subscriptions_count, body]],
-                                  'class' => 'FeedRefresherFetcher',
-                                  'queue' => 'feed_refresher_fetcher',
-                                  'retry' => false
-                                  )
+          'args'  => [[@feed.id, @feed.feed_url, nil, nil, @feed.subscriptions_count, body]],
+          'class' => 'FeedRefresherFetcher',
+          'queue' => 'feed_refresher_fetcher',
+          'retry' => false
+        )
       else
         logger.error("Non matching signature on PubsubHubbub notification. We get #{request.headers['HTTP_X_HUB_SIGNATURE']} when we expected #{["sha1", signature].join('=')}")
       end
-      render :nothing => true
+      render nothing: true
     end
   end
 

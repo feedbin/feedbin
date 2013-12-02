@@ -100,12 +100,12 @@ class FeedFetcher
       uri = URI(hub)
       # We want to make sure we use the https URL if available. TODO
       result = Net::HTTP.post_form(uri,
-                                   'hub.mode' => 'subscribe',
-                                   'hub.topic' => parsed_feed.feed_url,
-                                   'hub.secret' => Digest::SHA1.hexdigest([feed_id, ENV["SECRET_KEY_BASE"]].join('-')),
-                                   'hub.callback' => push_callback,
-                                   'hub.verify' => 'async'
-                                   )
+        'hub.mode' => 'subscribe',
+        'hub.topic' => parsed_feed.feed_url,
+        'hub.secret' => Digest::SHA1.hexdigest([feed_id, ENV["SECRET_KEY_BASE"]].join('-')),
+        'hub.callback' => push_callback,
+        'hub.verify' => 'async'
+      )
     end
   end
 
