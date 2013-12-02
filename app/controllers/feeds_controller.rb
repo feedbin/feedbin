@@ -56,19 +56,24 @@ class FeedsController < ApplicationController
         render_404
       end
     else
-      @feed = Feed.find(params[:id])
-      secret = Digest::SHA1.hexdigest([@feed.id, ENV["SECRET_KEY_BASE"]].join('-'))
+      feed = Feed.find(params[:id])
+      secret = Digest::SHA1.hexdigest([feed.id, Feedbin::Application.config.secret_key_base].join('-'))
       body = request.body.read
       signature = OpenSSL::HMAC.hexdigest('sha1', secret, body)
       if request.headers['HTTP_X_HUB_SIGNATURE'] == "sha1=#{signature}"
         Sidekiq::Client.push_bulk(
-          'args'  => [[@feed.id, @feed.feed_url, nil, nil, @feed.subscriptions_count, body]],
+          'args'  => [[feed.id, feed.feed_url, nil, nil, feed.subscriptions_count, body]],
           'class' => 'FeedRefresherFetcher',
           'queue' => 'feed_refresher_fetcher',
           'retry' => false
         )
+        Librato.increment 'entry.push'
       else
-        logger.error("Non matching signature on PubsubHubbub notification. We get #{request.headers['HTTP_X_HUB_SIGNATURE']} when we expected #{["sha1", signature].join('=')}")
+        Honeybadger.notify(
+          error_class: "PuSH",
+          error_message: "PuSH Invalid Signature",
+          parameters: params
+        )
       end
       render nothing: true
     end

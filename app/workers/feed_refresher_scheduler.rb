@@ -8,7 +8,8 @@ class FeedRefresherScheduler
         values.pop
         if feed.push_expiration.nil? || feed.push_expiration < Time.now
           values.push(nil) # Placeholder for the body upon fat notifications.
-          values.push(Rails.application.routes.url_helpers.push_feed_url(feed, :protocol => Feedbin::Application.config.force_ssl ? "https" : "http" , :host => ENV['DEFAULT_URL_OPTIONS_HOST']))
+          values.push(Push::callback_url(feed))
+          values.push(Digest::SHA1.hexdigest([feed.id, Feedbin::Application.config.secret_key_base].join('-')))
         end
         values
       end

@@ -86,26 +86,40 @@ class FeedFetcher
       get_site_url
     end
 
+    # now that we have a feed url recheck if a feed exists
     @feed = Feed.where(feed_url: @parsed_feed.feed_url).first
 
-    # now that we have a feed url recheck if a feed exists
     unless @feed
       @feed = Feed.create_from_feedzirra(@parsed_feed, @site_url)
+      if @parsed_feed.respond_to?(:hubs) && !@parsed_feed.hubs.blank?
+        hub_secret = Digest::SHA1.hexdigest([feed_id, Digest::SHA1.hexdigest([feed_id, Feedbin::Application.config.secret_key_base].join('-'))
+        push_subscribe(@parsed_feed, @feed.id, Push::callback_url(feed), hub_secret)
+      end
     end
 
   end
 
-  def push_subscribe(feed_id, parsed_feed, push_callback)
-    parsed_feed.hubs.each do |hub|
-      uri = URI(hub)
-      # We want to make sure we use the https URL if available. TODO
-      result = Net::HTTP.post_form(uri,
-        'hub.mode' => 'subscribe',
-        'hub.topic' => parsed_feed.feed_url,
-        'hub.secret' => Digest::SHA1.hexdigest([feed_id, ENV["SECRET_KEY_BASE"]].join('-')),
-        'hub.callback' => push_callback,
-        'hub.verify' => 'async'
-      )
+  def push_subscribe(feedzirra, feed_id, push_callback, hub_secret)
+    begin
+      feedzirra.hubs.each do |hub|
+        uri = URI(hub)
+        # We want to make sure we use the https URL if available. TODO
+        result = Net::HTTP.post_form(uri,
+          'hub.mode' => 'subscribe',
+          'hub.topic' => feedzirra.feed_url,
+          'hub.secret' => hub_secret,
+          'hub.callback' => push_callback,
+          'hub.verify' => 'async'
+        )
+      end
+    rescue Exception => e
+      if defined?(Honeybadger)
+        Honeybadger.notify(
+          error_class: "PuSH",
+          error_message: "PuSH Subscribe Failed",
+          parameters: e
+        )
+      end
     end
   end
 
@@ -142,8 +156,8 @@ class FeedFetcher
     Timeout::timeout(20) do
       feedzirra = Feedzirra::Feed.fetch_and_parse(@url, options)
     end
-    if !feedzirra.hubs.blank? && options[:push_callback]
-      push_subscribe(options[:feed_id], feedzirra, options[:push_callback])
+    if feedzirra.respond_to?(:hubs) && !feedzirra.hubs.blank? && options[:push_callback] && options[:feed_id]
+      push_subscribe(feedzirra, options[:feed_id], options[:push_callback], options[:hub_secret])
     end
     normalize(feedzirra, options, saved_feed_url)
   end
