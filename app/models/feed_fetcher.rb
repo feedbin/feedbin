@@ -92,7 +92,7 @@ class FeedFetcher
     unless @feed
       @feed = Feed.create_from_feedzirra(@parsed_feed, @site_url)
       if @parsed_feed.respond_to?(:hubs) && !@parsed_feed.hubs.blank?
-        hub_secret = Digest::SHA1.hexdigest([feed_id, Digest::SHA1.hexdigest([feed_id, Feedbin::Application.config.secret_key_base].join('-'))
+        hub_secret = Push::hub_secret(@feed.id)
         push_subscribe(@parsed_feed, @feed.id, Push::callback_url(feed), hub_secret)
       end
     end

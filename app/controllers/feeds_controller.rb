@@ -57,7 +57,7 @@ class FeedsController < ApplicationController
       end
     else
       feed = Feed.find(params[:id])
-      secret = Digest::SHA1.hexdigest([feed.id, Feedbin::Application.config.secret_key_base].join('-'))
+      secret = Push::hub_secret(feed.id)
       body = request.body.read
       signature = OpenSSL::HMAC.hexdigest('sha1', secret, body)
       if request.headers['HTTP_X_HUB_SIGNATURE'] == "sha1=#{signature}"
