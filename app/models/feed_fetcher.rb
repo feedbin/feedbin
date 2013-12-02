@@ -103,14 +103,14 @@ class FeedFetcher
     begin
       feedzirra.hubs.each do |hub|
         uri = URI(hub)
-        # We want to make sure we use the https URL if available. TODO
-        result = Net::HTTP.post_form(uri,
+        uri.scheme = 'https' # force https encrypt request
+        Curl.post(uri.to_s, {
           'hub.mode' => 'subscribe',
           'hub.topic' => feedzirra.feed_url,
           'hub.secret' => hub_secret,
           'hub.callback' => push_callback,
           'hub.verify' => 'async'
-        )
+        })
       end
     rescue Exception => e
       if defined?(Honeybadger)
