@@ -58,13 +58,13 @@ class FeedsController < ApplicationController
     else
       feed = Feed.find(params[:id])
       secret = Push::hub_secret(feed.id)
-      body = request.body.read
+      body = request.body.read.force_encoding("UTF-8")
       signature = OpenSSL::HMAC.hexdigest('sha1', secret, body)
       if request.headers['HTTP_X_HUB_SIGNATURE'] == "sha1=#{signature}"
         Sidekiq::Client.push_bulk(
           'args'  => [[feed.id, feed.feed_url, nil, nil, feed.subscriptions_count, body]],
-          'class' => 'FeedRefresherFetcher',
-          'queue' => 'feed_refresher_fetcher',
+          'class' => 'FeedRefresherFetcherCritical',
+          'queue' => 'feed_refresher_fetcher_critical',
           'retry' => false
         )
         Librato.increment 'entry.push'
