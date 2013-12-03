@@ -2488,6 +2488,7 @@ li.selected > a .favicon-wrap {
 }
 
 .audio-player {
+	font-family: $font-stack !important;
 	position: absolute;
 	bottom: 0;
 	left: 0;
