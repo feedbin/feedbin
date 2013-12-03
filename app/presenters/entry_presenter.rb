@@ -120,9 +120,9 @@ class EntryPresenter < BasePresenter
   end
 
   def media_type
-    if entry.data['enclosure_type'] == 'video/mp4'
+    if entry.data && entry.data['enclosure_type'] == 'video/mp4'
       :video
-    elsif entry.data['enclosure_type'] == 'audio/mpeg'
+    elsif entry.data && entry.data['enclosure_type'] == 'audio/mpeg'
       :audio
     else
       nil
