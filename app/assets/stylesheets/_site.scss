@@ -4015,6 +4015,9 @@ Right-to-left
 Print
 ------------------------------------------------------------------------------*/
 @media print {
+	@page {
+		margin: 1in;
+	}
 	body {
 		font-family: "Mercury SSm A", "Mercury SSm B", $font-stack;
 		font-weight: 400;
@@ -4026,6 +4029,16 @@ Print
 	hr {
 		background: none;
 		border-top: 1px solid #333;
+	}
+	h2, ul {
+		page-break-after: avoid;
+	}
+	p {
+		orphans: 3;
+		widows: 3;
+	}
+	p, li, blockquote, table {
+		font-size: 12pt;
 	}
 	.app .bar,
 	.app .feeds-column,
