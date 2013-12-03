@@ -1,5 +1,5 @@
 <% present entry do |entry_presenter| %>
-<div data-entry-id="<%= entry.id %>">
+<div data-entry-id="<%= entry.id %>" class="<%= 'has-audio' if entry_presenter.media_type == :audio %>">
   <div class="entry-toolbar">
     <button class="back-button" data-behavior="show_entries"></button>
     <%= entry_presenter.favicon(entry.feed.site_url) %>
@@ -30,11 +30,26 @@
         <div class="media-container">
           <%= entry_presenter.media.html_safe %>
         </div>
-        <script>$('video, audio', '.media-container').mediaelementplayer();</script>
+        <script>
+          <% if entry_presenter.media_type == :audio %>
+            feedbin.player = new MediaElementPlayer('audio');
+            feedbin.player.setSrc("<%= entry.data['enclosure_url'] %>");
+          <% else %>
+            $('video', '.media-container').mediaelementplayer();
+          <% end %>
+          </script>
         <% end %>
         <%= raw entry_presenter.content %>
       </div>
     </div>
   </div>
+  <% if entry_presenter.media_type == :audio %>
+  <div class="audio-player">
+    <div class="progress"></div>
+    <button class="icon-play" data-behavior="play">Play</button>
+    <div class="audio-title"><%= entry_presenter.title %> (<%= entry_presenter.media_duration %>)</div>
+    <%= link_to "Download #{entry_presenter.media_size}", entry.data['enclosure_url'], class: 'download-link', target: '_blank' %>
+  </div>
+  <% end %>
 </div>
 <% end %>

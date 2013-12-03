@@ -2145,6 +2145,9 @@ li.selected > a .favicon-wrap {
 	padding: 40px 20px 10px 20px;
 	margin: 0 auto;
 	max-width: 660px;
+	.has-audio & {
+		padding-bottom: 62px;
+	}
 }
 
 .fluid .entry-inner {
@@ -2466,6 +2469,9 @@ li.selected > a .favicon-wrap {
 
 	.media-container {
 		margin: 0 0 1.1em 0;
+		.has-audio & {
+			display: none;
+		}
 	}
 
 	.download-link {
@@ -2478,6 +2484,65 @@ li.selected > a .favicon-wrap {
 		width: 100%;
 		background-color: #000;
 		max-width: 100%;
+	}
+}
+
+.audio-player {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 52px;
+	background-color: rgba(51,51,51,.99);
+	z-index: 10000;
+	color: #fff;
+	padding-left: 40px;
+	button {
+		@extend .hide-text;
+		position: relative;
+		position: absolute;
+		left: 12px;
+		top: 14px;
+		-webkit-appearance: none;
+		height: 24px;
+		width: 24px;
+		border: none;
+		&.playing {
+			&:before {
+				background-position: 0 -18px;
+			}
+		}
+		&:before {
+			content: "";
+			position: absolute;
+			background: image-url("icon-play.svg") 0 0 no-repeat;
+			background-size: 15px 36px;
+			height: 18px;
+			width: 15px;
+			top: 3px;
+			left: 5px;
+		}
+	}
+	.audio-title {
+		margin-top: 18px;
+		padding-right: 160px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		width: 100%;
+	}
+	.download-link {
+		position: absolute;
+		right: 20px;
+		top: 18px;
+	}
+	.progress {
+		background-color: $selected;
+		height: 2px;
+		width: 0%;
+		position: absolute;
+		bottom: 0;
+		left: 0;
 	}
 }
 

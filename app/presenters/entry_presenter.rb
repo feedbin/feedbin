@@ -98,8 +98,7 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def media
-    output = ''
+  def media_size
     begin
       size = Integer(entry.data['enclosure_length'])
       size = @template.number_to_human_size(size)
@@ -107,13 +106,35 @@ class EntryPresenter < BasePresenter
     rescue Exception
       size = ''
     end
+  end
+
+  def media
+    output = ''
     if entry.data['enclosure_type'] == 'video/mp4'
       output += @template.video_tag entry.data['enclosure_url'], preload: 'none'
     elsif entry.data['enclosure_type'] == 'audio/mpeg'
       output += @template.audio_tag entry.data['enclosure_url'], preload: 'none'
     end
-    output += @template.link_to "Download #{size}", entry.data['enclosure_url'], class: 'download-link'
+    output += @template.link_to "Download #{media_size}", entry.data['enclosure_url'], class: 'download-link'
     output
+  end
+
+  def media_type
+    if entry.data['enclosure_type'] == 'video/mp4'
+      :video
+    elsif entry.data['enclosure_type'] == 'audio/mpeg'
+      :audio
+    else
+      nil
+    end
+  end
+
+  def media_duration
+    if entry.data['itunes_duration']
+      entry.data['itunes_duration']
+    else
+      ''
+    end
   end
 
 end
