@@ -8,8 +8,8 @@ class FeedRefresherReceiver
       update['entries'].each do |entry|
         begin
           if entry['update'] == true
-            entry = Entry.find_by_public_id(entry['public_id'])
-            entry.update_attributes(updated_content: entry['content'], updated: entry['updated'])
+            original_entry = Entry.find_by_public_id(entry['public_id'])
+            original_entry.update_attributes(updated_content: entry['content'], updated: entry['updated'])
             Librato.increment('entry.update')
           else
             feed.entries.create!(entry)
