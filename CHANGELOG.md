@@ -1,6 +1,15 @@
+December 2013
+-------------
+
+- 2013-12-02 Support for updated articles
+- 2013-12-01 PubSubHubbub support (thanks to @julien51)
+
 November 2013
 -------------
 
+- 2013-11-28 Print stylesheet
+- 2013-11-28 Links to new help.feedbin.me
+- 2013-11-26 Entry column redesign (star indicator, date format, etc...)
 - 2013-11-09 Action design update
 - 2013-11-09 Rewrote actions to use elasticsearch percolate
 - 2013-11-06 Actions - Workflows for your RSS feeds
