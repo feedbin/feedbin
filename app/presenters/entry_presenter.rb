@@ -72,12 +72,7 @@ class EntryPresenter < BasePresenter
   end
 
   def content
-    if entry.updated_content
-      content = entry.updated_content
-    else
-      content = entry.content
-    end
-    ContentFormatter.format!(content, entry)
+    ContentFormatter.format!(entry.content, entry)
   rescue HTML::Pipeline::Filter::InvalidDocumentException
     '(no content)'
   end
