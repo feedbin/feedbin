@@ -74,13 +74,13 @@ $.extend feedbin,
       if date && format != 'none'
         date = new Date(date)
         if format == 'long'
-          $(@).text(date.format("%B %d, %Y at %l:%M %p"))
+          $(@).text(date.format("%B %e, %Y at %l:%M %p"))
         else if format == 'time'
           $(@).text(date.format("%l:%M %p"))
         else if format == 'day'
-          $(@).text(date.format("%d %b"))
+          $(@).text(date.format("%e %b"))
         else if format == 'day_year'
-          $(@).text(date.format("%d %b %Y"))
+          $(@).text(date.format("%e %b %Y"))
 
   applyUserTitles: ->
     $('[data-behavior~=user_title]').each ->
