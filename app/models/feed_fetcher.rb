@@ -162,9 +162,9 @@ class FeedFetcher
     normalize(feedzirra, options, saved_feed_url)
   end
 
-  def parse(xml_string)
+  def parse(xml_string, saved_feed_url)
     feedzirra = Feedzirra::Feed.parse(xml_string)
-    normalize(feedzirra)
+    normalize(feedzirra, {}, saved_feed_url)
   end
 
   def normalize(feedzirra, options = {}, saved_feed_url = nil)
