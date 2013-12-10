@@ -1259,6 +1259,32 @@ Structure
 	}
 }
 
+.welcome {
+	text-align: center;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: $list-background;
+	.welcome-inner {
+		position: absolute;
+		height: 200px;
+		max-width: 450px;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+	h2 {
+		font-size: 28px;
+		color: #333;
+	}
+	.sub-head {
+		font-size: 18px;
+		color: #999999;
+	}
+}
+
 .content {
 	display: block;
 	position: absolute;
@@ -2278,12 +2304,12 @@ li.selected > a .favicon-wrap {
 			&:first-child a,
 			&:first-child span {
 				padding-top: 7px;
-				border-radius: 3px 3px 0 0;
+				border-radius: 4px 4px 0 0;
 			}
 			&:last-child a,
 			&:last-child span {
 				padding-bottom: 6px;
-				border-radius: 0 0 3px 3px;
+				border-radius: 0 0 4px 4px;
 				border-bottom: none;
 			}
 		}
@@ -3176,7 +3202,7 @@ Buttons
 	font-weight: bold;
 	border: 1px solid transparent;
 	padding: 7px 10px;
-	border-radius: 3px;
+	border-radius: 4px;
 	font-family: $font-stack;
 	color: $selected;
 	border-color: $selected;
@@ -3742,7 +3768,7 @@ h3 .inline-subhead {
 .payment-promo {
 	background-color: #e9eaeb;
 	padding: 10px 10px 1px 10px;
-	border-radius: 5px;
+	border-radius: 4px;
 	font-size: 14px;
 	p {
 		color: #666;
@@ -3852,36 +3878,16 @@ input:focus:invalid, textarea:focus:invalid, select:focus:invalid {
 }
 
 .box-header {
-	background-color: $selected;
-	color: #fff;
+	font-size: 18px;
 	font-weight: normal;
-	font-size: 24px;
-	border-radius: 4px 4px 0 0;
-	margin: 0;
-	-webkit-font-smoothing: antialiased;
-	padding: 15px 15px;
-	position: relative;
-	@include respond-to(screen-xs) {
-		padding: 20px 30px;
-	}
-	.trial-promo {
-		position: absolute;
-		right: 15px;
-		top: 22px;
-		color: #FFF;
-		font-size: 16px;
-		font-style: italic;
-		@include respond-to(screen-xs) {
-			right: 20px;
-			top: 27px;
-		}
-	}
+	color: #333;
+	text-align: center;
+	margin: 0 0 15px 0;
 }
 
 .box {
 	border: 1px solid #CCC;
-	border-top: none;
-	border-radius: 0 0 4px 4px;
+	border-radius: 4px;
 	background-color: #FFF;
 	margin-bottom: 15px;
 	.alert {
@@ -3976,15 +3982,36 @@ Login and Sign Up
 	input[type="text"] {
 		width: 100%;
 		max-width: 100%;
-		padding: 12px 10px 10px 10px;
+		padding: 14px 10px 12px 10px;
+		border-radius: 4px;
+		background-color: #fafafa;
+		&:focus {
+			border-color: #CCC;
+		}
 	}
 	input[type="submit"] {
-		padding: 10px 25px;
-		font-size: 18px;
+		padding: 20px 0;
+		font-size: 20px;
+		width: 100%;
+		display: block;
+		background-color: $selected;
+		color: #fff;
+	}
+	.combined-form {
+		input[type="email"] {
+			margin: 0;
+			border-radius: 4px 4px 0 0;
+		}
+		input[type="password"] {
+			border-top: none;
+			border-radius: 0 0 4px 4px;
+		}
 	}
 	.forgot-link {
 		display: block;
-		margin: 15px 0 0 0;
+		margin: 10px 0 0 0;
+		text-align: center;
+		color: #999;
 	}
 	.form-wrap {
 		padding: 0 15px;

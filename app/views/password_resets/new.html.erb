@@ -2,10 +2,10 @@
 <div class="login-wrap">
   <a href="/"><%= render partial: "shared/svg/logo" %></a>
 
-  <h3 class="box-header">Reset Password</h3>
   <div class="box">
-
     <%= render partial: 'shared/flash', locals: {flash: flash} %>
+
+    <h3 class="box-header">Reset Password</h3>
 
     <%= form_tag password_resets_path do %>
       <p>

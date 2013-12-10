@@ -37,9 +37,19 @@
       </td>
       <td class="entry-column app-panel" data-behavior="content_column">
         <div class="full-height entry-wrap">
-        	<div class="entry-content-wrap full-height <%= @user.entry_width %> font-size-<%= @user.font_size || 5 %> font-<%= @user.font || 'default' %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
-
-        	</div>
+          <% if current_user && !current_user.subscriptions.any? %>
+            <div class="welcome">
+              <div class="welcome-inner">
+                <h2>Thanks for Signing Up</h2>
+                <p class="sub-head">Get started by uploading a OPML file or add feeds. </p>
+                <button class="button">Upload OPML</button>
+                <p class="description">What is OPML?</p>
+              </div>
+            </div>
+          <% else %>
+          	<div class="entry-content-wrap full-height <%= @user.entry_width %> font-size-<%= @user.font_size || 5 %> font-<%= @user.font || 'default' %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
+          	</div>
+          <% end %>
         </div>
       </td>
     </tr>

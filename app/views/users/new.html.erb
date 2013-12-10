@@ -2,11 +2,12 @@
 <div class="signup-wrap pad-bottom">
   <a href="/"><%= render partial: "shared/svg/logo" %></a>
 
-  <h3 class="box-header">Sign Up <span class="trial-promo">14 day free trial</span></h3>
   <div class="box">
     <div data-behavior="stripe_error" class="alert alert-error hide"></div>
 
-    <%= form_for @user, html: { data: { behavior: 'credit_card_form' } } do |f| %>
+    <h3 class="box-header">Create your <strong>Free 14-Day Trial</strong> Account</h3>
+
+    <%= form_for @user, html: { class: 'combined-form', data: { behavior: 'credit_card_form' } } do |f| %>
       <% if @user.errors.any? %>
         <div class="alert alert-error">
           <%= @user.errors.full_messages.join('. ') %>.

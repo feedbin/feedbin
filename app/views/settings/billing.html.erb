@@ -4,7 +4,7 @@
     <% if @user.days_left <= 0 %>
       <p>Your trial has ended. Subscribe now to continue using Feedbin.</p>
     <% else %>
-      <p>Your trial period will end in <%= pluralize(@user.days_left, 'day') %>. Subscribe now to continue using Feedbin uninterrupted.</p>
+      <p>Your trial period will end in <strong><%= pluralize(@user.days_left, 'day') %></strong>. Subscribe now to continue using Feedbin uninterrupted.</p>
     <% end %>
 
     <div data-behavior="stripe_error" class="alert alert-error hide"></div>
