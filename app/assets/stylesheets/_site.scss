@@ -1243,12 +1243,16 @@ Structure
 
 .subscribe-promo {
 	position: absolute;
-	right: 200px;
-	top: 14px;
-	color: #66a35b;
+	right: 160px;
+	top: 8px;
+	color: $selected;
 	font-size: 13px;
+	display: inline-block;
+	padding: 4px 8px;
+	border: 1px solid $selected;
+	border-radius: 4px;
 	&:hover {
-		color: #418037;
+		text-decoration: none;
 	}
 	@media (max-width: 685px) {
 		display: none;
