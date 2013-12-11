@@ -1,6 +1,6 @@
-<% @class = 'signup' %>
-<div class="signup-wrap pad-bottom">
-  <a href="/"><%= render partial: "shared/svg/logo" %></a>
+<% @class = 'login' %>
+<div class="login-wrap">
+  <a href="/" class="logo hide-text">Feedbin</a>
 
   <div class="box">
     <div data-behavior="stripe_error" class="alert alert-error hide"></div>
@@ -32,13 +32,12 @@
 
       <%= f.hidden_field :stripe_token, data: { behavior: 'stripe_token' } %>
 
-      <%= f.email_field :email, autofocus: true, placeholder: 'Email', tabindex: 1 %>
+      <p>
+        <%= f.email_field :email, autofocus: true, placeholder: 'Email', tabindex: 1 %>
+        <%= f.password_field :password, placeholder: 'Password', tabindex: 2 %>
+      </p>
 
-      <%= f.password_field :password, placeholder: 'Password', tabindex: 2 %>
-
-      <div class="text-right">
-        <%= f.submit "Sign up", class: 'button', tabindex: 3 %>
-      </div>
+      <%= f.submit "Sign Up", class: 'button', tabindex: 3 %>
 
     <% end %>
   </div>

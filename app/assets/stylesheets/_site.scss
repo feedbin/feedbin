@@ -3878,28 +3878,6 @@ input:focus:invalid, textarea:focus:invalid, select:focus:invalid {
 	color: #666666;
 }
 
-.box-header {
-	font-size: 18px;
-	font-weight: normal;
-	color: #333;
-	text-align: center;
-	margin: 0 0 15px 0;
-}
-
-.box {
-	border: 1px solid #CCC;
-	border-radius: 4px;
-	background-color: #FFF;
-	margin-bottom: 15px;
-	.alert {
-		margin-top: 0;
-	}
-	padding: 15px;
-	@include respond-to(screen-xs) {
-		padding: 30px;
-	}
-}
-
 .xs-hide {
 	display: none;
 	@include respond-to(screen-xs) {
@@ -3959,23 +3937,47 @@ input:focus:invalid, textarea:focus:invalid, select:focus:invalid {
 /*------------------------------------------------------------------------------
 Login and Sign Up
 ------------------------------------------------------------------------------*/
-.login, .signup {
+.login {
 	background-color: #efefef;
-	.bar {
-		display: none;
+	padding: 15px;
+	display: box;
+	box-align: center;
+	box-pack: center;
+	.bar, .application-messages {
+		display: none !important;
 	}
-	.signup-wrap, .login-wrap {
-		padding: 0 15px 10px 15px;
-		max-width: 450px;
-		margin: 0 auto;
-	}
-	svg {
-		width: 78px;
-		height: 65px;
+	.logo {
+		background: image-url('logo-full.svg') no-repeat scroll top left;
 		display: block;
-		margin: 0 auto 29px auto;
-		* {
-			fill: #cccccc;
+		width: 205px;
+		height: 44px;
+		background-size: 205px 44px !important;
+		margin: 0 auto 30px auto;
+	}
+	.content {
+		position: static;
+		width: 100%;
+	}
+	.box-header {
+		font-size: 18px;
+		font-weight: normal;
+		color: #333;
+		text-align: center;
+		margin: 0 0 15px 0;
+	}
+	.box {
+		border: 1px solid #CCC;
+		border-radius: 4px;
+		background-color: #FFF;
+		margin: 0 auto 14px auto;
+		width: 100%;
+		max-width: 400px;
+		padding: 15px;
+		.alert {
+			margin-top: 0;
+		}
+		@include respond-to(screen-xs) {
+			padding: 36px;
 		}
 	}
 	input[type="email"],
@@ -3986,12 +3988,13 @@ Login and Sign Up
 		padding: 14px 10px 12px 10px;
 		border-radius: 4px;
 		background-color: #fafafa;
+		margin: 0;
 		&:focus {
 			border-color: #CCC;
 		}
 	}
 	input[type="submit"] {
-		padding: 20px 0;
+		padding: 15px 0;
 		font-size: 20px;
 		width: 100%;
 		display: block;
@@ -4000,7 +4003,6 @@ Login and Sign Up
 	}
 	.combined-form {
 		input[type="email"] {
-			margin: 0;
 			border-radius: 4px 4px 0 0;
 		}
 		input[type="password"] {
@@ -4013,31 +4015,6 @@ Login and Sign Up
 		margin: 10px 0 0 0;
 		text-align: center;
 		color: #999;
-	}
-	.form-wrap {
-		padding: 0 15px;
-		@include respond-to(screen-xs) {
-			margin-left: 15px;
-			max-width: 312px;
-			float: left;
-			padding: 0;
-		}
-	}
-	.promo-wrap {
-		margin-left: 20px;
-		max-width: 139px;
-		float: left;
-		display: none;
-		@include respond-to(screen-xs) {
-			display: block;
-		}
-	}
-	.radio {
-		margin-right: 15px;
-		float: left;
-	}
-	hr {
-		margin: 20px 0;
 	}
 }
 
