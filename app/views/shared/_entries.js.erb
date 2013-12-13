@@ -5,6 +5,7 @@ var header = '<%= j render partial: "entries/entries_header", locals: {feed: @fe
 	feedbin.appendEntries(entries, header);
 <% else %>
 	feedbin.updateEntries(entries, header);
+	$('.entries').prop('scrollTop', 0);
 <% end %>
 
 feedbin.localizeTime($('[data-behavior~=entries_target]'))

@@ -274,11 +274,6 @@ $.extend feedbin,
         $('.modal').modal('hide')
         return
 
-    resetEntryPostion: ->
-      $(document).on 'ajax:complete', '[data-behavior~=reset_entry_position]', ->
-        $('.entries').prop('scrollTop', 0)
-        return
-
     openEntry: ->
       $(document).on 'ajax:complete', '[data-behavior~=reset_entry_content_position]', ->
         feedbin.formatEntryContent()
