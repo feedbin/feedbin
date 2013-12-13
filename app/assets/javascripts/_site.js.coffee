@@ -125,9 +125,14 @@ $.extend feedbin,
   entries: {}
 
   preloadEntries: (entry_ids) ->
-    $.getJSON feedbin.data.preloadEntriesPath, {ids: entry_ids.join(',')}, (data) ->
-      $.extend feedbin.entries, data
-      feedbin.precacheImages(data)
+    cachedIds = []
+    for key of feedbin.entries
+      cachedIds.push key * 1
+    entry_ids = _.difference(entry_ids, cachedIds)
+    if entry_ids.length > 0
+      $.getJSON feedbin.data.preloadEntriesPath, {ids: entry_ids.join(',')}, (data) ->
+        $.extend feedbin.entries, data
+        feedbin.precacheImages(data)
 
   updateReadCount: (id, entry, target) ->
     if entry.read == false
