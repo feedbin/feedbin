@@ -2885,14 +2885,46 @@ Settings
 	    word-break: break-all;
 	}
 	.plan-options {
-		border-top: 1px solid #CCC;
 		border-bottom: 1px solid #CCC;
-		padding: 15px 0;
+		padding: 0 0 15px 0;
 		overflow: hidden;
 		margin-bottom: 15px;
-		.radio {
-			margin-left: 10px;
+		[type="radio"] {
+			display: none;
+		}
+		[type="radio"] + label {
+			font-size: 18px;
+			font-weight: bold;
+			border-radius: 4px;
+			padding: 8px 12px 8px 32px;
+			border: 1px solid transparent;
+			margin-right: 10px;
 			float: left;
+			position: relative;
+			display: inline-block;
+			&:before {
+				position: absolute;
+				left: 5px;
+				top: 12px;
+				content: "";
+				border: 2px solid #CCC;
+				border-radius: 17px;
+				height: 17px;
+				width: 17px;
+			}
+		}
+		[type="radio"]:checked + label {
+			border-color: $selected;
+			&:after {
+				position: absolute;
+				left: 9px;
+				top: 16px;
+				content: "";
+				background: #666666;
+				border-radius: 9px;
+				height: 9px;
+				width: 9px;
+			}
 		}
 	}
 	textarea,
@@ -2915,6 +2947,60 @@ Settings
 	}
 	.checkbox input {
 		margin-top: 3px;
+	}
+	.cc-form-wrap {
+		position: relative;
+		margin-bottom: 15px;
+		max-width: 261px;
+		input {
+			margin-bottom: 0;
+			padding: 10px;
+			font-size: 18px;
+			line-height: normal;
+			padding-left: 30px;
+			&:focus {
+				border-color: #CCC;
+			}
+		}
+		#card_number {
+			background: image-url("icon-credit-card.svg") 5px 15px no-repeat;
+			border-radius: 4px 4px 0 0;
+			margin-bottom: 0;
+			border-bottom: none;
+			&.visa {
+				background-image: image-url("icon-credit-card.svg"), image-url("icon-card-visa.png");
+				background-repeat: no-repeat, no-repeat;
+				background-position: 5px 15px, 220px 5px;
+			}
+			&.discover {
+				background-image: image-url("icon-credit-card.svg"), image-url("icon-card-discover.png");
+				background-repeat: no-repeat, no-repeat;
+				background-position: 5px 15px, 220px 5px;
+			}
+			&.amex {
+				background-image: image-url("icon-credit-card.svg"), image-url("icon-card-amex.png");
+				background-repeat: no-repeat, no-repeat;
+				background-position: 5px 15px, 220px 5px;
+			}
+			&.mastercard {
+				background-image: image-url("icon-credit-card.svg"), image-url("icon-card-mastercard.png");
+				background-repeat: no-repeat, no-repeat;
+				background-position: 5px 15px, 220px 5px;
+			}
+		}
+		#card_code {
+			background: image-url("icon-lock.svg") 5px 12px no-repeat;
+			width: 50%;
+			float: right;
+			border-radius: 0 0 4px 0;
+			border-left: none;
+		}
+		#card_expiration {
+			background: image-url("icon-calendar.svg") 5px 12px no-repeat;
+			width: 50%;
+			float: left;
+			border-radius: 0 0 0 4px;
+		}
 	}
 }
 

@@ -52,7 +52,9 @@ class SettingsController < ApplicationController
     end
     @billing_events = @user.billing_events.where(event_type: 'charge.succeeded')
     @billing_events = @billing_events.to_a.sort_by {|billing_event| -billing_event.details.data.object.created }
-    if @user.plan.stripe_id == 'free'
+    if @user.plan.stripe_id == 'trial'
+      @plans = Plan.where(stripe_id: ['basic-monthly-2', 'basic-yearly-2']).order('id DESC')
+    elsif @user.plan.stripe_id == 'free'
       @plans = Plan.where(price_tier: @user.plan.price_tier)
     else
       @plans = Plan.where(price_tier: @user.plan.price_tier).where.not(stripe_id: ['free', 'trial'])

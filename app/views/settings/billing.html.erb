@@ -20,10 +20,10 @@
       </div>
 
       <div class="plan-options">
-        <% Plan.where(price_tier: Feedbin::Application.config.price_tier).where.not(stripe_id: ['free', 'trial']).each do |plan| %>
-          <% options = plan.stripe_id =~ /^basic-monthly/ ? {checked: true} : {} %>
-          <%= label_tag nil, class: 'radio' do %>
-            <%= f.radio_button :plan_id, plan.id, options %>
+        <% @plans.each do |plan| %>
+          <% options = plan.stripe_id == 'basic-yearly-2' ? {checked: true, id: dom_id(plan)} : {id: dom_id(plan)} %>
+          <%= f.radio_button :plan_id, plan.id, options %>
+          <%= label_tag nil, for: dom_id(plan) do %>
             <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.name.gsub(/ly$/, '').downcase %>
           <% end %>
         <% end %>

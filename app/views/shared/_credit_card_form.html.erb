@@ -1,9 +1,10 @@
-<p>
-  <%= text_field_tag :card_number, nil, name: nil, placeholder: "Credit Card Number" %>
+<div class="cc-form-wrap clearfix">
+  <%= text_field_tag :card_number, nil, name: nil, data: { stripe: 'number' }, placeholder: 'Card Number', autocompletetype: 'cc-number', :'x-autocompletetype' => 'cc-number' %>
+  <%= text_field_tag :card_expiration, nil, name: nil, placeholder: 'MM / YY', autocompletetype: 'cc-exp', :'x-autocompletetype' => 'cc-exp' %>
+  <%= text_field_tag :card_code, nil, name: nil, data: { stripe: 'cvc' }, placeholder: 'CVC', autocompletetype: 'cc-csc', :'x-autocompletetype' => 'cc-csc' %>
+</div>
 
-  <%= text_field_tag :card_code, nil, name: nil, placeholder: "Card Security Code (CVC)" %>
-
-  <%= label_tag :card_month, "Card Expiration" %>
-  <%= select_month nil, {add_month_numbers: true}, {name: nil, id: "card_month"} %>
-  <%= select_year nil, {start_year: Date.today.year, end_year: Date.today.year + 10}, {name: nil, id: "card_year"} %>
-</p>
+<div class="ui-helper-hidden-accessible">
+  <%= select_tag nil, options_for_select(['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']), { id: "card_month" } %>
+  <%= select_year nil, {start_year: Date.today.year, end_year: Date.today.year + 10}, {data: {stripe: 'exp-month'}, name: nil, id: "card_year", class: ''} %>
+</div>

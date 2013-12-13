@@ -6,6 +6,13 @@ jQuery ->
 class feedbin.Registration
   constructor: ->
     Stripe.setPublishableKey($('meta[name="stripe-key"]').attr('content'))
+    $('#card_number').payment('formatCardNumber');
+    $('#card_expiration').payment('formatCardExpiry');
+    $('#card_code').payment('formatCardCVC');
+
+    $(document).on 'change', '#card_month, #card_year', (event) ->
+      $('#card_expiration').val("#{$('#card_month').val()} / #{$('#card_year').val()}")
+
     $(document).on 'submit', '[data-behavior~=credit_card_form]', (event) =>
       $('[data-behavior~=stripe_error]').addClass('hide')
       $('input[type=submit]').attr('disabled', true)
@@ -16,11 +23,12 @@ class feedbin.Registration
         true
 
   processCard: ->
+    expiration = $('#card_expiration').payment('cardExpiryVal')
     card =
       number: $('#card_number').val()
       cvc: $('#card_code').val()
-      expMonth: $('#card_month').val()
-      expYear: $('#card_year').val()
+      expMonth: expiration.month
+      expYear: expiration.year
     Stripe.createToken(card, @handleStripeResponse)
 
   handleStripeResponse: (status, response) ->
