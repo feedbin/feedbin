@@ -238,8 +238,8 @@ class Entry < ActiveRecord::Base
   private
 
   def ensure_published
-    if self[:published].nil?
-      self[:published] = DateTime.now
+    if self.published.nil? || self.published > 1.day.from_now
+      self.published = DateTime.now
     end
   end
 
@@ -253,7 +253,7 @@ class Entry < ActiveRecord::Base
   end
 
   def mark_as_unread
-    unless skip_mark_as_unread
+    if skip_mark_as_unread.blank? && self.published > 1.month.ago
       unread_entries = []
       subscriptions = Subscription.where(feed_id: self.feed_id, active: true).pluck(:user_id)
       subscriptions.each do |user_id|
