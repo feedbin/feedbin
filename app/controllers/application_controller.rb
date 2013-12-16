@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
 
   etag { current_user.try :id }
 
-  add_flash_types :analytics_event
+  add_flash_types :analytics_event, :one_time_content
 
   def update_selected_feed!(type, data = nil)
     if data.nil?

@@ -45,6 +45,7 @@ class UsersController < ApplicationController
       Librato.increment('user.trial.signup')
       @analytics_event = {eventCategory: 'customer', eventAction: 'new', eventLabel: 'trial', eventValue: 0}
       flash[:analytics_event] = render_to_string(partial: "shared/analytics_event").html_safe
+      flash[:one_time_content] = render_to_string(partial: "shared/register_protocol_handlers").html_safe
       sign_in @user
       redirect_to root_url
     else
