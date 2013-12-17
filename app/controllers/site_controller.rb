@@ -15,6 +15,10 @@ class SiteController < ApplicationController
       subscriptions = Subscription.where(user: @user).pluck(:feed_id, :view_inline)
       subscriptions.each { |feed_id, setting| @readability_settings[feed_id] = setting }
 
+      if subscriptions.blank?
+        @show_welcome = true
+      end
+
       @title = @user.title_with_count
 
       render action: 'logged_in'

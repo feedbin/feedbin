@@ -37,18 +37,18 @@
       </td>
       <td class="entry-column app-panel" data-behavior="content_column">
         <div class="full-height entry-wrap">
-          <% if current_user && !current_user.subscriptions.any? %>
+          <% if @show_welcome %>
             <div class="welcome">
               <div class="welcome-inner">
-                <h2>Thanks for Signing Up</h2>
-                <p class="sub-head">Get started by uploading a OPML file or add feeds. </p>
-                <button class="button">Upload OPML</button>
-                <p class="description">What is OPML?</p>
+                <h2>Welcome to Feedbin</h2>
+                <p class="sub-head">Get started by uploading an OPML file or <a href="http://help.feedbin.me/how-to-subscribe/">subscribing to feeds</a>. </p>
+                <%= link_to 'Upload OPML', settings_import_export_path, class: 'button' %>
+                <p class="description"><a href="http://help.feedbin.me/how-to-subscribe/#opml_import">What is OPML?</a></p>
               </div>
             </div>
           <% else %>
-          	<div class="entry-content-wrap full-height <%= @user.entry_width %> font-size-<%= @user.font_size || 5 %> font-<%= @user.font || 'default' %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
-          	</div>
+            <div class="entry-content-wrap full-height <%= @user.entry_width %> font-size-<%= @user.font_size || 5 %> font-<%= @user.font || 'default' %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
+            </div>
           <% end %>
         </div>
       </td>

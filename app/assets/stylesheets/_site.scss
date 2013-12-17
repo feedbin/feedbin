@@ -1260,29 +1260,37 @@ Structure
 }
 
 .welcome {
-	display: none;
-	text-align: center;
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: $list-background;
+	height: 100%;
+	width: 100%;
+	display: box;
+	box-align: center;
+	box-pack: center;
 	.welcome-inner {
-		position: absolute;
-		height: 200px;
-		max-width: 450px;
-		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -50%);
+		background-color: $list-background;
+		width: 100%;
+		text-align: center;
 	}
 	h2 {
 		font-size: 28px;
 		color: #333;
+		margin: 0 0 10px 0;
 	}
 	.sub-head {
 		font-size: 18px;
 		color: #999999;
+	}
+	.button {
+		background-color: $selected;
+		padding: 20px 40px;
+		font-size: 18px;
+		font-weight: bold;
+		color: #fff;
+		margin-bottom: 10px;
+		display: inline-block;
+	}
+	.description {
+		font-size: 13px;
+		margin-bottom: 0;
 	}
 }
 
