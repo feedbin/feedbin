@@ -23,6 +23,7 @@ gem 'opml_saw',              github: 'feedbin/opml_saw',            ref: '61d8c2
 gem 'feedzirra',             github: 'feedbin/feedzirra',           ref: '601864e'
 gem 'html-pipeline',         github: 'benubois/html-pipeline',      ref: '652162b'
 gem 'grocer-pushpackager',   github: 'feedbin/grocer-pushpackager', ref: 'e190796', require: 'grocer/pushpackager'
+gem 'html_diff',             github: 'feedbin/html_diff',           ref: 'c7c15ce'
 
 gem 'sass-rails', '~>4.0.0'
 gem 'coffee-rails', '~>4.0.0'

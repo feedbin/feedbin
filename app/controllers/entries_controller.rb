@@ -1,4 +1,3 @@
-require 'feedbin_diff'
 class EntriesController < ApplicationController
 
   skip_before_action :verify_authenticity_token, only: [:push_view]
@@ -286,7 +285,7 @@ class EntriesController < ApplicationController
       begin
         before = ContentFormatter.format!(@entry.original['content'], @entry)
         after = ContentFormatter.format!(@entry.content, @entry)
-        @content = FeedbinDiff.new(before, after).inline_html.html_safe
+        @content = HTMLDiff::Diff.new(before, after).inline_html.html_safe
       rescue HTML::Pipeline::Filter::InvalidDocumentException
         @content = '(comparison error)'
       end
