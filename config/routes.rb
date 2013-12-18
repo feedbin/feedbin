@@ -87,6 +87,7 @@ Feedbin::Application.routes.draw do
       post :starred_entries, to: 'starred_entries#update'
       post :mark_as_read, to: 'entries#mark_as_read'
       get :push_view
+      get :diff
     end
     collection do
       get :starred

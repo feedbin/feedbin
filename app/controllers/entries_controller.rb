@@ -1,3 +1,4 @@
+require 'feedbin_diff'
 class EntriesController < ApplicationController
 
   skip_before_action :verify_authenticity_token, only: [:push_view]
@@ -277,6 +278,19 @@ class EntriesController < ApplicationController
     @entry = Entry.find(params[:id])
     UnreadEntry.where(user: @user, entry: @entry).delete_all
     redirect_to @entry.fully_qualified_url, status: :found
+  end
+
+  def diff
+    @entry = Entry.find(params[:id])
+    if @entry.original && @entry.original['content'].present?
+      begin
+        before = ContentFormatter.format!(@entry.original['content'], @entry)
+        after = ContentFormatter.format!(@entry.content, @entry)
+        @content = FeedbinDiff.new(before, after).inline_html.html_safe
+      rescue HTML::Pipeline::Filter::InvalidDocumentException
+        @content = '(comparison error)'
+      end
+    end
   end
 
   private

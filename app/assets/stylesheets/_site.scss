@@ -2526,6 +2526,70 @@ li.selected > a .favicon-wrap {
 	}
 }
 
+.inline-diff {
+	ins {
+		color: #468847;
+		background: #dff0d8;
+		text-decoration: none;
+	}
+
+	.diff-ins {
+		background: #dff0d8;
+	}
+
+	ins, .diff-ins {
+		img {
+			opacity: .5;
+		}
+		a {
+			color: #468847;
+		}
+	}
+
+	img.diff-ins, code.diff-ins {
+		border: 2px solid #468847;
+	}
+
+	img.diff-ins {
+		opacity: .75;
+	}
+
+	del {
+		color: #b94a48;
+		background: #f2dede;
+	}
+
+	del, .diff-del {
+		img {
+			opacity: .5;
+		}
+		a {
+			color: #b94a48;
+		}
+	}
+
+	img.diff-del, code.diff-del {
+		border: 2px solid #b94a48;
+	}
+
+	img.diff-del {
+		opacity: .5;
+	}
+
+	.diff-del {
+		background: #f2dede;
+	}
+}
+
+.diff-wrap {
+	color: #999;
+	font-size: 13px;
+	border-top: 1px solid #dcdcdc;
+	padding: 10px 0 0 25px;
+	font-family: $font-stack !important;
+	background: image-url("icon-clock.svg") 0 11px no-repeat;
+}
+
 .audio-player {
 	font-family: $font-stack !important;
 	position: absolute;
