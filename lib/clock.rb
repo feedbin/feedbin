@@ -7,7 +7,7 @@ include Clockwork
 # Use locks so multiple clock processes do not schedule dupes
 every(1.minutes, 'clockwork.frequent') do
 
-  if RedisLock.acquire("clockwork:feed:refresher:scheduler", 25.minutes.to_i)
+  if RedisLock.acquire("clockwork:feed:refresher:scheduler", 55)
     FeedRefresherScheduler.perform_async
   end
 
