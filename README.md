@@ -56,6 +56,7 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | MEMCACHED_HOSTS          | Comma separated memcached hosts/ports - 192.168.1.2:11121                          |
 | POSTGRES_USERNAME        | Used for connecting to database                                                    |
 | POSTMARK_API_KEY         | Used for sending email - http://postmarkapp.com                                    |
+| PUSH_URL                 | URL for the Feedbin instance - https://feedbin.me                                  |
 | RACK_ENV                 | Environment - production                                                           |
 | RAILS_ENV                | Environment - production                                                           |
 | READABILITY_API_TOKEN    | Used for Readability - http://www.readability.com                                  |
