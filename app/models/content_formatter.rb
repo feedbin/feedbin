@@ -1,7 +1,7 @@
 class ContentFormatter
 
   def self.format!(content, entry = nil)
-    whitelist = HTML::Pipeline::SanitizationFilter::WHITELIST.clone
+    whitelist = Feedbin::Application.config.whitelist.clone
     transformers = [iframe_whitelist] + whitelist[:transformers]
     whitelist[:transformers] = transformers
 

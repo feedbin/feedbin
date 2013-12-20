@@ -48,6 +48,11 @@ $.extend feedbin,
     $('[data-behavior~=entry_content_target] pre').each (i, e) ->
       hljs.highlightBlock(e)
 
+  footnotes: ->
+    $.bigfoot
+      scope: '[data-behavior~=entry_content_wrap]'
+      actionOriginalFN: 'ignore'
+
   hideTagsForm: (form) ->
     if not form
       form = $('.tags-form-wrap')
@@ -164,6 +169,7 @@ $.extend feedbin,
       $('.entry-content').prop('scrollTop', 0)
     $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='view.vzaar.com']"});
     feedbin.syntaxHighlight()
+    feedbin.footnotes()
 
   refresh: ->
     if feedbin.data != null

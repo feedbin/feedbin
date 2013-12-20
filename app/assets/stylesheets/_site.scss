@@ -3028,7 +3028,7 @@ Settings
 				border-color: #CCC;
 			}
 		}
-		#card_number {
+		.card-number {
 			background: image-url("icon-credit-card.svg") 5px 15px no-repeat;
 			border-radius: 4px 4px 0 0;
 			margin-bottom: 0;
@@ -3054,14 +3054,14 @@ Settings
 				background-position: 5px 15px, 220px 5px;
 			}
 		}
-		#card_code {
+		.card-code {
 			background: image-url("icon-lock.svg") 5px 12px no-repeat;
 			width: 50%;
 			float: right;
 			border-radius: 0 0 4px 0;
 			border-left: none;
 		}
-		#card_expiration {
+		.card-expiration {
 			background: image-url("icon-calendar.svg") 5px 12px no-repeat;
 			width: 50%;
 			float: left;
