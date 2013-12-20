@@ -126,6 +126,8 @@ Feedbin::Application.routes.draw do
   constraints subdomain: 'api' do
     namespace :api, path: nil do
       namespace :v2 do
+        get :authentication, to: 'authentication#index'
+
         resources :feeds, only: [:show] do
           resources :entries, only: [:index, :show], controller: :feeds_entries
         end
