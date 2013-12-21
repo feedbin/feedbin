@@ -2644,7 +2644,8 @@ li.selected > a .favicon-wrap {
 	}
 }
 
-.font-serif-1 {
+.font-serif-1,
+.font-serif-1 .content-styles {
 	font-family: "Sentinel SSm A", "Sentinel SSm B", $font-stack;
 	font-weight: 400;
 	font-style: normal;
@@ -2659,12 +2660,13 @@ li.selected > a .favicon-wrap {
 	}
 }
 
-.font-serif-2 {
+.font-serif-2,
+.font-serif-2 .content-styles {
 	font-family: "Mercury SSm A", "Mercury SSm B", $font-stack;
-	font-weight: 400;
+	font-weight: 300;
 	font-style: normal;
 	strong {
-		font-weight: 700;
+		font-weight: 500;
 	}
 	em {
 		font-style: italic;
@@ -2674,7 +2676,8 @@ li.selected > a .favicon-wrap {
 	}
 }
 
-.font-serif-3 {
+.font-serif-3,
+.font-serif-3 .content-styles {
 	font-family: Georgia, $font-stack;
 	font-weight: 400;
 	font-style: normal;
@@ -2689,7 +2692,8 @@ li.selected > a .favicon-wrap {
 	}
 }
 
-.font-sans-serif-1 {
+.font-sans-serif-1,
+.font-sans-serif-1 .content-styles {
 	font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
 	font-weight: 400;
 	font-style: normal;
@@ -2707,7 +2711,8 @@ li.selected > a .favicon-wrap {
 	}
 }
 
-.font-sans-serif-2 {
+.font-sans-serif-2,
+.font-sans-serif-2 .content-styles {
 	font-family: "Ideal Sans A", "Ideal Sans B", $font-stack;
 	font-weight: 300;
 	font-style: normal;
