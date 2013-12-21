@@ -2301,6 +2301,7 @@ li.selected > a .favicon-wrap {
 				width: 100%;
 				padding: 6px 5px;
 				font-family: $font-stack;
+				font-weight: 400 !important;
 				border-bottom: 1px solid $list-background;
 				cursor: pointer;
 			}
@@ -2657,6 +2658,7 @@ li.selected > a .favicon-wrap {
 	}
 	.post-meta, .entry-feed-title {
 		font-family: $font-stack;
+		font-weight: 400;
 	}
 }
 
@@ -2673,6 +2675,10 @@ li.selected > a .favicon-wrap {
 	}
 	.post-meta, .entry-feed-title {
 		font-family: $font-stack;
+		font-weight: 400;
+	}
+	.entry-header h1 {
+		font-weight: 500;
 	}
 }
 
@@ -2689,6 +2695,7 @@ li.selected > a .favicon-wrap {
 	}
 	.post-meta, .entry-feed-title {
 		font-family: $font-stack;
+		font-weight: 400;
 	}
 }
 
@@ -2705,6 +2712,7 @@ li.selected > a .favicon-wrap {
 	}
 	.post-meta, .entry-feed-title {
 		font-family: $font-stack;
+		font-weight: 400;
 	}
 	.entry-header h1 {
 		font-weight: 700;
@@ -2725,6 +2733,9 @@ li.selected > a .favicon-wrap {
 	.post-meta, .entry-feed-title {
 		font-family: $font-stack;
 		font-weight: 400;
+	}
+	.entry-header h1 {
+		font-weight: 600;
 	}
 }
 
