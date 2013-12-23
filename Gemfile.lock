@@ -14,14 +14,13 @@ GIT
 
 GIT
   remote: git://github.com/feedbin/feedzirra.git
-  revision: 601864ec7f4a247da087ce7be14c8103059ad5b1
-  ref: 601864e
+  revision: 6d57e27f38d544c9e6d94c5b331ff9d23295075e
+  ref: 6d57e27
   specs:
-    feedzirra (0.2.0.rc2)
+    feedzirra (0.6.0)
       curb (~> 0.8.1)
       loofah (~> 1.2.1)
-      nokogiri (~> 1.5.3)
-      sax-machine (~> 0.2.0.rc1)
+      sax-machine (~> 0.2.1)
 
 GIT
   remote: git://github.com/feedbin/grocer-pushpackager.git
@@ -193,6 +192,7 @@ GEM
       jquery-rails (>= 1.0)
       railties (>= 3.1)
     mime-types (1.25.1)
+    mini_portile (0.5.2)
     minitest (4.7.5)
     multi_json (1.7.9)
     multi_xml (0.5.5)
@@ -204,7 +204,8 @@ GEM
     net-ssh (2.7.0)
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
-    nokogiri (1.5.10)
+    nokogiri (1.6.1)
+      mini_portile (~> 0.5.0)
     pg (0.17.0)
     polyglot (0.3.3)
     postmark (1.0.1)
@@ -259,8 +260,8 @@ GEM
       railties (>= 4.0.0, < 5.0)
       sass (>= 3.1.10)
       sprockets-rails (~> 2.0.0)
-    sax-machine (0.2.0.rc1)
-      nokogiri (~> 1.5.2)
+    sax-machine (0.2.1)
+      nokogiri (~> 1.6.0)
     sidekiq (2.16.1)
       celluloid (>= 0.15.2)
       connection_pool (>= 1.0.0)
@@ -349,7 +350,6 @@ DEPENDENCIES
   lograge
   longurl
   mediaelement_rails
-  nokogiri (= 1.5.10)
   opml_saw!
   pg
   postmark-rails

@@ -226,12 +226,7 @@ class FeedFetcher
       id_string = feedzirra.feed_url.dup
     end
 
-    # TODO this can probably be removed in the future.
-    # This is a band aid because ITunesRSSItem does not remap guid -> entry_id
-    # The fix would be to update Feedzirra to map correctly and remove this condition
-    if entry.is_a?(Feedzirra::Parser::ITunesRSSItem) && entry.guid && entry.published && entry.published > ITUNES_RSS_ITEM_FIX_DATE
-      id_string << entry.guid.dup
-    elsif entry.entry_id
+    if entry.entry_id
       id_string << entry.entry_id.dup
     else
       if entry.url
