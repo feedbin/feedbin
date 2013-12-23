@@ -45,7 +45,7 @@
           entry.original['content'].present? &&
           entry.original['content'].length != entry.content.length
         %>
-          <p class="diff-wrap">This post was updated <%= link_to "view changes", diff_entry_path(entry), remote: true %></p>
+          <p class="diff-wrap">This article was updated <%= link_to "view changes", diff_entry_path(entry), remote: true %></p>
         <% end %>
       </div>
     </div>
