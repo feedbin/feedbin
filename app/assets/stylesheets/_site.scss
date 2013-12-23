@@ -2585,10 +2585,11 @@ li.selected > a .favicon-wrap {
 	color: #999;
 	font-size: 13px;
 	border-top: 1px solid #dcdcdc;
-	padding: 10px 0 0 25px;
+	padding: 15px 0 0 25px;
 	font-family: $font-stack !important;
 	font-weight: 400 !important;
-	background: image-url("icon-clock.svg") 0 11px no-repeat;
+	background: image-url("icon-clock.svg") 0 16px no-repeat;
+	margin-top: 15px;
 }
 
 .audio-player {
