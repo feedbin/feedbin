@@ -2525,6 +2525,11 @@ li.selected > a .favicon-wrap {
 		background-color: #000;
 		max-width: 100%;
 	}
+
+	.table-wrap {
+		overflow-x: auto;
+	}
+
 }
 
 .inline-diff {

@@ -53,6 +53,9 @@ $.extend feedbin,
       scope: '[data-behavior~=entry_content_wrap]'
       actionOriginalFN: 'ignore'
 
+  tableWrap: ->
+    $('[data-behavior~=entry_content_wrap] table').wrap($('<div>', {class: 'table-wrap'}));
+
   hideTagsForm: (form) ->
     if not form
       form = $('.tags-form-wrap')
@@ -170,6 +173,7 @@ $.extend feedbin,
     $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='view.vzaar.com']"});
     feedbin.syntaxHighlight()
     feedbin.footnotes()
+    feedbin.tableWrap()
 
   refresh: ->
     if feedbin.data != null
