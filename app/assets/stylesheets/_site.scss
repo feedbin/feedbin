@@ -2530,6 +2530,17 @@ li.selected > a .favicon-wrap {
 		overflow-x: auto;
 	}
 
+	.diff-wrap {
+		color: #999;
+		font-size: 13px;
+		border-top: 1px solid #dcdcdc;
+		padding: 15px 0 0 25px;
+		font-family: $font-stack !important;
+		font-weight: 400 !important;
+		background: image-url("icon-clock.svg") 0 16px no-repeat;
+		margin-top: 15px;
+	}
+
 }
 
 .inline-diff {
@@ -2579,17 +2590,6 @@ li.selected > a .favicon-wrap {
 	.diff-del {
 		background: #f2dede;
 	}
-}
-
-.diff-wrap {
-	color: #999;
-	font-size: 13px;
-	border-top: 1px solid #dcdcdc;
-	padding: 15px 0 0 25px;
-	font-family: $font-stack !important;
-	font-weight: 400 !important;
-	background: image-url("icon-clock.svg") 0 16px no-repeat;
-	margin-top: 15px;
 }
 
 .audio-player {
