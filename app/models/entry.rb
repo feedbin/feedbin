@@ -218,13 +218,10 @@ class Entry < ActiveRecord::Base
 
   def fully_qualified_url
     entry_url = self.url
-    if entry_url
-      unless self.url.start_with?('http')
-        site_url = self.feed.site_url
-        if site_url
-          entry_url = URI.join(site_url.gsub('&#38;', '&'), entry_url.gsub('&#38;', '&')).to_s
-        end
-      end
+    if entry_url.present? && is_fully_qualified(entry_url)
+      entry_url = entry_url
+    elsif entry_url.present?
+      entry_url = URI.join(base_url.gsub('&#38;', '&'), entry_url.gsub('&#38;', '&')).to_s
     else
       entry_url = self.feed.site_url
     end
@@ -236,6 +233,19 @@ class Entry < ActiveRecord::Base
   end
 
   private
+
+  def base_url
+    parent_feed = self.feed
+    if is_fully_qualified(parent_feed.site_url)
+      parent_feed.site_url
+    else
+      parent_feed.feed_url
+    end
+  end
+
+  def is_fully_qualified(url_string)
+    url_string.respond_to?(:start_with?) && url_string.start_with?('http')
+  end
 
   def ensure_published
     if self.published.nil? || self.published > 1.day.from_now
