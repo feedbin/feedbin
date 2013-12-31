@@ -173,7 +173,6 @@ $.extend feedbin,
     $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com']"});
     feedbin.syntaxHighlight()
     feedbin.footnotes()
-    feedbin.tableWrap()
 
   refresh: ->
     if feedbin.data != null
