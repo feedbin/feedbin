@@ -1,16 +1,11 @@
 GIT
   remote: git://github.com/benubois/html-pipeline.git
-  revision: 652162b4c6c6a320cf8a45ee035704c10f802522
-  ref: 652162b
+  revision: 13aaf6d17148b519879d7d97c1b92e97dadfad7c
+  ref: 13aaf6d
   specs:
-    html-pipeline (0.0.12)
+    html-pipeline (1.1.0)
       activesupport (>= 2)
-      escape_utils (~> 0.3)
-      gemoji (~> 1.0)
-      github-markdown (~> 0.5)
       nokogiri (~> 1.4)
-      rinku (~> 1.7)
-      sanitize (~> 2.0)
 
 GIT
   remote: git://github.com/feedbin/feedzirra.git
@@ -129,7 +124,6 @@ GEM
     dalli (2.6.4)
     dotenv (0.9.0)
     erubis (2.7.0)
-    escape_utils (0.3.2)
     excon (0.28.0)
     execjs (2.0.2)
     faraday (0.8.8)
@@ -150,8 +144,6 @@ GEM
       dotenv (>= 0.7)
       thor (>= 0.13.6)
     formatador (0.2.4)
-    gemoji (1.4.0)
-    github-markdown (0.6.1)
     grocer (0.5.0)
     hashie (1.2.0)
     hashr (0.0.22)
@@ -250,7 +242,6 @@ GEM
       actionpack (>= 2.1)
     rest-client (1.6.7)
       mime-types (>= 1.16)
-    rinku (1.7.3)
     ruby-hmac (0.4.0)
     rubyzip (1.1.0)
     sanitize (2.0.6)
