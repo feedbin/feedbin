@@ -1262,9 +1262,8 @@ Structure
 .welcome {
 	height: 100%;
 	width: 100%;
-	display: box;
-	box-align: center;
-	box-pack: center;
+	display: flex;
+	align-items: center;
 	.welcome-inner {
 		background-color: $list-background;
 		width: 100%;
@@ -2176,6 +2175,7 @@ li.selected > a .favicon-wrap {
 	margin: 0;
 	overflow-y: auto;
 	overflow-x: hidden;
+	-webkit-overflow-scrolling: touch;
 	transition: top .2s ease;
 }
 
@@ -4115,9 +4115,8 @@ Login and Sign Up
 .login {
 	background-color: #efefef;
 	padding: 15px;
-	display: box;
-	box-align: center;
-	box-pack: center;
+	display: flex;
+	align-items: center;
 	.bar, .application-messages {
 		display: none !important;
 	}
