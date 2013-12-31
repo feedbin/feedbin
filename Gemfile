@@ -26,7 +26,7 @@ gem 'html_diff',             github: 'feedbin/html_diff',           ref: 'c7c15c
 gem 'sass-rails', '~>4.0.0'
 gem 'coffee-rails', '~>4.0.0'
 gem 'uglifier', '>= 1.0.3'
-gem 'autoprefixer-rails'
+gem 'autoprefixer-rails', '~> 0.7'
 
 gem 'activerecord-import', '>= 0.4.1'
 gem 'redis', '>= 3.0.5'

@@ -83,7 +83,7 @@ GEM
     ansi (1.4.3)
     arel (4.0.1)
     atomic (1.1.14)
-    autoprefixer-rails (1.0.20131225)
+    autoprefixer-rails (0.8.20131213)
       execjs
     bcrypt-ruby (3.1.2)
     better_errors (1.0.1)
@@ -315,7 +315,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import (>= 0.4.1)
   addressable
-  autoprefixer-rails
+  autoprefixer-rails (~> 0.7)
   bcrypt-ruby
   better_errors
   bust_rails_etags
