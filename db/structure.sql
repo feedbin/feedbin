@@ -593,7 +593,8 @@ CREATE TABLE users (
     password_reset_sent_at timestamp without time zone,
     settings hstore,
     starred_token character varying(255),
-    inbound_email_token character varying(255)
+    inbound_email_token character varying(255),
+    tag_visibility json DEFAULT '{}'::json
 );
 
 
@@ -1304,3 +1305,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131205004751');
 INSERT INTO schema_migrations (version) VALUES ('20131205095630');
 
 INSERT INTO schema_migrations (version) VALUES ('20131228183918');
+
+INSERT INTO schema_migrations (version) VALUES ('20131231084130');
