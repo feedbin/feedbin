@@ -10,9 +10,8 @@ class FeedsController < ApplicationController
     taggings = @feed.tag(params[:feed][:tag_list], @user)
 
     # Open the tag drawer this was just added to
-    session[:tag_visibility] ||= {}
     taggings.each do |tagging|
-      session[:tag_visibility][tagging.tag_id.to_s] = true
+      @user.update_tag_visibility(tagging.tag_id.to_s, true)
     end
 
     @mark_selected = true

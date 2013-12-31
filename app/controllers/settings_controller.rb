@@ -124,13 +124,13 @@ class SettingsController < ApplicationController
   end
 
   def view_settings_update
+    @user = current_user
     if params[:tag_visibility]
-      session[:tag_visibility] ||= {}
       tag_id = params[:tag].to_s
-      if session[:tag_visibility][params[:tag]].blank?
-        session[:tag_visibility][tag_id] = true
+      if @user.tag_visibility[params[:tag]].blank?
+        @user.update_tag_visibility(tag_id, true)
       else
-        session[:tag_visibility][tag_id] = false
+        @user.update_tag_visibility(tag_id, false)
       end
     end
 

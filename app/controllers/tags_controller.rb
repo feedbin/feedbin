@@ -51,8 +51,9 @@ class TagsController < ApplicationController
       end
       update_selected_feed!("tag", @new_tag.try(:id))
 
-      session[:tag_visibility] ||= {}
-      session[:tag_visibility][@new_tag.id.to_s] = session[:tag_visibility][tag.id.to_s] ? session[:tag_visibility][tag.id.to_s] : false
+      visibility = @user.tag_visibility[tag.id.to_s] ? @user.tag_visibility[tag.id.to_s] : false
+      @user.update_tag_visibility(@new_tag.id.to_s, visibility)
+
     else
       # Tag is empty, delete taggings
       @taggings.destroy_all

@@ -277,4 +277,10 @@ class User < ActiveRecord::Base
     (seconds_left.to_f / 86400.to_f).ceil
   end
 
+  def update_tag_visibility(tag, visible)
+    tag_visibility_will_change!
+    self.tag_visibility[tag] = visible
+    update_attributes tag_visibility: self.tag_visibility
+  end
+
 end
