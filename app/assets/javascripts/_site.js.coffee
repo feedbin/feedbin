@@ -170,7 +170,7 @@ $.extend feedbin,
   formatEntryContent: (resetScroll = true) ->
     if resetScroll
       $('.entry-content').prop('scrollTop', 0)
-    $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='view.vzaar.com']"});
+    $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com']"});
     feedbin.syntaxHighlight()
     feedbin.footnotes()
     feedbin.tableWrap()

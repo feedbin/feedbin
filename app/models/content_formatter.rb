@@ -117,6 +117,10 @@ class ContentFormatter
         /x,
         /^
           (?:https?:\/\/|\/\/)
+          (?:www\.flickr\.com)
+        /x,
+        /^
+          (?:https?:\/\/|\/\/)
           (?:mpora\.com)
         /x
       ]
