@@ -231,6 +231,9 @@ $.extend feedbin,
       $('body').removeClass('push-off')
       $('body').addClass('push-disabled')
 
+  toggleFullScreen: ->
+    $('body').toggleClass('full-screen')
+
   hideQueue: []
 
   feedCandidates: []
@@ -614,6 +617,12 @@ $.extend feedbin,
           $('[data-behavior~=entry_content_target]').removeClass('fluid')
         else
           $('[data-behavior~=entry_content_target]').addClass('fluid')
+        return
+
+    fullscreen: ->
+      $(document).on 'click', '[data-behavior~=full_screen]', (event) ->
+        feedbin.toggleFullScreen()
+        event.preventDefault()
         return
 
     filterList: ->

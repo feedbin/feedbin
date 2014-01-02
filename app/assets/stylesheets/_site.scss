@@ -2149,6 +2149,28 @@ li.selected > a .favicon-wrap {
 			background-position: 0px 0px;
 		}
 	}
+	.button-full-screen {
+		height: 48px;
+		width: 48px;
+		position: relative;
+		display: block;
+		&:hover {
+			cursor: pointer;
+		}
+		&:after {
+			display: block;
+			height: 26px;
+			width: 34px;
+			background: image-url("icon-full-screen.svg") 0 0 no-repeat;
+			content: "";
+			position: absolute;
+			top: 12px;
+			left: 7px;
+		}
+		.full-screen &:after {
+			background-position: 0px -26px;
+		}
+	}
 }
 
 .entry-wrap {
@@ -4201,7 +4223,7 @@ Mobile
 			font-size: 1.6em;
 		}
 	}
-	.button-entry-width {
+	.mobile-hide {
 		display: none !important;
 	}
 	.entry-inner {
@@ -4308,5 +4330,20 @@ Print
 	}
 	a[href^="http://"]:after, a[href^="https://"]:after {
 		content: " (" attr(href) ")";
+	}
+}
+
+/*------------------------------------------------------------------------------
+Fullscreen
+------------------------------------------------------------------------------*/
+.full-screen {
+	.feeds-column, .entries-column {
+		display: none;
+	}
+	.content {
+		top: 0;
+	}
+	.app-panel {
+		border-top: none;
 	}
 }

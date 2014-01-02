@@ -188,6 +188,12 @@ class feedbin.Keyboard
         shareButton.click()
         event.preventDefault()
 
+    # Full Screen
+    Mousetrap.bind 'F', (event, combo) =>
+      if $('[data-behavior~=entry_content_target]').html().length > 0
+        feedbin.toggleFullScreen()
+      event.preventDefault()
+
     Mousetrap.bind 'enter', (event, combo) =>
       if feedbin.shareOpen()
         dropdown = $('.dropdown-wrap')
