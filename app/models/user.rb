@@ -274,7 +274,8 @@ class User < ActiveRecord::Base
     expires = (self.created_at + Feedbin::Application.config.trial_days.days).to_i
     now = Time.now.to_i
     seconds_left = expires - now
-    (seconds_left.to_f / 86400.to_f).ceil
+    days = (seconds_left.to_f / 86400.to_f).ceil
+    (days > 0) ? days : 0
   end
 
   def update_tag_visibility(tag, visible)
