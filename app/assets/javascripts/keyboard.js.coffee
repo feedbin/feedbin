@@ -61,13 +61,13 @@ class feedbin.Keyboard
       @setEnvironment()
 
       if 'down' == combo || 'j' == combo
-        if 'entry-content' == @selectedColumnName()
+        if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
           @scrollContent(30, 'down')
         else
           @item = @next
           @selectItem()
       else if 'up' == combo || 'k' == combo
-        if 'entry-content' == @selectedColumnName()
+        if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
           @scrollContent(30, 'up')
         else
           @item = @previous

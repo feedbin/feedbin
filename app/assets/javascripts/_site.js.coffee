@@ -234,6 +234,9 @@ $.extend feedbin,
   toggleFullScreen: ->
     $('body').toggleClass('full-screen')
 
+  isFullScreen: ->
+    $('body').hasClass('full-screen')
+
   hideQueue: []
 
   feedCandidates: []
