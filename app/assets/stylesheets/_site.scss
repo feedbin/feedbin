@@ -6,7 +6,7 @@
 Variables
 ------------------------------------------------------------------------------*/
 $toolbar-width: 40px;
-$list-background: #efefef;
+$list-background: #f2f3f4;
 $list-border: #CCC;
 $selected: #3399ff;
 $font-stack: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -1099,7 +1099,7 @@ Structure
 		font-weight: bold;
 		font-size: 12px;
 		border-right: 1px solid #CCC;
-		background-color: #EFEFEF;
+		background-color: #f2f3f4;
 		padding: 0 0 0 6px;
 		user-select: none;
 		width: 82px;
@@ -1218,7 +1218,7 @@ Structure
 		overflow: auto;
 	}
 	.settings-nav {
-		background-color: #efefef;
+		background-color: #f2f3f4;
 		border: 1px solid #ccc;
 		display: none;
 		ul {
@@ -1487,8 +1487,8 @@ Structure
 	bottom: 0;
 	left: 0;
 	right: 0;
-	background-color: #dedede;
 	font-size: 10px;
+	background-color: #E6E7E8;
 	table {
 		margin-top: 8px;
 		width: 100%;
@@ -1517,6 +1517,7 @@ Structure
 	top: 37px;
 	border-bottom: 1px solid #CCC;
 	width: 100%;
+	background-color: #e6e7e8;
 	input {
 		height: 32px;
 		width: 100%;
@@ -1800,7 +1801,7 @@ li.selected > a .favicon-wrap {
 		li {
 			position: relative;
 			word-wrap: break-word;
-			background-color: #666;
+			background-color: #e6e7e8;
 			.favicon-wrap {
 				top: 23px;
 				left: 6px;
@@ -1973,7 +1974,7 @@ li.selected > a .favicon-wrap {
 			.mark-below-read {
 				position: absolute;
 				height: 50%;
-				color: #FFF;
+				color: #333;
 				width: 100%;
 				text-align: right;
 				cursor: pointer;
@@ -2005,7 +2006,7 @@ li.selected > a .favicon-wrap {
 			}
 			.mark-below-read {
 				bottom: 0;
-				border-top: 1px solid rgba(255,255,255,.5);
+				border-top: 1px solid #FFF;
 				i:before {
 					content: "↓";
 					top: -2px;
@@ -2071,7 +2072,7 @@ li.selected > a .favicon-wrap {
 	height: 48px;
 	width: 100%;
 	border-bottom: 1px solid #CCC;
-	background-color: #efefef;
+	background-color: #f2f3f4;
 	&:before {
 		visibility: hidden;
 		position: absolute;
@@ -2880,7 +2881,7 @@ Settings
 
 .settings {
 	font-size: 16px;
-	background-color: #efefef;
+	background-color: #f2f3f4;
 	color: #333;
 	.content {
 		display: table;
@@ -2976,13 +2977,13 @@ Settings
 	.split-bg {
 		height: 100%;
 		width: 100;
-		background-image: linear-gradient(to right, #efefef 50%, #fff 50%);
+		background-image: linear-gradient(to right, #f2f3f4 50%, #fff 50%);
 	}
 	.split-bg-inner {
 		width: 960px;
 		height: 100%;
 		margin: 0 auto;
-		background-image: image-url("border.png"), linear-gradient(to right, #efefef 330px, #fff 330px);
+		background-image: image-url("border.png"), linear-gradient(to right, #f2f3f4 330px, #fff 330px);
 		background-position: 330px 0, top left;
 		background-repeat: repeat-y, no-repeat;
 	}
@@ -3512,7 +3513,7 @@ Buttons
 			padding: 5px;
 			font-size: 14px;
 			border: none;
-			background-color: #efefef;
+			background-color: #f2f3f4;
 			width: 100%;
 			&:focus {
 				border: none;
@@ -3834,7 +3835,7 @@ select {
 }
 
 .billing-promo {
-	background-color: #efefef;
+	background-color: #f2f3f4;
 	background-repeat: no-repeat;
 	border: 1px solid #CCC;
 	padding: 10px 10px 10px 35px;
@@ -4134,7 +4135,7 @@ input:focus:invalid, textarea:focus:invalid, select:focus:invalid {
 Login and Sign Up
 ------------------------------------------------------------------------------*/
 .login {
-	background-color: #efefef;
+	background-color: #f2f3f4;
 	padding: 15px;
 	display: flex;
 	align-items: center;
