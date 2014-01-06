@@ -162,12 +162,13 @@ $.extend feedbin,
       $('[data-behavior~=entry_content_wrap]').html('Loading Readability&hellip;')
       $('[data-behavior~=toggle_content_view]').submit()
 
-  formatEntryContent: (resetScroll = true) ->
+  formatEntryContent: (resetScroll = true, currentItem = null) ->
     if resetScroll
       $('.entry-content').prop('scrollTop', 0)
     $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com']"});
     feedbin.syntaxHighlight()
     feedbin.footnotes()
+    feedbin.nextEntryPreview(currentItem)
 
   refresh: ->
     if feedbin.data != null
@@ -228,12 +229,32 @@ $.extend feedbin,
 
   toggleFullScreen: ->
     $('body').toggleClass('full-screen')
+    if feedbin.nextEntry()
+      $('.next-entry-preview').toggleClass('hide')
 
   isFullScreen: ->
     $('body').hasClass('full-screen')
 
   shareOpen: ->
     $('[data-behavior~=toggle_share_menu]').parents('.dropdown-wrap').hasClass('open')
+
+  nextEntry: ->
+    nextEntry = $('.entries').find('.selected').next()
+    if nextEntry.length
+      nextEntry
+    else
+      null
+
+  nextEntryPreview: (current) ->
+    next = $(current).parents('li').next()
+    $('.next-entry-preview').addClass('hide')
+    if next.length
+      title = next.find('.title').text()
+      feed = next.find('.feed-title').text()
+      $('.next-entry-title').text(title)
+      $('.next-entry-feed').text(feed)
+      if feedbin.isFullScreen()
+        $('.next-entry-preview').removeClass('hide')
 
   hideQueue: []
 
@@ -294,7 +315,7 @@ $.extend feedbin,
 
     openEntry: ->
       $(document).on 'ajax:complete', '[data-behavior~=reset_entry_content_position]', ->
-        feedbin.formatEntryContent()
+        feedbin.formatEntryContent(true, @)
         return
 
     entryLinks: ->
@@ -546,7 +567,7 @@ $.extend feedbin,
         if entry
           xhr.abort()
           feedbin.updateEntryContent(entry.content)
-          feedbin.formatEntryContent()
+          feedbin.formatEntryContent(true, @)
           feedbin.localizeTime($('[data-behavior~=entry_content_target]'))
           feedbin.applyUserTitles()
           feedbin.updateReadCount(id, entry, @)
@@ -795,6 +816,13 @@ $.extend feedbin,
             progress = Math.ceil((event.target.currentTime / event.target.duration) * 100)
             $('.audio-player .progress').css
               width: "#{progress}%"
+
+    nextEntry: ->
+      $(document).on 'click', '.next-entry-preview', (event) ->
+        next = feedbin.nextEntry()
+        if next
+          next.find('a').click()
+        return
 
 jQuery ->
   $.each feedbin.init, (i, item) ->

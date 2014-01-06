@@ -2206,12 +2206,53 @@ li.selected > a .favicon-wrap {
 	padding: 40px 20px 10px 20px;
 	margin: 0 auto;
 	max-width: 660px;
+	min-height: 100%;
 	.has-audio & {
 		padding-bottom: 62px;
 	}
 }
 
-.fluid .entry-inner {
+.next-entry-preview {
+	background-color: $list-background;
+	border-top: 1px solid #CCC;
+	display: block;
+	&:hover {
+		cursor: pointer;
+	}
+}
+
+.next-entry-preview-inner {
+	padding: 30px 20px;
+	margin: 0 auto;
+	max-width: 660px;
+	display: block;
+	.has-audio & {
+		padding-bottom: 82px;
+	}
+	.next-entry-link {
+		display: block;
+		font-size: 12px;
+		color: $selected;
+		border-bottom: 1px solid #CCC;
+		padding-bottom: 5px;
+		margin-bottom: 10px;
+		text-transform: uppercase;
+	}
+	.next-entry-feed {
+		display: block;
+		font-size: 16px;
+		color: #999999;
+		margin-bottom: 5px;
+	}
+	.next-entry-title {
+		display: block;
+		font-size: 24px;
+		color: #333333;
+	}
+}
+
+.fluid .entry-inner,
+.fluid .next-entry-preview-inner {
 	max-width: 100%;
 }
 
