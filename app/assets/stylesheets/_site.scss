@@ -2199,6 +2199,7 @@ li.selected > a .favicon-wrap {
 	overflow-y: auto;
 	overflow-x: hidden;
 	transition: top .2s ease;
+	-webkit-overflow-scrolling: touch;
 }
 
 .entry-inner {
