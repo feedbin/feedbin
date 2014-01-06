@@ -34,62 +34,80 @@ class feedbin.Keyboard
         @waitingForEntries = false
       return
 
+  navigateShareMenu: (combo) ->
+    # If share menu is showing intercept up down
+    dropdown = $('[data-behavior~=toggle_share_menu]').parents('.dropdown-wrap')
+    if dropdown.hasClass('open')
+      nextShare = false
+      selectedShare = $('li.selected', dropdown)
+      if 'down' == combo
+        nextShare = selectedShare.next()
+        if nextShare.length == 0
+          nextShare = $('li:first-child', dropdown)
+      else if 'up' == combo
+        nextShare = selectedShare.prev()
+        if nextShare.length == 0
+          nextShare = $('li:last-child', dropdown)
+
+      if nextShare
+        $('li.selected', dropdown).removeClass('selected')
+        nextShare.addClass('selected')
+
+  navigateFeedbin: (combo) ->
+    @setEnvironment()
+    if 'down' == combo || 'j' == combo
+      if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
+        @scrollContent(30, 'down')
+      else
+        @item = @next
+        @selectItem()
+    else if 'up' == combo || 'k' == combo
+      if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
+        @scrollContent(30, 'up')
+      else
+        @item = @previous
+        @selectItem()
+    else if 'right' == combo || 'l' == combo
+      if 'feeds' == @selectedColumnName()
+        if @rightLock
+          @waitingForEntries = true
+        else
+          @openFirstItem()
+      else if 'entries' == @selectedColumnName()
+        @selectColumn('entry-content')
+
+    else if 'left' == combo || 'h' == combo
+      if 'entry-content' == @selectedColumnName()
+        @selectColumn('entries')
+      else if 'entries' == @selectedColumnName()
+        if @columns['feeds'].find('.selected').length > 0
+          @selectColumn('feeds')
+        else
+          $("[data-feed-id=#{feedbin.feedCandidates[0]}]").find('[data-behavior~=open_item]').click()
+          feedbin.feedCandidates = []
+
+  navigateEntryContent: (combo) ->
+    @selectColumn('entries')
+    @setEnvironment()
+    if 'down' == combo
+      @scrollContent(30, 'down')
+    else if 'up' == combo
+      @scrollContent(30, 'up')
+    else if 'j' == combo
+      @item = @next
+      @selectItem()
+    else if 'k' == combo
+      @item = @previous
+      @selectItem()
+
   bindKeys: ->
     Mousetrap.bind ['up', 'down', 'left', 'right', 'j', 'k', 'h', 'l'], (event, combo) =>
-
-      # If share menu is showing intercept up down
-      dropdown = $('[data-behavior~=toggle_share_menu]').parents('.dropdown-wrap')
-      if dropdown.hasClass('open')
-        nextShare = false
-        selectedShare = $('li.selected', dropdown)
-        if 'down' == combo
-          nextShare = selectedShare.next()
-          if nextShare.length == 0
-            nextShare = $('li:first-child', dropdown)
-        else if 'up' == combo
-          nextShare = selectedShare.prev()
-          if nextShare.length == 0
-            nextShare = $('li:last-child', dropdown)
-
-        if nextShare
-          $('li.selected', dropdown).removeClass('selected')
-          nextShare.addClass('selected')
-
-        event.preventDefault()
-        return null
-
-      @setEnvironment()
-
-      if 'down' == combo || 'j' == combo
-        if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
-          @scrollContent(30, 'down')
-        else
-          @item = @next
-          @selectItem()
-      else if 'up' == combo || 'k' == combo
-        if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
-          @scrollContent(30, 'up')
-        else
-          @item = @previous
-          @selectItem()
-      else if 'right' == combo || 'l' == combo
-        if 'feeds' == @selectedColumnName()
-          if @rightLock
-            @waitingForEntries = true
-          else
-            @openFirstItem()
-        else if 'entries' == @selectedColumnName()
-          @selectColumn('entry-content')
-
-      else if 'left' == combo || 'h' == combo
-        if 'entry-content' == @selectedColumnName()
-          @selectColumn('entries')
-        else if 'entries' == @selectedColumnName()
-          if @columns['feeds'].find('.selected').length > 0
-            @selectColumn('feeds')
-          else
-            $("[data-feed-id=#{feedbin.feedCandidates[0]}]").find('[data-behavior~=open_item]').click()
-            feedbin.feedCandidates = []
+      if feedbin.shareOpen()
+        @navigateShareMenu(combo)
+      else if feedbin.isFullScreen()
+        @navigateEntryContent(combo)
+      else
+        @navigateFeedbin(combo)
       event.preventDefault()
 
     Mousetrap.bind ['space'], (event, combo) =>

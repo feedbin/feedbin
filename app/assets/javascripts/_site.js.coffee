@@ -232,6 +232,9 @@ $.extend feedbin,
   isFullScreen: ->
     $('body').hasClass('full-screen')
 
+  shareOpen: ->
+    $('[data-behavior~=toggle_share_menu]').parents('.dropdown-wrap').hasClass('open')
+
   hideQueue: []
 
   feedCandidates: []
