@@ -1,10 +1,5 @@
 window.feedbin ?= {}
 
-window.addEventListener "load", (->
-  new FastClick(document.body)
-  return
-), false
-
 $.extend feedbin,
 
   showNotification: (text) ->
