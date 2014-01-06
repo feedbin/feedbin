@@ -2216,6 +2216,8 @@ li.selected > a .favicon-wrap {
 	background-color: $list-background;
 	border-top: 1px solid #CCC;
 	display: block;
+	font-family: $font-stack !important;
+	font-weight: 400 !important;
 	&:hover {
 		cursor: pointer;
 	}
