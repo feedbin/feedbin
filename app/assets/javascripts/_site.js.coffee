@@ -247,7 +247,6 @@ $.extend feedbin,
 
   nextEntryPreview: (current) ->
     next = $(current).parents('li').next()
-    $('.next-entry-preview').addClass('hide')
     if next.length
       title = next.find('.title').text()
       feed = next.find('.feed-title').text()
