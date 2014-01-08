@@ -122,6 +122,10 @@ class ContentFormatter
         /^
           (?:https?:\/\/|\/\/)
           (?:mpora\.com)
+        /x,
+        /^
+          (?:https?:\/\/|\/\/)
+          (?:www\.tumblr\.com)
         /x
       ]
 
