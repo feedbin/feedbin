@@ -2240,8 +2240,6 @@ li.selected > a .favicon-wrap {
 	background-color: $list-background;
 	border-top: 1px solid #CCC;
 	display: block;
-	font-family: $font-stack !important;
-	font-weight: 400 !important;
 	&:hover {
 		cursor: pointer;
 	}
@@ -2263,12 +2261,16 @@ li.selected > a .favicon-wrap {
 		padding-bottom: 5px;
 		margin-bottom: 10px;
 		text-transform: uppercase;
+		font-family: $font-stack !important;
+		font-weight: 400 !important;
 	}
 	.next-entry-feed {
 		display: block;
 		font-size: 16px;
 		color: #999999;
 		margin-bottom: 5px;
+		font-family: $font-stack !important;
+		font-weight: 400 !important;
 	}
 	.next-entry-title {
 		display: block;
