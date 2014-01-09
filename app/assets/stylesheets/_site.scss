@@ -1526,6 +1526,30 @@ Structure
 		padding: 5px 25px 5px 5px;
 		font-size: 14px;
 	}
+	&:before {
+		position: absolute;
+		top: -1px;
+		left: 12px;
+		border-right: 6px solid rgba(0, 0, 0, 0);
+		border-top: 6px solid #bababa;
+		border-left: 6px solid rgba(0, 0, 0, 0);
+		border-bottom-color: rgba(0, 0, 0, 1);
+		content: '';
+		display: none;
+	}
+	&:after {
+		position: absolute;
+		top: -1px;
+		left: 13px;
+		border-right: 5px solid rgba(0, 0, 0, 0);
+		border-top: 5px solid $list-background;
+		border-left: 5px solid rgba(0, 0, 0, 0);
+		content: '';
+		display: none;
+	}
+	&.open:after, &.open:before {
+		display: inline-block;
+	}
 }
 
 .feeds {

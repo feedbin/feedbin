@@ -720,9 +720,11 @@ $.extend feedbin,
         feeds = $(".feeds")
         if feeds.hasClass('show-subscribe')
           feeds.removeClass('show-subscribe')
+          $('.subscribe-wrap').removeClass('open')
         else
           $('.subscribe-wrap input').val('')
           $('.subscribe-wrap input').focus()
+          $('.subscribe-wrap').addClass('open')
           feeds.addClass('show-subscribe')
         return
 
