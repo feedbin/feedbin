@@ -2082,6 +2082,9 @@ li.selected > a .favicon-wrap {
 	@media (max-width: 768px) {
 		.favicon-wrap, .entry-feed-title {
 			display: none;
+			.full-screen & {
+				display: block;
+			}
 		}
 	}
 }
