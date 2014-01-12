@@ -1203,19 +1203,24 @@ Structure
 	}
 }
 
-.bar .menu {
+.menu {
 	position: absolute;
 	top: 0;
 	right: 0;
 	margin: 0;
 	padding: 0;
 	z-index: 1;
-	.menu-button {
+	-webkit-appearance: none;
+	border: none;
+	background: none;
+	&:before {
 		background: image-url("icon-menu.svg") center center no-repeat;
 		width: 43px;
 		height: 43px;
 		margin-left: auto;
 		overflow: auto;
+		content: "";
+		display: block;
 	}
 	.settings-nav {
 		background-color: #f2f3f4;
@@ -1233,7 +1238,7 @@ Structure
 			display: none;
 		}
 	}
-	&:hover .settings-nav {
+	&.open .settings-nav {
 		display: block;
 	}
 	@media (min-width: 528px) {

@@ -825,6 +825,11 @@ $.extend feedbin,
           next.find('a').click()
         return
 
+    menu: ->
+      $(document).on 'click', '[data-behavior~=show_menu]', ->
+        $(@).toggleClass('open')
+        return
+
 jQuery ->
   $.each feedbin.init, (i, item) ->
     item()
