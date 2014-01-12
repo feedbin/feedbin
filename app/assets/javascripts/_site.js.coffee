@@ -255,6 +255,18 @@ $.extend feedbin,
       if feedbin.isFullScreen()
         $('.next-entry-preview').removeClass('hide')
 
+  showSubscribe: ->
+    $('.subscribe-wrap input').val('')
+    $('.subscribe-wrap input').focus()
+    $('.feeds').addClass('show-subscribe')
+    $('.subscribe-wrap').addClass('open')
+
+  hideSubscribe: ->
+    console.log 'hide'
+    $('.feeds').removeClass('show-subscribe')
+    $('.subscribe-wrap').removeClass('open')
+
+
   hideQueue: []
 
   feedCandidates: []
@@ -710,7 +722,7 @@ $.extend feedbin,
         $(@).find('input').removeClass('processing')
         if feedbin.closeSubcription
           setTimeout ( ->
-            $('.feeds').removeClass('show-subscribe')
+            feedbin.hideSubscribe()
           ), 600
           feedbin.closeSubcription = false
         return
@@ -719,18 +731,14 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=show_subscribe]', (event) ->
         feeds = $(".feeds")
         if feeds.hasClass('show-subscribe')
-          feeds.removeClass('show-subscribe')
-          $('.subscribe-wrap').removeClass('open')
+          feedbin.hideSubscribe()
         else
-          $('.subscribe-wrap input').val('')
-          $('.subscribe-wrap input').focus()
-          $('.subscribe-wrap').addClass('open')
-          feeds.addClass('show-subscribe')
+          feedbin.showSubscribe()
         return
 
       $(document).on 'click', (event) ->
         unless $(event.target).is('[data-behavior~=show_subscribe]') || $(event.target).is('.subscribe-wrap') || $(event.target).parents('.subscribe-wrap').length > 0
-          $('.feeds').removeClass('show-subscribe')
+          feedbin.hideSubscribe()
 
       subscription = feedbin.queryString('subscribe')
       if subscription?
@@ -758,6 +766,7 @@ $.extend feedbin,
         $('#saved_search_query').val(query)
 
       $(document).on 'click', '[data-behavior~=save_search_link]', ->
+        $(@).attr('disabled', 'disabled')
         savedSearchWrap = $('.saved-search-wrap')
         if savedSearchWrap.hasClass('show')
           savedSearchWrap.removeClass('show')

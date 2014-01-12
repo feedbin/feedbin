@@ -224,7 +224,7 @@ class feedbin.Keyboard
 
     # Unfocus field,
     Mousetrap.bindGlobal 'escape', (event, combo) =>
-      $('.feeds').removeClass('show-subscribe')
+      feedbin.hideSubscribe()
       if feedbin.modalShowing == true
         $('.modal').modal('hide')
         event.preventDefault()
