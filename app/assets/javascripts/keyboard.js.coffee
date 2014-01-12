@@ -34,6 +34,10 @@ class feedbin.Keyboard
         @waitingForEntries = false
       return
 
+    $(document).on 'click', '.entry-content', =>
+      @selectColumn('entry-content')
+      return
+
   navigateShareMenu: (combo) ->
     # If share menu is showing intercept up down
     dropdown = $('[data-behavior~=toggle_share_menu]').parents('.dropdown-wrap')
