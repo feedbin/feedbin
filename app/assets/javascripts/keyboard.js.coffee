@@ -143,11 +143,13 @@ class feedbin.Keyboard
 
     # Go to all
     Mousetrap.bind 'g a', (event, combo) =>
+      $('body').removeClass('full-screen')
       $('[data-behavior~=all_unread] [data-behavior~=open_item]').click()
       event.preventDefault()
 
     # Go to starred
     Mousetrap.bind 'g s', (event, combo) =>
+      $('body').removeClass('full-screen')
       $('[data-behavior~=starred] [data-behavior~=open_item]').click()
       event.preventDefault()
 
@@ -163,11 +165,13 @@ class feedbin.Keyboard
 
     # Add subscription
     Mousetrap.bind 'a', (event, combo) =>
+      $('body').removeClass('full-screen')
       $('[data-behavior~=show_subscribe]').click()
       event.preventDefault()
 
     # Focus search
     Mousetrap.bind '/', (event, combo) =>
+      $('body').removeClass('full-screen')
       $('[name="query"]').focus()
       event.preventDefault()
 
