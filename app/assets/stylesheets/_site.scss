@@ -2070,7 +2070,6 @@ li.selected > a .favicon-wrap {
 					font-style: normal;
 					content: "↑";
 					padding-right: 4px;
-					line-height: 0;
 				}
 			}
 			.mark-below-read {
@@ -2617,7 +2616,7 @@ li.selected > a .favicon-wrap {
 
 	blockquote {
 		padding: 0 0 0 15px;
-		border-left: 5px solid #CCC;
+		border-left: 2px solid #CCC;
 	}
 
 	blockquote,
