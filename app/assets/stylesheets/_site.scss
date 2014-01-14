@@ -1087,6 +1087,9 @@ Structure
 			&:-ms-input-placeholder {
  			   color: #CCC;
 			}
+			@media (max-width: 395px) {
+				width: 230px;
+			}
 		}
 	}
 	.app & {
