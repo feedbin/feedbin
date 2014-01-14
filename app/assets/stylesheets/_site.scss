@@ -1064,15 +1064,28 @@ Structure
 		margin: 0;
 		input[type="search"] {
 			height: 27px;
-			width: 242px;
+			width: 300px;
 			margin-bottom: 0;
 			padding: 3px 5px 3px 25px;
 			font-size: 14px;
-			background: image-url("favicon-search.svg") 5px 5px no-repeat;
+			background: image-url("favicon-search-light.svg") 5px 6px no-repeat;
 			background-size: 14px 14px, 16px 16px;
+			border-radius: 13px;
 			&.processing {
-				background-image: image-url("favicon-search.svg"), image-url("favicon-progress.gif");
+				background-image: image-url("favicon-search-light.svg"), image-url("favicon-progress.gif");
 				background-position: 5px 6px, 97% 5px;
+			}
+			&::-webkit-input-placeholder {
+			   color: #CCC;
+			}
+			&:-moz-placeholder {
+ 			   color: #CCC;
+			}
+			&::-moz-placeholder {
+ 			   color: #CCC;
+			}
+			&:-ms-input-placeholder {
+ 			   color: #CCC;
 			}
 		}
 	}
@@ -1493,7 +1506,7 @@ Structure
 	left: 0;
 	right: 0;
 	font-size: 10px;
-	background-color: #E6E7E8;
+	background-color: #F2F3F4;
 	table {
 		margin-top: 8px;
 		width: 100%;
@@ -1833,17 +1846,16 @@ li.selected > a .favicon-wrap {
 			background-color: #e6e7e8;
 			.favicon-wrap {
 				top: 23px;
-				left: 6px;
+				left: 5px;
 			}
 			a {
 				text-decoration: none;
 			}
 			.wrap {
-				border-bottom: 1px solid $list-background;
 				position: relative;
 				background-color: #FFF;
 				display: block;
-				padding: 10px 10px 8px 31px;
+				padding: 0;
 				color: #000;
 				left: 0;
 				transition:left .2s ease;
@@ -1851,7 +1863,12 @@ li.selected > a .favicon-wrap {
 					text-decoration: none;
 				}
 			}
-			.icon-gear {
+			.entries-inner-wrap {
+				padding: 10px 10px 8px 0;
+				margin-left: 30px;
+				border-bottom: 1px solid $list-background;
+			}
+			.icon-entry-actions {
 				cursor: pointer;
 				position: absolute;
 				top: 11px;
@@ -1968,6 +1985,9 @@ li.selected > a .favicon-wrap {
 					margin-top: -1px;
 					background: #666666;
 				}
+				.entries-inner-wrap {
+					border-bottom-color: transparent;
+				}
 				.icon-star {
 					&:before {
 						background-color: rgba(255,255,255,.4);
@@ -1996,7 +2016,7 @@ li.selected > a .favicon-wrap {
 						background: $selected;
 					}
 				}
-				.icon-gear {
+				.icon-entry-actions {
 					display: block;
 				}
 				.time {
@@ -2009,7 +2029,7 @@ li.selected > a .favicon-wrap {
 				}
 			}
 			&:hover {
-				.touch & .icon-gear {
+				.touch & .icon-entry-actions {
 					display: none;
 				}
 			}
@@ -2050,6 +2070,7 @@ li.selected > a .favicon-wrap {
 					font-style: normal;
 					content: "↑";
 					padding-right: 4px;
+					line-height: 0;
 				}
 			}
 			.mark-below-read {
@@ -4327,7 +4348,7 @@ Mobile
 			top: 7px;
 		}
 	}
-	.entries ul li .icon-gear {
+	.entries ul li .icon-entry-actions {
 		display: none !important;
 	}
 	.entries ul li:hover.starred .icon-star {
