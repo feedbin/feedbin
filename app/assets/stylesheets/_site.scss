@@ -2239,9 +2239,6 @@ li.selected > a .favicon-wrap {
 	margin: 0 auto;
 	max-width: 660px;
 	min-height: 100%;
-	.has-audio & {
-		padding-bottom: 62px;
-	}
 }
 
 .next-entry-preview {
@@ -2258,9 +2255,6 @@ li.selected > a .favicon-wrap {
 	margin: 0 auto;
 	max-width: 660px;
 	display: block;
-	.has-audio & {
-		padding-bottom: 82px;
-	}
 	.next-entry-link {
 		display: block;
 		font-size: 12px;
@@ -2609,9 +2603,6 @@ li.selected > a .favicon-wrap {
 
 	.media-container {
 		margin: 0 0 1.1em 0;
-		.has-audio & {
-			display: none;
-		}
 	}
 
 	.download-link {
