@@ -1855,12 +1855,31 @@ li.selected > a .favicon-wrap {
 				cursor: pointer;
 				position: absolute;
 				top: 11px;
-				right: 11px;
+				right: 9px;
 				height: 12px;
-				width: 12px;
-				background: image-url("icon-gear.svg") no-repeat;
-				background-size: 12px 12px;
+				width: 10px;
 				display: none;
+				border-top: 2px solid rgba(0,0,0,.3);
+				&:after {
+					height: 2px;
+					background-color: rgba(0,0,0,.3);
+					content: "";
+					position: absolute;
+					left: 0;
+					top: 1px;
+					display: block;
+					width: 10px;
+				}
+				&:before {
+					height: 2px;
+					background-color: rgba(0,0,0,.3);
+					content: "";
+					position: absolute;
+					left: 0;
+					top: 4px;
+					display: block;
+					width: 10px;
+				}
 			}
 			.time {
 				font-size: 12px;
