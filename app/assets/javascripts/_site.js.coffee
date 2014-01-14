@@ -813,20 +813,6 @@ $.extend feedbin,
         event.preventDefault()
         return
 
-    audioPlayer: ->
-      $(document).on 'click', '[data-behavior~=play]', (event) ->
-        if feedbin.player.media.paused
-          feedbin.player.play()
-          $(@).addClass('playing')
-        else
-          feedbin.player.pause()
-          $(@).removeClass('playing')
-        $(feedbin.player.media).on 'timeupdate', (event) ->
-          if event.target.currentTime && event.target.duration
-            progress = Math.ceil((event.target.currentTime / event.target.duration) * 100)
-            $('.audio-player .progress').css
-              width: "#{progress}%"
-
     nextEntry: ->
       $(document).on 'click', '.next-entry-preview', (event) ->
         next = feedbin.nextEntry()
