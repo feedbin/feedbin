@@ -36,6 +36,20 @@ CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA public;
 COMMENT ON EXTENSION hstore IS 'data type for storing sets of (key, value) pairs';
 
 
+--
+-- Name: pg_stat_statements; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_stat_statements IS 'track execution statistics of all SQL statements executed';
+
+
 SET search_path = public, pg_catalog;
 
 SET default_tablespace = '';
@@ -1047,6 +1061,13 @@ CREATE INDEX index_unread_entries_on_user_id ON unread_entries USING btree (user
 
 
 --
+-- Name: index_unread_entries_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_unread_entries_on_user_id_and_created_at ON unread_entries USING btree (user_id, created_at);
+
+
+--
 -- Name: index_unread_entries_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1307,3 +1328,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131205095630');
 INSERT INTO schema_migrations (version) VALUES ('20131228183918');
 
 INSERT INTO schema_migrations (version) VALUES ('20131231084130');
+
+INSERT INTO schema_migrations (version) VALUES ('20140116101303');
