@@ -265,7 +265,6 @@ $.extend feedbin,
     $('.subscribe-wrap').addClass('open')
 
   hideSubscribe: ->
-    console.log 'hide'
     $('.feeds').removeClass('show-subscribe')
     $('.subscribe-wrap').removeClass('open')
 
