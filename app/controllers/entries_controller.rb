@@ -149,8 +149,9 @@ class EntriesController < ApplicationController
 
     if params[:date].present?
       unread_entries = unread_entries.where('created_at <= :last_unread_date', {last_unread_date: params[:date]})
-      unread_entries.delete_all
     end
+
+    unread_entries.delete_all
 
     if params[:ids].present?
       ids = params[:ids].split(',').map {|i| i.to_i }
