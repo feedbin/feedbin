@@ -1,6 +1,14 @@
+January 2014
+------------
+
+- 2013-01-06 Next entry preview in full screen
+- 2013-01-02 Full screen mode
+
 December 2013
 -------------
 
+- 2013-12-22 Bigfoot.js integration for more usable footnotes
+- 2013-12-17 View changes in updated articles
 - 2013-12-02 Support for updated articles
 - 2013-12-01 PubSubHubbub support (thanks to @julien51)
 
