@@ -71,4 +71,8 @@ module ApplicationHelper
     Feedbin::Application.config.force_ssl ? "https:" : "http:"
   end
 
+  def last_unread_date
+    current_user.try(:unread_entries).try(:order, 'created_at DESC').try(:first).try(:created_at).try(:iso8601, 6)
+  end
+
 end

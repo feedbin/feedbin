@@ -201,11 +201,14 @@ $.extend feedbin,
       height: height
 
   disableMarkRead: () ->
-    feedbin.markReadData = null
+    feedbin.markReadData = {}
     $('[data-behavior~=mark_all_as_read]').attr('disabled', 'disabled')
 
   markRead: () ->
     $('.entries li').addClass('read')
+    feedbin.markReadData.ids = $('.entries li').map(() ->
+      $(@).data('entry-id')
+    ).get().join()
     $.post feedbin.data.markAsReadPath, feedbin.markReadData
 
   showForm: (selectOption) ->
@@ -277,7 +280,7 @@ $.extend feedbin,
 
   feedXhr: null
 
-  markReadData: null
+  markReadData: {}
 
   closeSubcription: false
 
