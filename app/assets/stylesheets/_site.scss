@@ -2671,6 +2671,14 @@ li.selected > a .favicon-wrap {
 		font-weight: 400 !important;
 		background: image-url("icon-clock.svg") 0 16px no-repeat;
 		margin-top: 15px;
+		.view-latest-link {
+			color: $selected;
+			&:hover {
+				text-decoration: underline;
+				cursor: pointer;
+				color: #2877c6;
+			}
+		}
 	}
 
 }

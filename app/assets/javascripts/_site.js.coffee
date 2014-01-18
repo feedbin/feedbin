@@ -827,6 +827,11 @@ $.extend feedbin,
         $(@).toggleClass('open')
         return
 
+    viewLatest: ->
+      $(document).on 'click', '.view-latest-link', ->
+        $('.entries .selected a').click()
+        return
+
 jQuery ->
   $.each feedbin.init, (i, item) ->
     item()
