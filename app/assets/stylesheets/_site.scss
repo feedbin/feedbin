@@ -650,6 +650,9 @@ body {
 	font-family: $font-stack;
 	font-size: 14px;
 	background-color: #FFF;
+	@include respond-to(hidpi) {
+		-webkit-font-smoothing: antialiased;
+	}
 }
 
 a {
