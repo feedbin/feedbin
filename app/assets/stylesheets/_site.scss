@@ -2687,6 +2687,44 @@ li.selected > a .favicon-wrap {
 		}
 	}
 
+	.original-content-info {
+		background-color: $list-background;
+		position: relative;
+		margin-bottom: 1.1em;
+		padding: 10px 53px 10px 36px;
+		line-height: 1;
+		&:after {
+			position: absolute;
+			display: block;
+			content: "";
+			background: image-url("icon-readability.svg") 10px 50% no-repeat;
+			background-size: 21px 14px;
+			width: 43px;
+			right: 0px;
+			top: 0;
+			bottom: 0;
+		}
+		.original-title,
+		.original-title a {
+			font-size: 14px;
+			font-weight: bold;
+			color: #666666;
+			margin-bottom: .55em;
+			&:hover {
+				color: #666;
+			}
+		}
+		.original-meta {
+			font-size: 12px;
+			color: #999;
+		}
+		.favicon-wrap {
+			top: 8px;
+			left: 8px;
+			background-color: #FFF;
+		}
+	}
+
 }
 
 .inline-diff {

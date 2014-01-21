@@ -6,11 +6,13 @@ class BasePresenter
     @template = template
   end
 
-  def favicon(host)
-    begin
-      host = URI::parse(host).host
-    rescue Exception => e
-      host = nil
+  def favicon(host, parse = true)
+    if parse
+      begin
+        host = URI::parse(host).host
+      rescue Exception => e
+        host = nil
+      end
     end
     @template.content_tag :span, '', class: "favicon-wrap" do
       @template.content_tag(:span, '', class: "favicon-default") +

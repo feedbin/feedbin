@@ -44,6 +44,15 @@ class EntryPresenter < BasePresenter
     end
   end
 
+  def parsed_date(date, format)
+    begin
+      date = Time.parse(date)
+      date.to_s(format)
+    rescue Exception
+      nil
+    end
+  end
+
   def abbr_time
     seconds_since_published = Time.now.utc - entry.published
     if seconds_since_published > 86400
@@ -129,6 +138,16 @@ class EntryPresenter < BasePresenter
       entry.data['itunes_duration']
     else
       ''
+    end
+  end
+
+  def feed_domain_matches?(comparison)
+    begin
+      uri = URI.parse(entry.feed.site_url)
+      puts uri.host
+      uri.host == comparison || uri.host == comparison.sub('www.', '')
+    rescue Exception
+      false
     end
   end
 

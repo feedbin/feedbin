@@ -334,10 +334,10 @@ class EntriesController < ApplicationController
     begin
       if @content_view
         url = @entry.fully_qualified_url
-        @content = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}") do
-          result = ReadabilityParser.parse(url)
-          result.content
+        @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v2") do
+          ReadabilityParser.parse(url)
         end
+        @content = @content_info.content
       else
         @content = @entry.content
       end
