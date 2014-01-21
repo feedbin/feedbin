@@ -2634,12 +2634,22 @@ li.selected > a .favicon-wrap {
 		background-color: #000;
 	}
 
-	iframe[src*='w.soundcloud.com'] {
-		background-color: transparent;
+	figcaption, caption {
+		font-size: 80%;
+		color: #999;
+		font-style: italic;
+		line-height: 1.3;
 	}
 
-	a[title*='Permanent'] {
-		text-decoration: none;
+	video, audio {
+		display: block;
+		width: 100%;
+		background-color: #000;
+		max-width: 100%;
+	}
+
+	iframe[src*='w.soundcloud.com'] {
+		background-color: transparent;
 	}
 
 	.media-container {
@@ -2649,13 +2659,6 @@ li.selected > a .favicon-wrap {
 	.download-link {
 		font-size: 12px;
 		font-family: $font-stack;
-	}
-
-	video, audio {
-		display: block;
-		width: 100%;
-		background-color: #000;
-		max-width: 100%;
 	}
 
 	.table-wrap {
