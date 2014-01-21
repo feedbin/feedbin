@@ -2362,11 +2362,11 @@ li.selected > a .favicon-wrap {
 	}
 	.button-toggle-read {
 		.circle-filled, .circle-empty {
-			border: 1px solid #999;
+			border: 2px solid #999;
 			background-color: #999;
-			height: 15px;
-			width: 15px;
-			border-radius: 15px;
+			height: 16px;
+			width: 16px;
+			border-radius: 16px;
 			position: absolute;
 			top: 11px;
 			left: 12px;
@@ -2385,7 +2385,7 @@ li.selected > a .favicon-wrap {
 	.button-toggle-content {
 		svg {
 			position: absolute;
-			top: 10px;
+			top: 11px;
 			left: 9px;
 		}
 	}
@@ -2405,7 +2405,7 @@ li.selected > a .favicon-wrap {
 		color: #333;
 		svg {
 			position: absolute;
-			top: 10px;
+			top: 11px;
 			left: 9px;
 		}
 	}
