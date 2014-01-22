@@ -232,8 +232,6 @@ $.extend feedbin,
 
   toggleFullScreen: ->
     $('body').toggleClass('full-screen')
-    if feedbin.nextEntry()
-      $('.next-entry-preview').toggleClass('hide')
 
   isFullScreen: ->
     $('body').hasClass('full-screen')
@@ -255,8 +253,7 @@ $.extend feedbin,
       feed = next.find('.feed-title').text()
       $('.next-entry-title').text(title)
       $('.next-entry-feed').text(feed)
-      if feedbin.isFullScreen()
-        $('.next-entry-preview').removeClass('hide')
+      $('.next-entry-preview').removeClass('no-content')
 
   showSubscribe: ->
     $('.subscribe-wrap input').val('')

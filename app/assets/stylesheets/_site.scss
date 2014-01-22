@@ -2288,9 +2288,30 @@ li.selected > a .favicon-wrap {
 
 .next-entry-preview {
 	background-color: $list-background;
-	display: block;
+	display: none;
 	&:hover {
 		cursor: pointer;
+	}
+	.full-screen & {
+		display: block;
+	}
+	@media (max-width: 420px) {
+		display: block;
+		.next-entry-preview-inner {
+			padding: 15px;
+			.next-entry-title {
+				font-size: 18px;
+			}
+			.next-entry-feed {
+				font-size: 14px;
+			}
+		}
+		&.no-content {
+			display: none;
+		}
+	}
+	.full-screen &.no-content {
+		display: none;
 	}
 }
 
@@ -4395,7 +4416,7 @@ Mobile
 		display: none !important;
 	}
 	.entry-inner {
-		padding: 20px;
+		padding: 15px;
 	}
 	.feeds {
 		.feed-link {
