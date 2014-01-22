@@ -2693,6 +2693,11 @@ li.selected > a .favicon-wrap {
 		margin-bottom: 1.1em;
 		padding: 10px 53px 10px 36px;
 		line-height: 1;
+		font-family: $font-stack !important;
+		font-weight: 400 !important;
+		strong {
+			font-weight: 700 !important;
+		}
 		&:after {
 			position: absolute;
 			display: block;
@@ -2717,8 +2722,6 @@ li.selected > a .favicon-wrap {
 		.original-meta {
 			font-size: 12px;
 			color: #999;
-			font-family: $font-stack;
-			font-weight: 400;
 		}
 		.favicon-wrap {
 			top: 8px;
