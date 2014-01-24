@@ -265,6 +265,8 @@ $.extend feedbin,
     $('.feeds').removeClass('show-subscribe')
     $('.subscribe-wrap').removeClass('open')
 
+  scrollTo: (item, container) ->
+    item.offset().top - container.offset().top + container.scrollTop()
 
   hideQueue: []
 

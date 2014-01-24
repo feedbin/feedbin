@@ -4,6 +4,9 @@
   feedbin.updateFeeds('<%= j render partial: 'feeds/feeds', locals: {collections: @collections, saved_searches: @saved_searches, tags: @tags, feeds: @feeds} %>');
   feedbin.showNotification('You have subscribed.');
   $("[data-feed-id=<%= @click_feed %>] a").click();
+  $('.feeds').animate({
+    scrollTop: feedbin.scrollTo($("[data-feed-id=<%= @click_feed %>]"), $('.feeds'))
+  }, 200);
   feedbin.updateTitle('<%= j @user.title_with_count %>')
 <% else %>
   feedbin.showNotification('No feed found.');
