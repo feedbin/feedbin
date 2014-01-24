@@ -123,6 +123,8 @@ GEM
     curb (0.8.5)
     dalli (2.6.4)
     dotenv (0.9.0)
+    dotenv-rails (0.9.0)
+      dotenv (= 0.9.0)
     erubis (2.7.0)
     excon (0.31.0)
     execjs (2.0.2)
@@ -327,6 +329,7 @@ DEPENDENCIES
   cocoon
   coffee-rails (~> 4.0.0)
   dalli
+  dotenv-rails
   feedzirra!
   fog
   foreman
