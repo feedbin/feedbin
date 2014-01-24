@@ -3459,6 +3459,13 @@ table.small td {
 	.action-keywords {
 		padding-top: 7px;
 	}
+	@media (max-width: 935px) {
+		.action-label {
+			text-align: left;
+			float: none;
+		}
+	}
+
 }
 
 [data-behavior="action_send_push_notification"] {
