@@ -59,7 +59,13 @@ class feedbin.Keyboard
 
   navigateFeedbin: (combo) ->
     @setEnvironment()
-    if 'down' == combo || 'j' == combo
+    if 'pageup' == combo
+      if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
+        @scrollContent(600, 'down')
+    else if 'pagedown' == combo
+      if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
+        @scrollContent(600, 'up')
+    else if 'down' == combo || 'j' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
         @scrollContent(30, 'down')
       else
@@ -93,7 +99,11 @@ class feedbin.Keyboard
   navigateEntryContent: (combo) ->
     @selectColumn('entries')
     @setEnvironment()
-    if 'down' == combo
+    if 'pagedown' == combo
+      @scrollContent(30, 'down')
+    else if 'pageup' == combo
+      @scrollContent(600, 'up')
+    else if 'down' == combo
       @scrollContent(30, 'down')
     else if 'up' == combo
       @scrollContent(30, 'up')
@@ -105,7 +115,7 @@ class feedbin.Keyboard
       @selectItem()
 
   bindKeys: ->
-    Mousetrap.bind ['up', 'down', 'left', 'right', 'j', 'k', 'h', 'l'], (event, combo) =>
+    Mousetrap.bind ['pageup', 'pagedown', 'up', 'down', 'left', 'right', 'j', 'k', 'h', 'l'], (event, combo) =>
       if feedbin.shareOpen()
         @navigateShareMenu(combo)
       else if feedbin.isFullScreen()
