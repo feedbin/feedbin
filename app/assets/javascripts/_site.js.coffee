@@ -586,6 +586,10 @@ $.extend feedbin,
           feedbin.readability(@)
         return
 
+    timeago: ->
+      $("time.timeago").timeago()
+      return
+
     updateReadability: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_content_view]', (event, xhr) ->
         feedId = $(event.currentTarget).data('feed-id')

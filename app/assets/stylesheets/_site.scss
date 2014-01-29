@@ -1025,7 +1025,7 @@ table th[class^="col-"] {
 Structure
 ------------------------------------------------------------------------------*/
 .logo {
-	margin: 7px 0 0 8px;
+	margin: 7px 0 0 20px;
 	svg {
 		width: 32px;
 		height: 27px;
@@ -1253,8 +1253,11 @@ Structure
 			padding-top: 4px;
 			padding-bottom: 4px;
 		}
-		.sharing-link, .home-link, .blog-link, .api-link, .twitter-link {
+		.mobile-hide {
 			display: none;
+		}
+		.desktop-hide {
+			display: block;
 		}
 	}
 	&.open .settings-nav {
@@ -3038,10 +3041,11 @@ Settings
 }
 
 .nav {
-	margin-top: 58px;
+	margin: 53px 0 0 0;
+	padding: 0;
 	list-style: none;
 	a {
-		text-align: right;
+		text-align: left;
 		padding: 4px 0;
 		display: block;
 		font-size: 18px;
@@ -3055,10 +3059,10 @@ Settings
 		}
 	}
 }
+
 .nav-small {
-	max-width: 140px;
 	padding-top: 10px;
-	padding-left: 0;
+	margin-top: 10px;
 	border-top: 1px solid #cccccc;
 	margin-left: auto;
 	a {
@@ -3072,40 +3076,31 @@ Settings
 	background-color: #f2f3f4;
 	color: #333;
 	.content {
-		display: table;
-		border-collapse: collapse;
 		width: 100%;
 		border-top: 1px solid #CCC;
+		display: table;
 		.settings-nav {
-			list-style-type: none;
+			width: 250px;
+			padding: 0 20px;
 			display: table-cell;
-			width: 40%;
-			padding-top: 20px;
-			> * {
-				margin-right: 20px;
-				margin-left: auto;
-			}
-			@media (max-width: 527px) {
+			border-right: 1px solid #CCC;
+			vertical-align: top;
+			.desktop-hide {
 				display: none;
 			}
-			.logout-link {
+			@media (max-width: 528px) {
 				display: none;
 			}
 		}
 		.settings-content {
-			border-top: 1px solid #CCC;
-			line-height: 1.4;
-			display: table-cell;
-			background-color: white;
 			vertical-align: top;
-			padding-top: 4px;
-			padding-left: 19px;
-			padding-right: 19px;
-			> * {
-				max-width: 580px;
-			}
-			@media (min-width: 528px) {
-				border-left: 1px solid #CCC;
+			margin-left: 250px;
+			padding: 25px 0 0 0;
+			background-color: #FFF;
+			display: table-cell;
+			.settings-content-inner {
+				max-width: 620px;
+				padding: 0 20px 0 20px;
 			}
 		}
 	}
@@ -3514,9 +3509,16 @@ table.small td {
 }
 
 .feed-form {
-	word-break: break-all;
-	td {
+	margin: -1px 0 0 0;
+	table-layout: fixed;
+	td, th {
 		line-height: 1.2;
+		&:first-child {
+			padding-left: 20px
+		}
+		&:last-child {
+			padding-right: 20px
+		}
 	}
 	.highlight {
 		color: #6AB042;
@@ -3527,6 +3529,40 @@ table.small td {
 	a {
 		color: #999;
 	}
+	.checkbox-wrap {
+		width: 15px;
+	}
+	.favicon-wrap {
+		margin-top: 8px;
+		position: static;
+	}
+	.favicon-container {
+		width: 16px;
+	}
+	.last-updated-wrap,
+	.feed-url-wrap {
+		font-size: 14px;
+		color: #999999;
+		padding-top: 15px;
+	}
+	.feed-url-wrap {
+		overflow: hidden;
+	}
+	.feed-url {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		display: block;
+	}
+	.last-updated-wrap {
+		text-align: right;
+	}
+}
+
+.feed-controls {
+	border-top: 1px solid #DDD;
+	border-bottom: 1px solid #DDD;
+	padding: 10px 20px 1px 20px;
 }
 
 .push-feed-settings {
@@ -4205,7 +4241,7 @@ input:focus:invalid, textarea:focus:invalid, select:focus:invalid {
 }
 
 .collection-edit-controls {
-	padding: 8px 0;
+	padding: 8px 20px;
 	border-top: 1px solid #CCC;
 }
 

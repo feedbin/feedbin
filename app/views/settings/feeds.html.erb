@@ -1,19 +1,40 @@
-<h2>Feeds</h2>
+<div class="settings-content-inner">
+  <h2>Feeds</h2>
+</div>
 
-<p class="half-margin">Select: <a href="#" data-behavior="check_all">All</a> / <a href="#" data-behavior="check_none">None</a></p>
+<div class="feed-controls clearfix">
+  <div class="half text-right float-right">
+    <p class="half-margin">Sort</p>
+  </div>
+  <div class="half">
+    <p class="half-margin">Select: <a href="#" data-behavior="check_all">All</a> / <a href="#" data-behavior="check_none">None</a></p>
+  </div>
+</div>
+
 <%= form_tag update_multiple_subscriptions_path, method: :patch do %>
   <div class="collection-edit-wrapper">
     <table class="table form-table feed-form">
       <% @subscriptions.each do |subscription| %>
-        <%= fields_for "subscriptions[]", subscription do |f| %>
-          <tr>
-            <td width="15"><%= check_box_tag "subscription_ids[]", subscription.id %></td>
-            <td>
-              <%= f.text_field :title %>
-              <br /><small title="Original title"><%= link_to subscription.site_url, subscription.site_url, target: '_blank' %></small>
-              <br /><small class="highlight break-word" title="Feed URL"><%= link_to subscription.feed_url, subscription.feed_url, target: '_blank' %></small>
-            </td>
-          </tr>
+        <% present subscription do |subscription_presenter| %>
+          <%= fields_for "subscriptions[]", subscription do |f| %>
+            <tr>
+              <td class="checkbox-wrap">
+                <%= check_box_tag "subscription_ids[]", subscription.id %>
+              </td>
+              <td class="favicon-container">
+                <%= subscription_presenter.favicon(subscription.site_url) %>
+              </td>
+              <td>
+                <%= f.text_field :title %>
+              </td>
+              <td class="feed-url-wrap">
+                <span class="feed-url" title="Feed URL"><%= link_to subscription.feed_url, subscription.feed_url, target: '_blank' %></span>
+              </td>
+              <td class="last-updated-wrap">
+                Last updated: <%= timeago(subscription.last_updated) %>
+              </td>
+            </tr>
+          <% end %>
         <% end %>
       <% end %>
     </table>
@@ -23,7 +44,7 @@
       <%= submit_tag "Save", class: 'button button-primary' %>
     </div>
     <div class="half">
-      <%= submit_tag 'Unsubscribe', class: 'button button-danger button-link', name: 'unsubscribe', style: 'margin-top: 11px;' %>
+      <%= submit_tag 'Unsubscribe', class: 'button button-danger button-link', name: 'unsubscribe', style: 'margin-top: 8px;' %>
     </div>
   </div>
 
