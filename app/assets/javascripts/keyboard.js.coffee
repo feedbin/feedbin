@@ -59,10 +59,10 @@ class feedbin.Keyboard
 
   navigateFeedbin: (combo) ->
     @setEnvironment()
-    if 'pageup' == combo
+    if 'pagedown' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
         @scrollContent(@contentHeight() - 100, 'down')
-    else if 'pagedown' == combo
+    else if 'pageup' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
         @scrollContent(@contentHeight() - 100, 'up')
     else if 'down' == combo || 'j' == combo
