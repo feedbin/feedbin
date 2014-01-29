@@ -61,10 +61,10 @@ class feedbin.Keyboard
     @setEnvironment()
     if 'pageup' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
-        @scrollContent(600, 'down')
+        @scrollContent(@contentHeight() - 100, 'down')
     else if 'pagedown' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
-        @scrollContent(600, 'up')
+        @scrollContent(@contentHeight() - 100, 'up')
     else if 'down' == combo || 'j' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
         @scrollContent(30, 'down')
@@ -100,9 +100,9 @@ class feedbin.Keyboard
     @selectColumn('entries')
     @setEnvironment()
     if 'pagedown' == combo
-      @scrollContent(30, 'down')
+      @scrollContent(@contentHeight() - 100, 'down')
     else if 'pageup' == combo
-      @scrollContent(600, 'up')
+      @scrollContent(@contentHeight() - 100, 'up')
     else if 'down' == combo
       @scrollContent(30, 'down')
     else if 'up' == combo
@@ -420,3 +420,6 @@ class feedbin.Keyboard
 
   entryScrollHeight: ->
     $('.entry-content').prop('scrollHeight') - $('.entry-content').prop('offsetHeight')
+    
+  contentHeight: ->
+    $('.entry-content').prop('clientHeight')
