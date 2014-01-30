@@ -35,7 +35,7 @@ class feedbin.Keyboard
       return
 
     $(document).on 'click', '.entry-content', (event) =>
-      unless $(event.originalEvent.target).is('a')
+      unless $(event.originalEvent.target).is('a') || $(event.originalEvent.target).parents('a').length > 0
         @selectColumn('entry-content')
       return
 
