@@ -34,8 +34,9 @@ class feedbin.Keyboard
         @waitingForEntries = false
       return
 
-    $(document).on 'click', '.entry-content', =>
-      @selectColumn('entry-content')
+    $(document).on 'click', '.entry-content', (event) =>
+      unless $(event.originalEvent.target).is('a')
+        @selectColumn('entry-content')
       return
 
   navigateShareMenu: (combo) ->
@@ -420,6 +421,6 @@ class feedbin.Keyboard
 
   entryScrollHeight: ->
     $('.entry-content').prop('scrollHeight') - $('.entry-content').prop('offsetHeight')
-    
+
   contentHeight: ->
     $('.entry-content').prop('clientHeight')
