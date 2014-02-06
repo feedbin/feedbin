@@ -44,7 +44,7 @@ module Api
             entry
           }
           links_header(page_query, path_helper, params[:feed_id])
-          fresh_when(etag: @entries, last_modified: @entries.maximum(:created_at))
+          fresh_when(etag: @entries)
         end
       end
 
