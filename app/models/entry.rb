@@ -162,13 +162,15 @@ class Entry < ActiveRecord::Base
     end
   end
 
-  def self.entries_with_feed(entry_ids, sort)
+  def self.entries_with_feed(entry_ids, sort = nil)
     entry_ids = entry_ids.map(&:entry_id)
     entries = Entry.where(id: entry_ids).includes(:feed)
-    if sort == 'ASC'
-      entries = entries.order('published ASC')
-    else
-      entries = entries.order('published DESC')
+    if sort
+      if sort == 'ASC'
+        entries = entries.order('published ASC')
+      else
+        entries = entries.order('published DESC')
+      end
     end
     entries
   end

@@ -9,12 +9,4 @@ class StarredEntry < ActiveRecord::Base
     create(user_id: user.id, feed_id: entry.feed_id, entry_id: entry.id, published: entry.published)
   end
 
-  def self.sort_preference(sort)
-    if sort == 'ASC'
-      order("published ASC")
-    else
-      order("published DESC")
-    end
-  end
-
 end

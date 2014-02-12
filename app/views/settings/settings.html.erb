@@ -4,7 +4,7 @@
   <h3>Reading</h3>
   <p>
     <%= label_tag nil do %>
-      Sort entries by <%= f.select :entry_sort, options_for_select([['Newest first', 'DESC'], ['Oldest first', 'ASC']], @user.entry_sort || 'DESC') %>
+      Sort unread entries by <%= f.select :entry_sort, options_for_select([['Newest first', 'DESC'], ['Oldest first', 'ASC']], @user.entry_sort || 'DESC') %>
     <% end %>
   </p>
 

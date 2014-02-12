@@ -108,7 +108,7 @@ class ApplicationController < ActionController::Base
   def feeds_response
     if 'view_all' == session[:view_mode]
       # Get all entries 100 at a time, then get unread info
-      @entries = Entry.where(feed_id: @feed_ids).page(params[:page]).includes(:feed).sort_preference(@user.entry_sort)
+      @entries = Entry.where(feed_id: @feed_ids).page(params[:page]).includes(:feed).sort_preference('DESC')
     else
       # Get unread info, then get entries
       unread_entries = @user.unread_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).sort_preference(@user.entry_sort)
