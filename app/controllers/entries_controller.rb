@@ -51,8 +51,8 @@ class EntriesController < ApplicationController
     @user = current_user
     update_selected_feed!("collection_starred")
 
-    starred_entries = @user.starred_entries.select(:entry_id).page(params[:page]).order('created_at DESC')
-    @entries = Entry.entries_with_feed(starred_entries)
+    starred_entries = @user.starred_entries.select(:entry_id).page(params[:page]).order("published DESC")
+    @entries = Entry.entries_with_feed(starred_entries, "published DESC")
 
     @entries = update_with_state(@entries)
     @page_query = starred_entries
