@@ -65,7 +65,7 @@ class Entry < ActiveRecord::Base
 
     tire.search(search_options) do
       fields ['id']
-      query { string params[:query] } if params[:query].present?
+      query { string params[:query], default_operator: "AND" } if params[:query].present?
       ids = []
 
       if params[:read] == false
