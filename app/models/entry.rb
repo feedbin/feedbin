@@ -221,13 +221,13 @@ class Entry < ActiveRecord::Base
     if entry_url.present? && is_fully_qualified(entry_url)
       entry_url = entry_url
     elsif entry_url.present?
-      entry_url = URI.join(base_url.gsub('&#38;', '&'), entry_url.gsub('&#38;', '&')).to_s
+      entry_url = URI.join(base_url, entry_url).to_s
     else
       entry_url = self.feed.site_url
     end
-    entry_url = entry_url.gsub('&#38;', '&')
     entry_url = Addressable::URI.unescape(entry_url)
-    Addressable::URI.escape(entry_url)
+    entry_url = Addressable::URI.escape(entry_url)
+    entry_url.gsub(Feedbin::Application.config.entities_regex, Feedbin::Application.config.entities_map)
   rescue
     self.feed.site_url
   end
