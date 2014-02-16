@@ -22,4 +22,10 @@ class UserMailer < ActionMailer::Base
     mail to: @user.email, subject: '[Feedbin] Your Trial is About to End'
   end
 
+  def starred_export_download(user_id, download_link)
+    @user = User.find(user_id)
+    @download_link = download_link
+    mail to: @user.email, subject: '[Feedbin] Starred Items Export Complete'
+  end
+
 end
