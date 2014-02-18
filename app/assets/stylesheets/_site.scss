@@ -1833,9 +1833,22 @@ li.selected > a .favicon-wrap {
 	}
 }
 
+.sort-control {
+	background-color: $list-background;
+	font-size: 11px;
+	color: #999;
+	height: 16px;
+	line-height: 14px;
+	padding: 0 8px;
+	.save-search {
+		float: right;
+	}
+
+}
+
 .entries {
 	position: absolute;
-	top: 0;
+	top: 16px;
 	bottom: 0;
 	left: 0;
 	right: 0;
