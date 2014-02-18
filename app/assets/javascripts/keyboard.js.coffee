@@ -34,8 +34,9 @@ class feedbin.Keyboard
         @waitingForEntries = false
       return
 
-    $(document).on 'click', '.entry-content', =>
-      @selectColumn('entry-content')
+    $(document).on 'click', '.entry-content', (event) =>
+      unless $(event.originalEvent.target).is('a') || $(event.originalEvent.target).parents('a').length > 0
+        @selectColumn('entry-content')
       return
 
   navigateShareMenu: (combo) ->
@@ -59,7 +60,13 @@ class feedbin.Keyboard
 
   navigateFeedbin: (combo) ->
     @setEnvironment()
-    if 'down' == combo || 'j' == combo
+    if 'pagedown' == combo
+      if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
+        @scrollContent(@contentHeight() - 100, 'down')
+    else if 'pageup' == combo
+      if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
+        @scrollContent(@contentHeight() - 100, 'up')
+    else if 'down' == combo || 'j' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
         @scrollContent(30, 'down')
       else
@@ -93,7 +100,11 @@ class feedbin.Keyboard
   navigateEntryContent: (combo) ->
     @selectColumn('entries')
     @setEnvironment()
-    if 'down' == combo
+    if 'pagedown' == combo
+      @scrollContent(@contentHeight() - 100, 'down')
+    else if 'pageup' == combo
+      @scrollContent(@contentHeight() - 100, 'up')
+    else if 'down' == combo
       @scrollContent(30, 'down')
     else if 'up' == combo
       @scrollContent(30, 'up')
@@ -105,7 +116,7 @@ class feedbin.Keyboard
       @selectItem()
 
   bindKeys: ->
-    Mousetrap.bind ['up', 'down', 'left', 'right', 'j', 'k', 'h', 'l'], (event, combo) =>
+    Mousetrap.bind ['pageup', 'pagedown', 'up', 'down', 'left', 'right', 'j', 'k', 'h', 'l'], (event, combo) =>
       if feedbin.shareOpen()
         @navigateShareMenu(combo)
       else if feedbin.isFullScreen()
@@ -410,3 +421,6 @@ class feedbin.Keyboard
 
   entryScrollHeight: ->
     $('.entry-content').prop('scrollHeight') - $('.entry-content').prop('offsetHeight')
+
+  contentHeight: ->
+    $('.entry-content').prop('clientHeight')

@@ -22,6 +22,7 @@ Feedbin::Application.routes.draw do
 
   match '/404', to: 'errors#not_found', via: :all
   get '/starred/:starred_token', to: 'starred#index', as: 'starred'
+  post '/starred/export', to: 'starred#export'
 
   get    :signup,         to: 'users#new',           as: 'signup'
   get    :login,          to: 'sessions#new',        as: 'login'

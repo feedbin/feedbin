@@ -1,5 +1,5 @@
 class StarredController < ApplicationController
-  skip_before_action :authorize
+  skip_before_action :authorize, only: :index
 
   def index
     @user = User.find_by_starred_token(params[:starred_token])
@@ -17,5 +17,11 @@ class StarredController < ApplicationController
     else
       render_404
     end
+  end
+
+  def export
+    user = current_user
+    StarredEntriesExport.perform_async(user.id)
+    redirect_to settings_import_export_url, notice: 'Starred export has begun. You will receive an email with the download link shortly.'
   end
 end
