@@ -3,17 +3,34 @@ class EntryPresenter < BasePresenter
   presents :entry
 
   def read_state
-    'read' if entry.read
+    if entry.read
+      'read'
+    else
+      ''
+    end
   end
 
   def starred_state
-    'starred' if entry.starred
+    if entry.starred
+      'starred'
+    else
+      ''
+    end
+  end
+
+  def media_state
+    if has_media?
+      'media'
+    else
+      ''
+    end
   end
 
   def classes
     classes = []
-    classes << read_state if read_state
-    classes << starred_state if starred_state
+    classes << read_state
+    classes << starred_state
+    classes << media_state
     classes.join ' '
   end
 
@@ -149,6 +166,10 @@ class EntryPresenter < BasePresenter
     rescue Exception
       false
     end
+  end
+
+  def has_media?
+    !media_type.nil? || content.include?('<iframe')
   end
 
 end

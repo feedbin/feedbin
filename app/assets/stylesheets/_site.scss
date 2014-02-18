@@ -1912,6 +1912,7 @@ li.selected > a .favicon-wrap {
 				position: absolute;
 				right: 10px;
 				top: 10px;
+				padding-left: 16px;
 			}
 			.title {
 				font-weight: bold;
@@ -1926,10 +1927,13 @@ li.selected > a .favicon-wrap {
 				line-height: 1.3;
 				margin: 0 0 1px 0;
 				color: #999;
-				padding-right: 75px;
+				padding-right: 91px;
 				white-space: nowrap;
 				overflow: hidden;
 				text-overflow: ellipsis;
+			}
+			.icon-play {
+				display: inline-block;
 			}
 			.body {
 				line-height: 1.3;
@@ -1982,6 +1986,11 @@ li.selected > a .favicon-wrap {
 				}
 				.body {
 					color: #CCC;
+				}
+			}
+			&.media {
+				.time {
+					background: image-url("icon-play-small.svg") 0 1px no-repeat;
 				}
 			}
 			&.selected {
