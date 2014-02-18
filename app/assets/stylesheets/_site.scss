@@ -1912,7 +1912,7 @@ li.selected > a .favicon-wrap {
 				position: absolute;
 				right: 10px;
 				top: 10px;
-				padding-left: 16px;
+				padding-left: 14px;
 			}
 			.title {
 				font-weight: bold;
@@ -1990,7 +1990,7 @@ li.selected > a .favicon-wrap {
 			}
 			&.media {
 				.time {
-					background: image-url("icon-play-small.svg") 0 1px no-repeat;
+					background: image-url("icon-play-small.svg") 0 2px no-repeat;
 				}
 			}
 			&.selected {
