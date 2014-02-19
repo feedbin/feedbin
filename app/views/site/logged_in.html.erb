@@ -29,10 +29,19 @@
       <td class="entries-column app-panel" data-behavior="content_column" <%= resizable 'entries' %>>
         <div class="full-height entries-wrap">
           <div class="entries-header" data-behavior="entries-header"></div>
+
           <div class="sort-control">
-            <span class="sort-order">Sort by date</span>
-            <span class="save-search">Save</span>
+            <div class="dropdown-wrap">
+              <span class="sort-order" data-behavior="toggle_share_menu toggle_dropdown">Sort by date</span>
+              <ul>
+                <li><span>Sort by date</a></span>
+                <li><span>Sort by relevance</a></span>
+              </ul>
+            </div>
+
+            <span class="save-search">Save Search</span>
           </div>
+
           <div class="entries">
             <ul data-behavior="entries_target"></ul>
           </div>

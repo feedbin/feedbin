@@ -1838,21 +1838,53 @@ li.selected > a .favicon-wrap {
 }
 
 .sort-control {
-	background-color: $list-background;
+	background-color: #dedede;
 	font-size: 11px;
 	color: #999;
-	height: 16px;
 	line-height: 14px;
-	padding: 0 8px;
+	height: 38px;
+	border-bottom: 1px solid #cccccc;
+	position: relative;
 	.save-search {
+		position: absolute;
+		right: 8px;
+		top: 12px;
 		float: right;
+		font-weight: bold;
+		cursor: pointer;
+		user-select: none;
 	}
-
+	.sort-order {
+		background-color: #f2f3f4;
+		border-radius: 12px;
+		margin: 7px 0 0 8px;
+		color: #666666;
+		padding: 5px 25px 5px 10px;
+		display: inline-block;
+		position: relative;
+		cursor: pointer;
+		user-select: none;
+		&:after {
+			width: 0px;
+			height: 0px;
+			border-style: solid;
+			border-width: 7px 5px 0 5px;
+			border-color: #007bff transparent transparent transparent;
+			content: "";
+			position: absolute;
+			right: 8px;
+			top: 9px;
+		}
+	}
+	.dropdown-wrap ul {
+		top: 35px;
+		left: 2px;
+	}
 }
 
 .entries {
 	position: absolute;
-	top: 16px;
+	top: 38px;
 	bottom: 0;
 	left: 0;
 	right: 0;
