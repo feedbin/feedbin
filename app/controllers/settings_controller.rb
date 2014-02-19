@@ -20,7 +20,7 @@ class SettingsController < ApplicationController
 
   def feeds
     @user = current_user
-    @subscriptions = @user.subscriptions.select('subscriptions.*, feeds.title AS original_title, feeds.updated_at AS last_updated, feeds.feed_url, feeds.site_url').joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}")
+    @subscriptions = @user.subscriptions.select('subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url').joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}")
     @subscriptions = @subscriptions.map {|subscription|
       if subscription.title
         subscription.title = subscription.title
@@ -32,10 +32,6 @@ class SettingsController < ApplicationController
       subscription
     }
     @subscriptions = @subscriptions.sort_by {|subscription| subscription.title.downcase}
-
-    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
-    @authentication_token = CGI::escape(verifier.generate(@user.id))
-    @web_service_url = "#{ENV['PUSH_URL']}/apple_push_notifications"
   end
 
   def billing

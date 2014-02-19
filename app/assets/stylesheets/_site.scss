@@ -800,6 +800,7 @@ input[type="color"],
 	line-height: 20px;
 	color: #555;
 	vertical-align: middle;
+	border-radius: 4px;
 	&:focus {
 		outline: none;
 		border-color: $selected;
@@ -1025,7 +1026,7 @@ table th[class^="col-"] {
 Structure
 ------------------------------------------------------------------------------*/
 .logo {
-	margin: 7px 0 0 20px;
+	margin: 7px 0 0 12px;
 	svg {
 		width: 32px;
 		height: 27px;
@@ -3111,6 +3112,10 @@ Settings
 				max-width: 620px;
 				padding: 0 20px 0 20px;
 			}
+			.settings-content-inner-wide {
+				max-width: 100%;
+				padding: 0 20px 0 20px;
+			}
 		}
 	}
 	.content {
@@ -3518,60 +3523,74 @@ table.small td {
 }
 
 .feed-form {
-	margin: -1px 0 0 0;
-	table-layout: fixed;
-	td, th {
-		line-height: 1.2;
-		&:first-child {
-			padding-left: 20px
-		}
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	li {
+		clear: both;
+		margin-left: 30px;
+		border-bottom: 1px solid #F2F3F4;
+		position: relative;
+		padding: 10px 0;
 		&:last-child {
-			padding-right: 20px
+			border: none;
 		}
-	}
-	.highlight {
-		color: #6AB042;
-	}
-	[class^="button"] {
-		float: none;
-	}
-	a {
-		color: #999;
 	}
 	.checkbox-wrap {
-		width: 15px;
+		position: absolute;
+		left: -30px;
+		top: 15px;
 	}
-	.favicon-wrap {
-		margin-top: 8px;
-		position: static;
+	.textfield-wrap {
+		position: relative;
+		max-width: 400px;
+		input {
+			max-width: 400px;
+			padding-left: 35px;
+			margin: 0;
+		}
 	}
 	.favicon-container {
-		width: 16px;
-	}
-	.last-updated-wrap,
-	.feed-url-wrap {
-		font-size: 14px;
-		color: #999999;
-		padding-top: 15px;
-	}
-	.feed-url-wrap {
-		overflow: hidden;
-	}
-	.feed-url {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
 		display: block;
+		position: absolute;
+		left: 0;
+		top: 0;
+		height: 32px;
+		border-right: 1px solid #CCC;
+		width: 32px;
+		.favicon-wrap {
+			top: 6px;
+			left: 6px;
+		}
+	}
+	.feed-url-container {
+		display: block;
+		position: absolute;
+		right: 1px;
+		top: 1px;
+		height: 30px;
+		border-left: 1px solid #CCC;
+		width: 30px;
+		background: $list-background image-url("favicon-feed.svg") 7px 8px no-repeat;
+		border-radius: 0 4px 4px 0;
 	}
 	.last-updated-wrap {
-		text-align: right;
+		position: absolute;
+		right: 0;
+		top: 17px;
+		font-size: 14px;
+		color: #cccccc;
+		@media (max-width:800px) {
+			display: none;
+		}
 	}
+
 }
 
 .feed-controls {
-	border-top: 1px solid #DDD;
-	border-bottom: 1px solid #DDD;
-	padding: 10px 20px 1px 20px;
+	border-top: 1px solid #CCC;
+	border-bottom: 1px solid #CCC;
+	padding: 10px 0 1px 0;
 }
 
 .push-feed-settings {

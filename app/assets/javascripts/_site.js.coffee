@@ -268,6 +268,14 @@ $.extend feedbin,
   scrollTo: (item, container) ->
     item.offset().top - container.offset().top + container.scrollTop()
 
+  sortByLastUpdated: (a, b) ->
+    aTimestamp = $(a).data('sort-last-updated') * 1
+    bTimestamp = $(b).data('sort-last-updated') * 1
+    return bTimestamp - aTimestamp
+
+  sortByName: (a, b) ->
+    $(a).data('sort-name').localeCompare($(b).data('sort-name'))
+
   hideQueue: []
 
   feedCandidates: []
@@ -587,6 +595,25 @@ $.extend feedbin,
         return
 
     timeago: ->
+      strings =
+        prefixAgo: null
+        prefixFromNow: null
+        suffixAgo: ""
+        suffixFromNow: "from now"
+        seconds: "less than 1 min"
+        minute: "1m"
+        minutes: "%dm"
+        hour: "1h"
+        hours: "%dh"
+        day: "1d"
+        days: "%dd"
+        month: "a month"
+        months: "%d months"
+        year: "a year"
+        years: "%d years"
+        wordSeparator: " "
+        numbers: []
+      jQuery.timeago.settings.strings = strings
       $("time.timeago").timeago()
       return
 
@@ -638,6 +665,17 @@ $.extend feedbin,
           $('.entry-settings').removeClass('open')
         $('.entry-content').css
           top: top
+      return
+
+    feedSettings: ->
+      $('[data-behavior~=sort_feeds]').change ->
+        sortBy = $(@).val()
+        console.log sortBy
+        if sortBy == "name"
+          sortFunction = feedbin.sortByName
+        else if sortBy == "last-updated"
+          sortFunction = feedbin.sortByLastUpdated
+        $('.sortable li').sort(sortFunction).appendTo('.sortable');
       return
 
     fontSize: ->

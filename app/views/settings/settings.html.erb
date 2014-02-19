@@ -1,70 +1,70 @@
 <div class="settings-content-inner">
-<h2>Settings</h2>
+  <h2>Settings</h2>
 
-<%= form_for @user, url: settings_update_user_path(@user) do |f| %>
-  <h3>Reading</h3>
-  <p>
-    <%= label_tag nil do %>
-      Sort unread entries by <%= f.select :entry_sort, options_for_select([['Newest first', 'DESC'], ['Oldest first', 'ASC']], @user.entry_sort || 'DESC') %>
-    <% end %>
-  </p>
+  <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
+    <h3>Reading</h3>
+    <p>
+      <%= label_tag nil do %>
+        Sort unread entries by <%= f.select :entry_sort, options_for_select([['Newest first', 'DESC'], ['Oldest first', 'ASC']], @user.entry_sort || 'DESC') %>
+      <% end %>
+    </p>
 
-  <p>
-    <label class="checkbox">
-      <%= f.check_box :precache_images %> Pre-load images
-    </label>
-    <small>Images for unread entries will be loaded in the background when viewing a feed. Not recommended with limited data/bandwidth.</small>
-  </p>
+    <p>
+      <label class="checkbox">
+        <%= f.check_box :precache_images %> Pre-load images
+      </label>
+      <small>Images for unread entries will be loaded in the background when viewing a feed. Not recommended with limited data/bandwidth.</small>
+    </p>
 
-  <p>
-    <label class="checkbox">
-      <%= f.check_box :sticky_view_inline %> Sticky Readability
-    </label>
-    <small>Use last Readability setting per feed (this will make loading entries slower).</small>
-  </p>
+    <p>
+      <label class="checkbox">
+        <%= f.check_box :sticky_view_inline %> Sticky Readability
+      </label>
+      <small>Use last Readability setting per feed (this will make loading entries slower).</small>
+    </p>
 
-  <p>
-    <label class="checkbox">
-      <%= f.check_box :mark_as_read_confirmation %> Ask before marking all as read
-    </label>
-  </p>
+    <p>
+      <label class="checkbox">
+        <%= f.check_box :mark_as_read_confirmation %> Ask before marking all as read
+      </label>
+    </p>
 
-  <h3>Tags</h3>
+    <h3>Tags</h3>
 
-  <p>
-    <label class="checkbox">
-      <%= f.check_box :hide_tagged_feeds %> Hide tagged feeds
-    </label>
-    <small>Tagged feeds will only show up in tag drawers</small>
-  </p>
+    <p>
+      <label class="checkbox">
+        <%= f.check_box :hide_tagged_feeds %> Hide tagged feeds
+      </label>
+      <small>Tagged feeds will only show up in tag drawers</small>
+    </p>
 
-  <h3>Extras</h3>
+    <h3>Extras</h3>
 
-  <p>
-    <label class="checkbox">
-      <%= f.check_box :show_unread_count %> Show unread count in title
-    </label>
-  </p>
+    <p>
+      <label class="checkbox">
+        <%= f.check_box :show_unread_count %> Show unread count in title
+      </label>
+    </p>
 
-  <p>
-    <label class="checkbox">
-      <%= f.check_box :starred_feed_enabled %> Enable starred entry feed
-    </label>
-    <% if @user.starred_feed_enabled == '1' %>
-      <small><%= link_to 'Starred Feed', starred_url(@user.starred_token, format: :xml) %></small>
-    <% else %>
-      <small>Link shown here when enabled</small>
-    <% end %>
-  </p>
+    <p>
+      <label class="checkbox">
+        <%= f.check_box :starred_feed_enabled %> Enable starred entry feed
+      </label>
+      <% if @user.starred_feed_enabled == '1' %>
+        <small><%= link_to 'Starred Feed', starred_url(@user.starred_token, format: :xml) %></small>
+      <% else %>
+        <small>Link shown here when enabled</small>
+      <% end %>
+    </p>
 
 
-  <%= f.submit "Save", class: 'button' %>
-<% end %>
+    <%= f.submit "Save", class: 'button' %>
+  <% end %>
 
-<hr />
+  <hr />
 
-<h3>Subscribe via Email</h3>
-<p class="muted">You can subscribe to any website that publishes a feed by sending an email to this secret address. The body of the email should only contain the URL to the website or feed.</p>
+  <h3>Subscribe via Email</h3>
+  <p class="muted">You can subscribe to any website that publishes a feed by sending an email to this secret address. The body of the email should only contain the URL to the website or feed.</p>
 
-<p class="subscribe-email"><a href="mailto:subscribe+<%= @user.inbound_email_token %>@subscribe.feedbin.me">subscribe+<%= @user.inbound_email_token %>@subscribe.feedbin.me</a></p>
+  <p class="subscribe-email"><a href="mailto:subscribe+<%= @user.inbound_email_token %>@subscribe.feedbin.me">subscribe+<%= @user.inbound_email_token %>@subscribe.feedbin.me</a></p>
 </div>
