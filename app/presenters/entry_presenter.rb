@@ -30,7 +30,6 @@ class EntryPresenter < BasePresenter
     classes = []
     classes << read_state
     classes << starred_state
-    classes << media_state
     classes.join ' '
   end
 
