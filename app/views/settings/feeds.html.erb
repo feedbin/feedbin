@@ -1,30 +1,57 @@
-<h2>Feeds</h2>
+<div class="settings-content-inner">
+  <h2>Feeds</h2>
+</div>
 
-<p class="half-margin">Select: <a href="#" data-behavior="check_all">All</a> / <a href="#" data-behavior="check_none">None</a></p>
-<%= form_tag update_multiple_subscriptions_path, method: :patch do %>
-  <div class="collection-edit-wrapper">
-    <table class="table form-table feed-form">
-      <% @subscriptions.each do |subscription| %>
-        <%= fields_for "subscriptions[]", subscription do |f| %>
-          <tr>
-            <td width="15"><%= check_box_tag "subscription_ids[]", subscription.id %></td>
-            <td>
-              <%= f.text_field :title %>
-              <br /><small title="Original title"><%= link_to subscription.site_url, subscription.site_url, target: '_blank' %></small>
-              <br /><small class="highlight break-word" title="Feed URL"><%= link_to subscription.feed_url, subscription.feed_url, target: '_blank' %></small>
-            </td>
-          </tr>
-        <% end %>
-      <% end %>
-    </table>
-  </div>
-  <div class="collection-edit-controls clearfix">
+<div class="settings-content-inner-wide">
+
+  <div class="feed-controls clearfix">
     <div class="half text-right float-right">
-      <%= submit_tag "Save", class: 'button button-primary' %>
+      <p class="half-margin">
+        <select data-behavior="sort_feeds">
+          <option value="name">Sort by name</option>
+          <option value="last-updated">Sort by last updated</option>
+        </select>
+      </p>
     </div>
     <div class="half">
-      <%= submit_tag 'Unsubscribe', class: 'button button-danger button-link', name: 'unsubscribe', style: 'margin-top: 11px;' %>
+      <p class="half-margin">Select: <a href="#" data-behavior="check_all">All</a> / <a href="#" data-behavior="check_none">None</a></p>
     </div>
   </div>
 
-<% end %>
+  <%= form_tag update_multiple_subscriptions_path, method: :patch do %>
+    <div class="collection-edit-wrapper">
+      <ul class="feed-form sortable">
+        <% @subscriptions.each do |subscription| %>
+          <% present subscription do |subscription_presenter| %>
+            <%= fields_for "subscriptions[]", subscription do |f| %>
+              <li data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>">
+                <div class="checkbox-wrap">
+                  <%= check_box_tag "subscription_ids[]", subscription.id %>
+                </div>
+                <div class="textfield-wrap">
+                  <a href="<%= subscription.site_url %>" title="<%= subscription.site_url %>" class="favicon-container">
+                    <%= subscription_presenter.favicon(subscription.site_url) %>
+                  </a>
+                  <%= f.text_field :title %>
+                  <a href="<%= subscription.feed_url %>" title="<%= subscription.feed_url %>" class="feed-url-container"></a>
+                </div>
+                <div class="last-updated-wrap">
+                  <%= timeago(subscription.last_published_entry) %>
+                </div>
+              </li>
+            <% end %>
+          <% end %>
+        <% end %>
+      </ul>
+    </div>
+    <div class="collection-edit-controls clearfix">
+      <div class="half text-right float-right">
+        <%= submit_tag "Save", class: 'button button-primary' %>
+      </div>
+      <div class="half">
+        <%= submit_tag 'Unsubscribe', class: 'button button-danger button-link', name: 'unsubscribe', style: 'margin-top: 8px;' %>
+      </div>
+    </div>
+
+  <% end %>
+</div>

@@ -54,7 +54,6 @@ gem 'readability_parser'
 gem 'lograge'
 gem 'tire'
 gem 'grocer'
-gem 'mediaelement_rails'
 gem 'cocoon'
 
 # Sidekiq

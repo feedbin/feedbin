@@ -1,22 +1,24 @@
-<h2>Import/Export</h2>
+<div class="settings-content-inner">
+  <h2>Import/Export</h2>
 
-<h3>Import</h3>
-<% if ENV['AWS_ACCESS_KEY_ID'] %>
-  <%= direct_upload_form_for @uploader do |f| %>
-    <p><%= f.file_field :upload %></p>
-    <p><%= f.submit "Import", class: 'button' %></p>
+  <h3>Import</h3>
+  <% if ENV['AWS_ACCESS_KEY_ID'] %>
+    <%= direct_upload_form_for @uploader do |f| %>
+      <p><%= f.file_field :upload %></p>
+      <p><%= f.submit "Import", class: 'button' %></p>
+    <% end %>
+
+    <p><small>You can import OPML or starred.json files. Import is done in the background so you may not see every subscription or starred item right away.</small></p>
+
+    <hr />
+  <% else %>
+    <p>Import disabled. <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> and <code>AWS_S3_BUCKET</code> are missing.</p>
   <% end %>
 
-  <p><small>You can import OPML or starred.json files. Import is done in the background so you may not see every subscription or starred item right away.</small></p>
-
-  <hr />
-<% else %>
-  <p>Import disabled. <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> and <code>AWS_S3_BUCKET</code> are missing.</p>
-<% end %>
-
-<h3>Export</h3>
-<p><%= link_to "Download Subscriptions", subscriptions_path(format: :xml) %></p>
-<p>
-  <%= link_to "Export Starred Items", starred_export_path, method: :post %>
-  <br /><small>A link will be emailed to you.</small>
-</p>
+  <h3>Export</h3>
+  <p><%= link_to "Download Subscriptions", subscriptions_path(format: :xml) %></p>
+  <p>
+    <%= link_to "Export Starred Items", starred_export_path, method: :post %>
+    <br /><small>A link will be emailed to you.</small>
+  </p>
+</div>

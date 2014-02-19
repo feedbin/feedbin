@@ -8,9 +8,18 @@ class BigBatch
     finish = batch * batch_size
     ids = (start..finish).to_a
 
-    Entry.where(id: ids).find_in_batches(batch_size: batch_size) do |entries|
-      Tire.index("entries").import(entries)
+    Feed.where(id: ids).find_in_batches(batch_size: batch_size) do |feeds|
+      feeds.each do |feed|
+        most_recent_entry = Entry.select(:published).where(feed_id: feed.id).order('published DESC').limit(1).first
+        if most_recent_entry.present?
+          feed.last_published_entry = most_recent_entry.published
+          feed.save
+        end
+      end
     end
+
+
   end
+
 
 end

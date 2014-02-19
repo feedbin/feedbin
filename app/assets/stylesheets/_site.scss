@@ -800,6 +800,7 @@ input[type="color"],
 	line-height: 20px;
 	color: #555;
 	vertical-align: middle;
+	border-radius: 4px;
 	&:focus {
 		outline: none;
 		border-color: $selected;
@@ -1025,7 +1026,7 @@ table th[class^="col-"] {
 Structure
 ------------------------------------------------------------------------------*/
 .logo {
-	margin: 7px 0 0 8px;
+	margin: 7px 0 0 12px;
 	svg {
 		width: 32px;
 		height: 27px;
@@ -1253,8 +1254,11 @@ Structure
 			padding-top: 4px;
 			padding-bottom: 4px;
 		}
-		.sharing-link, .home-link, .blog-link, .api-link, .twitter-link {
+		.mobile-hide {
 			display: none;
+		}
+		.desktop-hide {
+			display: block;
 		}
 	}
 	&.open .settings-nav {
@@ -1925,7 +1929,7 @@ li.selected > a .favicon-wrap {
 				position: absolute;
 				right: 10px;
 				top: 10px;
-				padding-left: 16px;
+				padding-left: 14px;
 			}
 			.title {
 				font-weight: bold;
@@ -2003,7 +2007,7 @@ li.selected > a .favicon-wrap {
 			}
 			&.media {
 				.time {
-					background: image-url("icon-play-small.svg") 0 1px no-repeat;
+					background: image-url("icon-play-small.svg") 0 2px no-repeat;
 				}
 			}
 			&.selected {
@@ -2622,7 +2626,6 @@ li.selected > a .favicon-wrap {
 	}
 
 	img {
-		padding: 3px;
 		display: block;
 		margin: 0 0 10px 0;
 		width: auto\9;
@@ -2705,6 +2708,7 @@ li.selected > a .favicon-wrap {
 	.download-link {
 		font-size: 12px;
 		font-family: $font-stack;
+		font-weight: 400 !important;
 	}
 
 	.table-wrap {
@@ -3060,10 +3064,11 @@ Settings
 }
 
 .nav {
-	margin-top: 58px;
+	margin: 53px 0 0 0;
+	padding: 0;
 	list-style: none;
 	a {
-		text-align: right;
+		text-align: left;
 		padding: 4px 0;
 		display: block;
 		font-size: 18px;
@@ -3077,10 +3082,10 @@ Settings
 		}
 	}
 }
+
 .nav-small {
-	max-width: 140px;
 	padding-top: 10px;
-	padding-left: 0;
+	margin-top: 10px;
 	border-top: 1px solid #cccccc;
 	margin-left: auto;
 	a {
@@ -3094,40 +3099,35 @@ Settings
 	background-color: #f2f3f4;
 	color: #333;
 	.content {
-		display: table;
-		border-collapse: collapse;
 		width: 100%;
 		border-top: 1px solid #CCC;
+		display: table;
 		.settings-nav {
-			list-style-type: none;
+			width: 250px;
+			padding: 0 20px;
 			display: table-cell;
-			width: 40%;
-			padding-top: 20px;
-			> * {
-				margin-right: 20px;
-				margin-left: auto;
-			}
-			@media (max-width: 527px) {
+			border-right: 1px solid #CCC;
+			vertical-align: top;
+			.desktop-hide {
 				display: none;
 			}
-			.logout-link {
+			@media (max-width: 528px) {
 				display: none;
 			}
 		}
 		.settings-content {
-			border-top: 1px solid #CCC;
-			line-height: 1.4;
-			display: table-cell;
-			background-color: white;
 			vertical-align: top;
-			padding-top: 4px;
-			padding-left: 19px;
-			padding-right: 19px;
-			> * {
-				max-width: 580px;
+			margin-left: 250px;
+			padding: 25px 0 0 0;
+			background-color: #FFF;
+			display: table-cell;
+			.settings-content-inner {
+				max-width: 620px;
+				padding: 0 20px 0 20px;
 			}
-			@media (min-width: 528px) {
-				border-left: 1px solid #CCC;
+			.settings-content-inner-wide {
+				max-width: 100%;
+				padding: 0 20px 0 20px;
 			}
 		}
 	}
@@ -3536,19 +3536,74 @@ table.small td {
 }
 
 .feed-form {
-	word-break: break-all;
-	td {
-		line-height: 1.2;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	li {
+		clear: both;
+		margin-left: 30px;
+		border-bottom: 1px solid #F2F3F4;
+		position: relative;
+		padding: 10px 0;
+		&:last-child {
+			border: none;
+		}
 	}
-	.highlight {
-		color: #6AB042;
+	.checkbox-wrap {
+		position: absolute;
+		left: -30px;
+		top: 15px;
 	}
-	[class^="button"] {
-		float: none;
+	.textfield-wrap {
+		position: relative;
+		max-width: 400px;
+		input {
+			max-width: 400px;
+			padding-left: 35px;
+			margin: 0;
+		}
 	}
-	a {
-		color: #999;
+	.favicon-container {
+		display: block;
+		position: absolute;
+		left: 0;
+		top: 0;
+		height: 32px;
+		border-right: 1px solid #CCC;
+		width: 32px;
+		.favicon-wrap {
+			top: 6px;
+			left: 6px;
+		}
 	}
+	.feed-url-container {
+		display: block;
+		position: absolute;
+		right: 1px;
+		top: 1px;
+		height: 30px;
+		border-left: 1px solid #CCC;
+		width: 30px;
+		background: $list-background image-url("favicon-feed.svg") 7px 8px no-repeat;
+		border-radius: 0 4px 4px 0;
+	}
+	.last-updated-wrap {
+		position: absolute;
+		right: 0;
+		top: 17px;
+		font-size: 14px;
+		color: #cccccc;
+		@media (max-width:800px) {
+			display: none;
+		}
+	}
+
+}
+
+.feed-controls {
+	border-top: 1px solid #CCC;
+	border-bottom: 1px solid #CCC;
+	padding: 10px 0 1px 0;
 }
 
 .push-feed-settings {
@@ -4564,4 +4619,183 @@ Fullscreen
 	.app-panel {
 		border-top: none;
 	}
+}
+
+
+/*------------------------------------------------------------------------------
+Media Players
+------------------------------------------------------------------------------*/
+.mejs-mediaelement {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+.mejs-poster {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+.mejs-audio {
+	height: 44px !important;
+}
+.mejs-overlay-play {
+	cursor: pointer;
+}
+.mejs-container {
+	position: relative;
+	font-family: Helvetica,Arial;
+	text-align: left;
+	vertical-align: top;
+	text-indent: 0;
+	width: 100% !important;
+	font-weight: 400 !important;
+}
+.mejs-container .mejs-controls {
+	position: absolute;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 44px;
+	padding: 0 10px 0 10px;
+	box-sizing: border-box;
+	background: #f5f5f5;
+	border-radius: 5px;
+}
+.mejs-container .mejs-controls div {
+	list-style-type: none;
+	background-image: none;
+	display: block;
+	float: left;
+	margin: 0;
+	padding: 0;
+	width: 28px;
+	height: 44px;
+	font-size: 11px;
+	line-height: 11px;
+	font-family: Helvetica,Arial;
+	border: 0;
+}
+.mejs-video .mejs-controls {
+	bottom: 10px !important;
+	left: 10px !important;
+	right: 10px !important;
+}
+.mejs-controls .mejs-button button {
+	cursor: pointer;
+	display: block;
+	font-size: 0;
+	line-height: 0;
+	text-decoration: none;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	height: 44px;
+	width: 28px;
+	border: 0;
+	background: none;
+	outline: none;
+}
+.mejs-controls .mejs-play button:after {
+	width: 0px;
+	height: 0px;
+	border-style: solid;
+	border-width: 11px 0 11px 20px;
+	border-color: transparent transparent transparent #000000;
+	content: "";
+	position: absolute;
+	top: 11px;
+	left: 5px;
+	pointer-events: none;
+}
+.mejs-controls .mejs-pause button:after,
+.mejs-controls .mejs-pause button:before {
+	width: 5px;
+	height: 18px;
+	content: "";
+	position: absolute;
+	top: 12px;
+	left: 5px;
+	pointer-events: none;
+	background-color: #333;
+}
+.mejs-controls .mejs-pause button:after {
+	left: 15px;
+}
+.mejs-fullscreen-button button:after {
+	display: block;
+	width: 18px;
+	height: 14px;
+	background: image-url("icon-full-screen-video.svg") 0 0 no-repeat;
+	background-size: 18px 28px;
+	content: "";
+	position: absolute;
+	top: 15px;
+	left: 4px;
+}
+.mejs-unfullscreen button:after {
+	background-position: 0px -14px;
+}
+.mejs-time-total {
+	background-color: #CCC;
+}
+.mejs-controls .mejs-time-rail .mejs-time-total {
+	margin: 17px 2px 0 2px;
+	background: #d7d7d7;
+}
+.mejs-controls .mejs-time-rail span {
+	display: block;
+	position: absolute;
+	width: 180px;
+	height: 10px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+.mejs-controls div.mejs-time-rail {
+	direction: ltr;
+}
+.mejs-controls .mejs-time-rail .mejs-time-current {
+	background: #3399FF;
+	width: 0;
+}
+.mejs-container .mejs-controls .mejs-time {
+	color: #3333;
+	display: block;
+	height: 17px;
+	width: auto;
+	padding: 15px 5px 0 5px;
+	overflow: hidden;
+	text-align: center;
+	box-sizing: content-box;
+	&.mejs-currenttime-container {
+		padding-right: 0;
+		span {
+			margin-right: 0;
+		}
+	}
+	&.mejs-duration-container {
+		padding-left: 0;
+		span {
+			margin-left: 0;
+		}
+	}
+
+}
+.mejs-container .mejs-controls .mejs-time span {
+	color: #333;
+	font-size: 14px;
+	line-height: 12px;
+	display: block;
+	float: left;
+	margin: 1px 2px 0 0;
+	width: auto;
+}
+.mejs-mute,
+.mejs-time-float,
+.mejs-time-handle {
+	display: none !important;
 }

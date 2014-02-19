@@ -12,6 +12,7 @@ class Entry < ActiveRecord::Base
   before_create :create_summary
   before_update :create_summary
   after_commit :mark_as_unread, on: :create
+  after_commit :touch_feed_last_published_entry, on: :create
   after_commit :updated_entry, on: :update
   after_destroy :search_index_remove
 
@@ -285,6 +286,14 @@ class Entry < ActiveRecord::Base
 
   def search_index_remove
     SearchIndexRemove.perform_async(self.class.name, self.id)
+  end
+
+  def touch_feed_last_published_entry
+    last_published_entry = self.feed.last_published_entry
+    if last_published_entry.nil? || last_published_entry < self.published
+      self.feed.last_published_entry = published
+      feed.save
+    end
   end
 
 end
