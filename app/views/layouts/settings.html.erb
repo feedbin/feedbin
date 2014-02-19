@@ -3,7 +3,9 @@
 
 <%= render partial: 'layouts/settings_nav' %>
 <div class="settings-content">
-  <%= render partial: 'shared/flash', locals: {flash: flash} %>
+  <div class="settings-content-inner">
+    <%= render partial: 'shared/flash', locals: {flash: flash} %>
+  </div>
   <%= yield %>
 </div>
 <% end %>
