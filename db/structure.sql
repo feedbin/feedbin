@@ -220,7 +220,8 @@ CREATE TABLE feeds (
     last_modified timestamp without time zone,
     subscriptions_count integer DEFAULT 0 NOT NULL,
     protected boolean DEFAULT false,
-    push_expiration timestamp without time zone
+    push_expiration timestamp without time zone,
+    last_published_entry timestamp without time zone
 );
 
 
@@ -921,6 +922,13 @@ CREATE UNIQUE INDEX index_feeds_on_feed_url ON feeds USING btree (feed_url);
 
 
 --
+-- Name: index_feeds_on_last_published_entry; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_feeds_on_last_published_entry ON feeds USING btree (last_published_entry);
+
+
+--
 -- Name: index_import_items_on_import_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1330,3 +1338,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131228183918');
 INSERT INTO schema_migrations (version) VALUES ('20131231084130');
 
 INSERT INTO schema_migrations (version) VALUES ('20140116101303');
+
+INSERT INTO schema_migrations (version) VALUES ('20140218235831');
