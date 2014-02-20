@@ -1,4 +1,5 @@
 <div class="settings-nav">
+  <a href="/" class="logo"><%= render partial: 'shared/svg/logo' %></a>
   <ul class="nav">
     <li><%= link_to 'Settings', settings_path, class: is_active?('settings', 'settings') %></li>
     <li><%= link_to 'Feeds', settings_feeds_path, class: is_active?('settings', 'feeds') %></li>
