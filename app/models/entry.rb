@@ -82,9 +82,11 @@ class Entry < ActiveRecord::Base
       end
 
       if params[:sort]
-        sort { by :published, params[:sort] }
+        if %w{desc asc}.include?(params[:sort])
+          sort { by :published, params[:sort] }
+        end
       else
-        sort { by :published, "desc" } if params[:query].blank?
+        sort { by :published, "desc" }
       end
 
       if ids.any?
@@ -104,7 +106,7 @@ class Entry < ActiveRecord::Base
     read_regex = /(?<=\s|^)is:\s*read(?=\s|$)/
     starred_regex = /(?<=\s|^)is:\s*starred(?=\s|$)/
     unstarred_regex = /(?<=\s|^)is:\s*unstarred(?=\s|$)/
-    sort_regex = /(?<=\s|^)sort:\s*(asc|desc)(?=\s|$)/i
+    sort_regex = /(?<=\s|^)sort:\s*(asc|desc|relevance)(?=\s|$)/i
 
     if params[:query] =~ unread_regex
       params[:query] = params[:query].gsub(unread_regex, '')

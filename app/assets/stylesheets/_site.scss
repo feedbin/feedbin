@@ -1147,59 +1147,6 @@ Structure
 	}
 }
 
-.saved-search-wrap {
-	background-color: #FFF;
-	width: 242px;
-	position: absolute;
-	top: 27px;
-	left: 0;
-	z-index: 100;
-	overflow: hidden;
-	height: 0;
-	transition: height .2s ease;
-	&.show {
-		height: 48px;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-		border: 1px solid #CCC;
-		border-top: none;
-	}
-	.saved-inner {
-		padding: 8px 0 0 8px;
-		input[type="text"] {
-			font-size: 14px;
-			width: 167px;
-			padding: 5px;
-			height: 30px;
-		}
-		.edit_saved_search {
-			input[type="text"] {
-				width: 146px;
-			}
-		}
-		input[type="submit"] {
-			position: absolute;
-			right: 8px;
-			top: 8px;
-		}
-	}
-}
-
-.save-search-link {
-	font-size: 13px;
-	position: absolute;
-	right: -37px;
-	top: 7px;
-	cursor: pointer;
-	color: $selected;
-	&[disabled] {
-		display: none;
-	}
-	&:hover {
-		text-decoration: none;
-		color: #2877c6;
-	}
-}
-
 .account-buttons {
 	position: absolute;
 	right: 8px;
@@ -1841,14 +1788,19 @@ li.selected > a .favicon-wrap {
 	}
 }
 
-.sort-control {
+.search-control {
 	background-color: #dedede;
 	font-size: 11px;
 	color: #999;
 	line-height: 14px;
-	height: 38px;
+	height: 86px;
 	border-bottom: 1px solid #cccccc;
 	position: relative;
+	.sort-control {
+		height: 37px;
+		position: relative;
+		border-bottom: 1px solid #cccccc;
+	}
 	.save-search {
 		position: absolute;
 		right: 8px;
@@ -1884,17 +1836,78 @@ li.selected > a .favicon-wrap {
 		top: 35px;
 		left: 2px;
 	}
+	.saved-search-wrap {
+		height: 48px;
+		padding: 8px;
+		background-color: #E6E7E8;
+		position: relative;
+		input[type="text"] {
+			height: 32px;
+			width: 100%;
+			max-width: 100%;
+			margin-bottom: 0;
+			padding: 5px 25px 5px 5px;
+			font-size: 14px;
+		}
+		&:before {
+			position: absolute;
+			top: -1px;
+			right: 12px;
+			border-right: 6px solid rgba(0, 0, 0, 0);
+			border-top: 6px solid #bababa;
+			border-left: 6px solid rgba(0, 0, 0, 0);
+			border-bottom-color: rgba(0, 0, 0, 1);
+			content: '';
+			display: none;
+		}
+		&:after {
+			position: absolute;
+			top: -1px;
+			right: 13px;
+			border-right: 5px solid rgba(0, 0, 0, 0);
+			border-top: 5px solid #dedede;
+			border-left: 5px solid rgba(0, 0, 0, 0);
+			content: '';
+			display: none;
+		}
+		&.open {
+			&:before {
+				display: block;
+			}
+			&:after {
+				display: block;
+			}
+		}
+	}
+	.save-search.edit {
+		display: none;
+	}
+	&.edit {
+		.save-search {
+			display: none;
+		}
+		.save-search.edit {
+			display: block;
+		}
+	}
 }
 
 .entries {
 	position: absolute;
-	top: 38px;
+	top: 0;
 	bottom: 0;
 	left: 0;
 	right: 0;
 	overflow-y: auto;
 	overflow-x: hidden;
 	-webkit-overflow-scrolling: touch;
+	transition: top .2s ease;
+	&.show-search-options {
+		top: 37px;
+	}
+	&.show-saved-search {
+		top: 86px;
+	}
 	ul {
 		margin: 0 0 0 0;
 		padding: 0 0 17px 0;

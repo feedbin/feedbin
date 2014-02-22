@@ -6,3 +6,4 @@ $('[data-behavior~=show_tags_form]').replaceWith('<%= j render partial: "shared/
 $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/unsubscribe", locals: {feed: nil} %>');
 feedbin.updateTitle('<%= j @user.title_with_count %>')
 feedbin.disableMarkRead()
+feedbin.hideSearchControls()

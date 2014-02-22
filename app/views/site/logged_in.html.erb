@@ -30,16 +30,22 @@
         <div class="full-height entries-wrap">
           <div class="entries-header" data-behavior="entries-header"></div>
 
-          <div class="sort-control">
-            <div class="dropdown-wrap">
-              <span class="sort-order" data-behavior="toggle_share_menu toggle_dropdown">Sort by date</span>
-              <ul>
-                <li><span>Sort by date</a></span>
-                <li><span>Sort by relevance</a></span>
-              </ul>
+          <div class="search-control hide">
+            <div class="sort-control">
+              <div class="dropdown-wrap">
+                <span class="sort-order" data-behavior="toggle_share_menu toggle_dropdown">Sort by date</span>
+                <ul>
+                  <li data-sort-option="desc"><span>Sort by date</a></span></li>
+                  <li data-sort-option="relevance"><span>Sort by relevance</a></span></li>
+                </ul>
+              </div>
+              <span class="save-search" data-behavior="save_search_link">Save Search</span>
+              <span class="save-search edit" data-behavior="save_search_link">Edit Saved Search</span>
             </div>
 
-            <span class="save-search">Save Search</span>
+            <div class="saved-search-wrap" data-behavior="saved_search_form_target">
+            </div>
+
           </div>
 
           <div class="entries">

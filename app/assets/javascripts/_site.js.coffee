@@ -273,6 +273,20 @@ $.extend feedbin,
   sortByName: (a, b) ->
     $(a).data('sort-name').localeCompare($(b).data('sort-name'))
 
+  showSearchControls: (sort) ->
+    $('.search-control').removeClass('hide');
+    text = $("[data-sort-option=#{sort}]").text()
+    if !text
+      text = $("[data-sort-option=desc]").text()
+    $('.sort-order').text(text)
+    $('.entries').addClass('show-search-options')
+
+  hideSearchControls: ->
+    $('.search-control').addClass('hide');
+    $('.entries').removeClass('show-search-options')
+    $('.entries').removeClass('show-saved-search')
+    $('.saved-search-wrap').removeClass('open')
+
   hideQueue: []
 
   feedCandidates: []
@@ -297,6 +311,17 @@ $.extend feedbin,
     hasTouch: ->
       if ('ontouchstart' in document)
         $('body').addClass('touch')
+
+    changeSearchSort: (sort) ->
+      $(document).on 'click', '[data-sort-option]', ->
+        sortOption = $(@).data('sort-option')
+        searchField = $('#query')
+        query = searchField.val()
+        query = query.replace(/\s*?(sort:\s*?asc|sort:\s*?desc|sort:\s*?relevance)\s*?/, '')
+        query = "#{query} sort:#{sortOption}"
+        searchField.val(query)
+        searchField.parents('form').submit()
+
 
     markRead: ->
       $(document).on 'click', '[data-mark-read]', ->
@@ -795,29 +820,16 @@ $.extend feedbin,
         return
 
     savedSearch: ->
-      $(document).on 'click', (event) ->
-        unless $(event.target).is('[data-behavior~=save_search_link]') || $(event.target).parents('.header-form-wrap').length > 0
-          savedSearchWrap = $('.saved-search-wrap')
-          if savedSearchWrap.hasClass('show')
-            savedSearchWrap.removeClass('show')
-        return
-
-      $(document).on 'click', '[data-behavior~=saved_search_form_target] input[type=submit]', ->
+      $(document).on 'click', '[data-behavior~=save_search_link]', ->
         query = $('#query').val()
         $('#saved_search_query').val(query)
-
-      $(document).on 'click', '[data-behavior~=save_search_link]', ->
-        $(@).attr('disabled', 'disabled')
-        savedSearchWrap = $('.saved-search-wrap')
-        if savedSearchWrap.hasClass('show')
-          savedSearchWrap.removeClass('show')
-        else
-          savedSearchWrap.addClass('show')
+        $('.entries').toggleClass('show-saved-search')
+        $('.saved-search-wrap').toggleClass('open')
+        $('#saved_search_name').focus()
         return
 
-      $(document).on 'click', '[data-behavior~=feed_link]', ->
+      $(document).on 'click', '[data-behavior~=feed_link]:not(.saved-search-link)', ->
         $('#query').val('')
-        $('[data-behavior~=save_search_link]').attr('disabled', 'disabled');
 
     showPushOptions: ->
       if "safari" of window and "pushNotification" of window.safari
