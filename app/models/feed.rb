@@ -4,6 +4,7 @@ class Feed < ActiveRecord::Base
   has_many :users, through: :subscriptions
   has_many :unread_entries
   has_many :starred_entries
+  has_many :feed_stats
 
   has_many :taggings
   has_many :tags, through: :taggings
