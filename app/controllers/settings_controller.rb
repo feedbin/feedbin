@@ -23,7 +23,7 @@ class SettingsController < ApplicationController
     @subscriptions = @user.subscriptions.select('subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url').joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}")
 
     feed_ids = @subscriptions.map {|subscription| subscription.feed_id}
-    entry_counts = get_entry_counts(feed_ids)
+    entry_counts = Rails.cache.fetch("#{@user.id}:entry_counts", expires_in: 24.hours) { get_entry_counts(feed_ids) }
 
     @subscriptions = @subscriptions.map {|subscription|
       subscription.entries_count = entry_counts[subscription.feed_id]
