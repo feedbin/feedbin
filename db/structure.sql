@@ -206,6 +206,39 @@ ALTER SEQUENCE entries_id_seq OWNED BY entries.id;
 
 
 --
+-- Name: feed_stats; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE feed_stats (
+    id integer NOT NULL,
+    feed_id integer,
+    day date,
+    entries_count integer DEFAULT 0,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: feed_stats_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE feed_stats_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: feed_stats_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE feed_stats_id_seq OWNED BY feed_stats.id;
+
+
+--
 -- Name: feeds; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -664,6 +697,13 @@ ALTER TABLE ONLY entries ALTER COLUMN id SET DEFAULT nextval('entries_id_seq'::r
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY feed_stats ALTER COLUMN id SET DEFAULT nextval('feed_stats_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY feeds ALTER COLUMN id SET DEFAULT nextval('feeds_id_seq'::regclass);
 
 
@@ -774,6 +814,14 @@ ALTER TABLE ONLY coupons
 
 ALTER TABLE ONLY entries
     ADD CONSTRAINT entries_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: feed_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY feed_stats
+    ADD CONSTRAINT feed_stats_pkey PRIMARY KEY (id);
 
 
 --
@@ -912,6 +960,20 @@ CREATE INDEX index_entries_on_feed_id ON entries USING btree (feed_id);
 --
 
 CREATE UNIQUE INDEX index_entries_on_public_id ON entries USING btree (public_id);
+
+
+--
+-- Name: index_feed_stats_on_feed_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_feed_stats_on_feed_id ON feed_stats USING btree (feed_id);
+
+
+--
+-- Name: index_feed_stats_on_feed_id_and_day; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_feed_stats_on_feed_id_and_day ON feed_stats USING btree (feed_id, day);
 
 
 --
@@ -1340,3 +1402,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131231084130');
 INSERT INTO schema_migrations (version) VALUES ('20140116101303');
 
 INSERT INTO schema_migrations (version) VALUES ('20140218235831');
+
+INSERT INTO schema_migrations (version) VALUES ('20140223114030');
