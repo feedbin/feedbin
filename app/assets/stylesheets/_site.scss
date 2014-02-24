@@ -3615,6 +3615,7 @@ table.small td {
 	.textfield-wrap {
 		position: relative;
 		max-width: 400px;
+		z-index: 100;
 		input {
 			max-width: 400px;
 			padding-left: 35px;
@@ -3655,7 +3656,19 @@ table.small td {
 			display: none;
 		}
 	}
-
+	.canvas-wrap {
+		max-width: 508px;
+		float: right;
+		overflow-x: hidden;
+		overflow-y: visible;
+		z-index: 0;
+	}
+	canvas {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		z-index: 0;
+	}
 }
 
 .feed-controls {

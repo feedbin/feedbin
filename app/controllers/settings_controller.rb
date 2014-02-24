@@ -21,7 +21,12 @@ class SettingsController < ApplicationController
   def feeds
     @user = current_user
     @subscriptions = @user.subscriptions.select('subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url').joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}")
+
+    feed_ids = @subscriptions.map {|subscription| subscription.feed_id}
+    entry_counts = get_entry_counts(feed_ids)
+
     @subscriptions = @subscriptions.map {|subscription|
+      subscription.entries_count = entry_counts[subscription.feed_id]
       if subscription.title
         subscription.title = subscription.title
       elsif subscription.original_title
@@ -31,6 +36,7 @@ class SettingsController < ApplicationController
       end
       subscription
     }
+
     @subscriptions = @subscriptions.sort_by {|subscription| subscription.title.downcase}
   end
 
@@ -192,6 +198,45 @@ class SettingsController < ApplicationController
 
   def user_settings_params
     params.require(:user).permit(:entry_sort, :starred_feed_enabled, :hide_tagged_feeds, :precache_images, :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation, :apple_push_notification_device_token, :receipt_info)
+  end
+
+  def get_entry_counts(feed_ids)
+    stats_query = <<-eos
+      SELECT
+        date,
+        coalesce(entries_count,0) AS entries_count
+      FROM
+      generate_series(
+        ?::date,
+        ?::date,
+        '1 day'
+      ) AS date
+      LEFT OUTER JOIN (
+        SELECT
+        day,
+        (entries_count::float / (SELECT MAX(entries_count) FROM feed_stats WHERE feed_id IN(?) and day >= ?)) AS entries_count
+        FROM feed_stats
+        WHERE day >= ?
+        AND feed_id = ?
+      ) results
+      ON (date = results.day)
+    eos
+    start_date = 30.days.ago
+    end_date = Time.now
+
+    entry_counts = {}
+    feed_ids.each do |feed_id|
+      query = ActiveRecord::Base.send(:sanitize_sql_array, [stats_query, start_date, end_date, feed_ids, start_date, start_date, feed_id])
+      results = ActiveRecord::Base.connection.execute(query)
+      results.each do |result|
+        if entry_counts.has_key?(feed_id)
+          entry_counts[feed_id] << result['entries_count']
+        else
+          entry_counts[feed_id] = [result['entries_count']]
+        end
+      end
+    end
+    entry_counts
   end
 
 end

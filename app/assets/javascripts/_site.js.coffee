@@ -287,6 +287,20 @@ $.extend feedbin,
     $('.entries').removeClass('show-saved-search')
     $('.saved-search-wrap').removeClass('open')
 
+  drawBarChart: (canvas, values) ->
+    spaceWidth = 2
+    numberOfSpaces = values.length - 1
+    barWidth = (canvas.width - numberOfSpaces * spaceWidth) / values.length
+    if canvas.getContext
+      context = canvas.getContext("2d")
+      context.fillStyle = "#f2f3f4"
+      xPosition = 0
+      for value in values
+        height = value * canvas.height
+        yPosition = canvas.height - height
+        context.fillRect(xPosition, Math.max(yPosition), barWidth, Math.max(height))
+        xPosition = xPosition + barWidth + spaceWidth
+
   hideQueue: []
 
   feedCandidates: []
@@ -693,7 +707,6 @@ $.extend feedbin,
     feedSettings: ->
       $('[data-behavior~=sort_feeds]').change ->
         sortBy = $(@).val()
-        console.log sortBy
         if sortBy == "name"
           sortFunction = feedbin.sortByName
         else if sortBy == "last-updated"
@@ -882,6 +895,11 @@ $.extend feedbin,
       $(document).on 'click', '.view-latest-link', ->
         $('.entries .selected a').click()
         return
+
+    drawBarCharts: ->
+      $('canvas').each ()->
+        feedbin.drawBarChart(@, $(@).data('values'))
+      return
 
 jQuery ->
   $.each feedbin.init, (i, item) ->

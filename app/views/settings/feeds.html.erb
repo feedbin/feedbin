@@ -35,6 +35,9 @@
                   <%= f.text_field :title %>
                   <a href="<%= subscription.feed_url %>" title="<%= subscription.feed_url %>" class="feed-url-container"></a>
                 </div>
+                <div class="canvas-wrap">
+                  <%= content_tag :canvas, '', width: 508, height: 50, data: { values: subscription.entries_count } %>
+                </div>
                 <div class="last-updated-wrap">
                   <%= timeago(subscription.last_published_entry) %>
                 </div>

@@ -1,4 +1,6 @@
 class Subscription < ActiveRecord::Base
+  attr_accessor :entries_count
+
   belongs_to :user
   belongs_to :feed, counter_cache: true
 

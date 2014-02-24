@@ -12,6 +12,7 @@ class Entry < ActiveRecord::Base
   before_create :create_summary
   before_update :create_summary
   after_commit :mark_as_unread, on: :create
+  after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
   after_commit :updated_entry, on: :update
   after_destroy :search_index_remove
@@ -275,6 +276,13 @@ class Entry < ActiveRecord::Base
       UnreadEntry.import(unread_entries, validate: false)
     end
     SearchIndexStore.perform_async(self.class.name, self.id)
+  end
+
+  def increment_feed_stat
+    result = FeedStat.where(feed_id: self.feed_id, day: self.published).update_all("entries_count = entries_count + 1")
+    if result == 0
+      FeedStat.create(feed_id: self.feed_id, day: self.published, entries_count: 1)
+    end
   end
 
   def updated_entry
