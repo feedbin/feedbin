@@ -7,7 +7,7 @@ Variables
 ------------------------------------------------------------------------------*/
 $toolbar-width: 40px;
 $list-background: #f2f3f4;
-$list-border: #CCC;
+$list-border: #DDDDDD;
 $selected: #3399ff;
 $font-stack: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
@@ -789,7 +789,7 @@ input[type="search"],
 input[type="tel"],
 input[type="color"],
 .uneditable-input {
-	border: 1px solid #CCC;
+	border: 1px solid #DDDDDD;
 	font-size: 18px;
 	padding: 12px 12px 10px 12px;
 	max-width: 300px;
@@ -1032,7 +1032,7 @@ Structure
 		width: 32px;
 		height: 27px;
 		* {
-			fill: #CCC;
+			fill: #DDDDDD;
 		}
 	}
 }
@@ -1084,16 +1084,16 @@ Structure
 				background-position: 11px 15px, 97% 15px;
 			}
 			&::-webkit-input-placeholder {
-			   color: #CCC;
+			   color: #DDDDDD;
 			}
 			&:-moz-placeholder {
- 			   color: #CCC;
+ 			   color: #DDDDDD;
 			}
 			&::-moz-placeholder {
- 			   color: #CCC;
+ 			   color: #DDDDDD;
 			}
 			&:-ms-input-placeholder {
- 			   color: #CCC;
+ 			   color: #DDDDDD;
 			}
 			@media (max-width: 395px) {
 				width: 230px;
@@ -1122,13 +1122,13 @@ Structure
 		line-height: 30px;
 		font-weight: bold;
 		font-size: 12px;
-		border-right: 1px solid #CCC;
+		border-right: 1px solid #DDDDDD;
 		background-color: #f2f3f4;
 		padding: 0 0 0 6px;
 		user-select: none;
 		width: 82px;
 		&:hover {
-			background-color: #CCC;
+			background-color: #DDDDDD;
 			cursor: pointer;
 		}
 	}
@@ -1162,7 +1162,7 @@ Structure
 		text-decoration: none;
 		margin: 0 10px 0 0;
 		padding: 0 10px 0 0;
-		border-right: 1px solid #cccccc;
+		border-right: 1px solid #DDDDDD;
 		&:last-child {
 			border: none;
 			margin-right: 0;
@@ -1195,7 +1195,7 @@ Structure
 	}
 	.settings-nav {
 		background-color: #f2f3f4;
-		border: 1px solid #ccc;
+		border: 1px solid #DDDDDD;
 		display: none;
 		.logo {
 			display: none !important;
@@ -1406,7 +1406,7 @@ Structure
 
 .view-toolbar {
 	height: 37px;
-	border-bottom: 1px solid #CCC;
+	border-bottom: 1px solid #DDDDDD;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -1464,7 +1464,7 @@ Structure
 
 .feeds-toolbar {
 	height: 52px;
-	border-top: 1px solid #CCC;
+	border-top: 1px solid #DDDDDD;
 	position: absolute;
 	bottom: 0;
 	left: 0;
@@ -1497,7 +1497,7 @@ Structure
 	padding: 8px;
 	position: absolute;
 	top: 37px;
-	border-bottom: 1px solid #CCC;
+	border-bottom: 1px solid #DDDDDD;
 	width: 100%;
 	background-color: #e6e7e8;
 	input {
@@ -1607,8 +1607,8 @@ Structure
 		overflow: hidden;
 		ul {
 			overflow: hidden;
-			border-top: 1px solid #CCC;
-			border-bottom: 1px solid #CCC;
+			border-top: 1px solid #DDDDDD;
+			border-bottom: 1px solid #DDDDDD;
 			padding: 0;
 		}
 		.drawer-arrow:before {
@@ -1640,7 +1640,7 @@ Structure
 	right: 45px;
 	top: 0;
 	font-weight: bold;
-	color: #CCC;
+	color: #DDDDDD;
 	font-size: 11px;
 	display: block;
 	-webkit-appearance: none;
@@ -1759,7 +1759,7 @@ li.selected > a .favicon-wrap {
 .entries-header {
 	color: #999;
 	display: none;
-	border-bottom: 1px solid #CCC;
+	border-bottom: 1px solid #DDDDDD;
 	line-height: 37px;
 	height: 37px;
 	text-align: center;
@@ -1797,12 +1797,12 @@ li.selected > a .favicon-wrap {
 	color: #999;
 	line-height: 14px;
 	height: 86px;
-	border-bottom: 1px solid #cccccc;
+	border-bottom: 1px solid #DDDDDD;
 	position: relative;
 	.sort-control {
 		height: 37px;
 		position: relative;
-		border-bottom: 1px solid #cccccc;
+		border-bottom: 1px solid #DDDDDD;
 	}
 	.save-search {
 		position: absolute;
@@ -2054,7 +2054,7 @@ li.selected > a .favicon-wrap {
 					color: #999;
 				}
 				.body {
-					color: #CCC;
+					color: #DDDDDD;
 				}
 			}
 			&.media {
@@ -2184,7 +2184,7 @@ li.selected > a .favicon-wrap {
 	left: 0;
 	width: 100%;
 	height: 37px;
-	border-bottom: 1px solid #CCC;
+	border-bottom: 1px solid #DDDDDD;
 	.back-button {
 		height: 36px;
 		width: 36px;
@@ -2226,7 +2226,7 @@ li.selected > a .favicon-wrap {
 .entry-settings {
 	height: 48px;
 	width: 100%;
-	border-bottom: 1px solid #CCC;
+	border-bottom: 1px solid #DDDDDD;
 	background-color: #f2f3f4;
 	&:before {
 		visibility: hidden;
@@ -2256,7 +2256,7 @@ li.selected > a .favicon-wrap {
 		visibility: visible;
 	}
 	.setting-wrap {
-		border-right: 1px solid #CCC;
+		border-right: 1px solid #DDDDDD;
 		height: 100%;
 		display: block;
 		padding: 0;
@@ -2268,7 +2268,7 @@ li.selected > a .favicon-wrap {
 		padding: 5px;
 		font-size: 13px;
 		line-height: 1.1;
-		border: 1px solid #CCC;
+		border: 1px solid #DDDDDD;
 		border-radius: 0;
 		height: 28px;
 		-webkit-appearance: none;
@@ -2402,7 +2402,7 @@ li.selected > a .favicon-wrap {
 		display: block;
 		font-size: 12px;
 		color: $selected;
-		border-bottom: 1px solid #CCC;
+		border-bottom: 1px solid #DDDDDD;
 		padding-bottom: 5px;
 		margin-bottom: 10px;
 		text-transform: uppercase;
@@ -2517,7 +2517,7 @@ li.selected > a .favicon-wrap {
 		display: none;
 		width: 140px;
 		list-style: none;
-		border: 1px solid #CCC;
+		border: 1px solid #DDDDDD;
 		background-color: #FFF;
 		position: absolute;
 		z-index: 10000;
@@ -2565,7 +2565,7 @@ li.selected > a .favicon-wrap {
 			left: 12px;
 			display: inline-block;
 			border-right: 7px solid rgba(0, 0, 0, 0);
-			border-bottom: 7px solid #CCC;
+			border-bottom: 7px solid #DDDDDD;
 			border-left: 7px solid rgba(0, 0, 0, 0);
 			border-bottom-color: rgba(0, 0, 0, 0.2);
 			content: '';
@@ -2719,7 +2719,7 @@ li.selected > a .favicon-wrap {
 
 	blockquote {
 		padding: 0 0 0 15px;
-		border-left: 2px solid #CCC;
+		border-left: 2px solid #DDDDDD;
 	}
 
 	blockquote,
@@ -3111,7 +3111,7 @@ Settings
 	margin-top: 20px;
 	padding: 4px 20px 12px 20px;
 	background-color: #FFF;
-	border: 1px solid #CCC;
+	border: 1px solid #DDDDDD;
 	border-radius: 4px;
 }
 
@@ -3138,7 +3138,7 @@ Settings
 .nav-small {
 	padding-top: 10px;
 	margin-top: 10px;
-	border-top: 1px solid #cccccc;
+	border-top: 1px solid #DDDDDD;
 	margin-left: auto;
 	a {
 		font-size: 14px;
@@ -3158,13 +3158,13 @@ Settings
 	}
 	.content {
 		width: 100%;
-		border-top: 1px solid #CCC;
+		border-top: 1px solid #DDDDDD;
 		display: table;
 		.settings-nav {
 			width: 250px;
 			padding: 0 20px;
 			display: table-cell;
-			border-right: 1px solid #CCC;
+			border-right: 1px solid #DDDDDD;
 			vertical-align: top;
 			.logo {
 				margin: 23px 0 0 0;
@@ -3267,7 +3267,7 @@ Settings
 	    word-break: break-all;
 	}
 	.plan-options {
-		border-bottom: 1px solid #CCC;
+		border-bottom: 1px solid #DDDDDD;
 		padding: 0 0 15px 0;
 		overflow: hidden;
 		margin-bottom: 15px;
@@ -3289,7 +3289,7 @@ Settings
 				left: 5px;
 				top: 12px;
 				content: "";
-				border: 2px solid #CCC;
+				border: 2px solid #DDDDDD;
 				border-radius: 17px;
 				height: 17px;
 				width: 17px;
@@ -3341,7 +3341,7 @@ Settings
 			line-height: normal;
 			padding-left: 30px;
 			&:focus {
-				border-color: #CCC;
+				border-color: #DDDDDD;
 			}
 		}
 		.card-number {
@@ -3390,12 +3390,12 @@ Settings
 	display: inline-block;
 	font-size: 16px;
 	font-weight: bold;
-	border: 1px solid #CCC;
+	border: 1px solid #DDDDDD;
 	width: 32px;
 	line-height: 32px;
 	text-align: center;
 	border-radius: 2px;
-	box-shadow: 1px 1px 1px #CCC;
+	box-shadow: 1px 1px 1px #DDDDDD;
 }
 .key.wide {
 	width: 70px;
@@ -3434,14 +3434,14 @@ table.small td {
 .actions-wrap {
 	background: $list-background;
 	padding: 8px 8px 1px 8px;
-	border: 1px solid #CCC;
+	border: 1px solid #DDDDDD;
 	border-bottom: none;
 }
 
 .action-form {
 	font-size: 14px;
 	position: relative;
-	border: 1px solid #CCC;
+	border: 1px solid #DDDDDD;
 	border-left-width: 5px;
 	padding: 8px 0;
 	background: #FFF;
@@ -3501,7 +3501,7 @@ table.small td {
 		overflow-x: hidden;
 		resize: vertical;
 		height: 78px;
-		border: 1px solid #CCC;
+		border: 1px solid #DDDDDD;
 		background: $list-background;
 		margin-bottom: 15px;
 		padding: 8px 6px;
@@ -3565,7 +3565,7 @@ table.small td {
 	font-size: 13px;
 	color: #999;
 	line-height: 1.2;
-	border: 1px solid #CCC;
+	border: 1px solid #DDDDDD;
 	background: $list-background;
 	margin: 0 0 15px 0;
 	padding: 8px 6px;
@@ -3631,7 +3631,7 @@ table.small td {
 		left: 0;
 		top: 0;
 		height: 32px;
-		border-right: 1px solid #CCC;
+		border-right: 1px solid #DDDDDD;
 		width: 32px;
 		.favicon-wrap {
 			top: 6px;
@@ -3644,7 +3644,7 @@ table.small td {
 		right: 1px;
 		top: 1px;
 		height: 30px;
-		border-left: 1px solid #CCC;
+		border-left: 1px solid #DDDDDD;
 		width: 30px;
 		background: $list-background image-url("favicon-feed.svg") 7px 8px no-repeat;
 		border-radius: 0 4px 4px 0;
@@ -3654,7 +3654,7 @@ table.small td {
 		right: 0;
 		top: 17px;
 		font-size: 14px;
-		color: #cccccc;
+		color: #DDDDDD;
 		@media (max-width:800px) {
 			display: none;
 		}
@@ -3676,8 +3676,8 @@ table.small td {
 }
 
 .feed-controls {
-	border-top: 1px solid #CCC;
-	border-bottom: 1px solid #CCC;
+	border-top: 1px solid #DDDDDD;
+	border-bottom: 1px solid #DDDDDD;
 	padding: 10px 0 1px 0;
 }
 
@@ -3709,7 +3709,7 @@ Icons
 	height: 16px;
 	width: 16px;
 	border-radius: 12px;
-	border: 2px solid #CCC;
+	border: 2px solid #DDDDDD;
 	display: inline-block;
 	position: relative;
 	&:before {
@@ -3719,7 +3719,7 @@ Icons
 		width: 5px;
 		height: 1px;
 		display: block;
-		background-color: #CCC;
+		background-color: #DDDDDD;
 		content: "";
 	}
 	&:after {
@@ -3728,7 +3728,7 @@ Icons
 		top: 2px;
 		width: 1px;
 		height: 5px;
-		background-color: #CCC;
+		background-color: #DDDDDD;
 		display: block;
 		content: "";
 	}
@@ -3759,8 +3759,8 @@ Buttons
 		text-decoration: none;
 	}
 	&[disabled] {
-		color: #CCC;
-		border-color: #ccc;
+		color: #DDDDDD;
+		border-color: #DDDDDD;
 		background-color: #FFF;
 		cursor: default;
 	}
@@ -4184,7 +4184,7 @@ select {
 .billing-promo {
 	background-color: #f2f3f4;
 	background-repeat: no-repeat;
-	border: 1px solid #CCC;
+	border: 1px solid #DDDDDD;
 	padding: 10px 10px 10px 35px;
 	font-size: 14px;
 	color: #333;
@@ -4358,7 +4358,7 @@ input:focus:invalid, textarea:focus:invalid, select:focus:invalid {
 
 .collection-edit-controls {
 	padding: 8px 0;
-	border-top: 1px solid #CCC;
+	border-top: 1px solid #DDDDDD;
 }
 
 .pull-right {
@@ -4509,7 +4509,7 @@ Login and Sign Up
 		margin: 0 0 15px 0;
 	}
 	.box {
-		border: 1px solid #CCC;
+		border: 1px solid #DDDDDD;
 		border-radius: 4px;
 		background-color: #FFF;
 		margin: 0 auto 14px auto;
@@ -4533,7 +4533,7 @@ Login and Sign Up
 		background-color: #fafafa;
 		margin: 0;
 		&:focus {
-			border-color: #CCC;
+			border-color: #DDDDDD;
 		}
 	}
 	input[type="submit"] {
@@ -4622,7 +4622,7 @@ Right-to-left
 	}
 	blockquote {
 		padding: 0 15px 0 0;
-		border-right: 5px solid #CCC;
+		border-right: 5px solid #DDDDDD;
 		border-left: none;
 	}
 }
@@ -4816,7 +4816,7 @@ Media Players
 	background-position: 0px -14px;
 }
 .mejs-time-total {
-	background-color: #CCC;
+	background-color: #DDDDDD;
 }
 .mejs-controls .mejs-time-rail .mejs-time-total {
 	margin: 17px 2px 0 2px;
