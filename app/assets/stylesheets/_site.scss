@@ -1443,8 +1443,8 @@ Structure
 		position: relative;
 		&:before {
 			background-color: $selected;
-			height: 14px;
-			width: 2px;
+			height: 13px;
+			width: 3px;
 			position: absolute;
 			left: 17px;
 			top: 12px;
@@ -1452,11 +1452,11 @@ Structure
 		}
 		&:after {
 			background-color: $selected;
-			height: 2px;
-			width: 14px;
+			height: 3px;
+			width: 13px;
 			position: absolute;
-			top: 18px;
-			left: 11px;
+			top: 17px;
+			left: 12px;
 			content: "";
 		}
 	}
