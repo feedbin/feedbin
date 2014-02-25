@@ -1063,22 +1063,24 @@ Structure
 .header-form-wrap {
 	display: none;
 	position: absolute;
-	left: 8px;
-	top: 8px;
+	left: 0;
+	top: 0;
 	form {
 		margin: 0;
 		input[type="search"] {
-			height: 27px;
+			height: 43px;
 			width: 300px;
 			margin-bottom: 0;
-			padding: 3px 5px 3px 25px;
+			padding: 7px 5px 3px 36px;
 			font-size: 14px;
-			background: image-url("favicon-search-light.svg") 5px 6px no-repeat;
+			background: image-url("favicon-search-light.svg") 11px 15px no-repeat;
 			background-size: 14px 14px, 16px 16px;
 			border-radius: 13px;
+			border: none;
+			line-height: 1;
 			&.processing {
 				background-image: image-url("favicon-search-light.svg"), image-url("favicon-progress.gif");
-				background-position: 5px 6px, 97% 5px;
+				background-position: 11px 15px, 97% 15px;
 			}
 			&::-webkit-input-placeholder {
 			   color: #CCC;
