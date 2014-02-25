@@ -288,18 +288,19 @@ $.extend feedbin,
     $('.saved-search-wrap').removeClass('open')
 
   drawBarChart: (canvas, values) ->
-    spaceWidth = 2
-    numberOfSpaces = values.length - 1
-    barWidth = (canvas.width - numberOfSpaces * spaceWidth) / values.length
-    if canvas.getContext
-      context = canvas.getContext("2d")
-      context.fillStyle = "#f2f3f4"
-      xPosition = 0
-      for value in values
-        height = value * canvas.height
-        yPosition = canvas.height - height
-        context.fillRect(xPosition, Math.max(yPosition), barWidth, Math.max(height))
-        xPosition = xPosition + barWidth + spaceWidth
+    if values
+      spaceWidth = 2
+      numberOfSpaces = values.length - 1
+      barWidth = (canvas.width - numberOfSpaces * spaceWidth) / values.length
+      if canvas.getContext
+        context = canvas.getContext("2d")
+        context.fillStyle = "#f2f3f4"
+        xPosition = 0
+        for value in values
+          height = value * canvas.height
+          yPosition = canvas.height - height
+          context.fillRect(xPosition, Math.ceil(yPosition), barWidth, Math.ceil(height))
+          xPosition = xPosition + barWidth + spaceWidth
 
   hideQueue: []
 

@@ -221,7 +221,7 @@ class SettingsController < ApplicationController
       ) results
       ON (date = results.day)
     eos
-    start_date = 30.days.ago
+    start_date = 29.days.ago
     end_date = Time.now
 
     entry_counts = {}
