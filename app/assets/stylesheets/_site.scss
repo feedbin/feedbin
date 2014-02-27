@@ -1728,6 +1728,12 @@ li.selected > a .favicon-wrap {
 	background-image: image-url("favicon-search.svg");
 }
 
+.favicon-recently-read {
+	background-size: 16px 16px;
+	background-repeat: no-repeat;
+	background-image: image-url("favicon-recently-read.svg");
+}
+
 .favicon-progress {
 	background-image: image-url("favicon-progress.gif") !important;
 }

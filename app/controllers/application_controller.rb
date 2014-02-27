@@ -63,6 +63,15 @@ class ApplicationController < ActionController::Base
       parent_data: { behavior: 'starred', feed_id: 'collection_starred' },
       data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'starred', message: 'Mark starred items as read?'}.to_json }
     }
+    collections << {
+      title: 'Recently Read',
+      path: recently_read_entries_path,
+      count: 0,
+      id: 'collection_recently_read',
+      favicon_class: 'favicon-recently-read',
+      parent_data: { behavior: 'recently_read', feed_id: 'collection_recently_read' },
+      data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'recently_read', message: 'Mark recently read items as read?'}.to_json }
+    }
     collections
   end
 

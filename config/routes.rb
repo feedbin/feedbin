@@ -87,6 +87,7 @@ Feedbin::Application.routes.draw do
       post :unread_entries, to: 'unread_entries#update'
       post :starred_entries, to: 'starred_entries#update'
       post :mark_as_read, to: 'entries#mark_as_read'
+      post :recently_read, to: 'recently_read_entries#create'
       get :push_view
       get :diff
     end
@@ -95,6 +96,7 @@ Feedbin::Application.routes.draw do
       get :unread
       get :preload
       get :search
+      get :recently_read, to: 'recently_read_entries#index'
       post :mark_all_as_read
       post :mark_direction_as_read
     end

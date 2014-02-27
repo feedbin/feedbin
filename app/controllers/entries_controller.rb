@@ -132,6 +132,9 @@ class EntriesController < ApplicationController
     elsif params[:type] == 'starred'
       starred = @user.starred_entries.pluck(:entry_id)
       unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: starred)
+    elsif params[:type] == 'recently_read'
+      recently_read = @user.recently_read_entries.pluck(:entry_id)
+      unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: recently_read)
     elsif  %w{unread all}.include?(params[:type])
       unread_entries = UnreadEntry.where(user_id: @user.id)
     elsif params[:type] == 'saved_search'

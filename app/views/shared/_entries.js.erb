@@ -22,7 +22,11 @@ $('[data-behavior~=show_tags_form]').replaceWith('<%= j render partial: "shared/
   $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/unsubscribe", locals: {feed: @feed || nil} %>');
 <% end %>
 
+<% if @page_query %>
 feedbin.updatePager('<%= j will_paginate(@page_query) %>');
+<% else %>
+feedbin.updatePager('');
+<% end %>
 
 feedbin.data.viewMode = "<%= j session[:view_mode] %>";
 

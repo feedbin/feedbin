@@ -6,6 +6,7 @@ class Entry < ActiveRecord::Base
   belongs_to :feed
   has_many :unread_entries, dependent: :delete_all
   has_many :starred_entries
+  has_many :recently_read_entries
 
   before_create :ensure_published
   before_create :cache_public_id, unless: -> { Rails.env.test? }

@@ -140,6 +140,10 @@ $.extend feedbin,
   updateReadCount: (id, entry, target) ->
     if entry.read == false
       $.post $(target).data('mark-as-read-path')
+      clearTimeout feedbin.recentlyReadTimer
+      feedbin.recentlyReadTimer = setTimeout ( ->
+        $.post $(target).data('recently-read-path')
+      ), 10000
       feedbin.CountInstance.updateCount(entry.feed_id, entry.tags, 'decrement')
       $("[data-entry-id=#{id}]").addClass('read')
       feedbin.entries[id].read = true
@@ -317,6 +321,8 @@ $.extend feedbin,
   closeSubcription: false
 
   player: null
+
+  recentlyReadTimer: null
 
 $.extend feedbin,
   init:
