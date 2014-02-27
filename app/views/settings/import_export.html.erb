@@ -17,8 +17,15 @@
 
   <h3>Export</h3>
   <p><%= link_to "Download Subscriptions", subscriptions_path(format: :xml) %></p>
-  <p>
-    <%= link_to "Export Starred Items", starred_export_path, method: :post %>
-    <br /><small>A link will be emailed to you.</small>
-  </p>
+  <% if @user.starred_entries.exists? %>
+    <p>
+      <%= link_to "Export Starred Articles", starred_export_path, method: :post %>
+      <br /><small>A link will be emailed to you.</small>
+    </p>
+  <% else %>
+    <p>
+      Export Starred Articles
+      <br /><small>No starred articles to export.</small>
+    </p>
+  <% end %>
 </div>
