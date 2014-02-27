@@ -140,7 +140,6 @@ $.extend feedbin,
   updateReadCount: (id, entry, target) ->
     if entry.read == false
       $.post $(target).data('mark-as-read-path')
-      clearTimeout feedbin.recentlyReadTimer
       feedbin.recentlyReadTimer = setTimeout ( ->
         $.post $(target).data('recently-read-path')
       ), 10000
@@ -625,6 +624,7 @@ $.extend feedbin,
 
     usePreloadContent: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=open_item]', (event, xhr) ->
+        clearTimeout feedbin.recentlyReadTimer
         id = $(@).parents('li').data('entry-id')
         entry = feedbin.entries[id]
         if entry
