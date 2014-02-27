@@ -378,6 +378,38 @@ ALTER SEQUENCE plans_id_seq OWNED BY plans.id;
 
 
 --
+-- Name: recently_read_entries; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE recently_read_entries (
+    id integer NOT NULL,
+    user_id integer,
+    entry_id integer,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: recently_read_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE recently_read_entries_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: recently_read_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE recently_read_entries_id_seq OWNED BY recently_read_entries.id;
+
+
+--
 -- Name: saved_searches; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -732,6 +764,13 @@ ALTER TABLE ONLY plans ALTER COLUMN id SET DEFAULT nextval('plans_id_seq'::regcl
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY recently_read_entries ALTER COLUMN id SET DEFAULT nextval('recently_read_entries_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY saved_searches ALTER COLUMN id SET DEFAULT nextval('saved_searches_id_seq'::regclass);
 
 
@@ -854,6 +893,14 @@ ALTER TABLE ONLY imports
 
 ALTER TABLE ONLY plans
     ADD CONSTRAINT plans_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: recently_read_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY recently_read_entries
+    ADD CONSTRAINT recently_read_entries_pkey PRIMARY KEY (id);
 
 
 --
@@ -995,6 +1042,27 @@ CREATE INDEX index_feeds_on_last_published_entry ON feeds USING btree (last_publ
 --
 
 CREATE INDEX index_import_items_on_import_id ON import_items USING btree (import_id);
+
+
+--
+-- Name: index_recently_read_entries_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_recently_read_entries_on_created_at ON recently_read_entries USING btree (created_at);
+
+
+--
+-- Name: index_recently_read_entries_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_recently_read_entries_on_user_id ON recently_read_entries USING btree (user_id);
+
+
+--
+-- Name: index_recently_read_entries_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_recently_read_entries_on_user_id_and_entry_id ON recently_read_entries USING btree (user_id, entry_id);
 
 
 --
@@ -1404,3 +1472,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140116101303');
 INSERT INTO schema_migrations (version) VALUES ('20140218235831');
 
 INSERT INTO schema_migrations (version) VALUES ('20140223114030');
+
+INSERT INTO schema_migrations (version) VALUES ('20140227001243');
