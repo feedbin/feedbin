@@ -7,6 +7,9 @@ class Subscription < ActiveRecord::Base
   before_create :mark_as_unread
   before_destroy :mark_as_read
 
+  before_create :expire_stat_cache
+  before_destroy :expire_stat_cache
+
   after_create :add_feed_to_action
   before_destroy :remove_feed_from_action
 
@@ -42,6 +45,10 @@ class Subscription < ActiveRecord::Base
       action.feed_ids = action.feed_ids - [self.feed_id.to_s]
       action.save
     end
+  end
+
+  def expire_stat_cache
+    Rails.cache.delete("#{self.user_id}:entry_counts")
   end
 
 end
