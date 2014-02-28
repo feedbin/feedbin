@@ -3660,18 +3660,20 @@ table.small td {
 		right: 0;
 		top: 17px;
 		font-size: 14px;
-		color: #DDDDDD;
+		color: #999999;
 		@media (max-width:800px) {
 			display: none;
 		}
 	}
 	.canvas-wrap {
-		display: none;
 		max-width: 508px;
 		float: right;
 		overflow-x: hidden;
 		overflow-y: visible;
 		z-index: 0;
+		@media (max-width:1235px) {
+			display: none;
+		}
 	}
 	canvas {
 		position: absolute;
