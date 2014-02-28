@@ -4,7 +4,7 @@ class BigBatchScheduler
 
   def perform
     total_records = Feed.count
-    batch_size = 1
+    batch_size = 1000
     batch_count = (total_records.to_f/batch_size.to_f).ceil
     1.upto(batch_count) do |batch|
       BigBatch.perform_async(batch)
