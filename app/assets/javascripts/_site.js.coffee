@@ -300,9 +300,9 @@ $.extend feedbin,
         context.fillStyle = "#f2f3f4"
         xPosition = 0
         for value in values
-          height = value * canvas.height
+          height = Math.ceil(value * canvas.height)
           yPosition = canvas.height - height
-          context.fillRect(xPosition, Math.ceil(yPosition), barWidth, Math.ceil(height))
+          context.fillRect(xPosition, yPosition, barWidth, height)
           xPosition = xPosition + barWidth + spaceWidth
 
   hideQueue: []
