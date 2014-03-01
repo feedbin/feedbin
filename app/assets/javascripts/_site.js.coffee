@@ -908,6 +908,26 @@ $.extend feedbin,
         feedbin.drawBarChart(@, $(@).data('values'))
       return
 
+    fuzzyFilter: ->
+      feeds = $('.feed-form li')
+      $(document).on 'keyup', '[data-behavior~=feed_search]', ->
+        suggestions = []
+        query = $(@).val()
+        if query.length < 1
+          suggestions = feeds
+        else
+          $.each feeds, (i, feed) ->
+            feed.score = $(feed).data('sort-name').score(query);
+            if feed.score > 0
+              suggestions.push(feed);
+          if suggestions.length > 0
+            suggestions = _.sortBy suggestions, (suggestion) ->
+              -(suggestion.score)
+          else
+            suggestions = ''
+        $('.feed-form').html(suggestions)
+      return
+
 jQuery ->
   $.each feedbin.init, (i, item) ->
     item()

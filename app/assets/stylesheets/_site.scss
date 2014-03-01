@@ -3683,6 +3683,23 @@ table.small td {
 	}
 }
 
+.feed-search {
+	position: absolute;
+	right: 20px;
+	top: 5px;
+	border-radius: 16px !important;
+	padding: 6px 5px 6px 36px !important;
+	font-size: 14px;
+	background: image-url("favicon-search-light.svg") 11px 9px no-repeat;
+	border: none !important;
+	max-width: 250px !important;
+	background-color: #f2f3f4;
+	display: block;
+	@media (max-width: 650px) {
+		position: static;
+	}
+}
+
 .feed-controls {
 	border-top: 1px solid #DDDDDD;
 	border-bottom: 1px solid #DDDDDD;
