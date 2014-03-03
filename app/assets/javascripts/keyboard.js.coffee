@@ -408,7 +408,7 @@ class feedbin.Keyboard
     @selectItem()
 
   hasEntryContent: ->
-    @entryScrollHeight() - $('.entry-content').prop('scrollTop') > 0
+    @entryScrollHeight() - $('.entry-content').prop('scrollTop') > 2
 
   scrollContent: (interval, direction) ->
     if 'down' == direction
