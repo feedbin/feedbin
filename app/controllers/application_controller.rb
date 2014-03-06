@@ -13,6 +13,11 @@ class ApplicationController < ActionController::Base
 
   add_flash_types :analytics_event, :one_time_content
 
+  def append_info_to_payload(payload)
+    super
+    payload[:feedbin_request_id] = request.headers['X-Feedbin-Request-ID']
+  end
+
   def update_selected_feed!(type, data = nil)
     if data.nil?
       selected_feed = type

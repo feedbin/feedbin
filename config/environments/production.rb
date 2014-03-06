@@ -57,6 +57,13 @@ Feedbin::Application.configure do
 
   # Less verbose logs
   config.lograge.enabled = true
+  config.lograge.custom_options = lambda do |event|
+    custom_options = {}
+    if event.payload && event.payload[:feedbin_request_id].present?
+      custom_options[:feedbin_request_id] = event.payload[:feedbin_request_id]
+    end
+    custom_options
+  end
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
