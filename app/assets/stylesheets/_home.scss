@@ -176,7 +176,11 @@
 		}
 	}
 	.rounded-icon {
-		border-radius: 8px;
+		border-radius: 12px;
+	}
+	.rounded-bordered-icon {
+		border-radius: 12px;
+		border: 1px solid #DDD;
 	}
 	.apps {
 		text-align: left;
