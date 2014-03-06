@@ -9,15 +9,28 @@ module Api
 
       def index
         @user = current_user
-        @subscriptions = @user.subscriptions.includes(:feed).order("subscriptions.created_at DESC")
-        if params.has_key?(:since)
-          time = Time.iso8601(params[:since])
-          @subscriptions = @subscriptions.where("subscriptions.created_at > :time", {time: time})
-        end
-        if @subscriptions.any?
-          fresh_when(etag: @subscriptions, last_modified: @subscriptions.maximum(:updated_at))
-        else
-          @subscriptions = []
+        respond_to do |format|
+          format.json do
+            @subscriptions = @user.subscriptions.includes(:feed).order("subscriptions.created_at DESC")
+            if params.has_key?(:since)
+              time = Time.iso8601(params[:since])
+              @subscriptions = @subscriptions.where("subscriptions.created_at > :time", {time: time})
+            end
+            if @subscriptions.any?
+              fresh_when(etag: @subscriptions, last_modified: @subscriptions.maximum(:updated_at))
+            else
+              @subscriptions = []
+            end
+          end
+          format.xml do
+            @tags = @user.feed_tags
+            @feeds = @user.feeds
+            @titles = {}
+            @user.subscriptions.pluck(:feed_id, :title).each do |feed_id, title|
+              @titles[feed_id] = title
+            end
+            render template: 'subscriptions/index'
+          end
         end
       end
 
