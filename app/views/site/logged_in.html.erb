@@ -1,5 +1,6 @@
 <% @class = 'app nothing-selected' %>
 <% content_for :head do %>
+  <meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no minimal-ui" />
   <% if ENV['FONT_STYLESHEET'] %>
   <link rel="stylesheet" type="text/css" href="<%= ENV['FONT_STYLESHEET'] %>" />
   <% end %>
