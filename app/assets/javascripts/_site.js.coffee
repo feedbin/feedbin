@@ -895,7 +895,7 @@ $.extend feedbin,
 
     menu: ->
       $(document).on 'click', '[data-behavior~=show_menu]', ->
-        $(@).toggleClass('open')
+        $(@).siblings('.settings-nav').toggleClass('open')
         return
 
     viewLatest: ->
