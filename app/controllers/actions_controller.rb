@@ -10,7 +10,6 @@ class ActionsController < ApplicationController
 
   def actions_update
     @user = current_user
-    @user.free_ok = (@user.plan.stripe_id == 'free')
     if @user.update_attributes(actions_update_params)
       redirect_to actions_url, notice: "Actions updated."
     else

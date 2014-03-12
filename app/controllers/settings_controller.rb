@@ -99,7 +99,6 @@ class SettingsController < ApplicationController
   def update_credit_card
     @user = current_user
     @user.stripe_token = params[:stripe_token]
-    @user.free_ok = (@user.plan.stripe_id == 'free')
 
     respond_to do |format|
       if @user.save
@@ -113,7 +112,6 @@ class SettingsController < ApplicationController
   def settings_update
     @user = current_user
     @user.attributes = user_settings_params
-    @user.free_ok = (@user.plan.stripe_id == 'free')
     if @user.save
       if params[:redirect_to]
         redirect_to params[:redirect_to], notice: 'Settings updated.'

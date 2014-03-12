@@ -32,6 +32,9 @@ class UsersController < ApplicationController
 
     if coupon_valid || !ENV['STRIPE_API_KEY']
       @user.free_ok = true
+      @user.plan = Plan.find_by_stripe_id('free')
+    else
+      @user.plan = Plan.find_by_stripe_id('trial')
     end
 
     if params[:user] && params[:user][:password]
@@ -57,7 +60,6 @@ class UsersController < ApplicationController
     old_plan_name = @user.plan.stripe_id
     @user.update_auth_token = true
     @user.old_password_valid = @user.authenticate(params[:user][:old_password])
-    @user.free_ok = (@user.plan.stripe_id == 'free')
     @user.attributes = user_params
     if params[:user] && params[:user][:password]
       @user.password_confirmation = params[:user][:password]

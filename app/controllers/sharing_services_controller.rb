@@ -7,7 +7,6 @@ class SharingServicesController < ApplicationController
 
   def sharing_services_update
     @user = current_user
-    @user.free_ok = (@user.plan.stripe_id == 'free')
     if @user.update_attributes(sharing_services_params)
       redirect_to sharing_services_url, notice: "Sharing services updated."
     else

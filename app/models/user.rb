@@ -1,6 +1,6 @@
 class User < ActiveRecord::Base
 
-  attr_accessor :stripe_token, :old_password_valid, :update_auth_token, :password_reset, :coupon_code, :free_ok, :is_trialing
+  attr_accessor :stripe_token, :old_password_valid, :update_auth_token, :password_reset, :coupon_code, :is_trialing
 
   has_secure_password
 
@@ -44,7 +44,7 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :email, case_sensitive: false
   validate :changed_password, on: :update, unless: -> user { user.password_reset }
   validate :coupon_code_valid, on: :create, if: -> user { user.coupon_code }
-  validate :plan_type_valid
+  validate :plan_type_valid, on: :update
   validate :trial_plan_valid
 
   def to_param
@@ -72,12 +72,22 @@ class User < ActiveRecord::Base
     end
   end
 
+  def free_ok
+    @free_ok || plan_id_was == Plan.find_by_stripe_id('free').id
+  end
+
+  def free_ok=(value)
+    @free_ok = value
+  end
+
   def plan_type_valid
+    original_plan = Plan.find(plan_id_was)
     if free_ok
-      valid_plans = Plan.where(price_tier: plan.price_tier).pluck(:id)
+      valid_plans = Plan.where(price_tier: original_plan.price_tier).pluck(:id)
     else
-      valid_plans = Plan.where(price_tier: plan.price_tier).where.not(stripe_id: 'free').pluck(:id)
+      valid_plans = Plan.where(price_tier: original_plan.price_tier).where.not(stripe_id: 'free').pluck(:id)
     end
+
     unless valid_plans.include?(plan.id)
       errors.add(:plan_id, 'is invalid')
     end

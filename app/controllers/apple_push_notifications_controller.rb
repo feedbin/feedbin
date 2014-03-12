@@ -33,14 +33,12 @@ class ApplePushNotificationsController < ApplicationController
 
   def update
     @user.apple_push_notification_device_token = params[:device_token]
-    @user.free_ok = (@user.plan.stripe_id == 'free')
     @user.save
     render nothing: true
   end
 
   def delete
     @user.apple_push_notification_device_token = nil
-    @user.free_ok = (@user.plan.stripe_id == 'free')
     @user.save
     render nothing: true
   end
