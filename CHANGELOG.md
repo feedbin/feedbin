@@ -16,7 +16,7 @@ November 2013
 -------------
 
 - 2013-11-28 Print stylesheet
-- 2013-11-28 Links to new help.feedbin.me
+- 2013-11-28 Links to new help.feedbin.com
 - 2013-11-26 Entry column redesign (star indicator, date format, etc...)
 - 2013-11-09 Action design update
 - 2013-11-09 Rewrote actions to use elasticsearch percolate

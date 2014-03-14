@@ -11,7 +11,7 @@ xml.rss version: "2.0", 'xmlns:dc' => 'http://purl.org/dc/elements/1.1/', 'xmlns
         xml.pubDate entry.published.to_s(:rfc822)
         xml.link entry.fully_qualified_url
         xml.dc :creator, entry.feed.title
-        xml.guid entry_url(entry), isPermaLink: false
+        xml.guid "https://feedbin.me#{entry_path(entry)}", isPermaLink: false
       end
     end
   end

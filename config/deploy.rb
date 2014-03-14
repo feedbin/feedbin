@@ -25,8 +25,8 @@ set :unicorn_bundle, bundle_cmd
 
 set :assets_role, [:app]
 
-role :app, "www1.feedbin.me", "www2.feedbin.me", "www3.feedbin.me"
-role :worker, "worker1.feedbin.me", "worker2.feedbin.me"
+role :app, "www1.feedbin.com", "www2.feedbin.com", "www3.feedbin.com"
+role :worker, "worker1.feedbin.com", "worker2.feedbin.com"
 
 default_run_options[:pty] = true
 default_run_options[:shell] = '/bin/bash --login'

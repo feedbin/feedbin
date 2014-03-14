@@ -12,7 +12,7 @@ Introduction
 
 Feedbin is a web based RSS reader. It provides a user interface for reading and managing feeds as well as a [REST-like API](https://github.com/feedbin/feedbin-api) for clients to connect to.
 
-If you would like to try Feedbin out you can [sign up](https://feedbin.me/) for an account.
+If you would like to try Feedbin out you can [sign up](https://feedbin.com/) for an account.
 
 The main Feedbin project is a [Rails 4.0](http://rubyonrails.org/) application. In addition to the main project there are several other services that provide additional functionality. None of these services are required to get Feedbin running locally, but they all provide important functionality that you would want for a production install.
 
@@ -44,7 +44,7 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | CAMO_HOST                | CDN to point to the camo host                                                      |
 | CAMO_KEY                 | Used to rewrite assets to use https - https://github.com/atmos/camo                |
 | DATABASE_URL             | Database connection string - postgres://USER:PASS@IP:PORT/DATABASE                 |
-| DEFAULT_URL_OPTIONS_HOST | Mailer host - feedbin.me                                                           |
+| DEFAULT_URL_OPTIONS_HOST | Mailer host - feedbin.com                                                           |
 | ELASTICSEARCH_URL        | search endpoint - http://localhost:9200                                            |
 | FEEDBIN_HOMEPAGE_REPO    | Git URL to a Rails engine that provides a custom homepage                          |
 | FROM_ADDRESS             | Used as a reply-to email address                                                   |
@@ -56,7 +56,7 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | MEMCACHED_HOSTS          | Comma separated memcached hosts/ports - 192.168.1.2:11121                          |
 | POSTGRES_USERNAME        | Used for connecting to database                                                    |
 | POSTMARK_API_KEY         | Used for sending email - http://postmarkapp.com                                    |
-| PUSH_URL                 | URL for the Feedbin instance - https://feedbin.me                                  |
+| PUSH_URL                 | URL for the Feedbin instance - https://feedbin.com                                  |
 | RACK_ENV                 | Environment - production                                                           |
 | RAILS_ENV                | Environment - production                                                           |
 | READABILITY_API_TOKEN    | Used for Readability - http://www.readability.com                                  |
@@ -94,4 +94,4 @@ export AWS_ACCESS_KEY_ID=aoisjf3j23oij23f
 
 Have a feature you would like to add but don't know where to start?
 
-Email [support@feedbin.me](support@feedbin.me) and we'll set something up to work on it together.
+Email [support@feedbin.com](support@feedbin.com) and we'll set something up to work on it together.
