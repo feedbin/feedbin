@@ -284,7 +284,7 @@ GEM
       json (~> 1.8.1)
       mime-types (~> 1.25)
       rest-client (~> 1.4)
-    stripe_event (1.1.0)
+    stripe_event (1.0.0)
       activesupport (>= 3.1)
       stripe (~> 1.6)
     therubyracer (0.12.1)
@@ -363,7 +363,7 @@ DEPENDENCIES
   sidekiq
   sinatra
   stripe
-  stripe_event
+  stripe_event (= 1.0.0)
   therubyracer
   tire
   uglifier (>= 1.0.3)
