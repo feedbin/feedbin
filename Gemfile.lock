@@ -1,7 +1,7 @@
 GIT
   remote: git://github.com/benubois/html-pipeline.git
-  revision: 13aaf6d17148b519879d7d97c1b92e97dadfad7c
-  ref: 13aaf6d
+  revision: f367d912a01fad495402a2597a5a1cabb8529d42
+  ref: f367d91
   specs:
     html-pipeline (1.1.0)
       activesupport (>= 2)
@@ -156,6 +156,7 @@ GEM
       dotenv (>= 0.7)
       thor (>= 0.13.6)
     formatador (0.2.4)
+    gctools (0.2.3)
     grocer (0.5.0)
     hashie (1.2.0)
     hashr (0.0.22)
@@ -340,6 +341,7 @@ DEPENDENCIES
   feedzirra!
   fog
   foreman
+  gctools
   grocer
   grocer-pushpackager!
   honeybadger
