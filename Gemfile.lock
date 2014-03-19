@@ -280,9 +280,9 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (~> 2.8)
-    stripe (1.10.1)
-      json (~> 1.8.1)
+    stripe (1.9.9)
       mime-types (~> 1.25)
+      multi_json (>= 1.0.4, < 2)
       rest-client (~> 1.4)
     stripe_event (1.0.0)
       activesupport (>= 3.1)
@@ -362,8 +362,8 @@ DEPENDENCIES
   sass-rails (~> 4.0.0)
   sidekiq
   sinatra
-  stripe
-  stripe_event (= 1.0.0)
+  stripe (= 1.9.9)
+  stripe_event
   therubyracer
   tire
   uglifier (>= 1.0.3)
