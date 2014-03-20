@@ -28,9 +28,8 @@
       <% end %>
     </div>
     <% if signed_in? %>
-      <button class="menu" data-behavior="show_menu">
-        <%= render partial: 'layouts/settings_nav' %>
-      </button>
+      <button class="menu" data-behavior="show_menu"></button>
+      <%= render partial: 'layouts/settings_nav' %>
     <% end %>
   </header>
 

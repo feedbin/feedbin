@@ -1175,12 +1175,9 @@ Structure
 }
 
 .menu {
-	position: absolute;
-	top: 0;
-	right: 0;
+    float: right;
 	margin: 0;
 	padding: 0;
-	z-index: 1;
 	-webkit-appearance: none;
 	border: none;
 	background: none;
@@ -1193,30 +1190,37 @@ Structure
 		content: "";
 		display: block;
 	}
-	.settings-nav {
-		background-color: #f2f3f4;
-		border: 1px solid #DDDDDD;
+	@media (min-width: 528px) {
 		display: none;
-		.logo {
-			display: none !important;
-		}
-		ul {
-			padding: 0;
-			margin: 20px 30px;
-		}
-		li {
-			padding-top: 4px;
-			padding-bottom: 4px;
-		}
-		.mobile-hide {
-			display: none;
-		}
-		.desktop-hide {
-			display: block;
-		}
 	}
-	&.open .settings-nav {
+}
+.bar .settings-nav {
+	position: absolute;
+	top: 43px;
+	right: 0;
+	z-index: 1;
+	background-color: #f2f3f4;
+	border: 1px solid #DDDDDD;
+	display: none;
+	.logo {
+		display: none !important;
+	}
+	ul {
+		padding: 0;
+		margin: 20px 30px;
+	}
+	li {
+		padding-top: 4px;
+		padding-bottom: 4px;
+	}
+	.mobile-hide {
+		display: none;
+	}
+	.desktop-hide {
 		display: block;
+	}
+	&.open {
+	    display: block;
 	}
 	@media (min-width: 528px) {
 		display: none;
