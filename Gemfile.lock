@@ -1,7 +1,7 @@
 GIT
   remote: git://github.com/benubois/html-pipeline.git
-  revision: f367d912a01fad495402a2597a5a1cabb8529d42
-  ref: f367d91
+  revision: 0d8583447489d4145fde5a2437d8a09a31492830
+  ref: 0d85834
   specs:
     html-pipeline (1.1.0)
       activesupport (>= 2)

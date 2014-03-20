@@ -20,7 +20,7 @@ gem 'unicorn'
 
 gem 'opml_saw',              github: 'feedbin/opml_saw',            ref: '61d8c2d'
 gem 'feedzirra',             github: 'feedbin/feedzirra',           ref: '6d57e27'
-gem 'html-pipeline',         github: 'benubois/html-pipeline',      ref: 'f367d91'
+gem 'html-pipeline',         github: 'benubois/html-pipeline',      ref: '0d85834'
 gem 'grocer-pushpackager',   github: 'feedbin/grocer-pushpackager', ref: 'e190796', require: 'grocer/pushpackager'
 gem 'html_diff',             github: 'feedbin/html_diff',           ref: 'c7c15ce'
 
