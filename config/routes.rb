@@ -21,8 +21,8 @@ Feedbin::Application.routes.draw do
   post '/emails' => 'emails#create'
 
   match '/404', to: 'errors#not_found', via: :all
-  get '/starred/:starred_token', to: 'starred#index', as: 'starred'
-  post '/starred/export', to: 'starred#export'
+  get '/starred/:starred_token', to: 'starred_entries#index', as: 'starred'
+  post '/starred/export', to: 'starred_entries#export'
 
   get    :signup,         to: 'users#new',           as: 'signup'
   get    :login,          to: 'sessions#new',        as: 'login'
