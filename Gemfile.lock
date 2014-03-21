@@ -251,7 +251,7 @@ GEM
       actionpack (>= 2.1)
     rest-client (1.6.7)
       mime-types (>= 1.16)
-    rubyzip (1.1.2)
+    rubyzip (1.1.0)
     sanitize (2.1.0)
       nokogiri (>= 1.4.4)
     sass (3.2.16)
@@ -360,6 +360,7 @@ DEPENDENCIES
   readability_parser
   redis (>= 3.0.5)
   request_exception_handler
+  rubyzip (= 1.1.0)
   sanitize
   sass-rails (~> 4.0.0)
   sidekiq
