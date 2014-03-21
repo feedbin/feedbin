@@ -861,9 +861,11 @@ $.extend feedbin,
           feedbin.checkPushPermission(permissionData )
 
     enablePush: ->
-      $(document).on 'click', '[data-behavior~=enable_push]', ->
+      $(document).on 'click', '[data-behavior~=enable_push]', (event) ->
         data = $('#push-data').data()
         window.safari.pushNotification.requestPermission(data.webServiceUrl, data.websiteId, {authentication_token: data.authenticationToken}, feedbin.checkPushPermission)
+        event.preventDefault()
+        return
 
     deleteAssociatedRecord: ->
       $(document).on 'click', '.remove_fields', (event) ->

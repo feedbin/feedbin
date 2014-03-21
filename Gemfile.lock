@@ -336,6 +336,7 @@ DEPENDENCIES
   clockwork
   cocoon
   coffee-rails (~> 4.0.0)
+  connection_pool
   dalli
   dotenv-rails
   feedzirra!

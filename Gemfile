@@ -57,6 +57,7 @@ gem 'tire'
 gem 'grocer'
 gem 'cocoon'
 gem 'gctools', require: false
+gem 'connection_pool'
 
 # Sidekiq
 gem 'sidekiq'
