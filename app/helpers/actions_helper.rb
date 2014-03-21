@@ -29,7 +29,9 @@ module ActionsHelper
   def action_names(action)
     actions = []
     action.actions.each do |action_name|
-      actions << action_label(action_name)
+      if action_name.present?
+        actions << action_label(action_name)
+      end
     end
     if actions.any?
       actions.join(', ')
