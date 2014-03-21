@@ -112,17 +112,23 @@ class User < ActiveRecord::Base
     end
   end
 
-  def generate_token(column)
+  def generate_token(column, hash = false)
     begin
-      self[column] = SecureRandom.urlsafe_base64
+      random_string = SecureRandom.urlsafe_base64
+      if hash
+        self[column] = Digest::SHA1.hexdigest(random_string)
+      else
+        self[column] = random_string
+      end
     end while User.exists?(column => self[column])
+    random_string
   end
 
   def send_password_reset
-    generate_token(:password_reset_token)
+    token = generate_token(:password_reset_token, true)
     self.password_reset_sent_at = Time.now
     save!
-    UserMailer.delay(queue: :critical).password_reset(id)
+    UserMailer.delay(queue: :critical).password_reset(id, token)
   end
 
   def update_billing

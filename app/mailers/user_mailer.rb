@@ -12,8 +12,9 @@ class UserMailer < ActionMailer::Base
     mail to: @user.email, subject: '[Feedbin] Please Update Your Billing Information'
   end
 
-  def password_reset(user_id)
+  def password_reset(user_id, reset_token)
     @user = User.find(user_id)
+    @reset_token = reset_token
     mail to: @user.email, subject: '[Feedbin] Password Reset'
   end
 
