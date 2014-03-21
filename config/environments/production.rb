@@ -1,5 +1,3 @@
-require 'rack_headers'
-
 Feedbin::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -34,19 +32,6 @@ Feedbin::Application.configure do
 
   # Version of your assets, change this if you want to expire all your assets.
   config.assets.version = '1.0'
-
-  # Rack Headers
-  # Set HTTP Headers on static assets
-  config.assets.header_rules = [
-    # Cache all static files in public caches (e.g. Rack::Cache)
-    #  as well as in the browser
-    [:all,   {'Cache-Control' => 'public, max-age=31536000'}],
-
-    # Provide web fonts with cross-origin access-control-headers
-    #  Firefox requires this when serving assets using a Content Delivery Network
-    [:fonts, {'Access-Control-Allow-Origin' => '*'}]
-  ]
-  config.middleware.insert_before '::ActionDispatch::Static', '::Rack::Headers'
 
   # Specifies the header that your server uses for sending files.
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
