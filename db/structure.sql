@@ -996,6 +996,13 @@ CREATE INDEX index_coupons_on_user_id ON coupons USING btree (user_id);
 
 
 --
+-- Name: index_entries_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_entries_on_created_at ON entries USING btree (created_at DESC);
+
+
+--
 -- Name: index_entries_on_feed_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1474,3 +1481,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140218235831');
 INSERT INTO schema_migrations (version) VALUES ('20140223114030');
 
 INSERT INTO schema_migrations (version) VALUES ('20140227001243');
+
+INSERT INTO schema_migrations (version) VALUES ('20140321203637');
