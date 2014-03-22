@@ -4777,7 +4777,7 @@ Media Players
 	float: left;
 	margin: 0;
 	padding: 0;
-	width: 28px;
+	width: 22px;
 	height: 44px;
 	font-size: 11px;
 	line-height: 11px;
@@ -4799,7 +4799,7 @@ Media Players
 	padding: 0;
 	position: absolute;
 	height: 44px;
-	width: 28px;
+	width: 22px;
 	border: 0;
 	background: none;
 	outline: none;
@@ -4808,27 +4808,27 @@ Media Players
 	width: 0px;
 	height: 0px;
 	border-style: solid;
-	border-width: 11px 0 11px 20px;
-	border-color: transparent transparent transparent #000000;
+	border-width: 9px 0 9px 15px;
+	border-color: transparent transparent transparent #333333;
 	content: "";
 	position: absolute;
-	top: 11px;
+	top: 13px;
 	left: 5px;
 	pointer-events: none;
 }
 .mejs-controls .mejs-pause button:after,
 .mejs-controls .mejs-pause button:before {
 	width: 5px;
-	height: 18px;
+	height: 16px;
 	content: "";
 	position: absolute;
-	top: 12px;
+	top: 14px;
 	left: 5px;
 	pointer-events: none;
 	background-color: #333;
 }
 .mejs-controls .mejs-pause button:after {
-	left: 15px;
+	left: 13px;
 }
 .mejs-fullscreen-button button:after {
 	display: block;
@@ -4876,13 +4876,13 @@ Media Players
 	text-align: center;
 	box-sizing: content-box;
 	&.mejs-currenttime-container {
-		padding-right: 0;
+		padding-right: 6px;
 		span {
 			margin-right: 0;
 		}
 	}
 	&.mejs-duration-container {
-		padding-left: 0;
+		padding-left: 6px;
 		span {
 			margin-left: 0;
 		}
