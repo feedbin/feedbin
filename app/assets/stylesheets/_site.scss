@@ -1629,11 +1629,11 @@ Structure
 	background: $selected;
 }
 
-li.selected .drawer .drawer-arrow:after {
+li.selected .drawer ul:after {
 	border-top-color: #666;
 }
 
-.selected li.selected .drawer .drawer-arrow:after {
+.selected li.selected .drawer ul:after {
 	border-top-color: $selected;
 }
 
