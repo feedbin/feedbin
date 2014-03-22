@@ -29,25 +29,36 @@
 	}
 }
 
-@mixin hairline($position) {
-	@if $position == bottom {
-		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1' height='1'><rect fill='#CCC' x='0' y='0' width='1' height='0.5'/></svg>");
-		background-position: 0 100%;
-		background-repeat: repeat-x;
+@mixin arrow($x-position, $y-position, $arrow-color, $shadow-color, $origin:left) {
+	&:before {
+		@if $origin == left {
+			left: $x-position;
+		}
+		@else {
+			right: $x-position;
+		}
+		top: $y-position;
+		position: absolute;
+		border-right: 6px solid rgba(0, 0, 0, 0);
+		border-top: 6px solid $shadow-color;
+		border-left: 6px solid rgba(0, 0, 0, 0);
+		border-bottom-color: rgba(0, 0, 0, 1);
+		content: '';
+		@content;
 	}
-	@else if $position == top {
-		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1' height='1'><rect fill='#CCC' x='0' y='0' width='1' height='0.5'/></svg>");
-		background-position: 0 0;
-		background-repeat: repeat-x;
-	}
-	@else if $position == right {
-		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1' height='1'><rect fill='#CCC' x='0' y='0' width='0.5' height='1'/></svg>");
-		background-position: 100% 0;
-		background-repeat: repeat-y;
-	}
-	@else if $position == left {
-		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1' height='1'><rect fill='#CCC' x='0' y='0' width='0.5' height='1'/></svg>");
-		background-position: 0 0;
-		background-repeat: repeat-y;
+	&:after {
+		@if $origin == left {
+			left: $x-position + 1;
+		}
+		@else {
+			right: $x-position + 1;
+		}
+		top: $y-position;
+		position: absolute;
+		border-right: 5px solid rgba(0, 0, 0, 0);
+		border-top: 5px solid $arrow-color;
+		border-left: 5px solid rgba(0, 0, 0, 0);
+		content: '';
+		@content;
 	}
 }

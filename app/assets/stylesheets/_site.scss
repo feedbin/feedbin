@@ -1512,25 +1512,7 @@ Structure
 		padding: 5px 25px 5px 5px;
 		font-size: 14px;
 	}
-	&:before {
-		position: absolute;
-		top: -1px;
-		left: 12px;
-		border-right: 6px solid rgba(0, 0, 0, 0);
-		border-top: 6px solid #CCCCCC;
-		border-left: 6px solid rgba(0, 0, 0, 0);
-		border-bottom-color: rgba(0, 0, 0, 1);
-		content: '';
-		display: none;
-	}
-	&:after {
-		position: absolute;
-		top: -1px;
-		left: 13px;
-		border-right: 5px solid rgba(0, 0, 0, 0);
-		border-top: 5px solid $list-background;
-		border-left: 5px solid rgba(0, 0, 0, 0);
-		content: '';
+	@include arrow(12px, -1px, $list-background, #CCC) {
 		display: none;
 	}
 	&.open:after, &.open:before {
@@ -1614,27 +1596,7 @@ Structure
 			border-top: 1px solid #DDDDDD;
 			border-bottom: 1px solid #DDDDDD;
 			padding: 0;
-		}
-		.drawer-arrow:before {
-			position: absolute;
-			top: 0;
-			left: 32px;
-			display: inline-block;
-			border-right: 6px solid rgba(0, 0, 0, 0);
-			border-top: 6px solid #CCCCCC;
-			border-left: 6px solid rgba(0, 0, 0, 0);
-			border-bottom-color: rgba(0, 0, 0, 1);
-			content: '';
-		}
-		.drawer-arrow:after {
-			position: absolute;
-			top: 0;
-			left: 33px;
-			display: inline-block;
-			border-right: 5px solid rgba(0, 0, 0, 0);
-			border-top: 5px solid $list-background;
-			border-left: 5px solid rgba(0, 0, 0, 0);
-			content: '';
+			@include arrow(32px, 0px, $list-background, #CCC)
 		}
 	}
 }
@@ -2238,28 +2200,8 @@ li.selected > a .favicon-wrap {
 	width: 100%;
 	border-bottom: 1px solid #DDDDDD;
 	background-color: #f2f3f4;
-	&:before {
+	@include arrow(21px, -1px, #FFF, #CCC, right) {
 		visibility: hidden;
-		position: absolute;
-		top: -1px;
-		right: 21px;
-		display: inline-block;
-		border-right: 6px solid rgba(0, 0, 0, 0);
-		border-top: 6px solid #CCCCCC;
-		border-left: 6px solid rgba(0, 0, 0, 0);
-		border-bottom-color: rgba(0, 0, 0, 1);
-		content: '';
-	}
-	&:after {
-		visibility: hidden;
-		position: absolute;
-		top: -1px;
-		right: 22px;
-		display: inline-block;
-		border-right: 5px solid rgba(0, 0, 0, 0);
-		border-top: 5px solid #FFF;
-		border-left: 5px solid rgba(0, 0, 0, 0);
-		content: '';
 	}
 	&.open:after,
 	&.open:before {
