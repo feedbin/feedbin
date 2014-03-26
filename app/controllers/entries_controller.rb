@@ -7,7 +7,8 @@ class EntriesController < ApplicationController
     @user = current_user
     update_selected_feed!("collection_all")
 
-    @entries = @user.entries.page(params[:page]).includes(:feed).sort_preference('DESC')
+    feed_ids = @user.subscriptions.pluck(:feed_id)
+    @entries = Entry.where(feed_id: feed_ids).page(params[:page]).includes(:feed).sort_preference('DESC')
     @entries = update_with_state(@entries)
     @page_query = @entries
 
