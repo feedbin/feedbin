@@ -1,41 +1,16 @@
-<% content_for :content do %>
-  <div class="application-messages"><div class="message-content" data-behavior="messages">You have subscribed</div></div>
-  <div class="modal-target"></div>
-  <header class="bar">
-		<a href="/" class="logo"><%= render partial: 'shared/svg/logo' %></a>
-
-    <% if signed_in? %>
-      <div class="header-form-wrap">
-        <div class="header-form-option selected" data-behavior="header_form_option search_form_wrap">
-          <%= render partial: "entries/search_form" %>
-        </div>
-      </div>
-    <% end %>
-
-    <% if signed_in? && current_user.plan.stripe_id == 'trial' %>
-      <%= link_to settings_billing_path, class: 'subscribe-promo' do %>
-        <%= pluralize(current_user.days_left, 'Day') %> Left &mdash; <strong>Subscribe Now</strong>
-      <% end %>
-    <% end %>
-
-    <div class="account-buttons">
-      <% if signed_in? %>
-        <%= link_to 'Settings', settings_path %>
-        <%= link_to 'Log Out', logout_path, method: 'delete' %>
-      <% else %>
-        <%= link_to 'Sign Up', signup_path %>
-        <%= link_to 'Log In', login_path %>
-      <% end %>
-    </div>
-    <% if signed_in? %>
-      <button class="menu" data-behavior="show_menu"></button>
-      <%= render partial: 'layouts/settings_nav' %>
-    <% end %>
-  </header>
-
-  <div class="content">
-    <%= content_for?(:app_content) ? yield(:app_content) : yield %>
-  </div>
-
-<% end %>
-<%= render template: 'layouts/wrap' %>
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= @title || 'Feedbin' %></title>
+  <%= render partial: 'shared/mobile_meta' %>
+  <%= stylesheet_link_tag "application", media: 'all'  %>
+  <%= yield(:head) %>
+  <%= javascript_include_tag "https://js.stripe.com/v1/", "application" %>
+  <%= csrf_meta_tags %>
+  <%= tag :meta, name: "stripe-key", content: STRIPE_PUBLIC_KEY %>
+</head>
+<body class="<%= @class %>">
+  <%= yield %>
+  <%= render partial: 'shared/tracking' %>
+</body>
+</html>

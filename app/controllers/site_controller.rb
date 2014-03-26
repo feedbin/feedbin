@@ -29,7 +29,7 @@ class SiteController < ApplicationController
 
   def home
     @page_view = '/home'
-    render action: 'not_logged_in', layout: 'wrap'
+    render action: 'not_logged_in'
   end
 
   def privacy_policy

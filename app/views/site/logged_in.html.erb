@@ -6,75 +6,86 @@
   <% end %>
 <% end %>
 
-<table class="app-wrap" cellpadding="0">
-  <tbody>
-    <tr>
-      <td class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
-        <div class="feeds-wrap full-height">
-          <div class="view-toolbar">
-            <%= render partial: 'shared/buttons/view_all' %>
-            <%= render partial: 'shared/buttons/view_unread' %>
-            <%= render partial: 'shared/buttons/subscribe' %>
-          </div>
-          <div class="subscribe-wrap">
-            <%= render partial: "subscriptions/form" %>
-          </div>
-          <div class="feeds">
-            <ul data-behavior="feeds_target">
-              <%= render partial: 'feeds/feeds', locals: {collections: @collections, saved_searches: @saved_searches, tags: @tags, feeds: @feeds} %>
-            </ul>
-          </div>
-          <%= render partial: 'shared/feeds_toolbar' %>
+<div class="application-messages"><div class="message-content" data-behavior="messages">You have subscribed</div></div>
+<div class="modal-target"></div>
+
+<div class="app-wrap">
+
+  <div class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
+    <div class="subscribe-toolbar">
+      <%= render partial: 'shared/buttons/subscribe' %>
+    </div>
+    <div class="subscribe-wrap">
+      <%= render partial: "subscriptions/form" %>
+    </div>
+    <div class="feeds-inner">
+      <div class="view-toolbar">
+        <%= render partial: 'shared/buttons/view_unread' %>
+        <%= render partial: 'shared/buttons/view_all' %>
+      </div>
+      <div class="feeds">
+        <ul data-behavior="feeds_target">
+          <%= render partial: 'feeds/feeds', locals: {collections: @collections, saved_searches: @saved_searches, tags: @tags, feeds: @feeds} %>
+        </ul>
+      </div>
+    </div>
+    <%= render partial: 'shared/feeds_toolbar' %>
+  </div>
+
+  <div class="entries-column app-panel" data-behavior="content_column" <%= resizable 'entries' %>>
+    <div class="entries-header" data-behavior="entries-header"></div>
+
+    <%= form_tag search_entries_path, class: 'search-form-wrap', remote: true, method: :get, data: {behavior: 'search_form'} do %>
+      <%= search_field_tag :query, params[:query], placeholder: 'Search' %>
+    <% end %>
+
+    <div class="search-control hide">
+      <div class="sort-control">
+        <div class="dropdown-wrap">
+          <span class="sort-order" data-behavior="toggle_share_menu toggle_dropdown">Sort by date</span>
+          <ul>
+            <li data-sort-option="desc"><span>Sort by date</a></span></li>
+            <li data-sort-option="relevance"><span>Sort by relevance</a></span></li>
+          </ul>
         </div>
-      </td>
-      <td class="entries-column app-panel" data-behavior="content_column" <%= resizable 'entries' %>>
-        <div class="full-height entries-wrap">
-          <div class="entries-header" data-behavior="entries-header"></div>
+        <span class="save-search" data-behavior="save_search_link">Save Search</span>
+        <span class="save-search edit" data-behavior="save_search_link">Edit Saved Search</span>
+      </div>
 
-          <div class="search-control hide">
-            <div class="sort-control">
-              <div class="dropdown-wrap">
-                <span class="sort-order" data-behavior="toggle_share_menu toggle_dropdown">Sort by date</span>
-                <ul>
-                  <li data-sort-option="desc"><span>Sort by date</a></span></li>
-                  <li data-sort-option="relevance"><span>Sort by relevance</a></span></li>
-                </ul>
-              </div>
-              <span class="save-search" data-behavior="save_search_link">Save Search</span>
-              <span class="save-search edit" data-behavior="save_search_link">Edit Saved Search</span>
-            </div>
+      <div class="saved-search-wrap" data-behavior="saved_search_form_target">
+      </div>
 
-            <div class="saved-search-wrap" data-behavior="saved_search_form_target">
-            </div>
+    </div>
 
+    <div class="entries">
+      <ul data-behavior="entries_target"></ul>
+    </div>
+    <%= render partial: 'shared/feeds_toolbar' %>
+  </div>
+
+  <div class="entry-column app-panel" data-behavior="content_column">
+
+      <div class="account-buttons">
+        <%= link_to 'Log Out', logout_path, method: 'delete' %>
+        <%= link_to 'Settings', settings_path %>
+      </div>
+
+      <% if @show_welcome %>
+        <div class="welcome">
+          <div class="welcome-inner">
+            <h2>Welcome to Feedbin</h2>
+            <p class="sub-head">Get started by uploading an OPML file or <a href="http://help.feedbin.com/how-to-subscribe/">subscribing to feeds</a>. </p>
+            <%= link_to 'Upload OPML', settings_import_export_path, class: 'button' %>
+            <p class="description"><a href="http://help.feedbin.com/how-to-subscribe/#opml_import">What is OPML?</a></p>
           </div>
+        </div>
+      <% else %>
+        <div class="entry-content-wrap <%= @user.entry_width %> font-size-<%= @user.font_size || 5 %> font-<%= @user.font || 'default' %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
+        </div>
+      <% end %>
+    </div>
 
-          <div class="entries">
-            <ul data-behavior="entries_target"></ul>
-          </div>
-          <%= render partial: 'shared/feeds_toolbar' %>
-        </div>
-      </td>
-      <td class="entry-column app-panel" data-behavior="content_column">
-        <div class="full-height entry-wrap">
-          <% if @show_welcome %>
-            <div class="welcome">
-              <div class="welcome-inner">
-                <h2>Welcome to Feedbin</h2>
-                <p class="sub-head">Get started by uploading an OPML file or <a href="http://help.feedbin.com/how-to-subscribe/">subscribing to feeds</a>. </p>
-                <%= link_to 'Upload OPML', settings_import_export_path, class: 'button' %>
-                <p class="description"><a href="http://help.feedbin.com/how-to-subscribe/#opml_import">What is OPML?</a></p>
-              </div>
-            </div>
-          <% else %>
-            <div class="entry-content-wrap full-height <%= @user.entry_width %> font-size-<%= @user.font_size || 5 %> font-<%= @user.font || 'default' %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
-            </div>
-          <% end %>
-        </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
+</div>
 
 <div class="hide" data-behavior="pagination"></div>
 <div class="hide" data-behavior="entry_settings_content">

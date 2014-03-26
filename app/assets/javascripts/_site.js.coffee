@@ -214,11 +214,6 @@ $.extend feedbin,
     ).get().join()
     $.post feedbin.data.markAsReadPath, feedbin.markReadData
 
-  showForm: (selectOption) ->
-    $('.header-form-option').removeClass('selected')
-    $("[data-behavior~=#{selectOption}]").addClass('selected')
-    $("[data-behavior~=show_form_options]").text($("[data-select-option=#{selectOption}]").text())
-
   checkPushPermission: (permissionData) ->
     if (permissionData.permission == 'default')
       $('body').removeClass('push-on')
@@ -258,11 +253,11 @@ $.extend feedbin,
   showSubscribe: ->
     $('.subscribe-wrap input').val('')
     $('.subscribe-wrap input').focus()
-    $('.feeds').addClass('show-subscribe')
+    $('.feeds-inner').addClass('show-subscribe')
     $('.subscribe-wrap').addClass('open')
 
   hideSubscribe: ->
-    $('.feeds').removeClass('show-subscribe')
+    $('.feeds-inner').removeClass('show-subscribe')
     $('.subscribe-wrap').removeClass('open')
 
   scrollTo: (item, container) ->
@@ -443,13 +438,14 @@ $.extend feedbin,
         handles: "e"
         minWidth: 200
         stop: (event, ui) ->
+          console.log ui
           form = $('[data-behavior~=resizable_form]')
-          $('[name=column]', form).val($(ui.element).parents('td').data('resizable-name'))
+          $('[name=column]', form).val($(ui.element).data('resizable-name'))
           $('[name=width]', form).val(ui.size.width)
           form.submit()
           return
-      $('.entries-wrap').resizable($.extend(defaults, {alsoResize: $('.entries-column')}))
-      $('.feeds-wrap').resizable($.extend(defaults, {alsoResize: $('.feeds-column')}))
+      $('.feeds-column').resizable($.extend(defaults))
+      $('.entries-column').resizable($.extend(defaults))
 
     processHideQueue: ->
       $(document).on 'click', '[data-behavior~=show_entries]', ->
@@ -815,7 +811,7 @@ $.extend feedbin,
 
     subscribe: ->
       $(document).on 'click', '[data-behavior~=show_subscribe]', (event) ->
-        feeds = $(".feeds")
+        feeds = $(".feeds-inner")
         if feeds.hasClass('show-subscribe')
           feedbin.hideSubscribe()
         else
