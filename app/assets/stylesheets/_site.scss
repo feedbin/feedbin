@@ -1512,25 +1512,7 @@ Structure
 		padding: 5px 25px 5px 5px;
 		font-size: 14px;
 	}
-	&:before {
-		position: absolute;
-		top: -1px;
-		left: 12px;
-		border-right: 6px solid rgba(0, 0, 0, 0);
-		border-top: 6px solid #CCCCCC;
-		border-left: 6px solid rgba(0, 0, 0, 0);
-		border-bottom-color: rgba(0, 0, 0, 1);
-		content: '';
-		display: none;
-	}
-	&:after {
-		position: absolute;
-		top: -1px;
-		left: 13px;
-		border-right: 5px solid rgba(0, 0, 0, 0);
-		border-top: 5px solid $list-background;
-		border-left: 5px solid rgba(0, 0, 0, 0);
-		content: '';
+	@include arrow(12px, -1px, $list-background, #CCC) {
 		display: none;
 	}
 	&.open:after, &.open:before {
@@ -1614,27 +1596,7 @@ Structure
 			border-top: 1px solid #DDDDDD;
 			border-bottom: 1px solid #DDDDDD;
 			padding: 0;
-		}
-		.drawer-arrow:before {
-			position: absolute;
-			top: 0;
-			left: 32px;
-			display: inline-block;
-			border-right: 6px solid rgba(0, 0, 0, 0);
-			border-top: 6px solid #CCCCCC;
-			border-left: 6px solid rgba(0, 0, 0, 0);
-			border-bottom-color: rgba(0, 0, 0, 1);
-			content: '';
-		}
-		.drawer-arrow:after {
-			position: absolute;
-			top: 0;
-			left: 33px;
-			display: inline-block;
-			border-right: 5px solid rgba(0, 0, 0, 0);
-			border-top: 5px solid $list-background;
-			border-left: 5px solid rgba(0, 0, 0, 0);
-			content: '';
+			@include arrow(32px, 0px, $list-background, #CCC)
 		}
 	}
 }
@@ -1667,11 +1629,11 @@ Structure
 	background: $selected;
 }
 
-li.selected .drawer .drawer-arrow:after {
+li.selected .drawer ul:after {
 	border-top-color: #666;
 }
 
-.selected li.selected .drawer .drawer-arrow:after {
+.selected li.selected .drawer ul:after {
 	border-top-color: $selected;
 }
 
@@ -2238,28 +2200,8 @@ li.selected > a .favicon-wrap {
 	width: 100%;
 	border-bottom: 1px solid #DDDDDD;
 	background-color: #f2f3f4;
-	&:before {
+	@include arrow(21px, -1px, #FFF, #CCC, right) {
 		visibility: hidden;
-		position: absolute;
-		top: -1px;
-		right: 21px;
-		display: inline-block;
-		border-right: 6px solid rgba(0, 0, 0, 0);
-		border-top: 6px solid #CCCCCC;
-		border-left: 6px solid rgba(0, 0, 0, 0);
-		border-bottom-color: rgba(0, 0, 0, 1);
-		content: '';
-	}
-	&:after {
-		visibility: hidden;
-		position: absolute;
-		top: -1px;
-		right: 22px;
-		display: inline-block;
-		border-right: 5px solid rgba(0, 0, 0, 0);
-		border-top: 5px solid #FFF;
-		border-left: 5px solid rgba(0, 0, 0, 0);
-		content: '';
 	}
 	&.open:after,
 	&.open:before {
@@ -4777,7 +4719,7 @@ Media Players
 	float: left;
 	margin: 0;
 	padding: 0;
-	width: 28px;
+	width: 22px;
 	height: 44px;
 	font-size: 11px;
 	line-height: 11px;
@@ -4799,7 +4741,7 @@ Media Players
 	padding: 0;
 	position: absolute;
 	height: 44px;
-	width: 28px;
+	width: 22px;
 	border: 0;
 	background: none;
 	outline: none;
@@ -4808,27 +4750,27 @@ Media Players
 	width: 0px;
 	height: 0px;
 	border-style: solid;
-	border-width: 11px 0 11px 20px;
-	border-color: transparent transparent transparent #000000;
+	border-width: 9px 0 9px 15px;
+	border-color: transparent transparent transparent #333333;
 	content: "";
 	position: absolute;
-	top: 11px;
+	top: 13px;
 	left: 5px;
 	pointer-events: none;
 }
 .mejs-controls .mejs-pause button:after,
 .mejs-controls .mejs-pause button:before {
 	width: 5px;
-	height: 18px;
+	height: 16px;
 	content: "";
 	position: absolute;
-	top: 12px;
+	top: 14px;
 	left: 5px;
 	pointer-events: none;
 	background-color: #333;
 }
 .mejs-controls .mejs-pause button:after {
-	left: 15px;
+	left: 13px;
 }
 .mejs-fullscreen-button button:after {
 	display: block;
@@ -4876,13 +4818,13 @@ Media Players
 	text-align: center;
 	box-sizing: content-box;
 	&.mejs-currenttime-container {
-		padding-right: 0;
+		padding-right: 6px;
 		span {
 			margin-right: 0;
 		}
 	}
 	&.mejs-duration-container {
-		padding-left: 0;
+		padding-left: 6px;
 		span {
 			margin-left: 0;
 		}

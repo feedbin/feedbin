@@ -1,6 +1,24 @@
+February 2014
+-------------
+
+- 2014-03-20 Password reset security improvements
+- 2014-03-13 Moved to feedbin.com
+
+
+February 2014
+-------------
+
+- 2014-02-28 Feed activity stats
+- 2014-02-24 Recently Read section
+- 2014-02-22 Search improvements. Visual sort order.
+- 2014-02-18 Redesigned feed settings page
+- 2014-02-16 Starred export
+
 January 2014
 ------------
 
+- 2013-01-29 Page up/down support (thanks to @scutifer)
+- 2013-01-21 Show more info about content loaded through Readability
 - 2013-01-06 Next entry preview in full screen
 - 2013-01-02 Full screen mode
 
