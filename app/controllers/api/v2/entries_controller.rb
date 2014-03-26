@@ -25,7 +25,8 @@ module Api
           end
           @entries = Entry.where(id: @starred_entries.map {|starred_entry| starred_entry.entry_id }).includes(:feed)
         else
-          @entries = @user.entries.includes(:feed).order("entries.created_at DESC").page(params[:page])
+          feed_ids = @user.subscriptions.pluck(:feed_id)
+          @entries = Entry.where(feed_id: feed_ids).includes(:feed).order("entries.created_at DESC").page(params[:page])
           if params.has_key?(:per_page)
             @entries = @entries.per_page(params[:per_page])
           end
