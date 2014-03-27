@@ -29,7 +29,7 @@
 	}
 }
 
-@mixin arrow($x-position, $y-position, $arrow-color, $shadow-color, $origin:left) {
+@mixin arrow($x-position, $y-position, $arrow-color, $arrow-color-night, $shadow-color, $shadow-color-night, $origin:left) {
 	&:before {
 		@if $origin == left {
 			left: $x-position;
@@ -44,6 +44,9 @@
 		border-left: 6px solid rgba(0, 0, 0, 0);
 		border-bottom-color: rgba(0, 0, 0, 1);
 		content: '';
+		.theme-night & {
+			border-top-color: $shadow-color-night;
+		}
 		@content;
 	}
 	&:after {
@@ -59,6 +62,45 @@
 		border-top: 5px solid $arrow-color;
 		border-left: 5px solid rgba(0, 0, 0, 0);
 		content: '';
+		.theme-night & {
+			border-top-color: $arrow-color-night;
+		}
 		@content;
 	}
 }
+
+@mixin background-color($day, $night) {
+	background-color: $day;
+	.theme-night & {
+		background-color: $night;
+	}
+}
+
+@mixin color($day, $night) {
+	color: $day;
+	.theme-night & {
+		color: $night;
+	}
+}
+
+@mixin border-color($day, $night) {
+	border-color: $day;
+	.theme-night & {
+		border-color: $night;
+	}
+}
+
+@mixin stroke($day, $night) {
+	stroke: $day;
+	.theme-night & {
+		stroke: $night;
+	}
+}
+
+@mixin fill($day, $night) {
+	fill: $day;
+	.theme-night & {
+		fill: $night;
+	}
+}
+

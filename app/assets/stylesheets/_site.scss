@@ -7,11 +7,37 @@ Variables
 ------------------------------------------------------------------------------*/
 $toolbar-height: 43px;
 $small-toolbar-height: 37px;
-$list-background: #f2f3f4;
-$drawer-background: #e6e7e8;
-$list-border: #DDDDDD;
-$selected: #3399ff;
 $font-stack: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+/*-- Colors --*/
+$body-background-color: #FFFFFF;
+$body-background-color-night: #2B2D2F;
+
+$list-background-color: #F2F3F4;
+$list-background-color-night: #212325;
+
+$drawer-background-color: #E6E7E8;
+$drawer-background-color-night: #464b4e;
+
+$border-color: #DDDDDD;
+$border-color-night: #040608;
+
+$input-background-color: #FFFFFF;
+$input-background-color-night: #191C20;
+
+$input-color: #333333;
+$input-color-night: #FFFFFF;
+
+$text-color: #000000;
+$text-color-night: #F3F3F3;
+
+$disabled-text-color: #999999;
+$disabled-text-color-night: #535353;
+
+$arrow-shadow-color: #CCCCCC;
+$arrow-shadow-color-night: #000000;
+
+$selected: #3399FF;
 
 /*------------------------------------------------------------------------------
 Grid
@@ -650,6 +676,10 @@ body, html {
 body {
 	font-family: $font-stack;
 	font-size: 14px;
+	background-color: $body-background-color;
+	&.theme-night {
+		background-color: $body-background-color-night;
+	}
 	@include respond-to(hidpi) {
 		-webkit-font-smoothing: antialiased;
 	}
@@ -789,18 +819,31 @@ input[type="search"],
 input[type="tel"],
 input[type="color"],
 .uneditable-input {
-	border: 1px solid #DDDDDD;
+	border: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
+	@include color($input-color, $input-color-night);
+	@include background-color($input-background-color, $input-background-color-night);
 	font-size: 18px;
 	padding: 12px 12px 10px 12px;
 	max-width: 300px;
 	width: 100%;
-	color: #333;
 	display: inline-block;
 	margin-bottom: 15px;
 	line-height: 20px;
-	color: #555;
 	vertical-align: middle;
 	border-radius: 4px;
+	&::-webkit-input-placeholder {
+		@include color($border-color, $border-color-night);
+	}
+	&:-moz-placeholder {
+		@include color($border-color, $border-color-night);
+	}
+	&::-moz-placeholder {
+		@include color($border-color, $border-color-night);
+	}
+	&:-ms-input-placeholder {
+		@include color($border-color, $border-color-night);
+	}
 	&:focus {
 		outline: none;
 		border-color: $selected;
@@ -871,7 +914,8 @@ th {
 	padding: 8px;
 	line-height: 1.428571429;
 	vertical-align: top;
-	border-top: 1px solid #dddddd;
+	border-top: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
 }
 
 .table thead > tr > th {
@@ -888,7 +932,8 @@ th {
 }
 
 .table tbody + tbody {
-	border-top: 2px solid #dddddd;
+	border-top: 2px solid transparent;
+	@include border-color($border-color, $border-color-night);
 }
 
 .table .table {
@@ -905,7 +950,8 @@ th {
 }
 
 .table-bordered {
-	border: 1px solid #dddddd;
+	border: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
 }
 
 .table-bordered > thead > tr > th,
@@ -914,7 +960,8 @@ th {
 .table-bordered > thead > tr > td,
 .table-bordered > tbody > tr > td,
 .table-bordered > tfoot > tr > td {
-	border: 1px solid #dddddd;
+	border: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
 }
 
 
@@ -928,7 +975,7 @@ Structure
 		width: 32px;
 		height: 27px;
 		* {
-			fill: #DDDDDD;
+			fill: $border-color;
 		}
 	}
 }
@@ -939,7 +986,9 @@ Structure
 	right: 0;
 	top: 0;
 	margin: 0;
-	border-bottom: 1px solid #DDD;
+	border-bottom: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
+	@include background-color($body-background-color, $body-background-color-night);
 	height: $toolbar-height;
 	input[type="search"] {
 		height: $toolbar-height;
@@ -953,22 +1002,9 @@ Structure
 		border-radius: 13px;
 		border: none;
 		line-height: 1;
-		color: #000;
 		&.processing {
 			background-image: image-url("favicon-search-light.svg"), image-url("favicon-progress.gif");
 			background-position: 11px 15px, 97% 15px;
-		}
-		&::-webkit-input-placeholder {
-		   color: #DDDDDD;
-		}
-		&:-moz-placeholder {
-		   color: #DDDDDD;
-		}
-		&::-moz-placeholder {
-		   color: #DDDDDD;
-		}
-		&:-ms-input-placeholder {
-		   color: #DDDDDD;
 		}
 	}
 }
@@ -979,9 +1015,10 @@ Structure
 	right: 0;
 	top: 0;
 	margin: 0;
-	border-bottom: 1px solid #DDD;
+	border-bottom: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
+	@include background-color($body-background-color, $body-background-color-night);
 	height: $toolbar-height;
-	background-color: #FFF;
 	a {
 		color: #666666;
 		font-size: 13px;
@@ -990,7 +1027,7 @@ Structure
 		text-decoration: none;
 		margin: 11px 0 0 0;
 		padding: 2px 11px;
-		border-left: 1px solid #DDDDDD;
+		border-left: 1px solid $border-color;
 		&:last-child {
 			border: none;
 		}
@@ -1018,7 +1055,7 @@ Structure
 	display: flex;
 	align-items: center;
 	.welcome-inner {
-		background-color: $list-background;
+		background-color: $list-background-color;
 		width: 100%;
 		text-align: center;
 	}
@@ -1054,7 +1091,8 @@ Structure
 	.entries-column {
 		width: 245px;
 		flex-grow: 0;
-		border-right: 1px solid #DDD;
+		border-right: 1px solid transparent;
+		@include border-color($border-color, $border-color-night);
 	}
 	.entry-column {
 		flex-grow: 1;
@@ -1062,7 +1100,7 @@ Structure
 }
 
 .feeds-column {
-	background-color: $list-background;
+	@include background-color($list-background-color, $list-background-color-night);
 }
 
 .app-panel {
@@ -1072,7 +1110,8 @@ Structure
 
 .subscribe-toolbar {
 	height: $toolbar-height;
-	border-bottom: 1px solid #DDDDDD;
+	border-bottom: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -1109,13 +1148,14 @@ Structure
 
 .feeds-toolbar {
 	height: 52px;
-	border-top: 1px solid #DDDDDD;
+	border-top: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
 	position: absolute;
 	bottom: 0;
 	left: 0;
 	right: 0;
 	font-size: 10px;
-	background-color: $list-background;
+	@include background-color($list-background-color, $list-background-color-night);
 	table {
 		margin-top: 8px;
 		width: 100%;
@@ -1143,10 +1183,11 @@ $subscribe-wrap-height: 49px;
 	padding: 8px;
 	position: absolute;
 	top: $toolbar-height;
-	border-bottom: 1px solid #DDDDDD;
+	border-bottom: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
 	width: 100%;
 	height: $subscribe-wrap-height;
-	background-color: $drawer-background;
+	@include background-color($drawer-background-color, $drawer-background-color-night);
 	input {
 		height: 32px;
 		width: 100%;
@@ -1155,9 +1196,8 @@ $subscribe-wrap-height: 49px;
 		padding: 5px 25px 5px 5px;
 		font-size: 14px;
 		border-radius: 0;
-		border-color: #ddd;
 	}
-	@include arrow(12px, -1px, $list-background, #CCC) {
+	@include arrow(12px, -1px, $list-background-color, $list-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night) {
 		display: none;
 	}
 	&.open:after, &.open:before {
@@ -1172,7 +1212,7 @@ $subscribe-wrap-height: 49px;
 	left: 0;
 	right: 0;
 	z-index: 1;
-	background-color: $list-background;
+	@include background-color($list-background-color, $list-background-color-night);
 	transition: top .2s ease;
 	&.show-subscribe {
 		top: $toolbar-height + $subscribe-wrap-height;
@@ -1182,7 +1222,8 @@ $subscribe-wrap-height: 49px;
 .view-toolbar {
 	display: flex;
 	height: $small-toolbar-height;
-	border-bottom: 1px solid #DDDDDD;
+	border-bottom: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
 	position: absolute;
 	left: 0;
 	right: 0;
@@ -1191,26 +1232,26 @@ $subscribe-wrap-height: 49px;
 		text-align: center;
 		line-height: $small-toolbar-height;
 		height: 100%;
-		color: #999999;
 		text-decoration: none;
-		border-left: 1px solid #DDD;
 		display: block;
 		font-size: 10px;
 		text-transform: uppercase;
 		font-weight: bold;
 		user-select: none;
+		border-left: 1px solid transparent;
+		@include border-color($border-color, $border-color-night);
+		@include color($disabled-text-color, $disabled-text-color-night);
 		&.selected {
-			color: #000;
+			@include color($text-color, $text-color-night);
 		}
-		&.no-border {
+		&:first-child {
 			border: none;
-			padding-left: none;
 		}
 	}
 }
 
 .feeds {
-	background-color: $list-background;
+	@include background-color($list-background-color, $list-background-color-night);
 	position: absolute;
 	top: $small-toolbar-height;
 	bottom: 0;
@@ -1236,7 +1277,7 @@ $subscribe-wrap-height: 49px;
 			}
 			.feed-link {
 				font-size: 13px;
-				color: #333;
+				@include color($text-color, $text-color-night);
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
@@ -1274,14 +1315,15 @@ $subscribe-wrap-height: 49px;
 	}
 	.drawer {
 		position: relative;
-		background: $drawer-background;
+		@include background-color($drawer-background-color, $drawer-background-color-night);
 		overflow: hidden;
 		ul {
 			overflow: hidden;
-			border-top: 1px solid #DDDDDD;
-			border-bottom: 1px solid #DDDDDD;
+			border-top: 1px solid transparent;
+			border-bottom: 1px solid transparent;
+			@include border-color($border-color, $border-color-night);
 			padding: 0;
-			@include arrow(32px, 0px, $list-background, #CCC)
+			@include arrow(32px, 0px, $list-background-color, $list-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night);
 		}
 	}
 }
@@ -1291,7 +1333,7 @@ $subscribe-wrap-height: 49px;
 	right: 45px;
 	top: 0;
 	font-weight: bold;
-	color: #DDDDDD;
+	color: $border-color;
 	font-size: 11px;
 	display: block;
 	-webkit-appearance: none;
@@ -1411,7 +1453,7 @@ li.selected > a .favicon-wrap {
 .entries-header {
 	color: #999;
 	display: none;
-	border-bottom: 1px solid #DDDDDD;
+	border-bottom: 1px solid $border-color;
 	line-height: $toolbar-height;
 	height: $toolbar-height;
 	text-align: center;
@@ -1447,7 +1489,7 @@ $sort-control-height: 37px;
 $saved-search-control-height: 48px;
 
 .search-control {
-	background-color: $drawer-background;
+	@include background-color($drawer-background-color, $drawer-background-color-night);
 	font-size: 11px;
 	color: #999;
 	line-height: 14px;
@@ -1459,7 +1501,8 @@ $saved-search-control-height: 48px;
 	.sort-control {
 		height: $sort-control-height;
 		position: relative;
-		border-bottom: 1px solid #DDD;
+		border-bottom: 1px solid transparent;
+		@include border-color($border-color, $border-color-night);
 	}
 	.save-search {
 		position: absolute;
@@ -1471,7 +1514,7 @@ $saved-search-control-height: 48px;
 		user-select: none;
 	}
 	.sort-order {
-		background-color: $list-background;
+		background-color: $list-background-color;
 		border-radius: 12px;
 		margin: 7px 0 0 8px;
 		color: #666666;
@@ -1499,9 +1542,9 @@ $saved-search-control-height: 48px;
 	.saved-search-wrap {
 		height: $saved-search-control-height;
 		padding: 8px;
-		background-color: $drawer-background;
+		background-color: $drawer-background-color;
 		position: relative;
-		border-bottom: 1px solid #DDDDDD;
+		border-bottom: 1px solid $border-color;
 		input[type="text"] {
 			height: 32px;
 			width: 100%;
@@ -1511,7 +1554,7 @@ $saved-search-control-height: 48px;
 			font-size: 14px;
 			border-radius: 0;
 		}
-		@include arrow(12px, -1px, $drawer-background, #CCC, right) {
+		@include arrow(12px, -1px, $drawer-background-color, $drawer-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right) {
 			display: none;
 		}
 		&.open {
@@ -1546,7 +1589,7 @@ $saved-search-control-height: 48px;
 	overflow-x: hidden;
 	-webkit-overflow-scrolling: touch;
 	transition: top .2s ease;
-	background-color: #FFF;
+	@include background-color($body-background-color, $body-background-color-night);
 	&.show-search-options {
 		top: $toolbar-height + $sort-control-height;
 	}
@@ -1563,7 +1606,7 @@ $saved-search-control-height: 48px;
 .entries ul li {
 	position: relative;
 	word-wrap: break-word;
-	background-color: $drawer-background;
+	background-color: $drawer-background-color;
 	.favicon-wrap {
 		top: 23px;
 		left: 5px;
@@ -1573,7 +1616,7 @@ $saved-search-control-height: 48px;
 	}
 	.wrap {
 		position: relative;
-		background-color: #FFF;
+		@include background-color($body-background-color, $body-background-color-night);
 		display: block;
 		padding: 0;
 		color: #000;
@@ -1586,7 +1629,7 @@ $saved-search-control-height: 48px;
 	.entries-inner-wrap {
 		padding: 10px 10px 8px 0;
 		margin-left: 30px;
-		border-bottom: 1px solid $list-background;
+		border-bottom: 1px solid $list-background-color;
 	}
 	.icon-entry-actions {
 		cursor: pointer;
@@ -1699,7 +1742,7 @@ $saved-search-control-height: 48px;
 			color: #999;
 		}
 		.body {
-			color: #DDDDDD;
+			color: $border-color;
 		}
 	}
 	&.media {
@@ -1816,13 +1859,14 @@ $saved-search-control-height: 48px;
 }
 
 .entry-toolbar {
-	background-color: #FFF;
+	@include background-color($body-background-color, $body-background-color-night);
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: $small-toolbar-height;
-	border-bottom: 1px solid #DDDDDD;
+	border-bottom: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
 	.back-button {
 		height: 36px;
 		width: 36px;
@@ -1852,9 +1896,10 @@ $saved-search-control-height: 48px;
 .entry-settings {
 	height: 48px;
 	width: 100%;
-	border-bottom: 1px solid #DDDDDD;
-	background-color: $list-background;
-	@include arrow(21px, -1px, #FFF, #CCC, right) {
+	border-bottom: 1px solid $border-color;
+	@include border-color($border-color, $border-color-night);
+	@include background-color($drawer-background-color, $drawer-background-color-night);
+	@include arrow(21px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right) {
 		visibility: hidden;
 	}
 	&.open:after,
@@ -1862,7 +1907,7 @@ $saved-search-control-height: 48px;
 		visibility: visible;
 	}
 	.setting-wrap {
-		border-right: 1px solid #DDDDDD;
+		border-right: 1px solid $border-color;
 		height: 100%;
 		display: block;
 		padding: 0;
@@ -1874,7 +1919,7 @@ $saved-search-control-height: 48px;
 		padding: 5px;
 		font-size: 13px;
 		line-height: 1.1;
-		border: 1px solid #DDDDDD;
+		border: 1px solid $border-color;
 		border-radius: 0;
 		height: 28px;
 		-webkit-appearance: none;
@@ -1989,7 +2034,7 @@ $saved-search-control-height: 48px;
 }
 
 .entry-content {
-	background-color: #FFF;
+	@include background-color($body-background-color, $body-background-color-night);
 	display: block;
 	position: absolute;
 	height: auto;
@@ -2013,7 +2058,7 @@ $saved-search-control-height: 48px;
 }
 
 .next-entry-preview {
-	background-color: $list-background;
+	background-color: $list-background-color;
 	display: none;
 	&:hover {
 		cursor: pointer;
@@ -2035,7 +2080,7 @@ $saved-search-control-height: 48px;
 		display: block;
 		font-size: 12px;
 		color: $selected;
-		border-bottom: 1px solid #DDDDDD;
+		border-bottom: 1px solid $border-color;
 		padding-bottom: 5px;
 		margin-bottom: 10px;
 		text-transform: uppercase;
@@ -2070,7 +2115,10 @@ $saved-search-control-height: 48px;
 	width: 250px;
 	height: 36px;
 	z-index: 1;
-	background-image: linear-gradient(to right, rgba(#FFF, 0) 0%, #FFF 10%);
+	background-image: linear-gradient(to right, rgba($body-background-color, 0) 0%, $body-background-color 10%);
+	.theme-night & {
+		background-image: linear-gradient(to right, rgba($body-background-color-night, 0) 0%, $body-background-color-night 10%);
+	}
 	form {
 		margin: 0;
 	}
@@ -2104,7 +2152,7 @@ $saved-search-control-height: 48px;
 			left: 12px;
 		}
 		.circle-empty {
-			background-color: #FFF;
+			background-color: transparent;
 		}
 	}
 	.button-toggle-starred {
@@ -2150,7 +2198,7 @@ $saved-search-control-height: 48px;
 		display: none;
 		width: 140px;
 		list-style: none;
-		border: 1px solid #DDDDDD;
+		border: 1px solid $border-color;
 		background-color: #FFF;
 		position: absolute;
 		z-index: 10000;
@@ -2171,14 +2219,14 @@ $saved-search-control-height: 48px;
 				padding: 6px 5px;
 				font-family: $font-stack;
 				font-weight: 400 !important;
-				border-bottom: 1px solid $list-background;
+				border-bottom: 1px solid $list-background-color;
 				cursor: pointer;
 			}
 			a:hover,
 			span:hover,
 			&.selected a,
 			&.selected span {
-				background-color: $list-background;
+				background-color: $list-background-color;
 			}
 			&:first-child a,
 			&:first-child span {
@@ -2198,7 +2246,7 @@ $saved-search-control-height: 48px;
 			left: 12px;
 			display: inline-block;
 			border-right: 7px solid rgba(0, 0, 0, 0);
-			border-bottom: 7px solid #DDDDDD;
+			border-bottom: 7px solid $border-color;
 			border-left: 7px solid rgba(0, 0, 0, 0);
 			border-bottom-color: rgba(0, 0, 0, 0.2);
 			content: '';
@@ -2215,7 +2263,7 @@ $saved-search-control-height: 48px;
 		}
 		li:first-child:hover:after,
 		li.selected:first-child:after {
-			border-bottom-color: $list-background;
+			border-bottom-color: $list-background-color;
 		}
 	}
 	&.open {
@@ -2359,7 +2407,7 @@ $saved-search-control-height: 48px;
 
 	blockquote {
 		padding: 0 0 0 15px;
-		border-left: 2px solid #DDDDDD;
+		border-left: 2px solid $border-color;
 	}
 
 	blockquote,
@@ -2427,7 +2475,7 @@ $saved-search-control-height: 48px;
 	}
 
 	.original-content-info {
-		background-color: $list-background;
+		background-color: $list-background-color;
 		position: relative;
 		margin-bottom: 1.1em;
 		padding: 10px 53px 10px 36px;
@@ -2751,7 +2799,7 @@ Settings
 	margin-top: 20px;
 	padding: 4px 20px 12px 20px;
 	background-color: #FFF;
-	border: 1px solid #DDDDDD;
+	border: 1px solid $border-color;
 	border-radius: 4px;
 }
 
@@ -2778,7 +2826,7 @@ Settings
 .nav-small {
 	padding-top: 10px;
 	margin-top: 10px;
-	border-top: 1px solid #DDDDDD;
+	border-top: 1px solid $border-color;
 	margin-left: auto;
 	a {
 		font-size: 14px;
@@ -2788,7 +2836,7 @@ Settings
 
 .settings {
 	font-size: 16px;
-	background-color: $list-background;
+	background-color: $list-background-color;
 	color: #333;
 	.bar {
 		display: none;
@@ -2798,13 +2846,13 @@ Settings
 	}
 	.content {
 		width: 100%;
-		border-top: 1px solid #DDDDDD;
+		border-top: 1px solid $border-color;
 		display: table;
 		.settings-nav {
 			width: 250px;
 			padding: 0 20px;
 			display: table-cell;
-			border-right: 1px solid #DDDDDD;
+			border-right: 1px solid $border-color;
 			vertical-align: top;
 			.logo {
 				margin: 23px 0 0 0;
@@ -2888,13 +2936,13 @@ Settings
 	.split-bg {
 		height: 100%;
 		width: 100;
-		background-image: linear-gradient(to right, $list-background 50%, #fff 50%);
+		background-image: linear-gradient(to right, $list-background-color 50%, #fff 50%);
 	}
 	.split-bg-inner {
 		width: 960px;
 		height: 100%;
 		margin: 0 auto;
-		background-image: image-url("border.png"), linear-gradient(to right, $list-background 330px, #fff 330px);
+		background-image: image-url("border.png"), linear-gradient(to right, $list-background-color 330px, #fff 330px);
 		background-position: 330px 0, top left;
 		background-repeat: repeat-y, no-repeat;
 	}
@@ -2907,7 +2955,7 @@ Settings
 	    word-break: break-all;
 	}
 	.plan-options {
-		border-bottom: 1px solid #DDDDDD;
+		border-bottom: 1px solid $border-color;
 		padding: 0 0 15px 0;
 		overflow: hidden;
 		margin-bottom: 15px;
@@ -2929,7 +2977,7 @@ Settings
 				left: 5px;
 				top: 12px;
 				content: "";
-				border: 2px solid #DDDDDD;
+				border: 2px solid $border-color;
 				border-radius: 17px;
 				height: 17px;
 				width: 17px;
@@ -2981,7 +3029,7 @@ Settings
 			line-height: normal;
 			padding-left: 30px;
 			&:focus {
-				border-color: #DDDDDD;
+				border-color: $border-color;
 			}
 		}
 		.card-number {
@@ -3030,12 +3078,12 @@ Settings
 	display: inline-block;
 	font-size: 16px;
 	font-weight: bold;
-	border: 1px solid #DDDDDD;
+	border: 1px solid $border-color;
 	width: 32px;
 	line-height: 32px;
 	text-align: center;
 	border-radius: 2px;
-	box-shadow: 1px 1px 1px #DDDDDD;
+	box-shadow: 1px 1px 1px $border-color;
 }
 .key.wide {
 	width: 70px;
@@ -3072,16 +3120,16 @@ table.small td {
 }
 
 .actions-wrap {
-	background: $list-background;
+	background: $list-background-color;
 	padding: 8px 8px 1px 8px;
-	border: 1px solid #DDDDDD;
+	border: 1px solid $border-color;
 	border-bottom: none;
 }
 
 .action-form {
 	font-size: 14px;
 	position: relative;
-	border: 1px solid #DDDDDD;
+	border: 1px solid $border-color;
 	border-left-width: 5px;
 	padding: 8px 0;
 	background: #FFF;
@@ -3141,8 +3189,8 @@ table.small td {
 		overflow-x: hidden;
 		resize: vertical;
 		height: 78px;
-		border: 1px solid #DDDDDD;
-		background: $list-background;
+		border: 1px solid $border-color;
+		background: $list-background-color;
 		margin-bottom: 15px;
 		padding: 8px 6px;
 		width: 300px;
@@ -3205,8 +3253,8 @@ table.small td {
 	font-size: 13px;
 	color: #999;
 	line-height: 1.2;
-	border: 1px solid #DDDDDD;
-	background: $list-background;
+	border: 1px solid $border-color;
+	background: $list-background-color;
 	margin: 0 0 15px 0;
 	padding: 8px 6px;
 	button {
@@ -3243,7 +3291,7 @@ table.small td {
 	li {
 		clear: both;
 		margin-left: 30px;
-		border-bottom: 1px solid $list-background;
+		border-bottom: 1px solid $list-background-color;
 		position: relative;
 		padding: 10px 0;
 		&:last-child {
@@ -3271,7 +3319,7 @@ table.small td {
 		left: 0;
 		top: 0;
 		height: 32px;
-		border-right: 1px solid #DDDDDD;
+		border-right: 1px solid $border-color;
 		width: 32px;
 		.favicon-wrap {
 			top: 6px;
@@ -3284,9 +3332,9 @@ table.small td {
 		right: 1px;
 		top: 1px;
 		height: 30px;
-		border-left: 1px solid #DDDDDD;
+		border-left: 1px solid $border-color;
 		width: 30px;
-		background: $list-background image-url("favicon-feed.svg") 7px 8px no-repeat;
+		background: $list-background-color image-url("favicon-feed.svg") 7px 8px no-repeat;
 		border-radius: 0 4px 4px 0;
 	}
 	.last-updated-wrap {
@@ -3327,7 +3375,7 @@ table.small td {
 	background: image-url("favicon-search-light.svg") 11px 9px no-repeat;
 	border: none !important;
 	max-width: 250px !important;
-	background-color: $list-background;
+	background-color: $list-background-color;
 	display: block;
 	@media (max-width: 650px) {
 		position: static;
@@ -3335,8 +3383,8 @@ table.small td {
 }
 
 .feed-controls {
-	border-top: 1px solid #DDDDDD;
-	border-bottom: 1px solid #DDDDDD;
+	border-top: 1px solid $border-color;
+	border-bottom: 1px solid $border-color;
 	padding: 10px 0 1px 0;
 }
 
@@ -3368,7 +3416,7 @@ Icons
 	height: 16px;
 	width: 16px;
 	border-radius: 12px;
-	border: 2px solid #DDDDDD;
+	border: 2px solid $border-color;
 	display: inline-block;
 	position: relative;
 	&:before {
@@ -3378,7 +3426,7 @@ Icons
 		width: 5px;
 		height: 1px;
 		display: block;
-		background-color: #DDDDDD;
+		background-color: $border-color;
 		content: "";
 	}
 	&:after {
@@ -3387,7 +3435,7 @@ Icons
 		top: 2px;
 		width: 1px;
 		height: 5px;
-		background-color: #DDDDDD;
+		background-color: $border-color;
 		display: block;
 		content: "";
 	}
@@ -3418,8 +3466,8 @@ Buttons
 		text-decoration: none;
 	}
 	&[disabled] {
-		color: #DDDDDD;
-		border-color: #DDDDDD;
+		color: $border-color;
+		border-color: $border-color;
 		background-color: #FFF;
 		cursor: default;
 	}
@@ -3519,7 +3567,7 @@ Buttons
 			padding: 5px;
 			font-size: 14px;
 			border: none;
-			background-color: $list-background;
+			background-color: $list-background-color;
 			width: 100%;
 			&:focus {
 				border: none;
@@ -3585,23 +3633,23 @@ Buttons
 }
 
 .button-tag * {
-	stroke: #333;
+	@include stroke(#333, #a1a3a5);
 	[disabled] & {
-		stroke: #999;
+		@include stroke(#999, #525456);
 	}
 }
 
 .button-check * {
-	fill: #333;
+	@include fill(#333, #a1a3a5);
 	[disabled] & {
-		fill: #999;
+		@include fill(#999, #525456);
 	}
 }
 
 .button-trash * {
-	fill: #333;
+	@include fill(#333, #a1a3a5);
 	[disabled] & {
-		fill: #999;
+		@include fill(#999, #525456);
 	}
 }
 
@@ -3841,9 +3889,9 @@ select {
 }
 
 .billing-promo {
-	background-color: $list-background;
+	background-color: $list-background-color;
 	background-repeat: no-repeat;
-	border: 1px solid #DDDDDD;
+	border: 1px solid $border-color;
 	padding: 10px 10px 10px 35px;
 	font-size: 14px;
 	color: #333;
@@ -3902,8 +3950,8 @@ select {
 }
 
 hr {
-	background: #dddddd;
-	color: #dddddd;
+	background: $border-color;
+	color: $border-color;
 	clear: both;
 	float: none;
 	width: 100%;
@@ -4008,7 +4056,7 @@ h3 .inline-subhead {
 
 .collection-edit-controls {
 	padding: 8px 0;
-	border-top: 1px solid #DDDDDD;
+	border-top: 1px solid $border-color;
 }
 
 .pull-right {
@@ -4132,7 +4180,7 @@ h3 .inline-subhead {
 Login and Sign Up
 ------------------------------------------------------------------------------*/
 .login {
-	background-color: $list-background;
+	background-color: $list-background-color;
 	padding: 15px;
 	display: flex;
 	align-items: center;
@@ -4159,7 +4207,7 @@ Login and Sign Up
 		margin: 0 0 15px 0;
 	}
 	.box {
-		border: 1px solid #DDDDDD;
+		border: 1px solid $border-color;
 		border-radius: 4px;
 		background-color: #FFF;
 		margin: 0 auto 14px auto;
@@ -4183,7 +4231,7 @@ Login and Sign Up
 		background-color: #fafafa;
 		margin: 0;
 		&:focus {
-			border-color: #DDDDDD;
+			border-color: $border-color;
 		}
 	}
 	input[type="submit"] {
@@ -4272,7 +4320,7 @@ Right-to-left
 	}
 	blockquote {
 		padding: 0 15px 0 0;
-		border-right: 5px solid #DDDDDD;
+		border-right: 5px solid $border-color;
 		border-left: none;
 	}
 }
@@ -4466,7 +4514,7 @@ Media Players
 	background-position: 0px -14px;
 }
 .mejs-time-total {
-	background-color: #DDDDDD;
+	background-color: $border-color;
 }
 .mejs-controls .mejs-time-rail .mejs-time-total {
 	margin: 17px 2px 0 2px;
