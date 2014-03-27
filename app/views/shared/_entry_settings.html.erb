@@ -16,4 +16,8 @@
   <div class="setting-wrap mobile-hide">
     <div class="button-full-screen" data-behavior="full_screen"></div>
   </div>
+  <%= link_to settings_theme_path, remote: true, method: :post, class: 'setting-wrap theme-settings', data: {behavior: 'switch_theme'} do %>
+    <span class="button-theme-day"></span>
+    <span class="button-theme-night"></span>
+  <% end %>
 </div>

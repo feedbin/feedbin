@@ -8,6 +8,7 @@ Variables
 $toolbar-height: 43px;
 $small-toolbar-height: 37px;
 $list-background: #f2f3f4;
+$drawer-background: #e6e7e8;
 $list-border: #DDDDDD;
 $selected: #3399ff;
 $font-stack: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -891,7 +892,7 @@ th {
 }
 
 .table .table {
-	background-color: #ffffff;
+	background-color: transparent;
 }
 
 .table-condensed thead > tr > th,
@@ -916,10 +917,6 @@ th {
 	border: 1px solid #dddddd;
 }
 
-.table-striped > tbody > tr:nth-child(odd) > td,
-.table-striped > tbody > tr:nth-child(odd) > th {
-	background-color: #f9f9f9;
-}
 
 /*------------------------------------------------------------------------------
 Structure
@@ -1140,6 +1137,7 @@ Structure
 	}
 }
 
+$subscribe-wrap-height: 49px;
 .subscribe-wrap {
 	z-index: 0;
 	padding: 8px;
@@ -1147,7 +1145,8 @@ Structure
 	top: $toolbar-height;
 	border-bottom: 1px solid #DDDDDD;
 	width: 100%;
-	background-color: #e6e7e8;
+	height: $subscribe-wrap-height;
+	background-color: $drawer-background;
 	input {
 		height: 32px;
 		width: 100%;
@@ -1157,10 +1156,6 @@ Structure
 		font-size: 14px;
 		border-radius: 0;
 		border-color: #ddd;
-		&:focus,
-		&:active {
-			border-color: #ddd;
-		}
 	}
 	@include arrow(12px, -1px, $list-background, #CCC) {
 		display: none;
@@ -1172,16 +1167,15 @@ Structure
 
 .feeds-inner {
 	position: absolute;
-	top: $toolbar-height - 1;
+	top: $toolbar-height;
 	bottom: 52px;
 	left: 0;
 	right: 0;
 	z-index: 1;
 	background-color: $list-background;
-	border-top: 1px solid #DDD;
 	transition: top .2s ease;
 	&.show-subscribe {
-		top: 92px;
+		top: $toolbar-height + $subscribe-wrap-height;
 	}
 }
 
@@ -1280,7 +1274,7 @@ Structure
 	}
 	.drawer {
 		position: relative;
-		background: #E6E7E8;
+		background: $drawer-background;
 		overflow: hidden;
 		ul {
 			overflow: hidden;
@@ -1331,13 +1325,13 @@ li.selected .drawer ul:after {
 .favicon-wrap {
 	border-radius: 2px;
 	z-index: 0;
-	padding: 2px;
+	padding: 1px;
 	display: block;
-	height: 20px;
-	width: 20px;
+	height: 18px;
+	width: 18px;
 	position: absolute;
 	left: 8px;
-	top: 5px;
+	top: 6px;
 	background-color: #FFF;
 	.favicon {
 		height: 16px;
@@ -1396,6 +1390,10 @@ li.selected > a .favicon-wrap {
 	background-image: image-url("favicon-progress.gif") !important;
 }
 
+.collection-favicon {
+	background-color: transparent;
+}
+
 .back-button {
 	background-color: transparent;
 	background-size: 11px 18px;
@@ -1445,18 +1443,23 @@ li.selected > a .favicon-wrap {
 	}
 }
 
+$sort-control-height: 37px;
+$saved-search-control-height: 48px;
+
 .search-control {
-	background-color: #dedede;
+	background-color: $drawer-background;
 	font-size: 11px;
 	color: #999;
 	line-height: 14px;
-	height: 86px;
-	border-bottom: 1px solid #DDDDDD;
-	position: relative;
+	height: $sort-control-height + $saved-search-control-height;
+	position: absolute;
+	top: $toolbar-height;
+	left: 0;
+	right: 0;
 	.sort-control {
-		height: 37px;
+		height: $sort-control-height;
 		position: relative;
-		border-bottom: 1px solid #DDDDDD;
+		border-bottom: 1px solid #DDD;
 	}
 	.save-search {
 		position: absolute;
@@ -1494,10 +1497,11 @@ li.selected > a .favicon-wrap {
 		left: 2px;
 	}
 	.saved-search-wrap {
-		height: 48px;
+		height: $saved-search-control-height;
 		padding: 8px;
-		background-color: #E6E7E8;
+		background-color: $drawer-background;
 		position: relative;
+		border-bottom: 1px solid #DDDDDD;
 		input[type="text"] {
 			height: 32px;
 			width: 100%;
@@ -1505,26 +1509,9 @@ li.selected > a .favicon-wrap {
 			margin-bottom: 0;
 			padding: 5px 25px 5px 5px;
 			font-size: 14px;
+			border-radius: 0;
 		}
-		&:before {
-			position: absolute;
-			top: -1px;
-			right: 12px;
-			border-right: 6px solid rgba(0, 0, 0, 0);
-			border-top: 6px solid #bababa;
-			border-left: 6px solid rgba(0, 0, 0, 0);
-			border-bottom-color: rgba(0, 0, 0, 1);
-			content: '';
-			display: none;
-		}
-		&:after {
-			position: absolute;
-			top: -1px;
-			right: 13px;
-			border-right: 5px solid rgba(0, 0, 0, 0);
-			border-top: 5px solid #dedede;
-			border-left: 5px solid rgba(0, 0, 0, 0);
-			content: '';
+		@include arrow(12px, -1px, $drawer-background, #CCC, right) {
 			display: none;
 		}
 		&.open {
@@ -1559,11 +1546,12 @@ li.selected > a .favicon-wrap {
 	overflow-x: hidden;
 	-webkit-overflow-scrolling: touch;
 	transition: top .2s ease;
+	background-color: #FFF;
 	&.show-search-options {
-		top: $toolbar-height;
+		top: $toolbar-height + $sort-control-height;
 	}
 	&.show-saved-search {
-		top: 86px;
+		top: $toolbar-height + $sort-control-height + $saved-search-control-height;
 	}
 	ul {
 		margin: 0;
@@ -1575,7 +1563,7 @@ li.selected > a .favicon-wrap {
 .entries ul li {
 	position: relative;
 	word-wrap: break-word;
-	background-color: #e6e7e8;
+	background-color: $drawer-background;
 	.favicon-wrap {
 		top: 23px;
 		left: 5px;
@@ -1821,6 +1809,10 @@ li.selected > a .favicon-wrap {
 			top: -2px;
 		}
 	}
+	&.no-entries {
+		background-color: #FFF;
+		padding: 8px;
+	}
 }
 
 .entry-toolbar {
@@ -1941,6 +1933,45 @@ li.selected > a .favicon-wrap {
 			background-position: 0px -26px;
 		}
 	}
+	.theme-settings {
+		width: 97px;
+		position: relative;
+		cursor: pointer;
+		&:after {
+			display: block;
+			content: '';
+			height: 32px;
+			width: 32px;
+			background-color: #fdfeff;
+			position: absolute;
+			top: 9px;
+			left: 12px;
+			transition: left .2s ease;
+			z-index: 0;
+			border-radius: 3px;
+			.theme-night & {
+				left: 52px;
+			}
+		}
+	}
+	.button-theme-day {
+		position: absolute;
+		top: 9px;
+		left: 12px;
+		background: image-url("icon-theme-day.svg") 50% 50% no-repeat;
+		width: 32px;
+		height: 32px;
+		z-index: 1;
+	}
+	.button-theme-night {
+		position: absolute;
+		top: 9px;
+		left: 51px;
+		background: image-url("icon-theme-night.svg") 50% 50% no-repeat;
+		width: 32px;
+		height: 32px;
+		z-index: 1;
+	}
 }
 
 .entry-column {
@@ -1971,6 +2002,7 @@ li.selected > a .favicon-wrap {
 	overflow-x: hidden;
 	transition: top .2s ease;
 	-webkit-overflow-scrolling: touch;
+	z-index: 2;
 }
 
 .entry-inner {
@@ -4492,3 +4524,9 @@ Media Players
 .mejs-time-handle {
 	display: none !important;
 }
+
+
+/*------------------------------------------------------------------------------
+Themes
+------------------------------------------------------------------------------*/
+

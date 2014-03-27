@@ -158,6 +158,17 @@ class SettingsController < ApplicationController
     render nothing: true
   end
 
+  def theme
+    @user = current_user
+    if @user.theme.blank? || @user.theme == 'day'
+      @user.theme = 'night'
+    else
+      @user.theme = 'day'
+    end
+    @user.save
+    render nothing: true
+  end
+
   def entry_width
     @user = current_user
     if @user.entry_width.blank?

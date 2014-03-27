@@ -740,6 +740,12 @@ $.extend feedbin,
         event.preventDefault()
         return
 
+    theme: ->
+      $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
+        $('body').toggleClass('theme-night')
+        event.preventDefault()
+        return
+
     filterList: ->
       feedbin.matchHeights($('.app-detail'))
       $(window).on 'resize', () ->

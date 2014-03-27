@@ -113,6 +113,7 @@ Feedbin::Application.routes.draw do
     post :mark_favicon_complete
     post :update_plan
     post :font
+    post :theme
     post :font_increase
     post :font_decrease
     post :entry_width
