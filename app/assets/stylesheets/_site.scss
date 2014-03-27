@@ -17,7 +17,7 @@ $list-background-color: #F2F3F4;
 $list-background-color-night: #212325;
 
 $drawer-background-color: #E6E7E8;
-$drawer-background-color-night: #212325;
+$drawer-background-color-night: #1d1f21;
 
 $border-color: #DDDDDD;
 $border-color-night: #040608;
@@ -1454,37 +1454,29 @@ li.selected > a .favicon-wrap {
 }
 
 .entries-header {
-	color: #999;
+	@include color(#999999, #858585);
 	display: none;
-	border-bottom: 1px solid $border-color;
+	border-bottom: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
 	line-height: $toolbar-height;
 	height: $toolbar-height;
 	text-align: center;
 	overflow: auto;
 	padding-right: 45px;
-	> * {
-		display: inline-block;
+	.feed-title-wrap {
+		position: relative;
+		padding-left: 24px;
+		top: 2px;
 	}
 	.back-button {
+		display: inline-block;
 		float: left;
-		height: 36px;
-		width: 36px;
+		height: $toolbar-height;
+		width: $toolbar-height;
 	}
 	.favicon-wrap {
-		position: static;
-	}
-	.favicon {
-		margin-top: 4px;
-	}
-	@media (max-width: 420px) {
-		.feed-selected & {
-			display: block;
-		}
-	}
-	@media (max-width: 768px) and (min-width: 621px) {
-		.entry-selected & {
-			display: block;
-		}
+		left: 0;
+		top: -2px;
 	}
 }
 
@@ -1581,6 +1573,15 @@ $saved-search-control-height: 48px;
 			display: block;
 		}
 	}
+}
+
+.entries-inner {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	transition: top .2s ease;
 }
 
 .entries {
@@ -1771,7 +1772,7 @@ $saved-search-control-height: 48px;
 				background-image: image-url("icon-star.svg"), none;
 			}
 			&:after {
-				background: #666;
+				@include background-color(#666666, #505a65);
 			}
 		}
 		.feed-title {
@@ -1868,6 +1869,7 @@ $saved-search-control-height: 48px;
 	position: absolute;
 	top: 0;
 	left: 0;
+	z-index: 3;
 	width: 100%;
 	height: $small-toolbar-height;
 	border-bottom: 1px solid transparent;
@@ -1886,6 +1888,7 @@ $saved-search-control-height: 48px;
 		left: 38px;
 		display: block;
 		font-size: 14px;
+		@include color(#999999, #858585);
 		color: #999999;
 		text-decoration: none;
 	}
@@ -1905,6 +1908,7 @@ $saved-search-control-height: 48px;
 	@include border-color($border-color, $border-color-night);
 	@include background-color($drawer-background-color, $drawer-background-color-night);
 	@include arrow(21px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right) {
+		z-index: 3;
 		visibility: hidden;
 	}
 	&.open:after,
@@ -1920,7 +1924,6 @@ $saved-search-control-height: 48px;
 		float: left;
 	}
 	select {
-		background: image-url("icon-dropdown-arrow.svg") 107px 5px no-repeat;
 		@include background-color($input-background-color, $input-background-color-night);
 		width: 128px;
 		padding: 5px;
@@ -1933,6 +1936,18 @@ $saved-search-control-height: 48px;
 		-webkit-appearance: none;
 		margin: 11px 10px 0 10px;
 		@include color(#333, #fbfdff);
+		position: relative;
+		&:after {
+			width: 0px;
+			height: 0px;
+			border-style: solid;
+			border-width: 5px 4px 0 4px;
+			border-color: #999 transparent transparent transparent;
+			content: "";
+			position: absolute;
+			right: 8px;
+			top: 10px;
+		}
 	}
 	.button-increase-font {
 		height: 48px;
@@ -2024,12 +2039,12 @@ $saved-search-control-height: 48px;
 			position: absolute;
 			top: 9px;
 			left: 12px;
-			transition: left .2s ease, background-color .2s ease;
+			transition: left .2s ease;
 			z-index: 0;
 			border-radius: 3px;
 			.theme-night & {
 				left: 52px;
-				background-color: #191c20;
+				background-color: #141619;
 			}
 		}
 	}
@@ -2166,11 +2181,14 @@ $saved-search-control-height: 48px;
 		border: none;
 		background: none;
 		width: 45px;
-		height: $toolbar-height;
+		height: $small-toolbar-height;
 		padding: 0;
 		position: relative;
+		svg {
+			pointer-events: none;
+		}
 		svg * {
-			fill: #999;
+			@include fill(#8f99a3,#97999b);
 		}
 	}
 	.entry-button-wrap {
@@ -2178,8 +2196,9 @@ $saved-search-control-height: 48px;
 	}
 	.button-toggle-read {
 		.circle-filled, .circle-empty {
-			border: 2px solid #999;
-			background-color: #999;
+			border: 2px solid transparent;
+			@include border-color(#8f99a3,#97999b);
+			@include background-color(#8f99a3,#97999b);
 			height: 16px;
 			width: 16px;
 			border-radius: 16px;
@@ -2188,7 +2207,7 @@ $saved-search-control-height: 48px;
 			left: 12px;
 		}
 		.circle-empty {
-			background-color: transparent;
+			@include background-color(transparent,transparent);
 		}
 	}
 	.button-toggle-starred {
@@ -2196,6 +2215,8 @@ $saved-search-control-height: 48px;
 			position: absolute;
 			top: 10px;
 			left: 13px;
+			height: 17px;
+			width: 17px;
 		}
 	}
 	.button-toggle-content {
@@ -2203,6 +2224,8 @@ $saved-search-control-height: 48px;
 			position: absolute;
 			top: 11px;
 			left: 9px;
+			height: 14px;
+			width: 21px;
 		}
 	}
 	.button-toggle-share-menu {
@@ -2211,6 +2234,8 @@ $saved-search-control-height: 48px;
 			position: absolute;
 			top: 9px;
 			left: 10px;
+			height: 16px;
+			width: 16px;
 		}
 		ul {
 			left: -5px;
@@ -2223,6 +2248,8 @@ $saved-search-control-height: 48px;
 			position: absolute;
 			top: 11px;
 			left: 9px;
+			height: 16px;
+			width: 16px;
 		}
 	}
 }
@@ -2234,12 +2261,16 @@ $saved-search-control-height: 48px;
 		display: none;
 		width: 140px;
 		list-style: none;
-		border: 1px solid $border-color;
-		background-color: #FFF;
+		border: 1px solid transparent;
+		@include border-color($border-color, $border-color-night);
+		@include background-color($body-background-color, $body-background-color-night);
 		position: absolute;
 		z-index: 10000;
 		border-radius: 4px;
 		box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.2);
+		.theme-night & {
+			box-shadow: 0 0 4px 0 rgba(0, 0, 0, 1);
+		}
 		li {
 			margin: 0;
 			padding: 0;
@@ -2247,7 +2278,7 @@ $saved-search-control-height: 48px;
 				text-decoration: none;
 				display: block;
 				font-size: 13px;
-				color: #333;
+				@include color($text-color, $text-color-night);
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
@@ -2255,14 +2286,15 @@ $saved-search-control-height: 48px;
 				padding: 6px 5px;
 				font-family: $font-stack;
 				font-weight: 400 !important;
-				border-bottom: 1px solid $list-background-color;
+				border-bottom: 1px solid transparent;
+				@include border-color($list-background-color, #212325);
 				cursor: pointer;
 			}
 			a:hover,
 			span:hover,
 			&.selected a,
 			&.selected span {
-				background-color: $list-background-color;
+				@include background-color($list-background-color, $list-background-color-night);
 			}
 			&:first-child a,
 			&:first-child span {
@@ -2275,31 +2307,16 @@ $saved-search-control-height: 48px;
 				border-radius: 0 0 4px 4px;
 				border-bottom: none;
 			}
-		}
-		li:first-child:before {
-			position: absolute;
-			top: -7px;
-			left: 12px;
-			display: inline-block;
-			border-right: 7px solid rgba(0, 0, 0, 0);
-			border-bottom: 7px solid $border-color;
-			border-left: 7px solid rgba(0, 0, 0, 0);
-			border-bottom-color: rgba(0, 0, 0, 0.2);
-			content: '';
-		}
-		li:first-child:after {
-			position: absolute;
-			top: -6px;
-			left: 13px;
-			display: inline-block;
-			border-right: 6px solid rgba(0, 0, 0, 0);
-			border-bottom: 6px solid #FFF;
-			border-left: 6px solid rgba(0, 0, 0, 0);
-			content: '';
-		}
-		li:first-child:hover:after,
-		li.selected:first-child:after {
-			border-bottom-color: $list-background-color;
+			&:first-child {
+				@include arrow(12px, -7px, $body-background-color, $body-background-color-night, #ebebeb, #191b1c, left, true);
+			}
+			&:first-child:hover:after,
+			&.selected:first-child:after {
+				border-bottom-color: $list-background-color !important;
+				.theme-night & {
+					border-bottom-color: $list-background-color-night !important;
+				}
+			}
 		}
 	}
 	&.open {
@@ -4223,8 +4240,9 @@ Login and Sign Up
 	padding: 15px;
 	display: flex;
 	align-items: center;
-	.bar, .application-messages {
-		display: none !important;
+	.login-wrap {
+		margin: auto;
+		width: 400px;
 	}
 	.logo {
 		background: image-url('logo-full.svg') no-repeat scroll top left;
@@ -4295,39 +4313,6 @@ Login and Sign Up
 		margin: 10px 0 0 0;
 		text-align: center;
 		color: #999;
-	}
-}
-
-
-/*------------------------------------------------------------------------------
-Mobile
-------------------------------------------------------------------------------*/
-@media (max-width: 420px) {
-	.entry-selected {
-		.entry-header h1 {
-			font-size: 1.6em;
-		}
-	}
-	.mobile-hide {
-		display: none !important;
-	}
-	.entry-inner {
-		padding: 15px;
-	}
-	.feeds {
-		.feed-link {
-			padding: 11px 40px 10px 35px !important;
-
-		}
-		.favicon-wrap {
-			top: 7px;
-		}
-	}
-	.entries ul li .icon-entry-actions {
-		display: none !important;
-	}
-	.entries ul li:hover.starred .icon-star {
-		display: block !important;
 	}
 }
 
@@ -4614,6 +4599,67 @@ Media Players
 
 
 /*------------------------------------------------------------------------------
-Themes
+Media Queries
 ------------------------------------------------------------------------------*/
+@media (max-width:768px) {
+    .entry-selected .content {
+        top: 0;
+    }
+    .nothing-selected, .feed-selected {
+		.entries-column {
+			width: auto !important;
+			flex-grow: 1;
+			border-right: none;
+		}
+		.ui-resizable-handle,
+		.entry-column {
+	        display: none;
+	    }
+    }
+    .entry-selected {
+		.feeds-column {
+			display: none;
+		}
+		.entries-inner {
+	        top: $toolbar-height;
+	    }
+    }
+
+
+}
+
+@media (max-width: 420px) {
+	.feed-selected .entries-header {
+		display: block;
+	}
+}
+@media (max-width: 768px) and (min-width: 621px) {
+	.feed-selected,
+	.entry-selected {
+		.entries-header {
+			display: block;
+		}
+	}
+}
+
+
+@media (max-width: 420px) {
+	.entry-selected {
+		.entry-header h1 {
+			font-size: 1.6em;
+		}
+	}
+	.mobile-hide {
+		display: none !important;
+	}
+	.entry-inner {
+		padding: 15px;
+	}
+	.entries ul li .icon-entry-actions {
+		display: none !important;
+	}
+	.entries ul li:hover.starred .icon-star {
+		display: block !important;
+	}
+}
 

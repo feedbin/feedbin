@@ -502,15 +502,15 @@ $.extend feedbin,
 
     feedSelected: ->
       $(document).on 'click', '[data-behavior~=back_to_feeds]', ->
-        $('.app').addClass('nothing-selected').removeClass('feed-selected entry-selected')
+        $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
         return
 
       $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
-        $('.app').addClass('feed-selected').removeClass('nothing-selected entry-selected')
+        $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
         return
 
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
-        $('.app').addClass('entry-selected').removeClass('nothing-selected feed-selected')
+        $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
         return
 
     addFields: ->

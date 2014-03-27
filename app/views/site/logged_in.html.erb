@@ -36,31 +36,32 @@
 
   <div class="entries-column app-panel" data-behavior="content_column" <%= resizable 'entries' %>>
     <div class="entries-header" data-behavior="entries-header"></div>
+      <div class="entries-inner">
+      <%= form_tag search_entries_path, class: 'search-form-wrap', remote: true, method: :get, data: {behavior: 'search_form'} do %>
+        <%= search_field_tag :query, params[:query], placeholder: 'Search' %>
+      <% end %>
 
-    <%= form_tag search_entries_path, class: 'search-form-wrap', remote: true, method: :get, data: {behavior: 'search_form'} do %>
-      <%= search_field_tag :query, params[:query], placeholder: 'Search' %>
-    <% end %>
-
-    <div class="search-control hide">
-      <div class="sort-control">
-        <div class="dropdown-wrap">
-          <span class="sort-order" data-behavior="toggle_share_menu toggle_dropdown">Sort by date</span>
-          <ul>
-            <li data-sort-option="desc"><span>Sort by date</a></span></li>
-            <li data-sort-option="relevance"><span>Sort by relevance</a></span></li>
-          </ul>
+      <div class="search-control hide">
+        <div class="sort-control">
+          <div class="dropdown-wrap">
+            <span class="sort-order" data-behavior="toggle_share_menu toggle_dropdown">Sort by date</span>
+            <ul>
+              <li data-sort-option="desc"><span>Sort by date</a></span></li>
+              <li data-sort-option="relevance"><span>Sort by relevance</a></span></li>
+            </ul>
+          </div>
+          <span class="save-search" data-behavior="save_search_link">Save Search</span>
+          <span class="save-search edit" data-behavior="save_search_link">Edit Saved Search</span>
         </div>
-        <span class="save-search" data-behavior="save_search_link">Save Search</span>
-        <span class="save-search edit" data-behavior="save_search_link">Edit Saved Search</span>
+
+        <div class="saved-search-wrap" data-behavior="saved_search_form_target">
+        </div>
+
       </div>
 
-      <div class="saved-search-wrap" data-behavior="saved_search_form_target">
+      <div class="entries">
+        <ul data-behavior="entries_target"></ul>
       </div>
-
-    </div>
-
-    <div class="entries">
-      <ul data-behavior="entries_target"></ul>
     </div>
     <%= render partial: 'shared/feeds_toolbar' %>
   </div>

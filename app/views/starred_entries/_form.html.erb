@@ -2,9 +2,9 @@
   <%= hidden_field_tag 'starred', !starred %>
   <button class="entry-button button-toggle-starred" title="Star/remove star">
     <% if starred %>
-      <%= render partial: "shared/svg/star_on" %>
+      <%= svg_tag 'icon-star-on', size: '17x17' %>
     <% else %>
-      <%= render partial: "shared/svg/star_off" %>
+      <%= svg_tag 'icon-star-off', size: '17x17' %>
     <% end %>
   </button>
 <% end %>

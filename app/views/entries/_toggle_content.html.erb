@@ -3,11 +3,11 @@
   <button class="entry-button button-toggle-content" title="View original inline">
     <% if content_view %>
       <span class="active">
-        <%= render partial: "shared/svg/readability" %>
+        <%= svg_tag 'icon-readability', size: '21x14' %>
       </span>
     <% else %>
       <span>
-        <%= render partial: "shared/svg/readability" %>
+        <%= svg_tag 'icon-readability', size: '21x14' %>
       </span>
     <% end %>
   </button>

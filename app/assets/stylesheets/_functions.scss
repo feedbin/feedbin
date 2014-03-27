@@ -29,7 +29,7 @@
 	}
 }
 
-@mixin arrow($x-position, $y-position, $arrow-color, $arrow-color-night, $shadow-color, $shadow-color-night, $origin:left) {
+@mixin arrow($x-position, $y-position, $arrow-color, $arrow-color-night, $shadow-color, $shadow-color-night, $origin:left, $invert:false) {
 	&:before {
 		@if $origin == left {
 			left: $x-position;
@@ -37,15 +37,24 @@
 		@else {
 			right: $x-position;
 		}
+		@if $invert == true {
+			border-bottom: 6px solid $shadow-color;
+		}
+		@else {
+			border-top: 6px solid $shadow-color;
+		}
 		top: $y-position;
 		position: absolute;
 		border-right: 6px solid rgba(0, 0, 0, 0);
-		border-top: 6px solid $shadow-color;
 		border-left: 6px solid rgba(0, 0, 0, 0);
-		border-bottom-color: rgba(0, 0, 0, 1);
 		content: '';
 		.theme-night & {
-			border-top-color: $shadow-color-night;
+			@if $invert == true {
+				border-bottom-color: $shadow-color-night;
+			}
+			@else {
+				border-top-color: $shadow-color-night;
+			}
 		}
 		@content;
 	}
@@ -56,14 +65,25 @@
 		@else {
 			right: $x-position + 1;
 		}
-		top: $y-position;
+		@if $invert == true {
+			border-bottom: 5px solid $arrow-color;
+			top: $y-position + 2;
+		}
+		@else {
+			border-top: 5px solid $arrow-color;
+			top: $y-position;
+		}
 		position: absolute;
 		border-right: 5px solid rgba(0, 0, 0, 0);
-		border-top: 5px solid $arrow-color;
 		border-left: 5px solid rgba(0, 0, 0, 0);
 		content: '';
 		.theme-night & {
-			border-top-color: $arrow-color-night;
+			@if $invert == true {
+				border-bottom-color: $arrow-color-night;
+			}
+			@else {
+				border-top-color: $arrow-color-night;
+			}
 		}
 		@content;
 	}

@@ -51,7 +51,7 @@ feedbin.hideSearchControls()
 <% if @search %>
   feedbin.markReadData = {type: "search", data: "<%= @escaped_query %>", message: "Mark search for <%= @escaped_query %> as read?"}
   $('.saved-search-wrap').removeClass('show')
-  $('.app').addClass('feed-selected').removeClass('nothing-selected entry-selected');
+  $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected');
   $('[data-behavior~=save_search_link]').removeAttr('disabled');
   $('[data-behavior~=saved_search_form_target]').html('<%= j render partial: "saved_searches/form", locals: {saved_search: @saved_search} %>');
 <% end %>

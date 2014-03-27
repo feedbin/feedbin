@@ -1,12 +1,16 @@
 <button class="back-button" data-behavior="back_to_feeds"></button>
 <% if @feed %>
   <% present feed do |feed_presenter| %>
-    <%= feed_presenter.favicon(feed.site_url) %>
-    <span data-behavior="user_title" data-feed-id="<%= @feed.id %>"><%= @feed.title %></span>
+    <span class="feed-title-wrap">
+      <%= feed_presenter.favicon(feed.site_url) %>
+      <span data-behavior="user_title" data-feed-id="<%= @feed.id %>"><%= @feed.title %></span>
+    </span>
   <% end %>
 <% else %>
-  <span class="favicon-wrap">
-    <span class="favicon <%= @collection_favicon %>"></span>
+  <span class="feed-title-wrap">
+    <span class="favicon-wrap">
+      <span class="favicon <%= @collection_favicon %>"></span>
+    </span>
+    <%= @collection_title %>
   </span>
-  <%= @collection_title %>
 <% end %>
