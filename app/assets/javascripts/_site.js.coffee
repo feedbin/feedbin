@@ -728,10 +728,7 @@ $.extend feedbin,
 
     entryWidth: ->
       $(document).on 'click', '[data-behavior~=entry_width]', (event) ->
-        if $('[data-behavior~=entry_content_target]').hasClass('fluid')
-          $('[data-behavior~=entry_content_target]').removeClass('fluid')
-        else
-          $('[data-behavior~=entry_content_target]').addClass('fluid')
+        $('[data-behavior~=entry_content_target]').toggleClass('fluid')
         return
 
     fullscreen: ->

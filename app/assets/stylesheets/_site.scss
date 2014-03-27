@@ -17,7 +17,7 @@ $list-background-color: #F2F3F4;
 $list-background-color-night: #212325;
 
 $drawer-background-color: #E6E7E8;
-$drawer-background-color-night: #464b4e;
+$drawer-background-color-night: #212325;
 
 $border-color: #DDDDDD;
 $border-color-night: #040608;
@@ -832,17 +832,11 @@ input[type="color"],
 	line-height: 20px;
 	vertical-align: middle;
 	border-radius: 4px;
-	&::-webkit-input-placeholder {
-		@include color($border-color, $border-color-night);
-	}
+	&::-moz-placeholder,
+	&:-ms-input-placeholder,
+	&::-webkit-input-placeholder,
 	&:-moz-placeholder {
-		@include color($border-color, $border-color-night);
-	}
-	&::-moz-placeholder {
-		@include color($border-color, $border-color-night);
-	}
-	&:-ms-input-placeholder {
-		@include color($border-color, $border-color-night);
+		@include color($border-color, #535353);
 	}
 	&:focus {
 		outline: none;
@@ -1020,14 +1014,15 @@ Structure
 	@include background-color($body-background-color, $body-background-color-night);
 	height: $toolbar-height;
 	a {
-		color: #666666;
+		@include color(#666666, #999999);
 		font-size: 13px;
 		display: block;
 		float: right;
 		text-decoration: none;
 		margin: 11px 0 0 0;
 		padding: 2px 11px;
-		border-left: 1px solid $border-color;
+		border-left: 1px solid transparent;
+		@include border-color($border-color, $border-color-night);
 		&:last-child {
 			border: none;
 		}
@@ -1282,12 +1277,10 @@ $subscribe-wrap-height: 49px;
 				text-overflow: ellipsis;
 				white-space: nowrap;
 				width: 100%;
-				padding: 9px 40px 8px 35px;
+				padding: 10px 40px 9px 35px;
 				display: block;
 				line-height: 1;
-				&:hover {
-					text-decoration: none;
-				}
+/*				transition: background-color .2s ease;*/
 			}
 			.tag-link {
 				padding-right: 70px;
@@ -1347,13 +1340,23 @@ $subscribe-wrap-height: 49px;
 	}
 }
 
+.feeds a:hover {
+	@include background-color(#2b2e30, #2b2e30);
+}
+
 .feeds .selected > a {
-	background: #666666;
+	@include background-color(#666666, #505a65);
 	color: #fff !important;
+	&:hover {
+		@include background-color(#666666, #505a65);
+	}
 }
 
 .selected .feeds .selected > a {
 	background: $selected;
+	&:hover {
+		background: $selected;
+	}
 }
 
 li.selected .drawer ul:after {
@@ -1373,7 +1376,7 @@ li.selected .drawer ul:after {
 	width: 18px;
 	position: absolute;
 	left: 8px;
-	top: 6px;
+	top: 7px;
 	background-color: #FFF;
 	.favicon {
 		height: 16px;
@@ -1542,9 +1545,10 @@ $saved-search-control-height: 48px;
 	.saved-search-wrap {
 		height: $saved-search-control-height;
 		padding: 8px;
-		background-color: $drawer-background-color;
+		@include background-color($drawer-background-color, $drawer-background-color-night);
 		position: relative;
 		border-bottom: 1px solid $border-color;
+		@include border-color($border-color, $border-color-night);
 		input[type="text"] {
 			height: 32px;
 			width: 100%;
@@ -1619,7 +1623,6 @@ $saved-search-control-height: 48px;
 		@include background-color($body-background-color, $body-background-color-night);
 		display: block;
 		padding: 0;
-		color: #000;
 		left: 0;
 		transition:left .2s ease;
 		&:hover {
@@ -1629,7 +1632,8 @@ $saved-search-control-height: 48px;
 	.entries-inner-wrap {
 		padding: 10px 10px 8px 0;
 		margin-left: 30px;
-		border-bottom: 1px solid $list-background-color;
+		border-bottom: 1px solid transparent;
+		@include border-color($list-background-color, #212325);
 	}
 	.icon-entry-actions {
 		cursor: pointer;
@@ -1663,7 +1667,7 @@ $saved-search-control-height: 48px;
 	}
 	.time {
 		font-size: 12px;
-		color: #999;
+		@include color(#999999, #b7b7b7);
 		margin-bottom: 1px;
 		display: block;
 		position: absolute;
@@ -1678,12 +1682,13 @@ $saved-search-control-height: 48px;
 		line-height: 1.1;
 		display: block;
 		margin-bottom: 4px;
+		@include color($text-color, $text-color-night);
 	}
 	.feed-title {
 		font-size: 12px;
 		line-height: 1.3;
 		margin: 0 0 1px 0;
-		color: #999;
+		@include color(#999999, #b7b7b7);
 		padding-right: 91px;
 		white-space: nowrap;
 		overflow: hidden;
@@ -1696,7 +1701,7 @@ $saved-search-control-height: 48px;
 		line-height: 1.3;
 		font-size: 12px;
 		margin: 0;
-		color: #999;
+		@include color(#999999, #b7b7b7);
 		display: block;
 	}
 	.icon-star {
@@ -1724,7 +1729,7 @@ $saved-search-control-height: 48px;
 			position: absolute;
 			top: 0px;
 			left: 9px;
-			background-color: #FFF;
+			@include background-color($body-background-color, $body-background-color-night);
 			height: 44px;
 			width: 27px;
 			content: '';
@@ -1739,10 +1744,10 @@ $saved-search-control-height: 48px;
 	}
 	&.read {
 		.title {
-			color: #999;
+			@include color(#999999, #535353);
 		}
 		.body {
-			color: $border-color;
+			@include color($border-color, #535353);
 		}
 	}
 	&.media {
@@ -1752,10 +1757,10 @@ $saved-search-control-height: 48px;
 	}
 	&.selected {
 		.wrap {
-			border-color: #666;
-			border-top: 1px solid #666;
+			border-top: 1px solid transparent;
+			@include border-color(#666, #505a65);
 			margin-top: -1px;
-			background: #666666;
+			@include background-color(#666666, #505a65);
 		}
 		.entries-inner-wrap {
 			border-bottom-color: transparent;
@@ -1907,53 +1912,75 @@ $saved-search-control-height: 48px;
 		visibility: visible;
 	}
 	.setting-wrap {
-		border-right: 1px solid $border-color;
+		border-right: 1px solid transparent;
+		@include border-color($border-color, $border-color-night);
 		height: 100%;
 		display: block;
 		padding: 0;
 		float: left;
 	}
 	select {
-		background: #FFF image-url("icon-dropdown-arrow.svg") 107px 5px no-repeat;
+		background: image-url("icon-dropdown-arrow.svg") 107px 5px no-repeat;
+		@include background-color($input-background-color, $input-background-color-night);
 		width: 128px;
 		padding: 5px;
 		font-size: 13px;
 		line-height: 1.1;
-		border: 1px solid $border-color;
+		border: 1px solid transparent;
+		@include border-color($border-color, $border-color-night);
 		border-radius: 0;
 		height: 28px;
 		-webkit-appearance: none;
 		margin: 11px 10px 0 10px;
+		@include color(#333, #fbfdff);
 	}
 	.button-increase-font {
 		height: 48px;
 		width: 48px;
-		background: image-url("icon-larger-text.svg") 0 0 no-repeat;
 		display: block;
+		.icon-larger-text {
+			height: 48px;
+			width: 48px;
+			pointer-events: none;
+			@include fill(#000000, #fbfdff);
+		}
 	}
 	.button-decrease-font {
 		height: 48px;
 		width: 48px;
-		background: image-url("icon-smaller-text.svg") 0 0 no-repeat;
 		display: block;
+		.icon-smaller-text {
+			height: 48px;
+			width: 48px;
+			pointer-events: none;
+			@include fill(#000000, #fbfdff);
+		}
 	}
 	.button-entry-width {
 		height: 48px;
 		width: 48px;
 		position: relative;
 		display: block;
-		&:after {
-			display: block;
-			height: 24px;
-			width: 34px;
-			background: image-url("icon-entry-width.svg") 0 -24px no-repeat;
-			content: "";
+		.icon-entry-width-fixed,
+		.icon-entry-width-fluid {
 			position: absolute;
 			top: 12px;
 			left: 7px;
+			height: 24px;
+			width: 34px;
+			@include fill(#000000, #fbfdff);
+			pointer-events: none;
 		}
-		.fluid &:after {
-			background-position: 0px 0px;
+		.icon-entry-width-fixed {
+			display: none;
+		}
+		.fluid & {
+			.icon-entry-width-fluid {
+				display: none;
+			}
+			.icon-entry-width-fixed {
+				display: block;
+			}
 		}
 	}
 	.button-full-screen {
@@ -1961,21 +1988,27 @@ $saved-search-control-height: 48px;
 		width: 48px;
 		position: relative;
 		display: block;
-		&:hover {
-			cursor: pointer;
-		}
-		&:after {
-			display: block;
-			height: 26px;
-			width: 34px;
-			background: image-url("icon-full-screen.svg") 0 0 no-repeat;
-			content: "";
+		cursor: pointer;
+		.icon-full-screen-open,
+		.icon-full-screen-close {
 			position: absolute;
-			top: 12px;
+			top: 11px;
 			left: 7px;
+			width: 34px;
+			height: 26px;
+			@include fill(#000000, #fbfdff);
+			pointer-events: none;
 		}
-		.full-screen &:after {
-			background-position: 0px -26px;
+		.icon-full-screen-close {
+			display: none;
+		}
+		.full-screen & {
+			.icon-full-screen-open {
+				display: none;
+			}
+			.icon-full-screen-close {
+				display: block;
+			}
 		}
 	}
 	.theme-settings {
@@ -1991,31 +2024,34 @@ $saved-search-control-height: 48px;
 			position: absolute;
 			top: 9px;
 			left: 12px;
-			transition: left .2s ease;
+			transition: left .2s ease, background-color .2s ease;
 			z-index: 0;
 			border-radius: 3px;
 			.theme-night & {
 				left: 52px;
+				background-color: #191c20;
 			}
 		}
 	}
 	.button-theme-day {
 		position: absolute;
-		top: 9px;
-		left: 12px;
-		background: image-url("icon-theme-day.svg") 50% 50% no-repeat;
-		width: 32px;
-		height: 32px;
+		top: 16px;
+		left: 19px;
+		width: 18px;
+		height: 18px;
 		z-index: 1;
+		pointer-events: none;
+		@include fill(#000000, #525456);
 	}
 	.button-theme-night {
 		position: absolute;
-		top: 9px;
-		left: 51px;
-		background: image-url("icon-theme-night.svg") 50% 50% no-repeat;
-		width: 32px;
-		height: 32px;
+		top: 15px;
+		left: 58px;
+		width: 17px;
+		height: 19px;
 		z-index: 1;
+		pointer-events: none;
+		@include fill(#000000, #fbfdff);
 	}
 }
 
@@ -2285,7 +2321,7 @@ $saved-search-control-height: 48px;
 	h1 {
 		font-size: 2.4em;
 		line-height: 1.1;
-		color: #000;
+		@include color(#000000, #FFFFFF);
 		margin: 0 0 .2em 0;
 		padding: 0;
 		font-weight: normal;
@@ -2294,6 +2330,7 @@ $saved-search-control-height: 48px;
 	.post-meta {
 		font-size: 1em;
 		color: #999;
+		@include color(#999999, #858585);
 		line-height: 1.2;
 		margin: .2em;
 		.icon-clock {
@@ -2315,7 +2352,7 @@ $saved-search-control-height: 48px;
 	font-style: normal;
 	font-size: 1.15em;
 	line-height: 1.6;
-	color: #333;
+	@include color(#333, #f3f3f3);
 	text-rendering: optimizeLegibility;
 
 	strong {
@@ -2386,7 +2423,7 @@ $saved-search-control-height: 48px;
 	}
 
 	code {
-		color: #333;
+		@include color(#333, #f3f3f3);
 	}
 
 	pre {
@@ -2407,12 +2444,13 @@ $saved-search-control-height: 48px;
 
 	blockquote {
 		padding: 0 0 0 15px;
-		border-left: 2px solid $border-color;
+		border-left: 2px solid transparent;
+		@include border-color($border-color, $border-color-night);
 	}
 
 	blockquote,
 	blockquote p {
-		color: #666;
+		@include color(#666666, #858585);
 	}
 
 	blockquote p:last-child {
@@ -2425,7 +2463,7 @@ $saved-search-control-height: 48px;
 
 	figcaption, caption {
 		font-size: 80%;
-		color: #999;
+		@include color(#999999, #858585);
 		font-style: italic;
 		line-height: 1.3;
 	}
@@ -2456,9 +2494,10 @@ $saved-search-control-height: 48px;
 	}
 
 	.diff-wrap {
-		color: #999;
+		@include color(#999999, #858585);
 		font-size: 13px;
-		border-top: 1px solid #dcdcdc;
+		border-top: 1px solid transparent;
+		@include border-color($border-color, $border-color-night);
 		padding: 15px 0 0 25px;
 		font-family: $font-stack !important;
 		font-weight: 400 !important;
@@ -2475,7 +2514,7 @@ $saved-search-control-height: 48px;
 	}
 
 	.original-content-info {
-		background-color: $list-background-color;
+		@include background-color($list-background-color, $list-background-color-night);
 		position: relative;
 		margin-bottom: 1.1em;
 		padding: 10px 53px 10px 36px;
@@ -2500,7 +2539,7 @@ $saved-search-control-height: 48px;
 		.original-title a {
 			font-size: 14px;
 			font-weight: bold;
-			color: #666666;
+			@include color(#666666, #858585);
 			margin-bottom: .55em;
 			&:hover {
 				color: #666;
@@ -4383,10 +4422,10 @@ Print
 Fullscreen
 ------------------------------------------------------------------------------*/
 .full-screen {
-	.feeds-column, .entries-column {
+	.feeds-column, .entries-column, .account-buttons {
 		display: none;
 	}
-	.content {
+	.entry-content-wrap {
 		top: 0;
 	}
 	.app-panel {
