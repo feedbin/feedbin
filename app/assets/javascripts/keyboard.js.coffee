@@ -116,6 +116,9 @@ class feedbin.Keyboard
       @selectItem()
 
   bindKeys: ->
+    if $('body.app').length == 0
+      return
+
     Mousetrap.bind ['pageup', 'pagedown', 'up', 'down', 'left', 'right', 'j', 'k', 'h', 'l'], (event, combo) =>
       if feedbin.shareOpen()
         @navigateShareMenu(combo)

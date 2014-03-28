@@ -292,7 +292,7 @@ $.extend feedbin,
       barWidth = (canvas.width - numberOfSpaces * spaceWidth) / values.length
       if canvas.getContext
         context = canvas.getContext("2d")
-        context.fillStyle = "#f2f3f4"
+        context.fillStyle = "#DDDDDD"
         xPosition = 0
         for value in values
           height = Math.ceil(value * canvas.height)
@@ -907,6 +907,12 @@ $.extend feedbin,
     drawBarCharts: ->
       $('canvas').each ()->
         feedbin.drawBarChart(@, $(@).data('values'))
+      return
+
+    selectText: ->
+      $(document).on 'mouseup', '[data-behavior~=select_text]', (event) ->
+        $(@).select()
+        event.preventDefault()
       return
 
     fuzzyFilter: ->

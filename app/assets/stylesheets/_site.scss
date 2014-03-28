@@ -8,6 +8,7 @@ Variables
 $toolbar-height: 43px;
 $small-toolbar-height: 37px;
 $font-stack: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$feeds-toolbar-height: 52px;
 
 /*-- Colors --*/
 $body-background-color: #FFFFFF;
@@ -962,17 +963,6 @@ th {
 /*------------------------------------------------------------------------------
 Structure
 ------------------------------------------------------------------------------*/
-.logo {
-	display: block;
-	margin: 7px 0 0 12px;
-	svg {
-		width: 32px;
-		height: 27px;
-		* {
-			fill: $border-color;
-		}
-	}
-}
 
 .search-form-wrap {
 	position: absolute;
@@ -1142,7 +1132,7 @@ Structure
 }
 
 .feeds-toolbar {
-	height: 52px;
+	height: $feeds-toolbar-height;
 	border-top: 1px solid transparent;
 	@include border-color($border-color, $border-color-night);
 	position: absolute;
@@ -1203,7 +1193,7 @@ $subscribe-wrap-height: 49px;
 .feeds-inner {
 	position: absolute;
 	top: $toolbar-height;
-	bottom: 52px;
+	bottom: $feeds-toolbar-height;
 	left: 0;
 	right: 0;
 	z-index: 1;
@@ -1581,7 +1571,6 @@ $saved-search-control-height: 48px;
 	bottom: 0;
 	left: 0;
 	right: 0;
-	transition: top .2s ease;
 }
 
 .entries {
@@ -1871,20 +1860,21 @@ $saved-search-control-height: 48px;
 	left: 0;
 	z-index: 3;
 	width: 100%;
-	height: $small-toolbar-height;
+	height: $toolbar-height;
 	border-bottom: 1px solid transparent;
 	@include border-color($border-color, $border-color-night);
 	.back-button {
-		height: 36px;
-		width: 36px;
+		display: none;
+		height: $toolbar-height;
+		width: $toolbar-height;
 	}
 	.favicon-wrap {
-		top: 8px;
+		top: 11px;
 		left: 13px;
 	}
 	.entry-feed-title {
 		position: absolute;
-		top: 10px;
+		top: 13px;
 		left: 38px;
 		display: block;
 		font-size: 14px;
@@ -1896,7 +1886,7 @@ $saved-search-control-height: 48px;
 
 .entry-settings-wrap {
 	position: absolute;
-	top: $small-toolbar-height;
+	top: $toolbar-height;
 	left: 0;
 	width: 100%;
 }
@@ -1925,7 +1915,7 @@ $saved-search-control-height: 48px;
 	}
 	select {
 		@include background-color($input-background-color, $input-background-color-night);
-		width: 128px;
+		width: 102px;
 		padding: 5px;
 		font-size: 13px;
 		line-height: 1.1;
@@ -2090,7 +2080,7 @@ $saved-search-control-height: 48px;
 	position: absolute;
 	height: auto;
 	bottom: 0;
-	top: $small-toolbar-height;
+	top: $toolbar-height;
 	left: 0;
 	right: 0;
 	margin: 0;
@@ -2164,7 +2154,7 @@ $saved-search-control-height: 48px;
 	top: 0;
 	right: 0px;
 	width: 250px;
-	height: 36px;
+	height: $toolbar-height - 1;
 	z-index: 1;
 	background-image: linear-gradient(to right, rgba($body-background-color, 0) 0%, $body-background-color 10%);
 	.theme-night & {
@@ -2181,7 +2171,7 @@ $saved-search-control-height: 48px;
 		border: none;
 		background: none;
 		width: 45px;
-		height: $small-toolbar-height;
+		height: $toolbar-height - 1;
 		padding: 0;
 		position: relative;
 		svg {
@@ -2203,7 +2193,7 @@ $saved-search-control-height: 48px;
 			width: 16px;
 			border-radius: 16px;
 			position: absolute;
-			top: 11px;
+			top: 13px;
 			left: 12px;
 		}
 		.circle-empty {
@@ -2213,7 +2203,7 @@ $saved-search-control-height: 48px;
 	.button-toggle-starred {
 		svg {
 			position: absolute;
-			top: 10px;
+			top: 12px;
 			left: 13px;
 			height: 17px;
 			width: 17px;
@@ -2222,7 +2212,7 @@ $saved-search-control-height: 48px;
 	.button-toggle-content {
 		svg {
 			position: absolute;
-			top: 11px;
+			top: 13px;
 			left: 9px;
 			height: 14px;
 			width: 21px;
@@ -2232,7 +2222,7 @@ $saved-search-control-height: 48px;
 		color: #333;
 		svg {
 			position: absolute;
-			top: 9px;
+			top: 11px;
 			left: 10px;
 			height: 16px;
 			width: 16px;
@@ -2246,7 +2236,7 @@ $saved-search-control-height: 48px;
 		color: #333;
 		svg {
 			position: absolute;
-			top: 11px;
+			top: 13px;
 			left: 9px;
 			height: 16px;
 			width: 16px;
@@ -2865,16 +2855,18 @@ Settings
 	list-style: none;
 	a {
 		text-align: left;
-		padding: 4px 0;
+		padding: 6px 35px;
 		display: block;
 		font-size: 18px;
-		color: #999;
+		color: #FFF;
 		&:hover {
-			color: #000;
+			color: #FFF;
 			text-decoration: none;
+			background-color: #2b2e30;
 		}
 		&.active {
-			color: #000;
+			color: #FFF;
+			background-color: $selected;
 		}
 	}
 }
@@ -2882,63 +2874,81 @@ Settings
 .nav-small {
 	padding-top: 10px;
 	margin-top: 10px;
-	border-top: 1px solid $border-color;
 	margin-left: auto;
 	a {
 		font-size: 14px;
-		color: #999999;
+		color: #b8b8b8;
 	}
 }
 
 .settings {
 	font-size: 16px;
-	background-color: $list-background-color;
+	background-color: $list-background-color-night;
 	color: #333;
+	display: table;
 	.bar {
 		display: none;
 		@media (max-width: 528px) {
 			display: block;
 		}
 	}
-	.content {
-		width: 100%;
-		border-top: 1px solid $border-color;
-		display: table;
-		.settings-nav {
-			width: 250px;
-			padding: 0 20px;
-			display: table-cell;
-			border-right: 1px solid $border-color;
-			vertical-align: top;
-			.logo {
-				margin: 23px 0 0 0;
+	.settings-nav {
+		width: 310px;
+		display: table-cell;
+		border-right: 1px solid $border-color;
+		vertical-align: top;
+		.logo {
+			margin: 23px 0 0 31px;
+			display: block;
+			svg {
+				width: 140px;
+				height: 30px;
+				path {
+					fill: #FFF;
+				}
 			}
-			.desktop-hide {
-				display: none;
-			}
-			@media (max-width: 528px) {
-				display: none;
-			}
+
 		}
-		.settings-content {
-			vertical-align: top;
-			margin-left: 250px;
-			padding: 0;
-			background-color: #FFF;
-			display: table-cell;
-			.settings-content-inner {
-				max-width: 620px;
-				padding: 0 20px 0 20px;
-			}
-			.settings-content-inner-wide {
-				max-width: 100%;
-				padding: 0 20px 0 20px;
-			}
+		.desktop-hide {
+			display: none;
+		}
+		@media (max-width: 528px) {
+			display: none;
 		}
 	}
-	.content {
-		position: static;
-		height: 100%;
+	.settings-content {
+		vertical-align: top;
+		margin-left: 250px;
+		padding: 0;
+		background-color: #eff1f3;
+		display: table-cell;
+		.settings-content-inner {
+			max-width: 620px;
+			padding: 0 20px 0 37px;
+		}
+		.settings-content-inner-wide {
+			max-width: 100%;
+			padding: 0 20px 0 37px;
+		}
+	}
+	.setting-combo {
+		margin-bottom: 15px;
+		small {
+			padding-left: 21px;
+			display: block;
+		}
+		.light-description {
+			display: block;
+			font-style: italic;
+			font-size: 12px;
+			color: #b6b6b6;
+		}
+	}
+	.starred-field {
+		input {
+			padding-left: 5px !important
+		}
+		margin-left: 21px;
 	}
 	small {
 		font-size: 13px;
@@ -2951,11 +2961,6 @@ Settings
 	.alert {
 		margin-top: 20px;
 	}
-	.bar {
-		.logo {
-			display: inline-block;
-		}
-	}
 	.label-info {
 		background-color: $selected;
 		padding: 3px;
@@ -2963,14 +2968,17 @@ Settings
 		color: #fff;
 	}
 	h2 {
-		margin: 15px 0 15px;
-		font-size: 36px;
+		margin: 35px 0 15px;
+		font-size: 24px;
 		font-weight: normal;
+		color: #535353;
 		-webkit-font-smoothing: antialiased;
 	}
 	h3 {
-		font-size: 20px;
+		font-size: 18px;
+		border-bottom: 1px solid #b7b7b7;
 		margin: 18px 0 15px 0;
+		padding-bottom: 7px;
 		&.no-margin {
 			margin-bottom: 0;
 		}
@@ -3347,7 +3355,7 @@ table.small td {
 	li {
 		clear: both;
 		margin-left: 30px;
-		border-bottom: 1px solid $list-background-color;
+		border-bottom: 1px solid $border-color;
 		position: relative;
 		padding: 10px 0;
 		&:last-child {
@@ -3358,40 +3366,6 @@ table.small td {
 		position: absolute;
 		left: -30px;
 		top: 15px;
-	}
-	.textfield-wrap {
-		position: relative;
-		max-width: 400px;
-		z-index: 100;
-		input {
-			max-width: 400px;
-			padding-left: 35px;
-			margin: 0;
-		}
-	}
-	.favicon-container {
-		display: block;
-		position: absolute;
-		left: 0;
-		top: 0;
-		height: 32px;
-		border-right: 1px solid $border-color;
-		width: 32px;
-		.favicon-wrap {
-			top: 6px;
-			left: 6px;
-		}
-	}
-	.feed-url-container {
-		display: block;
-		position: absolute;
-		right: 1px;
-		top: 1px;
-		height: 30px;
-		border-left: 1px solid $border-color;
-		width: 30px;
-		background: $list-background-color image-url("favicon-feed.svg") 7px 8px no-repeat;
-		border-radius: 0 4px 4px 0;
 	}
 	.last-updated-wrap {
 		position: absolute;
@@ -3418,6 +3392,42 @@ table.small td {
 		right: 0;
 		bottom: 0;
 		z-index: 0;
+	}
+}
+
+.textfield-wrap {
+	position: relative;
+	max-width: 400px;
+	z-index: 100;
+	input {
+		max-width: 400px;
+		padding-left: 35px !important;
+		padding-right: 35px !important;
+		margin: 0;
+	}
+	.favicon-container {
+		display: block;
+		position: absolute;
+		left: 0;
+		top: 0;
+		height: 32px;
+		border-right: 1px solid $border-color;
+		width: 32px;
+		.favicon-wrap {
+			top: 6px;
+			left: 6px;
+		}
+	}
+	.feed-url-container {
+		display: block;
+		position: absolute;
+		right: 1px;
+		top: 1px;
+		height: 30px;
+		border-left: 1px solid $border-color;
+		width: 30px;
+		background: $list-background-color image-url("favicon-feed.svg") 7px 8px no-repeat;
+		border-radius: 0 4px 4px 0;
 	}
 }
 
@@ -3592,9 +3602,10 @@ Buttons
 	height: 0;
 	width: 100%;
 	position: absolute;
-	bottom: 52px;
+	bottom: $feeds-toolbar-height;
 	left: 0;
 	overflow: hidden;
+	z-index: 1;
 }
 
 .tags-form {
@@ -4601,6 +4612,12 @@ Media Players
 /*------------------------------------------------------------------------------
 Media Queries
 ------------------------------------------------------------------------------*/
+@media only screen and (max-width:1024px) {
+	.entries-column, .feeds-column {
+        width: 270px !important;
+    }
+}
+
 @media (max-width:768px) {
     .entry-selected .content {
         top: 0;
@@ -4611,9 +4628,8 @@ Media Queries
 			flex-grow: 1;
 			border-right: none;
 		}
-		.ui-resizable-handle,
 		.entry-column {
-	        display: none;
+	        display: none !important;
 	    }
     }
     .entry-selected {
@@ -4624,30 +4640,83 @@ Media Queries
 	        top: $toolbar-height;
 	    }
     }
-
-
-}
-
-@media (max-width: 420px) {
-	.feed-selected .entries-header {
-		display: block;
-	}
-}
-@media (max-width: 768px) and (min-width: 621px) {
-	.feed-selected,
-	.entry-selected {
+	.feed-selected, .entry-selected {
 		.entries-header {
 			display: block;
 		}
 	}
+    .entry-toolbar, .entry-feed-title {
+		.favicon-wrap,
+		.entry-feed-title {
+			display: none;
+			.full-screen & {
+				display: block;
+			}
+		}
+    }
+	.ui-resizable-handle {
+		display: none !important;
+	}
 }
 
-
 @media (max-width: 420px) {
-	.entry-selected {
-		.entry-header h1 {
-			font-size: 1.6em;
+    .nothing-selected {
+		.feeds-column {
+			width: auto !important;
+			flex-grow: 1;
+			border-right: none;
 		}
+		.ui-resizable-handle,
+		.entry-column,
+		.entries-column {
+	        display: none;
+	    }
+    }
+	.feed-selected {
+		.entries-header {
+			display: block;
+		}
+		.feeds-column {
+	        display: none;
+	    }
+	}
+    .entry-selected {
+		.feeds-column,
+		.entries-column {
+			display: none;
+		}
+		.entries-inner {
+	        top: $toolbar-height;
+	    }
+    }
+	.entry-toolbar {
+		.back-button {
+			display: block;
+		}
+	}
+	.entries-inner {
+        top: $toolbar-height;
+    }
+	.theme-settings {
+		border-right: none !important;
+	}
+	.account-buttons {
+		display: none;
+	}
+	.entry-content-wrap {
+		top: 0;
+	}
+    .feeds-column .feeds-toolbar {
+        display: none;
+    }
+    .feeds-inner {
+        bottom: 0;
+    }
+	.entries-inner {
+        bottom: 51px;
+	}
+	.entry-header h1 {
+		font-size: 1.6em;
 	}
 	.mobile-hide {
 		display: none !important;
@@ -4662,4 +4731,3 @@ Media Queries
 		display: block !important;
 	}
 }
-

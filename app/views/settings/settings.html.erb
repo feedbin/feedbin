@@ -9,14 +9,17 @@
       <% end %>
     </p>
 
-    <p>
+    <p class="setting-combo">
       <label class="checkbox">
         <%= f.check_box :precache_images %> Pre-load images
       </label>
-      <small>Images for unread entries will be loaded in the background when viewing a feed. Not recommended with limited data/bandwidth.</small>
+      <small>
+        Images for unread entries will be loaded in the background when viewing a feed.
+        <span class="light-description">Not recommended with limited data/bandwidth.</span>
+      </small>
     </p>
 
-    <p>
+    <p class="setting-combo">
       <label class="checkbox">
         <%= f.check_box :sticky_view_inline %> Sticky Readability
       </label>
@@ -31,7 +34,7 @@
 
     <h3>Tags</h3>
 
-    <p>
+    <p class="setting-combo">
       <label class="checkbox">
         <%= f.check_box :hide_tagged_feeds %> Hide tagged feeds
       </label>
@@ -46,22 +49,21 @@
       </label>
     </p>
 
-    <p>
+    <div class="setting-combo">
       <label class="checkbox">
-        <%= f.check_box :starred_feed_enabled %> Enable starred entry feed
+        <%= f.check_box :starred_feed_enabled %> Enable starred article feed
       </label>
       <% if @user.starred_feed_enabled == '1' %>
-        <small><%= link_to 'Starred Feed', starred_url(@user.starred_token, format: :xml) %></small>
-      <% else %>
-        <small>Link shown here when enabled</small>
+        <div class="textfield-wrap starred-field">
+          <input type="text" value="<%= starred_url(@user.starred_token, format: :xml) %>" data-behavior="select_text" disabled="disabled" />
+          <a href="<%= starred_url(@user.starred_token, format: :xml) %>" title="<%= starred_url(@user.starred_token, format: :xml) %>" class="feed-url-container"></a>
+        </div>
       <% end %>
-    </p>
+    </div>
 
 
     <%= f.submit "Save", class: 'button' %>
   <% end %>
-
-  <hr />
 
   <h3>Subscribe via Email</h3>
   <p class="muted">You can subscribe to any website that publishes a feed by sending an email to this secret address. The body of the email should only contain the URL to the website or feed.</p>

@@ -1,12 +1,11 @@
 <% @class = 'settings' %>
-<% content_for :app_content do %>
-
+<% content_for :content do %>
 <%= render partial: 'layouts/settings_nav' %>
-<div class="settings-content">
-  <div class="settings-content-inner">
-    <%= render partial: 'shared/flash', locals: {flash: flash} %>
+  <div class="settings-content">
+    <div class="settings-content-inner">
+      <%= render partial: 'shared/flash', locals: {flash: flash} %>
+    </div>
+    <%= yield %>
   </div>
-  <%= yield %>
-</div>
 <% end %>
 <%= render template: 'layouts/application' %>

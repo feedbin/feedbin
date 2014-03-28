@@ -10,7 +10,7 @@
   <%= tag :meta, name: "stripe-key", content: STRIPE_PUBLIC_KEY %>
 </head>
 <body class="<%= @class %>">
-  <%= yield %>
+  <%= content_for?(:content) ? yield(:content) : yield %>
   <%= render partial: 'shared/tracking' %>
 </body>
 </html>
