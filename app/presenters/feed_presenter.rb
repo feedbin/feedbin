@@ -9,7 +9,7 @@ class FeedPresenter < BasePresenter
   end
 
   def feed_count
-    @template.content_tag :span, feed.unread_count, class: count_classes
+    @template.content_tag :span, feed.count, class: count_classes
   end
 
   def classes
@@ -19,7 +19,7 @@ class FeedPresenter < BasePresenter
   private
 
   def show_count?
-    feed.unread_count && feed.unread_count > 0
+    feed.count && feed.count > 0
   end
 
   def count_classes

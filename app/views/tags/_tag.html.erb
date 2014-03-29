@@ -1,8 +1,6 @@
 <%
 hide_drawer = false
-if session[:view_mode] == 'view_unread' && tag.unread_count == 0 && !tag.user_feeds.any?
-  hide_drawer = true
-elsif session[:view_mode] == 'view_starred' && tag.starred_count == 0 && !tag.user_feeds.any?
+if %w{view_unread view_starred}.include?(session[:view_mode]) && tag.count == 0 && !tag.user_feeds.any?
   hide_drawer = true
 end
 %>
@@ -11,7 +9,7 @@ end
     <span class="favicon-wrap collection-favicon">
       <span class="favicon favicon-tag"></span>
     </span>
-    <%= content_tag :span, tag.unread_count, class: 'count' + hide_count(tag.unread_count) %>
+    <%= content_tag :span, tag.count, class: 'count' + hide_count(tag.count) %>
     <% unless hide_drawer %>
       <%= render partial: 'tags/tag_visibility', locals: {user: @user, tag: tag} %>
     <% end %>

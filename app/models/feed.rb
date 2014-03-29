@@ -9,7 +9,7 @@ class Feed < ActiveRecord::Base
   has_many :taggings
   has_many :tags, through: :taggings
 
-  attr_accessor :unread_count, :starred_count, :tags
+  attr_accessor :count, :tags
 
   def tag(names, user, delete_existing = true)
     taggings = []
