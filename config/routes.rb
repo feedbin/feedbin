@@ -74,6 +74,7 @@ Feedbin::Application.routes.draw do
     collection do
       get :view_unread
       get :view_all
+      get :view_starred
       get :auto_update
     end
     member do

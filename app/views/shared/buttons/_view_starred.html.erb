@@ -1,0 +1,4 @@
+<%= link_to "Starred", view_starred_feeds_path,
+      remote: true, class: "view-button #{view_mode_selected('view_starred')}",
+      title: 'View starred',
+			data: { behavior: 'view_starred' } %>

@@ -2,6 +2,7 @@ feedbin.updateFeeds('<%= j render partial: 'feeds/feeds', locals: {collections: 
 
 $('[data-behavior~=view_all]').replaceWith('<%= j render partial: 'shared/buttons/view_all' %>');
 $('[data-behavior~=view_unread]').replaceWith('<%= j render partial: 'shared/buttons/view_unread' %>');
+$('[data-behavior~=view_unread]').replaceWith('<%= j render partial: 'shared/buttons/view_starred' %>');
 
 feedbin.data.viewMode = "<%= @view_mode.to_s %>";
 feedbin.updateTitle('<%= j @user.title_with_count %>');

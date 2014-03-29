@@ -202,6 +202,10 @@ class User < ActiveRecord::Base
     @count ||= unread_entries.group(:feed_id).count
   end
 
+  def starred_count
+    @starred_count ||= starred_entries.group(:feed_id).count
+  end
+
   def feed_entries_count
     ids = {}
     feeds.pluck('feeds.id').map {|id| ids[id] = 0 }
@@ -234,6 +238,19 @@ class User < ActiveRecord::Base
           feed.unread_count == 0
         end
       }
+    elsif 'view_starred' == view_mode
+      starred_counts = starred_count
+      user_feeds.map do |feed|
+        feed.starred_count = starred_counts[feed.id] || 0
+        feed
+      end
+      user_feeds = user_feeds.reject {|feed|
+        if keep_selected && feed.id == selected_item
+          false
+        else
+          feed.starred_count == 0
+        end
+      }
     end
     user_feeds
   end
@@ -261,6 +278,19 @@ class User < ActiveRecord::Base
           false
         else
           tag.unread_count == 0
+        end
+      }
+    elsif 'view_starred' == view_mode
+      starred_counts = starred_count
+      tag.starred_count = feed_ids.inject(0) { |sum, feed_id|
+        count = starred_counts[feed_id] || 0
+        sum + count
+      }
+      taggings = taggings.reject {|tag|
+        if selected_item && tag.id == selected_tag || tag.user_feeds.any?
+          false
+        else
+          tag.starred_count == 0
         end
       }
     end

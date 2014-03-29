@@ -25,6 +25,10 @@ class FeedsController < ApplicationController
     update_view_mode('view_unread')
   end
 
+  def view_starred
+    update_view_mode('view_starred')
+  end
+
   def view_all
     # Clear the hide queue when switching to view_all incase there's anything sitting in it.
     @clear_hide_queue = true
@@ -35,6 +39,8 @@ class FeedsController < ApplicationController
     @keep_selected = true
     if session[:view_mode] == 'view_all'
       view_all
+    elsif session[:view_mode] == 'view_starred'
+      view_starred
     else
       view_unread
     end
