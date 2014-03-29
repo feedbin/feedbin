@@ -7,4 +7,6 @@
 <% end %>
 
 $('[data-behavior~=toggle_starred]').replaceWith('<%= j render partial: "starred_entries/form", locals: {entry: @entry, starred: @starred} %>');
-feedbin.CountInstance.updateStarredCount(countAction)
+feedbin.CountInstance.updateStarredCount(<%= @entry.feed_id %>, <%= @tags.to_json %>, countAction)
+
+

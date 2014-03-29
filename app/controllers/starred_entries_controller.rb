@@ -42,6 +42,8 @@ class StarredEntriesController < ApplicationController
       starred_entry.destroy_all
     end
 
+    @tags = @user.tags.where(taggings: {feed_id: @entry.feed_id}).uniq.collect(&:id)
+
     respond_to do |format|
       format.js
     end

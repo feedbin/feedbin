@@ -22,6 +22,8 @@ class feedbin.EntriesPager
 
 class feedbin.Count
   updateCount: (feed, tags, action = 'decrement') ->
+    if feedbin.data.viewMode == 'view_starred'
+      return
     @action = action
     selectors = ['[data-behavior~=all_unread]', "[data-feed-id=#{feed}]"]
     $.each tags, (index, tag_id) =>
@@ -29,9 +31,17 @@ class feedbin.Count
     targets = $(selectors.join(', '))
     @performUpdate target for target in targets
 
-  updateStarredCount: (action) ->
-    @action = action
-    @performUpdate '[data-behavior~=starred]'
+  updateStarredCount: (feed, tags, action) ->
+    if feedbin.data.viewMode == 'view_starred'
+      @action = action
+      selectors = ['[data-behavior~=starred]', "[data-feed-id=#{feed}]"]
+      $.each tags, (index, tag_id) =>
+        selectors.push "[data-tag-id=#{tag_id}]"
+      targets = $(selectors.join(', '))
+      @performUpdate target for target in targets
+    else
+      @action = action
+      @performUpdate '[data-behavior~=starred]'
 
   performUpdate: (target) ->
     countWrap = $(target).find('.count').first()
@@ -44,6 +54,8 @@ class feedbin.Count
       countWrap.text(newCount)
       if newCount == 0
         if feedbin.data.viewMode == 'view_unread'
+          feedbin.hideQueue.push $(target).data('feed-id')
+        else if feedbin.data.viewMode == 'view_starred'
           feedbin.hideQueue.push $(target).data('feed-id')
         countWrap.addClass('hide')
       else
