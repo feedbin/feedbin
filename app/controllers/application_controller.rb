@@ -123,6 +123,10 @@ class ApplicationController < ActionController::Base
     if 'view_all' == session[:view_mode]
       # Get all entries 100 at a time, then get unread info
       @entries = Entry.where(feed_id: @feed_ids).page(params[:page]).includes(:feed).sort_preference('DESC')
+    elsif 'view_starred' == session[:view_mode]
+      # Get starred info, then get entries
+      starred_entries = @user.starred_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).order("published DESC")
+      @entries = Entry.entries_with_feed(starred_entries, 'DESC')
     else
       # Get unread info, then get entries
       unread_entries = @user.unread_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).sort_preference(@user.entry_sort)
@@ -132,6 +136,8 @@ class ApplicationController < ActionController::Base
     @entries = update_with_state(@entries)
     if 'view_all' == session[:view_mode]
       @page_query = @entries
+    elsif 'view_starred' == session[:view_mode]
+      @page_query = starred_entries
     else
       @page_query = unread_entries
     end
