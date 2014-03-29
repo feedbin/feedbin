@@ -1848,7 +1848,8 @@ $saved-search-control-height: 48px;
 		}
 	}
 	&.no-entries {
-		background-color: #FFF;
+		@include background-color($body-background-color, $body-background-color-night);
+		@include color($text-color, $text-color-night);
 		padding: 8px;
 	}
 }
@@ -4624,7 +4625,6 @@ Media Queries
     }
     .nothing-selected, .feed-selected {
 		.entries-column {
-			width: auto !important;
 			flex-grow: 1;
 			border-right: none;
 		}
@@ -4662,7 +4662,6 @@ Media Queries
 @media (max-width: 420px) {
     .nothing-selected {
 		.feeds-column {
-			width: auto !important;
 			flex-grow: 1;
 			border-right: none;
 		}
