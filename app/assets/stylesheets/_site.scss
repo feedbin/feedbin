@@ -1902,12 +1902,12 @@ $saved-search-control-height: 48px;
 	border-bottom: 1px solid $border-color;
 	@include border-color($border-color, $border-color-night);
 	@include background-color($drawer-background-color, $drawer-background-color-night);
-	@include arrow(21px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right) {
+	@include arrow(20px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right) {
 		z-index: 3;
 		visibility: hidden;
 	}
 	.full-screen & {
-		@include arrow(64px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right);
+		@include arrow(65px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right);
 	}
 	&.open:after,
 	&.open:before {
