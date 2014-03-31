@@ -32,6 +32,9 @@ $input-color-night: #FFFFFF;
 $text-color: #000000;
 $text-color-night: #F3F3F3;
 
+$text-color-light: #999999;
+$text-color-light-night: #858585;
+
 $disabled-text-color: #999999;
 $disabled-text-color-night: #535353;
 
@@ -1051,7 +1054,7 @@ Structure
 	}
 	.sub-head {
 		font-size: 18px;
-		color: #999999;
+		@include color($text-color-light, $text-color-light-night);
 	}
 	.button {
 		background-color: $selected;
@@ -1277,7 +1280,7 @@ $subscribe-wrap-height: 49px;
 			}
 			.count {
 				font-size: 12px;
-				color: #999999;
+				@include color($text-color-light, $text-color-light-night);
 				position: absolute;
 				right: 10px;
 				top: 10px;
@@ -1444,7 +1447,7 @@ li.selected > a .favicon-wrap {
 }
 
 .entries-header {
-	@include color(#999999, #858585);
+	@include color($text-color-light, $text-color-light-night);
 	display: none;
 	border-bottom: 1px solid transparent;
 	@include border-color($border-color, $border-color-night);
@@ -1600,7 +1603,7 @@ $saved-search-control-height: 48px;
 .entries ul li {
 	position: relative;
 	word-wrap: break-word;
-	background-color: $drawer-background-color;
+	@include background-color($drawer-background-color, $drawer-background-color-night);
 	.favicon-wrap {
 		top: 23px;
 		left: 5px;
@@ -1657,7 +1660,7 @@ $saved-search-control-height: 48px;
 	}
 	.time {
 		font-size: 12px;
-		@include color(#999999, #b7b7b7);
+		@include color($text-color-light, $text-color-light-night);
 		margin-bottom: 1px;
 		display: block;
 		position: absolute;
@@ -1678,7 +1681,7 @@ $saved-search-control-height: 48px;
 		font-size: 12px;
 		line-height: 1.3;
 		margin: 0 0 1px 0;
-		@include color(#999999, #b7b7b7);
+		@include color($text-color-light, $text-color-light-night);
 		padding-right: 91px;
 		white-space: nowrap;
 		overflow: hidden;
@@ -1691,7 +1694,7 @@ $saved-search-control-height: 48px;
 		line-height: 1.3;
 		font-size: 12px;
 		margin: 0;
-		@include color(#999999, #b7b7b7);
+		@include color($text-color-light, $text-color-light-night);
 		display: block;
 	}
 	.icon-star {
@@ -1809,7 +1812,7 @@ $saved-search-control-height: 48px;
 	.mark-below-read {
 		position: absolute;
 		height: 50%;
-		color: #333;
+		@include color($text-color-light, $text-color-light-night);
 		width: 100%;
 		text-align: right;
 		cursor: pointer;
@@ -1841,7 +1844,8 @@ $saved-search-control-height: 48px;
 	}
 	.mark-below-read {
 		bottom: 0;
-		border-top: 1px solid #FFF;
+		border-top: 1px solid transparent;
+		@include border-color($border-color, $border-color-night);
 		i:before {
 			content: "↓";
 			top: -2px;
@@ -1870,17 +1874,16 @@ $saved-search-control-height: 48px;
 		width: $toolbar-height;
 	}
 	.favicon-wrap {
-		top: 11px;
+		top: 12px;
 		left: 13px;
 	}
 	.entry-feed-title {
 		position: absolute;
-		top: 13px;
+		top: 14px;
 		left: 38px;
 		display: block;
 		font-size: 14px;
-		@include color(#999999, #858585);
-		color: #999999;
+		@include color($text-color-light, $text-color-light-night);
 		text-decoration: none;
 	}
 }
@@ -2100,7 +2103,7 @@ $saved-search-control-height: 48px;
 }
 
 .next-entry-preview {
-	background-color: $list-background-color;
+	@include background-color($list-background-color, $list-background-color-night);
 	display: none;
 	&:hover {
 		cursor: pointer;
@@ -2122,7 +2125,8 @@ $saved-search-control-height: 48px;
 		display: block;
 		font-size: 12px;
 		color: $selected;
-		border-bottom: 1px solid $border-color;
+		border-bottom: 1px solid transparent;
+		@include border-color($border-color, $border-color-night);
 		padding-bottom: 5px;
 		margin-bottom: 10px;
 		text-transform: uppercase;
@@ -2132,7 +2136,7 @@ $saved-search-control-height: 48px;
 	.next-entry-feed {
 		display: block;
 		font-size: 16px;
-		color: #999999;
+		@include color($text-color-light, $text-color-light-night);
 		margin-bottom: 5px;
 		font-family: $font-stack !important;
 		font-weight: 400 !important;
@@ -2140,7 +2144,7 @@ $saved-search-control-height: 48px;
 	.next-entry-title {
 		display: block;
 		font-size: 24px;
-		color: #333333;
+		@include color($text-color, $text-color-night);
 	}
 }
 
@@ -2194,7 +2198,7 @@ $saved-search-control-height: 48px;
 			width: 16px;
 			border-radius: 16px;
 			position: absolute;
-			top: 13px;
+			top: 14px;
 			left: 12px;
 		}
 		.circle-empty {
@@ -2204,7 +2208,7 @@ $saved-search-control-height: 48px;
 	.button-toggle-starred {
 		svg {
 			position: absolute;
-			top: 12px;
+			top: 13px;
 			left: 13px;
 			height: 17px;
 			width: 17px;
@@ -2213,7 +2217,7 @@ $saved-search-control-height: 48px;
 	.button-toggle-content {
 		svg {
 			position: absolute;
-			top: 13px;
+			top: 14px;
 			left: 9px;
 			height: 14px;
 			width: 21px;
@@ -2223,7 +2227,7 @@ $saved-search-control-height: 48px;
 		color: #333;
 		svg {
 			position: absolute;
-			top: 11px;
+			top: 12px;
 			left: 10px;
 			height: 16px;
 			width: 16px;
@@ -2237,7 +2241,7 @@ $saved-search-control-height: 48px;
 		color: #333;
 		svg {
 			position: absolute;
-			top: 13px;
+			top: 14px;
 			left: 9px;
 			height: 16px;
 			width: 16px;
@@ -2338,7 +2342,7 @@ $saved-search-control-height: 48px;
 	.post-meta {
 		font-size: 1em;
 		color: #999;
-		@include color(#999999, #858585);
+		@include color($text-color-light, $text-color-light-night);
 		line-height: 1.2;
 		margin: .2em;
 		.icon-clock {
@@ -2471,7 +2475,7 @@ $saved-search-control-height: 48px;
 
 	figcaption, caption {
 		font-size: 80%;
-		@include color(#999999, #858585);
+		@include color($text-color-light, $text-color-light-night);
 		font-style: italic;
 		line-height: 1.3;
 	}
@@ -2502,7 +2506,7 @@ $saved-search-control-height: 48px;
 	}
 
 	.diff-wrap {
-		@include color(#999999, #858585);
+		@include color($text-color-light, $text-color-light-night);
 		font-size: 13px;
 		border-top: 1px solid transparent;
 		@include border-color($border-color, $border-color-night);
@@ -3373,7 +3377,7 @@ table.small td {
 		right: 0;
 		top: 17px;
 		font-size: 14px;
-		color: #999999;
+		@include color($text-color-light, $text-color-light-night);
 		@media (max-width:800px) {
 			display: none;
 		}
@@ -3676,7 +3680,7 @@ Buttons
 }
 
 .toolbar-button {
-	color: #999999;
+	@include color($text-color-light, $text-color-light-night);
 	text-decoration: none;
 	-webkit-appearance: none;
 	display: inline-block;
@@ -4018,8 +4022,8 @@ select {
 }
 
 hr {
-	background: $border-color;
-	color: $border-color;
+	@include background-color($border-color, $border-color-night);
+	@include color($border-color, $border-color-night);
 	clear: both;
 	float: none;
 	width: 100%;
@@ -4614,8 +4618,11 @@ Media Players
 Media Queries
 ------------------------------------------------------------------------------*/
 @media only screen and (max-width:1024px) {
-	.entries-column, .feeds-column {
-        width: 270px !important;
+	.feeds-column {
+        width: 240px !important;
+    }
+	.entries-column {
+        width: 300px !important;
     }
 }
 
