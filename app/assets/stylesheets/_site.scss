@@ -15,13 +15,13 @@ $base-button-position: 9px;
 $body-background-color: #FFFFFF;
 $body-background-color-night: #2B2D2F;
 
-$list-background-color: #F2F3F4;
+$list-background-color: #dcdee0;
 $list-background-color-night: #212325;
 
-$drawer-background-color: #E6E7E8;
+$drawer-background-color: #c8cacc;
 $drawer-background-color-night: #1d1f21;
 
-$border-color: #DDDDDD;
+$border-color: #c8cacc;
 $border-color-night: #040608;
 
 $input-background-color: #FFFFFF;
@@ -682,7 +682,9 @@ body {
 	font-family: $font-stack;
 	font-size: 14px;
 	background-color: $body-background-color;
+	color: $text-color;
 	&.theme-night {
+		color: $text-color-night;
 		background-color: $body-background-color-night;
 	}
 	@include respond-to(hidpi) {
@@ -1310,7 +1312,9 @@ $subscribe-wrap-height: 49px;
 			border-bottom: 1px solid transparent;
 			@include border-color($border-color, $border-color-night);
 			padding: 0;
-			@include arrow(32px, 0px, $list-background-color, $list-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night);
+			@include arrow(32px, 0px, $list-background-color, $list-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night) {
+				z-index: 4;
+			}
 		}
 	}
 }
@@ -1320,13 +1324,13 @@ $subscribe-wrap-height: 49px;
 	right: 45px;
 	top: 0;
 	font-weight: bold;
-	color: $border-color;
+	@include color(#b7b7b7, #3f3f3f);
 	font-size: 11px;
 	display: block;
 	-webkit-appearance: none;
 	background: none;
 	border: none;
-	padding: 9px 3px 5px 3px;
+	padding: 9px 3px 10px 3px;
 	margin: 0;
 	display: block;
 	&:hover {
@@ -1334,16 +1338,9 @@ $subscribe-wrap-height: 49px;
 	}
 }
 
-.feeds a:hover {
-	@include background-color(#2b2e30, #2b2e30);
-}
-
 .feeds .selected > a {
-	@include background-color(#666666, #505a65);
+	@include background-color(#505a65, #505a65);
 	color: #fff !important;
-	&:hover {
-		@include background-color(#666666, #505a65);
-	}
 }
 
 .selected .feeds .selected > a {
@@ -1353,8 +1350,8 @@ $subscribe-wrap-height: 49px;
 	}
 }
 
-li.selected .drawer ul:after {
-	border-top-color: #666;
+.feeds li.selected .drawer ul:after {
+	border-top-color: #505a65;
 }
 
 .selected li.selected .drawer ul:after {
@@ -1629,34 +1626,51 @@ $saved-search-control-height: 48px;
 		border-bottom: 1px solid transparent;
 		@include border-color($list-background-color, #212325);
 	}
-	.icon-entry-actions {
-		cursor: pointer;
+	.entry-actions-wrap {
+		top: 0;
+		right: 0;
 		position: absolute;
-		top: 11px;
-		right: 10px;
-		height: 12px;
-		width: 10px;
+		height: 23px;
+		width: 30px;
 		display: none;
-		border-top: 2px solid rgba(0,0,0,.3);
-		&:after {
-			height: 2px;
-			background-color: rgba(0,0,0,.3);
-			content: "";
+		cursor: pointer;
+		.icon-entry-actions {
+			pointer-events: none;
 			position: absolute;
-			left: 0;
-			top: 1px;
-			display: block;
+			top: 11px;
+			right: 10px;
+			height: 12px;
 			width: 10px;
+			border-top: 2px solid rgba(0,0,0,.3);
+			&:after {
+				height: 2px;
+				background-color: rgba(0,0,0,.3);
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 1px;
+				display: block;
+				width: 10px;
+			}
+			&:before {
+				height: 2px;
+				background-color: rgba(0,0,0,.3);
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 4px;
+				display: block;
+				width: 10px;
+			}
 		}
-		&:before {
-			height: 2px;
-			background-color: rgba(0,0,0,.3);
-			content: "";
-			position: absolute;
-			left: 0;
-			top: 4px;
-			display: block;
-			width: 10px;
+		&:hover {
+			.icon-entry-actions {
+				border-top-color: #FFF;
+				&:before,
+				&:after {
+					background-color: #FFF;
+				}
+			}
 		}
 	}
 	.time {
@@ -1754,7 +1768,7 @@ $saved-search-control-height: 48px;
 			border-top: 1px solid transparent;
 			@include border-color(#666, #505a65);
 			margin-top: -1px;
-			@include background-color(#666666, #505a65);
+			@include background-color(#505a65, #505a65);
 		}
 		.entries-inner-wrap {
 			border-bottom-color: transparent;
@@ -1787,7 +1801,7 @@ $saved-search-control-height: 48px;
 				background: $selected;
 			}
 		}
-		.icon-entry-actions {
+		.entry-actions-wrap {
 			display: block;
 		}
 		.time {
@@ -1797,11 +1811,6 @@ $saved-search-control-height: 48px;
 			border-color: $selected;
 			border-top: 1px solid $selected;
 			background: $selected;
-		}
-	}
-	&:hover {
-		.touch & .icon-entry-actions {
-			display: none;
 		}
 	}
 	&.show-actions {
@@ -3802,7 +3811,7 @@ button.close {
 
 .modal-content {
 	position: relative;
-	background-color: #fff;
+	@include background-color($body-background-color, $body-background-color-night);
 	background-clip: padding-box;
 	border: 1px solid #999;
 	border: 1px solid rgba(0,0,0,.2);
@@ -3835,7 +3844,8 @@ button.close {
 .modal-header {
 	min-height: 16.42857143px;
 	padding: 15px;
-	border-bottom: 1px solid #e5e5e5;
+	border-bottom: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
 	position: relative;
 }
 
@@ -3859,7 +3869,8 @@ button.close {
 	padding: 19px 20px 20px;
 	margin-top: 15px;
 	text-align: right;
-	border-top: 1px solid #e5e5e5;
+	border-top: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
 }
 
 .modal-footer .btn + .btn {
