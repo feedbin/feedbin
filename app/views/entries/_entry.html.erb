@@ -12,7 +12,9 @@
           <p class="body"><%= entry.summary.html_safe %></p>
         <% end %>
         <i class="icon-star"></i>
-        <i class="icon-entry-actions" data-behavior="show_entry_actions"></i>
+        <div class="entry-actions-wrap" data-behavior="show_entry_actions">
+          <i class="icon-entry-actions"></i>
+        </div>
       </div>
     <% end %>
   </li>

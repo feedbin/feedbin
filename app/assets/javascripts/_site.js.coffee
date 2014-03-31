@@ -775,6 +775,8 @@ $.extend feedbin,
         else
           $('.entries li').removeClass('show-actions')
           parent.addClass('show-actions')
+        event.preventDefault()
+        event.stopPropagation()
         return
 
       $(document).on 'click', (event) ->
