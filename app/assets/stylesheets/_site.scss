@@ -9,6 +9,7 @@ $toolbar-height: 43px;
 $small-toolbar-height: 37px;
 $font-stack: "Helvetica Neue", Helvetica, Arial, sans-serif;
 $feeds-toolbar-height: 52px;
+$base-button-position: 9px;
 
 /*-- Colors --*/
 $body-background-color: #FFFFFF;
@@ -1865,21 +1866,21 @@ $saved-search-control-height: 48px;
 	left: 0;
 	z-index: 3;
 	width: 100%;
-	height: $toolbar-height;
+	height: $small-toolbar-height;
 	border-bottom: 1px solid transparent;
 	@include border-color($border-color, $border-color-night);
 	.back-button {
 		display: none;
-		height: $toolbar-height;
-		width: $toolbar-height;
+		height: $small-toolbar-height;
+		width: $small-toolbar-height;
 	}
 	.favicon-wrap {
-		top: 12px;
+		top: $base-button-position;
 		left: 13px;
 	}
 	.entry-feed-title {
 		position: absolute;
-		top: 14px;
+		top: $base-button-position + 2;
 		left: 38px;
 		display: block;
 		font-size: 14px;
@@ -1890,7 +1891,7 @@ $saved-search-control-height: 48px;
 
 .entry-settings-wrap {
 	position: absolute;
-	top: $toolbar-height;
+	top: $small-toolbar-height;
 	left: 0;
 	width: 100%;
 }
@@ -1904,6 +1905,9 @@ $saved-search-control-height: 48px;
 	@include arrow(21px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right) {
 		z-index: 3;
 		visibility: hidden;
+	}
+	.full-screen & {
+		@include arrow(64px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right);
 	}
 	&.open:after,
 	&.open:before {
@@ -2084,7 +2088,7 @@ $saved-search-control-height: 48px;
 	position: absolute;
 	height: auto;
 	bottom: 0;
-	top: $toolbar-height;
+	top: $small-toolbar-height;
 	left: 0;
 	right: 0;
 	margin: 0;
@@ -2159,7 +2163,7 @@ $saved-search-control-height: 48px;
 	top: 0;
 	right: 0px;
 	width: 250px;
-	height: $toolbar-height - 1;
+	height: $small-toolbar-height - 1;
 	z-index: 1;
 	background-image: linear-gradient(to right, rgba($body-background-color, 0) 0%, $body-background-color 10%);
 	.theme-night & {
@@ -2176,7 +2180,7 @@ $saved-search-control-height: 48px;
 		border: none;
 		background: none;
 		width: 45px;
-		height: $toolbar-height - 1;
+		height: $small-toolbar-height - 1;
 		padding: 0;
 		position: relative;
 		svg {
@@ -2198,8 +2202,8 @@ $saved-search-control-height: 48px;
 			width: 16px;
 			border-radius: 16px;
 			position: absolute;
-			top: 14px;
-			left: 12px;
+			top: $base-button-position + 2;
+			left: 15px;
 		}
 		.circle-empty {
 			@include background-color(transparent,transparent);
@@ -2208,8 +2212,8 @@ $saved-search-control-height: 48px;
 	.button-toggle-starred {
 		svg {
 			position: absolute;
-			top: 13px;
-			left: 13px;
+			top: $base-button-position + 1;
+			left: 15px;
 			height: 17px;
 			width: 17px;
 		}
@@ -2217,8 +2221,8 @@ $saved-search-control-height: 48px;
 	.button-toggle-content {
 		svg {
 			position: absolute;
-			top: 14px;
-			left: 9px;
+			top: $base-button-position + 3;
+			left: 11px;
 			height: 14px;
 			width: 21px;
 		}
@@ -2227,8 +2231,8 @@ $saved-search-control-height: 48px;
 		color: #333;
 		svg {
 			position: absolute;
-			top: 12px;
-			left: 10px;
+			top: $base-button-position;
+			left: 12px;
 			height: 16px;
 			width: 16px;
 		}
@@ -2241,10 +2245,26 @@ $saved-search-control-height: 48px;
 		color: #333;
 		svg {
 			position: absolute;
-			top: 14px;
-			left: 9px;
+			top: $base-button-position + 2;
+			left: 11px;
 			height: 16px;
 			width: 16px;
+		}
+	}
+	.button-full-screen {
+		display: none;
+		svg {
+			position: absolute;
+			top: $base-button-position + 1;
+			left: 6px;
+			height: 17px;
+			width: 18px;
+		}
+	}
+	.full-screen & {
+		width: 300px;
+		.button-full-screen {
+			display: block;
 		}
 	}
 }
@@ -4644,7 +4664,7 @@ Media Queries
 			display: none;
 		}
 		.entries-inner {
-	        top: $toolbar-height;
+	        top: $small-toolbar-height;
 	    }
     }
 	.feed-selected, .entry-selected {
@@ -4692,7 +4712,7 @@ Media Queries
 			display: none;
 		}
 		.entries-inner {
-	        top: $toolbar-height;
+	        top: $small-toolbar-height;
 	    }
     }
 	.entry-toolbar {
@@ -4701,7 +4721,7 @@ Media Queries
 		}
 	}
 	.entries-inner {
-        top: $toolbar-height;
+        top: $small-toolbar-height;
     }
 	.theme-settings {
 		border-right: none !important;

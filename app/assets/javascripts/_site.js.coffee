@@ -300,6 +300,12 @@ $.extend feedbin,
           context.fillRect(xPosition, yPosition, barWidth, height)
           xPosition = xPosition + barWidth + spaceWidth
 
+  closeEntrySettings: ->
+    top = $('.entry-toolbar').outerHeight()
+    $('.entry-settings').removeClass('open')
+    $('.entry-content').css
+      top: top
+
   hideQueue: []
 
   feedCandidates: []
@@ -700,11 +706,10 @@ $.extend feedbin,
             fontContainer.addClass("font-#{$(@).val()}")
             fontContainer.data('font', $(@).val())
             $(@).parents('form').submit()
+          $('.entry-content').css
+            top: top
         else
-          top = $('.entry-toolbar').outerHeight()
-          $('.entry-settings').removeClass('open')
-        $('.entry-content').css
-          top: top
+          feedbin.closeEntrySettings()
       return
 
     feedSettings: ->
@@ -734,6 +739,7 @@ $.extend feedbin,
     fullscreen: ->
       $(document).on 'click', '[data-behavior~=full_screen]', (event) ->
         feedbin.toggleFullScreen()
+        feedbin.closeEntrySettings()
         event.preventDefault()
         return
 
