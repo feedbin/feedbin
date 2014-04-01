@@ -2616,15 +2616,15 @@ $saved-search-control-height: 48px;
 		.original-title a {
 			font-size: 14px;
 			font-weight: bold;
-			@include color(#666666, #858585);
+			@include color($text-header-color, $text-header-color-night);
 			margin-bottom: .55em;
 			&:hover {
-				color: #666;
+				text-decoration: underline;
 			}
 		}
 		.original-meta {
 			font-size: 12px;
-			color: #999;
+			@include color($text-summary-color, $text-summary-color-night);
 		}
 		.favicon-wrap {
 			top: 8px;
