@@ -1118,6 +1118,9 @@ Structure
 		border-right: 1px solid transparent;
 		@include border-color($border-color, $border-color-night);
 	}
+	.entries-column {
+		width: 320px;
+	}
 	.entry-column {
 		flex-grow: 1;
 	}
