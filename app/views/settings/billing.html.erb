@@ -1,4 +1,5 @@
 <div class="settings-content-inner">
+  <h2>Billing</h2>
   <h3>Update Billing</h3>
   <% if ENV['STRIPE_API_KEY'] %>
     <% if @user.plan.stripe_id == 'trial' %>

@@ -1,5 +1,5 @@
 <div class="entry-settings">
-  <div class="setting-wrap">
+  <div class="setting-wrap font-settings">
     <%= form_tag settings_font_path, remote: true do %>
       <%= select_tag "font", options_for_select(Feedbin::Application.config.fonts, @user.font || 'default'), data: {behavior: 'change_font'} %>
     <% end %>
