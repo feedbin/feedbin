@@ -4746,7 +4746,7 @@ Media Queries
 			display: none;
 		}
 		.entries-inner {
-	        top: $small-toolbar-height;
+	        top: $toolbar-height;
 	    }
     }
 	.feed-selected, .entry-selected {
@@ -4793,9 +4793,6 @@ Media Queries
 		.entries-column {
 			display: none;
 		}
-		.entries-inner {
-	        top: $small-toolbar-height;
-	    }
     }
 	.entry-toolbar {
 		.back-button {
@@ -4803,7 +4800,7 @@ Media Queries
 		}
 	}
 	.entries-inner {
-        top: $small-toolbar-height;
+        top: $toolbar-height;
     }
 	.theme-settings {
 		border-right: none !important;
