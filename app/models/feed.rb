@@ -45,14 +45,6 @@ class Feed < ActiveRecord::Base
     self.site_url      = feed.url
   end
 
-  def cache_key
-    additions = []
-    if unread_count
-      additions << "/#{unread_count}"
-    end
-    super + additions.join('')
-  end
-
   def check
     options = {}
     unless last_modified.blank?
