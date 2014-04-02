@@ -1422,48 +1422,20 @@ li.selected > a .favicon-wrap {
 	background: image-url("favicon-feed.svg") 0 0 no-repeat;
 }
 
-.favicon-tag {
-	background-size: 16px 16px;
-	background-repeat: no-repeat;
-	background-image: image-url("favicon-tag.svg");
-}
-
-.favicon-unread {
-	background-size: 16px 16px;
-	background-repeat: no-repeat;
-	background-image: image-url("favicon-unread.svg");
-}
-
-.favicon-all {
-	background-size: 16px 16px;
-	background-repeat: no-repeat;
-	background-image: image-url("favicon-all.svg");
-}
-
-.favicon-star {
-	background-size: 16px 16px;
-	background-repeat: no-repeat;
-	background-image: image-url("favicon-star.svg");
-}
-
-.favicon-search {
-	background-size: 16px 16px;
-	background-repeat: no-repeat;
-	background-image: image-url("favicon-search.svg");
-}
-
-.favicon-recently-read {
-	background-size: 16px 16px;
-	background-repeat: no-repeat;
-	background-image: image-url("favicon-recently-read.svg");
-}
-
 .favicon-progress {
 	background-image: image-url("favicon-progress.gif") !important;
 }
 
 .collection-favicon {
 	background-color: transparent;
+	svg {
+		position: absolute;
+		top: 1px;
+		left: 1px;
+		height: 16px;
+		width: 16px;
+		@include fill(#b4b6b8, #3f4143);
+	}
 }
 
 .back-button {
@@ -3721,6 +3693,7 @@ Buttons
 		position: absolute;
 		top: 11px;
 		right: 5px;
+		@include color($text-header-color, $text-header-color-night);
 	}
 }
 
@@ -3733,11 +3706,12 @@ Buttons
 .autocomplete-suggestion {
 	font-size: 14px;
 	padding: 6px 11px;
-	color: rgba(255,255,255,.8);
-	border-bottom: 1px solid #b6b6b6;
+	@include color($text-color-light, $text-color-light-night);
+	border-bottom: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
 	strong {
 		font-weight: normal;
-		color: rgba(255,255,255,1);
+		@include color($text-header-color, $text-header-color-night);
 	}
 	&:last-child {
 		border-bottom: none;
@@ -4837,5 +4811,8 @@ Media Queries
 	}
 	.next-entry-preview {
 		display: block;
+		&.no-content {
+			display: none;
+		}
 	}
 }

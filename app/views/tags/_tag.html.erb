@@ -7,7 +7,7 @@ end
 <li data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" class="<%= selected("tag_#{tag.id}") %>">
   <%= link_to tag_path(tag.id), remote: true, class: 'feed-link tag-link', data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'tag', data: tag.id, message: "Mark #{tag.name} as read?"}.to_json } do %>
     <span class="favicon-wrap collection-favicon">
-      <span class="favicon favicon-tag"></span>
+      <%= svg_tag 'favicon-tag', size: '16x16' %>
     </span>
     <%= content_tag :span, tag.count, class: 'count' + hide_count(tag.count) %>
     <% unless hide_drawer %>

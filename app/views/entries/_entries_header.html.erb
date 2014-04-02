@@ -8,8 +8,8 @@
   <% end %>
 <% else %>
   <span class="feed-title-wrap">
-    <span class="favicon-wrap">
-      <span class="favicon <%= @collection_favicon %>"></span>
+    <span class="favicon-wrap collection-favicon">
+      <%= svg_tag @collection_favicon, size: '16x16' %>
     </span>
     <%= @collection_title %>
   </span>
