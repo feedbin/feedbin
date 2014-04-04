@@ -994,6 +994,28 @@ th {
 	@include border-color($border-color, $border-color-night);
 }
 
+.big-table-wrap {
+	background-color: #FFF;
+	border-radius: 8px;
+	border: 1px solid $border-color;
+	margin-bottom: 20px;
+}
+
+.big-table {
+	width: 100%;
+	th, td {
+		padding: 15px;
+		vertical-align: top;
+		border-bottom: 1px solid $border-color;
+	}
+	tr:last-child {
+		th, td {
+			border-bottom: none;
+		}
+	}
+}
+
+
 
 /*------------------------------------------------------------------------------
 Structure
@@ -2866,6 +2888,7 @@ $saved-search-control-height: 48px;
 		width: 500px;
 		height: 32px;
 		background-color: rgba(0,0,0,.9);
+		display: block;
 		line-height: 32px;
 		color: #fff;
 		font-size: 12px;
@@ -2873,10 +2896,17 @@ $saved-search-control-height: 48px;
 		margin: 0 auto;
 		transition:top .2s ease;
 		top: -32px;
+		cursor: pointer;
 		&.show {
 			top: 0;
 		}
-
+		&:hover {
+			text-decoration: none;
+			color: #FFF;
+		}
+		&[href=""] {
+			cursor: default;
+		}
 		@media (max-width: 500px) {
 			width: 100%;
 		}
@@ -3000,7 +3030,6 @@ Settings
 		color: #999;
 	}
 	code {
-		font-size: 15px;
 		padding: 0;
 	}
 	.alert {
@@ -3519,6 +3548,24 @@ table.small td {
 .highlight-negative {
 	color: red;
 	font-weight: bold;
+}
+
+.sharing-table {
+	td:last-child {
+		text-align: right;
+	}
+	.has-message {
+		td {
+			border-bottom: none;
+			padding-bottom: 0;
+		}
+	}
+	.message {
+		td:last-child {
+			padding-top: 0;
+			text-align: left;
+		}
+	}
 }
 
 /*------------------------------------------------------------------------------
@@ -4266,6 +4313,14 @@ h3 .inline-subhead {
 
 .muted {
 	color: #666666;
+}
+
+.danger {
+	color: red;
+}
+
+a:hover.danger {
+	color: #b80000;
 }
 
 .xs-hide {

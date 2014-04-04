@@ -310,23 +310,29 @@ class EntriesController < ApplicationController
   private
 
   def sharing_services(entry)
-    @user_sharing_services ||= @user.sharing_services
+    @user_sharing_services ||= @user.sharing_services.unscoped.order('lower(label)')
     services = []
 
     if @user_sharing_services.present?
       begin
-        @user_sharing_services.each do |service|
-          entry_url = entry.fully_qualified_url ? ERB::Util.url_encode(entry.fully_qualified_url) : ''
-          title = entry.title ? ERB::Util.url_encode(entry.title) : ''
-          feed_name = entry.feed.title ? ERB::Util.url_encode(entry.feed.title) : ''
-          url = service.url.clone
-          url = url.gsub('${url}', entry_url).gsub('${title}', title).gsub('${source}', feed_name)
-          if url.start_with?('http')
-            target = '_blank'
-          else
-            target = '_self'
+        @user_sharing_services.each do |sharing_service|
+          behavior = ''
+          if sharing_service.group == 'custom'
+            entry_url = entry.fully_qualified_url ? ERB::Util.url_encode(entry.fully_qualified_url) : ''
+            title = entry.title ? ERB::Util.url_encode(entry.title) : ''
+            feed_name = entry.feed.title ? ERB::Util.url_encode(entry.feed.title) : ''
+            url = sharing_service.url.clone
+            url = url.gsub('${url}', entry_url).gsub('${title}', title).gsub('${source}', feed_name)
+            if url.start_with?('http')
+              target = '_blank'
+            else
+              target = '_self'
+            end
+          elsif sharing_service.group == 'native'
+            url = share_entry_path(entry, sharing_service.service_id)
+            behavior = 'native_share'
           end
-          services << {label: service.label, url: url, target: target}
+          services << {label: sharing_service.label, url: url, target: target, behavior: behavior}
         end
       rescue Exception => e
       end

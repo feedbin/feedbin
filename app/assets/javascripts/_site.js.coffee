@@ -2,13 +2,14 @@ window.feedbin ?= {}
 
 $.extend feedbin,
 
-  showNotification: (text) ->
+  showNotification: (text, timeout = 3000, href = '') ->
     messages = $('[data-behavior~=messages]')
     messages.text(text)
     messages.addClass('show')
+    messages.attr('href', href)
     setTimeout ( ->
       messages.removeClass('show')
-    ), 3000
+    ), timeout
 
   updateEntries: (entries, header) ->
     $('.entries ul').html(entries)
@@ -920,6 +921,22 @@ $.extend feedbin,
     selectText: ->
       $(document).on 'mouseup', '[data-behavior~=select_text]', (event) ->
         $(@).select()
+        event.preventDefault()
+      return
+
+    nativeShare: ->
+      $(document).on 'click', '[data-behavior~=native_share]', (event) ->
+        result = $.post $(@).attr('href')
+        result.always (data, textStatus, xhr) ->
+          if data
+            if data.status== 200
+              feedbin.showNotification("Link saved to #{data.service}")
+            else if data.status == 401
+              feedbin.showNotification("#{data.service} authentication error", 6000, data.url)
+            else
+              feedbin.showNotification("There was a problem connecting to #{data.service}.")
+          else
+            feedbin.showNotification("An unknown error occured")
         event.preventDefault()
       return
 

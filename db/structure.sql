@@ -461,7 +461,10 @@ CREATE TABLE sharing_services (
     label text,
     url text,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    "group" text DEFAULT 'custom'::text,
+    service_id text,
+    access_token text
 );
 
 
@@ -1478,3 +1481,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140227001243');
 INSERT INTO schema_migrations (version) VALUES ('20140321203637');
 
 INSERT INTO schema_migrations (version) VALUES ('20140326173619');
+
+INSERT INTO schema_migrations (version) VALUES ('20140404020913');

@@ -45,6 +45,10 @@ Feedbin::Application.routes.draw do
   # Error log
   post 'apple_push_notifications/:version/log', as: :apple_push_notifications_log, to: 'apple_push_notifications#log'
 
+  get '/settings/sharing/oauth_request/:service', as: :oauth_request, to: 'sharing_services#oauth_request'
+  get '/settings/sharing/oauth_response/:service', as: :oauth_response, to: 'sharing_services#oauth_response'
+  delete '/settings/sharing/auth_delete/:service', as: :auth_delete, to: 'sharing_services#auth_delete'
+
   resources :tags,           only: [:index, :show, :update, :destroy]
   resources :billing_events, only: [:show]
   resources :imports
@@ -89,6 +93,7 @@ Feedbin::Application.routes.draw do
       post :starred_entries, to: 'starred_entries#update'
       post :mark_as_read, to: 'entries#mark_as_read'
       post :recently_read, to: 'recently_read_entries#create'
+      post 'share/:service', to: 'sharing_services#share', as: :share
       get :push_view
       get :diff
     end

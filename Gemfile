@@ -58,6 +58,7 @@ gem 'grocer'
 gem 'cocoon'
 gem 'gctools', require: false
 gem 'connection_pool'
+gem 'httparty'
 
 # Sidekiq
 gem 'sidekiq'
