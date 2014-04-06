@@ -4745,6 +4745,12 @@ Media Queries
 	}
 }
 
+@media (max-width:680px) {
+	.subscribe-promo {
+		display: none;
+	}
+}
+
 @media (max-width: 420px) {
     .nothing-selected {
 		.feeds-column {
