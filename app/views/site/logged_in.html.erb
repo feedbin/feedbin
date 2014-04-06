@@ -68,26 +68,31 @@
   </div>
 
   <div class="entry-column app-panel" data-behavior="content_column">
-
+    <div class="account-toolbar">
+      <% if signed_in? && current_user.plan.stripe_id == 'trial' %>
+        <%= link_to settings_billing_path, class: 'subscribe-promo' do %>
+          <%= pluralize(current_user.days_left, 'Day') %> Left &mdash; <strong>Subscribe Now</strong>
+        <% end %>
+      <% end %>
       <div class="account-buttons">
         <%= link_to 'Log Out', logout_path, method: 'delete' %>
         <%= link_to 'Settings', settings_path %>
       </div>
-
-      <% if @show_welcome %>
-        <div class="welcome">
-          <div class="welcome-inner">
-            <h2>Welcome to Feedbin</h2>
-            <p class="sub-head">Get started by uploading an OPML file or <a href="http://help.feedbin.com/how-to-subscribe/">subscribing to feeds</a>. </p>
-            <%= link_to 'Upload OPML', settings_import_export_path, class: 'button' %>
-            <p class="description"><a href="http://help.feedbin.com/how-to-subscribe/#opml_import">What is OPML?</a></p>
-          </div>
-        </div>
-      <% else %>
-        <div class="entry-content-wrap <%= @user.entry_width %> font-size-<%= @user.font_size || 5 %> font-<%= @user.font || 'default' %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
-        </div>
-      <% end %>
     </div>
+    <% if @show_welcome %>
+    <div class="welcome">
+      <div class="welcome-inner">
+        <h2>Welcome to Feedbin</h2>
+        <p class="sub-head">Get started by uploading an OPML file or <a href="http://help.feedbin.com/how-to-subscribe/">subscribing to feeds</a>. </p>
+        <%= link_to 'Upload OPML', settings_import_export_path, class: 'button' %>
+        <p class="description"><a href="http://help.feedbin.com/how-to-subscribe/#opml_import">What is OPML?</a></p>
+      </div>
+    </div>
+    <% else %>
+    <div class="entry-content-wrap <%= @user.entry_width %> font-size-<%= @user.font_size || 5 %> font-<%= @user.font || 'default' %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
+    </div>
+    <% end %>
+  </div>
 
 </div>
 
