@@ -1029,7 +1029,7 @@ Structure
 	}
 }
 
-.account-buttons {
+.account-toolbar {
 	position: absolute;
 	left: 0;
 	right: 0;
@@ -1039,6 +1039,9 @@ Structure
 	@include border-color($border-color, $border-color-night);
 	@include background-color($body-background-color, $body-background-color-night);
 	height: $toolbar-height;
+}
+
+.account-buttons {
 	a {
 		@include color($text-summary-color, $text-summary-color-night);
 		font-size: 13px;
@@ -1079,7 +1082,7 @@ Structure
 	display: flex;
 	align-items: center;
 	.welcome-inner {
-		background-color: $list-background-color;
+		@include background-color($body-background-color, $body-background-color-night);
 		width: 100%;
 		text-align: center;
 	}
@@ -4499,7 +4502,7 @@ Print
 Fullscreen
 ------------------------------------------------------------------------------*/
 .full-screen {
-	.feeds-column, .entries-column, .account-buttons {
+	.feeds-column, .entries-column, .account-toolbar {
 		display: none;
 	}
 	.entry-content-wrap {
@@ -4779,7 +4782,7 @@ Media Queries
 	.theme-settings {
 		border-right: none !important;
 	}
-	.account-buttons {
+	.account-toolbar {
 		display: none;
 	}
 	.entry-content-wrap {
