@@ -69,8 +69,10 @@
 
   <div class="entry-column app-panel" data-behavior="content_column">
     <div class="account-toolbar">
-      <%= link_to settings_billing_path, class: 'subscribe-promo' do %>
-        <%= pluralize(current_user.days_left, 'Day') %> Left &mdash; <strong>Subscribe Now</strong>
+      <% if signed_in? && current_user.plan.stripe_id == 'trial' %>
+        <%= link_to settings_billing_path, class: 'subscribe-promo' do %>
+          <%= pluralize(current_user.days_left, 'Day') %> Left &mdash; <strong>Subscribe Now</strong>
+        <% end %>
       <% end %>
       <div class="account-buttons">
         <%= link_to 'Log Out', logout_path, method: 'delete' %>
