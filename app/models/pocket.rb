@@ -18,26 +18,14 @@ class Pocket
     options = {
       body: {consumer_key: ENV['POCKET_CONSUMER_KEY'], redirect_uri: redirect_uri}.to_json
     }
-    response = self.class.post('/oauth/request', options)
-    if response.code == 200
-      response.parsed_response['code']
-    else
-      report_error(response)
-      false
-    end
+    self.class.post('/oauth/request', options)
   end
 
   def oauth_authorize(code)
     options = {
       body: {consumer_key: ENV['POCKET_CONSUMER_KEY'], code: code}.to_json
     }
-    response = self.class.post('/oauth/authorize', options)
-    if response.code == 200
-      response.parsed_response['access_token']
-    else
-      report_error(response)
-      false
-    end
+    self.class.post('/oauth/authorize', options)
   end
 
   def add(access_token, url)
@@ -50,14 +38,5 @@ class Pocket
   def redirect_uri
     Rails.application.routes.url_helpers.oauth_response_url('pocket', host: ENV['PUSH_URL'])
   end
-
-  def report_error(parameters)
-    Honeybadger.notify(
-      error_class: "Pocket HTTP",
-      error_message: "Pocket HTTP Failure",
-      parameters: parameters
-    )
-  end
-
 
 end

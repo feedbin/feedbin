@@ -6,11 +6,15 @@
     <table class="big-table sharing-table">
       <tbody>
         <% SharingService::NATIVE_SERVICES.each do |sharing_service| %>
-          <% if @native_serivces[sharing_service[:service_id]].present? && @native_serivces[sharing_service[:service_id]].access_token.blank? %>
+          <% if @native_services[sharing_service[:service_id]].present? && @native_services[sharing_service[:service_id]].access_token.blank? %>
           <tr class="has-message">
             <td><%= sharing_service[:label] %> X</td>
             <td>
-              <%= link_to 'Reactivate', oauth_request_path(sharing_service[:service_id]) %> | <%= link_to 'Remove', auth_delete_path(sharing_service[:service_id]), method: :delete, class: 'danger' %>
+              <% if sharing_service[:auth] == :oauth2 %>
+                <%= link_to 'Reactivate', oauth_request_path(sharing_service[:service_id]) %> | <%= link_to 'Remove', auth_delete_path(sharing_service[:service_id]), method: :delete, class: 'danger' %>
+              <% elsif sharing_service[:auth] == :xauth %>
+                <%= render partial: 'xauth_form', locals: {sharing_service: sharing_service} %>
+              <% end %>
             </td>
           </tr>
           <tr class="message">
@@ -18,15 +22,23 @@
               <small>There was a problem logging in to <%= sharing_service[:label] %>.</small>
             </td>
           </tr>
-          <% elsif @native_serivces[sharing_service[:service_id]].present? %>
+          <% elsif @native_services[sharing_service[:service_id]].present? %>
           <tr>
             <td><%= sharing_service[:label] %></td>
-            <td><%= link_to 'Deactivate', auth_delete_path(sharing_service[:service_id]), method: :delete, class: 'danger' %></td>
+            <td>
+              <%= link_to 'Deactivate', auth_delete_path(sharing_service[:service_id]), method: :delete, class: 'danger' %>
+            </td>
           </tr>
           <% else %>
           <tr>
             <td><%= sharing_service[:label] %></td>
-            <td><%= link_to 'Activate', oauth_request_path(sharing_service[:service_id]) %></td>
+            <td>
+              <% if sharing_service[:auth] == :oauth2 %>
+                <%= link_to 'Activate', oauth_request_path(sharing_service[:service_id]) %>
+              <% elsif sharing_service[:auth] == :xauth %>
+                <%= render partial: 'xauth_form', locals: {sharing_service: sharing_service} %>
+              <% end %>
+            </td>
           </tr>
           <% end %>
         <% end %>

@@ -310,14 +310,14 @@ class EntriesController < ApplicationController
   private
 
   def sharing_services(entry)
-    @user_sharing_services ||= @user.sharing_services.unscoped.order('lower(label)')
+    @user_sharing_services ||= SharingService.unscoped.where(user: @user).order('lower(label)')
     services = []
 
     if @user_sharing_services.present?
       begin
         @user_sharing_services.each do |sharing_service|
           behavior = ''
-          if sharing_service.group == 'custom'
+          if sharing_service.sharing_type == 'custom'
             entry_url = entry.fully_qualified_url ? ERB::Util.url_encode(entry.fully_qualified_url) : ''
             title = entry.title ? ERB::Util.url_encode(entry.title) : ''
             feed_name = entry.feed.title ? ERB::Util.url_encode(entry.feed.title) : ''
@@ -328,7 +328,7 @@ class EntriesController < ApplicationController
             else
               target = '_self'
             end
-          elsif sharing_service.group == 'native'
+          elsif sharing_service.sharing_type == 'native'
             url = share_entry_path(entry, sharing_service.service_id)
             behavior = 'native_share'
           end

@@ -462,9 +462,10 @@ CREATE TABLE sharing_services (
     url text,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    "group" text DEFAULT 'custom'::text,
+    sharing_type text DEFAULT 'custom'::text,
     service_id text,
-    access_token text
+    access_token text,
+    access_secret text
 );
 
 

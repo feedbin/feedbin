@@ -1,0 +1,5 @@
+<%= form_tag xauth_request_path(sharing_service[:service_id]) do %>
+  <%= text_field_tag 'username', '', placeholder: 'Username' %>
+  <%= password_field_tag 'password', '', placeholder: 'Password' %>
+  <br /><%= submit_tag "Login" %>
+<% end %>

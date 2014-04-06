@@ -2,13 +2,22 @@ class SharingServicesController < ApplicationController
 
   def index
     @user = current_user
-    native_serivces = @user.sharing_services.where(group: 'native')
-    @native_serivces = {}
-    native_serivces.each do |native_serivce|
-      @native_serivces[native_serivce.service_id] = native_serivce
+    native_services = @user.sharing_services.where(sharing_type: 'native')
+    @native_services = {}
+    native_services.each do |native_serivce|
+      @native_services[native_serivce.service_id] = native_serivce
     end
-    logger.info { @native_serivces.inspect }
+    logger.info { @native_services.inspect }
     render layout: 'settings'
+  end
+
+  def xauth_request
+    @user = current_user
+    if params[:service] == 'readability'
+      xauth_request_readability
+    else
+      redirect_to sharing_services_url, alert: "Unknown service."
+    end
   end
 
   def oauth_request
@@ -16,7 +25,7 @@ class SharingServicesController < ApplicationController
     if params[:service] == 'pocket'
       oauth_request_pocket
     else
-      redirect_to sharing_services_url, error: "Unknown service."
+      redirect_to sharing_services_url, alert: "Unknown service."
     end
   end
 
@@ -25,15 +34,15 @@ class SharingServicesController < ApplicationController
     if params[:service] == 'pocket'
       oauth_response_pocket
     else
-      redirect_to sharing_services_url, error: "Unknown service."
+      redirect_to sharing_services_url, alert: "Unknown service."
     end
   end
 
   def auth_delete
     @user = current_user
-    if %w{pocket}.include?(params[:service])
+    if %w{pocket readability}.include?(params[:service])
       service_info = SharingService.find_native_service!(params[:service])
-      @user.sharing_services.unscoped.where(service_id: params[:service]).destroy_all
+      SharingService.unscoped.where(user: @user, service_id: params[:service]).destroy_all
       redirect_to sharing_services_url, notice: "#{service_info[:label]} has been deactivated."
     else
       redirect_to sharing_services_url, notice: "Unknown service."
@@ -43,16 +52,10 @@ class SharingServicesController < ApplicationController
   def share
     @user = current_user
     entry = Entry.find(params[:id])
-    url = ''
     if params[:service] == 'pocket'
-      pocket = Pocket.new
-      sharing_service = @user.sharing_services.unscoped.where(service_id: 'pocket').first
-      response = pocket.add(sharing_service.access_token, entry.fully_qualified_url)
-      if response.code == 401
-        @user.sharing_services.unscoped.where(service_id: 'pocket').update_all(access_token: nil)
-        url = sharing_services_path
-      end
-      render json: {service: sharing_service.label, status: response.code, url: url}.to_json
+      share_pocket(entry)
+    elsif params[:service] == 'readability'
+      share_readability(entry)
     else
       render nothing: true
     end
@@ -87,26 +90,92 @@ class SharingServicesController < ApplicationController
   end
 
   def oauth_response_pocket
-    pocket = Pocket.new;
-    token = pocket.oauth_authorize(session[:pocket_oauth_token])
-    if token.present?
-      service_info = SharingService.find_native_service!('pocket')
-      result = @user.sharing_services.unscoped.where(service_id: 'pocket').update_all(access_token: token)
+    pocket = Pocket.new
+    service_info = SharingService.find_native_service!('pocket')
+    response = pocket.oauth_authorize(session[:pocket_oauth_token])
+    session.delete(:pocket_oauth_token)
+    if response.code == 200
+      access_token = response.parsed_response['access_token']
+      result = SharingService.unscoped.where(user: @user, service_id: 'pocket').update_all(access_token: access_token)
       if result == 0
-        @user.sharing_services.create(label: service_info[:label], group: "native", service_id: service_info[:service_id], access_token: token)
+        @user.sharing_services.create(label: service_info[:label], sharing_type: "native", service_id: service_info[:service_id], access_token: access_token)
       end
-      session.delete(:pocket_oauth_token)
-      redirect_to sharing_services_url, notice: "Pocket has been activated!"
+      redirect_to sharing_services_url, notice: "#{service_info[:label]} has been activated!"
+    elsif response.code == 403
+      redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{service_info[:label]}."
     else
-      redirect_to sharing_services_url, error: "Authentication error"
+      Honeybadger.notify(
+        error_class: "Pocket",
+        error_message: "Pocket::oauth_authorize Failure",
+        parameters: response
+      )
+      redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
     end
   end
 
   def oauth_request_pocket
-    pocket = Pocket.new;
-    token = pocket.request_token
-    session[:pocket_oauth_token] = token
-    redirect_to pocket.redirect_url(token)
+    pocket = Pocket.new
+    response = pocket.request_token
+    if response.code == 200
+      token = response.parsed_response['code']
+      session[:pocket_oauth_token] = token
+      redirect_to pocket.redirect_url(token)
+    else
+      Honeybadger.notify(
+        error_class: "Pocket",
+        error_message: "Pocket::request_token Failure",
+        parameters: response
+      )
+      redirect_to sharing_services_url, notice: "Unknown Pocket error."
+    end
+  end
+
+  def xauth_request_readability
+    service_info = SharingService.find_native_service!(params[:service])
+    readability = Readability.new
+    begin
+      response = readability.request_token(params[:username], params[:password])
+      if response.token && response.secret
+        result = SharingService.unscoped.where(user: @user, service_id: 'readability').update_all(access_token: response.token, access_secret: response.secret)
+        if result == 0
+          @user.sharing_services.create(label: service_info[:label], sharing_type: "native", service_id: service_info[:service_id], access_token: response.token, access_secret: response.secret)
+        end
+        redirect_to sharing_services_url, notice: "#{service_info[:label]} has been activated!"
+      else
+        redirect_to sharing_services_url, notice: "Unknown #{service_info[:label]} error."
+      end
+    rescue OAuth::Unauthorized
+      redirect_to sharing_services_url, notice: "Invalid username or password."
+    rescue
+      redirect_to sharing_services_url, notice: "Unknown #{service_info[:label]} error."
+    end
+  end
+
+  def share_pocket(entry)
+    url = ''
+    pocket = Pocket.new
+    sharing_service = SharingService.unscoped.where(user: @user, service_id: 'pocket').first
+    response = pocket.add(sharing_service.access_token, entry.fully_qualified_url)
+    if response.code == 401
+      SharingService.remove_access(@user, sharing_service[:service_id])
+      url = sharing_services_path
+    end
+    render json: {service: sharing_service.label, status: response.code, url: url}.to_json
+  end
+
+  def share_readability(entry)
+    url = ''
+    sharing_service = SharingService.unscoped.where(user: @user, service_id: 'readability').first
+    readability = Readability.new(sharing_service.access_token, sharing_service.access_secret)
+    response = readability.add(entry.fully_qualified_url)
+    status = response.code.to_i
+    if [202, 409].include?(status)
+      status = 200
+    elsif 401 == status
+      SharingService.remove_access(@user, sharing_service[:service_id])
+      url = sharing_services_path
+    end
+    render json: {service: sharing_service.label, status: status, url: url}.to_json
   end
 
 end

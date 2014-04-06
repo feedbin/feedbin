@@ -48,6 +48,7 @@ Feedbin::Application.routes.draw do
   get '/settings/sharing/oauth_request/:service', as: :oauth_request, to: 'sharing_services#oauth_request'
   get '/settings/sharing/oauth_response/:service', as: :oauth_response, to: 'sharing_services#oauth_response'
   delete '/settings/sharing/auth_delete/:service', as: :auth_delete, to: 'sharing_services#auth_delete'
+  post '/settings/sharing/xauth_request/:service', as: :xauth_request, to: 'sharing_services#xauth_request'
 
   resources :tags,           only: [:index, :show, :update, :destroy]
   resources :billing_events, only: [:show]

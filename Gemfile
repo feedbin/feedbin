@@ -59,6 +59,7 @@ gem 'cocoon'
 gem 'gctools', require: false
 gem 'connection_pool'
 gem 'httparty'
+gem 'oauth'
 
 # Sidekiq
 gem 'sidekiq'
