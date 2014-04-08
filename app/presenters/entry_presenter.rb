@@ -108,7 +108,18 @@ class EntryPresenter < BasePresenter
   end
 
   def title
-    @template.raw(@template.strip_tags(entry.title)) || '(No title)'
+    text = sanitized_title
+    if text.blank?
+      text = entry.summary.html_safe
+    end
+    if text.blank?
+      text = '&hellip;'.html_safe
+    end
+    text
+  end
+
+  def sanitized_title
+    @sanitized_title ||= @template.raw(@template.strip_tags(entry.title))
   end
 
   def author

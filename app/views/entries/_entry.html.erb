@@ -8,7 +8,7 @@
         <p class="feed-title" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= entry.feed.title %></p>
         <%= entry_presenter.abbr_time %>
         <h2 class="title"><%= entry_presenter.title %></h2>
-        <% if entry_presenter.has_content? %>
+        <% if entry_presenter.has_content? && entry_presenter.sanitized_title.present?  %>
           <p class="body"><%= entry.summary.html_safe %></p>
         <% end %>
         <i class="icon-star"></i>
