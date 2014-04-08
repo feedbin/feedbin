@@ -1,5 +1,5 @@
 class SharingService < ActiveRecord::Base
-  NATIVE_SERVICES = [
+  SUPPORTED_SERVICES = [
     {
       label: 'Pocket',
       service_id: 'pocket',
@@ -15,8 +15,8 @@ class SharingService < ActiveRecord::Base
   belongs_to :user
   default_scope { order('lower(label)').where(sharing_type: 'custom') }
 
-  def self.find_native_service!(service_id)
-    data = NATIVE_SERVICES.find {|native_service| native_service[:service_id] == service_id }
+  def self.find_supported_service!(service_id)
+    data = SUPPORTED_SERVICES.find {|supported_service| supported_service[:service_id] == service_id }
     raise ActiveRecord::RecordNotFound if data.nil?
     data
   end

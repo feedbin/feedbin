@@ -924,8 +924,8 @@ $.extend feedbin,
         event.preventDefault()
       return
 
-    nativeShare: ->
-      $(document).on 'click', '[data-behavior~=native_share]', (event) ->
+    supportedShare: ->
+      $(document).on 'click', '[data-behavior~=supported_share]', (event) ->
         result = $.post $(@).attr('href')
         result.always (data, textStatus, xhr) ->
           if data

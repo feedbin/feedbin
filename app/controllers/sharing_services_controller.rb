@@ -2,12 +2,11 @@ class SharingServicesController < ApplicationController
 
   def index
     @user = current_user
-    native_services = @user.sharing_services.where(sharing_type: 'native')
-    @native_services = {}
-    native_services.each do |native_serivce|
-      @native_services[native_serivce.service_id] = native_serivce
+    active_services = @user.sharing_services.where(sharing_type: 'supported')
+    @active_services = {}
+    active_services.each do |active_service|
+      @active_services[active_service.service_id] = active_service
     end
-    logger.info { @native_services.inspect }
     render layout: 'settings'
   end
 
@@ -41,7 +40,7 @@ class SharingServicesController < ApplicationController
   def auth_delete
     @user = current_user
     if %w{pocket readability}.include?(params[:service])
-      service_info = SharingService.find_native_service!(params[:service])
+      service_info = SharingService.find_supported_service!(params[:service])
       SharingService.unscoped.where(user: @user, service_id: params[:service]).destroy_all
       redirect_to sharing_services_url, notice: "#{service_info[:label]} has been deactivated."
     else
@@ -91,14 +90,14 @@ class SharingServicesController < ApplicationController
 
   def oauth_response_pocket
     pocket = Pocket.new
-    service_info = SharingService.find_native_service!('pocket')
+    service_info = SharingService.find_supported_service!('pocket')
     response = pocket.oauth_authorize(session[:pocket_oauth_token])
     session.delete(:pocket_oauth_token)
     if response.code == 200
       access_token = response.parsed_response['access_token']
       result = SharingService.unscoped.where(user: @user, service_id: 'pocket').update_all(access_token: access_token)
       if result == 0
-        @user.sharing_services.create(label: service_info[:label], sharing_type: "native", service_id: service_info[:service_id], access_token: access_token)
+        @user.sharing_services.create(label: service_info[:label], sharing_type: "supported", service_id: service_info[:service_id], access_token: access_token)
       end
       redirect_to sharing_services_url, notice: "#{service_info[:label]} has been activated!"
     elsif response.code == 403
@@ -131,14 +130,14 @@ class SharingServicesController < ApplicationController
   end
 
   def xauth_request_readability
-    service_info = SharingService.find_native_service!(params[:service])
+    service_info = SharingService.find_supported_service!(params[:service])
     readability = Readability.new
     begin
       response = readability.request_token(params[:username], params[:password])
       if response.token && response.secret
         result = SharingService.unscoped.where(user: @user, service_id: 'readability').update_all(access_token: response.token, access_secret: response.secret)
         if result == 0
-          @user.sharing_services.create(label: service_info[:label], sharing_type: "native", service_id: service_info[:service_id], access_token: response.token, access_secret: response.secret)
+          @user.sharing_services.create(label: service_info[:label], sharing_type: "supported", service_id: service_info[:service_id], access_token: response.token, access_secret: response.secret)
         end
         redirect_to sharing_services_url, notice: "#{service_info[:label]} has been activated!"
       else

@@ -328,9 +328,9 @@ class EntriesController < ApplicationController
             else
               target = '_self'
             end
-          elsif sharing_service.sharing_type == 'native'
+          elsif sharing_service.sharing_type == 'supported'
             url = share_entry_path(entry, sharing_service.service_id)
-            behavior = 'native_share'
+            behavior = 'supported_share'
           end
           services << {label: sharing_service.label, url: url, target: target, behavior: behavior}
         end
