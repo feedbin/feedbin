@@ -16,15 +16,17 @@
   <% end %>
 
 
-  <h3>Available Services</h3>
+  <% unless @active_services.count ==  Feedbin::Application.config.supported_services.count %>
+    <h3>Available Services</h3>
 
-  <ul class="pill-list">
-    <% Feedbin::Application.config.supported_services.each do |sharing_service| %>
-      <% unless @active_services[sharing_service.service_id].present? %>
-        <li><%= render partial: "service_#{sharing_service.service_id}", locals: {sharing_service: sharing_service, status: :inactive} %></li>
+    <ul class="pill-list">
+      <% Feedbin::Application.config.supported_services.each do |sharing_service| %>
+        <% unless @active_services[sharing_service.service_id].present? %>
+          <li><%= render partial: "service_#{sharing_service.service_id}", locals: {sharing_service: sharing_service, status: :inactive} %></li>
+        <% end %>
       <% end %>
-    <% end %>
-  </ul>
+    </ul>
+  <% end %>
 
   <h3>Custom</h3>
   <p class="muted">BYO sharing service. <a href="http://help.feedbin.com/sharing-read-it-later-services/">How does this work?</a></p>
