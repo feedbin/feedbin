@@ -1,4 +1,4 @@
-Feedbin::Application.config.supported_services = [
+services = [
   SupportedSharingService.new(
     service_id: 'pocket',
     label: 'Pocket',
@@ -18,3 +18,5 @@ Feedbin::Application.config.supported_services = [
     type: 'xauth'
   )
 ]
+
+Feedbin::Application.config.supported_services = services.sort_by {|supported_service| supported_service.service_id}
