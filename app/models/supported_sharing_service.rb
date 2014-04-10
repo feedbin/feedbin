@@ -9,11 +9,7 @@ class SupportedSharingService
   end
 
   def self.find(service_id)
-    where(service_id: service_id).first
-  end
-
-  def self.find!(service_id)
-    result = find(service_id)
+    result = where(service_id: service_id).first
     raise ActiveRecord::RecordNotFound if result.nil?
     result
   end

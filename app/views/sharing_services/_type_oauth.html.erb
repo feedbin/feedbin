@@ -3,7 +3,7 @@
 <% elsif status == :issue %>
   <p class="service-title <%= "service-icon-#{sharing_service.service_id}" %>"><%= sharing_service.label %></p>
   <small>Feedbin can no longer access <%= sharing_service.label %>, <%= link_to 'reactivate', oauth_request_path(sharing_service.service_id) %>?</small>
-  <%= link_to 'Deactivate', auth_delete_path(sharing_service.service_id), class: 'list-action danger' %>
+  <%= link_to 'Deactivate', auth_delete_path(sharing_service.service_id), class: 'list-action danger', method: :delete %>
 <% else %>
   <p class="service-title <%= "service-icon-#{sharing_service.service_id}" %>"><%= sharing_service.label %></p>
   <%= link_to 'Activate', oauth_request_path(sharing_service.service_id), class: 'list-action' %>

@@ -94,7 +94,7 @@ Feedbin::Application.routes.draw do
       post :starred_entries, to: 'starred_entries#update'
       post :mark_as_read, to: 'entries#mark_as_read'
       post :recently_read, to: 'recently_read_entries#create'
-      post 'share/:service', to: 'sharing_services#share', as: :share
+      post 'share/:service', to: 'supported_sharing_services#share', as: :share
       get :push_view
       get :diff
     end

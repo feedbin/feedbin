@@ -916,13 +916,13 @@ $.extend feedbin,
     serviceOptions: ->
       $(document).on 'click', '[data-behavior~=show_service_options]', (event) ->
         $(@).parents('li').find('.service-options').removeClass('hide')
-        $(@).addClass('hide')
+        $(@).parents('li').find('.show-service-options').addClass('hide')
         event.preventDefault()
         return
 
       $(document).on 'click', '[data-behavior~=hide_service_options]', (event) ->
         $(@).parents('li').find('.service-options').addClass('hide')
-        $(@).parents('li').find('[data-behavior~=show_service_options]').removeClass('hide')
+        $(@).parents('li').find('.show-service-options').removeClass('hide')
         event.preventDefault()
         return
 

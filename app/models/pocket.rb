@@ -3,6 +3,10 @@ class Pocket
   base_uri 'https://getpocket.com/v3'
   headers 'Content-Type' => 'application/json; charset=UTF-8', 'X-Accept' => 'application/json'
 
+  def initialize(access_token = nil)
+    @access_token = access_token
+  end
+
   def redirect_url(token)
     if token.present?
       uri = URI.parse(self.class.base_uri)
@@ -28,11 +32,11 @@ class Pocket
     self.class.post('/oauth/authorize', options)
   end
 
-  def add(access_token, url)
+  def add(url)
     options = {
-      body: { url: url, access_token: access_token, consumer_key: ENV['POCKET_CONSUMER_KEY'] }.to_json
+      body: { url: url, access_token: @access_token, consumer_key: ENV['POCKET_CONSUMER_KEY'] }.to_json
     }
-    self.class.post('/add', options)
+    self.class.post('/add', options).code
   end
 
   def redirect_uri

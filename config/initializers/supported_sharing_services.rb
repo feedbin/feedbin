@@ -10,5 +10,11 @@ Feedbin::Application.config.supported_services = [
     label: 'Readability',
     requires_auth: true,
     type: 'xauth'
+  ),
+  SupportedSharingService.new(
+    service_id: 'instapaper',
+    label: 'Instapaper',
+    requires_auth: true,
+    type: 'xauth'
   )
 ]
