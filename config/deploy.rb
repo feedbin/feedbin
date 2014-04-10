@@ -25,7 +25,7 @@ set :unicorn_bundle, bundle_cmd
 
 set :assets_role, [:app]
 
-role :app, "www1.feedbin.com", "www2.feedbin.com"
+role :app, "www2.feedbin.com"
 role :worker, "worker1.feedbin.com", "worker2.feedbin.com"
 
 default_run_options[:pty] = true

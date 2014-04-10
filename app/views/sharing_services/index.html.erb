@@ -1,17 +1,27 @@
-<div class="settings-content-inner">
+<div class="settings-content-inner-wide">
   <h2>Sharing</h2>
 
   <% if @active_services.any? %>
-  <h3>Active Services</h3>
+    <h3>Active Services</h3>
+
+    <ul class="pill-list">
+      <% @active_services.each do |service_id, sharing_service| %>
+        <% if sharing_service.active? %>
+          <li><%= render partial: "service_#{service_id}", locals: {sharing_service: sharing_service, status: :active} %></li>
+        <% else %>
+          <li><%= render partial: "service_#{service_id}", locals: {sharing_service: sharing_service, status: :issue} %></li>
+        <% end %>
+      <% end %>
+    </ul>
   <% end %>
 
 
   <h3>Available Services</h3>
 
   <ul class="pill-list">
-    <% SharingService::SUPPORTED_SERVICES.each do |sharing_service| %>
-      <% unless @active_services[sharing_service[:service_id]].present? %>
-        <li><%= render partial: "service_#{sharing_service[:service_id]}", locals: {sharing_service: sharing_service, status: :inactive} %></li>
+    <% Feedbin::Application.config.supported_services.each do |sharing_service| %>
+      <% unless @active_services[sharing_service.service_id].present? %>
+        <li><%= render partial: "service_#{sharing_service.service_id}", locals: {sharing_service: sharing_service, status: :inactive} %></li>
       <% end %>
     <% end %>
   </ul>

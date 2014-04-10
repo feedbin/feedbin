@@ -913,6 +913,19 @@ $.extend feedbin,
         $('.entries .selected a').click()
         return
 
+    serviceOptions: ->
+      $(document).on 'click', '[data-behavior~=show_service_options]', (event) ->
+        $(@).parents('li').find('.service-options').removeClass('hide')
+        $(@).addClass('hide')
+        event.preventDefault()
+        return
+
+      $(document).on 'click', '[data-behavior~=hide_service_options]', (event) ->
+        $(@).parents('li').find('.service-options').addClass('hide')
+        $(@).parents('li').find('[data-behavior~=show_service_options]').removeClass('hide')
+        event.preventDefault()
+        return
+
     drawBarCharts: ->
       $('canvas').each ()->
         feedbin.drawBarChart(@, $(@).data('values'))

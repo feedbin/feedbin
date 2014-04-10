@@ -1,4 +1,1 @@
-<% if status == :inactive %>
-  <p class="service-title"><%= sharing_service[:label] %></p>
-  <%= render partial: 'xauth_form', locals: {sharing_service: sharing_service} %>
-<% end %>
+<%= render partial: "type_xauth", locals: {sharing_service: sharing_service, status: status} %></li>

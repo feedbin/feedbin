@@ -1,13 +1,10 @@
-class SharingServicesController < ApplicationController
+class SupportedSharingServicesController < ApplicationController
 
-  def index
+  def delete
     @user = current_user
-    active_services = @user.sharing_services.where(sharing_type: 'supported')
-    @active_services = {}
-    active_services.each do |active_service|
-      @active_services[active_service.service_id] = active_service
-    end
-    render layout: 'settings'
+    supported_sharing_service = SupportedSharingService.find!(params[:service])
+    SharingService.unscoped.where(user: @user, service_id: params[:service]).destroy_all
+    redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been deactivated."
   end
 
   def xauth_request
@@ -37,16 +34,9 @@ class SharingServicesController < ApplicationController
     end
   end
 
-  def delete
-    @user = current_user
-    supported_sharing_service = SupportedSharingService.find!(params[:service])
-    SharingService.unscoped.where(user: @user, service_id: params[:service]).destroy_all
-    redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been deactivated."
-  end
-
   def share
     @user = current_user
-    entry = Entry.find(params[:id])
+    entry = Entry.find!(params[:id])
     if params[:service] == 'pocket'
       share_pocket(entry)
     elsif params[:service] == 'readability'
@@ -68,21 +58,6 @@ class SharingServicesController < ApplicationController
   end
 
   private
-
-  def sharing_services_params
-    if params[:user][:sharing_services_attributes]
-      owned_services = @user.sharing_services.pluck(:id)
-      requested_services = params[:user][:sharing_services_attributes].collect { |index, sharing_services| {index: index, id: sharing_services['id']} }
-      requested_services.each do |service|
-        next if service[:index] =~ /_insert$/
-        unless owned_services.include?(service[:id].to_i)
-          params[:user][:sharing_services_attributes].delete(service[:index])
-        end
-      end
-      params[:user][:sharing_services_attributes].map {|index, sharing_services| params[:user][:sharing_services_attributes][index] = sharing_services.slice(:id, :label, :url, :_destroy) }
-    end
-    params.require(:user).permit!
-  end
 
   def oauth_response_pocket
     pocket = Pocket.new

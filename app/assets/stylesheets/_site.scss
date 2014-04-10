@@ -994,23 +994,55 @@ th {
 	@include border-color($border-color, $border-color-night);
 }
 
-.big-table-wrap {
+.pill-list {
 	background-color: #FFF;
 	border-radius: 8px;
 	border: 1px solid $border-color;
-	margin-bottom: 20px;
-}
-
-.big-table {
-	width: 100%;
-	th, td {
+	margin: 0 0 20px 0;
+	padding: 0;
+	list-style: none;
+	li {
 		padding: 15px;
+		margin: 0;
 		vertical-align: top;
 		border-bottom: 1px solid $border-color;
-	}
-	tr:last-child {
-		th, td {
+		position: relative;
+		overflow: hidden;
+		&:last-child {
 			border-bottom: none;
+		}
+	}
+	.service-title {
+		color: #212121;
+		font-size: 16px;
+		font-weight: bold;
+		margin: 0;
+	}
+	.list-action {
+		position: absolute;
+		right: 15px;
+		top: 15px;
+	}
+	.service-options {
+		padding-top: 20px;
+	}
+	.service-options {
+		input, .cancel-button {
+			margin: 0 0 0 15px;
+			&.no-margin {
+				margin-left: 0;
+			}
+		}
+		input[type="text"],
+		input[type="password"] {
+			max-width: 250px;
+			float: left;
+		}
+		.action-button {
+			float: right;
+		}
+		.cancel-button {
+			margin-top: 7px;
 		}
 	}
 }
@@ -3669,6 +3701,7 @@ Buttons
 	padding: 0 !important;
 	border: none;
 	font-size: 16px;
+	background: transparent;
 	&:hover {
 		background: transparent;
 	}
