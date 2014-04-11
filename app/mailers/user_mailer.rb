@@ -1,6 +1,6 @@
 class UserMailer < ActionMailer::Base
 
-  default from: ENV['FROM_ADDRESS']
+  default from: "Feedbin <#{ENV['FROM_ADDRESS']}>"
 
   def payment_receipt(billing_event)
     @billing_event = BillingEvent.find(billing_event)
