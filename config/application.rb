@@ -24,8 +24,16 @@ module Feedbin
     config.assets.initialize_on_precompile = true
     config.serve_static_assets = true
 
-    config.action_mailer.delivery_method   = :postmark
-    config.action_mailer.postmark_settings = { api_key: ENV['POSTMARK_API_KEY'] }
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address:              ENV['SMTP_ADDRESS'],
+      port:                 587,
+      enable_starttls_auto: true,
+      authentication:       'login',
+      user_name:            ENV['SMTP_USERNAME'],
+      password:             ENV['SMTP_PASSWORD'],
+      domain:               ENV['DEFAULT_URL_OPTIONS_HOST']
+    }
 
     config.action_view.sanitized_allowed_tags = 'table', 'tr', 'td', 'th', 'thead', 'tbody'
 

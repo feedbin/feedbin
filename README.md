@@ -44,7 +44,7 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | CAMO_HOST                | CDN to point to the camo host                                                      |
 | CAMO_KEY                 | Used to rewrite assets to use https - https://github.com/atmos/camo                |
 | DATABASE_URL             | Database connection string - postgres://USER:PASS@IP:PORT/DATABASE                 |
-| DEFAULT_URL_OPTIONS_HOST | Mailer host - feedbin.com                                                           |
+| DEFAULT_URL_OPTIONS_HOST | Mailer host - feedbin.com                                                          |
 | ELASTICSEARCH_URL        | search endpoint - http://localhost:9200                                            |
 | FEEDBIN_HOMEPAGE_REPO    | Git URL to a Rails engine that provides a custom homepage                          |
 | FROM_ADDRESS             | Used as a reply-to email address                                                   |
@@ -55,14 +55,16 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | LIBRATO_USER             | Used for reporting stats - http://metrics.librato.com                              |
 | MEMCACHED_HOSTS          | Comma separated memcached hosts/ports - 192.168.1.2:11121                          |
 | POSTGRES_USERNAME        | Used for connecting to database                                                    |
-| POSTMARK_API_KEY         | Used for sending email - http://postmarkapp.com                                    |
-| PUSH_URL                 | URL for the Feedbin instance - https://feedbin.com                                  |
+| PUSH_URL                 | URL for the Feedbin instance - https://feedbin.com                                 |
 | RACK_ENV                 | Environment - production                                                           |
 | RAILS_ENV                | Environment - production                                                           |
 | READABILITY_API_TOKEN    | Used for Readability - http://www.readability.com                                  |
 | REDIS_URL                | redis connection string - redis://redis:PASSWORD@192.168.1.3:6379                  |
 | SECRET_KEY_BASE          | Encryptions key for Rails - run `rake secret`                                      |
 | SIDEKIQ_PASSWORD         | Sidekiq Basic Auth Password                                                        |
+| SMTP_ADDRESS             | SMTP Host                                                                          |
+| SMTP_USERNAME            | SMTP Username                                                                      |
+| SMTP_PASSWORD            | SMTP Password                                                                      |
 | STRIPE_API_KEY           | Used for communicating with stripe - https://stripe.com                            |
 | STRIPE_PUBLIC_KEY        | Used for communicating with stripe - https://stripe.com                            |
 
