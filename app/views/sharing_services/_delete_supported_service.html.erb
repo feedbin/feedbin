@@ -1,2 +1,2 @@
-<p class="service-title <%= "service-icon-#{sharing_service.service_id}" %>"><%= sharing_service.label %></p>
+<p class="service-title <%= "icon-share-#{sharing_service.service_id}" %>"><%= sharing_service.label %></p>
 <%= link_to 'Deactivate', auth_delete_path(sharing_service.service_id), class: 'list-action danger', method: :delete %>

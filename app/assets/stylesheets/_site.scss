@@ -1002,7 +1002,7 @@ th {
 	padding: 0;
 	list-style: none;
 	li {
-		padding: 15px;
+		padding: 10px 15px 10px 20px;
 		margin: 0;
 		vertical-align: top;
 		border-bottom: 1px solid $border-color;
@@ -1017,6 +1017,7 @@ th {
 		font-size: 16px;
 		font-weight: bold;
 		margin: 0;
+		padding: 5px 0 5px 40px;
 	}
 	.list-action {
 		position: absolute;
@@ -1044,6 +1045,18 @@ th {
 		.cancel-button {
 			margin-top: 7px;
 		}
+	}
+	.icon-share-instapaper {
+		background: image-url("icon-share-instapaper.svg") 7px 2px no-repeat;
+		background-size: 10px 23px;
+	}
+	.icon-share-readability {
+		background: image-url("icon-share-readability.svg") 0 5px no-repeat;
+		background-size: 24px 17px;
+	}
+	.icon-share-pocket {
+		background: image-url("icon-share-pocket.svg") 0 5px no-repeat;
+		background-size: 24px 21px;
 	}
 }
 
@@ -2306,10 +2319,10 @@ $saved-search-control-height: 48px;
 	.button-toggle-content {
 		svg {
 			position: absolute;
-			top: $base-button-position + 3;
-			left: 11px;
-			height: 14px;
-			width: 21px;
+			top: $base-button-position + 2;
+			left: 12px;
+			height: 15px;
+			width: 20px;
 		}
 	}
 	.button-toggle-share-menu {
@@ -2638,7 +2651,7 @@ $saved-search-control-height: 48px;
 			display: block;
 			content: "";
 			background: image-url("icon-readability.svg") 10px 50% no-repeat;
-			background-size: 21px 14px;
+			background-size: 20px 15px;
 			width: 43px;
 			right: 0px;
 			top: 0;

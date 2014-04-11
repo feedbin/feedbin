@@ -1,12 +1,12 @@
 <% if status == :active %>
   <%= render partial: "delete_supported_service", locals: {sharing_service: sharing_service} %>
 <% elsif status == :issue %>
-  <p class="service-title <%= "service-icon-#{sharing_service.service_id}" %>"><%= sharing_service.label %></p>
+  <p class="service-title <%= "icon-share-#{sharing_service.service_id}" %>"><%= sharing_service.label %></p>
   <small class="show-service-options">Feedbin can no longer access <%= sharing_service.label %>, <a href="#" data-behavior="show_service_options">reactivate</a>?</small>
   <%= link_to 'Deactivate', auth_delete_path(sharing_service.service_id), class: 'list-action danger show-service-options', method: :delete %>
   <%= render partial: "xauth_form", locals: {sharing_service: sharing_service} %>
 <% else %>
-  <p class="service-title"><%= sharing_service.label %></p>
+  <p class="service-title <%= "icon-share-#{sharing_service.service_id}" %>"><%= sharing_service.label %></p>
   <%= link_to 'Activate', '#', class: 'list-action show-service-options', data: {behavior: "show_service_options"} %>
   <%= render partial: "xauth_form", locals: {sharing_service: sharing_service} %>
 <% end %>
