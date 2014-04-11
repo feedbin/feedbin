@@ -1,6 +1,6 @@
 class UserMailer < ActionMailer::Base
 
-  default from: ENV['FROM_ADDRESS']
+  default from: "Feedbin <#{ENV['FROM_ADDRESS']}>"
 
   def payment_receipt(billing_event)
     @billing_event = BillingEvent.find(billing_event)
@@ -29,6 +29,14 @@ class UserMailer < ActionMailer::Base
     @user = User.find(user_id)
     @download_link = download_link
     mail to: @user.email, subject: '[Feedbin] Starred Items Export Complete'
+  end
+
+  def entry(user_id, entry_id, to)
+    @user = User.find(user_id)
+    @entry = Entry.find(entry_id)
+    mail to: to, subject: @entry.title, reply_to: @user.email, from: "Feedbin <notifications@feedbin.io>"
+    headers['X-MC-Autotext'] = "true"
+    headers['X-MC-SigningDomain'] = "feedbin.io"
   end
 
 end
