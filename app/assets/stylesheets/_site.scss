@@ -1794,17 +1794,11 @@ $saved-search-control-height: 48px;
 				@include background-color(#505a65, #505a65);
 			}
 		}
-		.feed-title {
-			color: rgba(255,255,255, .5) !important;
-		}
-		.time {
-			color: rgba(255,255,255, .5) !important;
+		.feed-title, .time, .body {
+			color: #97999b !important;
 		}
 		.title {
-			color: rgba(255,255,255, 1) !important;
-		}
-		.body {
-			color: rgba(255,255,255, .8) !important;
+			color: #FFFFFF !important;
 		}
 	}
 	.selected &.selected {
@@ -1823,6 +1817,12 @@ $saved-search-control-height: 48px;
 			border-color: $selected;
 			border-top: 1px solid $selected;
 			background: $selected;
+		}
+		.feed-title {
+			color: #add6ff !important;
+		}
+		.body {
+			color: #b7dbff !important;
 		}
 	}
 	&.show-actions {
