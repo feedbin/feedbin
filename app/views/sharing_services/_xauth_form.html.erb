@@ -1,5 +1,5 @@
 <div class="service-options hide">
-  <%= form_tag xauth_request_path(sharing_service.service_id) do %>
+  <%= form_tag xauth_request_supported_sharing_service_path(sharing_service.service_id) do %>
     <%= text_field_tag 'username', '', placeholder: 'Username', class: 'no-margin' %>
     <%= password_field_tag 'password', '', placeholder: 'Password' %>
 

@@ -40,7 +40,7 @@ class Pocket
   end
 
   def redirect_uri
-    Rails.application.routes.url_helpers.oauth_response_url('pocket', host: ENV['PUSH_URL'])
+    Rails.application.routes.url_helpers.oauth_response_supported_sharing_service_url('pocket', host: ENV['PUSH_URL'])
   end
 
 end

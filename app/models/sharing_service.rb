@@ -1,6 +1,6 @@
 class SharingService < ActiveRecord::Base
 
-  store_accessor :settings, :access_token, :access_secret
+  store_accessor :settings, :access_token, :access_secret, :email_name, :email_address, :kindle_address
 
   belongs_to :user
   default_scope { order('lower(label)').where(sharing_type: 'custom') }
@@ -13,6 +13,11 @@ class SharingService < ActiveRecord::Base
     defaults = {label: supported_sharing_service.label, sharing_type: "supported", service_id: supported_sharing_service.service_id}
     supported_service = unscoped.find_or_initialize_by(user: user, service_id: supported_sharing_service.service_id)
     supported_service.update(defaults.merge(options))
+  end
+
+  def self.create_supported_service(user, supported_sharing_service, options = {})
+    defaults = {label: supported_sharing_service.label, sharing_type: "supported", service_id: supported_sharing_service.service_id}
+    create(defaults.merge(options))
   end
 
   def supported_sharing_service_info

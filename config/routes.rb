@@ -45,11 +45,6 @@ Feedbin::Application.routes.draw do
   # Error log
   post 'apple_push_notifications/:version/log', as: :apple_push_notifications_log, to: 'apple_push_notifications#log'
 
-  get 'settings/sharing/oauth_request/:service', as: :oauth_request, to: 'supported_sharing_services#oauth_request'
-  get 'settings/sharing/oauth_response/:service', as: :oauth_response, to: 'supported_sharing_services#oauth_response'
-  delete 'settings/sharing/delete/:service', as: :auth_delete, to: 'supported_sharing_services#delete'
-  post 'settings/sharing/xauth_request/:service', as: :xauth_request, to: 'supported_sharing_services#xauth_request'
-
   resources :tags,           only: [:index, :show, :update, :destroy]
   resources :billing_events, only: [:show]
   resources :imports
@@ -58,6 +53,14 @@ Feedbin::Application.routes.draw do
   resources :sharing_services, path: 'settings/sharing', only: [:index]
   resources :actions, path: 'settings/actions', only: [:index]
   resources :saved_searches
+
+  resources :supported_sharing_services, only: [:create, :destroy] do
+    member do
+      get :oauth_request
+      get :oauth_response
+      post :xauth_request
+    end
+  end
 
   resources :subscriptions,  only: [:index, :create, :destroy] do
     collection do

@@ -1,53 +1,20 @@
 class SupportedSharingServicesController < ApplicationController
 
-  def delete
+  def create
     @user = current_user
-    supported_sharing_service = SupportedSharingService.find(params[:service])
-    SharingService.unscoped.where(user: @user, service_id: params[:service]).destroy_all
-    redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been deactivated."
-  end
-
-  def xauth_request
-    @user = current_user
-    supported_sharing_service = SupportedSharingService.find(params[:service])
-
-    if supported_sharing_service.service_id == 'readability'
-      klass = Readability.new
-    elsif supported_sharing_service.service_id == 'instapaper'
-      klass = Instapaper.new
-    end
-
-    begin
-      response = klass.request_token(params[:username], params[:password])
-      if response.token && response.secret
-        SharingService.create_or_update_supported_service(@user, supported_sharing_service, access_token: response.token, access_secret: response.secret)
-        redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
-      else
-        redirect_to sharing_services_url, notice: "Unknown #{supported_sharing_service.label} error."
-      end
-    rescue OAuth::Unauthorized
-      redirect_to sharing_services_url, notice: "Invalid username or password."
-    rescue
+    supported_sharing_service = SupportedSharingService.find(params[:id])
+    if SharingService.create_supported_service(@user, supported_sharing_service, supported_sharing_service_params)
+      redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
+    else
       redirect_to sharing_services_url, notice: "Unknown #{supported_sharing_service.label} error."
     end
   end
 
-  def oauth_request
+  def destroy
     @user = current_user
-    if params[:service] == 'pocket'
-      oauth_request_pocket
-    else
-      redirect_to sharing_services_url, alert: "Unknown service."
-    end
-  end
-
-  def oauth_response
-    @user = current_user
-    if params[:service] == 'pocket'
-      oauth_response_pocket
-    else
-      redirect_to sharing_services_url, alert: "Unknown service."
-    end
+    supported_sharing_service = SupportedSharingService.find(params[:id])
+    SharingService.unscoped.where(user: @user, service_id: params[:id]).destroy_all
+    redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been deactivated."
   end
 
   def share
@@ -75,18 +42,54 @@ class SupportedSharingServicesController < ApplicationController
     render json: {service: sharing_service.label, status: response, url: url}.to_json
   end
 
-  def sharing_services_update
+  def xauth_request
     @user = current_user
-    if @user.update_attributes(sharing_services_params)
-      redirect_to sharing_services_url, notice: "Sharing services updated."
+    supported_sharing_service = SupportedSharingService.find(params[:id])
+
+    if supported_sharing_service.service_id == 'readability'
+      klass = Readability.new
+    elsif supported_sharing_service.service_id == 'instapaper'
+      klass = Instapaper.new
+    end
+
+    begin
+      response = klass.request_token(params[:username], params[:password])
+      if response.token && response.secret
+        SharingService.create_or_update_supported_service(@user, supported_sharing_service, access_token: response.token, access_secret: response.secret)
+        redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
+      else
+        redirect_to sharing_services_url, notice: "Unknown #{supported_sharing_service.label} error."
+      end
+    rescue OAuth::Unauthorized
+      redirect_to sharing_services_url, notice: "Invalid username or password."
+    rescue
+      redirect_to sharing_services_url, notice: "Unknown #{supported_sharing_service.label} error."
+    end
+  end
+
+  def oauth_request
+    @user = current_user
+    if params[:id] == 'pocket'
+      oauth_request_pocket
     else
-      @messages = ['Error saving services.']
-      flash[:error] = render_to_string partial: "shared/messages"
-      redirect_to sharing_services_url
+      redirect_to sharing_services_url, alert: "Unknown service."
+    end
+  end
+
+  def oauth_response
+    @user = current_user
+    if params[:id] == 'pocket'
+      oauth_response_pocket
+    else
+      redirect_to sharing_services_url, alert: "Unknown service."
     end
   end
 
   private
+
+  def supported_sharing_service_params
+    params.permit(:email_name, :email_address, :kindle_address)
+  end
 
   def oauth_response_pocket
     pocket = Pocket.new
