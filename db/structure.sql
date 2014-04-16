@@ -464,8 +464,7 @@ CREATE TABLE sharing_services (
     updated_at timestamp without time zone,
     sharing_type text DEFAULT 'custom'::text,
     service_id text,
-    access_token text,
-    access_secret text
+    settings hstore
 );
 
 

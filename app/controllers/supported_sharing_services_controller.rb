@@ -20,10 +20,7 @@ class SupportedSharingServicesController < ApplicationController
     begin
       response = klass.request_token(params[:username], params[:password])
       if response.token && response.secret
-        result = SharingService.unscoped.where(user: @user, service_id: supported_sharing_service.service_id).update_all(access_token: response.token, access_secret: response.secret)
-        if result == 0
-          @user.sharing_services.create(label: supported_sharing_service.label, sharing_type: "supported", service_id: supported_sharing_service.service_id, access_token: response.token, access_secret: response.secret)
-        end
+        SharingService.create_or_update_supported_service(@user, supported_sharing_service, access_token: response.token, access_secret: response.secret)
         redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
       else
         redirect_to sharing_services_url, notice: "Unknown #{supported_sharing_service.label} error."
@@ -98,10 +95,7 @@ class SupportedSharingServicesController < ApplicationController
     session.delete(:pocket_oauth_token)
     if response.code == 200
       access_token = response.parsed_response['access_token']
-      result = SharingService.unscoped.where(user: @user, service_id: 'pocket').update_all(access_token: access_token)
-      if result == 0
-        @user.sharing_services.create(label: supported_sharing_service.label, sharing_type: "supported", service_id: supported_sharing_service.service_id, access_token: access_token)
-      end
+      SharingService.create_or_update_supported_service(@user, supported_sharing_service, access_token: access_token)
       redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
     elsif response.code == 403
       redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{supported_sharing_service.label}."

@@ -28,6 +28,14 @@ class SupportedSharingService
     results
   end
 
+  def self.first
+    Feedbin::Application.config.supported_services.first
+  end
+
+  def self.last
+    Feedbin::Application.config.supported_services.last
+  end
+
   def requires_auth?
     self.requires_auth
   end
