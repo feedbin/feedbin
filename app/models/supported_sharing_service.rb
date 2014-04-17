@@ -1,43 +1,62 @@
-class SupportedSharingService
+class SupportedSharingService < ActiveRecord::Base
+  store_accessor :settings, :access_token, :access_secret, :email_name, :email_address, :kindle_address
+  validates :service_id, presence: true, uniqueness: {scope: :user_id}, inclusion: { in: Feedbin::Application.config.supported_services.collect {|s| s[:service_id]} }
+  belongs_to :user
 
-  attr_accessor :service_id, :label, :requires_auth, :type
+  def share(entry_id)
+    entry = Entry.find(entry_id)
 
-  def initialize(params)
-    params.each do |key, value|
-      instance_variable_set("@#{key}", value) unless value.nil?
-    end
-  end
-
-  def self.find(service_id)
-    result = where(service_id: service_id).first
-    raise ActiveRecord::RecordNotFound if result.nil?
-    result
-  end
-
-  def self.where(params)
-    results = []
-    Feedbin::Application.config.supported_services.each do |supported_service|
-      include_service = true
-      params.each do |param, value|
-        if supported_service.send(param) != value
-          include_service = false
-        end
+    if active?
+      if service_id == 'pocket'
+        klass = Pocket.new(access_token)
+      elsif service_id == 'readability'
+        klass = Readability.new(access_token, access_secret)
+      elsif service_id == 'instapaper'
+        klass = Instapaper.new(access_token, access_secret)
       end
-      results << supported_service if include_service
+      response = klass.add(entry.fully_qualified_url)
+      if response == 401
+        remove_access!
+      end
+    else
+      response = 401
     end
-    results
+
+    response
   end
 
-  def self.first
-    Feedbin::Application.config.supported_services.first
+  def remove_access!
+    update(access_token: nil, access_secret: nil)
   end
 
-  def self.last
-    Feedbin::Application.config.supported_services.last
+  def active?
+    if requires_auth? && auth_present?
+      true
+    elsif requires_auth?
+      false
+    else
+      true
+    end
+  end
+
+  def info
+    @info ||= Feedbin::Application.config.supported_services.find {|option| option[:service_id] = service_id}
+  end
+
+  def label
+    info[:label]
   end
 
   def requires_auth?
-    self.requires_auth
+    info[:requires_auth]
+  end
+
+  def service_type
+    info[:service_type]
+  end
+
+  def auth_present?
+    access_token.present?
   end
 
 end

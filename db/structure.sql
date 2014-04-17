@@ -461,10 +461,7 @@ CREATE TABLE sharing_services (
     label text,
     url text,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    sharing_type text DEFAULT 'custom'::text,
-    service_id text,
-    settings hstore
+    updated_at timestamp without time zone
 );
 
 
@@ -555,6 +552,39 @@ CREATE SEQUENCE subscriptions_id_seq
 --
 
 ALTER SEQUENCE subscriptions_id_seq OWNED BY subscriptions.id;
+
+
+--
+-- Name: supported_sharing_services; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE supported_sharing_services (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    service_id character varying(255) NOT NULL,
+    settings hstore,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: supported_sharing_services_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE supported_sharing_services_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: supported_sharing_services_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE supported_sharing_services_id_seq OWNED BY supported_sharing_services.id;
 
 
 --
@@ -802,6 +832,13 @@ ALTER TABLE ONLY subscriptions ALTER COLUMN id SET DEFAULT nextval('subscription
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY supported_sharing_services ALTER COLUMN id SET DEFAULT nextval('supported_sharing_services_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY taggings ALTER COLUMN id SET DEFAULT nextval('taggings_id_seq'::regclass);
 
 
@@ -936,6 +973,14 @@ ALTER TABLE ONLY starred_entries
 
 ALTER TABLE ONLY subscriptions
     ADD CONSTRAINT subscriptions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: supported_sharing_services_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY supported_sharing_services
+    ADD CONSTRAINT supported_sharing_services_pkey PRIMARY KEY (id);
 
 
 --
@@ -1143,6 +1188,13 @@ CREATE INDEX index_subscriptions_on_user_id ON subscriptions USING btree (user_i
 --
 
 CREATE UNIQUE INDEX index_subscriptions_on_user_id_and_feed_id ON subscriptions USING btree (user_id, feed_id);
+
+
+--
+-- Name: index_supported_sharing_services_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_supported_sharing_services_on_user_id ON supported_sharing_services USING btree (user_id);
 
 
 --
@@ -1482,4 +1534,4 @@ INSERT INTO schema_migrations (version) VALUES ('20140321203637');
 
 INSERT INTO schema_migrations (version) VALUES ('20140326173619');
 
-INSERT INTO schema_migrations (version) VALUES ('20140404020913');
+INSERT INTO schema_migrations (version) VALUES ('20140416025157');

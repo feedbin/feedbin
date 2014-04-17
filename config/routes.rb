@@ -54,11 +54,12 @@ Feedbin::Application.routes.draw do
   resources :actions, path: 'settings/actions', only: [:index]
   resources :saved_searches
 
-  resources :supported_sharing_services, only: [:create, :destroy] do
+  resources :supported_sharing_services, only: [:create, :destroy, :update] do
     member do
       get :oauth_request
       get :oauth_response
       post :xauth_request
+      post 'share/:entry_id', to: 'supported_sharing_services#share', as: :share
     end
   end
 
@@ -97,7 +98,6 @@ Feedbin::Application.routes.draw do
       post :starred_entries, to: 'starred_entries#update'
       post :mark_as_read, to: 'entries#mark_as_read'
       post :recently_read, to: 'recently_read_entries#create'
-      post 'share/:service', to: 'supported_sharing_services#share', as: :share
       get :push_view
       get :diff
     end

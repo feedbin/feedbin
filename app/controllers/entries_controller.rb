@@ -310,31 +310,34 @@ class EntriesController < ApplicationController
   private
 
   def sharing_services(entry)
-    @user_sharing_services ||= SharingService.unscoped.where(user: @user).order('lower(label)')
+    @user_sharing_services ||= begin
+      (@user.sharing_services + @user.supported_sharing_services).sort_by{|sharing_service| sharing_service.label}
+    end
     services = []
 
     if @user_sharing_services.present?
       begin
         @user_sharing_services.each do |sharing_service|
           behavior = ''
-          if sharing_service.sharing_type == 'custom'
+          if sharing_service.class.name == 'SharingService'
             entry_url = entry.fully_qualified_url ? ERB::Util.url_encode(entry.fully_qualified_url) : ''
             title = entry.title ? ERB::Util.url_encode(entry.title) : ''
             feed_name = entry.feed.title ? ERB::Util.url_encode(entry.feed.title) : ''
             url = sharing_service.url.clone
-            url = url.gsub('${url}', entry_url).gsub('${title}', title).gsub('${source}', feed_name)
+            url = url.gsub('${url}', entry_url).gsub('${title}', title).gsub('${source}', feed_name).gsub('${id}', entry.id.to_s)
             if url.start_with?('http')
               target = '_blank'
             else
               target = '_self'
             end
-          elsif sharing_service.sharing_type == 'supported'
-            url = share_entry_path(entry, sharing_service.service_id)
+          elsif sharing_service.class.name == 'SupportedSharingService'
+            url = share_supported_sharing_service_path(sharing_service, entry)
             behavior = 'supported_share'
           end
           services << {label: sharing_service.label, url: url, target: target, behavior: behavior}
         end
       rescue Exception => e
+        logger.info { e.inspect }
       end
     end
     services

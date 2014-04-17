@@ -2,11 +2,12 @@ class SharingServicesController < ApplicationController
 
   def index
     @user = current_user
-    active_services = @user.sharing_services.where(sharing_type: 'supported')
-    @active_services = {}
-    active_services.each do |active_service|
-      @active_services[active_service.service_id] = active_service
+    supported_sharing_services = @user.supported_sharing_services
+    @supported_sharing_services = {}
+    supported_sharing_services.each do |sharing_service|
+      @supported_sharing_services[sharing_service.service_id] = sharing_service
     end
+    @available_sharing_services = Feedbin::Application.config.supported_services.sort_by {|supported_service| supported_service[:service_id]}
     render layout: 'settings'
   end
 

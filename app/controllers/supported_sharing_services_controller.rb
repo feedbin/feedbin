@@ -2,44 +2,44 @@ class SupportedSharingServicesController < ApplicationController
 
   def create
     @user = current_user
-    supported_sharing_service = SupportedSharingService.find(params[:id])
-    if SharingService.create_supported_service(@user, supported_sharing_service, supported_sharing_service_params)
-      redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
-    else
-      redirect_to sharing_services_url, notice: "Unknown #{supported_sharing_service.label} error."
+    if params[:supported_sharing_service][:operation] == 'authorize'
+      authorize_service(params[:supported_sharing_service][:service_id])
     end
   end
 
   def destroy
     @user = current_user
-    supported_sharing_service = SupportedSharingService.find(params[:id])
-    SharingService.unscoped.where(user: @user, service_id: params[:id]).destroy_all
-    redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been deactivated."
+    supported_sharing_service = @user.supported_sharing_services.where(id: params[:id]).first!
+    label = supported_sharing_service.label
+    supported_sharing_service.destroy
+    redirect_to sharing_services_url, notice: "#{label} has been deactivated."
+  end
+
+  def update
+    @user = current_user
+    supported_sharing_service = @user.supported_sharing_services.where(id: params[:id]).first!
+    if params[:supported_sharing_service][:operation] == 'authorize'
+      authorize_service(supported_sharing_service.service_id)
+    end
+  end
+
+  def authorize_service(service_id)
+    if service_id == 'pocket'
+      oauth_request_pocket
+    else
+      redirect_to sharing_services_url, alert: "Unknown service."
+    end
   end
 
   def share
     @user = current_user
-    url = ''
-    entry = Entry.find(params[:id])
-    sharing_service = SharingService.unscoped.where(user: @user, service_id: params[:service]).first!
-    if sharing_service.access_token.present?
-      if params[:service] == 'pocket'
-        klass = Pocket.new(sharing_service.access_token)
-      elsif params[:service] == 'readability'
-        klass = Readability.new(sharing_service.access_token, sharing_service.access_secret)
-      elsif params[:service] == 'instapaper'
-        klass = Instapaper.new(sharing_service.access_token, sharing_service.access_secret)
-      end
-      response = klass.add(entry.fully_qualified_url)
-      if response == 401
-        SharingService.remove_access(@user, params[:service])
-        url = sharing_services_path
-      end
-    else
-      response = 401
-      url = sharing_services_path
+    sharing_service = @user.supported_sharing_services.where(id: params[:id]).first!
+    status = sharing_service.share(params[:entry_id])
+    response = {service: sharing_service.label, status: status}
+    if status == 401
+      response[:url] = sharing_services_path
     end
-    render json: {service: sharing_service.label, status: response, url: url}.to_json
+    render json: response.to_json
   end
 
   def xauth_request
@@ -67,15 +67,6 @@ class SupportedSharingServicesController < ApplicationController
     end
   end
 
-  def oauth_request
-    @user = current_user
-    if params[:id] == 'pocket'
-      oauth_request_pocket
-    else
-      redirect_to sharing_services_url, alert: "Unknown service."
-    end
-  end
-
   def oauth_response
     @user = current_user
     if params[:id] == 'pocket'
@@ -93,13 +84,17 @@ class SupportedSharingServicesController < ApplicationController
 
   def oauth_response_pocket
     pocket = Pocket.new
-    supported_sharing_service = SupportedSharingService.find('pocket')
     response = pocket.oauth_authorize(session[:pocket_oauth_token])
     session.delete(:pocket_oauth_token)
     if response.code == 200
       access_token = response.parsed_response['access_token']
-      SharingService.create_or_update_supported_service(@user, supported_sharing_service, access_token: access_token)
-      redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
+      supported_sharing_service = @user.supported_sharing_services.first_or_initialize(service_id: 'pocket')
+      supported_sharing_service.update(access_token: access_token)
+      if supported_sharing_service.errors.any?
+        redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
+      else
+        redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
+      end
     elsif response.code == 403
       redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{supported_sharing_service.label}."
     else
@@ -108,7 +103,7 @@ class SupportedSharingServicesController < ApplicationController
         error_message: "Pocket::oauth_authorize Failure",
         parameters: response
       )
-      redirect_to sharing_services_url, alert: "Unknown #{supported_sharing_service.label} error."
+      redirect_to sharing_services_url, alert: "Unknown Pocket error."
     end
   end
 

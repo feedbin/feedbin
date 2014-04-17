@@ -1,32 +1,32 @@
 services = []
 
-services << SupportedSharingService.new(
+services << {
   service_id: 'pocket',
   label: 'Pocket',
   requires_auth: true,
-  type: 'oauth'
-)
+  service_type: 'oauth'
+}
 
-services << SupportedSharingService.new(
-  service_id: 'readability',
-  label: 'Readability',
-  requires_auth: true,
-  type: 'xauth'
-)
+# services << {
+#   service_id: 'readability',
+#   label: 'Readability',
+#   requires_auth: true,
+#   service_type: 'xauth'
+# }
+#
+# services << {
+#   service_id: 'instapaper',
+#   label: 'Instapaper',
+#   requires_auth: true,
+#   service_type: 'xauth'
+# }
+#
+# services << {
+#   service_id: 'email',
+#   label: 'Email',
+#   requires_auth: false,
+#   service_type: 'email'
+# }
 
-services << SupportedSharingService.new(
-  service_id: 'instapaper',
-  label: 'Instapaper',
-  requires_auth: true,
-  type: 'xauth'
-)
 
-services << SupportedSharingService.new(
-  service_id: 'email',
-  label: 'Email',
-  requires_auth: false,
-  type: 'email'
-)
-
-
-Feedbin::Application.config.supported_services = services.sort_by {|supported_service| supported_service.service_id}
+Feedbin::Application.config.supported_services = services

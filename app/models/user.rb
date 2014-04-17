@@ -18,6 +18,7 @@ class User < ActiveRecord::Base
   has_many :taggings, dependent: :delete_all
   has_many :tags, through: :taggings
   has_many :sharing_services, dependent: :delete_all
+  has_many :supported_sharing_services, dependent: :delete_all
   has_many :unread_entries, dependent: :delete_all
   has_many :starred_entries, dependent: :delete_all
   has_many :saved_searches, dependent: :delete_all
