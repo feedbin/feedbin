@@ -7,7 +7,7 @@ class SharingServicesController < ApplicationController
     supported_sharing_services.each do |sharing_service|
       @supported_sharing_services[sharing_service.service_id] = sharing_service
     end
-    @available_sharing_services = Feedbin::Application.config.supported_services.sort_by {|supported_service| supported_service[:service_id]}
+    @available_sharing_services = SupportedSharingService::SERVICES.sort_by {|supported_service| supported_service[:service_id]}
     render layout: 'settings'
   end
 

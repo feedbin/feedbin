@@ -1025,11 +1025,15 @@ th {
 		top: 16px;
 	}
 	.service-options {
-		padding-top: 20px;
+		overflow: hidden;
+		padding: 10px 0 0  40px;
 	}
 	small {
 		padding-left: 40px;
 		display: block;
+		&.hide {
+			display: none;
+		}
 	}
 	.service-options {
 		input, .cancel-button {

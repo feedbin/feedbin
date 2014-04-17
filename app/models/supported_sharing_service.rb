@@ -1,7 +1,36 @@
 class SupportedSharingService < ActiveRecord::Base
+
+  SERVICES = [
+    {
+      service_id: 'pocket',
+      label: 'Pocket',
+      requires_auth: true,
+      service_type: 'oauth'
+    },
+    {
+      service_id: 'readability',
+      label: 'Readability',
+      requires_auth: true,
+      service_type: 'xauth'
+    },
+    {
+      service_id: 'instapaper',
+      label: 'Instapaper',
+      requires_auth: true,
+      service_type: 'xauth'
+    },
+    {
+      service_id: 'email',
+      label: 'Email',
+      requires_auth: false,
+      service_type: 'email'
+    }
+  ].freeze
+
   store_accessor :settings, :access_token, :access_secret, :email_name, :email_address, :kindle_address
-  validates :service_id, presence: true, uniqueness: {scope: :user_id}, inclusion: { in: Feedbin::Application.config.supported_services.collect {|s| s[:service_id]} }
+  validates :service_id, presence: true, uniqueness: {scope: :user_id}, inclusion: { in: SERVICES.collect {|s| s[:service_id]} }
   belongs_to :user
+
 
   def share(entry_id)
     entry = Entry.find(entry_id)
@@ -39,8 +68,12 @@ class SupportedSharingService < ActiveRecord::Base
     end
   end
 
+  def self.info(service_id)
+    SERVICES.find {|service| service[:service_id] == service_id}
+  end
+
   def info
-    @info ||= Feedbin::Application.config.supported_services.find {|option| option[:service_id] = service_id}
+    SERVICES.find {|service| service[:service_id] == service_id}
   end
 
   def label
