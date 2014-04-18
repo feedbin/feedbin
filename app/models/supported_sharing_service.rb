@@ -5,25 +5,29 @@ class SupportedSharingService < ActiveRecord::Base
       service_id: 'pocket',
       label: 'Pocket',
       requires_auth: true,
-      service_type: 'oauth'
+      service_type: 'oauth',
+      html_options: {data: {behavior: 'supported_share'}}
     },
     {
       service_id: 'readability',
       label: 'Readability',
       requires_auth: true,
-      service_type: 'xauth'
+      service_type: 'xauth',
+      html_options: {data: {behavior: 'supported_share'}}
     },
     {
       service_id: 'instapaper',
       label: 'Instapaper',
       requires_auth: true,
-      service_type: 'xauth'
+      service_type: 'xauth',
+      html_options: {data: {behavior: 'supported_share'}}
     },
     {
       service_id: 'email',
       label: 'Email',
       requires_auth: false,
-      service_type: 'email'
+      service_type: 'email',
+      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'email_share_panel'}}
     }
   ].freeze
 
@@ -90,6 +94,10 @@ class SupportedSharingService < ActiveRecord::Base
 
   def auth_present?
     access_token.present?
+  end
+
+  def html_options
+    info[:html_options] || {}
   end
 
 end

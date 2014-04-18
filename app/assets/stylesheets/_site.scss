@@ -1985,11 +1985,14 @@ $saved-search-control-height: 48px;
 	}
 }
 
-.entry-settings-wrap {
+.entry-basement {
 	position: absolute;
-	top: $small-toolbar-height;
+	top: $toolbar-height + $small-toolbar-height;
 	left: 0;
 	width: 100%;
+	&.foreground {
+		z-index: 5;
+	}
 }
 
 .entry-settings {
@@ -2005,8 +2008,8 @@ $saved-search-control-height: 48px;
 	.full-screen & {
 		@include arrow(65px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right);
 	}
-	&.open:after,
-	&.open:before {
+	.entry-basement.open &:after,
+	.entry-basement.open &:before {
 		visibility: visible;
 	}
 	.setting-wrap {
@@ -4587,8 +4590,7 @@ Print
 	.app .bar,
 	.app .feeds-column,
 	.app .entries-column,
-	.app .entry-toolbar,
-	.entry-settings-wrap {
+	.app .entry-toolbar {
 		display: none !important;
 	}
 	.app .content,
@@ -4619,6 +4621,9 @@ Fullscreen
 	}
 	.app-panel {
 		border-top: none;
+	}
+	.entry-basement {
+		top: $small-toolbar-height;
 	}
 }
 
@@ -4931,6 +4936,54 @@ Media Queries
 		display: block;
 		&.no-content {
 			display: none;
+		}
+	}
+}
+
+.share-form {
+	@include background-color($drawer-background-color, $drawer-background-color-night);
+	padding: 17px;
+	border-bottom: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
+	h2 {
+		font-size: 16px;
+		@include color($text-header-color, $text-header-color-night);
+		font-weight: bold;
+		margin: 0 0 15px 0;
+	}
+	.field-cluster {
+		margin-bottom: 15px;
+		input, textarea {
+			width: 100%;
+			max-width: 100%;
+			margin: 0;
+			position: relative;
+			border-radius: 0;
+			border-bottom: none;
+			padding: 12px 12px 10px 12px !important;
+			&:focus {
+				@include border-color($border-color, $border-color-night);
+			}
+			&:first-child {
+				border-radius: 4px 4px 0 0;
+			}
+			&:last-child {
+				border-radius: 0 0 4px 4px;
+				border-bottom: 1px solid transparent;
+				@include border-color($border-color, $border-color-night);
+			}
+		}
+		textarea {
+			resize: none;
+		}
+	}
+	.button-wrap {
+		overflow: hidden;
+		input, button {
+			float: right;
+		}
+		.button-text {
+			margin-right: 15px;
 		}
 	}
 }

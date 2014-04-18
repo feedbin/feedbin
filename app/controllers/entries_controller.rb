@@ -330,11 +330,12 @@ class EntriesController < ApplicationController
             else
               target = '_self'
             end
+            html_options = {target: target, behavior: behavior}
           elsif sharing_service.class.name == 'SupportedSharingService'
             url = share_supported_sharing_service_path(sharing_service, entry)
-            behavior = 'supported_share'
+            html_options = sharing_service.html_options
           end
-          services << {label: sharing_service.label, url: url, target: target, behavior: behavior}
+          services << {url: url, label: sharing_service.label, html_options: html_options}
         end
       rescue Exception => e
         logger.info { e.inspect }

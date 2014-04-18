@@ -23,6 +23,7 @@ $.extend feedbin,
     $('[data-behavior~=pagination]').html(html)
 
   updateEntryContent: (html) ->
+    feedbin.closeEntryBasement(0)
     $('[data-behavior~=entry_content_target]').html(html)
 
   modalBox: (html) ->
@@ -38,7 +39,7 @@ $.extend feedbin,
     $('[data-behavior~=entries_target]').html('')
 
   clearEntry: ->
-    $('[data-behavior~=entry_content_target]' ).html('')
+    feedbin.updateEntryContent('')
 
   syntaxHighlight: ->
     $('[data-behavior~=entry_content_target] pre').each (i, e) ->
@@ -301,11 +302,29 @@ $.extend feedbin,
           context.fillRect(xPosition, yPosition, barWidth, height)
           xPosition = xPosition + barWidth + spaceWidth
 
-  closeEntrySettings: ->
+  closeEntryBasement: (timeout = 200) ->
+    feedbin.closeEntryBasementTimeount = setTimeout ( ->
+      $('.basement-panel').addClass('hide')
+    ), timeout
+    clearTimeout(feedbin.openEntryBasementTimeount)
+    $('.entry-basement').removeClass('foreground')
     top = $('.entry-toolbar').outerHeight()
-    $('.entry-settings').removeClass('open')
+    $('.entry-basement').removeClass('open')
     $('.entry-content').css
       top: top
+
+  openEntryBasement: (selectedPanel) ->
+    feedbin.openEntryBasementTimeount = setTimeout ( ->
+      $('.entry-basement').addClass('foreground')
+    ), 200
+    clearTimeout(feedbin.closeEntryBasementTimeount)
+    $('.basement-panel').addClass('hide')
+    selectedPanel.removeClass('hide')
+    $('.entry-basement').addClass('open')
+    newTop = $('.entry-toolbar').outerHeight() + selectedPanel.height()
+    $('.entry-content').css
+      top: newTop
+
 
   hideQueue: []
 
@@ -445,7 +464,6 @@ $.extend feedbin,
         handles: "e"
         minWidth: 200
         stop: (event, ui) ->
-          console.log ui
           form = $('[data-behavior~=resizable_form]')
           $('[name=column]', form).val($(ui.element).data('resizable-name'))
           $('[name=width]', form).val(ui.size.width)
@@ -691,27 +709,47 @@ $.extend feedbin,
         feedbin.refresh()
       ), 300000
 
-    entrySettings: ->
+    entryForms: ->
+      $('[data-behavior~=change_font]').val($("[data-font]").data('font'))
+      $('[data-behavior~=change_font]').change ->
+        fontContainer = $("[data-font]")
+        currentFont = fontContainer.data('font')
+        fontContainer.removeClass("font-#{currentFont}")
+        fontContainer.addClass("font-#{$(@).val()}")
+        fontContainer.data('font', $(@).val())
+        $(@).parents('form').submit()
+
       $(document).on 'click', (event, xhr) ->
-        if ($(event.target).hasClass('entry-settings') || $(event.target).parents('.entry-settings').length > 0)
+        if ($(event.target).hasClass('entry-basement') || $(event.target).parents('.entry-basement').length > 0)
           false
-        else if ($(event.target).hasClass('button-settings') || $(event.target).parents('.button-settings').length > 0) && !$('.entry-settings').hasClass('open')
-          top = $('.entry-toolbar').outerHeight() + $('.entry-settings').outerHeight()
-          $('.entry-settings').addClass('open')
-          $('[data-behavior="entry_settings_target"]').html($('[data-behavior="entry_settings_content"]').html())
-          $('[data-behavior~=change_font]').val($("[data-font]").data('font'))
-          $('[data-behavior~=change_font]').change ->
-            fontContainer = $("[data-font]")
-            currentFont = fontContainer.data('font')
-            fontContainer.removeClass("font-#{currentFont}")
-            fontContainer.addClass("font-#{$(@).val()}")
-            fontContainer.data('font', $(@).val())
-            $(@).parents('form').submit()
-          $('.entry-content').css
-            top: top
+
+        if !$(event.target).is('[data-behavior~=show_entry_basement]') && $(event.target).parents('.entry-basement').length == 0
+          feedbin.closeEntryBasement()
+        return
+
+      $(document).on 'click', '[data-behavior~=show_entry_basement]', (event, xhr) ->
+        panelName = $(@).data('basement-panel')
+        selectedPanel = $("[data-basement-panel-target=#{panelName}]")
+
+        if $('.entry-basement').hasClass('open')
+          if selectedPanel.hasClass('hide')
+            # There is another panel open, transition to the clicked on panel
+            console.log 'transition'
+          else
+            # The clicked on panel is alread open, close it
+            console.log 'close'
+            feedbin.closeEntryBasement()
         else
-          feedbin.closeEntrySettings()
-      return
+          feedbin.openEntryBasement(selectedPanel)
+
+        event.preventDefault()
+        return
+
+      $(document).on 'click', '[data-behavior~=close_entry_basement]', (event, xhr) ->
+        feedbin.closeEntryBasement()
+        event.preventDefault()
+        return
+
 
     feedSettings: ->
       $('[data-behavior~=sort_feeds]').change ->
@@ -740,7 +778,7 @@ $.extend feedbin,
     fullscreen: ->
       $(document).on 'click', '[data-behavior~=full_screen]', (event) ->
         feedbin.toggleFullScreen()
-        feedbin.closeEntrySettings()
+        feedbin.closeEntryBasement()
         event.preventDefault()
         return
 

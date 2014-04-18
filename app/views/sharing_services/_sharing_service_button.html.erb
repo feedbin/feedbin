@@ -6,7 +6,7 @@
     </a>
     <ul>
       <% services.each do |service| %>
-        <li><a href="<%= service[:url] %>" target="<%= service[:target] %>" data-behavior="<%= service[:behavior] %>"><%= service[:label] %></a></li>
+        <li><%= link_to service[:label], service[:url], service[:html_options] %></li>
       <% end %>
     </ul>
   </div>

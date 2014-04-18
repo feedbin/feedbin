@@ -89,6 +89,14 @@
       </div>
     </div>
     <% else %>
+    <div class="entry-basement">
+      <div class="basement-panel hide" data-basement-panel-target="settings_panel">
+        <%= render partial: 'shared/entry_settings' %>
+      </div>
+      <div class="basement-panel hide" data-basement-panel-target="email_share_panel">
+        <%= render partial: 'supported_sharing_services/share_form_email' %>
+      </div>
+    </div>
     <div class="entry-content-wrap <%= @user.entry_width %> font-size-<%= @user.font_size || 5 %> font-<%= @user.font || 'default' %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
     </div>
     <% end %>
@@ -97,9 +105,6 @@
 </div>
 
 <div class="hide" data-behavior="pagination"></div>
-<div class="hide" data-behavior="entry_settings_content">
-  <%= render partial: 'shared/entry_settings' %>
-</div>
 <%= render partial: "shared/keyboard_shortcuts_wrap" %>
 <%= render partial: "shared/data", locals: {mobile: false} %>
 <%= render partial: "shared/resizable_form" %>
