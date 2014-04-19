@@ -2,7 +2,7 @@
   <h2>Send Article via Email</h2>
   <%= form_tag('', remote: true) do %>
   <div class="field-cluster">
-    <%= email_field_tag :to, '', placeholder: 'To' %>
+    <%= text_field_tag :to, '', placeholder: 'To' %>
     <%= text_field_tag :subject, '', placeholder: 'Subject' %>
     <%= text_area_tag :body, '', rows: 5 %>
   </div>

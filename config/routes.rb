@@ -59,7 +59,7 @@ Feedbin::Application.routes.draw do
       get :oauth_request
       get :oauth_response
       post :xauth_request
-      post 'share/:entry_id', to: 'supported_sharing_services#share', as: :share
+      match 'share/:entry_id', to: 'supported_sharing_services#share', as: :share, via: [:get, :post]
     end
   end
 

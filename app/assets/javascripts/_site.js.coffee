@@ -306,7 +306,9 @@ $.extend feedbin,
     feedbin.closeEntryBasementTimeount = setTimeout ( ->
       $('.basement-panel').addClass('hide')
     ), timeout
+
     clearTimeout(feedbin.openEntryBasementTimeount)
+
     $('.entry-basement').removeClass('foreground')
     top = $('.entry-toolbar').outerHeight()
     $('.entry-basement').removeClass('open')
@@ -317,7 +319,12 @@ $.extend feedbin,
     feedbin.openEntryBasementTimeount = setTimeout ( ->
       $('.entry-basement').addClass('foreground')
     ), 200
+
     clearTimeout(feedbin.closeEntryBasementTimeount)
+
+    $('.field-cluster input, .field-cluster textarea').val('')
+    $('.field-cluster checkbox').attr('checked', false);
+
     $('.basement-panel').addClass('hide')
     selectedPanel.removeClass('hide')
     $('.entry-basement').addClass('open')
@@ -709,15 +716,7 @@ $.extend feedbin,
         feedbin.refresh()
       ), 300000
 
-    entryForms: ->
-      $('[data-behavior~=change_font]').val($("[data-font]").data('font'))
-      $('[data-behavior~=change_font]').change ->
-        fontContainer = $("[data-font]")
-        currentFont = fontContainer.data('font')
-        fontContainer.removeClass("font-#{currentFont}")
-        fontContainer.addClass("font-#{$(@).val()}")
-        fontContainer.data('font', $(@).val())
-        $(@).parents('form').submit()
+    entryBasement: ->
 
       $(document).on 'click', (event, xhr) ->
         if ($(event.target).hasClass('entry-basement') || $(event.target).parents('.entry-basement').length > 0)
@@ -750,6 +749,25 @@ $.extend feedbin,
         event.preventDefault()
         return
 
+      $(document).on 'submit', '.share-form form', (event, xhr) ->
+        feedbin.closeEntryBasement()
+        return
+
+    supportedSharing: ->
+      $(document).on 'click', '.button-toggle-share-menu [data-behavior~=show_entry_basement]', (event, xhr) ->
+        panelName = $(@).data('basement-panel')
+        selectedPanel = $("[data-basement-panel-target=#{panelName}]")
+        $('form', selectedPanel).attr('action', $(@).attr('href'))
+
+    formatToolbar: ->
+      $('[data-behavior~=change_font]').val($("[data-font]").data('font'))
+      $('[data-behavior~=change_font]').change ->
+        fontContainer = $("[data-font]")
+        currentFont = fontContainer.data('font')
+        fontContainer.removeClass("font-#{currentFont}")
+        fontContainer.addClass("font-#{$(@).val()}")
+        fontContainer.data('font', $(@).val())
+        $(@).parents('form').submit()
 
     feedSettings: ->
       $('[data-behavior~=sort_feeds]').change ->
@@ -972,22 +990,6 @@ $.extend feedbin,
     selectText: ->
       $(document).on 'mouseup', '[data-behavior~=select_text]', (event) ->
         $(@).select()
-        event.preventDefault()
-      return
-
-    supportedShare: ->
-      $(document).on 'click', '[data-behavior~=supported_share]', (event) ->
-        result = $.post $(@).attr('href')
-        result.always (data, textStatus, xhr) ->
-          if data
-            if data.status== 200
-              feedbin.showNotification("Link saved to #{data.service}")
-            else if data.status == 401
-              feedbin.showNotification("#{data.service} authentication error", 6000, data.url)
-            else
-              feedbin.showNotification("There was a problem connecting to #{data.service}.")
-          else
-            feedbin.showNotification("An unknown error occured")
         event.preventDefault()
       return
 

@@ -2002,7 +2002,7 @@ $saved-search-control-height: 48px;
 	@include border-color($border-color, $border-color-night);
 	@include background-color($drawer-background-color, $drawer-background-color-night);
 	@include arrow(20px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right) {
-		z-index: 3;
+		z-index: 10;
 		visibility: hidden;
 	}
 	.full-screen & {
@@ -4945,6 +4945,17 @@ Media Queries
 	padding: 17px;
 	border-bottom: 1px solid transparent;
 	@include border-color($border-color, $border-color-night);
+	@include arrow(201px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right) {
+		z-index: 10;
+		visibility: hidden;
+	}
+	.full-screen & {
+		@include arrow(246px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right);
+	}
+	.entry-basement.open &:after,
+	.entry-basement.open &:before {
+		visibility: visible;
+	}
 	h2 {
 		font-size: 16px;
 		@include color($text-header-color, $text-header-color-night);

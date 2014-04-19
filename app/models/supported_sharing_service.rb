@@ -5,22 +5,19 @@ class SupportedSharingService < ActiveRecord::Base
       service_id: 'pocket',
       label: 'Pocket',
       requires_auth: true,
-      service_type: 'oauth',
-      html_options: {data: {behavior: 'supported_share'}}
+      service_type: 'oauth'
     },
     {
       service_id: 'readability',
       label: 'Readability',
       requires_auth: true,
-      service_type: 'xauth',
-      html_options: {data: {behavior: 'supported_share'}}
+      service_type: 'xauth'
     },
     {
       service_id: 'instapaper',
       label: 'Instapaper',
       requires_auth: true,
-      service_type: 'xauth',
-      html_options: {data: {behavior: 'supported_share'}}
+      service_type: 'xauth'
     },
     {
       service_id: 'email',
@@ -36,26 +33,52 @@ class SupportedSharingService < ActiveRecord::Base
   belongs_to :user
 
 
-  def share(entry_id)
+  def share(entry_id, params = {})
     entry = Entry.find(entry_id)
+    self.send("share_with_#{service_id}", entry, params)
+  end
+
+  def share_with_pocket(entry, params)
+    klass = Pocket.new(access_token)
+    one_click_share(entry, klass)
+  end
+
+  def share_with_instapaper(entry, params)
+    klass = Instapaper.new(access_token, access_secret)
+    one_click_share(entry, klass)
+  end
+
+  def share_with_readability(entry, params)
+    klass = Readability.new(access_token, access_secret)
+    one_click_share(entry, klass)
+  end
+
+  def share_with_email(entry, params)
+    UserMailer.delay(queue: :critical).entry(user_id, entry.id, params[:to], params[:subject], params[:body])
+    {message: "Email sent to #{params[:to]}."}
+  end
+
+  def one_click_share(entry, klass)
+    url = nil
+    message = ''
 
     if active?
-      if service_id == 'pocket'
-        klass = Pocket.new(access_token)
-      elsif service_id == 'readability'
-        klass = Readability.new(access_token, access_secret)
-      elsif service_id == 'instapaper'
-        klass = Instapaper.new(access_token, access_secret)
-      end
-      response = klass.add(entry.fully_qualified_url)
-      if response == 401
+      status = klass.add(entry.fully_qualified_url)
+      if status == 200
+        message = "Link saved to #{label}."
+      elsif status == 401
         remove_access!
+        url = Rails.application.routes.url_helpers.sharing_services_path
+        message = "#{label} authentication error."
+      else
+        message = "There was a problem connecting to #{label}."
       end
     else
-      response = 401
+      url = Rails.application.routes.url_helpers.sharing_services_path
+      message = "#{label} authentication error."
     end
 
-    response
+    {message: message, url: url}
   end
 
   def remove_access!
@@ -97,7 +120,7 @@ class SupportedSharingService < ActiveRecord::Base
   end
 
   def html_options
-    info[:html_options] || {}
+    info[:html_options] || {remote: true}
   end
 
 end

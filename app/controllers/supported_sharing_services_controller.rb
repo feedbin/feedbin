@@ -49,12 +49,7 @@ class SupportedSharingServicesController < ApplicationController
   def share
     @user = current_user
     sharing_service = @user.supported_sharing_services.where(id: params[:id]).first!
-    status = sharing_service.share(params[:entry_id])
-    response = {service: sharing_service.label, status: status}
-    if status == 401
-      response[:url] = sharing_services_path
-    end
-    render json: response.to_json
+    @response = sharing_service.share(params[:entry_id], params)
   end
 
   def xauth_request(service_id)
