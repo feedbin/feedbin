@@ -31,24 +31,9 @@ class UserMailer < ActionMailer::Base
     mail to: @user.email, subject: '[Feedbin] Starred Items Export Complete'
   end
 
-  def entry(user_id, entry_id, to, subject, body)
-    @user = User.find(user_id)
+  def entry(entry_id, to, subject, body, reply_to, email_name)
     @entry = Entry.find(entry_id)
     @body = body
-
-    sharing_service = @user.supported_sharing_services.where(service_id: 'email').first
-
-    if sharing_service.present? && sharing_service.email_address.present?
-      reply_to = sharing_service.email_address
-    else
-      reply_to = @user.email
-    end
-
-    if sharing_service.present? && sharing_service.email_name.present?
-      email_name = sharing_service.email_name
-    else
-      email_name = @user.email
-    end
 
     if subject.blank?
       subject = @entry.title
@@ -57,7 +42,13 @@ class UserMailer < ActionMailer::Base
     headers['X-MC-InlineCSS'] = "true"
     headers['X-MC-Autotext'] = "true"
     headers['X-MC-SigningDomain'] = "feedbin.io"
-    mail to: to, subject: subject, reply_to: reply_to, from: "#{email_name} <notifications@feedbin.io>"
+    mail to: to, subject: subject, reply_to: reply_to, from: "#{email_name} <#{ENV['NOTIFICATION_EMAIL']}>"
+  end
+
+  def kindle(entry_id, kindle_address)
+    @entry = Entry.find(entry_id)
+    attachments["#{@entry.title}.html"] = render_to_string
+    mail to: kindle_address, subject: @entry.title, body: '', from: ENV['KINDLE_EMAIL']
   end
 
 end

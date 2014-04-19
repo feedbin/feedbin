@@ -25,6 +25,12 @@ class SupportedSharingService < ActiveRecord::Base
       requires_auth: false,
       service_type: 'email',
       html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'email_share_panel'}}
+    },
+    {
+      service_id: 'kindle',
+      label: 'Kindle',
+      requires_auth: false,
+      service_type: 'kindle'
     }
   ].freeze
 
@@ -54,31 +60,43 @@ class SupportedSharingService < ActiveRecord::Base
   end
 
   def share_with_email(entry, params)
-    UserMailer.delay(queue: :critical).entry(user_id, entry.id, params[:to], params[:subject], params[:body])
+    reply_to = (email_address.present?) ? email_address : user.email
+    from_name = (email_name.present?) ? email_name : user.email
+    UserMailer.delay(queue: :critical).entry(entry.id, params[:to], params[:subject], params[:body], reply_to, from_name)
     {message: "Email sent to #{params[:to]}."}
   end
 
+  def share_with_kindle(entry, params)
+    response = {}
+    if kindle_address
+      UserMailer.delay(queue: :critical).kindle(entry.id, kindle_address)
+      response[:message] = "Article sent to #{label}."
+    else
+      response[:message] = "Please provide a #{label} email address."
+      response[:url] = Rails.application.routes.url_helpers.sharing_services_path
+    end
+    response
+  end
+
   def one_click_share(entry, klass)
-    url = nil
-    message = ''
+    response = {}
 
     if active?
       status = klass.add(entry.fully_qualified_url)
       if status == 200
-        message = "Link saved to #{label}."
+        response[:message] = "Link saved to #{label}."
       elsif status == 401
         remove_access!
-        url = Rails.application.routes.url_helpers.sharing_services_path
-        message = "#{label} authentication error."
+        response[:url] = Rails.application.routes.url_helpers.sharing_services_path
+        response[:message] = "#{label} authentication error."
       else
-        message = "There was a problem connecting to #{label}."
+        response[:message] = "There was a problem connecting to #{label}."
       end
     else
-      url = Rails.application.routes.url_helpers.sharing_services_path
-      message = "#{label} authentication error."
+      response[:url] = Rails.application.routes.url_helpers.sharing_services_path
+      response[:message] = "#{label} authentication error."
     end
-
-    {message: message, url: url}
+    response
   end
 
   def remove_access!

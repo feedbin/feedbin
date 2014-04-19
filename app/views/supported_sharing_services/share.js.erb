@@ -1,5 +1,5 @@
 <% if @response[:url].present? %>
-  feedbin.showNotification("<%= @response[:message] %>", 6000, @response[:url]);
+  feedbin.showNotification("<%= j @response[:message] %>", 6000, "<%= j @response[:url] %>");
 <% else %>
-  feedbin.showNotification("<%= @response[:message] %>");
+  feedbin.showNotification("<%= j @response[:message] %>");
 <% end %>
