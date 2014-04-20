@@ -31,6 +31,13 @@ class SupportedSharingService < ActiveRecord::Base
       label: 'Kindle',
       requires_auth: false,
       service_type: 'kindle'
+    },
+    {
+      service_id: 'pinboard',
+      label: 'Pinboard',
+      requires_auth: true,
+      service_type: 'pinboard',
+      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'pinboard_share_panel'}}
     }
   ].freeze
 
@@ -39,37 +46,57 @@ class SupportedSharingService < ActiveRecord::Base
   belongs_to :user
 
 
-  def share(entry_id, params = {})
-    entry = Entry.find(entry_id)
-    self.send("share_with_#{service_id}", entry, params)
+  def share(params)
+    self.send("share_with_#{service_id}", params)
   end
 
-  def share_with_pocket(entry, params)
+  def share_with_pocket(params)
     klass = Pocket.new(access_token)
-    one_click_share(entry, klass)
+    one_click_share(params, klass)
   end
 
-  def share_with_instapaper(entry, params)
+  def share_with_instapaper(params)
     klass = Instapaper.new(access_token, access_secret)
-    one_click_share(entry, klass)
+    one_click_share(params, klass)
   end
 
-  def share_with_readability(entry, params)
+  def share_with_readability(params)
     klass = Readability.new(access_token, access_secret)
-    one_click_share(entry, klass)
+    one_click_share(params, klass)
   end
 
-  def share_with_email(entry, params)
+  def share_with_pinboard(params)
+    response = {}
+    if active?
+      pinboard = Pinboard.new(access_token)
+      status = pinboard.add(params)
+      if status == 200
+        response[:message] = "Link saved to #{label}."
+      elsif status == 401
+        remove_access!
+        response[:url] = Rails.application.routes.url_helpers.sharing_services_path
+        response[:message] = "#{label} authentication error."
+      else
+        response[:message] = "There was a problem connecting to #{label}."
+      end
+    else
+      response[:url] = Rails.application.routes.url_helpers.sharing_services_path
+      response[:message] = "#{label} authentication error."
+    end
+    response
+  end
+
+  def share_with_email(params)
     reply_to = (email_address.present?) ? email_address : user.email
     from_name = (email_name.present?) ? email_name : user.email
-    UserMailer.delay(queue: :critical).entry(entry.id, params[:to], params[:subject], params[:body], reply_to, from_name)
+    UserMailer.delay(queue: :critical).entry(params[:entry_id], params[:to], params[:subject], params[:body], reply_to, from_name)
     {message: "Email sent to #{params[:to]}."}
   end
 
-  def share_with_kindle(entry, params)
+  def share_with_kindle(params)
     response = {}
     if kindle_address
-      UserMailer.delay(queue: :critical).kindle(entry.id, kindle_address)
+      UserMailer.delay(queue: :critical).kindle(params[:entry_id], kindle_address)
       response[:message] = "Article sent to #{label}."
     else
       response[:message] = "Please provide a #{label} email address."
@@ -78,8 +105,9 @@ class SupportedSharingService < ActiveRecord::Base
     response
   end
 
-  def one_click_share(entry, klass)
+  def one_click_share(params, klass)
     response = {}
+    entry = Entry.find(params[:entry_id])
 
     if active?
       status = klass.add(entry.fully_qualified_url)

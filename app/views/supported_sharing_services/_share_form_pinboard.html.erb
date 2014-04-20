@@ -1,0 +1,23 @@
+<div class="share-form">
+  <h2>Save to Pinboard</h2>
+  <%= form_tag('', remote: true) do %>
+  <%= hidden_field_tag :url, '', class: 'url-placeholder' %>
+  <div class="field-cluster">
+    <%= text_field_tag :description, '', placeholder: 'Title', class: 'title-placeholder' %>
+    <%= text_area_tag :extended, '', rows: 5, placeholder: 'Description', class: 'description-placeholder' %>
+    <%= text_field_tag :tags, '', placeholder: 'Tags (space separated)' %>
+  </div>
+  <div class="share-checkboxes">
+    <label class="checkbox">
+      <%= check_box_tag :shared, 'no' %> Private
+    </label>
+    <label class="checkbox">
+      <%= check_box_tag :toread, 'yes' %> Read Later
+    </label>
+  </div>
+  <div class="button-wrap">
+    <%= submit_tag "Save", class: 'button' %>
+    <%= button_tag "Cancel", class: 'button button-text', data: {behavior: 'close_entry_basement'} %>
+  </div>
+  <% end %>
+</div>

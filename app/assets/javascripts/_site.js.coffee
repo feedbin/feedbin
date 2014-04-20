@@ -262,6 +262,14 @@ $.extend feedbin,
     $('.feeds-inner').removeClass('show-subscribe')
     $('.subscribe-wrap').removeClass('open')
 
+  getSelectedText: ->
+    text = ""
+    if (window.getSelection)
+      text = window.getSelection().toString();
+    else if (document.selection && document.selection.type != "Control")
+      text = document.selection.createRange().text;
+    text
+
   scrollTo: (item, container) ->
     item.offset().top - container.offset().top + container.scrollTop()
 
@@ -315,6 +323,19 @@ $.extend feedbin,
     $('.entry-content').css
       top: top
 
+  prepareShareForm: ->
+    $('.field-cluster input, .field-cluster textarea').val('')
+    $('.share-checkboxes [type="checkbox"]').attr('checked', false);
+
+    title = $('.entry-header h1').first().text()
+    $('.share-form .title-placeholder').val(title)
+
+    url = $('.entry-header a').first().attr('href')
+    $('.share-form .url-placeholder').val(url)
+
+    description = feedbin.getSelectedText()
+    $('.share-form .description-placeholder').val(description )
+
   openEntryBasement: (selectedPanel) ->
     feedbin.openEntryBasementTimeount = setTimeout ( ->
       $('.entry-basement').addClass('foreground')
@@ -322,8 +343,7 @@ $.extend feedbin,
 
     clearTimeout(feedbin.closeEntryBasementTimeount)
 
-    $('.field-cluster input, .field-cluster textarea').val('')
-    $('.field-cluster checkbox').attr('checked', false);
+    feedbin.prepareShareForm()
 
     $('.basement-panel').addClass('hide')
     selectedPanel.removeClass('hide')
@@ -733,10 +753,10 @@ $.extend feedbin,
         if $('.entry-basement').hasClass('open')
           if selectedPanel.hasClass('hide')
             # There is another panel open, transition to the clicked on panel
-            console.log 'transition'
+            feedbin.closeEntryBasement()
+            feedbin.openEntryBasement(selectedPanel)
           else
             # The clicked on panel is alread open, close it
-            console.log 'close'
             feedbin.closeEntryBasement()
         else
           feedbin.openEntryBasement(selectedPanel)

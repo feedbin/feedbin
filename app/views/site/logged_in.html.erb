@@ -96,6 +96,9 @@
       <div class="basement-panel hide" data-basement-panel-target="email_share_panel">
         <%= render partial: 'supported_sharing_services/share_form_email' %>
       </div>
+      <div class="basement-panel hide" data-basement-panel-target="pinboard_share_panel">
+        <%= render partial: 'supported_sharing_services/share_form_pinboard' %>
+      </div>
     </div>
     <div class="entry-content-wrap <%= @user.entry_width %> font-size-<%= @user.font_size || 5 %> font-<%= @user.font || 'default' %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
     </div>

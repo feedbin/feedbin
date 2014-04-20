@@ -39,7 +39,7 @@ class SupportedSharingServicesController < ApplicationController
   def authorize_service(service_id)
     if service_id == 'pocket'
       oauth_request_pocket
-    elsif %w{instapaper readability}.include?(service_id)
+    elsif %w{instapaper readability pinboard}.include?(service_id)
       xauth_request(service_id)
     else
       redirect_to sharing_services_url, alert: "Unknown service."
@@ -49,7 +49,7 @@ class SupportedSharingServicesController < ApplicationController
   def share
     @user = current_user
     sharing_service = @user.supported_sharing_services.where(id: params[:id]).first!
-    @response = sharing_service.share(params[:entry_id], params)
+    @response = sharing_service.share(params)
   end
 
   def xauth_request(service_id)
@@ -60,12 +60,14 @@ class SupportedSharingServicesController < ApplicationController
       klass = Readability.new
     elsif service_id == 'instapaper'
       klass = Instapaper.new
+    elsif service_id == 'pinboard'
+      klass = Pinboard.new
     end
 
     begin
       response = klass.request_token(params[:username], params[:password])
       if response.token && response.secret
-        supported_sharing_service = @user.supported_sharing_services.first_or_initialize(service_id: service_id)
+        supported_sharing_service = @user.supported_sharing_services.where(service_id: service_id).first_or_initialize
         supported_sharing_service.update(access_token: response.token, access_secret: response.secret)
         if supported_sharing_service.errors.any?
           redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
@@ -73,12 +75,12 @@ class SupportedSharingServicesController < ApplicationController
           redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
         end
       else
-        redirect_to sharing_services_url, notice: "Unknown #{service_info[:label]} error."
+        redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
       end
     rescue OAuth::Unauthorized
-      redirect_to sharing_services_url, notice: "Invalid username or password."
+      redirect_to sharing_services_url, alert: "Invalid #{service_info[:label]} username or password."
     rescue
-      redirect_to sharing_services_url, notice: "Unknown #{service_info[:label]} error."
+      redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
     end
   end
 
@@ -103,7 +105,7 @@ class SupportedSharingServicesController < ApplicationController
     session.delete(:pocket_oauth_token)
     if response.code == 200
       access_token = response.parsed_response['access_token']
-      supported_sharing_service = @user.supported_sharing_services.first_or_initialize(service_id: 'pocket')
+      supported_sharing_service = @user.supported_sharing_services.where(service_id: 'pocket').first_or_initialize
       supported_sharing_service.update(access_token: access_token)
       if supported_sharing_service.errors.any?
         redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')

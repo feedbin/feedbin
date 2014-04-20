@@ -1054,6 +1054,18 @@ th {
 			margin-top: 7px;
 		}
 	}
+	.icon-share-pinboard {
+		background: image-url("icon-share-pinboard.svg") 0 3px no-repeat;
+		background-size: 25px 25px;
+	}
+	.icon-share-kindle {
+		background: image-url("icon-share-kindle.png") 0 3px no-repeat;
+		background-size: 25px 24px;
+	}
+	.icon-share-email {
+		background: image-url("icon-share-email.svg") 0 6px no-repeat;
+		background-size: 24px 16px;
+	}
 	.icon-share-instapaper {
 		background: image-url("icon-share-instapaper.svg") 7px 2px no-repeat;
 		background-size: 10px 23px;
@@ -4965,6 +4977,8 @@ Media Queries
 	.field-cluster {
 		margin-bottom: 15px;
 		input, textarea {
+			@include background-color(#FFF, #191c20);
+			@include color($text-header-color, $text-header-color-night);
 			width: 100%;
 			max-width: 100%;
 			margin: 0;
@@ -4986,6 +5000,21 @@ Media Queries
 		}
 		textarea {
 			resize: none;
+		}
+	}
+	.share-checkboxes {
+		overflow: hidden;
+		.checkbox {
+			float: left;
+			margin-left: 15px;
+			font-size: 14px;
+			@include color($text-color-light-night, $text-color-light-night);
+			&:first-child {
+				margin-left: 0
+			}
+			input {
+				margin-top: 2px;
+			}
 		}
 	}
 	.button-wrap {
