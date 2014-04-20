@@ -25,7 +25,7 @@ class Pocket
     self.class.post('/oauth/request', options)
   end
 
-  def oauth_authorize(code)
+  def oauth2_authorize(code)
     options = {
       body: {consumer_key: ENV['POCKET_CONSUMER_KEY'], code: code}.to_json
     }
@@ -40,7 +40,7 @@ class Pocket
   end
 
   def redirect_uri
-    Rails.application.routes.url_helpers.oauth_response_supported_sharing_service_url('pocket', host: ENV['PUSH_URL'])
+    Rails.application.routes.url_helpers.oauth2_response_supported_sharing_service_url('pocket', host: ENV['PUSH_URL'])
   end
 
 end

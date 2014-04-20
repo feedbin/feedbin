@@ -38,6 +38,12 @@ class SupportedSharingService < ActiveRecord::Base
       requires_auth: true,
       service_type: 'pinboard',
       html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'pinboard_share_panel'}}
+    },
+    {
+      service_id: 'tumblr',
+      label: 'Tumblr',
+      requires_auth: true,
+      service_type: 'oauth'
     }
   ].freeze
 
@@ -125,6 +131,11 @@ class SupportedSharingService < ActiveRecord::Base
       response[:message] = "#{label} authentication error."
     end
     response
+  end
+
+  def tumblr_info
+    tumblr = Tumblr.new(access_token, access_secret)
+    tumblr.user_info
   end
 
   def remove_access!

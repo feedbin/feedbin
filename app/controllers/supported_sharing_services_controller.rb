@@ -38,7 +38,9 @@ class SupportedSharingServicesController < ApplicationController
 
   def authorize_service(service_id)
     if service_id == 'pocket'
-      oauth_request_pocket
+      oauth2_request_pocket
+    elsif service_id == 'tumblr'
+      oauth_request(service_id)
     elsif %w{instapaper readability pinboard}.include?(service_id)
       xauth_request(service_id)
     else
@@ -84,12 +86,34 @@ class SupportedSharingServicesController < ApplicationController
     end
   end
 
-  def oauth_response
+  def oauth2_response
     @user = current_user
     if params[:id] == 'pocket'
-      oauth_response_pocket
+      oauth2_response_pocket
     else
       redirect_to sharing_services_url, alert: "Unknown service."
+    end
+  end
+
+  def oauth_response
+    @user = current_user
+    if params[:id] == 'tumblr'
+      tumblr = Tumblr.new
+      service_info = SupportedSharingService.info(params[:id])
+      if params[:oauth_verifier].present?
+        access_token = tumblr.request_access(session[:tumblr_token], session[:tumblr_secret], params[:oauth_verifier])
+        session.delete(:tumblr_token)
+        session.delete(:tumblr_secret)
+        supported_sharing_service = @user.supported_sharing_services.where(service_id: params[:id]).first_or_initialize
+        supported_sharing_service.update(access_token: access_token.token, access_secret: access_token.secret)
+        if supported_sharing_service.errors.any?
+          redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
+        else
+          redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
+        end
+      else
+        redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{service_info[:label]}."
+      end
     end
   end
 
@@ -99,10 +123,10 @@ class SupportedSharingServicesController < ApplicationController
     params.require(:supported_sharing_service).permit(:service_id, :email_name, :email_address, :kindle_address)
   end
 
-  def oauth_response_pocket
+  def oauth2_response_pocket
     pocket = Pocket.new
-    response = pocket.oauth_authorize(session[:pocket_oauth_token])
-    session.delete(:pocket_oauth_token)
+    response = pocket.oauth2_authorize(session[:pocket_oauth2_token])
+    session.delete(:pocket_oauth2_token)
     if response.code == 200
       access_token = response.parsed_response['access_token']
       supported_sharing_service = @user.supported_sharing_services.where(service_id: 'pocket').first_or_initialize
@@ -117,19 +141,19 @@ class SupportedSharingServicesController < ApplicationController
     else
       Honeybadger.notify(
         error_class: "Pocket",
-        error_message: "Pocket::oauth_authorize Failure",
+        error_message: "Pocket::oauth2_authorize Failure",
         parameters: response
       )
       redirect_to sharing_services_url, alert: "Unknown #{SupportedSharingService.info('pocket')[:label]} error."
     end
   end
 
-  def oauth_request_pocket
+  def oauth2_request_pocket
     pocket = Pocket.new
     response = pocket.request_token
     if response.code == 200
       token = response.parsed_response['code']
-      session[:pocket_oauth_token] = token
+      session[:pocket_oauth2_token] = token
       redirect_to pocket.redirect_url(token)
     else
       Honeybadger.notify(
@@ -138,6 +162,20 @@ class SupportedSharingServicesController < ApplicationController
         parameters: response
       )
       redirect_to sharing_services_url, notice: "Unknown #{SupportedSharingService.info('pocket')[:label]} error."
+    end
+  end
+
+  def oauth_request(service_id)
+    if 'tumblr' == service_id
+      klass = Tumblr.new
+    end
+    response = klass.request_token
+    if response.token && response.secret
+      session[:tumblr_token] = response.token
+      session[:tumblr_secret] = response.secret
+      redirect_to response.authorize_url
+    else
+      redirect_to sharing_services_url, notice: "Unknown #{SupportedSharingService.info(service_id)[:label]} error."
     end
   end
 
