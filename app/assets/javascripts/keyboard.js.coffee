@@ -278,7 +278,7 @@ class feedbin.Keyboard
     if @item.length > 0
       @itemPosition = @getItemPosition()
       unless @itemInView()
-        @scrollOne()
+        @scrollItemToMiddle()
       @selected.removeClass('selected')
       @item.addClass('selected')
       @clickItem()
@@ -371,16 +371,8 @@ class feedbin.Keyboard
     bottom: (@item.offset().top - @columnOffsetTop) + @item.outerHeight() - drawer
     top: (@item.offset().top - @columnOffsetTop)
 
-  scrollOne: ->
-    if @itemAboveView
-      @scrollColumn @scrollTop + @itemPosition.top
-    else if @itemBelowView
-      if @selectedColumnName() == 'entries'
-        offset = 17 # above chrome's status bar
-      else
-        offset = 0
-      @scrollColumn (@itemPosition.bottom + @scrollTop + offset) - @containerHeight
-    else
+  scrollItemToMiddle: ->
+    @scrollColumn ((@scrollTop + @itemPosition.bottom) - (@containerHeight / 2))
 
   scrollColumn: (position) ->
     @selectedColumn.prop 'scrollTop', position
