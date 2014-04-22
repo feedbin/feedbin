@@ -43,7 +43,8 @@ class SupportedSharingService < ActiveRecord::Base
       service_id: 'tumblr',
       label: 'Tumblr',
       requires_auth: true,
-      service_type: 'oauth'
+      service_type: 'oauth',
+      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'tumblr_share_panel'}}
     }
   ].freeze
 

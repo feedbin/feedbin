@@ -16,7 +16,8 @@ content_tag :div, '',
     font_sizes: Feedbin::Application.config.font_sizes.to_json,
     mark_as_read_path: mark_all_as_read_entries_path,
     mark_as_read_confirmation: (@user.mark_as_read_confirmation == '1'),
-    mark_direction_as_read_entries: mark_direction_as_read_entries_path
+    mark_direction_as_read_entries: mark_direction_as_read_entries_path,
+    lazy_data_path: lazy_data_path
   },
   class: 'hide',
   id: 'feedbin-data'

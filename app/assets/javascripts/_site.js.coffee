@@ -325,7 +325,7 @@ $.extend feedbin,
 
   prepareShareForm: ->
     $('.field-cluster input, .field-cluster textarea').val('')
-    $('.share-checkboxes [type="checkbox"]').attr('checked', false);
+    $('.share-controls [type="checkbox"]').attr('checked', false);
 
     title = $('.entry-header h1').first().text()
     $('.share-form .title-placeholder').val(title)
@@ -390,6 +390,8 @@ $.extend feedbin,
         searchField.val(query)
         searchField.parents('form').submit()
 
+    lazyData: ->
+      $.get(feedbin.data.lazyDataPath)
 
     markRead: ->
       $(document).on 'click', '[data-mark-read]', ->

@@ -40,6 +40,19 @@ class SiteController < ApplicationController
     render layout: 'sub_page'
   end
 
+  def lazy_data
+    @tumblr_hosts = []
+    @user = current_user
+    # tumblr = @user.supported_sharing_services.where(service_id: 'tumblr').first
+    # if tumblr.present?
+    #   info = tumblr.tumblr_info
+    #   if info['response'].present?
+    #     @tumblr_hosts = info['response']['user']['blogs'].collect {|blog| URI.parse(blog['url']).host }
+    #   end
+    # end
+    @tumblr_hosts << ['feedbin-inc.tumblr.com']
+  end
+
   def manifest; end
 
   private

@@ -1,0 +1,3 @@
+<% if @tumblr_hosts.any? %>
+$('.tumblr-hosts-placeholder').html("<%= j options_for_select(@tumblr_hosts) %>");
+<% end %>
