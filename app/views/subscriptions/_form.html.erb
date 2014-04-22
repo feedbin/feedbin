@@ -1,5 +1,0 @@
-<%= form_for :subscription, url: subscriptions_path, remote: true, html: { data: {behavior: 'subscription_form'}, novalidate: 'novalidate' }  do |f| %>
-  <%= f.fields_for :feeds do |builder| %>
-    <%= builder.url_field :feed_url, placeholder: 'Feed or URL' %>
-  <% end %>
-<% end %>
