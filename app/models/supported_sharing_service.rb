@@ -59,24 +59,42 @@ class SupportedSharingService < ActiveRecord::Base
 
   def share_with_pocket(params)
     klass = Pocket.new(access_token)
-    one_click_share(params, klass)
+    authenticated_share(params, klass)
   end
 
   def share_with_instapaper(params)
     klass = Instapaper.new(access_token, access_secret)
-    one_click_share(params, klass)
+    authenticated_share(params, klass)
   end
 
   def share_with_readability(params)
     klass = Readability.new(access_token, access_secret)
-    one_click_share(params, klass)
+    authenticated_share(params, klass)
   end
 
   def share_with_pinboard(params)
+    klass = Pinboard.new(access_token)
+    authenticated_share(params, klass)
+  end
+
+  def share_with_tumblr(params)
+    klass = Tumblr.new(access_token, access_secret)
+    authenticated_share(params, klass)
+  end
+
+  def share_with_email(params)
+    reply_to = (email_address.present?) ? email_address : user.email
+    from_name = (email_name.present?) ? email_name : user.email
+    UserMailer.delay(queue: :critical).entry(params[:entry_id], params[:to], params[:subject], params[:body], reply_to, from_name)
+    {message: "Email sent to #{params[:to]}."}
+  end
+
+  def authenticated_share(params, klass)
     response = {}
+    entry = Entry.find(params[:entry_id])
+    params['entry_url'] = entry.fully_qualified_url
     if active?
-      pinboard = Pinboard.new(access_token)
-      status = pinboard.add(params)
+      status = klass.add(params)
       if status == 200
         response[:message] = "Link saved to #{label}."
       elsif status == 401
@@ -91,13 +109,6 @@ class SupportedSharingService < ActiveRecord::Base
       response[:message] = "#{label} authentication error."
     end
     response
-  end
-
-  def share_with_email(params)
-    reply_to = (email_address.present?) ? email_address : user.email
-    from_name = (email_name.present?) ? email_name : user.email
-    UserMailer.delay(queue: :critical).entry(params[:entry_id], params[:to], params[:subject], params[:body], reply_to, from_name)
-    {message: "Email sent to #{params[:to]}."}
   end
 
   def share_with_kindle(params)
@@ -108,28 +119,6 @@ class SupportedSharingService < ActiveRecord::Base
     else
       response[:message] = "Please provide a #{label} email address."
       response[:url] = Rails.application.routes.url_helpers.sharing_services_path
-    end
-    response
-  end
-
-  def one_click_share(params, klass)
-    response = {}
-    entry = Entry.find(params[:entry_id])
-
-    if active?
-      status = klass.add(entry.fully_qualified_url)
-      if status == 200
-        response[:message] = "Link saved to #{label}."
-      elsif status == 401
-        remove_access!
-        response[:url] = Rails.application.routes.url_helpers.sharing_services_path
-        response[:message] = "#{label} authentication error."
-      else
-        response[:message] = "There was a problem connecting to #{label}."
-      end
-    else
-      response[:url] = Rails.application.routes.url_helpers.sharing_services_path
-      response[:message] = "#{label} authentication error."
     end
     response
   end

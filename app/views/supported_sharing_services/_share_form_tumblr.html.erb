@@ -1,22 +1,27 @@
 <div class="share-form">
-  <h2>Publish to Tumblr</h2>
+  <h2>Post Link to Tumblr</h2>
   <%= form_tag('', remote: true) do %>
   <%= hidden_field_tag :url, '', class: 'url-placeholder' %>
   <div class="field-cluster">
-    <%= text_area_tag :description, '', rows: 5, placeholder: 'Description (Markdown enabled)', class: 'description-placeholder' %>
+    <%= text_field_tag :title, '', placeholder: 'Title', class: 'title-placeholder' %>
+    <%= text_area_tag :description, '', rows: 5, placeholder: 'Description', class: 'description-placeholder' %>
     <%= text_field_tag :tags, '', placeholder: 'Tags (comma separated)' %>
   </div>
   <div class="share-controls">
     <div class="control">
+      Format <%= select_tag "format", options_for_select({'Markdown' => 'markdown', 'HTML' => 'html'}, "markdown") %>
+    </div>
+    <div class="control">
       Publish to <select name="site" class="tumblr-hosts-placeholder"></select>
     </div>
     <div class="control">
-      Status <%= select_tag "status", options_for_select({'Published' => 'published', 'Draft' => 'draft'}, "published") %>
+      Status <%= select_tag "state", options_for_select({'Published' => 'published', 'Draft' => 'draft', 'Queue' => 'queue', 'Private' => 'private'}, "published") %>
     </div>
   </div>
   <div class="button-wrap">
-    <%= submit_tag "Publish", class: 'button' %>
+    <%= submit_tag "Post", class: 'button' %>
     <%= button_tag "Cancel", class: 'button button-text', data: {behavior: 'close_entry_basement'} %>
   </div>
   <% end %>
 </div>
+

@@ -46,5 +46,31 @@ class Tumblr
     JSON.load(result.body)
   end
 
+  def add(params)
+    options = {
+      type: 'link',
+      url: params['entry_url'],
+      format: params['format'],
+      state: params['state']
+    }
+    if params['title'].present?
+      options[:title] = params['title']
+    end
+    if params['description'].present?
+      options[:description] = params['description']
+    end
+    if params['tags'].present?
+      options[:tags] = params['tags']
+    end
+    response = @client.post("#{API_URL}/blog/#{params[:site]}/post", options)
+    code = response.code.to_i
+    if code == 201
+      code = 200
+    end
+    code
+  end
+
+
+
 
 end

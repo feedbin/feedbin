@@ -32,9 +32,9 @@ class Pocket
     self.class.post('/oauth/authorize', options)
   end
 
-  def add(url)
+  def add(params)
     options = {
-      body: { url: url, access_token: @access_token, consumer_key: ENV['POCKET_CONSUMER_KEY'] }.to_json
+      body: { url: params['entry_url'], access_token: @access_token, consumer_key: ENV['POCKET_CONSUMER_KEY'] }.to_json
     }
     self.class.post('/add', options).code
   end

@@ -17,8 +17,8 @@ class Instapaper
     consumer.get_access_token(nil, {}, { x_auth_username: username, x_auth_password: password, x_auth_mode: 'client_auth' })
   end
 
-  def add(url)
-    response = @client.post('/api/1/bookmarks/add', {url: url})
+  def add(params)
+    response = @client.post('/api/1/bookmarks/add', {url: params['entry_url']})
     code = response.code.to_i
     if code == 201
       code = 200
