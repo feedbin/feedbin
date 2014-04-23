@@ -37,8 +37,8 @@ class ActionsController < ApplicationController
           params[:user][:actions_attributes][index][:feed_ids] = all_feeds
         end
       end
+      params.require(:user).permit!
     end
-    params.require(:user).permit!
   end
 
 end
