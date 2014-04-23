@@ -981,11 +981,6 @@ $.extend feedbin,
           next.find('a').click()
         return
 
-    menu: ->
-      $(document).on 'click', '[data-behavior~=show_menu]', ->
-        $(@).siblings('.settings-nav').toggleClass('open')
-        return
-
     viewLatest: ->
       $(document).on 'click', '.view-latest-link', ->
         $('.entries .selected a').click()
@@ -1014,6 +1009,13 @@ $.extend feedbin,
         $(@).select()
         event.preventDefault()
       return
+
+    showSettingsModal: ->
+      $(document).on 'mouseup', '[data-behavior~=show_settings_modal]', (event) ->
+        content = $('[data-behavior~=settings_modal]').html()
+        feedbin.modalBox(content);
+        event.preventDefault()
+        return
 
     fuzzyFilter: ->
       feeds = $('.feed-form li')

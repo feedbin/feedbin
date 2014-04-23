@@ -1268,6 +1268,42 @@ Structure
 	}
 }
 
+.hamburger-menu {
+	display: none;
+	user-select: none;
+	$bar-height: 3px;
+	position: absolute;
+	cursor: pointer;
+	top: 13px;
+	right: 10px;
+	height: 17px;
+	width: 22px;
+	border-top: $bar-height solid rgba(0,0,0,.3);
+	@include border-color($text-color-light, $text-color-light-night);
+	z-index: 2;
+	&:after {
+		height: $bar-height;
+		@include background-color($text-color-light, $text-color-light-night);
+		content: "";
+		position: absolute;
+		left: 0;
+		top: 4px;
+		display: block;
+		width: 100%;
+	}
+	&:before {
+		height: $bar-height;
+		@include background-color($text-color-light, $text-color-light-night);
+		content: "";
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		display: block;
+		width: 100%;
+	}
+}
+
+
 .feeds-toolbar {
 	height: $feeds-toolbar-height;
 	border-top: 1px solid transparent;
@@ -1885,17 +1921,11 @@ $saved-search-control-height: 48px;
 				@include background-color(#505a65, #505a65);
 			}
 		}
-		.feed-title {
-			color: rgba(255,255,255, .5) !important;
-		}
-		.time {
-			color: rgba(255,255,255, .5) !important;
+		.feed-title, .time, .body {
+			color: #97999b !important;
 		}
 		.title {
-			color: rgba(255,255,255, 1) !important;
-		}
-		.body {
-			color: rgba(255,255,255, .8) !important;
+			color: #FFFFFF !important;
 		}
 	}
 	.selected &.selected {
@@ -1914,6 +1944,12 @@ $saved-search-control-height: 48px;
 			border-color: $selected;
 			border-top: 1px solid $selected;
 			background: $selected;
+		}
+		.feed-title {
+			color: #add6ff !important;
+		}
+		.body {
+			color: #b7dbff !important;
 		}
 	}
 	&.show-actions {
@@ -2999,6 +3035,47 @@ Settings
 	border-radius: 4px;
 }
 
+.settings-nav {
+	width: 310px;
+	display: table-cell;
+	border-right: 1px solid $border-color;
+	vertical-align: top;
+	.logo {
+		margin: 23px 0 0 31px;
+		display: block;
+		svg {
+			width: 140px;
+			height: 30px;
+			path {
+				fill: #FFF;
+			}
+		}
+
+	}
+	.desktop-hide {
+		display: none;
+	}
+	.modal & {
+		width: 100%;
+		display: block;
+		border: none;
+		.logo {
+			display: none;
+		}
+	}
+}
+
+@media (max-width: 528px) {
+	.settings-nav {
+		display: none;
+	}
+	.hamburger-menu,
+	.desktop-hide {
+		display: block !important;
+	}
+}
+
+
 .nav {
 	margin: 22px 0 0 0;
 	padding: 0;
@@ -3017,6 +3094,19 @@ Settings
 		&.active {
 			color: #FFF;
 			background-color: $selected;
+		}
+	}
+	.modal & {
+		margin: 0;
+		a, a.active {
+			color: #3399FF;
+			padding: 5px 0;
+			background-color: transparent;
+			&:hover {
+				background-color: transparent;
+				color: #2877c6;
+				text-decoration: underline;
+			}
 		}
 	}
 }
@@ -3040,30 +3130,6 @@ Settings
 		display: none;
 		@media (max-width: 528px) {
 			display: block;
-		}
-	}
-	.settings-nav {
-		width: 310px;
-		display: table-cell;
-		border-right: 1px solid $border-color;
-		vertical-align: top;
-		.logo {
-			margin: 23px 0 0 31px;
-			display: block;
-			svg {
-				width: 140px;
-				height: 30px;
-				path {
-					fill: #FFF;
-				}
-			}
-
-		}
-		.desktop-hide {
-			display: none;
-		}
-		@media (max-width: 528px) {
-			display: none;
 		}
 	}
 	.settings-content {
@@ -3246,7 +3312,7 @@ Settings
 			}
 		}
 		.card-number {
-			background: image-url("icon-credit-card.svg") 5px 15px no-repeat;
+			background: #FFF image-url("icon-credit-card.svg") 5px 15px no-repeat;
 			border-radius: 4px 4px 0 0;
 			margin-bottom: 0;
 			border-bottom: none;
@@ -3272,14 +3338,14 @@ Settings
 			}
 		}
 		.card-code {
-			background: image-url("icon-lock.svg") 5px 12px no-repeat;
+			background: #FFF image-url("icon-lock.svg") 5px 12px no-repeat;
 			width: 50%;
 			float: right;
 			border-radius: 0 0 4px 0;
 			border-left: none;
 		}
 		.card-expiration {
-			background: image-url("icon-calendar.svg") 5px 12px no-repeat;
+			background: #FFF image-url("icon-calendar.svg") 5px 12px no-repeat;
 			width: 50%;
 			float: left;
 			border-radius: 0 0 0 4px;
@@ -3996,7 +4062,8 @@ button.close {
 }
 
 .modal-title {
-	margin: 0;
+	margin: 0 !important;
+	font-size: 16px !important;
 	line-height: 1.42857143;
 }
 
@@ -4882,6 +4949,10 @@ Media Queries
 }
 
 @media (max-width: 420px) {
+	.hamburger-menu,
+	.desktop-hide {
+		display: block !important;
+	}
     .nothing-selected {
 		.feeds-column {
 			flex-grow: 1;

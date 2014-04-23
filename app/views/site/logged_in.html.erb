@@ -15,10 +15,15 @@
 
   <div class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
     <div class="subscribe-toolbar">
-      <%= render partial: 'shared/buttons/subscribe' %>
+      <div class="show-subscribe" data-behavior="show_subscribe">Subscribe</div>
+      <div class="hamburger-menu" data-behavior="show_settings_modal"></div>
     </div>
     <div class="subscribe-wrap">
-      <%= render partial: "subscriptions/form" %>
+      <%= form_for :subscription, url: subscriptions_path, remote: true, html: { data: {behavior: 'subscription_form'}, novalidate: 'novalidate' }  do |f| %>
+        <%= f.fields_for :feeds do |builder| %>
+          <%= builder.url_field :feed_url, placeholder: 'Feed or URL' %>
+        <% end %>
+      <% end %>
     </div>
     <div class="feeds-inner">
       <div class="view-toolbar">
@@ -112,6 +117,7 @@
 
 <div class="hide" data-behavior="pagination"></div>
 <%= render partial: "shared/keyboard_shortcuts_wrap" %>
+<%= render partial: "shared/settings_modal" %>
 <%= render partial: "shared/data", locals: {mobile: false} %>
 <%= render partial: "shared/resizable_form" %>
 
