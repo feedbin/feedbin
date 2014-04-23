@@ -39,7 +39,7 @@ class SupportedSharingServicesController < ApplicationController
   def authorize_service(service_id)
     if service_id == 'pocket'
       oauth2_request_pocket
-    elsif service_id == 'tumblr'
+    elsif %w{tumblr evernote}.include?(service_id)
       oauth_request(service_id)
     elsif %w{instapaper readability pinboard}.include?(service_id)
       xauth_request(service_id)
@@ -98,22 +98,24 @@ class SupportedSharingServicesController < ApplicationController
   def oauth_response
     @user = current_user
     if params[:id] == 'tumblr'
-      tumblr = Tumblr.new
-      service_info = SupportedSharingService.info(params[:id])
-      if params[:oauth_verifier].present?
-        access_token = tumblr.request_access(session[:tumblr_token], session[:tumblr_secret], params[:oauth_verifier])
-        session.delete(:tumblr_token)
-        session.delete(:tumblr_secret)
-        supported_sharing_service = @user.supported_sharing_services.where(service_id: params[:id]).first_or_initialize
-        supported_sharing_service.update(access_token: access_token.token, access_secret: access_token.secret)
-        if supported_sharing_service.errors.any?
-          redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
-        else
-          redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
-        end
+      klass = Tumblr.new
+    elsif params[:id] == 'evernote'
+      klass = EvernoteShare.new
+    end
+    service_info = SupportedSharingService.info(params[:id])
+    if params[:oauth_verifier].present?
+      access_token = klass.request_access(session[:oauth_token], session[:oauth_secret], params[:oauth_verifier])
+      session.delete(:oauth_token)
+      session.delete(:oauth_secret)
+      supported_sharing_service = @user.supported_sharing_services.where(service_id: params[:id]).first_or_initialize
+      supported_sharing_service.update(access_token: access_token.token, access_secret: access_token.secret)
+      if supported_sharing_service.errors.any?
+        redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
       else
-        redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{service_info[:label]}."
+        redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
       end
+    else
+      redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{service_info[:label]}."
     end
   end
 
@@ -168,11 +170,13 @@ class SupportedSharingServicesController < ApplicationController
   def oauth_request(service_id)
     if 'tumblr' == service_id
       klass = Tumblr.new
+    elsif 'evernote' == service_id
+      klass = EvernoteShare.new
     end
     response = klass.request_token
     if response.token && response.secret
-      session[:tumblr_token] = response.token
-      session[:tumblr_secret] = response.secret
+      session[:oauth_token] = response.token
+      session[:oauth_secret] = response.secret
       redirect_to response.authorize_url
     else
       redirect_to sharing_services_url, notice: "Unknown #{SupportedSharingService.info(service_id)[:label]} error."

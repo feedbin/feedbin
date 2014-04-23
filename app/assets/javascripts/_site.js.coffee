@@ -323,6 +323,9 @@ $.extend feedbin,
     $('.entry-content').css
       top: top
 
+  readabilityActive: ->
+    $('[data-behavior~=toggle_content_view]').find('.active').length > 0
+
   prepareShareForm: ->
     $('.field-cluster input, .field-cluster textarea').val('')
     $('.share-controls [type="checkbox"]').attr('checked', false);
@@ -334,7 +337,12 @@ $.extend feedbin,
     $('.share-form .url-placeholder').val(url)
 
     description = feedbin.getSelectedText()
-    $('.share-form .description-placeholder').val(description )
+    $('.share-form .description-placeholder').val(description)
+
+    if feedbin.readabilityActive()
+      $('.readability-placeholder').val('on')
+    else
+      $('.readability-placeholder').val('off')
 
   openEntryBasement: (selectedPanel) ->
     feedbin.openEntryBasementTimeount = setTimeout ( ->

@@ -45,6 +45,13 @@ class SupportedSharingService < ActiveRecord::Base
       requires_auth: true,
       service_type: 'oauth',
       html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'tumblr_share_panel'}}
+    },
+    {
+      service_id: 'evernote',
+      label: 'Evernote',
+      requires_auth: true,
+      service_type: 'oauth',
+      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'evernote_share_panel'}}
     }
   ].freeze
 
@@ -82,6 +89,29 @@ class SupportedSharingService < ActiveRecord::Base
     authenticated_share(params, klass)
   end
 
+  def share_with_evernote(params)
+    entry = Entry.find(params[:entry_id])
+    if params[:readability] = "on"
+      url = entry.fully_qualified_url
+      content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v2") do
+        ReadabilityParser.parse(url)
+      end
+      content = content_info.content
+    else
+      content = entry.content
+    end
+    Rails.logger.info { "----------------------" }
+    Rails.logger.info { content.inspect }
+    Rails.logger.info { "----------------------" }
+    content = ContentFormatter.evernote_format(content, entry)
+
+    klass = EvernoteShare.new(access_token)
+    view_paths = Rails::Application::Configuration.new(Rails.root).paths["app/views"]
+    action_view = ActionView::Base.new(view_paths)
+    params[:content] = action_view.render(partial: 'supported_sharing_services/evernote_note', locals: {content: content.html_safe})
+    authenticated_share(params, klass)
+  end
+
   def share_with_email(params)
     reply_to = (email_address.present?) ? email_address : user.email
     from_name = (email_name.present?) ? email_name : user.email
@@ -95,6 +125,9 @@ class SupportedSharingService < ActiveRecord::Base
     params['entry_url'] = entry.fully_qualified_url
     if active?
       status = klass.add(params)
+      logger.info { "----------------" }
+      logger.info { status.inspect }
+      logger.info { "----------------" }
       if status == 200
         response[:message] = "Link saved to #{label}."
       elsif status == 401
@@ -126,6 +159,11 @@ class SupportedSharingService < ActiveRecord::Base
   def tumblr_info
     tumblr = Tumblr.new(access_token, access_secret)
     tumblr.user_info
+  end
+
+  def evernote_notebooks
+    evernote = EvernoteShare.new(access_token)
+    evernote.notebooks
   end
 
   def remove_access!

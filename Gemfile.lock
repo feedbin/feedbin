@@ -129,6 +129,10 @@ GEM
     dotenv-rails (0.10.0)
       dotenv (= 0.10.0)
     erubis (2.7.0)
+    evernote-thrift (1.25.1)
+    evernote_oauth (0.2.3)
+      evernote-thrift
+      oauth (>= 0.4.1)
     excon (0.32.1)
     execjs (2.0.2)
     faraday (0.8.9)
@@ -337,6 +341,7 @@ DEPENDENCIES
   connection_pool
   dalli
   dotenv-rails
+  evernote_oauth
   feedzirra!
   fog
   foreman

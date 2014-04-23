@@ -42,6 +42,7 @@ class SiteController < ApplicationController
 
   def lazy_data
     @tumblr_hosts = []
+    @evernote_notebooks = {}
     @user = current_user
     tumblr = @user.supported_sharing_services.where(service_id: 'tumblr').first
     if tumblr.present?
@@ -50,7 +51,17 @@ class SiteController < ApplicationController
         @tumblr_hosts = info['response']['user']['blogs'].collect {|blog| URI.parse(blog['url']).host }
       end
     end
-    @tumblr_hosts
+
+    evernote = @user.supported_sharing_services.where(service_id: 'evernote').first
+    if evernote.present?
+      notebooks = evernote.evernote_notebooks
+      notebooks.each do |notebook|
+        @evernote_notebooks[notebook.name] = notebook.guid
+        if notebook.defaultNotebook
+          @evernote_selected = notebook.guid
+        end
+      end
+    end
   end
 
   def manifest; end

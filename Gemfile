@@ -59,6 +59,7 @@ gem 'gctools', require: false
 gem 'connection_pool'
 gem 'httparty'
 gem 'oauth'
+gem 'evernote_oauth'
 
 # Sidekiq
 gem 'sidekiq'
