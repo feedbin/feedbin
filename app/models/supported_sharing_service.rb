@@ -91,7 +91,7 @@ class SupportedSharingService < ActiveRecord::Base
 
   def share_with_evernote(params)
     entry = Entry.find(params[:entry_id])
-    if params[:readability] = "on"
+    if params[:readability] == "on"
       url = entry.fully_qualified_url
       content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v2") do
         ReadabilityParser.parse(url)
@@ -100,9 +100,6 @@ class SupportedSharingService < ActiveRecord::Base
     else
       content = entry.content
     end
-    Rails.logger.info { "----------------------" }
-    Rails.logger.info { content.inspect }
-    Rails.logger.info { "----------------------" }
     content = ContentFormatter.evernote_format(content, entry)
 
     klass = EvernoteShare.new(access_token)
@@ -125,9 +122,6 @@ class SupportedSharingService < ActiveRecord::Base
     params['entry_url'] = entry.fully_qualified_url
     if active?
       status = klass.add(params)
-      logger.info { "----------------" }
-      logger.info { status.inspect }
-      logger.info { "----------------" }
       if status == 200
         response[:message] = "Link saved to #{label}."
       elsif status == 401

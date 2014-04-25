@@ -48,12 +48,21 @@ class EvernoteShare
     if params[:tags].present?
       note.tagNames = params[:tags].split(',').map {|tag| tag.strip}
     end
-    note_store = @client.note_store
     note_store.createNote(@token, note)
+    200
+  rescue => exception
+    if exception.respond_to?(:errorCode) && exception.errorCode == Evernote::EDAM::Error::EDAMErrorCode::AUTH_EXPIRED
+      401
+    else
+      500
+    end
+  end
+
+  def note_store
+    @note_store ||= @client.note_store
   end
 
   def notebooks
-    note_store = @client.note_store
     note_store.listNotebooks(@token)
   end
 
