@@ -176,7 +176,7 @@ $.extend feedbin,
     feedbin.nextEntryPreview(currentItem)
 
   refresh: ->
-    if feedbin.data != null
+    if feedbin.data
       $.get(feedbin.data.autoUpdatePath)
 
   shareOpen: ->
@@ -399,7 +399,8 @@ $.extend feedbin,
         searchField.parents('form').submit()
 
     lazyData: ->
-      $.get(feedbin.data.lazyDataPath)
+      if feedbin.data
+        $.get(feedbin.data.lazyDataPath)
 
     markRead: ->
       $(document).on 'click', '[data-mark-read]', ->
