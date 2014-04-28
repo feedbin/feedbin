@@ -37,14 +37,13 @@ class SupportedSharingServicesController < ApplicationController
   end
 
   def authorize_service(service_id)
-    if service_id == 'pocket'
-      oauth2_request_pocket
-    elsif %w{tumblr evernote}.include?(service_id)
+    service_info = SupportedSharingService.info!(service_id)
+    if service_info[:service_type] == 'oauth2'
+      oauth2_request(service_id)
+    elsif service_info[:service_type] == 'oauth'
       oauth_request(service_id)
-    elsif %w{instapaper readability pinboard}.include?(service_id)
+    elsif service_info[:service_type] == 'xauth'
       xauth_request(service_id)
-    else
-      redirect_to sharing_services_url, alert: "Unknown service."
     end
   end
 
@@ -56,15 +55,8 @@ class SupportedSharingServicesController < ApplicationController
 
   def xauth_request(service_id)
     @user = current_user
-    service_info = SupportedSharingService.info(service_id)
-
-    if service_id == 'readability'
-      klass = Readability.new
-    elsif service_id == 'instapaper'
-      klass = Instapaper.new
-    elsif service_id == 'pinboard'
-      klass = Pinboard.new
-    end
+    service_info = SupportedSharingService.info!(service_id)
+    klass = service_info[:klass].constantize.new
 
     begin
       response = klass.request_token(params[:username], params[:password])
@@ -88,21 +80,38 @@ class SupportedSharingServicesController < ApplicationController
 
   def oauth2_response
     @user = current_user
-    if params[:id] == 'pocket'
-      oauth2_response_pocket
+
+    service_info = SupportedSharingService.info!(params[:id])
+    klass = service_info[:klass].constantize.new
+
+    response = klass.oauth2_authorize(session[:oauth2_token])
+    session.delete(:oauth2_token)
+    if response.code == 200
+      access_token = response.parsed_response['access_token']
+      supported_sharing_service = @user.supported_sharing_services.where(service_id: params[:id]).first_or_initialize
+      supported_sharing_service.update(access_token: access_token)
+      if supported_sharing_service.errors.any?
+        redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
+      else
+        redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
+      end
+    elsif response.code == 403
+      redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{supported_sharing_service.label}."
     else
-      redirect_to sharing_services_url, alert: "Unknown service."
+      Honeybadger.notify(
+        error_class: "SupportedSharingServicesController#oauth2_response",
+        error_message: "#{service_info[:label]} failure",
+        parameters: response
+      )
+      redirect_to sharing_services_url, notice: "Unknown #{service_info[:label]} error."
     end
+
   end
 
   def oauth_response
     @user = current_user
-    if params[:id] == 'tumblr'
-      klass = Tumblr.new
-    elsif params[:id] == 'evernote'
-      klass = EvernoteShare.new
-    end
-    service_info = SupportedSharingService.info(params[:id])
+    service_info = SupportedSharingService.info!(params[:id])
+    klass = service_info[:klass].constantize.new
     if params[:oauth_verifier].present?
       access_token = klass.request_access(session[:oauth_token], session[:oauth_secret], params[:oauth_verifier])
       session.delete(:oauth_token)
@@ -125,54 +134,28 @@ class SupportedSharingServicesController < ApplicationController
     params.require(:supported_sharing_service).permit(:service_id, :email_name, :email_address, :kindle_address)
   end
 
-  def oauth2_response_pocket
-    pocket = Pocket.new
-    response = pocket.oauth2_authorize(session[:pocket_oauth2_token])
-    session.delete(:pocket_oauth2_token)
-    if response.code == 200
-      access_token = response.parsed_response['access_token']
-      supported_sharing_service = @user.supported_sharing_services.where(service_id: 'pocket').first_or_initialize
-      supported_sharing_service.update(access_token: access_token)
-      if supported_sharing_service.errors.any?
-        redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
-      else
-        redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
-      end
-    elsif response.code == 403
-      redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{supported_sharing_service.label}."
-    else
-      Honeybadger.notify(
-        error_class: "Pocket",
-        error_message: "Pocket::oauth2_authorize Failure",
-        parameters: response
-      )
-      redirect_to sharing_services_url, alert: "Unknown #{SupportedSharingService.info('pocket')[:label]} error."
-    end
-  end
 
-  def oauth2_request_pocket
-    pocket = Pocket.new
-    response = pocket.request_token
+  def oauth2_request(service_id)
+    service_info = SupportedSharingService.info!(service_id)
+    klass = service_info[:klass].constantize.new
+    response = klass.request_token
     if response.code == 200
       token = response.parsed_response['code']
-      session[:pocket_oauth2_token] = token
-      redirect_to pocket.redirect_url(token)
+      session[:oauth2_token] = token
+      redirect_to klass.redirect_url(token)
     else
       Honeybadger.notify(
-        error_class: "Pocket",
-        error_message: "Pocket::request_token Failure",
+        error_class: "SupportedSharingServicesController#oauth2_request",
+        error_message: "#{service_info[:label]} failure",
         parameters: response
       )
-      redirect_to sharing_services_url, notice: "Unknown #{SupportedSharingService.info('pocket')[:label]} error."
+      redirect_to sharing_services_url, notice: "Unknown #{service_info[:label]} error."
     end
   end
 
   def oauth_request(service_id)
-    if 'tumblr' == service_id
-      klass = Tumblr.new
-    elsif 'evernote' == service_id
-      klass = EvernoteShare.new
-    end
+    service_info = SupportedSharingService.info!(service_id)
+    klass = service_info[:klass].constantize.new
     response = klass.request_token
     if response.token && response.secret
       session[:oauth_token] = response.token

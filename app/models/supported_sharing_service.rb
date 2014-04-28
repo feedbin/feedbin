@@ -5,19 +5,22 @@ class SupportedSharingService < ActiveRecord::Base
       service_id: 'pocket',
       label: 'Pocket',
       requires_auth: true,
-      service_type: 'oauth'
+      service_type: 'oauth2',
+      klass: 'Pocket'
     },
     {
       service_id: 'readability',
       label: 'Readability',
       requires_auth: true,
-      service_type: 'xauth'
+      service_type: 'xauth',
+      klass: 'Readability'
     },
     {
       service_id: 'instapaper',
       label: 'Instapaper',
       requires_auth: true,
-      service_type: 'xauth'
+      service_type: 'xauth',
+      klass: 'Instapaper'
     },
     {
       service_id: 'email',
@@ -37,21 +40,24 @@ class SupportedSharingService < ActiveRecord::Base
       label: 'Pinboard',
       requires_auth: true,
       service_type: 'pinboard',
-      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'pinboard_share_panel'}}
+      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'pinboard_share_panel'}},
+      klass: 'Pinboard'
     },
     {
       service_id: 'tumblr',
       label: 'Tumblr',
       requires_auth: true,
       service_type: 'oauth',
-      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'tumblr_share_panel'}}
+      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'tumblr_share_panel'}},
+      klass: 'Tumblr'
     },
     {
       service_id: 'evernote',
       label: 'Evernote',
       requires_auth: true,
       service_type: 'oauth',
-      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'evernote_share_panel'}}
+      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'evernote_share_panel'}},
+      klass: 'EvernoteShare'
     }
   ].freeze
 
@@ -176,6 +182,14 @@ class SupportedSharingService < ActiveRecord::Base
 
   def self.info(service_id)
     SERVICES.find {|service| service[:service_id] == service_id}
+  end
+
+  def self.info!(service_id)
+    data = info(service_id)
+    if data.blank?
+      raise ActionController::RoutingError.new('Not Found')
+    end
+    data
   end
 
   def info
