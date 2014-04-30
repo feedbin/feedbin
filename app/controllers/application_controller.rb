@@ -59,15 +59,17 @@ class ApplicationController < ActionController::Base
         data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'all', message: 'Mark all items as read?'}.to_json }
       }
     end
-    collections << {
-      title: 'Starred',
-      path: starred_entries_path,
-      count: @user.total_starred,
-      id: 'collection_starred',
-      favicon_class: 'favicon-star',
-      parent_data: { behavior: 'starred', feed_id: 'collection_starred' },
-      data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'starred', message: 'Mark starred items as read?'}.to_json }
-    }
+    if types.include? 'view_starred'
+      collections << {
+        title: 'Starred',
+        path: starred_entries_path,
+        count: @user.total_starred,
+        id: 'collection_starred',
+        favicon_class: 'favicon-star',
+        parent_data: { behavior: 'starred', feed_id: 'collection_starred' },
+        data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'starred', message: 'Mark starred items as read?'}.to_json }
+      }
+    end
     collections << {
       title: 'Recently Read',
       path: recently_read_entries_path,
