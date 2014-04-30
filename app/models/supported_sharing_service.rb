@@ -180,6 +180,16 @@ class SupportedSharingService < ActiveRecord::Base
     end
   end
 
+  def html_options
+    info[:html_options] || {remote: true}
+  end
+
+  def link_options(entry)
+    {url: Rails.application.routes.url_helpers.share_supported_sharing_service_path(self, entry),
+     label: self.label,
+     html_options: html_options}
+  end
+
   def self.info(service_id)
     SERVICES.find {|service| service[:service_id] == service_id}
   end
@@ -210,10 +220,6 @@ class SupportedSharingService < ActiveRecord::Base
 
   def auth_present?
     access_token.present?
-  end
-
-  def html_options
-    info[:html_options] || {remote: true}
   end
 
 end
