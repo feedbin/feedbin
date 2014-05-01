@@ -397,10 +397,6 @@ $.extend feedbin,
         searchField.val(query)
         searchField.parents('form').submit()
 
-    lazyData: ->
-      if feedbin.data
-        $.get(feedbin.data.lazyDataPath)
-
     markRead: ->
       $(document).on 'click', '[data-mark-read]', ->
         feedbin.markReadData = $(@).data('mark-read')

@@ -1198,6 +1198,13 @@ CREATE INDEX index_supported_sharing_services_on_user_id ON supported_sharing_se
 
 
 --
+-- Name: index_supported_sharing_services_on_user_id_and_service_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_supported_sharing_services_on_user_id_and_service_id ON supported_sharing_services USING btree (user_id, service_id);
+
+
+--
 -- Name: index_taggings_on_tag_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 

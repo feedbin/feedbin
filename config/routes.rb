@@ -18,8 +18,6 @@ Feedbin::Application.routes.draw do
   # FireFox OS manifest
   get :manifest, to: 'site#manifest'
 
-  get :lazy_data, to: 'site#lazy_data'
-
   post '/emails' => 'emails#create'
 
   match '/404', to: 'errors#not_found', via: :all

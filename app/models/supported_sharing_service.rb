@@ -61,7 +61,9 @@ class SupportedSharingService < ActiveRecord::Base
     }
   ].freeze
 
-  store_accessor :settings, :access_token, :access_secret, :email_name, :email_address, :kindle_address
+  store_accessor :settings, :access_token, :access_secret, :email_name, :email_address,
+                 :kindle_address, :evernote_notebooks, :evernote_default, :tumblr_hosts, :tumblr_default
+
   validates :service_id, presence: true, uniqueness: {scope: :user_id}, inclusion: { in: SERVICES.collect {|s| s[:service_id]} }
   belongs_to :user
 

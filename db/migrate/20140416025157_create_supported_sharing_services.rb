@@ -7,5 +7,6 @@ class CreateSupportedSharingServices < ActiveRecord::Migration
 
       t.timestamps
     end
+    add_index :supported_sharing_services, [:user_id, :service_id], unique: true
   end
 end
