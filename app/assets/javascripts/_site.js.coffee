@@ -360,7 +360,6 @@ $.extend feedbin,
     $('.entry-content').css
       top: newTop
 
-
   hideQueue: []
 
   feedCandidates: []
