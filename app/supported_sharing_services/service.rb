@@ -40,4 +40,11 @@ class Service
     new().determine_content(params)
   end
 
+  def render_popover_template(url)
+    action_view = ActionView::Base.new()
+    action_view.view_paths = ActionController::Base.view_paths
+    action_view.extend(ApplicationHelper)
+    action_view.render(template: "supported_sharing_services/popover.js.erb", locals: {url: url})
+  end
+
 end

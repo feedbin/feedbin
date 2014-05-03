@@ -1060,6 +1060,14 @@ th {
 			padding-left: 0;
 		}
 	}
+	.icon-share-facebook {
+		background: image-url("icon-share-facebook.svg") 0 0 no-repeat;
+		background-size: 25px 25px;
+	}
+	.icon-share-twitter {
+		background: image-url("icon-share-twitter.svg") 1px 3px no-repeat;
+		background-size: 21px 25px;
+	}
 	.icon-share-evernote {
 		background: image-url("icon-share-evernote.svg") 1px 3px no-repeat;
 		background-size: 20px 25px;

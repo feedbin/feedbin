@@ -8,7 +8,10 @@
       <% services.each_with_index do |service, row| %>
         <li>
           <%= link_to service[:url], service[:html_options] do %>
-            <%= service[:label] %> <i class="share-keyboard"><%= row + 1 %></i>
+            <%= service[:label] %>
+            <% if row + 1 < 10 %>
+              <i class="share-keyboard"><%= row + 1 %></i>
+            <% end %>
           <% end %>
         </li>
       <% end %>

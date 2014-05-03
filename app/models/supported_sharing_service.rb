@@ -64,6 +64,20 @@ class SupportedSharingService < ActiveRecord::Base
       html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'evernote_share_panel'}},
       klass: 'EvernoteShare',
       has_share_sheet: true
+    },
+    {
+      service_id: 'twitter',
+      label: 'Twitter',
+      requires_auth: false,
+      service_type: 'popover',
+      klass: 'Twitter'
+    },
+    {
+      service_id: 'facebook',
+      label: 'Facebook',
+      requires_auth: false,
+      service_type: 'popover',
+      klass: 'Facebook'
     }
   ].freeze
 
