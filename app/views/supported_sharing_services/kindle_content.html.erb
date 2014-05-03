@@ -3,13 +3,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8"/>
+  <dc:title><%= entry.title %></dc:title>
 </head>
 <body>
-  <h1><%= link_to strip_tags(@entry.title), @entry.fully_qualified_url %></h1>
+  <h1><%= link_to strip_tags(entry.title), entry.fully_qualified_url %></h1>
   <p>
-    <%= strip_tags(@entry.feed.title) %>
-    <br /><%= @entry.published.to_s(:full_human) %>
+    <%= strip_tags(entry.feed.title) %>
+    <br /><%= entry.published.to_s(:full_human) %>
   </p>
-  <%= raw(ContentFormatter.api_format(@entry.content, @entry)) %>
+  <%= raw(content) %>
 </body>
 </html>

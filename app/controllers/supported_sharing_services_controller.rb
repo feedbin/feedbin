@@ -42,7 +42,7 @@ class SupportedSharingServicesController < ApplicationController
       oauth2_request(service_id)
     elsif service_info[:service_type] == 'oauth'
       oauth_request(service_id)
-    elsif service_info[:service_type] == 'xauth'
+    elsif service_info[:service_type] == 'xauth' || service_info[:service_type] == 'pinboard'
       xauth_request(service_id)
     end
   end
@@ -121,11 +121,19 @@ class SupportedSharingServicesController < ApplicationController
       if supported_sharing_service.errors.any?
         redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
       else
+        supported_sharing_service.try(:after_activate)
         redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
       end
     else
       redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{service_info[:label]}."
     end
+  rescue OAuth => e
+    Honeybadger.notify(
+      error_class: "SupportedSharingServicesController#oauth_response",
+      error_message: "#{service_info[:label]} failure",
+      parameters: e
+    )
+    redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
   end
 
   private
@@ -164,6 +172,13 @@ class SupportedSharingServicesController < ApplicationController
     else
       redirect_to sharing_services_url, notice: "Unknown #{SupportedSharingService.info(service_id)[:label]} error."
     end
+  rescue OAuth => e
+    Honeybadger.notify(
+      error_class: "SupportedSharingServicesController#oauth_request",
+      error_message: "#{service_info[:label]} failure",
+      parameters: e
+    )
+    redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
   end
 
 end

@@ -12,7 +12,7 @@
   font-family: "Helvetica Neue","Helvetica",Helvetica,Arial,sans-serif;
 }
 img {
-  max-width: 100%;
+  max-width: 570px;
   height:auto !important;
   width:100% !important;
 }
@@ -51,6 +51,17 @@ table.body-wrap {
 .collapse {
   margin: 0!important;
 }
+h1, h2, h3, h4, h5, h6 {
+	font-weight: bold;
+	font-style: normal;
+	margin: 0 0 8px 0;
+}
+h1, h2 {
+	font-size: 18px;
+}
+h3, h4, h5, h6 {
+	font-size: 16px;
+}
 p,ul,ol {
   margin-bottom: 10px;
   font-weight: normal;
@@ -60,6 +71,11 @@ p,ul,ol {
 p.lead {
   font-size: 17px;
 }
+p.preformatted {
+  line-height: 1.4;
+  font-size: 15px;
+  white-space: pre-wrap;
+}
 p.last {
   margin-bottom: 0px;
 }
@@ -67,6 +83,13 @@ ul li,
 ol li {
   margin-left: 5px;
   list-style-position: inside;
+}
+pre code {
+	display: block;
+	white-space: pre-wrap;
+  font-family: monospace;
+  font-size: 15px;
+  margin-bottom: 10px;
 }
 .container {
   display: block!important;
@@ -101,16 +124,16 @@ ol li {
       <table>
         <tr>
           <td>
-            <% if @body.present? %>
-              <p class="lead"><%= @body.gsub("\n", "<br />").html_safe %></p>
+            <% if @message.present? %>
+              <p class="preformatted"><%= @message %></p>
               <hr />
             <% end %>
-            <p class="lead"><%= link_to strip_tags(@entry.title), @entry.fully_qualified_url  %></p>
+            <h1><%= link_to strip_tags(@entry.title), @entry.fully_qualified_url  %></h1>
             <p>
               <%= strip_tags(@entry.feed.title) %>
               <br /><%= @entry.published.to_s(:full_human) %>
             </p>
-            <%= raw(ContentFormatter.api_format(@entry.content, @entry)) %>
+            <%= raw(ContentFormatter.api_format(@content, @entry)) %>
           </td>
         </tr>
       </table>

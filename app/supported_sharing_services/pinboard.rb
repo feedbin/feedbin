@@ -1,9 +1,12 @@
-class Pinboard
+class Pinboard < Service
   include HTTParty
   base_uri 'https://api.pinboard.in/v1'
 
-  def initialize(auth_token = nil)
-    @auth_token = auth_token
+  def initialize(klass = nil)
+    @klass = klass
+    if @klass.present?
+      @auth_token = @klass.access_token
+    end
   end
 
   def request_token(username, password)
@@ -31,4 +34,9 @@ class Pinboard
       response.code
     end
   end
+
+  def share(params)
+    authenticated_share(@klass, params)
+  end
+
 end

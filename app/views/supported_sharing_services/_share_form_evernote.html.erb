@@ -8,7 +8,7 @@
   </div>
   <div class="share-controls">
     <div class="control">
-      Notebook <select name="notebook_guid" class="evernote-notebooks-placeholder"></select>
+      Notebook <%= select_tag "notebook_guid", options_for_select(service.service_options, service.default_option) %>
     </div>
   </div>
   <div class="button-wrap">

@@ -344,6 +344,7 @@ $.extend feedbin,
     else
       $('.readability-placeholder').val('off')
 
+
   openEntryBasement: (selectedPanel) ->
     feedbin.openEntryBasementTimeount = setTimeout ( ->
       $('.entry-basement').addClass('foreground')
@@ -592,6 +593,9 @@ $.extend feedbin,
         unless $(event.target).is('[data-behavior~=toggle_dropdown]') || $(event.target).parents('[data-behavior~=toggle_dropdown]').length > 0
           dropdown.removeClass('open')
         return
+
+      $(document).on 'click', '[data-behavior~=share_options] a', (event) ->
+        $('.dropdown-wrap').removeClass('open')
 
       $(document).on 'click', '[data-behavior~=toggle_share_menu]', (event) ->
         $(".dropdown-wrap li").removeClass('selected')

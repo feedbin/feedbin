@@ -1,4 +1,4 @@
-class Tumblr
+class Tumblr < Service
   URL = "http://www.tumblr.com"
   API_URL = "https://api.tumblr.com/v2"
 
@@ -10,9 +10,10 @@ class Tumblr
   # 6. access_token = tumblr.request_access(session[:tumblr_token], session[:tumblr_secret], params[:oauth_verifier])
   # 7. save access_token.token and access_token.secret in the database
 
-  def initialize(consumer_key = nil, consumer_secret = nil)
-    if consumer_secret && consumer_secret
-      @client = OAuth::AccessToken.new(consumer, consumer_key, consumer_secret)
+  def initialize(klass = nil)
+    @klass = klass
+    if @klass.present?
+      @client = OAuth::AccessToken.new(consumer, @klass.access_token, @klass.access_secret)
     end
   end
 
@@ -47,6 +48,7 @@ class Tumblr
   end
 
   def add(params)
+    @klass.update(default_option: params[:site])
     options = {
       type: 'link',
       url: params['entry_url'],
@@ -70,7 +72,20 @@ class Tumblr
     code
   end
 
+  def share(params)
+    authenticated_share(@klass, params)
+  end
 
+  def after_activate
+    get_blogs
+  end
+
+  def get_blogs
+    info = user_info
+    if info['response'].present?
+      tumblr_hosts = info['response']['user']['blogs'].collect {|blog| URI.parse(blog['url']).host }
+    end
+  end
 
 
 end

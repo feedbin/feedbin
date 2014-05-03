@@ -1,10 +1,13 @@
-class Pocket
+class Pocket < Service
   include HTTParty
   base_uri 'https://getpocket.com/v3'
   headers 'Content-Type' => 'application/json; charset=UTF-8', 'X-Accept' => 'application/json'
 
-  def initialize(access_token = nil)
-    @access_token = access_token
+  def initialize(klass = nil)
+    @klass = klass
+    if @klass.present?
+      @access_token = @klass.access_token
+    end
   end
 
   def redirect_url(token)
@@ -41,6 +44,10 @@ class Pocket
 
   def redirect_uri
     Rails.application.routes.url_helpers.oauth2_response_supported_sharing_service_url('pocket', host: ENV['PUSH_URL'])
+  end
+
+  def share(params)
+    authenticated_share(@klass, params)
   end
 
 end

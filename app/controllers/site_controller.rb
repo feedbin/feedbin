@@ -6,7 +6,6 @@ class SiteController < ApplicationController
   def index
     if signed_in?
       get_feeds_list
-      cache_expensive_data
       @user_titles = {}
       @user.feeds.select('feeds.id, feeds.title, subscriptions.title AS user_title').map { |feed|
         @user_titles[feed.id] = feed.user_title ? feed.user_title : feed.title
@@ -49,11 +48,6 @@ class SiteController < ApplicationController
     if current_user.suspended
       redirect_to settings_billing_url, alert: 'Please update your billing information to use Feedbin.'
     end
-  end
-
-  def cache_expensive_data
-    RefreshTumblrHosts.perform_async(@user.id)
-    RefreshEvernoteNotebooks.perform_async(@user.id)
   end
 
 end

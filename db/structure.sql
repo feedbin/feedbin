@@ -563,6 +563,7 @@ CREATE TABLE supported_sharing_services (
     user_id integer NOT NULL,
     service_id character varying(255) NOT NULL,
     settings hstore,
+    service_options json,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );

@@ -1029,8 +1029,10 @@ th {
 		padding: 10px 0 0  40px;
 	}
 	small {
+		clear: both;
 		padding-left: 40px;
 		display: block;
+		max-width: 600px;
 		&.hide {
 			display: none;
 		}
@@ -1052,6 +1054,10 @@ th {
 		}
 		.cancel-button {
 			margin-top: 7px;
+		}
+		small {
+			padding-top: 5px;
+			padding-left: 0;
 		}
 	}
 	.icon-share-evernote {
