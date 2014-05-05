@@ -57,7 +57,6 @@ gem 'grocer'
 gem 'cocoon'
 gem 'gctools', require: false
 gem 'connection_pool'
-gem 'skylight'
 
 # Sidekiq
 gem 'sidekiq'
