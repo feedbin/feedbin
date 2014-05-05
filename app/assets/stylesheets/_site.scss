@@ -2517,15 +2517,12 @@ $saved-search-control-height: 48px;
 		@include color(#333, #f3f3f3);
 	}
 
-	pre {
+	pre code {
+		background-color: transparent;
 		display: block;
 		overflow-x: auto;
 		white-space: pre;
 		word-wrap: normal;
-	}
-
-	pre code {
-		background-color: transparent;
 	}
 
 	tt, code, kbd, samp {
