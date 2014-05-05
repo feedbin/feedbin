@@ -1,7 +1,7 @@
 <div class="cc-form-wrap clearfix">
   <%= text_field_tag :card_number, nil, name: nil, data: { stripe: 'number' }, placeholder: 'Card Number', autocompletetype: 'cc-number', :'x-autocompletetype' => 'cc-number', class: 'card-number' %>
   <%= text_field_tag :card_expiration, nil, name: nil, placeholder: 'MM / YY', autocompletetype: 'cc-exp', :'x-autocompletetype' => 'cc-exp', class: 'card-expiration' %>
-  <%= text_field_tag :card_code, nil, name: nil, data: { stripe: 'cvc' }, placeholder: 'CVC', autocompletetype: 'cc-csc', :'x-autocompletetype' => 'cc-csc', class: 'card-code' %>
+  <%= text_field_tag :card_code, nil, name: nil, data: { stripe: 'cvc' }, placeholder: 'CVC', autocompletetype: 'cc-csc', :'x-autocompletetype' => 'cc-csc', class: 'card-code', autocomplete: 'off' %>
 </div>
 
 <div class="ui-helper-hidden-accessible">
