@@ -161,6 +161,38 @@ ALTER SEQUENCE coupons_id_seq OWNED BY coupons.id;
 
 
 --
+-- Name: deleted_users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE deleted_users (
+    id integer NOT NULL,
+    email text,
+    customer_id text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: deleted_users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE deleted_users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: deleted_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE deleted_users_id_seq OWNED BY deleted_users.id;
+
+
+--
 -- Name: entries; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -722,6 +754,13 @@ ALTER TABLE ONLY coupons ALTER COLUMN id SET DEFAULT nextval('coupons_id_seq'::r
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY deleted_users ALTER COLUMN id SET DEFAULT nextval('deleted_users_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY entries ALTER COLUMN id SET DEFAULT nextval('entries_id_seq'::regclass);
 
 
@@ -845,6 +884,14 @@ ALTER TABLE ONLY billing_events
 
 ALTER TABLE ONLY coupons
     ADD CONSTRAINT coupons_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: deleted_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY deleted_users
+    ADD CONSTRAINT deleted_users_pkey PRIMARY KEY (id);
 
 
 --
@@ -993,6 +1040,13 @@ CREATE UNIQUE INDEX index_billing_events_on_event_id ON billing_events USING btr
 --
 
 CREATE INDEX index_coupons_on_user_id ON coupons USING btree (user_id);
+
+
+--
+-- Name: index_deleted_users_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_deleted_users_on_email ON deleted_users USING btree (email);
 
 
 --
@@ -1478,3 +1532,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140227001243');
 INSERT INTO schema_migrations (version) VALUES ('20140321203637');
 
 INSERT INTO schema_migrations (version) VALUES ('20140326173619');
+
+INSERT INTO schema_migrations (version) VALUES ('20140505062817');
