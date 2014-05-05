@@ -320,6 +320,7 @@ class EntriesController < ApplicationController
           title = entry.title ? ERB::Util.url_encode(entry.title) : ''
           feed_name = entry.feed.title ? ERB::Util.url_encode(entry.feed.title) : ''
           url = service.url.clone
+          url = url.strip
           url = url.gsub('${url}', entry_url).gsub('${title}', title).gsub('${source}', feed_name)
           if url.start_with?('http')
             target = '_blank'
