@@ -38,8 +38,8 @@ class SupportedSharingServicesController < ApplicationController
 
   def authorize_service(service_id)
     service_info = SupportedSharingService.info!(service_id)
-    if service_info[:service_type] == 'oauth2'
-      oauth2_request(service_id)
+    if service_info[:service_type] == 'oauth2_pocket'
+      oauth2_pocket_request(service_id)
     elsif service_info[:service_type] == 'oauth'
       oauth_request(service_id)
     elsif service_info[:service_type] == 'xauth' || service_info[:service_type] == 'pinboard'
@@ -79,14 +79,14 @@ class SupportedSharingServicesController < ApplicationController
     end
   end
 
-  def oauth2_response
+  def oauth2_pocket_response
     @user = current_user
 
     service_info = SupportedSharingService.info!(params[:id])
     klass = service_info[:klass].constantize.new
 
-    response = klass.oauth2_authorize(session[:oauth2_token])
-    session.delete(:oauth2_token)
+    response = klass.oauth2_pocket_authorize(session[:oauth2_pocket_token])
+    session.delete(:oauth2_pocket_token)
     if response.code == 200
       access_token = response.parsed_response['access_token']
       supported_sharing_service = @user.supported_sharing_services.where(service_id: params[:id]).first_or_initialize
@@ -100,7 +100,7 @@ class SupportedSharingServicesController < ApplicationController
       redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{supported_sharing_service.label}."
     else
       Honeybadger.notify(
-        error_class: "SupportedSharingServicesController#oauth2_response",
+        error_class: "SupportedSharingServicesController#oauth2_pocket_response",
         error_message: "#{service_info[:label]} failure",
         parameters: response
       )
@@ -144,17 +144,17 @@ class SupportedSharingServicesController < ApplicationController
   end
 
 
-  def oauth2_request(service_id)
+  def oauth2_pocket_request(service_id)
     service_info = SupportedSharingService.info!(service_id)
     klass = service_info[:klass].constantize.new
     response = klass.request_token
     if response.code == 200
       token = response.parsed_response['code']
-      session[:oauth2_token] = token
+      session[:oauth2_pocket_token] = token
       redirect_to klass.redirect_url(token)
     else
       Honeybadger.notify(
-        error_class: "SupportedSharingServicesController#oauth2_request",
+        error_class: "SupportedSharingServicesController#oauth2_pocket_request",
         error_message: "#{service_info[:label]} failure",
         parameters: response
       )
