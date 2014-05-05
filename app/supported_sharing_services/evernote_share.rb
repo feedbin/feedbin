@@ -1,5 +1,5 @@
 class EvernoteShare < Service
-  URL = "https://sandbox.evernote.com"
+  URL = "https://www.evernote.com"
 
   # 1. evernote = EvernoteShare.new
   # 2. client = evernote.request_token
@@ -13,7 +13,7 @@ class EvernoteShare < Service
     if klass.present? && klass.access_token.present?
       @klass = klass
       @token = @klass.access_token
-      @client = EvernoteOAuth::Client.new(token: @token)
+      @client = EvernoteOAuth::Client.new(token: @token, sandbox: false)
     end
   end
 
