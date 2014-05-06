@@ -1,3 +1,5 @@
+require 'silencer/logger'
+
 Feedbin::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -32,4 +34,6 @@ Feedbin::Application.configure do
 
   # Log strong_parameters unpermitted
   config.action_controller.action_on_unpermitted_parameters = :log
+
+  config.middleware.swap Rails::Rack::Logger, Silencer::Logger
 end

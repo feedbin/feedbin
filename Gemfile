@@ -9,6 +9,8 @@ group :development do
   gem 'capistrano', '~> 2.15.5'
   gem 'capistrano-unicorn', github: 'sosedoff/capistrano-unicorn', ref: '52376ad', require: false
   gem 'dotenv-rails'
+  gem 'logster', github: 'benubois/logster', ref: '641f5f9'
+  gem 'silencer'
 end
 
 group :production do

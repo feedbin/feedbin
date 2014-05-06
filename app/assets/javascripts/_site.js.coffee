@@ -42,7 +42,7 @@ $.extend feedbin,
     feedbin.updateEntryContent('')
 
   syntaxHighlight: ->
-    $('[data-behavior~=entry_content_target] pre').each (i, e) ->
+    $('[data-behavior~=entry_content_target] pre code').each (i, e) ->
       hljs.highlightBlock(e)
 
   footnotes: ->

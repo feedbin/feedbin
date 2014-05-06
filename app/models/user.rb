@@ -34,6 +34,7 @@ class User < ActiveRecord::Base
 
   before_save :update_billing, unless: -> user { user.admin || !ENV['STRIPE_API_KEY'] }
   before_destroy :cancel_billing, unless: -> user { user.admin }
+  before_destroy :create_deleted_user
   before_save :strip_email
   before_save :activate_subscriptions
   before_save { reset_auth_token }
@@ -340,6 +341,10 @@ class User < ActiveRecord::Base
       tags[result['tag_id'].to_i] = JSON.parse(result['feed_ids'])
     end
     tags
+  end
+
+  def create_deleted_user
+    DeletedUser.create(email: self.email, customer_id: self.customer_id)
   end
 
 end
