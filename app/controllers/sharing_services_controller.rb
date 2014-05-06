@@ -2,6 +2,12 @@ class SharingServicesController < ApplicationController
 
   def index
     @user = current_user
+    supported_sharing_services = @user.supported_sharing_services
+    @supported_sharing_services = {}
+    supported_sharing_services.each do |sharing_service|
+      @supported_sharing_services[sharing_service.service_id] = sharing_service
+    end
+    @available_sharing_services = SupportedSharingService::SERVICES.sort_by {|supported_service| supported_service[:service_id]}
     render layout: 'settings'
   end
 
@@ -32,6 +38,5 @@ class SharingServicesController < ApplicationController
     end
     params.require(:user).permit!
   end
-
 
 end

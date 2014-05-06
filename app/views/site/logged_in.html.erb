@@ -8,7 +8,7 @@
 
 <%= render partial: 'shared/svg' %>
 
-<div class="application-messages"><div class="message-content" data-behavior="messages">You have subscribed</div></div>
+<div class="application-messages"><a href="" class="message-content" data-behavior="messages">You have subscribed</a></div>
 <div class="modal-target"></div>
 
 <div class="app-wrap">
@@ -94,6 +94,18 @@
       </div>
     </div>
     <% else %>
+    <div class="entry-basement">
+      <div class="basement-panel hide" data-basement-panel-target="settings_panel">
+        <%= render partial: 'shared/entry_settings' %>
+      </div>
+      <% @user.supported_sharing_services.each do |service| %>
+        <% if service.has_share_sheet? %>
+          <div class="basement-panel hide" data-basement-panel-target="<%= service.service_id %>_share_panel">
+            <%= render partial: "supported_sharing_services/share_form_#{service.service_id}", locals: {service: service} %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
     <div class="entry-content-wrap <%= @user.entry_width %> font-size-<%= @user.font_size || 5 %> font-<%= @user.font || 'default' %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
     </div>
     <% end %>
@@ -102,9 +114,6 @@
 </div>
 
 <div class="hide" data-behavior="pagination"></div>
-<div class="hide" data-behavior="entry_settings_content">
-  <%= render partial: 'shared/entry_settings' %>
-</div>
 <%= render partial: "shared/keyboard_shortcuts_wrap" %>
 <%= render partial: "shared/settings_modal" %>
 <%= render partial: "shared/data", locals: {mobile: false} %>

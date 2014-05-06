@@ -31,4 +31,24 @@ class UserMailer < ActionMailer::Base
     mail to: @user.email, subject: '[Feedbin] Starred Items Export Complete'
   end
 
+  def entry(entry_id, to, subject, body, reply_to, email_name, readability)
+    @entry = Entry.find(entry_id)
+    @message = body
+    @content = Service.determine_content({entry_id: entry_id, readability: readability})
+
+    if subject.blank?
+      subject = @entry.title
+    end
+
+    headers['X-MC-InlineCSS'] = "true"
+    headers['X-MC-Autotext'] = "true"
+    headers['X-MC-SigningDomain'] = "feedbin.io"
+    mail to: to, subject: subject, reply_to: reply_to, from: "#{email_name} <#{ENV['NOTIFICATION_EMAIL']}>"
+  end
+
+  def kindle(kindle_address, mobi_file)
+    attachments["kindle.mobi"] = File.read(mobi_file)
+    mail to: kindle_address, subject: 'Kindle Content', body: '', from: ENV['KINDLE_EMAIL']
+  end
+
 end

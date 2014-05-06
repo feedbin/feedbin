@@ -994,6 +994,119 @@ th {
 	@include border-color($border-color, $border-color-night);
 }
 
+.pill-list {
+	background-color: #FFF;
+	border-radius: 8px;
+	border: 1px solid $border-color;
+	margin: 0 0 20px 0;
+	padding: 0;
+	list-style: none;
+	li {
+		padding: 10px 15px 10px 20px;
+		margin: 0;
+		vertical-align: top;
+		border-bottom: 1px solid $border-color;
+		position: relative;
+		overflow: hidden;
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+	.service-title {
+		color: #212121;
+		font-size: 16px;
+		font-weight: bold;
+		margin: 0;
+		padding: 5px 0 5px 40px;
+	}
+	.service-error {
+		padding-right: 30px;
+		background: image-url("icon-error.svg") 100% 2px no-repeat;
+	}
+	.list-action {
+		position: absolute;
+		right: 15px;
+		top: 16px;
+	}
+	.service-options {
+		overflow: hidden;
+		padding: 10px 0 0  40px;
+	}
+	small {
+		clear: both;
+		padding-left: 40px;
+		display: block;
+		max-width: 600px;
+		&.hide {
+			display: none;
+		}
+	}
+	.service-options {
+		input, .cancel-button {
+			margin: 0 0 0 15px;
+			&.no-margin {
+				margin-left: 0;
+			}
+		}
+		input[type="text"],
+		input[type="password"] {
+			max-width: 250px;
+			float: left;
+		}
+		.action-button {
+			float: right;
+		}
+		.cancel-button {
+			margin-top: 7px;
+		}
+		small {
+			padding-top: 5px;
+			padding-left: 0;
+		}
+	}
+	.icon-share-facebook {
+		background: image-url("icon-share-facebook.svg") 0 0 no-repeat;
+		background-size: 25px 25px;
+	}
+	.icon-share-twitter {
+		background: image-url("icon-share-twitter.svg") 1px 3px no-repeat;
+		background-size: 21px 25px;
+	}
+	.icon-share-evernote {
+		background: image-url("icon-share-evernote.svg") 1px 3px no-repeat;
+		background-size: 20px 25px;
+	}
+	.icon-share-tumblr {
+		background: image-url("icon-share-tumblr.svg") 4px 3px no-repeat;
+		background-size: 14px 24px;
+	}
+	.icon-share-pinboard {
+		background: image-url("icon-share-pinboard.svg") 0 3px no-repeat;
+		background-size: 25px 25px;
+	}
+	.icon-share-kindle {
+		background: image-url("icon-share-kindle.png") 0 3px no-repeat;
+		background-size: 26px 23px;
+	}
+	.icon-share-email {
+		background: image-url("icon-share-email.svg") 0 6px no-repeat;
+		background-size: 24px 16px;
+	}
+	.icon-share-instapaper {
+		background: image-url("icon-share-instapaper.svg") 7px 2px no-repeat;
+		background-size: 10px 23px;
+	}
+	.icon-share-readability {
+		background: image-url("icon-share-readability.svg") 0 5px no-repeat;
+		background-size: 24px 17px;
+	}
+	.icon-share-pocket {
+		background: image-url("icon-share-pocket.svg") 0 5px no-repeat;
+		background-size: 24px 21px;
+	}
+}
+
+
 
 /*------------------------------------------------------------------------------
 Structure
@@ -1946,11 +2059,14 @@ $saved-search-control-height: 48px;
 	}
 }
 
-.entry-settings-wrap {
+.entry-basement {
 	position: absolute;
-	top: $small-toolbar-height;
+	top: $toolbar-height + $small-toolbar-height;
 	left: 0;
 	width: 100%;
+	&.foreground {
+		z-index: 5;
+	}
 }
 
 .entry-settings {
@@ -1960,14 +2076,14 @@ $saved-search-control-height: 48px;
 	@include border-color($border-color, $border-color-night);
 	@include background-color($drawer-background-color, $drawer-background-color-night);
 	@include arrow(20px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right) {
-		z-index: 3;
+		z-index: 10;
 		visibility: hidden;
 	}
 	.full-screen & {
 		@include arrow(65px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right);
 	}
-	&.open:after,
-	&.open:before {
+	.entry-basement.open &:after,
+	.entry-basement.open &:before {
 		visibility: visible;
 	}
 	.setting-wrap {
@@ -2288,10 +2404,10 @@ $saved-search-control-height: 48px;
 	.button-toggle-content {
 		svg {
 			position: absolute;
-			top: $base-button-position + 3;
-			left: 11px;
-			height: 14px;
-			width: 21px;
+			top: $base-button-position + 2;
+			left: 12px;
+			height: 15px;
+			width: 20px;
 		}
 	}
 	.button-toggle-share-menu {
@@ -2397,6 +2513,13 @@ $saved-search-control-height: 48px;
 		ul {
 			display: block;
 		}
+	}
+	.share-keyboard {
+		font-size: 11px;
+		float: right;
+		font-style: normal;
+		margin-top: 2px;
+		color: #CCC;
 	}
 }
 
@@ -2617,7 +2740,7 @@ $saved-search-control-height: 48px;
 			display: block;
 			content: "";
 			background: image-url("icon-readability.svg") 10px 50% no-repeat;
-			background-size: 21px 14px;
+			background-size: 20px 15px;
 			width: 43px;
 			right: 0px;
 			top: 0;
@@ -2893,6 +3016,7 @@ $saved-search-control-height: 48px;
 }
 
 .application-messages {
+  $height: 46px;
 	position: absolute;
 	z-index: 10000;
 	width: 100%;
@@ -2900,19 +3024,30 @@ $saved-search-control-height: 48px;
 	.message-content {
 		position: relative;
 		width: 500px;
-		height: 32px;
-		background-color: rgba(0,0,0,.9);
-		line-height: 32px;
+		background-color: $selected;
+		display: block;
+		height: $height;
+		line-height: $height;
+		top: -$height;
 		color: #fff;
-		font-size: 12px;
+		font-size: 16px;
 		padding: 0 10px;
 		margin: 0 auto;
 		transition:top .2s ease;
-		top: -32px;
+		cursor: pointer;
 		&.show {
 			top: 0;
 		}
-
+        &.error {
+            background-color: #d61f33;
+        }
+		&:hover {
+			text-decoration: none;
+			color: #FFF;
+		}
+		&[href=""] {
+			cursor: default;
+		}
 		@media (max-width: 500px) {
 			width: 100%;
 		}
@@ -3066,7 +3201,6 @@ Settings
 		color: #999;
 	}
 	code {
-		font-size: 15px;
 		padding: 0;
 	}
 	.alert {
@@ -3587,6 +3721,24 @@ table.small td {
 	font-weight: bold;
 }
 
+.sharing-table {
+	td:last-child {
+		text-align: right;
+	}
+	.has-message {
+		td {
+			border-bottom: none;
+			padding-bottom: 0;
+		}
+	}
+	.message {
+		td:last-child {
+			padding-top: 0;
+			text-align: left;
+		}
+	}
+}
+
 /*------------------------------------------------------------------------------
 Icons
 ------------------------------------------------------------------------------*/
@@ -3685,6 +3837,7 @@ Buttons
 	padding: 0 !important;
 	border: none;
 	font-size: 16px;
+	background: transparent;
 	&:hover {
 		background: transparent;
 	}
@@ -4038,18 +4191,12 @@ select {
 .alert {
 	padding: 8px 35px 8px 14px;
 	margin-bottom: 20px;
-	text-shadow: 0 1px 0 rgba(255,255,255,0.5);
-	background-color: #fcf8e3;
-	border: 1px solid #fbeed5;
-	border-radius: 4px;
-}
-
-.alert,
-.alert h4 {
-	color: #c09853;
+	background-color: $selected;
+	color: #FFF;
 }
 
 .alert h4 {
+	color: #FFF;
 	margin: 0;
 }
 
@@ -4060,47 +4207,19 @@ select {
 	line-height: 20px;
 }
 
+.alert-info,
 .alert-success {
-	color: #468847;
-	background-color: #dff0d8;
-	border-color: #d6e9c6;
-}
-
-.alert-success h4 {
-	color: #468847;
+	background-color: $selected;
 }
 
 .alert-danger,
 .alert-error {
-	color: #b94a48;
-	background-color: #f2dede;
-	border-color: #eed3d7;
-}
-
-.alert-danger h4,
-.alert-error h4 {
-	color: #b94a48;
-}
-
-.alert-info {
-	color: #3a87ad;
-	background-color: #d9edf7;
-	border-color: #bce8f1;
-}
-
-.alert-info h4 {
-	color: #3a87ad;
+	background-color: #d61f33;
 }
 
 .alert-block {
 	padding-top: 14px;
 	padding-bottom: 14px;
-}
-
-.alert-info {
-	color: #b94a48;
-	background-color: #f2dede;
-	border-color: #eed3d7;
 }
 
 .billing-promo {
@@ -4335,6 +4454,14 @@ h3 .inline-subhead {
 	color: #666666;
 }
 
+.danger {
+	color: red;
+}
+
+a:hover.danger {
+	color: #b80000;
+}
+
 .xs-hide {
 	display: none;
 	@include respond-to(screen-xs) {
@@ -4542,8 +4669,7 @@ Print
 	.app .bar,
 	.app .feeds-column,
 	.app .entries-column,
-	.app .entry-toolbar,
-	.entry-settings-wrap {
+	.app .entry-toolbar {
 		display: none !important;
 	}
 	.app .content,
@@ -4574,6 +4700,9 @@ Fullscreen
 	}
 	.app-panel {
 		border-top: none;
+	}
+	.entry-basement {
+		top: $small-toolbar-height;
 	}
 }
 
@@ -4850,6 +4979,9 @@ Media Queries
 			display: block;
 		}
 	}
+    .entry-basement {
+    	top: $small-toolbar-height;
+    }
 	.entries-inner {
         top: $toolbar-height;
     }
@@ -4891,5 +5023,116 @@ Media Queries
 		&.no-content {
 			display: none;
 		}
+	}
+}
+
+.share-form {
+	@include background-color($drawer-background-color, $drawer-background-color-night);
+	padding: 17px 20px;
+	border-bottom: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
+	@include arrow(201px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right) {
+		z-index: 10;
+		visibility: hidden;
+	}
+	.full-screen & {
+		@include arrow(246px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right);
+	}
+	.entry-basement.open &:after,
+	.entry-basement.open &:before {
+		visibility: visible;
+	}
+    .share-form-inner {
+        max-width: 620px;
+        margin: 0 auto;
+    }
+	h2 {
+		font-size: 16px;
+		@include color($text-header-color, $text-header-color-night);
+		font-weight: bold;
+		margin: 0 0 15px 0;
+	}
+	.field-cluster {
+		margin-bottom: 15px;
+		input, textarea {
+			@include background-color(#FFF, #191c20);
+			@include color($text-header-color, $text-header-color-night);
+			width: 100%;
+			max-width: 100%;
+			margin: 0;
+			position: relative;
+			border-radius: 0;
+			border-bottom: none;
+			padding: 10px 10px 8px 10px !important;
+            font-size: 16px;
+			&:focus {
+				@include border-color($border-color, $border-color-night);
+			}
+			&:first-child {
+				border-radius: 4px 4px 0 0;
+			}
+			&:last-child {
+				border-radius: 0 0 4px 4px;
+				border-bottom: 1px solid transparent;
+				@include border-color($border-color, $border-color-night);
+			}
+		}
+		textarea {
+			resize: none;
+		}
+	}
+	.share-controls {
+		overflow: hidden;
+        margin-bottom: 10px;
+		.checkbox, .radio, .control {
+			float: left;
+			margin-left: 15px;
+			font-size: 14px;
+			@include color($text-color-light-night, $text-color-light-night);
+			&:first-child {
+				margin-left: 0
+			}
+			input {
+				margin-top: 2px;
+			}
+		}
+	}
+    .button {
+        padding: 9px 15px;
+        background-color: $selected;
+        color: #fff;
+        &:hover {
+            background-color: #2877c6;
+        }
+    }
+    .button-text {
+        background-color: transparent;
+        color: $selected;
+        &:hover {
+            background-color: transparent;
+            color: #2877c6;
+        }
+    }
+	.button-wrap {
+		overflow: hidden;
+		input, button {
+			float: right;
+		}
+	}
+	.icon-share-email {
+		background: image-url("icon-share-email.svg") 100% 0 no-repeat;
+		background-size: 24px 16px;
+	}
+	.icon-share-evernote {
+		background: image-url("icon-share-evernote.svg") 100% 0 no-repeat;
+		background-size: 20px 25px;
+	}
+	.icon-share-tumblr {
+		background: image-url("icon-share-tumblr.svg") 100% 0 no-repeat;
+		background-size: 14px 24px;
+	}
+	.icon-share-pinboard {
+		background: image-url("icon-share-pinboard.svg") 100% 0 no-repeat;
+		background-size: 25px 25px;
 	}
 }

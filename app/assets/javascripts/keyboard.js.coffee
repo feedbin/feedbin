@@ -237,6 +237,13 @@ class feedbin.Keyboard
         shareButton.click()
         event.preventDefault()
 
+    # sharing hotkeys
+    Mousetrap.bind ['1', '2', '3', '4', '5', '6', '7', '8', '9'], (event, combo) =>
+      shareMenu = $('[data-behavior~=share_options]')
+      if shareMenu.length > 0
+        shareIndex = combo - 1
+        $('li', shareMenu).eq(shareIndex).find('a')[0].click()
+
     # Full Screen
     Mousetrap.bind 'F', (event, combo) =>
       if $('[data-behavior~=entry_content_target]').html().length > 0

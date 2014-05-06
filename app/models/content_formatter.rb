@@ -59,6 +59,23 @@ class ContentFormatter
     content
   end
 
+  def self.evernote_format(content, entry)
+    filters = [HTML::Pipeline::SanitizationFilter, HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter]
+    context = {
+      whitelist: Feedbin::Application.config.evernote_whitelist.clone,
+      image_base_url: entry.feed.site_url,
+      image_subpage_url: entry.url,
+      href_base_url: entry.feed.site_url,
+      href_subpage_url: entry.url
+    }
+
+    pipeline = HTML::Pipeline.new filters, context
+    result = pipeline.call(content)
+    result[:output].to_xml
+  rescue
+    content
+  end
+
   def self.summary(content)
     sanitize_config = Sanitize::Config::RELAXED.dup
     sanitize_config = sanitize_config.merge(remove_contents: ['script', 'style', 'iframe', 'object', 'embed'])

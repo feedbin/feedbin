@@ -2,13 +2,23 @@ window.feedbin ?= {}
 
 $.extend feedbin,
 
-  showNotification: (text) ->
+  showNotification: (text, timeout = 3000, href = '', error = false) ->
     messages = $('[data-behavior~=messages]')
+    if error == true
+      messages.addClass('error')
+    else
+      messages.removeClass('error')
+
+    if href == ''
+      messages.removeAttr('href')
+    else
+      messages.attr('href', href)
+
     messages.text(text)
     messages.addClass('show')
     setTimeout ( ->
       messages.removeClass('show')
-    ), 3000
+    ), timeout
 
   updateEntries: (entries, header) ->
     $('.entries ul').html(entries)
@@ -22,6 +32,7 @@ $.extend feedbin,
     $('[data-behavior~=pagination]').html(html)
 
   updateEntryContent: (html) ->
+    feedbin.closeEntryBasement(0)
     $('[data-behavior~=entry_content_target]').html(html)
 
   modalBox: (html) ->
@@ -37,7 +48,7 @@ $.extend feedbin,
     $('[data-behavior~=entries_target]').html('')
 
   clearEntry: ->
-    $('[data-behavior~=entry_content_target]' ).html('')
+    feedbin.updateEntryContent('')
 
   syntaxHighlight: ->
     $('[data-behavior~=entry_content_target] pre code').each (i, e) ->
@@ -174,7 +185,7 @@ $.extend feedbin,
     feedbin.nextEntryPreview(currentItem)
 
   refresh: ->
-    if feedbin.data != null
+    if feedbin.data
       $.get(feedbin.data.autoUpdatePath)
 
   shareOpen: ->
@@ -260,6 +271,14 @@ $.extend feedbin,
     $('.feeds-inner').removeClass('show-subscribe')
     $('.subscribe-wrap').removeClass('open')
 
+  getSelectedText: ->
+    text = ""
+    if (window.getSelection)
+      text = window.getSelection().toString();
+    else if (document.selection && document.selection.type != "Control")
+      text = document.selection.createRange().text;
+    text
+
   scrollTo: (item, container) ->
     item.offset().top - container.offset().top + container.scrollTop()
 
@@ -300,11 +319,69 @@ $.extend feedbin,
           context.fillRect(xPosition, yPosition, barWidth, height)
           xPosition = xPosition + barWidth + spaceWidth
 
-  closeEntrySettings: ->
+  closeEntryBasement: (timeout = 200) ->
+    feedbin.closeEntryBasementTimeount = setTimeout ( ->
+      $('.basement-panel').addClass('hide')
+    ), timeout
+
+    clearTimeout(feedbin.openEntryBasementTimeount)
+
+    $('.entry-basement').removeClass('foreground')
     top = $('.entry-toolbar').outerHeight()
-    $('.entry-settings').removeClass('open')
+    $('.entry-basement').removeClass('open')
     $('.entry-content').css
       top: top
+
+  readabilityActive: ->
+    $('[data-behavior~=toggle_content_view]').find('.active').length > 0
+
+  prepareShareForm: ->
+    $('.field-cluster input, .field-cluster textarea').val('')
+    $('.share-controls [type="checkbox"]').attr('checked', false);
+
+    title = $('.entry-header h1').first().text()
+    $('.share-form .title-placeholder').val(title)
+
+    url = $('.entry-header a').first().attr('href')
+    $('.share-form .url-placeholder').val(url)
+
+    description = feedbin.getSelectedText()
+    $('.share-form .description-placeholder').val(description)
+
+    if feedbin.readabilityActive()
+      $('.readability-placeholder').val('on')
+    else
+      $('.readability-placeholder').val('off')
+
+
+  sharePopup: (url) ->
+    windowOptions = 'scrollbars=yes,resizable=yes,toolbar=no,location=yes'
+    width = 550
+    height = 420
+    winHeight = screen.height
+    winWidth = screen.width
+    left = Math.round((winWidth / 2) - (width / 2));
+    top = 0;
+    if (winHeight > height)
+      top = Math.round((winHeight / 2) - (height / 2))
+    window.open(url, 'intent', "#{windowOptions},width=#{width},height=#{height},left=#{left},top=#{top}")
+
+
+  openEntryBasement: (selectedPanel) ->
+    feedbin.openEntryBasementTimeount = setTimeout ( ->
+      $('.entry-basement').addClass('foreground')
+    ), 200
+
+    clearTimeout(feedbin.closeEntryBasementTimeount)
+
+    feedbin.prepareShareForm()
+
+    $('.basement-panel').addClass('hide')
+    selectedPanel.removeClass('hide')
+    $('.entry-basement').addClass('open')
+    newTop = $('.entry-toolbar').outerHeight() + selectedPanel.height()
+    $('.entry-content').css
+      top: newTop
 
   hideQueue: []
 
@@ -342,7 +419,6 @@ $.extend feedbin,
         query = "#{query} sort:#{sortOption}"
         searchField.val(query)
         searchField.parents('form').submit()
-
 
     markRead: ->
       $(document).on 'click', '[data-mark-read]', ->
@@ -444,7 +520,6 @@ $.extend feedbin,
         handles: "e"
         minWidth: 200
         stop: (event, ui) ->
-          console.log ui
           form = $('[data-behavior~=resizable_form]')
           $('[name=column]', form).val($(ui.element).data('resizable-name'))
           $('[name=width]', form).val(ui.size.width)
@@ -540,6 +615,9 @@ $.extend feedbin,
         unless $(event.target).is('[data-behavior~=toggle_dropdown]') || $(event.target).parents('[data-behavior~=toggle_dropdown]').length > 0
           dropdown.removeClass('open')
         return
+
+      $(document).on 'click', '[data-behavior~=share_options] a', (event) ->
+        $('.dropdown-wrap').removeClass('open')
 
       $(document).on 'click', '[data-behavior~=toggle_share_menu]', (event) ->
         $(".dropdown-wrap li").removeClass('selected')
@@ -690,27 +768,58 @@ $.extend feedbin,
         feedbin.refresh()
       ), 300000
 
-    entrySettings: ->
+    entryBasement: ->
+
       $(document).on 'click', (event, xhr) ->
-        if ($(event.target).hasClass('entry-settings') || $(event.target).parents('.entry-settings').length > 0)
+        if ($(event.target).hasClass('entry-basement') || $(event.target).parents('.entry-basement').length > 0)
           false
-        else if ($(event.target).hasClass('button-settings') || $(event.target).parents('.button-settings').length > 0) && !$('.entry-settings').hasClass('open')
-          top = $('.entry-toolbar').outerHeight() + $('.entry-settings').outerHeight()
-          $('.entry-settings').addClass('open')
-          $('[data-behavior="entry_settings_target"]').html($('[data-behavior="entry_settings_content"]').html())
-          $('[data-behavior~=change_font]').val($("[data-font]").data('font'))
-          $('[data-behavior~=change_font]').change ->
-            fontContainer = $("[data-font]")
-            currentFont = fontContainer.data('font')
-            fontContainer.removeClass("font-#{currentFont}")
-            fontContainer.addClass("font-#{$(@).val()}")
-            fontContainer.data('font', $(@).val())
-            $(@).parents('form').submit()
-          $('.entry-content').css
-            top: top
+
+        if !$(event.target).is('[data-behavior~=show_entry_basement]') && $(event.target).parents('.entry-basement').length == 0
+          feedbin.closeEntryBasement()
+        return
+
+      $(document).on 'click', '[data-behavior~=show_entry_basement]', (event, xhr) ->
+        panelName = $(@).data('basement-panel')
+        selectedPanel = $("[data-basement-panel-target=#{panelName}]")
+
+        if $('.entry-basement').hasClass('open')
+          if selectedPanel.hasClass('hide')
+            # There is another panel open, transition to the clicked on panel
+            feedbin.closeEntryBasement()
+            feedbin.openEntryBasement(selectedPanel)
+          else
+            # The clicked on panel is alread open, close it
+            feedbin.closeEntryBasement()
         else
-          feedbin.closeEntrySettings()
-      return
+          feedbin.openEntryBasement(selectedPanel)
+
+        event.preventDefault()
+        return
+
+      $(document).on 'click', '[data-behavior~=close_entry_basement]', (event, xhr) ->
+        feedbin.closeEntryBasement()
+        event.preventDefault()
+        return
+
+      $(document).on 'submit', '.share-form form', (event, xhr) ->
+        feedbin.closeEntryBasement()
+        return
+
+    supportedSharing: ->
+      $(document).on 'click', '.button-toggle-share-menu [data-behavior~=show_entry_basement]', (event, xhr) ->
+        panelName = $(@).data('basement-panel')
+        selectedPanel = $("[data-basement-panel-target=#{panelName}]")
+        $('form', selectedPanel).attr('action', $(@).attr('href'))
+
+    formatToolbar: ->
+      $('[data-behavior~=change_font]').val($("[data-font]").data('font'))
+      $('[data-behavior~=change_font]').change ->
+        fontContainer = $("[data-font]")
+        currentFont = fontContainer.data('font')
+        fontContainer.removeClass("font-#{currentFont}")
+        fontContainer.addClass("font-#{$(@).val()}")
+        fontContainer.data('font', $(@).val())
+        $(@).parents('form').submit()
 
     feedSettings: ->
       $('[data-behavior~=sort_feeds]').change ->
@@ -739,7 +848,7 @@ $.extend feedbin,
     fullscreen: ->
       $(document).on 'click', '[data-behavior~=full_screen]', (event) ->
         feedbin.toggleFullScreen()
-        feedbin.closeEntrySettings()
+        feedbin.closeEntryBasement()
         event.preventDefault()
         return
 
@@ -905,6 +1014,19 @@ $.extend feedbin,
     viewLatest: ->
       $(document).on 'click', '.view-latest-link', ->
         $('.entries .selected a').click()
+        return
+
+    serviceOptions: ->
+      $(document).on 'click', '[data-behavior~=show_service_options]', (event) ->
+        $(@).parents('li').find('.service-options').removeClass('hide')
+        $(@).parents('li').find('.show-service-options').addClass('hide')
+        event.preventDefault()
+        return
+
+      $(document).on 'click', '[data-behavior~=hide_service_options]', (event) ->
+        $(@).parents('li').find('.service-options').addClass('hide')
+        $(@).parents('li').find('.show-service-options').removeClass('hide')
+        event.preventDefault()
         return
 
     drawBarCharts: ->

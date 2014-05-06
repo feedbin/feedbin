@@ -310,26 +310,15 @@ class EntriesController < ApplicationController
   private
 
   def sharing_services(entry)
-    @user_sharing_services ||= @user.sharing_services
-    services = []
+    @user_sharing_services ||= begin
+      (@user.sharing_services + @user.supported_sharing_services).sort_by{|sharing_service| sharing_service.label}
+    end
 
-    if @user_sharing_services.present?
+    services = []
+    @user_sharing_services.each do |sharing_service|
       begin
-        @user_sharing_services.each do |service|
-          entry_url = entry.fully_qualified_url ? ERB::Util.url_encode(entry.fully_qualified_url) : ''
-          title = entry.title ? ERB::Util.url_encode(entry.title) : ''
-          feed_name = entry.feed.title ? ERB::Util.url_encode(entry.feed.title) : ''
-          url = service.url.clone
-          url = url.strip
-          url = url.gsub('${url}', entry_url).gsub('${title}', title).gsub('${source}', feed_name)
-          if url.start_with?('http')
-            target = '_blank'
-          else
-            target = '_self'
-          end
-          services << {label: service.label, url: url, target: target}
-        end
-      rescue Exception => e
+        services << sharing_service.link_options(entry)
+      rescue
       end
     end
     services

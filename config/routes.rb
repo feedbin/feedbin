@@ -54,6 +54,16 @@ Feedbin::Application.routes.draw do
   resources :actions, path: 'settings/actions', only: [:index]
   resources :saved_searches
 
+  resources :supported_sharing_services, only: [:create, :destroy, :update] do
+    member do
+      get :oauth2_pocket_request
+      get :oauth2_pocket_response
+      get :oauth_response
+      post :xauth_request
+      match 'share/:entry_id', to: 'supported_sharing_services#share', as: :share, via: [:get, :post]
+    end
+  end
+
   resources :subscriptions,  only: [:index, :create, :destroy] do
     collection do
       patch :update_multiple
