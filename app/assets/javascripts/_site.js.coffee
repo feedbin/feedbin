@@ -2,11 +2,20 @@ window.feedbin ?= {}
 
 $.extend feedbin,
 
-  showNotification: (text, timeout = 3000, href = '') ->
+  showNotification: (text, timeout = 3000, href = '', error = false) ->
     messages = $('[data-behavior~=messages]')
+    if error == true
+      messages.addClass('error')
+    else
+      messages.removeClass('error')
+
+    if href == ''
+      messages.removeAttr('href')
+    else
+      messages.attr('href', href)
+
     messages.text(text)
     messages.addClass('show')
-    messages.attr('href', href)
     setTimeout ( ->
       messages.removeClass('show')
     ), timeout

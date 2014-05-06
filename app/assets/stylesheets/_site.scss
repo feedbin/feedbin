@@ -1019,6 +1019,10 @@ th {
 		margin: 0;
 		padding: 5px 0 5px 40px;
 	}
+	.service-error {
+		padding-right: 30px;
+		background: image-url("icon-error.svg") 100% 2px no-repeat;
+	}
 	.list-action {
 		position: absolute;
 		right: 15px;
@@ -1082,7 +1086,7 @@ th {
 	}
 	.icon-share-kindle {
 		background: image-url("icon-share-kindle.png") 0 3px no-repeat;
-		background-size: 25px 24px;
+		background-size: 26px 23px;
 	}
 	.icon-share-email {
 		background: image-url("icon-share-email.svg") 0 6px no-repeat;
@@ -3012,6 +3016,7 @@ $saved-search-control-height: 48px;
 }
 
 .application-messages {
+  $height: 46px;
 	position: absolute;
 	z-index: 10000;
 	width: 100%;
@@ -3019,20 +3024,23 @@ $saved-search-control-height: 48px;
 	.message-content {
 		position: relative;
 		width: 500px;
-		height: 32px;
-		background-color: rgba(0,0,0,.9);
+		background-color: $selected;
 		display: block;
-		line-height: 32px;
+		height: $height;
+		line-height: $height;
+		top: -$height;
 		color: #fff;
-		font-size: 12px;
+		font-size: 16px;
 		padding: 0 10px;
 		margin: 0 auto;
 		transition:top .2s ease;
-		top: -32px;
 		cursor: pointer;
 		&.show {
 			top: 0;
 		}
+        &.error {
+            background-color: #d61f33;
+        }
 		&:hover {
 			text-decoration: none;
 			color: #FFF;
@@ -4183,18 +4191,12 @@ select {
 .alert {
 	padding: 8px 35px 8px 14px;
 	margin-bottom: 20px;
-	text-shadow: 0 1px 0 rgba(255,255,255,0.5);
-	background-color: #fcf8e3;
-	border: 1px solid #fbeed5;
-	border-radius: 4px;
-}
-
-.alert,
-.alert h4 {
-	color: #c09853;
+	background-color: $selected;
+	color: #FFF;
 }
 
 .alert h4 {
+	color: #FFF;
 	margin: 0;
 }
 
@@ -4205,47 +4207,19 @@ select {
 	line-height: 20px;
 }
 
+.alert-info,
 .alert-success {
-	color: #468847;
-	background-color: #dff0d8;
-	border-color: #d6e9c6;
-}
-
-.alert-success h4 {
-	color: #468847;
+	background-color: $selected;
 }
 
 .alert-danger,
 .alert-error {
-	color: #b94a48;
-	background-color: #f2dede;
-	border-color: #eed3d7;
-}
-
-.alert-danger h4,
-.alert-error h4 {
-	color: #b94a48;
-}
-
-.alert-info {
-	color: #3a87ad;
-	background-color: #d9edf7;
-	border-color: #bce8f1;
-}
-
-.alert-info h4 {
-	color: #3a87ad;
+	background-color: #d61f33;
 }
 
 .alert-block {
 	padding-top: 14px;
 	padding-bottom: 14px;
-}
-
-.alert-info {
-	color: #b94a48;
-	background-color: #f2dede;
-	border-color: #eed3d7;
 }
 
 .billing-promo {
@@ -5005,6 +4979,9 @@ Media Queries
 			display: block;
 		}
 	}
+    .entry-basement {
+    	top: $small-toolbar-height;
+    }
 	.entries-inner {
         top: $toolbar-height;
     }
@@ -5051,7 +5028,7 @@ Media Queries
 
 .share-form {
 	@include background-color($drawer-background-color, $drawer-background-color-night);
-	padding: 17px;
+	padding: 17px 20px;
 	border-bottom: 1px solid transparent;
 	@include border-color($border-color, $border-color-night);
 	@include arrow(201px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right) {
@@ -5065,6 +5042,10 @@ Media Queries
 	.entry-basement.open &:before {
 		visibility: visible;
 	}
+    .share-form-inner {
+        max-width: 620px;
+        margin: 0 auto;
+    }
 	h2 {
 		font-size: 16px;
 		@include color($text-header-color, $text-header-color-night);
@@ -5082,7 +5063,8 @@ Media Queries
 			position: relative;
 			border-radius: 0;
 			border-bottom: none;
-			padding: 12px 12px 10px 12px !important;
+			padding: 10px 10px 8px 10px !important;
+            font-size: 16px;
 			&:focus {
 				@include border-color($border-color, $border-color-night);
 			}
@@ -5101,6 +5083,7 @@ Media Queries
 	}
 	.share-controls {
 		overflow: hidden;
+        margin-bottom: 10px;
 		.checkbox, .radio, .control {
 			float: left;
 			margin-left: 15px;
@@ -5114,13 +5097,42 @@ Media Queries
 			}
 		}
 	}
+    .button {
+        padding: 9px 15px;
+        background-color: $selected;
+        color: #fff;
+        &:hover {
+            background-color: #2877c6;
+        }
+    }
+    .button-text {
+        background-color: transparent;
+        color: $selected;
+        &:hover {
+            background-color: transparent;
+            color: #2877c6;
+        }
+    }
 	.button-wrap {
 		overflow: hidden;
 		input, button {
 			float: right;
 		}
-		.button-text {
-			margin-right: 15px;
-		}
+	}
+	.icon-share-email {
+		background: image-url("icon-share-email.svg") 100% 0 no-repeat;
+		background-size: 24px 16px;
+	}
+	.icon-share-evernote {
+		background: image-url("icon-share-evernote.svg") 100% 0 no-repeat;
+		background-size: 20px 25px;
+	}
+	.icon-share-tumblr {
+		background: image-url("icon-share-tumblr.svg") 100% 0 no-repeat;
+		background-size: 14px 24px;
+	}
+	.icon-share-pinboard {
+		background: image-url("icon-share-pinboard.svg") 100% 0 no-repeat;
+		background-size: 25px 25px;
 	}
 }
