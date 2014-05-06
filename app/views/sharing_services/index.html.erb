@@ -28,7 +28,7 @@
   <% end %>
 
   <h3>Custom</h3>
-  <p class="muted">BYO sharing service. <a href="http://help.feedbin.com/sharing-read-it-later-services/">How does this work?</a></p>
+  <p class="muted">Create your own sharing service. <a href="http://help.feedbin.com/sharing-read-it-later-services/">How does this work</a>?</p>
   <%= form_for @user, url: sharing_services_update_user_path(@user), html: {novalidate: 'novalidate'} do |f| %>
     <p class="half-margin"><%= link_to_add_fields "Add Service", f, :sharing_services %></p>
     <table class="table form-table" data-behavior="add_fields_target">
