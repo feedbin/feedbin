@@ -11,16 +11,16 @@ Feedbin::Application.config.evernote_whitelist = {
   ),
   :remove_contents => ['script', 'style', 'iframe', 'object', 'embed'],
   :attributes => {
-    'a' => ['href', :relative],
-    'img' => ['src', :relative],
+    'a' => ['href'],
+    'img' => ['src'],
     :all => ['align', 'alt', 'border', 'cellpadding', 'cellspacing', 'cite', 'cols', 'colspan', 'color',
       'coords', 'datetime', 'dir', 'disabled', 'enctype', 'for', 'height', 'hreflang', 'label', 'lang',
       'longdesc', 'name', 'rel', 'rev', 'rows', 'rowspan', 'selected', 'shape', 'size', 'span', 'start',
       'summary', 'target', 'title', 'type','valign', 'value', 'vspace', 'width']
   },
   :protocols => {
-    'a'   => {'href' => ['http', 'https']},
-    'img' => {'src'  => ['http', 'https']}
+    'a'   => {'href' => ['http', 'https', :relative]},
+    'img' => {'src'  => ['http', 'https', :relative]}
   }
 }
 
