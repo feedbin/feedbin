@@ -2,11 +2,8 @@ class SharingServicesController < ApplicationController
 
   def index
     @user = current_user
-    supported_sharing_services = @user.supported_sharing_services
-    @supported_sharing_services = {}
-    supported_sharing_services.each do |sharing_service|
-      @supported_sharing_services[sharing_service.service_id] = sharing_service
-    end
+    @active_sharing_services = @user.supported_sharing_services.order(:service_id)
+    @active_service_ids = @active_sharing_services.collect {|service| service.service_id}
     @available_sharing_services = SupportedSharingService::SERVICES.sort_by {|supported_service| supported_service[:service_id]}
     render layout: 'settings'
   end

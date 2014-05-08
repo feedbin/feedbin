@@ -1,26 +1,26 @@
 <div class="settings-content-inner-wide">
   <h2>Sharing</h2>
 
-  <% if @supported_sharing_services.any? %>
+  <% if @active_sharing_services.any? %>
     <h3>Active Services</h3>
 
     <ul class="pill-list">
-      <% @supported_sharing_services.each do |service_id, sharing_service| %>
+      <% @active_sharing_services.each do |sharing_service| %>
         <% if sharing_service.active? %>
-          <li><%= render partial: "supported_sharing_services/service_#{service_id}", locals: {sharing_service: sharing_service, record: sharing_service, status: :active} %></li>
+          <li><%= render partial: "supported_sharing_services/service_#{sharing_service.service_id}", locals: {sharing_service: sharing_service, record: sharing_service, status: :active} %></li>
         <% else %>
-          <li><%= render partial: "supported_sharing_services/service_#{service_id}", locals: {sharing_service: sharing_service, record: sharing_service, status: :issue} %></li>
+          <li><%= render partial: "supported_sharing_services/service_#{sharing_service.service_id}", locals: {sharing_service: sharing_service, record: sharing_service, status: :issue} %></li>
         <% end %>
       <% end %>
     </ul>
   <% end %>
 
-  <% unless @supported_sharing_services.count == @available_sharing_services.count %>
+  <% unless @active_sharing_services.count == @available_sharing_services.count %>
     <h3>Available Services</h3>
 
     <ul class="pill-list">
       <% @available_sharing_services.each do |sharing_service| %>
-        <% unless @supported_sharing_services[sharing_service[:service_id]].present? %>
+        <% unless @active_service_ids.include?(sharing_service[:service_id]) %>
           <li><%= render partial: "supported_sharing_services/service_#{sharing_service[:service_id]}", locals: {sharing_service: sharing_service, record: SupportedSharingService.new, status: :inactive} %></li>
         <% end %>
       <% end %>
