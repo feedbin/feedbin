@@ -8,13 +8,6 @@ GIT
       nokogiri (~> 1.4)
 
 GIT
-  remote: git://github.com/benubois/logster.git
-  revision: 641f5f9173b843f6b524b84ea1ea1fadb36cb63f
-  ref: 641f5f9
-  specs:
-    logster (0.0.1)
-
-GIT
   remote: git://github.com/feedbin/feedzirra.git
   revision: c7a1f101353401bfb7a3383325e3ff50227de5ac
   ref: c7a1f10
@@ -198,6 +191,7 @@ GEM
       actionpack (>= 3)
       activesupport (>= 3)
       railties (>= 3)
+    logster (0.0.4)
     longurl (0.1.6)
       json
     loofah (1.2.1)
@@ -363,7 +357,7 @@ DEPENDENCIES
   jquery-rails
   librato-rails (= 0.9.0)
   lograge
-  logster!
+  logster
   longurl
   oauth
   opml_saw!
