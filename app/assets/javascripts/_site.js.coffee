@@ -1067,6 +1067,18 @@ $.extend feedbin,
         $('.feed-form').html(suggestions)
       return
 
+    generalAutocomplete: ->
+      autocompleteFields = $('[data-behavior~=autocomplete_field]')
+      $.each autocompleteFields, (i, field) ->
+        field = $(field)
+        field.autocomplete
+          serviceUrl: field.data('autocompletePath')
+          appendTo: field.parent("[data-behavior~=autocomplete_parent]").find("[data-behavior=autocomplete_target]")
+          delimiter: /(,)\s*/
+          deferRequestBy: 50
+          autoSelectFirst: true
+      return
+
 jQuery ->
   $.each feedbin.init, (i, item) ->
     item()

@@ -137,6 +137,13 @@ class SupportedSharingServicesController < ApplicationController
     redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
   end
 
+  def autocomplete
+    @user = current_user
+    service = @user.supported_sharing_services.where(id: params[:id]).first!
+    completions = service.completions.find_all { |completion| completion.downcase.include?(params[:query].downcase) }.first(3)
+    render json: { suggestions: completions.map {|completion| { value: completion, data: completion } } }.to_json
+  end
+
   private
 
   def supported_sharing_service_params

@@ -171,5 +171,18 @@ class SupportedSharingService < ActiveRecord::Base
     access_token.present?
   end
 
+  def completions
+    options = service_options || {}
+    options['completions'] || []
+  end
+
+  def update_completions(new_completions)
+    old_completions = completions
+    final_completions = old_completions.concat(new_completions).uniq
+    options = service_options || {}
+    options['completions'] = final_completions
+    update_attributes(service_options: nil)
+    update_attributes(service_options: options)
+  end
 
 end

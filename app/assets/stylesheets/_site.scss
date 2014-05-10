@@ -5135,4 +5135,25 @@ Media Queries
 		background: image-url("icon-share-pinboard.svg") 100% 0 no-repeat;
 		background-size: 25px 25px;
 	}
+    .autocomplete-parent {
+        position: relative;
+        .share-autocomplete {
+            z-index: 2;
+            position: absolute;
+            top: 39px;
+            left: 7px;
+            width: 100%;
+            max-width: 400px;
+            @include background-color(#FFF, #191c20);
+			border-left: 1px solid transparent;
+			border-right: 1px solid transparent;
+			border-bottom: 1px solid transparent;
+			@include border-color($border-color, $border-color-night);
+        }
+        .autocomplete-suggestion {
+        	&:hover, &.autocomplete-selected {
+        		background-color: rgba(#000, .1);
+        	}
+        }
+    }
 }
