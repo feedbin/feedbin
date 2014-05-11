@@ -4207,11 +4207,11 @@ select {
 	line-height: 20px;
 }
 
-.alert-info,
 .alert-success {
 	background-color: $selected;
 }
 
+.alert-info,
 .alert-danger,
 .alert-error {
 	background-color: #d61f33;

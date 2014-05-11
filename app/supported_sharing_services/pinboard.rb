@@ -10,12 +10,11 @@ class Pinboard < Service
   end
 
   def request_token(username, password)
-    response = self.class.get('/user/api_token', basic_auth: {username: username, password: password}, query: {format: 'json'})
+    response = self.class.get('/user/api_token', query: {auth_token: password, format: 'json'})
     if response.code == 401
       raise OAuth::Unauthorized
     else
-      response = JSON.load(response.body)
-      OpenStruct.new(token: "#{username}:#{response['result']}", secret: 'n/a')
+      OpenStruct.new(token: password, secret: 'n/a')
     end
   end
 

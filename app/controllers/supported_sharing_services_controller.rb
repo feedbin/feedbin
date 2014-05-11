@@ -73,7 +73,7 @@ class SupportedSharingServicesController < ApplicationController
         redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
       end
     rescue OAuth::Unauthorized
-      redirect_to sharing_services_url, alert: "Invalid #{service_info[:label]} username or password."
+      redirect_to sharing_services_url, alert: "Invalid #{service_info[:label]} login."
     rescue
       redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
     end
