@@ -319,19 +319,6 @@ $.extend feedbin,
           context.fillRect(xPosition, yPosition, barWidth, height)
           xPosition = xPosition + barWidth + spaceWidth
 
-  closeEntryBasement: (timeout = 200) ->
-    feedbin.closeEntryBasementTimeount = setTimeout ( ->
-      $('.basement-panel').addClass('hide')
-    ), timeout
-
-    clearTimeout(feedbin.openEntryBasementTimeount)
-
-    $('.entry-basement').removeClass('foreground')
-    top = $('.entry-toolbar').outerHeight()
-    $('.entry-basement').removeClass('open')
-    $('.entry-content').css
-      top: top
-
   readabilityActive: ->
     $('[data-behavior~=toggle_content_view]').find('.active').length > 0
 
@@ -366,10 +353,23 @@ $.extend feedbin,
       top = Math.round((winHeight / 2) - (height / 2))
     window.open(url, 'intent', "#{windowOptions},width=#{width},height=#{height},left=#{left},top=#{top}")
 
+  closeEntryBasement: (timeout = 200) ->
+    feedbin.closeEntryBasementTimeount = setTimeout ( ->
+      $('.basement-panel').addClass('hide')
+      $('.field-cluster input').blur()
+    ), timeout
+
+    clearTimeout(feedbin.openEntryBasementTimeount)
+    $('.entry-basement').removeClass('foreground')
+    top = $('.entry-toolbar').outerHeight()
+    $('.entry-basement').removeClass('open')
+    $('.entry-content').css
+      top: top
 
   openEntryBasement: (selectedPanel) ->
     feedbin.openEntryBasementTimeount = setTimeout ( ->
       $('.entry-basement').addClass('foreground')
+      $('.field-cluster input', selectedPanel).first().select()
     ), 200
 
     clearTimeout(feedbin.closeEntryBasementTimeount)
