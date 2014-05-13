@@ -78,6 +78,13 @@ class SupportedSharingService < ActiveRecord::Base
       requires_auth: false,
       service_type: 'popover',
       klass: 'Facebook'
+    },
+    {
+      service_id: 'app_dot_net',
+      label: 'App.net',
+      requires_auth: false,
+      service_type: 'popover',
+      klass: 'AppDotNet'
     }
   ].freeze
 
