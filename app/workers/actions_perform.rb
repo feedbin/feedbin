@@ -22,7 +22,11 @@ class ActionsPerform
         elsif action_name == 'star'
           users = User.where(id: user_ids)
           entry = Entry.find(entry_id)
-          users.each {|user| StarredEntry.create_from_owners(user, entry) }
+          users.each do |user|
+            Throttle.throttle!("starred_entries:create:#{user.id}", 100, 1.day) do
+              StarredEntry.create_from_owners(user, entry)
+            end
+          end
         elsif action_name == 'mark_read'
           UnreadEntry.where(user_id: user_ids, entry_id: entry_id).delete_all
         end
