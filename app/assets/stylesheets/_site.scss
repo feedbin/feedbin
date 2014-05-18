@@ -2472,6 +2472,7 @@ $saved-search-control-height: 48px;
 			margin: 0;
 			padding: 0;
 			a,span {
+				position: relative;
 				text-decoration: none;
 				display: block;
 				font-size: 13px;
@@ -2520,7 +2521,9 @@ $saved-search-control-height: 48px;
 	}
 	.share-keyboard {
 		font-size: 11px;
-		float: right;
+		position: absolute;
+		right: 7px;
+		top: 7px;
 		font-style: normal;
 		margin-top: 2px;
 		color: #CCC;
