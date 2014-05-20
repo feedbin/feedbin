@@ -63,7 +63,7 @@ September 2013
 August 2013
 -----------
 
-- 2013-08-27 Added column resize for FireFox
+- 2013-08-27 Added column resize for Firefox
 - 2013-08-26 Case insensitive login
 - 2013-08-24 Added keyboard shortcut for sharing menu (f to activate ↑ ↓ to navigate)
 - 2013-08-23 Moved feedbin-homepage to gem
@@ -84,7 +84,7 @@ August 2013
 - 2013-08-11 Mask long titles in article toolbar
 - 2013-08-11 Format content after loading Readability
 - 2013-08-10 Settings, login and signup styles
-- 2013-08-09 FireFox tag form fixes
+- 2013-08-09 Firefox tag form fixes
 - 2013-08-06 Abort feed request if another one is made
 
 July 2013
@@ -144,7 +144,7 @@ May 2013
 - 2013-05-15 Rewrote starred items to use starred_entries
 - 2013-05-15 Rewrote unread tracking to use unread_entries
 - 2013-05-11 Switched to bourbon
-- 2013-05-09 FireFox fix for Favicons
+- 2013-05-09 Firefox fix for Favicons
 - 2013-05-09 Reset height to auto after animation is complete, fixes #124
 - 2013-05-05 Subscribe via email support
 - 2013-05-04 Subscribe via URL support

@@ -15,7 +15,7 @@ Feedbin::Application.routes.draw do
   get :home, to: 'site#home'
   get :apps, to: 'site#apps'
 
-  # FireFox OS manifest
+  # Firefox OS manifest
   get :manifest, to: 'site#manifest'
 
   post '/emails' => 'emails#create'
