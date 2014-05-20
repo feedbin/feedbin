@@ -9,6 +9,15 @@ class SendStats
       memcached_stats
       redis_stats
       postgres_stats
+      plan_count
+    end
+  end
+
+  def plan_count
+    counts = User.where(suspended: false).group(:plan_id).count
+    plans = Plan.all.index_by(&:id)
+    counts.each do |plan_id, count|
+      Librato.measure("plan_count", count, source: plans[plan_id].stripe_id)
     end
   end
 
