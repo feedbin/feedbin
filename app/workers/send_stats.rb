@@ -17,7 +17,7 @@ class SendStats
     counts = User.where(suspended: false).group(:plan_id).count
     plans = Plan.all.index_by(&:id)
     counts.each do |plan_id, count|
-      Librato.measure("plan_count", count, source: plans[plan_id].stripe_id)
+      Librato.measure("plan_count", (plans[1].price * count).to_i, source: plans[plan_id].stripe_id)
     end
   end
 
