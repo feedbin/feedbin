@@ -1,6 +1,6 @@
 <svg class="hide">
   <defs>
-    <% Dir.glob "#{Rails.root}/app/assets/svg/*.svg" do |svg| %>
+    <% Dir.glob("#{Rails.root}/app/assets/svg/*.svg").sort.each do |svg| %>
       <g id="<%= File.basename(svg, ".svg") %>">
         <%= File.read(svg).html_safe %>
       </g>
