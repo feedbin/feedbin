@@ -84,7 +84,7 @@ module ApplicationHelper
       options[:width] = options[:height] = size if size =~ %r{\A\d+\z}
     end
 
-    content_tag :svg, class: "#{name} #{options[:class]}", viewbox: "0 0 #{options[:width]} #{options[:height]}" do
+    content_tag :svg, class: "#{name} #{options[:class]}", viewBox: "0 0 #{options[:width]} #{options[:height]}" do
       content_tag :use, '', :"xlink:href" => "##{name}"
     end
   end
