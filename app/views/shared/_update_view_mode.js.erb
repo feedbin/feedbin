@@ -12,6 +12,6 @@ feedbin.updateTitle('<%= j @user.title_with_count %>');
 <% end %>
 
 if (feedbin.openFirstItem == true) {
-  $('[data-behavior~=feeds_target] li:first-child a').click();
+  $('[data-behavior~=feeds_target] li:first-child a').first().click();
   feedbin.openFirstItem = false;
 }
