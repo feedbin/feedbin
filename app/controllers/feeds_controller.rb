@@ -54,7 +54,7 @@ class FeedsController < ApplicationController
           render_404
         else
           @feed.update_attributes(push_expiration: Time.now + (params['hub.lease_seconds'].to_i/2).seconds)
-          render text: params['hub.challenge']
+          render plain: params['hub.challenge']
         end
       else
         # Handle unsubscriptions confirmation

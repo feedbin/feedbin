@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 ruby '2.1.1'
 
-gem 'rails', '~>4.0.0'
+gem 'rails'
 
 group :development do
   gem 'better_errors'
@@ -25,10 +25,11 @@ gem 'feedzirra',             github: 'feedbin/feedzirra',           ref: 'c7a1f1
 gem 'html-pipeline',         github: 'benubois/html-pipeline',      ref: '0d85834'
 gem 'grocer-pushpackager',   github: 'feedbin/grocer-pushpackager', ref: 'e190796', require: 'grocer/pushpackager'
 gem 'html_diff',             github: 'feedbin/html_diff',           ref: 'c7c15ce'
+gem 'tire',                  github: 'feedbin/retire',              ref: '0595d9e'
 
-gem 'sass-rails', '~>4.0.0'
-gem 'coffee-rails', '~>4.0.0'
-gem 'uglifier', '>= 1.0.3'
+gem 'sass-rails'
+gem 'coffee-rails'
+gem 'uglifier'
 gem 'autoprefixer-rails'
 gem 'rubyzip', '= 1.1.0'
 
@@ -49,12 +50,11 @@ gem 'request_exception_handler'
 gem 'bcrypt-ruby'
 gem 'honeybadger'
 gem 'addressable', require: 'addressable/uri'
-gem 'librato-rails', '= 0.9.0'
+gem 'librato-rails'
 gem 'foreman'
 gem 'yajl-ruby', require: nil
 gem 'readability_parser'
 gem 'lograge'
-gem 'tire'
 gem 'grocer'
 gem 'cocoon'
 gem 'gctools', require: false
