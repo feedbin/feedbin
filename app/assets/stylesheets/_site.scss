@@ -1550,6 +1550,7 @@ $subscribe-wrap-height: 49px;
 }
 
 .favicon-wrap {
+	pointer-events: none;
 	border-radius: 2px;
 	z-index: 0;
 	padding: 1px;
