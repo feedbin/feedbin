@@ -11,6 +11,7 @@ group :development do
   gem 'dotenv-rails'
   gem 'logster'
   gem 'silencer'
+  gem 'spring'
 end
 
 group :production do
