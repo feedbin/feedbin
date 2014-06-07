@@ -25,7 +25,7 @@ Requirements
 ------------
 
  - Mac OS X or Linux
- - [Ruby 2.0](http://www.ruby-lang.org/en/)
+ - [Ruby 2.1.2](http://www.ruby-lang.org/en/)
  - [Postgres 9.2.4](http://www.postgresql.org/)
  - [Redis 2.6.13](http://redis.io/)
 
