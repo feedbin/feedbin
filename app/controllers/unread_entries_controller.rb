@@ -10,12 +10,12 @@ class UnreadEntriesController < ApplicationController
       unread_entry.destroy_all
     elsif params[:read] == 'false'
       @read = false
-      unless unread_entry.present?
+      if unread_entry.nil?
         UnreadEntry.create_from_owners(@user, @entry)
       end
     end
 
-    @tags = @user.tags.where(taggings: {feed_id: @entry.feed_id}).uniq.collect(&:id)
+    @tags = @user.tags.where(taggings: {feed_id: @entry.feed_id}).uniq.pluck(:id)
     respond_to do |format|
       format.js
     end

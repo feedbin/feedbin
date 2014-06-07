@@ -21,7 +21,7 @@ class TagsController < ApplicationController
 
     feeds_response
 
-    @append = !params[:page].nil?
+    @append = params[:page].present?
 
     @type = 'tag'
     @data = params[:id]
@@ -63,7 +63,6 @@ class TagsController < ApplicationController
     respond_to do |format|
       format.js
     end
-
   end
 
   def destroy
@@ -76,7 +75,6 @@ class TagsController < ApplicationController
     respond_to do |format|
       format.js
     end
-
   end
 
   private
@@ -84,7 +82,7 @@ class TagsController < ApplicationController
   def user_owns_tag
     @user = current_user
     tags = Tagging.where(user_id: @user, tag_id: params[:id].to_i)
-    unless tags.any?
+    if tags.count.zero?
       render_404
     end
   end

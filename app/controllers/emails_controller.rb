@@ -6,7 +6,7 @@ class EmailsController < ApplicationController
   respond_to :json
 
   def create
-    user = User.where(inbound_email_token: params[:MailboxHash]).first
+    user = User.find_by(inbound_email_token: params[:MailboxHash])
     if user.present?
       url = params[:TextBody].try(:strip)
       result = FeedFetcher.new(url).create_feed!

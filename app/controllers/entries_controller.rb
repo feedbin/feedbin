@@ -12,7 +12,7 @@ class EntriesController < ApplicationController
     @entries = update_with_state(@entries)
     @page_query = @entries
 
-    @append = !params[:page].nil?
+    @append = params[:page].present?
 
     @type = 'all'
     @data = nil
@@ -77,7 +77,7 @@ class EntriesController < ApplicationController
 
     @content_view = false
     if @user.sticky_view_inline == '1'
-      subscription = Subscription.where(user: @user, feed_id: @entry.feed_id).first
+      subscription = Subscription.find_by(user: @user, feed_id: @entry.feed_id)
 
       # Subscription will not necessarily be present for starred items
       if subscription.try(:view_inline)
@@ -104,11 +104,7 @@ class EntriesController < ApplicationController
     @user = current_user
     @entry = Entry.find params[:id]
 
-    if 'true' == params[:content_view]
-      @content_view = true
-    else
-      @content_view = false
-    end
+    @content_view = params[:content_view] == 'true'
 
     if @user.sticky_view_inline == '1'
       subscription = Subscription.where(user: @user, feed_id: @entry.feed_id).first
@@ -119,7 +115,6 @@ class EntriesController < ApplicationController
 
     view_inline
     @content = ContentFormatter.format!(@content, @entry)
-
   end
 
   def mark_all_as_read
@@ -269,7 +264,7 @@ class EntriesController < ApplicationController
     @entries = update_with_state(@entries)
     @page_query = @entries
 
-    @append = !params[:page].nil?
+    @append = params[:page].present?
 
     @type = 'all'
     @data = nil

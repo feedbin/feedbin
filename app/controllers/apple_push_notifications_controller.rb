@@ -9,25 +9,7 @@ class ApplePushNotificationsController < ApplicationController
     user_id = verify_push_token(user_info['authentication_token'])
     @user = User.find(user_id)
 
-    p12 = OpenSSL::PKCS12.new(File.read(ENV['APPLE_PUSH_CERT']))
-    package = Grocer::Pushpackager::Package.new({
-      websiteName: 'Feedbin',
-      websitePushID: ENV['APPLE_PUSH_WEBSITE_ID'],
-      allowedDomains: [ENV['PUSH_URL']],
-      urlFormatString: "#{ENV['PUSH_URL']}/entries/%@/push_view?user=%@",
-      authenticationToken: user_info['authentication_token'],
-      webServiceURL: "#{ENV['PUSH_URL']}/apple_push_notifications",
-      certificate: p12.certificate,
-      key: p12.key,
-      iconSet: {
-        :'16x16'      => File.open(Rails.application.assets['push-iconset/16x16.png'].pathname),
-        :'16x16@2x'   => File.open(Rails.application.assets['push-iconset/16x16@2x.png'].pathname),
-        :'32x32'      => File.open(Rails.application.assets['push-iconset/32x32.png'].pathname),
-        :'32x32@2x'   => File.open(Rails.application.assets['push-iconset/32x32@2x.png'].pathname),
-        :'128x128'    => File.open(Rails.application.assets['push-iconset/128x128.png'].pathname),
-        :'128x128@2x' => File.open(Rails.application.assets['push-iconset/128x128@2x.png'].pathname)
-      }
-    })
+    package = build_grocer_package(user_info['authentication_token'])
     send_data package.buffer, type: :zip
   end
 
@@ -63,6 +45,32 @@ class ApplePushNotificationsController < ApplicationController
       user_id = verify_push_token(authentication_token)
     end
     @user = User.find(user_id)
+  end
+
+  def build_grocer_package(user_token)
+    p12 = OpenSSL::PKCS12.new(File.read(ENV['APPLE_PUSH_CERT']))
+    package = Grocer::Pushpackager::Package.new({
+      websiteName: 'Feedbin',
+      websitePushID: ENV['APPLE_PUSH_WEBSITE_ID'],
+      allowedDomains: [ENV['PUSH_URL']],
+      urlFormatString: "#{ENV['PUSH_URL']}/entries/%@/push_view?user=%@",
+      authenticationToken: user_token,
+      webServiceURL: "#{ENV['PUSH_URL']}/apple_push_notifications",
+      certificate: p12.certificate,
+      key: p12.key,
+      iconSet: {
+        :'16x16'      => push_icon_path('16x16'),
+        :'16x16@2x'   => push_icon_path('16x16@2x'),
+        :'32x32'      => push_icon_path('32x32'),
+        :'32x32@2x'   => push_icon_path('32x32@2x'),
+        :'128x128'    => push_icon_path('128x128'),
+        :'128x128@2x' => push_icon_path('128x128@2x')
+      }
+    })
+  end
+
+  def push_icon_path(size)
+    File.open(Rails.application.assets["push-iconset/#{size}.png"].pathname)
   end
 
 end
