@@ -993,6 +993,23 @@ th {
 	@include border-color($border-color, $border-color-night);
 }
 
+.table-rounded  {
+	tr:first-child th,
+	tr:first-child td {
+		border: none !important;
+	}
+	td, th {
+		padding: 11px !important;
+	}
+}
+
+.table-wrap {
+	background-color: #FFF;
+	border: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
+	border-radius: 4px;
+}
+
 .pill-list {
 	background-color: #FFF;
 	border-radius: 8px;
@@ -4460,6 +4477,10 @@ h3 .inline-subhead {
 
 .muted {
 	color: #666666;
+}
+
+.extra-muted {
+	color: #b7b7b7;
 }
 
 .danger {
