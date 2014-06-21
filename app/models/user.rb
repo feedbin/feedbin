@@ -49,10 +49,6 @@ class User < ActiveRecord::Base
   validate :plan_type_valid, on: :update
   validate :trial_plan_valid
 
-  def to_param
-    email
-  end
-
   def activate_subscriptions
     if plan_id_changed? && plan_id_was == Plan.find_by_stripe_id('trial').id
       subscriptions.update_all(active: true)
@@ -345,6 +341,10 @@ class User < ActiveRecord::Base
 
   def create_deleted_user
     DeletedUser.create(email: self.email, customer_id: self.customer_id)
+  end
+
+  def admin?
+    admin
   end
 
 end

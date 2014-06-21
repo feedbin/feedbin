@@ -1,0 +1,8 @@
+<div class="settings-content-inner">
+  <h2>Customer Admin</h2>
+  <ul class="pill-list">
+    <% @users.each do |user| %>
+      <li><%= link_to user.email, admin_user_path(user) %></li>
+    <% end %>
+  </ul>
+</div>

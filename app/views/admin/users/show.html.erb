@@ -1,0 +1,20 @@
+<div class="settings-content-inner">
+  <h2><%= @user.email %></h2>
+  <p>
+    <small>Plan: <%= @user.plan.name %></small>
+    <br />
+    <small>Member Since: <%= @user.created_at.to_s(:full_human) %></small>
+  </p>
+  <% if @billing_events.any? %>
+    <h3>Payments</h3>
+    <ul class="pill-list">
+      <% @billing_events.each do |invoice| %>
+      <li>
+        <strong><%= Time.at(invoice.details.data.object.created).to_s(:stats) %></strong>
+        <span class="charge"><%= number_to_currency(invoice.details.data.object.amount.to_f / 100) %></span>
+        <span class="pull-right"><a href="XX">Refund</a></span>
+      </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>
