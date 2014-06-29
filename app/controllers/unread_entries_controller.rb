@@ -10,7 +10,7 @@ class UnreadEntriesController < ApplicationController
       unread_entry.destroy_all
     elsif params[:read] == 'false'
       @read = false
-      if unread_entry.nil?
+      if unread_entry.blank?
         UnreadEntry.create_from_owners(@user, @entry)
       end
     end
