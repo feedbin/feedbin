@@ -12,7 +12,7 @@ class SavedSearchesController < ApplicationController
     @entries = update_with_state(@entries)
     @page_query = @entries
 
-    @append = !params[:page].nil?
+    @append = params[:page].present?
 
     @type = 'saved_search'
     @data = nil

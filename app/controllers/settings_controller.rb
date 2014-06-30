@@ -48,7 +48,7 @@ class SettingsController < ApplicationController
       @next_payment.first.details.data.object.lines.data.each do |event|
         event = event.to_hash
         if event[:type] && event[:type] == 'subscription'
-          @next_payment = Time.at(event[:period].end).utc.to_datetime
+          @next_payment_date = Time.at(event[:period].end).utc.to_datetime
         end
       end
     end
