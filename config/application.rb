@@ -1,6 +1,7 @@
 require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
+require_relative '../lib/basic_authentication'
 
 # Assets should be precompiled for production (so we don't need the gems loaded then)
 Bundler.require(*Rails.groups(assets: %w(development test)))
@@ -38,6 +39,8 @@ module Feedbin
     config.action_view.sanitized_allowed_tags = 'table', 'tr', 'td', 'th', 'thead', 'tbody'
 
     config.middleware.use Rack::ContentLength
+
+    config.middleware.use BasicAuthentication
 
     config.exceptions_app = self.routes
 
