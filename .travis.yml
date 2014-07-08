@@ -1,12 +1,17 @@
 language: ruby
+services:
+  - redis-server
+addons:
+  postgresql: "9.2"
 rvm:
-  - 2.0.0
+  - 2.1
 env:
   - DB=postgresql
 before_script:
   - psql -c 'create database feedbin_test;' -U postgres
-script:
+before_script:
   - export POSTGRES_USERNAME=postgres
-  - export RAILS_ENV=test
+  - export AWS_ACCESS_KEY_ID=foo
+  - export AWS_SECRET_ACCESS_KEY=bar
   - bundle exec rake db:setup
   - bundle exec rake db:test:prepare

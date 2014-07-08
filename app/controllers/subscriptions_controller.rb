@@ -97,7 +97,7 @@ class SubscriptionsController < ApplicationController
 
   def destroy_subscription_params
     owned_subscriptions = @user.subscriptions.pluck(:id)
-    params[:subscription_ids].reject {|id| !owned_subscriptions.include?(id.to_i) }
+    params[:subscription_ids].select {|id| owned_subscriptions.include?(id.to_i) }
   end
 
   def subscription_params
@@ -107,7 +107,10 @@ class SubscriptionsController < ApplicationController
         params[:subscriptions].delete(index)
       end
     end
-    params[:subscriptions].map {|index, fields| params[:subscriptions][index] = fields.slice(:title, :push) }
+    params[:subscriptions].map do |index, fields|
+      params[:subscriptions][index] = fields.slice(:title, :push)
+    end
+
     params.require(:subscriptions).permit!
   end
 

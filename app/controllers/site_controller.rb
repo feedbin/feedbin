@@ -1,7 +1,7 @@
 class SiteController < ApplicationController
 
   skip_before_action :authorize, only: [:index, :home, :privacy_policy, :apps, :manifest]
-  before_action :valid_user, if: :signed_in?
+  before_action :check_user, if: :signed_in?
 
   def index
     if signed_in?
@@ -44,7 +44,7 @@ class SiteController < ApplicationController
 
   private
 
-  def valid_user
+  def check_user
     if current_user.suspended
       redirect_to settings_billing_url, alert: 'Please update your billing information to use Feedbin.'
     end

@@ -5,8 +5,7 @@
 /*------------------------------------------------------------------------------
 Variables
 ------------------------------------------------------------------------------*/
-$toolbar-height: 43px;
-$small-toolbar-height: 37px;
+$toolbar-height: 37px;
 $font-stack: "Helvetica Neue", Helvetica, Arial, sans-serif;
 $feeds-toolbar-height: 52px;
 $base-button-position: 9px;
@@ -994,6 +993,23 @@ th {
 	@include border-color($border-color, $border-color-night);
 }
 
+.table-rounded  {
+	tr:first-child th,
+	tr:first-child td {
+		border: none !important;
+	}
+	td, th {
+		padding: 11px !important;
+	}
+}
+
+.table-wrap {
+	background-color: #FFF;
+	border: 1px solid transparent;
+	@include border-color($border-color, $border-color-night);
+	border-radius: 4px;
+}
+
 .pill-list {
 	background-color: #FFF;
 	border-radius: 8px;
@@ -1131,9 +1147,9 @@ Structure
 		width: 100%;
 		max-width: 100%;
 		margin: 0;
-		padding: 7px 5px 3px 36px;
+		padding: 4px 5px 3px 36px;
 		font-size: 14px;
-		background: image-url("favicon-search-light.svg") 14px 15px no-repeat;
+		background: image-url("favicon-search-light.svg") 14px 11px no-repeat;
 		background-size: 14px 14px, 16px 16px;
 		border-radius: 13px;
 		border: none;
@@ -1141,7 +1157,7 @@ Structure
 		@include color($text-header-color, $text-header-color-night);
 		&.processing {
 			background-image: image-url("favicon-search-light.svg");
-			background-position: 14px 15px;
+			background-position: 14px 11px;
 		}
 	}
 }
@@ -1165,7 +1181,7 @@ Structure
 		display: block;
 		float: right;
 		text-decoration: none;
-		margin: 11px 0 0 0;
+		margin: 9px 0 0 0;
 		padding: 2px 11px;
 		border-left: 1px solid transparent;
 		@include border-color($border-color, $border-color-night);
@@ -1181,7 +1197,7 @@ Structure
 .subscribe-promo {
 	position: absolute;
 	right: 160px;
-	top: 8px;
+	top: 5px;
 	color: $selected;
 	font-size: 13px;
 	display: inline-block;
@@ -1279,7 +1295,7 @@ Structure
 			width: 3px;
 			position: absolute;
 			left: 19px;
-			top: 15px;
+			top: 12px;
 			content: "";
 		}
 		&:after {
@@ -1287,7 +1303,7 @@ Structure
 			height: 3px;
 			width: 13px;
 			position: absolute;
-			top: 20px;
+			top: 17px;
 			left: 14px;
 			content: "";
 		}
@@ -1300,7 +1316,7 @@ Structure
 	$bar-height: 3px;
 	position: absolute;
 	cursor: pointer;
-	top: 13px;
+	top: 10px;
 	right: 10px;
 	height: 17px;
 	width: 22px;
@@ -1405,7 +1421,7 @@ $subscribe-wrap-height: 49px;
 
 .view-toolbar {
 	display: flex;
-	height: $small-toolbar-height;
+	height: $toolbar-height;
 	border-bottom: 1px solid transparent;
 	@include border-color($border-color, $border-color-night);
 	position: absolute;
@@ -1414,7 +1430,7 @@ $subscribe-wrap-height: 49px;
 	.view-button {
 		flex: 1;
 		text-align: center;
-		line-height: $small-toolbar-height;
+		line-height: $toolbar-height;
 		height: 100%;
 		text-decoration: none;
 		display: block;
@@ -1437,7 +1453,7 @@ $subscribe-wrap-height: 49px;
 .feeds {
 	@include background-color($list-background-color, $list-background-color-night);
 	position: absolute;
-	top: $small-toolbar-height;
+	top: $toolbar-height;
 	bottom: 0;
 	left: 0;
 	right: 0;
@@ -1551,6 +1567,7 @@ $subscribe-wrap-height: 49px;
 }
 
 .favicon-wrap {
+	pointer-events: none;
 	border-radius: 2px;
 	z-index: 0;
 	padding: 1px;
@@ -1622,6 +1639,8 @@ li.selected > a .favicon-wrap {
 		position: relative;
 		padding-left: 24px;
 		top: 2px;
+		@include color($text-header-color, $text-header-color-night);
+		font-weight: bold;
 	}
 	.back-button {
 		display: inline-block;
@@ -1635,20 +1654,19 @@ li.selected > a .favicon-wrap {
 	}
 }
 
-$sort-control-height: 37px;
 $saved-search-control-height: 48px;
 
 .search-control {
 	@include background-color($drawer-background-color, $drawer-background-color-night);
 	font-size: 11px;
 	line-height: 14px;
-	height: $sort-control-height + $saved-search-control-height;
+	height: $toolbar-height + $saved-search-control-height;
 	position: absolute;
 	top: $toolbar-height;
 	left: 0;
 	right: 0;
 	.sort-control {
-		height: $sort-control-height;
+		height: $toolbar-height;
 		position: relative;
 		border-bottom: 1px solid transparent;
 		@include border-color($border-color, $border-color-night);
@@ -1753,10 +1771,10 @@ $saved-search-control-height: 48px;
 	transition: top .2s ease;
 	@include background-color($body-background-color, $body-background-color-night);
 	&.show-search-options {
-		top: $toolbar-height + $sort-control-height;
+		top: $toolbar-height + $toolbar-height;
 	}
 	&.show-saved-search {
-		top: $toolbar-height + $sort-control-height + $saved-search-control-height;
+		top: $toolbar-height + $toolbar-height + $saved-search-control-height;
 	}
 	ul {
 		margin: 0;
@@ -2040,13 +2058,13 @@ $saved-search-control-height: 48px;
 	left: 0;
 	z-index: 3;
 	width: 100%;
-	height: $small-toolbar-height;
+	height: $toolbar-height;
 	border-bottom: 1px solid transparent;
 	@include border-color($border-color, $border-color-night);
 	.back-button {
 		display: none;
-		height: $small-toolbar-height;
-		width: $small-toolbar-height;
+		height: $toolbar-height;
+		width: $toolbar-height;
 	}
 	.favicon-wrap {
 		top: $base-button-position;
@@ -2065,7 +2083,7 @@ $saved-search-control-height: 48px;
 
 .entry-basement {
 	position: absolute;
-	top: $toolbar-height + $small-toolbar-height;
+	top: $toolbar-height + $toolbar-height;
 	left: 0;
 	width: 100%;
 	&.foreground {
@@ -2275,7 +2293,7 @@ $saved-search-control-height: 48px;
 	position: absolute;
 	height: auto;
 	bottom: 0;
-	top: $small-toolbar-height;
+	top: $toolbar-height;
 	left: 0;
 	right: 0;
 	margin: 0;
@@ -2350,7 +2368,7 @@ $saved-search-control-height: 48px;
 	top: 0;
 	right: 0px;
 	width: 250px;
-	height: $small-toolbar-height - 1;
+	height: $toolbar-height - 1;
 	z-index: 1;
 	background-image: linear-gradient(to right, rgba($body-background-color, 0) 0%, $body-background-color 10%);
 	.theme-night & {
@@ -2367,7 +2385,7 @@ $saved-search-control-height: 48px;
 		border: none;
 		background: none;
 		width: 45px;
-		height: $small-toolbar-height - 1;
+		height: $toolbar-height - 1;
 		padding: 0;
 		position: relative;
 		svg {
@@ -2443,8 +2461,8 @@ $saved-search-control-height: 48px;
 			position: absolute;
 			top: $base-button-position + 1;
 			left: 6px;
-			height: 17px;
-			width: 18px;
+			height: 16px;
+			width: 16px;
 		}
 	}
 	.full-screen & {
@@ -4461,6 +4479,10 @@ h3 .inline-subhead {
 	color: #666666;
 }
 
+.extra-muted {
+	color: #b7b7b7;
+}
+
 .danger {
 	color: red;
 }
@@ -4709,7 +4731,7 @@ Fullscreen
 		border-top: none;
 	}
 	.entry-basement {
-		top: $small-toolbar-height;
+		top: $toolbar-height;
 	}
 }
 
@@ -4987,7 +5009,7 @@ Media Queries
 		}
 	}
     .entry-basement {
-    	top: $small-toolbar-height;
+    	top: $toolbar-height;
     }
 	.entries-inner {
         top: $toolbar-height;
