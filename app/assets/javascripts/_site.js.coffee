@@ -1047,7 +1047,6 @@ $.extend feedbin,
         content = $('[data-behavior~=settings_modal]').html()
         feedbin.modalBox(content);
         event.preventDefault()
-        return
 
     fuzzyFilter: ->
       feeds = $('.feed-form li')
