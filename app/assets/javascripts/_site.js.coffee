@@ -292,7 +292,9 @@ $.extend feedbin,
 
   showSearchControls: (sort) ->
     $('.search-control').removeClass('hide');
-    text = $("[data-sort-option=#{sort}]").text()
+    text = null
+    if sort
+      text = $("[data-sort-option=#{sort}]").text()
     if !text
       text = $("[data-sort-option=desc]").text()
     $('.sort-order').text(text)
