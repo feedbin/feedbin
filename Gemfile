@@ -42,7 +42,7 @@ gem 'rubyzip', '= 1.1.0'
 
 gem 'activerecord-import', '>= 0.4.1'
 gem 'redis', '>= 3.0.5'
-gem 'jquery-rails'
+gem 'jquery-rails', '= 3.1.0'
 gem 'dalli'
 gem 'will_paginate'
 gem 'sanitize'

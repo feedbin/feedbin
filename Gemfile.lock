@@ -406,7 +406,7 @@ DEPENDENCIES
   html_diff!
   httparty
   jbuilder
-  jquery-rails
+  jquery-rails (= 3.1.0)
   librato-rails
   lograge
   logster
