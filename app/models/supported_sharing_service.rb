@@ -85,6 +85,13 @@ class SupportedSharingService < ActiveRecord::Base
       requires_auth: false,
       service_type: 'popover',
       klass: 'AppDotNet'
+    },
+    {
+      service_id: 'buffer',
+      label: 'Buffer',
+      requires_auth: false,
+      service_type: 'popover',
+      klass: 'Buffer'
     }
   ].freeze
 
