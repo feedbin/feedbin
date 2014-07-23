@@ -346,7 +346,7 @@ $.extend feedbin,
   sharePopup: (url) ->
     windowOptions = 'scrollbars=yes,resizable=yes,toolbar=no,location=yes'
     width = 620
-    height = 420
+    height = 590
     winHeight = screen.height
     winWidth = screen.width
     left = Math.round((winWidth / 2) - (width / 2));
