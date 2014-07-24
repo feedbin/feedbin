@@ -155,10 +155,12 @@ Feedbin::Application.routes.draw do
 
         resources :unread_entries, only: [:index, :show, :create]
         delete 'unread_entries', to: 'unread_entries#destroy'
+        put 'unread_entries', to: 'unread_entries#create'
         post 'unread_entries/delete', to: 'unread_entries#destroy'
 
         resources :starred_entries, only: [:index, :show, :create]
         delete 'starred_entries', to: 'starred_entries#destroy'
+        put 'starred_entries', to: 'starred_entries#create'
         post 'starred_entries/delete', to: 'starred_entries#destroy'
 
         resources :saved_searches,  only: [:index, :show, :create, :destroy, :update]
