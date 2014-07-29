@@ -34,6 +34,9 @@ class EntryDeleter
         end
       end
 
+      key = Feedbin::Application.config.redis_feed_entries_created_at % feed_id
+      $redis.zrem(key, entries_to_delete_ids)
+
       Librato.increment('entry.destroy', by: entries_to_delete_ids.count)
 
     end

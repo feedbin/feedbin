@@ -13,6 +13,7 @@ class Entry < ActiveRecord::Base
   before_create :create_summary
   before_update :create_summary
   after_commit :mark_as_unread, on: :create
+  after_commit :add_to_set, on: :create
   after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
   after_commit :updated_entry, on: :update
@@ -277,6 +278,12 @@ class Entry < ActiveRecord::Base
       UnreadEntry.import(unread_entries, validate: false)
     end
     SearchIndexStore.perform_async(self.class.name, self.id)
+  end
+
+  def add_to_set
+    score = "%10.6f" % self.created_at.to_f
+    key = Feedbin::Application.config.redis_feed_entries_created_at % self.feed_id
+    $redis.zadd(key, score, self.id)
   end
 
   def increment_feed_stat
