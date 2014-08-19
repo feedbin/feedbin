@@ -347,4 +347,14 @@ class User < ActiveRecord::Base
     DeletedUser.create(email: self.email, customer_id: self.customer_id)
   end
 
+  def activate
+    update_attributes(suspended: false)
+    subscriptions.update_all(active: true)
+  end
+
+  def deactivate
+    update_attributes(suspended: true)
+    subscriptions.update_all(active: false)
+  end
+
 end

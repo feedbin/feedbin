@@ -25,15 +25,40 @@ class BillingEvent < ActiveRecord::Base
   end
 
   def process_event
-    case event_type
-    when 'charge.succeeded'
-      billable.update_attributes(suspended: false)
+    if charge_succeeded?
       UserMailer.delay(queue: :critical).payment_receipt(id)
-    when 'invoice.payment_failed'
-      billable.update_attributes(suspended: true)
+    end
+
+    if charge_failed?
       UserMailer.delay(queue: :critical).payment_failed(id)
+    end
+
+    if subscription_deactivated?
+      billable.deactivate
+    end
+
+    if subscription_reactivated?
+      billable.activate
     end
   end
 
+  def charge_succeeded?
+    "charge.succeeded" == event_type
+  end
+
+  def charge_failed?
+    'invoice.payment_failed' == event_type
+  end
+
+  def subscription_deactivated?
+    "customer.subscription.updated" == event_type &&
+    details.data.object.status == "unpaid"
+  end
+
+  def subscription_reactivated?
+    "customer.subscription.updated" == event_type &&
+    details.data.object.status == "active" &&
+    details.data.try(:previous_attributes).try(:status) == "unpaid"
+  end
 
 end
