@@ -6,4 +6,3 @@
 
 # Firefox OS Manifests
 Mime::Type.register "application/x-web-app-manifest+json", :webapp
-Mime::Type.register "text/css", :css
