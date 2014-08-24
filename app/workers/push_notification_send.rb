@@ -1,6 +1,6 @@
 class PushNotificationSend
   include Sidekiq::Worker
-  sidekiq_options retry: false
+  sidekiq_options retry: false, queue: :critical
 
   # ENV['RAILS_ENV'] = 'production'; reload!; p = PushNotificationSend.new; p.perform(1, [1])
   #

@@ -1,5 +1,6 @@
 class FeedRefresherScheduler
   include Sidekiq::Worker
+  sidekiq_options queue: :critical
 
   def perform
     queues = Sidekiq::Stats.new().queues

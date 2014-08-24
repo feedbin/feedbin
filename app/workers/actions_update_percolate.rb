@@ -1,5 +1,6 @@
 class ActionsUpdatePercolate
   include Sidekiq::Worker
+  sidekiq_options queue: :critical
 
   def perform
     Action.find_each do |action|
