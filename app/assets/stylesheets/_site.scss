@@ -1574,7 +1574,6 @@ $subscribe-wrap-height: 49px;
 	pointer-events: none;
 	border-radius: 2px;
 	z-index: 0;
-	padding: 1px;
 	display: block;
 	height: 18px;
 	width: 18px;
@@ -1582,11 +1581,16 @@ $subscribe-wrap-height: 49px;
 	left: 12px;
 	top: 7px;
 	background-color: #FFF;
-	.favicon {
+	display: flex;
+	align-items: center;
+	.favicon, svg {
+		background-repeat: no-repeat;
+		background-position: center center;
+		background-size: 16px 16px;
 		height: 16px;
 		width: 16px;
 		display: block;
-		background-size: 16px 16px;
+		margin: auto;
 	}
 }
 
@@ -1595,7 +1599,6 @@ li.selected > a .favicon-wrap {
 }
 
 .favicon {
-	background-repeat: no-repeat;
 	background: image-url("favicon-feed.svg") 0 0 no-repeat;
 }
 
@@ -1606,11 +1609,6 @@ li.selected > a .favicon-wrap {
 .collection-favicon {
 	background-color: transparent;
 	svg {
-		position: absolute;
-		top: 1px;
-		left: 1px;
-		height: 16px;
-		width: 16px;
 		@include fill(#b4b6b8, #3f4143);
 	}
 }

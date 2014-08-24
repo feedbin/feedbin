@@ -2,7 +2,7 @@
 <% if @feed %>
   <% present feed do |feed_presenter| %>
     <span class="feed-title-wrap">
-      <%= feed_presenter.favicon(feed.site_url) %>
+      <%= feed_presenter.favicon(feed.host) %>
       <span data-behavior="user_title" data-feed-id="<%= @feed.id %>"><%= @feed.title %></span>
     </span>
   <% end %>

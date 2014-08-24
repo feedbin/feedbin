@@ -4,7 +4,7 @@
     <div class="mark-below-read" data-behavior="mark_below_read"><span><i>Mark Below as Read</i></span></div>
     <%= entry_presenter.entry_link do %>
       <div class="entries-inner-wrap">
-        <%= entry_presenter.favicon(entry.feed.site_url) %>
+        <%= entry_presenter.favicon(entry.feed.host) %>
         <p class="feed-title" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= entry.feed.title %></p>
         <%= entry_presenter.abbr_time %>
         <h2 class="title"><%= entry_presenter.title %></h2>

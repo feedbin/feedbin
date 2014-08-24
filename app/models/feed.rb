@@ -9,6 +9,8 @@ class Feed < ActiveRecord::Base
   has_many :taggings
   has_many :tags, through: :taggings
 
+  before_create :set_host
+
   attr_accessor :count, :tags
 
   def tag(names, user, delete_existing = true)
@@ -75,4 +77,14 @@ class Feed < ActiveRecord::Base
   def string_id
     self.id.to_s
   end
+
+  def set_host
+    begin
+      self.host = URI::parse(self.site_url).host
+      FaviconFetcher.perform_async(self.host)
+    rescue Exception
+      Rails.logger.info { "Failed to set host for feed: %s" %  self.site_url}
+    end
+  end
+
 end

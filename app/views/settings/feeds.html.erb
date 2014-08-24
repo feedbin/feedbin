@@ -31,7 +31,7 @@
                 </div>
                 <div class="textfield-wrap">
                   <a href="<%= subscription.site_url %>" title="<%= subscription.site_url %>" class="favicon-container">
-                    <%= subscription_presenter.favicon(subscription.site_url) %>
+                    <%= subscription_presenter.favicon(subscription.host) %>
                   </a>
                   <%= f.text_field :title %>
                   <a href="<%= subscription.feed_url %>" title="<%= subscription.feed_url %>" class="feed-url-container"></a>
