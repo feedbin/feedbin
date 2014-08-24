@@ -69,7 +69,7 @@ gem 'connection_pool'
 gem 'httparty'
 gem 'oauth'
 gem 'evernote_oauth'
-gem 'rmagick'
+gem 'rmagick', require: false
 
 # Sidekiq
 gem 'sidekiq'
