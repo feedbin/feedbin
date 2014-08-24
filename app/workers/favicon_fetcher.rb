@@ -1,3 +1,4 @@
+require 'RMagick'
 class FaviconFetcher
   include Sidekiq::Worker
   sidekiq_options retry: false
