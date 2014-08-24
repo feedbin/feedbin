@@ -239,6 +239,38 @@ ALTER SEQUENCE entries_id_seq OWNED BY entries.id;
 
 
 --
+-- Name: favicons; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE favicons (
+    id integer NOT NULL,
+    host text,
+    favicon text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: favicons_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE favicons_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: favicons_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE favicons_id_seq OWNED BY favicons.id;
+
+
+--
 -- Name: feed_stats; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -287,7 +319,8 @@ CREATE TABLE feeds (
     subscriptions_count integer DEFAULT 0 NOT NULL,
     protected boolean DEFAULT false,
     push_expiration timestamp without time zone,
-    last_published_entry timestamp without time zone
+    last_published_entry timestamp without time zone,
+    host text
 );
 
 
@@ -803,6 +836,13 @@ ALTER TABLE ONLY entries ALTER COLUMN id SET DEFAULT nextval('entries_id_seq'::r
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY favicons ALTER COLUMN id SET DEFAULT nextval('favicons_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY feed_stats ALTER COLUMN id SET DEFAULT nextval('feed_stats_id_seq'::regclass);
 
 
@@ -942,6 +982,14 @@ ALTER TABLE ONLY deleted_users
 
 ALTER TABLE ONLY entries
     ADD CONSTRAINT entries_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: favicons_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY favicons
+    ADD CONSTRAINT favicons_pkey PRIMARY KEY (id);
 
 
 --
@@ -1114,6 +1162,13 @@ CREATE UNIQUE INDEX index_entries_on_public_id ON entries USING btree (public_id
 
 
 --
+-- Name: index_favicons_on_host; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_favicons_on_host ON favicons USING btree (host);
+
+
+--
 -- Name: index_feed_stats_on_feed_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1132,6 +1187,13 @@ CREATE INDEX index_feed_stats_on_feed_id_and_day ON feed_stats USING btree (feed
 --
 
 CREATE UNIQUE INDEX index_feeds_on_feed_url ON feeds USING btree (feed_url);
+
+
+--
+-- Name: index_feeds_on_host; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_feeds_on_host ON feeds USING btree (host);
 
 
 --
@@ -1600,4 +1662,8 @@ INSERT INTO schema_migrations (version) VALUES ('20140326173619');
 INSERT INTO schema_migrations (version) VALUES ('20140416025157');
 
 INSERT INTO schema_migrations (version) VALUES ('20140505062817');
+
+INSERT INTO schema_migrations (version) VALUES ('20140823091357');
+
+INSERT INTO schema_migrations (version) VALUES ('20140823094323');
 

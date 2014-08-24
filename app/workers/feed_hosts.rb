@@ -11,8 +11,7 @@ class FeedHosts
     values = []
     feeds = Feed.where(id: ids).pluck(:id, :site_url)
     feeds.each do |(id, site_url)|
-      value = get_value(id, site_url)
-      values < value
+      values << value(id, site_url)
     end
     values = values.join(", ")
 
