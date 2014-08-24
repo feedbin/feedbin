@@ -5,7 +5,9 @@ class FaviconFetcher
 
   def perform(host)
     favicon = Favicon.where(host: host).first_or_initialize
-    update_favicon(favicon)
+    if !updated_recently?(favicon.updated_at)
+      update_favicon(favicon)
+    end
   end
 
   def update_favicon(favicon)
