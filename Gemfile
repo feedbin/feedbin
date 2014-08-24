@@ -69,6 +69,7 @@ gem 'connection_pool'
 gem 'httparty'
 gem 'oauth'
 gem 'evernote_oauth'
+gem 'rmagick'
 
 # Sidekiq
 gem 'sidekiq'

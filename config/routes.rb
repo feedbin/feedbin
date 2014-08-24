@@ -53,6 +53,7 @@ Feedbin::Application.routes.draw do
   resources :sharing_services, path: 'settings/sharing', only: [:index]
   resources :actions, path: 'settings/actions', only: [:index]
   resources :saved_searches
+  resources :favicons, only: [:index]
 
   resources :supported_sharing_services, only: [:create, :destroy, :update] do
     member do
