@@ -2315,14 +2315,10 @@ $saved-search-control-height: 48px;
 
 .next-entry-preview {
 	@include background-color($list-background-color, $list-background-color-night);
-	display: none;
 	&:hover {
 		cursor: pointer;
 	}
-	.full-screen & {
-		display: block;
-	}
-	.full-screen &.no-content {
+	&.no-content {
 		display: none;
 	}
 }
@@ -5048,12 +5044,6 @@ Media Queries
 	}
 	.entries ul li:hover.starred .icon-star {
 		display: block !important;
-	}
-	.next-entry-preview {
-		display: block;
-		&.no-content {
-			display: none;
-		}
 	}
 }
 
