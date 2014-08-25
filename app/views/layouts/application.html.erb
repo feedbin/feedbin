@@ -4,7 +4,6 @@
   <title><%= @title || 'Feedbin' %></title>
   <%= render partial: 'shared/mobile_meta' %>
   <%= stylesheet_link_tag "application", media: 'all'  %>
-  <%= render partial: 'shared/favicons' %>
   <%= yield(:head) %>
   <%= javascript_include_tag "application" %>
   <%= csrf_meta_tags %>
@@ -13,5 +12,6 @@
 <body class="<%= @class %>">
   <%= content_for?(:content) ? yield(:content) : yield %>
   <%= render partial: 'shared/tracking' %>
+  <%= render partial: 'shared/favicons' %>
 </body>
 </html>
