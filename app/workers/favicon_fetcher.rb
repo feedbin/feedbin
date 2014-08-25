@@ -21,7 +21,8 @@ class FaviconFetcher
     end
 
     if !favicon_found
-      data = download_favicon(default_favicon_location(favicon.host))
+      favicon_url = default_favicon_location(favicon.host)
+      data = download_favicon(favicon_url)
     end
 
     if data
