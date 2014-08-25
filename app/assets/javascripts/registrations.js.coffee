@@ -5,7 +5,8 @@ jQuery ->
 
 class feedbin.Registration
   constructor: ->
-    Stripe.setPublishableKey($('meta[name="stripe-key"]').attr('content'))
+    if typeof(Stripe) == "function"
+      Stripe.setPublishableKey($('meta[name="stripe-key"]').attr('content'))
     $('#card_number').payment('formatCardNumber');
     $('#card_expiration').payment('formatCardExpiry');
     $('#card_code').payment('formatCardCVC');
