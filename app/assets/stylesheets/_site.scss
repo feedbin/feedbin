@@ -1595,6 +1595,10 @@ $subscribe-wrap-height: 49px;
 	.entries & {
 		background-color: transparent;
 		box-shadow: none;
+		.theme-night & {
+			background-color: #FFF;
+			box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+		}
 	}
 }
 
@@ -2082,6 +2086,11 @@ $saved-search-control-height: 48px;
 	.favicon-wrap {
 		top: $base-button-position;
 		left: 13px;
+		box-shadow: none;
+		.theme-night & {
+			background-color: #FFF;
+			box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+		}
 	}
 	.entry-feed-title {
 		position: absolute;
