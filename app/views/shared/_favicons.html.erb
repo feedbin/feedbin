@@ -1,17 +1,10 @@
 <% if current_user %>
 <script>
-function loadCss(href){
-    var link = window.document.createElement("link");
-    var before = window.document.getElementsByTagName("script")[0];
-    link.rel = "stylesheet";
-    link.href = href;
-    link.media = "only x";
-    before.parentNode.insertBefore(link, before);
-    setTimeout(function(){
-        link.media = "all";
-    });
-    return link;
-}
-loadCss("<%= url_for(favicons_path(format: :css)) %>");
+jQuery(function() {
+    $("<link>")
+        .appendTo('head')
+        .attr({rel: "stylesheet"})
+        .attr({href: "<%= url_for(favicons_path(format: :css)) %>"});
+});
 </script>
 <% end %>
