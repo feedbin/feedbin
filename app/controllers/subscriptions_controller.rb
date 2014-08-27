@@ -49,6 +49,7 @@ class SubscriptionsController < ApplicationController
       session[:favicon_complete] = false
       @mark_selected = true
       @click_feed = @results[:success].first.id
+      @favicon_hash = UpdateFaviconHash.new.get_hash(@user)
       get_feeds_list
     end
 

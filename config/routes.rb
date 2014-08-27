@@ -24,6 +24,8 @@ Feedbin::Application.routes.draw do
   match '/404', to: 'errors#not_found', via: :all
   get '/starred/:starred_token', to: 'starred_entries#index', as: 'starred'
   post '/starred/export', to: 'starred_entries#export'
+  get '/favicons/:hash', to: 'favicons#index', as: 'favicons'
+
 
   get    :signup,         to: 'users#new',           as: 'signup'
   get    :login,          to: 'sessions#new',        as: 'login'
@@ -54,7 +56,6 @@ Feedbin::Application.routes.draw do
   resources :sharing_services, path: 'settings/sharing', only: [:index]
   resources :actions, path: 'settings/actions', only: [:index]
   resources :saved_searches
-  resources :favicons, only: [:index]
 
   resources :supported_sharing_services, only: [:create, :destroy, :update] do
     member do

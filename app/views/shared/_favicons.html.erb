@@ -4,7 +4,7 @@ jQuery(function() {
     $("<link>")
         .appendTo('head')
         .attr({rel: "stylesheet"})
-        .attr({href: "<%= url_for(favicons_path(format: :css)) %>"});
+        .attr({href: "<%= url_for(favicons_path(hash: current_user.favicon_hash || 'none', format: :css)) %>"});
 });
 </script>
 <% end %>
