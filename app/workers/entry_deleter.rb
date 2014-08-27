@@ -22,10 +22,6 @@ class EntryDeleter
       UnreadEntry.where(entry_id: entries_to_delete_ids).delete_all
       entries_to_delete.delete_all
 
-      entries_to_delete_ids.each do |entry_id|
-        SearchIndexRemove.perform_async("Entry", entry_id)
-      end
-
       Sidekiq.redis do |conn|
         conn.pipelined do
           entries_to_delete_public_ids.each do |public_id|
@@ -36,6 +32,7 @@ class EntryDeleter
 
       key = Feedbin::Application.config.redis_feed_entries_created_at % feed_id
       if entries_to_delete_ids.present?
+        SearchIndexRemove.perform_async(entries_to_delete_ids)
         $redis.zrem(key, entries_to_delete_ids)
       end
 

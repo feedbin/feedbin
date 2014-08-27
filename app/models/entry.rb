@@ -17,7 +17,6 @@ class Entry < ActiveRecord::Base
   after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
   after_commit :updated_entry, on: :update
-  after_destroy :search_index_remove
 
   validates_uniqueness_of :public_id
 
@@ -300,10 +299,6 @@ class Entry < ActiveRecord::Base
 
   def create_summary
     self.summary = ContentFormatter.summary(self.content)
-  end
-
-  def search_index_remove
-    SearchIndexRemove.perform_async(self.class.name, self.id)
   end
 
   def touch_feed_last_published_entry
