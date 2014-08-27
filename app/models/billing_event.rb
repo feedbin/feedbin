@@ -58,7 +58,7 @@ class BillingEvent < ActiveRecord::Base
   def subscription_reactivated?
     "customer.subscription.updated" == event_type &&
     details.data.object.status == "active" &&
-    details.data.try(:previous_attributes).try(:status) == "unpaid"
+    details.data.try(:[], :previous_attributes).try(:[], :status) == "unpaid"
   end
 
 end
