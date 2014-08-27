@@ -1486,7 +1486,7 @@ $subscribe-wrap-height: 49px;
 				text-overflow: ellipsis;
 				white-space: nowrap;
 				width: 100%;
-				padding: 10px 40px 9px 36px;
+				padding: 10px 40px 9px 38px;
 				display: block;
 				line-height: 1;
 			}
@@ -1572,17 +1572,17 @@ $subscribe-wrap-height: 49px;
 
 .favicon-wrap {
 	pointer-events: none;
-	border-radius: 2px;
 	z-index: 0;
 	display: block;
-	height: 18px;
-	width: 18px;
+	height: 20px;
+	width: 20px;
 	position: absolute;
 	left: 12px;
 	top: 7px;
 	background-color: #FFF;
 	display: flex;
 	align-items: center;
+	box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
 	.favicon, svg {
 		background-repeat: no-repeat;
 		background-position: center center;
@@ -1592,14 +1592,28 @@ $subscribe-wrap-height: 49px;
 		display: block;
 		margin: auto;
 	}
+	.entries & {
+		background-color: transparent;
+		box-shadow: none;
+		.theme-night & {
+			background-color: #FFF;
+			box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+		}
+	}
 }
+
 
 li.selected > a .favicon-wrap {
 	background-color: #FFF;
+	box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+	&.collection-favicon {
+		background: transparent;
+		box-shadow: none;
+	}
 }
 
 .favicon {
-	background: image-url("favicon-feed.svg") 0 0 no-repeat;
+	background: image-url("favicon-feed-blue.svg") 0 0 no-repeat;
 }
 
 .favicon-progress {
@@ -1607,7 +1621,8 @@ li.selected > a .favicon-wrap {
 }
 
 .collection-favicon {
-	background-color: transparent;
+	background: transparent;
+	box-shadow: none;
 	svg {
 		@include fill(#b4b6b8, #3f4143);
 	}
@@ -1809,7 +1824,7 @@ $saved-search-control-height: 48px;
 	}
 	.entries-inner-wrap {
 		padding: 10px 10px 8px 0;
-		margin-left: 36px;
+		margin-left: 38px;
 		border-bottom: 1px solid transparent;
 		@include border-color($list-background-color, #212325);
 	}
@@ -2071,6 +2086,11 @@ $saved-search-control-height: 48px;
 	.favicon-wrap {
 		top: $base-button-position;
 		left: 13px;
+		box-shadow: none;
+		.theme-night & {
+			background-color: #FFF;
+			box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+		}
 	}
 	.entry-feed-title {
 		position: absolute;
@@ -3683,8 +3703,9 @@ table.small td {
 		border-right: 1px solid $border-color;
 		width: 32px;
 		.favicon-wrap {
-			top: 7px;
-			left: 7px;
+			top: 6px;
+			left: 6px;
+			box-shadow: none;
 		}
 	}
 	.feed-url-container {
