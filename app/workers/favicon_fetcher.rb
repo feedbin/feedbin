@@ -41,7 +41,7 @@ class FaviconFetcher
                                 "//link[translate(@rel, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'shortcut icon']/@href")
 
     if favicon_links.present?
-      favicon_url = favicon_links[0].to_s
+      favicon_url = favicon_links.last.to_s
       favicon_url = URI.parse(favicon_url)
       if !favicon_url.host
         favicon_url.host = host
@@ -61,7 +61,7 @@ class FaviconFetcher
 
   def download_favicon(url)
     response = HTTParty.get(url, {timeout: 20})
-    base64_favicon(response.parsed_response)
+    base64_favicon(response.body)
   end
 
   def base64_favicon(data)
