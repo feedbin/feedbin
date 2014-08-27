@@ -12,7 +12,7 @@
   $("<link>")
       .appendTo('head')
       .attr({rel: "stylesheet"})
-      .attr({href: "<%= url_for(favicons_path(hash: @favicon_hash, format: :css)) %>"});
+      .attr({href: "<%= stylesheet_path(url_for(favicons_path(hash: @favicon_hash, format: :css))) %>"});
 
 <% else %>
   feedbin.showNotification('No feed found.');
