@@ -54,6 +54,9 @@ $.extend feedbin,
     $('[data-behavior~=entry_content_target] pre code').each (i, e) ->
       hljs.highlightBlock(e)
 
+  audioVideo: ->
+    $('[data-behavior~=entry_content_target] audio, [data-behavior~=entry_content_target] video').mediaelementplayer()
+
   footnotes: ->
     $.bigfoot
       scope: '[data-behavior~=entry_content_wrap]'
@@ -183,6 +186,7 @@ $.extend feedbin,
     feedbin.syntaxHighlight()
     feedbin.footnotes()
     feedbin.nextEntryPreview(currentItem)
+    feedbin.audioVideo()
 
   refresh: ->
     if feedbin.data

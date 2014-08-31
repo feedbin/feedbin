@@ -4784,6 +4784,10 @@ Media Players
 	text-indent: 0;
 	width: 100% !important;
 	font-weight: 400 !important;
+	margin: 0 0 1.1em 0;
+	.media-container & {
+		margin-bottom: 0;
+	}
 }
 .mejs-container .mejs-controls {
 	position: absolute;
