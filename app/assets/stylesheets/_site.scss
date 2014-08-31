@@ -1160,8 +1160,9 @@ Structure
 		line-height: 1;
 		@include color($text-header-color, $text-header-color-night);
 		&.processing {
-			background-image: image-url("favicon-search-light.svg");
-			background-position: 14px 11px;
+			background-image: image-url("favicon-search-light.svg"), image-url("favicon-progress.gif");
+			background-position: 14px 11px, 97% 11px;
+			background-size: 14px 14px, 16px 16px;
 		}
 	}
 }
