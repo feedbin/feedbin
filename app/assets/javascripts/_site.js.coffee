@@ -77,7 +77,7 @@ $.extend feedbin,
     $('.blog-post').attr('href', content.url);
 
   precacheImages: (data) ->
-    if feedbin.data.precacheImages == true && feedbin.data.mobile == false
+    if feedbin.data.precache_images == true && feedbin.data.mobile == false
       entries = []
       $.each data, (index, entry) ->
         if entry.read == false
@@ -101,9 +101,10 @@ $.extend feedbin,
 
   applyUserTitles: ->
     $('[data-behavior~=user_title]').each ->
-      index = $(@).data('feed-id')
-      newTitle = feedbin.data.userTitles[index]
-      $(@).text(newTitle)
+      feedId = $(@).data('feed-id')
+      if (feedId of feedbin.data.user_titles)
+        newTitle = feedbin.data.user_titles[feedId]
+        $(@).text(newTitle)
 
   queryString: (name) ->
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]")
@@ -128,7 +129,7 @@ $.extend feedbin,
 
   autocomplete: (element) ->
     element.autocomplete
-      serviceUrl: feedbin.data.tagsPath
+      serviceUrl: feedbin.data.tags_path
       appendTo: $(element).closest(".tags-form").children("[data-behavior=tag_completions]")
       delimiter: /(,)\s*/
 
@@ -147,34 +148,22 @@ $.extend feedbin,
       cachedIds.push key * 1
     entry_ids = _.difference(entry_ids, cachedIds)
     if entry_ids.length > 0
-      $.getJSON feedbin.data.preloadEntriesPath, {ids: entry_ids.join(',')}, (data) ->
+      $.getJSON feedbin.data.preload_entries_path, {ids: entry_ids.join(',')}, (data) ->
         $.extend feedbin.entries, data
         feedbin.precacheImages(data)
 
-  updateReadCount: (id, entry, target) ->
-    if entry.read == false
+  updateReadCount: (entryId, feedId, target) ->
+    markedAsRead = feedbin.Unread.get().markEntryRead(entryId, feedId)
+    if markedAsRead
       $.post $(target).data('mark-as-read-path')
       feedbin.recentlyReadTimer = setTimeout ( ->
         $.post $(target).data('recently-read-path')
       ), 10000
-      feedbin.CountInstance.updateCount(entry.feed_id, entry.tags, 'decrement')
-      $("[data-entry-id=#{id}]").addClass('read')
-      feedbin.entries[id].read = true
-
-      if feedbin.data.showUnreadCount
-        count = $('[data-behavior~=all_unread]').find('.count').text() * 1
-        if count == 0
-          title = "Feedbin"
-        else if count >= 1000
-          title = "Feedbin (1,000+)"
-        else
-          title = "Feedbin (#{count})"
-
-        feedbin.updateTitle(title)
+      $("[data-entry-id=#{entryId}]").addClass('read')
 
   readability: (target) ->
     feedId = $('[data-feed-id]', target).data('feed-id')
-    if feedbin.data.readabilitySettings[feedId] == true && feedbin.data.stickyReadability
+    if feedbin.data.readability_settings[feedId] == true && feedbin.data.sticky_readability
       $('.button-toggle-content').find('span').addClass('active')
       $('[data-behavior~=entry_content_wrap]').html('Loading Readability&hellip;')
       $('[data-behavior~=toggle_content_view]').submit()
@@ -190,7 +179,7 @@ $.extend feedbin,
 
   refresh: ->
     if feedbin.data
-      $.get(feedbin.data.autoUpdatePath)
+      $.get(feedbin.data.auto_update_path)
 
   shareOpen: ->
     $('[data-behavior~=toggle_share_menu]').parents('.dropdown-wrap').hasClass('open')
@@ -202,7 +191,7 @@ $.extend feedbin,
       newFontSize = currentFontSize + 1
     else
       newFontSize = currentFontSize - 1
-    if feedbin.data.fontSizes[newFontSize]
+    if feedbin.data.font_sizes[newFontSize]
       fontContainer.removeClass("font-size-#{currentFontSize}")
       fontContainer.addClass("font-size-#{newFontSize}")
       fontContainer.data('font-size', newFontSize)
@@ -227,7 +216,7 @@ $.extend feedbin,
     feedbin.markReadData.ids = $('.entries li').map(() ->
       $(@).data('entry-id')
     ).get().join()
-    $.post feedbin.data.markAsReadPath, feedbin.markReadData
+    $.post feedbin.data.mark_as_read_path, feedbin.markReadData
 
   checkPushPermission: (permissionData) ->
     if (permissionData.permission == 'default')
@@ -389,6 +378,52 @@ $.extend feedbin,
     $('.entry-content').css
       top: newTop
 
+  setCountCollection: (element, count) ->
+    countContainer = $('> .feed-link .count', element)
+    countContainer.text(count)
+    if count == 0
+      countContainer.addClass('hide')
+    else
+      countContainer.removeClass('hide')
+
+  setCount: (element, count) ->
+    countContainer = $('> .feed-link .count', element)
+    countContainer.text(count)
+    if count == 0
+      $(element).addClass('hide')
+    else
+      $(element).removeClass('hide')
+
+  applyCounts: ->
+    $('[data-count-type]').each (index, element) ->
+      counts = feedbin.Unread.get().unread
+      feedCounts = feedbin.Unread.get().byFeed
+      tagCounts = feedbin.Unread.get().byTag
+      countType = $(element).data('count-type')
+      count = 0
+
+      if countType == 'feed'
+        feedId = $(element).data('feed-id')
+        if (feedId of feedCounts)
+          count = feedCounts[feedId].length
+        feedbin.setCount(element, count)
+
+      if countType == 'tag'
+        tagId = $(element).data('tag-id')
+        if (tagId of tagCounts)
+          count = tagCounts[tagId].length
+        feedbin.setCount(element, count)
+
+      if countType == 'unread'
+        count = counts.length
+        feedbin.setCountCollection(element, count)
+
+      if countType == 'starred'
+        feedbin.setCountCollection(element, 0)
+
+      if countType == 'recently_read'
+        feedbin.setCountCollection(element, 0)
+
   hideQueue: []
 
   feedCandidates: []
@@ -409,12 +444,13 @@ $.extend feedbin,
 
 $.extend feedbin,
   init:
-    setData: ->
-      feedbin.data = $('#feedbin-data').data()
 
     hasTouch: ->
       if ('ontouchstart' in document)
         $('body').addClass('touch')
+
+    applyCounts: ->
+      feedbin.applyCounts()
 
     changeSearchSort: (sort) ->
       $(document).on 'click', '[data-sort-option]', ->
@@ -439,7 +475,7 @@ $.extend feedbin,
             if entry_id of feedbin.entries
               feedbin.entries[entry_id].read = true
 
-          if feedbin.data.markAsReadConfirmation
+          if feedbin.data.mark_as_read_confirmation
             result = confirm(feedbin.markReadData.message)
             if result
               feedbin.markRead()
@@ -556,7 +592,7 @@ $.extend feedbin,
     unauthorizedResponse: ->
       $(document).on 'ajax:complete', (event, response, status) ->
         if response.status == 401
-          document.location = feedbin.data.loginUrl
+          document.location = feedbin.data.login_url
         return
 
     screenshotTabs: ->
@@ -708,8 +744,14 @@ $.extend feedbin,
           feedbin.autoHeight()
           return
 
+    markAsRead: ->
+      $(document).on 'click', '[data-behavior~=show_entry_content]', (event) ->
+        entryId = $(@).data('entry-id') * 1
+        feedId = $(@).data('feed-id') * 1
+        feedbin.updateReadCount(entryId, feedId, @)
+
     usePreloadContent: ->
-      $(document).on 'ajax:beforeSend', '[data-behavior~=open_item]', (event, xhr) ->
+      $(document).on 'ajax:beforeSend', '[data-behavior~=show_entry_content]', (event, xhr) ->
         clearTimeout feedbin.recentlyReadTimer
         id = $(@).parents('li').data('entry-id')
         entry = feedbin.entries[id]
@@ -719,8 +761,8 @@ $.extend feedbin,
           feedbin.formatEntryContent(true, @)
           feedbin.localizeTime($('[data-behavior~=entry_content_target]'))
           feedbin.applyUserTitles()
-          feedbin.updateReadCount(id, entry, @)
           feedbin.readability(@)
+          feedbin.entries[id].read = true
         return
 
     timeago: ->
@@ -750,9 +792,9 @@ $.extend feedbin,
     updateReadability: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_content_view]', (event, xhr) ->
         feedId = $(event.currentTarget).data('feed-id')
-        if feedbin.data.stickyReadability && feedbin.data.readabilitySettings[feedId] != "undefined"
-          unless $("#content_view").val() == "true" && feedbin.data.readabilitySettings[feedId] == true
-            feedbin.data.readabilitySettings[feedId] = !feedbin.data.readabilitySettings[feedId]
+        if feedbin.data.sticky_readability && feedbin.data.readability_settings[feedId] != "undefined"
+          unless $("#content_view").val() == "true" && feedbin.data.readability_settings[feedId] == true
+            feedbin.data.readability_settings[feedId] = !feedbin.data.readability_settings[feedId]
         return
 
     removePreload: ->
@@ -918,7 +960,7 @@ $.extend feedbin,
             $(@).parents('li').prevAll().addClass('read')
             data['direction'] = 'above'
 
-        $.post feedbin.data.markDirectionAsReadEntries, data
+        $.post feedbin.data.mark_direction_as_read_entries, data
         return
 
     formProcessing: ->

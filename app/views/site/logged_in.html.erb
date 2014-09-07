@@ -4,6 +4,13 @@
   <% if ENV['FONT_STYLESHEET'] %>
   <link rel="stylesheet" type="text/css" href="<%= ENV['FONT_STYLESHEET'] %>" />
   <% end %>
+  <script>
+      if (window.feedbin == null) {
+          window.feedbin = {};
+      }
+      feedbin.data = <%= @data.to_json.html_safe %>
+      feedbin.Unread.get(feedbin.data)
+  </script>
 <% end %>
 <%= render partial: 'shared/svg' %>
 
@@ -115,7 +122,6 @@
 <div class="hide" data-behavior="pagination"></div>
 <%= render partial: "shared/keyboard_shortcuts_wrap" %>
 <%= render partial: "shared/settings_modal" %>
-<%= render partial: "shared/data", locals: {mobile: false} %>
 <%= render partial: "shared/resizable_form" %>
 
 <%= one_time_content %>

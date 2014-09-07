@@ -1,8 +1,8 @@
 <% present feed do |feed_presenter| %>
-  <%= content_tag :li, class: feed_presenter.classes, data: {feed_id: feed.id} do %>
+  <%= content_tag :li, class: feed_presenter.classes, data: {feed_id: feed.id, count_type: 'feed'} do %>
 	  <%= feed_presenter.feed_link do %>
 	    <%= feed_presenter.favicon(feed.host) %>
-	    <%= feed_presenter.feed_count %>
+	    <span class="count"></span>
 	    <%= feed.title %>
 	  <% end %>
 	<% end %>

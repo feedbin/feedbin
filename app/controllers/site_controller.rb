@@ -6,20 +6,40 @@ class SiteController < ApplicationController
   def index
     if signed_in?
       get_feeds_list
-      @user_titles = {}
-      @user.feeds.select('feeds.id, feeds.title, subscriptions.title AS user_title').map { |feed|
-        @user_titles[feed.id] = feed.user_title ? feed.user_title : feed.title
-      }
+      subscriptions = @user.subscriptions
+      unread_entries = @user.unread_entries.pluck('feed_id, entry_id, extract(epoch FROM published)')
+      tag_map = @user.taggings.group(:feed_id).pluck('feed_id, array_agg(tag_id)')
 
-      @readability_settings = {}
-      subscriptions = Subscription.where(user: @user).pluck(:feed_id, :view_inline)
-      subscriptions.each { |feed_id, setting| @readability_settings[feed_id] = setting }
-
-      if subscriptions.blank?
-        @show_welcome = true
+      user_titles = subscriptions.each_with_object({}) do |subscription, hash|
+        if subscription.title.present?
+          hash[subscription.feed_id] = subscription.title
+        end
       end
 
+      readability_settings = subscriptions.each_with_object({}) do |subscription, hash|
+        hash[subscription.feed_id] = subscription.view_inline
+      end
+
+      @show_welcome = (subscriptions.present?) ? false : true
       @title = @user.title_with_count
+      @data = {
+        login_url: login_url,
+        tags_path: tags_path(format: :json),
+        user_titles: user_titles,
+        preload_entries_path: preload_entries_path(format: :json),
+        sticky_readability: (@user.sticky_view_inline == '1'),
+        readability_settings: readability_settings,
+        show_unread_count:  (@user.show_unread_count == '1'),
+        precache_images: (@user.precache_images == '1'),
+        auto_update_path: auto_update_feeds_path,
+        font_sizes: Feedbin::Application.config.font_sizes,
+        mark_as_read_path: mark_all_as_read_entries_path,
+        mark_as_read_confirmation: (@user.mark_as_read_confirmation == '1'),
+        mark_direction_as_read_entries: mark_direction_as_read_entries_path,
+        unread_entries: unread_entries,
+        tag_map: tag_map,
+        entry_sort: @user.entry_sort
+      }
 
       render action: 'logged_in'
     else

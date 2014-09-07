@@ -364,13 +364,13 @@ class feedbin.Keyboard
   nextItem: ->
     @drawer = $('.drawer', @selectedItem())
     if @inDrawer()
-      next = @selectedItem().next()
+      next = @selectedItem().next(':not(.hide)')
       if next.length == 0
-        next = @selectedItem().parents('li[data-tag-id]').next()
+        next = @selectedItem().parents('li[data-tag-id]').next(':not(.hide)')
     else if @hasDrawer()
       next = $('ul li:first-child', @drawer)
     else
-      next = @selectedItem().next()
+      next = @selectedItem().next(':not(.hide)')
     next
 
   inDrawer: ->

@@ -38,7 +38,9 @@ class EntryPresenter < BasePresenter
       remote: true, class: 'wrap', data: {
         behavior: 'selectable reset_entry_content_position open_item show_entry_content',
         mark_as_read_path: @template.mark_as_read_entry_path(entry),
-        recently_read_path: @template.recently_read_entry_path(entry)
+        recently_read_path: @template.recently_read_entry_path(entry),
+        entry_id: entry.id,
+        feed_id: entry.feed_id
       }
     } do
       yield
