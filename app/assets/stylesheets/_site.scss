@@ -2418,7 +2418,7 @@ $saved-search-control-height: 48px;
 		float: right;
 	}
 	.button-toggle-read {
-		.circle-filled, .circle-empty {
+		.circle {
 			border: 2px solid transparent;
 			@include border-color(#b4b6b8,#97999b);
 			@include background-color(#b4b6b8,#97999b);
@@ -2428,9 +2428,9 @@ $saved-search-control-height: 48px;
 			position: absolute;
 			top: $base-button-position + 2;
 			left: 15px;
-		}
-		.circle-empty {
-			@include background-color(transparent,transparent);
+			.read & {
+				@include background-color(transparent,transparent);
+			}
 		}
 	}
 	.button-toggle-starred {

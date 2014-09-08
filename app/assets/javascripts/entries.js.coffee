@@ -2,7 +2,6 @@ window.feedbin ?= {}
 
 jQuery ->
   new feedbin.EntriesPager()
-  feedbin.CountInstance = new feedbin.Count()
 
 class feedbin.EntriesPager
   constructor: ->

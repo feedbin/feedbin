@@ -44,12 +44,10 @@ class UnreadCounts
 
   markEntryRead: (entryId, feedId) ->
     # total unread
-    markedAsRead = false
     entryIndex = @unread.indexOf(entryId);
     if entryIndex > -1
       @unread.splice(entryIndex, 1);
       @unreadEntries.splice(entryIndex, 1);
-      markedAsRead = true
 
     # feeds
     if (feedId of @byFeed)
@@ -66,7 +64,17 @@ class UnreadCounts
             @byTag[tagId].splice(entryIndex, 1);
 
     feedbin.applyCounts()
-    markedAsRead
+
+  markEntryUnread: (entryId, feedId, published) ->
+    unreadEntry = [feedId, entryId, published]
+    console.log
+    @unreadEntries.push(unreadEntry)
+    @unreadEntries = @sortUnread(@unreadEntries)
+    counts = @organizeCounts()
+    @byFeed = counts.byFeed
+    @byTag = counts.byTag
+    @unread = counts.unread
+    feedbin.applyCounts()
 
   buildTagMap: (tagArray) ->
     object = {}

@@ -152,14 +152,23 @@ $.extend feedbin,
         $.extend feedbin.entries, data
         feedbin.precacheImages(data)
 
-  updateReadCount: (entryId, feedId, target) ->
-    markedAsRead = feedbin.Unread.get().markEntryRead(entryId, feedId)
-    if markedAsRead
-      $.post $(target).data('mark-as-read-path')
-      feedbin.recentlyReadTimer = setTimeout ( ->
-        $.post $(target).data('recently-read-path')
-      ), 10000
-      $("[data-entry-id=#{entryId}]").addClass('read')
+  markAsRead: (entryInfo) ->
+    feedbin.Unread.get().markEntryRead(entryInfo.id, entryInfo.feed_id)
+    entryInfo.read = true
+    $("[data-entry-id=#{entryInfo.id}]").addClass('read')
+    $("[data-entry-id=#{entryInfo.id}][data-behavior~=entry_info]").data('entry-info', entryInfo)
+
+  markAsUnread: (entryInfo) ->
+    feedbin.Unread.get().markEntryUnread(entryInfo.id, entryInfo.feed_id, entryInfo.published)
+    entryInfo.read = false
+    $("[data-entry-id=#{entryInfo.id}]").removeClass('read')
+    $("[data-entry-id=#{entryInfo.id}][data-behavior~=entry_info]").data('entry-info', entryInfo)
+
+  toggleRead: (entryInfo) ->
+    if entryInfo.read
+      feedbin.markAsUnread(entryInfo)
+    else
+      feedbin.markAsRead(entryInfo)
 
   readability: (target) ->
     feedId = $('[data-feed-id]', target).data('feed-id')
@@ -472,8 +481,6 @@ $.extend feedbin,
         unless $(@).attr('disabled')
           $('.entries li').map ->
             entry_id = $(@).data('entry-id') * 1
-            if entry_id of feedbin.entries
-              feedbin.entries[entry_id].read = true
 
           if feedbin.data.mark_as_read_confirmation
             result = confirm(feedbin.markReadData.message)
@@ -746,13 +753,18 @@ $.extend feedbin,
 
     markAsRead: ->
       $(document).on 'click', '[data-behavior~=show_entry_content]', (event) ->
-        entryId = $(@).data('entry-id') * 1
-        feedId = $(@).data('feed-id') * 1
-        feedbin.updateReadCount(entryId, feedId, @)
+        clearTimeout feedbin.recentlyReadTimer
+        container = $(event.currentTarget)
+        entryInfo = $(container).data('entry-info')
+        if !entryInfo.read
+          $.post $(container).data('mark-as-read-path')
+          feedbin.recentlyReadTimer = setTimeout ( ->
+            $.post $(container).data('recently-read-path')
+          ), 10000
+          feedbin.markAsRead(entryInfo)
 
     usePreloadContent: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entry_content]', (event, xhr) ->
-        clearTimeout feedbin.recentlyReadTimer
         id = $(@).parents('li').data('entry-id')
         entry = feedbin.entries[id]
         if entry
@@ -762,7 +774,6 @@ $.extend feedbin,
           feedbin.localizeTime($('[data-behavior~=entry_content_target]'))
           feedbin.applyUserTitles()
           feedbin.readability(@)
-          feedbin.entries[id].read = true
         return
 
     timeago: ->
@@ -804,11 +815,10 @@ $.extend feedbin,
         delete feedbin.entries[entryId]
         return
 
-    updateRead: ->
+    toggleRead: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_read]', (event, xhr) ->
-        entryId = $(event.currentTarget).data('entry-id')
-        if feedbin.entries[entryId]
-          feedbin.entries[entryId].read = !feedbin.entries[entryId].read
+        entryInfo = $('[data-behavior~=selected_entry_data]').data('entry-info')
+        feedbin.toggleRead(entryInfo)
         return
 
     autoUpdate: ->

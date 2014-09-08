@@ -3,9 +3,3 @@ feedbin.updateEntryContent('<%= j render partial: "show", locals: { entry: @entr
 feedbin.localizeTime($('[data-behavior~=entry_content_target]'))
 
 feedbin.applyUserTitles()
-
-<% if @decrement %>
-feedbin.CountInstance.updateCount(<%= @entry.feed_id %>, <%= @tags.to_json %>, 'decrement')
-feedbin.updateTitle('<%= j @user.title_with_count %>')
-$("[data-entry-id=<%= @entry.id %>]").addClass('read');
-<% end %>
