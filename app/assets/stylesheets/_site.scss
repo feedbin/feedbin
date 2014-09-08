@@ -1455,6 +1455,25 @@ $subscribe-wrap-height: 49px;
 	}
 }
 
+.view_unread {
+	.collection-starred,
+	.collection-all {
+		display: none;
+	}
+}
+.view_starred {
+	.collection-all,
+	.collection-unread {
+		display: none;
+	}
+}
+.view_all {
+	.collection-starred,
+	.collection-unread {
+		display: none;
+	}
+}
+
 .feeds {
 	@include background-color($list-background-color, $list-background-color-night);
 	position: absolute;

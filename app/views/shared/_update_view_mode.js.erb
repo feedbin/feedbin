@@ -15,3 +15,7 @@ if (feedbin.openFirstItem == true) {
   $('[data-behavior~=feeds_target] li:first-child a').first().click();
   feedbin.openFirstItem = false;
 }
+$('body').removeClass('view_all');
+$('body').removeClass('view_unread');
+$('body').removeClass('view_starred');
+$('body').addClass(feedbin.data.viewMode);

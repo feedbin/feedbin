@@ -42,6 +42,7 @@ class ApplicationController < ActionController::Base
       count: 0,
       id: 'collection_unread',
       favicon_class: 'favicon-unread',
+      parent_class: 'collection-unread',
       parent_data: { behavior: 'all_unread', feed_id: 'collection_unread', count_type: 'unread' },
       data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'unread', message: 'Mark all items as read?'}.to_json }
     }
@@ -51,6 +52,7 @@ class ApplicationController < ActionController::Base
       count: 0,
       id: 'collection_all',
       favicon_class: 'favicon-all',
+      parent_class: 'collection-all',
       parent_data: { behavior: 'all_unread', feed_id: 'collection_all', count_type: 'unread' },
       data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'all', message: 'Mark all items as read?'}.to_json }
     }
@@ -60,6 +62,7 @@ class ApplicationController < ActionController::Base
       count: 0,
       id: 'collection_starred',
       favicon_class: 'favicon-star',
+      parent_class: 'collection-starred',
       parent_data: { behavior: 'starred', feed_id: 'collection_starred', count_type: 'starred' },
       data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'starred', message: 'Mark starred items as read?'}.to_json }
     }
@@ -69,6 +72,7 @@ class ApplicationController < ActionController::Base
       count: 0,
       id: 'collection_recently_read',
       favicon_class: 'favicon-recently-read',
+      parent_class: 'collection-recently-read',
       parent_data: { behavior: 'recently_read', feed_id: 'collection_recently_read', count_type: 'recently_read' },
       data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'recently_read', message: 'Mark recently read items as read?'}.to_json }
     }
