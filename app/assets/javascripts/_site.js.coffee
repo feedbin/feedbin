@@ -152,24 +152,6 @@ $.extend feedbin,
         $.extend feedbin.entries, data
         feedbin.precacheImages(data)
 
-  markAsRead: (entryInfo) ->
-    feedbin.Unread.get().markEntryRead(entryInfo.id, entryInfo.feed_id)
-    entryInfo.read = true
-    $("[data-entry-id=#{entryInfo.id}]").addClass('read')
-    $("[data-entry-id=#{entryInfo.id}][data-behavior~=entry_info]").data('entry-info', entryInfo)
-
-  markAsUnread: (entryInfo) ->
-    feedbin.Unread.get().markEntryUnread(entryInfo.id, entryInfo.feed_id, entryInfo.published)
-    entryInfo.read = false
-    $("[data-entry-id=#{entryInfo.id}]").removeClass('read')
-    $("[data-entry-id=#{entryInfo.id}][data-behavior~=entry_info]").data('entry-info', entryInfo)
-
-  toggleRead: (entryInfo) ->
-    if entryInfo.read
-      feedbin.markAsUnread(entryInfo)
-    else
-      feedbin.markAsRead(entryInfo)
-
   readability: (target) ->
     feedId = $('[data-feed-id]', target).data('feed-id')
     if feedbin.data.readability_settings[feedId] == true && feedbin.data.sticky_readability
@@ -387,52 +369,6 @@ $.extend feedbin,
     $('.entry-content').css
       top: newTop
 
-  setCountCollection: (element, count) ->
-    countContainer = $('> .feed-link .count', element)
-    countContainer.text(count)
-    if count == 0
-      countContainer.addClass('hide')
-    else
-      countContainer.removeClass('hide')
-
-  setCount: (element, count) ->
-    countContainer = $('> .feed-link .count', element)
-    countContainer.text(count)
-    if count == 0
-      $(element).addClass('hide')
-    else
-      $(element).removeClass('hide')
-
-  applyCounts: ->
-    $('[data-count-type]').each (index, element) ->
-      counts = feedbin.Unread.get().unread
-      feedCounts = feedbin.Unread.get().byFeed
-      tagCounts = feedbin.Unread.get().byTag
-      countType = $(element).data('count-type')
-      count = 0
-
-      if countType == 'feed'
-        feedId = $(element).data('feed-id')
-        if (feedId of feedCounts)
-          count = feedCounts[feedId].length
-        feedbin.setCount(element, count)
-
-      if countType == 'tag'
-        tagId = $(element).data('tag-id')
-        if (tagId of tagCounts)
-          count = tagCounts[tagId].length
-        feedbin.setCount(element, count)
-
-      if countType == 'unread'
-        count = counts.length
-        feedbin.setCountCollection(element, count)
-
-      if countType == 'starred'
-        feedbin.setCountCollection(element, 0)
-
-      if countType == 'recently_read'
-        feedbin.setCountCollection(element, 0)
-
   hideQueue: []
 
   feedCandidates: []
@@ -457,9 +393,6 @@ $.extend feedbin,
     hasTouch: ->
       if ('ontouchstart' in document)
         $('body').addClass('touch')
-
-    applyCounts: ->
-      feedbin.applyCounts()
 
     changeSearchSort: (sort) ->
       $(document).on 'click', '[data-sort-option]', ->
@@ -751,18 +684,6 @@ $.extend feedbin,
           feedbin.autoHeight()
           return
 
-    markAsRead: ->
-      $(document).on 'click', '[data-behavior~=show_entry_content]', (event) ->
-        clearTimeout feedbin.recentlyReadTimer
-        container = $(event.currentTarget)
-        entryInfo = $(container).data('entry-info')
-        if !entryInfo.read
-          $.post $(container).data('mark-as-read-path')
-          feedbin.recentlyReadTimer = setTimeout ( ->
-            $.post $(container).data('recently-read-path')
-          ), 10000
-          feedbin.markAsRead(entryInfo)
-
     usePreloadContent: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entry_content]', (event, xhr) ->
         id = $(@).parents('li').data('entry-id')
@@ -813,12 +734,6 @@ $.extend feedbin,
       $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_starred]', (event, xhr) ->
         entryId = $(event.currentTarget).data('entry-id')
         delete feedbin.entries[entryId]
-        return
-
-    toggleRead: ->
-      $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_read]', (event, xhr) ->
-        entryInfo = $('[data-behavior~=selected_entry_data]').data('entry-info')
-        feedbin.toggleRead(entryInfo)
         return
 
     autoUpdate: ->
