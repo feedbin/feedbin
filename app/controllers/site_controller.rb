@@ -8,6 +8,7 @@ class SiteController < ApplicationController
       get_feeds_list
       subscriptions = @user.subscriptions
       unread_entries = @user.unread_entries.pluck('feed_id, entry_id, extract(epoch FROM published)')
+      starred_entries = @user.starred_entries.pluck('feed_id, entry_id, extract(epoch FROM published)')
       tag_map = @user.taggings.group(:feed_id).pluck('feed_id, array_agg(tag_id)')
 
       user_titles = subscriptions.each_with_object({}) do |subscription, hash|
@@ -37,6 +38,7 @@ class SiteController < ApplicationController
         mark_as_read_confirmation: (@user.mark_as_read_confirmation == '1'),
         mark_direction_as_read_entries: mark_direction_as_read_entries_path,
         unread_entries: unread_entries,
+        starred_entries: starred_entries,
         tag_map: tag_map,
         entry_sort: @user.entry_sort
       }
