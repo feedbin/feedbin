@@ -1,12 +1,14 @@
 window.feedbin ?= {}
 
 class _Counts
-  constructor: (tagMap, sortOrder, unreadEntries) ->
+  constructor: (tagMap, sortOrder, unreadEntries, starredEntries) ->
     @tagMap = @buildTagMap(tagMap)
     @collections =
       unread: @sort(unreadEntries, sortOrder)
+      starred: @sort(starredEntries, 'DESC')
     @counts =
       unread: @organizeCounts(@collections.unread)
+      starred: @organizeCounts(@collections.starred)
 
   removeEntry: (entryId, feedId, collection) ->
     index = @counts[collection].all.indexOf(entryId);
@@ -86,7 +88,7 @@ class _Counts
 
 class Counts
   instance = null
-  @get: (tagMap, sortOrder, unreadEntries) ->
-    instance ?= new _Counts(tagMap, sortOrder, unreadEntries)
+  @get: (tagMap, sortOrder, unreadEntries, starredEntries) ->
+    instance ?= new _Counts(tagMap, sortOrder, unreadEntries, starredEntries)
 
 feedbin.Counts = Counts

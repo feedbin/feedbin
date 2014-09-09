@@ -9,7 +9,7 @@
           window.feedbin = {};
       }
       feedbin.data = <%= @data.to_json.html_safe %>
-      feedbin.Counts.get(feedbin.data.tag_map, feedbin.data.entry_sort, feedbin.data.unread_entries)
+      feedbin.Counts.get(feedbin.data.tag_map, feedbin.data.entry_sort, feedbin.data.unread_entries, feedbin.data.starred_entries)
   </script>
 <% end %>
 <%= render partial: 'shared/svg' %>

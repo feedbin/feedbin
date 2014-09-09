@@ -5,9 +5,27 @@ jQuery ->
 
 class feedbin.CountsBehavior
   constructor: ->
+    $(document).on('click', '[data-behavior~=change_view_mode]', @changeViewMode)
     $(document).on('click', '[data-behavior~=show_entry_content]', @showEntryContent)
     $(document).on('ajax:beforeSend', '[data-behavior~=toggle_read]', @toggleRead)
     @applyCounts()
+
+  changeViewMode: (event) =>
+    element = $(event.currentTarget)
+    $('[data-behavior~=change_view_mode]').removeClass('selected')
+    element.addClass('selected')
+
+    feedbin.data.viewMode = element.data('view-mode')
+    if feedbin.data.viewMode == 'view_all'
+      feedbin.hideQueue = [];
+
+    $('body').removeClass('view_all view_unread view_starred');
+    $('body').addClass(feedbin.data.viewMode);
+    @applyCounts()
+
+    if feedbin.openFirstItem
+      $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click();
+      feedbin.openFirstItem = false;
 
   showEntryContent: (event) =>
     clearTimeout feedbin.recentlyReadTimer
@@ -41,22 +59,6 @@ class feedbin.CountsBehavior
     $("[data-entry-id=#{entryInfo.id}]").removeClass('read')
     $("[data-entry-id=#{entryInfo.id}][data-behavior~=entry_info]").data('entry-info', entryInfo)
 
-  setCountCollection: (element, count) ->
-    countContainer = $('> .feed-link .count', element)
-    countContainer.text(count)
-    if count == 0
-      countContainer.addClass('hide')
-    else
-      countContainer.removeClass('hide')
-
-  setCount: (element, count) ->
-    countContainer = $('> .feed-link .count', element)
-    countContainer.text(count)
-    if count == 0
-      $(element).addClass('hide')
-    else
-      $(element).removeClass('hide')
-
   applyCounts: ->
     $('[data-behavior~=needs_count]').each (index, element) =>
       group = $(element).data('count-group')
@@ -64,9 +66,9 @@ class feedbin.CountsBehavior
 
       collection = 'unread'
       if feedbin.data.viewMode == 'view_starred'
-        # TODO change this to starred
-        collection = 'unread'
+        collection = 'starred'
 
+      console.log 'collection', collection
       counts = feedbin.Counts.get().counts[collection][group]
 
       count = 0
