@@ -1,6 +1,6 @@
 window.feedbin ?= {}
 
-class UnreadCounts
+class _Counts
   constructor: (data) ->
     @data ?= data
     @tagMap = @buildTagMap(@data.tag_map)
@@ -86,9 +86,9 @@ class UnreadCounts
   published: (unreadEntry) ->
     unreadEntry[2]
 
-class Unread
+class Counts
   instance = null
   @get: (data) ->
-    instance ?= new UnreadCounts(data)
+    instance ?= new _Counts(data)
 
-feedbin.Unread = Unread
+feedbin.Counts = Counts
