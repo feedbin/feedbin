@@ -4,7 +4,7 @@ class _Counts
   constructor: (data) ->
     @data ?= data
     @tagMap = @buildTagMap(@data.tag_map)
-    @unreadEntries = @sortUnread(data.unread_entries)
+    @unreadEntries = @sort(data.unread_entries)
     counts = @organizeCounts(@unreadEntries)
     @byFeed = counts.byFeed
     @byTag = counts.byTag
@@ -32,14 +32,14 @@ class _Counts
 
     counts
 
-  sortUnread: (unreadEntries) ->
+  sort: (entries) ->
     if @data.entry_sort == 'ASC'
-      unreadEntries.sort (a, b) =>
+      entries.sort (a, b) =>
         @published(a) - @published(b)
     else
-      unreadEntries.sort (a, b) =>
+      entries.sort (a, b) =>
         @published(b) - @published(a)
-    unreadEntries
+    entries
 
   markEntryRead: (entryId, feedId) ->
     # total unread
@@ -63,10 +63,13 @@ class _Counts
             @byTag[tagId].splice(entryIndex, 1);
 
   markEntryUnread: (entryId, feedId, published) ->
-    unreadEntry = [feedId, entryId, published]
+    unreadEntry = @buildEntry
+      feedId: feedId
+      entryId: entryId
+      published: published
     @unreadEntries.push(unreadEntry)
-    @unreadEntries = @sortUnread(@unreadEntries)
-    counts = @organizeCounts()
+    @unreadEntries = @sort(@unreadEntries)
+    counts = @organizeCounts(@unreadEntries)
     @byFeed = counts.byFeed
     @byTag = counts.byTag
     @unread = counts.all
@@ -76,14 +79,17 @@ class _Counts
     object[item[0]] = item[1] for item in tagArray
     object
 
-  feedId: (unreadEntry) ->
-    unreadEntry[0]
+  feedId: (entry) ->
+    entry[0]
 
-  entryId: (unreadEntry) ->
-    unreadEntry[1]
+  entryId: (entry) ->
+    entry[1]
 
-  published: (unreadEntry) ->
-    unreadEntry[2]
+  published: (entry) ->
+    entry[2]
+
+  buildEntry: (params) ->
+    [params.feedId, params.entryId, params.published]
 
 class Counts
   instance = null
