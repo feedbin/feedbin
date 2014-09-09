@@ -28,14 +28,14 @@ class feedbin.CountsBehavior
       @markAsRead(entryInfo)
 
   markAsRead: (entryInfo) ->
-    feedbin.Counts.get().markEntryRead(entryInfo.id, entryInfo.feed_id)
+    feedbin.Counts.get().removeEntry(entryInfo.id, entryInfo.feed_id, 'unread')
     @applyCounts()
     entryInfo.read = true
     $("[data-entry-id=#{entryInfo.id}]").addClass('read')
     $("[data-entry-id=#{entryInfo.id}][data-behavior~=entry_info]").data('entry-info', entryInfo)
 
   markAsUnread: (entryInfo) ->
-    feedbin.Counts.get().markEntryUnread(entryInfo.id, entryInfo.feed_id, entryInfo.published)
+    feedbin.Counts.get().addEntry(entryInfo.id, entryInfo.feed_id, entryInfo.published, 'unread')
     @applyCounts()
     entryInfo.read = false
     $("[data-entry-id=#{entryInfo.id}]").removeClass('read')

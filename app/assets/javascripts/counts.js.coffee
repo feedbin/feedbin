@@ -8,6 +8,28 @@ class _Counts
     @counts =
       unread: @organizeCounts(@collections.unread)
 
+  removeEntry: (entryId, feedId, collection) ->
+    index = @counts[collection].all.indexOf(entryId);
+    if index > -1
+      @counts[collection].all.splice(index, 1);
+      @collections[collection].splice(index, 1);
+
+    @removeFromCollection(collection, 'byFeed', entryId, feedId)
+
+    if (feedId of @tagMap)
+      tags = @tagMap[feedId]
+      for tagId in tags
+        @removeFromCollection(collection, 'byTag', entryId, tagId)
+
+  addEntry: (entryId, feedId, published, collection) ->
+    entry = @buildEntry
+      feedId: feedId
+      entryId: entryId
+      published: published
+    @collections[collection].push(entry)
+    @collections[collection] = @sort(@collections[collection])
+    @counts[collection] = @organizeCounts(@collections[collection])
+
   organizeCounts: (entries) ->
     counts =
       byFeed: {}
@@ -39,39 +61,19 @@ class _Counts
         @published(b) - @published(a)
     entries
 
-  markEntryRead: (entryId, feedId, collection = 'unread') ->
-    index = @counts[collection].all.indexOf(entryId);
-    if index > -1
-      @counts[collection].all.splice(index, 1);
-      @collections[collection].splice(index, 1);
-
-    @removeEntry(collection, 'byFeed', entryId, feedId)
-
-    if (feedId of @tagMap)
-      tags = @tagMap[feedId]
-      for tagId in tags
-        @removeEntry(collection, 'byTag', entryId, tagId)
-
-  removeEntry: (collection, group, entryId, groupId) ->
+  removeFromCollection: (collection, group, entryId, groupId) ->
     index = @counts[collection][group][groupId].indexOf(entryId);
     if index > -1
       @counts[collection][group][groupId].splice(index, 1);
     index
 
-  markEntryUnread: (entryId, feedId, published) ->
-    collection = 'unread'
-    unreadEntry = @buildEntry
-      feedId: feedId
-      entryId: entryId
-      published: published
-    @collections[collection].push(unreadEntry)
-    @collections[collection] = @sort(@collections[collection])
-    @counts[collection] = @organizeCounts(@collections[collection])
-
   buildTagMap: (tagArray) ->
     object = {}
     object[item[0]] = item[1] for item in tagArray
     object
+
+  buildEntry: (params) ->
+    [params.feedId, params.entryId, params.published]
 
   feedId: (entry) ->
     entry[0]
@@ -81,9 +83,6 @@ class _Counts
 
   published: (entry) ->
     entry[2]
-
-  buildEntry: (params) ->
-    [params.feedId, params.entryId, params.published]
 
 class Counts
   instance = null
