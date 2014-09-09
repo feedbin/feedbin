@@ -39,7 +39,7 @@ class ApplicationController < ActionController::Base
     collections << {
       title: 'Unread',
       path: unread_entries_path,
-      count: 0,
+      count_data: {behavior: 'needs_count', count_group: 'all'},
       id: 'collection_unread',
       favicon_class: 'favicon-unread',
       parent_class: 'collection-unread',
@@ -49,7 +49,7 @@ class ApplicationController < ActionController::Base
     collections << {
       title: 'All',
       path: entries_path,
-      count: 0,
+      count_data: {behavior: 'needs_count', count_group: 'all'},
       id: 'collection_all',
       favicon_class: 'favicon-all',
       parent_class: 'collection-all',
@@ -59,7 +59,7 @@ class ApplicationController < ActionController::Base
     collections << {
       title: 'Starred',
       path: starred_entries_path,
-      count: 0,
+      count_data: {behavior: 'needs_count', count_group: 'all'},
       id: 'collection_starred',
       favicon_class: 'favicon-star',
       parent_class: 'collection-starred',
@@ -69,7 +69,6 @@ class ApplicationController < ActionController::Base
     collections << {
       title: 'Recently Read',
       path: recently_read_entries_path,
-      count: 0,
       id: 'collection_recently_read',
       favicon_class: 'favicon-recently-read',
       parent_class: 'collection-recently-read',

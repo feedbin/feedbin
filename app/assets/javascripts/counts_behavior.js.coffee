@@ -58,31 +58,30 @@ class feedbin.CountsBehavior
       $(element).removeClass('hide')
 
   applyCounts: ->
-    $('[data-count-type]').each (index, element) =>
-      counts = feedbin.Counts.get().counts.unread.all
-      feedCounts = feedbin.Counts.get().counts.unread.byFeed
-      tagCounts = feedbin.Counts.get().counts.unread.byTag
-      countType = $(element).data('count-type')
+    $('[data-behavior~=needs_count]').each (index, element) =>
+      group = $(element).data('count-group')
+      groupId = $(element).data('count-group-id')
+
+      collection = 'unread'
+      if feedbin.data.viewMode == 'view_starred'
+        # TODO change this to starred
+        collection = 'unread'
+
+      counts = feedbin.Counts.get().counts[collection][group]
+
       count = 0
-
-      if countType == 'feed'
-        feedId = $(element).data('feed-id')
-        if (feedId of feedCounts)
-          count = feedCounts[feedId].length
-        @setCount(element, count)
-
-      if countType == 'tag'
-        tagId = $(element).data('tag-id')
-        if (tagId of tagCounts)
-          count = tagCounts[tagId].length
-        @setCount(element, count)
-
-      if countType == 'unread'
+      if groupId
+        if (groupId of counts)
+          count = counts[groupId].length
+          $(element).text(count)
+        if (count == 0)
+          $(element).parents('li').first().addClass('zero-count')
+        else
+          $(element).parents('li').first().removeClass('zero-count')
+      else
         count = counts.length
-        @setCountCollection(element, count)
-
-      if countType == 'starred'
-        @setCountCollection(element, 0)
-
-      if countType == 'recently_read'
-        @setCountCollection(element, 0)
+        $(element).text(count)
+        if (count == 0)
+          $(element).addClass('hide')
+        else
+          $(element).removeClass('hide')

@@ -1456,12 +1456,18 @@ $subscribe-wrap-height: 49px;
 }
 
 .view_unread {
+	.zero-count {
+		display: none;
+	}
 	.collection-starred,
 	.collection-all {
 		display: none;
 	}
 }
 .view_starred {
+	.zero-count {
+		display: none;
+	}
 	.collection-all,
 	.collection-unread {
 		display: none;
