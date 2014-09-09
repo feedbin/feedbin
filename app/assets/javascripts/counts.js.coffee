@@ -5,23 +5,22 @@ class _Counts
     @data ?= data
     @tagMap = @buildTagMap(@data.tag_map)
     @unreadEntries = @sortUnread(data.unread_entries)
-    counts = @organizeCounts()
+    counts = @organizeCounts(@unreadEntries)
     @byFeed = counts.byFeed
     @byTag = counts.byTag
-    @unread = counts.unread
+    @unread = counts.all
 
-  organizeCounts: () ->
+  organizeCounts: (entries) ->
     counts =
       byFeed: {}
       byTag: {}
-      unread: []
+      all: []
 
-    for unreadEntry in @unreadEntries
-      feedId = @feedId(unreadEntry)
-      entryId = @entryId(unreadEntry)
+    for entry in entries
+      feedId = @feedId(entry)
+      entryId = @entryId(entry)
 
-      counts.unread.push(entryId)
-
+      counts.all.push(entryId)
       counts.byFeed[feedId] = counts.byFeed[feedId] || []
       counts.byFeed[feedId].push(entryId)
 
@@ -70,7 +69,7 @@ class _Counts
     counts = @organizeCounts()
     @byFeed = counts.byFeed
     @byTag = counts.byTag
-    @unread = counts.unread
+    @unread = counts.all
 
   buildTagMap: (tagArray) ->
     object = {}
