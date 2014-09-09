@@ -1,14 +1,12 @@
 window.feedbin ?= {}
 
 class _Counts
-  constructor: (data) ->
-    @data ?= data
-    @tagMap = @buildTagMap(@data.tag_map)
-    @unreadEntries = @sort(data.unread_entries)
-    counts = @organizeCounts(@unreadEntries)
-    @byFeed = counts.byFeed
-    @byTag = counts.byTag
-    @unread = counts.all
+  constructor: (tagMap, sortOrder, unreadEntries) ->
+    @tagMap = @buildTagMap(tagMap)
+    @collections =
+      unread: @sort(unreadEntries, sortOrder)
+    @counts =
+      unread: @organizeCounts(@collections.unread)
 
   organizeCounts: (entries) ->
     counts =
@@ -32,8 +30,8 @@ class _Counts
 
     counts
 
-  sort: (entries) ->
-    if @data.entry_sort == 'ASC'
+  sort: (entries, sortOrder) ->
+    if sortOrder == 'ASC'
       entries.sort (a, b) =>
         @published(a) - @published(b)
     else
@@ -41,38 +39,34 @@ class _Counts
         @published(b) - @published(a)
     entries
 
-  markEntryRead: (entryId, feedId) ->
-    # total unread
-    entryIndex = @unread.indexOf(entryId);
-    if entryIndex > -1
-      @unread.splice(entryIndex, 1);
-      @unreadEntries.splice(entryIndex, 1);
+  markEntryRead: (entryId, feedId, collection = 'unread') ->
+    index = @counts[collection].all.indexOf(entryId);
+    if index > -1
+      @counts[collection].all.splice(index, 1);
+      @collections[collection].splice(index, 1);
 
-    # feeds
-    if (feedId of @byFeed)
-      entryIndex = @byFeed[feedId].indexOf(entryId);
-      if entryIndex > -1
-        @byFeed[feedId].splice(entryIndex, 1);
+    @removeEntry(collection, 'byFeed', entryId, feedId)
 
-    # tags
-      if (feedId of @tagMap)
-        tags = @tagMap[feedId]
-        for tagId in tags
-          entryIndex = @byTag[tagId].indexOf(entryId);
-          if entryIndex > -1
-            @byTag[tagId].splice(entryIndex, 1);
+    if (feedId of @tagMap)
+      tags = @tagMap[feedId]
+      for tagId in tags
+        @removeEntry(collection, 'byTag', entryId, tagId)
+
+  removeEntry: (collection, group, entryId, groupId) ->
+    index = @counts[collection][group][groupId].indexOf(entryId);
+    if index > -1
+      @counts[collection][group][groupId].splice(index, 1);
+    index
 
   markEntryUnread: (entryId, feedId, published) ->
+    collection = 'unread'
     unreadEntry = @buildEntry
       feedId: feedId
       entryId: entryId
       published: published
-    @unreadEntries.push(unreadEntry)
-    @unreadEntries = @sort(@unreadEntries)
-    counts = @organizeCounts(@unreadEntries)
-    @byFeed = counts.byFeed
-    @byTag = counts.byTag
-    @unread = counts.all
+    @collections[collection].push(unreadEntry)
+    @collections[collection] = @sort(@collections[collection])
+    @counts[collection] = @organizeCounts(@collections[collection])
 
   buildTagMap: (tagArray) ->
     object = {}
@@ -93,7 +87,7 @@ class _Counts
 
 class Counts
   instance = null
-  @get: (data) ->
-    instance ?= new _Counts(data)
+  @get: (tagMap, sortOrder, unreadEntries) ->
+    instance ?= new _Counts(tagMap, sortOrder, unreadEntries)
 
 feedbin.Counts = Counts

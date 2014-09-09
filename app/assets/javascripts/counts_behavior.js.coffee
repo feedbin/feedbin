@@ -59,9 +59,9 @@ class feedbin.CountsBehavior
 
   applyCounts: ->
     $('[data-count-type]').each (index, element) =>
-      counts = feedbin.Counts.get().unread
-      feedCounts = feedbin.Counts.get().byFeed
-      tagCounts = feedbin.Counts.get().byTag
+      counts = feedbin.Counts.get().counts.unread.all
+      feedCounts = feedbin.Counts.get().counts.unread.byFeed
+      tagCounts = feedbin.Counts.get().counts.unread.byTag
       countType = $(element).data('count-type')
       count = 0
 
