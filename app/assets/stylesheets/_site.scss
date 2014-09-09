@@ -2459,6 +2459,17 @@ $saved-search-control-height: 48px;
 		}
 	}
 	.button-toggle-starred {
+		.icon-star-on {
+			display: none;
+		}
+		.starred & {
+			.icon-star-on {
+				display: block;
+			}
+			.icon-star-off {
+				display: none;
+			}
+		}
 		svg {
 			position: absolute;
 			top: $base-button-position + 1;

@@ -469,7 +469,7 @@ $.extend feedbin,
         return
 
     loadEntries: ->
-      $('[data-behavior~=feeds_target] > li:first-child [data-behavior~=open_item]').click() unless $('body').hasClass('mobile')
+      $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click() unless $('body').hasClass('mobile')
 
     tagsForm: ->
       $(document).on 'click', (event) ->
@@ -727,13 +727,6 @@ $.extend feedbin,
         if feedbin.data.sticky_readability && feedbin.data.readability_settings[feedId] != "undefined"
           unless $("#content_view").val() == "true" && feedbin.data.readability_settings[feedId] == true
             feedbin.data.readability_settings[feedId] = !feedbin.data.readability_settings[feedId]
-        return
-
-    removePreload: ->
-      # Just delete the preloaded entry when something gets starred
-      $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_starred]', (event, xhr) ->
-        entryId = $(event.currentTarget).data('entry-id')
-        delete feedbin.entries[entryId]
         return
 
     autoUpdate: ->

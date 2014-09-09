@@ -26,6 +26,12 @@ class EntryPresenter < BasePresenter
     end
   end
 
+  def starred_class(starred)
+    if starred
+      'starred'
+    end
+  end
+
   def classes
     classes = []
     classes << read_state
