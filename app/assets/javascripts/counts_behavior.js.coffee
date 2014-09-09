@@ -68,7 +68,6 @@ class feedbin.CountsBehavior
       if feedbin.data.viewMode == 'view_starred'
         collection = 'starred'
 
-      console.log 'collection', collection
       counts = feedbin.Counts.get().counts[collection][group]
 
       count = 0
