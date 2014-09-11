@@ -70,6 +70,7 @@ gem 'httparty'
 gem 'oauth'
 gem 'evernote_oauth'
 gem 'rmagick', require: false
+gem 'skylight'
 
 # Sidekiq
 gem 'sidekiq'
