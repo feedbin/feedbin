@@ -277,10 +277,10 @@ class feedbin.Keyboard
         event.preventDefault()
 
   setEnvironment: ->
+    @selected = @selectedItem()
     @columnOffsetTop = @selectedColumn.offset().top
     @next = @nextItem()
     @previous = @previousItem()
-    @selected = @selectedItem()
     @containerHeight = @selectedColumn.outerHeight()
     @scrollTop = @selectedColumn.prop('scrollTop')
 
@@ -350,27 +350,27 @@ class feedbin.Keyboard
     selectedItem
 
   previousItem: ->
-    @drawer = @selectedItem().prev().find('.drawer')
+    @drawer = @selected.prevAll().not(":hidden").first().find('.drawer')
     if @inDrawer()
-      prev = @selectedItem().prev()
+      prev = @selected.prevAll().not(":hidden").first();
       if prev.length == 0
-        prev = @selectedItem().parents('li[data-tag-id]')
+        prev = @selected.parents('li[data-tag-id]');
     else if @hasDrawer()
-      prev = $('ul li:last-child', @drawer)
+      prev = $('ul li', @drawer).not(":hidden").last();
     else
-      prev = @selectedItem().prev()
+      prev = @selected.prevAll().not(":hidden").first();
     prev
 
   nextItem: ->
     @drawer = $('.drawer', @selectedItem())
     if @inDrawer()
-      next = @selectedItem().next(':not(.hide)')
+      next = @selected.nextAll().not(":hidden").first();
       if next.length == 0
-        next = @selectedItem().parents('li[data-tag-id]').next(':not(.hide)')
+        next = @selected.parents('li[data-tag-id]').nextAll().not(":hidden").first();
     else if @hasDrawer()
-      next = $('ul li:first-child', @drawer)
+      next = $('ul li', @drawer).not(":hidden").first();
     else
-      next = @selectedItem().next(':not(.hide)')
+      next = @selected.nextAll().not(":hidden").first();
     next
 
   inDrawer: ->
