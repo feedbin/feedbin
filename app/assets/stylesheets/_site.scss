@@ -1474,6 +1474,9 @@ $subscribe-wrap-height: 49px;
 	}
 }
 .view_all {
+	.zero-count .count {
+		display: none;
+	}
 	.collection-starred,
 	.collection-unread {
 		display: none;

@@ -92,7 +92,6 @@ class feedbin.CountsBehavior
 
   toggleStarred: (event, xhr) =>
     entryInfo = $('[data-behavior~=selected_entry_data]').data('entry-info')
-    console.log entryInfo
     if entryInfo.starred
       feedbin.Counts.get().removeEntry(entryInfo.id, entryInfo.feed_id, 'starred')
       @unmark(entryInfo, 'starred')
