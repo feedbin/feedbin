@@ -369,8 +369,6 @@ $.extend feedbin,
     $('.entry-content').css
       top: newTop
 
-  hideQueue: []
-
   feedCandidates: []
 
   modalShowing: false
@@ -509,17 +507,6 @@ $.extend feedbin,
           return
       $('.feeds-column').resizable($.extend(defaults))
       $('.entries-column').resizable($.extend(defaults))
-
-    processHideQueue: ->
-      $(document).on 'click', '[data-behavior~=show_entries]', ->
-        $.each feedbin.hideQueue, (i, feed_id) ->
-          if feed_id != undefined && feed_id != "collection_all" && feed_id != "collection_unread"
-            item = $("[data-feed-id=#{feed_id}]", '.feeds')
-            $(item).hide 'fast', () ->
-              $(item).remove()
-              feedbin.hideQueue.remove(i)
-        feedbin.hideQueue = []
-        return
 
     feedCandidates: ->
       $(document).on 'click', '[data-behavior~=show_entries]', ->
