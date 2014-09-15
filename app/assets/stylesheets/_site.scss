@@ -4940,6 +4940,19 @@ Media Players
 
 
 /*------------------------------------------------------------------------------
+Bigfoot
+------------------------------------------------------------------------------*/
+.footnote-button {
+	@include background-color($text-color, $text-color-night);
+}
+.footnote-circle {
+	@include background-color($text-color-light, $text-color-light-night);
+}
+.footnote-content-wrapper {
+	color: $text-color;
+}
+
+/*------------------------------------------------------------------------------
 Media Queries
 ------------------------------------------------------------------------------*/
 @media only screen and (max-width:1024px) {
