@@ -469,7 +469,7 @@ $.extend feedbin,
     loadEntries: ->
       link = $('[data-behavior~=feeds_target] li:visible').first().find('a')
       mobile = $('body').hasClass('mobile')
-      if link && !mobile
+      if link.length > 0 && !mobile
         link[0].click()
 
     tagsForm: ->
