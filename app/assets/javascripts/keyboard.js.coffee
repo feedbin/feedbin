@@ -350,27 +350,33 @@ class feedbin.Keyboard
     selectedItem
 
   previousItem: ->
-    @drawer = @selected.prevAll().not(":hidden").first().find('.drawer')
-    if @inDrawer()
-      prev = @selected.prevAll().not(":hidden").first();
-      if prev.length == 0
-        prev = @selected.parents('li[data-tag-id]');
-    else if @hasDrawer()
-      prev = $('ul li', @drawer).not(":hidden").last();
+    if @selectedColumnName() == 'feeds'
+      @drawer = @selected.prevAll().not(":hidden").first().find('.drawer')
+      if @inDrawer()
+        prev = @selected.prevAll().not(":hidden").first();
+        if prev.length == 0
+          prev = @selected.parents('li[data-tag-id]');
+      else if @hasDrawer()
+        prev = $('ul li', @drawer).not(":hidden").last();
+      else
+        prev = @selected.prevAll().not(":hidden").first();
     else
-      prev = @selected.prevAll().not(":hidden").first();
+      prev = @selectedItem().prev()
     prev
 
   nextItem: ->
-    @drawer = $('.drawer', @selectedItem())
-    if @inDrawer()
-      next = @selected.nextAll().not(":hidden").first();
-      if next.length == 0
-        next = @selected.parents('li[data-tag-id]').nextAll().not(":hidden").first();
-    else if @hasDrawer()
-      next = $('ul li', @drawer).not(":hidden").first();
+    if @selectedColumnName() == 'feeds'
+      @drawer = $('.drawer', @selectedItem())
+      if @inDrawer()
+        next = @selected.nextAll().not(":hidden").first();
+        if next.length == 0
+          next = @selected.parents('li[data-tag-id]').nextAll().not(":hidden").first();
+      else if @hasDrawer()
+        next = $('ul li', @drawer).not(":hidden").first();
+      else
+        next = @selected.nextAll().not(":hidden").first();
     else
-      next = @selected.nextAll().not(":hidden").first();
+      next = @selectedItem().next()
     next
 
   inDrawer: ->
