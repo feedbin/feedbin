@@ -77,11 +77,10 @@ $.extend feedbin,
     $('.blog-post').attr('href', content.url);
 
   precacheImages: (data) ->
-    if feedbin.data.precache_images == true && feedbin.data.mobile == false
+    if feedbin.data.precache_images == true
       entries = []
       $.each data, (index, entry) ->
-        if entry.read == false
-          entries.push(entry.content)
+        entries.push(entry.content)
       $(entries.join())
 
   localizeTime: (container) ->
