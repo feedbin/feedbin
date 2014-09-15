@@ -34,14 +34,7 @@ class FeedsController < ApplicationController
   end
 
   def auto_update
-    @keep_selected = true
-    if session[:view_mode] == 'view_all'
-      view_all
-    elsif session[:view_mode] == 'view_starred'
-      view_starred
-    else
-      view_unread
-    end
+    get_feeds_list
   end
 
   def push
