@@ -467,7 +467,10 @@ $.extend feedbin,
         return
 
     loadEntries: ->
-      $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click() unless $('body').hasClass('mobile')
+      link = $('[data-behavior~=feeds_target] li:visible').first().find('a')
+      mobile = $('body').hasClass('mobile')
+      if link && !mobile
+        link[0].click()
 
     tagsForm: ->
       $(document).on 'click', (event) ->

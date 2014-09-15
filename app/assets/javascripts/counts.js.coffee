@@ -2,6 +2,12 @@ window.feedbin ?= {}
 
 class _Counts
   constructor: (options) ->
+    @setData(options)
+
+  update: (options) ->
+    @setData(options)
+
+  setData: (options) ->
     @tagMap = @buildTagMap(options.tag_map)
     @collections =
       unread: @sort(options.unread_entries, options.sort_order)
