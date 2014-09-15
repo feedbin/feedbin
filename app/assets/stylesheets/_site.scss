@@ -5017,7 +5017,6 @@ Media Queries
 		}
 	}
     .entry-toolbar, .entry-feed-title {
-		.favicon-wrap,
 		.entry-feed-title {
 			display: none;
 			.full-screen & {
@@ -5071,6 +5070,14 @@ Media Queries
 			display: block;
 		}
 	}
+    .entry-toolbar {
+		.favicon-wrap {
+			display: none;
+			.full-screen & {
+				display: block;
+			}
+		}
+    }
     .entry-basement {
     	top: $toolbar-height;
     }

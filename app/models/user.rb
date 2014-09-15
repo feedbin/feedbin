@@ -148,6 +148,7 @@ class User < ActiveRecord::Base
         if stripe_token.present?
           customer.card = stripe_token
           self.suspended = false
+          subscriptions.update_all(active: true)
         end
         customer.plan = plan.stripe_id
         customer.email = email
