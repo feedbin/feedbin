@@ -1,11 +1,11 @@
 window.feedbin ?= {}
 
 class _Counts
-  constructor: (tagMap, sortOrder, unreadEntries, starredEntries) ->
-    @tagMap = @buildTagMap(tagMap)
+  constructor: (options) ->
+    @tagMap = @buildTagMap(options.tag_map)
     @collections =
-      unread: @sort(unreadEntries, sortOrder)
-      starred: @sort(starredEntries, 'DESC')
+      unread: @sort(options.unread_entries, options.sort_order)
+      starred: @sort(options.starred_entries, 'DESC')
     @counts =
       unread: @organizeCounts(@collections.unread)
       starred: @organizeCounts(@collections.starred)
