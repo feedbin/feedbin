@@ -412,7 +412,7 @@ class feedbin.Keyboard
     @columns['feeds'].find('.selected').nextAll('li').find('.count').not('.hide').length
 
   selectNextUnreadFeed: ->
-    @item = @columns['feeds'].find('.selected').nextAll('li').find('.count').not('.hide').first().parents('li')
+    @item = @columns['feeds'].find('.selected').nextAll('li').find('.count').not(':hidden').first().parents('li')
     @selectItem()
 
   hasUnreadEntries: ->
