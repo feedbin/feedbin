@@ -122,10 +122,6 @@ $.extend feedbin,
     event.initMouseEvent "click", true, true, window, 0, 0, 0, 0, 0, true, false, false, true, 0, null
     anchor.dispatchEvent event
 
-  updateTitle: (title) ->
-    docTitle = $('title')
-    docTitle.text(title) unless docTitle.text() is title
-
   autocomplete: (element) ->
     element.autocomplete
       serviceUrl: feedbin.data.tags_path

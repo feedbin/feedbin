@@ -81,9 +81,7 @@ class FeedsController < ApplicationController
     @user = current_user
     @view_mode = view_mode
     session[:view_mode] = @view_mode
-    respond_to do |format|
-      format.js { render partial: 'shared/update_view_mode' }
-    end
+    render nothing: true
   end
 
   def correct_user

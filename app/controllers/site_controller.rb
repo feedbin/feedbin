@@ -19,7 +19,6 @@ class SiteController < ApplicationController
       end
 
       @show_welcome = (subscriptions.present?) ? false : true
-      @title = @user.title_with_count
       @data = {
         login_url: login_url,
         tags_path: tags_path(format: :json),
