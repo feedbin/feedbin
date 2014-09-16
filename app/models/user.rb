@@ -185,21 +185,6 @@ class User < ActiveRecord::Base
     starred_entries.count
   end
 
-  def title_with_count
-    if self.show_unread_count == '1'
-      @title_count ||= unread_entries.limit(1000).count
-      if @title_count == 0
-        "Feedbin"
-      elsif @title_count >= 1_000
-        "Feedbin (1,000+)"
-      else
-        "Feedbin (#{@title_count.to_s})"
-      end
-    else
-      "Feedbin"
-    end
-  end
-
   # TODO make sure zero counts get hidden, maybe load feeds based on this list
   def unread_count
     @count ||= unread_entries.group(:feed_id).count

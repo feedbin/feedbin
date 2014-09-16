@@ -4,7 +4,7 @@ feedbin.hideQueue = []
 
 feedbin.updateTitle = () ->
   title = "Feedbin"
-  if feedbin.data.show_unread_count && feedbin.data.viewMode != 'view_starred'
+  if feedbin.data && feedbin.data.show_unread_count && feedbin.data.viewMode != 'view_starred'
     count = $('[data-behavior~=all_unread]').first().find('.count').text() * 1
     if count == 0
       title = "Feedbin"
