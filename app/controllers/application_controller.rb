@@ -107,23 +107,25 @@ class ApplicationController < ActionController::Base
   private
 
   def update_with_state(entries)
-    user = current_user
-    entry_ids = entries.map {|entry| entry.id }
-    unread = user.unread_entries.where(entry_id: entry_ids).pluck(:entry_id)
-    starred = user.starred_entries.where(entry_id: entry_ids).pluck(:entry_id)
-    entries.each_with_index do |entry, index|
-      if unread.include?(entry.id)
-        entries[index].read = false
-      else
-        entries[index].read = true
+    Librato.timing 'application_controller.update_with_state' do
+      user = current_user
+      entry_ids = entries.map {|entry| entry.id }
+      unread = user.unread_entries.where(entry_id: entry_ids).pluck(:entry_id)
+      starred = user.starred_entries.where(entry_id: entry_ids).pluck(:entry_id)
+      entries.each_with_index do |entry, index|
+        if unread.include?(entry.id)
+          entries[index].read = false
+        else
+          entries[index].read = true
+        end
+        if starred.include?(entry.id)
+          entries[index].starred = true
+        else
+          entries[index].starred = false
+        end
       end
-      if starred.include?(entry.id)
-        entries[index].starred = true
-      else
-        entries[index].starred = false
-      end
+      entries
     end
-    entries
   end
 
   def feeds_response
