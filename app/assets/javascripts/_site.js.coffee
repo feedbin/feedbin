@@ -147,21 +147,31 @@ $.extend feedbin,
         $.extend feedbin.entries, data
         feedbin.precacheImages(data)
 
-  readability: (target) ->
-    feedId = $('[data-feed-id]', target).data('feed-id')
+  readability: () ->
+    feedId = feedbin.selectedEntry.feed_id
     if feedbin.data.readability_settings[feedId] == true && feedbin.data.sticky_readability
       $('.button-toggle-content').find('span').addClass('active')
       $('[data-behavior~=entry_content_wrap]').html('Loading Readability&hellip;')
       $('[data-behavior~=toggle_content_view]').submit()
 
-  formatEntryContent: (resetScroll = true, currentItem = null) ->
-    if resetScroll
-      $('.entry-content').prop('scrollTop', 0)
+  resetScroll: ->
+    $('.entry-content').prop('scrollTop', 0)
+
+  fitVids: ->
     $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com']"});
+
+  formatEntryContent: (entryId, resetScroll=true, readability=true) ->
+    if resetScroll
+      feedbin.resetScroll
+    if readability
+      feedbin.readability()
     feedbin.syntaxHighlight()
     feedbin.footnotes()
-    feedbin.nextEntryPreview(currentItem)
+    feedbin.nextEntryPreview()
     feedbin.audioVideo()
+    feedbin.localizeTime($('[data-behavior~=entry_content_target]'))
+    feedbin.applyUserTitles()
+    feedbin.applyStarred(entryId)
 
   refresh: ->
     if feedbin.data
@@ -231,14 +241,16 @@ $.extend feedbin,
     else
       null
 
-  nextEntryPreview: (current) ->
-    next = $(current).parents('li').next()
+  nextEntryPreview: () ->
+    next = feedbin.selectedEntry.container.parents('li').next()
     if next.length
       title = next.find('.title').text()
       feed = next.find('.feed-title').text()
       $('.next-entry-title').text(title)
       $('.next-entry-feed').text(feed)
       $('.next-entry-preview').removeClass('no-content')
+    else
+      $('.next-entry-preview').addClass('no-content')
 
   showSubscribe: ->
     $('.subscribe-wrap input').val('')
@@ -368,6 +380,11 @@ $.extend feedbin,
     if feedbin.Counts.get().isStarred(entryId)
       $('[data-behavior~=selected_entry_data]').addClass('starred')
 
+  showEntry: (entryId) ->
+    entry = feedbin.entries[entryId]
+    feedbin.updateEntryContent(entry.content)
+    feedbin.formatEntryContent(entryId, true)
+
   feedCandidates: []
 
   modalShowing: false
@@ -429,11 +446,6 @@ $.extend feedbin,
     choicesSubmit: ->
       $(document).on 'ajax:beforeSend', '[data-choice-form]', ->
         $('.modal').modal('hide')
-        return
-
-    openEntry: ->
-      $(document).on 'ajax:complete', '[data-behavior~=reset_entry_content_position]', ->
-        feedbin.formatEntryContent(true, @)
         return
 
     entryLinks: ->
@@ -679,11 +691,7 @@ $.extend feedbin,
         entry = feedbin.entries[id]
         if entry
           xhr.abort()
-          feedbin.updateEntryContent(entry.content)
-          feedbin.formatEntryContent(true, @)
-          feedbin.localizeTime($('[data-behavior~=entry_content_target]'))
-          feedbin.applyUserTitles()
-          feedbin.readability(@)
+          feedbin.showEntry(id)
         return
 
     timeago: ->

@@ -73,22 +73,10 @@ class EntriesController < ApplicationController
 
   def show
     @user = current_user
-    @entry = Entry.find params[:id]
-
-    @content_view = false
-    if @user.sticky_view_inline == '1'
-      subscription = Subscription.find_by(user: @user, feed_id: @entry.feed_id)
-
-      # Subscription will not necessarily be present for starred items
-      if subscription.try(:view_inline)
-        @content_view = true
-        view_inline
-        @entry.content = @content
-      end
+    @entries = entries_by_id(params[:id])
+    respond_to do |format|
+      format.js
     end
-
-    @feed = @entry.feed
-    @services = sharing_services(@entry)
   end
 
   def content
@@ -159,27 +147,22 @@ class EntriesController < ApplicationController
   def preload
     @user = current_user
     ids = params[:ids].split(',').map {|i| i.to_i }
-    @entries = Entry.where(id: ids).includes(:feed)
+    entries = entries_by_id(ids)
+    render json: entries.to_json
+  end
 
-    result = {}
-    @entries.each do |entry|
-      readability = (@user.sticky_view_inline == '1' && view_inline_settings[entry.feed_id] == true)
+  def entries_by_id(entry_ids)
+    entries = Entry.where(id: entry_ids).includes(:feed)
+    entries.each_with_object({}) do |entry, hash|
       locals = {
         entry: entry,
         services: sharing_services(entry),
         content_view: false
       }
-      result[entry.id] = {
+      hash[entry.id] = {
         content: render_to_string(partial: "entries/show", formats: [:html], locals: locals),
-        read: entry.read,
-        starred: entry.starred,
-        tags: tags[entry.feed_id] ? tags[entry.feed_id] : [],
         feed_id: entry.feed_id
       }
-    end
-
-    respond_to do |format|
-      format.json { render json: result.to_json }
     end
   end
 
