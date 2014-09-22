@@ -101,11 +101,11 @@ class feedbin.CountsBehavior
 
     if !@isRead(entry.id)
       $.post $(container).data('mark-as-read-path')
+      feedbin.Counts.get().removeEntry(entry.id, entry.feed_id, 'unread')
+      @mark('read')
       feedbin.recentlyReadTimer = setTimeout ( ->
         $.post $(container).data('recently-read-path')
       ), 10000
-      feedbin.Counts.get().removeEntry(entry.id, entry.feed_id, 'unread')
-      @mark('read')
 
   isRead: (entryId) ->
     feedbin.Counts.get().isRead(entryId)
