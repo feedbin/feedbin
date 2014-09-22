@@ -1,4 +1,4 @@
-feedbin.updateEntryContent('<%= j render partial: "show", locals: { entry: @entry, feed: @feed, read: @read, starred: @starred, content_view: @content_view, services: @services } %>');
+feedbin.updateEntryContent('<%= j render partial: "show", locals: { entry: @entry, feed: @feed, content_view: @content_view, services: @services } %>');
 
 feedbin.localizeTime($('[data-behavior~=entry_content_target]'))
 

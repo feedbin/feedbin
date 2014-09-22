@@ -364,6 +364,10 @@ $.extend feedbin,
     $('.entry-content').css
       top: newTop
 
+  applyStarred: (entryId) ->
+    if feedbin.Counts.get().isStarred(entryId)
+      $('[data-behavior~=selected_entry_data]').addClass('starred')
+
   feedCandidates: []
 
   modalShowing: false

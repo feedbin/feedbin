@@ -53,6 +53,10 @@ class User < ActiveRecord::Base
     email
   end
 
+  def setting_on?(setting_symbol)
+    self.send(setting_symbol) == '1'
+  end
+
   def activate_subscriptions
     if plan_id_changed? && plan_id_was == Plan.find_by_stripe_id('trial').id
       subscriptions.update_all(active: true)

@@ -87,17 +87,8 @@ class EntriesController < ApplicationController
       end
     end
 
-    @decrement = UnreadEntry.where(user_id: @user.id, entry_id: @entry.id).delete_all > 0 ? true : false
-
-    @read = true
-    @starred = StarredEntry.where(user_id: @user.id, entry_id: @entry.id).present?
     @feed = @entry.feed
-    @tags = @user.tags.where(taggings: {feed_id: @feed}).uniq.collect(&:id)
-
     @services = sharing_services(@entry)
-    respond_to do |format|
-      format.js
-    end
   end
 
   def content
@@ -169,22 +160,6 @@ class EntriesController < ApplicationController
     @user = current_user
     ids = params[:ids].split(',').map {|i| i.to_i }
     @entries = Entry.where(id: ids).includes(:feed)
-    @entries = update_with_state(@entries)
-
-    # View inline setting
-    view_inline_settings = {}
-    subscriptions = Subscription.where(user: @user).pluck(:feed_id, :view_inline)
-    subscriptions.each { |feed_id, setting| view_inline_settings[feed_id] = setting }
-
-    tags = {}
-    taggings = @user.taggings.pluck(:feed_id, :tag_id)
-    taggings.each do |feed_id, tag_id|
-      if tags[feed_id]
-        tags[feed_id] << tag_id
-      else
-        tags[feed_id] = [tag_id]
-      end
-    end
 
     result = {}
     @entries.each do |entry|
@@ -192,8 +167,6 @@ class EntriesController < ApplicationController
       locals = {
         entry: entry,
         services: sharing_services(entry),
-        read: true, # will always be marked as read when viewing
-        starred: entry.starred,
         content_view: false
       }
       result[entry.id] = {

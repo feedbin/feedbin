@@ -92,6 +92,12 @@ class _Counts
   published: (entry) ->
     entry[2]
 
+  isRead: (entryId) ->
+    !_.contains(@counts.unread.all, entryId)
+
+  isStarred: (entryId) ->
+    _.contains(@counts.starred.all, entryId)
+
 class Counts
   instance = null
   @get: (tagMap, sortOrder, unreadEntries, starredEntries) ->

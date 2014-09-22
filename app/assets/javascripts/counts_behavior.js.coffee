@@ -88,54 +88,54 @@ class feedbin.CountsBehavior
       feedbin.openFirstItem = false;
 
   showEntryContent: (event) =>
-    clearTimeout feedbin.recentlyReadTimer
     container = $(event.currentTarget)
-    entryInfo = $(container).data('entry-info')
-    if !entryInfo.read
+    entry = $(container).data('entry-info')
+
+    feedbin.selectedEntry =
+      id: entry.id
+      feed_id: entry.feed_id
+      published: entry.published
+      container: container
+
+    clearTimeout feedbin.recentlyReadTimer
+
+    if !@isRead(entry.id)
       $.post $(container).data('mark-as-read-path')
       feedbin.recentlyReadTimer = setTimeout ( ->
         $.post $(container).data('recently-read-path')
       ), 10000
-      feedbin.Counts.get().removeEntry(entryInfo.id, entryInfo.feed_id, 'unread')
-      @mark(entryInfo, 'read')
-    @applyStarred()
+      feedbin.Counts.get().removeEntry(entry.id, entry.feed_id, 'unread')
+      @mark('read')
+
+  isRead: (entryId) ->
+    feedbin.Counts.get().isRead(entryId)
+
+  isStarred: (entryId) ->
+    feedbin.Counts.get().isStarred(entryId)
 
   toggleRead: (event, xhr) =>
-    entryInfo = $('[data-behavior~=selected_entry_data]').data('entry-info')
-    if entryInfo.read
-      feedbin.Counts.get().addEntry(entryInfo.id, entryInfo.feed_id, entryInfo.published, 'unread')
-      @unmark(entryInfo, 'read')
+    if @isRead(feedbin.selectedEntry.id)
+      feedbin.Counts.get().addEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, feedbin.selectedEntry.published, 'unread')
+      @unmark('read')
     else
-      feedbin.Counts.get().removeEntry(entryInfo.id, entryInfo.feed_id, 'unread')
-      @mark(entryInfo, 'read')
+      feedbin.Counts.get().removeEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, 'unread')
+      @mark('read')
 
-  mark: (entryInfo, property) ->
+  mark: (property) ->
     feedbin.applyCounts(true)
-    entryInfo[property] = true
-    $("[data-entry-id=#{entryInfo.id}]").addClass(property)
-    $("[data-entry-id=#{entryInfo.id}][data-behavior~=entry_info]").data('entry-info', entryInfo)
+    $("[data-entry-id=#{feedbin.selectedEntry.id}]").addClass(property)
 
-  unmark: (entryInfo, property) ->
+  unmark: (property) ->
     feedbin.applyCounts(true)
-    entryInfo[property] = false
-    $("[data-entry-id=#{entryInfo.id}]").removeClass(property)
-    $("[data-entry-id=#{entryInfo.id}][data-behavior~=entry_info]").data('entry-info', entryInfo)
+    $("[data-entry-id=#{feedbin.selectedEntry.id}]").removeClass(property)
 
   toggleStarred: (event, xhr) =>
-    entryInfo = $('[data-behavior~=selected_entry_data]').data('entry-info')
-    if entryInfo.starred
-      feedbin.Counts.get().removeEntry(entryInfo.id, entryInfo.feed_id, 'starred')
-      @unmark(entryInfo, 'starred')
+    if @isStarred(feedbin.selectedEntry.id)
+      feedbin.Counts.get().removeEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, 'starred')
+      @unmark('starred')
     else
-      feedbin.Counts.get().addEntry(entryInfo.id, entryInfo.feed_id, entryInfo.published, 'starred')
-      @mark(entryInfo, 'starred')
-
-  applyStarred: ->
-    entryInfo = $('[data-behavior~=selected_entry_data]').data('entry-info')
-    if entryInfo
-      starred = feedbin.Counts.get().counts.starred.all
-      if _.contains(starred, entryInfo.id)
-        @mark(entryInfo, 'starred')
+      feedbin.Counts.get().addEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, feedbin.selectedEntry.published, 'starred')
+      @mark('starred')
 
   processHideQueue: =>
     $.each feedbin.hideQueue, (index, feed_id) ->

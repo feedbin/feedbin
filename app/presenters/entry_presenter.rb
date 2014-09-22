@@ -46,7 +46,7 @@ class EntryPresenter < BasePresenter
         mark_as_read_path: @template.mark_as_read_entry_path(entry),
         recently_read_path: @template.recently_read_entry_path(entry),
         entry_id: entry.id,
-        entry_info: {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i, read: entry.read}
+        entry_info: {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}
       }
     } do
       yield
