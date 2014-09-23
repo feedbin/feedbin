@@ -210,17 +210,6 @@ class Entry < ActiveRecord::Base
     end
   end
 
-  def cache_key
-    additions = []
-    if defined?(read) && read
-      additions << '/read'
-    end
-    if defined?(starred) && starred
-      additions << '/starred'
-    end
-    super + additions.join('')
-  end
-
   def fully_qualified_url
     entry_url = self.url
     if entry_url.present? && is_fully_qualified(entry_url)

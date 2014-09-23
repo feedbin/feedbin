@@ -2,43 +2,6 @@ class EntryPresenter < BasePresenter
 
   presents :entry
 
-  def read_state
-    if entry.read
-      'read'
-    else
-      ''
-    end
-  end
-
-  def starred_state
-    if entry.starred
-      'starred'
-    else
-      ''
-    end
-  end
-
-  def media_state
-    if has_media?
-      'media'
-    else
-      ''
-    end
-  end
-
-  def starred_class(starred)
-    if starred
-      'starred'
-    end
-  end
-
-  def classes
-    classes = []
-    classes << read_state
-    classes << starred_state
-    classes.join ' '
-  end
-
   def entry_link(&block)
     @template.link_to @template.entry_path(entry), {
       remote: true, class: 'wrap', data: {

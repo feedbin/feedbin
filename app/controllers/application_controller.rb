@@ -106,28 +106,6 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def update_with_state(entries)
-    Librato.timing 'application_controller.update_with_state' do
-      user = current_user
-      entry_ids = entries.map {|entry| entry.id }
-      unread = user.unread_entries.where(entry_id: entry_ids).pluck(:entry_id)
-      starred = user.starred_entries.where(entry_id: entry_ids).pluck(:entry_id)
-      entries.each_with_index do |entry, index|
-        if unread.include?(entry.id)
-          entries[index].read = false
-        else
-          entries[index].read = true
-        end
-        if starred.include?(entry.id)
-          entries[index].starred = true
-        else
-          entries[index].starred = false
-        end
-      end
-      entries
-    end
-  end
-
   def feeds_response
     if 'view_all' == session[:view_mode]
       # Get all entries 100 at a time, then get unread info
@@ -142,7 +120,6 @@ class ApplicationController < ActionController::Base
       @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort)
     end
 
-    @entries = update_with_state(@entries)
     if 'view_all' == session[:view_mode]
       @page_query = @entries
     elsif 'view_starred' == session[:view_mode]

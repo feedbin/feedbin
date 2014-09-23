@@ -685,15 +685,6 @@ $.extend feedbin,
           feedbin.autoHeight()
           return
 
-    usePreloadContent: ->
-      $(document).on 'ajax:beforeSend', '[data-behavior~=show_entry_content]', (event, xhr) ->
-        id = $(@).parents('li').data('entry-id')
-        entry = feedbin.entries[id]
-        if entry
-          xhr.abort()
-          feedbin.showEntry(id)
-        return
-
     timeago: ->
       strings =
         prefixAgo: null

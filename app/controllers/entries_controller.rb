@@ -9,7 +9,6 @@ class EntriesController < ApplicationController
 
     feed_ids = @user.subscriptions.pluck(:feed_id)
     @entries = Entry.where(feed_id: feed_ids).page(params[:page]).includes(:feed).sort_preference('DESC')
-    @entries = update_with_state(@entries)
     @page_query = @entries
 
     @append = params[:page].present?
@@ -32,7 +31,6 @@ class EntriesController < ApplicationController
     unread_entries = @user.unread_entries.select(:entry_id).page(params[:page]).sort_preference(@user.entry_sort)
     @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort)
 
-    @entries = update_with_state(@entries)
     @page_query = unread_entries
 
     @append = params[:page].present?
@@ -55,7 +53,6 @@ class EntriesController < ApplicationController
     starred_entries = @user.starred_entries.select(:entry_id).page(params[:page]).order("published DESC")
     @entries = Entry.entries_with_feed(starred_entries, "published DESC")
 
-    @entries = update_with_state(@entries)
     @page_query = starred_entries
 
     @append = params[:page].present?
@@ -217,7 +214,6 @@ class EntriesController < ApplicationController
     @escaped_query = params[:query].gsub("\"", "'").html_safe if params[:query]
 
     @entries = Entry.search(params, @user)
-    @entries = update_with_state(@entries)
     @page_query = @entries
 
     @append = params[:page].present?

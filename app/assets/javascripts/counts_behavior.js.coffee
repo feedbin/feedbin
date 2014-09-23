@@ -65,11 +65,20 @@ jQuery ->
 class feedbin.CountsBehavior
   constructor: ->
     feedbin.applyCounts(false)
+    $(document).on('feedbin:entriesLoaded', @applyState)
     $(document).on('click', '[data-behavior~=change_view_mode]', @changeViewMode)
-    $(document).on('click', '[data-behavior~=show_entry_content]', @showEntryContent)
     $(document).on('click', '[data-behavior~=show_entries]', @processHideQueue)
+    $(document).on('ajax:beforeSend', '[data-behavior~=show_entry_content]', @showEntryContent)
     $(document).on('ajax:beforeSend', '[data-behavior~=toggle_read]', @toggleRead)
     $(document).on('ajax:beforeSend', '[data-behavior~=toggle_starred]', @toggleStarred)
+
+  applyState: =>
+    $('li[data-entry-id]').each (index, container) =>
+      id = $(container).data('entry-id')
+      if @isRead(id)
+        $(container).addClass('read')
+      if @isStarred(id)
+        $(container).addClass('starred')
 
   changeViewMode: (event) =>
     feedbin.hideQueue = []
@@ -87,7 +96,7 @@ class feedbin.CountsBehavior
       $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click();
       feedbin.openFirstItem = false;
 
-  showEntryContent: (event) =>
+  showEntryContent: (event, xhr) =>
     container = $(event.currentTarget)
     entry = $(container).data('entry-info')
 
@@ -96,6 +105,10 @@ class feedbin.CountsBehavior
       feed_id: entry.feed_id
       published: entry.published
       container: container
+
+    if entry.id of feedbin.entries
+      xhr.abort()
+      feedbin.showEntry(entry.id)
 
     clearTimeout feedbin.recentlyReadTimer
 

@@ -36,6 +36,7 @@ feedbin.updatePager('');
 feedbin.data.viewMode = "<%= j session[:view_mode] %>";
 
 feedbin.preloadEntries(<%= @entries.map{ |entry| entry.id }.to_json.html_safe %>);
+$(document).trigger('feedbin:entriesLoaded');
 
 feedbin.hideSearchControls()
 <% if @search || @saved_search %>

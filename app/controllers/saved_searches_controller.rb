@@ -9,7 +9,6 @@ class SavedSearchesController < ApplicationController
     params[:query] = @saved_search.query
 
     @entries = Entry.search(params, @user)
-    @entries = update_with_state(@entries)
     @page_query = @entries
 
     @append = params[:page].present?
