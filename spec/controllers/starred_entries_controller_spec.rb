@@ -62,7 +62,7 @@ describe StarredEntriesController do
 
           expect {
             post :update, id: entry.id, starred: 'true', format: :js
-          }.not_to change(StarredEntry, :count)
+          }.to change(StarredEntry, :count).by(-1)
 
           expect(response.status).to eq 200
         end
