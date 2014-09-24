@@ -212,14 +212,14 @@ class User < ActiveRecord::Base
     unique_tags = feed_tags
     feeds_by_tag = build_feeds_by_tag
     feeds_by_id = feeds.include_user_title
-    feeds_by_id = feeds.each_with_object({}) do |feed, hash|
+    feeds_by_id = feeds_by_id.each_with_object({}) do |feed, hash|
       hash[feed.id] = feed
     end
 
     unique_tags.map do |tag|
       feed_ids = feeds_by_tag[tag.id] || []
-      feeds = feeds_by_id.values_at(*feed_ids).compact
-      tag.user_feeds = feeds.sort_by { |feed| feed.title.try(:downcase) }
+      user_feeds = feeds_by_id.values_at(*feed_ids).compact
+      tag.user_feeds = user_feeds.sort_by { |feed| feed.title.try(:downcase) }
       tag
     end
 
