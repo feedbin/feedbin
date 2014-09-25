@@ -4,8 +4,8 @@
   <title><%= @title || 'Feedbin' %></title>
   <%= render partial: 'shared/mobile_meta' %>
   <%= stylesheet_link_tag "application", media: 'all'  %>
-  <%= yield(:head) %>
   <%= javascript_include_tag "application" %>
+  <%= yield(:head) %>
   <%= csrf_meta_tags %>
   <%= tag :meta, name: "stripe-key", content: STRIPE_PUBLIC_KEY %>
 </head>

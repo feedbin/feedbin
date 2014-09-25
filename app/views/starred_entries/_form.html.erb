@@ -1,10 +1,6 @@
 <%= form_tag starred_entries_entry_path(entry.id), remote: true, data: {behavior: 'toggle_starred', entry_id: entry.id}, class: 'entry-button-wrap' do %>
-  <%= hidden_field_tag 'starred', !starred %>
   <button class="entry-button button-toggle-starred" title="Star/remove star">
-    <% if starred %>
       <%= svg_tag 'icon-star-on', size: '17x17' %>
-    <% else %>
       <%= svg_tag 'icon-star-off', size: '17x17' %>
-    <% end %>
   </button>
 <% end %>

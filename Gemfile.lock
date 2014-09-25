@@ -225,7 +225,6 @@ GEM
       actionpack (>= 3)
       activesupport (>= 3)
       railties (>= 3)
-    logster (0.0.12)
     longurl (0.1.6)
       json
     loofah (1.2.1)
@@ -412,7 +411,6 @@ DEPENDENCIES
   jquery-rails (= 3.1.0)
   librato-rails
   lograge
-  logster
   longurl
   oauth
   opml_saw!

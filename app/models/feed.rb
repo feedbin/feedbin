@@ -60,18 +60,18 @@ class Feed < ActiveRecord::Base
   end
 
   def self.include_user_title
-    select('feeds.*, subscriptions.title AS user_title').
-      map {|feed|
-        if feed.user_title
-          feed.title = feed.user_title
-        elsif feed.title
-          feed.title = feed.title
-        else
-          feed.title = '(No title)'
-        end
-        feed
-      }.
-      sort_by {|feed| feed.title.try(:downcase)}
+    feeds = select('feeds.*, subscriptions.title AS user_title')
+    feeds.map do |feed|
+      if feed.user_title
+        feed.title = feed.user_title
+      elsif feed.title
+        feed.title = feed.title
+      else
+        feed.title = '(No title)'
+      end
+      feed
+    end
+    feeds.sort_by {|feed| feed.title.try(:downcase)}
   end
 
   def string_id

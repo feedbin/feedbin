@@ -33,50 +33,46 @@ class ApplicationController < ActionController::Base
     render 'errors/not_found', status: 404, layout: 'application', formats: [:html]
   end
 
-  def get_collections(*types, count)
+  def get_collections
     @user = current_user
-    types = [*types]
     collections = []
-    if types.include? 'view_unread'
-      collections << {
-        title: 'Unread',
-        path: unread_entries_path,
-        count: count,
-        id: 'collection_unread',
-        favicon_class: 'favicon-unread',
-        parent_data: { behavior: 'all_unread', feed_id: 'collection_unread' },
-        data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'unread', message: 'Mark all items as read?'}.to_json }
-      }
-    end
-    if types.include? 'view_all'
-      collections << {
-        title: 'All',
-        path: entries_path,
-        count: count,
-        id: 'collection_all',
-        favicon_class: 'favicon-all',
-        parent_data: { behavior: 'all_unread', feed_id: 'collection_all' },
-        data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'all', message: 'Mark all items as read?'}.to_json }
-      }
-    end
-    if types.include? 'view_starred'
-      collections << {
-        title: 'Starred',
-        path: starred_entries_path,
-        count: @user.total_starred,
-        id: 'collection_starred',
-        favicon_class: 'favicon-star',
-        parent_data: { behavior: 'starred', feed_id: 'collection_starred' },
-        data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'starred', message: 'Mark starred items as read?'}.to_json }
-      }
-    end
+    collections << {
+      title: 'Unread',
+      path: unread_entries_path,
+      count_data: {behavior: 'needs_count', count_group: 'all'},
+      id: 'collection_unread',
+      favicon_class: 'favicon-unread',
+      parent_class: 'collection-unread',
+      parent_data: { behavior: 'all_unread', feed_id: 'collection_unread', count_type: 'unread' },
+      data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'unread', message: 'Mark all items as read?'}.to_json }
+    }
+    collections << {
+      title: 'All',
+      path: entries_path,
+      count_data: {behavior: 'needs_count', count_group: 'all'},
+      id: 'collection_all',
+      favicon_class: 'favicon-all',
+      parent_class: 'collection-all',
+      parent_data: { behavior: 'all_unread', feed_id: 'collection_all', count_type: 'unread' },
+      data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'all', message: 'Mark all items as read?'}.to_json }
+    }
+    collections << {
+      title: 'Starred',
+      path: starred_entries_path,
+      count_data: {behavior: 'needs_count', count_group: 'all'},
+      id: 'collection_starred',
+      favicon_class: 'favicon-star',
+      parent_class: 'collection-starred',
+      parent_data: { behavior: 'starred', feed_id: 'collection_starred', count_type: 'starred' },
+      data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'starred', message: 'Mark starred items as read?'}.to_json }
+    }
     collections << {
       title: 'Recently Read',
       path: recently_read_entries_path,
-      count: 0,
       id: 'collection_recently_read',
       favicon_class: 'favicon-recently-read',
-      parent_data: { behavior: 'recently_read', feed_id: 'collection_recently_read' },
+      parent_class: 'collection-recently-read',
+      parent_data: { behavior: 'recently_read', feed_id: 'collection_recently_read', count_type: 'recently_read' },
       data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'recently_read', message: 'Mark recently read items as read?'}.to_json }
     }
     collections
@@ -93,35 +89,22 @@ class ApplicationController < ActionController::Base
       @feeds = @user.feeds.include_user_title
     end
 
-    @feeds = @user.feed_count(session[:view_mode], @feeds, session[:selected_feed], @keep_selected)
-    @collections = get_collections(session[:view_mode], @user.total_unread)
-    @tags = @user.owned_tags_with_count(session[:view_mode], session[:selected_feed], @keep_selected)
-    @saved_searches = @user.saved_searches.order("lower(name)")
+    @count_data = {
+      unread_entries: @user.unread_entries.pluck('feed_id, entry_id, extract(epoch FROM published)'),
+      starred_entries: @user.starred_entries.pluck('feed_id, entry_id, extract(epoch FROM published)'),
+      tag_map: @user.taggings.group(:feed_id).pluck('feed_id, array_agg(tag_id)'),
+      entry_sort: @user.entry_sort
+    }
+    @feed_data = {
+      feeds: @feeds,
+      collections: get_collections,
+      tags: @user.tag_group,
+      saved_searches: @user.saved_searches.order("lower(name)"),
+      count_data: @count_data
+    }
   end
 
   private
-
-  def update_with_state(entries)
-    Librato.timing 'application_controller.update_with_state' do
-      user = current_user
-      entry_ids = entries.map {|entry| entry.id }
-      unread = user.unread_entries.where(entry_id: entry_ids).pluck(:entry_id)
-      starred = user.starred_entries.where(entry_id: entry_ids).pluck(:entry_id)
-      entries.each_with_index do |entry, index|
-        if unread.include?(entry.id)
-          entries[index].read = false
-        else
-          entries[index].read = true
-        end
-        if starred.include?(entry.id)
-          entries[index].starred = true
-        else
-          entries[index].starred = false
-        end
-      end
-      entries
-    end
-  end
 
   def feeds_response
     if 'view_all' == session[:view_mode]
@@ -137,7 +120,6 @@ class ApplicationController < ActionController::Base
       @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort)
     end
 
-    @entries = update_with_state(@entries)
     if 'view_all' == session[:view_mode]
       @page_query = @entries
     elsif 'view_starred' == session[:view_mode]

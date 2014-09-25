@@ -9,7 +9,6 @@ class EntriesController < ApplicationController
 
     feed_ids = @user.subscriptions.pluck(:feed_id)
     @entries = Entry.where(feed_id: feed_ids).page(params[:page]).includes(:feed).sort_preference('DESC')
-    @entries = update_with_state(@entries)
     @page_query = @entries
 
     @append = params[:page].present?
@@ -32,7 +31,6 @@ class EntriesController < ApplicationController
     unread_entries = @user.unread_entries.select(:entry_id).page(params[:page]).sort_preference(@user.entry_sort)
     @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort)
 
-    @entries = update_with_state(@entries)
     @page_query = unread_entries
 
     @append = params[:page].present?
@@ -55,7 +53,6 @@ class EntriesController < ApplicationController
     starred_entries = @user.starred_entries.select(:entry_id).page(params[:page]).order("published DESC")
     @entries = Entry.entries_with_feed(starred_entries, "published DESC")
 
-    @entries = update_with_state(@entries)
     @page_query = starred_entries
 
     @append = params[:page].present?
@@ -73,28 +70,7 @@ class EntriesController < ApplicationController
 
   def show
     @user = current_user
-    @entry = Entry.find params[:id]
-
-    @content_view = false
-    if @user.sticky_view_inline == '1'
-      subscription = Subscription.find_by(user: @user, feed_id: @entry.feed_id)
-
-      # Subscription will not necessarily be present for starred items
-      if subscription.try(:view_inline)
-        @content_view = true
-        view_inline
-        @entry.content = @content
-      end
-    end
-
-    @decrement = UnreadEntry.where(user_id: @user.id, entry_id: @entry.id).delete_all > 0 ? true : false
-
-    @read = true
-    @starred = StarredEntry.where(user_id: @user.id, entry_id: @entry.id).present?
-    @feed = @entry.feed
-    @tags = @user.tags.where(taggings: {feed_id: @feed}).uniq.collect(&:id)
-
-    @services = sharing_services(@entry)
+    @entries = entries_by_id(params[:id])
     respond_to do |format|
       format.js
     end
@@ -168,45 +144,22 @@ class EntriesController < ApplicationController
   def preload
     @user = current_user
     ids = params[:ids].split(',').map {|i| i.to_i }
-    @entries = Entry.where(id: ids).includes(:feed)
-    @entries = update_with_state(@entries)
+    entries = entries_by_id(ids)
+    render json: entries.to_json
+  end
 
-    # View inline setting
-    view_inline_settings = {}
-    subscriptions = Subscription.where(user: @user).pluck(:feed_id, :view_inline)
-    subscriptions.each { |feed_id, setting| view_inline_settings[feed_id] = setting }
-
-    tags = {}
-    taggings = @user.taggings.pluck(:feed_id, :tag_id)
-    taggings.each do |feed_id, tag_id|
-      if tags[feed_id]
-        tags[feed_id] << tag_id
-      else
-        tags[feed_id] = [tag_id]
-      end
-    end
-
-    result = {}
-    @entries.each do |entry|
-      readability = (@user.sticky_view_inline == '1' && view_inline_settings[entry.feed_id] == true)
+  def entries_by_id(entry_ids)
+    entries = Entry.where(id: entry_ids).includes(:feed)
+    entries.each_with_object({}) do |entry, hash|
       locals = {
         entry: entry,
         services: sharing_services(entry),
-        read: true, # will always be marked as read when viewing
-        starred: entry.starred,
         content_view: false
       }
-      result[entry.id] = {
+      hash[entry.id] = {
         content: render_to_string(partial: "entries/show", formats: [:html], locals: locals),
-        read: entry.read,
-        starred: entry.starred,
-        tags: tags[entry.feed_id] ? tags[entry.feed_id] : [],
         feed_id: entry.feed_id
       }
-    end
-
-    respond_to do |format|
-      format.json { render json: result.to_json }
     end
   end
 
@@ -261,7 +214,6 @@ class EntriesController < ApplicationController
     @escaped_query = params[:query].gsub("\"", "'").html_safe if params[:query]
 
     @entries = Entry.search(params, @user)
-    @entries = update_with_state(@entries)
     @page_query = @entries
 
     @append = params[:page].present?

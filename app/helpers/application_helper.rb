@@ -25,10 +25,12 @@ module ApplicationHelper
   end
 
   def selected(feed_id)
+    css_class = ''
     if mark_selected? && feed_id == session[:selected_feed]
       @mark_selected = false
-      'selected'
+      css_class = 'selected'
     end
+    css_class
   end
 
   def view_mode_selected(view_mode)

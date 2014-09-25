@@ -30,20 +30,11 @@ class FeedsController < ApplicationController
   end
 
   def view_all
-    # Clear the hide queue when switching to view_all incase there's anything sitting in it.
-    @clear_hide_queue = true
     update_view_mode('view_all')
   end
 
   def auto_update
-    @keep_selected = true
-    if session[:view_mode] == 'view_all'
-      view_all
-    elsif session[:view_mode] == 'view_starred'
-      view_starred
-    else
-      view_unread
-    end
+    get_feeds_list
   end
 
   def push
@@ -90,12 +81,7 @@ class FeedsController < ApplicationController
     @user = current_user
     @view_mode = view_mode
     session[:view_mode] = @view_mode
-
-    @mark_selected = true
-    get_feeds_list
-    respond_to do |format|
-      format.js { render partial: 'shared/update_view_mode' }
-    end
+    render nothing: true
   end
 
   def correct_user

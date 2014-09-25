@@ -1,4 +1,4 @@
-feedbin.updateFeeds('<%= j render partial: 'feeds/feeds', locals: {collections: @collections, saved_searches: @saved_searches, tags: @tags, feeds: @feeds} %>');
+<%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
 feedbin.updateEntries('');
 feedbin.updateEntryContent('');
 feedbin.hideTagsForm();

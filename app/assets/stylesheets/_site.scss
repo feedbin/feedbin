@@ -1455,6 +1455,34 @@ $subscribe-wrap-height: 49px;
 	}
 }
 
+.view_unread {
+	.zero-count {
+		display: none;
+	}
+	.collection-starred,
+	.collection-all {
+		display: none;
+	}
+}
+.view_starred {
+	.zero-count {
+		display: none;
+	}
+	.collection-all,
+	.collection-unread {
+		display: none;
+	}
+}
+.view_all {
+	.zero-count .count {
+		display: none;
+	}
+	.collection-starred,
+	.collection-unread {
+		display: none;
+	}
+}
+
 .feeds {
 	@include background-color($list-background-color, $list-background-color-night);
 	position: absolute;
@@ -2418,7 +2446,7 @@ $saved-search-control-height: 48px;
 		float: right;
 	}
 	.button-toggle-read {
-		.circle-filled, .circle-empty {
+		.circle {
 			border: 2px solid transparent;
 			@include border-color(#b4b6b8,#97999b);
 			@include background-color(#b4b6b8,#97999b);
@@ -2428,12 +2456,23 @@ $saved-search-control-height: 48px;
 			position: absolute;
 			top: $base-button-position + 2;
 			left: 15px;
-		}
-		.circle-empty {
-			@include background-color(transparent,transparent);
+			.read & {
+				@include background-color(transparent,transparent);
+			}
 		}
 	}
 	.button-toggle-starred {
+		.icon-star-on {
+			display: none;
+		}
+		.starred & {
+			.icon-star-on {
+				display: block;
+			}
+			.icon-star-off {
+				display: none;
+			}
+		}
 		svg {
 			position: absolute;
 			top: $base-button-position + 1;

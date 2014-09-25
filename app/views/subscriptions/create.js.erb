@@ -1,14 +1,16 @@
 <% if @results[:options].any? %>
   feedbin.modalBox('<%= j render partial: "choices", locals: { options: @results[:options].first } %>');
 <% elsif @results[:success].any? %>
-  feedbin.updateFeeds('<%= j render partial: 'feeds/feeds', locals: {collections: @collections, saved_searches: @saved_searches, tags: @tags, feeds: @feeds} %>');
+  <%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
   feedbin.showNotification('You have subscribed.');
-  $("[data-feed-id=<%= @click_feed %>] a").click();
   feedbin.hideSubscribe()
+
+  $("[data-feed-id=<%= @click_feed %>] a").click();
+
   $('.feeds').animate({
     scrollTop: feedbin.scrollTo($("[data-feed-id=<%= @click_feed %>]"), $('.feeds'))
   }, 200);
-  feedbin.updateTitle('<%= j @user.title_with_count %>')
+
   $("<link>")
       .appendTo('head')
       .attr({rel: "stylesheet"})

@@ -26,13 +26,6 @@ module Api
           end
           @entries = Entry.where(id: @starred_entries.map {|starred_entry| starred_entry.entry_id }).includes(:feed)
           entries_response 'api_v2_entries_url'
-        elsif !params.has_key?(:since)
-          feed_ids = @user.subscriptions.pluck(:feed_id)
-          @entries = Entry.where(feed_id: feed_ids).includes(:feed).order("entries.created_at DESC").page(params[:page])
-          if params.has_key?(:per_page)
-            @entries = @entries.per_page(params[:per_page])
-          end
-          entries_response 'api_v2_entries_url'
         else
           sorted_set_response
         end
@@ -66,8 +59,12 @@ module Api
       end
 
       def sorted_set_response
-        since = Time.parse(params[:since])
-        since = "(%10.6f" % since.to_f
+        begin
+          since = Time.parse(params[:since])
+          since = "(%10.6f" % since.to_f
+        rescue TypeError
+          since = "-inf"
+        end
 
         cache_key = [since, params[:starred], params[:read]]
         cache_key = Digest::SHA1.hexdigest(cache_key.join(':'))
@@ -104,7 +101,7 @@ module Api
           }
           collection = OpenStruct.new(
             total_pages: pages.length,
-            next_page: pages[next_page] ? next_page : nil,
+            next_page: pages[current_page_index + 1] ? next_page : nil,
             previous_page: (previous_page > 0) ? previous_page : nil
           )
           links_header(collection, 'api_v2_entries_url')
