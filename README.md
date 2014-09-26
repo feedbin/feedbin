@@ -89,7 +89,7 @@ export AWS_ACCESS_KEY_ID=aoisjf3j23oij23f
 
 - [Mac OS X](doc/INSTALL-mac.md)
 - [Ubuntu](doc/INSTALL-ubuntu.md) (incomplete)
-- [Fedora 19](doc/INSTALL-fedora.md)
+- [Fedora](doc/INSTALL-fedora.md)
 
 
 ### Pair With Me
