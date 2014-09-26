@@ -2363,12 +2363,13 @@ $saved-search-control-height: 48px;
 }
 
 .next-entry-preview {
+	display: block;
 	@include background-color($list-background-color, $list-background-color-night);
-	&:hover {
-		cursor: pointer;
-	}
 	&.no-content {
 		display: none;
+	}
+	&:hover {
+		text-decoration: none;
 	}
 }
 

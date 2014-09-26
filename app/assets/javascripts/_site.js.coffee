@@ -963,10 +963,11 @@ $.extend feedbin,
         return
 
     nextEntry: ->
-      $(document).on 'click', '.next-entry-preview', (event) ->
+      $(document).on 'click', '[data-behavior~=open_next_entry]', (event) ->
         next = feedbin.nextEntry()
         if next
           next.find('a').click()
+        event.preventDefault()
         return
 
     viewLatest: ->
