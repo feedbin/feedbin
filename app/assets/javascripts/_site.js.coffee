@@ -76,11 +76,15 @@ $.extend feedbin,
     $('.blog-post').text(content.title);
     $('.blog-post').attr('href', content.url);
 
+  isRead: (entryId) ->
+    feedbin.Counts.get().isRead(entryId)
+
   precacheImages: (data) ->
     if feedbin.data.precache_images == true
       entries = []
-      $.each data, (index, entry) ->
-        entries.push(entry.content)
+      $.each data, (entryId, entry) ->
+        if !feedbin.isRead(entryId * 1)
+          entries.push(entry.content)
       $(entries.join())
 
   localizeTime: (container) ->
