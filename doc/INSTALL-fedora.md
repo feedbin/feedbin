@@ -1,11 +1,11 @@
-Feedbin Installation on Fedora 19
----------------------------------
+Feedbin Installation on Fedora
+------------------------------
 
 #### Feedbin Dependencies
 
 Install a bunch of dependencies:
 
-    sudo yum -y install gcc gcc-c++ git libcurl-devel libxml2-devel libxslt-devel postgresql postgresql-devel rubygems ruby-devel rubygem-bundler
+    sudo yum -y install gcc gcc-c++ git libcurl-devel libxml2-devel libxslt-devel postgresql postgresql-devel rubygems ruby-devel rubygem-bundler ImageMagick-devel
 
 Get Feedbin:
 
