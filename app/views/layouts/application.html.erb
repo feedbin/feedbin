@@ -2,7 +2,8 @@
 <html>
 <head>
   <title><%= @title || 'Feedbin' %></title>
-  <%= render partial: 'shared/mobile_meta' %>
+  <meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no" />
+  <link rel="apple-touch-icon-precomposed" href="<%= asset_path('apple-touch-icon-precomposed.png') %>" />
   <%= stylesheet_link_tag "application", media: 'all'  %>
   <%= javascript_include_tag "application" %>
   <%= yield(:head) %>
