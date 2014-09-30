@@ -12,37 +12,47 @@ $base-button-position: 9px;
 
 /*-- Colors --*/
 $body-background-color: #FFFFFF;
+$body-background-color-sunset: #efeee4;
 $body-background-color-night: #2B2D2F;
 
 $list-background-color: #eff1f3;
+$list-background-color-sunset: #e5e4db;
 $list-background-color-night: #212325;
 
 $drawer-background-color: #e5e7e9;
+$drawer-background-color-sunset: #dcdbd1;
 $drawer-background-color-night: #1d1f21;
 
 $border-color: #dcdee0;
-$border-color-night: #040608;
+$border-color-sunset: #d2d1c8;
 $border-color-night: #0e1012;
 
 $input-background-color: #FFFFFF;
+$input-background-color-sunset: #FFFFFF;
 $input-background-color-night: #FFFFFF;
 
 $text-header-color: #212325;
+$text-header-color-sunset: #222424;
 $text-header-color-night: #FFFFFF;
 
 $text-color: #212325;
+$text-color-sunset: #353636;
 $text-color-night: #FFFFFF;
 
 $text-color-light: #b4b6b8;
+$text-color-light-sunset: #b4b4ad;
 $text-color-light-night: #66686a;
 
 $text-summary-color: #7a7c7e;
+$text-summary-color-sunset: #7a7b78;
 $text-summary-color-night: #97999b;
 
 $arrow-shadow-color: #CCCCCC;
 $arrow-shadow-color-night: #000000;
 
 $selected: #3399FF;
+$selected-off: #505a65;
+
 
 /*------------------------------------------------------------------------------
 Grid
@@ -686,6 +696,10 @@ body {
 	&.theme-night {
 		color: $text-color-night;
 		background-color: $body-background-color-night;
+	}
+	&.theme-sunset {
+		color: $text-color-sunset;
+		background-color: $body-background-color-sunset;
 	}
 	@include respond-to(hidpi) {
 		-webkit-font-smoothing: antialiased;
@@ -1580,7 +1594,7 @@ $subscribe-wrap-height: 49px;
 }
 
 .feeds .selected > a {
-	@include background-color(#505a65, #505a65);
+	@include background-color($selected-off, $selected-off);
 	color: #fff !important;
 }
 
@@ -1592,7 +1606,7 @@ $subscribe-wrap-height: 49px;
 }
 
 .feeds li.selected .drawer ul:after {
-	border-top-color: #505a65;
+	border-top-color: $selected-off;
 }
 
 .selected li.selected .drawer ul:after {
@@ -1995,9 +2009,9 @@ $saved-search-control-height: 48px;
 	&.selected {
 		.wrap {
 			border-top: 1px solid transparent;
-			@include border-color(#666, #505a65);
+			@include border-color(#666, $selected-off);
 			margin-top: -1px;
-			@include background-color(#505a65, #505a65);
+			@include background-color($selected-off, $selected-off);
 		}
 		.entries-inner-wrap {
 			border-bottom-color: transparent;
@@ -2008,7 +2022,7 @@ $saved-search-control-height: 48px;
 				background-image: image-url("icon-star.svg"), none;
 			}
 			&:after {
-				@include background-color(#505a65, #505a65);
+				@include background-color($selected-off, $selected-off);
 			}
 		}
 		.feed-title, .time, .body {
@@ -2450,7 +2464,7 @@ $saved-search-control-height: 48px;
 		.circle {
 			border: 2px solid transparent;
 			@include border-color(#b4b6b8,#97999b);
-			@include background-color(#b4b6b8,#97999b);
+			@include background-color($text-color-light, $text-summary-color-night);
 			height: 16px;
 			width: 16px;
 			border-radius: 16px;
@@ -5165,8 +5179,8 @@ Media Queries
 	.field-cluster {
 		margin-bottom: 15px;
 		input, textarea {
-			@include background-color(#FFF, #191c20);
-			@include color($text-header-color, $text-header-color-night);
+			@include background-color(#FFF, #FFF);
+			@include color($text-header-color, $text-header-color);
 			width: 100%;
 			max-width: 100%;
 			margin: 0;
