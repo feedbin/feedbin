@@ -801,6 +801,7 @@ $.extend feedbin,
     entryWidth: ->
       $(document).on 'click', '[data-behavior~=entry_width]', (event) ->
         $('[data-behavior~=entry_content_target]').toggleClass('fluid')
+        $('body').toggleClass('fluid')
         return
 
     fullscreen: ->

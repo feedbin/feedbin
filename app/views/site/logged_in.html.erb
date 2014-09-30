@@ -1,4 +1,4 @@
-<% @class = "app nothing-selected theme-#{@user.theme} #{session[:view_mode]}" %>
+<% @class = "app nothing-selected theme-#{@user.theme} #{session[:view_mode]} #{@user.entry_width}" %>
 <% content_for :head do %>
   <% if ENV['FONT_STYLESHEET'] %>
   <link rel="stylesheet" type="text/css" href="<%= ENV['FONT_STYLESHEET'] %>" />
