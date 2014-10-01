@@ -66,7 +66,7 @@ Feedbin::Application.configure do
   # Disable automatic flushing of the log to improve performance.
   # config.autoflush_log = false
 
-  config.cache_store = :dalli_store, ENV['MEMCACHED_HOSTS'].split(',')
+  config.cache_store = :file_store, '/tmp/'
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   config.action_controller.asset_host = ENV['ASSET_HOST']
