@@ -176,6 +176,7 @@ $.extend feedbin,
     feedbin.localizeTime($('[data-behavior~=entry_content_target]'))
     feedbin.applyUserTitles()
     feedbin.applyStarred(entryId)
+    feedbin.fitVids()
 
   refresh: ->
     if feedbin.data
