@@ -57,6 +57,7 @@ $text-summary-color-night: #97999b;
 
 $arrow-shadow-color: #CCCCCC;
 $arrow-shadow-color-night: #000000;
+$arrow-shadow-color-sunset: #c8c7be;
 
 $selected: #3399FF;
 $selected-off: #505a65;
@@ -1424,7 +1425,16 @@ $subscribe-wrap-height: 49px;
 		font-size: 14px;
 		border-radius: 0;
 	}
-	@include arrow(12px, -1px, $list-background-color, $list-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night) {
+	@include arrow(
+		$x-position: 12px,
+		$y-position: -1px,
+		$arrow-color: $list-background-color,
+		$arrow-color-night: $list-background-color-night,
+		$arrow-color-sunset: $list-background-color-sunset,
+		$shadow-color: $arrow-shadow-color,
+		$shadow-color-night: $arrow-shadow-color-night,
+		$shadow-color-sunset: $arrow-shadow-color-sunset)
+	{
 		display: none;
 	}
 	&.open:after, &.open:before {
@@ -1575,7 +1585,16 @@ $subscribe-wrap-height: 49px;
 			border-bottom: 1px solid transparent;
 			@include border-color($border-color, $border-color-night, $border-color-sunset);
 			padding: 0;
-			@include arrow(32px, 0px, $list-background-color, $list-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night) {
+			@include arrow(
+				$x-position: 32px,
+				$y-position: 0px,
+				$arrow-color: $list-background-color,
+				$arrow-color-night: $list-background-color-night,
+				$arrow-color-sunset: $list-background-color-sunset,
+				$shadow-color: $arrow-shadow-color,
+				$shadow-color-night: $arrow-shadow-color-night,
+				$shadow-color-sunset: $arrow-shadow-color-sunset)
+			{
 				z-index: 4;
 			}
 		}
@@ -1794,7 +1813,17 @@ $saved-search-control-height: 48px;
 			font-size: 14px;
 			border-radius: 0;
 		}
-		@include arrow(12px, -1px, $drawer-background-color, $drawer-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right) {
+		@include arrow(
+			$x-position: 12px,
+			$y-position: -1px,
+			$arrow-color: $drawer-background-color,
+			$arrow-color-night: $drawer-background-color-night,
+			$arrow-color-sunset: $drawer-background-color-sunset,
+			$shadow-color: $arrow-shadow-color,
+			$shadow-color-night: $arrow-shadow-color-night,
+			$shadow-color-sunset: $arrow-shadow-color-sunset,
+			$origin: right)
+		{
 			display: none;
 		}
 		&.open {
@@ -2175,12 +2204,31 @@ $saved-search-control-height: 48px;
 	border-bottom: 1px solid $border-color;
 	@include border-color($border-color, $border-color-night, $border-color-sunset);
 	@include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
-	@include arrow(20px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right) {
+	@include arrow(
+		$x-position: 20px,
+		$y-position: -1px,
+		$arrow-color: $body-background-color,
+		$arrow-color-night: $body-background-color-night,
+		$arrow-color-sunset: $body-background-color-sunset,
+		$shadow-color: $arrow-shadow-color,
+		$shadow-color-night: $arrow-shadow-color-night,
+		$shadow-color-sunset: $arrow-shadow-color-sunset,
+		$origin: right)
+	{
 		z-index: 10;
 		visibility: hidden;
 	}
 	.full-screen & {
-		@include arrow(65px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right);
+		@include arrow(
+			$x-position: 65px,
+			$y-position: -1px,
+			$arrow-color: $body-background-color,
+			$arrow-color-night: $body-background-color-night,
+			$arrow-color-sunset: $body-background-color-sunset,
+			$shadow-color: $arrow-shadow-color,
+			$shadow-color-night: $arrow-shadow-color-night,
+			$shadow-color-sunset: $arrow-shadow-color-sunset,
+			$origin: right);
 	}
 	.entry-basement.open &:after,
 	.entry-basement.open &:before {
@@ -2613,7 +2661,17 @@ $saved-search-control-height: 48px;
 				border-bottom: none;
 			}
 			&:first-child {
-				@include arrow(12px, -7px, $list-background-color, $list-background-color, $border-color, $border-color, left, true);
+				@include arrow(
+					$x-position: 12px,
+					$y-position: -7px,
+					$arrow-color: $list-background-color,
+					$arrow-color-night: $list-background-color,
+					$arrow-color-sunset: $list-background-color,
+					$shadow-color: $border-color,
+					$shadow-color-night: $border-color,
+					$shadow-color-sunset: $border-color,
+					$origin: left,
+					$invert: true);
 			}
 			&:first-child:hover:after,
 			&.selected:first-child:after {
@@ -5171,12 +5229,31 @@ Media Queries
 	padding: 17px 20px;
 	border-bottom: 1px solid transparent;
 	@include border-color($border-color, $border-color-night, $border-color-sunset);
-	@include arrow(201px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right) {
+	@include arrow(
+		$x-position: 201px,
+		$y-position: -1px,
+		$arrow-color: $body-background-color,
+		$arrow-color-night: $body-background-color-night,
+		$arrow-color-sunset: $body-background-color-sunset,
+		$shadow-color: $arrow-shadow-color,
+		$shadow-color-night: $arrow-shadow-color-night,
+		$shadow-color-sunset: $arrow-shadow-color-sunset,
+		$origin: right)
+	{
 		z-index: 10;
 		visibility: hidden;
 	}
 	.full-screen & {
-		@include arrow(246px, -1px, $body-background-color, $body-background-color-night, $arrow-shadow-color, $arrow-shadow-color-night, right);
+		@include arrow(
+			$x-position: 246px,
+			$y-position: -1px,
+			$arrow-color: $body-background-color,
+			$arrow-color-night: $body-background-color-night,
+			$arrow-color-sunset: $body-background-color-sunset,
+			$shadow-color: $arrow-shadow-color,
+			$shadow-color-night: $arrow-shadow-color-night,
+			$shadow-color-sunset: $arrow-shadow-color-sunset,
+			$origin: right);
 	}
 	.entry-basement.open &:after,
 	.entry-basement.open &:before {
@@ -5296,4 +5373,30 @@ Media Queries
         	}
         }
     }
+}
+
+.theme-night.full-screen .share-form:before {
+  border-top-color: black;
+}
+.theme-sunset.full-screen .share-form:before {
+  border-top-color: $arrow-shadow-color-sunset;
+}
+.theme-night.full-screen .share-form:after {
+  border-top-color: $body-background-color-night;
+}
+.theme-sunset.full-screen .share-form:after {
+  border-top-color: $body-background-color-sunset;
+}
+
+.theme-night.full-screen .entry-settings:before {
+  border-top-color: black;
+}
+.theme-sunset.full-screen .entry-settings:before {
+  border-top-color: $arrow-shadow-color-sunset;
+}
+.theme-night.full-screen .entry-settings:after {
+  border-top-color: $body-background-color-night;
+}
+.theme-sunset.full-screen .entry-settings:after {
+  border-top-color: $body-background-color-sunset;
 }

@@ -29,7 +29,7 @@
 	}
 }
 
-@mixin arrow($x-position, $y-position, $arrow-color, $arrow-color-night, $shadow-color, $shadow-color-night, $origin:left, $invert:false) {
+@mixin arrow($x-position, $y-position, $arrow-color, $arrow-color-night, $arrow-color-sunset, $shadow-color, $shadow-color-night, $shadow-color-sunset, $origin:left, $invert:false) {
 	&:before {
 		@if $origin == left {
 			left: $x-position;
@@ -54,6 +54,14 @@
 			}
 			@else {
 				border-top-color: $shadow-color-night;
+			}
+		}
+		.theme-sunset & {
+			@if $invert == true {
+				border-bottom-color: $shadow-color-sunset;
+			}
+			@else {
+				border-top-color: $shadow-color-sunset;
 			}
 		}
 		@content;
@@ -83,6 +91,14 @@
 			}
 			@else {
 				border-top-color: $arrow-color-night;
+			}
+		}
+		.theme-sunset & {
+			@if $invert == true {
+				border-bottom-color: $arrow-color-sunset;
+			}
+			@else {
+				border-top-color: $arrow-color-sunset;
 			}
 		}
 		@content;
