@@ -165,18 +165,22 @@ $.extend feedbin,
     $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com']"});
 
   formatEntryContent: (entryId, resetScroll=true, readability=true) ->
+    feedbin.applyStarred(entryId)
     if resetScroll
       feedbin.resetScroll
     if readability
       feedbin.readability()
-    feedbin.syntaxHighlight()
-    feedbin.footnotes()
-    feedbin.nextEntryPreview()
-    feedbin.audioVideo()
-    feedbin.localizeTime($('[data-behavior~=entry_content_target]'))
-    feedbin.applyUserTitles()
-    feedbin.applyStarred(entryId)
-    feedbin.fitVids()
+    try
+      feedbin.syntaxHighlight()
+      feedbin.footnotes()
+      feedbin.nextEntryPreview()
+      feedbin.audioVideo()
+      feedbin.localizeTime($('[data-behavior~=entry_content_target]'))
+      feedbin.applyUserTitles()
+      feedbin.fitVids()
+    catch error
+      if 'console' of window
+        console.log error
 
   refresh: ->
     if feedbin.data
