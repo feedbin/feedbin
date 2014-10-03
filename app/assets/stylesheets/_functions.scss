@@ -89,38 +89,53 @@
 	}
 }
 
-@mixin background-color($day, $night) {
+@mixin background-color($day, $night, $sunset) {
 	background-color: $day;
 	.theme-night & {
 		background-color: $night;
 	}
+	.theme-sunset & {
+		background-color: $sunset;
+	}
 }
 
-@mixin color($day, $night) {
+@mixin color($day, $night, $sunset) {
 	color: $day;
 	.theme-night & {
 		color: $night;
 	}
+	.theme-sunset & {
+		color: $sunset;
+	}
 }
 
-@mixin border-color($day, $night) {
+@mixin border-color($day, $night, $sunset) {
 	border-color: $day;
 	.theme-night & {
 		border-color: $night;
 	}
+	.theme-sunset & {
+		border-color: $sunset;
+	}
 }
 
-@mixin stroke($day, $night) {
+@mixin stroke($day, $night, $sunset) {
 	stroke: $day;
 	.theme-night & {
 		stroke: $night;
 	}
+	.theme-sunset & {
+		stroke: $sunset;
+	}
 }
 
-@mixin fill($day, $night) {
+@mixin fill($day, $night, $sunset) {
 	fill: $day;
 	.theme-night & {
 		fill: $night;
+	}
+	.theme-sunset & {
+		fill: $sunset;
 	}
 }
 
