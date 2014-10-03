@@ -39,9 +39,16 @@ $text-color: #212325;
 $text-color-sunset: #353636;
 $text-color-night: #FFFFFF;
 
+$text-color-body: #353739;
+$text-color-body-night: #c8cacc;
+
 $text-color-light: #b4b6b8;
 $text-color-light-sunset: #b4b4ad;
 $text-color-light-night: #66686a;
+
+$text-color-muted: #c8cacc;
+$text-color-muted-sunset: #c8cacc;
+$text-color-muted-night: #3f4143;
 
 $text-summary-color: #7a7c7e;
 $text-summary-color-sunset: #7a7b78;
@@ -1579,7 +1586,7 @@ $subscribe-wrap-height: 49px;
 	right: 45px;
 	top: 0;
 	font-weight: bold;
-	@include color(#c8cacc, #3f4143);
+	@include color($text-color-muted, $text-color-muted-night);
 	font-size: 11px;
 	display: block;
 	-webkit-appearance: none;
@@ -1667,7 +1674,7 @@ li.selected > a .favicon-wrap {
 	background: transparent;
 	box-shadow: none;
 	svg {
-		@include fill(#b4b6b8, #3f4143);
+		@include fill($text-color-light, $text-color-muted-night);
 	}
 }
 
@@ -1869,7 +1876,7 @@ $saved-search-control-height: 48px;
 		padding: 10px 10px 8px 0;
 		margin-left: 38px;
 		border-bottom: 1px solid transparent;
-		@include border-color($list-background-color, #212325);
+		@include border-color($list-background-color, $list-background-color-night);
 	}
 	.entry-actions-wrap {
 		top: 0;
@@ -2009,7 +2016,7 @@ $saved-search-control-height: 48px;
 	&.selected {
 		.wrap {
 			border-top: 1px solid transparent;
-			@include border-color(#666, $selected-off);
+			@include border-color($selected-off, $selected-off);
 			margin-top: -1px;
 			@include background-color($selected-off, $selected-off);
 		}
@@ -2195,7 +2202,7 @@ $saved-search-control-height: 48px;
 			-webkit-appearance: none;
 			margin: 0 0 0 8px;
 			padding: 0;
-			@include color(#333, #fbfdff);
+			@include color($text-header-color, $text-header-color-night);
 			position: relative;
 		}
 		&:after {
@@ -2463,7 +2470,7 @@ $saved-search-control-height: 48px;
 	.button-toggle-read {
 		.circle {
 			border: 2px solid transparent;
-			@include border-color(#b4b6b8,#97999b);
+			@include border-color($text-color-light, $text-summary-color-night);
 			@include background-color($text-color-light, $text-summary-color-night);
 			height: 16px;
 			width: 16px;
@@ -2555,7 +2562,7 @@ $saved-search-control-height: 48px;
 		list-style: none;
 		border: 1px solid transparent;
 		@include border-color($border-color, $border-color);
-		@include background-color(#eff1f3, #eff1f3);
+		@include background-color($list-background-color, $list-background-color);
 		position: absolute;
 		z-index: 10000;
 		border-radius: 4px;
@@ -2597,7 +2604,7 @@ $saved-search-control-height: 48px;
 				border-bottom: none;
 			}
 			&:first-child {
-				@include arrow(12px, -7px, #eff1f3, #eff1f3, $border-color, $border-color, left, true);
+				@include arrow(12px, -7px, $list-background-color, $list-background-color, $border-color, $border-color, left, true);
 			}
 			&:first-child:hover:after,
 			&.selected:first-child:after {
@@ -2663,7 +2670,7 @@ $saved-search-control-height: 48px;
 	font-style: normal;
 	font-size: 1.15em;
 	line-height: 1.6;
-	@include color(#353739, #c8cacc);
+	@include color($text-color-body, $text-color-body-night);
 	text-rendering: optimizeLegibility;
 
 	strong {
@@ -2735,7 +2742,7 @@ $saved-search-control-height: 48px;
 	}
 
 	code {
-		@include color(#333, #f3f3f3);
+		@include color($text-color-body, $text-color-body-night);
 	}
 
 	pre code {
@@ -3264,7 +3271,7 @@ Settings
 		vertical-align: top;
 		margin-left: 250px;
 		padding: 0;
-		background-color: #eff1f3;
+		background-color: $list-background-color;
 		display: table-cell;
 		.settings-content-inner {
 			max-width: 620px;
@@ -4116,7 +4123,7 @@ button.close {
 	overflow-y: scroll;
 	-webkit-overflow-scrolling: touch;
 	outline: 0;
-	color: #353739;
+	color: $text-color-body;
 	td, th {
 		border-color: $border-color !important;
 	}
@@ -4146,7 +4153,7 @@ button.close {
 
 .modal-content {
 	position: relative;
-	@include background-color(#eff1f3, #eff1f3);
+	@include background-color($list-background-color, $list-background-color);
 	background-clip: padding-box;
 	border: 1px solid #999;
 	border: 1px solid rgba(0,0,0,.2);
@@ -5179,7 +5186,7 @@ Media Queries
 	.field-cluster {
 		margin-bottom: 15px;
 		input, textarea {
-			@include background-color(#FFF, #FFF);
+			@include background-color($input-background-color, $input-background-color);
 			@include color($text-header-color, $text-header-color);
 			width: 100%;
 			max-width: 100%;
@@ -5268,7 +5275,7 @@ Media Queries
             left: 7px;
             width: 100%;
             max-width: 400px;
-            @include background-color(#FFF, #191c20);
+            @include background-color($input-background-color, $input-background-color);
 			border-left: 1px solid transparent;
 			border-right: 1px solid transparent;
 			border-bottom: 1px solid transparent;
