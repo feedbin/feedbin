@@ -2353,46 +2353,87 @@ $saved-search-control-height: 48px;
 		}
 	}
 	.theme-settings {
-		width: 97px;
+		width: 140px;
 		position: relative;
-		cursor: pointer;
-		&:after {
-			display: block;
-			content: '';
-			height: 32px;
-			width: 32px;
-			background-color: #fdfeff;
+		.theme-button {
 			position: absolute;
 			top: 9px;
-			left: 12px;
-			transition: left .2s ease;
-			z-index: 0;
-			border-radius: 3px;
-			.theme-night & {
-				left: 52px;
-				background-color: $border-color-night;
+			left: 13px;
+			height: 32px;
+			width: 32px;
+			border: 1px solid transparent;
+			cursor: pointer;
+			@include border-color($border-color, $border-color-night, $border-color-sunset);
+			border-radius: 2px;
+			&:before,
+			&:after,
+			.theme-button-inner:before,
+			.theme-button-inner:after {
+				height: 3px;
+				left: 5px;
+				position: absolute;
+				content: "";
+				display: block;
+			}
+			&:before {
+				width: 19px;
+				top: 6px;
+			}
+			&:after {
+				width: 19px;
+				top: 11px;
+			}
+			.theme-button-inner {
+				height: 100%;
+				width: 100%;
+				&:before {
+					width: 17px;
+					top: 16px;
+				}
+				&:after {
+					width: 17px;
+					top: 21px;
+				}
 			}
 		}
-	}
-	.button-theme-day {
-		position: absolute;
-		top: 16px;
-		left: 19px;
-		width: 18px;
-		height: 18px;
-		z-index: 1;
-		pointer-events: none;
-		@include fill(#000000, #525456, #000000);
-	}
-	.button-theme-night {
-		position: absolute;
-		top: 15px;
-		left: 58px;
-		width: 17px;
-		height: 19px;
-		z-index: 1;
-		pointer-events: none;
-		@include fill(#000000, #fbfdff, #000000);
+		.theme-button-day {
+			&:before,
+			&:after,
+			.theme-button-inner:before,
+			.theme-button-inner:after {
+				background-color: $text-color-light;
+			}
+			background-color: $body-background-color;
+			.theme-day & {
+				border-color: $selected;
+			}
+		}
+		.theme-button-sunset {
+			background-color: $body-background-color-sunset;
+			left: 54px;
+			&:before,
+			&:after,
+			.theme-button-inner:before,
+			.theme-button-inner:after {
+				background-color: $text-color-light-sunset;
+			}
+			.theme-sunset & {
+				border-color: $selected;
+			}
+		}
+		.theme-button-night {
+			background-color: $body-background-color-night;
+			left: 95px;
+			&:before,
+			&:after,
+			.theme-button-inner:before,
+			.theme-button-inner:after {
+				background-color: $text-color-light-night;
+			}
+			.theme-night & {
+				border-color: $selected;
+			}
+		}
 	}
 }
 

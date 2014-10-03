@@ -818,7 +818,11 @@ $.extend feedbin,
 
     theme: ->
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
-        $('body').toggleClass('theme-night')
+        theme = $(@).data('theme')
+        $('body').removeClass('theme-day')
+        $('body').removeClass('theme-sunset')
+        $('body').removeClass('theme-night')
+        $('body').addClass("theme-#{theme}")
         event.preventDefault()
         return
 
