@@ -1738,9 +1738,9 @@ li.selected > a .favicon-wrap {
 		height: $toolbar-height;
 		width: $toolbar-height;
 		background-color: transparent;
-		background-size: 11px 18px;
+		background-size: 15px 15px;
 		background-repeat: no-repeat;
-		background-image: image-url("favicon-search-light.svg");
+		background-image: image-url("icon-search.svg");
 		background-position: center center;
 		display: block;
 		-webkit-appearance: none;
@@ -5172,11 +5172,10 @@ Media Queries
 		.entries-header {
 			display: block;
 		}
-		.entries {
-			.hide-search & {
-		        top: $toolbar-height;
-			}
-		}
+	}
+	.hide-search.feed-selected .entries,
+	.hide-search.entry-selected .entries {
+		top: 0;
 	}
     .entry-toolbar, .entry-feed-title {
 		.entry-feed-title {
