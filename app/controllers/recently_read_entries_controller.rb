@@ -13,7 +13,6 @@ class RecentlyReadEntriesController < ApplicationController
     @type = 'recently_read'
 
     @collection_title = 'Recently Read'
-    @collection_favicon = 'favicon-recently-read'
 
     respond_to do |format|
       format.js { render partial: 'shared/entries' }

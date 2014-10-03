@@ -17,7 +17,6 @@ class SavedSearchesController < ApplicationController
     @data = nil
 
     @collection_title = @saved_search.name
-    @collection_favicon = 'favicon-search'
 
     respond_to do |format|
       format.js { render partial: 'shared/entries' }

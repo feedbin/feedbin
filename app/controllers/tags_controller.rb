@@ -27,7 +27,6 @@ class TagsController < ApplicationController
     @data = params[:id]
 
     @collection_title = @tag.name
-    @collection_favicon = 'favicon-tag'
 
     respond_to do |format|
       format.js { render partial: 'shared/entries' }

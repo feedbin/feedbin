@@ -1721,17 +1721,31 @@ li.selected > a .favicon-wrap {
 	height: $toolbar-height;
 	text-align: center;
 	overflow: auto;
-	padding-right: 45px;
 	.feed-title-wrap {
 		position: relative;
-		padding-left: 24px;
-		top: 2px;
 		@include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
 		font-weight: bold;
 	}
 	.back-button {
 		display: inline-block;
 		float: left;
+		height: $toolbar-height;
+		width: $toolbar-height;
+	}
+	.search-button {
+		display: inline-block;
+		float: right;
+		height: $toolbar-height;
+		width: $toolbar-height;
+		background-color: transparent;
+		background-size: 11px 18px;
+		background-repeat: no-repeat;
+		background-image: image-url("favicon-search-light.svg");
+		background-position: center center;
+		display: block;
+		-webkit-appearance: none;
+		border: none;
+		padding: 0;
 		height: $toolbar-height;
 		width: $toolbar-height;
 	}
@@ -5158,6 +5172,11 @@ Media Queries
 		.entries-header {
 			display: block;
 		}
+		.entries {
+			.hide-search & {
+		        top: $toolbar-height;
+			}
+		}
 	}
     .entry-toolbar, .entry-feed-title {
 		.entry-feed-title {
@@ -5221,6 +5240,11 @@ Media Queries
 			}
 		}
     }
+	.entries {
+		.hide-search & {
+			top: 0;
+		}
+	}
     .entry-basement {
     	top: $toolbar-height;
     }

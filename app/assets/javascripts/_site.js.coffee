@@ -816,6 +816,12 @@ $.extend feedbin,
         event.preventDefault()
         return
 
+    showSearch: ->
+      $(document).on 'click', '[data-behavior~=show_search]', (event) ->
+        $('body').toggleClass('hide-search')
+        event.preventDefault()
+        return
+
     theme: ->
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
         theme = $(@).data('theme')

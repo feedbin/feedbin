@@ -17,7 +17,6 @@ class EntriesController < ApplicationController
     @data = nil
 
     @collection_title = 'All'
-    @collection_favicon = 'favicon-all'
 
     respond_to do |format|
       format.js { render partial: 'shared/entries' }
@@ -39,7 +38,6 @@ class EntriesController < ApplicationController
     @data = nil
 
     @collection_title = 'Unread'
-    @collection_favicon = 'favicon-unread'
 
     respond_to do |format|
       format.js { render partial: 'shared/entries' }
@@ -61,7 +59,6 @@ class EntriesController < ApplicationController
     @data = nil
 
     @collection_title = 'Starred'
-    @collection_favicon = 'favicon-star'
 
     respond_to do |format|
       format.js { render partial: 'shared/entries' }
@@ -224,7 +221,6 @@ class EntriesController < ApplicationController
     @search = true
 
     @collection_title = 'Search'
-    @collection_favicon = 'favicon-search'
 
     @saved_search = SavedSearch.new
 
