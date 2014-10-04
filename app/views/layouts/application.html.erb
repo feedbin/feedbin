@@ -10,7 +10,7 @@
   <%= csrf_meta_tags %>
   <%= tag :meta, name: "stripe-key", content: STRIPE_PUBLIC_KEY %>
 </head>
-<body class="<%= @class %>">
+<body class="<%= @class %>" data-behavior="<%= @behavior %>">
   <%= content_for?(:content) ? yield(:content) : yield %>
   <%= render partial: 'shared/tracking' %>
   <%= render partial: 'shared/favicons' %>

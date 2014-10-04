@@ -1153,6 +1153,13 @@ th {
 	}
 }
 
+.inset {
+	background-color: #FFF;
+	border-radius: 8px;
+	border: 1px solid $border-color;
+	margin: 0 0 20px 0;
+	padding: 30px;
+}
 
 
 /*------------------------------------------------------------------------------
@@ -3608,6 +3615,95 @@ Settings
 			border-radius: 0 0 0 4px;
 		}
 	}
+	.theme-wrap {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: no-wrap;
+		justify-content: space-around;
+	}
+	.theme-button {
+		width: 208px;
+		height: 208px;
+		padding-top: 25px;
+		font-weight: bold;
+		border: 1px solid transparent;
+		border-radius: 4px;
+		display: block;
+		text-decoration: none;
+		.theme-name {
+			text-transform: uppercase;
+			color: #878787;
+			font-size: 14px;
+			text-align: center;
+			display: block;
+			margin-bottom: 10px;
+		}
+	}
+	.mini-feedbin {
+		border: 4px solid transparent;
+		width: 164px;
+		height: 111px;
+		margin: 0 auto;
+		display: block;
+		position: relative;
+		&:before {
+			position: absolute;
+			display: block;
+			content: "";
+			border-left: 4px solid transparent;
+			border-right: 4px solid transparent;
+			height: 100%;
+			width: 40px;
+			left: 28px;
+		}
+		&:after {
+			width: 88px;
+			left: 68px;
+			position: absolute;
+			display: block;
+			content: "";
+			height: 100%;
+		}
+	}
+	.theme-button-day .mini-feedbin {
+		background-color: $list-background-color;
+		border-color: $border-color;
+		&:before, &:after {
+			background-color: $body-background-color;
+			border-color: $border-color;
+		}
+	}
+	.theme-button-sunset .mini-feedbin {
+		background-color: $list-background-color-sunset;
+		border-color: $border-color-sunset;
+		&:before, &:after {
+			background-color: $body-background-color-sunset;
+			border-color: $border-color-sunset;
+		}
+	}
+	.theme-button-night .mini-feedbin {
+		background-color: $list-background-color-night;
+		border-color: $border-color-night;
+		&:before, &:after {
+			background-color: $body-background-color-night;
+			border-color: $border-color-night;
+		}
+	}
+	.theme-day {
+		.theme-button-day {
+			border-color: $selected;
+		}
+	}
+	.theme-sunset {
+		.theme-button-sunset {
+			border-color: $selected;
+		}
+	}
+	.theme-night {
+		.theme-button-night {
+			border-color: $selected;
+		}
+	}
 }
 
 .key {
@@ -5464,3 +5560,4 @@ Media Queries
 .theme-sunset.full-screen .entry-settings:after {
   border-top-color: $body-background-color-sunset;
 }
+

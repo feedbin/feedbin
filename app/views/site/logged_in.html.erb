@@ -1,4 +1,5 @@
 <% @class = "app nothing-selected hide-search theme-#{@user.theme || 'day'} #{session[:view_mode]} #{@user.entry_width}" %>
+<% @behavior = "class_target" %>
 <% content_for :head do %>
   <% if ENV['FONT_STYLESHEET'] %>
   <link rel="stylesheet" type="text/css" href="<%= ENV['FONT_STYLESHEET'] %>" />

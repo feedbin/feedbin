@@ -1,0 +1,25 @@
+<div class="settings-content-inner-wide">
+  <h2>Appearance</h2>
+  <h3>Customize Feedbin</h3>
+
+  <div class="inset theme-<%= @user.theme || 'day' %>" data-behavior="class_target">
+    <div class="theme-wrap">
+
+      <%= link_to settings_theme_path(theme: 'day'), remote: true, method: :post, class: 'theme-button theme-button-day', title: 'Switch to day theme', data: {behavior: 'switch_theme', theme: 'day'} do %>
+        <span class="theme-name">Day</span>
+        <span class="mini-feedbin"></span>
+      <% end %>
+
+      <%= link_to settings_theme_path(theme: 'sunset'), remote: true, method: :post, class: 'theme-button theme-button-sunset', title: 'Switch to sunset theme', data: {behavior: 'switch_theme', theme: 'sunset'} do %>
+        <span class="theme-name">Sunset</span>
+        <span class="mini-feedbin"></span>
+      <% end %>
+
+      <%= link_to settings_theme_path(theme: 'night'), remote: true, method: :post, class: 'theme-button theme-button-night', title: 'Switch to night theme', data: {behavior: 'switch_theme', theme: 'night'} do %>
+        <span class="theme-name">Night</span>
+        <span class="mini-feedbin"></span>
+      <% end %>
+
+    </div>
+  </div>
+</div>

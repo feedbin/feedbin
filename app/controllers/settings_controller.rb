@@ -18,6 +18,10 @@ class SettingsController < ApplicationController
     @user = current_user
   end
 
+  def appearance
+    @user = current_user
+  end
+
   def feeds
     @user = current_user
     @subscriptions = @user.subscriptions.select('subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host').joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}")
