@@ -1,9 +1,6 @@
 <% @class = "app nothing-selected hide-search #{@classes}" %>
 <% @behavior = "class_target" %>
 <% content_for :head do %>
-  <% if ENV['FONT_STYLESHEET'] %>
-  <link rel="stylesheet" type="text/css" href="<%= ENV['FONT_STYLESHEET'] %>" />
-  <% end %>
   <script>
       if (window.feedbin == null) {
           window.feedbin = {};

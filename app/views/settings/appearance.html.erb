@@ -2,7 +2,7 @@
   <h2>Appearance</h2>
   <h3>Customize Feedbin</h3>
 
-  <div class="inset <%= @classes %>" data-behavior="class_target">
+  <div class="inset theme-<%= @user.theme || 'day' %>" data-behavior="theme_class_target">
     <div class="theme-wrap">
 
       <%= link_to settings_theme_path(theme: 'day'), remote: true, method: :post, class: 'theme-button theme-button-day', title: 'Switch to day theme', data: {behavior: 'switch_theme', theme: 'day'} do %>
@@ -22,29 +22,31 @@
 
     </div>
 
-    <div class="entries">
-      <ul>
-        <li data-behavior="responsive_text_size">
-          <span class="wrap">
-            <span class="entries-inner-wrap">
-              <span class="favicon-wrap">
-                <span class="favicon favicon-feedbin-com"></span>
-              </span>
-              <p class="feed-title">Food in Jars</p>
-              <time class="time">1h</time>
-              <span class="title-wrap">
-                <h2 class="title">
-                  <span class="favicon-wrap">
-                    <span class="favicon favicon-feedbin-com"></span>
-                  </span>
-                  Spicy Peach and Yellow Tomato Jam
-                </h2>
-                <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
+    <div class="<%= @classes %>" data-behavior="class_target">
+      <div class="entries">
+        <ul>
+          <li data-behavior="responsive_text_size">
+            <span class="wrap">
+              <span class="entries-inner-wrap">
+                <span class="favicon-wrap">
+                  <span class="favicon favicon-feedbin-com"></span>
+                </span>
+                <p class="feed-title">Food in Jars</p>
+                <time class="time">1h</time>
+                <span class="title-wrap">
+                  <h2 class="title">
+                    <span class="favicon-wrap">
+                      <span class="favicon favicon-feedbin-com"></span>
+                    </span>
+                    Spicy Peach and Yellow Tomato Jam
+                  </h2>
+                  <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
+                </span>
               </span>
             </span>
-          </span>
-        </li>
-      </ul>
+          </li>
+        </ul>
+      </div>
     </div>
 
     <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
@@ -81,13 +83,13 @@
       <p>
         Typeface
         <label class="radio">
-          <%= f.radio_button(:ui_typeface, "default", {checked: @user.ui_typeface.nil? || @user.ui_typeface === 'default'}) %> Default
+          <%= f.radio_button(:ui_typeface, "ui-font-default", {checked: @user.ui_typeface.nil? || @user.ui_typeface === 'ui-font-default'}) %> Default
         </label>
         <label class="radio">
-          <%= f.radio_button(:ui_typeface, "ideal-sans") %> Ideal Sans
+          <%= f.radio_button(:ui_typeface, "ui-font-sans-serif-2") %> Ideal Sans
         </label>
         <label class="radio">
-          <%= f.radio_button(:ui_typeface, "whitney") %> Whitney
+          <%= f.radio_button(:ui_typeface, "ui-font-sans-serif-1") %> Whitney
         </label>
       </p>
 

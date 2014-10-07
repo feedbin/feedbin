@@ -825,10 +825,10 @@ $.extend feedbin,
     theme: ->
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
         theme = $(@).data('theme')
-        $('[data-behavior~=class_target]').removeClass('theme-day')
-        $('[data-behavior~=class_target]').removeClass('theme-sunset')
-        $('[data-behavior~=class_target]').removeClass('theme-night')
-        $('[data-behavior~=class_target]').addClass("theme-#{theme}")
+        $('[data-behavior~=class_target], [data-behavior~=theme_class_target]').removeClass('theme-day')
+        $('[data-behavior~=class_target], [data-behavior~=theme_class_target]').removeClass('theme-sunset')
+        $('[data-behavior~=class_target], [data-behavior~=theme_class_target]').removeClass('theme-night')
+        $('[data-behavior~=class_target], [data-behavior~=theme_class_target]').addClass("theme-#{theme}")
         event.preventDefault()
         return
 
@@ -1068,10 +1068,10 @@ $.extend feedbin,
 
       $('[name="user[ui_typeface]"]').change (event) ->
         option = $(@).val()
-        $('[data-behavior~=class_target]').removeClass("ui-typeface-default")
-        $('[data-behavior~=class_target]').removeClass("ui-typeface-ideal-sans")
-        $('[data-behavior~=class_target]').removeClass("ui-typeface-whitney")
-        $('[data-behavior~=class_target]').addClass("ui-typeface-#{option}")
+        $('[data-behavior~=class_target]').removeClass("ui-font-default")
+        $('[data-behavior~=class_target]').removeClass("ui-font-sans-serif-1")
+        $('[data-behavior~=class_target]').removeClass("ui-font-sans-serif-2")
+        $('[data-behavior~=class_target]').addClass(option)
 
     # responsiveTextSize: ->
     #   $('[data-behavior~=responsive_text_size]').flowtype
