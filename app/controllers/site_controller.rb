@@ -19,6 +19,7 @@ class SiteController < ApplicationController
       end
 
       @show_welcome = (subscriptions.present?) ? false : true
+      @classes = user_classes
       @data = {
         login_url: login_url,
         tags_path: tags_path(format: :json),

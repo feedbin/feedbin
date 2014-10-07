@@ -2,7 +2,7 @@
   <h2>Appearance</h2>
   <h3>Customize Feedbin</h3>
 
-  <div class="inset theme-<%= @user.theme || 'day' %>" data-behavior="class_target">
+  <div class="inset <%= @classes %>" data-behavior="class_target">
     <div class="theme-wrap">
 
       <%= link_to settings_theme_path(theme: 'day'), remote: true, method: :post, class: 'theme-button theme-button-day', title: 'Switch to day theme', data: {behavior: 'switch_theme', theme: 'day'} do %>
@@ -21,5 +21,77 @@
       <% end %>
 
     </div>
+
+    <div class="entries">
+      <ul>
+        <li data-behavior="responsive_text_size">
+          <span class="wrap">
+            <span class="entries-inner-wrap">
+              <span class="favicon-wrap">
+                <span class="favicon favicon-feedbin-com"></span>
+              </span>
+              <p class="feed-title">Food in Jars</p>
+              <time class="time">1h</time>
+              <span class="title-wrap">
+                <h2 class="title">
+                  <span class="favicon-wrap">
+                    <span class="favicon favicon-feedbin-com"></span>
+                  </span>
+                  Spicy Peach and Yellow Tomato Jam
+                </h2>
+                <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
+              </span>
+            </span>
+          </span>
+        </li>
+      </ul>
+    </div>
+
+    <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
+      <%= hidden_field_tag :redirect_to, settings_appearance_url %>
+      <p class="radio-group">
+        Display:
+        <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block'}) %>
+        <%= f.label(:entries_display_block, "Block") %>
+        <%= f.radio_button(:entries_display, "inline") %>
+        <%= f.label(:entries_display_inline, "Inline") %>
+      </p>
+      <p class="radio-group">
+        Feed Name:
+        <%= f.radio_button(:entries_feed, "on", {checked: @user.entries_feed.nil? || @user.entries_feed === 'on'}) %>
+        <%= f.label(:entries_feed_on, "On") %>
+        <%= f.radio_button(:entries_feed, "off") %>
+        <%= f.label(:entries_feed_off, "Off") %>
+      </p>
+      <p class="radio-group">
+        Date:
+        <%= f.radio_button(:entries_time, "on", {checked: @user.entries_time.nil? || @user.entries_time === 'on'}) %>
+        <%= f.label(:entries_time_on, "On") %>
+        <%= f.radio_button(:entries_time, "off") %>
+        <%= f.label(:entries_time_off, "Off") %>
+      </p>
+      <p class="radio-group">
+        Summary:
+        <%= f.radio_button(:entries_body, "on", {checked: @user.entries_body.nil? || @user.entries_body === 'on'}) %>
+        <%= f.label(:entries_body_on, "On") %>
+        <%= f.radio_button(:entries_body, "off") %>
+        <%= f.label(:entries_body_off, "Off") %>
+      </p>
+
+      <p>
+        Typeface
+        <label class="radio">
+          <%= f.radio_button(:ui_typeface, "default", {checked: @user.ui_typeface.nil? || @user.ui_typeface === 'default'}) %> Default
+        </label>
+        <label class="radio">
+          <%= f.radio_button(:ui_typeface, "ideal-sans") %> Ideal Sans
+        </label>
+        <label class="radio">
+          <%= f.radio_button(:ui_typeface, "whitney") %> Whitney
+        </label>
+      </p>
+
+      <%= f.submit "Save", class: 'button' %>
+    <% end %>
   </div>
 </div>

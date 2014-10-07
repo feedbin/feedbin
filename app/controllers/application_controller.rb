@@ -153,4 +153,17 @@ class ApplicationController < ActionController::Base
     verifier.verify(authentication_token)
   end
 
+  def user_classes
+    @classes = []
+    @classes.push("theme-#{@user.theme || 'day'}")
+    @classes.push(session[:view_mode])
+    @classes.push(@user.entry_width)
+    @classes.push("entries-body-#{@user.entries_body || 'on'}")
+    @classes.push("entries-time-#{@user.entries_time || 'on'}")
+    @classes.push("entries-feed-#{@user.entries_feed || 'on'}")
+    @classes.push("entries-#{@user.entries_display || 'block'}")
+    @classes.push("ui-typeface-#{@user.ui_typeface || 'default'}")
+    @classes = @classes.join(" ")
+  end
+
 end

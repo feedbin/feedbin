@@ -1,4 +1,4 @@
-<% @class = "app nothing-selected hide-search theme-#{@user.theme || 'day'} #{session[:view_mode]} #{@user.entry_width}" %>
+<% @class = "app nothing-selected hide-search #{@classes}" %>
 <% @behavior = "class_target" %>
 <% content_for :head do %>
   <% if ENV['FONT_STYLESHEET'] %>

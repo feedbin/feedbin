@@ -1906,11 +1906,12 @@ $saved-search-control-height: 48px;
 	word-wrap: break-word;
 	@include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
 	.favicon-wrap {
-		top: 23px;
-		left: 12px;
+		top: -2px;
+		left: -26px;
 	}
 	a {
 		text-decoration: none;
+		@include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
 	}
 	.wrap {
 		position: relative;
@@ -1924,10 +1925,15 @@ $saved-search-control-height: 48px;
 		}
 	}
 	.entries-inner-wrap {
+		display: block;
 		padding: 10px 10px 8px 0;
 		margin-left: 38px;
 		border-bottom: 1px solid transparent;
+		position: relative;
 		@include border-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+		> .favicon-wrap {
+			display: none;
+		}
 	}
 	.entry-actions-wrap {
 		top: 0;
@@ -1994,6 +2000,7 @@ $saved-search-control-height: 48px;
 		display: block;
 		margin-bottom: 4px;
 		@include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+		position: relative;
 	}
 	.feed-title {
 		font-size: 12px;
@@ -2019,7 +2026,7 @@ $saved-search-control-height: 48px;
 		width: 30px;
 		height: 21px;
 		position: absolute;
-		left: 0;
+		left: -38px;
 		top: -1px;
 		overflow: hidden;
 		display: none;
@@ -2168,6 +2175,72 @@ $saved-search-control-height: 48px;
 		padding: 8px;
 	}
 }
+
+.entries-inline .entries {
+	.entries-inner-wrap {
+		padding-top: 8px;
+		padding-bottom: 8px;
+		> .favicon-wrap {
+			display: flex;
+			top: 5px;
+			z-index: 3;
+		}
+	}
+	.feed-title {
+		position: absolute;
+		width: 110px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		padding: 0 10px 0 0;
+	}
+	.title-wrap {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		width: 100%;
+		padding: 0 70px 0 100px;
+		display: block;
+		line-height: 1.1;
+		.favicon-wrap {
+			display: none;
+		}
+	}
+	.title, .body {
+		display: inline;
+		line-height: 1;
+	}
+	.feed-title, .time {
+		top: 9px;
+	}
+}
+
+.entries-feed-off .entries {
+	.feed-title {
+		display: none;
+	}
+}
+.entries-feed-off.entries-inline .entries {
+	.title-wrap {
+		padding-left: 0;
+	}
+}
+.entries-time-off .entries {
+	.time {
+		display: none;
+	}
+}
+.entries-time-off.entries-inline .entries {
+	.title-wrap {
+		padding-right: 0;
+	}
+}
+.entries-body-off .entries {
+	.body {
+		display: none;
+	}
+}
+
 
 .entry-toolbar {
 	@include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
@@ -2464,6 +2537,9 @@ $saved-search-control-height: 48px;
 	background-repeat: no-repeat;
 	.theme-night & {
 		background-image: image-url("logo-night.svg");
+	}
+	.theme-sunset & {
+		background-image: image-url("logo-sunset.svg");
 	}
 }
 
@@ -3424,6 +3500,15 @@ Settings
 			color: #b6b6b6;
 		}
 	}
+	.radio-group {
+		label {
+			display: inline;
+		}
+		input[type="radio"] {
+			position: relative;
+			top: -2px;
+		}
+	}
 	.starred-field {
 		input {
 			padding-left: 5px !important
@@ -3620,6 +3705,7 @@ Settings
 		flex-direction: row;
 		flex-wrap: no-wrap;
 		justify-content: space-around;
+		margin-bottom: 20px;
 	}
 	.theme-button {
 		width: 208px;
@@ -3702,6 +3788,51 @@ Settings
 	.theme-night {
 		.theme-button-night {
 			border-color: $selected;
+		}
+	}
+	.entries {
+		position: static;
+		margin-bottom: 20px;
+		max-width: 520px;
+	}
+	.entries ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.entries ul li .entries-inner-wrap {
+		border: none;
+	}
+	.entries ul li {
+		font-size: 12px;
+		.feed-title,
+		.time,
+		.body {
+			font-size: 100%;
+		}
+		.title {
+			font-size: 116.6%;
+		}
+		.title {
+			position: relative;
+		}
+	}
+	.theme-day {
+		.entries {
+			border: 1px solid $border-color;
+			box-shadow: 4px 4px 0 -2px $border-color;
+		}
+	}
+	.theme-sunset {
+		.entries {
+			border: 1px solid $border-color-sunset;
+			box-shadow: 4px 4px 0 -2px $border-color-sunset;
+		}
+	}
+	.theme-night {
+		.entries {
+			border: 1px solid $border-color-night;
+			box-shadow: 4px 4px 0 -2px $border-color-night;
 		}
 	}
 }

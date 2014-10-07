@@ -20,6 +20,7 @@ class SettingsController < ApplicationController
 
   def appearance
     @user = current_user
+    @classes = user_classes
   end
 
   def feeds
@@ -209,7 +210,10 @@ class SettingsController < ApplicationController
   end
 
   def user_settings_params
-    params.require(:user).permit(:entry_sort, :starred_feed_enabled, :hide_tagged_feeds, :precache_images, :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation, :apple_push_notification_device_token, :receipt_info)
+    params.require(:user).permit(:entry_sort, :starred_feed_enabled, :hide_tagged_feeds, :precache_images,
+                                 :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation,
+                                 :apple_push_notification_device_token, :receipt_info, :entries_display,
+                                 :entries_feed, :entries_time, :entries_body)
   end
 
   def get_entry_counts(feed_ids)

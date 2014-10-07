@@ -1041,6 +1041,43 @@ $.extend feedbin,
         $('.feed-form').html(suggestions)
       return
 
+    displaySettings: ->
+      $('[name="user[entries_display]"]').change (event) ->
+        option = $(@).val()
+        $('[data-behavior~=class_target]').removeClass("entries-inline")
+        $('[data-behavior~=class_target]').removeClass("entries-block")
+        $('[data-behavior~=class_target]').addClass("entries-#{option}")
+
+      $('[name="user[entries_feed]"]').change (event) ->
+        option = $(@).val()
+        $('[data-behavior~=class_target]').removeClass("entries-feed-on")
+        $('[data-behavior~=class_target]').removeClass("entries-feed-off")
+        $('[data-behavior~=class_target]').addClass("entries-feed-#{option}")
+
+      $('[name="user[entries_time]"]').change (event) ->
+        option = $(@).val()
+        $('[data-behavior~=class_target]').removeClass("entries-time-on")
+        $('[data-behavior~=class_target]').removeClass("entries-time-off")
+        $('[data-behavior~=class_target]').addClass("entries-time-#{option}")
+
+      $('[name="user[entries_body]"]').change (event) ->
+        option = $(@).val()
+        $('[data-behavior~=class_target]').removeClass("entries-body-on")
+        $('[data-behavior~=class_target]').removeClass("entries-body-off")
+        $('[data-behavior~=class_target]').addClass("entries-body-#{option}")
+
+      $('[name="user[ui_typeface]"]').change (event) ->
+        option = $(@).val()
+        $('[data-behavior~=class_target]').removeClass("ui-typeface-default")
+        $('[data-behavior~=class_target]').removeClass("ui-typeface-ideal-sans")
+        $('[data-behavior~=class_target]').removeClass("ui-typeface-whitney")
+        $('[data-behavior~=class_target]').addClass("ui-typeface-#{option}")
+
+    # responsiveTextSize: ->
+    #   $('[data-behavior~=responsive_text_size]').flowtype
+    #     minimum : 500,
+    #     maximum : 1200
+
     generalAutocomplete: ->
       autocompleteFields = $('[data-behavior~=autocomplete_field]')
       $.each autocompleteFields, (i, field) ->
