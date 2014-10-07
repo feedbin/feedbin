@@ -2383,40 +2383,32 @@ $saved-search-control-height: 48px;
 			&:after,
 			.theme-button-inner:before,
 			.theme-button-inner:after {
-				height: 3px;
-				left: 5px;
+				height: 2px;
+				left: 6px;
 				position: absolute;
 				content: "";
 				display: block;
+				width: 18px;
+				background-color: #000;
 			}
 			&:before {
-				width: 19px;
-				top: 6px;
+				top: 8px;
 			}
 			&:after {
-				width: 19px;
-				top: 11px;
+				top: 12px;
 			}
 			.theme-button-inner {
 				height: 100%;
 				width: 100%;
 				&:before {
-					width: 17px;
 					top: 16px;
 				}
 				&:after {
-					width: 17px;
-					top: 21px;
+					top: 20px;
 				}
 			}
 		}
 		.theme-button-day {
-			&:before,
-			&:after,
-			.theme-button-inner:before,
-			.theme-button-inner:after {
-				background-color: $text-color-light;
-			}
 			background-color: $body-background-color;
 			.theme-day & {
 				border-color: $selected;
@@ -2425,12 +2417,6 @@ $saved-search-control-height: 48px;
 		.theme-button-sunset {
 			background-color: $body-background-color-sunset;
 			left: 54px;
-			&:before,
-			&:after,
-			.theme-button-inner:before,
-			.theme-button-inner:after {
-				background-color: $text-color-light-sunset;
-			}
 			.theme-sunset & {
 				border-color: $selected;
 			}
@@ -2442,7 +2428,7 @@ $saved-search-control-height: 48px;
 			&:after,
 			.theme-button-inner:before,
 			.theme-button-inner:after {
-				background-color: $text-color-light-night;
+				background-color: #FFF;
 			}
 			.theme-night & {
 				border-color: $selected;
