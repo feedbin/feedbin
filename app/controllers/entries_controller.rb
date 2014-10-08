@@ -34,6 +34,7 @@ class EntriesController < ApplicationController
 
     @append = params[:page].present?
 
+    @all_unread = 'true'
     @type = 'unread'
     @data = nil
 

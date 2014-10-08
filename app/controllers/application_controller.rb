@@ -116,6 +116,7 @@ class ApplicationController < ActionController::Base
       @entries = Entry.entries_with_feed(starred_entries, 'DESC')
     else
       # Get unread info, then get entries
+      @all_unread = 'true'
       unread_entries = @user.unread_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).sort_preference(@user.entry_sort)
       @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort)
     end
