@@ -18,8 +18,6 @@ class Entry < ActiveRecord::Base
   after_commit :touch_feed_last_published_entry, on: :create
   after_commit :updated_entry, on: :update
 
-  validates_uniqueness_of :public_id
-
   tire_settings = {
     analysis: {
       filter: {
