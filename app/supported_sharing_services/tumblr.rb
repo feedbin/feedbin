@@ -50,17 +50,21 @@ class Tumblr < Service
   def add(params)
     @klass.update(default_option: params[:site])
     options = {
-      type: 'link',
-      url: params['entry_url'],
       format: params['format'],
       state: params['state']
     }
-    if params['title'].present?
+
+    if params[:type] == 'quote'
+      options[:type] = 'quote'
+      options[:source] = params['source']
+      options[:quote] = params['description']
+    else
+      options[:type] = 'link'
+      options[:url] = params['entry_url']
       options[:title] = params['title']
-    end
-    if params['description'].present?
       options[:description] = params['description']
     end
+
     if params['tags'].present?
       options[:tags] = params['tags']
     end

@@ -7,7 +7,7 @@ class Service
       # child classes using this need to implement add
       status = add(params)
       if status == 200
-        response[:message] = "Link saved to #{klass.label}."
+        response[:message] = "Saved to #{klass.label}."
       elsif status == 401
         klass.remove_access!
         response[:url] = Rails.application.routes.url_helpers.sharing_services_path
