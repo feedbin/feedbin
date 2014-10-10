@@ -95,10 +95,12 @@ class EntryPresenter < BasePresenter
 
   def author
     if entry.author
-      "by " + @template.strip_tags(entry.author)
+      clean_author = @template.strip_tags(entry.author)
+      clean_author = "by " + @template.content_tag(:span, clean_author, class: "author")
     else
-      ''
+      clean_author = ''
     end
+    clean_author.html_safe
   end
 
   def media_size

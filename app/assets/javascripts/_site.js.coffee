@@ -337,6 +337,11 @@ $.extend feedbin,
     description = feedbin.getSelectedText()
     $('.share-form .description-placeholder').val(description)
 
+    source = $('.entry-header .author').first().text()
+    if source == ""
+      source = $('.entry-header .feed-title').first().text()
+    $('.share-form .source-placeholder').val(source)
+
     if feedbin.readabilityActive()
       $('.readability-placeholder').val('on')
     else
@@ -1089,6 +1094,22 @@ $.extend feedbin,
           deferRequestBy: 50
           autoSelectFirst: true
       return
+
+    tumblrType: ->
+      $(document).on 'change', '[data-behavior~=tumblr_type]', ->
+        type = $(@).val()
+        description = $(@).find("option:selected").data('description-name')
+        typeText = $(@).find("option:selected").text()
+        if type == 'quote'
+          $('.share-form .source-placeholder').removeClass('hide')
+          $('.share-form .title-placeholder').addClass('hide')
+        else
+          $('.share-form .source-placeholder').addClass('hide')
+          $('.share-form .title-placeholder').removeClass('hide')
+
+        $('.share-form .type-text').text(typeText)
+        $('.share-form .description-placeholder').attr('placeholder', description)
+
 
 jQuery ->
   $.each feedbin.init, (i, item) ->

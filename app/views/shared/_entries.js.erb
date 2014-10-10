@@ -6,6 +6,16 @@
 
 var header = '<%= j render partial: "entries/entries_header", locals: {feed: @feed || nil} %>';
 
+if ("<%= @all_unread %>" === 'true') {
+    var unreadEntries = <%=  @entries.map {|entry| {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}}.to_json.html_safe %>;
+    $.each(unreadEntries, function(index, unreadEntry) {
+        if (feedbin.Counts.get().isRead(unreadEntry.id)) {
+            feedbin.Counts.get().addEntry(unreadEntry.id, unreadEntry.feed_id, unreadEntry.published, 'unread')
+        }
+    });
+    feedbin.applyCounts(true);
+}
+
 <% if @append %>
 	feedbin.appendEntries(entries, header);
 <% else %>
