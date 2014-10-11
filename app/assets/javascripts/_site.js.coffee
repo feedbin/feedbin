@@ -1053,30 +1053,19 @@ $.extend feedbin,
         $('[data-behavior~=class_target]').removeClass("entries-block")
         $('[data-behavior~=class_target]').addClass("entries-#{option}")
 
-      $('[name="user[entries_feed]"]').change (event) ->
-        option = $(@).val()
-        $('[data-behavior~=class_target]').removeClass("entries-feed-on")
-        $('[data-behavior~=class_target]').removeClass("entries-feed-off")
-        $('[data-behavior~=class_target]').addClass("entries-feed-#{option}")
-
-      $('[name="user[entries_time]"]').change (event) ->
-        option = $(@).val()
-        $('[data-behavior~=class_target]').removeClass("entries-time-on")
-        $('[data-behavior~=class_target]').removeClass("entries-time-off")
-        $('[data-behavior~=class_target]').addClass("entries-time-#{option}")
-
-      $('[name="user[entries_body]"]').change (event) ->
-        option = $(@).val()
-        $('[data-behavior~=class_target]').removeClass("entries-body-on")
-        $('[data-behavior~=class_target]').removeClass("entries-body-off")
-        $('[data-behavior~=class_target]').addClass("entries-body-#{option}")
-
       $('[name="user[ui_typeface]"]').change (event) ->
         option = $(@).val()
         $('[data-behavior~=class_target]').removeClass("ui-font-default")
         $('[data-behavior~=class_target]').removeClass("ui-font-sans-serif-1")
         $('[data-behavior~=class_target]').removeClass("ui-font-sans-serif-2")
         $('[data-behavior~=class_target]').addClass(option)
+
+      $(document).on 'click', '[data-behavior~=appearance_checkbox]', (event) ->
+        checked = if $(@).is(':checked') then '1' else '0'
+        id = $(@).attr('id')
+        $('[data-behavior~=class_target]').removeClass("#{id}_1")
+        $('[data-behavior~=class_target]').removeClass("#{id}_0")
+        $('[data-behavior~=class_target]').addClass("#{id}_#{checked}")
 
     # responsiveTextSize: ->
     #   $('[data-behavior~=responsive_text_size]').flowtype

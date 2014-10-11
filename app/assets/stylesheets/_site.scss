@@ -1154,11 +1154,14 @@ th {
 }
 
 .inset {
-	background-color: #FFF;
+	background-color: #fafafa;
 	border-radius: 8px;
 	border: 1px solid $border-color;
 	margin: 0 0 20px 0;
-	padding: 30px;
+	padding: 30px 0 30px 0;
+	.inset-content {
+		padding: 0 30px 0 30px;
+	}
 }
 
 
@@ -2215,27 +2218,27 @@ $saved-search-control-height: 48px;
 	}
 }
 
-.entries-feed-off .entries {
+.user_entries_feed_0 .entries {
 	.feed-title {
 		display: none;
 	}
 }
-.entries-feed-off.entries-inline .entries {
+.user_entries_feed_0.entries-inline .entries {
 	.title-wrap {
 		padding-left: 0;
 	}
 }
-.entries-time-off .entries {
+.user_entries_time_0 .entries {
 	.time {
 		display: none;
 	}
 }
-.entries-time-off.entries-inline .entries {
+.user_entries_time_0.entries-inline .entries {
 	.title-wrap {
 		padding-right: 0;
 	}
 }
-.entries-body-off .entries {
+.user_entries_body_0 .entries {
 	.body {
 		display: none;
 	}
@@ -3491,13 +3494,67 @@ Settings
 			color: #b6b6b6;
 		}
 	}
-	.radio-group {
-		label {
-			display: inline;
+	.control-group {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: 1px solid $border-color;
+		margin-bottom: 30px;
+		li {
+			margin: 0;
+			padding: 0;
 		}
-		input[type="radio"] {
+		input[type="radio"], input[type="checkbox"] {
+			display: none;
+		}
+		input[type="radio"]:checked + label {
 			position: relative;
-			top: -2px;
+			&:after {
+				position: absolute;
+				right: 37px;
+				top: 19px;
+				content: "";
+				background: image-url("icon-check.svg") 0 0 no-repeat;
+				height: 12px;
+				width: 15px;
+			}
+		}
+		input[type="checkbox"] + label .slider-checkbox {
+			width: 56px;
+			height: 27px;
+			display: block;
+			position: absolute;
+			right: 30px;
+			top: 10px;
+			border-radius: 28px;
+			background-color: #9e9e9e;
+			&:after {
+				position: absolute;
+				display: block;
+				content: "";
+				height: 23px;
+				width: 23px;
+				border-radius: 23px;
+				background-color: #FFF;
+				left: 2px;
+				top: 2px;
+				transition: left .2s ease;
+			}
+		}
+		input[type="checkbox"]:checked + label .slider-checkbox {
+			background-color: $selected;
+			&:after {
+				left: 30px;
+				background: #FFF image-url("icon-check.svg") 4px 6px no-repeat;
+			}
+		}
+		label {
+			position: relative;
+			user-select: none;
+			background-color: #FFF;
+			border-bottom: 1px solid $border-color;
+			padding: 15px 30px;
+			display: block;
 		}
 	}
 	.starred-field {
@@ -3541,6 +3598,11 @@ Settings
 	h4 {
 		font-size: 18px;
 		margin: 0 0 10px 0;
+	}
+	h4.group-header {
+		text-transform: uppercase;
+		color: #878787;
+		font-size: 14px;
 	}
 	h3.box-header {
 		margin: 0;
@@ -3768,16 +3830,19 @@ Settings
 	}
 	.theme-day {
 		.theme-button-day {
+			background-color: #FFF;
 			border-color: $selected;
 		}
 	}
 	.theme-sunset {
 		.theme-button-sunset {
+			background-color: #FFF;
 			border-color: $selected;
 		}
 	}
 	.theme-night {
 		.theme-button-night {
+			background-color: #FFF;
 			border-color: $selected;
 		}
 	}

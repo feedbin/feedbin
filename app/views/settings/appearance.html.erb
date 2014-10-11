@@ -3,97 +3,121 @@
   <h3>Customize Feedbin</h3>
 
   <div class="inset theme-<%= @user.theme || 'day' %>" data-behavior="theme_class_target">
-    <div class="theme-wrap">
 
-      <%= link_to settings_theme_path(theme: 'day'), remote: true, method: :post, class: 'theme-button theme-button-day', title: 'Switch to day theme', data: {behavior: 'switch_theme', theme: 'day'} do %>
-        <span class="theme-name">Day</span>
-        <span class="mini-feedbin"></span>
-      <% end %>
+    <div class="inset-content">
+      <div class="theme-wrap">
 
-      <%= link_to settings_theme_path(theme: 'sunset'), remote: true, method: :post, class: 'theme-button theme-button-sunset', title: 'Switch to sunset theme', data: {behavior: 'switch_theme', theme: 'sunset'} do %>
-        <span class="theme-name">Sunset</span>
-        <span class="mini-feedbin"></span>
-      <% end %>
+        <%= link_to settings_theme_path(theme: 'day'), remote: true, method: :post, class: 'theme-button theme-button-day', title: 'Switch to day theme', data: {behavior: 'switch_theme', theme: 'day'} do %>
+          <span class="theme-name">Day</span>
+          <span class="mini-feedbin"></span>
+        <% end %>
 
-      <%= link_to settings_theme_path(theme: 'night'), remote: true, method: :post, class: 'theme-button theme-button-night', title: 'Switch to night theme', data: {behavior: 'switch_theme', theme: 'night'} do %>
-        <span class="theme-name">Night</span>
-        <span class="mini-feedbin"></span>
-      <% end %>
+        <%= link_to settings_theme_path(theme: 'sunset'), remote: true, method: :post, class: 'theme-button theme-button-sunset', title: 'Switch to sunset theme', data: {behavior: 'switch_theme', theme: 'sunset'} do %>
+          <span class="theme-name">Sunset</span>
+          <span class="mini-feedbin"></span>
+        <% end %>
 
-    </div>
+        <%= link_to settings_theme_path(theme: 'night'), remote: true, method: :post, class: 'theme-button theme-button-night', title: 'Switch to night theme', data: {behavior: 'switch_theme', theme: 'night'} do %>
+          <span class="theme-name">Night</span>
+          <span class="mini-feedbin"></span>
+        <% end %>
 
-    <div class="<%= @classes %>" data-behavior="class_target">
-      <div class="entries">
-        <ul>
-          <li data-behavior="responsive_text_size">
-            <span class="wrap">
-              <span class="entries-inner-wrap">
-                <span class="favicon-wrap">
-                  <span class="favicon favicon-feedbin-com"></span>
-                </span>
-                <p class="feed-title">Food in Jars</p>
-                <time class="time">1h</time>
-                <span class="title-wrap">
-                  <h2 class="title">
-                    <span class="favicon-wrap">
-                      <span class="favicon favicon-feedbin-com"></span>
-                    </span>
-                    Spicy Peach and Yellow Tomato Jam
-                  </h2>
-                  <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
-                </span>
-              </span>
-            </span>
-          </li>
-        </ul>
       </div>
     </div>
 
+    <div class="inset-content">
+      <div class="<%= @classes %>" data-behavior="class_target">
+        <div class="entries">
+          <ul>
+            <li data-behavior="responsive_text_size">
+              <span class="wrap">
+                <span class="entries-inner-wrap">
+                  <span class="favicon-wrap">
+                    <span class="favicon favicon-feedbin-com"></span>
+                  </span>
+                  <p class="feed-title">Food in Jars</p>
+                  <time class="time">1h</time>
+                  <span class="title-wrap">
+                    <h2 class="title">
+                      <span class="favicon-wrap">
+                        <span class="favicon favicon-feedbin-com"></span>
+                      </span>
+                      Spicy Peach and Yellow Tomato Jam
+                    </h2>
+                    <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
+                  </span>
+                </span>
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
     <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
       <%= hidden_field_tag :redirect_to, settings_appearance_url %>
-      <p class="radio-group">
-        Display:
-        <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block'}) %>
-        <%= f.label(:entries_display_block, "Block") %>
-        <%= f.radio_button(:entries_display, "inline") %>
-        <%= f.label(:entries_display_inline, "Inline") %>
-      </p>
-      <p class="radio-group">
-        Feed Name:
-        <%= f.radio_button(:entries_feed, "on", {checked: @user.entries_feed.nil? || @user.entries_feed === 'on'}) %>
-        <%= f.label(:entries_feed_on, "On") %>
-        <%= f.radio_button(:entries_feed, "off") %>
-        <%= f.label(:entries_feed_off, "Off") %>
-      </p>
-      <p class="radio-group">
-        Date:
-        <%= f.radio_button(:entries_time, "on", {checked: @user.entries_time.nil? || @user.entries_time === 'on'}) %>
-        <%= f.label(:entries_time_on, "On") %>
-        <%= f.radio_button(:entries_time, "off") %>
-        <%= f.label(:entries_time_off, "Off") %>
-      </p>
-      <p class="radio-group">
-        Summary:
-        <%= f.radio_button(:entries_body, "on", {checked: @user.entries_body.nil? || @user.entries_body === 'on'}) %>
-        <%= f.label(:entries_body_on, "On") %>
-        <%= f.radio_button(:entries_body, "off") %>
-        <%= f.label(:entries_body_off, "Off") %>
-      </p>
 
-      <p>
-        Typeface
-        <label class="radio">
-          <%= f.radio_button(:ui_typeface, "ui-font-default", {checked: @user.ui_typeface.nil? || @user.ui_typeface === 'ui-font-default'}) %> Default
-        </label>
-        <label class="radio">
-          <%= f.radio_button(:ui_typeface, "ui-font-sans-serif-2") %> Ideal Sans
-        </label>
-        <label class="radio">
-          <%= f.radio_button(:ui_typeface, "ui-font-sans-serif-1") %> Whitney
-        </label>
-      </p>
+      <div class="inset-content">
+        <h4 class="group-header">Summary Display</h4>
+      </div>
+      <ul class="control-group">
+        <li>
+          <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block'}) %>
+          <%= f.label(:entries_display_block, "Block") %>
+        </li>
+        <li>
+          <%= f.radio_button(:entries_display, "inline") %>
+          <%= f.label(:entries_display_inline, "Inline") %>
+        </li>
+      </ul>
 
-      <%= f.submit "Save", class: 'button' %>
+      <div class="inset-content">
+        <h4 class="group-header">Interface Elements</h4>
+      </div>
+      <ul class="control-group">
+        <li>
+          <%= f.check_box :entries_feed, {checked: @user.entries_feed.nil? || @user.entries_feed == '1', data: {behavior: 'appearance_checkbox'} } %>
+          <%= f.label :entries_feed do %>
+            Feed Name <span class="slider-checkbox"></span>
+          <% end %>
+        </li>
+        <li>
+          <%= f.check_box :entries_time, {checked: @user.entries_time.nil? || @user.entries_time == '1', data: {behavior: 'appearance_checkbox'} } %>
+          <%= f.label :entries_time do %>
+            Date <span class="slider-checkbox"></span>
+          <% end %>
+        </li>
+        <li>
+          <%= f.check_box :entries_body, {checked: @user.entries_body.nil? || @user.entries_body == '1', data: {behavior: 'appearance_checkbox'} } %>
+          <%= f.label :entries_body do %>
+            Summary <span class="slider-checkbox"></span>
+          <% end %>
+        </li>
+      </ul>
+
+      <div class="inset-content">
+        <h4 class="group-header">Typeface</h4>
+      </div>
+      <ul class="control-group">
+        <li>
+          <%= f.radio_button(:ui_typeface, "ui-font-default", {checked: @user.ui_typeface.nil? || @user.ui_typeface === 'ui-font-default'}) %>
+          <%= f.label('ui_typeface_ui-font-default', "Default") %>
+        </li>
+        <li>
+          <%= f.radio_button(:ui_typeface, "ui-font-sans-serif-2") %>
+          <%= f.label('ui_typeface_ui-font-sans-serif-2', "Ideal Sans") %>
+        </li>
+        <li>
+          <%= f.radio_button(:ui_typeface, "ui-font-sans-serif-1") %>
+          <%= f.label('ui_typeface_ui-font-sans-serif-1', "Whitney") %>
+        </li>
+      </ul>
+
+      <div class="inset-content">
+        <%= f.submit "Save", class: 'button' %>
+      </div>
+
     <% end %>
   </div>
 </div>
