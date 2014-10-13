@@ -419,7 +419,7 @@ $.extend feedbin,
   init:
 
     hasTouch: ->
-      if ('ontouchstart' in document)
+      if 'ontouchstart' of document
         $('body').addClass('touch')
 
     changeSearchSort: (sort) ->
@@ -1066,11 +1066,6 @@ $.extend feedbin,
         $('[data-behavior~=class_target]').removeClass("#{setting}-0")
         $('[data-behavior~=class_target]').addClass("#{setting}-#{checked}")
 
-    # responsiveTextSize: ->
-    #   $('[data-behavior~=responsive_text_size]').flowtype
-    #     minimum : 500,
-    #     maximum : 1200
-
     generalAutocomplete: ->
       autocompleteFields = $('[data-behavior~=autocomplete_field]')
       $.each autocompleteFields, (i, field) ->
@@ -1083,13 +1078,32 @@ $.extend feedbin,
           autoSelectFirst: true
       return
 
-    scrollToFixed: ->
-      $('.preview-group').scrollToFixed();
+    entriesMaxWidth: ->
+      container = $('[data-behavior~=entries_max_width]')
+      resize = ->
+        windowWidth = $(window).width()
+        if windowWidth < 528
+          width = windowWidth - 100
+        else if windowWidth < 1083
+          width = windowWidth - 350
+        $('.entries-display-inline .entries').css({"max-width": "#{width}px"})
+      if container
+        throttledResize = _.throttle(resize, 50)
+        $(window).on('resize', throttledResize);
+        resize()
 
-    fixHeight: ->
-      height = $('[data-behavior~=fix_height]').outerHeight();
-      if height
-        $('[data-behavior~=fix_height]').css({height: "#{height}px"})
+
+    minHeight: ->
+      container = $('[data-behavior~=preview_min_height]')
+      minHeight = 85
+      if container.length > 0
+        if container.outerHeight() > minHeight
+          minHeight = container.outerHeight()
+        container.css(height: "#{minHeight}px")
+
+    scrollToFixed: ->
+      unless 'ontouchstart' of document
+        $('.preview-group').scrollToFixed()
 
     tumblrType: ->
       $(document).on 'change', '[data-behavior~=tumblr_type]', ->

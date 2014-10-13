@@ -3459,7 +3459,11 @@ Settings
 	font-size: 16px;
 	background-color: $list-background-color-night;
 	color: #333;
-	display: table;
+	.settings-inner {
+		height: 100%;
+		width: 100%;
+		display: table;
+	}
 	.bar {
 		display: none;
 		@media (max-width: 528px) {
@@ -3649,9 +3653,7 @@ Settings
 	}
 	h3 {
 		font-size: 18px;
-		border-bottom: 1px solid #DCDEE0;
 		margin: 18px 0 15px 0;
-		padding-bottom: 7px;
 		&.no-margin {
 			margin-bottom: 0;
 		}
@@ -3907,7 +3909,6 @@ Settings
 		}
 	}
 	.preview-group {
-		width: 841px;
 		z-index: 1000;
 		background-color: #fafafa;
 		margin-bottom: 30px;
@@ -3929,7 +3930,7 @@ Settings
 		margin-right: auto;
 	}
 	.entries-display-block .entries {
-		max-width: 320px;
+		max-width: 320px !important;
 	}
 	.entries-display-inline .entries {
 		max-width: 100%;
@@ -5282,7 +5283,7 @@ Print
 		max-width: 100%;
 		padding: 0;
 	}
-	.feed-title {
+	.entry-header .feed-title {
 		display: block !important;
 	}
 	a[href^="http://"]:after, a[href^="https://"]:after {
@@ -5641,7 +5642,7 @@ Media Queries
 	.entry-header h1 {
 		font-size: 1.6em;
 	}
-	.feed-title {
+	.entry-header .feed-title {
 		display: block !important;
 	}
 	.mobile-hide {
