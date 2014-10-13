@@ -2,78 +2,70 @@
   <h2>Appearance</h2>
   <h3>Customize Feedbin</h3>
 
-  <div class="inset theme-<%= @user.theme || 'day' %>" data-behavior="theme_class_target">
+  <div class="inset theme-<%= @user.theme || 'day' %>">
 
     <div class="preview-group">
       <div class="inset-content">
         <h4 class="group-header">Preview</h4>
       </div>
       <ul class="control-group">
-        <li data-behavior="fix_height">
+        <li>
           <div class="inset-content">
-            <div class="<%= @classes %>" data-behavior="class_target">
-              <div class="entries">
-                <ul>
-                  <li data-behavior="responsive_text_size">
-                    <span class="wrap">
-                      <span class="entries-inner-wrap">
-                        <span class="favicon-wrap">
-                          <span class="favicon favicon-feedbin-com"></span>
-                        </span>
-                        <p class="feed-title">Food in Jars</p>
-                        <time class="time">1h</time>
-                        <span class="title-wrap">
-                          <h2 class="title">
-                            <span class="favicon-wrap">
-                              <span class="favicon favicon-feedbin-com"></span>
-                            </span>
-                            Spicy Peach and Yellow Tomato Jam
-                          </h2>
-                          <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
+            <div class="<%= @classes %>" data-behavior="class_target" style="height: 80px;">
+
+              <div class="entries-wrap">
+                <div class="entries">
+                  <ul>
+                    <li data-behavior="responsive_text_size">
+                      <span class="wrap">
+                        <span class="entries-inner-wrap">
+                          <span class="favicon-wrap">
+                            <span class="favicon" style="background: url(https://www.google.com/s2/favicons?domain=foodinjars.com);"></span>
+                          </span>
+                          <p class="feed-title">Food in Jars</p>
+                          <time class="time">1h</time>
+                          <span class="title-wrap">
+                            <h2 class="title">
+                              <span class="favicon-wrap">
+                                <span class="favicon" style="background: url(https://www.google.com/s2/favicons?domain=foodinjars.com);"></span>
+                              </span>
+                              Spicy Peach and Yellow Tomato Jam
+                            </h2>
+                            <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
+                          </span>
                         </span>
                       </span>
-                    </span>
-                  </li>
-                </ul>
+                    </li>
+                  </ul>
+                </div>
               </div>
+
             </div>
           </div>
         </li>
       </ul>
     </div>
 
-
-    <div class="inset-content">
-      <h4 class="group-header">Theme</h4>
-    </div>
-    <ul class="control-group">
-      <li>
-        <div class="inset-content">
-          <div class="theme-wrap">
-
-            <%= link_to settings_theme_path(theme: 'day'), remote: true, method: :post, class: 'theme-button theme-button-day', title: 'Switch to day theme', data: {behavior: 'switch_theme', theme: 'day'} do %>
-              <span class="theme-name">Day</span>
-              <span class="mini-feedbin"></span>
-            <% end %>
-
-            <%= link_to settings_theme_path(theme: 'sunset'), remote: true, method: :post, class: 'theme-button theme-button-sunset', title: 'Switch to sunset theme', data: {behavior: 'switch_theme', theme: 'sunset'} do %>
-              <span class="theme-name">Sunset</span>
-              <span class="mini-feedbin"></span>
-            <% end %>
-
-            <%= link_to settings_theme_path(theme: 'night'), remote: true, method: :post, class: 'theme-button theme-button-night', title: 'Switch to night theme', data: {behavior: 'switch_theme', theme: 'night'} do %>
-              <span class="theme-name">Night</span>
-              <span class="mini-feedbin"></span>
-            <% end %>
-
-          </div>
-        </div>
-      </li>
-    </ul>
-
-
     <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
       <%= hidden_field_tag :redirect_to, settings_appearance_url %>
+
+      <div class="inset-content">
+        <h4 class="group-header">Theme</h4>
+      </div>
+      <ul class="control-group control-group-form">
+        <li>
+          <%= f.radio_button(:theme, "day", {checked: @user.theme.nil? || @user.theme === 'day', data: {behavior: 'appearance_radio', setting: 'theme'}}) %>
+          <%= f.label(:theme_day, "Day") %>
+        </li>
+        <li>
+          <%= f.radio_button(:theme, "sunset", {data: {behavior: 'appearance_radio', setting: 'theme'}}) %>
+          <%= f.label(:theme_sunset, "Sunset") %>
+        </li>
+        <li>
+          <%= f.radio_button(:theme, "night", {data: {behavior: 'appearance_radio', setting: 'theme'}}) %>
+          <%= f.label(:theme_night, "Night") %>
+        </li>
+      </ul>
 
       <div class="inset-content">
         <h4 class="group-header">Summary Display</h4>
@@ -81,7 +73,7 @@
       <ul class="control-group control-group-form">
         <li>
           <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block'}) %>
-          <%= f.label(:entries_display_block, "Block") %>
+          <%= f.label(:entries_display_block, "Default") %>
         </li>
         <li>
           <%= f.radio_button(:entries_display, "inline") %>

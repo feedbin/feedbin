@@ -3507,6 +3507,7 @@ Settings
 		border-top: 1px solid $border-color;
 		margin-bottom: 30px;
 		li {
+			line-height: 1;
 			margin: 0;
 			position: relative;
 			background-color: #FFF;
@@ -3521,12 +3522,12 @@ Settings
 		padding: 0;
 		border-top: 1px solid $border-color;
 		margin-bottom: 30px;
+		background-color: #FFF;
 		> li {
 			margin: 0;
 			padding: 0;
 			border-bottom: 1px solid $border-color;
 			padding: 15px 30px;
-			background-color: #FFF;
 		}
 	}
 	.control-group-form {
@@ -3535,6 +3536,7 @@ Settings
 			border: none;
 		}
 		label {
+			line-height: 1;
 			position: relative;
 			user-select: none;
 			border-bottom: 1px solid $border-color;
@@ -3584,6 +3586,36 @@ Settings
 				left: 30px;
 				background: #FFF image-url("icon-check.svg") 4px 6px no-repeat;
 			}
+		}
+	}
+	input[name="user[theme]"] + label {
+		padding-left: 50px;
+		&:before {
+			content: "";
+			display: block;
+			height: 16px;
+			width: 16px;
+			position: absolute;
+			left: 30px;
+			top: 15px;
+		}
+	}
+	label[for="user_theme_day"] {
+		&:before {
+			background-color: $body-background-color;
+			border: 1px solid $border-color;
+		}
+	}
+	label[for="user_theme_sunset"] {
+		&:before {
+			background-color: $body-background-color-sunset;
+			border: 1px solid $border-color-sunset;
+		}
+	}
+	label[for="user_theme_night"] {
+		&:before {
+			background-color: $body-background-color-night;
+			border: 1px solid $border-color-night;
 		}
 	}
 	.starred-field {
@@ -3886,11 +3918,21 @@ Settings
 			box-shadow: 0 2px 2px -1px rgba(0,0,0,.2);
 		}
 	}
+	.entries-wrap {
+		display: flex;
+		align-items: center;
+		height: 100%;
+	}
 	.entries {
 		position: static;
-		max-width: 520px;
 		margin-left: auto;
 		margin-right: auto;
+	}
+	.entries-block .entries {
+		max-width: 320px;
+	}
+	.entries-inline .entries {
+		max-width: 100%;
 	}
 	.entries ul {
 		list-style: none;

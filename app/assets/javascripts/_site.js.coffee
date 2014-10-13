@@ -1060,6 +1060,17 @@ $.extend feedbin,
         $('[data-behavior~=class_target]').removeClass("ui-font-sans-serif-2")
         $('[data-behavior~=class_target]').addClass(option)
 
+      $('[data-behavior~=appearance_radio]').on 'change', (event) ->
+        selected = $(@).val()
+        setting = $(@).data('setting')
+        name = $(@).attr('name')
+
+        $("[name='#{name}']").each ->
+          option = $(@).val()
+          $('[data-behavior~=class_target]').removeClass("#{setting}-#{option}")
+
+        $('[data-behavior~=class_target]').addClass("#{setting}-#{selected}")
+
       $(document).on 'click', '[data-behavior~=appearance_checkbox]', (event) ->
         checked = if $(@).is(':checked') then '1' else '0'
         id = $(@).attr('id')
