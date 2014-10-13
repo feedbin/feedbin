@@ -2179,7 +2179,7 @@ $saved-search-control-height: 48px;
 	}
 }
 
-.entries-inline .entries {
+.entries-display-inline .entries {
 	.entries-inner-wrap {
 		padding-top: 8px;
 		padding-bottom: 8px;
@@ -2218,27 +2218,27 @@ $saved-search-control-height: 48px;
 	}
 }
 
-.user_entries_feed_0 .entries {
+.entries-feed-0 .entries {
 	.feed-title {
 		display: none;
 	}
 }
-.user_entries_feed_0.entries-inline .entries {
+.entries-feed-0.entries-display-inline .entries {
 	.title-wrap {
 		padding-left: 0;
 	}
 }
-.user_entries_time_0 .entries {
+.entries-time-0 .entries {
 	.time {
 		display: none;
 	}
 }
-.user_entries_time_0.entries-inline .entries {
+.entries-time-0.entries-display-inline .entries {
 	.title-wrap {
 		padding-right: 0;
 	}
 }
-.user_entries_body_0 .entries {
+.entries-body-0 .entries {
 	.body {
 		display: none;
 	}
@@ -3928,10 +3928,10 @@ Settings
 		margin-left: auto;
 		margin-right: auto;
 	}
-	.entries-block .entries {
+	.entries-display-block .entries {
 		max-width: 320px;
 	}
-	.entries-inline .entries {
+	.entries-display-inline .entries {
 		max-width: 100%;
 	}
 	.entries ul {

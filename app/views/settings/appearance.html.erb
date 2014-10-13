@@ -72,11 +72,11 @@
       </div>
       <ul class="control-group control-group-form">
         <li>
-          <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block'}) %>
+          <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block', data: {behavior: 'appearance_radio', setting: 'entries-display'}}) %>
           <%= f.label(:entries_display_block, "Default") %>
         </li>
         <li>
-          <%= f.radio_button(:entries_display, "inline") %>
+          <%= f.radio_button(:entries_display, "inline", {data: {behavior: 'appearance_radio', setting: 'entries-display'}}) %>
           <%= f.label(:entries_display_inline, "Inline") %>
         </li>
       </ul>
@@ -86,19 +86,19 @@
       </div>
       <ul class="control-group control-group-form">
         <li>
-          <%= f.check_box :entries_feed, {checked: @user.entries_feed.nil? || @user.entries_feed == '1', data: {behavior: 'appearance_checkbox'} } %>
+          <%= f.check_box :entries_feed, {checked: @user.entries_feed.nil? || @user.entries_feed == '1', data: {behavior: 'appearance_checkbox', setting: 'entries-feed'} } %>
           <%= f.label :entries_feed do %>
             Feed Name <span class="slider-checkbox"></span>
           <% end %>
         </li>
         <li>
-          <%= f.check_box :entries_time, {checked: @user.entries_time.nil? || @user.entries_time == '1', data: {behavior: 'appearance_checkbox'} } %>
+          <%= f.check_box :entries_time, {checked: @user.entries_time.nil? || @user.entries_time == '1', data: {behavior: 'appearance_checkbox', setting: 'entries-time'} } %>
           <%= f.label :entries_time do %>
             Date <span class="slider-checkbox"></span>
           <% end %>
         </li>
         <li>
-          <%= f.check_box :entries_body, {checked: @user.entries_body.nil? || @user.entries_body == '1', data: {behavior: 'appearance_checkbox'} } %>
+          <%= f.check_box :entries_body, {checked: @user.entries_body.nil? || @user.entries_body == '1', data: {behavior: 'appearance_checkbox', setting: 'entries-body'} } %>
           <%= f.label :entries_body do %>
             Summary <span class="slider-checkbox"></span>
           <% end %>
@@ -110,16 +110,16 @@
       </div>
       <ul class="control-group control-group-form">
         <li>
-          <%= f.radio_button(:ui_typeface, "ui-font-default", {checked: @user.ui_typeface.nil? || @user.ui_typeface === 'ui-font-default'}) %>
-          <%= f.label('ui_typeface_ui-font-default', "Default") %>
+          <%= f.radio_button(:ui_typeface, "default", {checked: @user.ui_typeface.nil? || @user.ui_typeface === 'default', data: {behavior: 'appearance_radio', setting: 'ui-font'}}) %>
+          <%= f.label('ui_typeface_default', "Default") %>
         </li>
         <li>
-          <%= f.radio_button(:ui_typeface, "ui-font-sans-serif-2") %>
-          <%= f.label('ui_typeface_ui-font-sans-serif-2', "Ideal Sans") %>
+          <%= f.radio_button(:ui_typeface, "sans-serif-2", {data: {behavior: 'appearance_radio', setting: 'ui-font'}}) %>
+          <%= f.label('ui_typeface_sans-serif-2', "Ideal Sans") %>
         </li>
         <li>
-          <%= f.radio_button(:ui_typeface, "ui-font-sans-serif-1") %>
-          <%= f.label('ui_typeface_ui-font-sans-serif-1', "Whitney") %>
+          <%= f.radio_button(:ui_typeface, "sans-serif-1", {data: {behavior: 'appearance_radio', setting: 'ui-font'}}) %>
+          <%= f.label('ui_typeface_sans-serif-1', "Whitney") %>
         </li>
       </ul>
 

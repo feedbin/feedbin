@@ -830,10 +830,10 @@ $.extend feedbin,
     theme: ->
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
         theme = $(@).data('theme')
-        $('[data-behavior~=class_target], [data-behavior~=theme_class_target]').removeClass('theme-day')
-        $('[data-behavior~=class_target], [data-behavior~=theme_class_target]').removeClass('theme-sunset')
-        $('[data-behavior~=class_target], [data-behavior~=theme_class_target]').removeClass('theme-night')
-        $('[data-behavior~=class_target], [data-behavior~=theme_class_target]').addClass("theme-#{theme}")
+        $('[data-behavior~=class_target]').removeClass('theme-day')
+        $('[data-behavior~=class_target]').removeClass('theme-sunset')
+        $('[data-behavior~=class_target]').removeClass('theme-night')
+        $('[data-behavior~=class_target]').addClass("theme-#{theme}")
         event.preventDefault()
         return
 
@@ -1046,20 +1046,7 @@ $.extend feedbin,
         $('.feed-form').html(suggestions)
       return
 
-    displaySettings: ->
-      $('[name="user[entries_display]"]').change (event) ->
-        option = $(@).val()
-        $('[data-behavior~=class_target]').removeClass("entries-inline")
-        $('[data-behavior~=class_target]').removeClass("entries-block")
-        $('[data-behavior~=class_target]').addClass("entries-#{option}")
-
-      $('[name="user[ui_typeface]"]').change (event) ->
-        option = $(@).val()
-        $('[data-behavior~=class_target]').removeClass("ui-font-default")
-        $('[data-behavior~=class_target]').removeClass("ui-font-sans-serif-1")
-        $('[data-behavior~=class_target]').removeClass("ui-font-sans-serif-2")
-        $('[data-behavior~=class_target]').addClass(option)
-
+    appearanceRadio: ->
       $('[data-behavior~=appearance_radio]').on 'change', (event) ->
         selected = $(@).val()
         setting = $(@).data('setting')
@@ -1071,12 +1058,13 @@ $.extend feedbin,
 
         $('[data-behavior~=class_target]').addClass("#{setting}-#{selected}")
 
+    appearanceCheckbox: ->
       $(document).on 'click', '[data-behavior~=appearance_checkbox]', (event) ->
         checked = if $(@).is(':checked') then '1' else '0'
-        id = $(@).attr('id')
-        $('[data-behavior~=class_target]').removeClass("#{id}_1")
-        $('[data-behavior~=class_target]').removeClass("#{id}_0")
-        $('[data-behavior~=class_target]').addClass("#{id}_#{checked}")
+        setting = $(@).data('setting')
+        $('[data-behavior~=class_target]').removeClass("#{setting}-1")
+        $('[data-behavior~=class_target]').removeClass("#{setting}-0")
+        $('[data-behavior~=class_target]').addClass("#{setting}-#{checked}")
 
     # responsiveTextSize: ->
     #   $('[data-behavior~=responsive_text_size]').flowtype
