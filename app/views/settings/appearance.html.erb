@@ -4,55 +4,72 @@
 
   <div class="inset theme-<%= @user.theme || 'day' %>" data-behavior="theme_class_target">
 
-    <div class="inset-content">
-      <div class="theme-wrap">
-
-        <%= link_to settings_theme_path(theme: 'day'), remote: true, method: :post, class: 'theme-button theme-button-day', title: 'Switch to day theme', data: {behavior: 'switch_theme', theme: 'day'} do %>
-          <span class="theme-name">Day</span>
-          <span class="mini-feedbin"></span>
-        <% end %>
-
-        <%= link_to settings_theme_path(theme: 'sunset'), remote: true, method: :post, class: 'theme-button theme-button-sunset', title: 'Switch to sunset theme', data: {behavior: 'switch_theme', theme: 'sunset'} do %>
-          <span class="theme-name">Sunset</span>
-          <span class="mini-feedbin"></span>
-        <% end %>
-
-        <%= link_to settings_theme_path(theme: 'night'), remote: true, method: :post, class: 'theme-button theme-button-night', title: 'Switch to night theme', data: {behavior: 'switch_theme', theme: 'night'} do %>
-          <span class="theme-name">Night</span>
-          <span class="mini-feedbin"></span>
-        <% end %>
-
+    <div class="preview-group">
+      <div class="inset-content">
+        <h4 class="group-header">Preview</h4>
       </div>
-    </div>
-
-    <div class="inset-content">
-      <div class="<%= @classes %>" data-behavior="class_target">
-        <div class="entries">
-          <ul>
-            <li data-behavior="responsive_text_size">
-              <span class="wrap">
-                <span class="entries-inner-wrap">
-                  <span class="favicon-wrap">
-                    <span class="favicon favicon-feedbin-com"></span>
-                  </span>
-                  <p class="feed-title">Food in Jars</p>
-                  <time class="time">1h</time>
-                  <span class="title-wrap">
-                    <h2 class="title">
-                      <span class="favicon-wrap">
-                        <span class="favicon favicon-feedbin-com"></span>
+      <ul class="control-group">
+        <li data-behavior="fix_height">
+          <div class="inset-content">
+            <div class="<%= @classes %>" data-behavior="class_target">
+              <div class="entries">
+                <ul>
+                  <li data-behavior="responsive_text_size">
+                    <span class="wrap">
+                      <span class="entries-inner-wrap">
+                        <span class="favicon-wrap">
+                          <span class="favicon favicon-feedbin-com"></span>
+                        </span>
+                        <p class="feed-title">Food in Jars</p>
+                        <time class="time">1h</time>
+                        <span class="title-wrap">
+                          <h2 class="title">
+                            <span class="favicon-wrap">
+                              <span class="favicon favicon-feedbin-com"></span>
+                            </span>
+                            Spicy Peach and Yellow Tomato Jam
+                          </h2>
+                          <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
+                        </span>
                       </span>
-                      Spicy Peach and Yellow Tomato Jam
-                    </h2>
-                    <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
-                  </span>
-                </span>
-              </span>
-            </li>
-          </ul>
-        </div>
-      </div>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
+
+
+    <div class="inset-content">
+      <h4 class="group-header">Theme</h4>
+    </div>
+    <ul class="control-group">
+      <li>
+        <div class="inset-content">
+          <div class="theme-wrap">
+
+            <%= link_to settings_theme_path(theme: 'day'), remote: true, method: :post, class: 'theme-button theme-button-day', title: 'Switch to day theme', data: {behavior: 'switch_theme', theme: 'day'} do %>
+              <span class="theme-name">Day</span>
+              <span class="mini-feedbin"></span>
+            <% end %>
+
+            <%= link_to settings_theme_path(theme: 'sunset'), remote: true, method: :post, class: 'theme-button theme-button-sunset', title: 'Switch to sunset theme', data: {behavior: 'switch_theme', theme: 'sunset'} do %>
+              <span class="theme-name">Sunset</span>
+              <span class="mini-feedbin"></span>
+            <% end %>
+
+            <%= link_to settings_theme_path(theme: 'night'), remote: true, method: :post, class: 'theme-button theme-button-night', title: 'Switch to night theme', data: {behavior: 'switch_theme', theme: 'night'} do %>
+              <span class="theme-name">Night</span>
+              <span class="mini-feedbin"></span>
+            <% end %>
+
+          </div>
+        </div>
+      </li>
+    </ul>
 
 
     <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
@@ -61,7 +78,7 @@
       <div class="inset-content">
         <h4 class="group-header">Summary Display</h4>
       </div>
-      <ul class="control-group">
+      <ul class="control-group control-group-form">
         <li>
           <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block'}) %>
           <%= f.label(:entries_display_block, "Block") %>
@@ -75,7 +92,7 @@
       <div class="inset-content">
         <h4 class="group-header">Interface Elements</h4>
       </div>
-      <ul class="control-group">
+      <ul class="control-group control-group-form">
         <li>
           <%= f.check_box :entries_feed, {checked: @user.entries_feed.nil? || @user.entries_feed == '1', data: {behavior: 'appearance_checkbox'} } %>
           <%= f.label :entries_feed do %>
@@ -99,7 +116,7 @@
       <div class="inset-content">
         <h4 class="group-header">Typeface</h4>
       </div>
-      <ul class="control-group">
+      <ul class="control-group control-group-form">
         <li>
           <%= f.radio_button(:ui_typeface, "ui-font-default", {checked: @user.ui_typeface.nil? || @user.ui_typeface === 'ui-font-default'}) %>
           <%= f.label('ui_typeface_ui-font-default', "Default") %>

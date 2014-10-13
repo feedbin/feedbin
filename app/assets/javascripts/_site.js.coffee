@@ -1084,6 +1084,14 @@ $.extend feedbin,
           autoSelectFirst: true
       return
 
+    scrollToFixed: ->
+      $('.preview-group').scrollToFixed();
+
+    fixHeight: ->
+      height = $('[data-behavior~=fix_height]').outerHeight();
+      if height
+        $('[data-behavior~=fix_height]').css({height: "#{height}px"})
+
     tumblrType: ->
       $(document).on 'change', '[data-behavior~=tumblr_type]', ->
         type = $(@).val()

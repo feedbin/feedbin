@@ -3500,7 +3500,7 @@ Settings
 			color: #b6b6b6;
 		}
 	}
-	.control-group {
+	.control-list {
 		list-style: none;
 		margin: 0;
 		padding: 0;
@@ -3508,7 +3508,38 @@ Settings
 		margin-bottom: 30px;
 		li {
 			margin: 0;
+			position: relative;
+			background-color: #FFF;
+			border-bottom: 1px solid $border-color;
+			padding: 15px 30px;
+			display: block;
+		}
+	}
+	.control-group {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: 1px solid $border-color;
+		margin-bottom: 30px;
+		> li {
+			margin: 0;
 			padding: 0;
+			border-bottom: 1px solid $border-color;
+			padding: 15px 30px;
+			background-color: #FFF;
+		}
+	}
+	.control-group-form {
+		li {
+			padding: 0;
+			border: none;
+		}
+		label {
+			position: relative;
+			user-select: none;
+			border-bottom: 1px solid $border-color;
+			padding: 15px 30px;
+			display: block;
 		}
 		input[type="radio"], input[type="checkbox"] {
 			display: none;
@@ -3553,14 +3584,6 @@ Settings
 				left: 30px;
 				background: #FFF image-url("icon-check.svg") 4px 6px no-repeat;
 			}
-		}
-		label {
-			position: relative;
-			user-select: none;
-			background-color: #FFF;
-			border-bottom: 1px solid $border-color;
-			padding: 15px 30px;
-			display: block;
 		}
 	}
 	.starred-field {
@@ -3764,12 +3787,11 @@ Settings
 		flex-direction: row;
 		flex-wrap: no-wrap;
 		justify-content: space-around;
-		margin-bottom: 20px;
 	}
 	.theme-button {
 		width: 208px;
-		height: 208px;
-		padding-top: 25px;
+		height: 178px;
+		padding-top: 15px;
 		font-weight: bold;
 		border: 1px solid transparent;
 		border-radius: 4px;
@@ -3852,10 +3874,23 @@ Settings
 			border-color: $selected;
 		}
 	}
+	.preview-group {
+		width: 841px;
+		z-index: 1000;
+		background-color: #fafafa;
+		margin-bottom: 30px;
+		.control-group {
+			margin-bottom: 0;
+		}
+		&.scroll-to-fixed-fixed {
+			box-shadow: 0 2px 2px -1px rgba(0,0,0,.2);
+		}
+	}
 	.entries {
 		position: static;
-		margin-bottom: 20px;
 		max-width: 520px;
+		margin-left: auto;
+		margin-right: auto;
 	}
 	.entries ul {
 		list-style: none;
