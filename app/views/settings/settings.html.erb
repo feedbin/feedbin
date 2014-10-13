@@ -1,69 +1,98 @@
-<div class="settings-content-inner">
+<div class="settings-content-inner-wide">
   <h2>Settings</h2>
 
-  <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
-    <h3>Reading</h3>
-    <p>
-      <%= label_tag nil do %>
-        Sort unread entries by <%= f.select :entry_sort, options_for_select([['Newest first', 'DESC'], ['Oldest first', 'ASC']], @user.entry_sort || 'DESC') %>
+  <div class="inset">
+
+    <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
+
+      <div class="inset-content">
+        <h4 class="group-header">Unread Sort</h4>
+      </div>
+      <ul class="control-group control-group-form">
+        <li>
+          <%= f.radio_button(:entry_sort, "DESC", {checked: @user.entry_sort.nil? || @user.entry_sort === 'DESC'}) %>
+          <%= f.label('entry_sort_desc', "Newest First") %>
+        </li>
+        <li>
+          <%= f.radio_button(:entry_sort, "ASC") %>
+          <%= f.label('entry_sort_asc', "Oldest First") %>
+        </li>
+      </ul>
+
+      <ul class="control-group control-group-form">
+        <li>
+          <%= f.check_box :precache_images %>
+          <%= f.label :precache_images do %>
+            Preload images <span class="slider-checkbox"></span>
+          <% end %>
+        </li>
+      </ul>
+      <p class="control-group-description">
+        Images for unread entries will be loaded in the background when viewing a feed. Not recommended with limited data/bandwidth.
+      </p>
+
+      <ul class="control-group control-group-form">
+        <li>
+          <%= f.check_box :sticky_view_inline %>
+          <%= f.label :sticky_view_inline do %>
+            Sticky Readability <span class="slider-checkbox"></span>
+          <% end %>
+        </li>
+      </ul>
+      <p class="control-group-description">
+        Use last Readability setting per feed
+      </p>
+
+      <ul class="control-group control-group-form">
+        <li>
+          <%= f.check_box :mark_as_read_confirmation %>
+          <%= f.label :mark_as_read_confirmation do %>
+            Ask before marking all as read <span class="slider-checkbox"></span>
+          <% end %>
+        </li>
+      </ul>
+
+      <ul class="control-group control-group-form">
+        <li>
+          <%= f.check_box :hide_tagged_feeds %>
+          <%= f.label :hide_tagged_feeds do %>
+            Hide tagged feeds <span class="slider-checkbox"></span>
+          <% end %>
+        </li>
+      </ul>
+      <p class="control-group-description">
+        Tagged feeds will only show up in tag drawers
+      </p>
+
+      <ul class="control-group control-group-form">
+        <li>
+          <%= f.check_box :show_unread_count %>
+          <%= f.label :show_unread_count do %>
+            Show unread count in title <span class="slider-checkbox"></span>
+          <% end %>
+        </li>
+      </ul>
+
+      <ul class="control-group control-group-form">
+        <li>
+          <%= f.check_box :starred_feed_enabled %>
+          <%= f.label :starred_feed_enabled do %>
+            Enable starred article feed <span class="slider-checkbox"></span>
+          <% end %>
+        </li>
+      </ul>
+      <% if @user.setting_on?(:starred_feed_enabled) %>
+        <p class="control-group-description">
+          Your starred feed: <%= starred_url(@user.starred_token, format: :xml) %>
+        </p>
       <% end %>
-    </p>
 
-    <p class="setting-combo">
-      <label class="checkbox">
-        <%= f.check_box :precache_images %> Pre-load images
-      </label>
-      <small>
-        Images for unread entries will be loaded in the background when viewing a feed.
-        <span class="light-description">Not recommended with limited data/bandwidth.</span>
-      </small>
-    </p>
+      <div class="inset-content">
+        <%= f.submit "Save", class: 'button' %>
+      </div>
 
-    <p class="setting-combo">
-      <label class="checkbox">
-        <%= f.check_box :sticky_view_inline %> Sticky Readability
-      </label>
-      <small>Use last Readability setting per feed (this will make loading entries slower).</small>
-    </p>
-
-    <p>
-      <label class="checkbox">
-        <%= f.check_box :mark_as_read_confirmation %> Ask before marking all as read
-      </label>
-    </p>
-
-    <h3>Tags</h3>
-
-    <p class="setting-combo">
-      <label class="checkbox">
-        <%= f.check_box :hide_tagged_feeds %> Hide tagged feeds
-      </label>
-      <small>Tagged feeds will only show up in tag drawers</small>
-    </p>
-
-    <h3>Extras</h3>
-
-    <p>
-      <label class="checkbox">
-        <%= f.check_box :show_unread_count %> Show unread count in title
-      </label>
-    </p>
-
-    <div class="setting-combo">
-      <label class="checkbox">
-        <%= f.check_box :starred_feed_enabled %> Enable starred article feed
-      </label>
-      <% if @user.starred_feed_enabled == '1' %>
-        <div class="textfield-wrap starred-field">
-          <input type="text" value="<%= starred_url(@user.starred_token, format: :xml) %>" data-behavior="select_text" disabled="disabled" />
-          <a href="<%= starred_url(@user.starred_token, format: :xml) %>" title="<%= starred_url(@user.starred_token, format: :xml) %>" class="feed-url-container"></a>
-        </div>
-      <% end %>
-    </div>
-
-
-    <%= f.submit "Save", class: 'button' %>
-  <% end %>
+    <% end %>
+  </div>
 
   <h3>Subscribe via Email</h3>
   <p class="muted">You can subscribe to any website that publishes a feed by sending an email to this secret address. The body of the email should only contain the URL to the website or feed.</p>
