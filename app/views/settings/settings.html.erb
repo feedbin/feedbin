@@ -21,6 +21,12 @@
 
       <ul class="control-group control-group-form">
         <li>
+          <%= f.check_box :mark_as_read_confirmation %>
+          <%= f.label :mark_as_read_confirmation do %>
+            Ask before marking all as read <span class="slider-checkbox"></span>
+          <% end %>
+        </li>
+        <li>
           <%= f.check_box :precache_images %>
           <%= f.label :precache_images do %>
             Preload images <span class="slider-checkbox"></span>
@@ -45,14 +51,11 @@
 
       <ul class="control-group control-group-form">
         <li>
-          <%= f.check_box :mark_as_read_confirmation %>
-          <%= f.label :mark_as_read_confirmation do %>
-            Ask before marking all as read <span class="slider-checkbox"></span>
+          <%= f.check_box :show_unread_count %>
+          <%= f.label :show_unread_count do %>
+            Show unread count in title <span class="slider-checkbox"></span>
           <% end %>
         </li>
-      </ul>
-
-      <ul class="control-group control-group-form">
         <li>
           <%= f.check_box :hide_tagged_feeds %>
           <%= f.label :hide_tagged_feeds do %>
@@ -63,15 +66,6 @@
       <p class="control-group-description">
         Tagged feeds will only show up in tag drawers
       </p>
-
-      <ul class="control-group control-group-form">
-        <li>
-          <%= f.check_box :show_unread_count %>
-          <%= f.label :show_unread_count do %>
-            Show unread count in title <span class="slider-checkbox"></span>
-          <% end %>
-        </li>
-      </ul>
 
       <ul class="control-group control-group-form">
         <li>
@@ -94,8 +88,10 @@
     <% end %>
   </div>
 
-  <h3>Subscribe via Email</h3>
-  <p class="muted">You can subscribe to any website that publishes a feed by sending an email to this secret address. The body of the email should only contain the URL to the website or feed.</p>
+  <div class="description-inset icon-email">
+    <h3>Subscribe via Email</h3>
+    <p class="muted">You can subscribe to any website that publishes a feed by sending an email to this secret address. The body of the email should only contain the URL to the website or feed.</p>
+    <p class="subscribe-email"><a href="mailto:subscribe+<%= @user.inbound_email_token %>@subscribe.feedbin.com">subscribe+<%= @user.inbound_email_token %>@subscribe.feedbin.com</a></p>
+  </div>
 
-  <p class="subscribe-email"><a href="mailto:subscribe+<%= @user.inbound_email_token %>@subscribe.feedbin.com">subscribe+<%= @user.inbound_email_token %>@subscribe.feedbin.com</a></p>
 </div>

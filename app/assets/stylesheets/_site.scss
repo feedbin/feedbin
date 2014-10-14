@@ -1163,6 +1163,14 @@ th {
 		padding: 0 30px 0 30px;
 	}
 }
+.description-inset {
+	padding: 0 30px 0 30px;
+	&.icon-email {
+		background: image-url("icon-share-email.svg") 30px 3px no-repeat;
+		background-size: 24px 16px;
+		padding-left: 64px;
+	}
+}
 
 
 /*------------------------------------------------------------------------------
@@ -3911,6 +3919,17 @@ Settings
 		.theme-button-night {
 			background-color: #FFF;
 			border-color: $selected;
+		}
+	}
+	.theme-background {
+		&.theme-day {
+			background-color: $list-background-color;
+		}
+		&.theme-sunset {
+			background-color: $list-background-color-sunset;
+		}
+		&.theme-night {
+			background-color: $list-background-color-night;
 		}
 	}
 	.preview-group {
