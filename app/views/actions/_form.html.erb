@@ -1,0 +1,58 @@
+<%= form_for(@action) do |f| %>
+  <% if @action.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@action.errors.count, "error") %> prohibited this high_score from being saved:</h2>
+      <ul>
+      <% @high_score.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <h3 class="no-border">If&hellip;</h3>
+
+  <ul class="pill-list padded">
+
+    <li>
+      <p><strong>Article Matches Search</strong></p>
+      <div class="filter-search" data-behavior="autocomplete_parent">
+        <%= f.search_field :query, placeholder: "Search", data: {behavior: 'autocomplete_field', autocomplete_path: autocomplete_search_entries_path} %>
+        <div class="filter-search-preview" data-behavior="autocomplete_target"></div>
+      </div>
+    </li>
+
+    <li>
+      <p><strong>Article is in Feed or Tag</strong></p>
+      <div class="filter-feeds-include-all">
+        <label class="checkbox">
+          <%= f.check_box :all_feeds, data: {behavior: 'check_feeds'} %>
+          Include All
+        </label>
+      </div>
+      <div class="filter-feeds">
+        <%=
+        f.collection_check_boxes(:feed_ids, @user.feeds.include_user_title, :string_id, :title) do |b|
+          options = {data: {behavior: 'collection_checkbox'}}
+          if f.object.all_feeds == true
+            options[:disabled] = 'disabled'
+          end
+          b.label(class: "checkbox") { b.check_box(options) + b.text }
+        end
+        %>
+      </div>
+    </li>
+
+  </ul>
+
+  <h3 class="no-border">Then&hellip;</h3>
+  <ul class="pill-list padded">
+    <%= f.collection_check_boxes(:actions, Feedbin::Application.config.action_names, :value, :label) do |b|
+      content_tag :li, b.label(class: "checkbox") { b.check_box + b.text }, data: {behavior: "action_#{b.value}"}
+      end
+    %>
+  </ul>
+
+
+
+<% end %>

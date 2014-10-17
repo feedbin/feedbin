@@ -54,7 +54,7 @@ Feedbin::Application.routes.draw do
   resources :sessions
   resources :password_resets
   resources :sharing_services, path: 'settings/sharing', only: [:index]
-  resources :actions, path: 'settings/actions', only: [:index]
+  resources :actions, path: 'settings/actions', only: [:index, :create, :new, :update]
   resources :saved_searches
 
   resources :supported_sharing_services, only: [:create, :destroy, :update] do
@@ -111,6 +111,7 @@ Feedbin::Application.routes.draw do
       get :unread
       get :preload
       get :search
+      get :autocomplete_search
       get :recently_read, to: 'recently_read_entries#index'
       post :mark_all_as_read
       post :mark_direction_as_read

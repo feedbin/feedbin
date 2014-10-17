@@ -671,14 +671,13 @@ $.extend feedbin,
         return
 
       $(document).on 'click', '[data-behavior~=check_feeds]', (event) ->
-        cell = $(@).parents('[data-behavior~=associated_record]')
-        feedIds = $('.feed-ids', cell)
+        checkboxes = $('[data-behavior~=collection_checkbox]')
         if $(@).is(':checked')
-          $('[type="checkbox"]', feedIds ).prop('checked', true)
-          $('[type="checkbox"]', feedIds ).attr('disabled', 'disabled')
+          checkboxes.prop('checked', true)
+          checkboxes.attr('disabled', 'disabled')
         else
-          $('[type="checkbox"]', feedIds ).prop('checked', false)
-          $('[type="checkbox"]', feedIds ).removeAttr('disabled')
+          checkboxes.prop('checked', false)
+          checkboxes.removeAttr('disabled')
         return
 
     validateFile: ->

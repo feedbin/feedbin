@@ -75,6 +75,10 @@ class Entry < ActiveRecord::Base
         filter :not, { ids: { values: user.unread_entries.pluck(:entry_id) } }
       end
 
+      if params[:size].present?
+        size params[:size]
+      end
+
       if params[:starred] == true
         ids << user.starred_entries.pluck(:entry_id)
       elsif params[:starred] == false
