@@ -15,7 +15,7 @@ class ActionsController < ApplicationController
 
   def create
     @user = current_user
-    @action = Action.new(action_params)
+    @action = @user.actions.new(action_params)
     if @action.save
       redirect_to actions_path, notice: 'Action was successfully created.'
     else
@@ -29,5 +29,5 @@ class ActionsController < ApplicationController
   def action_params
     params.require(:action_params).permit(:query, :all_feeds, :feed_ids => [], :actions => [])
   end
-  
+
 end
