@@ -3540,6 +3540,9 @@ Settings
 			border-bottom: 1px solid $border-color;
 			padding: 15px 30px;
 		}
+		&:last-child {
+			margin-bottom: 0;
+		}
 	}
 	.control-group-description {
 		font-size: 12px;

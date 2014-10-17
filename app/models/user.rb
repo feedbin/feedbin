@@ -31,8 +31,6 @@ class User < ActiveRecord::Base
                                 allow_destroy: true,
                                 reject_if: -> attributes { attributes['label'].blank? || attributes['url'].blank? }
 
-  accepts_nested_attributes_for :actions, allow_destroy: true, reject_if: :all_blank
-
   before_save :update_billing, unless: -> user { user.admin || !ENV['STRIPE_API_KEY'] }
   before_destroy :cancel_billing, unless: -> user { user.admin }
   before_destroy :create_deleted_user
