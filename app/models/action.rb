@@ -1,8 +1,7 @@
 class Action < ActiveRecord::Base
     belongs_to :user
 
-    validate :validate_query
-
+    before_save :set_all_feeds
     after_commit :search_percolate_store, on: [:create, :update]
     after_destroy :search_percolate_remove
 
@@ -30,8 +29,10 @@ class Action < ActiveRecord::Base
       Entry.index.unregister_percolator_query(self.id)
     end
 
-    def validate_query
-      # errors.add(:query, 'is invalid')
+    def set_all_feeds
+      if self.all_feeds
+        self.feed_ids = self.user.subscriptions.pluck(:feed_id)
+      end
     end
 
 end

@@ -1,5 +1,32 @@
-<div class="settings-content-inner">
+<div class="settings-content-inner-wide">
   <h2>Actions</h2>
 
-  <%= link_to '+ Add Action', new_action_path, class: 'add-action' %>
+  <p class="muted">Actions can be performed on articles when they are published. Start by writing the keywords to match, just like you would when <a href="http://help.feedbin.com/search-syntax/">searching</a> for something. Then select the feeds to include. Finally check the actions you would like to perform on the matched incoming articles.</p>
+
+  <div class="push-options hide" id="push-data" data-website-id="<%= ENV['APPLE_PUSH_WEBSITE_ID'] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>">
+    <div class="push-enable hide">
+      <p>Push notifications can be enabled as an action. <a href="#" data-behavior="enable_push">Enable push notifications</a>.</p>
+    </div>
+    <div class="push-disable hide">
+      <p>Push notifications are <span class="highlight-positive">enabled</span>. You can disable them in preferences under Notifications.</p>
+    </div>
+    <div class="push-disabled hide">
+      <p>Push notifications are <span class="highlight-negative">disabled</span>. You can enable them in Safari preferences under Notifications.</p>
+    </div>
+  </div>
+
+  <p><%= link_to '+ Add Action', new_action_path, class: 'add-action' %></p>
+
+  <ul class="pill-list">
+    <% @user.actions.each do |action| %>
+      <li>
+        <div class="action-description">
+          <%= render partial: 'actions/text_description', locals: {action: action} %>
+        </div>
+        <%= link_to 'Edit', edit_action_path(action) %></td>
+        <%= link_to 'Destroy', action, method: :delete, data: { confirm: 'Are you sure?' } %>
+      </li>
+    <% end %>
+  </ul>
+
 </div>

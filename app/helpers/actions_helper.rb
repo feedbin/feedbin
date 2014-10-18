@@ -34,7 +34,7 @@ module ActionsHelper
       end
     end
     if actions.any?
-      actions.join(', ')
+      actions.join(' and ')
     else
       'None'
     end
@@ -44,7 +44,7 @@ module ActionsHelper
     action_label = ''
     Feedbin::Application.config.action_names.each do |action_name|
       if action_name.value == value
-        action_label = action_name.label
+        action_label = action_name.label.downcase
       end
     end
     action_label

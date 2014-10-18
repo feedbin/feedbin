@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
   include SessionsHelper
 
   before_action :authorize
+  before_action :set_user
   before_action :set_view_mode
   before_action :honeybadger_context
   before_action :block_if_maintenance_mode
@@ -34,7 +35,6 @@ class ApplicationController < ActionController::Base
   end
 
   def get_collections
-    @user = current_user
     collections = []
     collections << {
       title: 'Unread',
@@ -105,6 +105,10 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def set_user
+    @user = current_user
+  end
 
   def feeds_response
     if 'view_all' == session[:view_mode]
