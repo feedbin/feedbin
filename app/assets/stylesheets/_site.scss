@@ -2324,7 +2324,7 @@ $saved-search-control-height: 48px;
 	}
 	.full-screen & {
 		@include arrow(
-			$x-position: 65px,
+			$x-position: 55px,
 			$y-position: -1px,
 			$arrow-color: $body-background-color,
 			$arrow-color-night: $body-background-color-night,
@@ -2730,14 +2730,16 @@ $saved-search-control-height: 48px;
 		display: none;
 		svg {
 			position: absolute;
-			top: $base-button-position + 1;
-			left: 6px;
-			height: 16px;
-			width: 16px;
+			top: $base-button-position + 3;
+			top: 12px;
+			left: 3px;
+			height: 14px;
+			width: 14px;
 		}
 	}
 	.full-screen & {
 		width: 300px;
+		right: -10px;
 		.button-full-screen {
 			display: block;
 		}
@@ -5660,7 +5662,7 @@ Media Queries
 	}
 	.full-screen & {
 		@include arrow(
-			$x-position: 246px,
+			$x-position: 236px,
 			$y-position: -1px,
 			$arrow-color: $body-background-color,
 			$arrow-color-night: $body-background-color-night,
