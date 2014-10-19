@@ -1,4 +1,5 @@
-If a new article is published
+<% feed_ids = action.feed_ids.reject{ |feed_id| feed_id.empty? } %>
+If an article is published
 
 <% if action.query.present? %>
   that matches the search <strong><%= action.query %></strong>
@@ -6,8 +7,8 @@ If a new article is published
 
 <% if action.all_feeds %>
   in <strong>any</strong> feed
-<% elsif action.feed_ids.reject{ |feed_id| feed_id.empty? }.any? %>
-  in the feed <strong><%= action_feed_names(action) %></strong>
+<% elsif feed_ids.any? %>
+  in the feed<%= feed_ids.length > 1 ? 's' : '' %> <strong><%= action_feed_names(action) %></strong>
 <% end %>
 
 then <%= action_names(action) %>.

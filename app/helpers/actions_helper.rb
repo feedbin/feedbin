@@ -9,21 +9,23 @@ module ActionsHelper
   end
 
   def action_feed_names(action)
-    if action.all_feeds
-      'All'
-    else
-      feed_names = []
-      user = User.find(action.user_id)
-      feeds = user.feeds.where(id: action.feed_ids).include_user_title
-      feeds.each do |feed|
-        feed_names << feed.title
-      end
-      if feed_names.any?
-        feed_names.join(', ')
-      else
-        'None'
-      end
+    output = []
+
+    user = User.find(action.user_id)
+
+    feed_names = user.feeds.where(id: action.feed_ids).include_user_title.map do |feed|
+      feed.title
     end
+
+    feed_names.sort!
+
+    output << feed_names.shift(2).join(', ')
+
+    if feed_names.any?
+      output << "and #{feed_names.length} more feeds"
+    end
+
+    output.join(' ')
   end
 
   def action_names(action)
@@ -36,7 +38,7 @@ module ActionsHelper
     if actions.any?
       actions.join(' and ')
     else
-      'None'
+      'do nothing'
     end
   end
 

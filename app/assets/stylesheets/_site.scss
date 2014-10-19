@@ -4049,6 +4049,32 @@ table.small td {
 	}
 }
 
+.action-item {
+	position: relative;
+	.action-description {
+		padding-right: 52px;
+	}
+	.action-edit,
+	.action-destroy {
+		display: inline-block;
+		vertical-align: top;
+		position: absolute;
+		line-height: 1;
+	}
+	.action-edit{
+		top: 13px;
+		right: 35px;
+		font-size: 14px;
+	}
+	.action-destroy {
+		top: 8px;
+		right: 14px;
+		font-weight: bold;
+		font-size: 20px;
+		color: red;
+	}
+}
+
 .filter-search {
 	input[type="search"] {
 		width: 100%;
