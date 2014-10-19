@@ -4461,7 +4461,7 @@ Buttons
 	width: 100%;
 	top: 0;
 	left: 0;
-	@include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+	@include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
 	text-align: left;
 }
 
@@ -4473,22 +4473,15 @@ Buttons
 	height: 51px;
 	width: 100%;
 	position: relative;
-	.tag-field-wrap {
-		position: absolute;
-		top: 11px;
-		left: 11px;
-		right: 65px;
-		width: auto;
-		input {
-			margin: 0;
-			padding: 5px;
-			font-size: 14px;
-			width: 100%;
-			border-radius: 0;
-		}
-		&.tag-update {
-			right: 88px;
-		}
+	padding: 8px;
+	input[type="text"] {
+		height: 32px;
+		width: 100%;
+		max-width: 100%;
+		margin-bottom: 0;
+		padding: 5px 25px 5px 5px;
+		font-size: 14px;
+		border-radius: 0;
 	}
 	input[type="submit"] {
 		position: absolute;
