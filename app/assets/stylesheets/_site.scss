@@ -4003,6 +4003,65 @@ Settings
 			box-shadow: 4px 4px 0 -2px $border-color-night;
 		}
 	}
+	.feed-form {
+		li {
+			clear: both;
+			border-bottom: 1px solid $border-color;
+			position: relative;
+			padding: 0;
+		}
+		.last-updated-wrap {
+			position: absolute;
+			right: 10px;
+			top: 17px;
+			font-size: 14px;
+			@include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+			@media (max-width:800px) {
+				display: none;
+			}
+		}
+		.canvas-wrap {
+			max-width: 508px;
+			float: right;
+			overflow-x: hidden;
+			overflow-y: visible;
+			z-index: 0;
+		}
+		canvas {
+			position: absolute;
+			right: 0;
+			bottom: 0;
+			z-index: 0;
+		}
+		.textfield-wrap {
+			position: relative;
+			max-width: 450px;
+			z-index: 100;
+			input {
+				padding-top: 13px;
+				padding-bottom: 13px;
+				max-width: 100%;
+				padding-left: 35px !important;
+				margin: 0;
+				border: none;
+				border-right: 1px solid $border-color;
+				border-radius: 0;
+			}
+			.favicon-container {
+				display: block;
+				position: absolute;
+				left: 0;
+				top: 0;
+				height: 32px;
+				width: 32px;
+				.favicon-wrap {
+					top: 13px;
+					left: 6px;
+					box-shadow: none;
+				}
+			}
+		}
+	}
 }
 
 .key {
@@ -4186,111 +4245,24 @@ table.small td {
 	}
 }
 
-.feed-form {
-	margin: 0;
-	padding: 0;
-	list-style: none;
-	li {
-		clear: both;
-		margin-left: 30px;
-		border-bottom: 1px solid $border-color;
-		position: relative;
-		padding: 10px 0;
-		&:last-child {
-			border: none;
-		}
-	}
-	.checkbox-wrap {
-		position: absolute;
-		left: -30px;
-		top: 15px;
-	}
-	.last-updated-wrap {
-		position: absolute;
-		right: 0;
-		top: 17px;
-		font-size: 14px;
-		@include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-		@media (max-width:800px) {
-			display: none;
-		}
-	}
-	.canvas-wrap {
-		max-width: 508px;
-		float: right;
-		overflow-x: hidden;
-		overflow-y: visible;
-		z-index: 0;
-		@media (max-width:1235px) {
-			display: none;
-		}
-	}
-	canvas {
-		position: absolute;
-		right: 0;
-		bottom: 0;
-		z-index: 0;
-	}
-}
-
-.textfield-wrap {
-	position: relative;
-	max-width: 400px;
-	z-index: 100;
-	input {
-		max-width: 400px;
-		padding-left: 35px !important;
-		padding-right: 35px !important;
-		margin: 0;
-	}
-	.favicon-container {
-		display: block;
-		position: absolute;
-		left: 0;
-		top: 0;
-		height: 32px;
-		border-right: 1px solid $border-color;
-		width: 32px;
-		.favicon-wrap {
-			top: 6px;
-			left: 6px;
-			box-shadow: none;
-		}
-	}
-	.feed-url-container {
-		display: block;
-		position: absolute;
-		right: 1px;
-		top: 1px;
-		height: 30px;
-		border-left: 1px solid $border-color;
-		width: 30px;
-		background: $list-background-color image-url("favicon-feed.svg") 7px 8px no-repeat;
-		border-radius: 0 4px 4px 0;
-	}
-}
-
-.feed-search {
-	position: absolute;
-	right: 20px;
-	top: 5px;
-	border-radius: 16px !important;
-	padding: 6px 5px 6px 36px !important;
-	font-size: 14px;
-	background: image-url("favicon-search-light.svg") 11px 9px no-repeat;
-	border: none !important;
-	max-width: 250px !important;
-	background-color: $list-background-color;
-	display: block;
-	@media (max-width: 650px) {
-		position: static;
-	}
-}
 
 .feed-controls {
-	border-top: 1px solid $border-color;
-	border-bottom: 1px solid $border-color;
-	padding: 10px 0 1px 0;
+	padding: 0 30px 15px 30px;
+	select {
+		margin-top: 6px;
+	}
+	.feed-search {
+		border-radius: 16px !important;
+		padding: 5px 5px 5px 36px !important;
+		font-size: 14px;
+		background: #FFF image-url("favicon-search-light.svg") 11px 7px no-repeat;
+		max-width: 250px !important;
+		display: block;
+		margin: 0 !important;
+		@media (max-width: 650px) {
+			position: static;
+		}
+	}
 }
 
 .push-feed-settings {

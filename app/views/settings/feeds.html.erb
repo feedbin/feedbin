@@ -1,59 +1,51 @@
 <div class="settings-content-inner-wide por">
   <h2>Feeds</h2>
-  <input type="text" class="feed-search" data-behavior="feed_search" placeholder="Search Feeds" />
 </div>
 
 <div class="settings-content-inner-wide">
 
-  <div class="feed-controls clearfix">
-    <div class="half text-right float-right">
-      <p class="half-margin">
-        <select data-behavior="sort_feeds">
-          <option value="name">Sort by name</option>
-          <option value="last-updated">Sort by last updated</option>
-        </select>
-      </p>
-    </div>
-    <div class="half">
-      <p class="half-margin">Select: <a href="#" data-behavior="check_all">All</a> / <a href="#" data-behavior="check_none">None</a></p>
-    </div>
-  </div>
 
   <%= form_tag update_multiple_subscriptions_path, method: :patch do %>
     <div class="collection-edit-wrapper">
-      <ul class="feed-form sortable"  data-behavior="search_results">
-        <% @subscriptions.each do |subscription| %>
-          <% present subscription do |subscription_presenter| %>
-            <%= fields_for "subscriptions[]", subscription do |f| %>
-              <li data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>">
-                <div class="checkbox-wrap">
-                  <%= check_box_tag "subscription_ids[]", subscription.id %>
-                </div>
-                <div class="textfield-wrap">
-                  <a href="<%= subscription.site_url %>" title="<%= subscription.site_url %>" class="favicon-container">
-                    <%= subscription_presenter.favicon(subscription.host) %>
-                  </a>
-                  <%= f.text_field :title %>
-                  <a href="<%= subscription.feed_url %>" title="<%= subscription.feed_url %>" class="feed-url-container"></a>
-                </div>
-                <div class="canvas-wrap">
-                  <%= content_tag :canvas, '', width: 508, height: 50, data: { values: subscription.entries_count } %>
-                </div>
-                <div class="last-updated-wrap">
-                  <%= timeago(subscription.last_published_entry) %>
-                </div>
-              </li>
+      <div class="inset">
+        <div class="feed-controls clearfix">
+          <div class="half text-right float-right">
+            <select data-behavior="sort_feeds">
+              <option value="name">Sort by name</option>
+              <option value="last-updated">Sort by last updated</option>
+            </select>
+          </div>
+          <div class="half por">
+            <input type="text" class="feed-search" data-behavior="feed_search" placeholder="Search Feeds" />
+          </div>
+        </div>
+        <ul class="control-group feed-form sortable"  data-behavior="search_results">
+          <% @subscriptions.each do |subscription| %>
+            <% present subscription do |subscription_presenter| %>
+              <%= fields_for "subscriptions[]", subscription do |f| %>
+                <li data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>">
+                  <div class="textfield-wrap">
+                    <a href="<%= subscription.site_url %>" title="<%= subscription.site_url %>" class="favicon-container">
+                      <%= subscription_presenter.favicon(subscription.host) %>
+                    </a>
+                    <%= f.text_field :title %>
+                  </div>
+                  <div class="canvas-wrap">
+                    <%= content_tag :canvas, '', width: 508, height: 45, data: { values: subscription.entries_count } %>
+                  </div>
+                  <div class="last-updated-wrap">
+                    <%= timeago(subscription.last_published_entry) %>
+                  </div>
+                </li>
+              <% end %>
             <% end %>
           <% end %>
-        <% end %>
-      </ul>
+        </ul>
+      </div>
     </div>
     <div class="collection-edit-controls clearfix">
       <div class="half text-right float-right">
         <%= submit_tag "Save", class: 'button button-primary' %>
-      </div>
-      <div class="half">
-        <%= submit_tag 'Unsubscribe', class: 'button button-danger button-link', name: 'unsubscribe', style: 'margin-top: 8px;' %>
       </div>
     </div>
 

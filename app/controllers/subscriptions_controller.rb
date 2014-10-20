@@ -1,7 +1,5 @@
 class SubscriptionsController < ApplicationController
 
-  before_action :correct_user, only: :destroy
-
   # GET subscriptions.xml
   def index
     @user = current_user
@@ -63,7 +61,7 @@ class SubscriptionsController < ApplicationController
   # DELETE /subscriptions/1.json
   def destroy
     @user = current_user
-    @subscription = Subscription.find(params[:id])
+    @subscription = @user.subscriptions.find(params[:id])
 
     # Remove tags on this feed before destorying subscription
     @subscription.feed.tag('', @user)
@@ -113,11 +111,6 @@ class SubscriptionsController < ApplicationController
     end
 
     params.require(:subscriptions).permit!
-  end
-
-  def correct_user
-    @subscription = current_user.subscriptions.find_by_id(params[:id])
-    render_404 if @subscription.nil?
   end
 
 end
