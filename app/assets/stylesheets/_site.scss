@@ -4107,12 +4107,21 @@ table.small td {
 	border-bottom: none;
 	padding: 8px 6px;
 	background: $list-background-color;
+	position: relative;
+	.action-feed-search {
+		position: absolute;
+		right: 6px;
+		top: 5px;
+		font-size: 13px !important;
+		padding: 2px 4px!important;
+		max-width: 200px;
+	}
 }
 .filter-feeds {
 	overflow-y: auto;
 	overflow-x: hidden;
 	resize: vertical;
-	height: 78px;
+	height: 134px;
 	border: 1px solid $border-color;
 	border-top: none;
 	margin-bottom: 15px;

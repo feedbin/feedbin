@@ -1026,7 +1026,7 @@ $.extend feedbin,
         event.preventDefault()
 
     fuzzyFilter: ->
-      feeds = $('.feed-form li')
+      feeds = $('[data-sort-name]')
       $(document).on 'keyup', '[data-behavior~=feed_search]', ->
         suggestions = []
         query = $(@).val()
@@ -1042,7 +1042,7 @@ $.extend feedbin,
               -(suggestion.score)
           else
             suggestions = ''
-        $('.feed-form').html(suggestions)
+        $('[data-behavior~=search_results]').html(suggestions)
       return
 
     appearanceRadio: ->

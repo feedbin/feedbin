@@ -21,7 +21,7 @@
 
   <%= form_tag update_multiple_subscriptions_path, method: :patch do %>
     <div class="collection-edit-wrapper">
-      <ul class="feed-form sortable">
+      <ul class="feed-form sortable"  data-behavior="search_results">
         <% @subscriptions.each do |subscription| %>
           <% present subscription do |subscription_presenter| %>
             <%= fields_for "subscriptions[]", subscription do |f| %>

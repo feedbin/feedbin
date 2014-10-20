@@ -24,25 +24,28 @@
       </li>
     </ul>
 
-    <div class="inset-content">
+    <div class="inset-content por">
       <h4 class="group-header">Article is in Feed</h4>
     </div>
     <ul class="control-group">
       <li>
         <div class="filter-feeds-include-all">
+          <input type="text" class="action-feed-search" data-behavior="feed_search" placeholder="Filter" />
           <label class="checkbox">
             <%= f.check_box :all_feeds, data: {behavior: 'check_feeds'} %>
             Include All
           </label>
         </div>
-        <div class="filter-feeds">
+        <div class="filter-feeds" data-behavior="search_results">
           <%=
           f.collection_check_boxes(:feed_ids, @user.feeds.include_user_title, :string_id, :title) do |b|
             options = {data: {behavior: 'collection_checkbox'}}
             if f.object.all_feeds == true
               options[:disabled] = 'disabled'
             end
-            b.label(class: "checkbox") { b.check_box(options) + b.text }
+            b.label(class: "checkbox", data: {sort_name: b.text.downcase}) do
+              b.check_box(options) + b.text
+            end
           end
           %>
         </div>
