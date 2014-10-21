@@ -3479,13 +3479,6 @@ Settings
 		background-color: $list-background-color;
 		display: table-cell;
 		.settings-content-inner {
-			max-width: 620px;
-			padding: 0 20px 0 37px;
-			@media (max-width: 420px) {
-				padding: 0 15px 0 15px;
-			}
-		}
-		.settings-content-inner-wide {
 			max-width: 900px;
 			padding: 0 20px 0 37px;
 			@media (max-width: 420px) {
@@ -3944,7 +3937,7 @@ Settings
 			-webkit-appearance: none;
 			background: #FFF;
 		}
-		input[type="radio"], input[type="checkbox"] {
+		input[type="radio"], input[type="checkbox"], input[type="file"] {
 			display: none;
 		}
 		input[type="radio"]:checked + label {
