@@ -1366,6 +1366,10 @@ Structure
 	border-top: $bar-height solid rgba(0,0,0,.3);
 	@include border-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
 	z-index: 2;
+	.settings & {
+		top: 31px;
+		right: 15px;
+	}
 	&:after {
 		height: $bar-height;
 		@include background-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
@@ -3491,7 +3495,7 @@ Settings
 		margin-top: 20px;
 	}
 	h2 {
-		margin: 35px 0 15px;
+		margin: 25px 0 24px;
 		font-size: 24px;
 		font-weight: normal;
 		color: #535353;
@@ -3535,6 +3539,10 @@ Settings
 		margin-bottom: 30px;
 		&.no-margin {
 			margin-bottom: 0;
+		}
+		&[disabled] {
+			color: #999;
+			cursor: default;
 		}
 	}
 	.subscribe-email {
@@ -3780,7 +3788,22 @@ Settings
 			top: 10px;
 			border-radius: 28px;
 			background-color: #9e9e9e;
+			&:before {
+				background-color: #FFF;
+				height: 23px;
+				width: 23px;
+				border-radius: 23px;
+				background-color: #FFF;
+				content: "";
+				top: 2px;
+				left: 2px;
+				position: absolute;
+				z-index: 2;
+				transition: left .2s ease, opacity .3s ease;
+				opacity: 1;
+			}
 			&:after {
+				z-index: 1;
 				position: absolute;
 				display: block;
 				content: "";
@@ -3798,6 +3821,10 @@ Settings
 			&:after {
 				left: 30px;
 				background: #FFF image-url("icon-check.svg") 4px 6px no-repeat;
+			}
+			&:before {
+				left: 30px;
+				opacity: 0;
 			}
 		}
 	}

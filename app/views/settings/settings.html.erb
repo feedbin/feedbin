@@ -77,7 +77,7 @@
       </ul>
       <% if @user.setting_on?(:starred_feed_enabled) %>
         <p class="control-group-description">
-          Your starred feed: <a href="<%= starred_url(@user.starred_token, format: :xml) %>"><%= starred_url(@user.starred_token, format: :xml) %></a>
+          Your starred feed: <a href="<%= starred_url(@user.starred_token, format: :xml) %>" style="word-break: break-all;"><%= starred_url(@user.starred_token, format: :xml) %></a>
         </p>
       <% end %>
 
