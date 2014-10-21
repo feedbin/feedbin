@@ -1034,7 +1034,7 @@ th {
 	padding: 0;
 	list-style: none;
 	li {
-		padding: 10px 15px 10px 20px;
+		padding: 10px 30px 10px 30px;
 		margin: 0;
 		border-bottom: 1px solid $border-color;
 		position: relative;
@@ -3781,13 +3781,16 @@ Settings
 	}
 	.cc-form-wrap {
 		.card-number {
-			background: #FFF image-url("icon-credit-card.svg") 5px 17px no-repeat;
+			padding-left: 60px !important;
+			background: #FFF image-url("icon-credit-card.svg") 30px 17px no-repeat;
 		}
 		.card-code {
-			background: #FFF image-url("icon-lock.svg") 5px 14px no-repeat;
+			padding-left: 60px !important;
+			background: #FFF image-url("icon-lock.svg") 30px 14px no-repeat;
 		}
 		.card-expiration {
-			background: #FFF image-url("icon-calendar.svg") 5px 14px no-repeat;
+			padding-left: 60px !important;
+			background: #FFF image-url("icon-calendar.svg") 30px 14px no-repeat;
 		}
 	}
 	.feed-form {
@@ -3828,7 +3831,7 @@ Settings
 				padding-top: 13px;
 				padding-bottom: 13px;
 				max-width: 100%;
-				padding-left: 35px !important;
+				padding-left: 55px !important;
 				margin: 0;
 				border: none;
 				border-right: 1px solid $border-color;
@@ -3837,13 +3840,15 @@ Settings
 			.favicon-container {
 				display: block;
 				position: absolute;
-				left: 0;
-				top: 0;
-				height: 32px;
-				width: 32px;
+				left: 30px;
+				top: 15px;
+				height: 16px;
+				width: 16px;
 				.favicon-wrap {
-					top: 13px;
-					left: 6px;
+					height: 16px;
+					width: 16px;
+					top: 0;
+					left: 0;
 					box-shadow: none;
 				}
 			}
