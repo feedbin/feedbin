@@ -591,8 +591,10 @@ $.extend feedbin,
     addFields: ->
       $(document).on 'click', '[data-behavior~=add_fields]', (event) ->
         time = new Date().getTime() + '_insert'
-        regexp = new RegExp($(@).data('id'), 'g')
-        $('[data-behavior~=add_fields_target]').find('tr:first').before($(@).data('fields').replace(regexp, time))
+        id = $(@).data('id')
+        regexp = new RegExp(id, 'g')
+        content = $(@).data('fields').replace(regexp, time)
+        $('[data-behavior~=add_fields_target]').find('tbody').prepend(content)
         event.preventDefault()
         return
 

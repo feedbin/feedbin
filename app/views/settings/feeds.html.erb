@@ -19,7 +19,7 @@
             <input type="text" class="feed-search" data-behavior="feed_search" placeholder="Search Feeds" />
           </div>
         </div>
-        <ul class="control-group feed-form sortable"  data-behavior="search_results">
+        <ul class="control-group feed-form sortable no-margin"  data-behavior="search_results">
           <% @subscriptions.each do |subscription| %>
             <% present subscription do |subscription_presenter| %>
               <%= fields_for "subscriptions[]", subscription do |f| %>

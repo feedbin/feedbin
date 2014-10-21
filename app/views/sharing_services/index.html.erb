@@ -1,48 +1,64 @@
 <div class="settings-content-inner-wide">
   <h2>Sharing</h2>
 
-  <% if @active_sharing_services.any? %>
-    <h3>Active Services</h3>
+  <div class="inset">
 
-    <ul class="pill-list">
-      <% @active_sharing_services.each do |sharing_service| %>
-        <% if sharing_service.active? %>
-          <li><%= render partial: "supported_sharing_services/service_#{sharing_service.service_id}", locals: {sharing_service: sharing_service, record: sharing_service, status: :active} %></li>
-        <% else %>
-          <li><%= render partial: "supported_sharing_services/service_#{sharing_service.service_id}", locals: {sharing_service: sharing_service, record: sharing_service, status: :issue} %></li>
+    <% if @active_sharing_services.any? %>
+      <div class="inset-content">
+        <h4 class="group-header">Active Services</h4>
+      </div>
+
+      <ul class="pill-list">
+        <% @active_sharing_services.each do |sharing_service| %>
+          <% if sharing_service.active? %>
+            <li><%= render partial: "supported_sharing_services/service_#{sharing_service.service_id}", locals: {sharing_service: sharing_service, record: sharing_service, status: :active} %></li>
+          <% else %>
+            <li><%= render partial: "supported_sharing_services/service_#{sharing_service.service_id}", locals: {sharing_service: sharing_service, record: sharing_service, status: :issue} %></li>
+          <% end %>
         <% end %>
-      <% end %>
-    </ul>
-  <% end %>
+      </ul>
+    <% end %>
 
-  <% unless @active_sharing_services.count == @available_sharing_services.count %>
-    <h3>Available Services</h3>
+    <% unless @active_sharing_services.count == @available_sharing_services.count %>
 
-    <ul class="pill-list">
-      <% @available_sharing_services.each do |sharing_service| %>
-        <% unless @active_service_ids.include?(sharing_service[:service_id]) %>
-          <li><%= render partial: "supported_sharing_services/service_#{sharing_service[:service_id]}", locals: {sharing_service: sharing_service, record: SupportedSharingService.new, status: :inactive} %></li>
+      <div class="inset-content">
+        <h4 class="group-header">Available Services</h4>
+      </div>
+      <ul class="pill-list">
+        <% @available_sharing_services.each do |sharing_service| %>
+          <% unless @active_service_ids.include?(sharing_service[:service_id]) %>
+            <li><%= render partial: "supported_sharing_services/service_#{sharing_service[:service_id]}", locals: {sharing_service: sharing_service, record: SupportedSharingService.new, status: :inactive} %></li>
+          <% end %>
         <% end %>
-      <% end %>
-    </ul>
-  <% end %>
+      </ul>
+    <% end %>
 
-  <h3>Custom</h3>
-  <p class="muted">Create your own sharing service. <a href="http://help.feedbin.com/sharing-read-it-later-services/">How does this work</a>?</p>
-  <%= form_for @user, url: sharing_services_update_user_path(@user), html: {novalidate: 'novalidate'} do |f| %>
-    <p class="half-margin"><%= link_to_add_fields "Add Service", f, :sharing_services %></p>
-    <table class="table form-table" data-behavior="add_fields_target">
-      <tbody>
-        <%= f.fields_for :sharing_services do |builder| %>
-          <%= render 'sharing_service_fields', f: builder %>
-        <% end %>
-        <tr>
-          <td colspan="3">
-            <%= f.submit 'Save', class: 'button button-primary' %>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  <% end %>
+    <div class="inset-content">
+      <h4 class="group-header">Custom</h4>
+    </div>
+    <%= form_for @user, url: sharing_services_update_user_path(@user), html: {novalidate: 'novalidate'} do |f| %>
+
+      <div class="table-wrap">
+        <table class="table table-rounded" data-behavior="add_fields_target">
+          <tbody>
+            <%= f.fields_for :sharing_services do |builder| %>
+              <%= render 'sharing_service_fields', f: builder %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <ul class="control-group control-group-form no-margin">
+        <li>
+          <%= link_to_add_fields "Add Service", f, :sharing_services %>
+        </li>
+        <li>
+          <%= f.submit "Save" %>
+        </li>
+      </ul>
+
+    <% end %>
+    <p class="control-group-description">Create your own sharing service. <a href="http://help.feedbin.com/sharing-read-it-later-services/">How does this work</a>?</p>
+  </div>
 
 </div>

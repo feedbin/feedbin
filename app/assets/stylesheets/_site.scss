@@ -1154,6 +1154,11 @@ th {
 	.inset-content {
 		padding: 0 30px 0 30px;
 	}
+	.pill-list {
+		border-radius: 0;
+		border-left: none;
+		border-right: none;
+	}
 }
 .description-inset {
 	padding: 0 30px 0 30px;
@@ -3877,6 +3882,9 @@ Settings
 	}
 	.table-wrap {
 		border-bottom: 1px solid $border-color;
+		table {
+			margin: 0;
+		}
 		td {
 			width: 33% !important;
 		}
@@ -3886,6 +3894,9 @@ Settings
 		td:last-child {
 			padding-right: 30px !important;
 			text-align: right;
+		}
+		td input {
+			margin: 0;
 		}
 	}
 	.control-group-description {
@@ -3905,7 +3916,8 @@ Settings
 		input[type="password"],
 		input[type="submit"],
 		button,
-		textarea {
+		textarea,
+		a {
 			display: block;
 			text-align: left;
 			margin: 0 !important;
@@ -3919,6 +3931,9 @@ Settings
 			border-radius: 0 !important;
 			max-width: 100% !important;
 			width: 100%;
+		}
+		a:hover {
+			text-decoration: none;
 		}
 		textarea {
 			line-height: 1.2;

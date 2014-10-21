@@ -15,18 +15,24 @@
     </div>
   </div>
 
-  <p><%= link_to '+ Add Action', new_action_path, class: 'add-action' %></p>
+  <div class="inset">
+      <ul class="control-group control-group-form">
+        <li>
+          <%= link_to '+ Add Action', new_action_path, class: 'add-action' %>
+        </li>
+      </ul>
 
-  <ul class="pill-list">
-    <% @user.actions.each do |action| %>
-      <li class="action-item">
-        <div class="action-description">
-          <%= render partial: 'actions/text_description', locals: {action: action} %>
-        </div>
-        <%= link_to 'Edit', edit_action_path(action), class: 'action-edit' %></td>
-        <%= link_to '×', action, method: :delete, class: 'action-destroy', data: { confirm: 'Are you sure you want to delete this action?' } %>
-      </li>
-    <% end %>
-  </ul>
+      <ul class="pill-list">
+        <% @user.actions.each do |action| %>
+          <li class="action-item">
+            <div class="action-description">
+              <%= render partial: 'actions/text_description', locals: {action: action} %>
+            </div>
+            <%= link_to 'Edit', edit_action_path(action), class: 'action-edit' %></td>
+            <%= link_to '×', action, method: :delete, class: 'action-destroy', data: { confirm: 'Are you sure you want to delete this action?' } %>
+          </li>
+        <% end %>
+      </ul>
+  </div>
 
 </div>
