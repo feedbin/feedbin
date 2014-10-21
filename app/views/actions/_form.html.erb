@@ -1,12 +1,9 @@
 <%= form_for(@action, as: :action_params) do |f| %>
   <% if @action.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@action.errors.count, "error") %> prohibited this high_score from being saved:</h2>
-      <ul>
-      <% @high_score.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
+    <div class="alert alert-danger">
+      <% @action.errors.full_messages.each do |message| %>
+        <%= message %>
       <% end %>
-      </ul>
     </div>
   <% end %>
 

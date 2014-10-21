@@ -853,8 +853,8 @@ input[type="color"],
 	@include border-color($border-color, $border-color-night, $border-color-sunset);
 	@include color($text-header-color, $text-header-color, $text-header-color);
 	@include background-color($input-background-color, $input-background-color-night, $input-background-color-sunset);
-	font-size: 18px;
-	padding: 12px 12px 10px 12px;
+	font-size: 16px;
+	padding: 5px;
 	max-width: 300px;
 	width: 100%;
 	display: inline-block;
@@ -3466,12 +3466,6 @@ Settings
 		width: 100%;
 		display: table;
 	}
-	.bar {
-		display: none;
-		@media (max-width: 528px) {
-			display: block;
-		}
-	}
 	.settings-content {
 		vertical-align: top;
 		margin-left: 250px;
@@ -3486,55 +3480,6 @@ Settings
 			}
 		}
 	}
-	.setting-combo {
-		margin-bottom: 15px;
-		small {
-			padding-left: 21px;
-			display: block;
-		}
-		.light-description {
-			display: block;
-			font-style: italic;
-			font-size: 12px;
-			color: #b6b6b6;
-		}
-	}
-	input[name="user[theme]"] + label {
-		padding-left: 50px;
-		&:before {
-			content: "";
-			display: block;
-			height: 16px;
-			width: 16px;
-			position: absolute;
-			left: 30px;
-			top: 15px;
-		}
-	}
-	label[for="user_theme_day"] {
-		&:before {
-			background-color: $body-background-color;
-			border: 1px solid $border-color;
-		}
-	}
-	label[for="user_theme_sunset"] {
-		&:before {
-			background-color: $body-background-color-sunset;
-			border: 1px solid $border-color-sunset;
-		}
-	}
-	label[for="user_theme_night"] {
-		&:before {
-			background-color: $body-background-color-night;
-			border: 1px solid $border-color-night;
-		}
-	}
-	.starred-field {
-		input {
-			padding-left: 5px !important
-		}
-		margin-left: 21px;
-	}
 	small {
 		font-size: 13px;
 		color: #999;
@@ -3544,12 +3489,6 @@ Settings
 	}
 	.alert {
 		margin-top: 20px;
-	}
-	.label-info {
-		background-color: $selected;
-		padding: 3px;
-		border-radius: 2px;
-		color: #fff;
 	}
 	h2 {
 		margin: 35px 0 15px;
@@ -3584,163 +3523,37 @@ Settings
 	.button-mini {
 		padding: 7px 10px;
 	}
-	.split-bg {
-		height: 100%;
-		width: 100;
-		background-image: linear-gradient(to right, $list-background-color 50%, #fff 50%);
-	}
-	.split-bg-inner {
-		width: 960px;
-		height: 100%;
-		margin: 0 auto;
-		background-image: image-url("border.png"), linear-gradient(to right, $list-background-color 330px, #fff 330px);
-		background-position: 330px 0, top left;
-		background-repeat: repeat-y, no-repeat;
-	}
-	.content-inner {
-		margin: 0;
-		border: none;
-		background-color: transparent;
-	}
 	.subscribe-email {
 	    word-break: break-all;
 	}
-	.plan-options {
-		border-bottom: 1px solid $border-color;
-		padding: 0 0 15px 0;
-		overflow: hidden;
-		margin-bottom: 15px;
-		[type="radio"] {
-			display: none;
-		}
-		[type="radio"] + label {
-			font-size: 18px;
-			font-weight: bold;
-			border-radius: 4px;
-			padding: 8px 12px 8px 32px;
-			border: 1px solid transparent;
-			margin-right: 10px;
-			float: left;
-			position: relative;
-			display: inline-block;
-			&:before {
-				position: absolute;
-				left: 5px;
-				top: 12px;
-				content: "";
-				border: 2px solid $border-color;
-				border-radius: 17px;
-				height: 17px;
-				width: 17px;
-			}
-		}
-		[type="radio"]:checked + label {
-			border-color: $selected;
-			&:after {
-				position: absolute;
-				left: 9px;
-				top: 16px;
-				content: "";
-				background: #666666;
-				border-radius: 9px;
-				height: 9px;
-				width: 9px;
-			}
-		}
-	}
-	textarea,
-	input[type="text"],
-	input[type="password"],
-	input[type="datetime"],
-	input[type="datetime-local"],
-	input[type="date"],
-	input[type="month"],
-	input[type="time"],
-	input[type="week"],
-	input[type="number"],
-	input[type="email"],
-	input[type="url"],
-	input[type="search"],
-	input[type="tel"],
-	input[type="color"] {
-		padding: 5px;
-		font-size: 16px;
-	}
-	.checkbox input {
-		margin-top: 3px;
-	}
-	.theme-wrap {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: no-wrap;
-		justify-content: space-around;
-	}
-	.theme-button {
-		width: 208px;
-		height: 178px;
-		padding-top: 15px;
-		font-weight: bold;
-		border: 1px solid transparent;
-		border-radius: 4px;
-		display: block;
-		text-decoration: none;
-		.theme-name {
-			text-transform: uppercase;
-			color: #878787;
-			font-size: 14px;
-			text-align: center;
-			display: block;
-			margin-bottom: 10px;
-		}
-	}
-	.mini-feedbin {
-		border: 4px solid transparent;
-		width: 164px;
-		height: 111px;
-		margin: 0 auto;
-		display: block;
-		position: relative;
+	input[name="user[theme]"] + label {
+		padding-left: 50px;
 		&:before {
-			position: absolute;
-			display: block;
 			content: "";
-			border-left: 4px solid transparent;
-			border-right: 4px solid transparent;
-			height: 100%;
-			width: 40px;
-			left: 28px;
-		}
-		&:after {
-			width: 88px;
-			left: 68px;
-			position: absolute;
 			display: block;
-			content: "";
-			height: 100%;
+			height: 16px;
+			width: 16px;
+			position: absolute;
+			left: 30px;
+			top: 15px;
 		}
 	}
-	.theme-button-day .mini-feedbin {
-		background-color: $list-background-color;
-		border-color: $border-color;
-		&:before, &:after {
+	label[for="user_theme_day"] {
+		&:before {
 			background-color: $body-background-color;
-			border-color: $border-color;
+			border: 1px solid $border-color;
 		}
 	}
-	.theme-button-sunset .mini-feedbin {
-		background-color: $list-background-color-sunset;
-		border-color: $border-color-sunset;
-		&:before, &:after {
+	label[for="user_theme_sunset"] {
+		&:before {
 			background-color: $body-background-color-sunset;
-			border-color: $border-color-sunset;
+			border: 1px solid $border-color-sunset;
 		}
 	}
-	.theme-button-night .mini-feedbin {
-		background-color: $list-background-color-night;
-		border-color: $border-color-night;
-		&:before, &:after {
+	label[for="user_theme_night"] {
+		&:before {
 			background-color: $body-background-color-night;
-			border-color: $border-color-night;
+			border: 1px solid $border-color-night;
 		}
 	}
 	.theme-day {
@@ -3837,22 +3650,6 @@ Settings
 		.entries {
 			border: 1px solid $border-color-night;
 			box-shadow: 4px 4px 0 -2px $border-color-night;
-		}
-	}
-	.control-list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		border-top: 1px solid $border-color;
-		margin-bottom: 30px;
-		li {
-			line-height: 1;
-			margin: 0;
-			position: relative;
-			background-color: #FFF;
-			border-bottom: 1px solid $border-color;
-			padding: 15px 30px;
-			display: block;
 		}
 	}
 	.control-group,
