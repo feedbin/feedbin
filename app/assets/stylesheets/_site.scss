@@ -1026,13 +1026,6 @@ th {
 	}
 }
 
-.table-wrap {
-	background-color: #FFF;
-	border: 1px solid transparent;
-	@include border-color($border-color, $border-color-night, $border-color-sunset);
-	border-radius: 4px;
-}
-
 .pill-list {
 	background-color: #FFF;
 	border-radius: 8px;
@@ -3007,10 +3000,6 @@ $saved-search-control-height: 48px;
 		font-weight: 400 !important;
 	}
 
-	.table-wrap {
-		overflow-x: auto;
-	}
-
 	.diff-wrap {
 		@include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
 		font-size: 13px;
@@ -3512,103 +3501,6 @@ Settings
 			color: #b6b6b6;
 		}
 	}
-	.control-list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		border-top: 1px solid $border-color;
-		margin-bottom: 30px;
-		li {
-			line-height: 1;
-			margin: 0;
-			position: relative;
-			background-color: #FFF;
-			border-bottom: 1px solid $border-color;
-			padding: 15px 30px;
-			display: block;
-		}
-	}
-	.control-group {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		border-top: 1px solid $border-color;
-		margin-bottom: 30px;
-		background-color: #FFF;
-		> li {
-			margin: 0;
-			padding: 0;
-			border-bottom: 1px solid $border-color;
-			padding: 15px 30px;
-		}
-		&:last-child {
-			margin-bottom: 0;
-		}
-	}
-	.control-group-description {
-		font-size: 12px;
-		color: #999;
-		margin-top: -20px;
-		padding: 0 30px;
-	}
-	.control-group-form {
-		li {
-			padding: 0;
-			border: none;
-		}
-		label {
-			line-height: 1;
-			position: relative;
-			user-select: none;
-			border-bottom: 1px solid $border-color;
-			padding: 15px 30px;
-			display: block;
-		}
-		input[type="radio"], input[type="checkbox"] {
-			display: none;
-		}
-		input[type="radio"]:checked + label {
-			position: relative;
-			&:after {
-				position: absolute;
-				right: 37px;
-				top: 19px;
-				content: "";
-				background: image-url("icon-check.svg") 0 0 no-repeat;
-				height: 12px;
-				width: 15px;
-			}
-		}
-		input[type="checkbox"] + label .slider-checkbox {
-			width: 56px;
-			height: 27px;
-			display: block;
-			position: absolute;
-			right: 30px;
-			top: 10px;
-			border-radius: 28px;
-			background-color: #9e9e9e;
-			&:after {
-				position: absolute;
-				display: block;
-				content: "";
-				height: 23px;
-				width: 23px;
-				border-radius: 23px;
-				background-color: #FFF;
-				left: 2px;
-				top: 2px;
-				transition: left .2s ease;
-			}
-		}
-		input[type="checkbox"]:checked + label .slider-checkbox {
-			background-color: $selected;
-			&:after {
-				left: 30px;
-				background: #FFF image-url("icon-check.svg") 4px 6px no-repeat;
-			}
-		}
-	}
 	input[name="user[theme]"] + label {
 		padding-left: 50px;
 		&:before {
@@ -3779,60 +3671,6 @@ Settings
 	.checkbox input {
 		margin-top: 3px;
 	}
-	.cc-form-wrap {
-		position: relative;
-		margin-bottom: 15px;
-		max-width: 261px;
-		input {
-			margin-bottom: 0;
-			padding: 10px;
-			font-size: 18px;
-			line-height: normal;
-			padding-left: 30px;
-			&:focus {
-				border-color: $border-color;
-			}
-		}
-		.card-number {
-			background: #FFF image-url("icon-credit-card.svg") 5px 15px no-repeat;
-			border-radius: 4px 4px 0 0;
-			margin-bottom: 0;
-			border-bottom: none;
-			&.visa {
-				background-image: image-url("icon-credit-card.svg"), image-url("icon-card-visa.png");
-				background-repeat: no-repeat, no-repeat;
-				background-position: 5px 15px, 220px 5px;
-			}
-			&.discover {
-				background-image: image-url("icon-credit-card.svg"), image-url("icon-card-discover.png");
-				background-repeat: no-repeat, no-repeat;
-				background-position: 5px 15px, 220px 5px;
-			}
-			&.amex {
-				background-image: image-url("icon-credit-card.svg"), image-url("icon-card-amex.png");
-				background-repeat: no-repeat, no-repeat;
-				background-position: 5px 15px, 220px 5px;
-			}
-			&.mastercard {
-				background-image: image-url("icon-credit-card.svg"), image-url("icon-card-mastercard.png");
-				background-repeat: no-repeat, no-repeat;
-				background-position: 5px 15px, 220px 5px;
-			}
-		}
-		.card-code {
-			background: #FFF image-url("icon-lock.svg") 5px 12px no-repeat;
-			width: 50%;
-			float: right;
-			border-radius: 0 0 4px 0;
-			border-left: none;
-		}
-		.card-expiration {
-			background: #FFF image-url("icon-calendar.svg") 5px 12px no-repeat;
-			width: 50%;
-			float: left;
-			border-radius: 0 0 0 4px;
-		}
-	}
 	.theme-wrap {
 		display: flex;
 		flex-direction: row;
@@ -4001,6 +3839,150 @@ Settings
 		.entries {
 			border: 1px solid $border-color-night;
 			box-shadow: 4px 4px 0 -2px $border-color-night;
+		}
+	}
+	.control-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: 1px solid $border-color;
+		margin-bottom: 30px;
+		li {
+			line-height: 1;
+			margin: 0;
+			position: relative;
+			background-color: #FFF;
+			border-bottom: 1px solid $border-color;
+			padding: 15px 30px;
+			display: block;
+		}
+	}
+	.control-group,
+	.table-wrap {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: 1px solid $border-color;
+		margin-bottom: 30px;
+		background-color: #FFF;
+		> li {
+			margin: 0;
+			padding: 0;
+			border-bottom: 1px solid $border-color;
+			padding: 15px 30px;
+		}
+		&.no-margin {
+			margin-bottom: 0;
+		}
+	}
+	.table-wrap {
+		border-bottom: 1px solid $border-color;
+		td {
+			width: 33% !important;
+		}
+		td:first-child {
+			padding-left: 30px !important;
+		}
+		td:last-child {
+			padding-right: 30px !important;
+			text-align: right;
+		}
+	}
+	.control-group-description {
+		font-size: 12px;
+		color: #999;
+		margin-top: -20px;
+		padding: 0 30px;
+	}
+	.control-group-form {
+		li {
+			padding: 0;
+			border: none;
+		}
+		label,
+		input[type="text"],
+		input[type="email"],
+		input[type="password"],
+		input[type="submit"],
+		button,
+		textarea {
+			display: block;
+			text-align: left;
+			margin: 0 !important;
+			line-height: 1;
+			position: relative;
+			user-select: none;
+			border: none;
+			border-bottom: 1px solid $border-color;
+			padding: 15px 30px;
+			display: block;
+			border-radius: 0 !important;
+			max-width: 100% !important;
+			width: 100%;
+		}
+		textarea {
+			line-height: 1.2;
+		}
+		input[type="submit"],
+		button {
+			color: $selected;
+			-webkit-appearance: none;
+			background: #FFF;
+		}
+		input[type="radio"], input[type="checkbox"] {
+			display: none;
+		}
+		input[type="radio"]:checked + label {
+			position: relative;
+			&:after {
+				position: absolute;
+				right: 37px;
+				top: 19px;
+				content: "";
+				background: image-url("icon-check.svg") 0 0 no-repeat;
+				height: 12px;
+				width: 15px;
+			}
+		}
+		input[type="checkbox"] + label .slider-checkbox {
+			width: 56px;
+			height: 27px;
+			display: block;
+			position: absolute;
+			right: 30px;
+			top: 10px;
+			border-radius: 28px;
+			background-color: #9e9e9e;
+			&:after {
+				position: absolute;
+				display: block;
+				content: "";
+				height: 23px;
+				width: 23px;
+				border-radius: 23px;
+				background-color: #FFF;
+				left: 2px;
+				top: 2px;
+				transition: left .2s ease;
+			}
+		}
+		input[type="checkbox"]:checked + label .slider-checkbox {
+			background-color: $selected;
+			&:after {
+				left: 30px;
+				background: #FFF image-url("icon-check.svg") 4px 6px no-repeat;
+			}
+		}
+	}
+	.cc-form-wrap {
+		.card-number {
+			background: #FFF image-url("icon-credit-card.svg") 5px 17px no-repeat;
+		}
+		.card-code {
+			background: #FFF image-url("icon-lock.svg") 5px 14px no-repeat;
+		}
+		.card-expiration {
+			background: #FFF image-url("icon-calendar.svg") 5px 14px no-repeat;
 		}
 	}
 	.feed-form {

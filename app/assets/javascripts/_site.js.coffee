@@ -62,9 +62,6 @@ $.extend feedbin,
       scope: '[data-behavior~=entry_content_wrap]'
       actionOriginalFN: 'ignore'
 
-  tableWrap: ->
-    $('[data-behavior~=entry_content_wrap] table').wrap($('<div>', {class: 'table-wrap'}));
-
   hideTagsForm: (form) ->
     if not form
       form = $('.tags-form-wrap')
@@ -308,9 +305,9 @@ $.extend feedbin,
 
   drawBarChart: (canvas, values) ->
     if values
-      spaceWidth = 2
+      spaceWidth = 0
       numberOfSpaces = values.length - 1
-      barWidth = (canvas.width - numberOfSpaces * spaceWidth) / values.length
+      barWidth = 3
       if canvas.getContext
         context = canvas.getContext("2d")
         context.fillStyle = "#DDDDDD"

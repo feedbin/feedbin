@@ -25,13 +25,13 @@
               <%= fields_for "subscriptions[]", subscription do |f| %>
                 <li data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>">
                   <div class="textfield-wrap">
-                    <a href="<%= subscription.site_url %>" title="<%= subscription.site_url %>" class="favicon-container">
+                    <a href="<%= subscription.feed_url %>" title="Feed URL" class="favicon-container">
                       <%= subscription_presenter.favicon(subscription.host) %>
                     </a>
-                    <%= f.text_field :title %>
+                    <%= f.text_field :title, placeholder: subscription.original_title %>
                   </div>
                   <div class="canvas-wrap">
-                    <%= content_tag :canvas, '', width: 508, height: 45, data: { values: subscription.entries_count } %>
+                    <%= content_tag :canvas, '', width: 90, height: 45, data: { values: subscription.entries_count }, title: 'Post frequency' %>
                   </div>
                   <div class="last-updated-wrap">
                     <%= timeago(subscription.last_published_entry) %>
