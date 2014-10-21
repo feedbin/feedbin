@@ -53,7 +53,7 @@ Feedbin::Application.routes.draw do
   resources :imports
   resources :sessions
   resources :password_resets
-  resources :sharing_services, path: 'settings/sharing', only: [:index]
+  resources :sharing_services, path: 'settings/sharing', only: [:index, :create, :new, :update, :destroy, :edit]
   resources :actions, path: 'settings/actions', only: [:index, :create, :new, :update, :destroy, :edit]
   resources :saved_searches
 
@@ -78,8 +78,6 @@ Feedbin::Application.routes.draw do
     member do
       patch :settings_update, controller: :settings
       patch :view_settings_update, controller: :settings
-      patch :sharing_services_update, controller: :sharing_services
-      patch :actions_update, controller: :actions
     end
   end
 

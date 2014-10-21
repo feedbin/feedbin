@@ -42,15 +42,6 @@ module ApplicationHelper
     end
   end
 
-  def link_to_add_fields(name, f, association)
-    new_object = f.object.send(association).klass.new
-    id = new_object.object_id
-    fields = f.fields_for(association, new_object, child_index: id) do |builder|
-      render(association.to_s.singularize + "_fields", f: builder)
-    end
-    button_tag(name, data: {id: id, fields: fields.gsub("\n", ""), behavior: 'add_fields'})
-  end
-
   def rtl?(string)
     unless string.blank?
       rtl_test = /[\u0600-\u06FF]|[\u0750-\u077F]|[\u0590-\u05FF]|[\uFE70-\uFEFF]/m

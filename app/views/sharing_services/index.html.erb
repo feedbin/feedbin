@@ -33,32 +33,9 @@
       </ul>
     <% end %>
 
-    <div class="inset-content">
-      <h4 class="group-header">Custom</h4>
-    </div>
-    <%= form_for @user, url: sharing_services_update_user_path(@user), html: {novalidate: 'novalidate'} do |f| %>
 
-      <div class="table-wrap">
-        <table class="table table-rounded" data-behavior="add_fields_target">
-          <tbody>
-            <%= f.fields_for :sharing_services do |builder| %>
-              <%= render 'sharing_service_fields', f: builder %>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
+    <%= render 'sharing_services/form' %>
 
-      <ul class="control-group control-group-form no-margin">
-        <li>
-          <%= link_to_add_fields "Add Service", f, :sharing_services %>
-        </li>
-        <li>
-          <%= f.submit "Save" %>
-        </li>
-      </ul>
-
-    <% end %>
-    <p class="control-group-description">Create your own sharing service. <a href="http://help.feedbin.com/sharing-read-it-later-services/">How does this work</a>?</p>
   </div>
 
 </div>

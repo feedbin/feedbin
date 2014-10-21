@@ -40,11 +40,10 @@
           <% end %>
           </ul>
 
-          <ul class="control-group control-group-form no-margin">
-            <li>
-              <%= f.submit "Subscribe" %>
-            </li>
-          </ul>
+          <div class="description-inset">
+            <%= f.submit "Subscribe", class: 'button-plain' %>
+          </div>
+
         <% end %>
       </div>
 
@@ -60,11 +59,10 @@
 
           <%= render partial: 'shared/credit_card_form' %>
 
-          <ul class="control-group control-group-form">
-            <li>
-              <%= submit_tag "Update Billing" %>
-            </li>
-          </ul>
+          <div class="description-inset">
+            <%= submit_tag "Update Billing", class: "button-plain" %>
+          </div>
+
         <% end %>
 
         <div class="inset-content">
@@ -126,11 +124,9 @@
             </li>
           </ul>
           <p class="control-group-description">This will show up on your receipt. Useful for VAT, address etc&hellip;</p>
-          <ul class="control-group control-group-form">
-            <li>
-              <%= f.submit "Save Info" %>
-            </li>
-          </ul>
+          <div class="description-inset">
+            <%= f.submit "Save Info", class: "button-plain  no-margin" %>
+          </div>
         <% end %>
       </div>
 

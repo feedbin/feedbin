@@ -7,17 +7,13 @@
     </div>
   <% end %>
 
-  <h3 class="no-border">If&hellip;</h3>
   <div class="inset">
     <div class="inset-content">
       <h4 class="group-header">Article Matches Search</h4>
     </div>
-    <ul class="control-group">
+    <ul class="control-group control-group-form">
       <li>
-        <div class="filter-search" data-behavior="autocomplete_parent">
-          <%= f.search_field :query, placeholder: "Search", data: {behavior: 'autocomplete_field', autocomplete_path: autocomplete_search_entries_path} %>
-          <div class="filter-search-preview" data-behavior="autocomplete_target"></div>
-        </div>
+        <%= f.search_field :query, placeholder: "Search" %>
       </li>
     </ul>
 
@@ -48,10 +44,7 @@
         </div>
       </li>
     </ul>
-  </div>
 
-  <h3 class="no-border">Then&hellip;</h3>
-  <div class="inset">
     <ul class="control-group control-group-form">
       <%=
       f.collection_check_boxes(:actions, Feedbin::Application.config.action_names, :value, :label) do |b|
@@ -62,11 +55,9 @@
       %>
     </ul>
 
-    <ul class="control-group control-group-form no-margin">
-      <li>
-        <%= f.submit "Save" %>
-      </li>
-    </ul>
+    <div class="description-inset">
+      <%= f.submit "Save", class: "button-plain no-margin" %>
+    </div>
 
   </div>
 
