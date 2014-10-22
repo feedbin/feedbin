@@ -29,8 +29,10 @@
               <div class="action-description">
                 <%= render partial: 'actions/text_description', locals: {action: action} %>
               </div>
-              <%= link_to 'Edit', edit_action_path(action), class: 'action-edit' %></td>
-              <%= link_to '×', action, method: :delete, class: 'action-destroy', data: { confirm: 'Are you sure you want to delete this action?' } %>
+              <div class="action-links">
+                <%= link_to 'Edit', edit_action_path(action), class: 'action-edit' %> |
+                <%= link_to 'Delete', action, method: :delete, class: 'action-destroy', data: { confirm: 'Are you sure you want to delete this action?' } %>
+              </div>
             </li>
           <% end %>
         </ul>

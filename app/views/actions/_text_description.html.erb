@@ -1,3 +1,8 @@
+<% if action.title.present? %>
+  <p class="half-margin"><strong><%= action.title %></strong></p>
+<% end %>
+
+<small class="sub-head">
 <% feed_ids = action.feed_ids.reject{ |feed_id| feed_id.empty? } %>
 If an article is published
 
@@ -12,3 +17,4 @@ If an article is published
 <% end %>
 
 then <%= action_names(action) %>.
+</small>

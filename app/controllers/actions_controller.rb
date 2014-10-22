@@ -43,7 +43,7 @@ class ActionsController < ApplicationController
   private
 
   def action_params
-    params.require(:action_params).permit(:query, :all_feeds, :feed_ids => [], :actions => [])
+    params.require(:action_params).permit(:query, :all_feeds, :title, :feed_ids => [], :actions => [])
   end
 
   def set_action

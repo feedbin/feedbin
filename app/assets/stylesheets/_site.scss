@@ -1071,6 +1071,10 @@ th {
 		&.hide {
 			display: none;
 		}
+		&.sub-head {
+			padding-left: 0;
+			max-width: 100%;
+		}
 	}
 	.service-options {
 		input, .cancel-button {
@@ -3969,25 +3973,16 @@ table.small td {
 .action-item {
 	position: relative;
 	.action-description {
-		padding-right: 52px;
+		padding-right: 100px;
 	}
-	.action-edit,
-	.action-destroy {
-		display: inline-block;
-		vertical-align: top;
+	.action-links {
 		position: absolute;
-		line-height: 1;
-	}
-	.action-edit{
-		top: 13px;
+		text-align: right;
+		position: absolute;
+		top: 11px;
 		right: 35px;
-		font-size: 14px;
 	}
 	.action-destroy {
-		top: 8px;
-		right: 14px;
-		font-weight: bold;
-		font-size: 20px;
 		color: red;
 	}
 }
