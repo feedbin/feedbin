@@ -303,18 +303,31 @@ $.extend feedbin,
     $('.entries').removeClass('show-saved-search')
     $('.saved-search-wrap').removeClass('open')
 
+  retinaCanvas: (canvas, context) ->
+    width = $(canvas).attr('width')
+    height = $(canvas).attr('height')
+    $(canvas).attr('width', width * window.devicePixelRatio)
+    $(canvas).attr('height', height * window.devicePixelRatio)
+    $(canvas).css
+      width: width
+      height: height
+    context.scale(window.devicePixelRatio, window.devicePixelRatio)
+    context
+
   drawBarChart: (canvas, values) ->
     if values
       spaceWidth = 1
-      numberOfSpaces = values.length - 1
       barWidth = 5
       if canvas.getContext
         context = canvas.getContext("2d")
+        canvasHeight = $(canvas).attr('height')
+        if 'devicePixelRatio' of window
+          context = feedbin.retinaCanvas(canvas, context)
         context.fillStyle = "#DDDDDD"
         xPosition = 0
         for value in values
-          height = Math.ceil(value * canvas.height)
-          yPosition = canvas.height - height
+          height = Math.ceil(value * canvasHeight)
+          yPosition = canvasHeight - height
           context.fillRect(xPosition, yPosition, barWidth, height)
           xPosition = xPosition + barWidth + spaceWidth
 
