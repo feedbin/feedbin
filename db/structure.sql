@@ -69,7 +69,8 @@ CREATE TABLE actions (
     feed_ids text[] DEFAULT '{}'::text[],
     all_feeds boolean DEFAULT false,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    title text
 );
 
 
@@ -1666,4 +1667,6 @@ INSERT INTO schema_migrations (version) VALUES ('20140505062817');
 INSERT INTO schema_migrations (version) VALUES ('20140823091357');
 
 INSERT INTO schema_migrations (version) VALUES ('20140823094323');
+
+INSERT INTO schema_migrations (version) VALUES ('20141022031229');
 
