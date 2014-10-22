@@ -7,7 +7,11 @@ class SharingServicesController < ApplicationController
   def index
     @user = current_user
     @active_sharing_services = @user.supported_sharing_services.order(:service_id)
-    @active_service_ids = @active_sharing_services.collect {|service| service.service_id}
+
+    @active_sharing_services = (@user.sharing_services + @user.supported_sharing_services)
+    @active_sharing_services = @active_sharing_services.sort_by{|sharing_service| sharing_service.label}
+
+    @active_service_ids = @active_sharing_services.collect {|service| service.try(:service_id)}.compact
     @available_sharing_services = SupportedSharingService::SERVICES.sort_by {|supported_service| supported_service[:service_id]}
     @sharing_service = @user.sharing_services.new
   end

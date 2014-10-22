@@ -305,9 +305,9 @@ $.extend feedbin,
 
   drawBarChart: (canvas, values) ->
     if values
-      spaceWidth = 0
+      spaceWidth = 1
       numberOfSpaces = values.length - 1
-      barWidth = 3
+      barWidth = 5
       if canvas.getContext
         context = canvas.getContext("2d")
         context.fillStyle = "#DDDDDD"

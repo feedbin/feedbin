@@ -60,6 +60,19 @@ class SubscriptionsController < ApplicationController
   # DELETE /subscriptions/1
   # DELETE /subscriptions/1.json
   def destroy
+    destroy_subscription
+    get_feeds_list
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def settings_destroy
+    destroy_subscription
+    redirect_to settings_feeds_url
+  end
+
+  def destroy_subscription
     @user = current_user
     @subscription = @user.subscriptions.find(params[:id])
 
@@ -68,11 +81,6 @@ class SubscriptionsController < ApplicationController
 
     # Get rid of the subscription relationship
     @subscription.destroy
-
-    get_feeds_list
-    respond_to do |format|
-      format.js
-    end
   end
 
   def update_multiple

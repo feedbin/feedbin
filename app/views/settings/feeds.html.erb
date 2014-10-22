@@ -29,9 +29,12 @@
                       <%= subscription_presenter.favicon(subscription.host) %>
                     </a>
                     <%= f.text_field :title, placeholder: subscription.original_title %>
+                    <%= link_to 'Unsubscribe', settings_destroy_subscription_path(subscription), class: 'delete-subscription danger', method: :delete %>
                   </div>
+
+
                   <div class="canvas-wrap">
-                    <%= content_tag :canvas, '', width: 90, height: 45, data: { values: subscription.entries_count }, title: 'Post frequency' %>
+                    <%= content_tag :canvas, '', width: 179, height: 45, data: { values: subscription.entries_count }, title: 'Post frequency' %>
                   </div>
                   <div class="last-updated-wrap">
                     <%= timeago(subscription.last_published_entry) %>
@@ -45,7 +48,7 @@
     </div>
     <div class="collection-edit-controls clearfix">
       <div class="description-inset">
-        <%= submit_tag "Save", class: 'button-plain no-margin' %>
+        <%= submit_tag "Save", class: 'button-plain no-top-margin no-margin' %>
       </div>
     </div>
 

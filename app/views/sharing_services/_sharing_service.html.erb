@@ -1,0 +1,19 @@
+<li>
+  <p class="service-title <%= "icon-share-custom" %>"><%= sharing_service.label %></p>
+
+
+  <div class="list-action show-service-options">
+    <a href="#" data-behavior="show_service_options">Edit</a> |
+    <%= link_to 'Delete', sharing_service_path(sharing_service), class: 'danger', method: :delete %>
+  </div>
+
+  <div class="service-options hide">
+    <%= form_for(sharing_service) do |f| %>
+      <%= f.text_field :label, placeholder: 'Label', class: 'no-margin' %>
+      <%= f.url_field :url, placeholder: 'URL' %>
+      <%= link_to 'Cancel', '#', class: 'action-button button-danger button-link cancel-button', data: {behavior: "hide_service_options"} %>
+      <%= submit_tag "Save", class: 'action-button button button-primary' %>
+    <% end %>
+  </div>
+</li>
+
