@@ -4,7 +4,7 @@
 
   <div class="list-action show-service-options">
     <a href="#" data-behavior="show_service_options">Edit</a> |
-    <%= link_to 'Delete', sharing_service_path(sharing_service), class: 'danger', method: :delete %>
+    <%= link_to 'Delete', sharing_service_path(sharing_service), class: 'danger', method: :delete, data: { confirm: 'Are you sure you want to delete this sharing service?' } %>
   </div>
 
   <div class="service-options hide">

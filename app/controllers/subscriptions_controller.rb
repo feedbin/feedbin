@@ -69,7 +69,7 @@ class SubscriptionsController < ApplicationController
 
   def settings_destroy
     destroy_subscription
-    redirect_to settings_feeds_url
+    redirect_to settings_feeds_url, notice: 'You have successfully unsubscribed.'
   end
 
   def destroy_subscription

@@ -29,7 +29,7 @@
                       <%= subscription_presenter.favicon(subscription.host) %>
                     </a>
                     <%= f.text_field :title, placeholder: subscription.original_title %>
-                    <%= link_to 'Unsubscribe', settings_destroy_subscription_path(subscription), class: 'delete-subscription danger', method: :delete %>
+                    <%= link_to 'Unsubscribe', settings_destroy_subscription_path(subscription), class: 'delete-subscription danger', method: :delete, data: { confirm: 'Are you sure you want to unsubscribe?' } %>
                   </div>
 
 
