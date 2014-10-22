@@ -5,7 +5,9 @@
   <%= entry_presenter.entry_link do %>
   <span class="entries-inner-wrap">
     <%= entry_presenter.favicon(entry.feed.host) %>
-    <p class="feed-title" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= entry.feed.title %></p>
+    <p class="feed-title">
+      <span class="title-inner" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= entry.feed.title %></span>
+    </p>
     <%= entry_presenter.abbr_time %>
     <span class="title-wrap">
       <h2 class="title">

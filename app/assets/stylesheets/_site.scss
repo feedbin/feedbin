@@ -2236,13 +2236,14 @@ $saved-search-control-height: 48px;
 }
 
 .entries-feed-0 .entries {
-	.feed-title {
-		display: none;
+	.feed-title .title-inner {
+		visibility: hidden;
 	}
 }
 .entries-feed-0.entries-display-inline .entries {
 	.title-wrap {
 		padding-left: 0;
+		display: none;
 	}
 }
 .entries-time-0 .entries {
@@ -2260,6 +2261,12 @@ $saved-search-control-height: 48px;
 		display: none;
 	}
 }
+.entries-feed-0.entries-time-0 .entries {
+	.feed-title {
+		display: none;
+	}
+}
+
 
 
 .entry-toolbar {
@@ -2869,8 +2876,7 @@ $saved-search-control-height: 48px;
 			margin-right: 5px;
 		}
 		time {
-			display: inline-block;
-			line-height: 16px;
+			display: inline;
 		}
 	}
 	.feed-title {
