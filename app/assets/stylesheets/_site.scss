@@ -3762,7 +3762,6 @@ Settings
 			margin: 0 !important;
 			line-height: 1;
 			position: relative;
-			user-select: none;
 			border: none;
 			border-bottom: 1px solid $border-color;
 			padding: 15px 30px;
@@ -3770,6 +3769,9 @@ Settings
 			border-radius: 0 !important;
 			max-width: 100% !important;
 			width: 100%;
+		}
+		label {
+			user-select: none;
 		}
 		a:hover {
 			text-decoration: none;
