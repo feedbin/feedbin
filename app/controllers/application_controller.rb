@@ -167,7 +167,6 @@ class ApplicationController < ActionController::Base
     @classes.push("entries-time-#{@user.entries_time || '1'}")
     @classes.push("entries-feed-#{@user.entries_feed || '1'}")
     @classes.push("entries-display-#{@user.entries_display || 'block'}")
-    @classes.push("ui-font-#{@user.ui_typeface || 'default'}")
     @classes = @classes.join(" ")
   end
 
