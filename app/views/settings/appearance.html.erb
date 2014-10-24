@@ -102,24 +102,6 @@
         </li>
       </ul>
 
-      <div class="inset-content">
-        <h4 class="group-header">Typeface</h4>
-      </div>
-      <ul class="control-group control-group-form">
-        <li>
-          <%= f.radio_button(:ui_typeface, "default", {checked: @user.ui_typeface.nil? || @user.ui_typeface === 'default', data: {behavior: 'appearance_radio', setting: 'ui-font'}}) %>
-          <%= f.label('ui_typeface_default', "Default") %>
-        </li>
-        <li>
-          <%= f.radio_button(:ui_typeface, "sans-serif-2", {data: {behavior: 'appearance_radio', setting: 'ui-font'}}) %>
-          <%= f.label('ui_typeface_sans-serif-2', "Ideal Sans") %>
-        </li>
-        <li>
-          <%= f.radio_button(:ui_typeface, "sans-serif-1", {data: {behavior: 'appearance_radio', setting: 'ui-font'}}) %>
-          <%= f.label('ui_typeface_sans-serif-1', "Whitney") %>
-        </li>
-      </ul>
-
       <div class="description-inset">
         <%= f.submit "Save", class: 'button-plain no-margin' %>
       </div>

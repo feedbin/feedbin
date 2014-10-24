@@ -3250,12 +3250,7 @@ $saved-search-control-height: 48px;
 	}
 }
 
-.font-sans-serif-1 .content-styles,
-.ui-font-sans-serif-1 .feeds-column,
-.ui-font-sans-serif-1 .entries-column,
-.ui-font-sans-serif-1 .account-toolbar,
-.ui-font-sans-serif-1 .entry-toolbar,
-.ui-font-sans-serif-1 .entries {
+.font-sans-serif-1 .entry-inner {
 	font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
 	font-weight: 400;
 	font-style: normal;
@@ -3274,13 +3269,7 @@ $saved-search-control-height: 48px;
 	}
 }
 
-.font-sans-serif-2 .entry-inner,
-.ui-font-sans-serif-2 .feeds-column,
-.ui-font-sans-serif-2 .entries-column,
-.ui-font-sans-serif-2 .account-toolbar,
-.ui-font-sans-serif-2 .entry-toolbar,
-.ui-font-sans-serif-2 .entries {
-
+.font-sans-serif-2 .entry-inner {
 	font-family: "Ideal Sans A", "Ideal Sans B", $font-stack;
 	font-weight: 300;
 	font-style: normal;
