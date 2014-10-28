@@ -5,9 +5,6 @@
   <meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no" />
   <link rel="apple-touch-icon-precomposed" href="<%= asset_path('apple-touch-icon-precomposed.png') %>" />
   <%= stylesheet_link_tag "application", media: 'all'  %>
-  <% if current_user.present? %>
-  <link rel="stylesheet" type="text/css" href="<%= ENV['FONT_STYLESHEET'] %>" />
-  <% end %>
   <%= javascript_include_tag "application" %>
   <%= yield(:head) %>
   <%= csrf_meta_tags %>
@@ -17,5 +14,6 @@
   <%= content_for?(:content) ? yield(:content) : yield %>
   <%= render partial: 'shared/tracking' %>
   <%= render partial: 'shared/favicons' %>
+  <%= render partial: 'shared/fonts' %>
 </body>
 </html>

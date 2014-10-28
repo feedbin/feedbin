@@ -1042,6 +1042,10 @@ th {
 		&:last-child {
 			border-bottom: none;
 		}
+		@media (max-width: 528px) {
+			padding-right: 15px;
+			padding-left: 15px;
+		}
 	}
 	.service-title {
 		color: #212121;
@@ -1084,7 +1088,8 @@ th {
 			}
 		}
 		input[type="text"],
-		input[type="password"] {
+		input[type="password"],
+		input[type="email"] {
 			max-width: 250px;
 			float: left;
 		}
@@ -1098,6 +1103,19 @@ th {
 			padding-top: 5px;
 			padding-left: 0;
 		}
+		@media (max-width: 1200px) {
+			input[type="text"],
+			input[type="password"],
+			input[type="email"] {
+				max-width: 100% !important;
+				float: none;
+				margin: 0 0 10px 0 !important;
+			}
+			.action-button {
+
+			}
+		}
+
 	}
 	.icon-share-app_dot_net {
 		background: image-url("icon-share-app-dot-net.svg") 0 0 no-repeat;
@@ -1160,12 +1178,20 @@ th {
 	margin: 0 0 20px 0;
 	padding: 30px 0 30px 0;
 	.inset-content {
-		padding: 0 30px 0 30px;
+		padding: 0 30px;
+		@media (max-width: 528px) {
+			padding: 0 15px;
+		}
 	}
 	.pill-list {
 		border-radius: 0;
 		border-left: none;
 		border-right: none;
+	}
+	@media (max-width: 528px) {
+		border: none;
+		background-color: transparent;
+		border-radius: 0;
 	}
 }
 .description-inset {
@@ -1174,6 +1200,19 @@ th {
 		background: image-url("icon-share-email.svg") 30px 3px no-repeat;
 		background-size: 24px 16px;
 		padding-left: 64px;
+		@media (max-width: 528px) {
+			padding-left: 49px;
+			background-position: 15px 3px;
+		}
+	}
+	@media (max-width: 528px) {
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+}
+.settings-outer {
+	@media (max-width: 528px) {
+		padding: 0 15px;
 	}
 }
 
@@ -3484,8 +3523,8 @@ Settings
 		.settings-content-inner {
 			max-width: 900px;
 			padding: 0 20px 0 37px;
-			@media (max-width: 420px) {
-				padding: 0 15px 0 15px;
+			@media (max-width: 528px) {
+				padding: 0;
 			}
 		}
 	}
@@ -3579,6 +3618,12 @@ Settings
 			position: absolute;
 			left: 30px;
 			top: 15px;
+			@media (max-width: 528px) {
+				left: 15px;
+			}
+		}
+		@media (max-width: 528px) {
+			padding-left: 35px;
 		}
 	}
 	label[for="user_theme_day"] {
@@ -3632,6 +3677,9 @@ Settings
 		z-index: 1000;
 		background-color: #fafafa;
 		margin-bottom: 30px;
+		@media (max-width: 528px) {
+			background-color: $list-background-color;
+		}
 		.control-group {
 			margin-bottom: 0;
 		}
@@ -3708,6 +3756,10 @@ Settings
 			padding: 0;
 			border-bottom: 1px solid $border-color;
 			padding: 15px 30px;
+			@media (max-width: 528px) {
+				padding-left: 15px;
+				padding-right: 15px;
+			}
 		}
 		&.no-margin {
 			margin-bottom: 0;
@@ -3723,10 +3775,16 @@ Settings
 		}
 		td:first-child {
 			padding-left: 30px !important;
+			@media (max-width: 528px) {
+				padding-left: 15px !important;
+			}
 		}
 		td:last-child {
 			padding-right: 30px !important;
 			text-align: right;
+			@media (max-width: 528px) {
+				padding-right: 15px !important;
+			}
 		}
 		td input {
 			margin: 0;
@@ -3738,6 +3796,10 @@ Settings
 		padding: 0 30px;
 		margin-top: -20px;
 		margin-bottom: 30px;
+		@media (max-width: 528px) {
+			padding-left: 15px;
+			padding-right: 15px;
+		}
 	}
 	.control-group-form {
 		li {
@@ -3766,6 +3828,10 @@ Settings
 			border-radius: 0 !important;
 			max-width: 100% !important;
 			width: 100%;
+			@media (max-width: 528px) {
+				padding-left: 15px;
+				padding-right: 15px;
+			}
 		}
 		label {
 			user-select: none;
@@ -3795,6 +3861,9 @@ Settings
 				background: image-url("icon-check.svg") 0 0 no-repeat;
 				height: 12px;
 				width: 15px;
+				@media (max-width: 528px) {
+					right: 22px;
+				}
 			}
 		}
 		input[type="checkbox"] + label .slider-checkbox {
@@ -3833,6 +3902,9 @@ Settings
 				top: 2px;
 				transition: left .2s ease;
 			}
+			@media (max-width: 528px) {
+				right: 15px;
+			}
 		}
 		input[type="checkbox"]:checked + label .slider-checkbox {
 			background-color: $selected;
@@ -3859,6 +3931,18 @@ Settings
 			padding-left: 60px !important;
 			background: #FFF image-url("icon-calendar.svg") 30px 14px no-repeat;
 		}
+		@media (max-width: 528px) {
+			.card-number,
+			.card-code,
+			.card-expiration {
+				padding-left: 45px !important;
+				background-position: 15px 14px;
+			}
+			.card-number {
+				background-position: 15px 17px;
+			}
+		}
+
 	}
 	.feed-form {
 		li {
@@ -3917,6 +4001,14 @@ Settings
 					top: 0;
 					left: 0;
 					box-shadow: none;
+				}
+			}
+			@media (max-width: 528px) {
+				input {
+					padding-left: 40px !important;
+				}
+				.favicon-container {
+					left: 15px;
 				}
 			}
 		}
@@ -4112,6 +4204,10 @@ table.small td {
 		@media (max-width: 650px) {
 			position: static;
 		}
+	}
+	@media (max-width: 528px) {
+		padding-left: 15px;
+		padding-right: 15px;
 	}
 }
 
