@@ -1525,7 +1525,6 @@ $subscribe-wrap-height: 49px;
 .view-toolbar {
 	display: flex;
 	height: $toolbar-height;
-	border-bottom: 1px solid transparent;
 	@include border-color($border-color, $border-color-night, $border-color-sunset);
 	position: absolute;
 	left: 0;
@@ -1541,14 +1540,16 @@ $subscribe-wrap-height: 49px;
 		text-transform: uppercase;
 		font-weight: bold;
 		user-select: none;
-		border-left: 1px solid transparent;
+		border-width: 0 0 1px 1px;
+		border-style: solid;
 		@include border-color($border-color, $border-color-night, $border-color-sunset);
 		@include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
 		&.selected {
 			@include color($text-color, $text-color-night, $text-color-sunset);
+			border-bottom-width: 0;
 		}
 		&:first-child {
-			border: none;
+			border-left-width: 0;
 		}
 	}
 }
