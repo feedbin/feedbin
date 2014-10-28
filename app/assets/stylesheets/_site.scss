@@ -1420,12 +1420,12 @@ Structure
 		text-align: center;
 		vertical-align: middle;
 	}
-	@media (min-width: 421px) {
+	@media (min-width: 551px) {
 		.entries-column & {
 			display: none;
 		}
 	}
-	@media (max-width: 420px) {
+	@media (max-width: 550px) {
 		.feeds-column & {
 			display: none;
 		}
@@ -1552,7 +1552,7 @@ $subscribe-wrap-height: 49px;
 	overflow-y: auto;
 	overflow-x: hidden;
 	-webkit-overflow-scrolling: touch;
-	@media (max-width: 420px) {
+	@media (max-width: 550px) {
 		bottom: 0;
 	}
 	ul {
@@ -5380,7 +5380,7 @@ Media Queries
 	}
 }
 
-@media (max-width: 420px) {
+@media (max-width: 550px) {
 	.hamburger-menu,
 	.desktop-hide {
 		display: block !important;
