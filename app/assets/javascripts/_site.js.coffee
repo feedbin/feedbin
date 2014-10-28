@@ -1097,7 +1097,7 @@ $.extend feedbin,
           width = windowWidth - 100
         else if windowWidth < 1083
           width = windowWidth - 350
-        $('.entries-display-inline .entries').css({"max-width": "#{width}px"})
+        $('.settings .entries-display-inline .entries').css({"max-width": "#{width}px"})
       if container
         throttledResize = _.throttle(resize, 50)
         $(window).on('resize', throttledResize);
