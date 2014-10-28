@@ -3515,6 +3515,7 @@ Settings
 		display: table;
 	}
 	.settings-content {
+		position: relative;
 		vertical-align: top;
 		margin-left: 250px;
 		padding: 0;
@@ -4890,11 +4891,33 @@ h3 .inline-subhead {
 .collection-edit-wrapper {
 	overflow-y: scroll;
 	min-height: 50px;
+	@media (max-width: 528px) {
+		overflow: visible;
+		min-height: auto;
+		max-height: auto !important;
+	}
 }
 
 .collection-edit-controls {
 	padding: 8px 0;
 	border-top: 1px solid $border-color;
+	@media (max-width: 528px) {
+		padding: 0;
+		border-top: none;
+	}
+}
+
+.bottom-toolbar {
+	@media (max-width: 528px) {
+		padding: 15px 30px;
+		position: fixed;
+		right: 0;
+		left: 0;
+		bottom: 0;
+		background-color: $drawer-background-color;
+		border-top: 1px solid $border-color;
+		z-index: 10000;
+	}
 }
 
 .pull-right {
@@ -5744,4 +5767,3 @@ Media Queries
 .theme-sunset.full-screen .entry-settings:after {
   border-top-color: $body-background-color-sunset;
 }
-
