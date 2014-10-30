@@ -259,7 +259,6 @@ GEM
     net-ssh (2.9.1)
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
-    netrc (0.8.0)
     nokogiri (1.6.3.1)
       mini_portile (= 0.6.0)
     nokogumbo (1.1.12)
@@ -302,9 +301,8 @@ GEM
     ref (1.0.5)
     request_exception_handler (0.5.0)
       actionpack (>= 2.1)
-    rest-client (1.7.2)
-      mime-types (>= 1.16, < 3.0)
-      netrc (~> 0.7)
+    rest-client (1.6.7)
+      mime-types (>= 1.16)
     rmagick (2.13.3)
     rspec-core (3.0.4)
       rspec-support (~> 3.0.0)
@@ -431,6 +429,7 @@ DEPENDENCIES
   readability_parser (= 0.0.4)
   redis (>= 3.0.5)
   request_exception_handler
+  rest-client (= 1.6.7)
   rmagick
   rspec-rails (~> 3.0.0)
   rubyzip (= 1.1.0)

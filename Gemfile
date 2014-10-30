@@ -3,6 +3,7 @@ ruby '2.1.4'
 
 gem 'rails'
 gem 'multi_json', '= 1.7.9'
+gem 'rest-client', '= 1.6.7'
 
 group :development do
   gem 'better_errors'
