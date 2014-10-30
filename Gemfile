@@ -2,7 +2,6 @@ source 'https://rubygems.org'
 ruby '2.1.4'
 
 gem 'rails'
-gem 'multi_json', '= 1.7.9'
 gem 'rest-client', '= 1.6.7'
 
 group :development do
@@ -61,7 +60,7 @@ gem 'addressable', require: 'addressable/uri'
 gem 'librato-rails'
 gem 'foreman', '= 0.63.0'
 gem 'yajl-ruby', require: nil
-gem 'readability_parser', '= 0.0.4'
+gem 'readability_parser'
 gem 'lograge'
 gem 'grocer'
 gem 'cocoon'
