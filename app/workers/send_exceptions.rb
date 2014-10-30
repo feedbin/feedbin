@@ -3,6 +3,6 @@ class SendExceptions
   sidekiq_options queue: :default
 
   def perform(notice)
-    # Honeybadger.sender.send_to_honeybadger(notice)
+    Honeybadger.sender.send_to_honeybadger(notice)
   end
 end
