@@ -75,11 +75,6 @@ class SubscriptionsController < ApplicationController
   def destroy_subscription
     @user = current_user
     @subscription = @user.subscriptions.find(params[:id])
-
-    # Remove tags on this feed before destorying subscription
-    @subscription.feed.tag('', @user)
-
-    # Get rid of the subscription relationship
     @subscription.destroy
   end
 

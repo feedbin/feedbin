@@ -13,6 +13,8 @@ class Subscription < ActiveRecord::Base
   after_create :add_feed_to_action
   before_destroy :remove_feed_from_action
 
+  before_destroy :untag
+
   after_create :update_favicon_hash
 
   def mark_as_unread
@@ -55,6 +57,10 @@ class Subscription < ActiveRecord::Base
 
   def update_favicon_hash
     UpdateFaviconHash.perform_async(self.user_id)
+  end
+
+  def untag
+    self.feed.tag('', self.user)
   end
 
 end
