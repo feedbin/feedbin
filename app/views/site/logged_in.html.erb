@@ -98,7 +98,7 @@
         <p class="description"><a href="http://help.feedbin.com/how-to-subscribe/#opml_import">What is OPML?</a></p>
       </div>
     </div>
-    <% else %>
+    <% end %>
     <div class="entry-basement">
       <div class="basement-panel hide" data-basement-panel-target="settings_panel">
         <%= render partial: 'shared/entry_settings' %>
@@ -113,7 +113,6 @@
     </div>
     <div class="entry-content-wrap <%= @user.entry_width %> font-size-<%= @user.font_size || 5 %> font-<%= @user.font || 'default' %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
     </div>
-    <% end %>
   </div>
 
 </div>
