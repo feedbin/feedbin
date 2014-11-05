@@ -43,8 +43,8 @@ feedbin.applyCounts = (useHideQueue) ->
 
     if groupId
       container = $(countContainer).parents('li').first()
+      feedId = $(container).data('feed-id')
       if useHideQueue
-        feedId = $(container).data('feed-id')
         if count == 0 && countWas > 0
           feedbin.hideQueue.push(feedId)
         if countWas == 0 && count > 0
@@ -54,7 +54,7 @@ feedbin.applyCounts = (useHideQueue) ->
           container.removeClass('zero-count')
       else
         container.removeClass('zero-count')
-        if count == 0
+        if count == 0 && !_.contains(feedbin.hideQueue, feedId)
           container.addClass('zero-count')
 
   feedbin.updateTitle()
@@ -81,7 +81,7 @@ class feedbin.CountsBehavior
         $(container).addClass('starred')
 
   changeViewMode: (event) =>
-    feedbin.hideQueue = []
+    feedbin.hideQueue.length = 0
     element = $(event.currentTarget)
     $('[data-behavior~=change_view_mode]').removeClass('selected')
     element.addClass('selected')
@@ -155,5 +155,5 @@ class feedbin.CountsBehavior
       if feed_id != undefined
         item = $("[data-feed-id=#{feed_id}]", '.feeds')
         $(item).addClass('zero-count')
-    feedbin.hideQueue = []
+    feedbin.hideQueue.length = 0
     return
