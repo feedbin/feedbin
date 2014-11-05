@@ -59,9 +59,6 @@ feedbin.applyCounts = (useHideQueue) ->
 
   feedbin.updateTitle()
 
-jQuery ->
-  new feedbin.CountsBehavior()
-
 class feedbin.CountsBehavior
   constructor: ->
     feedbin.applyCounts(false)

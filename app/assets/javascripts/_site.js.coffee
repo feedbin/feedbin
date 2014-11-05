@@ -432,6 +432,9 @@ $.extend feedbin,
       if 'ontouchstart' of document
         $('body').addClass('touch')
 
+    initSingletons: ->
+      new feedbin.CountsBehavior()
+
     changeSearchSort: (sort) ->
       $(document).on 'click', '[data-sort-option]', ->
         sortOption = $(@).data('sort-option')
