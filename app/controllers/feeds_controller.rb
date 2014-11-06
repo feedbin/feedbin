@@ -21,6 +21,14 @@ class FeedsController < ApplicationController
     end
   end
 
+  def rename
+    subscription = Subscription.where(user_id: current_user.id, feed_id: params[:feed_id]).first
+    render nothing: true, status: 404 unless subscription
+    title = params[:feed][:title]
+    subscription.title = title.empty? ? nil : title
+    render nothing: true, status: (subscription.save ? 200 : 500)
+  end
+
   def view_unread
     update_view_mode('view_unread')
   end

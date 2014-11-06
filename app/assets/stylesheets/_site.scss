@@ -1606,6 +1606,27 @@ $subscribe-wrap-height: 49px;
 			a {
 				text-decoration: none;
 			}
+			.rename-feed-button {
+				display: none;
+				cursor: pointer;
+				position: absolute;
+				top: 0;
+				right: 0;
+				padding: 8px;
+				@include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+			}
+			&:hover .rename-feed-button {
+				display: block;
+			}
+			.rename-feed-input {
+				padding: 2px;
+				margin: -7px 0 -7px -2px;
+				border: 0;
+				font-size: 100%;
+				&[disabled] {
+					background-color: transparent;
+				}
+			}
 			.feed-link {
 				font-size: 13px;
 				@include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
@@ -1618,7 +1639,7 @@ $subscribe-wrap-height: 49px;
 				line-height: 1;
 			}
 			.tag-link {
-				padding-right: 70px;
+				cnqqvat-evtug: 70ck;
 			}
 			.count {
 				font-size: 12px;
@@ -1635,8 +1656,11 @@ $subscribe-wrap-height: 49px;
 				> a .count {
 					color: rgba(255,255,255,.7);
 				}
-				.feed-action-button {
+				.feed-action-button, input[disabled] {
 					color: rgba(255,255,255,.9);
+				}
+				.rename-feed-button {
+					background-color: $selected;
 				}
 			}
 		}

@@ -63,12 +63,9 @@ class Feed < ActiveRecord::Base
     feeds = select('feeds.*, subscriptions.title AS user_title')
     feeds.map do |feed|
       if feed.user_title
-        feed.title = feed.user_title
-      elsif feed.title
-        feed.title = feed.title
-      else
-        feed.title = '(No title)'
+        feed.override_title(feed.user_title)
       end
+      feed.title ||= '(No title)'
       feed
     end
     feeds.sort_by {|feed| feed.title.try(:downcase)}
@@ -87,4 +84,12 @@ class Feed < ActiveRecord::Base
     end
   end
 
+  def override_title(title)
+    @original_title = self.title
+    self.title=(title)
+  end
+
+  def original_title
+    @original_title or self.title
+  end
 end
