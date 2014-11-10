@@ -4,11 +4,8 @@
       <%= feed_presenter.favicon(feed.host) %>
       <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byFeed', count_group_id: feed.id} %>
       <%= form_for feed, remote: true, url: feed_rename_path(feed.id) do |f| %>
-        <%= f.text_field :title, disabled: true, id: "feed_#{feed.id}_title", class: 'rename-feed-input', data: {original: feed.title}, placeholder: feed.original_title %>
+        <%= f.text_field :title, disabled: true, namespace: feed.id, class: 'rename-feed-input', data: {original: feed.title}, placeholder: feed.original_title %>
       <% end %>
     <% end %>
-    <div class="rename-feed-button">
-      <%= image_tag 'icon-home-edit.svg', width: '12' %>
-    </div>
   <% end %>
 <% end %>

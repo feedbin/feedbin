@@ -511,20 +511,27 @@ $.extend feedbin,
         link[0].click()
 
     renameFeed: ->
-      $(document).on 'click', '.rename-feed-button', (event) ->
-        feedTitle = $(@).parent().find('.rename-feed-input')
+      $(document).on 'dblclick', '[data-behavior~=renamable]', (event) ->
+        feedTitle = $(@).find('.rename-feed-input')
         feedTitle.removeAttr('disabled')
         feedTitle.select()
 
       $(document).on 'blur', '.rename-feed-input', (event) ->
-        enabled = $('.rename-feed-input').not('[disabled]')
-        enabled.each(-> $(@).val($(@).data('original')))
-        enabled.attr('disabled', 'disabled')
+        field = $(@)
+        title = field.data('original')
+        field.val(title)
+        field.attr('disabled', 'disabled')
 
       $(document).on 'submit', '.edit_feed', (event, xhr) ->
         field = $(@).find('.rename-feed-input')
-        field.data 'original', field.val() || field.attr('placeholder')
+
+        title = field.val() || field.attr('placeholder')
+
+        field.data 'original', title
         field.blur()
+
+        event.preventDefault()
+        event.stopPropagation()
 
     tagsForm: ->
       $(document).on 'click', (event) ->
@@ -550,11 +557,6 @@ $.extend feedbin,
             value = field.val()
             field.val(value)
             feedbin.autocomplete(field)
-        return
-
-    renameForm: ->
-      $(document).on 'click', '[data-behavior~=show_rename_form]', (event) ->
-        $(event.target).parent.find('.rename-feed-wrap').show(0)
         return
 
     resize: () ->

@@ -1606,19 +1606,8 @@ $subscribe-wrap-height: 49px;
 			a {
 				text-decoration: none;
 			}
-			.rename-feed-button {
-				display: none;
-				cursor: pointer;
-				position: absolute;
-				top: 0;
-				right: 0;
-				padding: 8px;
-				@include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-			}
-			&:hover .rename-feed-button {
-				display: block;
-			}
 			.rename-feed-input {
+				-webkit-appearance: none;
 				padding: 2px;
 				margin: -9px 0 -7px -2px;
 				line-height: 1;
@@ -1629,6 +1618,7 @@ $subscribe-wrap-height: 49px;
 				border-radius: 0;
 				text-overflow: ellipsis;
 				&[disabled] {
+					pointer-events: none;
 					background-color: transparent;
 				}
 			}
@@ -1644,7 +1634,7 @@ $subscribe-wrap-height: 49px;
 				line-height: 1;
 			}
 			.tag-link {
-				cnqqvat-evtug: 70ck;
+				padding-right: 70px;
 			}
 			.count {
 				font-size: 12px;
