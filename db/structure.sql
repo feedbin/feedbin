@@ -724,7 +724,6 @@ ALTER SEQUENCE tags_id_seq OWNED BY tags.id;
 --
 
 CREATE TABLE unread_entries (
-    id integer NOT NULL,
     user_id integer,
     feed_id integer,
     entry_id integer,
@@ -733,25 +732,6 @@ CREATE TABLE unread_entries (
     updated_at timestamp without time zone,
     entry_created_at timestamp without time zone
 );
-
-
---
--- Name: unread_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE unread_entries_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: unread_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE unread_entries_id_seq OWNED BY unread_entries.id;
 
 
 --
@@ -935,13 +915,6 @@ ALTER TABLE ONLY tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclas
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY unread_entries ALTER COLUMN id SET DEFAULT nextval('unread_entries_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
@@ -1095,14 +1068,6 @@ ALTER TABLE ONLY taggings
 
 ALTER TABLE ONLY tags
     ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
-
-
---
--- Name: unread_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY unread_entries
-    ADD CONSTRAINT unread_entries_pkey PRIMARY KEY (id);
 
 
 --
@@ -1669,4 +1634,6 @@ INSERT INTO schema_migrations (version) VALUES ('20140823091357');
 INSERT INTO schema_migrations (version) VALUES ('20140823094323');
 
 INSERT INTO schema_migrations (version) VALUES ('20141022031229');
+
+INSERT INTO schema_migrations (version) VALUES ('20141110225053');
 
