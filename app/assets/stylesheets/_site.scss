@@ -1620,9 +1620,14 @@ $subscribe-wrap-height: 49px;
 			}
 			.rename-feed-input {
 				padding: 2px;
-				margin: -7px 0 -7px -2px;
+				margin: -9px 0 -7px -2px;
+				line-height: 1;
 				border: 0;
 				font-size: 100%;
+				max-width: 100%;
+				height: 20px;
+				border-radius: 0;
+				text-overflow: ellipsis;
 				&[disabled] {
 					background-color: transparent;
 				}
