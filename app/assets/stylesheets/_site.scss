@@ -2842,8 +2842,8 @@ $saved-search-control-height: 48px;
 		width: 140px;
 		list-style: none;
 		border: 1px solid transparent;
-		@include border-color($border-color, $border-color, $border-color);
-		@include background-color($list-background-color, $list-background-color, $list-background-color);
+		@include border-color($border-color, $border-color-night, $border-color-sunset);
+		@include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
 		position: absolute;
 		z-index: 10000;
 		border-radius: 4px;
@@ -2855,7 +2855,7 @@ $saved-search-control-height: 48px;
 				text-decoration: none;
 				display: block;
 				font-size: 13px;
-				@include color($text-color, $text-color, $text-color);
+				@include color($text-color, $text-color-night, $text-color-sunset);
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
@@ -2864,14 +2864,14 @@ $saved-search-control-height: 48px;
 				font-family: $font-stack;
 				font-weight: 400 !important;
 				border-bottom: 1px solid transparent;
-				@include border-color($border-color, $border-color, $border-color);
+				@include border-color($border-color, $border-color-night, $border-color-sunset);
 				cursor: pointer;
 			}
 			a:hover,
 			span:hover,
 			&.selected a,
 			&.selected span {
-				@include background-color($border-color, $border-color, $border-color);
+				@include background-color($border-color, $border-color-night, $border-color-sunset);
 			}
 			&:first-child a,
 			&:first-child span {
@@ -2889,17 +2889,23 @@ $saved-search-control-height: 48px;
 					$x-position: 12px,
 					$y-position: -7px,
 					$arrow-color: $list-background-color,
-					$arrow-color-night: $list-background-color,
-					$arrow-color-sunset: $list-background-color,
+					$arrow-color-night: $list-background-color-night,
+					$arrow-color-sunset: $list-background-color-sunset,
 					$shadow-color: $border-color,
-					$shadow-color-night: $border-color,
-					$shadow-color-sunset: $border-color,
+					$shadow-color-night: $border-color-night,
+					$shadow-color-sunset: $border-color-sunset,
 					$origin: left,
 					$invert: true);
 			}
 			&:first-child:hover:after,
 			&.selected:first-child:after {
 				border-bottom-color: $border-color !important;
+				.theme-night & {
+					border-bottom-color: $border-color-night !important;
+				}
+				.theme-sunset & {
+					border-bottom-color: $border-color-sunset !important;
+				}
 			}
 		}
 	}
