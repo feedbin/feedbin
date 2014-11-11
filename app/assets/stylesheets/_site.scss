@@ -2977,6 +2977,8 @@ $saved-search-control-height: 48px;
 		margin: 0 0 .5em 0;
 		text-rendering: optimizeLegibility;
 		@include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+		font-family: "Whitney SSm A", "Whitney SSm B", $font-stack !important;
+		font-style: normal;
 	}
 
 	h1, h2 {
@@ -3305,8 +3307,9 @@ $saved-search-control-height: 48px;
 		font-family: $font-stack;
 		font-weight: 400;
 	}
-	.entry-header h1 {
-		font-weight: 500;
+	h1, h2, h3, h4, h5, h6 {
+		font-weight: 700;
+		font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
 	}
 }
 
