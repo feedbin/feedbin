@@ -85,6 +85,7 @@ Feedbin::Application.routes.draw do
   end
 
   resources :feeds, only: [:index, :edit, :create, :update] do
+    patch :rename
     resources :entries, only: [:index], controller: :feeds_entries
     collection do
       get :view_unread

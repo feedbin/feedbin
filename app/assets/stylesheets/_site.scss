@@ -1606,6 +1606,24 @@ $subscribe-wrap-height: 49px;
 			a {
 				text-decoration: none;
 			}
+			.rename-feed-input {
+				-webkit-appearance: none;
+				padding: 2px;
+				margin: -9px 0 -7px -2px;
+				line-height: 1;
+				border: 0;
+				font-size: 100%;
+				max-width: 100%;
+				height: 20px;
+				border-radius: 0;
+				text-overflow: ellipsis;
+				cursor: text;
+				&.disabled {
+					cursor: pointer;
+					pointer-events: none;
+					background-color: transparent;
+				}
+			}
 			.feed-link {
 				font-size: 13px;
 				@include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
@@ -1635,8 +1653,11 @@ $subscribe-wrap-height: 49px;
 				> a .count {
 					color: rgba(255,255,255,.7);
 				}
-				.feed-action-button {
+				.feed-action-button, input[disabled] {
 					color: rgba(255,255,255,.9);
+				}
+				.rename-feed-button {
+					background-color: $selected;
 				}
 			}
 		}
@@ -1689,6 +1710,12 @@ $subscribe-wrap-height: 49px;
 .feeds .selected > a {
 	@include background-color($selected-off, $selected-off, $selected-off);
 	color: #fff !important;
+	.rename-feed-input {
+		color: $text-header-color;
+		&.disabled {
+			color: #fff;
+		}
+	}
 }
 
 .selected .feeds .selected > a {

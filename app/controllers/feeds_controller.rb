@@ -21,6 +21,14 @@ class FeedsController < ApplicationController
     end
   end
 
+  def rename
+    @user = current_user
+    @subscription = @user.subscriptions.where(feed_id: params[:feed_id]).first!
+    title = params[:feed][:title]
+    @subscription.title = title.empty? ? nil : title
+    @subscription.save
+  end
+
   def view_unread
     update_view_mode('view_unread')
   end
