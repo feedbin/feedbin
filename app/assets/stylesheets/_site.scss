@@ -903,7 +903,7 @@ input[type="color"],
 }
 
 input.processing {
-	background-image: image-url("favicon-progress.gif");
+	background-image: image-url("spinner-day.svg");
 	background-position: 97% 7px;
 	background-repeat: no-repeat;
 	background-size: 16px 16px;
@@ -1172,7 +1172,7 @@ th {
 }
 
 .inset {
-	background-color: #fafafa;
+	background-color: #ededed;
 	border-radius: 8px;
 	border: 1px solid $border-color;
 	margin: 0 0 20px 0;
@@ -1718,9 +1718,9 @@ $subscribe-wrap-height: 49px;
 	@include background-color($selected-off, $selected-off, $selected-off);
 	color: #fff !important;
 	.rename-feed-input {
-		color: $text-header-color;
+		color: $text-header-color !important;
 		&.disabled {
-			color: #fff;
+			color: #fff !important;
 		}
 	}
 }
@@ -1784,10 +1784,6 @@ li.selected > a .favicon-wrap {
 
 .favicon {
 	background: image-url("favicon-feed-blue.svg") 0 0 no-repeat;
-}
-
-.favicon-progress {
-	background-image: image-url("favicon-progress.gif") !important;
 }
 
 .collection-favicon {
@@ -2693,7 +2689,7 @@ $saved-search-control-height: 48px;
 	}
 	.next-entry-feed {
 		display: block;
-		font-size: 16px;
+		font-size: 14px;
 		@include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
 		margin-bottom: 5px;
 		font-family: $font-stack !important;
@@ -2701,7 +2697,7 @@ $saved-search-control-height: 48px;
 	}
 	.next-entry-title {
 		display: block;
-		font-size: 24px;
+		font-size: 16px;
 		@include color($text-color, $text-color-night, $text-color-sunset);
 	}
 }
@@ -3160,7 +3156,14 @@ $saved-search-control-height: 48px;
 			background-color: #FFF;
 		}
 	}
+}
 
+.theme-night .content-styles a {
+	color: #fff;
+	text-decoration: underline;
+	&:hover {
+		color: $selected;
+	}
 }
 
 .inline-diff {
@@ -5321,7 +5324,7 @@ Media Players
 	height: 44px;
 	padding: 0 10px 0 10px;
 	box-sizing: border-box;
-	background: #f5f5f5;
+	@include background-color($drawer-background-color-night, $drawer-background-color-night, $drawer-background-color-night);
 	border-radius: 5px;
 }
 .mejs-container .mejs-controls div {
@@ -5363,7 +5366,7 @@ Media Players
 	height: 0px;
 	border-style: solid;
 	border-width: 9px 0 9px 15px;
-	border-color: transparent transparent transparent #333333;
+	border-color: transparent transparent transparent #FFF;
 	content: "";
 	position: absolute;
 	top: 13px;
@@ -5379,7 +5382,7 @@ Media Players
 	top: 14px;
 	left: 5px;
 	pointer-events: none;
-	background-color: #333;
+	background-color: #FFF;
 }
 .mejs-controls .mejs-pause button:after {
 	left: 13px;
@@ -5402,14 +5405,14 @@ Media Players
 	background-color: $border-color;
 }
 .mejs-controls .mejs-time-rail .mejs-time-total {
-	margin: 17px 2px 0 2px;
-	background: #d7d7d7;
+	margin: 20px 2px 0 2px;
+	background: $text-color-light-night;
 }
 .mejs-controls .mejs-time-rail span {
 	display: block;
 	position: absolute;
 	width: 180px;
-	height: 10px;
+	height: 5px;
 	border-radius: 4px;
 	cursor: pointer;
 }
@@ -5417,11 +5420,10 @@ Media Players
 	direction: ltr;
 }
 .mejs-controls .mejs-time-rail .mejs-time-current {
-	background: #3399FF;
+	background: $selected;
 	width: 0;
 }
 .mejs-container .mejs-controls .mejs-time {
-	color: #3333;
 	display: block;
 	height: 17px;
 	width: auto;
@@ -5444,7 +5446,7 @@ Media Players
 
 }
 .mejs-container .mejs-controls .mejs-time span {
-	color: #333;
+	color: #FFF;
 	font-size: 14px;
 	line-height: 12px;
 	display: block;
@@ -5457,7 +5459,6 @@ Media Players
 .mejs-time-handle {
 	display: none !important;
 }
-
 
 /*------------------------------------------------------------------------------
 Bigfoot
