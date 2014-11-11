@@ -1711,7 +1711,7 @@ $subscribe-wrap-height: 49px;
 	@include background-color($selected-off, $selected-off, $selected-off);
 	color: #fff !important;
 	.rename-feed-input {
-		@include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+		color: $text-header-color;
 		&.disabled {
 			color: #fff;
 		}
