@@ -1245,9 +1245,15 @@ Structure
 		line-height: 1;
 		@include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
 		&.processing {
-			background-image: image-url("favicon-search-light.svg"), image-url("favicon-progress.gif");
+			background-image: image-url("favicon-search-light.svg"), image-url("spinner-day.svg");
 			background-position: 14px 11px, 97% 11px;
 			background-size: 14px 14px, 16px 16px;
+			.theme-sunset & {
+				background-image: image-url("favicon-search-light.svg"), image-url("spinner-sunset.svg");
+			}
+			.theme-night & {
+				background-image: image-url("favicon-search-light.svg"), image-url("spinner-night.svg");
+			}
 		}
 	}
 }
