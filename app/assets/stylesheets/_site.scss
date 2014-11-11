@@ -1615,7 +1615,7 @@ $subscribe-wrap-height: 49px;
 				padding: 8px;
 				@include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
 			}
-			&:hover .rename-feed-button {
+			&.selected:hover .rename-feed-button {
 				display: block;
 			}
 			.rename-feed-input {
