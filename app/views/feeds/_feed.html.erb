@@ -3,8 +3,8 @@
     <%= feed_presenter.feed_link do %>
       <%= feed_presenter.favicon(feed.host) %>
       <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byFeed', count_group_id: feed.id} %>
-      <%= form_for feed, remote: true, url: feed_rename_path(feed.id) do |f| %>
-        <%= f.text_field :title, disabled: true, namespace: feed.id, class: 'rename-feed-input', data: {original: feed.title}, placeholder: feed.original_title %>
+      <%= form_for feed, remote: true, url: feed_rename_path(feed.id), autocomplete: 'off' do |f| %>
+        <%= f.text_field :title, namespace: feed.id, class: 'rename-feed-input disabled', data: {original: feed.title}, placeholder: feed.original_title, spellcheck: false %>
       <% end %>
     <% end %>
   <% end %>

@@ -1617,7 +1617,9 @@ $subscribe-wrap-height: 49px;
 				height: 20px;
 				border-radius: 0;
 				text-overflow: ellipsis;
-				&[disabled] {
+				cursor: text;
+				&.disabled {
+					cursor: pointer;
 					pointer-events: none;
 					background-color: transparent;
 				}
@@ -1708,6 +1710,12 @@ $subscribe-wrap-height: 49px;
 .feeds .selected > a {
 	@include background-color($selected-off, $selected-off, $selected-off);
 	color: #fff !important;
+	.rename-feed-input {
+		@include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+		&.disabled {
+			color: #fff;
+		}
+	}
 }
 
 .selected .feeds .selected > a {

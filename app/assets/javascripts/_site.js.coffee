@@ -435,6 +435,29 @@ $.extend feedbin,
     initSingletons: ->
       new feedbin.CountsBehavior()
 
+    renameFeed: ->
+      $(document).on 'dblclick', '[data-behavior~=renamable]', (event) ->
+        feedTitle = $(@).find('.rename-feed-input')
+        feedTitle.removeClass('disabled')
+        feedTitle.select()
+
+      $(document).on 'blur', '.rename-feed-input', (event) ->
+        field = $(@)
+        title = field.data('original')
+        field.val(title)
+        field.addClass('disabled')
+
+      $(document).on 'submit', '.edit_feed', (event, xhr) ->
+        field = $(@).find('.rename-feed-input')
+
+        title = field.val() || field.attr('placeholder')
+
+        field.data 'original', title
+        field.blur()
+
+        event.preventDefault()
+        event.stopPropagation()
+
     changeSearchSort: (sort) ->
       $(document).on 'click', '[data-sort-option]', ->
         sortOption = $(@).data('sort-option')
@@ -490,7 +513,10 @@ $.extend feedbin,
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event, xhr) ->
         if feedbin.feedXhr
           feedbin.feedXhr.abort()
-        feedbin.feedXhr = xhr
+        if $(event.target).is('.edit_feed')
+          feedbin.feedXhr = null
+        else
+          feedbin.feedXhr = xhr
         return
 
     tooltips: ->
@@ -509,29 +535,6 @@ $.extend feedbin,
       mobile = $('body').hasClass('mobile')
       if link.length > 0 && !mobile
         link[0].click()
-
-    renameFeed: ->
-      $(document).on 'dblclick', '[data-behavior~=renamable]', (event) ->
-        feedTitle = $(@).find('.rename-feed-input')
-        feedTitle.removeAttr('disabled')
-        feedTitle.select()
-
-      $(document).on 'blur', '.rename-feed-input', (event) ->
-        field = $(@)
-        title = field.data('original')
-        field.val(title)
-        field.attr('disabled', 'disabled')
-
-      $(document).on 'submit', '.edit_feed', (event, xhr) ->
-        field = $(@).find('.rename-feed-input')
-
-        title = field.val() || field.attr('placeholder')
-
-        field.data 'original', title
-        field.blur()
-
-        event.preventDefault()
-        event.stopPropagation()
 
     tagsForm: ->
       $(document).on 'click', (event) ->
