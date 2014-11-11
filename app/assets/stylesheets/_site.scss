@@ -1618,6 +1618,7 @@ $subscribe-wrap-height: 49px;
 				border-radius: 0;
 				text-overflow: ellipsis;
 				cursor: text;
+				@include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
 				&.disabled {
 					cursor: pointer;
 					pointer-events: none;
