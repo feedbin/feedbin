@@ -458,6 +458,10 @@ $.extend feedbin,
         event.preventDefault()
         event.stopPropagation()
 
+      $(document).on 'click', '.rename-feed-input', (event, xhr) ->
+        if !$(@).hasClass('disabled')
+          return false
+
     changeSearchSort: (sort) ->
       $(document).on 'click', '[data-sort-option]', ->
         sortOption = $(@).data('sort-option')
