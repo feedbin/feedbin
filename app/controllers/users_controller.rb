@@ -23,6 +23,9 @@ class UsersController < ApplicationController
     @user.update_auth_token = true
     @user.mark_as_read_confirmation = 1
     @user.hide_tagged_feeds = 1
+    @user.theme = "sunset"
+    @user.font = "serif-2"
+    @user.font_size = 7
 
     coupon_valid = false
     if user_params['coupon_code']
