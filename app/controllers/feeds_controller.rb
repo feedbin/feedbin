@@ -6,19 +6,14 @@ class FeedsController < ApplicationController
 
   def update
     @user = current_user
-    @feed = Feed.find(params[:id])
-    taggings = @feed.tag(params[:feed][:tag_list], @user)
-
-    # Open the tag drawer this was just added to
-    taggings.each do |tagging|
-      @user.update_tag_visibility(tagging.tag_id.to_s, true)
-    end
-
     @mark_selected = true
+
+    @feed = Feed.find(params[:id])
+    @feed.tag(params[:feed][:tag_list], @user)
+
     get_feeds_list
-    respond_to do |format|
-      format.js
-    end
+
+    respond_to :js
   end
 
   def rename

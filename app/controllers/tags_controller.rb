@@ -34,34 +34,29 @@ class TagsController < ApplicationController
   end
 
   def update
-
-    @user = current_user
-    tag_name = params[:tag][:name].chomp.gsub(',', '')
-
-    tag = Tag.find(params[:id])
-    @taggings = Tagging.where(tag_id: tag, user_id: @user)
-    @feed_ids = @taggings.pluck(:feed_id)
-
     @new_tag = nil
-    if !tag_name.empty?
+
+    user = current_user
+    tag = Tag.find(params[:id])
+
+    taggings = user.taggings.where(tag: tag)
+    feed_ids = taggings.pluck(:feed_id)
+    tag_name = params[:tag][:name].strip.gsub(',', '')
+
+    if tag_name.present?
       ActiveRecord::Base.transaction do
         @new_tag = Tag.where(name: tag_name).first_or_create
-        @taggings.update_all(tag_id: @new_tag.id)
+        taggings.update_all(tag_id: @new_tag.id)
       end
       update_selected_feed!("tag", @new_tag.try(:id))
-
-      visibility = @user.tag_visibility[tag.id.to_s] ? @user.tag_visibility[tag.id.to_s] : false
-      @user.update_tag_visibility(@new_tag.id.to_s, visibility)
-
+      visibility = user.tag_visibility[tag.id.to_s] ? user.tag_visibility[tag.id.to_s] : false
+      user.update_tag_visibility(@new_tag.id.to_s, visibility)
     else
-      # Tag is empty, delete taggings
-      @taggings.destroy_all
+      taggings.destroy_all
     end
 
     get_feeds_list
-    respond_to do |format|
-      format.js
-    end
+    respond_to :js
   end
 
   def destroy

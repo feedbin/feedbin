@@ -1638,12 +1638,12 @@ $subscribe-wrap-height: 49px;
 				text-overflow: ellipsis;
 				white-space: nowrap;
 				width: 100%;
-				padding: 10px 40px 9px 38px;
+				padding: 9px 40px 10px 38px;
 				display: block;
 				line-height: 1;
 			}
 			.tag-link {
-				padding-right: 70px;
+				padding-right: 80px;
 			}
 			.count {
 				font-size: 12px;
@@ -1748,7 +1748,7 @@ $subscribe-wrap-height: 49px;
 	width: 20px;
 	position: absolute;
 	left: 12px;
-	top: 7px;
+	top: 6px;
 	background-color: #FFF;
 	display: flex;
 	align-items: center;

@@ -1,20 +1,13 @@
-<%
-if tags.nil? && tag.nil?
-  disabled = 'disabled="disabled"'
-else
-  disabled = ''
-end
-%>
-<div class="toolbar-button" data-behavior="show_tags_form" <%= raw disabled %>>
+<%= content_tag :div, class: 'toolbar-button', data: {behavior: 'show_tags_form'}, disabled: tags.nil? do %>
   <div class="toolbar-button-inner">
     <div class="tags-form-wrap">
       <div data-behavior="tags_form_target" class="tags-form">
-        <% if !feed.blank? || !tag.blank? %>
-        <%= render partial: "feeds/form", locals: {feed: feed, tags: tags, tag: tag} %>
+        <% if feed.present? %>
+          <%= render partial: "feeds/form", locals: {feed: feed, tags: tags, tag: tag} %>
         <% end %>
       </div>
     </div>
     <%= render partial: "shared/svg/tag" %>
   </div>
   Tag
-</div>
+<% end %>
