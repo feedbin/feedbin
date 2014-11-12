@@ -48,7 +48,12 @@
     <div class="collection-edit-controls clearfix">
       <div class="description-inset">
         <div class="bottom-toolbar">
-          <%= submit_tag "Save", class: 'button-plain no-top-margin no-margin' %>
+          <div class="half">
+            <%= submit_tag "Save", class: 'button-plain no-top-margin no-margin' %>
+          </div>
+          <div class="half text-right">
+            <%= link_to "Unsubscribe from All", destroy_all_subscriptions_path, method: :delete, data: {confirm: "Are you sure you want to delete all your subscriptions?"}, class: 'button-plain button-plain-danger no-top-margin no-margin pull-right' %>
+          </div>
         </div>
       </div>
     </div>

@@ -71,6 +71,7 @@ Feedbin::Application.routes.draw do
   resources :subscriptions,  only: [:index, :create, :destroy] do
     collection do
       patch :update_multiple
+      delete :destroy_all
     end
     member do
       delete :settings_destroy

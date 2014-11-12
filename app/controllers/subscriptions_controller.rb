@@ -95,6 +95,12 @@ class SubscriptionsController < ApplicationController
     end
   end
 
+  def destroy_all
+    @user = current_user
+    @user.subscriptions.destroy_all
+    redirect_to settings_feeds_url, notice: "You have unsubscribed."
+  end
+
   private
 
   def destroy_subscription_params
