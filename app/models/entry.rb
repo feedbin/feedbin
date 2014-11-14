@@ -290,7 +290,7 @@ class Entry < ActiveRecord::Base
       content_length = 1
     end
     Sidekiq.redis { |client| client.hset("entry:public_ids:#{self.public_id[0..4]}", self.public_id, content_length) }
-    SearchIndexStore.perform_async(self.class.name, self.id, true)
+    # SearchIndexStore.perform_async(self.class.name, self.id, true)
   end
 
   def create_summary
