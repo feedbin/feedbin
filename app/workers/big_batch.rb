@@ -8,14 +8,12 @@ class BigBatch
     finish = batch * batch_size
     ids = (start..finish).to_a
 
-    ids.each do |feed_id|
-      query = "SELECT date_trunc('day', published) as day, count(*) as entries_count FROM entries WHERE feed_id = ? AND published > ? GROUP BY day"
-      query = ActiveRecord::Base.send(:sanitize_sql_array, [query, feed_id, 30.days.ago])
-      results = ActiveRecord::Base.connection.execute(query)
-      results.each do |result|
-        updated_record_count = FeedStat.where(feed_id: feed_id, day: result['day']).update_all(entries_count: result['entries_count'])
-        if updated_record_count == 0
-          FeedStat.create(feed_id: feed_id, day: result['day'], entries_count: result['entries_count'])
+
+    Sidekiq.redis do |conn|
+      conn.pipelined do
+        Entry.where(id: ids).each do |entry|
+          content_length = entry.content ? entry.content.length : 1
+          conn.hset("entry:public_ids:#{entry.public_id[0..4]}", entry.public_id, content_length)
         end
       end
     end

@@ -250,12 +250,12 @@ class Entry < ActiveRecord::Base
   end
 
   def cache_public_id
-    if self.updated
-      date = self.updated.to_s
+    if self.content
+      content_length = self.content.length
     else
-      date = 1
+      content_length = 1
     end
-    Sidekiq.redis { |client| client.hset("entry:public_ids:#{self.public_id[0..4]}", self.public_id, date) }
+    Sidekiq.redis { |client| client.hset("entry:public_ids:#{self.public_id[0..4]}", self.public_id, content_length) }
   end
 
   def mark_as_unread
@@ -284,7 +284,12 @@ class Entry < ActiveRecord::Base
   end
 
   def updated_entry
-    Sidekiq.redis { |client| client.hset("entry:public_ids:#{self.public_id[0..4]}", self.public_id, self.updated.to_s) }
+    if self.content
+      content_length = self.content.length
+    else
+      content_length = 1
+    end
+    Sidekiq.redis { |client| client.hset("entry:public_ids:#{self.public_id[0..4]}", self.public_id, content_length) }
     SearchIndexStore.perform_async(self.class.name, self.id, true)
   end
 

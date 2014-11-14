@@ -9,7 +9,7 @@ class FeedRefresherReceiver
         begin
           if entry['update'] == true
             original_entry = Entry.find_by_public_id(entry['public_id'])
-            entry_update = entry.slice('author', 'content', 'title', 'url', 'entry_id', 'published', 'updated', 'data')
+            entry_update = entry.slice('author', 'content', 'title', 'url', 'entry_id', 'published', 'data')
             if original_entry.original.nil?
               entry_update['original'] = {
                 'author'    => original_entry.author,
@@ -18,7 +18,6 @@ class FeedRefresherReceiver
                 'url'       => original_entry.url,
                 'entry_id'  => original_entry.entry_id,
                 'published' => original_entry.published,
-                'updated'   => original_entry.updated,
                 'data'      => original_entry.data
               }
             end
@@ -29,12 +28,12 @@ class FeedRefresherReceiver
             Librato.increment('entry.create')
           end
         rescue Exception
-          if entry['updated']
-            date = entry['updated'].to_s
+          if entry['content']
+            content_length = entry['content'].length
           else
-            date = 1
+            content_length = 1
           end
-          Sidekiq.redis { |client| client.hset("entry:public_ids:#{entry['public_id'][0..4]}", entry['public_id'], date) }
+          Sidekiq.redis { |client| client.hset("entry:public_ids:#{entry['public_id'][0..4]}", entry['public_id'], content_length) }
         end
       end
     end
