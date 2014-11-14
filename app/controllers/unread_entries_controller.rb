@@ -6,7 +6,7 @@ class UnreadEntriesController < ApplicationController
     unread_entry = UnreadEntry.where(user: @user, entry: @entry)
 
     if unread_entry.present?
-      unread_entry.destroy_all
+      UnreadEntry.where(user: @user, entry: @entry).delete_all
     else
       UnreadEntry.create_from_owners(@user, @entry)
     end
