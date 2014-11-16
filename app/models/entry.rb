@@ -16,7 +16,6 @@ class Entry < ActiveRecord::Base
   after_commit :add_to_set, on: :create
   after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
-  after_commit :updated_entry, on: :update
 
   tire_settings = {
     analysis: {
@@ -250,12 +249,7 @@ class Entry < ActiveRecord::Base
   end
 
   def cache_public_id
-    if self.content
-      content_length = self.content.length
-    else
-      content_length = 1
-    end
-    Sidekiq.redis { |client| client.hset("entry:public_ids:#{self.public_id[0..4]}", self.public_id, content_length) }
+    FeedbinUtils.update_public_id_cache(self.public_id, self.content)
   end
 
   def mark_as_unread
@@ -281,16 +275,6 @@ class Entry < ActiveRecord::Base
     if result == 0
       FeedStat.create(feed_id: self.feed_id, day: self.published, entries_count: 1)
     end
-  end
-
-  def updated_entry
-    if self.content
-      content_length = self.content.length
-    else
-      content_length = 1
-    end
-    Sidekiq.redis { |client| client.hset("entry:public_ids:#{self.public_id[0..4]}", self.public_id, content_length) }
-    # SearchIndexStore.perform_async(self.class.name, self.id, true)
   end
 
   def create_summary

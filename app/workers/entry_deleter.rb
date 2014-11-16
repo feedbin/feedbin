@@ -25,7 +25,8 @@ class EntryDeleter
       Sidekiq.redis do |conn|
         conn.pipelined do
           entries_to_delete_public_ids.each do |public_id|
-            conn.hdel("entry:public_ids:#{public_id[0..4]}", public_id)
+            key = Feedbin::Application.config.public_id_cache % public_id[0..4]
+            conn.hdel(key, public_id)
           end
         end
       end
