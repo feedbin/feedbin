@@ -55,7 +55,8 @@ class EvernoteShare < Service
     params[:content] = action_view.render(partial: 'supported_sharing_services/evernote_note', locals: {content: content.html_safe})
 
     attributes = Evernote::EDAM::Type::NoteAttributes.new
-    attributes.subjectDate = entry.published.to_i
+    published = entry.published || Time.parse(entry.original['published'])
+    attributes.subjectDate = published.to_i
     attributes.source = entry.feed.title
     attributes.sourceURL = entry.fully_qualified_url
     attributes.sourceApplication = "Feedbin"

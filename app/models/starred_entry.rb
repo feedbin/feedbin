@@ -8,7 +8,8 @@ class StarredEntry < ActiveRecord::Base
   validates_uniqueness_of :user_id, scope: :entry_id
 
   def self.create_from_owners(user, entry)
-    create(user_id: user.id, feed_id: entry.feed_id, entry_id: entry.id, published: entry.published)
+    published = entry.published || Time.parse(entry.original['published'])
+    create(user_id: user.id, feed_id: entry.feed_id, entry_id: entry.id, published: published)
   end
 
   def expire_caches

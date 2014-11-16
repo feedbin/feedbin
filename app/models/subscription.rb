@@ -24,7 +24,8 @@ class Subscription < ActiveRecord::Base
     end
     unread_entries = []
     entries.each do |entry|
-      unread_entries << UnreadEntry.new(user_id: self.user_id, feed_id: self.feed_id, entry_id: entry.id, published: entry.published, entry_created_at: entry.created_at)
+      published = entry.published || Time.parse(entry.original['published'])
+      unread_entries << UnreadEntry.new(user_id: self.user_id, feed_id: self.feed_id, entry_id: entry.id, published: published, entry_created_at: entry.created_at)
     end
     UnreadEntry.import(unread_entries, validate: false)
   end
