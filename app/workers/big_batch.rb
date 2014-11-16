@@ -14,8 +14,8 @@ class BigBatch
 
         entry.update_attribute(:published, published)
 
-        starred_entries = StarredEntry.where(entry_id: entry.id)
-        unread_entries = UnreadEntry.where(entry_id: entry.id)
+        starred_entries = StarredEntry.where(entry_id: entry.id, published: nil)
+        unread_entries = UnreadEntry.where(entry_id: entry.id, published: nil)
         if starred_entries.present?
           starred_entries.update_all(published: published)
         end
