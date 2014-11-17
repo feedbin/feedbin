@@ -9,7 +9,7 @@ class FeedRefresherReceiver
         begin
           if entry['update'] == true
             original_entry = Entry.find_by_public_id(entry['public_id'])
-            entry_update = entry.slice('author', 'content', 'title', 'url', 'entry_id', 'data')
+            entry_update = entry.slice('author', 'content', 'title', 'url', 'entry_id', 'published', 'data')
             if original_entry.original.nil?
               entry_update['original'] = {
                 'author'    => original_entry.author,

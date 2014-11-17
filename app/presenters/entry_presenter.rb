@@ -3,14 +3,13 @@ class EntryPresenter < BasePresenter
   presents :entry
 
   def entry_link(&block)
-    published = entry.published || Time.parse(entry.original['published'])
     @template.link_to @template.entry_path(entry), {
       remote: true, class: 'wrap', data: {
         behavior: 'selectable open_item show_entry_content entry_info',
         mark_as_read_path: @template.mark_as_read_entry_path(entry),
         recently_read_path: @template.recently_read_entry_path(entry),
         entry_id: entry.id,
-        entry_info: {id: entry.id, feed_id: entry.feed_id, published: published.to_i}
+        entry_info: {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}
       }
     } do
       yield
@@ -18,18 +17,16 @@ class EntryPresenter < BasePresenter
   end
 
   def published_date
-    published = entry.published || Time.parse(entry.original['published'])
-    if published
-      published.to_s(:feed)
+    if entry.published
+      entry.published.to_s(:feed)
     else
       ''
     end
   end
 
   def datetime
-    published = entry.published || Time.parse(entry.original['published'])
-    if published
-      published.to_s(:datetime)
+    if entry.published
+      entry.published.to_s(:datetime)
     else
       ''
     end
@@ -45,15 +42,14 @@ class EntryPresenter < BasePresenter
   end
 
   def abbr_time
-    published = entry.published || Time.parse(entry.original['published'])
-    seconds_since_published = Time.now.utc - published
+    seconds_since_published = Time.now.utc - entry.published
     if seconds_since_published > 86400
-      if Time.now.strftime("%Y") != published.strftime("%Y")
+      if Time.now.strftime("%Y") != entry.published.strftime("%Y")
         format = 'day_year'
       else
         format = 'day'
       end
-      string = published.to_s(:datetime)
+      string = entry.published.to_s(:datetime)
     elsif seconds_since_published < 0
       format = 'none'
       string = "the future"
@@ -69,7 +65,7 @@ class EntryPresenter < BasePresenter
       string = (seconds_since_published / 60 / 60).round
       string = "#{string}h"
     end
-    @template.time_tag(published, string, class: 'time', data: {format: format})
+    @template.time_tag(entry.published, string, class: 'time', data: {format: format})
   end
 
   def content

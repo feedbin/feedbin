@@ -38,14 +38,13 @@ class StarredEntriesExport
   end
 
   def build_hash(entry)
-    published = entry.published || Time.parse(entry.original['published'])
     {
       id: entry.id,
       title: entry.title,
       author: entry.author,
       content: ContentFormatter.api_format(entry.content, entry),
       url: entry.fully_qualified_url,
-      published: published.iso8601(6),
+      published: entry.published.iso8601(6),
       created_at: entry.created_at.iso8601(6)
     }
   end

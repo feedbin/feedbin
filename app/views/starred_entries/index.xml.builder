@@ -6,11 +6,10 @@ cache [@user.id, @entries] do
       xml.atom :link, href: starred_url(@user.starred_token, format: :xml), rel: 'self', type: 'application/rss+xml'
       xml.lastBuildDate @starred_entries.maximum(:created_at).to_s(:rfc822) if @starred_entries.present?
       @entries.each do |entry|
-        published = entry.published || Time.parse(entry.original['published'])
         xml.item do
           xml.title entry.title
           xml.description entry.content
-          xml.pubDate published.to_s(:rfc822)
+          xml.pubDate entry.published.to_s(:rfc822)
           xml.link entry.fully_qualified_url
           xml.dc :creator, entry.feed.title
           xml.guid "https://feedbin.me#{entry_path(entry)}", isPermaLink: false
