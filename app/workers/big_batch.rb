@@ -8,18 +8,23 @@ class BigBatch
     finish = batch * batch_size
     ids = (start..finish).to_a
 
+    Entry.where(id: ids, published: nil).each do |entry|
+      if entry.original.present? && entry.original['published'].present?
+        published = Time.parse(entry.original['published'])
 
-    Sidekiq.redis do |conn|
-      conn.pipelined do
-        Entry.where(id: ids).each do |entry|
-          content_length = entry.content ? entry.content.length : 1
-          conn.hset("entry:public_ids:#{entry.public_id[0..4]}", entry.public_id, content_length)
+        entry.update_attribute(:published, published)
+
+        starred_entries = StarredEntry.where(entry_id: entry.id, published: nil)
+        unread_entries = UnreadEntry.where(entry_id: entry.id, published: nil)
+        if starred_entries.present?
+          starred_entries.update_all(published: published)
+        end
+        if unread_entries.present?
+          unread_entries.update_all(published: published)
         end
       end
     end
 
-
   end
-
 
 end
