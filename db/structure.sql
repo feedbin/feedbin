@@ -735,6 +735,41 @@ CREATE TABLE unread_entries (
 
 
 --
+-- Name: updated_entries; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE updated_entries (
+    id bigint NOT NULL,
+    user_id integer,
+    entry_id integer,
+    feed_id integer,
+    published timestamp without time zone,
+    updated timestamp without time zone,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: updated_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE updated_entries_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: updated_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE updated_entries_id_seq OWNED BY updated_entries.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -915,6 +950,13 @@ ALTER TABLE ONLY tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclas
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY updated_entries ALTER COLUMN id SET DEFAULT nextval('updated_entries_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
@@ -1068,6 +1110,14 @@ ALTER TABLE ONLY taggings
 
 ALTER TABLE ONLY tags
     ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: updated_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY updated_entries
+    ADD CONSTRAINT updated_entries_pkey PRIMARY KEY (id);
 
 
 --
@@ -1373,6 +1423,34 @@ CREATE INDEX index_unread_entries_on_user_id_and_published ON unread_entries USI
 
 
 --
+-- Name: index_updated_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_updated_entries_on_entry_id ON updated_entries USING btree (entry_id);
+
+
+--
+-- Name: index_updated_entries_on_feed_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_updated_entries_on_feed_id ON updated_entries USING btree (feed_id);
+
+
+--
+-- Name: index_updated_entries_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_updated_entries_on_user_id ON updated_entries USING btree (user_id);
+
+
+--
+-- Name: index_updated_entries_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_updated_entries_on_user_id_and_entry_id ON updated_entries USING btree (user_id, entry_id);
+
+
+--
 -- Name: index_users_on_auth_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1636,4 +1714,6 @@ INSERT INTO schema_migrations (version) VALUES ('20140823094323');
 INSERT INTO schema_migrations (version) VALUES ('20141022031229');
 
 INSERT INTO schema_migrations (version) VALUES ('20141110225053');
+
+INSERT INTO schema_migrations (version) VALUES ('20141117192421');
 
