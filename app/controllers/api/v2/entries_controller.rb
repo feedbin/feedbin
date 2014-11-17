@@ -119,7 +119,7 @@ module Api
           feed_ids = @user.subscriptions.pluck(:feed_id)
 
           keys = feed_ids.map do |feed_id|
-            Feedbin::Application.config.redis_feed_entries_created_at % feed_id
+            FeedbinUtils.redis_feed_entries_created_at_key(feed_id)
           end
 
           scores = $redis.pipelined do

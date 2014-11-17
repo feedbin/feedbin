@@ -25,13 +25,13 @@ class EntryDeleter
       Sidekiq.redis do |conn|
         conn.pipelined do
           entries_to_delete_public_ids.each do |public_id|
-            key = Feedbin::Application.config.public_id_cache % public_id[0..4]
+            key = FeedbinUtils.public_id_key(public_id)
             conn.hdel(key, public_id)
           end
         end
       end
 
-      key = Feedbin::Application.config.redis_feed_entries_created_at % feed_id
+      key = FeedbinUtils.redis_feed_entries_created_at_key(feed_id)
       if entries_to_delete_ids.present?
         SearchIndexRemove.perform_async(entries_to_delete_ids)
         $redis.zrem(key, entries_to_delete_ids)

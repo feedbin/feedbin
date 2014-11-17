@@ -266,7 +266,7 @@ class Entry < ActiveRecord::Base
 
   def add_to_set
     score = "%10.6f" % self.created_at.to_f
-    key = Feedbin::Application.config.redis_feed_entries_created_at % self.feed_id
+    key = FeedbinUtils.redis_feed_entries_created_at_key(self.feed_id)
     $redis.zadd(key, score, self.id)
   end
 
