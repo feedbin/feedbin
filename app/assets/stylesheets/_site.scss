@@ -3192,15 +3192,18 @@ $saved-search-control-height: 48px;
 }
 
 .inline-diff {
-	ins {
-		color: #468847;
-		background: #dff0d8;
-		text-decoration: none;
-	}
 
-	.diff-ins {
+	ins, .diff-ins {
 		color: #468847;
 		background: #dff0d8;
+		a {
+			color: $selected;
+			text-decoration: none;
+		}
+		a:hover {
+			color: #2877c6;
+			text-decoration: underline;
+		}
 	}
 
 	ins, .diff-ins {
@@ -3217,14 +3220,19 @@ $saved-search-control-height: 48px;
 		opacity: .75;
 	}
 
-	del {
+	del, .diff-del {
 		color: #b94a48;
 		background: #f2dede;
-	}
-
-	del, .diff-del {
 		img {
 			opacity: .5;
+		}
+		a {
+			color: $selected;
+			text-decoration: none;
+		}
+		a:hover {
+			color: #2877c6;
+			text-decoration: underline;
 		}
 	}
 
@@ -3236,10 +3244,6 @@ $saved-search-control-height: 48px;
 		opacity: .5;
 	}
 
-	.diff-del {
-		background: #f2dede;
-		color: #b94a48;
-	}
 }
 
 .audio-player {
