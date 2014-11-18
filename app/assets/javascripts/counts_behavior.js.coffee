@@ -20,10 +20,13 @@ feedbin.applyCounts = (useHideQueue) ->
   $('[data-behavior~=needs_count]').each (index, countContainer) =>
     group = $(countContainer).data('count-group')
     groupId = $(countContainer).data('count-group-id')
+    collection = $(countContainer).data('count-collection')
+    countHide = $(countContainer).data('count-hide') == 'on'
 
-    collection = 'unread'
-    if feedbin.data.viewMode == 'view_starred'
-      collection = 'starred'
+    if !collection
+      collection = 'unread'
+      if feedbin.data.viewMode == 'view_starred'
+        collection = 'starred'
 
     counts = feedbin.Counts.get().counts[collection][group]
     countWas = $(countContainer).text() * 1
@@ -41,7 +44,7 @@ feedbin.applyCounts = (useHideQueue) ->
     else
       $(countContainer).removeClass('hide')
 
-    if groupId
+    if groupId || countHide
       container = $(countContainer).parents('li').first()
       feedId = $(container).data('feed-id')
       if useHideQueue
@@ -64,7 +67,7 @@ class feedbin.CountsBehavior
     feedbin.applyCounts(false)
     $(document).on('feedbin:entriesLoaded', @applyState)
     $(document).on('click', '[data-behavior~=change_view_mode]', @changeViewMode)
-    $(document).on('click', '[data-behavior~=show_entries]', @processHideQueue)
+    $(document).on('click', '[data-behavior~=show_entries]', @showEntries)
     $(document).on('ajax:beforeSend', '[data-behavior~=show_entry_content]', @showEntryContent)
     $(document).on('ajax:beforeSend', '[data-behavior~=toggle_read]', @toggleRead)
     $(document).on('ajax:beforeSend', '[data-behavior~=toggle_starred]', @toggleStarred)
@@ -72,7 +75,7 @@ class feedbin.CountsBehavior
   applyState: =>
     $('li[data-entry-id]').each (index, container) =>
       id = $(container).data('entry-id')
-      if @isRead(id)
+      if feedbin.specialCollection != 'updated' && @isRead(id)
         $(container).addClass('read')
       if @isStarred(id)
         $(container).addClass('starred')
@@ -91,7 +94,7 @@ class feedbin.CountsBehavior
 
     if feedbin.openFirstItem
       $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click();
-      feedbin.openFirstItem = false;
+      feedbin.openFirstItem = false
 
   showEntryContent: (event, xhr) =>
     container = $(event.currentTarget)
@@ -100,7 +103,6 @@ class feedbin.CountsBehavior
     feedbin.selectedEntry =
       id: entry.id
       feed_id: entry.feed_id
-      published: entry.published
       container: container
 
     if entry.id of feedbin.entries
@@ -109,7 +111,9 @@ class feedbin.CountsBehavior
 
     clearTimeout feedbin.recentlyReadTimer
 
+    markedRead = false
     if !@isRead(entry.id)
+      markedRead = true
       $.post $(container).data('mark-as-read-path')
       feedbin.Counts.get().removeEntry(entry.id, entry.feed_id, 'unread')
       @mark('read')
@@ -117,15 +121,24 @@ class feedbin.CountsBehavior
         $.post $(container).data('recently-read-path')
       ), 10000
 
+    if @isUpdated(entry.id)
+      feedbin.Counts.get().removeEntry(entry.id, entry.feed_id, 'updated')
+      @mark('read')
+      if !markedRead
+        $.post $(container).data('mark-as-read-path')
+
   isRead: (entryId) ->
     feedbin.Counts.get().isRead(entryId)
+
+  isUpdated: (entryId) ->
+    feedbin.Counts.get().isUpdated(entryId)
 
   isStarred: (entryId) ->
     feedbin.Counts.get().isStarred(entryId)
 
   toggleRead: (event, xhr) =>
     if @isRead(feedbin.selectedEntry.id)
-      feedbin.Counts.get().addEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, feedbin.selectedEntry.published, 'unread')
+      feedbin.Counts.get().addEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, 'unread')
       @unmark('read')
     else
       feedbin.Counts.get().removeEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, 'unread')
@@ -137,17 +150,23 @@ class feedbin.CountsBehavior
 
   unmark: (property) ->
     feedbin.applyCounts(true)
-    $("[data-entry-id=#{feedbin.selectedEntry.id}]").removeClass(property)
+    if feedbin.specialCollection == 'updated'
+      $(".entry-column [data-entry-id=#{feedbin.selectedEntry.id}]").removeClass(property)
+    else
+      $("[data-entry-id=#{feedbin.selectedEntry.id}]").removeClass(property)
+
 
   toggleStarred: (event, xhr) =>
     if @isStarred(feedbin.selectedEntry.id)
       feedbin.Counts.get().removeEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, 'starred')
       @unmark('starred')
     else
-      feedbin.Counts.get().addEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, feedbin.selectedEntry.published, 'starred')
+      feedbin.Counts.get().addEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, 'starred')
       @mark('starred')
 
-  processHideQueue: =>
+  showEntries: (event) =>
+    feedbin.specialCollection = $(event.currentTarget).data('special-collection')
+    # Drain hide queue
     $.each feedbin.hideQueue, (index, feed_id) ->
       if feed_id != undefined
         item = $("[data-feed-id=#{feed_id}]", '.feeds')

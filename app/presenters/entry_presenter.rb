@@ -3,7 +3,7 @@ class EntryPresenter < BasePresenter
   presents :entry
 
   def entry_link(&block)
-    @template.link_to @template.entry_path(entry), {
+    options = {
       remote: true, class: 'wrap', data: {
         behavior: 'selectable open_item show_entry_content entry_info',
         mark_as_read_path: @template.mark_as_read_entry_path(entry),
@@ -11,7 +11,8 @@ class EntryPresenter < BasePresenter
         entry_id: entry.id,
         entry_info: {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}
       }
-    } do
+    }
+    @template.link_to @template.entry_path(entry), options do
       yield
     end
   end

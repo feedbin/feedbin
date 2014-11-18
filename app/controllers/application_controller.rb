@@ -75,6 +75,16 @@ class ApplicationController < ActionController::Base
       parent_data: { behavior: 'recently_read', feed_id: 'collection_recently_read', count_type: 'recently_read' },
       data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'recently_read', message: 'Mark recently read items as read?'}.to_json }
     }
+    collections << {
+      title: 'Updated',
+      path: updated_entries_path,
+      count_data: {behavior: 'needs_count', count_group: 'all', count_collection: 'updated', count_hide: 'on'},
+      id: 'collection_updated',
+      favicon_class: 'favicon-updated',
+      parent_class: 'collection-updated',
+      parent_data: { behavior: 'updated', feed_id: 'collection_updated', count_type: 'updated' },
+      data: { behavior: 'selectable show_entries open_item feed_link', special_collection: 'updated', mark_read: {type: 'updated', message: 'Mark updated items as read?'}.to_json }
+    }
     collections
   end
 
@@ -92,6 +102,7 @@ class ApplicationController < ActionController::Base
     @count_data = {
       unread_entries: @user.unread_entries.pluck('feed_id, entry_id, extract(epoch FROM published)'),
       starred_entries: @user.starred_entries.pluck('feed_id, entry_id, extract(epoch FROM published)'),
+      updated_entries: @user.updated_entries.pluck('feed_id, entry_id, extract(epoch FROM published)'),
       tag_map: @user.taggings.group(:feed_id).pluck('feed_id, array_agg(tag_id)'),
       entry_sort: @user.entry_sort
     }

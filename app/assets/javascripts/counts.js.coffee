@@ -10,11 +10,13 @@ class _Counts
   setData: (options) ->
     @tagMap = @buildTagMap(options.tag_map)
     @collections =
-      unread: @sort(options.unread_entries, options.sort_order)
-      starred: @sort(options.starred_entries, 'DESC')
+      unread: options.unread_entries
+      starred: options.starred_entries
+      updated: options.updated_entries
     @counts =
       unread: @organizeCounts(@collections.unread)
       starred: @organizeCounts(@collections.starred)
+      updated: @organizeCounts(@collections.updated)
 
   removeEntry: (entryId, feedId, collection) ->
     index = @counts[collection].all.indexOf(entryId);
@@ -29,13 +31,11 @@ class _Counts
       for tagId in tags
         @removeFromCollection(collection, 'byTag', entryId, tagId)
 
-  addEntry: (entryId, feedId, published, collection) ->
+  addEntry: (entryId, feedId, collection) ->
     entry = @buildEntry
       feedId: feedId
       entryId: entryId
-      published: published
     @collections[collection].push(entry)
-    @collections[collection] = @sort(@collections[collection])
     @counts[collection] = @organizeCounts(@collections[collection])
 
   organizeCounts: (entries) ->
@@ -60,15 +60,6 @@ class _Counts
 
     counts
 
-  sort: (entries, sortOrder) ->
-    if sortOrder == 'ASC'
-      entries.sort (a, b) =>
-        @published(a) - @published(b)
-    else
-      entries.sort (a, b) =>
-        @published(b) - @published(a)
-    entries
-
   removeFromCollection: (collection, group, entryId, groupId) ->
     index = @counts[collection][group][groupId].indexOf(entryId);
     if index > -1
@@ -81,7 +72,7 @@ class _Counts
     object
 
   buildEntry: (params) ->
-    [params.feedId, params.entryId, params.published]
+    [params.feedId, params.entryId]
 
   feedId: (entry) ->
     entry[0]
@@ -89,11 +80,11 @@ class _Counts
   entryId: (entry) ->
     entry[1]
 
-  published: (entry) ->
-    entry[2]
-
   isRead: (entryId) ->
     !_.contains(@counts.unread.all, entryId)
+
+  isUpdated: (entryId) ->
+    _.contains(@counts.updated.all, entryId)
 
   isStarred: (entryId) ->
     _.contains(@counts.starred.all, entryId)

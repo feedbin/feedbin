@@ -91,54 +91,6 @@ class EntriesController < ApplicationController
     @content = ContentFormatter.format!(@content, @entry)
   end
 
-  def mark_all_as_read
-    @user = current_user
-
-    if params[:type] == 'feed'
-      unread_entries = UnreadEntry.where(user_id: @user.id, feed_id: params[:data])
-    elsif params[:type] == 'tag'
-      feed_ids = @user.taggings.where(tag_id: params[:data]).pluck(:feed_id)
-      unread_entries = UnreadEntry.where(user_id: @user.id, feed_id: feed_ids)
-    elsif params[:type] == 'starred'
-      starred = @user.starred_entries.pluck(:entry_id)
-      unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: starred)
-    elsif params[:type] == 'recently_read'
-      recently_read = @user.recently_read_entries.pluck(:entry_id)
-      unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: recently_read)
-    elsif  %w{unread all}.include?(params[:type])
-      unread_entries = UnreadEntry.where(user_id: @user.id)
-    elsif params[:type] == 'saved_search'
-      saved_search = @user.saved_searches.where(id: params[:data]).first
-      if saved_search.present?
-        params[:query] = saved_search.query
-        ids = matched_search_ids(params)
-        unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: ids)
-      end
-    elsif params[:type] == 'search'
-      params[:query] = params[:data]
-      ids = matched_search_ids(params)
-      unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: ids)
-    end
-
-    if params[:date].present?
-      unread_entries = unread_entries.where('created_at <= :last_unread_date', {last_unread_date: params[:date]})
-    end
-
-    unread_entries.delete_all
-
-    if params[:ids].present?
-      ids = params[:ids].split(',').map {|i| i.to_i }
-      UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
-    end
-
-    @mark_selected = true
-    get_feeds_list
-
-    respond_to do |format|
-      format.js
-    end
-  end
-
   def preload
     @user = current_user
     ids = params[:ids].split(',').map {|i| i.to_i }
@@ -164,40 +116,101 @@ class EntriesController < ApplicationController
   def mark_as_read
     @user = current_user
     UnreadEntry.where(user: @user, entry_id: params[:id]).delete_all
+    UpdatedEntry.where(user: @user, entry_id: params[:id]).delete_all
     render nothing: true
+  end
+
+  def mark_all_as_read
+    @user = current_user
+
+    if params[:type] == 'feed'
+      unread_entries = UnreadEntry.where(user_id: @user.id, feed_id: params[:data])
+    elsif params[:type] == 'tag'
+      feed_ids = @user.taggings.where(tag_id: params[:data]).pluck(:feed_id)
+      unread_entries = UnreadEntry.where(user_id: @user.id, feed_id: feed_ids)
+    elsif params[:type] == 'starred'
+      starred = @user.starred_entries.pluck(:entry_id)
+      unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: starred)
+    elsif params[:type] == 'recently_read'
+      recently_read = @user.recently_read_entries.pluck(:entry_id)
+      unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: recently_read)
+    elsif params[:type] == 'updated'
+      updated = @user.updated_entries.pluck(:entry_id)
+      unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: updated)
+    elsif  %w{unread all}.include?(params[:type])
+      unread_entries = UnreadEntry.where(user_id: @user.id)
+    elsif params[:type] == 'saved_search'
+      saved_search = @user.saved_searches.where(id: params[:data]).first
+      if saved_search.present?
+        params[:query] = saved_search.query
+        ids = matched_search_ids(params)
+        unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: ids)
+      end
+    elsif params[:type] == 'search'
+      params[:query] = params[:data]
+      ids = matched_search_ids(params)
+      unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: ids)
+    end
+
+    if params[:date].present?
+      unread_entries = unread_entries.where('created_at <= :last_unread_date', {last_unread_date: params[:date]})
+    end
+
+    if params[:ids].present?
+      ids = params[:ids].split(',').map {|i| i.to_i }
+      unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: ids)
+    end
+
+    entry_ids = unread_entries.map(&:entry_id)
+    unread_entries.delete_all
+    @user.updated_entries.where(entry_id: entry_ids).delete_all
+
+    @mark_selected = true
+    get_feeds_list
+
+    respond_to do |format|
+      format.js
+    end
   end
 
   def mark_direction_as_read
     @user = current_user
     ids = params[:ids].split(',').map {|i| i.to_i }
     if params[:direction] == 'above'
-      UnreadEntry.where(user: @user, entry_id: ids).delete_all
+      unread_entries = UnreadEntry.where(user: @user, entry_id: ids)
     else
       if params[:type] == 'feed'
-        UnreadEntry.where(user: @user, feed_id: params[:data]).where.not(entry_id: ids).delete_all
+        unread_entries = UnreadEntry.where(user: @user, feed_id: params[:data]).where.not(entry_id: ids)
       elsif params[:type] == 'tag'
         feed_ids = @user.taggings.where(tag_id: params[:data]).pluck(:feed_id)
-        UnreadEntry.where(user: @user, feed_id: feed_ids).where.not(entry_id: ids).delete_all
+        unread_entries = UnreadEntry.where(user: @user, feed_id: feed_ids).where.not(entry_id: ids)
       elsif params[:type] == 'starred'
         starred = @user.starred_entries.pluck(:entry_id)
-        UnreadEntry.where(user: @user, entry_id: starred).where.not(entry_id: ids).delete_all
+        unread_entries = UnreadEntry.where(user: @user, entry_id: starred).where.not(entry_id: ids)
+      elsif params[:type] == 'updated'
+        updated = @user.updated_entries.pluck(:entry_id)
+        updated_entries = UnreadEntry.where(user: @user, entry_id: updated).where.not(entry_id: ids)
       elsif  %w{unread all}.include?(params[:type])
-        UnreadEntry.where(user: @user).where.not(entry_id: ids).delete_all
+        unread_entries = UnreadEntry.where(user: @user).where.not(entry_id: ids)
       elsif params[:type] == 'saved_search'
         saved_search = @user.saved_searches.where(id: params[:data]).first
         if saved_search.present?
           params[:query] = saved_search.query
           search_ids = matched_search_ids(params)
           ids = search_ids - ids
-          UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
+          unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: ids)
         end
       elsif params[:type] == 'search'
         params[:query] = params[:data]
         search_ids = matched_search_ids(params)
         ids = search_ids - ids
-        UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
+        unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: ids)
       end
     end
+
+    entry_ids = unread_entries.map(&:entry_id)
+    unread_entries.delete_all
+    @user.updated_entries.where(entry_id: entry_ids).delete_all
 
     @mark_selected = true
     get_feeds_list

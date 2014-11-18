@@ -1573,7 +1573,8 @@ $subscribe-wrap-height: 49px;
 		display: none;
 	}
 	.collection-all,
-	.collection-unread {
+	.collection-unread,
+	.collection-updated {
 		display: none;
 	}
 }
@@ -1582,7 +1583,8 @@ $subscribe-wrap-height: 49px;
 		display: none;
 	}
 	.collection-starred,
-	.collection-unread {
+	.collection-unread,
+	.collection-updated {
 		display: none;
 	}
 }
@@ -1787,10 +1789,19 @@ li.selected > a .favicon-wrap {
 }
 
 .collection-favicon {
+	background-size: 16px 16px;
 	background: transparent;
 	box-shadow: none;
 	svg {
 		@include fill($text-color-light, $text-color-muted-night, $text-color-light-sunset);
+	}
+}
+
+.favicon-updated {
+	@include fill($text-color-light, $text-color-muted-night, $text-color-light-sunset);
+	.updated-line {
+		fill: none;
+		stroke: #000 !important;
 	}
 }
 
