@@ -155,6 +155,7 @@ class feedbin.CountsBehavior
     else
       $("[data-entry-id=#{feedbin.selectedEntry.id}]").removeClass(property)
 
+
   toggleStarred: (event, xhr) =>
     if @isStarred(feedbin.selectedEntry.id)
       feedbin.Counts.get().removeEntry(feedbin.selectedEntry.id, feedbin.selectedEntry.feed_id, 'starred')

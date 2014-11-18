@@ -102,9 +102,9 @@ class ApplicationController < ActionController::Base
     end
 
     @count_data = {
-      unread_entries: @user.unread_entries.pluck('feed_id, entry_id'),
-      starred_entries: @user.starred_entries.pluck('feed_id, entry_id'),
-      updated_entries: @user.updated_entries.pluck('feed_id, entry_id'),
+      unread_entries: @user.unread_entries.pluck('feed_id, entry_id, extract(epoch FROM published)'),
+      starred_entries: @user.starred_entries.pluck('feed_id, entry_id, extract(epoch FROM published)'),
+      updated_entries: @user.updated_entries.pluck('feed_id, entry_id, extract(epoch FROM published)'),
       tag_map: @user.taggings.group(:feed_id).pluck('feed_id, array_agg(tag_id)'),
       entry_sort: @user.entry_sort
     }
