@@ -26,20 +26,23 @@
             <p class="post-meta feed-title"><span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
           </header>
           <div data-behavior="entry_content_wrap" class="content-styles">
-            <% if entry.data %>
-            <div class="media-container">
-              <%= entry_presenter.media.html_safe %>
-            </div>
-            <% end %>
-            <%= raw entry_presenter.content %>
             <%
               if entry.content.present? &&
               entry.original.present? &&
               entry.original['content'].present? &&
               entry.original['content'].length != entry.content.length
             %>
-              <p class="diff-wrap">This article was updated <%= link_to "view changes", diff_entry_path(entry), remote: true %></p>
+              <p class="diff-wrap">
+                <span class="icon-clock-wrap"><%= svg_tag 'favicon-updated', size: '16x16' %></span>
+                This article was updated <%= link_to "view changes", diff_entry_path(entry), remote: true %>
+              </p>
             <% end %>
+            <% if entry.data %>
+            <div class="media-container">
+              <%= entry_presenter.media.html_safe %>
+            </div>
+            <% end %>
+            <%= raw entry_presenter.content %>
           </div>
         </div>
         <a class="next-entry-preview no-content" data-behavior="open_next_entry" href="#">

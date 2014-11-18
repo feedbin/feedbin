@@ -1797,14 +1797,6 @@ li.selected > a .favicon-wrap {
 	}
 }
 
-.favicon-updated {
-	@include fill($text-color-light, $text-color-muted-night, $text-color-light-sunset);
-	.updated-line {
-		fill: none;
-		stroke: #000 !important;
-	}
-}
-
 .back-button {
 	background-color: transparent;
 	background-size: 11px 18px;
@@ -3114,21 +3106,35 @@ $saved-search-control-height: 48px;
 	}
 
 	.diff-wrap {
+		@include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
 		@include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+		position: relative;
+		margin-bottom: 1.1em;
+		padding: 10px 53px 10px 36px;
 		font-size: 13px;
-		border-top: 1px solid transparent;
-		@include border-color($border-color, $border-color-night, $border-color-sunset);
-		padding: 15px 0 0 25px;
 		font-family: $font-stack !important;
 		font-weight: 400 !important;
-		background: image-url("icon-clock.svg") 0 16px no-repeat;
 		margin-top: 15px;
+		.icon-clock-wrap {
+			display: block;
+			height: 16px;
+			width: 16px;
+			position: absolute;
+			top: 11px;
+			left: 11px;
+			svg {
+				@include fill($text-color-light, $text-color-muted-night, $text-color-light-sunset);
+			}
+		}
 		.view-latest-link {
-			color: $selected;
+			@include color($selected, #FFF, $selected);
 			&:hover {
 				text-decoration: underline;
 				cursor: pointer;
-				color: #2877c6;
+				@include color(#2877c6, $selected, #2877c6);
+			}
+			.theme-night & {
+				text-decoration: underline;
 			}
 		}
 	}
