@@ -117,7 +117,7 @@ class FeedFetcher
         Honeybadger.notify(
           error_class: "PuSH",
           error_message: "PuSH Subscribe Failed",
-          parameters: e
+          parameters: {exception: e}
         )
       end
     end

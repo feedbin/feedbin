@@ -24,27 +24,44 @@ class FeedRefresherReceiver
     original_entry = Entry.find_by_public_id(entry['public_id'])
     entry_update = entry.slice('author', 'content', 'title', 'url', 'entry_id', 'data')
 
-    original_content_length = original_entry.content.to_s.length
-    new_content_length = entry_update['content'].to_s.length
+    original_content = original_entry.content.to_s.clone
+    new_content = entry_update['content'].to_s.clone
 
     if original_entry.original.nil?
-      entry_update['original'] = {
-        'author'    => original_entry.author,
-        'content'   => original_entry.content,
-        'title'     => original_entry.title,
-        'url'       => original_entry.url,
-        'entry_id'  => original_entry.entry_id,
-        'published' => original_entry.published,
-        'data'      => original_entry.data
-      }
+      entry_update['original'] = build_original(original_entry)
     end
     original_entry.update_attributes(entry_update)
 
-    if (new_content_length - original_content_length).abs > 30
+    if significant_change?(original_content, new_content)
       create_update_notifications(original_entry)
     end
 
     Librato.increment('entry.update')
+  end
+
+  def build_original(original_entry)
+    {
+      'author'    => original_entry.author,
+      'content'   => original_entry.content,
+      'title'     => original_entry.title,
+      'url'       => original_entry.url,
+      'entry_id'  => original_entry.entry_id,
+      'published' => original_entry.published,
+      'data'      => original_entry.data
+    }
+  end
+
+  def significant_change?(original_content, new_content)
+    original_length = Sanitize.fragment(original_content).length
+    new_length = Sanitize.fragment(new_content).length
+    (new_length - original_length).abs > 50
+  rescue Exception => e
+    Honeybadger.notify(
+      error_class: "FeedRefresherReceiver#detect_significant_change",
+      error_message: "detect_significant_change failed",
+      parameters: {exception: e}
+    )
+    false
   end
 
   def create_update_notifications(entry)
@@ -66,7 +83,7 @@ class FeedRefresherReceiver
     Honeybadger.notify(
       error_class: "FeedRefresherReceiver#create_update_notifications",
       error_message: "create_update_notifications failed",
-      parameters: e
+      parameters: {exception: e}
     )
   end
 
