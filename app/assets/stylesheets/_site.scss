@@ -3607,6 +3607,13 @@ Settings
 				padding: 0;
 			}
 		}
+		.settings-content-inner-wide {
+			max-width: 100%;
+			padding: 0 20px 0 37px;
+			@media (max-width: 528px) {
+				padding: 0;
+			}
+		}
 	}
 	small {
 		font-size: 13px;
@@ -3847,6 +3854,10 @@ Settings
 		&.no-margin {
 			margin-bottom: 0;
 		}
+	}
+	.control-group-borders {
+		border-left: 1px solid $border-color;
+		border-right: 1px solid $border-color;
 	}
 	.table-wrap {
 		border-bottom: 1px solid $border-color;
@@ -4270,27 +4281,41 @@ table.small td {
 	}
 }
 
-
+.feed-settings {
+	padding-top: 119px;
+	position: relative;
+}
+.feed-header {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	height: 120px;
+	border-bottom: 1px solid $border-color;
+	z-index: 1000;
+	background-color: #EFF1F3;
+}
 .feed-controls {
-	padding: 0 30px 15px 30px;
+	position: fixed;
+	padding: 0;
 	select {
 		margin-top: 6px;
-	}
-	.feed-search {
-		border-radius: 16px !important;
-		padding: 5px 5px 5px 36px !important;
-		font-size: 14px;
-		background: #FFF image-url("favicon-search-light.svg") 11px 7px no-repeat;
-		max-width: 250px !important;
-		display: block;
-		margin: 0 !important;
-		@media (max-width: 650px) {
-			position: static;
-		}
 	}
 	@media (max-width: 528px) {
 		padding-left: 15px;
 		padding-right: 15px;
+	}
+}
+
+.feed-search {
+	border-radius: 16px !important;
+	padding: 5px 5px 5px 36px !important;
+	font-size: 14px;
+	background: #FFF image-url("favicon-search-light.svg") 11px 7px no-repeat;
+	max-width: 250px !important;
+	display: block;
+	margin: 22px 0 0 0 !important;
+	@media (max-width: 650px) {
+		position: static;
 	}
 }
 

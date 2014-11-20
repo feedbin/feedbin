@@ -1,12 +1,20 @@
-<div class="settings-content-inner">
-
-  <div class="settings-outer">
-    <h2>Feeds</h2>
-  </div>
+<div class="settings-content-inner-wide">
 
   <%= form_tag update_multiple_subscriptions_path, method: :patch do %>
-    <div class="collection-edit-wrapper">
-      <div class="inset">
+
+    <div class="feed-settings">
+
+      <div class="feed-header">
+
+        <div class="clearfix">
+          <div class="half float-right">
+            <input type="text" class="feed-search" data-behavior="feed_search" placeholder="Search Feeds" />
+          </div>
+          <div class="half por">
+            <h2>Feeds</h2>
+          </div>
+        </div>
+
         <div class="feed-controls clearfix">
           <div class="half text-right float-right">
             <select data-behavior="sort_feeds">
@@ -15,48 +23,40 @@
             </select>
           </div>
           <div class="half por">
-            <input type="text" class="feed-search" data-behavior="feed_search" placeholder="Search Feeds" />
+            <button class="button">Unsubscribe</button>
+            <button class="button">Mute</button>
+            <button class="button">Mute</button>
           </div>
         </div>
-        <ul class="control-group feed-form sortable no-margin"  data-behavior="search_results">
-          <% @subscriptions.each do |subscription| %>
-            <% present subscription do |subscription_presenter| %>
-              <%= fields_for "subscriptions[]", subscription do |f| %>
-                <li data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>">
-                  <div class="textfield-wrap">
-                    <a href="<%= subscription.feed_url %>" title="Feed URL" class="favicon-container">
-                      <%= subscription_presenter.favicon(subscription.host) %>
-                    </a>
-                    <%= f.text_field :title, placeholder: subscription.original_title %>
-                    <%= link_to 'Unsubscribe', settings_destroy_subscription_path(subscription), class: 'delete-subscription danger', method: :delete, data: { confirm: 'Are you sure you want to unsubscribe?' } %>
-                  </div>
+
+      </div>
 
 
-                  <div class="canvas-wrap">
-                    <%= content_tag :canvas, '', width: 179, height: 45, data: { values: subscription.entries_count }, title: 'Post frequency' %>
-                  </div>
-                  <div class="last-updated-wrap">
-                    <%= timeago(subscription.last_published_entry) %>
-                  </div>
-                </li>
-              <% end %>
+      <ul class="control-group control-group-borders feed-form sortable no-margin"  data-behavior="search_results">
+        <% @subscriptions.each do |subscription| %>
+          <% present subscription do |subscription_presenter| %>
+            <%= fields_for "subscriptions[]", subscription do |f| %>
+              <li data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>">
+                <div class="textfield-wrap">
+                  <a href="<%= subscription.feed_url %>" title="Feed URL" class="favicon-container">
+                    <%= subscription_presenter.favicon(subscription.host) %>
+                  </a>
+                  <%= f.text_field :title, placeholder: subscription.original_title %>
+                </div>
+
+
+                <div class="canvas-wrap">
+                  <%= content_tag :canvas, '', width: 179, height: 45, data: { values: subscription.entries_count }, title: 'Post frequency' %>
+                </div>
+                <div class="last-updated-wrap">
+                  <%= timeago(subscription.last_published_entry) %>
+                </div>
+              </li>
             <% end %>
           <% end %>
-        </ul>
-      </div>
-    </div>
-    <div class="collection-edit-controls clearfix">
-      <div class="description-inset">
-        <div class="bottom-toolbar">
-          <div class="half">
-            <%= submit_tag "Save", class: 'button-plain no-top-margin no-margin' %>
-          </div>
-          <div class="half text-right">
-            <%= link_to "Unsubscribe from All", destroy_all_subscriptions_path, method: :delete, data: {confirm: "Are you sure you want to delete all your subscriptions?"}, class: 'button-plain button-plain-danger no-top-margin no-margin pull-right' %>
-          </div>
-        </div>
-      </div>
-    </div>
+        <% end %>
+      </ul>
 
+    </div>
   <% end %>
 </div>
