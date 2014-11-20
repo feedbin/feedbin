@@ -31,7 +31,7 @@ class FeedRefresherReceiver
       entry_update['original'] = build_original(original_entry)
     end
     original_entry.update_attributes(entry_update)
-    FeedbinUtils.update_public_id_cache(entry_update['public_id'], entry_update['content'])
+    FeedbinUtils.update_public_id_cache(entry['public_id'], entry['content'])
 
     if published_recently?(original_entry.published) && significant_change?(original_content, new_content)
       create_update_notifications(original_entry)
