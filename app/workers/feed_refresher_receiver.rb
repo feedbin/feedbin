@@ -32,7 +32,7 @@ class FeedRefresherReceiver
     end
     original_entry.update_attributes(entry_update)
 
-    if significant_change?(original_content, new_content)
+    if published_recently?(original_entry.published) && significant_change?(original_content, new_content)
       create_update_notifications(original_entry)
     end
 
@@ -49,6 +49,10 @@ class FeedRefresherReceiver
       'published' => original_entry.published,
       'data'      => original_entry.data
     }
+  end
+
+  def published_recently?(published_date)
+    published_date > 7.days.ago
   end
 
   def significant_change?(original_content, new_content)
