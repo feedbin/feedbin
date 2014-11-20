@@ -157,7 +157,9 @@ class FeedFetcher
       feedzirra = Feedzirra::Feed.fetch_and_parse(@url, options)
     end
     if feedzirra.respond_to?(:hubs) && !feedzirra.hubs.blank? && options[:push_callback] && options[:feed_id]
-      push_subscribe(feedzirra, options[:feed_id], options[:push_callback], options[:hub_secret])
+      if @url == feedzirra.feed_url
+        push_subscribe(feedzirra, options[:feed_id], options[:push_callback], options[:hub_secret])
+      end
     end
     normalize(feedzirra, options, saved_feed_url)
   end
