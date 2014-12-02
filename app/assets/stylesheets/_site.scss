@@ -1310,6 +1310,8 @@ Structure
 	width: 100%;
 	display: flex;
 	align-items: center;
+	position: absolute;
+	z-index: 100;
 	.welcome-inner {
 		@include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
 		width: 100%;
