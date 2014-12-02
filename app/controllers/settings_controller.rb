@@ -92,25 +92,29 @@ class SettingsController < ApplicationController
   end
 
   def update_plan
-    plan = Plan.find(params[:plan])
     @user = current_user
-    @user.plan = plan
-    @user.save
+    plan = Plan.find(params[:plan])
     customer = Stripe::Customer.retrieve(@user.customer_id)
     customer.update_subscription(plan: plan.stripe_id)
-    redirect_to settings_billing_path
+    @user.plan = plan
+    @user.save
+    redirect_to settings_billing_path, notice: 'Plan successfully changed.'
+  rescue Stripe::CardError
+    redirect_to settings_billing_path, alert: "Your card was declined, please update your billing information."
   end
 
   def update_credit_card
     @user = current_user
     @user.stripe_token = params[:stripe_token]
 
-    respond_to do |format|
-      if @user.save
-        format.html { redirect_to settings_billing_url, notice: 'Your credit card has been updated.' }
-      else
-        format.html { redirect_to settings_billing_url, alert: @user.errors.messages[:base].join(' ') }
+    if @user.save
+      customer = Stripe::Customer.retrieve(@user.customer_id)
+      if customer.try(:subscriptions).try(:first).try(:status) == "unpaid"
+        reopen_account(customer.id)
       end
+      redirect_to settings_billing_url, notice: 'Your credit card has been updated.'
+    else
+      redirect_to settings_billing_url, alert: @user.errors.messages[:base].join(' ')
     end
   end
 
@@ -266,6 +270,15 @@ class SettingsController < ApplicationController
       ) results
       ON (date = results.day)
     eos
+  end
+  
+  def reopen_account(customer_id)
+    invoice = Stripe::Invoice.all(customer: customer_id, limit: 1).first
+    if invoice.closed
+      invoice.closed = false
+      invoice.save
+      invoice.pay
+    end
   end
 
 end

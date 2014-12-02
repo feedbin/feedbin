@@ -38,5 +38,9 @@ class feedbin.Registration
       $('[data-behavior~=credit_card_form]')[0].submit()
     else
       $('[data-behavior~=stripe_error]').removeClass('hide')
-      $('[data-behavior~=stripe_error]').text(response.error.message)
+      if response.error.param == "exp_month" || response.error.param == "exp_year"
+        message = "Your card's expiration date is invalid."
+      else
+        message = response.error.message
+      $('[data-behavior~=stripe_error]').text(message)
       $('input[type=submit]').removeAttr('disabled')
