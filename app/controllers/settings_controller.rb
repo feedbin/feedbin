@@ -92,13 +92,15 @@ class SettingsController < ApplicationController
   end
 
   def update_plan
-    plan = Plan.find(params[:plan])
     @user = current_user
-    @user.plan = plan
-    @user.save
+    plan = Plan.find(params[:plan])
     customer = Stripe::Customer.retrieve(@user.customer_id)
     customer.update_subscription(plan: plan.stripe_id)
-    redirect_to settings_billing_path
+    @user.plan = plan
+    @user.save
+    redirect_to settings_billing_path, notice: 'Plan successfully changed.'
+  rescue Stripe::CardError
+    redirect_to settings_billing_path, alert: "Your card was declined, please update your billing information."
   end
 
   def update_credit_card
