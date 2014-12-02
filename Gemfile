@@ -20,6 +20,10 @@ group :development, :test do
   gem 'faker'
 end
 
+group :test do
+  gem "codeclimate-test-reporter", require: nil
+end
+
 group :production do
   gem "therubyracer", require: 'v8'
 end
