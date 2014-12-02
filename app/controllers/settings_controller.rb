@@ -108,10 +108,8 @@ class SettingsController < ApplicationController
     @user.stripe_token = params[:stripe_token]
 
     if @user.save
-      customer = Stripe::Customer.retrieve(@user.customer_id)
-      if customer.try(:subscriptions).try(:first).try(:status) == "unpaid"
-        reopen_account(customer.id)
-      end
+      customer = Customer.retrieve(@user.customer_id)
+      customer.reopen_account if customer.unpaid?
       redirect_to settings_billing_url, notice: 'Your credit card has been updated.'
     else
       redirect_to settings_billing_url, alert: @user.errors.messages[:base].join(' ')
@@ -270,15 +268,6 @@ class SettingsController < ApplicationController
       ) results
       ON (date = results.day)
     eos
-  end
-  
-  def reopen_account(customer_id)
-    invoice = Stripe::Invoice.all(customer: customer_id, limit: 1).first
-    if invoice.closed
-      invoice.closed = false
-      invoice.save
-      invoice.pay
-    end
   end
 
 end
