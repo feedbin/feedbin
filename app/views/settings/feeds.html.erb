@@ -1,4 +1,4 @@
-<div class="settings-content-inner-wide">
+<div class="settings-content-inner">
 
   <%= form_tag update_multiple_subscriptions_path, method: :patch do %>
 
@@ -17,26 +17,43 @@
 
         <div class="feed-controls clearfix">
           <div class="half text-right float-right">
-            <select data-behavior="sort_feeds">
-              <option value="name">Sort by name</option>
-              <option value="last-updated">Sort by last updated</option>
-            </select>
+            <div class="dropdown-wrap dropdown-right feed-dropdown">
+              <button class="feeds-toolbar-button button-caret no-margin" data-behavior="toggle_share_menu toggle_dropdown">Sort</button>
+              <ul>
+                <li data-behavior="sort_feeds" data-value="name"><span>by name</span></li>
+                <li data-behavior="sort_feeds" data-value="last-updated"><span>by last updated</span></li>
+              </ul>
+            </div>
           </div>
           <div class="half por">
-            <button class="button">Unsubscribe</button>
-            <button class="button">Mute</button>
-            <button class="button">Mute</button>
+            <input type="checkbox" class="feeds-checkbox" data-behavior="toggle_checked" />
+            <button class="feeds-toolbar-button" name="unsubscribe">Unsubscribe</button>
+            <div class="dropdown-wrap feed-dropdown">
+              <button class="feeds-toolbar-button button-caret" data-behavior="toggle_share_menu toggle_dropdown">Actions</button>
+              <ul>
+                <li data-operation="show_updates"><span>Show updates on articles</span></li>
+                <li data-operation="hide_updates"><span>Hide updates on articles</span></li>
+                <li data-operation="mute"><span>Mute Feed</span></li>
+                <li data-operation="unmute"><span>Unmute Feed</span></li>
+              </ul>
+            </div>
           </div>
         </div>
 
       </div>
 
 
-      <ul class="control-group control-group-borders feed-form sortable no-margin"  data-behavior="search_results">
+      <ul class="pill-list feed-form sortable no-margin"  data-behavior="search_results">
         <% @subscriptions.each do |subscription| %>
           <% present subscription do |subscription_presenter| %>
             <%= fields_for "subscriptions[]", subscription do |f| %>
               <li data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>">
+                <div class="checkbox-wrap">
+                  <%= check_box_tag "subscription_ids[]", subscription.id %>
+                </div>
+                <div class="update-wrap">
+                  <%= link_to '', toggle_updates_subscription_path(subscription), remote: true, method: :post, class: "update-icon #{subscription.show_updates? ? 'on' : ''}", data: {behavior: 'toggle_updates'}, title: 'Toggle updates on articles' %>
+                </div>
                 <div class="textfield-wrap">
                   <a href="<%= subscription.feed_url %>" title="Feed URL" class="favicon-container">
                     <%= subscription_presenter.favicon(subscription.host) %>

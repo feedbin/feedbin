@@ -75,6 +75,7 @@ Feedbin::Application.routes.draw do
     end
     member do
       delete :settings_destroy
+      post :toggle_updates
     end
   end
 

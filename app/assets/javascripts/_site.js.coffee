@@ -938,6 +938,10 @@ $.extend feedbin,
         $.post feedbin.data.mark_direction_as_read_entries, data
         return
 
+    toggleUpdates: ->
+      $(document).on 'click', '[data-behavior~=toggle_updates]', ->
+        $(@).toggleClass('on')
+
     formProcessing: ->
       $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
         $(@).find('input').addClass('processing')

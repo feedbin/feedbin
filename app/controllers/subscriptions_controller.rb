@@ -100,6 +100,13 @@ class SubscriptionsController < ApplicationController
     @user.subscriptions.destroy_all
     redirect_to settings_feeds_url, notice: "You have unsubscribed."
   end
+  
+  def toggle_updates
+    user = current_user
+    subscription = user.subscriptions.find(params[:id])
+    subscription.toggle!(:show_updates)
+    render nothing: true
+  end
 
   private
 

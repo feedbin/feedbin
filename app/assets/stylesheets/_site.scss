@@ -2838,11 +2838,12 @@ $saved-search-control-height: 48px;
 }
 
 .dropdown-wrap {
+    position: relative;
 	ul {
 		margin: 0;
 		padding: 0;
 		display: none;
-		width: 140px;
+		width: 170px;
 		list-style: none;
 		border: 1px solid transparent;
 		@include border-color($border-color, $border-color-night, $border-color-sunset);
@@ -2917,6 +2918,26 @@ $saved-search-control-height: 48px;
 			display: block;
 		}
 	}
+    &.dropdown-right {
+        ul {
+            right: 0;
+            li {
+    			&:first-child {
+    				@include arrow(
+                		$x-position: 145px,
+                		$y-position: -7px,
+    					$arrow-color: $list-background-color,
+    					$arrow-color-night: $list-background-color-night,
+    					$arrow-color-sunset: $list-background-color-sunset,
+    					$shadow-color: $border-color,
+    					$shadow-color-night: $border-color-night,
+    					$shadow-color-sunset: $border-color-sunset,
+    					$origin: left,
+    					$invert: true);
+    			}
+            }
+        }
+    }
 	.share-keyboard {
 		font-size: 11px;
 		position: absolute;
@@ -3607,13 +3628,6 @@ Settings
 				padding: 0;
 			}
 		}
-		.settings-content-inner-wide {
-			max-width: 100%;
-			padding: 0 20px 0 37px;
-			@media (max-width: 528px) {
-				padding: 0;
-			}
-		}
 	}
 	small {
 		font-size: 13px;
@@ -4038,10 +4052,71 @@ Settings
 		}
 
 	}
+    .feed-search {
+        float: right;
+    	border-radius: 16px !important;
+    	padding: 5px 5px 5px 36px !important;
+    	font-size: 14px;
+    	background: #FFF image-url("favicon-search-light.svg") 11px 7px no-repeat;
+    	max-width: 250px !important;
+    	display: block;
+    	margin: 22px 0 0 0 !important;
+    	@media (max-width: 650px) {
+    		position: static;
+    	}
+    }
+    .feed-controls {
+        border-radius: 8px 8px 0 0;
+        background-color: #ededed;
+        border: 1px solid #DCDEE0;
+        padding: 15px 30px 12px 30px;
+    	@media (max-width: 528px) {
+    		padding-left: 15px;
+    		padding-right: 15px;
+    	}
+    }
+    .feeds-checkbox {
+        margin-right: 15px;
+    }
+    .feed-dropdown {
+        display: inline-block;
+        ul {
+            top: 25px;
+        }
+    }
+    .feeds-toolbar-button {
+        margin-right: 15px;
+        color: $selected;
+        -webkit-appearance: none;
+        background: transparent;
+        padding: 0;
+        border: none;
+        display: inline-block;
+        &.button-caret {
+            position: relative;
+            padding-right: 15px;
+            &:before {
+                top: 7px;
+                right: 0;
+                display: block;
+                position: absolute;
+                content: "";
+            	width: 0; 
+            	height: 0; 
+            	border-left: 5px solid transparent;
+            	border-right: 5px solid transparent;
+            	border-top: 5px solid $selected;
+            }
+        }
+        &.no-margin {
+            margin: 0;
+        }
+    }
 	.feed-form {
+        border-radius: 0 0 8px 8px;
+        border-top: none;
 		li {
 			clear: both;
-			border-bottom: 1px solid $border-color;
 			position: relative;
 			padding: 0;
 		}
@@ -4068,24 +4143,45 @@ Settings
 			bottom: 0;
 			z-index: 0;
 		}
+        .checkbox-wrap {
+            padding-left: 30px;
+            padding-top: 12px;
+            float: left;
+        }
+        .update-wrap {
+            padding-left: 15px;
+            padding-top: 15px;
+            float: left;
+            .update-icon {
+                background: image-url("icon-clock-off.svg") no-repeat;
+                height: 16px;
+                width: 17px;
+                display: block;
+                &.on {
+                    background: image-url("icon-clock-on.svg") no-repeat;
+                }
+            }
+        }
 		.textfield-wrap {
+            float: left;
 			position: relative;
 			max-width: 450px;
 			z-index: 100;
+            width: 100%;
 			input {
 				padding-top: 13px;
 				padding-bottom: 13px;
 				max-width: 100%;
-				padding-left: 55px !important;
+				padding-left: 45px !important;
 				margin: 0;
 				border: none;
-				border-right: 1px solid $border-color;
 				border-radius: 0;
+                background-color: transparent;
 			}
 			.favicon-container {
 				display: block;
 				position: absolute;
-				left: 30px;
+				left: 15px;
 				top: 15px;
 				height: 16px;
 				width: 16px;
@@ -4278,44 +4374,6 @@ table.small td {
 .push-disabled {
 	.push-disabled {
 		display: block;
-	}
-}
-
-.feed-settings {
-	padding-top: 119px;
-	position: relative;
-}
-.feed-header {
-	position: fixed;
-	top: 0;
-	width: 100%;
-	height: 120px;
-	border-bottom: 1px solid $border-color;
-	z-index: 1000;
-	background-color: #EFF1F3;
-}
-.feed-controls {
-	position: fixed;
-	padding: 0;
-	select {
-		margin-top: 6px;
-	}
-	@media (max-width: 528px) {
-		padding-left: 15px;
-		padding-right: 15px;
-	}
-}
-
-.feed-search {
-	border-radius: 16px !important;
-	padding: 5px 5px 5px 36px !important;
-	font-size: 14px;
-	background: #FFF image-url("favicon-search-light.svg") 11px 7px no-repeat;
-	max-width: 250px !important;
-	display: block;
-	margin: 22px 0 0 0 !important;
-	@media (max-width: 650px) {
-		position: static;
 	}
 }
 
