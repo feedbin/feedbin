@@ -4054,6 +4054,21 @@ Settings
 		}
 
 	}
+    .feed-settings {
+        position: absolute;
+        top: 0;
+        left: 37px;
+        right: 20px;
+        height: 127px;
+		@media (max-width: 528px) {
+            left: 0;
+            right: 0;
+            h2 {
+                padding: 0 15px;
+            }
+		}
+        
+    }
     .feed-search {
         float: right;
     	border-radius: 16px !important;
@@ -4063,8 +4078,8 @@ Settings
     	max-width: 250px !important;
     	display: block;
     	margin: 22px 0 0 0 !important;
-    	@media (max-width: 650px) {
-    		position: static;
+    	@media (max-width: 528px) {
+            display: none;
     	}
     }
     .feed-controls {
@@ -4115,8 +4130,20 @@ Settings
         }
     }
 	.feed-form {
+        position: absolute;
+        top: 127px;
+        bottom: 0;
+        right: 20px;
+        left: 37px;
+    	-webkit-overflow-scrolling: touch;
+        overflow-y: auto;
+        overflow-x: hidden;
         border-radius: 0 0 8px 8px;
         border-top: none;
+		@media (max-width: 528px) {
+            right: 0;
+            left: 0;
+		}
 		li {
 			clear: both;
 			position: relative;

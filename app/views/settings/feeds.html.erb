@@ -1,81 +1,75 @@
 <div class="settings-content-inner">
 
-  <%= form_tag update_multiple_subscriptions_path, method: :patch, autocomplete: 'off' do %>
-  <input type="hidden" name="operation" value="" />
+    <%= form_tag update_multiple_subscriptions_path, method: :patch, autocomplete: 'off' do %>
+    <input type="hidden" name="operation" value="" />
 
     <div class="feed-settings">
-
-      <div class="feed-header">
-
         <div class="clearfix">
-          <div class="half float-right">
-            <input type="text" class="feed-search" data-behavior="feed_search" placeholder="Search Feeds" />
-          </div>
-          <div class="half por">
-            <h2>Feeds</h2>
-          </div>
+            <div class="half float-right">
+                <input type="text" class="feed-search" data-behavior="feed_search" placeholder="Search Feeds" />
+            </div>
+            <div class="half por">
+                <h2>Feeds</h2>
+            </div>
         </div>
 
         <div class="feed-controls clearfix">
-          <div class="half text-right float-right">
-            <div class="dropdown-wrap dropdown-right feed-dropdown">
-              <button class="feeds-toolbar-button button-caret no-margin" data-behavior="toggle_share_menu toggle_dropdown sort_label">Sort by name</button>
-              <ul>
-                <li data-behavior="sort_feeds" data-value="name"><span>Sort by name</span></li>
-                <li data-behavior="sort_feeds" data-value="last-updated"><span>Sort by last updated</span></li>
-              </ul>
+            <div class="half text-right float-right">
+                <div class="dropdown-wrap dropdown-right feed-dropdown">
+                    <button class="feeds-toolbar-button button-caret no-margin" data-behavior="toggle_share_menu toggle_dropdown sort_label">Sort by name</button>
+                    <ul>
+                        <li data-behavior="sort_feeds" data-value="name"><span>Sort by name</span></li>
+                        <li data-behavior="sort_feeds" data-value="last-updated"><span>Sort by last updated</span></li>
+                    </ul>
+                </div>
             </div>
-          </div>
-          <div class="half por">
-            <input type="checkbox" class="feeds-checkbox" data-behavior="toggle_checked" />
-            <button class="feeds-toolbar-button">Save</button>
-            <div class="dropdown-wrap feed-dropdown">
-              <button class="feeds-toolbar-button button-caret" data-behavior="toggle_share_menu toggle_dropdown feed_actions">Actions</button>
-              <ul>
-                <li data-operation="unsubscribe"><span>Unsubscribe</span></li>
-                <li data-operation="show_updates"><span>Show updates on articles</span></li>
-                <li data-operation="hide_updates"><span>Hide updates on articles</span></li>
-                <li data-operation="mute"><span>Mute Feed</span></li>
-                <li data-operation="unmute"><span>Unmute Feed</span></li>
-              </ul>
+            <div class="half por">
+                <input type="checkbox" class="feeds-checkbox" data-behavior="toggle_checked" />
+                <button class="feeds-toolbar-button">Save</button>
+                <div class="dropdown-wrap feed-dropdown">
+                    <button class="feeds-toolbar-button button-caret" data-behavior="toggle_share_menu toggle_dropdown feed_actions">Actions</button>
+                    <ul>
+                        <li data-operation="unsubscribe"><span>Unsubscribe</span></li>
+                        <li data-operation="show_updates"><span>Show updates on articles</span></li>
+                        <li data-operation="hide_updates"><span>Hide updates on articles</span></li>
+                        <li data-operation="mute"><span>Mute Feed</span></li>
+                        <li data-operation="unmute"><span>Unmute Feed</span></li>
+                    </ul>
+                </div>
             </div>
-          </div>
         </div>
-
-      </div>
-
-
-      <ul class="pill-list feed-form sortable no-margin"  data-behavior="search_results">
-        <% @subscriptions.each do |subscription| %>
-          <% present subscription do |subscription_presenter| %>
-            <%= fields_for "subscriptions[]", subscription do |f| %>
-              <li data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>">
-                <div class="checkbox-wrap">
-                  <%= check_box_tag "subscription_ids[]", subscription.id %>
-                </div>
-                <div class="update-wrap">
-                  <%= link_to '', toggle_updates_subscription_path(subscription), remote: true, method: :post, class: "update-icon #{subscription.show_updates? ? 'on' : ''}", data: {behavior: 'toggle_updates'}, title: 'Toggle updates on articles' %>
-                </div>
-                <div class="textfield-wrap">
-                  <a href="<%= subscription.feed_url %>" title="Feed URL" class="favicon-container">
-                    <%= subscription_presenter.favicon(subscription.host) %>
-                  </a>
-                  <%= f.text_field :title, placeholder: subscription.original_title %>
-                </div>
-
-
-                <div class="canvas-wrap">
-                  <%= content_tag :canvas, '', width: 179, height: 45, data: { values: subscription.entries_count }, title: 'Post frequency' %>
-                </div>
-                <div class="last-updated-wrap">
-                  <%= timeago(subscription.last_published_entry) %>
-                </div>
-              </li>
-            <% end %>
-          <% end %>
-        <% end %>
-      </ul>
-
     </div>
-  <% end %>
+
+    <ul class="pill-list feed-form sortable no-margin"  data-behavior="search_results">
+        <% @subscriptions.each do |subscription| %>
+            <% present subscription do |subscription_presenter| %>
+                <%= fields_for "subscriptions[]", subscription do |f| %>
+                    <li data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>">
+                        <div class="checkbox-wrap">
+                            <%= check_box_tag "subscription_ids[]", subscription.id %>
+                        </div>
+                        <div class="update-wrap">
+                            <%= link_to '', toggle_updates_subscription_path(subscription), remote: true, method: :post, class: "update-icon #{subscription.show_updates? ? 'on' : ''}", data: {behavior: 'toggle_updates'}, title: 'Toggle updates on articles' %>
+                        </div>
+                        <div class="textfield-wrap">
+                            <a href="<%= subscription.feed_url %>" title="Feed URL" class="favicon-container">
+                                <%= subscription_presenter.favicon(subscription.host) %>
+                            </a>
+                            <%= f.text_field :title, placeholder: subscription.original_title %>
+                        </div>
+
+
+                        <div class="canvas-wrap">
+                            <%= content_tag :canvas, '', width: 179, height: 45, data: { values: subscription.entries_count }, title: 'Post frequency' %>
+                        </div>
+                        <div class="last-updated-wrap">
+                            <%= timeago(subscription.last_published_entry) %>
+                        </div>
+                    </li>
+                <% end %>
+            <% end %>
+        <% end %>
+    </ul>
+
+    <% end %>
 </div>
