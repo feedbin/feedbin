@@ -704,14 +704,19 @@ $.extend feedbin,
         event.preventDefault()
         return
 
-    checkBoxToggle: ->
-      $(document).on 'click', '[data-behavior~=check_all]', (event) =>
-        $('[type="checkbox"]').prop('checked', true)
-        event.preventDefault()
-        return
+    feedActions: ->
+      $(document).on 'click', '[data-operation]', (event) ->
+        operation = $(@).data('operation')
+        form = $(@).parents('form')
+        $('input[name=operation]').val(operation)
+        form.submit()
 
-      $(document).on 'click', '[data-behavior~=check_none]', (event) =>
-        $('[type="checkbox"]').prop('checked', false)
+    checkBoxToggle: ->
+      $(document).on 'change', '[data-behavior~=toggle_checked]', (event) ->
+        if $(@).is(':checked')
+          $('[type="checkbox"][name]').prop('checked', true)
+        else
+          $('[type="checkbox"][name]').prop('checked', false)
         event.preventDefault()
         return
 
@@ -834,8 +839,10 @@ $.extend feedbin,
         $(@).parents('form').submit()
 
     feedSettings: ->
-      $('[data-behavior~=sort_feeds]').change ->
-        sortBy = $(@).val()
+      $(document).on 'click', '[data-behavior~=sort_feeds]', (event, xhr) ->
+        sortBy = $(@).data('value')
+        label = $(@).text()
+        $('[data-behavior~=sort_label]').text(label)
         if sortBy == "name"
           sortFunction = feedbin.sortByName
         else if sortBy == "last-updated"

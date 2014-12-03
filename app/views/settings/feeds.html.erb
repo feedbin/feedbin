@@ -1,6 +1,7 @@
 <div class="settings-content-inner">
 
-  <%= form_tag update_multiple_subscriptions_path, method: :patch do %>
+  <%= form_tag update_multiple_subscriptions_path, method: :patch, autocomplete: 'off' do %>
+  <input type="hidden" name="operation" value="" />
 
     <div class="feed-settings">
 
@@ -18,19 +19,20 @@
         <div class="feed-controls clearfix">
           <div class="half text-right float-right">
             <div class="dropdown-wrap dropdown-right feed-dropdown">
-              <button class="feeds-toolbar-button button-caret no-margin" data-behavior="toggle_share_menu toggle_dropdown">Sort</button>
+              <button class="feeds-toolbar-button button-caret no-margin" data-behavior="toggle_share_menu toggle_dropdown sort_label">Sort by name</button>
               <ul>
-                <li data-behavior="sort_feeds" data-value="name"><span>by name</span></li>
-                <li data-behavior="sort_feeds" data-value="last-updated"><span>by last updated</span></li>
+                <li data-behavior="sort_feeds" data-value="name"><span>Sort by name</span></li>
+                <li data-behavior="sort_feeds" data-value="last-updated"><span>Sort by last updated</span></li>
               </ul>
             </div>
           </div>
           <div class="half por">
             <input type="checkbox" class="feeds-checkbox" data-behavior="toggle_checked" />
-            <button class="feeds-toolbar-button" name="unsubscribe">Unsubscribe</button>
+            <button class="feeds-toolbar-button">Save</button>
             <div class="dropdown-wrap feed-dropdown">
-              <button class="feeds-toolbar-button button-caret" data-behavior="toggle_share_menu toggle_dropdown">Actions</button>
+              <button class="feeds-toolbar-button button-caret" data-behavior="toggle_share_menu toggle_dropdown feed_actions">Actions</button>
               <ul>
+                <li data-operation="unsubscribe"><span>Unsubscribe</span></li>
                 <li data-operation="show_updates"><span>Show updates on articles</span></li>
                 <li data-operation="hide_updates"><span>Hide updates on articles</span></li>
                 <li data-operation="mute"><span>Mute Feed</span></li>
