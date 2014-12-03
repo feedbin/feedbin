@@ -161,6 +161,10 @@ $.extend feedbin,
   fitVids: ->
     $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com']"});
 
+  formatTweets: ->
+    target = $('[data-behavior~=entry_content_wrap]')[0]
+    result = twttr.widgets.load(target)
+
   formatEntryContent: (entryId, resetScroll=true, readability=true) ->
     feedbin.applyStarred(entryId)
     if resetScroll
@@ -175,6 +179,7 @@ $.extend feedbin,
       feedbin.localizeTime($('[data-behavior~=entry_content_target]'))
       feedbin.applyUserTitles()
       feedbin.fitVids()
+      feedbin.formatTweets()
     catch error
       if 'console' of window
         console.log error

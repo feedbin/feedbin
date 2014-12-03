@@ -3010,6 +3010,10 @@ $saved-search-control-height: 48px;
 	blockquote {
 		margin: 0 0 1.3em 0;
 	}
+    
+	blockquote[align="center"] {
+		text-align: left;
+	}
 
 	li {
 		line-height: 1.5;
@@ -3077,6 +3081,9 @@ $saved-search-control-height: 48px;
 
 	iframe {
 		background-color: #000;
+		&.twitter-tweet {
+			background-color: #FFF;
+		}
 	}
 
 	figcaption, caption {
