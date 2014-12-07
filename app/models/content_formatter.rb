@@ -177,9 +177,12 @@ class ContentFormatter
       if env[:node_name] != 'blockquote' || env[:is_whitelisted] || !node.element? || node['class'].nil?
         return
       end
-
+      
+      tweet_class = 'twitter-tweet'
+      
       allowed_attributes = []
-      if node['class'] == 'twitter-tweet'
+      if node['class'].include?(tweet_class)
+        node['class'] = tweet_class
         allowed_attributes = ['class']
       end
       
