@@ -8,7 +8,7 @@ class SubscriptionBatch
 
   def perform(batch)
     ids = build_ids(batch)
-    Subscription.where(id: ids).update_all(show_updates: true)
+    Subscription.where(id: ids).update_all(show_updates: true, muted: false)
   end
 
 end
