@@ -1306,14 +1306,15 @@ Structure
 }
 
 .welcome {
+	top: $toolbar-height;
 	height: 100%;
 	width: 100%;
 	display: flex;
 	align-items: center;
 	position: absolute;
 	z-index: 100;
+	@include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
 	.welcome-inner {
-		@include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
 		width: 100%;
 		text-align: center;
 	}
@@ -3031,6 +3032,10 @@ $saved-search-control-height: 48px;
 	blockquote {
 		margin: 0 0 1.3em 0;
 	}
+    
+	blockquote[align="center"] {
+		text-align: left;
+	}
 
 	li {
 		line-height: 1.5;
@@ -3098,6 +3103,9 @@ $saved-search-control-height: 48px;
 
 	iframe {
 		background-color: #000;
+		&.twitter-tweet {
+			background-color: #FFF;
+		}
 	}
 
 	figcaption, caption {
