@@ -598,7 +598,9 @@ CREATE TABLE subscriptions (
     title text,
     view_inline boolean DEFAULT false,
     active boolean DEFAULT true,
-    push boolean DEFAULT false
+    push boolean DEFAULT false,
+    show_updates boolean DEFAULT true,
+    muted boolean DEFAULT false
 );
 
 
@@ -1716,4 +1718,6 @@ INSERT INTO schema_migrations (version) VALUES ('20141022031229');
 INSERT INTO schema_migrations (version) VALUES ('20141110225053');
 
 INSERT INTO schema_migrations (version) VALUES ('20141117192421');
+
+INSERT INTO schema_migrations (version) VALUES ('20141202203934');
 
