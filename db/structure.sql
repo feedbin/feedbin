@@ -1320,6 +1320,13 @@ CREATE INDEX index_subscriptions_on_feed_id_and_active_and_muted ON subscription
 
 
 --
+-- Name: index_subscriptions_on_updates; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_subscriptions_on_updates ON subscriptions USING btree (feed_id, active, muted, show_updates);
+
+
+--
 -- Name: index_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 

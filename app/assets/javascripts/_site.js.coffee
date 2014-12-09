@@ -950,9 +950,17 @@ $.extend feedbin,
         $.post feedbin.data.mark_direction_as_read_entries, data
         return
 
-    toggleUpdates: ->
-      $(document).on 'click', '[data-behavior~=toggle_updates]', ->
-        $(@).toggleClass('on')
+    toggle: ->
+      $(document).on 'click', '[data-toggle]', ->
+        toggle = $(@).data('toggle')
+        if toggle['class']
+          $(@).toggleClass(toggle['class'])
+        if toggle['title']
+          if toggle['title'][0] == $(@).attr('title')
+            title = toggle['title'][1]
+          else
+            title = toggle['title'][0]
+          $(@).attr('title', title)
 
     formProcessing: ->
       $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->

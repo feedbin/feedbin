@@ -72,7 +72,7 @@ class FeedRefresherReceiver
   def create_update_notifications(entry)
     updated_entries = []
 
-    subscription_user_ids = Subscription.where(feed_id: entry.feed_id, active: true).pluck(:user_id)
+    subscription_user_ids = Subscription.where(feed_id: entry.feed_id, active: true, muted: false, show_updates: true).pluck(:user_id)
     unread_entries_user_ids = UnreadEntry.where(entry_id: entry.id, user_id: subscription_user_ids).pluck(:user_id)
     updated_entries_user_ids = UpdatedEntry.where(entry_id: entry.id, user_id: subscription_user_ids).pluck(:user_id)
 

@@ -76,6 +76,7 @@ Feedbin::Application.routes.draw do
     member do
       delete :settings_destroy
       post :toggle_updates
+      post :toggle_muted
     end
   end
 

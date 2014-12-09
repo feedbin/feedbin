@@ -86,13 +86,13 @@ class SubscriptionsController < ApplicationController
       if params[:operation] == "unsubscribe"
         subscriptions.destroy_all
         notice = "You have unsubscribed."
-      elsif params[:operation] == "show_updates" 
+      elsif params[:operation] == "show_updates"
         subscriptions.update_all(show_updates: true)
-      elsif params[:operation] == "hide_updates" 
+      elsif params[:operation] == "hide_updates"
         subscriptions.update_all(show_updates: false)
-      elsif params[:operation] == "mute" 
+      elsif params[:operation] == "mute"
         subscriptions.update_all(muted: true)
-      elsif params[:operation] == "unmute" 
+      elsif params[:operation] == "unmute"
         subscriptions.update_all(muted: false)
       end
     else
@@ -107,7 +107,7 @@ class SubscriptionsController < ApplicationController
     @user.subscriptions.destroy_all
     redirect_to settings_feeds_url, notice: "You have unsubscribed."
   end
-  
+
   def toggle_updates
     user = current_user
     subscription = user.subscriptions.find(params[:id])
@@ -115,8 +115,15 @@ class SubscriptionsController < ApplicationController
     render nothing: true
   end
 
+  def toggle_muted
+    user = current_user
+    subscription = user.subscriptions.find(params[:id])
+    subscription.toggle!(:muted)
+    render nothing: true
+  end
+
   private
-  
+
   def subscription_params
     owned_subscriptions = @user.subscriptions.pluck(:id)
     params[:subscriptions].each do |index, fields|

@@ -3032,7 +3032,7 @@ $saved-search-control-height: 48px;
 	blockquote {
 		margin: 0 0 1.3em 0;
 	}
-    
+
 	blockquote[align="center"] {
 		text-align: left;
 	}
@@ -4075,7 +4075,7 @@ Settings
                 padding: 0 15px;
             }
 		}
-        
+
     }
     .feed-search {
         float: right;
@@ -4095,9 +4095,14 @@ Settings
         background-color: #ededed;
         border: 1px solid #DCDEE0;
         padding: 15px 30px 12px 30px;
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
     	@media (max-width: 528px) {
     		padding-left: 15px;
     		padding-right: 15px;
+			border-radius: 0;
     	}
     }
     .feeds-checkbox {
@@ -4118,6 +4123,7 @@ Settings
         border: none;
         display: inline-block;
         &.button-caret {
+			color: #000;
             position: relative;
             padding-right: 15px;
             &:before {
@@ -4126,18 +4132,18 @@ Settings
                 display: block;
                 position: absolute;
                 content: "";
-            	width: 0; 
-            	height: 0; 
+            	width: 0;
+            	height: 0;
             	border-left: 5px solid transparent;
             	border-right: 5px solid transparent;
-            	border-top: 5px solid $selected;
+            	border-top: 5px solid #000;
             }
         }
         &.no-margin {
             margin: 0;
         }
     }
-	.feed-form {
+	.feed-form-wrap {
         position: absolute;
         top: 127px;
         bottom: 0;
@@ -4146,6 +4152,8 @@ Settings
     	-webkit-overflow-scrolling: touch;
         overflow-y: auto;
         overflow-x: hidden;
+	}
+	.feed-form {
         border-radius: 0 0 8px 8px;
         border-top: none;
 		@media (max-width: 528px) {
@@ -4173,6 +4181,9 @@ Settings
 			overflow-x: hidden;
 			overflow-y: visible;
 			z-index: 0;
+			@media (max-width: 528px) {
+                display: none;
+            }
 		}
 		canvas {
 			position: absolute;
@@ -4184,21 +4195,41 @@ Settings
             padding-left: 30px;
             padding-top: 12px;
             float: left;
+			@media (max-width: 528px) {
+                padding-left: 15px;
+			}
+
         }
         .update-wrap {
             padding-left: 15px;
             padding-top: 15px;
             float: left;
             .update-icon {
-                background: image-url("icon-clock-off.svg") no-repeat;
+                background: image-url("icon-clock-settings.svg") 0 -16px no-repeat;
+				background-size: 16px 32px;
                 height: 16px;
-                width: 17px;
+                width: 16px;
                 display: block;
                 &.on {
-                    background: image-url("icon-clock-on.svg") no-repeat;
+					background-position: 0 0;
                 }
             }
-        }
+		}
+		.mute-wrap {
+            padding-left: 15px;
+            padding-top: 16px;
+            float: left;
+            .mute-icon {
+                background: image-url("icon-mute-settings.svg") 0 -14px no-repeat;
+				background-size: 13px 28px;
+                height: 14px;
+                width: 13px;
+                display: block;
+                &.on {
+					background-position: 0 0;
+                }
+            }
+		}
 		.textfield-wrap {
             float: left;
 			position: relative;
@@ -4231,14 +4262,16 @@ Settings
 				}
 			}
 			@media (max-width: 528px) {
-				input {
-					padding-left: 40px !important;
-				}
-				.favicon-container {
-					left: 15px;
-				}
+                width: auto;
+                max-width: 100%;
 			}
 		}
+	}
+}
+
+.settings-feeds {
+	.alert {
+		display: none;
 	}
 }
 
