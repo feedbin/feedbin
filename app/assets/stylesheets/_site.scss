@@ -825,7 +825,7 @@ input[type="checkbox"] {
 
 input[type="search"]::-webkit-search-decoration,
 input[type="search"]::-webkit-search-cancel-button {
-        -webkit-appearance: none;
+		-webkit-appearance: none;
 }
 
 textarea {
@@ -2126,16 +2126,16 @@ $saved-search-control-height: 48px;
 		overflow: hidden;
 		display: none;
 		&:before {
-		    position: absolute;
-		    top: 0;
-		    left: 0;
-		    background-color: $selected;
+			position: absolute;
+			top: 0;
+			left: 0;
+			background-color: $selected;
 			background-image: image-url("icon-star.svg"), linear-gradient(to bottom, #3399ff 0%, #2c85dd 100%);
 			background-position: 2px 2px, 0 0;
 			background-repeat: no-repeat, no-repeat;
 			width: 30px;
 			height: 21px;
-		    content: '';
+			content: '';
 			z-index: 1;
 		}
 		&:after {
@@ -2841,7 +2841,7 @@ $saved-search-control-height: 48px;
 }
 
 .dropdown-wrap {
-    position: relative;
+	position: relative;
 	ul {
 		margin: 0;
 		padding: 0;
@@ -2921,26 +2921,26 @@ $saved-search-control-height: 48px;
 			display: block;
 		}
 	}
-    &.dropdown-right {
-        ul {
-            right: 0;
-            li {
-    			&:first-child {
-    				@include arrow(
-                		$x-position: 145px,
-                		$y-position: -7px,
-    					$arrow-color: $list-background-color,
-    					$arrow-color-night: $list-background-color-night,
-    					$arrow-color-sunset: $list-background-color-sunset,
-    					$shadow-color: $border-color,
-    					$shadow-color-night: $border-color-night,
-    					$shadow-color-sunset: $border-color-sunset,
-    					$origin: left,
-    					$invert: true);
-    			}
-            }
-        }
-    }
+	&.dropdown-right {
+		ul {
+			right: 0;
+			li {
+				&:first-child {
+					@include arrow(
+						$x-position: 145px,
+						$y-position: -7px,
+						$arrow-color: $list-background-color,
+						$arrow-color-night: $list-background-color-night,
+						$arrow-color-sunset: $list-background-color-sunset,
+						$shadow-color: $border-color,
+						$shadow-color-night: $border-color-night,
+						$shadow-color-sunset: $border-color-sunset,
+						$origin: left,
+						$invert: true);
+				}
+			}
+		}
+	}
 	.share-keyboard {
 		font-size: 11px;
 		position: absolute;
@@ -3481,7 +3481,7 @@ $saved-search-control-height: 48px;
 }
 
 .application-messages {
-    $height: 35px;
+	$height: 35px;
 	position: absolute;
 	z-index: 10000;
 	width: 100%;
@@ -3503,9 +3503,9 @@ $saved-search-control-height: 48px;
 		&.show {
 			top: 0;
 		}
-        &.error {
-            background-color: #d61f33;
-        }
+		&.error {
+			background-color: #d61f33;
+		}
 		&:hover {
 			text-decoration: none;
 			color: #FFF;
@@ -3707,7 +3707,7 @@ Settings
 		color: red;
 	}
 	.subscribe-email {
-	    word-break: break-all;
+		word-break: break-all;
 	}
 	.add-field {
 		position: absolute;
@@ -4062,103 +4062,103 @@ Settings
 		}
 
 	}
-    .feed-settings {
-        position: absolute;
-        top: 0;
-        left: 37px;
-        right: 20px;
-        height: 127px;
+	.feed-settings {
+		position: absolute;
+		top: 0;
+		left: 37px;
+		right: 20px;
+		height: 127px;
 		@media (max-width: 528px) {
-            left: 0;
-            right: 0;
-            h2 {
-                padding: 0 15px;
-            }
+			left: 0;
+			right: 0;
+			h2 {
+				padding: 0 15px;
+			}
 		}
 
-    }
-    .feed-search {
-        float: right;
-    	border-radius: 16px !important;
-    	padding: 5px 5px 5px 36px !important;
-    	font-size: 14px;
-    	background: #FFF image-url("favicon-search-light.svg") 11px 7px no-repeat;
-    	max-width: 250px !important;
-    	display: block;
-    	margin: 22px 0 0 0 !important;
-    	@media (max-width: 528px) {
-            display: none;
-    	}
-    }
-    .feed-controls {
-        border-radius: 8px 8px 0 0;
-        background-color: #ededed;
-        border: 1px solid #DCDEE0;
-        padding: 15px 30px 12px 30px;
+	}
+	.feed-search {
+		float: right;
+		border-radius: 16px !important;
+		padding: 5px 5px 5px 36px !important;
+		font-size: 14px;
+		background: #FFF image-url("favicon-search-light.svg") 11px 7px no-repeat;
+		max-width: 250px !important;
+		display: block;
+		margin: 22px 0 0 0 !important;
+		@media (max-width: 528px) {
+			display: none;
+		}
+	}
+	.feed-controls {
+		border-radius: 8px 8px 0 0;
+		background-color: #ededed;
+		border: 1px solid #DCDEE0;
+		padding: 15px 30px 12px 30px;
 		position: absolute;
 		bottom: 0;
 		left: 0;
 		right: 0;
-    	@media (max-width: 528px) {
-    		padding-left: 15px;
-    		padding-right: 15px;
+		@media (max-width: 528px) {
+			padding-left: 15px;
+			padding-right: 15px;
 			border-radius: 0;
-    	}
-    }
-    .feeds-checkbox {
-        margin-right: 15px;
-    }
-    .feed-dropdown {
-        display: inline-block;
-        ul {
-            top: 25px;
-        }
-    }
-    .feeds-toolbar-button {
-        margin-right: 15px;
-        color: $selected;
-        -webkit-appearance: none;
-        background: transparent;
-        padding: 0;
-        border: none;
-        display: inline-block;
-        &.button-caret {
+		}
+	}
+	.feeds-checkbox {
+		margin-right: 15px;
+	}
+	.feed-dropdown {
+		display: inline-block;
+		ul {
+			top: 25px;
+		}
+	}
+	.feeds-toolbar-button {
+		margin-right: 15px;
+		color: $selected;
+		-webkit-appearance: none;
+		background: transparent;
+		padding: 0;
+		border: none;
+		display: inline-block;
+		&.button-caret {
 			color: #000;
-            position: relative;
-            padding-right: 15px;
-            &:before {
-                top: 7px;
-                right: 0;
-                display: block;
-                position: absolute;
-                content: "";
-            	width: 0;
-            	height: 0;
-            	border-left: 5px solid transparent;
-            	border-right: 5px solid transparent;
-            	border-top: 5px solid #000;
-            }
-        }
-        &.no-margin {
-            margin: 0;
-        }
-    }
+			position: relative;
+			padding-right: 15px;
+			&:before {
+				top: 7px;
+				right: 0;
+				display: block;
+				position: absolute;
+				content: "";
+				width: 0;
+				height: 0;
+				border-left: 5px solid transparent;
+				border-right: 5px solid transparent;
+				border-top: 5px solid #000;
+			}
+		}
+		&.no-margin {
+			margin: 0;
+		}
+	}
 	.feed-form-wrap {
-        position: absolute;
-        top: 127px;
-        bottom: 0;
-        right: 20px;
-        left: 37px;
-    	-webkit-overflow-scrolling: touch;
-        overflow-y: auto;
-        overflow-x: hidden;
+		position: absolute;
+		top: 127px;
+		bottom: 0;
+		right: 20px;
+		left: 37px;
+		-webkit-overflow-scrolling: touch;
+		overflow-y: auto;
+		overflow-x: hidden;
 	}
 	.feed-form {
-        border-radius: 0 0 8px 8px;
-        border-top: none;
+		border-radius: 0 0 8px 8px;
+		border-top: none;
 		@media (max-width: 528px) {
-            right: 0;
-            left: 0;
+			right: 0;
+			left: 0;
 		}
 		li {
 			clear: both;
@@ -4182,8 +4182,8 @@ Settings
 			overflow-y: visible;
 			z-index: 0;
 			@media (max-width: 528px) {
-                display: none;
-            }
+				display: none;
+			}
 		}
 		canvas {
 			position: absolute;
@@ -4191,51 +4191,51 @@ Settings
 			bottom: 0;
 			z-index: 0;
 		}
-        .checkbox-wrap {
-            padding-left: 30px;
-            padding-top: 12px;
-            float: left;
+		.checkbox-wrap {
+			padding-left: 30px;
+			padding-top: 12px;
+			float: left;
 			@media (max-width: 528px) {
-                padding-left: 15px;
+				padding-left: 15px;
 			}
 
-        }
-        .update-wrap {
-            padding-left: 15px;
-            padding-top: 15px;
-            float: left;
-            .update-icon {
-                background: image-url("icon-clock-settings.svg") 0 -16px no-repeat;
+		}
+		.update-wrap {
+			padding-left: 15px;
+			padding-top: 15px;
+			float: left;
+			.update-icon {
+				background: image-url("icon-clock-settings.svg") 0 -16px no-repeat;
 				background-size: 16px 32px;
-                height: 16px;
-                width: 16px;
-                display: block;
-                &.on {
+				height: 16px;
+				width: 16px;
+				display: block;
+				&.on {
 					background-position: 0 0;
-                }
-            }
+				}
+			}
 		}
 		.mute-wrap {
-            padding-left: 15px;
-            padding-top: 16px;
-            float: left;
-            .mute-icon {
-                background: image-url("icon-mute-settings.svg") 0 -14px no-repeat;
+			padding-left: 15px;
+			padding-top: 16px;
+			float: left;
+			.mute-icon {
+				background: image-url("icon-mute-settings.svg") 0 -14px no-repeat;
 				background-size: 13px 28px;
-                height: 14px;
-                width: 13px;
-                display: block;
-                &.on {
+				height: 14px;
+				width: 13px;
+				display: block;
+				&.on {
 					background-position: 0 0;
-                }
-            }
+				}
+			}
 		}
 		.textfield-wrap {
-            float: left;
+			float: left;
 			position: relative;
 			max-width: 450px;
 			z-index: 100;
-            width: 100%;
+			width: 100%;
 			input {
 				padding-top: 13px;
 				padding-bottom: 13px;
@@ -4244,7 +4244,7 @@ Settings
 				margin: 0;
 				border: none;
 				border-radius: 0;
-                background-color: transparent;
+				background-color: transparent;
 			}
 			.favicon-container {
 				display: block;
@@ -4262,8 +4262,8 @@ Settings
 				}
 			}
 			@media (max-width: 528px) {
-                width: auto;
-                max-width: 100%;
+				width: auto;
+				max-width: 100%;
 			}
 		}
 	}
@@ -5676,34 +5676,34 @@ Media Queries
 ------------------------------------------------------------------------------*/
 @media only screen and (max-width:1024px) {
 	.feeds-column {
-        width: 240px !important;
-    }
+		width: 240px !important;
+	}
 	.entries-column {
-        width: 300px !important;
-    }
+		width: 300px !important;
+	}
 }
 
 @media (max-width:768px) {
-    .entry-selected .content {
-        top: 0;
-    }
-    .nothing-selected, .feed-selected {
+	.entry-selected .content {
+		top: 0;
+	}
+	.nothing-selected, .feed-selected {
 		.entries-column {
 			flex-grow: 1;
 			border-right: none;
 		}
 		.entry-column {
-	        display: none !important;
-	    }
-    }
-    .entry-selected {
+			display: none !important;
+		}
+	}
+	.entry-selected {
 		.feeds-column {
 			display: none;
 		}
 		.entries-inner {
-	        top: $toolbar-height;
-	    }
-    }
+			top: $toolbar-height;
+		}
+	}
 	.feed-selected, .entry-selected {
 		.entries-header {
 			display: block;
@@ -5713,14 +5713,14 @@ Media Queries
 	.hide-search.entry-selected .entries {
 		top: 0;
 	}
-    .entry-toolbar, .entry-feed-title {
+	.entry-toolbar, .entry-feed-title {
 		.entry-feed-title {
 			display: none;
 			.full-screen & {
 				display: block;
 			}
 		}
-    }
+	}
 	.ui-resizable-handle {
 		display: none !important;
 	}
@@ -5737,7 +5737,7 @@ Media Queries
 	.desktop-hide {
 		display: block !important;
 	}
-    .nothing-selected {
+	.nothing-selected {
 		.feeds-column {
 			flex-grow: 1;
 			border-right: none;
@@ -5745,47 +5745,47 @@ Media Queries
 		.ui-resizable-handle,
 		.entry-column,
 		.entries-column {
-	        display: none;
-	    }
-    }
+			display: none;
+		}
+	}
 	.feed-selected {
 		.entries-header {
 			display: block;
 		}
 		.feeds-column {
-	        display: none;
-	    }
+			display: none;
+		}
 	}
-    .entry-selected {
+	.entry-selected {
 		.feeds-column,
 		.entries-column {
 			display: none;
 		}
-    }
+	}
 	.entry-toolbar {
 		.back-button {
 			display: block;
 		}
 	}
-    .entry-toolbar {
+	.entry-toolbar {
 		.favicon-wrap {
 			display: none;
 			.full-screen & {
 				display: block;
 			}
 		}
-    }
+	}
 	.entries {
 		.hide-search & {
 			top: 0;
 		}
 	}
-    .entry-basement {
-    	top: $toolbar-height;
-    }
+	.entry-basement {
+		top: $toolbar-height;
+	}
 	.entries-inner {
-        top: $toolbar-height;
-    }
+		top: $toolbar-height;
+	}
 	.theme-settings {
 		border-right: none !important;
 	}
@@ -5795,14 +5795,14 @@ Media Queries
 	.entry-content-wrap {
 		top: 0;
 	}
-    .feeds-column .feeds-toolbar {
-        display: none;
-    }
-    .feeds-inner {
-        bottom: 0;
-    }
+	.feeds-column .feeds-toolbar {
+		display: none;
+	}
+	.feeds-inner {
+		bottom: 0;
+	}
 	.entries-inner {
-        bottom: 51px;
+		bottom: 51px;
 	}
 	.entry-header h1 {
 		font-size: 1.6em;
@@ -5859,10 +5859,10 @@ Media Queries
 	.entry-basement.open &:before {
 		visibility: visible;
 	}
-    .share-form-inner {
-        max-width: 620px;
-        margin: 0 auto;
-    }
+	.share-form-inner {
+		max-width: 620px;
+		margin: 0 auto;
+	}
 	h2 {
 		font-size: 16px;
 		@include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
@@ -5881,7 +5881,7 @@ Media Queries
 			border-radius: 0;
 			border-bottom: none;
 			padding: 10px 10px 8px 10px !important;
-            font-size: 16px;
+			font-size: 16px;
 			&:focus {
 				@include border-color($border-color, $border-color-night, $border-color-sunset);
 			}
@@ -5900,7 +5900,7 @@ Media Queries
 	}
 	.share-controls {
 		overflow: hidden;
-        margin-bottom: 10px;
+		margin-bottom: 10px;
 		.checkbox, .radio, .control {
 			float: left;
 			margin-left: 15px;
@@ -5914,22 +5914,22 @@ Media Queries
 			}
 		}
 	}
-    .button {
-        padding: 9px 15px;
-        background-color: $selected;
-        color: #fff;
-        &:hover {
-            background-color: #2877c6;
-        }
-    }
-    .button-text {
-        background-color: transparent;
-        color: $selected;
-        &:hover {
-            background-color: transparent;
-            color: #2877c6;
-        }
-    }
+	.button {
+		padding: 9px 15px;
+		background-color: $selected;
+		color: #fff;
+		&:hover {
+			background-color: #2877c6;
+		}
+	}
+	.button-text {
+		background-color: transparent;
+		color: $selected;
+		&:hover {
+			background-color: transparent;
+			color: #2877c6;
+		}
+	}
 	.button-wrap {
 		overflow: hidden;
 		input, button {
@@ -5952,51 +5952,51 @@ Media Queries
 		background: image-url("icon-share-pinboard.svg") 100% 0 no-repeat;
 		background-size: 25px 25px;
 	}
-    .autocomplete-parent {
-        position: relative;
-        .share-autocomplete {
-            z-index: 2;
-            position: absolute;
-            top: 39px;
-            left: 7px;
-            width: 100%;
-            max-width: 400px;
-            @include background-color($input-background-color, $input-background-color, $input-background-color);
+	.autocomplete-parent {
+		position: relative;
+		.share-autocomplete {
+			z-index: 2;
+			position: absolute;
+			top: 39px;
+			left: 7px;
+			width: 100%;
+			max-width: 400px;
+			@include background-color($input-background-color, $input-background-color, $input-background-color);
 			border-left: 1px solid transparent;
 			border-right: 1px solid transparent;
 			border-bottom: 1px solid transparent;
 			@include border-color($border-color, $border-color-night, $border-color-sunset);
-        }
-        .autocomplete-suggestion {
-        	&:hover, &.autocomplete-selected {
-        		background-color: rgba(#000, .1);
-        	}
-        }
-    }
+		}
+		.autocomplete-suggestion {
+			&:hover, &.autocomplete-selected {
+				background-color: rgba(#000, .1);
+			}
+		}
+	}
 }
 
 .theme-night.full-screen .share-form:before {
-  border-top-color: black;
+	border-top-color: black;
 }
 .theme-sunset.full-screen .share-form:before {
-  border-top-color: $arrow-shadow-color-sunset;
+	border-top-color: $arrow-shadow-color-sunset;
 }
 .theme-night.full-screen .share-form:after {
-  border-top-color: $body-background-color-night;
+	border-top-color: $body-background-color-night;
 }
 .theme-sunset.full-screen .share-form:after {
-  border-top-color: $body-background-color-sunset;
+	border-top-color: $body-background-color-sunset;
 }
 
 .theme-night.full-screen .entry-settings:before {
-  border-top-color: black;
+	border-top-color: black;
 }
 .theme-sunset.full-screen .entry-settings:before {
-  border-top-color: $arrow-shadow-color-sunset;
+	border-top-color: $arrow-shadow-color-sunset;
 }
 .theme-night.full-screen .entry-settings:after {
-  border-top-color: $body-background-color-night;
+	border-top-color: $body-background-color-night;
 }
 .theme-sunset.full-screen .entry-settings:after {
-  border-top-color: $body-background-color-sunset;
+	border-top-color: $body-background-color-sunset;
 }
