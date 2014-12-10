@@ -64,32 +64,12 @@ describe SubscriptionsController do
         sign_in user
 
         subscription = create(:subscription, user: user)
-        post :update_multiple, unsubscribe: true, subscription_ids: [subscription.id]
+        post :update_multiple, operation: 'unsubscribe', subscription_ids: [subscription.id]
 
         expect(response.status).to eq 302
         expect(response).to redirect_to(settings_feeds_url)
       end
     end
-
-    context "subscribe" do
-      it "works" do
-        user = create(:user)
-        sign_in user
-
-        subscription = create(:subscription, user: user, title: "was bad")
-        second_subscription = create(:subscription, user: user, title: "was bad 2")
-
-        post :update_multiple, unsubscribe: false, subscriptions: {
-          "#{subscription.id}" => { title: "renamed" },
-          "#{second_subscription.id}" => { title: "renamed2" }
-        }
-
-        subscription.reload
-        expect(subscription.title).to eq "renamed"
-
-        second_subscription.reload
-        expect(second_subscription.title).to eq "renamed2"
-      end
-    end
   end
+
 end

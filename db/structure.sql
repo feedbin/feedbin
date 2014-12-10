@@ -1313,6 +1313,20 @@ CREATE INDEX index_subscriptions_on_feed_id ON subscriptions USING btree (feed_i
 
 
 --
+-- Name: index_subscriptions_on_feed_id_and_active_and_muted; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_subscriptions_on_feed_id_and_active_and_muted ON subscriptions USING btree (feed_id, active, muted);
+
+
+--
+-- Name: index_subscriptions_on_updates; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_subscriptions_on_updates ON subscriptions USING btree (feed_id, active, muted, show_updates);
+
+
+--
 -- Name: index_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1720,4 +1734,6 @@ INSERT INTO schema_migrations (version) VALUES ('20141110225053');
 INSERT INTO schema_migrations (version) VALUES ('20141117192421');
 
 INSERT INTO schema_migrations (version) VALUES ('20141202203934');
+
+INSERT INTO schema_migrations (version) VALUES ('20141208231955');
 

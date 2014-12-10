@@ -255,7 +255,7 @@ class Entry < ActiveRecord::Base
   def mark_as_unread
     if skip_mark_as_unread.blank? && self.published > 1.month.ago
       unread_entries = []
-      subscriptions = Subscription.where(feed_id: self.feed_id, active: true).pluck(:user_id)
+      subscriptions = Subscription.where(feed_id: self.feed_id, active: true, muted: false).pluck(:user_id)
       subscriptions.each do |user_id|
         unread_entries << UnreadEntry.new(user_id: user_id, feed_id: self.feed_id, entry_id: self.id, published: self.published, entry_created_at: self.created_at)
       end

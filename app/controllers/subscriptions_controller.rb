@@ -80,19 +80,23 @@ class SubscriptionsController < ApplicationController
 
   def update_multiple
     @user = current_user
-    if params[:unsubscribe]
-      if params[:subscription_ids]
-        allowed_params = destroy_subscription_params
-        subscriptions = Subscription.where(id: allowed_params)
-        Tagging.delete_all(user_id: @user, feed_id: subscriptions.map{|subscription| subscription.feed_id})
+    notice = "Feeds updated."
+    if params[:operation] && params[:subscription_ids]
+      subscriptions = @user.subscriptions.where(id: params[:subscription_ids])
+      if params[:operation] == "unsubscribe"
         subscriptions.destroy_all
+        notice = "You have unsubscribed."
+      elsif params[:operation] == "show_updates"
+        subscriptions.update_all(show_updates: true)
+      elsif params[:operation] == "hide_updates"
+        subscriptions.update_all(show_updates: false)
+      elsif params[:operation] == "mute"
+        subscriptions.update_all(muted: true)
+      elsif params[:operation] == "unmute"
+        subscriptions.update_all(muted: false)
       end
-      redirect_to settings_feeds_url, notice: "You have unsubscribed."
-    else
-      allowed_params = subscription_params
-      Subscription.update(allowed_params.keys, allowed_params.values)
-      redirect_to settings_feeds_url, notice: "Feeds updated."
     end
+    redirect_to settings_feeds_url, notice: notice
   end
 
   def destroy_all
@@ -101,25 +105,18 @@ class SubscriptionsController < ApplicationController
     redirect_to settings_feeds_url, notice: "You have unsubscribed."
   end
 
-  private
-
-  def destroy_subscription_params
-    owned_subscriptions = @user.subscriptions.pluck(:id)
-    params[:subscription_ids].select {|id| owned_subscriptions.include?(id.to_i) }
+  def toggle_updates
+    user = current_user
+    subscription = user.subscriptions.find(params[:id])
+    subscription.toggle!(:show_updates)
+    render nothing: true
   end
 
-  def subscription_params
-    owned_subscriptions = @user.subscriptions.pluck(:id)
-    params[:subscriptions].each do |index, fields|
-      unless owned_subscriptions.include?(index.to_i)
-        params[:subscriptions].delete(index)
-      end
-    end
-    params[:subscriptions].map do |index, fields|
-      params[:subscriptions][index] = fields.slice(:title, :push)
-    end
-
-    params.require(:subscriptions).permit!
+  def toggle_muted
+    user = current_user
+    subscription = user.subscriptions.find(params[:id])
+    subscription.toggle!(:muted)
+    render nothing: true
   end
 
 end

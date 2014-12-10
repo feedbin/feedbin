@@ -62,5 +62,13 @@ class Subscription < ActiveRecord::Base
   def untag
     self.feed.tag('', self.user)
   end
+  
+  def show_updates?
+    self.show_updates
+  end
+  
+  def muted?
+    self.muted == true
+  end
 
 end

@@ -321,20 +321,31 @@ $.extend feedbin,
 
   drawBarChart: (canvas, values) ->
     if values
-      spaceWidth = 1
-      barWidth = 5
+      barWidth = 3
       if canvas.getContext
         context = canvas.getContext("2d")
         canvasHeight = $(canvas).attr('height')
         if 'devicePixelRatio' of window
           context = feedbin.retinaCanvas(canvas, context)
-        context.fillStyle = "#DDDDDD"
+
         xPosition = 0
+
+        context.strokeStyle = '#DDDDDD'
+        context.lineWidth = 2
+        context.beginPath()
+
+        height = Math.ceil(values.shift() * canvasHeight)
+        yPosition = (canvasHeight - height) - 1
+
+        context.moveTo(xPosition, yPosition)
+
         for value in values
           height = Math.ceil(value * canvasHeight)
-          yPosition = canvasHeight - height
-          context.fillRect(xPosition, yPosition, barWidth, height)
-          xPosition = xPosition + barWidth + spaceWidth
+          yPosition = (canvasHeight - height) - 1
+          xPosition = xPosition + barWidth
+          context.lineTo(xPosition, yPosition)
+
+        context.stroke()
 
   readabilityActive: ->
     $('[data-behavior~=toggle_content_view]').find('.active').length > 0
@@ -709,14 +720,19 @@ $.extend feedbin,
         event.preventDefault()
         return
 
-    checkBoxToggle: ->
-      $(document).on 'click', '[data-behavior~=check_all]', (event) =>
-        $('[type="checkbox"]').prop('checked', true)
-        event.preventDefault()
-        return
+    feedActions: ->
+      $(document).on 'click', '[data-operation]', (event) ->
+        operation = $(@).data('operation')
+        form = $(@).parents('form')
+        $('input[name=operation]').val(operation)
+        form.submit()
 
-      $(document).on 'click', '[data-behavior~=check_none]', (event) =>
-        $('[type="checkbox"]').prop('checked', false)
+    checkBoxToggle: ->
+      $(document).on 'change', '[data-behavior~=toggle_checked]', (event) ->
+        if $(@).is(':checked')
+          $('[type="checkbox"][name]').prop('checked', true)
+        else
+          $('[type="checkbox"][name]').prop('checked', false)
         event.preventDefault()
         return
 
@@ -839,8 +855,10 @@ $.extend feedbin,
         $(@).parents('form').submit()
 
     feedSettings: ->
-      $('[data-behavior~=sort_feeds]').change ->
-        sortBy = $(@).val()
+      $(document).on 'click', '[data-behavior~=sort_feeds]', (event, xhr) ->
+        sortBy = $(@).data('value')
+        label = $(@).text()
+        $('[data-behavior~=sort_label]').text(label)
         if sortBy == "name"
           sortFunction = feedbin.sortByName
         else if sortBy == "last-updated"
@@ -942,6 +960,18 @@ $.extend feedbin,
 
         $.post feedbin.data.mark_direction_as_read_entries, data
         return
+
+    toggle: ->
+      $(document).on 'click', '[data-toggle]', ->
+        toggle = $(@).data('toggle')
+        if toggle['class']
+          $(@).toggleClass(toggle['class'])
+        if toggle['title']
+          if toggle['title'][0] == $(@).attr('title')
+            title = toggle['title'][1]
+          else
+            title = toggle['title'][0]
+          $(@).attr('title', title)
 
     formProcessing: ->
       $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
