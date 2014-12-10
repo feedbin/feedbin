@@ -4152,58 +4152,52 @@ Settings
         -webkit-overflow-scrolling: touch;
         overflow-y: auto;
         overflow-x: hidden;
-    }
-    .feed-form {
-        border-radius: 0 0 8px 8px;
-        border-top: none;
         @media (max-width: 528px) {
             right: 0;
             left: 0;
         }
+    }
+    .feed-form {
+        border-radius: 0 0 8px 8px;
+        border-top: none;
         li {
             clear: both;
             position: relative;
             padding: 0;
         }
         .last-updated-wrap {
-            position: absolute;
-            right: 10px;
-            top: 17px;
+            float: left;
             font-size: 14px;
+            padding: 15px 0 0 7px;
             @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
             @media (max-width:800px) {
                 display: none;
             }
         }
         .canvas-wrap {
-            max-width: 508px;
-            float: right;
+            width: 87px;
+            float: left;
             overflow-x: hidden;
             overflow-y: visible;
             z-index: 0;
+            padding: 7px 0 0 10px;
             @media (max-width: 528px) {
                 display: none;
             }
         }
-        canvas {
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            z-index: 0;
-        }
         .checkbox-wrap {
-            padding-left: 30px;
-            padding-top: 12px;
-            float: left;
+            z-index: 100;
+            position: absolute;
+            left: 30px;
+            top: 12px;
             @media (max-width: 528px) {
-                padding-left: 15px;
+                left: 15px;
             }
-
         }
         .update-wrap {
-            padding-left: 15px;
-            padding-top: 15px;
-            float: left;
+            right: 30px;
+            top: 15px;
+            position: absolute;
             .update-icon {
                 background: image-url("icon-clock-settings.svg") 0 -16px no-repeat;
                 background-size: 16px 32px;
@@ -4216,54 +4210,52 @@ Settings
             }
         }
         .mute-wrap {
-            padding-left: 15px;
-            padding-top: 16px;
-            float: left;
+            right: 60px;
+            top: 16px;
+            position: absolute;
             .mute-icon {
-                background: image-url("icon-mute-settings.svg") 0 -14px no-repeat;
-                background-size: 13px 28px;
-                height: 14px;
-                width: 13px;
+                background: image-url("icon-mute-settings.svg") 0 -13px no-repeat;
+                background-size: 12px 26px;
+                height: 13px;
+                width: 12px;
                 display: block;
                 &.on {
                     background-position: 0 0;
                 }
             }
         }
-        .textfield-wrap {
-            float: left;
-            position: relative;
-            max-width: 450px;
-            z-index: 100;
-            width: 100%;
-            input {
-                padding-top: 13px;
-                padding-bottom: 13px;
-                max-width: 100%;
-                padding-left: 45px !important;
-                margin: 0;
-                border: none;
-                border-radius: 0;
-                background-color: transparent;
-            }
-            .favicon-container {
-                display: block;
-                position: absolute;
-                left: 15px;
-                top: 15px;
+        .favicon-container {
+            display: block;
+            position: absolute;
+            left: 60px;
+            top: 15px;
+            height: 16px;
+            width: 16px;
+            .favicon-wrap {
                 height: 16px;
                 width: 16px;
-                .favicon-wrap {
-                    height: 16px;
-                    width: 16px;
-                    top: 0;
-                    left: 0;
-                    box-shadow: none;
-                }
+                top: 0;
+                left: 0;
+                box-shadow: none;
             }
             @media (max-width: 528px) {
-                width: auto;
-                max-width: 100%;
+                left: 45px;
+            }
+        }
+        .subscription-title {
+            float: left;
+            display: inline-block;
+            padding-left: 85px;
+            padding-top: 13px;
+            padding-bottom: 13px;
+            position: relative;
+            @media (max-width: 528px) {
+                padding-left: 70px;
+                padding-right: 83px;
+                width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
         }
     }

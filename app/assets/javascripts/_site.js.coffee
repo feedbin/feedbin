@@ -321,20 +321,31 @@ $.extend feedbin,
 
   drawBarChart: (canvas, values) ->
     if values
-      spaceWidth = 1
-      barWidth = 5
+      barWidth = 3
       if canvas.getContext
         context = canvas.getContext("2d")
         canvasHeight = $(canvas).attr('height')
         if 'devicePixelRatio' of window
           context = feedbin.retinaCanvas(canvas, context)
-        context.fillStyle = "#DDDDDD"
+
         xPosition = 0
+
+        context.strokeStyle = '#DDDDDD'
+        context.lineWidth = 2
+        context.beginPath()
+
+        height = Math.ceil(values.shift() * canvasHeight)
+        yPosition = (canvasHeight - height) - 1
+
+        context.moveTo(xPosition, yPosition)
+
         for value in values
           height = Math.ceil(value * canvasHeight)
-          yPosition = canvasHeight - height
-          context.fillRect(xPosition, yPosition, barWidth, height)
-          xPosition = xPosition + barWidth + spaceWidth
+          yPosition = (canvasHeight - height) - 1
+          xPosition = xPosition + barWidth
+          context.lineTo(xPosition, yPosition)
+
+        context.stroke()
 
   readabilityActive: ->
     $('[data-behavior~=toggle_content_view]').find('.active').length > 0

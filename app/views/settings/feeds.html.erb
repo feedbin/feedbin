@@ -25,7 +25,6 @@
             </div>
             <div class="half por">
                 <input type="checkbox" class="feeds-checkbox" data-behavior="toggle_checked" />
-                <button class="feeds-toolbar-button">Save</button>
                 <div class="dropdown-wrap feed-dropdown">
                     <button class="feeds-toolbar-button button-caret" data-behavior="toggle_share_menu toggle_dropdown feed_actions">Actions</button>
                     <ul>
@@ -40,7 +39,7 @@
         </div>
     </div>
     <div class="feed-form-wrap">
-        <ul class="pill-list feed-form sortable no-margin"  data-behavior="search_results">
+        <ul class="pill-list feed-form sortable"  data-behavior="search_results">
             <% @subscriptions.each do |subscription| %>
                 <% present subscription do |subscription_presenter| %>
                     <%= fields_for "subscriptions[]", subscription do |f| %>
@@ -54,19 +53,17 @@
                             <div class="mute-wrap">
                                 <%= link_to '', toggle_muted_subscription_path(subscription), remote: true, method: :post, class: "mute-icon #{subscription.muted? ? '' : 'on'}", data: {toggle: {class: 'on', title: ['Mute', 'Unmute']}}, title: (subscription.muted?) ? 'Unmute' : 'Mute' %>
                             </div>
-                            <div class="textfield-wrap">
+                            <div class="subscription-title">
                                 <a href="<%= subscription.feed_url %>" title="Feed URL" class="favicon-container">
                                     <%= subscription_presenter.favicon(subscription.host) %>
                                 </a>
-                                <%= f.text_field :title, placeholder: subscription.original_title %>
-                            </div>
-
-
-                            <div class="canvas-wrap">
-                                <%= content_tag :canvas, '', width: 179, height: 45, data: { values: subscription.entries_count }, title: 'Post frequency' %>
+                                <%= subscription.title %>
                             </div>
                             <div class="last-updated-wrap">
                                 <%= timeago(subscription.last_published_entry) %>
+                            </div>
+                            <div class="canvas-wrap">
+                                <%= content_tag :canvas, '', width: 87, height: 20, data: { values: subscription.entries_count }, title: 'Post frequency' %>
                             </div>
                         </li>
                     <% end %>
