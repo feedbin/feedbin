@@ -4198,6 +4198,10 @@ Settings
             right: 22px;
             top: 7px;
             position: absolute;
+            z-index: 100;
+            @media (max-width: 528px) {
+                right: 7px;
+            }
             .update-icon {
                 display: flex;
                 align-items: center;
@@ -4223,6 +4227,10 @@ Settings
             right: 54px;
             top: 6px;
             position: absolute;
+            z-index: 100;
+            @media (max-width: 528px) {
+                right: 39px;
+            }
             .mute-icon {
                 display: flex;
                 align-items: center;

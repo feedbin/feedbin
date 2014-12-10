@@ -53,12 +53,12 @@
                             <div class="mute-wrap">
                                 <%= link_to '', toggle_muted_subscription_path(subscription), remote: true, method: :post, class: "mute-icon #{subscription.muted? ? '' : 'on'}", data: {toggle: {class: 'on', title: ['Mute', 'Unmute']}}, title: (subscription.muted?) ? 'Unmute' : 'Mute' %>
                             </div>
-                            <div class="subscription-title">
+                            <label class="subscription-title" for="subscription_checkbox_<%= subscription.id %>">
                                 <a href="<%= subscription.feed_url %>" title="Feed URL" class="favicon-container">
                                     <%= subscription_presenter.favicon(subscription.host) %>
                                 </a>
-                                <label for="subscription_checkbox_<%= subscription.id %>"><%= subscription.title %></label>
-                            </div>
+                                <%= subscription.title %>
+                            </label>
                             <div class="last-updated-wrap">
                                 <%= timeago(subscription.last_published_entry) %>
                             </div>
