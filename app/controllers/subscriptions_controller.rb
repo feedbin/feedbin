@@ -95,9 +95,6 @@ class SubscriptionsController < ApplicationController
       elsif params[:operation] == "unmute"
         subscriptions.update_all(muted: false)
       end
-    else
-      allowed_params = subscription_params
-      Subscription.update(allowed_params.keys, allowed_params.values)
     end
     redirect_to settings_feeds_url, notice: notice
   end
@@ -120,22 +117,6 @@ class SubscriptionsController < ApplicationController
     subscription = user.subscriptions.find(params[:id])
     subscription.toggle!(:muted)
     render nothing: true
-  end
-
-  private
-
-  def subscription_params
-    owned_subscriptions = @user.subscriptions.pluck(:id)
-    params[:subscriptions].each do |index, fields|
-      unless owned_subscriptions.include?(index.to_i)
-        params[:subscriptions].delete(index)
-      end
-    end
-    params[:subscriptions].map do |index, fields|
-      params[:subscriptions][index] = fields.slice(:title, :push)
-    end
-
-    params.require(:subscriptions).permit!
   end
 
 end

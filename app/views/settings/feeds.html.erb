@@ -45,7 +45,7 @@
                     <%= fields_for "subscriptions[]", subscription do |f| %>
                         <li data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>">
                             <div class="checkbox-wrap">
-                                <%= check_box_tag "subscription_ids[]", subscription.id %>
+                                <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}" %>
                             </div>
                             <div class="update-wrap">
                                 <%= link_to '', toggle_updates_subscription_path(subscription), remote: true, method: :post, class: "update-icon #{subscription.show_updates? ? 'on' : ''}", data: {toggle: {class: 'on', title: ['Show updates on articles', 'Hide updates on articles']}}, title: (subscription.show_updates?) ? 'Hide updates on articles' : 'Show updates on articles'   %>
@@ -57,7 +57,7 @@
                                 <a href="<%= subscription.feed_url %>" title="Feed URL" class="favicon-container">
                                     <%= subscription_presenter.favicon(subscription.host) %>
                                 </a>
-                                <%= subscription.title %>
+                                <label for="subscription_checkbox_<%= subscription.id %>"><%= subscription.title %></label>
                             </div>
                             <div class="last-updated-wrap">
                                 <%= timeago(subscription.last_published_entry) %>
