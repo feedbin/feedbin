@@ -59,7 +59,7 @@ class FeedRefresherReceiver
   def significant_change?(original_content, new_content)
     original_length = Sanitize.fragment(original_content).length
     new_length = Sanitize.fragment(new_content).length
-    (new_length - original_length).abs > 50
+    new_length - original_length > 50
   rescue Exception => e
     Honeybadger.notify(
       error_class: "FeedRefresherReceiver#detect_significant_change",
