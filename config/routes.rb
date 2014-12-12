@@ -75,8 +75,6 @@ Feedbin::Application.routes.draw do
     end
     member do
       delete :settings_destroy
-      post :toggle_updates
-      post :toggle_muted
     end
   end
 
@@ -95,9 +93,12 @@ Feedbin::Application.routes.draw do
       get :view_all
       get :view_starred
       get :auto_update
+      get :update_styles
     end
     member do
       match :push, via: [:post, :get]
+      post :toggle_updates
+      post :toggle_muted
     end
   end
 

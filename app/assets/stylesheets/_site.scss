@@ -3141,11 +3141,19 @@ $saved-search-control-height: 48px;
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         position: relative;
         margin-bottom: 1.1em;
-        padding: 10px 53px 10px 36px;
+        padding: 10px 12px 10px 36px;
         font-size: 13px;
         font-family: $font-stack !important;
         font-weight: 400 !important;
         margin-top: 15px;
+        .ignore-updates {
+            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            text-decoration: none;
+            font-weight: bold;
+            float: right;
+            font-size: 16px;
+            line-height: 1;
+        }
         .icon-clock-wrap {
             display: block;
             height: 16px;

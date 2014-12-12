@@ -961,6 +961,20 @@ $.extend feedbin,
         $.post feedbin.data.mark_direction_as_read_entries, data
         return
 
+    hideUpdates: ->
+      $(document).on 'click', '[data-behavior~=hide_updates]', (event) ->
+        container = $(@).parents('.diff-wrap')
+        console.log 'hideUpdates', event
+        console.log 'feedbin.data.update_message_seen', feedbin.data.update_message_seen
+        if feedbin.data.update_message_seen
+          container.addClass('hide')
+        else
+          feedbin.data.update_message_seen = true
+          container.find('.diff-wrap-text').text('To re-enable updates, go to Setting > Feeds.')
+          setTimeout ( ->
+            container.addClass('hide')
+          ), 4000
+
     toggle: ->
       $(document).on 'click', '[data-toggle]', ->
         toggle = $(@).data('toggle')

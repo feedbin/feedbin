@@ -48,10 +48,10 @@
                                 <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}" %>
                             </div>
                             <div class="update-wrap">
-                                <%= link_to '', toggle_updates_subscription_path(subscription), remote: true, method: :post, class: "update-icon #{subscription.show_updates? ? 'on' : ''}", data: {toggle: {class: 'on', title: ['Show updates on articles', 'Hide updates on articles']}}, title: (subscription.show_updates?) ? 'Hide updates on articles' : 'Show updates on articles'   %>
+                                <%= link_to '', toggle_updates_feed_path(subscription.feed), remote: true, method: :post, class: "update-icon #{subscription.show_updates? ? 'on' : ''}", data: {toggle: {class: 'on', title: ['Show updates on articles', 'Hide updates on articles']}}, title: (subscription.show_updates?) ? 'Hide updates on articles' : 'Show updates on articles'   %>
                             </div>
                             <div class="mute-wrap">
-                                <%= link_to '', toggle_muted_subscription_path(subscription), remote: true, method: :post, class: "mute-icon #{subscription.muted? ? '' : 'on'}", data: {toggle: {class: 'on', title: ['Mute', 'Unmute']}}, title: (subscription.muted?) ? 'Unmute' : 'Mute' %>
+                                <%= link_to '', toggle_muted_feed_path(subscription.feed), remote: true, method: :post, class: "mute-icon #{subscription.muted? ? '' : 'on'}", data: {toggle: {class: 'on', title: ['Mute', 'Unmute']}}, title: (subscription.muted?) ? 'Unmute' : 'Mute' %>
                             </div>
                             <label class="subscription-title" for="subscription_checkbox_<%= subscription.id %>">
                                 <a href="<%= subscription.feed_url %>" title="Feed URL" class="favicon-container">

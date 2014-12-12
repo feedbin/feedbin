@@ -25,16 +25,17 @@ class SiteController < ApplicationController
         tags_path: tags_path(format: :json),
         user_titles: user_titles,
         preload_entries_path: preload_entries_path(format: :json),
-        sticky_readability: (@user.sticky_view_inline == '1'),
+        sticky_readability: @user.setting_on?(:sticky_view_inline),
         readability_settings: readability_settings,
-        show_unread_count:  (@user.show_unread_count == '1'),
-        precache_images: (@user.precache_images == '1'),
+        show_unread_count: @user.setting_on?(:show_unread_count),
+        precache_images: @user.setting_on?(:precache_images),
         auto_update_path: auto_update_feeds_path,
         font_sizes: Feedbin::Application.config.font_sizes,
         mark_as_read_path: mark_all_as_read_entries_path,
-        mark_as_read_confirmation: (@user.mark_as_read_confirmation == '1'),
+        mark_as_read_confirmation: @user.setting_on?(:mark_as_read_confirmation),
         mark_direction_as_read_entries: mark_direction_as_read_entries_path,
-        entry_sort: @user.entry_sort
+        entry_sort: @user.entry_sort,
+        update_message_seen: @user.setting_on?(:update_message_seen),
       }
 
       render action: 'logged_in'

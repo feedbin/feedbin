@@ -78,6 +78,34 @@ class FeedsController < ApplicationController
     end
   end
 
+  def toggle_updates
+    @user = current_user
+    subscription = @user.subscriptions.where(feed_id: params[:id]).take!
+    subscription.toggle!(:show_updates)
+    if params.has_key?(:inline)
+      @delay = false
+      if !@user.setting_on?(:update_message_seen)
+        @user.update_message_seen = '1'
+        @user.save
+        @delay = true
+      end
+    else
+      render nothing: true
+    end
+  end
+
+  def toggle_muted
+    user = current_user
+    subscription = user.subscriptions.where(feed_id: params[:id]).take!
+    subscription.toggle!(:muted)
+    render nothing: true
+  end
+
+  def update_styles
+    user = current_user
+    @feed_ids = user.subscriptions.where(show_updates: false).pluck(:feed_id)
+  end
+
   private
 
   def update_view_mode(view_mode)
