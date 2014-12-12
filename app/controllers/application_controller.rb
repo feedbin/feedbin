@@ -92,7 +92,7 @@ class ApplicationController < ActionController::Base
     @mark_selected = true
     @user = current_user
 
-    if @user.hide_tagged_feeds == '1'
+    if @user.setting_on?(:hide_tagged_feeds)
       excluded_feeds = @user.taggings.pluck(:feed_id).uniq
       @feeds = @user.feeds.where.not(id: excluded_feeds).include_user_title
     else

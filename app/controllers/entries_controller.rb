@@ -80,7 +80,7 @@ class EntriesController < ApplicationController
 
     @content_view = params[:content_view] == 'true'
 
-    if @user.sticky_view_inline == '1'
+    if @user.setting_on?(:sticky_view_inline)
       subscription = Subscription.where(user: @user, feed_id: @entry.feed_id).first
       if subscription.present?
         subscription.update_attributes(view_inline: @content_view)

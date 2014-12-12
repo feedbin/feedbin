@@ -85,19 +85,19 @@
       </div>
       <ul class="control-group control-group-form">
         <li>
-          <%= f.check_box :entries_feed, {checked: @user.entries_feed.nil? || @user.entries_feed == '1', data: {behavior: 'appearance_checkbox', setting: 'entries-feed'} } %>
+          <%= f.check_box :entries_feed, {checked: @user.entries_feed.nil? || @user.setting_on?(:entries_feed), data: {behavior: 'appearance_checkbox', setting: 'entries-feed'} } %>
           <%= f.label :entries_feed do %>
             Feed Name <span class="slider-checkbox"></span>
           <% end %>
         </li>
         <li>
-          <%= f.check_box :entries_time, {checked: @user.entries_time.nil? || @user.entries_time == '1', data: {behavior: 'appearance_checkbox', setting: 'entries-time'} } %>
+          <%= f.check_box :entries_time, {checked: @user.entries_time.nil? || @user.setting_on?(:entries_time), data: {behavior: 'appearance_checkbox', setting: 'entries-time'} } %>
           <%= f.label :entries_time do %>
             Date <span class="slider-checkbox"></span>
           <% end %>
         </li>
         <li>
-          <%= f.check_box :entries_body, {checked: @user.entries_body.nil? || @user.entries_body == '1', data: {behavior: 'appearance_checkbox', setting: 'entries-body'} } %>
+          <%= f.check_box :entries_body, {checked: @user.entries_body.nil? || @user.setting_on?(:entries_body), data: {behavior: 'appearance_checkbox', setting: 'entries-body'} } %>
           <%= f.label :entries_body do %>
             Summary <span class="slider-checkbox"></span>
           <% end %>
