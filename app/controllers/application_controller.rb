@@ -35,6 +35,7 @@ class ApplicationController < ActionController::Base
   end
 
   def get_collections
+    user = current_user
     collections = []
     collections << {
       title: 'Unread',
@@ -66,25 +67,29 @@ class ApplicationController < ActionController::Base
       parent_data: { behavior: 'starred', feed_id: 'collection_starred', count_type: 'starred' },
       data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'starred', message: 'Mark starred items as read?'}.to_json }
     }
-    collections << {
-      title: 'Recently Read',
-      path: recently_read_entries_path,
-      id: 'collection_recently_read',
-      favicon_class: 'favicon-recently-read',
-      parent_class: 'collection-recently-read',
-      parent_data: { behavior: 'recently_read', feed_id: 'collection_recently_read', count_type: 'recently_read' },
-      data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'recently_read', message: 'Mark recently read items as read?'}.to_json }
-    }
-    collections << {
-      title: 'Updated',
-      path: updated_entries_path,
-      count_data: {behavior: 'needs_count', count_group: 'all', count_collection: 'updated', count_hide: 'on'},
-      id: 'collection_updated',
-      favicon_class: 'favicon-updated',
-      parent_class: 'collection-updated',
-      parent_data: { behavior: 'updated', feed_id: 'collection_updated', count_type: 'updated' },
-      data: { behavior: 'selectable show_entries open_item feed_link', special_collection: 'updated', mark_read: {type: 'updated', message: 'Mark updated items as read?'}.to_json }
-    }
+    if !user.setting_on?(:hide_recently_read)
+      collections << {
+        title: 'Recently Read',
+        path: recently_read_entries_path,
+        id: 'collection_recently_read',
+        favicon_class: 'favicon-recently-read',
+        parent_class: 'collection-recently-read',
+        parent_data: { behavior: 'recently_read', feed_id: 'collection_recently_read', count_type: 'recently_read' },
+        data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'recently_read', message: 'Mark recently read items as read?'}.to_json }
+      }
+    end
+    if !user.setting_on?(:hide_updated)
+      collections << {
+        title: 'Updated',
+        path: updated_entries_path,
+        count_data: {behavior: 'needs_count', count_group: 'all', count_collection: 'updated', count_hide: 'on'},
+        id: 'collection_updated',
+        favicon_class: 'favicon-updated',
+        parent_class: 'collection-updated',
+        parent_data: { behavior: 'updated', feed_id: 'collection_updated', count_type: 'updated' },
+        data: { behavior: 'selectable show_entries open_item feed_link', special_collection: 'updated', mark_read: {type: 'updated', message: 'Mark updated items as read?'}.to_json }
+      }
+    end
     collections
   end
 

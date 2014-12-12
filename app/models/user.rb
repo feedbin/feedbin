@@ -27,7 +27,9 @@ class User < ActiveRecord::Base
                  :entries_time,
                  :entries_body,
                  :ui_typeface,
-                 :update_message_seen
+                 :update_message_seen,
+                 :hide_recently_read,
+                 :hide_updated
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all

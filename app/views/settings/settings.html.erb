@@ -60,6 +60,18 @@
           <% end %>
         </li>
         <li>
+          <%= f.check_box :hide_recently_read %>
+          <%= f.label :hide_recently_read do %>
+            Hide Recently Read section <span class="slider-checkbox"></span>
+          <% end %>
+        </li>
+        <li>
+          <%= f.check_box :hide_updated %>
+          <%= f.label :hide_updated do %>
+            Hide Updated section <span class="slider-checkbox"></span>
+          <% end %>
+        </li>
+        <li>
           <%= f.check_box :hide_tagged_feeds %>
           <%= f.label :hide_tagged_feeds do %>
             Hide tagged feeds <span class="slider-checkbox"></span>
