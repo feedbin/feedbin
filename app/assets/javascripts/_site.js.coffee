@@ -104,7 +104,7 @@ $.extend feedbin,
       feedId = $(@).data('feed-id')
       if (feedId of feedbin.data.user_titles)
         newTitle = feedbin.data.user_titles[feedId]
-        $(@).text(newTitle)
+        $(@).html(newTitle)
 
   queryString: (name) ->
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]")

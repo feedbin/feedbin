@@ -10,7 +10,7 @@ class SiteController < ApplicationController
 
       user_titles = subscriptions.each_with_object({}) do |subscription, hash|
         if subscription.title.present?
-          hash[subscription.feed_id] = subscription.title
+          hash[subscription.feed_id] = ERB::Util.html_escape_once(subscription.title)
         end
       end
 
