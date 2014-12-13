@@ -324,7 +324,7 @@ $.extend feedbin,
       barWidth = 3
       if canvas.getContext
         context = canvas.getContext("2d")
-        canvasHeight = $(canvas).attr('height')
+        canvasHeight = $(canvas).attr('height') - 2
         if 'devicePixelRatio' of window
           context = feedbin.retinaCanvas(canvas, context)
 
@@ -335,13 +335,13 @@ $.extend feedbin,
         context.beginPath()
 
         height = Math.ceil(values.shift() * canvasHeight)
-        yPosition = (canvasHeight - height) - 1
+        yPosition = (canvasHeight - height)
 
         context.moveTo(xPosition, yPosition)
 
         for value in values
           height = Math.ceil(value * canvasHeight)
-          yPosition = (canvasHeight - height) - 1
+          yPosition = (canvasHeight - height) + 1
           xPosition = xPosition + barWidth
           context.lineTo(xPosition, yPosition)
 
