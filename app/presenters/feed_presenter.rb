@@ -9,7 +9,7 @@ class FeedPresenter < BasePresenter
   end
 
   def classes
-    @template.selected("feed_#{feed.id} zero-count")
+    @template.selected("feed_#{feed.id}")
   end
 
 end
