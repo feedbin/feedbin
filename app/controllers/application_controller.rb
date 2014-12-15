@@ -84,7 +84,7 @@ class ApplicationController < ActionController::Base
         path: updated_entries_path,
         count_data: {behavior: 'needs_count', count_group: 'all', count_collection: 'updated', count_hide: 'on'},
         id: 'collection_updated',
-        favicon_class: 'favicon-updated',
+        favicon_class: 'favicon-updated zero-count',
         parent_class: 'collection-updated',
         parent_data: { behavior: 'updated', feed_id: 'collection_updated', count_type: 'updated' },
         data: { behavior: 'selectable show_entries open_item feed_link', special_collection: 'updated', mark_read: {type: 'updated', message: 'Mark updated items as read?'}.to_json }
