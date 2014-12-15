@@ -1236,6 +1236,13 @@ CREATE INDEX index_recently_read_entries_on_created_at ON recently_read_entries 
 
 
 --
+-- Name: index_recently_read_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_recently_read_entries_on_entry_id ON recently_read_entries USING btree (entry_id);
+
+
+--
 -- Name: index_recently_read_entries_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1736,4 +1743,6 @@ INSERT INTO schema_migrations (version) VALUES ('20141117192421');
 INSERT INTO schema_migrations (version) VALUES ('20141202203934');
 
 INSERT INTO schema_migrations (version) VALUES ('20141208231955');
+
+INSERT INTO schema_migrations (version) VALUES ('20141215195928');
 

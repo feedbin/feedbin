@@ -20,6 +20,8 @@ class EntryDeleter
 
       # Delete records
       UnreadEntry.where(entry_id: entries_to_delete_ids).delete_all
+      UpdatedEntry.where(entry_id: entries_to_delete_ids).delete_all
+      RecentlyReadEntry.where(entry_id: entries_to_delete_ids).delete_all
       entries_to_delete.delete_all
 
       Sidekiq.redis do |conn|
