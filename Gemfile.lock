@@ -8,6 +8,16 @@ GIT
       nokogiri (~> 1.4)
 
 GIT
+  remote: git://github.com/feedbin/feedjira.git
+  revision: 154c523217b4e0316623582d17169178748e49d6
+  ref: 154c523
+  specs:
+    feedjira (1.5.0)
+      curb (~> 0.8)
+      loofah (~> 2.0)
+      sax-machine (~> 1.0)
+
+GIT
   remote: git://github.com/feedbin/grocer-pushpackager.git
   revision: e190796c7495e4d53849ad940a41969b45eaa6c9
   ref: e190796
@@ -157,10 +167,6 @@ GEM
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.9.1)
       faraday (>= 0.7.4, < 0.10)
-    feedjira (1.5.0)
-      curb (~> 0.8)
-      loofah (~> 2.0)
-      sax-machine (~> 1.0)
     fog (1.24.0)
       fog-brightbox
       fog-core (~> 1.23)
@@ -407,7 +413,7 @@ DEPENDENCIES
   evernote_oauth
   factory_girl_rails
   faker
-  feedjira
+  feedjira!
   fog
   foreman (= 0.63.0)
   gctools
