@@ -1,4 +1,6 @@
 language: ruby
+cache: bundler
+sudo: false
 services:
   - redis-server
 addons:
