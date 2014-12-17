@@ -28,7 +28,7 @@ class Feed < ActiveRecord::Base
     taggings
   end
 
-  def self.create_from_feedzirra(feed, site_url)
+  def self.create_from_feedjira(feed, site_url)
     feed.url = site_url
     feed_record = self.create!(feed: feed)
     ActiveRecord::Base.transaction do

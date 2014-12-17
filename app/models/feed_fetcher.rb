@@ -44,7 +44,7 @@ class FeedFetcher
   end
 
   def get_options
-    content = Feedzirra::Feed.fetch_raw(@url, {user_agent: 'Feedbin', ssl_verify_peer: false})
+    content = Feedjira::Feed.fetch_raw(@url, {user_agent: 'Feedbin', ssl_verify_peer: false})
     if content.is_a?(String)
       content = Nokogiri::HTML(content)
 
@@ -90,7 +90,7 @@ class FeedFetcher
     @feed = Feed.where(feed_url: @parsed_feed.feed_url).first
 
     unless @feed
-      @feed = Feed.create_from_feedzirra(@parsed_feed, @site_url)
+      @feed = Feed.create_from_feedjira(@parsed_feed, @site_url)
       if @parsed_feed.respond_to?(:hubs) && !@parsed_feed.hubs.blank?
         hub_secret = Push::hub_secret(@feed.id)
         push_subscribe(@parsed_feed, @feed.id, Push::callback_url(@feed), hub_secret)
@@ -99,14 +99,14 @@ class FeedFetcher
 
   end
 
-  def push_subscribe(feedzirra, feed_id, push_callback, hub_secret)
+  def push_subscribe(feedjira, feed_id, push_callback, hub_secret)
     begin
-      feedzirra.hubs.each do |hub|
+      feedjira.hubs.each do |hub|
         uri = URI(hub)
         uri.scheme = 'https' # force https encrypt request
         Curl.post(uri.to_s, {
           'hub.mode' => 'subscribe',
-          'hub.topic' => feedzirra.feed_url,
+          'hub.topic' => feedjira.feed_url,
           'hub.secret' => hub_secret,
           'hub.callback' => push_callback,
           'hub.verify' => 'async'
@@ -145,38 +145,38 @@ class FeedFetcher
   end
 
   def is_feed?(feed)
-    feed.class.name.starts_with?('Feedzirra')
+    feed.class.name.starts_with?('Feedjira')
   end
 
   # Fetch and normalize feed
   def fetch_and_parse(options = {}, saved_feed_url = nil)
     defaults = {user_agent: 'Feedbin', ssl_verify_peer: false}
     options = defaults.merge(options)
-    feedzirra = nil
+    feedjira = nil
     Timeout::timeout(20) do
-      feedzirra = Feedzirra::Feed.fetch_and_parse(@url, options)
+      feedjira = Feedjira::Feed.fetch_and_parse(@url, options)
     end
-    if feedzirra.respond_to?(:hubs) && !feedzirra.hubs.blank? && options[:push_callback] && options[:feed_id]
-      if @url == feedzirra.feed_url
-        push_subscribe(feedzirra, options[:feed_id], options[:push_callback], options[:hub_secret])
+    if feedjira.respond_to?(:hubs) && !feedjira.hubs.blank? && options[:push_callback] && options[:feed_id]
+      if @url == feedjira.feed_url
+        push_subscribe(feedjira, options[:feed_id], options[:push_callback], options[:hub_secret])
       end
     end
-    normalize(feedzirra, options, saved_feed_url)
+    normalize(feedjira, options, saved_feed_url)
   end
 
   def parse(xml_string, saved_feed_url)
-    feedzirra = Feedzirra::Feed.parse(xml_string)
-    normalize(feedzirra, {}, saved_feed_url)
+    feedjira = Feedjira::Feed.parse(xml_string)
+    normalize(feedjira, {}, saved_feed_url)
   end
 
-  def normalize(feedzirra, options = {}, saved_feed_url = nil)
-    if feedzirra && feedzirra.respond_to?(:feed_url)
-      feedzirra.etag          = feedzirra.etag ? feedzirra.etag.strip.gsub(/^"/, '').gsub(/"$/, '') : nil
-      feedzirra.last_modified = feedzirra.last_modified
-      feedzirra.title         = feedzirra.title ? feedzirra.title.strip : '(No title)'
-      feedzirra.feed_url      = feedzirra.feed_url.strip
-      feedzirra.url           = feedzirra.url ? feedzirra.url.strip : nil
-      feedzirra.entries.map do |entry|
+  def normalize(feedjira, options = {}, saved_feed_url = nil)
+    if feedjira && feedjira.respond_to?(:feed_url)
+      feedjira.etag          = feedjira.etag ? feedjira.etag.strip.gsub(/^"/, '').gsub(/"$/, '') : nil
+      feedjira.last_modified = feedjira.last_modified
+      feedjira.title         = feedjira.title ? feedjira.title.strip : '(No title)'
+      feedjira.feed_url      = feedjira.feed_url.strip
+      feedjira.url           = feedjira.url ? feedjira.url.strip : nil
+      feedjira.entries.map do |entry|
         if entry.try(:content)
           content = entry.content
         elsif entry.try(:summary)
@@ -191,8 +191,8 @@ class FeedFetcher
         entry.title           = entry.title ? entry.title.strip : nil
         entry.url             = entry.url ? entry.url.strip : nil
         entry.entry_id        = entry.entry_id ? entry.entry_id.strip : nil
-        entry._public_id_     = build_public_id(entry, feedzirra, saved_feed_url)
-        entry._old_public_id_ = build_public_id(entry, feedzirra)
+        entry._public_id_     = build_public_id(entry, feedjira, saved_feed_url)
+        entry._old_public_id_ = build_public_id(entry, feedjira)
         if entry.try(:enclosure_type) && entry.try(:enclosure_url)
           data = {}
           data[:enclosure_type] = entry.enclosure_type ? entry.enclosure_type : nil
@@ -202,11 +202,11 @@ class FeedFetcher
           entry._data_ = data
         end
       end
-      if feedzirra.entries.any?
-        feedzirra.entries = feedzirra.entries.uniq { |entry| entry._public_id_ }
+      if feedjira.entries.any?
+        feedjira.entries = feedjira.entries.uniq { |entry| entry._public_id_ }
       end
     end
-    feedzirra
+    feedjira
   end
 
   def log(message)
@@ -221,11 +221,11 @@ class FeedFetcher
 
   # WARNING: changes to this will break how entries are identified
   # This can only be changed with backwards compatibility in mind
-  def build_public_id(entry, feedzirra, saved_feed_url = nil)
+  def build_public_id(entry, feedjira, saved_feed_url = nil)
     if saved_feed_url
       id_string = saved_feed_url.dup
     else
-      id_string = feedzirra.feed_url.dup
+      id_string = feedjira.feed_url.dup
     end
 
     if entry.entry_id
