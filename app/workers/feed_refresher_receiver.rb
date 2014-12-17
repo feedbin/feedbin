@@ -37,6 +37,10 @@ class FeedRefresherReceiver
       create_update_notifications(original_entry)
     end
 
+    if new_content.length == original_content.length
+      Librato.increment('entry.no_change')
+    end
+
     Librato.increment('entry.update')
   end
 
