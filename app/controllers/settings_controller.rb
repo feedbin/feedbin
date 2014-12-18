@@ -105,15 +105,21 @@ class SettingsController < ApplicationController
 
   def update_credit_card
     @user = current_user
-    @user.stripe_token = params[:stripe_token]
 
-    if @user.save
-      customer = Customer.retrieve(@user.customer_id)
-      customer.reopen_account if customer.unpaid?
-      redirect_to settings_billing_url, notice: 'Your credit card has been updated.'
+    if params[:stripe_token].present?
+      @user.stripe_token = params[:stripe_token]
+      if @user.save
+        customer = Customer.retrieve(@user.customer_id)
+        customer.reopen_account if customer.unpaid?
+        redirect_to settings_billing_url, notice: 'Your credit card has been updated.'
+      else
+        redirect_to settings_billing_url, alert: @user.errors.messages[:base].join(' ')
+      end
     else
-      redirect_to settings_billing_url, alert: @user.errors.messages[:base].join(' ')
+      redirect_to settings_billing_url, alert: 'There was a problem updating your credit card. Please try again.'
+      Librato.increment('billing.token_missing')
     end
+
   end
 
   def settings_update
