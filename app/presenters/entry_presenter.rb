@@ -116,12 +116,14 @@ class EntryPresenter < BasePresenter
 
   def media
     output = ''
-    if entry.data['enclosure_type'] == 'video/mp4'
-      output += @template.video_tag entry.data['enclosure_url'], preload: 'none'
-    elsif entry.data['enclosure_type'] == 'audio/mpeg'
-      output += @template.audio_tag entry.data['enclosure_url'], preload: 'none'
+    if entry.data && entry.data['enclosure_url'].present? && media_type.present?
+      if media_type == :video
+        output += @template.video_tag entry.data['enclosure_url'], preload: 'none'
+      elsif media_type == :audio
+        output += @template.audio_tag entry.data['enclosure_url'], preload: 'none'
+      end
+      output += @template.link_to "Download #{media_size}", entry.data['enclosure_url'], class: 'download-link'
     end
-    output += @template.link_to "Download #{media_size}", entry.data['enclosure_url'], class: 'download-link'
     output
   end
 
