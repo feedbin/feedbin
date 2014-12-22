@@ -9,8 +9,8 @@ GIT
 
 GIT
   remote: git://github.com/feedbin/feedjira.git
-  revision: 154c523217b4e0316623582d17169178748e49d6
-  ref: 154c523
+  revision: 6912c430c423843ffa6bb80915e770fcf8074f1a
+  ref: 6912c43
   specs:
     feedjira (1.5.0)
       curb (~> 0.8)
