@@ -1,7 +1,7 @@
 require 'RMagick'
 class FaviconFetcher
   include Sidekiq::Worker
-  sidekiq_options retry: false
+  sidekiq_options retry: false, queue: :worker_slow
 
   def perform(host)
     favicon = Favicon.where(host: host).first_or_initialize
@@ -60,7 +60,7 @@ class FaviconFetcher
   end
 
   def download_favicon(url)
-    response = HTTParty.get(url, {timeout: 20})
+    response = HTTParty.get(url, timeout: 20, verify: false)
     base64_favicon(response.body)
   end
 
@@ -71,6 +71,9 @@ class FaviconFetcher
       favicon = Magick::Image.from_blob(data) { |image| image.format = 'ico' }
     end
     favicon = favicon.last
+    if favicon.columns > 32
+      favicon = favicon.resize_to_fit(32, 32)
+    end
     blob = favicon.to_blob { |image| image.format = 'png' }
     Base64.encode64(blob).gsub("\n", '')
   rescue
