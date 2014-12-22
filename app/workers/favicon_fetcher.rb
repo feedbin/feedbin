@@ -1,7 +1,7 @@
 require 'RMagick'
 class FaviconFetcher
   include Sidekiq::Worker
-  sidekiq_options retry: false, queue: :worker_slow
+  sidekiq_options retry: false
 
   def perform(host)
     favicon = Favicon.where(host: host).first_or_initialize
