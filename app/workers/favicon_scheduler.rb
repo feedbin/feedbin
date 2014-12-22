@@ -7,7 +7,7 @@ class FaviconScheduler
       Sidekiq::Client.push_bulk(
         'args'  => feeds.map{ |feed| [feed.host] },
         'class' => 'FaviconFetcher',
-        'queue' => 'default',
+        'queue' => 'worker_slow',
         'retry' => false
       )
     end
