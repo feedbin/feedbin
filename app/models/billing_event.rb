@@ -11,7 +11,7 @@ class BillingEvent < ActiveRecord::Base
     self.event_type = details.type
     self.event_id = details.id
 
-    if details.data.object.respond_to?(:customer)
+    if details.data.object['customer'].present?
       customer = details.data.object.customer
     elsif details.type == 'customer.created'
       customer = details.data.object.id
