@@ -124,8 +124,8 @@ GEM
       carrierwave
       fog
       uuidtools
-    celluloid (0.15.2)
-      timers (~> 1.1.0)
+    celluloid (0.16.0)
+      timers (~> 4.0.0)
     clockwork (1.0.0)
       activesupport
       tzinfo
@@ -140,7 +140,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.8.0)
-    connection_pool (2.0.0)
+    connection_pool (2.1.0)
     crass (0.2.1)
     curb (0.8.6)
     dalli (2.7.2)
@@ -212,6 +212,7 @@ GEM
     hashr (0.0.22)
     highline (1.6.21)
     hike (1.2.3)
+    hitimes (1.2.2)
     honeybadger (1.16.5)
       json
     httparty (0.13.1)
@@ -298,7 +299,7 @@ GEM
       hashie (~> 3.2)
       multi_json (~> 1.10)
       multi_xml (~> 0.5)
-    redis (3.1.0)
+    redis (3.2.0)
     redis-namespace (1.5.1)
       redis (~> 3.0, >= 3.0.4)
     ref (1.0.5)
@@ -335,8 +336,8 @@ GEM
       sprockets (~> 2.8, < 2.12)
       sprockets-rails (~> 2.0)
     sax-machine (1.1.1)
-    sidekiq (3.2.6)
-      celluloid (= 0.15.2)
+    sidekiq (3.3.0)
+      celluloid (>= 0.16.0)
       connection_pool (>= 2.0.0)
       json
       redis (>= 3.0.6)
@@ -375,7 +376,8 @@ GEM
     thor (0.19.1)
     thread_safe (0.3.4)
     tilt (1.4.1)
-    timers (1.1.0)
+    timers (4.0.1)
+      hitimes
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
     uglifier (2.5.3)
