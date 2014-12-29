@@ -27,9 +27,9 @@ class PushNotificationSend
     verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
 
     # Use user specified feed titles where available
-    titles = Subscription.where(feed: feed, user_id: user_ids).pluck(:user_id, :title).inject({}) do |hash, (user_id, feed_title)|
+    titles = Subscription.where(feed: feed, user_id: user_ids).pluck(:user_id, :title)
+    titles = titles.each_with_object({}) do |(user_id, feed_title), hash|
       hash[user_id] = feed_title
-      hash
     end
 
     notifications = []
