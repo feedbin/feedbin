@@ -1,51 +1,56 @@
 <div class="settings-content-inner">
-  <div class="settings-outer">
-    <h2>Import/Export</h2>
-  </div>
-
-  <div class="inset">
-
-    <div class="inset-content">
-      <h4 class="group-header">Import</h4>
+    <div class="settings-outer">
+        <h2>Import/Export</h2>
     </div>
 
-    <% if ENV['AWS_ACCESS_KEY_ID'] %>
-      <%= direct_upload_form_for @uploader do |f| %>
+    <div class="inset">
+
+        <div class="inset-content">
+            <h4 class="group-header">Import</h4>
+        </div>
+
+        <% if ENV['AWS_ACCESS_KEY_ID'] %>
+        <%= direct_upload_form_for @uploader do |f| %>
         <ul class="control-group">
-          <li>
-            <%= f.file_field :upload %>
-          </li>
+            <li>
+                <%= f.file_field :upload %>
+            </li>
         </ul>
         <p class="control-group-description">You can import OPML files. Import is done in the background so you may not see every subscription or starred item right away.</p>
 
         <div class="description-inset">
-          <%= f.submit "Import", class: "button-plain" %>
+            <%= f.submit "Import", class: "button-plain" %>
         </div>
 
-      <% end %>
+        <% end %>
 
-    <% else %>
-      <p class="control-group-description">Import disabled. <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> and <code>AWS_S3_BUCKET</code> are missing.</p>
-    <% end %>
+        <% else %>
+        <p class="control-group-description">Import disabled. <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> and <code>AWS_S3_BUCKET</code> are missing.</p>
+        <% end %>
 
-    <div class="inset-content">
-      <h4 class="group-header">Export</h4>
+        <div class="inset-content">
+            <h4 class="group-header">Export</h4>
+        </div>
+        <ul class="pill-list">
+            <li>
+
+                <%= form_tag subscriptions_path(format: :xml), method: :get, style: "margin: 4px 0;" do %>
+                    Subscriptions
+                    <%= select_tag :tag, options_for_select(@download_options), style: "width: 150px; margin-left: 10px;" %>
+                    <button class="button-plain no-margin pull-right no-top-margin">Download</button>
+                <% end %>
+            </li>
+            <% if @user.starred_entries.exists? %>
+            <li>
+                <%= link_to "Export Starred Articles", starred_export_path, method: :post %>
+            </li>
+            <% end %>
+        </ul>
+
+        <% if @user.starred_entries.exists? %>
+        <p class="control-group-description">A link will be emailed to you.</p>
+        <% end %>
+
     </div>
-    <ul class="control-group control-group-form">
-      <li>
-        <%= link_to "Download Subscriptions", subscriptions_path(format: :xml) %>
-      </li>
-      <% if @user.starred_entries.exists? %>
-        <li>
-          <%= link_to "Export Starred Articles", starred_export_path, method: :post %>
-        </li>
-      <% end %>
-    </ul>
-
-    <% if @user.starred_entries.exists? %>
-      <p class="control-group-description">A link will be emailed to you.</p>
-    <% end %>
-
-  </div>
 
 </div>
