@@ -70,10 +70,6 @@ class User < ActiveRecord::Base
   validate :plan_type_valid, on: :update
   validate :trial_plan_valid
 
-  def to_param
-    email
-  end
-
   def setting_on?(setting_symbol)
     self.send(setting_symbol) == '1'
   end
@@ -200,29 +196,6 @@ class User < ActiveRecord::Base
     logger.error "Stripe Error: " + e.message
     errors.add :base, "#{e.message}."
     CancelBilling.perform_async(customer_id)
-  end
-
-  def total_unread
-    @total_unread_count ||= unread_count.inject(0) {|sum, (feed_id, count)| sum += count}
-  end
-
-  def total_starred
-    starred_entries.count
-  end
-
-  # TODO make sure zero counts get hidden, maybe load feeds based on this list
-  def unread_count
-    @count ||= unread_entries.group(:feed_id).count
-  end
-
-  def starred_count
-    @starred_count ||= starred_entries.group(:feed_id).count
-  end
-
-  def feed_entries_count
-    ids = {}
-    feeds.pluck('feeds.id').map {|id| ids[id] = 0 }
-    ids.merge(entries.group('entries.feed_id').count)
   end
 
   def feed_with_subscription_id(feed_id)
