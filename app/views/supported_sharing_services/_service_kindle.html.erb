@@ -3,7 +3,7 @@
   <small class="show-service-options">Articles will be sent to <%= sharing_service.kindle_address %>, <a href="#" data-behavior="show_service_options">edit</a>.</small>
   <%= render partial: "supported_sharing_services/kindle_form", locals: {sharing_service: sharing_service, record: sharing_service} %>
 <% else %>
-  <p class="service-title <%= "icon-share-#{sharing_service[:service_id]}" %>"><%= sharing_service[:label] %></p>
+  <p class="service-title"><%= sharing_service[:label] %></p>
   <%= link_to 'Activate', '#', class: 'list-action show-service-options', data: {behavior: "show_service_options"} %>
   <%= render partial: "supported_sharing_services/kindle_form", locals: {sharing_service: sharing_service, record: record} %>
 <% end %>
