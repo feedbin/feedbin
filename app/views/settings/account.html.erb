@@ -15,11 +15,13 @@
       </ul>
 
       <div class="description-inset">
-        <%= f.submit "Update", class: "button-plain" %>
+        <%= f.submit "Update", class: "button-plain no-margin" %>
       </div>
 
     <% end %>
+  </div>
 
+  <div class="inset">
     <%= form_for(@user) do |f| %>
       <div class="inset-content">
         <h4 class="group-header">Update Password</h4>
