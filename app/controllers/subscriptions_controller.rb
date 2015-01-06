@@ -10,9 +10,8 @@ class SubscriptionsController < ApplicationController
       @feeds = []
       @tags = Tag.where(id: params[:tag])
     end
-    @titles = {}
-    @user.subscriptions.pluck(:feed_id, :title).each do |feed_id, title|
-      @titles[feed_id] = title
+    @titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) do |(feed_id, title), hash|
+      hash[feed_id] = title
     end
     respond_to do |format|
       format.xml do

@@ -33,8 +33,7 @@
         </div>
         <ul class="pill-list">
             <li>
-
-                <%= form_tag subscriptions_path(format: :xml), method: :get, style: "margin: 4px 0;" do %>
+                <%= form_tag subscriptions_path(format: :xml), method: :get do %>
                     Subscriptions
                     <%= select_tag :tag, options_for_select(@download_options), style: "width: 150px; margin-left: 10px;" %>
                     <button class="button-plain no-margin pull-right no-top-margin">Download</button>
@@ -42,7 +41,7 @@
             </li>
             <% if @user.starred_entries.exists? %>
             <li>
-                <%= link_to "Export Starred Articles", starred_export_path, method: :post %>
+                Starred Articles <%= link_to "Export", starred_export_path, method: :post, class: 'pull-right' %>
             </li>
             <% end %>
         </ul>
