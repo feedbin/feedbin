@@ -44,11 +44,10 @@ class FaviconFetcher
     if favicon_links.present?
       favicon_url = favicon_links.last.to_s
       favicon_url = URI.parse(favicon_url)
+      favicon_url.scheme = 'http'
       if !favicon_url.host
-        favicon_url.host = host
-      end
-      if !favicon_url.scheme
-        favicon_url.scheme = 'http'
+        favicon_url = URI::HTTP.build(scheme: 'http', host: host)
+        favicon_url = favicon_url.merge(favicon_links.last.to_s)
       end
     end
     favicon_url
