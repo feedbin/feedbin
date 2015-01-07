@@ -11,6 +11,7 @@ class FaviconScheduler
         'retry' => false
       )
     end
+    Librato.increment('favicon.fetch_scheduled')
   end
 
 end
