@@ -475,6 +475,10 @@
         w = viewportDetails();
         topRoom = $el.offset().top - w.scrollY + elHeight / 2;
         leftRoom = $el.offset().left - w.scrollX + elWidth / 2;
+
+        var extra = $('.entry-column').offset().left;
+        leftRoom = $el.offset().left - extra - w.scrollX + elWidth / 2;
+
         return {
           topRoom: topRoom,
           bottomRoom: w.height - topRoom,
@@ -486,7 +490,7 @@
       };
       viewportDetails = function() {
         return {
-          width: window.innerWidth,
+          width: $('.entry-column').outerWidth(),
           height: window.innerHeight,
           scrollX: window.scrollX,
           scrollY: window.scrollY
