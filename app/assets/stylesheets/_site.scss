@@ -5712,6 +5712,7 @@ Bigfoot
 .bigfoot-footnote__content, .bigfoot-footnote__tooltip {
     background-color: $list-background-color;
     color: $text-color;
+    line-height: 1.6;
 }
 .bigfoot-footnote.is-active {
     opacity: 1 !important;
