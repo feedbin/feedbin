@@ -72,6 +72,13 @@ class SettingsController < ApplicationController
     @user = current_user
     @uploader = Import.new.upload
     @uploader.success_action_redirect = settings_import_export_url
+    @tags = @user.feed_tags
+
+    @download_options = @tags.map do |tag|
+      [tag.name, tag.id]
+    end
+
+    @download_options.unshift(['All', 'all'])
 
     if params[:key]
       @import = Import.new(key: params[:key], user: @user)

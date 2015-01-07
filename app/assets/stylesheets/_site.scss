@@ -1030,11 +1030,11 @@ th {
     background-color: #FFF;
     border-radius: 8px;
     border: 1px solid $border-color;
-    margin: 0 0 20px 0;
+    margin: 0 0 30px 0;
     padding: 0;
     list-style: none;
     li {
-        padding: 10px 30px 10px 30px;
+        padding: 15px 30px;
         margin: 0;
         border-bottom: 1px solid $border-color;
         position: relative;
@@ -1052,7 +1052,8 @@ th {
         font-size: 16px;
         font-weight: bold;
         margin: 0;
-        padding: 5px 0 5px 40px;
+        padding: 0 0 0 40px;
+        overflow: visible;
     }
     .service-error {
         padding-right: 30px;
@@ -1118,56 +1119,69 @@ th {
 
     }
     .icon-share-app_dot_net {
-        background: image-url("icon-share-app-dot-net.svg") 0 0 no-repeat;
+        background-image: image-url("icon-share-app-dot-net.svg");
         background-size: 25px 25px;
+        @include share-icon(0, 0);
     }
     .icon-share-facebook {
-        background: image-url("icon-share-facebook.svg") 0 0 no-repeat;
+        background-image: image-url("icon-share-facebook.svg");
         background-size: 25px 25px;
+        @include share-icon(0, 0);
     }
     .icon-share-twitter {
-        background: image-url("icon-share-twitter.svg") 1px 3px no-repeat;
+        background-image: image-url("icon-share-twitter.svg");
         background-size: 21px 25px;
+        @include share-icon(1, 3);
     }
     .icon-share-evernote {
-        background: image-url("icon-share-evernote.svg") 1px 3px no-repeat;
+        background-image: image-url("icon-share-evernote.svg");
         background-size: 20px 25px;
+        @include share-icon(1, 3);
     }
     .icon-share-tumblr {
-        background: image-url("icon-share-tumblr.svg") 4px 3px no-repeat;
+        background-image: image-url("icon-share-tumblr.svg");
         background-size: 14px 24px;
+        @include share-icon(4, 3);
     }
     .icon-share-pinboard {
-        background: image-url("icon-share-pinboard.svg") 0 3px no-repeat;
+        background-image: image-url("icon-share-pinboard.svg");
         background-size: 25px 25px;
+        @include share-icon(0, 3);
     }
     .icon-share-kindle {
-        background: image-url("icon-share-kindle.svg") 0 3px no-repeat;
+        background-image: image-url("icon-share-kindle.svg");
         background-size: 26px 23px;
+        @include share-icon(0, 3);
     }
     .icon-share-email {
-        background: image-url("icon-share-email.svg") 0 6px no-repeat;
+        background-image: image-url("icon-share-email.svg");
         background-size: 24px 16px;
+        @include share-icon(0, 6);
     }
     .icon-share-instapaper {
-        background: image-url("icon-share-instapaper.svg") 7px 2px no-repeat;
+        background-image: image-url("icon-share-instapaper.svg");
         background-size: 10px 23px;
+        @include share-icon(7, 2);
     }
     .icon-share-readability {
-        background: image-url("icon-share-readability.svg") 0 5px no-repeat;
+        background-image: image-url("icon-share-readability.svg");
         background-size: 24px 17px;
+        @include share-icon(0, 5);
     }
     .icon-share-pocket {
-        background: image-url("icon-share-pocket.svg") 0 5px no-repeat;
+        background-image: image-url("icon-share-pocket.svg");
         background-size: 24px 21px;
+        @include share-icon(0, 5);
     }
     .icon-share-buffer {
-        background: image-url("icon-share-buffer.svg") 0 2px no-repeat;
+        background-image: image-url("icon-share-buffer.svg");
         background-size: 25px 25px;
+        @include share-icon(0, 2);
     }
     .icon-share-custom {
-        background: image-url("icon-share-custom.svg") 2px 4px no-repeat;
+        background-image: image-url("icon-share-custom.svg");
         background-size: 22px 18px;
+        @include share-icon(2, 4);
     }
 }
 

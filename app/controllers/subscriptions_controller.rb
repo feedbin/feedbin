@@ -3,11 +3,15 @@ class SubscriptionsController < ApplicationController
   # GET subscriptions.xml
   def index
     @user = current_user
-    @tags = @user.feed_tags
-    @feeds = @user.feeds
-    @titles = {}
-    @user.subscriptions.pluck(:feed_id, :title).each do |feed_id, title|
-      @titles[feed_id] = title
+    if params[:tag] == 'all' || params[:tag].blank?
+      @tags = @user.feed_tags
+      @feeds = @user.feeds
+    else
+      @feeds = []
+      @tags = Tag.where(id: params[:tag])
+    end
+    @titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) do |(feed_id, title), hash|
+      hash[feed_id] = title
     end
     respond_to do |format|
       format.xml do

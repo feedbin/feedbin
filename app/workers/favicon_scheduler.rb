@@ -7,10 +7,11 @@ class FaviconScheduler
       Sidekiq::Client.push_bulk(
         'args'  => feeds.map{ |feed| [feed.host] },
         'class' => 'FaviconFetcher',
-        'queue' => 'worker_slow',
+        'queue' => 'favicon',
         'retry' => false
       )
     end
+    Librato.increment('favicon.fetch_scheduled')
   end
 
 end

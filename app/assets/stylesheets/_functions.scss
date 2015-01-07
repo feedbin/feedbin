@@ -155,3 +155,10 @@
 	}
 }
 
+@mixin share-icon($x-offset, $y-offset) {
+    background-repeat: no-repeat;
+    background-position: 30px + $x-offset 12px + $y-offset;
+    @media (max-width: 528px) {
+        background-position: 15px + $x-offset 12px + $y-offset;
+    }
+}
