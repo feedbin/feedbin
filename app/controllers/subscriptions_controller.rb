@@ -3,7 +3,7 @@ class SubscriptionsController < ApplicationController
   # GET subscriptions.xml
   def index
     @user = current_user
-    if params[:tag] == 'all' || params[:tag].empty?
+    if params[:tag] == 'all' || params[:tag].blank?
       @tags = @user.feed_tags
       @feeds = @user.feeds
     else
