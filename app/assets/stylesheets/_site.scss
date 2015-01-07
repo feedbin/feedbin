@@ -5703,14 +5703,18 @@ Media Players
 /*------------------------------------------------------------------------------
 Bigfoot
 ------------------------------------------------------------------------------*/
-.footnote-button {
-    @include background-color($text-color, $text-color-night, $text-color-sunset);
-}
-.footnote-circle {
+.bigfoot-footnote__button {
     @include background-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
 }
-.footnote-content-wrapper {
+.footnote-circle {
+    @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+}
+.bigfoot-footnote__content, .bigfoot-footnote__tooltip {
+    background-color: $list-background-color;
     color: $text-color;
+}
+.bigfoot-footnote.is-active {
+    opacity: 1 !important;
 }
 
 /*------------------------------------------------------------------------------
