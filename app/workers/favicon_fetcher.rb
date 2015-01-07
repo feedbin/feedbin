@@ -25,7 +25,7 @@ class FaviconFetcher
       data = download_favicon(favicon_url)
     end
 
-    if data && favicon.favicon != data
+    if favicon.favicon != data
       favicon.favicon = data
       Librato.increment('favicon.updated')
     end
