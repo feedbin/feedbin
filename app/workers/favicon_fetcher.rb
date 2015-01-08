@@ -8,6 +8,8 @@ class FaviconFetcher
     if !updated_recently?(favicon.updated_at)
       update_favicon(favicon)
     end
+  rescue
+    Librato.increment('favicon.failed')
   end
 
   def update_favicon(favicon)
