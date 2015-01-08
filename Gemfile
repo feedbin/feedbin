@@ -12,6 +12,7 @@ group :development do
   gem 'dotenv-rails'
   gem 'silencer'
   gem 'spring'
+  gem 'benchmark-ips'
 end
 
 group :development, :test do
