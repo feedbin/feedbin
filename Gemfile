@@ -12,7 +12,6 @@ group :development do
   gem 'dotenv-rails'
   gem 'silencer'
   gem 'spring'
-  gem 'web-console', '~> 2.0'
 end
 
 group :development, :test do
@@ -75,7 +74,6 @@ gem 'httparty'
 gem 'oauth'
 gem 'evernote_oauth'
 gem 'rmagick', require: false
-gem 'responders', '~> 2.0'
 
 # Sidekiq
 gem 'sidekiq'
