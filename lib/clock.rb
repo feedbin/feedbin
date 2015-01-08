@@ -35,7 +35,7 @@ end
 
 every(1.week, 'clockwork.weekly', at: '12:00', tz: 'UTC') do
 
-  if RedisLock.acquire("clockwork:favicon_scheduler")
+  if RedisLock.acquire("clockwork:favicon_scheduler", 6.days.to_i)
     FaviconScheduler.perform_async
   end
 
