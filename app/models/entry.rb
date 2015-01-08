@@ -13,7 +13,8 @@ class Entry < ActiveRecord::Base
   before_create :create_summary
   before_update :create_summary
   after_commit :mark_as_unread, on: :create
-  after_commit :add_to_set, on: :create
+  after_commit :add_to_created_at_set, on: :create
+  after_commit :add_to_published_set, on: :create
   after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
 
@@ -264,9 +265,15 @@ class Entry < ActiveRecord::Base
     SearchIndexStore.perform_async(self.class.name, self.id)
   end
 
-  def add_to_set
+  def add_to_created_at_set
     score = "%10.6f" % self.created_at.to_f
     key = FeedbinUtils.redis_feed_entries_created_at_key(self.feed_id)
+    $redis.zadd(key, score, self.id)
+  end
+
+  def add_to_published_set
+    score = "%10.6f" % self.published.to_f
+    key = FeedbinUtils.redis_feed_entries_published_key(self.feed_id)
     $redis.zadd(key, score, self.id)
   end
 

@@ -14,4 +14,8 @@ class FeedbinUtils
   def self.redis_feed_entries_created_at_key(feed_id)
     "feed:%d:entry_ids:created_at" % feed_id
   end
+
+  def self.redis_feed_entries_published_key(feed_id)
+    "feed:%d:entry_ids:published" % feed_id
+  end
 end
