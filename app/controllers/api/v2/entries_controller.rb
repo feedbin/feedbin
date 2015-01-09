@@ -94,11 +94,8 @@ module Api
         elsif page <= 0 || pages[current_page_index].nil?
           status_not_found
         else
-          @entries = Entry.where(id: pages[current_page_index]).includes(:feed)
-          @entries.map { |entry|
-            entry.content = ContentFormatter.api_format(entry.content, entry)
-            entry
-          }
+          @entries = Entry.where(id: pages[current_page_index]).includes(:feed).order(created_at: :desc)
+          @entries.each { |entry| entry.content = ContentFormatter.api_format(entry.content, entry) }
           collection = OpenStruct.new(
             total_pages: pages.length,
             next_page: pages[current_page_index + 1] ? next_page : nil,
