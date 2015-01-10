@@ -1,4 +1,8 @@
 class FeedbinUtils
+
+  FEED_ENTRIES_PUBLISHED_KEY = "feed:%d:entry_ids:published"
+  FEED_ENTRIES_CREATED_AT_KEY = "feed:%d:entry_ids:created_at"
+
   def self.update_public_id_cache(public_id, content)
     content_length = (content.present?) ? content.length : 1
     key = public_id_key(public_id)
@@ -12,10 +16,14 @@ class FeedbinUtils
   end
 
   def self.redis_feed_entries_created_at_key(feed_id)
-    "feed:%d:entry_ids:created_at" % feed_id
+    FEED_ENTRIES_CREATED_AT_KEY % feed_id
   end
 
   def self.redis_feed_entries_published_key(feed_id)
-    "feed:%d:entry_ids:published" % feed_id
+    FEED_ENTRIES_PUBLISHED_KEY % feed_id
+  end
+
+  def self.redis_user_entries_published_key(user_id)
+    "user:%d:sorted_entry_ids:published" % user_id
   end
 end

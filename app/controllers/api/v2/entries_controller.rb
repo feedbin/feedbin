@@ -2,6 +2,8 @@ module Api
   module V2
     class EntriesController < ApiController
 
+      include RedisCache
+
       respond_to :json
       before_action :correct_user, only: [:show]
       before_action :limit_ids, only: [:index]
@@ -70,93 +72,17 @@ module Api
         cache_key = Digest::SHA1.hexdigest(cache_key.join(':'))
         cache_key = "user:#{@user.id}:sorted_entry_ids:#{cache_key}"
 
-        entry_ids = get_entry_ids(cache_key, since, params[:read], params[:starred])
+        entry_ids = get_cached_entry_ids(cache_key, FeedbinUtils::FEED_ENTRIES_CREATED_AT_KEY, since, params[:read], params[:starred])
+        pagination = build_pagination(entry_ids)
 
-        if params[:page]
-          page = params[:page].to_i
-        else
-          page = 1
-        end
-
-        if params[:per_page]
-          per_page = params[:per_page].to_i
-        else
-          per_page = WillPaginate.per_page
-        end
-
-        pages = entry_ids.each_slice(per_page).to_a
-        next_page = page + 1
-        previous_page = page - 1
-
-        current_page_index = page - 1
         if entry_ids.blank?
           @entries = []
-        elsif page <= 0 || pages[current_page_index].nil?
+        elsif pagination[:page] <= 0 || pagination[:paged_entry_ids][pagination[:page_index]].nil?
           status_not_found
         else
-          @entries = Entry.where(id: pages[current_page_index]).includes(:feed).order(created_at: :desc)
+          @entries = Entry.where(id: pagination[:paged_entry_ids][pagination[:page_index]]).includes(:feed).order(created_at: :desc)
           @entries.each { |entry| entry.content = ContentFormatter.api_format(entry.content, entry) }
-          collection = OpenStruct.new(
-            total_pages: pages.length,
-            next_page: pages[current_page_index + 1] ? next_page : nil,
-            previous_page: (previous_page > 0) ? previous_page : nil
-          )
-          links_header(collection, 'api_v2_entries_url')
-        end
-      end
-
-      def get_entry_ids(cache_key, since, read, starred)
-        key_exists, entry_ids = $redis.multi do
-          $redis.exists(cache_key)
-          $redis.lrange(cache_key, 0, -1)
-        end
-
-        unless key_exists
-
-          feed_ids = @user.subscriptions.pluck(:feed_id)
-
-          keys = feed_ids.map do |feed_id|
-            FeedbinUtils.redis_feed_entries_created_at_key(feed_id)
-          end
-
-          scores = $redis.pipelined do
-            keys.each do |key|
-              $redis.zrangebyscore(key, since, "+inf", with_scores: true)
-            end
-          end
-
-          scores = scores.flatten(1)
-          scores = scores.sort_by {|score| score[1]}.reverse
-
-          entry_ids = scores.map {|(feed_id, _)| feed_id.to_i}
-
-          if 'false' == starred
-            starred_entry_ids = @user.starred_entries.pluck(:entry_id)
-            entry_ids = entry_ids - starred_entry_ids
-          end
-
-          if ['true', 'false'].include?(read)
-            unread_entry_ids = @user.unread_entries.pluck(:entry_id)
-            if 'false' == read
-              entry_ids = entry_ids & unread_entry_ids
-            elsif 'true' == read
-              entry_ids = entry_ids - unread_entry_ids
-            end
-          end
-
-          cache_entry_ids(cache_key, entry_ids)
-        end
-
-       entry_ids.map(&:to_i)
-      end
-
-      def cache_entry_ids(cache_key, entry_ids)
-        if entry_ids.present?
-          $redis.multi do
-            $redis.del(cache_key)
-            $redis.rpush(cache_key, entry_ids)
-            $redis.expire(cache_key, 2.minutes.to_i)
-          end
+          links_header(pagination[:will_paginate], 'api_v2_entries_url')
         end
       end
 
