@@ -9,13 +9,10 @@ class EntriesController < ApplicationController
     @user = current_user
     update_selected_feed!("collection_all")
 
-    cache_key = FeedbinUtils.redis_user_entries_published_key(@user.id)
+    @entries = Entry.from_id_cache(@user.id, params[:page]).includes(:feed).sort_preference('DESC')
 
-    entry_ids = get_cached_entry_ids(cache_key, FeedbinUtils::FEED_ENTRIES_PUBLISHED_KEY)
-    pagination = build_pagination(entry_ids)
-
-    @entries = Entry.where(id: pagination[:paged_entry_ids][pagination[:page_index]]).includes(:feed).sort_preference('DESC')
-    @page_query = pagination[:will_paginate]
+    key = FeedbinUtils.redis_user_entries_published_key(@user.id)
+    @page_query = WillPaginate::Collection.new(params[:page] || 1, WillPaginate.per_page, $redis.zcard(key))
 
     @append = params[:page].present?
 
