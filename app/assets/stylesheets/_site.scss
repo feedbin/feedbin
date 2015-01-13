@@ -62,7 +62,6 @@ $arrow-shadow-color-sunset: #c8c7be;
 $selected: #3399FF;
 $selected-off: #505a65;
 
-
 /*------------------------------------------------------------------------------
 Grid
 ------------------------------------------------------------------------------*/
@@ -1186,7 +1185,7 @@ th {
 }
 
 .inset {
-    background-color: #ededed;
+    background-color: $list-background-color;
     border-radius: 8px;
     border: 1px solid $border-color;
     margin: 0 0 20px 0;
@@ -3811,7 +3810,7 @@ Settings
     }
     .preview-group {
         z-index: 1000;
-        background-color: #ededed;
+        background-color: $list-background-color;
         margin-bottom: 30px;
         @media (max-width: 528px) {
             background-color: $list-background-color;
@@ -4114,7 +4113,7 @@ Settings
     }
     .feed-controls {
         border-radius: 8px 8px 0 0;
-        background-color: #ededed;
+        background-color: $list-background-color;
         border: 1px solid #DCDEE0;
         padding: 15px 30px 12px 30px;
         position: absolute;
