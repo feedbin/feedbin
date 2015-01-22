@@ -162,8 +162,9 @@ Feedbin::Application.routes.draw do
         resources :subscriptions,  only: [:index, :show, :create, :destroy, :update]
         post "subscriptions/:id/update", to: 'subscriptions#update'
 
-        resources :taggings,       only: [:index, :show, :create, :destroy]
-        resources :entries,        only: [:index, :show]
+        resources :taggings,              only: [:index, :show, :create, :destroy]
+        resources :entries,               only: [:index, :show]
+        resources :recently_read_entries, only: [:index, :create]
 
         resources :unread_entries, only: [:index, :show, :create]
         delete 'unread_entries', to: 'unread_entries#destroy'
@@ -174,6 +175,10 @@ Feedbin::Application.routes.draw do
         delete 'starred_entries', to: 'starred_entries#destroy'
         put 'starred_entries', to: 'starred_entries#create'
         post 'starred_entries/delete', to: 'starred_entries#destroy'
+
+        resources :updated_entries, only: [:index]
+        delete 'updated_entries', to: 'updated_entries#destroy'
+        post 'updated_entries/delete', to: 'updated_entries#destroy'
 
         resources :saved_searches,  only: [:index, :show, :create, :destroy, :update]
         post "saved_searches/:id/update", to: 'saved_searches#update'

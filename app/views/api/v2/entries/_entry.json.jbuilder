@@ -3,3 +3,5 @@ json.summary nil
 json.url entry.fully_qualified_url
 json.published entry.published.iso8601(6)
 json.created_at entry.created_at.iso8601(6)
+json.original entry.original if params[:include_original] == 'true'
+json.enclosure entry.data if params[:include_enclosure] == 'true'
