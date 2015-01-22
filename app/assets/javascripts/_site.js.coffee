@@ -453,9 +453,10 @@ $.extend feedbin,
 
     renameFeed: ->
       $(document).on 'dblclick', '[data-behavior~=renamable]', (event) ->
-        feedTitle = $(@).find('.rename-feed-input')
-        feedTitle.removeClass('disabled')
-        feedTitle.select()
+        unless $(event.target).is('.feed-action-button')
+          feedTitle = $(@).find('.rename-feed-input')
+          feedTitle.removeClass('disabled')
+          feedTitle.select()
 
       $(document).on 'blur', '.rename-feed-input', (event) ->
         field = $(@)
