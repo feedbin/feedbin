@@ -2,7 +2,7 @@ class ContentFormatter
 
   def self.format!(content, entry = nil)
     whitelist = Feedbin::Application.config.whitelist.clone
-    transformers = [iframe_whitelist, embeded_tweet] + whitelist[:transformers]
+    transformers = [iframe_whitelist, class_whitelist] + whitelist[:transformers]
     whitelist[:transformers] = transformers
 
     context = {
@@ -170,25 +170,28 @@ class ContentFormatter
     }
   end
 
-  def self.embeded_tweet
+  def self.class_whitelist
     lambda do |env|
       node = env[:node]
-      
+
       if env[:node_name] != 'blockquote' || env[:is_whitelisted] || !node.element? || node['class'].nil?
         return
       end
-      
-      tweet_class = 'twitter-tweet'
-      
+
+      allowed_classes = ['twitter-tweet', 'instagram-media']
+
       allowed_attributes = []
-      if node['class'].include?(tweet_class)
-        node['class'] = tweet_class
-        allowed_attributes = ['class']
+
+      allowed_classes.each do |allowed_class|
+        if node['class'].include?(allowed_class)
+          node['class'] = allowed_class
+          allowed_attributes = ['class', :data]
+        end
       end
-      
+
       whitelist = Feedbin::Application.config.whitelist.clone
       whitelist[:attributes]['blockquote'] = allowed_attributes
-      
+
       Sanitize.clean_node!(node, whitelist)
 
       {:node_whitelist => [node]}

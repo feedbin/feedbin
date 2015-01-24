@@ -165,6 +165,9 @@ $.extend feedbin,
     target = $('[data-behavior~=entry_content_wrap]')[0]
     result = twttr.widgets.load(target)
 
+  formatInstagram: ->
+    instgrm.Embeds.process()
+
   formatEntryContent: (entryId, resetScroll=true, readability=true) ->
     feedbin.applyStarred(entryId)
     if resetScroll
@@ -180,6 +183,7 @@ $.extend feedbin,
       feedbin.applyUserTitles()
       feedbin.fitVids()
       feedbin.formatTweets()
+      feedbin.formatInstagram()
     catch error
       if 'console' of window
         console.log error
