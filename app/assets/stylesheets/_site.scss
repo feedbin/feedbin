@@ -1873,7 +1873,7 @@ li.selected > a .favicon-wrap {
 $saved-search-control-height: 48px;
 
 .search-control {
-    @include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
+    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     font-size: 11px;
     line-height: 14px;
     height: $toolbar-height + $saved-search-control-height;
@@ -1929,7 +1929,7 @@ $saved-search-control-height: 48px;
     .saved-search-wrap {
         height: $saved-search-control-height;
         padding: 8px;
-        @include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
+        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
         position: relative;
         border-bottom: 1px solid $border-color;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
@@ -1945,9 +1945,9 @@ $saved-search-control-height: 48px;
         @include arrow(
             $x-position: 12px,
             $y-position: -1px,
-            $arrow-color: $drawer-background-color,
-            $arrow-color-night: $drawer-background-color-night,
-            $arrow-color-sunset: $drawer-background-color-sunset,
+            $arrow-color: $list-background-color,
+            $arrow-color-night: $list-background-color-night,
+            $arrow-color-sunset: $list-background-color-sunset,
             $shadow-color: $arrow-shadow-color,
             $shadow-color-night: $arrow-shadow-color-night,
             $shadow-color-sunset: $arrow-shadow-color-sunset,
@@ -2414,7 +2414,7 @@ $saved-search-control-height: 48px;
     width: 100%;
     border-bottom: 1px solid $border-color;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
-    @include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
+    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     @include arrow(
         $x-position: 20px,
         $y-position: -1px,
@@ -2456,7 +2456,7 @@ $saved-search-control-height: 48px;
     .font-settings {
         position: relative;
         select {
-            @include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
+            @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
             width: 115px;
             padding: 0;
             font-size: 13px;
@@ -5906,7 +5906,7 @@ Media Queries
 }
 
 .share-form {
-    @include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
+    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     padding: 17px 20px;
     border-bottom: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
