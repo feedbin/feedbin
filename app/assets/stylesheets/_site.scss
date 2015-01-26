@@ -3086,11 +3086,12 @@ $saved-search-control-height: 48px;
     }
 
     pre code {
-        background-color: transparent;
+        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
         display: block;
         overflow-x: auto;
         white-space: pre;
         word-wrap: normal;
+        font-size: 90%;
     }
 
     tt, code, kbd, samp {
