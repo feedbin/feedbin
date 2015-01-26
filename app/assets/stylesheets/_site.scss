@@ -3232,6 +3232,7 @@ $saved-search-control-height: 48px;
             background-color: #FFF;
         }
     }
+
     .instagram-media {
         background:#FFF;
         border: 0;
@@ -3243,6 +3244,10 @@ $saved-search-control-height: 48px;
         width: 99.375%;
         width: -webkit-calc(100% - 2px);
         width: calc(100% - 2px);
+    }
+
+    .fluid-width-video-wrapper {
+        margin-bottom: 1.1em;
     }
 }
 
