@@ -1924,7 +1924,7 @@ $saved-search-control-height: 48px;
     }
     .dropdown-wrap ul {
         top: 35px;
-        left: 2px;
+        left: -52px;
     }
     .saved-search-wrap {
         height: $saved-search-control-height;
@@ -2819,8 +2819,9 @@ $saved-search-control-height: 48px;
             width: 16px;
         }
         ul {
-            left: -5px;
-            top: 35px;
+            margin-left: -108px;
+            left: 50%;
+            top: 34px;
         }
     }
     .button-settings {
@@ -2859,14 +2860,14 @@ $saved-search-control-height: 48px;
         margin: 0;
         padding: 0;
         display: none;
-        width: 170px;
+        width: 200px;
         list-style: none;
         border: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
-        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+        @include background-color(#FFF, $list-background-color-night, $list-background-color-sunset);
+        box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.03);
         position: absolute;
         z-index: 10000;
-        border-radius: 4px;
         li {
             margin: 0;
             padding: 0;
@@ -2874,18 +2875,21 @@ $saved-search-control-height: 48px;
                 position: relative;
                 text-decoration: none;
                 display: block;
-                font-size: 13px;
+                font-size: 16px;
                 @include color($text-color, $text-color-night, $text-color-sunset);
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 width: 100%;
-                padding: 8px 7px;
+                padding: 15px;
                 font-family: $font-stack;
                 font-weight: 400 !important;
                 border-bottom: 1px solid transparent;
                 @include border-color($border-color, $border-color-night, $border-color-sunset);
                 cursor: pointer;
+                &.no-border {
+                    border: none;
+                }
             }
             a:hover,
             span:hover,
@@ -2893,29 +2897,24 @@ $saved-search-control-height: 48px;
             &.selected span {
                 @include background-color($border-color, $border-color-night, $border-color-sunset);
             }
-            &:first-child a,
-            &:first-child span {
-                padding-top: 7px;
-                border-radius: 4px 4px 0 0;
-            }
             &:last-child a,
             &:last-child span {
-                padding-bottom: 6px;
-                border-radius: 0 0 4px 4px;
                 border-bottom: none;
             }
             &:first-child {
                 @include arrow(
-                    $x-position: 12px,
+                    $x-position: 50%,
                     $y-position: -7px,
-                    $arrow-color: $list-background-color,
+                    $arrow-color: #FFF,
                     $arrow-color-night: $list-background-color-night,
                     $arrow-color-sunset: $list-background-color-sunset,
                     $shadow-color: $border-color,
                     $shadow-color-night: $border-color-night,
                     $shadow-color-sunset: $border-color-sunset,
                     $origin: left,
-                    $invert: true);
+                    $invert: true) {
+                        margin-left: -3px;
+                    }
             }
             &:first-child:hover:after,
             &.selected:first-child:after {
@@ -2942,7 +2941,7 @@ $saved-search-control-height: 48px;
                     @include arrow(
                         $x-position: 145px,
                         $y-position: -7px,
-                        $arrow-color: $list-background-color,
+                        $arrow-color: #FFF,
                         $arrow-color-night: $list-background-color-night,
                         $arrow-color-sunset: $list-background-color-sunset,
                         $shadow-color: $border-color,
@@ -2957,8 +2956,8 @@ $saved-search-control-height: 48px;
     .share-keyboard {
         font-size: 11px;
         position: absolute;
-        right: 7px;
-        top: 7px;
+        right: 10px;
+        top: 18px;
         font-style: normal;
         margin-top: 2px;
         color: $text-color-light;
@@ -2972,7 +2971,7 @@ $saved-search-control-height: 48px;
     a {
         display: block;
         text-decoration: none;
-        color: #333;
+        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
     }
     h1 {
         font-size: 2.4em;
@@ -4144,7 +4143,20 @@ Settings
     .feed-dropdown {
         display: inline-block;
         ul {
+            width: 215px;
             top: 25px;
+            left: -81px;
+            @media (max-width: 528px) {
+                left: -10px;
+                li:first-child:after {
+                    left: 15px;
+                    margin: 0;
+                }
+                li:first-child:before {
+                    left: 14px;
+                    margin: 0;
+                }
+            }
         }
     }
     .feeds-toolbar-button {
@@ -5781,6 +5793,17 @@ Media Queries
     }
     .ui-resizable-handle {
         display: none !important;
+    }
+    .search-control .dropdown-wrap ul {
+        left: 8px;
+        li:first-child:after {
+            left: 15px;
+            margin: 0;
+        }
+        li:first-child:before {
+            left: 14px;
+            margin: 0;
+        }
     }
 }
 
