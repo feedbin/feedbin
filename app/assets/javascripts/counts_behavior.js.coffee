@@ -165,10 +165,14 @@ class feedbin.CountsBehavior
 
   showEntries: (event) =>
     feedbin.specialCollection = $(event.currentTarget).data('special-collection')
-    # Drain hide queue
-    $.each feedbin.hideQueue, (index, feed_id) ->
-      if feed_id != undefined
-        item = $("[data-feed-id=#{feed_id}]", '.feeds')
-        $(item).addClass('zero-count')
-    feedbin.hideQueue.length = 0
+
+    # Drain hide queue if this isn't the same collection
+    if feedbin.selectedFeed && feedbin.selectedFeed[0] != $(event.currentTarget)[0]
+      $.each feedbin.hideQueue, (index, feed_id) ->
+        if feed_id != undefined
+          item = $("[data-feed-id=#{feed_id}]", '.feeds')
+          $(item).addClass('zero-count')
+      feedbin.hideQueue.length = 0
+
+    feedbin.selectedFeed = $(event.currentTarget)
     return

@@ -445,6 +445,8 @@ $.extend feedbin,
 
   recentlyReadTimer: null
 
+  selectedFeed: null
+
 $.extend feedbin,
   init:
 
