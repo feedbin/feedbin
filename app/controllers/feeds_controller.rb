@@ -111,7 +111,7 @@ class FeedsController < ApplicationController
   def update_view_mode(view_mode)
     @user = current_user
     @view_mode = view_mode
-    session[:view_mode] = @view_mode
+    @user.update_attributes(view_mode: @view_mode)
     render nothing: true
   end
 

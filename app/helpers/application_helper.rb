@@ -34,12 +34,7 @@ module ApplicationHelper
   end
 
   def view_mode_selected(view_mode)
-    saved_view_mode = session[:view_mode]
-    if saved_view_mode
-      'selected' if view_mode == saved_view_mode
-    else
-      'selected' if view_mode == 'view_unread'
-    end
+    'selected' if view_mode == @user.get_view_mode
   end
 
   def rtl?(string)

@@ -29,7 +29,8 @@ class User < ActiveRecord::Base
                  :ui_typeface,
                  :update_message_seen,
                  :hide_recently_read,
-                 :hide_updated
+                 :hide_updated,
+                 :view_mode
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -69,6 +70,10 @@ class User < ActiveRecord::Base
   validate :coupon_code_valid, on: :create, if: -> user { user.coupon_code }
   validate :plan_type_valid, on: :update
   validate :trial_plan_valid
+
+  def get_view_mode
+    view_mode || "view_unread"
+  end
 
   def setting_on?(setting_symbol)
     self.send(setting_symbol) == '1'

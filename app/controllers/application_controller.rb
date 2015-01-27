@@ -6,9 +6,7 @@ class ApplicationController < ActionController::Base
 
   before_action :authorize
   before_action :set_user
-  before_action :set_view_mode
   before_action :honeybadger_context
-  before_action :block_if_maintenance_mode
 
   etag { current_user.try :id }
 
@@ -127,10 +125,10 @@ class ApplicationController < ActionController::Base
   end
 
   def feeds_response
-    if 'view_all' == session[:view_mode]
+    if 'view_all' == @user.get_view_mode
       # Get all entries 100 at a time, then get unread info
       @entries = Entry.where(feed_id: @feed_ids).page(params[:page]).includes(:feed).sort_preference('DESC')
-    elsif 'view_starred' == session[:view_mode]
+    elsif 'view_starred' == @user.get_view_mode
       # Get starred info, then get entries
       starred_entries = @user.starred_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).order("published DESC")
       @entries = Entry.entries_with_feed(starred_entries, 'DESC')
@@ -141,26 +139,12 @@ class ApplicationController < ActionController::Base
       @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort)
     end
 
-    if 'view_all' == session[:view_mode]
+    if 'view_all' == @user.get_view_mode
       @page_query = @entries
-    elsif 'view_starred' == session[:view_mode]
+    elsif 'view_starred' == @user.get_view_mode
       @page_query = starred_entries
     else
       @page_query = unread_entries
-    end
-  end
-
-  def set_view_mode
-    session[:view_mode] ||= 'view_unread'
-  end
-
-  def block_if_maintenance_mode
-    if ENV['FEEDBIN_MAINTENANCE_MODE']
-      if request.format.json?
-        render status: 503, json: {message: 'The site is undergoing maintenance.'}
-      else
-        render 'errors/service_unavailable', status: 503, layout: 'application'
-      end
     end
   end
 
@@ -177,7 +161,7 @@ class ApplicationController < ActionController::Base
   def user_classes
     @classes = []
     @classes.push("theme-#{@user.theme || 'day'}")
-    @classes.push(session[:view_mode])
+    @classes.push(@user.get_view_mode)
     @classes.push(@user.entry_width)
     @classes.push("entries-body-#{@user.entries_body || '1'}")
     @classes.push("entries-time-#{@user.entries_time || '1'}")

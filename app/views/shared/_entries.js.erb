@@ -43,7 +43,7 @@ feedbin.updatePager('<%= j will_paginate(@page_query) %>');
 feedbin.updatePager('');
 <% end %>
 
-feedbin.data.viewMode = "<%= j session[:view_mode] %>";
+feedbin.data.viewMode = "<%= j @user.get_view_mode %>";
 
 feedbin.preloadEntries(<%= @entries.map{ |entry| entry.id }.to_json.html_safe %>);
 $(document).trigger('feedbin:entriesLoaded');
