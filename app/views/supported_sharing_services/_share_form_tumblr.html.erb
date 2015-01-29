@@ -20,9 +20,11 @@
       <div class="control">
         Format <%= select_tag "format", options_for_select({'Markdown' => 'markdown', 'HTML' => 'html'}, "markdown") %>
       </div>
-      <div class="control">
-        Site <%= select_tag "site", options_for_select(service.service_options, service.default_option) %>
-      </div>
+      <% if service.service_options.present? %>
+        <div class="control">
+          Site <%= select_tag "site", options_for_select(service.service_options, service.default_option) %>
+        </div>
+      <% end %>
       <div class="control">
         Status <%= select_tag "state", options_for_select({'Published' => 'published', 'Draft' => 'draft', 'Queue' => 'queue', 'Private' => 'private'}, "published") %>
       </div>
