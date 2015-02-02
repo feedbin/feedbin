@@ -5734,6 +5734,13 @@ Bigfoot
 ------------------------------------------------------------------------------*/
 .bigfoot-footnote__button {
     @include background-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    padding: 0.1em;
+    border-radius: 8px;
+    min-width: 30px;
+    line-height: 1;
+    color: #FFF;
+    font-size: 70%;
+    font-weight: bold;
 }
 .footnote-circle {
     @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
@@ -5745,6 +5752,14 @@ Bigfoot
 }
 .bigfoot-footnote.is-active {
     opacity: 1 !important;
+}
+.bigfoot-footnote.is-scrollable .bigfoot-footnote__wrapper {
+    &:before {
+        background-image: linear-gradient(to bottom, $list-background-color 50%, rgba(255,255,255,0) 100%)
+    }
+    &:after {
+        background-image: linear-gradient(to bottom, rgba(255,255,255,0) 0%, $list-background-color 50%)
+    }
 }
 
 /*------------------------------------------------------------------------------

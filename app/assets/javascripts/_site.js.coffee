@@ -61,6 +61,7 @@ $.extend feedbin,
     $.bigfoot
       scope: '[data-behavior~=entry_content_wrap]'
       actionOriginalFN: 'ignore'
+      buttonMarkup: "<div class='bigfoot-footnote__container'> <button class=\"bigfoot-footnote__button\" id=\"{{SUP:data-footnote-backlink-ref}}\" data-footnote-number=\"{{FOOTNOTENUM}}\" data-footnote-identifier=\"{{FOOTNOTEID}}\" alt=\"See Footnote {{FOOTNOTENUM}}\" rel=\"footnote\" data-bigfoot-footnote=\"{{FOOTNOTECONTENT}}\"> {{FOOTNOTENUM}} </button></div>"
 
   hideTagsForm: (form) ->
     if not form
