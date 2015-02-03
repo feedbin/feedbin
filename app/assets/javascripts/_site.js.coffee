@@ -340,8 +340,8 @@ $.extend feedbin,
         context.beginPath()
 
         height = Math.ceil(values.shift() * canvasHeight)
-        yPosition = (canvasHeight - height)
-
+        yPosition = (canvasHeight - height) + 1
+        
         context.moveTo(xPosition, yPosition)
 
         for value in values
