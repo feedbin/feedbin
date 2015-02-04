@@ -186,7 +186,15 @@ class FeedFetcher
         else
           content = nil
         end
-        entry.author          = entry.author ? entry.author.strip : nil
+
+        if entry.try(:author)
+          entry.author = entry.author
+        elsif entry.try(:itunes_author)
+          entry.author = entry.itunes_author
+        else
+          entry.author = nil
+        end
+
         entry.content         = content ? content.strip : nil
         entry.title           = entry.title ? entry.title.strip : nil
         entry.url             = entry.url ? entry.url.strip : nil
