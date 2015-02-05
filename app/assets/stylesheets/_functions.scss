@@ -162,3 +162,13 @@
         background-position: 15px + $x-offset 12px + $y-offset;
     }
 }
+
+
+@mixin settings-row {
+    padding: 15px 30px;
+    @media (max-width: 528px) {
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+}
+

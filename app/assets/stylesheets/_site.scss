@@ -1007,15 +1007,6 @@ th {
     }
 }
 
-.settings-row {
-    padding: 15px 30px;
-    @media (max-width: 528px) {
-        padding-right: 15px;
-        padding-left: 15px;
-    }
-}
-
-
 .pill-list {
     background-color: #FFF;
     border-radius: 8px;
@@ -1024,7 +1015,7 @@ th {
     padding: 0;
     list-style: none;
     li {
-        @extend .settings-row;
+        @include settings-row;
         margin: 0;
         border-bottom: 1px solid $border-color;
         position: relative;
@@ -1045,12 +1036,30 @@ th {
         }
     }
     .service-header {
-        @extend .settings-row;
+        @include settings-row;
     }
-    .service-options {
-        @extend .settings-row;
-        border-top: 1px solid $border-color;
+    .service-options-wrap {
+        position: relative;
+        height: 0;
+        transition: height .2s ease;
         overflow: hidden;
+        &.open {
+            @include arrow(
+                $x-position: 35px,
+                $y-position: 0,
+                $arrow-color: #FFF,
+                $arrow-color-night: $list-background-color-night,
+                $arrow-color-sunset: $list-background-color-sunset,
+                $shadow-color: $arrow-shadow-color,
+                $shadow-color-night: $arrow-shadow-color-night,
+                $shadow-color-sunset: $arrow-shadow-color-sunset);
+            
+        }
+        .service-options {
+            @include settings-row;
+            border-top: 1px solid $border-color;
+            overflow: hidden;
+        }
     }
     .list-action {
         position: absolute;
@@ -1071,7 +1080,8 @@ th {
     }
     input[type="text"],
     input[type="email"],
-    input[type="password"] {
+    input[type="password"],
+    input[type="url"] {
         display: block;
         @media (max-width: 528px) {
             max-width: 100%;
@@ -3888,7 +3898,7 @@ Settings
             margin: 0;
             padding: 0;
             border-bottom: 1px solid $border-color;
-            @extend .settings-row;
+            @include settings-row;
         }
         &.no-margin {
             margin-bottom: 0;
@@ -3960,7 +3970,7 @@ Settings
             border-radius: 0 !important;
             max-width: 100% !important;
             width: 100%;
-            @extend .settings-row;
+            @include settings-row;
         }
         label {
             user-select: none;
@@ -4561,12 +4571,11 @@ Buttons
     }
 }
 
-.button-primary {
-    font-weight: bold;
-}
-
 .button-cancel {
     color: #5f5f5f;
+    &:hover {
+        color: #5f5f5f;
+    }
 }
 
 .button-inline {
@@ -4575,9 +4584,8 @@ Buttons
 
 .button-danger {
     color: red;
-    border-color: red;
     &:hover {
-        background-color: red;
+        color: red;
     }
 }
 

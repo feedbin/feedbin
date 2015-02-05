@@ -1099,13 +1099,16 @@ $.extend feedbin,
 
     serviceOptions: ->
       $(document).on 'click', '[data-behavior~=show_service_options]', (event) ->
-        $(@).parents('li').find('.service-options').removeClass('hide')
+        height = $(@).parents('li').find('.service-options').outerHeight()
+        $(@).parents('li').find('.service-options-wrap').addClass('open').css
+          height: height
         $(@).parents('li').find('.show-service-options').addClass('hide')
         event.preventDefault()
         return
 
       $(document).on 'click', '[data-behavior~=hide_service_options]', (event) ->
-        $(@).parents('li').find('.service-options').addClass('hide')
+        $(@).parents('li').find('.service-options-wrap').removeClass('open').css
+          height: 0
         $(@).parents('li').find('.show-service-options').removeClass('hide')
         event.preventDefault()
         return
