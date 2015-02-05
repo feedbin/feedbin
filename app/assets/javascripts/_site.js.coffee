@@ -160,7 +160,7 @@ $.extend feedbin,
     $('.entry-content').prop('scrollTop', 0)
 
   fitVids: ->
-    $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com']"});
+    $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com'], iframe[src*='embed-ssl.ted.com']"});
 
   formatTweets: ->
     target = $('[data-behavior~=entry_content_wrap]')[0]

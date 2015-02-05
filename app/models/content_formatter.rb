@@ -142,6 +142,10 @@ class ContentFormatter
         /x,
         /^
           (?:https?:\/\/|\/\/)
+          (?:embed-ssl\.ted\.com)
+        /x,
+        /^
+          (?:https?:\/\/|\/\/)
           (?:www\.tumblr\.com)
         /x
       ]
