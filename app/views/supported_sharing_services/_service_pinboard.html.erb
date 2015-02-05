@@ -1,12 +1,18 @@
 <% if status == :active %>
-  <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
+    <div class="service-header">
+        <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
+    </div>
 <% elsif status == :issue %>
-  <p class="service-title"><%= sharing_service.label %></p>
-  <small class="show-service-options">Feedbin can no longer access <%= sharing_service.label %>, <a href="#" data-behavior="show_service_options">reactivate</a>?</small>
-  <%= link_to 'Deactivate', supported_sharing_service_path(sharing_service), class: 'list-action danger show-service-options', method: :delete %>
-  <%= render partial: "supported_sharing_services/pinboard_form", locals: {sharing_service: sharing_service, record: record} %>
+    <div class="service-header">
+        <p class="service-title"><%= sharing_service.label %></p>
+        <small class="show-service-options pad-top">Feedbin can no longer access <%= sharing_service.label %>, <a href="#" data-behavior="show_service_options">reactivate</a>?</small>
+        <%= link_to 'Deactivate', supported_sharing_service_path(sharing_service), class: 'list-action show-service-options button button-cancel', method: :delete %>
+    </div>
+    <%= render partial: "supported_sharing_services/pinboard_form", locals: {sharing_service: sharing_service, record: record} %>
 <% else %>
-  <p class="service-title"><%= sharing_service[:label] %></p>
-  <%= link_to 'Activate', '#', class: 'list-action show-service-options', data: {behavior: "show_service_options"} %>
-  <%= render partial: "supported_sharing_services/pinboard_form", locals: {sharing_service: sharing_service, record: record} %>
+    <div class="service-header">
+        <p class="service-title"><%= sharing_service[:label] %></p>
+        <%= button_tag 'Activate', class: 'list-action show-service-options button', data: {behavior: "show_service_options"} %>
+    </div>
+    <%= render partial: "supported_sharing_services/pinboard_form", locals: {sharing_service: sharing_service, record: record} %>
 <% end %>

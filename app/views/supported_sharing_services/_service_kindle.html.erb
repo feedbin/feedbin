@@ -1,9 +1,13 @@
 <% if status == :active %>
-  <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
-  <small class="show-service-options">Articles will be sent to <%= sharing_service.kindle_address %>, <a href="#" data-behavior="show_service_options">edit</a>.</small>
-  <%= render partial: "supported_sharing_services/kindle_form", locals: {sharing_service: sharing_service, record: sharing_service} %>
+    <div class="service-header">
+        <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
+        <small class="show-service-options pad-top">Articles will be sent to <%= sharing_service.kindle_address %>, <a href="#" data-behavior="show_service_options">edit</a>.</small>
+    </div>
+    <%= render partial: "supported_sharing_services/kindle_form", locals: {sharing_service: sharing_service, record: sharing_service} %>
 <% else %>
-  <p class="service-title"><%= sharing_service[:label] %></p>
-  <%= link_to 'Activate', '#', class: 'list-action show-service-options', data: {behavior: "show_service_options"} %>
-  <%= render partial: "supported_sharing_services/kindle_form", locals: {sharing_service: sharing_service, record: record} %>
+    <div class="service-header">
+        <p class="service-title"><%= sharing_service[:label] %></p>
+        <%= button_tag 'Activate', class: 'list-action show-service-options button', data: {behavior: "show_service_options"} %>
+    </div>
+    <%= render partial: "supported_sharing_services/kindle_form", locals: {sharing_service: sharing_service, record: record} %>
 <% end %>

@@ -852,15 +852,15 @@ input[type="color"],
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     @include color($text-header-color, $text-header-color, $text-header-color);
     @include background-color($input-background-color, $input-background-color-night, $input-background-color-sunset);
-    font-size: 16px;
-    padding: 5px;
+    font-size: 14px;
+    padding: 5px 8px;
     max-width: 300px;
     width: 100%;
     display: inline-block;
-    margin-bottom: 15px;
+    margin-bottom: 7px;
     line-height: 20px;
     vertical-align: middle;
-    border-radius: 4px;
+    border-radius: 2px;
     &:focus {
         outline: none;
         border-color: $selected;
@@ -881,24 +881,6 @@ input[type="color"],
 
 :-ms-input-placeholder {
     color: $text-color-light;
-}
-
-.theme-night {
-    ::-webkit-input-placeholder {
-        color: $text-color-light-night;
-    }
-
-    :-moz-placeholder {
-        color: $text-color-light-night;
-    }
-
-    ::-moz-placeholder {
-        color: $text-color-light-night;
-    }
-
-    :-ms-input-placeholder {
-        color: $text-color-light-night;
-    }
 }
 
 input.processing {
@@ -1025,6 +1007,15 @@ th {
     }
 }
 
+.settings-row {
+    padding: 15px 30px;
+    @media (max-width: 528px) {
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+}
+
+
 .pill-list {
     background-color: #FFF;
     border-radius: 8px;
@@ -1033,7 +1024,7 @@ th {
     padding: 0;
     list-style: none;
     li {
-        padding: 15px 30px;
+        @extend .settings-row;
         margin: 0;
         border-bottom: 1px solid $border-color;
         position: relative;
@@ -1041,10 +1032,30 @@ th {
         &:last-child {
             border-bottom: none;
         }
+    }
+}
+
+.sharing-services {
+    @extend .pill-list;
+    li {
+        padding: 0;
         @media (max-width: 528px) {
-            padding-right: 15px;
-            padding-left: 15px;
+            padding-right: 0;
+            padding-left: 0;
         }
+    }
+    .service-header {
+        @extend .settings-row;
+    }
+    .service-options {
+        @extend .settings-row;
+        border-top: 1px solid $border-color;
+        overflow: hidden;
+    }
+    .list-action {
+        position: absolute;
+        right: 15px;
+        top: 16px;
     }
     .service-title {
         color: #212121;
@@ -1058,20 +1069,16 @@ th {
         padding-right: 30px;
         background: image-url("icon-error.svg") 100% 2px no-repeat;
     }
-    .list-action {
-        position: absolute;
-        right: 15px;
-        top: 16px;
-    }
-    .service-options {
-        overflow: hidden;
-        padding: 10px 0 0  40px;
-    }
-    small {
-        clear: both;
-        padding-left: 40px;
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
         display: block;
-        max-width: 600px;
+        @media (max-width: 528px) {
+            max-width: 100%;
+        }
+    }    
+    small {
+        display: block;
         &.hide {
             display: none;
         }
@@ -1080,42 +1087,19 @@ th {
             max-width: 100%;
         }
     }
+    .half {
+        padding-left: 5px;
+        padding-right: 5px;
+        @media (max-width: 528px) {
+            width: 100%;
+            float: none;
+        }
+    }
+    .pad-top {
+        padding-top: 7px;
+    }
     .service-options {
-        input, .cancel-button {
-            margin: 0 0 0 15px;
-            &.no-margin {
-                margin-left: 0;
-            }
-        }
-        input[type="text"],
-        input[type="password"],
-        input[type="email"] {
-            max-width: 250px;
-            float: left;
-        }
-        .action-button {
-            float: right;
-        }
-        .cancel-button {
-            margin-top: 7px;
-        }
-        small {
-            padding-top: 5px;
-            padding-left: 0;
-        }
-        @media (max-width: 1200px) {
-            input[type="text"],
-            input[type="password"],
-            input[type="email"] {
-                max-width: 100% !important;
-                float: none;
-                margin: 0 0 10px 0 !important;
-            }
-            .action-button {
-
-            }
-        }
-
+        background-color: $list-background-color;
     }
     .icon-share-app_dot_net {
         background-image: image-url("icon-share-app-dot-net.svg");
@@ -1182,6 +1166,7 @@ th {
         background-size: 22px 18px;
         @include share-icon(2, 4);
     }
+    
 }
 
 .inset {
@@ -3713,10 +3698,6 @@ Settings
     h3.box-header {
         margin: 0;
     }
-    .button {
-        padding: 7px 17px;
-        font-size: 16px;
-    }
     .button-mini {
         padding: 7px 10px;
     }
@@ -3907,11 +3888,7 @@ Settings
             margin: 0;
             padding: 0;
             border-bottom: 1px solid $border-color;
-            padding: 15px 30px;
-            @media (max-width: 528px) {
-                padding-left: 15px;
-                padding-right: 15px;
-            }
+            @extend .settings-row;
         }
         &.no-margin {
             margin-bottom: 0;
@@ -3979,15 +3956,11 @@ Settings
             position: relative;
             border: none;
             border-bottom: 1px solid $border-color;
-            padding: 15px 30px;
             display: block;
             border-radius: 0 !important;
             max-width: 100% !important;
             width: 100%;
-            @media (max-width: 528px) {
-                padding-left: 15px;
-                padding-right: 15px;
-            }
+            @extend .settings-row;
         }
         label {
             user-select: none;
@@ -4365,33 +4338,6 @@ table.small td {
     font-size: 13px;
 }
 
-.form-table {
-    input {
-        margin: 0;
-    }
-    .action {
-        padding-top: 11px;
-    }
-    [type="url"] {
-        width: 297px;
-    }
-    [type="checkbox"] {
-        margin-top: 10px;
-    }
-    [class*=" button-primary"] {
-        margin-right: 5px;
-    }
-    input.span2 {
-        width: 140px;
-    }
-    td:first-child {
-        padding-left: 0;
-    }
-    td:last-child {
-        padding-right: 0;
-    }
-}
-
 .action-item {
     position: relative;
     .action-description {
@@ -4593,25 +4539,19 @@ Icons
 Buttons
 ------------------------------------------------------------------------------*/
 .button {
-    -webkit-appearance: none;
+    -webkit-appearance: none !important;
     background: none;
     border: none;
     margin: 0;
     padding: 0;
-    font-size: 14px;
-    font-weight: bold;
-    border: 1px solid transparent;
-    padding: 7px 10px;
-    border-radius: 4px;
+    font-size: 16px;
+    font-weight: normal;
     font-family: $font-stack;
     color: $selected;
-    border-color: $selected;
     text-decoration: none;
-    line-height: 1;
+    line-height: 1.3;
     &:hover {
-        background-color: $selected;
-        color: #FFF;
-        text-decoration: none;
+        text-decoration: underline;
     }
     &[disabled] {
         color: $border-color;
@@ -4621,16 +4561,16 @@ Buttons
     }
 }
 
-.button::-moz-focus-inner {
-    border: 0;
-    padding: 0;
-    margin-top:-3px;
-    margin-bottom: -3px;
+.button-primary {
+    font-weight: bold;
 }
 
-.button-white {
-    color: #FFF;
-    border-color: $selected;
+.button-cancel {
+    color: #5f5f5f;
+}
+
+.button-inline {
+    margin-left: 15px;
 }
 
 .button-danger {
@@ -4641,44 +4581,11 @@ Buttons
     }
 }
 
-.button-text {
-    border-color: transparent;
-}
-
-.button-mini {
-    font-size: 12px;
-    padding: 4px 5px;
-}
-
-.button-link {
-    font-weight: normal;
-    padding: 0 !important;
-    border: none;
-    font-size: 16px;
-    background: transparent;
-    &:hover {
-        background: transparent;
-    }
-    &.button {
-        &:hover {
-            color: $selected;
-        }
-    }
-    &.button-danger {
-        &:hover {
-            color: red;
-        }
-    }
-}
-
-.add-button {
-    color: $selected;
-    position: relative;
-    display: block;
-    margin-bottom: 5px;
-    &:hover {
-        text-decoration: none;
-    }
+.button::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+    margin-top:-3px;
+    margin-bottom: -3px;
 }
 
 .tags-form-wrap {

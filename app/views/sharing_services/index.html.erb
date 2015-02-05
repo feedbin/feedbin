@@ -10,7 +10,7 @@
         <h4 class="group-header">Active Services</h4>
       </div>
 
-      <ul class="pill-list">
+      <ul class="sharing-services">
         <% @active_sharing_services.each do |sharing_service| %>
           <%= render sharing_service %>
         <% end %>
@@ -22,7 +22,7 @@
       <div class="inset-content">
         <h4 class="group-header">Available Services</h4>
       </div>
-      <ul class="pill-list">
+      <ul class="sharing-services">
         <% @available_sharing_services.each do |sharing_service| %>
           <% unless @active_service_ids.include?(sharing_service[:service_id]) %>
             <li class="share-icon-wrap <%= "icon-share-#{sharing_service[:service_id]}" %>">

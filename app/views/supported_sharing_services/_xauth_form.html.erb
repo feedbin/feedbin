@@ -5,7 +5,7 @@
     <%= text_field_tag 'username', '', placeholder: 'Username', class: 'no-margin' %>
     <%= password_field_tag 'password', '', placeholder: 'Password' %>
 
-    <%= link_to 'Cancel', '#', class: 'action-button button-danger button-link cancel-button', data: {behavior: "hide_service_options"} %>
-    <%= submit_tag "Login", class: 'action-button button button-primary' %>
+    <%= submit_tag "Login", class: 'button button-primary' %>
+    <%= button_tag 'Cancel', class: 'button button-cancel button-inline', data: {behavior: "hide_service_options"} %>
   <% end %>
 </div>
