@@ -75,6 +75,14 @@ class User < ActiveRecord::Base
     view_mode || "view_unread"
   end
 
+  def get_favicon_hash
+    if favicon_hash
+      "#{favicon_hash}1"
+    else
+      "none"
+    end
+  end
+
   def setting_on?(setting_symbol)
     self.send(setting_symbol) == '1'
   end
