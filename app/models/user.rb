@@ -77,7 +77,7 @@ class User < ActiveRecord::Base
 
   def get_favicon_hash
     if favicon_hash
-      "#{favicon_hash}1"
+      "#{favicon_hash}2"
     else
       "none"
     end

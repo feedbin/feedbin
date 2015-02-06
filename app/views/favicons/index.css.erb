@@ -2,7 +2,7 @@
 <% if favicon.favicon.present? %>
 .favicon-<%= favicon.host.parameterize %> {
     background-image: url("data:image/png;base64,<%= favicon.favicon %>");
-    background-color: #FFF !important;
+    background-color: transparent !important;
 }
 <% end %>
 <% end %>
