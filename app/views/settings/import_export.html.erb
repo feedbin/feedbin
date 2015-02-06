@@ -19,15 +19,17 @@
         <p class="control-group-description">You can import OPML files. Import is done in the background so you may not see every subscription or starred item right away.</p>
 
         <div class="description-inset">
-            <%= f.submit "Import", class: "button-plain" %>
+            <%= f.submit "Import", class: "button-plain no-margin" %>
         </div>
 
         <% end %>
 
         <% else %>
-        <p class="control-group-description">Import disabled. <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> and <code>AWS_S3_BUCKET</code> are missing.</p>
+            <p class="control-group-description">Import disabled. <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> and <code>AWS_S3_BUCKET</code> are missing.</p>
         <% end %>
+    </div>
 
+    <div class="inset">
         <div class="inset-content">
             <h4 class="group-header">Export</h4>
         </div>
@@ -40,14 +42,14 @@
                 <% end %>
             </li>
             <% if @user.starred_entries.exists? %>
-            <li>
-                Starred Articles <%= link_to "Export", starred_export_path, method: :post, class: 'pull-right' %>
-            </li>
+                <li>
+                    Starred Articles <%= link_to "Export", starred_export_path, method: :post, class: 'pull-right' %>
+                </li>
             <% end %>
         </ul>
 
         <% if @user.starred_entries.exists? %>
-        <p class="control-group-description">A link will be emailed to you.</p>
+            <p class="control-group-description">A link will be emailed to you.</p>
         <% end %>
 
     </div>
