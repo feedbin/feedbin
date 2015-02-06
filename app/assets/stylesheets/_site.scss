@@ -1016,6 +1016,10 @@ th {
     margin: 0 0 30px 0;
     padding: 0;
     list-style: none;
+    @media (max-width: 528px) {
+        border-left: none;
+        border-right: none;
+    }
     li {
         @include settings-row;
         margin: 0;
@@ -4127,6 +4131,8 @@ Settings
             padding-left: 15px;
             padding-right: 15px;
             border-radius: 0;
+            border-left: none;
+            border-right: none;
         }
     }
     .feeds-checkbox {
@@ -4149,6 +4155,19 @@ Settings
                     margin: 0;
                 }
             }
+        }
+        &.dropdown-right ul {
+            @media (max-width: 528px) {
+                left: -100px;
+                li:first-child:after {
+                    left: 175px;
+                    margin: 0;
+                }
+                li:first-child:before {
+                    left: 174px;
+                    margin: 0;
+                }
+            }            
         }
     }
     .feeds-toolbar-button {
@@ -4197,6 +4216,9 @@ Settings
     .feed-form {
         border-radius: 0 0 8px 8px;
         border-top: none;
+        @media (max-width: 528px) {
+            border-radius: 0;
+        }
         li {
             clear: both;
             position: relative;
