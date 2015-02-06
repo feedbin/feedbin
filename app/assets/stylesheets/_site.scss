@@ -1067,6 +1067,11 @@ th {
             overflow: hidden;
         }
     }
+    .share-help {
+        @media (max-width: 528px) {
+            padding-top: 20px;
+        }
+    }
     .list-action {
         position: absolute;
         right: 15px;
