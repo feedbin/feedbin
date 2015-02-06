@@ -62,6 +62,8 @@ $arrow-shadow-color-sunset: #c8c7be;
 $selected: #3399FF;
 $selected-off: #505a65;
 
+$inset-bg-color: #f4f6f8;
+
 /*------------------------------------------------------------------------------
 Grid
 ------------------------------------------------------------------------------*/
@@ -1180,7 +1182,7 @@ th {
 }
 
 .inset {
-    background-color: $list-background-color;
+    background-color: $inset-bg-color;
     border-radius: 8px;
     border: 1px solid $border-color;
     margin: 0 0 20px 0;
@@ -3819,7 +3821,7 @@ Settings
     }
     .preview-group {
         z-index: 1000;
-        background-color: $list-background-color;
+        background-color: $inset-bg-color;
         margin-bottom: 30px;
         @media (max-width: 528px) {
             background-color: $list-background-color;
