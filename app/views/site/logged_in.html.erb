@@ -85,9 +85,8 @@
           <%= pluralize(current_user.days_left, 'Day') %> Left &mdash; <strong>Subscribe Now</strong>
         <% end %>
       <% end %>
-      <div class="account-buttons">
-        <%= link_to 'Log Out', logout_path, method: 'delete' %>
-        <%= link_to 'Settings', settings_path %>
+      <div class="entry-buttons">
+        <%= render partial: 'shared/app_settings' %>
       </div>
     </div>
     <% if @show_welcome %>

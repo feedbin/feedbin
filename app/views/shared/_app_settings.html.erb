@@ -1,0 +1,11 @@
+<div class="entry-button-wrap">
+    <div class="dropdown-wrap dropdown-right button-app-settings entry-button">
+        <a class="entry-button" data-behavior="toggle_share_menu toggle_dropdown" href="#" title="Share">
+            <%= svg_tag 'icon-chevron', size: '14x8' %>
+        </a>
+        <ul>
+            <li><%= link_to 'Settings', settings_path %></li>
+            <li><%= link_to 'Log Out', logout_path, method: 'delete' %></li>
+        </ul>
+    </div>
+</div>

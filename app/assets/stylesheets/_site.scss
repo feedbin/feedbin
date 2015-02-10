@@ -5,10 +5,10 @@
 /*------------------------------------------------------------------------------
 Variables
 ------------------------------------------------------------------------------*/
-$toolbar-height: 37px;
+$toolbar-height: 40px;
 $font-stack: "Helvetica Neue", Helvetica, Arial, sans-serif;
 $feeds-toolbar-height: 52px;
-$base-button-position: 9px;
+$base-button-position: 10px;
 
 /*-- Colors --*/
 $body-background-color: #FFFFFF;
@@ -1059,7 +1059,7 @@ th {
                 $shadow-color: $arrow-shadow-color,
                 $shadow-color-night: $arrow-shadow-color-night,
                 $shadow-color-sunset: $arrow-shadow-color-sunset);
-            
+
         }
         .service-options {
             @include settings-row;
@@ -1097,7 +1097,7 @@ th {
         @media (max-width: 528px) {
             max-width: 100%;
         }
-    }    
+    }
     small {
         display: block;
         &.hide {
@@ -1187,7 +1187,7 @@ th {
         background-size: 22px 18px;
         @include share-icon(2, 4);
     }
-    
+
 }
 
 .inset {
@@ -1257,7 +1257,7 @@ Structure
         margin: 0;
         padding: 4px 36px 3px 36px;
         font-size: 14px;
-        background: image-url("favicon-search-light.svg") 14px 11px no-repeat;
+        background: image-url("favicon-search-light.svg") 14px 12px no-repeat;
         background-size: 14px 14px, 16px 16px;
         border-radius: 13px;
         border: none;
@@ -1265,7 +1265,7 @@ Structure
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         &.processing {
             background-image: image-url("favicon-search-light.svg"), image-url("spinner-day.svg");
-            background-position: 14px 11px, 97% 11px;
+            background-position: 14px 12px, 97% 12px;
             background-size: 14px 14px, 16px 16px;
             .theme-sunset & {
                 background-image: image-url("favicon-search-light.svg"), image-url("spinner-sunset.svg");
@@ -1413,7 +1413,7 @@ Structure
             width: 3px;
             position: absolute;
             left: 19px;
-            top: 12px;
+            top: 13px;
             content: "";
         }
         &:after {
@@ -1421,7 +1421,7 @@ Structure
             height: 3px;
             width: 13px;
             position: absolute;
-            top: 17px;
+            top: 18px;
             left: 14px;
             content: "";
         }
@@ -2408,7 +2408,7 @@ $saved-search-control-height: 48px;
 
 .entry-basement {
     position: absolute;
-    top: $toolbar-height + $toolbar-height;
+    top: $toolbar-height;
     left: 0;
     width: 100%;
     &.foreground {
@@ -2423,7 +2423,7 @@ $saved-search-control-height: 48px;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     @include arrow(
-        $x-position: 20px,
+        $x-position: 65px,
         $y-position: -1px,
         $arrow-color: $body-background-color,
         $arrow-color-night: $body-background-color-night,
@@ -2435,18 +2435,6 @@ $saved-search-control-height: 48px;
     {
         z-index: 10;
         visibility: hidden;
-    }
-    .full-screen & {
-        @include arrow(
-            $x-position: 55px,
-            $y-position: -1px,
-            $arrow-color: $body-background-color,
-            $arrow-color-night: $body-background-color-night,
-            $arrow-color-sunset: $body-background-color-sunset,
-            $shadow-color: $arrow-shadow-color,
-            $shadow-color-night: $arrow-shadow-color-night,
-            $shadow-color-sunset: $arrow-shadow-color-sunset,
-            $origin: right);
     }
     .entry-basement.open &:after,
     .entry-basement.open &:before {
@@ -2655,7 +2643,7 @@ $saved-search-control-height: 48px;
 
 .entry-content-wrap {
     position: absolute;
-    top: $toolbar-height;
+    top: 0;
     bottom: 0;
     left: 0;
     right: 0;
@@ -2738,7 +2726,7 @@ $saved-search-control-height: 48px;
     position: absolute;
     top: 0;
     right: 0px;
-    width: 250px;
+    width: 270px;
     height: $toolbar-height - 1;
     z-index: 1;
     background-image: linear-gradient(to right, rgba($body-background-color, 0) 0%, $body-background-color 10%);
@@ -2850,6 +2838,29 @@ $saved-search-control-height: 48px;
             left: 3px;
             height: 14px;
             width: 14px;
+        }
+    }
+    .button-app-settings {
+        border-left: 1px solid transparent;
+        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        svg {
+            position: absolute;
+            top: $base-button-position + 7;
+            left: 14px;
+            height: 8px;
+            width: 14px;
+        }
+        ul {
+            top: $toolbar-height - 6;
+            right: 8px !important;
+            li:first-child:after {
+                left: 179px !important;
+                margin: 0;
+            }
+            li:first-child:before {
+                left: 178px !important;
+                margin: 0;
+            }
         }
     }
     .full-screen & {
@@ -4125,7 +4136,7 @@ Settings
     }
     .feed-controls {
         border-radius: 8px 8px 0 0;
-        background-color: $list-background-color;
+        background-color: $inset-bg-color;
         border: 1px solid #DCDEE0;
         padding: 15px 30px 12px 30px;
         position: absolute;
@@ -4172,7 +4183,7 @@ Settings
                     left: 174px;
                     margin: 0;
                 }
-            }            
+            }
         }
     }
     .feeds-toolbar-button {
@@ -5488,7 +5499,7 @@ Fullscreen
         border-top: none;
     }
     .entry-basement {
-        top: $toolbar-height;
+        top: 0;
     }
 }
 
