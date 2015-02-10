@@ -130,15 +130,6 @@ $.extend feedbin,
       appendTo: $(element).closest(".tags-form").children("[data-behavior=tag_completions]")
       delimiter: /(,)\s*/
 
-  autoHeight: ->
-    windowHeight = $(window).height()
-    controlsHeight = $('.collection-edit-controls').outerHeight()
-    collectionOffset = $('.collection-edit-wrapper').offset().top
-    collectionHeight = windowHeight - controlsHeight - collectionOffset
-    $('.collection-edit-wrapper').css({'max-height': "#{collectionHeight}px"})
-
-  entries: {}
-
   preloadEntries: (entry_ids) ->
     cachedIds = []
     for key of feedbin.entries
@@ -429,7 +420,9 @@ $.extend feedbin,
     entry = feedbin.entries[entryId]
     feedbin.updateEntryContent(entry.content)
     feedbin.formatEntryContent(entryId, true)
-
+  
+  entries: {}
+  
   feedCandidates: []
 
   modalShowing: false

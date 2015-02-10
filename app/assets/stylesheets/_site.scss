@@ -1367,10 +1367,13 @@ Structure
     align-items: flex-start;
     .feeds-column,
     .entries-column {
-        width: 245px;
         flex-grow: 0;
         border-right: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
+    }
+    .feeds-column {
+        width: 245px;
+        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     }
     .entries-column {
         width: 320px;
@@ -1378,10 +1381,6 @@ Structure
     .entry-column {
         flex-grow: 1;
     }
-}
-
-.feeds-column {
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
 }
 
 .app-panel {
@@ -3044,12 +3043,10 @@ $saved-search-control-height: 48px;
     p,
     ul,
     ol,
-    figure {
+    figure,
+    blockquote,
+    .media-container {
         margin: 0 0 1.1em 0;
-    }
-
-    blockquote {
-        margin: 0 0 1.3em 0;
     }
 
     blockquote[align="center"] {
@@ -3088,12 +3085,9 @@ $saved-search-control-height: 48px;
         }
     }
 
-    code {
-        @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
-    }
-
     pre code {
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+        @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
         display: block;
         overflow-x: auto;
         white-space: pre;
@@ -3144,10 +3138,6 @@ $saved-search-control-height: 48px;
 
     iframe[src*='w.soundcloud.com'] {
         background-color: transparent;
-    }
-
-    .media-container {
-        margin: 0 0 1.1em 0;
     }
 
     .download-link {
@@ -3330,66 +3320,6 @@ $saved-search-control-height: 48px;
         opacity: .5;
     }
 
-}
-
-.audio-player {
-    font-family: $font-stack !important;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 52px;
-    background-color: rgba(51,51,51,.99);
-    z-index: 10000;
-    color: #fff;
-    padding-left: 40px;
-    button {
-        @extend .hide-text;
-        position: relative;
-        position: absolute;
-        left: 12px;
-        top: 14px;
-        -webkit-appearance: none;
-        height: 24px;
-        width: 24px;
-        border: none;
-        &.playing {
-            &:before {
-                background-position: 0 -18px;
-            }
-        }
-        &:before {
-            content: "";
-            position: absolute;
-            background: image-url("icon-play.svg") 0 0 no-repeat;
-            background-size: 15px 36px;
-            height: 18px;
-            width: 15px;
-            top: 3px;
-            left: 5px;
-        }
-    }
-    .audio-title {
-        margin-top: 18px;
-        padding-right: 160px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 100%;
-    }
-    .download-link {
-        position: absolute;
-        right: 20px;
-        top: 18px;
-    }
-    .progress {
-        background-color: $selected;
-        height: 2px;
-        width: 0%;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-    }
 }
 
 .font-serif-1 .entry-inner {
@@ -4978,38 +4908,6 @@ select {
     padding-bottom: 14px;
 }
 
-.billing-promo {
-    background-color: $list-background-color;
-    background-repeat: no-repeat;
-    border: 1px solid $border-color;
-    padding: 10px 10px 10px 35px;
-    font-size: 14px;
-    color: #333;
-    border-radius: 4px;
-    position: relative;
-    &:after {
-        position: absolute;
-        left: 8px;
-        top: 12px;
-        width: 18px;
-        height: 12px;
-        display: block;
-        border: 1px solid #999;
-        border-radius: 2px;
-        content: "";
-    }
-    &:before {
-        position: absolute;
-        left: 9px;
-        top: 14px;
-        width: 16px;
-        height: 3px;
-        display: block;
-        background-color: #999;
-        content: "";
-    }
-}
-
 .ui-helper-hidden-accessible {
     border: 0;
     clip: rect(0 0 0 0);
@@ -5086,50 +4984,6 @@ hr.nospace {
     position: relative;
 }
 
-h3 .inline-subhead {
-    position: absolute;
-    text-align: right;
-    bottom: 0;
-    right: 0;
-    margin: 0;
-    font-weight: normal;
-    small {
-        font-size: 12px;
-        color: #333;
-    }
-}
-
-.stripe-badge {
-    display: block;
-    height: 26px;
-    width: 119px;
-    background: image-url("logo-stripe.svg") 0 0 no-repeat;
-    background-size: 119px 26px;
-}
-
-.payment-promo {
-    background-color: #e9eaeb;
-    padding: 10px 10px 1px 10px;
-    border-radius: 4px;
-    font-size: 14px;
-    p {
-        color: #666;
-        line-height: 1.3;
-    }
-}
-
-.button-form {
-    margin: 0;
-    padding: 0;
-}
-
-.break-word {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    max-width: 530px;
-    display: block;
-}
-
 .half {
     width: 50%;
     float: left;
@@ -5137,38 +4991,6 @@ h3 .inline-subhead {
 
 .float-right {
     float: right;
-}
-
-.collection-edit-wrapper {
-    overflow-y: scroll;
-    min-height: 50px;
-    @media (max-width: 528px) {
-        overflow: visible;
-        min-height: auto;
-        max-height: auto !important;
-    }
-}
-
-.collection-edit-controls {
-    padding: 8px 0;
-    border-top: 1px solid $border-color;
-    @media (max-width: 528px) {
-        padding: 0;
-        border-top: none;
-    }
-}
-
-.bottom-toolbar {
-    @media (max-width: 528px) {
-        padding: 15px 30px;
-        position: fixed;
-        right: 0;
-        left: 0;
-        bottom: 0;
-        background-color: $drawer-background-color;
-        border-top: 1px solid $border-color;
-        z-index: 10000;
-    }
 }
 
 .pull-right {
