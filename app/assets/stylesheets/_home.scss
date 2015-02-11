@@ -162,18 +162,28 @@
 			text-decoration: none;
 		}
 	}
-	.screenshot-mask {
-		margin-top: 20px;
-		overflow: hidden;
-		line-height: 0;
-			padding: 10px 0 0 0;
-		img {
-			margin: 0 auto;
-			box-shadow: 0px 0px 15px 1px rgba(0,0,0,.1);
-		}
+    .screenshot-wrap {
+		margin: 20px auto 0 auto;
+		max-width: 1201px;
 		@include respond-to(screen-sm) {
 			margin-top: 40px;
 		}
+    }
+	.screenshot-mask {
+        padding-bottom: 56.95253955%;
+        position: relative;
+        .screenshot-inner,
+        .screenshot-outer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+        .screenshot-inner {
+            z-index: 1;
+        }
 	}
 	.rounded-icon {
 		border-radius: 12px;

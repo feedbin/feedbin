@@ -14,10 +14,11 @@
     <p class="pricing-promo"><sup>$</sup>3 per month <em>or</em> <sup>$</sup>30 a year</p>
     <p class="align-center"><%= link_to "Try it Free", signup_path, class: "button-get-started" %></p>
   </div>
-  <div class="screenshot-mask">
-    <div class="container">
-      <%= image_tag "screenshots/_main.png", width: 1250, class: "responsive" %>
-    </div>
+  <div class="screenshot-wrap">
+      <div class="screenshot-mask">
+          <%= image_tag "screenshots/_main_outer.png", width: 1201, height: 684, class: "screenshot-outer" %>
+          <%= image_tag "screenshots/_main_inner.jpg", width: 1201, height: 684, class: "screenshot-inner" %>
+      </div>
   </div>
 </div>
 <div class="main-content">
