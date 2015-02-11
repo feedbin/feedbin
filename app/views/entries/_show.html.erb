@@ -2,10 +2,13 @@
     <%= content_tag :div, class: "read entry-feed-#{entry.feed_id}", data: {behavior: 'selected_entry_data', entry_id: entry.id} do %>
       <div class="entry-toolbar">
         <button class="back-button" data-behavior="show_entries"></button>
-        <%= entry_presenter.favicon(entry.feed.host) %>
-        <%= link_to strip_tags(entry.feed.title), entry.feed.site_url, class: 'entry-feed-title', data: {behavior: 'user_title', feed_id: entry.feed.id}, target: '_blank' %>
+        <%= render partial: "shared/full_screen_button" %>
+        <span class="site-info">
+            <%= entry_presenter.favicon(entry.feed.host) %>
+            <%= link_to strip_tags(entry.feed.title), entry.feed.site_url, class: 'entry-feed-title', data: {behavior: 'user_title', feed_id: entry.feed.id}, target: '_blank' %>
+        </span>
         <div class="entry-buttons">
-          <%= render partial: "shared/full_screen_button" %>
+          <%= render partial: 'shared/app_settings' %>
           <%= render partial: "shared/entry_settings_button" %>
           <%= render partial: "unread_entries/form", locals: {entry: entry} %>
           <%= render partial: "starred_entries/form", locals: {entry: entry} %>
