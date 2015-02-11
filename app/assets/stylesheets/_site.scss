@@ -5,7 +5,7 @@
 /*------------------------------------------------------------------------------
 Variables
 ------------------------------------------------------------------------------*/
-$toolbar-height: 40px;
+$toolbar-height: 41px;
 $font-stack: "Helvetica Neue", Helvetica, Arial, sans-serif;
 $feeds-toolbar-height: 52px;
 $base-button-position: 10px;
@@ -1257,7 +1257,7 @@ Structure
         margin: 0;
         padding: 4px 36px 3px 36px;
         font-size: 14px;
-        background: image-url("favicon-search-light.svg") 14px 12px no-repeat;
+        background: image-url("favicon-search-light.svg") 14px ($base-button-position + 3) no-repeat;
         background-size: 14px 14px, 16px 16px;
         border-radius: 13px;
         border: none;
@@ -1265,7 +1265,7 @@ Structure
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         &.processing {
             background-image: image-url("favicon-search-light.svg"), image-url("spinner-day.svg");
-            background-position: 14px 12px, 97% 12px;
+            background-position: 14px ($base-button-position + 3), 97% ($base-button-position + 3);
             background-size: 14px 14px, 16px 16px;
             .theme-sunset & {
                 background-image: image-url("favicon-search-light.svg"), image-url("spinner-sunset.svg");
@@ -1413,7 +1413,7 @@ Structure
             width: 3px;
             position: absolute;
             left: 19px;
-            top: 13px;
+            top: $base-button-position + 4;
             content: "";
         }
         &:after {
@@ -1421,7 +1421,7 @@ Structure
             height: 3px;
             width: 13px;
             position: absolute;
-            top: 18px;
+            top: $base-button-position + 9;
             left: 14px;
             content: "";
         }
@@ -2381,28 +2381,53 @@ $saved-search-control-height: 48px;
         height: $toolbar-height;
         width: $toolbar-height;
     }
-    .favicon-wrap {
+    .site-info {
+        position: absolute;
         top: $base-button-position;
         left: 13px;
-        box-shadow: none;
-        background-color: transparent;
-        .theme-night & {
-            background-color: #FFF;
-            box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+        display: block;
+        .full-screen & {
+            left: 58px;
         }
-        .theme-sunset & {
-            background-color: transparent;
+        .favicon-wrap {
+            top: 0;
+            left: 0;
             box-shadow: none;
+            background-color: transparent;
+            .theme-night & {
+                background-color: #FFF;
+                box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+            }
+            .theme-sunset & {
+                background-color: transparent;
+                box-shadow: none;
+            }
+        }
+        .entry-feed-title {
+            position: absolute;
+            top: 2px;
+            left: 26px;
+            display: block;
+            font-size: 14px;
+            @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+            text-decoration: none;
+            white-space: nowrap;
         }
     }
-    .entry-feed-title {
-        position: absolute;
-        top: $base-button-position + 2;
-        left: 38px;
-        display: block;
-        font-size: 14px;
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-        text-decoration: none;
+    .button-full-screen {
+        display: none;
+        border-right: 1px solid transparent;
+        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        svg {
+            position: absolute;
+            top: $base-button-position + 3;
+            left: 15px;
+            height: 14px;
+            width: 14px;
+        }
+        .full-screen & {
+            display: block;
+        }
     }
 }
 
@@ -2423,7 +2448,7 @@ $saved-search-control-height: 48px;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     @include arrow(
-        $x-position: 65px,
+        $x-position: 63px,
         $y-position: -1px,
         $arrow-color: $body-background-color,
         $arrow-color-night: $body-background-color-night,
@@ -2739,24 +2764,6 @@ $saved-search-control-height: 48px;
     form {
         margin: 0;
     }
-    .entry-button {
-        display: block;
-        background-color: #ddd;
-        z-index: 2;
-        -webkit-appearance: none;
-        border: none;
-        background: none;
-        width: 45px;
-        height: $toolbar-height - 1;
-        padding: 0;
-        position: relative;
-        svg {
-            pointer-events: none;
-        }
-        svg * {
-            @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
-        }
-    }
     .entry-button-wrap {
         float: right;
     }
@@ -2791,7 +2798,7 @@ $saved-search-control-height: 48px;
         svg {
             position: absolute;
             top: $base-button-position + 1;
-            left: 15px;
+            left: 16px;
             height: 17px;
             width: 17px;
         }
@@ -2829,23 +2836,12 @@ $saved-search-control-height: 48px;
             width: 16px;
         }
     }
-    .button-full-screen {
-        display: none;
-        svg {
-            position: absolute;
-            top: $base-button-position + 3;
-            top: 12px;
-            left: 3px;
-            height: 14px;
-            width: 14px;
-        }
-    }
     .button-app-settings {
         border-left: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
         svg {
             position: absolute;
-            top: $base-button-position + 7;
+            top: $base-button-position + 6;
             left: 14px;
             height: 8px;
             width: 14px;
@@ -2863,12 +2859,24 @@ $saved-search-control-height: 48px;
             }
         }
     }
-    .full-screen & {
-        width: 300px;
-        right: -10px;
-        .button-full-screen {
-            display: block;
-        }
+}
+
+.entry-button {
+    display: block;
+    background-color: #ddd;
+    z-index: 2;
+    -webkit-appearance: none;
+    border: none;
+    background: none;
+    width: 44px;
+    height: $toolbar-height - 1;
+    padding: 0;
+    position: relative;
+    svg {
+        pointer-events: none;
+    }
+    svg * {
+        @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
     }
 }
 
@@ -5498,9 +5506,6 @@ Fullscreen
     .app-panel {
         border-top: none;
     }
-    .entry-basement {
-        top: 0;
-    }
 }
 
 
@@ -5888,7 +5893,7 @@ Media Queries
     border-bottom: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     @include arrow(
-        $x-position: 201px,
+        $x-position: 241px,
         $y-position: -1px,
         $arrow-color: $body-background-color,
         $arrow-color-night: $body-background-color-night,
@@ -5900,18 +5905,6 @@ Media Queries
     {
         z-index: 10;
         visibility: hidden;
-    }
-    .full-screen & {
-        @include arrow(
-            $x-position: 236px,
-            $y-position: -1px,
-            $arrow-color: $body-background-color,
-            $arrow-color-night: $body-background-color-night,
-            $arrow-color-sunset: $body-background-color-sunset,
-            $shadow-color: $arrow-shadow-color,
-            $shadow-color-night: $arrow-shadow-color-night,
-            $shadow-color-sunset: $arrow-shadow-color-sunset,
-            $origin: right);
     }
     .entry-basement.open &:after,
     .entry-basement.open &:before {
