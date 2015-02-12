@@ -1997,8 +1997,7 @@ $saved-search-control-height: 48px;
 
 .entries {
     position: absolute;
-    transform: translateY($toolbar-height);
-    top: 0;
+    top: $toolbar-height;
     bottom: 0;
     left: 0;
     right: 0;
