@@ -7,7 +7,7 @@ class RecentlyReadEntriesController < ApplicationController
     recently_read_entries = @user.recently_read_entries.order('created_at DESC').limit(100)
     recently_read_entry_ids = []
     recently_read_entries.each {|recently_read_entry| recently_read_entry_ids << recently_read_entry.entry_id}
-    @entries = Entry.where(id: recently_read_entry_ids).includes(:feed)
+    @entries = Entry.where(id: recently_read_entry_ids).includes(:feed).entries_list
     @entries = @entries.sort_by{ |entry| recently_read_entry_ids.index(entry.id) }
 
     @type = 'recently_read'

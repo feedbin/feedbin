@@ -181,6 +181,10 @@ class Entry < ActiveRecord::Base
     entries
   end
 
+  def self.entries_list
+    select(:id, :feed_id, :title, :summary, :published)
+  end
+
   def self.include_unread_entries(user_id)
     joins("LEFT OUTER JOIN unread_entries ON entries.id = unread_entries.entry_id AND unread_entries.user_id = #{user_id.to_i}")
   end
@@ -332,7 +336,7 @@ class Entry < ActiveRecord::Base
       feed.save
     end
   end
-  
+
   def count_update
     $redis.zincrby("update_counts", 1, self.feed_id)
   end

@@ -127,16 +127,16 @@ class ApplicationController < ActionController::Base
   def feeds_response
     if 'view_all' == @user.get_view_mode
       # Get all entries 100 at a time, then get unread info
-      @entries = Entry.where(feed_id: @feed_ids).page(params[:page]).includes(:feed).sort_preference('DESC')
+      @entries = Entry.where(feed_id: @feed_ids).page(params[:page]).includes(:feed).sort_preference('DESC').entries_list
     elsif 'view_starred' == @user.get_view_mode
       # Get starred info, then get entries
       starred_entries = @user.starred_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).order("published DESC")
-      @entries = Entry.entries_with_feed(starred_entries, 'DESC')
+      @entries = Entry.entries_with_feed(starred_entries, 'DESC').entries_list
     else
       # Get unread info, then get entries
       @all_unread = 'true'
       unread_entries = @user.unread_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).sort_preference(@user.entry_sort)
-      @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort)
+      @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort).entries_list
     end
 
     if 'view_all' == @user.get_view_mode

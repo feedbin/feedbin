@@ -9,7 +9,7 @@ class EntriesController < ApplicationController
     @user = current_user
     update_selected_feed!("collection_all")
 
-    @entries = Entry.from_id_cache(@user.id, params[:page]).includes(:feed).sort_preference('DESC')
+    @entries = Entry.from_id_cache(@user.id, params[:page]).includes(:feed).sort_preference('DESC').entries_list
 
     key = FeedbinUtils.redis_user_entries_published_key(@user.id)
     @page_query = WillPaginate::Collection.new(params[:page] || 1, WillPaginate.per_page, $redis.zcard(key))
@@ -31,7 +31,7 @@ class EntriesController < ApplicationController
     update_selected_feed!('collection_unread')
 
     unread_entries = @user.unread_entries.select(:entry_id).page(params[:page]).sort_preference(@user.entry_sort)
-    @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort)
+    @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort).entries_list
 
     @page_query = unread_entries
 
@@ -53,7 +53,7 @@ class EntriesController < ApplicationController
     update_selected_feed!("collection_starred")
 
     starred_entries = @user.starred_entries.select(:entry_id).page(params[:page]).order("published DESC")
-    @entries = Entry.entries_with_feed(starred_entries, "published DESC")
+    @entries = Entry.entries_with_feed(starred_entries, "published DESC").entries_list
 
     @page_query = starred_entries
 
