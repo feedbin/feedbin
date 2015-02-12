@@ -2678,6 +2678,7 @@ $saved-search-control-height: 48px;
 }
 
 .entry-content-wrap {
+    overflow: hidden;
     position: absolute;
     top: 0;
     bottom: 0;
