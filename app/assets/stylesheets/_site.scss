@@ -1472,6 +1472,7 @@ Structure
     border-top: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     position: absolute;
+    z-index: 2;
     bottom: 0;
     left: 0;
     right: 0;
@@ -1543,9 +1544,9 @@ $subscribe-wrap-height: 49px;
     right: 0;
     z-index: 1;
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-    transition: top .2s ease;
+    transition: transform .2s ease;
     &.show-subscribe {
-        top: $toolbar-height + $subscribe-wrap-height;
+        transform: translateY($subscribe-wrap-height);
     }
 }
 
@@ -1831,6 +1832,9 @@ li.selected > a .favicon-wrap {
     height: 16px;
     width: 11px;
     padding: 0;
+    .full-screen & {
+        display: none !important;
+    }
 }
 
 .entries-header {
@@ -1993,20 +1997,21 @@ $saved-search-control-height: 48px;
 
 .entries {
     position: absolute;
-    top: $toolbar-height;
+    transform: translateY($toolbar-height);
+    top: 0;
     bottom: 0;
     left: 0;
     right: 0;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    transition: top .2s ease;
+    transition: transform .2s ease;
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     &.show-search-options {
-        top: $toolbar-height + $toolbar-height;
+        transform: translateY($toolbar-height);
     }
     &.show-saved-search {
-        top: $toolbar-height + $toolbar-height + $saved-search-control-height;
+        transform: translateY($toolbar-height + $saved-search-control-height);
     }
     ul {
         margin: 0;
@@ -2685,7 +2690,7 @@ $saved-search-control-height: 48px;
     margin: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    transition: top .2s ease;
+    transition: transform .2s ease;
     -webkit-overflow-scrolling: touch;
     z-index: 2;
 }
@@ -5585,7 +5590,7 @@ Media Queries
     }
     .hide-search.feed-selected .entries,
     .hide-search.entry-selected .entries {
-        top: 0;
+        transform: translateY(0);
     }
     .entry-toolbar, .entry-feed-title {
         .entry-feed-title {
@@ -5653,16 +5658,13 @@ Media Queries
         }
     }
     .entry-toolbar {
-        .favicon-wrap {
+        .site-info {
             display: none;
-            .full-screen & {
-                display: block;
-            }
         }
     }
     .entries {
         .hide-search & {
-            top: 0;
+            transform: translateY(0);
         }
     }
     .entry-basement {

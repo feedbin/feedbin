@@ -332,7 +332,7 @@ $.extend feedbin,
 
         height = Math.ceil(values.shift() * canvasHeight)
         yPosition = (canvasHeight - height) + 1
-        
+
         context.moveTo(xPosition, yPosition)
 
         for value in values
@@ -393,7 +393,7 @@ $.extend feedbin,
     top = $('.entry-toolbar').outerHeight()
     $('.entry-basement').removeClass('open')
     $('.entry-content').css
-      top: top
+      transform: "translateY(0)"
 
   openEntryBasement: (selectedPanel) ->
     feedbin.openEntryBasementTimeount = setTimeout ( ->
@@ -408,9 +408,9 @@ $.extend feedbin,
     $('.basement-panel').addClass('hide')
     selectedPanel.removeClass('hide')
     $('.entry-basement').addClass('open')
-    newTop = $('.entry-toolbar').outerHeight() + selectedPanel.height()
+    newTop = selectedPanel.height()
     $('.entry-content').css
-      top: newTop
+      transform: "translateY(#{newTop}px)"
 
   applyStarred: (entryId) ->
     if feedbin.Counts.get().isStarred(entryId)
@@ -420,9 +420,9 @@ $.extend feedbin,
     entry = feedbin.entries[entryId]
     feedbin.updateEntryContent(entry.content)
     feedbin.formatEntryContent(entryId, true)
-  
+
   entries: {}
-  
+
   feedCandidates: []
 
   modalShowing: false
