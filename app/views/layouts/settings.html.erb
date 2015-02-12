@@ -3,7 +3,7 @@
   <div class="settings-inner">
     <%= render partial: 'shared/settings_nav' %>
     <div class="settings-content">
-      <div class="hamburger-menu" data-behavior="show_settings_modal"></div>
+      <%= render partial: 'shared/hamburger_menu_button' %>
       <div class="settings-content-inner">
         <%= render partial: 'shared/flash', locals: {flash: flash} %>
       </div>

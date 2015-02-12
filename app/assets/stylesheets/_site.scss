@@ -1427,13 +1427,21 @@ Structure
     }
 }
 
-.hamburger-menu {
+.hamburger-menu-wrap {
+    position: absolute;
     display: none;
     user-select: none;
+    top: 0;
+    right: 0;
+    height: $toolbar-height;
+    width: $toolbar-height;
+}
+
+.hamburger-menu {
     $bar-height: 3px;
     position: absolute;
     cursor: pointer;
-    top: 10px;
+    top: $base-button-position + 2;
     right: 10px;
     height: 17px;
     width: 22px;
@@ -3029,6 +3037,172 @@ $saved-search-control-height: 48px;
     }
 }
 
+
+.share-form {
+    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    padding: 17px 20px;
+    border-bottom: 1px solid transparent;
+    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include arrow(
+        $x-position: 241px,
+        $y-position: -1px,
+        $arrow-color: $body-background-color,
+        $arrow-color-night: $body-background-color-night,
+        $arrow-color-sunset: $body-background-color-sunset,
+        $shadow-color: $arrow-shadow-color,
+        $shadow-color-night: $arrow-shadow-color-night,
+        $shadow-color-sunset: $arrow-shadow-color-sunset,
+        $origin: right)
+    {
+        z-index: 10;
+        visibility: hidden;
+    }
+    .entry-basement.open &:after,
+    .entry-basement.open &:before {
+        visibility: visible;
+    }
+    .share-form-inner {
+        max-width: 620px;
+        margin: 0 auto;
+    }
+    h2 {
+        font-size: 16px;
+        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        font-weight: bold;
+        margin: 0 0 15px 0;
+    }
+    .field-cluster {
+        margin-bottom: 15px;
+        input, textarea {
+            @include background-color($input-background-color, $input-background-color, $input-background-color);
+            @include color($text-header-color, $text-header-color, $text-header-color);
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            position: relative;
+            border-radius: 0;
+            border-bottom: none;
+            padding: 10px 10px 8px 10px !important;
+            font-size: 16px;
+            &:focus {
+                @include border-color($border-color, $border-color-night, $border-color-sunset);
+            }
+            &:first-child {
+                border-radius: 4px 4px 0 0;
+            }
+            &:last-child {
+                border-radius: 0 0 4px 4px;
+                border-bottom: 1px solid transparent;
+                @include border-color($border-color, $border-color-night, $border-color-sunset);
+            }
+        }
+        textarea {
+            resize: none;
+        }
+    }
+    .share-controls {
+        overflow: hidden;
+        margin-bottom: 10px;
+        .checkbox, .radio, .control {
+            float: left;
+            margin-left: 15px;
+            font-size: 14px;
+            @include color($text-color-light-night, $text-color-light-night, $text-color-light-night);
+            &:first-child {
+                margin-left: 0
+            }
+            input {
+                margin-top: 2px;
+            }
+        }
+    }
+    .button {
+        padding: 9px 15px;
+        background-color: $selected;
+        color: #fff;
+        &:hover {
+            background-color: #2877c6;
+        }
+    }
+    .button-text {
+        background-color: transparent;
+        color: $selected;
+        &:hover {
+            background-color: transparent;
+            color: #2877c6;
+        }
+    }
+    .button-wrap {
+        overflow: hidden;
+        input, button {
+            float: right;
+        }
+    }
+    .icon-share-email {
+        background: image-url("icon-share-email.svg") 100% 0 no-repeat;
+        background-size: 24px 16px;
+    }
+    .icon-share-evernote {
+        background: image-url("icon-share-evernote.svg") 100% 0 no-repeat;
+        background-size: 20px 25px;
+    }
+    .icon-share-tumblr {
+        background: image-url("icon-share-tumblr.svg") 100% 0 no-repeat;
+        background-size: 14px 24px;
+    }
+    .icon-share-pinboard {
+        background: image-url("icon-share-pinboard.svg") 100% 0 no-repeat;
+        background-size: 25px 25px;
+    }
+    .autocomplete-parent {
+        position: relative;
+        .share-autocomplete {
+            z-index: 2;
+            position: absolute;
+            top: 39px;
+            left: 7px;
+            width: 100%;
+            max-width: 400px;
+            @include background-color($input-background-color, $input-background-color, $input-background-color);
+            border-left: 1px solid transparent;
+            border-right: 1px solid transparent;
+            border-bottom: 1px solid transparent;
+            @include border-color($border-color, $border-color-night, $border-color-sunset);
+        }
+        .autocomplete-suggestion {
+            &:hover, &.autocomplete-selected {
+                background-color: rgba(#000, .1);
+            }
+        }
+    }
+}
+
+.theme-night.full-screen .share-form:before {
+    border-top-color: black;
+}
+.theme-sunset.full-screen .share-form:before {
+    border-top-color: $arrow-shadow-color-sunset;
+}
+.theme-night.full-screen .share-form:after {
+    border-top-color: $body-background-color-night;
+}
+.theme-sunset.full-screen .share-form:after {
+    border-top-color: $body-background-color-sunset;
+}
+
+.theme-night.full-screen .entry-settings:before {
+    border-top-color: black;
+}
+.theme-sunset.full-screen .entry-settings:before {
+    border-top-color: $arrow-shadow-color-sunset;
+}
+.theme-night.full-screen .entry-settings:after {
+    border-top-color: $body-background-color-night;
+}
+.theme-sunset.full-screen .entry-settings:after {
+    border-top-color: $body-background-color-sunset;
+}
+
 .content-styles {
     font-style: normal;
     font-size: 1.15em;
@@ -3561,7 +3735,7 @@ Settings
     .settings-nav {
         display: none;
     }
-    .hamburger-menu,
+    .hamburger-menu-wrap,
     .desktop-hide {
         display: block !important;
     }
@@ -5624,7 +5798,7 @@ Media Queries
 }
 
 @media (max-width: 550px) {
-    .hamburger-menu,
+    .hamburger-menu-wrap,
     .desktop-hide {
         display: block !important;
     }
@@ -5718,169 +5892,20 @@ Media Queries
     .button-app-settings {
         display: none;
     }
-}
-
-.share-form {
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-    padding: 17px 20px;
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
-    @include arrow(
-        $x-position: 241px,
-        $y-position: -1px,
-        $arrow-color: $body-background-color,
-        $arrow-color-night: $body-background-color-night,
-        $arrow-color-sunset: $body-background-color-sunset,
-        $shadow-color: $arrow-shadow-color,
-        $shadow-color-night: $arrow-shadow-color-night,
-        $shadow-color-sunset: $arrow-shadow-color-sunset,
-        $origin: right)
-    {
-        z-index: 10;
-        visibility: hidden;
-    }
-    .entry-basement.open &:after,
-    .entry-basement.open &:before {
-        visibility: visible;
-    }
-    .share-form-inner {
-        max-width: 620px;
-        margin: 0 auto;
-    }
-    h2 {
-        font-size: 16px;
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-        font-weight: bold;
-        margin: 0 0 15px 0;
-    }
-    .field-cluster {
-        margin-bottom: 15px;
-        input, textarea {
-            @include background-color($input-background-color, $input-background-color, $input-background-color);
-            @include color($text-header-color, $text-header-color, $text-header-color);
-            width: 100%;
-            max-width: 100%;
-            margin: 0;
-            position: relative;
-            border-radius: 0;
-            border-bottom: none;
-            padding: 10px 10px 8px 10px !important;
-            font-size: 16px;
-            &:focus {
-                @include border-color($border-color, $border-color-night, $border-color-sunset);
-            }
-            &:first-child {
-                border-radius: 4px 4px 0 0;
-            }
-            &:last-child {
-                border-radius: 0 0 4px 4px;
-                border-bottom: 1px solid transparent;
-                @include border-color($border-color, $border-color-night, $border-color-sunset);
-            }
+    .entry-settings {
+        &:before {
+            right: 19px;
         }
-        textarea {
-            resize: none;
+        &:after {
+            right: 20px;
         }
     }
-    .share-controls {
-        overflow: hidden;
-        margin-bottom: 10px;
-        .checkbox, .radio, .control {
-            float: left;
-            margin-left: 15px;
-            font-size: 14px;
-            @include color($text-color-light-night, $text-color-light-night, $text-color-light-night);
-            &:first-child {
-                margin-left: 0
-            }
-            input {
-                margin-top: 2px;
-            }
+    .share-form {
+        &:before {
+            right: 196px;
+        }
+        &:after {
+            right: 197px;
         }
     }
-    .button {
-        padding: 9px 15px;
-        background-color: $selected;
-        color: #fff;
-        &:hover {
-            background-color: #2877c6;
-        }
-    }
-    .button-text {
-        background-color: transparent;
-        color: $selected;
-        &:hover {
-            background-color: transparent;
-            color: #2877c6;
-        }
-    }
-    .button-wrap {
-        overflow: hidden;
-        input, button {
-            float: right;
-        }
-    }
-    .icon-share-email {
-        background: image-url("icon-share-email.svg") 100% 0 no-repeat;
-        background-size: 24px 16px;
-    }
-    .icon-share-evernote {
-        background: image-url("icon-share-evernote.svg") 100% 0 no-repeat;
-        background-size: 20px 25px;
-    }
-    .icon-share-tumblr {
-        background: image-url("icon-share-tumblr.svg") 100% 0 no-repeat;
-        background-size: 14px 24px;
-    }
-    .icon-share-pinboard {
-        background: image-url("icon-share-pinboard.svg") 100% 0 no-repeat;
-        background-size: 25px 25px;
-    }
-    .autocomplete-parent {
-        position: relative;
-        .share-autocomplete {
-            z-index: 2;
-            position: absolute;
-            top: 39px;
-            left: 7px;
-            width: 100%;
-            max-width: 400px;
-            @include background-color($input-background-color, $input-background-color, $input-background-color);
-            border-left: 1px solid transparent;
-            border-right: 1px solid transparent;
-            border-bottom: 1px solid transparent;
-            @include border-color($border-color, $border-color-night, $border-color-sunset);
-        }
-        .autocomplete-suggestion {
-            &:hover, &.autocomplete-selected {
-                background-color: rgba(#000, .1);
-            }
-        }
-    }
-}
-
-.theme-night.full-screen .share-form:before {
-    border-top-color: black;
-}
-.theme-sunset.full-screen .share-form:before {
-    border-top-color: $arrow-shadow-color-sunset;
-}
-.theme-night.full-screen .share-form:after {
-    border-top-color: $body-background-color-night;
-}
-.theme-sunset.full-screen .share-form:after {
-    border-top-color: $body-background-color-sunset;
-}
-
-.theme-night.full-screen .entry-settings:before {
-    border-top-color: black;
-}
-.theme-sunset.full-screen .entry-settings:before {
-    border-top-color: $arrow-shadow-color-sunset;
-}
-.theme-night.full-screen .entry-settings:after {
-    border-top-color: $body-background-color-night;
-}
-.theme-sunset.full-screen .entry-settings:after {
-    border-top-color: $body-background-color-sunset;
 }

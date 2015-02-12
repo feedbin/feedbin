@@ -22,7 +22,7 @@
   <div class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
     <div class="subscribe-toolbar">
       <div class="show-subscribe" data-behavior="show_subscribe">Subscribe</div>
-      <div class="hamburger-menu" data-behavior="show_settings_modal"></div>
+      <%= render partial: 'shared/hamburger_menu_button' %>
     </div>
     <div class="subscribe-wrap">
       <%= form_for :subscription, url: subscriptions_path, remote: true, html: { data: {behavior: 'subscription_form'}, novalidate: 'novalidate' }  do |f| %>
