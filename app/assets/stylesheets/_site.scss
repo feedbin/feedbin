@@ -5587,10 +5587,6 @@ Media Queries
             display: block;
         }
     }
-    .hide-search.feed-selected .entries,
-    .hide-search.entry-selected .entries {
-        transform: translateY(0);
-    }
     .entry-toolbar, .entry-feed-title {
         .entry-feed-title {
             display: none;
@@ -5612,6 +5608,12 @@ Media Queries
             left: 14px;
             margin: 0;
         }
+    }
+    .search-button {
+        display: none !important;
+    }
+    .entry-selected .entries {
+        top: 0;
     }
 }
 
@@ -5661,7 +5663,12 @@ Media Queries
             display: none;
         }
     }
+    .search-button {
+        display: block !important;
+    }
     .entries {
+        top: 0;
+        transform: translateY($toolbar-height);
         .hide-search & {
             transform: translateY(0);
         }
@@ -5707,6 +5714,9 @@ Media Queries
     }
     .entries ul li:hover.starred .icon-star {
         display: block !important;
+    }
+    .button-app-settings {
+        display: none;
     }
 }
 
