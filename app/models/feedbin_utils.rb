@@ -29,7 +29,4 @@ class FeedbinUtils
     "user:%d:feed_key:%s:entry_ids:published" % [user_id, feed_key]
   end
 
-  def self.redis_key_set(user_id)
-    "user:%d:key_set" % user_id
-  end
 end

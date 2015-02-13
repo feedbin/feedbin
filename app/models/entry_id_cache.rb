@@ -34,9 +34,8 @@ class EntryIdCache
         FeedbinUtils.redis_feed_entries_published_key(feed_id)
       end
 
-      count, sadd, expire, entry_ids = $redis.multi do
+      count, expire, entry_ids = $redis.multi do
         $redis.zunionstore(cache_key, keys)
-        $redis.sadd(FeedbinUtils.redis_key_set(@user_id), cache_key)
         $redis.expire(cache_key, 2.minutes.to_i)
         $redis.zrevrange(cache_key, start, stop)
       end
