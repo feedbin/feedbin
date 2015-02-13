@@ -59,7 +59,9 @@ class Subscription < ActiveRecord::Base
   end
 
   def expire_entry_cache
-    $redis.del(FeedbinUtils.redis_user_entries_published_key(self.user_id))
+    set_key = FeedbinUtils.redis_key_set(self.user_id)
+    keys = $redis.smembers(set_key) + [set_key]
+    $redis.del(keys)
   end
 
   def update_favicon_hash

@@ -1,7 +1,5 @@
 class EntriesController < ApplicationController
 
-  include RedisCache
-
   skip_before_action :verify_authenticity_token, only: [:push_view]
   skip_before_action :authorize, only: [:push_view]
 
@@ -9,10 +7,11 @@ class EntriesController < ApplicationController
     @user = current_user
     update_selected_feed!("collection_all")
 
-    @entries = Entry.from_id_cache(@user.id, params[:page]).includes(:feed).sort_preference('DESC').entries_list
+    feed_ids = @user.subscriptions.pluck(:feed_id)
+    entry_id_cache = EntryIdCache.new(@user.id, feed_ids, params[:page])
 
-    key = FeedbinUtils.redis_user_entries_published_key(@user.id)
-    @page_query = WillPaginate::Collection.new(params[:page] || 1, WillPaginate.per_page, $redis.zcard(key))
+    @entries = entry_id_cache.entries
+    @page_query = entry_id_cache.page_query
 
     @append = params[:page].present?
 
