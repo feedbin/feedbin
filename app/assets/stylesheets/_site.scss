@@ -1559,6 +1559,9 @@ $subscribe-wrap-height: 49px;
     transition: transform .2s ease;
     &.show-subscribe {
         transform: translateY($subscribe-wrap-height);
+        .feeds {
+            padding-bottom: $subscribe-wrap-height;
+        }
     }
 }
 
@@ -2005,6 +2008,7 @@ $saved-search-control-height: 48px;
     bottom: 0;
     left: 0;
     right: 0;
+    overflow: hidden;
 }
 
 .entries {
@@ -2020,9 +2024,11 @@ $saved-search-control-height: 48px;
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     &.show-search-options {
         transform: translateY($toolbar-height);
+        padding-bottom: $toolbar-height;
     }
     &.show-saved-search {
         transform: translateY($toolbar-height + $saved-search-control-height);
+        padding-bottom: $toolbar-height + $saved-search-control-height;
     }
     ul {
         margin: 0;
