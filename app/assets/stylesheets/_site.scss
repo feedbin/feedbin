@@ -2055,7 +2055,7 @@ $saved-search-control-height: 48px;
         display: block;
         padding: 0;
         left: 0;
-        transition:left .2s ease;
+        transition: transform .2s ease;
         &:hover {
             text-decoration: none;
         }
@@ -2259,7 +2259,7 @@ $saved-search-control-height: 48px;
     }
     &.show-actions {
         a {
-            left: -70%;
+            transform: translateX(-70%);
         }
     }
     .mark-above-read,
