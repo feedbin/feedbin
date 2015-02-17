@@ -1311,14 +1311,18 @@ Structure
 
 .subscribe-promo {
     position: absolute;
-    right: 160px;
-    top: 5px;
+    right: 60px;
+    top: 7px;
     color: $selected;
     font-size: 13px;
     display: inline-block;
     padding: 4px 8px;
     border: 1px solid $selected;
     border-radius: 4px;
+    z-index: 100;
+    .entry-selected & {
+        display: none;
+    }
     &:hover {
         text-decoration: none;
     }
