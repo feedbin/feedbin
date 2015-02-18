@@ -1707,7 +1707,8 @@ $subscribe-wrap-height: 49px;
                 }
             }
             &.ui-draggable-dragging {
-                background-color: rgba(51,153,255,.9);
+                background-color: rgba(255,255,255, 1);
+                opacity: .8;
                 border-radius: 4px;
                 .count {
                     display: none;
