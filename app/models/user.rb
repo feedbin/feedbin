@@ -71,6 +71,10 @@ class User < ActiveRecord::Base
   validate :plan_type_valid, on: :update
   validate :trial_plan_valid
 
+  def hide_tagged_feeds
+    "1"
+  end
+
   def get_view_mode
     view_mode || "view_unread"
   end
