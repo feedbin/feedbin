@@ -1706,6 +1706,16 @@ $subscribe-wrap-height: 49px;
                     background-color: $selected;
                 }
             }
+            &.ui-draggable-dragging {
+                background-color: rgba(51,153,255,.9);
+                border-radius: 4px;
+                .count {
+                    display: none;
+                }
+                .feed-link {
+                    background-color: transparent !important;
+                }
+            }
         }
     }
     .drawer {
@@ -1731,6 +1741,9 @@ $subscribe-wrap-height: 49px;
                 z-index: 4;
             }
         }
+    }
+    .droppable-hover > a {
+        background-color: $selected !important;
     }
 }
 

@@ -423,6 +423,38 @@ $.extend feedbin,
     feedbin.updateEntryContent(entry.content)
     feedbin.formatEntryContent(entryId, true)
 
+  draggable: ->
+    $('[data-behavior~=draggable]').draggable
+      containment: '.feeds'
+      helper: 'clone'
+      appendTo: '[data-behavior~=feeds_target]'
+
+  droppable: ->
+    $('[data-behavior~=droppable]:not(.ui-droppable)').droppable
+      hoverClass: 'selected'
+      greedy: true
+      drop: (event, ui) ->
+
+        tag = $("> a", event.target).find(".rename-feed-input").val()
+        if !tag?
+          tag = ""
+
+        url = ui.draggable.data('feed-path')
+
+        $.ajax
+          type: "POST",
+          url: url,
+          data: { "_method": "patch", feed: {tag_list: tag} }
+
+        target = $(event.target)
+        target = if target.is('[data-behavior~=feeds_target]') then target else $(".drawer ul", target)
+        ui.helper.remove()
+        ui.draggable.appendTo(target)
+        $('> [data-sort-name]', target).sort(feedbin.sortByName).remove().appendTo(target)
+        setTimeout ( ->
+          feedbin.draggable()
+        ), 100
+
   entries: {}
 
   feedCandidates: []
@@ -1218,6 +1250,10 @@ $.extend feedbin,
 
         $('.share-form .type-text').text(typeText)
         $('.share-form .description-placeholder').attr('placeholder', description)
+
+    dragAndDrop: ->
+      feedbin.droppable()
+      feedbin.draggable()
 
 
 jQuery ->
