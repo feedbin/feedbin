@@ -999,8 +999,6 @@ $.extend feedbin,
     hideUpdates: ->
       $(document).on 'click', '[data-behavior~=hide_updates]', (event) ->
         container = $(@).parents('.diff-wrap')
-        console.log 'hideUpdates', event
-        console.log 'feedbin.data.update_message_seen', feedbin.data.update_message_seen
         if feedbin.data.update_message_seen
           container.addClass('hide')
         else
