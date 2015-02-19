@@ -77,6 +77,11 @@ class EvernoteShare < Service
     if exception.respond_to?(:errorCode) && exception.errorCode == Evernote::EDAM::Error::EDAMErrorCode::AUTH_EXPIRED
       401
     else
+      Honeybadger.notify(
+        error_class: "EvernoteShare#add",
+        error_message: "EvernoteShare add failure",
+        parameters: {exception: exception, user: @klass.user.id}
+      )
       500
     end
   end
