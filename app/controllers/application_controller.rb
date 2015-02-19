@@ -114,7 +114,8 @@ class ApplicationController < ActionController::Base
       collections: get_collections,
       tags: @user.tag_group,
       saved_searches: @user.saved_searches.order("lower(name)"),
-      count_data: @count_data
+      count_data: @count_data,
+      feed_order: @user.feed_order
     }
   end
 

@@ -288,6 +288,15 @@ $.extend feedbin,
   sortByName: (a, b) ->
     $(a).data('sort-name').localeCompare($(b).data('sort-name'))
 
+  sortByFeedOrder: (a, b) ->
+    a = parseInt($(a).data('sort-id'))
+    b = parseInt($(b).data('sort-id'))
+
+    a = feedbin.data.feed_order.indexOf(a)
+    b = feedbin.data.feed_order.indexOf(b)
+
+    a - b
+
   showSearchControls: (sort) ->
     $('.search-control').removeClass('hide');
     text = null
@@ -450,7 +459,7 @@ $.extend feedbin,
         target = if target.is('[data-behavior~=feeds_target]') then target else $(".drawer ul", target)
         ui.helper.remove()
         ui.draggable.appendTo(target)
-        $('> [data-sort-name]', target).sort(feedbin.sortByName).remove().appendTo(target)
+        $('> [data-behavior~=sort_feed]', target).sort(feedbin.sortByFeedOrder).remove().appendTo(target)
         setTimeout ( ->
           feedbin.draggable()
         ), 100

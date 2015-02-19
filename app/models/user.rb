@@ -237,6 +237,10 @@ class User < ActiveRecord::Base
     unique_tags
   end
 
+  def feed_order
+    feeds.include_user_title.map {|feed| feed.id}
+  end
+
   def subscribe!(feed)
     subscriptions.create!(feed_id: feed.id)
   end
