@@ -1963,7 +1963,16 @@ $saved-search-control-height: 48px;
     }
     .dropdown-wrap ul {
         top: 35px;
-        left: -52px;
+        left: 8px;
+        li:first-child {
+            &:after {
+                left: 38px
+            }
+            &:before {
+                left: 37px
+            }
+        }
+
     }
     .saved-search-wrap {
         height: $saved-search-control-height;

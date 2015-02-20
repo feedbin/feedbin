@@ -507,6 +507,10 @@ $.extend feedbin,
         field.val(title)
         field.addClass('disabled')
 
+      $(document).on 'click', '[data-behavior~=open_item]', (event) ->
+        $('.rename-feed-input').each ->
+          $(@).blur()
+
       $(document).on 'submit', '.edit_feed', (event, xhr) ->
         field = $(@).find('.rename-feed-input')
 
@@ -721,7 +725,7 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=share_options] a', (event) ->
         $('.dropdown-wrap').removeClass('open')
 
-      $(document).on 'click', '[data-behavior~=toggle_share_menu]', (event) ->
+      $(document).on 'click', '[data-behavior~=toggle_dropdown]', (event) ->
         $(".dropdown-wrap li").removeClass('selected')
         parent = $(@).closest('.dropdown-wrap')
         if parent.hasClass('open')
