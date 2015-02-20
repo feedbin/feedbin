@@ -11,9 +11,12 @@ class FeedsController < ApplicationController
     @feed = Feed.find(params[:id])
     @feed.tag(params[:feed][:tag_list], @user)
 
-    get_feeds_list
+    if params[:no_response].present?
+      render nothing: true
+    else
+      get_feeds_list
+    end
 
-    respond_to :js
   end
 
   def rename

@@ -437,6 +437,7 @@ $.extend feedbin,
       containment: '.feeds'
       helper: 'clone'
       appendTo: '[data-behavior~=feeds_target]'
+      scrollSpeed: 40
 
   droppable: ->
     $('[data-behavior~=droppable]:not(.ui-droppable)').droppable
@@ -448,22 +449,36 @@ $.extend feedbin,
       greedy: true
       drop: (event, ui) ->
 
+        feedId = parseInt(ui.draggable.data('feed-id'))
         tag = $("> a", event.target).find(".rename-feed-input").val()
-        if !tag?
+        if tag?
+          tagId = $(event.target).data('tag-id')
+        else
           tag = ""
+          tagId = null
+
+
+        feedbin.Counts.get().updateTagMap(feedId, tagId)
 
         url = ui.draggable.data('feed-path')
 
         $.ajax
           type: "POST",
           url: url,
-          data: { "_method": "patch", feed: {tag_list: tag} }
+          data: { _method: "patch", feed: {tag_list: tag}, no_response: true }
 
         target = $(event.target)
         target = if target.is('[data-behavior~=feeds_target]') then target else $(".drawer ul", target)
         ui.helper.remove()
         ui.draggable.appendTo(target)
         $('> [data-behavior~=sort_feed]', target).sort(feedbin.sortByFeedOrder).remove().appendTo(target)
+
+        feedbin.applyCounts(false)
+
+        $('[data-tag-id]').each ->
+          if $(@).find('ul li').length == 0
+            $(@).remove()
+
         setTimeout ( ->
           feedbin.draggable()
         ), 20

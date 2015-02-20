@@ -13,10 +13,15 @@ class _Counts
       unread: options.unread_entries
       starred: options.starred_entries
       updated: options.updated_entries
-    @counts =
+    @counts = @allCounts()
+
+  allCounts: ->
+    {
       unread: @organizeCounts(@collections.unread)
       starred: @organizeCounts(@collections.starred)
       updated: @organizeCounts(@collections.updated)
+    }
+
 
   removeEntry: (entryId, feedId, collection) ->
     index = @counts[collection].all.indexOf(entryId);
@@ -88,6 +93,13 @@ class _Counts
 
   isStarred: (entryId) ->
     _.contains(@counts.starred.all, entryId)
+
+  updateTagMap: (feedId, tagId) ->
+    if tagId?
+      @tagMap[feedId] = [tagId]
+    else
+      delete @tagMap[feedId]
+    @counts = @allCounts()
 
 class Counts
   instance = null
