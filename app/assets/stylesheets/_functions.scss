@@ -115,13 +115,24 @@
 	}
 }
 
-@mixin color($day, $night, $sunset) {
-	color: $day;
-	.theme-night & {
-		color: $night;
+@mixin color($day, $night, $sunset, $important:false) {
+	@if $important == true {
+    	color: $day !important;
+    	.theme-night & {
+    		color: $night !important;
+    	}
+    	.theme-sunset & {
+    		color: $sunset !important;
+    	}
 	}
-	.theme-sunset & {
-		color: $sunset;
+	@else {
+    	color: $day;
+    	.theme-night & {
+    		color: $night;
+    	}
+    	.theme-sunset & {
+    		color: $sunset;
+    	}
 	}
 }
 

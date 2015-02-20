@@ -1715,6 +1715,12 @@ $subscribe-wrap-height: 49px;
                 }
                 .feed-link {
                     background-color: transparent !important;
+                    .rename-feed-input {
+                        @include color($text-header-color, $text-header-color, $text-header-color-sunset, true);
+                        &.disabled {
+                            @include color($text-header-color, $text-header-color, $text-header-color-sunset, true);
+                        }
+                    }
                 }
             }
         }
@@ -1771,9 +1777,9 @@ $subscribe-wrap-height: 49px;
     @include background-color($selected-off, $selected-off, $selected-off);
     color: #fff !important;
     .rename-feed-input {
-        color: $text-header-color !important;
+        color: $text-header-color;
         &.disabled {
-            color: #fff !important;
+            color: #fff;
         }
     }
 }

@@ -440,7 +440,11 @@ $.extend feedbin,
 
   droppable: ->
     $('[data-behavior~=droppable]:not(.ui-droppable)').droppable
-      hoverClass: 'selected'
+      hoverClass: ->
+        if $(@).is('[data-behavior~=feeds_target]')
+          ''
+        else
+          'selected'
       greedy: true
       drop: (event, ui) ->
 
@@ -462,7 +466,7 @@ $.extend feedbin,
         $('> [data-behavior~=sort_feed]', target).sort(feedbin.sortByFeedOrder).remove().appendTo(target)
         setTimeout ( ->
           feedbin.draggable()
-        ), 100
+        ), 20
 
   entries: {}
 
