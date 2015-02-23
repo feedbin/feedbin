@@ -225,7 +225,7 @@ class SettingsController < ApplicationController
   end
 
   def user_settings_params
-    params.require(:user).permit(:entry_sort, :starred_feed_enabled, :hide_tagged_feeds, :precache_images,
+    params.require(:user).permit(:entry_sort, :starred_feed_enabled, :precache_images,
                                  :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation,
                                  :apple_push_notification_device_token, :receipt_info, :entries_display,
                                  :entries_feed, :entries_time, :entries_body, :ui_typeface, :theme,

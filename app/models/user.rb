@@ -8,7 +8,6 @@ class User < ActiveRecord::Base
                  :entry_sort,
                  :previous_read_count,
                  :starred_feed_enabled,
-                 :hide_tagged_feeds,
                  :precache_images,
                  :show_unread_count,
                  :sticky_view_inline,
@@ -70,10 +69,6 @@ class User < ActiveRecord::Base
   validate :coupon_code_valid, on: :create, if: -> user { user.coupon_code }
   validate :plan_type_valid, on: :update
   validate :trial_plan_valid
-
-  def hide_tagged_feeds
-    "1"
-  end
 
   def get_view_mode
     view_mode || "view_unread"

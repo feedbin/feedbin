@@ -95,12 +95,8 @@ class ApplicationController < ActionController::Base
     @mark_selected = true
     @user = current_user
 
-    if @user.setting_on?(:hide_tagged_feeds)
-      excluded_feeds = @user.taggings.pluck(:feed_id).uniq
-      @feeds = @user.feeds.where.not(id: excluded_feeds).include_user_title
-    else
-      @feeds = @user.feeds.include_user_title
-    end
+    excluded_feeds = @user.taggings.pluck(:feed_id).uniq
+    @feeds = @user.feeds.where.not(id: excluded_feeds).include_user_title
 
     @count_data = {
       unread_entries: @user.unread_entries.pluck('feed_id, entry_id'),

@@ -40,7 +40,6 @@ describe SettingsController do
       {
         entry_sort: 'DESC',
         starred_feed_enabled: "true",
-        hide_tagged_feeds: "false",
         precache_images: "true",
         show_unread_count: "true",
         sticky_view_inline: "false",
