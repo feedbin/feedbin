@@ -314,7 +314,7 @@ class EntriesController < ApplicationController
         @content = @entry.content
       end
     rescue => e
-      @content = '(no content)'
+      @content = check_for_image(@entry, url)
     end
 
   end
@@ -333,6 +333,16 @@ class EntriesController < ApplicationController
       end
     end
     ids
+  end
+
+  private
+
+  def check_for_image(entry, url)
+    @content = '(no content)'
+    response = HTTParty.head(url)
+    if response.headers['content-type'] =~ /^image\//
+      @content = "<img src='#{url}' />"
+    end
   end
 
 end
