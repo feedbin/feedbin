@@ -1639,6 +1639,9 @@ $subscribe-wrap-height: 49px;
     @media (max-width: 550px) {
         bottom: 0;
     }
+    .feeds-list {
+        min-height: 100%;
+    }
     ul {
         margin: 0;
         padding: 0;
@@ -1695,19 +1698,9 @@ $subscribe-wrap-height: 49px;
                 padding: 0;
                 margin: 0;
             }
-            &.selected {
-                > a .count {
-                    color: rgba(255,255,255,.7);
-                }
-                .feed-action-button, input[disabled] {
-                    color: rgba(255,255,255,.9);
-                }
-                .rename-feed-button {
-                    background-color: $selected;
-                }
-            }
             &.ui-draggable-dragging {
                 background-color: rgba(255,255,255, 1);
+                background-color: $selected;
                 opacity: .8;
                 border-radius: 4px;
                 .count {
@@ -1716,9 +1709,9 @@ $subscribe-wrap-height: 49px;
                 .feed-link {
                     background-color: transparent !important;
                     .rename-feed-input {
-                        @include color($text-header-color, $text-header-color, $text-header-color-sunset, true);
+                        color: #FFF !important;
                         &.disabled {
-                            @include color($text-header-color, $text-header-color, $text-header-color-sunset, true);
+                            color: #FFF !important;
                         }
                     }
                 }
@@ -1759,7 +1752,7 @@ $subscribe-wrap-height: 49px;
     right: 45px;
     top: 0;
     font-weight: bold;
-    @include color($text-color-muted, $text-color-muted-night, $text-color-muted-sunset);
+    @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
     font-size: 11px;
     display: block;
     -webkit-appearance: none;
@@ -1773,7 +1766,19 @@ $subscribe-wrap-height: 49px;
     }
 }
 
-.feeds .selected > a {
+.feeds-list:not(.dragging) .selected  {
+    > a .count {
+        color: rgba(255,255,255,.7);
+    }
+    .feed-action-button, input[disabled] {
+        color: rgba(255,255,255,.9);
+    }
+    .rename-feed-button {
+        background-color: $selected;
+    }
+}
+
+.feeds-list:not(.dragging) .selected > a {
     @include background-color($selected-off, $selected-off, $selected-off);
     color: #fff !important;
     .rename-feed-input {
@@ -1784,19 +1789,56 @@ $subscribe-wrap-height: 49px;
     }
 }
 
-.selected .feeds .selected > a {
+.selected .feeds-list:not(.dragging) .selected > a {
     background: $selected;
     &:hover {
         background: $selected;
     }
 }
 
-.feeds li.selected .drawer ul:after {
+.feeds-list:not(.dragging) li.selected .drawer ul:after {
     border-top-color: $selected-off;
 }
 
-.selected li.selected .drawer ul:after {
+.selected .feeds-list:not(.dragging) li.selected .drawer ul:after {
     border-top-color: $selected;
+}
+
+.feeds-list {
+    .drop-hover > a {
+        @include background-color($border-color, $border-color-night, $border-color-sunset);
+    }
+
+    li.drop-hover .drawer ul:after {
+        border-top-color: $border-color;
+        .theme-night & {
+            border-top-color: $border-color-night;
+        }
+        .theme-sunset & {
+            border-top-color: $border-color-sunset;
+        }
+    }
+
+    &.drop-hover {
+        &:after {
+            content: "";
+            position: absolute;
+            z-index: 1000;
+            display: block;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            box-shadow: inset 0 0 0 3px $border-color;
+            .theme-night & {
+                box-shadow: inset 0 0 0 3px $border-color-night;
+            }
+            .theme-sunset & {
+                box-shadow: inset 0 0 0 3px $border-color-sunset;
+            }
+        }
+    }
 }
 
 .favicon-wrap {

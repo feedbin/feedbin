@@ -439,6 +439,10 @@ $.extend feedbin,
       appendTo: '[data-behavior~=feeds_target]'
       scrollSpeed: 40
       start: (event, ui) ->
+        $('[data-behavior~=feeds_target]').addClass('dragging')
+        feedbin.dragOwner = $(@).parents('[data-behavior~=droppable]').first()
+      stop: (event, ui) ->
+        $('[data-behavior~=feeds_target]').removeClass('dragging')
         feedbin.dragOwner = $(@).parents('[data-behavior~=droppable]').first()
 
   tagFeed: (url, tag) ->
@@ -460,11 +464,7 @@ $.extend feedbin,
 
   droppable: ->
     $('[data-behavior~=droppable]:not(.ui-droppable)').droppable
-      hoverClass: ->
-        if $(@).is('[data-behavior~=feeds_target]')
-          ''
-        else
-          'selected'
+      hoverClass: 'drop-hover'
       greedy: true
       drop: (event, ui) ->
         if !feedbin.dragOwner.get(0).isEqualNode(event.target)
