@@ -432,19 +432,6 @@ $.extend feedbin,
     feedbin.updateEntryContent(entry.content)
     feedbin.formatEntryContent(entryId, true)
 
-  draggable: ->
-    $('[data-behavior~=draggable]').draggable
-      containment: '.feeds'
-      helper: 'clone'
-      appendTo: '[data-behavior~=feeds_target]'
-      scrollSpeed: 40
-      start: (event, ui) ->
-        $('[data-behavior~=feeds_target]').addClass('dragging')
-        feedbin.dragOwner = $(@).parents('[data-behavior~=droppable]').first()
-      stop: (event, ui) ->
-        $('[data-behavior~=feeds_target]').removeClass('dragging')
-        feedbin.dragOwner = $(@).parents('[data-behavior~=droppable]').first()
-
   tagFeed: (url, tag) ->
     $.ajax
       type: "POST",
@@ -457,10 +444,21 @@ $.extend feedbin,
         $(@).remove()
 
   appendTag: (target, ui) ->
-    appendTarget = if target.is('[data-behavior~=feeds_target]') then target else $(".drawer ul", target)
+    appendTarget = target.find('ul').first()
     ui.helper.remove()
     ui.draggable.appendTo(appendTarget)
     $('> [data-behavior~=sort_feed]', appendTarget).sort(feedbin.sortByFeedOrder).remove().appendTo(appendTarget)
+
+  draggable: ->
+    $('[data-behavior~=draggable]').draggable
+      containment: '.feeds'
+      helper: 'clone'
+      appendTo: '[data-behavior~=feeds_target]'
+      start: (event, ui) ->
+        $('.feeds').addClass('dragging')
+        feedbin.dragOwner = $(@).parents('[data-behavior~=droppable]').first()
+      stop: (event, ui) ->
+        $('.feeds').removeClass('dragging')
 
   droppable: ->
     $('[data-behavior~=droppable]:not(.ui-droppable)').droppable
@@ -485,7 +483,6 @@ $.extend feedbin,
           feedbin.appendTag(target, ui)
           feedbin.hideEmptyTags()
           feedbin.applyCounts(false)
-          feedbin.dragOwner = null
           setTimeout ( ->
             feedbin.draggable()
           ), 20

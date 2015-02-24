@@ -1639,9 +1639,6 @@ $subscribe-wrap-height: 49px;
     @media (max-width: 550px) {
         bottom: 0;
     }
-    .feeds-list {
-        min-height: 100%;
-    }
     ul {
         margin: 0;
         padding: 0;
@@ -1766,7 +1763,7 @@ $subscribe-wrap-height: 49px;
     }
 }
 
-.feeds-list:not(.dragging) .selected  {
+.feeds:not(.dragging) .selected  {
     > a .count {
         color: rgba(255,255,255,.7);
     }
@@ -1778,7 +1775,7 @@ $subscribe-wrap-height: 49px;
     }
 }
 
-.feeds-list:not(.dragging) .selected > a {
+.feeds:not(.dragging) .selected > a {
     @include background-color($selected-off, $selected-off, $selected-off);
     color: #fff !important;
     .rename-feed-input {
@@ -1789,53 +1786,41 @@ $subscribe-wrap-height: 49px;
     }
 }
 
-.selected .feeds-list:not(.dragging) .selected > a {
+.selected .feeds:not(.dragging) .selected > a {
     background: $selected;
     &:hover {
         background: $selected;
     }
 }
 
-.feeds-list:not(.dragging) li.selected .drawer ul:after {
+.feeds:not(.dragging) li.selected .drawer ul:after {
     border-top-color: $selected-off;
 }
 
-.selected .feeds-list:not(.dragging) li.selected .drawer ul:after {
+.selected .feeds:not(.dragging) li.selected .drawer ul:after {
     border-top-color: $selected;
 }
 
-.feeds-list {
+.feeds {
     .drop-hover > a {
         @include background-color($border-color, $border-color-night, $border-color-sunset);
     }
 
-    li.drop-hover .drawer ul:after {
-        border-top-color: $border-color;
+    li.drop-hover .drawer {
+        box-shadow: inset 0 0 0 3px $border-color;
         .theme-night & {
-            border-top-color: $border-color-night;
+            box-shadow: inset 0 0 0 3px $border-color-night;
         }
         .theme-sunset & {
-            border-top-color: $border-color-sunset;
+            box-shadow: inset 0 0 0 3px $border-color-sunset;
         }
-    }
-
-    &.drop-hover {
-        &:after {
-            content: "";
-            position: absolute;
-            z-index: 1000;
-            display: block;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-            box-shadow: inset 0 0 0 3px $border-color;
+        ul:after {
+            border-top-color: $border-color;
             .theme-night & {
-                box-shadow: inset 0 0 0 3px $border-color-night;
+                border-top-color: $border-color-night;
             }
             .theme-sunset & {
-                box-shadow: inset 0 0 0 3px $border-color-sunset;
+                border-top-color: $border-color-sunset;
             }
         }
     }
