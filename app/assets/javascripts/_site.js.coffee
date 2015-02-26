@@ -144,7 +144,8 @@ $.extend feedbin,
     feedId = feedbin.selectedEntry.feed_id
     if feedbin.data.readability_settings[feedId] == true && feedbin.data.sticky_readability
       $('.button-toggle-content').find('span').addClass('active')
-      $('[data-behavior~=entry_content_wrap]').html('Loading Readability&hellip;')
+      content = $('[data-behavior~=readability_loading]').html()
+      $('[data-behavior~=entry_content_wrap]').html(content)
       $('[data-behavior~=toggle_content_view]').submit()
 
   resetScroll: ->

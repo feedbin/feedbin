@@ -3410,16 +3410,23 @@ $saved-search-control-height: 48px;
         font-weight: 400 !important;
     }
 
-    .diff-wrap {
+    .entry-callout {
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         position: relative;
         margin-bottom: 1.1em;
-        padding: 10px 12px 10px 36px;
         font-size: 13px;
         font-family: $font-stack !important;
         font-weight: 400 !important;
         margin-top: 15px;
+        padding: 10px 12px;
+        strong {
+            font-weight: 700 !important;
+        }
+    }
+
+    .diff-wrap {
+        padding-left: 36px;
         .ignore-updates {
             @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
             text-decoration: none;
@@ -3453,16 +3460,9 @@ $saved-search-control-height: 48px;
     }
 
     .original-content-info {
-        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-        position: relative;
-        margin-bottom: 1.1em;
-        padding: 10px 53px 10px 36px;
+        padding-right: 53px;
+        padding-left: 36px;
         line-height: 1;
-        font-family: $font-stack !important;
-        font-weight: 400 !important;
-        strong {
-            font-weight: 700 !important;
-        }
         &:after {
             position: absolute;
             display: block;
@@ -3492,6 +3492,42 @@ $saved-search-control-height: 48px;
             top: 8px;
             left: 8px;
             background-color: #FFF;
+        }
+    }
+
+    .content-error {
+        padding-left: 36px;
+        &:after {
+            position: absolute;
+            display: block;
+            content: "";
+            background: image-url("icon-error.svg") 10px 11px no-repeat;
+            background-size: 20px 15px;
+            width: 43px;
+            left: 0px;
+            top: 0;
+            bottom: 0;
+        }
+    }
+
+    .readability-loading {
+        padding-left: 36px;
+        &:after {
+            position: absolute;
+            display: block;
+            content: "";
+            background: image-url("spinner-day.svg") 11px 11px no-repeat;
+            background-size: 16px 16px;
+            width: 43px;
+            left: 0px;
+            top: 0;
+            bottom: 0;
+            .theme-night & {
+                background-image: image-url("spinner-night.svg");
+            }
+            .theme-sunset & {
+                background-image: image-url("spinner-sunset.svg");
+            }
         }
     }
 

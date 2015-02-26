@@ -72,7 +72,7 @@ class EntryPresenter < BasePresenter
   def content
     ContentFormatter.format!(entry.content, entry)
   rescue HTML::Pipeline::Filter::InvalidDocumentException
-    '(no content)'
+    @template.content_tag(:p, "No content", class: "entry-callout")
   end
 
   def has_content?

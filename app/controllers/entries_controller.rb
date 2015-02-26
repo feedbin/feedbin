@@ -90,7 +90,12 @@ class EntriesController < ApplicationController
     end
 
     view_inline
-    @content = ContentFormatter.format!(@content, @entry)
+
+    begin
+      @content = ContentFormatter.format!(@content, @entry)
+    rescue
+      @content = nil
+    end
   end
 
   def preload
@@ -316,7 +321,6 @@ class EntriesController < ApplicationController
       end
     rescue => e
       @content = check_for_image(@entry, url)
-      Librato.increment 'readability.parse_fail'
     end
 
   end
@@ -340,12 +344,15 @@ class EntriesController < ApplicationController
   private
 
   def check_for_image(entry, url)
-    @content = '(no content)'
     response = HTTParty.head(url)
     if response.headers['content-type'] =~ /^image\//
-      @content = "<img src='#{url}' />"
+      content = "<img src='#{url}' />"
       Librato.increment 'readability.image_found'
+    else
+      content = nil
+      Librato.increment 'readability.parse_fail'
     end
+    content
   end
 
 end
