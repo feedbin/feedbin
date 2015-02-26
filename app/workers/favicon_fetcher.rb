@@ -62,7 +62,7 @@ class FaviconFetcher
   end
 
   def download_favicon(url)
-    response = HTTParty.get(url, timeout: 20, verify: false)
+    response = HTTParty.get(url, timeout: 20, verify: false, headers: {"User-Agent" => "Mozilla/5.0"})
     base64_favicon(response.body)
   end
 
