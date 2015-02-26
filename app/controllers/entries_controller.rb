@@ -310,11 +310,13 @@ class EntriesController < ApplicationController
           ReadabilityParser.parse(url)
         end
         @content = @content_info.content
+        Librato.increment 'readability.parse'
       else
         @content = @entry.content
       end
     rescue => e
       @content = check_for_image(@entry, url)
+      Librato.increment 'readability.parse_fail'
     end
 
   end
@@ -342,6 +344,7 @@ class EntriesController < ApplicationController
     response = HTTParty.head(url)
     if response.headers['content-type'] =~ /^image\//
       @content = "<img src='#{url}' />"
+      Librato.increment 'readability.image_found'
     end
   end
 
