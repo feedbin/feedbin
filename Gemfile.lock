@@ -1,13 +1,4 @@
 GIT
-  remote: git://github.com/benubois/html-pipeline.git
-  revision: d71de03a94fc8ce5f839be51236b6052077aaff7
-  ref: d71de03
-  specs:
-    html-pipeline (1.1.0)
-      activesupport (>= 2)
-      nokogiri (~> 1.4)
-
-GIT
   remote: git://github.com/feedbin/feedjira.git
   revision: 9ebf3987e9a0a857e916a87ce6156b96cd475aaa
   ref: 9ebf398
@@ -24,6 +15,15 @@ GIT
   specs:
     grocer-pushpackager (0.0.1)
       rubyzip
+
+GIT
+  remote: git://github.com/feedbin/html-pipeline.git
+  revision: c880a863ffcbb3ad9ea6b06c11637c30945dcbdd
+  ref: c880a86
+  specs:
+    html-pipeline (1.11.0)
+      activesupport (>= 2, < 5)
+      nokogiri (>= 1.4, <= 1.6.5)
 
 GIT
   remote: git://github.com/feedbin/html_diff.git

@@ -34,7 +34,7 @@ gem 'unicorn'
 
 gem 'feedjira',              github: 'feedbin/feedjira',            ref: '9ebf398'
 gem 'opml_saw',              github: 'feedbin/opml_saw',            ref: '61d8c2d'
-gem 'html-pipeline',         github: 'benubois/html-pipeline',      ref: 'd71de03'
+gem 'html-pipeline',         github: 'feedbin/html-pipeline',       ref: 'c880a86'
 gem 'grocer-pushpackager',   github: 'feedbin/grocer-pushpackager', ref: 'e190796', require: 'grocer/pushpackager'
 gem 'html_diff',             github: 'feedbin/html_diff',           ref: 'c7c15ce'
 gem 'tire',                  github: 'feedbin/retire',              ref: '0595d9e'
