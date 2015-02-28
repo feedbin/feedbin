@@ -86,19 +86,7 @@ $.extend feedbin,
       $(entries.join())
 
   localizeTime: (container) ->
-    $('time', container).each ->
-      date = $(@).attr('datetime')
-      format = $(@).data('format') || 'long'
-      if date && format != 'none'
-        date = new Date(date)
-        if format == 'long'
-          $(@).text(date.format("%B %e, %Y at %l:%M %p"))
-        else if format == 'time'
-          $(@).text(date.format("%l:%M %p"))
-        else if format == 'day'
-          $(@).text(date.format("%e %b"))
-        else if format == 'day_year'
-          $(@).text(date.format("%e %b %Y"))
+    $("time.timeago").timeago()
 
   applyUserTitles: ->
     $('[data-behavior~=user_title]').each ->
@@ -860,7 +848,7 @@ $.extend feedbin,
         numbers: []
       jQuery.timeago.settings.strings = strings
       jQuery.timeago.settings.allowFuture = true
-      $("time.timeago").timeago()
+      feedbin.localizeTime()
       return
 
     updateReadability: ->

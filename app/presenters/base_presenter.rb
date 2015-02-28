@@ -9,11 +9,15 @@ class BasePresenter
   def favicon(host)
     favicon_classes = ["favicon"]
     if host
-      favicon_classes << "favicon-#{host.parameterize}"
+      favicon_classes << "favicon-#{host.gsub('.', '-')}"
     end
-    @template.content_tag :span, '', class: "favicon-wrap" do
-      @template.content_tag(:span, '', class: favicon_classes.join(" ") )
-    end
+    classes = favicon_classes.join(" ")
+    content = <<-eos
+      <span class="favicon-wrap">
+        <span class="#{classes}"></span>
+      </span>
+    eos
+    content.html_safe
   end
 
   def favicon_with_url(host)
