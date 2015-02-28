@@ -1,6 +1,6 @@
 class ContentFormatter
 
-  def self.format!(content, entry = nil)
+  def self.format!(content, entry = nil, image_proxy_enabled = true)
     whitelist = Feedbin::Application.config.whitelist.clone
     transformers = [iframe_whitelist, class_whitelist] + whitelist[:transformers]
     whitelist[:transformers] = transformers
@@ -10,7 +10,7 @@ class ContentFormatter
     }
     filters = [HTML::Pipeline::LazyLoadFilter, HTML::Pipeline::SanitizationFilter]
 
-    if ENV['CAMO_HOST'] && ENV['CAMO_KEY']
+    if ENV['CAMO_HOST'] && ENV['CAMO_KEY'] && image_proxy_enabled
       context[:asset_proxy] = ENV['CAMO_HOST']
       context[:asset_proxy_secret_key] = ENV['CAMO_KEY']
       filters = filters << HTML::Pipeline::CamoFilter

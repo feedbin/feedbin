@@ -229,7 +229,7 @@ class SettingsController < ApplicationController
                                  :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation,
                                  :apple_push_notification_device_token, :receipt_info, :entries_display,
                                  :entries_feed, :entries_time, :entries_body, :ui_typeface, :theme,
-                                 :hide_recently_read, :hide_updated)
+                                 :hide_recently_read, :hide_updated, :disable_image_proxy)
   end
 
   def get_entry_counts(feed_ids)

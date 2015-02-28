@@ -29,7 +29,8 @@ class User < ActiveRecord::Base
                  :update_message_seen,
                  :hide_recently_read,
                  :hide_updated,
-                 :view_mode
+                 :view_mode,
+                 :disable_image_proxy
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all

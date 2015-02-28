@@ -92,7 +92,7 @@ class EntriesController < ApplicationController
     view_inline
 
     begin
-      @content = ContentFormatter.format!(@content, @entry)
+      @content = ContentFormatter.format!(@content, @entry, !@user.setting_on?(:disable_image_proxy))
     rescue
       @content = nil
     end
@@ -111,7 +111,8 @@ class EntriesController < ApplicationController
       locals = {
         entry: entry,
         services: sharing_services(entry),
-        content_view: false
+        content_view: false,
+        user: @user
       }
       hash[entry.id] = {
         content: render_to_string(partial: "entries/show", formats: [:html], locals: locals),
@@ -281,8 +282,8 @@ class EntriesController < ApplicationController
     @entry = Entry.find(params[:id])
     if @entry.original && @entry.original['content'].present?
       begin
-        before = ContentFormatter.format!(@entry.original['content'], @entry)
-        after = ContentFormatter.format!(@entry.content, @entry)
+        before = ContentFormatter.format!(@entry.original['content'], @entry, !@user.setting_on?(:disable_image_proxy))
+        after = ContentFormatter.format!(@entry.content, @entry, !@user.setting_on?(:disable_image_proxy))
         @content = HTMLDiff::Diff.new(before, after).inline_html.html_safe
       rescue HTML::Pipeline::Filter::InvalidDocumentException
         @content = '(comparison error)'

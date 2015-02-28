@@ -17,7 +17,7 @@
         </div>
       </div>
       <div class="entry-content">
-        <div class="entry-inner" <%= rtl(entry_presenter.content) %>>
+        <div class="entry-inner" <%= rtl(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>>
           <header class="entry-header">
             <%= link_to entry.fully_qualified_url, target: '_blank' do  %>
             <h1><%= entry_presenter.title %></h1>
@@ -46,7 +46,7 @@
               <%= entry_presenter.media.html_safe %>
             </div>
             <% end %>
-            <%= raw entry_presenter.content %>
+            <%= raw(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>
           </div>
         </div>
         <a class="next-entry-preview no-content" data-behavior="open_next_entry" href="#">
