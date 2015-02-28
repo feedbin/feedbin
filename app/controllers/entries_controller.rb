@@ -341,8 +341,6 @@ class EntriesController < ApplicationController
     ids
   end
 
-  private
-
   def check_for_image(entry, url)
     response = HTTParty.head(url)
     if response.headers['content-type'] =~ /^image\//
