@@ -18,8 +18,8 @@ GIT
 
 GIT
   remote: git://github.com/feedbin/html-pipeline.git
-  revision: 9920da6ed9b1e33129a78444243e7575fe90411b
-  ref: 9920da6
+  revision: d7e451fa5e99fcdf036009783961dbfc22c35a17
+  ref: d7e451f
   specs:
     html-pipeline (1.11.0)
       activesupport (>= 2, < 5)

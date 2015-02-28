@@ -80,7 +80,8 @@ $.extend feedbin,
   preloadImages: (id) ->
     id = parseInt(id)
     if feedbin.entries[id] && !_.contains(feedbin.preloadedImageIds, id)
-      $(feedbin.entries[id].content)
+      $(feedbin.entries[id].content).find("[data-behavior~=entry_content_wrap] img").each ->
+        $(@).attr("src", $(@).data('feedbin-src'))
       feedbin.preloadedImageIds.push(id)
 
   localizeTime: (container) ->
@@ -148,6 +149,10 @@ $.extend feedbin,
   formatInstagram: ->
     instgrm.Embeds.process()
 
+  updateSrc: ->
+    $("[data-behavior~=entry_content_wrap] img").each ->
+      $(@).attr("src", $(@).data('feedbin-src'))
+
   formatEntryContent: (entryId, resetScroll=true, readability=true) ->
     feedbin.applyStarred(entryId)
     if resetScroll
@@ -164,6 +169,7 @@ $.extend feedbin,
       feedbin.fitVids()
       feedbin.formatTweets()
       feedbin.formatInstagram()
+      feedbin.updateSrc()
     catch error
       if 'console' of window
         console.log error
