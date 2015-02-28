@@ -77,13 +77,11 @@ $.extend feedbin,
   isRead: (entryId) ->
     feedbin.Counts.get().isRead(entryId)
 
-  precacheImages: (data) ->
-    if feedbin.data.precache_images == true
-      entries = []
-      $.each data, (entryId, entry) ->
-        if !feedbin.isRead(entryId * 1)
-          entries.push(entry.content)
-      $(entries.join())
+  preloadImages: (id) ->
+    id = parseInt(id)
+    if feedbin.entries[id] && !_.contains(feedbin.preloadedImageIds, id)
+      $(feedbin.entries[id].content)
+      feedbin.preloadedImageIds.push(id)
 
   localizeTime: (container) ->
     $("time.timeago").timeago()
@@ -126,7 +124,8 @@ $.extend feedbin,
     if entry_ids.length > 0
       $.getJSON feedbin.data.preload_entries_path, {ids: entry_ids.join(',')}, (data) ->
         $.extend feedbin.entries, data
-        feedbin.precacheImages(data)
+        ids = _.keys(data)
+        feedbin.preloadImages(ids[0])
 
   readability: () ->
     feedId = feedbin.selectedEntry.feed_id
@@ -499,6 +498,8 @@ $.extend feedbin,
 
   dragOwner: null
 
+  preloadedImageIds: []
+
 $.extend feedbin,
   init:
 
@@ -699,6 +700,14 @@ $.extend feedbin,
         event.preventDefault()
         return
 
+    preloadImages: ->
+      $(document).on 'click', '[data-behavior~=show_entry_content]', ->
+        selected = $(@).parents('li')
+        next = selected.next('li')
+        if next.length > 0
+          id = next.data('entry-id')
+          feedbin.preloadImages(id)
+        return
 
     feedSelected: ->
       $(document).on 'click', '[data-behavior~=back_to_feeds]', ->
