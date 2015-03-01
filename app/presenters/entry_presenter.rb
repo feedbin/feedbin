@@ -70,7 +70,7 @@ class EntryPresenter < BasePresenter
   end
 
   def content(image_proxy_enabled)
-    @content = ContentFormatter.format!(entry.content, entry, image_proxy_enabled)
+    @content ||= ContentFormatter.format!(entry.content, entry, image_proxy_enabled)
   rescue HTML::Pipeline::Filter::InvalidDocumentException
     @template.content_tag(:p, "No content", class: "entry-callout")
   end
