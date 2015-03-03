@@ -151,7 +151,10 @@ $.extend feedbin,
 
   formatImages: ->
     $("[data-behavior~=entry_content_wrap] img").each ->
-      $(@).attr("src", $(@).data('feedbin-src'))
+      actualSrc = $(@).data('feedbin-src')
+      if actualSrc?
+        $(@).attr("src", actualSrc)
+
       if $(@).is("[src*='feeds.feedburner.com'], [data-canonical-src*='feeds.feedburner.com']")
         $(@).addClass('hide')
 
