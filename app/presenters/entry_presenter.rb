@@ -72,7 +72,7 @@ class EntryPresenter < BasePresenter
   def content(image_proxy_enabled)
     @content ||= ContentFormatter.format!(entry.content, entry, image_proxy_enabled)
   rescue HTML::Pipeline::Filter::InvalidDocumentException
-    @template.content_tag(:p, "No content", class: "entry-callout")
+    @template.content_tag(:p, '&ndash;&ndash;'.html_safe)
   end
 
   def has_content?
@@ -85,7 +85,15 @@ class EntryPresenter < BasePresenter
       text = entry.summary.html_safe
     end
     if text.blank?
-      text = '&hellip;'.html_safe
+      text = '&ndash;&ndash;'.html_safe
+    end
+    text
+  end
+
+  def entry_view_title
+    text = sanitized_title
+    if text.blank?
+      text = @template.content_tag(:span, '&ndash;&ndash;'.html_safe, title: "No title").html_safe
     end
     text
   end
