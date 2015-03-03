@@ -87,6 +87,12 @@ $.extend feedbin,
   localizeTime: (container) ->
     $("time.timeago").timeago()
 
+  entryTime: ->
+    $(".post-meta time").each ->
+      date = $(@).attr('datetime')
+      date = new Date(date)
+      $(@).text(date.format("%B %e, %Y at %l:%M %p"))
+
   applyUserTitles: ->
     $('[data-behavior~=user_title]').each ->
       feedId = $(@).data('feed-id')
@@ -169,7 +175,7 @@ $.extend feedbin,
       feedbin.footnotes()
       feedbin.nextEntryPreview()
       feedbin.audioVideo()
-      feedbin.localizeTime($('[data-behavior~=entry_content_target]'))
+      feedbin.entryTime()
       feedbin.applyUserTitles()
       feedbin.fitVids()
       feedbin.formatTweets()
