@@ -19,7 +19,7 @@ class EntryPresenter < BasePresenter
 
   def published_date
     if entry.published
-      entry.published.to_s(:feed)
+      entry.published.to_s(:full_human)
     else
       ''
     end
