@@ -3337,7 +3337,9 @@ $saved-search-control-height: 48px;
         &[align="right"] {
             float: none;
         }
-
+        &.hide {
+            display: none;
+        }
     }
 
     table {

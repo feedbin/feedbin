@@ -149,9 +149,11 @@ $.extend feedbin,
   formatInstagram: ->
     instgrm.Embeds.process()
 
-  updateSrc: ->
+  formatImages: ->
     $("[data-behavior~=entry_content_wrap] img").each ->
       $(@).attr("src", $(@).data('feedbin-src'))
+      if $(@).is("[src*='feeds.feedburner.com'], [data-canonical-src*='feeds.feedburner.com']")
+        $(@).addClass('hide')
 
   formatEntryContent: (entryId, resetScroll=true, readability=true) ->
     feedbin.applyStarred(entryId)
@@ -169,7 +171,7 @@ $.extend feedbin,
       feedbin.fitVids()
       feedbin.formatTweets()
       feedbin.formatInstagram()
-      feedbin.updateSrc()
+      feedbin.formatImages()
     catch error
       if 'console' of window
         console.log error
