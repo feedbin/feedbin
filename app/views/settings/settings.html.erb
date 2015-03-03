@@ -30,18 +30,6 @@
                     <% end %>
                 </li>
                 <li>
-                    <%= f.check_box :precache_images %>
-                    <%= f.label :precache_images do %>
-                        Preload images <span class="slider-checkbox"></span>
-                    <% end %>
-                </li>
-            </ul>
-            <p class="control-group-description">
-                Images for unread entries will be loaded in the background when viewing a feed. Not recommended with limited data/bandwidth.
-            </p>
-
-            <ul class="control-group control-group-form">
-                <li>
                     <%= f.check_box :sticky_view_inline %>
                     <%= f.label :sticky_view_inline do %>
                         Sticky Readability <span class="slider-checkbox"></span>
