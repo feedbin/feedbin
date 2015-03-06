@@ -236,6 +236,7 @@ class EntriesController < ApplicationController
 
     @entries = Entry.search(params, @user)
     @page_query = @entries
+    @total_results = @entries.total
 
     @append = params[:page].present?
 

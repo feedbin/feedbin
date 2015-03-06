@@ -60,7 +60,11 @@ feedbin.hideSearchControls()
 <% end %>
 
 <% if @search %>
-  feedbin.markReadData = {type: "search", data: "<%= @escaped_query %>", message: "Mark search for <%= @escaped_query %> as read?"}
+  feedbin.markReadData = {
+      type: "search",
+      data: "<%= @escaped_query %>",
+      message: "Mark <%= number_with_delimiter(@total_results) %> <%= 'article'.pluralize(@total_results) %> that <%= 'match'.pluralize(@total_results == 1 ? 2 : 1) %> the search “<%= @escaped_query %>” as read?"
+  }
   $('.saved-search-wrap').removeClass('show')
   $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected');
   $('[data-behavior~=save_search_link]').removeAttr('disabled');
