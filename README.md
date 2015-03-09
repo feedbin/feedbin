@@ -68,6 +68,8 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | SMTP_PASSWORD            | SMTP Password                                                                      |
 | STRIPE_API_KEY           | Used for communicating with stripe - https://stripe.com                            |
 | STRIPE_PUBLIC_KEY        | Used for communicating with stripe - https://stripe.com                            |
+| ANALYTICS_ID             | Google Analytics Property                                                          |
+| ANALYTICS_DOMAIN         | Google Analytics Domain                                                            |
 
 These variables need to be available in the environment of the user running the app.
 

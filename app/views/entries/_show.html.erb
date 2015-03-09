@@ -19,7 +19,7 @@
       <div class="entry-content">
         <div class="entry-inner" <%= rtl(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>>
           <header class="entry-header">
-            <%= link_to entry.fully_qualified_url, target: '_blank' do  %>
+            <%= link_to entry.fully_qualified_url, target: '_blank', id: 'source_link' do  %>
             <h1><%= entry_presenter.entry_view_title %></h1>
             <% end %>
             <p class="post-meta">
