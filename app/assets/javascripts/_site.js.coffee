@@ -85,7 +85,18 @@ $.extend feedbin,
       feedbin.preloadedImageIds.push(id)
 
   localizeTime: (container) ->
-    $("time.timeago").timeago()
+    now = new Date()
+    $("time.timeago").each ->
+      datePublished = $(@).attr('datetime')
+      datePublished = new Date(datePublished)
+      if datePublished > now
+        $(@).text('the future')
+      else if (now - datePublished) < feedbin.ONE_DAY * 7
+        $(@).timeago()
+      else if datePublished.getFullYear() == now.getFullYear()
+        $(@).text(datePublished.format("%e %b"))
+      else
+        $(@).text(datePublished.format("%e %b %Y"))
 
   entryTime: ->
     $(".post-meta time").each ->
@@ -517,6 +528,10 @@ $.extend feedbin,
 
   preloadedImageIds: []
 
+  ONE_HOUR: 60 * 60 * 1000
+
+  ONE_DAY: 60 * 60 * 1000 * 24
+
 $.extend feedbin,
   init:
 
@@ -874,7 +889,6 @@ $.extend feedbin,
         numbers: []
       jQuery.timeago.settings.strings = strings
       jQuery.timeago.settings.allowFuture = true
-      feedbin.localizeTime()
       return
 
     updateReadability: ->
