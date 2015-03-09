@@ -9,7 +9,13 @@
   <div class="box">
     <div data-behavior="stripe_error" class="alert alert-error hide"></div>
 
-    <h3 class="box-header">Create your <strong>Free 14-Day Trial</strong> Account</h3>
+    <h3 class="box-header">
+        <% if ENV['STRIPE_API_KEY'] %>
+            Create your <strong>Free 14-Day Trial</strong> Account
+        <% else %>
+            <h3 class="box-header">Create your <strong>Free</strong> Feedbin Account</h3>
+        <% end %>
+    </h3>
 
     <%= form_for @user, html: { class: 'combined-form', data: { behavior: 'credit_card_form' } } do |f| %>
       <% if @user.errors.any? %>
