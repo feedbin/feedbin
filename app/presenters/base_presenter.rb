@@ -7,17 +7,19 @@ class BasePresenter
   end
 
   def favicon(host)
-    favicon_classes = ["favicon"]
-    if host
-      favicon_classes << "favicon-#{host.gsub('.', '-')}"
+    @favicon ||= begin
+      favicon_classes = ["favicon"]
+      if host
+        favicon_classes << "favicon-#{host.gsub('.', '-')}"
+      end
+      classes = favicon_classes.join(" ")
+      content = <<-eos
+        <span class="favicon-wrap">
+          <span class="#{classes}"></span>
+        </span>
+      eos
+      content.html_safe
     end
-    classes = favicon_classes.join(" ")
-    content = <<-eos
-      <span class="favicon-wrap">
-        <span class="#{classes}"></span>
-      </span>
-    eos
-    content.html_safe
   end
 
   def favicon_with_url(host)

@@ -13,6 +13,7 @@
     href="/entries/<%= entry.id %>"
   >
 	<span class="entries-inner-wrap">
+	  <%= entry_presenter.favicon(entry.feed.host) %>
 	  <p class="feed-title">
 	    <span class="title-inner" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= entry.feed.title %></span>
 	  </p>
