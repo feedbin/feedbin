@@ -2764,7 +2764,7 @@ $saved-search-control-height: 48px;
     margin: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    transition: transform .2s ease;
+    transition: top .2s ease;
     -webkit-overflow-scrolling: touch;
     z-index: 2;
 }
