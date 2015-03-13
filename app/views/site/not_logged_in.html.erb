@@ -11,8 +11,12 @@
       </div>
     </div>
     <h1 class="tagline"><strong>A fast, simple RSS reader</strong> that delivers a great reading experience.</h1>
-    <p class="pricing-promo"><sup>$</sup>3 per month <em>or</em> <sup>$</sup>30 a year</p>
-    <p class="align-center"><%= link_to "Try it Free", signup_path, class: "button-get-started" %></p>
+    <% if ENV['STRIPE_API_KEY'] %>
+        <p class="pricing-promo"><sup>$</sup>3 per month <em>or</em> <sup>$</sup>30 a year</p>
+        <p class="align-center"><%= link_to "Try it Free", signup_path, class: "button-get-started" %></p>
+    <% else %>
+        <p class="align-center"><%= link_to "Sign Up", signup_path, class: "button-get-started" %></p>
+    <% end %>
   </div>
   <div class="screenshot-wrap">
       <div class="screenshot-mask">
