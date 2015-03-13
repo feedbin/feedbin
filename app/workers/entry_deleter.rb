@@ -10,7 +10,8 @@ class EntryDeleter
   end
 
   def delete_entries(feed_id)
-    entry_limit = 500
+    entry_limit = ENV['ENTRY_LIMIT'].to_i
+    entry_limit = 500 if entry_limit == 0
     entry_count = Entry.where(feed_id: feed_id).count
     if entry_count > entry_limit
       entries_to_keep = Entry.where(feed_id: feed_id).order('published DESC').limit(entry_limit).pluck('entries.id')
