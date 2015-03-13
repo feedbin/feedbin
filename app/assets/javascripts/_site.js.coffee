@@ -887,6 +887,7 @@ $.extend feedbin,
         numbers: []
       jQuery.timeago.settings.strings = strings
       jQuery.timeago.settings.allowFuture = true
+      $("time.timeago").timeago()
       return
 
     updateReadability: ->
