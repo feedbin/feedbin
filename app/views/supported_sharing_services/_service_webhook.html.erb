@@ -1,0 +1,13 @@
+<% if status == :active %>
+    <div class="service-header">
+      <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
+      <small class="show-service-options pad-top">Articles will be posted to: <%= sharing_service.webhook_url %>.</small>
+    </div>
+    <%= render partial: "supported_sharing_services/webhook_form", locals: {sharing_service: sharing_service, record: sharing_service} %>
+<% else %>
+    <div class="service-header">
+        <p class="service-title"><%= sharing_service[:label] %></p>
+        <%= button_tag 'Activate', class: 'list-action show-service-options button', data: {behavior: "show_service_options"} %>
+    </div>
+    <%= render partial: "supported_sharing_services/webhook_form", locals: {sharing_service: sharing_service, record: record} %>
+<% end %>

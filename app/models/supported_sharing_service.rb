@@ -92,11 +92,18 @@ class SupportedSharingService < ActiveRecord::Base
       requires_auth: false,
       service_type: 'popover',
       klass: 'Buffer'
+    },
+    {
+      service_id: 'webhook',
+      label: 'Webhook',
+      requires_auth: false,
+      service_type: 'webhook',
+      klass: 'Webhook'
     }
   ].freeze
 
   store_accessor :settings, :access_token, :access_secret, :email_name, :email_address,
-                 :kindle_address, :default_option
+                 :kindle_address, :default_option, :webhook_url
 
   validates :service_id, presence: true, uniqueness: {scope: :user_id}, inclusion: { in: SERVICES.collect {|s| s[:service_id]} }
   belongs_to :user

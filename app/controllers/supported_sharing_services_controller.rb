@@ -147,7 +147,7 @@ class SupportedSharingServicesController < ApplicationController
   private
 
   def supported_sharing_service_params
-    params.require(:supported_sharing_service).permit(:service_id, :email_name, :email_address, :kindle_address)
+    params.require(:supported_sharing_service).permit(:service_id, :email_name, :email_address, :kindle_address, :webhook_url)
   end
 
 

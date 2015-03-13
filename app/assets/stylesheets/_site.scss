@@ -1135,7 +1135,7 @@ th {
     .icon-share-twitter {
         background-image: image-url("icon-share-twitter.svg");
         background-size: 21px 25px;
-        @include share-icon(1, 3);
+        @include share-icon(1, 2);
     }
     .icon-share-evernote {
         background-image: image-url("icon-share-evernote.svg");
@@ -1186,6 +1186,11 @@ th {
         background-image: image-url("icon-share-custom.svg");
         background-size: 22px 18px;
         @include share-icon(2, 4);
+    }
+    .icon-share-webhook {
+        background-image: image-url("icon-share-webhook.svg");
+        background-size: 24px 20px;
+        @include share-icon(-2, 2);
     }
 
 }

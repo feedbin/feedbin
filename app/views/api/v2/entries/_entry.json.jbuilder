@@ -5,11 +5,18 @@ json.published entry.published.iso8601(6)
 json.created_at entry.created_at.iso8601(6)
 json.original entry.original if params[:include_original] == 'true'
 json.enclosure entry.data if params[:include_enclosure] == 'true'
+
 if params[:include_content_diff] == 'true'
   begin
     before = ContentFormatter.api_format(entry.original['content'], entry)
     json.content_diff HTMLDiff::Diff.new(before, entry.content).inline_html
   rescue
     json.content_diff nil
+  end
+end
+
+if params[:include_feed] == 'true'
+  json.feed do
+    json.partial! "api/v2/feeds/feed", feed: entry.feed
   end
 end
