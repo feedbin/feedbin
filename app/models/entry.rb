@@ -94,13 +94,19 @@ class Entry < ActiveRecord::Base
         sort { by :published, "desc" }
       end
 
+      if params[:tag_id].present?
+        feed_ids = user.taggings.where(tag_id: params[:tag_id]).pluck(:feed_id)
+      else
+        feed_ids = user.subscriptions.pluck(:feed_id)
+      end
+
       if ids.any?
         ids = ids.inject(:&) # intersect
         filter :ids, values: ids
       end
 
       # Always limit searches to subscriptions and starred items
-      filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
+      filter :or, { terms: { feed_id: feed_ids } },
                   { ids: { values: user.starred_entries.pluck(:entry_id) } }
     end
 
@@ -112,6 +118,7 @@ class Entry < ActiveRecord::Base
     starred_regex = /(?<=\s|^)is:\s*starred(?=\s|$)/
     unstarred_regex = /(?<=\s|^)is:\s*unstarred(?=\s|$)/
     sort_regex = /(?<=\s|^)sort:\s*(asc|desc|relevance)(?=\s|$)/i
+    tag_id_regex = /(?<=\s|^)tag_id:\s*([0-9]+)(?=\s|$)/
 
     if params[:query] =~ unread_regex
       params[:query] = params[:query].gsub(unread_regex, '')
@@ -132,6 +139,11 @@ class Entry < ActiveRecord::Base
     if params[:query] =~ sort_regex
       params[:sort] = params[:query].match(sort_regex)[1].downcase
       params[:query] = params[:query].gsub(sort_regex, '')
+    end
+
+    if params[:query] =~ tag_id_regex
+      params[:tag_id] = params[:query].match(tag_id_regex)[1].downcase
+      params[:query] = params[:query].gsub(tag_id_regex, '')
     end
 
     params[:query] = escape_search(params[:query])

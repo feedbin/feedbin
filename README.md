@@ -47,6 +47,7 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | DATABASE_URL             | Database connection string - postgres://USER:PASS@IP:PORT/DATABASE                 |
 | DEFAULT_URL_OPTIONS_HOST | Mailer host - feedbin.com                                                          |
 | ELASTICSEARCH_URL        | search endpoint - http://localhost:9200                                            |
+| ENTRY_LIMIT              | Maximum entries per feed. Older entries will be deleted.                           |
 | FEEDBIN_HOMEPAGE_REPO    | Git URL to a Rails engine that provides a custom homepage                          |
 | FROM_ADDRESS             | Used as a reply-to email address                                                   |
 | GAUGES_SITE_ID           | [gaug.es](http://gaug.es) analytics identifier                                     |
@@ -70,6 +71,8 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | STRIPE_PUBLIC_KEY        | Used for communicating with stripe - https://stripe.com                            |
 | ANALYTICS_ID             | Google Analytics Property                                                          |
 | ANALYTICS_DOMAIN         | Google Analytics Domain                                                            |
+| EVERNOTE_KEY             | Evernote API Key                                                                   |
+| EVERNOTE_SECRET          | Evernote API Secret                                                                |
 
 These variables need to be available in the environment of the user running the app.
 

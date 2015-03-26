@@ -8,7 +8,9 @@
     <li><%= link_to 'Actions', actions_path, class: is_active?('actions', ['index', 'new', 'edit']) %></li>
     <li><%= link_to 'Sharing', sharing_services_path, class: is_active?('sharing_services', 'index') %></li>
     <li><%= link_to 'Account', settings_account_path, class: is_active?('settings', 'account') %></li>
-    <li><%= link_to 'Billing', settings_billing_path, class: is_active?('settings', 'billing') %></li>
+    <% if ENV['STRIPE_API_KEY'] %>
+        <li><%= link_to 'Billing', settings_billing_path, class: is_active?('settings', 'billing') %></li>
+    <% end %>
     <li><%= link_to 'Import/Export', settings_import_export_path, class: is_active?('settings', 'import_export') %></li>
   </ul>
   <ul class="nav nav-small">
