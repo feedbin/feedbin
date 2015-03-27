@@ -12,8 +12,13 @@ class FeedRefresherReceiver
           else
             create_entry(entry, feed)
           end
-        rescue Exception
-          FeedbinUtils.update_public_id_cache(entry['public_id'], entry['content'])
+        rescue StandardError => error
+          message = entry['update'] ? "update" : "create"
+          Honeybadger.notify(
+            error_class: "FeedRefresherReceiver#" + message,
+            error_message: "Entry #{message} failed",
+            parameters: {exception: error}
+          )
         end
       end
     end
