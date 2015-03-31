@@ -390,6 +390,8 @@ GEM
       raindrops (~> 0.7)
     uuidtools (2.1.5)
     will_paginate (3.0.7)
+    xipio (1.0.0)
+      railties (>= 3)
     yajl-ruby (1.2.1)
 
 PLATFORMS
@@ -457,4 +459,5 @@ DEPENDENCIES
   uglifier
   unicorn
   will_paginate
+  xipio
   yajl-ruby

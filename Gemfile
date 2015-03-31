@@ -13,6 +13,7 @@ group :development do
   gem 'silencer'
   gem 'spring'
   gem 'benchmark-ips'
+  gem 'xipio'
 end
 
 group :development, :test do
