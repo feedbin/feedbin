@@ -162,6 +162,7 @@ Feedbin::Application.routes.draw do
         resources :subscriptions,  only: [:index, :show, :create, :destroy, :update]
         post "subscriptions/:id/update", to: 'subscriptions#update'
 
+        resources :favicons,              only: [:index]
         resources :tags,                  only: [:index]
         resources :taggings,              only: [:index, :show, :create, :destroy]
         resources :entries,               only: [:index, :show]
