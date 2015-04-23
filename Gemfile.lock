@@ -308,6 +308,8 @@ GEM
       actionpack (>= 2.1)
     rest-client (1.6.7)
       mime-types (>= 1.16)
+    reverse_markdown (0.8.1)
+      nokogiri
     rmagick (2.13.3)
     rspec-core (3.1.7)
       rspec-support (~> 3.1.0)
@@ -443,6 +445,7 @@ DEPENDENCIES
   redis (>= 3.0.5)
   request_exception_handler
   rest-client (= 1.6.7)
+  reverse_markdown
   rmagick
   rspec-rails (~> 3.1)
   rubyzip (= 1.1.0)
