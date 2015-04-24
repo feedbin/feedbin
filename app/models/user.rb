@@ -48,6 +48,7 @@ class User < ActiveRecord::Base
   has_many :actions, dependent: :destroy
   has_many :recently_read_entries, dependent: :delete_all
   has_many :updated_entries, dependent: :delete_all
+  has_many :devices, dependent: :delete_all
   belongs_to :plan
 
   accepts_nested_attributes_for :sharing_services,
