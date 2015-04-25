@@ -70,7 +70,9 @@ CREATE TABLE actions (
     all_feeds boolean DEFAULT false,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    title text
+    title text,
+    tag_ids integer[] DEFAULT '{}'::integer[],
+    action_type integer DEFAULT 0
 );
 
 
@@ -1808,4 +1810,6 @@ INSERT INTO schema_migrations (version) VALUES ('20141208231955');
 INSERT INTO schema_migrations (version) VALUES ('20141215195928');
 
 INSERT INTO schema_migrations (version) VALUES ('20150424224723');
+
+INSERT INTO schema_migrations (version) VALUES ('20150425060924');
 

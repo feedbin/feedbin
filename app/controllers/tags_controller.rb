@@ -55,6 +55,12 @@ class TagsController < ApplicationController
       taggings.destroy_all
     end
 
+    actions = user.actions.where("? = ANY (tag_ids)", tag.id)
+    actions.each do |action|
+      action.tag_ids = action.tag_ids - [tag.id] + [@new_tag.try(:id)]
+      action.save
+    end
+
     get_feeds_list
     respond_to :js
   end
