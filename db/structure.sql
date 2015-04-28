@@ -72,7 +72,8 @@ CREATE TABLE actions (
     updated_at timestamp without time zone,
     title text,
     tag_ids integer[] DEFAULT '{}'::integer[],
-    action_type integer DEFAULT 0
+    action_type integer DEFAULT 0,
+    computed_feed_ids integer[] DEFAULT '{}'::integer[]
 );
 
 
@@ -1812,4 +1813,6 @@ INSERT INTO schema_migrations (version) VALUES ('20141215195928');
 INSERT INTO schema_migrations (version) VALUES ('20150424224723');
 
 INSERT INTO schema_migrations (version) VALUES ('20150425060924');
+
+INSERT INTO schema_migrations (version) VALUES ('20150428183228');
 

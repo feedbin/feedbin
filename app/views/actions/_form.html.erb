@@ -24,6 +24,23 @@
     </ul>
 
     <div class="inset-content por">
+      <h4 class="group-header">Article is in Tag</h4>
+    </div>
+    <ul class="control-group">
+      <li>
+        <div class="filter-tags">
+          <%=
+          f.collection_check_boxes(:tag_ids, @user.feed_tags, :id, :name) do |b|
+            b.label(class: "checkbox") do
+              b.check_box + b.text
+            end
+          end
+          %>
+        </div>
+      </li>
+    </ul>
+
+    <div class="inset-content por">
       <h4 class="group-header">Article is in Feed</h4>
     </div>
     <ul class="control-group">

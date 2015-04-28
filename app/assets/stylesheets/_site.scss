@@ -4690,6 +4690,10 @@ table.small td {
         }
     }
 }
+.filter-tags {
+	@extend .filter-feeds;
+	border: 1px solid $border-color;
+}
 
 [data-behavior="action_send_push_notification"] {
     display: none;
