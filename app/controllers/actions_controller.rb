@@ -8,7 +8,7 @@ class ActionsController < ApplicationController
     verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
     @authentication_token = CGI::escape(verifier.generate(@user.id))
     @web_service_url = "#{ENV['PUSH_URL']}/apple_push_notifications"
-    @actions = @user.actions
+    @actions = @user.actions.where("action_type <> ?", Action.action_types[:notifier])
   end
 
   def new
