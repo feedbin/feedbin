@@ -48,17 +48,11 @@ class TagsController < ApplicationController
         @new_tag = Tag.where(name: tag_name).first_or_create
         taggings.update_all(tag_id: @new_tag.id)
       end
-      update_selected_feed!("tag", @new_tag.try(:id))
+      update_selected_feed!("tag", @new_tag.id)
       visibility = user.tag_visibility[tag.id.to_s] ? user.tag_visibility[tag.id.to_s] : false
       user.update_tag_visibility(@new_tag.id.to_s, visibility)
-    else
-      taggings.destroy_all
-    end
 
-    actions = user.actions.where("? = ANY (tag_ids)", tag.id)
-    actions.each do |action|
-      action.tag_ids = action.tag_ids - [tag.id] + [@new_tag.try(:id)]
-      action.save
+      ActionTags.perform_async(user.id, @new_tag.id, tag.id)
     end
 
     get_feeds_list
@@ -69,6 +63,8 @@ class TagsController < ApplicationController
     @user = current_user
     tag = Tag.find(params[:id])
     Tagging.where(tag_id: tag, user_id: @user).destroy_all
+
+    ActionTags.perform_async(@user.id, nil, tag.id)
 
     get_feeds_list
 
