@@ -1335,7 +1335,7 @@ Structure
     display: flex;
     align-items: center;
     position: absolute;
-    z-index: 0;
+    z-index: 100;
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     .welcome-inner {
         width: 100%;
