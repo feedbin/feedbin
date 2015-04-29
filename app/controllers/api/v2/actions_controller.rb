@@ -4,7 +4,7 @@ module Api
 
       respond_to :json
 
-      before_action :set_action, only: [:update]
+      before_action :set_action, only: [:update, :results]
       before_action :validate_content_type, only: [:create]
 
       def index
@@ -26,6 +26,25 @@ module Api
         if !@action.update(action_params)
           render nothing: true, status: :bad_request
         end
+      end
+
+      def results
+        @user = current_user
+        query = {}
+        if @action.query.present?
+          query[:query] = @action.query
+        end
+        if @action.computed_feed_ids.any?
+          query[:feed_ids] = @action.computed_feed_ids
+        end
+
+        if query.length > 1
+          query[:read] = false
+          @entries = Entry.search(query, @user)
+        else
+          @entries = []
+        end
+
       end
 
       private

@@ -94,7 +94,11 @@ class Entry < ActiveRecord::Base
         sort { by :published, "desc" }
       end
 
-      if params[:tag_id].present?
+      if params[:feed_ids].present?
+        subscribed_ids = user.subscriptions.pluck(:feed_id)
+        requested_ids = params[:feed_ids]
+        feed_ids = (requested_ids & subscribed_ids)
+      elsif params[:tag_id].present?
         feed_ids = user.taggings.where(tag_id: params[:tag_id]).pluck(:feed_id)
       else
         feed_ids = user.subscriptions.pluck(:feed_id)
