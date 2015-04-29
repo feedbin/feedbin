@@ -19,7 +19,6 @@ module Api
       def create
         @user = current_user
         @action = @user.actions.create(action_params)
-        render nothing: true
       end
 
       def update
@@ -38,7 +37,7 @@ module Api
           query[:feed_ids] = @action.computed_feed_ids
         end
 
-        if query.length > 1
+        if query.length > 0
           query[:read] = false
           @entries = Entry.search(query, @user)
         else
