@@ -1,8 +1,8 @@
-class PushNotificationSend
+class SafariPushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
 
-  # ENV['RAILS_ENV'] = 'production'; reload!; p = PushNotificationSend.new; p.perform(1, [1])
+  # ENV['RAILS_ENV'] = 'production'; reload!; p = SafariPushNotificationSend.new; p.perform(1, [1])
   #
   # Payload must be less than 256 bytes a payload without the body is about
   # 157 bytes
