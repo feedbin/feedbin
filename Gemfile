@@ -77,6 +77,7 @@ gem 'oauth'
 gem 'evernote_oauth'
 gem 'rmagick', require: false
 gem 'reverse_markdown'
+gem 'htmlentities'
 
 # Sidekiq
 gem 'sidekiq'

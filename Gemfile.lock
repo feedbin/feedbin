@@ -216,6 +216,7 @@ GEM
     hitimes (1.2.2)
     honeybadger (1.16.5)
       json
+    htmlentities (4.3.3)
     httparty (0.13.1)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
@@ -430,6 +431,7 @@ DEPENDENCIES
   honeybadger
   html-pipeline!
   html_diff!
+  htmlentities
   httparty
   jbuilder
   jquery-rails
