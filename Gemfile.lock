@@ -310,7 +310,7 @@ GEM
       mime-types (>= 1.16)
     reverse_markdown (0.8.1)
       nokogiri
-    rmagick (2.13.3)
+    rmagick (2.15.0)
     rspec-core (3.1.7)
       rspec-support (~> 3.1.0)
     rspec-expectations (3.1.2)
