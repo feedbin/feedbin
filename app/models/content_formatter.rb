@@ -62,6 +62,23 @@ class ContentFormatter
     content
   end
 
+  def self.app_format(content, entry)
+    filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, HTML::Pipeline::ImagePlaceholderFilter]
+    context = {
+      image_base_url: entry.feed.site_url,
+      image_subpage_url: entry.url || "",
+      href_base_url: entry.feed.site_url,
+      href_subpage_url: entry.url || "",
+      placeholder_url: "",
+      placeholder_attribute: "data-feedbin-src"
+    }
+    pipeline = HTML::Pipeline.new filters, context
+    result = pipeline.call(content)
+    result[:output].to_s
+  rescue
+    content
+  end
+
   def self.evernote_format(content, entry)
     filters = [HTML::Pipeline::SanitizationFilter, HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter]
     context = {
