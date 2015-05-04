@@ -1184,8 +1184,8 @@ th {
     }
     .icon-share-custom {
         background-image: image-url("icon-share-custom.svg");
-        background-size: 22px 18px;
-        @include share-icon(2, 4);
+        background-size: 21px 21px;
+        @include share-icon(1, 2);
     }
 
 }
@@ -1335,7 +1335,7 @@ Structure
     display: flex;
     align-items: center;
     position: absolute;
-    z-index: 0;
+    z-index: 100;
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     .welcome-inner {
         width: 100%;
@@ -2893,8 +2893,8 @@ $saved-search-control-height: 48px;
     .button-toggle-share-menu {
         svg {
             position: absolute;
-            top: $base-button-position;
-            left: 12px;
+            top: $base-button-position + 2;
+            left: 11px;
             height: 16px;
             width: 16px;
         }
