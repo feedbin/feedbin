@@ -2215,7 +2215,7 @@ $saved-search-control-height: 48px;
         display: block;
     }
     .icon-star {
-        width: 30px;
+        width: 38px;
         height: 21px;
         position: absolute;
         left: -38px;
@@ -2230,20 +2230,20 @@ $saved-search-control-height: 48px;
             background-image: image-url("icon-star.svg"), linear-gradient(to bottom, #3399ff 0%, #2c85dd 100%);
             background-position: 2px 2px, 0 0;
             background-repeat: no-repeat, no-repeat;
-            width: 30px;
+            width: 38px;
             height: 21px;
             content: '';
             z-index: 1;
         }
         &:after {
             position: absolute;
-            top: 0px;
+            top: 4px;
             left: 9px;
             @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
             height: 44px;
-            width: 27px;
+            width: 35px;
             content: '';
-            transform: rotate(56deg);
+            transform: rotate(63deg);
             z-index: 2;
         }
     }
