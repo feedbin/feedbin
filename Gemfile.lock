@@ -308,7 +308,7 @@ GEM
       actionpack (>= 2.1)
     rest-client (1.6.7)
       mime-types (>= 1.16)
-    rmagick (2.13.3)
+    rmagick (2.15.0)
     rspec-core (3.1.7)
       rspec-support (~> 3.1.0)
     rspec-expectations (3.1.2)
