@@ -268,10 +268,12 @@ class Entry < ActiveRecord::Base
     if self.published.nil? || self.published > 1.day.from_now
       self.published = DateTime.now
     end
+    true
   end
 
   def cache_public_id
     FeedbinUtils.update_public_id_cache(self.public_id, self.content)
+    true
   end
 
   def mark_as_unread
@@ -307,6 +309,7 @@ class Entry < ActiveRecord::Base
 
   def create_summary
     self.summary = ContentFormatter.summary(self.content)
+    true
   end
 
   def touch_feed_last_published_entry

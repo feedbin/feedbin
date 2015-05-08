@@ -3,11 +3,11 @@ class BigBatchScheduler
   sidekiq_options queue: :worker_slow
 
   def perform
-    total_records = 626984785
     batch_size = 1000
-    batch_count = (total_records.to_f/batch_size.to_f).ceil
+    start = (813083561/batch_size).floor
+    finish = (814728487/batch_size).ceil
     jobs = []
-    1.upto(batch_count) do |batch|
+    start.upto(finish) do |batch|
       jobs.push([batch])
     end
     Sidekiq::Client.push_bulk(

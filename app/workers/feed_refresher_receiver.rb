@@ -17,7 +17,7 @@ class FeedRefresherReceiver
           Honeybadger.notify(
             error_class: "FeedRefresherReceiver#" + message,
             error_message: "Entry #{message} failed",
-            parameters: {exception: error}
+            parameters: {exception: error, backtrace: error.backtrace}
           )
         end
       end
@@ -27,26 +27,28 @@ class FeedRefresherReceiver
 
   def update_entry(entry)
     original_entry = Entry.find_by_public_id(entry['public_id'])
-    entry_update = entry.slice('author', 'content', 'title', 'url', 'entry_id', 'data')
+    if original_entry.present?
+      entry_update = entry.slice('author', 'content', 'title', 'url', 'entry_id', 'data')
 
-    original_content = original_entry.content.to_s.clone
-    new_content = entry_update['content'].to_s.clone
+      original_content = original_entry.content.to_s.clone
+      new_content = entry_update['content'].to_s.clone
 
-    if original_entry.original.nil?
-      entry_update['original'] = build_original(original_entry)
+      if original_entry.original.nil?
+        entry_update['original'] = build_original(original_entry)
+      end
+      original_entry.update_attributes(entry_update)
+      FeedbinUtils.update_public_id_cache(entry['public_id'], entry['content'])
+
+      if published_recently?(original_entry.published) && significant_change?(original_content, new_content)
+        create_update_notifications(original_entry)
+      end
+
+      if new_content.length == original_content.length
+        Librato.increment('entry.no_change')
+      end
+
+      Librato.increment('entry.update')
     end
-    original_entry.update_attributes(entry_update)
-    FeedbinUtils.update_public_id_cache(entry['public_id'], entry['content'])
-
-    if published_recently?(original_entry.published) && significant_change?(original_content, new_content)
-      create_update_notifications(original_entry)
-    end
-
-    if new_content.length == original_content.length
-      Librato.increment('entry.no_change')
-    end
-
-    Librato.increment('entry.update')
   end
 
   def build_original(original_entry)
@@ -73,7 +75,7 @@ class FeedRefresherReceiver
     Honeybadger.notify(
       error_class: "FeedRefresherReceiver#detect_significant_change",
       error_message: "detect_significant_change failed",
-      parameters: {exception: e}
+      parameters: {exception: e, backtrace: e.backtrace}
     )
     false
   end
@@ -97,7 +99,7 @@ class FeedRefresherReceiver
     Honeybadger.notify(
       error_class: "FeedRefresherReceiver#create_update_notifications",
       error_message: "create_update_notifications failed",
-      parameters: {exception: e}
+      parameters: {exception: e, backtrace: e.backtrace}
     )
   end
 
