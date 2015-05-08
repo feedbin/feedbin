@@ -5,7 +5,7 @@ class BigBatchScheduler
   def perform
     batch_size = 1000
     start = (813083561/batch_size).floor
-    finish = (814628487/batch_size).ceil
+    finish = (814728487/batch_size).ceil
     jobs = []
     start.upto(finish) do |batch|
       jobs.push([batch])
