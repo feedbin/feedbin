@@ -20,6 +20,7 @@ class IosPushNotificationSend
       device_token: nil,
       category: "singleArticle",
       content_available: true,
+      sound: "",
       alert: {
         title: nil,
         body: decoder.decode(body)
