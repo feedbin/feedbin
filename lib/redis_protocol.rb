@@ -28,7 +28,7 @@ OptionParser.new do |options|
   options.separator ""
   options.separator "Options:"
 
-  options.on("--data DATA", "Specify which data you want. Options: public_id, created_at, published") do |data|
+  options.on("--data DATA", "Specify which data you want. Options: public_id, internal") do |data|
     opts[:data] = data
   end
 
@@ -49,10 +49,10 @@ while input = ARGF.gets
       case opts[:data]
       when "public_id"
         $stdout.write(gen_redis_proto("HSET", "entry:public_ids:#{public_id[0..4]}", public_id, 1))
-      when "created_at"
+      when "internal"
         score = get_score(created_at)
         $stdout.write(gen_redis_proto("ZADD", "feed:#{feed_id}:entry_ids:created_at", score, entry_id))
-      when "published"
+
         score = get_score(published)
         $stdout.write(gen_redis_proto("ZADD", "feed:#{feed_id}:entry_ids:published", score, entry_id))
       else
