@@ -167,7 +167,11 @@ Feedbin::Application.routes.draw do
             get :results
           end
         end
-        resources :devices,               only: [:create]
+        resources :devices,               only: [:create] do
+          collection do
+            get :test
+          end
+        end
         resources :favicons,              only: [:index]
         resources :tags,                  only: [:index]
         resources :taggings,              only: [:index, :show, :create, :destroy]

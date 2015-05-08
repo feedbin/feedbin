@@ -13,6 +13,14 @@ module Api
         render nothing: true
       end
 
+      def test
+        @user = current_user
+        subscription = @user.subscriptions.order("RANDOM()").limit(1).first
+        entry = Entry.where(feed_id: subscription.feed_id).order("RANDOM()").limit(1).first
+        IosPushNotificationSend.perform_async([@user.id], entry.id)
+        render nothing: true
+      end
+
       private
 
       def device_params
