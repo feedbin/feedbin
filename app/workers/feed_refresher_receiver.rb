@@ -17,7 +17,7 @@ class FeedRefresherReceiver
           Honeybadger.notify(
             error_class: "FeedRefresherReceiver#" + message,
             error_message: "Entry #{message} failed",
-            parameters: {exception: error}
+            parameters: {exception: error, backtrace: error.backtrace}
           )
         end
       end
@@ -73,7 +73,7 @@ class FeedRefresherReceiver
     Honeybadger.notify(
       error_class: "FeedRefresherReceiver#detect_significant_change",
       error_message: "detect_significant_change failed",
-      parameters: {exception: e}
+      parameters: {exception: e, backtrace: e.backtrace}
     )
     false
   end
@@ -97,7 +97,7 @@ class FeedRefresherReceiver
     Honeybadger.notify(
       error_class: "FeedRefresherReceiver#create_update_notifications",
       error_message: "create_update_notifications failed",
-      parameters: {exception: e}
+      parameters: {exception: e, backtrace: e.backtrace}
     )
   end
 
