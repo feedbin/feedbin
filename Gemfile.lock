@@ -207,7 +207,6 @@ GEM
       dotenv (>= 0.7)
       thor (>= 0.13.6)
     formatador (0.2.5)
-    gctools (0.2.3)
     grocer (0.6.0)
     hashie (3.3.1)
     hashr (0.0.22)
@@ -422,7 +421,6 @@ DEPENDENCIES
   feedjira!
   fog
   foreman (= 0.63.0)
-  gctools
   grocer
   grocer-pushpackager!
   honeybadger

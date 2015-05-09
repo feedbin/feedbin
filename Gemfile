@@ -70,7 +70,6 @@ gem 'readability_parser'
 gem 'lograge'
 gem 'grocer'
 gem 'cocoon'
-gem 'gctools', require: false
 gem 'connection_pool'
 gem 'httparty'
 gem 'oauth'
