@@ -24,7 +24,7 @@ module Api
       private
 
       def device_params
-        params.require(:device).permit(:token)
+        params.require(:device).permit(:token, :device_type, :model)
       end
 
     end
