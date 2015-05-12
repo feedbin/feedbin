@@ -25,9 +25,8 @@ module Api
 
       def destroy
         @user = current_user
-        entries = get_valid_entries
-        UnreadEntry.where(user_id: @user.id, entry_id: entries[:entry_ids]).delete_all
-        render json: entries[:entry_ids].to_json
+        @user.unread_entries.where(entry_id: params[:unread_entries]).delete_all
+        render json: params[:unread_entries].to_json
       end
 
       private

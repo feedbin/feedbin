@@ -17,7 +17,7 @@ content_text = Sanitize.fragment(entry.content,
 content_text = ReverseMarkdown.convert(content_text)
 content_text = ActionController::Base.helpers.strip_tags(content_text)
 json.extract! entry, :id, :feed_id
-json.title entry.title
+json.title decoder.decode(strip_tags(entry.title))
 json.author decoder.decode(strip_tags(entry.author))
 json.content ContentFormatter.app_format(entry.content, entry)
 json.content_text decoder.decode(content_text)
