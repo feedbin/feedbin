@@ -22,6 +22,8 @@ module Api
       end
 
       def update
+        params[:action_params][:feed_ids] ||= [] if params[:action_params].has_key?(:feed_ids)
+        params[:action_params][:tag_ids] ||= [] if params[:action_params].has_key?(:tag_ids)
         if !@action.update(action_params)
           render nothing: true, status: :bad_request
         end
