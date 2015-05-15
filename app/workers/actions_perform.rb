@@ -31,7 +31,7 @@ class ActionsPerform
         elsif action_name == 'mark_read'
           UnreadEntry.where(user_id: user_ids, entry_id: entry_id).delete_all
         elsif action_name == 'send_ios_notification'
-          DevicePushNotificationSend.perform_async(entry_id, user_ids)
+          DevicePushNotificationSend.perform_async(user_ids, entry_id)
         end
       end
 

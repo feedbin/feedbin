@@ -4,9 +4,9 @@ class DevicePushNotificationSend
 
   def perform(user_ids, entry_id)
     users = User.where(id: user_ids)
-    entry = Entry.find(entry_id)
-    feed = Feed.find(entry.feed_id)
     tokens = Device.where(user_id: user_ids).pluck(:user_id, :token)
+    entry = Entry.find(entry_id)
+    feed = entry.feed
 
     titles = subscription_titles(user_ids, feed)
     body = format_text(entry.title)

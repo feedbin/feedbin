@@ -40,7 +40,9 @@ module Api
         end
 
         if query.length > 0
-          query[:read] = false
+          if params[:read].present?
+            query[:read] = (params[:read] == 'true') ? true : false
+          end
           @entries = Entry.search(query, @user)
         else
           @entries = []
