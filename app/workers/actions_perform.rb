@@ -4,7 +4,7 @@ class ActionsPerform
 
   def perform(entry_id, matched_saved_search_ids)
     # Looks like [[8, 1, ["mark_read", "star"]], [7, 1, ["mark_read"]]]
-    actions = Rails.cache.fetch("actions:all:array4", expires_in: 5.minutes) { Action.all.pluck(:id, :user_id, :actions) }
+    actions = Rails.cache.fetch("actions:all:array", expires_in: 5.minutes) { Action.all.pluck(:id, :user_id, :actions) }
     actions = actions.keep_if { |action_id, user_id, actions| matched_saved_search_ids.include?(action_id) }
 
     if actions.present?
