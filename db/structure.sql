@@ -70,7 +70,10 @@ CREATE TABLE actions (
     all_feeds boolean DEFAULT false,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    title text
+    title text,
+    tag_ids integer[] DEFAULT '{}'::integer[],
+    action_type integer DEFAULT 0,
+    computed_feed_ids integer[] DEFAULT '{}'::integer[]
 );
 
 
@@ -192,6 +195,40 @@ CREATE SEQUENCE deleted_users_id_seq
 --
 
 ALTER SEQUENCE deleted_users_id_seq OWNED BY deleted_users.id;
+
+
+--
+-- Name: devices; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE devices (
+    id integer NOT NULL,
+    user_id integer,
+    token text,
+    model text,
+    device_type integer,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: devices_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE devices_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: devices_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE devices_id_seq OWNED BY devices.id;
 
 
 --
@@ -847,6 +884,13 @@ ALTER TABLE ONLY deleted_users ALTER COLUMN id SET DEFAULT nextval('deleted_user
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY devices ALTER COLUMN id SET DEFAULT nextval('devices_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY entries ALTER COLUMN id SET DEFAULT nextval('entries_id_seq'::regclass);
 
 
@@ -992,6 +1036,14 @@ ALTER TABLE ONLY coupons
 
 ALTER TABLE ONLY deleted_users
     ADD CONSTRAINT deleted_users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: devices_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY devices
+    ADD CONSTRAINT devices_pkey PRIMARY KEY (id);
 
 
 --
@@ -1163,6 +1215,20 @@ CREATE INDEX index_coupons_on_user_id ON coupons USING btree (user_id);
 --
 
 CREATE INDEX index_deleted_users_on_email ON deleted_users USING btree (email);
+
+
+--
+-- Name: index_devices_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_devices_on_token ON devices USING btree (token);
+
+
+--
+-- Name: index_devices_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_devices_on_user_id ON devices USING btree (user_id);
 
 
 --
@@ -1745,4 +1811,8 @@ INSERT INTO schema_migrations (version) VALUES ('20141202203934');
 INSERT INTO schema_migrations (version) VALUES ('20141208231955');
 
 INSERT INTO schema_migrations (version) VALUES ('20141215195928');
+
+INSERT INTO schema_migrations (version) VALUES ('20150424224723');
+
+INSERT INTO schema_migrations (version) VALUES ('20150425060924');
 
