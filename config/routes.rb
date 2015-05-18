@@ -154,29 +154,39 @@ Feedbin::Application.routes.draw do
   constraints subdomain: 'api' do
     namespace :api, path: nil do
       namespace :v2 do
-        get :authentication, to: 'authentication#index'
 
         resources :feeds, only: [:show] do
           resources :entries, only: [:index, :show], controller: :feeds_entries
         end
-        resources :subscriptions,  only: [:index, :show, :create, :destroy, :update]
-        post "subscriptions/:id/update", to: 'subscriptions#update'
+
+        resources :entry_counts, only: [] do
+          collection do
+            get :post_frequency
+          end
+        end
 
         resources :actions, only: [:index, :create, :update] do
           member do
             get :results
           end
         end
+
         resources :devices,               only: [:create] do
           collection do
             get :test
           end
         end
+
+        resources :subscriptions,         only: [:index, :show, :create, :destroy, :update]
         resources :favicons,              only: [:index]
         resources :tags,                  only: [:index]
         resources :taggings,              only: [:index, :show, :create, :destroy]
         resources :entries,               only: [:index, :show]
         resources :recently_read_entries, only: [:index, :create]
+
+        get :authentication, to: 'authentication#index'
+
+        post "subscriptions/:id/update", to: 'subscriptions#update'
 
         resources :unread_entries, only: [:index, :show, :create]
         delete 'unread_entries', to: 'unread_entries#destroy'

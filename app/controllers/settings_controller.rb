@@ -200,26 +200,6 @@ class SettingsController < ApplicationController
     render nothing: true
   end
 
-  def get_post_frequency(feed_ids)
-    start_date = 55.days.ago
-    end_date = Time.now
-
-    query = total_activity_query
-    query = ActiveRecord::Base.send(:sanitize_sql_array, [query, start_date, end_date, start_date, feed_ids])
-    results = ActiveRecord::Base.connection.execute(query)
-
-    counts = results.each_with_object([]) do |result, array|
-      array.push(result['entries_count'].to_i)
-    end
-
-    max = counts.max
-
-    if max != 0
-      counts = counts.map {|count| ((count.to_f / max.to_f) * 100).ceil}
-    end
-
-    counts
-  end
 
 
   private
@@ -301,30 +281,6 @@ class SettingsController < ApplicationController
         FROM feed_stats
         WHERE day >= ?
         AND feed_id = ?
-      ) results
-      ON (date = results.day)
-    eos
-  end
-
-  def total_activity_query
-    <<-eos
-      SELECT
-        date,
-        coalesce(entries_count,0) AS entries_count
-      FROM
-      generate_series(
-        ?::date,
-        ?::date,
-        '1 day'
-      ) AS date
-      LEFT OUTER JOIN (
-        SELECT
-        day,
-        sum(entries_count) AS entries_count
-        FROM feed_stats
-        WHERE day >= ?
-        AND feed_id IN (?)
-        GROUP BY day
       ) results
       ON (date = results.day)
     eos
