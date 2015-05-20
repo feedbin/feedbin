@@ -8,8 +8,9 @@ module Api
 
       def create
         @user = current_user
+        Device.where("lower(token) = ?", params[:device][:token].downcase).destroy_all
         token = params[:device][:old_token] || params[:device][:token]
-        @user.devices.where(token: token).first_or_create.update_attributes(device_params)
+        @user.devices.where("lower(token) = ?", token.downcase).first_or_create.update_attributes(device_params)
         render nothing: true
       end
 
