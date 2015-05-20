@@ -1218,10 +1218,10 @@ CREATE INDEX index_deleted_users_on_email ON deleted_users USING btree (email);
 
 
 --
--- Name: index_devices_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_devices_on_lower_tokens; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_devices_on_token ON devices USING btree (token);
+CREATE UNIQUE INDEX index_devices_on_lower_tokens ON devices USING btree (lower(token));
 
 
 --
@@ -1815,4 +1815,6 @@ INSERT INTO schema_migrations (version) VALUES ('20141215195928');
 INSERT INTO schema_migrations (version) VALUES ('20150424224723');
 
 INSERT INTO schema_migrations (version) VALUES ('20150425060924');
+
+INSERT INTO schema_migrations (version) VALUES ('20150520213553');
 

@@ -31,4 +31,8 @@ every(1.day, 'clockwork.daily', at: '12:00', tz: 'UTC') do
     TrialExpiration.perform_async
   end
 
+  if RedisLock.acquire("clockwork:device_feedback")
+    DeviceFeedback.perform_async
+  end
+
 end
