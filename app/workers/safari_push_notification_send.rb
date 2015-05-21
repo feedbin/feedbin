@@ -1,3 +1,4 @@
+# ENV['RAILS_ENV'] = 'production'; reload!; p = SafariPushNotificationSend.new; p.perform([2], 2)
 class SafariPushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
@@ -19,8 +20,6 @@ class SafariPushNotificationSend
       notification = Grocer::SafariNotification.new(notification)
       array.push(notification)
     end
-
-    puts notifications.inspect
 
     $grocer.with do |pusher|
       notifications.each { |notification| puts pusher.push(notification) }
