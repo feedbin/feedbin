@@ -22,7 +22,7 @@ class SafariPushNotificationSend
     end
 
     $grocer.with do |pusher|
-      notifications.each { |notification| puts pusher.push(notification) }
+      notifications.each { |notification| pusher.push(notification) }
     end
 
     Librato.increment 'push_notifications_sent', by: notifications.length
