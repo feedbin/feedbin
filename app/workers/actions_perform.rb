@@ -19,7 +19,7 @@ class ActionsPerform
       queues.each do |action_name, user_ids|
         user_ids = user_ids.to_a
         if action_name == 'send_push_notification'
-          SafariPushNotificationSend.perform_async(entry_id, user_ids)
+          SafariPushNotificationSend.perform_async(user_ids, entry_id)
         elsif action_name == 'star'
           users = User.where(id: user_ids)
           entry = Entry.find(entry_id)

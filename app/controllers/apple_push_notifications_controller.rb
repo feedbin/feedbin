@@ -14,14 +14,13 @@ class ApplePushNotificationsController < ApplicationController
   end
 
   def update
-    @user.apple_push_notification_device_token = params[:device_token]
-    @user.save
+    Device.where("lower(token) = ?", params[:device_token].downcase).destroy_all
+    @user.devices.where("lower(token) = ?", params[:device_token].downcase).first_or_create(token: params[:device_token], device_type: :safari, model: request.env['HTTP_USER_AGENT'])
     render nothing: true
   end
 
   def delete
-    @user.apple_push_notification_device_token = nil
-    @user.save
+    Device.where("lower(token) = ?", params[:device_token].downcase).destroy_all
     render nothing: true
   end
 

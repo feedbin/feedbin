@@ -2,60 +2,62 @@ class SafariPushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
 
-  # ENV['RAILS_ENV'] = 'production'; reload!; p = SafariPushNotificationSend.new; p.perform(1, [1])
-  #
-  # Payload must be less than 256 bytes a payload without the body is about
-  # 157 bytes
-  def perform(entry_id, user_ids)
-    if $grocer
-      notifications = build_notifications(entry_id, user_ids)
-      send_notifications(notifications)
-    end
-  end
+  def perform(user_ids, entry_id)
+    users = User.where(id: user_ids)
+    tokens = Device.where(user_id: user_ids).safari.pluck(:user_id, :token)
+    entry = Entry.find(entry_id)
+    feed = entry.feed
+    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
 
-  def send_notifications(notifications)
-    $grocer.with do |pusher|
-      notifications.each { |notification| pusher.push(notification) }
+    titles = subscription_titles(user_ids, feed)
+    body = format_text(entry.title, 90)
+    title = format_text(feed.title, 36)
+
+    notifications = tokens.each_with_object([]) do |(user_id, token), array|
+      title = titles[user_id] || title
+      notification = build_notification(token, title, body, entry_id, user_id, verifier)
+      notification = Grocer::SafariNotification.new(notification)
+      array.push(notification)
     end
+
+    puts notifications.inspect
+
+    $grocer.with do |pusher|
+      notifications.each { |notification| puts pusher.push(notification) }
+    end
+
     Librato.increment 'push_notifications_sent', by: notifications.length
   end
 
-  def build_notifications(entry_id, user_ids)
-    entry = Entry.find(entry_id)
-    feed = Feed.find(entry.feed_id)
-    users = User.where(id: user_ids)
-    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
-
-    # Use user specified feed titles where available
+  def subscription_titles(user_ids, feed)
     titles = Subscription.where(feed: feed, user_id: user_ids).pluck(:user_id, :title)
-    titles = titles.each_with_object({}) do |(user_id, feed_title), hash|
-      hash[user_id] = feed_title
+    titles.each_with_object({}) do |(user_id, feed_title), hash|
+      hash[user_id] = format_text(feed_title, 36)
     end
+  end
 
-    notifications = []
-    users.each do |user|
-      unless user.apple_push_notification_device_token.blank?
-        title = titles[user.id] || feed.title
-        notifications << Grocer::SafariNotification.new(
-          device_token: user.apple_push_notification_device_token,
-          title: format_string(title, 36),
-          body: format_string(entry.title, 90),
-          url_args: [entry.id.to_s, CGI::escape(verifier.generate(user.id))]
-        )
+  def format_text(string, max_bytes)
+    if string.present?
+      string = CGI.unescapeHTML(string)
+      string = ApplicationController.helpers.sanitize(string, tags: []).squish.mb_chars
+      if string.length > max_bytes
+        omission = '...'
+      else
+        omission = ''
       end
+      string = string.limit(max_bytes).to_s
+      string + omission
     end
-    notifications
+    string
   end
 
-  def format_string(string, max_bytes)
-    string = CGI.unescapeHTML(string)
-    string = ApplicationController.helpers.sanitize(string, tags: []).squish.mb_chars
-    if string.length > max_bytes
-      omission = '...'
-    else
-      omission = ''
-    end
-    string = string.limit(max_bytes).to_s
-    string + omission
+  def build_notification(device_token, title, body, entry_id, user_id, verifier)
+    {
+      device_token: device_token,
+      title: title,
+      body: body,
+      url_args: [entry_id.to_s, CGI::escape(verifier.generate(user_id))]
+    }
   end
+
 end
