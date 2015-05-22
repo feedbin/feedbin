@@ -33,7 +33,7 @@ end
 gem 'pg'
 gem 'unicorn'
 
-gem 'feedjira',              github: 'feedbin/feedjira',            ref: '9ebf398'
+gem 'feedjira',              github: 'feedbin/feedjira',            ref: '7884b8b'
 gem 'opml_saw',              github: 'feedbin/opml_saw',            ref: '61d8c2d'
 gem 'html-pipeline',         github: 'feedbin/html-pipeline',       ref: 'd7e451f'
 gem 'grocer-pushpackager',   github: 'feedbin/grocer-pushpackager', ref: 'e190796', require: 'grocer/pushpackager'
