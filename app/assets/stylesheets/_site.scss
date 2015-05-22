@@ -3381,13 +3381,6 @@ $saved-search-control-height: 48px;
         margin-bottom: 0;
     }
 
-    iframe {
-        background-color: #000;
-        &.twitter-tweet {
-            background-color: #FFF;
-        }
-    }
-
     figcaption, caption {
         font-size: 80%;
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
@@ -3400,10 +3393,6 @@ $saved-search-control-height: 48px;
         width: 100%;
         background-color: #000;
         max-width: 100%;
-    }
-
-    iframe[src*='w.soundcloud.com'] {
-        background-color: transparent;
     }
 
     .download-link {
