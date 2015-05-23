@@ -44,7 +44,7 @@ class FeedFetcher
   end
 
   def get_options
-    content = Feedjira::Feed.fetch_raw(@url, {user_agent: 'Feedbin', ssl_verify_peer: false, timeout: 20, connect_timeout: 10})
+    content = Feedjira::Feed.fetch_raw(@url, {user_agent: 'Feedbin', ssl_verify_peer: false, timeout: 20, connect_timeout: 10, max_redirects: 5})
     if content.is_a?(String)
       content = Nokogiri::HTML(content)
 
@@ -150,9 +150,12 @@ class FeedFetcher
 
   # Fetch and normalize feed
   def fetch_and_parse(options = {}, saved_feed_url = nil)
-    defaults = {user_agent: 'Feedbin', ssl_verify_peer: false, timeout: 20, connect_timeout: 10}
+    defaults = {user_agent: 'Feedbin', ssl_verify_peer: false, timeout: 20, connect_timeout: 10, max_redirects: 5}
     options = defaults.merge(options)
-    feedjira = Feedjira::Feed.fetch_and_parse(@url, options)
+    feedjira = nil
+    Timeout::timeout(35) do
+      feedjira = Feedjira::Feed.fetch_and_parse(@url, options)
+    end
     if feedjira.respond_to?(:hubs) && !feedjira.hubs.blank? && options[:push_callback] && options[:feed_id]
       if @url == feedjira.feed_url
         push_subscribe(feedjira, options[:feed_id], options[:push_callback], options[:hub_secret])
