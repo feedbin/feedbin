@@ -3,7 +3,6 @@ class DevicePushNotificationSend
   sidekiq_options retry: false, queue: :critical
 
   def perform(user_ids, entry_id)
-    users = User.where(id: user_ids)
     tokens = Device.where(user_id: user_ids).ios.pluck(:user_id, :token)
     entry = Entry.find(entry_id)
     feed = entry.feed
@@ -52,7 +51,7 @@ class DevicePushNotificationSend
       sound: "",
       alert: {
         title: title,
-        body: "#{title}: #{body}"
+        body: body
       },
       custom: {
         feedbin: {
