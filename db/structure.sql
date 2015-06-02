@@ -208,7 +208,9 @@ CREATE TABLE devices (
     model text,
     device_type integer,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    application text,
+    operating_system text
 );
 
 
@@ -1817,4 +1819,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150424224723');
 INSERT INTO schema_migrations (version) VALUES ('20150425060924');
 
 INSERT INTO schema_migrations (version) VALUES ('20150520213553');
+
+INSERT INTO schema_migrations (version) VALUES ('20150602223929');
 
