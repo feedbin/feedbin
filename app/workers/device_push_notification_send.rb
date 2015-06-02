@@ -44,21 +44,31 @@ class DevicePushNotificationSend
   end
 
   def build_notification(device_token, title, body, entry_id)
-    {
+    notification = {
       device_token: device_token,
       category: "singleArticle",
       content_available: true,
       sound: "",
-      alert: {
-        title: title,
-        body: body
-      },
       custom: {
         feedbin: {
-          entry_id: entry_id
+          entry_id: entry_id,
+          title: title,
+          body: body,
         }
       }
     }
+
+    # notification[:alert] = {
+    #   title: title,
+    #   body: body
+    # }
+    notification[:alert] = {
+      title: title,
+      body: "#{title}: #{body}"
+    }
+    # notification[:alert] = "#{title}: #{body}"
+
+    notification
   end
 
 end
