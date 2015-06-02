@@ -109,9 +109,26 @@ class Entry < ActiveRecord::Base
         filter :ids, values: ids
       end
 
-      # Always limit searches to subscriptions and starred items
-      filter :or, { terms: { feed_id: feed_ids } },
-                  { ids: { values: user.starred_entries.pluck(:entry_id) } }
+      if params[:query].present?
+        feed_options = {
+          terms: {
+            feed_id: feed_ids
+          }
+        }
+        starred_options = {
+          ids: {
+            values: user.starred_entries.pluck(:entry_id)
+          }
+        }
+        filter :or, feed_options, starred_options
+      else
+        options = {
+          terms: {
+            feed_id: feed_ids
+          }
+        }
+        filter :or, options, {}
+      end
     end
 
   end
