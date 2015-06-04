@@ -51,7 +51,7 @@ class DevicePushNotificationSend
       sound: "",
       alert: {
         title: title,
-        body: body,
+        body: "#{title}: #{body}",
       },
       custom: {
         feedbin: {
