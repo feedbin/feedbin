@@ -1,32 +1,41 @@
 class Action < ActiveRecord::Base
+
+    attr_accessor :empty, :automatic_modification
+
     belongs_to :user
 
     before_save :compute_tag_ids
     before_save :compute_feed_ids
-    after_commit :search_percolate_store, on: [:create, :update]
+    before_save :check_if_empty
     after_destroy :search_percolate_remove
+
+    after_commit :search_percolate_store, on: [:create, :update]
 
     enum action_type: { standard: 0, notifier: 1 }
 
     def search_percolate_store
-      action_feed_ids = self.computed_feed_ids
-      action_query = self.query
-      result = Entry.index.register_percolator_query(self.id) do |search|
-        search.filtered do
-          unless action_query.blank?
-            query { string Entry.escape_search(action_query) }
-          end
-          if action_feed_ids.any?
-            filter :terms, feed_id: action_feed_ids
+      if self.empty == true && self.automatic_modification == true
+        self.destroy
+      else
+        action_feed_ids = self.computed_feed_ids
+        action_query = self.query
+        result = Entry.index.register_percolator_query(self.id) do |search|
+          search.filtered do
+            unless action_query.blank?
+              query { string Entry.escape_search(action_query) }
+            end
+            if action_feed_ids.any?
+              filter :terms, feed_id: action_feed_ids
+            end
           end
         end
-      end
-      if result.nil?
-        Honeybadger.notify(
-          error_class: "Action Percolate Save",
-          error_message: "Action Percolate Save Failure",
-          parameters: {id: self.id}
-        )
+        if result.nil?
+          Honeybadger.notify(
+            error_class: "Action Percolate Save",
+            error_message: "Action Percolate Save Failure",
+            parameters: {id: self.id}
+          )
+        end
       end
     end
 
@@ -50,6 +59,12 @@ class Action < ActiveRecord::Base
         if !self.user.tags.where(id: tag_id).present?
           self.tag_ids = self.tag_ids - [tag_id]
         end
+      end
+    end
+
+    def check_if_empty
+      if self.computed_feed_ids.empty? && !self.computed_feed_ids_was.empty?
+        self.empty = true
       end
     end
 
