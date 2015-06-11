@@ -27,11 +27,19 @@ class SettingsController < ApplicationController
     @user = current_user
     @subscriptions = @user.subscriptions.select('subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host').joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}").includes(:feed)
 
+    start_date = 29.days.ago
     feed_ids = @subscriptions.map {|subscription| subscription.feed_id}
-    entry_counts = Rails.cache.fetch("#{@user.id}:entry_counts", expires_in: 24.hours) { get_entry_counts(feed_ids) }
+    entry_counts = Rails.cache.fetch("#{@user.id}:entry_counts:2", expires_in: 24.hours) { get_entry_counts(feed_ids, start_date) }
+    max = Rails.cache.fetch("#{@user.id}:max_entry_count", expires_in: 24.hours) { max_entry_count(feed_ids, start_date) }
 
-    @subscriptions = @subscriptions.map {|subscription|
-      subscription.entries_count = entry_counts[subscription.feed_id]
+    @subscriptions = @subscriptions.map do |subscription|
+      counts = entry_counts[subscription.feed_id]
+      percentages = counts.map { |count| count.to_f / max.to_f }
+      volume = counts.sum
+
+      subscription.entries_count = percentages
+      subscription.post_volume = volume
+
       if subscription.title
         subscription.title = subscription.title
       elsif subscription.original_title
@@ -40,7 +48,7 @@ class SettingsController < ApplicationController
         subscription.title = '(No title)'
       end
       subscription
-    }
+    end
 
     @subscriptions = @subscriptions.sort_by {|subscription| subscription.title.downcase}
   end
@@ -234,22 +242,20 @@ class SettingsController < ApplicationController
                                  :hide_recently_read, :hide_updated, :disable_image_proxy)
   end
 
-  def get_entry_counts(feed_ids)
-    start_date = 29.days.ago
+  def get_entry_counts(feed_ids, start_date)
     end_date = Time.now
 
-    max = max_entry_count(feed_ids, start_date)
     stats_query = relative_entry_count_query
 
     entry_counts = {}
     feed_ids.each do |feed_id|
-      query = ActiveRecord::Base.send(:sanitize_sql_array, [stats_query, start_date, end_date, max, start_date, feed_id])
+      query = ActiveRecord::Base.send(:sanitize_sql_array, [stats_query, start_date, end_date, start_date, feed_id])
       results = ActiveRecord::Base.connection.execute(query)
       results.each do |result|
         if entry_counts.has_key?(feed_id)
-          entry_counts[feed_id] << result['entries_count']
+          entry_counts[feed_id] << result['entries_count'].to_i
         else
-          entry_counts[feed_id] = [result['entries_count']]
+          entry_counts[feed_id] = [result['entries_count'].to_i]
         end
       end
     end
@@ -277,7 +283,7 @@ class SettingsController < ApplicationController
       LEFT OUTER JOIN (
         SELECT
         day,
-        (entries_count::float / ?) AS entries_count
+        entries_count
         FROM feed_stats
         WHERE day >= ?
         AND feed_id = ?

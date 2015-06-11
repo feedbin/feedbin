@@ -301,6 +301,11 @@ $.extend feedbin,
     bTimestamp = $(b).data('sort-last-updated') * 1
     return bTimestamp - aTimestamp
 
+  sortByVolume: (a, b) ->
+    aVolume = $(a).data('sort-post-volume') * 1
+    bVolume = $(b).data('sort-post-volume') * 1
+    return bVolume - aVolume
+
   sortByName: (a, b) ->
     $(a).data('sort-name').localeCompare($(b).data('sort-name'))
 
@@ -965,6 +970,8 @@ $.extend feedbin,
           sortFunction = feedbin.sortByName
         else if sortBy == "last-updated"
           sortFunction = feedbin.sortByLastUpdated
+        else if sortBy == "volume"
+          sortFunction = feedbin.sortByVolume
         $('.sortable li').sort(sortFunction).appendTo('.sortable');
       return
 

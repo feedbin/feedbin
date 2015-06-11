@@ -20,6 +20,7 @@
                     <ul>
                         <li data-behavior="sort_feeds" data-value="name"><span>Sort by name</span></li>
                         <li data-behavior="sort_feeds" data-value="last-updated"><span>Sort by last updated</span></li>
+                        <li data-behavior="sort_feeds" data-value="volume"><span>Sort by volume</span></li>
                     </ul>
                 </div>
             </div>
@@ -43,7 +44,7 @@
             <% @subscriptions.each do |subscription| %>
                 <% present subscription do |subscription_presenter| %>
                     <%= fields_for "subscriptions[]", subscription do |f| %>
-                        <li data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>">
+                        <li data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>" data-sort-post-volume="<%= subscription.post_volume %>">
                             <div class="checkbox-wrap">
                                 <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}" %>
                             </div>
@@ -63,7 +64,7 @@
                                 <%= timeago(subscription.last_published_entry) %>
                             </div>
                             <div class="canvas-wrap">
-                                <%= content_tag :canvas, '', width: 97, height: 20, data: { values: subscription.entries_count }, title: 'Post frequency' %>
+                                <%= content_tag :canvas, '', width: 97, height: 20, data: { values: subscription.entries_count }, title: "Post frequency (#{number_with_delimiter(subscription.post_volume)} posts in the last 30 days)" %>
                             </div>
                         </li>
                     <% end %>
