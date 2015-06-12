@@ -10,8 +10,9 @@ class SafariPushNotificationSend
     feed = entry.feed
     verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
 
+    body = entry.title || entry.summary
+    body = format_text(body, 90)
     titles = subscription_titles(user_ids, feed)
-    body = format_text(entry.title, 90)
     title = format_text(feed.title, 36)
 
     notifications = tokens.each_with_object([]) do |(user_id, token), array|
