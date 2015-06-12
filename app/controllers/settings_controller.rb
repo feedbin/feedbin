@@ -35,7 +35,7 @@ class SettingsController < ApplicationController
     @subscriptions = @subscriptions.map do |subscription|
       counts = entry_counts[subscription.feed_id]
       percentages = (counts.present?) ? counts.map { |count| count.to_f / max.to_f } : nil
-      volume = counts.sum
+      volume = (counts.present?) ? counts.sum : 0
 
       subscription.entries_count = percentages
       subscription.post_volume = volume
