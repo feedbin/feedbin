@@ -5836,6 +5836,14 @@ Bigfoot
         background-image: linear-gradient(to bottom, rgba(255,255,255,0) 0%, $list-background-color 50%)
     }
 }
+.theme-night .bigfoot-footnote a {
+	color: $selected !important;
+	text-decoration: none !important;
+}
+.theme-night .bigfoot-footnote a:hover {
+    color: #2877c6 !important;
+    text-decoration: underline !important;
+}
 
 /*------------------------------------------------------------------------------
 Media Queries
