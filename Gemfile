@@ -7,7 +7,7 @@ gem 'rest-client', '= 1.6.7'
 group :development do
   gem 'better_errors'
   gem 'quiet_assets'
-  gem 'capistrano', '~> 2.15.5'
+  gem 'capistrano', github: 'capistrano/capistrano', ref: 'dcd3257'
   gem 'capistrano-unicorn', github: 'sosedoff/capistrano-unicorn', ref: '52376ad', require: false
   gem 'dotenv-rails'
   gem 'silencer'

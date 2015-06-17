@@ -1,4 +1,16 @@
 GIT
+  remote: git://github.com/capistrano/capistrano.git
+  revision: dcd325716593553b1538a97c5876b07210f9af13
+  ref: dcd3257
+  specs:
+    capistrano (2.15.6)
+      highline
+      net-scp (>= 1.0.0)
+      net-sftp (>= 2.0.0)
+      net-ssh (>= 2.0.14)
+      net-ssh-gateway (>= 1.1.0)
+
+GIT
   remote: git://github.com/feedbin/feedjira.git
   revision: 7884b8bb25044f76196183cf072e116aed31b9f6
   ref: 7884b8b
@@ -112,12 +124,6 @@ GEM
       rack (>= 0.9.0)
     builder (3.2.2)
     bust_rails_etags (0.0.5)
-    capistrano (2.15.5)
-      highline
-      net-scp (>= 1.0.0)
-      net-sftp (>= 2.0.0)
-      net-ssh (>= 2.0.14)
-      net-ssh-gateway (>= 1.1.0)
     carrierwave (0.10.0)
       activemodel (>= 3.2.0)
       activesupport (>= 3.2.0)
@@ -468,7 +474,7 @@ DEPENDENCIES
   benchmark-ips
   better_errors
   bust_rails_etags
-  capistrano (~> 2.15.5)
+  capistrano!
   capistrano-unicorn!
   carrierwave
   carrierwave_direct
@@ -526,3 +532,6 @@ DEPENDENCIES
   will_paginate
   xipio
   yajl-ruby
+
+BUNDLED WITH
+   1.10.4
