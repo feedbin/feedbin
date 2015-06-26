@@ -55,22 +55,36 @@ class User < ActiveRecord::Base
                                 allow_destroy: true,
                                 reject_if: -> attributes { attributes['label'].blank? || attributes['url'].blank? }
 
+
+  after_initialize :set_defaults, if: :new_record?
+
   before_save :update_billing, unless: -> user { user.admin || !ENV['STRIPE_API_KEY'] }
-  before_destroy :cancel_billing, unless: -> user { user.admin }
-  before_destroy :create_deleted_user
   before_save :strip_email
   before_save :activate_subscriptions
   before_save { reset_auth_token }
+
   before_create { generate_token(:starred_token) }
   before_create { generate_token(:inbound_email_token) }
 
-  validates_presence_of :password, on: :create
-  validates_presence_of :email
-  validates_uniqueness_of :email, case_sensitive: false
+  before_destroy :cancel_billing, unless: -> user { user.admin }
+  before_destroy :create_deleted_user
+
   validate :changed_password, on: :update, unless: -> user { user.password_reset }
   validate :coupon_code_valid, on: :create, if: -> user { user.coupon_code }
   validate :plan_type_valid, on: :update
   validate :trial_plan_valid
+
+  validates_presence_of :password, on: :create
+  validates_presence_of :email
+  validates_uniqueness_of :email, case_sensitive: false
+
+  def set_defaults
+    self.update_auth_token = true
+    self.mark_as_read_confirmation = 1
+    self.theme = "sunset"
+    self.font = "serif-2"
+    self.font_size = 7
+  end
 
   def get_view_mode
     view_mode || "view_unread"

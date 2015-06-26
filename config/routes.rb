@@ -183,6 +183,7 @@ Feedbin::Application.routes.draw do
         resources :taggings,              only: [:index, :show, :create, :destroy]
         resources :entries,               only: [:index, :show]
         resources :recently_read_entries, only: [:index, :create]
+        resources :users,                 only: [:create]
 
         get :authentication, to: 'authentication#index'
 
