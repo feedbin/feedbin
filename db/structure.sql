@@ -831,7 +831,8 @@ CREATE TABLE users (
     settings hstore,
     starred_token character varying(255),
     inbound_email_token character varying(255),
-    tag_visibility json DEFAULT '{}'::json
+    tag_visibility json DEFAULT '{}'::json,
+    expires_at timestamp without time zone
 );
 
 
@@ -1556,6 +1557,13 @@ CREATE UNIQUE INDEX index_users_on_customer_id ON users USING btree (customer_id
 
 
 --
+-- Name: index_users_on_expires_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_users_on_expires_at ON users USING btree (expires_at);
+
+
+--
 -- Name: index_users_on_inbound_email_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1821,4 +1829,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150425060924');
 INSERT INTO schema_migrations (version) VALUES ('20150520213553');
 
 INSERT INTO schema_migrations (version) VALUES ('20150602223929');
+
+INSERT INTO schema_migrations (version) VALUES ('20150626223113');
 
