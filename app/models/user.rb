@@ -74,11 +74,12 @@ class User < ActiveRecord::Base
   validate :plan_type_valid, on: :update
   validate :trial_plan_valid
 
-  validates_presence_of :password, on: :create
   validates_presence_of :email
   validates_uniqueness_of :email, case_sensitive: false
+  validates_presence_of :password, on: :create
 
   def set_defaults
+    self.expires_at = Feedbin::Application.config.trial_days.days.from_now
     self.update_auth_token = true
     self.mark_as_read_confirmation = 1
     self.theme = "sunset"

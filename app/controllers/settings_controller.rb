@@ -72,7 +72,7 @@ class SettingsController < ApplicationController
     elsif @user.plan.stripe_id == 'free'
       @plans = Plan.where(price_tier: @user.plan.price_tier)
     else
-      @plans = Plan.where(price_tier: @user.plan.price_tier).where.not(stripe_id: ['free', 'trial'])
+      @plans = Plan.where(price_tier: @user.plan.price_tier).where.not(stripe_id: ['free', 'trial', 'timed'])
     end
   end
 

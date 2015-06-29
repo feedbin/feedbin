@@ -12,9 +12,9 @@ module Api
         @user.plan = Plan.find_by_stripe_id('trial')
         @user.password_confirmation = user_params.try(:user).try(:password)
         if @user.save
-          render nothing: true
+          render nothing: true, status: :created
         else
-          render json: { errors: @user.errors.full_messages.uniq }
+          render json: { errors: @user.errors.full_messages.uniq }, status: :bad_request
         end
       end
 
