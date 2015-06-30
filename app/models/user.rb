@@ -79,7 +79,7 @@ class User < ActiveRecord::Base
   validates_presence_of :password, on: :create
 
   def set_defaults
-    # self.expires_at = Feedbin::Application.config.trial_days.days.from_now
+    self.expires_at = Feedbin::Application.config.trial_days.days.from_now
     self.update_auth_token = true
     self.mark_as_read_confirmation = 1
     self.theme = "sunset"
