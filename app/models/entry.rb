@@ -302,7 +302,7 @@ class Entry < ActiveRecord::Base
       end
       UnreadEntry.import(unread_entries, validate: false)
     end
-    SearchIndexStore.perform_async(self.class.name, self.id)
+    # SearchIndexStore.perform_async(self.class.name, self.id)
   end
 
   def add_to_created_at_set
