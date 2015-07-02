@@ -50,7 +50,6 @@
     <div class="entries-header" data-behavior="entries-header"></div>
       <div class="entries-inner">
       <%= form_tag search_entries_path, class: 'search-form-wrap', remote: true, method: :get, data: {behavior: 'search_form'} do %>
-        <%= search_field_tag :query, params[:query], placeholder: 'Search', autocomplete: 'off' %>
       <% end %>
 
       <div class="search-control hide">
