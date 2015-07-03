@@ -3,7 +3,6 @@ class SearchIndexStore
   sidekiq_options queue: :critical
 
   def perform(klass, id, update = false)
-    return
     klass = klass.constantize
     record = klass.find(id)
     if update
