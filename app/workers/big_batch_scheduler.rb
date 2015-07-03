@@ -3,7 +3,7 @@ class BigBatchScheduler
   sidekiq_options queue: :worker_slow
 
   def perform
-    total_records = 47
+    total_records = 872963011
     batch_size = 1000
     batch_count = (total_records.to_f/batch_size.to_f).ceil
     jobs = []

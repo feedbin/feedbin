@@ -8,10 +8,9 @@ class BigBatch
     finish = batch * batch_size
     ids = (start..finish).to_a
 
-    Entry.where(id: ids).find_in_batches(batch_size: batch_size) do |entries|
-      Tire.index("entries").import(entries)
-    end
+    entries = Entry.where(id: ids)
 
+    Tire.index("entries").import(entries)
   end
 
 end
