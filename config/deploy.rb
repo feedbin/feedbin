@@ -34,7 +34,7 @@ default_run_options[:shell] = '/bin/bash --login'
 namespace :foreman do
 
   task :export_worker, roles: :worker do
-    foreman_export = "foreman export --app #{application} --user #{user} --concurrency worker=3,worker_slow=2,clock=1 --log #{shared_path}/log upstart /etc/init"
+    foreman_export = "foreman export --app #{application} --user #{user} --concurrency worker=3,worker_slow=3,clock=1 --log #{shared_path}/log upstart /etc/init"
     run "cd #{current_path} && sudo #{bundle_cmd} exec #{foreman_export}"
   end
 
