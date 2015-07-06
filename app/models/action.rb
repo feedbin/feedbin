@@ -4,8 +4,14 @@ class Action < ActiveRecord::Base
 
     belongs_to :user
 
-    before_save :compute_tag_ids
-    before_save :compute_feed_ids
+    validate do |action|
+      if computed_feed_ids.empty? && self.automatic_modification.blank?
+        self.errors[:base] << "Please select at least one feed or tag"
+      end
+    end
+
+    before_validation :compute_tag_ids
+    before_validation :compute_feed_ids
     before_save :check_if_empty
     after_destroy :search_percolate_remove
 
@@ -46,7 +52,10 @@ class Action < ActiveRecord::Base
     def compute_feed_ids
       final_feed_ids = []
       if self.all_feeds
-        final_feed_ids.concat(self.user.subscriptions.pluck(:feed_id))
+        subscriptions = Subscription.uncached do
+          self.user.subscriptions.pluck(:feed_id)
+        end
+        final_feed_ids.concat(subscriptions)
       end
       final_feed_ids.concat(self.user.taggings.where(tag: self.tag_ids).pluck(:feed_id))
       final_feed_ids.concat(self.feed_ids.reject(&:blank?).map(&:to_i))

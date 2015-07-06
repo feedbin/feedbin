@@ -23,6 +23,7 @@
       </li>
     </ul>
 
+    <% if @user.taggings.any? %>
     <div class="inset-content por">
       <h4 class="group-header">Article is in Tag</h4>
     </div>
@@ -39,6 +40,7 @@
         </div>
       </li>
     </ul>
+    <% end %>
 
     <div class="inset-content por">
       <h4 class="group-header">Article is in Feed</h4>
