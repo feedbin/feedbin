@@ -7,12 +7,12 @@ class InAppPurchase < ActiveRecord::Base
   after_commit :extend_subscription, on: :create
 
   def self.create_from_receipt_json(user, receipt_json)
-    attributes = {
+    create({
       transaction_id: receipt_json["transaction_id"],
       purchase_date: Time.at(receipt_json["purchase_date_ms"].to_i / 1_000),
-      receipt: receipt_json
-    }
-    user.in_app_purchases.create(attributes)
+      receipt: receipt_json,
+      user: user
+    })
   end
 
   def extend_subscription

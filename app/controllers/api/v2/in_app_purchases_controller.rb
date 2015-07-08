@@ -13,9 +13,6 @@ module Api
           receipts = response["receipt"]["in_app"]
           receipts.each do |receipt|
             result = InAppPurchase.create_from_receipt_json(@user, receipt)
-            logger.info { "=================================" }
-            logger.info { receipt.inspect }
-            logger.info { "=================================" }
           end
         else
           render nothing: true, status: :bad_request
