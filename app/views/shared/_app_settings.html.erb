@@ -1,11 +1,28 @@
 <div class="entry-button-wrap">
     <div class="dropdown-wrap dropdown-right button-app-settings">
-        <a class="entry-button" data-behavior="toggle_dropdown" href="#" title="Settings">
-            <%= svg_tag 'icon-chevron', size: '14x8' %>
-        </a>
-        <ul>
-            <li><%= link_to 'Settings', settings_path %></li>
-            <li><%= link_to 'Log Out', logout_path, method: 'delete' %></li>
-        </ul>
+        <div class="entry-button">
+            <div class="hamburger-menu-wrap" data-behavior="toggle_dropdown" title="Settings">
+                <div class="hamburger-menu"></div>
+            </div>
+        </div>
+        <div class="dropdown-content">
+            <ul class="segmented no-border">
+                <li><%= link_to 'Settings', settings_path, class: "no-border" %></li>
+                <li><%= link_to 'Appearance', settings_appearance_path, class: "no-border" %></li>
+                <li><%= link_to 'Feeds', settings_feeds_path %></li>
+            </ul>
+            <ul class="segmented">
+                <li><%= link_to 'Actions', actions_path, class: "no-border" %></li>
+                <li><%= link_to 'Sharing', sharing_services_path %></li>
+            </ul>
+            <ul class="segmented">
+                <li><%= link_to 'Account', settings_account_path, class: "no-border" %></li>
+                <li><%= link_to 'Billing', settings_billing_path, class: "no-border" %></li>
+                <li><%= link_to 'Import/Export', settings_import_export_path %></li>
+            </ul>
+            <ul class="segmented no-margin">
+                <li><%= link_to 'Log Out', logout_path, method: 'delete' %></li>
+            </ul>
+        </div>
     </div>
 </div>

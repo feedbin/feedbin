@@ -17,24 +17,28 @@
             <div class="half text-right float-right">
                 <div class="dropdown-wrap dropdown-right feed-dropdown">
                     <button class="feeds-toolbar-button button-caret no-margin" data-behavior="toggle_dropdown sort_label">Sort by name</button>
-                    <ul>
-                        <li data-behavior="sort_feeds" data-value="name"><span>Sort by name</span></li>
-                        <li data-behavior="sort_feeds" data-value="last-updated"><span>Sort by last updated</span></li>
-                        <li data-behavior="sort_feeds" data-value="volume"><span>Sort by volume</span></li>
-                    </ul>
+                    <div class="dropdown-content">
+                        <ul>
+                            <li data-behavior="sort_feeds" data-value="name"><span>Sort by name</span></li>
+                            <li data-behavior="sort_feeds" data-value="last-updated"><span>Sort by last updated</span></li>
+                            <li data-behavior="sort_feeds" data-value="volume"><span>Sort by volume</span></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div class="half por">
                 <input type="checkbox" class="feeds-checkbox" data-behavior="toggle_checked" />
                 <div class="dropdown-wrap feed-dropdown">
                     <button class="feeds-toolbar-button button-caret" data-behavior="toggle_dropdown feed_actions">Actions</button>
-                    <ul>
-                        <li data-operation="unsubscribe"><span>Unsubscribe</span></li>
-                        <li data-operation="show_updates"><span class="no-border">Show updates on articles</span></li>
-                        <li data-operation="hide_updates"><span>Hide updates on articles</span></li>
-                        <li data-operation="mute"><span class="no-border">Mute Feed</span></li>
-                        <li data-operation="unmute"><span>Unmute Feed</span></li>
-                    </ul>
+                    <div class="dropdown-content">
+                        <ul>
+                            <li data-operation="unsubscribe"><span>Unsubscribe</span></li>
+                            <li data-operation="show_updates"><span class="no-border">Show updates on articles</span></li>
+                            <li data-operation="hide_updates"><span>Hide updates on articles</span></li>
+                            <li data-operation="mute"><span class="no-border">Mute Feed</span></li>
+                            <li data-operation="unmute"><span>Unmute Feed</span></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
