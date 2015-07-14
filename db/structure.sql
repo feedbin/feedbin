@@ -697,6 +697,37 @@ ALTER SEQUENCE subscriptions_id_seq OWNED BY subscriptions.id;
 
 
 --
+-- Name: suggested_categories; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE suggested_categories (
+    id integer NOT NULL,
+    name text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: suggested_categories_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE suggested_categories_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: suggested_categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE suggested_categories_id_seq OWNED BY suggested_categories.id;
+
+
+--
 -- Name: supported_sharing_services; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1019,6 +1050,13 @@ ALTER TABLE ONLY subscriptions ALTER COLUMN id SET DEFAULT nextval('subscription
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY suggested_categories ALTER COLUMN id SET DEFAULT nextval('suggested_categories_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY supported_sharing_services ALTER COLUMN id SET DEFAULT nextval('supported_sharing_services_id_seq'::regclass);
 
 
@@ -1192,6 +1230,14 @@ ALTER TABLE ONLY starred_entries
 
 ALTER TABLE ONLY subscriptions
     ADD CONSTRAINT subscriptions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: suggested_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY suggested_categories
+    ADD CONSTRAINT suggested_categories_pkey PRIMARY KEY (id);
 
 
 --
@@ -1896,4 +1942,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150602223929');
 INSERT INTO schema_migrations (version) VALUES ('20150626223113');
 
 INSERT INTO schema_migrations (version) VALUES ('20150707202540');
+
+INSERT INTO schema_migrations (version) VALUES ('20150713230754');
 
