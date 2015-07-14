@@ -40,9 +40,7 @@ class FaviconFetcher
     url = URI::HTTP.build(host: host)
     response = HTTParty.get(url, {timeout: 20})
     html = Nokogiri::HTML(response)
-    favicon_links = html.search("//link[translate(@rel, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'icon']/@href |" +
-                                "//link[translate(@rel, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'shortcut icon']/@href")
-
+    favicon_links = html.search(xpath)
     if favicon_links.present?
       favicon_url = favicon_links.last.to_s
       favicon_url = URI.parse(favicon_url)
@@ -99,6 +97,14 @@ class FaviconFetcher
     else
       false
     end
+  end
+
+  def xpath
+    icon_names = ["icon", "shortcut icon"]
+    icon_names = icon_names.map do |icon_name|
+      "//link[not(@mask) and translate(@rel, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = '#{icon_name}']/@href"
+    end
+    icon_names.join(" | ")
   end
 
 end
