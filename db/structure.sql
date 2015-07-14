@@ -728,6 +728,38 @@ ALTER SEQUENCE suggested_categories_id_seq OWNED BY suggested_categories.id;
 
 
 --
+-- Name: suggested_feeds; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE suggested_feeds (
+    id integer NOT NULL,
+    suggested_category_id integer,
+    feed_id integer,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: suggested_feeds_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE suggested_feeds_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: suggested_feeds_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE suggested_feeds_id_seq OWNED BY suggested_feeds.id;
+
+
+--
 -- Name: supported_sharing_services; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1057,6 +1089,13 @@ ALTER TABLE ONLY suggested_categories ALTER COLUMN id SET DEFAULT nextval('sugge
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY suggested_feeds ALTER COLUMN id SET DEFAULT nextval('suggested_feeds_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY supported_sharing_services ALTER COLUMN id SET DEFAULT nextval('supported_sharing_services_id_seq'::regclass);
 
 
@@ -1238,6 +1277,14 @@ ALTER TABLE ONLY subscriptions
 
 ALTER TABLE ONLY suggested_categories
     ADD CONSTRAINT suggested_categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: suggested_feeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY suggested_feeds
+    ADD CONSTRAINT suggested_feeds_pkey PRIMARY KEY (id);
 
 
 --
@@ -1523,6 +1570,20 @@ CREATE INDEX index_subscriptions_on_user_id ON subscriptions USING btree (user_i
 --
 
 CREATE UNIQUE INDEX index_subscriptions_on_user_id_and_feed_id ON subscriptions USING btree (user_id, feed_id);
+
+
+--
+-- Name: index_suggested_feeds_on_feed_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_suggested_feeds_on_feed_id ON suggested_feeds USING btree (feed_id);
+
+
+--
+-- Name: index_suggested_feeds_on_suggested_category_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_suggested_feeds_on_suggested_category_id ON suggested_feeds USING btree (suggested_category_id);
 
 
 --
@@ -1944,4 +2005,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150626223113');
 INSERT INTO schema_migrations (version) VALUES ('20150707202540');
 
 INSERT INTO schema_migrations (version) VALUES ('20150713230754');
+
+INSERT INTO schema_migrations (version) VALUES ('20150714000523');
 
