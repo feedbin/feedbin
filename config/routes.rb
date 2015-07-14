@@ -190,6 +190,8 @@ Feedbin::Application.routes.draw do
         resources :entries,               only: [:index, :show]
         resources :recently_read_entries, only: [:index, :create]
         resources :in_app_purchases,      only: [:create]
+        resources :suggested_categories,  only: [:index]
+        resources :suggested_feeds,       only: [:index]
 
         get :authentication, to: 'authentication#index'
 
