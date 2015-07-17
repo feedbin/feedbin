@@ -267,7 +267,7 @@ class User < ActiveRecord::Base
   end
 
   def subscribed_to?(feed_id)
-    subscriptions.where(feed_id: feed_id).present?
+    subscriptions.where(feed_id: feed_id).exists?
   end
 
   def self.search(query)

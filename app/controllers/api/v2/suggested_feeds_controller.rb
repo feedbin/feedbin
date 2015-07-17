@@ -4,10 +4,26 @@ module Api
 
       respond_to :json
 
-      skip_before_action :authorize, only: [:index]
-
       def index
         @suggested_feeds = SuggestedFeed.limit(200).includes(:feed)
+      end
+
+      def subscribe
+        @user = current_user
+        suggested_feed = SuggestedFeed.find(params[:id])
+        feed = suggested_feed.feed
+
+        begin
+          @user.subscriptions.create!(feed: feed)
+        rescue Exception
+        end
+
+        if @user.subscribed_to?(feed.id)
+          render nothing: true, status: :created
+        else
+          render nothing: true, status: :bad_request
+        end
+
       end
 
     end
