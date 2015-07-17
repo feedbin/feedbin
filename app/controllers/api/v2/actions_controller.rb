@@ -18,7 +18,9 @@ module Api
 
       def create
         @user = current_user
-        @action = @user.actions.create(action_params)
+        @action = @user.actions.build(action_params)
+        @action.automatic_modification = true
+        @action.save
       end
 
       def update
