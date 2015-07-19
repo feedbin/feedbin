@@ -37,11 +37,6 @@ Feedbin::Application.configure do
 
   config.middleware.swap Rails::Rack::Logger, Silencer::Logger
 
-  config.action_controller.asset_host = Proc.new { |source, request|
-    if ENV["ASSET_HOST"].present?
-      ENV["ASSET_HOST"]
-    else
-      "#{request.protocol}#{request.host_with_port}"
-    end
-  }
+  config.action_controller.asset_host = ENV["ASSET_HOST"] if ENV["ASSET_HOST"].present?
+
 end
