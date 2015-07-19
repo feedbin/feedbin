@@ -5,147 +5,154 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <style type="text/css">
 * {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
 }
 * {
-  font-family: "Helvetica Neue","Helvetica",Helvetica,Arial,sans-serif;
+    font-family: Helvetica, Arial, sans-serif;
+}
+iframe {
+    display: none!important;
 }
 img {
-	display: block;
-	margin: 0 0 10px 0;
-	width: auto;
-	height: auto;
-	max-width: 100%;
-	vertical-align: middle;
-	border: 0;
+    outline:none;
+    text-decoration:none;
+    -ms-interpolation-mode: bicubic;
+    width: auto!important;
+    height: auto!important;
+    max-width: 100%;
+    clear: both;
+    display: block;
+    margin: 0 0 10px 0;
+    border: 0;
 }
 blockquote {
-	padding: 0 0 0 15px;
-	border-left: 2px solid #DCDEE0;
+    padding: 0 0 0 15px;
+    border-left: 2px solid #DCDEE0;
+    color: #7a7c7e;
 }
 .collapse {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
 }
 body {
-  -webkit-font-smoothing: antialiased;
-  -webkit-text-size-adjust: none;
-  width: 100%!important;
-  height: 100%;
-  padding-top: 40px;
-  padding-bottom: 40px;
-  background-color: #FFFFFF;
+    -webkit-font-smoothing: antialiased;
+    min-width: 100%;
+    -webkit-text-size-adjust:100%;
+    -ms-text-size-adjust:100%;
+    margin:0;
+    padding:0;
+    color: #353739;
+    font-size: 17px;
 }
 a {
-  color: #3399FF;
+    color: #3399FF;
 }
 hr {
-  border: 0;
-  height: 1px;
-  background: #DCDEE0;
-	margin: 25px 0;
+    border: 0;
+    height: 1px;
+    background: #DCDEE0;
+    margin: 25px 0;
 }
 table.body-wrap {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  border: 1px solid #DCDEE0;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
 }
 .collapse {
-  margin: 0!important;
+    margin: 0!important;
 }
 h1, h2, h3, h4, h5, h6 {
-	font-weight: bold;
-	font-style: normal;
-	margin: 0 0 8px 0;
+    font-weight: bold;
+    font-style: normal;
+    margin: 0 0 8px 0;
 }
 h1, h2 {
-	font-size: 18px;
+    font-size: 20px;
 }
 h3, h4, h5, h6 {
-	font-size: 16px;
+    font-size: 18px;
 }
 p,ul,ol {
-  margin-bottom: 10px;
-  font-weight: normal;
-  font-size: 14px;
-  line-height: 1.6;
-}
-p.lead {
-  font-size: 17px;
+    margin-bottom: 15px;
+    font-weight: normal;
+    line-height: 1.6;
 }
 p.preformatted {
-  line-height: 1.4;
-  font-size: 15px;
-  white-space: pre-wrap;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    font-size: 18px;
 }
 p.last {
-  margin-bottom: 0px;
+    margin-bottom: 0px;
 }
 ul li,
 ol li {
-  margin-left: 5px;
-  list-style-position: inside;
+    margin-left: 5px;
+    list-style-position: inside;
 }
 pre code {
-	display: block;
-	white-space: pre-wrap;
-  font-family: monospace;
-  font-size: 15px;
-  margin-bottom: 10px;
+    display: block;
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 16px;
+    margin-bottom: 10px;
 }
 .container {
-  display: block!important;
-  max-width: 600px!important;
-  margin: 0 auto!important;/* makes it centered */
-  clear:both!important;
+    display: block!important;
+    max-width: 600px!important;
+    margin: 0 auto!important;/* makes it centered */
+    clear:both!important;
 }
 .content {
-  padding: 15px;
-  max-width: 600px;
-  margin: 0 auto;
-  display: block;
+    padding: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+    display: block;
 }
 .content table {
-  width: 100%;
+    width: 100%;
+}
+.small {
+    font-size: 16px;
+    color: #b4b6b8;
 }
 @media (max-width: 600px) {
-  table.body-wrap {
-    border: none;
-  }
+    table.body-wrap {
+        border: none;
+    }
 }
 </style>
 </head>
 
 <body bgcolor="#FFFFFF">
-<table class="body-wrap" cellspacing="0">
-  <tr>
-    <td></td>
-    <td class="container" bgcolor="#FFFFFF">
-
-      <div class="content">
-      <table>
+    <table class="body-wrap" cellspacing="0">
         <tr>
-          <td>
-            <% if @message.present? %>
-              <p class="preformatted"><%= @message %></p>
-              <hr />
-            <% end %>
-            <h1><%= link_to strip_tags(@entry.title), @entry.fully_qualified_url  %></h1>
-            <p>
-              <%= strip_tags(@entry.feed.title) %>
-              <br /><%= @entry.published.to_s(:full_human) %>
-            </p>
-            <%= raw(ContentFormatter.api_format(@content, @entry)) %>
-          </td>
-        </tr>
-      </table>
-      </div>
-    </td>
-    <td></td>
-  </tr>
-</table>
+            <td></td>
+            <td class="container" bgcolor="#FFFFFF">
 
+                <div class="content">
+                    <table>
+                        <tr>
+                            <td>
+                                <% if @message.present? %>
+                                    <p class="preformatted"><%= @message %></p>
+                                    <hr />
+                                <% end %>
+                                <h1><%= link_to strip_tags(@entry.title), @entry.fully_qualified_url  %></h1>
+                                <p class="small">
+                                    <%= strip_tags(@entry.feed.title) %>
+                                    <br /><%= @entry.published.to_s(:full_human) %>
+                                </p>
+                                <%= raw(ContentFormatter.api_format(@content, @entry)) %>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+            </td>
+            <td></td>
+        </tr>
+    </table>
 </body>
 </html>
