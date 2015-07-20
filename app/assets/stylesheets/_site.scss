@@ -4277,7 +4277,7 @@ Settings
         }
         input[type="checkbox"] + label .slider-checkbox {
             width: 56px;
-            height: 27px;
+            height: 26px;
             display: block;
             position: absolute;
             right: 30px;
@@ -4286,9 +4286,9 @@ Settings
             background-color: #9e9e9e;
             &:before {
                 background-color: #FFF;
-                height: 23px;
-                width: 23px;
-                border-radius: 23px;
+                height: 22px;
+                width: 22px;
+                border-radius: 22px;
                 background-color: #FFF;
                 content: "";
                 top: 2px;
@@ -4303,9 +4303,9 @@ Settings
                 position: absolute;
                 display: block;
                 content: "";
-                height: 23px;
-                width: 23px;
-                border-radius: 23px;
+                height: 22px;
+                width: 22px;
+                border-radius: 22px;
                 background-color: #FFF;
                 left: 2px;
                 top: 2px;
@@ -4318,11 +4318,11 @@ Settings
         input[type="checkbox"]:checked + label .slider-checkbox {
             background-color: $selected;
             &:after {
-                left: 30px;
-                background: #FFF image-url("icon-check.svg") 4px 6px no-repeat;
+                left: 32px;
+                background: #FFF image-url("icon-check.svg") 4px 5px no-repeat;
             }
             &:before {
-                left: 30px;
+                left: 32px;
                 opacity: 0;
             }
         }
