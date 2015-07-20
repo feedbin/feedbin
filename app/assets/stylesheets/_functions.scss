@@ -183,3 +183,36 @@
     }
 }
 
+@mixin generateFontFace($fontName, $fontPSPrefix, $suffixMap, $italicSuffix: "Italic") {
+	@each $weight, $suffix in $suffixMap{
+		@font-face {
+			font-family: $fontName;
+			font-weight: $weight;
+			font-style: normal;
+			src: local("#{$fontPSPrefix}-#{$suffix}");
+		}
+
+		@font-face {
+			font-family: $fontName;
+			font-weight: $weight;
+			font-style: italic;
+			src: local("#{$fontPSPrefix}-#{$suffix}#{$italicSuffix}");
+		}
+	}
+}
+
+@mixin SFFontFace {
+	$sfSuffixMap: (
+		100: "Light",
+		200: "Light",
+		300: "Light",
+		400: "Regular",
+		500: "Regular",
+		600: "Semibold",
+		700: "Bold",
+		800: "Bold",
+		900: "Heavy"
+	);
+
+	@include generateFontFace("FeedbinSanFrancisco", ".SFNSText", $sfSuffixMap);
+}

@@ -1,6 +1,6 @@
 Feedbin::Application.config.font_sizes = (1..10).to_a
 Feedbin::Application.config.fonts = {
-    'Helvetica Neue' => 'default',
+    'System Font'    => 'default',
     'Whitney'        => 'sans-serif-1',
     'Ideal Sans'     => 'sans-serif-2',
     'Sentinel'       => 'serif-1',
