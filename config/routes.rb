@@ -194,6 +194,7 @@ Feedbin::Application.routes.draw do
         resources :suggested_feeds,       only: [:index] do
           member do
             post :subscribe
+            delete :unsubscribe
           end
         end
 

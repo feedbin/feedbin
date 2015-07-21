@@ -26,6 +26,22 @@ module Api
 
       end
 
+      def unsubscribe
+        @user = current_user
+        suggested_feed = SuggestedFeed.find(params[:id])
+        feed = suggested_feed.feed
+
+        @user.subscriptions.where(feed: feed).destroy_all
+
+        if !@user.subscribed_to?(feed.id)
+          render nothing: true, status: :no_content
+        else
+          render nothing: true, status: :bad_request
+        end
+
+      end
+
+
     end
   end
 end
