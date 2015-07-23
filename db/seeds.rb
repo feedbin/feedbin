@@ -15,7 +15,6 @@ u.save
 SuggestedCategory.create!(name: "Popular")
 SuggestedCategory.create!(name: "Tech")
 SuggestedCategory.create!(name: "Design")
-SuggestedCategory.create!(name: "Politics")
 SuggestedCategory.create!(name: "Arts & Entertainment")
 SuggestedCategory.create!(name: "Sports")
 SuggestedCategory.create!(name: "Business")
