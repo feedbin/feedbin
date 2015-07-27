@@ -183,36 +183,44 @@
     }
 }
 
-@mixin generateFontFace($fontName, $fontPSPrefix, $suffixMap, $italicSuffix: "Italic") {
-	@each $weight, $suffix in $suffixMap{
-		@font-face {
-			font-family: $fontName;
-			font-weight: $weight;
-			font-style: normal;
-			src: local("#{$fontPSPrefix}-#{$suffix}");
+@mixin generate-font-face($new-font-name, $font-basename, $suffix-map, $italic-suffix: "Italic") {
+	@each $weight, $suffix in $suffix-map{
+		$italic-suffix: false;
+
+		@if length($suffix) == 1 {
+			$italic-suffix: "#{$suffix}Italic";
+		} @else {
+			$italic-suffix: nth($suffix, 2);
 		}
 
 		@font-face {
-			font-family: $fontName;
+			font-family: $new-font-name;
+			font-weight: $weight;
+			font-style: normal;
+			src: local("#{$font-basename}-#{nth($suffix, 1)}");
+		}
+
+		@font-face {
+			font-family: $new-font-name;
 			font-weight: $weight;
 			font-style: italic;
-			src: local("#{$fontPSPrefix}-#{$suffix}#{$italicSuffix}");
+			src: local("#{$font-basename}-#{$italic-suffix}");
 		}
 	}
 }
 
-@mixin SFFontFace {
-	$sfSuffixMap: (
+@mixin SF-font-face {
+	$sf-suffix-map: (
 		100: "Light",
 		200: "Light",
 		300: "Light",
-		400: "Regular",
-		500: "Regular",
+		400: ("Regular", "Italic"), // "Italic", not "RegularItalic"
+		500: "Medium",
 		600: "Semibold",
 		700: "Bold",
-		800: "Bold",
+		800: "Heavy",
 		900: "Heavy"
 	);
 
-	@include generateFontFace("FeedbinSanFrancisco", ".SFNSText", $sfSuffixMap);
+	@include generate-font-face("Feedbin San Francisco", ".SFNSText", $sf-suffix-map);
 }
