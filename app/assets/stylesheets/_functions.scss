@@ -183,3 +183,66 @@
     }
 }
 
+@mixin generate-font-face($new-font-name, $src-font-basename, $fonts) {
+    @each $font in $fonts {
+        $suffix: map-get($font, suffix);
+        $italic-suffix: map-get($font, suffix-italic) or "#{$suffix}Italic";
+
+        @font-face {
+            font-family: $new-font-name;
+            font-weight: map-get($font, font-weight);
+            font-style: normal;
+            src: local("#{$src-font-basename}-#{$suffix}");
+        }
+        @font-face {
+            font-family: $new-font-name;
+            font-weight: map-get($font, font-weight);
+            font-style: italic;
+            src: local("#{$src-font-basename}-#{$italic-suffix}");
+        }
+    }
+}
+
+@mixin SF-UI-Text-font-face {
+    $fonts: (
+        (
+            font-weight: 100,
+            suffix: "Light"
+        ),
+        (
+            font-weight: 200,
+            suffix: "Light"
+        ),
+        (
+            font-weight: 300,
+            suffix: "Light"
+        ),
+        (
+            font-weight: 400,
+            suffix: "Regular",
+            suffix-italic: "Italic",
+        ),
+        (
+            font-weight: 500,
+            suffix: "Medium"
+        ),
+        (
+            font-weight: 600,
+            suffix: "Semibold"
+        ),
+        (
+            font-weight: 700,
+            suffix: "Bold"
+        ),
+        (
+            font-weight: 800,
+            suffix: "Heavy"
+        ),
+        (
+            font-weight: 900,
+            suffix: "Heavy"
+        )
+    );
+
+    @include generate-font-face("Feedbin SF UI Text", ".SFNSText", $fonts);
+}
