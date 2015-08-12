@@ -36,7 +36,4 @@ Feedbin::Application.configure do
   config.action_controller.action_on_unpermitted_parameters = :log
 
   config.middleware.swap Rails::Rack::Logger, Silencer::Logger
-
-  config.action_controller.asset_host = ENV["ASSET_HOST"] if ENV["ASSET_HOST"].present?
-
 end
