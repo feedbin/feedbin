@@ -49,7 +49,7 @@ class User < ActiveRecord::Base
   has_many :recently_read_entries, dependent: :delete_all
   has_many :updated_entries, dependent: :delete_all
   has_many :devices, dependent: :delete_all
-  has_many :in_app_purchases, dependent: :delete_all
+  has_many :in_app_purchases
   belongs_to :plan
 
   accepts_nested_attributes_for :sharing_services,
