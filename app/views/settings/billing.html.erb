@@ -3,9 +3,14 @@
 <% end %>
 
 <div class="settings-content-inner">
-  <div class="settings-outer">
-    <h2>Billing</h2>
-  </div>
+    <div class="settings-outer">
+        <div class="back-arrow">
+            <%= link_to '', '/' %>
+            <h2 class="settings-title">
+                Billing
+            </h2>
+        </div>
+    </div>
 
 
   <% if ENV['STRIPE_API_KEY'] %>

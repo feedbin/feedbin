@@ -1234,8 +1234,28 @@ th {
 }
 .settings-outer {
     @media (max-width: 528px) {
+        
         padding: 0 15px;
-    }
+        display: inline-block;
+        
+        .back-arrow {
+            background: image-url("icon-left-arrow.svg") 30px 3px no-repeat ;
+        
+            background-size: 24px 16px;
+            
+            a {
+                position: absolute;
+                width: 42px;
+                height: 32px;
+            }
+
+            background-position: 8px 6px;
+        }
+
+        .settings-title {
+            margin-left: 48px;
+        }
+    }    
 }
 
 
