@@ -84,7 +84,7 @@ class EntriesController < ApplicationController
         end ]
 
         scores = Hash[ frontier.keys.map do |k| 
-          [k, a * (feed_used_count[k] ** growth_factor) + b * frontier_times[k]] unless frontier_times[k] == -1
+          [k, a * frontier_times[k] + b * (feed_used_count[k] ** growth_factor) ] unless frontier_times[k] == -1
         end ]
 
         result = scores.min_by { |k, v| v }[0]
