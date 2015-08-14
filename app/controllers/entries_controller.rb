@@ -53,7 +53,7 @@ class EntriesController < ApplicationController
       # *   e = number of previous entries from selected feed (in entries ^ growth factor)
       # *
       # * Add the first entry from the feed with the lowest score
-      # * Repeat through all unread entries
+      # * Repeat through all unread entries O(n)
 
       split_entries = {}
       @entries.map do |e| 
