@@ -46,15 +46,15 @@ class EntriesController < ApplicationController
       # * Find the amount of entries in each feed (feed_queue_lengths): O(n) time
       # * Establish frontier of most recent entry from each feed (frontier)
       # * Find the time since publication of each item on the frontier (frontier_times)
-      # *
+      # 
       # * Produce score for each entry on frontier that is calculated as:
       # *   a*t + b*(e^g)
-      # *   
+      #    
       # *   a = adjustment factor for time since publication
       # *   t = time since publication (in hours)
       # *   b = adjustment factor for previous entries displayed
       # *   e = number of previous entries from selected feed (in entries ^ growth factor)
-      # *
+      # 
       # * Add the first entry from the feed with the lowest score
       # * Repeat through all unread entries O(n)
 
