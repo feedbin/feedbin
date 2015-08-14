@@ -33,7 +33,10 @@ class EntriesController < ApplicationController
     @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort).entries_list
 
     # Proper location for adjustments to unread entries?
-    
+    # 
+    # structured as case to support future additional alternative
+    # post-query shuffle / sort options
+
     case @user.entry_sort
      when 'SHUFF'
 
@@ -56,6 +59,7 @@ class EntriesController < ApplicationController
       # * Repeat through all unread entries O(n)
 
       split_entries = {}
+    
       @entries.map do |e| 
         split_entries[e.feed_id] = [] unless split_entries[e.feed_id]
         split_entries[e.feed_id].to_a.append e
@@ -70,9 +74,9 @@ class EntriesController < ApplicationController
 
       shuffled_entries = []
 
-      @entries.length.times do |ignore| 
-        
+      @entries.length.times do |ignore|         
         frontier = Hash[split_entries.keys.map { |k| [k, split_entries[k].first] } ]
+        
         frontier_times = Hash[ frontier.keys.map do |k| 
           time = -1 unless frontier[k]
           time = time || (Time.new - frontier[k].published)/3600
@@ -84,17 +88,13 @@ class EntriesController < ApplicationController
         end ]
 
         result = scores.min_by { |k, v| v }[0]
-        
         feed_used_count[result] += 1
-
         shuffled_entries.push split_entries[result].shift
-
-
       end
-
+    
       @entries = shuffled_entries
-      
     end
+
     @page_query = unread_entries
 
     @append = params[:page].present?
