@@ -32,7 +32,8 @@ class EntriesController < ApplicationController
     unread_entries = @user.unread_entries.select(:entry_id).page(params[:page]).sort_preference(@user.entry_sort)
     @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort).entries_list
 
-    # Shim for adjustments to unread entries
+    # Proper location for adjustments to unread entries?
+    
     case @user.entry_sort
      when 'SHUFF'
 
