@@ -32,6 +32,68 @@ class EntriesController < ApplicationController
     unread_entries = @user.unread_entries.select(:entry_id).page(params[:page]).sort_preference(@user.entry_sort)
     @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort).entries_list
 
+    # Shim for adjustments to unread entries
+    case @user.entry_sort
+     when 'SHUFF'
+
+      # Current Feed Shuffling Algorithm
+      # 
+      # * Split retrieved entries by feed: O(n) time, O(n) space
+      # * Find the amount of entries in each feed (feed_queue_lengths): O(n) time
+      # * Establish frontier of most recent entry from each feed (frontier)
+      # * Find the time since publication of each item on the frontier (frontier_times)
+      # *
+      # * Produce score for each entry on frontier that is calculated as:
+      # *   a*t + b*(e^g)
+      # *   
+      # *   a = adjustment factor for time since publication
+      # *   t = time since publication (in hours)
+      # *   b = adjustment factor for previous entries displayed
+      # *   e = number of previous entries from selected feed (in entries ^ growth factor)
+      # *
+      # * Add the first entry from the feed with the lowest score
+      # * Repeat through all unread entries
+
+      split_entries = {}
+      @entries.map do |e| 
+        split_entries[e.feed_id] = [] unless split_entries[e.feed_id]
+        split_entries[e.feed_id].to_a.append e
+      end
+
+      feed_queue_lengths = Hash[ split_entries.keys.map { |k| split_entries[k].length } ]
+      feed_used_count = Hash[split_entries.keys.map { |k| [k, 0] } ]
+      
+      a = 1
+      b = 1
+      growth_factor = 2
+
+      shuffled_entries = []
+
+      @entries.length.times do |ignore| 
+        
+        frontier = Hash[split_entries.keys.map { |k| [k, split_entries[k].first] } ]
+        frontier_times = Hash[ frontier.keys.map do |k| 
+          time = -1 unless frontier[k]
+          time = time || (Time.new - frontier[k].published)/3600
+          [k, time] 
+        end ]
+
+        scores = Hash[ frontier.keys.map do |k| 
+          [k, a * (feed_used_count[k] ** growth_factor) + b * frontier_times[k]] unless frontier_times[k] == -1
+        end ]
+
+        result = scores.min_by { |k, v| v }[0]
+        
+        feed_used_count[result] += 1
+
+        shuffled_entries.push split_entries[result].shift
+
+
+      end
+
+      @entries = shuffled_entries
+      
+    end
     @page_query = unread_entries
 
     @append = params[:page].present?

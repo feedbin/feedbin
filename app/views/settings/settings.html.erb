@@ -17,8 +17,14 @@
                     <%= f.label('entry_sort_desc', "Newest First") %>
                 </li>
                 <li>
-                    <%= f.radio_button(:entry_sort, "ASC") %>
+                    <%= f.radio_button(:entry_sort, "ASC", 
+                        {checked: @user.entry_sort === 'ASC'}) %>
                     <%= f.label('entry_sort_asc', "Oldest First") %>
+                </li>
+                <li>
+                    <%= f.radio_button(:entry_sort, "SHUFF",
+                        { checked: @user.entry_sort == 'SHUFF'}) %>
+                    <%= f.label('entry_sort_shuff', "Shuffled") %>
                 </li>
             </ul>
 
