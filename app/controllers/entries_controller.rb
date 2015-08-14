@@ -33,7 +33,7 @@ class EntriesController < ApplicationController
     @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort).entries_list
 
     # Proper location for adjustments to unread entries?
-    # 
+    #
     # structured as case to support future additional alternative
     # post-query shuffle / sort options
 
@@ -41,57 +41,62 @@ class EntriesController < ApplicationController
      when 'SHUFF'
 
       # Current Feed Shuffling Algorithm
-      # 
+      #
       # * Split retrieved entries by feed: O(n) time, O(n) space
       # * Find the amount of entries in each feed (feed_queue_lengths): O(n) time
       # * Establish frontier of most recent entry from each feed (frontier)
       # * Find the time since publication of each item on the frontier (frontier_times)
-      # 
+      #
       # * Produce score for each entry on frontier that is calculated as:
       # *   a*t + b*(e^g)
-      #    
+      #
       # *   a = adjustment factor for time since publication
       # *   t = time since publication (in hours)
       # *   b = adjustment factor for previous entries displayed
       # *   e = number of previous entries from selected feed (in entries ^ growth factor)
-      # 
+      #
       # * Add the first entry from the feed with the lowest score
       # * Repeat through all unread entries O(n)
 
-      split_entries = {}
-    
-      @entries.map do |e| 
-        split_entries[e.feed_id] = [] unless split_entries[e.feed_id]
-        split_entries[e.feed_id].to_a.append e
+      split_entries = @entries.each_with_object({}) do |entry, hash|
+        hash[entry.feed_id] ||= []
+        hash[entry.feed_id].append(entry)
       end
 
-      feed_queue_lengths = Hash[ split_entries.keys.map { |k| split_entries[k].length } ]
-      feed_used_count = Hash[split_entries.keys.map { |k| [k, 0] } ]
-      
+      feed_used_count = Hash[split_entries.keys.map { |key| [key, 0] } ]
+
       a = 1
       b = 1
       growth_factor = 2
 
       shuffled_entries = []
 
-      @entries.length.times do |ignore|         
-        frontier = Hash[split_entries.keys.map { |k| [k, split_entries[k].first] } ]
-        
-        frontier_times = Hash[ frontier.keys.map do |k| 
-          time = -1 unless frontier[k]
-          time = time || (Time.new - frontier[k].published)/3600
-          [k, time] 
-        end ]
+      @entries.length.times do
 
-        scores = Hash[ frontier.keys.map do |k| 
-          [k, a * frontier_times[k] + b * (feed_used_count[k] ** growth_factor) ] unless frontier_times[k] == -1
-        end ]
+        frontier = split_entries.each_with_object({}) do |(feed_id, entries), hash|
+          hash[feed_id] = entries.first
+        end
 
-        result = scores.min_by { |k, v| v }[0]
-        feed_used_count[result] += 1
-        shuffled_entries.push split_entries[result].shift
+        frontier_times = frontier.each_with_object({}) do |(feed_id, entry), hash|
+          time = nil
+          if frontier[feed_id].present?
+            time = (Time.new - frontier[feed_id].published) / 3600
+          end
+          hash[feed_id] = time
+        end
+
+        scores = frontier.each_with_object({}) do |(feed_id, _), hash|
+          if frontier_times[feed_id].present?
+            score = a * frontier_times[feed_id] + b * (feed_used_count[feed_id] ** growth_factor)
+            hash[feed_id] = score
+          end
+        end
+
+        min_feed_id = scores.min_by { |feed_id, score| score }.first
+        feed_used_count[min_feed_id] += 1
+        shuffled_entries.push split_entries[min_feed_id].shift
       end
-    
+
       @entries = shuffled_entries
     end
 
