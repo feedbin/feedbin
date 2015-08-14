@@ -1234,26 +1234,31 @@ th {
 }
 .settings-outer {
     @media (max-width: 528px) {
-        
-        padding: 0 15px;
+        width: 100%;
         display: inline-block;
         
+
         .back-arrow {
-            background: image-url("icon-left-arrow.svg") 30px 3px no-repeat ;
-        
-            background-size: 24px 16px;
+            background: image-url("icon-left-arrow.svg") no-repeat;
+            background-position: 0px 5px;
             
+            margin-left: 15px;
+            margin-right: 15px;
+        
             a {
                 position: absolute;
                 width: 42px;
                 height: 32px;
+                margin-left: 8px;
             }
 
-            background-position: 8px 6px;
-        }
-
-        .settings-title {
-            margin-left: 48px;
+            .settings-title {
+                text-align: center;
+                margin-left: 0px;
+                margin-right: 0px;
+                padding-left: 0px;
+                padding-right: 0px;
+            }
         }
     }    
 }
