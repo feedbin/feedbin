@@ -210,7 +210,7 @@ class Entry < ActiveRecord::Base
       entries = entries.order('published ASC')
     else
       entries = entries.order('published DESC')
-    end    
+    end
     entries
   end
 
