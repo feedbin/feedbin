@@ -10,8 +10,7 @@ Feedbin::Application.config.iap = {
   },
 }
 
-if Rails.env.production?
-  Feedbin::Application.config.iap_endpoint = "https://buy.itunes.apple.com/verifyReceipt"
-else
-  Feedbin::Application.config.iap_endpoint = "https://sandbox.itunes.apple.com/verifyReceipt"
-end
+Feedbin::Application.config.iap_endpoint = {
+  production: "https://buy.itunes.apple.com/verifyReceipt",
+  sandbox: "https://sandbox.itunes.apple.com/verifyReceipt"
+}
