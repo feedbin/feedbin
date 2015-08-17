@@ -1,12 +1,12 @@
 Feedbin::Application.config.iap = {
   "com.feedbin.feedbin.one_month" => {
-    time: 1.month
+    time: 31.days
   },
   "com.feedbin.feedbin.six_months" => {
-    time: 6.months
+    time: 183.days
   },
   "com.feedbin.feedbin.one_year" => {
-    time: 12.months
+    time: 365.days
   },
 }
 
