@@ -460,7 +460,8 @@ CREATE TABLE in_app_purchases (
     purchase_date timestamp without time zone,
     receipt json,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    response json
 );
 
 
@@ -2007,4 +2008,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150707202540');
 INSERT INTO schema_migrations (version) VALUES ('20150713230754');
 
 INSERT INTO schema_migrations (version) VALUES ('20150714000523');
+
+INSERT INTO schema_migrations (version) VALUES ('20150817230441');
 

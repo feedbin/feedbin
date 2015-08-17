@@ -18,7 +18,7 @@ module Api
         if response["status"] == 0
           receipts = response["receipt"]["in_app"]
           receipts.each do |receipt|
-            InAppPurchase.create_from_receipt_json(@user, receipt)
+            InAppPurchase.create_from_receipt_json(@user, receipt, response)
           end
         else
           Honeybadger.notify(

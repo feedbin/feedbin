@@ -6,11 +6,12 @@ class InAppPurchase < ActiveRecord::Base
 
   after_commit :extend_subscription, on: :create
 
-  def self.create_from_receipt_json(user, receipt_json)
+  def self.create_from_receipt_json(user, receipt_json, response)
     create({
       transaction_id: receipt_json["transaction_id"],
       purchase_date: Time.at(receipt_json["purchase_date_ms"].to_i / 1_000),
       receipt: receipt_json,
+      response: response,
       user: user
     })
   end
