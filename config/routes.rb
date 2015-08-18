@@ -13,12 +13,6 @@ Feedbin::Application.routes.draw do
   get :health_check, to: proc {|env| [200, {}, ["OK"]] }
   get :version, to: proc {|env| [200, {}, [ENV["ETAG_VERSION_ID"]]] }
 
-  get :home, to: 'site#home'
-  get :apps, to: 'site#apps'
-
-  # Firefox OS manifest
-  get :manifest, to: 'site#manifest'
-
   post '/emails' => 'emails#create'
 
   match '/404', to: 'errors#not_found', via: :all
@@ -26,10 +20,8 @@ Feedbin::Application.routes.draw do
   post '/starred/export', to: 'starred_entries#export'
   get '/favicons/:hash', to: 'favicons#index', as: 'favicons'
 
-
   get    :signup,         to: 'users#new',           as: 'signup'
   get    :login,          to: 'sessions#new',        as: 'login'
-  get    :privacy_policy, to: 'site#privacy_policy', as: 'privacy_policy'
   delete :logout,         to: 'sessions#destroy',    as: 'logout'
 
   # Apple Push

@@ -115,6 +115,15 @@ class ApplicationController < ActionController::Base
     }
   end
 
+  def render_file_or(directory, status, &block)
+    file = File.join(Rails.root, 'public', directory, 'index.html')
+    if File.exist?(file)
+      render file: file, status: status
+    else
+      yield
+    end
+  end
+
   private
 
   def set_user

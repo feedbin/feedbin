@@ -1,6 +1,6 @@
 class SiteController < ApplicationController
 
-  skip_before_action :authorize, only: [:index, :home, :privacy_policy, :apps, :manifest]
+  skip_before_action :authorize, only: [:index]
   before_action :check_user, if: :signed_in?
 
   def index
@@ -41,24 +41,11 @@ class SiteController < ApplicationController
 
       render action: 'logged_in'
     else
-      home
+      render_file_or("home", :ok) {
+        redirect_to login_url
+      }
     end
   end
-
-  def home
-    @page_view = '/home'
-    render action: 'not_logged_in'
-  end
-
-  def privacy_policy
-    render layout: 'sub_page'
-  end
-
-  def apps
-    render layout: 'sub_page'
-  end
-
-  def manifest; end
 
   private
 
