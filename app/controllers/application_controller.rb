@@ -118,7 +118,7 @@ class ApplicationController < ActionController::Base
   def render_file_or(directory, status, &block)
     file = File.join(Rails.root, 'public', directory, 'index.html')
     if File.exist?(file)
-      render file: file, status: status
+      render file: file, status: status, layout: nil
     else
       yield
     end
