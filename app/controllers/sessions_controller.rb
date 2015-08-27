@@ -3,7 +3,7 @@ class SessionsController < ApplicationController
   skip_before_action :authorize
 
   def new
-    @user = current_user
+    redirect_to root_url if signed_in?
   end
 
   def create
