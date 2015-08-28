@@ -67,7 +67,7 @@ class FeedFetcher
     end
 
     @feed_options = @feed_options.map do |option|
-      option[:title] = option[:title].gsub(/(RSS[\s0-9\.]*|Atom)/i, "")
+      option[:title] = option[:title].gsub(/(RSS[\s0-9\.]*|Atom)/i, "") if option[:title].present?
       option
     end
     @feed_options = @feed_options.uniq { |option| option[:title] }
