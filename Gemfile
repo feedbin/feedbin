@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 ruby '2.1.4'
 
-gem 'rails', '= 4.1.11'
+gem 'rails', '= 4.1.13'
 gem 'rest-client', '= 1.6.7'
 
 group :development do
