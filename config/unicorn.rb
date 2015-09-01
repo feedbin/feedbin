@@ -12,7 +12,7 @@ rails_env = ENV['RAILS_ENV'] || 'production'
 stderr_path "#{app_dir}/shared/log/unicorn.log"
 stdout_path "#{app_dir}/shared/log/unicorn.log"
 
-listen "#{app_dir}/shared/system/unicorn.sock"
+listen "/tmp/unicorn.sock"
 
 timeout 30
 
