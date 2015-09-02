@@ -9,7 +9,10 @@ class ActionsPerform
 
     if actions.present?
       queues = {}
+      user_actions = {}
       actions.each do |action_id, user_id, action_names|
+        user_actions[user_id] ||= []
+        user_actions[user_id] << action_id
         action_names.each do |action_name|
           queues[action_name] ||= Set.new
           queues[action_name] << user_id
@@ -24,8 +27,12 @@ class ActionsPerform
           users = User.where(id: user_ids)
           entry = Entry.find(entry_id)
           users.each do |user|
+            message = "action"
+            if user_actions[user.id].present?
+              message = "#{message} #{user_actions[user.id].join(',')}"
+            end
             Throttle.throttle!("starred_entries:create:#{user.id}", 100, 1.day) do
-              StarredEntry.create_from_owners(user, entry)
+              StarredEntry.create_from_owners(user, entry, message)
             end
           end
         elsif action_name == 'mark_read'

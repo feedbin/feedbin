@@ -6,7 +6,7 @@ services:
 addons:
   postgresql: "9.2"
 rvm:
-  - 2.1.4
+  - 2.2.3
 env:
   - DB=postgresql
 before_script:

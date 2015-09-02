@@ -35,7 +35,7 @@ class StarredEntriesController < ApplicationController
     if starred_entry.present?
       starred_entry.destroy_all
     else
-      StarredEntry.create_from_owners(@user, @entry)
+      StarredEntry.create_from_owners(@user, @entry, "web")
     end
 
     render nothing: true
