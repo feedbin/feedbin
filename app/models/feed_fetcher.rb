@@ -49,8 +49,8 @@ class FeedFetcher
       content = Nokogiri::HTML(content)
 
       # Case insensitive rss link search
-      links = content.search("//link[translate(@type, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'application/rss+xml'] |" +
-                             "//link[translate(@type, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'application/atom+xml']")
+      links = content.search("//link[@rel='alternate' and translate(@type, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'application/rss+xml'] |" +
+                             "//link[@rel='alternate' and translate(@type, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'application/atom+xml']")
 
       links.map do |link|
         href = link.get_attribute('href')
@@ -65,6 +65,12 @@ class FeedFetcher
         end
       end
     end
+
+    @feed_options = @feed_options.map do |option|
+      option[:title] = option[:title].gsub(/(RSS[\s0-9\.]*|Atom)/i, "") if option[:title].present?
+      option
+    end
+    @feed_options = @feed_options.uniq { |option| option[:title] }
 
     if @feed_options.length == 1
       @site_url = @url

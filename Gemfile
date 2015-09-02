@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
-ruby '2.1.4'
+ruby '2.2.3'
 
-gem 'rails', '= 4.1.11'
+gem 'rails', '= 4.1.13'
 gem 'rest-client', '= 1.6.7'
 
 group :development do
@@ -70,7 +70,6 @@ gem 'readability_parser'
 gem 'lograge'
 gem 'grocer'
 gem 'cocoon'
-gem 'gctools', require: false
 gem 'connection_pool'
 gem 'httparty'
 gem 'oauth'

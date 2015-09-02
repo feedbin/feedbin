@@ -636,7 +636,8 @@ CREATE TABLE starred_entries (
     entry_id integer,
     published timestamp without time zone,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    source text
 );
 
 
@@ -2010,4 +2011,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150713230754');
 INSERT INTO schema_migrations (version) VALUES ('20150714000523');
 
 INSERT INTO schema_migrations (version) VALUES ('20150817230441');
+
+INSERT INTO schema_migrations (version) VALUES ('20150827230751');
 

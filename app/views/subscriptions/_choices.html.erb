@@ -10,7 +10,7 @@
         <div class="modal-body">
     			<p>This website has multiple feed options. Select the feeds you’re interested in.</p>
           <% options.each do |option| %>
-            <label class="checkbox">
+            <label class="checkbox" title="<%= option[:href] %>">
               <%= check_box_tag "subscription[feeds][feed_url][]", option[:href] %> <%= option[:title] %>
             </label>
           <% end %>

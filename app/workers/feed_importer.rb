@@ -69,7 +69,7 @@ class FeedImporter
     end
 
     if entry.present?
-      StarredEntry.create_from_owners(user, entry)
+      StarredEntry.create_from_owners(user, entry, "imported #{import_item.import.id}")
     end
 
   end

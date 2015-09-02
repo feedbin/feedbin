@@ -32,9 +32,9 @@ Requirements
 
 Installation
 -------------
-Ultimately you need a Ruby environment and a Rack compatible application server. For development [Pow](http://pow.cx/) is recommended.
+Ultimately, you'll need a Ruby environment and a Rack compatible application server. For development [Pow](http://pow.cx/) is recommended.
 
-Feedbin uses environment variables for configuration. Feedbin will run without any of these, but various features and functionality will be turned off.
+Feedbin uses environment variables for configuration. Feedbin will run without these, but various features and functionality will be turned off.
 
 | Environment Variable     | Description                                                                        |
 |--------------------------|------------------------------------------------------------------------------------|
@@ -74,9 +74,9 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | EVERNOTE_KEY             | Evernote API Key                                                                   |
 | EVERNOTE_SECRET          | Evernote API Secret                                                                |
 
-These variables need to be available in the environment of the user running the app.
+These variables will need to be available in the environment of the user running the app.
 
-Locally I use [dotenv](https://github.com/bkeepers/dotenv) combined with [pow](http://pow.cx/). Pow's `.powenv` file is set up to read dotenv's .env file like:
+Locally, I use [dotenv](https://github.com/bkeepers/dotenv) combined with [pow](http://pow.cx/). Pow's `.powenv` file is set up to read dotenv's .env file like:
 
 ```shell
 export $(cat .env)
@@ -84,7 +84,7 @@ export $(cat .env)
 
 This is necessary so the environment variables can be read by both Pow and Unicorn.
 
-In production environment variables are set in the `app` users ~/.bash_profile like:
+In a production environment, variables are set in the `app` users ~/.bash_profile like:
 
 ```shell
 export AWS_ACCESS_KEY_ID=aoisjf3j23oij23f
