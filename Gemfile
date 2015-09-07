@@ -79,7 +79,7 @@ gem 'reverse_markdown'
 gem 'htmlentities'
 
 # Sidekiq
-gem 'sidekiq'
+gem 'sidekiq', '= 3.4.1'
 gem 'sinatra', require: nil
 
 # Stripe
