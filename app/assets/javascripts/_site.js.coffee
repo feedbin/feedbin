@@ -1238,7 +1238,11 @@ $.extend feedbin,
           suggestions = feeds
         else
           $.each feeds, (i, feed) ->
-            feed.score = $(feed).data('sort-name').score(query);
+            sortName = $(feed).data('sort-name')
+            if feed && sortName && query && typeof(query) == "string" && typeof(sortName) == "string"
+              feed.score = sortName.score(query)
+            else
+              feed.score = 0
             if feed.score > 0
               suggestions.push(feed);
           if suggestions.length > 0
