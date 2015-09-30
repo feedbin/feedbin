@@ -7,20 +7,20 @@ class DevicePushNotificationSend
     entry = Entry.find(entry_id)
     feed = entry.feed
 
-    body = entry.title || entry.summary
-    body = format_text(body)
-    titles = subscription_titles(user_ids, feed)
-    title = format_text(feed.title)
+    feed_titles = subscription_titles(user_ids, feed)
+    feed_title = format_text(feed.title) || ""
 
     notifications = tokens.each_with_object([]) do |(user_id, token), array|
-      title = titles[user_id] || title
-      notification = build_notification(token, title, body, entry.id)
+      feed_title = feed_titles[user_id] || feed_title
+      notification = build_notification(token, feed_title, entry)
       notification = Grocer::Notification.new(notification)
       array.push(notification)
     end
 
     $grocer_ios.with do |pusher|
-      notifications.each { |notification| pusher.push(notification) }
+      notifications.each do |notification|
+        pusher.push(notification)
+      end
     end
 
     Librato.increment 'ios_push_notifications_sent', by: notifications.length
@@ -44,24 +44,31 @@ class DevicePushNotificationSend
     text
   end
 
-  def build_notification(device_token, title, body, entry_id)
-    {
+  def build_notification(device_token, feed_title, entry)
+    body = format_text(entry.title || entry.summary || "")
+    author = format_text(entry.author || "")
+    title = format_text(entry.title || "")
+    published = entry.published.iso8601(6)
+    notification = {
       device_token: device_token,
       category: "singleArticle",
       content_available: true,
       sound: "",
-      alert: {
+    }
+    notification[:alert] = {
+      title: feed_title,
+      body: "#{feed_title}: #{body}",
+    }
+    notification[:custom] = {
+      feedbin: {
+        entry_id: entry.id,
         title: title,
-        body: "#{title}: #{body}",
-      },
-      custom: {
-        feedbin: {
-          entry_id: entry_id,
-          title: title,
-          body: body,
-        }
+        feed: feed_title,
+        author: author,
+        published: published
       }
     }
+    notification
   end
 
 end
