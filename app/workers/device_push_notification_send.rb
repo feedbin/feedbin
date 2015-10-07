@@ -1,6 +1,12 @@
+require 'apn_connection'
+
 class DevicePushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
+
+  APN_POOL = ConnectionPool.new(:size => 2, :timeout => 300) do
+    APNConnection.new
+  end
 
   def perform(user_ids, entry_id)
     tokens = Device.where(user_id: user_ids).ios.pluck(:user_id, :token)
@@ -13,13 +19,12 @@ class DevicePushNotificationSend
     notifications = tokens.each_with_object([]) do |(user_id, token), array|
       feed_title = feed_titles[user_id] || feed_title
       notification = build_notification(token, feed_title, entry)
-      notification = Grocer::Notification.new(notification)
       array.push(notification)
     end
 
-    $grocer_ios.with do |pusher|
+    APN_POOL.with do |connection|
       notifications.each do |notification|
-        pusher.push(notification)
+        connection.write(notification.message)
       end
     end
 
@@ -49,17 +54,16 @@ class DevicePushNotificationSend
     author = format_text(entry.author || "")
     title = format_text(entry.title || "")
     published = entry.published.iso8601(6)
-    notification = {
-      device_token: device_token,
-      category: "singleArticle",
-      content_available: true,
-      sound: "",
-    }
-    notification[:alert] = {
+
+    notification = Houston::Notification.new(device: device_token)
+    notification.category = "singleArticle"
+    notification.content_available = true
+    notification.sound = ""
+    notification.alert = {
       title: feed_title,
       body: "#{feed_title}: #{body}",
     }
-    notification[:custom] = {
+    notification.custom_data = {
       feedbin: {
         entry_id: entry.id,
         title: title,

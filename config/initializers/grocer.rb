@@ -10,7 +10,3 @@ end
 if ENV['APPLE_PUSH_CERT']
   $grocer = apns_pool(ENV['APPLE_PUSH_CERT'])
 end
-
-if ENV['APPLE_PUSH_CERT_IOS']
-  $grocer_ios = apns_pool(ENV['APPLE_PUSH_CERT_IOS'])
-end
