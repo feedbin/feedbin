@@ -4,11 +4,12 @@ class DevicePushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
 
-  APN_POOL = ConnectionPool.new(:size => 2, :timeout => 300) do
+  APN_POOL = ConnectionPool.new(size: 2, timeout: 300) do
     APNConnection.new
   end
 
   def perform(user_ids, entry_id)
+    Honeybadger.context(user_ids: user_ids, entry_id: entry_id)
     tokens = Device.where(user_id: user_ids).ios.pluck(:user_id, :token)
     entry = Entry.find(entry_id)
     feed = entry.feed
