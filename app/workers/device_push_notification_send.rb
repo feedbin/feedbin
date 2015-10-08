@@ -4,7 +4,7 @@ class DevicePushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
 
-  APN_POOL = ConnectionPool.new(size: 2, timeout: 300) do
+  APN_POOL = ConnectionPool.new(size: 3, timeout: 300) do
     APNConnection.new
   end
 
@@ -15,7 +15,7 @@ class DevicePushNotificationSend
     feed = entry.feed
 
     feed_titles = subscription_titles(user_ids, feed)
-    feed_title = format_text(feed.title) || ""
+    feed_title = format_text(feed.title)
 
     notifications = tokens.each_with_object([]) do |(user_id, token), array|
       feed_title = feed_titles[user_id] || feed_title
@@ -24,12 +24,32 @@ class DevicePushNotificationSend
     end
 
     APN_POOL.with do |connection|
-      notifications.each do |notification|
-        connection.write(notification.message)
-      end
+      Librato.increment 'apns.ios.connection.open'
+      send(notifications, connection)
     end
 
-    Librato.increment 'ios_push_notifications_sent', by: notifications.length
+    Librato.increment 'apns.ios.sent', by: notifications.length
+  end
+
+  def send(notifications, connection)
+    notifications.each do |notification|
+      begin
+        connection.write(notification.message)
+        sleep(0.1)
+      rescue Errno::EPIPE => exception
+        attempts ||= 0
+        attempts += 1
+        if attempts <= notifications.length
+          Librato.increment 'apns.ios.connection.open'
+          connection.close
+          sleep(0.2)
+          connection.open
+          retry
+        else
+          raise exception
+        end
+      end
+    end
   end
 
   def subscription_titles(user_ids, feed)
@@ -40,20 +60,19 @@ class DevicePushNotificationSend
   end
 
   def format_text(text)
-    if text.present?
-      decoder = HTMLEntities.new
-      text = ActionController::Base.helpers.strip_tags(text)
-      text = text.gsub("\n", "")
-      text = text.gsub(/\t/, "")
-      text = decoder.decode(text)
-    end
+    text ||= ""
+    decoder = HTMLEntities.new
+    text = ActionController::Base.helpers.strip_tags(text)
+    text = text.gsub("\n", "")
+    text = text.gsub(/\t/, "")
+    text = decoder.decode(text)
     text
   end
 
   def build_notification(device_token, feed_title, entry)
-    body = format_text(entry.title || entry.summary || "")
-    author = format_text(entry.author || "")
-    title = format_text(entry.title || "")
+    body = format_text(entry.title || entry.summary)
+    author = format_text(entry.author)
+    title = format_text(entry.title)
     published = entry.published.iso8601(6)
 
     notification = Houston::Notification.new(device: device_token)

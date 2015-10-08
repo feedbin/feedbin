@@ -43,6 +43,7 @@ class Subscription < ActiveRecord::Base
   def remove_feed_from_action
     actions = Action.where(user_id: self.user_id)
     actions.each do |action|
+      action.feed_ids = action.feed_ids - [self.feed_id.to_s]
       action.automatic_modification = true
       action.save
     end
