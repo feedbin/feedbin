@@ -24,7 +24,6 @@ class DevicePushNotificationSend
     end
 
     APN_POOL.with do |connection|
-      Librato.increment 'apns.ios.connection.open'
       send(notifications, connection)
     end
 
