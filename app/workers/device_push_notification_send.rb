@@ -14,8 +14,8 @@ class DevicePushNotificationSend
     entry = Entry.find(entry_id)
     feed = entry.feed
 
-    feed_titles = subscription_titles(user_ids, feed)
-    feed_title = format_text(feed.title)
+    feed_titles = d.subscription_titles(user_ids, feed)
+    feed_title = d.format_text(feed.title)
 
     notifications = tokens.each_with_object([]) do |(user_id, token), array|
       feed_title = feed_titles[user_id] || feed_title
@@ -54,7 +54,8 @@ class DevicePushNotificationSend
   def subscription_titles(user_ids, feed)
     titles = Subscription.where(feed: feed, user_id: user_ids).pluck(:user_id, :title)
     titles.each_with_object({}) do |(user_id, feed_title), hash|
-      hash[user_id] = format_text(feed_title)
+      title = format_text(feed_title)
+      hash[user_id] = (title.present?) ? title : nil
     end
   end
 
