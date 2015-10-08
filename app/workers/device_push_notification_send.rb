@@ -14,8 +14,8 @@ class DevicePushNotificationSend
     entry = Entry.find(entry_id)
     feed = entry.feed
 
-    feed_titles = d.subscription_titles(user_ids, feed)
-    feed_title = d.format_text(feed.title)
+    feed_titles = subscription_titles(user_ids, feed)
+    feed_title = format_text(feed.title)
 
     notifications = tokens.each_with_object([]) do |(user_id, token), array|
       feed_title = feed_titles[user_id] || feed_title
