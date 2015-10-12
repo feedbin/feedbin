@@ -2142,6 +2142,15 @@ $saved-search-control-height: 48px;
             position: relative;
             overflow: hidden;
             border-radius: 3px;
+            &:after {
+                position: absolute;
+                height: 100%;
+                width: 100%;
+                top: 0;
+                left: 0;
+                content: "";
+                display: block;
+            }
             img {
                 max-width: 100%;
                 position: absolute;
@@ -2149,6 +2158,9 @@ $saved-search-control-height: 48px;
                 left: 0;
             }
         }
+    }
+    &.read .image:after {
+        -webkit-backdrop-filter: grayscale(100%);
     }
     .entry-actions-wrap {
         top: 0;

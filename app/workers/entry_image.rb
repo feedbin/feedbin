@@ -1,15 +1,9 @@
 class EntryImage
   include Sidekiq::Worker
 
-  YOUTUBE_URLS = [
-    %r(https?://youtu\.be/(.+)),
-    %r(https?://www\.youtube\.com/watch\?v=(.*?)(&|#|$)),
-    %r(https?://www\.youtube\.com/embed/(.*?)(\?|$)),
-    %r(https?://www\.youtube\.com/v/(.*?)(#|\?|$)),
-    %r(https?://www\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b)
-  ]
-
+  YOUTUBE_URLS = [%r(https?://youtu\.be/(.+)), %r(https?://www\.youtube\.com/watch\?v=(.*?)(&|#|$)), %r(https?://www\.youtube\.com/embed/(.*?)(\?|$)), %r(https?://www\.youtube\.com/v/(.*?)(#|\?|$)), %r(https?://www\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b)]
   VIMEO_URL = %r(https?://player\.vimeo\.com/video/(.*?)(#|\?|$))
+  IGNORE_EXTENSIONS = [".gif", ".png", ".webp"]
 
   def perform(entry_id)
     @entry = Entry.find(entry_id)
@@ -44,6 +38,7 @@ class EntryImage
   end
 
   def image_candidate(src, base_url, subpage_url)
+    return nil if IGNORE_EXTENSIONS.find { |extension| src.include?(extension) }
     url = src
     if !src.start_with?('http')
       if src.start_with? '/'
