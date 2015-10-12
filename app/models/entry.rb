@@ -12,12 +12,17 @@ class Entry < ActiveRecord::Base
   before_create :cache_public_id, unless: -> { Rails.env.test? }
   before_create :create_summary
   before_update :create_summary
+  after_commit :find_images, on: :create
   after_commit :mark_as_unread, on: :create
   after_commit :add_to_created_at_set, on: :create
   after_commit :add_to_published_set, on: :create
   after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
   after_commit :count_update, on: :update
+
+  def find_images
+    EntryImage.perform_async(self.id)
+  end
 
   tire_settings = {
     analysis: {
@@ -215,7 +220,7 @@ class Entry < ActiveRecord::Base
   end
 
   def self.entries_list
-    select(:id, :feed_id, :title, :summary, :published)
+    select(:id, :feed_id, :title, :summary, :published, :image_url)
   end
 
   def self.include_unread_entries(user_id)

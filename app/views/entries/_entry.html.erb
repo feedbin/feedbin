@@ -23,9 +23,15 @@
 	      <%= entry_presenter.favicon(entry.feed.host) %>
 	      <%= entry_presenter.title %>
 	    </h2>
+	    <% if entry.image_url.present?  %>
+	      <span class="image">
+              <img src="<%= entry.image_url %>">
+          </span>
+	    <% end %>
 	    <% if entry_presenter.has_content? && entry_presenter.sanitized_title.present?  %>
 	      <p class="body"><%= entry.summary.html_safe %></p>
 	    <% end %>
+
 	  </span>
 	  <i class="icon-star"></i>
 	  <span class="entry-actions-wrap" data-behavior="show_entry_actions">

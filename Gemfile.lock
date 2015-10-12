@@ -514,6 +514,7 @@ DEPENDENCIES
   librato-rails
   lograge
   longurl
+  nokogumbo
   oauth
   opml_saw!
   pg

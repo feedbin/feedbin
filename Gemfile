@@ -78,6 +78,7 @@ gem 'rmagick', require: false
 gem 'reverse_markdown'
 gem 'htmlentities'
 gem 'houston'
+gem 'nokogumbo'
 
 # Sidekiq
 gem 'sidekiq', '= 3.4.1'
