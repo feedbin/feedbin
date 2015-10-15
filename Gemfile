@@ -79,7 +79,7 @@ gem 'reverse_markdown'
 gem 'htmlentities'
 gem 'houston'
 gem 'nokogumbo'
-gem 'ruby-opencv'
+gem 'ruby-opencv', require: false
 
 # Sidekiq
 gem 'sidekiq', '= 3.4.1'

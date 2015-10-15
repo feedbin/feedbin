@@ -20,7 +20,6 @@ class EntryImage
           end
         end
       rescue Exception => exception
-        puts exception.inspect
         Honeybadger.notify(exception)
       end
     end
