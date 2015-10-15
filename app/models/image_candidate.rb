@@ -78,7 +78,6 @@ class ImageCandidate
       response = HTTParty.get(uri, timeout: 5)
 
       if response.code == 200
-        puts response.inspect
         uri = response.parsed_response["thumbnail_url"]
         uri = uri.gsub(/_\d+.jpg/, ".jpg")
       else
@@ -95,7 +94,7 @@ class ImageCandidate
   end
 
   def last_effective_uri(uri)
-    response = HTTParty.head(uri, verify: false)
+    response = HTTParty.head(uri, verify: false, timeout: 15)
     response.request.last_uri
   end
 

@@ -4,21 +4,26 @@ class EntryImage
   def perform(entry_id)
     @entry = Entry.find(entry_id)
     @feed = @entry.feed
+    Honeybadger.context(entry_id: entry_id)
     find_image_url
   end
 
   def find_image_url
-    urls = candidates
-    urls.each do |url|
-      image = ProcessedImage.new(url)
-      if image.valid?
-        save_image(image)
+    candidates.each do |candidate|
+      begin
+        if candidate.valid?
+          download = DownloadImage.new(candidate.url)
+          if download.download
+            @entry.image_url = download.image.url
+            @entry.save
+            break
+          end
+        end
+      rescue Exception => exception
+        puts exception.inspect
+        Honeybadger.notify(exception)
       end
     end
-  end
-
-  def save_image(image)
-
   end
 
   def candidates

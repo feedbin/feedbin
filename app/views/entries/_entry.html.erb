@@ -27,9 +27,7 @@
                 <p class="body"><%= entry.summary.html_safe %></p>
             <% end %>
             <% if entry.image_url.present?  %>
-                <span class="image">
-                    <img src="<%= entry.image_url %>">
-                </span>
+                <img src="<%= entry.image_url %>" class="entry-image">
             <% end %>
 
         </span>

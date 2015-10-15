@@ -406,6 +406,7 @@ GEM
       rspec-mocks (~> 3.3.0)
       rspec-support (~> 3.3.0)
     rspec-support (3.3.0)
+    ruby-opencv (0.0.14)
     rubyzip (1.1.0)
     sanitize (4.0.0)
       crass (~> 1.0.2)
@@ -527,6 +528,7 @@ DEPENDENCIES
   reverse_markdown
   rmagick
   rspec-rails (~> 3.1)
+  ruby-opencv
   rubyzip (= 1.1.0)
   sanitize
   sass-rails

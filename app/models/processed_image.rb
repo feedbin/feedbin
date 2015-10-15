@@ -1,70 +1,94 @@
 require 'rmagick'
+require 'opencv'
+include OpenCV
 
 class ProcessedImage
 
-  MIN_WIDTH = 542
+  TARGET_WIDTH = 542.to_f
   WIDTH_RATIO = 16.to_f
   HEIGHT_RATIO = 9.to_f
 
-  attr_reader :file_path
+  attr_reader :url
 
-  def initialize(url)
-    @url = url
-    @valid = false
+  def initialize(file)
+    @file = file
+    @url = nil
+  end
+
+  def ping
+    @ping ||= Magick::Image.ping(@file.path).first
+  end
+
+  def width
+    @width ||= ping.columns.to_f
+  end
+
+  def height
+    @height ||= ping.rows.to_f
   end
 
   def valid?
-    @valid
+    image_ratio = height / width
+    target_ratio = HEIGHT_RATIO / WIDTH_RATIO
+    width >= TARGET_WIDTH && image_ratio <= 1 && image_ratio >= target_ratio
   end
 
   def process
-    file = Tempfile.new('image')
-    file.binmode
-    begin
-      if download(file) && image_valid?(file.path)
-        puts "valid"
-      else
-        puts "not valid"
-      end
-    ensure
-      # file.close
-      # file.unlink
-    end
-    puts file.path.inspect
-  end
-
-  def download(file)
     success = false
-    options = {use_ssl: @url.scheme == "https"}
-    Net::HTTP.start(@url.host, @url.port, options) do |http|
-      http.request_get(@url.path) do |response|
-        if headers_valid?(response.to_hash)
-          response.read_body do |chunk|
-            file.write(chunk)
-          end
-          success = true
-        end
-      end
+    if valid?
+      processed_image = Tempfile.new(["image-", ".jpg"])
+      processed_image.close
+      center = find_center_of_objects
+      crop = crop_rectangle(center)
+
+      image = Magick::Image.read(@file.path).first
+      image = image.crop(crop[:x], crop[:y], crop[:width], crop[:height])
+      image = image.resize_to_fit(TARGET_WIDTH)
+      image.write(processed_image.path)
+
+      processed_image.open
+      uploader = EntryImageUploader.new
+      uploader.store!(processed_image)
+      processed_image.close(true)
+
+      @url = uploader.url
+      success = true
     end
-    file.close
     success
   end
 
-  def headers_valid?(headers)
-    begin
-      headers["content-type"].first == "image/jpeg" && headers["content-length"].first.to_i > 20_000
-    rescue
-      false
+  def find_center_of_objects
+    data = "#{Rails.root}/lib/assets/haarcascade_frontalface_alt.xml"
+    detector = CvHaarClassifierCascade::load(data)
+
+    center = 0
+    image = CvMat.load(@file.path)
+
+    objects = detector.detect_objects(image)
+    if objects.count > 0
+      center = 0
+      objects.each do |region|
+        center += region.center.y
+      end
+      center = center / objects.count.to_f
     end
+
+    center
   end
 
-  def image_valid?(file)
-    image = Magick::Image.ping(file).first
-    width = image.columns.to_f
-    height = image.rows.to_f
-    image_ratio = height / width
-    target_ratio = HEIGHT_RATIO / WIDTH_RATIO
-    width > MIN_WIDTH && image_ratio <= 1 && image_ratio >= target_ratio
+  def crop_rectangle(center)
+    ratio = HEIGHT_RATIO / WIDTH_RATIO
+    crop_height = (ratio * width).floor
+    half_crop_height = crop_height / 2
+    y_position = center - half_crop_height
+
+    if y_position <= 0
+      y_position = 0
+    elsif center + half_crop_height > height
+      y_position = height - crop_height
+    end
+
+    {x: 0, y: y_position, width: width, height: crop_height}
   end
 
 end

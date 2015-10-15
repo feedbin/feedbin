@@ -2135,32 +2135,14 @@ $saved-search-control-height: 48px;
         > .favicon-wrap {
             display: none;
         }
-        .image {
+        .entry-image {
             margin-top: 8px;
-            padding-top: 56.25%;
             display: block;
             position: relative;
             overflow: hidden;
             border-radius: 3px;
-            &:after {
-                position: absolute;
-                height: 100%;
-                width: 100%;
-                top: 0;
-                left: 0;
-                content: "";
-                display: block;
-            }
-            img {
-                max-width: 100%;
-                position: absolute;
-                top: 0;
-                left: 0;
-            }
+            max-width: 100%;
         }
-    }
-    &.read .image:after {
-        -webkit-backdrop-filter: grayscale(100%);
     }
     .entry-actions-wrap {
         top: 0;
