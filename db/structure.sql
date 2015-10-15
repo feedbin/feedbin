@@ -256,7 +256,8 @@ CREATE TABLE entries (
     data json,
     original json,
     source text,
-    image_url text
+    image_url text,
+    processed_image_url text
 );
 
 

@@ -12,9 +12,11 @@ class EntryImage
     candidates.each do |candidate|
       begin
         if candidate.valid?
-          download = DownloadImage.new(candidate.url)
+          url = candidate.url
+          download = DownloadImage.new(url)
           if download.download
-            @entry.image_url = download.image.url
+            @entry.image_url = url.to_s
+            @entry.processed_image_url = download.image.url
             @entry.save
             break
           end
