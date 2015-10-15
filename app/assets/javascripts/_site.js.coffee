@@ -77,6 +77,24 @@ $.extend feedbin,
   isRead: (entryId) ->
     feedbin.Counts.get().isRead(entryId)
 
+  imagePlaceholders: (element) ->
+    image = new Image()
+    placehold = element.children[0]
+    element.className += ' is-loading'
+
+    image.onload = ->
+      element.className = element.className.replace('is-loading', 'is-loaded')
+      element.replaceChild(image, placehold)
+
+    for attr in placehold.attributes
+      if (attr.name.match(/^data-/))
+        image.setAttribute(attr.name.replace('data-', ''), attr.value)
+
+  loadEntryImages: ->
+    placeholders = document.querySelectorAll('.entry-image')
+    for placeholder in placeholders
+      feedbin.imagePlaceholders(placeholder)
+
   preloadImages: (id) ->
     id = parseInt(id)
     if feedbin.entries[id] && !_.contains(feedbin.preloadedImageIds, id)
