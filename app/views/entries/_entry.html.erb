@@ -1,37 +1,44 @@
 <% present entry do |entry_presenter| %>
 <li data-entry-id="<%= entry.id %>" <%= rtl(entry.summary) %>>
-  <div class="mark-above-read" data-behavior="mark_above_read"><span><i>Mark Above as Read</i></span></div>
-  <div class="mark-below-read" data-behavior="mark_below_read"><span><i>Mark Below as Read</i></span></div>
-  <a
-    class="wrap"
-    data-behavior="selectable open_item show_entry_content entry_info"
-    data-entry-id="<%= entry.id %>"
-    data-entry-info="<%= {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}.to_json %>"
-    data-remote="true"
-    data-mark-as-read-path="/entries/<%= entry.id %>/mark_as_read"
-    data-recently-read-path="/entries/<%= entry.id %>/recently_read"
-    href="/entries/<%= entry.id %>"
-  >
-	<span class="entries-inner-wrap">
-	  <%= entry_presenter.favicon(entry.feed.host) %>
-	  <p class="feed-title">
-	    <span class="title-inner" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= entry.feed.title %></span>
-	  </p>
-	  <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
-	  <span class="title-wrap">
-	    <h2 class="title">
-	      <%= entry_presenter.favicon(entry.feed.host) %>
-	      <%= entry_presenter.title %>
-	    </h2>
-	    <% if entry_presenter.has_content? && entry_presenter.sanitized_title.present?  %>
-	      <p class="body"><%= entry.summary.html_safe %></p>
-	    <% end %>
-	  </span>
-	  <i class="icon-star"></i>
-	  <span class="entry-actions-wrap" data-behavior="show_entry_actions">
-	    <i class="icon-entry-actions"></i>
-	  </span>
-	</span>
-  </a>
+    <div class="mark-above-read" data-behavior="mark_above_read"><span><i>Mark Above as Read</i></span></div>
+    <div class="mark-below-read" data-behavior="mark_below_read"><span><i>Mark Below as Read</i></span></div>
+    <a
+        class="wrap"
+        data-behavior="selectable open_item show_entry_content entry_info"
+        data-entry-id="<%= entry.id %>"
+        data-entry-info="<%= {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}.to_json %>"
+        data-remote="true"
+        data-mark-as-read-path="/entries/<%= entry.id %>/mark_as_read"
+        data-recently-read-path="/entries/<%= entry.id %>/recently_read"
+        href="/entries/<%= entry.id %>"
+    >
+    <span class="entries-inner-wrap">
+        <%= entry_presenter.favicon(entry.feed.host) %>
+        <p class="feed-title">
+            <span class="title-inner" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= entry.feed.title %></span>
+        </p>
+        <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
+        <span class="title-wrap">
+            <h2 class="title">
+                <%= entry_presenter.favicon(entry.feed.host) %>
+                <%= entry_presenter.title %>
+            </h2>
+            <% if entry_presenter.has_content? && entry_presenter.sanitized_title.present?  %>
+                <p class="body"><%= entry.summary.html_safe %></p>
+            <% end %>
+
+            <% if current_user.admin && entry.processed_image_url.present?  %>
+            <span class="entry-image">
+                <span data-src="<%= entry.processed_image_url %>"></span>
+            </span>
+            <% end %>
+
+        </span>
+        <i class="icon-star"></i>
+        <span class="entry-actions-wrap" data-behavior="show_entry_actions">
+            <i class="icon-entry-actions"></i>
+        </span>
+    </span>
+</a>
 </li>
 <% end %>

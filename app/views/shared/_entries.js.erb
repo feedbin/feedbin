@@ -27,6 +27,8 @@ feedbin.localizeTime()
 
 feedbin.applyUserTitles()
 
+feedbin.loadEntryImages()
+
 $('[data-behavior~=show_tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {feed: @feed || nil, tags: @tags, tag: @tag || nil} %>');
 
 <% if @type && @type == 'tag' %>
