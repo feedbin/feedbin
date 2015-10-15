@@ -343,7 +343,7 @@ class Entry < ActiveRecord::Base
   end
 
   def find_images
-    #EntryImage.perform_async(self.id)
+    EntryImage.perform_async(self.id)
   end
 
 end
