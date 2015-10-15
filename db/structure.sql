@@ -255,7 +255,9 @@ CREATE TABLE entries (
     starred_entries_count integer DEFAULT 0 NOT NULL,
     data json,
     original json,
-    source text
+    source text,
+    image_url text,
+    processed_image_url text
 );
 
 
@@ -2013,4 +2015,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150714000523');
 INSERT INTO schema_migrations (version) VALUES ('20150817230441');
 
 INSERT INTO schema_migrations (version) VALUES ('20150827230751');
+
+INSERT INTO schema_migrations (version) VALUES ('20151011143618');
 
