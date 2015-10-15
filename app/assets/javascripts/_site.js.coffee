@@ -166,6 +166,24 @@ $.extend feedbin,
   formatInstagram: ->
     instgrm.Embeds.process()
 
+  imagePlaceholders: (element) ->
+    image = new Image()
+    placehold = element.children[0]
+    element.className += ' is-loading'
+
+    image.onload = ->
+      element.className = element.className.replace('is-loading', 'is-loaded')
+      element.replaceChild(image, placehold)
+
+    for attr in placehold.attributes
+      if (attr.name.match(/^data-/))
+        image.setAttribute(attr.name.replace('data-', ''), attr.value)
+
+  loadEntryImages: ->
+    placeholders = document.querySelectorAll('.entry-image')
+    for placeholder in placeholders
+      feedbin.imagePlaceholders(placeholder)
+
   formatImages: ->
     $("[data-behavior~=entry_content_wrap] img").each ->
       actualSrc = $(@).data('feedbin-src')

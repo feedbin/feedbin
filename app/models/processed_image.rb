@@ -4,6 +4,8 @@ include OpenCV
 
 class ProcessedImage
 
+  DETECTOR = CvHaarClassifierCascade::load("#{Rails.root}/lib/assets/haarcascade_frontalface_alt.xml")
+
   TARGET_WIDTH = 542.to_f
   WIDTH_RATIO = 16.to_f
   HEIGHT_RATIO = 9.to_f
@@ -58,12 +60,10 @@ class ProcessedImage
   end
 
   def find_center_of_objects
-    data = "#{Rails.root}/lib/assets/haarcascade_frontalface_alt.xml"
-    detector = CvHaarClassifierCascade::load(data)
     image = CvMat.load(@file.path)
 
     center = 0
-    objects = detector.detect_objects(image)
+    objects = DETECTOR.detect_objects(image)
     if objects.count > 0
       objects.each do |region|
         center += region.center.y

@@ -2135,13 +2135,25 @@ $saved-search-control-height: 48px;
         > .favicon-wrap {
             display: none;
         }
-        .entry-image {
-            margin-top: 8px;
-            display: block;
+    }
+    .entry-image {
+        margin-top: 8px;
+        display: block;
+        border-radius: 3px;
+    	@include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+        &.is-loading {
             position: relative;
-            overflow: hidden;
+            background: #EEE;
+        }
+        img {
             border-radius: 3px;
+            display: block;
+            min-width: 100%;
             max-width: 100%;
+        }
+        span {
+            padding-top: 56.25%;
+            display: block;
         }
     }
     .entry-actions-wrap {

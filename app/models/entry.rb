@@ -20,10 +20,6 @@ class Entry < ActiveRecord::Base
   after_commit :touch_feed_last_published_entry, on: :create
   after_commit :count_update, on: :update
 
-  def find_images
-    EntryImage.perform_async(self.id)
-  end
-
   tire_settings = {
     analysis: {
       filter: {
@@ -344,6 +340,10 @@ class Entry < ActiveRecord::Base
 
   def count_update
     $redis.zincrby("update_counts", 1, self.feed_id)
+  end
+
+  def find_images
+    #EntryImage.perform_async(self.id)
   end
 
 end
