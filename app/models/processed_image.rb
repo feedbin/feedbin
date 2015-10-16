@@ -45,7 +45,7 @@ class ProcessedImage
   end
 
   def valid?
-    width >= TARGET_WIDTH && height >= TARGET_HEIGHT && landscape?
+    width >= TARGET_WIDTH && height >= TARGET_HEIGHT
   end
 
   def process
@@ -107,7 +107,7 @@ class ProcessedImage
 
     if point <= 0
       point = 0
-    elsif point + half_crop_dimension > contrained_dimension
+    elsif center + half_crop_dimension > contrained_dimension
       point = contrained_dimension - crop_dimension
     end
 
