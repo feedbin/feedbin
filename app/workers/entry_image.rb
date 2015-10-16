@@ -18,10 +18,12 @@ class EntryImage
             @entry.image_url = url.to_s
             @entry.processed_image_url = download.image.url
             @entry.save
+            Librato.increment 'entry_image.create'
             break
           end
         end
       rescue Exception => exception
+        Librato.increment 'entry_image.exception'
         Honeybadger.notify(exception)
       end
     end
