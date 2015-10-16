@@ -92,9 +92,7 @@ class ProcessedImage
 
     if panoramic?
       center = image.columns / 2
-      puts "center #{center.inspect}"
       center = find_center_of_objects(center, file_path, :x)
-      puts "center #{center.inspect}"
       crop_dimension = TARGET_WIDTH
       contrained_dimension = image.columns
     else
@@ -107,9 +105,6 @@ class ProcessedImage
     half_crop_dimension = crop_dimension / 2
     point = center - half_crop_dimension
 
-    puts "point: #{point.inspect}"
-    puts "half_crop_dimension: #{half_crop_dimension.inspect}"
-    puts "contrained_dimension: #{contrained_dimension.inspect}"
     if point <= 0
       point = 0
     elsif point + half_crop_dimension > contrained_dimension
