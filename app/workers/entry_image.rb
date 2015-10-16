@@ -13,7 +13,7 @@ class EntryImage
       begin
         if candidate.valid?
           url = candidate.url
-          download = DownloadImage.new(url)
+          download = DownloadImage.new(url, @entry.id)
           if download.download
             @entry.image_url = url.to_s
             @entry.processed_image_url = download.image.url

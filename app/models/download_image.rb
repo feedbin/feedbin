@@ -5,9 +5,10 @@ class DownloadImage
 
   attr_reader :image
 
-  def initialize(url)
+  def initialize(url, entry_id)
     @url = url
     @image = nil
+    @entry_id = entry_id
   end
 
   def download
@@ -35,7 +36,7 @@ class DownloadImage
           end
           file.rewind
           file.close
-          image = ProcessedImage.new(file)
+          image = ProcessedImage.new(file, @entry_id)
         end
       end
     end

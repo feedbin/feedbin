@@ -12,9 +12,10 @@ class ProcessedImage
 
   attr_reader :url
 
-  def initialize(file)
+  def initialize(file, entry_id)
     @file = file
     @url = nil
+    @entry_id = entry_id
   end
 
   def ping
@@ -38,7 +39,7 @@ class ProcessedImage
   def process
     success = false
     if valid?
-      processed_image = Tempfile.new(["image-", ".jpg"])
+      processed_image = Tempfile.new(["entry-#{@entry_id}-", ".jpg"])
       processed_image.close
       center = find_center_of_objects
       crop = crop_rectangle(center)
