@@ -1,14 +1,16 @@
 require 'rmagick'
 require 'opencv'
-include OpenCV
 
 class ProcessedImage
 
-  DETECTOR = CvHaarClassifierCascade::load("#{Rails.root}/lib/assets/haarcascade_frontalface_alt.xml")
+  DETECTOR = OpenCV::CvHaarClassifierCascade::load("#{Rails.root}/lib/assets/haarcascade_frontalface_alt.xml")
 
-  TARGET_WIDTH = 542.to_f
   WIDTH_RATIO = 16.to_f
   HEIGHT_RATIO = 9.to_f
+  TARGET_WIDTH = 542.to_f
+
+  TARGET_RATIO = HEIGHT_RATIO / WIDTH_RATIO
+  TARGET_HEIGHT = (TARGET_RATIO * TARGET_WIDTH).floor
 
   attr_reader :url
 
@@ -30,63 +32,113 @@ class ProcessedImage
     @height ||= ping.rows.to_f
   end
 
+  def ratio
+    @ratio ||= height / width
+  end
+
+  def landscape?
+    ratio <= 1
+  end
+
+  def panoramic?
+    ratio < TARGET_RATIO
+  end
+
   def valid?
-    image_ratio = height / width
-    target_ratio = HEIGHT_RATIO / WIDTH_RATIO
-    width >= TARGET_WIDTH && image_ratio <= 1 && image_ratio >= target_ratio
+    width >= TARGET_WIDTH && height >= TARGET_HEIGHT && landscape?
   end
 
   def process
     success = false
+    image = Magick::Image.read(@file.path).first
+    image_file = Tempfile.new(["entry-#{@entry_id}-", ".jpg"])
+    image_file.close
     if valid?
-      processed_image = Tempfile.new(["entry-#{@entry_id}-", ".jpg"])
-      processed_image.close
-      center = find_center_of_objects
-      crop = crop_rectangle(center)
-
-      image = Magick::Image.read(@file.path).first
-      image = image.crop(crop[:x], crop[:y], crop[:width], crop[:height])
-      image = image.resize_to_fit(TARGET_WIDTH)
-      image.write(processed_image.path)
-
-      processed_image.open
-      uploader = EntryImageUploader.new
-      uploader.store!(processed_image)
-      processed_image.close(true)
-
-      @url = uploader.url
+      resized_file = resize_to_fit(image)
+      crop = find_best_crop(image, resized_file.path)
+      image.crop!(crop[:x], crop[:y], crop[:width], crop[:height])
+      image.write(image_file.path)
+      @url = upload(image_file)
       success = true
     end
     success
+  ensure
+    image && image.destroy!
+    resized_file && resized_file.close(true)
+    image_file && image_file.close(true)
   end
 
-  def find_center_of_objects
-    image = CvMat.load(@file.path)
+  def upload(file)
+    file.open
+    uploader = EntryImageUploader.new
+    uploader.store!(file)
+    uploader.url
+  end
 
-    center = 0
+  def resize_to_fit(image)
+    file = Tempfile.new(["entry-#{@entry_id}-", ".png"])
+    file.close
+
+    geometry = Magick::Geometry.new(TARGET_WIDTH, TARGET_HEIGHT, 0, 0, Magick::MinimumGeometry)
+    image.change_geometry!(geometry) do |width, height|
+      image.resize!(width, height)
+    end
+
+    image.write(file.path)
+    file
+  end
+
+  def find_best_crop(image, file_path)
+
+    if panoramic?
+      center = image.columns / 2
+      puts "center #{center.inspect}"
+      center = find_center_of_objects(center, file_path, :x)
+      puts "center #{center.inspect}"
+      crop_dimension = TARGET_WIDTH
+      contrained_dimension = image.columns
+    else
+      center = 0
+      center = find_center_of_objects(center, file_path, :y)
+      crop_dimension = TARGET_HEIGHT
+      contrained_dimension = image.rows
+    end
+
+    half_crop_dimension = crop_dimension / 2
+    point = center - half_crop_dimension
+
+    puts "point: #{point.inspect}"
+    puts "half_crop_dimension: #{half_crop_dimension.inspect}"
+    puts "contrained_dimension: #{contrained_dimension.inspect}"
+    if point <= 0
+      point = 0
+    elsif point + half_crop_dimension > contrained_dimension
+      point = contrained_dimension - crop_dimension
+    end
+
+    x = 0
+    y = 0
+    if panoramic?
+      x = point
+    else
+      y = point
+    end
+
+    {x: x, y: y, width: TARGET_WIDTH, height: TARGET_HEIGHT}
+  end
+
+  def find_center_of_objects(center, file_path, dimension)
+    image = OpenCV::CvMat.load(file_path)
+
     objects = DETECTOR.detect_objects(image)
     if objects.count > 0
+      center = 0
       objects.each do |region|
-        center += region.center.y
+        center += region.center.send(dimension)
       end
       center = center / objects.count.to_f
     end
     center
-  end
-
-  def crop_rectangle(center)
-    ratio = HEIGHT_RATIO / WIDTH_RATIO
-    crop_height = (ratio * width).floor
-    half_crop_height = crop_height / 2
-    y_position = center - half_crop_height
-
-    if y_position <= 0
-      y_position = 0
-    elsif center + half_crop_height > height
-      y_position = height - crop_height
-    end
-
-    {x: 0, y: y_position, width: width, height: crop_height}
   end
 
 end
