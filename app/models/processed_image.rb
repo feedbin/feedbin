@@ -10,7 +10,6 @@ class ProcessedImage
   TARGET_WIDTH = 542.to_f
 
   TARGET_RATIO = HEIGHT_RATIO / WIDTH_RATIO
-  TARGET_HEIGHT = (TARGET_RATIO * TARGET_WIDTH).floor
 
   attr_reader :url
 
@@ -44,8 +43,18 @@ class ProcessedImage
     ratio < TARGET_RATIO
   end
 
+  def target_height
+    @target_height ||= begin
+      if landscape?
+        (TARGET_RATIO * TARGET_WIDTH).floor
+      else
+        TARGET_WIDTH
+      end
+    end
+  end
+
   def valid?
-    width >= TARGET_WIDTH && height >= TARGET_HEIGHT
+    width >= TARGET_WIDTH && height >= target_height
   end
 
   def process
@@ -79,7 +88,7 @@ class ProcessedImage
     file = Tempfile.new(["entry-#{@entry_id}-", ".png"])
     file.close
 
-    geometry = Magick::Geometry.new(TARGET_WIDTH, TARGET_HEIGHT, 0, 0, Magick::MinimumGeometry)
+    geometry = Magick::Geometry.new(TARGET_WIDTH, target_height, 0, 0, Magick::MinimumGeometry)
     image.change_geometry!(geometry) do |width, height|
       image.resize!(width, height)
     end
@@ -98,7 +107,7 @@ class ProcessedImage
     else
       center = 0
       center = find_center_of_objects(center, file_path, :y)
-      crop_dimension = TARGET_HEIGHT
+      crop_dimension = target_height
       contrained_dimension = image.rows
     end
 
@@ -119,7 +128,7 @@ class ProcessedImage
       y = point
     end
 
-    {x: x, y: y, width: TARGET_WIDTH, height: TARGET_HEIGHT}
+    {x: x, y: y, width: TARGET_WIDTH, height: target_height}
   end
 
   def find_center_of_objects(center, file_path, dimension)
