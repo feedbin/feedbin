@@ -4,14 +4,9 @@ require 'opencv'
 class ProcessedImage
 
   DETECTOR = OpenCV::CvHaarClassifierCascade::load("#{Rails.root}/lib/assets/haarcascade_frontalface_alt.xml")
-
-  WIDTH_RATIO = 16.to_f
-  HEIGHT_RATIO = 9.to_f
   TARGET_WIDTH = 542.to_f
 
-  TARGET_RATIO = HEIGHT_RATIO / WIDTH_RATIO
-
-  attr_reader :url
+  attr_reader :url, :width, :height
 
   def initialize(file, entry_id)
     @file = file
@@ -23,16 +18,16 @@ class ProcessedImage
     @ping ||= Magick::Image.ping(@file.path).first
   end
 
-  def width
-    @width ||= ping.columns.to_f
+  def original_width
+    @original_width ||= ping.columns.to_f
   end
 
-  def height
-    @height ||= ping.rows.to_f
+  def original_height
+    @original_height ||= ping.rows.to_f
   end
 
   def ratio
-    @ratio ||= height / width
+    @ratio ||= original_height / original_width
   end
 
   def landscape?
@@ -40,21 +35,32 @@ class ProcessedImage
   end
 
   def panoramic?
-    ratio < TARGET_RATIO
+    landscape? && ratio < target_ratio
+  end
+
+  def target_ratio
+    @target_ratio ||= begin
+      # if landscape?
+      #   width_ratio = 16
+      #   height_ratio = 9
+      # else
+      #   width_ratio = 1
+      #   height_ratio = 1
+      # end
+      width_ratio = 16
+      height_ratio = 9
+      height_ratio.to_f / width_ratio.to_f
+    end
   end
 
   def target_height
     @target_height ||= begin
-      if landscape?
-        (TARGET_RATIO * TARGET_WIDTH).floor
-      else
-        TARGET_WIDTH
-      end
+      (target_ratio * TARGET_WIDTH).floor
     end
   end
 
   def valid?
-    width >= TARGET_WIDTH && height >= target_height
+    original_width >= TARGET_WIDTH && original_height >= target_height
   end
 
   def process
@@ -68,6 +74,8 @@ class ProcessedImage
       image.crop!(crop[:x], crop[:y], crop[:width], crop[:height])
       image.write(image_file.path)
       @url = upload(image_file)
+      @width = crop[:width]
+      @height = crop[:height]
       success = true
     end
     success
@@ -89,8 +97,8 @@ class ProcessedImage
     file.close
 
     geometry = Magick::Geometry.new(TARGET_WIDTH, target_height, 0, 0, Magick::MinimumGeometry)
-    image.change_geometry!(geometry) do |width, height|
-      image.resize!(width, height)
+    image.change_geometry!(geometry) do |new_width, new_height|
+      image.resize!(new_width, new_height)
     end
 
     image.write(file.path)
@@ -128,7 +136,7 @@ class ProcessedImage
       y = point
     end
 
-    {x: x, y: y, width: TARGET_WIDTH, height: target_height}
+    {x: x, y: y, width: TARGET_WIDTH.to_i, height: target_height.to_i}
   end
 
   def find_center_of_objects(center, file_path, dimension)

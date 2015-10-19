@@ -2,21 +2,34 @@ class EntryImage
   include Sidekiq::Worker
 
   def perform(entry_id)
+    Honeybadger.context(entry_id: entry_id)
     @entry = Entry.find(entry_id)
     @feed = @entry.feed
-    Honeybadger.context(entry_id: entry_id)
     find_image_url
   end
 
   def find_image_url
+
+    download = nil
+
     candidates.each do |candidate|
       begin
-        break if suitable_image_found?(candidate)
+        break if download = try_candidate(candidate)
       rescue Exception => exception
         Librato.increment 'entry_image.exception'
         Honeybadger.notify(exception)
       end
     end
+
+    if download
+      @entry.update_attributes(image: {
+        original_url: download.url.to_s,
+        processed_url: download.image.url.to_s,
+        width: download.image.width,
+        height: download.image.height,
+      })
+    end
+
   end
 
   def candidates
@@ -50,17 +63,12 @@ class EntryImage
     urls.push(ImageCandidate.new(@entry.url, "iframe"))
   end
 
-  def suitable_image_found?(candidate)
+  def try_candidate(candidate)
     found = false
     if candidate.valid?
-      url = candidate.url
-      download = DownloadImage.new(url, @entry.id)
+      download = DownloadImage.new(candidate.original_url, @entry.id)
       if download.download
-        @entry.image_url = url.to_s
-        @entry.processed_image_url = download.image.url
-        @entry.save
-        found = true
-        Librato.increment 'entry_image.create'
+        found = download
       end
     end
     found

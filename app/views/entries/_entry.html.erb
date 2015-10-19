@@ -27,10 +27,8 @@
                 <p class="body"><%= entry.summary.html_safe %></p>
             <% end %>
 
-            <% if current_user.admin && entry.processed_image_url.present?  %>
-            <span class="entry-image">
-                <span data-src="<%= entry.processed_image_url %>"></span>
-            </span>
+            <% if current_user.admin %>
+                <%= entry_presenter.image %>
             <% end %>
 
         </span>

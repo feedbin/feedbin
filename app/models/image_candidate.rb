@@ -6,15 +6,13 @@ class ImageCandidate
   def initialize(src, element)
     @src = src
     @element = element
-    @valid = true
+    @valid = false
     @url = nil
 
     if image?
       @url = image_candidate
     elsif iframe?
       @url = iframe_candidate
-    else
-      @valid = false
     end
   end
 
@@ -22,11 +20,13 @@ class ImageCandidate
     return @valid
   end
 
-  def url
-    if @url.respond_to?(:call)
-      @url = @url.call
+  def original_url
+    @original_url ||= begin
+      if @url.respond_to?(:call)
+        @url = @url.call
+      end
+      URI(@url)
     end
-    URI(@url)
   end
 
   private
@@ -40,12 +40,12 @@ class ImageCandidate
   end
 
   def image_candidate
-    if IGNORE_EXTENSIONS.find { |extension| @src.include?(extension) }
-      @valid = false
-    end
-    lambda do
-      response = HTTParty.head(@src, verify: false, timeout: 15)
-      response.request.last_uri.to_s
+    if !IGNORE_EXTENSIONS.find { |extension| @src.include?(extension) }
+      @valid = true
+      lambda do
+        response = HTTParty.head(@src, verify: false, timeout: 15)
+        response.request.last_uri.to_s
+      end
     end
   end
 
@@ -53,10 +53,10 @@ class ImageCandidate
     uri = nil
     if YOUTUBE_URLS.find { |format| @src =~ format } && $1
       uri = youtube_uri($1)
+      @valid = true
     elsif @src =~ VIMEO_URL && $1
       uri = vimeo_uri($1)
-    else
-      @valid = false
+      @valid = true
     end
     uri
   end
@@ -71,15 +71,11 @@ class ImageCandidate
         path: "/api/oembed.json",
         query: query
       }
-      uri = URI::HTTP.build(options)
-      response = HTTParty.get(uri, timeout: 5)
 
+      response = HTTParty.get(URI::HTTP.build(options), timeout: 5)
       if response.code == 200
         uri = response.parsed_response["thumbnail_url"]
         uri = uri.gsub(/_\d+.jpg/, ".jpg")
-      else
-        uri = nil
-        @valid = false
       end
 
       uri

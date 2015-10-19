@@ -144,4 +144,19 @@ class EntryPresenter < BasePresenter
     entry.data && entry.data["youtube_video_id"].present?
   end
 
+  def image
+    if image?
+      url = URI(entry.image["processed_url"])
+      url.host = ENV['ENTRY_IMAGE_HOST'] if ENV['ENTRY_IMAGE_HOST']
+      padding = (entry.image["height"].to_f / entry.image["width"].to_f).round(4) * 100
+      @template.content_tag :span, class: "entry-image" do
+        @template.content_tag :span, "", data: {src: url.to_s }, style: "padding-top: #{padding}%;"
+      end
+    end
+  end
+
+  def image?
+    entry.image.present? && entry.image["original_url"] && entry.image["processed_url"] && entry.image["width"] && entry.image["height"]
+  end
+
 end
