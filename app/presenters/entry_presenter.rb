@@ -141,7 +141,7 @@ class EntryPresenter < BasePresenter
   end
 
   def youtube?
-    entry.data["youtube_video_id"].present?
+    entry.data && entry.data["youtube_video_id"].present?
   end
 
 end
