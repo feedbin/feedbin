@@ -216,7 +216,7 @@ class Entry < ActiveRecord::Base
   end
 
   def self.entries_list
-    select(:id, :feed_id, :title, :summary, :published, :processed_image_url)
+    select(:id, :feed_id, :title, :summary, :published, :image)
   end
 
   def self.include_unread_entries(user_id)

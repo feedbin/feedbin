@@ -3,7 +3,7 @@ require 'opencv'
 
 class DownloadImage
 
-  attr_reader :image
+  attr_reader :image, :url
 
   def initialize(url, entry_id)
     @url = url
