@@ -11,17 +11,7 @@ class EntryImage
   def find_image_url
     candidates.each do |candidate|
       begin
-        if candidate.valid?
-          url = candidate.url
-          download = DownloadImage.new(url, @entry.id)
-          if download.download
-            @entry.image_url = url.to_s
-            @entry.processed_image_url = download.image.url
-            @entry.save
-            Librato.increment 'entry_image.create'
-            break
-          end
-        end
+        break if suitable_image_found?(candidate)
       rescue Exception => exception
         Librato.increment 'entry_image.exception'
         Honeybadger.notify(exception)
@@ -32,8 +22,7 @@ class EntryImage
   def candidates
     document = Nokogiri::HTML5(@entry.content)
     elements = document.search("img, iframe")
-    elements.each_with_object([]) do |element, array|
-      candidate = nil
+    urls = elements.each_with_object([]) do |element, array|
 
       next if element["src"].blank?
       src = element["src"].strip
@@ -56,9 +45,25 @@ class EntryImage
       end
 
       candidate = ImageCandidate.new(src, element.name)
-
-      array.push(candidate) if candidate
+      array.push(candidate)
     end
+    urls.push(ImageCandidate.new(@entry.url, "iframe"))
+  end
+
+  def suitable_image_found?(candidate)
+    found = false
+    if candidate.valid?
+      url = candidate.url
+      download = DownloadImage.new(url, @entry.id)
+      if download.download
+        @entry.image_url = url.to_s
+        @entry.processed_image_url = download.image.url
+        @entry.save
+        found = true
+        Librato.increment 'entry_image.create'
+      end
+    end
+    found
   end
 
 end

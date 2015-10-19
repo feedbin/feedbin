@@ -41,12 +41,17 @@
                 <%= link_to '×', toggle_updates_feed_path(entry.feed, inline: true), remote: true, method: :post, class: 'ignore-updates', data: {behavior: 'hide_updates'}, title: "Don't tell me when articles from #{strip_tags(entry.feed.title)} have been updated."  %>
               </p>
             <% end %>
-            <% if entry.data %>
+            <% if entry_presenter.media_type %>
             <div class="media-container">
               <%= entry_presenter.media.html_safe %>
             </div>
             <% end %>
-            <%= raw(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>
+            <% if entry_presenter.youtube? %>
+                <iframe width="<%= entry.data["media_width"] %>" height="<%= entry.data["media_height"] %>" src="https://www.youtube-nocookie.com/embed/<%= entry.data["youtube_video_id"] %>?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe>
+                <div class="text"><%= entry.content %></div>
+            <% else %>
+                <%= raw(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>
+            <% end %>
           </div>
         </div>
         <a class="next-entry-preview no-content" data-behavior="open_next_entry" href="#">

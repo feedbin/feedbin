@@ -37,6 +37,8 @@ class DownloadImage
           file.rewind
           file.close
           image = ProcessedImage.new(file, @entry_id)
+        else
+          file.close(true)
         end
       end
     end

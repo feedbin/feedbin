@@ -143,6 +143,12 @@ Feedbin::Application.routes.draw do
     post :entry_width
   end
 
+  resources :recently_read_entries, only: [] do
+    collection do
+      delete :destroy_all
+    end
+  end
+
   constraints subdomain: 'api' do
     namespace :api, path: nil do
       namespace :v1 do

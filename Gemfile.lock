@@ -12,10 +12,10 @@ GIT
 
 GIT
   remote: git://github.com/feedbin/feedjira.git
-  revision: 7884b8bb25044f76196183cf072e116aed31b9f6
-  ref: 7884b8b
+  revision: de95ec64d6ce89b1d6077d96ecc0bbc6d0496b82
+  ref: de95ec6
   specs:
-    feedjira (1.6.0)
+    feedjira (1.6.1)
       curb (~> 0.8)
       loofah (~> 2.0)
       sax-machine (~> 1.0)

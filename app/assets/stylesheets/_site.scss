@@ -2140,10 +2140,9 @@ $saved-search-control-height: 48px;
         margin-top: 8px;
         display: block;
         border-radius: 3px;
-    	@include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
         &.is-loading {
             position: relative;
-            background: #EEE;
+            @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
         }
         img {
             border-radius: 3px;
@@ -3453,6 +3452,10 @@ $saved-search-control-height: 48px;
         width: 100%;
         background-color: #000;
         max-width: 100%;
+    }
+
+    .text {
+        white-space: pre-wrap;
     }
 
     .download-link {
