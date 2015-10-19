@@ -56,7 +56,6 @@ class ImageCandidate
       @valid = true
     elsif @src =~ VIMEO_URL && $1
       uri = vimeo_uri($1)
-      @valid = true
     end
     uri
   end
@@ -76,6 +75,7 @@ class ImageCandidate
       if response.code == 200
         uri = response.parsed_response["thumbnail_url"]
         uri = uri.gsub(/_\d+.jpg/, ".jpg")
+        @valid = true
       end
 
       uri
