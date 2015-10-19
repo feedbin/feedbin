@@ -10,7 +10,6 @@ class ImageCandidate
     @url = nil
 
     if image?
-      @check_for_redirect = true
       @url = image_candidate
     elsif iframe?
       @url = iframe_candidate
@@ -27,12 +26,7 @@ class ImageCandidate
     if @url.respond_to?(:call)
       @url = @url.call
     end
-
-    if @check_for_redirect
-      last_effective_uri(@url)
-    else
-      URI(@url)
-    end
+    URI(@url)
   end
 
   private
@@ -49,7 +43,10 @@ class ImageCandidate
     if IGNORE_EXTENSIONS.find { |extension| @src.include?(extension) }
       @valid = false
     end
-    @src
+    lambda do
+      response = HTTParty.head(@src, verify: false, timeout: 15)
+      response.request.last_uri.to_s
+    end
   end
 
   def iframe_candidate
@@ -91,11 +88,6 @@ class ImageCandidate
 
   def youtube_uri(id)
     "http://img.youtube.com/vi/#{id}/maxresdefault.jpg"
-  end
-
-  def last_effective_uri(uri)
-    response = HTTParty.head(uri, verify: false, timeout: 15)
-    response.request.last_uri
   end
 
 end
