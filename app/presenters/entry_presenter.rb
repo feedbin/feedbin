@@ -140,4 +140,8 @@ class EntryPresenter < BasePresenter
     !media_type.nil? || content.include?('<iframe')
   end
 
+  def youtube?
+    entry.data["youtube_video_id"].present?
+  end
+
 end

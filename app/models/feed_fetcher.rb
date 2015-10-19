@@ -207,14 +207,21 @@ class FeedFetcher
         entry.entry_id        = entry.entry_id ? entry.entry_id.strip : nil
         entry._public_id_     = build_public_id(entry, feedjira, saved_feed_url)
         entry._old_public_id_ = build_public_id(entry, feedjira)
+
+        data = {}
         if entry.try(:enclosure_type) && entry.try(:enclosure_url)
-          data = {}
-          data[:enclosure_type] = entry.enclosure_type ? entry.enclosure_type : nil
-          data[:enclosure_url] = entry.enclosure_url ? entry.enclosure_url : nil
-          data[:enclosure_length] = entry.enclosure_length ? entry.enclosure_length : nil
-          data[:itunes_duration] = entry.itunes_duration ? entry.itunes_duration : nil
-          entry._data_ = data
+          data[:enclosure_type] = entry.try(:enclosure_type)
+          data[:enclosure_url] = entry.try(:enclosure_url)
+          data[:enclosure_length] = entry.try(:enclosure_length)
+          data[:itunes_duration] = entry.try(:itunes_duration)
         end
+        if entry.try(:youtube_video_id)
+          entry.content = entry.try(:media_description)
+          data[:youtube_video_id] = entry.try(:youtube_video_id)
+          data[:media_width] = entry.try(:media_width)
+          data[:media_height] = entry.try(:media_height)
+        end
+        entry._data_ = data
       end
       if feedjira.entries.any?
         feedjira.entries = feedjira.entries.uniq { |entry| entry._public_id_ }

@@ -3454,6 +3454,10 @@ $saved-search-control-height: 48px;
         max-width: 100%;
     }
 
+    .text {
+        white-space: pre-wrap;
+    }
+
     .download-link {
         font-size: 12px;
         font-family: $font-stack;
