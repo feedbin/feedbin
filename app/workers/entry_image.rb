@@ -42,6 +42,7 @@ class EntryImage
       width: download.image.width,
       height: download.image.height,
     })
+    Librato.increment 'entry_image.create'
   end
 
   def rss_candidates
