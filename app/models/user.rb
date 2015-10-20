@@ -25,6 +25,7 @@ class User < ActiveRecord::Base
                  :entries_feed,
                  :entries_time,
                  :entries_body,
+                 :entries_image,
                  :ui_typeface,
                  :update_message_seen,
                  :hide_recently_read,

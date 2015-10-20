@@ -2462,6 +2462,11 @@ $saved-search-control-height: 48px;
         display: none;
     }
 }
+.entries-image-0 .entries, .entries-display-inline .entries {
+    .entry-image {
+        display: none;
+    }
+}
 .entries-feed-0.entries-time-0 .entries {
     .feed-title {
         display: none;
