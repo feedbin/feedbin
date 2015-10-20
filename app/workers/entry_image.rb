@@ -1,5 +1,6 @@
 class EntryImage
   include Sidekiq::Worker
+  sidekiq_options retry: false
 
   def perform(entry_id)
     Honeybadger.context(entry_id: entry_id)
