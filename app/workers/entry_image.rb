@@ -76,15 +76,25 @@ class EntryImage
   end
 
   def page_candidates
-    response = HTTParty.get(@entry.fully_qualified_url, timeout: 5)
-    document = Nokogiri::HTML5(response.body)
-    document.search("meta[property='og:image'], meta[property='twitter:image']").each_with_object([]) do |element, array|
-      if element["content"].present?
-        src = element["content"].strip
-        candidate = ImageCandidate.new(src, "img")
-        array.push(candidate)
+    candidates = []
+    if domains_match?(@entry.fully_qualified_url, @feed.site_url)
+      response = HTTParty.get(@entry.fully_qualified_url, timeout: 5)
+      document = Nokogiri::HTML5(response.body)
+      candidates = document.search("meta[property='og:image'], meta[property='twitter:image']").each_with_object([]) do |element, array|
+        if element["content"].present?
+          src = element["content"].strip
+          candidate = ImageCandidate.new(src, "img")
+          array.push(candidate)
+        end
       end
     end
+    candidates
+  end
+
+  def domains_match?(url_one, url_two)
+    host_one = URI(url_one).host.split(".").last(2)
+    host_two = URI(url_two).host.split(".").last(2)
+    host_one == host_two
   end
 
   def try_candidate(candidate)
