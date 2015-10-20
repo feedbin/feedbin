@@ -29,7 +29,7 @@ class DownloadImage
       read_timeout: 30,
     }
     Net::HTTP.start(@url.host, @url.port, options) do |http|
-      http.request_get(@url.path) do |response|
+      http.request_get(@url.request_uri) do |response|
         if headers_valid?(response.to_hash)
           response.read_body do |chunk|
             file.write(chunk)
