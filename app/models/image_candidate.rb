@@ -3,9 +3,9 @@ class ImageCandidate
   VIMEO_URL = %r(https?://player\.vimeo\.com/video/(.*?)(#|\?|$))
   IGNORE_EXTENSIONS = [".gif", ".png", ".webp"]
 
-  def initialize(src, element)
+  def initialize(src, type)
     @src = src
-    @element = element
+    @type = type
     @valid = false
     @url = nil
 
@@ -32,11 +32,11 @@ class ImageCandidate
   private
 
   def image?
-    @element == "img"
+    @type == "img"
   end
 
   def iframe?
-    @element == "iframe"
+    @type == "iframe"
   end
 
   def image_candidate

@@ -10,8 +10,20 @@ class EntryImage
 
   def find_image_url
 
-    download = nil
 
+    download = try_candidates(rss_candidates)
+    if download
+      save_image(download)
+    else
+      if download = try_candidates(page_candidates)
+        save_image(download)
+      end
+    end
+
+  end
+
+  def try_candidates(candidates)
+    download = nil
     candidates.each do |candidate|
       begin
         break if download = try_candidate(candidate)
@@ -20,19 +32,19 @@ class EntryImage
         Honeybadger.notify(exception)
       end
     end
-
-    if download
-      @entry.update_attributes(image: {
-        original_url: download.url.to_s,
-        processed_url: download.image.url.to_s,
-        width: download.image.width,
-        height: download.image.height,
-      })
-    end
-
+    download
   end
 
-  def candidates
+  def save_image(download)
+    @entry.update_attributes(image: {
+      original_url: download.url.to_s,
+      processed_url: download.image.url.to_s,
+      width: download.image.width,
+      height: download.image.height,
+    })
+  end
+
+  def rss_candidates
     document = Nokogiri::HTML5(@entry.content)
     elements = document.search("img, iframe")
     urls = elements.each_with_object([]) do |element, array|
@@ -61,6 +73,18 @@ class EntryImage
       array.push(candidate)
     end
     urls.push(ImageCandidate.new(@entry.url, "iframe"))
+  end
+
+  def page_candidates
+    response = HTTParty.get(@entry.fully_qualified_url, timeout: 5)
+    document = Nokogiri::HTML5(response.body)
+    document.search("meta[property='og:image'], meta[property='twitter:image']").each_with_object([]) do |element, array|
+      if element["content"].present?
+        src = element["content"].strip
+        candidate = ImageCandidate.new(src, "img")
+        array.push(candidate)
+      end
+    end
   end
 
   def try_candidate(candidate)
