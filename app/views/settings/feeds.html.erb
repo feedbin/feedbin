@@ -49,27 +49,30 @@
                 <% present subscription do |subscription_presenter| %>
                     <%= fields_for "subscriptions[]", subscription do |f| %>
                         <li data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>" data-sort-post-volume="<%= subscription.post_volume %>">
-                            <div class="checkbox-wrap">
-                                <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}" %>
-                            </div>
-                            <div class="update-wrap">
-                                <%= link_to '', toggle_updates_feed_path(subscription.feed), remote: true, method: :post, class: "update-icon #{subscription.show_updates? ? 'on' : ''}", data: {toggle: {class: 'on', title: ['Show updates on articles', 'Hide updates on articles']}}, title: (subscription.show_updates?) ? 'Hide updates on articles' : 'Show updates on articles'   %>
-                            </div>
-                            <div class="mute-wrap">
-                                <%= link_to '', toggle_muted_feed_path(subscription.feed), remote: true, method: :post, class: "mute-icon #{subscription.muted? ? '' : 'on'}", data: {toggle: {class: 'on', title: ['Mute', 'Unmute']}}, title: (subscription.muted?) ? 'Unmute' : 'Mute' %>
-                            </div>
-                            <label class="subscription-title" for="subscription_checkbox_<%= subscription.id %>">
-                                <a href="<%= subscription.feed_url %>" title="Feed URL" class="favicon-container">
-                                    <%= subscription_presenter.favicon(subscription.host) %>
-                                </a>
-                                <%= subscription.title %>
-                            </label>
-                            <div class="last-updated-wrap">
-                                <%= timeago(subscription.last_published_entry) %>
-                            </div>
-                            <div class="canvas-wrap">
-                                <%= content_tag :canvas, '', width: 97, height: 20, data: { values: subscription.entries_count }, title: "Post frequency (#{number_with_delimiter(subscription.post_volume)} posts in the last 30 days)" %>
-                            </div>
+                            <%= link_to settings_subscriptions_edit_path(subscription.id), class: "subscription-link" do %>
+                                <span class="subscription-data">
+                                    <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "checkbox" %>
+                                    <span class="favicon-container">
+                                        <%= subscription_presenter.favicon(subscription.host) %>
+                                    </span>
+                                    <span class="text-wrap">
+                                        <span class="title-container">
+                                            <%= subscription.title %>
+                                        </span>
+                                        <span class="last-updated-wrap">
+                                            <%= timeago(subscription.last_published_entry) %>
+                                        </span>
+                                    </span>
+                                    <span class="canvas-wrap">
+                                        <%= content_tag :canvas, '', width: 97, height: 20, data: { values: subscription.entries_count }, title: "Post frequency (#{number_with_delimiter(subscription.post_volume)} posts in the last 30 days)" %>
+                                    </span>
+                                </span>
+                                <span class="subscription-controls">
+                                    &nbsp;
+                                    <span class="icon-one"></span>
+                                    <span class="icon-two"></span>
+                                </span>
+                            <% end %>
                         </li>
                     <% end %>
                 <% end %>

@@ -4501,6 +4501,64 @@ Settings
             left: 0;
         }
     }
+    .feed-profile {
+        h3 {
+            margin: 0;
+            a {
+                color: $text-color;
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+        }
+        .subhead {
+            font-size: 12px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            color: $selected;
+        }
+        .chart-wrap {
+            line-height: 1;
+            display: flex;
+            .y-axis {
+                display: flex;
+                flex: 0 0 auto;
+                flex-direction: column;
+                justify-content: space-between;
+                text-align: right;
+            }
+            .graph {
+                flex: 1 1 auto;
+                display: flex;
+                align-items: flex-end;
+                height: 300px;
+                background-color: $drawer-background-color;
+                border-radius: 3px;
+                margin-left: 5px;
+                div {
+                    flex: 1 1 auto;
+                    background-color: $selected;
+                    margin-left: 2px;
+                    &:first-child {
+                        border-radius: 0 0 0 3px;
+                        margin-left: 0;
+                    }
+                    &:last-child {
+                        border-radius: 0 0 3px 0;
+                    }
+                }
+            }
+        }
+        .x-axis {
+            justify-content: space-between;
+            display: flex;
+        }
+        .x-axis, .y-axis {
+            color: $text-color-light;
+            font-size: 14px;
+        }
+    }
     .feed-form {
         border-radius: 0 0 8px 8px;
         border-top: none;
@@ -4512,10 +4570,68 @@ Settings
             position: relative;
             padding: 0;
         }
+        .subscription-link {
+            display: flex;
+            justify-content: space-between;
+            color: $text-color;
+            padding: 13px 30px;
+            padding-left: 30px;
+            padding-top: 13px;
+            padding-bottom: 13px;
+            &:hover {
+                text-decoration: none;
+            }
+            @media (max-width: 528px) {
+                padding: 13px 15px;
+            }
+        }
+        .subscription-data {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+        }
+        .subscription-controls {
+            display: flex;
+            align-items: center;
+            align-self: flex-end;
+            background: image-url("icon-arrow.svg") 100% 50% no-repeat;
+            width: 50px;
+            background-size: contain;
+        }
+        .checkbox {
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        .favicon-container {
+            display: block;
+            height: 16px;
+            width: 16px;
+            margin-right: 8px;
+            .favicon-wrap {
+                position: static;
+                height: 16px;
+                width: 16px;
+                top: 0;
+                left: 0;
+                box-shadow: none;
+            }
+        }
+        .text-wrap {
+            display: flex;
+            align-items: baseline;
+            min-width: 0;
+        }
+        .title-container {
+            display: block;
+            margin-right: 8px;
+            display: block;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
         .last-updated-wrap {
-            float: left;
+            margin-right: 8px;
             font-size: 14px;
-            padding: 15px 0 0 7px;
             @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
             @media (max-width:800px) {
                 display: none;
@@ -4523,23 +4639,15 @@ Settings
         }
         .canvas-wrap {
             width: 97px;
-            float: left;
             overflow-x: hidden;
             overflow-y: visible;
             z-index: 0;
-            padding: 8px 0 0 10px;
             @media (max-width: 528px) {
                 display: none;
             }
         }
-        .checkbox-wrap {
-            z-index: 100;
-            position: absolute;
-            left: 30px;
-            top: 12px;
-            @media (max-width: 528px) {
-                left: 15px;
-            }
+        .subscription-item {
+            margin-right: 10px;
         }
         .update-wrap {
             right: 22px;
@@ -4597,40 +4705,6 @@ Settings
                         background-position: 0 0;
                     }
                 }
-            }
-        }
-        .favicon-container {
-            display: block;
-            position: absolute;
-            left: 60px;
-            top: 15px;
-            height: 16px;
-            width: 16px;
-            .favicon-wrap {
-                height: 16px;
-                width: 16px;
-                top: 0;
-                left: 0;
-                box-shadow: none;
-            }
-            @media (max-width: 528px) {
-                left: 45px;
-            }
-        }
-        .subscription-title {
-            float: left;
-            display: inline-block;
-            padding-left: 85px;
-            padding-top: 13px;
-            padding-bottom: 13px;
-            position: relative;
-            @media (max-width: 528px) {
-                padding-left: 70px;
-                padding-right: 83px;
-                width: 100%;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
             }
         }
     }

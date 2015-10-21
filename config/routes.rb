@@ -143,6 +143,8 @@ Feedbin::Application.routes.draw do
     post :entry_width
   end
 
+  get :settings_subscriptions_edit, path: "/settings/feeds/:id/edit", to: 'subscriptions#edit'
+
   resources :recently_read_entries, only: [] do
     collection do
       delete :destroy_all

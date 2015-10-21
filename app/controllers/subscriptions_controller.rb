@@ -109,4 +109,12 @@ class SubscriptionsController < ApplicationController
     redirect_to settings_feeds_url, notice: "You have unsubscribed."
   end
 
+
+  def edit
+    @user = current_user
+    @subscription = @user.subscriptions.find(params[:id])
+    render layout: "settings"
+  end
+
+
 end
