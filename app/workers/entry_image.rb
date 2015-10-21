@@ -4,6 +4,7 @@ class EntryImage
 
   def perform(entry_id)
     Honeybadger.context(entry_id: entry_id)
+    Librato.increment 'entry_image.attempt'
     @entry = Entry.find(entry_id)
     @feed = @entry.feed
     find_image_url
@@ -89,6 +90,7 @@ class EntryImage
           array.push(candidate)
         end
       end
+      Librato.increment 'entry_image.page_request'
     end
     candidates
   end
