@@ -52,4 +52,13 @@ class DownloadImage
     end
   end
 
+  def to_h
+    {
+      original_url: self.url.to_s,
+      processed_url: self.image.url.to_s,
+      width: self.image.width,
+      height: self.image.height,
+    }
+  end
+
 end
