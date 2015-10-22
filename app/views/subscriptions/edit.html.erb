@@ -62,7 +62,7 @@
                             </ul>
                         </div>
                         <div class="recent-articles">
-                            <p><strong>Recent media</strong></p>
+                            <p><strong>Recent Media</strong></p>
                             <div class="profile-images">
                                 <% @subscription.feed.entries.where.not(image: nil).order(published: :desc).limit(8).each do |entry| %>
                                     <img class="image" src="<%= entry.image["processed_url"] %>" />
