@@ -43,7 +43,7 @@ class ImageCandidate
     if !IGNORE_EXTENSIONS.find { |extension| @src.include?(extension) }
       @valid = true
       lambda do
-        response = HTTParty.head(@src, verify: false, timeout: 15)
+        response = HTTParty.head(@src, verify: false, timeout: 4)
         response.request.last_uri.to_s
       end
     end
@@ -71,7 +71,7 @@ class ImageCandidate
         query: query
       }
 
-      response = HTTParty.get(URI::HTTP.build(options), timeout: 5)
+      response = HTTParty.get(URI::HTTP.build(options), timeout: 4)
       if response.code == 200
         uri = response.parsed_response["thumbnail_url"]
         uri = uri.gsub(/_\d+.jpg/, ".jpg")

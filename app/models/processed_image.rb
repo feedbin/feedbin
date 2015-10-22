@@ -8,10 +8,9 @@ class ProcessedImage
 
   attr_reader :url, :width, :height
 
-  def initialize(file, entry_id)
+  def initialize(file)
     @file = file
     @url = nil
-    @entry_id = entry_id
   end
 
   def ping
@@ -66,13 +65,14 @@ class ProcessedImage
   def process
     success = false
     image = Magick::Image.read(@file.path).first
-    image_file = Tempfile.new(["entry-#{@entry_id}-", ".jpg"])
+    image_file = Tempfile.new(["image-", ".jpg"])
     image_file.close
     if valid?
       resized_file = resize_to_fit(image)
       crop = find_best_crop(image, resized_file.path)
       image.crop!(crop[:x], crop[:y], crop[:width], crop[:height])
-      image.write(image_file.path)
+      sharpened_image = image.unsharp_mask(1.5)
+      sharpened_image.write(image_file.path)
       @url = upload(image_file)
       @width = crop[:width]
       @height = crop[:height]
@@ -81,6 +81,7 @@ class ProcessedImage
     success
   ensure
     image && image.destroy!
+    sharpened_image && sharpened_image.destroy!
     resized_file && resized_file.close(true)
     image_file && image_file.close(true)
   end
@@ -93,7 +94,7 @@ class ProcessedImage
   end
 
   def resize_to_fit(image)
-    file = Tempfile.new(["entry-#{@entry_id}-", ".png"])
+    file = Tempfile.new(["entry-", ".jpg"])
     file.close
 
     geometry = Magick::Geometry.new(TARGET_WIDTH, target_height, 0, 0, Magick::MinimumGeometry)
