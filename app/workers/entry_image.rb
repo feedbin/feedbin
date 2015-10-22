@@ -10,17 +10,28 @@ class EntryImage
   end
 
   def find_image_url
+    if download = try_candidates(rss_candidates)
+      save_image(download.to_h)
+    elsif domains_match?
+      check_for_meta_images
+    end
+  end
 
-
-    download = try_candidates(rss_candidates)
-    if download
-      save_image(download)
+  def check_for_meta_images
+    if page_checked?
+      if image = cached_image
+        save_image(image)
+        Librato.increment 'entry_image.page_request.cache_hit'
+      end
+      Librato.increment 'entry_image.page_request.cached'
     else
       if download = try_candidates(page_candidates)
-        save_image(download)
+        save_image(download.to_h)
+        set_cache(download.to_h.to_json)
+      else
+        set_cache("")
       end
     end
-
   end
 
   def try_candidates(candidates)
@@ -36,13 +47,8 @@ class EntryImage
     download
   end
 
-  def save_image(download)
-    @entry.update_attributes(image: {
-      original_url: download.url.to_s,
-      processed_url: download.image.url.to_s,
-      width: download.image.width,
-      height: download.image.height,
-    })
+  def save_image(attributes)
+    @entry.update_attributes(image: attributes)
     Librato.increment 'entry_image.create'
   end
 
@@ -79,35 +85,77 @@ class EntryImage
 
   def page_candidates
     candidates = []
-    if domains_match?(@entry.fully_qualified_url, @feed.site_url)
-      response = HTTParty.get(@entry.fully_qualified_url, timeout: 5)
+    if check_page?
+      Librato.increment 'entry_image.page_request'
+      response = HTTParty.get(@entry.fully_qualified_url, timeout: 4)
       document = Nokogiri::HTML5(response.body)
-      candidates = document.search("meta[property='og:image'], meta[property='twitter:image']").each_with_object([]) do |element, array|
-        if element["content"].present?
-          src = element["content"].strip
-          candidate = ImageCandidate.new(src, "img")
-          array.push(candidate)
+      tags = document.search("meta[property='og:title'], meta[property='twitter:card'], meta[property='og:image'], meta[property='twitter:image']")
+      if tags.any?
+        $redis.set(feed_key, "true", ex: 24.hours.to_i, nx: true)
+        candidates = tags.each_with_object([]) do |element, array|
+          if ["twitter:image", "og:image"].include?(element["property"]) && element["content"].present?
+            src = element["content"].strip
+            candidate = ImageCandidate.new(src, "img")
+            array.push(candidate)
+          end
         end
+      else
+        $redis.set(feed_key, "", ex: 24.hours.to_i, nx: true)
       end
+    else
+      Librato.increment 'entry_image.page_request.skip'
     end
     candidates
   end
 
-  def domains_match?(url_one, url_two)
-    host_one = URI(url_one).host.split(".").last(2)
-    host_two = URI(url_two).host.split(".").last(2)
+  def check_page?
+    result = $redis.get(feed_key)
+    result.nil? || result.present?
+  end
+
+  def feed_key
+    "feed_meta_presence:#{@feed.id}"
+  end
+
+  def domains_match?
+    host_one = URI(@entry.fully_qualified_url).host.split(".").last(2)
+    host_two = URI(@feed.site_url).host.split(".").last(2)
     host_one == host_two
   end
 
   def try_candidate(candidate)
     found = false
     if candidate.valid?
-      download = DownloadImage.new(candidate.original_url, @entry.id)
+      download = DownloadImage.new(candidate.original_url)
       if download.download
         found = download
       end
     end
     found
+  end
+
+  def cache_key
+    "entry_image:#{Digest::SHA1.hexdigest(@entry.fully_qualified_url)}"
+  end
+
+  def cached_value
+    @cached_value ||= $redis.get(cache_key)
+  end
+
+  def page_checked?
+    cached_value
+  end
+
+  def cached_image
+    if cached_value.present?
+      JSON.parse(cached_value)
+    else
+      false
+    end
+  end
+
+  def set_cache(value)
+    $redis.set(cache_key, value, ex: 24.hours.to_i, nx: true)
   end
 
 end
