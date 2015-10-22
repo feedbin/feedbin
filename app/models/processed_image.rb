@@ -71,10 +71,8 @@ class ProcessedImage
       resized_file = resize_to_fit(image)
       crop = find_best_crop(image, resized_file.path)
       image.crop!(crop[:x], crop[:y], crop[:width], crop[:height])
-
       sharpened_image = image.unsharp_mask(1.5)
       sharpened_image.write(image_file.path)
-
       @url = upload(image_file)
       @width = crop[:width]
       @height = crop[:height]
