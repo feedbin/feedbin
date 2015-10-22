@@ -3946,7 +3946,7 @@ Settings
 .settings {
     font-size: 16px;
     background-color: $list-background-color-night;
-    color: #333;
+    color: $text-color;
     .settings-inner {
         height: 100%;
         width: 100%;
@@ -4502,6 +4502,25 @@ Settings
         }
     }
     .feed-profile {
+        .profile-wrap {
+            display: flex;
+            .left-column {
+                flex: 0 0 auto;
+            }
+            .right-column {
+                margin-left: 5px;
+                flex: 1 1 auto;
+            }
+        }
+        .favicon-wrap {
+            margin-top: 2px;
+            position: static;
+            box-shadow: none;
+        }
+        .profile-header {
+            position: relative;
+            padding-left: 25px;
+        }
         h3 {
             margin: 0;
             a {
@@ -4521,42 +4540,111 @@ Settings
         .chart-wrap {
             line-height: 1;
             display: flex;
-            .y-axis {
-                display: flex;
-                flex: 0 0 auto;
-                flex-direction: column;
-                justify-content: space-between;
-                text-align: right;
-            }
-            .graph {
+            margin-bottom: 20px;
+            background-color: #f4f6f8;
+            padding: 10px 7px 25px 7px;
+            border-radius: 3px;
+            border: 1px solid $border-color;
+            .graph-wrap {
                 flex: 1 1 auto;
-                display: flex;
-                align-items: flex-end;
-                height: 300px;
-                background-color: $drawer-background-color;
-                border-radius: 3px;
+                padding-top: 50%;
+                border-left: 1px solid $border-color;
+                border-bottom: 1px solid $border-color;
                 margin-left: 5px;
-                div {
-                    flex: 1 1 auto;
-                    background-color: $selected;
-                    margin-left: 2px;
-                    &:first-child {
-                        border-radius: 0 0 0 3px;
-                        margin-left: 0;
-                    }
-                    &:last-child {
-                        border-radius: 0 0 3px 0;
+                position: relative;
+                .graph {
+                    display: flex;
+                    align-items: flex-end;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    right: 0;
+                    div {
+                        flex: 1 1 auto;
+                        background-color: $selected;
+                        margin-left: 1px;
+                        margin-bottom: 1px;
                     }
                 }
             }
         }
+        .y-axis {
+            display: flex;
+            flex: 0 0 auto;
+            flex-direction: column;
+            justify-content: space-between;
+            text-align: right;
+        }
         .x-axis {
+            position: absolute;
+            right: 0;
+            left: 0;
+            bottom: -18px;
             justify-content: space-between;
             display: flex;
         }
         .x-axis, .y-axis {
             color: $text-color-light;
-            font-size: 14px;
+            font-size: 12px;
+        }
+        .stats {
+            margin-top: 1px;
+            border-top: 1px solid $border-color;
+            border-bottom: 1px solid $border-color;
+            padding: 15px 0;
+            justify-content: space-between;
+            display: flex;
+            text-align: center;
+            @media (max-width: 528px) {
+                flex-direction: column;
+                text-align: left;
+                padding: 0;
+                border: none;
+                .stat {
+                    margin-bottom: 10px;
+                }
+            }
+            .stat {
+                flex: 1 1 auto;
+                &:last-child {
+                    margin-right: 0;
+                }
+            }
+            .stat-title {
+                margin: 0;
+                text-transform: uppercase;
+                font-size: 12px;
+                color: $text-color-light;
+            }
+            .stat-body {
+                font-weight: bold;
+                margin: 0;
+            }
+        }
+        .recent-articles {
+            padding-top: 20px;
+            p {
+                margin-bottom: 5px;
+            }
+            ul {
+                margin: 0;
+                padding: 0;
+                list-style: none;
+                li {
+                    color: $text-color-light;
+                    margin-bottom: 3px;
+                }
+            }
+        }
+        .profile-images {
+            .image {
+                margin-right: 5px;
+                max-width: 22%;
+                width: auto;
+                float: left;
+                margin-bottom: 5px;
+            }
         }
     }
     .feed-form {

@@ -1,70 +1,104 @@
 <%= form_for(@subscription) do |f| %>
-<div class="settings-content-inner feed-profile">
-    <div class="settings-outer">
-        <h2>Feeds</h2>
-    </div>
-    <div class="inset">
-        <ul class="control-group">
-            <li>
-                <div class="header clearfix">
-                    <div class="half">
-                        <h3><a href="<%= @subscription.feed.site_url %>"><%= @subscription.title || @subscription.feed.title %></a></h3>
-                        <p class="subhead"><a href="<%= @subscription.feed.feed_url %>"><%= @subscription.feed.feed_url %></a></p>
-                    </div>
-                    <div class="half text-right">
-                        Unsubscribe
-                    </div>
-                </div>
-                <div class="chart-wrap">
-                    <div class="y-axis">
-                        <div class="start">100</div>
-                        <div class="middle">50</div>
-                        <div class="end">0</div>
-                    </div>
-                    <div class="graph">
-                        <% 1.upto(30) do |count| %>
-                           <div style="height: <%=  rand(1..100) %>%;"></div>
-                        <% end %>
-                    </div>
-                </div>
-                <!-- <div class="x-axis">
-                    <div class="y-axis">
-
-                    </div>
-                    <div class="graph">
-                        <div class="start">9/25</div>
-                        <div class="middle">10/09</div>
-                        <div class="end">10/20</div>
-                    </div>
-                </div> -->
-            </li>
-        </ul>
-
-        <div class="inset-content">
-            <h4 class="group-header">Feed Options</h4>
+    <% present @subscription do |subscription_presenter| %>
+    <div class="settings-content-inner feed-profile">
+        <div class="settings-outer">
+            <h2>Feeds</h2>
         </div>
-        <ul class="control-group control-group-form">
-            <li>
-                <%= f.check_box :muted %>
-                <%= f.label :muted do %>
-                    Muted <span class="slider-checkbox"></span>
-                <% end %>
-            </li>
-            <li>
-                <%= f.check_box :show_updates %>
-                <%= f.label :show_updates do %>
-                    Show updates <span class="slider-checkbox"></span>
-                <% end %>
-            </li>
-        </ul>
-        <p class="control-group-description">
-            Tells you when an article has been changed after being published
-        </p>
+        <div class="inset">
+            <ul class="control-group">
+                <li class="profile-wrap">
+                    <div class="left-column">
+                        <%= subscription_presenter.favicon(@subscription.feed.host) %>
+                    </div>
+                    <div class="right-column">
+                        <div class="header clearfix">
+                            <div class="half">
+                                <h3><a href="<%= @subscription.feed.site_url %>"><%= @subscription.title || @subscription.feed.title %></a></h3>
+                                <p class="subhead"><a href="<%= @subscription.feed.feed_url %>"><%= @subscription.feed.feed_url %></a></p>
+                            </div>
+                            <div class="half text-right">
+                                Unsubscribe
+                            </div>
+                        </div>
+                        <div class="chart-wrap">
+                            <div class="y-axis">
+                                <div class="start"><%= subscription_presenter.graph_max %></div>
+                                <div class="middle"><%= subscription_presenter.graph_mid %></div>
+                                <div class="end">0</div>
+                            </div>
+                            <div class="graph-wrap">
+                                <div class="graph">
+                                    <%= subscription_presenter.graph_bars %>
+                                </div>
+                                <div class="x-axis">
+                                    <div><%= subscription_presenter.graph_date_start %></div>
+                                    <div><%= subscription_presenter.graph_date_mid %></div>
+                                    <div><%= subscription_presenter.graph_date_end %></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stats">
+                            <div class="stat">
+                                <p class="stat-title">Subscriber Since</p>
+                                <p class="stat-body"><%= @subscription.created_at.to_s(:date) %></p>
+                            </div>
+                            <div class="stat">
+                                <p class="stat-title">Last Updated</p>
+                                <p class="stat-body"><%= @subscription.feed.try(:last_published_entry).try(:to_s, :date) || "N/A" %></p>
+                            </div>
+                            <div class="stat">
+                                <p class="stat-title">Volume</p>
+                                <p class="stat-body"><%= subscription_presenter.graph_volume %> articles / month</p>
+                            </div>
+                        </div>
+                        <div class="recent-articles">
+                            <p><strong>Recent Articles</strong></p>
+                            <ul>
+                                <% @subscription.feed.entries.order(published: :desc).limit(5).each do |entry| %>
+                                    <% present entry do |entry_presenter| %>
+                                        <li><%= entry.published.to_s(:day_month) %>: <a href="<%= entry.fully_qualified_url %>"><%= entry_presenter.title %></a></li>
+                                    <% end %>
+                                <% end %>
+                            </ul>
+                        </div>
+                        <div class="recent-articles">
+                            <p><strong>Recent media</strong></p>
+                            <div class="profile-images">
+                                <% @subscription.feed.entries.where.not(image: nil).order(published: :desc).limit(8).each do |entry| %>
+                                    <img class="image" src="<%= entry.image["processed_url"] %>" />
+                                <% end %>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
 
-        <div class="description-inset">
-          <%= f.submit "Save", class: "button-plain no-margin" %>
+            <div class="inset-content">
+                <h4 class="group-header">Feed Options</h4>
+            </div>
+            <ul class="control-group control-group-form">
+                <li>
+                    <%= f.check_box :muted %>
+                    <%= f.label :muted do %>
+                        Muted <span class="slider-checkbox"></span>
+                    <% end %>
+                </li>
+                <li>
+                    <%= f.check_box :show_updates %>
+                    <%= f.label :show_updates do %>
+                        Show updates <span class="slider-checkbox"></span>
+                    <% end %>
+                </li>
+            </ul>
+            <p class="control-group-description">
+                Tells you when an article has been changed after being published
+            </p>
+
+            <div class="description-inset">
+              <%= f.submit "Save", class: "button-plain no-margin" %>
+            </div>
+
         </div>
-
     </div>
-</div>
+    <% end %>
 <% end %>
