@@ -19,13 +19,13 @@ module Api
       def create
         @user = current_user
         @action = @user.actions.build(action_params)
+        @action.all_feeds = all_feeds?(action_params)
         @action.automatic_modification = true
         @action.save
       end
 
       def update
-        params[:action_params][:feed_ids] ||= [] if params[:action_params].has_key?(:feed_ids)
-        params[:action_params][:tag_ids] ||= [] if params[:action_params].has_key?(:tag_ids)
+        @action.all_feeds = all_feeds?(action_params)
         if !@action.update(action_params)
           render nothing: true, status: :bad_request
         end
@@ -33,15 +33,14 @@ module Api
 
       def results
         @user = current_user
+
         query = {}
         if @action.query.present?
           query[:query] = @action.query
         end
+
         if @action.computed_feed_ids.any?
           query[:feed_ids] = @action.computed_feed_ids
-        end
-
-        if query.length > 0
           if params[:read].present?
             query[:read] = (params[:read] == 'true') ? true : false
           end
@@ -60,6 +59,10 @@ module Api
 
       def set_action
         @action = current_user.actions.find(params[:id])
+      end
+
+      def all_feeds?(action)
+        action[:feed_ids].blank? && action[:tag_ids].blank?
       end
 
     end

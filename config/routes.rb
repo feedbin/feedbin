@@ -135,6 +135,12 @@ Feedbin::Application.routes.draw do
     post :entry_width
   end
 
+  resources :recently_read_entries, only: [] do
+    collection do
+      delete :destroy_all
+    end
+  end
+
   constraints subdomain: 'api' do
     namespace :api, path: nil do
       namespace :v1 do
@@ -179,11 +185,16 @@ Feedbin::Application.routes.draw do
         resources :favicons,              only: [:index]
         resources :tags,                  only: [:index]
         resources :taggings,              only: [:index, :show, :create, :destroy]
-        resources :entries,               only: [:index, :show]
         resources :recently_read_entries, only: [:index, :create]
         resources :in_app_purchases,      only: [:create]
         resources :suggested_categories,  only: [:index]
-        resources :suggested_feeds,       only: [:index] do
+
+        resources :entries, only: [:index, :show] do
+          member do
+            get :text
+          end
+        end
+        resources :suggested_feeds, only: [:index] do
           member do
             post :subscribe
             delete :unsubscribe

@@ -12,6 +12,7 @@ class Entry < ActiveRecord::Base
   before_create :cache_public_id, unless: -> { Rails.env.test? }
   before_create :create_summary
   before_update :create_summary
+  after_commit :find_images, on: :create
   after_commit :mark_as_unread, on: :create
   after_commit :add_to_created_at_set, on: :create
   after_commit :add_to_published_set, on: :create
@@ -215,7 +216,7 @@ class Entry < ActiveRecord::Base
   end
 
   def self.entries_list
-    select(:id, :feed_id, :title, :summary, :published)
+    select(:id, :feed_id, :title, :summary, :published, :image)
   end
 
   def self.include_unread_entries(user_id)
@@ -339,6 +340,10 @@ class Entry < ActiveRecord::Base
 
   def count_update
     $redis.zincrby("update_counts", 1, self.feed_id)
+  end
+
+  def find_images
+    EntryImage.perform_async(self.id)
   end
 
 end

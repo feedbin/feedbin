@@ -1,0 +1,8 @@
+<%= link_to destroy_all_recently_read_entries_path(),
+      method: :delete, remote: true, class: 'toolbar-button', title: 'Delete recently read items',
+      data: { behavior: 'unsubscribe', confirm: "Are you want to delete your recently read items?" } do %>
+  <span class="toolbar-button-inner">
+    <%= render partial: "shared/svg/trash" %>
+  </span>
+  Delete
+<% end %>

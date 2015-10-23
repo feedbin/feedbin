@@ -2136,6 +2136,25 @@ $saved-search-control-height: 48px;
             display: none;
         }
     }
+    .entry-image {
+        margin-top: 8px;
+        display: block;
+        border-radius: 3px;
+        &.is-loading {
+            position: relative;
+            @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+        }
+        img {
+            border-radius: 3px;
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+        span {
+            padding-top: 56.25%;
+            display: block;
+        }
+    }
     .entry-actions-wrap {
         top: 0;
         right: 0;
@@ -2441,6 +2460,11 @@ $saved-search-control-height: 48px;
 }
 .entries-body-0 .entries {
     .body {
+        display: none;
+    }
+}
+.entries-image-0 .entries, .entries-display-inline .entries {
+    .entry-image {
         display: none;
     }
 }
@@ -3433,6 +3457,10 @@ $saved-search-control-height: 48px;
         width: 100%;
         background-color: #000;
         max-width: 100%;
+    }
+
+    .text {
+        white-space: pre-wrap;
     }
 
     .download-link {
