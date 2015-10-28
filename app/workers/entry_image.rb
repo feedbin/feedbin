@@ -2,6 +2,18 @@ class EntryImage
   include Sidekiq::Worker
   sidekiq_options retry: false
 
+  NETWORK_EXCEPTIONS = [Encoding::InvalidByteSequenceError,
+                        Encoding::UndefinedConversionError,
+                        Errno::ECONNRESET,
+                        HTTParty::RedirectionTooDeep,
+                        Net::OpenTimeout,
+                        Net::ReadTimeout,
+                        OpenSSL::SSL::SSLError,
+                        Timeout::Error,
+                        URI::InvalidURIError,
+                        Zlib::DataError]
+
+
   def perform(entry_id)
     Honeybadger.context(entry_id: entry_id)
     @entry = Entry.find(entry_id)
@@ -36,20 +48,11 @@ class EntryImage
   end
 
   def try_candidates(candidates)
-    network_exceptions = [Encoding::UndefinedConversionError,
-                          Errno::ECONNRESET,
-                          HTTParty::RedirectionTooDeep,
-                          Net::OpenTimeout,
-                          Net::ReadTimeout,
-                          OpenSSL::SSL::SSLError,
-                          Timeout::Error,
-                          URI::InvalidURIError,
-                          Zlib::DataError]
     download = nil
     candidates.each do |candidate|
       begin
         break if download = try_candidate(candidate)
-      rescue *network_exceptions
+      rescue *NETWORK_EXCEPTIONS
         Librato.increment 'entry_image.exception'
       rescue Exception => exception
         Librato.increment 'entry_image.exception'
@@ -99,18 +102,10 @@ class EntryImage
     candidates = []
     if check_page?
       Librato.increment 'entry_image.page_request'
-      response = HTTParty.get(@entry.fully_qualified_url, timeout: 4)
-      document = Nokogiri::HTML5(response.body)
-      tags = document.search("meta[property='og:title'], meta[property='twitter:card'], meta[property='og:image'], meta[property='twitter:image']")
+      tags = find_meta_tags
       if tags.any?
         $redis.set(feed_key, "true", ex: 24.hours.to_i, nx: true)
-        candidates = tags.each_with_object([]) do |element, array|
-          if ["twitter:image", "og:image"].include?(element["property"]) && element["content"].present?
-            src = element["content"].strip
-            candidate = ImageCandidate.new(src, "img")
-            array.push(candidate)
-          end
-        end
+        candidates = find_meta_image_candidates(tags)
       else
         $redis.set(feed_key, "", ex: 24.hours.to_i, nx: true)
       end
@@ -118,6 +113,24 @@ class EntryImage
       Librato.increment 'entry_image.page_request.skip'
     end
     candidates
+  end
+
+  def find_meta_tags
+    response = HTTParty.get(@entry.fully_qualified_url, timeout: 4)
+    document = Nokogiri::HTML5(response.body)
+    document.search("meta[property='og:title'], meta[property='twitter:card'], meta[property='og:image'], meta[property='twitter:image']")
+  rescue *NETWORK_EXCEPTIONS
+    Librato.increment 'entry_image.exception'
+  end
+
+  def find_meta_image_candidates(meta_tags)
+    meta_tags.each_with_object([]) do |element, array|
+      if ["twitter:image", "og:image"].include?(element["property"]) && element["content"].present?
+        src = element["content"].strip
+        candidate = ImageCandidate.new(src, "img")
+        array.push(candidate)
+      end
+    end
   end
 
   def check_page?
