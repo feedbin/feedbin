@@ -8,7 +8,8 @@ class EntryImageUploader < CarrierWave::Uploader::Base
 
   def fog_attributes
     {
-      'Cache-Control' => 'max-age=315360000, public'
+      "Cache-Control" => "max-age=315360000, public",
+      "Expires" => 20.years.from_now.httpdate
     }
   end
 
