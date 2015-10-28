@@ -28,6 +28,7 @@ class EntryImage
       if download = try_candidates(page_candidates)
         save_image(download.to_h)
         set_cache(download.to_h.to_json)
+        Librato.increment 'entry_image.page_request.image_found'
       else
         set_cache("")
       end
@@ -35,10 +36,21 @@ class EntryImage
   end
 
   def try_candidates(candidates)
+    network_exceptions = [Encoding::UndefinedConversionError,
+                          Errno::ECONNRESET,
+                          HTTParty::RedirectionTooDeep,
+                          Net::OpenTimeout,
+                          Net::ReadTimeout,
+                          OpenSSL::SSL::SSLError,
+                          Timeout::Error,
+                          URI::InvalidURIError,
+                          Zlib::DataError]
     download = nil
     candidates.each do |candidate|
       begin
         break if download = try_candidate(candidate)
+      rescue *network_exceptions
+        Librato.increment 'entry_image.exception'
       rescue Exception => exception
         Librato.increment 'entry_image.exception'
         Honeybadger.notify(exception)
