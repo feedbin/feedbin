@@ -26,11 +26,7 @@
             <% if entry_presenter.has_content? && entry_presenter.sanitized_title.present?  %>
                 <p class="body"><%= entry.summary.html_safe %></p>
             <% end %>
-
-            <% if current_user.admin %>
-                <%= entry_presenter.image %>
-            <% end %>
-
+            <%= entry_presenter.image %>
         </span>
         <i class="icon-star"></i>
         <span class="entry-actions-wrap" data-behavior="show_entry_actions">

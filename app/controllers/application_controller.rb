@@ -156,6 +156,7 @@ class ApplicationController < ActionController::Base
     @classes.push("entries-body-#{@user.entries_body || '1'}")
     @classes.push("entries-time-#{@user.entries_time || '1'}")
     @classes.push("entries-feed-#{@user.entries_feed || '1'}")
+    @classes.push("entries-image-#{@user.entries_image || '1'}")
     @classes.push("entries-display-#{@user.entries_display || 'block'}")
     @classes = @classes.join(" ")
   end

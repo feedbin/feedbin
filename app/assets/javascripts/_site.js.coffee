@@ -20,6 +20,15 @@ $.extend feedbin,
       messages.removeClass('show')
     ), timeout
 
+  previewHeight: ->
+    container = $('[data-behavior~=preview_min_height]')
+    preview = $('[data-behavior~=preview_container]')
+    minHeight = 85
+    if container.length > 0 && preview.length > 0
+      if preview.outerHeight() > minHeight
+        minHeight = container.outerHeight()
+      container.css(height: "#{minHeight}px")
+
   updateEntries: (entries, header) ->
     $('.entries ul').html(entries)
     $('.entries-header').html(header)
@@ -91,9 +100,10 @@ $.extend feedbin,
         image.setAttribute(attr.name.replace('data-', ''), attr.value)
 
   loadEntryImages: ->
-    placeholders = document.querySelectorAll('.entry-image')
-    for placeholder in placeholders
-      feedbin.imagePlaceholders(placeholder)
+    if $("body").hasClass("entries-image-1")
+      placeholders = document.querySelectorAll('.entry-image')
+      for placeholder in placeholders
+        feedbin.imagePlaceholders(placeholder)
 
   preloadImages: (id) ->
     id = parseInt(id)
@@ -1285,6 +1295,7 @@ $.extend feedbin,
           $('[data-behavior~=class_target]').removeClass("#{setting}-#{option}")
 
         $('[data-behavior~=class_target]').addClass("#{setting}-#{selected}")
+        feedbin.previewHeight()
 
     appearanceCheckbox: ->
       $(document).on 'click', '[data-behavior~=appearance_checkbox]', (event) ->
@@ -1293,6 +1304,7 @@ $.extend feedbin,
         $('[data-behavior~=class_target]').removeClass("#{setting}-1")
         $('[data-behavior~=class_target]').removeClass("#{setting}-0")
         $('[data-behavior~=class_target]').addClass("#{setting}-#{checked}")
+        feedbin.previewHeight()
 
     generalAutocomplete: ->
       autocompleteFields = $('[data-behavior~=autocomplete_field]')
@@ -1322,12 +1334,7 @@ $.extend feedbin,
 
 
     minHeight: ->
-      container = $('[data-behavior~=preview_min_height]')
-      minHeight = 85
-      if container.length > 0
-        if container.outerHeight() > minHeight
-          minHeight = container.outerHeight()
-        container.css(height: "#{minHeight}px")
+      feedbin.previewHeight()
 
     scrollToFixed: ->
       unless 'ontouchstart' of document

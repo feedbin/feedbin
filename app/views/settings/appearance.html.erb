@@ -16,7 +16,7 @@
             <div class="entries-wrap">
               <div class="entries">
                 <ul>
-                  <li data-behavior="responsive_text_size">
+                  <li data-behavior="responsive_text_size" data-behavior="preview_container">
                     <span class="wrap">
                       <span class="entries-inner-wrap">
                         <span class="favicon-wrap">
@@ -32,6 +32,9 @@
                             Spicy Peach and Yellow Tomato Jam
                           </h2>
                           <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
+                          <span class="entry-image">
+                              <img src="https://dinzvnnq89ifs.cloudfront.net/public-images/2015-10-20/entry-105997932-20151020-8084-1p1vyhr.jpg">
+                          </span>
                         </span>
                       </span>
                     </span>
@@ -100,6 +103,12 @@
           <%= f.check_box :entries_body, {checked: @user.entries_body.nil? || @user.setting_on?(:entries_body), data: {behavior: 'appearance_checkbox', setting: 'entries-body'} } %>
           <%= f.label :entries_body do %>
             Summary <span class="slider-checkbox"></span>
+          <% end %>
+        </li>
+        <li>
+          <%= f.check_box :entries_image, {checked: @user.entries_image.nil? || @user.setting_on?(:entries_image), data: {behavior: 'appearance_checkbox', setting: 'entries-image'} } %>
+          <%= f.label :entries_image do %>
+            Image Preview <span class="slider-checkbox"></span>
           <% end %>
         </li>
       </ul>

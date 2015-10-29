@@ -2148,6 +2148,7 @@ $saved-search-control-height: 48px;
             border-radius: 3px;
             display: block;
             max-width: 100%;
+            height: auto;
         }
         span {
             padding-top: 56.25%;
@@ -2459,6 +2460,11 @@ $saved-search-control-height: 48px;
 }
 .entries-body-0 .entries {
     .body {
+        display: none;
+    }
+}
+.entries-image-0 .entries, .entries-display-inline .entries {
+    .entry-image {
         display: none;
     }
 }
