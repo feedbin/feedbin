@@ -33,7 +33,7 @@ class Candidates
 
   def download_candidate(candidate)
     download = nil
-    if candidate.valid?
+    if candidate.valid? && candidate.original_url
       attempt = DownloadImage.new(candidate.original_url)
       if attempt.download
         download = attempt

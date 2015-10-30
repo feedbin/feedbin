@@ -25,7 +25,11 @@ class ImageCandidate
       if @url.respond_to?(:call)
         @url = @url.call
       end
-      URI(@url)
+      begin
+        URI(@url)
+      rescue
+        nil
+      end
     end
   end
 
@@ -43,8 +47,12 @@ class ImageCandidate
     if !IGNORE_EXTENSIONS.find { |extension| @src.include?(extension) }
       @valid = true
       lambda do
-        response = HTTParty.head(@src, verify: false, timeout: 4)
-        response.request.last_uri.to_s
+        begin
+          response = HTTParty.head(@src, verify: false, timeout: 4)
+          response.request.last_uri.to_s
+        rescue
+          nil
+        end
       end
     end
   end

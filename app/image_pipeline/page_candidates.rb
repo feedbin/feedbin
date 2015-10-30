@@ -62,6 +62,8 @@ class PageCandidates < Candidates
     host_one = URI(@entry.fully_qualified_url).host.split(".").last(2)
     host_two = URI(@feed.site_url).host.split(".").last(2)
     host_one == host_two
+  rescue
+    false
   end
 
   def tags_found(found)
