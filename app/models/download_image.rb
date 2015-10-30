@@ -19,29 +19,28 @@ class DownloadImage
   end
 
   def get_image
-    file = Tempfile.new('image')
-    file.binmode
     image = nil
-    options = {
-      use_ssl: @url.scheme == "https",
-      open_timeout: 5,
-      read_timeout: 30,
-    }
+    options = {use_ssl: @url.scheme == "https", open_timeout: 5, read_timeout: 30}
     Net::HTTP.start(@url.host, @url.port, options) do |http|
       http.request_get(@url.request_uri) do |response|
-        if headers_valid?(response.to_hash)
-          response.read_body do |chunk|
-            file.write(chunk)
-          end
-          file.rewind
-          file.close
-          image = ProcessedImage.new(file)
-        else
-          file.close(true)
-        end
+        image = download_image(response) if headers_valid?(response.to_hash)
       end
     end
     image
+  end
+
+  def download_image(response)
+    file = Tempfile.new(["original-", ".jpg"])
+    file.binmode
+    response.read_body do |chunk|
+      file.write(chunk)
+    end
+    file.rewind
+    file.close
+    ProcessedImage.new(file)
+  rescue Exception => e
+    file && file.close(true)
+    raise e
   end
 
   def headers_valid?(headers)

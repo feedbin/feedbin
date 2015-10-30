@@ -39,13 +39,6 @@ class ProcessedImage
 
   def target_ratio
     @target_ratio ||= begin
-      # if landscape?
-      #   width_ratio = 16
-      #   height_ratio = 9
-      # else
-      #   width_ratio = 1
-      #   height_ratio = 1
-      # end
       width_ratio = 16
       height_ratio = 9
       height_ratio.to_f / width_ratio.to_f
@@ -84,6 +77,7 @@ class ProcessedImage
     sharpened_image && sharpened_image.destroy!
     resized_file && resized_file.close(true)
     image_file && image_file.close(true)
+    @file && @file.close(true)
   end
 
   def upload(file)
