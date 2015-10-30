@@ -46,6 +46,7 @@ class PageCandidates < Candidates
     document.search("meta[property='og:title'], meta[property='twitter:card'], meta[property='og:image'], meta[property='twitter:image']")
   rescue *NETWORK_EXCEPTIONS
     Librato.increment 'entry_image.exception'
+    []
   end
 
   def find_meta_image_candidates(meta_tags)
