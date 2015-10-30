@@ -46,5 +46,7 @@ module Feedbin
 
     config.active_record.schema_format = :sql
 
+    config.eager_load_paths += ["#{config.root}/app/image_pipeline"]
+
   end
 end
