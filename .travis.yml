@@ -5,6 +5,9 @@ services:
   - redis-server
 addons:
   postgresql: "9.2"
+  apt:
+    packages:
+      - libopencv-dev
 rvm:
   - 2.2.3
 env:
@@ -17,6 +20,3 @@ before_script:
   - export AWS_SECRET_ACCESS_KEY=bar
   - bundle exec rake db:setup
   - bundle exec rake db:test:prepare
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y libopencv-dev
