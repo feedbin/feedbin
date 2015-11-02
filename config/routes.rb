@@ -1,6 +1,3 @@
-require 'sidekiq/web'
-require 'auth_constraint'
-
 Feedbin::Application.routes.draw do
 
   # The priority is based upon order of creation: first created -> highest priority.
@@ -9,9 +6,6 @@ Feedbin::Application.routes.draw do
   root to: 'site#index'
 
   mount StripeEvent::Engine, at: '/stripe'
-  constraints lambda {|request| AuthConstraint.admin?(request) } do
-    mount Sidekiq::Web => '/sidekiq'
-  end
 
   get :health_check, to: proc {|env| [200, {}, ["OK"]] }
   get :version, to: proc {|env| [200, {}, [ENV["ETAG_VERSION_ID"]]] }
