@@ -49,7 +49,7 @@ namespace :foreman do
   end
 
   desc 'Restart worker services'
-  task :restart_worker  do
+  task :restart_worker, roles: :worker  do
     run "sudo start #{application} || sudo restart #{application} || true"
   end
 
