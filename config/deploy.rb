@@ -38,11 +38,6 @@ namespace :foreman do
     run "cd #{current_path} && sudo #{bundle_cmd} exec #{foreman_export}"
   end
 
-  task :export_sidekiq, roles: :app do
-    foreman_export = "foreman export --app #{application} --user #{user} --concurrency sidekiq_web=1 --log #{shared_path}/log upstart /etc/init"
-    run "cd #{current_path} && sudo #{bundle_cmd} exec #{foreman_export}"
-  end
-
   desc 'Start the application services'
   task :start do
     run "sudo start #{application}"
@@ -78,7 +73,6 @@ namespace :deploy do
 end
 
 after 'deploy:update', 'foreman:export_worker'
-after 'deploy:update', 'foreman:export_sidekiq'
 after "deploy:restart", "foreman:restart_worker"
 after "deploy:restart", "foreman:restart_web"
 after "deploy:restart", "deploy:cleanup"
