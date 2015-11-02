@@ -82,7 +82,7 @@ gem 'nokogumbo'
 gem 'ruby-opencv', require: false
 
 # Sidekiq
-gem 'sidekiq', '= 3.4.1'
+gem 'sidekiq'
 gem 'sinatra', require: nil
 
 # Stripe
