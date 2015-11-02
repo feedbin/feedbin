@@ -17,3 +17,6 @@ before_script:
   - export AWS_SECRET_ACCESS_KEY=bar
   - bundle exec rake db:setup
   - bundle exec rake db:test:prepare
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libopencv-dev
