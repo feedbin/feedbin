@@ -567,6 +567,17 @@ $.extend feedbin,
   ONE_DAY: 60 * 60 * 1000 * 24
 
 $.extend feedbin,
+  preInit:
+
+    xsrf: ->
+      setup =
+        beforeSend: (xhr) ->
+          matches = document.cookie.match(/XSRF\-TOKEN\=([^;]*)/)
+          if matches && matches[1]
+            token = decodeURIComponent(matches[1])
+            xhr.setRequestHeader('X-XSRF-TOKEN', token)
+      $.ajaxSetup(setup);
+
   init:
 
     hasTouch: ->
@@ -1359,6 +1370,9 @@ $.extend feedbin,
       feedbin.droppable()
       feedbin.draggable()
 
+
+$.each feedbin.preInit, (i, item) ->
+  item()
 
 jQuery ->
   $.each feedbin.init, (i, item) ->
