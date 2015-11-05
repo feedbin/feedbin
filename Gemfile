@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 ruby '2.2.3'
 
-gem 'rails', '= 4.1.13'
+gem 'rails'
 gem 'rest-client', '= 1.6.7'
 
 group :development do
@@ -80,9 +80,11 @@ gem 'htmlentities'
 gem 'houston'
 gem 'nokogumbo'
 gem 'ruby-opencv', require: false
+gem 'rails-deprecated_sanitizer'
+gem 'responders', '~> 2.0'
 
 # Sidekiq
-gem 'sidekiq', '= 3.4.1'
+gem 'sidekiq'
 gem 'sinatra', require: nil
 
 # Stripe
