@@ -36,7 +36,8 @@ class SiteController < ApplicationController
         mark_direction_as_read_entries: mark_direction_as_read_entries_path,
         entry_sort: @user.entry_sort,
         update_message_seen: @user.setting_on?(:update_message_seen),
-        feed_order: @user.feed_order
+        feed_order: @user.feed_order,
+        refresh_sessions_path: refresh_sessions_path
       }
 
       render action: 'logged_in'

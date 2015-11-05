@@ -48,11 +48,16 @@ Feedbin::Application.routes.draw do
   resources :tags,           only: [:index, :show, :update, :destroy]
   resources :billing_events, only: [:show]
   resources :imports
-  resources :sessions
   resources :password_resets
   resources :sharing_services, path: 'settings/sharing', only: [:index, :create, :update, :destroy]
   resources :actions, path: 'settings/actions', only: [:index, :create, :new, :update, :destroy, :edit]
   resources :saved_searches
+
+  resources :sessions do
+    collection do
+      get :refresh
+    end
+  end
 
   resources :supported_sharing_services, only: [:create, :destroy, :update] do
     member do
