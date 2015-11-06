@@ -1,4 +1,4 @@
-worker_processes 16
+worker_processes Etc.nprocessors
 
 app_name = "feedbin"
 app_dir  = "/srv/apps/#{app_name}"
