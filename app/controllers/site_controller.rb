@@ -42,7 +42,7 @@ class SiteController < ApplicationController
 
       render action: 'logged_in'
     else
-      render_file_or("home", :ok) {
+      render_file_or("home/index.html", :ok) {
         redirect_to login_url
       }
     end
