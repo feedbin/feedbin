@@ -5027,24 +5027,47 @@ Buttons
     display: block;
 }
 
-.button-tag * {
-    @include stroke($text-header-color, $text-header-color-night, $text-header-color-sunset);
-    [disabled] & {
-        @include stroke($text-color-light, $text-color-light-night, $text-color-light-sunset);
+.button-tag {
+    width: 21px;
+    path {
+        @include stroke($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        [disabled] & {
+            @include stroke($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
+    }
+    circle {
+        @include fill($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        [disabled] & {
+            @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
+    }
+}
+.button-check {
+    width: 22px;
+    * {
+        @include fill($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        [disabled] & {
+            @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
     }
 }
 
-.button-check * {
-    @include fill($text-header-color, $text-header-color-night, $text-header-color-sunset);
-    [disabled] & {
-        @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
-    }
-}
 
-.button-trash * {
-    @include fill($text-header-color, $text-header-color-night, $text-header-color-sunset);
-    [disabled] & {
-        @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+.button-trash {
+    width: 18px;
+    * {
+        @include stroke($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        [disabled] & {
+            @include stroke($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
+    }
+    .lid {
+        stroke: none;
+        @include fill($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        [disabled] & {
+            stroke: none;
+            @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
     }
 }
 
