@@ -9,7 +9,6 @@ group :development do
   gem 'quiet_assets'
   gem 'capistrano', github: 'capistrano/capistrano', ref: 'dcd3257'
   gem 'capistrano-unicorn', github: 'sosedoff/capistrano-unicorn', ref: '52376ad', require: false
-  gem 'dotenv-rails'
   gem 'silencer'
   gem 'spring'
   gem 'benchmark-ips'
@@ -82,6 +81,7 @@ gem 'nokogumbo'
 gem 'ruby-opencv', require: false
 gem 'rails-deprecated_sanitizer'
 gem 'responders', '~> 2.0'
+gem 'dotenv-rails'
 
 # Sidekiq
 gem 'sidekiq'
