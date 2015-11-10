@@ -11,6 +11,7 @@ Feedbin::Application.routes.draw do
   get :version, to: proc {|env| [200, {}, [ENV["ETAG_VERSION_ID"]]] }
 
   post '/emails' => 'emails#create'
+  post '/newsletters' => 'newsletters#create'
 
   match '/404', to: 'errors#not_found', via: :all
   get '/starred/:starred_token', to: 'starred_entries#index', as: 'starred'

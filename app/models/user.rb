@@ -67,6 +67,7 @@ class User < ActiveRecord::Base
 
   before_create { generate_token(:starred_token) }
   before_create { generate_token(:inbound_email_token) }
+  before_create { generate_token(:newsletter_token) }
 
   before_destroy :cancel_billing, unless: -> user { user.admin }
   before_destroy :create_deleted_user
