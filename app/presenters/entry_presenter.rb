@@ -159,4 +159,12 @@ class EntryPresenter < BasePresenter
     entry.image.present? && entry.image["original_url"] && entry.image["processed_url"] && entry.image["width"] && entry.image["height"]
   end
 
+  def entry_type
+    if entry.data && entry.data["type"].present?
+      entry.data["type"]
+    else
+      "default"
+    end
+  end
+
 end

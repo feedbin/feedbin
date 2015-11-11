@@ -25,4 +25,41 @@ class Newsletter
   def from_name
     @event["msg"]["from_name"] || from_email
   end
+
+  def subject
+    @event["msg"]["subject"]
+  end
+
+  def text
+    @event["msg"]["text"]
+  end
+
+  def html
+    @event["msg"]["html"] || text
+  end
+
+  def timestamp
+    @event["ts"]
+  end
+
+  def feed_id
+    @feed_id ||= Digest::SHA1.hexdigest("#{token}#{from_email}")
+  end
+
+  def entry_id
+    @entry_id ||= Digest::SHA1.hexdigest("#{feed_id}#{subject}#{timestamp}")
+  end
+
+  def domain
+    @domain ||= Mail::Address.new(from_email).domain
+  end
+
+  def feed_url(query)
+    "#{site_url}?#{query}"
+  end
+
+  def site_url
+    site_url ||= URI::HTTP.build(host: domain).to_s
+  end
+
 end

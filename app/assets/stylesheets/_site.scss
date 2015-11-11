@@ -3459,6 +3459,28 @@ $saved-search-control-height: 48px;
         max-width: 100%;
     }
 
+    .entry-type-newsletter {
+        position: relative;
+        width: 100%;
+        table {
+            table-layout:fixed!important;
+            border: none !important;
+            border-collapse: collapse!important;
+            margin: 0!important;
+            padding: 0!important;
+            background-color: transparent!important;
+            height: 100%!important;
+            width: 100%!important;
+        }
+        tr, td, th {
+            border: none!important;
+            border-collapse: collapse!important;
+            margin: 0!important;
+            padding: 0!important;
+            background-color: transparent!important;
+        }
+    }
+
     .text {
         white-space: pre-wrap;
     }
