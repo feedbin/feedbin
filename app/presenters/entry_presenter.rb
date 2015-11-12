@@ -167,4 +167,8 @@ class EntryPresenter < BasePresenter
     end
   end
 
+  def entry_type_class
+    "entry-type-#{entry_type}"
+  end
+
 end

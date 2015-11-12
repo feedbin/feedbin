@@ -3406,14 +3406,6 @@ $saved-search-control-height: 48px;
         }
     }
 
-    table {
-        @extend .table;
-        @extend .table-bordered;
-        img {
-            max-width: none;
-            display: inline;
-        }
-    }
 
     pre code {
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
@@ -3459,31 +3451,23 @@ $saved-search-control-height: 48px;
         max-width: 100%;
     }
 
-    .entry-type-newsletter {
-        position: relative;
-        width: 100%;
-        table {
-            table-layout:fixed!important;
-            border: none !important;
-            border-collapse: collapse!important;
-            margin: 0!important;
-            padding: 0!important;
-            background-color: transparent!important;
-            height: 100%!important;
-            width: 100%!important;
-        }
-        tr, td, th {
-            border: none!important;
-            border-collapse: collapse!important;
-            margin: 0!important;
-            padding: 0!important;
-            background-color: transparent!important;
-        }
-    }
-
     .text {
         white-space: pre-wrap;
     }
+
+}
+
+.content-styles.entry-type-default {
+
+    table {
+        @extend .table;
+        @extend .table-bordered;
+        img {
+            max-width: none;
+            display: inline;
+        }
+    }
+
 
     .download-link {
         font-size: 12px;

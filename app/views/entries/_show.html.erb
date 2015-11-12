@@ -28,7 +28,7 @@
             </p>
             <p class="post-meta feed-title"><span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
           </header>
-          <div data-behavior="entry_content_wrap" class="content-styles">
+          <div data-behavior="entry_content_wrap" class="content-styles <%= entry_presenter.entry_type_class %>">
             <%
               if entry.content.present? &&
               entry.original.present? &&
@@ -50,10 +50,7 @@
                 <iframe width="<%= entry.data["media_width"] %>" height="<%= entry.data["media_height"] %>" src="https://www.youtube-nocookie.com/embed/<%= entry.data["youtube_video_id"] %>?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe>
                 <div class="text"><%= entry.content %></div>
             <% else %>
-              <div class="entry-type-<%= entry_presenter.entry_type %>">
                 <%= raw(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>
-              </div>
-
             <% end %>
           </div>
         </div>
