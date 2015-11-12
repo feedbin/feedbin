@@ -294,6 +294,7 @@ class EntriesController < ApplicationController
 
   def newsletter
     @entry = Entry.where(public_id: params[:id]).take!
+    render layout: nil
   end
 
   private
