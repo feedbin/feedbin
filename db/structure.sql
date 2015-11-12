@@ -934,7 +934,8 @@ CREATE TABLE users (
     starred_token character varying(255),
     inbound_email_token character varying(255),
     tag_visibility json DEFAULT '{}'::json,
-    expires_at timestamp without time zone
+    expires_at timestamp without time zone,
+    newsletter_token character varying
 );
 
 
@@ -1753,6 +1754,13 @@ CREATE UNIQUE INDEX index_users_on_lower_email ON users USING btree (lower((emai
 
 
 --
+-- Name: index_users_on_newsletter_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_users_on_newsletter_token ON users USING btree (newsletter_token);
+
+
+--
 -- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2020,4 +2028,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150827230751');
 INSERT INTO schema_migrations (version) VALUES ('20151011143618');
 
 INSERT INTO schema_migrations (version) VALUES ('20151019200512');
+
+INSERT INTO schema_migrations (version) VALUES ('20151110044837');
 
