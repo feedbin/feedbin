@@ -3614,6 +3614,24 @@ $saved-search-control-height: 48px;
     }
 }
 
+.content-styles.entry-type-newsletter {
+    @media (max-width: 600px) {
+        img {
+            max-width: 380px !important;
+        }
+    }
+    @media (max-width: 400px) {
+        img {
+            max-width: 345px !important;
+        }
+    }
+    @media (max-width: 320px) {
+        img {
+            max-width: 290px !important;
+        }
+    }
+}
+
 .theme-night .content-styles a {
     color: #fff;
     text-decoration: underline;
