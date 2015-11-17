@@ -44,19 +44,19 @@
                 <li>
                     <%= f.check_box :show_unread_count %>
                     <%= f.label :show_unread_count do %>
-                        Show unread count in title <span class="slider-checkbox"></span>
+                        Unread count in title <span class="slider-checkbox"></span>
                     <% end %>
                 </li>
                 <li>
-                    <%= f.check_box :hide_recently_read %>
+                    <%= f.check_box :hide_recently_read, {checked: @user.hide_recently_read.nil? || !@user.setting_on?(:hide_recently_read)}, "0", "1" %>
                     <%= f.label :hide_recently_read do %>
-                        Hide Recently Read section <span class="slider-checkbox"></span>
+                      Recently Read section <span class="slider-checkbox"></span>
                     <% end %>
                 </li>
                 <li>
-                    <%= f.check_box :hide_updated %>
+                    <%= f.check_box :hide_updated, {checked: @user.hide_updated.nil? || !@user.setting_on?(:hide_updated)}, "0", "1" %>
                     <%= f.label :hide_updated do %>
-                        Hide Updated section <span class="slider-checkbox"></span>
+                      Updated section <span class="slider-checkbox"></span>
                     <% end %>
                 </li>
             </ul>
@@ -65,7 +65,7 @@
                 <li>
                     <%= f.check_box :starred_feed_enabled %>
                     <%= f.label :starred_feed_enabled do %>
-                        Enable starred article feed <span class="slider-checkbox"></span>
+                      Starred article feed <span class="slider-checkbox"></span>
                     <% end %>
                 </li>
             </ul>
@@ -92,9 +92,9 @@
 
             <ul class="control-group control-group-form">
                 <li>
-                    <%= f.check_box :disable_image_proxy %>
+                    <%= f.check_box :disable_image_proxy, {checked: @user.disable_image_proxy.nil? || !@user.setting_on?(:disable_image_proxy)}, "0", "1" %>
                     <%= f.label :disable_image_proxy do %>
-                        Disable image proxy <span class="slider-checkbox"></span>
+                        Image proxy <span class="slider-checkbox"></span>
                     <% end %>
                 </li>
             </ul>
