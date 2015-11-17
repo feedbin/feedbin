@@ -1,7 +1,7 @@
 class EntriesController < ApplicationController
 
-  skip_before_action :verify_authenticity_token, only: [:push_view]
-  skip_before_action :authorize, only: [:push_view]
+  skip_before_action :verify_authenticity_token, only: [:push_view, :newsletter]
+  skip_before_action :authorize, only: [:push_view, :newsletter]
 
   def index
     @user = current_user
@@ -290,6 +290,11 @@ class EntriesController < ApplicationController
         @content = '(comparison error)'
       end
     end
+  end
+
+  def newsletter
+    @entry = Entry.where(public_id: params[:id]).take!
+    render layout: nil
   end
 
   private

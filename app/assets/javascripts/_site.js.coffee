@@ -188,11 +188,13 @@ $.extend feedbin,
     $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com'], iframe[src*='embed-ssl.ted.com']"});
 
   formatTweets: ->
-    target = $('[data-behavior~=entry_content_wrap]')[0]
-    result = twttr.widgets.load(target)
+    if typeof(twttr) != "undefined"
+      target = $('[data-behavior~=entry_content_wrap]')[0]
+      result = twttr.widgets.load(target)
 
   formatInstagram: ->
-    instgrm.Embeds.process()
+    if typeof(instgrm) != "undefined"
+      instgrm.Embeds.process()
 
   formatImages: ->
     $("[data-behavior~=entry_content_wrap] img").each ->
@@ -537,6 +539,10 @@ $.extend feedbin,
             feedbin.draggable()
           ), 20
 
+  refreshRetry: (xhr) ->
+    $.get(feedbin.data.refresh_sessions_path).success(->
+      $.ajax(xhr)
+    )
 
   entries: {}
 
@@ -567,6 +573,17 @@ $.extend feedbin,
   ONE_DAY: 60 * 60 * 1000 * 24
 
 $.extend feedbin,
+  preInit:
+
+    xsrf: ->
+      setup =
+        beforeSend: (xhr) ->
+          matches = document.cookie.match(/XSRF\-TOKEN\=([^;]*)/)
+          if matches && matches[1]
+            token = decodeURIComponent(matches[1])
+            xhr.setRequestHeader('X-XSRF-TOKEN', token)
+      $.ajaxSetup(setup);
+
   init:
 
     hasTouch: ->
@@ -1359,6 +1376,9 @@ $.extend feedbin,
       feedbin.droppable()
       feedbin.draggable()
 
+
+$.each feedbin.preInit, (i, item) ->
+  item()
 
 jQuery ->
   $.each feedbin.init, (i, item) ->

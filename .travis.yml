@@ -5,6 +5,9 @@ services:
   - redis-server
 addons:
   postgresql: "9.2"
+  apt:
+    packages:
+      - libopencv-dev
 rvm:
   - 2.2.3
 env:

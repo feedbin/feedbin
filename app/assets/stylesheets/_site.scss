@@ -3406,14 +3406,6 @@ $saved-search-control-height: 48px;
         }
     }
 
-    table {
-        @extend .table;
-        @extend .table-bordered;
-        img {
-            max-width: none;
-            display: inline;
-        }
-    }
 
     pre code {
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
@@ -3462,6 +3454,20 @@ $saved-search-control-height: 48px;
     .text {
         white-space: pre-wrap;
     }
+
+}
+
+.content-styles.entry-type-default {
+
+    table {
+        @extend .table;
+        @extend .table-bordered;
+        img {
+            max-width: none;
+            display: inline;
+        }
+    }
+
 
     .download-link {
         font-size: 12px;
@@ -3605,6 +3611,24 @@ $saved-search-control-height: 48px;
 
     .fluid-width-video-wrapper {
         margin-bottom: 1.1em;
+    }
+}
+
+.content-styles.entry-type-newsletter {
+    @media (max-width: 600px) {
+        img {
+            max-width: 380px !important;
+        }
+    }
+    @media (max-width: 400px) {
+        img {
+            max-width: 345px !important;
+        }
+    }
+    @media (max-width: 320px) {
+        img {
+            max-width: 290px !important;
+        }
     }
 }
 
@@ -5189,24 +5213,47 @@ Buttons
     display: block;
 }
 
-.button-tag * {
-    @include stroke($text-header-color, $text-header-color-night, $text-header-color-sunset);
-    [disabled] & {
-        @include stroke($text-color-light, $text-color-light-night, $text-color-light-sunset);
+.button-tag {
+    width: 21px;
+    path {
+        @include stroke($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        [disabled] & {
+            @include stroke($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
+    }
+    circle {
+        @include fill($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        [disabled] & {
+            @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
+    }
+}
+.button-check {
+    width: 22px;
+    * {
+        @include fill($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        [disabled] & {
+            @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
     }
 }
 
-.button-check * {
-    @include fill($text-header-color, $text-header-color-night, $text-header-color-sunset);
-    [disabled] & {
-        @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
-    }
-}
 
-.button-trash * {
-    @include fill($text-header-color, $text-header-color-night, $text-header-color-sunset);
-    [disabled] & {
-        @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+.button-trash {
+    width: 18px;
+    * {
+        @include stroke($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        [disabled] & {
+            @include stroke($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
+    }
+    .lid {
+        stroke: none;
+        @include fill($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        [disabled] & {
+            stroke: none;
+            @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
     }
 }
 

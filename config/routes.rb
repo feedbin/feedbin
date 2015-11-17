@@ -1,5 +1,3 @@
-require 'sidekiq/web'
-
 Feedbin::Application.routes.draw do
 
   # The priority is based upon order of creation: first created -> highest priority.
@@ -7,29 +5,21 @@ Feedbin::Application.routes.draw do
 
   root to: 'site#index'
 
-  mount Sidekiq::Web, at: '/sidekiq'
   mount StripeEvent::Engine, at: '/stripe'
 
   get :health_check, to: proc {|env| [200, {}, ["OK"]] }
   get :version, to: proc {|env| [200, {}, [ENV["ETAG_VERSION_ID"]]] }
 
-  get :home, to: 'site#home'
-  get :apps, to: 'site#apps'
-
-  # Firefox OS manifest
-  get :manifest, to: 'site#manifest'
-
   post '/emails' => 'emails#create'
+  post '/newsletters' => 'newsletters#create'
 
   match '/404', to: 'errors#not_found', via: :all
   get '/starred/:starred_token', to: 'starred_entries#index', as: 'starred'
   post '/starred/export', to: 'starred_entries#export'
   get '/favicons/:hash', to: 'favicons#index', as: 'favicons'
 
-
   get    :signup,         to: 'users#new',           as: 'signup'
   get    :login,          to: 'sessions#new',        as: 'login'
-  get    :privacy_policy, to: 'site#privacy_policy', as: 'privacy_policy'
   delete :logout,         to: 'sessions#destroy',    as: 'logout'
 
   # Apple Push
@@ -51,11 +41,16 @@ Feedbin::Application.routes.draw do
   resources :tags,           only: [:index, :show, :update, :destroy]
   resources :billing_events, only: [:show]
   resources :imports
-  resources :sessions
   resources :password_resets
   resources :sharing_services, path: 'settings/sharing', only: [:index, :create, :update, :destroy]
   resources :actions, path: 'settings/actions', only: [:index, :create, :new, :update, :destroy, :edit]
   resources :saved_searches
+
+  resources :sessions do
+    collection do
+      get :refresh
+    end
+  end
 
   resources :supported_sharing_services, only: [:create, :destroy, :update] do
     member do
@@ -111,6 +106,7 @@ Feedbin::Application.routes.draw do
       post :recently_read, to: 'recently_read_entries#create'
       get :push_view
       get :diff
+      get :newsletter
     end
     collection do
       get :starred

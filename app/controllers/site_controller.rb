@@ -1,6 +1,6 @@
 class SiteController < ApplicationController
 
-  skip_before_action :authorize, only: [:index, :home, :privacy_policy, :apps, :manifest]
+  skip_before_action :authorize, only: [:index]
   before_action :check_user, if: :signed_in?
 
   def index
@@ -36,29 +36,17 @@ class SiteController < ApplicationController
         mark_direction_as_read_entries: mark_direction_as_read_entries_path,
         entry_sort: @user.entry_sort,
         update_message_seen: @user.setting_on?(:update_message_seen),
-        feed_order: @user.feed_order
+        feed_order: @user.feed_order,
+        refresh_sessions_path: refresh_sessions_path
       }
 
       render action: 'logged_in'
     else
-      home
+      render_file_or("home/index.html", :ok) {
+        redirect_to login_url
+      }
     end
   end
-
-  def home
-    @page_view = '/home'
-    render action: 'not_logged_in'
-  end
-
-  def privacy_policy
-    render layout: 'sub_page'
-  end
-
-  def apps
-    render layout: 'sub_page'
-  end
-
-  def manifest; end
 
   private
 

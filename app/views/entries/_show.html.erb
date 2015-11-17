@@ -28,7 +28,7 @@
             </p>
             <p class="post-meta feed-title"><span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
           </header>
-          <div data-behavior="entry_content_wrap" class="content-styles">
+          <div data-behavior="entry_content_wrap" class="content-styles <%= entry_presenter.entry_type_class %>">
             <%
               if entry.content.present? &&
               entry.original.present? &&

@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 ruby '2.2.3'
 
-gem 'rails', '= 4.1.13'
+gem 'rails'
 gem 'rest-client', '= 1.6.7'
 
 group :development do
@@ -9,7 +9,6 @@ group :development do
   gem 'quiet_assets'
   gem 'capistrano', github: 'capistrano/capistrano', ref: 'dcd3257'
   gem 'capistrano-unicorn', github: 'sosedoff/capistrano-unicorn', ref: '52376ad', require: false
-  gem 'dotenv-rails'
   gem 'silencer'
   gem 'spring'
   gem 'benchmark-ips'
@@ -80,9 +79,12 @@ gem 'htmlentities'
 gem 'houston'
 gem 'nokogumbo'
 gem 'ruby-opencv', require: false
+gem 'rails-deprecated_sanitizer'
+gem 'responders', '~> 2.0'
+gem 'dotenv-rails'
 
 # Sidekiq
-gem 'sidekiq', '= 3.4.1'
+gem 'sidekiq'
 gem 'sinatra', require: nil
 
 # Stripe

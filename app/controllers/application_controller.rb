@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
   before_action :authorize
   before_action :set_user
   before_action :honeybadger_context
+  after_action :set_csrf_cookie
 
   etag { current_user.try :id }
 
@@ -113,6 +114,24 @@ class ApplicationController < ActionController::Base
       count_data: @count_data,
       feed_order: @user.feed_order
     }
+  end
+
+  def render_file_or(file, status, &block)
+    if ENV['SITE_PATH'].present? && File.exist?(File.join(ENV['SITE_PATH'], file))
+      render file: File.join(ENV['SITE_PATH'], file), status: status, layout: nil
+    else
+      yield
+    end
+  end
+
+  def set_csrf_cookie
+    cookies['XSRF-TOKEN'] = form_authenticity_token if protect_against_forgery?
+  end
+
+  protected
+
+  def verified_request?
+    super || valid_authenticity_token?(session, request.headers['X-XSRF-TOKEN'])
   end
 
   private
