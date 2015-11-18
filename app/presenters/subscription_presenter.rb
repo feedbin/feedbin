@@ -3,7 +3,7 @@ class SubscriptionPresenter < BasePresenter
   presents :subscription
 
   def graph_volume
-    counts.sum
+    @template.number_with_delimiter(counts.sum)
   end
 
   def graph_date_start
@@ -25,11 +25,21 @@ class SubscriptionPresenter < BasePresenter
   end
 
   def graph_max
-    counts.max
+    max = counts.max
+    if max == 0
+      nil
+    else
+      max
+    end
   end
 
   def graph_mid
-    counts.max / 2
+    mid = counts.max / 2
+    if mid == 0
+      nil
+    else
+      mid
+    end
   end
 
   private

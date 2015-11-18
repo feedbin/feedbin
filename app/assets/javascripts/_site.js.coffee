@@ -397,8 +397,8 @@ $.extend feedbin,
 
         context.lineTo(xPosition, canvasHeight)
 
-        context.fillStyle = '#d0def1'
-        context.strokeStyle = '#3399FF'
+        context.fillStyle = $(canvas).data('fill')
+        context.strokeStyle = $(canvas).data('stroke')
         context.lineWidth = 3
         context.lineCap = 'round'
 
