@@ -21,11 +21,7 @@ class SubscriptionPresenter < BasePresenter
 
   def graph_bars
     max = counts.max
-    output = ""
-    counts.map { |count| (count.to_f / max.to_f) * 100 }.each do |percentage|
-      output += @template.content_tag(:div, '', style: "height: #{percentage}%")
-    end
-    output.html_safe
+    counts.map { |count| (count.to_f / max.to_f) }.to_json
   end
 
   def graph_max

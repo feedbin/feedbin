@@ -368,42 +368,41 @@ $.extend feedbin,
     $('.saved-search-wrap').removeClass('open')
 
   retinaCanvas: (canvas, context) ->
-    width = $(canvas).attr('width')
-    height = $(canvas).attr('height')
+    width = $(canvas).outerWidth()
+    height = $(canvas).outerHeight()
     $(canvas).attr('width', width * window.devicePixelRatio)
     $(canvas).attr('height', height * window.devicePixelRatio)
-    $(canvas).css
-      width: width
-      height: height
     context.scale(window.devicePixelRatio, window.devicePixelRatio)
     context
 
   drawBarChart: (canvas, values) ->
     if values
-      barWidth = 3
       if canvas.getContext
         context = canvas.getContext("2d")
-        canvasHeight = $(canvas).attr('height') - 2
+        canvasHeight = $(canvas).outerHeight()
+        canvasWidth = $(canvas).outerWidth() + 2
+        barWidth = canvasWidth / (values.length - 1)
         if 'devicePixelRatio' of window
           context = feedbin.retinaCanvas(canvas, context)
 
-        xPosition = 0
-
-        context.strokeStyle = '#DDDDDD'
-        context.lineWidth = 2
+        xPosition = -2
         context.beginPath()
-
-        height = Math.ceil(values.shift() * canvasHeight)
-        yPosition = (canvasHeight - height) + 1
-
-        context.moveTo(xPosition, yPosition)
-
+        context.moveTo(xPosition, canvasHeight)
         for value in values
-          height = Math.ceil(value * canvasHeight)
-          yPosition = (canvasHeight - height) + 1
-          xPosition = xPosition + barWidth
+          height = Math.round(value * canvasHeight)
+          yPosition = (canvasHeight - height)
+          context.lineJoin = 'round'
           context.lineTo(xPosition, yPosition)
+          xPosition += barWidth
 
+        context.lineTo(xPosition, canvasHeight)
+
+        context.fillStyle = '#d0def1'
+        context.strokeStyle = '#3399FF'
+        context.lineWidth = 3
+        context.lineCap = 'round'
+
+        context.fill()
         context.stroke()
 
   readabilityActive: ->

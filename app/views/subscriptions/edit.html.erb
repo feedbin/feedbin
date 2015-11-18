@@ -16,9 +16,6 @@
                                 <h3><a href="<%= @subscription.feed.site_url %>"><%= @subscription.title || @subscription.feed.title %></a></h3>
                                 <p class="subhead"><a href="<%= @subscription.feed.feed_url %>"><%= @subscription.feed.feed_url %></a></p>
                             </div>
-                            <div class="half text-right">
-                                Unsubscribe
-                            </div>
                         </div>
                         <div class="chart-wrap">
                             <div class="y-axis">
@@ -28,7 +25,7 @@
                             </div>
                             <div class="graph-wrap">
                                 <div class="graph">
-                                    <%= subscription_presenter.graph_bars %>
+                                  <canvas data-values="<%= subscription_presenter.graph_bars %>"></canvas>
                                 </div>
                                 <div class="x-axis">
                                     <div><%= subscription_presenter.graph_date_start %></div>

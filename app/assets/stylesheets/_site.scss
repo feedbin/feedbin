@@ -4577,7 +4577,7 @@ Settings
             border: 1px solid $border-color;
             .graph-wrap {
                 flex: 1 1 auto;
-                padding-top: 50%;
+                padding-top: 30%;
                 border-left: 1px solid $border-color;
                 border-bottom: 1px solid $border-color;
                 margin-left: 5px;
@@ -4587,14 +4587,12 @@ Settings
                     align-items: flex-end;
                     position: absolute;
                     top: 0;
-                    left: 0;
-                    bottom: 0;
+                    left: 1px;
+                    bottom: 1px;
                     right: 0;
-                    div {
-                        flex: 1 1 auto;
-                        background-color: $selected;
-                        margin-left: 1px;
-                        margin-bottom: 1px;
+                    canvas {
+                        width: 100%;
+                        height: 100%;
                     }
                 }
             }
@@ -4774,6 +4772,10 @@ Settings
             overflow-x: hidden;
             overflow-y: visible;
             z-index: 0;
+            canvas {
+                width: 100%;
+                height: 100%;
+            }
             @media (max-width: 528px) {
                 display: none;
             }
