@@ -367,43 +367,63 @@ $.extend feedbin,
     $('.entries').removeClass('show-saved-search')
     $('.saved-search-wrap').removeClass('open')
 
-  retinaCanvas: (canvas, context) ->
-    width = $(canvas).outerWidth()
-    height = $(canvas).outerHeight()
-    $(canvas).attr('width', width * window.devicePixelRatio)
-    $(canvas).attr('height', height * window.devicePixelRatio)
-    context.scale(window.devicePixelRatio, window.devicePixelRatio)
-    context
+  buildPoints: (percentages, width, height) ->
+    barWidth = width / (percentages.length - 1)
+    x = 0
+
+    points = []
+    for percentage in percentages
+      y = (height - Math.round(percentage * height))
+      points.push({x: x, y: y})
+      x += barWidth
+
+    points
 
   drawBarChart: (canvas, values) ->
-    if values
-      if canvas.getContext
-        context = canvas.getContext("2d")
-        canvasHeight = $(canvas).outerHeight()
-        canvasWidth = $(canvas).outerWidth() + 2
-        barWidth = canvasWidth / (values.length - 1)
-        if 'devicePixelRatio' of window
-          context = feedbin.retinaCanvas(canvas, context)
+    if values && canvas.getContext
+      lineTo = (x, y, context, height) ->
+        if y == 0
+          y = 1
+        if y == height
+          y = height - 1
+        context.lineTo(x, y)
 
-        xPosition = -2
-        context.beginPath()
-        context.moveTo(xPosition, canvasHeight)
-        for value in values
-          height = Math.round(value * canvasHeight)
-          yPosition = (canvasHeight - height)
-          context.lineJoin = 'round'
-          context.lineTo(xPosition, yPosition)
-          xPosition += barWidth
+      context = canvas.getContext("2d")
+      canvasHeight = $(canvas).outerHeight()
+      canvasWidth = $(canvas).outerWidth()
 
-        context.lineTo(xPosition, canvasHeight)
+      ratio = 1
+      if 'devicePixelRatio' of window
+        ratio = window.devicePixelRatio
 
-        context.fillStyle = $(canvas).data('fill')
-        context.strokeStyle = $(canvas).data('stroke')
-        context.lineWidth = 3
-        context.lineCap = 'round'
+      $(canvas).attr('width', canvasWidth * ratio)
+      $(canvas).attr('height', canvasHeight * ratio)
+      context.scale(ratio, ratio)
 
-        context.fill()
-        context.stroke()
+      context.lineJoin = 'round'
+      context.fillStyle = $(canvas).data('fill')
+      context.strokeStyle = $(canvas).data('stroke')
+      context.lineWidth = 2
+      context.lineCap = 'round'
+
+      points = feedbin.buildPoints(values, canvasWidth, canvasHeight)
+
+      context.beginPath()
+      context.moveTo(0, canvasHeight)
+      for point in points
+        context.lineTo(point.x, point.y)
+      context.lineTo(canvasWidth, canvasHeight)
+      context.fill()
+
+      context.beginPath()
+      for point, index in points
+        if index == 0
+          lineTo(point.x + 1, point.y, context, canvasHeight)
+        else if index == points.length - 1
+          lineTo(canvasWidth - 1, point.y, context, canvasHeight)
+        else
+          lineTo(point.x, point.y, context, canvasHeight)
+      context.stroke()
 
   readabilityActive: ->
     $('[data-behavior~=toggle_content_view]').find('.active').length > 0
