@@ -84,7 +84,7 @@ gem 'responders', '~> 2.0'
 gem 'dotenv-rails'
 
 # Sidekiq
-gem 'sidekiq'
+gem 'sidekiq', '= 3.5.3'
 gem 'sinatra', require: nil
 
 # Stripe
