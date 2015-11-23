@@ -1,6 +1,9 @@
 class WorkerStat
   def call(worker, item, queue)
-    Librato.timing "worker.#{worker.class.to_s.underscore}" do
+    title = "worker.#{worker.class.to_s.underscore}"
+    Librato.increment "#{title}.count"
+    Librato.increment "worker_perform"
+    Librato.timing title do
       yield
     end
   end
