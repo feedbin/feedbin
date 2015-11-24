@@ -4725,8 +4725,9 @@ Settings
             align-items: center;
             align-self: flex-end;
             background: image-url("icon-arrow.svg") 100% 50% no-repeat;
-            width: 50px;
-            background-size: contain;
+            background-size: 12px 18px;
+            width: 70px;
+            padding-right: 20px;
         }
         .checkbox {
             margin-right: 20px;
@@ -4783,63 +4784,22 @@ Settings
         .subscription-item {
             margin-right: 10px;
         }
-        .update-wrap {
-            right: 22px;
-            top: 7px;
-            position: absolute;
-            z-index: 100;
-            @media (max-width: 528px) {
-                right: 7px;
-            }
-            .update-icon {
-                display: flex;
-                align-items: center;
-                height: 32px;
-                width: 32px;
-                &:after {
-                    content: "";
-                    background: image-url("icon-clock-settings.svg") 0 -16px no-repeat;
-                    background-size: 16px 32px;
-                    height: 16px;
-                    width: 16px;
-                    display: block;
-                    margin: auto;
-                }
-                &.on {
-                    &:after {
-                        background-position: 0 0;
-                    }
-                }
-            }
+        .update-icon {
+            content: "";
+            background: image-url("icon-clock-settings.svg") 0 -16px no-repeat;
+            background-size: 16px 32px;
+            height: 16px;
+            width: 16px;
+            display: block;
+            margin: auto;
         }
-        .mute-wrap {
-            right: 54px;
-            top: 6px;
-            position: absolute;
-            z-index: 100;
-            @media (max-width: 528px) {
-                right: 39px;
-            }
-            .mute-icon {
-                display: flex;
-                align-items: center;
-                height: 32px;
-                width: 32px;
-                &:after {
-                    content: "";
-                    background: image-url("icon-mute-settings.svg") 0 -13px no-repeat;
-                    background-size: 12px 26px;
-                    height: 13px;
-                    width: 12px;
-                    display: block;
-                    margin: auto;
-                }
-                &.on {
-                    &:after {
-                        background-position: 0 0;
-                    }
-                }
-            }
+        .mute-icon {
+            background: image-url("icon-mute-settings.svg") 0 -13px no-repeat;
+            background-size: 12px 26px;
+            height: 13px;
+            width: 12px;
+            display: block;
+            margin: auto;
         }
     }
 }

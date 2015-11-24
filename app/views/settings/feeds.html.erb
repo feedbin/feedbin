@@ -60,17 +60,17 @@
                                             <%= subscription.title %>
                                         </span>
                                         <span class="last-updated-wrap">
-                                            <%= timeago(subscription.last_published_entry) %>
+                                            <%= timeago(subscription.last_published_entry) %>, <%= number_with_delimiter(subscription.post_volume) %>/mo
                                         </span>
                                     </span>
                                     <span class="canvas-wrap">
-                                        <%= content_tag :canvas, '', width: 97, height: 20, data: { values: subscription.entries_count, fill: "#eeeeee", stroke: "#dddddd" }, title: "Post frequency (#{number_with_delimiter(subscription.post_volume)} posts in the last 30 days)" %>
+                                        <%= content_tag :canvas, '', width: 97, height: 20, data: { values: subscription.entries_count, fill: "#eeeeee", stroke: "#dddddd" } %>
                                     </span>
                                 </span>
                                 <span class="subscription-controls">
                                     &nbsp;
-                                    <span class="icon-one"></span>
-                                    <span class="icon-two"></span>
+                                    <%= subscription_presenter.mute_icon %>
+                                    <%= subscription_presenter.update_icon %>
                                 </span>
                             <% end %>
                         </li>
