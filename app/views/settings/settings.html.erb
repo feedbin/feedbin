@@ -1,3 +1,4 @@
+<%= form_for @user, remote: true, url: settings_update_user_path(@user) do |f| %>
 <div class="settings-content-inner">
 
     <div class="settings-outer">
@@ -5,108 +6,92 @@
     </div>
 
     <div class="inset">
+        <div class="inset-content">
+            <h4 class="group-header">Unread Sort</h4>
+        </div>
+        <ul class="control-group control-group-form">
+            <li>
+                <%= f.radio_button(:entry_sort, "DESC", {checked: @user.entry_sort.nil? || @user.entry_sort === 'DESC'}) %>
+                <%= f.label('entry_sort_desc', "Newest First") %>
+            </li>
+            <li>
+                <%= f.radio_button(:entry_sort, "ASC") %>
+                <%= f.label('entry_sort_asc', "Oldest First") %>
+            </li>
+        </ul>
 
-        <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
+        <ul class="control-group control-group-form">
+            <li>
+                <%= f.check_box :mark_as_read_confirmation %>
+                <%= f.label :mark_as_read_confirmation do %>
+                    Ask before marking all as read <span class="slider-checkbox"></span>
+                <% end %>
+            </li>
+            <li>
+                <%= f.check_box :sticky_view_inline %>
+                <%= f.label :sticky_view_inline do %>
+                    Sticky Readability <span class="slider-checkbox"></span>
+                <% end %>
+            </li>
+        </ul>
+        <p class="control-group-description">
+            Use last Readability setting per feed
+        </p>
 
-            <div class="inset-content">
-                <h4 class="group-header">Unread Sort</h4>
-            </div>
-            <ul class="control-group control-group-form">
-                <li>
-                    <%= f.radio_button(:entry_sort, "DESC", {checked: @user.entry_sort.nil? || @user.entry_sort === 'DESC'}) %>
-                    <%= f.label('entry_sort_desc', "Newest First") %>
-                </li>
-                <li>
-                    <%= f.radio_button(:entry_sort, "ASC") %>
-                    <%= f.label('entry_sort_asc', "Oldest First") %>
-                </li>
-            </ul>
+        <ul class="control-group control-group-form">
+            <li>
+                <%= f.check_box :show_unread_count %>
+                <%= f.label :show_unread_count do %>
+                    Unread count in title <span class="slider-checkbox"></span>
+                <% end %>
+            </li>
+            <li>
+                <%= f.check_box :hide_recently_read, {checked: @user.hide_recently_read.nil? || !@user.setting_on?(:hide_recently_read)}, "0", "1" %>
+                <%= f.label :hide_recently_read do %>
+                  Recently Read section <span class="slider-checkbox"></span>
+                <% end %>
+            </li>
+            <li>
+                <%= f.check_box :hide_updated, {checked: @user.hide_updated.nil? || !@user.setting_on?(:hide_updated)}, "0", "1" %>
+                <%= f.label :hide_updated do %>
+                  Updated section <span class="slider-checkbox"></span>
+                <% end %>
+            </li>
+        </ul>
 
-            <ul class="control-group control-group-form">
-                <li>
-                    <%= f.check_box :mark_as_read_confirmation %>
-                    <%= f.label :mark_as_read_confirmation do %>
-                        Ask before marking all as read <span class="slider-checkbox"></span>
-                    <% end %>
-                </li>
-                <li>
-                    <%= f.check_box :sticky_view_inline %>
-                    <%= f.label :sticky_view_inline do %>
-                        Sticky Readability <span class="slider-checkbox"></span>
-                    <% end %>
-                </li>
-            </ul>
+        <ul class="control-group control-group-form">
+            <li>
+                <%= f.check_box :starred_feed_enabled %>
+                <%= f.label :starred_feed_enabled do %>
+                  Starred article feed <span class="slider-checkbox"></span>
+                <% end %>
+            </li>
+        </ul>
+        <% if @user.setting_on?(:starred_feed_enabled) %>
             <p class="control-group-description">
-                Use last Readability setting per feed
+                Your starred feed: <a href="<%= starred_url(@user.starred_token, format: :xml) %>" style="word-break: break-all;"><%= starred_url(@user.starred_token, format: :xml) %></a>
             </p>
-
-            <ul class="control-group control-group-form">
-                <li>
-                    <%= f.check_box :show_unread_count %>
-                    <%= f.label :show_unread_count do %>
-                        Unread count in title <span class="slider-checkbox"></span>
-                    <% end %>
-                </li>
-                <li>
-                    <%= f.check_box :hide_recently_read, {checked: @user.hide_recently_read.nil? || !@user.setting_on?(:hide_recently_read)}, "0", "1" %>
-                    <%= f.label :hide_recently_read do %>
-                      Recently Read section <span class="slider-checkbox"></span>
-                    <% end %>
-                </li>
-                <li>
-                    <%= f.check_box :hide_updated, {checked: @user.hide_updated.nil? || !@user.setting_on?(:hide_updated)}, "0", "1" %>
-                    <%= f.label :hide_updated do %>
-                      Updated section <span class="slider-checkbox"></span>
-                    <% end %>
-                </li>
-            </ul>
-
-            <ul class="control-group control-group-form">
-                <li>
-                    <%= f.check_box :starred_feed_enabled %>
-                    <%= f.label :starred_feed_enabled do %>
-                      Starred article feed <span class="slider-checkbox"></span>
-                    <% end %>
-                </li>
-            </ul>
-            <% if @user.setting_on?(:starred_feed_enabled) %>
-                <p class="control-group-description">
-                    Your starred feed: <a href="<%= starred_url(@user.starred_token, format: :xml) %>" style="word-break: break-all;"><%= starred_url(@user.starred_token, format: :xml) %></a>
-                </p>
-            <% end %>
-
-            <div class="description-inset">
-                <%= f.submit "Save", class: 'button-plain no-margin' %>
-            </div>
-
         <% end %>
     </div>
 
     <div class="inset">
 
-        <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
+        <div class="inset-content">
+            <h4 class="group-header">Advanced</h4>
+        </div>
 
-            <div class="inset-content">
-                <h4 class="group-header">Advanced</h4>
-            </div>
+        <ul class="control-group control-group-form">
+            <li>
+                <%= f.check_box :disable_image_proxy, {checked: @user.disable_image_proxy.nil? || !@user.setting_on?(:disable_image_proxy)}, "0", "1" %>
+                <%= f.label :disable_image_proxy do %>
+                    Image proxy <span class="slider-checkbox"></span>
+                <% end %>
+            </li>
+        </ul>
+        <p class="control-group-description">
+            A TLS enabled image proxy is used to prevent <a href="https://developer.mozilla.org/en-US/docs/Security/MixedContent">mixed content</a> warnings. You can turn it off if you experience image loading issues.
+        </p>
 
-            <ul class="control-group control-group-form">
-                <li>
-                    <%= f.check_box :disable_image_proxy, {checked: @user.disable_image_proxy.nil? || !@user.setting_on?(:disable_image_proxy)}, "0", "1" %>
-                    <%= f.label :disable_image_proxy do %>
-                        Image proxy <span class="slider-checkbox"></span>
-                    <% end %>
-                </li>
-            </ul>
-            <p class="control-group-description">
-                A TLS enabled image proxy is used to prevent <a href="https://developer.mozilla.org/en-US/docs/Security/MixedContent">mixed content</a> warnings. You can turn it off if you experience image loading issues.
-            </p>
-
-            <div class="description-inset">
-                <%= f.submit "Save", class: 'button-plain no-margin' %>
-            </div>
-
-        <% end %>
     </div>
 
     <div class="description-inset icon-email">
@@ -116,3 +101,4 @@
     </div>
 
 </div>
+<% end %>

@@ -141,13 +141,23 @@ class SettingsController < ApplicationController
     @user = current_user
     @user.attributes = user_settings_params
     if @user.save
-      if params[:redirect_to]
-        redirect_to params[:redirect_to], notice: 'Settings updated.'
-      else
-        redirect_to settings_path, notice: 'Settings updated.'
+      respond_to do |format|
+        format.js { render nothing: true }
+        format.html do
+          if params[:redirect_to]
+            redirect_to params[:redirect_to], notice: 'Settings updated.'
+          else
+            redirect_to settings_path, notice: 'Settings updated.'
+          end
+        end
       end
     else
-      redirect_to settings_path, alert: @user.errors.full_messages.join('. ') + '.'
+      respond_to do |format|
+        format.js { render nothing: true }
+        format.html do
+          redirect_to settings_path, alert: @user.errors.full_messages.join('. ') + '.'
+        end
+      end
     end
   end
 

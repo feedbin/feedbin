@@ -1395,6 +1395,10 @@ $.extend feedbin,
       feedbin.droppable()
       feedbin.draggable()
 
+    settingsCheckbox: ->
+      $(document).on 'change', '.control-group [type="checkbox"]', (event) ->
+        $(@).parents("form").submit()
+
 
 $.each feedbin.preInit, (i, item) ->
   item()
