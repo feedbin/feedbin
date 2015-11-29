@@ -1,10 +1,14 @@
 <div class="settings-content-inner">
-  <div class="settings-outer">
-    <h2>Actions</h2>
+    <div class="settings-outer">
+        <div class="back-arrow">
+            <%= link_to '', '/' %>
+            <h2 class="settings-title">
+                Actions
+            </h2>
+        </div>
 
-    <p class="muted">Actions can be performed on articles when they are published. Start by writing the keywords to match, just like you would when <a href="http://help.feedbin.com/search-syntax/">searching</a> for something. Then select the feeds to include. Finally check the actions you would like to perform on the matched incoming articles.</p>
-  </div>
-
+     <p class="muted">Actions can be performed on articles when they are published. Start by writing the keywords to match, just like you would when <a href="http://help.feedbin.com/search-syntax/">searching</a> for something. Then select the feeds to include. Finally check the actions you would like to perform on the matched incoming articles.</p>
+ 
   <div class="push-options hide" id="push-data" data-website-id="<%= ENV['APPLE_PUSH_WEBSITE_ID'] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>">
     <div class="push-enable hide">
       <p>Push notifications can be enabled as an action. <a href="#" data-behavior="enable_push">Enable push notifications</a>.</p>
