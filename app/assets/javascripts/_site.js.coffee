@@ -1280,7 +1280,7 @@ $.extend feedbin,
         return
 
     drawBarCharts: ->
-      $('canvas').each ()->
+      $('[data-behavior~=line_graph]').each ()->
         feedbin.drawBarChart(@, $(@).data('values'))
       return
 
@@ -1395,6 +1395,12 @@ $.extend feedbin,
       feedbin.droppable()
       feedbin.draggable()
 
+    resizeGraph: ->
+      if $("[data-behavior~=resize_graph]").length
+        $(window).resize(_.debounce(->
+          $('[data-behavior~=resize_graph]').each ()->
+            feedbin.drawBarChart(@, $(@).data('values'))
+        20))
 
 $.each feedbin.preInit, (i, item) ->
   item()
