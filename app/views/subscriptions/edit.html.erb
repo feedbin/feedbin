@@ -36,22 +36,22 @@
                         </div>
                         <div class="stats">
                             <div class="stat">
-                                <p class="stat-title">Subscriber Since</p>
+                                <p class="stat-title stat-header">Subscriber Since</p>
                                 <p class="stat-body"><%= @subscription.created_at.to_s(:date) %></p>
                             </div>
                             <div class="stat">
-                                <p class="stat-title">Last Updated</p>
+                                <p class="stat-title stat-header">Last Updated</p>
                                 <p class="stat-body"><%= @subscription.feed.try(:last_published_entry).try(:to_s, :date) || "N/A" %></p>
                             </div>
                             <div class="stat">
-                                <p class="stat-title">Volume</p>
+                                <p class="stat-title stat-header">Volume</p>
                                 <p class="stat-body"><%= subscription_presenter.graph_volume %> articles / month</p>
                             </div>
                         </div>
                         <div class="recent-articles">
-                            <p><strong>Recent Articles</strong></p>
+                            <p class="stat-header">Recent Articles</p>
                             <ul>
-                                <% @subscription.feed.entries.order(published: :desc).limit(5).each do |entry| %>
+                                <% @subscription.feed.entries.order(published: :desc).limit(3).each do |entry| %>
                                     <% present entry do |entry_presenter| %>
                                         <li><%= entry.published.to_s(:day_month) %>: <a href="<%= entry.fully_qualified_url %>"><%= entry_presenter.title %></a></li>
                                     <% end %>

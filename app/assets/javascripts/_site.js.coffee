@@ -403,7 +403,7 @@ $.extend feedbin,
       context.lineJoin = 'round'
       context.fillStyle = $(canvas).data('fill')
       context.strokeStyle = $(canvas).data('stroke')
-      context.lineWidth = 2
+      context.lineWidth = 1
       context.lineCap = 'round'
 
       points = feedbin.buildPoints(values, canvasWidth, canvasHeight)
