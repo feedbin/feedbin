@@ -1,7 +1,7 @@
 require 'rmagick'
 class FaviconFetcher
   include Sidekiq::Worker
-  sidekiq_options retry: false, queue: :favicon
+  sidekiq_options retry: false
 
   def perform(host)
     favicon = Favicon.where(host: host).first_or_initialize
@@ -27,7 +27,7 @@ class FaviconFetcher
       data = download_favicon(favicon_url)
     end
 
-    if favicon.favicon != data
+    if data && favicon.favicon != data
       favicon.favicon = data
       Librato.increment('favicon.updated')
     end
@@ -81,6 +81,9 @@ class FaviconFetcher
     Base64.encode64(blob).gsub("\n", '')
   rescue
     nil
+  ensure
+    favicon && favicon.destroy!
+    favicons && favicons.map(&:destroy!)
   end
 
   def remove_blank_images(favicons)
