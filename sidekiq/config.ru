@@ -3,6 +3,9 @@ require 'sidekiq/web'
 
 Sidekiq::Web.app_url = ENV['FEEDBIN_URL']
 
+Sidekiq::Web.use Rack::Session::Cookie, secret: ENV["SECRET_KEY_BASE"]
+Sidekiq::Web.instance_eval { @middleware.rotate!(-1) }
+
 Sidekiq.configure_client do |config|
   config.redis = { :size => 1 }
 end
