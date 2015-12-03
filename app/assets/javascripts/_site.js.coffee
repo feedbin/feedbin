@@ -403,7 +403,7 @@ $.extend feedbin,
       context.lineJoin = 'round'
       context.fillStyle = $(canvas).data('fill')
       context.strokeStyle = $(canvas).data('stroke')
-      context.lineWidth = 2
+      context.lineWidth = 1
       context.lineCap = 'round'
 
       points = feedbin.buildPoints(values, canvasWidth, canvasHeight)
@@ -1280,7 +1280,7 @@ $.extend feedbin,
         return
 
     drawBarCharts: ->
-      $('canvas').each ()->
+      $('[data-behavior~=line_graph]').each ()->
         feedbin.drawBarChart(@, $(@).data('values'))
       return
 
@@ -1394,6 +1394,13 @@ $.extend feedbin,
     dragAndDrop: ->
       feedbin.droppable()
       feedbin.draggable()
+
+    resizeGraph: ->
+      if $("[data-behavior~=resize_graph]").length
+        $(window).resize(_.debounce(->
+          $('[data-behavior~=resize_graph]').each ()->
+            feedbin.drawBarChart(@, $(@).data('values'))
+        20))
 
     settingsCheckbox: ->
       $(document).on 'change', '.control-group [type="checkbox"]', (event) ->

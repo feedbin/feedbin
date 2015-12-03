@@ -4543,7 +4543,7 @@ Settings
             }
         }
         .favicon-wrap {
-            margin-top: 2px;
+            margin-top: 4px;
             position: static;
             box-shadow: none;
         }
@@ -4552,6 +4552,8 @@ Settings
             padding-left: 25px;
         }
         h3 {
+            font-size: 24px;
+            letter-spacing: -1px;
             margin: 0;
             a {
                 color: $text-color;
@@ -4565,19 +4567,22 @@ Settings
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
-            color: $selected;
+            margin: 0 0 20px 0;
+            a, a:hover {
+                color: $text-color-light;
+            }
         }
         .chart-wrap {
             line-height: 1;
             display: flex;
             margin-bottom: 20px;
-            background-color: #f4f6f8;
-            padding: 10px 7px 25px 7px;
+            padding: 15px 12px 30px 12px;
             border-radius: 3px;
+            background-color: #f4f6f8;
             border: 1px solid $border-color;
             .graph-wrap {
                 flex: 1 1 auto;
-                padding-top: 30%;
+                padding-top: 25%;
                 border-left: 1px solid $border-color;
                 border-bottom: 1px solid $border-color;
                 margin-left: 5px;
@@ -4618,12 +4623,11 @@ Settings
         }
         .stats {
             margin-top: 1px;
-            border-top: 1px solid $border-color;
             border-bottom: 1px solid $border-color;
-            padding: 15px 0;
+            padding: 0 0 15px 0;
             justify-content: space-between;
             display: flex;
-            text-align: center;
+            margin-bottom: 15px;
             @media (max-width: 528px) {
                 flex-direction: column;
                 text-align: left;
@@ -4640,10 +4644,6 @@ Settings
                 }
             }
             .stat-title {
-                margin: 0;
-                text-transform: uppercase;
-                font-size: 12px;
-                color: $text-color-light;
                 @media (max-width: 528px) {
                     display: inline;
                     font-size: 16px;
@@ -4656,7 +4656,6 @@ Settings
                 }
             }
             .stat-body {
-                font-weight: bold;
                 margin: 0;
                 @media (max-width: 528px) {
                     display: inline;
@@ -4664,18 +4663,22 @@ Settings
                 }
             }
         }
+        .stat-header {
+            margin: 0 0 5px 0;
+            text-transform: uppercase;
+            font-size: 12px;
+            color: $text-color-light;
+        }
         .recent-articles {
             padding-top: 20px;
-            p {
-                margin-bottom: 5px;
-            }
+            margin-bottom: 15px;
             ul {
                 margin: 0;
                 padding: 0;
                 list-style: none;
                 li {
                     color: $text-color-light;
-                    margin-bottom: 3px;
+                    margin-bottom: 8px;
                 }
             }
         }
