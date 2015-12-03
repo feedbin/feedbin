@@ -61,14 +61,14 @@ namespace :deploy do
   desc 'Restart services'
   task :restart, roles: [:app, :worker] do
     run "/etc/init.d/unicorn reload", roles: :app
-    run "sudo restart #{application} || true"
-    run "sudo restart workers", roles: :worker
-    run "sudo restart workers_slow", roles: :worker
+    run "sudo start #{application} || sudo restart #{application} || true"
+    run "sudo start workers || sudo restart workers", roles: :worker
+    run "sudo start workers_slow || sudo restart workers_slow", roles: :worker
   end
 
   desc 'Quiet Sidekiq'
   task :quiet, roles: :worker do
-    run "sudo pkill --signal USR1 -f '^sidekiq'"
+    run "sudo pkill --signal USR1 -f '^sidekiq'; true"
   end
 end
 
