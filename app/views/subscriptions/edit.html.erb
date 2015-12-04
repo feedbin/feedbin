@@ -1,4 +1,4 @@
-<%= form_for(@subscription) do |f| %>
+<%= form_for(@subscription, remote: true) do |f| %>
     <% present @subscription do |subscription_presenter| %>
     <div class="settings-content-inner feed-profile">
         <div class="settings-outer">
@@ -67,13 +67,13 @@
             </div>
             <ul class="control-group control-group-form">
                 <li>
-                    <%= f.check_box :muted %>
+                    <%= f.check_box :muted, data: {behavior: "auto_submit"} %>
                     <%= f.label :muted do %>
                         Muted <span class="slider-checkbox"></span>
                     <% end %>
                 </li>
                 <li>
-                    <%= f.check_box :show_updates %>
+                    <%= f.check_box :show_updates, data: {behavior: "auto_submit"} %>
                     <%= f.label :show_updates do %>
                         Show updates <span class="slider-checkbox"></span>
                     <% end %>
@@ -82,11 +82,6 @@
             <p class="control-group-description">
                 Tells you when an article has been changed after being published
             </p>
-
-            <div class="description-inset">
-              <%= f.submit "Save", class: "button-plain no-margin" %>
-            </div>
-
         </div>
     </div>
     <% end %>

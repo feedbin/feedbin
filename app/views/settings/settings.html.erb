@@ -11,24 +11,24 @@
         </div>
         <ul class="control-group control-group-form">
             <li>
-                <%= f.radio_button(:entry_sort, "DESC", {checked: @user.entry_sort.nil? || @user.entry_sort === 'DESC'}) %>
+                <%= f.radio_button(:entry_sort, "DESC", checked: @user.entry_sort.nil? || @user.entry_sort === 'DESC', data: {behavior: "auto_submit"}) %>
                 <%= f.label('entry_sort_desc', "Newest First") %>
             </li>
             <li>
-                <%= f.radio_button(:entry_sort, "ASC") %>
+                <%= f.radio_button(:entry_sort, "ASC", data: {behavior: "auto_submit"}) %>
                 <%= f.label('entry_sort_asc', "Oldest First") %>
             </li>
         </ul>
 
         <ul class="control-group control-group-form">
             <li>
-                <%= f.check_box :mark_as_read_confirmation %>
+                <%= f.check_box :mark_as_read_confirmation, data: {behavior: "auto_submit"} %>
                 <%= f.label :mark_as_read_confirmation do %>
                     Ask before marking all as read <span class="slider-checkbox"></span>
                 <% end %>
             </li>
             <li>
-                <%= f.check_box :sticky_view_inline %>
+                <%= f.check_box :sticky_view_inline, data: {behavior: "auto_submit"} %>
                 <%= f.label :sticky_view_inline do %>
                     Sticky Readability <span class="slider-checkbox"></span>
                 <% end %>
@@ -40,19 +40,19 @@
 
         <ul class="control-group control-group-form">
             <li>
-                <%= f.check_box :show_unread_count %>
+                <%= f.check_box :show_unread_count, data: {behavior: "auto_submit"} %>
                 <%= f.label :show_unread_count do %>
                     Unread count in title <span class="slider-checkbox"></span>
                 <% end %>
             </li>
             <li>
-                <%= f.check_box :hide_recently_read, {checked: @user.hide_recently_read.nil? || !@user.setting_on?(:hide_recently_read)}, "0", "1" %>
+                <%= f.check_box :hide_recently_read, {checked: @user.hide_recently_read.nil? || !@user.setting_on?(:hide_recently_read), data: {behavior: "auto_submit"}}, "0", "1" %>
                 <%= f.label :hide_recently_read do %>
                   Recently Read section <span class="slider-checkbox"></span>
                 <% end %>
             </li>
             <li>
-                <%= f.check_box :hide_updated, {checked: @user.hide_updated.nil? || !@user.setting_on?(:hide_updated)}, "0", "1" %>
+                <%= f.check_box :hide_updated, {checked: @user.hide_updated.nil? || !@user.setting_on?(:hide_updated), data: {behavior: "auto_submit"}}, "0", "1" %>
                 <%= f.label :hide_updated do %>
                   Updated section <span class="slider-checkbox"></span>
                 <% end %>
@@ -61,17 +61,18 @@
 
         <ul class="control-group control-group-form">
             <li>
-                <%= f.check_box :starred_feed_enabled %>
+                <%= f.check_box :starred_feed_enabled, data: {behavior: "auto_submit"} %>
                 <%= f.label :starred_feed_enabled do %>
                   Starred article feed <span class="slider-checkbox"></span>
                 <% end %>
             </li>
         </ul>
-        <% if @user.setting_on?(:starred_feed_enabled) %>
-            <p class="control-group-description">
-                Your starred feed: <a href="<%= starred_url(@user.starred_token, format: :xml) %>" style="word-break: break-all;"><%= starred_url(@user.starred_token, format: :xml) %></a>
-            </p>
-        <% end %>
+
+        <div data-behavior="starred_feed_url">
+            <% if @user.setting_on?(:starred_feed_enabled) %>
+                <%= render partial: 'shared/starred_feed_url', locals: {user: @user} %>
+            <% end %>
+        </div>
     </div>
 
     <div class="inset">
@@ -82,7 +83,7 @@
 
         <ul class="control-group control-group-form">
             <li>
-                <%= f.check_box :disable_image_proxy, {checked: @user.disable_image_proxy.nil? || !@user.setting_on?(:disable_image_proxy)}, "0", "1" %>
+                <%= f.check_box :disable_image_proxy, {checked: @user.disable_image_proxy.nil? || !@user.setting_on?(:disable_image_proxy), data: {behavior: "auto_submit"}}, "0", "1" %>
                 <%= f.label :disable_image_proxy do %>
                     Image proxy <span class="slider-checkbox"></span>
                 <% end %>

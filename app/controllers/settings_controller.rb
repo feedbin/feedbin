@@ -142,20 +142,22 @@ class SettingsController < ApplicationController
     @user.attributes = user_settings_params
     if @user.save
       respond_to do |format|
-        format.js { render nothing: true }
+        flash[:notice] = 'Settings updated.'
+        format.js {flash.discard()}
         format.html do
           if params[:redirect_to]
-            redirect_to params[:redirect_to], notice: 'Settings updated.'
+            redirect_to params[:redirect_to]
           else
-            redirect_to settings_path, notice: 'Settings updated.'
+            redirect_to settings_path
           end
         end
       end
     else
       respond_to do |format|
-        format.js { render nothing: true }
+        flash[:alert] = @user.errors.full_messages.join('. ') + '.'
+        format.js {flash.discard()}
         format.html do
-          redirect_to settings_path, alert: @user.errors.full_messages.join('. ') + '.'
+          redirect_to settings_path
         end
       end
     end

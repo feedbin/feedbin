@@ -1395,17 +1395,19 @@ $.extend feedbin,
       feedbin.droppable()
       feedbin.draggable()
 
+<<<<<<< HEAD
+    settingsCheckbox: ->
+      $(document).on 'change', '.control-group [type="checkbox"]', (event) ->
+        $(@).parents("form").submit()
+
+=======
     resizeGraph: ->
       if $("[data-behavior~=resize_graph]").length
         $(window).resize(_.debounce(->
           $('[data-behavior~=resize_graph]').each ()->
             feedbin.drawBarChart(@, $(@).data('values'))
         20))
-
-    settingsCheckbox: ->
-      $(document).on 'change', '[data-behavior~=auto_submit]', (event) ->
-        $(@).parents("form").submit()
-
+>>>>>>> feed_settings
 
 $.each feedbin.preInit, (i, item) ->
   item()

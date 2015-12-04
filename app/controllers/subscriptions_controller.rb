@@ -109,12 +109,25 @@ class SubscriptionsController < ApplicationController
     redirect_to settings_feeds_url, notice: "You have unsubscribed."
   end
 
-
   def edit
     @user = current_user
     @subscription = @user.subscriptions.find(params[:id])
     render layout: "settings"
   end
 
+  def update
+    @user = current_user
+    @subscription = @user.subscriptions.find(params[:id])
+    if @subscription.update(subscription_params)
+      flash[:notice] = "Settings updated."
+    else
+      flash[:alert] = "Update failed."
+    end
+    flash.discard()
+  end
+
+  def subscription_params
+    params.require(:subscription).permit(:muted, :show_updates)
+  end
 
 end

@@ -97,13 +97,6 @@ class FeedsController < ApplicationController
     end
   end
 
-  def toggle_muted
-    user = current_user
-    subscription = user.subscriptions.where(feed_id: params[:id]).take!
-    subscription.toggle!(:muted)
-    render nothing: true
-  end
-
   def update_styles
     user = current_user
     @feed_ids = user.subscriptions.where(show_updates: false).pluck(:feed_id)
