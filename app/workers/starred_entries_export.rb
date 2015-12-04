@@ -1,6 +1,5 @@
 class StarredEntriesExport
   include Sidekiq::Worker
-  sidekiq_options queue: :worker_slow_critical
 
   def perform(user_id)
     user = User.find(user_id)

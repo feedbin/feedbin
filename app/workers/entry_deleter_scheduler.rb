@@ -1,6 +1,5 @@
 class EntryDeleterScheduler
   include Sidekiq::Worker
-  sidekiq_options queue: :worker_slow
 
   def perform
     Feed.select(:id).find_in_batches(batch_size: 10_000) do |feeds|

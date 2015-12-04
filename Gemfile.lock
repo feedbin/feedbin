@@ -67,14 +67,6 @@ GIT
       rake
       rest-client (~> 1.6)
 
-GIT
-  remote: git://github.com/sosedoff/capistrano-unicorn.git
-  revision: 52376ad3d1fb20c21b7d79806bcf79fb91c78471
-  ref: 52376ad
-  specs:
-    capistrano-unicorn (0.1.9)
-      capistrano
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -513,7 +505,6 @@ DEPENDENCIES
   better_errors
   bust_rails_etags
   capistrano!
-  capistrano-unicorn!
   carrierwave
   carrierwave_direct
   clockwork
