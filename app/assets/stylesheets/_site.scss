@@ -1210,6 +1210,14 @@ th {
         border-left: none;
         border-right: none;
     }
+    &.smooth-top {
+        padding-top: 0;
+        .control-group:first-child {
+            border-top: none;
+            border-radius: 8px 8px 0 0;
+            padding-top: 30px;
+        }
+    }
     @media (max-width: 528px) {
         border: none;
         background-color: transparent;
