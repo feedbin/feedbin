@@ -1,3 +1,5 @@
+require 'sidekiq/api'
+
 class FeedRefresherScheduler
   include Sidekiq::Worker
   sidekiq_options queue: :critical
