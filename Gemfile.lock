@@ -12,8 +12,8 @@ GIT
 
 GIT
   remote: git://github.com/feedbin/feedjira.git
-  revision: de95ec64d6ce89b1d6077d96ecc0bbc6d0496b82
-  ref: de95ec6
+  revision: 1e60a3983139d68610564c2ab9be0a252c145df4
+  ref: 1e60a39
   specs:
     feedjira (1.6.1)
       curb (~> 0.8)

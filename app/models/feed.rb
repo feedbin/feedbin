@@ -45,6 +45,7 @@ class Feed < ActiveRecord::Base
     self.title         = feed.title
     self.feed_url      = feed.feed_url
     self.site_url      = feed.url
+    self.self_url      = feed.self_url
   end
 
   def check

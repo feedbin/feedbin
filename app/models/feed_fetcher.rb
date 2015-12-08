@@ -181,6 +181,7 @@ class FeedFetcher
       feedjira.last_modified = feedjira.last_modified
       feedjira.title         = feedjira.title ? feedjira.title.strip : '(No title)'
       feedjira.feed_url      = feedjira.feed_url.strip
+      feedjira.self_url      = self_url(feedjira)
       feedjira.url           = feedjira.url ? feedjira.url.strip : nil
       feedjira.entries.map do |entry|
         if entry.try(:content)
@@ -228,6 +229,19 @@ class FeedFetcher
       end
     end
     feedjira
+  end
+
+  def self_url(feedjira)
+    url = feedjira.feed_url
+    if feedjira.self_url
+      url = feedjira.self_url.strip
+      if !url.match(/^http/)
+        url = URI.join(feedjira.feed_url, url).to_s
+      end
+    end
+    url
+  rescue
+    feedjira.feed_url
   end
 
   def log(message)

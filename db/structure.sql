@@ -363,7 +363,8 @@ CREATE TABLE feeds (
     protected boolean DEFAULT false,
     push_expiration timestamp without time zone,
     last_published_entry timestamp without time zone,
-    host text
+    host text,
+    self_url text
 );
 
 
@@ -2030,4 +2031,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151011143618');
 INSERT INTO schema_migrations (version) VALUES ('20151019200512');
 
 INSERT INTO schema_migrations (version) VALUES ('20151110044837');
+
+INSERT INTO schema_migrations (version) VALUES ('20151207224028');
 
