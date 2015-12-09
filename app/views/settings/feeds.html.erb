@@ -28,13 +28,13 @@
             </div>
             <div class="half por">
                 <input type="checkbox" class="feeds-checkbox" data-behavior="toggle_checked" />
-                <div class="dropdown-wrap feed-dropdown">
+                <div class="dropdown-wrap dropdown-left feed-dropdown">
                     <button class="feeds-toolbar-button button-caret" data-behavior="toggle_dropdown feed_actions">Actions</button>
                     <div class="dropdown-content">
                         <ul>
                             <li data-operation="unsubscribe"><span>Unsubscribe</span></li>
-                            <li data-operation="show_updates"><span class="no-border">Show updates on articles</span></li>
-                            <li data-operation="hide_updates"><span>Hide updates on articles</span></li>
+                            <li data-operation="show_updates"><span class="no-border">Show edits on articles</span></li>
+                            <li data-operation="hide_updates"><span>Hide edits on articles</span></li>
                             <li data-operation="mute"><span class="no-border">Mute Feed</span></li>
                             <li data-operation="unmute"><span>Unmute Feed</span></li>
                         </ul>
@@ -48,10 +48,12 @@
             <% @subscriptions.each do |subscription| %>
                 <% present subscription do |subscription_presenter| %>
                     <%= fields_for "subscriptions[]", subscription do |f| %>
-                        <li data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>" data-sort-post-volume="<%= subscription.post_volume %>">
+                        <li class="feeds-wrap" data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>" data-sort-post-volume="<%= subscription.post_volume %>">
+                            <div class="checkbox-wrap">
+                                <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "checkbox feeds-checkbox" %>
+                            </div>
                             <%= link_to settings_subscriptions_edit_path(subscription.id), class: "subscription-link" do %>
                                 <span class="subscription-data">
-                                    <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "checkbox" %>
                                     <span class="favicon-container">
                                         <%= subscription_presenter.favicon(subscription.host) %>
                                     </span>

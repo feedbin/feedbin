@@ -3129,6 +3129,26 @@ $saved-search-control-height: 48px;
             }
         }
     }
+    &.dropdown-left {
+        .dropdown-content {
+            left: 0 !important;
+        }
+        ul:first-child li {
+            &:first-child {
+                @include arrow(
+                    $x-position: 20px,
+                    $y-position: -7px,
+                    $arrow-color: #FFF,
+                    $arrow-color-night: $list-background-color-night,
+                    $arrow-color-sunset: $list-background-color-sunset,
+                    $shadow-color: $border-color,
+                    $shadow-color-night: $border-color-night,
+                    $shadow-color-sunset: $border-color-sunset,
+                    $origin: left,
+                    $invert: true);
+            }
+        }
+    }
     .share-keyboard {
         font-size: 11px;
         position: absolute;
@@ -4712,19 +4732,36 @@ Settings
             position: relative;
             padding: 0;
         }
+        .feeds-wrap {
+            position: relative;
+        }
+        .checkbox-wrap {
+            display: flex;
+            align-items: center;
+            position: absolute;
+            z-index: 1000;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            @media (max-width: 528px) {
+                left: 15px;
+            }
+        }
+        .feeds-checkbox {
+            margin: 0 !important;
+            padding: 0;
+        }
         .subscription-link {
             display: flex;
             justify-content: space-between;
             color: $text-color;
-            padding: 13px 30px;
-            padding-left: 30px;
-            padding-top: 13px;
-            padding-bottom: 13px;
+            padding: 13px 30px 13px 64px;
             &:hover {
                 text-decoration: none;
             }
             @media (max-width: 528px) {
-                padding: 13px 15px;
+                padding: 13px 15px 13px 49px;
             }
         }
         .subscription-data {
@@ -4740,10 +4777,6 @@ Settings
             background-size: 12px 18px;
             width: 70px;
             padding-right: 20px;
-        }
-        .checkbox {
-            margin-right: 20px;
-            flex-shrink: 0;
         }
         .favicon-container {
             display: block;
