@@ -1,76 +1,98 @@
 class ParsedEntry
 
-  attr_accessor :entry
-  
-  def initialize(entry:, feed:, base_feed_url: nil)
-    @entry = {
-      content: get_content(entry)
-      author: entry.author ? entry.author.strip : nil
-      content: content ? content.strip : nil
-      title: entry.title ? entry.title.strip : nil
-      url: entry.url ? entry.url.strip : nil
-      published: entry.published ? entry.published : nil
-      updated: entry.updated ? entry.updated : nil
-      entry_id: entry.entry_id ? entry.entry_id.strip : nil
-      public_id: build_public_id(entry, feed, base_feed_url)
-      data: get_data(entry)
-    }
+  ENTRY_ATTRIBUTES = %i(author content data entry_id public_id published source title url).freeze
+
+  def initialize(entry, feed_url)
+    @entry = entry
+    @feed_url = feed_url
   end
 
-  private
-
-  def get_content(entry)
-    content = nil
-    if entry.try(:content)
-      content = entry.content
-    elsif entry.try(:summary)
-      content = entry.summary
-    elsif entry.try(:description)
-      content = entry.description
+  def author
+    @author ||= begin
+      value = nil
+      if @entry.try(:author)
+        value = @entry.author
+      elsif @entry.try(:itunes_author)
+        value = @entry.itunes_author
+      end
+      value
     end
-    content
   end
 
-  def get_data(entry)
-    data = {}
-    if entry.try(:enclosure_type) && entry.try(:enclosure_url)
-      data[:enclosure_type] = entry.enclosure_type ? entry.enclosure_type : nil
-      data[:enclosure_url] = entry.enclosure_url ? entry.enclosure_url : nil
-      data[:enclosure_length] = entry.enclosure_length ? entry.enclosure_length : nil
-      data[:itunes_duration] = entry.itunes_duration ? entry.itunes_duration : nil
+  def content
+    @content ||= begin
+      value = nil
+      if @entry.try(:content)
+        value = @entry.content
+      elsif @entry.try(:summary)
+        value = @entry.summary
+      elsif @entry.try(:description)
+        value = @entry.description
+      elsif @entry.try(:media_description)
+        value = @entry.media_description
+      end
+      value
     end
-    data
   end
 
-  # This is the id strategy
-  # All values are stripped
-  # feed url + id
-  # feed url + link + utc iso 8601 date
-  # feed url + link + title
+  def data
+    value = {}
+    value[:enclosure_type]   = @entry.enclosure_type if @entry.try(:enclosure_type)
+    value[:enclosure_url]    = @entry.enclosure_url if @entry.try(:enclosure_url)
+    value[:enclosure_length] = @entry.enclosure_length if @entry.try(:enclosure_length)
+    value[:itunes_duration]  = @entry.itunes_duration if @entry.try(:itunes_duration)
+    value[:youtube_video_id] = @entry.youtube_video_id if @entry.try(:youtube_video_id)
+    value[:media_width]      = @entry.media_width if @entry.try(:media_width)
+    value[:media_height]     = @entry.media_height if @entry.try(:media_height)
+    value
+  end
 
-  # WARNING: changes to this will break how entries are identified
-  # This can only be changed with backwards compatibility in mind
-  def build_public_id(entry, feed, base_feed_url = nil)
-    if base_feed_url
-      id_string = base_feed_url.dup
-    else
-      id_string = feed.feed_url.dup
-    end
+  def entry_id
+    @entry.entry_id ? @entry.entry_id.strip : nil
+  end
 
-    if entry.entry_id
-      id_string << entry.entry_id.dup
-    else
-      if entry.url
-        id_string << entry.url.dup
+  def public_id
+    @public_id ||= begin
+      id_string = @feed_url.dup
+      if @entry.entry_id
+        id_string << @entry.entry_id.dup
+      else
+        if @entry.url
+          id_string << @entry.url.dup
+        end
+        if @entry.published
+          id_string << @entry.published.iso8601
+        end
+        if @entry.title
+          id_string << @entry.title.dup
+        end
       end
-      if entry.published
-        id_string << entry.published.iso8601
-      end
-      if entry.title
-        id_string << entry.title.dup
+      Digest::SHA1.hexdigest(id_string)
+    end
+  end
+
+  def published
+    @entry.published || Time.now
+  end
+
+  def source
+    "Feedbin"
+  end
+
+  def title
+    @entry.title ? @entry.title.strip : nil
+  end
+
+  def url
+    @entry.url ? @entry.url.strip : nil
+  end
+
+  def to_entry
+    @to_entry ||= begin
+      ENTRY_ATTRIBUTES.each_with_object({}) do |attribute, hash|
+        hash[attribute] = self.send(attribute)
       end
     end
-    Digest::SHA1.hexdigest(id_string)
   end
 
 end

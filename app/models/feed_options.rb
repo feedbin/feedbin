@@ -31,7 +31,7 @@ class FeedOptions
 
   def format_href(href)
     href = href.strip
-    href = href.gsub(/^feed:\/\//, 'http://')
+    href = href.gsub(/^feed:/, 'http:')
     if !href.start_with?('http')
       href = URI.join(@url, href).to_s
     end

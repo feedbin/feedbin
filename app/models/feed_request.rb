@@ -87,11 +87,8 @@ class FeedRequest
   def clean_url
     url = @url
     url = url.strip
-    url = url.gsub(/^ht*p(s?):?\/*/, 'http\1://')
-    url = url.gsub(/^feed:\/\//, 'http://')
-    if url !~ /^https?:\/\//
-      url = "http://#{url}"
-    end
+    url = url.gsub(/^ht*p(s?):?\/*/, "http\1://")
+    url = url.gsub(/^feed:/, "http:")
     Addressable::URI.heuristic_parse(url).to_s
   end
 
