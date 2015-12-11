@@ -8,7 +8,7 @@ class FeedOptions
     @document ||= Nokogiri::HTML(@html)
   end
 
-  def links
+  def perform
     @links ||= begin
       options = document.search("link[rel='alternate']").each_with_object([]) do |link, array|
         if link_valid?(link)
