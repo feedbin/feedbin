@@ -22,7 +22,7 @@ class FeedRequest
   end
 
   def format
-    if /^\s*<(?:!DOCTYPE\s+)?html[\s>]/i === body[0, 512]
+    if body && /^\s*<(?:!DOCTYPE\s+)?html[\s>]/i === body[0, 512]
       :html
     else
       :xml
@@ -34,13 +34,15 @@ class FeedRequest
   end
 
   def last_modified
-    Time.parse(headers[:last_modified])
-  rescue
-    nil
+    @last_modified ||= begin
+      Time.parse(headers[:last_modified])
+    rescue
+      nil
+    end
   end
 
   def etag
-    headers[:etag] ? headers[:etag].gsub(/^"/, "").gsub(/"$/, "") : nil
+    @etag ||= headers[:etag] ? headers[:etag].gsub(/^"/, "").gsub(/"$/, "") : nil
   end
 
   def headers
@@ -87,9 +89,12 @@ class FeedRequest
   def clean_url
     url = @url
     url = url.strip
-    url = url.gsub(/^ht*p(s?):?\/*/, "http\1://")
-    url = url.gsub(/^feed:/, "http:")
-    Addressable::URI.heuristic_parse(url).to_s
+    url = url.gsub(/^ht*p(s?):?\/*/, 'http\1://')
+    url = url.gsub(/^feed:\/\//, 'http://')
+    if url !~ /^https?:\/\//
+      url = "http://#{url}"
+    end
+    url
   end
 
 end

@@ -25,7 +25,7 @@ feedbin.Counts.get(feedbin.count_data);
             <%= render partial: 'shared/hamburger_menu_button' %>
         </div>
         <div class="subscribe-wrap">
-            <%= form_for :subscription, url: subscriptions_path, remote: true, html: { data: {behavior: 'subscription_form'}, novalidate: 'novalidate' }  do |f| %>
+            <%= form_for :subscription, url: subscriptions_path, remote: true, html: { data: {behavior: 'subscription_form'}, novalidate: 'novalidate', autocomplete: 'off' }  do |f| %>
                 <%= f.fields_for :feeds do |builder| %>
                     <%= builder.url_field :feed_url, placeholder: 'Feed or URL' %>
                 <% end %>

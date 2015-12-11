@@ -9,34 +9,18 @@ class FeedOptions
   end
 
   def perform
-    @links ||= begin
+    @perform ||= begin
       options = document.search("link[rel='alternate']").each_with_object([]) do |link, array|
         if link_valid?(link)
-          option = {
-            href: format_href(link["href"]),
-            title: format_title(link["title"]) || link["href"]
-          }
+          option = FeedOption.new(@url, link["href"], link["title"])
           array.push(option)
         end
       end
-      options.uniq { |link| link[:title] }
+      options.uniq { |option| option.title }
     end
   end
 
   private
-
-  def format_title(title)
-    title.respond_to?(:gsub) ? title.gsub(/\s*(RSS[\s0-9\.]*|Atom)/i, "") : title
-  end
-
-  def format_href(href)
-    href = href.strip
-    href = href.gsub(/^feed:/, 'http:')
-    if !href.start_with?('http')
-      href = URI.join(@url, href).to_s
-    end
-    href
-  end
 
   def link_valid?(link)
     valid = false

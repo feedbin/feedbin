@@ -25,23 +25,30 @@ class SubscriptionsController < ApplicationController
   def create
     @user = current_user
 
-    feeds = [*params[:subscription][:feeds][:feed_url]]
-    site_url = params[:subscription][:site_url]
+    feed_urls = [*params[:subscription][:feeds][:feed_url]]
     @results = { success: [], options: [], failed: [] }
 
-    feeds.each do |feed|
+    feed_urls.each do |feed_url|
       begin
-        result = FeedFetcher.new(feed, site_url).create_feed!
-        if result.feed
-          @user.safe_subscribe(result.feed)
-          @results[:success].push(result.feed)
-        elsif result.feed_options.any?
-          @results[:options].push(result.feed_options)
+        finder = FeedFinder.new(feed_url)
+        if finder.options.length == 0
+          @results[:failed].push(feed_url)
+        elsif finder.options.length == 1
+          feed = finder.create_feed(finder.options.first)
+          if feed
+            @user.safe_subscribe(feed)
+            @results[:success].push(feed)
+          else
+            @results[:failed].push(feed_url)
+          end
         else
-          @results[:failed].push(feed)
+          @results[:options].push(finder.options)
         end
       rescue Exception => e
+        logger.info { "exception ---------------------------" }
         logger.info { e.inspect }
+        logger.info { e.backtrace.inspect }
+        logger.info { "exception ---------------------------" }
         Honeybadger.notify(e)
         @results[:failed].push(feed)
       end
