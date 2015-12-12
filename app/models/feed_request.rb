@@ -2,8 +2,9 @@ class FeedRequest
 
   attr_reader :url
 
-  def initialize(url, clean = false)
+  def initialize(url:, clean: false, options: {})
     @url = url
+    @options = options
     if clean
       @url = clean_url
     end
@@ -42,7 +43,17 @@ class FeedRequest
   end
 
   def etag
-    @etag ||= headers[:etag] ? headers[:etag].gsub(/^"/, "").gsub(/"$/, "") : nil
+    @etag ||= begin
+      content = headers[:etag]
+      if content && content.match(/^"/) && content.match(/"$/)
+        content = content.gsub(/^"/, "").gsub(/"$/, "")
+      end
+      content
+    end
+  end
+
+  def status
+    @status ||= response.response_code
   end
 
   def headers
@@ -76,7 +87,13 @@ class FeedRequest
 
   def response
     @response ||= Curl::Easy.perform(@url) do |curl|
-      curl.headers["User-Agent"] = "Feedbin"
+      if @options.has_key?(:if_modified_since)
+        curl.headers["If-Modified-Since"] = @options[:if_modified_since].httpdate
+      end
+      if @options.has_key?(:if_none_match)
+        curl.headers["If-None-Match"] = @options[:if_none_match]
+      end
+      curl.headers["User-Agent"] = @options[:user_agent] || "Feedbin"
       curl.headers["Accept-Encoding"] = "gzip"
       curl.connect_timeout = 10
       curl.follow_location = true

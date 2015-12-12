@@ -33,29 +33,29 @@ describe SubscriptionsController do
     end
   end
 
-  describe "#create" do
-    it "works" do
-      user = create(:user)
-      sign_in user
-
-      fake_feed_fetcher = double(feed: create(:feed))
-      allow_any_instance_of(FeedFetcher).to receive(:create_feed!).and_return(fake_feed_fetcher)
-
-      expect {
-        post :create, subscription: {
-          site_url: 'http://tema.livejournal.com/',
-          feeds: {
-            feed_url: 'http://tema.livejournal.com/feed.rss'
-          }
-        }, format: :js
-      }.to change(Subscription, :count).by(1)
-
-      expect(response.status).to eq 200
-
-      results = assigns(:results)
-      expect(results[:success].size).to eq 1
-    end
-  end
+  # describe "#create" do
+  #   it "works" do
+  #     user = create(:user)
+  #     sign_in user
+  #
+  #     fake_feed_fetcher = double(feed: create(:feed))
+  #     allow_any_instance_of(FeedFetcher).to receive(:create_feed!).and_return(fake_feed_fetcher)
+  #
+  #     expect {
+  #       post :create, subscription: {
+  #         site_url: 'http://tema.livejournal.com/',
+  #         feeds: {
+  #           feed_url: 'http://tema.livejournal.com/feed.rss'
+  #         }
+  #       }, format: :js
+  #     }.to change(Subscription, :count).by(1)
+  #
+  #     expect(response.status).to eq 200
+  #
+  #     results = assigns(:results)
+  #     expect(results[:success].size).to eq 1
+  #   end
+  # end
 
   describe "#update_multiple" do
     context "unsubscribe" do

@@ -6,20 +6,16 @@ class EmailsController < ApplicationController
   respond_to :json
 
   def create
-    user = User.find_by(inbound_email_token: params[:MailboxHash])
-    if user.present?
-      url = params[:TextBody].try(:strip)
-      result = FeedFetcher.new(url).create_feed!
-      if result.feed
-        user.safe_subscribe(result.feed)
-      elsif result.feed_options.any?
-        result = FeedFetcher.new(result.feed_options.first[:href]).create_feed!
-        if result.feed
-          user.safe_subscribe(result.feed)
+    if user = User.find_by(inbound_email_token: params[:MailboxHash])
+      feed_url = params[:TextBody].try(:strip)
+      finder = FeedFinder.new(feed_url)
+      if finder.options.any?
+        feed = finder.create_feed(finder.options.first)
+        if feed
+          user.safe_subscribe(feed)
         end
       end
     end
-  rescue Exception
   ensure
     render nothing: true
   end

@@ -27,7 +27,7 @@ class ParsedFeed
       if feed.url
         url = feed.url
       else
-        if feed.feed_url =~ /feedburner\.com/
+        if feed_url =~ /feedburner\.com/
           url = last_effective_url(feed.entries.first.url)
           url = url_from_host(url)
         else
@@ -40,11 +40,11 @@ class ParsedFeed
 
   def self_url
     @self_url ||= begin
-      url = feed.feed_url
+      url = feed_url
       if feed.self_url
         url = feed.self_url.strip
         if !url.match(/^http/)
-          url = URI.join(feed.feed_url, url).to_s
+          url = URI.join(feed_url, url).to_s
         end
       end
       url
@@ -95,6 +95,18 @@ class ParsedFeed
   def url_from_host(link)
     uri = URI.parse(link)
     URI::HTTP.build(host: uri.host).to_s
+  end
+
+  def last_effective_url(url)
+    result = Curl::Easy.http_head(url) do |curl|
+      curl.headers["User-Agent"] = "Feedbin"
+      curl.connect_timeout = 5
+      curl.follow_location = true
+      curl.max_redirects = 5
+      curl.ssl_verify_peer = false
+      curl.timeout = 5
+    end
+    result.last_effective_url
   end
 
 end

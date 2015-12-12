@@ -1,5 +1,3 @@
-require 'yajl'
-
 class Import < ActiveRecord::Base
   mount_uploader :upload, ImportUploader
 
@@ -31,17 +29,6 @@ class Import < ActiveRecord::Base
     tags = Set.new
     feeds.each {|feed| tags.add(feed[:tag]) unless feed[:tag].nil? }
     tags.each {|tag| Tag.where(name: tag).first_or_create! }
-  end
-
-
-  def build_starred_import_job
-    parser = Yajl::Parser.new(symbolize_keys: true)
-    starred = parser.parse(upload.read)
-    if starred[:items] && starred[:items].length > 0
-      starred[:items].each do |item|
-        self.import_items << ImportItem.new(details: item, item_type: 'starred')
-      end
-    end
   end
 
 end

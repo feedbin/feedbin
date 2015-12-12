@@ -11,7 +11,7 @@ class FeedFinder
       if option = existing_option(@url)
         options.push(option)
       else
-        @cache[@url] = FeedRequest.new(@url, true)
+        @cache[@url] = FeedRequest.new(url: @url, clean: true)
         if @cache[@url].format == :html
           options = FeedOptions.new(@cache[@url].body, @cache[@url].last_effective_url).perform
         else
@@ -29,11 +29,11 @@ class FeedFinder
 
     request = @cache[option.href]
     if !request
-      request = FeedRequest.new(option.href)
+      request = FeedRequest.new(url: option.href)
     end
 
     feed = Feed.where(feed_url: option.href).take
-    if !feed && request.format == :xml
+    if !feed && request.body.present? && request.format == :xml
       parsed_feed = ParsedFeed.new(request.body, request)
       feed = Feed.create_from_parsed_feed(parsed_feed)
     end

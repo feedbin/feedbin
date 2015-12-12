@@ -44,8 +44,12 @@ class Feed < ActiveRecord::Base
     unless etag.blank?
       options[:if_none_match] = etag
     end
-    feed_fetcher = FeedFetcher.new(feed_url)
-    feed_fetcher.fetch_and_parse(options, feed_url)
+    request = FeedRequest.new(url: self.feed_url, options: options)
+    result = request.status
+    if request.body
+      result = ParsedFeed.new(request.body, request)
+    end
+    result
   end
 
   def self.include_user_title

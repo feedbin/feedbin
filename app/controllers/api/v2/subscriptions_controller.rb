@@ -46,22 +46,25 @@ module Api
 
       def create
         @user = current_user
-        begin
-          result = FeedFetcher.new(params[:feed_url]).create_feed!
-          if result.feed
-            status = @user.subscribed_to?(result.feed) ? :found : :created
-            @subscription = @user.safe_subscribe(result.feed)
+        finder = FeedFinder.new(params[:feed_url])
+        if finder.options.length == 0
+          status_not_found
+        elsif finder.options.length == 1
+          feed = finder.create_feed(finder.options.first)
+          if feed
+            status = @user.subscribed_to?(feed) ? :found : :created
+            @subscription = @user.safe_subscribe(feed)
             render status: status, location: api_v2_subscription_url(@subscription, format: :json)
-          elsif result.feed_options.any?
-            @options = result.feed_options
-            render status: :multiple_choices
           else
             status_not_found
           end
-        rescue Exception => e
-          status_not_found
-          Honeybadger.notify(e)
+        else
+          @options = finder.options
+          render status: :multiple_choices
         end
+      rescue Exception => e
+        status_not_found
+        Honeybadger.notify(e)
       end
 
       def destroy
