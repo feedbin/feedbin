@@ -1,5 +1,5 @@
 module BatchJobs
-  BATCH_SIZE = 2
+  BATCH_SIZE = 5_000
 
   def job_args(total_records, *args)
     batch_count = (total_records.to_f/BATCH_SIZE.to_f).ceil
