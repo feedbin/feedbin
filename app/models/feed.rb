@@ -13,6 +13,8 @@ class Feed < ActiveRecord::Base
 
   attr_accessor :count, :tags
 
+  UPDATABLE_ATTRIBUTES = %w(etag last_modified self_url site_url title).freeze
+
   def tag(names, user, delete_existing = true)
     taggings = []
     if delete_existing

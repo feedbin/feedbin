@@ -12,8 +12,8 @@ GIT
 
 GIT
   remote: git://github.com/feedbin/feedjira.git
-  revision: 1e60a3983139d68610564c2ab9be0a252c145df4
-  ref: 1e60a39
+  revision: 43ba9b453cad27461d05e4db7a5b8da93e327d44
+  ref: 43ba9b4
   specs:
     feedjira (1.6.1)
       curb (~> 0.8)
@@ -153,7 +153,7 @@ GEM
     concurrent-ruby (1.0.0)
     connection_pool (2.2.0)
     crass (1.0.2)
-    curb (0.8.8)
+    curb (0.9.0)
     dalli (2.7.4)
     diff-lcs (1.2.5)
     docile (1.1.5)

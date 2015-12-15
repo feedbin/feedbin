@@ -111,13 +111,10 @@ class FeedRefresherReceiver
   end
 
   def update_feed(update, feed)
-    if update['feed']['title'].present?
-      feed.title = update['feed']['title']
+    attributes = update['feed'].select do |key, value|
+      Feed::UPDATABLE_ATTRIBUTES.include?(key)
     end
-    feed.etag = update['feed']['etag']
-    feed.last_modified = update['feed']['last_modified']
-    feed.self_url = update['feed']['self_url']
-    feed.save
+    feed.update(attributes)
   end
 
 end
