@@ -47,7 +47,14 @@ class FeedRefresher
     end
 
     def to_a
-      [@feed[:id], @feed[:feed_url], @feed[:etag], @feed[:last_modified], @feed[:subscriptions_count], @body, push_callback, hub_secret]
+      options = {
+        etag: @feed[:etag],
+        last_modified: @feed[:last_modified],
+        subscriptions_count: @feed[:subscriptions_count],
+        push_callback: push_callback,
+        hub_secret: hub_secret
+      }
+      [@feed[:id], @feed[:feed_url], options]
     end
 
     private

@@ -47,7 +47,7 @@ class FeedsController < ApplicationController
     if request.get?
       if params['hub.mode'] == 'subscribe'
         @feed = Feed.find(params[:id])
-        if @feed.feed_url != params['hub.topic']
+        if @feed.self_url != params['hub.topic']
           render_404
         else
           @feed.update_attributes(push_expiration: Time.now + (params['hub.lease_seconds'].to_i/2).seconds)
@@ -64,7 +64,7 @@ class FeedsController < ApplicationController
       signature = OpenSSL::HMAC.hexdigest('sha1', secret, body)
       if request.headers['HTTP_X_HUB_SIGNATURE'] == "sha1=#{signature}"
         Sidekiq::Client.push_bulk(
-          'args'  => [[feed.id, feed.feed_url, nil, nil, feed.subscriptions_count, body]],
+          'args'  => [[feed.id, feed.feed_url, {xml: body}]],
           'class' => 'FeedRefresherFetcherCritical',
           'queue' => 'feed_refresher_fetcher_critical',
           'retry' => false
