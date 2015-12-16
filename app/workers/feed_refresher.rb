@@ -52,7 +52,8 @@ class FeedRefresher
         last_modified: @feed[:last_modified],
         subscriptions_count: @feed[:subscriptions_count],
         push_callback: push_callback,
-        hub_secret: hub_secret
+        hub_secret: hub_secret,
+        push_mode: push_mode
       }
       [@feed[:id], @feed[:feed_url], options]
     end
@@ -65,6 +66,10 @@ class FeedRefresher
 
     def hub_secret
       (push?) ? Push::hub_secret(@feed[:id]) : nil
+    end
+
+    def push_mode
+      (push?) ? "subscribe" : nil
     end
 
     def push?
