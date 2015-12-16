@@ -9,11 +9,7 @@ class FeedRefresherScheduler
   STRATEGY_KEY = "last_refresh:strategy".freeze
 
   def perform
-    queues = Sidekiq::Stats.new().queues
-    if queues['feed_refresher_fetcher'].blank? || queues['feed_refresher_fetcher'] == 0
-      refresh_feeds
-      Librato.increment 'refresh_feeds'
-    end
+    refresh_feeds if refresh_queue_empty?
   end
 
   def refresh_feeds
@@ -27,6 +23,7 @@ class FeedRefresherScheduler
         'queue' => 'worker_slow_critical'
       )
     end
+    Librato.increment 'refresh_feeds'
   end
 
   def priority?
@@ -44,6 +41,11 @@ class FeedRefresherScheduler
     else
       Sidekiq.redis {|client| client.set(STRATEGY_KEY, "all")}
     end
+  end
+
+  def refresh_queue_empty?
+    queues = Sidekiq::Stats.new().queues
+    queues['feed_refresher_fetcher'].blank? || queues['feed_refresher_fetcher'] == 0
   end
 
 end
