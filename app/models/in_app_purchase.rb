@@ -27,6 +27,7 @@ class InAppPurchase < ActiveRecord::Base
     new_expires_at = base_date + product[:time]
     user.plan = Plan.find_by_stripe_id("timed")
     user.expires_at = new_expires_at
+    user.suspended = false
     user.save
   end
 
