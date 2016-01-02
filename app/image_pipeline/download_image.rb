@@ -44,11 +44,9 @@ class DownloadImage
   end
 
   def headers_valid?(headers)
-    begin
-      headers["content-type"].first == "image/jpeg" && headers["content-length"].first.to_i > 20_000
-    rescue
-      false
-    end
+    headers["content-type"].first == "image/jpeg" && headers["content-length"].first.to_i > 20_000
+  rescue
+    false
   end
 
   def to_h
