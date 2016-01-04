@@ -49,9 +49,9 @@
                 <% present subscription do |subscription_presenter| %>
                     <%= fields_for "subscriptions[]", subscription do |f| %>
                         <li class="feeds-wrap" data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>" data-sort-post-volume="<%= subscription.post_volume %>">
-                            <div class="checkbox-wrap">
+                            <label class="checkbox-wrap">
                                 <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "checkbox feeds-checkbox" %>
-                            </div>
+                            </label>
                             <%= link_to settings_subscriptions_edit_path(subscription.id), class: "subscription-link" do %>
                                 <span class="subscription-data">
                                     <span class="favicon-container">

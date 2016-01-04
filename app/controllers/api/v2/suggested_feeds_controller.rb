@@ -3,6 +3,7 @@ module Api
     class SuggestedFeedsController < ApiController
 
       respond_to :json
+      skip_before_action :valid_user
 
       def index
         @suggested_feeds = SuggestedFeed.limit(200).includes(:feed)

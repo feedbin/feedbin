@@ -5,6 +5,7 @@ module Api
       respond_to :json
 
       before_action :validate_content_type, only: [:create]
+      skip_before_action :valid_user
 
       def create
         @user = current_user

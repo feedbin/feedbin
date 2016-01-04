@@ -6,6 +6,7 @@ module Api
 
       before_action :set_action, only: [:update, :results]
       before_action :validate_content_type, only: [:create]
+      skip_before_action :valid_user
 
       def index
         @user = current_user
