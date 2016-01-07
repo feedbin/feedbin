@@ -445,7 +445,11 @@ class feedbin.Keyboard
     $('.entry-content').prop 'scrollTop', newPosition
 
   entryScrollHeight: ->
-    $('.entry-content').prop('scrollHeight') - $('.entry-content').prop('offsetHeight')
+    $('.entry-content').prop('scrollHeight') - $('.entry-content').prop('offsetHeight') - @nextEntryPreviewHeight()
 
   contentHeight: ->
     $('.entry-content').prop('clientHeight')
+
+  nextEntryPreviewHeight: ->
+    container = $('.next-entry-preview')
+    if container.is(":visible") then container.height() else 0
