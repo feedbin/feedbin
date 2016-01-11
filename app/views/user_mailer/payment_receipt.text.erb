@@ -16,8 +16,12 @@ Description: <%= invoice_item["description"] %>
 <%- end %>
 Price: <%= invoice_item["currency"].upcase %> <%= number_to_currency(invoice_item["amount"].to_f / 100) %>
 <%- end %>
+<%- if @billing_event.invoice["starting_balance"] != 0 %>
 
-Total Charged: <%= @billing_event.details.data.object.currency.upcase %> <%= number_to_currency(@billing_event.details.data.object.amount.to_f / 100) %>
+Applied balance: <%= @billing_event.invoice["currency"].upcase %> <%= number_to_currency(@billing_event.invoice["starting_balance"].to_f / 100) %>
+<%- end %>
+
+Paid: <%= @billing_event.details.data.object.currency.upcase %> <%= number_to_currency(@billing_event.details.data.object.amount.to_f / 100) %>
 -------------------------------------------------
 
 Feedbin, Inc.
