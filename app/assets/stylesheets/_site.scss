@@ -934,10 +934,6 @@ table {
     background-color: transparent;
 }
 
-th {
-    text-align: left;
-}
-
 .table {
     width: 100%;
     margin-bottom: 20px;
@@ -3478,6 +3474,10 @@ $saved-search-control-height: 48px;
         width: 100%;
         background-color: #000;
         max-width: 100%;
+    }
+
+    th {
+        text-align: left;
     }
 
     .text {

@@ -14,7 +14,10 @@
   </head>
   <body>
     <h2 class="no-margin">Receipt</h2>
-    <p><small>Invoice ID: <%= @billing_event.details.data.object.invoice %></small></p>
+    <p>
+        <small>Invoice: <%= @billing_event.details.data.object.invoice %></small>
+        <br /><small><%= Time.at(@billing_event.details.data.object.created).to_s(:date) %></small>
+    </p>
 
     <div class="customer-info">
       <strong>Account</strong>
@@ -37,16 +40,26 @@
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th width="33%">Item</th>
-          <th width="33%">Date</th>
-          <th width="33%">Amount</th>
+          <th width="33%">Description</th>
+          <th width="33%">Price</th>
         </tr>
       </thead>
-      <tr>
-        <td><%= @user.plan.name %> Subscription</td>
-        <td align="right"><%= Time.at(@billing_event.details.data.object.created).to_s(:date) %></td>
-        <td align="right"><%= @billing_event.details.data.object.currency.upcase %> <%= number_to_currency(@billing_event.details.data.object.amount.to_f / 100) %></td>
-      </tr>
+      <% @billing_event.invoice_items["data"].each do |invoice_item| %>
+          <tr>
+            <td>
+                <% if invoice_item["plan"] %>
+                    Subscription to <%= invoice_item["plan"]["id"] %>
+                <% else %>
+                    <%= invoice_item["description"] %>
+                <% end %>
+            </td>
+            <td align="right"><%= invoice_item["currency"].upcase %> <%= number_to_currency(invoice_item["amount"].to_f / 100) %></td>
+          </tr>
+      <% end %>
+        <tr>
+          <th align="left"><strong>Total Charged</strong></th>
+          <th align="right"><%= @billing_event.details.data.object.currency.upcase %> <strong><%= number_to_currency(@billing_event.details.data.object.amount.to_f / 100) %></strong></th>
+        </tr>
     </table>
 
     <p><strong>Thank You!</strong></p>
