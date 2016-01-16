@@ -6,7 +6,7 @@
 Variables
 ------------------------------------------------------------------------------*/
 $toolbar-height: 41px;
-$font-stack: -apple-system, "Feedbin SF UI Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-stack: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $feeds-toolbar-height: 52px;
 $base-button-position: 10px;
 
@@ -691,8 +691,6 @@ Grid
 /*------------------------------------------------------------------------------
 HTML Elements
 ------------------------------------------------------------------------------*/
-
-@include SF-UI-Text-font-face;
 
 body, html {
     margin: 0;
