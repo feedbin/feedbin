@@ -1,9 +1,9 @@
 require 'rmagick'
-require 'opencv'
+# require 'opencv'
 
 class ProcessedImage
 
-  DETECTOR = OpenCV::CvHaarClassifierCascade::load("#{Rails.root}/lib/assets/haarcascade_frontalface_alt.xml")
+  # DETECTOR = OpenCV::CvHaarClassifierCascade::load("#{Rails.root}/lib/assets/haarcascade_frontalface_alt.xml")
   TARGET_WIDTH = 542.to_f
 
   attr_reader :url, :width, :height
@@ -139,16 +139,16 @@ class ProcessedImage
   end
 
   def find_center_of_objects(center, file_path, dimension)
-    image = OpenCV::CvMat.load(file_path)
-
-    objects = DETECTOR.detect_objects(image)
-    if objects.count > 0
-      center = 0
-      objects.each do |region|
-        center += region.center.send(dimension)
-      end
-      center = center / objects.count.to_f
-    end
+    # image = OpenCV::CvMat.load(file_path)
+    #
+    # objects = DETECTOR.detect_objects(image)
+    # if objects.count > 0
+    #   center = 0
+    #   objects.each do |region|
+    #     center += region.center.send(dimension)
+    #   end
+    #   center = center / objects.count.to_f
+    # end
     center
   end
 
