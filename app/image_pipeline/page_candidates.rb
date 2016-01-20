@@ -17,8 +17,8 @@ class PageCandidates < Candidates
       Librato.increment 'entry_image.page_request.cached'
     else
       if download = try_candidates(page_candidates)
-        image = download.to_h
-        cache_image(download.to_h.to_json)
+        image = download
+        cache_image(download.to_json)
         Librato.increment 'entry_image.page_request.image_found'
       else
         cache_image("")
