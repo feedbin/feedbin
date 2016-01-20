@@ -1,6 +1,6 @@
 class EntryImage
   include Sidekiq::Worker
-  sidekiq_options retry: false
+  sidekiq_options retry: false, queue: :image
 
   def perform(entry_id)
     entry = Entry.find(entry_id)
