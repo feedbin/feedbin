@@ -23,10 +23,10 @@ class FeedRequest
   end
 
   def format
-    if body && /^\s*<(?:!DOCTYPE\s+)?html[\s>]/i === body[0, 512]
-      :html
-    else
+    if Feedjira::Feed.determine_feed_parser_for_xml(body)
       :xml
+    else
+      :html
     end
   end
 
