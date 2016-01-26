@@ -13,6 +13,8 @@ class Feed < ActiveRecord::Base
 
   attr_accessor :count, :tags
 
+  enum feed_type: { xml: 0 }
+
   def tag(names, user, delete_existing = true)
     taggings = []
     if delete_existing
