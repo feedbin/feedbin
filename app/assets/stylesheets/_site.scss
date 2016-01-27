@@ -1891,6 +1891,11 @@ li.selected > a .favicon-wrap {
     }
 }
 
+.favicon-newsletter {
+    background: image-url("favicon-newsletter.svg") 0 0 no-repeat;
+    @include background-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+}
+
 .back-button {
     background-color: transparent;
     background-size: 11px 18px;

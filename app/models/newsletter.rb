@@ -54,8 +54,8 @@ class Newsletter
     @domain ||= Mail::Address.new(from_email).domain
   end
 
-  def feed_url(query)
-    "#{site_url}?#{query}"
+  def feed_url
+    "#{site_url}?#{feed_id}"
   end
 
   def site_url

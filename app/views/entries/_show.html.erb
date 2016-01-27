@@ -4,7 +4,7 @@
         <button class="back-button" data-behavior="show_entries"></button>
         <%= render partial: "shared/full_screen_button" %>
         <span class="site-info">
-            <%= entry_presenter.favicon(entry.feed.host) %>
+            <%= entry_presenter.favicon(entry.feed) %>
             <%= link_to strip_tags(entry.feed.title), entry.feed.site_url, class: 'entry-feed-title', data: {behavior: 'user_title', feed_id: entry.feed.id}, target: '_blank' %>
         </span>
         <div class="entry-buttons">

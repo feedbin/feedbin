@@ -8,7 +8,7 @@ class FeedRefresher
     feed_ids = build_ids(batch)
     count = priority_refresh ? 1 : 0
     fields = [:id, :feed_url, :etag, :last_modified, :subscriptions_count, :push_expiration]
-    results = Feed.where(id: feed_ids).where("subscriptions_count > ?", count).pluck(*fields)
+    results = Feed.xml.where(id: feed_ids).where("subscriptions_count > ?", count).pluck(*fields)
     subscriptions = Subscription.where(feed_id: feed_ids, active: true, muted: false).group(:feed_id).count
 
     arguments = results.each_with_object([]) do |result, array|
