@@ -35,7 +35,11 @@ class Newsletter
   end
 
   def html
-    @event["msg"]["html"] || text
+    @event["msg"]["html"]
+  end
+
+  def content
+    html || text
   end
 
   def timestamp
@@ -60,6 +64,10 @@ class Newsletter
 
   def site_url
     site_url ||= URI::HTTP.build(host: domain).to_s
+  end
+
+  def format
+    html ? "html" : "text"
   end
 
 end

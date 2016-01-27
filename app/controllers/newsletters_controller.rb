@@ -26,14 +26,14 @@ class NewslettersController < ApplicationController
       feed = Feed.where(feed_url: feed_url).take || create_newsletter_feed(newsletter, feed_url, user)
       entry = {
         author: newsletter.from_name,
-        content: newsletter.html,
+        content: newsletter.content,
         title: newsletter.subject,
         url: newsletter_entry_url(newsletter.entry_id),
         entry_id: newsletter.entry_id,
         published: Time.now,
         updated: Time.now,
         public_id: newsletter.entry_id,
-        data: {newsletter_text: newsletter.text, type: "newsletter"}
+        data: {newsletter_text: newsletter.text, type: "newsletter", format: newsletter.format}
       }
       feed.entries.create(entry)
       feed.update(feed_type: :newsletter)
