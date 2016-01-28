@@ -19,10 +19,10 @@ These can be downloaded from the [Apple Developer website](https://developer.app
     echo 'if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi' >> ~/.bash_profile
     source ~/.bash_profile
 
-#### Ruby 2.2.3
+#### Ruby 2.3.0
 
-    rbenv install 2.2.3
-    rbenv global 2.2.3
+    rbenv install 2.3.0
+    rbenv global 2.3.0
 
 #### Bundler
 
