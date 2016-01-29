@@ -55,7 +55,7 @@
                             <%= link_to settings_subscriptions_edit_path(subscription.id), class: "subscription-link" do %>
                                 <span class="subscription-data">
                                     <span class="favicon-container">
-                                        <%= subscription_presenter.favicon(subscription.host) %>
+                                        <%= subscription_presenter.favicon(subscription.feed) %>
                                     </span>
                                     <span class="text-wrap">
                                         <span class="title-container">

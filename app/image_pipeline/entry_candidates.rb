@@ -5,7 +5,7 @@ class EntryCandidates < Candidates
     candidates = document_candidates
     candidates.push(ImageCandidate.new(@entry.url, "iframe"))
     if download = try_candidates(candidates)
-      image = download.to_h
+      image = download
     end
     image
   end

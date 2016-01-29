@@ -95,6 +95,9 @@ $.extend feedbin,
       element.className = element.className.replace('is-loading', 'is-loaded')
       element.replaceChild(image, placehold)
 
+    image.onerror = ->
+      element.style.display = "none"
+
     for attr in placehold.attributes
       if (attr.name.match(/^data-/))
         image.setAttribute(attr.name.replace('data-', ''), attr.value)

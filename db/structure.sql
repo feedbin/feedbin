@@ -364,7 +364,8 @@ CREATE TABLE feeds (
     push_expiration timestamp without time zone,
     last_published_entry timestamp without time zone,
     host text,
-    self_url text
+    self_url text,
+    feed_type integer DEFAULT 0
 );
 
 
@@ -1419,6 +1420,13 @@ CREATE INDEX index_feed_stats_on_feed_id_and_day ON feed_stats USING btree (feed
 
 
 --
+-- Name: index_feeds_on_feed_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_feeds_on_feed_type ON feeds USING btree (feed_type);
+
+
+--
 -- Name: index_feeds_on_feed_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2033,4 +2041,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151019200512');
 INSERT INTO schema_migrations (version) VALUES ('20151110044837');
 
 INSERT INTO schema_migrations (version) VALUES ('20151207224028');
+
+INSERT INTO schema_migrations (version) VALUES ('20160126003712');
 

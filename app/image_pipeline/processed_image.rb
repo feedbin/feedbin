@@ -3,7 +3,6 @@ require 'opencv'
 
 class ProcessedImage
 
-  DETECTOR = OpenCV::CvHaarClassifierCascade::load("#{Rails.root}/lib/assets/haarcascade_frontalface_alt.xml")
   TARGET_WIDTH = 542.to_f
 
   attr_reader :url, :width, :height
@@ -13,8 +12,38 @@ class ProcessedImage
     @url = nil
   end
 
+  def process
+    success = false
+    image = Magick::Image.read(@file).first
+    image_file = Pathname.new(File.join(Dir.tmpdir, "#{SecureRandom.hex}.jpg"))
+    resized_file = Pathname.new(File.join(Dir.tmpdir, "#{SecureRandom.hex}.jpg"))
+    if valid?
+      geometry = Magick::Geometry.new(TARGET_WIDTH, target_height, 0, 0, Magick::MinimumGeometry)
+      image.change_geometry!(geometry) do |new_width, new_height|
+        image.resize!(new_width, new_height)
+      end
+      image.write(resized_file.to_s)
+      crop = find_best_crop(image.columns, image.rows, resized_file.to_s)
+      image.crop!(crop[:x], crop[:y], crop[:width], crop[:height])
+      sharpened_image = image.unsharp_mask(1.5)
+      sharpened_image.write(image_file.to_s)
+      @url = upload(image_file)
+      @width = crop[:width]
+      @height = crop[:height]
+      success = true
+    end
+    success
+  ensure
+    image && image.destroy!
+    sharpened_image && sharpened_image.destroy!
+    resized_file && File.exist?(resized_file) && File.delete(resized_file)
+    image_file && File.exist?(image_file) && File.delete(image_file)
+  end
+
+  private
+
   def ping
-    @ping ||= Magick::Image.ping(@file.path).first
+    @ping ||= Magick::Image.ping(@file).first
   end
 
   def original_width
@@ -55,67 +84,26 @@ class ProcessedImage
     original_width >= TARGET_WIDTH && original_height >= target_height
   end
 
-  def process
-    success = false
-    image = Magick::Image.read(@file.path).first
-    image_file = Tempfile.new(["image-", ".jpg"])
-    image_file.close
-    if valid?
-      resized_file = resize_to_fit(image)
-      crop = find_best_crop(image, resized_file.path)
-      image.crop!(crop[:x], crop[:y], crop[:width], crop[:height])
-      sharpened_image = image.unsharp_mask(1.5)
-      sharpened_image.write(image_file.path)
-      @url = upload(image_file)
-      @width = crop[:width]
-      @height = crop[:height]
-      success = true
-    end
-    success
-  ensure
-    image && image.destroy!
-    sharpened_image && sharpened_image.destroy!
-    resized_file && resized_file.close(true)
-    image_file && image_file.close(true)
-    @file && @file.close(true)
-  end
-
   def upload(file)
-    file.open
     uploader = EntryImageUploader.new
-    uploader.store!(file)
+    File.open(file) do |f|
+      uploader.store!(f)
+    end
     uploader.url
   end
 
-  def resize_to_fit(image)
-    file = Tempfile.new(["resized-", ".jpg"])
-    file.close
-
-    geometry = Magick::Geometry.new(TARGET_WIDTH, target_height, 0, 0, Magick::MinimumGeometry)
-    image.change_geometry!(geometry) do |new_width, new_height|
-      image.resize!(new_width, new_height)
-    end
-
-    image.write(file.path)
-    file
-  rescue Exception => e
-    image && image.destroy!
-    file.close(true)
-    raise e
-  end
-
-  def find_best_crop(image, file_path)
+  def find_best_crop(width, height, file_path)
 
     if panoramic?
-      center = image.columns / 2
+      center = width / 2
       center = find_center_of_objects(center, file_path, :x)
       crop_dimension = TARGET_WIDTH
-      contrained_dimension = image.columns
+      contrained_dimension = width
     else
       center = 0
       center = find_center_of_objects(center, file_path, :y)
       crop_dimension = target_height
-      contrained_dimension = image.rows
+      contrained_dimension = height
     end
 
     half_crop_dimension = crop_dimension / 2
@@ -139,9 +127,9 @@ class ProcessedImage
   end
 
   def find_center_of_objects(center, file_path, dimension)
+    detector = OpenCV::CvHaarClassifierCascade::load("#{Rails.root}/lib/assets/haarcascade_frontalface_alt.xml")
     image = OpenCV::CvMat.load(file_path)
-
-    objects = DETECTOR.detect_objects(image)
+    objects = detector.detect_objects(image)
     if objects.count > 0
       center = 0
       objects.each do |region|

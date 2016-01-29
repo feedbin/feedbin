@@ -6,7 +6,7 @@
 Variables
 ------------------------------------------------------------------------------*/
 $toolbar-height: 41px;
-$font-stack: -apple-system, "Feedbin SF UI Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-stack: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $feeds-toolbar-height: 52px;
 $base-button-position: 10px;
 
@@ -692,8 +692,6 @@ Grid
 HTML Elements
 ------------------------------------------------------------------------------*/
 
-@include SF-UI-Text-font-face;
-
 body, html {
     margin: 0;
     padding: 0;
@@ -932,10 +930,6 @@ table {
 table {
     max-width: 100%;
     background-color: transparent;
-}
-
-th {
-    text-align: left;
 }
 
 .table {
@@ -1895,6 +1889,11 @@ li.selected > a .favicon-wrap {
     svg {
         @include fill($text-color-light, $text-color-muted-night, $text-color-light-sunset);
     }
+}
+
+.favicon-newsletter {
+    background: image-url("favicon-newsletter.svg") 0 0 no-repeat;
+    @include background-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
 }
 
 .back-button {
@@ -3478,6 +3477,10 @@ $saved-search-control-height: 48px;
         width: 100%;
         background-color: #000;
         max-width: 100%;
+    }
+
+    th {
+        text-align: left;
     }
 
     .text {

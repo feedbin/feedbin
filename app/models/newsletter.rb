@@ -35,7 +35,11 @@ class Newsletter
   end
 
   def html
-    @event["msg"]["html"] || text
+    @event["msg"]["html"]
+  end
+
+  def content
+    html || text
   end
 
   def timestamp
@@ -54,12 +58,16 @@ class Newsletter
     @domain ||= Mail::Address.new(from_email).domain
   end
 
-  def feed_url(query)
-    "#{site_url}?#{query}"
+  def feed_url
+    "#{site_url}?#{feed_id}"
   end
 
   def site_url
     site_url ||= URI::HTTP.build(host: domain).to_s
+  end
+
+  def format
+    html ? "html" : "text"
   end
 
 end

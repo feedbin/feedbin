@@ -167,8 +167,12 @@ class EntryPresenter < BasePresenter
     end
   end
 
+  def entry_format
+    entry.data && entry.data["format"] || "default"
+  end
+
   def entry_type_class
-    "entry-type-#{entry_type}"
+    "entry-type-#{entry_type} entry-format-#{entry_type}-#{entry_format}"
   end
 
 end

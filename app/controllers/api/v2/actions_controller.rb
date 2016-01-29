@@ -55,7 +55,7 @@ module Api
       private
 
       def action_params
-        params.require(:action_params).permit(:query, :action_type, :feed_ids => [], :tag_ids => [], :actions => [])
+        params.require(:action_params).permit(:query, :action_type, :feed_ids, :tag_ids, :feed_ids => [], :tag_ids => [], :actions => [])
       end
 
       def set_action

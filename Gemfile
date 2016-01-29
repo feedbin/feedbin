@@ -1,5 +1,4 @@
 source 'https://rubygems.org'
-ruby '2.2.3'
 
 gem 'rails'
 gem 'rest-client', '= 1.6.7'

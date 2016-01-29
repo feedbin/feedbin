@@ -6,16 +6,17 @@ class BasePresenter
     @template = template
   end
 
-  def favicon(host)
+  def favicon(feed)
     @favicon ||= begin
       favicon_classes = ["favicon"]
-      if host
-        favicon_classes << "favicon-#{host.gsub('.', '-')}"
+      if feed.newsletter?
+        favicon_classes << "favicon-newsletter"
+      elsif feed.host
+        favicon_classes << "favicon-#{feed.host.gsub('.', '-')}"
       end
-      classes = favicon_classes.join(" ")
       content = <<-eos
         <span class="favicon-wrap">
-          <span class="#{classes}"></span>
+          <span class="#{favicon_classes.join(" ")}"></span>
         </span>
       eos
       content.html_safe
