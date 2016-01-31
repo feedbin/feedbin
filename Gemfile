@@ -11,6 +11,8 @@ group :development do
   gem 'spring'
   gem 'benchmark-ips'
   gem 'xipio'
+  # gem 'binding_of_caller'
+  # gem 'pry-rails'
 end
 
 group :development, :test do
@@ -80,6 +82,7 @@ gem 'ruby-opencv', require: false
 gem 'rails-deprecated_sanitizer'
 gem 'responders', '~> 2.0'
 gem 'dotenv-rails'
+gem 'doorkeeper'
 
 # Sidekiq
 gem 'sidekiq'
