@@ -14,6 +14,9 @@
             <ul class="segmented">
                 <li><%= link_to 'Actions', actions_path, class: "no-border" %></li>
                 <li><%= link_to 'Sharing', sharing_services_path %></li>
+                <% if Doorkeeper::Application.authorized_for(@user).length > 1 %>
+                    <li><%= link_to 'Applications', settings_applications_path %></li>
+                <% end %>
             </ul>
             <ul class="segmented">
                 <li><%= link_to 'Account', settings_account_path, class: "no-border" %></li>

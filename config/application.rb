@@ -48,5 +48,14 @@ module Feedbin
 
     config.eager_load_paths += ["#{config.root}/app/image_pipeline"]
 
+    config.to_prepare do 
+      Doorkeeper::AuthorizationsController.layout 'application'
+      Doorkeeper::AuthorizationsController.add_flash_types :analytics_event
+
+      Doorkeeper::AuthorizedApplicationsController.before_action :only => [:index] do
+        redirect_to(settings_applications_path)        
+      end
+    end
+
   end
 end

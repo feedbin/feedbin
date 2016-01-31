@@ -129,6 +129,7 @@ Feedbin::Application.routes.draw do
     get :feeds
     get :help
     get :appearance
+    get :applications
     post :update_credit_card
     post :mark_favicon_complete
     post :update_plan

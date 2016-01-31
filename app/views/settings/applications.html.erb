@@ -1,0 +1,31 @@
+<div class="settings-content-inner">
+    <div class="settings-outer">
+        <h2>Applications</h2>
+    </div>
+
+    <div class="inset">
+        <div class="inset-content">
+            <h4 class="group-header">Active Applications</h4>
+        </div>
+
+        <ul class="applications-list">
+        <% if @applications.any? %>
+            <% @applications.each do |application| %>
+            <li>
+                <div class="application-header">
+                    <p class="application-title"><%= application.name %></p>
+                </div>
+                <%= link_to 'Revoke', oauth_authorized_application_path(application), class: 'button button-cancel application-revoke show-service-options', method: :delete, data: { confirm: "Are you sure you want to revoke access to #{application.name}?" } %>
+            </li>
+            <% end %>
+        <% else %>
+            <li>
+                <div class="application-header">
+                    <p class="application-title">No Applications Found</p>
+                </div>
+            </li>
+        <% end %>
+
+        </ul>
+    </div>
+</div>
