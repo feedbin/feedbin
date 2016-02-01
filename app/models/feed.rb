@@ -12,10 +12,9 @@ class Feed < ActiveRecord::Base
   before_create :set_host
 
   attr_accessor :count, :tags
+  attr_readonly :feed_url
 
   enum feed_type: { xml: 0, newsletter: 1 }
-
-  UPDATABLE_ATTRIBUTES = %w(etag last_modified self_url site_url title).freeze
 
   def tag(names, user, delete_existing = true)
     taggings = []
