@@ -11,8 +11,6 @@ group :development do
   gem 'spring'
   gem 'benchmark-ips'
   gem 'xipio'
-  # gem 'binding_of_caller'
-  # gem 'pry-rails'
 end
 
 group :development, :test do
