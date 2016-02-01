@@ -13,7 +13,6 @@ module SessionsHelper
   def current_user
     @current_user ||= begin
       if request.subdomain == "api"
-
         if valid_doorkeeper_token?
           User.find(doorkeeper_token.resource_owner_id)
         else 
