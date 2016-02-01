@@ -18,13 +18,13 @@ class Subscription < ActiveRecord::Base
   after_create :update_favicon_hash
 
   def mark_as_unread
-    entries = Entry.select(:id, :published, :created_at).where(feed_id: self.feed_id).where('published > ?', Time.now.ago(2.weeks))
+    base = Entry.select(:id, :feed_id, :published, :created_at).where(feed_id: self.feed_id).order('published DESC')
+    entries = base.where('published > ?', Time.now.ago(2.weeks)).limit(10)
     if entries.length == 0
-      entries = Entry.select(:id, :published, :created_at).where(feed_id: self.feed_id).order('published DESC').limit(1)
+      entries = base.limit(3)
     end
-    unread_entries = []
-    entries.each do |entry|
-      unread_entries << UnreadEntry.new(user_id: self.user_id, feed_id: self.feed_id, entry_id: entry.id, published: entry.published, entry_created_at: entry.created_at)
+    unread_entries = entries.map do |entry|
+      UnreadEntry.new_from_owners(self.user, entry)
     end
     UnreadEntry.import(unread_entries, validate: false)
   end
