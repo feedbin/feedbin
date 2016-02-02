@@ -1871,7 +1871,7 @@ $subscribe-wrap-height: 49px;
 li.selected > a .favicon-wrap {
     background-color: #FFF;
     box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
-    &.collection-favicon {
+    .feeds &.collection-favicon {
         background: transparent;
         box-shadow: none;
     }
@@ -1889,12 +1889,11 @@ li.selected > a .favicon-wrap {
     svg {
         @include fill($text-color-light, $text-color-muted-night, $text-color-light-sunset);
     }
+    .favicon-newsletter {
+        @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+    }
 }
 
-.favicon-newsletter {
-    background: image-url("favicon-newsletter.svg") 0 0 no-repeat;
-    @include background-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-}
 
 .back-button {
     background-color: transparent;
