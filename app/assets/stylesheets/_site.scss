@@ -4295,6 +4295,9 @@ Settings
         padding: 0 30px;
         margin-top: -20px;
         margin-bottom: 30px;
+        &.no-margin {
+            margin-bottom: 0;
+        }
         @media (max-width: 528px) {
             padding-left: 15px;
             padding-right: 15px;

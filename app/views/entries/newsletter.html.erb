@@ -1,1 +1,1 @@
-<%= @entry.content.html_safe %>
+<%= Sanitize.fragment(@entry.content, Sanitize::Config::RELAXED).html_safe %>

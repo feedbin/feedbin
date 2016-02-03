@@ -319,4 +319,12 @@ class User < ActiveRecord::Base
     admin
   end
 
+  def newsletter_address
+    template = "subscribe+%s@newsletters.feedbin.com"
+    if Rails.env.development?
+      template = "test-subscribe+%s@newsletters.feedbin.com"
+    end
+    template % self.newsletter_token
+  end
+
 end

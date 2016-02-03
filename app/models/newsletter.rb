@@ -10,7 +10,7 @@ class Newsletter
 
   def token
     @token ||= begin
-      to_email.sub("@newsletters.feedbin.com", "").sub("test-subscribe-", "").sub("subscribe-", "")
+      to_email.sub("@newsletters.feedbin.com", "").sub("test-subscribe+", "").sub("subscribe+", "")
     end
   end
 

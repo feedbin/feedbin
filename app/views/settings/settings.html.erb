@@ -78,6 +78,21 @@
     <div class="inset">
 
         <div class="inset-content">
+            <h4 class="group-header">Newsletter Address</h4>
+        </div>
+
+        <ul class="pill-list">
+            <li><a href="mailto:<%= @user.newsletter_address %>"><%= @user.newsletter_address %></a></li>
+        </ul>
+        <p class="control-group-description no-margin">
+            Use this address to receive emails in Feedbin.
+        </p>
+
+    </div>
+
+    <div class="inset">
+
+        <div class="inset-content">
             <h4 class="group-header">Advanced</h4>
         </div>
 
@@ -89,16 +104,10 @@
                 <% end %>
             </li>
         </ul>
-        <p class="control-group-description">
+        <p class="control-group-description no-margin">
             A TLS enabled image proxy is used to prevent <a href="https://developer.mozilla.org/en-US/docs/Security/MixedContent">mixed content</a> warnings. You can turn it off if you experience image loading issues.
         </p>
 
-    </div>
-
-    <div class="description-inset icon-email">
-        <h3>Subscribe via Email</h3>
-        <p class="muted">You can subscribe to any website that publishes a feed by sending an email to this secret address. The body of the email should only contain the URL to the website or feed.</p>
-        <p class="subscribe-email"><a href="mailto:subscribe+<%= @user.inbound_email_token %>@subscribe.feedbin.com">subscribe+<%= @user.inbound_email_token %>@subscribe.feedbin.com</a></p>
     </div>
 
 </div>
