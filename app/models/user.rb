@@ -65,9 +65,9 @@ class User < ActiveRecord::Base
   before_save :activate_subscriptions
   before_save { reset_auth_token }
 
-  before_create { generate_token(:starred_token, 3) }
-  before_create { generate_token(:inbound_email_token, 3) }
-  before_create { generate_token(:newsletter_token, 3) }
+  before_create { generate_token(:starred_token) }
+  before_create { generate_token(:inbound_email_token, 4) }
+  before_create { generate_token(:newsletter_token, 4) }
 
   before_destroy :cancel_billing, unless: -> user { user.admin }
   before_destroy :create_deleted_user
