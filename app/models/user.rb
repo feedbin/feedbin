@@ -85,7 +85,6 @@ class User < ActiveRecord::Base
     self.expires_at = Feedbin::Application.config.trial_days.days.from_now
     self.update_auth_token = true
     self.mark_as_read_confirmation = 1
-    self.theme = "sunset"
     self.font = "serif-2"
     self.font_size = 7
   end
