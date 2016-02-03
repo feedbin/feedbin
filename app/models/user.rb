@@ -65,9 +65,9 @@ class User < ActiveRecord::Base
   before_save :activate_subscriptions
   before_save { reset_auth_token }
 
-  before_create { generate_token(:starred_token) }
-  before_create { generate_token(:inbound_email_token) }
-  before_create { generate_token(:newsletter_token) }
+  before_create { generate_token(:starred_token, 3) }
+  before_create { generate_token(:inbound_email_token, 3) }
+  before_create { generate_token(:newsletter_token, 3) }
 
   before_destroy :cancel_billing, unless: -> user { user.admin }
   before_destroy :create_deleted_user
@@ -167,20 +167,16 @@ class User < ActiveRecord::Base
     end
   end
 
-  def generate_token(column, hash = false)
+  def generate_token(column, length = nil)
     begin
-      random_string = SecureRandom.urlsafe_base64
-      if hash
-        self[column] = Digest::SHA1.hexdigest(random_string)
-      else
-        self[column] = random_string
-      end
+      random_string = SecureRandom.hex(length)
+      self[column] = random_string
     end while User.exists?(column => self[column])
     random_string
   end
 
   def send_password_reset
-    token = generate_token(:password_reset_token, true)
+    token = generate_token(:password_reset_token)
     self.password_reset_sent_at = Time.now
     save!
     UserMailer.delay(queue: :critical).password_reset(id, token)
