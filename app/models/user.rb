@@ -166,16 +166,20 @@ class User < ActiveRecord::Base
     end
   end
 
-  def generate_token(column, length = nil)
+  def generate_token(column, length = nil, hash = false)
     begin
       random_string = SecureRandom.hex(length)
-      self[column] = random_string
+      if hash
+        self[column] = Digest::SHA1.hexdigest(random_string)
+      else
+        self[column] = random_string
+      end
     end while User.exists?(column => self[column])
     random_string
   end
 
   def send_password_reset
-    token = generate_token(:password_reset_token)
+    token = generate_token(:password_reset_token, nil, true)
     self.password_reset_sent_at = Time.now
     save!
     UserMailer.delay(queue: :critical).password_reset(id, token)
