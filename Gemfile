@@ -80,6 +80,7 @@ gem 'ruby-opencv', require: false
 gem 'rails-deprecated_sanitizer'
 gem 'responders', '~> 2.0'
 gem 'dotenv-rails'
+gem 'doorkeeper'
 
 # Sidekiq
 gem 'sidekiq'

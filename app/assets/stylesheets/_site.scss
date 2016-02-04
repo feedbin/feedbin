@@ -1187,6 +1187,26 @@ table {
 
 }
 
+.applications-list {
+    @extend .sharing-services;
+
+    .application-header {
+        @include settings-row;
+    }
+
+    .application-title {
+        @extend .service-title;
+        padding: 0;
+    }
+
+    .application-revoke {
+        position: absolute;
+        right: 15px;
+        top: 16px;
+        color: red;
+    }
+}
+
 .inset {
     background-color: $inset-bg-color;
     border-radius: 8px;

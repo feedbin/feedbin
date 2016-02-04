@@ -13,8 +13,12 @@ module SessionsHelper
   def current_user
     @current_user ||= begin
       if request.subdomain == "api"
-        authenticate_with_http_basic do |username, password|
-          User.where('lower(email) = ?', username.try(:downcase)).take.try(:authenticate, password)
+        if valid_doorkeeper_token?
+          User.find(doorkeeper_token.resource_owner_id)
+        else 
+          authenticate_with_http_basic do |username, password|
+            User.where('lower(email) = ?', username.try(:downcase)).take.try(:authenticate, password)
+          end
         end
       else
         User.find_by_auth_token(cookies.signed[:auth_token]) if cookies.signed[:auth_token]

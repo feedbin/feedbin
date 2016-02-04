@@ -157,6 +157,8 @@ GEM
     dalli (2.7.5)
     diff-lcs (1.2.5)
     docile (1.1.5)
+    doorkeeper (3.1.0)
+      railties (>= 3.2)
     dotenv (2.1.0)
     dotenv-rails (2.1.0)
       dotenv (= 2.1.0)
@@ -520,6 +522,7 @@ DEPENDENCIES
   coffee-rails
   connection_pool
   dalli
+  doorkeeper
   dotenv-rails
   evernote_oauth
   factory_girl_rails
