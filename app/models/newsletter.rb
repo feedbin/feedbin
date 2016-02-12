@@ -63,7 +63,7 @@ class Newsletter
   end
 
   def site_url
-    site_url ||= URI::HTTP.build(host: domain).to_s
+    @site_url ||= URI::HTTP.build(host: domain).to_s
   end
 
   def format
