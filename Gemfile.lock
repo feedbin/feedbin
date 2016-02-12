@@ -321,6 +321,7 @@ GEM
       thor (>= 0.14, < 2.0)
     json (1.8.3)
     kgio (2.10.0)
+    kramdown (1.9.0)
     librato-metrics (1.6.0)
       aggregate (~> 0.2.2)
       faraday (~> 0.7)
@@ -388,6 +389,8 @@ GEM
       rails-deprecated_sanitizer (>= 1.0.1)
     rails-html-sanitizer (1.0.3)
       loofah (~> 2.0)
+    rails_autolink (1.1.6)
+      rails (> 3.1)
     railties (4.2.5.1)
       actionpack (= 4.2.5.1)
       activesupport (= 4.2.5.1)
@@ -537,6 +540,7 @@ DEPENDENCIES
   httparty
   jbuilder
   jquery-rails
+  kramdown
   librato-rails
   lograge
   longurl
@@ -547,6 +551,7 @@ DEPENDENCIES
   quiet_assets
   rails
   rails-deprecated_sanitizer
+  rails_autolink
   readability_parser
   redis (>= 3.0.5)
   request_exception_handler

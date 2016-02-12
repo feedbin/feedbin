@@ -43,9 +43,34 @@ class EntryPresenter < BasePresenter
   end
 
   def content(image_proxy_enabled)
-    @content ||= ContentFormatter.format!(entry.content, entry, image_proxy_enabled)
-  rescue HTML::Pipeline::Filter::InvalidDocumentException
+    ContentFormatter.format!(formatted_content, entry, image_proxy_enabled)
+  rescue => e
+    Rails.logger.info { e.inspect }
     @template.content_tag(:p, '&ndash;&ndash;'.html_safe)
+  end
+
+  def api_content
+    ContentFormatter.api_format(formatted_content, entry)
+  rescue => e
+    Rails.logger.info { e.inspect }
+    @template.content_tag(:p, '&ndash;&ndash;'.html_safe)
+  end
+
+  def app_content
+    ContentFormatter.app_format(formatted_content, entry)
+  rescue => e
+    Rails.logger.info { e.inspect }
+    @template.content_tag(:p, '&ndash;&ndash;'.html_safe)
+  end
+
+  def formatted_content
+    @formatted_content ||= begin
+      formatted_content = entry.content
+      if entry.content_format == "text"
+        formatted_content = ContentFormatter.text_email(formatted_content)
+      end
+      formatted_content
+    end
   end
 
   def has_content?
@@ -167,12 +192,54 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def entry_format
-    entry.data && entry.data["format"] || "default"
+  def entry_type_class
+    "entry-type-#{entry_type} entry-format-#{entry_type}-#{entry.content_format}"
   end
 
-  def entry_type_class
-    "entry-type-#{entry_type} entry-format-#{entry_type}-#{entry_format}"
+  def content_diff
+    before = ContentFormatter.api_format(entry.original['content'], entry)
+    HTMLDiff::Diff.new(before, entry.content).inline_html
+  rescue
+    nil
+  end
+
+  def decoder
+    @decoder ||= HTMLEntities.new
+  end
+
+  def content_text
+    @content_text ||= begin
+      text = Sanitize.fragment(entry.content,
+        remove_contents: true,
+        elements: %w{html body div span
+                     h1 h2 h3 h4 h5 h6 p blockquote pre
+                     a abbr acronym address big cite code
+                     del dfn em ins kbd q s samp
+                     small strike strong sub sup tt var
+                     b u i center
+                     dl dt dd ol ul li
+                     fieldset form label legend
+                     table caption tbody tfoot thead tr th td
+                     article aside canvas details embed
+                     figure figcaption footer header hgroup
+                     menu nav output ruby section summary}
+      )
+      text = ReverseMarkdown.convert(text)
+      text = ActionController::Base.helpers.strip_tags(text)
+      decoder.decode(text)
+    end
+  end
+
+  def app_summary
+    decoder.decode(@template.strip_tags(entry.summary))
+  end
+
+  def app_title
+    (entry.title.present?) ? decoder.decode(@template.strip_tags(entry.title.strip)) : nil
+  end
+
+  def app_author
+    (entry.author.present?) ? decoder.decode(@template.strip_tags(entry.author.strip)) : nil
   end
 
 end

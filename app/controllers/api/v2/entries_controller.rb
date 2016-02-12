@@ -87,7 +87,6 @@ module Api
           status_not_found
         else
           @entries = Entry.where(id: pagination[:paged_entry_ids][pagination[:page_index]]).includes(:feed).order(created_at: :desc)
-          @entries.each { |entry| entry.content = ContentFormatter.api_format(entry.content, entry) }
           links_header(pagination[:will_paginate], 'api_v2_entries_url')
         end
       end

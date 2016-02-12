@@ -39,10 +39,6 @@ module Api
         elsif !@entries.present?
           @entries = []
         else
-          @entries.map { |entry|
-            entry.content = ContentFormatter.api_format(entry.content, entry)
-            entry
-          }
           links_header(page_query, path_helper, params[:feed_id])
           fresh_when(etag: @entries)
         end
