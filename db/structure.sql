@@ -2,11 +2,16 @@
 -- PostgreSQL database dump
 --
 
+-- Dumped from database version 9.5.0
+-- Dumped by pg_dump version 9.5.0
+
 SET statement_timeout = 0;
+SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
+SET row_security = off;
 
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
@@ -57,7 +62,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: actions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: actions; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE actions (
@@ -68,7 +73,11 @@ CREATE TABLE actions (
     feed_ids text[] DEFAULT '{}'::text[],
     all_feeds boolean DEFAULT false,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    title text,
+    tag_ids integer[] DEFAULT '{}'::integer[],
+    action_type integer DEFAULT 0,
+    computed_feed_ids integer[] DEFAULT '{}'::integer[]
 );
 
 
@@ -92,7 +101,7 @@ ALTER SEQUENCE actions_id_seq OWNED BY actions.id;
 
 
 --
--- Name: billing_events; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: billing_events; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE billing_events (
@@ -127,7 +136,7 @@ ALTER SEQUENCE billing_events_id_seq OWNED BY billing_events.id;
 
 
 --
--- Name: coupons; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: coupons; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE coupons (
@@ -161,7 +170,7 @@ ALTER SEQUENCE coupons_id_seq OWNED BY coupons.id;
 
 
 --
--- Name: deleted_users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: deleted_users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE deleted_users (
@@ -193,7 +202,43 @@ ALTER SEQUENCE deleted_users_id_seq OWNED BY deleted_users.id;
 
 
 --
--- Name: entries; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: devices; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE devices (
+    id integer NOT NULL,
+    user_id integer,
+    token text,
+    model text,
+    device_type integer,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
+    application text,
+    operating_system text
+);
+
+
+--
+-- Name: devices_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE devices_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: devices_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE devices_id_seq OWNED BY devices.id;
+
+
+--
+-- Name: entries; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE entries (
@@ -214,7 +259,10 @@ CREATE TABLE entries (
     starred_entries_count integer DEFAULT 0 NOT NULL,
     data json,
     original json,
-    source text
+    source text,
+    image_url text,
+    processed_image_url text,
+    image json
 );
 
 
@@ -238,7 +286,39 @@ ALTER SEQUENCE entries_id_seq OWNED BY entries.id;
 
 
 --
--- Name: feed_stats; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: favicons; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE favicons (
+    id integer NOT NULL,
+    host text,
+    favicon text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: favicons_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE favicons_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: favicons_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE favicons_id_seq OWNED BY favicons.id;
+
+
+--
+-- Name: feed_stats; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE feed_stats (
@@ -271,7 +351,7 @@ ALTER SEQUENCE feed_stats_id_seq OWNED BY feed_stats.id;
 
 
 --
--- Name: feeds; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: feeds; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE feeds (
@@ -286,7 +366,10 @@ CREATE TABLE feeds (
     subscriptions_count integer DEFAULT 0 NOT NULL,
     protected boolean DEFAULT false,
     push_expiration timestamp without time zone,
-    last_published_entry timestamp without time zone
+    last_published_entry timestamp without time zone,
+    host text,
+    self_url text,
+    feed_type integer DEFAULT 0
 );
 
 
@@ -310,7 +393,7 @@ ALTER SEQUENCE feeds_id_seq OWNED BY feeds.id;
 
 
 --
--- Name: import_items; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: import_items; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE import_items (
@@ -343,7 +426,7 @@ ALTER SEQUENCE import_items_id_seq OWNED BY import_items.id;
 
 
 --
--- Name: imports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: imports; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE imports (
@@ -376,7 +459,42 @@ ALTER SEQUENCE imports_id_seq OWNED BY imports.id;
 
 
 --
--- Name: plans; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: in_app_purchases; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE in_app_purchases (
+    id integer NOT NULL,
+    user_id integer,
+    transaction_id text,
+    purchase_date timestamp without time zone,
+    receipt json,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
+    response json
+);
+
+
+--
+-- Name: in_app_purchases_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE in_app_purchases_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: in_app_purchases_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE in_app_purchases_id_seq OWNED BY in_app_purchases.id;
+
+
+--
+-- Name: plans; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE plans (
@@ -410,7 +528,7 @@ ALTER SEQUENCE plans_id_seq OWNED BY plans.id;
 
 
 --
--- Name: recently_read_entries; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: recently_read_entries; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE recently_read_entries (
@@ -442,7 +560,7 @@ ALTER SEQUENCE recently_read_entries_id_seq OWNED BY recently_read_entries.id;
 
 
 --
--- Name: saved_searches; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: saved_searches; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE saved_searches (
@@ -475,7 +593,7 @@ ALTER SEQUENCE saved_searches_id_seq OWNED BY saved_searches.id;
 
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE schema_migrations (
@@ -484,7 +602,7 @@ CREATE TABLE schema_migrations (
 
 
 --
--- Name: sharing_services; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: sharing_services; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE sharing_services (
@@ -517,7 +635,7 @@ ALTER SEQUENCE sharing_services_id_seq OWNED BY sharing_services.id;
 
 
 --
--- Name: starred_entries; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: starred_entries; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE starred_entries (
@@ -527,7 +645,8 @@ CREATE TABLE starred_entries (
     entry_id integer,
     published timestamp without time zone,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    source text
 );
 
 
@@ -551,7 +670,7 @@ ALTER SEQUENCE starred_entries_id_seq OWNED BY starred_entries.id;
 
 
 --
--- Name: subscriptions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: subscriptions; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE subscriptions (
@@ -563,7 +682,9 @@ CREATE TABLE subscriptions (
     title text,
     view_inline boolean DEFAULT false,
     active boolean DEFAULT true,
-    push boolean DEFAULT false
+    push boolean DEFAULT false,
+    show_updates boolean DEFAULT true,
+    muted boolean DEFAULT false
 );
 
 
@@ -587,7 +708,70 @@ ALTER SEQUENCE subscriptions_id_seq OWNED BY subscriptions.id;
 
 
 --
--- Name: supported_sharing_services; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: suggested_categories; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE suggested_categories (
+    id integer NOT NULL,
+    name text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: suggested_categories_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE suggested_categories_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: suggested_categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE suggested_categories_id_seq OWNED BY suggested_categories.id;
+
+
+--
+-- Name: suggested_feeds; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE suggested_feeds (
+    id integer NOT NULL,
+    suggested_category_id integer,
+    feed_id integer,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: suggested_feeds_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE suggested_feeds_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: suggested_feeds_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE suggested_feeds_id_seq OWNED BY suggested_feeds.id;
+
+
+--
+-- Name: supported_sharing_services; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE supported_sharing_services (
@@ -621,7 +805,7 @@ ALTER SEQUENCE supported_sharing_services_id_seq OWNED BY supported_sharing_serv
 
 
 --
--- Name: taggings; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: taggings; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE taggings (
@@ -654,7 +838,7 @@ ALTER SEQUENCE taggings_id_seq OWNED BY taggings.id;
 
 
 --
--- Name: tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: tags; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE tags (
@@ -685,11 +869,10 @@ ALTER SEQUENCE tags_id_seq OWNED BY tags.id;
 
 
 --
--- Name: unread_entries; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: unread_entries; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE unread_entries (
-    id integer NOT NULL,
     user_id integer,
     feed_id integer,
     entry_id integer,
@@ -701,10 +884,26 @@ CREATE TABLE unread_entries (
 
 
 --
--- Name: unread_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: updated_entries; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE unread_entries_id_seq
+CREATE TABLE updated_entries (
+    id bigint NOT NULL,
+    user_id integer,
+    entry_id integer,
+    feed_id integer,
+    published timestamp without time zone,
+    updated timestamp without time zone,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: updated_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE updated_entries_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -713,14 +912,14 @@ CREATE SEQUENCE unread_entries_id_seq
 
 
 --
--- Name: unread_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: updated_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE unread_entries_id_seq OWNED BY unread_entries.id;
+ALTER SEQUENCE updated_entries_id_seq OWNED BY updated_entries.id;
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE users (
@@ -740,7 +939,9 @@ CREATE TABLE users (
     settings hstore,
     starred_token character varying(255),
     inbound_email_token character varying(255),
-    tag_visibility json DEFAULT '{}'::json
+    tag_visibility json DEFAULT '{}'::json,
+    expires_at timestamp without time zone,
+    newsletter_token character varying
 );
 
 
@@ -795,7 +996,21 @@ ALTER TABLE ONLY deleted_users ALTER COLUMN id SET DEFAULT nextval('deleted_user
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY devices ALTER COLUMN id SET DEFAULT nextval('devices_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY entries ALTER COLUMN id SET DEFAULT nextval('entries_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY favicons ALTER COLUMN id SET DEFAULT nextval('favicons_id_seq'::regclass);
 
 
 --
@@ -824,6 +1039,13 @@ ALTER TABLE ONLY import_items ALTER COLUMN id SET DEFAULT nextval('import_items_
 --
 
 ALTER TABLE ONLY imports ALTER COLUMN id SET DEFAULT nextval('imports_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY in_app_purchases ALTER COLUMN id SET DEFAULT nextval('in_app_purchases_id_seq'::regclass);
 
 
 --
@@ -872,6 +1094,20 @@ ALTER TABLE ONLY subscriptions ALTER COLUMN id SET DEFAULT nextval('subscription
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY suggested_categories ALTER COLUMN id SET DEFAULT nextval('suggested_categories_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY suggested_feeds ALTER COLUMN id SET DEFAULT nextval('suggested_feeds_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY supported_sharing_services ALTER COLUMN id SET DEFAULT nextval('supported_sharing_services_id_seq'::regclass);
 
 
@@ -893,7 +1129,7 @@ ALTER TABLE ONLY tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclas
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY unread_entries ALTER COLUMN id SET DEFAULT nextval('unread_entries_id_seq'::regclass);
+ALTER TABLE ONLY updated_entries ALTER COLUMN id SET DEFAULT nextval('updated_entries_id_seq'::regclass);
 
 
 --
@@ -904,7 +1140,7 @@ ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regcl
 
 
 --
--- Name: actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY actions
@@ -912,7 +1148,7 @@ ALTER TABLE ONLY actions
 
 
 --
--- Name: billing_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: billing_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY billing_events
@@ -920,7 +1156,7 @@ ALTER TABLE ONLY billing_events
 
 
 --
--- Name: coupons_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: coupons_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY coupons
@@ -928,7 +1164,7 @@ ALTER TABLE ONLY coupons
 
 
 --
--- Name: deleted_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: deleted_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY deleted_users
@@ -936,7 +1172,15 @@ ALTER TABLE ONLY deleted_users
 
 
 --
--- Name: entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: devices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY devices
+    ADD CONSTRAINT devices_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY entries
@@ -944,7 +1188,15 @@ ALTER TABLE ONLY entries
 
 
 --
--- Name: feed_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: favicons_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY favicons
+    ADD CONSTRAINT favicons_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: feed_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY feed_stats
@@ -952,7 +1204,7 @@ ALTER TABLE ONLY feed_stats
 
 
 --
--- Name: feeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: feeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY feeds
@@ -960,7 +1212,7 @@ ALTER TABLE ONLY feeds
 
 
 --
--- Name: import_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: import_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY import_items
@@ -968,7 +1220,7 @@ ALTER TABLE ONLY import_items
 
 
 --
--- Name: imports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: imports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY imports
@@ -976,7 +1228,15 @@ ALTER TABLE ONLY imports
 
 
 --
--- Name: plans_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: in_app_purchases_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY in_app_purchases
+    ADD CONSTRAINT in_app_purchases_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: plans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY plans
@@ -984,7 +1244,7 @@ ALTER TABLE ONLY plans
 
 
 --
--- Name: recently_read_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: recently_read_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY recently_read_entries
@@ -992,7 +1252,7 @@ ALTER TABLE ONLY recently_read_entries
 
 
 --
--- Name: saved_searches_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: saved_searches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY saved_searches
@@ -1000,7 +1260,7 @@ ALTER TABLE ONLY saved_searches
 
 
 --
--- Name: sharing_services_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: sharing_services_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY sharing_services
@@ -1008,7 +1268,7 @@ ALTER TABLE ONLY sharing_services
 
 
 --
--- Name: starred_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: starred_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY starred_entries
@@ -1016,7 +1276,7 @@ ALTER TABLE ONLY starred_entries
 
 
 --
--- Name: subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY subscriptions
@@ -1024,7 +1284,23 @@ ALTER TABLE ONLY subscriptions
 
 
 --
--- Name: supported_sharing_services_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: suggested_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY suggested_categories
+    ADD CONSTRAINT suggested_categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: suggested_feeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY suggested_feeds
+    ADD CONSTRAINT suggested_feeds_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: supported_sharing_services_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY supported_sharing_services
@@ -1032,7 +1308,7 @@ ALTER TABLE ONLY supported_sharing_services
 
 
 --
--- Name: taggings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: taggings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY taggings
@@ -1040,7 +1316,7 @@ ALTER TABLE ONLY taggings
 
 
 --
--- Name: tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY tags
@@ -1048,15 +1324,15 @@ ALTER TABLE ONLY tags
 
 
 --
--- Name: unread_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: updated_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY unread_entries
-    ADD CONSTRAINT unread_entries_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY updated_entries
+    ADD CONSTRAINT updated_entries_pkey PRIMARY KEY (id);
 
 
 --
--- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users
@@ -1064,329 +1340,455 @@ ALTER TABLE ONLY users
 
 
 --
--- Name: index_actions_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_actions_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_actions_on_user_id ON actions USING btree (user_id);
 
 
 --
--- Name: index_billing_events_on_billable_id_and_billable_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_billing_events_on_billable_id_and_billable_type; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_billing_events_on_billable_id_and_billable_type ON billing_events USING btree (billable_id, billable_type);
 
 
 --
--- Name: index_billing_events_on_event_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_billing_events_on_event_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_billing_events_on_event_id ON billing_events USING btree (event_id);
 
 
 --
--- Name: index_coupons_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_coupons_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_coupons_on_user_id ON coupons USING btree (user_id);
 
 
 --
--- Name: index_deleted_users_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_deleted_users_on_email; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_deleted_users_on_email ON deleted_users USING btree (email);
 
 
 --
--- Name: index_entries_on_feed_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_devices_on_lower_tokens; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_devices_on_lower_tokens ON devices USING btree (lower(token));
+
+
+--
+-- Name: index_devices_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_devices_on_user_id ON devices USING btree (user_id);
+
+
+--
+-- Name: index_entries_on_feed_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_entries_on_feed_id ON entries USING btree (feed_id);
 
 
 --
--- Name: index_entries_on_public_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_entries_on_public_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_entries_on_public_id ON entries USING btree (public_id);
 
 
 --
--- Name: index_feed_stats_on_feed_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_favicons_on_host; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_favicons_on_host ON favicons USING btree (host);
+
+
+--
+-- Name: index_feed_stats_on_feed_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_feed_stats_on_feed_id ON feed_stats USING btree (feed_id);
 
 
 --
--- Name: index_feed_stats_on_feed_id_and_day; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_feed_stats_on_feed_id_and_day; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_feed_stats_on_feed_id_and_day ON feed_stats USING btree (feed_id, day);
 
 
 --
--- Name: index_feeds_on_feed_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_feeds_on_feed_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_feeds_on_feed_type ON feeds USING btree (feed_type);
+
+
+--
+-- Name: index_feeds_on_feed_url; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_feeds_on_feed_url ON feeds USING btree (feed_url);
 
 
 --
--- Name: index_feeds_on_last_published_entry; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_feeds_on_host; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_feeds_on_host ON feeds USING btree (host);
+
+
+--
+-- Name: index_feeds_on_last_published_entry; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_feeds_on_last_published_entry ON feeds USING btree (last_published_entry);
 
 
 --
--- Name: index_import_items_on_import_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_import_items_on_import_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_import_items_on_import_id ON import_items USING btree (import_id);
 
 
 --
--- Name: index_recently_read_entries_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_in_app_purchases_on_transaction_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_in_app_purchases_on_transaction_id ON in_app_purchases USING btree (transaction_id);
+
+
+--
+-- Name: index_in_app_purchases_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_in_app_purchases_on_user_id ON in_app_purchases USING btree (user_id);
+
+
+--
+-- Name: index_recently_read_entries_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_recently_read_entries_on_created_at ON recently_read_entries USING btree (created_at);
 
 
 --
--- Name: index_recently_read_entries_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_recently_read_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recently_read_entries_on_entry_id ON recently_read_entries USING btree (entry_id);
+
+
+--
+-- Name: index_recently_read_entries_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_recently_read_entries_on_user_id ON recently_read_entries USING btree (user_id);
 
 
 --
--- Name: index_recently_read_entries_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_recently_read_entries_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_recently_read_entries_on_user_id_and_entry_id ON recently_read_entries USING btree (user_id, entry_id);
 
 
 --
--- Name: index_saved_searches_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_saved_searches_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_saved_searches_on_user_id ON saved_searches USING btree (user_id);
 
 
 --
--- Name: index_sharing_services_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_sharing_services_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_sharing_services_on_user_id ON sharing_services USING btree (user_id);
 
 
 --
--- Name: index_starred_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_starred_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_starred_entries_on_entry_id ON starred_entries USING btree (entry_id);
 
 
 --
--- Name: index_starred_entries_on_feed_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_starred_entries_on_feed_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_starred_entries_on_feed_id ON starred_entries USING btree (feed_id);
 
 
 --
--- Name: index_starred_entries_on_published; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_starred_entries_on_published; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_starred_entries_on_published ON starred_entries USING btree (published);
 
 
 --
--- Name: index_starred_entries_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_starred_entries_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_starred_entries_on_user_id ON starred_entries USING btree (user_id);
 
 
 --
--- Name: index_starred_entries_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_starred_entries_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_starred_entries_on_user_id_and_entry_id ON starred_entries USING btree (user_id, entry_id);
 
 
 --
--- Name: index_subscriptions_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_subscriptions_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_subscriptions_on_created_at ON subscriptions USING btree (created_at);
 
 
 --
--- Name: index_subscriptions_on_feed_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_subscriptions_on_feed_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_subscriptions_on_feed_id ON subscriptions USING btree (feed_id);
 
 
 --
--- Name: index_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_subscriptions_on_feed_id_and_active_and_muted; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_subscriptions_on_feed_id_and_active_and_muted ON subscriptions USING btree (feed_id, active, muted);
+
+
+--
+-- Name: index_subscriptions_on_updates; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_subscriptions_on_updates ON subscriptions USING btree (feed_id, active, muted, show_updates);
+
+
+--
+-- Name: index_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_subscriptions_on_user_id ON subscriptions USING btree (user_id);
 
 
 --
--- Name: index_subscriptions_on_user_id_and_feed_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_subscriptions_on_user_id_and_feed_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_subscriptions_on_user_id_and_feed_id ON subscriptions USING btree (user_id, feed_id);
 
 
 --
--- Name: index_supported_sharing_services_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_suggested_feeds_on_feed_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_suggested_feeds_on_feed_id ON suggested_feeds USING btree (feed_id);
+
+
+--
+-- Name: index_suggested_feeds_on_suggested_category_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_suggested_feeds_on_suggested_category_id ON suggested_feeds USING btree (suggested_category_id);
+
+
+--
+-- Name: index_supported_sharing_services_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_supported_sharing_services_on_user_id ON supported_sharing_services USING btree (user_id);
 
 
 --
--- Name: index_supported_sharing_services_on_user_id_and_service_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_supported_sharing_services_on_user_id_and_service_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_supported_sharing_services_on_user_id_and_service_id ON supported_sharing_services USING btree (user_id, service_id);
 
 
 --
--- Name: index_taggings_on_tag_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_taggings_on_tag_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_taggings_on_tag_id ON taggings USING btree (tag_id);
 
 
 --
--- Name: index_taggings_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_taggings_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_taggings_on_user_id ON taggings USING btree (user_id);
 
 
 --
--- Name: index_taggings_on_user_id_and_feed_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_taggings_on_user_id_and_feed_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_taggings_on_user_id_and_feed_id ON taggings USING btree (user_id, feed_id);
 
 
 --
--- Name: index_taggings_on_user_id_and_tag_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_taggings_on_user_id_and_tag_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_taggings_on_user_id_and_tag_id ON taggings USING btree (user_id, tag_id);
 
 
 --
--- Name: index_tags_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tags_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_tags_on_name ON tags USING btree (name);
 
 
 --
--- Name: index_unread_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_unread_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_unread_entries_on_entry_id ON unread_entries USING btree (entry_id);
 
 
 --
--- Name: index_unread_entries_on_feed_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_unread_entries_on_feed_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_unread_entries_on_feed_id ON unread_entries USING btree (feed_id);
 
 
 --
--- Name: index_unread_entries_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_unread_entries_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_unread_entries_on_user_id ON unread_entries USING btree (user_id);
 
 
 --
--- Name: index_unread_entries_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_unread_entries_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_unread_entries_on_user_id_and_created_at ON unread_entries USING btree (user_id, created_at);
 
 
 --
--- Name: index_unread_entries_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_unread_entries_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_unread_entries_on_user_id_and_entry_id ON unread_entries USING btree (user_id, entry_id);
 
 
 --
--- Name: index_unread_entries_on_user_id_and_feed_id_and_published; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_unread_entries_on_user_id_and_feed_id_and_published; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_unread_entries_on_user_id_and_feed_id_and_published ON unread_entries USING btree (user_id, feed_id, published);
 
 
 --
--- Name: index_unread_entries_on_user_id_and_published; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_unread_entries_on_user_id_and_published; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_unread_entries_on_user_id_and_published ON unread_entries USING btree (user_id, published);
 
 
 --
--- Name: index_users_on_auth_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_updated_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_updated_entries_on_entry_id ON updated_entries USING btree (entry_id);
+
+
+--
+-- Name: index_updated_entries_on_feed_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_updated_entries_on_feed_id ON updated_entries USING btree (feed_id);
+
+
+--
+-- Name: index_updated_entries_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_updated_entries_on_user_id ON updated_entries USING btree (user_id);
+
+
+--
+-- Name: index_updated_entries_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_updated_entries_on_user_id_and_entry_id ON updated_entries USING btree (user_id, entry_id);
+
+
+--
+-- Name: index_users_on_auth_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_users_on_auth_token ON users USING btree (auth_token);
 
 
 --
--- Name: index_users_on_customer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_customer_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_users_on_customer_id ON users USING btree (customer_id);
 
 
 --
--- Name: index_users_on_inbound_email_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_expires_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_expires_at ON users USING btree (expires_at);
+
+
+--
+-- Name: index_users_on_inbound_email_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_users_on_inbound_email_token ON users USING btree (inbound_email_token);
 
 
 --
--- Name: index_users_on_lower_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_lower_email; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_users_on_lower_email ON users USING btree (lower((email)::text));
 
 
 --
--- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_newsletter_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_users_on_newsletter_token ON users USING btree (newsletter_token);
+
+
+--
+-- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_users_on_password_reset_token ON users USING btree (password_reset_token);
 
 
 --
--- Name: index_users_on_starred_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_starred_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_users_on_starred_token ON users USING btree (starred_token);
 
 
 --
--- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
@@ -1396,7 +1798,7 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "$user",public;
+SET search_path TO "$user", public;
 
 INSERT INTO schema_migrations (version) VALUES ('20121010042043');
 
@@ -1599,3 +2001,50 @@ INSERT INTO schema_migrations (version) VALUES ('20140326173619');
 INSERT INTO schema_migrations (version) VALUES ('20140416025157');
 
 INSERT INTO schema_migrations (version) VALUES ('20140505062817');
+
+INSERT INTO schema_migrations (version) VALUES ('20140823091357');
+
+INSERT INTO schema_migrations (version) VALUES ('20140823094323');
+
+INSERT INTO schema_migrations (version) VALUES ('20141022031229');
+
+INSERT INTO schema_migrations (version) VALUES ('20141110225053');
+
+INSERT INTO schema_migrations (version) VALUES ('20141117192421');
+
+INSERT INTO schema_migrations (version) VALUES ('20141202203934');
+
+INSERT INTO schema_migrations (version) VALUES ('20141208231955');
+
+INSERT INTO schema_migrations (version) VALUES ('20141215195928');
+
+INSERT INTO schema_migrations (version) VALUES ('20150424224723');
+
+INSERT INTO schema_migrations (version) VALUES ('20150425060924');
+
+INSERT INTO schema_migrations (version) VALUES ('20150520213553');
+
+INSERT INTO schema_migrations (version) VALUES ('20150602223929');
+
+INSERT INTO schema_migrations (version) VALUES ('20150626223113');
+
+INSERT INTO schema_migrations (version) VALUES ('20150707202540');
+
+INSERT INTO schema_migrations (version) VALUES ('20150713230754');
+
+INSERT INTO schema_migrations (version) VALUES ('20150714000523');
+
+INSERT INTO schema_migrations (version) VALUES ('20150817230441');
+
+INSERT INTO schema_migrations (version) VALUES ('20150827230751');
+
+INSERT INTO schema_migrations (version) VALUES ('20151011143618');
+
+INSERT INTO schema_migrations (version) VALUES ('20151019200512');
+
+INSERT INTO schema_migrations (version) VALUES ('20151110044837');
+
+INSERT INTO schema_migrations (version) VALUES ('20151207224028');
+
+INSERT INTO schema_migrations (version) VALUES ('20160126003712');
+

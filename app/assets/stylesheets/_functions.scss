@@ -29,7 +29,7 @@
 	}
 }
 
-@mixin arrow($x-position, $y-position, $arrow-color, $arrow-color-night, $shadow-color, $shadow-color-night, $origin:left, $invert:false) {
+@mixin arrow($x-position, $y-position, $arrow-color, $arrow-color-night, $arrow-color-sunset, $shadow-color, $shadow-color-night, $shadow-color-sunset, $origin:left, $invert:false) {
 	&:before {
 		@if $origin == left {
 			left: $x-position;
@@ -54,6 +54,14 @@
 			}
 			@else {
 				border-top-color: $shadow-color-night;
+			}
+		}
+		.theme-sunset & {
+			@if $invert == true {
+				border-bottom-color: $shadow-color-sunset;
+			}
+			@else {
+				border-top-color: $shadow-color-sunset;
 			}
 		}
 		@content;
@@ -85,42 +93,92 @@
 				border-top-color: $arrow-color-night;
 			}
 		}
+		.theme-sunset & {
+			@if $invert == true {
+				border-bottom-color: $arrow-color-sunset;
+			}
+			@else {
+				border-top-color: $arrow-color-sunset;
+			}
+		}
 		@content;
 	}
 }
 
-@mixin background-color($day, $night) {
+@mixin background-color($day, $night, $sunset) {
 	background-color: $day;
 	.theme-night & {
 		background-color: $night;
 	}
-}
-
-@mixin color($day, $night) {
-	color: $day;
-	.theme-night & {
-		color: $night;
+	.theme-sunset & {
+		background-color: $sunset;
 	}
 }
 
-@mixin border-color($day, $night) {
+@mixin color($day, $night, $sunset, $important:false) {
+	@if $important == true {
+    	color: $day !important;
+    	.theme-night & {
+    		color: $night !important;
+    	}
+    	.theme-sunset & {
+    		color: $sunset !important;
+    	}
+	}
+	@else {
+    	color: $day;
+    	.theme-night & {
+    		color: $night;
+    	}
+    	.theme-sunset & {
+    		color: $sunset;
+    	}
+	}
+}
+
+@mixin border-color($day, $night, $sunset) {
 	border-color: $day;
 	.theme-night & {
 		border-color: $night;
 	}
+	.theme-sunset & {
+		border-color: $sunset;
+	}
 }
 
-@mixin stroke($day, $night) {
+@mixin stroke($day, $night, $sunset) {
 	stroke: $day;
 	.theme-night & {
 		stroke: $night;
 	}
+	.theme-sunset & {
+		stroke: $sunset;
+	}
 }
 
-@mixin fill($day, $night) {
+@mixin fill($day, $night, $sunset) {
 	fill: $day;
 	.theme-night & {
 		fill: $night;
 	}
+	.theme-sunset & {
+		fill: $sunset;
+	}
 }
 
+@mixin share-icon($x-offset, $y-offset) {
+    background-repeat: no-repeat;
+    background-position: 30px + $x-offset 12px + $y-offset;
+    @media (max-width: 528px) {
+        background-position: 15px + $x-offset 12px + $y-offset;
+    }
+}
+
+
+@mixin settings-row {
+    padding: 15px 30px;
+    @media (max-width: 528px) {
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+}

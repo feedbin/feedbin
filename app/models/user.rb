@@ -4,10 +4,34 @@ class User < ActiveRecord::Base
 
   has_secure_password
 
-  store_accessor :settings, :entry_sort, :previous_read_count, :starred_feed_enabled,
-                 :hide_tagged_feeds, :precache_images, :show_unread_count, :sticky_view_inline,
-                 :mark_as_read_confirmation, :font_size, :font, :entry_width, :apple_push_notification_device_token,
-                 :mark_as_read_push_view, :keep_unread_entries, :receipt_info, :theme
+  store_accessor :settings,
+                 :entry_sort,
+                 :previous_read_count,
+                 :starred_feed_enabled,
+                 :precache_images,
+                 :show_unread_count,
+                 :sticky_view_inline,
+                 :mark_as_read_confirmation,
+                 :font_size,
+                 :font,
+                 :entry_width,
+                 :apple_push_notification_device_token,
+                 :mark_as_read_push_view,
+                 :keep_unread_entries,
+                 :receipt_info,
+                 :theme,
+                 :favicon_hash,
+                 :entries_display,
+                 :entries_feed,
+                 :entries_time,
+                 :entries_body,
+                 :entries_image,
+                 :ui_typeface,
+                 :update_message_seen,
+                 :hide_recently_read,
+                 :hide_updated,
+                 :view_mode,
+                 :disable_image_proxy
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -24,30 +48,62 @@ class User < ActiveRecord::Base
   has_many :saved_searches, dependent: :delete_all
   has_many :actions, dependent: :destroy
   has_many :recently_read_entries, dependent: :delete_all
+  has_many :updated_entries, dependent: :delete_all
+  has_many :devices, dependent: :delete_all
+  has_many :in_app_purchases
   belongs_to :plan
 
   accepts_nested_attributes_for :sharing_services,
                                 allow_destroy: true,
                                 reject_if: -> attributes { attributes['label'].blank? || attributes['url'].blank? }
 
-  accepts_nested_attributes_for :actions, allow_destroy: true, reject_if: :all_blank
+
+  after_initialize :set_defaults, if: :new_record?
 
   before_save :update_billing, unless: -> user { user.admin || !ENV['STRIPE_API_KEY'] }
-  before_destroy :cancel_billing, unless: -> user { user.admin }
-  before_destroy :create_deleted_user
   before_save :strip_email
   before_save :activate_subscriptions
   before_save { reset_auth_token }
-  before_create { generate_token(:starred_token) }
-  before_create { generate_token(:inbound_email_token) }
 
-  validates_presence_of :password, on: :create
-  validates_presence_of :email
-  validates_uniqueness_of :email, case_sensitive: false
+  before_create { generate_token(:starred_token) }
+  before_create { generate_token(:inbound_email_token, 4) }
+  before_create { generate_token(:newsletter_token, 4) }
+
+  before_destroy :cancel_billing, unless: -> user { user.admin }
+  before_destroy :create_deleted_user
+
   validate :changed_password, on: :update, unless: -> user { user.password_reset }
   validate :coupon_code_valid, on: :create, if: -> user { user.coupon_code }
   validate :plan_type_valid, on: :update
   validate :trial_plan_valid
+
+  validates_presence_of :email
+  validates_uniqueness_of :email, case_sensitive: false
+  validates_presence_of :password, on: :create
+
+  def set_defaults
+    self.expires_at = Feedbin::Application.config.trial_days.days.from_now
+    self.update_auth_token = true
+    self.mark_as_read_confirmation = 1
+    self.font = "serif-2"
+    self.font_size = 7
+  end
+
+  def get_view_mode
+    view_mode || "view_unread"
+  end
+
+  def get_favicon_hash
+    if favicon_hash
+      "#{favicon_hash}2"
+    else
+      "none"
+    end
+  end
+
+  def setting_on?(setting_symbol)
+    self.send(setting_symbol) == '1'
+  end
 
   def activate_subscriptions
     if plan_id_changed? && plan_id_was == Plan.find_by_stripe_id('trial').id
@@ -110,9 +166,9 @@ class User < ActiveRecord::Base
     end
   end
 
-  def generate_token(column, hash = false)
+  def generate_token(column, length = nil, hash = false)
     begin
-      random_string = SecureRandom.urlsafe_base64
+      random_string = SecureRandom.hex(length)
       if hash
         self[column] = Digest::SHA1.hexdigest(random_string)
       else
@@ -123,7 +179,7 @@ class User < ActiveRecord::Base
   end
 
   def send_password_reset
-    token = generate_token(:password_reset_token, true)
+    token = generate_token(:password_reset_token, nil, true)
     self.password_reset_sent_at = Time.now
     save!
     UserMailer.delay(queue: :critical).password_reset(id, token)
@@ -144,6 +200,7 @@ class User < ActiveRecord::Base
         if stripe_token.present?
           customer.card = stripe_token
           self.suspended = false
+          subscriptions.update_all(active: true)
         end
         customer.plan = plan.stripe_id
         customer.email = email
@@ -172,119 +229,30 @@ class User < ActiveRecord::Base
     CancelBilling.perform_async(customer_id)
   end
 
-  def total_unread
-    @total_unread_count ||= unread_count.inject(0) {|sum, (feed_id, count)| sum += count}
-  end
-
-  def total_starred
-    starred_entries.count
-  end
-
-  def title_with_count
-    if self.show_unread_count == '1'
-      @title_count ||= unread_entries.limit(1000).count
-      if @title_count == 0
-        "Feedbin"
-      elsif @title_count >= 1_000
-        "Feedbin (1,000+)"
-      else
-        "Feedbin (#{@title_count.to_s})"
-      end
-    else
-      "Feedbin"
-    end
-  end
-
-  # TODO make sure zero counts get hidden, maybe load feeds based on this list
-  def unread_count
-    @count ||= unread_entries.group(:feed_id).count
-  end
-
-  def starred_count
-    @starred_count ||= starred_entries.group(:feed_id).count
-  end
-
-  def feed_entries_count
-    ids = {}
-    feeds.pluck('feeds.id').map {|id| ids[id] = 0 }
-    ids.merge(entries.group('entries.feed_id').count)
-  end
-
   def feed_with_subscription_id(feed_id)
     feeds.select("feeds.*, subscriptions.id as subscription_id").where("feeds.id = ? AND subscriptions.user_id = #{self.id}", feed_id).first
   end
 
-  def feed_count(view_mode, user_feeds, selected_item = nil, keep_selected = false)
-    if 'view_starred' == view_mode
-      counts = starred_count
-    else
-      counts = unread_count
+  def tag_group
+    unique_tags = feed_tags
+    feeds_by_tag = build_feeds_by_tag
+    feeds_by_id = feeds.include_user_title
+    feeds_by_id = feeds_by_id.each_with_object({}) do |feed, hash|
+      hash[feed.id] = feed
     end
 
-    user_feeds.map do |feed|
-      feed.count = counts[feed.id] || 0
-      feed
+    unique_tags.map do |tag|
+      feed_ids = feeds_by_tag[tag.id] || []
+      user_feeds = feeds_by_id.values_at(*feed_ids).compact
+      tag.user_feeds = user_feeds.sort_by { |feed| feed.title.try(:downcase) }
+      tag
     end
 
-    if selected_item =~ /feed_/
-      selected_item = selected_item.sub('feed_', '').to_i
-    end
-
-    if %w{view_unread view_starred}.include?(view_mode)
-      user_feeds = user_feeds.reject do |feed|
-        if keep_selected && feed.id == selected_item
-          false
-        else
-          feed.count == 0
-        end
-      end
-    end
-    user_feeds
+    unique_tags
   end
 
-  def owned_tags_with_count(view_mode, selected_item = nil, keep_selected = false)
-    taggings = feed_tags
-    feeds_by_tag = build_feeds_by_tag
-    feeds_with_count = feed_count(view_mode, feeds.include_user_title, selected_item, true)
-
-    if selected_item =~ /tag_/
-      selected_tag = selected_item.sub('tag_', '').to_i
-    else
-      selected_tag = nil
-    end
-
-    if 'view_starred' == view_mode
-      counts = starred_count
-    else
-      counts = unread_count
-    end
-
-    taggings.each do |tag|
-      feed_ids = feeds_by_tag[tag.id] || []
-      tag.count = feed_ids.inject(0) do |sum, feed_id|
-        count = counts[feed_id] || 0
-        sum + count
-      end
-
-      tag.user_feeds = []
-      feeds_with_count.each do |feed|
-        if feed_ids.include?(feed.id)
-          tag.user_feeds << feed
-        end
-      end
-    end
-
-    if %w{view_unread view_starred}.include?(view_mode)
-      taggings = taggings.reject do |tag|
-        if selected_item && tag.id == selected_tag || tag.user_feeds.any?
-          false
-        else
-          tag.count == 0
-        end
-      end
-    end
-
-    taggings
+  def feed_order
+    feeds.include_user_title.map {|feed| feed.id}
   end
 
   def subscribe!(feed)
@@ -300,7 +268,7 @@ class User < ActiveRecord::Base
   end
 
   def subscribed_to?(feed_id)
-    subscriptions.where(feed_id: feed_id).present?
+    subscriptions.where(feed_id: feed_id).exists?
   end
 
   def self.search(query)
@@ -322,7 +290,6 @@ class User < ActiveRecord::Base
   end
 
   def build_feeds_by_tag
-    tags = {}
     query = <<-eos
       SELECT
         tag_id, array_to_json(array_agg(feed_id)) as feed_ids
@@ -333,18 +300,35 @@ class User < ActiveRecord::Base
     eos
     query = ActiveRecord::Base.send(:sanitize_sql_array, [query, self.id, subscriptions.pluck(:feed_id)])
     results = ActiveRecord::Base.connection.execute(query)
-    results.each do |result|
-      tags[result['tag_id'].to_i] = JSON.parse(result['feed_ids'])
+    results.each_with_object({}) do |result, hash|
+      hash[result['tag_id'].to_i] = JSON.parse(result['feed_ids'])
     end
-    tags
   end
 
   def create_deleted_user
     DeletedUser.create(email: self.email, customer_id: self.customer_id)
   end
 
+  def activate
+    update_attributes(suspended: false)
+    subscriptions.update_all(active: true)
+  end
+
+  def deactivate
+    update_attributes(suspended: true)
+    subscriptions.update_all(active: false)
+  end
+
   def admin?
     admin
+  end
+
+  def newsletter_address
+    template = "subscribe+%s@newsletters.feedbin.com"
+    if Rails.env.development?
+      template = "test-subscribe+%s@newsletters.feedbin.com"
+    end
+    template % self.newsletter_token
   end
 
 end

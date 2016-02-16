@@ -6,19 +6,25 @@ class FeedsController < ApplicationController
 
   def update
     @user = current_user
-    @feed = Feed.find(params[:id])
-    taggings = @feed.tag(params[:feed][:tag_list], @user)
-
-    # Open the tag drawer this was just added to
-    taggings.each do |tagging|
-      @user.update_tag_visibility(tagging.tag_id.to_s, true)
-    end
-
     @mark_selected = true
-    get_feeds_list
-    respond_to do |format|
-      format.js
+
+    @feed = Feed.find(params[:id])
+    @feed.tag(params[:feed][:tag_list], @user)
+
+    if params[:no_response].present?
+      render nothing: true
+    else
+      get_feeds_list
     end
+
+  end
+
+  def rename
+    @user = current_user
+    @subscription = @user.subscriptions.where(feed_id: params[:feed_id]).first!
+    title = params[:feed][:title]
+    @subscription.title = title.empty? ? nil : title
+    @subscription.save
   end
 
   def view_unread
@@ -30,20 +36,11 @@ class FeedsController < ApplicationController
   end
 
   def view_all
-    # Clear the hide queue when switching to view_all incase there's anything sitting in it.
-    @clear_hide_queue = true
     update_view_mode('view_all')
   end
 
   def auto_update
-    @keep_selected = true
-    if session[:view_mode] == 'view_all'
-      view_all
-    elsif session[:view_mode] == 'view_starred'
-      view_starred
-    else
-      view_unread
-    end
+    get_feeds_list
   end
 
   def push
@@ -54,7 +51,7 @@ class FeedsController < ApplicationController
           render_404
         else
           @feed.update_attributes(push_expiration: Time.now + (params['hub.lease_seconds'].to_i/2).seconds)
-          render text: params['hub.challenge']
+          render plain: params['hub.challenge']
         end
       else
         # Handle unsubscriptions confirmation
@@ -84,18 +81,34 @@ class FeedsController < ApplicationController
     end
   end
 
+  def toggle_updates
+    @user = current_user
+    subscription = @user.subscriptions.where(feed_id: params[:id]).take!
+    subscription.toggle!(:show_updates)
+    if params.has_key?(:inline)
+      @delay = false
+      if !@user.setting_on?(:update_message_seen)
+        @user.update_message_seen = '1'
+        @user.save
+        @delay = true
+      end
+    else
+      render nothing: true
+    end
+  end
+
+  def update_styles
+    user = current_user
+    @feed_ids = user.subscriptions.where(show_updates: false).pluck(:feed_id)
+  end
+
   private
 
   def update_view_mode(view_mode)
     @user = current_user
     @view_mode = view_mode
-    session[:view_mode] = @view_mode
-
-    @mark_selected = true
-    get_feeds_list
-    respond_to do |format|
-      format.js { render partial: 'shared/update_view_mode' }
-    end
+    @user.update_attributes(view_mode: @view_mode)
+    render nothing: true
   end
 
   def correct_user

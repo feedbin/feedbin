@@ -4,7 +4,7 @@ class StarredEntriesController < ApplicationController
   def index
     @user = User.find_by_starred_token(params[:starred_token])
 
-    if @user && @user.starred_feed_enabled == '1'
+    if @user && @user.setting_on?(:starred_feed_enabled)
       @title = "Feedbin Starred Entries for #{@user.email}"
       @entries = Rails.cache.fetch("#{@user.id}:starred_feed") {
         @starred_entries = @user.starred_entries.order('created_at DESC').limit(50)
@@ -32,21 +32,14 @@ class StarredEntriesController < ApplicationController
     @entry = Entry.find(params[:id])
     starred_entry = StarredEntry.where(user: @user, entry: @entry)
 
-    if params[:starred] == 'true'
-      @starred = true
-      unless starred_entry.present?
-        StarredEntry.create_from_owners(@user, @entry)
-      end
-    elsif params[:starred] == 'false'
-      @starred = false
+    if starred_entry.present?
       starred_entry.destroy_all
+    else
+      StarredEntry.create_from_owners(@user, @entry, "web")
     end
 
-    @tags = @user.tags.where(taggings: {feed_id: @entry.feed_id}).uniq.collect(&:id)
-
-    respond_to do |format|
-      format.js
-    end
+    render nothing: true
   end
+
 
 end

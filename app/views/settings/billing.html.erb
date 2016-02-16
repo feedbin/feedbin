@@ -1,105 +1,144 @@
+<% content_for :head do %>
+  <%= javascript_include_tag "https://js.stripe.com/v1/" %>
+<% end %>
+
 <div class="settings-content-inner">
-  <h2>Billing</h2>
-  <h3>Update Billing</h3>
+  <div class="settings-outer">
+    <h2>Billing</h2>
+  </div>
+
+
   <% if ENV['STRIPE_API_KEY'] %>
     <% if @user.plan.stripe_id == 'trial' %>
-      <% if @user.days_left <= 0 %>
-        <p>Your trial has ended. Subscribe now to continue using Feedbin.</p>
-      <% else %>
-        <p>Your trial period will end in <strong><%= pluralize(@user.days_left, 'day') %></strong>. Subscribe now to continue using Feedbin uninterrupted.</p>
-      <% end %>
+      <div class="settings-outer">
+        <% if @user.days_left <= 0 %>
+          <p>Your trial has ended. Subscribe now to continue using Feedbin.</p>
+        <% else %>
+          <p>Your trial period will end in <strong><%= pluralize(@user.days_left, 'day') %></strong>. Subscribe now to continue using Feedbin uninterrupted.</p>
+        <% end %>
+        <div data-behavior="stripe_error" class="alert alert-error hide"></div>
+      </div>
+      <div class="inset">
+        <%= form_for @user, html: { data: { behavior: 'credit_card_form' } } do |f| %>
+          <%= f.hidden_field :stripe_token, data: { behavior: 'stripe_token' } %>
+          <%= hidden_field_tag :redirect_to, settings_billing_url %>
 
-      <div data-behavior="stripe_error" class="alert alert-error hide"></div>
-      <%= form_for @user, html: { data: { behavior: 'credit_card_form' } } do |f| %>
-        <%= f.hidden_field :stripe_token, data: { behavior: 'stripe_token' } %>
-        <%= hidden_field_tag :redirect_to, settings_billing_url %>
-        <div class="form-wrap">
+          <div class="inset-content">
+            <h4 class="group-header">Subscribe</h4>
+          </div>
           <% if @user.stripe_token %>
             <p>Credit card acceptance is pending.</p>
           <% else %>
             <%= render partial: 'shared/credit_card_form' %>
           <% end %>
-        </div>
 
-        <div class="plan-options">
+          <ul class="control-group control-group-form">
           <% @plans.each do |plan| %>
-            <% options = plan.stripe_id == 'basic-yearly-2' ? {checked: true, id: dom_id(plan)} : {id: dom_id(plan)} %>
-            <%= f.radio_button :plan_id, plan.id, options %>
-            <%= label_tag nil, for: dom_id(plan) do %>
-              <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.name.gsub(/ly$/, '').downcase %>
-            <% end %>
+            <li>
+              <% options = plan.stripe_id == 'basic-yearly-2' ? {checked: true, id: dom_id(plan)} : {id: dom_id(plan)} %>
+              <%= f.radio_button :plan_id, plan.id, options %>
+              <%= label_tag nil, for: dom_id(plan) do %>
+                <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.name.gsub(/ly$/, '').downcase %>
+              <% end %>
+            </li>
           <% end %>
-        </div>
+          </ul>
 
-        <%= f.submit "Subscribe", class: 'button', tabindex: 3 %>
+          <div class="description-inset">
+            <%= f.submit "Subscribe", class: 'button-plain no-margin' %>
+          </div>
 
-      <% end %>
+        <% end %>
+      </div>
+
     <% else %>
-      <% if @user.last_4_digits %>
-        <p class="billing-promo">Your current card **** **** **** <%= @user.last_4_digits %></p>
-      <% end %>
-      <div data-behavior="stripe_error" class="alert alert-error hide"></div>
-      <%= form_tag settings_update_credit_card_path, data: { behavior: 'credit_card_form' } do %>
-        <%= hidden_field_tag :stripe_token, nil, data: { behavior: 'stripe_token' } %>
-        <%= render partial: 'shared/credit_card_form' %>
-        <%= submit_tag "Update", class: 'button' %>
-      <% end %>
+      <div class="settings-outer">
+        <div data-behavior="stripe_error" class="alert alert-error hide"></div>
+      </div>
 
-      <h3>Change your Plan</h3>
-      <div class="table-wrap">
+      <div class="inset">
+        <%= form_tag settings_update_credit_card_path, data: { behavior: 'credit_card_form' } do %>
+          <%= hidden_field_tag :stripe_token, nil, data: { behavior: 'stripe_token' } %>
+          <div class="inset-content">
+            <h4 class="group-header">Update Billing Info</h4>
+          </div>
+
+          <%= render partial: 'shared/credit_card_form' %>
+
+          <div class="description-inset">
+            <%= submit_tag "Update Billing", class: "button-plain no-margin" %>
+          </div>
+
+        <% end %>
+      </div>
+
+      <div class="inset">
+        <div class="inset-content">
+          <h4 class="group-header">Change Your Plan</h4>
+        </div>
+        <div class="table-wrap">
           <table class="table table-rounded" style="margin-bottom: 0;">
             <% @plans.each do |plan| %>
               <tr>
-                  <td><%= plan.name %></td>
-                  <td><%= number_to_currency(plan.price) %>/<%= plan.name %></td>
-                  <td>
-                    <% if @user.plan.id == plan.id %>
-                      Your plan
-                    <% else %>
-                      <%= form_tag settings_update_plan_path, data: { behavior: 'change_plan' }, class: 'no-margin' do %>
-                        <%= hidden_field_tag 'plan', plan.id %>
-                        <%= button_tag 'Switch to this plan', data: { confirm: 'Are you sure you want to change plans?' }, class: 'button button-link' %>
-                      <% end %>
+                <td><%= plan.name %></td>
+                <td><%= number_to_currency(plan.price) %>/<%= plan.name %></td>
+                <td>
+                  <% if @user.plan.id == plan.id %>
+                    Your plan
+                  <% else %>
+                    <%= form_tag settings_update_plan_path, data: { behavior: 'change_plan' }, class: 'no-margin' do %>
+                      <%= hidden_field_tag 'plan', plan.id %>
+                      <%= button_tag 'Switch to this plan', class: 'button button-link' %>
                     <% end %>
-                  </td>
+                  <% end %>
+                </td>
               </tr>
             <% end %>
           </table>
-      </div>
+        </div>
+        <p class="control-group-description">Plan changes are pro-rated.</p>
 
-      <p><small>Plan changes are pro-rated.</small></p>
-
-      <h3 class="por">
-        Payment History
-      </h3>
-
-      <div class="table-wrap">
-        <table class="table table-rounded">
-          <% if @next_payment_date %>
+        <div class="inset-content">
+          <h4 class="group-header">Payment History</h4>
+        </div>
+        <div class="table-wrap">
+          <table class="table table-rounded">
+            <% if @next_payment_date %>
+              <tr>
+                <td><time datetime="<%= @next_payment_date.to_s(:date) %>"><%= @next_payment_date.to_s(:date) %></time></td>
+                <td>&nbsp;</td>
+                <td><span class="extra-muted">Scheduled</span></td>
+              </tr>
+            <% end %>
+            <% @billing_events.each do |invoice| %>
             <tr>
-              <td><time datetime="<%= @next_payment_date.to_s(:date) %>"><%= @next_payment_date.to_s(:date) %></time></td>
-              <td><span class="extra-muted">Scheduled</span></td>
-              <td>&nbsp;</td>
+              <td><%= Time.at(invoice.details.data.object.created).to_s(:date) %></td>
+              <td><%= invoice.details.data.object.currency.upcase %> <%= number_to_currency(invoice.details.data.object.amount.to_f / 100) %></td>
+              <td><%= link_to 'Receipt', invoice %></td>
             </tr>
-          <% end %>
-          <% @billing_events.each do |invoice| %>
-          <tr>
-            <td><%= Time.at(invoice.details.data.object.created).to_s(:date) %></td>
-            <td><%= link_to 'Receipt', invoice %></td>
-            <td><%= invoice.details.data.object.currency.upcase %> <%= number_to_currency(invoice.details.data.object.amount.to_f / 100) %></td>
-          </tr>
-          <% end %>
-        </table>
+            <% end %>
+          </table>
+        </div>
       </div>
 
-      <h3 class="no-margin">Receipt Info</h3>
-      <p><small>This will show up on your receipt. Useful for VAT, address etc...</small></p>
+      <div class="inset">
+        <div class="inset-content">
+          <h4 class="group-header">Receipt Info</h4>
+        </div>
 
-      <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
-        <%= hidden_field_tag :redirect_to, settings_billing_url %>
-        <%= f.text_area :receipt_info, rows: 3 %>
-        <p><%= f.submit "Save", class: 'button' %></p>
-      <% end %>
+        <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
+          <%= hidden_field_tag :redirect_to, settings_billing_url %>
+          <ul class="control-group control-group-form">
+            <li>
+              <%= f.text_area :receipt_info, rows: 3 %>
+            </li>
+          </ul>
+          <p class="control-group-description">This will show up on your receipt. Useful for VAT, address etc&hellip;</p>
+          <div class="description-inset">
+            <%= f.submit "Save Info", class: "button-plain  no-margin" %>
+          </div>
+        <% end %>
+      </div>
 
     <% end %>
   <% else %>

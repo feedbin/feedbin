@@ -26,8 +26,15 @@
       <%= svg_tag 'icon-full-screen-close', size: '34x26' %>
     </div>
   </div>
-  <%= link_to settings_theme_path, remote: true, method: :post, class: 'setting-wrap theme-settings', title: 'Toggle theme', data: {behavior: 'switch_theme'} do %>
-    <%= svg_tag 'icon-theme-day', class: 'button-theme-day', size: '18x18' %>
-    <%= svg_tag 'icon-theme-night', class: 'button-theme-night', size: '17x19' %>
-  <% end %>
+  <div class="setting-wrap theme-settings">
+    <%= link_to settings_theme_path(theme: 'day'), remote: true, method: :post, class: 'theme-button theme-button-day', title: 'Switch to day theme', data: {behavior: 'switch_theme', theme: 'day'} do %>
+      <span class="theme-button-inner"></span>
+    <% end %>
+    <%= link_to settings_theme_path(theme: 'sunset'), remote: true, method: :post, class: 'theme-button theme-button-sunset', title: 'Switch to sunset theme', data: {behavior: 'switch_theme', theme: 'sunset'} do %>
+      <span class="theme-button-inner"></span>
+    <% end %>
+    <%= link_to settings_theme_path(theme: 'night'), remote: true, method: :post, class: 'theme-button theme-button-night', title: 'Switch to night theme', data: {behavior: 'switch_theme', theme: 'night'} do %>
+      <span class="theme-button-inner"></span>
+    <% end %>
+  </div>
 </div>

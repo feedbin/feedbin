@@ -18,15 +18,28 @@ class SettingsController < ApplicationController
     @user = current_user
   end
 
+  def appearance
+    @user = current_user
+    @classes = user_classes
+  end
+
   def feeds
     @user = current_user
-    @subscriptions = @user.subscriptions.select('subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url').joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}")
+    @subscriptions = @user.subscriptions.select('subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host').joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}").includes(:feed)
 
+    start_date = 29.days.ago
     feed_ids = @subscriptions.map {|subscription| subscription.feed_id}
-    entry_counts = Rails.cache.fetch("#{@user.id}:entry_counts", expires_in: 24.hours) { get_entry_counts(feed_ids) }
+    entry_counts = Rails.cache.fetch("#{@user.id}:entry_counts:2", expires_in: 24.hours) { FeedStat.get_entry_counts(feed_ids, start_date) }
+    max = Rails.cache.fetch("#{@user.id}:max_entry_count", expires_in: 24.hours) { FeedStat.max_entry_count(feed_ids, start_date) }
 
-    @subscriptions = @subscriptions.map {|subscription|
-      subscription.entries_count = entry_counts[subscription.feed_id]
+    @subscriptions = @subscriptions.map do |subscription|
+      counts = entry_counts[subscription.feed_id]
+      percentages = (counts.present?) ? counts.map { |count| count.to_f / max.to_f } : nil
+      volume = (counts.present?) ? counts.sum : 0
+
+      subscription.entries_count = percentages
+      subscription.post_volume = volume
+
       if subscription.title
         subscription.title = subscription.title
       elsif subscription.original_title
@@ -35,7 +48,7 @@ class SettingsController < ApplicationController
         subscription.title = '(No title)'
       end
       subscription
-    }
+    end
 
     @subscriptions = @subscriptions.sort_by {|subscription| subscription.title.downcase}
   end
@@ -59,7 +72,7 @@ class SettingsController < ApplicationController
     elsif @user.plan.stripe_id == 'free'
       @plans = Plan.where(price_tier: @user.plan.price_tier)
     else
-      @plans = Plan.where(price_tier: @user.plan.price_tier).where.not(stripe_id: ['free', 'trial'])
+      @plans = Plan.where(price_tier: @user.plan.price_tier).where.not(stripe_id: ['free', 'trial', 'timed'])
     end
   end
 
@@ -67,6 +80,13 @@ class SettingsController < ApplicationController
     @user = current_user
     @uploader = Import.new.upload
     @uploader.success_action_redirect = settings_import_export_url
+    @tags = @user.feed_tags
+
+    @download_options = @tags.map do |tag|
+      [tag.name, tag.id]
+    end
+
+    @download_options.unshift(['All', 'all'])
 
     if params[:key]
       @import = Import.new(key: params[:key], user: @user)
@@ -87,39 +107,59 @@ class SettingsController < ApplicationController
   end
 
   def update_plan
-    plan = Plan.find(params[:plan])
     @user = current_user
-    @user.plan = plan
-    @user.save
+    plan = Plan.find(params[:plan])
     customer = Stripe::Customer.retrieve(@user.customer_id)
     customer.update_subscription(plan: plan.stripe_id)
-    redirect_to settings_billing_path
+    @user.plan = plan
+    @user.save
+    redirect_to settings_billing_path, notice: 'Plan successfully changed.'
+  rescue Stripe::CardError
+    redirect_to settings_billing_path, alert: "Your card was declined, please update your billing information."
   end
 
   def update_credit_card
     @user = current_user
-    @user.stripe_token = params[:stripe_token]
 
-    respond_to do |format|
+    if params[:stripe_token].present?
+      @user.stripe_token = params[:stripe_token]
       if @user.save
-        format.html { redirect_to settings_billing_url, notice: 'Your credit card has been updated.' }
+        customer = Customer.retrieve(@user.customer_id)
+        customer.reopen_account if customer.unpaid?
+        redirect_to settings_billing_url, notice: 'Your credit card has been updated.'
       else
-        format.html { redirect_to settings_billing_url, alert: @user.errors.messages[:base].join(' ') }
+        redirect_to settings_billing_url, alert: @user.errors.messages[:base].join(' ')
       end
+    else
+      redirect_to settings_billing_url, alert: 'There was a problem updating your credit card. Please try again.'
+      Librato.increment('billing.token_missing')
     end
+
   end
 
   def settings_update
     @user = current_user
     @user.attributes = user_settings_params
     if @user.save
-      if params[:redirect_to]
-        redirect_to params[:redirect_to], notice: 'Settings updated.'
-      else
-        redirect_to settings_path, notice: 'Settings updated.'
+      respond_to do |format|
+        flash[:notice] = 'Settings updated.'
+        format.js {flash.discard()}
+        format.html do
+          if params[:redirect_to]
+            redirect_to params[:redirect_to]
+          else
+            redirect_to settings_path
+          end
+        end
       end
     else
-      redirect_to settings_path, alert: @user.errors.full_messages.join('. ') + '.'
+      respond_to do |format|
+        flash[:alert] = @user.errors.full_messages.join('. ') + '.'
+        format.js {flash.discard()}
+        format.html do
+          redirect_to settings_path
+        end
+      end
     end
   end
 
@@ -160,12 +200,11 @@ class SettingsController < ApplicationController
 
   def theme
     @user = current_user
-    if @user.theme.blank? || @user.theme == 'day'
-      @user.theme = 'night'
-    else
-      @user.theme = 'day'
+    themes = ['day', 'night', 'sunset']
+    if themes.include?(params[:theme])
+      @user.theme = params[:theme]
+      @user.save
     end
-    @user.save
     render nothing: true
   end
 
@@ -180,6 +219,8 @@ class SettingsController < ApplicationController
     @user.save
     render nothing: true
   end
+
+
 
   private
 
@@ -206,59 +247,12 @@ class SettingsController < ApplicationController
   end
 
   def user_settings_params
-    params.require(:user).permit(:entry_sort, :starred_feed_enabled, :hide_tagged_feeds, :precache_images, :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation, :apple_push_notification_device_token, :receipt_info)
+    params.require(:user).permit(:entry_sort, :starred_feed_enabled, :precache_images,
+                                 :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation,
+                                 :apple_push_notification_device_token, :receipt_info, :entries_display,
+                                 :entries_feed, :entries_time, :entries_body, :ui_typeface, :theme,
+                                 :hide_recently_read, :hide_updated, :disable_image_proxy, :entries_image)
   end
 
-  def get_entry_counts(feed_ids)
-    start_date = 29.days.ago
-    end_date = Time.now
-
-    max = max_entry_count(feed_ids, start_date)
-    stats_query = relative_entry_count_query
-
-    entry_counts = {}
-    feed_ids.each do |feed_id|
-      query = ActiveRecord::Base.send(:sanitize_sql_array, [stats_query, start_date, end_date, max, start_date, feed_id])
-      results = ActiveRecord::Base.connection.execute(query)
-      results.each do |result|
-        if entry_counts.has_key?(feed_id)
-          entry_counts[feed_id] << result['entries_count']
-        else
-          entry_counts[feed_id] = [result['entries_count']]
-        end
-      end
-    end
-    entry_counts
-  end
-
-  def max_entry_count(feed_ids, start_date)
-    max_query = "SELECT COALESCE(MAX(entries_count), 0) as max FROM feed_stats WHERE feed_id IN(?) and day >= ?"
-    max_query = ActiveRecord::Base.send(:sanitize_sql_array, [max_query, feed_ids, start_date])
-    max = ActiveRecord::Base.connection.execute(max_query)
-    max.first['max'].to_i
-  end
-
-  def relative_entry_count_query
-    <<-eos
-      SELECT
-        date,
-        coalesce(entries_count,0) AS entries_count
-      FROM
-      generate_series(
-        ?::date,
-        ?::date,
-        '1 day'
-      ) AS date
-      LEFT OUTER JOIN (
-        SELECT
-        day,
-        (entries_count::float / ?) AS entries_count
-        FROM feed_stats
-        WHERE day >= ?
-        AND feed_id = ?
-      ) results
-      ON (date = results.day)
-    eos
-  end
 
 end

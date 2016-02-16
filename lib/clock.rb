@@ -7,11 +7,11 @@ include Clockwork
 # Use locks so multiple clock processes do not schedule dupes
 every(1.minutes, 'clockwork.frequent') do
 
-  if RedisLock.acquire("clockwork:feed:refresher:scheduler", 55)
+  if RedisLock.acquire("clockwork:feed:refresher:scheduler")
     FeedRefresherScheduler.perform_async
   end
 
-  if RedisLock.acquire("clockwork:send_stats", 55)
+  if RedisLock.acquire("clockwork:send_stats")
     SendStats.perform_async
   end
 
@@ -19,16 +19,20 @@ end
 
 every(1.day, 'clockwork.daily', at: '12:00', tz: 'UTC') do
 
-  if RedisLock.acquire("clockwork:delete_unread_entries", 23.hours.to_i)
+  if RedisLock.acquire("clockwork:delete_unread_entries")
     UnreadEntryDeleterScheduler.perform_async
   end
 
-  if RedisLock.acquire("clockwork:delete_entries", 23.hours.to_i)
+  if RedisLock.acquire("clockwork:delete_entries")
     EntryDeleterScheduler.perform_async
   end
 
-  if RedisLock.acquire("clockwork:trial_expiration", 23.hours.to_i)
+  if RedisLock.acquire("clockwork:trial_expiration")
     TrialExpiration.perform_async
+  end
+
+  if RedisLock.acquire("clockwork:device_feedback")
+    DeviceFeedback.perform_async
   end
 
 end

@@ -2,15 +2,12 @@
 <% if @feed %>
   <% present feed do |feed_presenter| %>
     <span class="feed-title-wrap">
-      <%= feed_presenter.favicon(feed.site_url) %>
       <span data-behavior="user_title" data-feed-id="<%= @feed.id %>"><%= @feed.title %></span>
     </span>
   <% end %>
 <% else %>
   <span class="feed-title-wrap">
-    <span class="favicon-wrap collection-favicon">
-      <%= svg_tag @collection_favicon, size: '16x16' %>
-    </span>
     <%= @collection_title %>
   </span>
 <% end %>
+<button class="search-button" data-behavior="show_search"></button>

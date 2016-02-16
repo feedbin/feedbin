@@ -6,16 +6,27 @@ class BasePresenter
     @template = template
   end
 
-  def favicon(host, parse = true)
-    if parse
-      begin
-        host = URI::parse(host).host
-      rescue Exception => e
-        host = nil
+  def favicon(feed)
+    @favicon ||= begin
+      if feed.newsletter?
+        content = @template.content_tag :span, '', class: "favicon-wrap collection-favicon" do
+          @template.svg_tag('favicon-newsletter', size: "16x16")
+        end
+      else
+        favicon_classes = "favicon"
+        favicon_classes << " favicon-#{feed.host.gsub('.', '-')}" if feed.host
+        content = <<-eos
+          <span class="favicon-wrap">
+            <span class="#{favicon_classes}"></span>
+          </span>
+        eos
       end
+      content.html_safe
     end
+  end
+
+  def favicon_with_url(host)
     @template.content_tag :span, '', class: "favicon-wrap" do
-      @template.content_tag(:span, '', class: "favicon-default") +
       @template.content_tag(:span, '', class: "favicon", style: "background-image: url(#{favicon_url(host)});")
     end
   end
@@ -23,8 +34,9 @@ class BasePresenter
   def favicon_url(host)
     uri = URI::HTTP.build(
       scheme: "https",
-      host: "d34k41xev839cc.cloudfront.net",
-      path: "/#{host}"
+      host: "www.google.com",
+      path: "/s2/favicons",
+      query: {domain: host}.to_query
     )
     uri.scheme = "https"
     uri.to_s

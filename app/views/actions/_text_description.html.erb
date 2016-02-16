@@ -1,30 +1,20 @@
-<div class="action-description">
-  <div class="description-item clearfix">
-    <div class="action-label action-keywords">
-      Keywords:
-    </div>
-    <div class="action-data action-keywords">
-      <% if action.query.blank? %>
-        Anything
-      <% else %>
-        <%= action.query %>
-      <% end %>
-    </div>
-  </div>
-  <div class="description-item clearfix">
-    <div class="action-label">
-      Feeds:
-    </div>
-    <div class="action-data">
-      <%= action_feed_names(action) %>
-    </div>
-  </div>
-  <div class="description-item clearfix">
-    <div class="action-label">
-      Actions:
-    </div>
-    <div class="action-data">
-      <%= action_names(action) %>
-    </div>
-  </div>
-</div>
+<% if action.title.present? %>
+  <p class="half-margin"><strong><%= action.title %></strong></p>
+<% end %>
+
+<small class="sub-head">
+<% feed_ids = action.feed_ids.reject{ |feed_id| feed_id.empty? } %>
+If an article is published
+
+<% if action.query.present? %>
+  that matches the search <strong><%= action.query %></strong>
+<% end %>
+
+<% if action.all_feeds %>
+  in <strong>any</strong> feed
+<% elsif feed_ids.any? %>
+  in the feed<%= feed_ids.length > 1 ? 's' : '' %> <strong><%= action_feed_names(action) %></strong>
+<% end %>
+
+then <%= action_names(action) %>.
+</small>

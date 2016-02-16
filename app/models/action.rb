@@ -1,37 +1,68 @@
 class Action < ActiveRecord::Base
-    belongs_to :user
 
-    validate :validate_query
+  attr_accessor :automatic_modification
 
-    after_commit :search_percolate_store, on: [:create, :update]
-    after_destroy :search_percolate_remove
+  belongs_to :user
+  enum action_type: { standard: 0, notifier: 1 }
 
-    def search_percolate_store
-      action_feed_ids = self.feed_ids
-      action_query = self.query
-      result = Entry.index.register_percolator_query(self.id) do |search|
+  validate do |action|
+    if computed_feed_ids.empty? && self.automatic_modification.blank?
+      self.errors[:base] << "Please select at least one feed or tag"
+    end
+  end
+
+  before_validation :compute_tag_ids
+  before_validation :compute_feed_ids
+  after_destroy :search_percolate_remove
+  after_commit :search_percolate_store, on: [:create, :update]
+
+  def search_percolate_store
+    percolator_query = self.query
+    percolator_ids = self.computed_feed_ids
+    if percolator_ids.empty?
+      search_percolate_remove
+    elsif self.all_feeds && percolator_query.blank?
+      search_percolate_remove
+    else
+      Entry.index.register_percolator_query(self.id) do |search|
         search.filtered do
-          unless action_query.blank?
-            query { string Entry.escape_search(action_query) }
+          filter :terms, feed_id: percolator_ids
+          unless percolator_query.blank?
+            query { string Entry.escape_search(percolator_query) }
           end
-          filter :terms, feed_id: action_feed_ids.map(&:to_i)
         end
       end
-      if result.nil?
-        Honeybadger.notify(
-          error_class: "Action Percolate Save",
-          error_message: "Action Percolate Save Failure",
-          parameters: {id: self.id}
-        )
+    end
+  end
+
+  def search_percolate_remove
+    Entry.index.unregister_percolator_query(self.id)
+  end
+
+  def compute_feed_ids
+    final_feed_ids = []
+    new_feed_ids = self.feed_ids || []
+    subscriptions = Subscription.uncached do
+      self.user.subscriptions.pluck(:feed_id)
+    end
+    if self.all_feeds
+      final_feed_ids.concat(subscriptions)
+    end
+    final_feed_ids.concat(self.user.taggings.where(tag: self.tag_ids).pluck(:feed_id))
+    final_feed_ids.concat(new_feed_ids.reject(&:blank?).map(&:to_i))
+    final_feed_ids = final_feed_ids.uniq
+    final_feed_ids = final_feed_ids & subscriptions
+    self.computed_feed_ids = final_feed_ids
+  end
+
+  def compute_tag_ids
+    new_tag_ids = self.tag_ids || []
+    new_tag_ids.each do |tag_id|
+      if !self.user.tags.where(id: tag_id).present?
+        new_tag_ids = new_tag_ids - [tag_id]
       end
     end
-
-    def search_percolate_remove
-      Entry.index.unregister_percolator_query(self.id)
-    end
-
-    def validate_query
-      # errors.add(:query, 'is invalid')
-    end
+    self.tag_ids = new_tag_ids
+  end
 
 end

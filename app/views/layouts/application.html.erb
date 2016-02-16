@@ -2,15 +2,20 @@
 <html>
 <head>
   <title><%= @title || 'Feedbin' %></title>
-  <%= render partial: 'shared/mobile_meta' %>
+  <meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no" />
+  <link rel="mask-icon" href="<%= asset_path('website-icon.svg') %>" color="#000000" />
+  <link rel="apple-touch-icon-precomposed" href="<%= asset_path('apple-touch-icon-precomposed.png') %>" />
+  <link rel="shortcut icon" href="<%= asset_path('favicon.ico') %>" type="image/vnd.microsoft.icon" />
   <%= stylesheet_link_tag "application", media: 'all'  %>
+  <%= javascript_include_tag "application" %>
   <%= yield(:head) %>
-  <%= javascript_include_tag "https://js.stripe.com/v1/", "application" %>
   <%= csrf_meta_tags %>
   <%= tag :meta, name: "stripe-key", content: STRIPE_PUBLIC_KEY %>
 </head>
-<body class="<%= @class %>">
+<body class="<%= @class %>" data-behavior="<%= @behavior %>">
   <%= content_for?(:content) ? yield(:content) : yield %>
   <%= render partial: 'shared/tracking' %>
+  <%= render partial: 'shared/favicons' %>
+  <%= render partial: 'shared/fonts' %>
 </body>
 </html>

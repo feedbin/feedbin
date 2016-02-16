@@ -1,3 +1,4 @@
-worker: env DB_POOL=12 bundle exec sidekiq -c 12 -q critical,2 -q feed_refresher_receiver,1 -q default
-worker_slow: env DB_POOL=1 bundle exec sidekiq -c 1 -q worker_slow_critical,2 -q worker_slow,1
+worker: env DB_POOL=20 LIBRATO_AUTORUN=1 bundle exec sidekiq -c 20 -q critical,3 -q feed_refresher_receiver,2 -q default
+worker_slow: env DB_POOL=2 bundle exec sidekiq -c 2 -q worker_slow_critical,2 -q worker_slow,1
 clock: bundle exec clockwork lib/clock.rb
+sidekiq_web: bundle exec unicorn sidekiq/config.ru -p 2808

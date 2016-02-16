@@ -14,13 +14,12 @@ module Api
 
       def create
         @user = current_user
-        entries = get_valid_entries
-        ActiveRecord::Base.transaction do
-          entries[:valid_entries].each do |entry|
-            StarredEntry.create(user_id: @user.id, feed_id: entry[:feed_id], entry_id: entry[:entry_id], published: entry[:published])
-          end
+        valid_entries = get_valid_entries
+        entries = Entry.find(valid_entries[:entry_ids])
+        entries.each do |entry|
+          StarredEntry.create_from_owners(@user, entry, "api")
         end
-        render json: entries[:entry_ids].to_json
+        render json: valid_entries[:entry_ids].to_json
       end
 
       def destroy

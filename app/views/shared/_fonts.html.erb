@@ -1,0 +1,10 @@
+<% if current_user.present? && ENV['FONT_STYLESHEET'].present? %>
+<script>
+jQuery(function() {
+    $("<link>")
+        .appendTo('head')
+        .attr({rel: "stylesheet"})
+        .attr({href: "<%= ENV['FONT_STYLESHEET'] %>"});
+});
+</script>
+<% end %>

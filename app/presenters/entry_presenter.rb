@@ -2,52 +2,24 @@ class EntryPresenter < BasePresenter
 
   presents :entry
 
-  def read_state
-    if entry.read
-      'read'
-    else
-      ''
-    end
-  end
-
-  def starred_state
-    if entry.starred
-      'starred'
-    else
-      ''
-    end
-  end
-
-  def media_state
-    if has_media?
-      'media'
-    else
-      ''
-    end
-  end
-
-  def classes
-    classes = []
-    classes << read_state
-    classes << starred_state
-    classes.join ' '
-  end
-
   def entry_link(&block)
-    @template.link_to @template.entry_path(entry), {
+    options = {
       remote: true, class: 'wrap', data: {
-        behavior: 'selectable reset_entry_content_position open_item show_entry_content',
+        behavior: 'selectable open_item show_entry_content entry_info',
         mark_as_read_path: @template.mark_as_read_entry_path(entry),
-        recently_read_path: @template.recently_read_entry_path(entry)
+        recently_read_path: @template.recently_read_entry_path(entry),
+        entry_id: entry.id,
+        entry_info: {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}
       }
-    } do
+    }
+    @template.link_to @template.entry_path(entry), options do
       yield
     end
   end
 
   def published_date
     if entry.published
-      entry.published.to_s(:feed)
+      entry.published.to_s(:full_human)
     else
       ''
     end
@@ -70,37 +42,35 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def abbr_time
-    seconds_since_published = Time.now.utc - entry.published
-    if seconds_since_published > 86400
-      if Time.now.strftime("%Y") != entry.published.strftime("%Y")
-        format = 'day_year'
-      else
-        format = 'day'
-      end
-      string = entry.published.to_s(:datetime)
-    elsif seconds_since_published < 0
-      format = 'none'
-      string = "the future"
-    elsif seconds_since_published < 60
-      format = 'none'
-      string = "now"
-    elsif seconds_since_published < 3600
-      format = 'none'
-      string = (seconds_since_published / 60).round
-      string = "#{string}m"
-    else
-      format = 'none'
-      string = (seconds_since_published / 60 / 60).round
-      string = "#{string}h"
-    end
-    @template.time_tag(entry.published, string, class: 'time', data: {format: format})
+  def content(image_proxy_enabled)
+    ContentFormatter.format!(formatted_content, entry, image_proxy_enabled)
+  rescue => e
+    Rails.logger.info { e.inspect }
+    @template.content_tag(:p, '&ndash;&ndash;'.html_safe)
   end
 
-  def content
-    ContentFormatter.format!(entry.content, entry)
-  rescue HTML::Pipeline::Filter::InvalidDocumentException
-    '(no content)'
+  def api_content
+    ContentFormatter.api_format(formatted_content, entry)
+  rescue => e
+    Rails.logger.info { e.inspect }
+    @template.content_tag(:p, '&ndash;&ndash;'.html_safe)
+  end
+
+  def app_content
+    ContentFormatter.app_format(formatted_content, entry)
+  rescue => e
+    Rails.logger.info { e.inspect }
+    @template.content_tag(:p, '&ndash;&ndash;'.html_safe)
+  end
+
+  def formatted_content
+    @formatted_content ||= begin
+      formatted_content = entry.content
+      if entry.content_format == "text"
+        formatted_content = ContentFormatter.text_email(formatted_content)
+      end
+      formatted_content
+    end
   end
 
   def has_content?
@@ -113,7 +83,15 @@ class EntryPresenter < BasePresenter
       text = entry.summary.html_safe
     end
     if text.blank?
-      text = '&hellip;'.html_safe
+      text = '&ndash;&ndash;'.html_safe
+    end
+    text
+  end
+
+  def entry_view_title
+    text = sanitized_title
+    if text.blank?
+      text = @template.content_tag(:span, '&ndash;&ndash;'.html_safe, title: "No title").html_safe
     end
     text
   end
@@ -124,10 +102,12 @@ class EntryPresenter < BasePresenter
 
   def author
     if entry.author
-      "by " + @template.strip_tags(entry.author)
+      clean_author = @template.strip_tags(entry.author)
+      clean_author = "by " + @template.content_tag(:span, clean_author, class: "author")
     else
-      ''
+      clean_author = ''
     end
+    clean_author.html_safe
   end
 
   def media_size
@@ -142,12 +122,14 @@ class EntryPresenter < BasePresenter
 
   def media
     output = ''
-    if entry.data['enclosure_type'] == 'video/mp4'
-      output += @template.video_tag entry.data['enclosure_url'], preload: 'none'
-    elsif entry.data['enclosure_type'] == 'audio/mpeg'
-      output += @template.audio_tag entry.data['enclosure_url'], preload: 'none'
+    if entry.data && entry.data['enclosure_url'].present? && media_type.present?
+      if media_type == :video
+        output += @template.video_tag entry.data['enclosure_url'], preload: 'none'
+      elsif media_type == :audio
+        output += @template.audio_tag entry.data['enclosure_url'], preload: 'none'
+      end
+      output += @template.link_to "Download #{media_size}", entry.data['enclosure_url'], class: 'download-link'
     end
-    output += @template.link_to "Download #{media_size}", entry.data['enclosure_url'], class: 'download-link'
     output
   end
 
@@ -181,6 +163,83 @@ class EntryPresenter < BasePresenter
 
   def has_media?
     !media_type.nil? || content.include?('<iframe')
+  end
+
+  def youtube?
+    entry.data && entry.data["youtube_video_id"].present?
+  end
+
+  def image
+    if image?
+      url = URI(entry.image["processed_url"])
+      url.host = ENV['ENTRY_IMAGE_HOST'] if ENV['ENTRY_IMAGE_HOST']
+      padding = (entry.image["height"].to_f / entry.image["width"].to_f).round(4) * 100
+      @template.content_tag :span, class: "entry-image" do
+        @template.content_tag :span, "", data: {src: url.to_s }, style: "padding-top: #{padding}%;"
+      end
+    end
+  end
+
+  def image?
+    entry.image.present? && entry.image["original_url"] && entry.image["processed_url"] && entry.image["width"] && entry.image["height"]
+  end
+
+  def entry_type
+    if entry.data && entry.data["type"].present?
+      entry.data["type"]
+    else
+      "default"
+    end
+  end
+
+  def entry_type_class
+    "entry-type-#{entry_type} entry-format-#{entry_type}-#{entry.content_format}"
+  end
+
+  def content_diff
+    before = ContentFormatter.api_format(entry.original['content'], entry)
+    HTMLDiff::Diff.new(before, entry.content).inline_html
+  rescue
+    nil
+  end
+
+  def decoder
+    @decoder ||= HTMLEntities.new
+  end
+
+  def content_text
+    @content_text ||= begin
+      text = Sanitize.fragment(entry.content,
+        remove_contents: true,
+        elements: %w{html body div span
+                     h1 h2 h3 h4 h5 h6 p blockquote pre
+                     a abbr acronym address big cite code
+                     del dfn em ins kbd q s samp
+                     small strike strong sub sup tt var
+                     b u i center
+                     dl dt dd ol ul li
+                     fieldset form label legend
+                     table caption tbody tfoot thead tr th td
+                     article aside canvas details embed
+                     figure figcaption footer header hgroup
+                     menu nav output ruby section summary}
+      )
+      text = ReverseMarkdown.convert(text)
+      text = ActionController::Base.helpers.strip_tags(text)
+      decoder.decode(text)
+    end
+  end
+
+  def app_summary
+    decoder.decode(@template.strip_tags(entry.summary))
+  end
+
+  def app_title
+    (entry.title.present?) ? decoder.decode(@template.strip_tags(entry.title.strip)) : nil
+  end
+
+  def app_author
+    (entry.author.present?) ? decoder.decode(@template.strip_tags(entry.author.strip)) : nil
   end
 
 end

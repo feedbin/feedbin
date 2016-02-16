@@ -6,8 +6,8 @@ class UsersController < ApplicationController
 
   def new
     @user = User.new
-    if params[:coupon]
-      @coupon = Coupon.where(coupon_code: params[:coupon]).first
+    if params[:coupon].present?
+      @coupon = Coupon.find_by(coupon_code: params[:coupon])
       @coupon_valid = @coupon.present? && !@coupon.redeemed
       @user.coupon_code = params[:coupon]
     end
@@ -20,9 +20,6 @@ class UsersController < ApplicationController
 
   def create
     @user = User.new(user_params)
-    @user.update_auth_token = true
-    @user.mark_as_read_confirmation = 1
-    @user.hide_tagged_feeds = 1
 
     coupon_valid = false
     if user_params['coupon_code']
@@ -42,7 +39,7 @@ class UsersController < ApplicationController
     end
 
     if @user.save
-      unless @user.plan.stripe_id == 'free'
+      if @user.plan.stripe_id != 'free'
         schedule_trial_jobs
       end
       Librato.increment('user.trial.signup')

@@ -12,13 +12,13 @@ class Entry < ActiveRecord::Base
   before_create :cache_public_id, unless: -> { Rails.env.test? }
   before_create :create_summary
   before_update :create_summary
+  after_commit :find_images, on: :create
   after_commit :mark_as_unread, on: :create
+  after_commit :add_to_created_at_set, on: :create
+  after_commit :add_to_published_set, on: :create
   after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
-  after_commit :updated_entry, on: :update
-  after_destroy :search_index_remove
-
-  validates_uniqueness_of :public_id
+  after_commit :count_update, on: :update
 
   tire_settings = {
     analysis: {
@@ -77,6 +77,10 @@ class Entry < ActiveRecord::Base
         filter :not, { ids: { values: user.unread_entries.pluck(:entry_id) } }
       end
 
+      if params[:size].present?
+        size params[:size]
+      end
+
       if params[:starred] == true
         ids << user.starred_entries.pluck(:entry_id)
       elsif params[:starred] == false
@@ -91,14 +95,41 @@ class Entry < ActiveRecord::Base
         sort { by :published, "desc" }
       end
 
+      if params[:feed_ids].present?
+        subscribed_ids = user.subscriptions.pluck(:feed_id)
+        requested_ids = params[:feed_ids]
+        feed_ids = (requested_ids & subscribed_ids)
+      elsif params[:tag_id].present?
+        feed_ids = user.taggings.where(tag_id: params[:tag_id]).pluck(:feed_id)
+      else
+        feed_ids = user.subscriptions.pluck(:feed_id)
+      end
+
       if ids.any?
         ids = ids.inject(:&) # intersect
         filter :ids, values: ids
       end
 
-      # Always limit searches to subscriptions and starred items
-      filter :or, { terms: { feed_id: user.subscriptions.pluck(:feed_id) } },
-                  { ids: { values: user.starred_entries.pluck(:entry_id) } }
+      if params[:query].present?
+        feed_options = {
+          terms: {
+            feed_id: feed_ids
+          }
+        }
+        starred_options = {
+          ids: {
+            values: user.starred_entries.pluck(:entry_id)
+          }
+        }
+        filter :or, feed_options, starred_options
+      else
+        options = {
+          terms: {
+            feed_id: feed_ids
+          }
+        }
+        filter :or, options, {}
+      end
     end
 
   end
@@ -109,6 +140,7 @@ class Entry < ActiveRecord::Base
     starred_regex = /(?<=\s|^)is:\s*starred(?=\s|$)/
     unstarred_regex = /(?<=\s|^)is:\s*unstarred(?=\s|$)/
     sort_regex = /(?<=\s|^)sort:\s*(asc|desc|relevance)(?=\s|$)/i
+    tag_id_regex = /(?<=\s|^)tag_id:\s*([0-9]+)(?=\s|$)/
 
     if params[:query] =~ unread_regex
       params[:query] = params[:query].gsub(unread_regex, '')
@@ -129,6 +161,11 @@ class Entry < ActiveRecord::Base
     if params[:query] =~ sort_regex
       params[:sort] = params[:query].match(sort_regex)[1].downcase
       params[:query] = params[:query].gsub(sort_regex, '')
+    end
+
+    if params[:query] =~ tag_id_regex
+      params[:tag_id] = params[:query].match(tag_id_regex)[1].downcase
+      params[:query] = params[:query].gsub(tag_id_regex, '')
     end
 
     params[:query] = escape_search(params[:query])
@@ -178,6 +215,10 @@ class Entry < ActiveRecord::Base
     entries
   end
 
+  def self.entries_list
+    select(:id, :feed_id, :title, :summary, :published, :image)
+  end
+
   def self.include_unread_entries(user_id)
     joins("LEFT OUTER JOIN unread_entries ON entries.id = unread_entries.entry_id AND unread_entries.user_id = #{user_id.to_i}")
   end
@@ -210,17 +251,6 @@ class Entry < ActiveRecord::Base
     end
   end
 
-  def cache_key
-    additions = []
-    if defined?(read) && read
-      additions << '/read'
-    end
-    if defined?(starred) && starred
-      additions << '/starred'
-    end
-    super + additions.join('')
-  end
-
   def fully_qualified_url
     entry_url = self.url
     if entry_url.present? && is_fully_qualified(entry_url)
@@ -235,6 +265,10 @@ class Entry < ActiveRecord::Base
     entry_url.gsub(Feedbin::Application.config.entities_regex, Feedbin::Application.config.entities_map)
   rescue
     self.feed.site_url
+  end
+
+  def content_format
+    self.data && self.data["format"] || "default"
   end
 
   private
@@ -256,27 +290,36 @@ class Entry < ActiveRecord::Base
     if self.published.nil? || self.published > 1.day.from_now
       self.published = DateTime.now
     end
+    true
   end
 
   def cache_public_id
-    if self.updated
-      date = self.updated.to_s
-    else
-      date = 1
-    end
-    Sidekiq.redis { |client| client.hset("entry:public_ids:#{self.public_id[0..4]}", self.public_id, date) }
+    FeedbinUtils.update_public_id_cache(self.public_id, self.content)
+    true
   end
 
   def mark_as_unread
     if skip_mark_as_unread.blank? && self.published > 1.month.ago
       unread_entries = []
-      subscriptions = Subscription.where(feed_id: self.feed_id, active: true).pluck(:user_id)
+      subscriptions = Subscription.where(feed_id: self.feed_id, active: true, muted: false).pluck(:user_id)
       subscriptions.each do |user_id|
         unread_entries << UnreadEntry.new(user_id: user_id, feed_id: self.feed_id, entry_id: self.id, published: self.published, entry_created_at: self.created_at)
       end
       UnreadEntry.import(unread_entries, validate: false)
     end
     SearchIndexStore.perform_async(self.class.name, self.id)
+  end
+
+  def add_to_created_at_set
+    score = "%10.6f" % self.created_at.to_f
+    key = FeedbinUtils.redis_feed_entries_created_at_key(self.feed_id)
+    $redis.zadd(key, score, self.id)
+  end
+
+  def add_to_published_set
+    score = "%10.6f" % self.published.to_f
+    key = FeedbinUtils.redis_feed_entries_published_key(self.feed_id)
+    $redis.zadd(key, score, self.id)
   end
 
   def increment_feed_stat
@@ -286,17 +329,9 @@ class Entry < ActiveRecord::Base
     end
   end
 
-  def updated_entry
-    Sidekiq.redis { |client| client.hset("entry:public_ids:#{self.public_id[0..4]}", self.public_id, self.updated.to_s) }
-    SearchIndexStore.perform_async(self.class.name, self.id, true)
-  end
-
   def create_summary
     self.summary = ContentFormatter.summary(self.content)
-  end
-
-  def search_index_remove
-    SearchIndexRemove.perform_async(self.class.name, self.id)
+    true
   end
 
   def touch_feed_last_published_entry
@@ -305,6 +340,14 @@ class Entry < ActiveRecord::Base
       self.feed.last_published_entry = published
       feed.save
     end
+  end
+
+  def count_update
+    $redis.zincrby("update_counts", 1, self.feed_id)
+  end
+
+  def find_images
+    EntryImage.perform_async(self.id)
   end
 
 end

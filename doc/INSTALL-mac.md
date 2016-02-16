@@ -1,11 +1,11 @@
-Feedbin Installation on Mac OS X Mountain Lion
+Feedbin Installation on Mac OS X
 ----------------------------------------------
 
-This will get Feedbin running on a fresh Mountain Lion install. If you already have a ruby environment configured you can skip most of these steps.
+This will get Feedbin running on a fresh install. If you already have a ruby environment configured you can skip most of these steps.
 
-#### Command Line Tools (OS X Mountain Lion)
+#### Command Line Tools
 
-These can be downloaded from the [Apple Developer website](https://developer.apple.com/downloads/index.action), or in XCode preferences.
+These can be downloaded from the [Apple Developer website](https://developer.apple.com/downloads/index.action), or in Xcode preferences.
 
 #### Homebrew
 
@@ -19,27 +19,33 @@ These can be downloaded from the [Apple Developer website](https://developer.app
     echo 'if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi' >> ~/.bash_profile
     source ~/.bash_profile
 
-#### Ruby 2.0
+#### Ruby 2.3.0
 
-    rbenv install 2.0.0-p247
-    rbenv global 2.0.0-p247
+    rbenv install 2.3.0
+    rbenv global 2.3.0
 
 #### Bundler
 
     gem install bundler
 
+You may need to open a new terminal to make the `bundle` command available in your `PATH`.
+
 #### Postgres 9.2.4
 
-    cd ~/Downloads
-    curl -L http://postgresapp.com/download > postgres.zip
-    unzip postgres.zip
-    mv Postgres.app /Applications/
-    open /Applications/Postgres.app
+    brew install caskroom/cask/brew-cask
+    brew cask install postgres
+    open ~/Applications/Postgres.app
 
 #### Redis 2.6.14
 
     brew update
     brew install redis
+    redis-server
+
+#### ImageMagick (requirement for rmagick gem)
+
+    brew update
+    brew install ImageMagick
 
 Make sure to follow post install instructions.
 
@@ -49,7 +55,7 @@ Make sure to follow post install instructions.
     cd feedbin
     bundle
 
-#### Setup the database
+#### Setup the database (Make sure you're running Postgres and Redis)
 
     rake db:setup
 

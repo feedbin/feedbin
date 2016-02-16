@@ -1,7 +1,7 @@
 class Push
   def self.callback_url(feed)
-    protocol = Feedbin::Application.config.force_ssl ? "https" : "http"
-    Rails.application.routes.url_helpers.push_feed_url(feed, protocol: protocol, host: ENV['PUSH_URL'])
+    uri = URI(ENV['PUSH_URL'])
+    Rails.application.routes.url_helpers.push_feed_url(feed, protocol: uri.scheme, host: uri.host)
   end
 
   def self.hub_secret(feed_id)

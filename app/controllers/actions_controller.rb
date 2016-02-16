@@ -1,44 +1,53 @@
 class ActionsController < ApplicationController
 
+  layout "settings"
+
+  before_action :set_action, only: [:edit, :update, :destroy]
+
   def index
-    @user = current_user
     verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
     @authentication_token = CGI::escape(verifier.generate(@user.id))
     @web_service_url = "#{ENV['PUSH_URL']}/apple_push_notifications"
-    render layout: 'settings'
+    @actions = @user.actions.where("action_type <> ?", Action.action_types[:notifier])
   end
 
-  def actions_update
-    @user = current_user
-    if @user.update_attributes(actions_update_params)
-      redirect_to actions_url, notice: "Actions updated."
+  def new
+    @action = @user.actions.new
+  end
+
+  def edit
+  end
+
+  def create
+    @action = @user.actions.new(action_params)
+    if @action.save
+      redirect_to actions_url, notice: "Action was successfully created."
     else
-      render action: 'index', layout: 'settings'
+      render :new
     end
+  end
+
+  def update
+    if @action.update(action_params)
+      redirect_to actions_url, notice: "Action was successfully updated."
+    else
+      render :edit
+    end
+  end
+
+  def destroy
+    @action.destroy
+    redirect_to actions_url, notice: "Action was successfully deleted."
   end
 
   private
 
-  def actions_update_params
-    # Remove actions the user does not own and add all feeds if all feeds is selected
-    all_feeds = @user.subscriptions.pluck(:feed_id)
-    if params[:user] && params[:user][:actions_attributes]
-      owned_actions = @user.actions.pluck(:id)
-      requested_actions = params[:user][:actions_attributes].collect { |index, actions| {index: index, id: actions['id']} }
-      requested_actions.each do |service|
-        next if service[:id].blank?
-        unless owned_actions.include?(service[:id].to_i)
-          params[:user][:actions_attributes].delete(service[:index])
-        end
-      end
-      params[:user][:actions_attributes].map do |index, actions|
-        params[:user][:actions_attributes][index] = actions.slice(:id, :query, :actions, :feed_ids, :all_feeds, :_destroy)
-        if actions[:all_feeds] == '1'
-          params[:user][:actions_attributes][index][:feed_ids] = all_feeds
-        end
-      end
-      params.require(:user).permit!
-    end
+  def action_params
+    params.require(:action_params).permit(:query, :all_feeds, :title, :feed_ids => [], :actions => [], :tag_ids => [])
+  end
+
+  def set_action
+    @action = @user.actions.find(params[:id])
   end
 
 end

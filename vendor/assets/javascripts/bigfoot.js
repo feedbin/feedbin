@@ -1,939 +1,640 @@
-//   _______    ________  _______    ______   ______   ______   _________
-// /_______/\  /_______/\/______/\  /_____/\ /_____/\ /_____/\ /________/\
-// \::: _  \ \ \__.::._\/\::::__\/__\::::_\/_\:::_ \ \\:::_ \ \\__.::.__\/
-//  \::(_)  \/_   \::\ \  \:\ /____/\\:\/___/\\:\ \ \ \\:\ \ \ \  \::\ \
-//   \::  _  \ \  _\::\ \__\:\\_  _\/ \:::._\/ \:\ \ \ \\:\ \ \ \  \::\ \
-//    \::(_)  \ \/__\::\__/\\:\_\ \ \  \:\ \    \:\_\ \ \\:\_\ \ \  \::\ \
-//     \_______\/\________\/ \_____\/   \_\/     \_____\/ \_____\/   \__\/
-// 		   _________________________________________________________________
-// 		  /________________________________________________________________/\
-// 		  \________________________________________________________________\/
-
-// PURPOSE -----
-// Looks through the page's markup to identify footnote links/ content.
-// It then creates footnote buttons in place of the footnote links and hides the content.
-// Finally, creates and positions footnotes when the generated buttons are pressed.
-
-// IN ----------
-// An optional object literal specifying script settings.
-
-// OUT ---------
-// Returns an object with the following methods:
-// close: closes footnotes matching the jQuery selector passed to the function.
-// activate: activates the footnote button matching the jQuery selector passed to the function.
-
-// INFO --------
-// Developed and maintained by Chris Sauve (http://pxldot.com)
-// Documentation, license, and other information can be found at http://cmsauve.com/projects/bigfoot.
-
-// TODO --------
-// - Better handling of hover
-// - Ability to position/ size popover relative to a containing element (rather than the window)
-// - Compensate for zoom position on mobile
-
-// KNOWN ISSUES -
-// - Safari 7 doesn't properly calculate the scrollheight of the content wrapper and, as a result, will not
-//		properly indicate a scrollable footnote
-// - Popovers that are instantiated at a smaller font size which is then resized to a larger one won't adhere
-//		to your chosen max-height (in CSS) since JS tries to keep it from running off the top/ bottom of the page
-//		but does so using pixel values tied to the sizes of the footnote content when it was originally activated.
-//		If anyone has any ideas on this, please let me know!
-
-
-
-(function($) {
-
-	$.bigfoot = function(options) {
-
-
-		//  ______   ______   _________  _________  ________  ___   __    _______    ______
-		// /_____/\ /_____/\ /________/\/________/\/_______/\/__/\ /__/\ /______/\  /_____/\
-		// \::::_\/_\::::_\/_\__.::.__\/\__.::.__\/\__.::._\/\::\_\\  \ \\::::__\/__\::::_\/_
-		//  \:\/___/\\:\/___/\  \::\ \     \::\ \     \::\ \  \:. `-\  \ \\:\ /____/\\:\/___/\
-		//   \_::._\:\\::___\/_  \::\ \     \::\ \    _\::\ \__\:. _    \ \\:\\_  _\/ \_::._\:\
-		//     /____\:\\:\____/\  \::\ \     \::\ \  /__\::\__/\\. \`-\  \ \\:\_\ \ \   /____\:\
-		//     \_____\/ \_____\/   \__\/      \__\/  \________\/ \__\/ \__\/ \_____\/   \_____\/
-		//
-
-		var settings = $.extend(
-			{
-				actionOriginalFN 	: "hide", // "delete", "hide", or "ignore"
-				activateOnHover 	: false,
-				allowMultipleFN 	: false,
-				appendPopoversTo 	: undefined,
-				deleteOnUnhover 	: false,
-				hoverDelay 			: 250,
-				popoverDeleteDelay	: 500,
-				popoverCreateDelay	: 100,
-				positionNextToBlock : true,
-				positionContent 	: true,
-				preventPageScroll 	: true,
-				scope				: false,
-
-				contentMarkup 		: "<aside class=\"footnote-content bottom\"" +
-											"data-footnote-identifier=\"{{FOOTNOTENUM}}\" " +
-											"alt=\"Footnote {{FOOTNOTENUM}}\">" +
-												"<div class=\"footnote-main-wrapper\">" +
-													"<div class=\"footnote-content-wrapper\">" +
-														"{{FOOTNOTECONTENT}}" +
-												"</div></div>" +
-											"<div class=\"tooltip\"></div>" +
-										"</aside>",
-
-				buttonMarkup 		:  "<a href=\"#\" class=\"footnote-button\" " +
-											"data-footnote-identifier=\"{{FOOTNOTENUM}}\" " +
-											"alt=\"See Footnote {{FOOTNOTENUM}}\" " +
-											"rel=\"footnote\"" +
-											"data-footnote-content=\"{{FOOTNOTECONTENT}}\">" +
-												"<span class=\"footnote-circle\" data-footnote-identifier=\"{{FOOTNOTENUM}}\"></span>" +
-												"<span class=\"footnote-circle\"></span>" +
-												"<span class=\"footnote-circle\"></span>" +
-										"</a>"
-			}, options);
-
-
-
-		//  ________  ___   __     ________  _________
-		// /_______/\/__/\ /__/\  /_______/\/________/\
-		// \__.::._\/\::\_\\  \ \ \__.::._\/\__.::.__\/
-		//    \::\ \  \:. `-\  \ \   \::\ \    \::\ \
-		//    _\::\ \__\:. _    \ \  _\::\ \__  \::\ \
-		//   /__\::\__/\\. \`-\  \ \/__\::\__/\  \::\ \
-		//   \________\/ \__\/ \__\/\________\/   \__\/
-		//
-
-
-		// FUNCTION ----
-		// Footnote button/ content initializer (run on doc.ready)
-
-		// PURPOSE -----
-		// Finds the likely footnote links and then uses their target to find the content
-
-		var footnoteInit = function() {
-
-			// Get all of the possible footnote links
-			var footnoteButtonSearchQuery;
-			footnoteButtonSearchQuery = !settings.scope ? "a[href*=\"#\"]" : settings.scope + " a[href*=\"#\"]";
-
-			// Filter down to links that:
-			// - have an HREF referencing a footnote, OR
-			// - have a rel attribute of footnote
-			// AND that aren't a descendant of a footnote (prevents backlinks)
-			var $footnoteAnchors = $(footnoteButtonSearchQuery).filter(function() {
-				var $this = $(this);
-				var relAttr = $this.attr("rel");
-				if(!relAttr || relAttr == "null") {
-					relAttr = "";
-				}
-				return ($this.attr("href") + relAttr).match(/(fn|footnote|note)[:\-_\d]/gi) && $this.closest("[class*=footnote]:not(a):not(sup)").length < 1;
-			}); // End of footnote link .filter()
-
-			var footnotes 		= [],
-				footnoteLinks 	= [],
-				finalFNLinks    = [],
-				relatedFN,
-				$closestFootnoteLi;
-
-			// Resolve issues with superscript/ anchor combination
-			cleanFootnoteLinks($footnoteAnchors, footnoteLinks);
-
-			// Get the footnote that the link was pointing to
-			$(footnoteLinks).each(function() {
-				relatedFN = $(this).attr("data-footnote-ref").replace(":", "\\:");
-				$closestFootnoteLi = $(relatedFN).closest("li");
-				if($closestFootnoteLi.length > 0) {
-					footnotes.push($closestFootnoteLi);
-					finalFNLinks.push(this);
-				}
-			});
-
-			// Initiates the button with the footnote content
-			// Also performs the desired action on the original footnotes
-			for(var i = 0; i<footnotes.length; i++) {
-
-				// Removes any backlinks and hackily encodes double quotes and >/< symbols to prevent conflicts
-				var footnoteContent = removeBackLinks($(footnotes[i]).html().trim(), $(finalFNLinks[i]).data("footnote-backlink-ref"))
-										.replace(/"/g, "&quot;").replace(/&lt;/g, "&ltsym;").replace(/&gt;/g, "&gtsym;"),
-					$footnoteNum = +(i + 1),
-					footnoteButton = "",
-					$footnoteButton;
-
-				// Add a paragraph container if the footnote was written directly in the list element
-				if(footnoteContent.indexOf("<") !== 0) {
-					footnoteContent = "<p>" + footnoteContent + "</p>";
-				}
-
-				// Gives default button markup unless custom one is defined
-				// Gets the easy replacements out of the way
-				footnoteButton = settings.buttonMarkup.replace(/\{\{FOOTNOTENUM\}\}/g, $footnoteNum).replace(/\{\{FOOTNOTECONTENT\}\}/g, footnoteContent);
-
-				// Handles replacements of SUP/FN attribute requests
-				footnoteButton = replaceWithReferenceAttributes(footnoteButton, "SUP", $(finalFNLinks[i]));
-				footnoteButton = replaceWithReferenceAttributes(footnoteButton, "FN", $(footnotes[i]));
-
-				$footnoteButton = $(footnoteButton).insertAfter($(finalFNLinks[i]));
-				$(finalFNLinks[i]).remove();
-
-				var $parent = $(footnotes[i]).parent();
-				switch(settings.actionOriginalFN.toLowerCase()) {
-					case "delete":
-						$(footnotes[i]).remove();
-						deleteEmptyOrHR($parent);
-						break;
-					case "hide":
-						$(footnotes[i]).addClass("hidden").css({"display": "none"});
-						deleteEmptyOrHR($parent);
-						break;
-				}
-			} // end of loop through footnotes
-		}
-
-
-		// FUNCTION ----
-		// cleanFootnoteLinks
-
-		// PURPOSE -----
-		// Groups the ID and HREF of a superscript/ anchor tag pair in data attributes
-		// This resolves the issue of the href and backlink id being separated between the two elements
-
-		// IN ----------
-		// Anchors that link to footnotes
-
-		// OUT ---------
-		// Array of top-level emenets with data attributes for combined ID/ HREF
-
-		function cleanFootnoteLinks($footnoteAnchors, footnoteLinks) {
-			var $supParent,
-				$supChild,
-				linkHREF,
-				linkID;
-
-			// Problem: backlink ID might point to containing superscript of the fn link
-			// Solution: Check if there is a superscript and move the href/ ID up to it.
-			// The combined id/ href of the sup/a pair are stored in sup using data attributes
-			$footnoteAnchors.each(function() {
-				var $this = $(this);
-				linkHREF = "#" + ($this.attr("href")).split("#")[1]; // just the fragment ID
-				$supParent = $this.closest("sup");
-				$supChild = $this.find("sup");
-
-				if($supParent.length > 0) {
-					// Assign the link ID to be the parent's and child's combined
-					linkID = ($supParent.attr("id") || "") + ($this.attr("id") || "");
-					footnoteLinks.push(
-						$supParent.attr({
-							"data-footnote-backlink-ref": linkID,
-							"data-footnote-ref": linkHREF
-						})
-					);
-				} else if($supChild.length > 0) {
-					linkID = ($supChild.attr("id") || "") + ($this.attr("id") || "");
-					footnoteLinks.push(
-						$this.attr({
-							"data-footnote-backlink-ref": linkID,
-							"data-footnote-ref": linkHREF
-						})
-					);
-				} else {
-					// || "" protects against undefined ID's
-					linkID = $this.attr("id") || "";
-					footnoteLinks.push(
-						$this.attr({
-							"data-footnote-backlink-ref": linkID,
-							"data-footnote-ref": linkHREF
-						})
-					);
-				}
-			});
-		}
-
-
-		// FUNCTION ----
-		// deleteEmptyOrHR
-
-		// PURPOSE -----
-		// Propogates the decision of deleting/ hiding the original footnotes up the hierarchy,
-		// eliminating any empty/ fully-hidden elements containing the footnotes and
-		// any horizontal rules used to denote the start of the footnote section
-
-		// IN ----------
-		// Container of the footnote that was deleted/ hidden
-
-		// OUT ---------
-		// Array of top-level emenets with data attributes for combined ID/ HREF
-
-		function deleteEmptyOrHR($el) {
-			// If it has no children or all children have been hidden
-			if($el.is(":empty") || $el.children(":not(.hidden)").length == 0) {
-				var $parent = $el.parent();
-				if(settings.actionOriginalFN.toLowerCase() === "delete") {
-					$el.remove();
-				} else {
-					$el.addClass("hidden").css({"display": "none"});
-				}
-
-				// Propogate up to the container element
-				deleteEmptyOrHR($parent);
-
-			} else if($el.children(":not(.hidden)").length == $el.children("hr:not(.hidden)").length) {
-
-				// If the only child not hidden/ removed is a horizontal rule, remove the entire container
-				var $parent = $el.parent();
-				if(settings.actionOriginalFN.toLowerCase() === "delete") {
-					$el.remove();
-				} else {
-					$el.children("hr").addClass("hidden").css({"display": "none"});
-					$el.addClass("hidden").css({"display": "none"});
-				}
-
-				// Propogate up to the container element
-				deleteEmptyOrHR($parent);
-			}
-		}
-
-
-		// FUNCTION ----
-		// removeBackLinks
-
-		// PURPOSE -----
-		// Removes any links from the footnote back to the footnote link
-		// as these don't make sense when the footnote is shown inline
-
-		// IN ----------
-		// HTML of the footnote possibly containing the backlink and
-		// the ID(s) of the footnote link
-
-		// OUT ---------
-		// New HTML string with relevant links taken out
-
-		function removeBackLinks(footnoteHTML, backlinkID) {
-
-			// First, though, take care of multiple ID's by getting rid of spaces
-			if(backlinkID.indexOf(" ") >= 0) {
-				backlinkID = backlinkID.trim().replace(/ +/g, "|").replace(/(.*)/g, "($1)");
-			}
-
-			// Regex finds the preceding space/ nbsp, the anchor tag and contents
-			var regexPat = "(\s|&nbsp;)*<\s*a[^#<]*#" + backlinkID + "[^>]*>(.*?)<\s*/\s*a>";
-			var regex = new RegExp(regexPat, "g");
-			return footnoteHTML.replace(regex, "").replace("[]", "");
-		}
-
-
-		// FUNCTION ----
-		// replaceWithReferenceAttributes
-
-		// PURPOSE -----
-		// Replaces the reference attributes (encased in {{}}) with the relevant attributes
-		// from the desired element; for example, {{SUP:id}} will be replaced with the ID of the
-		// superscript element passed as $referenceElement
-
-		// IN ----------
-		// String to do replacements on, the reference keyword to look for (i.e., BUTTON or SUP),
-		// and the associated element to search through for the identified attribute(s)
-
-		// OUT ---------
-		// New string with replacements performed
-
-		function replaceWithReferenceAttributes(string, referenceKeyword, $referenceElement) {
-			var refRegex = new RegExp("\{\{" + referenceKeyword + ":([^\}]*)\}\}", "g"),
-				refMatches,
-				refReplaceText,
-				refReplaceRegex;
-
-			// Performs the regex and does the replacement until it doesn't find any more matches
-			while (refMatches = refRegex.exec(string)) {
-				// refMatches[1] stores the attribute that is to be matched
-				 if(refMatches[1]) {
-					refReplaceText = $referenceElement.attr(refMatches[1]) || "";
-					string = string.replace("\{\{" + referenceKeyword + ":" + refMatches[1] + "\}\}", refReplaceText);
-				}
-			}
-			return string;
-		}
-
-
-
-		//  ________   ______  _________  ________  __   __   ________   _________  ______
-		// /_______/\ /_____/\/________/\/_______/\/_/\ /_/\ /_______/\ /________/\/_____/\
-		// \::: _  \ \\:::__\/\__.::.__\/\__.::._\/\:\ \\ \ \\::: _  \ \\__.::.__\/\::::_\/_
-		//  \::(_)  \ \\:\ \  __ \::\ \     \::\ \  \:\ \\ \ \\::(_)  \ \  \::\ \   \:\/___/\
-		//   \:: __  \ \\:\ \/_/\ \::\ \    _\::\ \__\:\_/.:\ \\:: __  \ \  \::\ \   \::___\/_
-		//    \:.\ \  \ \\:\_\ \ \ \::\ \  /__\::\__/\\ ..::/ / \:.\ \  \ \  \::\ \   \:\____/\
-		//     \__\/\__\/ \_____\/  \__\/  \________\/ \___/_(   \__\/\__\/   \__\/    \_____\/
-		//
-
-
-		// FUNCTION ----
-		// buttonHover
-
-		// PURPOSE -----
-		// To activate the popover of a hovered footnote button
-		// Also removes other popovers, if allowMultipleFN is false
-
-		// IN ----------
-		// Event that contains the target of the mouseenter event
-
-		var buttonHover = function(e) {
-			if(settings.activateOnHover) {
-				var $buttonHovered = $(e.target).closest(".footnote-button"),
-					dataIdentifier = "[data-footnote-identifier=\"" + $buttonHovered.attr("data-footnote-identifier") + "\"]";
-				if($buttonHovered.hasClass("active")) return;
-
-				$buttonHovered.addClass("hover-instantiated");
-
-				// Delete other popovers, unless overriden in the settings
-				if(!settings.allowMultipleFN) {
-					var otherPopoverSelector = ".footnote-content:not(" + dataIdentifier + ")";
-					removePopovers(otherPopoverSelector);
-				}
-				createPopover(".footnote-button" + dataIdentifier).addClass("hover-instantiated");
-			}
-		}
-
-
-		// FUNCTION ----
-		// touchClick
-
-		// PURPOSE -----
-		// Activates the button the was clicked/ taps
-		// Also removes other popovers, if allowMultipleFN is false
-		// Finally, removes all popovers if something non-fn related was clicked/ tapped
-
-		// IN ----------
-		// Event that contains the target of the tap/click event
-
-		var touchClick = function(e){
-			var $target			= $(e.target),
-				$nearButton		= $target.closest(".footnote-button");
-				$nearFootnote	= $target.closest(".footnote-content");
-
-			// If a button was tapped/ clicked
-			if($nearButton.length > 0) {
-				// Button was clicked
-				// Cancel the link, if it exists
-				e.preventDefault();
-
-				// Do the button clicking
-				clickButton($nearButton);
-
-			} else if($nearFootnote.length < 1) {
-				// Something other than a button or popover was pressed
-				if($(".footnote-content").length > 0) {
-					removePopovers();
-				}
-
-			}
-		}
-
-
-		// FUNCTION ----
-		// clickButton
-
-		// PURPOSE -----
-		// Handles the logic of clicking/ tapping the footnote button
-		// That is, activates the popover if it isn't already active (+ deactivate others, if appropriate)
-		// or, deactivates the popover if it is already active
-
-		// IN ----------
-		// Button being clicked/ pressed
-
-		var clickButton = function($button) {
-
-			// Cancel blur
-			$button.blur();
-
-			// Get the identifier of the footnote
-			var dataIdentifier = "data-footnote-identifier=\"" + $button.attr("data-footnote-identifier") + "\"";
-
-			// Only create footnote if it's not already active
-			// If it's activating, ignore the new activation until the popover is fully formed.
-			if($button.hasClass("changing")) {
-
-				return;
-
-			} else if(!$button.hasClass("active")) {
-
-				$button.addClass("changing");
-				setTimeout(function() {
-					$button.removeClass("changing");
-				}, settings.popoverCreateDelay);
-				createPopover(".footnote-button[" + dataIdentifier + "]");
-				$button.addClass("click-instantiated");
-
-				// Delete all other footnote popovers if we are only allowing one
-				if(!settings.allowMultipleFN) {
-					removePopovers(".footnote-content:not([" + dataIdentifier + "])");
-				}
-
-			} else {
-
-				// A fully instantiated footnote; either remove it or all footnotes, depending on settings
-				if(!settings.allowMultipleFN) {
-					removePopovers();
-				} else {
-					removePopovers(".footnote-content[" + dataIdentifier + "]");
-				}
-
-			}
-		}
-
-
-		// FUNCTION ----
-		// createPopover
-
-		// PURPOSE -----
-		// Instantiates the footnote popover of the buttons matching the passed selector.
-		// This includes replacing any variables in the content markup, decoding any special characters,
-		// Adding the new element to the page, calling the position function, and adding the scroll handler
-
-		// IN ----------
-		// Selector of buttons that are to be activated
-
-		// OUT ---------
-		// All footnotes activated by the function
-
-		var createPopover = function(selector) {
-
-			selector = selector || ".footnote-button";
-
-			// Activate all matching if multiple footnotes are allowed
-			// Or only the first matching element otherwise
-			if(settings.allowMultipleFN) {
-				var $buttons = $(selector).closest(".footnote-button");
-			} else {
-				var $buttons = $(selector + ":first").closest(".footnote-button");
-			}
-
-			$buttons.each(function() {
-				var $this = $(this);
-
-				try {
-					// Gets the easy replacements out of the way (try is there to ignore the "replacing undefined" error if it's activated too freuqnetly)
-					var content = settings.contentMarkup
-								.replace(/\{\{FOOTNOTENUM\}\}/g, $this.attr("data-footnote-identifier"))
-								.replace(/\{\{FOOTNOTECONTENT\}\}/g, $this.attr("data-footnote-content").replace(/&gtsym;/, "&gt;").replace(/&ltsym;/, "&lt;"));
-
-					// Handles replacements of BUTTON attribute requests
-					content = replaceWithReferenceAttributes(content, "BUTTON", $this);
-				} finally {
-
-					if(!settings.appendPopoversTo) {
-						// Insert content after next block-level element, or after the nearest footnote
-						$nearestBlock = $this.closest("p, div, pre, li, ul, section, article, main, aside");
-						$siblingFootnote = $nearestBlock.siblings(".footnote-content:last");
-						if($siblingFootnote.length > 0) {
-							$content = $(content).insertAfter($siblingFootnote);
-						} else {
-							$content = $(content).insertAfter($nearestBlock);
-						}
-
-					} else {
-						$content = $(content).appendTo(settings.appendPopoversTo + ":first");
-					}
-
-					// Instantiate the max-height for storage and use in repositioning
-					$content.attr("data-bigfoot-max-height", $content.height());
-
-					repositionFeet();
-					$this.addClass("active");
-
-					// Bind the scroll handler to the popover
-					$content.find(".footnote-content-wrapper").bindScrollHandler();
-				}
-			});
-
-			// Get all footnotes activated by this function
-			var $allFootnotesActivated = $(selector.replace(".footnote-button", ".footnote-content"));
-
-			// Add active class after a delay to give it time to transition
-			setTimeout(function() {
-				$allFootnotesActivated.addClass("active");
-			}, settings.popoverCreateDelay);
-
-			return $allFootnotesActivated;
-		}
-
-
-		// FUNCTION ----
-		// bindScrollHandler
-
-		// PURPOSE -----
-		// Prevents scrolling of the page when you reach the top/ bottom
-		// of scrolling a scrollable footnote popover
-
-		// IN ----------
-		// Run on popover(s) that are to have the event bound
-
-		// SOURCE ------
-		// adapted from: http://stackoverflow.com/questions/16323770/stop-page-from-scrolling-if-hovering-div
-
-		$.fn.bindScrollHandler = function() {
-			// Don't even bother checking if option is set to false
-			if(!settings.preventPageScroll) { return; }
-
-			$(this).on("DOMMouseScroll mousewheel", function(e) {
-
-				var $this = $(this),
-					scrollTop = $this.scrollTop(),
-					scrollHeight = $this[0].scrollHeight,
-					height = parseInt($this.css("height")),
-					$popover = $this.closest(".footnote-content");
-
-				// Fix for Safari 7 not properly calculating scrollHeight()
-				// Just add the class as soon as there is any scrolling
-				if($this.scrollTop() > 0 && $this.scrollTop() < 10) {
-					$popover.addClass("scrollable");
-				}
-
-				// Return if the element isn't scrollable
-				if(!$popover.hasClass("scrollable")) { return; }
-
-				var delta = (e.type == 'DOMMouseScroll' ?
-							 e.originalEvent.detail * -40 :
-							 e.originalEvent.wheelDelta), // Get the change in scroll position
-					up = delta > 0; // Decide whether the scroll was up or down
-
-				var prevent = function() {
-					e.stopPropagation();
-					e.preventDefault();
-					e.returnValue = false;
-					return false;
-				}
-
-				if(!up && -delta > scrollHeight - height - scrollTop) {
-
-					// Scrolling down, but this will take us past the bottom.
-					$this.scrollTop(scrollHeight);
-					$popover.addClass("fully-scrolled"); // Give a class for removal of scroll-related styles
-					return prevent();
-				} else if(up && delta > scrollTop) {
-
-					// Scrolling up, but this will take us past the top.
-					$this.scrollTop(0);
-					$popover.removeClass("fully-scrolled");
-					return prevent();
-				} else {
-					$popover.removeClass("fully-scrolled");
-				}
-			});
-		}
-
-
-
-		//  ______   ______   ________   ______  _________  ________  __   __   ________   _________  ______
-		// /_____/\ /_____/\ /_______/\ /_____/\/________/\/_______/\/_/\ /_/\ /_______/\ /________/\/_____/\
-		// \:::_ \ \\::::_\/_\::: _  \ \\:::__\/\__.::.__\/\__.::._\/\:\ \\ \ \\::: _  \ \\__.::.__\/\::::_\/_
-		//  \:\ \ \ \\:\/___/\\::(_)  \ \\:\ \  __ \::\ \     \::\ \  \:\ \\ \ \\::(_)  \ \  \::\ \   \:\/___/\
-		//   \:\ \ \ \\::___\/_\:: __  \ \\:\ \/_/\ \::\ \    _\::\ \__\:\_/.:\ \\:: __  \ \  \::\ \   \::___\/_
-		//    \:\/.:| |\:\____/\\:.\ \  \ \\:\_\ \ \ \::\ \  /__\::\__/\\ ..::/ / \:.\ \  \ \  \::\ \   \:\____/\
-		//     \____/_/ \_____\/ \__\/\__\/ \_____\/  \__\/  \________\/ \___/_(   \__\/\__\/   \__\/    \_____\/
-		//
-
-		// FUNCTION ----
-		// unhoverFeet
-
-		// PURPOSE -----
-		// Removes the unhovered footnote content if deleteOnUnhover is true
-
-		// IN ----------
-		// Event that contains the target of the mouseout event
-
-		var unhoverFeet = function(e) {
-			if(settings.deleteOnUnhover && settings.activateOnHover) {
-				setTimeout(function() {
-					// If the new element is NOT a descendant of the footnote button
-					var $target = $(e.target).closest(".footnote-content, .footnote-button");
-					if($(".footnote-button:hover, .footnote-content:hover").length < 1) {
-						removePopovers();
-					}
-				}, settings.hoverDelay);
-			}
-		}
-
-
-		// FUNCTION ----
-		// escapeKeypress
-
-		// PURPOSE -----
-		// Removes all popovers on keypress
-
-		// IN ----------
-		// Event that contains the key that was pressed
-
-		var escapeKeypress = function(e) {
-			if(e.keyCode == 27) {
-				removePopovers();
-			}
-		}
-
-
-		// FUNCTION ----
-		// removePopovers
-
-		// PURPOSE -----
-		// Removes/ adds appropriate classes to the footnote content and button
-		// After a delay (to allow for transitions) it removes the actual footnote content
-
-		// IN ----------
-		// Selector of footnotes to deactivate and timeout before deleting actual elements
-
-		// OUT ---------
-		// Footnote buttons that were deactivated
-
-		function removePopovers(footnotes, timeout) {
-			footnotes = footnotes || ".footnote-content";
-			timeout = timeout || settings.popoverDeleteDelay;
-
-			$(footnotes).each(function() {
-				var $linkedButton = $(".footnote-button[data-footnote-identifier=\"" + $(this).attr("data-footnote-identifier") + "\"]"),
-					$this = $(this);
-				if($linkedButton.hasClass("changing")) return;
-				$linkedButton.removeClass("active hover-instantiated click-instantiated").addClass("changing");
-				$this.removeClass("active").addClass("disapearing");
-
-				// Gets rid of the footnote after the timeout
-				setTimeout(function() {
-					$this.remove();
-					$linkedButton.removeClass("changing");
-				}, timeout);
-			});
-
-			return $(footnotes.replace(".footnote-content", ".footnote-button"));
-		}
-
-
-
-		//  ______    ______   ______   ______   ______    ________  _________  ________  ______   ___   __
-		// /_____/\  /_____/\ /_____/\ /_____/\ /_____/\  /_______/\/________/\/_______/\/_____/\ /__/\ /__/\
-		// \:::_ \ \ \::::_\/_\:::_ \ \\:::_ \ \\::::_\/_ \__.::._\/\__.::.__\/\__.::._\/\:::_ \ \\::\_\\  \ \
-		//  \:(_) ) )_\:\/___/\\:(_) \ \\:\ \ \ \\:\/___/\   \::\ \    \::\ \     \::\ \  \:\ \ \ \\:. `-\  \ \
-		//   \: __ `\ \\::___\/_\: ___\/ \:\ \ \ \\_::._\:\  _\::\ \__  \::\ \    _\::\ \__\:\ \ \ \\:. _    \ \
-		//    \ \ `\ \ \\:\____/\\ \ \    \:\_\ \ \ /____\:\/__\::\__/\  \::\ \  /__\::\__/\\:\_\ \ \\. \`-\  \ \
-		//     \_\/ \_\/ \_____\/ \_\/     \_____\/ \_____\/\________\/   \__\/  \________\/ \_____\/ \__\/ \__\/
-		//
-
-
-		// FUNCTION ----
-		// repositionFeet
-
-		// PURPOSE -----
-		// Positions each footnote relative to its button
-
-		var repositionFeet = function() {
-			if(settings.positionContent) {
-
-				$(".footnote-content").each(function() {
-
-					// Element Definitions
-					var $this 				= $(this),
-						dataIdentifier 		= "data-footnote-identifier=\"" + $this.attr("data-footnote-identifier") + "\"",
-						$contentWrapper 	= $this.find(".footnote-content-wrapper"),
-						$button 			= $(".footnote-button[" + dataIdentifier + "]");
-
-					// Spacing Information
-					var roomLeft 			= roomCalc($button),
-						contentWidth 		= parseFloat($this.css("width")),
-						marginSize 			= parseFloat($this.css("margin-top")),
-						maxHeightInCSS 		= +($this.attr("data-bigfoot-max-height")),
-						totalHeightInCSS	= 2*marginSize + maxHeightInCSS,
-						maxHeightOnScreen 	= 10000;
-
-					// Position tooltip on top if:
-					// total space on bottom is not enough to hold footnote AND
-					// top room is larger than bottom room
-					if(roomLeft.bottomRoom < totalHeightInCSS && roomLeft.topRoom > roomLeft.bottomRoom) {
-						$this.css({"top": "auto", "bottom": roomLeft.bottomRoom + "px"}).addClass("top").removeClass("bottom");
-						maxHeightOnScreen = roomLeft.topRoom - marginSize - 15;
-						$this.css({"transform-origin": (roomLeft.leftRelative*100) + "% 100%"});
-					} else {
-						$this.css({"bottom": "auto", "top": roomLeft.topRoom + "px"}).addClass("bottom").removeClass("top");
-						maxHeightOnScreen = roomLeft.bottomRoom - marginSize - 15;
-						$this.css({"transform-origin": (roomLeft.leftRelative*100) + "% 0%"});
-					}
-
-					// Sets the max height so that there is no footnote overflow
-					$this.find(".footnote-content-wrapper").css({"max-height": Math.min(maxHeightOnScreen, maxHeightInCSS) + "px"});
-
-					// Positions the popover
-					$this.css({"left": (roomLeft.leftRoom - (roomLeft.leftRelative * contentWidth)) + "px"});
-
-					// Position the tooltip
-					positionTooltip($this, roomLeft.leftRelative);
-
-					// Give scrollable class if the content hight is larger than the container
-					if(parseInt($this.css("height")) < $this.find(".footnote-content-wrapper")[0].scrollHeight) {
-						$this.addClass("scrollable");
-					}
-				});
-			}
-		}
-
-
-		// FUNCTION ----
-		// positionTooltip
-
-		// PURPOSE -----
-		// Positions the tooltip at the same relative horizontal position as the button
-
-		// IN ----------
-		// Footnote popover to get the tooltip of and the relative horizontal position (as a decimal)
-
-		function positionTooltip($popover, leftRelative) {
-			leftRelative = leftRelative || 0.5; // default to 50%
-			var $tooltip = $popover.find(".tooltip");
-
-			if($tooltip.length > 0) {
-				$tooltip.css({"left": leftRelative*100 + "%"});
-			}
-		}
-
-
-		// FUNCTION ----
-		// roomCalc
-
-		// PURPOSE -----
-		// Calculates area on the top, left, bottom and right of the element
-		// Also calculates the relative position to the left and top of the screen
-
-		// IN ----------
-		// Element to calculate screen position of
-
-		// OUT ---------
-		// Object containing room on all sides and top/ left relative positions
-		// All measurements are relative to the middle of the element
-
-		function roomCalc($el) {
-			var elWidth		= parseFloat($el.outerWidth()),
-				elHeight	= parseFloat($el.outerHeight()),
-				w 			= viewportSize(),
-				topRoom		= $el.offset().top - $(window).scrollTop() + elHeight/2,
-				leftRoom	= $el.offset().left + elWidth/2;
-
-			return {
-				topRoom			: topRoom,
-				bottomRoom		: w.height - topRoom,
-				leftRoom		: leftRoom,
-				rightRoom		: w.width - leftRoom,
-				leftRelative	: leftRoom / w.width,
-				topRelative		: topRoom / w.height
-			};
-		}
-
-
-		// FUNCTION ----
-		// viewportSize
-
-		// PURPOSE -----
-		// Calculates the height and width of the viewport
-
-		// OUT ---------
-		// Object with .width and .height properties
-
-		function viewportSize() {
-			var test = document.createElement("div");
-
-			test.style.cssText = "position: fixed;top: 0;left: 0;bottom: 0;right: 0;";
-			document.documentElement.insertBefore(test, document.documentElement.firstChild);
-
-			var dims = { width: test.offsetWidth, height: test.offsetHeight };
-			document.documentElement.removeChild(test);
-
-			return dims;
-		}
-
-
-
-		//  ______   _________  ___   ___   ______   ______
-		// /_____/\ /________/\/__/\ /__/\ /_____/\ /_____/\
-		// \:::_ \ \\__.::.__\/\::\ \\  \ \\::::_\/_\:::_ \ \
-		//  \:\ \ \ \  \::\ \   \::\/_\ .\ \\:\/___/\\:(_) ) )_
-		//   \:\ \ \ \  \::\ \   \:: ___::\ \\::___\/_\: __ `\ \
-		//    \:\_\ \ \  \::\ \   \: \ \\::\ \\:\____/\\ \ `\ \ \
-		//     \_____\/   \__\/    \__\/ \::\/ \_____\/ \_\/ \_\/
-		//
-
-
-		// FUNCTION ----
-		// updateSetting
-
-		// PURPOSE -----
-		// Updates the specified setting with the value you pass
-
-		// IN ----------
-		// Setting to adjust and new value for the setting
-
-		// OUT ---------
-		// Returns the old value for the setting
-
-		var updateSetting = function(setting, value) {
-			var oldValue = settings[setting];
-			settings[setting] = value;
-			return oldValue;
-		}
-
-
-		// FUNCTION ----
-		// getSetting
-
-		// PURPOSE -----
-		// Returns the settings object
-
-		var getSetting = function(setting) {
-
-			return settings[setting];
-		}
-
-
-
-		//   _______    ________  ___   __    ______    ________  ___   __    _______
-		// /_______/\  /_______/\/__/\ /__/\ /_____/\  /_______/\/__/\ /__/\ /______/\
-		// \::: _  \ \ \__.::._\/\::\_\\  \ \\:::_ \ \ \__.::._\/\::\_\\  \ \\::::__\/__
-		//  \::(_)  \/_   \::\ \  \:. `-\  \ \\:\ \ \ \   \::\ \  \:. `-\  \ \\:\ /____/\
-		//   \::  _  \ \  _\::\ \__\:. _    \ \\:\ \ \ \  _\::\ \__\:. _    \ \\:\\_  _\/
-		//    \::(_)  \ \/__\::\__/\\. \`-\  \ \\:\/.:| |/__\::\__/\\. \`-\  \ \\:\_\ \ \
-		//     \_______\/\________\/ \__\/ \__\/ \____/_/\________\/ \__\/ \__\/ \_____\/
-		//
-
-		$(document).ready(function() {
-
-			footnoteInit();
-
-			$(document).on("mouseenter", ".footnote-button", buttonHover);
-			$(document).on("touchend click", touchClick);
-			$(document).on("mouseout", ".hover-instantiated", unhoverFeet);
-			$(document).on("keyup", escapeKeypress);
-			$(window).on("scroll resize", repositionFeet);
-		});
-
-
-
-		//  ______    ______   _________  __  __   ______    ___   __
-		// /_____/\  /_____/\ /________/\/_/\/_/\ /_____/\  /__/\ /__/\
-		// \:::_ \ \ \::::_\/_\__.::.__\/\:\ \:\ \\:::_ \ \ \::\_\\  \ \
-		//  \:(_) ) )_\:\/___/\  \::\ \   \:\ \:\ \\:(_) ) )_\:. `-\  \ \
-		//   \: __ `\ \\::___\/_  \::\ \   \:\ \:\ \\: __ `\ \\:. _    \ \
-		//    \ \ `\ \ \\:\____/\  \::\ \   \:\_\:\ \\ \ `\ \ \\. \`-\  \ \
-		//     \_\/ \_\/ \_____\/   \__\/    \_____\/ \_\/ \_\/ \__\/ \__\/
-		//
-
-		return {
-			close: function(footnotes, timeout) {
-				return removePopovers(footnotes, timeout);
-			},
-			activate: function(button) {
-				return createPopover(button);
-			},
-			reposition: function() {
-				return repositionFeet();
-			},
-			getSetting: function(setting) {
-				return getSetting(setting);
-			},
-			updateSetting: function(setting, newValue) {
-				return updateSetting(setting, newValue);
-			}
-		}
-	};
-
-})(jQuery);
+(function() {
+  (function($) {
+    return $.bigfoot = function(options) {
+      var addBreakpoint, baseFontSize, bigfoot, buttonHover, calculatePixelDimension, cleanFootnoteLinks, clickButton, createPopover, defaults, deleteEmptyOrHR, escapeKeypress, footnoteInit, getSetting, makeDefaultCallbacks, popoverStates, positionTooltip, removeBackLinks, removeBreakpoint, removePopovers, replaceWithReferenceAttributes, repositionFeet, roomCalc, settings, touchClick, unhoverFeet, updateSetting, viewportDetails;
+      bigfoot = void 0;
+      defaults = {
+        actionOriginalFN: "hide",
+        activateCallback: function() {},
+        activateOnHover: false,
+        allowMultipleFN: false,
+        anchorPattern: /(fn|footnote|note)[:\-_\d]/gi,
+        anchorParentTagname: 'sup',
+        breakpoints: {},
+        deleteOnUnhover: false,
+        footnoteParentClass: 'footnote',
+        footnoteTagname: 'li',
+        hoverDelay: 250,
+        numberResetSelector: void 0,
+        popoverDeleteDelay: 300,
+        popoverCreateDelay: 100,
+        positionContent: true,
+        preventPageScroll: true,
+        scope: false,
+        useFootnoteOnlyOnce: true,
+        contentMarkup: "<aside class=\"bigfoot-footnote is-positioned-bottom\" data-footnote-number=\"{{FOOTNOTENUM}}\" data-footnote-identifier=\"{{FOOTNOTEID}}\" alt=\"Footnote {{FOOTNOTENUM}}\"> <div class=\"bigfoot-footnote__wrapper\"> <div class=\"bigfoot-footnote__content\"> {{FOOTNOTECONTENT}} </div></div> <div class=\"bigfoot-footnote__tooltip\"></div> </aside>",
+        buttonMarkup: "<div class='bigfoot-footnote__container'> <button class=\"bigfoot-footnote__button\" id=\"{{SUP:data-footnote-backlink-ref}}\" data-footnote-number=\"{{FOOTNOTENUM}}\" data-footnote-identifier=\"{{FOOTNOTEID}}\" alt=\"See Footnote {{FOOTNOTENUM}}\" rel=\"footnote\" data-bigfoot-footnote=\"{{FOOTNOTECONTENT}}\"> <svg class=\"bigfoot-footnote__button__circle\" viewbox=\"0 0 6 6\" preserveAspectRatio=\"xMinYMin\"><circle r=\"3\" cx=\"3\" cy=\"3\" fill=\"white\"></circle></svg> <svg class=\"bigfoot-footnote__button__circle\" viewbox=\"0 0 6 6\" preserveAspectRatio=\"xMinYMin\"><circle r=\"3\" cx=\"3\" cy=\"3\" fill=\"white\"></circle></svg> <svg class=\"bigfoot-footnote__button__circle\" viewbox=\"0 0 6 6\" preserveAspectRatio=\"xMinYMin\"><circle r=\"3\" cx=\"3\" cy=\"3\" fill=\"white\"></circle></svg> </button></div>"
+      };
+      settings = $.extend(defaults, options);
+      popoverStates = {};
+      footnoteInit = function() {
+        var $curResetElement, $currentLastFootnoteLink, $footnoteAnchors, $footnoteButton, $lastResetElement, $parent, $relevantFNLink, $relevantFootnote, finalFNLinks, footnoteButton, footnoteButtonSearchQuery, footnoteContent, footnoteIDNum, footnoteLinks, footnoteNum, footnotes, i, _i, _ref, _results;
+        footnoteButtonSearchQuery = settings.scope ? "" + settings.scope + " a[href*=\"#\"]" : "a[href*=\"#\"]";
+        $footnoteAnchors = $(footnoteButtonSearchQuery).filter(function() {
+          var $this, relAttr;
+          $this = $(this);
+          relAttr = $this.attr("rel");
+          if (relAttr === "null" || (relAttr == null)) {
+            relAttr = "";
+          }
+          return ("" + ($this.attr("href")) + relAttr).match(settings.anchorPattern) && $this.closest("[class*=" + settings.footnoteParentClass + "]:not(a):not(" + settings.anchorParentTagname + ")").length < 1;
+        });
+        footnotes = [];
+        footnoteLinks = [];
+        finalFNLinks = [];
+        cleanFootnoteLinks($footnoteAnchors, footnoteLinks);
+        $(footnoteLinks).each(function() {
+          var $closestFootnoteEl, relatedFN;
+          relatedFN = $(this).data("footnote-ref").replace(/[:.+~*\]\[]/g, "\\$&");
+          if (settings.useFootnoteOnlyOnce) {
+            relatedFN = "" + relatedFN + ":not(.footnote-processed)";
+          }
+          $closestFootnoteEl = $(relatedFN).closest(settings.footnoteTagname);
+          if ($closestFootnoteEl.length > 0) {
+            footnotes.push($closestFootnoteEl.first().addClass("footnote-processed"));
+            return finalFNLinks.push(this);
+          }
+        });
+        $currentLastFootnoteLink = $("[data-footnote-identifier]:last");
+        footnoteIDNum = $currentLastFootnoteLink.length < 1 ? 0 : +$currentLastFootnoteLink.data("footnote-identifier");
+        _results = [];
+        for (i = _i = 0, _ref = footnotes.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+          footnoteContent = removeBackLinks($(footnotes[i]).html().trim(), $(finalFNLinks[i]).data("footnote-backlink-ref"));
+          footnoteContent = footnoteContent.replace(/"/g, "&quot;").replace(/&lt;/g, "&ltsym;").replace(/&gt;/g, "&gtsym;");
+          footnoteIDNum += 1;
+          footnoteButton = "";
+          $relevantFNLink = $(finalFNLinks[i]);
+          $relevantFootnote = $(footnotes[i]);
+          if (settings.numberResetSelector != null) {
+            $curResetElement = $relevantFNLink.closest(settings.numberResetSelector);
+            if ($curResetElement.is($lastResetElement)) {
+              footnoteNum += 1;
+            } else {
+              footnoteNum = 1;
+            }
+            $lastResetElement = $curResetElement;
+          } else {
+            footnoteNum = footnoteIDNum;
+          }
+          if (footnoteContent.indexOf("<") !== 0) {
+            footnoteContent = "<p>" + footnoteContent + "</p>";
+          }
+          footnoteButton = settings.buttonMarkup.replace(/\{\{FOOTNOTENUM\}\}/g, footnoteNum).replace(/\{\{FOOTNOTEID\}\}/g, footnoteIDNum).replace(/\{\{FOOTNOTECONTENT\}\}/g, footnoteContent);
+          footnoteButton = replaceWithReferenceAttributes(footnoteButton, "SUP", $relevantFNLink);
+          footnoteButton = replaceWithReferenceAttributes(footnoteButton, "FN", $relevantFootnote);
+          $footnoteButton = $(footnoteButton).insertBefore($relevantFNLink);
+          $parent = $relevantFootnote.parent();
+          switch (settings.actionOriginalFN.toLowerCase()) {
+            case "hide":
+              $relevantFNLink.addClass("footnote-print-only");
+              $relevantFootnote.addClass("footnote-print-only");
+              _results.push(deleteEmptyOrHR($parent));
+              break;
+            case "delete":
+              $relevantFNLink.remove();
+              $relevantFootnote.remove();
+              _results.push(deleteEmptyOrHR($parent));
+              break;
+            default:
+              _results.push($relevantFNLink.addClass("footnote-print-only"));
+          }
+        }
+        return _results;
+      };
+      cleanFootnoteLinks = function($footnoteAnchors, footnoteLinks) {
+        var $parent, $supChild, linkHREF, linkID;
+        if (footnoteLinks == null) {
+          footnoteLinks = [];
+        }
+        $parent = void 0;
+        $supChild = void 0;
+        linkHREF = void 0;
+        linkID = void 0;
+        $footnoteAnchors.each(function() {
+          var $child, $this;
+          $this = $(this);
+          linkHREF = "#" + ($this.attr("href")).split("#")[1];
+          $parent = $this.closest(settings.anchorParentTagname);
+          $child = $this.find(settings.anchorParentTagname);
+          if ($parent.length > 0) {
+            linkID = ($parent.attr("id") || "") + ($this.attr("id") || "");
+            return footnoteLinks.push($parent.attr({
+              "data-footnote-backlink-ref": linkID,
+              "data-footnote-ref": linkHREF
+            }));
+          } else if ($child.length > 0) {
+            linkID = ($child.attr("id") || "") + ($this.attr("id") || "");
+            return footnoteLinks.push($this.attr({
+              "data-footnote-backlink-ref": linkID,
+              "data-footnote-ref": linkHREF
+            }));
+          } else {
+            linkID = $this.attr("id") || "";
+            return footnoteLinks.push($this.attr({
+              "data-footnote-backlink-ref": linkID,
+              "data-footnote-ref": linkHREF
+            }));
+          }
+        });
+      };
+      deleteEmptyOrHR = function($el) {
+        var $parent;
+        $parent = void 0;
+        if ($el.is(":empty") || $el.children(":not(.footnote-print-only)").length === 0) {
+          $parent = $el.parent();
+          if (settings.actionOriginalFN.toLowerCase() === "delete") {
+            $el.remove();
+          } else {
+            $el.addClass("footnote-print-only");
+          }
+          return deleteEmptyOrHR($parent);
+        } else if ($el.children(":not(.footnote-print-only)").length === $el.children("hr:not(.footnote-print-only)").length) {
+          $parent = $el.parent();
+          if (settings.actionOriginalFN.toLowerCase() === "delete") {
+            $el.remove();
+          } else {
+            $el.children("hr").addClass("footnote-print-only");
+            $el.addClass("footnote-print-only");
+          }
+          return deleteEmptyOrHR($parent);
+        }
+      };
+      removeBackLinks = function(footnoteHTML, backlinkID) {
+        var regex;
+        if (backlinkID.indexOf(' ') >= 0) {
+          backlinkID = backlinkID.trim().replace(/\s+/g, "|").replace(/(.*)/g, "($1)");
+        }
+        regex = new RegExp("(\\s|&nbsp;)*<\\s*a[^#<]*#" + backlinkID + "[^>]*>(.*?)<\\s*/\\s*a>", "g");
+        return footnoteHTML.replace(regex, "").replace("[]", "");
+      };
+      replaceWithReferenceAttributes = function(string, referenceKeyword, $referenceElement) {
+        var refMatches, refRegex, refReplaceRegex, refReplaceText;
+        refRegex = new RegExp("\\{\\{" + referenceKeyword + ":([^\\}]*)\\}\\}", "g");
+        refMatches = void 0;
+        refReplaceText = void 0;
+        refReplaceRegex = void 0;
+        refMatches = refRegex.exec(string);
+        while (refMatches) {
+          if (refMatches[1]) {
+            refReplaceText = $referenceElement.attr(refMatches[1]) || "";
+            string = string.replace("{{" + referenceKeyword + ":" + refMatches[1] + "}}", refReplaceText);
+          }
+          refMatches = refRegex.exec(string);
+        }
+        return string;
+      };
+      buttonHover = function(event) {
+        var $buttonHovered, dataIdentifier, otherPopoverSelector;
+        if (settings.activateOnHover) {
+          $buttonHovered = $(event.target).closest(".bigfoot-footnote__button");
+          dataIdentifier = "[data-footnote-identifier=\"" + ($buttonHovered.attr("data-footnote-identifier")) + "\"]";
+          if ($buttonHovered.hasClass("is-active")) {
+            return;
+          }
+          $buttonHovered.addClass("is-hover-instantiated");
+          if (!settings.allowMultipleFN) {
+            otherPopoverSelector = ".bigfoot-footnote:not(" + dataIdentifier + ")";
+            removePopovers(otherPopoverSelector);
+          }
+          createPopover(".bigfoot-footnote__button" + dataIdentifier).addClass("is-hover-instantiated");
+        }
+      };
+      touchClick = function(event) {
+        var $nearButton, $nearFootnote, $target;
+        $target = $(event.target);
+        $nearButton = $target.closest(".bigfoot-footnote__button");
+        $nearFootnote = $target.closest(".bigfoot-footnote");
+        if ($nearButton.length > 0) {
+          event.preventDefault();
+          clickButton($nearButton);
+        } else if ($nearFootnote.length < 1) {
+          if ($(".bigfoot-footnote").length > 0) {
+            removePopovers();
+          }
+        }
+      };
+      clickButton = function($button) {
+        var dataIdentifier;
+        $button.blur();
+        dataIdentifier = "data-footnote-identifier=\"" + ($button.attr("data-footnote-identifier")) + "\"";
+        if ($button.hasClass("changing")) {
+          return;
+        } else if (!$button.hasClass("is-active")) {
+          $button.addClass("changing");
+          setTimeout((function() {
+            return $button.removeClass("changing");
+          }), settings.popoverCreateDelay);
+          createPopover(".bigfoot-footnote__button[" + dataIdentifier + "]");
+          $button.addClass("is-click-instantiated");
+          if (!settings.allowMultipleFN) {
+            removePopovers(".bigfoot-footnote:not([" + dataIdentifier + "])");
+          }
+        } else {
+          if (!settings.allowMultipleFN) {
+            removePopovers();
+          } else {
+            removePopovers(".bigfoot-footnote[" + dataIdentifier + "]");
+          }
+        }
+      };
+      createPopover = function(selector) {
+        var $buttons, $popoversCreated;
+        $buttons = void 0;
+        if (typeof selector !== "string" && settings.allowMultipleFN) {
+          $buttons = selector;
+        } else if (typeof selector !== "string") {
+          $buttons = selector.first();
+        } else if (settings.allowMultipleFN) {
+          $buttons = $(selector).closest(".bigfoot-footnote__button");
+        } else {
+          $buttons = $(selector + ":first").closest(".bigfoot-footnote__button");
+        }
+        $popoversCreated = $();
+        $buttons.each(function() {
+          var $content, $contentContainer, $this, content;
+          $this = $(this);
+          content = void 0;
+          try {
+            content = settings.contentMarkup.replace(/\{\{FOOTNOTENUM\}\}/g, $this.attr("data-footnote-number")).replace(/\{\{FOOTNOTEID\}\}/g, $this.attr("data-footnote-identifier")).replace(/\{\{FOOTNOTECONTENT\}\}/g, $this.attr("data-bigfoot-footnote")).replace(/\&gtsym\;/g, "&gt;").replace(/\&ltsym\;/g, "&lt;");
+            return content = replaceWithReferenceAttributes(content, "BUTTON", $this);
+          } finally {
+            $content = $(content);
+            try {
+              settings.activateCallback($content, $this);
+            } catch (_error) {}
+            $content.insertAfter($buttons);
+            popoverStates[$this.attr("data-footnote-identifier")] = "init";
+            $content.attr("bigfoot-max-width", calculatePixelDimension($content.css("max-width"), $content));
+            $content.css("max-width", 10000);
+            $contentContainer = $content.find(".bigfoot-footnote__content");
+            $content.attr("data-bigfoot-max-height", calculatePixelDimension($contentContainer.css("max-height"), $contentContainer));
+            repositionFeet();
+            $this.addClass("is-active");
+            $content.find(".bigfoot-footnote__content").bindScrollHandler();
+            $popoversCreated = $popoversCreated.add($content);
+          }
+        });
+        setTimeout((function() {
+          return $popoversCreated.addClass("is-active");
+        }), settings.popoverCreateDelay);
+        return $popoversCreated;
+      };
+      baseFontSize = function() {
+        var el, size;
+        el = document.createElement("div");
+        el.style.cssText = "display:inline-block;padding:0;line-height:1;position:absolute;visibility:hidden;font-size:1em;";
+        el.appendChild(document.createElement("M"));
+        document.body.appendChild(el);
+        size = el.offsetHeight;
+        document.body.removeChild(el);
+        return size;
+      };
+      calculatePixelDimension = function(dim, $el) {
+        if (dim === "none") {
+          dim = 10000;
+        } else if (dim.indexOf("rem") >= 0) {
+          dim = parseFloat(dim) * baseFontSize();
+        } else if (dim.indexOf("em") >= 0) {
+          dim = parseFloat(dim) * parseFloat($el.css("font-size"));
+        } else if (dim.indexOf("px") >= 0) {
+          dim = parseFloat(dim);
+          if (dim <= 60) {
+            dim = dim / parseFloat($el.parent().css("width"));
+          }
+        } else if (dim.indexOf("%") >= 0) {
+          dim = parseFloat(dim) / 100;
+        }
+        return dim;
+      };
+      $.fn.bindScrollHandler = function() {
+        if (!settings.preventPageScroll) {
+          return $(this);
+        }
+        $(this).on("DOMMouseScroll mousewheel", function(event) {
+          var $popover, $this, delta, height, prevent, scrollHeight, scrollTop, up;
+          $this = $(this);
+          scrollTop = $this.scrollTop();
+          scrollHeight = $this[0].scrollHeight;
+          height = parseInt($this.css("height"));
+          $popover = $this.closest(".bigfoot-footnote");
+          if ($this.scrollTop() > 0 && $this.scrollTop() < 10) {
+            $popover.addClass("is-scrollable");
+          }
+          if (!$popover.hasClass("is-scrollable")) {
+            return;
+          }
+          delta = event.type === "DOMMouseScroll" ? event.originalEvent.detail * -40 : event.originalEvent.wheelDelta;
+          up = delta > 0;
+          prevent = function() {
+            event.stopPropagation();
+            event.preventDefault();
+            event.returnValue = false;
+            return false;
+          };
+          if (!up && -delta > scrollHeight - height - scrollTop) {
+            $this.scrollTop(scrollHeight);
+            $popover.addClass("is-fully-scrolled");
+            return prevent();
+          } else if (up && delta > scrollTop) {
+            $this.scrollTop(0);
+            $popover.removeClass("is-fully-scrolled");
+            return prevent();
+          } else {
+            return $popover.removeClass("is-fully-scrolled");
+          }
+        });
+        return $(this);
+      };
+      unhoverFeet = function(e) {
+        if (settings.deleteOnUnhover && settings.activateOnHover) {
+          return setTimeout((function() {
+            var $target;
+            $target = $(e.target).closest(".bigfoot-footnote, .bigfoot-footnote__button");
+            if ($(".bigfoot-footnote__button:hover, .bigfoot-footnote:hover").length < 1) {
+              return removePopovers();
+            }
+          }), settings.hoverDelay);
+        }
+      };
+      escapeKeypress = function(event) {
+        if (event.keyCode === 27) {
+          return removePopovers();
+        }
+      };
+      removePopovers = function(footnotes, timeout) {
+        var $buttonsClosed, $linkedButton, $this, footnoteID;
+        if (footnotes == null) {
+          footnotes = ".bigfoot-footnote";
+        }
+        if (timeout == null) {
+          timeout = settings.popoverDeleteDelay;
+        }
+        $buttonsClosed = $();
+        footnoteID = void 0;
+        $linkedButton = void 0;
+        $this = void 0;
+        $(footnotes).each(function() {
+          $this = $(this);
+          footnoteID = $this.attr("data-footnote-identifier");
+          $linkedButton = $(".bigfoot-footnote__button[data-footnote-identifier=\"" + footnoteID + "\"]");
+          if (!$linkedButton.hasClass("changing")) {
+            $buttonsClosed = $buttonsClosed.add($linkedButton);
+            $linkedButton.removeClass("is-active is-hover-instantiated is-click-instantiated").addClass("changing");
+            $this.removeClass("is-active").addClass("disapearing");
+            return setTimeout((function() {
+              $this.remove();
+              delete popoverStates[footnoteID];
+              return $linkedButton.removeClass("changing");
+            }), timeout);
+          }
+        });
+        return $buttonsClosed;
+      };
+      repositionFeet = function(e) {
+        var type;
+        if (settings.positionContent) {
+          type = e ? e.type : "resize";
+          $(".bigfoot-footnote").each(function() {
+            var $button, $contentWrapper, $mainWrap, $this, dataIdentifier, identifier, lastState, marginSize, maxHeightInCSS, maxHeightOnScreen, maxWidth, maxWidthInCSS, positionOnTop, relativeToWidth, roomLeft, totalHeight;
+            $this = $(this);
+            identifier = $this.attr("data-footnote-identifier");
+            dataIdentifier = "data-footnote-identifier=\"" + identifier + "\"";
+            $contentWrapper = $this.find(".bigfoot-footnote__content");
+            $button = $this.siblings(".bigfoot-footnote__button");
+            roomLeft = roomCalc($button);
+            marginSize = parseFloat($this.css("margin-top"));
+            maxHeightInCSS = +($this.attr("data-bigfoot-max-height"));
+            totalHeight = 2 * marginSize + $this.outerHeight();
+            maxHeightOnScreen = 10000;
+            positionOnTop = roomLeft.bottomRoom < totalHeight && roomLeft.topRoom > roomLeft.bottomRoom;
+            lastState = popoverStates[identifier];
+            if (positionOnTop) {
+              if (lastState !== "top") {
+                popoverStates[identifier] = "top";
+                $this.addClass("is-positioned-top").removeClass("is-positioned-bottom");
+                $this.css("transform-origin", (roomLeft.leftRelative * 100) + "% 100%");
+              }
+              maxHeightOnScreen = roomLeft.topRoom - marginSize - 15;
+            } else {
+              if (lastState !== "bottom" || lastState === "init") {
+                popoverStates[identifier] = "bottom";
+                $this.removeClass("is-positioned-top").addClass("is-positioned-bottom");
+                $this.css("transform-origin", (roomLeft.leftRelative * 100) + "% 0%");
+              }
+              maxHeightOnScreen = roomLeft.bottomRoom - marginSize - 15;
+            }
+            $this.find(".bigfoot-footnote__content").css({
+              "max-height": Math.min(maxHeightOnScreen, maxHeightInCSS) + "px"
+            });
+            if (type === "resize") {
+              maxWidthInCSS = parseFloat($this.attr("bigfoot-max-width"));
+              $mainWrap = $this.find(".bigfoot-footnote__wrapper");
+              maxWidth = maxWidthInCSS;
+              if (maxWidthInCSS <= 1) {
+                relativeToWidth = (function() {
+                  var jq, userSpecifiedRelativeElWidth;
+                  userSpecifiedRelativeElWidth = 10000;
+                  if (settings.maxWidthRelativeTo) {
+                    jq = $(settings.maxWidthRelativeTo);
+                    if (jq.length > 0) {
+                      userSpecifiedRelativeElWidth = jq.outerWidth();
+                    }
+                  }
+                  return Math.min(window.innerWidth, userSpecifiedRelativeElWidth);
+                })();
+                maxWidth = relativeToWidth * maxWidthInCSS;
+              }
+              maxWidth = Math.min(maxWidth, $this.find(".bigfoot-footnote__content").outerWidth() + 1);
+              $mainWrap.css("max-width", maxWidth + "px");
+              $this.css({
+                left: (-roomLeft.leftRelative * maxWidth + parseFloat($button.css("margin-left")) + $button.outerWidth() / 2) + "px"
+              });
+              positionTooltip($this, roomLeft.leftRelative);
+            }
+            if (parseInt($this.outerHeight()) < $this.find(".bigfoot-footnote__content")[0].scrollHeight) {
+              return $this.addClass("is-scrollable");
+            }
+          });
+        }
+      };
+      positionTooltip = function($popover, leftRelative) {
+        var $tooltip;
+        if (leftRelative == null) {
+          leftRelative = 0.5;
+        }
+        $tooltip = $popover.find(".bigfoot-footnote__tooltip");
+        if ($tooltip.length > 0) {
+          $tooltip.css("left", "" + (leftRelative * 100) + "%");
+        }
+      };
+      roomCalc = function($el) {
+        var elHeight, elLeftMargin, elWidth, leftRoom, topRoom, w;
+        elLeftMargin = parseFloat($el.css("margin-left"));
+        elWidth = parseFloat($el.outerWidth()) - elLeftMargin;
+        elHeight = parseFloat($el.outerHeight());
+        w = viewportDetails();
+        topRoom = $el.offset().top - w.scrollY + elHeight / 2;
+        leftRoom = $el.offset().left - w.scrollX + elWidth / 2;
+
+        var extra = $('.entry-column').offset().left;
+        leftRoom = $el.offset().left - extra - w.scrollX + elWidth / 2;
+
+        return {
+          topRoom: topRoom,
+          bottomRoom: w.height - topRoom,
+          leftRoom: leftRoom,
+          rightRoom: w.width - leftRoom,
+          leftRelative: leftRoom / w.width,
+          topRelative: topRoom / w.height
+        };
+      };
+      viewportDetails = function() {
+        return {
+          width: $('.entry-column').outerWidth(),
+          height: window.innerHeight,
+          scrollX: window.scrollX,
+          scrollY: window.scrollY
+        };
+      };
+      addBreakpoint = function(size, trueCallback, falseCallback, deleteDelay, removeOpen) {
+        var falseDefaultPositionSetting, minMax, mqListener, mql, query, s, trueDefaultPositionSetting;
+        if (deleteDelay == null) {
+          deleteDelay = settings.popoverDeleteDelay;
+        }
+        if (removeOpen == null) {
+          removeOpen = true;
+        }
+        mql = void 0;
+        minMax = void 0;
+        s = void 0;
+        if (typeof size === "string") {
+          s = size.toLowerCase() === "iphone" ? "<320px" : size.toLowerCase() === "ipad" ? "<768px" : size;
+          minMax = s.charAt(0) === ">" ? "min" : s.charAt(0) === "<" ? "max" : null;
+          query = minMax ? "(" + minMax + "-width: " + (s.substring(1)) + ")" : s;
+          mql = window.matchMedia(query);
+        } else {
+          mql = size;
+        }
+        if (mql.media && mql.media === "invalid") {
+          return {
+            added: false,
+            mq: mql,
+            listener: null
+          };
+        }
+        trueDefaultPositionSetting = minMax === "min";
+        falseDefaultPositionSetting = minMax === "max";
+        trueCallback = trueCallback || makeDefaultCallbacks(removeOpen, deleteDelay, trueDefaultPositionSetting, function($popover) {
+          return $popover.addClass("is-bottom-fixed");
+        });
+        falseCallback = falseCallback || makeDefaultCallbacks(removeOpen, deleteDelay, falseDefaultPositionSetting, function() {});
+        mqListener = function(mq) {
+          if (mq.matches) {
+            trueCallback(removeOpen, bigfoot);
+          } else {
+            falseCallback(removeOpen, bigfoot);
+          }
+        };
+        mql.addListener(mqListener);
+        mqListener(mql);
+        settings.breakpoints[size] = {
+          added: true,
+          mq: mql,
+          listener: mqListener
+        };
+        return settings.breakpoints[size];
+      };
+      makeDefaultCallbacks = function(removeOpen, deleteDelay, position, callback) {
+        return function(removeOpen, bigfoot) {
+          var $closedPopovers;
+          $closedPopovers = void 0;
+          if (removeOpen) {
+            $closedPopovers = bigfoot.close();
+            bigfoot.updateSetting("activateCallback", callback);
+          }
+          return setTimeout((function() {
+            bigfoot.updateSetting("positionContent", position);
+            if (removeOpen) {
+              return bigfoot.activate($closedPopovers);
+            }
+          }), deleteDelay);
+        };
+      };
+      removeBreakpoint = function(target, callback) {
+        var b, breakpoint, mq, mqFound;
+        mq = null;
+        b = void 0;
+        mqFound = false;
+        if (typeof target === "string") {
+          mqFound = settings.breakpoints[target] !== undefined;
+        } else {
+          for (b in settings.breakpoints) {
+            if (settings.breakpoints.hasOwnProperty(b) && settings.breakpoints[b].mq === target) {
+              mqFound = true;
+            }
+          }
+        }
+        if (mqFound) {
+          breakpoint = settings.breakpoints[b || target];
+          if (callback) {
+            callback({
+              matches: false
+            });
+          } else {
+            breakpoint.listener({
+              matches: false
+            });
+          }
+          breakpoint.mq.removeListener(breakpoint.listener);
+          delete settings.breakpoints[b || target];
+        }
+        return mqFound;
+      };
+      updateSetting = function(newSettings, value) {
+        var oldValue, prop;
+        oldValue = void 0;
+        if (typeof newSettings === "string") {
+          oldValue = settings[newSettings];
+          settings[newSettings] = value;
+        } else {
+          oldValue = {};
+          for (prop in newSettings) {
+            if (newSettings.hasOwnProperty(prop)) {
+              oldValue[prop] = settings[prop];
+              settings[prop] = newSettings[prop];
+            }
+          }
+        }
+        return oldValue;
+      };
+      getSetting = function(setting) {
+        return settings[setting];
+      };
+      $(document).ready(function() {
+        footnoteInit();
+        $(document).on("mouseenter", ".bigfoot-footnote__button", buttonHover);
+        $(document).on("touchend click", touchClick);
+        $(document).on("mouseout", ".is-hover-instantiated", unhoverFeet);
+        $(document).on("keyup", escapeKeypress);
+        $(window).on("scroll resize", repositionFeet);
+        return $(document).on("gestureend", function() {
+          return repositionFeet();
+        });
+      });
+      bigfoot = {
+        removePopovers: removePopovers,
+        close: removePopovers,
+        createPopover: createPopover,
+        activate: createPopover,
+        repositionFeet: repositionFeet,
+        reposition: repositionFeet,
+        addBreakpoint: addBreakpoint,
+        removeBreakpoint: removeBreakpoint,
+        getSetting: getSetting,
+        updateSetting: updateSetting
+      };
+      return bigfoot;
+    };
+  })(jQuery);
+
+}).call(this);

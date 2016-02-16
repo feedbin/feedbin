@@ -1,11 +1,11 @@
-Feedbin Installation on Fedora 19
----------------------------------
+Feedbin Installation on Fedora
+------------------------------
 
 #### Feedbin Dependencies
 
 Install a bunch of dependencies:
 
-    sudo yum -y install gcc gcc-c++ git libcurl-devel libxml2-devel libxslt-devel postgresql postgresql-devel rubygems ruby-devel rubygem-bundler
+    sudo dnf install gcc gcc-c++ git libcurl-devel libxml2-devel libxslt-devel postgresql postgresql-devel rubygems ruby-devel rubygem-bundler ImageMagick-devel opencv-devel
 
 Get Feedbin:
 
@@ -30,7 +30,7 @@ After changing this file, it's probably a good idea to open a new terminal to ma
 
 Install PostgreSQL:
 
-    sudo yum -y install postgresql-server postgresql-contrib
+    sudo dnf install postgresql-server postgresql-contrib
     sudo postgresql-setup initdb
 
 Remove all authentication by changing `/var/lib/pgsql/data/pg_hba.conf` so
@@ -73,7 +73,7 @@ Setup databases:
 
 Install:
 
-    sudo yum install redis
+    sudo dnf install redis
 
 Start the service:
 

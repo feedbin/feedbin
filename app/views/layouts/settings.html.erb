@@ -1,12 +1,14 @@
-<% @class = 'settings' %>
+<% @class = "settings settings-#{params[:action]}" %>
 <% content_for :content do %>
-<%= render partial: 'shared/settings_nav' %>
-  <div class="settings-content">
-    <div class="hamburger-menu" data-behavior="show_settings_modal"></div>
-    <div class="settings-content-inner">
-      <%= render partial: 'shared/flash', locals: {flash: flash} %>
+  <div class="settings-inner">
+    <%= render partial: 'shared/settings_nav' %>
+    <div class="settings-content">
+      <%= render partial: 'shared/hamburger_menu_button' %>
+      <div class="settings-content-inner" data-behavior="flash_wrap">
+        <%= render partial: 'shared/flash', locals: {flash: flash} %>
+      </div>
+      <%= yield %>
     </div>
-    <%= yield %>
   </div>
   <div class="modal-target"></div>
   <%= render partial: "shared/settings_modal" %>

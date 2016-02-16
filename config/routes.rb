@@ -1,5 +1,3 @@
-require 'sidekiq/web'
-
 Feedbin::Application.routes.draw do
 
   # The priority is based upon order of creation: first created -> highest priority.
@@ -7,26 +5,21 @@ Feedbin::Application.routes.draw do
 
   root to: 'site#index'
 
-  mount Sidekiq::Web, at: '/sidekiq'
   mount StripeEvent::Engine, at: '/stripe'
 
   get :health_check, to: proc {|env| [200, {}, ["OK"]] }
-
-  get :home, to: 'site#home'
-  get :apps, to: 'site#apps'
-
-  # Firefox OS manifest
-  get :manifest, to: 'site#manifest'
+  get :version, to: proc {|env| [200, {}, [ENV["ETAG_VERSION_ID"]]] }
 
   post '/emails' => 'emails#create'
+  post '/newsletters' => 'newsletters#create'
 
   match '/404', to: 'errors#not_found', via: :all
   get '/starred/:starred_token', to: 'starred_entries#index', as: 'starred'
   post '/starred/export', to: 'starred_entries#export'
+  get '/favicons/:hash', to: 'favicons#index', as: 'favicons'
 
   get    :signup,         to: 'users#new',           as: 'signup'
   get    :login,          to: 'sessions#new',        as: 'login'
-  get    :privacy_policy, to: 'site#privacy_policy', as: 'privacy_policy'
   delete :logout,         to: 'sessions#destroy',    as: 'logout'
 
   # Apple Push
@@ -48,11 +41,16 @@ Feedbin::Application.routes.draw do
   resources :tags,           only: [:index, :show, :update, :destroy]
   resources :billing_events, only: [:show]
   resources :imports
-  resources :sessions
   resources :password_resets
-  resources :sharing_services, path: 'settings/sharing', only: [:index]
-  resources :actions, path: 'settings/actions', only: [:index]
+  resources :sharing_services, path: 'settings/sharing', only: [:index, :create, :update, :destroy]
+  resources :actions, path: 'settings/actions', only: [:index, :create, :new, :update, :destroy, :edit]
   resources :saved_searches
+
+  resources :sessions do
+    collection do
+      get :refresh
+    end
+  end
 
   resources :supported_sharing_services, only: [:create, :destroy, :update] do
     member do
@@ -65,9 +63,13 @@ Feedbin::Application.routes.draw do
     end
   end
 
-  resources :subscriptions,  only: [:index, :create, :destroy] do
+  resources :subscriptions,  only: [:index, :create, :destroy, :update] do
     collection do
       patch :update_multiple
+      delete :destroy_all
+    end
+    member do
+      delete :settings_destroy
     end
   end
 
@@ -75,21 +77,22 @@ Feedbin::Application.routes.draw do
     member do
       patch :settings_update, controller: :settings
       patch :view_settings_update, controller: :settings
-      patch :sharing_services_update, controller: :sharing_services
-      patch :actions_update, controller: :actions
     end
   end
 
   resources :feeds, only: [:index, :edit, :create, :update] do
+    patch :rename
     resources :entries, only: [:index], controller: :feeds_entries
     collection do
       get :view_unread
       get :view_all
       get :view_starred
       get :auto_update
+      get :update_styles
     end
     member do
       match :push, via: [:post, :get]
+      post :toggle_updates
     end
   end
 
@@ -102,13 +105,16 @@ Feedbin::Application.routes.draw do
       post :recently_read, to: 'recently_read_entries#create'
       get :push_view
       get :diff
+      get :newsletter
     end
     collection do
       get :starred
       get :unread
       get :preload
       get :search
+      get :autocomplete_search
       get :recently_read, to: 'recently_read_entries#index'
+      get :updated, to: 'updated_entries#index'
       post :mark_all_as_read
       post :mark_direction_as_read
     end
@@ -121,6 +127,7 @@ Feedbin::Application.routes.draw do
     get :import_export
     get :feeds
     get :help
+    get :appearance
     post :update_credit_card
     post :mark_favicon_complete
     post :update_plan
@@ -129,6 +136,14 @@ Feedbin::Application.routes.draw do
     post :font_increase
     post :font_decrease
     post :entry_width
+  end
+
+  get :settings_subscriptions_edit, path: "/settings/feeds/:id/edit", to: 'subscriptions#edit'
+
+  resources :recently_read_entries, only: [] do
+    collection do
+      delete :destroy_all
+    end
   end
 
   constraints subdomain: 'api' do
@@ -142,24 +157,72 @@ Feedbin::Application.routes.draw do
   constraints subdomain: 'api' do
     namespace :api, path: nil do
       namespace :v2 do
-        get :authentication, to: 'authentication#index'
 
         resources :feeds, only: [:show] do
           resources :entries, only: [:index, :show], controller: :feeds_entries
         end
-        resources :subscriptions,  only: [:index, :show, :create, :destroy, :update]
-        post "subscriptions/:id/update", to: 'subscriptions#update'
 
-        resources :taggings,       only: [:index, :show, :create, :destroy]
-        resources :entries,        only: [:index, :show]
+        resources :entry_counts, only: [] do
+          collection do
+            get :post_frequency
+          end
+        end
+
+        resources :actions, only: [:index, :create, :update] do
+          member do
+            get :results
+          end
+        end
+
+        resources :devices, only: [:create] do
+          collection do
+            get :test
+          end
+        end
+
+        resources :users, only: [:create] do
+          collection do
+            get :info
+          end
+        end
+
+        resources :subscriptions,         only: [:index, :show, :create, :destroy, :update]
+        resources :favicons,              only: [:index]
+        resources :tags,                  only: [:index]
+        resources :taggings,              only: [:index, :show, :create, :destroy]
+        resources :recently_read_entries, only: [:index, :create]
+        resources :in_app_purchases,      only: [:create]
+        resources :suggested_categories,  only: [:index]
+
+        resources :entries, only: [:index, :show] do
+          member do
+            get :text
+          end
+        end
+        resources :suggested_feeds, only: [:index] do
+          member do
+            post :subscribe
+            delete :unsubscribe
+          end
+        end
+
+        get :authentication, to: 'authentication#index'
+
+        post "subscriptions/:id/update", to: 'subscriptions#update'
 
         resources :unread_entries, only: [:index, :show, :create]
         delete 'unread_entries', to: 'unread_entries#destroy'
+        put 'unread_entries', to: 'unread_entries#create'
         post 'unread_entries/delete', to: 'unread_entries#destroy'
 
         resources :starred_entries, only: [:index, :show, :create]
         delete 'starred_entries', to: 'starred_entries#destroy'
+        put 'starred_entries', to: 'starred_entries#create'
         post 'starred_entries/delete', to: 'starred_entries#destroy'
+
+        resources :updated_entries, only: [:index]
+        delete 'updated_entries', to: 'updated_entries#destroy'
+        post 'updated_entries/delete', to: 'updated_entries#destroy'
 
         resources :saved_searches,  only: [:index, :show, :create, :destroy, :update]
         post "saved_searches/:id/update", to: 'saved_searches#update'

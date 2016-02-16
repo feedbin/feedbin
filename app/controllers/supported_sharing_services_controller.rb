@@ -86,10 +86,10 @@ class SupportedSharingServicesController < ApplicationController
     klass = service_info[:klass].constantize.new
 
     response = klass.oauth2_pocket_authorize(session[:oauth2_pocket_token])
+    supported_sharing_service = @user.supported_sharing_services.where(service_id: params[:id]).first_or_initialize
     session.delete(:oauth2_pocket_token)
     if response.code == 200
       access_token = response.parsed_response['access_token']
-      supported_sharing_service = @user.supported_sharing_services.where(service_id: params[:id]).first_or_initialize
       supported_sharing_service.update(access_token: access_token)
       if supported_sharing_service.errors.any?
         redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
@@ -102,7 +102,7 @@ class SupportedSharingServicesController < ApplicationController
       Honeybadger.notify(
         error_class: "SupportedSharingServicesController#oauth2_pocket_response",
         error_message: "#{service_info[:label]} failure",
-        parameters: response
+        parameters: {response: response}
       )
       redirect_to sharing_services_url, notice: "Unknown #{service_info[:label]} error."
     end
@@ -132,7 +132,7 @@ class SupportedSharingServicesController < ApplicationController
     Honeybadger.notify(
       error_class: "SupportedSharingServicesController#oauth_response",
       error_message: "#{service_info[:label]} failure",
-      parameters: e
+      parameters: {exception: e}
     )
     redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
   end
@@ -163,7 +163,7 @@ class SupportedSharingServicesController < ApplicationController
       Honeybadger.notify(
         error_class: "SupportedSharingServicesController#oauth2_pocket_request",
         error_message: "#{service_info[:label]} failure",
-        parameters: response
+        parameters: {response: response}
       )
       redirect_to sharing_services_url, notice: "Unknown #{service_info[:label]} error."
     end
@@ -184,7 +184,7 @@ class SupportedSharingServicesController < ApplicationController
     Honeybadger.notify(
       error_class: "SupportedSharingServicesController#oauth_request",
       error_message: "#{service_info[:label]} failure",
-      parameters: e
+      parameters: {exception: e}
     )
     redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
   end

@@ -1,7 +1,9 @@
 <div class="settings-content-inner">
-  <h2>Actions</h2>
+  <div class="settings-outer">
+    <h2>Actions</h2>
 
-  <p class="muted">Actions can be performed on articles when they are published. Start by writing the keywords to match, just like you would when <a href="http://help.feedbin.com/search-syntax/">searching</a> for something. Then select the feeds to include. Finally check the actions you would like to perform on the matched incoming articles.</p>
+    <p class="muted">Actions can be performed on articles when they are published. Start by writing the keywords to match, just like you would when <a href="http://help.feedbin.com/search-syntax/">searching</a> for something. Then select the feeds to include. Finally check the actions you would like to perform on the matched incoming articles.</p>
+  </div>
 
   <div class="push-options hide" id="push-data" data-website-id="<%= ENV['APPLE_PUSH_WEBSITE_ID'] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>">
     <div class="push-enable hide">
@@ -15,15 +17,29 @@
     </div>
   </div>
 
-  <%= form_for @user, url: actions_update_user_path(@user), html: {novalidate: 'novalidate'} do |f| %>
-    <p class="half-margin"><%= link_to_add_association "Add Action", f, :actions, data: {association_insertion_node: '[data-behavior~=association_insertion_node]', association_insertion_method: 'prepend' } %></p>
-    <div data-behavior="association_insertion_node" class="collection-edit-wrapper actions-wrap">
-      <%= f.fields_for :actions do |builder| %>
-        <%= render 'action_fields', f: builder %>
+  <div class="inset">
+      <ul class="control-group control-group-form">
+        <li>
+          <%= link_to '+ Add Action', new_action_path, class: 'add-action' %>
+        </li>
+      </ul>
+
+      <% if @actions.any? %>
+        <ul class="pill-list">
+          <% @actions.each do |action| %>
+            <li class="action-item">
+              <div class="action-description">
+                <%= render partial: 'actions/text_description', locals: {action: action} %>
+              </div>
+              <div class="action-links">
+                <%= link_to 'Edit', edit_action_path(action), class: 'action-edit' %> |
+                <%= link_to 'Delete', action, method: :delete, class: 'action-destroy', data: { confirm: 'Are you sure you want to delete this action?' } %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
       <% end %>
-    </div>
-    <div class="collection-edit-controls clearfix">
-      <%= f.submit 'Save', class: 'button button-primary' %>
-    </div>
-  <% end %>
+
+  </div>
+
 </div>

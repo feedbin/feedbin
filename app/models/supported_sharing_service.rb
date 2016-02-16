@@ -85,6 +85,13 @@ class SupportedSharingService < ActiveRecord::Base
       requires_auth: false,
       service_type: 'popover',
       klass: 'AppDotNet'
+    },
+    {
+      service_id: 'buffer',
+      label: 'Buffer',
+      requires_auth: false,
+      service_type: 'popover',
+      klass: 'Buffer'
     }
   ].freeze
 
@@ -125,9 +132,9 @@ class SupportedSharingService < ActiveRecord::Base
   end
 
   def link_options(entry)
-    {url: Rails.application.routes.url_helpers.share_supported_sharing_service_path(self, entry),
-     label: self.label,
-     html_options: html_options}
+    service_info = SupportedSharingService.info!(self.service_id)
+    klass = service_info[:klass].constantize.new(self)
+    klass.link_options(entry)
   end
 
   def self.info(service_id)

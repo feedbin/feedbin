@@ -1,6 +1,7 @@
 require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
+require_relative '../lib/basic_authentication'
 
 # Assets should be precompiled for production (so we don't need the gems loaded then)
 Bundler.require(*Rails.groups(assets: %w(development test)))
@@ -22,7 +23,7 @@ module Feedbin
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
     config.assets.initialize_on_precompile = true
-    config.serve_static_assets = true
+    config.serve_static_files = true
 
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {
@@ -39,8 +40,13 @@ module Feedbin
 
     config.middleware.use Rack::ContentLength
 
+    config.middleware.use BasicAuthentication
+
     config.exceptions_app = self.routes
 
     config.active_record.schema_format = :sql
+
+    config.eager_load_paths += ["#{config.root}/app/image_pipeline"]
+
   end
 end

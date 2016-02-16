@@ -7,7 +7,7 @@ class Service
       # child classes using this need to implement add
       status = add(params)
       if status == 200
-        response[:message] = "Link saved to #{klass.label}."
+        response[:message] = "Saved to #{klass.label}."
       elsif status == 401
         klass.remove_access!
         response[:url] = Rails.application.routes.url_helpers.sharing_services_path
@@ -45,6 +45,12 @@ class Service
     action_view.view_paths = ActionController::Base.view_paths
     action_view.extend(ApplicationHelper)
     action_view.render(template: "supported_sharing_services/popover.js.erb", locals: {url: url})
+  end
+
+  def link_options(entry)
+    {url: Rails.application.routes.url_helpers.share_supported_sharing_service_path(@klass, entry),
+     label: @klass.label,
+     html_options: @klass.html_options}
   end
 
 end

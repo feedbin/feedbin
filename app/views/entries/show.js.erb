@@ -1,11 +1,2 @@
-feedbin.updateEntryContent('<%= j render partial: "show", locals: { entry: @entry, feed: @feed, read: @read, starred: @starred, content_view: @content_view, services: @services } %>');
-
-feedbin.localizeTime($('[data-behavior~=entry_content_target]'))
-
-feedbin.applyUserTitles()
-
-<% if @decrement %>
-feedbin.CountInstance.updateCount(<%= @entry.feed_id %>, <%= @tags.to_json %>, 'decrement')
-feedbin.updateTitle('<%= j @user.title_with_count %>')
-$("[data-entry-id=<%= @entry.id %>]").addClass('read');
-<% end %>
+$.extend(feedbin.entries, <%= @entries.to_json.html_safe %>);
+feedbin.showEntry(<%= params[:id] %>);

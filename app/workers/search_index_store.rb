@@ -1,5 +1,6 @@
 class SearchIndexStore
   include Sidekiq::Worker
+  sidekiq_options queue: :critical
 
   def perform(klass, id, update = false)
     klass = klass.constantize

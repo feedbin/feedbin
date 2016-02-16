@@ -277,10 +277,10 @@ class feedbin.Keyboard
         event.preventDefault()
 
   setEnvironment: ->
+    @selected = @selectedItem()
     @columnOffsetTop = @selectedColumn.offset().top
     @next = @nextItem()
     @previous = @previousItem()
-    @selected = @selectedItem()
     @containerHeight = @selectedColumn.outerHeight()
     @scrollTop = @selectedColumn.prop('scrollTop')
 
@@ -350,25 +350,31 @@ class feedbin.Keyboard
     selectedItem
 
   previousItem: ->
-    @drawer = @selectedItem().prev().find('.drawer')
-    if @inDrawer()
-      prev = @selectedItem().prev()
-      if prev.length == 0
-        prev = @selectedItem().parents('li[data-tag-id]')
-    else if @hasDrawer()
-      prev = $('ul li:last-child', @drawer)
+    if @selectedColumnName() == 'feeds'
+      @drawer = @selected.prevAll().not(":hidden").first().find('.drawer')
+      if @inDrawer()
+        prev = @selected.prevAll().not(":hidden").first();
+        if prev.length == 0
+          prev = @selected.parents('li[data-tag-id]');
+      else if @hasDrawer()
+        prev = $('ul li', @drawer).not(":hidden").last();
+      else
+        prev = @selected.prevAll().not(":hidden").first();
     else
       prev = @selectedItem().prev()
     prev
 
   nextItem: ->
-    @drawer = $('.drawer', @selectedItem())
-    if @inDrawer()
-      next = @selectedItem().next()
-      if next.length == 0
-        next = @selectedItem().parents('li[data-tag-id]').next()
-    else if @hasDrawer()
-      next = $('ul li:first-child', @drawer)
+    if @selectedColumnName() == 'feeds'
+      @drawer = $('.drawer', @selectedItem())
+      if @inDrawer()
+        next = @selected.nextAll().not(":hidden").first();
+        if next.length == 0
+          next = @selected.parents('li[data-tag-id]').nextAll().not(":hidden").first();
+      else if @hasDrawer()
+        next = $('ul li', @drawer).not(":hidden").first();
+      else
+        next = @selected.nextAll().not(":hidden").first();
     else
       next = @selectedItem().next()
     next
@@ -406,7 +412,7 @@ class feedbin.Keyboard
     @columns['feeds'].find('.selected').nextAll('li').find('.count').not('.hide').length
 
   selectNextUnreadFeed: ->
-    @item = @columns['feeds'].find('.selected').nextAll('li').find('.count').not('.hide').first().parents('li')
+    @item = @columns['feeds'].find('.selected').nextAll('li').find('.count').not(':hidden').first().parents('li')
     @selectItem()
 
   hasUnreadEntries: ->
@@ -439,7 +445,11 @@ class feedbin.Keyboard
     $('.entry-content').prop 'scrollTop', newPosition
 
   entryScrollHeight: ->
-    $('.entry-content').prop('scrollHeight') - $('.entry-content').prop('offsetHeight')
+    $('.entry-content').prop('scrollHeight') - $('.entry-content').prop('offsetHeight') - @nextEntryPreviewHeight()
 
   contentHeight: ->
     $('.entry-content').prop('clientHeight')
+
+  nextEntryPreviewHeight: ->
+    container = $('.next-entry-preview')
+    if container.is(":visible") then container.height() else 0

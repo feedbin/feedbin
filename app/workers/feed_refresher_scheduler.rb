@@ -1,5 +1,12 @@
+require 'sidekiq/api'
+require_relative '../../lib/batch_jobs'
+
 class FeedRefresherScheduler
   include Sidekiq::Worker
+  include BatchJobs
+  sidekiq_options queue: :critical
+
+  STRATEGY_KEY = "last_refresh:strategy".freeze
 
   def perform
     queues = Sidekiq::Stats.new().queues
@@ -10,38 +17,33 @@ class FeedRefresherScheduler
   end
 
   def refresh_feeds
-    feeds = Feed.select(:id, :feed_url, :etag, :last_modified, :subscriptions_count, :push_expiration).where("EXISTS (SELECT 1 FROM subscriptions WHERE subscriptions.feed_id = feeds.id AND subscriptions.active = 't')")
-    last_refresh_strategy = Sidekiq.redis {|client| client.get('last_refresh:strategy')}
-    if last_refresh_strategy.blank? || last_refresh_strategy == 'all'
-      feeds = feeds.where('feeds.subscriptions_count > 1')
-      Sidekiq.redis {|client| client.set('last_refresh:strategy', 'partial')}
-    else
-      Sidekiq.redis {|client| client.set('last_refresh:strategy', 'all')}
+    feed = Feed.last
+    if feed
+      jobs = job_args(feed.id, priority?)
+      set_strategy
+      Sidekiq::Client.push_bulk(
+        'args'  => jobs,
+        'class' => "FeedRefresher",
+        'queue' => 'worker_slow_critical'
+      )
     end
-
-    feeds.find_in_batches(batch_size: 5000) do |feeds|
-      arguments = feeds.map do |feed|
-        values = feed.attributes.values
-        values.pop
-        if feed.push_expiration.nil? || feed.push_expiration < Time.now
-          values.push(nil) # Placeholder for the body upon fat notifications.
-          values.push(Push::callback_url(feed))
-          values.push(Push::hub_secret(feed.id))
-        end
-        values
-      end
-      queue_refresh(arguments)
-    end
-
   end
 
-  def queue_refresh(arguments)
-    Sidekiq::Client.push_bulk(
-      'args'  => arguments,
-      'class' => 'FeedRefresherFetcher',
-      'queue' => 'feed_refresher_fetcher',
-      'retry' => false
-    )
+  def priority?
+    last_refresh_strategy = Sidekiq.redis {|client| client.get(STRATEGY_KEY)}
+    if last_refresh_strategy.blank? || last_refresh_strategy == 'all'
+      true
+    else
+      false
+    end
+  end
+
+  def set_strategy
+    if priority?
+      Sidekiq.redis {|client| client.set(STRATEGY_KEY, "partial")}
+    else
+      Sidekiq.redis {|client| client.set(STRATEGY_KEY, "all")}
+    end
   end
 
 end

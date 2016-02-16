@@ -1,0 +1,89 @@
+<%= form_for(@action, as: :action_params) do |f| %>
+  <% if @action.errors.any? %>
+    <div class="alert alert-danger">
+      <% @action.errors.full_messages.each do |message| %>
+        <%= message %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="inset">
+    <ul class="control-group control-group-form">
+      <li>
+        <%= f.text_field :title, placeholder: "Title" %>
+      </li>
+    </ul>
+
+    <div class="inset-content">
+      <h4 class="group-header">Article Matches Search</h4>
+    </div>
+    <ul class="control-group control-group-form">
+      <li>
+        <%= f.search_field :query, placeholder: "Search" %>
+      </li>
+    </ul>
+
+    <% if @user.taggings.any? %>
+    <div class="inset-content por">
+      <h4 class="group-header">Article is in Tag</h4>
+    </div>
+    <ul class="control-group">
+      <li>
+        <div class="filter-tags">
+          <%=
+          f.collection_check_boxes(:tag_ids, @user.feed_tags, :id, :name) do |b|
+            b.label(class: "checkbox") do
+              b.check_box + b.text
+            end
+          end
+          %>
+        </div>
+      </li>
+    </ul>
+    <% end %>
+
+    <div class="inset-content por">
+      <h4 class="group-header">Article is in Feed</h4>
+    </div>
+    <ul class="control-group">
+      <li>
+        <div class="filter-feeds-include-all">
+          <input type="text" class="action-feed-search" data-behavior="feed_search" placeholder="Filter" />
+          <label class="checkbox">
+            <%= f.check_box :all_feeds, data: {behavior: 'check_feeds'} %>
+            Include All
+          </label>
+        </div>
+        <div class="filter-feeds" data-behavior="search_results">
+          <%=
+          f.collection_check_boxes(:feed_ids, @user.feeds.include_user_title, :string_id, :title) do |b|
+            options = {data: {behavior: 'collection_checkbox'}}
+            if f.object.all_feeds == true
+              options[:disabled] = 'disabled'
+            end
+            b.label(class: "checkbox", data: {sort_name: b.text.downcase}) do
+              b.check_box(options) + b.text
+            end
+          end
+          %>
+        </div>
+      </li>
+    </ul>
+
+    <ul class="control-group control-group-form">
+      <%=
+      f.collection_check_boxes(:actions, Feedbin::Application.config.action_names, :value, :label) do |b|
+        content_tag :li, data: {behavior: "action_#{b.value}"} do
+          b.check_box + b.label {  "#{b.text} <span class='slider-checkbox'></span>".html_safe }
+        end
+      end
+      %>
+    </ul>
+
+    <div class="description-inset">
+      <%= f.submit "Save", class: "button-plain no-margin" %>
+    </div>
+
+  </div>
+
+<% end %>

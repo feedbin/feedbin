@@ -1,11 +1,12 @@
 Feedbin
 =======
-[![Code Climate](https://codeclimate.com/github/feedbin/feedbin.png)](https://codeclimate.com/github/feedbin/feedbin)
-[![Build Status](https://travis-ci.org/feedbin/feedbin.png?branch=master)](https://travis-ci.org/feedbin/feedbin)
+[![Build Status](https://travis-ci.org/feedbin/feedbin.svg?branch=master)](https://travis-ci.org/feedbin/feedbin)
+[![Code Climate](https://codeclimate.com/github/feedbin/feedbin.svg)](https://codeclimate.com/github/feedbin/feedbin)
+[![Test Coverage](https://codeclimate.com/github/feedbin/feedbin/badges/coverage.svg)](https://codeclimate.com/github/feedbin/feedbin)
 
 Feedbin is a simple, fast and nice looking RSS reader.
 
-![Feedbin Screenshot](https://raw.github.com/feedbin/feedbin/master/app/assets/images/screenshots/_main.png)
+![Feedbin Screenshot](https://www.dropbox.com/s/1crp6nmoh6uwjp1/_screenshot.jpg?dl=1)
 
 Introduction
 ------------
@@ -31,9 +32,9 @@ Requirements
 
 Installation
 -------------
-Ultimately you need a Ruby environment and a Rack compatible application server. For development [Pow](http://pow.cx/) is recommended.
+Ultimately, you'll need a Ruby environment and a Rack compatible application server. For development [Pow](http://pow.cx/) is recommended.
 
-Feedbin uses environment variables for configuration. Feedbin will run without any of these, but various features and functionality will be turned off.
+Feedbin uses environment variables for configuration. Feedbin will run without these, but various features and functionality will be turned off.
 
 | Environment Variable     | Description                                                                        |
 |--------------------------|------------------------------------------------------------------------------------|
@@ -46,6 +47,7 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | DATABASE_URL             | Database connection string - postgres://USER:PASS@IP:PORT/DATABASE                 |
 | DEFAULT_URL_OPTIONS_HOST | Mailer host - feedbin.com                                                          |
 | ELASTICSEARCH_URL        | search endpoint - http://localhost:9200                                            |
+| ENTRY_LIMIT              | Maximum entries per feed. Older entries will be deleted.                           |
 | FEEDBIN_HOMEPAGE_REPO    | Git URL to a Rails engine that provides a custom homepage                          |
 | FROM_ADDRESS             | Used as a reply-to email address                                                   |
 | GAUGES_SITE_ID           | [gaug.es](http://gaug.es) analytics identifier                                     |
@@ -67,10 +69,14 @@ Feedbin uses environment variables for configuration. Feedbin will run without a
 | SMTP_PASSWORD            | SMTP Password                                                                      |
 | STRIPE_API_KEY           | Used for communicating with stripe - https://stripe.com                            |
 | STRIPE_PUBLIC_KEY        | Used for communicating with stripe - https://stripe.com                            |
+| ANALYTICS_ID             | Google Analytics Property                                                          |
+| ANALYTICS_DOMAIN         | Google Analytics Domain                                                            |
+| EVERNOTE_KEY             | Evernote API Key                                                                   |
+| EVERNOTE_SECRET          | Evernote API Secret                                                                |
 
-These variables need to be available in the environment of the user running the app.
+These variables will need to be available in the environment of the user running the app.
 
-Locally I use [dotenv](https://github.com/bkeepers/dotenv) combined with [pow](http://pow.cx/). Pow's `.powenv` file is set up to read dotenv's .env file like:
+Locally, I use [dotenv](https://github.com/bkeepers/dotenv) combined with [pow](http://pow.cx/). Pow's `.powenv` file is set up to read dotenv's .env file like:
 
 ```shell
 export $(cat .env)
@@ -78,7 +84,7 @@ export $(cat .env)
 
 This is necessary so the environment variables can be read by both Pow and Unicorn.
 
-In production environment variables are set in the `app` users ~/.bash_profile like:
+In a production environment, variables are set in the `app` users ~/.bash_profile like:
 
 ```shell
 export AWS_ACCESS_KEY_ID=aoisjf3j23oij23f
@@ -89,7 +95,7 @@ export AWS_ACCESS_KEY_ID=aoisjf3j23oij23f
 
 - [Mac OS X](doc/INSTALL-mac.md)
 - [Ubuntu](doc/INSTALL-ubuntu.md) (incomplete)
-- [Fedora 19](doc/INSTALL-fedora.md)
+- [Fedora](doc/INSTALL-fedora.md)
 
 
 ### Pair With Me

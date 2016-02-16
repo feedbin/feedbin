@@ -7,12 +7,13 @@ class StarredEntry < ActiveRecord::Base
 
   validates_uniqueness_of :user_id, scope: :entry_id
 
-  def self.create_from_owners(user, entry)
-    create(user_id: user.id, feed_id: entry.feed_id, entry_id: entry.id, published: entry.published)
+  def self.create_from_owners(user, entry, source = nil)
+    create(user_id: user.id, feed_id: entry.feed_id, entry_id: entry.id, published: entry.published, source: source)
   end
 
   def expire_caches
     Rails.cache.delete("#{self.user_id}:starred_feed")
+    true
   end
 
 end
