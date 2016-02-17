@@ -331,4 +331,8 @@ class User < ActiveRecord::Base
     template % self.newsletter_token
   end
 
+  def stripe_url
+    "https://manage.stripe.com/customers/#{customer_id}"
+  end
+
 end

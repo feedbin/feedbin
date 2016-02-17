@@ -230,4 +230,8 @@ Feedbin::Application.routes.draw do
     end
   end
 
+  namespace :admin do
+    resources :users
+  end
+
 end

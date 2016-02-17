@@ -137,7 +137,6 @@ GEM
     clockwork (1.2.0)
       activesupport
       tzinfo
-    cocoon (1.2.6)
     codeclimate-test-reporter (0.4.8)
       simplecov (>= 0.7.1, < 1.0.0)
     coderay (1.1.0)
@@ -338,8 +337,6 @@ GEM
       actionpack (>= 3)
       activesupport (>= 3)
       railties (>= 3)
-    longurl (0.1.6)
-      json
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     mail (2.6.3)
@@ -501,7 +498,6 @@ GEM
     xipio (1.0.0)
       railties (>= 3)
     xml-simple (1.1.5)
-    yajl-ruby (1.2.1)
 
 PLATFORMS
   ruby
@@ -518,7 +514,6 @@ DEPENDENCIES
   carrierwave
   carrierwave_direct
   clockwork
-  cocoon
   codeclimate-test-reporter
   coffee-rails
   connection_pool
@@ -543,7 +538,6 @@ DEPENDENCIES
   kramdown
   librato-rails
   lograge
-  longurl
   nokogumbo
   oauth
   opml_saw!
@@ -576,7 +570,6 @@ DEPENDENCIES
   unicorn
   will_paginate
   xipio
-  yajl-ruby
 
 BUNDLED WITH
    1.11.2

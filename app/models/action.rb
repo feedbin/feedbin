@@ -65,4 +65,9 @@ class Action < ActiveRecord::Base
     self.tag_ids = new_tag_ids
   end
 
+  def _percolator
+    response = Tire::Configuration.client.get "#{Tire::Configuration.url}/_percolator/entries/#{self.id}"
+    pp(JSON.load(response.body))
+  end
+
 end

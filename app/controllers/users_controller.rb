@@ -101,7 +101,7 @@ class UsersController < ApplicationController
   end
 
   def ensure_permission
-    unless @user.id == current_user.id || current_user.admin
+    unless @user.id == current_user.id
       render_404
     end
   end
