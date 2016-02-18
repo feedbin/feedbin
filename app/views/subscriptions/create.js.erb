@@ -18,6 +18,8 @@
 
   $('.welcome').remove();
 
+  $('[name="subscription[feeds][feed_url]"]').blur()
+
 <% else %>
   feedbin.showNotification('No feed found.');
 <% end %>
