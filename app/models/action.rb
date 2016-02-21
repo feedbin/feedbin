@@ -21,7 +21,7 @@ class Action < ActiveRecord::Base
     percolator_ids = self.computed_feed_ids
     if percolator_ids.empty?
       search_percolate_remove
-    elsif self.all_feeds && percolator_query.nil? || percolator_query == ""
+    elsif self.all_feeds && (percolator_query.nil? || percolator_query == "")
       search_percolate_remove
     else
       Entry.index.register_percolator_query(self.id) do |search|
