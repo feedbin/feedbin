@@ -3,8 +3,6 @@ class NewslettersController < ApplicationController
   skip_before_action :verify_authenticity_token
   skip_before_action :authorize
 
-  respond_to :json
-
   def create
     if inbound_message?
       events.each do |event|
@@ -14,7 +12,14 @@ class NewslettersController < ApplicationController
         end
       end
     end
-  ensure
+    render nothing: true
+  end
+
+  def create2
+    newsletter = Newsletter2.new(params)
+    if newsletter.valid?
+      create_newsletter(newsletter)
+    end
     render nothing: true
   end
 
@@ -54,7 +59,6 @@ class NewslettersController < ApplicationController
       data: {newsletter_text: newsletter.text, type: "newsletter", format: newsletter.format}
     }
   end
-
 
   def get_feed(newsletter)
     Feed.where(feed_url: newsletter.feed_url).first_or_create(

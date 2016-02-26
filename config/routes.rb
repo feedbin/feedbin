@@ -12,6 +12,7 @@ Feedbin::Application.routes.draw do
 
   post '/emails' => 'emails#create'
   post '/newsletters' => 'newsletters#create'
+  post '/newsletters2' => 'newsletters#create2'
 
   match '/404', to: 'errors#not_found', via: :all
   get '/starred/:starred_token', to: 'starred_entries#index', as: 'starred'
