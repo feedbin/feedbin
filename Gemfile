@@ -79,6 +79,7 @@ gem 'responders', '~> 2.0'
 gem 'dotenv-rails'
 gem 'kramdown'
 gem 'rails_autolink'
+gem 'premailer'
 
 # Sidekiq
 gem 'sidekiq'
