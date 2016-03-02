@@ -9,11 +9,22 @@ class FeedRefresherScheduler
   STRATEGY_KEY = "last_refresh:strategy".freeze
 
   def perform
-    queues = Sidekiq::Stats.new().queues
-    if queues['feed_refresher_fetcher'].blank? || queues['feed_refresher_fetcher'] == 0
+    if fetcher_queue_empty? && receiver_queue_empty?
       refresh_feeds
       Librato.increment 'refresh_feeds'
     end
+  end
+
+  def fetcher_queue_empty?
+    queues['feed_refresher_fetcher'].blank? || queues['feed_refresher_fetcher'] == 0
+  end
+
+  def receiver_queue_empty?
+    queues['feed_refresher_receiver'].blank? || queues['feed_refresher_receiver'] == 0
+  end
+
+  def queues
+    Sidekiq::Stats.new().queues
   end
 
   def refresh_feeds
