@@ -6,55 +6,46 @@ class FeedRefresherScheduler
   include BatchJobs
   sidekiq_options queue: :critical
 
-  STRATEGY_KEY = "last_refresh:strategy".freeze
+  COUNT_KEY = "feed_refresher_scheduler:count".freeze
 
   def perform
-    if fetcher_queue_empty? && receiver_queue_empty?
+    if queue_empty?('feed_refresher_receiver') && queue_empty?('feed_refresher_fetcher')
       refresh_feeds
-      Librato.increment 'refresh_feeds'
     end
-  end
-
-  def fetcher_queue_empty?
-    queues['feed_refresher_fetcher'].blank? || queues['feed_refresher_fetcher'] == 0
-  end
-
-  def receiver_queue_empty?
-    queues['feed_refresher_receiver'].blank? || queues['feed_refresher_receiver'] == 0
-  end
-
-  def queues
-    Sidekiq::Stats.new().queues
   end
 
   def refresh_feeds
     feed = Feed.last
     if feed
       jobs = job_args(feed.id, priority?)
-      set_strategy
       Sidekiq::Client.push_bulk(
         'args'  => jobs,
         'class' => "FeedRefresher",
         'queue' => 'worker_slow_critical'
       )
+      increment
     end
   end
 
   def priority?
-    last_refresh_strategy = Sidekiq.redis {|client| client.get(STRATEGY_KEY)}
-    if last_refresh_strategy.blank? || last_refresh_strategy == 'all'
-      true
-    else
-      false
+    @priority ||= count % 2 == 0
+  end
+
+  def increment
+    Librato.increment 'refresh_feeds'
+    Sidekiq.redis {|client| client.incr(COUNT_KEY)}
+  end
+
+  def count
+    @count ||= begin
+      result = Sidekiq.redis {|client| client.get(COUNT_KEY)} || 0
+      result.to_i
     end
   end
 
-  def set_strategy
-    if priority?
-      Sidekiq.redis {|client| client.set(STRATEGY_KEY, "partial")}
-    else
-      Sidekiq.redis {|client| client.set(STRATEGY_KEY, "all")}
-    end
+  def queue_empty?(queue)
+    @queues ||= Sidekiq::Stats.new().queues
+    @queues[queue].blank? || @queues[queue] == 0
   end
 
 end
