@@ -1,4 +1,4 @@
-# ENV['RAILS_ENV'] = 'production'; reload!; p = SafariPushNotificationSend.new; p.perform([2], 2)
+# ENV['RAILS_ENV'] = 'production'; reload!; p = SafariPushNotificationSend.new; p.perform([1], 2)
 class SafariPushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
