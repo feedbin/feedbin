@@ -69,7 +69,7 @@ class ApplePushNotificationsController < ApplicationController
   end
 
   def push_icon_path(size)
-    File.open(Rails.application.assets["push-iconset/#{size}.png"].pathname)
+    File.open("#{Rails.root}/lib/assets/push-iconset/#{size}.png")
   end
 
 end
