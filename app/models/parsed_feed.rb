@@ -62,7 +62,7 @@ class ParsedFeed
   end
 
   def hubs
-    @hubs = feed.hubs ? feed.hubs : []
+    @hubs = feed.respond_to?(:hubs) ? feed.hubs : []
   end
 
   def entries

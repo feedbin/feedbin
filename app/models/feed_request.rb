@@ -16,7 +16,11 @@ class FeedRequest
       if gzipped?
         result = gunzip(result)
       end
-      result.lstrip
+      result = result.lstrip
+      if result == ""
+        result = nil
+      end
+      result
     rescue
       nil
     end
