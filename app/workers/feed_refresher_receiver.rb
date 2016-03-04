@@ -111,10 +111,7 @@ class FeedRefresherReceiver
   end
 
   def update_feed(update, feed)
-    attributes = update['feed'].select do |key, value|
-      Feed::UPDATABLE_ATTRIBUTES.include?(key)
-    end
-    feed.update(attributes)
+    feed.update(update['feed'])
   end
 
 end
