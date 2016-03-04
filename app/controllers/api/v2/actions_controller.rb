@@ -6,6 +6,7 @@ module Api
 
       before_action :set_action, only: [:update, :results]
       before_action :validate_content_type, only: [:create]
+      skip_before_action :valid_user
 
       def index
         @user = current_user
@@ -54,7 +55,7 @@ module Api
       private
 
       def action_params
-        params.require(:action_params).permit(:query, :action_type, :feed_ids => [], :tag_ids => [], :actions => [])
+        params.require(:action_params).permit(:query, :action_type, :feed_ids, :tag_ids, :feed_ids => [], :tag_ids => [], :actions => [])
       end
 
       def set_action

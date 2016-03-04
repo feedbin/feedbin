@@ -43,6 +43,7 @@ namespace :deploy do
     run "sudo start #{application}"
     run "sudo start workers", roles: :worker
     run "sudo start workers_slow", roles: :worker
+    run "sudo start workers_images", roles: :worker
   end
 
   desc 'Stop the application services'
@@ -51,6 +52,7 @@ namespace :deploy do
     run "sudo stop #{application}"
     run "sudo stop workers", roles: :worker
     run "sudo stop workers_slow", roles: :worker
+    run "sudo stop workers_images", roles: :worker
   end
 
   desc 'Restart services'
@@ -59,6 +61,7 @@ namespace :deploy do
     run "sudo start #{application} || sudo restart #{application} || true"
     run "sudo start workers || sudo restart workers", roles: :worker
     run "sudo start workers_slow || sudo restart workers_slow", roles: :worker
+    run "sudo start workers_images || sudo restart workers_images", roles: :worker
   end
 
   desc 'Quiet Sidekiq'

@@ -21,6 +21,8 @@ class Action < ActiveRecord::Base
     percolator_ids = self.computed_feed_ids
     if percolator_ids.empty?
       search_percolate_remove
+    elsif self.all_feeds && (percolator_query.nil? || percolator_query == "")
+      search_percolate_remove
     else
       Entry.index.register_percolator_query(self.id) do |search|
         search.filtered do
@@ -39,6 +41,7 @@ class Action < ActiveRecord::Base
 
   def compute_feed_ids
     final_feed_ids = []
+    new_feed_ids = self.feed_ids || []
     subscriptions = Subscription.uncached do
       self.user.subscriptions.pluck(:feed_id)
     end
@@ -46,18 +49,25 @@ class Action < ActiveRecord::Base
       final_feed_ids.concat(subscriptions)
     end
     final_feed_ids.concat(self.user.taggings.where(tag: self.tag_ids).pluck(:feed_id))
-    final_feed_ids.concat(self.feed_ids.reject(&:blank?).map(&:to_i))
+    final_feed_ids.concat(new_feed_ids.reject(&:blank?).map(&:to_i))
     final_feed_ids = final_feed_ids.uniq
     final_feed_ids = final_feed_ids & subscriptions
     self.computed_feed_ids = final_feed_ids
   end
 
   def compute_tag_ids
-    self.tag_ids.each do |tag_id|
+    new_tag_ids = self.tag_ids || []
+    new_tag_ids.each do |tag_id|
       if !self.user.tags.where(id: tag_id).present?
-        self.tag_ids = self.tag_ids - [tag_id]
+        new_tag_ids = new_tag_ids - [tag_id]
       end
     end
+    self.tag_ids = new_tag_ids
+  end
+
+  def _percolator
+    response = Tire::Configuration.client.get "#{Tire::Configuration.url}/_percolator/entries/#{self.id}"
+    pp(JSON.load(response.body))
   end
 
 end

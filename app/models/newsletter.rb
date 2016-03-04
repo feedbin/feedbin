@@ -10,7 +10,7 @@ class Newsletter
 
   def token
     @token ||= begin
-      to_email.sub("@newsletters.feedbin.com", "").sub("test-subscribe-", "").sub("subscribe-", "")
+      to_email.sub("@newsletters.feedbin.com", "").sub("test-subscribe+", "").sub("subscribe+", "")
     end
   end
 
@@ -35,7 +35,11 @@ class Newsletter
   end
 
   def html
-    @event["msg"]["html"] || text
+    @event["msg"]["html"]
+  end
+
+  def content
+    html || text
   end
 
   def timestamp
@@ -54,12 +58,16 @@ class Newsletter
     @domain ||= Mail::Address.new(from_email).domain
   end
 
-  def feed_url(query)
-    "#{site_url}?#{query}"
+  def feed_url
+    "#{site_url}?#{feed_id}"
   end
 
   def site_url
-    site_url ||= URI::HTTP.build(host: domain).to_s
+    @site_url ||= URI::HTTP.build(host: domain).to_s
+  end
+
+  def format
+    html ? "html" : "text"
   end
 
 end

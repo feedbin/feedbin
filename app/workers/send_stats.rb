@@ -10,7 +10,13 @@ class SendStats
       redis_stats
       postgres_stats
       plan_count
+      active_users_count
     end
+  end
+
+  def active_users_count
+    count = User.where(plan: Plan.where.not(price: 0), suspended: false).count
+    Librato.measure("active_users_count", count)
   end
 
   def plan_count

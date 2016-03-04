@@ -61,4 +61,24 @@ class BillingEvent < ActiveRecord::Base
     details.data.try(:[], :previous_attributes).try(:[], :status) == "unpaid"
   end
 
+  def invoice
+    if self.event_type == "charge.succeeded"
+      Rails.cache.fetch("#{self.details.data.object.invoice}") do
+        JSON.parse(Stripe::Invoice.retrieve(self.details.data.object.invoice).to_json)
+      end
+    else
+      nil
+    end
+  end
+
+  def invoice_items
+    if self.event_type == "charge.succeeded"
+      Rails.cache.fetch("#{self.details.data.object.invoice}:lines") do
+        JSON.parse(Stripe::Invoice.retrieve(self.details.data.object.invoice).lines.all(limit: 10).to_json)
+      end
+    else
+      nil
+    end
+  end
+
 end

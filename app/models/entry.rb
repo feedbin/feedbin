@@ -267,6 +267,10 @@ class Entry < ActiveRecord::Base
     self.feed.site_url
   end
 
+  def content_format
+    self.data && self.data["format"] || "default"
+  end
+
   private
 
   def base_url

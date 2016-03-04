@@ -6,7 +6,7 @@
 Variables
 ------------------------------------------------------------------------------*/
 $toolbar-height: 41px;
-$font-stack: -apple-system, "Feedbin SF UI Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-stack: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $feeds-toolbar-height: 52px;
 $base-button-position: 10px;
 
@@ -692,8 +692,6 @@ Grid
 HTML Elements
 ------------------------------------------------------------------------------*/
 
-@include SF-UI-Text-font-face;
-
 body, html {
     margin: 0;
     padding: 0;
@@ -932,10 +930,6 @@ table {
 table {
     max-width: 100%;
     background-color: transparent;
-}
-
-th {
-    text-align: left;
 }
 
 .table {
@@ -1877,7 +1871,7 @@ $subscribe-wrap-height: 49px;
 li.selected > a .favicon-wrap {
     background-color: #FFF;
     box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
-    &.collection-favicon {
+    .feeds &.collection-favicon {
         background: transparent;
         box-shadow: none;
     }
@@ -1895,7 +1889,11 @@ li.selected > a .favicon-wrap {
     svg {
         @include fill($text-color-light, $text-color-muted-night, $text-color-light-sunset);
     }
+    .favicon-newsletter {
+        @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+    }
 }
+
 
 .back-button {
     background-color: transparent;
@@ -3480,6 +3478,10 @@ $saved-search-control-height: 48px;
         max-width: 100%;
     }
 
+    th {
+        text-align: left;
+    }
+
     .text {
         white-space: pre-wrap;
     }
@@ -4293,6 +4295,9 @@ Settings
         padding: 0 30px;
         margin-top: -20px;
         margin-bottom: 30px;
+        &.no-margin {
+            margin-bottom: 0;
+        }
         @media (max-width: 528px) {
             padding-left: 15px;
             padding-right: 15px;
@@ -4735,33 +4740,38 @@ Settings
         .feeds-wrap {
             position: relative;
         }
+        $checkbox-offset: 64px;
+        $checkbox-offset-narrow: 49px;
         .checkbox-wrap {
             display: flex;
             align-items: center;
             position: absolute;
             z-index: 1000;
-            left: 30px;
+            left: 0;
             top: 0;
             bottom: 0;
-            width: 20px;
-            @media (max-width: 528px) {
-                left: 15px;
+            width: $checkbox-offset;
+            .feeds-checkbox {
+                margin: 0 0 0 30px !important;
+                padding: 0;
             }
-        }
-        .feeds-checkbox {
-            margin: 0 !important;
-            padding: 0;
+            @media (max-width: 528px) {
+                width: $checkbox-offset-narrow;
+                .feeds-checkbox {
+                    margin: 0 0 0 15px !important;
+                }
+            }
         }
         .subscription-link {
             display: flex;
             justify-content: space-between;
             color: $text-color;
-            padding: 13px 30px 13px 64px;
+            padding: 13px 30px 13px $checkbox-offset;
             &:hover {
                 text-decoration: none;
             }
             @media (max-width: 528px) {
-                padding: 13px 15px 13px 49px;
+                padding: 13px 15px 13px $checkbox-offset-narrow;
             }
         }
         .subscription-data {

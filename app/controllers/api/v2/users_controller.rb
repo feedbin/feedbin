@@ -6,6 +6,7 @@ module Api
 
       before_action :validate_content_type, only: [:create]
       skip_before_action :authorize, only: [:create]
+      skip_before_action :valid_user
 
       def create
         @user = User.new(user_params)

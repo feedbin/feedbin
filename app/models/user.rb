@@ -66,8 +66,8 @@ class User < ActiveRecord::Base
   before_save { reset_auth_token }
 
   before_create { generate_token(:starred_token) }
-  before_create { generate_token(:inbound_email_token) }
-  before_create { generate_token(:newsletter_token) }
+  before_create { generate_token(:inbound_email_token, 4) }
+  before_create { generate_token(:newsletter_token, 4) }
 
   before_destroy :cancel_billing, unless: -> user { user.admin }
   before_destroy :create_deleted_user
@@ -85,7 +85,6 @@ class User < ActiveRecord::Base
     self.expires_at = Feedbin::Application.config.trial_days.days.from_now
     self.update_auth_token = true
     self.mark_as_read_confirmation = 1
-    self.theme = "sunset"
     self.font = "serif-2"
     self.font_size = 7
   end
@@ -167,9 +166,9 @@ class User < ActiveRecord::Base
     end
   end
 
-  def generate_token(column, hash = false)
+  def generate_token(column, length = nil, hash = false)
     begin
-      random_string = SecureRandom.urlsafe_base64
+      random_string = SecureRandom.hex(length)
       if hash
         self[column] = Digest::SHA1.hexdigest(random_string)
       else
@@ -180,7 +179,7 @@ class User < ActiveRecord::Base
   end
 
   def send_password_reset
-    token = generate_token(:password_reset_token, true)
+    token = generate_token(:password_reset_token, nil, true)
     self.password_reset_sent_at = Time.now
     save!
     UserMailer.delay(queue: :critical).password_reset(id, token)
@@ -322,6 +321,14 @@ class User < ActiveRecord::Base
 
   def admin?
     admin
+  end
+
+  def newsletter_address
+    "#{self.newsletter_token}@newsletters.feedbin.com"
+  end
+
+  def stripe_url
+    "https://manage.stripe.com/customers/#{customer_id}"
   end
 
 end
