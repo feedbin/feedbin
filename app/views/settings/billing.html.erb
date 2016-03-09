@@ -35,7 +35,7 @@
           <ul class="control-group control-group-form">
           <% @plans.each do |plan| %>
             <li>
-              <% options = plan.stripe_id == 'basic-yearly-2' ? {checked: true, id: dom_id(plan)} : {id: dom_id(plan)} %>
+              <% options = plan == @default_plan ? {checked: true, id: dom_id(plan)} : {id: dom_id(plan)} %>
               <%= f.radio_button :plan_id, plan.id, options %>
               <%= label_tag nil, for: dom_id(plan) do %>
                 <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.name.gsub(/ly$/, '').downcase %>
@@ -43,6 +43,19 @@
             </li>
           <% end %>
           </ul>
+          <p class="control-group-description" data-behavior="billing_help_text">
+
+          <% @plans.each do |plan| %>
+            <% if plan.name =~ "monthly" %>
+
+            <% else %>
+
+            <% end %>
+          <% end %>
+            <%= render partial: 'shared/billing_help_text', locals: {flash: flash} %>
+            <%= render partial: ""  %>
+            Click below to charge your card $<span data-behavior=""><%=  %></span> now and on <%= Time.now.strftime("%B #{Time.now.day.ordinalize}") %> each year thereafter. You can change plans or cancel any time.
+          </p>
 
           <div class="description-inset">
             <%= f.submit "Subscribe", class: 'button-plain no-margin' %>

@@ -55,6 +55,9 @@ class SettingsController < ApplicationController
 
   def billing
     @user = current_user
+
+    @default_plan = Plan.find_by_stripe_id('basic-yearly-2')
+
     @next_payment = @user.billing_events.where(event_type: 'invoice.payment_succeeded')
     @next_payment = @next_payment.to_a.sort_by {|next_payment| -next_payment.details.data.object.date }
     if @next_payment.present?

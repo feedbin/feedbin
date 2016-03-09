@@ -106,9 +106,13 @@ class User < ActiveRecord::Base
   end
 
   def activate_subscriptions
-    if plan_id_changed? && plan_id_was == Plan.find_by_stripe_id('trial').id
+    if paid_conversion?
       subscriptions.update_all(active: true)
     end
+  end
+
+  def paid_conversion?
+    plan_id_changed? && plan_id_was == Plan.find_by_stripe_id('trial').id
   end
 
   def strip_email
@@ -202,7 +206,16 @@ class User < ActiveRecord::Base
           self.suspended = false
           subscriptions.update_all(active: true)
         end
-        customer.plan = plan.stripe_id
+        if plan_id_changed?
+          customer.plan = plan.stripe_id
+        end
+        if paid_conversion?
+          if trial_end.future?
+            customer.trial_end = trial_end.to_i
+          else
+            customer.trial_end = "now"
+          end
+        end
         customer.email = email
         customer.save
       end
@@ -276,11 +289,14 @@ class User < ActiveRecord::Base
   end
 
   def days_left
-    expires = (self.created_at + Feedbin::Application.config.trial_days.days).to_i
     now = Time.now.to_i
-    seconds_left = expires - now
+    seconds_left = trial_end.to_i - now
     days = (seconds_left.to_f / 86400.to_f).ceil
     (days > 0) ? days : 0
+  end
+
+  def trial_end
+    @trial_end ||= self.created_at + Feedbin::Application.config.trial_days.days
   end
 
   def update_tag_visibility(tag, visible)
