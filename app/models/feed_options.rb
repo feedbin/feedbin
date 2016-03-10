@@ -11,26 +11,17 @@ class FeedOptions
 
   def perform
     @perform ||= begin
-      options = []
-      options += page_options
-      if options.empty?
-        options += YoutubeOptions.new(@url).options
+      options = document.search("link[rel='alternate']").each_with_object([]) do |link, array|
+        if link_valid?(link)
+          option = FeedOption.new(@url, link["href"], link["title"])
+          array.push(option)
+        end
       end
-      options
+      options.uniq { |option| option.title }
     end
   end
 
   private
-
-  def page_options
-    options = document.search("link[rel='alternate']").each_with_object([]) do |link, array|
-      if link_valid?(link)
-        option = FeedOption.new(@url, link["href"], link["title"])
-        array.push(option)
-      end
-    end
-    options.uniq { |option| option.title }
-  end
 
   def link_valid?(link)
     valid = false

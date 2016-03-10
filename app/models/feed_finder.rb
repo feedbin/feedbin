@@ -8,18 +8,10 @@ class FeedFinder
   def options
     @options ||= begin
       options = []
-      if option = existing_option(@url)
-        options.push(option)
-      else
-        @cache[@url] = FeedRequest.new(url: @url, clean: true)
-        if @cache[@url].format == :html
-          options = FeedOptions.new(@cache[@url].body, @cache[@url].last_effective_url).perform
-        else
-          url = @cache[@url].last_effective_url
-          options.push(FeedOption.new(url, url, url))
-          @cache[url] = @cache[@url]
-        end
-      end
+      options.concat(existing_feed) if options.empty?
+      options.concat(page_links) if options.empty?
+      options.concat(xml) if options.empty?
+      options.concat(youtube) if options.empty?
       options
     end
   end
@@ -43,13 +35,41 @@ class FeedFinder
 
   private
 
-  def existing_option(url)
-    option = nil
-    feed = Feed.where(feed_url: url).take
+  def existing_feed
+    options = []
+    feed = Feed.where(feed_url: @url).take
     if feed
-      option = FeedOption.new(feed.feed_url, feed.feed_url, feed.title)
+      options.push(FeedOption.new(feed.feed_url, feed.feed_url, feed.title))
     end
-    option
+    options
+  end
+
+  def page_links
+    options = []
+    if cache(@url).format == :html
+      options = FeedOptions.new(cache(@url).body, cache(@url).last_effective_url).perform
+    end
+    options
+  end
+
+  def xml
+    options = []
+    if cache(@url).format == :xml
+      url = cache(@url).last_effective_url
+      options.push(FeedOption.new(url, url, url))
+    end
+    options
+  end
+
+  def youtube
+    YoutubeOptions.new(cache(@url).last_effective_url).options
+  end
+
+  def cache(url)
+    @cache[url] ||= FeedRequest.new(url: @url, clean: true)
+    last_effective_url = @cache[@url].last_effective_url
+    @cache[last_effective_url] = @cache[url]
+    @cache[url]
   end
 
 end
