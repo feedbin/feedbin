@@ -21,8 +21,6 @@ class FeedRequest
         result = nil
       end
       result
-    rescue
-      nil
     end
   end
 
@@ -75,14 +73,14 @@ class FeedRequest
 
   private
 
-  def gunzip(string)
-    string = StringIO.new(string)
+  def gunzip(data)
+    string = StringIO.new(data)
     gz =  Zlib::GzipReader.new(string)
     result = gz.read
     gz.close
     result
   rescue Zlib::GzipFile::Error
-    string
+    data
   end
 
   def gzipped?
