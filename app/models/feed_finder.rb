@@ -12,6 +12,7 @@ class FeedFinder
       options.concat(page_links) if options.empty?
       options.concat(xml) if options.empty?
       options.concat(youtube) if options.empty?
+      options.concat(guess) if options.empty?
       options
     end
   end
@@ -63,6 +64,21 @@ class FeedFinder
 
   def youtube
     YoutubeOptions.new(cache(@url).last_effective_url).options
+  end
+
+  def guess
+    options = []
+    if cache(@url).format == :html
+      host = URI.parse(cache(@url).last_effective_url).host
+      if cache(@url).body =~ /tumblr\.com/i
+        url = URI::HTTP.build(host: host, path: "/rss").to_s
+        options.push(FeedOption.new(url, url, url))
+      elsif cache(@url).body =~ /wordpress/i
+        url = URI::HTTP.build(host: host, path: "/feed").to_s
+        options.push(FeedOption.new(url, url, url))
+      end
+    end
+    options
   end
 
   def cache(url)
