@@ -30,6 +30,13 @@ class FeedRequest
     else
       :html
     end
+  rescue ArgumentError
+    if charset
+      @body = body.force_encoding(charset)
+    else
+      @body = body.force_encoding("ASCII-8BIT")
+    end
+    format
   end
 
   def last_effective_url
@@ -56,6 +63,24 @@ class FeedRequest
 
   def status
     @status ||= response.response_code
+  end
+
+  def charset
+    @charset ||= begin
+      if headers[:content_type]
+        charset = nil
+        headers[:content_type].split(";").each do |item|
+          item = item.strip
+          if item.start_with?("charset=")
+            charset = item.gsub("charset=", "")
+            charset = charset.strip.upcase
+          end
+        end
+        charset
+      else
+        nil
+      end
+    end
   end
 
   def headers
