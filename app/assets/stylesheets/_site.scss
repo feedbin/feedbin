@@ -1026,6 +1026,32 @@ table {
         &:last-child {
             border-bottom: none;
         }
+        &.linked {
+            padding: 0;
+            a {
+                display: block;
+                text-decoration: none;
+                @include settings-row;
+                color: $text-header-color;
+                @media (max-width: 528px) {
+                    padding-right: 20px;
+                }
+                &:after {
+                    content: "";
+                    display: block;
+                    position: absolute;
+                    background: image-url("icon-arrow.svg") 0 50% no-repeat;
+                    background-size: 12px 22px;
+                    width: 12px;
+                    right: 15px;
+                    top: 0;
+                    bottom: 0;
+                    @media (max-width: 528px) {
+                        right: 5px;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -4064,19 +4090,19 @@ Settings
     h3.box-header {
         margin: 0;
     }
-    .button-mini {
-        padding: 7px 10px;
-    }
     .button-plain {
-        color: $selected;
         -webkit-appearance: none;
-        background: transparent;
-        padding: 0;
+        color: #fff;
+        background: $selected;
+        padding: 10px 20px;
         margin: 0 0 30px 0;
         border: none;
         display: block;
         margin-top: -20px;
         margin-bottom: 30px;
+        &:hover {
+            text-decoration: none;
+        }
         &.no-margin {
             margin-bottom: 0;
         }
@@ -4084,12 +4110,32 @@ Settings
             margin-top: 0;
         }
         &[disabled] {
-            color: #999;
+            background-color: $border-color;
             cursor: default;
         }
     }
+    .button-inline {
+        -webkit-appearance: none;
+        color: $selected;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        border: none;
+        display: block;
+    }
     .button-plain-danger {
         color: red;
+        background-color: transparent;
+    }
+    .button-group {
+        display: flex;
+        margin-top: -20px;
+        .button-plain {
+            margin: 0;
+            &:not(:first-child) {
+                margin-left: 20px
+            }
+        }
     }
     .subscribe-email {
         word-break: break-all;
