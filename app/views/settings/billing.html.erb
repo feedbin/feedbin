@@ -88,7 +88,7 @@
                   <% else %>
                     <%= form_tag settings_update_plan_path, data: { behavior: 'change_plan' }, class: 'no-margin' do %>
                       <%= hidden_field_tag 'plan', plan.id %>
-                      <%= button_tag 'Switch to this plan', class: 'button button-link' %>
+                      <%= button_tag 'Switch to this plan', class: 'button' %>
                     <% end %>
                   <% end %>
                 </td>
