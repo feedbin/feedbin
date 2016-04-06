@@ -319,6 +319,7 @@ class EntriesController < ApplicationController
       if @content_view
         url = @entry.fully_qualified_url
         @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v2") do
+          Librato.increment 'readability.first_parse'
           ReadabilityParser.parse(url)
         end
         @content = @content_info.content
