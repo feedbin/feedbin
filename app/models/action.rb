@@ -66,7 +66,7 @@ class Action < ActiveRecord::Base
   end
 
   def _percolator
-    response = Tire::Configuration.client.get "#{Tire::Configuration.url}/_percolator/entries/#{self.id}"
+    response = Tire::Configuration.client.get "#{Tire::Configuration.url}/entries/.percolator/#{self.id}"
     pp(JSON.load(response.body))
   end
 

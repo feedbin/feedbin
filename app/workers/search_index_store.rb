@@ -5,13 +5,11 @@ class SearchIndexStore
   def perform(klass, id, update = false)
     klass = klass.constantize
     record = klass.find(id)
-    if update
-      record.tire.index.store(record)
-    else
-      result = record.tire.index.store(record, {percolate: true})
-      if result['matches'].present?
-        matched_saved_search_ids = result['matches'].map{|match| match.to_i}
-        ActionsPerform.perform_async(id, matched_saved_search_ids)
+    record.tire.index.store(record)
+    if !update
+      percolator_ids = record.tire.index.percolate(record).map{ |match| match["_id"].to_i}
+      if percolator_ids.present?
+        ActionsPerform.perform_async(id, percolator_ids)
       end
     end
   end

@@ -19,40 +19,15 @@ class Entry < ActiveRecord::Base
   after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
 
-  tire_settings = {
-    analysis: {
-      filter: {
-        url_stop: {
-          "type" => "stop",
-          "stopwords" => ["http", "https"]
-        },
-        url_ngram: {
-          "type"     => "nGram",
-          "max_gram" => 5,
-          "min_gram" => 3
-        }
-      },
-      analyzer: {
-        url_analyzer: {
-          "tokenizer" => "lowercase",
-          "filter"    => ["stop", "url_stop", "url_ngram"],
-          "type"      => "custom"
-        }
-      }
-    }
-  }
-
-  tire.settings tire_settings do
-    tire.mapping(_source: {enabled: false}) do
-      indexes :id,        index: :not_analyzed
-      indexes :title,     analyzer: 'snowball', boost: 100
-      indexes :content,   analyzer: 'snowball'
-      indexes :author,    analyzer: 'keyword'
-      indexes :url,       as: -> entry { entry.fully_qualified_url }, analyzer: 'url_analyzer'
-      indexes :feed_id,   index: :not_analyzed, include_in_all: false
-      indexes :published, type: 'date', include_in_all: false
-      indexes :updated,   type: 'date', include_in_all: false
-    end
+  tire.mapping(_source: {enabled: false}) do
+    indexes :id,        index: :not_analyzed
+    indexes :title,     analyzer: 'snowball'
+    indexes :content,   analyzer: 'snowball'
+    indexes :author,    analyzer: 'keyword'
+    indexes :url,       analyzer: 'keyword'
+    indexes :feed_id,   index: :not_analyzed, include_in_all: false
+    indexes :published, type: 'date', include_in_all: false
+    indexes :updated,   type: 'date', include_in_all: false
   end
 
   def self.search(params, user)
