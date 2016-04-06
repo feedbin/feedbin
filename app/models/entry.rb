@@ -43,7 +43,7 @@ class Entry < ActiveRecord::Base
   }
 
   tire.settings tire_settings do
-    tire.mapping do
+    tire.mapping(_source: {enabled: false}) do
       indexes :id,        index: :not_analyzed
       indexes :title,     analyzer: 'snowball', boost: 100
       indexes :content,   analyzer: 'snowball'
