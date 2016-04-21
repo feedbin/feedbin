@@ -8,6 +8,7 @@ addons:
   apt:
     packages:
       - libopencv-dev
+      - libopencv-photo-dev
 rvm:
   - 2.3.0
 env:

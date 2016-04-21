@@ -20,7 +20,7 @@ describe PasswordResetsController do
     it "works" do
       user = create(:user)
 
-      token = user.generate_token(:password_reset_token)
+      token = user.generate_token(:password_reset_token, nil, true)
       user.password_reset_sent_at = Time.now
       user.save!
 
