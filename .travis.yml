@@ -1,6 +1,7 @@
 language: ruby
 cache: bundler
 sudo: false
+dist: trusty
 services:
   - redis-server
 addons:
@@ -8,7 +9,6 @@ addons:
   apt:
     packages:
       - libopencv-dev
-      - libopencv-photo-dev
 rvm:
   - 2.3.0
 env:
