@@ -324,15 +324,15 @@ class User < ActiveRecord::Base
   end
 
   def newsletter_address
-    template = "subscribe+%s@newsletters.feedbin.com"
-    if Rails.env.development?
-      template = "test-subscribe+%s@newsletters.feedbin.com"
-    end
-    template % self.newsletter_token
+    "#{self.newsletter_token}@newsletters.feedbin.com"
   end
 
   def stripe_url
     "https://manage.stripe.com/customers/#{customer_id}"
+  end
+
+  def deleted?
+    false
   end
 
 end

@@ -7,23 +7,25 @@ class FeedRefresher
   def perform(batch, priority_refresh)
     feed_ids = build_ids(batch)
     count = priority_refresh ? 1 : 0
-    fields = [:id, :feed_url, :etag, :last_modified, :subscriptions_count, :push_expiration]
-    results = Feed.xml.where(id: feed_ids).where("subscriptions_count > ?", count).pluck(*fields)
-    subscriptions = Subscription.where(feed_id: feed_ids, active: true, muted: false).group(:feed_id).count
 
-    arguments = results.each_with_object([]) do |result, array|
+    Sidekiq::Client.push_bulk(
+      'args'  => build_arguments(feed_ids, count),
+      'class' => 'FeedRefresherFetcher',
+      'queue' => 'feed_refresher_fetcher',
+      'retry' => false
+    )
+  end
+
+  def build_arguments(feed_ids, count)
+    fields = [:id, :feed_url, :etag, :last_modified, :subscriptions_count, :push_expiration]
+    subscriptions = Subscription.where(feed_id: feed_ids, active: true, muted: false).group(:feed_id).count
+    feeds = Feed.xml.where(id: feed_ids).where("subscriptions_count > ?", count).pluck(*fields)
+    feeds.each_with_object([]) do |result, array|
       feed = Hash[fields.zip(result)]
       if subscriptions.has_key?(feed[:id])
         array << Arguments.new(feed, url_template).to_a
       end
     end
-
-    Sidekiq::Client.push_bulk(
-      'args'  => arguments,
-      'class' => 'FeedRefresherFetcher',
-      'queue' => 'feed_refresher_fetcher',
-      'retry' => false
-    )
   end
 
   def url_template
@@ -39,6 +41,15 @@ class FeedRefresher
     end
   end
 
+  def _debug(feed_id)
+    Sidekiq::Client.push_bulk(
+      'args'  => build_arguments([feed_id], 0),
+      'class' => 'FeedRefresherFetcher',
+      'queue' => 'feed_refresher_fetcher_debug',
+      'retry' => false
+    )
+  end
+
   class Arguments
     def initialize(feed, push_url)
       @feed = feed
@@ -47,7 +58,15 @@ class FeedRefresher
     end
 
     def to_a
-      [@feed[:id], @feed[:feed_url], @feed[:etag], @feed[:last_modified], @feed[:subscriptions_count], @body, push_callback, hub_secret]
+      options = {
+        etag: @feed[:etag],
+        last_modified: @feed[:last_modified],
+        subscriptions_count: @feed[:subscriptions_count],
+        push_callback: push_callback,
+        hub_secret: hub_secret,
+        push_mode: push_mode
+      }
+      [@feed[:id], @feed[:feed_url], options]
     end
 
     private
@@ -58,6 +77,10 @@ class FeedRefresher
 
     def hub_secret
       (push?) ? Push::hub_secret(@feed[:id]) : nil
+    end
+
+    def push_mode
+      (push?) ? "subscribe" : nil
     end
 
     def push?

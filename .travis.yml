@@ -1,6 +1,7 @@
 language: ruby
 cache: bundler
-sudo: false
+sudo: required
+dist: trusty
 services:
   - redis-server
 addons:

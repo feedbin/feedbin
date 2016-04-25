@@ -21,7 +21,7 @@ class Action < ActiveRecord::Base
     percolator_ids = self.computed_feed_ids
     if percolator_ids.empty?
       search_percolate_remove
-    elsif self.all_feeds && percolator_query.nil? || percolator_query == ""
+    elsif empty_notifier_action?
       search_percolate_remove
     else
       Entry.index.register_percolator_query(self.id) do |search|
@@ -33,6 +33,10 @@ class Action < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def empty_notifier_action?
+    self.all_feeds && self.notifier? && (self.query.nil? || self.query == "")
   end
 
   def search_percolate_remove

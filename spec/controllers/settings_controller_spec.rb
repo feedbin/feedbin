@@ -19,21 +19,6 @@ describe SettingsController do
     end
   end
 
-  describe "#update_credit_card" do
-    it "works" do
-      user = create(:user, customer_id: '1234')
-      sign_in user
-
-      customer = double(:customer)
-      expect(Customer).to receive(:retrieve).with('1234').and_return(customer)
-      expect(customer).to receive(:unpaid?).and_return(true)
-      expect(customer).to receive(:reopen_account)
-
-      post :update_credit_card, stripe_token: 'foobar'
-
-      expect(response).to redirect_to settings_billing_url
-    end
-  end
 
   describe "#settings_update" do
     let(:settings_params) {

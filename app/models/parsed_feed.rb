@@ -12,6 +12,12 @@ class ParsedFeed
 
   def feed
     @feed ||= Feedjira::Feed.parse(@xml)
+  rescue ArgumentError
+    if @feed_request.charset
+      @feed ||= Feedjira::Feed.parse(@xml.force_encoding(@feed_request.charset))
+    else
+      @feed ||= Feedjira::Feed.parse(@xml.force_encoding("ASCII-8BIT"))
+    end
   end
 
   def title
@@ -62,7 +68,7 @@ class ParsedFeed
   end
 
   def hubs
-    @hubs = feed.hubs ? feed.hubs : []
+    @hubs = feed.respond_to?(:hubs) ? feed.hubs : []
   end
 
   def entries

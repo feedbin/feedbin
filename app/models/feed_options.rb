@@ -1,4 +1,5 @@
 class FeedOptions
+
   def initialize(html, url)
     @html = html
     @url = url

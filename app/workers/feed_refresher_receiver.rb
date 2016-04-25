@@ -30,26 +30,29 @@ class FeedRefresherReceiver
   def update_entry(entry)
     original_entry = Entry.find_by_public_id(entry['public_id'])
     if original_entry.present?
-      entry_update = entry.slice('author', 'content', 'title', 'url', 'entry_id', 'data')
-
-      original_content = original_entry.content.to_s.clone
-      new_content = entry_update['content'].to_s.clone
-
-      if original_entry.original.nil?
-        entry_update['original'] = build_original(original_entry)
-      end
-      original_entry.update_attributes(entry_update)
       FeedbinUtils.update_public_id_cache(entry['public_id'], entry['content'])
+      if published_recently?(original_entry.published)
+        entry_update = entry.slice('author', 'content', 'title', 'url', 'entry_id', 'data')
+        entry_update['summary'] = ContentFormatter.summary(entry_update['content'])
 
-      if published_recently?(original_entry.published) && significant_change?(original_content, new_content)
-        create_update_notifications(original_entry)
+        original_content = original_entry.content.to_s.clone
+        new_content = entry_update['content'].to_s.clone
+
+        if original_entry.original.nil?
+          entry_update['original'] = build_original(original_entry)
+        end
+        original_entry.update_attributes(entry_update)
+
+        if significant_change?(original_content, new_content)
+          create_update_notifications(original_entry)
+        end
+
+        if new_content.length == original_content.length
+          Librato.increment('entry.no_change')
+        end
+
+        Librato.increment('entry.update')
       end
-
-      if new_content.length == original_content.length
-        Librato.increment('entry.no_change')
-      end
-
-      Librato.increment('entry.update')
     end
   end
 
@@ -111,13 +114,7 @@ class FeedRefresherReceiver
   end
 
   def update_feed(update, feed)
-    if update['feed']['title'].present?
-      feed.title = update['feed']['title']
-    end
-    feed.etag = update['feed']['etag']
-    feed.last_modified = update['feed']['last_modified']
-    feed.self_url = update['feed']['self_url']
-    feed.save
+    feed.update(update['feed'])
   end
 
 end

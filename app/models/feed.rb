@@ -12,6 +12,7 @@ class Feed < ActiveRecord::Base
   before_create :set_host
 
   attr_accessor :count, :tags
+  attr_readonly :feed_url
 
   enum feed_type: { xml: 0, newsletter: 1 }
 

@@ -45,7 +45,7 @@ describe UsersController do
 
       it "user has free plan" do
         expect {
-          post :create, user: user_params.merge(coupon: coupon.coupon_code)
+          post :create, user: user_params.merge(coupon_code: coupon.coupon_code)
         }.to change(User, :count).by(1)
 
         user = User.last
