@@ -4,7 +4,7 @@ sudo: false
 services:
   - redis-server
 addons:
-  postgresql: "9.5"
+  postgresql: "9.4"
 env:
   - DB=postgresql
 bundler_args: --without production development
