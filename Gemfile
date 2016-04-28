@@ -27,6 +27,10 @@ group :production do
   gem "therubyracer", require: 'v8'
 end
 
+group :production, :development do
+  gem 'ruby-opencv', require: false
+end
+
 gem 'pg'
 gem 'unicorn'
 
@@ -73,7 +77,6 @@ gem 'reverse_markdown'
 gem 'htmlentities'
 gem 'houston'
 gem 'nokogumbo'
-gem 'ruby-opencv', require: false
 gem 'rails-deprecated_sanitizer'
 gem 'responders', '~> 2.0'
 gem 'dotenv-rails'

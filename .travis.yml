@@ -1,14 +1,10 @@
 language: ruby
 cache: bundler
-sudo: required
-dist: trusty
+sudo: false
 services:
   - redis-server
 addons:
-  postgresql: "9.2"
-  apt:
-    packages:
-      - libopencv-dev
+  postgresql: "9.5"
 rvm:
   - 2.3.0
 env:
