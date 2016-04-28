@@ -5,10 +5,9 @@ services:
   - redis-server
 addons:
   postgresql: "9.5"
-rvm:
-  - 2.3.0
 env:
   - DB=postgresql
+bundler_args: --without production development
 before_script:
   - psql -c 'create database feedbin_test;' -U postgres
 before_script:
