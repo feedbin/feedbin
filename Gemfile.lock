@@ -11,6 +11,15 @@ GIT
       net-ssh-gateway (>= 1.1.0)
 
 GIT
+  remote: git://github.com/feedbin/apnotic.git
+  revision: e86f18d18d9bb44ce5a696214f0eac596cf6c741
+  ref: e86f18d
+  specs:
+    apnotic (0.7.0)
+      connection_pool (~> 2.0)
+      http-2 (~> 0.8.1)
+
+GIT
   remote: git://github.com/feedbin/feedjira.git
   revision: 43ba9b453cad27461d05e4db7a5b8da93e327d44
   ref: 43ba9b4
@@ -306,6 +315,7 @@ GEM
       commander (~> 4.1)
       json
     htmlentities (4.3.4)
+    http-2 (0.8.1)
     httparty (0.13.7)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
@@ -509,6 +519,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import (>= 0.4.1)
   addressable
+  apnotic!
   autoprefixer-rails
   bcrypt-ruby
   benchmark-ips

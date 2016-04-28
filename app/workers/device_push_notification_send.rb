@@ -1,12 +1,8 @@
-require 'apn_connection'
-
 class DevicePushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
 
-  APN_POOL = ConnectionPool.new(size: 3, timeout: 300) do
-    APNConnection.new
-  end
+  APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV['APPLE_PUSH_CERT_IOS']}, size: 5)
 
   def perform(user_ids, entry_id)
     Honeybadger.context(user_ids: user_ids, entry_id: entry_id)
@@ -23,33 +19,18 @@ class DevicePushNotificationSend
       array.push(notification)
     end
 
-    APN_POOL.with do |connection|
-      send(notifications, connection)
-    end
-
-    Librato.increment 'apns.ios.sent', by: notifications.length
-  end
-
-  def send(notifications, connection)
     notifications.each do |notification|
-      begin
-        connection.write(notification.message)
-        sleep(0.1)
-      rescue Errno::EPIPE => exception
-        attempts ||= 0
-        attempts += 1
-        if attempts <= notifications.length
-          Librato.increment 'apns.ios.connection.open'
-          connection.close
-          sleep(0.2)
-          connection.open
-          retry
-        else
-          raise exception
+      APNOTIC_POOL.with do |connection|
+        response = connection.push(notification)
+        if response.status == '410' || (response.status == '400' && response.body['reason'] == 'BadDeviceToken')
+          Device.where("lower(token) = ?", notification.token.downcase).take&.destroy
         end
+        Librato.increment('apns.safari.sent', source: response.status)
       end
     end
   end
+
+  private
 
   def subscription_titles(user_ids, feed)
     titles = Subscription.where(feed: feed, user_id: user_ids).pluck(:user_id, :title)
@@ -75,7 +56,7 @@ class DevicePushNotificationSend
     title = format_text(entry.title)
     published = entry.published.iso8601(6)
 
-    notification = Houston::Notification.new(device: device_token)
+    notification = Apnotic::Notification.new(device_token)
     notification.category = "singleArticle"
     notification.content_available = true
     notification.sound = ""
@@ -83,7 +64,7 @@ class DevicePushNotificationSend
       title: feed_title,
       body: "#{feed_title}: #{body}",
     }
-    notification.custom_data = {
+    notification.custom_payload = {
       feedbin: {
         entry_id: entry.id,
         title: title,

@@ -40,6 +40,7 @@ gem 'html-pipeline',         github: 'feedbin/html-pipeline',       ref: 'd7e451
 gem 'grocer-pushpackager',   github: 'feedbin/grocer-pushpackager', ref: '6b01b4e', require: 'grocer/pushpackager'
 gem 'html_diff',             github: 'feedbin/html_diff',           ref: 'c7c15ce'
 gem 'tire',                  github: 'feedbin/retire',              ref: '0595d9e'
+gem 'apnotic',               github: 'feedbin/apnotic',             ref: 'e86f18d'
 
 gem 'sass-rails'
 gem 'coffee-rails'

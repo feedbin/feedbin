@@ -3,6 +3,8 @@ class SafariPushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
 
+  APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV['APPLE_PUSH_CERT']}, size: 5)
+
   def perform(user_ids, entry_id)
     users = User.where(id: user_ids)
     tokens = Device.where(user_id: user_ids).safari.pluck(:user_id, :token)
@@ -18,15 +20,19 @@ class SafariPushNotificationSend
     notifications = tokens.each_with_object([]) do |(user_id, token), array|
       title = titles[user_id] || title
       notification = build_notification(token, title, body, entry_id, user_id, verifier)
-      notification = Grocer::SafariNotification.new(notification)
       array.push(notification)
     end
 
-    $grocer.with do |pusher|
-      notifications.each { |notification| pusher.push(notification) }
+    notifications.each do |notification|
+      APNOTIC_POOL.with do |connection|
+        response = connection.push(notification)
+        puts response.status
+        if response.status == '410' || (response.status == '400' && response.body['reason'] == 'BadDeviceToken')
+          Device.where("lower(token) = ?", notification.token.downcase).take&.destroy
+        end
+        Librato.increment('apns.safari.sent', source: response.status)
+      end
     end
-
-    Librato.increment 'push_notifications_sent', by: notifications.length
   end
 
   def subscription_titles(user_ids, feed)
@@ -52,12 +58,17 @@ class SafariPushNotificationSend
   end
 
   def build_notification(device_token, title, body, entry_id, user_id, verifier)
-    {
-      device_token: device_token,
-      title: title,
-      body: body,
-      url_args: [entry_id.to_s, CGI::escape(verifier.generate(user_id))]
+    notification = Apnotic::Notification.new(device_token)
+    notification.custom_payload = {
+      aps: {
+        alert: {
+          title: title,
+          body: body
+        },
+        "url-args" => [entry_id.to_s, CGI::escape(verifier.generate(user_id))]
+      }
     }
+    notification
   end
 
 end
