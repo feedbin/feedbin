@@ -1,16 +1,15 @@
-# ENV['RAILS_ENV'] = 'production'; reload!; p = SafariPushNotificationSend.new; p.perform([1], 2)
 class SafariPushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
 
   APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV['APPLE_PUSH_CERT']}, size: 5)
+  VERIFIER = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
 
   def perform(user_ids, entry_id)
     users = User.where(id: user_ids)
     tokens = Device.where(user_id: user_ids).safari.pluck(:user_id, :token)
     entry = Entry.find(entry_id)
     feed = entry.feed
-    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
 
     body = entry.title || entry.summary
     body = format_text(body, 90)
@@ -19,14 +18,13 @@ class SafariPushNotificationSend
 
     notifications = tokens.each_with_object([]) do |(user_id, token), array|
       title = titles[user_id] || title
-      notification = build_notification(token, title, body, entry_id, user_id, verifier)
+      notification = build_notification(token, title, body, entry_id, user_id)
       array.push(notification)
     end
 
     notifications.each do |notification|
       APNOTIC_POOL.with do |connection|
         response = connection.push(notification)
-        puts response.status
         if response.status == '410' || (response.status == '400' && response.body['reason'] == 'BadDeviceToken')
           Device.where("lower(token) = ?", notification.token.downcase).take&.destroy
         end
@@ -57,18 +55,16 @@ class SafariPushNotificationSend
     string
   end
 
-  def build_notification(device_token, title, body, entry_id, user_id, verifier)
-    notification = Apnotic::Notification.new(device_token)
-    notification.custom_payload = {
-      aps: {
-        alert: {
-          title: title,
-          body: body
-        },
-        "url-args" => [entry_id.to_s, CGI::escape(verifier.generate(user_id))]
+  def build_notification(device_token, title, body, entry_id, user_id)
+    Apnotic::Notification.new(device_token).tap do |notification|
+      notification.alert = {
+        title: title,
+        body: body
       }
-    }
-    notification
+      notification.url_args = [entry_id.to_s, CGI::escape(VERIFIER.generate(user_id))]
+    end
   end
 
 end
+
+

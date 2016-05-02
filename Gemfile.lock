@@ -11,15 +11,6 @@ GIT
       net-ssh-gateway (>= 1.1.0)
 
 GIT
-  remote: git://github.com/feedbin/apnotic.git
-  revision: e86f18d18d9bb44ce5a696214f0eac596cf6c741
-  ref: e86f18d
-  specs:
-    apnotic (0.7.0)
-      connection_pool (~> 2.0)
-      http-2 (~> 0.8.1)
-
-GIT
   remote: git://github.com/feedbin/feedjira.git
   revision: 43ba9b453cad27461d05e4db7a5b8da93e327d44
   ref: 43ba9b4
@@ -120,6 +111,9 @@ GEM
     addressable (2.4.0)
     aggregate (0.2.2)
     ansi (1.5.0)
+    apnotic (0.9.0)
+      connection_pool (~> 2.0)
+      net-http2 (~> 0.9.2)
     arel (6.0.3)
     autoprefixer-rails (6.3.3.1)
       execjs
@@ -155,8 +149,6 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.10.0)
-    commander (4.4.0)
-      highline (~> 1.7.2)
     concurrent-ruby (1.0.1)
     connection_pool (2.2.0)
     crass (1.0.2)
@@ -305,15 +297,11 @@ GEM
     formatador (0.2.5)
     globalid (0.3.6)
       activesupport (>= 4.1.0)
-    grocer (0.6.1)
     hashie (3.4.3)
     hashr (0.0.22)
     hetchy (1.0.0)
     highline (1.7.8)
     honeybadger (2.5.1)
-    houston (2.2.3)
-      commander (~> 4.1)
-      json
     htmlentities (4.3.4)
     http-2 (0.8.1)
     httparty (0.13.7)
@@ -358,6 +346,8 @@ GEM
     multi_json (1.11.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
+    net-http2 (0.9.2)
+      http-2 (~> 0.8.1)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-sftp (2.1.2)
@@ -519,7 +509,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import (>= 0.4.1)
   addressable
-  apnotic!
+  apnotic
   autoprefixer-rails
   bcrypt-ruby
   benchmark-ips
@@ -540,10 +530,8 @@ DEPENDENCIES
   feedjira!
   fog
   foreman (= 0.63.0)
-  grocer
   grocer-pushpackager!
   honeybadger
-  houston
   html-pipeline!
   html_diff!
   htmlentities

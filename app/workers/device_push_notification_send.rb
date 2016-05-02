@@ -55,25 +55,24 @@ class DevicePushNotificationSend
     author = format_text(entry.author)
     title = format_text(entry.title)
     published = entry.published.iso8601(6)
-
-    notification = Apnotic::Notification.new(device_token)
-    notification.category = "singleArticle"
-    notification.content_available = true
-    notification.sound = ""
-    notification.alert = {
-      title: feed_title,
-      body: "#{feed_title}: #{body}",
-    }
-    notification.custom_payload = {
-      feedbin: {
-        entry_id: entry.id,
-        title: title,
-        feed: feed_title,
-        author: author,
-        published: published
+    Apnotic::Notification.new(device_token).tap do |notification|
+      notification.alert = {
+        title: feed_title,
+        body: "#{feed_title}: #{body}",
       }
-    }
-    notification
+      notification.custom_payload = {
+        feedbin: {
+          entry_id: entry.id,
+          title: title,
+          feed: feed_title,
+          author: author,
+          published: published
+        }
+      }
+      notification.category = "singleArticle"
+      notification.content_available = true
+      notification.sound = ""
+    end
   end
 
 end
