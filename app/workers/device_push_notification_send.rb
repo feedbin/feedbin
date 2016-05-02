@@ -72,6 +72,8 @@ class DevicePushNotificationSend
       notification.category = "singleArticle"
       notification.content_available = true
       notification.sound = ""
+      notification.priority = "10"
+      notification.topic = ENV['APPLE_PUSH_TOPIC']
     end
   end
 
