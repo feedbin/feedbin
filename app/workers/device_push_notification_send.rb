@@ -25,7 +25,7 @@ class DevicePushNotificationSend
         if response.status == '410' || (response.status == '400' && response.body['reason'] == 'BadDeviceToken')
           Device.where("lower(token) = ?", notification.token.downcase).take&.destroy
         end
-        Librato.increment('apns.safari.sent', source: response.status)
+        Librato.increment('apns.ios.sent', source: response.status)
       end
     end
   end
