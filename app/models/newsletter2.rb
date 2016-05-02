@@ -73,7 +73,11 @@ class Newsletter2
   private
 
   def parsed_from
-    @parsed_from ||= Mail::Address.new(@params["from"])
+    Mail::Address.new(@params["from"])
+  rescue Mail::Field::ParseError
+    name, address = @params["from"].split(/[<>]/).map(&:strip)
+    domain = address.split("@").last
+    OpenStruct.new(name: name, address: address, domain: domain)
   end
 
   def signature_valid?
