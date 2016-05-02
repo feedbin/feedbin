@@ -59,7 +59,7 @@ namespace :deploy do
   task :restart, roles: [:app, :worker] do
     run "sudo /etc/init.d/unicorn start || sudo /etc/init.d/unicorn reload", roles: :app
     run "sudo start #{application} || sudo restart #{application} || true"
-    # run "sudo start workers || sudo restart workers", roles: :worker
+    run "sudo start workers || sudo restart workers", roles: :worker
     run "sudo start workers_slow || sudo restart workers_slow", roles: :worker
     run "sudo start workers_images || sudo restart workers_images", roles: :worker
   end
