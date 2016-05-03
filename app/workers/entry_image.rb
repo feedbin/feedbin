@@ -3,6 +3,7 @@ class EntryImage
   sidekiq_options retry: false, queue: :image
 
   def perform(entry_id)
+    return
     entry = Entry.find(entry_id)
     feed = entry.feed
     if image = EntryCandidates.new(entry, feed).find_image

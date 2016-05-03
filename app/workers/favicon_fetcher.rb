@@ -4,6 +4,7 @@ class FaviconFetcher
   sidekiq_options retry: false
 
   def perform(host)
+    return
     favicon = Favicon.where(host: host).first_or_initialize
     if !updated_recently?(favicon.updated_at)
       update_favicon(favicon)
