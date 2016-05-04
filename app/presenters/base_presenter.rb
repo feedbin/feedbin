@@ -12,6 +12,11 @@ class BasePresenter
         content = @template.content_tag :span, '', class: "favicon-wrap collection-favicon" do
           @template.svg_tag('favicon-newsletter', size: "16x16")
         end
+      elsif feed.alive == false
+        content = @template.content_tag :span, '', class: "favicon-wrap collection-favicon" do
+          # TODO: change favicon to a new one which connotes not-aliveness
+          @template.svg_tag('favicon-not-alive', size: "16x16")
+        end
       else
         favicon_classes = "favicon"
         favicon_classes << " favicon-#{feed.host.gsub('.', '-')}" if feed.host
