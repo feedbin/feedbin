@@ -82,6 +82,7 @@ gem 'kramdown'
 gem 'rails_autolink'
 gem 'premailer'
 gem 'apnotic'
+gem 'http'
 
 # Sidekiq
 gem 'sidekiq'

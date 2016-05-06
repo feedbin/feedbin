@@ -3,42 +3,61 @@ class FaviconFetcher
   include Sidekiq::Worker
   sidekiq_options retry: false
 
-  def perform(host)
-    favicon = Favicon.where(host: host).first_or_initialize
-    if !updated_recently?(favicon.updated_at)
-      update_favicon(favicon)
-    end
+  def perform(host, force = false)
+    @favicon = Favicon.where(host: host).first_or_initialize
+    @force = force
+    update if should_update?
   rescue
     Librato.increment('favicon.failed')
   end
 
-  def update_favicon(favicon)
+  def update
     data = nil
     favicon_found = false
+    response = nil
 
-    favicon_url = find_favicon_link(favicon.host)
+    favicon_url = find_favicon_link
     if favicon_url
-      data = download_favicon(favicon_url)
-      favicon_found = true if data
+      response = download_favicon(favicon_url)
+      favicon_found = true if !response.to_s.empty?
     end
 
     if !favicon_found
-      favicon_url = default_favicon_location(favicon.host)
-      data = download_favicon(favicon_url)
+      favicon_url = default_favicon_location
+      response = download_favicon(favicon_url)
     end
 
-    if data && favicon.favicon != data
-      favicon.favicon = data
-      Librato.increment('favicon.updated')
+    if response
+      data = response.to_s
+      favicon_hash = Digest::SHA1.hexdigest(data)
+      if data.present? && @favicon.data["favicon_hash"] != favicon_hash
+        image = format_favicon(response.to_s)
+        @favicon.favicon = image if image
+        @favicon.data = get_data(response, favicon_hash)
+        Librato.increment('favicon.updated')
+      end
+      Librato.increment('favicon.status', source: response.code)
     end
 
-    favicon.save
+    @favicon.save
   end
 
-  def find_favicon_link(host)
+  def get_data(response, favicon_hash)
+    data = {favicon_hash: favicon_hash}
+    if response
+      data = data.merge!(response.headers.to_h.extract!("Last-Modified", "Etag"))
+    end
+    data
+  end
+
+  def find_favicon_link
     favicon_url = nil
-    url = URI::HTTP.build(host: host)
-    response = HTTParty.get(url, {timeout: 20})
+    url = URI::HTTP.build(host: @favicon.host)
+    response = HTTP
+      .timeout(:global, write: 5, connect: 5, read: 5)
+      .follow()
+      .get(url)
+      .to_s
     html = Nokogiri::HTML(response)
     favicon_links = html.search(xpath)
     if favicon_links.present?
@@ -55,28 +74,37 @@ class FaviconFetcher
     nil
   end
 
-  def default_favicon_location(host)
-    URI::HTTP.build(host: host, path: "/favicon.ico")
+  def default_favicon_location
+    URI::HTTP.build(host: @favicon.host, path: "/favicon.ico")
   end
 
   def download_favicon(url)
-    response = HTTParty.get(url, timeout: 20, verify: false, headers: {"User-Agent" => "Mozilla/5.0"})
-    base64_favicon(response.body)
+    response = HTTP
+      .timeout(:global, write: 5, connect: 5, read: 5)
+      .follow()
+      .headers(request_headers)
+      .get(url)
   end
 
-  def base64_favicon(data)
+  def request_headers
+    headers = {user_agent: "Mozilla/5.0"}
+    if !@force
+      conditional_headers = ConditionalHTTP.new(@favicon.data["Etag"], @favicon.data["Last-Modified"])
+      headers = headers.merge(conditional_headers.to_h)
+    end
+    headers
+  end
+
+  def format_favicon(data)
     begin
       favicons = Magick::Image.from_blob(data)
     rescue Magick::ImageMagickError
       favicons = Magick::Image.from_blob(data) { |image| image.format = 'ico' }
     end
-
     favicon = remove_blank_images(favicons).last
-
     if favicon.columns > 32
       favicon = favicon.resize_to_fit(32, 32)
     end
-
     blob = favicon.to_blob { |image| image.format = 'png' }
     Base64.encode64(blob).gsub("\n", '')
   rescue
@@ -94,9 +122,18 @@ class FaviconFetcher
     end
   end
 
-  def updated_recently?(date)
-    if date
-      date > 1.day.ago
+  def should_update?
+    if @force
+      true
+    else
+      !updated_recently?
+    end
+    true
+  end
+
+  def updated_recently?
+    if @favicon.updated_at
+      @favicon.updated_at > 1.day.ago
     else
       false
     end
