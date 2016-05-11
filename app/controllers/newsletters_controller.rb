@@ -11,14 +11,6 @@ class NewslettersController < ApplicationController
     render nothing: true
   end
 
-  def create2
-    newsletter = Newsletter.new(params)
-    if newsletter.valid?
-      create_newsletter(newsletter)
-    end
-    render nothing: true
-  end
-
   private
 
   def create_newsletter(newsletter)
