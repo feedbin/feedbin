@@ -1,41 +1,41 @@
 class Newsletter
 
-  def initialize(event)
-    @event = event
+  def initialize(params)
+    @params = params
   end
 
   def valid?
-    @event["event"] == "inbound"
+    @params["X-Mailgun-Incoming"] == "Yes" && signature_valid?
   end
 
   def token
     @token ||= begin
-      to_email.sub("@newsletters.feedbin.com", "").sub("test-subscribe+", "").sub("subscribe+", "")
+      to_email.sub("@newsletters.feedbin.com", "").sub("@development.newsletters.feedbin.com", "").sub("test-subscribe+", "").sub("subscribe+", "")
     end
   end
 
   def to_email
-    @event["msg"]["email"]
+    @params["recipient"]
   end
 
   def from_email
-    @event["msg"]["from_email"]
+    parsed_from.address
   end
 
   def from_name
-    @event["msg"]["from_name"] || from_email
+    parsed_from.name || from_email
   end
 
   def subject
-    @event["msg"]["subject"]
+    @params["subject"]
   end
 
   def text
-    @event["msg"]["text"]
+    @params["body-plain"]
   end
 
   def html
-    @event["msg"]["html"]
+    @params["body-html"]
   end
 
   def content
@@ -43,7 +43,7 @@ class Newsletter
   end
 
   def timestamp
-    @event["ts"]
+    @params["timestamp"]
   end
 
   def feed_id
@@ -55,7 +55,7 @@ class Newsletter
   end
 
   def domain
-    @domain ||= Mail::Address.new(from_email).domain
+    parsed_from.domain
   end
 
   def feed_url
@@ -68,6 +68,22 @@ class Newsletter
 
   def format
     html ? "html" : "text"
+  end
+
+  private
+
+  def parsed_from
+    Mail::Address.new(@params["from"])
+  rescue Mail::Field::ParseError
+    name, address = @params["from"].split(/[<>]/).map(&:strip)
+    domain = address.split("@").last
+    OpenStruct.new(name: name, address: address, domain: domain)
+  end
+
+  def signature_valid?
+    digest = OpenSSL::Digest::SHA256.new
+    data = [@params["timestamp"], @params["token"]].join
+    @params["signature"] == OpenSSL::HMAC.hexdigest(digest, ENV['MAILGUN_INBOUND_KEY'], data)
   end
 
 end

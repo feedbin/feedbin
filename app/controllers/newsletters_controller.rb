@@ -4,19 +4,15 @@ class NewslettersController < ApplicationController
   skip_before_action :authorize
 
   def create
-    if inbound_message?
-      events.each do |event|
-        newsletter = Newsletter.new(event)
-        if newsletter.valid?
-          create_newsletter(newsletter)
-        end
-      end
+    newsletter = Newsletter.new(params)
+    if newsletter.valid?
+      create_newsletter(newsletter)
     end
     render nothing: true
   end
 
   def create2
-    newsletter = Newsletter2.new(params)
+    newsletter = Newsletter.new(params)
     if newsletter.valid?
       create_newsletter(newsletter)
     end
@@ -33,17 +29,6 @@ class NewslettersController < ApplicationController
       feed.entries.create(entry)
       feed.update(feed_type: :newsletter)
     end
-  rescue Exception => exception
-    logger.info { exception.inspect }
-    Honeybadger.notify(exception)
-  end
-
-  def inbound_message?
-    params[:mandrill_events].present?
-  end
-
-  def events
-    JSON.parse(params[:mandrill_events])
   end
 
   def build_entry(newsletter)
