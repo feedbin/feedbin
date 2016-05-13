@@ -1326,6 +1326,15 @@ li.selected > a .favicon-wrap {
     }
 }
 
+.entries .favicon-newsletter-wrap {
+    top: 0 !important;
+    height: 16px;
+}
+
+.entry-toolbar .favicon-newsletter-wrap {
+    height: 16px;
+    top: 2px !important;
+}
 
 .back-button {
     background-color: transparent;
