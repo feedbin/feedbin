@@ -7,13 +7,15 @@ class FeedRefresher
   def perform(batch, priority_refresh)
     feed_ids = build_ids(batch)
     count = priority_refresh ? 1 : 0
-
-    Sidekiq::Client.push_bulk(
-      'args'  => build_arguments(feed_ids, count),
-      'class' => 'FeedRefresherFetcher',
-      'queue' => 'feed_refresher_fetcher',
-      'retry' => false
-    )
+    jobs = build_arguments(feed_ids, count)
+    if jobs.present?
+      Sidekiq::Client.push_bulk(
+        'args'  => jobs,
+        'class' => 'FeedRefresherFetcher',
+        'queue' => 'feed_refresher_fetcher',
+        'retry' => false
+      )
+    end
   end
 
   def build_arguments(feed_ids, count)
