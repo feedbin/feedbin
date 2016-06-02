@@ -39,7 +39,7 @@ gem 'opml_saw',              github: 'feedbin/opml_saw',            ref: '61d8c2
 gem 'html-pipeline',         github: 'feedbin/html-pipeline',       ref: 'd7e451f'
 gem 'grocer-pushpackager',   github: 'feedbin/grocer-pushpackager', ref: '6b01b4e', require: 'grocer/pushpackager'
 gem 'html_diff',             github: 'feedbin/html_diff',           ref: 'c7c15ce'
-gem 'tire',                  github: 'feedbin/retire',              ref: '0595d9e'
+gem 'tire',                  github: 'feedbin/retire',              ref: '60f3877'
 
 gem 'sass-rails'
 gem 'coffee-rails'

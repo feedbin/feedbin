@@ -55,8 +55,8 @@ GIT
 
 GIT
   remote: git://github.com/feedbin/retire.git
-  revision: 0595d9e9df852f42d30f43b75d80a234160d7e32
-  ref: 0595d9e
+  revision: 60f38775f88d8343e842901d6520e2e7466b0bde
+  ref: 60f3877
   specs:
     tire (0.6.2)
       activemodel (>= 3.0)
