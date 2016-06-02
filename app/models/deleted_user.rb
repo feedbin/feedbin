@@ -6,4 +6,8 @@ class DeletedUser < ActiveRecord::Base
   def stripe_url
     "https://manage.stripe.com/customers/#{customer_id}"
   end
+
+  def deleted?
+    true
+  end
 end

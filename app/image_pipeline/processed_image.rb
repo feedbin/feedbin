@@ -1,5 +1,5 @@
 require 'rmagick'
-require 'opencv'
+require 'opencv' if ENV['RACK_ENV'] != 'test'
 
 class ProcessedImage
 

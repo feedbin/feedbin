@@ -331,4 +331,8 @@ class User < ActiveRecord::Base
     "https://manage.stripe.com/customers/#{customer_id}"
   end
 
+  def deleted?
+    false
+  end
+
 end

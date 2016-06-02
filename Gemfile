@@ -25,10 +25,14 @@ end
 
 group :production do
   gem "therubyracer", require: 'v8'
+  gem 'unicorn'
+end
+
+group :production, :development do
+  gem 'ruby-opencv', require: false
 end
 
 gem 'pg'
-gem 'unicorn'
 
 gem 'feedjira',              github: 'feedbin/feedjira',            ref: '43ba9b4'
 gem 'opml_saw',              github: 'feedbin/opml_saw',            ref: '61d8c2d'
@@ -63,7 +67,6 @@ gem 'librato-rails'
 gem 'foreman', '= 0.63.0'
 gem 'readability_parser'
 gem 'lograge'
-gem 'grocer'
 gem 'connection_pool'
 gem 'httparty'
 gem 'oauth'
@@ -71,14 +74,15 @@ gem 'evernote_oauth'
 gem 'rmagick', require: false
 gem 'reverse_markdown'
 gem 'htmlentities'
-gem 'houston'
 gem 'nokogumbo'
-gem 'ruby-opencv', require: false
 gem 'rails-deprecated_sanitizer'
 gem 'responders', '~> 2.0'
 gem 'dotenv-rails'
 gem 'kramdown'
 gem 'rails_autolink'
+gem 'premailer'
+gem 'apnotic'
+gem 'http'
 
 # Sidekiq
 gem 'sidekiq'

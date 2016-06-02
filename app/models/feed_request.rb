@@ -52,13 +52,7 @@ class FeedRequest
   end
 
   def etag
-    @etag ||= begin
-      content = headers[:etag]
-      if content && content.match(/^"/) && content.match(/"$/)
-        content = content.gsub(/^"/, "").gsub(/"$/, "")
-      end
-      content
-    end
+    headers[:etag]
   end
 
   def status

@@ -15,11 +15,19 @@ module Api
         render nothing: true
       end
 
-      def test
+      def ios_test
         @user = current_user
         subscription = @user.subscriptions.order("RANDOM()").limit(1).first
         entry = Entry.where(feed_id: subscription.feed_id).order("RANDOM()").limit(1).first
         DevicePushNotificationSend.perform_async([@user.id], entry.id)
+        render nothing: true
+      end
+
+      def safari_test
+        @user = current_user
+        subscription = @user.subscriptions.order("RANDOM()").limit(1).first
+        entry = Entry.where(feed_id: subscription.feed_id).order("RANDOM()").limit(1).first
+        SafariPushNotificationSend.perform_async([@user.id], entry.id)
         render nothing: true
       end
 

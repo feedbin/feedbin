@@ -9,7 +9,7 @@ class BasePresenter
   def favicon(feed)
     @favicon ||= begin
       if feed.newsletter?
-        content = @template.content_tag :span, '', class: "favicon-wrap collection-favicon" do
+        content = @template.content_tag :span, '', class: "favicon-wrap collection-favicon favicon-newsletter-wrap" do
           @template.svg_tag('favicon-newsletter', size: "16x16")
         end
       else

@@ -176,7 +176,8 @@ Feedbin::Application.routes.draw do
 
         resources :devices, only: [:create] do
           collection do
-            get :test
+            get :ios_test
+            get :safari_test
           end
         end
 
