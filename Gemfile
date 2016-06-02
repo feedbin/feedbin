@@ -25,7 +25,6 @@ end
 
 group :production do
   gem "therubyracer", require: 'v8'
-  gem 'unicorn'
 end
 
 group :production, :development do
@@ -33,6 +32,7 @@ group :production, :development do
 end
 
 gem 'pg'
+gem 'unicorn'
 
 gem 'feedjira',              github: 'feedbin/feedjira',            ref: '43ba9b4'
 gem 'opml_saw',              github: 'feedbin/opml_saw',            ref: '61d8c2d'
