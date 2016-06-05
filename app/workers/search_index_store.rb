@@ -12,6 +12,7 @@ class SearchIndexStore
         ActionsPerform.perform_async(id, percolator_ids)
       end
     end
+  rescue ActiveRecord::RecordNotFound
   end
 
 end
