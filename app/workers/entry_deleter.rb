@@ -24,19 +24,10 @@ class EntryDeleter
       RecentlyReadEntry.where(entry_id: entries_to_delete_ids).delete_all
       entries_to_delete.delete_all
 
-      Sidekiq.redis do |conn|
-        conn.pipelined do
-          entries_to_delete_public_ids.each do |public_id|
-            key = FeedbinUtils.public_id_key(public_id)
-            conn.hdel(key, public_id)
-          end
-        end
-      end
-
       key_created_at = FeedbinUtils.redis_feed_entries_created_at_key(feed_id)
       key_published = FeedbinUtils.redis_feed_entries_published_key(feed_id)
       if entries_to_delete_ids.present?
-        # SearchIndexRemove.perform_async(entries_to_delete_ids)
+        SearchIndexRemove.perform_async(entries_to_delete_ids)
         $redis.zrem(key_created_at, entries_to_delete_ids)
         $redis.zrem(key_published, entries_to_delete_ids)
       end

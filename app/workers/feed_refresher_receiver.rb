@@ -14,6 +14,7 @@ class FeedRefresherReceiver
           end
         rescue ActiveRecord::RecordNotUnique
           FeedbinUtils.update_public_id_cache(entry['public_id'], entry['content'])
+          Librato.increment 'entry.record_not_unique'
         rescue StandardError => error
           message = entry['update'] ? "update" : "create"
           Honeybadger.notify(
