@@ -1,5 +1,4 @@
 require 'sidekiq/web'
-require_relative '../lib/auth_constraint'
 
 Sidekiq::Web.set :session_secret, Feedbin::Application.config.secret_key_base
 Sidekiq::Web.set :sessions, Rails.application.config.session_options

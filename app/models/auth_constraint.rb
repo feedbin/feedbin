@@ -1,6 +1,3 @@
-require_relative '../config/boot'
-require_relative '../config/environment'
-
 class AuthConstraint
   def self.admin?(request)
     auth_token = request.cookie_jar.signed[:auth_token]
