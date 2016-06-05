@@ -16,6 +16,7 @@ Feedbin::Application.routes.draw do
   end
   get :health_check, to: proc {|env| [200, {}, ["OK"]] }
   get :version, to: proc {|env| [200, {}, [ENV["ETAG_VERSION_ID"]]] }
+  get :headers, to: 'site#headers'
 
   post '/emails' => 'emails#create'
   post '/newsletters' => 'newsletters#create'
