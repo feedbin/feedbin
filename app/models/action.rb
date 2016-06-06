@@ -28,7 +28,7 @@ class Action < ActiveRecord::Base
         search.filtered do
           filter :terms, feed_id: percolator_ids
           unless percolator_query.blank?
-            query { string Entry.escape_search(percolator_query) }
+            query { string Entry.escape_search(percolator_query), default_operator: "AND" }
           end
         end
       end
