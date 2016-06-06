@@ -2,6 +2,7 @@ require 'sidekiq/web'
 
 Sidekiq::Web.set :session_secret, Feedbin::Application.config.secret_key_base
 Sidekiq::Web.set :sessions, Rails.application.config.session_options
+Sidekiq::Web.app_url = ENV['FEEDBIN_URL']
 
 Feedbin::Application.routes.draw do
 
