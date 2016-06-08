@@ -79,7 +79,7 @@ class Subscription < ActiveRecord::Base
   end
 
   def any_subscribers?
-    Subscription.where(feed_id: self.feed_id).exists?
+    Subscription.where(feed_id: self.feed_id, active: true, muted: false).exists?
   end
 
   def feed_already_existed?
