@@ -1,5 +1,5 @@
 class Entry < ActiveRecord::Base
-  include Tire::Model::Search
+  include Elasticsearch::Model
 
   attr_accessor :fully_qualified_url, :read, :starred, :skip_mark_as_unread
 
@@ -19,15 +19,17 @@ class Entry < ActiveRecord::Base
   after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
 
-  tire.mapping(_source: {enabled: false}) do
-    indexes :id,        index: :not_analyzed
-    indexes :title,     analyzer: 'snowball'
-    indexes :content,   analyzer: 'snowball'
-    indexes :author,    analyzer: 'keyword'
-    indexes :url,       analyzer: 'keyword'
-    indexes :feed_id,   index: :not_analyzed, include_in_all: false
-    indexes :published, type: 'date', include_in_all: false
-    indexes :updated,   type: 'date', include_in_all: false
+  settings do
+    mappings _source: {enabled: false} do
+      indexes :id,        index: :not_analyzed
+      indexes :title,     analyzer: 'snowball'
+      indexes :content,   analyzer: 'snowball'
+      indexes :author,    analyzer: 'keyword'
+      indexes :url,       analyzer: 'keyword'
+      indexes :feed_id,   index: :not_analyzed, include_in_all: false
+      indexes :published, type: 'date', include_in_all: false
+      indexes :updated,   type: 'date', include_in_all: false
+    end
   end
 
   def self.search(params, user)

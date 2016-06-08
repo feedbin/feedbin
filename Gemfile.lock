@@ -53,20 +53,6 @@ GIT
     opml_saw (0.0.2)
       nokogiri
 
-GIT
-  remote: git://github.com/feedbin/retire.git
-  revision: 60f38775f88d8343e842901d6520e2e7466b0bde
-  ref: 60f3877
-  specs:
-    tire (0.6.2)
-      activemodel (>= 3.0)
-      activesupport
-      ansi
-      hashr (~> 0.0.19)
-      multi_json (~> 1.3)
-      rake
-      rest-client (~> 1.6)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -110,7 +96,6 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.4.0)
     aggregate (0.2.2)
-    ansi (1.5.0)
     apnotic (0.9.1)
       connection_pool (~> 2.0)
       net-http2 (~> 0.10.0)
@@ -165,6 +150,18 @@ GEM
     dotenv-rails (2.1.1)
       dotenv (= 2.1.1)
       railties (>= 4.0, < 5.1)
+    elasticsearch (1.0.17)
+      elasticsearch-api (= 1.0.17)
+      elasticsearch-transport (= 1.0.17)
+    elasticsearch-api (1.0.17)
+      multi_json
+    elasticsearch-model (0.1.9)
+      activesupport (> 3)
+      elasticsearch (> 0.4)
+      hashie
+    elasticsearch-transport (1.0.17)
+      faraday
+      multi_json
     erubis (2.7.0)
     evernote-thrift (1.25.2)
     evernote_oauth (0.2.3)
@@ -318,7 +315,6 @@ GEM
     globalid (0.3.6)
       activesupport (>= 4.1.0)
     hashie (3.4.4)
-    hashr (0.0.22)
     hetchy (1.0.0)
     highline (1.7.8)
     honeybadger (2.6.0)
@@ -555,6 +551,7 @@ DEPENDENCIES
   connection_pool
   dalli
   dotenv-rails
+  elasticsearch-model
   evernote_oauth
   factory_girl_rails
   faker
@@ -601,7 +598,6 @@ DEPENDENCIES
   stripe (= 1.9.9)
   stripe_event
   therubyracer
-  tire!
   uglifier
   unicorn
   will_paginate
