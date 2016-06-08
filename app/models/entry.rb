@@ -42,6 +42,26 @@ class Entry < ActiveRecord::Base
       search_options[:load] = { include: :feed }
     end
 
+    # Standard query
+    {
+      "query": {
+        "query_string": {
+          "query":"john","default_operator":"AND"
+        }
+      },
+      "sort": [
+        {"published":"desc"}
+      ],
+      "bool": {
+        "should": [
+          {"terms":{"feed_id":[2,1]}},
+          {"ids":{"values":[]}}
+        ]
+      },
+      "size":100,
+      "fields":["id"]
+    }
+
     tire.search(search_options) do
       fields ['id']
       query { string params[:query], default_operator: "AND" } if params[:query].present?
