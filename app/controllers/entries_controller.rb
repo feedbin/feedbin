@@ -254,23 +254,6 @@ class EntriesController < ApplicationController
     end
   end
 
-  def autocomplete_search
-    user = current_user
-    escaped_query = params[:query].gsub("\"", "'").html_safe if params[:query]
-    params[:size] = 5
-    entries = Entry.search(params, user)
-    suggestions = entries.map do |entry|
-      title = ContentFormatter.summary(entry.title)
-      feed = ContentFormatter.summary(entry.feed.title)
-      content = "#{feed}: #{title}"
-      {
-        value: content,
-        data: content
-      }
-    end
-    render json: { suggestions: suggestions }.to_json
-  end
-
   def push_view
     user_id = verify_push_token(params[:user])
     @user = User.find(user_id)

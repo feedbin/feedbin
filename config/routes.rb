@@ -121,7 +121,6 @@ Feedbin::Application.routes.draw do
       get :unread
       get :preload
       get :search
-      get :autocomplete_search
       get :recently_read, to: 'recently_read_entries#index'
       get :updated, to: 'updated_entries#index'
       post :mark_all_as_read
