@@ -25,7 +25,7 @@ class FeedFinder
       request = FeedRequest.new(url: option.href)
     end
 
-    feed = Feed.where(feed_url: option.href).take
+    feed = Feed.where(feed_url: request.last_effective_url).take
     if !feed && request.body.present? && request.format == :xml
       parsed_feed = ParsedFeed.new(request.body, request)
       feed = Feed.create_from_parsed_feed(parsed_feed)
