@@ -4,7 +4,7 @@ class Subscription < ActiveRecord::Base
   belongs_to :user
   belongs_to :feed, counter_cache: true
 
-  before_create :mark_as_unread
+  after_commit :mark_as_unread, on: [:create]
   before_destroy :mark_as_read
 
   before_create :expire_stat_cache
@@ -12,6 +12,8 @@ class Subscription < ActiveRecord::Base
 
   after_create :add_feed_to_action
   after_commit :remove_feed_from_action, on: [:destroy]
+
+  before_create :refresh_feed
 
   before_destroy :untag
 
@@ -67,6 +69,21 @@ class Subscription < ActiveRecord::Base
 
   def muted?
     self.muted == true
+  end
+
+  def refresh_feed
+    if feed_already_existed? && !any_subscribers?
+      self.feed.priority_refresh
+      sleep(3)
+    end
+  end
+
+  def any_subscribers?
+    Subscription.where(feed_id: self.feed_id).exists?
+  end
+
+  def feed_already_existed?
+    self.feed.created_at < 1.minute.ago
   end
 
 end

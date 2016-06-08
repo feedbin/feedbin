@@ -88,4 +88,13 @@ class Feed < ActiveRecord::Base
   def original_title
     @original_title or self.title
   end
+
+  def priority_refresh
+    Sidekiq::Client.push_bulk(
+      'args'  => [[self.id, self.feed_url]],
+      'class' => 'FeedRefresherFetcherCritical',
+      'queue' => 'feed_refresher_fetcher_critical',
+      'retry' => false
+    )
+  end
 end
