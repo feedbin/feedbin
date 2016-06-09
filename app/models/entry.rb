@@ -104,6 +104,10 @@ class Entry < ActiveRecord::Base
     self.data && self.data["format"] || "default"
   end
 
+  def as_indexed_json
+    as_json(root: false, only: Entry.mappings.to_hash[:entry][:properties].keys)
+  end
+
   private
 
   def base_url

@@ -4,7 +4,7 @@ module Searchable
   included do
     include Elasticsearch::Model
 
-    mapping _source: {enabled: false} do
+    mappings _source: {enabled: false} do
       indexes :id,        index: :not_analyzed
       indexes :title,     analyzer: 'snowball'
       indexes :content,   analyzer: 'snowball'
@@ -30,6 +30,10 @@ module Searchable
       #   search_options[:load] = { include: :feed }
       # end
 
+      if params[:sort] && %w{desc asc}.include?(params[:sort])
+        options[:sort] = params[:sort]
+      end
+
       if params[:read] == false
         options[:ids].push(user.unread_entries.pluck(:entry_id))
       elsif params[:read] == true
@@ -40,10 +44,6 @@ module Searchable
         options[:ids].push(user.starred_entries.pluck(:entry_id))
       elsif params[:starred] == false
         options[:not_ids].push(user.starred_entries.pluck(:entry_id))
-      end
-
-      if params[:sort] && %w{desc asc}.include?(params[:sort])
-        options[:sort] = params[:sort]
       end
 
       if params[:feed_ids].present?
@@ -64,7 +64,9 @@ module Searchable
         options[:not_ids] = options[:ids].inject(:&)
       end
 
-      build_query(options)
+      query = build_query(options)
+
+      Entry.search(query).records(includes: :feed)
     end
 
     def self.build_query(options)
@@ -72,33 +74,36 @@ module Searchable
         json.fields ["id"]
         json.sort [ {published: options[:sort]} ]
 
-        if options[:query].present?
-          json.simple_query_string do
-            json.query options[:query]
-            json.default_operator "AND"
+        json.query do
+          if options[:query].present?
+            json.simple_query_string do
+              json.query options[:query]
+              json.default_operator "AND"
+            end
           end
-        end
 
-        json.bool do
-          json.should [
-            {terms: {feed_ids: options[:feed_ids]}},
-            {terms: {ids: options[:starred_ids]}}
-          ]
-          if options[:ids].present?
-            json.must do
-              json.terms do
-                json.id options[:ids]
+          json.bool do
+            json.should [
+              {terms: {feed_ids: options[:feed_ids]}},
+              {terms: {ids: options[:starred_ids]}}
+            ]
+            if options[:ids].present?
+              json.must do
+                json.terms do
+                  json.id options[:ids]
+                end
+              end
+            end
+
+            if options[:not_ids].present?
+              json.must_not do
+                json.terms do
+                  json.id options[:not_ids]
+                end
               end
             end
           end
 
-          if options[:not_ids].present?
-            json.must_not do
-              json.terms do
-                json.id options[:not_ids]
-              end
-            end
-          end
         end
       end
     end
