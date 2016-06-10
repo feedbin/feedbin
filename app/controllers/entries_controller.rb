@@ -234,7 +234,7 @@ class EntriesController < ApplicationController
     @user = current_user
     @escaped_query = params[:query].gsub("\"", "'").html_safe if params[:query]
 
-    @entries = Entry.search(params, @user)
+    @entries = Entry.scoped_search(params, @user)
     @page_query = @entries
     @total_results = @entries.total
 
@@ -319,13 +319,13 @@ class EntriesController < ApplicationController
   def matched_search_ids(params)
     params[:load] = false
     query = params[:query]
-    entries = Entry.search(params, @user)
+    entries = Entry.scoped_search(params, @user)
     ids = entries.results.map {|entry| entry.id.to_i}
     if entries.total_pages > 1
       2.upto(entries.total_pages) do |page|
         params[:page] = page
         params[:query] = query
-        entries = Entry.search(params, @user)
+        entries = Entry.scoped_search(params, @user)
         ids = ids.concat(entries.results.map {|entry| entry.id.to_i})
       end
     end

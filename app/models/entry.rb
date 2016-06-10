@@ -104,8 +104,19 @@ class Entry < ActiveRecord::Base
     self.data && self.data["format"] || "default"
   end
 
-  def as_indexed_json
-    as_json(root: false, only: Entry.mappings.to_hash[:entry][:properties].keys)
+  def as_indexed_json(options={})
+    base = as_json(root: false, only: Entry.mappings.to_hash[:entry][:properties].keys)
+    base["title"] = format_text(self.title)
+    base["content"] = format_text(self.content)
+    base
+  end
+
+  def format_text(text)
+    text ||= ""
+    decoder = HTMLEntities.new
+    text = ApplicationController.helpers.sanitize(text, tags: []).squish.mb_chars.to_s
+    text = decoder.decode(text)
+    text
   end
 
   private

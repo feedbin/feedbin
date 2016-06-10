@@ -4,15 +4,28 @@ module Searchable
   included do
     include Elasticsearch::Model
 
-    mappings _source: {enabled: false} do
-      indexes :id,        index: :not_analyzed
-      indexes :title,     analyzer: 'snowball'
-      indexes :content,   analyzer: 'snowball'
-      indexes :author,    analyzer: 'keyword'
-      indexes :url,       analyzer: 'keyword'
-      indexes :feed_id,   index: :not_analyzed, include_in_all: false
-      indexes :published, type: 'date', include_in_all: false
-      indexes :updated,   type: 'date', include_in_all: false
+    search_settings = {
+      analysis: {
+        analyzer: {
+          lowercase_keyword: {
+            type: "keyword",
+            filter: ["lowercase"]
+          }
+        }
+      }
+    }
+
+    settings search_settings do
+      mappings _source: {enabled: false} do
+        indexes :id,        index: :not_analyzed
+        indexes :title,     analyzer: 'snowball'
+        indexes :content,   analyzer: 'snowball'
+        indexes :author,    analyzer: 'lowercase_keyword'
+        indexes :url,       analyzer: 'keyword'
+        indexes :feed_id,   index: :not_analyzed, include_in_all: false
+        indexes :published, type: 'date', include_in_all: false
+        indexes :updated,   type: 'date', include_in_all: false
+      end
     end
 
     def self.scoped_search(params, user)
@@ -30,7 +43,7 @@ module Searchable
       #   search_options[:load] = { include: :feed }
       # end
 
-      if params[:sort] && %w{desc asc}.include?(params[:sort])
+      if params[:sort] && %w{desc asc relevance}.include?(params[:sort])
         options[:sort] = params[:sort]
       end
 
@@ -61,49 +74,54 @@ module Searchable
       end
 
       if options[:not_ids].present?
-        options[:not_ids] = options[:ids].inject(:&)
+        options[:not_ids] = options[:not_ids].flatten.uniq
       end
 
       query = build_query(options)
 
-      Entry.search(query).records(includes: :feed)
+
+      Entry.search(query).page(params[:page]).records(includes: :feed)
     end
 
     def self.build_query(options)
-      Jbuilder.encode do |json|
-        json.fields ["id"]
-        json.sort [ {published: options[:sort]} ]
-
-        json.query do
-          if options[:query].present?
-            json.simple_query_string do
-              json.query options[:query]
-              json.default_operator "AND"
-            end
+      Hash.new.tap do |hash|
+        hash[:fields] = ["id"]
+        if options[:sort]
+          if %w{desc asc}.include?(options[:sort])
+            hash[:sort] = [{published: options[:sort]}]
           end
-
-          json.bool do
-            json.should [
-              {terms: {feed_ids: options[:feed_ids]}},
-              {terms: {ids: options[:starred_ids]}}
-            ]
-            if options[:ids].present?
-              json.must do
-                json.terms do
-                  json.id options[:ids]
-                end
-              end
-            end
-
-            if options[:not_ids].present?
-              json.must_not do
-                json.terms do
-                  json.id options[:not_ids]
-                end
-              end
-            end
-          end
-
+        else
+          hash[:sort] = [{published: "desc"}]
+        end
+        hash[:query] = {
+          bool: {
+            filter: {
+              bool: {
+                should: [
+                  {terms: {feed_id: options[:feed_ids]}},
+                  {terms: {id: options[:starred_ids]}}
+                ]
+              }
+            }
+          }
+        }
+        if options[:query].present?
+          hash[:query][:bool][:must] = {
+            query_string: {
+              query: options[:query],
+              default_operator: "AND"
+            }
+          }
+        end
+        if options[:ids].present?
+          hash[:query][:bool][:filter][:bool][:must] = {
+            terms: {id: options[:ids]}
+          }
+        end
+        if options[:not_ids].present?
+          hash[:query][:bool][:filter][:bool][:must_not] = {
+            terms: {id: options[:not_ids]}
+          }
         end
       end
     end

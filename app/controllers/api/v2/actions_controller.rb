@@ -45,7 +45,7 @@ module Api
           if params[:read].present?
             query[:read] = (params[:read] == 'true') ? true : false
           end
-          @entries = Entry.search(query, @user)
+          @entries = Entry.scoped_search(query, @user)
         else
           @entries = []
         end
