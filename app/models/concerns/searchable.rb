@@ -4,28 +4,15 @@ module Searchable
   included do
     include Elasticsearch::Model
 
-    search_settings = {
-      analysis: {
-        analyzer: {
-          lowercase_keyword: {
-            type: "keyword",
-            filter: ["lowercase"]
-          }
-        }
-      }
-    }
-
-    settings search_settings do
-      mappings _source: {enabled: false} do
-        indexes :id,        index: :not_analyzed
-        indexes :title,     analyzer: 'snowball'
-        indexes :content,   analyzer: 'snowball'
-        indexes :author,    analyzer: 'lowercase_keyword'
-        indexes :url,       analyzer: 'keyword'
-        indexes :feed_id,   index: :not_analyzed, include_in_all: false
-        indexes :published, type: 'date', include_in_all: false
-        indexes :updated,   type: 'date', include_in_all: false
-      end
+    mappings _source: {enabled: false} do
+      indexes :id,        index: :not_analyzed
+      indexes :title,     analyzer: 'snowball'
+      indexes :content,   analyzer: 'snowball'
+      indexes :author,    analyzer: 'keyword'
+      indexes :url,       analyzer: 'keyword'
+      indexes :feed_id,   index: :not_analyzed, include_in_all: false
+      indexes :published, type: 'date', include_in_all: false
+      indexes :updated,   type: 'date', include_in_all: false
     end
 
     def self.scoped_search(params, user)
@@ -38,10 +25,6 @@ module Searchable
         not_ids: [],
         feed_ids: [],
       }
-
-      # unless params[:load] == false
-      #   search_options[:load] = { include: :feed }
-      # end
 
       if params[:sort] && %w{desc asc relevance}.include?(params[:sort])
         options[:sort] = params[:sort]
@@ -160,7 +143,21 @@ module Searchable
         params[:query] = params[:query].gsub(tag_id_regex, '')
       end
 
+      params[:query] = escape_search(params[:query])
+
       params
+    end
+
+    def self.escape_search(query)
+      if query.present? && query.respond_to?(:gsub)
+        special_characters_regex = /([\+\-\!\{\}\[\]\^\~\?\\])/
+        escape = '\ '.sub(' ', '')
+        query = query.gsub(special_characters_regex) { |character| escape + character }
+
+        colon_regex = /(?<!title|feed_id|body|author):(?=.*)/
+        query = query.gsub(colon_regex, '\:')
+        query
+      end
     end
 
   end
