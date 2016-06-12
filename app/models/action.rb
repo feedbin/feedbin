@@ -24,13 +24,34 @@ class Action < ActiveRecord::Base
     elsif empty_notifier_action?
       search_percolate_remove
     else
-      Entry.index.register_percolator_query(self.id) do |search|
-        search.filtered do
-          filter :terms, feed_id: percolator_ids
-          unless percolator_query.blank?
-            query { string Entry.escape_search(percolator_query), default_operator: "AND" }
-          end
-        end
+      Entry.__elasticsearch__.client.index(
+        index: Entry.index_name,
+        type: '.percolator',
+        id: self.id,
+        body: body(percolator_query, percolator_ids)
+      )
+    end
+  end
+
+  def body(percolator_query, percolator_ids)
+    Hash.new.tap do |hash|
+      hash[:feed_id] = percolator_ids
+      hash[:query] = {
+        bool: {
+          filter: {
+            bool: {
+              must: { terms: { feed_id: percolator_ids } }
+            }
+          }
+        }
+      }
+      if percolator_query.present?
+        hash[:query][:bool][:must] = {
+          query_string: {
+            query: percolator_query,
+            default_operator: "AND"
+          }
+        }
       end
     end
   end
@@ -40,7 +61,7 @@ class Action < ActiveRecord::Base
   end
 
   def search_percolate_remove
-    Entry.index.unregister_percolator_query(self.id)
+    Entry.__elasticsearch__.client.delete index: Entry.index_name, type: '.percolator', id: self.id
   end
 
   def compute_feed_ids
@@ -70,8 +91,12 @@ class Action < ActiveRecord::Base
   end
 
   def _percolator
-    response = Tire::Configuration.client.get "#{Tire::Configuration.url}/entries/.percolator/#{self.id}"
-    pp(JSON.load(response.body))
+    response = Entry.__elasticsearch__.client.get(
+      index: Entry.index_name,
+      type: '.percolator',
+      id: self.id
+    )
+    pp(response)
   end
 
 end
