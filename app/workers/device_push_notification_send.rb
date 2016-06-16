@@ -6,16 +6,16 @@ class DevicePushNotificationSend
 
   def perform(user_ids, entry_id)
     Honeybadger.context(user_ids: user_ids, entry_id: entry_id)
-    tokens = Device.where(user_id: user_ids).ios.pluck(:user_id, :token)
+    tokens = Device.where(user_id: user_ids).ios.pluck(:user_id, :token, :operating_system)
     entry = Entry.find(entry_id)
     feed = entry.feed
 
     feed_titles = subscription_titles(user_ids, feed)
     feed_title = format_text(feed.title)
 
-    notifications = tokens.each_with_object([]) do |(user_id, token), array|
+    notifications = tokens.each_with_object([]) do |(user_id, token, operating_system), array|
       feed_title = feed_titles[user_id] || feed_title
-      notification = build_notification(token, feed_title, entry)
+      notification = build_notification(token, feed_title, entry, operating_system)
       array.push(notification)
     end
 
@@ -50,15 +50,18 @@ class DevicePushNotificationSend
     text
   end
 
-  def build_notification(device_token, feed_title, entry)
+  def build_notification(device_token, feed_title, entry, operating_system)
     body = format_text(entry.title || entry.summary)
     author = format_text(entry.author)
     title = format_text(entry.title)
     published = entry.published.iso8601(6)
+    unless operating_system =~ /^iPhone OS 10/
+      body = "#{feed_title}: #{body}"
+    end
     Apnotic::Notification.new(device_token).tap do |notification|
       notification.alert = {
         title: feed_title,
-        body: "#{feed_title}: #{body}",
+        body: body,
       }
       notification.custom_payload = {
         feedbin: {
