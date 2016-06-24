@@ -16,10 +16,7 @@ class SearchIndexStore
       type: klass.document_type,
       percolate_format: 'ids',
       body: {
-        doc: record.as_indexed_json,
-        filter: {
-          term: { feed_id: record.feed_id }
-        }
+        doc: record.as_indexed_json
       }
     )
 
