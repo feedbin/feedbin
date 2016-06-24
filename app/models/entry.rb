@@ -19,6 +19,8 @@ class Entry < ActiveRecord::Base
   after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
 
+  self.per_page = 100
+
   def entry=(entry)
     self.author    = entry.author
     self.content   = entry.content
