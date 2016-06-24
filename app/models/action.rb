@@ -62,6 +62,7 @@ class Action < ActiveRecord::Base
 
   def search_percolate_remove
     Entry.__elasticsearch__.client.delete index: Entry.index_name, type: '.percolator', id: self.id
+  rescue Elasticsearch::Transport::Transport::Errors::NotFound
   end
 
   def compute_feed_ids
