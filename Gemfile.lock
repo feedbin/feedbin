@@ -583,7 +583,6 @@ DEPENDENCIES
   redis (>= 3.0.5)
   request_exception_handler
   responders (~> 2.0)
-  rest-client (= 1.6.7)
   reverse_markdown
   rmagick
   rspec-rails (~> 3.1)

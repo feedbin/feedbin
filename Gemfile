@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
 gem 'rails'
-gem 'rest-client', '= 1.6.7'
 
 group :development do
   gem 'better_errors'
