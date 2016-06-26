@@ -7,7 +7,7 @@ class SearchIndexStore
     record = klass.find(id)
     record.__elasticsearch__.index_document
     percolate(record, klass) if !update
-    alt_index(record, klass)
+    alt_index(record, klass) if $alt_search
   rescue ActiveRecord::RecordNotFound
   end
 
