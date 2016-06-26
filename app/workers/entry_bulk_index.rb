@@ -4,9 +4,11 @@ class EntryBulkIndex
   include BatchJobs
   sidekiq_options queue: :worker_slow
 
-  def perform(batch = nil, schedule = false)
+  Client = $alt_search ? $alt_search : Entry.__elasticsearch__.client
+
+  def perform(batch = nil, schedule = false, last_entry_id = nil)
     if schedule
-      build
+      build(last_entry_id)
     else
       index(batch)
     end
@@ -23,7 +25,7 @@ class EntryBulkIndex
       }
     end
     if data.present?
-      Entry.__elasticsearch__.client.bulk(
+      Client.bulk(
         index: Entry.index_name,
         type: Entry.document_type,
         body: data
@@ -31,8 +33,8 @@ class EntryBulkIndex
     end
   end
 
-  def build
-    jobs = job_args(1160152813)
+  def build(last_entry_id)
+    jobs = job_args(last_entry_id)
     Sidekiq::Client.push_bulk(
       'args'  => jobs,
       'class' => "EntryBulkIndex",

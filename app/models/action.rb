@@ -24,12 +24,14 @@ class Action < ActiveRecord::Base
     elsif empty_notifier_action?
       search_percolate_remove
     else
-      Entry.__elasticsearch__.client.index(
+      options = {
         index: Entry.index_name,
         type: '.percolator',
         id: self.id,
         body: body(percolator_query, percolator_ids)
-      )
+      }
+      Entry.__elasticsearch__.client.index(options)
+      $alt_search.index(options) if $alt_search
     end
   end
 
@@ -61,7 +63,13 @@ class Action < ActiveRecord::Base
   end
 
   def search_percolate_remove
-    Entry.__elasticsearch__.client.delete index: Entry.index_name, type: '.percolator', id: self.id
+    options = {
+      index: Entry.index_name,
+      type: '.percolator',
+      id: self.id
+    }
+    Entry.__elasticsearch__.client.delete(options)
+    $alt_search.delete(options) if $alt_search
   rescue Elasticsearch::Transport::Transport::Errors::NotFound
   end
 
