@@ -68,6 +68,14 @@ namespace :deploy do
   task :quiet, roles: :worker do
     run "sudo pkill --signal USR1 -f '^sidekiq'; true"
   end
+
+  desc 'Reload procs'
+  task :reload, roles: [:app, :worker] do
+    quiet
+    sleep(3)
+    restart
+  end
+
 end
 
 before 'deploy:update', 'deploy:quiet'

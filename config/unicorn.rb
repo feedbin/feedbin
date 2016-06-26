@@ -1,3 +1,5 @@
+require 'dotenv'
+
 worker_processes Etc.nprocessors
 timeout 30
 preload_app true
@@ -24,5 +26,11 @@ after_fork do |server, worker|
       Process.kill(sig, File.read(old_pid).to_i)
     rescue Errno::ENOENT, Errno::ESRCH
     end
+  end
+end
+
+before_exec do |server|
+  if ENV['ENV_PATH']
+    ENV.update Dotenv::Environment.new(ENV['ENV_PATH'])
   end
 end
