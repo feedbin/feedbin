@@ -5,12 +5,12 @@ module Searchable
     include Elasticsearch::Model
 
     mappings _source: {enabled: false} do
-      indexes :id,        index: :not_analyzed
+      indexes :id,        type: 'long', index: :not_analyzed
       indexes :title,     analyzer: 'snowball'
       indexes :content,   analyzer: 'snowball'
       indexes :author,    analyzer: 'keyword'
       indexes :url,       analyzer: 'keyword'
-      indexes :feed_id,   index: :not_analyzed, include_in_all: false
+      indexes :feed_id,   type: 'long', index: :not_analyzed, include_in_all: false
       indexes :published, type: 'date', include_in_all: false
       indexes :updated,   type: 'date', include_in_all: false
     end
