@@ -4,7 +4,7 @@ class EntryBulkIndex
   include BatchJobs
   sidekiq_options queue: :worker_slow
 
-  Client = $alt_search ? $alt_search : Entry.__elasticsearch__.client
+  Client = $search[:alt] ? $search[:alt] : $search[:main]
 
   def perform(batch = nil, schedule = false, last_entry_id = nil)
     if schedule

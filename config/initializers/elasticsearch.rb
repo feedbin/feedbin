@@ -1,21 +1,16 @@
-Elasticsearch::Model.client = Elasticsearch::Client.new(
+defaults = {
   log: Rails.env.development?,
   transport_options: {
     ssl: { verify: false }
   }
-)
-$alt_search = begin
-  if ENV['ELASTICSEARCH_ALT_URL']
-    Elasticsearch::Client.new(
-      url: ENV['ELASTICSEARCH_ALT_URL'],
-      transport_options: {
-        ssl: { verify: false }
-      }
-    )
-  else
-    nil
-  end
+}
+$search = Hash.new.tap do |hash|
+  hash[:main] = Elasticsearch::Client.new(defaults)
+  hash[:alt] = Elasticsearch::Client.new(defaults.merge(url: ENV['ELASTICSEARCH_ALT_URL'])) if ENV['ELASTICSEARCH_ALT_URL']
 end
+
+Elasticsearch::Model.client = $search[:main]
+
 if Rails.env.development?
   Elasticsearch::Model.client.transport.tracer = ActiveSupport::Logger.new('log/elasticsearch.log')
   Entry.__elasticsearch__.create_index! rescue nil

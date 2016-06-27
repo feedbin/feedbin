@@ -13,16 +13,16 @@ class Action < ActiveRecord::Base
 
   before_validation :compute_tag_ids
   before_validation :compute_feed_ids
-  after_destroy :search_percolate_remove
-  after_commit :search_percolate_store, on: [:create, :update]
+  after_destroy :percolate_remove
+  after_commit :percolate_setup, on: [:create, :update]
 
-  def search_percolate_store
+  def percolate_setup
     percolator_query = self.query
     percolator_ids = self.computed_feed_ids
     if percolator_ids.empty?
-      search_percolate_remove
+      percolate_remove
     elsif empty_notifier_action?
-      search_percolate_remove
+      percolate_remove
     else
       options = {
         index: Entry.index_name,
@@ -30,8 +30,9 @@ class Action < ActiveRecord::Base
         id: self.id,
         body: body(percolator_query, percolator_ids)
       }
-      Entry.__elasticsearch__.client.index(options)
-      $alt_search.index(options) if $alt_search
+      $search.each do |_, client|
+        client.index(options)
+      end
     end
   end
 
@@ -62,14 +63,15 @@ class Action < ActiveRecord::Base
     self.all_feeds && self.notifier? && (self.query.nil? || self.query == "")
   end
 
-  def search_percolate_remove
+  def percolate_remove
     options = {
       index: Entry.index_name,
       type: '.percolator',
       id: self.id
     }
-    Entry.__elasticsearch__.client.delete(options)
-    $alt_search.delete(options) if $alt_search
+    $search.each do |_, client|
+      client.delete(options)
+    end
   rescue Elasticsearch::Transport::Transport::Errors::NotFound
   end
 
