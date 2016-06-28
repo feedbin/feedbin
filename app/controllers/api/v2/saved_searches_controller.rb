@@ -25,12 +25,20 @@ module Api
           params[:query] = saved_search.query
           if params[:include_entries] && params[:include_entries] == "true"
             @entries = Entry.scoped_search(params, @user)
-            links_header(@entries, 'api_v2_saved_search_url', saved_search.id)
+            if @entries.out_of_bounds?
+              status_not_found
+            else
+              links_header(@entries, 'api_v2_saved_search_url', saved_search.id)
+            end
           else
             params[:load] = false
             entries = Entry.scoped_search(params, @user)
-            links_header(entries, 'api_v2_saved_search_url', saved_search.id)
-            render json: entries.results.map {|entry| entry.id.to_i}.to_json
+            if entries.out_of_bounds?
+              status_not_found
+            else
+              links_header(entries, 'api_v2_saved_search_url', saved_search.id)
+              render json: entries.results.map {|entry| entry.id.to_i}.to_json
+            end
           end
         else
           status_forbidden
