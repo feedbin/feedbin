@@ -15,6 +15,7 @@ class EntryImage
         Librato.increment 'entry_image.create.from_page'
       end
     end
+  rescue ActiveRecord::RecordNotFound
   end
 
 end
