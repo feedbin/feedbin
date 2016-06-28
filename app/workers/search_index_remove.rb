@@ -2,8 +2,16 @@ class SearchIndexRemove
   include Sidekiq::Worker
 
   def perform(ids)
-    ids = ids.map { |id| { id: id, type: 'entry' } }
-    Entry.tire.index.bulk_delete(ids)
+    data = ids.map do |id|
+      { delete: { _id: id } }
+    end
+    $search.each do |_, client|
+      client.bulk(
+        index: Entry.index_name,
+        type: Entry.document_type,
+        body: data
+      )
+    end
   end
 
 end
