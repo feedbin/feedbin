@@ -28,8 +28,8 @@ class EntryDeleter
       key_published = FeedbinUtils.redis_feed_entries_published_key(feed_id)
       if entries_to_delete_ids.present?
         SearchIndexRemove.perform_async(entries_to_delete_ids)
-        $redis.zrem(key_created_at, entries_to_delete_ids)
-        $redis.zrem(key_published, entries_to_delete_ids)
+        $redis[:sorted_entries].zrem(key_created_at, entries_to_delete_ids)
+        $redis[:sorted_entries].zrem(key_published, entries_to_delete_ids)
       end
 
       Librato.increment('entry.destroy', by: entries_to_delete_ids.count)

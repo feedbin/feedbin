@@ -163,13 +163,13 @@ class Entry < ActiveRecord::Base
   def add_to_created_at_set
     score = "%10.6f" % self.created_at.to_f
     key = FeedbinUtils.redis_feed_entries_created_at_key(self.feed_id)
-    $redis.zadd(key, score, self.id)
+    $redis[:sorted_entries].zadd(key, score, self.id)
   end
 
   def add_to_published_set
     score = "%10.6f" % self.published.to_f
     key = FeedbinUtils.redis_feed_entries_published_key(self.feed_id)
-    $redis.zadd(key, score, self.id)
+    $redis[:sorted_entries].zadd(key, score, self.id)
   end
 
   def increment_feed_stat

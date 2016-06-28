@@ -1,16 +1,16 @@
-redis_options = {connect_timeout: 5, timeout: 5}
-if ENV['REDIS_URL_ENTRY_CREATED']
-  redis_options[:url] = ENV['REDIS_URL_ENTRY_CREATED']
-elsif ENV['REDIS_URL']
-  redis_options[:url] = ENV['REDIS_URL']
-end
-$redis = Redis.new(redis_options)
+defaults = {connect_timeout: 5, timeout: 5}
+defaults.merge!(url: ENV['REDIS_URL']) if ENV['REDIS_URL']
 
+$redis = Hash.new.tap do |hash|
+  options = defaults.dup
+  if ENV['REDIS_URL_ENTRY_CREATED']
+    options.merge!(url: ENV['REDIS_URL_ENTRY_CREATED'])
+  end
+  hash[:sorted_entries] = Redis.new(options)
 
-redis_id_options = {connect_timeout: 5, timeout: 5}
-if ENV['REDIS_ID_URL']
-  redis_id_options[:url] = ENV['REDIS_ID_URL']
-elsif ENV['REDIS_URL']
-  redis_id_options[:url] = ENV['REDIS_URL']
+  options = defaults.dup
+  if ENV['REDIS_ID_URL']
+    options.merge!(url: ENV['REDIS_ID_URL'])
+  end
+  hash[:id_cache] = Redis.new(options)
 end
-$redis_id_cache = Redis.new(redis_id_options)

@@ -69,19 +69,19 @@ class PageCandidates < Candidates
 
   def tags_found(found)
     if found
-      $redis.set(feed_key, "true", ex: 24.hours.to_i, nx: true)
+      $redis[:sorted_entries].set(feed_key, "true", ex: 24.hours.to_i, nx: true)
     else
-      $redis.set(feed_key, "", ex: 24.hours.to_i, nx: true)
+      $redis[:sorted_entries].set(feed_key, "", ex: 24.hours.to_i, nx: true)
     end
   end
 
   def check_page?
-    result = $redis.get(feed_key)
+    result = $redis[:sorted_entries].get(feed_key)
     result.nil? || result.present?
   end
 
   def cached_value
-    @cached_value ||= $redis.get(image_cache_key)
+    @cached_value ||= $redis[:sorted_entries].get(image_cache_key)
   end
 
   def page_checked?
@@ -97,7 +97,7 @@ class PageCandidates < Candidates
   end
 
   def cache_image(value)
-    $redis.set(image_cache_key, value, ex: 24.hours.to_i, nx: true)
+    $redis[:sorted_entries].set(image_cache_key, value, ex: 24.hours.to_i, nx: true)
   end
 
   def feed_key

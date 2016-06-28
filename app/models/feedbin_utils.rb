@@ -5,7 +5,7 @@ class FeedbinUtils
 
   def self.update_public_id_cache(public_id, content)
     content_length = (content.present?) ? content.length : 1
-    $redis_id_cache.set(public_id, content_length)
+    $redis[:id_cache].set(public_id, content_length)
   end
 
   def self.redis_feed_entries_created_at_key(feed_id)
