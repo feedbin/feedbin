@@ -1,21 +1,28 @@
 class EntryImage
   include Sidekiq::Worker
-  sidekiq_options retry: false, queue: :image
+  sidekiq_options retry: false
 
-  def perform(entry_id)
-    entry = Entry.find(entry_id)
-    feed = entry.feed
-    if image = EntryCandidates.new(entry, feed).find_image
-      entry.update_attributes(image: image)
-      Librato.increment 'entry_image.create.from_entry'
-    end
-    if image.nil?
-      if image = PageCandidates.new(entry, feed).find_image
-        entry.update_attributes(image: image)
-        Librato.increment 'entry_image.create.from_page'
-      end
+  def perform(entry_id, image = nil)
+    @entry = Entry.find(entry_id)
+    @image = image
+    if image
+      receive
+    else
+      schedule
     end
   rescue ActiveRecord::RecordNotFound
+  end
+
+  def schedule
+    Sidekiq::Client.push(
+      'args'  => [@entry.id, @entry.feed_id, @entry.url, @entry.fully_qualified_url, @entry.feed.site_url, @entry.content],
+      'class' => 'FindImage',
+      'queue' => 'image'
+    )
+  end
+
+  def receive
+    @entry.update_attributes(image: @image)
   end
 
 end

@@ -26,10 +26,6 @@ group :production do
   gem "therubyracer", require: 'v8'
 end
 
-group :production, :development do
-  gem 'ruby-opencv', require: false
-end
-
 gem 'pg'
 gem 'unicorn'
 
@@ -46,7 +42,7 @@ gem 'autoprefixer-rails'
 gem 'rubyzip', '= 1.1.0'
 
 gem 'activerecord-import', '>= 0.4.1'
-gem 'redis', '>= 3.0.5'
+gem 'redis', '= 3.2.2'
 gem 'jquery-rails'
 gem 'dalli'
 gem 'will_paginate'
@@ -72,7 +68,6 @@ gem 'evernote_oauth'
 gem 'rmagick', require: false
 gem 'reverse_markdown'
 gem 'htmlentities'
-gem 'nokogumbo'
 gem 'rails-deprecated_sanitizer'
 gem 'responders', '~> 2.0'
 gem 'dotenv-rails'
