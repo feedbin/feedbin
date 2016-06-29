@@ -1,4 +1,4 @@
-$redis = ConnectionPool.new(size: 20, timeout: 5) do
+$redis = begin
   if ENV['REDIS_ID_URL']
     Redis.new(url: ENV['REDIS_ID_URL'])
   else
