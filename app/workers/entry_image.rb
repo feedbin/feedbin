@@ -5,7 +5,7 @@ class EntryImage
   def perform(entry_id, image = nil)
     @entry = Entry.find(entry_id)
     @image = image
-    if image
+    if @image
       receive
     else
       schedule

@@ -180,6 +180,7 @@ class EntryPresenter < BasePresenter
     if image?
       url = URI(entry.image["processed_url"])
       url.host = ENV['ENTRY_IMAGE_HOST'] if ENV['ENTRY_IMAGE_HOST']
+      url.scheme = 'https'
       padding = (entry.image["height"].to_f / entry.image["width"].to_f).round(4) * 100
       @template.content_tag :span, class: "entry-image" do
         @template.content_tag :span, "", data: {src: url.to_s }, style: "padding-top: #{padding}%;"
