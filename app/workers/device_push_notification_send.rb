@@ -13,21 +13,28 @@ class DevicePushNotificationSend
     feed_titles = subscription_titles(user_ids, feed)
     feed_title = format_text(feed.title)
 
-    notifications = tokens.each_with_object([]) do |(user_id, token, operating_system), array|
+    notifications = tokens.each_with_object({}) do |(user_id, token, operating_system), hash|
       feed_title = feed_titles[user_id] || feed_title
       notification = build_notification(token, feed_title, entry, operating_system)
-      array.push(notification)
+      hash[notification.apns_id] = notification
     end
 
-    notifications.each do |notification|
-      APNOTIC_POOL.with do |connection|
-        response = connection.push(notification)
-        if response.status == '410' || (response.status == '400' && response.body['reason'] == 'BadDeviceToken')
-          Device.where("lower(token) = ?", notification.token.downcase).take&.destroy
+    APNOTIC_POOL.with do |connection|
+      notifications.each do |_, notification|
+        push = connection.prepare_push(notification)
+        push.on(:response) do |response|
+          Librato.increment('apns.ios.sent', source: response.status)
+          if response.status == '410' || (response.status == '400' && response.body['reason'] == 'BadDeviceToken')
+            apns_id = response.headers["apns-id"]
+            token = notifications[apns_id].token
+            Device.where("lower(token) = ?", token.downcase).take&.destroy
+          end
         end
-        Librato.increment('apns.ios.sent', source: response.status)
+        connection.push_async(push)
       end
+      connection.join
     end
+
   end
 
   private
@@ -77,6 +84,7 @@ class DevicePushNotificationSend
       notification.sound = ""
       notification.priority = "10"
       notification.topic = ENV['APPLE_PUSH_TOPIC']
+      notification.apns_id = SecureRandom.uuid
     end
   end
 

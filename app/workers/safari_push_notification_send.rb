@@ -6,7 +6,6 @@ class SafariPushNotificationSend
   VERIFIER = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
 
   def perform(user_ids, entry_id)
-    users = User.where(id: user_ids)
     tokens = Device.where(user_id: user_ids).safari.pluck(:user_id, :token)
     entry = Entry.find(entry_id)
     feed = entry.feed
@@ -16,20 +15,26 @@ class SafariPushNotificationSend
     titles = subscription_titles(user_ids, feed)
     title = format_text(feed.title, 36)
 
-    notifications = tokens.each_with_object([]) do |(user_id, token), array|
+    notifications = tokens.each_with_object({}) do |(user_id, token), hash|
       title = titles[user_id] || title
       notification = build_notification(token, title, body, entry_id, user_id)
-      array.push(notification)
+      hash[notification.apns_id] = notification
     end
 
-    notifications.each do |notification|
-      APNOTIC_POOL.with do |connection|
-        response = connection.push(notification)
-        if response.status == '410' || (response.status == '400' && response.body['reason'] == 'BadDeviceToken')
-          Device.where("lower(token) = ?", notification.token.downcase).take&.destroy
+    APNOTIC_POOL.with do |connection|
+      notifications.each do |_, notification|
+        push = connection.prepare_push(notification)
+        push.on(:response) do |response|
+          Librato.increment('apns.safari.sent', source: response.status)
+          if response.status == '410' || (response.status == '400' && response.body['reason'] == 'BadDeviceToken')
+            apns_id = response.headers["apns-id"]
+            token = notifications[apns_id].token
+            Device.where("lower(token) = ?", token.downcase).take&.destroy
+          end
         end
-        Librato.increment('apns.safari.sent', source: response.status)
+        connection.push_async(push)
       end
+      connection.join
     end
   end
 
@@ -62,6 +67,7 @@ class SafariPushNotificationSend
         body: body
       }
       notification.url_args = [entry_id.to_s, CGI::escape(VERIFIER.generate(user_id))]
+      notification.apns_id = SecureRandom.uuid
     end
   end
 
