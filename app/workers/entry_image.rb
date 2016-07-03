@@ -17,7 +17,8 @@ class EntryImage
     Sidekiq::Client.push(
       'args'  => [@entry.id, @entry.feed_id, @entry.url, @entry.fully_qualified_url, @entry.feed.site_url, @entry.content],
       'class' => 'FindImage',
-      'queue' => 'images'
+      'queue' => 'images',
+      'retry' => false
     )
   end
 
