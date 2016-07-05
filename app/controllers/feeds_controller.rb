@@ -49,7 +49,6 @@ class FeedsController < ApplicationController
 
     if request.get?
       response = ""
-      status = :not_found
       if [feed.self_url, feed.feed_url].include?(params['hub.topic']) && secret == params['hub.verify_token']
         if params['hub.mode'] == 'subscribe'
           Librato.increment 'push.subscribe'
@@ -62,6 +61,20 @@ class FeedsController < ApplicationController
           response = params['hub.challenge']
           status = :ok
         end
+      else
+        Honeybadger.notify(
+          error_class: "PuSH Subscribe",
+          error_message: "PuSH Invalid Params",
+          parameters: {
+            params: params,
+            feed: {
+              feed_url: feed.feed_url,
+              site_url: feed.site_url,
+              self_url: feed.self_url,
+            }
+          }
+        )
+        status = :not_found
       end
       render plain: response, status: status
     else
