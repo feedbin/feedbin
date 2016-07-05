@@ -169,6 +169,10 @@ class ContentFormatter
         /x,
         /^
           (?:https?:\/\/|\/\/)
+          (?:embed\.itunes\.apple\.com)
+        /x,
+        /^
+          (?:https?:\/\/|\/\/)
           (?:www\.tumblr\.com)
         /x
       ]
