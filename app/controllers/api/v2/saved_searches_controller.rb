@@ -39,7 +39,7 @@ module Api
       end
 
       def out_of_bounds?
-        @entries.out_of_bounds? || (params[:page] && params[:page].to_i > 99)
+        @entries.out_of_bounds? || (params[:page] && params[:page].to_i > 5)
       end
 
       def create
