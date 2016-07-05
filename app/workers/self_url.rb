@@ -20,12 +20,12 @@ class SelfUrl
   end
 
   def build
-    args = (1..Feed.count).to_a.map { |id| [id] }
-    if args.present?
+    Feed.select(:id).find_in_batches(batch_size: 10_000) do |feeds|
       Sidekiq::Client.push_bulk(
-        'args'  => args,
+        'args'  => feeds.map{ |feed| feed.attributes.values },
         'class' => self.class.name,
-        'queue' => 'worker_slow'
+        'queue' => 'worker_slow',
+        'retry' => false
       )
     end
   end
