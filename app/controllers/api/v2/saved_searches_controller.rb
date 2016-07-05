@@ -23,27 +23,23 @@ module Api
 
         if saved_search.present?
           params[:query] = saved_search.query
-          if params[:include_entries] && params[:include_entries] == "true"
-            @entries = Entry.scoped_search(params, @user)
-            if @entries.out_of_bounds?
-              status_not_found
-            else
-              links_header(@entries, 'api_v2_saved_search_url', saved_search.id)
-            end
+          @entries = Entry.scoped_search(params, @user)
+          if out_of_bounds?
+            render json: []
+            return
           else
-            params[:load] = false
-            entries = Entry.scoped_search(params, @user)
-            if entries.out_of_bounds?
-              status_not_found
-            else
-              links_header(entries, 'api_v2_saved_search_url', saved_search.id)
-              render json: entries.results.map {|entry| entry.id.to_i}.to_json
-            end
+            links_header(@entries, 'api_v2_saved_search_url', saved_search.id)
+          end
+          if params[:include_entries] != "true"
+            render json: @entries.results.map {|entry| entry.id.to_i}.to_json
           end
         else
           status_forbidden
         end
+      end
 
+      def out_of_bounds?
+        @entries.out_of_bounds? || (params[:page] && params[:page].to_i > 99)
       end
 
       def create
