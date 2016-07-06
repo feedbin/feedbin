@@ -74,6 +74,7 @@ class FeedsController < ApplicationController
             }
           }
         )
+        SelfUrl.perform_async(feed.id)
         status = :not_found
       end
       render plain: response, status: status

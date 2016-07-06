@@ -21,7 +21,7 @@ set :normalize_asset_timestamps, false
 
 set :assets_role, [:app]
 
-role :app, "app1.feedbin.com", "app2.feedbin.com", "app3.feedbin.com"
+role :app, "app1.feedbin.com", "app2.feedbin.com"
 
 default_run_options[:pty] = true
 default_run_options[:shell] = '/bin/bash --login'
