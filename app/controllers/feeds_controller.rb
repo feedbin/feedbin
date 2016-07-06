@@ -62,18 +62,6 @@ class FeedsController < ApplicationController
           status = :ok
         end
       else
-        Honeybadger.notify(
-          error_class: "PuSH Subscribe",
-          error_message: "PuSH Invalid Params",
-          parameters: {
-            params: params,
-            feed: {
-              feed_url: feed.feed_url,
-              site_url: feed.site_url,
-              self_url: feed.self_url,
-            }
-          }
-        )
         SelfUrl.perform_async(feed.id)
         status = :not_found
       end
