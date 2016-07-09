@@ -370,7 +370,8 @@ CREATE TABLE feeds (
     last_published_entry timestamp without time zone,
     host text,
     self_url text,
-    feed_type integer DEFAULT 0
+    feed_type integer DEFAULT 0,
+    active boolean DEFAULT true
 );
 
 
@@ -1425,6 +1426,13 @@ CREATE INDEX index_feed_stats_on_feed_id_and_day ON feed_stats USING btree (feed
 
 
 --
+-- Name: index_feeds_on_active; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_feeds_on_active ON feeds USING btree (active);
+
+
+--
 -- Name: index_feeds_on_feed_type; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2050,4 +2058,6 @@ INSERT INTO schema_migrations (version) VALUES ('20151207224028');
 INSERT INTO schema_migrations (version) VALUES ('20160126003712');
 
 INSERT INTO schema_migrations (version) VALUES ('20160504184656');
+
+INSERT INTO schema_migrations (version) VALUES ('20160709063934');
 
