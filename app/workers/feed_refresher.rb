@@ -21,7 +21,7 @@ class FeedRefresher
   def build_arguments(feed_ids, count)
     fields = [:id, :feed_url, :etag, :last_modified, :subscriptions_count, :push_expiration]
     subscriptions = Subscription.where(feed_id: feed_ids, active: true, muted: false).group(:feed_id).count
-    feeds = Feed.xml.where(id: feed_ids).where("subscriptions_count > ?", count).pluck(*fields)
+    feeds = Feed.xml.where(id: feed_ids, active: true).where("subscriptions_count > ?", count).pluck(*fields)
     feeds.each_with_object([]) do |result, array|
       feed = Hash[fields.zip(result)]
       if subscriptions.has_key?(feed[:id])
