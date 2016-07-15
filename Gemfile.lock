@@ -142,7 +142,6 @@ GEM
       addressable
     curb (0.9.3)
     dalli (2.7.6)
-    diff-lcs (1.2.5)
     docile (1.1.5)
     domain_name (0.5.20160615)
       unf (>= 0.0.5, < 1.0.0)
@@ -449,23 +448,6 @@ GEM
     reverse_markdown (1.0.3)
       nokogiri
     rmagick (2.15.4)
-    rspec-core (3.4.4)
-      rspec-support (~> 3.4.0)
-    rspec-expectations (3.4.0)
-      diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.4.0)
-    rspec-mocks (3.4.1)
-      diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.4.0)
-    rspec-rails (3.4.2)
-      actionpack (>= 3.0, < 4.3)
-      activesupport (>= 3.0, < 4.3)
-      railties (>= 3.0, < 4.3)
-      rspec-core (~> 3.4.0)
-      rspec-expectations (~> 3.4.0)
-      rspec-mocks (~> 3.4.0)
-      rspec-support (~> 3.4.0)
-    rspec-support (3.4.1)
     rubyzip (1.1.0)
     sanitize (4.0.1)
       crass (~> 1.0.2)
@@ -587,7 +569,6 @@ DEPENDENCIES
   responders (~> 2.0)
   reverse_markdown
   rmagick
-  rspec-rails (~> 3.1)
   rubyzip (= 1.1.0)
   sanitize
   sass-rails
