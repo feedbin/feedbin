@@ -1,0 +1,5 @@
+ben:
+  email: ben@benubois.com
+  password_digest: <%= default_password_digest %>
+  auth_token: <%= SecureRandom.hex %>
+
