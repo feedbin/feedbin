@@ -1,6 +1,6 @@
 language: ruby
 cache: bundler
-sudo: false
+sudo: true
 bundler_args: --without production development
 services:
   - redis-server
