@@ -8,6 +8,4 @@ class ActiveSupport::TestCase
   include LoginHelper
 
   fixtures :all
-
-  # Add more helper methods to be used by all tests here...
 end

@@ -1,0 +1,13 @@
+daring_fireball:
+  title: Daring Fireball
+  feed_url: http://daringfireball.net/feeds/main
+  site_url: http://daringfireball.net/
+  self_url: http://daringfireball.net/feeds/main
+  host: daringfireball.net
+
+kottke:
+  title: kottke.org
+  feed_url: http://feeds.kottke.org/main
+  site_url: http://kottke.org/
+  self_url: http://feeds.kottke.org/main
+  host: kottke.org

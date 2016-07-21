@@ -3,3 +3,8 @@ ben:
   password_digest: <%= default_password_digest %>
   auth_token: <%= SecureRandom.hex %>
 
+ann:
+  email: ann@example.com
+  password_digest: <%= default_password_digest %>
+  auth_token: <%= SecureRandom.hex %>
+
