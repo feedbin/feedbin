@@ -9,7 +9,7 @@ addons:
 env:
   - DB=postgresql
 before_install:
-  - curl -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-2.3.4.deb && sudo dpkg -i --force-confnew elasticsearch-2.3.4.deb && sudo service elasticsearch restart
+  - curl -LO https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-2.3.4.deb && sudo dpkg -i --force-confnew elasticsearch-2.3.4.deb && sudo service elasticsearch restart
 before_script:
   - export POSTGRES_USERNAME=postgres
   - export AWS_ACCESS_KEY_ID=foo
