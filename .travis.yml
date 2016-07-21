@@ -1,19 +1,29 @@
 language: ruby
 cache: bundler
-sudo: true
-bundler_args: --without production development
+sudo: false
+bundler_args: --without development
+
 services:
   - redis-server
+
 addons:
   postgresql: "9.4"
+
 env:
-  - DB=postgresql
-before_install:
-  - curl -LO https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-2.3.4.deb && sudo dpkg -i --force-confnew elasticsearch-2.3.4.deb && sudo service elasticsearch restart
+  global:
+    - DB=postgresql
+    - POSTGRES_USERNAME=postgres
+    - AWS_ACCESS_KEY_ID=foo
+    - AWS_SECRET_ACCESS_KEY=bar
+  matrix:
+    - ES_VERSION=2.3.3
+
+install:
+  - mkdir /tmp/elasticsearch
+  - wget -O - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1
+  - /tmp/elasticsearch/bin/elasticsearch --daemonize --path.data /tmp
+
 before_script:
-  - export POSTGRES_USERNAME=postgres
-  - export AWS_ACCESS_KEY_ID=foo
-  - export AWS_SECRET_ACCESS_KEY=bar
   - psql -c 'create database feedbin_test;' -U postgres
   - bundle exec rake db:setup
   - bundle exec rake db:test:prepare
