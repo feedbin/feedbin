@@ -1,20 +1,19 @@
 language: ruby
 cache: bundler
 sudo: false
+bundler_args: --without production development
 services:
   - redis-server
-  - elasticsearch
 addons:
   postgresql: "9.4"
 env:
   - DB=postgresql
-bundler_args: --without production development
-before_script:
-  - psql -c 'create database feedbin_test;' -U postgres
-  - sleep 10 # needed to give elasticsearch time to boot
+before_install:
+  - curl -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-2.3.4.deb && sudo dpkg -i --force-confnew elasticsearch-2.3.4.deb && sudo service elasticsearch restart
 before_script:
   - export POSTGRES_USERNAME=postgres
   - export AWS_ACCESS_KEY_ID=foo
   - export AWS_SECRET_ACCESS_KEY=bar
+  - psql -c 'create database feedbin_test;' -U postgres
   - bundle exec rake db:setup
   - bundle exec rake db:test:prepare
