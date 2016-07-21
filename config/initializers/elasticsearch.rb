@@ -11,7 +11,7 @@ end
 
 Elasticsearch::Model.client = $search[:main]
 
-if Rails.env.development?
+if Rails.env.development? || Rails.env.test?
   Elasticsearch::Model.client.transport.tracer = ActiveSupport::Logger.new('log/elasticsearch.log')
   Entry.__elasticsearch__.create_index! rescue nil
 end

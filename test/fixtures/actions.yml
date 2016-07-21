@@ -1,7 +1,7 @@
-one:
+ben_one:
   user: ben
   query: lorem
-  actions: 
+  actions:
     - mark_read
   all_feeds: true
   title: Mark lorem read

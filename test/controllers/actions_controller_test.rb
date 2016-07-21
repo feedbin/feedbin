@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ActionsControllerTest < ActionController::TestCase
   setup do
-    @action = actions(:one)
+    @action = actions(:ben_one)
   end
 
   test "should get index" do

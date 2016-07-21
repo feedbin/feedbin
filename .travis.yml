@@ -3,6 +3,7 @@ cache: bundler
 sudo: false
 services:
   - redis-server
+  - elasticsearch
 addons:
   postgresql: "9.4"
 env:
@@ -10,6 +11,7 @@ env:
 bundler_args: --without production development
 before_script:
   - psql -c 'create database feedbin_test;' -U postgres
+  - sleep 10 # needed to give elasticsearch time to boot
 before_script:
   - export POSTGRES_USERNAME=postgres
   - export AWS_ACCESS_KEY_ID=foo

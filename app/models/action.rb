@@ -102,12 +102,11 @@ class Action < ActiveRecord::Base
   end
 
   def _percolator
-    response = Entry.__elasticsearch__.client.get(
+    Entry.__elasticsearch__.client.get(
       index: Entry.index_name,
       type: '.percolator',
       id: self.id
     )
-    pp(response)
   end
 
 end

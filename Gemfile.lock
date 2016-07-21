@@ -492,6 +492,8 @@ GEM
     stripe_event (1.5.0)
       activesupport (>= 3.1)
       stripe (~> 1.6)
+    test_after_commit (1.1.0)
+      activerecord (>= 3.2)
     therubyracer (0.12.2)
       libv8 (~> 3.16.14.0)
       ref
@@ -578,6 +580,7 @@ DEPENDENCIES
   spring
   stripe (= 1.9.9)
   stripe_event
+  test_after_commit
   therubyracer
   uglifier
   unicorn
