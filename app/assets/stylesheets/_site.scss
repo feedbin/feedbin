@@ -4050,10 +4050,13 @@ Settings
         }
         .subhead {
             font-size: 12px;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
             margin: 0 0 20px 0;
+            a {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                display: block;
+            }
             a, a:hover {
                 color: $text-color-light;
             }
