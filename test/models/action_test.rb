@@ -11,33 +11,50 @@ class ActionTest < ActiveSupport::TestCase
   end
 
   test "feeds should be present" do
-    @action.feed_ids = []
-    @action.tag_ids = []
-    @action.all_feeds = false
-    assert_not @action.valid?
+    action = @user.actions.build(feed_ids: [])
+    assert_not action.valid?
   end
 
   test "must be subscribed to requested feeds" do
     feed = Feed.create
-    action = @user.actions.build(action_params([feed.id]))
+    action = @user.actions.build(feed_ids: [feed.id])
     assert_not action.computed_feed_ids.include?(feed.id)
+    assert_not action.valid?
   end
 
-  test "saved to elasticsearch" do
+  test "must save to elasticsearch" do
     feed = feeds(:daring_fireball)
-    action = @user.actions.create(action_params([feed.id]))
-    assert action._percolator['found'] == true
+    action = @user.actions.create(feed_ids: [feed.id])
+    assert percolator_found?(action)
+  end
+
+  test "recognizes tags" do
+    feed = feeds(:daring_fireball)
+    tagging = feed.tag('Favs', @user, false).first
+    action = @user.actions.create(tag_ids: [tagging.tag.id])
+    assert action.computed_feed_ids.include?(feed.id)
+  end
+
+  test "doesn't percolate when empty" do
+    feed = feeds(:daring_fireball)
+    action = @user.actions.create(feed_ids: [feed.id])
+    assert percolator_found?(action)
+    action.automatic_modification = true
+    action.update(feed_ids: [])
+    assert_not percolator_found?(action)
+  end
+
+  test "doesn't percolate when empty iOS" do
+    action = @user.actions.create(query: "hello", all_feeds: true, action_type: :notifier)
+    assert percolator_found?(action)
+    action.update(query: "")
+    assert_not percolator_found?(action)
   end
 
   private
 
-  def action_params(feed_ids)
-    {
-      title: "Star",
-      query: "john",
-      all_feeds: false,
-      feed_ids: feed_ids,
-      actions: ["star"]
-    }
+  def percolator_found?(action)
+    action._percolator && action._percolator['found'] == true
   end
+
 end

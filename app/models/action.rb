@@ -105,7 +105,8 @@ class Action < ActiveRecord::Base
     Entry.__elasticsearch__.client.get(
       index: Entry.index_name,
       type: '.percolator',
-      id: self.id
+      id: self.id,
+      ignore: 404
     )
   end
 
