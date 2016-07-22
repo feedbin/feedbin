@@ -11,10 +11,12 @@ addons:
 
 env:
   global:
-    - DB=postgresql
-    - POSTGRES_USERNAME=postgres
+    - APPLE_PUSH_WEBSITE_ID=com.example
     - AWS_ACCESS_KEY_ID=foo
     - AWS_SECRET_ACCESS_KEY=bar
+    - DB=postgresql
+    - POSTGRES_USERNAME=postgres
+    - PUSH_URL=http://example.com
   matrix:
     - ES_VERSION=2.3.3
 
