@@ -1,7 +1,7 @@
 language: ruby
 cache: bundler
 sudo: false
-bundler_args: --without development
+bundler_args: --without development --jobs 2
 
 services:
   - redis-server
