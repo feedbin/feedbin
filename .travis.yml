@@ -27,3 +27,5 @@ before_script:
   - psql -c 'create database feedbin_test;' -U postgres
   - bundle exec rake db:setup
   - bundle exec rake db:test:prepare
+  - curl http://127.0.0.1:9200/
+  - nproc
