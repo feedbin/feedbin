@@ -40,7 +40,7 @@ class ApplePushNotificationsControllerTest < ActionController::TestCase
   private
 
   def default_params
-    {version: 1, website_push_id: ENV['APPLE_PUSH_WEBSITE_ID']}
+    {version: 1, website_push_id: "push_id"}
   end
 
   def set_authorization_header
