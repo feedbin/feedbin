@@ -70,6 +70,7 @@ class ApplicationController < ActionController::Base
       collections << {
         title: 'Recently Read',
         path: recently_read_entries_path,
+        count_data: nil,
         id: 'collection_recently_read',
         favicon_class: 'favicon-recently-read',
         parent_class: 'collection-recently-read',

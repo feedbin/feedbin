@@ -52,7 +52,7 @@ class ApplePushNotificationsControllerTest < ActionController::TestCase
     rsa_key = OpenSSL::PKey::RSA.new(2048)
     cert = OpenSSL::X509::Certificate.new()
     cert.not_before = Time.new()
-    cert.not_after = cert.not_before + (60*60*24*365)
+    cert.not_after = cert.not_before + 10_000
     cert.public_key = rsa_key.public_key
     cert.sign rsa_key, OpenSSL::Digest::SHA1.new()
     p12 = OpenSSL::PKCS12.create(nil, nil, rsa_key, cert)
