@@ -21,7 +21,6 @@ class Customer
     if !invoice.paid && invoice.closed
       invoice.closed = false
       invoice.save
-      invoice.pay
     end
   end
 end
