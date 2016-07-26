@@ -14,8 +14,9 @@ end
 
 group :test do
   gem 'minitest'
-  gem "codeclimate-test-reporter", require: nil
+  gem 'codeclimate-test-reporter', require: nil
   gem 'test_after_commit'
+  gem 'stripe-ruby-mock', require: 'stripe_mock'
 end
 
 group :production do
