@@ -12,12 +12,8 @@ group :development do
   gem 'xipio'
 end
 
-group :development, :test do
-  gem 'factory_girl_rails'
-  gem 'faker'
-end
-
 group :test do
+  gem 'minitest'
   gem "codeclimate-test-reporter", require: nil
   gem 'test_after_commit'
 end

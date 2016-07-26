@@ -168,13 +168,6 @@ GEM
       oauth (>= 0.4.1)
     excon (0.50.1)
     execjs (2.7.0)
-    factory_girl (4.7.0)
-      activesupport (>= 3.0.0)
-    factory_girl_rails (4.7.0)
-      factory_girl (~> 4.7.0)
-      railties (>= 3.0.0)
-    faker (1.6.3)
-      i18n (~> 0.5)
     faraday (0.9.2)
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.10.0)
@@ -540,8 +533,6 @@ DEPENDENCIES
   dotenv-rails
   elasticsearch-model
   evernote_oauth
-  factory_girl_rails
-  faker
   feedjira!
   fog
   foreman (= 0.63.0)
@@ -557,6 +548,7 @@ DEPENDENCIES
   kramdown
   librato-rails
   lograge
+  minitest
   oauth
   opml_saw!
   pg
