@@ -13,7 +13,7 @@ class BillingEventTest < ActiveSupport::TestCase
   test "charge_succeeded?" do
     Sidekiq::Worker.clear_all
     assert_equal 0, Sidekiq::Extensions::DelayedMailer.jobs.size
-    event = StripeMock.mock_webhook_event('charge.succeeded', {customer: @user.customer_id})
+    event = StripeMock.mock_webhook_event('charge.succeeded', webhook_defaults)
     BillingEvent.create(details: event)
     assert_equal 1, Sidekiq::Extensions::DelayedMailer.jobs.size
     Sidekiq::Worker.clear_all
@@ -22,7 +22,7 @@ class BillingEventTest < ActiveSupport::TestCase
   test "charge_failed?" do
     Sidekiq::Worker.clear_all
     assert_equal 0, Sidekiq::Extensions::DelayedMailer.jobs.size
-    event = StripeMock.mock_webhook_event('invoice.payment_failed', {customer: @user.customer_id})
+    event = StripeMock.mock_webhook_event('invoice.payment_failed', webhook_defaults)
     BillingEvent.create(details: event)
     assert_equal 1, Sidekiq::Extensions::DelayedMailer.jobs.size
     Sidekiq::Worker.clear_all
@@ -30,7 +30,7 @@ class BillingEventTest < ActiveSupport::TestCase
 
   test "subscription_deactivated?" do
     assert @user.active?
-    event = StripeMock.mock_webhook_event('customer.subscription.updated', {customer: @user.customer_id, status: 'unpaid'})
+    event = StripeMock.mock_webhook_event('customer.subscription.updated', webhook_defaults.merge(status: 'unpaid'))
     BillingEvent.create(details: event)
     assert_not @user.reload.active?
   end
@@ -38,9 +38,15 @@ class BillingEventTest < ActiveSupport::TestCase
   test "subscription_reactivated?" do
     assert @user.deactivate
     assert_not @user.reload.active?
-    event = StripeMock.mock_webhook_event('customer.subscription.updated-custom', {customer: @user.customer_id, status: 'active'})
+    event = StripeMock.mock_webhook_event('customer.subscription.updated-custom', webhook_defaults.merge(status: 'active'))
     BillingEvent.create(details: event)
     assert @user.reload.active?
+  end
+
+  private
+
+  def webhook_defaults
+    {customer: @user.customer_id}
   end
 
 end
