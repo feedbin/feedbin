@@ -43,7 +43,7 @@ class BillingEvent < ActiveRecord::Base
   end
 
   def charge_succeeded?
-    "charge.succeeded" == event_type
+    'charge.succeeded' == event_type
   end
 
   def charge_failed?

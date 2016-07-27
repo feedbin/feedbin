@@ -319,6 +319,10 @@ class User < ActiveRecord::Base
     subscriptions.update_all(active: false)
   end
 
+  def active?
+    !suspended
+  end
+
   def admin?
     admin
   end

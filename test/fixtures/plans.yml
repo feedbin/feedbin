@@ -1,0 +1,11 @@
+trial:
+  stripe_id: trial
+  name: Trial
+  price: 0
+  price_tier: 2
+
+free:
+  stripe_id: free
+  name: Free
+  price: 0
+  price_tier: 2
