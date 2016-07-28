@@ -20,4 +20,12 @@ class ActiveSupport::TestCase
     @request.env.delete('RAW_POST_DATA')
     response
   end
+
+  def flush_redis
+    if Rails.env.test?
+      $redis.each do |_, redis|
+        redis.flushdb
+      end
+    end
+  end
 end

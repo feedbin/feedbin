@@ -17,6 +17,7 @@ group :test do
   gem 'codeclimate-test-reporter', require: nil
   gem 'test_after_commit'
   gem 'stripe-ruby-mock', require: 'stripe_mock'
+  gem 'faker'
 end
 
 group :production do

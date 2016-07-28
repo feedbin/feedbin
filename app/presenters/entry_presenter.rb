@@ -161,7 +161,6 @@ class EntryPresenter < BasePresenter
   def feed_domain_matches?(comparison)
     begin
       uri = URI.parse(entry.feed.site_url)
-      puts uri.host
       uri.host == comparison || uri.host == comparison.sub('www.', '')
     rescue Exception
       false

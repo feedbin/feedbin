@@ -89,7 +89,21 @@ class EntriesController < ApplicationController
       end
     end
 
-    view_inline
+    begin
+      if @content_view
+        url = @entry.fully_qualified_url
+        @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v2") do
+          Librato.increment 'readability.first_parse'
+          ReadabilityParser.parse(url)
+        end
+        @content = @content_info.content
+        Librato.increment 'readability.parse'
+      else
+        @content = @entry.content
+      end
+    rescue => e
+      @content = check_for_image(@entry, url)
+    end
 
     begin
       @content = ContentFormatter.format!(@content, @entry, !@user.setting_on?(:disable_image_proxy))
@@ -103,22 +117,6 @@ class EntriesController < ApplicationController
     ids = params[:ids].split(',').map {|i| i.to_i }
     entries = entries_by_id(ids)
     render json: entries.to_json
-  end
-
-  def entries_by_id(entry_ids)
-    entries = Entry.where(id: entry_ids).includes(:feed)
-    entries.each_with_object({}) do |entry, hash|
-      locals = {
-        entry: entry,
-        services: sharing_services(entry),
-        content_view: false,
-        user: @user
-      }
-      hash[entry.id] = {
-        content: render_to_string(partial: "entries/show", formats: [:html], locals: locals),
-        feed_id: entry.feed_id
-      }
-    end
   end
 
   def mark_as_read
@@ -282,6 +280,22 @@ class EntriesController < ApplicationController
 
   private
 
+  def entries_by_id(entry_ids)
+    entries = Entry.where(id: entry_ids).includes(:feed)
+    entries.each_with_object({}) do |entry, hash|
+      locals = {
+        entry: entry,
+        services: sharing_services(entry),
+        content_view: false,
+        user: @user
+      }
+      hash[entry.id] = {
+        content: render_to_string(partial: "entries/show", formats: [:html], locals: locals),
+        feed_id: entry.feed_id
+      }
+    end
+  end
+
   def sharing_services(entry)
     @user_sharing_services ||= begin
       (@user.sharing_services + @user.supported_sharing_services).sort_by{|sharing_service| sharing_service.label}
@@ -295,25 +309,6 @@ class EntriesController < ApplicationController
       end
     end
     services
-  end
-
-  def view_inline
-    begin
-      if @content_view
-        url = @entry.fully_qualified_url
-        @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v2") do
-          Librato.increment 'readability.first_parse'
-          ReadabilityParser.parse(url)
-        end
-        @content = @content_info.content
-        Librato.increment 'readability.parse'
-      else
-        @content = @entry.content
-      end
-    rescue => e
-      @content = check_for_image(@entry, url)
-    end
-
   end
 
   def matched_search_ids(params)
