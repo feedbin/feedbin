@@ -152,6 +152,32 @@ class EntriesControllerTest < ActionController::TestCase
       assert_response :success
     end
 
+    mark_unread
+
+    assert_difference('UnreadEntry.count', -entries.total_entries) do
+      xhr :post, :mark_all_as_read, type: 'search', data: saved_search.query
+      assert_response :success
+    end
+
+  end
+
+  test "mark specific ids read" do
+    login_as @user
+    entries = @user.entries.first(2)
+    assert_difference('UnreadEntry.count', -entries.length) do
+      xhr :post, :mark_all_as_read, ids: entries.map(&:id).join(',')
+      assert_response :success
+    end
+  end
+
+  test "mark read respects date cap" do
+    login_as @user
+    date = @user.unread_entries.order(created_at: :asc).limit(1).take.created_at.iso8601(6)
+    assert @user.unread_entries.count > 1
+    assert_difference('UnreadEntry.count', -1) do
+      xhr :post, :mark_all_as_read, type: 'all', date: date
+      assert_response :success
+    end
   end
 
   test "should get search" do
@@ -162,13 +188,21 @@ class EntriesControllerTest < ActionController::TestCase
     assert_equal 1, assigns(:entries).total_entries
   end
 
+  test "should get diff" do
+    login_as @user
+    entry = @user.entries.first
+    entry.update(content: '<p>This is the test.</p>')
+    entry.update(content: '<p>This is the text.</p>', original: {content: entry.content})
+    xhr :get, :diff, id: entry
+    assert_response :success
+    assert_match /inline-diff/, assigns(:content)
+  end
 
-
-# params[:type] == 'saved_search'
-# params[:type] == 'search'
-# params[:date].present?
-# params[:ids].present?
-
+  test "should get newsletter" do
+    entry = @user.entries.first
+    get :newsletter, id: entry.public_id
+    assert_response :success
+  end
 
   private
 

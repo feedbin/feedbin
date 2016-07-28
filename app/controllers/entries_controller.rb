@@ -163,10 +163,10 @@ class EntriesController < ApplicationController
       unread_entries = unread_entries.where('created_at <= :last_unread_date', {last_unread_date: params[:date]})
     end
 
-    unread_entries.delete_all
+    unread_entries.delete_all if unread_entries
 
     if params[:ids].present?
-      ids = params[:ids].split(',').map {|i| i.to_i }
+      ids = params[:ids].split(',').map(&:to_i)
       UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
     end
 
