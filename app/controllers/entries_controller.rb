@@ -315,13 +315,13 @@ class EntriesController < ApplicationController
     params[:load] = false
     query = params[:query]
     entries = Entry.scoped_search(params, @user)
-    ids = entries.results.map {|entry| entry.id.to_i}
+    ids = entries.results.map(&:id)
     if entries.total_pages > 1
       2.upto(entries.total_pages) do |page|
         params[:page] = page
         params[:query] = query
         entries = Entry.scoped_search(params, @user)
-        ids = ids.concat(entries.results.map {|entry| entry.id.to_i})
+        ids = ids.concat(entries.results.map(&:id))
       end
     end
     ids
