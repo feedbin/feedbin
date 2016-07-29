@@ -19,7 +19,7 @@ class PasswordResetsControllerTest < ActionController::TestCase
     assert_equal 1, Sidekiq::Extensions::DelayedMailer.jobs.size
   end
 
-  test "gets edit" do
+  test "should get edit" do
     token = @user.generate_token(:password_reset_token, nil, true)
     @user.save
     get :edit, id: token
