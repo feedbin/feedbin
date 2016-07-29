@@ -1,11 +1,13 @@
 class Newsletter
 
+  attr_reader :data
+
   def initialize(params)
-    @params = params
+    @data = params
   end
 
   def valid?
-    @params["X-Mailgun-Incoming"] == "Yes" && signature_valid?
+    data["X-Mailgun-Incoming"] == "Yes" && signature_valid?
   end
 
   def token
@@ -15,7 +17,7 @@ class Newsletter
   end
 
   def to_email
-    @params["recipient"]
+    data["recipient"]
   end
 
   def from_email
@@ -27,15 +29,15 @@ class Newsletter
   end
 
   def subject
-    @params["subject"]
+    data["subject"]
   end
 
   def text
-    @params["body-plain"]
+    data["body-plain"]
   end
 
   def html
-    @params["body-html"]
+    data["body-html"]
   end
 
   def content
@@ -43,7 +45,7 @@ class Newsletter
   end
 
   def timestamp
-    @params["timestamp"]
+    data["timestamp"]
   end
 
   def feed_id
@@ -73,17 +75,23 @@ class Newsletter
   private
 
   def parsed_from
-    Mail::Address.new(@params["from"])
+    Mail::Address.new(data["from"])
   rescue Mail::Field::ParseError
-    name, address = @params["from"].split(/[<>]/).map(&:strip)
+    name, address = data["from"].split(/[<>]/).map(&:strip)
     domain = address.split("@").last
     OpenStruct.new(name: name, address: address, domain: domain)
   end
 
   def signature_valid?
-    digest = OpenSSL::Digest::SHA256.new
-    data = [@params["timestamp"], @params["token"]].join
-    @params["signature"] == OpenSSL::HMAC.hexdigest(digest, ENV['MAILGUN_INBOUND_KEY'], data)
+    data["signature"] == signature
+  end
+
+  def signature
+    @signature ||= begin
+      digest = OpenSSL::Digest::SHA256.new
+      signed_data = [data["timestamp"], data["token"]].join
+      OpenSSL::HMAC.hexdigest(digest, ENV['MAILGUN_INBOUND_KEY'], signed_data)
+    end
   end
 
 end

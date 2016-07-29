@@ -4,6 +4,7 @@ ben:
   auth_token: <%= SecureRandom.hex %>
   customer_id: cus_123
   plan: trial
+  newsletter_token: <%= SecureRandom.hex %>
 
 ann:
   email: ann@example.com
