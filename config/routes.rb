@@ -49,7 +49,6 @@ Feedbin::Application.routes.draw do
 
   resources :tags,           only: [:index, :show, :update, :destroy]
   resources :billing_events, only: [:show]
-  resources :imports
   resources :password_resets
   resources :sharing_services, path: 'settings/sharing', only: [:index, :create, :update, :destroy]
   resources :actions, path: 'settings/actions', only: [:index, :create, :new, :update, :destroy, :edit]
