@@ -17,10 +17,12 @@ class Customer
   end
 
   def reopen_account
-    invoice = Stripe::Invoice.all(customer: id, limit: 1).first
+    invoice = Stripe::Invoice.all(customer: u.customer_id, limit: 1).first
     if !invoice.paid && invoice.closed
       invoice.closed = false
       invoice.save
+    elsif !invoice.paid && invoice.attempt_count >= 4
+      invoice.pay
     end
   end
 end
