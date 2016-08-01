@@ -140,7 +140,7 @@ class SettingsController < ApplicationController
           if params[:redirect_to]
             redirect_to params[:redirect_to]
           else
-            redirect_to settings_path
+            redirect_to settings_url
           end
         end
       end
@@ -149,7 +149,7 @@ class SettingsController < ApplicationController
         flash[:alert] = @user.errors.full_messages.join('. ') + '.'
         format.js {flash.discard()}
         format.html do
-          redirect_to settings_path
+          redirect_to settings_url
         end
       end
     end

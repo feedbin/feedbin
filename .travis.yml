@@ -18,6 +18,7 @@ env:
     - MAILGUN_INBOUND_KEY=xyz
     - POSTGRES_USERNAME=postgres
     - PUSH_URL=http://example.com
+    - STRIPE_API_KEY=xyz
   matrix:
     - ES_VERSION=2.3.3
 

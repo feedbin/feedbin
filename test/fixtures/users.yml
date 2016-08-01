@@ -3,7 +3,7 @@ ben:
   password_digest: <%= default_password_digest %>
   auth_token: <%= SecureRandom.hex %>
   customer_id: cus_123
-  plan: trial
+  plan: basic_monthly_2
   newsletter_token: <%= SecureRandom.hex %>
 
 ann:

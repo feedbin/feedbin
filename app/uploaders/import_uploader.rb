@@ -4,6 +4,6 @@ class ImportUploader < CarrierWave::Uploader::Base
   process :set_content_type
 
   def extension_white_list
-    %w(opml xml json)
+    %w(opml xml)
   end
 end
