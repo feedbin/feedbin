@@ -1,17 +1,18 @@
+require 'codeclimate-test-reporter'
+CodeClimate::TestReporter.start
+
 ENV['RAILS_ENV'] ||= 'test'
 
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 require 'minitest/autorun'
 require 'sidekiq/testing'
-require 'codeclimate-test-reporter'
 
 require 'login_helper'
 require 'factory_helper'
 
 ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
 StripeMock.webhook_fixture_path = './test/fixtures/stripe_webhooks/'
-CodeClimate::TestReporter.start
 
 class ActiveSupport::TestCase
   include LoginHelper
