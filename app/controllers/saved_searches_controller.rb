@@ -34,11 +34,6 @@ class SavedSearchesController < ApplicationController
     get_feeds_list
   end
 
-  def edit
-    @user = current_user
-    @saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
-  end
-
   def update
     @user = current_user
     @saved_search = SavedSearch.where(user: @user, id: params[:id]).take!

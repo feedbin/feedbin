@@ -52,7 +52,7 @@ Feedbin::Application.routes.draw do
   resources :password_resets
   resources :sharing_services, path: 'settings/sharing', only: [:index, :create, :update, :destroy]
   resources :actions, path: 'settings/actions', only: [:index, :create, :new, :update, :destroy, :edit]
-  resources :saved_searches
+  resources :saved_searches, only: [:show, :update, :destroy, :create]
 
   resources :sessions do
     collection do
@@ -133,7 +133,6 @@ Feedbin::Application.routes.draw do
     get :billing
     get :import_export
     get :feeds
-    get :help
     get :appearance
     post :update_credit_card
     post :mark_favicon_complete

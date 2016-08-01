@@ -15,6 +15,7 @@ env:
     - AWS_ACCESS_KEY_ID=foo
     - AWS_SECRET_ACCESS_KEY=bar
     - DB=postgresql
+    - MAILGUN_INBOUND_KEY=xyz
     - POSTGRES_USERNAME=postgres
     - PUSH_URL=http://example.com
   matrix:

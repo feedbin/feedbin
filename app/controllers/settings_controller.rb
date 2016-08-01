@@ -2,15 +2,7 @@ class SettingsController < ApplicationController
 
   before_action :plan_exists, only: [:update_plan]
 
-  def help
-    @user = current_user
-  end
-
   def settings
-    @user = current_user
-  end
-
-  def sharing
     @user = current_user
   end
 
