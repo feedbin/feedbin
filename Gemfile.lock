@@ -392,6 +392,7 @@ GEM
     premailer (1.8.7)
       css_parser (>= 1.4.5)
       htmlentities (>= 4.0.0)
+    puma (3.6.0)
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     rack (1.6.4)
@@ -567,6 +568,7 @@ DEPENDENCIES
   opml_saw!
   pg
   premailer
+  puma
   quiet_assets
   rails
   rails-deprecated_sanitizer

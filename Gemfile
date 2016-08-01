@@ -10,6 +10,7 @@ group :development do
   gem 'spring'
   gem 'benchmark-ips'
   gem 'xipio'
+  gem 'puma'
 end
 
 group :test do
