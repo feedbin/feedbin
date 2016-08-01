@@ -21,6 +21,8 @@ class Customer
     if !invoice.paid && invoice.closed
       invoice.closed = false
       invoice.save
+    elsif !invoice.paid && invoice.attempt_count >= 4
+      invoice.pay
     end
   end
 end
