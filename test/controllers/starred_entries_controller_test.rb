@@ -15,6 +15,7 @@ class StarredEntriesControllerTest < ActionController::TestCase
   test "should get index" do
     @user.starred_feed_enabled = '1'
     @user.save
+    assert @user.setting_on?(:starred_feed_enabled)
     login_as @user
     get :index, starred_token: @user.starred_token, format: :xml
     assert_response :success

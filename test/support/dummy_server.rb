@@ -70,9 +70,7 @@ class DummyServer
       part == '..' ? clean.pop : clean << part
     end
 
-    file = File.join(File.dirname(__FILE__), WEB_ROOT, *clean)
-    STDERR.puts file
-    file
+    File.join(File.dirname(__FILE__), WEB_ROOT, *clean)
   end
 
   def respond(status, headers)
@@ -84,8 +82,6 @@ class DummyServer
   def handle(socket)
     request_line = socket.gets
 
-    STDERR.puts request_line
-
     path = requested_file(request_line)
     path = File.join(path, 'index.html') if File.directory?(path)
 
@@ -96,10 +92,7 @@ class DummyServer
           "Content-Length" => file.size,
           "Connection" => "close"
         }
-        r = respond("200 OK", headers)
-        STDERR.puts r
-
-        socket.print r
+        socket.print respond("200 OK", headers)
         IO.copy_stream(file, socket)
       end
     else
