@@ -110,12 +110,6 @@ class SubscriptionsController < ApplicationController
     redirect_to settings_feeds_url, notice: notice
   end
 
-  def destroy_all
-    @user = current_user
-    @user.subscriptions.destroy_all
-    redirect_to settings_feeds_url, notice: "You have unsubscribed."
-  end
-
   def edit
     @user = current_user
     @subscription = @user.subscriptions.find(params[:id])
@@ -132,6 +126,8 @@ class SubscriptionsController < ApplicationController
     end
     flash.discard()
   end
+
+  private
 
   def subscription_params
     params.require(:subscription).permit(:muted, :show_updates)

@@ -11,12 +11,11 @@ class DummyServer
     'html' => 'text/html',
     'txt' => 'text/plain',
     'png' => 'image/png',
-    'jpg' => 'image/jpeg'
+    'jpg' => 'image/jpeg',
+    'xml' => 'text/xml',
   }
 
   DEFAULT_CONTENT_TYPE = 'application/octet-stream'
-
-  attr_accessor :on_req
 
   def initialize
     @port = 9595
@@ -98,7 +97,7 @@ class DummyServer
     else
       message = "File not found\n"
       headers = {
-        "Content-Type" => "text/plain",
+        "Content-Type" => CONTENT_TYPE_MAPPING['text'],
         "Content-Length" => message.size,
         "Connection" => "close"
       }
