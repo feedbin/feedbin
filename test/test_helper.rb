@@ -10,6 +10,7 @@ require 'sidekiq/testing'
 
 require 'login_helper'
 require 'factory_helper'
+require 'support/dummy_server'
 
 ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
 StripeMock.webhook_fixture_path = './test/fixtures/stripe_webhooks/'
