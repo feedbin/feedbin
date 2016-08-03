@@ -16,3 +16,5 @@ new:
   email: new@example.com
   password_digest: <%= default_password_digest %>
   auth_token: <%= SecureRandom.hex %>
+  starred_token: <%= SecureRandom.hex %>
+  plan: basic_monthly_2
