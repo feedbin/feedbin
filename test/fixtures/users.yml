@@ -18,3 +18,4 @@ new:
   auth_token: <%= SecureRandom.hex %>
   starred_token: <%= SecureRandom.hex %>
   plan: basic_monthly_2
+  customer_id: cus_new
