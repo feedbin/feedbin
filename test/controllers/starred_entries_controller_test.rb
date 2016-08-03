@@ -13,7 +13,7 @@ class StarredEntriesControllerTest < ActionController::TestCase
   end
 
   test "should get index" do
-    @user.starred_feed_enabled = 1
+    @user.starred_feed_enabled = '1'
     @user.save
     login_as @user
     get :index, starred_token: @user.starred_token, format: :xml
