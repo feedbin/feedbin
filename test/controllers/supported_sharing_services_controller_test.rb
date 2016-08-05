@@ -67,4 +67,13 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
     assert_equal token, pocket.settings['access_token']
   end
 
+  test "should share" do
+    Sidekiq::Worker.clear_all
+    login_as @user
+    assert_difference "SendToKindle.jobs.size", +1 do
+      xhr :post, :share, id: @service, entry_id: 1
+      assert_response :success
+    end
+  end
+
 end
