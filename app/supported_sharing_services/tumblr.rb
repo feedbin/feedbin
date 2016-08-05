@@ -42,6 +42,10 @@ class Tumblr < Service
     Rails.application.routes.url_helpers.oauth_response_supported_sharing_service_url('tumblr', host: ENV['PUSH_URL'])
   end
 
+  def response_valid?(session, params)
+    params[:oauth_verifier].present?
+  end
+
   def user_info
     result = @client.get("#{API_URL}/user/info")
     JSON.load(result.body)

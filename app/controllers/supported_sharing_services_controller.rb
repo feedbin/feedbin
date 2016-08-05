@@ -43,44 +43,19 @@ class SupportedSharingServicesController < ApplicationController
     @response = sharing_service.share(params)
   end
 
-  def oauth2_pocket_response
+  def autocomplete
     @user = current_user
-
-    service_info = SupportedSharingService.info!(params[:id])
-    klass = service_info[:klass].constantize.new
-
-    response = klass.oauth2_pocket_authorize(session[:oauth2_pocket_token])
-    supported_sharing_service = @user.supported_sharing_services.where(service_id: params[:id]).first_or_initialize
-    session.delete(:oauth2_pocket_token)
-    if response.code == 200
-      access_token = response.parsed_response['access_token']
-      supported_sharing_service.update(access_token: access_token)
-      if supported_sharing_service.errors.any?
-        redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
-      else
-        redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
-      end
-    elsif response.code == 403
-      redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{supported_sharing_service.label}."
-    else
-      Honeybadger.notify(
-        error_class: "SupportedSharingServicesController#oauth2_pocket_response",
-        error_message: "#{service_info[:label]} failure",
-        parameters: {response: response}
-      )
-      redirect_to sharing_services_url, notice: "Unknown #{service_info[:label]} error."
-    end
-
+    service = @user.supported_sharing_services.where(id: params[:id]).first!
+    completions = service.completions.find_all { |completion| completion.downcase.include?(params[:query].downcase) }.first(3)
+    render json: { suggestions: completions.map {|completion| { value: completion, data: completion } } }.to_json
   end
 
   def oauth_response
     @user = current_user
     service_info = SupportedSharingService.info!(params[:id])
     klass = service_info[:klass].constantize.new
-    if params[:oauth_verifier].present?
-      access_token = klass.request_access(session[:oauth_token], session[:oauth_secret], params[:oauth_verifier])
-      session.delete(:oauth_token)
-      session.delete(:oauth_secret)
+    if klass.response_valid?(session, params)
+      access_token = klass.request_access(session.delete(:oauth_token), session.delete(:oauth_secret), params[:oauth_verifier])
       supported_sharing_service = @user.supported_sharing_services.where(service_id: params[:id]).first_or_initialize
       supported_sharing_service.update(access_token: access_token.token, access_secret: access_token.secret)
       if supported_sharing_service.errors.any?
@@ -101,13 +76,6 @@ class SupportedSharingServicesController < ApplicationController
     redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
   end
 
-  def autocomplete
-    @user = current_user
-    service = @user.supported_sharing_services.where(id: params[:id]).first!
-    completions = service.completions.find_all { |completion| completion.downcase.include?(params[:query].downcase) }.first(3)
-    render json: { suggestions: completions.map {|completion| { value: completion, data: completion } } }.to_json
-  end
-
   private
 
   def supported_sharing_service_params
@@ -116,9 +84,7 @@ class SupportedSharingServicesController < ApplicationController
 
   def authorize_service(service_id)
     service_info = SupportedSharingService.info!(service_id)
-    if service_info[:service_type] == 'oauth2_pocket'
-      oauth2_pocket_request(service_id)
-    elsif service_info[:service_type] == 'oauth'
+    if service_info[:service_type] == 'oauth'
       oauth_request(service_id)
     elsif service_info[:service_type] == 'xauth' || service_info[:service_type] == 'pinboard'
       xauth_request(service_id)
@@ -150,24 +116,6 @@ class SupportedSharingServicesController < ApplicationController
     end
   end
 
-  def oauth2_pocket_request(service_id)
-    service_info = SupportedSharingService.info!(service_id)
-    klass = service_info[:klass].constantize.new
-    response = klass.request_token
-    if response.code == 200
-      token = response.parsed_response['code']
-      session[:oauth2_pocket_token] = token
-      redirect_to klass.redirect_url(token)
-    else
-      Honeybadger.notify(
-        error_class: "SupportedSharingServicesController#oauth2_pocket_request",
-        error_message: "#{service_info[:label]} failure",
-        parameters: {response: response}
-      )
-      redirect_to sharing_services_url, notice: "Unknown #{service_info[:label]} error."
-    end
-  end
-
   def oauth_request(service_id)
     service_info = SupportedSharingService.info!(service_id)
     klass = service_info[:klass].constantize.new
@@ -177,6 +125,11 @@ class SupportedSharingServicesController < ApplicationController
       session[:oauth_secret] = response.secret
       redirect_to response.authorize_url
     else
+      Honeybadger.notify(
+        error_class: "SupportedSharingServicesController#oauth_request",
+        error_message: "#{service_info[:label]} failure",
+        parameters: {response: response}
+      )
       redirect_to sharing_services_url, notice: "Unknown #{SupportedSharingService.info(service_id)[:label]} error."
     end
   rescue OAuth => e

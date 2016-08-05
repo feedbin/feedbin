@@ -5,7 +5,7 @@ class SupportedSharingService < ActiveRecord::Base
       service_id: 'pocket',
       label: 'Pocket',
       requires_auth: true,
-      service_type: 'oauth2_pocket',
+      service_type: 'oauth',
       klass: 'Pocket'
     },
     {

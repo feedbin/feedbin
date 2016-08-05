@@ -41,6 +41,10 @@ class EvernoteShare < Service
     Rails.application.routes.url_helpers.oauth_response_supported_sharing_service_url('evernote', host: ENV['PUSH_URL'])
   end
 
+  def response_valid?(session, params)
+    params[:oauth_verifier].present?
+  end
+
   def share(params)
     @klass.update(default_option: params[:notebook_guid])
     authenticated_share(@klass, params)

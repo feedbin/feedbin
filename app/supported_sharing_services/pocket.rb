@@ -4,7 +4,7 @@ class Pocket < Service
   headers 'Content-Type' => 'application/json; charset=UTF-8', 'X-Accept' => 'application/json'
 
   PATHS = {
-    auth_authorize: '/v3/auth/authorize',
+    auth_authorize: '/auth/authorize',
     oauth_request: '/v3/oauth/request',
     oauth_authorize: '/v3/oauth/authorize',
     add: '/v3/add',
@@ -17,7 +17,7 @@ class Pocket < Service
     end
   end
 
-  def redirect_url(token)
+  def authorize_url(token)
     if token.present?
       uri = url_for(:auth_authorize)
       uri.query = { 'request_token' => token, 'redirect_uri' => redirect_uri }.to_query
@@ -31,25 +31,45 @@ class Pocket < Service
     options = {
       body: {consumer_key: ENV['POCKET_CONSUMER_KEY'], redirect_uri: redirect_uri}.to_json
     }
-    self.class.post(PATHS[:oauth_request], options)
+    response = self.class.post(PATHS[:oauth_request], options)
+    if response.code == 200
+      code = response.parsed_response['code']
+      OpenStruct.new(token: code, secret: code, authorize_url: authorize_url(code))
+    end
   end
 
-  def oauth2_pocket_authorize(code)
+  def authorize(code)
     options = {
       body: {consumer_key: ENV['POCKET_CONSUMER_KEY'], code: code}.to_json
     }
     self.class.post(PATHS[:oauth_authorize], options)
   end
 
+  def response_valid?(session, params)
+    response = authorize(session[:oauth_token])
+    valid = false
+    if response.code == 200
+      valid = true
+      @access_token = response.parsed_response['access_token']
+    elsif response.code != 403
+      raise OAuth::Unauthorized
+    end
+    valid
+  end
+
+  def request_access(*args)
+    OpenStruct.new(token: @access_token, access_secret: nil)
+  end
+
   def add(params)
     options = {
       body: { url: params['entry_url'], access_token: @access_token, consumer_key: ENV['POCKET_CONSUMER_KEY'] }.to_json
     }
-    self.class.post(PATHS[:oauth_authorize], options).code
+    self.class.post(PATHS[:add], options).code
   end
 
   def redirect_uri
-    Rails.application.routes.url_helpers.oauth2_pocket_response_supported_sharing_service_url('pocket', host: ENV['PUSH_URL'])
+    Rails.application.routes.url_helpers.oauth_response_supported_sharing_service_url('pocket', host: ENV['PUSH_URL'])
   end
 
   def share(params)
