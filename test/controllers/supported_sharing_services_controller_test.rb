@@ -44,7 +44,27 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
   end
 
   test "should authorize with pocket" do
+    code = 'code'
+    token = 'access_token'
 
+    stub_request(:post, Pocket.new.url_for(:oauth_request).to_s).
+      to_return(body: {code: code}.to_json, status: 200)
+
+    login_as @user
+    post :create, supported_sharing_service: {service_id: 'pocket', operation: 'authorize'}
+    assert_redirected_to Pocket.new.redirect_url(code)
+
+    stub_request(:post, Pocket.new.url_for(:oauth_authorize).to_s).
+      with(body: hash_including({'code' => code})).
+      to_return(body: {access_token: token}.to_json, status: 200)
+
+    assert_difference "SupportedSharingService.count", +1 do
+      get :oauth2_pocket_response, id: 'pocket'
+      assert_redirected_to sharing_services_url
+    end
+
+    pocket = @user.supported_sharing_services.where(service_id: 'pocket').take
+    assert_equal token, pocket.settings['access_token']
   end
 
 end

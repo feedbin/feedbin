@@ -1,7 +1,14 @@
 class Pocket < Service
   include HTTParty
-  base_uri 'https://getpocket.com/v3'
+  base_uri 'https://getpocket.com'
   headers 'Content-Type' => 'application/json; charset=UTF-8', 'X-Accept' => 'application/json'
+
+  PATHS = {
+    auth_authorize: '/v3/auth/authorize',
+    oauth_request: '/v3/oauth/request',
+    oauth_authorize: '/v3/oauth/authorize',
+    add: '/v3/add',
+  }
 
   def initialize(klass = nil)
     @klass = klass
@@ -12,8 +19,7 @@ class Pocket < Service
 
   def redirect_url(token)
     if token.present?
-      uri = URI.parse(self.class.base_uri)
-      uri.path = '/auth/authorize'
+      uri = url_for(:auth_authorize)
       uri.query = { 'request_token' => token, 'redirect_uri' => redirect_uri }.to_query
       uri.to_s
     else
@@ -25,21 +31,21 @@ class Pocket < Service
     options = {
       body: {consumer_key: ENV['POCKET_CONSUMER_KEY'], redirect_uri: redirect_uri}.to_json
     }
-    self.class.post('/oauth/request', options)
+    self.class.post(PATHS[:oauth_request], options)
   end
 
   def oauth2_pocket_authorize(code)
     options = {
       body: {consumer_key: ENV['POCKET_CONSUMER_KEY'], code: code}.to_json
     }
-    self.class.post('/oauth/authorize', options)
+    self.class.post(PATHS[:oauth_authorize], options)
   end
 
   def add(params)
     options = {
       body: { url: params['entry_url'], access_token: @access_token, consumer_key: ENV['POCKET_CONSUMER_KEY'] }.to_json
     }
-    self.class.post('/add', options).code
+    self.class.post(PATHS[:oauth_authorize], options).code
   end
 
   def redirect_uri
@@ -48,6 +54,10 @@ class Pocket < Service
 
   def share(params)
     authenticated_share(@klass, params)
+  end
+
+  def url_for(path)
+    URI.join(self.class.base_uri, PATHS[path])
   end
 
 end
