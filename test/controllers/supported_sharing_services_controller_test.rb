@@ -43,4 +43,8 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
     assert data.length, options.length
   end
 
+  test "should authorize with pocket" do
+
+  end
+
 end

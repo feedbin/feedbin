@@ -19,6 +19,7 @@ group :test do
   gem 'test_after_commit'
   gem 'stripe-ruby-mock', require: 'stripe_mock'
   gem 'faker'
+  gem 'webmock'
 end
 
 group :production do

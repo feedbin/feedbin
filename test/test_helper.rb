@@ -7,6 +7,7 @@ require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 require 'minitest/autorun'
 require 'sidekiq/testing'
+require 'webmock/minitest'
 
 require 'login_helper'
 require 'factory_helper'
@@ -14,6 +15,7 @@ require 'support/dummy_server'
 
 ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
 StripeMock.webhook_fixture_path = './test/fixtures/stripe_webhooks/'
+WebMock.disable_net_connect!(allow_localhost: true)
 
 class ActiveSupport::TestCase
   include LoginHelper

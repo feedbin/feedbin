@@ -138,6 +138,8 @@ GEM
     coffee-script-source (1.10.0)
     concurrent-ruby (1.0.2)
     connection_pool (2.2.0)
+    crack (0.4.3)
+      safe_yaml (~> 1.0.0)
     crass (1.0.2)
     css_parser (1.4.5)
       addressable
@@ -310,6 +312,7 @@ GEM
     formatador (0.2.5)
     globalid (0.3.6)
       activesupport (>= 4.1.0)
+    hashdiff (0.3.0)
     hashie (3.4.4)
     hetchy (1.0.0)
     highline (1.7.8)
@@ -452,6 +455,7 @@ GEM
       nokogiri
     rmagick (2.15.4)
     rubyzip (1.1.0)
+    safe_yaml (1.0.4)
     sanitize (4.0.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.4.4)
@@ -519,6 +523,10 @@ GEM
       kgio (~> 2.6)
       raindrops (~> 0.7)
     uuidtools (2.1.5)
+    webmock (2.1.0)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff
     will_paginate (3.1.0)
     xipio (1.0.0)
       railties (>= 3)
@@ -593,6 +601,7 @@ DEPENDENCIES
   therubyracer
   uglifier
   unicorn
+  webmock
   will_paginate
   xipio
 
