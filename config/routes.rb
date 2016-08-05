@@ -62,11 +62,9 @@ Feedbin::Application.routes.draw do
 
   resources :supported_sharing_services, only: [:create, :destroy, :update] do
     member do
-      get :oauth2_pocket_request
       get :oauth2_pocket_response
       get :oauth_response
       get :autocomplete
-      post :xauth_request
       match 'share/:entry_id', to: 'supported_sharing_services#share', as: :share, via: [:get, :post]
     end
   end

@@ -36,47 +36,11 @@ class SupportedSharingServicesController < ApplicationController
     end
   end
 
-  def authorize_service(service_id)
-    service_info = SupportedSharingService.info!(service_id)
-    if service_info[:service_type] == 'oauth2_pocket'
-      oauth2_pocket_request(service_id)
-    elsif service_info[:service_type] == 'oauth'
-      oauth_request(service_id)
-    elsif service_info[:service_type] == 'xauth' || service_info[:service_type] == 'pinboard'
-      xauth_request(service_id)
-    end
-  end
-
   def share
     @user = current_user
     sharing_service = @user.supported_sharing_services.where(id: params[:id]).first!
     Librato.increment('supported_sharing_services.share', source: sharing_service.service_id)
     @response = sharing_service.share(params)
-  end
-
-  def xauth_request(service_id)
-    @user = current_user
-    service_info = SupportedSharingService.info!(service_id)
-    klass = service_info[:klass].constantize.new
-
-    begin
-      response = klass.request_token(params[:username], params[:password])
-      if response.token && response.secret
-        supported_sharing_service = @user.supported_sharing_services.where(service_id: service_id).first_or_initialize
-        supported_sharing_service.update(access_token: response.token, access_secret: response.secret)
-        if supported_sharing_service.errors.any?
-          redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
-        else
-          redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
-        end
-      else
-        redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
-      end
-    rescue OAuth::Unauthorized
-      redirect_to sharing_services_url, alert: "Invalid #{service_info[:label]} login."
-    rescue
-      redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
-    end
   end
 
   def oauth2_pocket_response
@@ -150,6 +114,41 @@ class SupportedSharingServicesController < ApplicationController
     params.require(:supported_sharing_service).permit(:service_id, :email_name, :email_address, :kindle_address)
   end
 
+  def authorize_service(service_id)
+    service_info = SupportedSharingService.info!(service_id)
+    if service_info[:service_type] == 'oauth2_pocket'
+      oauth2_pocket_request(service_id)
+    elsif service_info[:service_type] == 'oauth'
+      oauth_request(service_id)
+    elsif service_info[:service_type] == 'xauth' || service_info[:service_type] == 'pinboard'
+      xauth_request(service_id)
+    end
+  end
+
+  def xauth_request(service_id)
+    @user = current_user
+    service_info = SupportedSharingService.info!(service_id)
+    klass = service_info[:klass].constantize.new
+
+    begin
+      response = klass.request_token(params[:username], params[:password])
+      if response.token && response.secret
+        supported_sharing_service = @user.supported_sharing_services.where(service_id: service_id).first_or_initialize
+        supported_sharing_service.update(access_token: response.token, access_secret: response.secret)
+        if supported_sharing_service.errors.any?
+          redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
+        else
+          redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
+        end
+      else
+        redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
+      end
+    rescue OAuth::Unauthorized
+      redirect_to sharing_services_url, alert: "Invalid #{service_info[:label]} login."
+    rescue
+      redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
+    end
+  end
 
   def oauth2_pocket_request(service_id)
     service_info = SupportedSharingService.info!(service_id)
