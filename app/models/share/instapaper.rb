@@ -1,4 +1,4 @@
-class Instapaper < Service
+class Share::Instapaper < Share::Service
   URL = "https://www.instapaper.com"
 
   def initialize(klass = nil)

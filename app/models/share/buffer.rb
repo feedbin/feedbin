@@ -1,4 +1,4 @@
-class Buffer < Service
+class Share::Buffer < Share::Service
   URL = 'http://bufferapp.com/add'
 
   def initialize(klass = nil)

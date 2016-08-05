@@ -1,4 +1,4 @@
-class Pocket < Service
+class Share::Pocket < Share::Service
   include HTTParty
   base_uri 'https://getpocket.com'
   headers 'Content-Type' => 'application/json; charset=UTF-8', 'X-Accept' => 'application/json'

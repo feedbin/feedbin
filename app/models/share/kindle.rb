@@ -1,4 +1,4 @@
-class Kindle < Service
+class Share::Kindle < Share::Service
   def initialize(klass)
     @klass = klass
   end

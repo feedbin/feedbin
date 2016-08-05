@@ -1,4 +1,4 @@
-class Readability < Service
+class Share::Readability < Share::Service
   URL = "https://www.readability.com"
 
   def initialize(klass = nil)

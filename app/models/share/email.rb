@@ -1,4 +1,4 @@
-class Email < Service
+class Share::Email < Share::Service
 
   def initialize(klass)
     @klass = klass

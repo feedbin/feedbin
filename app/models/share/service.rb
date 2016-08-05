@@ -1,4 +1,4 @@
-class Service
+class Share::Service
   def authenticated_share(klass, params)
     response = {}
     entry = Entry.find(params[:entry_id])

@@ -1,5 +1,5 @@
-class Facebook < Service
-  URL = 'https://www.facebook.com/sharer/sharer.php'
+class Share::Twitter < Share::Service
+  URL = 'https://twitter.com/intent/tweet'
 
   def initialize(klass = nil)
     @klass = klass
@@ -10,7 +10,7 @@ class Facebook < Service
       entry = Entry.find(params[:entry_id])
     end
     uri = URI.parse(URL)
-    uri.query = { 'u' => entry.fully_qualified_url, 'display' => 'popup' }.to_query
+    uri.query = { 'url' => entry.fully_qualified_url, 'text' => entry.title }.to_query
     {text: "feedbin.sharePopup('#{uri.to_s}'); return false;"}
   end
 

@@ -1,4 +1,4 @@
-class Tumblr < Service
+class Share::Tumblr < Share::Service
   URL = "http://www.tumblr.com"
   API_URL = "https://api.tumblr.com/v2"
 

@@ -1,4 +1,4 @@
-class AppDotNet < Service
+class Share::AppDotNet < Share::Service
   URL = 'https://account.app.net/intent/post'
 
   def initialize(klass = nil)

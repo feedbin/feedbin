@@ -1,4 +1,4 @@
-class EvernoteShare < Service
+class Share::EvernoteShare < Share::Service
   URL = "https://www.evernote.com"
 
   # 1. evernote = EvernoteShare.new

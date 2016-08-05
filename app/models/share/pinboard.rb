@@ -1,4 +1,4 @@
-class Pinboard < Service
+class Share::Pinboard < Share::Service
   include HTTParty
   base_uri 'https://api.pinboard.in/v1'
 
