@@ -1,0 +1,22 @@
+require 'test_helper'
+
+class UpdatedEntriesControllerTest < ActionController::TestCase
+
+  setup do
+    flush_redis
+    @user = users(:new)
+    @feeds = create_feeds(@user)
+    @entries = @user.entries
+    @updated = @entries.each do |entry|
+      UpdatedEntry.create_from_owners(@user.id, entry)
+    end
+  end
+
+  test "should get index" do
+    login_as @user
+    xhr :get, :index
+    assert_response :success
+    assert_equal @updated.length, assigns(:entries).length
+  end
+
+end
