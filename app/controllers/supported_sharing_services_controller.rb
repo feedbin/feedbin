@@ -39,7 +39,6 @@ class SupportedSharingServicesController < ApplicationController
   def share
     @user = current_user
     sharing_service = @user.supported_sharing_services.where(id: params[:id]).first!
-    puts sharing_service.service.inspect
     Librato.increment('supported_sharing_services.share', source: sharing_service.service_id)
     @response = sharing_service.share(params)
   end
