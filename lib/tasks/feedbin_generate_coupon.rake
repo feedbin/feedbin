@@ -11,7 +11,7 @@ namespace :feedbin  do
         scheme: Rails.application.config.force_ssl ? 'https' : 'http',
         host: Rails.application.config.action_mailer.default_url_options[:host],
         path: '/signup',
-        query: "coupon=#{coupon.coupon_code}"
+        query: "coupon_code=#{coupon.coupon_code}"
       )
       puts "----------------------------------------------"
       puts "Coupon id: #{coupon.coupon_code}"

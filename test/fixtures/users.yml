@@ -11,6 +11,7 @@ ann:
   password_digest: <%= default_password_digest %>
   auth_token: <%= SecureRandom.hex %>
   inbound_email_token: <%= SecureRandom.hex %>
+  plan: trial
 
 new:
   email: new@example.com

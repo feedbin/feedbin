@@ -1,6 +1,7 @@
 class User < ActiveRecord::Base
 
-  attr_accessor :stripe_token, :old_password_valid, :update_auth_token, :password_reset, :coupon_code, :is_trialing
+  attr_accessor :stripe_token, :old_password_valid, :update_auth_token,
+                :password_reset, :coupon_code, :is_trialing, :coupon_valid
 
   has_secure_password
 
@@ -69,8 +70,11 @@ class User < ActiveRecord::Base
   before_create { generate_token(:inbound_email_token, 4) }
   before_create { generate_token(:newsletter_token, 4) }
 
+  after_create { schedule_trial_jobs }
+
   before_destroy :cancel_billing, unless: -> user { user.admin }
   before_destroy :create_deleted_user
+  before_destroy :record_stats
 
   validate :changed_password, on: :update, unless: -> user { user.password_reset }
   validate :coupon_code_valid, on: :create, if: -> user { user.coupon_code }
@@ -89,8 +93,35 @@ class User < ActiveRecord::Base
     self.font_size = 7
   end
 
+  def with_params(params)
+    if params[:coupon_code].present?
+      coupon = Coupon.find_by(coupon_code: params[:coupon_code])
+      self.coupon_valid = coupon.present? && !coupon.redeemed
+      self.coupon_code = params[:coupon_code]
+    end
+
+    if self.coupon_valid || !ENV['STRIPE_API_KEY']
+      self.free_ok = true
+      self.plan = Plan.find_by_stripe_id('free')
+    else
+      self.plan = Plan.find_by_stripe_id('trial')
+    end
+
+    if params[:user] && params[:user][:password]
+      self.password_confirmation = params[:user][:password]
+    end
+    self
+  end
+
   def get_view_mode
     view_mode || "view_unread"
+  end
+
+  def schedule_trial_jobs
+    if self.plan.stripe_id != 'free'
+      send_notice = Feedbin::Application.config.trial_days - 1
+      TrialSendExpiration.perform_in(send_notice.days, self.id)
+    end
   end
 
   def get_favicon_hash
@@ -307,6 +338,14 @@ class User < ActiveRecord::Base
 
   def create_deleted_user
     DeletedUser.create(email: self.email, customer_id: self.customer_id)
+  end
+
+  def record_stats
+    if self.plan.stripe_id == 'trial'
+      Librato.increment('user.trial.cancel')
+    else
+      Librato.increment('user.paid.cancel')
+    end
   end
 
   def activate

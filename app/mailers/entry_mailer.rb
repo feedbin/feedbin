@@ -15,7 +15,7 @@ class EntryMailer < ActionMailer::Base
       subject = entry.title
     end
 
-    article = Service.determine_content({entry_id: entry_id, readability: readability})
+    article = Share::Service.determine_content({entry_id: entry_id, readability: readability})
     article = render_entry(entry, article, message)
     premailer = Premailer.new(article, with_html_string: true)
 
