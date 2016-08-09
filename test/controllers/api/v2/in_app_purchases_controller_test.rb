@@ -32,7 +32,7 @@ class Api::V2::InAppPurchasesControllerTest < ApiControllerTestCase
       end
       assert_response :success
     end
-    assert_equal(time + product_options[:time], @user.reload.expires_at)
+    assert_equal((time + product_options[:time]).iso8601, @user.reload.expires_at.iso8601)
   end
 
 end

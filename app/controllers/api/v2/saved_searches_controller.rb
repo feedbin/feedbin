@@ -38,10 +38,6 @@ module Api
         end
       end
 
-      def out_of_bounds?
-        @entries.out_of_bounds? || (params[:page] && params[:page].to_i > 5)
-      end
-
       def create
         @user = current_user
         @saved_search = @user.saved_searches.create(saved_search_params)
@@ -77,6 +73,10 @@ module Api
 
       def validate_create
         needs 'query', 'name'
+      end
+
+      def out_of_bounds?
+        @entries.out_of_bounds? || (params[:page] && params[:page].to_i > 5)
       end
 
     end
