@@ -16,7 +16,7 @@ class EntriesControllerTest < ActionController::TestCase
   end
 
   test "should get unread" do
-    mark_unread
+    mark_unread(@user)
     @user.unread_entries.where(entry_id: @entries.first.id).delete_all
     login_as @user
     xhr :get, :unread
@@ -151,7 +151,7 @@ class EntriesControllerTest < ActionController::TestCase
       assert_response :success
     end
 
-    mark_unread
+    mark_unread(@user)
 
     assert_difference('UnreadEntry.count', -entries.total_entries) do
       xhr :post, :mark_all_as_read, type: 'search', data: saved_search.query
@@ -201,14 +201,5 @@ class EntriesControllerTest < ActionController::TestCase
     get :newsletter, id: entry.public_id
     assert_response :success
   end
-
-  private
-
-  def mark_unread
-    @user.entries.each do |entry|
-      UnreadEntry.create_from_owners(@user, entry)
-    end
-  end
-
 
 end

@@ -16,8 +16,14 @@ module FactoryHelper
       title: Faker::Lorem.sentence,
       url: Faker::Internet.url,
       content: Faker::Lorem.paragraph,
-      public_id: Faker::Internet.slug,
+      public_id: SecureRandom.hex,
     )
     SearchIndexStore.new().perform("Entry", entry.id)
+  end
+
+  def mark_unread(user)
+    user.entries.each do |entry|
+      UnreadEntry.create_from_owners(user, entry)
+    end
   end
 end
