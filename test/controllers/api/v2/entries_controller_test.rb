@@ -21,6 +21,7 @@ class Api::V2::EntriesControllerTest < ApiControllerTestCase
     puts "allowed: #{allowed_feed_ids}"
     puts "actual: #{entries.map(&:feed_id)}"
     puts "id request: #{ids}"
+    puts "per page: #{Entry.per_page}"
     assert_response :success
     assert_equal_ids(entries, parse_json)
   end
