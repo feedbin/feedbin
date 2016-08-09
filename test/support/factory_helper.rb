@@ -1,8 +1,11 @@
 module FactoryHelper
 
   def create_feeds(user)
+    flush_redis
     feeds = 3.times.map do
-      Feed.create(feed_url: Faker::Internet.url).tap do |feed|
+      url = Faker::Internet.url
+      host = URI(url).host
+      Feed.create(feed_url: url, host: host).tap do |feed|
         user.subscriptions.where(feed: feed).first_or_create
         create_entry(feed)
       end

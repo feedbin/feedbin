@@ -3,7 +3,6 @@ require 'test_helper'
 class Api::V2::ActionsControllerTest < ApiControllerTestCase
 
   setup do
-    flush_redis
     @user = users(:new)
     @feeds = create_feeds(@user)
     @entries = @user.entries

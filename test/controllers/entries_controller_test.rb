@@ -2,7 +2,6 @@ require 'test_helper'
 
 class EntriesControllerTest < ActionController::TestCase
   setup do
-    flush_redis
     @user = users(:new)
     @feeds = create_feeds(@user)
     @entries = @user.entries

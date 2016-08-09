@@ -3,7 +3,6 @@ require 'test_helper'
 class FeedsEntriesControllerTest < ActionController::TestCase
 
   test "gets the index" do
-    flush_redis
     user = users(:new)
     feeds = create_feeds(user)
     entries = user.entries

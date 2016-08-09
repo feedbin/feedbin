@@ -3,7 +3,6 @@ require 'test_helper'
 class UpdatedEntriesControllerTest < ActionController::TestCase
 
   setup do
-    flush_redis
     @user = users(:new)
     @feeds = create_feeds(@user)
     @entries = @user.entries
