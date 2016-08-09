@@ -21,3 +21,9 @@ basic_yearly_2:
   name: Yearly
   price: 0
   price_tier: 2
+
+timed:
+  stripe_id: timed
+  name: Timed
+  price: 0
+  price_tier: 2

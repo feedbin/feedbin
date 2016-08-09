@@ -20,3 +20,9 @@ new:
   starred_token: <%= SecureRandom.hex %>
   plan: basic_monthly_2
   customer_id: cus_new
+
+timed:
+  email: timed@example.com
+  password_digest: <%= default_password_digest %>
+  plan: timed
+  customer_id: cus_timed
