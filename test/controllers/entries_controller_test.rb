@@ -141,7 +141,6 @@ class EntriesControllerTest < ActionController::TestCase
 
     login_as @user
 
-    index_entries
     entries = @user.entries.first(2)
 
     saved_search = @user.saved_searches.create(query: "\"#{entries.first.title}\" OR \"#{entries.last.title}\"", name: 'test')
@@ -182,7 +181,6 @@ class EntriesControllerTest < ActionController::TestCase
 
   test "should get search" do
     login_as @user
-    index_entries
     xhr :get, :search, query: "\"#{@entries.first.title}\""
     assert_response :success
     assert_equal 1, assigns(:entries).total_entries
@@ -205,13 +203,6 @@ class EntriesControllerTest < ActionController::TestCase
   end
 
   private
-
-  def index_entries
-    @user.entries.each do |entry|
-      SearchIndexStore.new().perform("Entry", entry.id)
-    end
-    Entry.__elasticsearch__.refresh_index!
-  end
 
   def mark_unread
     @user.entries.each do |entry|
