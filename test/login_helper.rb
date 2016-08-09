@@ -3,7 +3,11 @@ require "bcrypt"
 module LoginHelper
 
   def login_as(user)
-    cookies.signed[:auth_token] = user.auth_token
+    if @request.subdomain == 'api'
+      @request.headers[:authorization] = ActionController::HttpAuthentication::Basic.encode_credentials(user.email, default_password)
+    else
+      cookies.signed[:auth_token] = user.auth_token
+    end
   end
 
   def default_password_digest

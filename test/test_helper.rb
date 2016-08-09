@@ -11,7 +11,9 @@ require 'webmock/minitest'
 
 require 'login_helper'
 require 'factory_helper'
+require 'support/assertions'
 require 'support/dummy_server'
+require 'support/api_controller_test_case'
 
 ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
 StripeMock.webhook_fixture_path = './test/fixtures/stripe_webhooks/'
@@ -36,5 +38,9 @@ class ActiveSupport::TestCase
         redis.flushdb
       end
     end
+  end
+
+  def parse_json
+    JSON.parse(@response.body)
   end
 end
