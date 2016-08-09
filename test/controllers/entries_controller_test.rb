@@ -136,6 +136,7 @@ class EntriesControllerTest < ActionController::TestCase
   end
 
   test "marks saved search read" do
+    original_per_page = Entry.per_page
     Entry.per_page = 1
 
     login_as @user
@@ -157,6 +158,7 @@ class EntriesControllerTest < ActionController::TestCase
       assert_response :success
     end
 
+    Entry.per_page = original_per_page
   end
 
   test "mark specific ids read" do
