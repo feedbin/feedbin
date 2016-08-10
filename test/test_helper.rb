@@ -43,4 +43,10 @@ class ActiveSupport::TestCase
   def parse_json
     JSON.parse(@response.body)
   end
+
+  def stub_request_file(file, url)
+    file = File.join(Rails.root, 'test/support/www', file)
+    stub_request(:get, url).
+      to_return(body: File.new(file), status: 200)
+  end
 end

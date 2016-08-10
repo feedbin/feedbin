@@ -23,14 +23,10 @@ class Api::V2::SubscriptionsControllerTest < ApiControllerTestCase
 
   test "should create subscription" do
     api_content_type
-    html_file = File.join(Rails.root, "test/support/www/index.html")
-    html_url = "www.example.com/index.html"
-    stub_request(:get, html_url).
-      to_return(body: File.new(html_file), status: 200)
 
-    xml_file = File.join(Rails.root, "test/support/www/atom.xml")
-    stub_request(:get, "www.example.com/atom.xml").
-      to_return(body: File.new(xml_file), status: 200)
+    html_url = "www.example.com/index.html"
+    stub_request_file('index.html', html_url)
+    stub_request_file('atom.xml', "www.example.com/atom.xml")
 
     login_as @user
     assert_difference "Subscription.count", +1 do
