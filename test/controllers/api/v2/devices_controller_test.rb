@@ -7,7 +7,7 @@ class Api::V2::DevicesControllerTest < ApiControllerTestCase
   end
 
   test "should create device" do
-    @request.headers["Content-Type"] = "application/json; charset=utf-8"
+    api_content_type
     login_as @user
 
     assert_difference "Device.count", +1 do

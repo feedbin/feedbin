@@ -90,7 +90,11 @@ module Api
       end
 
       def needs(*keys)
-        missing = keys.reject { |key| params.has_key? key }
+        needs_nested(params, *keys)
+      end
+
+      def needs_nested(parameters, *keys)
+        missing = keys.reject { |key| parameters.has_key? key }
         if missing.any?
           @error = {status: 400, errors: []}
           missing.map {|key| @error[:errors] << {key => "Missing parameter: #{key}"}}

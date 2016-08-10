@@ -21,7 +21,7 @@ class Api::V2::RecentlyReadEntriesControllerTest < ApiControllerTestCase
   end
 
   test "should create recently read entry" do
-    @request.headers["Content-Type"] = "application/json; charset=utf-8"
+    api_content_type
     entry = @entries.sample
 
     login_as @user

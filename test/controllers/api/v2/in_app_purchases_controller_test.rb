@@ -7,7 +7,7 @@ class Api::V2::InAppPurchasesControllerTest < ApiControllerTestCase
   end
 
   test "should create in_app_purchase" do
-    @request.headers["Content-Type"] = "application/json; charset=utf-8"
+    api_content_type
     login_as @user
     product_id, product_options = Feedbin::Application.config.iap.to_a.sample
 

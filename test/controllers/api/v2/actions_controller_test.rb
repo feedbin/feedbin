@@ -29,7 +29,7 @@ class Api::V2::ActionsControllerTest < ApiControllerTestCase
   end
 
   test "should create action" do
-    @request.headers["Content-Type"] = "application/json; charset=utf-8"
+    api_content_type
     login_as @user
     assert_difference "Action.count", +1 do
       post :create, format: :json, action_params: {
@@ -42,7 +42,7 @@ class Api::V2::ActionsControllerTest < ApiControllerTestCase
   end
 
   test "should update action" do
-    @request.headers["Content-Type"] = "application/json; charset=utf-8"
+    api_content_type
     login_as @user
     action = @actions.first
     query = "#{action.query} new"
