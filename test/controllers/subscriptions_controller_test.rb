@@ -4,12 +4,6 @@ class SubscriptionsControllerTest < ActionController::TestCase
 
   setup do
     @user = users(:ben)
-    @server = DummyServer.new()
-    @server.listen
-  end
-
-  teardown do
-    @server.stop
   end
 
   test "should get index" do
@@ -19,9 +13,19 @@ class SubscriptionsControllerTest < ActionController::TestCase
   end
 
   test "should create subscription" do
+    html_file = File.join(Rails.root, "test/support/www/index.html")
+    html_url = "www.example.com/index.html"
+    stub_request(:get, html_url).
+      to_return(body: File.new(html_file), status: 200)
+
+    xml_file = File.join(Rails.root, "test/support/www/atom.xml")
+    stub_request(:get, "www.example.com/atom.xml").
+      to_return(body: File.new(xml_file), status: 200)
+
+
     login_as @user
     assert_difference "Subscription.count", +1 do
-      xhr :post, :create, subscription: {feeds: {feed_url: @server.url("/index.html")}}
+      xhr :post, :create, subscription: {feeds: {feed_url: html_url}}
       assert_response :success
     end
   end
