@@ -100,7 +100,7 @@ GEM
       connection_pool (~> 2.0)
       net-http2 (~> 0.12.0)
     arel (6.0.3)
-    autoprefixer-rails (6.3.6.2)
+    autoprefixer-rails (6.4.0.2)
       execjs
     bcrypt (3.1.11)
     bcrypt-ruby (3.1.5)
