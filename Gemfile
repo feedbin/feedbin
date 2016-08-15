@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails'
+gem 'rails', '= 4.2.7.1'
 
 group :development do
   gem 'better_errors'
