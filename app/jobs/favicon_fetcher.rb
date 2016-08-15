@@ -133,7 +133,7 @@ class FaviconFetcher
 
   def updated_recently?
     if @favicon.updated_at
-      @favicon.updated_at > 1.day.ago
+      @favicon.updated_at > 1.hour.ago
     else
       false
     end

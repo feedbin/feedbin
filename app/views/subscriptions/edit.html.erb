@@ -85,6 +85,13 @@
             <p class="control-group-description">
                 Tells you when an article has been changed after being published
             </p>
+
+            <ul class="control-group control-group-form">
+                <li>
+                    <%= link_to 'Refresh Favicon', refresh_favicon_subscription_path(@subscription), remote: true, method: :post %>
+                </li>
+            </ul>
+
         </div>
     </div>
     <% end %>

@@ -93,4 +93,15 @@ class SubscriptionsControllerTest < ActionController::TestCase
     end
   end
 
+  test "should refresh favicon" do
+    Sidekiq::Worker.clear_all
+    login_as @user
+    subscription = @user.subscriptions.first
+
+    assert_difference "FaviconFetcher.jobs.size", +1 do
+      xhr :post, :refresh_favicon, id: subscription
+      assert_response :success
+    end
+  end
+
 end
