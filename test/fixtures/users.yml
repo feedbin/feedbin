@@ -5,6 +5,7 @@ ben:
   customer_id: cus_123
   plan: basic_monthly_2
   newsletter_token: <%= SecureRandom.hex %>
+  admin: true
 
 ann:
   email: ann@example.com

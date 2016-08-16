@@ -1,4 +1,7 @@
 class ConditionalHTTP
+
+  attr_reader :etag, :last_modified
+
   def initialize(etag, last_modified)
     @etag = etag
     @last_modified = last_modified
@@ -15,16 +18,16 @@ class ConditionalHTTP
 
   def if_none_match
     @if_none_match ||= begin
-      @etag if @etag
+      etag if etag
     end
   end
 
   def if_modified_since
     @if_modified_since ||= begin
-      if @last_modified.respond_to?(:httpdate)
-        @last_modified.httpdate
+      if last_modified.respond_to?(:httpdate)
+        last_modified.httpdate
       else
-        Time.parse(@last_modified).httpdate if @last_modified
+        Time.parse(last_modified).httpdate if last_modified
       end
     end
   rescue
