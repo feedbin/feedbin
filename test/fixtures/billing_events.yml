@@ -1,0 +1,7 @@
+one:
+  details:
+    - <%= SecureRandom.hex %>
+
+two:
+  details:
+    - <%= SecureRandom.hex %>
