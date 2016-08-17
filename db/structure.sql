@@ -112,7 +112,8 @@ CREATE TABLE billing_events (
     billable_type character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    event_id character varying(255)
+    event_id character varying(255),
+    info json
 );
 
 
@@ -2060,4 +2061,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160126003712');
 INSERT INTO schema_migrations (version) VALUES ('20160504184656');
 
 INSERT INTO schema_migrations (version) VALUES ('20160709063934');
+
+INSERT INTO schema_migrations (version) VALUES ('20160817165958');
 
