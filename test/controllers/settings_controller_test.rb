@@ -46,7 +46,6 @@ class SettingsControllerTest < ActionController::TestCase
     events.each do |event|
       BillingEvent.create(details: event)
     end
-    StripeMock.stop
 
     login_as @user
     get :billing
@@ -54,6 +53,7 @@ class SettingsControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:next_payment_date)
     assert assigns(:billing_events).present?
+    StripeMock.stop
   end
 
   test "should get import_export" do

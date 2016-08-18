@@ -1,5 +1,7 @@
 class BillingEvent < ActiveRecord::Base
-  serialize :details
+
+  attr_accessor :details
+
   belongs_to :billable, polymorphic: true
 
   validates_uniqueness_of :event_id
@@ -7,21 +9,22 @@ class BillingEvent < ActiveRecord::Base
   before_validation :build_event
   after_commit :process_event, on: :create
 
+  def details
+    @details ||= Stripe::StripeObject.construct_from(self.info)
+  end
+
   def build_event
     self.event_type = details.type
     self.event_id = details.id
     self.info = details.as_json
 
-    if details.data.object['customer'].present?
-      customer = details.data.object.customer
-    elsif details.type == 'customer.created'
+    customer = details.data.object.try(:customer)
+    if details.type == "customer.created"
       customer = details.data.object.id
-    else
-      customer = nil
     end
 
     if customer
-      self.billable = User.where(customer_id: customer).first
+      self.billable = User.find_by_customer_id(customer)
     end
   end
 

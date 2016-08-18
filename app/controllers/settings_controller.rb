@@ -51,7 +51,7 @@ class SettingsController < ApplicationController
     @next_payment = @next_payment.to_a.sort_by {|next_payment| -next_payment.details.data.object.date }
     if @next_payment.present?
       @next_payment.first.details.data.object.lines.data.each do |event|
-        event = event.to_hash
+        event = event.to_hash.with_indifferent_access
         if event[:type] && event[:type] == 'subscription'
           @next_payment_date = Time.at(event[:period].end).utc.to_datetime
         end
