@@ -100,8 +100,6 @@ class SettingsController < ApplicationController
   def update_plan
     @user = current_user
     plan = Plan.find(params[:plan])
-    customer = Stripe::Customer.retrieve(@user.customer_id)
-    customer.update_subscription(plan: plan.stripe_id)
     @user.plan = plan
     @user.save
     redirect_to settings_billing_path, notice: 'Plan successfully changed.'

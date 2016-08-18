@@ -229,7 +229,7 @@ class User < ActiveRecord::Base
       if email_changed? || stripe_token.present? || plan_id_changed?
         customer = Stripe::Customer.retrieve(customer_id)
         if stripe_token.present?
-          customer.card = stripe_token
+          customer.source = stripe_token
           self.suspended = false
           subscriptions.update_all(active: true)
         end
@@ -239,7 +239,7 @@ class User < ActiveRecord::Base
       end
     end
     unless customer.nil?
-      self.last_4_digits = customer.try(:active_card).try(:last4)
+      self.last_4_digits = customer.try(:sources).try(:data).try(:first).try(:last4)
       self.customer_id = customer.id
       self.stripe_token = nil
     end

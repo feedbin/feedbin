@@ -77,15 +77,17 @@ class SettingsControllerTest < ActionController::TestCase
 
   test "should update plan" do
     StripeMock.start
+    stripe_helper = StripeMock.create_test_helper
+
     plans = {
       original: plans(:basic_monthly_2),
       new: plans(:basic_yearly_2)
     }
     plans.each do |_, plan|
-      Stripe::Plan.create(id: plan.stripe_id, amount: plan.price)
+      create_stripe_plan(plan)
     end
 
-    customer = Stripe::Customer.create({email: @user.email, plan: plans[:original].stripe_id, card: 'card'})
+    customer = Stripe::Customer.create({email: @user.email, plan: plans[:original].stripe_id, source: stripe_helper.generate_card_token})
     @user.update(customer_id: customer.id)
     @user.reload.inspect
 
@@ -101,7 +103,7 @@ class SettingsControllerTest < ActionController::TestCase
     last4 = "1234"
     card_1 = StripeMock.generate_card_token(last4: "4242", exp_month: 99, exp_year: 3005)
     card_2 = StripeMock.generate_card_token(last4: last4, exp_month: 99, exp_year: 3005)
-    Stripe::Plan.create(id: plan.stripe_id, amount: plan.price)
+    create_stripe_plan(plan)
 
     user = User.create(
       email: 'cc@example.com',
@@ -116,7 +118,7 @@ class SettingsControllerTest < ActionController::TestCase
     assert_redirected_to settings_billing_url
 
     customer = Stripe::Customer.retrieve(user.customer_id)
-    assert_equal last4, customer.cards.first.last4
+    assert_equal last4, customer.sources.data.first.last4
     StripeMock.stop
   end
 

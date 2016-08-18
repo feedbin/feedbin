@@ -6,7 +6,7 @@ class Api::V2::UsersControllerTest < ApiControllerTestCase
     api_content_type
     StripeMock.start
     plan = plans(:trial)
-    Stripe::Plan.create(id: plan.stripe_id, amount: plan.price)
+    create_stripe_plan(plan)
 
     assert_difference "User.count", +1 do
       post :create, user: {email: 'example@example.com', password: default_password}, format: :json

@@ -49,4 +49,8 @@ class ActiveSupport::TestCase
     stub_request(:get, url).
       to_return(body: File.new(file), status: 200)
   end
+
+  def create_stripe_plan(plan)
+    Stripe::Plan.create(name: plan.name, id: plan.stripe_id, amount: plan.price, currency: "USD", interval: "day")
+  end
 end

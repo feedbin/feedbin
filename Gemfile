@@ -83,5 +83,5 @@ gem 'sidekiq'
 gem 'sinatra', require: nil
 
 # Stripe
-gem 'stripe', '= 1.9.9'
+gem 'stripe'
 gem 'stripe_event'
