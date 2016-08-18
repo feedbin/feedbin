@@ -14,7 +14,7 @@ class BillingEvent < ActiveRecord::Base
     self.event_id = info["id"]
 
     customer = event_object.dig("customer")
-    if info["type"] == "customer.created"
+    if event_object["object"] == "customer"
       customer = event_object["id"]
     end
 
