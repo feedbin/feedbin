@@ -61,7 +61,7 @@ class User < ActiveRecord::Base
 
   after_initialize :set_defaults, if: :new_record?
 
-  before_save :update_billing, unless: -> user { user.admin || !ENV['STRIPE_API_KEY'] }
+  before_save :update_billing, unless: -> { !ENV['STRIPE_API_KEY'] }
   before_save :strip_email
   before_save :activate_subscriptions
   before_save { reset_auth_token }
@@ -72,7 +72,7 @@ class User < ActiveRecord::Base
 
   after_create { schedule_trial_jobs }
 
-  before_destroy :cancel_billing, unless: -> user { user.admin }
+  before_destroy :cancel_billing, unless: -> { !ENV['STRIPE_API_KEY'] }
   before_destroy :create_deleted_user
   before_destroy :record_stats
 
