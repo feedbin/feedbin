@@ -9,18 +9,13 @@ class BillingEvent < ActiveRecord::Base
   before_validation :build_event
   after_commit :process_event, on: :create
 
-  def details
-    @details ||= Stripe::StripeObject.construct_from(self.info)
-  end
-
   def build_event
-    self.event_type = details.type
-    self.event_id = details.id
-    self.info = details.as_json
+    self.event_type = info["type"]
+    self.event_id = info["id"]
 
-    customer = details.data.object.try(:customer)
-    if details.type == "customer.created"
-      customer = details.data.object.id
+    customer = event_object.dig("customer")
+    if info["type"] == "customer.created"
+      customer = event_object["id"]
     end
 
     if customer
@@ -56,19 +51,19 @@ class BillingEvent < ActiveRecord::Base
 
   def subscription_deactivated?
     "customer.subscription.updated" == event_type &&
-    details.data.object.status == "unpaid"
+    event_object["status"] == "unpaid"
   end
 
   def subscription_reactivated?
     "customer.subscription.updated" == event_type &&
-    details.data.object.status == "active" &&
-    details.data.try(:[], :previous_attributes).try(:[], :status) == "unpaid"
+    event_object["status"] == "active" &&
+    info.dig("data", "previous_attributes", "status") == "unpaid"
   end
 
   def invoice
-    if self.event_type == "charge.succeeded"
-      Rails.cache.fetch("#{self.details.data.object.invoice}") do
-        JSON.parse(Stripe::Invoice.retrieve(self.details.data.object.invoice).to_json)
+    if event_type == "charge.succeeded"
+      Rails.cache.fetch("#{event_object["invoice"]}") do
+        JSON.parse(Stripe::Invoice.retrieve(event_object["invoice"]).to_json)
       end
     else
       nil
@@ -77,12 +72,20 @@ class BillingEvent < ActiveRecord::Base
 
   def invoice_items
     if self.event_type == "charge.succeeded"
-      Rails.cache.fetch("#{self.details.data.object.invoice}:lines") do
-        JSON.parse(Stripe::Invoice.retrieve(self.details.data.object.invoice).lines.all(limit: 10).to_json)
+      Rails.cache.fetch("#{event_object["invoice"]}:lines") do
+        JSON.parse(Stripe::Invoice.retrieve(event_object["invoice"]).lines.all(limit: 10).to_json)
       end
     else
       nil
     end
+  end
+
+  def details
+    @details ||= Stripe::StripeObject.construct_from(self.info)
+  end
+
+  def event_object
+    info["data"]["object"]
   end
 
 end

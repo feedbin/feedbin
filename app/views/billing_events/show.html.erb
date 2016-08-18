@@ -15,8 +15,8 @@
 <body>
     <h2 class="no-margin">Receipt</h2>
     <p>
-        <small>Invoice: <%= @billing_event.details.data.object.invoice %></small>
-        <br /><small><%= Time.at(@billing_event.details.data.object.created).to_s(:date) %></small>
+        <small>Invoice: <%= @billing_event.event_object["invoice"] %></small>
+        <br /><small><%= Time.at(@billing_event.event_object["created"]).to_s(:date) %></small>
     </p>
 
     <div class="customer-info">
@@ -64,7 +64,7 @@
         <% end %>
         <tr>
             <th align="left"><strong>Paid</strong></th>
-            <th align="right"><%= @billing_event.details.data.object.currency.upcase %> <strong><%= number_to_currency(@billing_event.details.data.object.amount.to_f / 100) %></strong></th>
+            <th align="right"><%= @billing_event.event_object["currency"].upcase %> <strong><%= number_to_currency(@billing_event.event_object["amount"].to_f / 100) %></strong></th>
         </tr>
     </table>
 

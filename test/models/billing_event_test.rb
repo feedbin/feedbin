@@ -14,7 +14,7 @@ class BillingEventTest < ActiveSupport::TestCase
     Sidekiq::Worker.clear_all
     assert_equal 0, Sidekiq::Extensions::DelayedMailer.jobs.size
     event = StripeMock.mock_webhook_event('charge.succeeded', webhook_defaults)
-    BillingEvent.create(details: event)
+    BillingEvent.create(info: event.as_json)
     assert_equal 1, Sidekiq::Extensions::DelayedMailer.jobs.size
     Sidekiq::Worker.clear_all
   end
@@ -23,7 +23,7 @@ class BillingEventTest < ActiveSupport::TestCase
     Sidekiq::Worker.clear_all
     assert_equal 0, Sidekiq::Extensions::DelayedMailer.jobs.size
     event = StripeMock.mock_webhook_event('invoice.payment_failed', webhook_defaults)
-    BillingEvent.create(details: event)
+    BillingEvent.create(info: event.as_json)
     assert_equal 1, Sidekiq::Extensions::DelayedMailer.jobs.size
     Sidekiq::Worker.clear_all
   end
@@ -31,7 +31,7 @@ class BillingEventTest < ActiveSupport::TestCase
   test "subscription_deactivated?" do
     assert @user.active?
     event = StripeMock.mock_webhook_event('customer.subscription.updated', webhook_defaults.merge(status: 'unpaid'))
-    BillingEvent.create(details: event)
+    BillingEvent.create(info: event.as_json)
     assert_not @user.reload.active?
   end
 
@@ -39,7 +39,7 @@ class BillingEventTest < ActiveSupport::TestCase
     assert @user.deactivate
     assert_not @user.reload.active?
     event = StripeMock.mock_webhook_event('customer.subscription.updated-custom', webhook_defaults.merge(status: 'active'))
-    BillingEvent.create(details: event)
+    BillingEvent.create(info: event.as_json)
     assert @user.reload.active?
   end
 

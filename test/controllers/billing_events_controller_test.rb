@@ -6,7 +6,7 @@ class BillingEventsControllerTest < ActionController::TestCase
     StripeMock.start
     event = StripeMock.mock_webhook_event('charge.succeeded', {customer: @user.customer_id})
     StripeMock.stop
-    @billing_event = BillingEvent.create(details: event)
+    @billing_event = BillingEvent.create(info: event.as_json)
   end
 
   test "should show billing_event" do

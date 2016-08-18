@@ -3,6 +3,6 @@ STRIPE_PUBLIC_KEY = ENV['STRIPE_PUBLIC_KEY']
 
 StripeEvent.setup do
   all do |event|
-    BillingEvent.create(details: event)
+    BillingEvent.create(info: event.as_json)
   end
 end

@@ -112,8 +112,8 @@
             <% end %>
             <% @billing_events.each do |invoice| %>
             <tr>
-              <td><%= Time.at(invoice.details.data.object.created).to_s(:date) %></td>
-              <td><%= invoice.details.data.object.currency.upcase %> <%= number_to_currency(invoice.details.data.object.amount.to_f / 100) %></td>
+              <td><%= Time.at(invoice.event_object["created"]).to_s(:date) %></td>
+              <td><%= invoice.event_object["currency"].upcase %> <%= number_to_currency(invoice.event_object["amount"].to_f / 100) %></td>
               <td><%= link_to 'Receipt', invoice %></td>
             </tr>
             <% end %>

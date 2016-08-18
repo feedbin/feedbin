@@ -44,7 +44,7 @@ class SettingsControllerTest < ActionController::TestCase
       StripeMock.mock_webhook_event('invoice.payment_succeeded', {customer: @user.customer_id})
     ]
     events.each do |event|
-      BillingEvent.create(details: event)
+      BillingEvent.create(info: event.as_json)
     end
 
     login_as @user
