@@ -372,7 +372,8 @@ CREATE TABLE feeds (
     host text,
     self_url text,
     feed_type integer DEFAULT 0,
-    active boolean DEFAULT true
+    active boolean DEFAULT true,
+    options json
 );
 
 
@@ -2063,4 +2064,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160504184656');
 INSERT INTO schema_migrations (version) VALUES ('20160709063934');
 
 INSERT INTO schema_migrations (version) VALUES ('20160817165958');
+
+INSERT INTO schema_migrations (version) VALUES ('20160822194302');
 
