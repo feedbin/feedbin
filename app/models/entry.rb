@@ -137,8 +137,9 @@ class Entry < ActiveRecord::Base
   end
 
   def ensure_published
-    if self.published.nil? || self.published > 1.day.from_now
-      self.published = DateTime.now
+    now = DateTime.now
+    if self.published.nil? || self.published > now
+      self.published = now
     end
     true
   end
