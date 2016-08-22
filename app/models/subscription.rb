@@ -16,6 +16,7 @@ class Subscription < ActiveRecord::Base
   before_create :refresh_feed
 
   before_destroy :untag
+  before_destroy :email_unsubscribe
 
   after_create :update_favicon_hash
 
@@ -84,6 +85,12 @@ class Subscription < ActiveRecord::Base
 
   def feed_already_existed?
     self.feed.created_at < 1.minute.ago
+  end
+
+  private
+
+  def email_unsubscribe
+    EmailUnsubscribe.perform_async(self.feed_id)
   end
 
 end

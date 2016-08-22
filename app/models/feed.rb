@@ -100,6 +100,10 @@ class Feed < ActiveRecord::Base
     )
   end
 
+  def list_unsubscribe
+    self.options.dig('email_headers', 'List-Unsubscribe')
+  end
+
   private
 
   def default_values
