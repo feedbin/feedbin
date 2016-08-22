@@ -19,7 +19,9 @@ class NewslettersController < ApplicationController
       feed = get_feed(newsletter)
       user.safe_subscribe(feed)
       feed.entries.create(entry)
-      feed.update(feed_type: :newsletter)
+      feed.feed_type = :newsletter
+      feed.options["email_headers"] = newsletter.headers
+      feed.save
     end
   end
 

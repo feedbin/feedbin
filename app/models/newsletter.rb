@@ -72,6 +72,12 @@ class Newsletter
     html ? "html" : "text"
   end
 
+  def headers
+    {
+      "List-Unsubscribe" => data["List-Unsubscribe"]
+    }
+  end
+
   private
 
   def parsed_from

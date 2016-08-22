@@ -14,6 +14,8 @@ class Feed < ActiveRecord::Base
   attr_accessor :count, :tags
   attr_readonly :feed_url
 
+  after_initialize :default_values
+
   enum feed_type: { xml: 0, newsletter: 1 }
 
   def tag(names, user, delete_existing = true)
@@ -97,4 +99,11 @@ class Feed < ActiveRecord::Base
       'retry' => false
     )
   end
+
+  private
+
+  def default_values
+    self.options ||= {}
+  end
+
 end

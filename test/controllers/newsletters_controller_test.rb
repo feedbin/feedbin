@@ -19,9 +19,23 @@ class NewslettersControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "Updates Feed" do
+    user = users(:ben)
+    signature = Newsletter.new(newsletter_params('asdf', 'asdf')).send(:signature)
+    title = SecureRandom.hex
+    assert_difference('Entry.count', 1) do
+      post :create, newsletter_params(user.newsletter_token, signature, title)
+    end
+    assert_response :success
+    feed = Feed.find_by_title(title)
+    assert feed.options["email_headers"].present?
+    assert_equal feed.feed_type, "newsletter"
+  end
+
   private
 
-  def newsletter_params(recipient, signature)
+  def newsletter_params(recipient, signature, title = nil)
+    title = SecureRandom.hex if title.nil?
     {
       "timestamp"               => 'timestamp',
       "token"                   => 'token',
@@ -29,7 +43,7 @@ class NewslettersControllerTest < ActionController::TestCase
       "recipient"               => "#{recipient}@development.newsletters.feedbin.com",
       "sender"                  => "ben@feedbin.com",
       "subject"                 => "This is the subject",
-      "from"                    => "Ben Ubois <ben@feedbin.com>",
+      "from"                    => "#{title} <ben@feedbin.com>",
       "X-Mailgun-Incoming"      => "Yes",
       "X-Envelope-From"         => "<ben@feedbin.com>",
       "Received"                => "XYZ",
@@ -52,6 +66,7 @@ class NewslettersControllerTest < ActionController::TestCase
       "stripped-html"           => "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html charset=us-ascii\"></head><body style=\"word-wrap: break-word; -webkit-nbsp-mode: space; -webkit-line-break: after-white-space;\" class=\"\"><div style=\"margin: 0px; line-height: normal;\" class=\"\"><b class=\"\">Lorem ipsum</b> dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</div></body></html>",
       "stripped-text"           => "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation .",
       "stripped-signature"      => "",
+      "List-Unsubscribe"        => "<http://www.host.com/list.cgi?cmd=unsub&lst=list>, <mailto:list-request@host.com?subject=unsubscribe>",
     }
   end
 
