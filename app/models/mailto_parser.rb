@@ -10,11 +10,19 @@ class MailtoParser
     parsed.path
   end
 
-  def params
-    parsed.query_values || {}
+  def body
+    params["body"]
+  end
+
+  def subject
+    params["subject"]
   end
 
   private
+
+  def params
+    @params ||= parsed.query_values || {}
+  end
 
   def parsed
     @parsed ||= Addressable::URI.parse(mailto)

@@ -9,8 +9,8 @@ class EmailUnsubscribe
           parser = MailtoParser.new(option)
           email = {
             to: parser.email,
-            subject: parser.params["subject"] || "",
-            body: parser.params["body"] || ""
+            subject: parser.subject || "",
+            body: parser.body || "",
           }
           ActionMailer::Base.mail(email).deliver_now
         end

@@ -16,11 +16,28 @@ class MailtoParserTest < ActiveSupport::TestCase
     assert_equal(@email_address, parser.email)
   end
 
-  test "should parse params" do
+  test "should parse body" do
     parser = MailtoParser.new(@link)
-    @params.each do |param, value|
-      assert_equal(value, parser.params[param])
-    end
+    assert_equal @params["body"], parser.body
+  end
+
+  test "should parse subject" do
+    parser = MailtoParser.new(@link)
+    assert_equal @params["subject"], parser.subject
+  end
+
+  test "should have default body" do
+    email_address = Faker::Internet.email
+    link = "mailto:#{@email_address}"
+    parser = MailtoParser.new(link)
+    assert_equal nil, parser.body
+  end
+
+  test "should have default subject" do
+    email_address = Faker::Internet.email
+    link = "mailto:#{@email_address}"
+    parser = MailtoParser.new(link)
+    assert_equal nil, parser.subject
   end
 
 end
