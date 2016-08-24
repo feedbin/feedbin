@@ -20,6 +20,7 @@ group :test do
   gem 'stripe-ruby-mock', require: 'stripe_mock'
   gem 'faker'
   gem 'webmock'
+  gem 'minitest-stub-const'
 end
 
 group :production do

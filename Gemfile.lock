@@ -368,6 +368,7 @@ GEM
     mimemagic (0.3.2)
     mini_portile (0.6.2)
     minitest (5.9.0)
+    minitest-stub-const (0.5)
     multi_json (1.12.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
@@ -565,6 +566,7 @@ DEPENDENCIES
   librato-rails
   lograge
   minitest
+  minitest-stub-const
   oauth
   opml_saw!
   pg
