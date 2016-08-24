@@ -1,7 +1,8 @@
 require 'test_helper'
 
-class ActionsPerformTest < ActionController::TestCase
+class ActionsPerformTest < ActiveSupport::TestCase
   setup do
+    Rails.cache.clear
     @user = users(:new)
     @feeds = create_feeds(@user)
     @entries = @user.entries
@@ -14,21 +15,36 @@ class ActionsPerformTest < ActionController::TestCase
     )
   end
 
-  # test "should send_push_notification" do
-  #   Sidekiq::Worker.clear_all
-  #   assert_difference "SafariPushNotificationSend.jobs.size", +1 do
-  #     Throttle.stub :throttle!, true do
-  #       ActionsPerform.new().perform(@entry.id, [@action.id])
-  #     end
-  #   end
-  # end
-  #
-  # test "should mark_read" do
-  #   UnreadEntry.create_from_owners(@user, @entry)
-  #   assert_difference "UnreadEntry.count", -1 do
-  #     Throttle.stub :throttle!, true do
-  #       ActionsPerform.new().perform(@entry.id, [@action.id])
-  #     end
-  #   end
-  # end
+  test "should send_push_notification" do
+    Sidekiq::Worker.clear_all
+    assert_difference "SafariPushNotificationSend.jobs.size", +1 do
+      Throttle.stub :throttle!, true do
+        ActionsPerform.new().perform(@entry.id, [@action.id])
+      end
+    end
+  end
+
+  test "should mark_read" do
+    assert_difference "UnreadEntry.count", -1 do
+      Throttle.stub :throttle!, true do
+        ActionsPerform.new().perform(@entry.id, [@action.id])
+      end
+    end
+  end
+
+  test "should star" do
+    assert_difference "StarredEntry.count", +1 do
+      Throttle.stub :throttle!, true do
+        ActionsPerform.new().perform(@entry.id, [@action.id])
+      end
+    end
+  end
+
+  test "should send_ios_notification" do
+    assert_difference "DevicePushNotificationSend.jobs.size", +1 do
+      Throttle.stub :throttle!, true do
+        ActionsPerform.new().perform(@entry.id, [@action.id])
+      end
+    end
+  end
 end

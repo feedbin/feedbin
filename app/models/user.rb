@@ -252,7 +252,6 @@ class User < ActiveRecord::Base
 
   def cancel_billing
     customer = Stripe::Customer.retrieve(customer_id)
-    customer.cancel_subscription
     customer.delete
   rescue Stripe::StripeError => e
     logger.error "Stripe Error: " + e.message

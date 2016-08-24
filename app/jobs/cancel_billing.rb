@@ -5,7 +5,6 @@ class CancelBilling
   def perform(customer_id)
     Honeybadger.context(customer_id: customer_id)
     customer = Stripe::Customer.retrieve(customer_id)
-    customer.cancel_subscription
     customer.delete
   end
 

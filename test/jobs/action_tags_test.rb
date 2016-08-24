@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ActionTagsTest < ActionController::TestCase
+class ActionTagsTest < ActiveSupport::TestCase
   test "updates tag ids" do
 
     action = actions(:api)
