@@ -30,6 +30,9 @@ $redis = {
   id_cache: Redis.new(url: ENV['REDIS_URL'])
 }
 
+Entry.__elasticsearch__.delete_index! rescue nil
+Entry.__elasticsearch__.create_index! rescue nil
+
 class ActiveSupport::TestCase
   include LoginHelper
   include FactoryHelper
