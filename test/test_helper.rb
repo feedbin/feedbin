@@ -19,6 +19,17 @@ ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
 StripeMock.webhook_fixture_path = './test/fixtures/stripe_webhooks/'
 WebMock.disable_net_connect!(allow_localhost: true, allow: 'codeclimate.com')
 
+redis_test_instance = IO.popen("redis-server --port 7776")
+Minitest.after_run {
+  Process.kill("INT", redis_test_instance.pid)
+}
+
+ENV['REDIS_URL'] = "redis://localhost:7776"
+$redis = {
+  sorted_entries: Redis.new(url: ENV['REDIS_URL']),
+  id_cache: Redis.new(url: ENV['REDIS_URL'])
+}
+
 class ActiveSupport::TestCase
   include LoginHelper
   include FactoryHelper
@@ -33,10 +44,11 @@ class ActiveSupport::TestCase
   end
 
   def flush_redis
-    if Rails.env.test?
-      $redis.each do |_, redis|
-        redis.flushdb
-      end
+    Sidekiq.redis do |redis|
+      redis.flushdb
+    end
+    $redis.each do |_, redis|
+      redis.flushdb
     end
   end
 
