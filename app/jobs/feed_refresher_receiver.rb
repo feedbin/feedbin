@@ -2,12 +2,13 @@ class FeedRefresherReceiver
   include Sidekiq::Worker
   sidekiq_options queue: :feed_refresher_receiver
 
-  def perform(update)
-    feed = Feed.find(update['feed']['id'])
-    if update['entries'].any?
-      update['entries'].each do |entry|
+  def perform(params)
+    feed = Feed.find(params['feed']['id'])
+    if params['entries'].any?
+      params['entries'].each do |entry|
+        update = entry.delete('update')
         begin
-          if entry['update'] == true
+          if update == true
             update_entry(entry)
           else
             create_entry(entry, feed)
@@ -16,7 +17,7 @@ class FeedRefresherReceiver
           FeedbinUtils.update_public_id_cache(entry['public_id'], entry['content'])
           Librato.increment 'entry.record_not_unique'
         rescue StandardError => error
-          message = entry['update'] ? "update" : "create"
+          message = update ? "update" : "create"
           Honeybadger.notify(
             error_class: "FeedRefresherReceiver#" + message,
             error_message: "Entry #{message} failed",
@@ -25,7 +26,7 @@ class FeedRefresherReceiver
         end
       end
     end
-    update_feed(update, feed)
+    update_feed(params, feed)
   end
 
   def update_entry(entry)
