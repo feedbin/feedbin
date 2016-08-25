@@ -107,7 +107,9 @@ class Feed < ActiveRecord::Base
   private
 
   def default_values
-    self.options ||= {}
+    if self.respond_to?(:options)
+      self.options ||= {}
+    end
   end
 
 end
