@@ -12,11 +12,10 @@ class PasswordResetsControllerTest < ActionController::TestCase
   end
 
   test "should create password reset" do
-    Sidekiq::Worker.clear_all
-    assert_equal 0, Sidekiq::Extensions::DelayedMailer.jobs.size
-    post :create, email: @user.email
-    assert_not_equal @user.password_reset_token, @user.reload.password_reset_token
-    assert_equal 1, Sidekiq::Extensions::DelayedMailer.jobs.size
+    assert_difference "Sidekiq::Extensions::DelayedMailer.jobs.size", +1 do
+      post :create, email: @user.email
+      assert_not_equal @user.password_reset_token, @user.reload.password_reset_token
+    end
   end
 
   test "should get edit" do

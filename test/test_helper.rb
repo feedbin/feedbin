@@ -14,6 +14,7 @@ require 'support/factory_helper'
 require 'support/assertions'
 require 'support/dummy_server'
 require 'support/api_controller_test_case'
+require 'support/push_server_mock'
 
 ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
 StripeMock.webhook_fixture_path = './test/fixtures/stripe_webhooks/'
@@ -29,9 +30,6 @@ $redis = {
   sorted_entries: Redis.new(url: ENV['REDIS_URL']),
   id_cache: Redis.new(url: ENV['REDIS_URL'])
 }
-
-Entry.__elasticsearch__.delete_index! rescue nil
-Entry.__elasticsearch__.create_index! rescue nil
 
 class ActiveSupport::TestCase
   include LoginHelper
@@ -67,5 +65,10 @@ class ActiveSupport::TestCase
 
   def create_stripe_plan(plan)
     Stripe::Plan.create(name: plan.name, id: plan.stripe_id, amount: plan.price, currency: "USD", interval: "day")
+  end
+
+  def clear_search
+    Entry.__elasticsearch__.delete_index! rescue nil
+    Entry.__elasticsearch__.create_index! rescue nil
   end
 end

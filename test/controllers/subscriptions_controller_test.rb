@@ -94,7 +94,6 @@ class SubscriptionsControllerTest < ActionController::TestCase
   end
 
   test "should refresh favicon" do
-    Sidekiq::Worker.clear_all
     login_as @user
     subscription = @user.subscriptions.first
 

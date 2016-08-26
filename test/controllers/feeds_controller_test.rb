@@ -86,21 +86,21 @@ class FeedsControllerTest < ActionController::TestCase
     feed = @user.feeds.first
     Feed.reset_counters(feed.id, :subscriptions)
     body = push_prep(feed)
-    raw_post :push, {id: feed.id}, body
 
-    assert_response :success
-    assert_equal 1, Sidekiq::Queues["feed_refresher_fetcher_critical"].size
+    assert_difference "Sidekiq::Queues['feed_refresher_fetcher_critical'].size", +1 do
+      raw_post :push, {id: feed.id}, body
+      assert_response :success
+    end
   end
 
   test "PuSH unsubscribe" do
-    Sidekiq::Worker.clear_all
-
     feed = @user.feeds.first
     body = push_prep(feed)
-    raw_post :push, {id: feed.id}, body
 
-    assert_response :success
-    assert_equal 1, Sidekiq::Queues["feed_refresher_fetcher"].size
+    assert_difference "Sidekiq::Queues['feed_refresher_fetcher'].size", +1 do
+      raw_post :push, {id: feed.id}, body
+      assert_response :success
+    end
   end
 
   test "modify toggle update settings" do
@@ -122,7 +122,6 @@ class FeedsControllerTest < ActionController::TestCase
   private
 
   def push_prep(feed)
-    Sidekiq::Worker.clear_all
     secret = Push::hub_secret(feed.id)
     body = 'BODY'
     signature = OpenSSL::HMAC.hexdigest('sha1', secret, body)

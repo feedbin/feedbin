@@ -7,7 +7,8 @@ module FactoryHelper
       host = URI(url).host
       Feed.create(feed_url: url, host: host).tap do |feed|
         user.subscriptions.where(feed: feed).first_or_create
-        create_entry(feed)
+        entry = create_entry(feed)
+        SearchIndexStore.new().perform("Entry", entry.id)
       end
     end
     Entry.__elasticsearch__.refresh_index!
@@ -15,13 +16,12 @@ module FactoryHelper
   end
 
   def create_entry(feed)
-    entry = feed.entries.create(
+    feed.entries.create(
       title: Faker::Lorem.sentence,
       url: Faker::Internet.url,
       content: Faker::Lorem.paragraph,
       public_id: SecureRandom.hex,
     )
-    SearchIndexStore.new().perform("Entry", entry.id)
   end
 
   def mark_unread(user)

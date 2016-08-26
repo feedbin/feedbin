@@ -3,6 +3,8 @@ require 'test_helper'
 class EntryBulkIndexTest < ActiveSupport::TestCase
   test "should bulk index entries in elasticsearch" do
     Sidekiq::Queues["worker_slow"].clear
+    clear_search
+
     feed = Feed.first
     entries = SecureRandom.random_number(10).times.map do
       feed.entries.create(

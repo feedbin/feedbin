@@ -28,11 +28,11 @@ class StarredEntriesControllerTest < ActionController::TestCase
   end
 
   test "should export starred entries" do
-    Sidekiq::Worker.clear_all
     login_as @user
-    post :export
-    assert_redirected_to settings_import_export_url
-    assert_equal 1, StarredEntriesExport.jobs.size
+    assert_difference "StarredEntriesExport.jobs.size", +1 do
+      post :export
+      assert_redirected_to settings_import_export_url
+    end
   end
 
   test "should update starred entries" do
