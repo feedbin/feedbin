@@ -12,6 +12,7 @@ addons:
 env:
   global:
     - DB=postgresql
+    - KINDLEGEN_PATH=/tmp/kindlegen/kindlegen
   matrix:
     - ES_VERSION=2.3.3
 
@@ -19,7 +20,7 @@ before_install:
   - mkdir /tmp/elasticsearch
   - wget -O - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1
   - /tmp/elasticsearch/bin/elasticsearch --daemonize --path.data /tmp
-  - wget -O - http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz | tar xz --directory=/usr/local/bin --strip-components=1
+  - wget -O - http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz | tar xz --directory=/tmp/kindlegen --strip-components=1
 
 before_script:
   - psql -c 'create database feedbin_test;' -U postgres
