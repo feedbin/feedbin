@@ -18,7 +18,7 @@ class SendToKindle
       content_path = write_html
       mobi_path = kindlegen(content_path)
       if File.file?(mobi_path)
-        UserMailer.kindle(kindle_address, mobi_path).deliver
+        UserMailer.kindle(kindle_address, mobi_path).deliver_now
       else
         # Notify user of error?
       end
@@ -29,7 +29,7 @@ class SendToKindle
 
   def kindlegen(content_path)
     mobi_file = 'kindle.mobi'
-    system("#{ENV["KINDLEGEN_PATH"]} #{content_path} -o #{mobi_file}")
+    system("#{ENV["KINDLEGEN_PATH"]} #{content_path} -o #{mobi_file} &> /dev/null ")
     File.join(@working_directory, mobi_file)
   end
 
