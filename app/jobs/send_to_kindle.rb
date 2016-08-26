@@ -16,6 +16,7 @@ class SendToKindle
     @working_directory = Dir.mktmpdir
     begin
       content_path = write_html
+      system("ls -al #{@working_directory}")
       mobi_path = kindlegen(content_path)
       if File.file?(mobi_path)
         UserMailer.kindle(kindle_address, mobi_path).deliver_now
