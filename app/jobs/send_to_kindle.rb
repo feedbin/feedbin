@@ -29,7 +29,7 @@ class SendToKindle
 
   def kindlegen(content_path)
     mobi_file = 'kindle.mobi'
-    system("#{ENV["KINDLEGEN_PATH"]} #{content_path} -o #{mobi_file}")
+    system("#{ENV["KINDLEGEN_PATH"]} #{content_path} -o #{mobi_file} > /dev/null")
     File.join(@working_directory, mobi_file)
   end
 
