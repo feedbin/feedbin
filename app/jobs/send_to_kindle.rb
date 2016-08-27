@@ -16,7 +16,6 @@ class SendToKindle
     @working_directory = Dir.mktmpdir
     begin
       content_path = write_html
-      system("ls -al #{@working_directory}")
       mobi_path = kindlegen(content_path)
       if File.file?(mobi_path)
         UserMailer.kindle(kindle_address, mobi_path).deliver_now
@@ -30,7 +29,7 @@ class SendToKindle
 
   def kindlegen(content_path)
     mobi_file = 'kindle.mobi'
-    system("#{ENV["KINDLEGEN_PATH"]} #{content_path} -o #{mobi_file} &> /dev/null ")
+    system("#{ENV["KINDLEGEN_PATH"]} #{content_path} -o #{mobi_file}")
     File.join(@working_directory, mobi_file)
   end
 
