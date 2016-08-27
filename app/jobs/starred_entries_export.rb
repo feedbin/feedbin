@@ -6,7 +6,7 @@ class StarredEntriesExport
     file = Tempfile.new(['starred_', '.json'])
     build_file(user, file)
     upload_url = upload_file(file)
-    UserMailer.starred_export_download(user_id, upload_url).deliver
+    UserMailer.starred_export_download(user_id, upload_url).deliver_now
   ensure
     file.close
     file.unlink
