@@ -6,7 +6,7 @@ class EntryBulkIndexTest < ActiveSupport::TestCase
     clear_search
 
     feed = Feed.first
-    entries = SecureRandom.random_number(10).times.map do
+    entries = (1..10).to_a.sample.times.map do
       feed.entries.create(
         content: Faker::Lorem.paragraph,
         public_id: SecureRandom.hex,
