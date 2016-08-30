@@ -20,7 +20,7 @@ end
 every(1.day, 'clockwork.daily', at: '12:00', tz: 'UTC') do
 
   if RedisLock.acquire("clockwork:delete_unread_entries:v2")
-    UnreadEntryDeleterScheduler.perform_async
+    UnreadEntryDeleter.perform_async(nil, true)
   end
 
   if RedisLock.acquire("clockwork:delete_entries:v2")

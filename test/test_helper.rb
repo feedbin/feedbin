@@ -2,6 +2,7 @@ require 'codeclimate-test-reporter'
 CodeClimate::TestReporter.start
 
 ENV['RAILS_ENV'] ||= 'test'
+ENV['REDIS_URL'] = "redis://localhost:7776"
 
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
@@ -25,7 +26,6 @@ Minitest.after_run {
   Process.kill("INT", redis_test_instance.pid)
 }
 
-ENV['REDIS_URL'] = "redis://localhost:7776"
 $redis = {
   sorted_entries: Redis.new(url: ENV['REDIS_URL']),
   id_cache: Redis.new(url: ENV['REDIS_URL'])
