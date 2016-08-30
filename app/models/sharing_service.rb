@@ -13,6 +13,6 @@ class SharingService < ActiveRecord::Base
     else
       target = '_self'
     end
-    {url: share_url, label: self.label, html_options: {target: target}}
+    {url: share_url, label: self.label, html_options: {target: target, rel: 'noopener'}}
   end
 end
