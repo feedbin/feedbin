@@ -15,12 +15,12 @@ end
 
 group :test do
   gem 'minitest'
-  gem 'codeclimate-test-reporter', require: nil
   gem 'test_after_commit'
   gem 'stripe-ruby-mock', require: 'stripe_mock'
   gem 'faker'
   gem 'webmock'
   gem 'minitest-stub-const'
+  gem 'coveralls', require: false
 end
 
 group :production do
