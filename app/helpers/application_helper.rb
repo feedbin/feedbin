@@ -12,14 +12,6 @@ module ApplicationHelper
     "active" if controller.include?(params[:controller]) && action.include?(params[:action])
   end
 
-  def hide_count(count)
-    if count == 0
-      ' hide'
-    else
-      ''
-    end
-  end
-
   def mark_selected?
     @mark_selected || false
   end

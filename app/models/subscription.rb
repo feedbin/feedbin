@@ -64,14 +64,6 @@ class Subscription < ActiveRecord::Base
     self.feed.tag('', self.user)
   end
 
-  def show_updates?
-    self.show_updates
-  end
-
-  def muted?
-    self.muted == true
-  end
-
   def refresh_feed
     if feed_already_existed? && !any_subscribers?
       self.feed.priority_refresh

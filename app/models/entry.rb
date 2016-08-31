@@ -21,24 +21,6 @@ class Entry < ActiveRecord::Base
 
   self.per_page = 100
 
-  def entry=(entry)
-    self.author    = entry.author
-    self.content   = entry.content
-    self.title     = entry.title
-    self.url       = entry.url
-    self.entry_id  = entry.entry_id
-
-    self.published = entry.try(:published)
-    self.updated   = entry.try(:updated)
-
-    self.public_id     = entry._public_id_
-    self.old_public_id = entry._old_public_id_
-
-    if entry.try(:_data_)
-      self.data = entry._data_
-    end
-  end
-
   def self.entries_with_feed(entry_ids, sort)
     entry_ids = entry_ids.map(&:entry_id)
     entries = Entry.where(id: entry_ids).includes(:feed)
@@ -68,10 +50,6 @@ class Entry < ActiveRecord::Base
 
   def self.include_starred_entries(user_id)
     joins("LEFT OUTER JOIN starred_entries ON entries.id = starred_entries.entry_id AND starred_entries.user_id = #{user_id.to_i}")
-  end
-
-  def self.starred_new
-    where("starred_entries.entry_id IS NOT NULL")
   end
 
   def self.unstarred_new
