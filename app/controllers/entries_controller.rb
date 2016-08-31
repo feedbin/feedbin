@@ -8,10 +8,10 @@ class EntriesController < ApplicationController
     update_selected_feed!("collection_all")
 
     feed_ids = @user.subscriptions.pluck(:feed_id)
-    entry_id_cache = EntryIdCache.new(@user.id, feed_ids, params[:page])
+    entry_id_cache = EntryIdCache.new(@user.id, feed_ids)
 
-    @entries = entry_id_cache.entries
-    @page_query = entry_id_cache.page_query
+    @entries = entry_id_cache.page(params[:page])
+    @page_query = @entries
 
     @append = params[:page].present?
 

@@ -143,9 +143,9 @@ class ApplicationController < ActionController::Base
 
   def feeds_response
     if 'view_all' == @user.get_view_mode
-      entry_id_cache = EntryIdCache.new(@user.id, @feed_ids, params[:page])
-      @entries = entry_id_cache.entries
-      @page_query = entry_id_cache.page_query
+      entry_id_cache = EntryIdCache.new(@user.id, @feed_ids)
+      @entries = entry_id_cache.page(params[:page])
+      @page_query = @entries
     elsif 'view_starred' == @user.get_view_mode
       starred_entries = @user.starred_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).order("published DESC")
       @entries = Entry.entries_with_feed(starred_entries, 'DESC').entries_list
