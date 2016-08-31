@@ -1,4 +1,4 @@
-$('[data-behavior~=flash_wrap]').html('<%= j render partial: 'shared/flash', locals: {flash: flash} %>')
+$('[data-behavior~=<%= @user.customer_id %>]').html('<%= j render partial: 'user', locals: {user: @user} %>')
 
 clearTimeout(clearMessage);
 var clearMessage = setTimeout(function() {

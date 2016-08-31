@@ -11,8 +11,7 @@ class Admin::UsersController < ApplicationController
   def destroy
     user = User.find(params[:id])
     user.destroy
-    flash[:notice] = 'User deleted'
-    flash.discard()
+    @user = DeletedUser.where(customer_id: user.customer_id).take!
   end
 
   def authorize
