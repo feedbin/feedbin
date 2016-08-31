@@ -21,3 +21,4 @@
 .env-tmp
 .env.development
 public
+coverage

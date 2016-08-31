@@ -13,7 +13,6 @@ require 'webmock/minitest'
 require 'support/login_helper'
 require 'support/factory_helper'
 require 'support/assertions'
-require 'support/dummy_server'
 require 'support/api_controller_test_case'
 require 'support/push_server_mock'
 

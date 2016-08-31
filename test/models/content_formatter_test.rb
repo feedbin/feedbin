@@ -33,4 +33,37 @@ class ContentFormatterTest < ActiveSupport::TestCase
     expected = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor..."
     assert_equal expected, ContentFormatter.summary(content)
   end
+
+  test "should allow certain iframes" do
+    hosts = %w{
+      www.youtube.com
+      youtube.com
+      youtu.be
+      youtube-nocookie.com
+      www.vimeo.com
+      player.vimeo.com
+      kickstarter.com
+      embed.spotify.com
+      w.soundcloud.com
+      view.vzaar.com
+      vine.co
+      e.infogr.am
+      infogr.am
+      www.flickr.com
+      mpora.com
+      embed-ssl.ted.com
+      embed.itunes.apple.com
+      www.tumblr.com
+    }
+    hosts.each do |host|
+      content = %(<iframe src="http://#{host}"></iframe>)
+      expected = %(<iframe src="//#{host}"></iframe>)
+      assert_equal expected, ContentFormatter.format!(content)
+    end
+  end
+
+  test "should not allow other iframes" do
+    content = %(<iframe src="http://myhost.com"></iframe>)
+    assert_equal "", ContentFormatter.format!(content)
+  end
 end
