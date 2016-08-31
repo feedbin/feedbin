@@ -9,7 +9,7 @@ class Entry < ActiveRecord::Base
   has_many :recently_read_entries
 
   before_create :ensure_published
-  before_create :cache_public_id, unless: -> { Rails.env.test? }
+  before_create :cache_public_id
   before_create :create_summary
   before_update :create_summary
   after_commit :find_images, on: :create
