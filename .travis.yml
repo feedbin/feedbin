@@ -13,7 +13,6 @@ env:
   global:
     - DB=postgresql
     - KINDLEGEN_PATH=/tmp/kindlegen/kindlegen
-  matrix:
     - ES_VERSION=2.3.3
 
 before_install:
