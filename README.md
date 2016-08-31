@@ -2,7 +2,7 @@ Feedbin
 =======
 [![Build Status](https://travis-ci.org/feedbin/feedbin.svg?branch=master)](https://travis-ci.org/feedbin/feedbin)
 [![Code Climate](https://codeclimate.com/github/feedbin/feedbin.svg)](https://codeclimate.com/github/feedbin/feedbin)
-[![Test Coverage](https://codeclimate.com/github/feedbin/feedbin/badges/coverage.svg)](https://codeclimate.com/github/feedbin/feedbin)
+[![Coverage Status](https://coveralls.io/repos/github/feedbin/feedbin/badge.svg)](https://coveralls.io/github/feedbin/feedbin)
 
 Feedbin is a simple, fast and nice looking RSS reader.
 
