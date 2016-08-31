@@ -66,4 +66,20 @@ class ContentFormatterTest < ActiveSupport::TestCase
     content = %(<iframe src="http://myhost.com"></iframe>)
     assert_equal "", ContentFormatter.format!(content)
   end
+
+  test "should allow certain classes" do
+    classes = %w{twitter-tweet instagram-media}
+    classes.each do |css_class|
+      content = %(<blockquote class="#{css_class}"></blockquote>)
+      assert_equal content, ContentFormatter.format!(content)
+    end
+  end
+
+  test "should not allow certain classes" do
+    classes = %w{other-class}
+    classes.each do |css_class|
+      content = %(<blockquote class="#{css_class}"></blockquote>)
+      assert_equal "<blockquote></blockquote>", ContentFormatter.format!(content)
+    end
+  end
 end
