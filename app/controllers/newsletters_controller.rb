@@ -17,7 +17,7 @@ class NewslettersController < ApplicationController
     if user = User.where(newsletter_token: newsletter.token).take
       entry = build_entry(newsletter)
       feed = get_feed(newsletter)
-      user.safe_subscribe(feed)
+      user.subscriptions.find_or_create_by(feed: feed)
       feed.entries.create(entry)
       feed.feed_type = :newsletter
       feed.options["email_headers"] = newsletter.headers

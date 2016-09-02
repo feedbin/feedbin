@@ -36,7 +36,7 @@ class SubscriptionsController < ApplicationController
         elsif finder.options.length == 1
           feed = finder.create_feed(finder.options.first)
           if feed
-            @user.safe_subscribe(feed)
+            @user.subscriptions.find_or_create_by(feed: feed)
             @results[:success].push(feed)
           else
             @results[:failed].push(feed_url)

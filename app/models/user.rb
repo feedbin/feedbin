@@ -289,14 +289,6 @@ class User < ActiveRecord::Base
     subscriptions.create!(feed_id: feed.id)
   end
 
-  def safe_subscribe(feed)
-    if subscribed_to?(feed.id)
-      subscriptions.where(feed_id: feed.id).first
-    else
-      subscribe!(feed)
-    end
-  end
-
   def subscribed_to?(feed_id)
     subscriptions.where(feed_id: feed_id).exists?
   end

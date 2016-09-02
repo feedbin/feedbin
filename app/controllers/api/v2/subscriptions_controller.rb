@@ -53,7 +53,7 @@ module Api
           feed = finder.create_feed(finder.options.first)
           if feed
             status = @user.subscribed_to?(feed) ? :found : :created
-            @subscription = @user.safe_subscribe(feed)
+            @subscription = @user.subscriptions.find_or_create_by(feed: feed)
             render status: status, location: api_v2_subscription_url(@subscription, format: :json)
           else
             status_not_found

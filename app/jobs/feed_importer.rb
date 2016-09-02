@@ -10,7 +10,7 @@ class FeedImporter
     if finder.options.any?
       feed = finder.create_feed(finder.options.first)
       if feed
-        subscription = user.safe_subscribe(feed)
+        subscription = user.subscriptions.find_or_create_by(feed: feed)
         if import_item.details[:title] && subscription
           subscription.update(title: import_item.details[:title])
         end
