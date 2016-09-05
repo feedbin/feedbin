@@ -137,10 +137,14 @@ $.extend feedbin,
 
   applyUserTitles: ->
     $('[data-behavior~=user_title]').each ->
-      feedId = $(@).data('feed-id')
-      if (feedId of feedbin.data.user_titles)
-        newTitle = feedbin.data.user_titles[feedId]
-        $(@).html(newTitle)
+      element = $(@)
+      feed = element.data('feed-id')
+      if (feed of feedbin.data.user_titles)
+        newTitle = feedbin.data.user_titles[feed]
+        if element.prop('tagName') == "INPUT"
+          element.val(newTitle)
+        else
+          element.html(newTitle)
 
   queryString: (name) ->
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]")
@@ -984,7 +988,11 @@ $.extend feedbin,
         if ($(event.target).hasClass('entry-basement') || $(event.target).parents('.entry-basement').length > 0)
           false
 
-        if !$(event.target).is('[data-behavior~=show_entry_basement]') && $(event.target).parents('.entry-basement').length == 0
+        isButton = (event) ->
+          $(event.target).is('[data-behavior~=show_entry_basement]') ||
+          $(event.target).parents('[data-behavior~=show_entry_basement]').length > 0
+
+        if !isButton(event) && $(event.target).parents('.entry-basement').length == 0
           feedbin.closeEntryBasement()
         return
 

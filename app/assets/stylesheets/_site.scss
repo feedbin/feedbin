@@ -1338,7 +1338,7 @@ li.selected > a .favicon-wrap {
 
 .back-button {
     background-color: transparent;
-    background-size: 11px 18px;
+    background-size: 11px 15px;
     background-repeat: no-repeat;
     background-image: image-url("icon-left-arrow.svg");
     background-position: center center;
@@ -1924,7 +1924,7 @@ $saved-search-control-height: 48px;
 
 
 .entry-toolbar {
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    display: flex;
     position: absolute;
     top: 0;
     left: 0;
@@ -1932,43 +1932,44 @@ $saved-search-control-height: 48px;
     width: 100%;
     height: $toolbar-height;
     border-bottom: 1px solid transparent;
+    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     @include border-color($border-color, $border-color-night, $border-color-sunset);
-    .back-button {
-        display: none;
-        height: $toolbar-height;
-        width: $toolbar-height;
-    }
     .site-info {
-        position: absolute;
-        top: $base-button-position;
-        left: 13px;
-        display: block;
-        .full-screen & {
-            left: 58px;
+        display: flex;
+        align-items: stretch;
+        .back-button {
+            display: none;
+            height: $toolbar-height;
+            width: $toolbar-height;
         }
-        .favicon-wrap {
-            top: 0;
-            left: 0;
-            box-shadow: none;
-            background-color: transparent;
-            .theme-night & {
-                background-color: #FFF;
-                box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
-            }
-            .theme-sunset & {
-                background-color: transparent;
+        .feed-button {
+            margin-left: 13px;
+            display: flex;
+            align-items: center;
+            -webkit-appearance: none;
+            border: none;
+            background: none;
+            padding: 0;
+            .favicon-wrap {
+                position: static;
                 box-shadow: none;
+                background-color: transparent;
+                .theme-night & {
+                    background-color: #FFF;
+                    box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+                }
+                .theme-sunset & {
+                    background-color: transparent;
+                    box-shadow: none;
+                }
             }
-        }
-        .entry-feed-title {
-            position: absolute;
-            top: 2px;
-            left: 26px;
-            display: block;
-            font-size: 14px;
-            @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-            text-decoration: none;
-            white-space: nowrap;
+            .entry-feed-title {
+                margin-left: 6px;
+                font-size: 14px;
+                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+                text-decoration: none;
+                white-space: nowrap;
+            }
         }
     }
     .button-full-screen {
@@ -1998,7 +1999,7 @@ $saved-search-control-height: 48px;
     }
 }
 
-.entry-settings {
+.basement-toolbar {
     height: 48px;
     width: 100%;
     border-bottom: 1px solid $border-color;
@@ -2021,6 +2022,29 @@ $saved-search-control-height: 48px;
     .entry-basement.open &:after,
     .entry-basement.open &:before {
         visibility: visible;
+    }
+    &.feed-settings {
+        display: flex;
+        align-items: stretch;
+        .toolbar-item {
+            border-right: 1px solid transparent;
+            @include border-color($border-color, $border-color-night, $border-color-sunset);
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+        }
+        input[type="text"] {
+            margin: 0;
+        }
+        $base-position: 17px;
+        &:before {
+            left: $base-position;
+            right: auto;
+        }
+        &:after {
+            left: $base-position + 1;
+            right: auto;
+        }
     }
     .setting-wrap {
         border-right: 1px solid transparent;
@@ -2789,16 +2813,16 @@ $saved-search-control-height: 48px;
     border-top-color: $body-background-color-sunset;
 }
 
-.theme-night.full-screen .entry-settings:before {
+.theme-night.full-screen .basement-toolbar:before {
     border-top-color: black;
 }
-.theme-sunset.full-screen .entry-settings:before {
+.theme-sunset.full-screen .basement-toolbar:before {
     border-top-color: $arrow-shadow-color-sunset;
 }
-.theme-night.full-screen .entry-settings:after {
+.theme-night.full-screen .basement-toolbar:after {
     border-top-color: $body-background-color-night;
 }
-.theme-sunset.full-screen .entry-settings:after {
+.theme-sunset.full-screen .basement-toolbar:after {
     border-top-color: $body-background-color-sunset;
 }
 
@@ -5714,13 +5738,17 @@ Media Queries
         }
     }
     .entry-toolbar {
-        .back-button {
-            display: block;
-        }
-    }
-    .entry-toolbar {
         .site-info {
-            display: none;
+            .feed-button {
+                margin-left: 0;
+                padding: 0 10px 0 5px;
+            }
+            .back-button {
+                display: block;
+            }
+            .entry-feed-title {
+                display: none;
+            }
         }
     }
     .search-button {
@@ -5778,7 +5806,7 @@ Media Queries
     .button-app-settings {
         display: none;
     }
-    .entry-settings {
+    .basement-toolbar {
         &:before {
             right: 19px;
         }
