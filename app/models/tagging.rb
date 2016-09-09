@@ -10,4 +10,10 @@ class Tagging < ActiveRecord::Base
     TouchActions.perform_async(actions)
   end
 
+  def self.build_map
+    group(:feed_id).pluck('feed_id, array_agg(tag_id)').each_with_object({}) do |(feed_id, tag_ids), hash|
+      hash[feed_id] = tag_ids
+    end
+  end
+
 end

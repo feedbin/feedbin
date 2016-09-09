@@ -150,6 +150,12 @@ class User < ActiveRecord::Base
     tags.where(id: taggings.pluck(:tag_id)).order(:name).uniq
   end
 
+  def tag_names
+    feed_tags.each_with_object({}) do |tag, hash|
+      hash[tag.id] = tag.name
+    end
+  end
+
   def coupon_code_valid
     coupon_record = Coupon.find_by_coupon_code(coupon_code)
     if !coupon_record || coupon_record.redeemed

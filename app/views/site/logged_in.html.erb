@@ -6,9 +6,10 @@
 if (window.feedbin == null) {
     window.feedbin = {};
 }
-feedbin.data = <%= @data.to_json.html_safe %>;
+feedbin.data = <%= raw json_escape(@data.to_json) %>;
+feedbin.data.tagNames = <%= raw json_escape(@user.tag_names.to_json) %>;
+feedbin.count_data = <%= raw json_escape(@count_data.to_json) %>;
 feedbin.data.viewMode = "<%= @user.get_view_mode %>";
-feedbin.count_data = <%= @count_data.to_json.html_safe %>;
 feedbin.Counts.get(feedbin.count_data);
 </script>
 <% end %>

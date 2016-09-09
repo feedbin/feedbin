@@ -104,7 +104,7 @@ class ApplicationController < ActionController::Base
       unread_entries: @user.unread_entries.pluck('feed_id, entry_id'),
       starred_entries: @user.starred_entries.pluck('feed_id, entry_id'),
       updated_entries: @user.updated_entries.pluck('feed_id, entry_id'),
-      tag_map: @user.taggings.group(:feed_id).pluck('feed_id, array_agg(tag_id)'),
+      tag_map: @user.taggings.build_map,
       entry_sort: @user.entry_sort
     }
     @feed_data = {
