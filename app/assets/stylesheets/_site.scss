@@ -1964,6 +1964,7 @@ $saved-search-control-height: 48px;
                 }
             }
             .entry-feed-title {
+                line-height: 20px;
                 margin-left: 6px;
                 font-size: 14px;
                 @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
@@ -2032,6 +2033,9 @@ $saved-search-control-height: 48px;
             display: flex;
             align-items: center;
             padding: 0 8px;
+            &:hover {
+                text-decoration: none;
+            }
         }
         input[type="text"] {
             margin: 0;

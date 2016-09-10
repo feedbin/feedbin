@@ -71,21 +71,30 @@ class SubscriptionsController < ApplicationController
   # DELETE /subscriptions/1
   # DELETE /subscriptions/1.json
   def destroy
-    destroy_subscription
+    destroy_subscription(params[:id])
     get_feeds_list
     respond_to do |format|
       format.js
     end
   end
 
+  def feed_destroy
+    subscription = @user.subscriptions.where(feed_id: params[:id]).take!
+    destroy_subscription(subscription.id)
+    get_feeds_list
+    respond_to do |format|
+      format.js { render 'subscriptions/destroy' }
+    end
+  end
+
   def settings_destroy
-    destroy_subscription
+    destroy_subscription(params[:id])
     redirect_to settings_feeds_url, notice: 'You have successfully unsubscribed.'
   end
 
-  def destroy_subscription
+  def destroy_subscription(subscription_id)
     @user = current_user
-    @subscription = @user.subscriptions.find(params[:id])
+    @subscription = @user.subscriptions.find(subscription_id)
     @subscription.destroy
   end
 

@@ -510,11 +510,11 @@ $.extend feedbin,
     feedbin.updateEntryContent(entry.content)
     feedbin.formatEntryContent(entryId, true)
 
-  tagFeed: (url, tag) ->
+  tagFeed: (url, tag, noResponse = true) ->
     $.ajax
       type: "POST",
       url: url,
-      data: { _method: "patch", feed: {tag_list: tag}, no_response: true }
+      data: { _method: "patch", feed: {tag_list: tag}, no_response: noResponse }
 
   hideEmptyTags: ->
     $('[data-tag-id]').each ->

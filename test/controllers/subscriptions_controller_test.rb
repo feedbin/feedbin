@@ -33,6 +33,24 @@ class SubscriptionsControllerTest < ActionController::TestCase
     end
   end
 
+  test "should destroy subscription settings" do
+    login_as @user
+    subscription = @user.subscriptions.first
+    assert_difference "Subscription.count", -1 do
+      xhr :delete, :settings_destroy, id: subscription
+      assert_redirected_to settings_feeds_url
+    end
+  end
+
+  test "should destroy subscription with feed id" do
+    login_as @user
+    subscription = @user.subscriptions.first
+    assert_difference "Subscription.count", -1 do
+      xhr :delete, :feed_destroy, id: subscription.feed_id
+      assert_response :success
+    end
+  end
+
   test "should destroy multiple subscriptions" do
     login_as @user
     ids = @user.subscriptions.pluck(:id)

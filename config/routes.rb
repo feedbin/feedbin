@@ -74,6 +74,7 @@ Feedbin::Application.routes.draw do
     end
     member do
       delete :settings_destroy
+      delete :feed_destroy
       post :refresh_favicon
     end
   end
