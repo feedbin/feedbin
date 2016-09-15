@@ -76,7 +76,6 @@ class Feed < ActiveRecord::Base
   def set_host
     begin
       self.host = URI::parse(self.site_url).host
-      FaviconFetcher.perform_async(self.host)
     rescue Exception
       Rails.logger.info { "Failed to set host for feed: %s" %  self.site_url}
     end

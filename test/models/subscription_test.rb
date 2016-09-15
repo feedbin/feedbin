@@ -10,5 +10,16 @@ class SubscriptionTest < ActiveSupport::TestCase
     end
   end
 
+  test "should enqueue FaviconFetcher" do
+    user = users(:ben)
+    host = "example.com"
+    url = URI::HTTP.build(host: host)
+    feed = Feed.create(feed_url: url.to_s, site_url: url.to_s)
+    assert_difference "FaviconFetcher.jobs.size", +1 do
+      user.subscriptions.create(feed: feed)
+      assert_equal host, FaviconFetcher.jobs.first["args"].first
+    end
+  end
+
 
 end

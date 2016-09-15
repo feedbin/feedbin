@@ -19,6 +19,7 @@ class Subscription < ActiveRecord::Base
   before_destroy :email_unsubscribe
 
   after_create :update_favicon_hash
+  after_create :refresh_favicon
 
   def mark_as_unread
     base = Entry.select(:id, :feed_id, :published, :created_at).where(feed_id: self.feed_id).order('published DESC')
@@ -83,6 +84,10 @@ class Subscription < ActiveRecord::Base
 
   def email_unsubscribe
     EmailUnsubscribe.perform_async(self.feed_id)
+  end
+
+  def refresh_favicon
+    FaviconFetcher.perform_async(self.feed.host)
   end
 
 end
