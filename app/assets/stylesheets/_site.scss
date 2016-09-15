@@ -1937,41 +1937,11 @@ $saved-search-control-height: 48px;
     .site-info {
         display: flex;
         align-items: stretch;
-        .back-button {
-            display: none;
-            height: $toolbar-height;
-            width: $toolbar-height;
-        }
-        .feed-button {
-            margin-left: 13px;
-            display: flex;
-            align-items: center;
-            -webkit-appearance: none;
-            border: none;
-            background: none;
-            padding: 0;
-            .favicon-wrap {
-                position: static;
-                box-shadow: none;
-                background-color: transparent;
-                .theme-night & {
-                    background-color: #FFF;
-                    box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
-                }
-                .theme-sunset & {
-                    background-color: transparent;
-                    box-shadow: none;
-                }
-            }
-            .entry-feed-title {
-                line-height: 20px;
-                margin-left: 6px;
-                font-size: 14px;
-                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-                text-decoration: none;
-                white-space: nowrap;
-            }
-        }
+    }
+    .back-button {
+        display: none;
+        height: $toolbar-height;
+        width: $toolbar-height;
     }
     .button-full-screen {
         display: none;
@@ -1986,6 +1956,38 @@ $saved-search-control-height: 48px;
         }
         .full-screen & {
             display: block;
+        }
+    }
+    .feed-button {
+        margin-left: 13px;
+        display: flex;
+        align-items: center;
+        -webkit-appearance: none;
+        border: none;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+        .favicon-wrap {
+            position: static;
+            box-shadow: none;
+            background-color: transparent;
+            .theme-night & {
+                background-color: #FFF;
+                box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+            }
+            .theme-sunset & {
+                background-color: transparent;
+                box-shadow: none;
+            }
+        }
+        .entry-feed-title {
+            line-height: 20px;
+            margin-left: 6px;
+            font-size: 14px;
+            @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+            text-decoration: none;
+            white-space: nowrap;
+            user-select: none;
         }
     }
 }

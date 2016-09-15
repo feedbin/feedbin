@@ -6,11 +6,10 @@
           <button class="entry-button button-full-screen" data-behavior="full_screen" title="Close full screen">
               <%= svg_tag 'icon-full-screen-close-small', size: '16x16' %>
           </button>
-          <button class="feed-button" data-behavior="show_entry_basement" data-basement-panel="feed_panel" title="Feed Options">
+          <div class="feed-button" data-behavior="show_entry_basement" data-basement-panel="feed_panel" title="Feed Options" role="button">
             <%= entry_presenter.favicon(entry.feed) %>
             <%= content_tag :div, strip_tags(entry.feed.title), class: 'entry-feed-title', data: {behavior: 'user_title', feed_id: entry.feed.id} %>
-          </button>
-
+          </div>
         </div>
         <div class="entry-buttons">
           <%= render partial: 'shared/app_settings' %>
