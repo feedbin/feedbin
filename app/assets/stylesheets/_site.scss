@@ -2030,10 +2030,13 @@ $saved-search-control-height: 48px;
         display: flex;
         align-items: stretch;
         .toolbar-item {
-            border-right: 1px solid transparent;
-            @include border-color($border-color, $border-color-night, $border-color-sunset);
             display: flex;
             align-items: center;
+            text-align: center;
+            justify-content: center;
+            min-width: 50px;
+            border-right: 1px solid transparent;
+            @include border-color($border-color, $border-color-night, $border-color-sunset);
             padding: 0 8px;
             &:hover {
                 text-decoration: none;
@@ -2339,7 +2342,7 @@ $saved-search-control-height: 48px;
     position: absolute;
     top: 0;
     right: 0px;
-    width: 270px;
+    width: 250px;
     height: $toolbar-height - 1;
     z-index: 1;
     background-image: linear-gradient(to right, rgba($body-background-color, 0) 0%, $body-background-color 10%);
@@ -5827,5 +5830,8 @@ Media Queries
         &:after {
             right: 197px;
         }
+    }
+    .toolbar-tag {
+        display: none !important;
     }
 }
