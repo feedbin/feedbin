@@ -11,6 +11,7 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test "should enqueue FaviconFetcher" do
+    Sidekiq::Worker.clear_all
     user = users(:ben)
     host = "example.com"
     url = URI::HTTP.build(host: host)
