@@ -1,5 +1,5 @@
 require_relative '../../lib/batch_jobs'
-class EntryBulkIndex
+class SearchServerSetup
   include Sidekiq::Worker
   include BatchJobs
   sidekiq_options queue: :worker_slow
@@ -9,6 +9,7 @@ class EntryBulkIndex
   def perform(batch = nil, schedule = false, last_entry_id = nil)
     if schedule
       build(last_entry_id)
+      touch_actions
     else
       index(batch)
     end
@@ -37,9 +38,18 @@ class EntryBulkIndex
     jobs = job_args(last_entry_id)
     Sidekiq::Client.push_bulk(
       'args'  => jobs,
-      'class' => "EntryBulkIndex",
-      'queue' => 'worker_slow'
+      'class' => self.class.name,
+      'queue' => self.class.get_sidekiq_options["queue"].to_s
     )
+  end
+
+  def touch_actions
+    Action.find_each do |action|
+      begin
+        action.touch
+      rescue
+      end
+    end
   end
 
 end
