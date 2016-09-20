@@ -6,7 +6,8 @@ ENV['REDIS_URL'] = "redis://localhost:7776"
 
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
-require 'minitest/autorun'
+require "minitest"
+require "minitest/mock"
 require 'sidekiq/testing'
 require 'webmock/minitest'
 
