@@ -1,4 +1,4 @@
-class UserMailer < ActionMailer::Base
+class UserMailer < ApplicationMailer
 
   default from: "Feedbin <#{ENV['FROM_ADDRESS']}>"
 

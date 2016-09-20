@@ -1,4 +1,4 @@
-class EntryMailer < ActionMailer::Base
+class EntryMailer < ApplicationMailer
 
   default from: "Feedbin <#{ENV['NOTIFICATION_EMAIL']}>"
 
