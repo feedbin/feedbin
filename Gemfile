@@ -1,10 +1,13 @@
 source 'https://rubygems.org'
 
-gem 'rails', '= 4.2.7.1'
+gem 'rails', '= 5.0.0.1'
+
+gem 'rails-deprecated_sanitizer'
+gem 'rails-controller-testing'
+gem 'rails_autolink'
 
 group :development do
   gem 'better_errors'
-  gem 'quiet_assets'
   gem 'capistrano', github: 'capistrano/capistrano', ref: 'dcd3257'
   gem 'silencer'
   gem 'spring'
@@ -15,7 +18,6 @@ end
 
 group :test do
   gem 'minitest'
-  gem 'test_after_commit'
   gem 'stripe-ruby-mock', require: 'stripe_mock'
   gem 'faker'
   gem 'webmock'
@@ -32,7 +34,7 @@ gem 'unicorn'
 
 gem 'feedjira',              github: 'feedbin/feedjira',            ref: '43ba9b4'
 gem 'opml_saw',              github: 'feedbin/opml_saw',            ref: '61d8c2d'
-gem 'html-pipeline',         github: 'feedbin/html-pipeline',       ref: 'd7e451f'
+gem 'html-pipeline',         github: 'feedbin/html-pipeline',       ref: '411228c'
 gem 'grocer-pushpackager',   github: 'feedbin/grocer-pushpackager', ref: '6b01b4e', require: 'grocer/pushpackager'
 gem 'html_diff',             github: 'feedbin/html_diff',           ref: 'c7c15ce'
 
@@ -52,9 +54,7 @@ gem 'carrierwave'
 gem 'carrierwave_direct'
 gem 'fog'
 gem 'clockwork'
-gem 'bust_rails_etags'
 gem 'jbuilder'
-gem 'request_exception_handler'
 gem 'bcrypt-ruby'
 gem 'honeybadger'
 gem 'addressable', require: 'addressable/uri'
@@ -69,19 +69,14 @@ gem 'evernote_oauth'
 gem 'rmagick', require: false
 gem 'reverse_markdown'
 gem 'htmlentities'
-gem 'rails-deprecated_sanitizer'
 gem 'responders', '~> 2.0'
 gem 'dotenv-rails'
 gem 'kramdown'
-gem 'rails_autolink'
 gem 'premailer'
 gem 'apnotic'
 gem 'http'
 gem 'elasticsearch-model'
-
-# Sidekiq
 gem 'sidekiq'
-gem 'sinatra', require: nil
 
 # Stripe
 gem 'stripe'
