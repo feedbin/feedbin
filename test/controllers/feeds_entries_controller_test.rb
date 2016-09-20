@@ -9,7 +9,7 @@ class FeedsEntriesControllerTest < ActionController::TestCase
 
     login_as user
 
-    xhr :get, :index, feed_id: feeds.first
+    get :index, params: {feed_id: feeds.first}, xhr: true
     assert_response :success
     assert_equal feeds.first.entries.length, assigns(:entries).length
   end

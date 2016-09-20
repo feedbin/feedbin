@@ -17,7 +17,7 @@ class Api::V2::SubscriptionsControllerTest < ApiControllerTestCase
 
   test "should show subscription" do
     login_as @user
-    get :index, id: @user.subscriptions.first, format: :json
+    get :index, params: {id: @user.subscriptions.first}, format: :json
     assert_response :success
   end
 
@@ -30,7 +30,7 @@ class Api::V2::SubscriptionsControllerTest < ApiControllerTestCase
 
     login_as @user
     assert_difference "Subscription.count", +1 do
-      post :create, feed_url: html_url, format: :json
+      post :create, params: {feed_url: html_url}, format: :json
       assert_response :success
     end
   end
@@ -40,7 +40,7 @@ class Api::V2::SubscriptionsControllerTest < ApiControllerTestCase
     subscription = @user.subscriptions.first
 
     attributes = {title: "#{@user.subscriptions.first} new"}
-    patch :update, id: subscription, subscription: attributes, format: :json
+    patch :update, params: {id: subscription, subscription: attributes}, format: :json
 
     assert_response :success
     attributes.each do |attribute, value|

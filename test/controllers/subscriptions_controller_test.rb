@@ -19,7 +19,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
 
     login_as @user
     assert_difference "Subscription.count", +1 do
-      xhr :post, :create, subscription: {feeds: {feed_url: html_url}}
+      post :create, params: {subscription: {feeds: {feed_url: html_url}}}, xhr: true
       assert_response :success
     end
   end
@@ -28,7 +28,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
     login_as @user
     subscription = @user.subscriptions.first
     assert_difference "Subscription.count", -1 do
-      xhr :delete, :destroy, id: subscription
+      delete :destroy, params: {id: subscription}, xhr: true
       assert_response :success
     end
   end
@@ -37,7 +37,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
     login_as @user
     subscription = @user.subscriptions.first
     assert_difference "Subscription.count", -1 do
-      xhr :delete, :settings_destroy, id: subscription
+      delete :settings_destroy, params: {id: subscription}, xhr: true
       assert_redirected_to settings_feeds_url
     end
   end
@@ -46,7 +46,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
     login_as @user
     subscription = @user.subscriptions.first
     assert_difference "Subscription.count", -1 do
-      xhr :delete, :feed_destroy, id: subscription.feed_id
+      delete :feed_destroy, params: {id: subscription.feed_id}, xhr: true
       assert_response :success
     end
   end
@@ -55,7 +55,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
     login_as @user
     ids = @user.subscriptions.pluck(:id)
     assert_difference "Subscription.count", -ids.length do
-      post :update_multiple, operation: 'unsubscribe', subscription_ids: ids
+      post :update_multiple, params: {operation: 'unsubscribe', subscription_ids: ids}
       assert_redirected_to settings_feeds_url
     end
   end
@@ -63,7 +63,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
   test "should show_updates multiple subscriptions" do
     login_as @user
     ids = @user.subscriptions.pluck(:id)
-    post :update_multiple, operation: 'show_updates', subscription_ids: ids
+    post :update_multiple, params: {operation: 'show_updates', subscription_ids: ids}
     assert_equal ids.sort, @user.subscriptions.where(show_updates: true).pluck(:id).sort
     assert_redirected_to settings_feeds_url
   end
@@ -71,7 +71,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
   test "should hide_updates multiple subscriptions" do
     login_as @user
     ids = @user.subscriptions.pluck(:id)
-    post :update_multiple, operation: 'hide_updates', subscription_ids: ids
+    post :update_multiple, params: {operation: 'hide_updates', subscription_ids: ids}
     assert_equal ids.sort, @user.subscriptions.where(show_updates: false).pluck(:id).sort
     assert_redirected_to settings_feeds_url
   end
@@ -79,7 +79,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
   test "should mute multiple subscriptions" do
     login_as @user
     ids = @user.subscriptions.pluck(:id)
-    post :update_multiple, operation: 'mute', subscription_ids: ids
+    post :update_multiple, params: {operation: 'mute', subscription_ids: ids}
     assert_equal ids.sort, @user.subscriptions.where(muted: true).pluck(:id).sort
     assert_redirected_to settings_feeds_url
   end
@@ -87,14 +87,14 @@ class SubscriptionsControllerTest < ActionController::TestCase
   test "should unmute multiple subscriptions" do
     login_as @user
     ids = @user.subscriptions.pluck(:id)
-    post :update_multiple, operation: 'unmute', subscription_ids: ids
+    post :update_multiple, params: {operation: 'unmute', subscription_ids: ids}
     assert_equal ids.sort, @user.subscriptions.where(muted: false).pluck(:id).sort
     assert_redirected_to settings_feeds_url
   end
 
   test "should get edit" do
     login_as @user
-    get :edit, id: @user.subscriptions.first
+    get :edit, params: {id: @user.subscriptions.first}
     assert_response :success
   end
 
@@ -103,7 +103,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
     subscription = @user.subscriptions.first
 
     attributes = {muted: true, show_updates: false}
-    xhr :patch, :update, id: subscription, subscription: attributes
+    patch :update, params: {id: subscription, subscription: attributes}, xhr: true
 
     assert_response :success
     attributes.each do |attribute, value|
@@ -116,7 +116,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
     subscription = @user.subscriptions.first
 
     assert_difference "FaviconFetcher.jobs.size", +1 do
-      xhr :post, :refresh_favicon, id: subscription
+      post :refresh_favicon, params: {id: subscription}, xhr: true
       assert_response :success
     end
   end

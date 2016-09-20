@@ -14,7 +14,7 @@ class UsersControllerTest < ActionController::TestCase
     plan = plans(:trial)
     create_stripe_plan(plan)
     assert_difference "User.count", +1 do
-      post :create, user: {email: 'example@example.com', password: default_password, plan_id: plan.id}
+      post :create, params: {user: {email: 'example@example.com', password: default_password, plan_id: plan.id}}
       assert_redirected_to root_url
     end
     assert signed_in?
@@ -25,7 +25,7 @@ class UsersControllerTest < ActionController::TestCase
     user = users(:ben)
     login_as user
     new_password = "#{default_password} new"
-    patch :update, id: user, user: {old_password: default_password, password: new_password}
+    patch :update, params: {id: user, user: {old_password: default_password, password: new_password}}
     assert_redirected_to settings_account_url
     assert user.reload.authenticate(new_password)
   end
@@ -46,7 +46,7 @@ class UsersControllerTest < ActionController::TestCase
     redirect_url = settings_billing_url
 
     login_as user
-    patch :update, id: user, redirect_to: redirect_url, user: {stripe_token: token, plan_id: new_plan.id}
+    patch :update, params: {id: user, redirect_to: redirect_url, user: {stripe_token: token, plan_id: new_plan.id}}
     assert_redirected_to redirect_url
     assert_equal new_plan, user.reload.plan
 
@@ -61,7 +61,7 @@ class UsersControllerTest < ActionController::TestCase
     user = users(:ben)
     login_as user
     assert_difference "User.count", -1 do
-      delete :destroy, id: user
+      delete :destroy, params: {id: user}
       assert_redirected_to root_url
     end
     StripeMock.stop

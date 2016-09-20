@@ -13,7 +13,7 @@ class UpdatedEntriesControllerTest < ActionController::TestCase
 
   test "should get index" do
     login_as @user
-    xhr :get, :index
+    get :index, xhr: true
     assert_response :success
     assert_equal @updated.length, assigns(:entries).length
   end

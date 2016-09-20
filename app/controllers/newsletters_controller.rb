@@ -8,7 +8,7 @@ class NewslettersController < ApplicationController
     if newsletter.valid?
       create_newsletter(newsletter)
     end
-    render nothing: true
+    head :ok
   end
 
   private

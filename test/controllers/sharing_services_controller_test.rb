@@ -20,7 +20,7 @@ class SharingServicesControllerTest < ActionController::TestCase
   test "should create sharing service" do
     login_as @user
     assert_difference "SharingService.count", 1 do
-      post :create, sharing_service: {label: 'Label', url: 'URL'}
+      post :create, params: {sharing_service: {label: 'Label', url: 'URL'}}
       assert_redirected_to sharing_services_url
     end
   end
@@ -29,7 +29,7 @@ class SharingServicesControllerTest < ActionController::TestCase
     login_as @user
     sharing_service = @services[:custom]
     assert_difference "SharingService.count", -1 do
-      delete :destroy, id: sharing_service
+      delete :destroy, params: {id: sharing_service}
       assert_redirected_to sharing_services_url
     end
   end
@@ -38,7 +38,7 @@ class SharingServicesControllerTest < ActionController::TestCase
     login_as @user
     sharing_service = @services[:custom]
     attributes = {label: "#{sharing_service.label} new",  url: "#{sharing_service.url} new"}
-    patch :update, id: sharing_service, sharing_service: attributes
+    patch :update, params: {id: sharing_service, sharing_service: attributes}
     assert_redirected_to sharing_services_url
     attributes.each do |attribute, value|
       assert_equal(value, sharing_service.reload.send(attribute))

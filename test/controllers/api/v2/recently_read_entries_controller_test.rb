@@ -26,7 +26,7 @@ class Api::V2::RecentlyReadEntriesControllerTest < ApiControllerTestCase
 
     login_as @user
     assert_difference "RecentlyReadEntry.count", +1 do
-      post :create, id: entry, recently_read_entries: [entry], format: :json
+      post :create, params: {id: entry, recently_read_entries: [entry]}, format: :json
       assert_response :success
     end
   end

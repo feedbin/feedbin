@@ -11,11 +11,11 @@ class UnreadEntriesControllerTest < ActionController::TestCase
   test "should toggle read" do
     login_as @user
     assert_difference "UnreadEntry.count", -1 do
-      xhr :patch, :update, id: @entries.first
+      patch :update, params: {id: @entries.first}, xhr: true
       assert_response :success
     end
     assert_difference "UnreadEntry.count", +1 do
-      xhr :patch, :update, id: @entries.first
+      patch :update, params: {id: @entries.first}, xhr: true
       assert_response :success
     end
   end

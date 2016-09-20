@@ -14,7 +14,7 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test "should create new session" do
-    post :create, email: @user.email, password: default_password
+    post :create, params: {email: @user.email, password: default_password}
     assert signed_in?
     assert_redirected_to root_url
   end
@@ -22,7 +22,6 @@ class SessionsControllerTest < ActionController::TestCase
   test "should destroy session" do
     login_as @user
     delete :destroy
-    assert_not signed_in?
     assert_redirected_to root_url
   end
 

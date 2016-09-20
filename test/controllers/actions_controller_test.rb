@@ -32,7 +32,7 @@ class ActionsControllerTest < ActionController::TestCase
     }
 
     assert_difference('Action.count') do
-      post :create, action_params: params
+      post :create, params: {action_params: params}
     end
 
     assert_redirected_to actions_path
@@ -40,7 +40,7 @@ class ActionsControllerTest < ActionController::TestCase
 
   test "should get edit" do
     login_as users(:ben)
-    get :edit, id: @action
+    get :edit, params: {id: @action}
     assert_response :success
   end
 
@@ -49,7 +49,7 @@ class ActionsControllerTest < ActionController::TestCase
 
     login_as users(:ben)
 
-    patch :update, id: @action, action_params: {title: new_title}
+    patch :update, params: {id: @action, action_params: {title: new_title}}
     assert_redirected_to actions_path
 
     @action.reload
@@ -59,7 +59,7 @@ class ActionsControllerTest < ActionController::TestCase
   test "should destroy action" do
     login_as users(:ben)
     assert_difference('Action.count', -1) do
-      delete :destroy, id: @action
+      delete :destroy, params: {id: @action}
     end
 
     assert_redirected_to actions_path

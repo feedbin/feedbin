@@ -32,10 +32,12 @@ class Api::V2::ActionsControllerTest < ApiControllerTestCase
     api_content_type
     login_as @user
     assert_difference "Action.count", +1 do
-      post :create, format: :json, action_params: {
-        query: "query",
-        feed_ids: [@feeds.first.id],
-        actions: ['mark_read']
+      post :create, format: :json, params: {
+        action_params: {
+          query: "query",
+          feed_ids: [@feeds.first.id],
+          actions: ['mark_read']
+        }
       }
       assert_response :success
     end
@@ -46,14 +48,14 @@ class Api::V2::ActionsControllerTest < ApiControllerTestCase
     login_as @user
     action = @actions.first
     query = "#{action.query} new"
-    patch :update, id: action, action_params: {query: query}, format: :json
+    patch :update, params: {id: action, action_params: {query: query}}, format: :json
     assert_response :success
     assert_equal query, action.reload.query
   end
 
   test "should get results" do
     login_as @user
-    get :results, id: @actions.first, format: :json
+    get :results, params: {id: @actions.first}, format: :json
     assert_includes assigns(:entries).to_a, @entry
   end
 

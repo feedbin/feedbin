@@ -4,7 +4,7 @@ class FaviconsControllerTest < ActionController::TestCase
 
   test "get index" do
     login_as users(:ben)
-    get :index, hash: 'none', format: :css
+    get :index, params: {hash: 'none'}, format: :css
     assert_response :success
   end
 

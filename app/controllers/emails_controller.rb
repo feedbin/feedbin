@@ -17,7 +17,7 @@ class EmailsController < ApplicationController
       end
     end
   ensure
-    render nothing: true
+    head :ok
   end
 
 end

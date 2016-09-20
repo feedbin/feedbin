@@ -38,7 +38,7 @@ class StarredEntriesController < ApplicationController
       StarredEntry.create_from_owners(@user, @entry, "web")
     end
 
-    render nothing: true
+    head :ok
   end
 
 

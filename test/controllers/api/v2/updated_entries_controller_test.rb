@@ -22,7 +22,7 @@ class Api::V2::UpdatedEntriesControllerTest < ApiControllerTestCase
   test "should destroy updated entry" do
     login_as @user
     assert_difference "UpdatedEntry.count", -@entries.length do
-      delete :destroy, updated_entries: @entries.map(&:id), format: :json
+      delete :destroy, params: {updated_entries: @entries.map(&:id)}, format: :json
       assert_response :success
     end
   end

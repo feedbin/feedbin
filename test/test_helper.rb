@@ -38,7 +38,7 @@ class ActiveSupport::TestCase
 
   def raw_post(action, params, body)
     @request.env['RAW_POST_DATA'] = body
-    response = post(action, params)
+    response = post(action, params: params)
     @request.env.delete('RAW_POST_DATA')
     response
   end

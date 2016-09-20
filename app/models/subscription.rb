@@ -34,7 +34,7 @@ class Subscription < ActiveRecord::Base
   end
 
   def mark_as_read
-    UnreadEntry.delete_all(user_id: self.user_id, feed_id: self.feed_id)
+    UnreadEntry.where(user_id: self.user_id, feed_id: self.feed_id).delete_all
   end
 
   def add_feed_to_action

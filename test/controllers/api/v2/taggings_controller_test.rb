@@ -17,7 +17,7 @@ class Api::V2::TaggingsControllerTest < ApiControllerTestCase
 
   test "should show tag" do
     login_as @user
-    get :show, id: @tagging, format: :json
+    get :show, params: {id: @tagging}, format: :json
     assert_response :success
   end
 
@@ -26,7 +26,7 @@ class Api::V2::TaggingsControllerTest < ApiControllerTestCase
     login_as @user
 
     assert_difference "Tagging.count", +1 do
-      post :create, feed_id: @user.feeds.first, name: "#{@tagging.tag.name} new", format: :json
+      post :create, params: {feed_id: @user.feeds.first.id, name: "#{@tagging.tag.name} new"}, format: :json
       assert_response :success
     end
   end
@@ -35,7 +35,7 @@ class Api::V2::TaggingsControllerTest < ApiControllerTestCase
     login_as @user
 
     assert_difference "Tagging.count", -1 do
-      delete :destroy, id: @tagging, format: :json
+      delete :destroy, params: {id: @tagging}, format: :json
       assert_response :success
     end
 

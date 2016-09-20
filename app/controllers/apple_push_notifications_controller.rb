@@ -16,12 +16,12 @@ class ApplePushNotificationsController < ApplicationController
   def update
     Device.where("lower(token) = ?", params[:device_token].downcase).destroy_all
     @user.devices.where("lower(token) = ?", params[:device_token].downcase).first_or_create(token: params[:device_token], device_type: :safari, model: request.env['HTTP_USER_AGENT'])
-    render nothing: true
+    head :ok
   end
 
   def delete
     Device.where("lower(token) = ?", params[:device_token].downcase).destroy_all
-    render nothing: true
+    head :ok
   end
 
   def log
@@ -30,7 +30,7 @@ class ApplePushNotificationsController < ApplicationController
       error_message: "Apple Push Notification Failure",
       parameters: params
     )
-    render nothing: true
+    head :ok
   end
 
   private

@@ -28,7 +28,7 @@ class Api::V2::InAppPurchasesControllerTest < ApiControllerTestCase
     time = Time.now
     assert_difference "InAppPurchase.count", +1 do
       Time.stub :now, time do
-        post :create, in_app_purchase: {id: nil}, format: :json
+        post :create, params: {in_app_purchase: {id: nil}}, format: :json
       end
       assert_response :success
     end

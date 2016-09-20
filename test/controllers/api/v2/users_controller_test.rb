@@ -9,7 +9,7 @@ class Api::V2::UsersControllerTest < ApiControllerTestCase
     create_stripe_plan(plan)
 
     assert_difference "User.count", +1 do
-      post :create, user: {email: 'example@example.com', password: default_password}, format: :json
+      post :create, params: {user: {email: 'example@example.com', password: default_password}}, format: :json
       assert_response :success
     end
     StripeMock.stop

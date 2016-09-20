@@ -10,7 +10,7 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
   test "should create supported sharing service" do
     login_as @user
     assert_difference "SupportedSharingService.count", +1 do
-      post :create, supported_sharing_service: {service_id: 'email'}
+      post :create, params: {supported_sharing_service: {service_id: 'email'}}
       assert_redirected_to sharing_services_url
     end
   end
@@ -18,7 +18,7 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
   test "should destroy supported sharing service" do
     login_as @user
     assert_difference "SupportedSharingService.count", -1 do
-      delete :destroy, id: @service
+      delete :destroy, params: {id: @service}
       assert_redirected_to sharing_services_url
     end
   end
@@ -26,7 +26,7 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
   test "should update supported sharing service" do
     login_as @user
     attributes = {email_name: 'email_name', email_address: 'email_address', kindle_address: 'kindle_address'}
-    patch :update, id: @service, supported_sharing_service: attributes
+    patch :update, params: {id: @service, supported_sharing_service: attributes}
     assert_redirected_to sharing_services_url
     attributes.each do |attribute, value|
       assert_equal(value, @service.reload.send(attribute))
@@ -37,7 +37,7 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
     options = ['test@test.com', 'test@example.com']
     @service.update(service_options: {completions: options})
     login_as @user
-    get :autocomplete, id: @service, query: 'test'
+    get :autocomplete, params: {id: @service, query: 'test'}
     assert_response :success
     data = JSON.parse(@response.body)
     assert data.length, options.length
@@ -51,7 +51,7 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
       to_return(body: {code: code}.to_json, status: 200)
 
     login_as @user
-    post :create, supported_sharing_service: {service_id: 'pocket', operation: 'authorize'}
+    post :create, params: {supported_sharing_service: {service_id: 'pocket', operation: 'authorize'}}
     assert_redirected_to Share::Pocket.new.authorize_url(code)
 
     stub_request(:post, Share::Pocket.new.url_for(:oauth_authorize).to_s).
@@ -59,7 +59,7 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
       to_return(body: {access_token: token}.to_json, status: 200)
 
     assert_difference "SupportedSharingService.count", +1 do
-      get :oauth_response, id: 'pocket'
+      get :oauth_response, params: {id: 'pocket'}
       assert_redirected_to sharing_services_url
     end
 
@@ -72,7 +72,7 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
     @service.update(kindle_address: 'example@example.com')
     login_as @user
     assert_difference "SendToKindle.jobs.size", +1 do
-      xhr :post, :share, id: @service, entry_id: 1
+      post :share, params: {id: @service, entry_id: 1}, xhr: true
       assert_response :success
     end
   end

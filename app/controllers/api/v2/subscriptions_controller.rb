@@ -73,7 +73,7 @@ module Api
         if @subscription.present?
           @subscription.destroy
           @subscription.feed.tag('', @user)
-          render nothing: true, status: :no_content
+          head :no_content
         else
           status_forbidden
         end

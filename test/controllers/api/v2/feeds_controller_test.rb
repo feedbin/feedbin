@@ -11,7 +11,7 @@ class Api::V2::FeedsControllerTest < ApiControllerTestCase
     login_as @user
     feed = @feeds.first
 
-    get :show, id: feed, format: :json
+    get :show, params: {id: feed}, format: :json
     assert_response :success
 
     feed = parse_json

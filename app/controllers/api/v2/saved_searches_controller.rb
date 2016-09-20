@@ -49,7 +49,7 @@ module Api
         @saved_search = @user.saved_searches.where(id: params[:id]).first
         if @saved_search.present?
           @saved_search.destroy
-          render nothing: true, status: :no_content
+          head :no_content
         else
           status_forbidden
         end

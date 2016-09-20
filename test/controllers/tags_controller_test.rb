@@ -9,7 +9,7 @@ class TagsControllerTest < ActionController::TestCase
 
   test "should get index" do
     login_as @user
-    get :index, query: @tag.name, format: :json
+    get :index, params: {query: @tag.name}, format: :json
     assert_response :success
     data = JSON.parse(@response.body)
     assert_kind_of Array, data['suggestions']
@@ -20,14 +20,14 @@ class TagsControllerTest < ActionController::TestCase
 
   test "should show tag" do
     login_as @user
-    xhr :get, :show, id: @tag
+    get :show, params: {id: @tag}, xhr: true
     assert_response :success
   end
 
   test "should update tag" do
     login_as @user
     assert_difference "Tag.count", +1 do
-      xhr :post, :update, id: @tag, tag: {name: "#{@tag.name} New"}
+      post :update, params: {id: @tag, tag: {name: "#{@tag.name} New"}}, xhr: true
       assert_response :success
     end
   end
@@ -35,7 +35,7 @@ class TagsControllerTest < ActionController::TestCase
   test "should destroy tag" do
     login_as @user
     assert_difference "Tagging.count", -1 do
-      xhr :delete, :destroy, id: @tag
+      delete :destroy, params: {id: @tag}, xhr: true
       assert_response :success
     end
   end

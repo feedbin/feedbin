@@ -12,7 +12,7 @@ class FeedsController < ApplicationController
     @feed.tag(params[:feed][:tag_list], @user)
 
     if params[:no_response].present?
-      render nothing: true
+      head :ok
     else
       get_feeds_list
     end
@@ -95,7 +95,7 @@ class FeedsController < ApplicationController
           'retry' => false
         )
       end
-      render nothing: true
+      head :ok
     end
 
   end
@@ -112,7 +112,7 @@ class FeedsController < ApplicationController
         @delay = true
       end
     else
-      render nothing: true
+      head :ok
     end
   end
 
@@ -127,7 +127,7 @@ class FeedsController < ApplicationController
     @user = current_user
     @view_mode = view_mode
     @user.update_attributes(view_mode: @view_mode)
-    render nothing: true
+    head :ok
   end
 
   def correct_user

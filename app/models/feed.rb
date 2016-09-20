@@ -21,7 +21,7 @@ class Feed < ActiveRecord::Base
   def tag(names, user, delete_existing = true)
     taggings = []
     if delete_existing
-      Tagging.destroy_all(user_id: user, feed_id: self.id)
+      Tagging.where(user_id: user, feed_id: self.id).destroy_all
     end
     names.split(",").map do |name|
       name = name.strip

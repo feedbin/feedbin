@@ -21,7 +21,7 @@ class RecentlyReadEntriesController < ApplicationController
   def create
     @user = current_user
     RecentlyReadEntry.create(user: @user, entry_id: params[:id])
-    render nothing: true
+    head :ok
   end
 
   def destroy_all

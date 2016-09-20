@@ -27,7 +27,7 @@ module Api
             error_message: error_codes[response["status"]] || "Receipt verification failed",
             parameters: {status: response["status"]}
           )
-          render nothing: true, status: :bad_request
+          head :bad_request
         end
 
       end

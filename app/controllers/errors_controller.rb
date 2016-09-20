@@ -4,7 +4,7 @@ class ErrorsController < ApplicationController
 
   def not_found
     render_file_or("404", :not_found) {
-      render text: 'Not found', status: :not_found
+      render plain: 'Not found', status: :not_found
     }
   end
 

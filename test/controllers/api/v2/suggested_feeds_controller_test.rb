@@ -21,7 +21,7 @@ class Api::V2::SuggestedFeedsControllerTest < ApiControllerTestCase
     login_as @user
 
     assert_difference "Subscription.count", +1 do
-      post :subscribe, id: @suggested_feed, format: :json
+      post :subscribe, params: {id: @suggested_feed}, format: :json
       assert_response :success
     end
   end
@@ -31,7 +31,7 @@ class Api::V2::SuggestedFeedsControllerTest < ApiControllerTestCase
     login_as @user
 
     assert_difference "Subscription.count", -1 do
-      delete :unsubscribe, id: @suggested_feed, format: :json
+      delete :unsubscribe, params: {id: @suggested_feed}, format: :json
       assert_response :success
     end
   end

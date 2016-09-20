@@ -23,9 +23,9 @@ class ApplePushNotificationsControllerTest < ActionController::TestCase
 
   test "should destroy device token" do
     set_authorization_header
-    patch :update, default_params.merge(device_token: "token")
+    patch :update, params: default_params.merge(device_token: "token")
     assert_difference('Device.count', -1) do
-      delete :delete, default_params.merge(device_token: "token")
+      delete :delete, params: default_params.merge(device_token: "token")
     end
     assert_response :success
   end
@@ -33,7 +33,7 @@ class ApplePushNotificationsControllerTest < ActionController::TestCase
   test "should update device token" do
     set_authorization_header
     assert_difference('Device.count') do
-      patch :update, default_params.merge(device_token: "token")
+      patch :update, params: default_params.merge(device_token: "token")
     end
     assert_response :success
   end

@@ -65,7 +65,7 @@ class SettingsControllerTest < ActionController::TestCase
   test "should import" do
     login_as @user
     skip "Figure out how to test CarrierWave direct"
-    get :import_export, key: sample_key(ImportUploader.new, base: 'test.opml')
+    get :import_export, params: {key: sample_key(ImportUploader.new, base: 'test.opml')}
     assert_redirected_to settings_import_export_url
   end
 
@@ -92,7 +92,7 @@ class SettingsControllerTest < ActionController::TestCase
     @user.reload.inspect
 
     login_as @user
-    post :update_plan, plan: plans[:new].id
+    post :update_plan, params: {plan: plans[:new].id}
     assert_equal plans[:new], @user.reload.plan
     StripeMock.stop
   end
@@ -114,7 +114,7 @@ class SettingsControllerTest < ActionController::TestCase
     user.save
 
     login_as user
-    post :update_credit_card, stripe_token: card_2
+    post :update_credit_card, params: {stripe_token: card_2}
     assert_redirected_to settings_billing_url
 
     customer = Stripe::Customer.retrieve(user.customer_id)
@@ -133,7 +133,7 @@ class SettingsControllerTest < ActionController::TestCase
       :hide_recently_read, :hide_updated, :disable_image_proxy, :entries_image
     ].each_with_object({}) {|setting, hash| hash[setting.to_s] = '1'}
 
-    patch :settings_update, id: @user, user: settings
+    patch :settings_update, params: {id: @user, user: settings}
     assert_redirected_to settings_url
     assert_equal settings, @user.reload.settings
   end
@@ -149,7 +149,7 @@ class SettingsControllerTest < ActionController::TestCase
       column: 'test',
       width: 1234
     }
-    patch :view_settings_update, params
+    patch :view_settings_update, params: params
     assert_equal({tag.id.to_s => true}, @user.reload.tag_visibility)
     assert_response :success
     assert_equal session[:column_widths], {params[:column] => params[:width].to_s}
@@ -162,7 +162,7 @@ class SettingsControllerTest < ActionController::TestCase
 
     post :font_increase
     assert_response :success
-    assert_equal (@user.font_size + 1).to_s, @user.reload.font_size
+    assert_equal (@user.font_size.to_i + 1).to_s, @user.reload.font_size
   end
 
   test "should decrease font" do
@@ -172,19 +172,19 @@ class SettingsControllerTest < ActionController::TestCase
 
     post :font_decrease
     assert_response :success
-    assert_equal (@user.font_size - 1).to_s, @user.reload.font_size
+    assert_equal (@user.font_size.to_i - 1).to_s, @user.reload.font_size
   end
 
   test "should change font" do
     login_as @user
-    post :font, font: Feedbin::Application.config.fonts.values.last
+    post :font, params: {font: Feedbin::Application.config.fonts.values.last}
     assert_equal @user.reload.font, Feedbin::Application.config.fonts.values.last
   end
 
   test "should change theme" do
     login_as @user
     ['day', 'night', 'sunset'].each do |theme|
-      post :theme, theme: theme
+      post :theme, params: {theme: theme}
       assert_equal @user.reload.theme, theme
     end
   end

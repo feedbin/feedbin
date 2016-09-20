@@ -11,7 +11,7 @@ class RecentlyReadEntriesControllerTest < ActionController::TestCase
   test "should get index" do
     @user.recently_read_entries.create(entry: @entries.first)
     login_as @user
-    xhr :get, :index
+    get :index, xhr: true
     assert_response :success
     assert assigns(:entries).present?
   end
@@ -22,7 +22,7 @@ class RecentlyReadEntriesControllerTest < ActionController::TestCase
     end
     login_as @user
     assert_difference('RecentlyReadEntry.count', -@entries.length) do
-      xhr :delete, :destroy_all
+      delete :destroy_all, xhr: true
       assert_response :success
     end
   end

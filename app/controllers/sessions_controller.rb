@@ -23,7 +23,7 @@ class SessionsController < ApplicationController
   end
 
   def refresh
-    render nothing: true
+    head :ok
   end
 
 end

@@ -147,7 +147,7 @@ class User < ActiveRecord::Base
   end
 
   def feed_tags
-    tags.where(id: taggings.pluck(:tag_id)).order(:name).uniq
+    tags.where(id: taggings.pluck(:tag_id)).order(:name).distinct
   end
 
   def tag_names

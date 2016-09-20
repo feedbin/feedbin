@@ -94,7 +94,7 @@ class SettingsController < ApplicationController
 
   def mark_favicon_complete
     session[:favicon_complete] = true
-    render nothing: true
+    head :ok
   end
 
   def update_plan
@@ -167,7 +167,7 @@ class SettingsController < ApplicationController
       session[:column_widths] ||= {}
       session[:column_widths][params[:column]] = params[:width]
     end
-    render nothing: true
+    head :ok
   end
 
   def font_increase
@@ -184,7 +184,7 @@ class SettingsController < ApplicationController
       @user.font = params[:font]
       @user.save
     end
-    render nothing: true
+    head :ok
   end
 
   def theme
@@ -194,7 +194,7 @@ class SettingsController < ApplicationController
       @user.theme = params[:theme]
       @user.save
     end
-    render nothing: true
+    head :ok
   end
 
   def entry_width
@@ -206,7 +206,7 @@ class SettingsController < ApplicationController
     end
     @user.entry_width = new_width
     @user.save
-    render nothing: true
+    head :ok
   end
 
 
@@ -228,7 +228,7 @@ class SettingsController < ApplicationController
       @user.save
     end
 
-    render nothing: true
+    head :ok
   end
 
   def plan_exists

@@ -13,7 +13,7 @@ class BillingEventsControllerTest < ActionController::TestCase
     login_as users(:ben)
     skip '@billing_event not fully implemented'
     assert_raises(ActionView::Template::Error) do
-      get :show, id: @billing_event
+      get :show, params: {id: @billing_event}
       assert_not_nil assigns(:billing_event)
     end
   end

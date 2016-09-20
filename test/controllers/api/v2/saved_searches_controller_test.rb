@@ -20,11 +20,11 @@ class Api::V2::SavedSearchesControllerTest < ApiControllerTestCase
 
   test "should show saved search" do
     login_as @user
-    get :show, id: @saved_search, format: :json
+    get :show, params: {id: @saved_search}, format: :json
     assert_response :success
     assert_equal Set.new([@entry.id]), Set.new(parse_json)
 
-    get :show, id: @saved_search, include_entries: 'true', format: :json
+    get :show, params: {id: @saved_search, include_entries: 'true'}, format: :json
     assert_response :success
     assert_equal_ids [@entry], parse_json
   end
@@ -33,7 +33,7 @@ class Api::V2::SavedSearchesControllerTest < ApiControllerTestCase
     api_content_type
     login_as @user
     assert_difference('SavedSearch.count', 1) do
-      post :create, saved_search: {query: 'test', name: 'test'}, format: :json
+      post :create, params: {saved_search: {query: 'test', name: 'test'}}, format: :json
       assert_response :success
     end
   end
@@ -41,7 +41,7 @@ class Api::V2::SavedSearchesControllerTest < ApiControllerTestCase
   test "should destroy saved search" do
     login_as @user
     assert_difference('SavedSearch.count', -1) do
-      delete :destroy, id: @saved_search, format: :json
+      delete :destroy, params: {id: @saved_search}, format: :json
       assert_response :success
     end
   end
@@ -50,7 +50,7 @@ class Api::V2::SavedSearchesControllerTest < ApiControllerTestCase
     api_content_type
     login_as @user
     params = {query: "#{@saved_search.query} new", name: "#{@saved_search.name} new"}
-    patch :update, id: @saved_search, saved_search: params, format: :json
+    patch :update, params: {id: @saved_search, saved_search: params}, format: :json
     assert_response :success
     params.each do |attribute, value|
       assert_equal value, @saved_search.reload.send(attribute.to_sym)

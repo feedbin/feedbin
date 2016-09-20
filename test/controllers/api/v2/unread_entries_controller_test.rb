@@ -22,7 +22,7 @@ class Api::V2::UnreadEntriesControllerTest < ApiControllerTestCase
     login_as @user
     entries = @entries.sample(2)
     assert_difference "UnreadEntry.count", +entries.length do
-      post :create, unread_entries: entries.map(&:id), format: :json
+      post :create, params: {unread_entries: entries.map(&:id)}, format: :json
       assert_response :success
     end
   end
@@ -32,7 +32,7 @@ class Api::V2::UnreadEntriesControllerTest < ApiControllerTestCase
     login_as @user
     entries = @entries.sample(2)
     assert_difference "UnreadEntry.count", -entries.length do
-      delete :destroy, unread_entries: entries.map(&:id), format: :json
+      delete :destroy, params: {unread_entries: entries.map(&:id)}, format: :json
       assert_response :success
     end
   end

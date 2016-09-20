@@ -20,9 +20,9 @@ module Api
         end
 
         if @user.subscribed_to?(feed.id)
-          render nothing: true, status: :created
+          head :created
         else
-          render nothing: true, status: :bad_request
+          head :bad_request
         end
 
       end
@@ -35,9 +35,9 @@ module Api
         @user.subscriptions.where(feed: feed).destroy_all
 
         if !@user.subscribed_to?(feed.id)
-          render nothing: true, status: :no_content
+          head :no_content
         else
-          render nothing: true, status: :bad_request
+          head :bad_request
         end
 
       end

@@ -10,7 +10,7 @@ class FeedsControllerTest < ActionController::TestCase
     login_as @user
 
     assert_difference('Tagging.count', 1) do
-      xhr :patch, :update, id: @user.feeds.first, feed: {tag_list: "Tag"}
+      patch :update, params: {id: @user.feeds.first, feed: {tag_list: "Tag"}}, xhr: true
       assert_response :success
     end
   end
@@ -19,7 +19,7 @@ class FeedsControllerTest < ActionController::TestCase
     login_as @user
     feed = @user.feeds.first
     title = Faker::Lorem.sentence
-    xhr :patch, :rename, feed_id: feed, feed: {title: title}
+    patch :rename, params: {feed_id: feed, feed: {title: title}}, xhr: true
     assert @user.subscriptions.where(title: title, feed: feed).length == 1
   end
 
@@ -27,7 +27,7 @@ class FeedsControllerTest < ActionController::TestCase
     login_as @user
 
     %w{view_unread view_starred view_all}.each do |view_mode|
-      xhr :get, view_mode
+      get view_mode, xhr: true
       assert_response :success
       assert @user.reload.view_mode == view_mode
     end
@@ -36,7 +36,7 @@ class FeedsControllerTest < ActionController::TestCase
 
   test "gets auto_update" do
     login_as @user
-    xhr :get, :auto_update
+    get :auto_update, xhr: true
     assert_response :success
   end
 
@@ -53,13 +53,13 @@ class FeedsControllerTest < ActionController::TestCase
     }
 
     subscribe_challenge = Faker::Internet.slug
-    get :push, params.merge('hub.mode' => 'subscribe', 'hub.challenge' => subscribe_challenge)
+    get :push, params: params.merge('hub.mode' => 'subscribe', 'hub.challenge' => subscribe_challenge)
     assert_response :success
     assert_equal subscribe_challenge, @response.body
     assert_not_nil feed.reload.push_expiration
 
     unsubscribe_challenge = Faker::Internet.slug
-    get :push, params.merge('hub.mode' => 'unsubscribe', 'hub.challenge' => unsubscribe_challenge)
+    get :push, params: params.merge('hub.mode' => 'unsubscribe', 'hub.challenge' => unsubscribe_challenge)
     assert_response :success
     assert_equal unsubscribe_challenge, @response.body
   end
@@ -77,7 +77,7 @@ class FeedsControllerTest < ActionController::TestCase
       'hub.challenge' => Faker::Internet.slug
     }
 
-    get :push, params
+    get :push, params: params
     assert_response :not_found
   end
 
@@ -107,7 +107,7 @@ class FeedsControllerTest < ActionController::TestCase
     login_as @user
     feed = @user.feeds.first
     subscription = @user.subscriptions.where(feed: feed).take!
-    xhr :post, :toggle_updates, id: feed
+    post :toggle_updates, params: {id: feed}, xhr: true
     assert_response :success
     assert_not_equal subscription.show_updates, subscription.reload.show_updates
   end
@@ -115,7 +115,7 @@ class FeedsControllerTest < ActionController::TestCase
   test "get update_styles" do
     login_as @user
     feed = @user.feeds.first
-    xhr :get, :update_styles
+    get :update_styles, xhr: true
     assert_response :success
   end
 

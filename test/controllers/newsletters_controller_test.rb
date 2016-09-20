@@ -6,7 +6,7 @@ class NewslettersControllerTest < ActionController::TestCase
     user = users(:ben)
     signature = Newsletter.new(newsletter_params('asdf', 'asdf')).send(:signature)
     assert_difference('Entry.count', 1) do
-      post :create, newsletter_params(user.newsletter_token, signature)
+      post :create, params: newsletter_params(user.newsletter_token, signature)
     end
     assert_response :success
   end
@@ -14,7 +14,7 @@ class NewslettersControllerTest < ActionController::TestCase
   test "doesn't create newsletter with invalid signature" do
     user = users(:ben)
     assert_no_difference('Entry.count') do
-      post :create, newsletter_params(user.newsletter_token, 'fdsa')
+      post :create, params: newsletter_params(user.newsletter_token, 'fdsa')
     end
     assert_response :success
   end
@@ -24,7 +24,7 @@ class NewslettersControllerTest < ActionController::TestCase
     signature = Newsletter.new(newsletter_params('asdf', 'asdf')).send(:signature)
     title = SecureRandom.hex
     assert_difference('Entry.count', 1) do
-      post :create, newsletter_params(user.newsletter_token, signature, title)
+      post :create, params: newsletter_params(user.newsletter_token, signature, title)
     end
     assert_response :success
     feed = Feed.find_by_title(title)

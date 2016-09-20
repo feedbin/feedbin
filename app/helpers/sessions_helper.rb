@@ -29,7 +29,7 @@ module SessionsHelper
       else
         flash[:error] = "Please log in."
         if request.xhr?
-          render nothing: true, status: 401
+          head :unauthorized
         else
           store_location
           redirect_to login_url

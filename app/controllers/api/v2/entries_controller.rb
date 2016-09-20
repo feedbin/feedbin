@@ -40,7 +40,7 @@ module Api
 
       def text
         entry = Entry.find(params[:id])
-        render text: text_format(entry.content), content_type: 'text/plain'
+        render plain: text_format(entry.content), content_type: 'text/plain'
       end
 
       private

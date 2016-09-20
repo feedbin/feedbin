@@ -23,7 +23,7 @@ class Api::V2::StarredEntriesControllerTest < ApiControllerTestCase
     login_as @user
     entry = @entries.sample
     assert_difference "StarredEntry.count", +1 do
-      post :create, starred_entries: [entry.id], format: :json
+      post :create, params: {starred_entries: [entry.id]}, format: :json
       assert_response :success
     end
   end
@@ -34,7 +34,7 @@ class Api::V2::StarredEntriesControllerTest < ApiControllerTestCase
     end
     login_as @user
     assert_difference "StarredEntry.count", -starred.count do
-      delete :destroy, starred_entries: starred.map(&:entry_id), format: :json
+      delete :destroy, params: {starred_entries: starred.map(&:entry_id)}, format: :json
       assert_response :success
     end
   end

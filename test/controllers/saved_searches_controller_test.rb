@@ -11,14 +11,14 @@ class SavedSearchesControllerTest < ActionController::TestCase
 
   test "should show saved search" do
     login_as @user
-    xhr :get, :show, id: @saved_search
+    get :show, params: {id: @saved_search}, xhr: true
     assert_response :success
   end
 
   test "should create saved search" do
     login_as @user
     assert_difference('SavedSearch.count', 1) do
-      xhr :post, :create, saved_search: {query: 'test', name: 'test'}
+      post :create, params: {saved_search: {query: 'test', name: 'test'}}, xhr: true
       assert_response :success
     end
   end
@@ -26,7 +26,7 @@ class SavedSearchesControllerTest < ActionController::TestCase
   test "should destroy saved search" do
     login_as @user
     assert_difference('SavedSearch.count', -1) do
-      xhr :delete, :destroy, id: @saved_search
+      delete :destroy, params: {id: @saved_search}, xhr: true
       assert_response :success
     end
   end
@@ -34,7 +34,7 @@ class SavedSearchesControllerTest < ActionController::TestCase
   test "should update saved search" do
     login_as @user
     params = {query: "#{@saved_search.query} new", name: "#{@saved_search.name} new"}
-    xhr :patch, :update, id: @saved_search, saved_search: params
+    patch :update, params: {id: @saved_search, saved_search: params}, xhr: true
     assert_response :success
     params.each do |attribute, value|
       assert_equal value, @saved_search.reload.send(attribute.to_sym)

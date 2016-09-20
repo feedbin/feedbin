@@ -123,7 +123,7 @@ class EntriesController < ApplicationController
     @user = current_user
     UnreadEntry.where(user: @user, entry_id: params[:id]).delete_all
     UpdatedEntry.where(user: @user, entry_id: params[:id]).delete_all
-    render nothing: true
+    head :ok
   end
 
   def mark_all_as_read

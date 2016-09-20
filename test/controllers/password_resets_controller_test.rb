@@ -13,7 +13,7 @@ class PasswordResetsControllerTest < ActionController::TestCase
 
   test "should create password reset" do
     assert_difference "Sidekiq::Extensions::DelayedMailer.jobs.size", +1 do
-      post :create, email: @user.email
+      post :create, params: {email: @user.email}
       assert_not_equal @user.password_reset_token, @user.reload.password_reset_token
     end
   end
@@ -21,7 +21,7 @@ class PasswordResetsControllerTest < ActionController::TestCase
   test "should get edit" do
     token = @user.generate_token(:password_reset_token, nil, true)
     @user.save
-    get :edit, id: token
+    get :edit, params: {id: token}
     assert_response :success
   end
 
@@ -29,7 +29,7 @@ class PasswordResetsControllerTest < ActionController::TestCase
     token = @user.generate_token(:password_reset_token, nil, true)
     @user.password_reset_sent_at = Time.now
     @user.save
-    post :update, id: token, user: {password: 'new password'}
+    post :update, params: {id: token, user: {password: 'new password'}}
     assert_redirected_to login_url
   end
 
@@ -37,7 +37,7 @@ class PasswordResetsControllerTest < ActionController::TestCase
     token = @user.generate_token(:password_reset_token, nil, true)
     @user.password_reset_sent_at = 3.hours.ago
     @user.save
-    post :update, id: token, user: {password: 'new password'}
+    post :update, params: {id: token, user: {password: 'new password'}}
     assert_redirected_to new_password_reset_path
     assert flash[:alert].present?
   end

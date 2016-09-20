@@ -16,14 +16,14 @@ class StarredEntriesControllerTest < ActionController::TestCase
     @user.save
     assert @user.setting_on?(:starred_feed_enabled)
     login_as @user
-    get :index, starred_token: @user.starred_token, format: :xml
+    get :index, params: {starred_token: @user.starred_token}, format: :xml
     assert_response :success
     assert assigns(:entries).present?
   end
 
   test "should not get index with starred_feed disabled" do
     login_as @user
-    get :index, starred_token: @user.starred_token, format: :xml
+    get :index, params: {starred_token: @user.starred_token}, format: :xml
     assert_response :not_found
   end
 
@@ -39,11 +39,11 @@ class StarredEntriesControllerTest < ActionController::TestCase
     login_as @user
     entry = @entries.first
     assert_difference "StarredEntry.count", -1 do
-      patch :update, id: entry
+      patch :update, params: {id: entry}
       assert_response :success
     end
     assert_difference "StarredEntry.count", +1 do
-      patch :update, id: entry
+      patch :update, params: {id: entry}
       assert_response :success
     end
   end
