@@ -136,13 +136,15 @@ $.extend feedbin,
       $(@).text(date.format("%B %e, %Y at %l:%M %p"))
 
   applyUserTitles: ->
+    textarea = document.createElement("textarea")
     $('[data-behavior~=user_title]').each ->
       element = $(@)
       feed = element.data('feed-id')
       if (feed of feedbin.data.user_titles)
         newTitle = feedbin.data.user_titles[feed]
         if element.prop('tagName') == "INPUT"
-          element.val(newTitle)
+          textarea.innerHTML = newTitle
+          element.val(textarea.value)
         else
           element.html(newTitle)
 
