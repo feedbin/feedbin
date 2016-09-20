@@ -1,4 +1,4 @@
-class Subscription < ActiveRecord::Base
+class Subscription < ApplicationRecord
   attr_accessor :entries_count, :post_volume
 
   belongs_to :user

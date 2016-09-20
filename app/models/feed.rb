@@ -1,4 +1,4 @@
-class Feed < ActiveRecord::Base
+class Feed < ApplicationRecord
   has_many :subscriptions
   has_many :entries
   has_many :users, through: :subscriptions

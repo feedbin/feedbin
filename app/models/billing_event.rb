@@ -1,4 +1,4 @@
-class BillingEvent < ActiveRecord::Base
+class BillingEvent < ApplicationRecord
 
   attr_accessor :details
 

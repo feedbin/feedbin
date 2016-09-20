@@ -1,4 +1,4 @@
-class DeletedUser < ActiveRecord::Base
+class DeletedUser < ApplicationRecord
   def self.search(query)
     where("email like ?", "%#{query}%")
   end

@@ -1,4 +1,4 @@
-class ImportItem < ActiveRecord::Base
+class ImportItem < ApplicationRecord
   serialize :details, Hash
   belongs_to :import
 

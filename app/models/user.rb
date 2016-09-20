@@ -1,4 +1,4 @@
-class User < ActiveRecord::Base
+class User < ApplicationRecord
 
   attr_accessor :stripe_token, :old_password_valid, :update_auth_token,
                 :password_reset, :coupon_code, :is_trialing, :coupon_valid

@@ -1,4 +1,4 @@
-class Tagging < ActiveRecord::Base
+class Tagging < ApplicationRecord
   belongs_to :tag
   belongs_to :feed
   belongs_to :user

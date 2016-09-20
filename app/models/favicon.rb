@@ -1,4 +1,4 @@
-class Favicon < ActiveRecord::Base
+class Favicon < ApplicationRecord
   def data
     self[:data] || {}
   end

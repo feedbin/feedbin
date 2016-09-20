@@ -1,4 +1,4 @@
-class SupportedSharingService < ActiveRecord::Base
+class SupportedSharingService < ApplicationRecord
 
   SERVICES = [
     {

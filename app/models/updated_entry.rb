@@ -1,4 +1,4 @@
-class UpdatedEntry < ActiveRecord::Base
+class UpdatedEntry < ApplicationRecord
   belongs_to :user
   belongs_to :entry
   belongs_to :feed

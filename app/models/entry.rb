@@ -1,4 +1,4 @@
-class Entry < ActiveRecord::Base
+class Entry < ApplicationRecord
   include Searchable
 
   attr_accessor :fully_qualified_url, :read, :starred, :skip_mark_as_unread

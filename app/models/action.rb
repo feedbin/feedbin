@@ -1,4 +1,4 @@
-class Action < ActiveRecord::Base
+class Action < ApplicationRecord
 
   attr_accessor :automatic_modification
 

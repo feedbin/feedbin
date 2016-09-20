@@ -1,4 +1,4 @@
-class Tag < ActiveRecord::Base
+class Tag < ApplicationRecord
   attr_accessor :count, :user_feeds
 
   has_many :taggings

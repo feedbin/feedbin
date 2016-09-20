@@ -1,4 +1,4 @@
-class Import < ActiveRecord::Base
+class Import < ApplicationRecord
   mount_uploader :upload, ImportUploader
 
   belongs_to :user

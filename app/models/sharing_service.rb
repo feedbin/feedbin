@@ -1,4 +1,4 @@
-class SharingService < ActiveRecord::Base
+class SharingService < ApplicationRecord
   belongs_to :user
   default_scope { order('lower(label)') }
 
