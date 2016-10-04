@@ -15,7 +15,7 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => 'sidekiq'
   end
   get :health_check, to: proc {|env| [200, {}, ["OK"]] }
-  get :version, to: proc {|env| [200, {}, [ENV["ETAG_VERSION_ID"]]] }
+  get :version, to: proc {|env| [200, {}, [File.read("REVISION")]] }
   get :headers, to: 'site#headers'
 
   post '/emails' => 'emails#create'
