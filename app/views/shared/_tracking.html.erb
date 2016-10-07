@@ -9,5 +9,5 @@
   <% else %>
     ga('send', 'pageview');
   <% end %>
-  <%= analytics_event %>
+  <%= analytics_event && analytics_event.html_safe %>
 </script>

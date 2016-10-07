@@ -13,8 +13,8 @@ class UsersController < ApplicationController
     if @user.save
       Librato.increment('user.trial.signup')
       @analytics_event = {eventCategory: 'customer', eventAction: 'new', eventLabel: 'trial', eventValue: 0}
-      flash[:analytics_event] = render_to_string(partial: "shared/analytics_event").html_safe
-      flash[:one_time_content] = render_to_string(partial: "shared/register_protocol_handlers").html_safe
+      flash[:analytics_event] = render_to_string(partial: "shared/analytics_event")
+      flash[:one_time_content] = render_to_string(partial: "shared/register_protocol_handlers")
       sign_in @user
       redirect_to root_url
     else
@@ -35,7 +35,7 @@ class UsersController < ApplicationController
       if old_plan_name == 'trial' && new_plan_name != 'trial'
         Librato.increment('user.paid.signup')
         @analytics_event = {eventCategory: 'customer', eventAction: 'upgrade', eventLabel: @user.plan.stripe_id, eventValue: @user.plan.price.to_i}
-        flash[:analytics_event] = render_to_string(partial: "shared/analytics_event").html_safe
+        flash[:analytics_event] = render_to_string(partial: "shared/analytics_event")
       end
       sign_in @user
       if params[:redirect_to]
