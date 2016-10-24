@@ -695,7 +695,7 @@ $.extend feedbin,
 
     entryLinks: ->
       $(document).on 'click', '[data-behavior~=entry_content_wrap] a', ->
-        $(this).attr('target', '_blank').attr('rel', 'noopener')
+        $(this).attr('target', '_blank').attr('rel', 'noopener noreferrer')
         return
 
     clearEntry: ->

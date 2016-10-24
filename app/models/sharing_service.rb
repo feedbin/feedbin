@@ -13,6 +13,6 @@ class SharingService < ApplicationRecord
     else
       target = '_self'
     end
-    {url: share_url, label: self.label, html_options: {target: target, rel: 'noopener'}}
+    {url: share_url, label: self.label, html_options: {target: target, rel: 'noopener noreferrer'}}
   end
 end
