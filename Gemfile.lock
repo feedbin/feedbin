@@ -182,6 +182,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.10.0)
       faraday (>= 0.7.4, < 0.10)
+    ffi (1.9.14)
     fission (0.5.0)
       CFPropertyList (~> 2.2)
     fog (1.38.0)
@@ -358,6 +359,10 @@ GEM
       librato-rack (~> 1.0.1)
       railties (>= 3.0)
     libv8 (3.16.14.15)
+    listen (3.1.5)
+      rb-fsevent (~> 0.9, >= 0.9.4)
+      rb-inotify (~> 0.9, >= 0.9.7)
+      ruby_dep (~> 1.2)
     lograge (0.4.1)
       actionpack (>= 4, < 5.1)
       activesupport (>= 4, < 5.1)
@@ -438,6 +443,9 @@ GEM
       thor (>= 0.18.1, < 2.0)
     raindrops (0.17.0)
     rake (11.2.2)
+    rb-fsevent (0.9.8)
+    rb-inotify (0.9.7)
+      ffi (>= 0.5.0)
     rbvmomi (1.8.2)
       builder
       nokogiri (>= 1.4.1)
@@ -459,6 +467,7 @@ GEM
     reverse_markdown (1.0.3)
       nokogiri
     rmagick (2.16.0)
+    ruby_dep (1.5.0)
     rubyzip (1.1.0)
     safe_yaml (1.0.4)
     sanitize (4.2.0)
@@ -572,6 +581,7 @@ DEPENDENCIES
   jquery-rails
   kramdown
   librato-rails
+  listen
   lograge
   minitest
   minitest-stub-const
