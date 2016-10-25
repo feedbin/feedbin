@@ -14,7 +14,6 @@ group :development do
   gem 'benchmark-ips'
   gem 'xipio'
   gem 'puma'
-  gem 'listen'
 end
 
 group :test do
