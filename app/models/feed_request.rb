@@ -114,6 +114,9 @@ class FeedRequest
       if @options.has_key?(:if_none_match)
         curl.headers["If-None-Match"] = @options[:if_none_match]
       end
+      if @options.has_key?(:if_modified_since) || @options.has_key?(:if_none_match)
+        curl.headers["A-IM"] = "feed"
+      end
       curl.headers["User-Agent"] = @options[:user_agent] || "Feedbin"
       curl.headers["Accept-Encoding"] = "gzip"
       curl.connect_timeout = 10
