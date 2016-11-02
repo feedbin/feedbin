@@ -17,7 +17,7 @@ class FeedRefresherScheduler
   def refresh_feeds
     feed = Feed.last
     if feed
-      jobs = job_args(feed.id, priority?)
+      jobs = job_args(feed.id, priority?, force_refresh?)
       Sidekiq::Client.push_bulk(
         'args'  => jobs,
         'class' => "FeedRefresher",
@@ -29,6 +29,10 @@ class FeedRefresherScheduler
 
   def priority?
     @priority ||= count % 2 == 0
+  end
+
+  def force_refresh?
+    @force_refresh ||= count % 2 != 0 && count % 3 == 0
   end
 
   def increment

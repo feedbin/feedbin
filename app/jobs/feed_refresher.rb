@@ -4,7 +4,10 @@ class FeedRefresher
   include BatchJobs
   include Sidekiq::Worker
 
-  def perform(batch, priority_refresh)
+  attr_accessor :force_refresh
+
+  def perform(batch, priority_refresh, force_refresh = false)
+    @force_refresh = force_refresh
     feed_ids = build_ids(batch)
     count = priority_refresh ? 1 : 0
     jobs = build_arguments(feed_ids, count)
@@ -25,7 +28,7 @@ class FeedRefresher
     feeds.each_with_object([]) do |result, array|
       feed = Hash[fields.zip(result)]
       if subscriptions.has_key?(feed[:id])
-        array << Arguments.new(feed, url_template).to_a
+        array << Arguments.new(feed, url_template, force_refresh).to_a
       end
     end
   end
@@ -53,16 +56,17 @@ class FeedRefresher
   end
 
   class Arguments
-    def initialize(feed, push_url)
+    def initialize(feed, push_url, force_refresh = false)
       @feed = feed
       @push_url = push_url
       @body = nil # only needed when receiving PuSH
+      @force_refresh = force_refresh
     end
 
     def to_a
       options = {
-        etag: @feed[:etag],
-        last_modified: @feed[:last_modified],
+        etag: etag,
+        last_modified: last_modified,
         subscriptions_count: @feed[:subscriptions_count],
         push_callback: push_callback,
         hub_secret: hub_secret,
@@ -72,6 +76,14 @@ class FeedRefresher
     end
 
     private
+
+    def etag
+      @force_refresh ? nil : @feed[:etag]
+    end
+
+    def last_modified
+      @force_refresh ? nil : @feed[:last_modified]
+    end
 
     def push_callback
       (push?) ? @push_url % @feed[:id] : nil
