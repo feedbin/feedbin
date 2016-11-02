@@ -21,7 +21,7 @@ class FeedRefresherReceiver
           Honeybadger.notify(
             error_class: "FeedRefresherReceiver#" + message,
             error_message: "Entry #{message} failed",
-            parameters: {exception: error, backtrace: error.backtrace}
+            parameters: {feed_id: feed.id, entry: entry, exception: error, backtrace: error.backtrace}
           )
         end
       end

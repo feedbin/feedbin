@@ -9,9 +9,9 @@ class Entry < ApplicationRecord
   has_many :recently_read_entries
 
   before_create :ensure_published
-  before_create :cache_public_id
   before_create :create_summary
   before_update :create_summary
+  after_commit :cache_public_id, on: :create
   after_commit :find_images, on: :create
   after_commit :mark_as_unread, on: :create
   after_commit :add_to_created_at_set, on: :create
