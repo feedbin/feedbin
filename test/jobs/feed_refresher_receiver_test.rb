@@ -36,7 +36,7 @@ class FeedRefresherReceiverTestTest < ActiveSupport::TestCase
 
   test "should update entry" do
     public_id = SecureRandom.hex
-    entry = @feed.entries.create(public_id: public_id, public_id_alt: "#{public_id}_alt")
+    entry = @feed.entries.create(public_id: public_id)
     update = build_entry(entry.public_id, true)
     params = {
       "feed" => {
@@ -79,21 +79,24 @@ class FeedRefresherReceiverTestTest < ActiveSupport::TestCase
   private
 
   def build_entry(public_id = SecureRandom.hex, update = false)
+    data = {
+      "public_id_alt" => public_id + "_alt"
+    }
     {
       "author"        => SecureRandom.hex,
       "content"       => SecureRandom.hex,
       "entry_id"      => SecureRandom.hex,
       "public_id"     => public_id,
-      "public_id_alt" => public_id + "_alt",
       "title"         => SecureRandom.hex,
       "url"           => Faker::Internet.url,
-      "update"        => update
+      "update"        => update,
+      "data"          => data
     }
   end
 
   def update_params
     public_id = SecureRandom.hex
-    entry = @feed.entries.create(public_id: public_id, public_id_alt: "#{public_id}_alt")
+    entry = @feed.entries.create(public_id: public_id)
     update = build_entry(entry.public_id, true)
     update["content"] = update["content"] * 10
     {

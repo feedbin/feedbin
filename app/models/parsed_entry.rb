@@ -2,7 +2,7 @@ require 'socket'
 
 class ParsedEntry
 
-  ENTRY_ATTRIBUTES = %i(author content data entry_id public_id public_id_alt published source title url).freeze
+  ENTRY_ATTRIBUTES = %i(author content data entry_id public_id published source title url).freeze
 
   def initialize(entry, feed_url)
     @entry = entry
@@ -94,6 +94,7 @@ class ParsedEntry
     value[:youtube_video_id] = @entry.youtube_video_id if @entry.try(:youtube_video_id)
     value[:media_width]      = @entry.media_width if @entry.try(:media_width)
     value[:media_height]     = @entry.media_height if @entry.try(:media_height)
+    value[:public_id_alt]    = public_id_alt if public_id_alt
     value
   end
 

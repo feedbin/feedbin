@@ -99,6 +99,10 @@ class Entry < ApplicationRecord
     text
   end
 
+  def public_id_alt
+    self.data && self.data["public_id_alt"]
+  end
+
   private
 
   def base_url
