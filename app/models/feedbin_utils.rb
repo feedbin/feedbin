@@ -3,9 +3,12 @@ class FeedbinUtils
   FEED_ENTRIES_PUBLISHED_KEY = "feed:%d:entry_ids:published"
   FEED_ENTRIES_CREATED_AT_KEY = "feed:%d:entry_ids:created_at"
 
-  def self.update_public_id_cache(public_id, content)
+  def self.update_public_id_cache(public_id, content, public_id_alt = nil)
     content_length = (content.present?) ? content.length : 1
     $redis[:id_cache].set(public_id, content_length)
+    if public_id_alt
+      $redis[:id_cache].set(public_id_alt, content_length)
+    end
   end
 
   def self.redis_feed_entries_created_at_key(feed_id)

@@ -19,8 +19,24 @@ class FeedRefresherReceiverTestTest < ActiveSupport::TestCase
     end
   end
 
+  test "should not create entry" do
+    public_id = SecureRandom.hex
+    entry = @feed.entries.create(public_id: "#{public_id}_alt")
+
+    params = {
+      "feed" => {
+        "id" => @feed.id
+      },
+      "entries" => [build_entry(public_id)]
+    }
+    assert_no_difference "Entry.count" do
+      FeedRefresherReceiver.new().perform(params)
+    end
+  end
+
   test "should update entry" do
-    entry = @feed.entries.create(public_id: SecureRandom.hex)
+    public_id = SecureRandom.hex
+    entry = @feed.entries.create(public_id: public_id, public_id_alt: "#{public_id}_alt")
     update = build_entry(entry.public_id, true)
     params = {
       "feed" => {
@@ -64,18 +80,20 @@ class FeedRefresherReceiverTestTest < ActiveSupport::TestCase
 
   def build_entry(public_id = SecureRandom.hex, update = false)
     {
-      "author"    => SecureRandom.hex,
-      "content"   => SecureRandom.hex,
-      "entry_id"  => SecureRandom.hex,
-      "public_id" => public_id,
-      "title"     => SecureRandom.hex,
-      "url"       => Faker::Internet.url,
-      "update"    => update
+      "author"        => SecureRandom.hex,
+      "content"       => SecureRandom.hex,
+      "entry_id"      => SecureRandom.hex,
+      "public_id"     => public_id,
+      "public_id_alt" => public_id + "_alt",
+      "title"         => SecureRandom.hex,
+      "url"           => Faker::Internet.url,
+      "update"        => update
     }
   end
 
   def update_params
-    entry = @feed.entries.create(public_id: SecureRandom.hex)
+    public_id = SecureRandom.hex
+    entry = @feed.entries.create(public_id: public_id, public_id_alt: "#{public_id}_alt")
     update = build_entry(entry.public_id, true)
     update["content"] = update["content"] * 10
     {

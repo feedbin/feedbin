@@ -14,7 +14,7 @@ class FeedRefresherReceiver
             create_entry(entry, feed)
           end
         rescue ActiveRecord::RecordNotUnique
-          FeedbinUtils.update_public_id_cache(entry['public_id'], entry['content'])
+          FeedbinUtils.update_public_id_cache(entry['public_id'], entry['content'], entry['public_id_alt'])
           Librato.increment 'entry.record_not_unique'
         rescue StandardError => error
           message = update ? "update" : "create"
@@ -32,7 +32,7 @@ class FeedRefresherReceiver
   def update_entry(entry)
     original_entry = Entry.find_by_public_id(entry['public_id'])
     if original_entry.present?
-      FeedbinUtils.update_public_id_cache(entry['public_id'], entry['content'])
+      FeedbinUtils.update_public_id_cache(entry['public_id'], entry['content'], entry['public_id_alt'])
       if published_recently?(original_entry.published)
         entry_update = entry.slice('author', 'content', 'title', 'url', 'entry_id', 'data')
         entry_update['summary'] = ContentFormatter.summary(entry_update['content'])
@@ -111,8 +111,16 @@ class FeedRefresherReceiver
   end
 
   def create_entry(entry, feed)
-    feed.entries.create!(entry)
-    Librato.increment('entry.create')
+    if alternate_exists?(entry['public_id_alt'])
+      Librato.increment('entry.alternate_exists')
+    else
+      feed.entries.create!(entry)
+      Librato.increment('entry.create')
+    end
+  end
+
+  def alternate_exists?(public_id_alt)
+    public_id_alt && Entry.where(public_id: public_id_alt).exists?
   end
 
   def update_feed(update, feed)

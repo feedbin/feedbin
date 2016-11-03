@@ -123,7 +123,7 @@ class Entry < ApplicationRecord
   end
 
   def cache_public_id
-    FeedbinUtils.update_public_id_cache(self.public_id, self.content)
+    FeedbinUtils.update_public_id_cache(self.public_id, self.content, self.public_id_alt)
     true
   end
 
