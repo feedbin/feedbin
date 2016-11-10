@@ -3,8 +3,8 @@ class FaviconProcessor
   S3_POOL = ConnectionPool.new(size: 10, timeout: 5) do
     Fog::Storage.new(
       provider: "AWS",
-      aws_access_key_id: ENV["AWS_ACCESS_KEY_ID_FAVICONS"],
-      aws_secret_access_key: ENV["AWS_SECRET_ACCESS_KEY_FAVICONS"],
+      aws_access_key_id: ENV["AWS_ACCESS_KEY_ID"],
+      aws_secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"],
       persistent: true
     )
   end
@@ -37,7 +37,7 @@ class FaviconProcessor
   def upload(data)
     upload_url = nil
     S3_POOL.with do |connection|
-      response = connection.put_object(ENV['AWS_S3_BUCKET_FAVICONS'], path, data, s3_options)
+      response = connection.put_object(ENV['AWS_S3_BUCKET'], path, data, s3_options)
       upload_url = URI::HTTP.build(
         scheme: 'https',
         host: response.data[:host],
@@ -95,7 +95,7 @@ class FaviconProcessor
   end
 
   def path
-    @path ||= File.join(favicon_hash[0..3], "#{favicon_hash}.png")
+    @path ||= File.join("public-favicons", favicon_hash[0..3], "#{favicon_hash}.png")
   end
 
 end
