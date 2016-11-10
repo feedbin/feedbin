@@ -9,7 +9,7 @@ class FaviconMigration
     if schedule
       build
     else
-      update(favicon_id)
+      upload(favicon_id)
     end
   end
 
