@@ -11,6 +11,7 @@ class FaviconMigration
     else
       upload(favicon_id)
     end
+  rescue ActiveRecord::RecordNotFound
   end
 
   def upload(favicon_id)
