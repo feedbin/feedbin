@@ -28,12 +28,11 @@ class FaviconFetcher
     end
 
     if response
-      data = response.to_s
-      favicon_hash = Digest::SHA1.hexdigest(data)
-      if data.present? && @favicon.data["favicon_hash"] != favicon_hash
-        image = format_favicon(response.to_s)
-        @favicon.favicon = image if image
-        @favicon.data = get_data(response, favicon_hash)
+      processor = FaviconProcessor.new(response.to_s)
+      if processor.valid? && @favicon.data["favicon_hash"] != processor.favicon_hash
+        @favicon.favicon = processor.encoded_favicon if processor.encoded_favicon
+        @favicon.url = processor.favicon_url if processor.favicon_url
+        @favicon.data = get_data(response, processor.favicon_hash)
         Librato.increment('favicon.updated')
       end
       Librato.increment('favicon.status', source: response.code)
@@ -93,33 +92,6 @@ class FaviconFetcher
       headers = headers.merge(conditional_headers.to_h)
     end
     headers
-  end
-
-  def format_favicon(data)
-    begin
-      favicons = Magick::Image.from_blob(data)
-    rescue Magick::ImageMagickError
-      favicons = Magick::Image.from_blob(data) { |image| image.format = 'ico' }
-    end
-    favicon = remove_blank_images(favicons).last
-    if favicon.columns > 32
-      favicon = favicon.resize_to_fit(32, 32)
-    end
-    blob = favicon.to_blob { |image| image.format = 'png' }
-    Base64.encode64(blob).gsub("\n", '')
-  rescue
-    nil
-  ensure
-    favicon && favicon.destroy!
-    favicons && favicons.map(&:destroy!)
-  end
-
-  def remove_blank_images(favicons)
-    favicons.reject do |favicon|
-      favicon = favicon.scale(1, 1)
-      pixel = favicon.pixel_color(0,0)
-      favicon.to_color(pixel) == "none"
-    end
   end
 
   def should_update?
