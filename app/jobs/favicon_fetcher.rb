@@ -28,7 +28,7 @@ class FaviconFetcher
     end
 
     if response
-      processor = FaviconProcessor.new(response.to_s)
+      processor = FaviconProcessor.new(response.to_s, @favicon.host)
       if processor.valid? && @favicon.data["favicon_hash"] != processor.favicon_hash
         @favicon.favicon = processor.encoded_favicon if processor.encoded_favicon
         @favicon.url = processor.favicon_url if processor.favicon_url
@@ -100,7 +100,6 @@ class FaviconFetcher
     else
       !updated_recently?
     end
-    true
   end
 
   def updated_recently?
