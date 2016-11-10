@@ -32,6 +32,10 @@ class FaviconProcessor
     @favicon_hash ||= Digest::SHA1.hexdigest(data)
   end
 
+  def upload_existing
+    upload(data)
+  end
+
   private
 
   def upload(data)
