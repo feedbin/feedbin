@@ -5,12 +5,16 @@ class Favicon < ApplicationRecord
 
   def cdn_url
     @cdn_url ||= begin
-      uri = URI(self.url)
-      if ENV['FAVICON_HOST']
-        uri.host = ENV['FAVICON_HOST']
+      if self.url
+        uri = URI(self.url)
+        if ENV['FAVICON_HOST']
+          uri.host = ENV['FAVICON_HOST']
+        end
+        uri.scheme = 'https'
+        uri.to_s
+      else
+        nil
       end
-      uri.scheme = 'https'
-      uri.to_s
     end
   end
 end

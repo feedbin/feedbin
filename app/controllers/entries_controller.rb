@@ -281,7 +281,7 @@ class EntriesController < ApplicationController
   private
 
   def entries_by_id(entry_ids)
-    entries = Entry.where(id: entry_ids).includes(:feed)
+    entries = Entry.where(id: entry_ids).includes(feed: [:favicon])
     entries.each_with_object({}) do |entry, hash|
       locals = {
         entry: entry,

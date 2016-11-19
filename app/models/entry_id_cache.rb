@@ -12,7 +12,7 @@ class EntryIdCache
     @page_number = number ? number.to_i : 1
     ids = get_ids
     WillPaginate::Collection.create(page_number, per_page, count) do |pager|
-      pager.replace Entry.where(id: ids).includes(:feed).sort_preference('DESC').entries_list
+      pager.replace Entry.where(id: ids).includes(feed: [:favicon]).sort_preference('DESC').entries_list
     end
   end
 

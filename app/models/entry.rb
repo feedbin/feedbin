@@ -23,7 +23,7 @@ class Entry < ApplicationRecord
 
   def self.entries_with_feed(entry_ids, sort)
     entry_ids = entry_ids.map(&:entry_id)
-    entries = Entry.where(id: entry_ids).includes(:feed)
+    entries = Entry.where(id: entry_ids).includes(feed: [:favicon])
     if sort == 'ASC'
       entries = entries.order('published ASC')
     else

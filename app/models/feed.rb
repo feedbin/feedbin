@@ -9,6 +9,8 @@ class Feed < ApplicationRecord
   has_many :taggings
   has_many :tags, through: :taggings
 
+  has_one :favicon, foreign_key: "host", primary_key: "host"
+
   before_create :set_host
 
   attr_accessor :count, :tags
