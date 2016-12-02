@@ -92,11 +92,6 @@ class SettingsController < ApplicationController
     end
   end
 
-  def mark_favicon_complete
-    session[:favicon_complete] = true
-    head :ok
-  end
-
   def update_plan
     @user = current_user
     plan = Plan.find(params[:plan])

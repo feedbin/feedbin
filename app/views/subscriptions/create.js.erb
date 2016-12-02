@@ -11,11 +11,6 @@
     scrollTop: feedbin.scrollTo($("[data-feed-id=<%= @click_feed %>]"), $('.feeds'))
   }, 200);
 
-  $("<link>")
-      .appendTo('head')
-      .attr({rel: "stylesheet"})
-      .attr({href: "<%= url_for(favicons_path(hash: @favicon_hash, format: :css)) %>"});
-
   $('.welcome').remove();
 
   $('[name="subscription[feeds][feed_url]"]').blur()

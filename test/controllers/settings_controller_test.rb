@@ -69,12 +69,6 @@ class SettingsControllerTest < ActionController::TestCase
     assert_redirected_to settings_import_export_url
   end
 
-  test "should mark_favicon_complete" do
-    login_as @user
-    post :mark_favicon_complete
-    assert_response :success
-  end
-
   test "should update plan" do
     StripeMock.start
     stripe_helper = StripeMock.create_test_helper

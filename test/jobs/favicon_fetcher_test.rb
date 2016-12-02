@@ -18,6 +18,8 @@ class FaviconFetcherTest < ActiveSupport::TestCase
     </html>
     eot
 
+    stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+
     stub_request(:get, @page_url).
       to_return(body: body, status: 200)
 
@@ -25,7 +27,7 @@ class FaviconFetcherTest < ActiveSupport::TestCase
 
     FaviconFetcher.new().perform(@page_url.host)
 
-    assert_not_nil Favicon.where(host: @page_url.host).take!.favicon
+    assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
   end
 
   test "should get favicon from shortcut icon link" do
@@ -37,6 +39,8 @@ class FaviconFetcherTest < ActiveSupport::TestCase
     </html>
     eot
 
+    stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+
     stub_request(:get, @page_url).
       to_return(body: body, status: 200)
 
@@ -44,7 +48,7 @@ class FaviconFetcherTest < ActiveSupport::TestCase
 
     FaviconFetcher.new().perform(@page_url.host)
 
-    assert_not_nil Favicon.where(host: @page_url.host).take!.favicon
+    assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
   end
 
   test "should get favicon from default location" do
@@ -55,6 +59,8 @@ class FaviconFetcherTest < ActiveSupport::TestCase
     </html>
     eot
 
+    stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+
     stub_request(:get, @page_url).
       to_return(body: body, status: 200)
 
@@ -62,7 +68,7 @@ class FaviconFetcherTest < ActiveSupport::TestCase
 
     FaviconFetcher.new().perform(@page_url.host)
 
-    assert_not_nil Favicon.where(host: @page_url.host).take!.favicon
+    assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
   end
 
 end

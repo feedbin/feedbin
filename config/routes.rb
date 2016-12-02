@@ -24,7 +24,6 @@ Rails.application.routes.draw do
   match '/404', to: 'errors#not_found', via: :all
   get '/starred/:starred_token', to: 'starred_entries#index', as: 'starred'
   post '/starred/export', to: 'starred_entries#export'
-  get '/favicons/:hash', to: 'favicons#index', as: 'favicons'
 
   get    :signup,         to: 'users#new',           as: 'signup'
   get    :login,          to: 'sessions#new',        as: 'login'
@@ -132,7 +131,6 @@ Rails.application.routes.draw do
     get :feeds
     get :appearance
     post :update_credit_card
-    post :mark_favicon_complete
     post :update_plan
     post :font
     post :theme

@@ -13,13 +13,17 @@ class BasePresenter
           @template.svg_tag('favicon-newsletter', size: "16x16")
         end
       else
-        style = nil
+        markup = <<-eos
+          <span class="favicon favicon-default"></span>
+        eos
         if feed.favicon && feed.favicon.cdn_url
-          style = "background-color: transparent !important; background-image: url(#{feed.favicon.cdn_url});"
+          markup = <<-eos
+            <span class="favicon" style="background-image: url(#{feed.favicon.cdn_url});"></span>
+          eos
         end
         content = <<-eos
           <span class="favicon-wrap">
-            <span class="favicon" style="#{style}"></span>
+            #{markup}
           </span>
         eos
       end

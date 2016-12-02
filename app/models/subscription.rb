@@ -18,7 +18,6 @@ class Subscription < ApplicationRecord
   before_destroy :untag
   before_destroy :email_unsubscribe
 
-  after_create :update_favicon_hash
   after_create :refresh_favicon
 
   def mark_as_unread
@@ -56,10 +55,6 @@ class Subscription < ApplicationRecord
 
   def expire_stat_cache
     Rails.cache.delete("#{self.user_id}:entry_counts")
-  end
-
-  def update_favicon_hash
-    UpdateFaviconHash.perform_async(self.user_id)
   end
 
   def untag

@@ -1,4 +1,7 @@
 class Favicon < ApplicationRecord
+
+  default_scope { select(*(Favicon.column_names - ["favicon"])) }
+
   def data
     self[:data] || {}
   end

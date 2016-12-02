@@ -21,7 +21,6 @@ class User < ApplicationRecord
                  :keep_unread_entries,
                  :receipt_info,
                  :theme,
-                 :favicon_hash,
                  :entries_display,
                  :entries_feed,
                  :entries_time,
@@ -121,14 +120,6 @@ class User < ApplicationRecord
     if self.plan.stripe_id != 'free'
       send_notice = Feedbin::Application.config.trial_days - 1
       TrialSendExpiration.perform_in(send_notice.days, self.id)
-    end
-  end
-
-  def get_favicon_hash
-    if favicon_hash
-      "#{favicon_hash}2"
-    else
-      "none"
     end
   end
 

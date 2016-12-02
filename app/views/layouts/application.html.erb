@@ -15,7 +15,6 @@
 <body class="<%= @class %>" data-behavior="<%= @behavior %>">
   <%= content_for?(:content) ? yield(:content) : yield %>
   <%= render partial: 'shared/tracking' %>
-  <%= render partial: 'shared/favicons' %>
   <%= render partial: 'shared/fonts' %>
 </body>
 </html>

@@ -1309,7 +1309,7 @@ li.selected > a .favicon-wrap {
     }
 }
 
-.favicon {
+.favicon-default {
     background: image-url("favicon-feed-blue.svg") 0 0 no-repeat;
     @include background-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
 }
