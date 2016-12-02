@@ -101,18 +101,12 @@ class EntryPresenter < BasePresenter
       if text.blank?
         text = @template.content_tag(:span, '&ndash;&ndash;'.html_safe, title: "No title").html_safe
       end
-      @template.truncate(text, length: 140, omission: '…', escape: false)
+      text
     end
   end
 
   def sanitized_title
     @sanitized_title ||= @template.raw(@template.strip_tags(entry.title))
-  end
-
-  def title_attr
-    if sanitized_title.length > entry_view_title.length
-      sanitized_title
-    end
   end
 
   def author
