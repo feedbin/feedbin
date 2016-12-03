@@ -41,7 +41,7 @@ class EntriesControllerTest < ActionController::TestCase
     login_as @user
     content = Faker::Lorem.paragraph
     struct = OpenStruct.new(content: content)
-    ReadabilityParser.stub :parse, struct do
+    DiffbotParser.stub :parse, struct do
       post :content, params: {id: @entries.first, content_view: 'true'}, xhr: true
     end
     assert_equal assigns(:content), content

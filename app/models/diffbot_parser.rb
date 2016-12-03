@@ -1,0 +1,75 @@
+class DiffbotParser
+
+  BASE_URL = "http://api.diffbot.com/v3/article"
+
+  attr_reader :url, :body
+
+  def initialize(url, body = nil)
+    @url = url
+    @body = body
+  end
+
+  def self.parse(url)
+    new(url)
+  end
+
+  def title
+    result['title']
+  end
+
+  def content
+    result['html']
+  end
+
+  def author
+    result['author']
+  end
+
+  def published
+    if result['estimatedDate']
+      Time.parse(result['estimatedDate'])
+    end
+  end
+
+  def date_published
+    result['estimatedDate'] if result['estimatedDate']
+  end
+
+  def domain
+    @domain ||= begin
+      parsed_url = result['resolvedPageUrl'] || result['pageUrl']
+      URI.parse(parsed_url).host
+    end
+  end
+
+  private
+
+  def result
+    @result ||= begin
+      uri = URI.parse(BASE_URL)
+      uri.query = { 'url' => url, discussion: false, 'token' => ENV['DIFFBOT_TOKEN'] }.to_query
+      response = HTTP.timeout(:global, write: 10, connect: 10, read: 10)
+      if body
+        response = response.headers(content_type: "text/html; charset=utf-8").post(uri, body: body)
+      else
+        response = response.get(uri)
+      end
+      response.parse['objects'].first
+    end
+  end
+
+  def marshal_dump
+    {
+      result: result,
+      url: url,
+      body: body
+    }
+  end
+
+  def marshal_load(data)
+    @result = data[:result]
+    @url = data[:url]
+    @body = data[:body]
+  end
+
+end
