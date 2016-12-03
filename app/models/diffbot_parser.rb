@@ -47,7 +47,12 @@ class DiffbotParser
   def result
     @result ||= begin
       uri = URI.parse(BASE_URL)
-      uri.query = { 'url' => url, discussion: false, 'token' => ENV['DIFFBOT_TOKEN'] }.to_query
+      uri.query = {
+        url: url,
+        discussion: false,
+        norender: "norender",
+        token: ENV['DIFFBOT_TOKEN']
+      }.to_query
       response = HTTP.timeout(:global, write: 10, connect: 10, read: 10)
       if body
         response = response.headers(content_type: "text/html; charset=utf-8").post(uri, body: body)
