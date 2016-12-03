@@ -13,7 +13,8 @@ class SupportedSharingService < ApplicationRecord
       label: 'Readability',
       requires_auth: true,
       service_type: 'xauth',
-      klass: 'Share::Readability'
+      klass: 'Share::Readability',
+      active: false
     },
     {
       service_id: 'instapaper',
@@ -155,6 +156,14 @@ class SupportedSharingService < ApplicationRecord
 
   def html_options
     info[:html_options] || {remote: true}
+  end
+
+  def active?
+    if info.has_key?(:active)
+      info[:active]
+    else
+      true
+    end
   end
 
   def label

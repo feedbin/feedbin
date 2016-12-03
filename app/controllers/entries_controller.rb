@@ -298,7 +298,7 @@ class EntriesController < ApplicationController
 
   def sharing_services(entry)
     @user_sharing_services ||= begin
-      (@user.sharing_services + @user.supported_sharing_services).sort_by{|sharing_service| sharing_service.label}
+      (@user.sharing_services + @user.supported_sharing_services).reject {|sharing_service| sharing_service.active? == false }.sort_by{|sharing_service| sharing_service.label}
     end
 
     services = []

@@ -15,4 +15,8 @@ class SharingService < ApplicationRecord
     end
     {url: share_url, label: self.label, html_options: {target: target, rel: 'noopener noreferrer'}}
   end
+
+  def active?
+    true
+  end
 end
