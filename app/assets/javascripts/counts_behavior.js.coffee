@@ -13,8 +13,8 @@ feedbin.updateTitle = () ->
     else
       title = "Feedbin (#{count})"
 
-  docTitle = $('title')
-  docTitle.text(title) unless docTitle.text() is title
+    docTitle = $('title')
+    docTitle.text(title) unless docTitle.text() is title
 
 feedbin.applyCounts = (useHideQueue) ->
   $('[data-behavior~=needs_count]').each (index, countContainer) =>

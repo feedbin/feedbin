@@ -68,4 +68,9 @@ module ApplicationHelper
       content_tag :use, '', :"xlink:href" => "##{name}"
     end
   end
+
+  def branch_info
+    branch_name = `git rev-parse --abbrev-ref HEAD`
+    " [#{branch_name.chomp}]"
+  end
 end
