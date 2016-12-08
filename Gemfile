@@ -76,6 +76,7 @@ gem 'kramdown'
 gem 'premailer'
 gem 'apnotic'
 gem 'http'
+gem 'elasticsearch', '~> 2.0'
 gem 'elasticsearch-model'
 gem 'sidekiq'
 

@@ -30,14 +30,14 @@ class MailtoParserTest < ActiveSupport::TestCase
     email_address = Faker::Internet.email
     link = "mailto:#{@email_address}"
     parser = MailtoParser.new(link)
-    assert_equal nil, parser.body
+    assert_nil parser.body
   end
 
   test "should have default subject" do
     email_address = Faker::Internet.email
     link = "mailto:#{@email_address}"
     parser = MailtoParser.new(link)
-    assert_equal nil, parser.subject
+    assert_nil parser.subject
   end
 
 end

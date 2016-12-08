@@ -14,7 +14,8 @@ class FeedRefresherSchedulerTestTest < ActiveSupport::TestCase
   end
 
   test "should periodically force_refresh" do
-    results = 15.times.each_with_object([]) do |count, array|
+    flush_redis
+    results = 16.times.each_with_object([]) do |count, array|
       job = perform
       array.push job.force_refresh?
     end
