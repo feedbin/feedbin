@@ -366,4 +366,21 @@ class User < ApplicationRecord
     false
   end
 
+  def can_read_feed?(feed)
+    can_read = false
+    if feed.respond_to?(:id)
+      feed = feed.id
+    end
+
+    if subscribed_to?(feed)
+      can_read = true
+    end
+
+    if !can_read && starred_entries.where(feed_id: feed).exists?
+      can_read = true
+    end
+
+    can_read
+  end
+
 end
