@@ -9,7 +9,7 @@ module Api
         @user = current_user
         feed_ids = @user.subscriptions.pluck(:feed_id)
         hosts = Feed.where(id: feed_ids).pluck(:host)
-        @favicons = Favicon.where(host: hosts).unscoped
+        @favicons = Favicon.unscoped.where(host: hosts)
         fresh_when(@favicons)
       end
 
