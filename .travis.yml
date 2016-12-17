@@ -1,6 +1,6 @@
 language: ruby
 cache: bundler
-sudo: false
+sudo: required
 bundler_args: --without development --jobs 2
 
 services:
