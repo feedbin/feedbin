@@ -1,6 +1,6 @@
 class DiffbotParser
 
-  BASE_URL = "http://api.diffbot.com/v3/article"
+  BASE_URL = "https://api.diffbot.com/v3/article"
 
   attr_reader :url, :body
 
