@@ -6,6 +6,8 @@ gem 'rails-deprecated_sanitizer'
 gem 'rails-controller-testing'
 gem 'rails_autolink'
 
+gem 'nokogumbo', '= 1.4.9'
+
 group :development do
   gem 'better_errors'
   gem 'capistrano', github: 'capistrano/capistrano', ref: 'dcd3257'

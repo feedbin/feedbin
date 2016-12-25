@@ -396,7 +396,7 @@ GEM
     nio4r (1.2.1)
     nokogiri (1.6.8.1)
       mini_portile2 (~> 2.1.0)
-    nokogumbo (1.4.10)
+    nokogumbo (1.4.9)
       nokogiri
     oauth (0.5.1)
     pg (0.19.0)
@@ -588,6 +588,7 @@ DEPENDENCIES
   lograge
   minitest
   minitest-stub-const
+  nokogumbo (= 1.4.9)
   oauth
   opml_saw!
   pg
