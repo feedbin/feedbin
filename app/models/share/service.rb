@@ -27,7 +27,7 @@ class Share::Service
     if params[:readability] == "on"
       url = entry.fully_qualified_url
       content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v4") do
-        DiffbotParser.parse(url)
+        MercuryParser.parse(url)
       end
       content = content_info.content
     else

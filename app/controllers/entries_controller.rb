@@ -94,7 +94,7 @@ class EntriesController < ApplicationController
         url = @entry.fully_qualified_url
         @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v4") do
           Librato.increment 'readability.first_parse'
-          DiffbotParser.parse(url)
+          MercuryParser.parse(url)
         end
         @content = @content_info.content
         Librato.increment 'readability.parse'
