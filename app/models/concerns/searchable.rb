@@ -20,7 +20,7 @@ module Searchable
       options = {
         query: params[:query],
         sort: "desc",
-        starred_ids: user.starred_entries.pluck(:entry_id),
+        starred_ids: [],
         ids: [],
         not_ids: [],
         feed_ids: [],
@@ -50,6 +50,7 @@ module Searchable
         options[:feed_ids] = user.taggings.where(tag_id: params[:tag_id]).pluck(:feed_id)
       else
         options[:feed_ids] = user.subscriptions.pluck(:feed_id)
+        options[:starred_ids] = user.starred_entries.pluck(:entry_id)
       end
 
       if options[:ids].present?
