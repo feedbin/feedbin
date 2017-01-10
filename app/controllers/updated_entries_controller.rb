@@ -9,8 +9,8 @@ class UpdatedEntriesController < ApplicationController
     @entries = @entries.sort_by{ |entry| updated_entry_ids.index(entry.id) }
 
     @type = 'updated'
-
     @collection_title = 'Updated'
+    @force_preload = true
 
     respond_to do |format|
       format.js { render partial: 'shared/entries' }

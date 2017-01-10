@@ -171,11 +171,12 @@ $.extend feedbin,
       appendTo: $(element).closest(".tags-form").children("[data-behavior=tag_completions]")
       delimiter: /(,)\s*/
 
-  preloadEntries: (entry_ids) ->
+  preloadEntries: (entry_ids, forcePreload = false) ->
     cachedIds = []
     for key of feedbin.entries
       cachedIds.push key * 1
-    entry_ids = _.difference(entry_ids, cachedIds)
+    if !forcePreload
+      entry_ids = _.difference(entry_ids, cachedIds)
     if entry_ids.length > 0
       $.getJSON feedbin.data.preload_entries_path, {ids: entry_ids.join(',')}, (data) ->
         $.extend feedbin.entries, data
