@@ -885,14 +885,14 @@ Structure
 .hamburger-menu {
     $bar-height: 3px;
     cursor: pointer;
-    top: $base-button-position + 7;
-    right: 18px;
+    top: $base-button-position + 8;
+    right: 19px;
     z-index: 2;
     &:before {
-        left: -10px;
+        left: -9px;
     }
     &:after {
-        left: 10px;
+        left: 9px;
     }
     .settings & {
         top: 31px;
@@ -900,7 +900,7 @@ Structure
     }
 }
 .hamburger-menu, .hamburger-menu:before, .hamburger-menu:after {
-    $dot: 7px;
+    $dot: 5px;
     width: $dot;
     height: $dot;
     border-radius: $dot/2;
@@ -1603,8 +1603,8 @@ $saved-search-control-height: 48px;
         .icon-entry-actions {
             pointer-events: none;
             position: absolute;
-            top: 11px;
-            right: 13px;
+            top: 17px;
+            right: 20px;
             &:before {
                 left: -6px;
             }
@@ -1623,14 +1623,14 @@ $saved-search-control-height: 48px;
         }
     }
     .icon-entry-actions, .icon-entry-actions:before, .icon-entry-actions:after {
-        $dot: 5px;
+        $dot: 3px;
         width: $dot;
         height: $dot;
         border-radius: $dot/2;
         position: absolute;
         content: '';
         display: inline-block;
-        background-color: rgba(0,0,0,.3);
+        background-color: #FFF;
     }
     .time {
         font-size: 12px;
