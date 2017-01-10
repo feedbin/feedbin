@@ -1,14 +1,6 @@
 <%= form_tag content_entry_path(entry), remote: true, data: {behavior: 'toggle_content_view', feed_id: entry.feed_id}, class: 'entry-button-wrap' do %>
   <%= hidden_field_tag 'content_view', !content_view %>
-  <button class="entry-button button-toggle-content" title="View original inline">
-    <% if content_view %>
-      <span class="active">
-        <%= svg_tag 'icon-readability', size: '20x15' %>
-      </span>
-    <% else %>
-      <span>
-        <%= svg_tag 'icon-readability', size: '20x15' %>
-      </span>
-    <% end %>
+  <button class="entry-button button-toggle-content <%= 'active' if content_view %>" title="Attempt to load full content">
+    <%= svg_tag 'icon-full-content', size: '14x16' %>
   </button>
 <% end %>
