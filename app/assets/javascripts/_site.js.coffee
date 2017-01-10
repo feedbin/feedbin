@@ -978,6 +978,10 @@ $.extend feedbin,
         if feedbin.data.sticky_readability && feedbin.data.readability_settings[feedId] != "undefined"
           unless $("#content_view").val() == "true" && feedbin.data.readability_settings[feedId] == true
             feedbin.data.readability_settings[feedId] = !feedbin.data.readability_settings[feedId]
+
+        if !$('.button-toggle-content').hasClass('active')
+          $('.button-toggle-content').addClass('loading')
+
         return
 
     autoUpdate: ->
@@ -1418,6 +1422,11 @@ $.extend feedbin,
 
     settingsCheckbox: ->
       $(document).on 'change', '[data-behavior~=auto_submit]', (event) ->
+        $(@).parents("form").submit()
+
+    toggleContent: ->
+      $(document).on 'click', '[data-behavior~=toggle_content_button]', (event) ->
+
         $(@).parents("form").submit()
 
 

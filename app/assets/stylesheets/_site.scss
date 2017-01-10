@@ -884,41 +884,31 @@ Structure
 
 .hamburger-menu {
     $bar-height: 3px;
-    position: absolute;
     cursor: pointer;
-    top: $base-button-position + 3;
-    right: 11px;
-    height: 15px;
-    width: 20px;
-    border-top: $bar-height solid rgba(0,0,0,.3);
-    @include border-color($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+    top: $base-button-position + 8;
+    right: 19px;
     z-index: 2;
+    &:before {
+        left: -9px;
+    }
+    &:after {
+        left: 9px;
+    }
     .settings & {
         top: 31px;
         right: 15px;
     }
-    &:after {
-        height: $bar-height;
-        @include background-color($text-color-light, $text-summary-color-night, $text-color-light-sunset);
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 3px;
-        display: block;
-        width: 100%;
-    }
-    &:before {
-        height: $bar-height;
-        @include background-color($text-color-light, $text-summary-color-night, $text-color-light-sunset);
-        content: "";
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        display: block;
-        width: 100%;
-    }
 }
-
+.hamburger-menu, .hamburger-menu:before, .hamburger-menu:after {
+    $dot: 5px;
+    width: $dot;
+    height: $dot;
+    border-radius: $dot/2;
+    position: absolute;
+    content: '';
+    display: inline-block;
+    background-color: #b4b6b8;
+}
 
 .feeds-toolbar {
     height: $feeds-toolbar-height;
@@ -1613,41 +1603,34 @@ $saved-search-control-height: 48px;
         .icon-entry-actions {
             pointer-events: none;
             position: absolute;
-            top: 11px;
-            right: 10px;
-            height: 12px;
-            width: 10px;
-            border-top: 2px solid rgba(0,0,0,.3);
-            &:after {
-                height: 2px;
-                background-color: rgba(0,0,0,.3);
-                content: "";
-                position: absolute;
-                left: 0;
-                top: 1px;
-                display: block;
-                width: 10px;
-            }
+            top: 17px;
+            right: 20px;
             &:before {
-                height: 2px;
-                background-color: rgba(0,0,0,.3);
-                content: "";
-                position: absolute;
-                left: 0;
-                top: 4px;
-                display: block;
-                width: 10px;
+                left: -6px;
+            }
+            &:after {
+                left: 6px;
             }
         }
         &:hover {
             .icon-entry-actions {
-                border-top-color: #FFF;
+                background-color: #FFF;
                 &:before,
                 &:after {
                     background-color: #FFF;
                 }
             }
         }
+    }
+    .icon-entry-actions, .icon-entry-actions:before, .icon-entry-actions:after {
+        $dot: 3px;
+        width: $dot;
+        height: $dot;
+        border-radius: $dot/2;
+        position: absolute;
+        content: '';
+        display: inline-block;
+        background-color: #FFF;
     }
     .time {
         font-size: 12px;
@@ -2402,6 +2385,34 @@ $saved-search-control-height: 48px;
             height: 15px;
             width: 20px;
         }
+        svg {
+            top: $base-button-position + 3;
+            left: 16px;
+            height: 16px;
+            width: 14px;
+        }
+        &.loading {
+            @keyframes flip {
+                50% {
+                    transform: scaleX(-1);
+                }
+            }
+            @keyframes pulse {
+                0% {
+                    opacity: .8;
+                }
+                50% {
+                    opacity: .4;
+                }
+                100% {
+                    opacity: .8;
+                }
+            }
+            animation: pulse 2s linear infinite;
+            svg {
+                animation: flip 1s step-start 0s infinite;
+            }
+        }
     }
     .button-toggle-share-menu {
         svg {
@@ -3037,8 +3048,8 @@ $saved-search-control-height: 48px;
             position: absolute;
             display: block;
             content: "";
-            background: image-url("icon-readability.svg") 10px 50% no-repeat;
-            background-size: 20px 15px;
+            background: image-url("icon-full-content.svg") 10px 50% no-repeat;
+            background-size: 16px 14px;
             width: 43px;
             right: 0px;
             top: 0;
@@ -4778,7 +4789,7 @@ Buttons
     }
 }
 
-.button-toggle-content .active * {
+.button-toggle-content.active * {
     fill: #860000 !important;
 }
 
