@@ -118,6 +118,8 @@ module Searchable
       sort_regex = /(?<=\s|^)sort:\s*(asc|desc|relevance)(?=\s|$)/i
       tag_id_regex = /(?<=\s|^)tag_id:\s*([0-9]+)(?=\s|$)/
 
+      params[:query] = params[:query].gsub("body:", "content:")
+
       if params[:query] =~ unread_regex
         params[:query] = params[:query].gsub(unread_regex, '')
         params[:read] = false
@@ -155,7 +157,7 @@ module Searchable
         escape = '\ '.sub(' ', '')
         query = query.gsub(special_characters_regex) { |character| escape + character }
 
-        colon_regex = /(?<!title|feed_id|body|author):(?=.*)/
+        colon_regex = /(?<!title|feed_id|content|author):(?=.*)/
         query = query.gsub(colon_regex, '\:')
         query
       end
