@@ -15,7 +15,7 @@ class FaviconMigration
   end
 
   def upload(favicon_id)
-    favicon = Favicon.find(favicon_id)
+    favicon = Favicon.unscoped.find(favicon_id)
     if favicon.favicon
       data = Base64.decode64(favicon.favicon)
       processor = FaviconProcessor.new(data, favicon.host)
