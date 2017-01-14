@@ -100,8 +100,9 @@ class ContentFormatter
 
   def self.summary(content)
     sanitize_config = Sanitize::Config::BASIC.dup
-    sanitize_config = sanitize_config.merge(remove_contents: ['script', 'style', 'iframe', 'object', 'embed'])
+    sanitize_config = sanitize_config.merge(remove_contents: ['script', 'style', 'iframe', 'object', 'embed', 'figure'])
     content = Sanitize.fragment(content, sanitize_config)
+    content = content.squeeze.strip
     ApplicationController.helpers.sanitize(content, tags: []).truncate(86, :separator => " ").squish
   rescue
     ''
