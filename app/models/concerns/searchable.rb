@@ -118,7 +118,9 @@ module Searchable
       sort_regex = /(?<=\s|^)sort:\s*(asc|desc|relevance)(?=\s|$)/i
       tag_id_regex = /(?<=\s|^)tag_id:\s*([0-9]+)(?=\s|$)/
 
-      params[:query] = params[:query].gsub("body:", "content:")
+      if params[:query].respond_to?(:gsub)
+        params[:query] = params[:query].gsub("body:", "content:")
+      end
 
       if params[:query] =~ unread_regex
         params[:query] = params[:query].gsub(unread_regex, '')
