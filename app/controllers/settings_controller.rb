@@ -22,10 +22,10 @@ class SettingsController < ApplicationController
     start_date = 29.days.ago
     feed_ids = @subscriptions.map {|subscription| subscription.feed_id}
     entry_counts = Rails.cache.fetch("#{@user.id}:entry_counts:2", expires_in: 24.hours) { FeedStat.get_entry_counts(feed_ids, start_date) }
-    max = Rails.cache.fetch("#{@user.id}:max_entry_count", expires_in: 24.hours) { FeedStat.max_entry_count(feed_ids, start_date) }
 
     @subscriptions = @subscriptions.map do |subscription|
       counts = entry_counts[subscription.feed_id]
+      max = (counts.present?) ? counts.max.to_i : 0
       percentages = (counts.present?) ? counts.map { |count| count.to_f / max.to_f } : nil
       volume = (counts.present?) ? counts.sum : 0
 
