@@ -13,12 +13,9 @@ end
     <% unless hide_drawer %>
       <%= render partial: 'tags/tag_visibility', locals: {user: @user, tag: tag} %>
     <% end %>
-
     <span data-behavior="rename_target" data-form-action="<%= tag_path(tag) %>" data-input-name="tag[name]" data-title="<%= tag.name %>", data-original-title="<%= tag.name %>">
       <span data-behavior="rename_title"><%= tag.name %></span>
     </span>
-
-
   <% end %>
   <div class="drawer <%= hide_drawer ? ' hide' : '' %>" data-hidden="<%= drawer_visible?(tag.id) ? 'false' : 'true' %>" style="<%= drawer_visible?(tag.id) ? '' : 'height: 0;' %>">
     <ul>

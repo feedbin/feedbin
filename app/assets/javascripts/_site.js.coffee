@@ -551,7 +551,7 @@ $.extend feedbin,
           feedId = parseInt(ui.draggable.data('feed-id'))
           url = ui.draggable.data('feed-path')
           target = $(event.target)
-          tag = $("> a", event.target).find(".rename-feed-input").val()
+          tag = $("> a", event.target).find("[data-behavior~=rename_title]").text()
 
           if tag?
             tagId = $(event.target).data('tag-id')
