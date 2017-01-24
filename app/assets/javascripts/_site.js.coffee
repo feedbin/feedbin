@@ -638,12 +638,11 @@ $.extend feedbin,
           form = $('<form>', formAttributes)
 
           inputAttributes =
-            "data-behavior": "rename_input"
-            "data-feed-id": data.feedId
             "placeholder": data.originalTitle
             "value": data.title
+            "name": data.inputName
+            "data-behavior": "rename_input"
             "type": "text"
-            "name": "feed[title]"
             "spellcheck": "false"
             "class": "rename-feed-input"
 
