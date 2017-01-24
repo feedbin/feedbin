@@ -625,34 +625,57 @@ $.extend feedbin,
     renameFeed: ->
       $(document).on 'dblclick', '[data-behavior~=renamable]', (event) ->
         unless $(event.target).is('.feed-action-button')
-          feedTitle = $(@).find('.rename-feed-input')
-          feedTitle.removeClass('disabled')
-          feedTitle.select()
+          target = $(@).find('[data-behavior~=rename_target]')
+          title = $(@).find('[data-behavior~=rename_title]')
+          data = target.data()
 
-      $(document).on 'blur', '.rename-feed-input', (event) ->
-        field = $(@)
-        title = field.data('original')
-        field.val(title)
-        field.addClass('disabled')
+          formAttributes =
+            "accept-charset": "UTF-8"
+            "data-remote": "true"
+            "method": "post"
+            "action": data.formAction
+            "data-behavior": "rename_form"
+          form = $('<form>', formAttributes)
+
+          inputAttributes =
+            "data-behavior": "rename_input"
+            "data-feed-id": data.feedId
+            "placeholder": data.originalTitle
+            "value": data.title
+            "type": "text"
+            "name": "feed[title]"
+            "spellcheck": "false"
+            "class": "rename-feed-input"
+
+          input = $('<input>', inputAttributes)
+          methodInput = $('<input>', {type: "hidden", name: "_method", value: "patch"})
+
+          form.append(input)
+          form.append(methodInput)
+
+          title.addClass('hide')
+          target.append(form)
+          input.select()
+
+      $(document).on 'blur', '[data-behavior~=rename_input]', (event) ->
+        $('[data-behavior~=rename_form]').remove()
+        $('[data-behavior~=rename_title]').removeClass('hide')
+
+      $(document).on 'submit', '[data-behavior~=rename_form]', (event, xhr) ->
+        container = $(@).closest('[data-behavior~=renamable]')
+        title = container.find('[data-behavior~=rename_title]')
+        input = container.find('[data-behavior~=rename_input]')
+        target = container.find('[data-behavior~=rename_target]')
+        target.data('title', input.val())
+        title.text(input.val())
+
+        $('[data-behavior~=rename_form]').remove()
+        $('[data-behavior~=rename_title]').removeClass('hide')
 
       $(document).on 'click', '[data-behavior~=open_item]', (event) ->
-        $('.rename-feed-input').each ->
-          $(@).blur()
-
-      $(document).on 'submit', '.edit_feed', (event, xhr) ->
-        field = $(@).find('.rename-feed-input')
-
-        title = field.val() || field.attr('placeholder')
-
-        field.data 'original', title
-        field.blur()
-
-        event.preventDefault()
-        event.stopPropagation()
-
-      $(document).on 'click', '.rename-feed-input', (event, xhr) ->
-        if !$(@).hasClass('disabled')
-          return false
+        unless $(event.target).is('[data-behavior~=rename_input]')
+          $('[data-behavior~=rename_input]').each ->
+            $(@).blur()
 
     changeSearchSort: (sort) ->
       $(document).on 'click', '[data-sort-option]', ->
