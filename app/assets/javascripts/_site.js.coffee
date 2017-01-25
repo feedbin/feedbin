@@ -47,7 +47,7 @@ $.extend feedbin,
   modalBox: (html) ->
     $('.modal-target').html(html)
     $('.modal').modal
-      backdrop: false
+      backdrop: "static"
     feedbin.modalShowing = true
 
   updateFeeds: (feeds) ->
@@ -1216,18 +1216,6 @@ $.extend feedbin,
         return
 
     subscribe: ->
-      $(document).on 'click', '[data-behavior~=show_subscribe]', (event) ->
-        feeds = $(".feeds-inner")
-        if feeds.hasClass('show-subscribe')
-          feedbin.hideSubscribe()
-        else
-          feedbin.showSubscribe()
-        return
-
-      $(document).on 'click', (event) ->
-        unless $(event.target).is('[data-behavior~=show_subscribe]') || $(event.target).is('.subscribe-wrap') || $(event.target).parents('.subscribe-wrap').length > 0
-          feedbin.hideSubscribe()
-
       subscription = feedbin.queryString('subscribe')
       if subscription?
         $('[data-behavior~=show_subscribe]').click()

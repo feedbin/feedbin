@@ -847,6 +847,14 @@ Structure
         cursor: pointer;
         position: relative;
         font-weight: bold;
+        touch-action: manipulation;
+        display: block;
+        -webkit-appearance: none;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+
         &:before {
             background-color: $selected;
             height: 13px;
@@ -4796,6 +4804,15 @@ Buttons
 /*------------------------------------------------------------------------------
     Modal
 ------------------------------------------------------------------------------*/
+.fade {
+    opacity: 0;
+    transition: opacity 0.15s linear;
+}
+
+.fade.in {
+    opacity: 1;
+}
+
 button.close {
     -webkit-appearance: none;
     padding: 0;
@@ -4807,59 +4824,42 @@ button.close {
 .modal-open {
     overflow: hidden;
 }
-
 .modal {
+    display: none;
+    overflow: hidden;
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
     z-index: 1050;
-    display: none;
-    overflow: auto;
-    overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
     outline: 0;
-    color: $text-color-body;
-    td, th {
-        border-color: $border-color !important;
-    }
 }
-
 .modal.fade .modal-dialog {
-    -webkit-transition: -webkit-transform .3s ease-out;
-    -moz-transition: -moz-transform .3s ease-out;
-    -o-transition: -o-transform .3s ease-out;
-    transition: transform .3s ease-out;
-    -webkit-transform: translate(0,-25%);
-    -ms-transform: translate(0,-25%);
-    transform: translate(0,-25%);
+    transform: translate(0, -25%);
+    transition: transform 0.3s ease-out;
 }
-
 .modal.in .modal-dialog {
-    -webkit-transform: translate(0,0);
-    -ms-transform: translate(0,0);
-    transform: translate(0,0);
+    transform: translate(0, 0);
 }
-
+.modal-open .modal {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
 .modal-dialog {
     position: relative;
     width: auto;
     margin: 10px;
 }
-
 .modal-content {
     position: relative;
-    @include background-color($list-background-color, $list-background-color, $list-background-color);
+    background-color: $inset-bg-color;
+    border-radius: 8px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
     background-clip: padding-box;
-    border: 1px solid #999;
-    border: 1px solid rgba(0,0,0,.2);
-    border-radius: 6px;
-    outline: none;
-    -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
-    box-shadow: 0 3px 9px rgba(0,0,0,.5);
+    outline: 0;
 }
-
 .modal-backdrop {
     position: fixed;
     top: 0;
@@ -4867,83 +4867,87 @@ button.close {
     bottom: 0;
     left: 0;
     z-index: 1040;
-    background-color: #000;
+    background-color: #333E48;
 }
-
 .modal-backdrop.fade {
-    filter: alpha(opacity=0);
     opacity: 0;
+    filter: alpha(opacity=0);
 }
-
 .modal-backdrop.in {
-    filter: alpha(opacity=50);
-    opacity: .5;
+    opacity: 0.8;
+    filter: alpha(opacity=80);
 }
-
 .modal-header {
-    min-height: 16.42857143px;
     padding: 15px;
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color, $border-color);
-    position: relative;
+    border-bottom: 1px solid #e5e5e5;
+    h4 {
+        font-size: 21px;
+        font-weight: normal;
+    }
 }
-
 .modal-header .close {
     position: absolute;
     right: 15px;
     top: 15px;
+    font-size: 21px;
 }
-
 .modal-title {
-    margin: 0 !important;
-    font-size: 16px !important;
+    margin: 0;
     line-height: 1.42857143;
 }
-
 .modal-body {
     position: relative;
-    padding: 20px;
+    padding: 15px;
 }
-
 .modal-footer {
-    padding: 19px 20px 20px;
-    margin-top: 15px;
+    padding: 15px;
     text-align: right;
-    border-top: 1px solid transparent;
-    @include border-color($border-color, $border-color, $border-color);
+    border-top: 1px solid #e5e5e5;
 }
-
 .modal-footer .btn + .btn {
-    margin-bottom: 0;
     margin-left: 5px;
+    margin-bottom: 0;
 }
-
 .modal-footer .btn-group .btn + .btn {
     margin-left: -1px;
 }
-
 .modal-footer .btn-block + .btn-block {
     margin-left: 0;
 }
-
-@media (min-width:768px) {
+.modal-scrollbar-measure {
+    position: absolute;
+    top: -9999px;
+    width: 50px;
+    height: 50px;
+    overflow: scroll;
+}
+@media (min-width: 768px) {
     .modal-dialog {
         width: 600px;
         margin: 30px auto;
     }
     .modal-content {
-        -webkit-box-shadow: 0 5px 15px rgba(0,0,0,.5);
-        box-shadow: 0 5px 15px rgba(0,0,0,.5);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     }
     .modal-sm {
         width: 300px;
     }
 }
-
-@media (min-width:992px) {
+@media (min-width: 992px) {
     .modal-lg {
         width: 900px;
     }
+}
+.modal-header:before,
+.modal-header:after,
+.modal-footer:before,
+.modal-footer:after {
+    content: " ";
+    display: table;
+}
+.modal-header:after,
+.modal-footer:after {
+    clear: both;
 }
 
 /*------------------------------------------------------------------------------
@@ -5152,15 +5156,6 @@ input[type="text"].hide {
 
 .text-right {
     text-align: right;
-}
-
-.fade {
-  opacity: 0;
-  transition: opacity 0.15s linear;
-}
-
-.fade.in {
-  opacity: 1;
 }
 
 .large {
