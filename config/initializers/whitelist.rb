@@ -1,8 +1,10 @@
 Feedbin::Application.config.whitelist = HTML::Pipeline::SanitizationFilter::WHITELIST.clone
 Feedbin::Application.config.whitelist[:attributes][:all] += ['id']
 Feedbin::Application.config.whitelist[:attributes]['source'] = ['src']
+Feedbin::Application.config.whitelist[:attributes]['video'] = ['src']
 Feedbin::Application.config.whitelist[:elements] += ['figure', 'figcaption', 'audio', 'video', 'source']
 Feedbin::Application.config.whitelist[:protocols]['img']['src'] += ['data']
+Feedbin::Application.config.whitelist[:protocols]['img']['video'] = {'src'  => ['http', 'https']}
 
 Feedbin::Application.config.evernote_whitelist = {
   :elements => %w(
