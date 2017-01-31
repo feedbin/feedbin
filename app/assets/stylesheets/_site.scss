@@ -4584,17 +4584,19 @@ Add
         margin-bottom: 30px;
         .category {
             width: 150px;
-            background-color: #FFF;
             display: flex;
             justify-content: center;
             flex-direction: column;
             border: 1px solid $border-color;
             border-right: none;
             border-radius: 4px 0 0 4px;
-            padding: 0 8px;
+            padding: 0 8px 0 25px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            cursor: pointer;
+            background: #FFF image-url("icon-caret.svg") 7px 50% no-repeat;
+            background-size: 13px 13px;
         }
         .title {
             flex-grow: 1;
