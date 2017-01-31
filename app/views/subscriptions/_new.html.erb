@@ -1,0 +1,19 @@
+<h5>Feeds Available</h5>
+<%= form_tag subscriptions_path, method: :post do %>
+  <% feeds.each do |feed| %>
+    <%= fields_for "feeds[]", feed do |pf| %>
+      <div class="subscription-option">
+        <div class="category">
+          Uncategorized
+        </div>
+        <div class="title">
+          <%= pf.text_field :title, placeholder: feed.title %>
+          <p class="feed-url"><%= feed.feed_url %></p>
+        </div>
+        <div class="action">
+          <button>+ Add</button>
+        </div>
+      </div>
+     <% end %>
+  <% end %>
+<% end %>

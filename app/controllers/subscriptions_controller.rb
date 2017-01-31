@@ -23,47 +23,6 @@ class SubscriptionsController < ApplicationController
   # POST /subscriptions
   # POST /subscriptions.json
   def create
-    @user = current_user
-
-    feed_urls = [*params[:subscription][:feeds][:feed_url]]
-    @results = { success: [], options: [], failed: [] }
-
-    feed_urls.each do |feed_url|
-      begin
-        finder = FeedFinder.new(feed_url)
-        if finder.options.length == 0
-          @results[:failed].push(feed_url)
-        elsif finder.options.length == 1
-          feed = finder.create_feed(finder.options.first)
-          if feed
-            @user.subscriptions.find_or_create_by(feed: feed)
-            @results[:success].push(feed)
-          else
-            @results[:failed].push(feed_url)
-          end
-        else
-          @results[:options].push(finder.options)
-        end
-      rescue Exception => e
-        logger.info { "exception ---------------------------" }
-        logger.info { e.inspect }
-        logger.info { e.backtrace.inspect }
-        logger.info { "exception ---------------------------" }
-        Honeybadger.notify(e)
-        @results[:failed].push(feed)
-      end
-    end
-
-    if @results[:success].any?
-      session[:favicon_complete] = false
-      @mark_selected = true
-      @click_feed = @results[:success].first.id
-      get_feeds_list
-    end
-
-    respond_to do |format|
-      format.js
-    end
 
   end
 

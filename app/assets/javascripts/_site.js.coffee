@@ -44,12 +44,6 @@ $.extend feedbin,
     feedbin.closeEntryBasement(0)
     $('[data-behavior~=entry_content_target]').html(html)
 
-  modalBox: (html) ->
-    $('.modal-target').html(html)
-    $('.modal').modal
-      backdrop: "static"
-    feedbin.modalShowing = true
-
   updateFeeds: (feeds) ->
     $('[data-behavior~=feeds_target]').html(feeds)
 
@@ -573,6 +567,13 @@ $.extend feedbin,
       $.ajax(xhr)
     )
 
+  modal: (selector) ->
+    activeModal = $(selector)
+    $('.modal').each ->
+      unless $(@).get(0) == activeModal.get(0)
+        $(@).modal('hide')
+    activeModal.modal('toggle')
+
   entries: {}
 
   feedCandidates: []
@@ -808,6 +809,7 @@ $.extend feedbin,
         return
 
     screenshotTabs: ->
+
       $('[data-behavior~=screenshot_nav] li').first().addClass('active')
       $(document).on 'click', '[data-behavior~=screenshot_nav] a', (event) ->
         $('[data-behavior~=screenshot_nav] li').removeClass('active')
@@ -1202,11 +1204,11 @@ $.extend feedbin,
           $(@).attr('title', title)
 
     formProcessing: ->
-      $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
+      $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form], [data-behavior~=feeds_search]', ->
         $(@).find('input').addClass('processing')
         return
 
-      $(document).on 'ajax:complete', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
+      $(document).on 'ajax:complete', '[data-behavior~=subscription_form], [data-behavior~=search_form], [data-behavior~=feeds_search]', ->
         $(@).find('input').removeClass('processing')
         if feedbin.closeSubcription
           setTimeout ( ->
@@ -1317,12 +1319,6 @@ $.extend feedbin,
         $(@).select()
         event.preventDefault()
       return
-
-    showSettingsModal: ->
-      $(document).on 'mouseup', '[data-behavior~=show_settings_modal]', (event) ->
-        content = $('[data-behavior~=settings_modal]').html()
-        feedbin.modalBox(content);
-        event.preventDefault()
 
     fuzzyFilter: ->
       feeds = $('[data-sort-name]')

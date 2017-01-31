@@ -188,24 +188,18 @@ class feedbin.Keyboard
 
     # Add subscription
     Mousetrap.bind 'a', (event, combo) =>
-      $('body').removeClass('full-screen')
-      $('[data-behavior~=show_subscribe]').click()
+      feedbin.modal("#add_form_modal")
+      event.preventDefault()
+
+    # Show Keyboard shortcuts
+    Mousetrap.bind '?', (event, combo) =>
+      feedbin.modal("#keyboard_shortcuts")
       event.preventDefault()
 
     # Focus search
     Mousetrap.bind '/', (event, combo) =>
       $('body').removeClass('full-screen')
       $('[name="query"]').focus()
-      event.preventDefault()
-
-    # Show Keyboard shortcuts
-    Mousetrap.bind '?', (event, combo) =>
-      if feedbin.modalShowing == true
-        $('.modal').modal('hide')
-        feedbin.modalShowing = false
-      else
-        content = $('[data-behavior~=keyboard_shortcuts]').html()
-        feedbin.modalBox(content);
       event.preventDefault()
 
     # Open original article
@@ -259,9 +253,6 @@ class feedbin.Keyboard
     # Unfocus field,
     Mousetrap.bindGlobal 'escape', (event, combo) =>
       feedbin.hideSubscribe()
-      if feedbin.modalShowing == true
-        $('.modal').modal('hide')
-        event.preventDefault()
 
       if $('[name="subscription[feeds][feed_url]"]').is(':focus')
         $('[name="subscription[feeds][feed_url]"]').blur()

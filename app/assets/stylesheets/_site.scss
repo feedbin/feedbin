@@ -322,7 +322,8 @@ label select {
     margin-bottom: 0;
 }
 
-.field_with_errors input {
+.field_with_errors input,
+input.error {
     border: 1px solid red;
 }
 
@@ -4327,6 +4328,7 @@ Settings
         .last-updated-wrap {
             margin-right: 8px;
             font-size: 14px;
+            white-space: nowrap;
             @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
             @media (max-width:800px) {
                 display: none;
@@ -4558,6 +4560,67 @@ table.small td {
         td:last-child {
             padding-top: 0;
             text-align: left;
+        }
+    }
+}
+
+/*------------------------------------------------------------------------------
+Add
+------------------------------------------------------------------------------*/
+.add-content {
+    input[type=text] {
+        max-width: 100%;
+        margin-bottom: 0;
+        border-radius: 4px;
+    }
+    h5 {
+        font-size: 16px;
+        font-weight: normal;
+        margin: 1em 0 .5em 0;
+    }
+    .subscription-option {
+        display: flex;
+        align-items: stretch;
+        margin-bottom: 30px;
+        .category {
+            width: 150px;
+            background-color: #FFF;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            border: 1px solid $border-color;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            padding: 0 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .title {
+            flex-grow: 1;
+            position: relative;
+            input {
+                border-radius: 0 4px 4px 0;
+            }
+            .feed-url {
+                position: absolute;
+                bottom: -33px;
+                left: 8px;
+                font-size: 12px;
+                color: $text-color-light;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+        .action {
+            width: 100px;
+            padding: 0 0 0 8px;
+            button {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
         }
     }
 }
@@ -4804,6 +4867,7 @@ Buttons
 /*------------------------------------------------------------------------------
     Modal
 ------------------------------------------------------------------------------*/
+$modal-border-radius: 8px;
 .fade {
     opacity: 0;
     transition: opacity 0.15s linear;
@@ -4819,6 +4883,10 @@ button.close {
     cursor: pointer;
     background: transparent;
     border: 0;
+    color: $text-color-light;
+    &:hover {
+        color: $text-color;
+    }
 }
 
 .modal-open {
@@ -4855,7 +4923,7 @@ button.close {
 .modal-content {
     position: relative;
     background-color: $inset-bg-color;
-    border-radius: 8px;
+    border-radius: $modal-border-radius;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
     background-clip: padding-box;
     outline: 0;
@@ -4879,17 +4947,18 @@ button.close {
 }
 .modal-header {
     padding: 15px;
-    border-bottom: 1px solid #e5e5e5;
     h4 {
-        font-size: 21px;
+        font-size: 24px;
         font-weight: normal;
     }
 }
 .modal-header .close {
     position: absolute;
-    right: 15px;
-    top: 15px;
+    right: 0px;
+    top: 0px;
     font-size: 21px;
+    height: 53px;
+    width: 40px;
 }
 .modal-title {
     margin: 0;
@@ -4903,6 +4972,8 @@ button.close {
     padding: 15px;
     text-align: right;
     border-top: 1px solid #e5e5e5;
+    background-color: #fff;
+    border-radius: 0 0 $modal-border-radius $modal-border-radius;
 }
 .modal-footer .btn + .btn {
     margin-left: 5px;

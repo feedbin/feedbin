@@ -1,0 +1,5 @@
+<% if @feeds.present? %>
+  $('[data-behavior~=subscribe_target]').html('<%= j render partial: "subscriptions/new", locals: {feeds: @feeds} %>');
+<% else %>
+  $('[data-behavior~=feeds_search]').replaceWith('<%= j render partial: "feeds/search", locals: {query: params[:q], error: "No Feeds Found"} %>');
+<% end %>

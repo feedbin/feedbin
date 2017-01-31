@@ -16,13 +16,12 @@ feedbin.Counts.get(feedbin.count_data);
 <%= render partial: 'shared/svg' %>
 
 <div class="application-messages"><a href="" class="message-content" data-behavior="messages">You have subscribed</a></div>
-<div class="modal-target"></div>
 
 <div class="app-wrap">
 
     <div class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
         <div class="subscribe-toolbar">
-            <button type="button" class="show-subscribe" data-behavior="show_subscribe" data-toggle="modal" data-target="#add_form">Add</button>
+            <button type="button" class="show-subscribe" data-behavior="show_subscribe" data-toggle="modal" data-target="#add_form_modal">Add</button>
             <%= render partial: 'shared/hamburger_menu_button' %>
         </div>
         <div class="feeds-inner">
@@ -107,6 +106,8 @@ feedbin.Counts.get(feedbin.count_data);
 <div class="hide" data-behavior="pagination"></div>
 <%= render partial: "shared/readability_loading" %>
 <%= render partial: "shared/add_form" %>
+<%= render partial: "shared/keyboard_shortcuts_wrap" %>
+<%= render partial: "shared/settings_modal" %>
 <%= render partial: "shared/resizable_form" %>
 <%= render partial: 'shared/update_styles' %>
 

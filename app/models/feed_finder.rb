@@ -17,6 +17,12 @@ class FeedFinder
     end
   end
 
+  def create_feeds!
+    options.each_with_object([]) do |option, array|
+      array.push(create_feed(option))
+    end.compact
+  end
+
   def create_feed(option)
     feed = Feed.where(feed_url: option.href).take
 
