@@ -4591,12 +4591,12 @@ Add
             border-right: none;
             border-radius: 4px 0 0 4px;
             padding: 0 8px 0 25px;
-            overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             cursor: pointer;
             background: #FFF image-url("icon-caret.svg") 7px 50% no-repeat;
             background-size: 13px 13px;
+            position: relative;
         }
         .title {
             flex-grow: 1;
@@ -4616,12 +4616,75 @@ Add
             }
         }
         .action {
+            display: flex;
+            align-items: stretch;
             width: 100px;
             padding: 0 0 0 8px;
-            button {
+        }
+    }
+    .check-toggle {
+        width: 100%;
+        height: 100%;
+        label {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        [type=checkbox] {
+            display: none;
+        }
+        input[type="checkbox"] + label {
+            span {
+                text-align: center;
+            }
+            .on {
+                display: none;
+            }
+            .off {
                 display: block;
-                width: 100%;
-                height: 100%;
+            }
+        }
+        input[type="checkbox"]:checked + label {
+            .on {
+                display: block;
+            }
+            .off {
+                display: none;
+            }
+            background-color: $selected;
+        }
+        .button {
+            padding: 0;
+        }
+    }
+    .categories {
+        position: absolute;
+        z-index: 100;
+        bottom: -28px;
+        left: -2px;
+        width: 100%;
+        background-color: #fff;
+        margin: 0 1px 0 1px;
+        padding: 0;
+        list-style-type: none;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+        li {
+            margin: 0;
+            position: relative;
+            margin: 0;
+            padding: 5px;
+            @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
+            font-size: 13px;
+            border-bottom: 1px solid $border-color;
+            &:last-child {
+                border-bottom: none;
+            }
+            &:hover {
+                @include background-color($border-color, $border-color-night, $border-color-sunset);
             }
         }
     }
@@ -4696,6 +4759,18 @@ Buttons
 	display: inline-block;
 	padding: 7px 10px;
 	border-radius: 2px;
+}
+
+.button-bordered {
+    border: 2px solid $selected;
+    border-radius: 3px;
+    padding: 8px 15px;
+    text-decoration: none;
+    &:hover {
+        background-color: $selected;
+        text-decoration: none;
+        color: #fff;
+    }
 }
 
 .button-cancel {
@@ -4959,7 +5034,7 @@ button.close {
     right: 0px;
     top: 0px;
     font-size: 21px;
-    height: 53px;
+    height: 40px;
     width: 40px;
 }
 .modal-title {
@@ -4976,6 +5051,26 @@ button.close {
     border-top: 1px solid #e5e5e5;
     background-color: #fff;
     border-radius: 0 0 $modal-border-radius $modal-border-radius;
+}
+.modal-lg {
+    .modal-header {
+        padding-top: 40px;
+        .close {
+            top: 38px;
+            right: 35px;
+        }
+    }
+    .modal-body {
+        padding-bottom: 40px;
+    }
+    .modal-footer {
+        padding-bottom: 20px;
+        padding-top: 20px;
+    }
+    .modal-header, .modal-body, .modal-footer {
+        padding-left: 50px;
+        padding-right: 50px;
+    }
 }
 .modal-footer .btn + .btn {
     margin-left: 5px;

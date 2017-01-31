@@ -1419,6 +1419,10 @@ $.extend feedbin,
       feedbin.droppable()
       feedbin.draggable()
 
+    selectCategory: ->
+      $(document).on 'click', '[data-behavior~=selected_category]', (event) ->
+        $(@).find('[data-behavior~=categories]').toggleClass('hide')
+
     resizeGraph: ->
       if $("[data-behavior~=resize_graph]").length
         $(window).resize(_.debounce(->
