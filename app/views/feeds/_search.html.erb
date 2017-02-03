@@ -1,3 +1,3 @@
 <%= form_tag({controller: "feeds", action: "search"}, remote: true, autocomplete: 'off', data: { behavior: 'feeds_search'}) do %>
-    <%= text_field_tag(:q, query, placeholder: 'Feed or Website URL', class: error.present? ? 'error' : '') %>
+    <%= text_field_tag(:q, query, placeholder: 'Feed or Website URL', class: error.present? ? 'error' : '', data: { behavior: 'feeds_search_field'}) %>
 <% end %>

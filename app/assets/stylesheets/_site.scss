@@ -269,7 +269,7 @@ input[type="color"],
     margin-bottom: 7px;
     line-height: 20px;
     vertical-align: middle;
-    border-radius: 2px;
+    border-radius: 4px;
     &:focus {
         outline: none;
         border-color: $selected;
@@ -844,7 +844,7 @@ Structure
         color: $selected;
         line-height: $toolbar-height;
         font-size: 13px;
-        padding: 0 0 0 36px;
+        padding: 0 0 0 16px;
         cursor: pointer;
         position: relative;
         font-weight: bold;
@@ -855,25 +855,6 @@ Structure
         background: none;
         width: 100%;
         text-align: left;
-
-        &:before {
-            background-color: $selected;
-            height: 13px;
-            width: 3px;
-            position: absolute;
-            left: 19px;
-            top: $base-button-position + 4;
-            content: "";
-        }
-        &:after {
-            background-color: $selected;
-            height: 3px;
-            width: 13px;
-            position: absolute;
-            top: $base-button-position + 9;
-            left: 14px;
-            content: "";
-        }
     }
 }
 
@@ -4571,7 +4552,6 @@ Add
     input[type=text] {
         max-width: 100%;
         margin-bottom: 0;
-        border-radius: 4px;
     }
     h5 {
         font-size: 16px;
@@ -4613,6 +4593,8 @@ Add
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                max-width: 90%;
+                padding-right: 5px;
             }
         }
         .action {
@@ -4637,6 +4619,7 @@ Add
             display: none;
         }
         input[type="checkbox"] + label {
+            font-weight: bold;
             span {
                 text-align: center;
             }
@@ -4645,6 +4628,14 @@ Add
             }
             .off {
                 display: block;
+                svg * {
+                    fill: $selected;
+                }
+            }
+            &:hover {
+                svg * {
+                    fill: #FFF;
+                }
             }
         }
         input[type="checkbox"]:checked + label {
@@ -4663,20 +4654,21 @@ Add
     .categories {
         position: absolute;
         z-index: 100;
-        bottom: -28px;
+        top: -30px;
         left: -2px;
-        width: 100%;
+        width: 200px;
         background-color: #fff;
         margin: 0 1px 0 1px;
         padding: 0;
         list-style-type: none;
         border: 1px solid $border-color;
         border-radius: 4px;
+        box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.2);
         li {
             margin: 0;
             position: relative;
             margin: 0;
-            padding: 5px;
+            padding: 7px 5px;
             @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
             font-size: 13px;
             border-bottom: 1px solid $border-color;
@@ -4763,13 +4755,35 @@ Buttons
 
 .button-bordered {
     border: 2px solid $selected;
-    border-radius: 3px;
+    border-radius: 4px;
     padding: 8px 15px;
     text-decoration: none;
+    min-width: 90px;
+    transition: background-color 0.2s ease;
     &:hover {
         background-color: $selected;
         text-decoration: none;
         color: #fff;
+    }
+}
+
+.button-secondary {
+    color: $text-color-light;
+    border-color: $text-color-light;
+    &:hover {
+        background-color: $text-color-light;
+        text-decoration: none;
+        color: #fff;
+    }
+}
+
+.button-primary {
+    background-color: $selected;
+    color: #fff;
+    font-weight: bold;
+    &[disabled] {
+        background-color: $text-color-light;
+        border-color: $text-color-light;
     }
 }
 
@@ -5034,6 +5048,7 @@ button.close {
     right: 0px;
     top: 0px;
     font-size: 21px;
+    font-weight: bold;
     height: 40px;
     width: 40px;
 }

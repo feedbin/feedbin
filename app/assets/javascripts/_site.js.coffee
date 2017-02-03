@@ -1218,6 +1218,15 @@ $.extend feedbin,
         return
 
     subscribe: ->
+      $(document).on 'click', '[data-behavior~=show_subscribe]', ->
+        modal = $('#add_form_modal')
+        markup = $('[data-behavior~=add_form_markup]')
+        modal.html(markup.html())
+        feedbin.modal('#add_form_modal')
+
+      $('#add_form_modal').on 'shown.bs.modal', () ->
+        $('#add_form_modal [data-behavior~=feeds_search_field]').focus()
+
       subscription = feedbin.queryString('subscribe')
       if subscription?
         $('[data-behavior~=show_subscribe]').click()
@@ -1433,6 +1442,14 @@ $.extend feedbin,
     settingsCheckbox: ->
       $(document).on 'change', '[data-behavior~=auto_submit]', (event) ->
         $(@).parents("form").submit()
+
+    submitAdd: ->
+      $(document).on 'click', '[data-behavior~=submit_add]', (event) ->
+        $(@).attr('disabled', 'disabled')
+        setTimeout ( ->
+          $("#add_form_modal").modal('hide')
+        ), 1000
+
 
     toggleContent: ->
       $(document).on 'click', '[data-behavior~=toggle_content_button]', (event) ->

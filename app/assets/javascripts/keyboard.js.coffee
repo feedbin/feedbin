@@ -188,7 +188,7 @@ class feedbin.Keyboard
 
     # Add subscription
     Mousetrap.bind 'a', (event, combo) =>
-      feedbin.modal("#add_form_modal")
+      $('[data-behavior~=show_subscribe]').click()
       event.preventDefault()
 
     # Show Keyboard shortcuts
