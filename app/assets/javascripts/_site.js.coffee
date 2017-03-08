@@ -1237,7 +1237,8 @@ $.extend feedbin,
 
     searchError: ->
       $(document).on 'ajax:error', '[data-behavior~=search_form]', (event, xhr) ->
-        feedbin.showNotification('Search error.');
+        feedbin.showNotification('Search error.', 3000, '', true);
+
         return
 
     savedSearch: ->
@@ -1450,11 +1451,16 @@ $.extend feedbin,
           $("#add_form_modal").modal('hide')
         ), 1000
 
-
     toggleContent: ->
       $(document).on 'click', '[data-behavior~=toggle_content_button]', (event) ->
-
         $(@).parents("form").submit()
+
+    checkToggle: ->
+      $(document).on 'change', '[data-behavior~=check_toggle]', (event) ->
+        if $('[data-behavior~=check_toggle]:checked').length == 0
+          $('#add_form_modal [data-behavior~=submit_add]').attr('disabled', 'disabled')
+        else
+          $('#add_form_modal [data-behavior~=submit_add]').removeAttr('disabled', 'disabled')
 
 
 $.each feedbin.preInit, (i, item) ->

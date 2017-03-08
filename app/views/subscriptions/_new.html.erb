@@ -1,18 +1,9 @@
-<h5>Feeds Available</h5>
 <%= form_tag subscriptions_path, method: :post do %>
-  <% feeds.each do |feed| %>
+  <% feeds.each_with_index do |feed, index| %>
     <%= fields_for "feeds[]", feed do |pf| %>
       <div class="subscription-option">
         <div class="category" data-behavior="selected_category">
-          <span data-behavior="category_title" class="title">Uncategorized</span>
-          <div data-behavior="categories" class="categories">
-              <ul>
-                <li class="selected">Uncategorized</li>
-                <% @user.feed_tags.each do |tag| %>
-                  <li><%= tag.name %></li>
-                <% end %>
-              </ul>
-          </div>
+            <%= pf.text_field :tags, placeholder: "Tags" %>
         </div>
         <div class="title">
           <%= pf.text_field :title, placeholder: feed.title %>
@@ -20,7 +11,7 @@
         </div>
         <div class="action">
           <div class="check-toggle">
-            <%= pf.check_box :id, checked: false, data: {behavior: "check_toggle"} %>
+            <%= pf.check_box :id, checked: index == 0 ? true : false, data: {behavior: "check_toggle"} %>
             <%= pf.label :id, class: "button button-bordered" do %>
               <span class="off"><%= svg_tag 'icon-plus', size: '12x12' %></span>
               <span class="on"><%= svg_tag 'icon-check', size: '15x12' %></span>

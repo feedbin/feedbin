@@ -1,3 +1,4 @@
-<%= form_tag({controller: "feeds", action: "search"}, remote: true, autocomplete: 'off', data: { behavior: 'feeds_search'}) do %>
-    <%= text_field_tag(:q, query, placeholder: 'Feed or Website URL', class: error.present? ? 'error' : '', data: { behavior: 'feeds_search_field'}) %>
+<%= form_tag({controller: "feeds", action: "search"}, remote: true, autocomplete: 'off', class: 'modal-form', data: { behavior: 'feeds_search'}) do %>
+    <label for="q">+ Add</label><%= text_field_tag(:q, query, placeholder: 'Feed or Website URL', class: error.present? ? 'error' : '', data: { behavior: 'feeds_search_field'}) %>
+    <span data-behavior="feeds_search_favicon_target" class="favicon-target"></span>
 <% end %>

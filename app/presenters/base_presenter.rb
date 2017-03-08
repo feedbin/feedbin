@@ -37,6 +37,14 @@ class BasePresenter
     end
   end
 
+  def favicon_with_fallback
+    if @object.favicon && @object.favicon.cdn_url
+      favicon(@object)
+    else
+      favicon_with_url(@object.host)
+    end
+  end
+
   def favicon_url(host)
     uri = URI::HTTP.build(
       scheme: "https",
