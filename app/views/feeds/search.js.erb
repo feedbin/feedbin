@@ -1,9 +1,11 @@
 <% if @feeds.present? %>
   $('#add_form_modal [data-behavior~=subscribe_target]').html('<%= j render partial: "subscriptions/new", locals: {feeds: @feeds} %>');
   $('#add_form_modal [data-behavior~=feeds_search_favicon_target]').html('<%= j render partial: "feeds/favicon", locals: {feed: @feeds.first} %>');
-  $('#add_form_modal .modal-body, #add_form_modal .modal-footer').slideDown(200)
+  $('#add_form_modal .feed-search-results').slideDown(200)
   $('#add_form_modal .modal-dialog').addClass('done');
   $('#add_form_modal [data-behavior~=submit_add]').removeAttr('disabled');
+  $('#add_form_modal [data-behavior~=feeds_search_field]').blur();
+  feedbin.updateFeedSearchMessage();
 <% else %>
     feedbin.showNotification('No feed found.', 3000, '', true);
 <% end %>

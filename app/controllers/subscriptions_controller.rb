@@ -23,6 +23,9 @@ class SubscriptionsController < ApplicationController
   # POST /subscriptions
   # POST /subscriptions.json
   def create
+    @mark_selected = true
+    @click_feed = Feed.first.id
+    get_feeds_list
 
   end
 

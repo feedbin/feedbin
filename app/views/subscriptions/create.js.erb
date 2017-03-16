@@ -1,20 +1,13 @@
-<% if @results[:options].any? %>
-  feedbin.modalBox('<%= j render partial: "choices", locals: { options: @results[:options].first } %>');
-<% elsif @results[:success].any? %>
-  <%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
-  feedbin.showNotification('You have subscribed.');
-  feedbin.hideSubscribe()
+<%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
+feedbin.showNotification('You have subscribed.');
+feedbin.hideSubscribe();
 
-  $("[data-feed-id=<%= @click_feed %>] a").click();
+$("[data-feed-id=<%= @click_feed %>] a").click();
 
-  $('.feeds').animate({
+$('.feeds').animate({
     scrollTop: feedbin.scrollTo($("[data-feed-id=<%= @click_feed %>]"), $('.feeds'))
-  }, 200);
+}, 200);
 
-  $('.welcome').remove();
+$('.welcome').remove();
 
-  $('[name="subscription[feeds][feed_url]"]').blur()
-
-<% else %>
-  feedbin.showNotification('No feed found.');
-<% end %>
+$('#add_form_modal').modal('hide')

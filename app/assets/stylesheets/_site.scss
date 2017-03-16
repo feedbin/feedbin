@@ -4641,12 +4641,18 @@ Buttons
         text-decoration: none;
         color: #fff;
     }
+    &:focus {
+        box-shadow: 0px 0px 10px 1px rgba($text-color-light,0.8);
+    }
 }
 
 .button-primary {
     background-color: $selected;
     color: #fff;
     font-weight: bold;
+    &:focus {
+        box-shadow: 0px 0px 10px 1px rgba($selected,0.8);
+    }
     &[disabled] {
         background-color: $text-color-light;
         border-color: $text-color-light;
@@ -4935,6 +4941,11 @@ button.close {
     text-align: right;
     border-top: 1px solid #e5e5e5;
 }
+.modal-footer-message {
+    float: left;
+    padding-top: 12px;
+    color: $text-summary-color;
+}
 .modal-form {
     background-color: $inset-bg-color;
     border-radius: $modal-border-radius $modal-border-radius 0 0;
@@ -4943,7 +4954,7 @@ button.close {
     display: flex;
     .favicon-target {
         position: absolute;
-        right: 20px;
+        right: 30px;
         top: 26px;
         .favicon-wrap {
             position: static;
@@ -4967,10 +4978,10 @@ button.close {
         background-color: transparent;
         width: 100%;
         max-width: 100%;
-        padding: 20px 50px 20px 20px;
+        padding: 20px 60px 20px 20px;
         font-size: 24px;
         &.processing {
-            background-position: 97% 26px;
+            background-position: 95.5% 26px;
         }
     }
 }
@@ -5976,6 +5987,9 @@ Add
         align-items: stretch;
         margin-bottom: 35px;
         .category {
+            position: relative;
+            right: -1px;
+
             width: 180px;
             display: flex;
             justify-content: center;
@@ -5986,8 +6000,7 @@ Add
             background-size: 13px 13px;
             position: relative;
             input {
-                background: image-url("favicon-tag.svg") 8px 50% no-repeat;
-                border-right: none;
+                background: transparent image-url("favicon-tag.svg") 8px 50% no-repeat;
                 border-radius: 4px 0 0 4px;
                 background-size: 16px;
                 padding-left: 30px;
@@ -6001,7 +6014,12 @@ Add
             flex-direction: column;
             text-align: center;
             input {
+                border-left-color: transparent;
                 border-radius: 0 4px 4px 0;
+                background-color: transparent;
+                &:focus {
+                    border-left-color: $selected;
+                }
             }
             .feed-url {
                 position: absolute;
@@ -6035,7 +6053,9 @@ Add
             align-items: stretch;
         }
         [type=checkbox] {
-            display: none;
+            position: absolute !important;
+            top: -9999px !important;
+            left: -9999px !important;
         }
         input[type="checkbox"] + label {
             font-weight: bold;
@@ -6069,6 +6089,9 @@ Add
         .button {
             padding: 0;
         }
+    }
+    input[type="checkbox"]:focus + label {
+        box-shadow: 0px 0px 10px 1px rgba($selected,0.8);
     }
     .categories {
         position: absolute;

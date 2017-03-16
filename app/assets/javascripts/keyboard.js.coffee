@@ -250,6 +250,9 @@ class feedbin.Keyboard
         $('li.selected a', dropdown)[0].click()
         event.preventDefault()
 
+      if $("#add_form_modal").hasClass('in') && $('[data-behavior~=check_toggle]:checked').length > 0 && $(":focus").length == 0
+        $("[data-behavior~=subscription_options]").submit()
+
     # Unfocus field,
     Mousetrap.bindGlobal 'escape', (event, combo) =>
       feedbin.hideSubscribe()

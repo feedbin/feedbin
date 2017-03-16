@@ -574,6 +574,20 @@ $.extend feedbin,
         $(@).modal('hide')
     activeModal.modal('toggle')
 
+  updateFeedSearchMessage: ->
+    length = $('[data-behavior~=check_toggle]:checked').length
+    show = (message) ->
+      $("#add_form_modal [data-behavior~=feeds_search_message]").addClass("hide")
+      $("#add_form_modal [data-behavior~=feeds_search_message][data-behavior~=#{message}]").removeClass("hide")
+
+    if length == 0
+      show("message_none")
+    else if length == 1
+      show("message_one")
+    else
+      show("message_multiple")
+
+
   entries: {}
 
   feedCandidates: []
@@ -1203,6 +1217,12 @@ $.extend feedbin,
             title = toggle['title'][0]
           $(@).attr('title', title)
 
+    feedsSearch: ->
+      $(document).on 'submit', '[data-behavior~=feeds_search]', ->
+        $('#add_form_modal .feed-search-results').hide()
+        $('[data-behavior~=feeds_search_favicon_target]').html('')
+        $('#add_form_modal .modal-dialog').removeClass('done');
+
     formProcessing: ->
       $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form], [data-behavior~=feeds_search]', ->
         $(@).find('input').addClass('processing')
@@ -1445,11 +1465,11 @@ $.extend feedbin,
         $(@).parents("form").submit()
 
     submitAdd: ->
+      $(document).on 'submit', '[data-behavior~=subscription_options]', (event) ->
+        $('[data-behavior~=submit_add]').attr('disabled', 'disabled')
+
       $(document).on 'click', '[data-behavior~=submit_add]', (event) ->
-        $(@).attr('disabled', 'disabled')
-        setTimeout ( ->
-          $("#add_form_modal").modal('hide')
-        ), 1000
+        $("[data-behavior~=subscription_options]").submit()
 
     toggleContent: ->
       $(document).on 'click', '[data-behavior~=toggle_content_button]', (event) ->
@@ -1457,11 +1477,12 @@ $.extend feedbin,
 
     checkToggle: ->
       $(document).on 'change', '[data-behavior~=check_toggle]', (event) ->
-        if $('[data-behavior~=check_toggle]:checked').length == 0
+        length = $('[data-behavior~=check_toggle]:checked').length
+        if length == 0
           $('#add_form_modal [data-behavior~=submit_add]').attr('disabled', 'disabled')
         else
           $('#add_form_modal [data-behavior~=submit_add]').removeAttr('disabled', 'disabled')
-
+        feedbin.updateFeedSearchMessage()
 
 $.each feedbin.preInit, (i, item) ->
   item()
