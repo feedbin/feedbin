@@ -4,6 +4,7 @@
       <div class="subscription-option">
         <div class="category" data-behavior="selected_category">
             <%= pf.text_field :tags, placeholder: "Tags" %>
+            <div data-behavior="tag_completions" class="completions"></div>
         </div>
         <div class="title">
           <%= pf.text_field :title, placeholder: feed.title %>
@@ -21,4 +22,5 @@
       </div>
      <% end %>
   <% end %>
+  <%= submit_tag("Submit", class: "visually-hidden", data: {behavior: "submit_add"}) %>
 <% end %>
