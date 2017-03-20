@@ -2787,25 +2787,55 @@ $saved-search-control-height: 48px;
         background: image-url("icon-share-pinboard.svg") 100% 0 no-repeat;
         background-size: 25px 25px;
     }
-    .autocomplete-parent {
-        position: relative;
-        .share-autocomplete {
-            z-index: 2;
-            position: absolute;
-            top: 39px;
-            left: 7px;
-            width: 100%;
-            max-width: 400px;
-            @include background-color($input-background-color, $input-background-color, $input-background-color);
-            border-left: 1px solid transparent;
-            border-right: 1px solid transparent;
-            border-bottom: 1px solid transparent;
-            @include border-color($border-color, $border-color-night, $border-color-sunset);
+}
+.autocomplete-parent {
+    position: relative;
+    .share-autocomplete {
+        z-index: 2;
+        position: absolute;
+        top: 39px;
+        left: 7px;
+        width: 100%;
+        max-width: 400px;
+        @include background-color($input-background-color, $input-background-color, $input-background-color);
+        border-left: 1px solid transparent;
+        border-right: 1px solid transparent;
+        border-bottom: 1px solid transparent;
+        @include border-color($border-color, $border-color-night, $border-color-sunset);
+    }
+    .subscribe-tags-autocomplete {
+        z-index: 2;
+        position: absolute;
+        top: 41px;
+        left: 0;
+        width: 200px;
+        .autocomplete-suggestions {
+            background-color: #FFF;
+            border: 1px solid $border-color;
+            border-radius: 8px;
         }
         .autocomplete-suggestion {
-            &:hover, &.autocomplete-selected {
-                background-color: rgba(#000, .1);
+            padding: 10px 11px;
+        }
+        .autocomplete-suggestion:hover, .autocomplete-suggestion.autocomplete-selected {
+            color: $text-color-light;
+            strong {
+                color: #fff;
             }
+        }
+        .autocomplete-suggestion:first-child {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .autocomplete-suggestion:last-child {
+            border-bottom-right-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+    }
+    .autocomplete-suggestion {
+        &:hover, &.autocomplete-selected {
+            background-color: $selected;
+            color: #fff;
         }
     }
 }
@@ -4742,6 +4772,10 @@ Buttons
     @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
     border-bottom: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    overflow: hidden;
     strong {
         font-weight: normal;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);

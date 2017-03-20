@@ -1,10 +1,15 @@
 <%= form_tag subscriptions_path, method: :post, remote: true, data: {behavior: "subscription_options"} do %>
+  <%
+  verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
+  valid_feed_ids = verifier.generate(feeds.map(&:id))
+  %>
+  <%= hidden_field_tag "valid_feed_ids", valid_feed_ids %>
   <% feeds.each_with_index do |feed, index| %>
     <%= fields_for "feeds[]", feed do |pf| %>
       <div class="subscription-option">
-        <div class="category" data-behavior="selected_category">
-            <%= pf.text_field :tags, placeholder: "Tags" %>
-            <div data-behavior="tag_completions" class="completions"></div>
+        <div class="autocomplete-parent category" data-behavior="selected_category autocomplete_parent">
+            <%= pf.text_field :tags, placeholder: "Tags", data: {behavior: 'autocomplete_field', autocomplete_path: tags_path} %>
+            <div class="subscribe-tags-autocomplete" data-behavior="autocomplete_target"></div>
         </div>
         <div class="title">
           <%= pf.text_field :title, placeholder: feed.title %>

@@ -1397,16 +1397,14 @@ $.extend feedbin,
         feedbin.previewHeight()
 
     generalAutocomplete: ->
-      autocompleteFields = $('[data-behavior~=autocomplete_field]')
-      $.each autocompleteFields, (i, field) ->
-        field = $(field)
+      $(document).on 'focus', '[data-behavior~=autocomplete_field]', (event) ->
+        field = $(event.currentTarget)
         field.autocomplete
           serviceUrl: field.data('autocompletePath')
           appendTo: field.parent("[data-behavior~=autocomplete_parent]").find("[data-behavior=autocomplete_target]")
           delimiter: /(,)\s*/
           deferRequestBy: 50
           autoSelectFirst: true
-      return
 
     entriesMaxWidth: ->
       container = $('[data-behavior~=entries_max_width]')

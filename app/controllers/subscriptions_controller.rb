@@ -24,9 +24,22 @@ class SubscriptionsController < ApplicationController
   # POST /subscriptions.json
   def create
     @mark_selected = true
-    @click_feed = Feed.first.id
+    user = current_user
+    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
+    valid_feed_ids = verifier.verify(params[:valid_feed_ids])
+    params[:feeds].each do |feed_id, subscription|
+      feed = Feed.find(feed_id)
+      if valid_feed_ids.include?(feed.id)
+        user.subscriptions.find_or_create_by(feed: feed)
+        if subscription["tags"].present?
+          feed.tag(subscription["tags"], user, true)
+        end
+        if !@click_feed
+          @click_feed = feed.id
+        end
+      end
+    end
     get_feeds_list
-
   end
 
   # DELETE /subscriptions/1
