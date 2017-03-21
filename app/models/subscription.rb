@@ -18,6 +18,20 @@ class Subscription < ApplicationRecord
 
   after_create :refresh_favicon
 
+  def self.create_multiple(feeds, user, valid_feed_ids)
+    @subscriptions = feeds.each_with_object([]) do |(feed_id, subscription), array|
+      feed = Feed.find(feed_id)
+      if valid_feed_ids.include?(feed.id) && subscription["subscribe"] == "1"
+        record = user.subscriptions.find_or_create_by(feed: feed)
+        record.update(title: subscription["title"].strip)
+        array.push(record)
+        if subscription["tags"].present?
+          feed.tag(subscription["tags"], user, true)
+        end
+      end
+    end
+  end
+
   def mark_as_unread
     base = Entry.select(:id, :feed_id, :published, :created_at).where(feed_id: self.feed_id).order('published DESC')
     entries = base.where('published > ?', Time.now.ago(2.weeks)).limit(10)

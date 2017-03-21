@@ -14,12 +14,28 @@ class SubscriptionsControllerTest < ActionController::TestCase
 
   test "should create subscription" do
     html_url = "www.example.com/index.html"
+    feed_url = "http://www.example.com/atom.xml"
     stub_request_file('index.html', html_url)
-    stub_request_file('atom.xml', "www.example.com/atom.xml")
+    stub_request_file('atom.xml', feed_url)
 
+    feed = Feed.create(feed_url: feed_url)
+
+    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
+    valid_feed_ids = verifier.generate([feed.id])
+
+    params = {
+      valid_feed_ids: valid_feed_ids,
+      feeds: {
+        feed.id => {
+          title: "title",
+          tags: "Design",
+          subscribe: "1"
+        }
+      }
+    }
     login_as @user
     assert_difference "Subscription.count", +1 do
-      post :create, params: {subscription: {feeds: {feed_url: html_url}}}, xhr: true
+      post :create, params: params, xhr: true
       assert_response :success
     end
   end

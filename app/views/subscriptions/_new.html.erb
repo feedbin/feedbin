@@ -17,8 +17,8 @@
         </div>
         <div class="action">
           <div class="check-toggle">
-            <%= pf.check_box :id, checked: index == 0 ? true : false, data: {behavior: "check_toggle"} %>
-            <%= pf.label :id, class: "button button-bordered" do %>
+            <%= pf.check_box :subscribe, checked: index == 0 ? true : false, data: {behavior: "check_toggle"} %>
+            <%= pf.label :subscribe, class: "button button-bordered" do %>
               <span class="off"><%= svg_tag 'icon-plus', size: '12x12' %></span>
               <span class="on"><%= svg_tag 'icon-check', size: '15x12' %></span>
             <% end %>

@@ -10,7 +10,7 @@
             <%= form_for(sharing_service) do |f| %>
             <%= f.text_field :label, placeholder: 'Label', class: 'no-margin' %>
             <%= f.url_field :url, placeholder: 'URL' %>
-            <%= submit_tag "Save", class: 'button button-primary' %>
+            <%= submit_tag "Save", class: 'button button-primary-plain' %>
             <%= button_tag 'Cancel', class: 'button button-cancel button-inline', data: {behavior: "hide_service_options"} %>
             <% end %>
         </div>

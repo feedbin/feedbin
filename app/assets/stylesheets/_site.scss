@@ -4663,6 +4663,18 @@ Buttons
     }
 }
 
+.button-primary-plain {
+    color: $selected;
+    font-weight: bold;
+    &:focus {
+        box-shadow: 0px 0px 10px 1px rgba($selected,0.8);
+    }
+    &[disabled] {
+        background-color: $text-color-light;
+        border-color: $text-color-light;
+    }
+}
+
 .button-cancel {
     color: #5f5f5f;
     &:hover {
