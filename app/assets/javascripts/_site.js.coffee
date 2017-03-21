@@ -1249,10 +1249,9 @@ $.extend feedbin,
       subscription = feedbin.queryString('subscribe')
       if subscription?
         $('[data-behavior~=show_subscribe]').click()
-        $('[data-behavior~=subscription_form] input').val(subscription)
-        $('[data-behavior~=subscription_form]').submit()
-        $('[data-behavior~=subscription_form] input').blur()
-        feedbin.closeSubcription = true
+        field = $('#add_form_modal [data-behavior~=feeds_search_field]')
+        field.val(subscription)
+        field.closest("form").submit()
 
     searchError: ->
       $(document).on 'ajax:error', '[data-behavior~=search_form]', (event, xhr) ->
