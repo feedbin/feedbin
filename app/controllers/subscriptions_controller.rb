@@ -30,7 +30,7 @@ class SubscriptionsController < ApplicationController
     params[:feeds].each do |feed_id, subscription|
       feed = Feed.find(feed_id)
       if valid_feed_ids.include?(feed.id)
-        user.subscriptions.find_or_create_by(feed: feed)
+        user.subscriptions.create_with(title: subscription["title"].strip).find_or_create_by(feed: feed)
         if subscription["tags"].present?
           feed.tag(subscription["tags"], user, true)
         end

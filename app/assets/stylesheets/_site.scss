@@ -60,6 +60,8 @@ $selected-off: #505a65;
 
 $inset-bg-color: #f4f6f8;
 
+$box-shadow-dropdown: 0px 4px 6px 0 rgba(0, 0, 0, 0.1);
+
 /*------------------------------------------------------------------------------
 Grid
 ------------------------------------------------------------------------------*/
@@ -273,6 +275,29 @@ input[type="color"],
     &:focus {
         outline: none;
         border-color: $selected;
+    }
+}
+.modal {
+    textarea,
+    input[type="text"],
+    input[type="password"],
+    input[type="datetime"],
+    input[type="datetime-local"],
+    input[type="date"],
+    input[type="month"],
+    input[type="time"],
+    input[type="week"],
+    input[type="number"],
+    input[type="email"],
+    input[type="url"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="color"],
+    .uneditable-input {
+        border-color: $border-color;
+        &:focus {
+            border-color: $selected;
+        }
     }
 }
 
@@ -2480,7 +2505,7 @@ $saved-search-control-height: 48px;
         border: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
         @include background-color(#FFF, $list-background-color-night, $list-background-color-sunset);
-        box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.03);
+        box-shadow: $box-shadow-dropdown;
         position: absolute;
         z-index: 10000;
     }
@@ -2786,57 +2811,6 @@ $saved-search-control-height: 48px;
     .icon-share-pinboard {
         background: image-url("icon-share-pinboard.svg") 100% 0 no-repeat;
         background-size: 25px 25px;
-    }
-}
-.autocomplete-parent {
-    position: relative;
-    .share-autocomplete {
-        z-index: 2;
-        position: absolute;
-        top: 39px;
-        left: 7px;
-        width: 100%;
-        max-width: 400px;
-        @include background-color($input-background-color, $input-background-color, $input-background-color);
-        border-left: 1px solid transparent;
-        border-right: 1px solid transparent;
-        border-bottom: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
-    }
-    .subscribe-tags-autocomplete {
-        z-index: 2;
-        position: absolute;
-        top: 41px;
-        left: 0;
-        width: 200px;
-        .autocomplete-suggestions {
-            background-color: #FFF;
-            border: 1px solid $border-color;
-            border-radius: 8px;
-        }
-        .autocomplete-suggestion {
-            padding: 10px 11px;
-        }
-        .autocomplete-suggestion:hover, .autocomplete-suggestion.autocomplete-selected {
-            color: $text-color-light;
-            strong {
-                color: #fff;
-            }
-        }
-        .autocomplete-suggestion:first-child {
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-        }
-        .autocomplete-suggestion:last-child {
-            border-bottom-right-radius: 8px;
-            border-bottom-left-radius: 8px;
-        }
-    }
-    .autocomplete-suggestion {
-        &:hover, &.autocomplete-selected {
-            background-color: $selected;
-            color: #fff;
-        }
     }
 }
 
@@ -4750,7 +4724,6 @@ Buttons
         margin-bottom: 0;
         padding: 5px 25px 5px 5px;
         font-size: 14px;
-        border-radius: 0;
     }
     input[type="submit"] {
         position: absolute;
@@ -4769,7 +4742,7 @@ Buttons
 .autocomplete-suggestion {
     font-size: 14px;
     padding: 6px 11px;
-    @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    @include color($text-color, $text-color-night, $text-color-sunset);
     border-bottom: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     text-overflow: ellipsis;
@@ -4778,13 +4751,13 @@ Buttons
     overflow: hidden;
     strong {
         font-weight: normal;
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
     }
     &:last-child {
         border-bottom: none;
     }
     &:hover, &.autocomplete-selected {
-        background-color: rgba(#FFF, .1);
+        background-color: $selected;
+        color: #fff;
     }
 }
 
@@ -6028,8 +6001,6 @@ Add
         margin-bottom: 35px;
         .category {
             position: relative;
-            right: -1px;
-
             width: 180px;
             display: flex;
             justify-content: center;
@@ -6039,11 +6010,18 @@ Add
             cursor: pointer;
             background-size: 13px 13px;
             position: relative;
+            input:placeholder-shown {
+                background-image: image-url("favicon-tag.svg");
+            }
             input {
-                background: transparent image-url("favicon-tag.svg") 8px 50% no-repeat;
-                border-radius: 4px 0 0 4px;
+                background: transparent image-url("favicon-tag-selected.svg") 97% 50% no-repeat;
                 background-size: 16px;
-                padding-left: 30px;
+                padding-right: 30px;
+                border-left-color: transparent;
+                border-radius: 0 4px 4px 0;
+                &:focus {
+                    border-left-color: $selected;
+                }
             }
         }
         .title {
@@ -6053,26 +6031,23 @@ Add
             justify-content: center;
             flex-direction: column;
             text-align: center;
+            right: -1px;
             input {
-                border-left-color: transparent;
-                border-radius: 0 4px 4px 0;
                 background-color: transparent;
-                &:focus {
-                    border-left-color: $selected;
-                }
+                border-radius: 4px 0 0 4px;
             }
-            .feed-url {
-                position: absolute;
-                bottom: -37px;
-                left: 8px;
-                font-size: 12px;
-                color: $text-color-light;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                max-width: 90%;
-                padding-right: 5px;
-            }
+        }
+        .feed-url {
+            position: absolute;
+            bottom: -37px;
+            left: 8px;
+            font-size: 12px;
+            color: $text-color-light;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 90%;
+            padding-right: 5px;
         }
         .action {
             display: flex;
@@ -6080,6 +6055,12 @@ Add
             width: 100px;
             padding: 0 0 0 8px;
         }
+    }
+    .feed-url {
+        display: none;
+    }
+    .title .feed-url {
+        display: block;
     }
     .check-toggle {
         width: 100%;
@@ -6131,38 +6112,86 @@ Add
         }
     }
     input[type="checkbox"]:focus + label {
-        box-shadow: 0px 0px 10px 1px rgba($selected,0.8);
+        box-shadow: 0px 0px 10px 0 rgba($selected,0.6);
     }
-    .categories {
-        position: absolute;
-        z-index: 100;
-        top: 30px;
-        left: -2px;
-        width: 200px;
-        background-color: #fff;
-        margin: 0 1px 0 1px;
+}
+@media (max-width: 600px) {
+    .add-content .subscription-option {
+        display: block;
+        input[type=text] {
+            border: 1px solid $border-color!important;
+            margin-bottom: 5px!important;
+            border-radius: 4px!important;
+        }
+        input[type="checkbox"] + label {
+            display: block;
+            padding: 11px;
+        }
+    }
+    .add-content .subscription-option .action {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .add-content .subscription-option .category {
+        display: block;
+        width: 100%;
+    }
+    .modal-footer-message {
+        display: none !important;
+    }
+    .feed-url {
+        position: static!important;
+        display: block!important;
+        margin-top: 8px !important;
+    }
+    .title .feed-url {
+        display: none!important;
+    }
+}
+
+.autocomplete-parent {
+    position: relative;
+    .autocomplete-suggestions {
+        background-color: #FFF;
         border: 1px solid $border-color;
         border-radius: 4px;
-        box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.2);
-        ul {
-            margin: 0;
-            padding: 0;
-            list-style-type: none;
-        }
-        li {
-            margin: 0;
-            position: relative;
-            margin: 0;
-            padding: 7px 5px;
-            @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
-            font-size: 13px;
-            border-bottom: 1px solid $border-color;
-            &:last-child {
-                border-bottom: none;
-            }
-            &:hover {
-                @include background-color($border-color, $border-color-night, $border-color-sunset);
-            }
-        }
+    }
+    .autocomplete-suggestion {
+        padding: 10px 11px;
+    }
+    .autocomplete-suggestion:first-child {
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+    }
+    .autocomplete-suggestion:last-child {
+        border-bottom-right-radius: 4px;
+        border-bottom-left-radius: 4px;
+    }
+    .autocomplete-suggestions {
+        box-shadow: $box-shadow-dropdown;
+    }
+    .autocomplete-suggestion {
+        color: $text-color;
+        border-color: $border-color;
+    }
+    .autocomplete-suggestion:hover, .autocomplete-suggestion.autocomplete-selected {
+        background-color: $selected !important;
+        color: #fff  !important;
+    }
+    .share-autocomplete {
+        z-index: 2;
+        position: absolute;
+        top: 41px;
+        left: 7px;
+        width: 100%;
+        max-width: 400px;
+    }
+    .subscribe-tags-autocomplete {
+        z-index: 2;
+        position: absolute;
+        top: 41px;
+        left: 0;
+        width: 200px;
     }
 }

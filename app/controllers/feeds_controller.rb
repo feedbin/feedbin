@@ -124,6 +124,7 @@ class FeedsController < ApplicationController
   def search
     @user = current_user
     @feeds = FeedFinder.new(params[:q]).create_feeds!
+    @feeds.map(&:priority_refresh)
   rescue
     @feeds = nil
   end

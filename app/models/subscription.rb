@@ -13,8 +13,6 @@ class Subscription < ApplicationRecord
   after_create :add_feed_to_action
   after_commit :remove_feed_from_action, on: [:destroy]
 
-  before_create :refresh_feed
-
   before_destroy :untag
   before_destroy :email_unsubscribe
 
@@ -59,21 +57,6 @@ class Subscription < ApplicationRecord
 
   def untag
     self.feed.tag('', self.user)
-  end
-
-  def refresh_feed
-    if feed_already_existed? && !any_subscribers?
-      self.feed.priority_refresh
-      sleep(3)
-    end
-  end
-
-  def any_subscribers?
-    Subscription.where(feed_id: self.feed_id, active: true, muted: false).exists?
-  end
-
-  def feed_already_existed?
-    self.feed.created_at < 1.minute.ago
   end
 
   private
