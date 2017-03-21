@@ -24,6 +24,7 @@ class FeedRefresherScheduler
         'queue' => 'worker_slow_critical'
       )
       increment
+      report
     end
   end
 
@@ -38,6 +39,12 @@ class FeedRefresherScheduler
   def increment
     Librato.increment 'refresh_feeds'
     Sidekiq.redis {|client| client.incr(COUNT_KEY)}
+  end
+
+  def report
+    if ENV['FEED_REFRESHER_REPORT_URL']
+      HTTP.get(ENV['FEED_REFRESHER_REPORT_URL'])
+    end
   end
 
   def count
