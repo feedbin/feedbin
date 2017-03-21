@@ -188,6 +188,7 @@ class feedbin.Keyboard
 
     # Add subscription
     Mousetrap.bind 'a', (event, combo) =>
+      $('body').removeClass('full-screen')
       $('[data-behavior~=show_subscribe]').click()
       event.preventDefault()
 

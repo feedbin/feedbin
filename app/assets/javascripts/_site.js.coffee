@@ -823,7 +823,6 @@ $.extend feedbin,
         return
 
     screenshotTabs: ->
-
       $('[data-behavior~=screenshot_nav] li').first().addClass('active')
       $(document).on 'click', '[data-behavior~=screenshot_nav] a', (event) ->
         $('[data-behavior~=screenshot_nav] li').removeClass('active')
