@@ -72,7 +72,6 @@ class FeedRefresherReceiver
 
   def published_recently?(published_date)
     published_date > 7.days.ago
-    true
   end
 
   def significant_change?(original_content, new_content)
