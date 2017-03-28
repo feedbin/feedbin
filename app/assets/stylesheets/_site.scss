@@ -6026,7 +6026,7 @@ Add
                 background-image: image-url("favicon-tag.svg");
             }
             input {
-                background: transparent image-url("favicon-tag-selected.svg") 97% 50% no-repeat;
+                background: transparent image-url("favicon-tag-selected.svg") 95% 50% no-repeat;
                 background-size: 16px;
                 padding-right: 30px;
                 border-left-color: transparent;
@@ -6165,6 +6165,9 @@ Add
     }
     .title .feed-url {
         display: none!important;
+    }
+    .check-toggle {
+        position: static!important;
     }
 }
 
