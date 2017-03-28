@@ -16,13 +16,10 @@
             <div class="subscribe-tags-autocomplete" data-behavior="autocomplete_target"></div>
         </div>
         <div class="action">
-          <div class="check-toggle">
             <%= pf.check_box :subscribe, checked: index == 0 ? true : false, data: {behavior: "check_toggle"} %>
-            <%= pf.label :subscribe, class: "button button-bordered" do %>
-              <span class="off"><%= svg_tag 'icon-plus', size: '12x12' %></span>
-              <span class="on"><%= svg_tag 'icon-check', size: '15x12' %></span>
+            <%= pf.label :subscribe do %>
+                <span class="slider-checkbox"></span>
             <% end %>
-          </div>
         </div>
         <p class="feed-url" title="Feed URL"><%= feed.feed_url %></p>
       </div>
