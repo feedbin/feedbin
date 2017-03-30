@@ -312,12 +312,6 @@ $.extend feedbin,
     else
       $('.next-entry-preview').addClass('no-content')
 
-  showSubscribe: ->
-    $('.subscribe-wrap input').val('')
-    $('.subscribe-wrap input').focus()
-    $('.feeds-inner').addClass('show-subscribe')
-    $('.subscribe-wrap').addClass('open')
-
   hideSubscribe: ->
     $('.feeds-inner').removeClass('show-subscribe')
     $('.subscribe-wrap').removeClass('open')

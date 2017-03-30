@@ -6,7 +6,7 @@
             <%= f.text_field :email_name, placeholder: 'Full Name' %>
             <%= f.email_field :email_address, placeholder: 'Reply-To' %>
             <div class="button-wrap">
-                <%= button_tag 'Cancel', class: 'button button-secondary', data: {behavior: "hide_service_options"} %>
+                <%= button_tag 'Cancel', type: "button", class: 'button button-secondary', data: {behavior: "hide_service_options"} %>
                 <%= submit_tag "Save", class: 'button button-primary-plain' %>
             </div>
         <% end %>

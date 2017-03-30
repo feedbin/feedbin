@@ -954,43 +954,6 @@ Structure
     }
 }
 
-$subscribe-wrap-height: 49px;
-.subscribe-wrap {
-    z-index: 0;
-    padding: 8px;
-    position: absolute;
-    top: $toolbar-height;
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
-    width: 100%;
-    height: $subscribe-wrap-height;
-    @include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
-    input {
-        height: 32px;
-        width: 100%;
-        max-width: 100%;
-        margin-bottom: 0;
-        padding: 5px 25px 5px 5px;
-        font-size: 14px;
-        border-radius: 0;
-    }
-    @include arrow(
-        $x-position: 12px,
-        $y-position: -1px,
-        $arrow-color: $list-background-color,
-        $arrow-color-night: $list-background-color-night,
-        $arrow-color-sunset: $list-background-color-sunset,
-        $shadow-color: $arrow-shadow-color,
-        $shadow-color-night: $arrow-shadow-color-night,
-        $shadow-color-sunset: $arrow-shadow-color-sunset)
-    {
-        display: none;
-    }
-    &.open:after, &.open:before {
-        display: inline-block;
-    }
-}
-
 .feeds-inner {
     position: absolute;
     top: $toolbar-height;
@@ -1000,12 +963,6 @@ $subscribe-wrap-height: 49px;
     z-index: 1;
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     transition: transform .2s ease;
-    &.show-subscribe {
-        transform: translateY($subscribe-wrap-height);
-        .feeds {
-            padding-bottom: $subscribe-wrap-height;
-        }
-    }
 }
 
 .view-toolbar {
@@ -1455,15 +1412,6 @@ $saved-search-control-height: 48px;
             top: 35px;
             left: 8px;
         }
-        li:first-child {
-            &:after {
-                left: 38px !important;
-            }
-            &:before {
-                left: 37px !important;
-            }
-        }
-
     }
     .saved-search-wrap {
         height: $saved-search-control-height;
@@ -2463,14 +2411,6 @@ $saved-search-control-height: 48px;
         .dropdown-content {
             top: $toolbar-height - 6;
             right: 8px !important;
-            li:first-child:after {
-                left: 179px !important;
-                margin: 0;
-            }
-            li:first-child:before {
-                left: 178px !important;
-                margin: 0;
-            }
         }
     }
 }
@@ -2499,6 +2439,7 @@ $saved-search-control-height: 48px;
     .dropdown-content {
         display: none;
         width: 200px;
+        border-radius: 4px;
         border: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
         @include background-color(#FFF, $list-background-color-night, $list-background-color-sunset);
@@ -2523,52 +2464,31 @@ $saved-search-control-height: 48px;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 width: 100%;
-                padding: 10px 15px 11px 15px;
+                padding: 10px 11px;
                 font-family: $font-stack;
                 font-weight: 400 !important;
                 border-bottom: 1px solid transparent;
                 @include border-color($border-color, $border-color-night, $border-color-sunset);
                 cursor: pointer;
+                &:hover, &.selected {
+                    background-color: $selected !important;
+                    color: #fff  !important;
+                }
+
                 &.no-border {
                     border: none;
                 }
             }
-            a:hover,
-            span:hover,
-            &.selected a,
-            &.selected span {
-                @include background-color($border-color, $border-color-night, $border-color-sunset);
-            }
             &:last-child a,
             &:last-child span {
                 border-bottom: none;
+                border-bottom-right-radius: 4px;
+                border-bottom-left-radius: 4px;
             }
-        }
-    }
-    ul:first-child li {
-        &:first-child {
-            @include arrow(
-                $x-position: 50%,
-                $y-position: -7px,
-                $arrow-color: #FFF,
-                $arrow-color-night: $list-background-color-night,
-                $arrow-color-sunset: $list-background-color-sunset,
-                $shadow-color: $border-color,
-                $shadow-color-night: $border-color-night,
-                $shadow-color-sunset: $border-color-sunset,
-                $origin: left,
-                $invert: true) {
-                    margin-left: -3px;
-                }
-        }
-        &:first-child:hover:after,
-        &.selected:first-child:after {
-            border-bottom-color: $border-color !important;
-            .theme-night & {
-                border-bottom-color: $border-color-night !important;
-            }
-            .theme-sunset & {
-                border-bottom-color: $border-color-sunset !important;
+            &:first-child a,
+            &:first-child span {
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
             }
         }
     }
@@ -2593,10 +2513,22 @@ $saved-search-control-height: 48px;
         &.no-margin {
             margin-bottom: 0;
         }
-        li a, li span {
-            border: none;
-            padding-left: 20px;
-            padding-right: 20px;
+        a, span {
+            border-radius: 0 !important;
+        }
+        &:last-child {
+            li:last-child a,
+            li:last-child span {
+                border-bottom-right-radius: 4px!important;
+                border-bottom-left-radius: 4px!important;
+            }
+        }
+        &:first-child {
+            li:first-child a,
+            li:first-child span {
+                border-top-left-radius: 4px!important;
+                border-top-right-radius: 4px!important;
+            }
         }
     }
     &.open {
@@ -2608,40 +2540,10 @@ $saved-search-control-height: 48px;
         .dropdown-content {
             right: 0;
         }
-        ul:first-child li {
-            &:first-child {
-                @include arrow(
-                    $x-position: 145px,
-                    $y-position: -7px,
-                    $arrow-color: #FFF,
-                    $arrow-color-night: $list-background-color-night,
-                    $arrow-color-sunset: $list-background-color-sunset,
-                    $shadow-color: $border-color,
-                    $shadow-color-night: $border-color-night,
-                    $shadow-color-sunset: $border-color-sunset,
-                    $origin: left,
-                    $invert: true);
-            }
-        }
     }
     &.dropdown-left {
         .dropdown-content {
             left: 0 !important;
-        }
-        ul:first-child li {
-            &:first-child {
-                @include arrow(
-                    $x-position: 20px,
-                    $y-position: -7px,
-                    $arrow-color: #FFF,
-                    $arrow-color-night: $list-background-color-night,
-                    $arrow-color-sunset: $list-background-color-sunset,
-                    $shadow-color: $border-color,
-                    $shadow-color-night: $border-color-night,
-                    $shadow-color-sunset: $border-color-sunset,
-                    $origin: left,
-                    $invert: true);
-            }
         }
     }
     .share-keyboard {
@@ -4690,33 +4592,6 @@ Buttons
     }
 }
 
-.autocomplete-suggestions {
-    width: 100% !important;
-    position: static !important;
-    max-height: auto !important;
-}
-
-.autocomplete-suggestion {
-    font-size: 14px;
-    padding: 6px 11px;
-    @include color($text-color, $text-color-night, $text-color-sunset);
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 100%;
-    overflow: hidden;
-    strong {
-        font-weight: normal;
-    }
-    &:last-child {
-        border-bottom: none;
-    }
-    &:hover, &.autocomplete-selected {
-        background-color: $selected;
-        color: #fff;
-    }
-}
 
 .toolbar-button {
     @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
@@ -6065,15 +5940,50 @@ Add
     }
 }
 
+.autocomplete-suggestions {
+    width: 100% !important;
+    position: static !important;
+    max-height: auto !important;
+}
+
+.autocomplete-suggestion {
+    font-size: 14px;
+    padding: 6px 11px;
+    @include color($text-color, $text-color-night, $text-color-sunset);
+    border-bottom: 1px solid transparent;
+    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    overflow: hidden;
+    strong {
+        font-weight: normal;
+    }
+    &:last-child {
+        border-bottom: none;
+    }
+    &:hover, &.autocomplete-selected {
+        background-color: $selected;
+        color: #fff;
+    }
+}
+
 .autocomplete-parent {
     position: relative;
     .autocomplete-suggestions {
         background-color: #FFF;
         border: 1px solid $border-color;
         border-radius: 4px;
+        box-shadow: $box-shadow-dropdown;
     }
     .autocomplete-suggestion {
+        color: $text-color;
+        border-color: $border-color;
         padding: 10px 11px;
+        &:hover, &.autocomplete-selected {
+            background-color: $selected !important;
+            color: #fff  !important;
+        }
     }
     .autocomplete-suggestion:first-child {
         border-top-left-radius: 4px;
@@ -6082,17 +5992,6 @@ Add
     .autocomplete-suggestion:last-child {
         border-bottom-right-radius: 4px;
         border-bottom-left-radius: 4px;
-    }
-    .autocomplete-suggestions {
-        box-shadow: $box-shadow-dropdown;
-    }
-    .autocomplete-suggestion {
-        color: $text-color;
-        border-color: $border-color;
-    }
-    .autocomplete-suggestion:hover, .autocomplete-suggestion.autocomplete-selected {
-        background-color: $selected !important;
-        color: #fff  !important;
     }
     .share-autocomplete {
         z-index: 2;

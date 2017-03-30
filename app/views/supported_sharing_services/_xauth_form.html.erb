@@ -7,7 +7,7 @@
             <%= password_field_tag 'password', '', placeholder: 'Password' %>
 
             <div class="button-wrap">
-                <%= button_tag 'Cancel', class: 'button button-secondary button-inline', data: {behavior: "hide_service_options"} %>
+                <%= button_tag 'Cancel', type: "button", class: 'button button-secondary button-inline', data: {behavior: "hide_service_options"} %>
                 <%= submit_tag "Save", class: 'button button-primary-plain' %>
             </div>
         <% end %>
