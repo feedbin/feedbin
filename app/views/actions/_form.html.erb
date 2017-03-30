@@ -81,11 +81,11 @@
     </ul>
 
     <div class="description-inset">
-        <div class="button-group">
-            <%= f.submit "Save", class: "group-member button-plain" %>
+        <div class="button-wrap">
             <% if @action.persisted? %>
-                <%= link_to 'Delete', @action, method: :delete, class: 'group-member button-plain button-plain-danger' , data: { confirm: 'Are you sure you want to delete this action?' } %>
+                <%= button_to 'Delete', @action, method: :delete, class: 'button button-secondary' , data: { confirm: 'Are you sure you want to delete this action?' } %>
             <% end %>
+            <%= f.submit "Save", class: "button" %>
         </div>
     </div>
 

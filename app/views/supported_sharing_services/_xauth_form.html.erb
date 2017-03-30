@@ -6,8 +6,10 @@
             <%= text_field_tag 'username', '', placeholder: 'Username', class: 'no-margin' %>
             <%= password_field_tag 'password', '', placeholder: 'Password' %>
 
-            <%= submit_tag "Save", class: 'button button-primary-plain' %>
-            <%= button_tag 'Cancel', class: 'button button-cancel button-inline', data: {behavior: "hide_service_options"} %>
+            <div class="button-wrap">
+                <%= button_tag 'Cancel', class: 'button button-secondary button-inline', data: {behavior: "hide_service_options"} %>
+                <%= submit_tag "Save", class: 'button button-primary-plain' %>
+            </div>
         <% end %>
     </div>
 </div>

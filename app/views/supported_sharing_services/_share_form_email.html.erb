@@ -12,8 +12,8 @@
       <%= text_area_tag :body, '', rows: 5, class: 'description-placeholder' %>
     </div>
     <div class="button-wrap">
+      <%= button_tag "Cancel", class: 'button button-secondary', data: {behavior: 'close_entry_basement'} %>
       <%= submit_tag "Send", class: 'button' %>
-      <%= button_tag "Cancel", class: 'button button-text', data: {behavior: 'close_entry_basement'} %>
     </div>
     <% end %>
   </div>

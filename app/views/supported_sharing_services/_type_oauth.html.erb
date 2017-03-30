@@ -6,7 +6,7 @@
     <div class="service-header">
         <p class="service-title"><span class="service-error"><%= sharing_service.label %></span></p>
         <small class="show-service-options pad-top">Feedbin can no longer access <%= sharing_service.label %>, <%= link_to 'reactivate', supported_sharing_service_path(sharing_service, supported_sharing_service: {operation: 'authorize'}), method: :patch %>?</small>
-        <%= link_to 'Deactivate', supported_sharing_service_path(sharing_service), class: 'list-action show-service-options button button-cancel', method: :delete %>
+        <%= link_to 'Deactivate', supported_sharing_service_path(sharing_service), class: 'list-action show-service-options button-text-secondary', method: :delete %>
     </div>
 <% else %>
     <div class="service-header">

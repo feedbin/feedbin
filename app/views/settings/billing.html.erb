@@ -45,7 +45,9 @@
           </ul>
 
           <div class="description-inset">
-            <%= f.submit "Subscribe", class: 'button-plain no-margin' %>
+              <div class="button-wrap">
+                  <%= f.submit "Subscribe", class: 'button no-margin' %>
+              </div>
           </div>
 
         <% end %>
@@ -66,7 +68,9 @@
           <%= render partial: 'shared/credit_card_form' %>
 
           <div class="description-inset">
-            <%= submit_tag "Update Billing", class: "button-plain no-margin" %>
+              <div class="button-wrap">
+                  <%= submit_tag "Update Billing", class: "button no-margin" %>
+              </div>
           </div>
 
         <% end %>
@@ -88,7 +92,7 @@
                   <% else %>
                     <%= form_tag settings_update_plan_path, data: { behavior: 'change_plan' }, class: 'no-margin' do %>
                       <%= hidden_field_tag 'plan', plan.id %>
-                      <%= button_tag 'Switch to this plan', class: 'button' %>
+                      <%= button_tag 'Switch to this plan', class: 'button-text' %>
                     <% end %>
                   <% end %>
                 </td>
@@ -135,7 +139,9 @@
           </ul>
           <p class="control-group-description">This will show up on your receipt. Useful for VAT, address etc&hellip;</p>
           <div class="description-inset">
-            <%= f.submit "Save Info", class: "button-plain  no-margin" %>
+              <div class="button-wrap">
+                  <%= f.submit "Save Info", class: "button  no-margin" %>
+              </div>
           </div>
         <% end %>
       </div>

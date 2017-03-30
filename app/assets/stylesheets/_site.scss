@@ -134,7 +134,7 @@ a {
 }
 
 a:hover {
-    color: #2877c6;
+    color: $selected-hover;
     text-decoration: underline;
 }
 
@@ -523,6 +523,9 @@ table {
             @include settings-row;
             border-top: 1px solid $border-color;
             overflow: hidden;
+            form {
+                max-width: 300px;
+            }
         }
     }
     .share-help {
@@ -2998,7 +3001,7 @@ $saved-search-control-height: 48px;
             &:hover {
                 text-decoration: underline;
                 cursor: pointer;
-                @include color(#2877c6, $selected, #2877c6);
+                @include color($selected-hover, $selected, $selected-hover);
             }
             .theme-night & {
                 text-decoration: underline;
@@ -3128,7 +3131,7 @@ $saved-search-control-height: 48px;
         text-decoration: none;
     }
     a:hover, a:hover.diff-ins, a:hover.diff-del {
-        color: #2877c6;
+        color: $selected-hover;
         text-decoration: underline;
     }
 
@@ -3140,7 +3143,7 @@ $saved-search-control-height: 48px;
             text-decoration: none;
         }
         a:hover {
-            color: #2877c6;
+            color: $selected-hover;
             text-decoration: underline;
         }
     }
@@ -3172,7 +3175,7 @@ $saved-search-control-height: 48px;
             text-decoration: none;
         }
         a:hover {
-            color: #2877c6;
+            color: $selected-hover;
             text-decoration: underline;
         }
     }
@@ -3441,7 +3444,7 @@ Settings
             background-color: transparent;
             &:hover {
                 background-color: transparent;
-                color: #2877c6;
+                color: $selected-hover;
                 text-decoration: underline;
             }
         }
@@ -4537,6 +4540,8 @@ Buttons
     border-radius: 4px;
     padding: 11px;
     min-width: 90px;
+    display: inline-block;
+    text-align: center;
     &:hover {
         text-decoration: none;
         border-color: $selected-hover;
@@ -4581,11 +4586,52 @@ Buttons
     }
 }
 
+.button-text {
+    -webkit-appearance: none !important;
+    background: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    font-weight: normal;
+    font-family: $font-stack;
+    color: $selected;
+    &:hover {
+        text-decoration: underline;
+        color: $selected-hover;
+    }
+}
+
+.button-text-secondary {
+    -webkit-appearance: none !important;
+    background: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    font-weight: normal;
+    font-family: $font-stack;
+    color: $text-color-light;
+    &:hover {
+        text-decoration: underline;
+        color: $text-color-light;
+    }
+}
+
 .button::-moz-focus-inner {
     border: 0;
     padding: 0;
     margin-top:-3px;
     margin-bottom: -3px;
+}
+
+.button-wrap {
+    text-align: right;
+    vertical-align: middle;
+    button:last-child {
+        margin-left: 5px;
+    }
+    input:last-child {
+        margin-left: 5px;
+    }
 }
 
 .button-group {
@@ -5668,7 +5714,7 @@ Bigfoot
 	text-decoration: none !important;
 }
 .theme-night .bigfoot-footnote a:hover {
-    color: #2877c6 !important;
+    color: $selected-hover !important;
     text-decoration: underline !important;
 }
 

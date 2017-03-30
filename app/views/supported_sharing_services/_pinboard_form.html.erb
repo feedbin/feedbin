@@ -6,9 +6,10 @@
                     <%= f.hidden_field :service_id, value: sharing_service[:service_id] %>
                     <%= f.hidden_field :operation, value: 'authorize' %>
                     <%= password_field_tag 'password', '', placeholder: 'API Token', class: 'no-margin' %>
-
-                    <%= submit_tag "Save", class: 'button button-primary-plain' %>
-                    <%= button_tag 'Cancel', class: 'button button-cancel button-inline', data: {behavior: "hide_service_options"} %>
+                    <div class="button-wrap">
+                        <%= button_tag 'Cancel', class: 'button button-secondary button-inline', data: {behavior: "hide_service_options"} %>
+                        <%= submit_tag "Save", class: 'button button-primary-plain' %>
+                    </div>
                 <% end %>
             </div>
             <div class="half">
