@@ -83,7 +83,7 @@
     <div class="description-inset">
         <div class="button-wrap">
             <% if @action.persisted? %>
-                <%= button_to 'Delete', @action, method: :delete, class: 'button button-secondary' , data: { confirm: 'Are you sure you want to delete this action?' } %>
+                <%= link_to 'Delete', @action, method: :delete, class: 'button button-secondary' , data: { confirm: 'Are you sure you want to delete this action?' }, style: "position: relative; bottom: -2px;" %>
             <% end %>
             <%= f.submit "Save", class: "button" %>
         </div>
