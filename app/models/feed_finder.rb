@@ -20,7 +20,7 @@ class FeedFinder
   def create_feeds!
     options.each_with_object([]) do |option, array|
       array.push(create_feed(option))
-    end.compact
+    end.compact.uniq
   end
 
   def create_feed(option)

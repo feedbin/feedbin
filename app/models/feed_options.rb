@@ -18,6 +18,7 @@ class FeedOptions
         end
       end
       options.uniq { |option| option.title }
+      options.uniq { |option| option.href }
     end
   end
 
