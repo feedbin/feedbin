@@ -728,7 +728,6 @@ Structure
         font-size: 14px;
         background: image-url("favicon-search-light.svg") 14px ($base-button-position + 3) no-repeat;
         background-size: 14px 14px, 16px 16px;
-        border-radius: 13px;
         border: none;
         line-height: 1;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
@@ -1536,13 +1535,13 @@ $saved-search-control-height: 48px;
     .entry-image {
         margin-top: 8px;
         display: block;
-        border-radius: 3px;
+        border-radius: 4px;
         &.is-loading {
             position: relative;
             @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
         }
         img {
-            border-radius: 3px;
+            border-radius: 4px;
             display: block;
             max-width: 100%;
             height: auto;
@@ -2986,7 +2985,7 @@ $saved-search-control-height: 48px;
     .instagram-media {
         background:#FFF;
         border: 0;
-        border-radius: 3px;
+        border-radius: 4px;
         box-shadow: 0 0 1px 0 rgba(0,0,0,0.5), 0 1px 10px 0 rgba(0,0,0,0.15);
         margin: 1px 1px 1.1em 1px;
         max-width: 658px;
@@ -3894,7 +3893,7 @@ Settings
             display: flex;
             margin-bottom: 20px;
             padding: 15px 12px 30px 12px;
-            border-radius: 3px;
+            border-radius: 4px;
             background-color: #f4f6f8;
             border: 1px solid $border-color;
             .graph-wrap {
@@ -4212,7 +4211,7 @@ input[type="checkbox"]:focus + label .slider-checkbox {
     width: 32px;
     line-height: 32px;
     text-align: center;
-    border-radius: 2px;
+    border-radius: 4px;
     box-shadow: 1px 1px 1px $border-color;
     background-color: #FFF;
 }
@@ -5416,7 +5415,7 @@ Media Players
     padding: 0 10px 0 10px;
     box-sizing: border-box;
     @include background-color($drawer-background-color-night, $drawer-background-color-night, $drawer-background-color-night);
-    border-radius: 5px;
+    border-radius: 4px;
 }
 .mejs-container .mejs-controls div {
     list-style-type: none;
