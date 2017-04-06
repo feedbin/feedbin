@@ -200,6 +200,13 @@ $.extend feedbin,
     if typeof(instgrm) != "undefined"
       instgrm.Embeds.process()
 
+  checkType: ->
+    element = $('.entry-final-content')
+    if element.length > 0
+      tag = element.children().get(0).nodeName
+      if tag == "TABLE"
+        console.log  $('.entry-type-default').removeClass("entry-type-default").addClass("entry-type-newsletter");
+
   formatImages: ->
     $("[data-behavior~=entry_content_wrap] img").each ->
       actualSrc = $(@).data('feedbin-src')
@@ -226,6 +233,7 @@ $.extend feedbin,
       feedbin.formatTweets()
       feedbin.formatInstagram()
       feedbin.formatImages()
+      feedbin.checkType()
     catch error
       if 'console' of window
         console.log error
