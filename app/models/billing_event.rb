@@ -1,5 +1,7 @@
-class BillingEvent < ActiveRecord::Base
-  serialize :details
+class BillingEvent < ApplicationRecord
+
+  attr_accessor :details
+
   belongs_to :billable, polymorphic: true
 
   validates_uniqueness_of :event_id
@@ -8,19 +10,16 @@ class BillingEvent < ActiveRecord::Base
   after_commit :process_event, on: :create
 
   def build_event
-    self.event_type = details.type
-    self.event_id = details.id
+    self.event_type = info["type"]
+    self.event_id = info["id"]
 
-    if details.data.object['customer'].present?
-      customer = details.data.object.customer
-    elsif details.type == 'customer.created'
-      customer = details.data.object.id
-    else
-      customer = nil
+    customer = event_object.dig("customer")
+    if event_object["object"] == "customer"
+      customer = event_object["id"]
     end
 
     if customer
-      self.billable = User.where(customer_id: customer).first
+      self.billable = User.find_by_customer_id(customer)
     end
   end
 
@@ -43,7 +42,7 @@ class BillingEvent < ActiveRecord::Base
   end
 
   def charge_succeeded?
-    "charge.succeeded" == event_type
+    'charge.succeeded' == event_type
   end
 
   def charge_failed?
@@ -52,19 +51,19 @@ class BillingEvent < ActiveRecord::Base
 
   def subscription_deactivated?
     "customer.subscription.updated" == event_type &&
-    details.data.object.status == "unpaid"
+    event_object["status"] == "unpaid"
   end
 
   def subscription_reactivated?
     "customer.subscription.updated" == event_type &&
-    details.data.object.status == "active" &&
-    details.data.try(:[], :previous_attributes).try(:[], :status) == "unpaid"
+    event_object["status"] == "active" &&
+    info.dig("data", "previous_attributes", "status") == "unpaid"
   end
 
   def invoice
-    if self.event_type == "charge.succeeded"
-      Rails.cache.fetch("#{self.details.data.object.invoice}") do
-        JSON.parse(Stripe::Invoice.retrieve(self.details.data.object.invoice).to_json)
+    if event_type == "charge.succeeded"
+      Rails.cache.fetch("#{event_object["invoice"]}") do
+        JSON.parse(Stripe::Invoice.retrieve(event_object["invoice"]).to_json)
       end
     else
       nil
@@ -73,12 +72,20 @@ class BillingEvent < ActiveRecord::Base
 
   def invoice_items
     if self.event_type == "charge.succeeded"
-      Rails.cache.fetch("#{self.details.data.object.invoice}:lines") do
-        JSON.parse(Stripe::Invoice.retrieve(self.details.data.object.invoice).lines.all(limit: 10).to_json)
+      Rails.cache.fetch("#{event_object["invoice"]}:lines") do
+        JSON.parse(Stripe::Invoice.retrieve(event_object["invoice"]).lines.all(limit: 10).to_json)
       end
     else
       nil
     end
+  end
+
+  def details
+    @details ||= Stripe::StripeObject.construct_from(self.info)
+  end
+
+  def event_object
+    info["data"]["object"]
   end
 
 end

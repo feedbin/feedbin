@@ -44,7 +44,7 @@ module Api
         @tagging = @user.taggings.where(id: params[:id]).first
         if @tagging.present?
           @tagging.destroy
-          render nothing: true, status: :no_content
+          head :no_content
         else
           status_forbidden
         end

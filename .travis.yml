@@ -1,22 +1,29 @@
 language: ruby
 cache: bundler
-sudo: false
+sudo: required
+bundler_args: --without development --jobs 2
+
 services:
   - redis-server
+
 addons:
-  postgresql: "9.2"
-  apt:
-    packages:
-      - libopencv-dev
-rvm:
-  - 2.3.0
+  postgresql: "9.4"
+
 env:
-  - DB=postgresql
+  global:
+    - DB=postgresql
+    - KINDLEGEN_PATH=/tmp/kindlegen/kindlegen
+    - ES_VERSION=2.3.3
+
+before_install:
+  - mkdir /tmp/elasticsearch
+  - wget -O - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1
+  - /tmp/elasticsearch/bin/elasticsearch --daemonize --path.data /tmp
+  - mkdir /tmp/kindlegen
+  - wget -O - http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz | tar xz --directory=/tmp/kindlegen
+
 before_script:
   - psql -c 'create database feedbin_test;' -U postgres
-before_script:
-  - export POSTGRES_USERNAME=postgres
-  - export AWS_ACCESS_KEY_ID=foo
-  - export AWS_SECRET_ACCESS_KEY=bar
   - bundle exec rake db:setup
   - bundle exec rake db:test:prepare
+  - curl http://127.0.0.1:9200/

@@ -1,4 +1,4 @@
-class UserMailer < ActionMailer::Base
+class UserMailer < ApplicationMailer
 
   default from: "Feedbin <#{ENV['FROM_ADDRESS']}>"
 
@@ -29,21 +29,6 @@ class UserMailer < ActionMailer::Base
     @user = User.find(user_id)
     @download_link = download_link
     mail to: @user.email, subject: '[Feedbin] Starred Items Export Complete'
-  end
-
-  def entry(entry_id, to, subject, body, reply_to, email_name, readability)
-    @entry = Entry.find(entry_id)
-    @message = body
-    @content = Service.determine_content({entry_id: entry_id, readability: readability})
-
-    if subject.blank?
-      subject = @entry.title
-    end
-
-    headers['X-MC-InlineCSS'] = "true"
-    headers['X-MC-Autotext'] = "true"
-    headers['X-MC-SigningDomain'] = "feedbin.io"
-    mail to: to, subject: subject, reply_to: reply_to, from: "#{email_name} <#{ENV['NOTIFICATION_EMAIL']}>"
   end
 
   def kindle(kindle_address, mobi_file)

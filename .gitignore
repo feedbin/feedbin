@@ -19,4 +19,6 @@
 .powenv
 .env
 .env-tmp
+.env.development
 public
+coverage

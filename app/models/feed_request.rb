@@ -21,8 +21,6 @@ class FeedRequest
         result = nil
       end
       result
-    rescue
-      nil
     end
   end
 
@@ -32,6 +30,13 @@ class FeedRequest
     else
       :html
     end
+  rescue ArgumentError
+    if charset
+      @body = body.force_encoding(charset)
+    else
+      @body = body.force_encoding("ASCII-8BIT")
+    end
+    format
   end
 
   def last_effective_url
@@ -47,17 +52,29 @@ class FeedRequest
   end
 
   def etag
-    @etag ||= begin
-      content = headers[:etag]
-      if content && content.match(/^"/) && content.match(/"$/)
-        content = content.gsub(/^"/, "").gsub(/"$/, "")
-      end
-      content
-    end
+    headers[:etag]
   end
 
   def status
     @status ||= response.response_code
+  end
+
+  def charset
+    @charset ||= begin
+      if headers[:content_type]
+        charset = nil
+        headers[:content_type].split(";").each do |item|
+          item = item.strip
+          if item.start_with?("charset=")
+            charset = item.gsub("charset=", "")
+            charset = charset.strip.upcase
+          end
+        end
+        charset
+      else
+        nil
+      end
+    end
   end
 
   def headers
@@ -75,14 +92,14 @@ class FeedRequest
 
   private
 
-  def gunzip(string)
-    string = StringIO.new(string)
+  def gunzip(data)
+    string = StringIO.new(data)
     gz =  Zlib::GzipReader.new(string)
     result = gz.read
     gz.close
     result
   rescue Zlib::GzipFile::Error
-    string
+    data
   end
 
   def gzipped?

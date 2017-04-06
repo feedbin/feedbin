@@ -1,4 +1,4 @@
-class SharingService < ActiveRecord::Base
+class SharingService < ApplicationRecord
   belongs_to :user
   default_scope { order('lower(label)') }
 
@@ -13,6 +13,10 @@ class SharingService < ActiveRecord::Base
     else
       target = '_self'
     end
-    {url: share_url, label: self.label, html_options: {target: target}}
+    {url: share_url, label: self.label, html_options: {target: target, rel: 'noopener noreferrer'}}
+  end
+
+  def active?
+    true
   end
 end

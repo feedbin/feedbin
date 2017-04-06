@@ -12,7 +12,7 @@ class FeedsController < ApplicationController
     @feed.tag(params[:feed][:tag_list], @user)
 
     if params[:no_response].present?
-      render nothing: true
+      head :ok
     else
       get_feeds_list
     end
@@ -44,41 +44,60 @@ class FeedsController < ApplicationController
   end
 
   def push
+    feed = Feed.find(params[:id])
+    secret = Push::hub_secret(feed.id)
+
     if request.get?
-      if params['hub.mode'] == 'subscribe'
-        @feed = Feed.find(params[:id])
-        if @feed.feed_url != params['hub.topic']
-          render_404
-        else
-          @feed.update_attributes(push_expiration: Time.now + (params['hub.lease_seconds'].to_i/2).seconds)
-          render plain: params['hub.challenge']
+      response = ""
+      if [feed.self_url, feed.feed_url].include?(params['hub.topic']) && secret == params['hub.verify_token']
+        if params['hub.mode'] == 'subscribe'
+          Librato.increment 'push.subscribe'
+          feed.update_attributes(push_expiration: Time.now + (params['hub.lease_seconds'].to_i/2).seconds)
+          response = params['hub.challenge']
+          status = :ok
+        elsif params['hub.mode'] == 'unsubscribe'
+          Librato.increment 'push.unsubscribe'
+          feed.update_attributes(push_expiration: nil)
+          response = params['hub.challenge']
+          status = :ok
         end
       else
-        # Handle unsubscriptions confirmation
-        render_404
+        SelfUrl.perform_async(feed.id)
+        status = :not_found
       end
+      render plain: response, status: status
     else
-      feed = Feed.find(params[:id])
-      secret = Push::hub_secret(feed.id)
-      body = request.body.read.force_encoding("UTF-8")
-      signature = OpenSSL::HMAC.hexdigest('sha1', secret, body)
-      if request.headers['HTTP_X_HUB_SIGNATURE'] == "sha1=#{signature}"
+      if feed.subscriptions_count > 0
+        body = request.raw_post.force_encoding("UTF-8")
+        signature = OpenSSL::HMAC.hexdigest('sha1', secret, body)
+        if request.headers['HTTP_X_HUB_SIGNATURE'] == "sha1=#{signature}"
+          Sidekiq::Client.push_bulk(
+            'args'  => [[feed.id, feed.feed_url, {xml: body}]],
+            'class' => 'FeedRefresherFetcherCritical',
+            'queue' => 'feed_refresher_fetcher_critical',
+            'retry' => false
+          )
+          Librato.increment 'entry.push'
+        else
+          Honeybadger.notify(error_class: "PuSH", error_message: "PuSH Invalid Signature", parameters: params)
+        end
+      else
+        uri = URI(ENV['PUSH_URL'])
+        options = {
+          push_callback: Rails.application.routes.url_helpers.push_feed_url(feed, protocol: uri.scheme, host: uri.host),
+          hub_secret: secret,
+          push_mode: "unsubscribe"
+        }
         Sidekiq::Client.push_bulk(
-          'args'  => [[feed.id, feed.feed_url, nil, nil, feed.subscriptions_count, body]],
-          'class' => 'FeedRefresherFetcherCritical',
-          'queue' => 'feed_refresher_fetcher_critical',
+          'args'  => [[feed.id, feed.feed_url, options]],
+          'class' => 'FeedRefresherFetcher',
+          'queue' => 'feed_refresher_fetcher',
           'retry' => false
         )
-        Librato.increment 'entry.push'
-      else
-        Honeybadger.notify(
-          error_class: "PuSH",
-          error_message: "PuSH Invalid Signature",
-          parameters: params
-        )
       end
-      render nothing: true
+      head :ok
     end
+
   end
 
   def toggle_updates
@@ -93,7 +112,7 @@ class FeedsController < ApplicationController
         @delay = true
       end
     else
-      render nothing: true
+      head :ok
     end
   end
 
@@ -102,13 +121,21 @@ class FeedsController < ApplicationController
     @feed_ids = user.subscriptions.where(show_updates: false).pluck(:feed_id)
   end
 
+  def search
+    @user = current_user
+    @feeds = FeedFinder.new(params[:q]).create_feeds!
+    @feeds.map(&:priority_refresh)
+  rescue
+    @feeds = nil
+  end
+
   private
 
   def update_view_mode(view_mode)
     @user = current_user
     @view_mode = view_mode
     @user.update_attributes(view_mode: @view_mode)
-    render nothing: true
+    head :ok
   end
 
   def correct_user

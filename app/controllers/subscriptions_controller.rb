@@ -23,69 +23,44 @@ class SubscriptionsController < ApplicationController
   # POST /subscriptions
   # POST /subscriptions.json
   def create
-    @user = current_user
-
-    feed_urls = [*params[:subscription][:feeds][:feed_url]]
-    @results = { success: [], options: [], failed: [] }
-
-    feed_urls.each do |feed_url|
-      begin
-        finder = FeedFinder.new(feed_url)
-        if finder.options.length == 0
-          @results[:failed].push(feed_url)
-        elsif finder.options.length == 1
-          feed = finder.create_feed(finder.options.first)
-          if feed
-            @user.safe_subscribe(feed)
-            @results[:success].push(feed)
-          else
-            @results[:failed].push(feed_url)
-          end
-        else
-          @results[:options].push(finder.options)
-        end
-      rescue Exception => e
-        logger.info { "exception ---------------------------" }
-        logger.info { e.inspect }
-        logger.info { e.backtrace.inspect }
-        logger.info { "exception ---------------------------" }
-        Honeybadger.notify(e)
-        @results[:failed].push(feed)
-      end
+    user = current_user
+    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
+    valid_feed_ids = verifier.verify(params[:valid_feed_ids])
+    @subscriptions = Subscription.create_multiple(params[:feeds], user, valid_feed_ids)
+    if @subscriptions.present?
+      @click_feed = @subscriptions.first.feed_id
     end
-
-    if @results[:success].any?
-      session[:favicon_complete] = false
-      @mark_selected = true
-      @click_feed = @results[:success].first.id
-      @favicon_hash = UpdateFaviconHash.new.get_hash(@user)
-      get_feeds_list
-    end
-
-    respond_to do |format|
-      format.js
-    end
-
+    @mark_selected = true
+    get_feeds_list
   end
 
   # DELETE /subscriptions/1
   # DELETE /subscriptions/1.json
   def destroy
-    destroy_subscription
+    destroy_subscription(params[:id])
     get_feeds_list
     respond_to do |format|
       format.js
     end
   end
 
+  def feed_destroy
+    subscription = @user.subscriptions.where(feed_id: params[:id]).take!
+    destroy_subscription(subscription.id)
+    get_feeds_list
+    respond_to do |format|
+      format.js { render 'subscriptions/destroy' }
+    end
+  end
+
   def settings_destroy
-    destroy_subscription
+    destroy_subscription(params[:id])
     redirect_to settings_feeds_url, notice: 'You have successfully unsubscribed.'
   end
 
-  def destroy_subscription
+  def destroy_subscription(subscription_id)
     @user = current_user
-    @subscription = @user.subscriptions.find(params[:id])
+    @subscription = @user.subscriptions.find(subscription_id)
     @subscription.destroy
   end
 
@@ -110,12 +85,6 @@ class SubscriptionsController < ApplicationController
     redirect_to settings_feeds_url, notice: notice
   end
 
-  def destroy_all
-    @user = current_user
-    @user.subscriptions.destroy_all
-    redirect_to settings_feeds_url, notice: "You have unsubscribed."
-  end
-
   def edit
     @user = current_user
     @subscription = @user.subscriptions.find(params[:id])
@@ -132,6 +101,17 @@ class SubscriptionsController < ApplicationController
     end
     flash.discard()
   end
+
+  def refresh_favicon
+    @user = current_user
+    @subscription = @user.subscriptions.find(params[:id])
+    FaviconFetcher.perform_async(@subscription.feed.host)
+    flash[:notice] = "Favicon will be refreshed shortly"
+    flash.discard()
+    render 'update'
+  end
+
+  private
 
   def subscription_params
     params.require(:subscription).permit(:muted, :show_updates)

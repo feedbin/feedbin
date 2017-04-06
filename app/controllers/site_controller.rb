@@ -48,6 +48,13 @@ class SiteController < ApplicationController
     end
   end
 
+  def headers
+    @user = current_user
+    if @user.admin?
+      @headers = request.env.select {|k,v| k =~ /^HTTP_/}
+    end
+  end
+
   private
 
   def check_user

@@ -1,0 +1,10 @@
+engines:
+  rubocop:
+    enabled: true
+  coffeelint:
+    enabled: true
+
+ratings:
+  paths:
+  - "**.rb"
+  - "**.coffee"

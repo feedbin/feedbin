@@ -1,41 +1,43 @@
 class Newsletter
 
-  def initialize(event)
-    @event = event
+  attr_reader :data
+
+  def initialize(params)
+    @data = params
   end
 
   def valid?
-    @event["event"] == "inbound"
+    data["X-Mailgun-Incoming"] == "Yes" && signature_valid?
   end
 
   def token
     @token ||= begin
-      to_email.sub("@newsletters.feedbin.com", "").sub("test-subscribe+", "").sub("subscribe+", "")
+      to_email.sub("@newsletters.feedbin.com", "").sub("@development.newsletters.feedbin.com", "").sub("test-subscribe+", "").sub("subscribe+", "")
     end
   end
 
   def to_email
-    @event["msg"]["email"]
+    data["recipient"]
   end
 
   def from_email
-    @event["msg"]["from_email"]
+    parsed_from.address
   end
 
   def from_name
-    @event["msg"]["from_name"] || from_email
+    parsed_from.name || from_email
   end
 
   def subject
-    @event["msg"]["subject"]
+    data["subject"]
   end
 
   def text
-    @event["msg"]["text"]
+    data["body-plain"]
   end
 
   def html
-    @event["msg"]["html"]
+    data["body-html"]
   end
 
   def content
@@ -43,7 +45,7 @@ class Newsletter
   end
 
   def timestamp
-    @event["ts"]
+    data["timestamp"]
   end
 
   def feed_id
@@ -55,7 +57,7 @@ class Newsletter
   end
 
   def domain
-    @domain ||= Mail::Address.new(from_email).domain
+    parsed_from.domain
   end
 
   def feed_url
@@ -68,6 +70,34 @@ class Newsletter
 
   def format
     html ? "html" : "text"
+  end
+
+  def headers
+    {
+      "List-Unsubscribe" => data["List-Unsubscribe"]
+    }
+  end
+
+  private
+
+  def parsed_from
+    Mail::Address.new(data["from"])
+  rescue Mail::Field::ParseError
+    name, address = data["from"].split(/[<>]/).map(&:strip)
+    domain = address.split("@").last
+    OpenStruct.new(name: name, address: address, domain: domain)
+  end
+
+  def signature_valid?
+    data["signature"] == signature
+  end
+
+  def signature
+    @signature ||= begin
+      digest = OpenSSL::Digest::SHA256.new
+      signed_data = [data["timestamp"], data["token"]].join
+      OpenSSL::HMAC.hexdigest(digest, ENV['MAILGUN_INBOUND_KEY'], signed_data)
+    end
   end
 
 end

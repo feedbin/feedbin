@@ -28,7 +28,7 @@ module Api
       def update
         @action.all_feeds = all_feeds?(action_params)
         if !@action.update(action_params)
-          render nothing: true, status: :bad_request
+          head :bad_request
         end
       end
 
@@ -45,7 +45,7 @@ module Api
           if params[:read].present?
             query[:read] = (params[:read] == 'true') ? true : false
           end
-          @entries = Entry.search(query, @user)
+          @entries = Entry.scoped_search(query, @user)
         else
           @entries = []
         end

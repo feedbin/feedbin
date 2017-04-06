@@ -1,4 +1,4 @@
-class Tagging < ActiveRecord::Base
+class Tagging < ApplicationRecord
   belongs_to :tag
   belongs_to :feed
   belongs_to :user
@@ -8,6 +8,12 @@ class Tagging < ActiveRecord::Base
   def update_actions
     actions = self.user.actions.where("? = ANY (tag_ids)", tag_id).pluck(:id)
     TouchActions.perform_async(actions)
+  end
+
+  def self.build_map
+    group(:feed_id).pluck('feed_id, array_agg(tag_id)').each_with_object({}) do |(feed_id, tag_ids), hash|
+      hash[feed_id] = tag_ids
+    end
   end
 
 end

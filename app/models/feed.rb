@@ -1,4 +1,4 @@
-class Feed < ActiveRecord::Base
+class Feed < ApplicationRecord
   has_many :subscriptions
   has_many :entries
   has_many :users, through: :subscriptions
@@ -9,16 +9,22 @@ class Feed < ActiveRecord::Base
   has_many :taggings
   has_many :tags, through: :taggings
 
+  has_one :favicon, foreign_key: "host", primary_key: "host"
+
   before_create :set_host
+  after_create :refresh_favicon
 
   attr_accessor :count, :tags
+  attr_readonly :feed_url
+
+  after_initialize :default_values
 
   enum feed_type: { xml: 0, newsletter: 1 }
 
   def tag(names, user, delete_existing = true)
     taggings = []
     if delete_existing
-      Tagging.destroy_all(user_id: user, feed_id: self.id)
+      Tagging.where(user_id: user, feed_id: self.id).destroy_all
     end
     names.split(",").map do |name|
       name = name.strip
@@ -73,7 +79,6 @@ class Feed < ActiveRecord::Base
   def set_host
     begin
       self.host = URI::parse(self.site_url).host
-      FaviconFetcher.perform_async(self.host)
     rescue Exception
       Rails.logger.info { "Failed to set host for feed: %s" %  self.site_url}
     end
@@ -87,4 +92,30 @@ class Feed < ActiveRecord::Base
   def original_title
     @original_title or self.title
   end
+
+  def priority_refresh
+    Sidekiq::Client.push_bulk(
+      'args'  => [[self.id, self.feed_url]],
+      'class' => 'FeedRefresherFetcherCritical',
+      'queue' => 'feed_refresher_fetcher_critical',
+      'retry' => false
+    )
+  end
+
+  def list_unsubscribe
+    self.options.dig('email_headers', 'List-Unsubscribe')
+  end
+
+  private
+
+  def refresh_favicon
+    FaviconFetcher.perform_async(self.host)
+  end
+
+  def default_values
+    if self.respond_to?(:options)
+      self.options ||= {}
+    end
+  end
+
 end

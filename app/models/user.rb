@@ -1,6 +1,7 @@
-class User < ActiveRecord::Base
+class User < ApplicationRecord
 
-  attr_accessor :stripe_token, :old_password_valid, :update_auth_token, :password_reset, :coupon_code, :is_trialing
+  attr_accessor :stripe_token, :old_password_valid, :update_auth_token,
+                :password_reset, :coupon_code, :is_trialing, :coupon_valid
 
   has_secure_password
 
@@ -20,7 +21,6 @@ class User < ActiveRecord::Base
                  :keep_unread_entries,
                  :receipt_info,
                  :theme,
-                 :favicon_hash,
                  :entries_display,
                  :entries_feed,
                  :entries_time,
@@ -60,7 +60,7 @@ class User < ActiveRecord::Base
 
   after_initialize :set_defaults, if: :new_record?
 
-  before_save :update_billing, unless: -> user { user.admin || !ENV['STRIPE_API_KEY'] }
+  before_save :update_billing, unless: -> { !ENV['STRIPE_API_KEY'] }
   before_save :strip_email
   before_save :activate_subscriptions
   before_save { reset_auth_token }
@@ -69,8 +69,11 @@ class User < ActiveRecord::Base
   before_create { generate_token(:inbound_email_token, 4) }
   before_create { generate_token(:newsletter_token, 4) }
 
-  before_destroy :cancel_billing, unless: -> user { user.admin }
+  after_create { schedule_trial_jobs }
+
+  before_destroy :cancel_billing, unless: -> { !ENV['STRIPE_API_KEY'] }
   before_destroy :create_deleted_user
+  before_destroy :record_stats
 
   validate :changed_password, on: :update, unless: -> user { user.password_reset }
   validate :coupon_code_valid, on: :create, if: -> user { user.coupon_code }
@@ -89,15 +92,34 @@ class User < ActiveRecord::Base
     self.font_size = 7
   end
 
+  def with_params(params)
+    if params[:coupon_code].present?
+      coupon = Coupon.find_by(coupon_code: params[:coupon_code])
+      self.coupon_valid = coupon.present? && !coupon.redeemed
+      self.coupon_code = params[:coupon_code]
+    end
+
+    if self.coupon_valid || !ENV['STRIPE_API_KEY']
+      self.free_ok = true
+      self.plan = Plan.find_by_stripe_id('free')
+    else
+      self.plan = Plan.find_by_stripe_id('trial')
+    end
+
+    if params[:user] && params[:user][:password]
+      self.password_confirmation = params[:user][:password]
+    end
+    self
+  end
+
   def get_view_mode
     view_mode || "view_unread"
   end
 
-  def get_favicon_hash
-    if favicon_hash
-      "#{favicon_hash}2"
-    else
-      "none"
+  def schedule_trial_jobs
+    if self.plan.stripe_id != 'free'
+      send_notice = Feedbin::Application.config.trial_days - 1
+      TrialSendExpiration.perform_in(send_notice.days, self.id)
     end
   end
 
@@ -120,7 +142,13 @@ class User < ActiveRecord::Base
   end
 
   def feed_tags
-    tags.where(id: taggings.pluck(:tag_id)).order(:name).uniq
+    tags.where(id: taggings.pluck(:tag_id)).order(:name).distinct
+  end
+
+  def tag_names
+    feed_tags.each_with_object({}) do |tag, hash|
+      hash[tag.id] = tag.name
+    end
   end
 
   def coupon_code_valid
@@ -202,7 +230,7 @@ class User < ActiveRecord::Base
       if email_changed? || stripe_token.present? || plan_id_changed?
         customer = Stripe::Customer.retrieve(customer_id)
         if stripe_token.present?
-          customer.card = stripe_token
+          customer.source = stripe_token
           self.suspended = false
           subscriptions.update_all(active: true)
         end
@@ -221,7 +249,7 @@ class User < ActiveRecord::Base
       end
     end
     unless customer.nil?
-      self.last_4_digits = customer.try(:active_card).try(:last4)
+      self.last_4_digits = customer.try(:sources).try(:data).try(:first).try(:last4)
       self.customer_id = customer.id
       self.stripe_token = nil
     end
@@ -234,7 +262,6 @@ class User < ActiveRecord::Base
 
   def cancel_billing
     customer = Stripe::Customer.retrieve(customer_id)
-    customer.cancel_subscription
     customer.delete
   rescue Stripe::StripeError => e
     logger.error "Stripe Error: " + e.message
@@ -249,7 +276,7 @@ class User < ActiveRecord::Base
   def tag_group
     unique_tags = feed_tags
     feeds_by_tag = build_feeds_by_tag
-    feeds_by_id = feeds.include_user_title
+    feeds_by_id = feeds.includes(:favicon).include_user_title
     feeds_by_id = feeds_by_id.each_with_object({}) do |feed, hash|
       hash[feed.id] = feed
     end
@@ -270,14 +297,6 @@ class User < ActiveRecord::Base
 
   def subscribe!(feed)
     subscriptions.create!(feed_id: feed.id)
-  end
-
-  def safe_subscribe(feed)
-    if subscribed_to?(feed.id)
-      subscriptions.where(feed_id: feed.id).first
-    else
-      subscribe!(feed)
-    end
   end
 
   def subscribed_to?(feed_id)
@@ -325,6 +344,14 @@ class User < ActiveRecord::Base
     DeletedUser.create(email: self.email, customer_id: self.customer_id)
   end
 
+  def record_stats
+    if self.plan.stripe_id == 'trial'
+      Librato.increment('user.trial.cancel')
+    else
+      Librato.increment('user.paid.cancel')
+    end
+  end
+
   def activate
     update_attributes(suspended: false)
     subscriptions.update_all(active: true)
@@ -333,6 +360,10 @@ class User < ActiveRecord::Base
   def deactivate
     update_attributes(suspended: true)
     subscriptions.update_all(active: false)
+  end
+
+  def active?
+    !suspended
   end
 
   def admin?
@@ -345,6 +376,27 @@ class User < ActiveRecord::Base
 
   def stripe_url
     "https://manage.stripe.com/customers/#{customer_id}"
+  end
+
+  def deleted?
+    false
+  end
+
+  def can_read_feed?(feed)
+    can_read = false
+    if feed.respond_to?(:id)
+      feed = feed.id
+    end
+
+    if subscribed_to?(feed)
+      can_read = true
+    end
+
+    if !can_read && starred_entries.where(feed_id: feed).exists?
+      can_read = true
+    end
+
+    can_read
   end
 
 end

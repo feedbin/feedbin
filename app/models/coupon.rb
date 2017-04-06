@@ -1,4 +1,4 @@
-class Coupon < ActiveRecord::Base
+class Coupon < ApplicationRecord
   belongs_to :user
 
   before_create :generate_coupon

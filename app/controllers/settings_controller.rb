@@ -2,15 +2,7 @@ class SettingsController < ApplicationController
 
   before_action :plan_exists, only: [:update_plan]
 
-  def help
-    @user = current_user
-  end
-
   def settings
-    @user = current_user
-  end
-
-  def sharing
     @user = current_user
   end
 
@@ -25,15 +17,15 @@ class SettingsController < ApplicationController
 
   def feeds
     @user = current_user
-    @subscriptions = @user.subscriptions.select('subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host').joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}").includes(:feed)
+    @subscriptions = @user.subscriptions.select('subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host').joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}").includes(feed: [:favicon])
 
     start_date = 29.days.ago
     feed_ids = @subscriptions.map {|subscription| subscription.feed_id}
     entry_counts = Rails.cache.fetch("#{@user.id}:entry_counts:2", expires_in: 24.hours) { FeedStat.get_entry_counts(feed_ids, start_date) }
-    max = Rails.cache.fetch("#{@user.id}:max_entry_count", expires_in: 24.hours) { FeedStat.max_entry_count(feed_ids, start_date) }
 
     @subscriptions = @subscriptions.map do |subscription|
       counts = entry_counts[subscription.feed_id]
+      max = (counts.present?) ? counts.max.to_i : 0
       percentages = (counts.present?) ? counts.map { |count| count.to_f / max.to_f } : nil
       volume = (counts.present?) ? counts.sum : 0
 
@@ -59,17 +51,16 @@ class SettingsController < ApplicationController
     @default_plan = Plan.find_by_stripe_id('basic-yearly-2')
 
     @next_payment = @user.billing_events.where(event_type: 'invoice.payment_succeeded')
-    @next_payment = @next_payment.to_a.sort_by {|next_payment| -next_payment.details.data.object.date }
+    @next_payment = @next_payment.to_a.sort_by {|next_payment| -next_payment.event_object["date"] }
     if @next_payment.present?
-      @next_payment.first.details.data.object.lines.data.each do |event|
-        event = event.to_hash
-        if event[:type] && event[:type] == 'subscription'
-          @next_payment_date = Time.at(event[:period].end).utc.to_datetime
+      @next_payment.first.event_object["lines"]["data"].each do |event|
+        if event.dig("type") == 'subscription'
+          @next_payment_date = Time.at(event["period"]["end"]).utc.to_datetime
         end
       end
     end
     @billing_events = @user.billing_events.where(event_type: 'charge.succeeded')
-    @billing_events = @billing_events.to_a.sort_by {|billing_event| -billing_event.details.data.object.created }
+    @billing_events = @billing_events.to_a.sort_by {|billing_event| -billing_event.event_object["created"] }
     if @user.plan.stripe_id == 'trial'
       @plans = Plan.where(stripe_id: ['basic-monthly-2', 'basic-yearly-2']).order('id DESC')
     elsif @user.plan.stripe_id == 'free'
@@ -104,16 +95,9 @@ class SettingsController < ApplicationController
     end
   end
 
-  def mark_favicon_complete
-    session[:favicon_complete] = true
-    render nothing: true
-  end
-
   def update_plan
     @user = current_user
     plan = Plan.find(params[:plan])
-    customer = Stripe::Customer.retrieve(@user.customer_id)
-    customer.update_subscription(plan: plan.stripe_id)
     @user.plan = plan
     @user.save
     redirect_to settings_billing_path, notice: 'Plan successfully changed.'
@@ -151,7 +135,7 @@ class SettingsController < ApplicationController
           if params[:redirect_to]
             redirect_to params[:redirect_to]
           else
-            redirect_to settings_path
+            redirect_to settings_url
           end
         end
       end
@@ -160,7 +144,7 @@ class SettingsController < ApplicationController
         flash[:alert] = @user.errors.full_messages.join('. ') + '.'
         format.js {flash.discard()}
         format.html do
-          redirect_to settings_path
+          redirect_to settings_url
         end
       end
     end
@@ -181,7 +165,7 @@ class SettingsController < ApplicationController
       session[:column_widths] ||= {}
       session[:column_widths][params[:column]] = params[:width]
     end
-    render nothing: true
+    head :ok
   end
 
   def font_increase
@@ -198,7 +182,7 @@ class SettingsController < ApplicationController
       @user.font = params[:font]
       @user.save
     end
-    render nothing: true
+    head :ok
   end
 
   def theme
@@ -208,7 +192,7 @@ class SettingsController < ApplicationController
       @user.theme = params[:theme]
       @user.save
     end
-    render nothing: true
+    head :ok
   end
 
   def entry_width
@@ -220,7 +204,7 @@ class SettingsController < ApplicationController
     end
     @user.entry_width = new_width
     @user.save
-    render nothing: true
+    head :ok
   end
 
 
@@ -242,7 +226,7 @@ class SettingsController < ApplicationController
       @user.save
     end
 
-    render nothing: true
+    head :ok
   end
 
   def plan_exists

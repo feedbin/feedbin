@@ -19,7 +19,9 @@
         <p class="control-group-description">You can import OPML files. Import is done in the background so you may not see every subscription or starred item right away.</p>
 
         <div class="description-inset">
-            <%= f.submit "Import", class: "button-plain no-margin" %>
+            <div class="button-wrap">
+                <%= f.submit "Import", class: "button no-margin" %>
+            </div>
         </div>
 
         <% end %>
@@ -38,7 +40,7 @@
                 <%= form_tag subscriptions_path(format: :xml), method: :get do %>
                     Subscriptions
                     <%= select_tag :tag, options_for_select(@download_options), style: "width: 150px; margin-left: 10px;" %>
-                    <button class="button-plain no-margin pull-right no-top-margin">Download</button>
+                    <button class="button-text pull-right">Download</button>
                 <% end %>
             </li>
             <% if @user.starred_entries.exists? %>

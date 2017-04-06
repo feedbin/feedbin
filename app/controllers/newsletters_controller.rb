@@ -3,19 +3,12 @@ class NewslettersController < ApplicationController
   skip_before_action :verify_authenticity_token
   skip_before_action :authorize
 
-  respond_to :json
-
   def create
-    if inbound_message?
-      events.each do |event|
-        newsletter = Newsletter.new(event)
-        if newsletter.valid?
-          create_newsletter(newsletter)
-        end
-      end
+    newsletter = Newsletter.new(params)
+    if newsletter.valid?
+      create_newsletter(newsletter)
     end
-  ensure
-    render nothing: true
+    head :ok
   end
 
   private
@@ -24,21 +17,12 @@ class NewslettersController < ApplicationController
     if user = User.where(newsletter_token: newsletter.token).take
       entry = build_entry(newsletter)
       feed = get_feed(newsletter)
-      user.safe_subscribe(feed)
+      user.subscriptions.find_or_create_by(feed: feed)
       feed.entries.create(entry)
-      feed.update(feed_type: :newsletter)
+      feed.feed_type = :newsletter
+      feed.options["email_headers"] = newsletter.headers
+      feed.save
     end
-  rescue Exception => exception
-    logger.info { exception.inspect }
-    Honeybadger.notify(exception)
-  end
-
-  def inbound_message?
-    params[:mandrill_events].present?
-  end
-
-  def events
-    JSON.parse(params[:mandrill_events])
   end
 
   def build_entry(newsletter)
@@ -54,7 +38,6 @@ class NewslettersController < ApplicationController
       data: {newsletter_text: newsletter.text, type: "newsletter", format: newsletter.format}
     }
   end
-
 
   def get_feed(newsletter)
     Feed.where(feed_url: newsletter.feed_url).first_or_create(

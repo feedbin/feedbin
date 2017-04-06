@@ -1,4 +1,4 @@
-class InAppPurchase < ActiveRecord::Base
+class InAppPurchase < ApplicationRecord
 
   belongs_to :user
 

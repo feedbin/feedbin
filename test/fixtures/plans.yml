@@ -1,0 +1,29 @@
+trial:
+  stripe_id: trial
+  name: Trial
+  price: 0
+  price_tier: 2
+
+free:
+  stripe_id: free
+  name: Free
+  price: 0
+  price_tier: 2
+
+basic_monthly_2:
+  stripe_id: basic-monthly-2
+  name: Monthly
+  price: 0
+  price_tier: 2
+
+basic_yearly_2:
+  stripe_id: basic-yearly-2
+  name: Yearly
+  price: 0
+  price_tier: 2
+
+timed:
+  stripe_id: timed
+  name: Timed
+  price: 0
+  price_tier: 2

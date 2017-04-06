@@ -6,30 +6,23 @@
 if (window.feedbin == null) {
     window.feedbin = {};
 }
-feedbin.data = <%= @data.to_json.html_safe %>;
+feedbin.data = <%= raw json_escape(@data.to_json) %>;
+feedbin.data.tagNames = <%= raw json_escape(@user.tag_names.to_json) %>;
+feedbin.count_data = <%= raw json_escape(@count_data.to_json) %>;
 feedbin.data.viewMode = "<%= @user.get_view_mode %>";
-feedbin.count_data = <%= @count_data.to_json.html_safe %>;
 feedbin.Counts.get(feedbin.count_data);
 </script>
 <% end %>
 <%= render partial: 'shared/svg' %>
 
 <div class="application-messages"><a href="" class="message-content" data-behavior="messages">You have subscribed</a></div>
-<div class="modal-target"></div>
 
 <div class="app-wrap">
 
     <div class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
         <div class="subscribe-toolbar">
-            <div class="show-subscribe" data-behavior="show_subscribe">Subscribe</div>
+            <button type="button" class="show-subscribe" data-behavior="show_subscribe">+ Add</button>
             <%= render partial: 'shared/hamburger_menu_button' %>
-        </div>
-        <div class="subscribe-wrap">
-            <%= form_for :subscription, url: subscriptions_path, remote: true, html: { data: {behavior: 'subscription_form'}, novalidate: 'novalidate', autocomplete: 'off' }  do |f| %>
-                <%= f.fields_for :feeds do |builder| %>
-                    <%= builder.url_field :feed_url, placeholder: 'Feed or URL' %>
-                <% end %>
-            <% end %>
         </div>
         <div class="feeds-inner">
             <div class="view-toolbar">
@@ -95,6 +88,7 @@ feedbin.Counts.get(feedbin.count_data);
             <div class="basement-panel hide" data-basement-panel-target="settings_panel">
                 <%= render partial: 'shared/entry_settings' %>
             </div>
+            <div class="basement-panel hide" data-basement-panel-target="feed_panel"></div>
             <% @user.supported_sharing_services.each do |service| %>
                 <% if service.has_share_sheet? %>
                 <div class="basement-panel hide" data-basement-panel-target="<%= service.service_id %>_share_panel">
@@ -111,12 +105,13 @@ feedbin.Counts.get(feedbin.count_data);
 
 <div class="hide" data-behavior="pagination"></div>
 <%= render partial: "shared/readability_loading" %>
+<%= render partial: "shared/add_form" %>
 <%= render partial: "shared/keyboard_shortcuts_wrap" %>
 <%= render partial: "shared/settings_modal" %>
 <%= render partial: "shared/resizable_form" %>
 <%= render partial: 'shared/update_styles' %>
 
-<%= one_time_content %>
+<%= one_time_content && one_time_content.html_safe %>
 
 <%= render partial: 'shared/twitter_embed' %>
 <%= render partial: 'shared/instagram_embed' %>

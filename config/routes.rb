@@ -1,4 +1,9 @@
-Feedbin::Application.routes.draw do
+require 'sidekiq/web'
+
+Sidekiq::Web.set :session_secret, Feedbin::Application.config.secret_key_base
+Sidekiq::Web.app_url = ENV['FEEDBIN_URL']
+
+Rails.application.routes.draw do
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
@@ -6,9 +11,12 @@ Feedbin::Application.routes.draw do
   root to: 'site#index'
 
   mount StripeEvent::Engine, at: '/stripe'
-
+  constraints lambda {|request| AuthConstraint.admin?(request) } do
+    mount Sidekiq::Web => 'sidekiq'
+  end
   get :health_check, to: proc {|env| [200, {}, ["OK"]] }
-  get :version, to: proc {|env| [200, {}, [ENV["ETAG_VERSION_ID"]]] }
+  get :version, to: proc {|env| [200, {}, [File.read("REVISION")]] }
+  get :headers, to: 'site#headers'
 
   post '/emails' => 'emails#create'
   post '/newsletters' => 'newsletters#create'
@@ -16,7 +24,6 @@ Feedbin::Application.routes.draw do
   match '/404', to: 'errors#not_found', via: :all
   get '/starred/:starred_token', to: 'starred_entries#index', as: 'starred'
   post '/starred/export', to: 'starred_entries#export'
-  get '/favicons/:hash', to: 'favicons#index', as: 'favicons'
 
   get    :signup,         to: 'users#new',           as: 'signup'
   get    :login,          to: 'sessions#new',        as: 'login'
@@ -40,11 +47,10 @@ Feedbin::Application.routes.draw do
 
   resources :tags,           only: [:index, :show, :update, :destroy]
   resources :billing_events, only: [:show]
-  resources :imports
   resources :password_resets
   resources :sharing_services, path: 'settings/sharing', only: [:index, :create, :update, :destroy]
   resources :actions, path: 'settings/actions', only: [:index, :create, :new, :update, :destroy, :edit]
-  resources :saved_searches
+  resources :saved_searches, only: [:show, :update, :destroy, :create]
 
   resources :sessions do
     collection do
@@ -54,11 +60,8 @@ Feedbin::Application.routes.draw do
 
   resources :supported_sharing_services, only: [:create, :destroy, :update] do
     member do
-      get :oauth2_pocket_request
-      get :oauth2_pocket_response
       get :oauth_response
       get :autocomplete
-      post :xauth_request
       match 'share/:entry_id', to: 'supported_sharing_services#share', as: :share, via: [:get, :post]
     end
   end
@@ -66,10 +69,11 @@ Feedbin::Application.routes.draw do
   resources :subscriptions,  only: [:index, :create, :destroy, :update] do
     collection do
       patch :update_multiple
-      delete :destroy_all
     end
     member do
       delete :settings_destroy
+      delete :feed_destroy
+      post :refresh_favicon
     end
   end
 
@@ -89,6 +93,7 @@ Feedbin::Application.routes.draw do
       get :view_starred
       get :auto_update
       get :update_styles
+      post :search
     end
     member do
       match :push, via: [:post, :get]
@@ -112,7 +117,6 @@ Feedbin::Application.routes.draw do
       get :unread
       get :preload
       get :search
-      get :autocomplete_search
       get :recently_read, to: 'recently_read_entries#index'
       get :updated, to: 'updated_entries#index'
       post :mark_all_as_read
@@ -126,10 +130,8 @@ Feedbin::Application.routes.draw do
     get :billing
     get :import_export
     get :feeds
-    get :help
     get :appearance
     post :update_credit_card
-    post :mark_favicon_complete
     post :update_plan
     post :font
     post :theme
@@ -176,7 +178,8 @@ Feedbin::Application.routes.draw do
 
         resources :devices, only: [:create] do
           collection do
-            get :test
+            get :ios_test
+            get :safari_test
           end
         end
 

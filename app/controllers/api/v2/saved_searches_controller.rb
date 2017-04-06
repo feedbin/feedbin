@@ -23,19 +23,19 @@ module Api
 
         if saved_search.present?
           params[:query] = saved_search.query
-          if params[:include_entries] && params[:include_entries] == "true"
-            @entries = Entry.search(params, @user)
-            links_header(@entries, 'api_v2_saved_search_url', saved_search.id)
+          @entries = Entry.scoped_search(params, @user)
+          if out_of_bounds?
+            render json: []
+            return
           else
-            params[:load] = false
-            entries = Entry.search(params, @user)
-            links_header(entries, 'api_v2_saved_search_url', saved_search.id)
-            render json: entries.results.map {|entry| entry.id.to_i}.to_json
+            links_header(@entries, 'api_v2_saved_search_url', saved_search.id)
+          end
+          if params[:include_entries] != "true"
+            render json: @entries.results.map {|entry| entry.id.to_i}.to_json
           end
         else
           status_forbidden
         end
-
       end
 
       def create
@@ -49,7 +49,7 @@ module Api
         @saved_search = @user.saved_searches.where(id: params[:id]).first
         if @saved_search.present?
           @saved_search.destroy
-          render nothing: true, status: :no_content
+          head :no_content
         else
           status_forbidden
         end
@@ -72,7 +72,11 @@ module Api
       end
 
       def validate_create
-        needs 'query', 'name'
+        needs_nested params[:saved_search], 'query', 'name'
+      end
+
+      def out_of_bounds?
+        @entries.out_of_bounds? || (params[:page] && params[:page].to_i > 5)
       end
 
     end

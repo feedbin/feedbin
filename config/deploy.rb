@@ -19,56 +19,50 @@ set :bundle_cmd, "/usr/local/rbenv/shims/bundle"
 # Gets rid of trying to link public/* directories
 set :normalize_asset_timestamps, false
 
-set :assets_role, [:app, :worker]
+set :assets_role, [:app]
 
-role :app, "www1.feedbin.com", "www2.feedbin.com", "worker1.feedbin.com", "worker2.feedbin.com"
-role :worker, "worker1.feedbin.com", "worker2.feedbin.com"
+role :app, "app1.feedbin.com", "app2.feedbin.com"
 
 default_run_options[:pty] = true
 default_run_options[:shell] = '/bin/bash --login'
 
-namespace :foreman do
-
-  task :export_procs, roles: :app do
-    foreman_export = "foreman export --app #{application} --user #{user} --concurrency clock=1,sidekiq_web=1 --log #{shared_path}/log upstart /etc/init"
-    run "cd #{current_path} && sudo #{bundle_cmd} exec #{foreman_export}"
-  end
-
-end
-
 namespace :deploy do
   desc 'Start the application services'
-  task :start, roles: [:app, :worker] do
-    run "sudo /etc/init.d/unicorn start", roles: :app
-    run "sudo start #{application}"
-    run "sudo start workers", roles: :worker
-    run "sudo start workers_slow", roles: :worker
-    run "sudo start workers_images", roles: :worker
+  task :start do
+    run "sudo /etc/init.d/unicorn start"
+    run "sudo start clock"
+    run "sudo start workers"
+    run "sudo start workers_slow"
   end
 
   desc 'Stop the application services'
-  task :stop, roles: [:app, :worker] do
-    run "sudo /etc/init.d/unicorn stop", roles: :app
-    run "sudo stop #{application}"
-    run "sudo stop workers", roles: :worker
-    run "sudo stop workers_slow", roles: :worker
-    run "sudo stop workers_images", roles: :worker
+  task :stop do
+    run "sudo /etc/init.d/unicorn stop"
+    run "sudo stop clock"
+    run "sudo stop workers"
+    run "sudo stop workers_slow"
   end
 
   desc 'Restart services'
-  task :restart, roles: [:app, :worker] do
-    run "sudo /etc/init.d/unicorn start || sudo /etc/init.d/unicorn reload", roles: :app
-    run "sudo start #{application} || sudo restart #{application} || true"
-    run "sudo start workers || sudo restart workers", roles: :worker
-    run "sudo start workers_slow || sudo restart workers_slow", roles: :worker
-    run "sudo start workers_images || sudo restart workers_images", roles: :worker
+  task :restart do
+    run "sudo /etc/init.d/unicorn start || sudo /etc/init.d/unicorn reload"
+    run "sudo start clock || sudo restart clock || true"
+    run "sudo start workers || sudo restart workers"
+    run "sudo start workers_slow || sudo restart workers_slow"
   end
 
   desc 'Quiet Sidekiq'
-  task :quiet, roles: :worker do
+  task :quiet do
     run "sudo pkill --signal USR1 -f '^sidekiq'; true"
   end
+
+  desc 'Reload procs'
+  task :reload do
+    quiet
+    sleep(3)
+    restart
+  end
+
 end
 
 before 'deploy:update', 'deploy:quiet'
-after 'deploy:update', 'foreman:export_procs'

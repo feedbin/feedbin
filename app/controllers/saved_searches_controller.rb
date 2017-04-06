@@ -8,8 +8,13 @@ class SavedSearchesController < ApplicationController
 
     params[:query] = @saved_search.query
 
-    @entries = Entry.search(params, @user)
-    @page_query = @entries
+    begin
+      @entries = Entry.scoped_search(params, @user)
+      @page_query = @entries
+    rescue => exception
+      Honeybadger.notify(exception)
+      @entries = Entry.none
+    end
 
     @append = params[:page].present?
 
@@ -27,11 +32,6 @@ class SavedSearchesController < ApplicationController
     @user = current_user
     @saved_search = @user.saved_searches.create(saved_search_params)
     get_feeds_list
-  end
-
-  def edit
-    @user = current_user
-    @saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
   end
 
   def update

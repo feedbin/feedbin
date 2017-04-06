@@ -9,15 +9,21 @@ class BasePresenter
   def favicon(feed)
     @favicon ||= begin
       if feed.newsletter?
-        content = @template.content_tag :span, '', class: "favicon-wrap collection-favicon" do
+        content = @template.content_tag :span, '', class: "favicon-wrap collection-favicon favicon-newsletter-wrap" do
           @template.svg_tag('favicon-newsletter', size: "16x16")
         end
       else
-        favicon_classes = "favicon"
-        favicon_classes << " favicon-#{feed.host.gsub('.', '-')}" if feed.host
+        markup = <<-eos
+          <span class="favicon favicon-default"></span>
+        eos
+        if feed.favicon && feed.favicon.cdn_url
+          markup = <<-eos
+            <span class="favicon" style="background-image: url(#{feed.favicon.cdn_url});"></span>
+          eos
+        end
         content = <<-eos
           <span class="favicon-wrap">
-            <span class="#{favicon_classes}"></span>
+            #{markup}
           </span>
         eos
       end
@@ -28,6 +34,14 @@ class BasePresenter
   def favicon_with_url(host)
     @template.content_tag :span, '', class: "favicon-wrap" do
       @template.content_tag(:span, '', class: "favicon", style: "background-image: url(#{favicon_url(host)});")
+    end
+  end
+
+  def favicon_with_fallback
+    if @object.favicon && @object.favicon.cdn_url
+      favicon(@object)
+    else
+      favicon_with_url(@object.host)
     end
   end
 

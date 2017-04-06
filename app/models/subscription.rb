@@ -1,10 +1,10 @@
-class Subscription < ActiveRecord::Base
+class Subscription < ApplicationRecord
   attr_accessor :entries_count, :post_volume
 
   belongs_to :user
   belongs_to :feed, counter_cache: true
 
-  before_create :mark_as_unread
+  after_commit :mark_as_unread, on: [:create]
   before_destroy :mark_as_read
 
   before_create :expire_stat_cache
@@ -14,8 +14,23 @@ class Subscription < ActiveRecord::Base
   after_commit :remove_feed_from_action, on: [:destroy]
 
   before_destroy :untag
+  before_destroy :email_unsubscribe
 
-  after_create :update_favicon_hash
+  after_create :refresh_favicon
+
+  def self.create_multiple(feeds, user, valid_feed_ids)
+    @subscriptions = feeds.each_with_object([]) do |(feed_id, subscription), array|
+      feed = Feed.find(feed_id)
+      if valid_feed_ids.include?(feed.id) && subscription["subscribe"] == "1"
+        record = user.subscriptions.find_or_create_by(feed: feed)
+        record.update(title: subscription["title"].strip)
+        array.push(record)
+        if subscription["tags"].present?
+          feed.tag(subscription["tags"], user, true)
+        end
+      end
+    end
+  end
 
   def mark_as_unread
     base = Entry.select(:id, :feed_id, :published, :created_at).where(feed_id: self.feed_id).order('published DESC')
@@ -30,7 +45,7 @@ class Subscription < ActiveRecord::Base
   end
 
   def mark_as_read
-    UnreadEntry.delete_all(user_id: self.user_id, feed_id: self.feed_id)
+    UnreadEntry.where(user_id: self.user_id, feed_id: self.feed_id).delete_all
   end
 
   def add_feed_to_action
@@ -43,7 +58,8 @@ class Subscription < ActiveRecord::Base
   def remove_feed_from_action
     actions = Action.where(user_id: self.user_id)
     actions.each do |action|
-      action.feed_ids = action.feed_ids - [self.feed_id.to_s]
+      feed_ids = action.feed_ids || []
+      action.feed_ids = feed_ids - [self.feed_id.to_s]
       action.automatic_modification = true
       action.save
     end
@@ -53,20 +69,18 @@ class Subscription < ActiveRecord::Base
     Rails.cache.delete("#{self.user_id}:entry_counts")
   end
 
-  def update_favicon_hash
-    UpdateFaviconHash.perform_async(self.user_id)
-  end
-
   def untag
     self.feed.tag('', self.user)
   end
 
-  def show_updates?
-    self.show_updates
+  private
+
+  def email_unsubscribe
+    EmailUnsubscribe.perform_async(self.feed_id)
   end
 
-  def muted?
-    self.muted == true
+  def refresh_favicon
+    FaviconFetcher.perform_async(self.feed.host)
   end
 
 end

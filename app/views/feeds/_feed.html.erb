@@ -3,9 +3,9 @@
     <%= feed_presenter.feed_link do %>
       <%= feed_presenter.favicon(feed) %>
       <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byFeed', count_group_id: feed.id} %>
-      <%= form_for feed, remote: true, url: feed_rename_path(feed.id), autocomplete: 'off' do |f| %>
-        <%= f.text_field :title, namespace: feed.id, class: 'rename-feed-input disabled', data: {original: feed.title}, placeholder: feed.original_title, spellcheck: false %>
-      <% end %>
+      <span data-behavior="rename_target" data-form-action="<%= feed_rename_path(feed.id) %>" data-input-name="feed[title]" data-title="<%= feed.title %>", data-original-title="<%= feed.original_title %>">
+        <span data-behavior="user_title rename_title" data-feed-id="<%= feed.id %>"><%= feed.title %></span>
+      </span>
     <% end %>
   <% end %>
 <% end %>

@@ -31,7 +31,7 @@ module Api
           @entry = Entry.find(params[:id])
           if !@entry.present?
             status_not_found
-          elsif !current_user.subscribed_to?(params[:feed_id])
+          elsif !current_user.subscribed_to?(@entry.feed_id)
             status_forbidden
           end
         end

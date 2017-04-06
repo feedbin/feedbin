@@ -15,7 +15,9 @@
       </ul>
 
       <div class="description-inset">
-        <%= f.submit "Update", class: "button-plain no-margin" %>
+          <div class="button-wrap">
+              <%= f.submit "Update", class: "button no-margin" %>
+          </div>
       </div>
 
     <% end %>
@@ -36,14 +38,28 @@
       </ul>
 
       <div class="description-inset">
-        <%= f.submit "Update", class: "button-plain  no-margin" %>
+          <div class="button-wrap">
+              <%= f.submit "Update", class: "button  no-margin" %>
+          </div>
       </div>
     <% end %>
   </div>
 
-  <div class="description-inset">
-    <h3>Cancel Account</h3>
-    <p class="muted">Canceling your account will end your subscription immediately. All of your data will be deleted. <strong>You cannot undo this</strong>.</p>
-    <p><%= link_to "Cancel Account", user_path(@user), data: { confirm: "Are you sure?" }, method: :delete, class: 'button button-danger button-link' %></p>
+  <div class="inset">
+      <div class="inset-content">
+          <h4 class="group-header">Cancel Account</h4>
+      </div>
+
+      <div class="description-inset">
+          <p class="muted">Canceling your account will end your subscription immediately. All of your data will be deleted. <strong>You cannot undo this</strong>.</p>
+      </div>
+
+
+      <div class="description-inset">
+          <div class="button-wrap">
+              <p><%= link_to "Cancel Account", user_path(@user), data: { confirm: "Are you sure?" }, method: :delete, class: 'button button-secondary' %></p>
+          </div>
+      </div>
   </div>
+
 </div>

@@ -66,11 +66,18 @@ class EntryPresenter < BasePresenter
   def formatted_content
     @formatted_content ||= begin
       formatted_content = entry.content
-      if entry.content_format == "text"
+      if text?
         formatted_content = ContentFormatter.text_email(formatted_content)
+      elsif youtube?
+        formatted_content = ContentFormatter.text_email(formatted_content)
+        formatted_content = @template.content_tag(:iframe, '', width: entry.data["media_width"], height: entry.data["media_height"], src: "https://www.youtube-nocookie.com/embed/#{entry.data["youtube_video_id"]}?rel=0&amp;showinfo=0", frameborder: 0, allowfullscreen: true) + formatted_content
       end
       formatted_content
     end
+  end
+
+  def text?
+    entry.content_format == "text"
   end
 
   def has_content?
@@ -85,15 +92,17 @@ class EntryPresenter < BasePresenter
     if text.blank?
       text = '&ndash;&ndash;'.html_safe
     end
-    text
+    @template.truncate(text, length: 98, omission: '…', escape: false)
   end
 
   def entry_view_title
-    text = sanitized_title
-    if text.blank?
-      text = @template.content_tag(:span, '&ndash;&ndash;'.html_safe, title: "No title").html_safe
+    @entry_view_title ||= begin
+      text = sanitized_title
+      if text.blank?
+        text = @template.content_tag(:span, '&ndash;&ndash;'.html_safe, title: "No title").html_safe
+      end
+      text
     end
-    text
   end
 
   def sanitized_title
@@ -154,7 +163,6 @@ class EntryPresenter < BasePresenter
   def feed_domain_matches?(comparison)
     begin
       uri = URI.parse(entry.feed.site_url)
-      puts uri.host
       uri.host == comparison || uri.host == comparison.sub('www.', '')
     rescue Exception
       false
@@ -173,6 +181,7 @@ class EntryPresenter < BasePresenter
     if image?
       url = URI(entry.image["processed_url"])
       url.host = ENV['ENTRY_IMAGE_HOST'] if ENV['ENTRY_IMAGE_HOST']
+      url.scheme = 'https'
       padding = (entry.image["height"].to_f / entry.image["width"].to_f).round(4) * 100
       @template.content_tag :span, class: "entry-image" do
         @template.content_tag :span, "", data: {src: url.to_s }, style: "padding-top: #{padding}%;"

@@ -1,0 +1,22 @@
+ben_one:
+  user: ben
+  query: lorem
+  actions:
+    - mark_read
+  all_feeds: true
+  title: Mark lorem read
+  action_type: 0
+
+api:
+  user: ben
+  title: title
+  action_type: 0
+  query: query
+  feed_ids:
+    - 1
+    - 2
+  tag_ids:
+    - 1
+    - 2
+  actions:
+    - mark_read

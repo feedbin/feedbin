@@ -1,0 +1,6 @@
+$('[data-behavior~=<%= @user.customer_id %>]').html('<%= j render partial: 'user', locals: {user: @user} %>')
+
+clearTimeout(clearMessage);
+var clearMessage = setTimeout(function() {
+    $('[data-behavior~=flash_wrap]').html('');
+}, 5000)

@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Feedbin</title>
+    <subtitle>A fast, simple RSS feed reader that delivers a great reading experience.</subtitle>
+    <link rel="hub" href="http://pubsubhubbub.superfeedr.com/" />
+    <link href="https://feedbin.com/blog/atom.xml" rel="self" />
+    <link href="https://feedbin.com" />
+    <updated>2016-06-03T13:25:02-05:00</updated>
+    <id>https://feedbin.com</id>
+    <author>
+        <name>Feedbin</name>
+        <email>support@feedbin.com</email>
+    </author>
+
+
+    <entry>
+        <title>Subscribe to Email Newsletters in Feedbin</title>
+        <author>
+            <name>Ben Ubois</name>
+        </author>
+        <link href="https://feedbin.com/blog/2016/02/03/subscribe-to-email-newsletters-in-feedbin/" />
+
+            <published>2016-02-03T15:37:25-06:00</published>
+
+
+            <updated>2016-02-03T00:00:00-06:00</updated>
+
+        <id>/2016/02/03/subscribe-to-email-newsletters-in-feedbin</id>
+        <summary>You can now receive email newsletters in Feedbin. Newsletter Subscriptions To use this feature, go to the settings page and find your secret Feedbin email address. Use this email address whenever you sign up for an email newsletter. Anything sent to it will show up as a feed in Feedbin,...</summary>
+        <content type="html">&lt;p&gt;You can now receive email newsletters in Feedbin.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;a href=&quot;https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2016-02-03/email-large-ce9a0b27d895b4cb89429bb1d5773e0d1a394ef225dab5c0ced8c4419ed05bae.png&quot;&gt;&lt;img src=&quot;https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2016-02-03/email-large-ce9a0b27d895b4cb89429bb1d5773e0d1a394ef225dab5c0ced8c4419ed05bae.png&quot; /&gt;&lt;/a&gt;
+  &lt;figcaption&gt;Newsletter Subscriptions&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;To use this feature, go to the &lt;a href=&quot;https://feedbin.com/settings&quot;&gt;settings&lt;/a&gt; page and find your secret Feedbin email address. Use this email address whenever you sign up for an email newsletter. Anything sent to it will show up as a feed in Feedbin, grouped by sender.&lt;/p&gt;
+
+&lt;p&gt;Reading email in an email app feels like work to me. However, there’s a certain class of email that I &lt;em&gt;want&lt;/em&gt; to enjoy reading, and Feedbin is where I go when I want to read for pleasure.&lt;/p&gt;
+
+&lt;p&gt;For example, many great websites offer subscription content, usually with an email newsletter component. Not only do I enjoy the premium content from these sites, but I believe this a great way forward for people to support writers. Personally I have paid subscriptions to four of these including:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.macstories.net&quot;&gt;MacStories&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://www.aboveavalon.com&quot;&gt;Above Avalon&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://stratechery.com&quot;&gt;Stratechery&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://sixcolors.com&quot;&gt;Six Colors&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This feature is also great for mailing lists and product announcement emails and since it’s just a regular feed, it will sync with your favorite native app as well.&lt;/p&gt;
+</content>
+    </entry>
+
+    <entry>
+        <title>Feedbin Notifier vs. Notify by Facebook</title>
+        <author>
+            <name>Ben Ubois</name>
+        </author>
+        <link href="https://feedbin.com/blog/2015/11/11/feedbin-notifier-vs-notify-by-facebook/" />
+
+            <published>2015-11-11T15:44:00-06:00</published>
+
+
+            <updated>2015-11-11T00:00:00-06:00</updated>
+
+        <id>/2015/11/11/feedbin-notifier-vs-notify-by-facebook</id>
+        <summary>Today, Notify by Facebook was released. Conceptually, this is a similar app to Feedbin Notifier, which was released two days ago. The timing is coincidental but still interesting. Left: Feedbin Notifier. Right: Notify by Facebook. A similar coincidence happened when Feedbin launched, which is that two days later Google announced...</summary>
+        <content type="html">&lt;p&gt;Today, &lt;a href=&quot;https://notify.co/&quot;&gt;Notify by Facebook&lt;/a&gt; was released. Conceptually, this is a similar app to &lt;a href=&quot;https://feedbin.com/notifier&quot;&gt;Feedbin Notifier&lt;/a&gt;, which was released &lt;a href=&quot;https://feedbin.com/blog/2015/11/08/notifier/&quot;&gt;two days ago&lt;/a&gt;. The timing is coincidental but still interesting.&lt;/p&gt;
+
+&lt;figure&gt;
+  &lt;a href=&quot;https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2015-11-11/comparison_large-c56f942852b4f4aafba371de0aa2774be8f3888b696a2aadf4a122f97516bcca.png&quot;&gt;&lt;img src=&quot;https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2015-11-11/comparison-12756a9e8953957f3167c3ee6ea6f33a8ec4bf2a742a6455af6fcb9d2c3e245e.png&quot; /&gt;&lt;/a&gt;
+  &lt;figcaption&gt;Left: Feedbin Notifier. Right: Notify by Facebook.&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;A similar coincidence happened when &lt;a href=&quot;https://feedbin.com/blog/2013/03/12/rediscover-rss/&quot;&gt;Feedbin launched&lt;/a&gt;, which is that two days later &lt;a href=&quot;http://googlereader.blogspot.com/2013/03/powering-down-google-reader.html&quot;&gt;Google announced they were shutting down Reader&lt;/a&gt;. Weird timing.&lt;/p&gt;
+
+&lt;p&gt;In my mind, Feedbin Notifier offers many advantages over Notify. The biggest reason to choose Feedbin Notifier is that it works with any source that offers an RSS feed, while Facebook has a limited number of built in sources.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;Feature&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;Feedbin Notifier&lt;/th&gt;
+      &lt;th style=&quot;text-align: right&quot;&gt;Notify by Facebook&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Sources&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;Anything with an RSS feed&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;72&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Apple Watch App&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;Yes&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;No&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Read offline&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;Yes&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;No&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Spotlight Integration&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;Yes&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;No&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Sync&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;Yes&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;No&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Privacy&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;Yes&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;LOL&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Price&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;$3/mo&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;Free&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;This comparison is obviously biased. However, it is worth pointing out that Notify costs nothing, while Notifier only works with a paid Feedbin subscription.&lt;/p&gt;
+
+&lt;p&gt;I think that having a large free competitor like this validates the idea. It also creates a market for a premium, more fully-featured version, which is what Feedbin Notifier is. Competing with Free is nothing new, it’s what Feedbin has been doing since day one.&lt;/p&gt;
+</content>
+    </entry>
+
+    <entry>
+        <title>Feedbin Notifier for iPhone, iPad and Apple Watch</title>
+        <author>
+            <name>Ben Ubois</name>
+        </author>
+        <link href="https://feedbin.com/blog/2015/11/08/notifier/" />
+
+            <published>2015-11-09T12:14:00-06:00</published>
+
+
+            <updated>2015-11-08T00:00:00-06:00</updated>
+
+        <id>/2015/11/08/notifier</id>
+        <summary>There are already many great full-featured apps that work with Feedbin. Feedbin Notifier aims to be different. Feedbin Notifier is a notifications based reader. The idea is to select the handful of feeds or keywords you care about most. Then when Feedbin matches an article, it will send a push...</summary>
+        <content type="html">&lt;p&gt;There are already many great full-featured apps that work with Feedbin. &lt;a href=&quot;/notifier&quot;&gt;Feedbin Notifier&lt;/a&gt; aims to be different.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://itunes.apple.com/app/feedbin-notifier/id996164128?mt=8&quot;&gt;&lt;img src=&quot;https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2015-11-09/notifier-7164c36f94df6fbe9cec47d9e8c4f4d2ee04460e28ea258e41d8f33ef843b83a.png&quot; class=&quot;image-notifier&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Feedbin Notifier is a notifications based reader. The idea is to select the handful of feeds or keywords you care about most. Then when Feedbin matches an article, it will send a push notification to your iPhone, iPad or Apple Watch, keeping you informed throughout the day.&lt;/p&gt;
+
+&lt;p&gt;This way, Notification Center becomes the primary interface for catching up on the stories that are important to you. You’ll see articles along side your email and other notifications allowing tell at a glance if there’s anything you want to read right away.&lt;/p&gt;
+
+&lt;p&gt;Feedbin is a free universal app for iPhone, iPad and the Apple Watch. On the Apple Watch you can read full articles right away or for a better reading experience use Handoff to continue reading on your iPhone or iPad.&lt;/p&gt;
+
+&lt;p&gt;Hope you enjoy it! Would love to &lt;a href=&quot;https://twitter.com/feedbin&quot;&gt;hear your feedback&lt;/a&gt;.&lt;/p&gt;
+</content>
+    </entry>
+
+    <entry>
+        <title>Image Previews</title>
+        <author>
+            <name>Ben Ubois</name>
+        </author>
+        <link href="https://feedbin.com/blog/2015/10/22/image-previews/" />
+
+            <published>2015-10-22T00:00:00-05:00</published>
+
+
+            <updated>2015-10-22T00:00:00-05:00</updated>
+
+        <id>/2015/10/22/image-previews</id>
+        <summary>Feedbin now features image previews in the center column. Feedbin, now with more images. The most important thing to me when building this feature was that only images that are reasonably high quality would show up here. To do this Feedbin uses a set of criteria that an image must...</summary>
+        <content type="html">&lt;p&gt;Feedbin now features image previews in the center column.&lt;/p&gt;
+
+&lt;figure&gt;
+	&lt;a href=&quot;https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2015-10-22/screenshot_one_large-b08bfd8618a62a09fbad6b70ba28c973a70f1815a2e4fe00a78392b76f05720b.jpg&quot;&gt;
+        &lt;img src=&quot;https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2015-10-22/screenshot_one_small-8e3180a61ba1fb72768ab7e21037dd431d40c07e64d146a24adfed06e6fa6158.jpg&quot; /&gt;
+    &lt;/a&gt;
+	&lt;figcaption&gt;Feedbin, now with more images.&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;The most important thing to me when building this feature was that only images that are reasonably high quality would show up here. To do this Feedbin uses a set of criteria that an image must meet in order to be chosen.&lt;/p&gt;
+
+&lt;p&gt;Feedbin can find a variety of images including:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Images in the RSS post&lt;/li&gt;
+  &lt;li&gt;Poster frames from YouTube and Vimeo embeds&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://ogp.me/&quot;&gt;Open Graph&lt;/a&gt; and &lt;a href=&quot;https://dev.twitter.com/cards/overview&quot;&gt;Twitter Card&lt;/a&gt; meta data&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;One of my favorite operations that Feedbin does to ensure the quality of these image previews is facial detection using &lt;a href=&quot;http://opencv.org/&quot;&gt;OpenCV&lt;/a&gt;. By getting a rough idea about where faces in an image might be, Feedbin is able to get a better crop. I first saw this idea used in &lt;a href=&quot;http://blog.iconfactory.com/2015/06/twitterrifics-new-facial-recognition-keeps-faces-front-center/&quot;&gt;Twitterrific&lt;/a&gt; and loved the results.&lt;/p&gt;
+
+&lt;figure&gt;
+    &lt;img src=&quot;https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2015-10-22/crop_smart-cf421c97e5ff5181774b0655490144581705d8cd1fea64e9045a23814c72daa7.jpg&quot; /&gt;
+    &lt;figcaption&gt;Crop with face detection. Sample image from &lt;a href=&quot;https://thegreatdiscontent.com/interview/jim-riswold&quot;&gt;The Great Discontent&lt;/a&gt;.&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;figure&gt;
+    &lt;img src=&quot;https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2015-10-22/crop_naive-16be8a0d9b8f9edbfcc413049e68cc17354a18678b3adb6efd92787684e7ccac.jpg&quot; /&gt;
+    &lt;figcaption&gt;Crop without face detection. Sample image from &lt;a href=&quot;https://thegreatdiscontent.com/interview/jim-riswold&quot;&gt;The Great Discontent&lt;/a&gt;.&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Adding images is a big visual change and if you prefer the old look you can turn off image previews in the &lt;a href=&quot;https://feedbin.com/settings/appearance&quot;&gt;Appearance settings&lt;/a&gt;.&lt;/p&gt;
+</content>
+    </entry>
+
+    <entry>
+        <title>Link Opener for Chrome</title>
+        <author>
+            <name>Ben Ubois</name>
+        </author>
+        <link href="https://feedbin.com/blog/2015/03/09/link-opener-for-chrome/" />
+
+            <published>2015-03-09T00:00:00-05:00</published>
+
+
+            <updated>2015-03-09T00:00:00-05:00</updated>
+
+        <id>/2015/03/09/link-opener-for-chrome</id>
+        <summary>This official extension restores the ability for Chrome users to open article links in a background tab using a configurable keyboard shortcut. Previously this was possible without an extension, however the Chrome team recently removed this feature. The default shortcut to open a link is option/alt + v. This can...</summary>
+        <content type="html">&lt;p&gt;This &lt;a href=&quot;https://chrome.google.com/webstore/detail/feedbin-link-opener/naflkhnfmneiigdcphekaemdmeajiand&quot;&gt;official extension&lt;/a&gt; restores the ability for Chrome users to open article links in a background tab using a configurable keyboard shortcut.&lt;/p&gt;
+
+&lt;p&gt;Previously this was possible without an extension, however the Chrome team &lt;a href=&quot;https://code.google.com/p/chromium/issues/detail?id=456910&quot;&gt;recently removed this feature&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The default shortcut to open a link is &lt;code class=&quot;highlighter-rouge&quot;&gt;option/alt + v&lt;/code&gt;. This can be customized in Chrome’s &lt;a href=&quot;chrome://extensions/configureCommands&quot;&gt;Keyboard Shortcuts for Extensions and Apps&lt;/a&gt; page.&lt;/p&gt;
+
+&lt;p&gt;The &lt;a href=&quot;https://github.com/feedbin/feedbin-link-opener-chrome&quot;&gt;extension is open source&lt;/a&gt; and ideas for improvements are welcome.&lt;/p&gt;
+
+&lt;p&gt;An extension for Safari is not necessary because WebKit still supports the browser API to create background tabs.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Update:&lt;/strong&gt; Martijn van der Ven has created a &lt;a href=&quot;https://github.com/Zegnat/feedbin-link-opener-firefox/releases/&quot;&gt;FireFox version of this extension&lt;/a&gt;. Thanks Martijn!&lt;/p&gt;
+</content>
+    </entry>
+
+</feed>

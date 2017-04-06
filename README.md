@@ -2,11 +2,11 @@ Feedbin
 =======
 [![Build Status](https://travis-ci.org/feedbin/feedbin.svg?branch=master)](https://travis-ci.org/feedbin/feedbin)
 [![Code Climate](https://codeclimate.com/github/feedbin/feedbin.svg)](https://codeclimate.com/github/feedbin/feedbin)
-[![Test Coverage](https://codeclimate.com/github/feedbin/feedbin/badges/coverage.svg)](https://codeclimate.com/github/feedbin/feedbin)
+[![Coverage Status](https://coveralls.io/repos/github/feedbin/feedbin/badge.svg)](https://coveralls.io/github/feedbin/feedbin)
 
 Feedbin is a simple, fast and nice looking RSS reader.
 
-![Feedbin Screenshot](https://www.dropbox.com/s/1crp6nmoh6uwjp1/_screenshot.jpg?dl=1)
+![Feedbin Screenshot](https://feedbin.github.io/files/feedbin_screenshot.jpeg)
 
 Introduction
 ------------
@@ -15,10 +15,12 @@ Feedbin is a web based RSS reader. It provides a user interface for reading and 
 
 If you would like to try Feedbin out you can [sign up](https://feedbin.com/) for an account.
 
-The main Feedbin project is a [Rails 4.0](http://rubyonrails.org/) application. In addition to the main project there are several other services that provide additional functionality. None of these services are required to get Feedbin running locally, but they all provide important functionality that you would want for a production install.
+The main Feedbin project is a [Rails 5](http://rubyonrails.org/) application. In addition to the main project there are several other services that provide additional functionality. None of these services are required to get Feedbin running locally, but they all provide important functionality that you would want for a production install.
 
  - [**refresher:**](https://github.com/feedbin/refresher)
    Refresher is the service that does feed refreshing. Feed refreshes are scheduled as background jobs using [Sidekiq](https://github.com/mperham/sidekiq). Refresher is kept separate so it can be scaled independently. It's also a benefit to not have to load all of Rails for this service.
+ - [**image:**](https://github.com/feedbin/image)
+   Image is the service that finds images to be [associated with articles](https://feedbin.com/blog/2015/10/22/image-previews/)
  - [**camo:**](https://github.com/atmos/camo)
    Camo is an https image proxy. In production Feedbin is SSL only. One issue with SSL is all assets must be served over SSL as well or the browser will show insecure content warnings. Camo proxies all image requests through an SSL enabled host to prevent this.
 
@@ -26,9 +28,9 @@ Requirements
 ------------
 
  - Mac OS X or Linux
- - [Ruby 2.0](http://www.ruby-lang.org/en/)
+ - [Ruby 2.3.1](http://www.ruby-lang.org/en/)
  - [Postgres 9.2.4](http://www.postgresql.org/)
- - [Redis 2.6.13](http://redis.io/)
+ - [Redis > 2.8](http://redis.io/)
 
 Installation
 -------------
@@ -76,30 +78,8 @@ Feedbin uses environment variables for configuration. Feedbin will run without t
 
 These variables will need to be available in the environment of the user running the app.
 
-Locally, I use [dotenv](https://github.com/bkeepers/dotenv) combined with [pow](http://pow.cx/). Pow's `.powenv` file is set up to read dotenv's .env file like:
-
-```shell
-export $(cat .env)
-```
-
-This is necessary so the environment variables can be read by both Pow and Unicorn.
-
-In a production environment, variables are set in the `app` users ~/.bash_profile like:
-
-```shell
-export AWS_ACCESS_KEY_ID=aoisjf3j23oij23f
-...
-```
-
 ### Feedbin Install Guides
 
 - [Mac OS X](doc/INSTALL-mac.md)
 - [Ubuntu](doc/INSTALL-ubuntu.md) (incomplete)
 - [Fedora](doc/INSTALL-fedora.md)
-
-
-### Pair With Me
-
-Have a feature you would like to add but don't know where to start?
-
-Email [support@feedbin.com](support@feedbin.com) and we'll set something up to work on it together.

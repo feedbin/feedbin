@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title><%= @title || 'Feedbin' %></title>
+  <title><%= @title || 'Feedbin' %><%= branch_info if Rails.env.development? %></title>
   <meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no" />
   <link rel="mask-icon" href="<%= asset_path('website-icon.svg') %>" color="#000000" />
   <link rel="apple-touch-icon-precomposed" href="<%= asset_path('apple-touch-icon-precomposed.png') %>" />
@@ -15,7 +15,6 @@
 <body class="<%= @class %>" data-behavior="<%= @behavior %>">
   <%= content_for?(:content) ? yield(:content) : yield %>
   <%= render partial: 'shared/tracking' %>
-  <%= render partial: 'shared/favicons' %>
   <%= render partial: 'shared/fonts' %>
 </body>
 </html>

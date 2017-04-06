@@ -1,3 +1,5 @@
+require 'socket'
+
 class ParsedEntry
 
   ENTRY_ATTRIBUTES = %i(author content data entry_id public_id published source title url).freeze
@@ -5,6 +7,54 @@ class ParsedEntry
   def initialize(entry, feed_url)
     @entry = entry
     @feed_url = feed_url
+  end
+
+  def to_entry
+    @to_entry ||= begin
+      ENTRY_ATTRIBUTES.each_with_object({}) do |attribute, hash|
+        hash[attribute] = self.send(attribute)
+      end
+    end
+  end
+
+  def build_id(base_entry_id)
+    parts = []
+    parts.push(@feed_url)
+    parts.push(base_entry_id)
+    if !entry_id
+      parts.push(url)
+      parts.push(published.iso8601) if published.respond_to?(:iso8601)
+      parts.push(title)
+    end
+    Digest::SHA1.hexdigest(parts.compact.join)
+  end
+
+  def public_id
+    @public_id ||= build_id(entry_id)
+  end
+
+  def public_id_alt
+    @public_id_alt ||= begin
+      if entry_id_alt
+        build_id(entry_id_alt)
+      end
+    end
+  end
+
+  def entry_id
+    @entry.entry_id ? @entry.entry_id.strip : nil
+  end
+
+  def entry_id_alt
+    @entry_id_alt ||= begin
+      if entry_id
+        if entry_id.include?("http:")
+          entry_id.sub("http:", "https:")
+        elsif entry_id.include?("https:")
+          entry_id.sub("https:", "http:")
+        end
+      end
+    end
   end
 
   def author
@@ -44,39 +94,16 @@ class ParsedEntry
     value[:youtube_video_id] = @entry.youtube_video_id if @entry.try(:youtube_video_id)
     value[:media_width]      = @entry.media_width if @entry.try(:media_width)
     value[:media_height]     = @entry.media_height if @entry.try(:media_height)
+    value[:public_id_alt]    = public_id_alt if public_id_alt
     value
   end
 
-  def entry_id
-    @entry.entry_id ? @entry.entry_id.strip : nil
-  end
-
-  def public_id
-    @public_id ||= begin
-      id_string = @feed_url.dup
-      if @entry.entry_id
-        id_string << @entry.entry_id.dup
-      else
-        if @entry.url
-          id_string << @entry.url.dup
-        end
-        if @entry.published
-          id_string << @entry.published.iso8601
-        end
-        if @entry.title
-          id_string << @entry.title.dup
-        end
-      end
-      Digest::SHA1.hexdigest(id_string)
-    end
-  end
-
   def published
-    @entry.published || Time.now
+    @entry.published
   end
 
   def source
-    "Feedbin"
+    Socket.gethostname
   end
 
   def title
@@ -85,14 +112,6 @@ class ParsedEntry
 
   def url
     @entry.url ? @entry.url.strip : nil
-  end
-
-  def to_entry
-    @to_entry ||= begin
-      ENTRY_ATTRIBUTES.each_with_object({}) do |attribute, hash|
-        hash[attribute] = self.send(attribute)
-      end
-    end
   end
 
 end

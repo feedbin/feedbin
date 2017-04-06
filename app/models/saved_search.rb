@@ -1,3 +1,3 @@
-class SavedSearch < ActiveRecord::Base
+class SavedSearch < ApplicationRecord
   belongs_to :user
 end

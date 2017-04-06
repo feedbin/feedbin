@@ -16,6 +16,9 @@
                                 <h3><a href="<%= @subscription.feed.site_url %>"><%= @subscription.title || @subscription.feed.title %></a></h3>
                                 <p class="subhead"><a href="<%= @subscription.feed.feed_url %>"><%= @subscription.feed.feed_url %></a></p>
                             </div>
+                            <div class="half">
+                                <%= link_to 'Unsubscribe', settings_destroy_subscription_path(@subscription), method: :delete, class: 'button-secondary pull-right' , data: { confirm: 'Are you sure you want to unsubscribe?' } %>
+                            </div>
                         </div>
                         <div class="chart-wrap">
                             <div class="y-axis">
@@ -82,6 +85,13 @@
             <p class="control-group-description">
                 Tells you when an article has been changed after being published
             </p>
+
+            <ul class="control-group control-group-form">
+                <li>
+                    <%= link_to 'Refresh Favicon', refresh_favicon_subscription_path(@subscription), remote: true, method: :post %>
+                </li>
+            </ul>
+
         </div>
     </div>
     <% end %>

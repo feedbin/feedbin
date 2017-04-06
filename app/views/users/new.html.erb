@@ -17,7 +17,7 @@
         <% end %>
     </h3>
 
-    <%= form_for @user, html: { class: 'combined-form', data: { behavior: 'credit_card_form' } } do |f| %>
+    <%= form_for @user, html: { class: 'combined-form', data: { behavior: 'credit_card_form' }, novalidate: true } do |f| %>
       <% if @user.errors.any? %>
         <div class="alert alert-error">
           <%= @user.errors.full_messages.join('. ') %>.
@@ -28,12 +28,12 @@
         <%= f.hidden_field :plan_id %>
       <% end %>
 
-      <% if @coupon_valid == true %>
+      <% if @user.coupon_valid %>
         <%= f.hidden_field :coupon_code %>
         <div class="alert alert-success">
           Your coupon gets you a free account.
         </div>
-      <% elsif @coupon_valid == false %>
+      <% elsif @user.coupon_valid == false %>
         <div class="alert alert-error">
           Invalid coupon.
         </div>

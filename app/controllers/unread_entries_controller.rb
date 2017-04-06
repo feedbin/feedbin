@@ -11,7 +11,7 @@ class UnreadEntriesController < ApplicationController
       UnreadEntry.create_from_owners(@user, @entry)
     end
 
-    render nothing: true
+    head :ok
   end
 
 end

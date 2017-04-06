@@ -44,12 +44,6 @@ $.extend feedbin,
     feedbin.closeEntryBasement(0)
     $('[data-behavior~=entry_content_target]').html(html)
 
-  modalBox: (html) ->
-    $('.modal-target').html(html)
-    $('.modal').modal
-      backdrop: false
-    feedbin.modalShowing = true
-
   updateFeeds: (feeds) ->
     $('[data-behavior~=feeds_target]').html(feeds)
 
@@ -136,11 +130,17 @@ $.extend feedbin,
       $(@).text(date.format("%B %e, %Y at %l:%M %p"))
 
   applyUserTitles: ->
+    textarea = document.createElement("textarea")
     $('[data-behavior~=user_title]').each ->
-      feedId = $(@).data('feed-id')
-      if (feedId of feedbin.data.user_titles)
-        newTitle = feedbin.data.user_titles[feedId]
-        $(@).html(newTitle)
+      element = $(@)
+      feed = element.data('feed-id')
+      if (feed of feedbin.data.user_titles)
+        newTitle = feedbin.data.user_titles[feed]
+        if element.prop('tagName') == "INPUT"
+          textarea.innerHTML = newTitle
+          element.val(textarea.value)
+        else
+          element.html(newTitle)
 
   queryString: (name) ->
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]")
@@ -165,11 +165,12 @@ $.extend feedbin,
       appendTo: $(element).closest(".tags-form").children("[data-behavior=tag_completions]")
       delimiter: /(,)\s*/
 
-  preloadEntries: (entry_ids) ->
+  preloadEntries: (entry_ids, forcePreload = false) ->
     cachedIds = []
     for key of feedbin.entries
       cachedIds.push key * 1
-    entry_ids = _.difference(entry_ids, cachedIds)
+    if !forcePreload
+      entry_ids = _.difference(entry_ids, cachedIds)
     if entry_ids.length > 0
       $.getJSON feedbin.data.preload_entries_path, {ids: entry_ids.join(',')}, (data) ->
         $.extend feedbin.entries, data
@@ -191,13 +192,20 @@ $.extend feedbin,
     $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com'], iframe[src*='embed-ssl.ted.com']"});
 
   formatTweets: ->
-    if typeof(twttr) != "undefined"
+    if typeof(twttr) != "undefined" && typeof(twttr.widgets) != "undefined"
       target = $('[data-behavior~=entry_content_wrap]')[0]
       result = twttr.widgets.load(target)
 
   formatInstagram: ->
     if typeof(instgrm) != "undefined"
       instgrm.Embeds.process()
+
+  checkType: ->
+    element = $('.entry-final-content')
+    if element.length > 0
+      tag = element.children().get(0).nodeName
+      if tag == "TABLE"
+        $('.entry-type-default').removeClass("entry-type-default").addClass("entry-type-newsletter");
 
   formatImages: ->
     $("[data-behavior~=entry_content_wrap] img").each ->
@@ -225,6 +233,7 @@ $.extend feedbin,
       feedbin.formatTweets()
       feedbin.formatInstagram()
       feedbin.formatImages()
+      feedbin.checkType()
     catch error
       if 'console' of window
         console.log error
@@ -310,12 +319,6 @@ $.extend feedbin,
       $('.next-entry-preview').removeClass('no-content')
     else
       $('.next-entry-preview').addClass('no-content')
-
-  showSubscribe: ->
-    $('.subscribe-wrap input').val('')
-    $('.subscribe-wrap input').focus()
-    $('.feeds-inner').addClass('show-subscribe')
-    $('.subscribe-wrap').addClass('open')
 
   hideSubscribe: ->
     $('.feeds-inner').removeClass('show-subscribe')
@@ -506,11 +509,11 @@ $.extend feedbin,
     feedbin.updateEntryContent(entry.content)
     feedbin.formatEntryContent(entryId, true)
 
-  tagFeed: (url, tag) ->
+  tagFeed: (url, tag, noResponse = true) ->
     $.ajax
       type: "POST",
       url: url,
-      data: { _method: "patch", feed: {tag_list: tag}, no_response: true }
+      data: { _method: "patch", feed: {tag_list: tag}, no_response: noResponse }
 
   hideEmptyTags: ->
     $('[data-tag-id]').each ->
@@ -544,7 +547,7 @@ $.extend feedbin,
           feedId = parseInt(ui.draggable.data('feed-id'))
           url = ui.draggable.data('feed-path')
           target = $(event.target)
-          tag = $("> a", event.target).find(".rename-feed-input").val()
+          tag = $("> a", event.target).find("[data-behavior~=rename_title]").text()
 
           if tag?
             tagId = $(event.target).data('tag-id')
@@ -565,6 +568,27 @@ $.extend feedbin,
     $.get(feedbin.data.refresh_sessions_path).success(->
       $.ajax(xhr)
     )
+
+  modal: (selector) ->
+    activeModal = $(selector)
+    $('.modal').each ->
+      unless $(@).get(0) == activeModal.get(0)
+        $(@).modal('hide')
+    activeModal.modal('toggle')
+
+  updateFeedSearchMessage: ->
+    length = $('[data-behavior~=check_toggle]:checked').length
+    show = (message) ->
+      $("#add_form_modal [data-behavior~=feeds_search_message]").addClass("hide")
+      $("#add_form_modal [data-behavior~=feeds_search_message][data-behavior~=#{message}]").removeClass("hide")
+
+    if length == 0
+      show("message_none")
+    else if length == 1
+      show("message_one")
+    else
+      show("message_multiple")
+
 
   entries: {}
 
@@ -618,34 +642,56 @@ $.extend feedbin,
     renameFeed: ->
       $(document).on 'dblclick', '[data-behavior~=renamable]', (event) ->
         unless $(event.target).is('.feed-action-button')
-          feedTitle = $(@).find('.rename-feed-input')
-          feedTitle.removeClass('disabled')
-          feedTitle.select()
+          target = $(@).find('[data-behavior~=rename_target]')
+          title = $(@).find('[data-behavior~=rename_title]')
+          data = target.data()
 
-      $(document).on 'blur', '.rename-feed-input', (event) ->
-        field = $(@)
-        title = field.data('original')
-        field.val(title)
-        field.addClass('disabled')
+          formAttributes =
+            "accept-charset": "UTF-8"
+            "data-remote": "true"
+            "method": "post"
+            "action": data.formAction
+            "data-behavior": "rename_form"
+          form = $('<form>', formAttributes)
+
+          inputAttributes =
+            "placeholder": data.originalTitle
+            "value": data.title
+            "name": data.inputName
+            "data-behavior": "rename_input"
+            "type": "text"
+            "spellcheck": "false"
+            "class": "rename-feed-input"
+
+          input = $('<input>', inputAttributes)
+          methodInput = $('<input>', {type: "hidden", name: "_method", value: "patch"})
+
+          form.append(input)
+          form.append(methodInput)
+
+          title.addClass('hide')
+          target.append(form)
+          input.select()
+
+      $(document).on 'blur', '[data-behavior~=rename_input]', (event) ->
+        $('[data-behavior~=rename_form]').remove()
+        $('[data-behavior~=rename_title]').removeClass('hide')
+
+      $(document).on 'submit', '[data-behavior~=rename_form]', (event, xhr) ->
+        container = $(@).closest('[data-behavior~=renamable]')
+        title = container.find('[data-behavior~=rename_title]')
+        input = container.find('[data-behavior~=rename_input]')
+        target = container.find('[data-behavior~=rename_target]')
+        target.data('title', input.val())
+        title.text(input.val())
+
+        $('[data-behavior~=rename_form]').remove()
+        $('[data-behavior~=rename_title]').removeClass('hide')
 
       $(document).on 'click', '[data-behavior~=open_item]', (event) ->
-        $('.rename-feed-input').each ->
-          $(@).blur()
-
-      $(document).on 'submit', '.edit_feed', (event, xhr) ->
-        field = $(@).find('.rename-feed-input')
-
-        title = field.val() || field.attr('placeholder')
-
-        field.data 'original', title
-        field.blur()
-
-        event.preventDefault()
-        event.stopPropagation()
-
-      $(document).on 'click', '.rename-feed-input', (event, xhr) ->
-        if !$(@).hasClass('disabled')
-          return false
+        unless $(event.target).is('[data-behavior~=rename_input]')
+          $('[data-behavior~=rename_input]').each ->
+            $(@).blur()
 
     changeSearchSort: (sort) ->
       $(document).on 'click', '[data-sort-option]', ->
@@ -689,7 +735,7 @@ $.extend feedbin,
 
     entryLinks: ->
       $(document).on 'click', '[data-behavior~=entry_content_wrap] a', ->
-        $(this).attr('target', '_blank')
+        $(this).attr('target', '_blank').attr('rel', 'noopener noreferrer')
         return
 
     clearEntry: ->
@@ -971,6 +1017,10 @@ $.extend feedbin,
         if feedbin.data.sticky_readability && feedbin.data.readability_settings[feedId] != "undefined"
           unless $("#content_view").val() == "true" && feedbin.data.readability_settings[feedId] == true
             feedbin.data.readability_settings[feedId] = !feedbin.data.readability_settings[feedId]
+
+        if !$('.button-toggle-content').hasClass('active')
+          $('.button-toggle-content').addClass('loading')
+
         return
 
     autoUpdate: ->
@@ -984,7 +1034,11 @@ $.extend feedbin,
         if ($(event.target).hasClass('entry-basement') || $(event.target).parents('.entry-basement').length > 0)
           false
 
-        if !$(event.target).is('[data-behavior~=show_entry_basement]') && $(event.target).parents('.entry-basement').length == 0
+        isButton = (event) ->
+          $(event.target).is('[data-behavior~=show_entry_basement]') ||
+          $(event.target).parents('[data-behavior~=show_entry_basement]').length > 0
+
+        if !isButton(event) && $(event.target).parents('.entry-basement').length == 0
           feedbin.closeEntryBasement()
         return
 
@@ -1164,12 +1218,18 @@ $.extend feedbin,
             title = toggle['title'][0]
           $(@).attr('title', title)
 
+    feedsSearch: ->
+      $(document).on 'submit', '[data-behavior~=feeds_search]', ->
+        $('#add_form_modal .feed-search-results').hide()
+        $('[data-behavior~=feeds_search_favicon_target]').html('')
+        $('#add_form_modal .modal-dialog').removeClass('done');
+
     formProcessing: ->
-      $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
+      $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form], [data-behavior~=feeds_search]', ->
         $(@).find('input').addClass('processing')
         return
 
-      $(document).on 'ajax:complete', '[data-behavior~=subscription_form], [data-behavior~=search_form]', ->
+      $(document).on 'ajax:complete', '[data-behavior~=subscription_form], [data-behavior~=search_form], [data-behavior~=feeds_search]', ->
         $(@).find('input').removeClass('processing')
         if feedbin.closeSubcription
           setTimeout ( ->
@@ -1179,29 +1239,26 @@ $.extend feedbin,
         return
 
     subscribe: ->
-      $(document).on 'click', '[data-behavior~=show_subscribe]', (event) ->
-        feeds = $(".feeds-inner")
-        if feeds.hasClass('show-subscribe')
-          feedbin.hideSubscribe()
-        else
-          feedbin.showSubscribe()
-        return
+      $(document).on 'click', '[data-behavior~=show_subscribe]', ->
+        modal = $('#add_form_modal')
+        markup = $('[data-behavior~=add_form_markup]')
+        modal.html(markup.html())
+        feedbin.modal('#add_form_modal')
 
-      $(document).on 'click', (event) ->
-        unless $(event.target).is('[data-behavior~=show_subscribe]') || $(event.target).is('.subscribe-wrap') || $(event.target).parents('.subscribe-wrap').length > 0
-          feedbin.hideSubscribe()
+      $('#add_form_modal').on 'shown.bs.modal', () ->
+        $('#add_form_modal [data-behavior~=feeds_search_field]').focus()
 
       subscription = feedbin.queryString('subscribe')
       if subscription?
         $('[data-behavior~=show_subscribe]').click()
-        $('[data-behavior~=subscription_form] input').val(subscription)
-        $('[data-behavior~=subscription_form]').submit()
-        $('[data-behavior~=subscription_form] input').blur()
-        feedbin.closeSubcription = true
+        field = $('#add_form_modal [data-behavior~=feeds_search_field]')
+        field.val(subscription)
+        field.closest("form").submit()
 
     searchError: ->
       $(document).on 'ajax:error', '[data-behavior~=search_form]', (event, xhr) ->
-        feedbin.showNotification('Search error.');
+        feedbin.showNotification('Search error.', 3000, '', true);
+
         return
 
     savedSearch: ->
@@ -1293,12 +1350,6 @@ $.extend feedbin,
         event.preventDefault()
       return
 
-    showSettingsModal: ->
-      $(document).on 'mouseup', '[data-behavior~=show_settings_modal]', (event) ->
-        content = $('[data-behavior~=settings_modal]').html()
-        feedbin.modalBox(content);
-        event.preventDefault()
-
     fuzzyFilter: ->
       feeds = $('[data-sort-name]')
       $(document).on 'keyup', '[data-behavior~=feed_search]', ->
@@ -1346,16 +1397,14 @@ $.extend feedbin,
         feedbin.previewHeight()
 
     generalAutocomplete: ->
-      autocompleteFields = $('[data-behavior~=autocomplete_field]')
-      $.each autocompleteFields, (i, field) ->
-        field = $(field)
+      $(document).on 'focus', '[data-behavior~=autocomplete_field]', (event) ->
+        field = $(event.currentTarget)
         field.autocomplete
           serviceUrl: field.data('autocompletePath')
           appendTo: field.parent("[data-behavior~=autocomplete_parent]").find("[data-behavior=autocomplete_target]")
           delimiter: /(,)\s*/
           deferRequestBy: 50
           autoSelectFirst: true
-      return
 
     entriesMaxWidth: ->
       container = $('[data-behavior~=entries_max_width]')
@@ -1398,6 +1447,10 @@ $.extend feedbin,
       feedbin.droppable()
       feedbin.draggable()
 
+    selectCategory: ->
+      $(document).on 'click', '[data-behavior~=selected_category]', (event) ->
+        $(@).find('[data-behavior~=categories]').toggleClass('hide')
+
     resizeGraph: ->
       if $("[data-behavior~=resize_graph]").length
         $(window).resize(_.debounce(->
@@ -1409,6 +1462,25 @@ $.extend feedbin,
       $(document).on 'change', '[data-behavior~=auto_submit]', (event) ->
         $(@).parents("form").submit()
 
+    submitAdd: ->
+      $(document).on 'submit', '[data-behavior~=subscription_options]', (event) ->
+        $('[data-behavior~=submit_add]').attr('disabled', 'disabled')
+
+      $(document).on 'click', '[data-behavior~=submit_add]', (event) ->
+        $("[data-behavior~=subscription_options]").submit()
+
+    toggleContent: ->
+      $(document).on 'click', '[data-behavior~=toggle_content_button]', (event) ->
+        $(@).parents("form").submit()
+
+    checkToggle: ->
+      $(document).on 'change', '[data-behavior~=check_toggle]', (event) ->
+        length = $('[data-behavior~=check_toggle]:checked').length
+        if length == 0
+          $('#add_form_modal [data-behavior~=submit_add]').attr('disabled', 'disabled')
+        else
+          $('#add_form_modal [data-behavior~=submit_add]').removeAttr('disabled', 'disabled')
+        feedbin.updateFeedSearchMessage()
 
 $.each feedbin.preInit, (i, item) ->
   item()

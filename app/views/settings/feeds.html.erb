@@ -1,3 +1,4 @@
+<%= render partial: 'shared/svg' %>
 <div class="settings-content-inner">
 
     <%= form_tag update_multiple_subscriptions_path, method: :patch, autocomplete: 'off' do %>
@@ -48,7 +49,7 @@
             <% @subscriptions.each do |subscription| %>
                 <% present subscription do |subscription_presenter| %>
                     <%= fields_for "subscriptions[]", subscription do |f| %>
-                        <li class="feeds-wrap" data-sort-name="<%= subscription.title.downcase %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>" data-sort-post-volume="<%= subscription.post_volume %>">
+                        <li class="feeds-wrap" data-sort-name="<%= subscription.title.downcase %><%= subscription.site_url %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>" data-sort-post-volume="<%= subscription.post_volume %>">
                             <label class="checkbox-wrap">
                                 <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "checkbox feeds-checkbox" %>
                             </label>

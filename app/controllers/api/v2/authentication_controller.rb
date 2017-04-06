@@ -8,7 +8,7 @@ module Api
 
       def index
         expires_now
-        render nothing: true
+        head :ok
       end
 
     end

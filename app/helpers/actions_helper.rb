@@ -1,13 +1,5 @@
 module ActionsHelper
 
-  def action_class(persisted)
-    if persisted
-      'persisted'
-    else
-      ''
-    end
-  end
-
   def action_feed_names(action)
     output = []
 

@@ -8,10 +8,10 @@ class EntriesController < ApplicationController
     update_selected_feed!("collection_all")
 
     feed_ids = @user.subscriptions.pluck(:feed_id)
-    entry_id_cache = EntryIdCache.new(@user.id, feed_ids, params[:page])
+    entry_id_cache = EntryIdCache.new(@user.id, feed_ids)
 
-    @entries = entry_id_cache.entries
-    @page_query = entry_id_cache.page_query
+    @entries = entry_id_cache.page(params[:page])
+    @page_query = @entries
 
     @append = params[:page].present?
 
@@ -89,7 +89,21 @@ class EntriesController < ApplicationController
       end
     end
 
-    view_inline
+    begin
+      if @content_view
+        url = @entry.fully_qualified_url
+        @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v5") do
+          Librato.increment 'readability.first_parse'
+          MercuryParser.parse(url)
+        end
+        @content = @content_info.content
+        Librato.increment 'readability.parse'
+      else
+        @content = @entry.content
+      end
+    rescue => e
+      @content = check_for_image(@entry, url)
+    end
 
     begin
       @content = ContentFormatter.format!(@content, @entry, !@user.setting_on?(:disable_image_proxy))
@@ -105,27 +119,11 @@ class EntriesController < ApplicationController
     render json: entries.to_json
   end
 
-  def entries_by_id(entry_ids)
-    entries = Entry.where(id: entry_ids).includes(:feed)
-    entries.each_with_object({}) do |entry, hash|
-      locals = {
-        entry: entry,
-        services: sharing_services(entry),
-        content_view: false,
-        user: @user
-      }
-      hash[entry.id] = {
-        content: render_to_string(partial: "entries/show", formats: [:html], locals: locals),
-        feed_id: entry.feed_id
-      }
-    end
-  end
-
   def mark_as_read
     @user = current_user
     UnreadEntry.where(user: @user, entry_id: params[:id]).delete_all
     UpdatedEntry.where(user: @user, entry_id: params[:id]).delete_all
-    render nothing: true
+    head :ok
   end
 
   def mark_all_as_read
@@ -165,10 +163,10 @@ class EntriesController < ApplicationController
       unread_entries = unread_entries.where('created_at <= :last_unread_date', {last_unread_date: params[:date]})
     end
 
-    unread_entries.delete_all
+    unread_entries.delete_all if unread_entries
 
     if params[:ids].present?
-      ids = params[:ids].split(',').map {|i| i.to_i }
+      ids = params[:ids].split(',').map(&:to_i)
       UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
     end
 
@@ -234,7 +232,7 @@ class EntriesController < ApplicationController
     @user = current_user
     @escaped_query = params[:query].gsub("\"", "'").html_safe if params[:query]
 
-    @entries = Entry.search(params, @user)
+    @entries = Entry.scoped_search(params, @user)
     @page_query = @entries
     @total_results = @entries.total
 
@@ -252,23 +250,6 @@ class EntriesController < ApplicationController
     respond_to do |format|
       format.js { render partial: 'shared/entries' }
     end
-  end
-
-  def autocomplete_search
-    user = current_user
-    escaped_query = params[:query].gsub("\"", "'").html_safe if params[:query]
-    params[:size] = 5
-    entries = Entry.search(params, user)
-    suggestions = entries.map do |entry|
-      title = ContentFormatter.summary(entry.title)
-      feed = ContentFormatter.summary(entry.feed.title)
-      content = "#{feed}: #{title}"
-      {
-        value: content,
-        data: content
-      }
-    end
-    render json: { suggestions: suggestions }.to_json
   end
 
   def push_view
@@ -299,9 +280,25 @@ class EntriesController < ApplicationController
 
   private
 
+  def entries_by_id(entry_ids)
+    entries = Entry.where(id: entry_ids).includes(feed: [:favicon])
+    entries.each_with_object({}) do |entry, hash|
+      locals = {
+        entry: entry,
+        services: sharing_services(entry),
+        content_view: false,
+        user: @user
+      }
+      hash[entry.id] = {
+        content: render_to_string(partial: "entries/show", formats: [:html], locals: locals),
+        feed_id: entry.feed_id
+      }
+    end
+  end
+
   def sharing_services(entry)
     @user_sharing_services ||= begin
-      (@user.sharing_services + @user.supported_sharing_services).sort_by{|sharing_service| sharing_service.label}
+      (@user.sharing_services + @user.supported_sharing_services).reject {|sharing_service| sharing_service.active? == false }.sort_by{|sharing_service| sharing_service.label}
     end
 
     services = []
@@ -314,35 +311,17 @@ class EntriesController < ApplicationController
     services
   end
 
-  def view_inline
-    begin
-      if @content_view
-        url = @entry.fully_qualified_url
-        @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v2") do
-          ReadabilityParser.parse(url)
-        end
-        @content = @content_info.content
-        Librato.increment 'readability.parse'
-      else
-        @content = @entry.content
-      end
-    rescue => e
-      @content = check_for_image(@entry, url)
-    end
-
-  end
-
   def matched_search_ids(params)
     params[:load] = false
     query = params[:query]
-    entries = Entry.search(params, @user)
-    ids = entries.results.map {|entry| entry.id.to_i}
+    entries = Entry.scoped_search(params, @user)
+    ids = entries.results.map(&:id)
     if entries.total_pages > 1
       2.upto(entries.total_pages) do |page|
         params[:page] = page
         params[:query] = query
-        entries = Entry.search(params, @user)
-        ids = ids.concat(entries.results.map {|entry| entry.id.to_i})
+        entries = Entry.scoped_search(params, @user)
+        ids = ids.concat(entries.results.map(&:id))
       end
     end
     ids

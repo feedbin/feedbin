@@ -1,26 +1,27 @@
-class SupportedSharingService < ActiveRecord::Base
+class SupportedSharingService < ApplicationRecord
 
   SERVICES = [
     {
       service_id: 'pocket',
       label: 'Pocket',
       requires_auth: true,
-      service_type: 'oauth2_pocket',
-      klass: 'Pocket'
+      service_type: 'oauth',
+      klass: 'Share::Pocket'
     },
     {
       service_id: 'readability',
       label: 'Readability',
       requires_auth: true,
       service_type: 'xauth',
-      klass: 'Readability'
+      klass: 'Share::Readability',
+      active: false
     },
     {
       service_id: 'instapaper',
       label: 'Instapaper',
       requires_auth: true,
       service_type: 'xauth',
-      klass: 'Instapaper'
+      klass: 'Share::Instapaper'
     },
     {
       service_id: 'email',
@@ -28,7 +29,7 @@ class SupportedSharingService < ActiveRecord::Base
       requires_auth: false,
       service_type: 'email',
       html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'email_share_panel'}},
-      klass: 'Email',
+      klass: 'Share::Email',
       has_share_sheet: true
     },
     {
@@ -36,7 +37,7 @@ class SupportedSharingService < ActiveRecord::Base
       label: 'Kindle',
       requires_auth: false,
       service_type: 'kindle',
-      klass: 'Kindle'
+      klass: 'Share::Kindle'
     },
     {
       service_id: 'pinboard',
@@ -44,7 +45,7 @@ class SupportedSharingService < ActiveRecord::Base
       requires_auth: true,
       service_type: 'pinboard',
       html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'pinboard_share_panel'}},
-      klass: 'Pinboard',
+      klass: 'Share::Pinboard',
       has_share_sheet: true
     },
     {
@@ -53,7 +54,7 @@ class SupportedSharingService < ActiveRecord::Base
       requires_auth: true,
       service_type: 'oauth',
       html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'tumblr_share_panel'}},
-      klass: 'Tumblr',
+      klass: 'Share::Tumblr',
       has_share_sheet: true
     },
     {
@@ -62,7 +63,7 @@ class SupportedSharingService < ActiveRecord::Base
       requires_auth: true,
       service_type: 'oauth',
       html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'evernote_share_panel'}},
-      klass: 'EvernoteShare',
+      klass: 'Share::EvernoteShare',
       has_share_sheet: true
     },
     {
@@ -70,28 +71,28 @@ class SupportedSharingService < ActiveRecord::Base
       label: 'Twitter',
       requires_auth: false,
       service_type: 'popover',
-      klass: 'Twitter'
+      klass: 'Share::Twitter'
     },
     {
       service_id: 'facebook',
       label: 'Facebook',
       requires_auth: false,
       service_type: 'popover',
-      klass: 'Facebook'
+      klass: 'Share::Facebook'
     },
     {
       service_id: 'app_dot_net',
       label: 'App.net',
       requires_auth: false,
       service_type: 'popover',
-      klass: 'AppDotNet'
+      klass: 'Share::AppDotNet'
     },
     {
       service_id: 'buffer',
       label: 'Buffer',
       requires_auth: false,
       service_type: 'popover',
-      klass: 'Buffer'
+      klass: 'Share::Buffer'
     }
   ].freeze
 
@@ -155,6 +156,14 @@ class SupportedSharingService < ActiveRecord::Base
 
   def html_options
     info[:html_options] || {remote: true}
+  end
+
+  def active?
+    if info.has_key?(:active)
+      info[:active]
+    else
+      true
+    end
   end
 
   def label

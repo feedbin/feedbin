@@ -8,7 +8,7 @@ class _Counts
     @setData(options)
 
   setData: (options) ->
-    @tagMap = @buildTagMap(options.tag_map)
+    @tagMap = options.tag_map
     @collections =
       unread: options.unread_entries
       starred: options.starred_entries
@@ -70,11 +70,6 @@ class _Counts
     if index > -1
       @counts[collection][group][groupId].splice(index, 1);
     index
-
-  buildTagMap: (tagArray) ->
-    object = {}
-    object[item[0]] = item[1] for item in tagArray
-    object
 
   buildEntry: (params) ->
     [params.feedId, params.entryId]

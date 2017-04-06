@@ -12,12 +12,12 @@ class EmailsController < ApplicationController
       if finder.options.any?
         feed = finder.create_feed(finder.options.first)
         if feed
-          user.safe_subscribe(feed)
+          user.subscriptions.find_or_create_by(feed: feed)
         end
       end
     end
   ensure
-    render nothing: true
+    head :ok
   end
 
 end

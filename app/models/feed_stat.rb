@@ -1,4 +1,4 @@
-class FeedStat < ActiveRecord::Base
+class FeedStat < ApplicationRecord
   belongs_to :feed
 
   def self.get_entry_counts(feed_ids, start_date)

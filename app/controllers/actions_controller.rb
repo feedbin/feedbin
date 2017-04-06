@@ -5,8 +5,7 @@ class ActionsController < ApplicationController
   before_action :set_action, only: [:edit, :update, :destroy]
 
   def index
-    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
-    @authentication_token = CGI::escape(verifier.generate(@user.id))
+    @authentication_token = authentication_token(@user)
     @web_service_url = "#{ENV['PUSH_URL']}/apple_push_notifications"
     @actions = @user.actions.where("action_type <> ?", Action.action_types[:notifier])
   end
@@ -41,6 +40,11 @@ class ActionsController < ApplicationController
   end
 
   private
+
+  def authentication_token(user)
+    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
+    CGI::escape(verifier.generate(user.id))
+  end
 
   def action_params
     params.require(:action_params).permit(:query, :all_feeds, :title, :feed_ids => [], :actions => [], :tag_ids => [])

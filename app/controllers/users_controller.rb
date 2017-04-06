@@ -5,47 +5,16 @@ class UsersController < ApplicationController
   before_action :ensure_permission, only: [:update, :destroy]
 
   def new
-    @user = User.new
-    if params[:coupon].present?
-      @coupon = Coupon.find_by(coupon_code: params[:coupon])
-      @coupon_valid = @coupon.present? && !@coupon.redeemed
-      @user.coupon_code = params[:coupon]
-    end
-    if !ENV['STRIPE_API_KEY'] || params[:coupon]
-      @user.plan_id = Plan.find_by_stripe_id('free').id
-    else
-      @user.plan_id = Plan.find_by_stripe_id('trial').id
-    end
+    @user = User.new().with_params(params)
   end
 
   def create
-    @user = User.new(user_params)
-
-    coupon_valid = false
-    if user_params['coupon_code']
-      coupon = Coupon.find_by_coupon_code(user_params['coupon_code'])
-      coupon_valid = (coupon.present? && !coupon.redeemed)
-    end
-
-    if coupon_valid || !ENV['STRIPE_API_KEY']
-      @user.free_ok = true
-      @user.plan = Plan.find_by_stripe_id('free')
-    else
-      @user.plan = Plan.find_by_stripe_id('trial')
-    end
-
-    if params[:user] && params[:user][:password]
-      @user.password_confirmation = params[:user][:password]
-    end
-
+    @user = User.new(user_params).with_params(user_params)
     if @user.save
-      if @user.plan.stripe_id != 'free'
-        schedule_trial_jobs
-      end
       Librato.increment('user.trial.signup')
       @analytics_event = {eventCategory: 'customer', eventAction: 'new', eventLabel: 'trial', eventValue: 0}
-      flash[:analytics_event] = render_to_string(partial: "shared/analytics_event").html_safe
-      flash[:one_time_content] = render_to_string(partial: "shared/register_protocol_handlers").html_safe
+      flash[:analytics_event] = render_to_string(partial: "shared/analytics_event")
+      flash[:one_time_content] = render_to_string(partial: "shared/register_protocol_handlers")
       sign_in @user
       redirect_to root_url
     else
@@ -66,7 +35,7 @@ class UsersController < ApplicationController
       if old_plan_name == 'trial' && new_plan_name != 'trial'
         Librato.increment('user.paid.signup')
         @analytics_event = {eventCategory: 'customer', eventAction: 'upgrade', eventLabel: @user.plan.stripe_id, eventValue: @user.plan.price.to_i}
-        flash[:analytics_event] = render_to_string(partial: "shared/analytics_event").html_safe
+        flash[:analytics_event] = render_to_string(partial: "shared/analytics_event")
       end
       sign_in @user
       if params[:redirect_to]
@@ -80,21 +49,11 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    if @user.plan.stripe_id == 'trial'
-      Librato.increment('user.trial.cancel')
-    else
-      Librato.increment('user.paid.cancel')
-    end
     @user.destroy
     redirect_to root_url
   end
 
   private
-
-  def schedule_trial_jobs
-    send_notice = Feedbin::Application.config.trial_days - 1
-    TrialSendExpiration.perform_in(send_notice.days, @user.id)
-  end
 
   def set_user
     @user = current_user

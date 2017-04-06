@@ -1,4 +1,4 @@
-class Action < ActiveRecord::Base
+class Action < ApplicationRecord
 
   attr_accessor :automatic_modification
 
@@ -13,30 +13,66 @@ class Action < ActiveRecord::Base
 
   before_validation :compute_tag_ids
   before_validation :compute_feed_ids
-  after_destroy :search_percolate_remove
-  after_commit :search_percolate_store, on: [:create, :update]
+  after_destroy :percolate_remove
+  after_commit :percolate_setup, on: [:create, :update]
 
-  def search_percolate_store
+  def percolate_setup
     percolator_query = self.query
     percolator_ids = self.computed_feed_ids
     if percolator_ids.empty?
-      search_percolate_remove
-    elsif self.all_feeds && (percolator_query.nil? || percolator_query == "")
-      search_percolate_remove
+      percolate_remove
+    elsif empty_notifier_action?
+      percolate_remove
     else
-      Entry.index.register_percolator_query(self.id) do |search|
-        search.filtered do
-          filter :terms, feed_id: percolator_ids
-          unless percolator_query.blank?
-            query { string Entry.escape_search(percolator_query) }
-          end
-        end
+      options = {
+        index: Entry.index_name,
+        type: '.percolator',
+        id: self.id,
+        body: body(percolator_query, percolator_ids)
+      }
+      $search.each do |_, client|
+        client.index(options)
       end
     end
   end
 
-  def search_percolate_remove
-    Entry.index.unregister_percolator_query(self.id)
+  def body(percolator_query, percolator_ids)
+    Hash.new.tap do |hash|
+      hash[:feed_id] = percolator_ids
+      hash[:query] = {
+        bool: {
+          filter: {
+            bool: {
+              must: { terms: { feed_id: percolator_ids } }
+            }
+          }
+        }
+      }
+      if percolator_query.present?
+        hash[:query][:bool][:must] = {
+          query_string: {
+            query: percolator_query,
+            default_operator: "AND"
+          }
+        }
+      end
+    end
+  end
+
+  def empty_notifier_action?
+    self.all_feeds && self.notifier? && (self.query.nil? || self.query == "")
+  end
+
+  def percolate_remove
+    options = {
+      index: Entry.index_name,
+      type: '.percolator',
+      id: self.id
+    }
+    $search.each do |_, client|
+      client.delete(options)
+    end
+  rescue Elasticsearch::Transport::Transport::Errors::NotFound
   end
 
   def compute_feed_ids
@@ -66,8 +102,12 @@ class Action < ActiveRecord::Base
   end
 
   def _percolator
-    response = Tire::Configuration.client.get "#{Tire::Configuration.url}/_percolator/entries/#{self.id}"
-    pp(JSON.load(response.body))
+    Entry.__elasticsearch__.client.get(
+      index: Entry.index_name,
+      type: '.percolator',
+      id: self.id,
+      ignore: 404
+    )
   end
 
 end

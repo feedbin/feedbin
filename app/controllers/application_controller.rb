@@ -70,6 +70,7 @@ class ApplicationController < ActionController::Base
       collections << {
         title: 'Recently Read',
         path: recently_read_entries_path,
+        count_data: nil,
         id: 'collection_recently_read',
         favicon_class: 'favicon-recently-read',
         parent_class: 'collection-recently-read',
@@ -97,13 +98,13 @@ class ApplicationController < ActionController::Base
     @user = current_user
 
     excluded_feeds = @user.taggings.pluck(:feed_id).uniq
-    @feeds = @user.feeds.where.not(id: excluded_feeds).include_user_title
+    @feeds = @user.feeds.where.not(id: excluded_feeds).includes(:favicon).include_user_title
 
     @count_data = {
       unread_entries: @user.unread_entries.pluck('feed_id, entry_id'),
       starred_entries: @user.starred_entries.pluck('feed_id, entry_id'),
       updated_entries: @user.updated_entries.pluck('feed_id, entry_id'),
-      tag_map: @user.taggings.group(:feed_id).pluck('feed_id, array_agg(tag_id)'),
+      tag_map: @user.taggings.build_map,
       entry_sort: @user.entry_sort
     }
     @feed_data = {
@@ -142,9 +143,9 @@ class ApplicationController < ActionController::Base
 
   def feeds_response
     if 'view_all' == @user.get_view_mode
-      entry_id_cache = EntryIdCache.new(@user.id, @feed_ids, params[:page])
-      @entries = entry_id_cache.entries
-      @page_query = entry_id_cache.page_query
+      entry_id_cache = EntryIdCache.new(@user.id, @feed_ids)
+      @entries = entry_id_cache.page(params[:page])
+      @page_query = @entries
     elsif 'view_starred' == @user.get_view_mode
       starred_entries = @user.starred_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).order("published DESC")
       @entries = Entry.entries_with_feed(starred_entries, 'DESC').entries_list

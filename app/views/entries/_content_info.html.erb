@@ -12,7 +12,7 @@
               <%= content_info.domain %>
 
               <% if content_info.date_published.present? %>
-                - <time datetime="<%= entry_presenter.parsed_date(content_info.date_published, :datetime) %>"><%= entry_presenter.parsed_date(content_info.date_published, :feed) %></time>
+                - <time datetime="<%= entry_presenter.parsed_date(content_info.date_published, :datetime) %>"><%= entry_presenter.parsed_date(content_info.date_published, :date) %></time>
               <% end %>
 
               <% if content_info.author.present? %>
@@ -23,7 +23,7 @@
       <% end %>
       <%= content.html_safe %>
   <% else %>
-      <p class="content-error entry-callout">Readability was unable to get this article’s content.</p>
+      <p class="content-error entry-callout">Unable to get this article’s content.</p>
   <% end %>
 
 <% end %>
