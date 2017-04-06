@@ -205,7 +205,7 @@ $.extend feedbin,
     if element.length > 0
       tag = element.children().get(0).nodeName
       if tag == "TABLE"
-        console.log  $('.entry-type-default').removeClass("entry-type-default").addClass("entry-type-newsletter");
+        $('.entry-type-default').removeClass("entry-type-default").addClass("entry-type-newsletter");
 
   formatImages: ->
     $("[data-behavior~=entry_content_wrap] img").each ->
