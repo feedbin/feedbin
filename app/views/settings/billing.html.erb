@@ -43,19 +43,34 @@
             </li>
           <% end %>
           </ul>
-          <p class="control-group-description" data-behavior="billing_help_text">
 
           <% @plans.each do |plan| %>
-            <% if plan.name =~ "monthly" %>
+              <% if @user.trial_end.future? %>
+                  <% if plan.name =~ "monthly" %>
+                      <p class="control-group-description" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                          Clicking subscribe will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> when your trial ends on <strong><%= @user.trial_end.to_s(:day_month_long) %></strong> and again each month thereafter. You can change plans or cancel any time.
+                      </p>
+                  <% else %>
+                      <p class="control-group-description" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                          Clicking subscribe will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> when your trial ends on <strong><%= @user.trial_end.to_s(:day_month_long) %></strong> and again each year thereafter. You can change plans or cancel any time.
+                      </p>
+                  <% end %>
 
-            <% else %>
-
-            <% end %>
+              <% else %>
+                  <% if plan.name =~ "monthly" %>
+                      <p class="control-group-description" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                          Clicking subscribe will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> immediately and again each month thereafter. You can change plans or cancel any time.
+                      </p>
+                  <% else %>
+                      <p class="control-group-description" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                          Clicking subscribe will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> immediately and again each year thereafter. You can change plans or cancel any time.
+                      </p>
+                  <% end %>
+              <% end %>
           <% end %>
-            <%= render partial: 'shared/billing_help_text', locals: {flash: flash} %>
-            <%= render partial: ""  %>
-            Click below to charge your card $<span data-behavior=""><%=  %></span> now and on <%= Time.now.strftime("%B #{Time.now.day.ordinalize}") %> each year thereafter. You can change plans or cancel any time.
-          </p>
+
+
+
 
           <div class="description-inset">
               <div class="button-wrap">
