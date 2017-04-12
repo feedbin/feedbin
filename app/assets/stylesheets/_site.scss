@@ -118,10 +118,16 @@ body {
     &.theme-night {
         color: $text-color-night;
         background-color: $body-background-color-night;
+        & .modal {
+            color: $text-color;
+        }
     }
     &.theme-sunset {
         color: $text-color-sunset;
         background-color: $body-background-color-sunset;
+        & .modal {
+            color: $text-color;
+        }
     }
     @include respond-to(hidpi) {
         -webkit-font-smoothing: antialiased;
