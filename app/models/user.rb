@@ -237,12 +237,10 @@ class User < ApplicationRecord
         if plan_id_changed?
           customer.plan = plan.stripe_id
         end
-        if paid_conversion?
-          if trial_end.future?
-            customer.trial_end = trial_end.to_i
-          else
-            customer.trial_end = "now"
-          end
+        if trial_end.future?
+          customer.trial_end = trial_end.to_i
+        else
+          customer.trial_end = "now"
         end
         customer.email = email
         customer.save
