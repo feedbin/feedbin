@@ -60,14 +60,16 @@ class User < ApplicationRecord
 
   after_initialize :set_defaults, if: :new_record?
 
-  before_save :update_billing, unless: -> { !ENV['STRIPE_API_KEY'] }
   before_save :strip_email
   before_save :activate_subscriptions
   before_save { reset_auth_token }
 
+  before_create { create_customer }
   before_create { generate_token(:starred_token) }
   before_create { generate_token(:inbound_email_token, 4) }
   before_create { generate_token(:newsletter_token, 4) }
+
+  before_update :update_billing, unless: -> { !ENV['STRIPE_API_KEY'] }
 
   after_create { schedule_trial_jobs }
 
@@ -217,45 +219,36 @@ class User < ApplicationRecord
     UserMailer.delay(queue: :critical).password_reset(id, token)
   end
 
+  def create_customer
+    @stripe_customer = Customer.create(email, plan.stripe_id, trial_end)
+    self.customer_id = @stripe_customer.id
+    if coupon_code
+      coupon_record = Coupon.find_by_coupon_code(coupon_code)
+      coupon_record.update(redeemed: true)
+      self.coupon = coupon_record
+    end
+  end
+
   def update_billing
-    if customer_id.nil?
-      customer = Stripe::Customer.create({email: email, plan: plan.stripe_id})
-      if coupon_code
-        coupon_record = Coupon.find_by_coupon_code(coupon_code)
-        coupon_record.redeemed = true
-        coupon_record.save
-        self.coupon = coupon_record
-      end
-    else
-      if email_changed? || stripe_token.present? || plan_id_changed?
-        customer = Stripe::Customer.retrieve(customer_id)
-        if stripe_token.present?
-          customer.source = stripe_token
-          self.suspended = false
-          subscriptions.update_all(active: true)
-        end
-        if plan_id_changed?
-          customer.plan = plan.stripe_id
-        end
-        if trial_end.future?
-          customer.trial_end = trial_end.to_i
-        else
-          customer.trial_end = "now"
-        end
-        customer.email = email
-        customer.save
-      end
+    if email_changed?
+      stripe_customer.update_email(email)
     end
-    unless customer.nil?
-      self.last_4_digits = customer.try(:sources).try(:data).try(:first).try(:last4)
-      self.customer_id = customer.id
-      self.stripe_token = nil
+
+    if stripe_token.present?
+      stripe_customer.update_source(stripe_token)
+      self.suspended = false
+      subscriptions.update_all(active: true)
     end
-  rescue Stripe::StripeError => e
-    logger.error "Stripe Error: " + e.message
-    errors.add :base, "#{e.message}."
+
+    if plan_id_changed?
+      stripe_customer.update_plan(plan.stripe_id, trial_end)
+    end
+
     self.stripe_token = nil
-    false
+  end
+
+  def stripe_customer
+    @stripe_customer ||= Customer.retrieve(customer_id)
   end
 
   def cancel_billing
@@ -313,7 +306,10 @@ class User < ApplicationRecord
   end
 
   def trial_end
-    @trial_end ||= self.created_at + Feedbin::Application.config.trial_days.days
+    @trial_end ||= begin
+      date = self.created_at || Time.now
+      date + Feedbin::Application.config.trial_days.days
+    end
   end
 
   def update_tag_visibility(tag, visible)
