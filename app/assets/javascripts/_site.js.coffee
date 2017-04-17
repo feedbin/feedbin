@@ -1248,6 +1248,9 @@ $.extend feedbin,
       $('#add_form_modal').on 'shown.bs.modal', () ->
         $('#add_form_modal [data-behavior~=feeds_search_field]').focus()
 
+      $('#add_form_modal').on 'hide.bs.modal', () ->
+        $('#add_form_modal input').blur()
+
       subscription = feedbin.queryString('subscribe')
       if subscription?
         $('[data-behavior~=show_subscribe]').click()
