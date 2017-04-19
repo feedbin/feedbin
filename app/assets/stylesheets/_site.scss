@@ -3652,6 +3652,7 @@ Settings
         input[type="submit"],
         input[type="search"],
         input[type="url"],
+        input[type="tel"],
         button,
         textarea,
         a {
@@ -3715,6 +3716,53 @@ Settings
             padding-left: 60px !important;
             background: #FFF image-url("icon-calendar.svg") 30px 14px no-repeat;
         }
+        .card-number-wrap {
+            position: relative;
+            .card-type {
+                display: block;
+                position: absolute;
+                color: $selected;
+                font-family: Consolas, Monaco, monospace;
+                text-align: right;
+                font-size: 11px;
+                font-weight: bold;
+                width: 100px;
+                z-index: 100;
+                right: 37px;
+                top: 17px;
+                vertical-align: middle;
+            }
+        }
+        .card-number.visa + .card-type:before {
+            content: "VISA";
+        }
+        .card-number.mastercard + .card-type:before {
+            content: "Mastercard";
+        }
+        .card-number.amex + .card-type:before {
+            content: "AMEX";
+        }
+        .card-number.dinersclub + .card-type:before {
+            content: "Diners Club";
+        }
+        .card-number.discover + .card-type:before {
+            content: "Discover";
+        }
+        .card-number.unionpay + .card-type:before {
+            content: "Unionpay";
+        }
+        .card-number.jcb + .card-type:before {
+            content: "JCB";
+        }
+        .card-number.maestro + .card-type:before {
+            content: "Maestro";
+        }
+        .card-number.forbrugsforeningen + .card-type:before {
+            content: "FFK";
+        }
+        .card-number.dankort + .card-type:before {
+            content: "Dankort";
+        }
         @media (max-width: 528px) {
             .card-number,
             .card-code,
@@ -3724,6 +3772,9 @@ Settings
             }
             .card-number {
                 background-position: 15px 17px;
+            }
+            .card-type {
+                right: 22px !important;
             }
         }
 

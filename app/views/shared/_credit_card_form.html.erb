@@ -1,12 +1,13 @@
 <ul class="control-group control-group-form cc-form-wrap">
-  <li>
-    <%= text_field_tag :card_number, nil, name: nil, data: { stripe: 'number' }, placeholder: 'Card Number', autocompletetype: 'cc-number', :'x-autocompletetype' => 'cc-number', class: 'card-number' %>
+  <li class="card-number-wrap">
+    <%= telephone_field_tag :card_number, nil, name: nil, data: { stripe: 'number' }, placeholder: 'Card Number', autocompletetype: 'cc-number', :'x-autocompletetype' => 'cc-number', class: 'card-number' %>
+    <div class="card-type"></div>
   </li>
   <li>
-    <%= text_field_tag :card_expiration, nil, name: nil, placeholder: 'MM / YY', autocompletetype: 'cc-exp', :'x-autocompletetype' => 'cc-exp', class: 'card-expiration' %>
+    <%= telephone_field_tag :card_expiration, nil, name: nil, placeholder: 'MM / YY', autocompletetype: 'cc-exp', :'x-autocompletetype' => 'cc-exp', class: 'card-expiration' %>
   </li>
   <li>
-    <%= text_field_tag :card_code, nil, name: nil, data: { stripe: 'cvc' }, placeholder: 'CVC', autocompletetype: 'cc-csc', :'x-autocompletetype' => 'cc-csc', class: 'card-code', autocomplete: 'off' %>
+    <%= telephone_field_tag :card_code, nil, name: nil, data: { stripe: 'cvc' }, placeholder: 'CVC', autocompletetype: 'cc-csc', :'x-autocompletetype' => 'cc-csc', class: 'card-code', autocomplete: 'off' %>
   </li>
 </ul>
 
