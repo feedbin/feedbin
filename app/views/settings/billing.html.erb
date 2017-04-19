@@ -46,7 +46,7 @@
               %>
               <%= f.radio_button :plan_id, plan.id, options %>
               <%= label_tag nil, for: dom_id(plan) do %>
-                <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.name.gsub(/ly$/, '').downcase %>
+                <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
               <% end %>
             </li>
           <% end %>
@@ -117,7 +117,7 @@
             <% @plans.each do |plan| %>
               <tr>
                 <td><%= plan.name %></td>
-                <td><%= number_to_currency(plan.price) %>/<%= plan.name %></td>
+                <td><%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %></td>
                 <td>
                   <% if @user.plan.id == plan.id %>
                     Your plan
