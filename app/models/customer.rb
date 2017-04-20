@@ -4,6 +4,16 @@ class Customer
 
   delegate :id, to: :customer
 
+  def self.create(email, plan, trial_end)
+    new_customer = new(Stripe::Customer.create({email: email}))
+    Stripe::Subscription.create(
+      customer: new_customer.id,
+      plan: plan,
+      trial_end: trial_end.to_i
+    )
+    new_customer
+  end
+
   def self.retrieve(customer_id)
     new(Stripe::Customer.retrieve(customer_id))
   end
@@ -25,5 +35,30 @@ class Customer
       invoice.pay
     end
   end
+
+  def update_email(email)
+    customer.email = email
+    customer.save
+  end
+
+  def update_source(stripe_token)
+    customer.source = stripe_token
+    customer.save
+  end
+
+  def update_plan(plan_id, trial_end)
+    if trial_end.future?
+      subscription.trial_end = trial_end.to_i
+    else
+      subscription.trial_end = "now"
+    end
+    subscription.plan = plan_id
+    subscription.save
+  end
+
+  def subscription
+    @subscription ||= customer.subscriptions.first
+  end
+
 end
 

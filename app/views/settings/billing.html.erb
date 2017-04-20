@@ -35,14 +35,46 @@
           <ul class="control-group control-group-form">
           <% @plans.each do |plan| %>
             <li>
-              <% options = plan.stripe_id == 'basic-yearly-2' ? {checked: true, id: dom_id(plan)} : {id: dom_id(plan)} %>
+              <%
+              options = {
+                  id: dom_id(plan),
+                  data: {behavior: "plan_select"}
+              }
+              if plan == @default_plan
+                  options[:checked] = true
+              end
+              %>
               <%= f.radio_button :plan_id, plan.id, options %>
               <%= label_tag nil, for: dom_id(plan) do %>
-                <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.name.gsub(/ly$/, '').downcase %>
+                <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
               <% end %>
             </li>
           <% end %>
           </ul>
+
+          <% @plans.each do |plan| %>
+              <% if @user.trial_end.future? %>
+                  <% if plan.name == "Monthly" %>
+                      <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                          Clicking subscribe will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> when your trial ends on <strong><%= @user.trial_end.to_s(:date) %></strong> and again each month thereafter. You can change plans or cancel any time.
+                      </p>
+                  <% else %>
+                      <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                          Clicking subscribe will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> when your trial ends on <strong><%= @user.trial_end.to_s(:date) %></strong> and again each year thereafter. You can change plans or cancel any time.
+                      </p>
+                  <% end %>
+              <% else %>
+                  <% if plan.name == "Monthly" %>
+                      <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                          Clicking subscribe will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> immediately and again each month thereafter. You can change plans or cancel any time.
+                      </p>
+                  <% else %>
+                      <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                          Clicking subscribe will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> immediately and again each year thereafter. You can change plans or cancel any time.
+                      </p>
+                  <% end %>
+              <% end %>
+          <% end %>
 
           <div class="description-inset">
               <div class="button-wrap">
@@ -85,7 +117,7 @@
             <% @plans.each do |plan| %>
               <tr>
                 <td><%= plan.name %></td>
-                <td><%= number_to_currency(plan.price) %>/<%= plan.name %></td>
+                <td><%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %></td>
                 <td>
                   <% if @user.plan.id == plan.id %>
                     Your plan
