@@ -58,7 +58,10 @@ class DevicePushNotificationSend
   end
 
   def build_notification(device_token, feed_title, entry, operating_system)
-    body = format_text(entry.title || entry.summary)
+    body = format_text(entry.title)
+    if body.empty?
+      body = format_text(entry.summary)
+    end
     author = format_text(entry.author)
     title = format_text(entry.title)
     published = entry.published.iso8601(6)
