@@ -220,7 +220,7 @@ input[type="password"],
 input[type="url"],
 input[type="search"],
 input[type="tel"] {
-    -webkit-appearance: none;
+    appearance: none;
 }
 
 button,
@@ -228,7 +228,7 @@ html input[type="button"],
 input[type="reset"],
 input[type="submit"] {
     cursor: pointer;
-    -webkit-appearance: button;
+    appearance: button;
 }
 
 label,
@@ -244,7 +244,7 @@ input[type="checkbox"] {
 
 input[type="search"]::-webkit-search-decoration,
 input[type="search"]::-webkit-search-cancel-button {
-        -webkit-appearance: none;
+        appearance: none;
 }
 
 textarea {
@@ -880,7 +880,7 @@ Structure
         font-weight: bold;
         touch-action: manipulation;
         display: block;
-        -webkit-appearance: none;
+        appearance: none;
         border: none;
         background: none;
         width: 100%;
@@ -1060,7 +1060,7 @@ Structure
                 text-decoration: none;
             }
             .rename-feed-input {
-                -webkit-appearance: none;
+                appearance: none;
                 padding: 2px;
                 margin: -9px 0 -7px -2px;
                 line-height: 1;
@@ -1160,7 +1160,7 @@ Structure
     @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
     font-size: 11px;
     display: block;
-    -webkit-appearance: none;
+    appearance: none;
     background: none;
     border: none;
     padding: 9px 3px 10px 3px;
@@ -1310,7 +1310,7 @@ li.selected > a .favicon-wrap {
     background-image: image-url("icon-left-arrow.svg");
     background-position: center center;
     display: block;
-    -webkit-appearance: none;
+    appearance: none;
     border: none;
     height: 16px;
     width: 11px;
@@ -1351,7 +1351,7 @@ li.selected > a .favicon-wrap {
         background-image: image-url("icon-search.svg");
         background-position: center center;
         display: block;
-        -webkit-appearance: none;
+        appearance: none;
         border: none;
         padding: 0;
         height: $toolbar-height;
@@ -1913,7 +1913,7 @@ $saved-search-control-height: 48px;
         margin-left: 13px;
         display: flex;
         align-items: center;
-        -webkit-appearance: none;
+        appearance: none;
         border: none;
         background: none;
         padding: 0;
@@ -2025,7 +2025,7 @@ $saved-search-control-height: 48px;
             border: none;
             border-radius: 0;
             height: 47px;
-            -webkit-appearance: none;
+            appearance: none;
             margin: 0 0 0 8px;
             padding: 0;
             @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
@@ -2427,7 +2427,7 @@ $saved-search-control-height: 48px;
     display: block;
     background-color: #ddd;
     z-index: 2;
-    -webkit-appearance: none;
+    appearance: none;
     border: none;
     background: none;
     width: 44px;
@@ -3684,7 +3684,7 @@ Settings
         input[type="submit"],
         button {
             color: $selected;
-            -webkit-appearance: none;
+            appearance: none;
             background: #FFF;
         }
         input[type="radio"], input[type="checkbox"], input[type="file"] {
@@ -3865,7 +3865,7 @@ Settings
     .feeds-toolbar-button {
         margin-right: 15px;
         color: $selected;
-        -webkit-appearance: none;
+        appearance: none;
         background: transparent;
         padding: 0;
         border: none;
@@ -4487,7 +4487,7 @@ Icons
 Buttons
 ------------------------------------------------------------------------------*/
 .button {
-    -webkit-appearance: none !important;
+    appearance: none !important;
     background: $selected;
     border: none;
     margin: 0;
@@ -4548,7 +4548,7 @@ Buttons
 }
 
 .button-text {
-    -webkit-appearance: none !important;
+    appearance: none !important;
     background: none;
     border: none;
     margin: 0;
@@ -4563,7 +4563,7 @@ Buttons
 }
 
 .button-text-secondary {
-    -webkit-appearance: none !important;
+    appearance: none !important;
     background: none;
     border: none;
     margin: 0;
@@ -4655,7 +4655,7 @@ Buttons
 .toolbar-button {
     @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
     text-decoration: none;
-    -webkit-appearance: none;
+    appearance: none;
     display: inline-block;
     border: none;
     background: none;
@@ -4739,7 +4739,7 @@ $modal-border-radius: 8px;
 }
 
 button.close {
-    -webkit-appearance: none;
+    appearance: none;
     padding: 0;
     cursor: pointer;
     background: transparent;
