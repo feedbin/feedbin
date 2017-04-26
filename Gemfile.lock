@@ -144,7 +144,7 @@ GEM
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     crass (1.0.2)
-    css_parser (1.4.7)
+    css_parser (1.5.0)
       addressable
     curb (0.9.3)
     dalli (2.7.6)
@@ -397,9 +397,13 @@ GEM
       nokogiri
     oauth (0.5.1)
     pg (0.19.0)
-    premailer (1.8.7)
-      css_parser (>= 1.4.5)
+    premailer (1.10.3)
+      addressable
+      css_parser (>= 1.4.10)
       htmlentities (>= 4.0.0)
+    premailer-rails (1.9.6)
+      actionmailer (>= 3, < 6)
+      premailer (~> 1.7, >= 1.7.9)
     public_suffix (2.0.5)
     puma (3.6.2)
     rack (2.0.1)
@@ -589,7 +593,7 @@ DEPENDENCIES
   oauth
   opml_saw!
   pg
-  premailer
+  premailer-rails
   puma
   rails (= 5.0.1)
   rails-controller-testing
