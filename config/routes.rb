@@ -93,6 +93,7 @@ Rails.application.routes.draw do
       get :view_starred
       get :auto_update
       get :update_styles
+      post :search
     end
     member do
       match :push, via: [:post, :get]

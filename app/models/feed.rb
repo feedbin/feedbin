@@ -12,6 +12,7 @@ class Feed < ApplicationRecord
   has_one :favicon, foreign_key: "host", primary_key: "host"
 
   before_create :set_host
+  after_create :refresh_favicon
 
   attr_accessor :count, :tags
   attr_readonly :feed_url
@@ -106,6 +107,10 @@ class Feed < ApplicationRecord
   end
 
   private
+
+  def refresh_favicon
+    FaviconFetcher.perform_async(self.host)
+  end
 
   def default_values
     if self.respond_to?(:options)

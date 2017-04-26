@@ -13,12 +13,24 @@ class Subscription < ApplicationRecord
   after_create :add_feed_to_action
   after_commit :remove_feed_from_action, on: [:destroy]
 
-  before_create :refresh_feed
-
   before_destroy :untag
   before_destroy :email_unsubscribe
 
   after_create :refresh_favicon
+
+  def self.create_multiple(feeds, user, valid_feed_ids)
+    @subscriptions = feeds.each_with_object([]) do |(feed_id, subscription), array|
+      feed = Feed.find(feed_id)
+      if valid_feed_ids.include?(feed.id) && subscription["subscribe"] == "1"
+        record = user.subscriptions.find_or_create_by(feed: feed)
+        record.update(title: subscription["title"].strip)
+        array.push(record)
+        if subscription["tags"].present?
+          feed.tag(subscription["tags"], user, true)
+        end
+      end
+    end
+  end
 
   def mark_as_unread
     base = Entry.select(:id, :feed_id, :published, :created_at).where(feed_id: self.feed_id).order('published DESC')
@@ -59,21 +71,6 @@ class Subscription < ApplicationRecord
 
   def untag
     self.feed.tag('', self.user)
-  end
-
-  def refresh_feed
-    if feed_already_existed? && !any_subscribers?
-      self.feed.priority_refresh
-      sleep(3)
-    end
-  end
-
-  def any_subscribers?
-    Subscription.where(feed_id: self.feed_id, active: true, muted: false).exists?
-  end
-
-  def feed_already_existed?
-    self.feed.created_at < 1.minute.ago
   end
 
   private

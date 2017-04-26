@@ -121,6 +121,14 @@ class FeedsController < ApplicationController
     @feed_ids = user.subscriptions.where(show_updates: false).pluck(:feed_id)
   end
 
+  def search
+    @user = current_user
+    @feeds = FeedFinder.new(params[:q]).create_feeds!
+    @feeds.map(&:priority_refresh)
+  rescue
+    @feeds = nil
+  end
+
   private
 
   def update_view_mode(view_mode)

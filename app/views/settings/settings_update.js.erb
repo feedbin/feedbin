@@ -6,7 +6,7 @@ var clearMessage = setTimeout(function() {
 }, 5000)
 
 <% if @user.setting_on?(:starred_feed_enabled) %>
-    $('[data-behavior~=starred_feed_url]').html('<%= j render partial: 'shared/starred_feed_url', locals: {flash: flash} %>')
+    $('[data-behavior~=starred_feed_url]').html('<%= j render partial: 'shared/starred_feed_url', locals: {user: @user} %>')
 <% else %>
     $('[data-behavior~=starred_feed_url]').html('')
 <% end %>

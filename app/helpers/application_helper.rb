@@ -55,18 +55,18 @@ module ApplicationHelper
     current_user.try(:unread_entries).try(:order, 'created_at DESC').try(:first).try(:created_at).try(:iso8601, 6)
   end
 
+
   def svg_tag(name, options={})
     options = options.symbolize_keys
 
     name = name.sub('.svg', '')
-    if size = options.delete(:size)
-      options[:width], options[:height] = size.split("x") if size =~ %r{\A\d+x\d+\z}
-      options[:width] = options[:height] = size if size =~ %r{\A\d+\z}
-    end
+    options[:width], options[:height] = extract_dimensions(options.delete(:size)) if options[:size]
+    options[:class] = "#{name} #{options[:class]}"
 
-    content_tag :svg, class: "#{name} #{options[:class]}", viewBox: "0 0 #{options[:width]} #{options[:height]}" do
+    content_tag :svg, options do
       content_tag :use, '', :"xlink:href" => "##{name}"
     end
+
   end
 
   def branch_info

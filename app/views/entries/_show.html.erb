@@ -50,7 +50,9 @@
               <%= entry_presenter.media.html_safe %>
             </div>
             <% end %>
-            <%= raw(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>
+            <div class="entry-final-content">
+                <%= raw(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>
+            </div>
           </div>
         </div>
         <a class="next-entry-preview no-content" data-behavior="open_next_entry" href="#">

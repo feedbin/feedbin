@@ -16,21 +16,13 @@ feedbin.Counts.get(feedbin.count_data);
 <%= render partial: 'shared/svg' %>
 
 <div class="application-messages"><a href="" class="message-content" data-behavior="messages">You have subscribed</a></div>
-<div class="modal-target"></div>
 
 <div class="app-wrap">
 
     <div class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
         <div class="subscribe-toolbar">
-            <div class="show-subscribe" data-behavior="show_subscribe">Subscribe</div>
+            <button type="button" class="show-subscribe" data-behavior="show_subscribe">+ Add</button>
             <%= render partial: 'shared/hamburger_menu_button' %>
-        </div>
-        <div class="subscribe-wrap">
-            <%= form_for :subscription, url: subscriptions_path, remote: true, html: { data: {behavior: 'subscription_form'}, novalidate: 'novalidate', autocomplete: 'off' }  do |f| %>
-                <%= f.fields_for :feeds do |builder| %>
-                    <%= builder.url_field :feed_url, placeholder: 'Feed or Website URL' %>
-                <% end %>
-            <% end %>
         </div>
         <div class="feeds-inner">
             <div class="view-toolbar">
@@ -113,6 +105,7 @@ feedbin.Counts.get(feedbin.count_data);
 
 <div class="hide" data-behavior="pagination"></div>
 <%= render partial: "shared/readability_loading" %>
+<%= render partial: "shared/add_form" %>
 <%= render partial: "shared/keyboard_shortcuts_wrap" %>
 <%= render partial: "shared/settings_modal" %>
 <%= render partial: "shared/resizable_form" %>
