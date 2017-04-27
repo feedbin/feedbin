@@ -171,7 +171,7 @@ class User < ApplicationRecord
 
   def plan_type_valid
     if free_ok
-      valid_plans = Plan.where(price_tier: price_tier).pluck(:id)
+      valid_plans = Plan.all.pluck(:id)
     else
       valid_plans = Plan.where(price_tier: price_tier).where.not(stripe_id: 'free').pluck(:id)
     end
