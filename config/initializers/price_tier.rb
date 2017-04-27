@@ -1,1 +1,1 @@
-Feedbin::Application.config.price_tier = 2
+Feedbin::Application.config.price_tier = 3
