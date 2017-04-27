@@ -92,6 +92,7 @@ class User < ApplicationRecord
     self.mark_as_read_confirmation = 1
     self.font = "serif-2"
     self.font_size = 7
+    self.price_tier = Feedbin::Application.config.price_tier
   end
 
   def with_params(params)
