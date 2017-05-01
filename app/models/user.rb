@@ -92,6 +92,7 @@ class User < ApplicationRecord
     self.mark_as_read_confirmation = 1
     self.font = "serif-2"
     self.font_size = 7
+    self.price_tier = Feedbin::Application.config.price_tier
   end
 
   def with_params(params)
@@ -169,15 +170,24 @@ class User < ApplicationRecord
   end
 
   def plan_type_valid
-    original_plan = Plan.find(plan_id_was)
     if free_ok
-      valid_plans = Plan.where(price_tier: original_plan.price_tier).pluck(:id)
+      valid_plans = Plan.all.pluck(:id)
     else
-      valid_plans = Plan.where(price_tier: original_plan.price_tier).where.not(stripe_id: 'free').pluck(:id)
+      valid_plans = Plan.where(price_tier: price_tier).where.not(stripe_id: 'free').pluck(:id)
     end
 
     unless valid_plans.include?(plan.id)
       errors.add(:plan_id, 'is invalid')
+    end
+  end
+
+  def available_plans
+    if plan.stripe_id == 'trial'
+      Plan.where(price_tier: price_tier, stripe_id: ['basic-monthly-2', 'basic-yearly-2', 'basic-monthly-3', 'basic-yearly-3']).order('price DESC')
+    elsif plan.stripe_id == 'free'
+      Plan.where(price_tier: price_tier)
+    else
+      Plan.where(price_tier: price_tier).where.not(stripe_id: ['free', 'trial', 'timed'])
     end
   end
 
