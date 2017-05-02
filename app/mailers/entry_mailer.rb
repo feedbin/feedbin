@@ -1,6 +1,6 @@
 class EntryMailer < ApplicationMailer
 
-  default from: "Feedbin <#{ENV['NOTIFICATION_EMAIL']}>"
+  default from: "Feedbin <#{ENV['NOTIFICATION_EMAIL']}>", skip_premailer: true
 
   self.smtp_settings = self.smtp_settings.merge({
     user_name: ENV['SMTP_BULK_USERNAME'] || ENV['SMTP_USERNAME'],
