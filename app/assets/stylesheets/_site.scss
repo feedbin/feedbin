@@ -2731,6 +2731,8 @@ $saved-search-control-height: 48px;
     line-height: 1.6;
     @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
     text-rendering: optimizeLegibility;
+    word-break: break-word;
+    hyphens: auto;
 
     strong {
         font-weight: 700;
