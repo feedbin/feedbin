@@ -44,7 +44,11 @@ class UsersController < ApplicationController
         redirect_to settings_account_path, notice: 'Account updated.'
       end
     else
-      redirect_to settings_account_path, alert: @user.errors.full_messages.join('. ') + '.'
+      if params[:redirect_to]
+        redirect_to params[:redirect_to], alert: @user.errors.full_messages.join('. ')
+      else
+        redirect_to settings_account_path, alert: @user.errors.full_messages.join('. ')
+      end
     end
   end
 
