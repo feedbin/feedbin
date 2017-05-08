@@ -31,7 +31,8 @@ class User < ApplicationRecord
                  :hide_recently_read,
                  :hide_updated,
                  :view_mode,
-                 :disable_image_proxy
+                 :disable_image_proxy,
+                 :api_client
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
