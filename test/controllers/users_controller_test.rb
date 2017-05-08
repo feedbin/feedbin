@@ -34,7 +34,7 @@ class UsersControllerTest < ActionController::TestCase
     StripeMock.start
     stripe_helper = StripeMock.create_test_helper
     user = users(:ann)
-    new_plan = plans(:basic_monthly_2)
+    new_plan = plans(:basic_monthly_3)
     last4 = "1234"
     token = stripe_helper.generate_card_token(last4: last4, exp_month: 99, exp_year: 3005)
     create_stripe_plan(user.plan)

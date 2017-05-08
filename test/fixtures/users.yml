@@ -3,9 +3,10 @@ ben:
   password_digest: <%= default_password_digest %>
   auth_token: <%= SecureRandom.hex %>
   customer_id: cus_123
-  plan: basic_monthly_2
+  plan: basic_monthly_3
   newsletter_token: <%= SecureRandom.hex %>
   admin: true
+  price_tier: 3
 
 ann:
   email: ann@example.com
@@ -13,17 +14,20 @@ ann:
   auth_token: <%= SecureRandom.hex %>
   inbound_email_token: <%= SecureRandom.hex %>
   plan: trial
+  price_tier: 3
 
 new:
   email: new@example.com
   password_digest: <%= default_password_digest %>
   auth_token: <%= SecureRandom.hex %>
   starred_token: <%= SecureRandom.hex %>
-  plan: basic_monthly_2
+  plan: basic_monthly_3
   customer_id: cus_new
+  price_tier: 3
 
 timed:
   email: timed@example.com
   password_digest: <%= default_password_digest %>
   plan: timed
   customer_id: cus_timed
+  price_tier: 3
