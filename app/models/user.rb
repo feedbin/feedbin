@@ -121,10 +121,11 @@ class User < ApplicationRecord
   end
 
   def schedule_trial_jobs
-    if self.plan.stripe_id != 'free'
-      send_notice = Feedbin::Application.config.trial_days - 1
-      TrialSendExpiration.perform_in(send_notice.days, self.id)
-    end
+    OnboardingMessage.perform_async(self.id, MarketingMailer.method(:onboarding_1_welcome).name.to_s)
+    OnboardingMessage.perform_in(3.days, self.id, MarketingMailer.method(:onboarding_2_mobile).name.to_s)
+    OnboardingMessage.perform_in(5.days, self.id, MarketingMailer.method(:onboarding_3_subscribe).name.to_s)
+    OnboardingMessage.perform_in(Feedbin::Application.config.trial_days.days - 1, self.id, MarketingMailer.method(:onboarding_4_expiring).name.to_s)
+    OnboardingMessage.perform_at(Feedbin::Application.config.trial_days.days.from_now, self.id, MarketingMailer.method(:onboarding_5_expired).name.to_s)
   end
 
   def setting_on?(setting_symbol)
@@ -407,6 +408,10 @@ class User < ApplicationRecord
     end
 
     can_read
+  end
+
+  def trialing?
+    self.plan == Plan.find_by_stripe_id('trial')
   end
 
 end
