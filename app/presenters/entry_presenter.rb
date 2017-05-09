@@ -169,6 +169,10 @@ class EntryPresenter < BasePresenter
     end
   end
 
+  def has_enclosure?
+    entry.data.respond_to?(:[]) && entry.data["enclosure_url"].present?
+  end
+
   def has_media?
     !media_type.nil? || content.include?('<iframe')
   end

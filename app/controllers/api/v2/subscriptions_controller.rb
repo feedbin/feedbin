@@ -9,6 +9,7 @@ module Api
 
       def index
         @user = current_user
+        @user.update(api_client: request.user_agent)
         respond_to do |format|
           format.json do
             @subscriptions = @user.subscriptions.includes(:feed).order("subscriptions.created_at DESC")

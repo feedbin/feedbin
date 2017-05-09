@@ -74,8 +74,8 @@ class SettingsControllerTest < ActionController::TestCase
     stripe_helper = StripeMock.create_test_helper
 
     plans = {
-      original: plans(:basic_monthly_2),
-      new: plans(:basic_yearly_2)
+      original: plans(:basic_monthly_3),
+      new: plans(:basic_yearly_3)
     }
     plans.each do |_, plan|
       create_stripe_plan(plan)
@@ -179,7 +179,7 @@ class SettingsControllerTest < ActionController::TestCase
     login_as @user
     ['day', 'night', 'sunset'].each do |theme|
       post :theme, params: {theme: theme}
-      assert_equal @user.reload.theme, theme
+      assert_equal(theme, @user.reload.theme)
     end
   end
 

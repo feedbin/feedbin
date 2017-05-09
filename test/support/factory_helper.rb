@@ -21,6 +21,9 @@ module FactoryHelper
       url: Faker::Internet.url,
       content: Faker::Lorem.paragraph,
       public_id: SecureRandom.hex,
+      data: {
+        enclosure_url: Faker::Internet.url
+      }
     )
   end
 

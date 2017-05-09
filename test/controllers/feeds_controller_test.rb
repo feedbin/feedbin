@@ -29,7 +29,7 @@ class FeedsControllerTest < ActionController::TestCase
     %w{view_unread view_starred view_all}.each do |view_mode|
       get view_mode, xhr: true
       assert_response :success
-      assert @user.reload.view_mode == view_mode
+      assert_equal view_mode, @user.reload.view_mode
     end
 
   end
