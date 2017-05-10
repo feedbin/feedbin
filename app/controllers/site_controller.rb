@@ -48,6 +48,10 @@ class SiteController < ApplicationController
     end
   end
 
+  def subscribe
+    redirect_to root_url(request.query_parameters)
+  end
+
   def headers
     @user = current_user
     if @user.admin?
