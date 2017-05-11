@@ -1639,6 +1639,7 @@ $saved-search-control-height: 48px;
         margin: 0;
         @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         display: block;
+        hyphens: auto;
     }
     .icon-star {
         width: 38px;
@@ -2239,6 +2240,67 @@ $saved-search-control-height: 48px;
     max-width: 660px;
     min-height: 100%;
 }
+
+.font-size-0 {
+    .entry-inner {
+        max-width: 390px;
+    }
+}
+
+.font-size-1 {
+    .entry-inner {
+        max-width: 420px;
+    }
+}
+
+.font-size-2 {
+    .entry-inner {
+        max-width: 450px;
+    }
+}
+
+.font-size-3 {
+    .entry-inner {
+        max-width: 490px;
+    }
+}
+
+.font-size-4 {
+    .entry-inner {
+        max-width: 510px;
+    }
+}
+
+.font-size-5 {
+    .entry-inner {
+        max-width: 530px;
+    }
+}
+
+.font-size-6 {
+    .entry-inner {
+        max-width: 580px;
+    }
+}
+
+.font-size-7 {
+    .entry-inner {
+        max-width: 660px;
+    }
+}
+
+.font-size-8 {
+    .entry-inner {
+        max-width: 720px;
+    }
+}
+
+.font-size-9 {
+    .entry-inner {
+        max-width: 790px;
+    }
+}
+
 
 .next-entry-preview {
     display: block;
