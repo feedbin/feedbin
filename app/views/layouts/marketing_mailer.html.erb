@@ -15,6 +15,5 @@
 </head>
 <body>
     <%= yield %>
-    <img src="<%= url_for("https://www.google-analytics.com/collect?#{{v: 1, t: 'event', ec: 'email', ea: 'open', dt: message.subject, tid: ENV['ANALYTICS_ID']}.to_query}") %>"/>
 </body>
 </html>
