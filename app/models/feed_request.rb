@@ -25,10 +25,14 @@ class FeedRequest
   end
 
   def format
-    if Feedjira::Feed.determine_feed_parser_for_xml(body)
-      :xml
+    if json_feed?
+      :json_feed
     else
-      :html
+      if Feedjira::Feed.determine_feed_parser_for_xml(body)
+        :xml
+      else
+        :html
+      end
     end
   rescue ArgumentError
     if charset
@@ -37,6 +41,10 @@ class FeedRequest
       @body = body.force_encoding("ASCII-8BIT")
     end
     format
+  end
+
+  def json_feed?
+    @json_feed ||= headers[:content_type] && headers[:content_type].start_with?("application/json") && body.include?("jsonfeed.org")
   end
 
   def last_effective_url

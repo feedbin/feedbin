@@ -11,6 +11,7 @@ class FeedFinder
       options.concat(existing_feed) if options.empty?
       options.concat(page_links) if options.empty?
       options.concat(xml) if options.empty?
+      options.concat(json_feed) if options.empty?
       options.concat(youtube) if options.empty?
       options.concat(guess) if options.empty?
       options
@@ -33,12 +34,15 @@ class FeedFinder
       end
 
       feed = Feed.where(feed_url: request.last_effective_url).take
-      if !feed && request.body.present? && request.format == :xml
-        parsed_feed = ParsedFeed.new(request.body, request)
+      if !feed && request.body.present? && [:xml, :json_feed].include?(request.format)
+        if request.format == :xml
+          parsed_feed = ParsedXMLFeed.new(request.body, request)
+        elsif request.format == :json_feed
+          parsed_feed = ParsedJSONFeed.new(request.body, request)
+        end
         feed = Feed.create_from_parsed_feed(parsed_feed)
       end
     end
-
     feed
   end
 
@@ -64,6 +68,15 @@ class FeedFinder
   def xml
     options = []
     if cache(@url).format == :xml
+      url = cache(@url).last_effective_url
+      options.push(FeedOption.new(url, url, url))
+    end
+    options
+  end
+
+  def json_feed
+    options = []
+    if cache(@url).format == :json_feed
       url = cache(@url).last_effective_url
       options.push(FeedOption.new(url, url, url))
     end

@@ -13,7 +13,7 @@ class SelfUrl
   def update(feed_id)
     feed = Feed.find(feed_id)
     request = FeedRequest.new(url: feed.feed_url)
-    parsed_feed = ParsedFeed.new(request.body, request)
+    parsed_feed = ParsedXMLFeed.new(request.body, request)
     if parsed_feed.self_url
       feed.update_attributes(self_url: parsed_feed.self_url)
     end
