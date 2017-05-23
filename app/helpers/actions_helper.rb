@@ -20,6 +20,10 @@ module ActionsHelper
     output.join(' ')
   end
 
+  def action_tag_names(action)
+    Tag.where(id: action.tag_ids).order(name: :asc).pluck(:name).join(', ')
+  end
+
   def action_names(action)
     actions = []
     action.actions.each do |action_name|

@@ -4,6 +4,7 @@
 
 <small class="sub-head">
 <% feed_ids = action.feed_ids.reject{ |feed_id| feed_id.empty? } %>
+<% tag_ids = action.tag_ids.reject{ |tag_id| tag_id.blank? } %>
 If an article is published
 
 <% if action.query.present? %>
@@ -14,6 +15,10 @@ If an article is published
   in <strong>any</strong> feed
 <% elsif feed_ids.any? %>
   in the feed<%= feed_ids.length > 1 ? 's' : '' %> <strong><%= action_feed_names(action) %></strong>
+<% end %>
+
+<% if tag_ids.any? %>
+  in the <%= 'tag'.pluralize(tag_ids.length) %> <strong><%= action_tag_names(action) %></strong>
 <% end %>
 
 then <%= action_names(action) %>.
