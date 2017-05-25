@@ -37,7 +37,7 @@ class OnboardingMessage
 
   def onboarding_5_expired
     if @user.trialing?
-      send_message
+      MarketingMailer.delay_for(1.day).send(@message, @user.id)
     end
   end
 
