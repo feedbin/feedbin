@@ -22,8 +22,6 @@ class InAppPurchase < ApplicationRecord
     if expires_at.present? && expires_at.future?
       base_date = expires_at
     end
-    product_id = receipt["product_id"]
-    product = Feedbin::Application.config.iap[product_id]
     new_expires_at = base_date + product[:time]
     user.plan = Plan.find_by_stripe_id("timed")
     user.expires_at = new_expires_at
@@ -31,8 +29,24 @@ class InAppPurchase < ApplicationRecord
     user.save
   end
 
+  def product_id
+    @product_id ||= receipt["product_id"]
+  end
+
+  def product
+    @product ||= Feedbin::Application.config.iap[product_id]
+  end
+
+  def receipt_amount
+    product[:amount].to_f / 100
+  end
+
   def receipt_date
     purchase_date.to_s(:date)
+  end
+
+  def receipt_description
+    product[:name]
   end
 
   def currency

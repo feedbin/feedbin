@@ -92,6 +92,10 @@ class BillingEvent < ApplicationRecord
     Time.at(event_object["created"]).to_s(:date)
   end
 
+  def receipt_description
+    ""
+  end
+
   def receipt_amount
     event_object["amount"].to_f / 100
   end

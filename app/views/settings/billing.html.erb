@@ -118,8 +118,10 @@
               <tr>
                 <td><%= plan.name %></td>
                 <td>
-                    <% if plan.price > 0 %>
-                    <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
+                    <% if plan.stripe_id == "timed" && @user.expires_at %>
+                        Expires <%= @user.expires_at.to_s(:date) %>
+                    <% else %>
+                        <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
                     <% end %>
                 </td>
                 <td>
@@ -143,7 +145,7 @@
         </div>
         <div class="table-wrap">
           <table class="table table-rounded">
-            <% if @next_payment_date %>
+            <% if @next_payment_date && @user.plan.stripe_id != 'timed' %>
               <tr>
                 <td><time datetime="<%= @next_payment_date.to_s(:date) %>"><%= @next_payment_date.to_s(:date) %></time></td>
                 <td>&nbsp;</td>
@@ -153,7 +155,7 @@
             <% @billing_events.each do |invoice| %>
             <tr>
               <td><%= invoice.receipt_date %></td>
-              <td><%= invoice.currency %> <%= number_to_currency(invoice.receipt_amount) %></td>
+              <td><%= number_to_currency(invoice.receipt_amount) %> <%= invoice.currency %> <%= invoice.receipt_description %></td>
               <td><%= link_to 'Receipt', invoice %></td>
             </tr>
             <% end %>
