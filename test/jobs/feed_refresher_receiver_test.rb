@@ -34,6 +34,20 @@ class FeedRefresherReceiverTestTest < ActiveSupport::TestCase
     end
   end
 
+  test "should not create entry public_id_alt" do
+    entry = build_entry()
+    params = {
+      "feed" => {
+        "id" => @feed.id
+      },
+      "entries" => [entry]
+    }
+    FeedbinUtils.update_public_id_cache(entry["data"]["public_id_alt"], '')
+    assert_no_difference "Entry.count" do
+      FeedRefresherReceiver.new().perform(params)
+    end
+  end
+
   test "should update entry" do
     public_id = SecureRandom.hex
     entry = @feed.entries.create(public_id: public_id)

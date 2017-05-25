@@ -120,9 +120,9 @@ class FeedRefresherReceiver
   end
 
   def alternate_exists?(entry)
-    entry['data'] &&
-    entry['data']['public_id_alt'] &&
-    Entry.where(public_id: entry['data']['public_id_alt']).exists?
+    if entry['data'] && entry['data']['public_id_alt']
+      Entry.where(public_id: entry['data']['public_id_alt']).exists? || FeedbinUtils.public_id_exists?(entry['data']['public_id_alt'])
+    end
   end
 
   def update_feed(update, feed)

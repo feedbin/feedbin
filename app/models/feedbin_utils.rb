@@ -11,6 +11,10 @@ class FeedbinUtils
     end
   end
 
+  def self.public_id_exists?(public_id)
+    $redis[:id_cache].exists(public_id)
+  end
+
   def self.redis_feed_entries_created_at_key(feed_id)
     FEED_ENTRIES_CREATED_AT_KEY % feed_id
   end
