@@ -6,6 +6,7 @@ Plan.create!(stripe_id: 'basic-monthly-3', name: "Monthly", price: 5, price_tier
 Plan.create!(stripe_id: 'basic-yearly-3', name: "Yearly", price: 50, price_tier: 3)
 Plan.create!(stripe_id: 'free', name: "Free", price: 0, price_tier: 3)
 Plan.create!(stripe_id: 'timed', name: "Timed", price: 0, price_tier: 3)
+Plan.create!(stripe_id: 'timed', name: "Timed", price: 0, price_tier: 2)
 plan = Plan.create!(stripe_id: 'trial', name: "Trial", price: 0, price_tier: 3)
 
 

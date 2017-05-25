@@ -117,7 +117,11 @@
             <% @plans.each do |plan| %>
               <tr>
                 <td><%= plan.name %></td>
-                <td><%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %></td>
+                <td>
+                    <% if plan.price > 0 %>
+                    <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
+                    <% end %>
+                </td>
                 <td>
                   <% if @user.plan.id == plan.id %>
                     Your plan
@@ -148,8 +152,8 @@
             <% end %>
             <% @billing_events.each do |invoice| %>
             <tr>
-              <td><%= Time.at(invoice.event_object["created"]).to_s(:date) %></td>
-              <td><%= invoice.event_object["currency"].upcase %> <%= number_to_currency(invoice.event_object["amount"].to_f / 100) %></td>
+              <td><%= invoice.receipt_date %></td>
+              <td><%= invoice.currency %> <%= number_to_currency(invoice.receipt_amount) %></td>
               <td><%= link_to 'Receipt', invoice %></td>
             </tr>
             <% end %>

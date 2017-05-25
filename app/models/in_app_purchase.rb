@@ -31,4 +31,13 @@ class InAppPurchase < ApplicationRecord
     user.save
   end
 
+  def receipt_date
+    purchase_date.to_s(:date)
+  end
+
+  def currency
+    "USD"
+  end
+
+
 end

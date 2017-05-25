@@ -184,12 +184,17 @@ class User < ApplicationRecord
   end
 
   def available_plans
-    if plan.stripe_id == 'trial'
+    plan_stripe_id = plan.stripe_id
+    if plan_stripe_id == 'trial'
       Plan.where(price_tier: price_tier, stripe_id: ['basic-monthly-2', 'basic-yearly-2', 'basic-monthly-3', 'basic-yearly-3']).order('price DESC')
-    elsif plan.stripe_id == 'free'
+    elsif plan_stripe_id == 'free'
       Plan.where(price_tier: price_tier)
     else
-      Plan.where(price_tier: price_tier).where.not(stripe_id: ['free', 'trial', 'timed'])
+      exclude = ['free', 'trial']
+      if plan_stripe_id != 'timed'
+        exclude.push('timed')
+      end
+      Plan.where(price_tier: price_tier).where.not(stripe_id: exclude)
     end
   end
 
