@@ -50,7 +50,11 @@ class ParsedJSONEntry < ParsedEntry
   end
 
   def published
-    Time.parse(@entry["date_published"])
+    begin
+      Time.parse(@entry["date_published"])
+    rescue
+      nil
+    end
   end
 
   def title
