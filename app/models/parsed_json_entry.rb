@@ -8,7 +8,6 @@ class ParsedJSONEntry < ParsedEntry
   end
 
   def entry_id
-    puts @entry.inspect
     @entry["id"] ? @entry["id"].strip : nil
   end
 
@@ -50,7 +49,11 @@ class ParsedJSONEntry < ParsedEntry
   end
 
   def published
-    Time.parse(@entry["date_published"])
+    begin
+      Time.parse(@entry["date_published"])
+    rescue
+      nil
+    end
   end
 
   def title

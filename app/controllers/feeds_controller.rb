@@ -125,7 +125,11 @@ class FeedsController < ApplicationController
     @user = current_user
     @feeds = FeedFinder.new(params[:q]).create_feeds!
     @feeds.map(&:priority_refresh)
-  rescue
+  rescue => exception
+    logger.info { "------------------------" }
+    logger.info { exception.message }
+    logger.info { exception.backtrace }
+    logger.info { "------------------------" }
     @feeds = nil
   end
 

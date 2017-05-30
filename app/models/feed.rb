@@ -37,11 +37,13 @@ class Feed < ApplicationRecord
   end
 
   def self.create_from_parsed_feed(parsed_feed)
-    record = self.create!(parsed_feed.to_feed)
-    parsed_feed.entries.each do |parsed_entry|
-      record.entries.create!(parsed_entry.to_entry)
+    ActiveRecord::Base.transaction do
+      record = self.create!(parsed_feed.to_feed)
+      parsed_feed.entries.each do |parsed_entry|
+        record.entries.create!(parsed_entry.to_entry)
+      end
+      record
     end
-    record
   end
 
   def check
