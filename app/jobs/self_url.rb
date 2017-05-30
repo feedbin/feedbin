@@ -14,9 +14,9 @@ class SelfUrl
     feed = Feed.find(feed_id)
     request = FeedRequest.new(url: feed.feed_url)
     parsed_feed = ParsedXMLFeed.new(request.body, request)
-    if parsed_feed.self_url
-      feed.update_attributes(self_url: parsed_feed.self_url)
-    end
+    feed.update(self_url: parsed_feed.self_url)
+  rescue
+    feed.update(self_url: nil)
   end
 
   def build
