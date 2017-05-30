@@ -54,6 +54,12 @@ Rails.application.routes.draw do
   resources :actions, path: 'settings/actions', only: [:index, :create, :new, :update, :destroy, :edit]
   resources :saved_searches, only: [:show, :update, :destroy, :create]
 
+  resources :public_settings, only: [] do
+    member do
+      get :email_unsubscribe
+    end
+  end
+
   resources :sessions do
     collection do
       get :refresh

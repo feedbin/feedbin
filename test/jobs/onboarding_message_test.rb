@@ -65,4 +65,14 @@ class OnboardingMessageTest < ActionMailer::TestCase
       end
     end
   end
+
+  test "should skip because unsubscribed" do
+    @user = users(:ann)
+    @user.update(marketing_unsubscribe: '1')
+    assert_emails 0 do
+      %i(onboarding_5_expired onboarding_4_expiring onboarding_3_subscribe onboarding_2_mobile onboarding_1_welcome).each do |method|
+        OnboardingMessage.new().perform(@user.id, MarketingMailer.method(method).name.to_s)
+      end
+    end
+  end
 end

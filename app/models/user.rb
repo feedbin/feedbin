@@ -32,7 +32,8 @@ class User < ApplicationRecord
                  :hide_updated,
                  :view_mode,
                  :disable_image_proxy,
-                 :api_client
+                 :api_client,
+                 :marketing_unsubscribe
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -130,6 +131,10 @@ class User < ApplicationRecord
 
   def setting_on?(setting_symbol)
     self.send(setting_symbol) == '1'
+  end
+
+  def subscribed_to_emails?
+    !setting_on?(:marketing_unsubscribe)
   end
 
   def activate_subscriptions

@@ -12,31 +12,31 @@ class OnboardingMessage
   private
 
   def onboarding_1_welcome
-    if @user.trialing?
+    if @user.trialing? && @user.subscribed_to_emails?
       send_message
     end
   end
 
   def onboarding_2_mobile
-    if @user.trialing? && @user.api_client.blank?
+    if @user.trialing? && @user.api_client.blank? && @user.subscribed_to_emails?
       send_message
     end
   end
 
   def onboarding_3_subscribe
-    if @user.trialing? && @user.subscriptions.count < 10
+    if @user.trialing? && @user.subscriptions.count < 10 && @user.subscribed_to_emails?
       send_message
     end
   end
 
   def onboarding_4_expiring
-    if @user.trialing?
+    if @user.trialing? && @user.subscribed_to_emails?
       send_message
     end
   end
 
   def onboarding_5_expired
-    if @user.trialing?
+    if @user.trialing? && @user.subscribed_to_emails?
       MarketingMailer.delay_for(1.day).send(@message, @user.id)
     end
   end
@@ -44,7 +44,5 @@ class OnboardingMessage
   def send_message
     MarketingMailer.send(@message, @user).deliver
   end
-
-
 
 end

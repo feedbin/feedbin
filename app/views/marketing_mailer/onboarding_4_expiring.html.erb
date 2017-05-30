@@ -1,4 +1,5 @@
 <p>I hope you’ve been enjoying Feedbin so far. It’s just $5 a month (or $50 a year) to keep your Feedbin account going - <a href="<%= url_for settings_billing_url %>">sign up for your paid account today</a>.</p>
 <p>Without a Feedbin membership we’ll stop refreshing your feed (and shed a little tear), but you can start your membership up at anytime.</p>
 <p>Thanks!</p>
-<p>Ben</p>
+<p class="border">Ben</p>
+<p><small><a href="<%= unsubscribe_link(@user) %>">Unsubscribe</a></small></p>
