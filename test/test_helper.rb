@@ -64,7 +64,7 @@ class ActiveSupport::TestCase
   end
 
   def create_stripe_plan(plan)
-    Stripe::Plan.create(name: plan.name, id: plan.stripe_id, amount: plan.price, currency: "USD", interval: "day")
+    Stripe::Plan.create(name: plan.name, id: plan.stripe_id, amount: plan.price.to_i, currency: "USD", interval: "day")
   end
 
   def clear_search
