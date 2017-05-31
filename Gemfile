@@ -48,7 +48,7 @@ gem 'autoprefixer-rails'
 gem 'rubyzip', '= 1.1.0'
 
 gem 'activerecord-import', '>= 0.4.1'
-gem 'redis', '= 3.2.2'
+gem 'redis'
 gem 'jquery-rails'
 gem 'dalli'
 gem 'will_paginate'

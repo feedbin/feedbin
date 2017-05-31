@@ -344,7 +344,7 @@ GEM
     http_parser.rb (0.6.0)
     httparty (0.15.5)
       multi_xml (>= 0.5.2)
-    i18n (0.8.1)
+    i18n (0.8.4)
     inflecto (0.0.2)
     ipaddress (0.8.3)
     jbuilder (2.6.4)
@@ -468,7 +468,7 @@ GEM
       hashie (~> 3.2)
       multi_json (~> 1.10)
       multi_xml (~> 0.5)
-    redis (3.2.2)
+    redis (3.3.3)
     ref (2.0.0)
     responders (2.4.0)
       actionpack (>= 4.2.0, < 5.3)
@@ -495,11 +495,11 @@ GEM
       sprockets-rails (>= 2.0, < 4.0)
       tilt (>= 1.1, < 3)
     sax-machine (1.3.2)
-    sidekiq (4.2.10)
+    sidekiq (5.0.0)
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)
       rack-protection (>= 1.5.0)
-      redis (~> 3.2, >= 3.2.1)
+      redis (~> 3.3, >= 3.3.3)
     silencer (1.0.1)
     simplecov (0.14.1)
       docile (~> 1.1.0)
@@ -610,7 +610,7 @@ DEPENDENCIES
   rails-deprecated_sanitizer
   rails_autolink
   readability_parser
-  redis (= 3.2.2)
+  redis
   responders (~> 2.0)
   reverse_markdown
   rmagick
