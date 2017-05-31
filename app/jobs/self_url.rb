@@ -13,10 +13,10 @@ class SelfUrl
   def update(feed_id)
     feed = Feed.find(feed_id)
     request = FeedRequest.new(url: feed.feed_url)
-    parsed_feed = ParsedXMLFeed.new(request.body, request)
-    feed.update(self_url: parsed_feed.self_url)
+    self_url = ParsedXMLFeed.new(request.body, request).self_url
+    feed.update(self_url: self_url)
   rescue
-    feed.update(self_url: nil)
+    feed.update(self_url: feed.feed_url)
   end
 
   def build
