@@ -16,7 +16,7 @@ module FactoryHelper
   end
 
   def create_entry(feed)
-    feed.entries.create(
+    feed.entries.create!(
       title: Faker::Lorem.sentence,
       url: Faker::Internet.url,
       content: Faker::Lorem.paragraph,

@@ -19,7 +19,16 @@ class Entry < ApplicationRecord
   after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
 
+  validate :has_content
+  validates :feed, :public_id, presence: true
+
   self.per_page = 100
+
+  def has_content
+    if [title, url, entry_id, content].compact.count == 0
+      errors.add(:base, 'entry has no content')
+    end
+  end
 
   def self.entries_with_feed(entry_ids, sort)
     entry_ids = entry_ids.map(&:entry_id)

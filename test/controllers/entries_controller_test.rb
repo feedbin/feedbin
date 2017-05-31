@@ -95,7 +95,7 @@ class EntriesControllerTest < ActionController::TestCase
     login_as @user
 
     recently_read_entries = @user.entries.limit(2).map do |entry|
-      @user.recently_read_entries.create(entry: entry)
+      @user.recently_read_entries.create!(entry: entry)
     end
 
     assert_difference('UnreadEntry.count', -recently_read_entries.length) do
@@ -108,7 +108,7 @@ class EntriesControllerTest < ActionController::TestCase
     login_as @user
 
     updated_entries = @user.entries.limit(2).map do |entry|
-      @user.updated_entries.create(entry: entry)
+      @user.updated_entries.create!(entry: entry)
     end
 
     assert_difference('UpdatedEntry.count', -updated_entries.length) do

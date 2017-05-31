@@ -19,7 +19,7 @@ class Api::V2::DevicesControllerTest < ApiControllerTestCase
   test "should get ios_test" do
     Sidekiq::Worker.clear_all
     login_as @user
-    @user.feeds.first.entries.create(public_id: 'new')
+    @user.feeds.first.entries.create!(url: 'url', public_id: 'new')
     assert_difference "DevicePushNotificationSend.jobs.size", +1 do
       get :ios_test, format: :json
       assert_response :success
@@ -29,7 +29,7 @@ class Api::V2::DevicesControllerTest < ApiControllerTestCase
   test "should get safari_test" do
     Sidekiq::Worker.clear_all
     login_as @user
-    @user.feeds.first.entries.create(public_id: 'new')
+    @user.feeds.first.entries.create!(url: 'url', public_id: 'new')
     assert_difference "SafariPushNotificationSend.jobs.size", +1 do
       get :safari_test, format: :json
       assert_response :success

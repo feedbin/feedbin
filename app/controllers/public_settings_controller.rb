@@ -7,6 +7,8 @@ class PublicSettingsController < ApplicationController
     user = Rails.application.message_verifier(:unsubscribe).verify(params[:id])
     @user = User.find(user)
     @user.update(marketing_unsubscribe: "1")
+  rescue ActiveSupport::MessageVerifier::InvalidSignature
+    render_404
   end
 
 end

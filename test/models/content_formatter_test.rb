@@ -5,7 +5,7 @@ class ContentFormatterTest < ActiveSupport::TestCase
   setup do
     feed = feeds(:kottke)
     content = %(<p><a href="/link"><img src="/img.png"></a></p>)
-    @entry = feed.entries.create(content: content)
+    @entry = feed.entries.create!(content: content, public_id: SecureRandom.hex)
   end
 
   test "should format content" do

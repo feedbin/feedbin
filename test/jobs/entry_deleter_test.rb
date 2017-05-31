@@ -10,7 +10,7 @@ class EntryDeleterTestTest < ActiveSupport::TestCase
     @feed = @user.feeds.first
     Feed.reset_counters(@feed.id, :subscriptions)
     @entries = (ENV['ENTRY_LIMIT'].to_i + count.sample).times.map do
-      @feed.entries.create(
+      @feed.entries.create!(
         content: Faker::Lorem.paragraph,
         public_id: SecureRandom.hex,
       )

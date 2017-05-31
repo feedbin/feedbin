@@ -7,7 +7,7 @@ class SearchServerSetupTest < ActiveSupport::TestCase
     @user = users(:ben)
     feed = @user.feeds.first
     @entries = (1..10).to_a.sample.times.map do
-      feed.entries.create(
+      feed.entries.create!(
         content: Faker::Lorem.paragraph,
         public_id: SecureRandom.hex,
       )
