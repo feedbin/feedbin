@@ -1,0 +1,64 @@
+version: '3'
+services:
+  web:
+    image: feedbin
+    container_name: feedbin_web
+    command: rackup --host 0.0.0.0 --port 9292
+    ports:
+      - "9292:9292"
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: postgres://feedbin:secret@postgres:5432/feedbin_db
+      POSTGRES_USERNAME: feedbin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_HOST: postgres
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      REDIS_URL: redis://redis:6379
+      AWS_ACCESS_KEY_ID: foo
+      AWS_SECRET_ACCESS_KEY: bar
+      RACK_ENV: development
+      RAILS_ENV: development
+    depends_on:
+      - postgres
+      - elasticsearch
+      - redis
+  worker:
+    image: feedbin
+    container_name: feedbin_worker
+    command: bundle exec foreman start
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: postgres://feedbin:secret@postgres:5432/feedbin_db
+      POSTGRES_USERNAME: feedbin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_HOST: postgres
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      REDIS_URL: redis://redis:6379
+      AWS_ACCESS_KEY_ID: foo
+      AWS_SECRET_ACCESS_KEY: bar
+      RACK_ENV: development
+      RAILS_ENV: development
+    depends_on:
+      - postgres
+      - elasticsearch
+      - redis
+  redis:
+    image: redis:3.2
+    container_name: feedbin_redis
+  postgres:
+    image: postgres:9.5
+    container_name: feedbin_postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: feedbin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: feedbin_db
+      PGDATA: /var/lib/postgresql/data/pgdata
+  elasticsearch:
+    image: elasticsearch:2.3.3
+    container_name: feedbin_elasticsearch
+volumes:
+  pgdata:

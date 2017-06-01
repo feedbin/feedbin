@@ -4,8 +4,8 @@ development:
   database: feedbin_development
   pool: <%= ENV['DB_POOL'] || 5 %>
   username: <%= ENV['POSTGRES_USERNAME'] %>
-  password:
-  host: localhost
+  password: <%= ENV['POSTGRES_PASSWORD'] || '' %>
+  host: <%= ENV['POSTGRES_HOST'] || 'localhost' %>
 
 test:
   adapter: postgresql
@@ -13,5 +13,5 @@ test:
   database: feedbin_test
   pool: <%= ENV['DB_POOL'] || 5 %>
   username: <%= ENV['POSTGRES_USERNAME'] %>
-  password:
-  host: localhost
+  password: <%= ENV['POSTGRES_PASSWORD'] || '' %>
+  host: <%= ENV['POSTGRES_HOST'] || 'localhost' %>

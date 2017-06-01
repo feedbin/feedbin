@@ -59,6 +59,8 @@ Feedbin uses environment variables for configuration. Feedbin will run without t
 | LIBRATO_USER             | Used for reporting stats - http://metrics.librato.com                              |
 | MEMCACHED_HOSTS          | Comma separated memcached hosts/ports - 192.168.1.2:11121                          |
 | POSTGRES_USERNAME        | Used for connecting to database                                                    |
+| POSTGRES_HOST            | Used for connecting to database                                                    |
+| POSTGRES_PASSWORD        | Used for connecting to database                                                    |
 | PUSH_URL                 | URL for the Feedbin instance - https://feedbin.com                                 |
 | RACK_ENV                 | Environment - production                                                           |
 | RAILS_ENV                | Environment - production                                                           |
