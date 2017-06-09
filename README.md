@@ -48,7 +48,7 @@ If you encounter any errors after running `bundle` there is a problem installing
 
 Feedbin uses environment variables for configuration. Feedbin will run without most of these, but various features and functionality will be turned off.
 
-Rename [.env.example](.env.example]) to `.env` and customize it with your settings.
+Rename [.env.example](.env.example) to `.env` and customize it with your settings.
 
 **Setup the database**
 
