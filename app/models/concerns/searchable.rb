@@ -5,14 +5,16 @@ module Searchable
     include Elasticsearch::Model
 
     mappings _source: {enabled: false} do
-      indexes :id,        type: 'long', index: :not_analyzed
-      indexes :title,     analyzer: 'snowball'
-      indexes :content,   analyzer: 'snowball'
-      indexes :author,    analyzer: 'keyword'
-      indexes :url,       analyzer: 'keyword'
-      indexes :feed_id,   type: 'long', index: :not_analyzed, include_in_all: false
-      indexes :published, type: 'date', include_in_all: false
-      indexes :updated,   type: 'date', include_in_all: false
+      indexes :id,            type: 'long', index: :not_analyzed
+      indexes :title,         analyzer: 'snowball'
+      indexes :title_exact,   analyzer: 'whitespace'
+      indexes :content,       analyzer: 'snowball'
+      indexes :content_exact, analyzer: 'whitespace'
+      indexes :author,        analyzer: 'keyword'
+      indexes :url,           analyzer: 'keyword'
+      indexes :feed_id,       type: 'long', index: :not_analyzed, include_in_all: false
+      indexes :published,     type: 'date', include_in_all: false
+      indexes :updated,       type: 'date', include_in_all: false
     end
 
     def self.scoped_search(params, user)
@@ -159,7 +161,7 @@ module Searchable
         escape = '\ '.sub(' ', '')
         query = query.gsub(special_characters_regex) { |character| escape + character }
 
-        colon_regex = /(?<!title|feed_id|content|author):(?=.*)/
+        colon_regex = /(?<!title|title_exact|feed_id|content|content_exact|author):(?=.*)/
         query = query.gsub(colon_regex, '\:')
         query
       end
