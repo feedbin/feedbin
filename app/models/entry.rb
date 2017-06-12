@@ -106,6 +106,7 @@ class Entry < ApplicationRecord
     text ||= ""
     decoder = HTMLEntities.new
     text = decoder.decode(text)
+    text = text.chars.select(&:valid_encoding?).join
     text = ApplicationController.helpers.sanitize(text, tags: []).squish.mb_chars.to_s
     text
   end

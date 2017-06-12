@@ -26,7 +26,7 @@ class MarketingMailer < ApplicationMailer
 
   def onboarding_5_expired(user)
     @user = User.find(user)
-    mail(to: user.email, subject: 'Your Feedbin trial has expired')
+    mail(to: @user.email, subject: 'Your Feedbin trial has expired')
   end
 
   def member_discount(user)

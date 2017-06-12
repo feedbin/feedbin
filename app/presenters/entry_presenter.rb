@@ -99,7 +99,7 @@ class EntryPresenter < BasePresenter
     @entry_view_title ||= begin
       text = sanitized_title
       if text.blank?
-        text = @template.content_tag(:span, '&ndash;&ndash;'.html_safe, title: "No title").html_safe
+        text = @template.content_tag(:span, entry.feed.title, title: "No title").html_safe
       end
       text
     end
