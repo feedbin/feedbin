@@ -65,7 +65,7 @@ class DevicePushNotificationSend
     author = format_text(entry.author)
     title = format_text(entry.title)
     published = entry.published.iso8601(6)
-    unless operating_system =~ /^iPhone OS 10/
+    unless operating_system =~ /^iPhone OS 1[0-9]/
       body = "#{feed_title}: #{body}"
     end
     Apnotic::Notification.new(device_token).tap do |notification|
