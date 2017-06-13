@@ -161,7 +161,7 @@ module Searchable
         escape = '\ '.sub(' ', '')
         query = query.gsub(special_characters_regex) { |character| escape + character }
 
-        colon_regex = /(?<!title|title_exact|feed_id|content|content_exact|author):(?=.*)/
+        colon_regex = /(?<!title|title_exact|feed_id|content|content_exact|author|_missing_|_exists_):(?=.*)/
         query = query.gsub(colon_regex, '\:')
         query
       end
