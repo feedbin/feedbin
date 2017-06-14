@@ -9,8 +9,12 @@
             <%= text_field_tag 'feed[tag_list]', '', autocomplete: 'off', placeholder: 'Tags', data: {behavior: "tag_name_target", feed_id: entry.feed_id} %>
         <% end %>
     </div>
-    <%= link_to "Visit", entry.feed.site_url, class: "toolbar-item", target: "_blank", rel: 'noopener noreferrer' %>
-    <%= link_to "Unsubscribe", feed_destroy_subscription_url(entry.feed), class: "toolbar-item danger", method: :delete, remote: true, data: { confirm: "Are you sure you want to unsubscribe from #{entry.feed.title}?" } %>
+    <%= link_to entry.feed.site_url, class: "toolbar-item icon", target: "_blank", rel: 'noopener noreferrer', title: "Visit #{entry.feed.host}" do %>
+        <%= svg_tag 'icon-visit', size: '48x48' %>
+    <% end %>
+    <%= link_to feed_destroy_subscription_url(entry.feed), class: "toolbar-item icon", method: :delete, remote: true, title: "Unsubscribe", data: { confirm: "Are you sure you want to unsubscribe from #{entry.feed.title}?" } do %>
+        <%= svg_tag 'icon-delete', size: '48x48' %>
+    <% end %>
 </div>
 <script>
 var feedId = <%= entry.feed_id %>;

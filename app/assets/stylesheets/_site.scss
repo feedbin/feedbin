@@ -1993,6 +1993,9 @@ $saved-search-control-height: 48px;
             &:hover {
                 text-decoration: none;
             }
+            &.icon {
+                padding: 0;
+            }
         }
         input[type="text"] {
             margin: 0;
