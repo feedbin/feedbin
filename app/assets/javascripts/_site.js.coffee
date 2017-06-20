@@ -1491,6 +1491,16 @@ $.extend feedbin,
           $('#add_form_modal [data-behavior~=submit_add]').removeAttr('disabled', 'disabled')
         feedbin.updateFeedSearchMessage()
 
+    linkActions: ->
+      $(document).on 'click', '[data-behavior~=link_actions]', (event) ->
+        link = $(@).parent()
+        input = $("<input>").attr(type: "hidden", name: "url").val(link.attr("href"))
+        console.log input
+        form = $('[data-behavior~=toggle_content_view]')
+        form.append(input)
+        form.submit()
+        event.preventDefault()
+
 $.each feedbin.preInit, (i, item) ->
   item()
 

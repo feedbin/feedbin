@@ -30,8 +30,8 @@ GIT
 
 GIT
   remote: git://github.com/feedbin/html-pipeline.git
-  revision: 5794077544566707cd8ff4adbb8b0d9011b33b10
-  ref: 5794077
+  revision: dc012b9d1d0d6487fc96a66af50b0608acc22b93
+  ref: dc012b9
   specs:
     html-pipeline (2.4.2)
       activesupport (>= 2)
@@ -632,4 +632,4 @@ DEPENDENCIES
   xipio
 
 BUNDLED WITH
-   1.15.0
+   1.15.1

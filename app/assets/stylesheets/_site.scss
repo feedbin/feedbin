@@ -2755,6 +2755,25 @@ $saved-search-control-height: 48px;
     border-top-color: $body-background-color-sunset;
 }
 
+.entry-final-content {
+    a {
+        position: relative;
+        [data-behavior=link_actions] {
+            content: "";
+            display: inline-block;
+            position: absolute;
+            left: -16px;
+            top: 6px;
+            height: 15px;
+            width: 15px;
+            border: 1px solid #999;
+            border-radius: 3px;
+            background-color: #ccc;
+            cursor: pointer;
+        }
+    }
+}
+
 .content-styles {
     font-style: normal;
     font-size: 1.15em;

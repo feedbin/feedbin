@@ -21,7 +21,19 @@
             </div>
         </div>
       <% end %>
-      <%= content.html_safe %>
+
+      <% if content_info.blank? %>
+          <% if entry_presenter.media_type %>
+              <div class="media-container">
+                <%= entry_presenter.media.html_safe %>
+              </div>
+          <% end %>
+      <% end %>
+
+      <div class="entry-final-content">
+          <%= content.html_safe %>
+      </div>
+
   <% else %>
       <p class="content-error entry-callout">Unable to get this article’s content.</p>
   <% end %>
