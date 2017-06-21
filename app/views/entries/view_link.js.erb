@@ -1,0 +1,4 @@
+modal = $('#view_link_wrap')
+markup = $('[data-behavior~=markup_target]', modal)
+markup.html("<%= j @content.html_safe %>")
+feedbin.modal('#view_link_wrap')

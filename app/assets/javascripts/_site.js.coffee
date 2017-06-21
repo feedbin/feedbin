@@ -614,6 +614,8 @@ $.extend feedbin,
 
   preloadedImageIds: []
 
+  linkActionsTimer: []
+
   ONE_HOUR: 60 * 60 * 1000
 
   ONE_DAY: 60 * 60 * 1000 * 24
@@ -1491,14 +1493,26 @@ $.extend feedbin,
           $('#add_form_modal [data-behavior~=submit_add]').removeAttr('disabled', 'disabled')
         feedbin.updateFeedSearchMessage()
 
+    linkActionsHover: ->
+      $(document).on 'mouseenter mouseleave', '.entry-final-content a:not(.skip)', (event) ->
+        clearTimeout(feedbin.linkActionsTimer)
+        $('.entry-final-content a [data-behavior~=link_actions]').remove()
+
+        link = $(@)
+        contents = $('[data-behavior~=link_actions]').clone()
+        action = $('[data-behavior~=view_link]', contents)
+        href = action.attr('href')
+        action.attr('href', "#{href}?url=#{link.attr('href')}")
+        contents = contents[0].outerHTML
+
+        if event.type == "mouseenter"
+          feedbin.linkActionsTimer = setTimeout ( ->
+            link.append(contents)
+          ), 300
+
     linkActions: ->
       $(document).on 'click', '[data-behavior~=link_actions]', (event) ->
-        link = $(@).parent()
-        input = $("<input>").attr(type: "hidden", name: "url").val(link.attr("href"))
-        console.log input
-        form = $('[data-behavior~=toggle_content_view]')
-        form.append(input)
-        form.submit()
+        $(@).addClass('open')
         event.preventDefault()
 
 $.each feedbin.preInit, (i, item) ->

@@ -2492,7 +2492,7 @@ $saved-search-control-height: 48px;
         li {
             margin: 0;
             padding: 0;
-            a,span {
+            a,span,button {
                 position: relative;
                 text-decoration: none;
                 display: block;
@@ -2506,11 +2506,13 @@ $saved-search-control-height: 48px;
                 font-family: $font-stack;
                 font-weight: 400 !important;
                 border-bottom: 1px solid transparent;
+                text-align: left;
                 @include border-color($border-color, $border-color-night, $border-color-sunset);
                 cursor: pointer;
                 &:hover, &.selected {
                     background-color: $selected !important;
                     color: #fff  !important;
+                    text-decoration: none;
                 }
 
                 &.no-border {
@@ -2518,12 +2520,14 @@ $saved-search-control-height: 48px;
                 }
             }
             &:last-child a,
+            &:last-child button,
             &:last-child span {
                 border-bottom: none;
                 border-bottom-right-radius: 4px;
                 border-bottom-left-radius: 4px;
             }
             &:first-child a,
+            &:first-child button,
             &:first-child span {
                 border-top-left-radius: 4px;
                 border-top-right-radius: 4px;
@@ -2755,21 +2759,40 @@ $saved-search-control-height: 48px;
     border-top-color: $body-background-color-sunset;
 }
 
+@keyframes slidein {
+  from {
+      opacity: 0;
+  }
+  to {
+      opacity: 1;
+  }
+}
+
 .entry-final-content {
     a {
         position: relative;
-        [data-behavior=link_actions] {
-            content: "";
+        .link-actions {
             display: inline-block;
-            position: absolute;
-            left: -16px;
-            top: 6px;
-            height: 15px;
-            width: 15px;
-            border: 1px solid #999;
+            position: relative;
+            content: "";
+            height: 18px;
+            width: 18px;
+            border: 1px solid #dcdee0;
             border-radius: 3px;
-            background-color: #ccc;
             cursor: pointer;
+            margin-right: -18px;
+            background: #FFF image-url("icon-caret.svg") 50% 50% no-repeat;
+            background-size: 80% 80%;
+            bottom: -2px;
+            box-shadow: 0 0 1px 0 #dcdee0;
+            animation-duration: .3s;
+            animation-name: slidein;
+            .dropdown-content {
+                top: 15px;
+            }
+            ul {
+                margin: 0 !important;
+            }
         }
     }
 }

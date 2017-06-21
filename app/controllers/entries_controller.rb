@@ -96,9 +96,6 @@ class EntriesController < ApplicationController
         else
           url = @entry.fully_qualified_url
         end
-        logger.info { "----------------" }
-        logger.info { url }
-        logger.info { "----------------" }
         @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v5") do
           Librato.increment 'readability.first_parse'
           MercuryParser.parse(url)
@@ -117,6 +114,14 @@ class EntriesController < ApplicationController
     rescue
       @content = nil
     end
+  end
+
+  def view_link
+    @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(params[:url])}:v5") do
+      Librato.increment 'readability.first_parse'
+      MercuryParser.parse(params[:url])
+    end
+    @content = @content_info.content
   end
 
   def preload

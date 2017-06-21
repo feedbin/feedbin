@@ -11,7 +11,7 @@ class ContentFormatter
     context = {
       whitelist: whitelist
     }
-    filters = [HTML::Pipeline::LazyLoadFilter, HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer, HTML::Pipeline::LinkButton]
+    filters = [HTML::Pipeline::LazyLoadFilter, HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer]
 
     if ENV['CAMO_HOST'] && ENV['CAMO_KEY'] && image_proxy_enabled
       context[:asset_proxy] = ENV['CAMO_HOST']
