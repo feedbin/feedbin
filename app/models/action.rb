@@ -13,9 +13,8 @@ class Action < ApplicationRecord
 
   before_validation :compute_tag_ids
   before_validation :compute_feed_ids
-  before_save :percolate_setup
   after_destroy :percolate_remove
-  after_touch :percolate_setup
+  after_commit :percolate_setup, on: [:create, :update]
 
   def percolate_setup
     percolator_query = self.query
