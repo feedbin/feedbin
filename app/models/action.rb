@@ -13,8 +13,8 @@ class Action < ApplicationRecord
 
   before_validation :compute_tag_ids
   before_validation :compute_feed_ids
+  before_save :percolate_setup
   after_destroy :percolate_remove
-  after_commit :percolate_setup, on: [:create, :update]
 
   def percolate_setup
     percolator_query = self.query
@@ -34,6 +34,10 @@ class Action < ApplicationRecord
         client.index(options)
       end
     end
+  rescue Elasticsearch::Transport::Transport::Errors::InternalServerError => exception
+    Honeybadger.notify(exception)
+    errors.add :base, "Invalid action syntax"
+    throw(:abort)
   end
 
   def body(percolator_query, percolator_ids)
