@@ -36,6 +36,9 @@ module Api
         else
           status_forbidden
         end
+      rescue Elasticsearch::Transport::Transport::Errors => exception
+        Honeybadger.notify(exception)
+        render json: []
       end
 
       def create
