@@ -117,11 +117,17 @@ class EntriesController < ApplicationController
   end
 
   def view_link
+    @user = current_user
     @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(params[:url])}:v5") do
       Librato.increment 'readability.first_parse'
       MercuryParser.parse(params[:url])
     end
-    @content = @content_info.content
+
+    begin
+      @content = ContentFormatter.format!(@content_info.content, nil, !@user.setting_on?(:disable_image_proxy))
+    rescue
+      @content = nil
+    end
   end
 
   def preload

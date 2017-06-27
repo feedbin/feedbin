@@ -116,7 +116,6 @@ Rails.application.routes.draw do
       post :starred_entries, to: 'starred_entries#update'
       post :mark_as_read, to: 'entries#mark_as_read'
       post :recently_read, to: 'recently_read_entries#create'
-      get :view_link
       get :push_view
       get :diff
       get :newsletter
@@ -128,6 +127,7 @@ Rails.application.routes.draw do
       get :search
       get :recently_read, to: 'recently_read_entries#index'
       get :updated, to: 'updated_entries#index'
+      post :view_link
       post :mark_all_as_read
       post :mark_direction_as_read
     end

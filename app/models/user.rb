@@ -424,4 +424,8 @@ class User < ApplicationRecord
     self.plan == Plan.find_by_stripe_id('trial')
   end
 
+  def display_prefs
+    "font-size-#{self.font_size || 5} font-#{ self.font || 'default' }"
+  end
+
 end

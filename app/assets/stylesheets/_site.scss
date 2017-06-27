@@ -2772,6 +2772,7 @@ $saved-search-control-height: 48px;
     a {
         position: relative;
         .link-actions {
+            z-index: 100;
             display: inline-block;
             position: relative;
             content: "";
@@ -5006,6 +5007,31 @@ button.close {
 @media (min-width: 992px) {
     .modal-lg {
         width: 800px;
+    }
+}
+.modal-fluid {
+    width: 95% !important;
+    &.modal-dialog {
+        margin-top: 40px;
+    }
+    .modal-header {
+        padding-top: 40px;
+        .close {
+            top: 38px;
+            right: 35px;
+        }
+    }
+    .modal-body {
+        padding-bottom: 30px;
+        padding-top: 30px;
+    }
+    .modal-footer {
+        padding-bottom: 20px;
+        padding-top: 20px;
+    }
+    .modal-header, .modal-body, .modal-footer {
+        padding-left: 30px;
+        padding-right: 30px;
     }
 }
 .modal-header:before,

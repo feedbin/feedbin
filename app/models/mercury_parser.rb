@@ -28,6 +28,8 @@ class MercuryParser
     if result['date_published']
       Time.parse(result['date_published'])
     end
+  rescue
+    nil
   end
 
   def date_published
