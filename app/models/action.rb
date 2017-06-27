@@ -36,8 +36,6 @@ class Action < ApplicationRecord
     end
   rescue Elasticsearch::Transport::Transport::Errors::InternalServerError => exception
     Honeybadger.notify(exception)
-    errors.add :base, "Invalid action syntax"
-    throw(:abort)
   end
 
   def body(percolator_query, percolator_ids)
