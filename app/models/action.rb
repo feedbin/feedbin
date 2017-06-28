@@ -13,6 +13,9 @@ class Action < ApplicationRecord
 
   before_validation :compute_tag_ids
   before_validation :compute_feed_ids
+
+  validate :query_valid
+
   after_destroy :percolate_remove
   after_commit :percolate_setup, on: [:create, :update]
 
@@ -110,6 +113,18 @@ class Action < ApplicationRecord
       id: self.id,
       ignore: 404
     )
+  end
+
+  def query_valid
+    body = body(self.query, self.computed_feed_ids)
+    options = {
+      index: Entry.index_name,
+      body: {query: body[:query]}
+    }
+    result = $search[:main].indices.validate_query(options)
+    if false == result["valid"]
+      self.errors[:base] << "Search syntax invalid"
+    end
   end
 
 end
