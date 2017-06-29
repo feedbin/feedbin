@@ -91,12 +91,8 @@ class EntriesController < ApplicationController
 
     begin
       if @content_view
-        if params[:url]
-          url = params[:url]
-        else
-          url = @entry.fully_qualified_url
-        end
-        @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v5") do
+        url = @entry.fully_qualified_url
+        @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v6") do
           Librato.increment 'readability.first_parse'
           MercuryParser.parse(url)
         end
