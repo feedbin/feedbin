@@ -2,9 +2,36 @@ require 'test_helper'
 
 class NewslettersControllerTest < ActionController::TestCase
 
-  test "creates newsletters" do
+  test "doesn't create newsletter if unsubscribed" do
+    user = users(:ben)
+    newsletter = Newsletter.new(newsletter_params(user.newsletter_token, 'asdf'))
+    signature = newsletter.send(:signature)
+
+    Feed.create!(feed_url: newsletter.feed_url)
+
+    assert_difference('Entry.count', 0) do
+      post :create, params: newsletter_params(user.newsletter_token, signature)
+    end
+    assert_response :success
+  end
+
+  test "creates newsletters with new feed" do
     user = users(:ben)
     signature = Newsletter.new(newsletter_params('asdf', 'asdf')).send(:signature)
+    assert_difference('Entry.count', 1) do
+      post :create, params: newsletter_params(user.newsletter_token, signature)
+    end
+    assert_response :success
+  end
+
+  test "creates newsletters with existing feed" do
+    user = users(:ben)
+    newsletter = Newsletter.new(newsletter_params(user.newsletter_token, 'asdf'))
+    signature = newsletter.send(:signature)
+
+    feed = Feed.create!(feed_url: newsletter.feed_url)
+    user.subscriptions.find_or_create_by(feed: feed)
+
     assert_difference('Entry.count', 1) do
       post :create, params: newsletter_params(user.newsletter_token, signature)
     end

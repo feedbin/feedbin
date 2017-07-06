@@ -14,7 +14,6 @@ class Subscription < ApplicationRecord
   after_commit :remove_feed_from_action, on: [:destroy]
 
   before_destroy :untag
-  before_destroy :email_unsubscribe
 
   after_create :refresh_favicon
 
@@ -74,10 +73,6 @@ class Subscription < ApplicationRecord
   end
 
   private
-
-  def email_unsubscribe
-    EmailUnsubscribe.perform_async(self.feed_id)
-  end
 
   def refresh_favicon
     FaviconFetcher.perform_async(self.feed.host)
