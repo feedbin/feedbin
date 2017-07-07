@@ -32,8 +32,13 @@ class BasePresenter
   end
 
   def favicon_with_url(host)
+    favicon_url = favicon_service_url(host)
+    favicon_template(favicon_url)
+  end
+
+  def favicon_template(favicon_url)
     @template.content_tag :span, '', class: "favicon-wrap" do
-      @template.content_tag(:span, '', class: "favicon", style: "background-image: url(#{favicon_url(host)});")
+      @template.content_tag(:span, '', class: "favicon", style: "background-image: url(#{favicon_url});")
     end
   end
 
@@ -45,7 +50,7 @@ class BasePresenter
     end
   end
 
-  def favicon_url(host)
+  def favicon_service_url(host)
     uri = URI::HTTP.build(
       scheme: "https",
       host: "www.google.com",

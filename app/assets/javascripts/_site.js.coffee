@@ -1511,18 +1511,12 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
         link = $(@).parents("a:first")
 
-        modal = $('#view_link_wrap')
-        markup = $('[data-behavior~=view_link_markup]')
-        modal.html(markup.html())
-        feedbin.modal('#view_link_wrap')
-
-        form = $("#view_link_wrap [data-behavior~=view_link_form]")
+        form = $("[data-behavior~=view_link_form]")
         $("#url", form).val(link.attr('href'))
         form.submit()
 
         $('.entry-final-content a [data-behavior~=link_actions]').remove()
         event.preventDefault()
-
 
       $(document).on 'click', '[data-behavior~=link_actions]', (event) ->
         $(@).addClass('open')

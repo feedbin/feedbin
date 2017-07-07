@@ -113,6 +113,14 @@ class EntriesController < ApplicationController
   end
 
   def view_link
+    @host = URI::parse(params[:url]).host
+    @user = current_user
+    @url = params[:url]
+  rescue
+    @host = nil
+  end
+
+  def view_link_contents
     @user = current_user
     @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(params[:url])}:v5") do
       Librato.increment 'readability.first_parse'

@@ -128,6 +128,7 @@ Rails.application.routes.draw do
       get :recently_read, to: 'recently_read_entries#index'
       get :updated, to: 'updated_entries#index'
       post :view_link
+      post :view_link_contents
       post :mark_all_as_read
       post :mark_direction_as_read
     end

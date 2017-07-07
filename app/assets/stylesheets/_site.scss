@@ -4900,6 +4900,15 @@ button.close {
     height: 40px;
     width: 40px;
 }
+.modal-body .close {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    font-size: 39px;
+    font-weight: bold;
+    height: 46px;
+    width: 46px;
+}
 .modal-title {
     margin: 0;
     line-height: 1.42857143;
@@ -5044,6 +5053,69 @@ button.close {
 .modal-header:after,
 .modal-footer:after {
     clear: both;
+}
+
+/*------------------------------------------------------------------------------
+Link Viewer
+------------------------------------------------------------------------------*/
+.theme-night #view_link_wrap .modal-content {
+    color: $text-color-night;
+    background-color: $body-background-color-night;
+    & .modal {
+        color: $text-color;
+    }
+}
+.theme-sunset #view_link_wrap .modal-content {
+    color: $text-color-sunset;
+    background-color: $body-background-color-sunset;
+    & .modal {
+        color: $text-color;
+    }
+}
+
+#view_link_wrap .post-meta {
+    position: relative;
+    .favicon-wrap {
+        left: -26px;
+        top: 1px;
+    }
+}
+
+.link-loading h1:empty, .link-loading p:empty {
+    @keyframes pulse {
+        0% {
+            opacity: .9;
+        }
+        50% {
+            opacity: .6;
+        }
+        100% {
+            opacity: .9;
+        }
+    }
+    animation: pulse 3s linear infinite;
+    background: $text-color-light;
+    .theme-sunset & {
+        background: $text-color-light-sunset;
+    }
+    .theme-night & {
+        background: $text-color-light-night;
+    }
+}
+.link-loading h1:empty {
+    height: 35px;
+}
+.link-loading p:empty {
+    height: 20px;
+}
+.link-loading p:nth-child(2n) {
+    width: 90%;
+}
+.link-loading p:nth-child(3n) {
+    width: 96%;
+}
+.link-loading p:last-child {
+    width: 30%;
 }
 
 /*------------------------------------------------------------------------------
