@@ -29,6 +29,7 @@ Requirements
  - [Postgres 9.2](http://www.postgresql.org/)
  - [Redis > 2.8](http://redis.io/)
  - [Memcached](https://memcached.org/)
+ - [Elasticsearch 2.4.X](https://www.elastic.co/downloads/past-releases/elasticsearch-2-4-5)
 
 Installation
 -------------
