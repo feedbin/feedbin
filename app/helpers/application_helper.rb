@@ -73,4 +73,32 @@ module ApplicationHelper
     branch_name = `git rev-parse --abbrev-ref HEAD`
     " [#{branch_name.chomp}]"
   end
+
+  def favicon_with_host(host)
+    if record = Favicon.find_by(host: host)
+      favicon_template(record.cdn_url)
+    else
+      favicon_url = favicon_service_url(host)
+      favicon_template(favicon_url)
+    end
+  end
+
+  def favicon_template(favicon_url)
+    content_tag :span, '', class: "favicon-wrap" do
+      content_tag(:span, '', class: "favicon", style: "background-image: url(#{favicon_url});")
+    end
+  end
+
+  def favicon_service_url(host)
+    uri = URI::HTTP.build(
+      scheme: "https",
+      host: "www.google.com",
+      path: "/s2/favicons",
+      query: {domain: host}.to_query
+    )
+    uri.scheme = "https"
+    uri.to_s
+  end
+
+
 end

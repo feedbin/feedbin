@@ -57,8 +57,8 @@ $.extend feedbin,
     $('[data-behavior~=entry_content_target] pre code').each (i, e) ->
       hljs.highlightBlock(e)
 
-  audioVideo: ->
-    $('[data-behavior~=entry_content_target] audio, [data-behavior~=entry_content_target] video').mediaelementplayer()
+  audioVideo: (selector = "entry_content_target") ->
+    $("[data-behavior~=#{selector}] audio, [data-behavior~=#{selector}] video").mediaelementplayer()
 
   footnotes: ->
     $.bigfoot
@@ -188,12 +188,13 @@ $.extend feedbin,
   resetScroll: ->
     $('.entry-content').prop('scrollTop', 0)
 
-  fitVids: ->
-    $('[data-behavior~=entry_content_target]').fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com'], iframe[src*='embed-ssl.ted.com']"});
+  fitVids: (selector = "entry_content_target") ->
+    target = $("[data-behavior~=#{selector}]")
+    target.fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com'], iframe[src*='embed-ssl.ted.com']"});
 
-  formatTweets: ->
+  formatTweets: (selector = "entry_content_wrap") ->
     if typeof(twttr) != "undefined" && typeof(twttr.widgets) != "undefined"
-      target = $('[data-behavior~=entry_content_wrap]')[0]
+      target = $("[data-behavior~=#{selector}]")[0]
       result = twttr.widgets.load(target)
 
   formatInstagram: ->
@@ -234,6 +235,16 @@ $.extend feedbin,
       feedbin.formatInstagram()
       feedbin.formatImages()
       feedbin.checkType()
+    catch error
+      if 'console' of window
+        console.log error
+
+  formatLinkContents: ->
+    try
+      feedbin.audioVideo("view_link_markup_wrap")
+      feedbin.fitVids("view_link_markup_wrap")
+      feedbin.formatTweets("view_link_markup_wrap")
+      feedbin.formatInstagram()
     catch error
       if 'console' of window
         console.log error
@@ -614,7 +625,9 @@ $.extend feedbin,
 
   preloadedImageIds: []
 
-  linkActionsTimer: []
+  linkActionsTimer: null
+
+  linkCacheTimer: null
 
   ONE_HOUR: 60 * 60 * 1000
 
@@ -736,7 +749,7 @@ $.extend feedbin,
         return
 
     entryLinks: ->
-      $(document).on 'click', '[data-behavior~=entry_content_wrap] a', ->
+      $(document).on 'click', '[data-behavior~=entry_content_wrap] a, [data-behavior~=view_link_markup_wrap] a', ->
         $(this).attr('target', '_blank').attr('rel', 'noopener noreferrer')
         return
 
@@ -1496,6 +1509,7 @@ $.extend feedbin,
     linkActionsHover: ->
       $(document).on 'mouseenter mouseleave', '.entry-final-content a', (event) ->
         clearTimeout(feedbin.linkActionsTimer)
+        clearTimeout(feedbin.linkCacheTimer)
         $('.entry-final-content a [data-behavior~=link_actions]').remove()
 
         link = $(@)
@@ -1503,9 +1517,14 @@ $.extend feedbin,
         contents = contents[0].outerHTML
 
         if event.type == "mouseenter"
+          feedbin.linkCacheTimer = setTimeout ( ->
+            form = $("[data-behavior~=view_link_cache_form]")
+            $("#url", form).val(link.attr('href'))
+            form.submit()
+          ), 100
           feedbin.linkActionsTimer = setTimeout ( ->
             link.append(contents)
-          ), 300
+          ), 400
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
@@ -1519,7 +1538,16 @@ $.extend feedbin,
         event.preventDefault()
 
       $(document).on 'click', '[data-behavior~=link_actions]', (event) ->
-        $(@).addClass('open')
+        windowWidth = $(window).width()
+        offset = $(@).offset().left
+        width = $(".dropdown-content", @).outerWidth()
+
+        if offset + width >= windowWidth
+          $(@).addClass('open dropdown-right')
+        else
+          $(@).addClass('open dropdown-left')
+
+
         event.preventDefault()
 
 $.each feedbin.preInit, (i, item) ->

@@ -3,7 +3,7 @@
   <% if content.present? %>
       <% if content_info.present? && !entry_presenter.feed_domain_matches?(content_info.domain) %>
         <div class="original-content-info entry-callout">
-          <%= entry_presenter.favicon_with_url(content_info.domain) %>
+          <%= favicon_with_host(content_info.domain) %>
           <% if content_info.title.present? %>
             <div class="original-title"><a href="<%= content_info.url %>"><%= content_info.title %></a></div>
           <% end %>

@@ -31,36 +31,6 @@ class BasePresenter
     end
   end
 
-  def favicon_with_url(host)
-    favicon_url = favicon_service_url(host)
-    favicon_template(favicon_url)
-  end
-
-  def favicon_template(favicon_url)
-    @template.content_tag :span, '', class: "favicon-wrap" do
-      @template.content_tag(:span, '', class: "favicon", style: "background-image: url(#{favicon_url});")
-    end
-  end
-
-  def favicon_with_fallback
-    if @object.favicon && @object.favicon.cdn_url
-      favicon(@object)
-    else
-      favicon_with_url(@object.host)
-    end
-  end
-
-  def favicon_service_url(host)
-    uri = URI::HTTP.build(
-      scheme: "https",
-      host: "www.google.com",
-      path: "/s2/favicons",
-      query: {domain: host}.to_query
-    )
-    uri.scheme = "https"
-    uri.to_s
-  end
-
   private
 
   def self.presents(name)

@@ -2778,14 +2778,14 @@ $saved-search-control-height: 48px;
             content: "";
             height: 18px;
             width: 18px;
-            border: 1px solid #dcdee0;
+            border: 1px solid $border-color;
             border-radius: 3px;
             cursor: pointer;
             margin-right: -18px;
-            background: #FFF image-url("icon-caret.svg") 50% 50% no-repeat;
+            background: $body-background-color image-url("icon-caret.svg") 50% 50% no-repeat;
             background-size: 80% 80%;
             bottom: -2px;
-            box-shadow: 0 0 1px 0 #dcdee0;
+            box-shadow: 0 0 1px 0 $border-color;
             animation-duration: .3s;
             animation-name: slidein;
             .dropdown-content {
@@ -2793,6 +2793,16 @@ $saved-search-control-height: 48px;
             }
             ul {
                 margin: 0 !important;
+            }
+            .theme-sunset & {
+                background-color: $body-background-color-sunset;
+                box-shadow: 0 0 1px 0 $border-color-sunset;
+                border-color: $border-color-sunset;
+            }
+            .theme-night & {
+                background-color: $body-background-color-night;
+                box-shadow: 0 0 1px 0 $border-color-night;
+                border-color: $border-color-night;
             }
         }
     }
@@ -4581,6 +4591,8 @@ Buttons
         text-decoration: none;
         border-color: $selected-hover;
         background-color: $selected-hover;
+        color: #FFF;
+        cursor: pointer;
     }
     &:active {
         text-decoration: none;
@@ -4618,6 +4630,9 @@ Buttons
     &:active {
         background-color: transparent;
         color: $selected-active;
+    }
+    .theme-night & {
+        color: #fff;
     }
 }
 
@@ -4899,6 +4914,11 @@ button.close {
     font-weight: bold;
     height: 40px;
     width: 40px;
+    svg {
+        position: absolute;
+        top: 26px;
+        right: 26px;
+    }
 }
 .modal-body .close {
     position: absolute;
@@ -4908,6 +4928,11 @@ button.close {
     font-weight: bold;
     height: 46px;
     width: 46px;
+    svg {
+        position: absolute;
+        top: 33px;
+        right: 33px;
+    }
 }
 .modal-title {
     margin: 0;
@@ -5041,6 +5066,18 @@ button.close {
     .modal-header, .modal-body, .modal-footer {
         padding-left: 30px;
         padding-right: 30px;
+        @media (max-width: 550px) {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+    }
+    .entry-inner {
+        padding: 0 !important;
+        @media (max-width: 550px) {
+            .favicon-wrap {
+                display: none;
+            }
+        }
     }
 }
 .modal-header:before,
@@ -5074,6 +5111,14 @@ Link Viewer
 }
 
 #view_link_wrap .post-meta {
+    margin-bottom: 30px;
+    .url {
+        color: $text-color-light;
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
     position: relative;
     .favicon-wrap {
         left: -26px;
@@ -5082,31 +5127,16 @@ Link Viewer
 }
 
 .link-loading h1:empty, .link-loading p:empty {
-    @keyframes pulse {
-        0% {
-            opacity: .9;
-        }
-        50% {
-            opacity: .6;
-        }
-        100% {
-            opacity: .9;
-        }
-    }
-    animation: pulse 3s linear infinite;
-    background: $text-color-light;
+    background: rgba($text-color-light, .2);
     .theme-sunset & {
-        background: $text-color-light-sunset;
+        background: rgba($text-color-light-sunset, .2);
     }
     .theme-night & {
-        background: $text-color-light-night;
+        background: rgba($text-color-light-night, .2);
     }
 }
-.link-loading h1:empty {
-    height: 35px;
-}
 .link-loading p:empty {
-    height: 20px;
+    height: 14px;
 }
 .link-loading p:nth-child(2n) {
     width: 90%;
@@ -5116,6 +5146,35 @@ Link Viewer
 }
 .link-loading p:last-child {
     width: 30%;
+}
+.spinner {
+    height: 50px;
+    background: image-url("spinner-day.svg") 50% 50% no-repeat;
+    .theme-sunset & {
+        background: image-url("spinner-sunset.svg") 50% 50% no-repeat;
+    }
+    .theme-night & {
+        background: image-url("spinner-night.svg") 50% 50% no-repeat;
+    }
+}
+
+.view-link-error-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    .view-link-error {
+        margin-top: 40px;
+        font-size: 24px;
+        margin-bottom: 40px;
+        span {
+            background: image-url("error-sign.svg") 0 50% no-repeat;
+            padding-left: 40px;
+        }
+    }
+    p {
+        display: inline-block;
+        text-align: center;
+    }
 }
 
 /*------------------------------------------------------------------------------

@@ -1,9 +1,9 @@
 <% present page do |page_presenter| %>
 <div class="<%= user.display_prefs %>">
-    <div class="entry-inner">
+    <div class="entry-inner opacity-fade">
         <p class="post-meta">
-            <%= page_presenter.favicon %>
-            <%= page.domain %>
+            <%= favicon_with_host(page.domain) %>
+            <span class="url"><%= page.url %></span>
         </p>
         <header class="entry-header">
             <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
@@ -20,7 +20,7 @@
                 </p>
             <% end %>
         </header>
-        <div class="content-styles">
+        <div class="content-styles" data-behavior="view_link_markup_wrap">
             <%= content.html_safe %>
         </div>
     </div>

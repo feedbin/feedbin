@@ -1,13 +1,17 @@
 <div class="<%= user.display_prefs %> link-loading">
     <div class="entry-inner">
         <p class="post-meta">
-            <%= host %>
+            <%= favicon_with_host(host) %>
+            <span class="url"><%= url %></span>
         </p>
-        <h1></h1>
         <p></p>
         <p></p>
         <p></p>
         <p></p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <div class="spinner"></div>
     </div>
 </div>
 <%= form_tag(view_link_contents_entries_path, class: 'hide', remote: true, data: {behavior: 'view_link_contents_form'}) do %>

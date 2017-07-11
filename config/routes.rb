@@ -129,6 +129,7 @@ Rails.application.routes.draw do
       get :updated, to: 'updated_entries#index'
       post :view_link
       post :view_link_contents
+      post :view_link_cache
       post :mark_all_as_read
       post :mark_direction_as_read
     end
