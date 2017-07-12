@@ -3,7 +3,7 @@
     <div class="entry-inner opacity-fade">
         <p class="post-meta">
             <%= favicon_with_host(page.domain) %>
-            <span class="url"><%= page.url %></span>
+            <a class="url" href="<%= page.url %>"><%= page.url %></a>
         </p>
         <header class="entry-header">
             <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
