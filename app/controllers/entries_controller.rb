@@ -92,7 +92,8 @@ class EntriesController < ApplicationController
     begin
       if @content_view
         url = @entry.fully_qualified_url
-        @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v6") do
+        key = FeedbinUtils.page_cache_key(url)
+        @content_info = Rails.cache.fetch(key) do
           Librato.increment 'readability.first_parse'
           MercuryParser.parse(url)
         end
@@ -123,7 +124,8 @@ class EntriesController < ApplicationController
   def view_link_contents
     @user = current_user
     @url = params[:url]
-    @content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(@url)}:v5") do
+    key = FeedbinUtils.page_cache_key(@url)
+    @content_info = Rails.cache.fetch(key) do
       Librato.increment 'readability.first_parse'
       MercuryParser.parse(params[:url])
     end

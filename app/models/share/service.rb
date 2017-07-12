@@ -26,7 +26,8 @@ class Share::Service
     entry = Entry.find(params[:entry_id])
     if params[:readability] == "on"
       url = entry.fully_qualified_url
-      content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v6") do
+      key = FeedbinUtils.page_cache_key(url)
+      content_info = Rails.cache.fetch(key) do
         MercuryParser.parse(url)
       end
       content = content_info.content

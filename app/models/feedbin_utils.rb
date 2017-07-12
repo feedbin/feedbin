@@ -29,4 +29,8 @@ class FeedbinUtils
     "user:%d:feed_key:%s:entry_ids:published" % [user_id, feed_key]
   end
 
+  def self.page_cache_key(url)
+    "content_view:%s:v6" % Digest::SHA1.hexdigest(url)
+  end
+
 end
