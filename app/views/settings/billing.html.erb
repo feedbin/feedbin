@@ -1,5 +1,9 @@
 <% content_for :head do %>
-  <%= javascript_include_tag "https://js.stripe.com/v1/" %>
+  <%= javascript_include_tag "https://js.stripe.com/v3/" %>
+  <%= javascript_tag do %>
+      var stripe = Stripe("<%= STRIPE_PUBLIC_KEY %>");
+      var elements = stripe.elements();
+  <% end %>
 <% end %>
 
 <div class="settings-content-inner">
@@ -16,21 +20,16 @@
         <% else %>
           <p>Your trial period will end in <strong><%= pluralize(@user.days_left, 'day') %></strong>. Subscribe now to continue using Feedbin uninterrupted.</p>
         <% end %>
-        <div data-behavior="stripe_error" class="alert alert-error hide"></div>
+        <div id="card-errors" role="alert" class="alert alert-error"></div>
       </div>
       <div class="inset">
-        <%= form_for @user, html: { data: { behavior: 'credit_card_form' } } do |f| %>
-          <%= f.hidden_field :stripe_token, data: { behavior: 'stripe_token' } %>
+        <%= form_for @user, id: "payment-form" do |f| %>
           <%= hidden_field_tag :redirect_to, settings_billing_url %>
 
           <div class="inset-content">
             <h4 class="group-header">Subscribe</h4>
           </div>
-          <% if @user.stripe_token %>
-            <p>Credit card acceptance is pending.</p>
-          <% else %>
-            <%= render partial: 'shared/credit_card_form' %>
-          <% end %>
+          <%= render partial: 'shared/credit_card_form' %>
 
           <ul class="control-group control-group-form">
           <% @plans.each do |plan| %>
@@ -78,7 +77,7 @@
 
           <div class="description-inset">
               <div class="button-wrap">
-                  <%= f.submit "Subscribe", class: 'button no-margin' %>
+                  <%= f.submit "Subscribe", class: 'button no-margin', data: { disable_with: false } %>
               </div>
           </div>
 
@@ -87,12 +86,11 @@
 
     <% else %>
       <div class="settings-outer">
-        <div data-behavior="stripe_error" class="alert alert-error hide"></div>
+        <div id="card-errors" role="alert" class="alert alert-error"></div>
       </div>
 
       <div class="inset">
-        <%= form_tag settings_update_credit_card_path, data: { behavior: 'credit_card_form' } do %>
-          <%= hidden_field_tag :stripe_token, nil, data: { behavior: 'stripe_token' } %>
+        <%= form_tag settings_update_credit_card_path, id: "payment-form" do %>
           <div class="inset-content">
             <h4 class="group-header">Update Billing Info</h4>
           </div>
@@ -101,7 +99,7 @@
 
           <div class="description-inset">
               <div class="button-wrap">
-                  <%= submit_tag "Update Billing", class: "button no-margin" %>
+                  <%= submit_tag "Update Billing", class: "button no-margin", data: { disable_with: false } %>
               </div>
           </div>
 
