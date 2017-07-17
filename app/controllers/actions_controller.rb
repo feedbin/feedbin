@@ -22,6 +22,7 @@ class ActionsController < ApplicationController
     if @action.save
       redirect_to actions_url, notice: "Action was successfully created."
     else
+      flash.now[:error] = @action.errors.full_messages.join('. ')
       render :new
     end
   end
@@ -30,6 +31,7 @@ class ActionsController < ApplicationController
     if @action.update(action_params)
       redirect_to actions_url, notice: "Action was successfully updated."
     else
+      flash.now[:error] = @action.errors.full_messages.join('. ')
       render :edit
     end
   end

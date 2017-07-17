@@ -2,7 +2,12 @@ window.feedbin ?= {}
 
 $.extend feedbin,
 
+  messageTimeout: null
+
   showNotification: (text, timeout = 3000, href = '', error = false) ->
+
+    clearTimeout(feedbin.messageTimeout)
+
     messages = $('[data-behavior~=messages]')
     if error == true
       messages.addClass('error')
@@ -16,9 +21,13 @@ $.extend feedbin,
 
     messages.text(text)
     messages.addClass('show')
-    setTimeout ( ->
+    feedbin.messageTimeout = setTimeout ( ->
       messages.removeClass('show')
     ), timeout
+
+  hideNotification: ->
+    messages = $('[data-behavior~=messages]')
+    messages.removeClass('show')
 
   previewHeight: ->
     container = $('[data-behavior~=preview_min_height]')

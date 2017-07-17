@@ -1,6 +1,1 @@
-$('[data-behavior~=flash_wrap]').html('<%= j render partial: 'shared/flash', locals: {flash: flash} %>')
-
-clearTimeout(clearMessage);
-var clearMessage = setTimeout(function() {
-    $('[data-behavior~=flash_wrap]').html('');
-}, 5000)
+<%= render partial: 'shared/message_flash', locals: {flash: flash} %>

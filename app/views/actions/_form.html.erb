@@ -1,11 +1,4 @@
 <%= form_for(@action, as: :action_params) do |f| %>
-  <% if @action.errors.any? %>
-    <div class="alert alert-danger">
-      <% @action.errors.full_messages.each do |message| %>
-        <%= message %>.
-      <% end %>
-    </div>
-  <% end %>
 
   <div class="inset">
     <ul class="control-group control-group-form">

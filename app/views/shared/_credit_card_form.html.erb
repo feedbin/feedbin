@@ -7,11 +7,8 @@
 <script type="text/javascript">
     function stripeTokenHandler(token) {
         var form = document.getElementById('payment-form');
-        var hiddenInput = document.createElement('input');
-        hiddenInput.setAttribute('type', 'hidden');
-        hiddenInput.setAttribute('name', 'stripe_token');
+        var hiddenInput = document.getElementById('stripe_token');
         hiddenInput.setAttribute('value', token.id);
-        form.appendChild(hiddenInput);
         form.submit();
     }
 
@@ -19,32 +16,46 @@
         base: {
             fontFamily: '-apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif',
             fontSize: '16px',
-            lineHeight: '22.8571px'
+            lineHeight: '22.8571px',
+            color: '#212325',
+            '::placeholder': {
+                color: '#b4b6b8'
+            }
+        },
+        invalid: {
+            iconColor: 'red',
+            color: 'red',
         }
     };
-    var card = elements.create('card', {style: style});
-    card.mount('#card-element');
 
     var form = document.getElementById('payment-form');
+    var card = elements.create('card', {style: style});
+
+    card.mount('#card-element');
+
+    card.addEventListener('change', function(event) {
+        if (event.error) {
+            feedbin.showNotification(event.error.message, 3000, '', true);
+        } else {
+            feedbin.hideNotification();
+        }
+    });
+
+    card.addEventListener('ready', function(event) {
+        document.getElementById('submit_button').disabled = false;
+    });
+
     form.addEventListener('submit', function(event) {
+        document.getElementById('submit_button').disabled = true;
         event.preventDefault();
 
         stripe.createToken(card).then(function(result) {
             if (result.error) {
-                var errorElement = document.getElementById('card-errors');
-                errorElement.textContent = result.error.message;
+                document.getElementById('submit_button').disabled = false;
+                feedbin.showNotification(result.error.message, 3000, '', true);
             } else {
                 stripeTokenHandler(result.token);
             }
         });
-    });
-
-    card.addEventListener('change', function(event) {
-        var displayError = document.getElementById('card-errors');
-        if (event.error) {
-            displayError.textContent = event.error.message;
-        } else {
-            displayError.textContent = '';
-        }
     });
 </script>
