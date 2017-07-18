@@ -145,6 +145,7 @@ class EntriesController < ApplicationController
   def preload
     @user = current_user
     ids = params[:ids].split(',').map {|i| i.to_i }
+    ViewLinkCacheMultiple.perform_async(@user.id, ids)
     entries = entries_by_id(ids)
     render json: entries.to_json
   end
