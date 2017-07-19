@@ -3798,6 +3798,10 @@ Settings
         .card-number-wrap {
             padding: 9px 30px;
             border-bottom: 1px solid $border-color;
+            @media (max-width: 528px) {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
         }
     }
     .feed-settings {
