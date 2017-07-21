@@ -551,6 +551,7 @@ $.extend feedbin,
       containment: '.feeds'
       helper: 'clone'
       appendTo: '[data-behavior~=feeds_target]'
+      delay: 300
       start: (event, ui) ->
         $('.feeds').addClass('dragging')
         feedbin.dragOwner = $(@).parents('[data-behavior~=droppable]').first()
