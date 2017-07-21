@@ -22,7 +22,7 @@ class YoutubeOptions
     options = []
     if (match = URLS.find { |candidate| @url =~ candidate[:regex] }) && $1
       feed_url = match[:template] % $1
-      option = FeedOption.new(feed_url, feed_url)
+      option = FeedOption.new(feed_url, feed_url, nil, "youtube_options")
       options.push(option)
     end
     options

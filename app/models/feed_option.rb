@@ -1,8 +1,12 @@
 class FeedOption
-  def initialize(base_url, href, title = nil)
+
+  attr_reader :source
+
+  def initialize(base_url, href, title = nil, source = "unspecified")
     @base_url = base_url
     @href = href
     @title = title
+    @source = source
   end
 
   def href

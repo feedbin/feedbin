@@ -13,7 +13,7 @@ class FeedOptions
     @perform ||= begin
       options = document.search("link[rel='alternate']").each_with_object([]) do |link, array|
         if link_valid?(link)
-          option = FeedOption.new(@url, link["href"], link["title"])
+          option = FeedOption.new(@url, link["href"], link["title"], "page_links")
           array.push(option)
         end
       end
