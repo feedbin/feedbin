@@ -1,6 +1,6 @@
 class ViewLinkCacheMultiple
   include Sidekiq::Worker
-  sidekiq_options queue: :critical, retry: false
+  sidekiq_options queue: :default, retry: false
 
   def perform(user_id, entry_ids)
     user = User.find(user_id)
@@ -11,16 +11,14 @@ class ViewLinkCacheMultiple
 
     entries.each do |entry|
       if inline_on.include?(entry.feed_id)
-        key = "view_link_cache_multiple:%s" % Digest::SHA1.hexdigest(entry.fully_qualified_url)
-        if Rails.cache.exist?(key)
-          Librato.increment 'view_link_cache_multiple.cache_hit'
-        else
-          Rails.cache.write(key, key)
+        url = entry.fully_qualified_url
+        key = FeedbinUtils.page_cache_key(url)
+        Rails.cache.fetch(key) do
           Librato.increment 'view_link_cache_multiple.cache_miss'
+          MercuryParser.parse(url)
         end
       end
     end
-
   end
 
 end

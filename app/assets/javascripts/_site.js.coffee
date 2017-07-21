@@ -1518,23 +1518,24 @@ $.extend feedbin,
 
     linkActionsHover: ->
       $(document).on 'mouseenter mouseleave', '.entry-final-content a', (event) ->
-        clearTimeout(feedbin.linkActionsTimer)
-        clearTimeout(feedbin.linkCacheTimer)
-        $('.entry-final-content a [data-behavior~=link_actions]').remove()
-
         link = $(@)
-        contents = $('[data-behavior~=link_actions]').clone()
-        contents = contents[0].outerHTML
+        if link.text().trim().length > 0
+          clearTimeout(feedbin.linkActionsTimer)
+          clearTimeout(feedbin.linkCacheTimer)
+          $('.entry-final-content a [data-behavior~=link_actions]').remove()
 
-        if event.type == "mouseenter"
-          feedbin.linkCacheTimer = setTimeout ( ->
-            form = $("[data-behavior~=view_link_cache_form]")
-            $("#url", form).val(link.attr('href'))
-            form.submit()
-          ), 100
-          feedbin.linkActionsTimer = setTimeout ( ->
-            link.append(contents)
-          ), 400
+          contents = $('[data-behavior~=link_actions]').clone()
+          contents = contents[0].outerHTML
+
+          if event.type == "mouseenter"
+            feedbin.linkCacheTimer = setTimeout ( ->
+              form = $("[data-behavior~=view_link_cache_form]")
+              $("#url", form).val(link.attr('href'))
+              form.submit()
+            ), 100
+            feedbin.linkActionsTimer = setTimeout ( ->
+              link.append(contents)
+            ), 400
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
