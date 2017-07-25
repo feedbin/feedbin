@@ -1,3 +1,4 @@
+<% results ||= action.results %>
 <div class="modal fade" tabindex="-1" role="dialog" id="action_results">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -13,10 +14,10 @@
                 </div>
             </div>
             <div class="modal-body">
-                <p><%= number_to_human(action.results.total) %> <%= 'result'.pluralize(action.results.total) %></p>
+                <p><%= number_to_human(results.total) %> <%= 'result'.pluralize(results.total) %></p>
                 <div class="entries action-preview-entries">
                     <ul>
-                        <%= render partial: "entries/entry", collection: action.results %>
+                        <%= render partial: "entries/entry", collection: results %>
                     </ul>
                 </div>
             </div>

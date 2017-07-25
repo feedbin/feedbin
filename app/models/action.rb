@@ -129,7 +129,13 @@ class Action < ApplicationRecord
 
   def results
     body = body(self.query, self.computed_feed_ids)
-    Entry.search({query: body[:query]}).page(1).records(includes: :feed)
+
+    options = {
+      query: body[:query],
+      sort: [{published: "desc"}]
+    }
+
+    Entry.search(options).page(1).records(includes: :feed)
   end
 
 end
