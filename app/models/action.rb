@@ -127,4 +127,9 @@ class Action < ApplicationRecord
     end
   end
 
+  def results
+    body = body(self.query, self.computed_feed_ids)
+    Entry.search({query: body[:query]}).page(1).records(includes: :feed)
+  end
+
 end

@@ -1,0 +1,31 @@
+<div class="modal fade" tabindex="-1" role="dialog" id="action_results">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="content">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><%= svg_tag 'icon-full-screen-close-small', size: '16x16' %></button>
+                    <h4 class="modal-title">Action Results</h4>
+                </div>
+                <div class="action-description">
+                    <div class="content">
+                        <%= render partial: 'text_description', locals: {action: action} %>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <p><%= number_to_human(action.results.total) %> <%= 'result'.pluralize(action.results.total) %></p>
+                <div class="entries action-preview-entries">
+                    <ul>
+                        <%= render partial: "entries/entry", collection: action.results %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('#action_results').on('hidden.bs.modal', function (event) {
+        $(event.target).remove();
+    });
+    feedbin.localizeTime();
+</script>

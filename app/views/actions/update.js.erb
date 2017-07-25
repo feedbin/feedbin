@@ -1,0 +1,9 @@
+<% if @preview %>
+    <%= render partial: 'preview', locals: {action: @action} %>
+<% else %>
+    <% if flash[:notice] %>
+        window.location = "<%= actions_url %>";
+    <% else %>
+        <%= render partial: 'shared/message_flash', locals: {flash: flash} %>
+    <% end %>
+<% end %>

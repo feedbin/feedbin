@@ -1,4 +1,4 @@
-<%= form_for(@action, as: :action_params) do |f| %>
+<%= form_for(@action, as: :action_params, remote: true) do |f| %>
 
   <div class="inset">
     <ul class="control-group control-group-form">
@@ -78,7 +78,8 @@
             <% if @action.persisted? %>
                 <%= link_to 'Delete', @action, method: :delete, class: 'button button-secondary' , data: { confirm: 'Are you sure you want to delete this action?' }, style: "position: relative; bottom: -2px;" %>
             <% end %>
-            <%= f.submit "Save", class: "button" %>
+            <%= f.submit "View Results", name: 'preview', class: "button button-secondary" %>
+            <%= f.submit "Save", name: 'commit', class: "button" %>
         </div>
     </div>
 

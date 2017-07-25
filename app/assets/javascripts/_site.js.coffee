@@ -132,7 +132,7 @@ $.extend feedbin,
         $(@).attr("src", $(@).data('feedbin-src'))
       feedbin.preloadedImageIds.push(id)
 
-  localizeTime: (container) ->
+  localizeTime: ->
     now = new Date()
     $("time.timeago").each ->
       datePublished = $(@).attr('datetime')

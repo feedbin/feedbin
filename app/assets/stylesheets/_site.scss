@@ -3618,39 +3618,39 @@ Settings
         display: flex;
         align-items: center;
         height: 100%;
-    }
-    .entries {
-        position: static;
-        margin-left: auto;
-        margin-right: auto;
+        .entries {
+            position: static;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .entries ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .entries ul li .entries-inner-wrap {
+            border: none;
+        }
+        .entries ul li {
+            font-size: 12px;
+            .feed-title,
+            .time,
+            .body {
+                font-size: 100%;
+            }
+            .title {
+                font-size: 116.6%;
+            }
+            .title {
+                position: relative;
+            }
+        }
     }
     .entries-display-block .entries {
         max-width: 320px !important;
     }
     .entries-display-inline .entries {
         max-width: 100%;
-    }
-    .entries ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-    .entries ul li .entries-inner-wrap {
-        border: none;
-    }
-    .entries ul li {
-        font-size: 12px;
-        .feed-title,
-        .time,
-        .body {
-            font-size: 100%;
-        }
-        .title {
-            font-size: 116.6%;
-        }
-        .title {
-            position: relative;
-        }
     }
     .theme-day {
         .entries {
@@ -4222,6 +4222,33 @@ Settings
             margin: auto;
         }
     }
+    #action_results {
+        .modal-header {
+            padding: 0;
+            h4 {
+                margin-bottom: 0;
+            }
+        }
+        .content {
+            padding: 15px;
+        }
+    }
+    .action-description {
+        border: 1px solid $border-color;
+        border-width: 1px 0 1px 0;
+    }
+    .action-preview-entries {
+        position: static;
+        margin-left: auto;
+        margin-right: auto;
+
+        .entries-inner-wrap {
+            padding-right: 0;
+        }
+        a, div {
+            pointer-events: none;
+        }
+    }
 }
 
 input[type="checkbox"] + label .slider-checkbox {
@@ -4614,10 +4641,10 @@ Buttons
 .button-wrap {
     text-align: right;
     vertical-align: middle;
-    button:last-child {
+    button {
         margin-left: 5px;
     }
-    input:last-child {
+    input {
         margin-left: 5px;
     }
 }

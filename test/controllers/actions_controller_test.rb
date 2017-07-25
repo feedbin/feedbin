@@ -32,10 +32,9 @@ class ActionsControllerTest < ActionController::TestCase
     }
 
     assert_difference('Action.count') do
-      post :create, params: {action_params: params}
+      post :create, params: {action_params: params}, xhr: true
     end
 
-    assert_redirected_to actions_path
   end
 
   test "should get edit" do
@@ -49,8 +48,7 @@ class ActionsControllerTest < ActionController::TestCase
 
     login_as users(:ben)
 
-    patch :update, params: {id: @action, action_params: {title: new_title}}
-    assert_redirected_to actions_path
+    patch :update, params: {id: @action, action_params: {title: new_title}}, xhr: true
 
     @action.reload
     assert_equal new_title, @action.title

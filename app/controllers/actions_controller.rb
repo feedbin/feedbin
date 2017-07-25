@@ -19,20 +19,30 @@ class ActionsController < ApplicationController
 
   def create
     @action = @user.actions.new(action_params)
-    if @action.save
-      redirect_to actions_url, notice: "Action was successfully created."
+
+    if params.has_key?(:preview)
+      @preview = true
     else
-      flash.now[:error] = @action.errors.full_messages.join('. ')
-      render :new
+      if @action.save
+        flash[:notice] = "Action was successfully created."
+      else
+        flash[:error] = @action.errors.full_messages.join('. ')
+        flash.discard()
+      end
     end
   end
 
   def update
-    if @action.update(action_params)
-      redirect_to actions_url, notice: "Action was successfully updated."
+    if params.has_key?(:preview)
+      @preview = true
+      @action = @user.actions.new(action_params)
     else
-      flash.now[:error] = @action.errors.full_messages.join('. ')
-      render :edit
+      if @action.update(action_params)
+        flash[:notice] = "Action was successfully updated."
+      else
+        flash[:error] = @action.errors.full_messages.join('. ')
+        flash.discard()
+      end
     end
   end
 

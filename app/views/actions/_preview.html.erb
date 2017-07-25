@@ -1,0 +1,7 @@
+<% if action.valid? %>
+<% logger.info { action.inspect } %>
+    $('body').append("<%= j render partial: 'preview_modal', locals: {action: action} %>");
+    feedbin.modal("#action_results");
+<% else %>
+    feedbin.showNotification('Invalid action: <%= j action.errors.full_messages.join('. ') %>', 3000, '', true);
+<% end %>
