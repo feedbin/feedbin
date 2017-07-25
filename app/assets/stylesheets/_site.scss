@@ -2618,21 +2618,21 @@ $saved-search-control-height: 48px;
         text-rendering: optimizeLegibility;
         word-wrap: break-word;
     }
-    .post-meta {
-        font-size: 1em;
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-        line-height: 1.2;
-        margin: .2em;
-        .icon-clock {
-            float: left;
-            margin-right: 5px;
-        }
-        time {
-            display: inline;
-        }
-    }
     .feed-title {
         display: none;
+    }
+}
+.post-meta {
+    font-size: 17px;
+    @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    line-height: 1.2;
+    margin: .2em;
+    .icon-clock {
+        float: left;
+        margin-right: 5px;
+    }
+    time {
+        display: inline;
     }
 }
 
@@ -4858,20 +4858,6 @@ button.close {
         right: 26px;
     }
 }
-.modal-body .close {
-    position: absolute;
-    right: 0px;
-    top: 0px;
-    font-size: 39px;
-    font-weight: bold;
-    height: 46px;
-    width: 46px;
-    svg {
-        position: absolute;
-        top: 33px;
-        right: 33px;
-    }
-}
 .modal-title {
     margin: 0;
     line-height: 1.42857143;
@@ -4982,7 +4968,7 @@ button.close {
     }
 }
 .modal-fluid {
-    width: 95% !important;
+    width: 90% !important;
     &.modal-dialog {
         margin-top: 40px;
     }
@@ -4995,7 +4981,7 @@ button.close {
     }
     .modal-body {
         padding-bottom: 30px;
-        padding-top: 30px;
+        padding-top: 70px;
     }
     .modal-footer {
         padding-bottom: 20px;
@@ -5064,7 +5050,7 @@ Link Viewer
     }
 }
 
-.link-loading h1:empty, .link-loading p:empty {
+.placeholder-content h1:empty, .placeholder-content p:empty {
     background: rgba($text-color-light, .2);
     .theme-sunset & {
         background: rgba($text-color-light-sunset, .2);
@@ -5073,16 +5059,16 @@ Link Viewer
         background: rgba($text-color-light-night, .2);
     }
 }
-.link-loading p:empty {
+.placeholder-content p:empty {
     height: 14px;
 }
-.link-loading p:nth-child(2n) {
+.placeholder-content p:nth-child(2n) {
     width: 90%;
 }
-.link-loading p:nth-child(3n) {
+.placeholder-content p:nth-child(3n) {
     width: 96%;
 }
-.link-loading p:last-child {
+.placeholder-content p:last-child {
     width: 30%;
 }
 .spinner {
@@ -5114,6 +5100,54 @@ Link Viewer
         text-align: center;
     }
 }
+
+$affix-height: 50px;
+
+.affix-top, .affix {
+    position: fixed;
+    width: 100%;
+    z-index: 10000;
+    top: 0;
+    left: 0;
+    height: $affix-height;
+}
+
+.affix-inner {
+    padding-top: 13px;
+    margin: 0 auto;
+    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    border-bottom: 1px solid transparent;
+    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    height: $affix-height;
+    position: relative;
+    border-radius: 8px 8px 0 0;
+    .close {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: $affix-height;
+        height: $affix-height;
+        svg {
+            position: absolute;
+            top: 19px;
+            right: 16px;
+        }
+    }
+    p {
+        margin-bottom: 0 !important;
+    }
+}
+
+.affix {
+    .affix-inner {
+        width: 90%;
+    }
+    .entry-inner {
+        padding: 0 !important;
+    }
+}
+
+
 
 /*------------------------------------------------------------------------------
 Helpers

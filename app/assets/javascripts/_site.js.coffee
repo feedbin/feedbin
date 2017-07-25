@@ -4,6 +4,20 @@ $.extend feedbin,
 
   messageTimeout: null
 
+  affix: ->
+    $('[data-behavior~=modal_affix]').affix
+      target: '#view_link_wrap'
+      offset: {
+          top: 40
+      }
+
+    $('[data-behavior~=modal_affix]').on 'affixed.bs.affix', (event) ->
+      $(event.target).prependTo("#view_link_wrap");
+
+    $('[data-behavior~=modal_affix]').on 'affixed-top.bs.affix', (event) ->
+      $(event.target).prependTo("[data-behavior~=modal_affix_top]");
+
+
   showNotification: (text, timeout = 3000, href = '', error = false) ->
 
     clearTimeout(feedbin.messageTimeout)

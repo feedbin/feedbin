@@ -1,8 +1,9 @@
 <% if @host %>
-    modal = $('#view_link_wrap')
-    target = $('[data-behavior~=markup_target]', modal)
-    target.html("<%= j render partial: 'shared/view_link', locals: {host: @host, url: @url, user: @user} %>")
-    feedbin.modal('#view_link_wrap')
+    modal = $('#view_link_wrap');
+    target = $('[data-behavior~=markup_target]', modal);
+    target.html("<%= j render partial: 'shared/view_link', locals: {host: @host, url: @url, user: @user} %>");
+    feedbin.modal('#view_link_wrap');
+    feedbin.affix();
 <% else %>
     feedbin.showNotification('Unable to load content.', 3000, '', true);
 <% end %>
