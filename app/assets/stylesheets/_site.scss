@@ -4241,7 +4241,9 @@ Settings
         position: static;
         margin-left: auto;
         margin-right: auto;
-
+        ul li .entries-inner-wrap {
+            margin-left: 25px;
+        }
         .entries-inner-wrap {
             padding-right: 0;
         }
