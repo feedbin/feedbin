@@ -4592,6 +4592,10 @@ Buttons
     &[disabled] {
         background-color: transparent;
         color: $text-color-light;
+        &:hover {
+            background-color: transparent;
+            color: $text-color-light;
+        }
     }
     &:hover {
         background-color: transparent;
