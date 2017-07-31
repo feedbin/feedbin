@@ -108,7 +108,8 @@ class Entry < ApplicationRecord
       text = decoder.decode(text)
       text = text.chars.select(&:valid_encoding?).join
       begin
-        text = ApplicationController.helpers.sanitize(text, tags: []).squish.mb_chars.to_s
+        text = Nokogiri::HTML(text).to_xhtml
+        text = Nokogiri::HTML(text).text.squish
       rescue
         text = nil
       end
