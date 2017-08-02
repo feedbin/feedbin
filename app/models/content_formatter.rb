@@ -102,8 +102,13 @@ class ContentFormatter
     sanitize_config = Sanitize::Config::BASIC.dup
     sanitize_config = sanitize_config.merge(remove_contents: ['script', 'style', 'iframe', 'object', 'embed', 'figure'])
     content = Sanitize.fragment(content, sanitize_config)
-    content = content.squeeze(" \t\n").strip
-    ApplicationController.helpers.sanitize(content, tags: []).truncate(86, :separator => " ").squish
+
+    decoder = HTMLEntities.new
+    content = decoder.decode(content)
+    content = content.chars.select(&:valid_encoding?).join
+
+    content = Nokogiri::HTML(content)
+    content.search('//text()').map(&:text).join(" ").squish.truncate(86, separator: " ")
   rescue
     ''
   end

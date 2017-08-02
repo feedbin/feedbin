@@ -108,8 +108,8 @@ class Entry < ApplicationRecord
       text = decoder.decode(text)
       text = text.chars.select(&:valid_encoding?).join
       begin
-        text = Nokogiri::HTML(text).to_xhtml
-        text = Nokogiri::HTML(text).text.squish
+        text = Nokogiri::HTML(text)
+        text = text.search('//text()').map(&:text).join(" ").squish
       rescue
         text = nil
       end
@@ -182,7 +182,6 @@ class Entry < ApplicationRecord
 
   def create_summary
     self.summary = ContentFormatter.summary(self.content)
-    true
   end
 
   def touch_feed_last_published_entry
