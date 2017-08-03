@@ -75,6 +75,15 @@
       %>
     </ul>
 
+    <ul class="control-group control-group-form">
+        <li>
+            <%= f.check_box :apply_action %>
+            <%= f.label :apply_action do %>
+                Apply to existing matches <span class="slider-checkbox"></span>
+            <% end %>
+        </li>
+    </ul>
+
     <div class="description-inset">
         <div class="button-wrap">
             <%= f.submit "Save", name: 'commit', class: "button ui-helper-hidden-accessible" %>

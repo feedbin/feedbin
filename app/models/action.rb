@@ -1,6 +1,6 @@
 class Action < ApplicationRecord
 
-  attr_accessor :automatic_modification
+  attr_accessor :automatic_modification, :apply_action
 
   belongs_to :user
   enum action_type: { standard: 0, notifier: 1 }
@@ -18,6 +18,7 @@ class Action < ApplicationRecord
 
   after_destroy :percolate_remove
   after_commit :percolate_setup, on: [:create, :update]
+  after_commit :bulk_actions, on: [:create, :update]
 
   def percolate_setup
     percolator_query = self.query
@@ -62,6 +63,10 @@ class Action < ApplicationRecord
         }
       end
     end
+  end
+
+  def bulk_actions
+    ActionsBulk.perform_async(self.id, self.user.id) if apply_action
   end
 
   def empty_notifier_action?
@@ -128,14 +133,34 @@ class Action < ApplicationRecord
   end
 
   def results
+    Entry.search(search_options).page(1).records(includes: :feed)
+  end
+
+  def scrolled_results(&block)
+    scroll = '2m'
+    response = Entry.__elasticsearch__.client.search(
+      index: Entry.index_name,
+      type: Entry.document_type,
+      scroll: scroll,
+      body: search_options
+    )
+
+    while response['hits']['hits'].any? do
+      yield response
+      response = Entry.__elasticsearch__.client.scroll( { scroll_id: response['_scroll_id'], scroll: scroll } )
+    end
+
+    return response['_scroll_id']
+  end
+
+  private
+
+  def search_options
     body = body(self.query, self.computed_feed_ids)
-
-    options = {
-      query: body[:query],
-      sort: [{published: "desc"}]
-    }
-
-    Entry.search(options).page(1).records(includes: :feed)
+    Hash.new.tap do |hash|
+      hash[:query] = body[:query]
+      hash[:sort] = [{published: "desc"}]
+    end
   end
 
 end
