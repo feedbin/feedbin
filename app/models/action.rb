@@ -66,7 +66,7 @@ class Action < ApplicationRecord
   end
 
   def bulk_actions
-    ActionsBulk.perform_async(self.id, self.user.id) if apply_action
+    ActionsBulk.perform_async(self.id, self.user.id) if apply_action == "1"
   end
 
   def empty_notifier_action?
