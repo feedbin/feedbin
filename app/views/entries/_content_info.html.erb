@@ -23,11 +23,7 @@
       <% end %>
 
       <% if content_info.blank? %>
-          <% if entry_presenter.media_type %>
-              <div class="media-container">
-                <%= entry_presenter.media.html_safe %>
-              </div>
-          <% end %>
+        <%= render partial: 'media', locals: {entry: entry} %>
       <% end %>
 
       <div class="entry-final-content">

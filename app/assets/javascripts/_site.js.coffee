@@ -80,8 +80,21 @@ $.extend feedbin,
     $('[data-behavior~=entry_content_target] pre code').each (i, e) ->
       hljs.highlightBlock(e)
 
-  audioVideo: (selector = "entry_content_target") ->
+  audioVideo: (selector = "entry_final_content") ->
     $("[data-behavior~=#{selector}] audio, [data-behavior~=#{selector}] video").mediaelementplayer()
+
+  updateAudioProgress: ->
+    console.log 'update'
+
+  audioPlayer: ->
+    window.player = new MediaElementPlayer 'audio_player',
+      features: ['progress']
+      classPrefix: 'mejs_empty__'
+      defaultAudioWidth: 'auto'
+      defaultAudioHeight: '5px'
+      success: (mediaElement, domObject) ->
+        mediaElement.play()
+        mediaElement.addEventListener 'timeupdate', _.throttle(feedbin.updateAudioProgress, 5000, {leading: false})
 
   footnotes: ->
     $.bigfoot
@@ -1550,6 +1563,25 @@ $.extend feedbin,
             feedbin.linkActionsTimer = setTimeout ( ->
               link.append(contents)
             ), 400
+
+    audioSkipForward: ->
+      $(document).on 'click', '[data-behavior~=audio_skip_forward]', (event) ->
+        window.player.currentTime = window.player.currentTime + 30
+
+    audioSkipBackward: ->
+      $(document).on 'click', '[data-behavior~=audio_skip_backward]', (event) ->
+        window.player.currentTime = window.player.currentTime - 30
+
+    audioPlay: ->
+      $(document).on 'click', '[data-behavior~=audio_play]', (event) ->
+        window.player.play()
+
+    playAudio: ->
+      $(document).on 'click', '[data-behavior~=play_audio]', (event) ->
+        source = $("[data-behavior~=audio_markup]")
+        target = $("[data-behavior~=audio_target]")
+        target.html(source.html())
+        feedbin.audioPlayer()
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->

@@ -255,4 +255,22 @@ class EntryPresenter < BasePresenter
     (entry.author.present?) ? decoder.decode(@template.strip_tags(entry.author.strip)) : nil
   end
 
+  def has_diff?
+    entry.content.present? && entry.original.present? && entry.original['content'].present? && entry.original['content'].length != entry.content.length
+  end
+
+  def audio_duration
+    if media_duration && parts = media_duration.split(":").map(&:to_i)
+      if parts.length == 3
+        hours, minutes, seconds = parts
+        result = hours * 60 + minutes
+        @template.content_tag :div, class: "audio-duration" do
+          "#{result} minutes"
+        end
+      end
+    end
+  rescue
+    nil
+  end
+
 end
