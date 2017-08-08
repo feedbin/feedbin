@@ -5679,37 +5679,44 @@ Fullscreen
 /*------------------------------------------------------------------------------
 Media Players
 ------------------------------------------------------------------------------*/
+.content-styles.entry-type-default .entry-callout.audio-container {
+}
 .audio-container {
     display: flex;
     align-items: stretch;
-    background-color: #333E48;
-    padding: 15px;
-    color: #fff;
-    margin-bottom: 1.1em;
-    font-size: 13px;
-    font-family: $font-stack !important;
-    font-weight: 400 !important;
-    margin-top: 15px;
+
     .audio-image {
         flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-        height: 36px;
-        width: 36px;
+        background-image: image-url("icon-podcast.svg");
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        background-size: 16px 28px;
+        img {
+            width: auto;
+            height: 100%;
+            margin: 0;
+        }
         svg {
             fill: $text-summary-color;
         }
     }
     .audio-text {
         margin-left: 15px;
+        margin-right: 15px;
         min-width: 0;
         div {
             line-height: 1.4;
         }
         .entry-feed-title {
             font-weight: bold;
+            @include color($text-color, $text-color-night, $text-color-sunset);
+        }
+        .audio-title, .audio-duration {
+            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         }
         .entry-feed-title, .audio-title {
             display: block;
@@ -5731,11 +5738,20 @@ Media Players
         margin-left: auto;
         display: flex;
         align-items: center;
+        a {
+            line-height: 0;
+        }
+        a svg {
+            fill: #FFF;
+        }
+        button {
+            margin-left: 15px;
+        }
     }
 }
 
 .audio-player {
-    background-color: #333E48;
+    @include background-color($border-color, $border-color-night, $border-color-sunset);
     position: absolute;
     height: $audio-player-height;
     width: 100%;

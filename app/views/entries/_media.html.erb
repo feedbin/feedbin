@@ -1,15 +1,19 @@
 <% present entry do |entry_presenter| %>
     <% if entry_presenter.media_type && entry_presenter.media_type == :audio %>
-        <div class="audio-container">
+        <div class="audio-container entry-callout">
             <div class="audio-image">
-                <%= svg_tag('icon-audio', size: "16x16") %>
+                <%= image_tag 'placeholder.svg' %>
             </div>
             <div class="audio-text">
                 <%= content_tag :div, strip_tags(entry.feed.title), class: 'entry-feed-title', data: {behavior: 'user_title', feed_id: entry.feed.id} %>
-                <div class="audio-title-wrap"><div class="audio-title"><%= entry_presenter.entry_view_title %></div><%= entry_presenter.audio_duration %></div>
+                <div class="audio-title-wrap">
+                    <div class="audio-title"><%= entry_presenter.entry_view_title %></div>
+                </div>
+                <%= entry_presenter.audio_duration %>
             </div>
             <div class="audio-controls">
-                <button class="button-text button-empty" data-behavior="play_audio"><%= svg_tag('icon-play', size: "31x31") %></button>
+                <a class="button-text button-empty" href="<%= entry.data['enclosure_url'] %>" target="_blank" rel="noopener noreferrer"><%= svg_tag('icon-download', size: "16x16") %></a>
+                <button class="button-text button-empty" data-behavior="play_audio"><%= svg_tag('icon-play', size: "16x16") %></button>
             </div>
         </div>
 
