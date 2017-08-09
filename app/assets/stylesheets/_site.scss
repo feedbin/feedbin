@@ -5,6 +5,7 @@ $toolbar-height: 41px;
 $font-stack: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $feeds-toolbar-height: 52px;
 $audio-player-height: 141px;
+$audio-player-height-minimized: 53px;
 $base-button-position: 10px;
 
 /*-- Colors --*/
@@ -1048,8 +1049,11 @@ Structure
     @media (max-width: 550px) {
         bottom: 0;
     }
-    &.showing-audio-player {
-        padding-bottom: $audio-player-height;
+    .audio-panel-minimized & {
+        bottom: $audio-player-height-minimized;
+    }
+    .audio-panel-maximized & {
+        bottom: $audio-player-height;
     }
     ul {
         margin: 0;
@@ -5679,29 +5683,35 @@ Fullscreen
 /*------------------------------------------------------------------------------
 Media Players
 ------------------------------------------------------------------------------*/
-.content-styles.entry-type-default .entry-callout.audio-container {
-}
 .audio-container {
     display: flex;
     align-items: stretch;
-
     .audio-image {
         flex-shrink: 0;
+        height: 54px;
+        width: 54px;
         display: flex;
         align-items: center;
         justify-content: center;
-        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-        background-image: image-url("icon-podcast.svg");
-        background-position: 50% 50%;
-        background-repeat: no-repeat;
-        background-size: 16px 28px;
+        @include background-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        position: relative;
         img {
-            width: auto;
-            height: 100%;
-            margin: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
         }
         svg {
-            fill: $text-summary-color;
+            .theme-night & {
+                fill: $text-summary-color-night;
+            }
+            .theme-day & {
+                fill: $text-summary-color;
+            }
+            .theme-sunset & {
+                fill: $text-summary-color-sunset;
+            }
         }
     }
     .audio-text {
@@ -5741,8 +5751,16 @@ Media Players
         a {
             line-height: 0;
         }
-        a svg {
-            fill: #FFF;
+        svg * {
+            .theme-night & {
+                fill: $text-summary-color-night;
+            }
+            .theme-day & {
+                fill: $text-summary-color;
+            }
+            .theme-sunset & {
+                fill: $text-summary-color-sunset;
+            }
         }
         button {
             margin-left: 15px;
@@ -5750,26 +5768,105 @@ Media Players
     }
 }
 
-.audio-player {
+.audio-panel {
+    padding: 12px 12px 0 12px;
+    font-size: 13px;
+    font-family: $font-stack !important;
+    font-weight: 400 !important;
     @include background-color($border-color, $border-color-night, $border-color-sunset);
     position: absolute;
-    height: $audio-player-height;
     width: 100%;
-    position: absolute;
     bottom: $feeds-toolbar-height;
     left: 0;
     overflow: hidden;
     z-index: 1;
+    height: 0;
+    visibility: hidden;
+    transition: .2s ease-in height;
+    .audio-panel-minimized & {
+        visibility: visible;
+        height: $audio-player-height-minimized;
+    }
+    .audio-panel-maximized & {
+        visibility: visible;
+        height: $audio-player-height;
+    }
+    .feed-title-wrap {
+        display: flex;
+        .entry-feed-title {
+            margin-right: 10px;
+        }
+        .audio-panel-controls {
+            margin-left: auto;
+            white-space: nowrap;
+        }
+    }
+    .audio-image {
+        height: 36px;
+        width: 36px;
+        background-size: 11px 19px;
+        .audio-panel-minimized & {
+            height: auto;
+            width: 15px;
+            background-color: transparent;
+            .icon-podcast {
+                display: none;
+            }
+        }
+    }
+    .audio-text {
+        margin-left: 10px;
+        margin-right: 0;
+        div {
+            line-height: 1;
+        }
+    }
     .audio-container {
-        margin: 0;
+        margin: 0 0 25px 0;
     }
     .audio-player-controls {
         display: flex;
         justify-content: space-around;
+        .audio-panel-minimized & {
+            display: none;
+        }
+        button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            width: 40px;
+        }
+        svg {
+            .theme-night & {
+                fill: $text-summary-color-night !important;
+                color: $text-summary-color-night !important;
+            }
+            .theme-day & {
+                fill: $text-summary-color !important;
+                color: $text-summary-color !important;
+            }
+            .theme-sunset & {
+                fill: $text-summary-color-sunset !important;
+                color: $text-summary-color-sunset !important;
+            }
+        }
     }
 }
 
-
+.play-button {
+    .icon-pause {
+        display: none;
+    }
+    .playing-audio & {
+        .icon-pause {
+            display: block;
+        }
+        .icon-play {
+            display: none;
+        }
+    }
+}
 
 .audio-progress {
     height: 5px;

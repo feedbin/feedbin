@@ -86,6 +86,12 @@ $.extend feedbin,
   updateAudioProgress: ->
     console.log 'update'
 
+  playingAudio: ->
+    $('body').addClass('playing-audio')
+
+  stoppedAudio: ->
+    $('body').removeClass('playing-audio')
+
   audioPlayer: ->
     window.player = new MediaElementPlayer 'audio_player',
       features: ['progress']
@@ -93,8 +99,10 @@ $.extend feedbin,
       defaultAudioWidth: 'auto'
       defaultAudioHeight: '5px'
       success: (mediaElement, domObject) ->
-        mediaElement.play()
         mediaElement.addEventListener 'timeupdate', _.throttle(feedbin.updateAudioProgress, 5000, {leading: false})
+        mediaElement.addEventListener 'playing', feedbin.playingAudio
+        mediaElement.addEventListener 'pause', feedbin.stoppedAudio
+        mediaElement.play()
 
   footnotes: ->
     $.bigfoot
@@ -1574,14 +1582,18 @@ $.extend feedbin,
 
     audioPlay: ->
       $(document).on 'click', '[data-behavior~=audio_play]', (event) ->
-        window.player.play()
+        if window.player.paused
+          window.player.play()
+        else
+          window.player.pause()
 
-    playAudio: ->
-      $(document).on 'click', '[data-behavior~=play_audio]', (event) ->
+    launchPlayer: ->
+      $(document).on 'click', '[data-behavior~=audio_launch_player]', (event) ->
         source = $("[data-behavior~=audio_markup]")
         target = $("[data-behavior~=audio_target]")
         target.html(source.html())
         feedbin.audioPlayer()
+        $('body').addClass('audio-panel-minimized')
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->

@@ -2,35 +2,63 @@
     <% if entry_presenter.media_type && entry_presenter.media_type == :audio %>
         <div class="audio-container entry-callout">
             <div class="audio-image">
-                <%= image_tag 'placeholder.svg' %>
+                <%= svg_tag 'icon-podcast', size: '15x26' %>
             </div>
             <div class="audio-text">
-                <%= content_tag :div, strip_tags(entry.feed.title), class: 'entry-feed-title', data: {behavior: 'user_title', feed_id: entry.feed.id} %>
+                <%= content_tag :div, strip_tags(entry.feed.title), class: 'entry-feed-title', title: strip_tags(entry.feed.title), data: {behavior: 'user_title', feed_id: entry.feed.id} %>
                 <div class="audio-title-wrap">
-                    <div class="audio-title"><%= entry_presenter.entry_view_title %></div>
+                    <div class="audio-title" title="<%= entry_presenter.entry_view_title %>"><%= entry_presenter.entry_view_title %></div>
                 </div>
                 <%= entry_presenter.audio_duration %>
             </div>
             <div class="audio-controls">
-                <a class="button-text button-empty" href="<%= entry.data['enclosure_url'] %>" target="_blank" rel="noopener noreferrer"><%= svg_tag('icon-download', size: "16x16") %></a>
-                <button class="button-text button-empty" data-behavior="play_audio"><%= svg_tag('icon-play', size: "16x16") %></button>
+                <a class="button-text button-empty" href="<%= entry.data['enclosure_url'] %>" target="_blank" rel="noopener noreferrer" title="Download">
+                    <%= svg_tag('icon-download', size: "16x16") %>
+                </a>
+                <button class="button-text button-empty play-button" data-behavior="audio_launch_player" title="Play/Pause">
+                    <%= svg_tag('icon-play', size: "18x18") %>
+                    <%= svg_tag('icon-pause', size: "18x18") %>
+                </button>
             </div>
         </div>
 
         <div class="hide" data-behavior="audio_markup">
             <div class="audio-container">
                 <div class="audio-image">
-                    <%= svg_tag('icon-audio', size: "16x16") %>
+                    <%= svg_tag 'icon-podcast', size: '10x17' %>
+                    <button class="button-text button-empty play-button" data-behavior="audio_play" title="Play/Pause">
+                        <%= svg_tag('icon-play', size: "14x16") %>
+                        <%= svg_tag('icon-pause', size: "13x17") %>
+                    </button>
                 </div>
                 <div class="audio-text">
-                    <%= content_tag :div, strip_tags(entry.feed.title), class: 'entry-feed-title', data: {behavior: 'user_title', feed_id: entry.feed.id} %>
-                    <div class="audio-title-wrap"><div class="audio-title"><%= entry_presenter.entry_view_title %></div></div>
+                    <div class="feed-title-wrap">
+                        <div class="entry-feed-title" title="<%= strip_tags(entry.feed.title) %>" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>">
+                            <%= strip_tags(entry.feed.title) %>hi
+                        </div>
+                        <div class="audio-panel-controls">
+                            <button title="Minimize" class="button-text button-empty">
+                                -
+                            </button>
+                            <button title="Close" class="button-text button-empty">
+                                ×
+                            </button>
+                        </div>
+                    </div>
+                    <div class="audio-title-wrap"><div class="audio-title" title="<%= entry_presenter.entry_view_title %>"><%= entry_presenter.entry_view_title %></div></div>
                 </div>
             </div>
             <div class="audio-player-controls">
-                <button class="button-text button-empty" data-behavior="audio_skip_backward">&lt;-</button>
-                <button class="button-text button-empty" data-behavior="audio_play">PLAY</button>
-                <button class="button-text button-empty" data-behavior="audio_skip_forward">-&gt;</button>
+                <button class="button-text button-empty" data-behavior="audio_skip_backward" title="Skip Backward 15 Seconds">
+                    <%= svg_tag('icon-skip-backward', size: "18x19") %>
+                </button>
+                <button class="button-text button-empty play-button" data-behavior="audio_play" title="Play/Pause">
+                    <%= svg_tag('icon-play', size: "14x16") %>
+                    <%= svg_tag('icon-pause', size: "13x17") %>
+                </button>
+                <button class="button-text button-empty" data-behavior="audio_skip_forward" title="Skip Forward 15 Seconds">
+                    <%= svg_tag('icon-skip-forward', size: "18x19") %>
+                </button>
             </div>
             <div class="audio-progress">
                 <%= audio_tag entry.data['enclosure_url'], preload: 'none', id: 'audio_player' %>
