@@ -183,6 +183,8 @@ class User < ApplicationRecord
       valid_plans = Plan.where(price_tier: price_tier).where.not(stripe_id: 'free').pluck(:id)
     end
 
+    valid_plans.append(plan_id_was)
+
     unless valid_plans.include?(plan.id)
       errors.add(:plan_id, 'is invalid')
     end
