@@ -40,6 +40,7 @@ gem 'opml_saw',              github: 'feedbin/opml_saw',            ref: '61d8c2
 gem 'html-pipeline',         github: 'feedbin/html-pipeline',       ref: 'dc012b9'
 gem 'grocer-pushpackager',   github: 'feedbin/grocer-pushpackager', ref: '6b01b4e', require: 'grocer/pushpackager'
 gem 'html_diff',             github: 'feedbin/html_diff',           ref: 'c7c15ce'
+gem 'rack-queue-metrics',    github: 'feedbin/rack-queue-metrics',  ref: '53b2b29'
 
 gem 'sass-rails'
 gem 'coffee-rails'
@@ -81,7 +82,6 @@ gem 'http'
 gem 'elasticsearch', '~> 2.0'
 gem 'elasticsearch-model', '~> 2.0'
 gem 'sidekiq'
-gem 'raindrops', require: false
 
 # Stripe
 gem 'stripe'

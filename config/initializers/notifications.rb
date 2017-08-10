@@ -17,3 +17,10 @@ ActiveSupport::Notifications.subscribe('process_action.action_controller') do |n
     end
   end
 end
+
+ActiveSupport::Notifications.subscribe("rack.queue-metrics.queue-depth") do |*args|
+  event = ActiveSupport::Notifications::Event.new(*args)
+  payload = event.payload
+  Librato.measure "rack.queue-metrics.queue-depth.active", payload[:requests][:active], source: Socket.gethostname
+  Librato.measure "rack.queue-metrics.queue-depth.queued", payload[:requests][:queued], source: Socket.gethostname
+end
