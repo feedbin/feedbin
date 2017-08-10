@@ -14,7 +14,7 @@ class Action < ApplicationRecord
   before_validation :compute_tag_ids
   before_validation :compute_feed_ids
 
-  validate :query_valid
+  validate :query_valid, unless: :automatic_modification
 
   after_destroy :percolate_remove
   after_commit :percolate_setup, on: [:create, :update]

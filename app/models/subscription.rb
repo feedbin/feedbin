@@ -50,7 +50,8 @@ class Subscription < ApplicationRecord
   def add_feed_to_action
     actions = Action.where(user_id: self.user_id, all_feeds: true)
     actions.each do |action|
-      action.save
+      action.automatic_modification = true
+      action.save!
     end
   end
 
@@ -60,7 +61,7 @@ class Subscription < ApplicationRecord
       feed_ids = action.feed_ids || []
       action.feed_ids = feed_ids - [self.feed_id.to_s]
       action.automatic_modification = true
-      action.save
+      action.save!
     end
   end
 
