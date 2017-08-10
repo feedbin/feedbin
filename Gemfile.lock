@@ -614,6 +614,7 @@ DEPENDENCIES
   rails-controller-testing
   rails-deprecated_sanitizer
   rails_autolink
+  raindrops
   readability_parser
   redis
   responders (~> 2.0)

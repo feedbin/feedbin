@@ -1,3 +1,5 @@
+require 'raindrops'
+
 class SendStats
   include Sidekiq::Worker
   sidekiq_options queue: :critical, retry: false
