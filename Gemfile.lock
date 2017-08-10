@@ -53,14 +53,6 @@ GIT
     opml_saw (0.0.2)
       nokogiri
 
-GIT
-  remote: git://github.com/feedbin/rack-queue-metrics.git
-  revision: 53b2b298b5ec28f773fe427db2135782185f3e06
-  ref: 53b2b29
-  specs:
-    rack-queue-metrics (2.0.0)
-      raindrops
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -618,11 +610,11 @@ DEPENDENCIES
   pg
   premailer-rails
   puma
-  rack-queue-metrics!
   rails (= 5.0.5)
   rails-controller-testing
   rails-deprecated_sanitizer
   rails_autolink
+  raindrops
   readability_parser
   redis
   responders (~> 2.0)
