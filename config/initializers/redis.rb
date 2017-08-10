@@ -6,11 +6,11 @@ $redis = Hash.new.tap do |hash|
   if ENV['REDIS_URL_ENTRY_CREATED']
     options.merge!(url: ENV['REDIS_URL_ENTRY_CREATED'])
   end
-  hash[:sorted_entries] = Redis.new(options)
+  hash[:sorted_entries] = ConnectionPool.new(size: 10) { Redis.new(options) }
 
   options = defaults.dup
   if ENV['REDIS_ID_URL']
     options.merge!(url: ENV['REDIS_ID_URL'])
   end
-  hash[:id_cache] = Redis.new(options)
+  hash[:id_cache] = ConnectionPool.new(size: 10) { Redis.new(options) }
 end

@@ -31,8 +31,10 @@ class EntryDeleter
         key_created_at = FeedbinUtils.redis_feed_entries_created_at_key(feed_id)
         key_published = FeedbinUtils.redis_feed_entries_published_key(feed_id)
         SearchIndexRemove.perform_async(entries_to_delete_ids)
-        $redis[:sorted_entries].zrem(key_created_at, entries_to_delete_ids)
-        $redis[:sorted_entries].zrem(key_published, entries_to_delete_ids)
+        $redis[:sorted_entries].with do |redis|
+          redis.zrem(key_created_at, entries_to_delete_ids)
+          redis.zrem(key_published, entries_to_delete_ids)
+        end
       end
 
       Librato.increment('entry.destroy', by: entries_to_delete_ids.count)

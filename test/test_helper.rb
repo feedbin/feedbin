@@ -27,8 +27,8 @@ Minitest.after_run {
 }
 
 $redis = {
-  sorted_entries: Redis.new(url: ENV['REDIS_URL']),
-  id_cache: Redis.new(url: ENV['REDIS_URL'])
+  sorted_entries: ConnectionPool.new(size: 10) { Redis.new(url: ENV['REDIS_URL']) },
+  id_cache: ConnectionPool.new(size: 10) { Redis.new(url: ENV['REDIS_URL']) }
 }
 
 class ActiveSupport::TestCase
@@ -48,8 +48,10 @@ class ActiveSupport::TestCase
     Sidekiq.redis do |redis|
       redis.flushdb
     end
-    $redis.each do |_, redis|
-      redis.flushdb
+    $redis.each do |_, instance|
+      instance.with do |redis|
+        redis.flushdb
+      end
     end
   end
 

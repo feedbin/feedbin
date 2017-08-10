@@ -14,8 +14,7 @@ class EntryTestTest < ActiveSupport::TestCase
     @entry.save
     key = FeedbinUtils.redis_feed_entries_created_at_key(@entry.feed_id)
     created_at = "%10.6f" % @entry.reload.created_at
-    score = $redis[:sorted_entries].zscore(key, @entry.reload.id)
-
+    score = $redis[:sorted_entries].with { |redis| redis.zscore(key, @entry.reload.id) }
     assert_equal("%10.5f" % created_at.to_f, "%10.5f" % score.to_f)
   end
 
@@ -23,7 +22,7 @@ class EntryTestTest < ActiveSupport::TestCase
     @entry.save
     key = FeedbinUtils.redis_feed_entries_published_key(@entry.feed_id)
     published = "%10.6f" % @entry.reload.published
-    score = $redis[:sorted_entries].zscore(key, @entry.reload.id)
+    score = $redis[:sorted_entries].with { |redis| redis.zscore(key, @entry.reload.id) }
 
     assert_equal("%10.5f" % published.to_f, "%10.5f" % score.to_f)
   end
@@ -36,7 +35,7 @@ class EntryTestTest < ActiveSupport::TestCase
 
   test "should cache id" do
     @entry.save
-    assert_equal(@entry.content.length, $redis[:id_cache].get(@entry.public_id).to_i)
+    assert_equal(@entry.content.length, $redis[:id_cache].with { |redis| redis.get(@entry.public_id).to_i })
   end
 
   test "should create summary" do
