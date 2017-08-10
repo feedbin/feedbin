@@ -11,6 +11,17 @@ class SendStats
       postgres_stats
       plan_count
       active_users_count
+      queue_depth
+    end
+  end
+
+  def queue_depth
+    socket = "/tmp/unicorn.sock"
+    if File.exist?(socket)
+      result = Raindrops::Linux.unix_listener_stats([socket])
+      stats = result.values.first
+      Librato.measure "server_queue_depth.active", stats.active, source: Socket.gethostname
+      Librato.measure "server_queue_depth.queued", stats.queued, source: Socket.gethostname
     end
   end
 
