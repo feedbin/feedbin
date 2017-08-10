@@ -5,16 +5,16 @@ require_relative '../config/environment'
 include Clockwork
 
 # Use locks so multiple clock processes do not schedule dupes
-every(1.minutes, 'clockwork.frequent') do
-
-  if RedisLock.acquire("clockwork:feed:refresher:scheduler:v2")
-    FeedRefresherScheduler.perform_async
-  end
-
+every(10.seconds, 'clockwork.very_frequent') do
   if RedisLock.acquire("clockwork:send_stats:v2")
     SendStats.perform_async
   end
+end
 
+every(1.minutes, 'clockwork.frequent') do
+  if RedisLock.acquire("clockwork:feed:refresher:scheduler:v2")
+    FeedRefresherScheduler.perform_async
+  end
 end
 
 every(1.day, 'clockwork.daily', at: '12:00', tz: 'UTC') do
