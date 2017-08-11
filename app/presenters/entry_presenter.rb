@@ -161,7 +161,12 @@ class EntryPresenter < BasePresenter
   end
 
   def media_image
-    entry.data && entry.data['itunes_image']
+    if entry.data && entry.data['itunes_image_processed']
+      url = URI(entry.data['itunes_image_processed'])
+      url.host = ENV['ENTRY_IMAGE_HOST'] if ENV['ENTRY_IMAGE_HOST']
+      url.scheme = 'https'
+      url.to_s
+    end
   end
 
   def feed_domain_matches?(comparison)
@@ -268,9 +273,7 @@ class EntryPresenter < BasePresenter
       if parts.length == 3
         hours, minutes, seconds = parts
         result = hours * 60 + minutes
-        @template.content_tag :div, class: "audio-duration" do
-          "#{result} minutes"
-        end
+        "#{result} minutes"
       end
     end
   rescue

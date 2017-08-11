@@ -27,7 +27,7 @@ class ItunesImage
     entry = Entry.find(@entry_id)
     data = entry.data || {}
     data['itunes_image_processed'] = @processed_url
-    @entry.update(data: data)
+    entry.update(data: data)
   end
 
 end

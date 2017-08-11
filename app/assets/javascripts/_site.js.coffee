@@ -86,7 +86,30 @@ $.extend feedbin,
   updateAudioProgress: ->
     console.log 'update'
 
-  playingAudio: ->
+  togglePlay: ->
+    if window.player.paused
+      window.player.play()
+    else
+      window.player.pause()
+
+  playState: ->
+    if typeof(window.player) != "undefined"
+      data = $(window.player.domNode).data()
+      duration = $("[data-behavior~=audio_duration_#{data.entryId}]")
+      if $.trim(duration.text()) == ''
+        minutes = Math.floor(player.duration / 60);
+        duration.html("#{minutes} minutes")
+
+      play = $("[data-behavior~=audio_play_#{data.entryId}]")
+      if window.player.paused
+        play.addClass('paused')
+        play.removeClass('playing')
+      else
+        play.addClass('playing')
+        play.removeClass('paused')
+
+
+  playingAudio: (event) ->
     $('body').addClass('playing-audio')
 
   stoppedAudio: ->
@@ -100,8 +123,8 @@ $.extend feedbin,
       defaultAudioHeight: '5px'
       success: (mediaElement, domObject) ->
         mediaElement.addEventListener 'timeupdate', _.throttle(feedbin.updateAudioProgress, 5000, {leading: false})
-        mediaElement.addEventListener 'playing', feedbin.playingAudio
-        mediaElement.addEventListener 'pause', feedbin.stoppedAudio
+        mediaElement.addEventListener 'playing', feedbin.playState
+        mediaElement.addEventListener 'pause', feedbin.playState
         mediaElement.play()
 
   footnotes: ->
@@ -268,6 +291,7 @@ $.extend feedbin,
     if readability
       feedbin.readability()
     try
+      feedbin.playState()
       feedbin.syntaxHighlight()
       feedbin.footnotes()
       feedbin.nextEntryPreview()
@@ -1582,27 +1606,41 @@ $.extend feedbin,
 
     audioPlay: ->
       $(document).on 'click', '[data-behavior~=audio_play]', (event) ->
-        if window.player.paused
-          window.player.play()
-        else
-          window.player.pause()
+        feedbin.togglePlay()
 
     launchPlayer: ->
       $(document).on 'click', '[data-behavior~=audio_launch_player]', (event) ->
-        source = $("[data-behavior~=audio_markup]")
-        target = $("[data-behavior~=audio_target]")
-        target.html(source.html())
-        feedbin.audioPlayer()
-        $('body').addClass('audio-panel-minimized')
+        init = ->
+          source = $("[data-behavior~=audio_markup]")
+          target = $("[data-behavior~=audio_target]")
+          target.html(source.html())
+          feedbin.audioPlayer()
+
+          $('body').removeClass('audio-panel-minimized')
+          $('body').removeClass('audio-panel-maximized')
+          size = feedbin.data.audioPanelSize || "minimized"
+          $('body').addClass("audio-panel-#{size}")
+
+        if typeof(window.player) == "undefined"
+          init()
+        else
+          data = $(window.player.domNode).data()
+          if data.entryId == $(@).data('entry-id')
+            feedbin.togglePlay()
+          else
+            init()
+
 
     toggleAudioPanel: ->
       $(document).on 'click', '[data-behavior~=toggle_audio_panel]', (event) ->
         if $('body').hasClass('audio-panel-minimized')
           $('body').removeClass('audio-panel-minimized')
           $('body').addClass('audio-panel-maximized')
+          feedbin.data.audioPanelSize = "maximized"
         else
           $('body').removeClass('audio-panel-maximized')
           $('body').addClass('audio-panel-minimized')
+          feedbin.data.audioPanelSize = "minimized"
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
