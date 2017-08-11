@@ -81,6 +81,7 @@ gem 'http'
 gem 'elasticsearch', '~> 2.0'
 gem 'elasticsearch-model', '~> 2.0'
 gem 'sidekiq'
+gem 'raindrops'
 
 # Stripe
 gem 'stripe'

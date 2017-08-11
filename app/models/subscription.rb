@@ -48,20 +48,11 @@ class Subscription < ApplicationRecord
   end
 
   def add_feed_to_action
-    actions = Action.where(user_id: self.user_id, all_feeds: true)
-    actions.each do |action|
-      action.save
-    end
+    AddFeedToAction.perform_async(user_id)
   end
 
   def remove_feed_from_action
-    actions = Action.where(user_id: self.user_id)
-    actions.each do |action|
-      feed_ids = action.feed_ids || []
-      action.feed_ids = feed_ids - [self.feed_id.to_s]
-      action.automatic_modification = true
-      action.save
-    end
+    RemoveFeedFromAction.perform_async(self.user_id, self.feed_id)
   end
 
   def expire_stat_cache
