@@ -1046,6 +1046,7 @@ Structure
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    transition: .2s ease-in bottom;
     @media (max-width: 550px) {
         bottom: 0;
     }
