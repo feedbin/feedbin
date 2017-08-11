@@ -198,6 +198,9 @@ class Entry < ApplicationRecord
 
   def find_images
     EntryImage.perform_async(self.id)
+    if self.data && self.data['itunes_image']
+      ItunesImage.perform_async(self.id, self.data['itunes_image'])
+    end
   end
 
 end

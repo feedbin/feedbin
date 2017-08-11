@@ -5696,6 +5696,7 @@ Media Players
         @include background-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         position: relative;
         img {
+            max-width: 100%;
             position: absolute;
             top: 0;
             left: 0;
@@ -5809,7 +5810,7 @@ Media Players
             height: auto;
             width: 15px;
             background-color: transparent;
-            .icon-podcast {
+            .image-container {
                 display: none;
             }
         }

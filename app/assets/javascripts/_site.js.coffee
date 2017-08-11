@@ -1595,6 +1595,15 @@ $.extend feedbin,
         feedbin.audioPlayer()
         $('body').addClass('audio-panel-minimized')
 
+    toggleAudioPanel: ->
+      $(document).on 'click', '[data-behavior~=toggle_audio_panel]', (event) ->
+        if $('body').hasClass('audio-panel-minimized')
+          $('body').removeClass('audio-panel-minimized')
+          $('body').addClass('audio-panel-maximized')
+        else
+          $('body').removeClass('audio-panel-maximized')
+          $('body').addClass('audio-panel-minimized')
+
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
         link = $(@).parents("a:first")
