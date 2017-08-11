@@ -28,7 +28,7 @@ class FeedRequest
     if json_feed?
       :json_feed
     else
-      if Feedjira::Feed.determine_feed_parser_for_xml(body)
+      if Feedjira.parser_for_xml(body)
         :xml
       else
         :html

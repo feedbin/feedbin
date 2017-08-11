@@ -35,7 +35,7 @@ end
 gem 'pg'
 gem 'unicorn'
 
-gem 'feedjira',              github: 'feedbin/feedjira',            ref: 'f229365'
+gem 'feedjira',              github: 'feedbin/feedjira',            ref: 'eeb7e81'
 gem 'opml_saw',              github: 'feedbin/opml_saw',            ref: '61d8c2d'
 gem 'html-pipeline',         github: 'feedbin/html-pipeline',       ref: 'dc012b9'
 gem 'grocer-pushpackager',   github: 'feedbin/grocer-pushpackager', ref: '6b01b4e', require: 'grocer/pushpackager'
@@ -82,6 +82,7 @@ gem 'elasticsearch', '~> 2.0'
 gem 'elasticsearch-model', '~> 2.0'
 gem 'sidekiq'
 gem 'raindrops'
+gem 'curb'
 
 # Stripe
 gem 'stripe'

@@ -2,7 +2,11 @@
     <% if entry_presenter.media_type && entry_presenter.media_type == :audio %>
         <div class="audio-container entry-callout">
             <div class="audio-image">
-                <%= svg_tag 'icon-podcast', size: '15x26' %>
+                <% if entry_presenter.media_image %>
+                    <%= image_tag entry_presenter.media_image %>
+                <% else %>
+                    <%= svg_tag 'icon-podcast', size: '15x26' %>
+                <% end %>
             </div>
             <div class="audio-text">
                 <%= content_tag :div, strip_tags(entry.feed.title), class: 'entry-feed-title', title: strip_tags(entry.feed.title), data: {behavior: 'user_title', feed_id: entry.feed.id} %>
@@ -25,7 +29,11 @@
         <div class="hide" data-behavior="audio_markup">
             <div class="audio-container">
                 <div class="audio-image">
-                    <%= svg_tag 'icon-podcast', size: '10x17' %>
+                    <% if entry_presenter.media_image %>
+                        <%= image_tag entry_presenter.media_image %>
+                    <% else %>
+                        <%= svg_tag 'icon-podcast', size: '15x26' %>
+                    <% end %>
                     <button class="button-text button-empty play-button" data-behavior="audio_play" title="Play/Pause">
                         <%= svg_tag('icon-play', size: "14x16") %>
                         <%= svg_tag('icon-pause', size: "13x17") %>

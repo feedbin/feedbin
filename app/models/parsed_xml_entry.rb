@@ -40,6 +40,7 @@ class ParsedXMLEntry < ParsedEntry
     value[:enclosure_url]    = @entry.enclosure_url if @entry.try(:enclosure_url)
     value[:enclosure_length] = @entry.enclosure_length if @entry.try(:enclosure_length)
     value[:itunes_duration]  = @entry.itunes_duration if @entry.try(:itunes_duration)
+    value[:itunes_image]     = itunes_image
     value[:youtube_video_id] = @entry.youtube_video_id if @entry.try(:youtube_video_id)
     value[:media_width]      = @entry.media_width if @entry.try(:media_width)
     value[:media_height]     = @entry.media_height if @entry.try(:media_height)
@@ -57,6 +58,14 @@ class ParsedXMLEntry < ParsedEntry
 
   def url
     @entry.url ? @entry.url.strip : nil
+  end
+
+  def itunes_image
+    if @feed.try(:itunes_image)
+      @feed.itunes_image.strip
+    elsif @entry.try(:itunes_image)
+      @entry.itunes_image.strip
+    end
   end
 
 end

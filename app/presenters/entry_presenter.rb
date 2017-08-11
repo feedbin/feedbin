@@ -145,7 +145,7 @@ class EntryPresenter < BasePresenter
   def media_type
     if entry.data && entry.data['enclosure_type'] == 'video/mp4'
       :video
-    elsif entry.data && entry.data['enclosure_type'] == 'audio/mpeg'
+    elsif entry.data && ['audio/mp3', 'audio/mpeg'].include?(entry.data['enclosure_type'])
       :audio
     else
       nil
@@ -158,6 +158,10 @@ class EntryPresenter < BasePresenter
     else
       ''
     end
+  end
+
+  def media_image
+    entry.data && entry.data['itunes_image']
   end
 
   def feed_domain_matches?(comparison)
