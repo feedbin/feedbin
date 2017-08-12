@@ -5799,9 +5799,12 @@ Media Players
         .entry-feed-title {
             margin-right: 10px;
         }
-        .audio-panel-controls {
-            margin-left: auto;
-            white-space: nowrap;
+    }
+    .audio-panel-controls {
+        margin-left: auto;
+        white-space: nowrap;
+        .icon-caret * {
+            @include fill($text-color-light !important, $text-color-light-night !important, $text-color-light-sunset !important);
         }
     }
     .audio-image {
@@ -5854,18 +5857,8 @@ Media Players
             width: 40px;
         }
         svg {
-            .theme-night & {
-                fill: $text-summary-color-night !important;
-                color: $text-summary-color-night !important;
-            }
-            .theme-day & {
-                fill: $text-summary-color !important;
-                color: $text-summary-color !important;
-            }
-            .theme-sunset & {
-                fill: $text-summary-color-sunset !important;
-                color: $text-summary-color-sunset !important;
-            }
+            @include fill($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         }
     }
 }
