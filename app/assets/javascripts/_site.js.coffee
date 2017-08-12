@@ -1624,11 +1624,20 @@ $.extend feedbin,
         if typeof(window.player) == "undefined"
           init()
         else
+          size = feedbin.data.audioPanelSize || "minimized"
+          $('body').addClass("audio-panel-#{size}")
           data = $(window.player.domNode).data()
           if data.entryId == $(@).data('entry-id')
             feedbin.togglePlay()
           else
             init()
+
+
+    closeAudio: ->
+      $(document).on 'click', '[data-behavior~=close_audio]', (event) ->
+        window.player.pause()
+        $('body').removeClass('audio-panel-minimized')
+        $('body').removeClass('audio-panel-maximized')
 
 
     toggleAudioPanel: ->

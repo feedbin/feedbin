@@ -5808,6 +5808,11 @@ Media Players
         height: 43px;
         width: 43px;
         background-size: 11px 19px;
+        .audio-panel-maximized & {
+            .play-button {
+                display: none;
+            }
+        }
         .audio-panel-minimized & {
             height: auto;
             width: 15px;
