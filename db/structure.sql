@@ -2,11 +2,12 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.0
--- Dumped by pg_dump version 9.5.0
+-- Dumped from database version 9.6.2
+-- Dumped by pg_dump version 9.6.2
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
@@ -545,6 +546,40 @@ ALTER SEQUENCE plans_id_seq OWNED BY plans.id;
 
 
 --
+-- Name: recently_played_entries; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE recently_played_entries (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    entry_id integer NOT NULL,
+    progress integer DEFAULT 0 NOT NULL,
+    duration integer DEFAULT 0 NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: recently_played_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE recently_played_entries_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: recently_played_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE recently_played_entries_id_seq OWNED BY recently_played_entries.id;
+
+
+--
 -- Name: recently_read_entries; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -983,182 +1018,189 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: actions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY actions ALTER COLUMN id SET DEFAULT nextval('actions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: billing_events id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY billing_events ALTER COLUMN id SET DEFAULT nextval('billing_events_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: coupons id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY coupons ALTER COLUMN id SET DEFAULT nextval('coupons_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: deleted_users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY deleted_users ALTER COLUMN id SET DEFAULT nextval('deleted_users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: devices id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY devices ALTER COLUMN id SET DEFAULT nextval('devices_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: entries id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY entries ALTER COLUMN id SET DEFAULT nextval('entries_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: favicons id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY favicons ALTER COLUMN id SET DEFAULT nextval('favicons_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: feed_stats id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY feed_stats ALTER COLUMN id SET DEFAULT nextval('feed_stats_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: feeds id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY feeds ALTER COLUMN id SET DEFAULT nextval('feeds_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: import_items id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY import_items ALTER COLUMN id SET DEFAULT nextval('import_items_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: imports id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY imports ALTER COLUMN id SET DEFAULT nextval('imports_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: in_app_purchases id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY in_app_purchases ALTER COLUMN id SET DEFAULT nextval('in_app_purchases_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: plans id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY plans ALTER COLUMN id SET DEFAULT nextval('plans_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: recently_played_entries id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY recently_played_entries ALTER COLUMN id SET DEFAULT nextval('recently_played_entries_id_seq'::regclass);
+
+
+--
+-- Name: recently_read_entries id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY recently_read_entries ALTER COLUMN id SET DEFAULT nextval('recently_read_entries_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: saved_searches id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY saved_searches ALTER COLUMN id SET DEFAULT nextval('saved_searches_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: sharing_services id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY sharing_services ALTER COLUMN id SET DEFAULT nextval('sharing_services_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: starred_entries id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY starred_entries ALTER COLUMN id SET DEFAULT nextval('starred_entries_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: subscriptions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY subscriptions ALTER COLUMN id SET DEFAULT nextval('subscriptions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: suggested_categories id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY suggested_categories ALTER COLUMN id SET DEFAULT nextval('suggested_categories_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: suggested_feeds id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY suggested_feeds ALTER COLUMN id SET DEFAULT nextval('suggested_feeds_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: supported_sharing_services id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY supported_sharing_services ALTER COLUMN id SET DEFAULT nextval('supported_sharing_services_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: taggings id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY taggings ALTER COLUMN id SET DEFAULT nextval('taggings_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: tags id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: updated_entries id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY updated_entries ALTER COLUMN id SET DEFAULT nextval('updated_entries_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
 --
--- Name: actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: actions actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY actions
@@ -1166,7 +1208,7 @@ ALTER TABLE ONLY actions
 
 
 --
--- Name: ar_internal_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: ar_internal_metadata ar_internal_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY ar_internal_metadata
@@ -1174,7 +1216,7 @@ ALTER TABLE ONLY ar_internal_metadata
 
 
 --
--- Name: billing_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: billing_events billing_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY billing_events
@@ -1182,7 +1224,7 @@ ALTER TABLE ONLY billing_events
 
 
 --
--- Name: coupons_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: coupons coupons_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY coupons
@@ -1190,7 +1232,7 @@ ALTER TABLE ONLY coupons
 
 
 --
--- Name: deleted_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: deleted_users deleted_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY deleted_users
@@ -1198,7 +1240,7 @@ ALTER TABLE ONLY deleted_users
 
 
 --
--- Name: devices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: devices devices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY devices
@@ -1206,7 +1248,7 @@ ALTER TABLE ONLY devices
 
 
 --
--- Name: entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: entries entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY entries
@@ -1214,7 +1256,7 @@ ALTER TABLE ONLY entries
 
 
 --
--- Name: favicons_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: favicons favicons_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY favicons
@@ -1222,7 +1264,7 @@ ALTER TABLE ONLY favicons
 
 
 --
--- Name: feed_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: feed_stats feed_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY feed_stats
@@ -1230,7 +1272,7 @@ ALTER TABLE ONLY feed_stats
 
 
 --
--- Name: feeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: feeds feeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY feeds
@@ -1238,7 +1280,7 @@ ALTER TABLE ONLY feeds
 
 
 --
--- Name: import_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: import_items import_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY import_items
@@ -1246,7 +1288,7 @@ ALTER TABLE ONLY import_items
 
 
 --
--- Name: imports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: imports imports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY imports
@@ -1254,7 +1296,7 @@ ALTER TABLE ONLY imports
 
 
 --
--- Name: in_app_purchases_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: in_app_purchases in_app_purchases_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY in_app_purchases
@@ -1262,7 +1304,7 @@ ALTER TABLE ONLY in_app_purchases
 
 
 --
--- Name: plans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: plans plans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY plans
@@ -1270,7 +1312,15 @@ ALTER TABLE ONLY plans
 
 
 --
--- Name: recently_read_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: recently_played_entries recently_played_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY recently_played_entries
+    ADD CONSTRAINT recently_played_entries_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: recently_read_entries recently_read_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY recently_read_entries
@@ -1278,7 +1328,7 @@ ALTER TABLE ONLY recently_read_entries
 
 
 --
--- Name: saved_searches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: saved_searches saved_searches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY saved_searches
@@ -1286,7 +1336,7 @@ ALTER TABLE ONLY saved_searches
 
 
 --
--- Name: sharing_services_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: sharing_services sharing_services_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY sharing_services
@@ -1294,7 +1344,7 @@ ALTER TABLE ONLY sharing_services
 
 
 --
--- Name: starred_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: starred_entries starred_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY starred_entries
@@ -1302,7 +1352,7 @@ ALTER TABLE ONLY starred_entries
 
 
 --
--- Name: subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: subscriptions subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY subscriptions
@@ -1310,7 +1360,7 @@ ALTER TABLE ONLY subscriptions
 
 
 --
--- Name: suggested_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: suggested_categories suggested_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY suggested_categories
@@ -1318,7 +1368,7 @@ ALTER TABLE ONLY suggested_categories
 
 
 --
--- Name: suggested_feeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: suggested_feeds suggested_feeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY suggested_feeds
@@ -1326,7 +1376,7 @@ ALTER TABLE ONLY suggested_feeds
 
 
 --
--- Name: supported_sharing_services_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: supported_sharing_services supported_sharing_services_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY supported_sharing_services
@@ -1334,7 +1384,7 @@ ALTER TABLE ONLY supported_sharing_services
 
 
 --
--- Name: taggings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: taggings taggings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY taggings
@@ -1342,7 +1392,7 @@ ALTER TABLE ONLY taggings
 
 
 --
--- Name: tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY tags
@@ -1350,7 +1400,7 @@ ALTER TABLE ONLY tags
 
 
 --
--- Name: updated_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: updated_entries updated_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY updated_entries
@@ -1358,7 +1408,7 @@ ALTER TABLE ONLY updated_entries
 
 
 --
--- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users
@@ -1503,6 +1553,34 @@ CREATE UNIQUE INDEX index_in_app_purchases_on_transaction_id ON in_app_purchases
 --
 
 CREATE INDEX index_in_app_purchases_on_user_id ON in_app_purchases USING btree (user_id);
+
+
+--
+-- Name: index_recently_played_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recently_played_entries_on_entry_id ON recently_played_entries USING btree (entry_id);
+
+
+--
+-- Name: index_recently_played_entries_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recently_played_entries_on_user_id ON recently_played_entries USING btree (user_id);
+
+
+--
+-- Name: index_recently_played_entries_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recently_played_entries_on_user_id_and_created_at ON recently_played_entries USING btree (user_id, created_at);
+
+
+--
+-- Name: index_recently_played_entries_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_recently_played_entries_on_user_id_and_entry_id ON recently_played_entries USING btree (user_id, entry_id);
 
 
 --
@@ -1828,12 +1906,28 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 
 
 --
+-- Name: recently_played_entries fk_rails_5d354dd9ac; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY recently_played_entries
+    ADD CONSTRAINT fk_rails_5d354dd9ac FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: recently_played_entries fk_rails_6a56afb3ea; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY recently_played_entries
+    ADD CONSTRAINT fk_rails_6a56afb3ea FOREIGN KEY (entry_id) REFERENCES entries(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
-INSERT INTO schema_migrations (version) VALUES
+INSERT INTO "schema_migrations" (version) VALUES
 ('20121010042043'),
 ('20121011035904'),
 ('20121011035933'),
@@ -1963,6 +2057,7 @@ INSERT INTO schema_migrations (version) VALUES
 ('20160817165958'),
 ('20160822194302'),
 ('20161110045909'),
-('20170427001830');
+('20170427001830'),
+('20170812121620');
 
 

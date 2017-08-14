@@ -84,7 +84,15 @@ $.extend feedbin,
     $("[data-behavior~=#{selector}] audio, [data-behavior~=#{selector}] video").mediaelementplayer()
 
   updateAudioProgress: ->
-    console.log 'update'
+    data = $(window.player.domNode).data()
+    form = $("[data-behavior~=audio_target] [data-behavior~=audio_progress_form_#{data.entryId}]")
+    feedbin.data.progress[data.entryId] =
+      progress: window.player.currentTime
+      duration: window.player.duration
+    if form.length > 0
+      field = form.find('#recently_played_entry_progress').val(window.player.currentTime)
+      field = form.find('#recently_played_entry_duration').val(window.player.duration)
+      form.submit()
 
   togglePlay: ->
     if window.player.paused
@@ -92,13 +100,24 @@ $.extend feedbin,
     else
       window.player.pause()
 
+  setDuration: (entryId, duration) ->
+    durationElement = $("[data-behavior~=audio_duration_#{entryId}]")
+    if $.trim(durationElement.text()) == ''
+      minutes = Math.floor(duration / 60);
+      durationElement.html("#{minutes} minutes")
+
+  playTime: (entryId) ->
+    if (entryId of feedbin.data.progress)
+      progress = feedbin.data.progress[entryId]
+      console.log progress
+      feedbin.setDuration(entryId, progress.duration)
+
   playState: ->
     if typeof(window.player) != "undefined"
       data = $(window.player.domNode).data()
-      duration = $("[data-behavior~=audio_duration_#{data.entryId}]")
-      if $.trim(duration.text()) == ''
-        minutes = Math.floor(player.duration / 60);
-        duration.html("#{minutes} minutes")
+      duration = window.player.duration
+      if !isNaN(duration)
+        feedbin.setDuration(data.entryId, duration)
 
       play = $("[data-behavior~=audio_play_#{data.entryId}]")
       if window.player.paused
@@ -115,6 +134,9 @@ $.extend feedbin,
   stoppedAudio: ->
     $('body').removeClass('playing-audio')
 
+  seeked: ->
+    console.log 'seeked'
+
   audioPlayer: ->
     window.player = new MediaElementPlayer 'audio_player',
       features: ['progress']
@@ -122,9 +144,14 @@ $.extend feedbin,
       defaultAudioWidth: 'auto'
       defaultAudioHeight: '5px'
       success: (mediaElement, domObject) ->
+        data = $(domObject).data()
+        if (data.entryId of feedbin.data.progress)
+          progress = feedbin.data.progress[data.entryId]
+          mediaElement.setCurrentTime(progress.progress)
         mediaElement.addEventListener 'timeupdate', _.throttle(feedbin.updateAudioProgress, 5000, {leading: false})
         mediaElement.addEventListener 'playing', feedbin.playState
         mediaElement.addEventListener 'pause', feedbin.playState
+        mediaElement.addEventListener 'seeked', _.throttle(feedbin.updateAudioProgress, 1000, {leading: false})
         mediaElement.play()
 
   footnotes: ->
@@ -292,6 +319,7 @@ $.extend feedbin,
       feedbin.readability()
     try
       feedbin.playState()
+      feedbin.playTime(entryId)
       feedbin.syntaxHighlight()
       feedbin.footnotes()
       feedbin.nextEntryPreview()

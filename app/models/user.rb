@@ -33,7 +33,8 @@ class User < ApplicationRecord
                  :view_mode,
                  :disable_image_proxy,
                  :api_client,
-                 :marketing_unsubscribe
+                 :marketing_unsubscribe,
+                 :hide_recently_played
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -50,6 +51,7 @@ class User < ApplicationRecord
   has_many :saved_searches, dependent: :delete_all
   has_many :actions, dependent: :destroy
   has_many :recently_read_entries, dependent: :delete_all
+  has_many :recently_played_entries, dependent: :delete_all
   has_many :updated_entries, dependent: :delete_all
   has_many :devices, dependent: :delete_all
   has_many :in_app_purchases

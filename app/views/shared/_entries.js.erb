@@ -56,6 +56,11 @@ var entryIds = <%= @entries.map{ |entry| entry.id }.to_json.html_safe %>;
     feedbin.preloadEntries(entryIds, false);
 <% end %>
 
+<% @user.recently_played_entries.where(entry_id: @entries.map(&:id)).select(:duration, :progress, :entry_id).each do |record| %>
+feedbin.data.progress[<%= record.entry_id %>] = {progress: <%= record.progress %>, duration: <%= record.duration %>}
+<% end %>
+
+
 $(document).trigger('feedbin:entriesLoaded');
 
 feedbin.hideSearchControls()
@@ -80,5 +85,6 @@ feedbin.hideSearchControls()
   $('[data-behavior~=save_search_link]').removeAttr('disabled');
   $('[data-behavior~=saved_search_form_target]').html('<%= j render partial: "saved_searches/form", locals: {saved_search: @saved_search} %>');
 <% end %>
+
 
 feedbin.markReadData.date = "<%= j last_unread_date %>";

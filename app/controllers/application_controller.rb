@@ -90,6 +90,18 @@ class ApplicationController < ActionController::Base
         data: { behavior: 'selectable show_entries open_item feed_link', special_collection: 'updated', mark_read: {type: 'updated', message: 'Mark updated items as read?'}.to_json }
       }
     end
+    if !user.setting_on?(:hide_recently_played)
+      collections << {
+        title: 'Recently Played',
+        path: recently_played_entries_path,
+        count_data: nil,
+        id: 'collection_recently_played',
+        favicon_class: 'favicon-recently-played',
+        parent_class: 'collection-recently-played',
+        parent_data: { behavior: 'recently_played', feed_id: 'collection_recently_played', count_type: 'recently_played' },
+        data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'recently_played', message: 'Mark recently played items as read?'}.to_json }
+      }
+    end
     collections
   end
 

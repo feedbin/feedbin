@@ -37,7 +37,8 @@ class SiteController < ApplicationController
         entry_sort: @user.entry_sort,
         update_message_seen: @user.setting_on?(:update_message_seen),
         feed_order: @user.feed_order,
-        refresh_sessions_path: refresh_sessions_path
+        refresh_sessions_path: refresh_sessions_path,
+        progress: {}
       }
 
       render action: 'logged_in'

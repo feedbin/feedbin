@@ -29,6 +29,10 @@
         </div>
 
         <div class="hide" data-behavior="audio_markup">
+            <%= form_for RecentlyPlayedEntry.new(), url: {id: entry.id, action: "create", controller: "recently_played_entries"}, remote: true, html: {class: "hide", data: {behavior: "audio_progress_form_#{entry.id}"}} do |f| %>
+                <%= f.hidden_field :progress %>
+                <%= f.hidden_field :duration %>
+            <% end %>
             <div class="audio-container">
                 <div class="audio-image">
                     <div class="image-container">
