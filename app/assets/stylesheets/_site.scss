@@ -1510,7 +1510,6 @@ $saved-search-control-height: 48px;
 .entries ul li {
     position: relative;
     word-wrap: break-word;
-    @include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
     .favicon-wrap {
         top: -2px;
         left: -26px;
@@ -1769,6 +1768,7 @@ $saved-search-control-height: 48px;
             bottom: 0;
             right: 8px;
             line-height: 1;
+            color: $selected;
         }
         i {
             font-style: normal;
@@ -1782,8 +1782,9 @@ $saved-search-control-height: 48px;
     .mark-below-read {
         bottom: 0;
         border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
-        i:before {
+                i:before {
             content: "↓";
             top: -2px;
         }
