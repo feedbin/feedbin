@@ -18,6 +18,9 @@ class SiteController < ApplicationController
         hash[subscription.feed_id] = subscription.view_inline
       end
 
+      @now_playing = Entry.where(id: @user.now_playing_entry).first
+      @recently_played = @user.recently_played_entries.where(entry_id: @user.now_playing_entry).first
+
       @show_welcome = (subscriptions.present?) ? false : true
       @classes = user_classes
       @data = {
@@ -38,7 +41,8 @@ class SiteController < ApplicationController
         update_message_seen: @user.setting_on?(:update_message_seen),
         feed_order: @user.feed_order,
         refresh_sessions_path: refresh_sessions_path,
-        progress: {}
+        progress: {},
+        audio_panel_size: @user.audio_panel_size
       }
 
       render action: 'logged_in'

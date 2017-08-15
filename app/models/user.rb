@@ -34,7 +34,9 @@ class User < ApplicationRecord
                  :disable_image_proxy,
                  :api_client,
                  :marketing_unsubscribe,
-                 :hide_recently_played
+                 :hide_recently_played,
+                 :now_playing_entry,
+                 :audio_panel_size
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -418,6 +420,30 @@ class User < ApplicationRecord
     end
 
     if !can_read && starred_entries.where(feed_id: feed).exists?
+      can_read = true
+    end
+
+    can_read
+  end
+
+  def can_read_entry?(entry_id)
+    can_read = false
+
+    entry = Entry.find(entry_id)
+
+    if subscribed_to?(entry.feed)
+      can_read = true
+    end
+
+    if !can_read && starred_entries.where(entry: entry).exists?
+      can_read = true
+    end
+
+    if !can_read && recently_read_entries.where(entry: entry).exists?
+      can_read = true
+    end
+
+    if !can_read && recently_played_entries.where(entry: entry).exists?
       can_read = true
     end
 

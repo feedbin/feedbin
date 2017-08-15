@@ -151,6 +151,8 @@ Rails.application.routes.draw do
     post :font_increase
     post :font_decrease
     post :entry_width
+    post :now_playing
+    post :audio_panel_size
   end
 
   get :settings_subscriptions_edit, path: "/settings/feeds/:id/edit", to: 'subscriptions#edit'

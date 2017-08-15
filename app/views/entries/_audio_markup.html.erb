@@ -1,0 +1,65 @@
+<% present entry do |entry_presenter| %>
+    <%= form_for RecentlyPlayedEntry.new(), url: {id: entry.id, action: "create", controller: "recently_played_entries"}, remote: true, html: {class: "hide", data: {behavior: "audio_progress_form_#{entry.id}"}} do |f| %>
+        <%= f.hidden_field :progress %>
+        <%= f.hidden_field :duration %>
+    <% end %>
+    <%= form_tag settings_now_playing_path, remote: true, class: "hide", data: {behavior: "now_playing_form"} do |f| %>
+        <%= hidden_field_tag :now_playing_entry, entry.id %>
+    <% end %>
+    <%= form_tag settings_now_playing_path, remote: true, class: "hide", data: {behavior: "remove_now_playing"} do |f| %>
+        <%= hidden_field_tag :remove_now_playing_entry, 1 %>
+    <% end %>
+    <%= form_tag settings_audio_panel_size_path, remote: true, class: "hide", data: {behavior: "audio_panel_size"} do |f| %>
+        <%= hidden_field_tag :audio_panel_size, nil %>
+    <% end %>
+
+    <div class="audio-container">
+        <div class="audio-image">
+            <div class="image-container">
+                <% if entry_presenter.media_image %>
+                    <%= image_tag entry_presenter.media_image %>
+                <% else %>
+                    <%= svg_tag 'icon-podcast', size: '15x26' %>
+                <% end %>
+            </div>
+            <button class="button-text button-empty play-button" data-behavior="audio_play audio_play_<%= entry.id %>" title="Play/Pause">
+                <%= svg_tag('icon-play', size: "14x16") %>
+                <%= svg_tag('icon-pause', size: "13x17") %>
+            </button>
+        </div>
+        <div class="audio-text">
+            <div class="feed-title-wrap">
+                <div class="entry-feed-title" title="<%= strip_tags(entry.feed.title) %>" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>">
+                    <%= strip_tags(entry.feed.title) %>
+                </div>
+                <div class="audio-panel-controls">
+                    <button title="Minimize" class="button-text button-empty" data-behavior="toggle_audio_panel">
+                        <%= svg_tag 'icon-caret', size: '18x11' %>
+                    </button>
+                    <button title="Close" class="button-text button-empty" data-behavior="close_audio">
+                        <%= svg_tag 'icon-full-screen-close-small', size: '16x16'  %>
+                    </button>
+                </div>
+            </div>
+            <div class="audio-title-wrap"><div class="audio-title" title="<%= entry_presenter.entry_view_title %>"><%= entry_presenter.entry_view_title %></div></div>
+            <div class="audio-duration" data-behavior="audio_duration_<%= entry.id %>">
+                <%= entry_presenter.audio_duration %>
+            </div>
+        </div>
+    </div>
+    <div class="audio-player-controls">
+        <button class="button-text button-empty" data-behavior="audio_skip_backward" title="Skip Backward 15 Seconds">
+            <%= svg_tag('icon-skip-backward', size: "18x19") %>
+        </button>
+        <button class="button-text button-empty play-button" data-behavior="audio_play audio_play_<%= entry.id %>" title="Play/Pause">
+            <%= svg_tag('icon-play', size: "14x16") %>
+            <%= svg_tag('icon-pause', size: "13x17") %>
+        </button>
+        <button class="button-text button-empty" data-behavior="audio_skip_forward" title="Skip Forward 15 Seconds">
+            <%= svg_tag('icon-skip-forward', size: "18x19") %>
+        </button>
+    </div>
+    <div class="audio-progress">
+        <%= audio_tag entry.data['enclosure_url'], preload: 'none', id: 'audio_player', data: {entry_id: entry.id} %>
+    </div>
+<% end %>
