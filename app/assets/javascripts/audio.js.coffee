@@ -100,30 +100,39 @@ $.extend feedbin,
 
     togglePanel: ->
       $(document).on 'click', '[data-behavior~=toggle_audio_panel]', (event) ->
-        if $('body').hasClass('audio-panel-minimized')
-          $('body').removeClass('audio-panel-minimized')
-          $('body').addClass('audio-panel-maximized')
-          feedbin.data.audio_panel_size = "maximized"
+        console.log event
+        if $(event.target).has('[data-behavior~=toggle_audio_panel]')
+          console.log 'yest'
+          if $('body').hasClass('audio-panel-minimized')
+            $('body').removeClass('audio-panel-minimized')
+            $('body').addClass('audio-panel-maximized')
+            feedbin.data.audio_panel_size = "maximized"
+          else
+            $('body').removeClass('audio-panel-maximized')
+            $('body').addClass('audio-panel-minimized')
+            feedbin.data.audio_panel_size = "minimized"
+          form = $("[data-behavior~=audio_target] [data-behavior~=audio_panel_size]")
+          form.find('#audio_panel_size').val(feedbin.data.audio_panel_size)
+          form.submit()
         else
-          $('body').removeClass('audio-panel-maximized')
-          $('body').addClass('audio-panel-minimized')
-          feedbin.data.audio_panel_size = "minimized"
+          console.log 'no'
 
-        form = $("[data-behavior~=audio_target] [data-behavior~=audio_panel_size]")
-        form.find('#audio_panel_size').val(feedbin.data.audio_panel_size)
-        form.submit()
 
     skipForward: ->
       $(document).on 'click', '[data-behavior~=audio_skip_forward]', (event) ->
         feedbin.audioJump(30)
+        event.stopPropagation()
 
     skipBackward: ->
       $(document).on 'click', '[data-behavior~=audio_skip_backward]', (event) ->
         feedbin.audioJump(-30)
+        event.stopPropagation()
+
 
     playPause: ->
       $(document).on 'click', '[data-behavior~=audio_play]', (event) ->
         feedbin.togglePlay()
+        event.stopPropagation()
 
     close: ->
       $(document).on 'click', '[data-behavior~=close_audio]', (event) ->
@@ -132,6 +141,8 @@ $.extend feedbin,
         window.player.pause()
         $('body').removeClass('audio-panel-minimized')
         $('body').removeClass('audio-panel-maximized')
+        event.stopPropagation()
+
 
 
 

@@ -4,8 +4,8 @@ Variables
 $toolbar-height: 41px;
 $font-stack: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $feeds-toolbar-height: 52px;
-$audio-player-height: 112px;
-$audio-player-height-minimized: 53px;
+$audio-player-height: 132px;
+$audio-player-height-minimized: 49px;
 $base-button-position: 10px;
 
 /*-- Colors --*/
@@ -1046,7 +1046,7 @@ Structure
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    transition: .2s ease-in bottom;
+    transition: .1s ease-in bottom;
     @media (max-width: 550px) {
         bottom: 0;
     }
@@ -5733,10 +5733,14 @@ Media Players
         .audio-title, .audio-duration {
             @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         }
+        .audio-duration {
+            font-size: 12px;
+            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
         .entry-feed-title, .audio-title {
             display: block;
             text-overflow: ellipsis;
-            overflow: hidden;
+            overflow-x: hidden;
             white-space: nowrap;
         }
         .audio-title-wrap {
@@ -5767,18 +5771,26 @@ Media Players
                 fill: $text-summary-color-sunset;
             }
         }
-        button {
-            margin-left: 15px;
+        button, a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            height: 100%;
+            padding-left: 25px;
         }
     }
 }
 
 .audio-panel {
-    padding: 12px 12px 0 12px;
+    cursor: pointer;
+    padding: 30px 12px 0 12px;
     font-size: 13px;
     font-family: $font-stack !important;
     font-weight: 400 !important;
-    @include background-color($border-color, $border-color-night, $border-color-sunset);
+    @include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
+    border-top: 1px solid transparent;
+    @include border-color($border-color, $border-color-night, $border-color-sunset);
     position: absolute;
     width: 100%;
     bottom: $feeds-toolbar-height;
@@ -5787,29 +5799,53 @@ Media Players
     z-index: 1;
     height: 0;
     visibility: hidden;
+
     .animate-panel & {
-        transition: .2s ease-in height;
+        transition: .1s ease-in height;
     }
 
     .audio-panel-minimized & {
         visibility: visible;
         height: $audio-player-height-minimized;
+        padding: 0;
     }
     .audio-panel-maximized & {
         visibility: visible;
         height: $audio-player-height;
+        .audio-container {
+            margin: 0 0 5px 0;
+        }
     }
     .feed-title-wrap {
         display: flex;
+        user-select: none;
         .entry-feed-title {
             margin-right: 10px;
         }
     }
     .audio-panel-controls {
-        margin-left: auto;
+        right: 3px;
+        top: 5px;
+        position: absolute;
         white-space: nowrap;
-        .icon-caret * {
-            @include fill($text-color-light !important, $text-color-light-night !important, $text-color-light-sunset !important);
+        width: 23px;
+        .button-change-size {
+            &:after {
+                display: block;
+                content: "+";
+                .audio-panel-maximized & {
+                    content: "-";
+                }
+            }
+        }
+        button {
+            font-size: 20px;
+            width: 23px;
+            height: 20px;
+            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+            &:hover {
+                text-decoration: none;
+            }
         }
     }
     .audio-image {
@@ -5822,8 +5858,6 @@ Media Players
             }
         }
         .audio-panel-minimized & {
-            height: auto;
-            width: 15px;
             background-color: transparent;
             .image-container {
                 display: none;
@@ -5833,11 +5867,15 @@ Media Players
     .audio-text {
         margin-left: 6px;
         margin-right: 0;
+        .audio-panel-minimized & {
+            padding-top: 9px;
+            padding-right: 20px;
+        }
+        .audio-title {
+            font-size: 12px;
+        }
         div {
-            line-height: 1.1;
-            .audio-panel-minimized & {
-                line-height: 1;
-            }
+            line-height: 1.3;
         }
     }
     .audio-duration {
@@ -5845,12 +5883,9 @@ Media Players
             display: none;
         }
     }
-    .audio-container {
-        margin: 0 0 5px 0;
-    }
     .audio-player-controls {
         display: flex;
-        justify-content: space-around;
+        justify-content: center;
         .audio-panel-minimized & {
             display: none;
         }
@@ -5860,6 +5895,11 @@ Media Players
             justify-content: center;
             height: 40px;
             width: 40px;
+            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+            margin-left: 20px;
+            &:first-child {
+                margin-left: 0;
+            }
         }
         svg {
             @include fill($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
@@ -5895,7 +5935,6 @@ Media Players
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(#FFF,.1);
     position: absolute;
 
     .mejs_empty__controls {
@@ -6042,16 +6081,10 @@ Media Players
     }
 
     .mejs_empty__time-total {
-        background: rgba(255, 255, 255, 0.3);
         width: 100%;
     }
 
     .mejs_empty__time-buffering {
-        -webkit-animation: buffering-stripes 2s linear infinite;
-                animation: buffering-stripes 2s linear infinite;
-        background: -webkit-linear-gradient(135deg, rgba(255, 255, 255, 0.4) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.4) 75%, transparent 75%, transparent);
-        background: linear-gradient(-45deg, rgba(255, 255, 255, 0.4) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.4) 75%, transparent 75%, transparent);
-        background-size: 15px 15px;
         width: 100%;
     }
 
@@ -6071,10 +6104,6 @@ Media Players
         to {
             background-position: 30px 0;
         }
-    }
-
-    .mejs_empty__time-loaded {
-        background: rgba(255, 255, 255, 0.3);
     }
 
     .mejs_empty__time-current,

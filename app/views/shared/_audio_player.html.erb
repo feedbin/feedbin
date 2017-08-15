@@ -1,4 +1,4 @@
-<div class="audio-panel" data-behavior="audio_target">
+<div class="audio-panel" data-behavior="audio_target toggle_audio_panel">
     <% if @now_playing %>
         <%= render partial: "entries/audio_markup", locals: {entry: @now_playing} %>
         <script type="text/javascript">

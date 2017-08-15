@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="audio-controls">
-                <a class="button-text button-empty" href="<%= entry.data['enclosure_url'] %>" target="_blank" rel="noopener noreferrer" title="Download">
+                <a class="button-text button-empty" href="<%= entry.data['enclosure_url'] %>" target="_blank" rel="noopener noreferrer" title="<%= entry_presenter.download_title %>">
                     <%= svg_tag('icon-download', size: "16x16") %>
                 </a>
                 <button class="button-text button-empty play-button" data-behavior="audio_launch_player audio_play_<%= entry.id %>" data-entry-id="<%= entry.id %>" title="Play/Pause">

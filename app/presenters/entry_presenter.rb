@@ -129,6 +129,10 @@ class EntryPresenter < BasePresenter
     end
   end
 
+  def download_title
+    "Download #{media_size}"
+  end
+
   def media
     output = ''
     if entry.data && entry.data['enclosure_url'].present? && media_type.present?
