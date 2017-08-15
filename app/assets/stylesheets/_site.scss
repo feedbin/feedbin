@@ -909,10 +909,10 @@ Structure
     right: 19px;
     z-index: 2;
     &:before {
-        left: -9px;
+        left: -7px;
     }
     &:after {
-        left: 9px;
+        left: 7px;
     }
     .settings & {
         top: 31px;
@@ -920,7 +920,7 @@ Structure
     }
 }
 .hamburger-menu, .hamburger-menu:before, .hamburger-menu:after {
-    $dot: 5px;
+    $dot: 4px;
     width: $dot;
     height: $dot;
     border-radius: $dot/2;
