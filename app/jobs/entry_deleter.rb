@@ -18,14 +18,13 @@ class EntryDeleter
     entry_count = Entry.where(feed_id: feed_id).count
     if entry_count > entry_limit
       entries_to_keep = Entry.where(feed_id: feed_id).order('published DESC').limit(entry_limit).pluck('entries.id')
-      entries_to_delete = Entry.select(:id, :public_id).where(feed_id: feed_id, starred_entries_count: 0).where.not(id: entries_to_keep)
-      entries_to_delete_ids = entries_to_delete.map {|entry| entry.id }
+      entries_to_delete_ids = Entry.where(feed_id: feed_id, starred_entries_count: 0).where.not(id: entries_to_keep).pluck(:id)
 
       # Delete records
       UnreadEntry.where(entry_id: entries_to_delete_ids).delete_all
       UpdatedEntry.where(entry_id: entries_to_delete_ids).delete_all
       RecentlyReadEntry.where(entry_id: entries_to_delete_ids).delete_all
-      entries_to_delete.delete_all
+      Entry.where(id: entries_to_delete_ids).delete_all
 
       if entries_to_delete_ids.present?
         key_created_at = FeedbinUtils.redis_feed_entries_created_at_key(feed_id)

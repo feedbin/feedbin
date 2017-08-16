@@ -1,13 +1,15 @@
 module BatchJobs
   BATCH_SIZE = 5_000
 
-  def job_args(total_records, *args)
-    batch_count = (total_records.to_f/BATCH_SIZE.to_f).ceil
-    jobs = []
-    1.upto(batch_count) do |batch|
+  def job_args(ending_id, starting_id = 1, *args)
+    start_batch = (starting_id.to_f/BATCH_SIZE.to_f).floor
+    if start_batch == 0
+      start_batch = 1
+    end
+    end_batch = (ending_id.to_f/BATCH_SIZE.to_f).ceil
+    start_batch.upto(end_batch).each_with_object([]) do |batch, jobs|
       jobs.push([batch].concat(args))
     end
-    jobs
   end
 
   def build_ids(batch)

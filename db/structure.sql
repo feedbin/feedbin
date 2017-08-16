@@ -275,7 +275,8 @@ CREATE TABLE entries (
     source text,
     image_url text,
     processed_image_url text,
-    image json
+    image json,
+    recently_played_entries_count integer DEFAULT 0
 );
 
 
@@ -1478,6 +1479,13 @@ CREATE UNIQUE INDEX index_entries_on_public_id ON entries USING btree (public_id
 
 
 --
+-- Name: index_entries_on_recently_played_entries_count; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_entries_on_recently_played_entries_count ON entries USING btree (recently_played_entries_count);
+
+
+--
 -- Name: index_favicons_on_host; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1905,22 +1913,6 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 
 
 --
--- Name: fk_rails_5d354dd9ac; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY recently_played_entries
-    ADD CONSTRAINT fk_rails_5d354dd9ac FOREIGN KEY (user_id) REFERENCES users(id);
-
-
---
--- Name: fk_rails_6a56afb3ea; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY recently_played_entries
-    ADD CONSTRAINT fk_rails_6a56afb3ea FOREIGN KEY (entry_id) REFERENCES entries(id);
-
-
---
 -- PostgreSQL database dump complete
 --
 
@@ -2057,6 +2049,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20160822194302'),
 ('20161110045909'),
 ('20170427001830'),
-('20170812121620');
+('20170812121620'),
+('20170816220409');
 
 
