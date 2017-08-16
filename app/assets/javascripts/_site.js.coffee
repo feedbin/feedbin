@@ -81,7 +81,12 @@ $.extend feedbin,
       hljs.highlightBlock(e)
 
   audioVideo: (selector = "entry_final_content") ->
-    $("[data-behavior~=#{selector}] audio, [data-behavior~=#{selector}] video").mediaelementplayer()
+    $("[data-behavior~=#{selector}] audio").mediaelementplayer
+      stretching: 'responsive'
+      features: ['playpause', 'current', 'progress', 'duration', 'tracks', 'fullscreen']
+    $("video").mediaelementplayer
+      stretching: 'responsive'
+      features: ['playpause', 'current', 'progress', 'duration', 'tracks', 'fullscreen']
 
 
   footnotes: ->
@@ -1536,7 +1541,7 @@ $.extend feedbin,
     linkActionsHover: ->
       $(document).on 'mouseenter mouseleave', '.entry-final-content a', (event) ->
         link = $(@)
-        if link.text().trim().length > 0
+        if link.text().trim().length > 0 && !$(@).has('.mejs__container')
           clearTimeout(feedbin.linkActionsTimer)
           clearTimeout(feedbin.linkCacheTimer)
           $('.entry-final-content a [data-behavior~=link_actions]').remove()

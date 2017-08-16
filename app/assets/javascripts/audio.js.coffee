@@ -18,23 +18,30 @@ $.extend feedbin,
         if (data.entryId of feedbin.data.progress)
           progress = feedbin.data.progress[data.entryId]
           mediaElement.setCurrentTime(progress.progress)
+
+        mediaElement.addEventListener 'timeupdate', (e) ->
+          console.log 'timeupdate'
+          if !isNaN(window.player.duration) && window.player.duration != 0
+            feedbin.data.progress[data.entryId] =
+              progress: window.player.currentTime
+              duration: window.player.duration
+          feedbin.playTime(data.entryId)
+
+        mediaElement.addEventListener 'seeked', _.throttle(feedbin.updateProgress, 1000, {leading: false})
         mediaElement.addEventListener 'timeupdate', _.throttle(feedbin.updateProgress, 5000, {leading: false})
         mediaElement.addEventListener 'playing', feedbin.playState
         mediaElement.addEventListener 'pause', feedbin.playState
-        mediaElement.addEventListener 'seeked', _.throttle(feedbin.updateProgress, 1000, {leading: false})
         if play
           mediaElement.play()
 
   updateProgress: ->
-    data = $(window.player.domNode).data()
-    form = $("[data-behavior~=audio_target] [data-behavior~=audio_progress_form_#{data.entryId}]")
-    feedbin.data.progress[data.entryId] =
-      progress: window.player.currentTime
-      duration: window.player.duration
-    if form.length > 0
-      field = form.find('#recently_played_entry_progress').val(window.player.currentTime)
-      field = form.find('#recently_played_entry_duration').val(window.player.duration)
-      form.submit()
+    if !isNaN(window.player.duration) && window.player.duration != 0
+      data = $(window.player.domNode).data()
+      form = $("[data-behavior~=audio_target] [data-behavior~=audio_progress_form_#{data.entryId}]")
+      if form.length > 0
+        field = form.find('#recently_played_entry_progress').val(window.player.currentTime)
+        field = form.find('#recently_played_entry_duration').val(window.player.duration)
+        form.submit()
 
   togglePlay: ->
     if window.player.paused
@@ -46,12 +53,19 @@ $.extend feedbin,
     durationElement = $("[data-behavior~=audio_duration_#{entryId}]")
     if $.trim(durationElement.text()) == ''
       minutes = Math.floor(duration / 60);
-      durationElement.html("#{minutes} minutes")
+      durationElement.text("#{minutes} minutes")
 
   playTime: (entryId) ->
     if (entryId of feedbin.data.progress)
       progress = feedbin.data.progress[entryId]
-      feedbin.setDuration(entryId, progress.duration)
+      durationElement = $("[data-behavior~=audio_duration_#{entryId}]")
+      left = progress.duration - progress.progress
+      minutes = Math.ceil(left / 60);
+      if minutes == 1
+        message = "1 minute left"
+      else
+        message = "#{minutes} minutes left"
+      durationElement.text(message)
 
   playState: ->
     if typeof(window.player) != "undefined"
@@ -135,6 +149,9 @@ $.extend feedbin,
         event.stopPropagation()
 
     close: ->
+      $(document).on 'click', '.audio-progress', (event) ->
+        event.stopPropagation()
+
       $(document).on 'click', '[data-behavior~=close_audio]', (event) ->
         $("[data-behavior~=audio_target] [data-behavior~=remove_now_playing]").submit()
 
