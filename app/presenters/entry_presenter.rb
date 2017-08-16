@@ -146,6 +146,12 @@ class EntryPresenter < BasePresenter
     output
   end
 
+  def media_class
+    if media_type == :audio
+      "media"
+    end
+  end
+
   def media_type
     if entry.data && entry.data['enclosure_type'] == 'video/mp4'
       :video

@@ -4,7 +4,7 @@ Variables
 $toolbar-height: 41px;
 $font-stack: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $feeds-toolbar-height: 52px;
-$audio-player-height: 132px;
+$audio-player-height: 115px;
 $audio-player-height-minimized: 54px;
 $base-button-position: 10px;
 
@@ -1696,7 +1696,7 @@ $saved-search-control-height: 48px;
     }
     &.media {
         .time {
-            background: image-url("icon-play-small.svg") 0 2px no-repeat;
+            background: image-url("icon-play-small.svg") 0 50% no-repeat;
         }
     }
     &.selected {
@@ -5784,7 +5784,7 @@ Media Players
 
 .audio-panel {
     cursor: pointer;
-    padding: 30px 12px 0 12px;
+    padding: 12px 0 0 12px;
     font-size: 13px;
     font-family: $font-stack !important;
     font-weight: 400 !important;
@@ -5829,7 +5829,7 @@ Media Players
         position: absolute;
         white-space: nowrap;
         width: 30px;
-        height: 30px;
+        height: 39px;
         .button-change-size {
             &:after {
                 display: block;
@@ -5873,9 +5873,9 @@ Media Players
     .audio-text {
         margin-left: 6px;
         margin-right: 0;
+        padding-right: 20px;
         .audio-panel-minimized & {
-            padding-top: 9px;
-            padding-right: 20px;
+            padding-top: 12px;
         }
         .audio-title {
             font-size: 12px;
