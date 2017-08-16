@@ -2,6 +2,20 @@ window.feedbin ?= {}
 
 $.extend feedbin,
 
+  nowPlayingdata: {}
+
+  hasDuration: ->
+    if isNaN(window.player.duration) || window.player.duration == 0
+      false
+    else
+      true
+
+  loadProgress: (entryId) ->
+    if (entryId of feedbin.data.progress)
+      feedbin.data.progress[entryId]
+    else
+      false
+
   initPlayer: (play = true) ->
     $('body').removeClass('audio-panel-minimized')
     $('body').removeClass('audio-panel-maximized')
@@ -14,18 +28,17 @@ $.extend feedbin,
       defaultAudioWidth: 'auto'
       defaultAudioHeight: '5px'
       success: (mediaElement, domObject) ->
-        data = $(domObject).data()
-        if (data.entryId of feedbin.data.progress)
-          progress = feedbin.data.progress[data.entryId]
+        feedbin.nowPlayingData = $(domObject).data()
+
+        if progress = feedbin.loadProgress(feedbin.nowPlayingData.entryId)
           mediaElement.setCurrentTime(progress.progress)
 
         mediaElement.addEventListener 'timeupdate', (e) ->
-          console.log 'timeupdate'
-          if !isNaN(window.player.duration) && window.player.duration != 0
-            feedbin.data.progress[data.entryId] =
+          if feedbin.hasDuration()
+            feedbin.data.progress[feedbin.nowPlayingData.entryId] =
               progress: window.player.currentTime
               duration: window.player.duration
-          feedbin.playTime(data.entryId)
+          feedbin.timeRemaining(feedbin.nowPlayingData.entryId)
 
         mediaElement.addEventListener 'seeked', _.throttle(feedbin.updateProgress, 1000, {leading: false})
         mediaElement.addEventListener 'timeupdate', _.throttle(feedbin.updateProgress, 5000, {leading: false})
@@ -35,9 +48,8 @@ $.extend feedbin,
           mediaElement.play()
 
   updateProgress: ->
-    if !isNaN(window.player.duration) && window.player.duration != 0
-      data = $(window.player.domNode).data()
-      form = $("[data-behavior~=audio_target] [data-behavior~=audio_progress_form_#{data.entryId}]")
+    if feedbin.hasDuration()
+      form = $("[data-behavior~=audio_target] [data-behavior~=audio_progress_form_#{feedbin.nowPlayingData.entryId}]")
       if form.length > 0
         field = form.find('#recently_played_entry_progress').val(window.player.currentTime)
         field = form.find('#recently_played_entry_duration').val(window.player.duration)
@@ -55,9 +67,8 @@ $.extend feedbin,
       minutes = Math.floor(duration / 60);
       durationElement.text("#{minutes} minutes")
 
-  playTime: (entryId) ->
-    if (entryId of feedbin.data.progress)
-      progress = feedbin.data.progress[entryId]
+  timeRemaining: (entryId) ->
+    if progress = feedbin.loadProgress(entryId)
       durationElement = $("[data-behavior~=audio_duration_#{entryId}]")
       left = progress.duration - progress.progress
       minutes = Math.ceil(left / 60);
@@ -69,12 +80,10 @@ $.extend feedbin,
 
   playState: ->
     if typeof(window.player) != "undefined"
-      data = $(window.player.domNode).data()
-      duration = window.player.duration
-      if !isNaN(duration)
-        feedbin.setDuration(data.entryId, duration)
+      if feedbin.hasDuration()
+        feedbin.setDuration(feedbin.nowPlayingData.entryId, window.player.duration)
 
-      play = $("[data-behavior~=audio_play_#{data.entryId}]")
+      play = $("[data-behavior~=audio_play_#{feedbin.nowPlayingData.entryId}]")
       if window.player.paused
         play.addClass('paused')
         play.removeClass('playing')
@@ -106,17 +115,14 @@ $.extend feedbin,
         else
           size = feedbin.data.audio_panel_size || "minimized"
           $('body').addClass("audio-panel-#{size}")
-          data = $(window.player.domNode).data()
-          if data.entryId == $(@).data('entry-id')
+          if feedbin.nowPlayingData.entryId == $(@).data('entry-id')
             feedbin.togglePlay()
           else
             init()
 
     togglePanel: ->
       $(document).on 'click', '[data-behavior~=toggle_audio_panel]', (event) ->
-        console.log event
         if $(event.target).has('[data-behavior~=toggle_audio_panel]')
-          console.log 'yest'
           if $('body').hasClass('audio-panel-minimized')
             $('body').removeClass('audio-panel-minimized')
             $('body').addClass('audio-panel-maximized')
@@ -128,9 +134,6 @@ $.extend feedbin,
           form = $("[data-behavior~=audio_target] [data-behavior~=audio_panel_size]")
           form.find('#audio_panel_size').val(feedbin.data.audio_panel_size)
           form.submit()
-        else
-          console.log 'no'
-
 
     skipForward: ->
       $(document).on 'click', '[data-behavior~=audio_skip_forward]', (event) ->
@@ -141,7 +144,6 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=audio_skip_backward]', (event) ->
         feedbin.audioJump(-30)
         event.stopPropagation()
-
 
     playPause: ->
       $(document).on 'click', '[data-behavior~=audio_play]', (event) ->
@@ -159,9 +161,6 @@ $.extend feedbin,
         $('body').removeClass('audio-panel-minimized')
         $('body').removeClass('audio-panel-maximized')
         event.stopPropagation()
-
-
-
 
 jQuery ->
   $.each feedbin.audioInit, (i, item) ->
