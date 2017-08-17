@@ -68,8 +68,7 @@ class FeedRefresher
         subscriptions_count: @feed[:subscriptions_count],
         push_callback: push_callback,
         hub_secret: hub_secret,
-        push_mode: push_mode,
-        itunes_image: true
+        push_mode: push_mode
       }
       [@feed[:id], @feed[:feed_url], options]
     end
