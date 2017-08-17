@@ -4,10 +4,12 @@ class FeedRefresherReceiverImage
 
   def perform(public_id, url)
     entry = Entry.find_by_public_id(public_id)
-    data = entry.data || {}
-    data['itunes_image'] = url
-    entry.update(data: data)
-    ItunesImage.perform_async(entry.id, entry.data['itunes_image'])
+    if entry.published > 4.weeks.ago
+      data = entry.data || {}
+      data['itunes_image'] = url
+      entry.update(data: data)
+      ItunesImage.perform_async(entry.id, entry.data['itunes_image'])
+    end
   end
 
 end
