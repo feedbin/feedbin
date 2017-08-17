@@ -1,5 +1,3 @@
-require_relative '../../lib/batch_jobs'
-
 class FaviconMigration
   include Sidekiq::Worker
   include BatchJobs

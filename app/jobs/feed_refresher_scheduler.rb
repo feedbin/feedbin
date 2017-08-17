@@ -1,5 +1,4 @@
 require 'sidekiq/api'
-require_relative '../../lib/batch_jobs'
 
 class FeedRefresherScheduler
   include Sidekiq::Worker

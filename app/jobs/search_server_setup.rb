@@ -1,4 +1,3 @@
-require_relative '../../lib/batch_jobs'
 class SearchServerSetup
   include Sidekiq::Worker
   include BatchJobs

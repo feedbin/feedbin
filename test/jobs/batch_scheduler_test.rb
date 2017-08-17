@@ -1,5 +1,4 @@
 require 'test_helper'
-require_relative '../../lib/batch_jobs'
 
 class BatchSchedulerTest < ActiveSupport::TestCase
   test "should bulk load jobs" do

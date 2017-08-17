@@ -1,5 +1,3 @@
-load "#{Rails.root}/lib/batch_jobs.rb"
-
 class UpdateDefaultColumn
   include Sidekiq::Worker
   include BatchJobs

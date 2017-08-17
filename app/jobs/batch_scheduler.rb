@@ -1,5 +1,3 @@
-require_relative '../../lib/batch_jobs'
-
 class BatchScheduler
   include Sidekiq::Worker
   include BatchJobs
