@@ -5869,10 +5869,14 @@ Media Players
             height: 48px;
             .play-button {
                 display: flex;
+                flex: 1;
                 height: 100%;
-                width: 100%;
                 align-items: center;
                 justify-content: center;
+                svg {
+                    align-self: center;
+                    margin: auto;
+                }
             }
             .image-container {
                 display: none;
