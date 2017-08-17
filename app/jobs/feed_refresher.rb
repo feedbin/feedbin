@@ -1,5 +1,3 @@
-require_relative '../../lib/batch_jobs'
-
 class FeedRefresher
   include BatchJobs
   include Sidekiq::Worker

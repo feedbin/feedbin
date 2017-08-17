@@ -116,6 +116,7 @@ Rails.application.routes.draw do
       post :starred_entries, to: 'starred_entries#update'
       post :mark_as_read, to: 'entries#mark_as_read'
       post :recently_read, to: 'recently_read_entries#create'
+      post :recently_played, to: 'recently_played_entries#create'
       get :push_view
       get :diff
       get :newsletter
@@ -126,6 +127,7 @@ Rails.application.routes.draw do
       get :preload
       get :search
       get :recently_read, to: 'recently_read_entries#index'
+      get :recently_played, to: 'recently_played_entries#index'
       get :updated, to: 'updated_entries#index'
       post :view_link
       post :view_link_contents
@@ -149,11 +151,19 @@ Rails.application.routes.draw do
     post :font_increase
     post :font_decrease
     post :entry_width
+    post :now_playing
+    post :audio_panel_size
   end
 
   get :settings_subscriptions_edit, path: "/settings/feeds/:id/edit", to: 'subscriptions#edit'
 
   resources :recently_read_entries, only: [] do
+    collection do
+      delete :destroy_all
+    end
+  end
+
+  resources :recently_played_entries, only: [] do
     collection do
       delete :destroy_all
     end

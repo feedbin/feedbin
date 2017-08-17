@@ -1,12 +1,13 @@
 class ParsedXMLFeed < ParsedFeed
 
   def feed
-    @feed ||= Feedjira::Feed.parse(@body)
+    parser = Feedjira.parser_for_xml(@body)
+    @feed ||= parser.parse(@body)
   rescue ArgumentError
     if @feed_request.charset
-      @feed ||= Feedjira::Feed.parse(@body.force_encoding(@feed_request.charset))
+      @feed ||= parser.parse(@body.force_encoding(@feed_request.charset))
     else
-      @feed ||= Feedjira::Feed.parse(@body.force_encoding("ASCII-8BIT"))
+      @feed ||= parser.parse(@body.force_encoding("ASCII-8BIT"))
     end
   end
 
@@ -54,12 +55,16 @@ class ParsedXMLFeed < ParsedFeed
       entries = []
       if feed.entries.respond_to?(:any?) && feed.entries.any?
         entries = feed.entries.map do |entry|
-          ParsedXMLEntry.new(entry, base_url)
+          ParsedXMLEntry.new(entry, base_url, self)
         end
         entries = entries.uniq { |entry| entry.public_id }
       end
       entries
     end
+  end
+
+  def itunes_image
+    feed.respond_to?(:itunes_image) ? feed.itunes_image.strip : nil
   end
 
 end

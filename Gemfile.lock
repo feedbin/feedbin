@@ -12,13 +12,14 @@ GIT
 
 GIT
   remote: git://github.com/feedbin/feedjira.git
-  revision: f2293659c66c9b7689364c1b0a0eb8a391453b3f
-  ref: f229365
+  revision: eeb7e81b38469b5e9d4324c62ee6e5ac6b79678d
+  ref: eeb7e81
   specs:
-    feedjira (1.6.1)
-      curb (~> 0.8)
-      loofah (~> 2.0)
-      sax-machine (~> 1.0)
+    feedjira (2.1.2)
+      faraday (>= 0.9)
+      faraday_middleware (>= 0.9)
+      loofah (>= 2.0)
+      sax-machine (>= 1.0)
 
 GIT
   remote: git://github.com/feedbin/grocer-pushpackager.git
@@ -580,6 +581,7 @@ DEPENDENCIES
   coffee-rails
   connection_pool
   coveralls
+  curb
   dalli
   dotenv-rails
   elasticsearch (~> 2.0)

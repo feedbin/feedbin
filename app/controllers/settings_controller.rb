@@ -206,7 +206,28 @@ class SettingsController < ApplicationController
     head :ok
   end
 
+  def now_playing
+    user = current_user
+    if params[:now_playing_entry]
+      entry_id = params[:now_playing_entry].to_i
+      if user.can_read_entry?(entry_id)
+        user.update(now_playing_entry: entry_id)
+      end
+    end
 
+    if params[:remove_now_playing_entry]
+      user.update(now_playing_entry: nil)
+    end
+    head :ok
+  end
+
+  def audio_panel_size
+    user = current_user
+    if %w{minimized maximized}.include?(params[:audio_panel_size])
+      user.update(audio_panel_size: params[:audio_panel_size])
+    end
+    head :ok
+  end
 
   private
 
@@ -237,7 +258,12 @@ class SettingsController < ApplicationController
                                  :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation,
                                  :apple_push_notification_device_token, :receipt_info, :entries_display,
                                  :entries_feed, :entries_time, :entries_body, :ui_typeface, :theme,
-                                 :hide_recently_read, :hide_updated, :disable_image_proxy, :entries_image)
+                                 :hide_recently_read, :hide_updated, :disable_image_proxy, :entries_image,
+                                 :now_playing_entry, :hide_recently_played)
+  end
+
+  def user_now_playing_params
+    params.require(:user).permit(:now_playing_entry)
   end
 
 

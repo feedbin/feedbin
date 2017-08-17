@@ -80,8 +80,14 @@ $.extend feedbin,
     $('[data-behavior~=entry_content_target] pre code').each (i, e) ->
       hljs.highlightBlock(e)
 
-  audioVideo: (selector = "entry_content_target") ->
-    $("[data-behavior~=#{selector}] audio, [data-behavior~=#{selector}] video").mediaelementplayer()
+  audioVideo: (selector = "entry_final_content") ->
+    $("[data-behavior~=#{selector}] audio").mediaelementplayer
+      stretching: 'responsive'
+      features: ['playpause', 'current', 'progress', 'duration', 'tracks', 'fullscreen']
+    $("video").mediaelementplayer
+      stretching: 'responsive'
+      features: ['playpause', 'current', 'progress', 'duration', 'tracks', 'fullscreen']
+
 
   footnotes: ->
     $.bigfoot
@@ -247,6 +253,8 @@ $.extend feedbin,
     if readability
       feedbin.readability()
     try
+      feedbin.playState()
+      feedbin.playTime(entryId)
       feedbin.syntaxHighlight()
       feedbin.footnotes()
       feedbin.nextEntryPreview()
@@ -1533,7 +1541,7 @@ $.extend feedbin,
     linkActionsHover: ->
       $(document).on 'mouseenter mouseleave', '.entry-final-content a', (event) ->
         link = $(@)
-        if link.text().trim().length > 0
+        if link.text().trim().length > 0 && !$(@).has('.mejs__container')
           clearTimeout(feedbin.linkActionsTimer)
           clearTimeout(feedbin.linkCacheTimer)
           $('.entry-final-content a [data-behavior~=link_actions]').remove()

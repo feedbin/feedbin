@@ -189,4 +189,32 @@ class SettingsControllerTest < ActionController::TestCase
     assert_not_equal @user.entry_width, @user.reload.entry_width
   end
 
+  test "should update now playing" do
+    @feeds = create_feeds(@user)
+    @entries = @user.entries
+
+    login_as @user
+    post :now_playing, params: {now_playing_entry: @entries.first.id}
+    assert_not_equal @entries.first.id, @user.reload.now_playing_entry.to_s
+  end
+
+  test "should remove now playing" do
+    login_as @user
+    now_playing_entry = "1"
+    @user.update(now_playing_entry: now_playing_entry)
+    assert_equal @user.reload.now_playing_entry, now_playing_entry
+
+    post :now_playing, params: {remove_now_playing_entry: 1}
+    assert_nil @user.reload.now_playing_entry
+  end
+
+  test "should change audio panel size" do
+    login_as @user
+    %w[minimized maximized].each do |audio_panel_size|
+      post :audio_panel_size, params: {audio_panel_size: audio_panel_size}
+      assert_equal(audio_panel_size, @user.reload.audio_panel_size)
+    end
+  end
+
+
 end

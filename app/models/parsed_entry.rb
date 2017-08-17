@@ -4,9 +4,10 @@ class ParsedEntry
 
   ENTRY_ATTRIBUTES = %i(author content data entry_id public_id published source title url).freeze
 
-  def initialize(entry, feed_url)
+  def initialize(entry, feed_url, feed = nil)
     @entry = entry
     @feed_url = feed_url
+    @feed = feed
   end
 
   def to_entry

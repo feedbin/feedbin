@@ -1,0 +1,14 @@
+<div class="audio-panel" data-behavior="audio_target toggle_audio_panel">
+    <% if @now_playing %>
+        <%= render partial: "entries/audio_markup", locals: {entry: @now_playing} %>
+        <script type="text/javascript">
+            <% if @recently_played %>
+                feedbin.data.progress[<%= @recently_played.entry_id %>] = {progress: <%= @recently_played.progress %>, duration: <%= @recently_played.duration %>}
+            <% end %>
+            $(function() {
+                feedbin.initPlayer(false);
+                $('body').addClass("animate-panel")
+            })
+        </script>
+    <% end %>
+</div>

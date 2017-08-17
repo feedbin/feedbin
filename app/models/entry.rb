@@ -42,7 +42,7 @@ class Entry < ApplicationRecord
   end
 
   def self.entries_list
-    select(:id, :feed_id, :title, :summary, :published, :image)
+    select(:id, :feed_id, :title, :summary, :published, :image, :data)
   end
 
   def self.include_unread_entries(user_id)
@@ -198,6 +198,9 @@ class Entry < ApplicationRecord
 
   def find_images
     EntryImage.perform_async(self.id)
+    if self.data && self.data['itunes_image']
+      ItunesImage.perform_async(self.id, self.data['itunes_image'])
+    end
   end
 
 end

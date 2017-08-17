@@ -129,6 +129,10 @@ class EntryPresenter < BasePresenter
     end
   end
 
+  def download_title
+    "Download #{media_size}"
+  end
+
   def media
     output = ''
     if entry.data && entry.data['enclosure_url'].present? && media_type.present?
@@ -142,10 +146,16 @@ class EntryPresenter < BasePresenter
     output
   end
 
+  def media_class
+    if media_type == :audio
+      "media"
+    end
+  end
+
   def media_type
     if entry.data && entry.data['enclosure_type'] == 'video/mp4'
       :video
-    elsif entry.data && entry.data['enclosure_type'] == 'audio/mpeg'
+    elsif entry.data && ['audio/mp3', 'audio/mpeg'].include?(entry.data['enclosure_type'])
       :audio
     else
       nil
@@ -157,6 +167,15 @@ class EntryPresenter < BasePresenter
       entry.data['itunes_duration']
     else
       ''
+    end
+  end
+
+  def media_image
+    if entry.data && entry.data['itunes_image_processed']
+      url = URI(entry.data['itunes_image_processed'])
+      url.host = ENV['ENTRY_IMAGE_HOST'] if ENV['ENTRY_IMAGE_HOST']
+      url.scheme = 'https'
+      url.to_s
     end
   end
 
@@ -253,6 +272,22 @@ class EntryPresenter < BasePresenter
 
   def app_author
     (entry.author.present?) ? decoder.decode(@template.strip_tags(entry.author.strip)) : nil
+  end
+
+  def has_diff?
+    entry.content.present? && entry.original.present? && entry.original['content'].present? && entry.original['content'].length != entry.content.length
+  end
+
+  def audio_duration
+    if media_duration && parts = media_duration.split(":").map(&:to_i)
+      if parts.length == 3
+        hours, minutes, seconds = parts
+        result = hours * 60 + minutes
+        "#{result} minutes"
+      end
+    end
+  rescue
+    nil
   end
 
 end

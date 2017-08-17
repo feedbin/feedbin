@@ -52,6 +52,12 @@
                 <% end %>
             </li>
             <li>
+                <%= f.check_box :hide_recently_played, {checked: @user.hide_recently_played.nil? || !@user.setting_on?(:hide_recently_played), data: {behavior: "auto_submit"}}, "0", "1" %>
+                <%= f.label :hide_recently_played do %>
+                  Recently Played section <span class="slider-checkbox"></span>
+                <% end %>
+            </li>
+            <li>
                 <%= f.check_box :hide_updated, {checked: @user.hide_updated.nil? || !@user.setting_on?(:hide_updated), data: {behavior: "auto_submit"}}, "0", "1" %>
                 <%= f.label :hide_updated do %>
                   Updated section <span class="slider-checkbox"></span>
