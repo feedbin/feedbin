@@ -254,7 +254,7 @@ $.extend feedbin,
       feedbin.readability()
     try
       feedbin.playState()
-      feedbin.playTime(entryId)
+      feedbin.timeRemaining(entryId)
       feedbin.syntaxHighlight()
       feedbin.footnotes()
       feedbin.nextEntryPreview()
