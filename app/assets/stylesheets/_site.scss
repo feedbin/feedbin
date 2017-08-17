@@ -6249,6 +6249,10 @@ Media Players
         width: 60px;
     }
 
+    .mejs_empty__time-float {
+        display: none !important;
+    }
+
 }
 
 /* Accessibility: hide screen reader texts (and prefer "top" for RTL languages).

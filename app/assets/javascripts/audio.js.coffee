@@ -30,9 +30,6 @@ $.extend feedbin,
       success: (mediaElement, domObject) ->
         feedbin.nowPlayingData = $(domObject).data()
 
-        if progress = feedbin.loadProgress(feedbin.nowPlayingData.entryId)
-          mediaElement.setCurrentTime(progress.progress)
-
         mediaElement.addEventListener 'timeupdate', (e) ->
           if feedbin.hasDuration()
             feedbin.data.progress[feedbin.nowPlayingData.entryId] =
@@ -44,8 +41,15 @@ $.extend feedbin,
         mediaElement.addEventListener 'timeupdate', _.throttle(feedbin.updateProgress, 5000, {leading: false})
         mediaElement.addEventListener 'playing', feedbin.playState
         mediaElement.addEventListener 'pause', feedbin.playState
+        mediaElement.addEventListener 'loadedmetadata', feedbin.loadedmetadata
         if play
           mediaElement.play()
+        else
+          feedbin.timeRemaining(feedbin.nowPlayingData.entryId)
+
+  loadedmetadata: ->
+    if progress = feedbin.loadProgress(feedbin.nowPlayingData.entryId)
+      window.player.setCurrentTime(progress.progress)
 
   updateProgress: ->
     if feedbin.hasDuration()
