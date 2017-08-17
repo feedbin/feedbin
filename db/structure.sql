@@ -275,7 +275,8 @@ CREATE TABLE entries (
     source text,
     image_url text,
     processed_image_url text,
-    image json
+    image json,
+    recently_played_entries_count integer DEFAULT 0
 );
 
 
@@ -542,6 +543,40 @@ CREATE SEQUENCE plans_id_seq
 --
 
 ALTER SEQUENCE plans_id_seq OWNED BY plans.id;
+
+
+--
+-- Name: recently_played_entries; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE recently_played_entries (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    entry_id integer NOT NULL,
+    progress integer DEFAULT 0 NOT NULL,
+    duration integer DEFAULT 0 NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: recently_played_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE recently_played_entries_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: recently_played_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE recently_played_entries_id_seq OWNED BY recently_played_entries.id;
 
 
 --
@@ -1077,6 +1112,13 @@ ALTER TABLE ONLY plans ALTER COLUMN id SET DEFAULT nextval('plans_id_seq'::regcl
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY recently_played_entries ALTER COLUMN id SET DEFAULT nextval('recently_played_entries_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY recently_read_entries ALTER COLUMN id SET DEFAULT nextval('recently_read_entries_id_seq'::regclass);
 
 
@@ -1270,6 +1312,14 @@ ALTER TABLE ONLY plans
 
 
 --
+-- Name: recently_played_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY recently_played_entries
+    ADD CONSTRAINT recently_played_entries_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: recently_read_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1429,6 +1479,13 @@ CREATE UNIQUE INDEX index_entries_on_public_id ON entries USING btree (public_id
 
 
 --
+-- Name: index_entries_on_recently_played_entries_count; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_entries_on_recently_played_entries_count ON entries USING btree (recently_played_entries_count);
+
+
+--
 -- Name: index_favicons_on_host; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1503,6 +1560,34 @@ CREATE UNIQUE INDEX index_in_app_purchases_on_transaction_id ON in_app_purchases
 --
 
 CREATE INDEX index_in_app_purchases_on_user_id ON in_app_purchases USING btree (user_id);
+
+
+--
+-- Name: index_recently_played_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recently_played_entries_on_entry_id ON recently_played_entries USING btree (entry_id);
+
+
+--
+-- Name: index_recently_played_entries_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recently_played_entries_on_user_id ON recently_played_entries USING btree (user_id);
+
+
+--
+-- Name: index_recently_played_entries_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recently_played_entries_on_user_id_and_created_at ON recently_played_entries USING btree (user_id, created_at);
+
+
+--
+-- Name: index_recently_played_entries_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_recently_played_entries_on_user_id_and_entry_id ON recently_played_entries USING btree (user_id, entry_id);
 
 
 --
@@ -1833,7 +1918,7 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 
 SET search_path TO "$user", public;
 
-INSERT INTO schema_migrations (version) VALUES
+INSERT INTO "schema_migrations" (version) VALUES
 ('20121010042043'),
 ('20121011035904'),
 ('20121011035933'),
@@ -1963,6 +2048,8 @@ INSERT INTO schema_migrations (version) VALUES
 ('20160817165958'),
 ('20160822194302'),
 ('20161110045909'),
-('20170427001830');
+('20170427001830'),
+('20170812121620'),
+('20170816220409');
 
 
