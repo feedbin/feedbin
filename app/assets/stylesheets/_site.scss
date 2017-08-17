@@ -911,10 +911,10 @@ Structure
     right: 19px;
     z-index: 2;
     &:before {
-        left: -9px;
+        left: -7px;
     }
     &:after {
-        left: 9px;
+        left: 7px;
     }
     .settings & {
         top: 31px;
@@ -922,7 +922,7 @@ Structure
     }
 }
 .hamburger-menu, .hamburger-menu:before, .hamburger-menu:after {
-    $dot: 5px;
+    $dot: 4px;
     width: $dot;
     height: $dot;
     border-radius: $dot/2;
@@ -1519,7 +1519,6 @@ $saved-search-control-height: 48px;
 .entries ul li {
     position: relative;
     word-wrap: break-word;
-    @include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
     .favicon-wrap {
         top: -2px;
         left: -26px;
@@ -1778,6 +1777,7 @@ $saved-search-control-height: 48px;
             bottom: 0;
             right: 8px;
             line-height: 1;
+            color: $selected;
         }
         i {
             font-style: normal;
@@ -1791,8 +1791,9 @@ $saved-search-control-height: 48px;
     .mark-below-read {
         bottom: 0;
         border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
-        i:before {
+                i:before {
             content: "↓";
             top: -2px;
         }
