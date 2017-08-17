@@ -40,6 +40,7 @@ class ParsedXMLEntry < ParsedEntry
     value[:enclosure_url]    = @entry.enclosure_url if @entry.try(:enclosure_url)
     value[:enclosure_length] = @entry.enclosure_length if @entry.try(:enclosure_length)
     value[:itunes_duration]  = @entry.itunes_duration if @entry.try(:itunes_duration)
+    value[:itunes_subtitle]  = @entry.itunes_subtitle if @entry.try(:itunes_subtitle)
     value[:itunes_image]     = itunes_image
     value[:youtube_video_id] = @entry.youtube_video_id if @entry.try(:youtube_video_id)
     value[:media_width]      = @entry.media_width if @entry.try(:media_width)
