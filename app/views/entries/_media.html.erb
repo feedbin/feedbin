@@ -1,32 +1,34 @@
 <% present entry do |entry_presenter| %>
     <% if entry_presenter.media_type && entry_presenter.media_type == :audio %>
-        <div class="audio-container entry-callout">
-            <div class="audio-image">
-                <% if entry_presenter.media_image %>
-                    <%= image_tag entry_presenter.media_image %>
-                <% else %>
-                    <%= svg_tag 'icon-podcast', size: '15x26' %>
-                <% end %>
-            </div>
-            <div class="audio-text">
-                <%= content_tag :div, strip_tags(entry.feed.title), class: 'entry-feed-title', title: strip_tags(entry.feed.title), data: {behavior: 'user_title', feed_id: entry.feed.id} %>
-                <div class="audio-title-wrap">
-                    <div class="audio-title" title="<%= entry_presenter.entry_view_title %>"><%= entry_presenter.entry_view_title %></div>
+        <figure>
+            <div class="audio-container entry-callout">
+                <div class="audio-image">
+                    <% if entry_presenter.media_image %>
+                        <%= image_tag entry_presenter.media_image %>
+                    <% else %>
+                        <%= svg_tag 'icon-podcast', size: '15x26' %>
+                    <% end %>
                 </div>
-                <div class="audio-duration" data-behavior="audio_duration_<%= entry.id %>">
-                    <%= entry_presenter.audio_duration %>
+                <div class="audio-text">
+                    <%= content_tag :div, strip_tags(entry.feed.title), class: 'entry-feed-title', title: strip_tags(entry.feed.title), data: {behavior: 'user_title', feed_id: entry.feed.id} %>
+                    <div class="audio-title-wrap">
+                        <div class="audio-title" title="<%= entry_presenter.entry_view_title %>"><%= entry_presenter.entry_view_title %></div>
+                    </div>
+                    <div class="audio-duration" data-behavior="audio_duration_<%= entry.id %>">
+                        <%= entry_presenter.audio_duration %>
+                    </div>
+                </div>
+                <div class="audio-controls">
+                    <a class="button-text button-empty" href="<%= entry.data['enclosure_url'] %>" target="_blank" rel="noopener noreferrer" title="<%= entry_presenter.download_title %>">
+                        <%= svg_tag('icon-download', size: "16x16") %>
+                    </a>
+                    <button class="button-text button-empty play-button" data-behavior="audio_launch_player audio_play_<%= entry.id %>" data-entry-id="<%= entry.id %>" title="Play/Pause">
+                        <%= svg_tag('icon-play', size: "18x18") %>
+                        <%= svg_tag('icon-pause', size: "18x18") %>
+                    </button>
                 </div>
             </div>
-            <div class="audio-controls">
-                <a class="button-text button-empty" href="<%= entry.data['enclosure_url'] %>" target="_blank" rel="noopener noreferrer" title="<%= entry_presenter.download_title %>">
-                    <%= svg_tag('icon-download', size: "16x16") %>
-                </a>
-                <button class="button-text button-empty play-button" data-behavior="audio_launch_player audio_play_<%= entry.id %>" data-entry-id="<%= entry.id %>" title="Play/Pause">
-                    <%= svg_tag('icon-play', size: "18x18") %>
-                    <%= svg_tag('icon-pause', size: "18x18") %>
-                </button>
-            </div>
-        </div>
+        </figure>
 
         <div class="hide" data-behavior="audio_markup">
             <%= render partial: "audio_markup", locals: {entry: entry} %>

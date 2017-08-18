@@ -5685,7 +5685,9 @@ Fullscreen
 /*------------------------------------------------------------------------------
 Media Players
 ------------------------------------------------------------------------------*/
+
 .audio-container {
+    margin-bottom: 10px !important;
     display: flex;
     align-items: stretch;
     .audio-image {

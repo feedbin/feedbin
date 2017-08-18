@@ -179,6 +179,20 @@ class EntryPresenter < BasePresenter
     end
   end
 
+  def media_subtitle
+    if entry.data && entry.data['itunes_subtitle']
+      subtitle = @template.strip_tags(entry.data['itunes_subtitle'])
+      body = @template.strip_tags(entry.content)
+      decoder = HTMLEntities.new
+      body = decoder.decode(body)
+      if !body.include?(subtitle)
+        @template.content_tag :figcaption do
+          @template.raw(subtitle)
+        end
+      end
+    end
+  end
+
   def feed_domain_matches?(comparison)
     begin
       uri = URI.parse(entry.feed.site_url)
