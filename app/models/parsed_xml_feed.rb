@@ -64,7 +64,7 @@ class ParsedXMLFeed < ParsedFeed
   end
 
   def itunes_image
-    feed.respond_to?(:itunes_image) ? feed.itunes_image.strip : nil
+    (feed.respond_to?(:itunes_image) && feed.itunes_image) ? feed.itunes_image.strip : nil
   end
 
 end
