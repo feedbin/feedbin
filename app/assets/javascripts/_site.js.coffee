@@ -1541,7 +1541,7 @@ $.extend feedbin,
     linkActionsHover: ->
       $(document).on 'mouseenter mouseleave', '.entry-final-content a', (event) ->
         link = $(@)
-        if link.text().trim().length > 0 && !$(@).has('.mejs__container')
+        if link.text().trim().length > 0 && !$(@).has('.mejs__container').length > 0
           clearTimeout(feedbin.linkActionsTimer)
           clearTimeout(feedbin.linkCacheTimer)
           $('.entry-final-content a [data-behavior~=link_actions]').remove()
