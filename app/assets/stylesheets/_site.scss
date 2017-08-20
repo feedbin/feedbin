@@ -7203,6 +7203,9 @@ Media Queries
 }
 
 @media (max-width: 550px) {
+    .audio-panel {
+        bottom: 0;
+    }
     .mobile-hamburger,
     .desktop-hide {
         display: block !important;
