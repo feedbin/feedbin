@@ -31,8 +31,8 @@ GIT
 
 GIT
   remote: git://github.com/feedbin/html-pipeline.git
-  revision: dc012b9d1d0d6487fc96a66af50b0608acc22b93
-  ref: dc012b9
+  revision: 819a2b9ca901dd5bc8eabc76fd8ac26c7f6038ec
+  ref: 819a2b9
   specs:
     html-pipeline (2.4.2)
       activesupport (>= 2)
