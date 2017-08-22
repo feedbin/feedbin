@@ -59,10 +59,15 @@ class UsersControllerTest < ActionController::TestCase
   test "should destroy user" do
     StripeMock.start
     user = users(:ben)
+    customer = Stripe::Customer.create({email: user.email})
+    user.update(customer_id: customer.id)
+
     login_as user
     assert_difference "User.count", -1 do
-      delete :destroy, params: {id: user}
-      assert_redirected_to root_url
+      Sidekiq::Testing.inline! do
+        delete :destroy, params: {id: user}
+        assert_redirected_to account_closed_public_settings_url
+      end
     end
     StripeMock.stop
   end

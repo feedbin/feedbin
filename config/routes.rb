@@ -58,6 +58,9 @@ Rails.application.routes.draw do
     member do
       get :email_unsubscribe
     end
+    collection do
+      get :account_closed
+    end
   end
 
   resources :sessions do

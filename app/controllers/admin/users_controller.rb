@@ -9,9 +9,9 @@ class Admin::UsersController < ApplicationController
   end
 
   def destroy
-    user = User.find(params[:id])
-    user.destroy
-    @user = DeletedUser.where(customer_id: user.customer_id).take!
+    @user = User.find(params[:id])
+    @user.deleted = true
+    UserDeleter.perform_async(@user.id)
   end
 
   def authorize

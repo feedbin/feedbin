@@ -53,8 +53,9 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    @user.destroy
-    redirect_to root_url
+    UserDeleter.perform_async(@user.id)
+    sign_out
+    redirect_to account_closed_public_settings_url
   end
 
   private

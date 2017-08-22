@@ -11,4 +11,7 @@ class PublicSettingsController < ApplicationController
     render_404
   end
 
+  def account_closed
+  end
+
 end
