@@ -6,4 +6,10 @@ module SettingsHelper
       content_tag(:time, time.to_s(:feed), datetime: time.utc.iso8601, class: 'timeago', title: "Last updated: #{time.to_s(:feed)}" ) + " ago"
     end
   end
+
+  def get_tag_names(tags, feed_id)
+    if names = tags[feed_id]
+      names.join(", ")
+    end
+  end
 end

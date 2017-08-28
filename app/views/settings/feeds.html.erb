@@ -49,29 +49,44 @@
             <% @subscriptions.each do |subscription| %>
                 <% present subscription do |subscription_presenter| %>
                     <%= fields_for "subscriptions[]", subscription do |f| %>
-                        <li class="feeds-wrap" data-sort-name="<%= subscription.title.downcase %><%= subscription.site_url %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>" data-sort-post-volume="<%= subscription.post_volume %>">
+                        <% tag_names = get_tag_names(@tags, subscription.feed_id) %>
+                        <li class="feeds-wrap" data-sort-name="<%= subscription.title.downcase %><%= subscription.site_url %><%= subscription.feed_url %><%= tag_names %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>" data-sort-post-volume="<%= subscription.post_volume %>">
                             <label class="checkbox-wrap">
                                 <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "checkbox feeds-checkbox" %>
                             </label>
                             <%= link_to settings_subscriptions_edit_path(subscription.id), class: "subscription-link" do %>
-                                <span class="subscription-data">
-                                    <span class="favicon-container">
-                                        <%= subscription_presenter.favicon(subscription.feed) %>
-                                    </span>
-                                    <span class="text-wrap">
-                                        <span class="title-container">
-                                            <%= subscription.title %>
+
+                                <span class="subscription-data-wrap">
+                                    <span class="subscription-data">
+                                        <span class="favicon-container">
+                                            <%= subscription_presenter.favicon(subscription.feed) %>
                                         </span>
-                                        <span class="last-updated-wrap">
-                                            <%= timeago(subscription.last_published_entry) %>, <%= number_with_delimiter(subscription.post_volume) %>/mo
+                                        <span class="text-wrap">
+                                            <span class="title-container">
+                                                <%= subscription.title %>
+                                            </span>
+                                            <span class="last-updated-wrap">
+                                                <%= timeago(subscription.last_published_entry) %>, <%= number_with_delimiter(subscription.post_volume) %>/mo
+                                            </span>
+                                        </span>
+                                        <span class="canvas-wrap">
+                                            <%= content_tag :canvas, '', width: 97, height: 20, data: { values: subscription.entries_count, fill: "#dcebff", stroke: "#3399FF", behavior: "line_graph" } %>
                                         </span>
                                     </span>
-                                    <span class="canvas-wrap">
-                                        <%= content_tag :canvas, '', width: 97, height: 20, data: { values: subscription.entries_count, fill: "#dcebff", stroke: "#3399FF", behavior: "line_graph" } %>
+                                    <span class="subscription-meta">
+                                        <span class="feed-url-wrap">
+                                            <%= subscription.feed_url %>
+                                        </span>
                                     </span>
                                 </span>
+
                                 <span class="subscription-controls">
                                     &nbsp;
+                                    <% if tag_names %>
+                                        <span class="tags">
+                                            <%= tag_names %>
+                                        </span>
+                                    <% end %>
                                     <%= subscription_presenter.mute_icon %>
                                     <%= subscription_presenter.update_icon %>
                                 </span>

@@ -315,6 +315,13 @@ class User < ApplicationRecord
     unique_tags
   end
 
+  def tags_on_feed
+    names = tag_names
+    build_tags_by_feed.each_with_object({}) do |(feed_id, tag_ids), hash|
+      hash[feed_id] = tag_ids.map { |tag_id| names[tag_id] }
+    end
+  end
+
   def feed_order
     feeds.include_user_title.map {|feed| feed.id}
   end
@@ -364,6 +371,22 @@ class User < ApplicationRecord
     results = ActiveRecord::Base.connection.execute(query)
     results.each_with_object({}) do |result, hash|
       hash[result['tag_id'].to_i] = JSON.parse(result['feed_ids'])
+    end
+  end
+
+  def build_tags_by_feed
+    query = <<-eos
+      SELECT
+        feed_id, array_to_json(array_agg(tag_id)) as tag_ids
+      FROM
+        taggings
+      WHERE user_id = ? AND feed_id IN (?)
+      GROUP BY feed_id
+    eos
+    query = ActiveRecord::Base.send(:sanitize_sql_array, [query, self.id, subscriptions.pluck(:feed_id)])
+    results = ActiveRecord::Base.connection.execute(query)
+    results.each_with_object({}) do |result, hash|
+      hash[result['feed_id'].to_i] = JSON.parse(result['tag_ids'])
     end
   end
 

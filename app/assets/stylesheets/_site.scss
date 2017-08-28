@@ -4118,7 +4118,7 @@ Settings
         $checkbox-offset-narrow: 49px;
         .checkbox-wrap {
             display: flex;
-            align-items: center;
+            padding-top: 18px;
             position: absolute;
             z-index: 1000;
             left: 0;
@@ -4130,6 +4130,7 @@ Settings
                 padding: 0;
             }
             @media (max-width: 528px) {
+                padding-top: 15px;
                 width: $checkbox-offset-narrow;
                 .feeds-checkbox {
                     margin: 0 0 0 15px !important;
@@ -4141,12 +4142,18 @@ Settings
             justify-content: space-between;
             color: $text-color;
             padding: 13px 30px 13px $checkbox-offset;
+            align-items: center;
             &:hover {
                 text-decoration: none;
             }
             @media (max-width: 528px) {
                 padding: 13px 15px 13px $checkbox-offset-narrow;
             }
+        }
+        .subscription-data-wrap {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
         }
         .subscription-data {
             display: flex;
@@ -4156,11 +4163,22 @@ Settings
         .subscription-controls {
             display: flex;
             align-items: center;
-            align-self: flex-end;
             background: image-url("icon-arrow.svg") 100% 50% no-repeat;
             background-size: 12px 18px;
-            width: 70px;
+            width: 170px;
             padding-right: 20px;
+            .tags {
+                text-align: right;
+                font-size: 14px;
+                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+                display: block;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                width: 100%;
+                white-space: nowrap;
+                margin-right: 20px;
+                margin-right: 15px;
+            }
         }
         .favicon-container {
             display: block;
@@ -4191,11 +4209,23 @@ Settings
         }
         .last-updated-wrap {
             margin-right: 8px;
-            font-size: 14px;
             white-space: nowrap;
-            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
             @media (max-width:800px) {
                 display: none;
+            }
+        }
+        .last-updated-wrap, .subscription-meta {
+            font-size: 14px;
+            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
+        .subscription-meta {
+            margin-left: 24px;
+            display: flex;
+            .feed-url-wrap {
+                display: block;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
             }
         }
         .canvas-wrap {
