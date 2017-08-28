@@ -5312,7 +5312,7 @@ select {
     padding-bottom: 14px;
 }
 
-.ui-helper-hidden-accessible, .mejs__offscreen, .mejs_empty__offscreen  {
+.visually-hidden, .ui-helper-hidden-accessible, .mejs__offscreen, .mejs_empty__offscreen  {
     border: 0;
     clip: rect(0 0 0 0);
     height: 1px;
@@ -5521,11 +5521,6 @@ a:hover.danger {
     }
 }
 
-.visually-hidden {
-    position: absolute !important;
-    top: -9999px !important;
-    left: -9999px !important;
-}
 
 /*------------------------------------------------------------------------------
 Login and Sign Up

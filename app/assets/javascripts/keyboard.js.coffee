@@ -268,6 +268,18 @@ class feedbin.Keyboard
         dropdown.removeClass('open')
         event.preventDefault()
 
+    Mousetrap.bind 'C', (event, combo) =>
+      link = $('#source_link_field')
+      if link.length > 0
+        link.select()
+        try
+          document.execCommand('copy');
+          link.blur()
+        catch error
+          if 'console' of window
+            console.log error
+      event.preventDefault()
+
   setEnvironment: ->
     @selected = @selectedItem()
     @columnOffsetTop = @selectedColumn.offset().top
