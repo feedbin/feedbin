@@ -5,6 +5,7 @@ module Api
 
       skip_before_action :verify_authenticity_token
       before_action :valid_user, if: :signed_in?
+      before_action :pagination
 
       def entries_response(path_helper)
 
@@ -129,12 +130,14 @@ module Api
         end
       end
 
-      private
-
       def valid_user
         if current_user.suspended
           status_forbidden
         end
+      end
+
+      def pagination
+        WillPaginate.per_page = 100
       end
 
     end
