@@ -16,73 +16,43 @@ class Action < ApplicationRecord
 
   validate :query_valid, unless: :automatic_modification
 
-  after_destroy :percolate_remove
-  after_commit :percolate_setup, on: [:create, :update]
+  after_destroy :percolate_destroy
+  after_commit :percolate_create, on: [:create, :update]
   after_commit :bulk_actions, on: [:create, :update]
 
-  def percolate_setup
-    percolator_query = self.query
-    percolator_ids = self.computed_feed_ids
-    if percolator_ids.empty?
-      percolate_remove
-    elsif empty_notifier_action?
-      percolate_remove
-    else
-      options = {
-        index: Entry.index_name,
-        type: '.percolator',
-        id: self.id,
-        body: body(percolator_query, percolator_ids)
-      }
-      $search.each do |_, client|
-        client.index(options)
-      end
-    end
-  rescue Elasticsearch::Transport::Transport::Errors::InternalServerError => exception
-    Honeybadger.notify(exception)
+  def percolate_create
+    PercolateCreate.perform_async(self.id)
   end
 
-  def body(percolator_query, percolator_ids)
-    Hash.new.tap do |hash|
-      hash[:feed_id] = percolator_ids
-      hash[:query] = {
-        bool: {
-          filter: {
-            bool: {
-              must: { terms: { feed_id: percolator_ids } }
-            }
-          }
-        }
-      }
-      if percolator_query.present?
-        hash[:query][:bool][:must] = {
-          query_string: {
-            query: percolator_query,
-            default_operator: "AND"
-          }
-        }
-      end
-    end
+  def percolate_destroy
+    PercolateDestroy.perform_async(self.id)
   end
 
   def bulk_actions
     ActionsBulk.perform_async(self.id, self.user.id) if apply_action == "1"
   end
 
-  def empty_notifier_action?
-    self.all_feeds && self.notifier? && (self.query.nil? || self.query == "")
-  end
-
-  def percolate_remove
-    options = {
-      index: Entry.index_name,
-      type: '.percolator',
-      id: self.id
-    }
-    $search.each do |_, client|
-      client.delete(options)
+  def search_body
+    Hash.new.tap do |hash|
+      hash[:feed_id] = self.computed_feed_ids
+      hash[:query] = {
+        bool: {
+          filter: {
+            bool: {
+              must: { terms: { feed_id: self.computed_feed_ids } }
+            }
+          }
+        }
+      }
+      if self.query.present?
+        hash[:query][:bool][:must] = {
+          query_string: {
+            query: self.query,
+            default_operator: "AND"
+          }
+        }
+      end
     end
-  rescue Elasticsearch::Transport::Transport::Errors::NotFound
   end
 
   def compute_feed_ids
@@ -121,10 +91,9 @@ class Action < ApplicationRecord
   end
 
   def query_valid
-    body = body(self.query, self.computed_feed_ids)
     options = {
       index: Entry.index_name,
-      body: {query: body[:query]}
+      body: {query: search_body[:query]}
     }
     result = $search[:main].indices.validate_query(options)
     if false == result["valid"]
@@ -156,9 +125,8 @@ class Action < ApplicationRecord
   private
 
   def search_options
-    body = body(self.query, self.computed_feed_ids)
     Hash.new.tap do |hash|
-      hash[:query] = body[:query]
+      hash[:query] = search_body[:query]
       hash[:sort] = [{published: "desc"}]
     end
   end

@@ -24,7 +24,9 @@ class ActionTest < ActiveSupport::TestCase
 
   test "must save to elasticsearch" do
     feed = feeds(:daring_fireball)
-    action = @user.actions.create(feed_ids: [feed.id])
+    action = Sidekiq::Testing.inline! do
+      @user.actions.create(feed_ids: [feed.id])
+    end
     assert percolator_found?(action)
   end
 
@@ -37,17 +39,25 @@ class ActionTest < ActiveSupport::TestCase
 
   test "doesn't percolate when empty" do
     feed = feeds(:daring_fireball)
-    action = @user.actions.create(feed_ids: [feed.id])
+    action = Sidekiq::Testing.inline! do
+      @user.actions.create(feed_ids: [feed.id])
+    end
     assert percolator_found?(action)
     action.automatic_modification = true
-    action.update(feed_ids: [])
+    Sidekiq::Testing.inline! do
+      action.update(feed_ids: [])
+    end
     assert_not percolator_found?(action)
   end
 
   test "doesn't percolate when empty iOS" do
-    action = @user.actions.create(query: "hello", all_feeds: true, action_type: :notifier)
+    action = Sidekiq::Testing.inline! do
+      @user.actions.create(query: "hello", all_feeds: true, action_type: :notifier)
+    end
     assert percolator_found?(action)
-    action.update(query: "")
+    Sidekiq::Testing.inline! do
+      action.update(query: "")
+    end
     assert_not percolator_found?(action)
   end
 
