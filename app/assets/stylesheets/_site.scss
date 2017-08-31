@@ -3814,6 +3814,13 @@ Settings
             }
         }
     }
+    .stripe-promo-wrap {
+        position: relative;
+        .stripe-promo {
+            position: absolute;
+            right: 0;
+        }
+    }
     .feed-settings {
         position: absolute;
         top: 0;

@@ -11,7 +11,7 @@
     <%= hidden_field_tag :redirect_to, settings_billing_url %>
 
     <div class="inset-content">
-      <h4 class="group-header">Subscribe</h4>
+      <h4 class="group-header stripe-promo-wrap">Subscribe <%= link_to image_tag("logo-stripe.svg", size: "78x17"), "https://stripe.com", target: :_blank, rel: "noopener noreferrer", class: "stripe-promo" %></h4>
     </div>
     <%= render partial: 'shared/credit_card_form' %>
 
