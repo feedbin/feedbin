@@ -24,9 +24,8 @@ class SubscriptionsController < ApplicationController
   # POST /subscriptions.json
   def create
     user = current_user
-    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
-    valid_feed_ids = verifier.verify(params[:valid_feed_ids])
-    @subscriptions = Subscription.create_multiple(params[:feeds], user, valid_feed_ids)
+    valid_feed_ids = Rails.application.message_verifier(:valid_feed_ids).verify(params[:valid_feed_ids])
+    @subscriptions = Subscription.create_multiple(params[:feeds].to_unsafe_h, user, valid_feed_ids)
     if @subscriptions.present?
       @click_feed = @subscriptions.first.feed_id
     end

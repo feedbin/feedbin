@@ -1,8 +1,5 @@
 <%= form_tag subscriptions_path, method: :post, remote: true, data: {behavior: "subscription_options"} do %>
-  <%
-  verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
-  valid_feed_ids = verifier.generate(feeds.map(&:id))
-  %>
+  <% valid_feed_ids = Rails.application.message_verifier(:valid_feed_ids).generate(feeds.map(&:id)) %>
   <%= hidden_field_tag "valid_feed_ids", valid_feed_ids %>
   <% feeds.each_with_index do |feed, index| %>
     <%= fields_for "feeds[]", feed do |pf| %>

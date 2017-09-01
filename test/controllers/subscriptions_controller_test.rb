@@ -20,8 +20,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
 
     feed = Feed.create(feed_url: feed_url)
 
-    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
-    valid_feed_ids = verifier.generate([feed.id])
+    valid_feed_ids = Rails.application.message_verifier(:valid_feed_ids).generate([feed.id])
 
     params = {
       valid_feed_ids: valid_feed_ids,
