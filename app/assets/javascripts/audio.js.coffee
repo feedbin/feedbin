@@ -60,9 +60,14 @@ $.extend feedbin,
         form.submit()
 
   togglePlay: ->
+    play = $("[data-behavior~=audio_play_#{feedbin.nowPlayingData.entryId}]")
     if window.player.paused
+      play.addClass('playing')
+      play.removeClass('paused')
       window.player.play()
     else
+      play.addClass('paused')
+      play.removeClass('playing')
       window.player.pause()
 
   setDuration: (entryId, duration) ->
