@@ -1,5 +1,7 @@
 class FeedRequest
 
+  USER_AGENT_DOMAINS = [%r((.+)\.tumblr.com)]
+
   attr_reader :url
 
   def initialize(url:, clean: false, options: {})
@@ -122,7 +124,7 @@ class FeedRequest
       if @options.has_key?(:if_none_match)
         curl.headers["If-None-Match"] = @options[:if_none_match]
       end
-      curl.headers["User-Agent"] = @options[:user_agent] || "Feedbin"
+      curl.headers["User-Agent"] = user_agent_spoof || @options[:user_agent] || "Feedbin"
       curl.headers["Accept-Encoding"] = "gzip"
       curl.connect_timeout = 10
       curl.follow_location = true
@@ -141,6 +143,13 @@ class FeedRequest
       url = "http://#{url}"
     end
     url
+  end
+
+  def user_agent_spoof
+    host = URI::parse(@url).host
+    if USER_AGENT_DOMAINS.find { |host_pattern| host =~ host_pattern }
+      "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+    end
   end
 
 end
