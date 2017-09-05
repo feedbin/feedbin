@@ -4,7 +4,7 @@ class Api::V2::SuggestedCategoriesControllerTest < ApiControllerTestCase
 
   setup do
     @user = users(:ben)
-    @category = SuggestedCategory.create!(name: "Popular")
+    @category = SuggestedCategory.create!(id: 1, name: "Popular")
   end
 
   test "gets index" do

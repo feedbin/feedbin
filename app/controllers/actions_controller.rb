@@ -54,7 +54,7 @@ class ActionsController < ApplicationController
   private
 
   def authentication_token(user)
-    verifier = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
+    verifier = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)
     CGI::escape(verifier.generate(user.id))
   end
 

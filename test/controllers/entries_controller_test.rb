@@ -108,7 +108,7 @@ class EntriesControllerTest < ActionController::TestCase
     login_as @user
 
     updated_entries = @user.entries.limit(2).map do |entry|
-      @user.updated_entries.create!(entry: entry)
+      @user.updated_entries.create!(entry: entry, feed: entry.feed)
     end
 
     assert_difference('UpdatedEntry.count', -updated_entries.length) do

@@ -2,7 +2,9 @@ require 'test_helper'
 
 class ImportWorkerTestTest < ActiveSupport::TestCase
   test "should build import" do
-    import = Import.create().tap do |record|
+    user = users(:new)
+
+    import = Import.create!(user: user).tap do |record|
       def record.upload
         xml = <<-eot
           <?xml version="1.0" encoding="UTF-8"?>

@@ -3,7 +3,7 @@ class SafariPushNotificationSend
   sidekiq_options retry: false, queue: :critical
 
   APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV['APPLE_PUSH_CERT']}, size: 5)
-  VERIFIER = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
+  VERIFIER = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)
 
   def perform(user_ids, entry_id)
     tokens = Device.where(user_id: user_ids).safari.pluck(:user_id, :token)

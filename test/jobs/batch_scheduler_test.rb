@@ -3,7 +3,12 @@ require 'test_helper'
 class BatchSchedulerTest < ActiveSupport::TestCase
   test "should bulk load jobs" do
     Sidekiq::Queues["worker_slow"].clear
-    StarredEntry.create(user_id: 1, feed_id: 1, entry_id: 1)
+
+    @user = users(:new)
+    @feeds = create_feeds(@user)
+    @entries = @user.entries
+
+    StarredEntry.create!(user_id: @user.id, feed_id: @entries.first.feed_id, entry_id: @entries.first.id)
     worker = "NonExistentWorker"
     count = (StarredEntry.last.id.to_f/BatchJobs::BATCH_SIZE.to_f).ceil
 
