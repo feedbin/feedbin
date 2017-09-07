@@ -2,12 +2,7 @@ class DevicePushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
 
-  APNOTIC_POOL = Apnotic::ConnectionPool.new({
-    auth_method: :token,
-    cert_path: ENV['APPLE_AUTH_KEY'],
-    team_id:   ENV['APPLE_TEAM_ID'],
-    key_id:    ENV['APPLE_KEY_ID'],
-  }, size: 5)
+  APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV['APPLE_PUSH_CERT_IOS']}, size: 5)
 
   def perform(user_ids, entry_id)
     Honeybadger.context(user_ids: user_ids, entry_id: entry_id)
