@@ -1,5 +1,5 @@
 GIT
-  remote: git://github.com/capistrano/capistrano.git
+  remote: https://github.com/capistrano/capistrano.git
   revision: dcd325716593553b1538a97c5876b07210f9af13
   ref: dcd3257
   specs:
@@ -11,7 +11,7 @@ GIT
       net-ssh-gateway (>= 1.1.0)
 
 GIT
-  remote: git://github.com/feedbin/apnotic.git
+  remote: https://github.com/feedbin/apnotic.git
   revision: d5481eca2a3d45e3388b3e045f532eb7b08772bf
   ref: d5481ec
   specs:
@@ -20,7 +20,7 @@ GIT
       net-http2 (>= 0.15, < 2)
 
 GIT
-  remote: git://github.com/feedbin/feedjira.git
+  remote: https://github.com/feedbin/feedjira.git
   revision: eeb7e81b38469b5e9d4324c62ee6e5ac6b79678d
   ref: eeb7e81
   specs:
@@ -31,7 +31,7 @@ GIT
       sax-machine (>= 1.0)
 
 GIT
-  remote: git://github.com/feedbin/grocer-pushpackager.git
+  remote: https://github.com/feedbin/grocer-pushpackager.git
   revision: 6b01b4e4e71af26edf55f095251366294527afaf
   ref: 6b01b4e
   specs:
@@ -39,7 +39,7 @@ GIT
       rubyzip
 
 GIT
-  remote: git://github.com/feedbin/html-pipeline.git
+  remote: https://github.com/feedbin/html-pipeline.git
   revision: 819a2b9ca901dd5bc8eabc76fd8ac26c7f6038ec
   ref: 819a2b9
   specs:
@@ -48,7 +48,7 @@ GIT
       nokogiri (>= 1.4)
 
 GIT
-  remote: git://github.com/feedbin/html_diff.git
+  remote: https://github.com/feedbin/html_diff.git
   revision: c7c15ce6c9bbc4cc04971d5e921b0bcb49a5c59b
   ref: c7c15ce
   specs:
@@ -56,7 +56,7 @@ GIT
       nokogiri
 
 GIT
-  remote: git://github.com/feedbin/net-http2.git
+  remote: https://github.com/feedbin/net-http2.git
   revision: 8be56ce8147662dd1729fed0b8b33d65e93f8589
   ref: 8be56ce
   specs:
@@ -64,7 +64,7 @@ GIT
       http-2 (= 0.8.2)
 
 GIT
-  remote: git://github.com/feedbin/opml_saw.git
+  remote: https://github.com/feedbin/opml_saw.git
   revision: 61d8c2dd3d46e9cae38178754469dd9da7c8bd6a
   ref: 61d8c2d
   specs:
@@ -410,7 +410,7 @@ GEM
       net-ssh (>= 2.6.5)
     net-sftp (2.1.2)
       net-ssh (>= 2.6.5)
-    net-ssh (4.1.0)
+    net-ssh (4.2.0)
     net-ssh-gateway (2.0.0)
       net-ssh (>= 4.0.0)
     netrc (0.11.0)
@@ -652,4 +652,4 @@ DEPENDENCIES
   xipio
 
 BUNDLED WITH
-   1.15.3
+   1.15.4
