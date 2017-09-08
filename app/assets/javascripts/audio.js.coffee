@@ -3,6 +3,7 @@ window.feedbin ?= {}
 $.extend feedbin,
 
   nowPlayingdata: {}
+  forcePlay: false
 
   hasDuration: ->
     if isNaN(window.player.duration) || window.player.duration == 0
@@ -43,6 +44,7 @@ $.extend feedbin,
         mediaElement.addEventListener 'pause', feedbin.playState
         mediaElement.addEventListener 'loadedmetadata', feedbin.loadedmetadata
         if play
+          feedbin.play()
           mediaElement.play()
         else
           feedbin.timeRemaining(feedbin.nowPlayingData.entryId)
@@ -58,6 +60,12 @@ $.extend feedbin,
         field = form.find('#recently_played_entry_progress').val(window.player.currentTime)
         field = form.find('#recently_played_entry_duration').val(window.player.duration)
         form.submit()
+
+  play: ->
+    feedbin.forcePlay = true
+    buttons = $("[data-behavior~=audio_play_#{feedbin.nowPlayingData.entryId}]")
+    buttons.addClass('playing')
+    buttons.removeClass('paused')
 
   togglePlay: ->
     if window.player.paused
@@ -75,8 +83,8 @@ $.extend feedbin,
     if progress = feedbin.loadProgress(entryId)
       durationElement = $("[data-behavior~=audio_duration_#{entryId}]")
       left = progress.duration - progress.progress
-      minutes = Math.ceil(left / 60);
-      if minutes == 1
+      minutes = Math.floor(left / 60);
+      if minutes <= 1
         message = "1 minute left"
       else
         message = "#{minutes} minutes left"
@@ -87,13 +95,16 @@ $.extend feedbin,
       if feedbin.hasDuration()
         feedbin.setDuration(feedbin.nowPlayingData.entryId, window.player.duration)
 
-      play = $("[data-behavior~=audio_play_#{feedbin.nowPlayingData.entryId}]")
-      if window.player.paused
-        play.addClass('paused')
-        play.removeClass('playing')
-      else
-        play.addClass('playing')
-        play.removeClass('paused')
+      if !feedbin.forcePlay
+        play = $("[data-behavior~=audio_play_#{feedbin.nowPlayingData.entryId}]")
+        if window.player.paused
+          play.addClass('paused')
+          play.removeClass('playing')
+        else
+          play.addClass('playing')
+          play.removeClass('paused')
+
+      feedbin.forcePlay = false
 
   audioJump: (time) ->
     window.player.setCurrentTime(window.player.currentTime + time)

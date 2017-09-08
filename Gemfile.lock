@@ -11,6 +11,15 @@ GIT
       net-ssh-gateway (>= 1.1.0)
 
 GIT
+  remote: https://github.com/feedbin/apnotic.git
+  revision: d5481eca2a3d45e3388b3e045f532eb7b08772bf
+  ref: d5481ec
+  specs:
+    apnotic (1.1.0)
+      connection_pool (~> 2.0)
+      net-http2 (>= 0.15, < 2)
+
+GIT
   remote: https://github.com/feedbin/feedjira.git
   revision: eeb7e81b38469b5e9d4324c62ee6e5ac6b79678d
   ref: eeb7e81
@@ -45,6 +54,14 @@ GIT
   specs:
     html_diff (1.0.0)
       nokogiri
+
+GIT
+  remote: https://github.com/feedbin/net-http2.git
+  revision: 8be56ce8147662dd1729fed0b8b33d65e93f8589
+  ref: 8be56ce
+  specs:
+    net-http2 (0.15.0)
+      http-2 (= 0.8.2)
 
 GIT
   remote: https://github.com/feedbin/opml_saw.git
@@ -100,9 +117,6 @@ GEM
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
     aggregate (0.2.2)
-    apnotic (1.1.0)
-      connection_pool (~> 2.0)
-      net-http2 (>= 0.15, < 2)
     arel (8.0.0)
     autoprefixer-rails (7.1.4)
       execjs
@@ -402,8 +416,6 @@ GEM
     multi_json (1.12.2)
     multi_xml (0.6.0)
     multipart-post (2.0.0)
-    net-http2 (0.15.0)
-      http-2 (= 0.8.2)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-sftp (2.1.2)
@@ -575,7 +587,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import (>= 0.4.1)
   addressable
-  apnotic
+  apnotic!
   autoprefixer-rails
   bcrypt-ruby
   benchmark-ips
@@ -612,6 +624,7 @@ DEPENDENCIES
   lograge
   minitest
   minitest-stub-const
+  net-http2!
   nokogumbo (= 1.4.9)
   oauth
   opml_saw!
