@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '= 5.1.4.rc1'
+gem 'rails', '= 5.1.4'
 
 gem 'rails-deprecated_sanitizer'
 gem 'rails-controller-testing'

@@ -1,5 +1,5 @@
 GIT
-  remote: git://github.com/capistrano/capistrano.git
+  remote: https://github.com/capistrano/capistrano.git
   revision: dcd325716593553b1538a97c5876b07210f9af13
   ref: dcd3257
   specs:
@@ -11,7 +11,7 @@ GIT
       net-ssh-gateway (>= 1.1.0)
 
 GIT
-  remote: git://github.com/feedbin/feedjira.git
+  remote: https://github.com/feedbin/feedjira.git
   revision: eeb7e81b38469b5e9d4324c62ee6e5ac6b79678d
   ref: eeb7e81
   specs:
@@ -22,7 +22,7 @@ GIT
       sax-machine (>= 1.0)
 
 GIT
-  remote: git://github.com/feedbin/grocer-pushpackager.git
+  remote: https://github.com/feedbin/grocer-pushpackager.git
   revision: 6b01b4e4e71af26edf55f095251366294527afaf
   ref: 6b01b4e
   specs:
@@ -30,7 +30,7 @@ GIT
       rubyzip
 
 GIT
-  remote: git://github.com/feedbin/html-pipeline.git
+  remote: https://github.com/feedbin/html-pipeline.git
   revision: 819a2b9ca901dd5bc8eabc76fd8ac26c7f6038ec
   ref: 819a2b9
   specs:
@@ -39,7 +39,7 @@ GIT
       nokogiri (>= 1.4)
 
 GIT
-  remote: git://github.com/feedbin/html_diff.git
+  remote: https://github.com/feedbin/html_diff.git
   revision: c7c15ce6c9bbc4cc04971d5e921b0bcb49a5c59b
   ref: c7c15ce
   specs:
@@ -47,7 +47,7 @@ GIT
       nokogiri
 
 GIT
-  remote: git://github.com/feedbin/opml_saw.git
+  remote: https://github.com/feedbin/opml_saw.git
   revision: 61d8c2dd3d46e9cae38178754469dd9da7c8bd6a
   ref: 61d8c2d
   specs:
@@ -58,41 +58,41 @@ GEM
   remote: https://rubygems.org/
   specs:
     CFPropertyList (2.3.5)
-    actioncable (5.1.4.rc1)
-      actionpack (= 5.1.4.rc1)
+    actioncable (5.1.4)
+      actionpack (= 5.1.4)
       nio4r (~> 2.0)
       websocket-driver (~> 0.6.1)
-    actionmailer (5.1.4.rc1)
-      actionpack (= 5.1.4.rc1)
-      actionview (= 5.1.4.rc1)
-      activejob (= 5.1.4.rc1)
+    actionmailer (5.1.4)
+      actionpack (= 5.1.4)
+      actionview (= 5.1.4)
+      activejob (= 5.1.4)
       mail (~> 2.5, >= 2.5.4)
       rails-dom-testing (~> 2.0)
-    actionpack (5.1.4.rc1)
-      actionview (= 5.1.4.rc1)
-      activesupport (= 5.1.4.rc1)
+    actionpack (5.1.4)
+      actionview (= 5.1.4)
+      activesupport (= 5.1.4)
       rack (~> 2.0)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    actionview (5.1.4.rc1)
-      activesupport (= 5.1.4.rc1)
+    actionview (5.1.4)
+      activesupport (= 5.1.4)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
-    activejob (5.1.4.rc1)
-      activesupport (= 5.1.4.rc1)
+    activejob (5.1.4)
+      activesupport (= 5.1.4)
       globalid (>= 0.3.6)
-    activemodel (5.1.4.rc1)
-      activesupport (= 5.1.4.rc1)
-    activerecord (5.1.4.rc1)
-      activemodel (= 5.1.4.rc1)
-      activesupport (= 5.1.4.rc1)
+    activemodel (5.1.4)
+      activesupport (= 5.1.4)
+    activerecord (5.1.4)
+      activemodel (= 5.1.4)
+      activesupport (= 5.1.4)
       arel (~> 8.0)
     activerecord-import (0.19.1)
       activerecord (>= 3.2)
-    activesupport (5.1.4.rc1)
+    activesupport (5.1.4)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (~> 0.7)
       minitest (~> 5.1)
@@ -104,7 +104,7 @@ GEM
       connection_pool (~> 2.0)
       net-http2 (>= 0.15, < 2)
     arel (8.0.0)
-    autoprefixer-rails (7.1.3)
+    autoprefixer-rails (7.1.4)
       execjs
     bcrypt (3.1.11)
     bcrypt-ruby (3.1.5)
@@ -126,7 +126,7 @@ GEM
     clockwork (2.0.2)
       activesupport
       tzinfo
-    coderay (1.1.1)
+    coderay (1.1.2)
     coffee-rails (4.2.2)
       coffee-script (>= 2.2.0)
       railties (>= 4.0.0)
@@ -174,7 +174,7 @@ GEM
     evernote_oauth (0.2.3)
       evernote-thrift
       oauth (>= 0.4.1)
-    excon (0.58.0)
+    excon (0.59.0)
     execjs (2.7.0)
     faker (1.8.4)
       i18n (~> 0.5)
@@ -274,7 +274,7 @@ GEM
     fog-json (1.0.2)
       fog-core (~> 1.0)
       multi_json (~> 1.10)
-    fog-local (0.3.1)
+    fog-local (0.4.0)
       fog-core (~> 1.27)
     fog-openstack (0.1.21)
       fog-core (>= 1.40)
@@ -399,7 +399,7 @@ GEM
     mini_portile2 (2.2.0)
     minitest (5.10.3)
     minitest-stub-const (0.6)
-    multi_json (1.12.1)
+    multi_json (1.12.2)
     multi_xml (0.6.0)
     multipart-post (2.0.0)
     net-http2 (0.15.0)
@@ -408,7 +408,7 @@ GEM
       net-ssh (>= 2.6.5)
     net-sftp (2.1.2)
       net-ssh (>= 2.6.5)
-    net-ssh (4.1.0)
+    net-ssh (4.2.0)
     net-ssh-gateway (2.0.0)
       net-ssh (>= 4.0.0)
     nio4r (2.1.0)
@@ -432,17 +432,17 @@ GEM
       rack
     rack-test (0.7.0)
       rack (>= 1.0, < 3)
-    rails (5.1.4.rc1)
-      actioncable (= 5.1.4.rc1)
-      actionmailer (= 5.1.4.rc1)
-      actionpack (= 5.1.4.rc1)
-      actionview (= 5.1.4.rc1)
-      activejob (= 5.1.4.rc1)
-      activemodel (= 5.1.4.rc1)
-      activerecord (= 5.1.4.rc1)
-      activesupport (= 5.1.4.rc1)
+    rails (5.1.4)
+      actioncable (= 5.1.4)
+      actionmailer (= 5.1.4)
+      actionpack (= 5.1.4)
+      actionview (= 5.1.4)
+      activejob (= 5.1.4)
+      activemodel (= 5.1.4)
+      activerecord (= 5.1.4)
+      activesupport (= 5.1.4)
       bundler (>= 1.3.0)
-      railties (= 5.1.4.rc1)
+      railties (= 5.1.4)
       sprockets-rails (>= 2.0.0)
     rails-controller-testing (1.0.2)
       actionpack (~> 5.x, >= 5.0.1)
@@ -457,9 +457,9 @@ GEM
       loofah (~> 2.0)
     rails_autolink (1.1.6)
       rails (> 3.1)
-    railties (5.1.4.rc1)
-      actionpack (= 5.1.4.rc1)
-      activesupport (= 5.1.4.rc1)
+    railties (5.1.4)
+      actionpack (= 5.1.4)
+      activesupport (= 5.1.4)
       method_source
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
@@ -618,7 +618,7 @@ DEPENDENCIES
   pg
   premailer-rails
   puma
-  rails (= 5.1.4.rc1)
+  rails (= 5.1.4)
   rails-controller-testing
   rails-deprecated_sanitizer
   rails_autolink
