@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+git_source(:github) { |name| "https://github.com/#{name}.git" }
 
 gem 'rails', '= 5.1.4'
 
