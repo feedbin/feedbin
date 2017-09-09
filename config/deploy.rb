@@ -8,9 +8,7 @@ set :repo_url, "git@github.com:feedbin/#{fetch(:application)}.git"
 set :deploy_to, "/srv/apps/#{fetch(:application)}"
 set :bundle_jobs, 4
 set :rbenv_type, :system
-set :log_level, :info
-# set :format_options, command_output: true, log_file: "log/capistrano.log", color: :auto, truncate: :auto
-set :pty, true
+set :log_level, :warn
 
 # Rails
 set :assets_roles, [:app]
