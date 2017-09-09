@@ -10,8 +10,11 @@ gem 'rails_autolink'
 gem 'nokogumbo', '= 1.4.9'
 
 group :development do
+  gem 'capistrano'
+  gem 'capistrano-bundler'
+  gem 'capistrano-rbenv'
+  gem 'capistrano-rails'
   gem 'better_errors'
-  gem 'capistrano', github: 'capistrano/capistrano', ref: 'dcd3257'
   gem 'silencer'
   gem 'spring'
   gem 'benchmark-ips'
