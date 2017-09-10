@@ -23,13 +23,16 @@ group :development do
   gem 'listen'
 end
 
-group :test do
+group :development, :test do
   gem 'minitest'
   gem 'stripe-ruby-mock', require: 'stripe_mock'
   gem 'faker'
   gem 'webmock'
   gem 'minitest-stub-const'
   gem 'coveralls', require: false
+  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  gem 'capybara', '~> 2.13'
+  gem 'selenium-webdriver'
 end
 
 group :production do
