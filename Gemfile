@@ -19,11 +19,11 @@ group :development do
   gem 'spring'
   gem 'benchmark-ips'
   gem 'xipio'
-  gem 'puma'
   gem 'listen'
 end
 
 group :development, :test do
+  gem 'puma'
   gem 'minitest'
   gem 'stripe-ruby-mock', require: 'stripe_mock'
   gem 'faker'
