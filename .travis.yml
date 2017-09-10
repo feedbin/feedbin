@@ -36,3 +36,4 @@ before_script:
 
 script:
   - bin/rails test:system
+  - bin/rails test
