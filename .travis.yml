@@ -9,7 +9,7 @@ services:
 addons:
   postgresql: "9.5"
   chrome: stable
-  artifacts: true
+  artifacts:
     paths:
       - ./tmp/screenshots
 env:
