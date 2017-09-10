@@ -2,10 +2,16 @@ require "application_system_test_case"
 
 class SignupTest < ApplicationSystemTestCase
   test "Signup" do
-    # visit signup_path
-    # fill_in 'Email', with: SecureRandom.hex
-    # fill_in 'Password', with: SecureRandom.hex
-    # click_button 'Sign Up'
-    # take_screenshot
+    StripeMock.start
+    plan = plans(:trial)
+    create_stripe_plan(plan)
+
+    visit signup_path
+    fill_in 'Email', with: SecureRandom.hex
+    fill_in 'Password', with: SecureRandom.hex
+    click_button 'Sign Up'
+
+    find_button(class: ['show-subscribe']).visible?
+    StripeMock.stop
   end
 end

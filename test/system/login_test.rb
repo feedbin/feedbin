@@ -7,6 +7,6 @@ class LoginTest < ApplicationSystemTestCase
     fill_in 'Email', with: user.email
     fill_in 'Password', with: default_password
     click_button 'Login'
-    take_screenshot
+    find_button(class: ['show-subscribe']).visible?
   end
 end
