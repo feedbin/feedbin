@@ -17,7 +17,7 @@ class SubscribeTest < ApplicationSystemTestCase
       click_button 'Add'
     end
 
-    feed = Feed.find_by_feed_url(feed_url)
+    feed = Feed.find_by_feed_url!(feed_url)
 
     feed.entries.first(3) do |entry|
       expect_text(entry.title)
