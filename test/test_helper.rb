@@ -43,6 +43,8 @@ Capybara.register_driver(:headless_chrome) do |app|
   )
 end
 
+Capybara.default_max_wait_time = 10
+
 class ActiveSupport::TestCase
   include LoginHelper
   include FactoryHelper
