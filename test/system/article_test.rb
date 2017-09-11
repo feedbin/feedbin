@@ -2,13 +2,15 @@ require "application_system_test_case"
 
 class ArticleTest < ApplicationSystemTestCase
   test "Show article" do
-    user = users(:ben)
-    feeds = create_feeds(user, 1)
-    entries = user.entries
+    show_article
+    assert_text @entries.first.content
+  end
 
-    visit login_path
-    fill_in 'Email', with: user.email
-    fill_in 'Password', with: default_password
-    click_button 'Login'
+  test "star" do
+    show_article
+    assert_difference "StarredEntry.count", +1 do
+      find(".button-toggle-starred").click
+      find(".entries li.starred")
+    end
   end
 end
