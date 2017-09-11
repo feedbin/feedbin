@@ -11,7 +11,8 @@ class SignupTest < ApplicationSystemTestCase
     fill_in 'Password', with: SecureRandom.hex
     click_button 'Sign Up'
 
-    find_button(class: ['show-subscribe']).visible?
+    find("[data-behavior~=show_subscribe]")
+
     StripeMock.stop
   end
 end

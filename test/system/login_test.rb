@@ -4,6 +4,6 @@ class LoginTest < ApplicationSystemTestCase
   test "Login" do
     user = users(:ben)
     login_as(user)
-    find_button(class: ['show-subscribe']).visible?
+    find("[data-behavior~=show_subscribe]")
   end
 end

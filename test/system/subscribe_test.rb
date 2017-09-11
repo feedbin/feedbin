@@ -8,7 +8,7 @@ class SubscribeTest < ApplicationSystemTestCase
     user = users(:ben)
     login_as(user)
 
-    click_button(class: ['show-subscribe'])
+    find("[data-behavior~=show_subscribe]").click
 
     within("#add_form_modal") do
       fill_in 'q', with: feed_url

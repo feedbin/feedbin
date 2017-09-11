@@ -9,8 +9,18 @@ class ArticleTest < ApplicationSystemTestCase
   test "star" do
     show_article
     assert_difference "StarredEntry.count", +1 do
-      find(".button-toggle-starred").click
-      find(".entries li.starred")
+      find("[data-behavior~=toggle_starred]:not(.starred)")
+      find("[data-behavior~=toggle_starred] button").click
+      find("[data-behavior~=toggle_starred].starred")
+    end
+  end
+
+  test "mark unread" do
+    show_article
+    assert_difference "UnreadEntry.count", +1 do
+      find("[data-behavior~=toggle_read].read")
+      find("[data-behavior~=toggle_read] button").click
+      find("[data-behavior~=toggle_read]:not(.read)")
     end
   end
 end
