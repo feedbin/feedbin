@@ -6,10 +6,8 @@ class SubscribeTest < ApplicationSystemTestCase
     stub_request_file('atom.xml', feed_url)
 
     user = users(:ben)
-    visit login_path
-    fill_in 'Email', with: user.email
-    fill_in 'Password', with: default_password
-    click_button 'Login'
+    login_as(user)
+
     click_button(class: ['show-subscribe'])
 
     within("#add_form_modal") do
@@ -19,9 +17,10 @@ class SubscribeTest < ApplicationSystemTestCase
       click_button 'Add'
     end
 
-    count = find("[data-behavior~=entries_target] li:first-child .feed-title")
-    count = all("[data-behavior~=entries_target] li .feed-title").count
+    feed = Feed.find_by_feed_url(feed_url)
 
-    assert_equal(3, count)
+    feed.entries.first(3) do |entry|
+      expect_text(entry.title)
+    end
   end
 end
