@@ -11,6 +11,7 @@ class ArticleTest < ApplicationSystemTestCase
     assert_difference "StarredEntry.count", +1 do
       find("[data-behavior~=toggle_starred]:not(.starred)")
       find("[data-behavior~=toggle_starred] button").click
+      wait_for_ajax
       find("[data-behavior~=toggle_starred].starred")
     end
   end
@@ -20,6 +21,7 @@ class ArticleTest < ApplicationSystemTestCase
     assert_difference "UnreadEntry.count", +1 do
       find("[data-behavior~=toggle_read].read")
       find("[data-behavior~=toggle_read] button").click
+      wait_for_ajax
       find("[data-behavior~=toggle_read]:not(.read)")
     end
   end
