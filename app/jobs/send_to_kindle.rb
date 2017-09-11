@@ -42,10 +42,7 @@ class SendToKindle
   end
 
   def render_content(content)
-    action_view = ActionView::Base.new()
-    action_view.view_paths = ActionController::Base.view_paths
-    action_view.extend(ApplicationHelper)
-    action_view.render(template: "supported_sharing_services/kindle_content.html.erb", locals: {entry: @entry, content: content})
+    ApplicationController.render template: "supported_sharing_services/kindle_content.html.erb", locals: {entry: @entry, content: content}, layout: nil
   end
 
   def write_html

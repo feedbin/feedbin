@@ -15,7 +15,7 @@ module Feedbin
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
-    
+
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {
       address:              ENV['SMTP_ADDRESS'],
@@ -24,7 +24,7 @@ module Feedbin
       authentication:       'login',
       user_name:            ENV['SMTP_USERNAME'],
       password:             ENV['SMTP_PASSWORD'],
-      domain:               ENV['DEFAULT_URL_OPTIONS_HOST']
+      domain:               ENV['SMTP_DOMAIN'] || ENV['DEFAULT_URL_OPTIONS_HOST']
     }
 
     config.action_view.sanitized_allowed_tags = 'table', 'tr', 'td', 'th', 'thead', 'tbody'
