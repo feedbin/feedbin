@@ -17,7 +17,7 @@
                                 <p class="subhead"><a href="<%= @subscription.feed.feed_url %>"><%= @subscription.feed.feed_url %></a></p>
                             </div>
                             <div class="half">
-                                <%= link_to 'Unsubscribe', settings_destroy_subscription_path(@subscription), method: :delete, class: 'button-secondary pull-right' , data: { confirm: 'Are you sure you want to unsubscribe?' } %>
+                                <%= link_to 'Unsubscribe', settings_destroy_subscription_path(@subscription), method: :delete, class: 'button-secondary pull-right settings-unsubscribe' , data: { confirm: 'Are you sure you want to unsubscribe?' } %>
                             </div>
                         </div>
                         <div class="chart-wrap">
