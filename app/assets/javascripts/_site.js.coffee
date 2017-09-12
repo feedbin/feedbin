@@ -390,6 +390,19 @@ $.extend feedbin,
   sortByName: (a, b) ->
     $(a).data('sort-name').localeCompare($(b).data('sort-name'))
 
+  sortByTags: (a, b) ->
+    a = $(a).data('sort-tags')
+    b = $(b).data('sort-tags')
+
+    if (a == "")
+      return 1
+    if (b == "")
+      return -1
+    if (a == b)
+      return 0
+
+    a.localeCompare(b)
+
   sortByFeedOrder: (a, b) ->
     a = parseInt($(a).data('sort-id'))
     b = parseInt($(b).data('sort-id'))
@@ -1149,6 +1162,8 @@ $.extend feedbin,
           sortFunction = feedbin.sortByLastUpdated
         else if sortBy == "volume"
           sortFunction = feedbin.sortByVolume
+        else if sortBy == "tags"
+          sortFunction = feedbin.sortByTags
         $('.sortable li').sort(sortFunction).appendTo('.sortable');
       return
 
