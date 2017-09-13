@@ -103,7 +103,15 @@ class SupportedSharingService < ApplicationRecord
   belongs_to :user
 
   def share(params)
-    service.share(params)
+    key = "SupportedSharingService:share:#{user_id}:#{service_id}"
+    result = Throttle.throttle!(key, 10, 1.hour) do
+      service.share(params)
+    end
+    if result == false
+      limit_exceeded
+    else
+      result
+    end
   end
 
   def remove_access!
@@ -207,5 +215,15 @@ class SupportedSharingService < ApplicationRecord
     update_attributes(service_options: nil)
     update_attributes(service_options: options)
   end
+
+  def limit_exceeded
+    Honeybadger.notify(
+      error_class: "SupportedSharingService",
+      error_message: "SupportedSharingService rate limit exceeded",
+      parameters: {user_id: user_id}
+    )
+    {error: "Share limit exceeded"}
+  end
+
 
 end
