@@ -24,7 +24,7 @@ class EntryTestTest < ActiveSupport::TestCase
     published = "%10.6f" % @entry.reload.published
     score = $redis[:sorted_entries].with { |redis| redis.zscore(key, @entry.reload.id) }
 
-    assert_equal("%10.5f" % published.to_f, "%10.5f" % score.to_f)
+    assert_equal(published.to_i, score.to_i)
   end
 
   test "should always have a published date" do
