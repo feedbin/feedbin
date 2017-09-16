@@ -70,7 +70,7 @@ class DevicePushNotificationSend
     author = format_text(entry.author)
     title = format_text(entry.title)
     published = entry.published.iso8601(6)
-    unless operating_system =~ /^iPhone OS 1[0-9]/
+    if operating_system =~ /^iPhone OS 9/
       body = "#{feed_title}: #{body}"
     end
     Apnotic::Notification.new(device_token).tap do |notification|
@@ -87,12 +87,25 @@ class DevicePushNotificationSend
           published: published
         }
       }
+      if url = image_url(entry)
+        notification.custom_payload[:image_url] = url
+      end
       notification.category = "singleArticle"
       notification.content_available = true
-      notification.sound = ""
+      notification.sound = "default"
       notification.priority = "10"
       notification.topic = ENV['APPLE_PUSH_TOPIC']
       notification.apns_id = SecureRandom.uuid
+      notification.mutable_content = "1"
+    end
+  end
+
+  def image_url(entry)
+    if entry.image.present? && entry.image["processed_url"]
+      url = URI(entry.image["processed_url"])
+      url.host = ENV['ENTRY_IMAGE_HOST'] if ENV['ENTRY_IMAGE_HOST']
+      url.scheme = 'https'
+      url.to_s
     end
   end
 
