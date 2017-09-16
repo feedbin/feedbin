@@ -16,7 +16,6 @@ Rails.application.routes.draw do
   end
   get :health_check, to: proc {|env| [200, {}, ["OK"]] }
   get :version, to: proc {|env| [200, {}, [File.read("REVISION")]] }
-  get :headers, to: 'site#headers'
   get :subscribe, to: 'site#subscribe'
 
   post '/emails' => 'emails#create'
