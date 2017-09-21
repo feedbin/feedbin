@@ -5,6 +5,7 @@ bundler_args: --without development --jobs 2
 
 services:
   - redis-server
+  - memcached
 
 addons:
   postgresql: "9.5"

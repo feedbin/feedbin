@@ -121,6 +121,14 @@ class Entry < ApplicationRecord
     self.data && self.data["public_id_alt"]
   end
 
+  def processed_image
+    self.image && self.image["original_url"] && self.image["width"] && self.image["height"] && self.image["processed_url"]
+  end
+
+  def processed_image?
+    processed_image ? true : false
+  end
+
   private
 
   def base_url

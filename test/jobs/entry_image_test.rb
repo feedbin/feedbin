@@ -25,4 +25,16 @@ class EntryImageTestTest < ActiveSupport::TestCase
     EntryImage.new().perform(@entry.id, image)
     assert_equal image, @entry.reload.image
   end
+
+  test "should skip enqueue" do
+    @entry.update(image: {
+      "original_url"  => "http://example.com/image.jpg",
+      "processed_url" => "http://cdn.example.com/image.jpg",
+      "width"         => 542,
+      "height"        => 304
+    })
+    assert_difference "Sidekiq::Queues['images'].count", 0 do
+      EntryImage.new().perform(@entry.id)
+    end
+  end
 end
