@@ -57,7 +57,7 @@ class ActionsPerform
   def send_ios_notification(user_ids)
     if Sidekiq::Queue.new("images").size > 10
       Sidekiq::Client.push(
-        'args'  => EntryImage.build_find_image_args(entry),
+        'args'  => EntryImage.build_find_image_args(@entry),
         'class' => 'FindImageCritical',
         'queue' => 'images_critical',
         'retry' => false
