@@ -33,7 +33,9 @@ module Searchable
       end
 
       if params[:read] == false
-        options[:ids].push(user.unread_entries.pluck(:entry_id))
+        ids = [0]
+        ids.concat(user.unread_entries.pluck(:entry_id))
+        options[:ids].push(ids)
       elsif params[:read] == true
         options[:not_ids].push(user.unread_entries.pluck(:entry_id))
       end

@@ -197,6 +197,9 @@ Rails.application.routes.draw do
           member do
             get :results
           end
+          collection do
+            get :results_watch
+          end
         end
 
         resources :devices, only: [:create] do
@@ -223,6 +226,7 @@ Rails.application.routes.draw do
         resources :entries, only: [:index, :show] do
           member do
             get :text
+            get :watch
           end
         end
         resources :suggested_feeds, only: [:index] do

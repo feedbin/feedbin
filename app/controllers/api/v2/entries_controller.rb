@@ -40,7 +40,20 @@ module Api
 
       def text
         entry = Entry.find(params[:id])
-        render plain: text_format(entry.content), content_type: 'text/plain'
+        render plain: EntriesHelper.text_format(entry.content), content_type: 'text/plain'
+      end
+
+
+      def watch
+        @user = current_user
+        if @user.can_read_entry?(params[:id])
+          @titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) do |(feed_id, title), hash|
+            hash[feed_id] = title
+          end
+          @entry = Entry.find(params[:id])
+        else
+          render_404
+        end
       end
 
       private
@@ -91,28 +104,6 @@ module Api
         end
       end
 
-      def text_format(text)
-        decoder = HTMLEntities.new
-        content_text = Sanitize.fragment(text,
-          remove_contents: true,
-          elements: %w{html body div span
-                       h1 h2 h3 h4 h5 h6 p blockquote pre
-                       a abbr acronym address big cite code
-                       del dfn em ins kbd q s samp
-                       small strike strong sub sup tt var
-                       b u i center
-                       dl dt dd ol ul li
-                       fieldset form label legend
-                       table caption tbody tfoot thead tr th td
-                       article aside canvas details embed
-                       figure figcaption footer header hgroup
-                       menu nav output ruby section summary}
-        )
-
-        content_text = ReverseMarkdown.convert(content_text)
-        content_text = ActionController::Base.helpers.strip_tags(content_text)
-        decoder.decode(content_text)
-      end
 
     end
   end
