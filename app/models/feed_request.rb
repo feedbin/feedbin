@@ -150,6 +150,8 @@ class FeedRequest
     if USER_AGENT_DOMAINS.find { |host_pattern| host =~ host_pattern }
       "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
     end
+  rescue URI::InvalidURIError
+    nil
   end
 
 end
