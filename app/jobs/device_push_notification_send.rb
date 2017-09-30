@@ -2,6 +2,8 @@ class DevicePushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
 
+  MAX_PAYLOAD_SIZE = 4096
+
   APNOTIC_POOL = Apnotic::ConnectionPool.new({
     auth_method: :token,
     cert_path: ENV['APPLE_AUTH_KEY'],
@@ -73,7 +75,7 @@ class DevicePushNotificationSend
     if operating_system =~ /^iPhone OS 9/
       body = "#{feed_title}: #{body}"
     end
-    Apnotic::Notification.new(device_token).tap do |notification|
+    notification = Apnotic::Notification.new(device_token).tap do |notification|
       notification.alert = {
         title: feed_title,
         body: body,
@@ -84,7 +86,8 @@ class DevicePushNotificationSend
           title: title,
           feed: feed_title,
           author: author,
-          published: published
+          published: published,
+          content: nil
         }
       }
       if url = image_url(entry)
@@ -98,6 +101,15 @@ class DevicePushNotificationSend
       notification.apns_id = SecureRandom.uuid
       notification.mutable_content = "1"
     end
+
+    notification_size = notification.body.bytesize
+    available = MAX_PAYLOAD_SIZE - notification_size
+    content = EntriesHelper.text_format(entry.content)
+    if content && content.bytesize < available
+      notification.custom_payload[:feedbin][:content] = content
+    end
+
+    notification
   end
 
   def image_url(entry)
