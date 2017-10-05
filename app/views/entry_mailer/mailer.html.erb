@@ -1,9 +1,12 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<meta name="viewport" content="width=device-width" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<style type="text/css">
+<meta name="viewport" content="width=device-width" />
+<style>
+iframe {
+    display: none!important;
+}
 * {
     margin: 0;
     padding: 0;
@@ -11,25 +14,17 @@
 * {
     font-family: Helvetica, Arial, sans-serif;
 }
-iframe {
-    display: none!important;
-}
 img {
-    outline:none;
     text-decoration:none;
     -ms-interpolation-mode: bicubic;
+    outline:none;
     width: auto!important;
-    height: auto!important;
     max-width: 100%;
+    height: auto!important;
     clear: both;
-    display: block;
     margin: 0 0 10px 0;
+    display: block;
     border: 0;
-}
-blockquote {
-    padding: 0 0 0 15px;
-    border-left: 2px solid #DCDEE0;
-    color: #7a7c7e;
 }
 .collapse {
     margin: 0;
@@ -44,6 +39,11 @@ body {
     padding:0;
     color: #353739;
     font-size: 17px;
+}
+blockquote {
+    padding: 0 0 0 15px;
+    border-left: 2px solid #DCDEE0;
+    color: #7a7c7e;
 }
 a {
     color: #3399FF;
@@ -78,7 +78,7 @@ p,ul,ol {
     font-weight: normal;
     line-height: 1.6;
 }
-p.preformatted {
+p.pre {
     line-height: 1.4;
     white-space: pre-wrap;
     font-size: 18px;
@@ -113,7 +113,7 @@ pre code {
 .content table {
     width: 100%;
 }
-.small {
+.smaller {
     font-size: 16px;
     color: #b4b6b8;
 }
@@ -126,33 +126,32 @@ pre code {
 </head>
 
 <body bgcolor="#FFFFFF">
-    <table class="body-wrap" cellspacing="0">
-        <tr>
-            <td></td>
-            <td class="container" bgcolor="#FFFFFF">
+	<table class="body-wrap" cellspacing="0">
+		<tr>
+			<td></td>
+			<td class="container" bgcolor="#FFFFFF">
+				<div class="content">
+					<table>
+						<tr>
+							<td>
+								<% if @message.present? %>
+								<p class="pre"><%= @message %></p>
+								<hr />
+								<% end %>
+								<h1><%= link_to strip_tags(@entry.title), @entry.fully_qualified_url  %></h1>
+								<p class="smaller">
+									<%= strip_tags(@entry.feed.title) %>
+									<br /><%= @entry.published.to_s(:full_human) %>
+								</p>
+								<%= raw(ContentFormatter.api_format(@content, @entry)) %>
+							</td>
+						</tr>
+					</table>
+				</div>
 
-                <div class="content">
-                    <table>
-                        <tr>
-                            <td>
-                                <% if @message.present? %>
-                                    <p class="preformatted"><%= @message %></p>
-                                    <hr />
-                                <% end %>
-                                <h1><%= link_to strip_tags(@entry.title), @entry.fully_qualified_url  %></h1>
-                                <p class="small">
-                                    <%= strip_tags(@entry.feed.title) %>
-                                    <br /><%= @entry.published.to_s(:full_human) %>
-                                </p>
-                                <%= raw(ContentFormatter.api_format(@content, @entry)) %>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-
-            </td>
-            <td></td>
-        </tr>
-    </table>
+			</td>
+			<td></td>
+		</tr>
+	</table>
 </body>
 </html>
