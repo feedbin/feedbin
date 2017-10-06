@@ -15,7 +15,7 @@ class EntryTestTest < ActiveSupport::TestCase
     key = FeedbinUtils.redis_feed_entries_created_at_key(@entry.feed_id)
     created_at = "%10.6f" % @entry.reload.created_at
     score = $redis[:sorted_entries].with { |redis| redis.zscore(key, @entry.reload.id) }
-    assert_equal("%10.5f" % created_at.to_f, "%10.5f" % score.to_f)
+    assert_equal("%10.5f" % created_at.to_i, "%10.5f" % score.to_i)
   end
 
   test "should add to published cache" do
