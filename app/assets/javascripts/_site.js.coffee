@@ -3,6 +3,7 @@ window.feedbin ?= {}
 $.extend feedbin,
 
   messageTimeout: null
+  swipe: false
 
   affix: ->
     $('[data-behavior~=modal_affix]').affix
@@ -692,6 +693,11 @@ $.extend feedbin,
 
   init:
 
+    hasScrollSnap: ->
+      if 'scroll-snap-type' of document.body.style
+        feedbin.swipe = true
+        $('body').addClass('swipe')
+
     hasTouch: ->
       if 'ontouchstart' of document
         $('body').addClass('touch')
@@ -923,14 +929,22 @@ $.extend feedbin,
     feedSelected: ->
       $(document).on 'click', '[data-behavior~=back_to_feeds]', ->
         $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
+        if feedbin.swipe
+          $('.app-wrap').animate({scrollLeft: 0}, {duration: 250, easing: "easeOutQuad"})
         return
 
       $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
         $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
+        if feedbin.swipe
+          offset = $('.entries-column')[0].offsetLeft
+          $('.app-wrap').animate({scrollLeft: offset}, {duration: 250, easing: "easeOutQuad"})
         return
 
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
         $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
+        if feedbin.swipe
+          offset = $('.entry-column')[0].offsetLeft
+          $('.app-wrap').animate({scrollLeft: offset}, {duration: 250, easing: "easeOutQuad"})
         return
 
     addFields: ->

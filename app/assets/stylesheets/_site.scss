@@ -1332,6 +1332,12 @@ li.selected > a .favicon-wrap {
 .entries-header {
     @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
     display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    margin: 0;
+    height: $toolbar-height;
     border-bottom: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     line-height: $toolbar-height;
@@ -7578,5 +7584,29 @@ Add
         top: 41px;
         left: 0;
         width: 200px;
+    }
+}
+
+.swipe {
+    @media (max-width: 550px) {
+        .app-wrap {
+            display: block !important;
+            scroll-snap-type: x mandatory;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            white-space: nowrap;
+        }
+        .entries-header {
+            display: inline-block !important;
+        }
+        .app-panel {
+            top: 0;
+            height: 100vh !important;
+            width: 100vw !important;
+            white-space: normal;
+            display: inline-block !important;
+            scroll-snap-align: start;
+        }
     }
 }
