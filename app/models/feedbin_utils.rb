@@ -36,7 +36,7 @@ class FeedbinUtils
   end
 
   def self.page_cache_key(url)
-    "content_view:%s:v6" % Digest::SHA1.hexdigest(url)
+    "content_view:%s:v7" % Digest::SHA1.hexdigest(url)
   end
 
 end
