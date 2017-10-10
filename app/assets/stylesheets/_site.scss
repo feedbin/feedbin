@@ -7616,8 +7616,8 @@ Add
         }
         .app-panel {
             top: 0;
-            height: 100vh !important;
-            width: 100vw !important;
+            height: 100% !important;
+            width: 100% !important;
             white-space: normal;
             display: inline-block !important;
             scroll-snap-align: start;
