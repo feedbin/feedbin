@@ -7381,6 +7381,23 @@ Media Queries
             font-size: 14px;
         }
     }
+    .app-wrap {
+        .feeds-column, .view-toolbar, .feeds {
+            @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+        }
+        .feeds .drawer {
+            @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+            ul:after {
+                border-top-color: $body-background-color;
+                .theme-night & {
+                    border-top-color: $body-background-color-night;
+                }
+                .theme-sunset & {
+                    border-top-color: $body-background-color-sunset;
+                }
+            }
+        }
+    }
 }
 
 
