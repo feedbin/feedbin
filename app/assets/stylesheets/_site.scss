@@ -2915,13 +2915,13 @@ $saved-search-control-height: 48px;
 
     blockquote {
         padding: 0 0 0 15px;
-        border-left: 2px solid transparent;
+        border-left: 4px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
     }
 
     blockquote,
     blockquote p {
-        @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+        @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
     }
 
     blockquote p:last-child {
