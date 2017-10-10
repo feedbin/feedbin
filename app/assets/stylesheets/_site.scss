@@ -7382,6 +7382,10 @@ Media Queries
         }
     }
     .app-wrap {
+        .feeds-column,
+        .entries-column {
+            border-right: none;
+        }
         .feeds-column, .view-toolbar, .feeds {
             @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
         }
