@@ -7367,6 +7367,20 @@ Media Queries
     .entry-buttons {
         width: 250px;
     }
+    .feeds ul li .feed-link {
+        font-size: 15px;
+        padding: 13px 40px 13px 38px;
+        .favicon-wrap {
+            top: 11px;
+        }
+        .feed-action-button {
+            top: 6px;
+        }
+        .count {
+            top: 15px;
+            font-size: 14px;
+        }
+    }
 }
 
 
