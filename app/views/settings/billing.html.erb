@@ -1,8 +1,36 @@
 <% content_for :head do %>
   <%= javascript_include_tag "https://js.stripe.com/v3/" %>
   <%= javascript_tag do %>
-      var stripe = Stripe("<%= STRIPE_PUBLIC_KEY %>");
-      var elements = stripe.elements();
+      var feedbinBilling = {}
+      feedbinBilling.stripe = Stripe("<%= STRIPE_PUBLIC_KEY %>");
+      feedbinBilling.elements = feedbinBilling.stripe.elements();
+      feedbinBilling.paymentRequests = {};
+      feedbinBilling.button = {
+          destroy: function(){}
+      };
+      feedbinBilling.updatePaymentRequest = function(plan) {
+          feedbinBilling.button.destroy()
+          feedbinBilling.button = feedbinBilling.elements.create('paymentRequestButton', {
+              paymentRequest: feedbinBilling.paymentRequests[plan],
+              style: {
+                  paymentRequestButton: {
+                      type: 'default',
+                      theme: 'dark',
+                      height: '40px',
+                  },
+              },
+          });
+          feedbinBilling.paymentRequests[plan].canMakePayment().then(function(result) {
+              if (result) {
+                  feedbinBilling.button.mount('#payment_request_button');
+              } else {
+                  document.getElementById('payment_request_button').style.display = 'none';
+                  document.getElementById('credit_card_button').style.display = 'inline-block';
+                  document.getElementById('credit_card_payment').style.display = 'block';
+              }
+          });
+      }
+
   <% end %>
 <% end %>
 

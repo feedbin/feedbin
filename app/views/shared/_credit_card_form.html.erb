@@ -30,7 +30,7 @@
     };
 
     var form = document.getElementById('payment-form');
-    var card = elements.create('card', {style: style});
+    var card = feedbinBilling.elements.create('card', {style: style});
 
     card.mount('#card-element');
 
@@ -50,7 +50,7 @@
         document.getElementById('submit_button').disabled = true;
         event.preventDefault();
 
-        stripe.createToken(card).then(function(result) {
+        feedbinBilling.stripe.createToken(card).then(function(result) {
             if (result.error) {
                 document.getElementById('submit_button').disabled = false;
                 feedbin.showNotification(result.error.message, 3000, '', true);

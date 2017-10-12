@@ -19,7 +19,11 @@
         <%
         options = {
             id: dom_id(plan),
-            data: {behavior: "plan_select"}
+            data: {
+                name: plan.name,
+                amount: number_to_currency(plan.price, unit: ""),
+                behavior: "plan_select"
+            }
         }
         if plan == @default_plan
             options[:checked] = true
@@ -30,56 +34,57 @@
           <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
         <% end %>
       </li>
+      <script type="text/javascript">
+          feedbinBilling.paymentRequests[<%= plan.id %>] = feedbinBilling.stripe.paymentRequest({
+              country: 'US',
+              currency: 'usd',
+              total: {
+                  label: '<%= "Feedbin #{plan.name} Subscription" %>',
+                  amount: <%= plan.price_in_cents %>,
+              },
+          });
+          <% if plan == @default_plan %>
+              feedbinBilling.defaultPlan = <%= plan.id %>;
+              feedbinBilling.updatePaymentRequest(feedbinBilling.defaultPlan)
+          <% end %>
+      </script>
     <% end %>
     </ul>
 
-    <div data-behavior="payment_method">
+    <div id="credit_card_payment" style="display: none;">
         <div class="inset-content">
-            <h4 class="group-header">Payment Method</h4>
+          <h4 class="group-header stripe-promo-wrap">Payment Details <%= link_to image_tag("logo-stripe.svg", size: "78x17"), "https://stripe.com", target: :_blank, rel: "noopener noreferrer", class: "stripe-promo" %></h4>
         </div>
-        <ul class="control-group control-group-form">
-            <li>
-                <%= radio_button_tag("billing_method", "apple_pay", true, { data: {behavior: 'billing_method_radio'}}) %>
-                <%= label_tag("billing_method_apple_pay", "Apple Pay") %>
-            </li>
-            <li>
-                <%= radio_button_tag("billing_method", "credit_card", false, { data: {behavior: 'billing_method_radio'}}) %>
-                <%= label_tag("billing_method_credit_card", "Credit Card") %>
-            </li>
-        </ul>
+        <%= render partial: 'shared/credit_card_form' %>
     </div>
-
-    <div class="inset-content">
-      <h4 class="group-header stripe-promo-wrap">Payment Details <%= link_to image_tag("logo-stripe.svg", size: "78x17"), "https://stripe.com", target: :_blank, rel: "noopener noreferrer", class: "stripe-promo" %></h4>
-    </div>
-    <%= render partial: 'shared/credit_card_form' %>
 
     <% @plans.each do |plan| %>
         <% if @user.trial_end.future? %>
             <% if plan.name == "Monthly" %>
                 <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
-                    Clicking subscribe will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> when your trial ends on <strong><%= @user.trial_end.to_s(:date) %></strong> and again each month thereafter. You can change plans or cancel any time.
+                    Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> when your trial ends on <strong><%= @user.trial_end.to_s(:date) %></strong> and again each month thereafter. You can change plans or cancel any time.
                 </p>
             <% else %>
                 <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
-                    Clicking subscribe will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> when your trial ends on <strong><%= @user.trial_end.to_s(:date) %></strong> and again each year thereafter. You can change plans or cancel any time.
+                    Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> when your trial ends on <strong><%= @user.trial_end.to_s(:date) %></strong> and again each year thereafter. You can change plans or cancel any time.
                 </p>
             <% end %>
         <% else %>
             <% if plan.name == "Monthly" %>
                 <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
-                    Clicking subscribe will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> immediately and again each month thereafter. You can change plans or cancel any time.
+                    Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> immediately and again each month thereafter. You can change plans or cancel any time.
                 </p>
             <% else %>
                 <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
-                    Clicking subscribe will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> immediately and again each year thereafter. You can change plans or cancel any time.
+                    Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> immediately and again each year thereafter. You can change plans or cancel any time.
                 </p>
             <% end %>
         <% end %>
     <% end %>
 
     <div class="description-inset">
-        <div class="button-wrap">
+        <div id="payment_request_button"><small>Loading…</small></div>
+        <div class="button-wrap"  id="credit_card_button" style="display: none;">
             <%= f.submit "Subscribe", class: 'button no-margin', id: "submit_button", disabled: true, data: { disable_with: false } %>
         </div>
     </div>

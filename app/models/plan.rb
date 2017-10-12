@@ -5,4 +5,8 @@ class Plan < ApplicationRecord
     name.gsub(/ly$/, '').downcase
   end
 
+  def price_in_cents
+    price.to_i * 100
+  end
+
 end
