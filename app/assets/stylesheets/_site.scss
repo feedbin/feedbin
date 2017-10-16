@@ -5249,6 +5249,7 @@ $affix-height: 50px;
 }
 
 .affix {
+    transform: translateZ(0);
     .affix-inner {
         width: 90%;
     }
