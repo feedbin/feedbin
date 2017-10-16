@@ -1596,7 +1596,8 @@ $.extend feedbin,
 
     loadLinksInApp: ->
       $(document).on 'click', '[data-behavior~=entry_final_content] a', (event) ->
-        if feedbin.data.view_links_in_app && event.target.nodeName == "A"
+        newTab = (event.ctrlKey || event.metaKey)
+        if feedbin.data.view_links_in_app && event.target.nodeName == "A" && !newTab
           href = $(@).attr('href')
           feedbin.loadLink(href)
           event.preventDefault()
