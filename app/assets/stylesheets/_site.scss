@@ -2931,13 +2931,13 @@ $saved-search-control-height: 48px;
 
     blockquote {
         padding: 0 0 0 15px;
-        border-left: 2px solid transparent;
+        border-left: 4px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
     }
 
     blockquote,
     blockquote p {
-        @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+        @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
     }
 
     blockquote p:last-child {
@@ -7360,6 +7360,9 @@ Media Queries
     .entry-header h1 {
         font-size: 1.6em;
     }
+    .post-meta {
+        font-size: 14px;
+    }
     .entry-header .feed-title {
         display: block !important;
     }
@@ -7399,6 +7402,41 @@ Media Queries
     }
     .entry-buttons {
         width: 250px;
+    }
+    .feeds ul li .feed-link {
+        font-size: 15px;
+        padding: 13px 40px 13px 38px;
+        .favicon-wrap {
+            top: 11px;
+        }
+        .feed-action-button {
+            top: 6px;
+        }
+        .count {
+            top: 15px;
+            font-size: 14px;
+        }
+    }
+    .app-wrap {
+        .feeds-column,
+        .entries-column {
+            border-right: none;
+        }
+        .feeds-column, .view-toolbar, .feeds {
+            @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+        }
+        .feeds .drawer {
+            @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+            ul:after {
+                border-top-color: $body-background-color;
+                .theme-night & {
+                    border-top-color: $body-background-color-night;
+                }
+                .theme-sunset & {
+                    border-top-color: $body-background-color-sunset;
+                }
+            }
+        }
     }
 }
 
@@ -7635,8 +7673,8 @@ Add
         }
         .app-panel {
             top: 0;
-            height: 100vh !important;
-            width: 100vw !important;
+            height: 100% !important;
+            width: 100% !important;
             white-space: normal;
             display: inline-block !important;
             scroll-snap-align: start;
