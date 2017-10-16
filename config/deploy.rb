@@ -1,7 +1,7 @@
 # config valid only for current version of Capistrano
 lock "3.9.1"
 
-ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
+set :branch, "master"
 
 set :application, "feedbin"
 set :repo_url, "git@github.com:feedbin/#{fetch(:application)}.git"
