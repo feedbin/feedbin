@@ -36,7 +36,8 @@ class User < ApplicationRecord
                  :marketing_unsubscribe,
                  :hide_recently_played,
                  :now_playing_entry,
-                 :audio_panel_size
+                 :audio_panel_size,
+                 :view_links_in_app
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all

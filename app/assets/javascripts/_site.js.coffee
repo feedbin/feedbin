@@ -633,6 +633,12 @@ $.extend feedbin,
         $(@).modal('hide')
     activeModal.modal('toggle')
 
+  loadLink: (href) ->
+    form = $("[data-behavior~=view_link_form]")
+    $("#url", form).val(href)
+    form.submit()
+    $('.entry-final-content a [data-behavior~=link_actions]').remove()
+
   updateFeedSearchMessage: ->
     length = $('[data-behavior~=check_toggle]:checked').length
     show = (message) ->
@@ -1588,15 +1594,20 @@ $.extend feedbin,
               link.append(contents)
             ), 400
 
+    loadLinksInApp: ->
+      $(document).on 'click', '[data-behavior~=entry_final_content] a', (event) ->
+        if feedbin.data.view_links_in_app && event.target.nodeName == "A"
+          href = $(@).attr('href')
+          feedbin.loadLink(href)
+          event.preventDefault()
+
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
-        link = $(@).parents("a:first")
-
-        form = $("[data-behavior~=view_link_form]")
-        $("#url", form).val(link.attr('href'))
-        form.submit()
-
-        $('.entry-final-content a [data-behavior~=link_actions]').remove()
+        href = $(@).parents("a:first").attr('href')
+        if feedbin.data.view_links_in_app
+          window.open(href, '_blank');
+        else
+          feedbin.loadLink(href)
         event.preventDefault()
 
       $(document).on 'click', '[data-behavior~=link_actions]', (event) ->

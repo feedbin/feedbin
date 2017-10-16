@@ -190,6 +190,7 @@ class ApplicationController < ActionController::Base
     @classes.push("entries-feed-#{@user.entries_feed || '1'}")
     @classes.push("entries-image-#{@user.entries_image || '1'}")
     @classes.push("entries-display-#{@user.entries_display || 'block'}")
+    @classes.push("setting-view-link-#{@user.view_links_in_app || '0'}")
     @classes = @classes.join(" ")
   end
 

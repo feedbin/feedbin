@@ -104,6 +104,18 @@
 
         <ul class="control-group control-group-form">
             <li>
+                <%= f.check_box :view_links_in_app, {checked: @user.setting_on?(:view_links_in_app), data: {behavior: "auto_submit"}}, "1", "0" %>
+                <%= f.label :view_links_in_app do %>
+                    Always view links in Feedbin <span class="slider-checkbox"></span>
+                <% end %>
+            </li>
+        </ul>
+        <p class="control-group-description">
+            Load article links in Feedbin‘s <a href="https://feedbin.com/blog/2017/07/25/view-links-in-feedbin/">link viewer</a> by default.
+        </p>
+
+        <ul class="control-group control-group-form">
+            <li>
                 <%= f.check_box :disable_image_proxy, {checked: @user.disable_image_proxy.nil? || !@user.setting_on?(:disable_image_proxy), data: {behavior: "auto_submit"}}, "0", "1" %>
                 <%= f.label :disable_image_proxy do %>
                     Image proxy <span class="slider-checkbox"></span>
