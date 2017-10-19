@@ -34,20 +34,6 @@
           <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
         <% end %>
       </li>
-      <script type="text/javascript">
-          feedbinBilling.paymentRequests[<%= plan.id %>] = feedbinBilling.stripe.paymentRequest({
-              country: 'US',
-              currency: 'usd',
-              total: {
-                  label: '<%= "Feedbin #{plan.name} Subscription" %>',
-                  amount: <%= plan.price_in_cents %>,
-              },
-          });
-          <% if plan == @default_plan %>
-              feedbinBilling.defaultPlan = <%= plan.id %>;
-              feedbinBilling.updatePaymentRequest(feedbinBilling.defaultPlan)
-          <% end %>
-      </script>
     <% end %>
     </ul>
 

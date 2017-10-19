@@ -21,6 +21,7 @@
               },
           });
           feedbinBilling.paymentRequests[plan].canMakePayment().then(function(result) {
+              console.log(result);
               if (result) {
                   feedbinBilling.button.mount('#payment_request_button');
               } else {
@@ -30,7 +31,20 @@
               }
           });
       }
-
+      <% @plans.each do |plan| %>
+          feedbinBilling.paymentRequests[<%= plan.id %>] = feedbinBilling.stripe.paymentRequest({
+              country: 'US',
+              currency: 'usd',
+              total: {
+                  label: '<%= "Feedbin #{plan.name} Subscription" %>',
+                  amount: <%= plan.price_in_cents %>,
+              },
+          });
+          <% if plan == @default_plan %>
+              feedbinBilling.defaultPlan = <%= plan.id %>;
+              feedbinBilling.updatePaymentRequest(feedbinBilling.defaultPlan)
+          <% end %>
+      <% end %>
   <% end %>
 <% end %>
 
