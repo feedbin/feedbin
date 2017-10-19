@@ -20,6 +20,7 @@
         options = {
             id: dom_id(plan),
             data: {
+                plan_id: plan.id,
                 name: plan.name,
                 amount: number_to_currency(plan.price, unit: ""),
                 behavior: "plan_select"
@@ -37,9 +38,30 @@
     <% end %>
     </ul>
 
-    <div id="credit_card_payment" style="display: none;">
+    <div data-behavior="payment_method">
         <div class="inset-content">
-          <h4 class="group-header stripe-promo-wrap">Payment Details <%= link_to image_tag("logo-stripe.svg", size: "78x17"), "https://stripe.com", target: :_blank, rel: "noopener noreferrer", class: "stripe-promo" %></h4>
+            <h4 class="group-header">Payment Method</h4>
+        </div>
+        <ul class="control-group control-group-form">
+            <li data-behavior="billing_option_apple_pay">
+                <%= radio_button_tag("billing_method", "apple_pay", false, { data: {behavior: 'billing_method_radio'}}) %>
+                <%= label_tag("billing_method_apple_pay", "Apple Pay") %>
+            </li>
+            <li data-behavior="billing_option_payment_request">
+                <%= radio_button_tag("billing_method", "pay_with_google", false, { data: {behavior: 'billing_method_radio'}}) %>
+                <%= label_tag("billing_method_pay_with_google", "Pay with Google") %>
+            </li>
+            <li>
+                <%= radio_button_tag("billing_method", "credit_card", false, { data: {behavior: 'billing_method_radio'}}) %>
+                <%= label_tag("billing_method_credit_card", "Credit Card") %>
+            </li>
+        </ul>
+    </div>
+
+
+    <div id="credit_card_payment" data-behavior="credit_card_details">
+        <div class="inset-content">
+          <h4 class="group-header">Card Details</h4>
         </div>
         <%= render partial: 'shared/credit_card_form' %>
     </div>
@@ -69,9 +91,9 @@
     <% end %>
 
     <div class="description-inset">
-        <div id="payment_request_button"><small>Loading…</small></div>
-        <div class="button-wrap"  id="credit_card_button" style="display: none;">
-            <%= f.submit "Subscribe", class: 'button no-margin', id: "submit_button", disabled: true, data: { disable_with: false } %>
+        <div class="button-wrap">
+            <div id="payment_request_button"><small>Loading…</small></div>
+            <%= f.submit "Subscribe", class: 'button no-margin', id: "credit_card_button", disabled: true, data: { disable_with: false } %>
         </div>
     </div>
 
