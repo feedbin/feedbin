@@ -5,13 +5,6 @@
   </li>
 </ul>
 <script type="text/javascript">
-    function stripeTokenHandler(token) {
-        var form = document.getElementById('payment-form');
-        var hiddenInput = document.getElementById('stripe_token');
-        hiddenInput.setAttribute('value', token.id);
-        form.submit();
-    }
-
     var style = {
         base: {
             fontFamily: '-apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -30,7 +23,7 @@
     };
 
     var form = document.getElementById('payment-form');
-    var card = elements.create('card', {style: style});
+    var card = feedbinBilling.elements.create('card', {style: style});
 
     card.mount('#card-element');
 
@@ -43,19 +36,19 @@
     });
 
     card.addEventListener('ready', function(event) {
-        document.getElementById('submit_button').disabled = false;
+        document.getElementById('credit_card_button').disabled = false;
     });
 
     form.addEventListener('submit', function(event) {
-        document.getElementById('submit_button').disabled = true;
+        document.getElementById('credit_card_button').disabled = true;
         event.preventDefault();
 
-        stripe.createToken(card).then(function(result) {
+        feedbinBilling.stripe.createToken(card).then(function(result) {
             if (result.error) {
-                document.getElementById('submit_button').disabled = false;
+                document.getElementById('credit_card_button').disabled = false;
                 feedbin.showNotification(result.error.message, 3000, '', true);
             } else {
-                stripeTokenHandler(result.token);
+                feedbinBilling.stripeTokenHandler(result.token);
             }
         });
     });

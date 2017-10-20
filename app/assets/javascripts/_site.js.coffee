@@ -1030,12 +1030,6 @@ $.extend feedbin,
         $('input[name=operation]').val(operation)
         form.submit()
 
-    planSelect: ->
-      $(document).on 'change', '[data-behavior~=plan_select]', (event) ->
-        selected = $(@).attr('id')
-        $('[data-behavior~=billing_help_text]').addClass('hide')
-        $("[data-plan-id=#{selected}]").removeClass('hide')
-
     checkBoxToggle: ->
       $(document).on 'change', '[data-behavior~=toggle_checked]', (event) ->
         if $(@).is(':checked')

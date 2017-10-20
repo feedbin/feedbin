@@ -4576,6 +4576,64 @@ table.small td {
         }
     }
 }
+/*------------------------------------------------------------------------------
+Billing/Subscribe
+------------------------------------------------------------------------------*/
+#payment_request_button {
+    width: 150px;
+    display: none;
+}
+#credit_card_button {
+    display: none;
+}
+[data-behavior="billing_option_apple_pay"] {
+    display: none;
+}
+[data-behavior="billing_option_payment_request"] {
+    display: none;
+}
+[data-behavior="payment_method"], [data-behavior="credit_card_details"] {
+    display: none;
+}
+.native-payment {
+    [data-behavior="payment_method"] {
+        display: block;
+    }
+    [data-behavior="billing_option_payment_request"] {
+        display: block;
+    }
+    #payment_request_button {
+        display: inline-block;
+    }
+}
+.apple-pay {
+    [data-behavior="billing_option_apple_pay"] {
+        display: block;
+    }
+    [data-behavior="billing_option_payment_request"] {
+        display: none;
+    }
+}
+.native-payment.billing_method_credit_card {
+    [data-behavior="credit_card_details"] {
+        display: block;
+    }
+    #credit_card_button {
+        display: inline-block;
+    }
+    #payment_request_button {
+        display: none;
+    }
+}
+
+.no-native-payment {
+    #credit_card_button {
+        display: inline-block;
+    }
+    [data-behavior="credit_card_details"] {
+        display: block;
+    }
+}
 
 /*------------------------------------------------------------------------------
 Icons
