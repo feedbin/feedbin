@@ -42,7 +42,8 @@ class SiteController < ApplicationController
         feed_order: @user.feed_order,
         refresh_sessions_path: refresh_sessions_path,
         progress: {},
-        audio_panel_size: @user.audio_panel_size
+        audio_panel_size: @user.audio_panel_size,
+        view_links_in_app: @user.setting_on?(:view_links_in_app)
       }
 
       render action: 'logged_in'
