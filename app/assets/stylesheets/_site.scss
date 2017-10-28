@@ -3836,13 +3836,6 @@ Settings
             }
         }
     }
-    .stripe-promo-wrap {
-        position: relative;
-        .stripe-promo {
-            position: absolute;
-            right: 0;
-        }
-    }
     .feed-settings {
         position: absolute;
         top: 0;
@@ -4585,6 +4578,9 @@ Billing/Subscribe
 }
 #credit_card_button {
     display: none;
+    &.update-cc-button {
+        display: inline-block !important;
+    }
 }
 [data-behavior="billing_option_apple_pay"] {
     display: none;

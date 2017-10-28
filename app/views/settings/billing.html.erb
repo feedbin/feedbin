@@ -61,22 +61,24 @@
       <% end %>
 
       $(function(){
-          feedbinBilling.updatePaymentRequest(feedbinBilling.defaultPlan);
-          $(document).on ('change', '[data-behavior~=billing_method_radio]', function() {
-              var selected = $(this).attr('id');
-              $('[data-behavior~=billing_method_radio]').each(function() {
-                  var option = $(this).attr('id');
-                  $('body').removeClass(option);
+          if ($("#payment_request_button").length > 0) {
+              feedbinBilling.updatePaymentRequest(feedbinBilling.defaultPlan);
+              $(document).on ('change', '[data-behavior~=billing_method_radio]', function() {
+                  var selected = $(this).attr('id');
+                  $('[data-behavior~=billing_method_radio]').each(function() {
+                      var option = $(this).attr('id');
+                      $('body').removeClass(option);
+                  });
+                  $('body').addClass(selected)
               });
-              $('body').addClass(selected)
-          });
-          $(document).on ('change', '[data-behavior~=plan_select]', function() {
-              var selected = $(this).attr('id');
-              var plan = $(this).data('plan-id');
-              feedbinBilling.updatePaymentRequest(plan);
-              $('[data-behavior~=billing_help_text]').addClass('hide');
-              $("[data-plan-id=" + selected + "]").removeClass('hide');
-          });
+              $(document).on ('change', '[data-behavior~=plan_select]', function() {
+                  var selected = $(this).attr('id');
+                  var plan = $(this).data('plan-id');
+                  feedbinBilling.updatePaymentRequest(plan);
+                  $('[data-behavior~=billing_help_text]').addClass('hide');
+                  $("[data-plan-id=" + selected + "]").removeClass('hide');
+              });
+          }
       });
   </script>
 <% end %>
