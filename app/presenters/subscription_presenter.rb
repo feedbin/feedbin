@@ -42,6 +42,12 @@ class SubscriptionPresenter < BasePresenter
     end
   end
 
+  def muted_status
+    if subscription.muted
+      "muted"
+    end
+  end
+
   def mute_class
     if subscription.muted
       "status-muted"
