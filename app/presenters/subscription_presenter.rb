@@ -42,6 +42,12 @@ class SubscriptionPresenter < BasePresenter
     end
   end
 
+  def mute_class
+    if subscription.muted
+      "muted-feed"
+    end
+  end
+
   def mute_icon
     css_classes = ['mute-icon']
     css_classes.push('hidden') unless subscription.muted
