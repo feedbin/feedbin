@@ -1655,39 +1655,6 @@ $saved-search-control-height: 48px;
         display: block;
         hyphens: auto;
     }
-    .icon-star {
-        width: 38px;
-        height: 21px;
-        position: absolute;
-        left: -38px;
-        top: -1px;
-        overflow: hidden;
-        display: none;
-        &:before {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: $selected;
-            background-image: image-url("icon-star.svg");
-            background-position: 2px 2px, 0 0;
-            background-repeat: no-repeat, no-repeat;
-            width: 38px;
-            height: 21px;
-            content: '';
-            z-index: 1;
-        }
-        &:after {
-            position: absolute;
-            top: 4px;
-            left: 9px;
-            @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
-            height: 44px;
-            width: 35px;
-            content: '';
-            transform: rotate(63deg);
-            z-index: 2;
-        }
-    }
     &.starred {
         .icon-star {
             display: block;
@@ -5623,6 +5590,58 @@ a:hover.danger {
         display: none;
     }
 }
+
+.status-indicator {
+    width: 38px;
+    height: 21px;
+    position: absolute;
+    overflow: hidden;
+    display: none;
+    &:before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-repeat: no-repeat;
+        width: 38px;
+        height: 21px;
+        content: '';
+        z-index: 1;
+    }
+    &:after {
+        position: absolute;
+        top: 4px;
+        left: 9px;
+        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+        height: 44px;
+        width: 35px;
+        content: '';
+        transform: rotate(63deg);
+        z-index: 2;
+    }
+    &.icon-star {
+        left: -38px;
+        top: -1px;
+        &:before {
+            background-color: $selected;
+            background-image: image-url("icon-star.svg");
+            background-position: 2px 2px, 0 0;
+        }
+    }
+    &.icon-muted {
+        left: 0;
+        top: -1px;
+        &:before {
+            background-color: $list-background-color-night;
+            background-image: image-url("icon-muted.svg");
+            background-position: 4px 3px;
+            background-size: 9.693px 9.693px;
+        }
+        .status-muted & {
+            display: block;
+        }
+    }
+}
+
 
 
 /*------------------------------------------------------------------------------

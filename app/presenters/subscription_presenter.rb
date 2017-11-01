@@ -44,7 +44,7 @@ class SubscriptionPresenter < BasePresenter
 
   def mute_class
     if subscription.muted
-      "muted-feed"
+      "status-muted"
     end
   end
 
