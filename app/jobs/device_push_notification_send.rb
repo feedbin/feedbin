@@ -11,10 +11,16 @@ class DevicePushNotificationSend
     key_id:    ENV['APPLE_KEY_ID'],
   }, size: 5)
 
-  def perform(user_ids, entry_id)
+  def perform(user_ids, entry_id, skip_read)
     Honeybadger.context(user_ids: user_ids, entry_id: entry_id)
-    tokens = Device.where(user_id: user_ids).ios.pluck(:user_id, :token, :operating_system)
+
     entry = Entry.find(entry_id)
+
+    if skip_read
+      user_ids = UnreadEntry.where(entry: entry, user_id: user_ids).pluck(:user_id)
+    end
+
+    tokens = Device.where(user_id: user_ids).ios.pluck(:user_id, :token, :operating_system)
     feed = entry.feed
 
     feed_titles = subscription_titles(user_ids, feed)

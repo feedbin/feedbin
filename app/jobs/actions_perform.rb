@@ -63,7 +63,7 @@ class ActionsPerform
         'retry' => false
       )
     end
-    DevicePushNotificationSend.perform_in(1.minute, user_ids, @entry.id)
+    DevicePushNotificationSend.perform_in(1.minute, user_ids, @entry.id, true)
   end
 
 end

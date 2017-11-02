@@ -19,7 +19,7 @@ module Api
         @user = current_user
         subscription = @user.subscriptions.order("RANDOM()").limit(1).first
         entry = Entry.where(feed_id: subscription.feed_id).order("RANDOM()").limit(1).first
-        DevicePushNotificationSend.perform_async([@user.id], entry.id)
+        DevicePushNotificationSend.perform_async([@user.id], entry.id, false)
         head :ok
       end
 

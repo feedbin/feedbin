@@ -1,12 +1,15 @@
 module FactoryHelper
 
-  def create_feeds(user, count = 3)
+  def create_feeds(users, count = 3)
     flush_redis
+    users = [*users]
     feeds = count.times.map do
       url = Faker::Internet.url
       host = URI(url).host
       Feed.create(feed_url: url, host: host, title: Faker::Lorem.sentence).tap do |feed|
-        user.subscriptions.where(feed: feed).first_or_create
+        users.map do |user|
+          user.subscriptions.where(feed: feed).first_or_create
+        end
         entry = create_entry(feed)
         SearchIndexStore.new().perform("Entry", entry.id)
       end
