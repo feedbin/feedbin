@@ -60,10 +60,10 @@ class feedbin.Keyboard
 
   navigateFeedbin: (combo) ->
     @setEnvironment()
-    if 'pagedown' == combo
+    if 'pagedown' == combo || 'shift+j' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
         @scrollContent(@contentHeight() - 100, 'down')
-    else if 'pageup' == combo
+    else if 'pageup' == combo || 'shift+k' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
         @scrollContent(@contentHeight() - 100, 'up')
     else if 'down' == combo || 'j' == combo
@@ -119,7 +119,7 @@ class feedbin.Keyboard
     if $('body.app').length == 0
       return
 
-    Mousetrap.bind ['pageup', 'pagedown', 'up', 'down', 'left', 'right', 'j', 'k', 'h', 'l'], (event, combo) =>
+    Mousetrap.bind ['pageup', 'pagedown', 'up', 'down', 'left', 'right', 'j', 'k', 'h', 'l', 'shift+j', 'shift+k'], (event, combo) =>
       if feedbin.shareOpen()
         @navigateShareMenu(combo)
       else if feedbin.isFullScreen()
@@ -279,6 +279,23 @@ class feedbin.Keyboard
           if 'console' of window
             console.log error
       event.preventDefault()
+
+    $(window).on 'keydown', (event) =>
+      keys = {
+        UIKeyInputUpArrow: "up",
+        UIKeyInputDownArrow: "down",
+        UIKeyInputLeftArrow: "left",
+        UIKeyInputRightArrow: "right"
+      }
+
+      if keys[event.key]
+        if feedbin.shareOpen()
+          @navigateShareMenu(keys[event.key])
+        else if feedbin.isFullScreen()
+          @navigateEntryContent(keys[event.key])
+        else
+          @navigateFeedbin(keys[event.key])
+        event.preventDefault()
 
   setEnvironment: ->
     @selected = @selectedItem()
