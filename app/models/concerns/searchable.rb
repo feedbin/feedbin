@@ -52,8 +52,10 @@ module Searchable
       if queries.present?
         result = Entry.__elasticsearch__.client.msearch body: queries
         entry_ids = result["responses"].map do |response|
-          response["hits"]["hits"].map do |hit|
-            hit["_id"].to_i
+          if hits = response.dig("hits", "hits")
+            hits.map do |hit|
+              hit["_id"].to_i
+            end
           end
         end
         search_ids = searches.map {|search| search.id}
