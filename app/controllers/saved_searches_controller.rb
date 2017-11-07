@@ -48,6 +48,10 @@ class SavedSearchesController < ApplicationController
     get_feeds_list
   end
 
+  def count
+
+  end
+
   private
 
   def saved_search_params
