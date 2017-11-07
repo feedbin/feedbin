@@ -43,7 +43,8 @@ class SiteController < ApplicationController
         refresh_sessions_path: refresh_sessions_path,
         progress: {},
         audio_panel_size: @user.audio_panel_size,
-        view_links_in_app: @user.setting_on?(:view_links_in_app)
+        view_links_in_app: @user.setting_on?(:view_links_in_app),
+        saved_searches_count_path: count_saved_searches_path
       }
 
       render action: 'logged_in'

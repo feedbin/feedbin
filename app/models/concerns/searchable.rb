@@ -25,9 +25,9 @@ module Searchable
       indexes :updated,       type: 'date', include_in_all: false
     end
 
-    def self.saved_search_count(user)
+    def self.saved_search_count(user, saved_searches)
       unread_entries = user.unread_entries.pluck(:entry_id)
-      searches = user.saved_searches.map do |saved_search|
+      searches = saved_searches.map do |saved_search|
         query_string = saved_search.query
 
         continue if query_string =~ READ_REGEX
