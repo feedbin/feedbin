@@ -25,9 +25,36 @@ module Searchable
       indexes :updated,       type: 'date', include_in_all: false
     end
 
-    def self.saved_search_count(user, saved_searches)
-      unread_entries = user.unread_entries.pluck(:entry_id)
-      searches = saved_searches.map do |saved_search|
+    def self.saved_search_count(user)
+      saved_searches = user.saved_searches
+      if saved_searches.length < 10
+        unread_entries = user.unread_entries.pluck(:entry_id)
+        searches = build_multi_search(user, saved_searches)
+        queries = searches.map do |search|
+          {
+            index: Entry.index_name,
+            search: search.query
+          }
+        end
+
+        if queries.present?
+          result = Entry.__elasticsearch__.client.msearch body: queries
+          entry_ids = result["responses"].map do |response|
+            hits = response.dig("hits", "hits") || []
+            hits.map do |hit|
+              hit["_id"].to_i
+            end
+          end
+          search_ids = searches.map {|search| search.id}
+          Hash[search_ids.zip(entry_ids)]
+        else
+          nil
+        end
+      end
+    end
+
+    def self.build_multi_search(user, saved_searches)
+      saved_searches.map do |saved_search|
         query_string = saved_search.query
 
         continue if query_string =~ READ_REGEX
@@ -38,29 +65,9 @@ module Searchable
         options[:size] = 50
 
         query = build_query(options)
+        query[:fields] = ["id", "feed_id"]
 
         OpenStruct.new({id: saved_search.id, query: query})
-      end
-
-      queries = searches.map do |search|
-        {
-          index: Entry.index_name,
-          search: search.query
-        }
-      end
-
-      if queries.present?
-        result = Entry.__elasticsearch__.client.msearch body: queries
-        entry_ids = result["responses"].map do |response|
-          hits = response.dig("hits", "hits") || []
-          hits.map do |hit|
-            hit["_id"].to_i
-          end
-        end
-        search_ids = searches.map {|search| search.id}
-        Hash[search_ids.zip(entry_ids)]
-      else
-        nil
       end
     end
 

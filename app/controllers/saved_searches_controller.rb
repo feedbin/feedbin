@@ -50,12 +50,7 @@ class SavedSearchesController < ApplicationController
 
   def count
     @user = current_user
-    saved_searches = @user.saved_searches
-    if saved_searches.count < 10
-      @count = Entry.saved_search_count(@user, saved_searches)
-    else
-      @count = []
-    end
+    @count = Entry.saved_search_count(@user) || []
   end
 
   private

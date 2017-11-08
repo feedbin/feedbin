@@ -9,6 +9,7 @@ class _Counts
 
   setData: (options) ->
     @tagMap = options.tag_map
+    @savedSearches = options.saved_searches
     @collections =
       unread: options.unread_entries
       starred: options.starred_entries
@@ -36,6 +37,10 @@ class _Counts
       for tagId in tags
         @removeFromCollection(collection, 'byTag', entryId, tagId)
 
+    if (@savedSearches)
+      for searchID, entry_ids of @savedSearches
+        @removeFromCollection(collection, 'bySavedSearch', entryId, searchID)
+
   addEntry: (entryId, feedId, collection) ->
     entry = @buildEntry
       feedId: feedId
@@ -47,6 +52,7 @@ class _Counts
     counts =
       byFeed: {}
       byTag: {}
+      bySavedSearch: {}
       all: []
 
     for entry in entries
@@ -63,13 +69,21 @@ class _Counts
           counts.byTag[tagId] = counts.byTag[tagId] || []
           counts.byTag[tagId].push(entryId)
 
+      if (@savedSearches)
+        for searchID, entry_ids of @savedSearches
+          if _.contains(entry_ids, entryId)
+            counts.bySavedSearch[searchID] = counts.bySavedSearch[searchID] || []
+            counts.bySavedSearch[searchID].push(entryId)
+
     counts
 
   removeFromCollection: (collection, group, entryId, groupId) ->
-    index = @counts[collection][group][groupId].indexOf(entryId);
-    if index > -1
-      @counts[collection][group][groupId].splice(index, 1);
-    index
+    items = @counts[collection][group][groupId]
+    if typeof(items) != "undefined"
+      index = items.indexOf(entryId);
+      if index > -1
+        @counts[collection][group][groupId].splice(index, 1);
+      index
 
   buildEntry: (params) ->
     [params.feedId, params.entryId]
