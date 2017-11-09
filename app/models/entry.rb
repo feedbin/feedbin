@@ -110,6 +110,7 @@ class Entry < ApplicationRecord
       begin
         text = Nokogiri::HTML(text)
         text = text.search('//text()').map(&:text).join(" ").squish
+        text = text.sub(' .', '.').sub(' ,', ',')
       rescue
         text = nil
       end
