@@ -766,6 +766,7 @@ Structure
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     height: $toolbar-height;
+    z-index: 1;
 }
 
 .account-buttons {

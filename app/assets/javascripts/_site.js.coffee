@@ -5,6 +5,11 @@ $.extend feedbin,
   messageTimeout: null
   swipe: false
 
+  showFeeds: ->
+    $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
+    if feedbin.swipe
+      $('.app-wrap').animate({scrollLeft: 0}, {duration: 250})
+
   affix: ->
     $('[data-behavior~=modal_affix]').affix
       target: '#view_link_wrap'
@@ -933,24 +938,21 @@ $.extend feedbin,
         return
 
     feedSelected: ->
-      $(document).on 'click', '[data-behavior~=back_to_feeds]', ->
-        $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
-        if feedbin.swipe
-          $('.app-wrap').animate({scrollLeft: 0}, {duration: 250, easing: "easeOutQuad"})
-        return
+      $(document).on 'click', '[data-behavior~=show_feeds]', ->
+        feedbin.showFeeds()
 
       $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
         $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
         if feedbin.swipe
           offset = $('.entries-column')[0].offsetLeft
-          $('.app-wrap').animate({scrollLeft: offset}, {duration: 250, easing: "easeOutQuad"})
+          $('.app-wrap').animate({scrollLeft: offset}, {duration: 250})
         return
 
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
         $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
         if feedbin.swipe
           offset = $('.entry-column')[0].offsetLeft
-          $('.app-wrap').animate({scrollLeft: offset}, {duration: 250, easing: "easeOutQuad"})
+          $('.app-wrap').animate({scrollLeft: offset}, {duration: 250})
         return
 
     addFields: ->
