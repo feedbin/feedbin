@@ -42,8 +42,6 @@ end
 gem 'pg'
 gem 'unicorn'
 
-gem 'net-http2',             github: 'feedbin/net-http2',           ref: '8be56ce'
-gem 'apnotic',               github: 'feedbin/apnotic',             ref: 'd5481ec'
 gem 'feedjira',              github: 'feedbin/feedjira',            ref: 'eeb7e81'
 gem 'opml_saw',              github: 'feedbin/opml_saw',            ref: '61d8c2d'
 gem 'html-pipeline',         github: 'feedbin/html-pipeline',       ref: '819a2b9'
@@ -57,6 +55,7 @@ gem 'uglifier'
 gem 'autoprefixer-rails'
 gem 'rubyzip', '= 1.1.0'
 
+gem 'apnotic'
 gem 'json'
 gem 'activerecord-import', '>= 0.4.1'
 gem 'redis'

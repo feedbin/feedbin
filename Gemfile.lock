@@ -1,13 +1,4 @@
 GIT
-  remote: https://github.com/feedbin/apnotic.git
-  revision: d5481eca2a3d45e3388b3e045f532eb7b08772bf
-  ref: d5481ec
-  specs:
-    apnotic (1.1.0)
-      connection_pool (~> 2.0)
-      net-http2 (>= 0.15, < 2)
-
-GIT
   remote: https://github.com/feedbin/carrierwave_direct.git
   revision: a0bc3230e544c0ea88f35d2bb6b7eb6a1fdb9196
   ref: a0bc323
@@ -53,14 +44,6 @@ GIT
       nokogiri
 
 GIT
-  remote: https://github.com/feedbin/net-http2.git
-  revision: 8be56ce8147662dd1729fed0b8b33d65e93f8589
-  ref: 8be56ce
-  specs:
-    net-http2 (0.15.0)
-      http-2 (= 0.8.2)
-
-GIT
   remote: https://github.com/feedbin/opml_saw.git
   revision: 61d8c2dd3d46e9cae38178754469dd9da7c8bd6a
   ref: 61d8c2d
@@ -103,7 +86,7 @@ GEM
       activemodel (= 5.1.4)
       activesupport (= 5.1.4)
       arel (~> 8.0)
-    activerecord-import (0.19.1)
+    activerecord-import (0.20.2)
       activerecord (>= 3.2)
     activesupport (5.1.4)
       concurrent-ruby (~> 1.0, >= 1.0.2)
@@ -115,45 +98,48 @@ GEM
     aggregate (0.2.2)
     airbrussh (1.3.0)
       sshkit (>= 1.6.1, != 1.7.0)
+    apnotic (1.3.0)
+      connection_pool (~> 2.0)
+      net-http2 (>= 0.16, < 2)
     arel (8.0.0)
-    autoprefixer-rails (7.1.4)
+    autoprefixer-rails (7.1.6)
       execjs
     bcrypt (3.1.11)
     bcrypt-ruby (3.1.5)
       bcrypt (>= 3.1.3)
     benchmark-ips (2.7.2)
-    better_errors (2.3.0)
+    better_errors (2.4.0)
       coderay (>= 1.0.0)
       erubi (>= 1.0.0)
       rack (>= 0.9.0)
     builder (3.2.3)
     byebug (9.1.0)
-    capistrano (3.9.1)
+    capistrano (3.10.0)
       airbrussh (>= 1.0.0)
       i18n
       rake (>= 10.0.0)
       sshkit (>= 1.9.0)
-    capistrano-bundler (1.2.0)
+    capistrano-bundler (1.3.0)
       capistrano (~> 3.1)
       sshkit (~> 1.2)
     capistrano-rails (1.3.0)
       capistrano (~> 3.1)
       capistrano-bundler (~> 1.1)
-    capistrano-rbenv (2.1.1)
+    capistrano-rbenv (2.1.2)
       capistrano (~> 3.1)
       sshkit (~> 1.3)
-    capybara (2.15.1)
+    capybara (2.15.4)
       addressable
       mini_mime (>= 0.1.3)
       nokogiri (>= 1.3.3)
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
-    carrierwave (1.1.0)
+    carrierwave (1.2.1)
       activemodel (>= 4.0.0)
       activesupport (>= 4.0.0)
       mime-types (>= 1.16)
-    childprocess (0.7.1)
+    childprocess (0.8.0)
       ffi (~> 1.0, >= 1.0.11)
     clockwork (2.0.2)
       activesupport
@@ -201,7 +187,7 @@ GEM
     elasticsearch-transport (2.0.2)
       faraday
       multi_json
-    erubi (1.6.1)
+    erubi (1.7.0)
     evernote-thrift (1.25.2)
     evernote_oauth (0.2.3)
       evernote-thrift
@@ -234,26 +220,27 @@ GEM
       dotenv (>= 0.7)
       thor (>= 0.13.6)
     formatador (0.2.5)
-    globalid (0.4.0)
+    globalid (0.4.1)
       activesupport (>= 4.2.0)
-    hashdiff (0.3.6)
+    hashdiff (0.3.7)
     hashie (3.5.6)
     hetchy (1.0.0)
     honeybadger (3.1.2)
     htmlentities (4.3.4)
-    http-2 (0.8.2)
-    http (2.2.2)
+    http-2 (0.8.4)
+    http (3.0.0)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
-      http-form_data (~> 1.0.1)
+      http-form_data (>= 2.0.0.pre.pre2, < 3)
       http_parser.rb (~> 0.6.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
-    http-form_data (1.0.3)
+    http-form_data (2.0.0)
     http_parser.rb (0.6.0)
     httparty (0.15.6)
       multi_xml (>= 0.5.2)
-    i18n (0.8.6)
+    i18n (0.9.1)
+      concurrent-ruby (~> 1.0)
     ipaddress (0.8.3)
     jbuilder (2.7.0)
       activesupport (>= 4.2.0)
@@ -281,44 +268,47 @@ GEM
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
       ruby_dep (~> 1.2)
-    lograge (0.6.0)
+    lograge (0.7.1)
       actionpack (>= 4, < 5.2)
       activesupport (>= 4, < 5.2)
       railties (>= 4, < 5.2)
       request_store (~> 1.0)
-    loofah (2.0.3)
+    loofah (2.1.1)
+      crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
-    mail (2.6.6)
-      mime-types (>= 1.16, < 4)
-    method_source (0.8.2)
+    mail (2.7.0)
+      mini_mime (>= 0.1.1)
+    method_source (0.9.0)
     mime-types (3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
-    mini_mime (0.1.4)
-    mini_portile2 (2.2.0)
+    mini_mime (1.0.0)
+    mini_portile2 (2.3.0)
     minitest (5.10.3)
     minitest-stub-const (0.6)
     multi_json (1.12.2)
     multi_xml (0.6.0)
     multipart-post (2.0.0)
+    net-http2 (0.16.0)
+      http-2 (= 0.8.4)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (4.2.0)
     nio4r (2.1.0)
-    nokogiri (1.8.0)
-      mini_portile2 (~> 2.2.0)
+    nokogiri (1.8.1)
+      mini_portile2 (~> 2.3.0)
     nokogumbo (1.4.9)
       nokogiri
     oauth (0.5.3)
     pg (0.21.0)
-    premailer (1.10.4)
+    premailer (1.11.0)
       addressable
-      css_parser (>= 1.4.10)
+      css_parser (>= 1.6.0)
       htmlentities (>= 4.0.0)
     premailer-rails (1.9.7)
       actionmailer (>= 3, < 6)
       premailer (~> 1.7, >= 1.7.9)
-    public_suffix (3.0.0)
+    public_suffix (3.0.1)
     puma (3.10.0)
     rack (2.0.3)
     rack-protection (2.0.0)
@@ -357,7 +347,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     raindrops (0.19.0)
-    rake (12.0.0)
+    rake (12.2.1)
     rb-fsevent (0.10.2)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
@@ -367,7 +357,7 @@ GEM
       hashie (~> 3.2)
       multi_json (~> 1.10)
       multi_xml (~> 0.5)
-    redis (3.3.3)
+    redis (4.0.1)
     ref (2.0.0)
     request_store (1.3.2)
     responders (2.4.0)
@@ -383,7 +373,7 @@ GEM
       crass (~> 1.0.2)
       nokogiri (>= 1.4.4)
       nokogumbo (~> 1.4.1)
-    sass (3.5.1)
+    sass (3.5.3)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -395,14 +385,14 @@ GEM
       sprockets-rails (>= 2.0, < 4.0)
       tilt (>= 1.1, < 3)
     sax-machine (1.3.2)
-    selenium-webdriver (3.5.2)
+    selenium-webdriver (3.7.0)
       childprocess (~> 0.5)
       rubyzip (~> 1.0)
-    sidekiq (5.0.4)
+    sidekiq (5.0.5)
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)
       rack-protection (>= 1.5.0)
-      redis (~> 3.3, >= 3.3.3)
+      redis (>= 3.3.4, < 5)
     silencer (1.0.1)
     simplecov (0.14.1)
       docile (~> 1.1.0)
@@ -418,11 +408,11 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    sshkit (1.14.0)
+    sshkit (1.15.0)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    stripe (3.3.1)
-      faraday (~> 0.9)
+    stripe (3.8.0)
+      faraday (~> 0.10)
     stripe-ruby-mock (2.5.0)
       dante (>= 0.2.0)
       multi_json (~> 1.0)
@@ -438,18 +428,18 @@ GEM
     thor (0.19.4)
     thread_safe (0.3.6)
     tilt (2.0.8)
-    tins (1.15.0)
-    tzinfo (1.2.3)
+    tins (1.15.1)
+    tzinfo (1.2.4)
       thread_safe (~> 0.1)
     uglifier (3.2.0)
       execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.4)
-    unicorn (5.3.0)
+    unicorn (5.3.1)
       kgio (~> 2.6)
       raindrops (~> 0.7)
-    webmock (3.0.1)
+    webmock (3.1.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff
@@ -468,7 +458,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import (>= 0.4.1)
   addressable
-  apnotic!
+  apnotic
   autoprefixer-rails
   bcrypt-ruby
   benchmark-ips
@@ -511,7 +501,6 @@ DEPENDENCIES
   lograge
   minitest
   minitest-stub-const
-  net-http2!
   nokogumbo (= 1.4.9)
   oauth
   opml_saw!
