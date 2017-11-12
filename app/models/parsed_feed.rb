@@ -25,7 +25,7 @@ class ParsedFeed
   def to_feed
     @to_feed ||= begin
       FEED_ATTRIBUTES.each_with_object({}) do |attribute, hash|
-        hash[attribute] = self.send(attribute)
+        hash[attribute] = self.respond_to?(attribute) ? self.send(attribute) : nil
       end
     end
   end

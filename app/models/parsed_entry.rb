@@ -13,7 +13,7 @@ class ParsedEntry
   def to_entry
     @to_entry ||= begin
       ENTRY_ATTRIBUTES.each_with_object({}) do |attribute, hash|
-        hash[attribute] = self.send(attribute)
+        hash[attribute] = self.respond_to?(attribute) ? self.send(attribute) : nil
       end
     end
   end
