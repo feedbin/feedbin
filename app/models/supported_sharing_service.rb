@@ -30,7 +30,8 @@ class SupportedSharingService < ApplicationRecord
       service_type: 'email',
       html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'email_share_panel'}},
       klass: 'Share::Email',
-      has_share_sheet: true
+      has_share_sheet: true,
+      limit: 20
     },
     {
       service_id: 'kindle',
@@ -104,9 +105,15 @@ class SupportedSharingService < ApplicationRecord
 
   def share(params)
     key = "SupportedSharingService:share:#{user_id}:#{service_id}"
-    result = Throttle.throttle!(key, 10, 1.hour) do
-      service.share(params)
+
+    if info[:limit]
+      result = Throttle.throttle!(key, info[:limit], 1.hour) do
+        service.share(params)
+      end
+    else
+      result = service.share(params)
     end
+
     if result == false
       limit_exceeded
     else
