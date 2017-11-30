@@ -1,14 +1,16 @@
 class FeedFinder
 
-  def initialize(url)
+  def initialize(url, config = {})
     @url = url
     @cache = {}
+    @config = config
   end
 
   def options
     @options ||= begin
       options = []
       options.concat(existing_feed) if options.empty?
+      options.concat(twitter) if options.empty?
       options.concat(page_links) if options.empty?
       options.concat(xml) if options.empty?
       options.concat(json_feed) if options.empty?
@@ -117,6 +119,10 @@ class FeedFinder
     last_effective_url = @cache[@url].last_effective_url
     @cache[last_effective_url] = @cache[url]
     @cache[url]
+  end
+
+  def twitter
+    TwitterFeed.new(@url, @config[:twitter_access_token], @config[:twitter_access_secret]).options
   end
 
 end

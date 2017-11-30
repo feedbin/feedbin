@@ -11,13 +11,13 @@ class TwitterAPI
 
   attr_reader :client
 
-  def initialize(user = nil)
-    if user.present? && user.twitter_access_secret && user.twitter_access_token
+  def initialize(token = nil, secret = nil)
+    if token && secret
       @client = Twitter::REST::Client.new do |config|
         config.consumer_key        = ENV['TWITTER_KEY']
         config.consumer_secret     = ENV['TWITTER_SECRET']
-        config.access_token        = user.twitter_access_token
-        config.access_token_secret = user.twitter_access_secret
+        config.access_token        = token
+        config.access_token_secret = secret
       end
     end
   end

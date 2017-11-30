@@ -95,6 +95,10 @@ class User < ApplicationRecord
   validates_uniqueness_of :email, case_sensitive: false
   validates_presence_of :password, on: :create
 
+  def twitter_enabled?
+    twitter_access_secret && twitter_access_token
+  end
+
   def set_defaults
     self.expires_at = Feedbin::Application.config.trial_days.days.from_now
     self.update_auth_token = true

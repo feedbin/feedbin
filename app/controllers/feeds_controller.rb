@@ -123,8 +123,16 @@ class FeedsController < ApplicationController
 
   def search
     @user = current_user
-    @feeds = FeedFinder.new(params[:q]).create_feeds!
-    @feeds.map(&:priority_refresh)
+    if twitter_feed?(params[:q]) && !@user.twitter_enabled?
+      @twitter_error = true
+    else
+      config = {
+        twitter_access_token: @user.twitter_access_token,
+        twitter_access_secret: @user.twitter_access_secret
+      }
+      @feeds = FeedFinder.new(params[:q], config).create_feeds!
+      @feeds.map(&:priority_refresh)
+    end
   rescue => exception
     logger.info { "------------------------" }
     logger.info { exception.message }
@@ -134,6 +142,15 @@ class FeedsController < ApplicationController
   end
 
   private
+
+  def twitter_feed?(url)
+    url = url.strip
+    url.start_with?("@") ||
+    url.start_with?("#") ||
+    url.start_with?("http://twitter.com") ||
+    url.start_with?("https://twitter.com") ||
+    url.start_with?("twitter.com")
+  end
 
   def update_view_mode(view_mode)
     @user = current_user
