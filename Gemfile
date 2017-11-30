@@ -91,6 +91,8 @@ gem 'elasticsearch-model', '~> 2.0'
 gem 'sidekiq'
 gem 'raindrops'
 gem 'curb'
+gem 'twitter'
+gem 'twitter-text'
 
 # Stripe
 gem 'stripe'

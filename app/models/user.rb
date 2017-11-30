@@ -37,7 +37,9 @@ class User < ApplicationRecord
                  :hide_recently_played,
                  :now_playing_entry,
                  :audio_panel_size,
-                 :view_links_in_app
+                 :view_links_in_app,
+                 :twitter_access_secret,
+                 :twitter_access_token
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all

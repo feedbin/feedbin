@@ -23,33 +23,92 @@
       </div>
       <div class="entry-content">
         <div class="entry-inner" <%= rtl(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>>
-          <header class="entry-header">
-            <%= link_to entry.fully_qualified_url, target: '_blank', rel: 'noopener noreferrer', id: 'source_link' do  %>
-            <h1><%= entry_presenter.entry_view_title %></h1>
-            <% end %>
-            <p class="post-meta">
-              <time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time>
-              <%= entry_presenter.author %>
-            </p>
-            <p class="post-meta feed-title"><span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
-          </header>
 
-          <div data-behavior="entry_content_wrap" class="content-styles <%= entry_presenter.entry_type_class %>">
-            <% if entry_presenter.has_diff? %>
-              <p class="diff-wrap entry-callout">
-                <span class="icon-clock-wrap"><%= svg_tag 'favicon-updated', size: '16x16' %></span>
-                <span class="diff-wrap-text">This article was updated <%= link_to "view changes", diff_entry_path(entry), remote: true %></span>
-                <%= link_to '×', toggle_updates_feed_path(entry.feed, inline: true), remote: true, method: :post, class: 'ignore-updates', data: {behavior: 'hide_updates'}, title: "Don't tell me when articles from #{strip_tags(entry.feed.title)} have been updated."  %>
+          <% if entry.tweet? %>
+            <header class="tweet-header">
+              <% if entry.tweet.user.profile_image_uri? %>
+                <%= image_tag entry.tweet.user.profile_image_uri("bigger") %>
+              <% end %>
+              <h1><%= entry.tweet.user.name %></h1>
+              <h2>@<%= entry.tweet.user.screen_name %></h2>
+            </header>
+              <div class="content-styles">
+                <%= Twitter::Autolink.auto_link_with_json(entry.tweet.to_h[:full_text], entry.tweet.to_hash[:entities]).html_safe %>
+              </div>
+
+            <hr />
+
+              <% entry.tweet.media.each do |media| %>
+                <%= media.display_url %>
+                <div class="content-styles">
+                  <%= image_tag media.media_url_https.to_s + ":large" %>
+                </div>
+              <% end %>
+
+              <hr />
+
+              <% entry.tweet.urls.each do |url| %>
+                <%= url.expanded_url.to_s.sub('http://', '').sub('https://', '') %>
+
+                <%
+                key = FeedbinUtils.page_cache_key(url.expanded_url.to_s) + "3"
+                page = Rails.cache.fetch(key) do
+                  Librato.increment 'readability.first_parse'
+                  MercuryParser.parse(url.expanded_url.to_s)
+                end
+                link_content = ContentFormatter.format!(page.content, nil, !@user.setting_on?(:disable_image_proxy))
+                %>
+
+                <header class="entry-header">
+                    <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
+                    <h1><%= page.title || "Untitled" %></h1>
+                    <% end %>
+                    <% if page.author || page.published %>
+                        <p class="post-meta">
+                            <% if page.published %>
+                                <time><%= page.published.to_s(:full_human) %></time>
+                            <% end %>
+                            <% if page.author %>
+                                by <%= page.author %>
+                            <% end %>
+                        </p>
+                    <% end %>
+                </header>
+                <div class="content-styles" data-behavior="view_link_markup_wrap">
+                    <%= link_content.html_safe %>
+                </div>
+
+              <% end %>
+
+
+          <% else %>
+            <header class="entry-header">
+              <%= link_to entry.fully_qualified_url, target: '_blank', rel: 'noopener noreferrer', id: 'source_link' do  %>
+              <h1><%= entry_presenter.entry_view_title %></h1>
+              <% end %>
+              <p class="post-meta">
+                <time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time>
+                <%= entry_presenter.author %>
               </p>
-            <% end %>
+              <p class="post-meta feed-title"><span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
+            </header>
 
-            <%= render partial: 'media', locals: {entry: entry} %>
+            <div data-behavior="entry_content_wrap" class="content-styles <%= entry_presenter.entry_type_class %>">
+              <% if entry_presenter.has_diff? %>
+                <p class="diff-wrap entry-callout">
+                  <span class="icon-clock-wrap"><%= svg_tag 'favicon-updated', size: '16x16' %></span>
+                  <span class="diff-wrap-text">This article was updated <%= link_to "view changes", diff_entry_path(entry), remote: true %></span>
+                  <%= link_to '×', toggle_updates_feed_path(entry.feed, inline: true), remote: true, method: :post, class: 'ignore-updates', data: {behavior: 'hide_updates'}, title: "Don't tell me when articles from #{strip_tags(entry.feed.title)} have been updated."  %>
+                </p>
+              <% end %>
 
-            <div class="entry-final-content" data-behavior="entry_final_content">
-                <%= raw(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>
+              <%= render partial: 'media', locals: {entry: entry} %>
+
+              <div class="entry-final-content" data-behavior="entry_final_content">
+                  <%= raw(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>
+              </div>
             </div>
-          </div>
-
+          <% end %>
 
         </div>
         <a class="next-entry-preview no-content" data-behavior="open_next_entry" href="#">

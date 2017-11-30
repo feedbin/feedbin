@@ -24,6 +24,14 @@ class Entry < ApplicationRecord
 
   self.per_page = 100
 
+  def tweet?
+    data && data["tweet"]
+  end
+
+  def tweet
+    @tweet ||= (tweet?) ? Twitter::Tweet.new(data["tweet"].deep_symbolize_keys) : nil
+  end
+
   def has_content
     if [title, url, entry_id, content].compact.count == 0
       errors.add(:base, 'entry has no content')
