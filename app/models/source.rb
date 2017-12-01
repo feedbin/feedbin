@@ -5,13 +5,12 @@ class Source
   def initialize(url, config)
     @url = url
     @config = config
-    @options = []
-    @cache = {}
+    @feed_options = []
   end
 
   def create_feeds!
-    @options.each_with_object([]) do |option, array|
-      array.push(create_feed(option))
+    @feed_options.each_with_object([]) do |feed_option, array|
+      array.push(create_feed(feed_option))
     end.compact.uniq
   end
 
@@ -20,8 +19,8 @@ class Source
     feed = Feed.where(feed_url: option.href).take
 
     if !feed
-      request = @cache[option.href]
-      if !request
+      request = @config[:request]
+      if request.nil? || request.last_effective_url != option.href
         request = FeedRequest.new(url: option.href)
       end
 
@@ -36,13 +35,6 @@ class Source
       end
     end
     feed
-  end
-
-  def cache(url)
-    @cache[url] ||= FeedRequest.new(url: @url, clean: true)
-    last_effective_url = @cache[@url].last_effective_url
-    @cache[last_effective_url] = @cache[url]
-    @cache[url]
   end
 
 end

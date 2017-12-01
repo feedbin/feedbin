@@ -1,4 +1,6 @@
 class TwitterFeed
+  attr_reader :url
+
   def initialize(url, token, secret)
     url = url.strip
     url = shortcut(url)
@@ -9,17 +11,21 @@ class TwitterFeed
     @api = TwitterAPI.new(token, secret)
   end
 
-  def options
-
-  end
-
-  def load_tweets
+  def feed
+    type = nil
+    tweets = nil
     if value = user
-      @api.client.user_timeline(value, exclude_replies: true, count: 100, extended_tweet: true)
+      type = :user
+      tweets = @api.client.user_timeline(value, exclude_replies: true, count: 100, extended_tweet: true)
     elsif value = search || value = hashtag
-      @api.client.search(value, count: 100, result_type: "recent", include_entities: true, extended_tweet: true).map{|a|a}
+      type = :search
+      tweets = @api.client.search(value, count: 100, result_type: "recent", include_entities: true, extended_tweet: true).map{|a|a}
     elsif value = list
-      @api.client.list_timeline(value[:user], value[:list], count: 100, extended_tweet: true)
+      type = :list
+      tweets = @api.client.list_timeline(value[:user], value[:list], count: 100, extended_tweet: true)
+    end
+    if tweets && value
+      ParsedTwitterFeed.new(@url.to_s, tweets, type, value)
     end
   end
 

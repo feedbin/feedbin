@@ -33,7 +33,7 @@
               <h2>@<%= entry.tweet.user.screen_name %></h2>
             </header>
               <div class="content-styles">
-                <%= Twitter::Autolink.auto_link_with_json(entry.tweet.to_h[:full_text], entry.tweet.to_hash[:entities]).html_safe %>
+                <%= Twitter::Autolink.auto_link_with_json(entry.tweet.full_text, entry.tweet.to_hash[:entities]).html_safe %>
               </div>
 
             <hr />

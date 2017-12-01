@@ -1,4 +1,4 @@
-class YoutubeOptions
+class Source::YouTube < Source
   URLS = [
     {
       template: "https://www.youtube.com/feeds/videos.xml?channel_id=%s".freeze,
@@ -14,18 +14,13 @@ class YoutubeOptions
     }
   ]
 
-  def initialize(url)
-    @url = url
-  end
-
-  def options
-    options = []
-    if (match = URLS.find { |candidate| @url =~ candidate[:regex] }) && $1
+  def call
+    if (match = URLS.find { |candidate| @config[:request].last_effective_url =~ candidate[:regex] }) && $1
       feed_url = match[:template] % $1
       option = FeedOption.new(feed_url, feed_url, nil, "youtube_options")
-      options.push(option)
+      @feed_options.push(option)
+      create_feeds!
     end
-    options
   end
 
 end
