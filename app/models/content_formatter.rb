@@ -3,6 +3,32 @@ require 'rails_autolink'
 
 class ContentFormatter
 
+  LEADING_CHARS = %w|
+    (
+    [
+    {
+    @
+    #
+    '
+    "
+    $
+    “
+  |
+  TRAILING_CHARS = %w|
+    )
+    ]
+    }
+    :
+    ;
+    '
+    "
+    ?
+    .
+    ,
+    !
+    ”
+  |
+
   def self.format!(content, entry = nil, image_proxy_enabled = true)
     whitelist = Feedbin::Application.config.whitelist.clone
     transformers = [iframe_whitelist, class_whitelist] + whitelist[:transformers]
@@ -98,19 +124,33 @@ class ContentFormatter
     content
   end
 
-  def self.summary(content)
+  def self.summary(text, length = nil)
+    decoder = HTMLEntities.new
+    text = decoder.decode(text)
+    text = text.chars.select(&:valid_encoding?).join
+
     sanitize_config = Sanitize::Config::BASIC.dup
     sanitize_config = sanitize_config.merge(remove_contents: ['script', 'style', 'iframe', 'object', 'embed', 'figure'])
-    content = Sanitize.fragment(content, sanitize_config)
+    text = Sanitize.fragment(text, sanitize_config)
 
-    decoder = HTMLEntities.new
-    content = decoder.decode(content)
-    content = content.chars.select(&:valid_encoding?).join
+    text = Nokogiri::HTML(text)
+    text = text.search('//text()').map(&:text).join(" ").squish
 
-    content = Nokogiri::HTML(content)
-    content.search('//text()').map(&:text).join(" ").squish.truncate(86, separator: " ")
+    TRAILING_CHARS.each do |char|
+      text = text.gsub(" #{char}", "#{char}")
+    end
+
+    LEADING_CHARS.each do |char|
+      text = text.gsub("#{char} ", "#{char}")
+    end
+
+    if length
+      text = text.truncate(86, separator: " ")
+    end
+
+    text
   rescue
-    ''
+    nil
   end
 
   def self.iframe_whitelist

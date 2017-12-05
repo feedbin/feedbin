@@ -103,28 +103,13 @@ class Entry < ApplicationRecord
 
   def as_indexed_json(options={})
     base = as_json(root: false, only: Entry.mappings.to_hash[:entry][:properties].keys)
-    base["title"] = format_text(self.title)
-    base["content"] = format_text(self.content)
+    base["title"] =  ContentFormatter.summary(self.title)
+    base["content"] = ContentFormatter.summary(self.content)
     base["title_exact"] = base["title"]
     base["content_exact"] = base["content"]
     base
   end
 
-  def format_text(text)
-    if text.respond_to?(:chars)
-      decoder = HTMLEntities.new
-      text = decoder.decode(text)
-      text = text.chars.select(&:valid_encoding?).join
-      begin
-        text = Nokogiri::HTML(text)
-        text = text.search('//text()').map(&:text).join(" ").squish
-        text = text.sub(' .', '.').sub(' ,', ',')
-      rescue
-        text = nil
-      end
-      text
-    end
-  end
 
   def public_id_alt
     self.data && self.data["public_id_alt"]
@@ -202,7 +187,7 @@ class Entry < ApplicationRecord
   end
 
   def create_summary
-    self.summary = ContentFormatter.summary(self.content)
+    self.summary = ContentFormatter.summary(self.content, 86)
   end
 
   def touch_feed_last_published_entry

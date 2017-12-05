@@ -1658,7 +1658,9 @@ $saved-search-control-height: 48px;
         margin: 0;
         @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         display: block;
-        hyphens: auto;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     &.starred {
         .icon-star {
@@ -5940,7 +5942,7 @@ Media Players
 
 .audio-panel {
     cursor: pointer;
-    padding: 12px 0 0 12px;
+    padding: 12px 12px 0 12px;
     font-size: 13px;
     font-family: $font-stack !important;
     font-weight: 400 !important;
