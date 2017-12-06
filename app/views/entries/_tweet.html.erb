@@ -1,60 +1,53 @@
 <% present entry do |entry_presenter| %>
   <% present entry.tweet do |tweet_presenter| %>
-
-    <% if entry.tweet.retweeted_status? %>
-      <p><%= tweet_presenter.retweeted_message %></p>
-    <% end %>
-    <header class="tweet-header">
-    <%= image_tag tweet_presenter.profile_image_uri %>
-    <h1><%= tweet_presenter.name %></h1>
-    <h2><%= tweet_presenter.screen_name %></h2>
-    </header>
-    <div class="content-styles">
-      <%= tweet_presenter.text %>
-    </div>
-
-    <hr />
-
-    <% tweet_presenter.media.each do |media| %>
-      <%= media.display_url %>
-      <div class="content-styles">
-        <%= image_tag media.media_url_https.to_s + ":large" %>
-      </div>
-    <% end %>
-
-    <hr />
-
-    <% tweet_presenter.urls.each do |url| %>
-      <%= url.display_url %>
-
-      <%
-      key = FeedbinUtils.page_cache_key(url.expanded_url.to_s) + "3"
-      page = Rails.cache.fetch(key) do
-        Librato.increment 'readability.first_parse'
-        MercuryParser.parse(url.expanded_url.to_s)
-      end
-      link_content = ContentFormatter.format!(page.content, nil, !@user.setting_on?(:disable_image_proxy))
-      %>
-
-      <header class="entry-header">
-          <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
-          <h1><%= page.title || "Untitled" %></h1>
-          <% end %>
-          <% if page.author || page.published %>
-              <p class="post-meta">
-                  <% if page.published %>
-                      <time><%= page.published.to_s(:full_human) %></time>
-                  <% end %>
-                  <% if page.author %>
-                      by <%= page.author %>
-                  <% end %>
-              </p>
-          <% end %>
+    <div class="tweet-wrap">
+      <header class="tweet-header">
+        <%= image_tag tweet_presenter.profile_image_uri, size: "45x45" %>
+        <h1><%= tweet_presenter.name %></h1>
+        <h2><a href="<%= tweet_presenter.user_url %>"><%= tweet_presenter.screen_name %></a></h2>
       </header>
-      <div class="content-styles" data-behavior="view_link_markup_wrap">
-          <%= link_content.html_safe %>
-      </div>
 
-    <% end %>
+      <p><%= tweet_presenter.text %></p>
+
+      <% if entry.tweet.retweeted_status? %>
+        <p class="retweeted-by"><%= image_tag tweet_presenter.retweeted_image, size: "16x16" %> <%= tweet_presenter.retweeted_message %></p>
+      <% end %>
+
+      <% tweet_presenter.media.each do |media| %>
+        <div class="content-styles">
+          <%= image_tag media.media_url_https.to_s + ":large" %>
+        </div>
+      <% end %>
+
+      <% tweet_presenter.urls.each do |url| %>
+        <%= url.display_url %>
+
+        <%
+        key = FeedbinUtils.page_cache_key(url.expanded_url.to_s) + "3"
+        page = Rails.cache.fetch(key) do
+          Librato.increment 'readability.first_parse'
+          MercuryParser.parse(url.expanded_url.to_s)
+        end
+        link_content = ContentFormatter.format!(page.content, nil, !@user.setting_on?(:disable_image_proxy))
+        %>
+
+        <header class="entry-header">
+            <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
+            <h1><%= page.title || "Untitled" %></h1>
+            <% end %>
+            <% if page.author %>
+                <p class="post-meta">
+                    <% if page.author %>
+                        by <%= page.author %>
+                    <% end %>
+                </p>
+            <% end %>
+        </header>
+        <div class="content-styles" data-behavior="view_link_markup_wrap">
+            <%= link_content.html_safe %>
+        </div>
+
+      <% end %>
+    </div>
   <% end %>
 <% end %>

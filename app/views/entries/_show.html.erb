@@ -26,7 +26,7 @@
           <% if entry.tweet? %>
               <%= render partial: "tweet", locals: {entry: entry} %>
           <% else %>
-              <%= render partial: "article", locals: {entry: entry} %>
+              <%= render partial: "article", locals: {entry: entry, user: user} %>
           <% end %>
         </div>
         <a class="next-entry-preview no-content" data-behavior="open_next_entry" href="#">

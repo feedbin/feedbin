@@ -26,6 +26,10 @@ class Twitter::TweetPresenter < BasePresenter
     "@" + main_tweet.user.screen_name
   end
 
+  def user_url
+    "https://twitter.com/#{main_tweet.user.screen_name}"
+  end
+
   def media
     main_tweet.media
   end
@@ -35,7 +39,15 @@ class Twitter::TweetPresenter < BasePresenter
   end
 
   def retweeted_message
-    (tweet.user.name || "@" + tweet.user.screen_name) + " Retweeted"
+    "Retweeted by " + (tweet.user.name || "@" + tweet.user.screen_name)
+  end
+
+  def retweeted_image
+    if tweet.user.profile_image_uri?
+      tweet.user.profile_image_uri("normal")
+    else
+      # default twitter avatar
+    end
   end
 
   def profile_image_uri
