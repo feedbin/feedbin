@@ -4,10 +4,13 @@
       <header class="tweet-header">
         <%= image_tag tweet_presenter.profile_image_uri, size: "45x45" %>
         <h1><%= tweet_presenter.name %></h1>
-        <h2><a href="<%= tweet_presenter.user_url %>"><%= tweet_presenter.screen_name %></a></h2>
+        <h2><a href="<%= tweet_presenter.user_url %>" target="_blank"><%= tweet_presenter.screen_name %></a></h2>
+        <%= link_to entry.tweet.uri.to_s, target: "_blank", title: "View on Twitter", class: "twitter-link" do %>
+            <%= svg_tag "icon-twitter" %>
+        <% end %>
       </header>
 
-      <p><%= tweet_presenter.text %></p>
+      <p class="tweet-text"><%= tweet_presenter.text %></p>
 
       <% if entry.tweet.retweeted_status? %>
         <p class="retweeted-by"><%= image_tag tweet_presenter.retweeted_image, size: "16x16" %> <%= tweet_presenter.retweeted_message %></p>
@@ -15,37 +18,51 @@
 
       <% tweet_presenter.media.each do |media| %>
         <div class="content-styles">
+        <% if media.type == "video" %>
+          <%= video_tag tweet_presenter.find_video_url(media.video_info.variants), poster: media.media_url_https.to_s + ":large", width: media.video_info.aspect_ratio.first, height: media.video_info.aspect_ratio.last %>
+        <% else %>
           <%= image_tag media.media_url_https.to_s + ":large" %>
+        <% end %>
         </div>
       <% end %>
 
       <% tweet_presenter.urls.each do |url| %>
-        <%= url.display_url %>
 
-        <%
-        key = FeedbinUtils.page_cache_key(url.expanded_url.to_s) + "3"
-        page = Rails.cache.fetch(key) do
-          Librato.increment 'readability.first_parse'
-          MercuryParser.parse(url.expanded_url.to_s)
-        end
-        link_content = ContentFormatter.format!(page.content, nil, !@user.setting_on?(:disable_image_proxy))
-        %>
+        <% if tweet_presenter.youtube_embed(url) %>
+          <%= tweet_presenter.youtube_embed(url) %>
+        <% else %>
+          <%
+          key = FeedbinUtils.page_cache_key(url.expanded_url.to_s) + "3"
+          page = Rails.cache.fetch(key) do
+            Librato.increment 'readability.first_parse'
+            MercuryParser.parse(url.expanded_url.to_s)
+          end
+          begin
+              link_content = ContentFormatter.format!(page.content, nil, !@user.setting_on?(:disable_image_proxy))
+          rescue
+              link_content = nil
+          end
+          %>
 
-        <header class="entry-header">
-            <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
-            <h1><%= page.title || "Untitled" %></h1>
-            <% end %>
-            <% if page.author %>
-                <p class="post-meta">
-                    <% if page.author %>
-                        by <%= page.author %>
-                    <% end %>
-                </p>
-            <% end %>
-        </header>
-        <div class="content-styles" data-behavior="view_link_markup_wrap">
-            <%= link_content.html_safe %>
-        </div>
+          <% if link_content %>
+              <p class="post-meta new-section">
+              <%= favicon_with_host(url.expanded_url.host) %> <%= url.expanded_url.host %>
+              </p>
+              <header class="entry-header">
+                  <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
+                  <h1><%= page.title || "Untitled" %></h1>
+                  <% end %>
+                  <p class="post-meta">
+                      <% if page.author %>
+                          by <%= page.author %>
+                      <% end %>
+                  </p>
+              </header>
+              <div class="content-styles" data-behavior="view_link_markup_wrap">
+                  <%= link_content.html_safe %>
+              </div>
+          <% end %>
+        <% end %>
 
       <% end %>
     </div>

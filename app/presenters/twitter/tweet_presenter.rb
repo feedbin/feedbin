@@ -1,5 +1,14 @@
 class Twitter::TweetPresenter < BasePresenter
 
+  YOUTUBE_URLS = [
+    %r(https?://youtu\.be/(.+)),
+    %r(https?://www\.youtube\.com/watch\?v=(.*?)(&|#|$)),
+    %r(https?://m\.youtube\.com/watch\?v=(.*?)(&|#|$)),
+    %r(https?://www\.youtube\.com/embed/(.*?)(\?|$)),
+    %r(https?://www\.youtube\.com/v/(.*?)(#|\?|$)),
+    %r(https?://www\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b)
+  ]
+
   presents :tweet
 
   def text
@@ -55,6 +64,28 @@ class Twitter::TweetPresenter < BasePresenter
       main_tweet.user.profile_image_uri("bigger")
     else
       # default twitter avatar
+    end
+  end
+
+  def find_video_url(variants)
+    video = variants.max_by do |element|
+      if element.content_type == "video/mp4" && element.bitrate
+        element.bitrate
+      else
+        0
+      end
+    end
+
+    video.url.to_s
+  end
+
+  def youtube_embed(url)
+    url = url.expanded_url.to_s
+    if YOUTUBE_URLS.find { |format| url =~ format } && $1
+      youtube_id = $1
+      @template.content_tag(:iframe, "", src: "https://www.youtube.com/embed/#{youtube_id}", height: 9, width: 16, frameborder: 0, allowfullscreen: true).html_safe
+    else
+      false
     end
   end
 
