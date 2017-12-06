@@ -16,7 +16,7 @@ class ParsedTweetEntry < ParsedEntry
   end
 
   def content
-    Twitter::Autolink.auto_link_with_json(@tweet.full_text, @tweet.to_hash[:entities])
+    Twitter::Autolink.auto_link_with_json(to_h[:full_text], to_h[:extended_entities])
   end
 
   def data
@@ -35,6 +35,10 @@ class ParsedTweetEntry < ParsedEntry
 
   def url
     @tweet.url.to_s
+  end
+
+  def to_h
+    @to_h ||= @tweet.to_h
   end
 
 end
