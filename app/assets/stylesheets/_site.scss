@@ -3322,6 +3322,7 @@ $saved-search-control-height: 48px;
 }
 
 .tweet-wrap {
+    padding-left: 60px;
     .tweet-header {
         position: relative;
         h1 {
@@ -3349,6 +3350,7 @@ $saved-search-control-height: 48px;
         }
     }
     .retweeted-by {
+        font-size: 14px;
         img {
             position: relative;
             top: 2px;
