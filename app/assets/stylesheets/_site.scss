@@ -2617,7 +2617,7 @@ $saved-search-control-height: 48px;
     font-size: 17px;
     @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
     line-height: 1.2;
-    margin: .2em;
+    margin-bottom: .2em;
     .icon-clock {
         float: left;
         margin-right: 5px;
