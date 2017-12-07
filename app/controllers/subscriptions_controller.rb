@@ -5,7 +5,7 @@ class SubscriptionsController < ApplicationController
     @user = current_user
     if params[:tag] == 'all' || params[:tag].blank?
       @tags = @user.feed_tags
-      @feeds = @user.feeds
+      @feeds = @user.feeds.xml
     else
       @feeds = []
       @tags = Tag.where(id: params[:tag])
