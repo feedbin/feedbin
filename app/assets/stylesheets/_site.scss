@@ -3330,8 +3330,10 @@ $saved-search-control-height: 48px;
             margin: 0;
             padding-right: 25px;
         }
-        h2, h2 a {
+        h2 {
             padding-right: 25px;
+        }
+        h2, h2 a {
             font-size: 14px;
             font-weight: normal;
             margin: 0 0 1.1em 0;
@@ -3349,7 +3351,10 @@ $saved-search-control-height: 48px;
             line-height: 1.4;
         }
     }
-    .retweeted-by {
+    .tweet-meta-wrap {
+
+    }
+    .tweet-meta {
         font-size: 14px;
         img {
             position: relative;

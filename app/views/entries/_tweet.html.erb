@@ -4,7 +4,10 @@
       <header class="tweet-header">
         <%= image_tag tweet_presenter.profile_image_uri, size: "45x45" %>
         <h1><%= tweet_presenter.name %></h1>
-        <h2><a href="<%= tweet_presenter.user_url %>" target="_blank"><%= tweet_presenter.screen_name %></a></h2>
+        <h2>
+          <%= tweet_presenter.created_at_display %>
+          by <a href="<%= tweet_presenter.user_url %>" target="_blank"><%= tweet_presenter.screen_name %></a>
+        </h2>
         <%= link_to entry.tweet.uri.to_s, target: "_blank", title: "View on Twitter", class: "twitter-link" do %>
             <%= svg_tag "icon-twitter" %>
         <% end %>
@@ -12,9 +15,17 @@
 
       <p class="tweet-text"><%= tweet_presenter.text %></p>
 
-      <% if entry.tweet.retweeted_status? %>
-        <p class="retweeted-by"><%= image_tag tweet_presenter.retweeted_image, size: "16x16" %> <%= tweet_presenter.retweeted_message %></p>
-      <% end %>
+      <div class="tweet-meta-wrap">
+        <p class="tweet-meta">
+          <%= tweet_presenter.location %>
+        </p>
+        <% if entry.tweet.retweeted_status? %>
+          <p class="tweet-meta">
+            <%= image_tag tweet_presenter.retweeted_image, size: "16x16" %>
+            <%= tweet_presenter.retweeted_message %>
+          </p>
+        <% end %>
+      </div>
 
       <% tweet_presenter.media.each do |media| %>
         <div class="content-styles">

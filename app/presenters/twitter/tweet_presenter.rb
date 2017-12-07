@@ -89,4 +89,17 @@ class Twitter::TweetPresenter < BasePresenter
     end
   end
 
+  def created_at
+    # 12:08 PM - 6 Nov 2017
+    main_tweet.created_at.strftime("%l:%M %p - %e %b %Y")
+  end
+
+  def created_at_display
+    # 12:08 PM - 6 Nov 2017
+    main_tweet.created_at.to_s(:full_human)
+  end
+
+  def location
+    (main_tweet.place?) ? main_tweet.place.full_name : nil
+  end
 end
