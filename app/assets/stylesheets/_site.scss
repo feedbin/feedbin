@@ -113,6 +113,8 @@ body, html {
 }
 
 body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
     font-family: $font-stack;
     font-size: 14px;
     background-color: $body-background-color;
@@ -934,7 +936,6 @@ Structure
 }
 
 .feeds-toolbar {
-    height: $feeds-toolbar-height;
     border-top: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     position: absolute;
@@ -944,6 +945,11 @@ Structure
     right: 0;
     font-size: 10px;
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    height: $feeds-toolbar-height;
+    .standalone-navigator & {
+        height: calc(#{$feeds-toolbar-height - 8px} + env(safe-area-inset-bottom));
+        min-height: $feeds-toolbar-height !important;
+    }
     table {
         margin-top: 8px;
         width: 100%;
@@ -2833,13 +2839,11 @@ $saved-search-control-height: 48px;
     }
 
     h1, h2, h3, h4, h5, h6 {
-        font-weight: 700;
+        font-weight: bold;
         font-style: normal;
         margin: 0 0 .5em 0;
         text-rendering: optimizeLegibility;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-        font-family: "Whitney SSm A", "Whitney SSm B", $font-stack !important;
-        font-style: normal;
     }
 
     h1, h2 {
@@ -7349,16 +7353,16 @@ Bigfoot
 /*------------------------------------------------------------------------------
 Media Queries
 ------------------------------------------------------------------------------*/
-@media only screen and (max-width:1024px) {
+@media only screen and (max-width:1125px) {
     .feeds-column {
-        width: 240px !important;
+        width: 220px !important;
     }
     .entries-column {
-        width: 300px !important;
+        width: 260px !important;
     }
 }
 
-@media (max-width:768px) {
+@media (max-width:855px) {
     .entry-selected .content {
         top: 0;
     }
@@ -7501,7 +7505,10 @@ Media Queries
         bottom: 0;
     }
     .entries-inner {
-        bottom: 51px;
+        bottom: $feeds-toolbar-height - 1px;
+        .standalone-navigator & {
+            bottom: calc(#{$feeds-toolbar-height - 9px} + env(safe-area-inset-bottom));
+        }
     }
     .entry-header h1 {
         font-size: 1.6em;
