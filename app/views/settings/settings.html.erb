@@ -86,13 +86,29 @@
         <div class="inset-content">
             <h4 class="group-header"><a name="twitter"></a>Twitter</h4>
         </div>
-
-        <ul class="pill-list">
-            <li><%= link_to "Activate Twitter Support", new_twitter_authentication_path %></li>
-        </ul>
-        <p class="control-group-description no-margin">
-            Once activated you will be able to subscribe to Twitter users and searches.
-        </p>
+        <% if @user.twitter_enabled? %>
+            <ul class="control-group control-group-form">
+                <li>
+                    <%= f.check_box :twitter_links_enabled, data: {behavior: "auto_submit"} %>
+                    <%= f.label :twitter_links_enabled do %>
+                      Twitter Links <span class="slider-checkbox"></span>
+                    <% end %>
+                </li>
+            </ul>
+            <p class="control-group-description">
+                Subscribe to all tweets with links and images from everyone <strong>@<%= @user.twitter_screen_name %></strong> follows.
+            </p>
+            <ul class="pill-list no-margin">
+                <li><%= link_to "Deactivate Twitter", delete_twitter_authentications_path, class: "danger", method: :delete, data: { confirm: "Are you sure you want to deactivate Twitter? Your Twitter feeds will no longer be updated."} %></li>
+            </ul>
+        <% else %>
+            <ul class="pill-list">
+                <li><%= link_to "Activate Twitter", new_twitter_authentication_path %></li>
+            </ul>
+            <p class="control-group-description no-margin">
+                Once activated you will be able to subscribe to Twitter users and searches.
+            </p>
+        <% end %>
 
     </div>
 

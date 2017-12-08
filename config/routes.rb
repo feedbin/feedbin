@@ -163,9 +163,10 @@ Rails.application.routes.draw do
 
   get :settings_subscriptions_edit, path: "/settings/feeds/:id/edit", to: 'subscriptions#edit'
 
-  resources :twitter_authentications, only: [:new, :destroy] do
+  resources :twitter_authentications, only: [:new] do
     collection do
       get :save
+      delete :delete
     end
   end
 

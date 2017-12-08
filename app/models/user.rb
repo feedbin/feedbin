@@ -39,7 +39,10 @@ class User < ApplicationRecord
                  :audio_panel_size,
                  :view_links_in_app,
                  :twitter_access_secret,
-                 :twitter_access_token
+                 :twitter_access_token,
+                 :twitter_screen_name,
+                 :twitter_access_error,
+                 :twitter_links_enabled
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -79,6 +82,8 @@ class User < ApplicationRecord
   before_create { generate_token(:newsletter_token, 4) }
 
   before_update :update_billing, unless: -> { !ENV['STRIPE_API_KEY'] }
+
+  before_update :check_settings
 
   after_create { schedule_trial_jobs }
 
@@ -261,6 +266,16 @@ class User < ApplicationRecord
       coupon_record = Coupon.find_by_coupon_code(coupon_code)
       coupon_record.update(redeemed: true)
       self.coupon = coupon_record
+    end
+  end
+
+  def check_settings
+    if settings_changed?
+      if setting_on?(:twitter_links_enabled) && settings_was["twitter_links_enabled"] != "1"
+        TwitterLinkFeed.perform_async(self.id, true)
+      elsif !setting_on?(:twitter_links_enabled) && settings_was["twitter_links_enabled"] == "1"
+        TwitterLinkFeed.perform_async(self.id, false)
+      end
     end
   end
 

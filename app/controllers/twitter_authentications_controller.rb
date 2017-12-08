@@ -29,7 +29,7 @@ class TwitterAuthenticationsController < ApplicationController
     klass = TwitterAPI.new
     if klass.response_valid?(session, params)
       access_token = klass.request_access(session.delete(:oauth_token), session.delete(:oauth_secret), params[:oauth_verifier])
-      @user.update(twitter_access_token: access_token.token, twitter_access_secret: access_token.secret)
+      @user.update(twitter_access_token: access_token.token, twitter_access_secret: access_token.secret, twitter_screen_name: access_token.params[:screen_name])
       redirect_to settings_url, notice: "Twitter has been activated!"
     else
       redirect_to settings_url, alert: "Feedbin needs your permission to activate Twitter."
@@ -43,9 +43,9 @@ class TwitterAuthenticationsController < ApplicationController
     redirect_to settings_url, alert: "Unknown Twitter error."
   end
 
-  def destroy
+  def delete
+    @user.update(twitter_access_token: nil, twitter_access_secret: nil, twitter_screen_name: nil, twitter_links_enabled: 0)
+    redirect_to settings_url, notice: "Twitter has been deactivated."
   end
-
-
 
 end
