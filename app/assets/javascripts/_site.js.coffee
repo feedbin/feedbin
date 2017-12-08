@@ -713,6 +713,10 @@ $.extend feedbin,
       if 'ontouchstart' of document
         $('body').addClass('touch')
 
+    isStandalone: ->
+      if 'standalone' of window.navigator && window.navigator.standalone
+        $('body').addClass('standalone-navigator')
+
     initSingletons: ->
       new feedbin.CountsBehavior()
 
