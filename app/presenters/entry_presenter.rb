@@ -280,6 +280,27 @@ class EntryPresenter < BasePresenter
     decoder.decode(@template.strip_tags(entry.summary))
   end
 
+  def summary(text)
+    output = ""
+    parts = text.split('. ')
+    a = parts.each_with_index do |part, index|
+      new_part = part + ". "
+      output << new_part
+      if index == 0
+        if output.length > 216
+          output = output[0..216]
+          output = output[0..-2]
+          return output << "…"
+        end
+      else
+        if output.length > 216
+          return output.sub(new_part, "")
+        end
+      end
+    end
+    output
+  end
+
   def app_title
     (entry.title.present?) ? decoder.decode(@template.strip_tags(entry.title.strip)) : nil
   end

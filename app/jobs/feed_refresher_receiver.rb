@@ -35,7 +35,7 @@ class FeedRefresherReceiver
       FeedbinUtils.update_public_id_cache(entry['public_id'], entry['content'], entry['data']['public_id_alt'])
       if published_recently?(original_entry.published)
         entry_update = entry.slice('author', 'content', 'title', 'url', 'entry_id', 'data')
-        entry_update['summary'] = ContentFormatter.summary(entry_update['content'], 86)
+        entry_update['summary'] = ContentFormatter.summary(entry_update['content'], 256)
 
         original_content = original_entry.content.to_s.clone
         new_content = entry_update['content'].to_s.clone
