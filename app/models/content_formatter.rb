@@ -145,7 +145,7 @@ class ContentFormatter
     end
 
     if length
-      text = text.truncate(86, separator: " ")
+      text = text.truncate(length, separator: " ", omission: "")
     end
 
     text

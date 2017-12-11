@@ -179,7 +179,7 @@ class Entry < ApplicationRecord
   end
 
   def create_summary
-    self.summary = ContentFormatter.summary(self.content, 86)
+    self.summary = ContentFormatter.summary(self.content, 256)
   end
 
   def touch_feed_last_published_entry
