@@ -2,10 +2,12 @@
 <div class="tweet-wrap">
   <header class="tweet-header">
     <%= image_tag entry_presenter.tweet_profile_image_uri, size: "45x45" %>
-    <h1><%= entry_presenter.tweet_name %></h1>
+    <h1><a href="<%= entry_presenter.tweet_user_url %>" target="_blank"><%= entry_presenter.tweet_name %> <span><%= entry_presenter.tweet_screen_name %></span></a></h1>
     <h2>
       <%= entry_presenter.tweet_created_at_display %>
-      by <a href="<%= entry_presenter.tweet_user_url %>" target="_blank"><%= entry_presenter.tweet_screen_name %></a>
+      <% if entry_presenter.tweet_location %>
+          from <%= entry_presenter.tweet_location %>
+      <% end %>
     </h2>
     <%= link_to entry.tweet.uri.to_s, target: "_blank", title: "View on Twitter", class: "twitter-link" do %>
         <%= svg_tag "icon-twitter" %>
@@ -14,17 +16,14 @@
 
   <p class="tweet-text"><%= entry_presenter.tweet_text %></p>
 
-  <div class="tweet-meta-wrap">
-    <p class="tweet-meta">
-      <%= entry_presenter.tweet_location %>
-    </p>
     <% if entry.tweet.retweeted_status? %>
-      <p class="tweet-meta">
-        <%= image_tag entry_presenter.tweet_retweeted_image, size: "16x16" %>
-        <%= entry_presenter.tweet_retweeted_message %>
-      </p>
+      <div class="tweet-meta-wrap">
+          <p class="tweet-meta">
+            <%= image_tag entry_presenter.tweet_retweeted_image, size: "16x16" %>
+            <%= entry_presenter.tweet_retweeted_message %>
+          </p>
+      </div>
     <% end %>
-  </div>
 
   <% entry_presenter.tweet_media.each do |media| %>
     <div class="content-styles">
@@ -35,6 +34,8 @@
     <% end %>
     </div>
   <% end %>
+
+<hr />
 
   <% entry_presenter.tweet_urls.each do |url| %>
 

@@ -25,7 +25,7 @@ class ParsedTweetEntry < ParsedEntry
 
   def data
     value = {}
-    value["tweet"] = tweet_hash
+    value["tweet"] = @tweet.to_h
     value
   end
 
