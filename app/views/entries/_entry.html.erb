@@ -19,12 +19,14 @@
         </p>
         <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
         <span class="title-wrap">
-            <h2 class="title">
-                <%= entry_presenter.profile_image(entry.feed) %>
-                <span><%= entry_presenter.title %></span>
-            </h2>
-            <% if entry_presenter.has_content? && entry_presenter.sanitized_title.present?  %>
-                <p class="body"><%= entry.summary.html_safe %></p>
+            <% if !entry.tweet? %>
+                <h2 class="title">
+                    <%= entry_presenter.profile_image(entry.feed) %>
+                    <span><%= entry_presenter.title %></span>
+                </h2>
+            <% end %>
+            <% if entry_presenter.show_body?  %>
+                <p class="body"><%= entry_presenter.summary %></p>
             <% end %>
             <%= entry_presenter.image %>
         </span>

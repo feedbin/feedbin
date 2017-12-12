@@ -93,19 +93,23 @@ class EntryPresenter < BasePresenter
     entry.summary.respond_to?(:length) && entry.summary.length > 0
   end
 
-  def title
-    if entry.tweet
-      tweet_hash[:full_text]
+  def show_body?
+    if entry.tweet?
+      true
     else
-      text = sanitized_title
-      if text.blank?
-        text = entry.summary.html_safe
-      end
-      if text.blank?
-        text = '&ndash;&ndash;'.html_safe
-      end
-      @template.truncate(text, length: 98, omission: '…', escape: false)
+      has_content? && sanitized_title.present?
     end
+  end
+
+  def title
+    text = sanitized_title
+    if text.blank?
+      text = entry.summary.html_safe
+    end
+    if text.blank?
+      text = '&ndash;&ndash;'.html_safe
+    end
+    @template.truncate(text, length: 98, omission: '…', escape: false)
   end
 
   def entry_view_title
@@ -306,7 +310,15 @@ class EntryPresenter < BasePresenter
     decoder.decode(@template.strip_tags(entry.summary))
   end
 
-  def summary(text)
+  def summary
+    if entry.tweet
+      tweet_hash[:full_text]
+    else
+      entry.summary.html_safe
+    end
+  end
+
+  def trimmed_summary(text)
     output = ""
     parts = text.split('. ')
     a = parts.each_with_index do |part, index|

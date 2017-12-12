@@ -1267,7 +1267,8 @@ Structure
     display: flex;
     align-items: center;
     box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
-    .favicon, svg {
+    border-radius: 1px;
+    .favicon, svg, img {
         background-repeat: no-repeat;
         background-position: center center;
         background-size: 16px 16px;
@@ -1276,6 +1277,12 @@ Structure
         display: block;
         margin: auto;
     }
+    &.twitter-profile-image {
+        border-radius: 20px;
+        img {
+            border-radius: 16px;
+        }
+    }
     .entries & {
         background-color: transparent;
         box-shadow: none;
@@ -1283,19 +1290,6 @@ Structure
             background-color: #FFF;
             box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
         }
-    }
-}
-
-.twitter-profile-image {
-    height: 20px;
-    width: 20px;
-    top: -19px !important;
-    border-radius: 20px;
-    img {
-        margin: auto;
-        border-radius: 16px;
-        height: 16px;
-        width: 16px;
     }
 }
 
@@ -1574,13 +1568,8 @@ $saved-search-control-height: 48px;
         border-bottom: 1px solid transparent;
         position: relative;
         @include border-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-        > .favicon-wrap, > .twitter-profile-image {
+        > .favicon-wrap {
             display: none;
-        }
-    }
-    &.tweet {
-        .entries-inner-wrap {
-            min-height: 59px;
         }
     }
     .entry-image {
@@ -1662,19 +1651,6 @@ $saved-search-control-height: 48px;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         position: relative;
     }
-    &.tweet {
-        .title {
-            line-height: 1.3;
-            font-size: 12px;
-            margin: 0;
-            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
-            font-weight: normal;
-            line-height: 1.1;
-            span {
-                white-space: pre-wrap;
-            }
-        }
-    }
     .feed-title {
         font-size: 12px;
         line-height: 1.3;
@@ -1685,20 +1661,6 @@ $saved-search-control-height: 48px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    &.tweet {
-        .feed-title {
-            strong {
-                font-weight: bold;
-            }
-            margin: 0;
-            font-size: 14px;
-            line-height: 1.1;
-            display: block;
-            margin-bottom: 4px;
-            @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-            position: relative;
-        }
-    }
     .icon-play {
         display: inline-block;
     }
@@ -1708,6 +1670,36 @@ $saved-search-control-height: 48px;
         margin: 0;
         @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    &.tweet {
+        .entries-inner-wrap {
+            > .favicon-wrap {
+                display: flex;
+                top: 8px;
+                z-index: 3;
+            }
+        }
+        .title {
+            display: none;
+        }
+        .feed-title {
+            strong {
+                font-weight: bold;
+            }
+            margin: 0;
+            font-size: 14px;
+            display: block;
+            margin-bottom: 4px;
+            @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+            position: relative;
+        }
+        .body {
+            white-space: pre-wrap;
+            overflow: visible;
+        }
     }
     &.starred {
         .icon-star {
@@ -1854,12 +1846,18 @@ $saved-search-control-height: 48px;
         }
     }
     .feed-title {
-        position: absolute;
+        position: absolute !important;
         width: 110px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         padding: 0 10px 0 0;
+
+        font-size: 12px !important;
+        line-height: 1.3 !important;
+        strong {
+            font-weight: normal !important;
+        }
     }
     .title-wrap {
         overflow: hidden;
@@ -1876,6 +1874,9 @@ $saved-search-control-height: 48px;
     .title, .body {
         display: inline;
         line-height: 1;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
     }
     .feed-title, .time {
         top: 9px;
