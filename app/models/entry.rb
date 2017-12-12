@@ -18,6 +18,7 @@ class Entry < ApplicationRecord
   after_commit :add_to_published_set, on: :create
   after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
+  after_commit :save_pages, on: :create
 
   validate :has_content
   validates :feed, :public_id, presence: true
@@ -202,6 +203,12 @@ class Entry < ApplicationRecord
     EntryImage.perform_async(self.id)
     if self.data && self.data['itunes_image']
       ItunesImage.perform_async(self.id, self.data['itunes_image'])
+    end
+  end
+
+  def save_pages
+    if self.tweet?
+      SavePages.perform_async(self.id)
     end
   end
 

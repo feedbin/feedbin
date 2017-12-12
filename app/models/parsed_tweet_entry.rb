@@ -12,7 +12,7 @@ class ParsedTweetEntry < ParsedEntry
   end
 
   def author
-    @tweet.user.name || "@#{@tweet.user.name.screen_name}"
+    main_tweet.user.name || "@#{main_tweet.user.name.screen_name}"
   end
 
   def content
@@ -41,8 +41,12 @@ class ParsedTweetEntry < ParsedEntry
     @tweet.url.to_s
   end
 
+  def main_tweet
+    (@tweet.retweeted_status?) ? @tweet.retweeted_status : @tweet
+  end
+
   def tweet_hash
-    @tweet_hash ||= @tweet.to_h
+    @tweet_hash ||= main_tweet.to_h
   end
 
 end

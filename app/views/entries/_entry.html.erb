@@ -13,15 +13,15 @@
         href="/entries/<%= entry.id %>"
     >
     <span class="entries-inner-wrap">
-        <%= entry_presenter.favicon(entry.feed) %>
+        <%= entry_presenter.profile_image(entry.feed) %>
         <p class="feed-title">
-            <span class="title-inner" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= entry.feed.title %></span>
+            <%= entry_presenter.feed_title %>
         </p>
         <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
         <span class="title-wrap">
             <h2 class="title">
-                <%= entry_presenter.favicon(entry.feed) %>
-                <%= entry_presenter.title %>
+                <%= entry_presenter.profile_image(entry.feed) %>
+                <span><%= entry_presenter.title %></span>
             </h2>
             <% if entry_presenter.has_content? && entry_presenter.sanitized_title.present?  %>
                 <p class="body"><%= entry.summary.html_safe %></p>

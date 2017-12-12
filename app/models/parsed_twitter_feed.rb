@@ -40,7 +40,7 @@ class ParsedTwitterFeed
     when :user
       "@#{@value}"
     when :search
-      "Twitter Search: @#{@value}"
+      "Twitter Search: #{@value}"
     when :list
       "Twitter List: @#{@value}"
     when :home_timeline

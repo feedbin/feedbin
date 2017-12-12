@@ -1,5 +1,14 @@
 class EntryPresenter < BasePresenter
 
+  YOUTUBE_URLS = [
+    %r(https?://youtu\.be/(.+)),
+    %r(https?://www\.youtube\.com/watch\?v=(.*?)(&|#|$)),
+    %r(https?://m\.youtube\.com/watch\?v=(.*?)(&|#|$)),
+    %r(https?://www\.youtube\.com/embed/(.*?)(\?|$)),
+    %r(https?://www\.youtube\.com/v/(.*?)(#|\?|$)),
+    %r(https?://www\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b)
+  ]
+
   presents :entry
 
   def entry_link(&block)
@@ -85,14 +94,18 @@ class EntryPresenter < BasePresenter
   end
 
   def title
-    text = sanitized_title
-    if text.blank?
-      text = entry.summary.html_safe
+    if entry.tweet
+      tweet_hash[:full_text]
+    else
+      text = sanitized_title
+      if text.blank?
+        text = entry.summary.html_safe
+      end
+      if text.blank?
+        text = '&ndash;&ndash;'.html_safe
+      end
+      @template.truncate(text, length: 98, omission: '…', escape: false)
     end
-    if text.blank?
-      text = '&ndash;&ndash;'.html_safe
-    end
-    @template.truncate(text, length: 98, omission: '…', escape: false)
   end
 
   def entry_view_title
@@ -146,10 +159,23 @@ class EntryPresenter < BasePresenter
     output
   end
 
-  def media_class
-    if media_type == :audio
-      "media"
+  def saved_page(url)
+    if entry.data && entry.data['saved_pages'] && page = entry.data['saved_pages'][url]
+      MercuryParser.new(nil, page)
     end
+  end
+
+  def media_class
+    classes = []
+    if media_type == :audio
+      classes.push("media")
+    end
+
+    if entry.tweet?
+      classes.push("tweet")
+    end
+
+    classes.join(" ")
   end
 
   def media_type
@@ -323,6 +349,121 @@ class EntryPresenter < BasePresenter
     end
   rescue
     nil
+  end
+
+  def profile_image(feed)
+    if entry.tweet?
+      @template.content_tag :span, '', class: "twitter-profile-image" do
+        @template.image_tag(tweet_profile_image_uri)
+      end
+    else
+      favicon(feed)
+    end
+  end
+
+  def feed_title
+    if entry.tweet?
+      @template.content_tag(:span, '', class: "title-inner twitter-feed-title") do
+        @template.content_tag(:strong, tweet_name) + " #{tweet_screen_name}"
+      end
+    else
+      @template.content_tag(:span, '', class: "title-inner", data: {behavior: "user_title", feed_id: entry.feed.id}) do
+        entry.feed.title
+      end
+    end
+  end
+
+  def tweet_text
+    if tweet_hash[:entities]
+      Twitter::Autolink.auto_link_with_json(tweet_hash[:full_text], tweet_hash[:entities]).html_safe
+    else
+      tweet_hash[:full_text]
+    end
+  end
+
+  def tweet_name
+    main_tweet.user.name
+  end
+
+  def tweet_screen_name
+    "@" + main_tweet.user.screen_name
+  end
+
+  def tweet_user_url
+    "https://twitter.com/#{main_tweet.user.screen_name}"
+  end
+
+  def tweet_media
+    main_tweet.media
+  end
+
+  def tweet_urls
+    main_tweet.urls
+  end
+
+  def tweet_retweeted_message
+    "Retweeted by " + (entry.tweet.user.name || "@" + entry.tweet.user.screen_name)
+  end
+
+  def tweet_retweeted_image
+    if entry.tweet.user.profile_image_uri?
+      entry.tweet.user.profile_image_uri("normal")
+    else
+      # default twitter avatar
+    end
+  end
+
+  # Sizes: normal, bigger
+  def tweet_profile_image_uri(size = "bigger")
+    if main_tweet.user.profile_image_uri?
+      main_tweet.user.profile_image_uri("bigger")
+    else
+      # default twitter avatar
+    end
+  end
+
+  def tweet_find_video_url(variants)
+    video = variants.max_by do |element|
+      if element.content_type == "video/mp4" && element.bitrate
+        element.bitrate
+      else
+        0
+      end
+    end
+
+    video.url.to_s
+  end
+
+  def tweet_youtube_embed(url)
+    url = url.expanded_url.to_s
+    if YOUTUBE_URLS.find { |format| url =~ format } && $1
+      youtube_id = $1
+      @template.content_tag(:iframe, "", src: "https://www.youtube.com/embed/#{youtube_id}", height: 9, width: 16, frameborder: 0, allowfullscreen: true).html_safe
+    else
+      false
+    end
+  end
+
+  def tweet_created_at
+    main_tweet.created_at.strftime("%l:%M %p - %e %b %Y")
+  end
+
+  def tweet_created_at_display
+    main_tweet.created_at.to_s(:full_human)
+  end
+
+  def tweet_location
+    (main_tweet.place?) ? main_tweet.place.full_name : nil
+  end
+
+  private
+
+  def main_tweet
+    (entry.tweet.retweeted_status?) ? entry.tweet.retweeted_status : entry.tweet
+  end
+
+  def tweet_hash
+    @tweet_hash ||= main_tweet.to_h
   end
 
 end

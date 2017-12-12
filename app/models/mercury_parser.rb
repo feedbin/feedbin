@@ -4,8 +4,9 @@ class MercuryParser
 
   attr_reader :url
 
-  def initialize(url)
+  def initialize(url, data = nil)
     @url = url
+    load_data(data) if data
   end
 
   def self.parse(url)
@@ -62,6 +63,11 @@ class MercuryParser
   def marshal_load(data)
     @result = data[:result]
     @url = data[:url]
+  end
+
+  def load_data(data)
+    @result = data["result"]
+    @url = data["url"]
   end
 
 end
