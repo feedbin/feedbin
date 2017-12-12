@@ -56,7 +56,7 @@
             if f.object.all_feeds == true
               options[:disabled] = 'disabled'
             end
-            b.label(class: "checkbox", data: {sort_name: b.text.downcase}) do
+            b.label(class: "checkbox", title: b.object.feed_url, data: {sort_name: b.text.downcase}) do
               b.check_box(options) + b.text
             end
           end
