@@ -9,7 +9,7 @@
           from <%= entry_presenter.tweet_location %>
       <% end %>
     </h2>
-    <%= link_to entry.tweet.uri.to_s, target: "_blank", title: "View on Twitter", class: "twitter-link" do %>
+    <%= link_to entry.tweet.uri.to_s, target: "_blank", title: "View on Twitter", class: "twitter-link", id: "source_link" do %>
         <%= svg_tag "icon-twitter" %>
     <% end %>
   </header>

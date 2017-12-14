@@ -2,13 +2,14 @@ class ParsedTwitterFeed
 
   attr_reader :feed, :entries
 
-  FEED_ATTRIBUTES = %i(etag feed_url last_modified self_url site_url title feed_type).freeze
+  FEED_ATTRIBUTES = %i(etag feed_url last_modified self_url site_url title feed_type options).freeze
 
-  def initialize(url, tweets, type, value)
+  def initialize(url, tweets, type, value, options = {})
     @url = url
     @tweets = tweets
     @type = type
     @value = value
+    @options = options
   end
 
   def etag
@@ -33,6 +34,10 @@ class ParsedTwitterFeed
 
   def feed_type
     :twitter
+  end
+
+  def options
+    @options
   end
 
   def title

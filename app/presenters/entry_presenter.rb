@@ -440,7 +440,7 @@ class EntryPresenter < BasePresenter
   # Sizes: normal, bigger
   def tweet_profile_image_uri(size = "bigger")
     if main_tweet.user.profile_image_uri?
-      main_tweet.user.profile_image_uri("bigger")
+      main_tweet.user.profile_image_uri_https("bigger")
     else
       # default twitter avatar
     end

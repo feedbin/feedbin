@@ -21,6 +21,15 @@ class Feed < ApplicationRecord
 
   enum feed_type: { xml: 0, newsletter: 1, twitter: 2, twitter_links: 3}
 
+
+  def twitter_user?
+    options && options["twitter_user"]
+  end
+
+  def twitter_user
+    @twitter_user ||= (twitter_user?) ? Twitter::User.new(options["twitter_user"].deep_symbolize_keys) : nil
+  end
+
   def tag(names, user, delete_existing = true)
     taggings = []
     if delete_existing

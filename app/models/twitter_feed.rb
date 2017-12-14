@@ -14,6 +14,7 @@ class TwitterFeed
   def feed
     type = nil
     tweets = nil
+    options = {}
     default_options = {
       count: 100,
       tweet_mode: "extended"
@@ -21,6 +22,7 @@ class TwitterFeed
     if value = user
       type = :user
       tweets = @api.client.user_timeline(value, default_options.merge(exclude_replies: true))
+      options["twitter_user"] = @api.client.user(value)
     elsif value = search || value = hashtag
       type = :search
       tweets = @api.client.search(value, default_options.merge(result_type: "recent", include_entities: true)).map{|a|a}
@@ -32,7 +34,7 @@ class TwitterFeed
       tweets = @api.client.home_timeline(default_options)
     end
     if tweets && value
-      ParsedTwitterFeed.new(@url.to_s, tweets, type, value)
+      ParsedTwitterFeed.new(@url.to_s, tweets, type, value, options)
     end
   end
 

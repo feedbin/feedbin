@@ -12,6 +12,10 @@ class BasePresenter
         content = @template.content_tag :span, '', class: "favicon-wrap collection-favicon favicon-newsletter-wrap" do
           @template.svg_tag('favicon-newsletter', size: "16x16")
         end
+      elsif feed.twitter_user?
+        content = @template.content_tag :span, '', class: "favicon-wrap twitter-profile-image" do
+          @template.image_tag(feed.twitter_user.profile_image_uri_https("bigger"))
+        end
       else
         markup = <<-eos
           <span class="favicon favicon-default"></span>
