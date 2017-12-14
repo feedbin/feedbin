@@ -27,10 +27,17 @@ class TwitterFeed
     elsif value = list
       type = :list
       tweets = @api.client.list_timeline(value[:user], value[:list], default_options)
+    elsif value = home
+      type = :home
+      tweets = @api.client.home_timeline(default_options)
     end
     if tweets && value
       ParsedTwitterFeed.new(@url.to_s, tweets, type, value)
     end
+  end
+
+  def home
+    @url.host == "twitter.com" && ["", "/"].include?(@url.path)
   end
 
   def user

@@ -44,7 +44,7 @@ class TwitterAuthenticationsController < ApplicationController
   end
 
   def delete
-    @user.update(twitter_access_token: nil, twitter_access_secret: nil, twitter_screen_name: nil, twitter_links_enabled: 0)
+    @user.update(twitter_access_token: nil, twitter_access_secret: nil, twitter_screen_name: nil)
     redirect_to settings_url, notice: "Twitter has been deactivated."
   end
 

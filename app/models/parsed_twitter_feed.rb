@@ -43,8 +43,8 @@ class ParsedTwitterFeed
       "Twitter Search: #{@value}"
     when :list
       "Twitter List: @#{@value}"
-    when :home_timeline
-      "@#{@value}'s Twitter Links"
+    when :home
+      "Twitter"
     end
   end
 

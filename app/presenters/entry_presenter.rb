@@ -312,7 +312,19 @@ class EntryPresenter < BasePresenter
 
   def summary
     if entry.tweet
-      tweet_hash[:full_text]
+      text = tweet_hash[:full_text]
+      if range = tweet_hash[:display_text_range]
+        range = Range.new(0, range.last, true)
+        text = text.codepoints[range].pack("U*")
+      end
+      main_tweet.urls.reverse.each do |url|
+        begin
+          range = Range.new(*url.indices, true)
+          text[range] = url.display_url
+        rescue
+        end
+      end
+      text.html_safe
     else
       entry.summary.html_safe
     end
@@ -434,18 +446,6 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def tweet_find_video_url(variants)
-    video = variants.max_by do |element|
-      if element.content_type == "video/mp4" && element.bitrate
-        element.bitrate
-      else
-        0
-      end
-    end
-
-    video.url.to_s
-  end
-
   def tweet_youtube_embed(url)
     url = url.expanded_url.to_s
     if YOUTUBE_URLS.find { |format| url =~ format } && $1
@@ -467,6 +467,38 @@ class EntryPresenter < BasePresenter
   def tweet_location
     (main_tweet.place?) ? main_tweet.place.full_name : nil
   end
+
+  def tweet_video?(media)
+    media.type == "video" || media.type == "animated_gif"
+  end
+
+  def tweet_video(media)
+    options = {
+      poster: media.media_url_https.to_s + ":large",
+      width: media.video_info.aspect_ratio.first,
+      height: media.video_info.aspect_ratio.last
+    }
+
+    if media.type == "animated_gif"
+      options["autoplay"] = true
+      options["loop"] = true
+    end
+
+    highest_quality_video = media.video_info.variants.max_by do |element|
+      if element.content_type == "video/mp4" && element.bitrate
+        element.bitrate
+      else
+        0
+      end
+    end
+
+    @template.video_tag highest_quality_video.url.to_s, options
+  end
+
+
+  def tweet_find_video_url(variants)
+  end
+
 
   private
 

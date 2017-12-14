@@ -27,8 +27,8 @@
 
   <% entry_presenter.tweet_media.each do |media| %>
     <div class="content-styles">
-    <% if media.type == "video" %>
-      <%= video_tag entry_presenter.tweet_find_video_url(media.video_info.variants), poster: media.media_url_https.to_s + ":large", width: media.video_info.aspect_ratio.first, height: media.video_info.aspect_ratio.last %>
+    <% if entry_presenter.tweet_video?(media) %>
+      <%= entry_presenter.tweet_video(media) %>
     <% else %>
       <%= image_tag media.media_url_https.to_s + ":large" %>
     <% end %>
