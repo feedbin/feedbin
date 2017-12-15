@@ -1,7 +1,7 @@
 <% present entry do |entry_presenter| %>
 <div class="tweet-wrap">
   <header class="tweet-header">
-    <%= image_tag entry_presenter.tweet_profile_image_uri, size: "45x45" %>
+    <%= image_tag entry_presenter.tweet_profile_image_uri, size: "47x47" %>
     <h1><a href="<%= entry_presenter.tweet_user_url %>" target="_blank"><%= entry_presenter.tweet_name %> <span><%= entry_presenter.tweet_screen_name %></span></a></h1>
     <h2>
       <%= entry_presenter.tweet_created_at_display %>

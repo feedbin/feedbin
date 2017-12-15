@@ -3404,9 +3404,14 @@ $saved-search-control-height: 48px;
             @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         }
         img {
+            border: 2px solid white;
             position: absolute;
             left: -60px;
-            border-radius: 45px;
+            border-radius: 47px;
+            box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+            .theme-day & {
+                box-shadow: none;
+            }
         }
     }
     .entry-header {
