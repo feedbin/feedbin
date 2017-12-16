@@ -16,7 +16,6 @@ class EntryImage
   def schedule
     if !@entry.processed_image?
       options = build_options
-      puts options.inspect
       Sidekiq::Client.push(
         'args'  => EntryImage.build_find_image_args(@entry, options),
         'class' => 'FindImage',
@@ -31,7 +30,9 @@ class EntryImage
     if @entry.tweet?
       tweet = (@entry.tweet.retweeted_status?) ? @entry.tweet.retweeted_status : @entry.tweet
       if tweet.media?
-        options["link"] = tweet.media.last.media_url_https.to_s
+        options["urls"] = [tweet.media.last.media_url_https.to_s]
+      elsif tweet.urls?
+        options["urls"] = tweet.urls.map {|url| url.expanded_url.to_s}
       end
     end
     options

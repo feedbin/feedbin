@@ -8,11 +8,8 @@ class SavePages
 
     tweets = [tweet]
     tweets.push(tweet.retweeted_status) if tweet.retweeted_status?
-    urls = tweets.each_with_object([]) do |tweet, array|
-      tweet.urls.each do |url|
-        array.push(url.expanded_url.to_s)
-      end
-    end
+    tweets.push(tweet.quoted_status) if tweet.quoted_status?
+    urls = find_urls(tweets)
 
     saved_pages = urls.each_with_object({}) do |url, hash|
       key = FeedbinUtils.page_cache_key(url)
@@ -26,6 +23,24 @@ class SavePages
     end
     entry.data["saved_pages"] = saved_pages
     entry.save!
+  end
+
+  def find_urls(tweets)
+    tweets.each_with_object([]) do |tweet, array|
+      tweet.urls.each do |url|
+        url = url.expanded_url.to_s
+        array.push(url) if url_valid?(url)
+      end
+    end
+  end
+
+  def url_valid?(url)
+    url = URI.parse(url)
+    if url.host == "twitter.com" && url.path.include?("/status/")
+      false
+    else
+      true
+    end
   end
 
 end

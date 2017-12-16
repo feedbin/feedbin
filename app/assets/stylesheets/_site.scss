@@ -3414,6 +3414,28 @@ $saved-search-control-height: 48px;
             }
         }
     }
+    .quoted-tweet {
+        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        margin-bottom: 1.1em;
+        padding: 10px 12px;
+        border-radius: 4px;
+        h1 {
+            font-size: 18px;
+            margin: 0;
+            padding-right: 25px;
+            a {
+                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+                text-decoration: none;
+            }
+            span {
+                font-weight: normal;
+            }
+        }
+        p {
+            margin-bottom: 0;
+        }
+    }
     .entry-header {
         h1 {
             font-size: 1.2em;

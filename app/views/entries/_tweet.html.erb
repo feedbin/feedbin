@@ -16,14 +16,26 @@
 
   <p class="tweet-text"><%= entry_presenter.tweet_text %></p>
 
-    <% if entry.tweet.retweeted_status? %>
-      <div class="tweet-meta-wrap">
-          <p class="tweet-meta">
-            <%= image_tag entry_presenter.tweet_retweeted_image, size: "16x16" %>
-            <%= entry_presenter.tweet_retweeted_message %>
-          </p>
-      </div>
-    <% end %>
+  <% if entry.tweet.retweeted_status? %>
+    <div class="tweet-meta-wrap">
+        <p class="tweet-meta">
+          <%= image_tag entry_presenter.tweet_retweeted_image, size: "16x16" %>
+          <%= entry_presenter.tweet_retweeted_message %>
+        </p>
+    </div>
+  <% end %>
+
+  <% if entry.tweet.quoted_status? %>
+  <div class="quoted-tweet">
+    <h1>
+      <a href="<%= entry_presenter.tweet_user_url(entry.tweet.quoted_status) %>" target="_blank">
+        <%= entry_presenter.tweet_name(entry.tweet.quoted_status) %>
+        <span><%= entry_presenter.tweet_screen_name(entry.tweet.quoted_status) %></span>
+      </a>
+    </h1>
+    <p class="tweet-text"><%= entry_presenter.tweet_text(entry.tweet.quoted_status) %></p>
+  </div>
+  <% end %>
 
   <% entry_presenter.tweet_media.each do |media| %>
     <div class="content-styles">
@@ -41,6 +53,8 @@
 
     <% if entry_presenter.tweet_youtube_embed(url) %>
       <%= entry_presenter.tweet_youtube_embed(url) %>
+    <% elsif entry_presenter.tweet_instagram_embed(url) %>
+      <%= entry_presenter.tweet_instagram_embed(url) %>
     <% elsif page = entry_presenter.saved_page(url.expanded_url.to_s) %>
 
       <%

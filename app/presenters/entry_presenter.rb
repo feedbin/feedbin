@@ -9,6 +9,10 @@ class EntryPresenter < BasePresenter
     %r(https?://www\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b)
   ]
 
+  INSTAGRAM_URLS = [
+    %r(https?://www\.instagram\.com/p/(.*?)(/|#|\?|$))
+  ]
+
   presents :entry
 
   def entry_link(&block)
@@ -397,24 +401,29 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def tweet_text
-    if tweet_hash[:entities]
-      Twitter::Autolink.auto_link_with_json(tweet_hash[:full_text], tweet_hash[:entities]).html_safe
+  def tweet_text(tweet = nil)
+    tweet = tweet ? tweet : main_tweet
+    hash = tweet.to_h
+    if hash[:entities]
+      Twitter::Autolink.auto_link_with_json(hash[:full_text], hash[:entities]).html_safe
     else
-      tweet_hash[:full_text]
+      hash[:full_text]
     end
   end
 
-  def tweet_name
-    main_tweet.user.name
+  def tweet_name(tweet = nil)
+    tweet = tweet ? tweet : main_tweet
+    tweet.user.name
   end
 
-  def tweet_screen_name
-    "@" + main_tweet.user.screen_name
+  def tweet_screen_name(tweet = nil)
+    tweet = tweet ? tweet : main_tweet
+    "@" + tweet.user.screen_name
   end
 
-  def tweet_user_url
-    "https://twitter.com/#{main_tweet.user.screen_name}"
+  def tweet_user_url(tweet = nil)
+    tweet = tweet ? tweet : main_tweet
+    "https://twitter.com/#{tweet.user.screen_name}"
   end
 
   def tweet_media
@@ -451,6 +460,18 @@ class EntryPresenter < BasePresenter
     if YOUTUBE_URLS.find { |format| url =~ format } && $1
       youtube_id = $1
       @template.content_tag(:iframe, "", src: "https://www.youtube.com/embed/#{youtube_id}", height: 9, width: 16, frameborder: 0, allowfullscreen: true).html_safe
+    else
+      false
+    end
+  end
+
+  def tweet_instagram_embed(url)
+    url = url.expanded_url.to_s
+    if INSTAGRAM_URLS.find { |format| url =~ format } && $1
+      instagram_id = $1
+      @template.link_to url, class: "content-styles", target: "_blank" do
+        @template.image_tag("https://instagram.com/p/#{instagram_id}/media/?size=l")
+      end
     else
       false
     end
@@ -495,9 +516,6 @@ class EntryPresenter < BasePresenter
     @template.video_tag highest_quality_video.url.to_s, options
   end
 
-
-  def tweet_find_video_url(variants)
-  end
 
 
   private
