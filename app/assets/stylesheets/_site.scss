@@ -3414,36 +3414,11 @@ $saved-search-control-height: 48px;
             }
         }
     }
-    .quoted-tweet {
-        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-        margin-bottom: 1.1em;
-        padding: 10px 12px;
-        border-radius: 4px;
-        h1 {
-            font-size: 18px;
-            margin: 0;
-            padding-right: 25px;
-            a {
-                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-                text-decoration: none;
-            }
-            span {
-                font-weight: normal;
-            }
-        }
-        p {
-            margin-bottom: 0;
-        }
-    }
     .entry-header {
         h1 {
             font-size: 1.2em;
             line-height: 1.4;
         }
-    }
-    .tweet-meta-wrap {
-
     }
     .tweet-meta {
         font-size: 14px;
@@ -3479,6 +3454,30 @@ $saved-search-control-height: 48px;
             width: 18px;
             height: 15px;
             @include fill($text-color-body, $text-color-body-night, $text-color-body-sunset);
+        }
+    }
+    .quoted-tweet {
+        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        margin-bottom: 1.1em;
+        padding: 10px 12px;
+        border-radius: 4px;
+        h1 {
+            font-size: 16px;
+            margin: 0 0 5px 0;
+            a {
+                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+                text-decoration: none;
+            }
+            span {
+                font-weight: normal;
+            }
+        }
+        p {
+            margin-bottom: 0;
+        }
+        .tweet-text {
+            font-size: .85em;
         }
     }
 }

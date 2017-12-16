@@ -16,6 +16,18 @@
 
   <p class="tweet-text"><%= entry_presenter.tweet_text %></p>
 
+  <% if entry_presenter.quoted_status? %>
+  <div class="quoted-tweet">
+    <h1>
+      <a href="<%= entry_presenter.tweet_user_url(entry_presenter.quoted_status) %>" target="_blank">
+        <%= entry_presenter.tweet_name(entry_presenter.quoted_status) %>
+        <span><%= entry_presenter.tweet_screen_name(entry_presenter.quoted_status) %></span>
+      </a>
+    </h1>
+    <p class="tweet-text"><%= entry_presenter.tweet_text(entry_presenter.quoted_status) %></p>
+  </div>
+  <% end %>
+
   <% if entry.tweet.retweeted_status? %>
     <div class="tweet-meta-wrap">
         <p class="tweet-meta">
@@ -23,18 +35,6 @@
           <%= entry_presenter.tweet_retweeted_message %>
         </p>
     </div>
-  <% end %>
-
-  <% if entry.tweet.quoted_status? %>
-  <div class="quoted-tweet">
-    <h1>
-      <a href="<%= entry_presenter.tweet_user_url(entry.tweet.quoted_status) %>" target="_blank">
-        <%= entry_presenter.tweet_name(entry.tweet.quoted_status) %>
-        <span><%= entry_presenter.tweet_screen_name(entry.tweet.quoted_status) %></span>
-      </a>
-    </h1>
-    <p class="tweet-text"><%= entry_presenter.tweet_text(entry.tweet.quoted_status) %></p>
-  </div>
   <% end %>
 
   <% entry_presenter.tweet_media.each do |media| %>
@@ -47,7 +47,6 @@
     </div>
   <% end %>
 
-<hr />
 
   <% entry_presenter.tweet_urls.each do |url| %>
 
@@ -65,7 +64,7 @@
       end
       %>
 
-      <% if link_content %>
+      <% if link_content && link_content.length > 279 %>
           <p class="post-meta new-section">
           <%= favicon_with_host(url.expanded_url.host) %> <%= url.expanded_url.host %>
           </p>

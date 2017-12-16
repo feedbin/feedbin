@@ -516,7 +516,13 @@ class EntryPresenter < BasePresenter
     @template.video_tag highest_quality_video.url.to_s, options
   end
 
+  def quoted_status?
+    main_tweet.quoted_status?
+  end
 
+  def quoted_status
+    main_tweet.quoted_status
+  end
 
   private
 
