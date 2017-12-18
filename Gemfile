@@ -49,7 +49,7 @@ gem 'grocer-pushpackager',   github: 'feedbin/grocer-pushpackager', ref: '6b01b4
 gem 'html_diff',             github: 'feedbin/html_diff',           ref: 'c7c15ce'
 gem 'carrierwave_direct',    github: 'feedbin/carrierwave_direct',  ref: 'a0bc323'
 
-gem 'sass-rails'
+gem 'sassc-rails'
 gem 'coffee-rails'
 gem 'uglifier'
 gem 'autoprefixer-rails'
