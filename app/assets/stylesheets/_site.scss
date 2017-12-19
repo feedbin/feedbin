@@ -2611,7 +2611,7 @@ $saved-search-control-height: 48px;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         margin: 0 0 .2em 0;
         padding: 0;
-        font-weight: normal;
+        font-weight: bold;
         text-rendering: optimizeLegibility;
         word-wrap: break-word;
     }
@@ -3209,6 +3209,9 @@ $saved-search-control-height: 48px;
         font-family: $font-stack;
         font-weight: 400;
     }
+    .entry-header h1 {
+        font-weight: 400;
+    }
 }
 
 .font-serif-2 .entry-inner {
@@ -3224,6 +3227,9 @@ $saved-search-control-height: 48px;
     .post-meta {
         font-family: $font-stack;
         font-weight: 400;
+    }
+    .entry-header h1 {
+        font-weight: 700;
     }
     h1, h2, h3, h4, h5, h6 {
         font-weight: 700;
@@ -3246,6 +3252,9 @@ $saved-search-control-height: 48px;
     }
     .post-meta {
         font-family: $font-stack;
+        font-weight: 400;
+    }
+    .entry-header h1 {
         font-weight: 400;
     }
 }
