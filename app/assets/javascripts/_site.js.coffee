@@ -815,7 +815,7 @@ $.extend feedbin,
         return
 
     entryLinks: ->
-      $(document).on 'click', '[data-behavior~=entry_content_wrap] a, [data-behavior~=view_link_markup_wrap] a', ->
+      $(document).on 'click', '[data-behavior~=entry_content_wrap] a, [data-behavior~=view_link_markup_wrap] a, [data-behavior~=external_links] a', ->
         $(this).attr('target', '_blank').attr('rel', 'noopener noreferrer')
         return
 

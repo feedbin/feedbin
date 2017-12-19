@@ -31,18 +31,26 @@ class EntryPresenter < BasePresenter
   end
 
   def published_date
-    if entry.published
-      entry.published.to_s(:full_human)
+    if entry.tweet?
+      main_tweet.created_at.to_s(:full_human)
     else
-      ''
+      if entry.published
+        entry.published.to_s(:full_human)
+      else
+        ''
+      end
     end
   end
 
   def datetime
-    if entry.published
-      entry.published.to_s(:datetime)
+    if entry.tweet?
+      main_tweet.created_at.to_s(:datetime)
     else
-      ''
+      if entry.published
+        entry.published.to_s(:datetime)
+      else
+        ''
+      end
     end
   end
 
@@ -169,7 +177,9 @@ class EntryPresenter < BasePresenter
 
   def saved_page(url)
     if entry.data && entry.data['saved_pages'] && page = entry.data['saved_pages'][url]
-      MercuryParser.new(nil, page)
+      if page["result"]
+        MercuryParser.new(nil, page)
+      end
     end
   end
 
@@ -475,14 +485,6 @@ class EntryPresenter < BasePresenter
     else
       false
     end
-  end
-
-  def tweet_created_at
-    main_tweet.created_at.strftime("%l:%M %p - %e %b %Y")
-  end
-
-  def tweet_created_at_display
-    main_tweet.created_at.to_s(:full_human)
   end
 
   def tweet_location

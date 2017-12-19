@@ -2677,6 +2677,9 @@ $saved-search-control-height: 48px;
     @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
     line-height: 1.2;
     margin-bottom: .2em;
+    a {
+        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    }
     .icon-clock {
         float: left;
         margin-right: 5px;
@@ -3394,15 +3397,6 @@ $saved-search-control-height: 48px;
                 font-weight: normal;
             }
         }
-        h2 {
-            padding-right: 25px;
-        }
-        h2, h2 a {
-            font-size: 14px;
-            font-weight: normal;
-            margin: 0 0 1.1em 0;
-            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-        }
         img {
             border: 2px solid white;
             position: absolute;
@@ -3422,12 +3416,16 @@ $saved-search-control-height: 48px;
     }
     .tweet-meta {
         font-size: 14px;
+        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         img {
             position: relative;
             top: 2px;
             border-radius: 16px;
         }
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        a {
+            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            text-decoration: none;
+        }
     }
     .new-section {
         position: relative;
