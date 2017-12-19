@@ -450,7 +450,7 @@ class EntryPresenter < BasePresenter
 
   def tweet_retweeted_image
     if entry.tweet.user.profile_image_uri?
-      entry.tweet.user.profile_image_uri("normal")
+      entry.tweet.user.profile_image_uri_https("normal")
     else
       # default twitter avatar
     end
