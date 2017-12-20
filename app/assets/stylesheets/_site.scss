@@ -3035,6 +3035,7 @@ $saved-search-control-height: 48px;
         font-weight: 400 !important;
         margin-top: 15px;
         padding: 10px 12px;
+        border-radius: 4px;
         strong {
             font-weight: 700 !important;
         }
@@ -3402,6 +3403,7 @@ $saved-search-control-height: 48px;
             border: 2px solid white;
             position: absolute;
             left: -60px;
+            top: -5px;
             border-radius: 47px;
             box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
             .theme-day & {
@@ -3456,11 +3458,11 @@ $saved-search-control-height: 48px;
         }
     }
     .quoted-tweet {
-        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         margin-bottom: 1.1em;
-        padding: 10px 12px;
+        padding: 14px 16px;
         border-radius: 4px;
+        border: 1px solid transparent;
+        @include border-color($border-color, $border-color-night, $border-color-sunset);
         h1 {
             font-size: 16px;
             margin: 0 0 5px 0;
