@@ -94,11 +94,20 @@ class SupportedSharingService < ApplicationRecord
       requires_auth: false,
       service_type: 'popover',
       klass: 'Share::Buffer'
+    },
+    {
+      service_id: 'micro_blog',
+      label: 'Micro.blog',
+      requires_auth: true,
+      service_type: 'micro_blog',
+      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'micro_blog_share_panel'}},
+      klass: 'Share::MicroBlog',
+      has_share_sheet: true
     }
   ].freeze
 
   store_accessor :settings, :access_token, :access_secret, :email_name, :email_address,
-                 :kindle_address, :default_option
+                 :kindle_address, :default_option, :api_token
 
   validates :service_id, presence: true, uniqueness: {scope: :user_id}, inclusion: { in: SERVICES.collect {|s| s[:service_id]} }
   belongs_to :user
