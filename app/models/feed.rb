@@ -57,7 +57,7 @@ class Feed < ApplicationRecord
     request = FeedRequest.new(url: self.feed_url, options: options)
     result = request.status
     if request.body
-      result = ParsedFeed.new(request.body, request)
+      result = ParsedXMLFeed.new(request.body, request)
     end
     result
   end
