@@ -2664,7 +2664,7 @@ $saved-search-control-height: 48px;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         margin: 0 0 .2em 0;
         padding: 0;
-        font-weight: normal;
+        font-weight: bold;
         text-rendering: optimizeLegibility;
         word-wrap: break-word;
     }
@@ -3266,25 +3266,35 @@ $saved-search-control-height: 48px;
     em {
         font-style: italic;
     }
+    .post-meta {
+        font-family: $font-stack;
+        font-weight: 400;
+    }
+    .entry-header h1 {
+        font-weight: 400;
+    }
 }
 
 .font-serif-2 {
     .content-styles {
-        font-family: "Mercury SSm A", "Mercury SSm B", $font-stack;
-        font-weight: 300;
-        font-style: normal;
+    font-family: "Mercury SSm A", "Mercury SSm B", $font-stack;
+    font-weight: 300;
+    font-style: normal;
+    strong {
+        font-weight: 500;
+    }
+    em {
+        font-style: italic;
+    }
+    .post-meta {
+        font-family: $font-stack;
+        font-weight: 400;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 700;
+        font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
         strong {
-            font-weight: 500;
-        }
-        em {
-            font-style: italic;
-        }
-        h1, h2, h3, h4, h5, h6 {
             font-weight: 700;
-            font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
-            strong {
-                font-weight: 700;
-            }
         }
     }
     .entry-header h1 {
@@ -3303,19 +3313,26 @@ $saved-search-control-height: 48px;
     em {
         font-style: italic;
     }
+    .post-meta {
+        font-family: $font-stack;
+        font-weight: 400;
+    }
+    .entry-header h1 {
+        font-weight: 400;
+    }
 }
 
 .font-sans-serif-1 {
     .content-styles {
-        font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
-        font-weight: 400;
-        font-style: normal;
-        strong {
-            font-weight: 700;
-        }
-        em {
-            font-style: italic;
-        }
+    font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
+    font-weight: 400;
+    font-style: normal;
+    strong {
+        font-weight: 700;
+    }
+    em {
+        font-style: italic;
+    }
     }
     .entry-header h1 {
         font-weight: 700;
@@ -3324,15 +3341,15 @@ $saved-search-control-height: 48px;
 
 .font-sans-serif-2 {
     .content-styles {
-        font-family: "Ideal Sans A", "Ideal Sans B", $font-stack;
-        font-weight: 300;
-        font-style: normal;
-        strong {
-            font-weight: 600;
-        }
-        em {
-            font-style: italic;
-        }
+    font-family: "Ideal Sans A", "Ideal Sans B", $font-stack;
+    font-weight: 300;
+    font-style: normal;
+    strong {
+        font-weight: 600;
+    }
+    em {
+        font-style: italic;
+    }
     }
     .entry-header h1 {
         font-weight: 600;
