@@ -3277,24 +3277,25 @@ $saved-search-control-height: 48px;
 
 .font-serif-2 {
     .content-styles {
-    font-family: "Mercury SSm A", "Mercury SSm B", $font-stack;
-    font-weight: 300;
-    font-style: normal;
-    strong {
-        font-weight: 500;
-    }
-    em {
-        font-style: italic;
-    }
-    .post-meta {
-        font-family: $font-stack;
-        font-weight: 400;
-    }
-    h1, h2, h3, h4, h5, h6 {
-        font-weight: 700;
-        font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
+        font-family: "Mercury SSm A", "Mercury SSm B", $font-stack;
+        font-weight: 300;
+        font-style: normal;
         strong {
+            font-weight: 500;
+        }
+        em {
+            font-style: italic;
+        }
+        .post-meta {
+            font-family: $font-stack;
+            font-weight: 400;
+        }
+        h1, h2, h3, h4, h5, h6 {
             font-weight: 700;
+            font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
+            strong {
+                font-weight: 700;
+            }
         }
     }
     .entry-header h1 {
