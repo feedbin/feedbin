@@ -30,7 +30,7 @@ class EntryImage
     if @entry.tweet?
       tweet = (@entry.tweet.retweeted_status?) ? @entry.tweet.retweeted_status : @entry.tweet
       if tweet.media?
-        options["urls"] = [tweet.media.last.media_url_https.to_s]
+        options["urls"] = [tweet.media.first.media_url_https.to_s]
       elsif tweet.urls?
         options["urls"] = tweet.urls.map {|url| url.expanded_url.to_s}
       end

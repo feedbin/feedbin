@@ -17,7 +17,7 @@ class ParsedTweetEntry < ParsedEntry
 
   def content
     if tweet_hash[:entities]
-      Twitter::Autolink.auto_link_with_json(tweet_hash[:full_text], tweet_hash[:entities]).html_safe
+      Twitter::TwitterText::Autolink.auto_link_with_json(tweet_hash[:full_text], tweet_hash[:entities]).html_safe
     else
       tweet_hash[:full_text]
     end

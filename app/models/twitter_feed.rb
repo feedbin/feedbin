@@ -1,12 +1,13 @@
 class TwitterFeed
   attr_reader :url
 
-  def initialize(url, token, secret)
+  def initialize(url, token, secret, screen_name = nil)
     url = url.strip
     url = shortcut(url)
     if url.start_with?("twitter.com")
       url = "https://#{url}"
     end
+    @screen_name = screen_name
     @url = URI.parse(url)
     @api = TwitterAPI.new(token, secret)
   end
@@ -15,6 +16,8 @@ class TwitterFeed
     type = nil
     tweets = nil
     options = {}
+    url = nil
+
     default_options = {
       count: 100,
       tweet_mode: "extended"
@@ -32,6 +35,7 @@ class TwitterFeed
     elsif value = home
       type = :home
       tweets = @api.client.home_timeline(default_options)
+      @url.query = "screen_name=#{value}"
     end
     if tweets && value
       ParsedTwitterFeed.new(@url.to_s, tweets, type, value, options)
@@ -39,7 +43,9 @@ class TwitterFeed
   end
 
   def home
-    @url.host == "twitter.com" && ["", "/"].include?(@url.path)
+    if @url.host == "twitter.com" && ["", "/"].include?(@url.path)
+      @screen_name
+    end
   end
 
   def user

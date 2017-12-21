@@ -326,21 +326,48 @@ class EntryPresenter < BasePresenter
 
   def summary
     if entry.tweet
-      text = tweet_hash[:full_text]
-      if range = tweet_hash[:display_text_range]
-        range = Range.new(0, range.last, true)
-        text = text.codepoints[range].pack("U*")
-      end
-      main_tweet.urls.reverse.each do |url|
-        begin
-          range = Range.new(*url.indices, true)
-          text[range] = url.display_url
-        rescue
-        end
-      end
-      text.html_safe
+      tweet_summary.html_safe
     else
       entry.summary.html_safe
+    end
+  end
+
+  def tweet_summary(tweet = nil)
+    tweet = tweet ? tweet : main_tweet
+    hash = tweet.to_h
+
+    text = trim_text(hash)
+    main_tweet.urls.reverse.each do |url|
+      begin
+        range = Range.new(*url.indices, true)
+        text[range] = url.display_url
+      rescue
+      end
+    end
+    text
+  end
+
+  def trim_text(hash)
+    text = hash[:full_text]
+    if range = hash[:display_text_range]
+      range = Range.new(0, range.last, false)
+      text = text.codepoints[range].pack("U*")
+    end
+    text
+  end
+
+
+  def tweet_text(tweet = nil)
+    tweet = tweet ? tweet : main_tweet
+    hash = tweet.to_h
+    if hash[:entities]
+      if hash[:entities][:media].present? && hash[:display_text_range] && hash[:entities][:media].last[:indices].first > hash[:display_text_range].last
+        hash[:entities][:media].pop
+      end
+      text = trim_text(hash)
+      Twitter::TwitterText::Autolink.auto_link_with_json(text, hash[:entities]).html_safe
+    else
+      hash[:full_text]
     end
   end
 
@@ -408,16 +435,6 @@ class EntryPresenter < BasePresenter
       @template.content_tag(:span, '', class: "title-inner", data: {behavior: "user_title", feed_id: entry.feed.id}) do
         entry.feed.title
       end
-    end
-  end
-
-  def tweet_text(tweet = nil)
-    tweet = tweet ? tweet : main_tweet
-    hash = tweet.to_h
-    if hash[:entities]
-      Twitter::Autolink.auto_link_with_json(hash[:full_text], hash[:entities]).html_safe
-    else
-      hash[:full_text]
     end
   end
 

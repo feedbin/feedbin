@@ -128,7 +128,8 @@ class FeedsController < ApplicationController
     else
       config = {
         twitter_access_token: @user.twitter_access_token,
-        twitter_access_secret: @user.twitter_access_secret
+        twitter_access_secret: @user.twitter_access_secret,
+        twitter_screen_name: @user.twitter_screen_name
       }
       @feeds = FeedFinder.new(params[:q], config).create_feeds!
       @feeds.map(&:priority_refresh)
