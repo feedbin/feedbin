@@ -1645,6 +1645,7 @@ $saved-search-control-height: 48px;
         display: flex;
         justify-content: space-between;
         margin: 0 0 1px 0;
+        align-items: baseline;
     }
     .feed-title {
         font-size: 12px;
@@ -1659,7 +1660,6 @@ $saved-search-control-height: 48px;
         align-self: flex-end;
         font-size: 12px;
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-        margin-bottom: 1px;
         display: block;
         white-space: nowrap;
         &.inline {
@@ -1690,14 +1690,15 @@ $saved-search-control-height: 48px;
         .title {
             display: none;
         }
+        .meta-wrap {
+            margin-bottom: 2px;
+        }
         .feed-title {
             strong {
                 font-weight: bold;
             }
-            margin: 0;
             font-size: 14px;
             display: block;
-            margin-bottom: 2px;
             line-height: 1.2;
             position: relative;
             @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
@@ -1750,6 +1751,9 @@ $saved-search-control-height: 48px;
         }
         .feed-title, .time, .body {
             color: #97999b !important;
+        }
+        .feed-title {
+            margin-right: 26px;
         }
         .title {
             color: #FFFFFF !important;
