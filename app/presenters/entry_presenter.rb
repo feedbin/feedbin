@@ -13,6 +13,12 @@ class EntryPresenter < BasePresenter
     %r(https?://www\.instagram\.com/p/(.*?)(/|#|\?|$))
   ]
 
+  VIMEO_URL = %r(https?://vimeo\.com/video/(.*?)(#|\?|$))
+
+  INSTAGRAM_URLS = [
+    %r(https?://www\.instagram\.com/p/(.*?)(/|#|\?|$))
+  ]
+
   presents :entry
 
   def entry_link(&block)
@@ -494,6 +500,16 @@ class EntryPresenter < BasePresenter
     if YOUTUBE_URLS.find { |format| url =~ format } && $1
       youtube_id = $1
       @template.content_tag(:iframe, "", src: "https://www.youtube.com/embed/#{youtube_id}", height: 9, width: 16, frameborder: 0, allowfullscreen: true).html_safe
+    else
+      false
+    end
+  end
+
+  def tweet_vimeo_embed(url)
+    url = url.expanded_url.to_s
+    if VIMEO_URL =~ url && $1
+      vimeo_id = $1
+      @template.content_tag(:iframe, "", src: "https://player.vimeo.com/video/#{vimeo_id}", height: 9, width: 16, frameborder: 0, allowfullscreen: true).html_safe
     else
       false
     end
