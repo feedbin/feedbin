@@ -14,10 +14,12 @@
     >
     <span class="entries-inner-wrap">
         <%= entry_presenter.profile_image(entry.feed) %>
-        <p class="feed-title">
-            <%= entry_presenter.feed_title %>
-        </p>
-        <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
+        <div class="meta-wrap">
+            <p class="feed-title">
+                <%= entry_presenter.feed_title %>
+            </p>
+            <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
+        </div>
         <span class="title-wrap">
             <% if !entry.tweet? %>
                 <h2 class="title">
