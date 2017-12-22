@@ -19,7 +19,7 @@ class Feed < ApplicationRecord
 
   after_initialize :default_values
 
-  enum feed_type: { xml: 0, newsletter: 1, twitter: 2, twitter_links: 3}
+  enum feed_type: { xml: 0, newsletter: 1, twitter: 2, twitter_home: 3}
 
 
   def twitter_user?
@@ -66,7 +66,7 @@ class Feed < ApplicationRecord
     request = FeedRequest.new(url: self.feed_url, options: options)
     result = request.status
     if request.body
-      result = ParsedFeed.new(request.body, request)
+      result = ParsedXMLFeed.new(request.body, request)
     end
     result
   end

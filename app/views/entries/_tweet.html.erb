@@ -45,12 +45,13 @@
     <% if entry_presenter.tweet_video?(media) %>
       <%= entry_presenter.tweet_video(media) %>
     <% else %>
-      <%= image_tag media.media_url_https.to_s + ":large" %>
+      <%= link_to media.media_url_https.to_s do %>
+        <%= image_tag media.media_url_https.to_s + ":large" %>
+      <% end %>
     <% end %>
     </div>
   <% end %>
 
-  <hr />
   <% entry_presenter.tweet_urls.each do |url| %>
 
     <% if entry_presenter.tweet_youtube_embed(url) %>
@@ -70,22 +71,23 @@
       %>
 
       <% if link_content && link_content.length > 400 %>
-          <p class="post-meta new-section">
-          <%= favicon_with_host(url.expanded_url.host) %> <%= url.expanded_url.host %>
-          </p>
-          <header class="entry-header">
-              <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
-              <h1><%= page.title || "Untitled" %></h1>
-              <% end %>
-              <p class="post-meta">
-                  <% if page.author %>
-                      by <%= page.author %>
-                  <% end %>
-              </p>
-          </header>
-          <div class="content-styles entry-final-content" data-behavior="view_link_markup_wrap entry_final_content">
-              <%= link_content.html_safe %>
-          </div>
+        <hr />
+        <p class="post-meta new-section">
+        <%= favicon_with_host(url.expanded_url.host) %> <%= url.expanded_url.host %>
+        </p>
+        <header class="entry-header">
+            <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
+            <h1><%= page.title || "Untitled" %></h1>
+            <% end %>
+            <p class="post-meta">
+                <% if page.author %>
+                    by <%= page.author %>
+                <% end %>
+            </p>
+        </header>
+        <div class="content-styles entry-final-content" data-behavior="view_link_markup_wrap entry_final_content">
+            <%= link_content.html_safe %>
+        </div>
       <% end %>
     <% end %>
 

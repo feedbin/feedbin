@@ -1645,9 +1645,9 @@ $saved-search-control-height: 48px;
         font-weight: bold;
         margin: 0;
         font-size: 14px;
-        line-height: 1.1;
+        line-height: 1.2;
         display: block;
-        margin-bottom: 4px;
+        margin-bottom: 2px;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         position: relative;
     }
@@ -1692,9 +1692,10 @@ $saved-search-control-height: 48px;
             margin: 0;
             font-size: 14px;
             display: block;
-            margin-bottom: 4px;
-            @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+            margin-bottom: 2px;
+            line-height: 1.2;
             position: relative;
+            @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         }
         .body {
             white-space: pre-wrap;
@@ -3277,24 +3278,25 @@ $saved-search-control-height: 48px;
 
 .font-serif-2 {
     .content-styles {
-    font-family: "Mercury SSm A", "Mercury SSm B", $font-stack;
-    font-weight: 300;
-    font-style: normal;
-    strong {
-        font-weight: 500;
-    }
-    em {
-        font-style: italic;
-    }
-    .post-meta {
-        font-family: $font-stack;
-        font-weight: 400;
-    }
-    h1, h2, h3, h4, h5, h6 {
-        font-weight: 700;
-        font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
+        font-family: "Mercury SSm A", "Mercury SSm B", $font-stack;
+        font-weight: 300;
+        font-style: normal;
         strong {
+            font-weight: 500;
+        }
+        em {
+            font-style: italic;
+        }
+        .post-meta {
+            font-family: $font-stack;
+            font-weight: 400;
+        }
+        h1, h2, h3, h4, h5, h6 {
             font-weight: 700;
+            font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
+            strong {
+                font-weight: 700;
+            }
         }
     }
     .entry-header h1 {
@@ -3429,8 +3431,9 @@ $saved-search-control-height: 48px;
         }
     }
     .entry-header {
+        font-size: 1.15em;
         h1 {
-            font-size: 1.2em;
+            font-size: 1.3em;
             line-height: 1.4;
         }
     }
@@ -3449,7 +3452,6 @@ $saved-search-control-height: 48px;
     }
     .new-section {
         position: relative;
-        margin-top: 40px;
         .favicon-wrap {
             left: -30px;
             top: 0;
@@ -3458,7 +3460,7 @@ $saved-search-control-height: 48px;
     .tweet-text {
         white-space: pre-wrap;
         font-size: 1.15em;
-        line-height: 1.3;
+        line-height: 1.4;
         @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
         font-family: $font-stack;
     }

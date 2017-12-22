@@ -21,17 +21,21 @@ class ParsedXMLEntry < ParsedEntry
   def content
     @content ||= begin
       value = nil
-      if @entry.try(:content)
+      if entry_has?(:content)
         value = @entry.content
-      elsif @entry.try(:summary)
+      elsif entry_has?(:summary)
         value = @entry.summary
-      elsif @entry.try(:description)
+      elsif entry_has?(:description)
         value = @entry.description
-      elsif @entry.try(:media_description)
+      elsif entry_has?(:media_description)
         value = @entry.media_description
       end
       value
     end
+  end
+
+  def entry_has?(attribute)
+    @entry.try(attribute) && @entry.try(attribute).strip != ""
   end
 
   def data

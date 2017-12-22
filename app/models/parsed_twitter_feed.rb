@@ -33,7 +33,11 @@ class ParsedTwitterFeed
   end
 
   def feed_type
-    :twitter
+    if @type == :home
+      :twitter_home
+    else
+      :twitter
+    end
   end
 
   def options
