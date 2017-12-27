@@ -20,7 +20,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: 36cea2675921f157a289be0ce12f5b96f715dca3
+  revision: a4ccdffb395b96a06ddf4c6fdc353a5a25046970
   branch: master
   specs:
     feedkit (0.1.0)
@@ -174,7 +174,7 @@ GEM
       tins (~> 1.6)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
-    crass (1.0.2)
+    crass (1.0.3)
     css_parser (1.6.0)
       addressable
     curb (0.9.4)
