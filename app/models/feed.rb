@@ -63,10 +63,10 @@ class Feed < ApplicationRecord
     unless etag.blank?
       options[:if_none_match] = etag
     end
-    request = FeedRequest.new(url: self.feed_url, options: options)
+    request = Feedkit::Request.new(url: self.feed_url, options: options)
     result = request.status
     if request.body
-      result = ParsedXMLFeed.new(request.body, request)
+      result = Feedkit.fetch_and_parse(self.feed_url, request: request)
     end
     result
   end

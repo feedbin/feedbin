@@ -9,12 +9,13 @@ class EmailsController < ApplicationController
     if user = User.find_by(inbound_email_token: params[:MailboxHash])
       feed_url = params[:TextBody].try(:strip)
       finder = FeedFinder.new(feed_url)
-      if finder.options.any?
-        feed = finder.create_feed(finder.options.first)
-        if feed
-          user.subscriptions.find_or_create_by(feed: feed)
-        end
+
+      feeds = finder.create_feeds!
+      if feeds
+        feed = feeds.first
+        user.subscriptions.find_or_create_by(feed: feed)
       end
+
     end
   ensure
     head :ok

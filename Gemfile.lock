@@ -19,6 +19,17 @@ GIT
       sax-machine (>= 1.0)
 
 GIT
+  remote: https://github.com/feedbin/feedkit.git
+  revision: 36cea2675921f157a289be0ce12f5b96f715dca3
+  branch: master
+  specs:
+    feedkit (0.1.0)
+      curb (~> 0.9)
+      feedjira (~> 2.0)
+      twitter (~> 6.2)
+      twitter-text (~> 2.1)
+
+GIT
   remote: https://github.com/feedbin/grocer-pushpackager.git
   revision: 6b01b4e4e71af26edf55f095251366294527afaf
   ref: 6b01b4e
@@ -509,6 +520,7 @@ DEPENDENCIES
   evernote_oauth
   faker
   feedjira!
+  feedkit!
   fog-aws
   foreman (= 0.63.0)
   grocer-pushpackager!
@@ -563,4 +575,4 @@ DEPENDENCIES
   xipio
 
 BUNDLED WITH
-   1.15.4
+   1.16.1

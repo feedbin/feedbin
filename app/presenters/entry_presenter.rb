@@ -15,9 +15,6 @@ class EntryPresenter < BasePresenter
 
   VIMEO_URL = %r(https?://vimeo\.com/video/(.*?)(#|\?|$))
 
-  INSTAGRAM_URLS = [
-    %r(https?://www\.instagram\.com/p/(.*?)(/|#|\?|$))
-  ]
 
   presents :entry
 

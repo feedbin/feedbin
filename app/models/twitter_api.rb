@@ -9,19 +9,6 @@ class TwitterAPI
   # 6. access_token = twitter.request_access(session[:twitter_token], session[:twitter_secret], params[:oauth_verifier])
   # 7. save access_token.token and access_token.secret in the database
 
-  attr_reader :client
-
-  def initialize(token = nil, secret = nil)
-    if token && secret
-      @client = Twitter::REST::Client.new do |config|
-        config.consumer_key        = ENV['TWITTER_KEY']
-        config.consumer_secret     = ENV['TWITTER_SECRET']
-        config.access_token        = token
-        config.access_token_secret = secret
-      end
-    end
-  end
-
   def consumer
     options = {
       site: API_URL,

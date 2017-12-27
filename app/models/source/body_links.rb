@@ -39,8 +39,8 @@ class Source::BodyLinks < Source
     if option.href.include?(host)
       response = HTTP.head(option.href)
       if response["Content-Type"] =~ /xml/
-        request = FeedRequest.new(url: option.href)
-        title = ParsedXMLFeed.new(request.body, request).title
+        request = Feedkit::Request.new(url: option.href)
+        title = Feedkit.fetch_and_parse(option.href, request: request).title
         result = FeedOption.new(request.last_effective_url, request.last_effective_url, title, "rss_anchors")
       end
     end

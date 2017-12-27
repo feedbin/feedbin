@@ -12,8 +12,8 @@ class SelfUrl
 
   def update(feed_id)
     feed = Feed.find(feed_id)
-    request = FeedRequest.new(url: feed.feed_url)
-    self_url = ParsedXMLFeed.new(request.body, request).self_url
+    request = Feedkit.fetch_and_parse(feed.feed_url)
+    self_url = request.self_url
     feed.update(self_url: self_url)
   rescue
     feed.update(self_url: feed.feed_url)

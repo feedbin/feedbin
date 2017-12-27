@@ -21,16 +21,12 @@ class Source
     if !feed
       request = @config[:request]
       if request.nil? || request.last_effective_url != option.href
-        request = FeedRequest.new(url: option.href)
+        request = Feedkit::Request.new(url: option.href)
       end
 
       feed = Feed.where(feed_url: request.last_effective_url).take
       if !feed && request.body.present? && [:xml, :json_feed].include?(request.format)
-        if request.format == :xml
-          parsed_feed = ParsedXMLFeed.new(request.body, request)
-        elsif request.format == :json_feed
-          parsed_feed = ParsedJSONFeed.new(request.body, request)
-        end
+        parsed_feed = Feedkit.fetch_and_parse(request.last_effective_url, request: request)
         feed = Feed.create_from_parsed_feed(parsed_feed)
       end
     end
