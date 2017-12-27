@@ -31,7 +31,7 @@ class FeedFinder
     end
 
     if feeds.blank?
-      feeds = Source::YouTube.new(@url, @config).call
+      feeds = Source::Youtube.new(@url, @config).call
     end
 
     if feeds.blank?

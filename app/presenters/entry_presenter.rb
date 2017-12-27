@@ -339,7 +339,7 @@ class EntryPresenter < BasePresenter
     tweet = tweet ? tweet : main_tweet
     hash = tweet.to_h
 
-    text = trim_text(hash)
+    text = trim_text(hash, true)
     main_tweet.urls.reverse.each do |url|
       begin
         range = Range.new(*url.indices, true)
@@ -350,15 +350,14 @@ class EntryPresenter < BasePresenter
     text
   end
 
-  def trim_text(hash)
+  def trim_text(hash, exclude_end = false)
     text = hash[:full_text]
     if range = hash[:display_text_range]
-      range = Range.new(0, range.last, false)
+      range = Range.new(0, range.last, exclude_end)
       text = text.codepoints[range].pack("U*")
     end
     text
   end
-
 
   def tweet_text(tweet = nil)
     tweet = tweet ? tweet : main_tweet
@@ -366,6 +365,8 @@ class EntryPresenter < BasePresenter
     if hash[:entities]
       if hash[:entities][:media].present? && hash[:display_text_range] && hash[:entities][:media].last[:indices].first > hash[:display_text_range].last
         hash[:entities][:media].pop
+      elsif hash[:quoted_status] && hash[:display_text_range] && hash[:entities][:urls].last[:indices].first > hash[:display_text_range].last
+        hash[:entities][:urls].pop
       end
       text = trim_text(hash)
       Twitter::TwitterText::Autolink.auto_link_with_json(text, hash[:entities]).html_safe

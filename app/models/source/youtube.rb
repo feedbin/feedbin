@@ -1,4 +1,4 @@
-class Source::YouTube < Source
+class Source::Youtube < Source
   URLS = [
     {
       template: "https://www.youtube.com/feeds/videos.xml?channel_id=%s".freeze,
