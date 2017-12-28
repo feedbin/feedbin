@@ -6,14 +6,10 @@ class SavePages
     entry = Entry.find(entry_id)
     tweet = entry.tweet
 
-    tweets = []
-    if tweet.retweeted_status?
-      tweets.push(tweet.retweeted_status)
-    else
-      tweets.push(tweet)
-    end
+    main_tweet = (tweet.retweeted_status?) ? tweet.retweeted_status : tweet
+    tweets = [main_tweet]
+    tweets.push(main_tweet.quoted_status) if main_tweet.quoted_status?
 
-    tweets.push(tweet.quoted_status) if tweet.quoted_status?
     urls = find_urls(tweets)
 
     saved_pages = urls.each_with_object({}) do |url, hash|

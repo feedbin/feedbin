@@ -462,9 +462,8 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_urls
-    tweet = entry.tweet
     tweets = [main_tweet]
-    tweets.push(tweet.quoted_status) if tweet.quoted_status?
+    tweets.push(main_tweet.quoted_status) if main_tweet.quoted_status?
     tweets.each_with_object([]) do |tweet, array|
       tweet.urls.each do |url|
         array.push(url)
