@@ -23,11 +23,13 @@ class Feed < ApplicationRecord
 
 
   def twitter_user?
-    options && options["twitter_user"]
+    twitter_user.present?
   end
 
   def twitter_user
-    @twitter_user ||= (twitter_user?) ? Twitter::User.new(options["twitter_user"].deep_symbolize_keys) : nil
+    @twitter_user ||= Twitter::User.new(options["twitter_user"].deep_symbolize_keys)
+  rescue
+    nil
   end
 
   def tag(names, user, delete_existing = true)

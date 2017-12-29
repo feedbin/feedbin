@@ -14,6 +14,7 @@ end
 every(1.minutes, 'clockwork.frequent') do
   if RedisLock.acquire("clockwork:feed:refresher:scheduler:v2")
     FeedRefresherScheduler.perform_async
+    TwitterFeedRefresher.perform_async
   end
 end
 
