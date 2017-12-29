@@ -176,7 +176,7 @@ class feedbin.CountsBehavior
     if feedbin.selectedFeed && feedbin.selectedFeed[0] != $(event.currentTarget)[0]
       $.each feedbin.hideQueue, (index, feed_id) ->
         if feed_id != undefined
-          item = $("[data-feed-id=#{feed_id}]", '.feeds')
+          item = $("li[data-feed-id=#{feed_id}]", '.feeds')
           $(item).addClass('zero-count')
       feedbin.hideQueue.length = 0
 
