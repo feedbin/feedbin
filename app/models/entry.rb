@@ -33,6 +33,12 @@ class Entry < ApplicationRecord
     @tweet ||= (tweet?) ? Twitter::Tweet.new(data["tweet"].deep_symbolize_keys) : nil
   end
 
+  def main_tweet
+    if self.tweet?
+      @main_tweet ||= (self.tweet.retweeted_status?) ? self.tweet.retweeted_status : self.tweet
+    end
+  end
+
   def has_content
     if [title, url, entry_id, content].compact.count == 0
       errors.add(:base, 'entry has no content')

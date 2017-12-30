@@ -4,11 +4,9 @@ class SavePages
 
   def perform(entry_id)
     entry = Entry.find(entry_id)
-    tweet = entry.tweet
 
-    main_tweet = (tweet.retweeted_status?) ? tweet.retweeted_status : tweet
-    tweets = [main_tweet]
-    tweets.push(main_tweet.quoted_status) if main_tweet.quoted_status?
+    tweets = [entry.main_tweet]
+    tweets.push(entry.main_tweet.quoted_status) if entry.main_tweet.quoted_status?
 
     urls = find_urls(tweets)
 

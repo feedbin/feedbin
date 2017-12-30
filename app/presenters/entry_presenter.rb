@@ -36,7 +36,7 @@ class EntryPresenter < BasePresenter
 
   def published_date
     if entry.tweet?
-      main_tweet.created_at.to_s(:full_human)
+      entry.main_tweet.created_at.to_s(:full_human)
     else
       if entry.published
         entry.published.to_s(:full_human)
@@ -48,7 +48,7 @@ class EntryPresenter < BasePresenter
 
   def datetime
     if entry.tweet?
-      main_tweet.created_at.to_s(:datetime)
+      entry.main_tweet.created_at.to_s(:datetime)
     else
       if entry.published
         entry.published.to_s(:datetime)
@@ -337,11 +337,11 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_summary(tweet = nil)
-    tweet = tweet ? tweet : main_tweet
+    tweet = tweet ? tweet : entry.main_tweet
     hash = tweet.to_h
 
     text = trim_text(hash, true)
-    main_tweet.urls.reverse.each do |url|
+    entry.main_tweet.urls.reverse.each do |url|
       begin
         range = Range.new(*url.indices, true)
         text[range] = url.display_url
@@ -361,7 +361,7 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_text(tweet = nil)
-    tweet = tweet ? tweet : main_tweet
+    tweet = tweet ? tweet : entry.main_tweet
     hash = tweet.to_h
     if hash[:entities]
       if hash[:entities][:media].present? && hash[:display_text_range] && hash[:entities][:media].last[:indices].first > hash[:display_text_range].last
@@ -444,27 +444,27 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_name(tweet = nil)
-    tweet = tweet ? tweet : main_tweet
+    tweet = tweet ? tweet : entry.main_tweet
     tweet.user.name
   end
 
   def tweet_screen_name(tweet = nil)
-    tweet = tweet ? tweet : main_tweet
+    tweet = tweet ? tweet : entry.main_tweet
     "@" + tweet.user.screen_name
   end
 
   def tweet_user_url(tweet = nil)
-    tweet = tweet ? tweet : main_tweet
+    tweet = tweet ? tweet : entry.main_tweet
     "https://twitter.com/#{tweet.user.screen_name}"
   end
 
   def tweet_media
-    main_tweet.media
+    entry.main_tweet.media
   end
 
   def tweet_urls
-    tweets = [main_tweet]
-    tweets.push(main_tweet.quoted_status) if main_tweet.quoted_status?
+    tweets = [entry.main_tweet]
+    tweets.push(entry.main_tweet.quoted_status) if entry.main_tweet.quoted_status?
     tweets.each_with_object([]) do |tweet, array|
       tweet.urls.each do |url|
         array.push(url)
@@ -486,8 +486,8 @@ class EntryPresenter < BasePresenter
 
   # Sizes: normal, bigger
   def tweet_profile_image_uri(size = "bigger")
-    if main_tweet.user.profile_image_uri?
-      main_tweet.user.profile_image_uri_https("bigger")
+    if entry.main_tweet.user.profile_image_uri?
+      entry.main_tweet.user.profile_image_uri_https("bigger")
     else
       # default twitter avatar
     end
@@ -526,7 +526,7 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_location
-    (main_tweet.place?) ? main_tweet.place.full_name : nil
+    (entry.main_tweet.place?) ? entry.main_tweet.place.full_name : nil
   end
 
   def tweet_video?(media)
@@ -557,21 +557,11 @@ class EntryPresenter < BasePresenter
   end
 
   def quoted_status?
-    main_tweet.quoted_status?
+    entry.main_tweet.quoted_status?
   end
 
   def quoted_status
-    main_tweet.quoted_status
-  end
-
-  private
-
-  def main_tweet
-    (entry.tweet.retweeted_status?) ? entry.tweet.retweeted_status : entry.tweet
-  end
-
-  def tweet_hash
-    @tweet_hash ||= main_tweet.to_h
+    entry.main_tweet.quoted_status
   end
 
 end
