@@ -3477,6 +3477,7 @@ $saved-search-control-height: 48px;
     }
     .new-section {
         position: relative;
+        margin-bottom: .4em;
         .favicon-wrap {
             left: -30px;
             top: 0;
@@ -3523,6 +3524,21 @@ $saved-search-control-height: 48px;
         }
         .tweet-text {
             font-size: .85em;
+        }
+    }
+    @media (max-width: 1024px) {
+        padding-left: 0;
+        .tweet-header {
+            padding-left: 60px;
+            img {
+                left: 0;
+            }
+        }
+        .new-section {
+            padding-left: 30px;
+            .favicon-wrap {
+                left: 0;
+            }
         }
     }
 }
