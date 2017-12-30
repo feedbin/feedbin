@@ -10,7 +10,8 @@ class EntryPresenter < BasePresenter
   ]
 
   INSTAGRAM_URLS = [
-    %r(https?://www\.instagram\.com/p/(.*?)(/|#|\?|$))
+    %r(https?://www\.instagram\.com/p/(.*?)(/|#|\?|$)),
+    %r(https?://instagram\.com/p/(.*?)(/|#|\?|$))
   ]
 
   VIMEO_URL = %r(https?://vimeo\.com/video/(.*?)(#|\?|$))
