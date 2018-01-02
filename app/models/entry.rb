@@ -176,7 +176,7 @@ class Entry < ApplicationRecord
     if skip_mark_as_unread.blank? && self.published > 1.month.ago
 
       filters = {
-        feed_id: 1,
+        feed_id: self.feed_id,
         active: true,
         muted: false
       }
