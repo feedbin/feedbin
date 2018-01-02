@@ -57,7 +57,7 @@ module Searchable
       saved_searches.map do |saved_search|
         query_string = saved_search.query
 
-        continue if query_string =~ READ_REGEX
+        next if query_string =~ READ_REGEX
 
         query_string = query_string.gsub(UNREAD_REGEX, '')
         query_string = {query: "#{query_string} is:unread"}
