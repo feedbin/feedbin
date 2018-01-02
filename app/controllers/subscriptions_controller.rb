@@ -113,7 +113,7 @@ class SubscriptionsController < ApplicationController
   private
 
   def subscription_params
-    params.require(:subscription).permit(:muted, :show_updates)
+    params.require(:subscription).permit(:muted, :show_updates, :show_retweets, :media_only)
   end
 
 end

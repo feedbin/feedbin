@@ -32,6 +32,10 @@ class Feed < ApplicationRecord
     nil
   end
 
+  def twitter_feed?
+    self.twitter? || self.twitter_home?
+  end
+
   def tag(names, user, delete_existing = true)
     taggings = []
     if delete_existing

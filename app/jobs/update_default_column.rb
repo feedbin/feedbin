@@ -18,6 +18,7 @@ class UpdateDefaultColumn
   end
 
   def set_default
+    @klass.reset_column_information
     ids = build_ids(@batch)
     @klass.where(id: ids).update_all(@column => @default)
   end

@@ -13,8 +13,6 @@ set :log_level, :warn
 # Rails
 set :assets_roles, [:app]
 set :keep_assets, 2
-set :migration_servers, -> { primary(fetch(:migration_role)) }
-set :migration_role, :app
 set :conditionally_migrate, true
 
 append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "vendor/bundle", "public/system", "public/uploads"

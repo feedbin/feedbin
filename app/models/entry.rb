@@ -39,6 +39,20 @@ class Entry < ApplicationRecord
     end
   end
 
+  def twitter_media?
+    media = false
+    if self.tweet?
+      tweets = [self.main_tweet]
+      tweets.push(self.main_tweet.quoted_status) if self.main_tweet.quoted_status?
+      media = !!(tweets.find { |tweet| tweet.media? || tweet.urls? })
+    end
+    media
+  end
+
+  def retweet?
+    (self.tweet?) ? self.tweet.retweeted_status? : false
+  end
+
   def has_content
     if [title, url, entry_id, content].compact.count == 0
       errors.add(:base, 'entry has no content')
@@ -160,10 +174,24 @@ class Entry < ApplicationRecord
 
   def mark_as_unread
     if skip_mark_as_unread.blank? && self.published > 1.month.ago
-      unread_entries = []
-      subscriptions = Subscription.where(feed_id: self.feed_id, active: true, muted: false).pluck(:user_id)
-      subscriptions.each do |user_id|
-        unread_entries << UnreadEntry.new(user_id: user_id, feed_id: self.feed_id, entry_id: self.id, published: self.published, entry_created_at: self.created_at)
+
+      filters = {
+        feed_id: 1,
+        active: true,
+        muted: false
+      }
+      if self.tweet?
+        if self.retweet?
+          filters[:show_retweets] = true
+        end
+        if !self.twitter_media?
+          filters[:media_only] = false
+        end
+      end
+
+      subscriptions = Subscription.where(filters).pluck(:user_id)
+      unread_entries = subscriptions.each_with_object([]) do |user_id, array|
+        array << UnreadEntry.new(user_id: user_id, feed_id: self.feed_id, entry_id: self.id, published: self.published, entry_created_at: self.created_at)
       end
       UnreadEntry.import(unread_entries, validate: false)
     end

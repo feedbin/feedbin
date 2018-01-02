@@ -86,6 +86,31 @@
                 Tells you when an article has been changed after being published
             </p>
 
+            <% if @subscription.feed.twitter? || @subscription.feed.twitter_home? %>
+
+                <div class="inset-content">
+                    <h4 class="group-header">Twitter Options</h4>
+                </div>
+                <ul class="control-group control-group-form">
+                    <li>
+                        <%= f.check_box :show_retweets, data: {behavior: "auto_submit"} %>
+                        <%= f.label :show_retweets do %>
+                            Show Retweets <span class="slider-checkbox"></span>
+                        <% end %>
+                    </li>
+                    <li>
+                        <%= f.check_box :media_only, data: {behavior: "auto_submit"} %>
+                        <%= f.label :media_only do %>
+                            Media Only <span class="slider-checkbox"></span>
+                        <% end %>
+                    </li>
+                </ul>
+                <p class="control-group-description">
+                    Only show tweets that contain links or images
+                </p>
+
+            <% end %>
+
             <ul class="control-group control-group-form">
                 <li>
                     <%= link_to 'Refresh Favicon', refresh_favicon_subscription_path(@subscription), remote: true, method: :post %>
