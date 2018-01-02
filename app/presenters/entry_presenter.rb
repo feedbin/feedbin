@@ -16,7 +16,7 @@ class EntryPresenter < BasePresenter
 
   VIMEO_URLS = [
     %r(https?://vimeo\.com/video/(.*?)(#|\?|$)),
-    %r(https?://vimeo\.com/(.*?)(#|\?|$))
+    %r(https?://vimeo\.com/([0-9]+)(#|\?|$))
   ]
 
 
