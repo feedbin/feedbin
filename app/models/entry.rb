@@ -175,17 +175,13 @@ class Entry < ApplicationRecord
   def mark_as_unread
     if skip_mark_as_unread.blank? && self.published > 1.month.ago
 
-      filters = {
-        feed_id: self.feed_id,
-        active: true,
-        muted: false
-      }
-      if self.tweet?
-        if self.retweet?
-          filters[:show_retweets] = true
-        end
-        if !self.twitter_media?
-          filters[:media_only] = false
+      filters = Hash.new.tap do |hash|
+        hash[:feed_id] = self.feed_id
+        hash[:active] = true
+        hash[:muted] = false
+        if self.tweet?
+          hash[:show_retweets] = true if self.retweet?
+          hash[:media_only] = false if !self.twitter_media?
         end
       end
 
