@@ -16,7 +16,6 @@ group :development do
   gem 'capistrano-rails'
   gem 'better_errors'
   gem 'silencer'
-  gem 'spring'
   gem 'benchmark-ips'
   gem 'xipio'
   gem 'listen'
@@ -95,6 +94,7 @@ gem 'raindrops'
 gem 'curb'
 gem 'twitter'
 gem 'twitter-text'
+gem 'bootsnap', require: false
 
 # Stripe
 gem 'stripe'
