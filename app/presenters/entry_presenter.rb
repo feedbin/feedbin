@@ -14,7 +14,10 @@ class EntryPresenter < BasePresenter
     %r(https?://instagram\.com/p/(.*?)(/|#|\?|$))
   ]
 
-  VIMEO_URL = %r(https?://vimeo\.com/video/(.*?)(#|\?|$))
+  VIMEO_URLS = [
+    %r(https?://vimeo\.com/video/(.*?)(#|\?|$)),
+    %r(https?://vimeo\.com/(.*?)(#|\?|$))
+  ]
 
 
   presents :entry
@@ -505,7 +508,7 @@ class EntryPresenter < BasePresenter
 
   def tweet_vimeo_embed(url)
     url = url.expanded_url.to_s
-    if VIMEO_URL =~ url && $1
+    if VIMEO_URLS.find { |format| url =~ format } && $1
       vimeo_id = $1
       @template.content_tag(:iframe, "", src: "https://player.vimeo.com/video/#{vimeo_id}", height: 9, width: 16, frameborder: 0, allowfullscreen: true).html_safe
     else
