@@ -111,12 +111,16 @@ class Feed < ApplicationRecord
   end
 
   def priority_refresh
-    Sidekiq::Client.push_bulk(
-      'args'  => [[self.id, self.feed_url]],
-      'class' => 'FeedRefresherFetcherCritical',
-      'queue' => 'feed_refresher_fetcher_critical',
-      'retry' => false
-    )
+    if self.twitter_feed? && 2.hours.ago > self.updated_at
+      TwitterFeedRefresher.new().enqueue_feed(self)
+    else
+      Sidekiq::Client.push_bulk(
+        'args'  => [[self.id, self.feed_url]],
+        'class' => 'FeedRefresherFetcherCritical',
+        'queue' => 'feed_refresher_fetcher_critical',
+        'retry' => false
+      )
+    end
   end
 
   def list_unsubscribe
