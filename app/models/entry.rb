@@ -44,9 +44,24 @@ class Entry < ApplicationRecord
     if self.tweet?
       tweets = [self.main_tweet]
       tweets.push(self.main_tweet.quoted_status) if self.main_tweet.quoted_status?
-      media = !!(tweets.find { |tweet| tweet.media? || tweet.urls? })
+
+      media = tweets.find do |tweet|
+        found = false
+        found = true if tweet.media?
+
+        # quoted tweets have at least one url
+        if !found && tweet.urls?
+          if tweet.quoted_status?
+            found = true if tweet.urls.length > 1
+          else
+            found = true
+          end
+        end
+        found
+      end
+
     end
-    media
+    !!media
   end
 
   def retweet?
