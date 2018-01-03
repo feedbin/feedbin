@@ -86,7 +86,7 @@
                 Tells you when an article has been changed after being published
             </p>
 
-            <% if @subscription.feed.twitter? || @subscription.feed.twitter_home? %>
+            <% if @subscription.twitter_feed? %>
 
                 <div class="inset-content">
                     <h4 class="group-header">Twitter Options</h4>
