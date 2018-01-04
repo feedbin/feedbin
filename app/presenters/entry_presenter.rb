@@ -462,16 +462,25 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_media
-    entry.main_tweet.media
+    all_tweets.each_with_object([]) do |tweet, array|
+      tweet.media.each do |m|
+        array.push(m)
+      end
+    end
   end
 
   def tweet_urls
-    tweets = [entry.main_tweet]
-    tweets.push(entry.main_tweet.quoted_status) if entry.main_tweet.quoted_status?
-    tweets.each_with_object([]) do |tweet, array|
+    all_tweets.each_with_object([]) do |tweet, array|
       tweet.urls.each do |url|
         array.push(url)
       end
+    end
+  end
+
+  def all_tweets
+    Array.new.tap do |array|
+      array.push(entry.main_tweet)
+      array.push(entry.main_tweet.quoted_status) if entry.main_tweet.quoted_status?
     end
   end
 
