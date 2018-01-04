@@ -22,6 +22,9 @@ class SavePages
     end
     entry.data["saved_pages"] = saved_pages
     entry.save!
+
+    entry.content = ApplicationController.render template: "entries/_tweet_default.html.erb", locals: {entry: entry}, layout: nil
+    entry.save!
   end
 
   def find_urls(tweets)
