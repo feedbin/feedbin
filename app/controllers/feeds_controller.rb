@@ -124,7 +124,8 @@ class FeedsController < ApplicationController
   def search
     @user = current_user
     if twitter_feed?(params[:q]) && !@user.twitter_enabled?
-      @twitter_error = true
+      session[:subscribe_query] = params[:q]
+      render :js => "window.location = '#{new_twitter_authentication_path}';"
     else
       config = {
         twitter_access_token: @user.twitter_access_token,
@@ -149,7 +150,10 @@ class FeedsController < ApplicationController
     url.start_with?("#") ||
     url.start_with?("http://twitter.com") ||
     url.start_with?("https://twitter.com") ||
-    url.start_with?("twitter.com")
+    url.start_with?("http://mobile.twitter.com") ||
+    url.start_with?("https://mobile.twitter.com") ||
+    url.start_with?("twitter.com") ||
+    url.start_with?("mobile.twitter.com")
   end
 
   def update_view_mode(view_mode)

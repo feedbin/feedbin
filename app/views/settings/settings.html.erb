@@ -84,26 +84,6 @@
     <div class="inset">
 
         <div class="inset-content">
-            <h4 class="group-header"><a name="twitter"></a>Twitter</h4>
-        </div>
-        <% if @user.twitter_enabled? %>
-            <ul class="pill-list no-margin">
-                <li><%= link_to "Deactivate Twitter", delete_twitter_authentications_path, class: "danger", method: :delete, data: { confirm: "Are you sure you want to deactivate Twitter? Your Twitter feeds will no longer be updated."} %></li>
-            </ul>
-        <% else %>
-            <ul class="pill-list">
-                <li><%= link_to "Activate Twitter", new_twitter_authentication_path %></li>
-            </ul>
-            <p class="control-group-description no-margin">
-                Once activated you will be able to subscribe to Twitter users and searches.
-            </p>
-        <% end %>
-
-    </div>
-
-    <div class="inset">
-
-        <div class="inset-content">
             <h4 class="group-header">Newsletter Address</h4>
         </div>
 
@@ -142,9 +122,18 @@
                 <% end %>
             </li>
         </ul>
-        <p class="control-group-description no-margin">
+        <p class="control-group-description <%= (!@user.twitter_enabled?) ? "no-margin" : "" %>">
             A TLS enabled image proxy is used to prevent <a href="https://developer.mozilla.org/en-US/docs/Security/MixedContent">mixed content</a> warnings. You can turn it off if you experience image loading issues.
         </p>
+
+        <% if @user.twitter_enabled? %>
+            <ul class="pill-list">
+                <li><%= link_to "Switch Twitter Account", new_twitter_authentication_path %></li>
+            </ul>
+            <p class="control-group-description no-margin">
+                You are currently signed in to Twitter as <strong><%= @user.twitter_screen_name %></strong>.
+            </p>
+        <% end %>
 
     </div>
 

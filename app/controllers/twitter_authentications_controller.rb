@@ -30,9 +30,15 @@ class TwitterAuthenticationsController < ApplicationController
     if klass.response_valid?(session, params)
       access_token = klass.request_access(session.delete(:oauth_token), session.delete(:oauth_secret), params[:oauth_verifier])
       @user.update(twitter_access_token: access_token.token, twitter_access_secret: access_token.secret, twitter_screen_name: access_token.params[:screen_name])
-      redirect_to settings_url, notice: "Twitter has been activated!"
+
+      if query = session.delete(:subscribe_query)
+        redirect_to subscribe_url(subscribe: query)
+      else
+        redirect_to settings_url, notice: "Twitter has been activated!"
+      end
+
     else
-      redirect_to settings_url, alert: "Feedbin needs your permission to activate Twitter."
+      redirect_to root_url, alert: "Feedbin needs your permission to activate Twitter."
     end
   rescue OAuth => e
     Honeybadger.notify(
