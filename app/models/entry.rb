@@ -130,11 +130,23 @@ class Entry < ApplicationRecord
   end
 
   def as_indexed_json(options={})
-    base = as_json(root: false, only: Entry.mappings.to_hash[:entry][:properties].keys)
+    base = as_json(root: false, only: Entry.mappings.to_hash[:entry][:properties].keys.reject {|key| key.to_s.start_with?("twitter")})
     base["title"] =  ContentFormatter.summary(self.title)
     base["content"] = ContentFormatter.summary(self.content)
     base["title_exact"] = base["title"]
     base["content_exact"] = base["content"]
+
+    if self.tweet?
+      tweets = [self.main_tweet]
+      tweets.push(self.main_tweet.quoted_status) if self.main_tweet.quoted_status?
+      base["twitter_screen_name"] = "#{self.main_tweet.user.screen_name} @#{self.main_tweet.user.screen_name}"
+      base["twitter_name"] = self.main_tweet.user.name
+      base["twitter_retweet"] = self.tweet.retweeted_status?
+      base["twitter_quoted"] = self.tweet.quoted_status?
+      base["twitter_media"] = self.twitter_media?
+      base["twitter_image"] = !!(tweets.find {|tweet| tweet.media? })
+      base["twitter_link"] = !!(tweets.find {|tweet| tweet.urls? })
+    end
     base
   end
 
