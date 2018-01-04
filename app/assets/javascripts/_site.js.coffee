@@ -5,6 +5,9 @@ $.extend feedbin,
   messageTimeout: null
   swipe: false
 
+  showFeedList: ->
+    $('[data-behavior~=feeds_target]').addClass('in')
+
   showFeeds: ->
     $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
     if feedbin.swipe

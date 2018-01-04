@@ -61,6 +61,7 @@ feedbin.applyCounts = (useHideQueue) ->
           container.addClass('zero-count')
 
   feedbin.updateTitle()
+  feedbin.showFeedList()
 
 class feedbin.CountsBehavior
   constructor: ->
