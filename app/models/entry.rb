@@ -26,11 +26,13 @@ class Entry < ApplicationRecord
   self.per_page = 100
 
   def tweet?
-    data && data["tweet"]
+    tweet.present?
   end
 
   def tweet
-    @tweet ||= (tweet?) ? Twitter::Tweet.new(data["tweet"].deep_symbolize_keys) : nil
+    @tweet ||= Twitter::Tweet.new(data["tweet"].deep_symbolize_keys)
+  rescue
+    nil
   end
 
   def main_tweet
@@ -46,20 +48,10 @@ class Entry < ApplicationRecord
       tweets.push(self.main_tweet.quoted_status) if self.main_tweet.quoted_status?
 
       media = tweets.find do |tweet|
-        found = false
-        found = true if tweet.media?
-
-        # quoted tweets have at least one url
-        if !found && tweet.urls?
-          if tweet.quoted_status?
-            found = true if tweet.urls.length > 1
-          else
-            found = true
-          end
-        end
-        found
+        return true if tweet.media?
+        urls = tweet.urls.reject {|url| url.expanded_url.host == "twitter.com" }
+        return true if !urls.empty?
       end
-
     end
     !!media
   end
