@@ -333,50 +333,12 @@ class EntryPresenter < BasePresenter
 
   def summary
     if entry.tweet
-      tweet_summary.html_safe
+      entry.tweet_summary.html_safe
     else
       entry.summary.html_safe
     end
-  end
-
-  def tweet_summary(tweet = nil)
-    tweet = tweet ? tweet : entry.main_tweet
-    hash = tweet.to_h
-
-    text = trim_text(hash, true)
-    entry.main_tweet.urls.reverse.each do |url|
-      begin
-        range = Range.new(*url.indices, true)
-        text[range] = url.display_url
-      rescue
-      end
-    end
-    text
-  end
-
-  def trim_text(hash, exclude_end = false)
-    text = hash[:full_text]
-    if range = hash[:display_text_range]
-      range = Range.new(0, range.last, exclude_end)
-      text = text.codepoints[range].pack("U*")
-    end
-    text
-  end
-
-  def tweet_text(tweet = nil)
-    tweet = tweet ? tweet : entry.main_tweet
-    hash = tweet.to_h
-    if hash[:entities]
-      if hash[:entities][:media].present? && hash[:display_text_range] && hash[:entities][:media].last[:indices].first > hash[:display_text_range].last
-        hash[:entities][:media].pop
-      elsif hash[:quoted_status] && hash[:display_text_range] && hash[:entities][:urls].last[:indices].first > hash[:display_text_range].last
-        hash[:entities][:urls].pop
-      end
-      text = trim_text(hash)
-      Twitter::TwitterText::Autolink.auto_link_with_json(text, hash[:entities]).html_safe
-    else
-      hash[:full_text]
-    end
+  rescue
+    ""
   end
 
   def trimmed_summary(text)

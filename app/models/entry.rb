@@ -60,6 +60,45 @@ class Entry < ApplicationRecord
     (self.tweet?) ? self.tweet.retweeted_status? : false
   end
 
+  def tweet_summary
+    hash = self.main_tweet.to_h
+
+    text = trim_text(hash, true)
+    self.main_tweet.urls.reverse.each do |url|
+      begin
+        range = Range.new(*url.indices, true)
+        text[range] = url.display_url
+      rescue
+      end
+    end
+    text
+  end
+
+  def tweet_text(tweet = nil)
+    tweet = tweet ? tweet : self.main_tweet
+    hash = tweet.to_h
+    if hash[:entities]
+      if hash[:entities][:media].present? && hash[:display_text_range] && hash[:entities][:media].last[:indices].first > hash[:display_text_range].last
+        hash[:entities][:media].pop
+      elsif hash[:quoted_status] && hash[:display_text_range] && hash[:entities][:urls].last[:indices].first > hash[:display_text_range].last
+        hash[:entities][:urls].pop
+      end
+      text = trim_text(hash)
+      Twitter::TwitterText::Autolink.auto_link_with_json(text, hash[:entities]).html_safe
+    else
+      hash[:full_text]
+    end
+  end
+
+  def trim_text(hash, exclude_end = false)
+    text = hash[:full_text]
+    if range = hash[:display_text_range]
+      range = Range.new(0, range.last, exclude_end)
+      text = text.codepoints[range].pack("U*")
+    end
+    text
+  end
+
   def has_content
     if [title, url, entry_id, content].compact.count == 0
       errors.add(:base, 'entry has no content')
@@ -237,7 +276,15 @@ class Entry < ApplicationRecord
   end
 
   def create_summary
-    self.summary = ContentFormatter.summary(self.content, 256)
+    if self.tweet?
+      begin
+        self.summary = self.tweet_summary
+      rescue
+        self.summary = ""
+      end
+    else
+      self.summary = ContentFormatter.summary(self.content, 256)
+    end
   end
 
   def touch_feed_last_published_entry

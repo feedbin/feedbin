@@ -71,8 +71,14 @@ class DevicePushNotificationSend
   end
 
   def build_notification(device_token, feed_title, entry, operating_system)
+
+    alert_title = feed_title
+    if entry.tweet?
+      alert_title = entry.title
+    end
+
     body = format_text(entry.title)
-    if body.empty?
+    if body.empty? || entry.tweet?
       body = format_text(entry.summary)
     end
     author = format_text(entry.author)
@@ -83,7 +89,7 @@ class DevicePushNotificationSend
     end
     notification = Apnotic::Notification.new(device_token).tap do |notification|
       notification.alert = {
-        title: feed_title,
+        title: alert_title,
         body: body,
       }
       notification.custom_payload = {

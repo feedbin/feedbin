@@ -15,7 +15,7 @@
     <% end %>
   </header>
 
-  <p class="tweet-text"><%= entry_presenter.tweet_text %></p>
+  <p class="tweet-text"><%= entry.tweet_text %></p>
 
   <% if entry_presenter.quoted_status? %>
   <div class="quoted-tweet">
@@ -25,7 +25,7 @@
         <span><%= entry_presenter.tweet_screen_name(entry_presenter.quoted_status) %></span>
       </a>
     </h1>
-    <p class="tweet-text"><%= entry_presenter.tweet_text(entry_presenter.quoted_status) %></p>
+    <p class="tweet-text"><%= entry.tweet_text(entry_presenter.quoted_status) %></p>
   </div>
   <% end %>
 
