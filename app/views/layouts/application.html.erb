@@ -12,6 +12,11 @@
   <%= javascript_include_tag "application" %>
   <% if native? %>
     <%= javascript_include_tag "conditional/turbolinks" %>
+    <script>
+        $(function() {
+            $('body').addClass('standalone-navigator');
+        });
+    </script>
   <% end %>
   <%= yield(:head) %>
   <%= csrf_meta_tags %>
