@@ -6,6 +6,10 @@ module ApplicationHelper
     presenter
   end
 
+  def native?
+    request.user_agent && request.user_agent.include?("TurbolinksFeedbin")
+  end
+
   def is_active?(controller, action)
     controller = [*controller]
     action = [*action]

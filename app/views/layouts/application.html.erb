@@ -10,6 +10,9 @@
   <link rel="shortcut icon" href="<%= asset_path('favicon.ico') %>" type="image/vnd.microsoft.icon" />
   <%= stylesheet_link_tag "application", media: 'all'  %>
   <%= javascript_include_tag "application" %>
+  <% if native? %>
+    <%= javascript_include_tag "conditional/turbolinks" %>
+  <% end %>
   <%= yield(:head) %>
   <%= csrf_meta_tags %>
   <%= tag :meta, name: "stripe-key", content: STRIPE_PUBLIC_KEY %>
