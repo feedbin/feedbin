@@ -952,7 +952,6 @@ Structure
         min-height: $feeds-toolbar-height !important;
     }
     table {
-        margin-top: 8px;
         width: 100%;
     }
     td {
@@ -5043,7 +5042,7 @@ Buttons
     border: none;
     background: none;
     margin: 0;
-    padding: 0;
+    padding: 8px 0 0 0;
     width: 65px;
     cursor: pointer;
     &[disabled] {
