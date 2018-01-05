@@ -2929,10 +2929,12 @@ $saved-search-control-height: 48px;
 
     h1, h2 {
         font-size: 1.3em;
+        line-height: 1.3;
     }
 
     h3, h4, h5, h6 {
         font-size: 1.1em;
+        line-height: 1.4;
     }
 
     p,
@@ -3103,7 +3105,7 @@ $saved-search-control-height: 48px;
     .original-content-info {
         padding-right: 53px;
         padding-left: 36px;
-        line-height: 1;
+        line-height: 1.4;
         &:after {
             position: absolute;
             display: block;
@@ -3120,7 +3122,7 @@ $saved-search-control-height: 48px;
             font-size: 14px;
             font-weight: bold;
             @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-            margin-bottom: .55em;
+            margin-bottom: .3em;
             &:hover {
                 text-decoration: underline;
             }
@@ -3130,7 +3132,7 @@ $saved-search-control-height: 48px;
             @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         }
         .favicon-wrap {
-            top: 8px;
+            top: 10px;
             left: 8px;
             background-color: #FFF;
         }
