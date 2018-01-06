@@ -18,7 +18,19 @@
   <p class="tweet-text"><%= entry.tweet_text %></p>
 
   <% entry.tweet_thread.each do |thread| %>
-  <p class="tweet-text"><%= entry.tweet_text(thread) %></p>
+    <p class="tweet-text"><%= entry.tweet_text(thread) %></p>
+    <% thread.media.each do |media| %>
+      <div class="content-styles">
+      <% if entry_presenter.tweet_video?(media) %>
+        <%= entry_presenter.tweet_video(media) %>
+      <% else %>
+        <%= link_to media.media_url_https.to_s do %>
+          <%= image_tag media.media_url_https.to_s + ":large" %>
+        <% end %>
+      <% end %>
+      </div>
+    <% end %>
+
   <% end %>
 
   <% if entry_presenter.quoted_status? %>
