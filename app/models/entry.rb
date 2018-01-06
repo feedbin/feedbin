@@ -90,6 +90,18 @@ class Entry < ApplicationRecord
     end
   end
 
+  def thread
+    self.data.dig("thread") || []
+  end
+
+  def tweet_thread
+    @tweet_thread ||= begin
+      thread.map {|part| Twitter::Tweet.new(part.deep_symbolize_keys) }
+    end
+  rescue
+    []
+  end
+
   def trim_text(hash, exclude_end = false)
     text = hash[:full_text]
     if range = hash[:display_text_range]

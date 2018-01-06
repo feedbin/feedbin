@@ -42,7 +42,7 @@ gem 'pg'
 gem 'unicorn'
 
 gem 'feedjira', github: 'feedbin/feedjira', ref: 'eeb7e81'
-gem 'feedkit', github: "feedbin/feedkit", branch: "master"
+gem 'feedkit', github: "feedbin/feedkit", branch: "thread"
 
 gem 'opml_saw',              github: 'feedbin/opml_saw',            ref: '61d8c2d'
 gem 'html-pipeline',         github: 'feedbin/html-pipeline',       ref: '819a2b9'

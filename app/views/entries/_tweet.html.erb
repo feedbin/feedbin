@@ -17,6 +17,10 @@
 
   <p class="tweet-text"><%= entry.tweet_text %></p>
 
+  <% entry.tweet_thread.each do |thread| %>
+  <p class="tweet-text"><%= entry.tweet_text(thread) %></p>
+  <% end %>
+
   <% if entry_presenter.quoted_status? %>
   <div class="quoted-tweet">
     <h1>

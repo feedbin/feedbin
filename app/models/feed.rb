@@ -55,7 +55,11 @@ class Feed < ApplicationRecord
     ActiveRecord::Base.transaction do
       record = self.create!(parsed_feed.to_feed)
       parsed_feed.entries.each do |parsed_entry|
-        record.entries.create!(parsed_entry.to_entry)
+        entry_hash = parsed_entry.to_entry
+        threader = Threader.new(entry_hash, record)
+        if !threader.thread
+          record.entries.create!(entry_hash)
+        end
       end
       record
     end

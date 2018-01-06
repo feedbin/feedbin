@@ -114,8 +114,13 @@ class FeedRefresherReceiver
     if alternate_exists?(entry)
       Librato.increment('entry.alternate_exists')
     else
-      feed.entries.create!(entry)
-      Librato.increment('entry.create')
+      threader = Threader.new(entry, feed)
+      if !threader.thread
+        feed.entries.create!(entry)
+        Librato.increment('entry.create')
+      else
+        Librato.increment('entry.thread')
+      end
     end
   end
 
