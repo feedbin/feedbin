@@ -196,7 +196,7 @@ class EntryPresenter < BasePresenter
       classes.push("media")
     end
 
-    if entry.tweet?
+    if entry.tweet? || tweetlike?
       classes.push("tweet")
     end
 
@@ -335,7 +335,7 @@ class EntryPresenter < BasePresenter
     if entry.tweet
       entry.tweet_summary.html_safe
     else
-      entry.summary.html_safe
+      entry.summary.truncate(240, separator: " ", omission: "…").html_safe
     end
   rescue
     ""
@@ -401,11 +401,23 @@ class EntryPresenter < BasePresenter
       @template.content_tag(:span, '', class: "title-inner twitter-feed-title") do
         @template.content_tag(:strong, tweet_name) + " #{tweet_screen_name}"
       end
+    elsif tweetlike?
+      @template.content_tag(:strong, '', class: "title-inner twitter-feed-title", data: {behavior: "user_title", feed_id: entry.feed.id}) do
+        entry.feed.title
+      end
     else
       @template.content_tag(:span, '', class: "title-inner", data: {behavior: "user_title", feed_id: entry.feed.id}) do
         entry.feed.title
       end
     end
+  end
+
+  def tweetlike?
+    entry.title.blank?
+  end
+
+  def title?
+    !entry.tweet? || entry.title.present?
   end
 
   def tweet_name(tweet = nil)

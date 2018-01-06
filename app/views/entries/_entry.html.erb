@@ -22,15 +22,13 @@
         </div>
         <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago inline') %>
         <span class="title-wrap">
-            <% if !entry.tweet? %>
+            <% if entry_presenter.title? %>
                 <h2 class="title">
                     <%= entry_presenter.profile_image(entry.feed) %>
                     <span><%= entry_presenter.title %></span>
                 </h2>
             <% end %>
-            <% if entry_presenter.show_body?  %>
-                <p class="body"><%= entry_presenter.summary %></p>
-            <% end %>
+            <p class="body"><%= entry_presenter.summary %></p>
             <%= entry_presenter.image %>
         </span>
         <i class="status-indicator icon-star"></i>
