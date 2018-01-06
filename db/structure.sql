@@ -270,7 +270,8 @@ CREATE TABLE entries (
     image_url text,
     processed_image_url text,
     image json,
-    recently_played_entries_count integer DEFAULT 0
+    recently_played_entries_count integer DEFAULT 0,
+    thread_id bigint
 );
 
 
@@ -1482,6 +1483,13 @@ CREATE INDEX index_entries_on_recently_played_entries_count ON entries USING btr
 
 
 --
+-- Name: index_entries_on_thread_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_entries_on_thread_id ON entries USING btree (thread_id) WHERE (thread_id IS NOT NULL);
+
+
+--
 -- Name: index_favicons_on_host; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2061,6 +2069,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20170427001830'),
 ('20170812121620'),
 ('20170816220409'),
-('20180102071024');
+('20180102071024'),
+('20180106031725');
 
 
