@@ -348,13 +348,13 @@ class EntryPresenter < BasePresenter
       new_part = part + ". "
       output << new_part
       if index == 0
-        if output.length > 216
-          output = output[0..216]
+        if output.length > 180
+          output = output[0..180]
           output = output[0..-2]
           return output << "…"
         end
       else
-        if output.length > 216
+        if output.length > 180
           return output.sub(new_part, "")
         end
       end
