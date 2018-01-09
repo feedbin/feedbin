@@ -1,14 +1,19 @@
 <% if @feeds.present? %>
-  $('#add_form_modal [data-behavior~=subscribe_target]').html('<%= j render partial: "subscriptions/new", locals: {feeds: @feeds} %>');
-  $('#add_form_modal [data-behavior~=feeds_search_favicon_target]').html('<%= j favicon_with_host(@feeds.first.host) %>');
-  $('#add_form_modal .feed-search-results').slideDown(200)
-  $('#add_form_modal .modal-dialog').addClass('done');
-  $('#add_form_modal [data-behavior~=submit_add]').removeAttr('disabled');
-  $('#add_form_modal .title').first().find("input").focus();
-  window.history.replaceState({}, document.title, "/");
-  feedbin.updateFeedSearchMessage();
-<% elsif @twitter_error %>
-    feedbin.showNotification('Please activate Twitter in the settings.', 3000, '<%= settings_path %>#twitter', true);
+    <% present @feeds.first do |feed_presenter| %>
+        <% if @feeds.first.twitter_user? %>
+            $('#add_form_modal [data-behavior~=feeds_search_favicon_target]').html('<%= j feed_presenter.favicon(@feeds.first) %>');
+        <% else %>
+            $('#add_form_modal [data-behavior~=feeds_search_favicon_target]').html('<%= j favicon_with_host(@feeds.first.host) %>');
+        <% end %>
+
+        $('#add_form_modal [data-behavior~=subscribe_target]').html('<%= j render partial: "subscriptions/new", locals: {feeds: @feeds} %>');
+        $('#add_form_modal .feed-search-results').slideDown(200)
+        $('#add_form_modal .modal-dialog').addClass('done');
+        $('#add_form_modal [data-behavior~=submit_add]').removeAttr('disabled');
+        $('#add_form_modal .title').first().find("input").focus();
+        window.history.replaceState({}, document.title, "/");
+        feedbin.updateFeedSearchMessage();
+  <% end %>
 <% else %>
     feedbin.showNotification('No feed found.', 3000, '', true);
 <% end %>
