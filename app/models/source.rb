@@ -17,6 +17,9 @@ class Source
   def create_feed(option)
     Librato.increment("feed_finder.#{option.source}")
     feed = Feed.where(feed_url: option.href).take
+    if feed
+      feed.priority_refresh
+    end
 
     if !feed
       request = @config[:request]

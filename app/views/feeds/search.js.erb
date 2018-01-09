@@ -5,6 +5,7 @@
   $('#add_form_modal .modal-dialog').addClass('done');
   $('#add_form_modal [data-behavior~=submit_add]').removeAttr('disabled');
   $('#add_form_modal .title').first().find("input").focus();
+  window.history.replaceState({}, document.title, "/");
   feedbin.updateFeedSearchMessage();
 <% elsif @twitter_error %>
     feedbin.showNotification('Please activate Twitter in the settings.', 3000, '<%= settings_path %>#twitter', true);

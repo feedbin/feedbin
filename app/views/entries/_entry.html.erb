@@ -14,25 +14,23 @@
     >
     <span class="entries-inner-wrap">
         <%= entry_presenter.profile_image(entry.feed) %>
-        <div class="meta-wrap">
-            <p class="feed-title">
-                <%= entry_presenter.feed_title %>
-            </p>
-            <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
-        </div>
-        <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago inline') %>
-        <span class="title-wrap">
-            <% if !entry.tweet? %>
+        <div class="inline-content-wrap">
+            <div class="meta-wrap">
+                <p class="feed-title">
+                    <%= entry_presenter.feed_title %>
+                </p>
+                <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
+            </div>
+            <span class="title-wrap">
                 <h2 class="title">
                     <%= entry_presenter.profile_image(entry.feed) %>
                     <span><%= entry_presenter.title %></span>
                 </h2>
-            <% end %>
-            <% if entry_presenter.show_body?  %>
-                <p class="body"><%= entry_presenter.summary %></p>
-            <% end %>
-            <%= entry_presenter.image %>
-        </span>
+                <%= entry_presenter.summary %>
+                <%= entry_presenter.image %>
+            </span>
+        </div>
+        <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago inline') %>
         <i class="status-indicator icon-star"></i>
         <span class="entry-actions-wrap" data-behavior="show_entry_actions">
             <i class="icon-entry-actions"></i>

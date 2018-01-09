@@ -1563,7 +1563,7 @@ $saved-search-control-height: 48px;
     }
     .entries-inner-wrap {
         display: block;
-        padding: 10px 10px 8px 0;
+        padding: 10px 10px 10px 0;
         margin-left: 38px;
         border-bottom: 1px solid transparent;
         position: relative;
@@ -1631,16 +1631,6 @@ $saved-search-control-height: 48px;
         display: inline-block;
         background-color: #FFF;
     }
-    .title {
-        font-weight: bold;
-        margin: 0;
-        font-size: 14px;
-        line-height: 1.2;
-        display: block;
-        margin-bottom: 2px;
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-        position: relative;
-    }
     .meta-wrap {
         display: flex;
         justify-content: space-between;
@@ -1669,52 +1659,65 @@ $saved-search-control-height: 48px;
     .icon-play {
         display: inline-block;
     }
-    .body {
+    .title {
+        font-weight: bold;
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.2;
+        display: block;
+        margin-bottom: 2px;
+        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        position: relative;
+    }
+    .body, &.no-title .title {
+        font-weight: normal;
         line-height: 1.3;
         font-size: 12px;
         margin: 0;
         @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         display: block;
+    }
+    .body {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    &.tweet {
-        .entries-inner-wrap {
-            > .favicon-wrap {
-                display: flex;
-                top: 8px;
-                z-index: 3;
-            }
+    &.no-title {
+        .favicon-wrap {
+            display: flex;
+            top: 8px;
+            z-index: 3;
         }
-        .title {
+        .title .favicon-wrap {
             display: none;
         }
         .meta-wrap {
             margin-bottom: 2px;
         }
         .feed-title {
-            strong {
-                font-weight: bold;
-            }
+            font-weight: bold;
             font-size: 14px;
             display: block;
             line-height: 1.2;
             position: relative;
             @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+            .title-inner {
+                font-weight: bold;
+                span {
+                    font-weight: normal;
+                }
+            }
         }
-        .body {
-            white-space: pre-wrap;
-            overflow: visible;
-        }
+
     }
     &.starred {
         .icon-star {
             display: block;
         }
     }
-    &.read {
+    &.read, &.read.no-title {
         .title,
+        .feed-title,
         .body {
             @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         }
@@ -1847,7 +1850,15 @@ $saved-search-control-height: 48px;
 }
 
 .entries-display-inline .entries {
+    .inline-content-wrap {
+        display: flex;
+        align-items: baseline;
+        min-width: 0;
+    }
     .entries-inner-wrap {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
         padding-top: 8px;
         padding-bottom: 8px;
         > .favicon-wrap {
@@ -1859,31 +1870,37 @@ $saved-search-control-height: 48px;
     .meta-wrap {
         display: inline-block;
     }
+    .feed-title, .no-title .feed-title {
+        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        .title-inner {
+            font-weight: normal;
+        }
+    }
     .feed-title {
-        position: absolute !important;
         width: 110px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         padding: 0 10px 0 0;
-
         font-size: 12px !important;
         line-height: 1.3 !important;
-        strong {
-            font-weight: normal !important;
-        }
+        margin: 0 !important;
     }
     .title-wrap {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        width: 100%;
-        padding: 0 70px 0 100px;
         display: block;
         line-height: 1.1;
+        padding-right: 26px;
         .favicon-wrap {
             display: none;
         }
+    }
+    .no-title .title {
+        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        font-weight: bold;
+        font-size: 14px;
     }
     .title, .body {
         display: inline;
@@ -1893,18 +1910,13 @@ $saved-search-control-height: 48px;
         overflow: hidden !important;
     }
     .meta-wrap {
-        position: absolute;
-        top: 9px;
         .time {
             display: none;
         }
     }
     .time.inline {
         display: block;
-    }
-    .time {
-        position: absolute;
-        right: 10px;
+        align-self: auto;
     }
 }
 

@@ -121,14 +121,21 @@ class EntryPresenter < BasePresenter
   end
 
   def title
-    text = sanitized_title
-    if text.blank?
+    length = 100
+    if entry.tweet?
+      text = entry.tweet_summary.html_safe
+      length = 280
+    elsif sanitized_title.present?
+      text = sanitized_title
+    elsif !entry.summary.blank?
       text = entry.summary.html_safe
+      length = 240
     end
+
     if text.blank?
-      text = '&ndash;&ndash;'.html_safe
+      text = '--'.html_safe
     end
-    @template.truncate(text, length: 98, omission: '…', escape: false)
+    @template.truncate(text, length: length, omission: '…', escape: false)
   end
 
   def entry_view_title
@@ -196,8 +203,8 @@ class EntryPresenter < BasePresenter
       classes.push("media")
     end
 
-    if entry.tweet?
-      classes.push("tweet")
+    if !title? || entry.tweet?
+      classes.push("no-title")
     end
 
     classes.join(" ")
@@ -332,13 +339,12 @@ class EntryPresenter < BasePresenter
   end
 
   def summary
-    if entry.tweet
-      entry.tweet_summary.html_safe
-    else
-      entry.summary.html_safe
+    if !entry.tweet && title?
+      summary = entry.summary.truncate(240, separator: " ", omission: "…").html_safe
+      @template.content_tag(:p, summary, class: "body")
     end
   rescue
-    ""
+    nil
   end
 
   def trimmed_summary(text)
@@ -348,13 +354,13 @@ class EntryPresenter < BasePresenter
       new_part = part + ". "
       output << new_part
       if index == 0
-        if output.length > 216
-          output = output[0..216]
+        if output.length > 180
+          output = output[0..180]
           output = output[0..-2]
           return output << "…"
         end
       else
-        if output.length > 216
+        if output.length > 180
           return output.sub(new_part, "")
         end
       end
@@ -398,14 +404,18 @@ class EntryPresenter < BasePresenter
 
   def feed_title
     if entry.tweet?
-      @template.content_tag(:span, '', class: "title-inner twitter-feed-title") do
-        @template.content_tag(:strong, tweet_name) + " #{tweet_screen_name}"
+      @template.content_tag(:span, '', class: "title-inner") do
+        "#{tweet_name} #{@template.content_tag(:span, tweet_screen_name)}".html_safe
       end
     else
       @template.content_tag(:span, '', class: "title-inner", data: {behavior: "user_title", feed_id: entry.feed.id}) do
         entry.feed.title
       end
     end
+  end
+
+  def title?
+    entry.title.present?
   end
 
   def tweet_name(tweet = nil)
