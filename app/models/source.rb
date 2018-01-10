@@ -17,9 +17,6 @@ class Source
   def create_feed(option)
     Librato.increment("feed_finder.#{option.source}")
     feed = Feed.where(feed_url: option.href).take
-    if feed
-      feed.priority_refresh
-    end
 
     if !feed
       request = @config[:request]
@@ -28,10 +25,6 @@ class Source
       end
 
       feed = Feed.where(feed_url: request.last_effective_url).take
-
-      if feed
-        feed.priority_refresh
-      end
 
       if !feed && request.body.present? && [:xml, :json_feed].include?(request.format)
         parsed_feed = Feedkit.fetch_and_parse(request.last_effective_url, request: request)

@@ -114,9 +114,9 @@ class Feed < ApplicationRecord
     @original_title or self.title
   end
 
-  def priority_refresh
+  def priority_refresh(user = nil)
     if self.twitter_feed? && 2.hours.ago > self.updated_at
-      TwitterFeedRefresher.new().enqueue_feed(self)
+      TwitterFeedRefresher.new().enqueue_feed(self, user)
     else
       Sidekiq::Client.push_bulk(
         'args'  => [[self.id, self.feed_url]],

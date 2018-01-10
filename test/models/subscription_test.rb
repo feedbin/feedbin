@@ -14,5 +14,42 @@ class SubscriptionTest < ActiveSupport::TestCase
     end
   end
 
+  test "should be media only" do
+    user = users(:ben)
+    feed = Feed.create(feed_url: SecureRandom.hex, site_url: SecureRandom.hex)
+
+    feeds = {
+      feed.id => {
+        "title" => "title",
+        "tags" => "Design",
+        "subscribe" => "1",
+        "media_only" => "1"
+      }
+    }
+
+    Subscription.create_multiple(feeds, user, [feed.id])
+    subscription = user.subscriptions.where(feed: feed).take!
+    assert(subscription.media_only, "Subscription should be media only")
+  end
+
+  test "should not media only" do
+    user = users(:ben)
+    feed = Feed.create(feed_url: SecureRandom.hex, site_url: SecureRandom.hex)
+
+    feeds = {
+      feed.id => {
+        "title" => "title",
+        "tags" => "Design",
+        "subscribe" => "1",
+        "media_only" => "0"
+      }
+    }
+
+    Subscription.create_multiple(feeds, user, [feed.id])
+    subscription = user.subscriptions.where(feed: feed).take!
+    assert_not(subscription.media_only, "Subscription should be not media only")
+  end
+
+
 
 end

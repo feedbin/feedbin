@@ -133,6 +133,7 @@ class FeedsController < ApplicationController
         twitter_screen_name: @user.twitter_screen_name
       }
       @feeds = FeedFinder.new(params[:q], config).create_feeds!
+      @feeds.map{|feed| feed.priority_refresh(@user) }
     end
   rescue => exception
     logger.info { "------------------------" }

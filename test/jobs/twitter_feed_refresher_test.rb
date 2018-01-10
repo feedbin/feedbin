@@ -20,6 +20,16 @@ class TwitterFeedRefresherTest < ActiveSupport::TestCase
     assert_equal args, Sidekiq::Queues["feed_refresher_fetcher"].first["args"]
   end
 
+  test "feed gets with passed user" do
+    Sidekiq::Worker.clear_all
+    assert_difference "TwitterFeedRefresher.jobs.size", +1 do
+      TwitterFeedRefresher.new().enqueue_feed(@feed, @user)
+    end
+
+    args = [@feed.id, @feed.feed_url, [@keys]]
+    assert_equal args, Sidekiq::Queues["feed_refresher_fetcher"].first["args"]
+  end
+
   test "feed does not get scheduled because user doesn't match" do
     Feed.class_eval do
       def self.readonly_attributes

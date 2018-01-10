@@ -7,8 +7,8 @@ class TwitterFeedRefresher
     end
   end
 
-  def enqueue_feed(feed)
-    keys = load_keys(feed)
+  def enqueue_feed(feed, user = nil)
+    keys = load_keys(feed, user)
     if keys.present?
       Sidekiq::Client.push(
         'args'  => [feed.id, feed.feed_url, keys],
@@ -19,8 +19,13 @@ class TwitterFeedRefresher
     end
   end
 
-  def load_keys(feed)
-    user_ids = feed.subscriptions.where(active: true, muted: false).pluck(:user_id)
+  def load_keys(feed, user = nil)
+    if user
+      user_ids = [user.id]
+    else
+      user_ids = feed.subscriptions.where(active: true, muted: false).pluck(:user_id)
+    end
+
     users = User.where(id: user_ids)
     users.map do |user|
       user_matches = true
