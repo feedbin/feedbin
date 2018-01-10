@@ -21,7 +21,7 @@ GIT
 GIT
   remote: https://github.com/feedbin/feedkit.git
   revision: d3f256ce2d24ec281dfb5cfca2e71628ad41e0de
-  branch: thread
+  branch: master
   specs:
     feedkit (0.1.0)
       curb (~> 0.9)
