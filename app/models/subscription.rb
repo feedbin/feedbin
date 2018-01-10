@@ -22,7 +22,7 @@ class Subscription < ApplicationRecord
       feed = Feed.find(feed_id)
       if valid_feed_ids.include?(feed.id) && subscription["subscribe"] == "1"
         record = user.subscriptions.find_or_create_by(feed: feed)
-        record.update(title: subscription["title"].strip)
+        record.update(title: subscription["title"].strip, media_only: subscription["media_only"])
         array.push(record)
         if subscription["tags"].present?
           feed.tag(subscription["tags"], user, true)

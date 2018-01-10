@@ -7880,7 +7880,30 @@ Add
                 right: auto;
                 top: auto;
             }
+            &.hide {
+                display: none;
+            }
         }
+    }
+    .subscription-preferences {
+        label {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            [type=checkbox] {
+                position: absolute !important;
+                top: -9999px !important;
+                left: -9999px !important;
+            }
+            .slider-checkbox {
+                margin-left: 15px;
+                position: relative;
+                display: inline-block;
+                right: 0;
+                top: 0;
+            }
+        }
+
     }
     .feed-url {
         display: none;

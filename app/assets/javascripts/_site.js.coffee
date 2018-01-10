@@ -667,7 +667,7 @@ $.extend feedbin,
     $('.entry-final-content a [data-behavior~=link_actions]').remove()
 
   updateFeedSearchMessage: ->
-    length = $('[data-behavior~=check_toggle]:checked').length
+    length = $('[data-behavior~=subscription_option] [data-behavior~=check_toggle]:checked').length
     show = (message) ->
       $("#add_form_modal [data-behavior~=feeds_search_message]").addClass("hide")
       $("#add_form_modal [data-behavior~=feeds_search_message][data-behavior~=#{message}]").removeClass("hide")
@@ -1587,8 +1587,8 @@ $.extend feedbin,
         $(@).parents("form").submit()
 
     checkToggle: ->
-      $(document).on 'change', '[data-behavior~=check_toggle]', (event) ->
-        length = $('[data-behavior~=check_toggle]:checked').length
+      $(document).on 'change', '[data-behavior~=subscription_option] [data-behavior~=check_toggle]', (event) ->
+        length = $('[data-behavior~=subscription_option] [data-behavior~=check_toggle]:checked').length
         if length == 0
           $('#add_form_modal [data-behavior~=submit_add]').attr('disabled', 'disabled')
         else

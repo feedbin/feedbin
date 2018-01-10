@@ -3,7 +3,7 @@
   <%= hidden_field_tag "valid_feed_ids", valid_feed_ids %>
   <% feeds.each_with_index do |feed, index| %>
     <%= fields_for "feeds[]", feed do |pf| %>
-      <div class="subscription-option">
+      <div class="subscription-option" data-behavior="subscription_option">
         <div class="title">
           <%= pf.text_field :title, placeholder: feed.title %>
           <p class="feed-url" title="Feed URL"><%= feed.feed_url %></p>
@@ -12,7 +12,7 @@
             <%= pf.text_field :tags, placeholder: "Tags", data: {behavior: 'autocomplete_field', autocomplete_path: tags_path} %>
             <div class="subscribe-tags-autocomplete" data-behavior="autocomplete_target"></div>
         </div>
-        <div class="action">
+        <div class="action <%= (feeds.length == 1) ? 'hide' : '' %>">
             <%= pf.check_box :subscribe, checked: index == 0 ? true : false, data: {behavior: "check_toggle"} %>
             <%= pf.label :subscribe do %>
                 <span class="slider-checkbox"></span>
@@ -20,6 +20,18 @@
         </div>
         <p class="feed-url" title="Feed URL"><%= feed.feed_url %></p>
       </div>
+
+      <% if feed.twitter_feed? %>
+          <div class="subscription-preferences">
+              <label>
+                  Tweets with media and links only
+                  <%= pf.check_box :media_only, checked: true, data: {behavior: "check_toggle"} %>
+                  <%= pf.label :media_only do %>
+                      <span class="slider-checkbox"></span>
+                  <% end %>
+              </label>
+          </div>
+      <% end %>
      <% end %>
   <% end %>
   <%= submit_tag("Submit", class: "visually-hidden", data: {behavior: "submit_add"}) %>
