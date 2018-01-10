@@ -4323,8 +4323,19 @@ Settings
                 padding: 0;
                 list-style: none;
                 li {
+                    display: flex;
+                    justify-content: space-between;
                     color: $text-color-light;
-                    margin-bottom: 8px;
+                    border-top: 1px solid $border-color;
+                    a {
+                        padding: 10px 0;
+                        margin-right: 10px;
+                        text-decoration: none;
+                    }
+                    time {
+                        padding: 10px 0;
+                        margin-right: 10px;
+                    }
                 }
             }
         }
