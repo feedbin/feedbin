@@ -13,7 +13,17 @@
                     <div class="right-column">
                         <div class="header clearfix">
                             <div class="half">
-                                <h3><a href="<%= @subscription.feed.site_url %>"><%= @subscription.title || @subscription.feed.title %></a></h3>
+                                <h3>
+                                    <% if @subscription.feed.twitter_user? %>
+                                        <a href="<%= @subscription.feed.feed_url %>">
+                                            <%= @subscription.feed.twitter_user.name %> <span>@<%= @subscription.feed.twitter_user.screen_name %></span>
+                                        </a>
+                                    <% else %>
+                                        <a href="<%= @subscription.feed.site_url %>">
+                                            <%= @subscription.title || @subscription.feed.title %>
+                                        </a>
+                                    <% end %>
+                                </h3>
                                 <p class="subhead"><a href="<%= @subscription.feed.feed_url %>"><%= @subscription.feed.feed_url %></a></p>
                             </div>
                             <div class="half">
@@ -48,11 +58,24 @@
                             </div>
                             <div class="stat">
                                 <p class="stat-title stat-header">Volume</p>
-                                <p class="stat-body"><%= subscription_presenter.graph_volume %> articles / month</p>
+                                <p class="stat-body">
+                                    <%= subscription_presenter.graph_volume %>
+                                    <% if @subscription.feed.twitter_feed? %>
+                                        tweets / month
+                                    <% else %>
+                                        articles / month
+                                    <% end %>
+                                 </p>
                             </div>
                         </div>
                         <div class="recent-articles">
-                            <p class="stat-header">Recent Articles</p>
+                            <p class="stat-header">
+                                <% if @subscription.feed.twitter_feed? %>
+                                    Recent Tweets
+                                <% else %>
+                                    Recent Articles
+                                <% end %>
+                            </p>
                             <ul>
                                 <% @subscription.feed.entries.order(published: :desc).limit(3).each do |entry| %>
                                     <% present entry do |entry_presenter| %>
@@ -111,11 +134,13 @@
 
             <% end %>
 
-            <ul class="control-group control-group-form">
-                <li>
-                    <%= link_to 'Refresh Favicon', refresh_favicon_subscription_path(@subscription), remote: true, method: :post %>
-                </li>
-            </ul>
+            <% if !@subscription.feed.twitter_feed? %>
+                <ul class="control-group control-group-form">
+                    <li>
+                        <%= link_to 'Refresh Favicon', refresh_favicon_subscription_path(@subscription), remote: true, method: :post %>
+                    </li>
+                </ul>
+            <% end %>
 
         </div>
     </div>

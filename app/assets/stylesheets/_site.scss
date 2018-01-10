@@ -4193,6 +4193,11 @@ Settings
         h3 {
             font-size: 24px;
             margin: 0;
+            span {
+                font-weight: normal;
+                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+
+            }
             a {
                 color: $text-color;
                 &:hover {
@@ -5262,9 +5267,22 @@ button.close {
     .favicon-target {
         position: absolute;
         right: 30px;
-        top: 26px;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
         .favicon-wrap {
             position: static;
+            margin: auto;
+        }
+        .twitter-profile-image {
+            height: 34px;
+            width: 34px;
+            img {
+                height: 30px;
+                width: 30px;
+                border-radius: 30px;
+            }
         }
     }
     label {
@@ -5279,7 +5297,7 @@ button.close {
         font-size: 18px;
         padding-top: 5px;
     }
-    input[type=text] {
+    input[type=text], input[type=url] {
         border: none;
         margin: 0;
         background-color: transparent;

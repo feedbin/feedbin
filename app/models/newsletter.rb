@@ -12,6 +12,12 @@ class Newsletter
 
   def token
     @token ||= begin
+      full_token.split("+").first
+    end
+  end
+
+  def full_token
+    @full_token ||= begin
       to_email.sub("@newsletters.feedbin.com", "").sub("@development.newsletters.feedbin.com", "").sub("test-subscribe+", "").sub("subscribe+", "")
     end
   end
@@ -49,7 +55,7 @@ class Newsletter
   end
 
   def feed_id
-    @feed_id ||= Digest::SHA1.hexdigest("#{token}#{from_email}")
+    @feed_id ||= Digest::SHA1.hexdigest("#{full_token}#{from_email}")
   end
 
   def entry_id
