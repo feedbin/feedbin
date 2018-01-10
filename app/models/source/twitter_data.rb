@@ -5,9 +5,7 @@ class Source::TwitterData < Source
     if recognized_url.valid?
       twitter = Feedkit::Tweets.new(recognized_url, @config[:twitter_access_token], @config[:twitter_access_secret])
       feed = Feed.where(feed_url: recognized_url.url.to_s).take
-      if feed
-        feed.priority_refresh
-      else
+      if !feed
         feed = Feed.create_from_parsed_feed(twitter.feed)
       end
       [feed]
