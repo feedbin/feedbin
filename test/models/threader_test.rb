@@ -9,8 +9,14 @@ class ThreaderTest < ActiveSupport::TestCase
 
   test "should add thread" do
     entry_hash = threaded_entry(@parent_entry.thread_id)
+
+    UnreadEntry.where(entry: @parent_entry).delete_all
+
     threader = Threader.new(entry_hash, @feed)
-    assert(threader.thread)
+    assert_difference "UpdatedEntry.count", +1 do
+      assert(threader.thread)
+    end
+
     assert_equal(@parent_entry.reload.thread_id, entry_hash["thread_id"])
     assert_equal(@parent_entry.reload.thread.length, 1)
   end
