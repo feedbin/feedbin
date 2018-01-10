@@ -31,7 +31,7 @@ class FeedRefresherReceiver
 
   def update_entry(entry)
     original_entry = Entry.find_by_public_id(entry['public_id'])
-    if original_entry.present?
+    if original_entry.present? && !original_entry.tweet?
       FeedbinUtils.update_public_id_cache(entry['public_id'], entry['content'], entry['data']['public_id_alt'])
       if published_recently?(original_entry.published)
         entry_update = entry.slice('author', 'content', 'title', 'url', 'entry_id', 'data')
