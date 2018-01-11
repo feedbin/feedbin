@@ -2702,7 +2702,7 @@ $saved-search-control-height: 48px;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
     }
     h1 {
-        font-size: 2.4em;
+        font-size: 2em;
         line-height: 1.1;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         margin: 0 0 .2em 0;
@@ -2716,7 +2716,7 @@ $saved-search-control-height: 48px;
     }
 }
 .post-meta {
-    font-size: 17px;
+    font-size: 14px;
     @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
     line-height: 1.2;
     margin-bottom: .2em;
@@ -3466,6 +3466,7 @@ $saved-search-control-height: 48px;
             font-size: 18px;
             margin: 0;
             padding-right: 25px;
+            margin-bottom: .2em;
             a {
                 @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
                 text-decoration: none;
@@ -3541,7 +3542,7 @@ $saved-search-control-height: 48px;
         border: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
         h1 {
-            font-size: 16px;
+            font-size: 18px;
             margin: 0 0 5px 0;
             a {
                 @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
