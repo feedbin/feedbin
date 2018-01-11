@@ -525,7 +525,7 @@ class EntryPresenter < BasePresenter
     }
 
     if media.type == "animated_gif"
-      options["autoplay"] = true
+      options["autoplay"] = false
       options["loop"] = true
     end
 
