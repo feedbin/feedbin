@@ -10,23 +10,24 @@ class SavePages
 
     urls = find_urls(tweets)
 
-    url = urls.first
-    saved_pages = {}
+    if url = urls.first
+      saved_pages = {}
 
-    key = FeedbinUtils.page_cache_key(url)
-    begin
-      saved_pages[url] = Rails.cache.fetch(key) do
-        Librato.increment 'readability.first_parse'
-        MercuryParser.parse(url)
+      key = FeedbinUtils.page_cache_key(url)
+      begin
+        saved_pages[url] = Rails.cache.fetch(key) do
+          Librato.increment 'readability.first_parse'
+          MercuryParser.parse(url)
+        end
+      rescue
       end
-    rescue
+
+      entry.data["saved_pages"] = saved_pages
+      entry.save!
+
+      entry.content = ApplicationController.render template: "entries/_tweet_default.html.erb", locals: {entry: entry}, layout: nil
+      entry.save!
     end
-
-    entry.data["saved_pages"] = saved_pages
-    entry.save!
-
-    entry.content = ApplicationController.render template: "entries/_tweet_default.html.erb", locals: {entry: entry}, layout: nil
-    entry.save!
   end
 
   def find_urls(tweets)
