@@ -10,7 +10,13 @@ class SessionsController < ApplicationController
     user = User.where('lower(email) = ?', params[:email].try(:strip).try(:downcase)).take
     if user && user.authenticate(params[:password])
       sign_in user, params[:remember_me]
-      redirect_back_or root_url
+
+      if request.xhr?
+        render js: "window.location = '#{root_url}';"
+      else
+        redirect_back_or root_url
+      end
+
     else
       flash.now.alert = "Invalid email or password"
       render "new"

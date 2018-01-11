@@ -1,0 +1,123 @@
+<% present entry do |entry_presenter| %>
+<div class="tweet-wrap" data-behavior="external_links">
+  <header class="tweet-header">
+    <%= image_tag entry_presenter.tweet_profile_image_uri, size: "47x47" %>
+    <h1><a href="<%= entry_presenter.tweet_user_url %>" target="_blank"><%= entry_presenter.tweet_name %> <span><%= entry_presenter.tweet_screen_name %></span></a></h1>
+
+    <p class="post-meta">
+      <time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time>
+      <% if entry_presenter.tweet_location %>
+          from <%= entry_presenter.tweet_location %>
+      <% end %>
+    </p>
+    <%= link_to entry.tweet.uri.to_s, target: "_blank", title: "View on Twitter", class: "twitter-link", id: "source_link" do %>
+        <%= svg_tag "icon-twitter" %>
+    <% end %>
+  </header>
+
+  <p class="tweet-text"><%= entry.tweet_text %></p>
+
+  <% entry.tweet_thread.each do |thread| %>
+    <p class="tweet-text"><%= entry.tweet_text(thread) %></p>
+    <% thread.media.each do |media| %>
+      <div class="content-styles">
+      <% if entry_presenter.tweet_video?(media) %>
+        <%= entry_presenter.tweet_video(media) %>
+      <% else %>
+        <%= link_to media.media_url_https.to_s do %>
+          <%= image_tag media.media_url_https.to_s + ":large" %>
+        <% end %>
+      <% end %>
+      </div>
+    <% end %>
+
+    <% thread.urls.each do |url| %>
+      <% if entry_presenter.tweet_youtube_embed(url) %>
+        <p><%= entry_presenter.tweet_youtube_embed(url) %></p>
+      <% elsif entry_presenter.tweet_vimeo_embed(url) %>
+        <%= entry_presenter.tweet_vimeo_embed(url) %>
+      <% elsif entry_presenter.tweet_instagram_embed(url) %>
+        <%= entry_presenter.tweet_instagram_embed(url) %>
+      <% end %>
+    <% end %>
+
+
+  <% end %>
+
+  <% if entry_presenter.quoted_status? %>
+  <div class="quoted-tweet">
+    <h1>
+      <a href="<%= entry_presenter.tweet_user_url(entry_presenter.quoted_status) %>" target="_blank">
+        <%= entry_presenter.tweet_name(entry_presenter.quoted_status) %>
+        <span><%= entry_presenter.tweet_screen_name(entry_presenter.quoted_status) %></span>
+      </a>
+    </h1>
+    <p class="tweet-text"><%= entry.tweet_text(entry_presenter.quoted_status) %></p>
+  </div>
+  <% end %>
+
+  <% if entry.tweet.retweeted_status? %>
+    <div class="tweet-meta-wrap">
+        <p class="tweet-meta">
+          <a href="<%= entry_presenter.tweet_user_url(entry.tweet) %>">
+            <%= image_tag entry_presenter.tweet_retweeted_image, size: "16x16" %>
+            <%= entry_presenter.tweet_retweeted_message %>
+          </a>
+        </p>
+    </div>
+  <% end %>
+
+  <% entry_presenter.tweet_media.each do |media| %>
+    <div class="content-styles">
+    <% if entry_presenter.tweet_video?(media) %>
+      <%= entry_presenter.tweet_video(media) %>
+    <% else %>
+      <%= link_to media.media_url_https.to_s do %>
+        <%= image_tag media.media_url_https.to_s + ":large" %>
+      <% end %>
+    <% end %>
+    </div>
+  <% end %>
+
+  <% entry_presenter.tweet_urls.each do |url| %>
+
+    <% if entry_presenter.tweet_youtube_embed(url) %>
+      <%= entry_presenter.tweet_youtube_embed(url) %>
+    <% elsif entry_presenter.tweet_vimeo_embed(url) %>
+      <%= entry_presenter.tweet_vimeo_embed(url) %>
+    <% elsif entry_presenter.tweet_instagram_embed(url) %>
+      <%= entry_presenter.tweet_instagram_embed(url) %>
+    <% elsif page = entry_presenter.saved_page(url.expanded_url.to_s) %>
+
+      <%
+      begin
+          link_content = ContentFormatter.format!(page.content, nil)
+      rescue
+          link_content = nil
+      end
+      %>
+
+      <% if link_content && link_content.length > 400 %>
+        <hr />
+        <p class="post-meta new-section">
+        <%= favicon_with_host(url.expanded_url.host) %> <%= url.expanded_url.host %>
+        </p>
+        <header class="entry-header">
+            <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
+            <h1><%= page.title || "Untitled" %></h1>
+            <% end %>
+            <p class="post-meta">
+                <% if page.author %>
+                    by <%= page.author %>
+                <% end %>
+            </p>
+        </header>
+        <div class="content-styles entry-final-content" data-behavior="view_link_markup_wrap entry_final_content">
+            <%= link_content.html_safe %>
+        </div>
+      <% end %>
+    <% end %>
+
+  <% end %>
+</div>
+<% end %>

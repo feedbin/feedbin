@@ -5,10 +5,31 @@ $.extend feedbin,
   messageTimeout: null
   swipe: false
 
-  showFeeds: ->
-    $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
-    if feedbin.swipe
-      $('.app-wrap').animate({scrollLeft: 0}, {duration: 250})
+  showFeedList: ->
+    $('[data-behavior~=feeds_target]').addClass('in')
+
+  showPanel: (panel, state = true) ->
+    if panel == 1
+      window.history.replaceState({panel: 1}, document.title, "/");
+      $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
+      if feedbin.swipe
+        $('.app-wrap').animate({scrollLeft: 0}, {duration: 250})
+    else if panel == 2
+      if state
+        window.history.pushState({panel: 2}, document.title, "/");
+
+      $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
+      if feedbin.swipe
+        offset = $('.entries-column')[0].offsetLeft
+        $('.app-wrap').animate({scrollLeft: offset}, {duration: 250})
+    else if panel == 3
+      if state
+        window.history.pushState({panel: 3}, document.title, "/");
+
+      $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
+      if feedbin.swipe
+        offset = $('.entry-column')[0].offsetLeft
+        $('.app-wrap').animate({scrollLeft: offset}, {duration: 250})
 
   affix: ->
     $('[data-behavior~=modal_affix]').affix
@@ -324,6 +345,7 @@ $.extend feedbin,
     console.log input
 
   markRead: () ->
+    feedbin.showPanel(1);
     $('.entries li').addClass('read')
     feedbin.markReadData.ids = $('.entries li').map(() ->
       $(@).data('entry-id')
@@ -645,7 +667,7 @@ $.extend feedbin,
     $('.entry-final-content a [data-behavior~=link_actions]').remove()
 
   updateFeedSearchMessage: ->
-    length = $('[data-behavior~=check_toggle]:checked').length
+    length = $('[data-behavior~=subscription_option] [data-behavior~=check_toggle]:checked').length
     show = (message) ->
       $("#add_form_modal [data-behavior~=feeds_search_message]").addClass("hide")
       $("#add_form_modal [data-behavior~=feeds_search_message][data-behavior~=#{message}]").removeClass("hide")
@@ -719,6 +741,14 @@ $.extend feedbin,
 
     initSingletons: ->
       new feedbin.CountsBehavior()
+
+    state: ->
+      $(window).on 'popstate', (event) ->
+        original = event.originalEvent
+        if original.state?
+          feedbin.showPanel(original.state.panel, false)
+        else
+          feedbin.showPanel(1)
 
     renameFeed: ->
       $(document).on 'dblclick', '[data-behavior~=renamable]', (event) ->
@@ -815,7 +845,7 @@ $.extend feedbin,
         return
 
     entryLinks: ->
-      $(document).on 'click', '[data-behavior~=entry_content_wrap] a, [data-behavior~=view_link_markup_wrap] a', ->
+      $(document).on 'click', '[data-behavior~=entry_content_wrap] a, [data-behavior~=view_link_markup_wrap] a, [data-behavior~=external_links] a', ->
         $(this).attr('target', '_blank').attr('rel', 'noopener noreferrer')
         return
 
@@ -943,21 +973,13 @@ $.extend feedbin,
 
     feedSelected: ->
       $(document).on 'click', '[data-behavior~=show_feeds]', ->
-        feedbin.showFeeds()
+        feedbin.showPanel(1)
 
       $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
-        $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
-        if feedbin.swipe
-          offset = $('.entries-column')[0].offsetLeft
-          $('.app-wrap').animate({scrollLeft: offset}, {duration: 250})
-        return
+        feedbin.showPanel(2)
 
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
-        $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
-        if feedbin.swipe
-          offset = $('.entry-column')[0].offsetLeft
-          $('.app-wrap').animate({scrollLeft: offset}, {duration: 250})
-        return
+        feedbin.showPanel(3)
 
     addFields: ->
       $(document).on 'click', '[data-behavior~=add_fields]', (event) ->
@@ -1565,8 +1587,8 @@ $.extend feedbin,
         $(@).parents("form").submit()
 
     checkToggle: ->
-      $(document).on 'change', '[data-behavior~=check_toggle]', (event) ->
-        length = $('[data-behavior~=check_toggle]:checked').length
+      $(document).on 'change', '[data-behavior~=subscription_option] [data-behavior~=check_toggle]', (event) ->
+        length = $('[data-behavior~=subscription_option] [data-behavior~=check_toggle]:checked').length
         if length == 0
           $('#add_form_modal [data-behavior~=submit_add]').attr('disabled', 'disabled')
         else

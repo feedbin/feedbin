@@ -23,6 +23,13 @@ module Searchable
       indexes :feed_id,       type: 'long', index: :not_analyzed, include_in_all: false
       indexes :published,     type: 'date', include_in_all: false
       indexes :updated,       type: 'date', include_in_all: false
+
+      indexes :twitter_screen_name, analyzer: 'whitespace'
+      indexes :twitter_name, analyzer: 'whitespace'
+      indexes :twitter_retweet, type: 'boolean'
+      indexes :twitter_media, type: 'boolean'
+      indexes :twitter_image, type: 'boolean'
+      indexes :twitter_link, type: 'boolean'
     end
 
     def self.saved_search_count(user)
@@ -57,7 +64,7 @@ module Searchable
       saved_searches.map do |saved_search|
         query_string = saved_search.query
 
-        continue if query_string =~ READ_REGEX
+        next if query_string =~ READ_REGEX
 
         query_string = query_string.gsub(UNREAD_REGEX, '')
         query_string = {query: "#{query_string} is:unread"}
@@ -214,7 +221,7 @@ module Searchable
         escape = '\ '.sub(' ', '')
         query = query.gsub(special_characters_regex) { |character| escape + character }
 
-        colon_regex = /(?<!title|title_exact|feed_id|content|content_exact|author|_missing_|_exists_):(?=.*)/
+        colon_regex = /(?<!title|title_exact|feed_id|content|content_exact|author|_missing_|_exists_|twitter_screen_name|twitter_name|twitter_retweet|twitter_media|twitter_image|twitter_link):(?=.*)/
         query = query.gsub(colon_regex, '\:')
         query
       end

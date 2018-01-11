@@ -1,5 +1,25 @@
 class EntryPresenter < BasePresenter
 
+  YOUTUBE_URLS = [
+    %r(https?://youtu\.be/(.+)),
+    %r(https?://www\.youtube\.com/watch\?v=(.*?)(&|#|$)),
+    %r(https?://m\.youtube\.com/watch\?v=(.*?)(&|#|$)),
+    %r(https?://www\.youtube\.com/embed/(.*?)(\?|$)),
+    %r(https?://www\.youtube\.com/v/(.*?)(#|\?|$)),
+    %r(https?://www\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b)
+  ]
+
+  INSTAGRAM_URLS = [
+    %r(https?://www\.instagram\.com/p/(.*?)(/|#|\?|$)),
+    %r(https?://instagram\.com/p/(.*?)(/|#|\?|$))
+  ]
+
+  VIMEO_URLS = [
+    %r(https?://vimeo\.com/video/(.*?)(#|\?|$)),
+    %r(https?://vimeo\.com/([0-9]+)(#|\?|$))
+  ]
+
+
   presents :entry
 
   def entry_link(&block)
@@ -18,18 +38,26 @@ class EntryPresenter < BasePresenter
   end
 
   def published_date
-    if entry.published
-      entry.published.to_s(:full_human)
+    if entry.tweet?
+      entry.main_tweet.created_at.to_s(:full_human)
     else
-      ''
+      if entry.published
+        entry.published.to_s(:full_human)
+      else
+        ''
+      end
     end
   end
 
   def datetime
-    if entry.published
-      entry.published.to_s(:datetime)
+    if entry.tweet?
+      entry.main_tweet.created_at.to_s(:datetime)
     else
-      ''
+      if entry.published
+        entry.published.to_s(:datetime)
+      else
+        ''
+      end
     end
   end
 
@@ -84,15 +112,30 @@ class EntryPresenter < BasePresenter
     entry.summary.respond_to?(:length) && entry.summary.length > 0
   end
 
+  def show_body?
+    if entry.tweet?
+      true
+    else
+      has_content? && sanitized_title.present?
+    end
+  end
+
   def title
-    text = sanitized_title
-    if text.blank?
+    length = 100
+    if entry.tweet?
+      text = entry.tweet_summary.html_safe
+      length = 280
+    elsif sanitized_title.present?
+      text = sanitized_title
+    elsif !entry.summary.blank?
       text = entry.summary.html_safe
+      length = 240
     end
+
     if text.blank?
-      text = '&ndash;&ndash;'.html_safe
+      text = '--'.html_safe
     end
-    @template.truncate(text, length: 98, omission: '…', escape: false)
+    @template.truncate(text, length: length, omission: '…', escape: false)
   end
 
   def entry_view_title
@@ -146,10 +189,25 @@ class EntryPresenter < BasePresenter
     output
   end
 
-  def media_class
-    if media_type == :audio
-      "media"
+  def saved_page(url)
+    if entry.data && entry.data['saved_pages'] && page = entry.data['saved_pages'][url]
+      if page["result"]
+        MercuryParser.new(nil, page)
+      end
     end
+  end
+
+  def media_class
+    classes = []
+    if media_type == :audio
+      classes.push("media")
+    end
+
+    if !title? || entry.tweet?
+      classes.push("no-title")
+    end
+
+    classes.join(" ")
   end
 
   def media_type
@@ -280,20 +338,29 @@ class EntryPresenter < BasePresenter
     decoder.decode(@template.strip_tags(entry.summary))
   end
 
-  def summary(text)
+  def summary
+    if !entry.tweet && title?
+      summary = entry.summary.truncate(240, separator: " ", omission: "…").html_safe
+      @template.content_tag(:p, summary, class: "body")
+    end
+  rescue
+    nil
+  end
+
+  def trimmed_summary(text)
     output = ""
     parts = text.split('. ')
     a = parts.each_with_index do |part, index|
       new_part = part + ". "
       output << new_part
       if index == 0
-        if output.length > 216
-          output = output[0..216]
+        if output.length > 180
+          output = output[0..180]
           output = output[0..-2]
           return output << "…"
         end
       else
-        if output.length > 216
+        if output.length > 180
           return output.sub(new_part, "")
         end
       end
@@ -323,6 +390,162 @@ class EntryPresenter < BasePresenter
     end
   rescue
     nil
+  end
+
+  def profile_image(feed)
+    if entry.tweet?
+      @template.content_tag :span, '', class: "favicon-wrap twitter-profile-image" do
+        @template.image_tag(tweet_profile_image_uri)
+      end
+    else
+      favicon(feed)
+    end
+  end
+
+  def feed_title
+    if entry.tweet?
+      @template.content_tag(:span, '', class: "title-inner") do
+        "#{tweet_name} #{@template.content_tag(:span, tweet_screen_name)}".html_safe
+      end
+    else
+      @template.content_tag(:span, '', class: "title-inner", data: {behavior: "user_title", feed_id: entry.feed.id}) do
+        entry.feed.title
+      end
+    end
+  end
+
+  def title?
+    entry.title.present?
+  end
+
+  def tweet_name(tweet = nil)
+    tweet = tweet ? tweet : entry.main_tweet
+    tweet.user.name
+  end
+
+  def tweet_screen_name(tweet = nil)
+    tweet = tweet ? tweet : entry.main_tweet
+    "@" + tweet.user.screen_name
+  end
+
+  def tweet_user_url(tweet = nil)
+    tweet = tweet ? tweet : entry.main_tweet
+    "https://twitter.com/#{tweet.user.screen_name}"
+  end
+
+  def tweet_media
+    all_tweets.each_with_object([]) do |tweet, array|
+      tweet.media.each do |m|
+        array.push(m)
+      end
+    end
+  end
+
+  def tweet_urls
+    all_tweets.each_with_object([]) do |tweet, array|
+      tweet.urls.each do |url|
+        array.push(url)
+      end
+    end
+  end
+
+  def all_tweets
+    Array.new.tap do |array|
+      array.push(entry.main_tweet)
+      array.push(entry.main_tweet.quoted_status) if entry.main_tweet.quoted_status?
+    end
+  end
+
+  def tweet_retweeted_message
+    "Retweeted by " + (entry.tweet.user.name || "@" + entry.tweet.user.screen_name)
+  end
+
+  def tweet_retweeted_image
+    if entry.tweet.user.profile_image_uri?
+      entry.tweet.user.profile_image_uri_https("normal")
+    else
+      # default twitter avatar
+    end
+  end
+
+  # Sizes: normal, bigger
+  def tweet_profile_image_uri(size = "bigger")
+    if entry.main_tweet.user.profile_image_uri?
+      entry.main_tweet.user.profile_image_uri_https("bigger")
+    else
+      # default twitter avatar
+    end
+  end
+
+  def tweet_youtube_embed(url)
+    url = url.expanded_url.to_s
+    if YOUTUBE_URLS.find { |format| url =~ format } && $1
+      youtube_id = $1
+      @template.content_tag(:iframe, "", src: "https://www.youtube.com/embed/#{youtube_id}", height: 9, width: 16, frameborder: 0, allowfullscreen: true).html_safe
+    else
+      false
+    end
+  end
+
+  def tweet_vimeo_embed(url)
+    url = url.expanded_url.to_s
+    if VIMEO_URLS.find { |format| url =~ format } && $1
+      vimeo_id = $1
+      @template.content_tag(:iframe, "", src: "https://player.vimeo.com/video/#{vimeo_id}", height: 9, width: 16, frameborder: 0, allowfullscreen: true).html_safe
+    else
+      false
+    end
+  end
+
+  def tweet_instagram_embed(url)
+    url = url.expanded_url.to_s
+    if INSTAGRAM_URLS.find { |format| url =~ format } && $1
+      instagram_id = $1
+      @template.link_to url, class: "content-styles", target: "_blank" do
+        @template.image_tag("https://instagram.com/p/#{instagram_id}/media/?size=l")
+      end
+    else
+      false
+    end
+  end
+
+  def tweet_location
+    (entry.main_tweet.place?) ? entry.main_tweet.place.full_name : nil
+  end
+
+  def tweet_video?(media)
+    media.type == "video" || media.type == "animated_gif"
+  end
+
+  def tweet_video(media)
+    options = {
+      poster: media.media_url_https.to_s + ":large",
+      width: media.video_info.aspect_ratio.first,
+      height: media.video_info.aspect_ratio.last
+    }
+
+    if media.type == "animated_gif"
+      options["autoplay"] = false
+      options["loop"] = true
+    end
+
+    highest_quality_video = media.video_info.variants.max_by do |element|
+      if element.content_type == "video/mp4" && element.bitrate
+        element.bitrate
+      else
+        0
+      end
+    end
+
+    @template.video_tag highest_quality_video.url.to_s, options
+  end
+
+  def quoted_status?
+    entry.main_tweet.quoted_status?
+  end
+
+  def quoted_status
+    entry.main_tweet.quoted_status
   end
 
 end

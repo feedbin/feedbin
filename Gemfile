@@ -16,7 +16,6 @@ group :development do
   gem 'capistrano-rails'
   gem 'better_errors'
   gem 'silencer'
-  gem 'spring'
   gem 'benchmark-ips'
   gem 'xipio'
   gem 'listen'
@@ -42,14 +41,16 @@ end
 gem 'pg'
 gem 'unicorn'
 
-gem 'feedjira',              github: 'feedbin/feedjira',            ref: 'eeb7e81'
+gem 'feedjira', github: 'feedbin/feedjira', ref: 'eeb7e81'
+gem 'feedkit', github: 'feedbin/feedkit', branch: 'master'
+
 gem 'opml_saw',              github: 'feedbin/opml_saw',            ref: '61d8c2d'
 gem 'html-pipeline',         github: 'feedbin/html-pipeline',       ref: '819a2b9'
 gem 'grocer-pushpackager',   github: 'feedbin/grocer-pushpackager', ref: '6b01b4e', require: 'grocer/pushpackager'
 gem 'html_diff',             github: 'feedbin/html_diff',           ref: 'c7c15ce'
 gem 'carrierwave_direct',    github: 'feedbin/carrierwave_direct',  ref: 'a0bc323'
 
-gem 'sass-rails'
+gem 'sassc-rails'
 gem 'coffee-rails'
 gem 'uglifier'
 gem 'autoprefixer-rails'
@@ -91,6 +92,9 @@ gem 'elasticsearch-model', '~> 2.0'
 gem 'sidekiq'
 gem 'raindrops'
 gem 'curb'
+gem 'twitter'
+gem 'twitter-text'
+gem 'bootsnap', require: false
 
 # Stripe
 gem 'stripe'

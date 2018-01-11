@@ -37,7 +37,11 @@ class User < ApplicationRecord
                  :hide_recently_played,
                  :now_playing_entry,
                  :audio_panel_size,
-                 :view_links_in_app
+                 :view_links_in_app,
+                 :twitter_access_secret,
+                 :twitter_access_token,
+                 :twitter_screen_name,
+                 :twitter_access_error
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -93,6 +97,10 @@ class User < ApplicationRecord
   validates_uniqueness_of :email, case_sensitive: false
   validates_presence_of :password, on: :create
 
+  def twitter_enabled?
+    twitter_access_secret && twitter_access_token
+  end
+
   def set_defaults
     self.expires_at = Feedbin::Application.config.trial_days.days.from_now
     self.update_auth_token = true
@@ -131,7 +139,7 @@ class User < ApplicationRecord
     OnboardingMessage.perform_in(3.days, self.id, MarketingMailer.method(:onboarding_2_mobile).name.to_s)
     OnboardingMessage.perform_in(5.days, self.id, MarketingMailer.method(:onboarding_3_subscribe).name.to_s)
     OnboardingMessage.perform_in(Feedbin::Application.config.trial_days.days - 1.days, self.id, MarketingMailer.method(:onboarding_4_expiring).name.to_s)
-    OnboardingMessage.perform_at(Feedbin::Application.config.trial_days.days.from_now, self.id, MarketingMailer.method(:onboarding_5_expired).name.to_s)
+    OnboardingMessage.perform_at(Feedbin::Application.config.trial_days.days.from_now + 1.days, self.id, MarketingMailer.method(:onboarding_5_expired).name.to_s)
   end
 
   def setting_on?(setting_symbol)

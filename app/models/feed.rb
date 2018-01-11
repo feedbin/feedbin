@@ -19,7 +19,22 @@ class Feed < ApplicationRecord
 
   after_initialize :default_values
 
-  enum feed_type: { xml: 0, newsletter: 1 }
+  enum feed_type: { xml: 0, newsletter: 1, twitter: 2, twitter_home: 3}
+
+
+  def twitter_user?
+    twitter_user.present?
+  end
+
+  def twitter_user
+    @twitter_user ||= Twitter::User.new(options["twitter_user"].deep_symbolize_keys)
+  rescue
+    nil
+  end
+
+  def twitter_feed?
+    self.twitter? || self.twitter_home?
+  end
 
   def tag(names, user, delete_existing = true)
     taggings = []
@@ -40,7 +55,11 @@ class Feed < ApplicationRecord
     ActiveRecord::Base.transaction do
       record = self.create!(parsed_feed.to_feed)
       parsed_feed.entries.each do |parsed_entry|
-        record.entries.create!(parsed_entry.to_entry)
+        entry_hash = parsed_entry.to_entry
+        threader = Threader.new(entry_hash, record)
+        if !threader.thread
+          record.entries.create!(entry_hash)
+        end
       end
       record
     end
@@ -54,10 +73,10 @@ class Feed < ApplicationRecord
     unless etag.blank?
       options[:if_none_match] = etag
     end
-    request = FeedRequest.new(url: self.feed_url, options: options)
+    request = Feedkit::Request.new(url: self.feed_url, options: options)
     result = request.status
     if request.body
-      result = ParsedFeed.new(request.body, request)
+      result = Feedkit.fetch_and_parse(self.feed_url, request: request)
     end
     result
   end
@@ -95,13 +114,17 @@ class Feed < ApplicationRecord
     @original_title or self.title
   end
 
-  def priority_refresh
-    Sidekiq::Client.push_bulk(
-      'args'  => [[self.id, self.feed_url]],
-      'class' => 'FeedRefresherFetcherCritical',
-      'queue' => 'feed_refresher_fetcher_critical',
-      'retry' => false
-    )
+  def priority_refresh(user = nil)
+    if self.twitter_feed? && 2.hours.ago > self.updated_at
+      TwitterFeedRefresher.new().enqueue_feed(self, user)
+    else
+      Sidekiq::Client.push_bulk(
+        'args'  => [[self.id, self.feed_url]],
+        'class' => 'FeedRefresherFetcherCritical',
+        'queue' => 'feed_refresher_fetcher_critical',
+        'retry' => false
+      )
+    end
   end
 
   def list_unsubscribe

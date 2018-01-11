@@ -110,6 +110,7 @@ body, html {
     padding: 0;
     height: 100%;
     width: 100%;
+    -webkit-text-size-adjust: none;
 }
 
 body {
@@ -951,7 +952,6 @@ Structure
         min-height: $feeds-toolbar-height !important;
     }
     table {
-        margin-top: 8px;
         width: 100%;
     }
     td {
@@ -1267,7 +1267,8 @@ Structure
     display: flex;
     align-items: center;
     box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
-    .favicon, svg {
+    border-radius: 1px;
+    .favicon, svg, img {
         background-repeat: no-repeat;
         background-position: center center;
         background-size: 16px 16px;
@@ -1275,6 +1276,12 @@ Structure
         width: 16px;
         display: block;
         margin: auto;
+    }
+    &.twitter-profile-image {
+        border-radius: 20px;
+        img {
+            border-radius: 16px;
+        }
     }
     .entries & {
         background-color: transparent;
@@ -1285,7 +1292,6 @@ Structure
         }
     }
 }
-
 
 li.selected > a .favicon-wrap {
     background-color: #FFF;
@@ -1557,7 +1563,7 @@ $saved-search-control-height: 48px;
     }
     .entries-inner-wrap {
         display: block;
-        padding: 10px 10px 8px 0;
+        padding: 10px 10px 10px 0;
         margin-left: 38px;
         border-bottom: 1px solid transparent;
         position: relative;
@@ -1625,62 +1631,105 @@ $saved-search-control-height: 48px;
         display: inline-block;
         background-color: #FFF;
     }
+    .meta-wrap {
+        display: flex;
+        justify-content: space-between;
+        margin: 0 0 1px 0;
+        align-items: baseline;
+    }
+    .feed-title {
+        font-size: 12px;
+        line-height: 1.3;
+        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0 5px 0 0;
+    }
     .time {
+        align-self: flex-end;
         font-size: 12px;
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-        margin-bottom: 1px;
         display: block;
-        position: absolute;
-        right: 10px;
-        top: 10px;
-        padding-left: 14px;
+        white-space: nowrap;
+        &.inline {
+            display: none;
+        }
+    }
+    .icon-play {
+        display: inline-block;
     }
     .title {
         font-weight: bold;
         margin: 0;
         font-size: 14px;
-        line-height: 1.1;
+        line-height: 1.2;
         display: block;
-        margin-bottom: 4px;
+        margin-bottom: 2px;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         position: relative;
     }
-    .feed-title {
-        font-size: 12px;
-        line-height: 1.3;
-        margin: 0 0 1px 0;
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-        padding-right: 91px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .icon-play {
-        display: inline-block;
-    }
-    .body {
+    .body, &.no-title .title {
+        font-weight: normal;
         line-height: 1.3;
         font-size: 12px;
         margin: 0;
         @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         display: block;
+    }
+    .body {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+    &.no-title {
+        .favicon-wrap {
+            display: flex;
+            top: 8px;
+            z-index: 3;
+        }
+        .title .favicon-wrap {
+            display: none;
+        }
+        .meta-wrap {
+            margin-bottom: 2px;
+        }
+        .feed-title {
+            font-weight: bold;
+            font-size: 14px;
+            display: block;
+            line-height: 1.2;
+            position: relative;
+            @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+            .title-inner {
+                font-weight: bold;
+                span {
+                    font-weight: normal;
+                }
+            }
+        }
+
     }
     &.starred {
         .icon-star {
             display: block;
         }
     }
-    &.read {
+    &.read, &.read.no-title {
         .title,
+        .feed-title,
         .body {
+            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
+    }
+    &.read.tweet {
+        .feed-title {
             @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         }
     }
     &.media {
         .time {
+            padding-left: 14px;
             background: image-url("icon-play-small.svg") 0 50% no-repeat;
         }
     }
@@ -1706,10 +1755,19 @@ $saved-search-control-height: 48px;
         .feed-title, .time, .body {
             color: #97999b !important;
         }
+        .feed-title {
+            margin-right: 26px;
+        }
         .title {
             color: #FFFFFF !important;
         }
     }
+    &.selected.tweet {
+        .feed-title strong {
+            color: white !important;
+        }
+    }
+
     .selected &.selected {
         .icon-star {
             &:after {
@@ -1792,7 +1850,15 @@ $saved-search-control-height: 48px;
 }
 
 .entries-display-inline .entries {
+    .inline-content-wrap {
+        display: flex;
+        align-items: baseline;
+        min-width: 0;
+    }
     .entries-inner-wrap {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
         padding-top: 8px;
         padding-bottom: 8px;
         > .favicon-wrap {
@@ -1801,32 +1867,56 @@ $saved-search-control-height: 48px;
             z-index: 3;
         }
     }
+    .meta-wrap {
+        display: inline-block;
+    }
+    .feed-title, .no-title .feed-title {
+        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        .title-inner {
+            font-weight: normal;
+        }
+    }
     .feed-title {
-        position: absolute;
         width: 110px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         padding: 0 10px 0 0;
+        font-size: 12px !important;
+        line-height: 1.3 !important;
+        margin: 0 !important;
     }
     .title-wrap {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        width: 100%;
-        padding: 0 70px 0 100px;
         display: block;
         line-height: 1.1;
+        padding-right: 26px;
         .favicon-wrap {
             display: none;
         }
     }
+    .no-title .title {
+        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        font-weight: bold;
+        font-size: 14px;
+    }
     .title, .body {
         display: inline;
         line-height: 1;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
     }
-    .feed-title, .time {
-        top: 9px;
+    .meta-wrap {
+        .time {
+            display: none;
+        }
+    }
+    .time.inline {
+        display: block;
+        align-self: auto;
     }
 }
 
@@ -2624,6 +2714,9 @@ $saved-search-control-height: 48px;
     @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
     line-height: 1.2;
     margin-bottom: .2em;
+    a {
+        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    }
     .icon-clock {
         float: left;
         margin-right: 5px;
@@ -2848,10 +2941,12 @@ $saved-search-control-height: 48px;
 
     h1, h2 {
         font-size: 1.3em;
+        line-height: 1.3;
     }
 
     h3, h4, h5, h6 {
         font-size: 1.1em;
+        line-height: 1.4;
     }
 
     p,
@@ -2865,6 +2960,10 @@ $saved-search-control-height: 48px;
 
     blockquote[align="center"] {
         text-align: left;
+    }
+
+    dd {
+        margin-left: 0;
     }
 
     li {
@@ -2975,6 +3074,7 @@ $saved-search-control-height: 48px;
         font-weight: 400 !important;
         margin-top: 15px;
         padding: 10px 12px;
+        border-radius: 4px;
         strong {
             font-weight: 700 !important;
         }
@@ -3017,7 +3117,7 @@ $saved-search-control-height: 48px;
     .original-content-info {
         padding-right: 53px;
         padding-left: 36px;
-        line-height: 1;
+        line-height: 1.4;
         &:after {
             position: absolute;
             display: block;
@@ -3034,7 +3134,7 @@ $saved-search-control-height: 48px;
             font-size: 14px;
             font-weight: bold;
             @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-            margin-bottom: .55em;
+            margin-bottom: .3em;
             &:hover {
                 text-decoration: underline;
             }
@@ -3044,7 +3144,7 @@ $saved-search-control-height: 48px;
             @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         }
         .favicon-wrap {
-            top: 8px;
+            top: 10px;
             left: 8px;
             background-color: #FFF;
         }
@@ -3195,104 +3295,111 @@ $saved-search-control-height: 48px;
 
 }
 
-.font-serif-1 .entry-inner {
-    font-family: "Sentinel SSm A", "Sentinel SSm B", $font-stack;
-    font-weight: 400;
-    font-style: normal;
-    strong {
-        font-weight: 700;
-    }
-    em {
-        font-style: italic;
-    }
-    .post-meta {
-        font-family: $font-stack;
+.font-serif-1 {
+    .content-styles {
+        font-family: "Sentinel SSm A", "Sentinel SSm B", $font-stack;
         font-weight: 400;
-    }
-    .entry-header h1 {
-        font-weight: 400;
-    }
-}
-
-.font-serif-2 .entry-inner {
-    font-family: "Mercury SSm A", "Mercury SSm B", $font-stack;
-    font-weight: 300;
-    font-style: normal;
-    strong {
-        font-weight: 500;
-    }
-    em {
-        font-style: italic;
-    }
-    .post-meta {
-        font-family: $font-stack;
-        font-weight: 400;
-    }
-    .entry-header h1 {
-        font-weight: 700;
-    }
-    h1, h2, h3, h4, h5, h6 {
-        font-weight: 700;
-        font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
+        font-style: normal;
         strong {
             font-weight: 700;
         }
-    }
-}
-
-.font-serif-3 .entry-inner {
-    font-family: Georgia, $font-stack;
-    font-weight: 400;
-    font-style: normal;
-    strong {
-        font-weight: 700;
-    }
-    em {
-        font-style: italic;
-    }
-    .post-meta {
-        font-family: $font-stack;
-        font-weight: 400;
+        em {
+            font-style: italic;
+        }
+        .post-meta {
+            font-family: $font-stack;
+            font-weight: 400;
+        }
     }
     .entry-header h1 {
+        font-family: "Sentinel SSm A", "Sentinel SSm B", $font-stack;
         font-weight: 400;
     }
 }
 
-.font-sans-serif-1 .entry-inner {
-    font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
-    font-weight: 400;
-    font-style: normal;
-    strong {
-        font-weight: 700;
-    }
-    em {
-        font-style: italic;
-    }
-    .post-meta {
-        font-family: $font-stack;
-        font-weight: 400;
+.font-serif-2 {
+    .content-styles {
+        font-family: "Mercury SSm A", "Mercury SSm B", $font-stack;
+        font-weight: 300;
+        font-style: normal;
+        strong {
+            font-weight: 500;
+        }
+        em {
+            font-style: italic;
+        }
+        .post-meta {
+            font-family: $font-stack;
+            font-weight: 400;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
+            strong {
+                font-weight: 700;
+            }
+        }
     }
     .entry-header h1 {
+        font-weight: 700;
+        font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
+    }
+}
+
+.font-serif-3 {
+    .content-styles {
+        font-family: Georgia, $font-stack;
+        font-weight: 400;
+        font-style: normal;
+        strong {
+            font-weight: 700;
+        }
+        em {
+            font-style: italic;
+        }
+        .post-meta {
+            font-family: $font-stack;
+            font-weight: 400;
+        }
+    }
+    .entry-header h1 {
+        font-weight: 400;
+        font-family: Georgia, $font-stack;
+    }
+}
+
+.font-sans-serif-1 {
+    .content-styles {
+        font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
+        font-weight: 400;
+        font-style: normal;
+        strong {
+            font-weight: 700;
+        }
+        em {
+            font-style: italic;
+        }
+    }
+    .entry-header h1 {
+        font-family: "Whitney SSm A", "Whitney SSm B", $font-stack;
         font-weight: 700;
     }
 }
 
-.font-sans-serif-2 .entry-inner {
-    font-family: "Ideal Sans A", "Ideal Sans B", $font-stack;
-    font-weight: 300;
-    font-style: normal;
-    strong {
-        font-weight: 600;
-    }
-    em {
-        font-style: italic;
-    }
-    .post-meta {
-        font-family: $font-stack;
-        font-weight: 400;
+.font-sans-serif-2 {
+    .content-styles {
+        font-family: "Ideal Sans A", "Ideal Sans B", $font-stack;
+        font-weight: 300;
+        font-style: normal;
+        strong {
+            font-weight: 600;
+        }
+        em {
+            font-style: italic;
+        }
     }
     .entry-header h1 {
+        font-family: "Ideal Sans A", "Ideal Sans B", $font-stack;
         font-weight: 600;
     }
 }
@@ -3338,6 +3445,123 @@ $saved-search-control-height: 48px;
 
 .radio input {
     margin-top: 2px;
+}
+
+.tweet-wrap {
+    padding-left: 60px;
+    .tweet-header {
+        margin-bottom: 1.1em;
+        position: relative;
+        h1 {
+            font-size: 18px;
+            margin: 0;
+            padding-right: 25px;
+            a {
+                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+                text-decoration: none;
+            }
+            span {
+                font-weight: normal;
+            }
+        }
+        img {
+            border: 2px solid white;
+            position: absolute;
+            left: -60px;
+            top: -5px;
+            border-radius: 47px;
+            box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+            .theme-day & {
+                box-shadow: none;
+            }
+        }
+    }
+    .entry-header {
+        font-size: 1.15em;
+        h1 {
+            font-size: 1.3em;
+            line-height: 1.4;
+        }
+    }
+    .tweet-meta {
+        font-size: 14px;
+        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        img {
+            position: relative;
+            top: 2px;
+            border-radius: 16px;
+        }
+        a {
+            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            text-decoration: none;
+        }
+    }
+    .new-section {
+        position: relative;
+        margin-bottom: .4em;
+        .favicon-wrap {
+            left: -30px;
+            top: 0;
+        }
+    }
+    .tweet-text {
+        white-space: pre-wrap;
+        font-size: 1.15em;
+        line-height: 1.4;
+        @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
+        font-family: $font-stack;
+    }
+    .twitter-link {
+        position: absolute;
+        right: 0;
+        top: 0;
+        display: block;
+        svg {
+            fill: green;
+            width: 18px;
+            height: 15px;
+            @include fill($text-color-body, $text-color-body-night, $text-color-body-sunset);
+        }
+    }
+    .quoted-tweet {
+        margin-bottom: 1.1em;
+        padding: 14px 16px;
+        border-radius: 4px;
+        border: 1px solid transparent;
+        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        h1 {
+            font-size: 16px;
+            margin: 0 0 5px 0;
+            a {
+                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+                text-decoration: none;
+            }
+            span {
+                font-weight: normal;
+            }
+        }
+        p {
+            margin-bottom: 0;
+        }
+        .tweet-text {
+            font-size: .85em;
+        }
+    }
+    @media (max-width: 1024px) {
+        padding-left: 0;
+        .tweet-header {
+            padding-left: 60px;
+            img {
+                left: 0;
+            }
+        }
+        .new-section {
+            padding-left: 30px;
+            .favicon-wrap {
+                left: 0;
+            }
+        }
+    }
 }
 
 .application-messages {
@@ -3969,6 +4193,11 @@ Settings
         h3 {
             font-size: 24px;
             margin: 0;
+            span {
+                font-weight: normal;
+                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+
+            }
             a {
                 color: $text-color;
                 &:hover {
@@ -4094,8 +4323,19 @@ Settings
                 padding: 0;
                 list-style: none;
                 li {
+                    display: flex;
+                    justify-content: space-between;
                     color: $text-color-light;
-                    margin-bottom: 8px;
+                    border-top: 1px solid $border-color;
+                    a {
+                        padding: 10px 0;
+                        margin-right: 10px;
+                        text-decoration: none;
+                    }
+                    time {
+                        padding: 10px 0;
+                        margin-right: 10px;
+                    }
                 }
             }
         }
@@ -4840,7 +5080,7 @@ Buttons
     border: none;
     background: none;
     margin: 0;
-    padding: 0;
+    padding: 8px 0 0 0;
     width: 65px;
     cursor: pointer;
     &[disabled] {
@@ -5038,9 +5278,22 @@ button.close {
     .favicon-target {
         position: absolute;
         right: 30px;
-        top: 26px;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
         .favicon-wrap {
             position: static;
+            margin: auto;
+        }
+        .twitter-profile-image {
+            height: 34px;
+            width: 34px;
+            img {
+                height: 30px;
+                width: 30px;
+                border-radius: 30px;
+            }
         }
     }
     label {
@@ -5055,7 +5308,7 @@ button.close {
         font-size: 18px;
         padding-top: 5px;
     }
-    input[type=text] {
+    input[type=text], input[type=url] {
         border: none;
         margin: 0;
         background-color: transparent;
@@ -7638,7 +7891,30 @@ Add
                 right: auto;
                 top: auto;
             }
+            &.hide {
+                display: none;
+            }
         }
+    }
+    .subscription-preferences {
+        label {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            [type=checkbox] {
+                position: absolute !important;
+                top: -9999px !important;
+                left: -9999px !important;
+            }
+            .slider-checkbox {
+                margin-left: 15px;
+                position: relative;
+                display: inline-block;
+                right: 0;
+                top: 0;
+            }
+        }
+
     }
     .feed-url {
         display: none;

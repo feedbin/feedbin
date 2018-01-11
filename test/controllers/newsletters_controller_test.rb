@@ -19,7 +19,7 @@ class NewslettersControllerTest < ActionController::TestCase
     user = users(:ben)
     signature = Newsletter.new(newsletter_params('asdf', 'asdf')).send(:signature)
     assert_difference('Entry.count', 1) do
-      post :create, params: newsletter_params(user.newsletter_token, signature)
+      post :create, params: newsletter_params("#{user.newsletter_token}+other", signature)
     end
     assert_response :success
   end

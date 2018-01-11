@@ -7,7 +7,13 @@
 
     <h3 class="box-header">Welcome Back</h3>
 
-    <%= form_tag sessions_path, class: 'combined-form', novalidate: true do %>
+    <%
+      options = {class: 'combined-form', novalidate: true}
+      if native?
+        options[:remote] = 'true'
+      end
+    %>
+    <%= form_tag sessions_path, options do %>
       <p>
         <%= email_field_tag :email, params[:email], autofocus: true, tabindex: '1', placeholder: 'Email' %>
         <%= password_field_tag :password, nil, tabindex: '2', placeholder: 'Password' %>

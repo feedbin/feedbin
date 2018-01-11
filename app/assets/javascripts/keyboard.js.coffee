@@ -210,7 +210,7 @@ class feedbin.Keyboard
 
     # Open original article
     Mousetrap.bind 'V', (event, combo) =>
-      href = $('.entry-header').find('a').attr('href')
+      href = $('#source_link').attr('href')
       if href
         feedbin.openLinkInBackground(href)
       event.preventDefault()

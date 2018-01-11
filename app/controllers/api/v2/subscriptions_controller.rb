@@ -48,19 +48,21 @@ module Api
       def create
         @user = current_user
         finder = FeedFinder.new(params[:feed_url])
-        if finder.options.length == 0
+        begin
+          feeds = finder.create_feeds!
+        rescue
+          feeds = []
+        end
+
+        if feeds.length == 0
           status_not_found
-        elsif finder.options.length == 1
-          feed = finder.create_feed(finder.options.first)
-          if feed
-            status = @user.subscribed_to?(feed) ? :found : :created
-            @subscription = @user.subscriptions.find_or_create_by(feed: feed)
-            render status: status, location: api_v2_subscription_url(@subscription, format: :json)
-          else
-            status_not_found
-          end
+        elsif feeds.length == 1
+          feed = feeds.first
+          status = @user.subscribed_to?(feed) ? :found : :created
+          @subscription = @user.subscriptions.find_or_create_by(feed: feed)
+          render status: status, location: api_v2_subscription_url(@subscription, format: :json)
         else
-          @options = finder.options
+          @options = feeds
           render status: :multiple_choices
         end
       rescue Exception => e

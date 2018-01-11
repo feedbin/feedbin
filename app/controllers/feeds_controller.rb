@@ -123,8 +123,18 @@ class FeedsController < ApplicationController
 
   def search
     @user = current_user
-    @feeds = FeedFinder.new(params[:q]).create_feeds!
-    @feeds.map(&:priority_refresh)
+    if twitter_feed?(params[:q]) && !@user.twitter_enabled?
+      session[:subscribe_query] = params[:q]
+      render :js => "window.location = '#{new_twitter_authentication_path}';"
+    else
+      config = {
+        twitter_access_token: @user.twitter_access_token,
+        twitter_access_secret: @user.twitter_access_secret,
+        twitter_screen_name: @user.twitter_screen_name
+      }
+      @feeds = FeedFinder.new(params[:q], config).create_feeds!
+      @feeds.map{|feed| feed.priority_refresh(@user) }
+    end
   rescue => exception
     logger.info { "------------------------" }
     logger.info { exception.message }
@@ -134,6 +144,18 @@ class FeedsController < ApplicationController
   end
 
   private
+
+  def twitter_feed?(url)
+    url = url.strip
+    url.start_with?("@") ||
+    url.start_with?("#") ||
+    url.start_with?("http://twitter.com") ||
+    url.start_with?("https://twitter.com") ||
+    url.start_with?("http://mobile.twitter.com") ||
+    url.start_with?("https://mobile.twitter.com") ||
+    url.start_with?("twitter.com") ||
+    url.start_with?("mobile.twitter.com")
+  end
 
   def update_view_mode(view_mode)
     @user = current_user

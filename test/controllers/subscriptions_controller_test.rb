@@ -28,7 +28,8 @@ class SubscriptionsControllerTest < ActionController::TestCase
         feed.id => {
           title: "title",
           tags: "Design",
-          subscribe: "1"
+          subscribe: "1",
+          media_only: "1"
         }
       }
     }
@@ -37,6 +38,9 @@ class SubscriptionsControllerTest < ActionController::TestCase
       post :create, params: params, xhr: true
       assert_response :success
     end
+
+    subscription = @user.subscriptions.where(feed: feed).take!
+    assert(subscription.media_only, "Subscription should be media only")
   end
 
   test "should destroy subscription" do

@@ -52,7 +52,7 @@ class OnboardingMessageTest < ActionMailer::TestCase
   test "should send onboarding_5_expired" do
     Sidekiq::Worker.clear_all
     @user = users(:ann)
-    assert_difference "Sidekiq::Extensions::DelayedMailer.jobs.size", 1 do
+    assert_emails 1 do
       OnboardingMessage.new().perform(@user.id, MarketingMailer.method(:onboarding_5_expired).name.to_s)
     end
   end
