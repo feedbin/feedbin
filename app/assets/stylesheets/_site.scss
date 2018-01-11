@@ -1710,6 +1710,7 @@ $saved-search-control-height: 48px;
                 font-weight: bold;
                 span {
                     font-weight: normal;
+                    @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
                 }
             }
         }
@@ -1790,7 +1791,7 @@ $saved-search-control-height: 48px;
             border-top: 1px solid $selected;
             background: $selected;
         }
-        .feed-title {
+        .feed-title, .title-inner span {
             color: #add6ff !important;
         }
         .body {
@@ -3471,6 +3472,7 @@ $saved-search-control-height: 48px;
             }
             span {
                 font-weight: normal;
+                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
             }
         }
         img {
@@ -3546,14 +3548,12 @@ $saved-search-control-height: 48px;
                 text-decoration: none;
             }
             span {
+                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
                 font-weight: normal;
             }
         }
         p {
             margin-bottom: 0;
-        }
-        .tweet-text {
-            font-size: .85em;
         }
     }
     @media (max-width: 1024px) {
