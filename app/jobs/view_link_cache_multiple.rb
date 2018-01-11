@@ -1,6 +1,6 @@
 class ViewLinkCacheMultiple
   include Sidekiq::Worker
-  sidekiq_options queue: :default, retry: false
+  sidekiq_options queue: :low, retry: false
 
   def perform(user_id, entry_ids)
     user = User.find(user_id)

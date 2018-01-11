@@ -1,6 +1,6 @@
 class SavePages
   include Sidekiq::Worker
-  sidekiq_options queue: :default
+  sidekiq_options queue: :low
 
   def perform(entry_id)
     entry = Entry.find(entry_id)
