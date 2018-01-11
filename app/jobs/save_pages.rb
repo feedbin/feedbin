@@ -3,7 +3,6 @@ class SavePages
   sidekiq_options queue: :low
 
   def perform(entry_id)
-    return true
     entry = Entry.find(entry_id)
 
     tweets = [entry.main_tweet]
