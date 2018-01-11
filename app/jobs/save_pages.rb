@@ -3,6 +3,7 @@ class SavePages
   sidekiq_options queue: :low
 
   def perform(entry_id)
+    return true
     entry = Entry.find(entry_id)
 
     tweets = [entry.main_tweet]
@@ -10,16 +11,18 @@ class SavePages
 
     urls = find_urls(tweets)
 
-    saved_pages = urls.each_with_object({}) do |url, hash|
-      key = FeedbinUtils.page_cache_key(url)
-      begin
-        hash[url] = Rails.cache.fetch(key) do
-          Librato.increment 'readability.first_parse'
-          MercuryParser.parse(url)
-        end
-      rescue
+    url = urls.first
+    saved_pages = {}
+
+    key = FeedbinUtils.page_cache_key(url)
+    begin
+      saved_pages[url] = Rails.cache.fetch(key) do
+        Librato.increment 'readability.first_parse'
+        MercuryParser.parse(url)
       end
+    rescue
     end
+
     entry.data["saved_pages"] = saved_pages
     entry.save!
 
@@ -31,14 +34,16 @@ class SavePages
     tweets.each_with_object([]) do |tweet, array|
       tweet.urls.each do |url|
         url = url.expanded_url.to_s
-        array.push(url) if url_valid?(url)
+        if url_valid?(url)
+          array.push(url)
+        end
       end
     end
   end
 
   def url_valid?(url)
     url = URI.parse(url)
-    if url.host == "twitter.com" && url.path.include?("/status/")
+    if url.host == "twitter.com"
       false
     else
       true
