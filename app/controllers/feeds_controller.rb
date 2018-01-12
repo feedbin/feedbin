@@ -140,6 +140,7 @@ class FeedsController < ApplicationController
     logger.info { exception.message }
     logger.info { exception.backtrace }
     logger.info { "------------------------" }
+    Honeybadger.notify(exception)
     @feeds = nil
   end
 
