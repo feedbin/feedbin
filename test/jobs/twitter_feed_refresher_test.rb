@@ -17,7 +17,9 @@ class TwitterFeedRefresherTest < ActiveSupport::TestCase
     end
 
     args = [@feed.id, @feed.feed_url, [@keys]]
-    assert_equal args, Sidekiq::Queues["feed_refresher_fetcher"].first["args"]
+    job = Sidekiq::Queues["feed_refresher_fetcher"].first
+    assert_equal args, job["args"]
+    assert(job.has_key?("at"), "job should have an 'at' parameter")
   end
 
   test "feed gets with passed user" do
@@ -28,7 +30,9 @@ class TwitterFeedRefresherTest < ActiveSupport::TestCase
     end
 
     args = [@feed.id, @feed.feed_url, [@keys]]
-    assert_equal args, Sidekiq::Queues["feed_refresher_fetcher_critical"].first["args"]
+    job = Sidekiq::Queues["feed_refresher_fetcher_critical"].first
+    assert_equal args, job["args"]
+    assert_not(job.has_key?("at"), "job should not have an 'at' parameter")
   end
 
   test "feed does not get scheduled because user doesn't match" do
