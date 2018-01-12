@@ -26,6 +26,12 @@ namespace :deploy do
         execute :sudo, :start, :workers_slow
       end
 
+      begin
+        execute :sudo, :restart, :workers_low
+      rescue SSHKit::Command::Failed
+        execute :sudo, :start, :workers_low
+      end
+
     end
   end
 end
