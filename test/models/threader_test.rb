@@ -21,6 +21,17 @@ class ThreaderTest < ActiveSupport::TestCase
     assert_equal(@parent_entry.reload.thread.length, 1)
   end
 
+  test "should not create more than one entry" do
+    reply_one = threaded_entry(@parent_entry.thread_id)
+    reply_two = threaded_entry(reply_one["thread_id"])
+
+    Threader.new(reply_one, @feed).thread
+    Threader.new(reply_two, @feed).thread
+
+    assert FeedbinUtils.public_id_exists?(reply_two["public_id"]), "reply_two should have a public_id saved"
+    assert_equal(2, @parent_entry.reload.data["thread"].length)
+  end
+
   def threaded_entry(reply_to = nil)
     thread_id = Random.new().rand(10000)
     data = {
