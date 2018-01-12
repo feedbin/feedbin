@@ -17,14 +17,21 @@ class NewslettersController < ApplicationController
     if user = User.where(newsletter_token: newsletter.token).take
       entry = build_entry(newsletter)
       feed = get_feed(newsletter)
+
       if should_subscribe?(feed)
         feed.save
         user.subscriptions.find_or_create_by(feed: feed)
-        feed.entries.create!(entry)
-        feed.feed_type = :newsletter
-        feed.options["email_headers"] = newsletter.headers
-        feed.save
       end
+
+      if feed.persisted?
+        feed.entries.create!(entry)
+        options = {
+          "email_headers" => newsletter.headers,
+          "newsletter_token" => newsletter.full_token
+        }
+        feed.update(feed_type: :newsletter, options: options)
+      end
+
     end
   end
 
