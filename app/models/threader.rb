@@ -25,7 +25,7 @@ class Threader
       entry = false
       if @thread_id && @reply_to
         if parent_entry = @feed.entries.where(thread_id: @reply_to)
-          if parent_entry.length == 1
+          if parent_entry.length == 1 && same_user?(parent_entry)
             entry = parent_entry.first
           end
         end
@@ -45,6 +45,11 @@ class Threader
       end
     end
     UpdatedEntry.import(updated_entries, validate: false)
+  end
+
+  def same_user?(parents)
+    parent = parents.first
+    parent.data.dig("tweet", "user", "screen_name") == @entry_hash.dig("data", "tweet", "user", "screen_name")
   end
 
 end

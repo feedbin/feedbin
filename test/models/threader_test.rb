@@ -25,7 +25,10 @@ class ThreaderTest < ActiveSupport::TestCase
     thread_id = Random.new().rand(10000)
     data = {
       "tweet" => {
-        "id" => thread_id
+        "id" => thread_id,
+        "user" => {
+          "screen_name" => "bsaid"
+        }
       }
     }
     if reply_to
