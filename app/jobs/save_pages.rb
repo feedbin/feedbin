@@ -33,16 +33,15 @@ class SavePages
   def find_urls(tweets)
     tweets.each_with_object([]) do |tweet, array|
       tweet.urls.each do |url|
-        url = url.expanded_url.to_s
+        url = url.expanded_url
         if url_valid?(url)
-          array.push(url)
+          array.push(url.to_s)
         end
       end
     end
   end
 
   def url_valid?(url)
-    url = URI.parse(url)
     if url.host == "twitter.com"
       false
     else
