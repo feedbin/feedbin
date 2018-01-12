@@ -13,6 +13,7 @@ class Threader
       entry.data["thread"] = updated_thread
       entry.thread_id = @thread_id
       entry.save!
+      FeedbinUtils.update_public_id_cache(@entry_hash['public_id'], @entry_hash['content'])
       create_updated_entries
     end
   rescue => e

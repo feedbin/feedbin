@@ -24,7 +24,7 @@
       <% if entry_presenter.tweet_video?(media) %>
         <%= entry_presenter.tweet_video(media) %>
       <% else %>
-        <%= link_to media.media_url_https.to_s do %>
+        <%= link_to media.media_url_https.to_s + ":large" do %>
           <%= image_tag media.media_url_https.to_s + ":large" %>
         <% end %>
       <% end %>
@@ -72,7 +72,7 @@
     <% if entry_presenter.tweet_video?(media) %>
       <%= entry_presenter.tweet_video(media) %>
     <% else %>
-      <%= link_to media.media_url_https.to_s do %>
+      <%= link_to media.media_url_https.to_s + ":large" do %>
         <%= image_tag media.media_url_https.to_s + ":large" %>
       <% end %>
     <% end %>

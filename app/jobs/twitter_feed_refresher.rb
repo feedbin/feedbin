@@ -10,12 +10,22 @@ class TwitterFeedRefresher
   def enqueue_feed(feed, user = nil)
     keys = load_keys(feed, user)
     if keys.present?
-      Sidekiq::Client.push(
+
+      args = {
         'args'  => [feed.id, feed.feed_url, keys],
-        'class' => 'TwitterFeedRefresher',
-        'queue' => 'feed_refresher_fetcher',
-        'retry' => false
-      )
+        'class' => "TwitterFeedRefresher",
+        'queue' => "feed_refresher_fetcher",
+        'retry' => false,
+        'at' => Time.now.to_i + rand(0..6.minutes.to_i)
+      }
+
+      if user
+        args['class'] = "TwitterFeedRefresherCritical"
+        args['queue'] = "feed_refresher_fetcher_critical"
+        args.delete('at')
+      end
+
+      Sidekiq::Client.push(args)
     end
   end
 
