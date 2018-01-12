@@ -10,10 +10,16 @@ class TwitterFeedRefresher
   def enqueue_feed(feed, user = nil)
     keys = load_keys(feed, user)
     if keys.present?
+      queue = "feed_refresher_fetcher"
+      klass = "TwitterFeedRefresher"
+      if user
+        queue = "feed_refresher_fetcher_critical"
+        klass = "TwitterFeedRefresherCritical"
+      end
       Sidekiq::Client.push(
         'args'  => [feed.id, feed.feed_url, keys],
-        'class' => 'TwitterFeedRefresher',
-        'queue' => 'feed_refresher_fetcher',
+        'class' => klass,
+        'queue' => queue,
         'retry' => false
       )
     end
