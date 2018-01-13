@@ -75,7 +75,7 @@ module Searchable
         query[:fields] = ["id", "feed_id"]
 
         OpenStruct.new({id: saved_search.id, query: query})
-      end
+      end.compact
     end
 
     def self.scoped_search(params, user)
