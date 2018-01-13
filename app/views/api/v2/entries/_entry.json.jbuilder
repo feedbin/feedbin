@@ -10,7 +10,7 @@ present entry do |entry_presenter|
     json.original entry.original if params[:include_original] == 'true'
     if params[:include_enclosure] == 'true' && entry_presenter.has_enclosure?
         json.enclosure do
-            json.enclosure_url entry.data["enclosure_url"]
+            json.enclosure_url entry_presenter.enclosure_url
             json.enclosure_type entry.data["enclosure_type"]
             json.enclosure_length entry.data["enclosure_length"]
             json.itunes_duration entry.data["itunes_duration"]

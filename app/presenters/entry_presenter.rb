@@ -178,13 +178,13 @@ class EntryPresenter < BasePresenter
 
   def media
     output = ''
-    if entry.data && entry.data['enclosure_url'].present? && media_type.present?
+    if has_enclosure? && media_type.present?
       if media_type == :video
-        output += @template.video_tag entry.data['enclosure_url'], preload: 'none'
+        output += @template.video_tag enclosure_url, preload: 'none'
       elsif media_type == :audio
-        output += @template.audio_tag entry.data['enclosure_url'], preload: 'none'
+        output += @template.audio_tag enclosure_url, preload: 'none'
       end
-      output += @template.link_to "Download #{media_size}", entry.data['enclosure_url'], class: 'download-link'
+      output += @template.link_to "Download #{media_size}", enclosure_url, class: 'download-link'
     end
     output
   end
@@ -262,6 +262,13 @@ class EntryPresenter < BasePresenter
 
   def has_enclosure?
     entry.data.respond_to?(:[]) && entry.data["enclosure_url"].present?
+  end
+
+  def enclosure_url
+    if has_enclosure?
+      base = Addressable::URI.parse(entry.fully_qualified_url)
+      base.join(entry.data["enclosure_url"]).to_s
+    end
   end
 
   def has_media?

@@ -57,6 +57,6 @@
         </button>
     </div>
     <div class="audio-progress">
-        <%= audio_tag entry.data['enclosure_url'], preload: 'none', id: 'audio_player', data: {entry_id: entry.id} %>
+        <%= audio_tag entry_presenter.enclosure_url, preload: 'none', id: 'audio_player', data: {entry_id: entry.id} %>
     </div>
 <% end %>
