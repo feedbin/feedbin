@@ -40,8 +40,6 @@
         <%= entry_presenter.tweet_instagram_embed(url) %>
       <% end %>
     <% end %>
-
-
   <% end %>
 
   <% if entry_presenter.quoted_status? %>
@@ -66,6 +64,9 @@
         </p>
     </div>
   <% end %>
+
+  <%= link_to "Show Replies", thread_tweet_path(entry), remote: true %>
+  <div data-behavior="tweet_replies_target"></div>
 
   <% entry_presenter.tweet_media.each do |media| %>
     <div class="content-styles">

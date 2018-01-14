@@ -74,7 +74,7 @@ class Entry < ApplicationRecord
     text
   end
 
-  def tweet_text(tweet = nil)
+  def tweet_text(tweet = nil, trim_start = false)
     tweet = tweet ? tweet : self.main_tweet
     hash = tweet.to_h
     if hash[:entities]
@@ -83,7 +83,19 @@ class Entry < ApplicationRecord
       elsif hash[:quoted_status] && hash[:display_text_range] && hash[:entities][:urls].last[:indices].first > hash[:display_text_range].last
         hash[:entities][:urls].pop
       end
-      text = trim_text(hash)
+
+      if hash[:display_text_range] && trim_start
+        start = hash[:display_text_range].first
+        hash[:entities][:user_mentions] = hash[:entities][:user_mentions].reject do |mention|
+          mention[:indices].last <= start
+        end.map do |mention|
+          mention[:indices][0] = mention[:indices][0] - start
+          mention[:indices][1] = mention[:indices][1] - start
+          mention
+        end
+      end
+
+      text = trim_text(hash, false, trim_start)
       Twitter::TwitterText::Autolink.auto_link_with_json(text, hash[:entities]).html_safe
     else
       hash[:full_text]
@@ -102,10 +114,11 @@ class Entry < ApplicationRecord
     []
   end
 
-  def trim_text(hash, exclude_end = false)
+  def trim_text(hash, exclude_end = false, trim_start = false)
     text = hash[:full_text]
     if range = hash[:display_text_range]
-      range = Range.new(0, range.last, exclude_end)
+      start = (trim_start) ? range.first : 0
+      range = Range.new(start, range.last, exclude_end)
       text = text.codepoints[range].pack("U*")
     end
     text
