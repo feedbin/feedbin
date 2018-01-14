@@ -3,7 +3,8 @@ class TweetsController < ApplicationController
   def thread
     @user = current_user
     @entry = Entry.find(params[:id])
-    @tweets = load_replies
+    replies = load_replies
+    @tweets = load_author_replies(replies)
   end
 
   private
@@ -30,13 +31,27 @@ class TweetsController < ApplicationController
       tweet_mode: "extended",
       count: 100,
     }
-    logger.info { "----------------------" }
-    logger.info { query.inspect }
-    logger.info { options.inspect }
-    logger.info { "----------------------" }
-    tweets = client.search(query, options).take(100)
-    tweets.select do |tweet|
+    results = client.search(query, options)
+    tweets = results.take(100).select do |tweet|
       tweet.in_reply_to_status_id? && tweet.in_reply_to_status_id == @entry.main_tweet.id
+    end.reverse
+    OpenStruct.new(tweets: tweets, search_metadata: results.to_h[:search_metadata])
+  end
+
+  def load_author_replies(replies)
+    options = {
+      include_rts:	false,
+      max_id:	replies.search_metadata[:max_id],
+      since_id:	@entry.main_tweet.id,
+      tweet_mode:	"extended",
+      count: 100,
+    }
+    author_replies = client.user_timeline(@entry.main_tweet.user.id, options)
+    replies.tweets.each_with_object([]) do |tweet, array|
+      array.push(tweet)
+      if reply = author_replies.find {|author_reply| author_reply.in_reply_to_status_id == tweet.id }
+        array.push(reply)
+      end
     end
   end
 
