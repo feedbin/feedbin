@@ -35,4 +35,11 @@ module FactoryHelper
       UnreadEntry.create_from_owners(user, entry)
     end
   end
+
+  def create_tweet_entry(feed)
+    entry = create_entry(feed)
+    entry.data["tweet"] = load_tweet
+    entry.save!
+    entry
+  end
 end

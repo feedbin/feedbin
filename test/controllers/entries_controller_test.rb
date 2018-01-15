@@ -37,6 +37,17 @@ class EntriesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "should get show with tweet" do
+    entry = create_tweet_entry(@user.feeds.first)
+    url = "https://mercury.postlight.com/parser?url=https://9to5mac.com/2018/01/12/final-cut-pro-x-how-to-improve-slow-motion-in-your-projects-video/"
+    stub_request_file('parsed_page.json', url, headers: {"Content-Type" => "application/json; charset=utf-8"})
+    SavePages.new().perform(entry.id)
+
+    login_as @user
+    get :show, params: {id: entry}, xhr: true
+    assert_response :success
+  end
+
   test "should get content" do
     login_as @user
     content = Faker::Lorem.paragraph

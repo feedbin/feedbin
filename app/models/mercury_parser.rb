@@ -41,6 +41,13 @@ class MercuryParser
     result['domain']
   end
 
+  def to_h
+    {
+      result: result,
+      url: url
+    }
+  end
+
   private
 
   def result
@@ -54,10 +61,7 @@ class MercuryParser
   end
 
   def marshal_dump
-    {
-      result: result,
-      url: url
-    }
+    to_h
   end
 
   def marshal_load(data)

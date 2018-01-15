@@ -73,10 +73,16 @@ class ActiveSupport::TestCase
     JSON.parse(@response.body)
   end
 
-  def stub_request_file(file, url)
+  def stub_request_file(file, url, response_options = {})
     file = File.join(Rails.root, 'test/support/www', file)
+    options = {body: File.new(file), status: 200}.merge(response_options)
     stub_request(:get, url).
-      to_return(body: File.new(file), status: 200)
+      to_return(options)
+  end
+
+  def load_tweet
+    file = File.join(Rails.root, 'test/support/tweet_one.json')
+    JSON.parse(File.read(file))
   end
 
   def create_stripe_plan(plan)

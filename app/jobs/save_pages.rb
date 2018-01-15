@@ -15,11 +15,13 @@ class SavePages
 
       key = FeedbinUtils.page_cache_key(url)
       begin
-        saved_pages[url] = Rails.cache.fetch(key) do
+        page = Rails.cache.fetch(key)
+        if !page
           Librato.increment 'readability.first_parse'
-          MercuryParser.parse(url)
+          page = MercuryParser.parse(url)
+          Rails.cache.write(key, page)
         end
-      rescue
+        saved_pages[url] = page.to_h
       end
 
       entry.data["saved_pages"] = saved_pages
