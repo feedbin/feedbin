@@ -250,12 +250,14 @@ $.extend feedbin,
 
   formatTweets: (selector = "entry_content_wrap") ->
     if typeof(twttr) != "undefined" && typeof(twttr.widgets) != "undefined"
-      target = $("[data-behavior~=#{selector}]")[0]
-      result = twttr.widgets.load(target)
+      target = $("[data-behavior~=#{selector}]")
+      if $('blockquote.twitter-tweet', target).length > 0
+        twttr.widgets.load(target[0])
 
   formatInstagram: ->
     if typeof(instgrm) != "undefined"
-      instgrm.Embeds.process()
+      if $('blockquote.instagram-media').length > 0
+        instgrm.Embeds.process()
 
   checkType: ->
     element = $('.entry-final-content')
