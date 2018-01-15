@@ -530,7 +530,8 @@ $.extend feedbin,
     $('.share-form .url-placeholder').val(url)
 
     description = feedbin.getSelectedText()
-    $('.share-form .description-placeholder').val(description)
+    url = $('#source_link').attr('href')
+    $('.share-form .description-placeholder').val("#{description} #{url}")
 
     source = $('.entry-header .author').first().text()
     if source == ""
