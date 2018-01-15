@@ -484,7 +484,7 @@ class EntryPresenter < BasePresenter
 
   def tweet_retweeted_image
     if entry.tweet.user.profile_image_uri? && entry.tweet.user.profile_image_uri_https("normal")
-      entry.tweet.user.profile_image_uri_https("normal")
+      camo_link(entry.tweet.user.profile_image_uri_https("normal"))
     else
       "https://dinzvnnq89ifs.cloudfront.net/public-favicons/75b8/75b817d23070af4638e4be9af12d74831adf20ce.png"
     end
@@ -493,7 +493,7 @@ class EntryPresenter < BasePresenter
   # Sizes: normal, bigger
   def tweet_profile_image_uri(tweet, size = "bigger")
     if tweet.user.profile_image_uri? && tweet.user.profile_image_uri_https(size)
-      tweet.user.profile_image_uri_https("bigger")
+      camo_link(tweet.user.profile_image_uri_https("bigger"))
     else
       "https://dinzvnnq89ifs.cloudfront.net/public-favicons/75b8/75b817d23070af4638e4be9af12d74831adf20ce.png"
     end
