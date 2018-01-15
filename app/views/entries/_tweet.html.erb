@@ -11,7 +11,7 @@
         <%= entry_presenter.tweet_video(media) %>
       <% else %>
         <%= link_to media.media_url_https.to_s + ":large" do %>
-          <%= image_tag media.media_url_https.to_s + ":large" %>
+          <%= image_tag entry_presenter.camo_link(media.media_url_https.to_s + ":large") %>
         <% end %>
       <% end %>
       </div>
@@ -52,7 +52,7 @@
       <%= entry_presenter.tweet_video(media) %>
     <% else %>
       <%= link_to media.media_url_https.to_s + ":large" do %>
-        <%= image_tag media.media_url_https.to_s + ":large" %>
+        <%= image_tag entry_presenter.camo_link(media.media_url_https.to_s + ":large") %>
       <% end %>
     <% end %>
     </div>
