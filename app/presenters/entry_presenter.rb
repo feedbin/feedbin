@@ -402,7 +402,7 @@ class EntryPresenter < BasePresenter
   def profile_image(feed)
     if entry.tweet?
       @template.content_tag :span, '', class: "favicon-wrap twitter-profile-image" do
-        @template.image_tag(tweet_profile_image_uri)
+        @template.image_tag(tweet_profile_image_uri(entry.main_tweet))
       end
     else
       favicon(feed)
@@ -412,7 +412,7 @@ class EntryPresenter < BasePresenter
   def feed_title
     if entry.tweet?
       @template.content_tag(:span, '', class: "title-inner") do
-        "#{tweet_name} #{@template.content_tag(:span, tweet_screen_name)}".html_safe
+        "#{tweet_name(entry.main_tweet)} #{@template.content_tag(:span, tweet_screen_name(entry.main_tweet))}".html_safe
       end
     else
       @template.content_tag(:span, '', class: "title-inner", data: {behavior: "user_title", feed_id: entry.feed.id}) do
@@ -425,18 +425,33 @@ class EntryPresenter < BasePresenter
     entry.title.present?
   end
 
-  def tweet_name(tweet = nil)
+  def tweet_in_reply_to(tweet)
     tweet = tweet ? tweet : entry.main_tweet
+    if tweet.to_h[:display_text_range] && tweet.in_reply_to_screen_name?
+      range = tweet.to_h[:display_text_range]
+      content_start = range.last
+      mentions = tweet.user_mentions.select do |mention|
+        mention.indices.last <= content_start
+      end.map do |mention|
+        @template.link_to "@#{mention.screen_name}", "https://twitter.com/#{mention.screen_name}", target: "_blank"
+      end
+      if !mentions.empty?
+        @template.content_tag(:p, '', class: "tweet-mentions") do
+          "Replying to #{mentions.join(", ")}".html_safe
+        end
+      end
+    end
+  end
+
+  def tweet_name(tweet)
     tweet.user.name
   end
 
-  def tweet_screen_name(tweet = nil)
-    tweet = tweet ? tweet : entry.main_tweet
+  def tweet_screen_name(tweet)
     "@" + tweet.user.screen_name
   end
 
-  def tweet_user_url(tweet = nil)
-    tweet = tweet ? tweet : entry.main_tweet
+  def tweet_user_url(tweet)
     "https://twitter.com/#{tweet.user.screen_name}"
   end
 
@@ -476,9 +491,9 @@ class EntryPresenter < BasePresenter
   end
 
   # Sizes: normal, bigger
-  def tweet_profile_image_uri(size = "bigger")
-    if entry.main_tweet.user.profile_image_uri? && entry.main_tweet.user.profile_image_uri_https(size)
-      entry.main_tweet.user.profile_image_uri_https("bigger")
+  def tweet_profile_image_uri(tweet, size = "bigger")
+    if tweet.user.profile_image_uri? && tweet.user.profile_image_uri_https(size)
+      tweet.user.profile_image_uri_https("bigger")
     else
       "https://dinzvnnq89ifs.cloudfront.net/public-favicons/75b8/75b817d23070af4638e4be9af12d74831adf20ce.png"
     end

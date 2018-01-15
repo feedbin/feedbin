@@ -1,0 +1,28 @@
+<% present entry do |entry_presenter| %>
+<div class="tweet <%= local_assigns[:css] ? css : '' %>">
+  <header class="tweet-header">
+    <%= image_tag entry_presenter.tweet_profile_image_uri(tweet), size: "47x47" %>
+    <h1>
+        <a href="<%= entry_presenter.tweet_user_url(tweet) %>" target="_blank">
+            <%= entry_presenter.tweet_name(tweet) %>
+            <span><%= entry_presenter.tweet_screen_name(tweet) %></span>
+        </a>
+
+        <time class="header-time timeago" datetime="<%= tweet.created_at.iso8601 %>"><%= tweet.created_at.to_s(:full_human) %></time>
+    </h1>
+    <p class="post-meta">
+      <time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time>
+      <% if entry_presenter.tweet_location %>
+          from <%= entry_presenter.tweet_location %>
+      <% end %>
+    </p>
+    <%= link_to tweet.uri.to_s, target: "_blank", title: "View on Twitter", class: "twitter-link", id: "source_link" do %>
+        <%= svg_tag "icon-twitter" %>
+    <% end %>
+  </header>
+
+  <%= entry_presenter.tweet_in_reply_to(tweet) %>
+  <p class="tweet-text"><%= entry.tweet_text(tweet) %></p>
+</div>
+<% end %>
+

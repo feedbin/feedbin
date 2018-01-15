@@ -1,21 +1,7 @@
 <% present entry do |entry_presenter| %>
 <div class="tweet-wrap" data-behavior="external_links">
-  <header class="tweet-header">
-    <%= image_tag entry_presenter.tweet_profile_image_uri, size: "47x47" %>
-    <h1><a href="<%= entry_presenter.tweet_user_url %>" target="_blank"><%= entry_presenter.tweet_name %> <span><%= entry_presenter.tweet_screen_name %></span></a></h1>
 
-    <p class="post-meta">
-      <time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time>
-      <% if entry_presenter.tweet_location %>
-          from <%= entry_presenter.tweet_location %>
-      <% end %>
-    </p>
-    <%= link_to entry.tweet.uri.to_s, target: "_blank", title: "View on Twitter", class: "twitter-link", id: "source_link" do %>
-        <%= svg_tag "icon-twitter" %>
-    <% end %>
-  </header>
-
-  <p class="tweet-text"><%= entry.tweet_text %></p>
+  <%= render partial: "shared/tweet", locals: {entry: entry, tweet: entry.main_tweet} %>
 
   <% entry.tweet_thread.each do |thread| %>
     <p class="tweet-text"><%= entry.tweet_text(thread) %></p>
@@ -43,15 +29,7 @@
   <% end %>
 
   <% if entry_presenter.quoted_status? %>
-  <div class="quoted-tweet">
-    <h1>
-      <a href="<%= entry_presenter.tweet_user_url(entry_presenter.quoted_status) %>" target="_blank">
-        <%= entry_presenter.tweet_name(entry_presenter.quoted_status) %>
-        <span><%= entry_presenter.tweet_screen_name(entry_presenter.quoted_status) %></span>
-      </a>
-    </h1>
-    <p class="tweet-text"><%= entry.tweet_text(entry_presenter.quoted_status) %></p>
-  </div>
+    <%= render partial: "shared/tweet", locals: {entry: entry, tweet: entry_presenter.quoted_status, css: "quoted-tweet"} %>
   <% end %>
 
   <% if entry.tweet.retweeted_status? %>
@@ -65,7 +43,7 @@
     </div>
   <% end %>
 
-  <%= link_to "Show Replies", thread_tweet_path(entry), remote: true %>
+  <p><%= link_to "Show Replies", thread_tweet_path(entry), remote: true %></p>
   <div data-behavior="tweet_replies_target"></div>
 
   <% entry_presenter.tweet_media.each do |media| %>

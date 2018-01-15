@@ -1,1 +1,2 @@
-$('[data-behavior~=tweet_replies_target]').html('<%= j render partial: 'reply', collection: @tweets, locals: {entry: @entry} %>');
+$('[data-behavior~=tweet_replies_target]').html('<%= j render partial: "shared/tweet", collection: @tweets, locals: {entry: @entry, css: "quoted-tweet reply"} %>');
+feedbin.localizeTime();

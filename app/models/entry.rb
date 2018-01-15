@@ -74,8 +74,7 @@ class Entry < ApplicationRecord
     text
   end
 
-  def tweet_text(tweet = nil, trim_start = false)
-    tweet = tweet ? tweet : self.main_tweet
+  def tweet_text(tweet, trim_start = true)
     hash = tweet.to_h
     if hash[:entities]
       if hash[:entities][:media].present? && hash[:display_text_range] && hash[:entities][:media].last[:indices].first > hash[:display_text_range].last
@@ -89,8 +88,10 @@ class Entry < ApplicationRecord
         hash[:entities][:user_mentions] = hash[:entities][:user_mentions].reject do |mention|
           mention[:indices].last <= start
         end.map do |mention|
-          mention[:indices][0] = mention[:indices][0] - start
-          mention[:indices][1] = mention[:indices][1] - start
+          mention[:indices] = [
+            mention[:indices][0] - start,
+            mention[:indices][1] - start
+          ]
           mention
         end
       end

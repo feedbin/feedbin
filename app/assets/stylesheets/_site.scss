@@ -3458,6 +3458,11 @@ $saved-search-control-height: 48px;
 
 .tweet-wrap {
     padding-left: 60px;
+    .tweet-mentions {
+        font-size: 14px;
+        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        margin-bottom: 10px;
+    }
     .tweet-header {
         margin-bottom: 1.1em;
         position: relative;
@@ -3469,6 +3474,10 @@ $saved-search-control-height: 48px;
             a {
                 @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
                 text-decoration: none;
+                display: block;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
             span {
                 font-weight: normal;
@@ -3534,15 +3543,39 @@ $saved-search-control-height: 48px;
             @include fill($text-color-body, $text-color-body-night, $text-color-body-sunset);
         }
     }
+    .header-time {
+        display: none;
+    }
     .quoted-tweet {
         margin-bottom: 1.1em;
         padding: 14px 16px;
         border-radius: 4px;
         border: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
+        .post-meta {
+            display: none;
+        }
+        .tweet-header {
+            margin-bottom: .8em;
+            img {
+                height: 24px;
+                width: 24px;
+                left: 0;
+                top: -2px;
+            }
+        }
+        .tweet-text, .tweet-mentions, .tweet-header {
+            padding-left: 30px;
+        }
+        .twitter-link {
+            display: none;
+        }
         h1 {
+            display: flex;
+            justify-content: space-between;
             font-size: 18px;
             margin: 0 0 5px 0;
+            padding-right: 0;
             a {
                 @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
                 text-decoration: none;
@@ -3551,9 +3584,23 @@ $saved-search-control-height: 48px;
                 @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
                 font-weight: normal;
             }
+            time {
+                margin-left: auto;
+            }
         }
-        p {
+        .tweet-text {
             margin-bottom: 0;
+        }
+        &.reply {
+            padding: 20px 0 0 0;
+            margin-bottom: 20px;
+            border-radius: 0;
+            border-left: none;
+            border-right: none;
+            border-bottom: none;
+            .header-time {
+                display: block;
+            }
         }
     }
     @media (max-width: 1024px) {
