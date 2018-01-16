@@ -425,6 +425,16 @@ class EntryPresenter < BasePresenter
     entry.title.present?
   end
 
+  def tweet_classes(tweet)
+    classes = ["tweet-author-#{tweet.user.id}"]
+    if tweet.user.id == entry.main_tweet.user.id
+      if tweet.in_reply_to_screen_name? && tweet.in_reply_to_screen_name != entry.main_tweet.user.id
+        classes.push("tweet-author-reply")
+      end
+    end
+    classes.join(" ")
+  end
+
   def tweet_in_reply_to(tweet)
     tweet = tweet ? tweet : entry.main_tweet
     if tweet.to_h[:display_text_range] && tweet.in_reply_to_screen_name?

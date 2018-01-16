@@ -3556,7 +3556,7 @@ $saved-search-control-height: 48px;
             display: none;
         }
         .tweet-header {
-            margin-bottom: .8em;
+            margin-bottom: .2em;
             img {
                 height: 24px;
                 width: 24px;
@@ -3576,6 +3576,7 @@ $saved-search-control-height: 48px;
             font-size: 18px;
             margin: 0 0 5px 0;
             padding-right: 0;
+            align-items: baseline;
             a {
                 @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
                 text-decoration: none;
@@ -3585,6 +3586,10 @@ $saved-search-control-height: 48px;
                 font-weight: normal;
             }
             time {
+                font-size: 14px;
+                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+                line-height: 1.2;
+                font-weight: normal;
                 margin-left: auto;
             }
         }
@@ -3601,6 +3606,15 @@ $saved-search-control-height: 48px;
             .header-time {
                 display: block;
             }
+        }
+    }
+    .tweet-author-reply {
+        border-top: none;
+        padding-top: 0 !important;
+    }
+    .reply {
+        .tweet-mentions {
+            display: none;
         }
     }
     @media (max-width: 1024px) {

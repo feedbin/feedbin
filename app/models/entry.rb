@@ -101,6 +101,8 @@ class Entry < ApplicationRecord
     else
       hash[:full_text]
     end
+  rescue
+    hash[:full_text]
   end
 
   def thread

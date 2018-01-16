@@ -3,8 +3,13 @@ class TweetsController < ApplicationController
   def thread
     @user = current_user
     @entry = Entry.find(params[:id])
-    replies = load_replies
-    @tweets = load_author_replies(replies)
+    @tweets = Rails.cache.fetch("thread:#{@entry.id}") do
+      replies = load_replies
+      tweets = load_author_replies(replies)
+      tweets = tweets.unshift(@entry.main_tweet)
+      parents = load_parents
+      parents.concat(tweets)
+    end
   end
 
   private
@@ -19,6 +24,25 @@ class TweetsController < ApplicationController
       config.consumer_secret     = ENV['TWITTER_SECRET']
       config.access_token        = @user.twitter_access_token
       config.access_token_secret = @user.twitter_access_secret
+    end
+  end
+
+  def load_parents
+    parents = []
+    while parent = load_parent(parent)
+      parents.unshift(parent)
+    end
+    parents
+  end
+
+  def load_parent(parent)
+    if parent.nil?
+      parent = @entry.main_tweet
+    end
+    if parent.in_reply_to_status_id?
+      client.status(parent.in_reply_to_status_id, tweet_mode: "extended")
+    else
+      false
     end
   end
 
