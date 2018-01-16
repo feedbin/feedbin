@@ -428,7 +428,7 @@ class EntryPresenter < BasePresenter
   def tweet_classes(tweet)
     classes = ["tweet-author-#{tweet.user.id}"]
     if tweet.user.id == entry.main_tweet.user.id
-      if tweet.in_reply_to_screen_name? && tweet.in_reply_to_screen_name != entry.main_tweet.user.id
+      if tweet.in_reply_to_screen_name? && tweet.in_reply_to_screen_name != entry.main_tweet.user.id && tweet.id != entry.main_tweet.id
         classes.push("tweet-author-reply")
       end
     end

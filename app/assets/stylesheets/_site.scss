@@ -3459,14 +3459,14 @@ $saved-search-control-height: 48px;
 .tweet-wrap {
     .tweet-mentions {
         font-size: 14px;
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         margin-bottom: 10px;
         a {
-            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         }
     }
     .tweet-header {
-        margin-bottom: 1.1em;
+        margin-bottom: .6em;
         position: relative;
         h1 {
             font-size: 18px;
@@ -3535,14 +3535,24 @@ $saved-search-control-height: 48px;
     }
     .twitter-link {
         position: absolute;
-        right: 16px;
+        right: 0;
         top: 0;
         display: block;
         svg {
-            fill: green;
             width: 18px;
             height: 15px;
-            @include fill($text-color-body, $text-color-body-night, $text-color-body-sunset);
+            @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
+    }
+    .twitter-conversation-link {
+        position: absolute;
+        right: 37px;
+        top: 1px;
+        display: block;
+        svg {
+            width: 18px;
+            height: 18px;
+            @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
         }
     }
     .header-time {
@@ -3554,11 +3564,13 @@ $saved-search-control-height: 48px;
         border-radius: 4px;
         border: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
-        .post-meta {
+        .post-meta .tweet-location {
+            display: none;
+        }
+        .icon-twitter-conversation {
             display: none;
         }
         .tweet-header {
-            margin-bottom: .2em;
             img {
                 height: 24px;
                 width: 24px;
