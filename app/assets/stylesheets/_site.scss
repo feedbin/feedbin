@@ -3457,11 +3457,13 @@ $saved-search-control-height: 48px;
 }
 
 .tweet-wrap {
-    padding-left: 60px;
     .tweet-mentions {
         font-size: 14px;
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         margin-bottom: 10px;
+        a {
+            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        }
     }
     .tweet-header {
         margin-bottom: 1.1em;
@@ -3469,7 +3471,7 @@ $saved-search-control-height: 48px;
         h1 {
             font-size: 18px;
             margin: 0;
-            padding-right: 25px;
+            padding-right: 41px;
             margin-bottom: .2em;
             a {
                 @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
@@ -3533,7 +3535,7 @@ $saved-search-control-height: 48px;
     }
     .twitter-link {
         position: absolute;
-        right: 0;
+        right: 16px;
         top: 0;
         display: block;
         svg {
@@ -3560,12 +3562,10 @@ $saved-search-control-height: 48px;
             img {
                 height: 24px;
                 width: 24px;
-                left: 0;
+                left: auto;
+                right: 0;
                 top: -2px;
             }
-        }
-        .tweet-text, .tweet-mentions, .tweet-header {
-            padding-left: 30px;
         }
         .twitter-link {
             display: none;
@@ -3617,7 +3617,7 @@ $saved-search-control-height: 48px;
             display: none;
         }
     }
-    @media (max-width: 1024px) {
+    @media (max-width: 1397px) {
         padding-left: 0;
         .tweet-header {
             padding-left: 60px;
