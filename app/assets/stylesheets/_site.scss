@@ -3629,7 +3629,7 @@ $saved-search-control-height: 48px;
             display: none;
         }
     }
-    @media (max-width: 1397px) {
+    @mixin responsive-tweet {
         padding-left: 0;
         .tweet-header {
             padding-left: 60px;
@@ -3643,6 +3643,17 @@ $saved-search-control-height: 48px;
                 left: 0;
             }
         }
+    }
+    @media (max-width: 1397px) {
+        body:not(.full-screen) & {
+            @include responsive-tweet;
+        }
+    }
+    @media (max-width: 907px) {
+        @include responsive-tweet;
+    }
+    body.full-screen.fluid & {
+        @include responsive-tweet;
     }
 }
 
@@ -5455,41 +5466,6 @@ button.close {
         width: 800px;
     }
 }
-.modal-fluid {
-    width: 90% !important;
-    @media (max-width: 550px) {
-        width: auto !important;
-    }
-    &.modal-dialog {
-        margin-top: 40px;
-    }
-    .modal-header {
-        padding-top: 40px;
-        .close {
-            top: 38px;
-            right: 35px;
-        }
-    }
-    .modal-body {
-        padding-bottom: 30px;
-        padding-top: 70px;
-    }
-    .modal-footer {
-        padding-bottom: 20px;
-        padding-top: 20px;
-    }
-    .modal-header, .modal-body, .modal-footer {
-        padding-left: 30px;
-        padding-right: 30px;
-        @media (max-width: 550px) {
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-    }
-    .entry-inner {
-        padding: 0 !important;
-    }
-}
 .modal-header:before,
 .modal-header:after,
 .modal-footer:before,
@@ -5587,6 +5563,49 @@ Link Viewer
     }
 }
 
+.modal-view-link {
+    width: 800px;
+    &.modal-dialog {
+        margin-top: 40px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .modal-header {
+        padding-top: 40px;
+        .close {
+            top: 38px;
+            right: 35px;
+        }
+    }
+    .modal-body {
+        padding-bottom: 30px;
+        padding-top: 70px;
+    }
+    .modal-footer {
+        padding-bottom: 20px;
+        padding-top: 20px;
+    }
+    .modal-header, .modal-body, .modal-footer {
+        padding-left: 30px;
+        padding-right: 30px;
+        @media (max-width: 550px) {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+    }
+    .entry-inner {
+        padding: 0 !important;
+    }
+    @media (max-width: 768px) {
+        width: 550px !important;
+    }
+    @media (max-width: 550px) {
+        width: auto !important;
+        margin-left: 10px !important;
+        margin-right: 10px !important;
+    }
+}
+
 $affix-height: 50px;
 
 .affix-top, .affix {
@@ -5598,8 +5617,7 @@ $affix-height: 50px;
     height: $affix-height;
 }
 
-.affix-inner {
-    padding-top: 13px;
+.sticky-header {
     margin: 0 auto;
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     border-bottom: 1px solid transparent;
@@ -5607,6 +5625,8 @@ $affix-height: 50px;
     height: $affix-height;
     position: relative;
     border-radius: 8px 8px 0 0;
+    padding-left: 15px;
+    padding-right: 15px;
     .close {
         position: absolute;
         right: 0;
@@ -5619,36 +5639,46 @@ $affix-height: 50px;
             right: 16px;
         }
     }
-    p {
-        margin-bottom: 0 !important;
+    .entry-inner {
+        display: flex;
+        align-items: center;
+        padding: 0 !important;
+    }
+    .post-meta {
+        margin-bottom: auto !important;
+        margin-top: auto !important;
+        display: flex;
+        align-items: center;
+        height: 100%;
+        text-overflow: ellipsis;
+        overflow-x: hidden;
+        white-space: nowrap;
+        margin-right: 20px;
+        .favicon-wrap {
+            margin-right: 10px;
+            position: static;
+        }
     }
 }
 
 .affix {
     transform: translateZ(0);
-    .affix-inner {
-        width: 90%;
+    .sticky-header {
+        width: 800px;
+        @media (max-width: 768px) {
+            width: 550px;
+        }
     }
 }
 
-
 .link-header {
     @media (max-width: 550px) {
-        .post-meta {
-            margin-left: 43px;
-            margin-right: 50px;
-        }
-        .affix-inner {
-            width: auto;
-        }
         &.affix {
-            .affix-inner {
+            .sticky-header {
                 margin: 0 10px;
+                width: auto;
             }
         }
-    }
-    .entry-inner {
-        padding: 0 !important;
     }
 }
 
