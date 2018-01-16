@@ -1,7 +1,9 @@
-<% present entry do |entry_presenter| %>
-<div class="tweet <%= local_assigns[:css] ? css : '' %> <%= entry_presenter.tweet_classes(tweet) %>">
+<% present entry, local_assigns do |entry_presenter| %>
+<div class="tweet <%= entry_presenter.tweet_classes(tweet) %>">
   <header class="tweet-header">
-    <%= image_tag entry_presenter.tweet_profile_image_uri(tweet), size: "47x47" %>
+    <%= link_to tweet.uri.to_s, target: "_blank", title: "View on Twitter" do %>
+        <%= image_tag entry_presenter.tweet_profile_image_uri(tweet), size: "47x47" %>
+    <% end %>
     <h1>
         <a href="<%= entry_presenter.tweet_user_url(tweet) %>" target="_blank">
             <%= entry_presenter.tweet_name(tweet) %>
@@ -9,15 +11,15 @@
         </a>
     </h1>
     <p class="post-meta">
-      <time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time>
+      <time datetime="<%= tweet.created_at.iso8601 %>"><%= tweet.created_at.to_s(:full_human) %></time>
       <span class="tweet-location">
-          <% if entry_presenter.tweet_location %>
-              from <%= entry_presenter.tweet_location %>
+          <% if entry_presenter.tweet_location(tweet) %>
+              from <%= entry_presenter.tweet_location(tweet) %>
           <% end %>
       </span>
     </p>
 
-    <%= link_to thread_tweet_path(entry), remote: true, class: "twitter-conversation-link", title: "Show Conversation" do %>
+    <%= link_to load_tweet_path(entry), remote: true, class: "twitter-conversation-link", title: "Show Conversation" do %>
         <%= svg_tag "icon-twitter-conversation" %>
     <% end %>
 
@@ -28,5 +30,20 @@
   <%= entry_presenter.tweet_in_reply_to(tweet) %>
   <p class="tweet-text"><%= entry.tweet_text(tweet) %></p>
 </div>
+
+<% if local_assigns[:include_media] && include_media %>
+  <% tweet.media.take(1).each do |media| %>
+    <div class="content-styles">
+    <% if entry_presenter.tweet_video?(media) %>
+      <%= entry_presenter.tweet_video(media) %>
+    <% else %>
+      <%= link_to media.media_url_https.to_s + ":large" do %>
+        <%= image_tag entry_presenter.camo_link(media.media_url_https.to_s + ":large") %>
+      <% end %>
+    <% end %>
+    </div>
+  <% end %>
+<% end %>
+
 <% end %>
 

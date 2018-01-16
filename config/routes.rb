@@ -172,7 +172,8 @@ Rails.application.routes.draw do
 
   resources :tweets, only: [] do
     member do
-      get :thread
+      post :thread
+      get :load
     end
   end
 

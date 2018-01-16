@@ -1,3 +1,4 @@
-$('[data-behavior~=tweet_replies_style_target]').html('<%= j render partial: "thread_css", locals: {entry: @entry, tweets: @tweets} %>');
-$('[data-behavior~=tweet_replies_target]').html('<%= j render partial: "shared/tweet", collection: @tweets, locals: {entry: @entry, css: "quoted-tweet reply"} %>');
-feedbin.localizeTime();
+modal = $('#view_conversation_wrap')
+target = $('[data-behavior~=markup_target]', modal)
+target.html("<%= j render partial: 'conversation_contents', locals: {tweets: @tweets, parent: @parent, entry: @entry, user: @user} %>")
+feedbin.entryTime()

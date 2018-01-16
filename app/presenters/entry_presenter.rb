@@ -427,10 +427,18 @@ class EntryPresenter < BasePresenter
 
   def tweet_classes(tweet)
     classes = ["tweet-author-#{tweet.user.id}"]
-    if tweet.user.id == entry.main_tweet.user.id
-      if tweet.in_reply_to_screen_name? && tweet.in_reply_to_screen_name != entry.main_tweet.user.id && tweet.id != entry.main_tweet.id
+    parent = (@locals[:parent]) ? @locals[:parent] : entry.main_tweet
+    if tweet.user.id == parent.user.id
+      if tweet.in_reply_to_screen_name? && tweet.in_reply_to_screen_name != parent.user.id && tweet.id != parent.id
         classes.push("tweet-author-reply")
       end
+    end
+
+    if @locals[:tweet_counter] == 0
+      classes.push("main-tweet")
+      classes.push("main-tweet-conversation")
+    else
+      classes.push(@locals[:css])
     end
     classes.join(" ")
   end
@@ -541,8 +549,8 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def tweet_location
-    (entry.main_tweet.place?) ? entry.main_tweet.place.full_name : nil
+  def tweet_location(tweet)
+    (tweet.place?) ? tweet.place.full_name : nil
   end
 
   def tweet_video?(media)

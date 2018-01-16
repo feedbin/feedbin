@@ -1,15 +1,23 @@
 class TweetsController < ApplicationController
 
+  def load
+    @user = current_user
+    @entry = Entry.find(params[:id])
+  end
+
   def thread
     @user = current_user
     @entry = Entry.find(params[:id])
-    @tweets = Rails.cache.fetch("thread:#{@entry.id}") do
-      replies = load_replies
-      tweets = load_author_replies(replies)
-      tweets = tweets.unshift(@entry.main_tweet)
-      parents = load_parents
-      parents.concat(tweets)
-    end
+    # @tweets = Rails.cache.fetch("thread:#{@entry.id}") do
+    # end
+
+    parents = load_parents
+    @parent = parents.first
+
+    replies = load_replies(parents)
+    tweets = load_author_replies(replies, @parent)
+    tweets = tweets.unshift(@entry.main_tweet)
+    @tweets = parents.concat(tweets)
   end
 
   private
@@ -35,6 +43,41 @@ class TweetsController < ApplicationController
     parents
   end
 
+  def load_replies(parents)
+    parent = (parents.first) ? parents.first : @entry.main_tweet
+    query = "to:#{parent.user.screen_name} AND filter:replies"
+    options = {
+      since_id: parent.id,
+      result_type: "recent",
+      include_entities: true,
+      tweet_mode: "extended",
+      count: 100,
+    }
+    results = client.search(query, options)
+    tweets = results.take(100).select do |tweet|
+      tweet.in_reply_to_status_id? && tweet.in_reply_to_status_id == parent.id && !parents.find {|t| tweet.id == t.id }
+    end.reverse
+    OpenStruct.new(tweets: tweets, search_metadata: results.to_h[:search_metadata])
+  end
+
+  def load_author_replies(replies, parent)
+    parent = (parent) ? parent : @entry.main_tweet
+    options = {
+      include_rts:	false,
+      max_id:	replies.search_metadata[:max_id],
+      since_id:	parent.id,
+      tweet_mode:	"extended",
+      count: 100,
+    }
+    author_replies = client.user_timeline(parent.user.id, options)
+    replies.tweets.each_with_object([]) do |tweet, array|
+      array.push(tweet)
+      if reply = author_replies.find {|author_reply| author_reply.in_reply_to_status_id == tweet.id }
+        array.push(reply)
+      end
+    end
+  end
+
   def load_parent(parent)
     if parent.nil?
       parent = @entry.main_tweet
@@ -43,39 +86,6 @@ class TweetsController < ApplicationController
       client.status(parent.in_reply_to_status_id, tweet_mode: "extended")
     else
       false
-    end
-  end
-
-  def load_replies
-    query = "to:#{@entry.main_tweet.user.screen_name} AND filter:replies"
-    options = {
-      since_id: @entry.main_tweet.id,
-      result_type: "recent",
-      include_entities: true,
-      tweet_mode: "extended",
-      count: 100,
-    }
-    results = client.search(query, options)
-    tweets = results.take(100).select do |tweet|
-      tweet.in_reply_to_status_id? && tweet.in_reply_to_status_id == @entry.main_tweet.id
-    end.reverse
-    OpenStruct.new(tweets: tweets, search_metadata: results.to_h[:search_metadata])
-  end
-
-  def load_author_replies(replies)
-    options = {
-      include_rts:	false,
-      max_id:	replies.search_metadata[:max_id],
-      since_id:	@entry.main_tweet.id,
-      tweet_mode:	"extended",
-      count: 100,
-    }
-    author_replies = client.user_timeline(@entry.main_tweet.user.id, options)
-    replies.tweets.each_with_object([]) do |tweet, array|
-      array.push(tweet)
-      if reply = author_replies.find {|author_reply| author_reply.in_reply_to_status_id == tweet.id }
-        array.push(reply)
-      end
     end
   end
 

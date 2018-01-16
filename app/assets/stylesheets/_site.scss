@@ -3558,15 +3558,17 @@ $saved-search-control-height: 48px;
     .header-time {
         display: none;
     }
+    .main-tweet-conversation {
+        .icon-twitter-conversation {
+            display: none;
+        }
+    }
     .quoted-tweet {
         margin-bottom: 1.1em;
         padding: 14px 16px;
         border-radius: 4px;
         border: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
-        .post-meta .tweet-location {
-            display: none;
-        }
         .icon-twitter-conversation {
             display: none;
         }
@@ -3615,9 +3617,6 @@ $saved-search-control-height: 48px;
             border-left: none;
             border-right: none;
             border-bottom: none;
-            .header-time {
-                display: block;
-            }
         }
     }
     .tweet-author-reply {
@@ -3629,31 +3628,40 @@ $saved-search-control-height: 48px;
             display: none;
         }
     }
-    @mixin responsive-tweet {
-        padding-left: 0;
-        .tweet-header {
-            padding-left: 60px;
-            img {
-                left: 0;
+    .main-tweet {
+        @mixin responsive-tweet {
+            padding-left: 0;
+            .tweet-header {
+                padding-left: 60px;
+                img {
+                    left: 0;
+                }
+            }
+            .new-section {
+                padding-left: 30px;
+                .favicon-wrap {
+                    left: 0;
+                }
             }
         }
-        .new-section {
-            padding-left: 30px;
-            .favicon-wrap {
-                left: 0;
+        @media (max-width: 1397px) {
+            body:not(.full-screen) .entry-column & {
+                @include responsive-tweet;
             }
         }
-    }
-    @media (max-width: 1397px) {
-        body:not(.full-screen) & {
+        @media (max-width: 907px) {
+            .entry-column & {
+                @include responsive-tweet;
+            }
+        }
+        body.full-screen.fluid .entry-column & {
             @include responsive-tweet;
         }
-    }
-    @media (max-width: 907px) {
-        @include responsive-tweet;
-    }
-    body.full-screen.fluid & {
-        @include responsive-tweet;
+        @media (max-width: 920px) {
+            .modal & {
+                @include responsive-tweet;
+            }
+        }
     }
 }
 
@@ -5564,7 +5572,7 @@ Link Viewer
 }
 
 .modal-view-link {
-    width: 800px;
+    width: 900px;
     &.modal-dialog {
         margin-top: 40px;
         margin-left: auto;
@@ -5581,6 +5589,11 @@ Link Viewer
         padding-bottom: 30px;
         padding-top: 70px;
     }
+    &.modal-conversation  {
+        .modal-body {
+            padding-top: 30px;
+        }
+    }
     .modal-footer {
         padding-bottom: 20px;
         padding-top: 20px;
@@ -5596,7 +5609,7 @@ Link Viewer
     .entry-inner {
         padding: 0 !important;
     }
-    @media (max-width: 768px) {
+    @media (max-width: 920px) {
         width: 550px !important;
     }
     @media (max-width: 550px) {
@@ -5664,8 +5677,8 @@ $affix-height: 50px;
 .affix {
     transform: translateZ(0);
     .sticky-header {
-        width: 800px;
-        @media (max-width: 768px) {
+        width: 900px;
+        @media (max-width: 920px) {
             width: 550px;
         }
     }
