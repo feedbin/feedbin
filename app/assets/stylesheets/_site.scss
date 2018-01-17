@@ -3663,6 +3663,33 @@ $saved-search-control-height: 48px;
             }
         }
     }
+    @mixin responsive-tweet-body {
+        .new-section {
+            padding-left: 30px;
+            .favicon-wrap {
+                left: 0;
+            }
+        }
+    }
+    @media (max-width: 1397px) {
+        body:not(.full-screen) .entry-column & {
+            @include responsive-tweet-body;
+        }
+    }
+    @media (max-width: 907px) {
+        .entry-column & {
+            @include responsive-tweet-body;
+        }
+    }
+    body.full-screen.fluid .entry-column & {
+        @include responsive-tweet-body;
+    }
+    @media (max-width: 920px) {
+        .modal & {
+            @include responsive-tweet-body;
+        }
+    }
+
 }
 
 .application-messages {
