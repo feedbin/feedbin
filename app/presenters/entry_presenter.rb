@@ -428,7 +428,7 @@ class EntryPresenter < BasePresenter
   def tweet_classes(tweet)
     classes = ["tweet-author-#{tweet.user.id}"]
     parent = (@locals[:parent]) ? @locals[:parent] : entry.main_tweet
-    if tweet.user.id == parent.user.id
+    if @locals[:tweet_counter].present? && tweet.user.id == parent.user.id
       if tweet.in_reply_to_screen_name? && tweet.in_reply_to_screen_name != parent.user.id && tweet.id != parent.id
         classes.push("tweet-author-reply")
       end
