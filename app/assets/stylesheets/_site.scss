@@ -5631,12 +5631,13 @@ Link Viewer
         padding-left: 30px;
         padding-right: 30px;
         @media (max-width: 550px) {
-            padding-left: 15px;
-            padding-right: 15px;
+            padding-left: 0px;
+            padding-right: 0px;
         }
     }
     .entry-inner {
-        padding: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
     }
     @media (max-width: 920px) {
         width: 550px !important;
@@ -5684,7 +5685,12 @@ $affix-height: 50px;
     .entry-inner {
         display: flex;
         align-items: center;
-        padding: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        @media (max-width: 550px) {
+            padding-left: 0px;
+            padding-right: 0px;
+        }
     }
     .post-meta {
         margin-bottom: auto !important;
