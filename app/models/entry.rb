@@ -87,19 +87,25 @@ class Entry < ApplicationRecord
         start = hash[:display_text_range].first
         hash[:entities][:user_mentions] = hash[:entities][:user_mentions].reject do |mention|
           mention[:indices].last <= start
-        end.map do |mention|
-          mention[:indices] = [
-            mention[:indices][0] - start,
-            mention[:indices][1] - start
-          ]
-          mention
+        end
+        hash[:entities].each do |entity, values|
+          values.each_with_index do |value, index|
+            hash[:entities][entity][index][:indices] = [
+              value[:indices][0] - start,
+              value[:indices][1] - start
+            ]
+          end
         end
       end
-
       text = trim_text(hash, false, trim_start)
-      Twitter::TwitterText::Autolink.auto_link_with_json(text, hash[:entities]).html_safe
+      final_text = Twitter::TwitterText::Autolink.auto_link_with_json(text, hash[:entities]).html_safe
     else
-      hash[:full_text]
+      final_text = hash[:full_text]
+    end
+    if final_text.respond_to?(:strip)
+      final_text.strip
+    else
+      final_text
     end
   rescue
     hash[:full_text]

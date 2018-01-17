@@ -3471,7 +3471,7 @@ $saved-search-control-height: 48px;
         h1 {
             font-size: 18px;
             margin: 0;
-            padding-right: 41px;
+            padding-right: 56px;
             margin-bottom: .2em;
             a {
                 @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
@@ -7019,9 +7019,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 }
 
 .mejs__controls:not([style*='display: none']) {
-    background: rgba(255, 0, 0, 0.7);
-    background: -webkit-linear-gradient(transparent, rgba(0, 0, 0, 0.35));
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.35));
+    background: rgba($text-color, 0.35)
 }
 
 .mejs__button,

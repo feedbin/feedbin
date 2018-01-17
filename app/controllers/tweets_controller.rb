@@ -16,7 +16,11 @@ class TweetsController < ApplicationController
 
     replies = load_replies(parents)
     tweets = load_author_replies(replies, @parent)
-    tweets = tweets.unshift(@entry.main_tweet)
+
+    if !tweets.find {|tweet| tweet.id == @entry.main_tweet.id }
+      tweets = tweets.unshift(@entry.main_tweet)
+    end
+
     @tweets = parents.concat(tweets)
   end
 
