@@ -8,20 +8,18 @@ class TweetsController < ApplicationController
   def thread
     @user = current_user
     @entry = Entry.find(params[:id])
-    # @tweets = Rails.cache.fetch("thread:#{@entry.id}") do
-    # end
+    @tweets = Rails.cache.fetch("thread:#{@entry.id}", expires_in: 2.minutes) do
+      parents = load_parents
+      @parent = parents.first
 
-    parents = load_parents
-    @parent = parents.first
+      replies = load_replies(parents)
+      tweets = load_author_replies(replies, @parent)
 
-    replies = load_replies(parents)
-    tweets = load_author_replies(replies, @parent)
-
-    if !tweets.find {|tweet| tweet.id == @entry.main_tweet.id }
-      tweets = tweets.unshift(@entry.main_tweet)
+      if !tweets.find {|tweet| tweet.id == @entry.main_tweet.id }
+        tweets = tweets.unshift(@entry.main_tweet)
+      end
+      parents.concat(tweets)
     end
-
-    @tweets = parents.concat(tweets)
   end
 
   private
