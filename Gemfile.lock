@@ -304,6 +304,7 @@ GEM
     mini_portile2 (2.3.0)
     minitest (5.10.3)
     minitest-stub-const (0.6)
+    minitest-stub_any_instance (1.0.1)
     msgpack (1.2.0)
     multi_json (1.12.2)
     multi_xml (0.6.0)
@@ -541,6 +542,7 @@ DEPENDENCIES
   lograge
   minitest
   minitest-stub-const
+  minitest-stub_any_instance
   nokogumbo (= 1.4.9)
   oauth
   opml_saw!
