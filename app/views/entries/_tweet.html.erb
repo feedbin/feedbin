@@ -4,7 +4,7 @@
   <%= render partial: "shared/tweet", locals: {entry: entry, tweet: entry.main_tweet, css: "main-tweet"} %>
 
   <% entry.tweet_thread.each do |thread| %>
-    <p class="tweet-text"><%= entry.tweet_text(thread) %></p>
+    <%= entry_presenter.tweet_text(thread) %>
     <% thread.media.each do |media| %>
       <div class="content-styles">
       <% if entry_presenter.tweet_video?(media) %>

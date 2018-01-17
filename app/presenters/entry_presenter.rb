@@ -580,10 +580,14 @@ class EntryPresenter < BasePresenter
     @template.video_tag highest_quality_video.url.to_s, options
   end
 
-  def tweet_text(tweet)
-    text = entry.tweet_text(tweet)
+  def tweet_text(tweet, trim_start = true, tag = true)
+    text = entry.tweet_text(tweet, trim_start)
     if !text.empty?
-      @template.content_tag(:p, class: "tweet-text") do
+      if tag
+        @template.content_tag(:p, class: "tweet-text") do
+          text.html_safe
+        end
+      else
         text.html_safe
       end
     end
