@@ -79,7 +79,8 @@ module ApplicationHelper
   end
 
   def favicon_with_host(host)
-    if record = Favicon.find_by(host: host) && record.url
+    record = Favicon.find_by(host: host)
+    if record && record.respond_to?(:url)
       favicon_template(record.cdn_url)
     else
       favicon_url = favicon_service_url(host)
