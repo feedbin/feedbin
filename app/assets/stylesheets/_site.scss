@@ -3655,7 +3655,7 @@ $saved-search-control-height: 48px;
                 @include responsive-tweet;
             }
         }
-        body.full-screen.fluid .entry-column & {
+        body.fluid .entry-column & {
             @include responsive-tweet;
         }
         @media (max-width: 920px) {
@@ -3682,7 +3682,7 @@ $saved-search-control-height: 48px;
             @include responsive-tweet-body;
         }
     }
-    body.full-screen.fluid .entry-column & {
+    body.fluid .entry-column & {
         @include responsive-tweet-body;
     }
     @media (max-width: 920px) {
