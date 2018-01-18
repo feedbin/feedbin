@@ -2930,7 +2930,7 @@ $saved-search-control-height: 48px;
     line-height: 1.6;
     @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
     text-rendering: optimizeLegibility;
-    word-break: break-word;
+    overflow-wrap: break-word
 
     strong {
         font-weight: 700;
@@ -3532,6 +3532,7 @@ $saved-search-control-height: 48px;
         line-height: 1.4;
         @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
         font-family: $font-stack;
+        overflow-wrap: break-word
     }
     .twitter-link {
         position: absolute;
