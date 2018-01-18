@@ -429,7 +429,7 @@ class EntryPresenter < BasePresenter
     classes = ["tweet-author-#{tweet.user.id}"]
     parent = (@locals[:parent]) ? @locals[:parent] : entry.main_tweet
     if @locals[:tweet_counter].present? && tweet.user.id == parent.user.id
-      if tweet.in_reply_to_screen_name? && tweet.in_reply_to_screen_name != parent.user.id && tweet.id != parent.id
+      if tweet.in_reply_to_user_id? && tweet.in_reply_to_user_id != parent.user.id && tweet.id != parent.id
         classes.push("tweet-author-reply")
       end
     end
@@ -445,7 +445,7 @@ class EntryPresenter < BasePresenter
 
   def tweet_in_reply_to(tweet)
     tweet = tweet ? tweet : entry.main_tweet
-    if tweet.to_h[:display_text_range] && tweet.in_reply_to_screen_name?
+    if tweet.to_h[:display_text_range] && tweet.in_reply_to_status_id?
       range = tweet.to_h[:display_text_range]
       content_start = range.last
       mentions = tweet.user_mentions.select do |mention|
@@ -580,8 +580,8 @@ class EntryPresenter < BasePresenter
     @template.video_tag highest_quality_video.url.to_s, options
   end
 
-  def tweet_text(tweet, trim_start = true, tag = true)
-    text = entry.tweet_text(tweet, trim_start)
+  def tweet_text(tweet, tag = true)
+    text = entry.tweet_text(tweet)
     if !text.empty?
       if tag
         @template.content_tag(:p, class: "tweet-text") do

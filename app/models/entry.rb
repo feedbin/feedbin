@@ -74,41 +74,41 @@ class Entry < ApplicationRecord
     text
   end
 
-  def tweet_text(tweet, trim_start = true)
+  def tweet_text(tweet)
     hash = tweet.to_h
     if hash[:entities]
-      if hash[:entities][:media].present? && hash[:display_text_range] && hash[:entities][:media].last[:indices].first > hash[:display_text_range].last
-        hash[:entities][:media].pop
-      elsif hash[:quoted_status] && hash[:display_text_range] && hash[:entities][:urls].last[:indices].first > hash[:display_text_range].last
-        hash[:entities][:urls].pop
-      end
-
-      if hash[:display_text_range] && trim_start
-        start = hash[:display_text_range].first
-        hash[:entities][:user_mentions] = hash[:entities][:user_mentions].reject do |mention|
-          mention[:indices].last <= start
-        end
-        hash[:entities].each do |entity, values|
-          values.each_with_index do |value, index|
-            hash[:entities][entity][index][:indices] = [
-              value[:indices][0] - start,
-              value[:indices][1] - start
-            ]
-          end
-        end
-      end
-      text = trim_text(hash, false, trim_start)
-      final_text = Twitter::TwitterText::Autolink.auto_link_with_json(text, hash[:entities]).html_safe
+      hash = remove_entities(hash)
+      text = trim_text(hash, false, true)
+      text = Twitter::TwitterText::Autolink.auto_link_with_json(text, hash[:entities]).html_safe
     else
-      final_text = hash[:full_text]
+      text = hash[:full_text]
     end
-    if final_text.respond_to?(:strip)
-      final_text.strip
+    if text.respond_to?(:strip)
+      text.strip
     else
-      final_text
+      text
     end
   rescue
     hash[:full_text]
+  end
+
+  def remove_entities(hash)
+    if hash[:display_text_range]
+      text_start = hash[:display_text_range].first
+      text_end = hash[:display_text_range].last
+      hash[:entities].each do |entity, values|
+        hash[:entities][entity] = values.reject do |value|
+          value[:indices].last < text_start || value[:indices].first > text_end
+        end
+        hash[:entities][entity].each_with_index do |value, index|
+          hash[:entities][entity][index][:indices] = [
+            value[:indices][0] - text_start,
+            value[:indices][1] - text_start
+          ]
+        end
+      end
+    end
+    hash
   end
 
   def thread
