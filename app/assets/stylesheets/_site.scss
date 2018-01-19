@@ -3000,6 +3000,9 @@ $saved-search-control-height: 48px;
         }
     }
 
+    pre {
+        font-family: inherit;
+    }
 
     pre code {
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
