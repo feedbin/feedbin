@@ -205,7 +205,7 @@ class feedbin.Keyboard
 
     # Open original article
     Mousetrap.bind 'v', (event, combo) =>
-      content = $('.entry-header').find('a')[0].click()
+      content = $('#source_link')[0].click()
       event.preventDefault()
 
     # Open original article
