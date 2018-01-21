@@ -27,29 +27,29 @@
         <%= svg_tag "icon-twitter" %>
     <% end %>
   </header>
+
   <%= entry_presenter.tweet_in_reply_to(tweet) %>
   <%= entry_presenter.tweet_text(tweet) %>
-</div>
 
-<% if local_assigns[:tweet_counter] && tweet_counter == 0 %>
-  <% if tweet.quoted_status? %>
-    <%= render partial: "shared/tweet", locals: {entry: entry, tweet: tweet.quoted_status, css: "quoted-tweet"} %>
-  <% end %>
-<% end %>
-
-<% if local_assigns[:include_media] && include_media %>
-  <% tweet.media.take(1).each do |media| %>
-    <div class="content-styles">
-    <% if entry_presenter.tweet_video?(media) %>
-      <%= entry_presenter.tweet_video(media) %>
-    <% else %>
-      <%= link_to media.media_url_https.to_s + ":large" do %>
-        <%= image_tag entry_presenter.camo_link(media.media_url_https.to_s + ":large") %>
-      <% end %>
+  <% if local_assigns[:tweet_counter] && tweet_counter == 0 %>
+    <% if tweet.quoted_status? %>
+      <%= render partial: "shared/tweet", locals: {entry: entry, tweet: tweet.quoted_status, css: "quoted-tweet"} %>
     <% end %>
-    </div>
   <% end %>
-<% end %>
 
+  <% if local_assigns[:include_media] && include_media %>
+    <% tweet.media.take(1).each do |media| %>
+      <div class="content-styles">
+      <% if entry_presenter.tweet_video?(media) %>
+        <%= entry_presenter.tweet_video(media) %>
+      <% else %>
+        <%= link_to media.media_url_https.to_s + ":large" do %>
+          <%= image_tag entry_presenter.camo_link(media.media_url_https.to_s + ":large") %>
+        <% end %>
+      <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
 <% end %>
 

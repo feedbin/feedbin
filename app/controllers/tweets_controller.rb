@@ -10,15 +10,14 @@ class TweetsController < ApplicationController
     @entry = Entry.find(params[:id])
     @tweets = Rails.cache.fetch("thread:#{@entry.id}", expires_in: 2.minutes) do
       parents = load_parents
-      @parent = parents.first
-
       replies = load_replies(parents)
-      tweets = load_author_replies(replies, @parent)
+      tweets = load_author_replies(replies, parents)
 
       if !tweets.find {|tweet| tweet.id == @entry.main_tweet.id }
         tweets = tweets.unshift(@entry.main_tweet)
       end
-      parents.concat(tweets)
+      tweets = parents.concat(tweets)
+      tweets.uniq {|tweet| tweet.id }
     end
   end
 
@@ -57,27 +56,45 @@ class TweetsController < ApplicationController
     }
     results = client.search(query, options)
     tweets = results.take(100).select do |tweet|
-      tweet.in_reply_to_status_id? && tweet.in_reply_to_status_id == parent.id && !parents.find {|t| tweet.id == t.id }
+      tweet.in_reply_to_status_id? &&
+      tweet.in_reply_to_status_id == parent.id &&
+      tweet.user.id != parent.user.id &&
+      !parents.find {|t| tweet.id == t.id }
     end.reverse
     OpenStruct.new(tweets: tweets, search_metadata: results.to_h[:search_metadata])
   end
 
-  def load_author_replies(replies, parent)
-    parent = (parent) ? parent : @entry.main_tweet
+  def load_author_replies(replies, parents)
+    parent = (parents.first) ? parents.first : @entry.main_tweet
     options = {
       include_rts:	false,
       max_id:	replies.search_metadata[:max_id],
       since_id:	parent.id,
       tweet_mode:	"extended",
-      count: 100,
+      count: 200,
+      exclude_replies: false
     }
     author_replies = client.user_timeline(parent.user.id, options)
-    replies.tweets.each_with_object([]) do |tweet, array|
+
+    parent_id = parent.id
+    thread = author_replies.each_with_object([]) do |tweet, array|
+      reply = author_replies.find do |author_reply|
+        author_reply.in_reply_to_status_id == parent_id
+      end
+      if reply
+        parent_id = reply.id
+        array.push(reply)
+      end
+    end
+
+    tweets = replies.tweets.each_with_object([]) do |tweet, array|
       array.push(tweet)
       if reply = author_replies.find {|author_reply| author_reply.in_reply_to_status_id == tweet.id }
         array.push(reply)
       end
     end
+
+    tweets.unshift(*thread)
   end
 
   def load_parent(parent)
