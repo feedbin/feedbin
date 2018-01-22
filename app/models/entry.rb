@@ -10,6 +10,7 @@ class Entry < ApplicationRecord
 
   before_create :ensure_published
   before_create :create_summary
+  before_create :update_content
   before_update :create_summary
   after_commit :cache_public_id, on: :create
   after_commit :find_images, on: :create
@@ -234,6 +235,15 @@ class Entry < ApplicationRecord
 
   def processed_image?
     processed_image ? true : false
+  end
+
+  def update_content
+    original = self.content
+    if self.tweet?
+      self.content = ApplicationController.render(template: "entries/_tweet_default.html.erb", locals: {entry: self}, layout: nil)
+    end
+  rescue
+    self.content = original
   end
 
   private
