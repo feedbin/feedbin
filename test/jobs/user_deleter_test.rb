@@ -13,7 +13,9 @@ class UserDeleterTest < ActiveSupport::TestCase
     customer = Stripe::Customer.create({email: @user.email})
     @user.update(customer_id: customer.id)
     Sidekiq::Testing.inline! do
-      UserDeleter.perform_async(@user.id)
+      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+        UserDeleter.perform_async(@user.id)
+      end
     end
     StripeMock.stop
 

@@ -36,4 +36,10 @@ class UserMailer < ApplicationMailer
     mail to: kindle_address, subject: 'Kindle Content', body: '', from: ENV['KINDLE_EMAIL']
   end
 
+  def account_closed(user_id, opml)
+    @user = User.find(user_id)
+    attachments["subscriptions.xml"] = opml
+    mail to: @user.email, subject: '[Feedbin] Account Closed'
+  end
+
 end
