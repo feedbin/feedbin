@@ -1373,7 +1373,9 @@ li.selected > a .favicon-wrap {
     }
     .back-button {
         display: inline-block;
-        float: left;
+        position: absolute;
+        left: 0;
+        top: 0;
         height: $toolbar-height;
         width: $toolbar-height;
     }
@@ -7743,6 +7745,9 @@ Media Queries
         .entries-header {
             display: block;
         }
+    }
+    .entry-selected .entries-column, .feeds-column {
+        width: 320px !important;
     }
     .entry-toolbar, .entry-feed-title {
         .entry-feed-title {
