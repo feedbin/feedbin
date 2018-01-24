@@ -3620,13 +3620,15 @@ $saved-search-control-height: 48px;
             border-bottom: none;
         }
     }
-    .tweet-author-reply {
-        border-top: none;
-        padding-top: 0 !important;
-    }
-    .reply {
-        .tweet-mentions {
-            display: none;
+    .modal-conversation & {
+        .tweet-author-reply {
+            border-top: none;
+            padding-top: 0 !important;
+        }
+        .reply {
+            .tweet-mentions {
+                display: none;
+            }
         }
     }
     .main-tweet {
