@@ -347,7 +347,7 @@ class EntryPresenter < BasePresenter
 
   def summary
     if !entry.tweet && title?
-      summary = entry.summary.truncate(240, separator: " ", omission: "…").html_safe
+      summary = entry.summary.truncate(120, separator: " ", omission: "…").html_safe
       @template.content_tag(:p, summary, class: "body")
     end
   rescue
