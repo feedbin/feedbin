@@ -5073,7 +5073,7 @@ Buttons
 
 .button-secondary {
     background-color: transparent;
-    color: $selected;
+    color: $selected !important;
     &[disabled] {
         background-color: transparent;
         color: $text-color-light;
