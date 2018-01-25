@@ -3,6 +3,7 @@ class SelfUrl
   sidekiq_options retry: false, queue: :worker_slow
 
   def perform(feed_id = nil, schedule = false)
+    return true
     if schedule
       build
     else
