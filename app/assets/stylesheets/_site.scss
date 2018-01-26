@@ -5075,10 +5075,10 @@ Buttons
     color: $selected !important;
     &[disabled] {
         background-color: transparent;
-        color: $text-color-light;
+        color: $text-color-light !important;
         &:hover {
             background-color: transparent;
-            color: $text-color-light;
+            color: $text-color-light !important;
         }
     }
     &:hover {

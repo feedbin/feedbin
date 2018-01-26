@@ -8,6 +8,11 @@ class SettingsController < ApplicationController
 
   def account
     @user = current_user
+    @last_payment = @user.billing_events.
+      order(created_at: :desc).
+      where(event_type: 'charge.succeeded').
+      where('created_at >= :one_week', {one_week: 1.week.ago}).
+      take
   end
 
   def appearance
