@@ -20,7 +20,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: ca0c5b9c6ee3b47309f46e2120cef57491ff9228
+  revision: a8954bfb10f4ebeff7f7c25636ba665d4ef4c192
   branch: master
   specs:
     feedkit (0.1.0)
@@ -211,7 +211,7 @@ GEM
     execjs (2.7.0)
     faker (1.8.4)
       i18n (~> 0.5)
-    faraday (0.13.1)
+    faraday (0.14.0)
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.12.2)
       faraday (>= 0.7.4, < 1.0)
