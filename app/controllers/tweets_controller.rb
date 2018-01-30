@@ -107,6 +107,8 @@ class TweetsController < ApplicationController
     else
       false
     end
+  rescue Twitter::Error::Forbidden
+    false
   end
 
 end
