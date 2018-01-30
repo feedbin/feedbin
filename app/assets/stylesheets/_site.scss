@@ -3211,6 +3211,20 @@ $saved-search-control-height: 48px;
     .fluid-width-video-wrapper {
         margin-bottom: 1.1em;
     }
+
+    @media (max-width: 528px) {
+        img {
+            visibility: hidden;
+            &.full-width, &.show {
+                visibility: visible;
+            }
+        }
+        img.full-width, .fluid-width-video-wrapper {
+            width: 100vw !important;
+            max-width: none !important;
+            margin-left: -15px !important;
+        }
+    }
 }
 
 .content-styles.entry-type-newsletter {

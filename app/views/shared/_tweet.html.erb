@@ -43,7 +43,7 @@
 
   <% if local_assigns[:include_media] && include_media %>
     <% tweet.media.take(1).each do |media| %>
-      <div class="content-styles">
+      <div class="content-styles" data-behavior="format_images">
       <% if entry_presenter.tweet_video?(media) %>
         <%= entry_presenter.tweet_video(media) %>
       <% else %>

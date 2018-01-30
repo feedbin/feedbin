@@ -21,7 +21,7 @@
 
     <%= render partial: 'media', locals: {entry: entry} %>
 
-    <div class="entry-final-content" data-behavior="entry_final_content">
+    <div class="entry-final-content" data-behavior="entry_final_content format_images">
         <%= raw(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>
     </div>
   </div>

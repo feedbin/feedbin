@@ -267,13 +267,26 @@ $.extend feedbin,
         $('.entry-type-default').removeClass("entry-type-default").addClass("entry-type-newsletter");
 
   formatImages: ->
-    $("[data-behavior~=entry_content_wrap] img").each ->
-      actualSrc = $(@).data('feedbin-src')
+    $("[data-behavior~=format_images] img").each ->
+      img = $(@)
+      actualSrc = img.data('feedbin-src')
       if actualSrc?
-        $(@).attr("src", actualSrc)
+        img.attr("src", actualSrc)
 
-      if $(@).is("[src*='feeds.feedburner.com'], [data-canonical-src*='feeds.feedburner.com']")
-        $(@).addClass('hide')
+      load = ->
+        width = img.get(0).naturalWidth
+        if width > 528
+          img.addClass("full-width")
+        img.addClass("show")
+
+      if img.get(0).complete
+        load()
+
+      img.on 'load', (event) ->
+        load()
+
+      if img.is("[src*='feeds.feedburner.com'], [data-canonical-src*='feeds.feedburner.com']")
+        img.addClass('hide')
 
   formatEntryContent: (entryId, resetScroll=true, readability=true) ->
     feedbin.applyStarred(entryId)
