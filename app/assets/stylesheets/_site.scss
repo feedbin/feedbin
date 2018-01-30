@@ -3485,19 +3485,20 @@ $saved-search-control-height: 48px;
         h1 {
             font-size: 18px;
             margin: 0;
-            padding-right: 56px;
             margin-bottom: .2em;
-            a {
-                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+            display: flex;
+            align-items: baseline;
+            .link {
+                font-weight: normal;
+                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
                 text-decoration: none;
                 display: block;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
-            }
-            span {
-                font-weight: normal;
-                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+                strong {
+                    @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+                }
             }
         }
         img {
@@ -3509,6 +3510,30 @@ $saved-search-control-height: 48px;
             box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
             .theme-day & {
                 box-shadow: none;
+            }
+        }
+        .tweet-actions {
+            display: flex;
+            align-items: baseline;
+            margin-left: auto;
+            .twitter-link {
+                padding-left: 15px;
+                display: block;
+                svg {
+                    width: 18px;
+                    height: 15px;
+                    @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+                }
+            }
+            .twitter-conversation-link {
+                bottom: -2px;
+                position: relative;
+                padding-left: 15px;
+                svg {
+                    width: 18px;
+                    height: 18px;
+                    @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+                }
             }
         }
     }
@@ -3547,28 +3572,6 @@ $saved-search-control-height: 48px;
         @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
         font-family: $font-stack;
         overflow-wrap: break-word
-    }
-    .twitter-link {
-        position: absolute;
-        right: 0;
-        top: 0;
-        display: block;
-        svg {
-            width: 18px;
-            height: 15px;
-            @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
-        }
-    }
-    .twitter-conversation-link {
-        position: absolute;
-        right: 37px;
-        top: 0;
-        display: block;
-        svg {
-            width: 18px;
-            height: 18px;
-            @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
-        }
     }
     .header-time {
         display: none;

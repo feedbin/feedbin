@@ -19,6 +19,7 @@ class TweetsController < ApplicationController
       tweets = parents.concat(tweets)
       tweets.uniq {|tweet| tweet.id }
     end
+    @parent = @tweets.first
   end
 
   private
