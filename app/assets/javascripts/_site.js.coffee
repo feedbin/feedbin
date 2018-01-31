@@ -286,8 +286,6 @@ $.extend feedbin,
 
       load = ->
         width = img.get(0).naturalWidth
-        console.log 'width'
-        console.log width
         if width > 528
           img.addClass("full-width")
         img.addClass("show")
