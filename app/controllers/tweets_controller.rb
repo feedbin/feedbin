@@ -19,6 +19,7 @@ class TweetsController < ApplicationController
       tweets = parents.concat(tweets)
       tweets.uniq {|tweet| tweet.id }
     end
+    @parent = @tweets.first
   end
 
   private
@@ -106,6 +107,8 @@ class TweetsController < ApplicationController
     else
       false
     end
+  rescue Twitter::Error::Forbidden
+    false
   end
 
 end

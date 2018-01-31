@@ -44,7 +44,8 @@ class SiteController < ApplicationController
         progress: {},
         audio_panel_size: @user.audio_panel_size,
         view_links_in_app: @user.setting_on?(:view_links_in_app),
-        saved_searches_count_path: count_saved_searches_path
+        saved_searches_count_path: count_saved_searches_path,
+        proxy_images: !@user.setting_on?(:disable_image_proxy)
       }
 
       render action: 'logged_in'

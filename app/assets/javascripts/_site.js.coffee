@@ -161,8 +161,12 @@ $.extend feedbin,
   preloadImages: (id) ->
     id = parseInt(id)
     if feedbin.entries[id] && !_.contains(feedbin.preloadedImageIds, id)
-      $(feedbin.entries[id].content).find("[data-behavior~=entry_content_wrap] img").each ->
-        $(@).attr("src", $(@).data('feedbin-src'))
+      $(feedbin.entries[id].content).find("img[data-camo-src][data-canonical-src]").each ->
+        if feedbin.data.proxy_images
+          src = 'camo-src'
+        else
+          src = 'canonical-src'
+        $(@).attr("src", $(@).data(src))
       feedbin.preloadedImageIds.push(id)
 
   localizeTime: ->
@@ -230,8 +234,7 @@ $.extend feedbin,
     if entry_ids.length > 0
       $.getJSON feedbin.data.preload_entries_path, {ids: entry_ids.join(',')}, (data) ->
         $.extend feedbin.entries, data
-        ids = _.keys(data)
-        feedbin.preloadImages(ids[0])
+        feedbin.preloadImages(entry_ids[0])
 
   readability: () ->
     feedId = feedbin.selectedEntry.feed_id
@@ -262,18 +265,39 @@ $.extend feedbin,
   checkType: ->
     element = $('.entry-final-content')
     if element.length > 0
-      tag = element.children().get(0).nodeName
-      if tag == "TABLE"
-        $('.entry-type-default').removeClass("entry-type-default").addClass("entry-type-newsletter");
+      tag = element.children().get(0)
+      if tag
+        node = tag.nodeName
+        if node == "TABLE"
+          $('.entry-type-default').removeClass("entry-type-default").addClass("entry-type-newsletter");
 
   formatImages: ->
-    $("[data-behavior~=entry_content_wrap] img").each ->
-      actualSrc = $(@).data('feedbin-src')
-      if actualSrc?
-        $(@).attr("src", actualSrc)
+    $("img[data-camo-src]").each ->
+      img = $(@)
 
-      if $(@).is("[src*='feeds.feedburner.com'], [data-canonical-src*='feeds.feedburner.com']")
-        $(@).addClass('hide')
+      if feedbin.data.proxy_images
+        src = 'camo-src'
+      else
+        src = 'canonical-src'
+
+      actualSrc = img.data(src)
+      if actualSrc?
+        img.attr("src", actualSrc)
+
+      load = ->
+        width = img.get(0).naturalWidth
+        if width > 528
+          img.addClass("full-width")
+        img.addClass("show")
+
+      if img.get(0).complete
+        load()
+
+      img.on 'load', (event) ->
+        load()
+
+      if img.is("[src*='feeds.feedburner.com'], [data-canonical-src*='feeds.feedburner.com']")
+        img.addClass('hide')
 
   formatEntryContent: (entryId, resetScroll=true, readability=true) ->
     feedbin.applyStarred(entryId)
@@ -305,6 +329,7 @@ $.extend feedbin,
       feedbin.fitVids("view_link_markup_wrap")
       feedbin.formatTweets("view_link_markup_wrap")
       feedbin.formatInstagram()
+      feedbin.formatImages()
     catch error
       if 'console' of window
         console.log error

@@ -70,8 +70,8 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def content(image_proxy_enabled)
-    ContentFormatter.format!(formatted_content, entry, image_proxy_enabled)
+  def content
+    ContentFormatter.format!(formatted_content, entry)
   rescue => e
     Rails.logger.info { e.inspect }
     @template.content_tag(:p, '&ndash;&ndash;'.html_safe)
@@ -541,7 +541,7 @@ class EntryPresenter < BasePresenter
     url = url.expanded_url.to_s
     if INSTAGRAM_URLS.find { |format| url =~ format } && $1
       instagram_id = $1
-      @template.link_to url, class: "content-styles", target: "_blank" do
+      @template.link_to url, class: "content-styles entry-type-default", target: "_blank", data: {behavior: "format_images"} do
         @template.image_tag("https://instagram.com/p/#{instagram_id}/media/?size=l")
       end
     else
