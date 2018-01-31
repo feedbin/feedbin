@@ -160,7 +160,6 @@ $.extend feedbin,
 
   preloadImages: (id) ->
     id = parseInt(id)
-    console.log id
     if feedbin.entries[id] && !_.contains(feedbin.preloadedImageIds, id)
       $(feedbin.entries[id].content).find("img[data-camo-src][data-canonical-src]").each ->
         if feedbin.data.proxy_images
