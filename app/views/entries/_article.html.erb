@@ -22,7 +22,7 @@
     <%= render partial: 'media', locals: {entry: entry} %>
 
     <div class="entry-final-content" data-behavior="entry_final_content">
-        <%= raw(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>
+        <%= raw(entry_presenter.content) %>
     </div>
   </div>
 <% end %>

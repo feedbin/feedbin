@@ -38,6 +38,7 @@ class ContentFormatter
     if ENV['CAMO_HOST'] && ENV['CAMO_KEY'] && image_proxy_enabled
       context[:asset_proxy] = ENV['CAMO_HOST']
       context[:asset_proxy_secret_key] = ENV['CAMO_KEY']
+      context[:asset_src_attribute] = "data-camo-src"
       filters = filters << HTML::Pipeline::CamoFilter
     end
 

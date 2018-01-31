@@ -160,9 +160,14 @@ $.extend feedbin,
 
   preloadImages: (id) ->
     id = parseInt(id)
+    console.log id
     if feedbin.entries[id] && !_.contains(feedbin.preloadedImageIds, id)
-      $(feedbin.entries[id].content).find("[data-behavior~=entry_content_wrap] img").each ->
-        $(@).attr("src", $(@).data('feedbin-src'))
+      $(feedbin.entries[id].content).find("img[data-camo-src][data-canonical-src]").each ->
+        if feedbin.data.proxy_images
+          src = 'camo-src'
+        else
+          src = 'canonical-src'
+        $(@).attr("src", $(@).data(src))
       feedbin.preloadedImageIds.push(id)
 
   localizeTime: ->
@@ -230,8 +235,7 @@ $.extend feedbin,
     if entry_ids.length > 0
       $.getJSON feedbin.data.preload_entries_path, {ids: entry_ids.join(',')}, (data) ->
         $.extend feedbin.entries, data
-        ids = _.keys(data)
-        feedbin.preloadImages(ids[0])
+        feedbin.preloadImages(entry_ids[0])
 
   readability: () ->
     feedId = feedbin.selectedEntry.feed_id
@@ -262,13 +266,19 @@ $.extend feedbin,
   checkType: ->
     element = $('.entry-final-content')
     if element.length > 0
-      tag = element.children().get(0).nodeName
-      if tag == "TABLE"
-        $('.entry-type-default').removeClass("entry-type-default").addClass("entry-type-newsletter");
+      tag = element.children().get(0)
+      if tag
+        node = tag.nodeName
+        if node == "TABLE"
+          $('.entry-type-default').removeClass("entry-type-default").addClass("entry-type-newsletter");
 
   formatImages: ->
-    $("[data-behavior~=entry_content_wrap] img").each ->
-      actualSrc = $(@).data('feedbin-src')
+    $("img[data-camo-src]").each ->
+      if feedbin.data.proxy_images
+        src = 'camo-src'
+      else
+        src = 'canonical-src'
+      actualSrc = $(@).data(src)
       if actualSrc?
         $(@).attr("src", actualSrc)
 
@@ -305,6 +315,7 @@ $.extend feedbin,
       feedbin.fitVids("view_link_markup_wrap")
       feedbin.formatTweets("view_link_markup_wrap")
       feedbin.formatInstagram()
+      feedbin.formatImages()
     catch error
       if 'console' of window
         console.log error

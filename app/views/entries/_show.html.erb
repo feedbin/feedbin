@@ -22,7 +22,7 @@
         </div>
       </div>
       <div class="entry-content">
-        <div class="entry-inner" <%= rtl(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>>
+        <div class="entry-inner" <%= rtl(entry_presenter.content) %>>
           <% if entry.tweet? %>
               <%= render partial: "tweet", locals: {entry: entry} %>
           <% else %>
