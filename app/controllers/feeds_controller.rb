@@ -49,7 +49,7 @@ class FeedsController < ApplicationController
 
     if request.get?
       response = ""
-      if [feed.self_url, feed.feed_url].include?(params['hub.topic']) && secret == params['hub.verify_token']
+      if [feed.self_url, feed.feed_url].include?(params['hub.topic'])
         if params['hub.mode'] == 'subscribe'
           Librato.increment 'push.subscribe'
           feed.update_attributes(push_expiration: Time.now + (params['hub.lease_seconds'].to_i/2).seconds)
