@@ -70,8 +70,8 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def content(image_proxy_enabled)
-    ContentFormatter.format!(formatted_content, entry, image_proxy_enabled)
+  def content
+    ContentFormatter.format!(formatted_content, entry)
   rescue => e
     Rails.logger.info { e.inspect }
     @template.content_tag(:p, '&ndash;&ndash;'.html_safe)
