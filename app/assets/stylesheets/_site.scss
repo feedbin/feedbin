@@ -3213,7 +3213,7 @@ $saved-search-control-height: 48px;
     }
 
     @media (max-width: 528px) {
-        img {
+        img[data-camo-src] {
             visibility: hidden;
             &.full-width, &.show {
                 visibility: visible;
