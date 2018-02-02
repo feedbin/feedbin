@@ -105,5 +105,10 @@ module ApplicationHelper
     uri.to_s
   end
 
+  def image_tag_with_fallback(fallback, *image_args)
+    options = (image_args.length > 1) ? image_args.last : {}
+    options["onerror"] = "this.onerror=null;this.src='%s';" % fallback
+    image_tag(image_args.first, options)
+  end
 
 end
