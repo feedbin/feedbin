@@ -402,7 +402,7 @@ class EntryPresenter < BasePresenter
   def profile_image(feed)
     if entry.tweet?
       @template.content_tag :span, '', class: "favicon-wrap twitter-profile-image" do
-        @template.image_tag(tweet_profile_image_uri(entry.main_tweet))
+        @template.image_tag(tweet_profile_image_uri(entry.main_tweet), alt: "")
       end
     else
       favicon(feed)

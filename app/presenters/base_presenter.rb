@@ -14,7 +14,8 @@ class BasePresenter
         end
       elsif feed.twitter_user?
         content = @template.content_tag :span, '', class: "favicon-wrap twitter-profile-image" do
-          @template.image_tag(camo_link(feed.twitter_user.profile_image_uri_https("bigger")))
+          url = camo_link(feed.twitter_user.profile_image_uri_https("bigger"))
+          @template.image_tag(url, alt: "")
         end
       else
         markup = <<-eos
