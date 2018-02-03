@@ -1352,6 +1352,8 @@ li.selected > a .favicon-wrap {
 }
 
 .entries-header {
+    justify-content: space-between;
+    align-items: center;
     @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
     display: none;
     position: absolute;
@@ -1362,28 +1364,25 @@ li.selected > a .favicon-wrap {
     height: $toolbar-height;
     border-bottom: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
-    line-height: $toolbar-height;
     height: $toolbar-height;
     text-align: center;
     overflow: auto;
     .feed-title-wrap {
-        position: relative;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .back-button {
         display: inline-block;
-        position: absolute;
-        left: 0;
-        top: 0;
+        position: static;
         height: $toolbar-height;
         width: $toolbar-height;
+        flex-shrink: 0;
     }
     .search-button {
         display: inline-block;
-        float: right;
-        height: $toolbar-height;
-        width: $toolbar-height;
         background-color: transparent;
         background-size: 15px 15px;
         background-repeat: no-repeat;
@@ -1395,6 +1394,7 @@ li.selected > a .favicon-wrap {
         padding: 0;
         height: $toolbar-height;
         width: $toolbar-height;
+        flex-shrink: 0;
     }
     .favicon-wrap {
         left: 0;
@@ -7757,7 +7757,7 @@ Media Queries
     }
     .feed-selected, .entry-selected {
         .entries-header {
-            display: block;
+            display: flex;
         }
     }
     .entry-selected .entries-column, .feeds-column {
@@ -7822,7 +7822,7 @@ Media Queries
     }
     .feed-selected {
         .entries-header {
-            display: block;
+            display: flex;
         }
         .feeds-column {
             display: none;
@@ -8218,9 +8218,6 @@ Add
             overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
             white-space: nowrap;
-        }
-        .entries-header {
-            display: inline-block !important;
         }
         .app-panel {
             top: 0;
