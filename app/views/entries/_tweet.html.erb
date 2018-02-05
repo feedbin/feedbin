@@ -36,7 +36,7 @@
     <div class="tweet-meta-wrap">
         <p class="tweet-meta">
           <a href="<%= entry_presenter.tweet_user_url(entry.tweet) %>">
-            <%= image_tag entry_presenter.tweet_retweeted_image, size: "16x16" %>
+            <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry_presenter.tweet_retweeted_image, size: "16x16", alt: "") %>
             <%= entry_presenter.tweet_retweeted_message %>
           </a>
         </p>
