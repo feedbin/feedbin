@@ -11,7 +11,7 @@ class SettingsController < ApplicationController
     @last_payment = @user.billing_events.
       order(created_at: :desc).
       where(event_type: 'charge.succeeded').
-      where('created_at >= :one_week', {one_week: 1.week.ago}).
+      where('created_at >= :expiration_cutoff', {expiration_cutoff: 3.days.ago}).
       take
   end
 
