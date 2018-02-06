@@ -1,6 +1,6 @@
 class SharingService < ApplicationRecord
   belongs_to :user
-  default_scope { order('lower(label)') }
+  default_scope { order(Arel.sql('lower(label)')) }
 
   def link_options(entry)
     entry_url = entry.fully_qualified_url ? ERB::Util.url_encode(entry.fully_qualified_url) : ''

@@ -11,7 +11,7 @@ class Tagging < ApplicationRecord
   end
 
   def self.build_map
-    group(:feed_id).pluck('feed_id, array_agg(tag_id)').each_with_object({}) do |(feed_id, tag_ids), hash|
+    group(:feed_id).pluck(Arel.sql('feed_id, array_agg(tag_id)')).each_with_object({}) do |(feed_id, tag_ids), hash|
       hash[feed_id] = tag_ids
     end
   end

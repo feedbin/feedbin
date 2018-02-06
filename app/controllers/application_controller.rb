@@ -123,7 +123,7 @@ class ApplicationController < ActionController::Base
       feeds: @feeds,
       collections: get_collections,
       tags: @user.tag_group,
-      saved_searches: @user.saved_searches.order("lower(name)"),
+      saved_searches: @user.saved_searches.order(Arel.sql("lower(name)")),
       count_data: @count_data,
       feed_order: @user.feed_order
     }

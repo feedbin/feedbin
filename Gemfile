@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem 'rails', '= 5.1.4'
+gem 'rails', '= 5.2.0.rc1'
 
 gem 'rails-deprecated_sanitizer'
 gem 'rails-controller-testing'
@@ -24,7 +24,7 @@ end
 group :development, :test do
   gem 'puma'
   gem 'minitest'
-  gem 'stripe-ruby-mock', require: 'stripe_mock'
+  gem 'stripe-ruby-mock', '= 2.5.0', require: 'stripe_mock'
   gem 'faker'
   gem 'webmock'
   gem 'minitest-stub-const'
