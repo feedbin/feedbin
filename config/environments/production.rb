@@ -49,7 +49,7 @@ Rails.application.configure do
   config.ssl_options = { hsts: { subdomains: false } }
 
   # Less verbose logs
-  config.lograge.enabled = true
+  config.lograge.enabled = false
   config.lograge.custom_options = lambda do |event|
     custom_options = {}
     if event.payload && event.payload[:feedbin_request_id].present?
