@@ -5,7 +5,7 @@ timeout 30
 preload_app true
 user 'app', 'app'
 
-listen 3000
+listen /tmp/unicorn.sock
 
 app_dir  = "/srv/apps/feedbin"
 working_directory "#{app_dir}/current"
