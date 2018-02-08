@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem 'rails', '= 5.2.0.rc1'
+gem 'rails', '= 5.1.4'
 
 gem 'rails-deprecated_sanitizer'
 gem 'rails-controller-testing'
@@ -39,7 +39,7 @@ group :production do
   gem "therubyracer", require: 'v8'
 end
 
-gem 'pg'
+gem 'pg', '< 1.0'
 gem 'unicorn'
 
 gem 'feedjira', github: 'feedbin/feedjira', ref: 'eeb7e81'
