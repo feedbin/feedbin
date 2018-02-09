@@ -17,7 +17,7 @@ module SessionsHelper
           User.where('lower(email) = ?', username.try(:downcase)).take.try(:authenticate, password)
         end
       else
-        User.find_by_auth_token(cookies.signed[:auth_token]) if cookies.signed[:auth_token]
+        User.find_by_auth_token(cookies.signed[:auth_token].to_s) if cookies.signed[:auth_token].respond_to?(:to_s)
       end
     end
   end
