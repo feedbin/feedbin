@@ -71,6 +71,10 @@ class Transformers
         /^
           (?:https?:\/\/|\/\/)
           (?:www\.tumblr\.com)
+        /x,
+        /^
+          (?:https?:\/\/|\/\/)
+          (?:cdn\.embedly\.com)
         /x
       ]
 
