@@ -249,7 +249,7 @@ $.extend feedbin,
 
   fitVids: (selector = "entry_content_target") ->
     target = $("[data-behavior~=#{selector}]")
-    target.fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com'], iframe[src*='embed-ssl.ted.com']"});
+    target.fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com'], iframe[src*='embed-ssl.ted.com'], iframe[src*='gfycat.com']"});
 
   formatTweets: (selector = "entry_content_wrap") ->
     if typeof(twttr) != "undefined" && typeof(twttr.widgets) != "undefined"

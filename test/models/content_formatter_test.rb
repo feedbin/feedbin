@@ -54,6 +54,7 @@ class ContentFormatterTest < ActiveSupport::TestCase
       embed-ssl.ted.com
       embed.itunes.apple.com
       www.tumblr.com
+      gfycat.com
     }
     hosts.each do |host|
       content = %(<iframe src="http://#{host}"></iframe>)
