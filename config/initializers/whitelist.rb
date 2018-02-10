@@ -17,7 +17,7 @@ class Whitelist
         "ins"        => ["cite"],
         "q"          => ["cite"],
         "source"     => ["src"],
-        "video"      => ["src"],
+        "video"      => ["src", "poster"],
         "audio"      => ["src"],
         "td"         => ["style"],
         all: %w[
@@ -52,7 +52,8 @@ class Whitelist
           "longdesc" => ["http", "https", :relative]
         },
         "video" => {
-          "src" => ["http", "https"]
+          "src" => ["http", "https"],
+          "poster" => ["http", "https"]
         },
         "audio" => {
           "src" => ["http", "https"]

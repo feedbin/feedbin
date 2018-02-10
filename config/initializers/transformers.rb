@@ -106,7 +106,7 @@ class Transformers
         return
       end
 
-      allowed_classes = ['twitter-tweet', 'instagram-media']
+      allowed_classes = ['twitter-tweet', 'instagram-media', 'imgur-embed-pub']
 
       allowed_attributes = []
 

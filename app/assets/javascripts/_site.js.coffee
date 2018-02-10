@@ -262,6 +262,11 @@ $.extend feedbin,
       if $('blockquote.instagram-media').length > 0
         instgrm.Embeds.process()
 
+  formatImgur: ->
+    if typeof(imgurEmbed) != "undefined"
+      if $('blockquote.imgur-embed-pub').length > 0
+        window.imgurEmbed.createIframe()
+
   checkType: ->
     element = $('.entry-final-content')
     if element.length > 0
@@ -317,6 +322,7 @@ $.extend feedbin,
       feedbin.fitVids()
       feedbin.formatTweets()
       feedbin.formatInstagram()
+      feedbin.formatImgur()
       feedbin.formatImages()
       feedbin.checkType()
     catch error
@@ -328,7 +334,7 @@ $.extend feedbin,
       feedbin.audioVideo("view_link_markup_wrap")
       feedbin.fitVids("view_link_markup_wrap")
       feedbin.formatTweets("view_link_markup_wrap")
-      feedbin.formatInstagram()
+      feedbin.formatImgur()
       feedbin.formatImages()
     catch error
       if 'console' of window
