@@ -1352,8 +1352,8 @@ li.selected > a .favicon-wrap {
 }
 
 .entries-header {
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
     display: none;
     position: absolute;
@@ -1382,13 +1382,13 @@ li.selected > a .favicon-wrap {
         flex-shrink: 0;
     }
     .search-button {
-        display: inline-block;
         background-color: transparent;
         background-size: 15px 15px;
         background-repeat: no-repeat;
         background-image: image-url("icon-search.svg");
         background-position: center center;
         display: block;
+        visibility: visible;
         appearance: none;
         border: none;
         padding: 0;
@@ -7788,7 +7788,7 @@ Media Queries
         }
     }
     .search-button {
-        display: none !important;
+        visibility: hidden !important;
     }
     .entry-selected .entries {
         top: 0;
@@ -7849,7 +7849,7 @@ Media Queries
         }
     }
     .search-button {
-        display: block !important;
+        visibility: visible !important;
     }
     .entries {
         top: 0;
