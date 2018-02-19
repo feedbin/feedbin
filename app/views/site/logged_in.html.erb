@@ -113,7 +113,7 @@ feedbin.Counts.get(feedbin.count_data);
 <%= render partial: "shared/resizable_form" %>
 <%= render partial: 'shared/update_styles' %>
 <%= render partial: 'shared/saved_searches_count' %>
-<%= render partial: "tweets/conversation_wrap" %>
+<%= render partial: 'shared/modal_wrap', locals: {user: @user} %>
 
 <%= one_time_content && one_time_content.html_safe %>
 

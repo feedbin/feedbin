@@ -5,6 +5,13 @@ $.extend feedbin,
   messageTimeout: null
   swipe: false
 
+  modalContent: (html) ->
+    modal = $('#general_modal')
+    target = $('[data-behavior~=markup_target]', modal)
+    placeholder = $('[data-behavior~=modal_placeholder]', modal)
+    placeholder.addClass('hide')
+    target.html(html)
+
   showFeedList: ->
     $('[data-behavior~=feeds_target]').addClass('in')
 
@@ -1658,6 +1665,19 @@ $.extend feedbin,
           href = $(@).attr('href')
           feedbin.loadLink(href)
           event.preventDefault()
+
+    openModal: ->
+      $(document).on 'click', '[data-behavior~=open_modal]', (event) ->
+        id = '#general_modal'
+        modal = $(id)
+        target = $('[data-behavior~=markup_target]', modal)
+
+        placeholder = $('[data-behavior~=modal_placeholder]', modal)
+        placeholder.removeClass("hide")
+
+        target.html('')
+
+        feedbin.modal(id)
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->

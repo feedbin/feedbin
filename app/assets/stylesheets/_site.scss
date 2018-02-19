@@ -5537,7 +5537,7 @@ button.close {
 Link Viewer
 ------------------------------------------------------------------------------*/
 .theme-night #view_link_wrap .modal-content,
-.theme-night #view_conversation_wrap .modal-content {
+.theme-night #general_modal .modal-content {
     color: $text-color-night;
     background-color: $body-background-color-night;
     & .modal {
@@ -5545,7 +5545,7 @@ Link Viewer
     }
 }
 .theme-sunset #view_link_wrap .modal-content,
-.theme-sunset #view_conversation_wrap .modal-content {
+.theme-sunset #general_modal .modal-content {
     color: $text-color-sunset;
     background-color: $body-background-color-sunset;
     & .modal {
