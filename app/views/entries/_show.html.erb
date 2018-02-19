@@ -7,10 +7,12 @@
           <button class="entry-button button-full-screen" data-behavior="full_screen" title="Close full screen">
               <%= svg_tag 'icon-full-screen-close-small', size: '16x16' %>
           </button>
-          <div class="feed-button" data-behavior="show_entry_basement" data-basement-panel="feed_panel" title="Feed Options" role="button">
+
+          <%= form_tag modal_edit_feed_path(entry.feed), remote: true, class: 'feed-button', title: 'Feed options' do %>
             <%= entry_presenter.favicon(entry.feed) %>
-            <%= content_tag :div, strip_tags(entry.feed.title), class: 'entry-feed-title', data: {behavior: 'user_title', feed_id: entry.feed.id} %>
-          </div>
+            <%= content_tag :button, strip_tags(entry.feed.title), type: 'submit', class: 'entry-feed-title', data: {behavior: 'user_title open_modal', feed_id: entry.feed.id} %>
+          <% end %>
+
         </div>
         <div class="entry-buttons">
           <%= render partial: 'shared/app_settings' %>

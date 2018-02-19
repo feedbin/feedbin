@@ -27,6 +27,15 @@ class FeedsController < ApplicationController
     @subscription.save
   end
 
+  def modal_edit
+    # handle unsubscribed feeds
+    @user = current_user
+    @subscription = @user.subscriptions.find_by_feed_id(params[:id])
+    logger.info { "--------------" }
+    logger.info { @subscription.inspect }
+    logger.info { "--------------" }
+  end
+
   def view_unread
     update_view_mode('view_unread')
   end

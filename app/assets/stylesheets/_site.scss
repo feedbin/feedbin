@@ -3851,10 +3851,13 @@ Settings
     }
 }
 
-.settings {
-    font-size: 16px;
+body.settings {
     background-color: $list-background-color-night;
     color: $text-color;
+}
+
+.settings {
+    font-size: 16px;
     .settings-inner {
         height: 100%;
         width: 100%;
