@@ -1,4 +1,4 @@
 modal = $('#view_conversation_wrap');
 target = $('[data-behavior~=markup_target]', modal);
-target.html("<%= j render partial: 'conversation', locals: {user: @user, entry: @entry} %>");
+target.html("<%= j render partial: 'conversation_placeholder', locals: {user: @user, entry: @entry} %>");
 feedbin.modal('#view_conversation_wrap');
