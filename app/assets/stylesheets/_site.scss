@@ -3651,7 +3651,7 @@ $saved-search-control-height: 48px;
     .main-tweet {
         @mixin responsive-tweet {
             padding-left: 0;
-            .tweet-header {
+            > .tweet-header {
                 padding-left: 60px;
                 img {
                     left: 0;
