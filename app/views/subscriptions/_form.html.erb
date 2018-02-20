@@ -10,18 +10,13 @@
                     <div class="right-column">
                         <div class="header clearfix">
                             <div class="half">
-                                <h3>
-                                    <% if subscription.feed.twitter_user? %>
-                                        <a href="<%= subscription.feed.feed_url %>">
-                                            <%= subscription.feed.twitter_user.name %> <span>@<%= subscription.feed.twitter_user.screen_name %></span>
-                                        </a>
-                                    <% else %>
-                                        <a href="<%= subscription.feed.site_url %>">
-                                            <%= subscription.title || subscription.feed.title %>
-                                        </a>
-                                    <% end %>
-                                </h3>
-                                <p class="subhead"><a href="<%= subscription.feed.feed_url %>"><%= subscription.feed.feed_url %></a></p>
+                                <%= f.text_field :title, class: 'subscription-title' %>
+                                <% if !subscription.feed.twitter_feed? %>
+                                <p class="subhead">
+                                    <a href="<%= subscription.feed.site_url %>">Website: <%= pretty_url(subscription.feed.site_url) %></a>
+                                    <a href="<%= subscription.feed.feed_url %>">Feed: <%= pretty_url(subscription.feed.feed_url) %></a>
+                                </p>
+                                <% end %>
                             </div>
                             <div class="half">
                                 <%= link_to 'Unsubscribe', settings_destroy_subscription_path(subscription), method: :delete, class: 'button-secondary pull-right settings-unsubscribe' , data: { confirm: 'Are you sure you want to unsubscribe?' } %>
@@ -35,7 +30,7 @@
                             </div>
                             <div class="graph-wrap">
                                 <div class="graph">
-                                  <%= content_tag :canvas, '', data: { values: subscription_presenter.graph_bars, fill: "#dcebff", stroke: "#3399FF", behavior: "resize_graph line_graph" } %>
+                                  <%= content_tag :canvas, '', data: { values: subscription_presenter.graph_bars, fill: "#3399FF", stroke: "#3399FF", behavior: "resize_graph line_graph" } %>
                                 </div>
                                 <div class="x-axis">
                                     <div><%= subscription_presenter.graph_date_start %></div>
@@ -64,25 +59,6 @@
                                     <% end %>
                                  </p>
                             </div>
-                        </div>
-                        <div class="recent-articles">
-                            <p class="stat-header">
-                                <% if subscription.feed.twitter_feed? %>
-                                    Recent Tweets
-                                <% else %>
-                                    Recent Articles
-                                <% end %>
-                            </p>
-                            <ul>
-                                <% subscription.feed.entries.order(published: :desc).limit(3).each do |entry| %>
-                                    <% present entry do |entry_presenter| %>
-                                        <li>
-                                            <a href="<%= entry.fully_qualified_url %>"><%= entry_presenter.title %></a>
-                                            <time datetime="<%= entry.published.iso8601 %>" class="timeago"><%= entry.published.to_s(:day_month) %></time>
-                                        </li>
-                                    <% end %>
-                                <% end %>
-                            </ul>
                         </div>
                     </div>
                 </li>

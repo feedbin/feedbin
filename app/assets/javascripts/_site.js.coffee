@@ -5,9 +5,15 @@ $.extend feedbin,
   messageTimeout: null
   swipe: false
 
-  modalContent: (html) ->
+  drawBarCharts: ->
+    $('[data-behavior~=line_graph]').each ()->
+      feedbin.drawBarChart(@, $(@).data('values'))
+
+  modalContent: (html, css) ->
     modal = $('#general_modal')
     target = $('[data-behavior~=markup_target]', modal)
+    $('.modal-dialog', modal).addClass(css)
+
     placeholder = $('[data-behavior~=modal_placeholder]', modal)
     placeholder.addClass('hide')
     target.html(html)
@@ -1494,9 +1500,7 @@ $.extend feedbin,
         return
 
     drawBarCharts: ->
-      $('[data-behavior~=line_graph]').each ()->
-        feedbin.drawBarChart(@, $(@).data('values'))
-      return
+      feedbin.drawBarCharts()
 
     selectText: ->
       $(document).on 'mouseup', '[data-behavior~=select_text]', (event) ->

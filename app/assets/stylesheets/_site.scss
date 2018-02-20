@@ -671,11 +671,14 @@ table {
 }
 
 .inset {
-    background-color: $inset-bg-color;
+    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     border-radius: 8px;
     border: 1px solid $border-color;
     margin: 0 0 20px 0;
     padding: 30px 0 30px 0;
+    .modal & {
+        border: none;
+    }
     .inset-content {
         padding: 0 30px;
         @media (max-width: 528px) {
@@ -2008,6 +2011,9 @@ $saved-search-control-height: 48px;
         background: none;
         padding: 0;
         cursor: pointer;
+        &:hover {
+            text-decoration: none;
+        }
         .favicon-wrap {
             position: static;
             box-shadow: none;
@@ -2029,6 +2035,9 @@ $saved-search-control-height: 48px;
             text-decoration: none;
             white-space: nowrap;
             user-select: none;
+            appearance: none !important;
+            border: none;
+            background: none;
         }
     }
 }
@@ -3902,6 +3911,10 @@ body.settings {
             margin-bottom: 0;
         }
     }
+    .subscription-title {
+        font-size: 18px;
+        font-weight: bold;
+    }
     h4 {
         font-size: 18px;
         margin: 0 0 10px 0;
@@ -4070,13 +4083,15 @@ body.settings {
         list-style: none;
         margin: 0;
         padding: 0;
-        border-top: 1px solid $border-color;
         margin-bottom: 30px;
-        background-color: #FFF;
+        border-top: 1px solid $border-color;
+        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
         > li {
             margin: 0;
             padding: 0;
             border-bottom: 1px solid $border-color;
+            @include border-color($border-color, $border-color-night, $border-color-sunset);
             @include settings-row;
         }
         &.no-margin {
@@ -4149,6 +4164,7 @@ body.settings {
             position: relative;
             border: none;
             border-bottom: 1px solid $border-color;
+            @include border-color($border-color, $border-color-night, $border-color-sunset);
             display: block;
             border-radius: 0 !important;
             max-width: 100% !important;
@@ -4333,7 +4349,7 @@ body.settings {
             }
         }
         .favicon-wrap {
-            margin-top: 4px;
+            margin-top: 6px;
             position: static;
             box-shadow: none;
         }
@@ -4347,10 +4363,10 @@ body.settings {
             span {
                 font-weight: normal;
                 @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-
             }
             a {
                 color: $text-color;
+                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
                 &:hover {
                     text-decoration: none;
                 }
@@ -4375,8 +4391,9 @@ body.settings {
             margin-bottom: 20px;
             padding: 15px 12px 30px 12px;
             border-radius: 4px;
-            background-color: #f4f6f8;
+            @include background-color($inset-bg-color, $list-background-color-night, $list-background-color-sunset);
             border: 1px solid $border-color;
+            @include border-color($border-color, $border-color-night, $border-color-sunset);
             .graph-wrap {
                 flex: 1 1 auto;
                 padding-top: 25%;
@@ -4421,6 +4438,7 @@ body.settings {
         .stats {
             margin-top: 1px;
             border-bottom: 1px solid $border-color;
+            @include border-color($border-color, $border-color-night, $border-color-sunset);
             padding: 0 0 15px 0;
             justify-content: space-between;
             display: flex;
@@ -4444,7 +4462,7 @@ body.settings {
                 @media (max-width: 528px) {
                     display: inline;
                     font-size: 16px;
-                    color: $text-color;
+                    @include color($text-color, $text-color-night, $text-color-sunset);
                     text-transform: none;
                     font-weight: bold;
                     &:after {
@@ -4469,6 +4487,9 @@ body.settings {
         .recent-articles {
             padding-top: 20px;
             margin-bottom: 15px;
+            .modal & {
+                display: none;
+            }
             ul {
                 margin: 0;
                 padding: 0;
@@ -5656,6 +5677,11 @@ Link Viewer
         @media (max-width: 550px) {
             padding-left: 0px;
             padding-right: 0px;
+        }
+    }
+    &.modal-feed-edit {
+        .modal-body {
+            padding: 0;
         }
     }
     .entry-inner {

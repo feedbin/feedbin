@@ -111,4 +111,8 @@ module ApplicationHelper
     image_tag(image_args.first, options)
   end
 
+  def pretty_url(url)
+    url && url.sub('http://', '').sub('https://', '').gsub(/\/$/, '')
+  end
+
 end

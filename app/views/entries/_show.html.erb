@@ -8,9 +8,9 @@
               <%= svg_tag 'icon-full-screen-close-small', size: '16x16' %>
           </button>
 
-          <%= form_tag modal_edit_feed_path(entry.feed), remote: true, class: 'feed-button', title: 'Feed options' do %>
+          <%= link_to modal_edit_feed_path(entry.feed), remote: true, class: 'feed-button', data: {behavior: 'open_modal'} do %>
             <%= entry_presenter.favicon(entry.feed) %>
-            <%= content_tag :button, strip_tags(entry.feed.title), type: 'submit', class: 'entry-feed-title', data: {behavior: 'user_title open_modal', feed_id: entry.feed.id} %>
+            <span class="entry-feed-title" data-behavior="user_title"><%= strip_tags(entry.feed.title) %></span>
           <% end %>
 
         </div>
