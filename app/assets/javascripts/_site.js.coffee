@@ -1683,6 +1683,13 @@ $.extend feedbin,
 
         feedbin.modal(id)
 
+    showMessage: ->
+      $(document).on 'click', '[data-behavior~=show_message]', (event) ->
+        message = $(@).data("message")
+        if message
+          feedbin.showNotification(message)
+        event.preventDefault()
+
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
         href = $(@).parents("a:first").attr('href')

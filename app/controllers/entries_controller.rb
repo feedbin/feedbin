@@ -313,12 +313,14 @@ class EntriesController < ApplicationController
 
   def entries_by_id(entry_ids)
     entries = Entry.where(id: entry_ids).includes(feed: [:favicon])
+    subscriptions = @user.subscriptions.pluck(:feed_id)
     entries.each_with_object({}) do |entry, hash|
       locals = {
         entry: entry,
         services: sharing_services(entry),
         content_view: false,
-        user: @user
+        user: @user,
+        subscriptions: subscriptions
       }
       hash[entry.id] = {
         content: render_to_string(partial: "entries/show", formats: [:html], locals: locals),

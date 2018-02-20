@@ -3912,8 +3912,19 @@ body.settings {
         }
     }
     .subscription-title {
+        position: relative;
+        left: -9px;
+        margin: 0;
+        background-color: transparent !important;
+        border-color: transparent !important;
         font-size: 18px;
         font-weight: bold;
+        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        &:focus {
+            background-color: #FFF !important;
+            border-color: $selected !important;
+            @include color($text-header-color, $text-header-color, $text-header-color);
+        }
     }
     h4 {
         font-size: 18px;
@@ -4342,6 +4353,7 @@ body.settings {
             display: flex;
             .left-column {
                 flex: 0 0 auto;
+                margin-right: 5px;
             }
             .right-column {
                 margin-left: 5px;
@@ -4352,6 +4364,9 @@ body.settings {
             margin-top: 6px;
             position: static;
             box-shadow: none;
+            .modal & {
+                margin-top: 10px;
+            }
         }
         .profile-header {
             position: relative;
