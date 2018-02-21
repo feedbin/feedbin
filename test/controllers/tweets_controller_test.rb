@@ -13,15 +13,9 @@ class TweetsControllerTest < ActionController::TestCase
 
     client = Client.new()
     TweetsController.stub_any_instance :client, client do
-      post :thread, params: {id: entry}, xhr: true
+      get :thread, params: {id: entry}, xhr: true
     end
 
-    assert_response :success
-  end
-
-  test "should get load" do
-    login_as @user
-    get :load, params: {id: @user.entries.first}, xhr: true
     assert_response :success
   end
 
