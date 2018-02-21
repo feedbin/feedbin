@@ -112,7 +112,7 @@ module ApplicationHelper
   end
 
   def pretty_url(url)
-    url && url.sub('http://', '').sub('https://', '').gsub(/\/$/, '')
+    url && url.sub('http://', '').sub('https://', '').gsub(/\/$/, '').truncate(40, omission: "...")
   end
 
 end

@@ -3913,11 +3913,13 @@ body.settings {
     }
     .subscription-title {
         position: relative;
-        left: -9px;
-        margin: 0;
+        left: -5px;
+        margin: 0 0 5px 0;
         background-color: transparent !important;
-        border-color: transparent !important;
-        font-size: 18px;
+        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        font-size: 18px !important;
+        line-height: 18px !important;
+        padding: 3px !important;
         font-weight: bold;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         &:focus {
@@ -4361,12 +4363,9 @@ body.settings {
             }
         }
         .favicon-wrap {
-            margin-top: 6px;
+            margin-top: 5px;
             position: static;
             box-shadow: none;
-            .modal & {
-                margin-top: 10px;
-            }
         }
         .profile-header {
             position: relative;
@@ -4398,6 +4397,12 @@ body.settings {
             }
             a, a:hover {
                 color: $text-color-light;
+            }
+            a:hover {
+                text-decoration: none;
+                span {
+                    text-decoration: underline;
+                }
             }
         }
         .chart-wrap {

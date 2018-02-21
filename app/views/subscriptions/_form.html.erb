@@ -13,8 +13,8 @@
                                 <%= f.text_field :title, class: 'subscription-title' %>
                                 <% if !subscription.feed.twitter_feed? %>
                                 <p class="subhead">
-                                    <a href="<%= subscription.feed.site_url %>">Website: <%= pretty_url(subscription.feed.site_url) %></a>
-                                    <a href="<%= subscription.feed.feed_url %>">Feed: <%= pretty_url(subscription.feed.feed_url) %></a>
+                                    <a href="<%= subscription.feed.site_url %>">Website: <span><%= pretty_url(subscription.feed.site_url) %></span></a>
+                                    <a href="<%= subscription.feed.feed_url %>">Feed: <span><%= pretty_url(subscription.feed.feed_url) %></span></a>
                                 </p>
                                 <% end %>
                             </div>
