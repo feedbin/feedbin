@@ -1,10 +1,5 @@
 class TweetsController < ApplicationController
 
-  def load
-    @user = current_user
-    @entry = Entry.find(params[:id])
-  end
-
   def thread
     @user = current_user
     @entry = Entry.find(params[:id])
@@ -107,6 +102,8 @@ class TweetsController < ApplicationController
     else
       false
     end
+  rescue Twitter::Error::Forbidden
+    false
   end
 
 end

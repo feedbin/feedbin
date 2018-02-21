@@ -190,6 +190,7 @@ pre code {
 
 iframe {
     border: none;
+    max-width: 100% !important;
 }
 
 :focus {
@@ -283,7 +284,6 @@ input[type="color"],
     width: 100%;
     display: inline-block;
     margin-bottom: 7px;
-    line-height: 20px;
     vertical-align: middle;
     border-radius: 4px;
     &:focus {
@@ -1352,6 +1352,8 @@ li.selected > a .favicon-wrap {
 }
 
 .entries-header {
+    align-items: center;
+    justify-content: space-between;
     @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
     display: none;
     position: absolute;
@@ -1362,39 +1364,37 @@ li.selected > a .favicon-wrap {
     height: $toolbar-height;
     border-bottom: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
-    line-height: $toolbar-height;
     height: $toolbar-height;
     text-align: center;
     overflow: auto;
     .feed-title-wrap {
-        position: relative;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .back-button {
         display: inline-block;
-        position: absolute;
-        left: 0;
-        top: 0;
+        position: static;
         height: $toolbar-height;
         width: $toolbar-height;
+        flex-shrink: 0;
     }
     .search-button {
-        display: inline-block;
-        float: right;
-        height: $toolbar-height;
-        width: $toolbar-height;
         background-color: transparent;
         background-size: 15px 15px;
         background-repeat: no-repeat;
         background-image: image-url("icon-search.svg");
         background-position: center center;
         display: block;
+        visibility: visible;
         appearance: none;
         border: none;
         padding: 0;
         height: $toolbar-height;
         width: $toolbar-height;
+        flex-shrink: 0;
     }
     .favicon-wrap {
         left: 0;
@@ -3211,6 +3211,20 @@ $saved-search-control-height: 48px;
     .fluid-width-video-wrapper {
         margin-bottom: 1.1em;
     }
+
+    @media (max-width: 528px) {
+        img[data-camo-src] {
+            visibility: hidden;
+            &.full-width, &.show {
+                visibility: visible;
+            }
+        }
+        img.full-width, .fluid-width-video-wrapper {
+            width: 100vw !important;
+            max-width: none !important;
+            margin-left: -15px !important;
+        }
+    }
 }
 
 .content-styles.entry-type-newsletter {
@@ -3586,7 +3600,7 @@ $saved-search-control-height: 48px;
             }
         }
         .twitter-link {
-            display: none;
+            display: none !important;
         }
         h1 {
             display: flex;
@@ -3637,7 +3651,7 @@ $saved-search-control-height: 48px;
     .main-tweet {
         @mixin responsive-tweet {
             padding-left: 0;
-            .tweet-header {
+            > .tweet-header {
                 padding-left: 60px;
                 img {
                     left: 0;
@@ -5078,10 +5092,10 @@ Buttons
     color: $selected !important;
     &[disabled] {
         background-color: transparent;
-        color: $text-color-light;
+        color: $text-color-light !important;
         &:hover {
             background-color: transparent;
-            color: $text-color-light;
+            color: $text-color-light !important;
         }
     }
     &:hover {
@@ -5523,7 +5537,7 @@ button.close {
 Link Viewer
 ------------------------------------------------------------------------------*/
 .theme-night #view_link_wrap .modal-content,
-.theme-night #view_conversation_wrap .modal-content {
+.theme-night #general_modal .modal-content {
     color: $text-color-night;
     background-color: $body-background-color-night;
     & .modal {
@@ -5531,7 +5545,7 @@ Link Viewer
     }
 }
 .theme-sunset #view_link_wrap .modal-content,
-.theme-sunset #view_conversation_wrap .modal-content {
+.theme-sunset #general_modal .modal-content {
     color: $text-color-sunset;
     background-color: $body-background-color-sunset;
     & .modal {
@@ -7743,7 +7757,7 @@ Media Queries
     }
     .feed-selected, .entry-selected {
         .entries-header {
-            display: block;
+            display: flex;
         }
     }
     .entry-selected .entries-column, .feeds-column {
@@ -7774,7 +7788,7 @@ Media Queries
         }
     }
     .search-button {
-        display: none !important;
+        visibility: hidden !important;
     }
     .entry-selected .entries {
         top: 0;
@@ -7808,7 +7822,7 @@ Media Queries
     }
     .feed-selected {
         .entries-header {
-            display: block;
+            display: flex;
         }
         .feeds-column {
             display: none;
@@ -7835,7 +7849,7 @@ Media Queries
         }
     }
     .search-button {
-        display: block !important;
+        visibility: visible !important;
     }
     .entries {
         top: 0;
@@ -8204,9 +8218,6 @@ Add
             overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
             white-space: nowrap;
-        }
-        .entries-header {
-            display: inline-block !important;
         }
         .app-panel {
             top: 0;

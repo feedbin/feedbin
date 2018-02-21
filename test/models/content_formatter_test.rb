@@ -9,7 +9,7 @@ class ContentFormatterTest < ActiveSupport::TestCase
   end
 
   test "should format content" do
-    expected = %(<p><a href="http://kottke.org/link"><img src="https://example.com/e3b56842cc257f75872facfb7febe44968bddf6a/687474703a2f2f6b6f74746b652e6f72672f696d672e706e67" data-canonical-src="http://kottke.org/img.png"></a></p>)
+    expected = %(<p><a href="http://kottke.org/link"><img src="" data-camo-src="https://example.com/e3b56842cc257f75872facfb7febe44968bddf6a/687474703a2f2f6b6f74746b652e6f72672f696d672e706e67" data-canonical-src="http://kottke.org/img.png"></a></p>)
     assert_equal expected, ContentFormatter.format!(@entry.content, @entry)
   end
 
@@ -54,6 +54,7 @@ class ContentFormatterTest < ActiveSupport::TestCase
       embed-ssl.ted.com
       embed.itunes.apple.com
       www.tumblr.com
+      cdn.embedly.com
     }
     hosts.each do |host|
       content = %(<iframe src="http://#{host}"></iframe>)

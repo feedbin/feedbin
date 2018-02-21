@@ -1623,6 +1623,13 @@ CREATE UNIQUE INDEX index_recently_read_entries_on_user_id_and_entry_id ON recen
 
 
 --
+-- Name: index_recently_read_entries_on_user_id_and_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recently_read_entries_on_user_id_and_id ON recently_read_entries USING btree (user_id, id DESC);
+
+
+--
 -- Name: index_saved_searches_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2070,6 +2077,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20170812121620'),
 ('20170816220409'),
 ('20180102071024'),
-('20180106031725');
+('20180106031725'),
+('20180204093407');
 
 

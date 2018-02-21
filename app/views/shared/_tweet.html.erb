@@ -2,7 +2,7 @@
 <div class="tweet <%= entry_presenter.tweet_classes(tweet) %>">
   <header class="tweet-header">
     <%= link_to tweet.uri.to_s, target: "_blank", title: "View on Twitter" do %>
-        <%= image_tag entry_presenter.tweet_profile_image_uri(tweet), size: "47x47" %>
+        <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry_presenter.tweet_profile_image_uri(tweet), size: "47x47", alt: "") %>
     <% end %>
     <h1>
         <a href="<%= entry_presenter.tweet_user_url(tweet) %>" target="_blank" class="link">
@@ -10,7 +10,7 @@
             <%= entry_presenter.tweet_screen_name(tweet) %>
         </a>
         <span class="tweet-actions">
-            <%= link_to load_tweet_path(entry), remote: true, class: "twitter-conversation-link", title: "Show Conversation" do %>
+            <%= link_to thread_tweet_path(entry), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {behavior: "open_modal"} do %>
                 <%= svg_tag "icon-twitter-conversation" %>
             <% end %>
 
@@ -45,7 +45,7 @@
 
   <% if local_assigns[:include_media] && include_media %>
     <% tweet.media.take(1).each do |media| %>
-      <div class="content-styles">
+      <div class="content-styles entry-type-default" data-behavior="format_images">
       <% if entry_presenter.tweet_video?(media) %>
         <%= entry_presenter.tweet_video(media) %>
       <% else %>

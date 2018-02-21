@@ -70,8 +70,8 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def content(image_proxy_enabled)
-    ContentFormatter.format!(formatted_content, entry, image_proxy_enabled)
+  def content
+    ContentFormatter.format!(formatted_content, entry)
   rescue => e
     Rails.logger.info { e.inspect }
     @template.content_tag(:p, '&ndash;&ndash;'.html_safe)
@@ -402,7 +402,9 @@ class EntryPresenter < BasePresenter
   def profile_image(feed)
     if entry.tweet?
       @template.content_tag :span, '', class: "favicon-wrap twitter-profile-image" do
-        @template.image_tag(tweet_profile_image_uri(entry.main_tweet))
+        url = tweet_profile_image_uri(entry.main_tweet)
+        fallback = @template.image_url("favicon-profile-default.png")
+        @template.image_tag_with_fallback(fallback, url, alt: "")
       end
     else
       favicon(feed)
@@ -504,7 +506,7 @@ class EntryPresenter < BasePresenter
     if entry.tweet.user.profile_image_uri? && entry.tweet.user.profile_image_uri_https("normal")
       camo_link(entry.tweet.user.profile_image_uri_https("normal"))
     else
-      "https://dinzvnnq89ifs.cloudfront.net/public-favicons/75b8/75b817d23070af4638e4be9af12d74831adf20ce.png"
+      @template.image_url("favicon-profile-default.png ")
     end
   end
 
@@ -513,7 +515,7 @@ class EntryPresenter < BasePresenter
     if tweet.user.profile_image_uri? && tweet.user.profile_image_uri_https(size)
       camo_link(tweet.user.profile_image_uri_https("bigger"))
     else
-      "https://dinzvnnq89ifs.cloudfront.net/public-favicons/75b8/75b817d23070af4638e4be9af12d74831adf20ce.png"
+      @template.image_url("favicon-profile-default.png ")
     end
   end
 
@@ -541,7 +543,7 @@ class EntryPresenter < BasePresenter
     url = url.expanded_url.to_s
     if INSTAGRAM_URLS.find { |format| url =~ format } && $1
       instagram_id = $1
-      @template.link_to url, class: "content-styles", target: "_blank" do
+      @template.link_to url, class: "content-styles entry-type-default", target: "_blank", data: {behavior: "format_images"} do
         @template.image_tag("https://instagram.com/p/#{instagram_id}/media/?size=l")
       end
     else

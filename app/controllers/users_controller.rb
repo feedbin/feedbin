@@ -53,7 +53,7 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    UserDeleter.perform_async(@user.id)
+    UserDeleter.perform_async(@user.id, params[:billing_event_id])
     sign_out
     redirect_to account_closed_public_settings_url
   end
