@@ -39,11 +39,11 @@ class feedbin.Keyboard
         @selectColumn('entry-content')
       return
 
-    $(document).on 'click', '[data-behavior~=open_next_entry]', =>
+    $(document).on 'click', '[data-behavior~=open_next_entry]', (event) =>
       @setEnvironment()
       @item = @next
       @selectItem()
-      return
+      event.preventDefault()
 
   navigateShareMenu: (combo) ->
     # If share menu is showing intercept up down
