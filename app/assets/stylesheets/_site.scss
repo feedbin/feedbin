@@ -3571,7 +3571,7 @@ $saved-search-control-height: 48px;
         margin-bottom: .4em;
         .favicon-wrap {
             left: -30px;
-            top: 0;
+            top: -2px;
         }
     }
     .tweet-text {
@@ -3660,7 +3660,7 @@ $saved-search-control-height: 48px;
     .main-tweet {
         @mixin responsive-tweet {
             padding-left: 0;
-            .tweet-header {
+            > .tweet-header {
                 padding-left: 60px;
                 img {
                     left: 0;
@@ -6321,7 +6321,9 @@ Fullscreen
 ------------------------------------------------------------------------------*/
 .full-screen {
     .feeds-column, .entries-column, .account-toolbar {
-        display: none;
+        position: absolute !important;
+        top: -9999px !important;
+        left: -9999px !important;
     }
     .entry-content-wrap {
         top: 0;

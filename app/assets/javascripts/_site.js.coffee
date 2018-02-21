@@ -1470,14 +1470,6 @@ $.extend feedbin,
         event.preventDefault()
         return
 
-    nextEntry: ->
-      $(document).on 'click', '[data-behavior~=open_next_entry]', (event) ->
-        next = feedbin.nextEntry()
-        if next
-          next.find('a').click()
-        event.preventDefault()
-        return
-
     viewLatest: ->
       $(document).on 'click', '.view-latest-link', ->
         $('.entries .selected a').click()

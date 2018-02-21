@@ -416,6 +416,10 @@ class EntryPresenter < BasePresenter
       @template.content_tag(:span, '', class: "title-inner") do
         "#{tweet_name(entry.main_tweet)} #{@template.content_tag(:span, tweet_screen_name(entry.main_tweet))}".html_safe
       end
+    elsif entry.title.blank? && entry.author.present?
+      @template.content_tag(:span, '', class: "title-inner") do
+        entry.author
+      end
     else
       @template.content_tag(:span, '', class: "title-inner", data: {behavior: "user_title", feed_id: entry.feed.id}) do
         entry.feed.title

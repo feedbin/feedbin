@@ -86,7 +86,8 @@ class SupportedSharingService < ApplicationRecord
       label: 'App.net',
       requires_auth: false,
       service_type: 'popover',
-      klass: 'Share::AppDotNet'
+      klass: 'Share::AppDotNet',
+      active: false
     },
     {
       service_id: 'buffer',
