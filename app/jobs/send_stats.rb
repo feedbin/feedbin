@@ -12,7 +12,13 @@ class SendStats
       plan_count
       active_users_count
       queue_depth
+      clear_empty_jobs
     end
+  end
+
+  def clear_empty_jobs
+    queue = Sidekiq::Queue.new('')
+    queue.clear
   end
 
   def queue_depth
