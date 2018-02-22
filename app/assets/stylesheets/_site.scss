@@ -2069,7 +2069,7 @@ $saved-search-control-height: 48px;
     }
     &.entry-settings {
         display: flex;
-        overflow: scroll;
+        overflow-x: scroll;
         -webkit-overflow-scrolling: touch;
     }
     &.feed-settings {
