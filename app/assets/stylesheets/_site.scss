@@ -2067,6 +2067,11 @@ $saved-search-control-height: 48px;
     .entry-basement.open &:before {
         visibility: visible;
     }
+    &.entry-settings {
+        display: flex;
+        overflow: scroll;
+        -webkit-overflow-scrolling: touch;
+    }
     &.feed-settings {
         display: flex;
         align-items: stretch;
@@ -2102,10 +2107,8 @@ $saved-search-control-height: 48px;
     .setting-wrap {
         border-right: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
-        height: 100%;
         display: block;
         padding: 0;
-        float: left;
     }
     .font-settings {
         position: relative;
