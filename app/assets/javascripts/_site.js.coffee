@@ -536,19 +536,11 @@ $.extend feedbin,
       context.scale(ratio, ratio)
 
       context.lineJoin = 'round'
-      context.fillStyle = $(canvas).data('fill')
       context.strokeStyle = $(canvas).data('stroke')
       context.lineWidth = 1
       context.lineCap = 'round'
 
       points = feedbin.buildPoints(values, canvasWidth, canvasHeight)
-
-      context.beginPath()
-      context.moveTo(0, canvasHeight)
-      for point in points
-        context.lineTo(point.x, point.y)
-      context.lineTo(canvasWidth, canvasHeight)
-      context.fill()
 
       context.beginPath()
       for point, index in points
