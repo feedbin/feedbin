@@ -133,6 +133,10 @@ class Feed < ApplicationRecord
     self.options.dig('email_headers', 'List-Unsubscribe')
   end
 
+  def self.search(url)
+    where("feed_url ILIKE :query", query: "%#{url}%")
+  end
+
   private
 
   def refresh_favicon
