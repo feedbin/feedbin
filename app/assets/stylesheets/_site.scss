@@ -2053,7 +2053,7 @@ $saved-search-control-height: 48px;
 }
 
 .basement-toolbar {
-    height: 48px;
+    height: 49px;
     width: 100%;
     border-bottom: 1px solid $border-color;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
@@ -2075,6 +2075,16 @@ $saved-search-control-height: 48px;
     .entry-basement.open &:after,
     .entry-basement.open &:before {
         visibility: visible;
+    }
+    &.entry-settings {
+        display: flex;
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
+        .setting-wrap {
+            display: flex;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
     }
     &.feed-settings {
         display: flex;
@@ -2111,10 +2121,8 @@ $saved-search-control-height: 48px;
     .setting-wrap {
         border-right: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
-        height: 100%;
         display: block;
         padding: 0;
-        float: left;
     }
     .font-settings {
         position: relative;
@@ -2150,29 +2158,24 @@ $saved-search-control-height: 48px;
         }
     }
     .button-increase-font {
-        height: 48px;
         width: 48px;
         display: block;
         .icon-larger-text {
-            height: 48px;
             width: 48px;
             pointer-events: none;
             @include fill(#000000, #fbfdff, #000000);
         }
     }
     .button-decrease-font {
-        height: 48px;
         width: 48px;
         display: block;
         .icon-smaller-text {
-            height: 48px;
             width: 48px;
             pointer-events: none;
             @include fill(#000000, #fbfdff, #000000);
         }
     }
     .button-entry-width {
-        height: 48px;
         width: 48px;
         position: relative;
         display: block;
@@ -2199,7 +2202,6 @@ $saved-search-control-height: 48px;
         }
     }
     .button-full-screen {
-        height: 48px;
         width: 48px;
         position: relative;
         display: block;
