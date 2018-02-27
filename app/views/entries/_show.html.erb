@@ -38,13 +38,12 @@
               <%= render partial: "article", locals: {entry: entry, user: user} %>
           <% end %>
         </div>
-        <a class="next-entry-preview no-content" data-behavior="open_next_entry" href="#">
+        <button class="next-entry-preview no-content" data-behavior="open_next_entry">
           <span class="next-entry-preview-inner">
-            <span class="next-entry-link">Next</span>
             <span class="next-entry-feed"></span>
             <span class="next-entry-title"></span>
           </span>
-        </a>
+        </button>
       </div>
     <% end %>
     <script type="text/javascript">

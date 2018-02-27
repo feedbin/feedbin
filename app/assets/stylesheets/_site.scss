@@ -2373,7 +2373,13 @@ $saved-search-control-height: 48px;
 
 .next-entry-preview {
     display: block;
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    appearance: none !important;
+    background: $selected;
+    border: none;
+    padding: 0;
+    width: 100%;
+    text-align: left;
+    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     &.no-content {
         display: none;
     }
@@ -2383,10 +2389,14 @@ $saved-search-control-height: 48px;
 }
 
 .next-entry-preview-inner {
-    padding: 30px 20px;
+    padding: 30px 0 43px 0;
     margin: 0 auto;
-    max-width: 660px;
+    max-width: 620px;
     display: block;
+    border-top: 1px solid transparent;
+    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    background: transparent image-url("icon-next.svg") 50% 100% no-repeat;
+    margin-bottom: 20px;
     .next-entry-link {
         display: block;
         font-size: 12px;
@@ -2411,6 +2421,10 @@ $saved-search-control-height: 48px;
         display: block;
         font-size: 16px;
         @include color($text-color, $text-color-night, $text-color-sunset);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
     }
 }
 
