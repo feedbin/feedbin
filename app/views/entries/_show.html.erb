@@ -17,7 +17,7 @@
           %>
           <%= link_to *link_args do %>
             <%= entry_presenter.favicon(entry.feed) %>
-            <span class="entry-feed-title" data-behavior="user_title"><%= strip_tags(entry.feed.title) %></span>
+            <span class="entry-feed-title" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span>
           <% end %>
 
         </div>
