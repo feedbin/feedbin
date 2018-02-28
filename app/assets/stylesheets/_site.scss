@@ -2397,34 +2397,19 @@ $saved-search-control-height: 48px;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     background: transparent image-url("icon-next.svg") 50% 100% no-repeat;
     margin-bottom: 20px;
-    .next-entry-link {
-        display: block;
-        font-size: 12px;
-        color: $selected;
-        border-bottom: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
-        padding-bottom: 5px;
-        margin-bottom: 10px;
-        text-transform: uppercase;
-        font-family: $font-stack !important;
-        font-weight: 400 !important;
-    }
-    .next-entry-feed {
+    .next-entry-feed, .next-entry-title {
         display: block;
         font-size: 14px;
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         margin-bottom: 5px;
         font-family: $font-stack !important;
         font-weight: 400 !important;
-    }
-    .next-entry-title {
-        display: block;
-        font-size: 16px;
-        @include color($text-color, $text-color-night, $text-color-sunset);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-
+    }
+    .next-entry-title {
+        @include color($text-color, $text-color-night, $text-color-sunset);
     }
 }
 
