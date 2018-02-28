@@ -2377,8 +2377,10 @@ $saved-search-control-height: 48px;
     background: $selected;
     border: none;
     padding: 0;
-    width: 100%;
     text-align: left;
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     &.no-content {
         display: none;
@@ -2390,13 +2392,11 @@ $saved-search-control-height: 48px;
 
 .next-entry-preview-inner {
     padding: 30px 0 43px 0;
-    margin: 0 auto;
-    max-width: 620px;
+    margin: 0 15px 20px 15px;
     display: block;
     border-top: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     background: transparent image-url("icon-next.svg") 50% 100% no-repeat;
-    margin-bottom: 20px;
     .next-entry-feed, .next-entry-title {
         display: block;
         font-size: 14px;
@@ -2413,8 +2413,7 @@ $saved-search-control-height: 48px;
     }
 }
 
-.fluid .entry-inner,
-.fluid .next-entry-preview-inner {
+.fluid .entry-inner {
     max-width: 100%;
 }
 
