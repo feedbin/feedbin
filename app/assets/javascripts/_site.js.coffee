@@ -5,9 +5,15 @@ $.extend feedbin,
   messageTimeout: null
   swipe: false
 
-  modalContent: (html) ->
+  drawBarCharts: ->
+    $('[data-behavior~=line_graph]').each ()->
+      feedbin.drawBarChart(@, $(@).data('values'))
+
+  modalContent: (html, css) ->
     modal = $('#general_modal')
     target = $('[data-behavior~=markup_target]', modal)
+    $('.modal-dialog', modal).addClass(css)
+
     placeholder = $('[data-behavior~=modal_placeholder]', modal)
     placeholder.addClass('hide')
     target.html(html)
@@ -530,19 +536,11 @@ $.extend feedbin,
       context.scale(ratio, ratio)
 
       context.lineJoin = 'round'
-      context.fillStyle = $(canvas).data('fill')
       context.strokeStyle = $(canvas).data('stroke')
       context.lineWidth = 1
       context.lineCap = 'round'
 
       points = feedbin.buildPoints(values, canvasWidth, canvasHeight)
-
-      context.beginPath()
-      context.moveTo(0, canvasHeight)
-      for point in points
-        context.lineTo(point.x, point.y)
-      context.lineTo(canvasWidth, canvasHeight)
-      context.fill()
 
       context.beginPath()
       for point, index in points
@@ -1486,9 +1484,7 @@ $.extend feedbin,
         return
 
     drawBarCharts: ->
-      $('[data-behavior~=line_graph]').each ()->
-        feedbin.drawBarChart(@, $(@).data('values'))
-      return
+      feedbin.drawBarCharts()
 
     selectText: ->
       $(document).on 'mouseup', '[data-behavior~=select_text]', (event) ->
@@ -1670,6 +1666,13 @@ $.extend feedbin,
         target.html('')
 
         feedbin.modal(id)
+
+    showMessage: ->
+      $(document).on 'click', '[data-behavior~=show_message]', (event) ->
+        message = $(@).data("message")
+        if message
+          feedbin.showNotification(message)
+        event.preventDefault()
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->

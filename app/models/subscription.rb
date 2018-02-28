@@ -31,6 +31,10 @@ class Subscription < ApplicationRecord
     end
   end
 
+  def title
+    self[:title] || self.feed.title
+  end
+
   def mark_as_unread
     base = Entry.select(:id, :feed_id, :published, :created_at).where(feed_id: self.feed_id).order('published DESC')
     entries = base.where('published > ?', Time.now.ago(2.weeks)).limit(10)

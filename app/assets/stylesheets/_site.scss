@@ -671,11 +671,14 @@ table {
 }
 
 .inset {
-    background-color: $inset-bg-color;
+    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     border-radius: 8px;
     border: 1px solid $border-color;
     margin: 0 0 20px 0;
     padding: 30px 0 30px 0;
+    .modal & {
+        border: none;
+    }
     .inset-content {
         padding: 0 30px;
         @media (max-width: 528px) {
@@ -2008,6 +2011,9 @@ $saved-search-control-height: 48px;
         background: none;
         padding: 0;
         cursor: pointer;
+        &:hover {
+            text-decoration: none;
+        }
         .favicon-wrap {
             position: static;
             box-shadow: none;
@@ -2029,6 +2035,9 @@ $saved-search-control-height: 48px;
             text-decoration: none;
             white-space: nowrap;
             user-select: none;
+            appearance: none !important;
+            border: none;
+            background: none;
         }
     }
 }
@@ -2364,7 +2373,15 @@ $saved-search-control-height: 48px;
 
 .next-entry-preview {
     display: block;
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    appearance: none !important;
+    background: $selected;
+    border: none;
+    padding: 0;
+    text-align: left;
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
+    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     &.no-content {
         display: none;
     }
@@ -2374,39 +2391,29 @@ $saved-search-control-height: 48px;
 }
 
 .next-entry-preview-inner {
-    padding: 30px 20px;
-    margin: 0 auto;
-    max-width: 660px;
+    padding: 30px 0 43px 0;
+    margin: 0 15px 20px 15px;
     display: block;
-    .next-entry-link {
-        display: block;
-        font-size: 12px;
-        color: $selected;
-        border-bottom: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
-        padding-bottom: 5px;
-        margin-bottom: 10px;
-        text-transform: uppercase;
-        font-family: $font-stack !important;
-        font-weight: 400 !important;
-    }
-    .next-entry-feed {
+    border-top: 1px solid transparent;
+    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    background: transparent image-url("icon-next.svg") 50% 100% no-repeat;
+    .next-entry-feed, .next-entry-title {
         display: block;
         font-size: 14px;
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         margin-bottom: 5px;
         font-family: $font-stack !important;
         font-weight: 400 !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
     .next-entry-title {
-        display: block;
-        font-size: 16px;
         @include color($text-color, $text-color-night, $text-color-sunset);
     }
 }
 
-.fluid .entry-inner,
-.fluid .next-entry-preview-inner {
+.fluid .entry-inner {
     max-width: 100%;
 }
 
@@ -3853,10 +3860,13 @@ Settings
     }
 }
 
-.settings {
-    font-size: 16px;
+body.settings {
     background-color: $list-background-color-night;
     color: $text-color;
+}
+
+.settings {
+    font-size: 16px;
     .settings-inner {
         height: 100%;
         width: 100%;
@@ -3899,6 +3909,23 @@ Settings
         margin: 18px 0 15px 0;
         &.no-margin {
             margin-bottom: 0;
+        }
+    }
+    .subscription-title {
+        position: relative;
+        left: -5px;
+        margin: 0 0 5px 0;
+        background-color: transparent !important;
+        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        font-size: 18px !important;
+        line-height: 18px !important;
+        padding: 3px !important;
+        font-weight: bold;
+        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        &:focus {
+            background-color: #FFF !important;
+            border-color: $selected !important;
+            @include color($text-header-color, $text-header-color, $text-header-color);
         }
     }
     h4 {
@@ -4069,13 +4096,15 @@ Settings
         list-style: none;
         margin: 0;
         padding: 0;
-        border-top: 1px solid $border-color;
         margin-bottom: 30px;
-        background-color: #FFF;
+        border-top: 1px solid $border-color;
+        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
         > li {
             margin: 0;
             padding: 0;
             border-bottom: 1px solid $border-color;
+            @include border-color($border-color, $border-color-night, $border-color-sunset);
             @include settings-row;
         }
         &.no-margin {
@@ -4148,6 +4177,7 @@ Settings
             position: relative;
             border: none;
             border-bottom: 1px solid $border-color;
+            @include border-color($border-color, $border-color-night, $border-color-sunset);
             display: block;
             border-radius: 0 !important;
             max-width: 100% !important;
@@ -4325,6 +4355,7 @@ Settings
             display: flex;
             .left-column {
                 flex: 0 0 auto;
+                margin-right: 5px;
             }
             .right-column {
                 margin-left: 5px;
@@ -4332,7 +4363,7 @@ Settings
             }
         }
         .favicon-wrap {
-            margin-top: 4px;
+            margin-top: 5px;
             position: static;
             box-shadow: none;
         }
@@ -4346,10 +4377,10 @@ Settings
             span {
                 font-weight: normal;
                 @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-
             }
             a {
                 color: $text-color;
+                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
                 &:hover {
                     text-decoration: none;
                 }
@@ -4367,6 +4398,12 @@ Settings
             a, a:hover {
                 color: $text-color-light;
             }
+            a:hover {
+                text-decoration: none;
+                span {
+                    text-decoration: underline;
+                }
+            }
         }
         .chart-wrap {
             line-height: 1;
@@ -4374,8 +4411,9 @@ Settings
             margin-bottom: 20px;
             padding: 15px 12px 30px 12px;
             border-radius: 4px;
-            background-color: #f4f6f8;
+            @include background-color($inset-bg-color, $list-background-color-night, $list-background-color-sunset);
             border: 1px solid $border-color;
+            @include border-color($border-color, $border-color-night, $border-color-sunset);
             .graph-wrap {
                 flex: 1 1 auto;
                 padding-top: 25%;
@@ -4420,6 +4458,7 @@ Settings
         .stats {
             margin-top: 1px;
             border-bottom: 1px solid $border-color;
+            @include border-color($border-color, $border-color-night, $border-color-sunset);
             padding: 0 0 15px 0;
             justify-content: space-between;
             display: flex;
@@ -4443,7 +4482,7 @@ Settings
                 @media (max-width: 528px) {
                     display: inline;
                     font-size: 16px;
-                    color: $text-color;
+                    @include color($text-color, $text-color-night, $text-color-sunset);
                     text-transform: none;
                     font-weight: bold;
                     &:after {
@@ -4468,6 +4507,9 @@ Settings
         .recent-articles {
             padding-top: 20px;
             margin-bottom: 15px;
+            .modal & {
+                display: none;
+            }
             ul {
                 margin: 0;
                 padding: 0;
@@ -5655,6 +5697,11 @@ Link Viewer
         @media (max-width: 550px) {
             padding-left: 0px;
             padding-right: 0px;
+        }
+    }
+    &.modal-feed-edit {
+        .modal-body {
+            padding: 0;
         }
     }
     .entry-inner {

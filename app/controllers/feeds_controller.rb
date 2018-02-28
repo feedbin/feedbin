@@ -27,6 +27,11 @@ class FeedsController < ApplicationController
     @subscription.save
   end
 
+  def modal_edit
+    @user = current_user
+    @subscription = @user.subscriptions.find_by_feed_id(params[:id])
+  end
+
   def view_unread
     update_view_mode('view_unread')
   end

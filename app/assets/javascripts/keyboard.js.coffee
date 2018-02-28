@@ -40,6 +40,7 @@ class feedbin.Keyboard
       return
 
     $(document).on 'click', '[data-behavior~=open_next_entry]', (event) =>
+      @selectColumn('entries')
       @setEnvironment()
       @item = @next
       @selectItem()

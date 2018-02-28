@@ -112,6 +112,7 @@ Rails.application.routes.draw do
     member do
       match :push, via: [:post, :get]
       post :toggle_updates
+      get :modal_edit
     end
   end
 

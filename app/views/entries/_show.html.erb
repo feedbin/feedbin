@@ -7,10 +7,19 @@
           <button class="entry-button button-full-screen" data-behavior="full_screen" title="Close full screen">
               <%= svg_tag 'icon-full-screen-close-small', size: '16x16' %>
           </button>
-          <div class="feed-button" data-behavior="show_entry_basement" data-basement-panel="feed_panel" title="Feed Options" role="button">
+
+          <%
+              if subscriptions.include?(entry.feed.id)
+                link_args = [modal_edit_feed_path(entry.feed), remote: true, class: 'feed-button', data: {behavior: 'open_modal'}]
+              else
+                link_args = ["#", remote: true, class: 'feed-button', data: {behavior: 'show_message', message: "Cannot edit. You are no longer subscribed to this feed."}]
+              end
+          %>
+          <%= link_to *link_args do %>
             <%= entry_presenter.favicon(entry.feed) %>
-            <%= content_tag :div, strip_tags(entry.feed.title), class: 'entry-feed-title', data: {behavior: 'user_title', feed_id: entry.feed.id} %>
-          </div>
+            <span class="entry-feed-title" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span>
+          <% end %>
+
         </div>
         <div class="entry-buttons">
           <%= render partial: 'shared/app_settings' %>
@@ -29,13 +38,12 @@
               <%= render partial: "article", locals: {entry: entry, user: user} %>
           <% end %>
         </div>
-        <a class="next-entry-preview no-content" data-behavior="open_next_entry" href="#">
+        <button class="next-entry-preview no-content" data-behavior="open_next_entry">
           <span class="next-entry-preview-inner">
-            <span class="next-entry-link">Next</span>
             <span class="next-entry-feed"></span>
             <span class="next-entry-title"></span>
           </span>
-        </a>
+        </button>
       </div>
     <% end %>
     <script type="text/javascript">
