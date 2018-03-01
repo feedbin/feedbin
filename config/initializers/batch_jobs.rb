@@ -25,9 +25,15 @@ module BatchJobs
         'queue' => sidekiq_class.get_sidekiq_options["queue"].to_s.freeze,
         'retry' => sidekiq_class.get_sidekiq_options["retry"].freeze,
       }
-      (1..last_id).to_a.each_slice(10_000) do |group|
+      start = 1
+      size = 10_000
+      while start <= last_id
+        finish = start + size
+        ids = (start..finish).map { |id| [id] }
+        start += size + 1
+
         Sidekiq::Client.push_bulk(
-          defaults.merge('args' => group.map { |id| [id] })
+          defaults.merge('args' => ids)
         )
       end
     end
