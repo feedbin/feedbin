@@ -230,8 +230,15 @@ class EntryPresenter < BasePresenter
 
   def media_image
     if entry.data && entry.data['itunes_image_processed']
-      url = URI(entry.data['itunes_image_processed'])
-      url.host = ENV['ENTRY_IMAGE_HOST'] if ENV['ENTRY_IMAGE_HOST']
+      image_url = entry.data['itunes_image_processed']
+
+      host = ENV['ENTRY_IMAGE_HOST']
+      if ENV['ENTRY_IMAGE_HOST_NEW'] && ENV["AWS_S3_BUCKET_NEW"] && image_url.include?(ENV["AWS_S3_BUCKET_NEW"])
+        host = ENV['ENTRY_IMAGE_HOST_NEW']
+      end
+
+      url = URI(image_url)
+      url.host = host if host
       url.scheme = 'https'
       url.to_s
     end
@@ -280,19 +287,12 @@ class EntryPresenter < BasePresenter
   end
 
   def image
-    if image?
-      url = URI(entry.image["processed_url"])
-      url.host = ENV['ENTRY_IMAGE_HOST'] if ENV['ENTRY_IMAGE_HOST']
-      url.scheme = 'https'
+    if entry.processed_image?
       padding = (entry.image["height"].to_f / entry.image["width"].to_f).round(4) * 100
       @template.content_tag :span, class: "entry-image" do
-        @template.content_tag :span, "", data: {src: url.to_s }, style: "padding-top: #{padding}%;"
+        @template.content_tag :span, "", data: {src: entry.processed_image }, style: "padding-top: #{padding}%;"
       end
     end
-  end
-
-  def image?
-    entry.image.present? && entry.image["original_url"] && entry.image["processed_url"] && entry.image["width"] && entry.image["height"]
   end
 
   def entry_type

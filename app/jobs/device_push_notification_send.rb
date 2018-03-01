@@ -125,12 +125,7 @@ class DevicePushNotificationSend
   end
 
   def image_url(entry)
-    if entry.image.present? && entry.image["processed_url"]
-      url = URI(entry.image["processed_url"])
-      url.host = ENV['ENTRY_IMAGE_HOST'] if ENV['ENTRY_IMAGE_HOST']
-      url.scheme = 'https'
-      url.to_s
-    end
+    entry.processed_image if entry.processed_image?
   end
 
 end
