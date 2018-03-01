@@ -20,7 +20,7 @@ class ImageCopy
       data["itunes_image_processed"] = url
       entry.update(data: data)
     end
-  rescue ActiveRecord::RecordNotFound
+  rescue ActiveRecord::RecordNotFound, Excon::Error::NotFound
   end
 
   def copy(url, append = '')
@@ -33,7 +33,7 @@ class ImageCopy
     end
 
     url.host = url.host.sub(ENV['AWS_S3_BUCKET'], ENV['AWS_S3_BUCKET_NEW'])
-    final_url = url.path = "/#{destination_object_name}"
+    url.path = "/#{destination_object_name}"
     url.to_s
   end
 
