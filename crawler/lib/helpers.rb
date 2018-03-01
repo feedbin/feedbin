@@ -4,11 +4,19 @@ module Helpers
     source_object_name = url.path[1..-1]
     target_object_name = File.join(@public_id[0..6], "#{@public_id}.jpg")
     S3_POOL.with do |connection|
-      connection.copy_object(ENV['AWS_S3_BUCKET'], source_object_name, ENV['AWS_S3_BUCKET'], target_object_name, options = {})
-      connection.copy_object(ENV['AWS_S3_BUCKET'], source_object_name, ENV['AWS_S3_BUCKET_NEW'], target_object_name, options = {})
+      connection.copy_object(ENV['AWS_S3_BUCKET'], source_object_name, ENV['AWS_S3_BUCKET'], target_object_name, options)
+      connection.copy_object(ENV['AWS_S3_BUCKET'], source_object_name, ENV['AWS_S3_BUCKET_NEW'], target_object_name, options)
     end
-
     final_url = url.path = "/#{target_object_name}"
     url.to_s
   end
+
+  def options
+    {
+      "Cache-Control" => "max-age=315360000, public",
+      "Expires" => "Sun, 29 Jun 2036 17:48:34 GMT",
+      "x-amz-storage-class" => "REDUCED_REDUNDANCY"
+    }
+  end
+
 end
