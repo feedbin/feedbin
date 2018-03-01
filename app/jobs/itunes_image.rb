@@ -3,6 +3,7 @@ class ItunesImage
   sidekiq_options retry: false
 
   def perform(entry_id, original_url = nil, processed_url = nil)
+    @entry = Entry.find(entry_id)
     @entry_id = entry_id
     @original_url = original_url
     @processed_url = processed_url
@@ -16,7 +17,7 @@ class ItunesImage
 
   def schedule
     Sidekiq::Client.push(
-      'args'  => [@entry_id, @original_url],
+      'args'  => [@entry_id, @original_url, @entry.public_id],
       'class' => 'ItunesImage',
       'queue' => 'images',
       'retry' => false

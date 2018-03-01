@@ -26,7 +26,9 @@ class EntryImage
   end
 
   def build_options
-    options = {}
+    options = {
+      public_id: @entry.public_id
+    }
     if @entry.tweet?
       tweet = (@entry.tweet.retweeted_status?) ? @entry.tweet.retweeted_status : @entry.tweet
       if tweet.media?
