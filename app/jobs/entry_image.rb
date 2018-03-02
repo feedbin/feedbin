@@ -26,9 +26,7 @@ class EntryImage
   end
 
   def build_options
-    options = {
-      public_id: @entry.public_id
-    }
+    options = {}
     if @entry.tweet?
       tweet = (@entry.tweet.retweeted_status?) ? @entry.tweet.retweeted_status : @entry.tweet
       if tweet.media?
@@ -45,7 +43,7 @@ class EntryImage
   end
 
   def self.build_find_image_args(entry, options = {})
-    [entry.id, entry.feed_id, entry.url, entry.fully_qualified_url, entry.feed.site_url, entry.content, options]
+    [entry.id, entry.feed_id, entry.url, entry.fully_qualified_url, entry.feed.site_url, entry.content, entry.public_id, options]
   end
 
 end
