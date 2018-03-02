@@ -1,6 +1,6 @@
 class ImageCopy
   include Sidekiq::Worker
-  sidekiq_options queue: :worker_slow
+  sidekiq_options queue: :image_mover
 
   attr_reader :entry
 
