@@ -1,47 +1,35 @@
 class ImageCopy
   include Sidekiq::Worker
-  include BatchJobs
   sidekiq_options queue: :worker_slow
 
   attr_reader :entry
 
-  def perform(entry_id = nil, build = false)
-    if build
-      build_jobs
-    else
-      move_entry_images(entry_id)
+  def perform(entry_id)
+    @entry = Entry.find(entry_id)
+
+    if entry.image && entry.image["processed_url"]
+      url = s3_copy(entry.image["processed_url"])
+      image = entry.image
+      image["processed_url"] = url
+      entry.update(image: image)
     end
+
+    if entry.data && entry.data["itunes_image_processed"]
+      url = s3_copy(entry.data["itunes_image_processed"], "-itunes")
+      data = entry.data
+      data["itunes_image_processed"] = url
+      entry.update(data: data)
+    end
+  rescue ActiveRecord::RecordNotFound, Excon::Error::NotFound
   end
 
   private
+
     STORAGE_OPTIONS = {
       "Cache-Control" => "max-age=315360000, public",
       "Expires" => "Sun, 29 Jun 2036 17:48:34 GMT",
       "x-amz-storage-class" => "REDUCED_REDUNDANCY"
     }
-
-    def build_jobs
-      enqueue_all(Entry, self.class)
-    end
-
-    def move_entry_images(entry_id)
-      @entry = Entry.find(entry_id)
-
-      if entry.image && entry.image["processed_url"]
-        url = s3_copy(entry.image["processed_url"])
-        image = entry.image
-        image["processed_url"] = url
-        entry.update(image: image)
-      end
-
-      if entry.data && entry.data["itunes_image_processed"]
-        url = s3_copy(entry.data["itunes_image_processed"], "-itunes")
-        data = entry.data
-        data["itunes_image_processed"] = url
-        entry.update(data: data)
-      end
-    rescue ActiveRecord::RecordNotFound, Excon::Error::NotFound
-    end
 
     def s3_copy(url, append = '')
       url = URI.parse(url)
