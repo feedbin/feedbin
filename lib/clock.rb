@@ -8,9 +8,9 @@ include Clockwork
 every(10.seconds, 'clockwork.very_frequent') do
   if RedisLock.acquire("clockwork:send_stats:v2")
     SendStats.perform_async
-    # if Rails.env.production?
-    #   ImageCopyScheduler.perform_async
-    # end
+    if Rails.env.production? && ENV['ENTRY_IMAGE_HOST_NEW']
+      ImageCopyScheduler.perform_async
+    end
   end
 end
 
