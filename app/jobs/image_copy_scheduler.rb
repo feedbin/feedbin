@@ -8,7 +8,7 @@ class ImageCopyScheduler
   BATCH_SIZE = 100_000
 
   def perform
-    if queue_empty?('worker_slow')
+    if queue_empty?('image_mover')
       enqueue_batch
     end
   end
