@@ -4,7 +4,7 @@ module Helpers
     source_object_name = url.path[1..-1]
 
     S3_POOL.with do |connection|
-      connection.copy_object(ENV['AWS_S3_BUCKET_NEW'], source_object_name, ENV['AWS_S3_BUCKET_NEW'], path, options)
+      connection.copy_object(ENV['AWS_S3_BUCKET'], source_object_name, ENV['AWS_S3_BUCKET'], path, options)
     end
     final_url = url.path = "/#{path}"
     url.to_s
