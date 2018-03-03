@@ -27,9 +27,7 @@
                     <span><%= entry_presenter.title %></span>
                 </h2>
                 <%= entry_presenter.summary %>
-                <% if current_user && current_user.admin? %>
                 <%= entry_presenter.image %>
-                <% end %>
             </span>
         </div>
         <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago inline') %>
