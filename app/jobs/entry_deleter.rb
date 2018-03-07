@@ -20,7 +20,7 @@ class EntryDeleter
       entries_to_keep = Entry.where(feed_id: feed_id).order('published DESC').limit(entry_limit).pluck('entries.id')
       entries_to_delete = Entry.where(feed_id: feed_id, starred_entries_count: 0, recently_played_entries_count: 0).where.not(id: entries_to_keep).pluck(:id, :image)
       entries_to_delete_ids = entries_to_delete.map(&:first)
-      entries_to_delete_images = entries_to_delete.map {|array| array.last && array.last["processed_url"] }
+      entries_to_delete_images = entries_to_delete.map {|array| array.last && array.last["processed_url"] }.compact
 
       # Delete records
       UnreadEntry.where(entry_id: entries_to_delete_ids).delete_all
