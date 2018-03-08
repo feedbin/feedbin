@@ -229,19 +229,31 @@ class EntryPresenter < BasePresenter
   end
 
   def media_image
-    if entry.data && entry.data['itunes_image_processed']
-      image_url = entry.data['itunes_image_processed']
+    entry.itunes_image
+  end
 
-      host = ENV['ENTRY_IMAGE_HOST']
-      if ENV['ENTRY_IMAGE_HOST_NEW'] && ENV["AWS_S3_BUCKET_NEW"] && image_url.include?(ENV["AWS_S3_BUCKET_NEW"])
-        host = ENV['ENTRY_IMAGE_HOST_NEW']
+  def extracted_articles
+    articles = []
+    if entry.data && entry.data['saved_pages']
+      entry.data['saved_pages'].each do |url, page|
+        begin
+          if page["result"]
+            parsed = MercuryParser.new(nil, page)
+            content = ContentFormatter.api_format(parsed.content, nil)
+            data = {
+              url: url,
+              title: parsed.title,
+              host: parsed.domain,
+              author: parsed.author,
+              content: content
+            }
+            articles.push data
+          end
+        rescue
+        end
       end
-
-      url = URI(image_url)
-      url.host = host if host
-      url.scheme = 'https'
-      url.to_s
     end
+    articles
   end
 
   def media_subtitle

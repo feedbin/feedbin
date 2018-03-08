@@ -36,6 +36,16 @@ class Entry < ApplicationRecord
     nil
   end
 
+  def twitter_thread_ids
+    thread.map do |t|
+      t.dig("id")
+    end
+  end
+
+  def twitter_id
+    data && data.dig("tweet", "id")
+  end
+
   def main_tweet
     if self.tweet?
       @main_tweet ||= (self.tweet.retweeted_status?) ? self.tweet.retweeted_status : self.tweet
@@ -245,6 +255,22 @@ class Entry < ApplicationRecord
 
   def processed_image?
     processed_image ? true : false
+  end
+
+  def itunes_image
+    if self.data && self.data['itunes_image_processed']
+      image_url = self.data['itunes_image_processed']
+
+      host = ENV['ENTRY_IMAGE_HOST']
+      if ENV['ENTRY_IMAGE_HOST_NEW'] && ENV["AWS_S3_BUCKET_NEW"] && image_url.include?(ENV["AWS_S3_BUCKET_NEW"])
+        host = ENV['ENTRY_IMAGE_HOST_NEW']
+      end
+
+      url = URI(image_url)
+      url.host = host if host
+      url.scheme = 'https'
+      url.to_s
+    end
   end
 
   def update_content

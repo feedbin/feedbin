@@ -10,7 +10,7 @@ class BatchJobsTests < ActiveSupport::TestCase
 
     queue.clear
 
-    assert_difference -> { queue.count }, +klass.id do
+    assert_difference -> { queue.count }, +klass.id  do
       enqueue_all(klass, sidekiq_class)
     end
 
