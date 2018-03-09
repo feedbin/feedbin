@@ -8,7 +8,7 @@ services:
   - memcached
 
 addons:
-  postgresql: "10"
+  postgresql: "9.6"
   chrome: stable
   artifacts:
     paths:
