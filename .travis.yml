@@ -18,7 +18,7 @@ env:
     - DB=postgresql
     - KINDLEGEN_PATH=/tmp/kindlegen/kindlegen
     - ES_VERSION=2.3.3
-    - CHROME_DRIVER_VERSION=2.32
+    - CHROME_DRIVER_VERSION=2.36
 
 before_install:
   - wget "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" -O /tmp/chromedriver.zip
