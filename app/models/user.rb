@@ -75,7 +75,9 @@ class User < ApplicationRecord
   before_save :activate_subscriptions
   before_save { reset_auth_token }
 
-  before_create { create_customer }
+  if ENV["STRIPE_API_KEY"] && ENV["STRIPE_PUBLIC_KEY"]
+    before_create { create_customer }
+  end
   before_create { generate_token(:starred_token) }
   before_create { generate_token(:inbound_email_token, 4) }
   before_create { generate_token(:newsletter_token, 4) }
