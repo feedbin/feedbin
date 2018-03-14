@@ -1,61 +1,63 @@
 <% present entry, local_assigns do |entry_presenter| %>
 <div class="tweet <%= entry_presenter.tweet_classes(tweet) %>">
-  <header class="tweet-header">
-    <%= link_to tweet.uri.to_s, target: "_blank", title: "View on Twitter" do %>
-        <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry_presenter.tweet_profile_image_uri(tweet), size: "47x47", alt: "") %>
-    <% end %>
-    <h1>
-        <a href="<%= entry_presenter.tweet_user_url(tweet) %>" target="_blank" class="link">
-            <strong><%= entry_presenter.tweet_name(tweet) %></strong>
-            <%= entry_presenter.tweet_screen_name(tweet) %>
-        </a>
-        <span class="tweet-actions">
-            <%= link_to thread_tweet_path(entry), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {behavior: "open_modal"} do %>
-                <%= svg_tag "icon-twitter-conversation" %>
-            <% end %>
-
-            <%= link_to tweet.uri.to_s, target: "_blank", title: "View on Twitter", class: "twitter-link", id: "source_link" do %>
-                <%= svg_tag "icon-twitter" %>
-            <% end %>
-        </span>
-    </h1>
-    <p class="post-meta">
-      <%= link_to tweet.uri.to_s, target: "_blank", title: "View on Twitter" do %>
-          <time datetime="<%= tweet.created_at.iso8601 %>">
-              <%= tweet.created_at.to_s(:full_human) %>
-          </time>
-      <% end %>
-      <span class="tweet-location">
-          <% if entry_presenter.tweet_location(tweet) %>
-              from <%= entry_presenter.tweet_location(tweet) %>
-          <% end %>
-      </span>
-    </p>
-
-  </header>
-
-  <%= entry_presenter.tweet_in_reply_to(tweet) %>
-  <%= entry_presenter.tweet_text(tweet) %>
-
-  <% if local_assigns[:tweet_counter] && tweet_counter == 0 %>
-    <% if tweet.quoted_status? %>
-      <%= render partial: "shared/tweet", locals: {entry: entry, tweet: tweet.quoted_status, css: "quoted-tweet"} %>
-    <% end %>
-  <% end %>
-
-  <% if local_assigns[:include_media] && include_media %>
-    <% tweet.media.take(1).each do |media| %>
-      <div class="content-styles entry-type-default" data-behavior="format_images">
-      <% if entry_presenter.tweet_video?(media) %>
-        <%= entry_presenter.tweet_video(media) %>
-      <% else %>
-        <%= link_to media.media_url_https.to_s + ":large" do %>
-          <%= image_tag entry_presenter.camo_link(media.media_url_https.to_s + ":large") %>
+    <header class="tweet-header">
+        <%= link_to tweet.uri.to_s, target: "_blank", title: "View on Twitter" do %>
+            <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry_presenter.tweet_profile_image_uri(tweet), size: "47x47", alt: "") %>
         <% end %>
-      <% end %>
-      </div>
-    <% end %>
-  <% end %>
+        <h1>
+            <a href="<%= entry_presenter.tweet_user_url(tweet) %>" target="_blank" class="link">
+                <strong><%= entry_presenter.tweet_name(tweet) %></strong>
+                <%= entry_presenter.tweet_screen_name(tweet) %>
+            </a>
+            <span class="tweet-actions">
+                <%= link_to thread_tweet_path(entry), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {behavior: "open_modal"} do %>
+                    <%= svg_tag "icon-twitter-conversation" %>
+                <% end %>
+
+                <%= link_to tweet.uri.to_s, target: "_blank", title: "View on Twitter", class: "twitter-link", id: "source_link" do %>
+                    <%= svg_tag "icon-twitter" %>
+                <% end %>
+            </span>
+        </h1>
+        <p class="post-meta">
+          <%= link_to tweet.uri.to_s, target: "_blank", title: "View on Twitter" do %>
+              <time datetime="<%= tweet.created_at.iso8601 %>">
+                  <%= tweet.created_at.to_s(:full_human) %>
+              </time>
+          <% end %>
+          <span class="tweet-location">
+              <% if entry_presenter.tweet_location(tweet) %>
+                  from <%= entry_presenter.tweet_location(tweet) %>
+              <% end %>
+          </span>
+        </p>
+    </header>
+
+    <div class="tweet-body">
+        <%= entry_presenter.tweet_in_reply_to(tweet) %>
+        <%= entry_presenter.tweet_text(tweet) %>
+
+        <% if local_assigns[:tweet_counter] && tweet_counter == 0 %>
+            <% if tweet.quoted_status? %>
+                <%= render partial: "shared/tweet", locals: {entry: entry, tweet: tweet.quoted_status, css: "quoted-tweet"} %>
+            <% end %>
+        <% end %>
+
+        <% if local_assigns[:include_media] && include_media %>
+            <% tweet.media.take(1).each do |media| %>
+                <div class="content-styles entry-type-default" data-behavior="format_images">
+                    <% if entry_presenter.tweet_video?(media) %>
+                        <%= entry_presenter.tweet_video(media) %>
+                    <% else %>
+                        <%= link_to media.media_url_https.to_s + ":large" do %>
+                            <%= image_tag entry_presenter.camo_link(media.media_url_https.to_s + ":large") %>
+                        <% end %>
+                    <% end %>
+                </div>
+            <% end %>
+        <% end %>
+    </div>
+
 </div>
 <% end %>
 

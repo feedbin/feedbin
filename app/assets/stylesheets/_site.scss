@@ -3498,6 +3498,7 @@ $saved-search-control-height: 48px;
             display: flex;
             align-items: baseline;
             .link {
+                line-height: 1;
                 font-weight: normal;
                 @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
                 text-decoration: none;
@@ -3586,6 +3587,12 @@ $saved-search-control-height: 48px;
         display: none;
     }
     .main-tweet-conversation {
+        .tweet-header {
+            padding-left: 60px;
+            img {
+                left: 0;
+            }
+        }
         .icon-twitter-conversation {
             display: none;
         }
@@ -3600,12 +3607,9 @@ $saved-search-control-height: 48px;
             display: none;
         }
         .tweet-header {
+            padding-left: 60px;
             img {
-                height: 24px;
-                width: 24px;
-                left: auto;
-                right: 0;
-                top: -2px;
+                left: 0;
             }
         }
         .twitter-link {
@@ -3644,6 +3648,9 @@ $saved-search-control-height: 48px;
             border-left: none;
             border-right: none;
             border-bottom: none;
+            .tweet-text {
+                margin-bottom: 20px;
+            }
         }
     }
     .modal-conversation & {
@@ -3652,6 +3659,9 @@ $saved-search-control-height: 48px;
             padding-top: 0 !important;
         }
         .reply {
+            .tweet-body {
+                padding-left: 60px;
+            }
             .tweet-mentions {
                 display: none;
             }
@@ -5682,11 +5692,6 @@ Link Viewer
         padding-bottom: 30px;
         padding-top: 70px;
     }
-    &.modal-conversation  {
-        .modal-body {
-            padding-top: 30px;
-        }
-    }
     .modal-footer {
         padding-bottom: 20px;
         padding-top: 20px;
@@ -5707,6 +5712,12 @@ Link Viewer
     .entry-inner {
         padding-top: 0 !important;
         padding-bottom: 0 !important;
+    }
+    &.modal-conversation  {
+        .modal-body {
+            padding: 30px 0 10px 0;
+        }
+        max-width: 580px;
     }
     @media (max-width: 920px) {
         width: 550px !important;
