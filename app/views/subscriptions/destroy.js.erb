@@ -1,4 +1,5 @@
 <%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
+feedbin.showPanel(1);
 if (feedbin.data.viewMode != 'view_starred') {
     $('.feed-id-<%= @subscription.feed_id %>').remove();
 }

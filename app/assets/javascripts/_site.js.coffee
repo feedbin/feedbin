@@ -23,22 +23,15 @@ $.extend feedbin,
 
   showPanel: (panel, state = true) ->
     if panel == 1
-      window.history.replaceState({panel: 1}, document.title, "/");
       $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
       if feedbin.swipe
         $('.app-wrap').animate({scrollLeft: 0}, {duration: 250})
     else if panel == 2
-      if state
-        window.history.pushState({panel: 2}, document.title, "/");
-
       $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
       if feedbin.swipe
         offset = $('.entries-column')[0].offsetLeft
         $('.app-wrap').animate({scrollLeft: offset}, {duration: 250})
     else if panel == 3
-      if state
-        window.history.pushState({panel: 3}, document.title, "/");
-
       $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
       if feedbin.swipe
         offset = $('.entry-column')[0].offsetLeft
