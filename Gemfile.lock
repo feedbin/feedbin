@@ -9,8 +9,8 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedjira.git
-  revision: 84d919de4ce78d57eac5dcc9e303244dcd83839a
-  ref: 84d919d
+  revision: a8a90bbc601f695c07e0797688e846d5d561263c
+  ref: a8a90bb
   specs:
     feedjira (2.1.2)
       faraday (>= 0.9)
@@ -289,7 +289,7 @@ GEM
       activesupport (>= 4)
       railties (>= 4)
       request_store (~> 1.0)
-    loofah (2.1.1)
+    loofah (2.2.2)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.0)
