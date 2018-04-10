@@ -1,0 +1,3 @@
+<%= render partial: 'shared/message_flash', locals: {flash: flash} %>
+feedbin.data.user_titles[<%= @subscription.feed_id %>] = "<%= j @subscription.title %>";
+feedbin.applyUserTitles();
