@@ -4,7 +4,7 @@
     <li class="desktop-hide"><%= link_to 'Feedbin', '/' %></li>
     <li><%= link_to 'Settings', settings_path, class: is_active?('settings', 'settings') %></li>
     <li><%= link_to 'Appearance', settings_appearance_path, class: is_active?('settings', 'appearance') %></li>
-    <li><%= link_to 'Feeds', settings_feeds_path, class: is_active?(['settings', 'subscriptions'], ['feeds', 'edit']) %></li>
+    <li><%= link_to 'Subscriptions', settings_subscriptions_path, class: is_active?(['settings/subscriptions'], ['index', 'edit']) %></li>
     <li><%= link_to 'Actions', actions_path, class: is_active?('actions', ['index', 'new', 'edit']) %></li>
     <li><%= link_to 'Share & Save', sharing_services_path, class: is_active?('sharing_services', 'index') %></li>
     <li><%= link_to 'Account', settings_account_path, class: is_active?('settings', 'account') %></li>

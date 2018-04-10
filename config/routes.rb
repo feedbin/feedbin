@@ -81,13 +81,8 @@ Rails.application.routes.draw do
   end
 
   resources :subscriptions,  only: [:index, :create, :destroy, :update] do
-    collection do
-      patch :update_multiple
-    end
     member do
-      delete :settings_destroy
       delete :feed_destroy
-      post :refresh_favicon
     end
   end
 
@@ -146,10 +141,17 @@ Rails.application.routes.draw do
 
   get :settings, to: 'settings#settings'
   namespace :settings do
+    resources :subscriptions do
+      collection do
+        patch :update_multiple
+      end
+      member do
+        post :refresh_favicon
+      end
+    end
     get :account
     get :billing
     get :import_export
-    get :feeds
     get :appearance
     post :update_credit_card
     post :update_plan
@@ -161,8 +163,6 @@ Rails.application.routes.draw do
     post :now_playing
     post :audio_panel_size
   end
-
-  get :settings_subscriptions_edit, path: "/settings/feeds/:id/edit", to: 'subscriptions#edit'
 
   resources :twitter_authentications, only: [:new] do
     collection do

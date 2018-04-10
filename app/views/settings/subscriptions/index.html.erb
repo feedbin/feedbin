@@ -1,7 +1,7 @@
 <%= render partial: 'shared/svg' %>
 <div class="settings-content-inner">
 
-    <%= form_tag update_multiple_subscriptions_path, method: :patch, autocomplete: 'off' do %>
+    <%= form_tag update_multiple_settings_subscriptions_path, method: :patch, autocomplete: 'off' do %>
     <input type="hidden" name="operation" value="" />
 
     <div class="feed-settings">
@@ -56,7 +56,7 @@
                             <label class="checkbox-wrap">
                                 <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "checkbox feeds-checkbox" %>
                             </label>
-                            <%= link_to settings_subscriptions_edit_path(subscription.id), class: "subscription-link" do %>
+                            <%= link_to edit_settings_subscription_path(subscription), class: "subscription-link" do %>
 
                                 <span class="subscription-data-wrap">
                                     <span class="subscription-data">

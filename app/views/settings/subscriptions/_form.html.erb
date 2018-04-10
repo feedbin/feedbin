@@ -113,7 +113,7 @@
             <% if !subscription.feed.twitter_feed? %>
                 <ul class="control-group control-group-form">
                     <li>
-                        <%= link_to 'Refresh Favicon', refresh_favicon_subscription_path(subscription), remote: true, method: :post %>
+                        <%= link_to 'Refresh Favicon', refresh_favicon_settings_subscription_path(subscription), remote: true, method: :post %>
                     </li>
                 </ul>
             <% end %>

@@ -67,6 +67,12 @@ class Subscription < ApplicationRecord
     self.feed.tag('', self.user)
   end
 
+  def muted_status
+    if subscription.muted
+      "muted"
+    end
+  end
+
   private
 
   def refresh_favicon

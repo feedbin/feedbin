@@ -52,68 +52,10 @@ class SubscriptionsController < ApplicationController
     end
   end
 
-  def settings_destroy
-    destroy_subscription(params[:id])
-    redirect_to settings_feeds_url, notice: 'You have successfully unsubscribed.'
-  end
-
   def destroy_subscription(subscription_id)
     @user = current_user
     @subscription = @user.subscriptions.find(subscription_id)
     @subscription.destroy
-  end
-
-  def update_multiple
-    @user = current_user
-    notice = "Feeds updated."
-    if params[:operation] && params[:subscription_ids]
-      subscriptions = @user.subscriptions.where(id: params[:subscription_ids])
-      if params[:operation] == "unsubscribe"
-        subscriptions.destroy_all
-        notice = "You have unsubscribed."
-      elsif params[:operation] == "show_updates"
-        subscriptions.update_all(show_updates: true)
-      elsif params[:operation] == "hide_updates"
-        subscriptions.update_all(show_updates: false)
-      elsif params[:operation] == "mute"
-        subscriptions.update_all(muted: true)
-      elsif params[:operation] == "unmute"
-        subscriptions.update_all(muted: false)
-      end
-    end
-    redirect_to settings_feeds_url, notice: notice
-  end
-
-  def edit
-    @user = current_user
-    @subscription = @user.subscriptions.find(params[:id])
-    render layout: "settings"
-  end
-
-  def update
-    @user = current_user
-    @subscription = @user.subscriptions.find(params[:id])
-    if @subscription.update(subscription_params)
-      flash[:notice] = "Settings updated."
-    else
-      flash[:alert] = "Update failed."
-    end
-    flash.discard()
-  end
-
-  def refresh_favicon
-    @user = current_user
-    @subscription = @user.subscriptions.find(params[:id])
-    FaviconFetcher.perform_async(@subscription.feed.host)
-    flash[:notice] = "Favicon will be refreshed shortly"
-    flash.discard()
-    render 'update'
-  end
-
-  private
-
-  def subscription_params
-    params.require(:subscription).permit(:muted, :show_updates, :show_retweets, :media_only, :title)
   end
 
 end

@@ -1,0 +1,6 @@
+<div class="settings-content-inner">
+    <div class="settings-outer">
+        <h2>Feeds</h2>
+    </div>
+    <%= render partial: 'form', locals: {subscription: @subscription, unsubscribe: link_to('Unsubscribe', settings_subscription_path(@subscription), method: :delete, class: 'button-secondary pull-right settings-unsubscribe' , data: { confirm: 'Are you sure you want to unsubscribe?' })} %>
+</div>

@@ -48,17 +48,6 @@ class SettingsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "should get feeds" do
-    user = users(:new)
-    feeds = create_feeds(user)
-    entries = user.entries
-    login_as user
-
-    get :feeds
-    assert_response :success
-    assert assigns(:subscriptions).present?
-  end
-
   test "should get billing" do
     StripeMock.start
     events = [
