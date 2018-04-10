@@ -73,19 +73,6 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "should update subscription" do
-    login_as @user
-    subscription = @user.subscriptions.first
-
-    attributes = {muted: true, show_updates: false}
-    patch :update, params: {id: subscription, subscription: attributes}, xhr: true
-
-    assert_response :success
-    attributes.each do |attribute, value|
-      assert_equal(value, subscription.reload.send(attribute))
-    end
-  end
-
   test "should refresh favicon" do
     login_as @user
     subscription = @user.subscriptions.first

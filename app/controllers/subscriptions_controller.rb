@@ -52,10 +52,27 @@ class SubscriptionsController < ApplicationController
     end
   end
 
+  def update
+    @user = current_user
+    @subscription = @user.subscriptions.find(params[:id])
+    if @subscription.update(subscription_params)
+      flash[:notice] = "Settings updated."
+    else
+      flash[:alert] = "Update failed."
+    end
+    flash.discard()
+  end
+
+  private
+
   def destroy_subscription(subscription_id)
     @user = current_user
     @subscription = @user.subscriptions.find(subscription_id)
     @subscription.destroy
+  end
+
+  def subscription_params
+    params.require(:subscription).permit(:muted, :show_updates, :show_retweets, :media_only, :title)
   end
 
 end
