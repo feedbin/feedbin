@@ -31,7 +31,7 @@
 
             <% if entry.tweet? && entry.tweet.quoted_status? %>
                 <p class="title quoted-summary">
-                    <strong><%= entry_presenter.tweet_name(entry.tweet.quoted_status) %></strong> -
+                    <strong><%= entry_presenter.tweet_name(entry.tweet.quoted_status) %></strong> &ndash;
                     <%= entry.tweet_summary(entry.tweet.quoted_status).html_safe.truncate(80, separator: " ", omission: "…") %>
                 </p>
             <% end %>
