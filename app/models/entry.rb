@@ -123,7 +123,7 @@ class Entry < ApplicationRecord
   end
 
   def thread
-    self.data.dig("thread") || []
+    self.data && self.data.dig("thread") || []
   end
 
   def tweet_thread
