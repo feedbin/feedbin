@@ -207,6 +207,10 @@ class EntryPresenter < BasePresenter
       classes.push("no-title")
     end
 
+    if entry.retweet?
+      classes.push("retweet")
+    end
+
     classes.join(" ")
   end
 

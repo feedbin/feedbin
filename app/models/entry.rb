@@ -71,11 +71,12 @@ class Entry < ApplicationRecord
     (self.tweet?) ? self.tweet.retweeted_status? : false
   end
 
-  def tweet_summary
-    hash = self.main_tweet.to_h
+  def tweet_summary(tweet = nil)
+    tweet = tweet || self.main_tweet
+    hash = tweet.to_h
 
     text = trim_text(hash, true)
-    self.main_tweet.urls.reverse.each do |url|
+    tweet.urls.reverse.each do |url|
       begin
         range = Range.new(*url.indices, true)
         text[range] = url.display_url

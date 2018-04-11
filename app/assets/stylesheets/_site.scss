@@ -1547,6 +1547,13 @@ $saved-search-control-height: 48px;
         padding: 0 0 17px 0;
         list-style: none;
     }
+    .quoted-summary {
+        margin-top: 8px !important;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid transparent;
+        @include border-color($border-color, $border-color-night, $border-color-sunset);
+    }
 }
 
 .entries ul li {
@@ -1739,6 +1746,12 @@ $saved-search-control-height: 48px;
             background: image-url("icon-play-small.svg") 0 50% no-repeat;
         }
     }
+    &.retweet {
+        .time {
+            padding-left: 14px;
+            background: image-url("icon-retweet.svg") 0 50% no-repeat;
+        }
+    }
     &.selected {
         .wrap {
             border-top: 1px solid transparent;
@@ -1923,6 +1936,9 @@ $saved-search-control-height: 48px;
     .time.inline {
         display: block;
         align-self: auto;
+    }
+    .quoted-summary {
+        display: none !important;
     }
 }
 

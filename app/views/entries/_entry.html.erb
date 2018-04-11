@@ -27,8 +27,17 @@
                     <span><%= entry_presenter.title %></span>
                 </h2>
                 <%= entry_presenter.summary %>
-                <%= entry_presenter.image %>
             </span>
+
+            <% if entry.tweet? && entry.tweet.quoted_status? %>
+                <p class="title quoted-summary">
+                    <strong><%= entry_presenter.tweet_name(entry.tweet.quoted_status) %></strong> -
+                    <%= entry.tweet_summary(entry.tweet.quoted_status).html_safe.truncate(80, separator: " ", omission: "…") %>
+                </p>
+            <% end %>
+
+            <%= entry_presenter.image %>
+
         </div>
         <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago inline') %>
         <i class="status-indicator icon-star"></i>
