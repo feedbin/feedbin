@@ -29,10 +29,10 @@
                 <%= entry_presenter.summary %>
             </span>
 
-            <% if entry.tweet? && entry.tweet.quoted_status? %>
+            <% if entry.tweet? && entry.main_tweet.quoted_status? %>
                 <p class="title quoted-summary">
-                    <strong><%= entry_presenter.tweet_name(entry.tweet.quoted_status) %></strong> &ndash;
-                    <%= entry.tweet_summary(entry.tweet.quoted_status).html_safe.truncate(80, separator: " ", omission: "…") %>
+                    <strong><%= entry_presenter.tweet_name(entry.main_tweet.quoted_status) %></strong> &ndash;
+                    <%= entry.tweet_summary(entry.main_tweet.quoted_status).html_safe.truncate(80, separator: " ", omission: "…") %>
                 </p>
             <% end %>
 
