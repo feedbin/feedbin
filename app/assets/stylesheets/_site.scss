@@ -3519,8 +3519,8 @@ $saved-search-control-height: 48px;
             margin-bottom: .2em;
             display: flex;
             align-items: baseline;
+            line-height: 1.2;
             .link {
-                line-height: 1;
                 font-weight: normal;
                 @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
                 text-decoration: none;
