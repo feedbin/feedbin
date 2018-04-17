@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
 
   etag { current_user.try :id }
 
-  add_flash_types :analytics_event, :one_time_content
+  add_flash_types :one_time_content
 
   def append_info_to_payload(payload)
     super
