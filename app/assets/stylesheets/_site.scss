@@ -1692,7 +1692,7 @@ $saved-search-control-height: 48px;
         padding: 8px;
         border-radius: 4px;
         border: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
     }
     &.no-title {
         .favicon-wrap {
@@ -1781,7 +1781,7 @@ $saved-search-control-height: 48px;
             color: #FFFFFF !important;
         }
         .quoted-summary {
-            border-color: #FFFFFF !important;
+            border-color: #97999b !important;
         }
     }
     &.selected.tweet {
@@ -1809,6 +1809,9 @@ $saved-search-control-height: 48px;
         }
         .feed-title, .title-inner span {
             color: #add6ff !important;
+        }
+        .quoted-summary {
+            border-color: #add6ff !important;
         }
         .body {
             color: #b7dbff !important;
