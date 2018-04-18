@@ -260,8 +260,10 @@ $.extend feedbin,
   formatTweets: (selector = "entry_content_wrap") ->
     if typeof(twttr) != "undefined" && typeof(twttr.widgets) != "undefined"
       target = $("[data-behavior~=#{selector}]")
-      if $('blockquote.twitter-tweet', target).length > 0
-        twttr.widgets.load(target[0])
+      tweets = $('blockquote.twitter-tweet', target)
+      if tweets.length > 0
+        console.log tweets
+
 
   formatInstagram: ->
     if typeof(instgrm) != "undefined"

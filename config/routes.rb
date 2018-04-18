@@ -86,6 +86,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :embeds,  only: [] do
+    collection do
+      get :twitter
+    end
+  end
+
   resources :users, id: /.*/ do
     member do
       patch :settings_update, controller: :settings
