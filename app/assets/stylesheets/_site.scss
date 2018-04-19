@@ -3561,6 +3561,7 @@ $saved-search-control-height: 48px;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 strong {
+                    font-weight: bold;
                     @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
                 }
             }
