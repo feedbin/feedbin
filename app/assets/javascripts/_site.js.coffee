@@ -275,24 +275,22 @@ $.extend feedbin,
 
 
   formatTweets: (selector = "entry_content_wrap") ->
-    if typeof(twttr) != "undefined" && typeof(twttr.widgets) != "undefined"
-      target = $("[data-behavior~=#{selector}]")
-      items = $('blockquote.twitter-tweet', target)
+    target = $("[data-behavior~=#{selector}]")
+    items = $('blockquote.twitter-tweet', target)
 
-      urlFinder = (item) ->
-        $("> a", item).attr("href")
+    urlFinder = (item) ->
+      $("> a", item).attr("href")
 
-      feedbin.embed(items, feedbin.data.twitter_embed_path, urlFinder)
+    feedbin.embed(items, feedbin.data.twitter_embed_path, urlFinder)
 
 
   formatInstagram: ->
-    if typeof(instgrm) != "undefined"
-      items = $('blockquote.instagram-media')
+    items = $('blockquote.instagram-media')
 
-      urlFinder = (item) ->
-        item.data("instgrmPermalink")
+    urlFinder = (item) ->
+      item.data("instgrmPermalink")
 
-      feedbin.embed(items, feedbin.data.instagram_embed_path, urlFinder)
+    feedbin.embed(items, feedbin.data.instagram_embed_path, urlFinder)
 
   formatImgur: ->
     if typeof(imgurEmbed) != "undefined"
