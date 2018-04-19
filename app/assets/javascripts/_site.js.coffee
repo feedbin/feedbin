@@ -433,6 +433,7 @@ $.extend feedbin,
 
   toggleFullScreen: ->
     $('body').toggleClass('full-screen')
+    feedbin.measureEntryColumn()
 
   isFullScreen: ->
     $('body').hasClass('full-screen')
@@ -737,6 +738,15 @@ $.extend feedbin,
     else
       show("message_multiple")
 
+  measureEntryColumn: ->
+    width = $(".entry-column").outerWidth()
+    if width
+      $(".entry-column").removeClass("wide")
+      $(".entry-column").removeClass("narrow")
+      if width > 775
+        $(".entry-column").addClass("wide")
+      else
+        $(".entry-column").addClass("narrow")
 
   embeds: {}
 
@@ -968,10 +978,19 @@ $.extend feedbin,
             feedbin.autocomplete(field)
         return
 
-    resize: () ->
+    resizeWindow: ->
+      feedbin.measureEntryColumn()
+      measure = _.throttle(feedbin.measureEntryColumn, 100);
+      $(window).on "resize", measure
+
+    resizeColumns: ->
+      measure = _.throttle(feedbin.measureEntryColumn, 100);
+
       defaults =
         handles: "e"
         minWidth: 200
+        resize: (event, ui) ->
+          measure()
         stop: (event, ui) ->
           form = $('[data-behavior~=resizable_form]')
           $('[name=column]', form).val($(ui.element).data('resizable-name'))
@@ -1148,13 +1167,6 @@ $.extend feedbin,
           form.find('[type=submit]').removeAttr('disabled')
         return
 
-    autoHeight: ->
-      if $('.collection-edit-wrapper').length
-        feedbin.autoHeight()
-        $(window).on 'resize', () ->
-          feedbin.autoHeight()
-          return
-
     timeago: ->
       strings =
         prefixAgo: null
@@ -1305,24 +1317,6 @@ $.extend feedbin,
         $('[data-behavior~=class_target]').removeClass('theme-night')
         $('[data-behavior~=class_target]').addClass("theme-#{theme}")
         event.preventDefault()
-        return
-
-    filterList: ->
-      feedbin.matchHeights($('.app-detail'))
-      $(window).on 'resize', () ->
-        feedbin.matchHeights($('.app-detail'))
-        return
-
-      $(document).on 'click', '[data-filter]', (event) ->
-        $('[data-filter]').removeClass('active')
-        $(@).addClass('active')
-
-        filter = $(@).data('filter')
-        if filter == 'all'
-          $("[data-platforms]").removeClass('hide')
-        else
-          $("[data-behavior~=filter_target]").addClass('hide')
-          $("[data-platforms~=#{filter}]").removeClass('hide')
         return
 
     showEntryActions: ->

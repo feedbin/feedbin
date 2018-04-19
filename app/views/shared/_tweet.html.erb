@@ -2,12 +2,12 @@
 <div class="tweet <%= entry_presenter.tweet_classes(tweet) %>">
     <header class="tweet-header">
         <div class="profile-wrap">
-            <%= link_to tweet.uri.to_s, target: "_blank", title: "View on Twitter" do %>
+            <%= link_to entry_presenter.tweet_user_url(tweet), target: "_blank", title: "View on Twitter", class: "profile-image" do %>
                 <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry_presenter.tweet_profile_image_uri(tweet), size: "47x47", alt: "") %>
             <% end %>
             <div class="profile-info">
                 <h1>
-                    <a href="<%= entry_presenter.tweet_user_url(tweet) %>" target="_blank" class="link">
+                    <a href="<%= tweet.uri.to_s %>" target="_blank" class="link">
                         <strong><%= entry_presenter.tweet_name(tweet) %></strong>
                         <%= entry_presenter.tweet_screen_name(tweet) %>
                     </a>

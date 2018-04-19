@@ -3062,11 +3062,7 @@ $saved-search-control-height: 48px;
         margin-bottom: 0;
     }
 
-    blockquote.twitter-tweet {
-        border: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
-        padding: 14px 16px;
-        border-radius: 4px;
+    blockquote.twitter-tweet, blockquote.instagram-media {
         display: none;
     }
 
@@ -3232,19 +3228,6 @@ $saved-search-control-height: 48px;
                 background-image: image-url("spinner-sunset.svg");
             }
         }
-    }
-
-    .instagram-media {
-        background:#FFF;
-        border: 0;
-        border-radius: 4px;
-        box-shadow: 0 0 1px 0 rgba(0,0,0,0.5), 0 1px 10px 0 rgba(0,0,0,0.15);
-        margin: 1px 1px 1.1em 1px;
-        max-width: 658px;
-        padding: 0;
-        width: 99.375%;
-        width: -webkit-calc(100% - 2px);
-        width: calc(100% - 2px);
     }
 
     .fluid-width-video-wrapper {
@@ -3555,8 +3538,10 @@ $saved-search-control-height: 48px;
             align-items: center;
         }
         .profile-info {
-            margin-left: 10px;
             flex-grow: 1;
+        }
+        .profile-image {
+            margin-right: 10px;
         }
         h1 {
             font-size: 18px;
@@ -3631,10 +3616,12 @@ $saved-search-control-height: 48px;
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         img {
             position: relative;
-            top: 2px;
             border-radius: 16px;
+            margin-right: 8px;
         }
         a {
+            display: flex;
+            align-items: center;
             @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
             text-decoration: none;
         }
@@ -3642,9 +3629,11 @@ $saved-search-control-height: 48px;
     .new-section {
         position: relative;
         margin-bottom: .4em;
+        display: flex;
+        align-items: center;
         .favicon-wrap {
-            left: -30px;
-            top: -2px;
+            margin-right: 8px;
+            position: static;
         }
     }
     .tweet-text {
@@ -3719,69 +3708,33 @@ $saved-search-control-height: 48px;
         }
         .reply {
             .tweet-body {
-                padding-left: 60px;
+                padding-left: 57px;
             }
             .tweet-mentions {
                 display: none;
             }
         }
     }
-    .main-tweet {
-        @mixin responsive-tweet {
-            padding-left: 0;
-            .new-section {
-                padding-left: 30px;
-                .favicon-wrap {
-                    left: 0;
-                }
-            }
-        }
-        @media (max-width: 1397px) {
-            body:not(.full-screen) .entry-column & {
-                @include responsive-tweet;
-            }
-        }
-        @media (max-width: 907px) {
-            .entry-column & {
-                @include responsive-tweet;
-            }
-        }
-        body.fluid .entry-column & {
-            @include responsive-tweet;
-        }
-        @media (max-width: 920px) {
-            .modal & {
-                @include responsive-tweet;
-            }
-        }
-    }
-    @mixin responsive-tweet-body {
-        .new-section {
-            padding-left: 30px;
-            .favicon-wrap {
-                left: 0;
-            }
-        }
-    }
-    @media (max-width: 1397px) {
-        body:not(.full-screen) .entry-column & {
-            @include responsive-tweet-body;
-        }
-    }
-    @media (max-width: 907px) {
-        .entry-column & {
-            @include responsive-tweet-body;
-        }
-    }
-    body.fluid .entry-column & {
-        @include responsive-tweet-body;
-    }
-    @media (max-width: 920px) {
-        .modal & {
-            @include responsive-tweet-body;
-        }
-    }
+}
 
+.entry-column.wide {
+    .entry-main-tweet {
+        .profile-wrap {
+            position: relative;
+        }
+        .profile-image {
+            position: absolute;
+            left: -60px;
+        }
+    }
+    .new-section {
+        position: relative;
+        .favicon-wrap {
+            position: absolute;
+            top: -2px;
+            left: -30px;
+        }
+    }
 }
 
 .application-messages {
