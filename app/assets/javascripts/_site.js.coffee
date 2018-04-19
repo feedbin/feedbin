@@ -4,6 +4,7 @@ $.extend feedbin,
 
   messageTimeout: null
   swipe: false
+  panel: 1
 
   drawBarCharts: ->
     $('[data-behavior~=line_graph]').each ()->
@@ -21,17 +22,30 @@ $.extend feedbin,
   showFeedList: ->
     $('[data-behavior~=feeds_target]').addClass('in')
 
+  mobileView: ->
+    if $(window).width() <= 550
+      true
+    else
+      false
+
   showPanel: (panel, state = true) ->
+    feedbin.panel = panel
     if panel == 1
+      if feedbin.mobileView()
+        window.history.replaceState({panel: 1}, document.title, "/");
       $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
       if feedbin.swipe
         $('.app-wrap').animate({scrollLeft: 0}, {duration: 250})
     else if panel == 2
+      if state && feedbin.mobileView()
+        window.history.pushState({panel: 2}, document.title, "/");
       $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
       if feedbin.swipe
         offset = $('.entries-column')[0].offsetLeft
         $('.app-wrap').animate({scrollLeft: offset}, {duration: 250})
     else if panel == 3
+      if state && feedbin.mobileView()
+        window.history.pushState({panel: 3}, document.title, "/");
       $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
       if feedbin.swipe
         offset = $('.entry-column')[0].offsetLeft
@@ -812,11 +826,9 @@ $.extend feedbin,
 
     state: ->
       $(window).on 'popstate', (event) ->
-        original = event.originalEvent
-        if original.state?
-          feedbin.showPanel(original.state.panel, false)
-        else
-          feedbin.showPanel(1)
+        if feedbin.panel > 1
+          newPanel = feedbin.panel - 1
+          feedbin.showPanel(newPanel, false)
 
     renameFeed: ->
       $(document).on 'dblclick', '[data-behavior~=renamable]', (event) ->
