@@ -89,6 +89,7 @@ Rails.application.routes.draw do
   resources :embeds,  only: [] do
     collection do
       get :twitter
+      get :instagram
     end
   end
 

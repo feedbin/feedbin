@@ -257,18 +257,42 @@ $.extend feedbin,
     target = $("[data-behavior~=#{selector}]")
     target.fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com'], iframe[src*='embed-ssl.ted.com'], iframe[src*='cdn.embedly.com']"});
 
+  randomNumber: ->
+    Math.floor(Math.random() * 1000)
+
+  embed: (items, embed_url, urlFinder) ->
+    if items.length > 0
+      items.each ->
+        item = $(@)
+        url = urlFinder(item)
+        if feedbin.embeds["#{url}"]
+          item.replaceWith(feedbin.embeds["#{url}"])
+        else
+          id = feedbin.randomNumber()
+          item.attr("id", id)
+          $.get(embed_url, {url: url, dom_id: id}).fail ->
+            item.css({display: "block"})
+
+
   formatTweets: (selector = "entry_content_wrap") ->
     if typeof(twttr) != "undefined" && typeof(twttr.widgets) != "undefined"
       target = $("[data-behavior~=#{selector}]")
-      tweets = $('blockquote.twitter-tweet', target)
-      if tweets.length > 0
-        console.log tweets
+      items = $('blockquote.twitter-tweet', target)
+
+      urlFinder = (item) ->
+        $("> a", item).attr("href")
+
+      feedbin.embed(items, feedbin.data.twitter_embed_path, urlFinder)
 
 
   formatInstagram: ->
     if typeof(instgrm) != "undefined"
-      if $('blockquote.instagram-media').length > 0
-        instgrm.Embeds.process()
+      items = $('blockquote.instagram-media')
+
+      urlFinder = (item) ->
+        item.data("instgrmPermalink")
+
+      feedbin.embed(items, feedbin.data.instagram_embed_path, urlFinder)
 
   formatImgur: ->
     if typeof(imgurEmbed) != "undefined"
@@ -713,6 +737,8 @@ $.extend feedbin,
     else
       show("message_multiple")
 
+
+  embeds: {}
 
   entries: {}
 
@@ -1622,7 +1648,7 @@ $.extend feedbin,
     linkActionsHover: ->
       $(document).on 'mouseenter mouseleave', '.entry-final-content a', (event) ->
         link = $(@)
-        if link.text().trim().length > 0 && !$(@).has('.mejs__container').length > 0
+        if link.text().trim().length > 0 && !$(@).has('.mejs__container').length > 0 && !link.closest(".system-content").length
           clearTimeout(feedbin.linkActionsTimer)
           clearTimeout(feedbin.linkCacheTimer)
           $('.entry-final-content a [data-behavior~=link_actions]').remove()

@@ -45,7 +45,9 @@ class SiteController < ApplicationController
         audio_panel_size: @user.audio_panel_size,
         view_links_in_app: @user.setting_on?(:view_links_in_app),
         saved_searches_count_path: count_saved_searches_path,
-        proxy_images: !@user.setting_on?(:disable_image_proxy)
+        proxy_images: !@user.setting_on?(:disable_image_proxy),
+        twitter_embed_path: twitter_embeds_path,
+        instagram_embed_path: instagram_embeds_path,
       }
 
       render action: 'logged_in'

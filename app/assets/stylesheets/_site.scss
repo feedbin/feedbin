@@ -3062,6 +3062,14 @@ $saved-search-control-height: 48px;
         margin-bottom: 0;
     }
 
+    blockquote.twitter-tweet {
+        border: 1px solid transparent;
+        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        padding: 14px 16px;
+        border-radius: 4px;
+        display: none;
+    }
+
     figcaption, caption {
         font-size: 80%;
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
@@ -3489,6 +3497,35 @@ $saved-search-control-height: 48px;
     font-size: 147%;/*24px*/
 }
 
+.content-styles {
+    .system-content {
+        html, body, div, span, applet, object, iframe,
+        h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+        a, abbr, acronym, address, big, cite, code,
+        del, dfn, em, img, ins, kbd, q, s, samp,
+        small, strike, strong, sub, sup, tt, var,
+        b, u, i, center,
+        dl, dt, dd, ol, ul, li,
+        fieldset, form, label, legend,
+        table, caption, tbody, tfoot, thead, tr, th, td,
+        article, aside, canvas, details, embed,
+        figure, figcaption, footer, header, hgroup,
+        menu, nav, output, ruby, section, summary,
+        time, mark, audio, video {
+            font-family: $font-stack;
+            font-weight: normal;
+        }
+        a {
+            text-decoration: none;
+            position: static;
+        }
+        img {
+            max-width: unset;
+            width: auto;
+        }
+    }
+}
+
 .modal form {
     margin: 0;
 }
@@ -3513,13 +3550,22 @@ $saved-search-control-height: 48px;
     .tweet-header {
         margin-bottom: .6em;
         position: relative;
+        .profile-wrap {
+            display: flex;
+            align-items: center;
+        }
+        .profile-info {
+            margin-left: 10px;
+            flex-grow: 1;
+        }
         h1 {
             font-size: 18px;
             margin: 0;
-            margin-bottom: .2em;
+            margin: 0 0 .2em 0;
             display: flex;
             align-items: baseline;
             line-height: 1.2;
+            flex-grow: 1;
             .link {
                 font-weight: normal;
                 @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
@@ -3534,11 +3580,12 @@ $saved-search-control-height: 48px;
             }
         }
         img {
+            margin: 0;
+            $size: 47px;
             border: 2px solid white;
-            position: absolute;
-            left: -60px;
-            top: -5px;
-            border-radius: 47px;
+            border-radius: $size;
+            height: $size;
+            width: $size;
             box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
             .theme-day & {
                 box-shadow: none;
@@ -3568,6 +3615,9 @@ $saved-search-control-height: 48px;
                 }
             }
         }
+    }
+    .tweet-body img {
+        max-width: 100%;
     }
     .entry-header {
         font-size: 1.15em;
@@ -3609,12 +3659,6 @@ $saved-search-control-height: 48px;
         display: none;
     }
     .main-tweet-conversation {
-        .tweet-header {
-            padding-left: 60px;
-            img {
-                left: 0;
-            }
-        }
         .icon-twitter-conversation {
             display: none;
         }
@@ -3628,20 +3672,16 @@ $saved-search-control-height: 48px;
         .icon-twitter-conversation {
             display: none;
         }
-        .tweet-header {
-            padding-left: 60px;
-            img {
-                left: 0;
-            }
-        }
-        .twitter-link {
+        .twitter-link:not(.embed) {
             display: none !important;
+        }
+        p:last-child {
+            margin-bottom: 0;
         }
         h1 {
             display: flex;
             justify-content: space-between;
             font-size: 18px;
-            margin: 0 0 5px 0;
             padding-right: 0;
             align-items: baseline;
             a {
@@ -3659,9 +3699,6 @@ $saved-search-control-height: 48px;
                 font-weight: normal;
                 margin-left: auto;
             }
-        }
-        .tweet-text {
-            margin-bottom: 0;
         }
         &.reply {
             padding: 20px 0 0 0;
@@ -3692,12 +3729,6 @@ $saved-search-control-height: 48px;
     .main-tweet {
         @mixin responsive-tweet {
             padding-left: 0;
-            > .tweet-header {
-                padding-left: 60px;
-                img {
-                    left: 0;
-                }
-            }
             .new-section {
                 padding-left: 30px;
                 .favicon-wrap {

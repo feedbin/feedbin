@@ -14,12 +14,12 @@ class TwitterEmbed
     "@#{user}"
   end
 
-  def tweet_url
+  def permalink
     data.dig("url")
   end
 
   def date
-    Date.parse document.search("blockquote > a").text
+    Time.parse document.search("blockquote > a").text
   end
 
   def content
@@ -36,7 +36,7 @@ class TwitterEmbed
 
   private
 
-    TWITTER_URL = "https://publish.twitter.com/oembed"
+    OEMBED_URL = "https://publish.twitter.com/oembed"
 
     def user
       @user ||= data.dig("author_url") && data.dig("author_url").split("/").last
@@ -54,7 +54,7 @@ class TwitterEmbed
             omit_script: true
           }
         }
-        HTTP.get(TWITTER_URL, options).parse
+        HTTP.get(OEMBED_URL, options).parse
       end
     end
 
