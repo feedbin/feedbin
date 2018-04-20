@@ -3539,6 +3539,7 @@ $saved-search-control-height: 48px;
         }
         .profile-info {
             flex-grow: 1;
+            min-width: 0;
         }
         .profile-image {
             margin-right: 10px;
