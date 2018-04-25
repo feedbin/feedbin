@@ -3536,6 +3536,7 @@ $saved-search-control-height: 48px;
         .profile-wrap {
             display: flex;
             align-items: center;
+            position: relative;
         }
         .profile-info {
             flex-grow: 1;
@@ -3722,12 +3723,12 @@ $saved-search-control-height: 48px;
 
 .entry-column.wide {
     .entry-main-tweet {
-        .profile-wrap {
-            position: relative;
-        }
         .profile-image {
             position: absolute;
             left: -60px;
+            .fluid & {
+                position: static;
+            }
         }
     }
     .new-section {
@@ -3736,6 +3737,9 @@ $saved-search-control-height: 48px;
             position: absolute;
             top: -2px;
             left: -30px;
+            .fluid & {
+                position: static;
+            }
         }
     }
 }
