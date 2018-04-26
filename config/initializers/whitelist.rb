@@ -19,9 +19,10 @@ class Whitelist
         "source"     => ["src"],
         "video"      => ["src", "poster"],
         "audio"      => ["src"],
-        "td"         => ["style"],
+        "td"         => ["align"],
+        "th"         => ["align"],
         all: %w[
-          abbr accept accept-charset accesskey action align alt axis border cellpadding
+          abbr accept accept-charset accesskey action alt axis border cellpadding
           cellspacing char charoff charset checked clear cols colspan color compact
           coords datetime dir disabled enctype for frame headers height hreflang hspace
           ismap label lang maxlength media method multiple name nohref noshade nowrap

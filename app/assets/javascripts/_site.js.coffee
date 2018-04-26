@@ -293,7 +293,7 @@ $.extend feedbin,
     items = $('blockquote.twitter-tweet', target)
 
     urlFinder = (item) ->
-      $("> a", item).attr("href")
+      $("a", item).last().attr("href")
 
     feedbin.embed(items, feedbin.data.twitter_embed_path, urlFinder)
 
