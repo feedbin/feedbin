@@ -51,7 +51,7 @@ class InstagramEmbed
             omitscript: true
           }
         }
-        HTTP.follow(max_hops: 5).get(OEMBED_URL, options).parse
+        JSON.parse(URLCache.new(OEMBED_URL, options).body)
       end
     end
 
@@ -63,7 +63,7 @@ class InstagramEmbed
             omitscript: true
           }
         }
-        HTTP.follow(max_hops: 5).get((PROFILE_URL % author_id), options).parse
+        JSON.parse(URLCache.new((PROFILE_URL % author_id), options).body)
       end
     end
 

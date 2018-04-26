@@ -34,6 +34,29 @@ class TwitterEmbed
     data.dig("author_url")
   end
 
+  def image_url
+    @image_url ||= begin
+      url = nil
+
+      pics = document.search("a").each_with_object([]) do |anchor, array|
+        if anchor.text && anchor.text.start_with?("pic.twitter.com")
+          array.push anchor.attr("href")
+        end
+      end
+
+      if !pics.empty?
+        page = URLCache.new(pics.last).body
+        doc = Nokogiri::HTML5(page)
+        image = doc.css("meta[property='og:image']")
+        if !image.empty?
+          url = image.first.attributes["content"].value
+        end
+      end
+
+      url
+    end
+  end
+
   private
 
     OEMBED_URL = "https://publish.twitter.com/oembed"
@@ -54,7 +77,7 @@ class TwitterEmbed
             omit_script: true
           }
         }
-        HTTP.get(OEMBED_URL, options).parse
+        JSON.parse(URLCache.new(OEMBED_URL, options).body)
       end
     end
 

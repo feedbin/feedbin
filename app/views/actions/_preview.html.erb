@@ -1,5 +1,4 @@
 <% if action.valid? %>
-<% logger.info { action.inspect } %>
     $('body').append("<%= j render partial: 'preview_modal', locals: {action: action} %>");
     feedbin.modal("#action_results");
 <% else %>

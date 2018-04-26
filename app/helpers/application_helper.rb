@@ -13,10 +13,6 @@ module ApplicationHelper
   def is_active?(controller, action)
     controller = [*controller]
     action = [*action]
-    logger.info { "----------------------" }
-    logger.info { params[:controller] }
-    logger.info { params[:action] }
-    logger.info { "----------------------" }
     "active" if controller.include?(params[:controller]) && action.include?(params[:action])
   end
 

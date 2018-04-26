@@ -31,6 +31,9 @@
 
         <div class="tweet-body">
             <%= tweet.content.html_safe %>
+            <% if tweet.image_url %>
+                <p><a href="<%= tweet.image_url %>"><img src="<%= embedded_tweet_presenter.camo_link(tweet.image_url) %>"></a></p>
+            <% end %>
         </div>
     </div>
 </div>
