@@ -8,7 +8,8 @@ class SharingService < ApplicationRecord
     title = entry.title ? ERB::Util.url_encode(entry.title) : ''
     feed_name = entry.feed.title ? ERB::Util.url_encode(entry.feed.title) : ''
     share_url = self.url.clone
-    share_url = share_url.gsub('${url}', entry_url).gsub('${title}', title).gsub('${source}', feed_name).gsub('${id}', entry.id.to_s).gsub('${raw_url}', raw_url)
+    twitter_id = entry.twitter_id || ""
+    share_url = share_url.gsub('${url}', entry_url).gsub('${title}', title).gsub('${source}', feed_name).gsub('${id}', entry.id.to_s).gsub('${raw_url}', raw_url).gsub('${twitter_id}', twitter_id.to_s)
     if share_url.start_with?('http')
       target = '_blank'
     else
