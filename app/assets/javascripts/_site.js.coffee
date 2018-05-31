@@ -772,6 +772,8 @@ $.extend feedbin,
 
   feedXhr: null
 
+  readabilityXHR: null
+
   markReadData: {}
 
   closeSubcription: false
@@ -1203,13 +1205,22 @@ $.extend feedbin,
 
     updateReadability: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_content_view]', (event, xhr) ->
+
+        if !$('.button-toggle-content').hasClass('active')
+          $('.button-toggle-content').addClass('loading')
+
+        if feedbin.readabilityXHR
+          feedbin.readabilityXHR.abort()
+          xhr.abort()
+          feedbin.readabilityXHR = null
+          $('.button-toggle-content').removeClass('loading')
+        else
+          feedbin.readabilityXHR = xhr
+
         feedId = $(event.currentTarget).data('feed-id')
         if feedbin.data.sticky_readability && feedbin.data.readability_settings[feedId] != "undefined"
           unless $("#content_view").val() == "true" && feedbin.data.readability_settings[feedId] == true
             feedbin.data.readability_settings[feedId] = !feedbin.data.readability_settings[feedId]
-
-        if !$('.button-toggle-content').hasClass('active')
-          $('.button-toggle-content').addClass('loading')
 
         return
 

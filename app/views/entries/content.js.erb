@@ -2,3 +2,4 @@ $('[data-entry-id=<%= @entry.id %>] [data-behavior~=entry_content_wrap]').html("
 $('[data-entry-id=<%= @entry.id %>] [data-behavior~=toggle_content_view]').replaceWith("<%= j render partial: "entries/toggle_content", locals: {content_view: @content_view, entry: @entry} %>");
 feedbin.formatEntryContent(<%= @entry.id %>, false, false);
 feedbin.entryTime();
+feedbin.readabilityXHR = null;
