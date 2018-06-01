@@ -293,15 +293,7 @@ class EntriesController < ApplicationController
 
   def diff
     @entry = Entry.find(params[:id])
-    if @entry.original && @entry.original['content'].present?
-      begin
-        before = ContentFormatter.format!(@entry.original['content'], @entry)
-        after = ContentFormatter.format!(@entry.content, @entry)
-        @content = HTMLDiff::Diff.new(before, after).inline_html.html_safe
-      rescue HTML::Pipeline::Filter::InvalidDocumentException
-        @content = '(comparison error)'
-      end
-    end
+    @content = @entry.content_diff
   end
 
   def newsletter
@@ -314,13 +306,15 @@ class EntriesController < ApplicationController
   def entries_by_id(entry_ids)
     entries = Entry.where(id: entry_ids).includes(feed: [:favicon])
     subscriptions = @user.subscriptions.pluck(:feed_id)
+    updated_entries = @user.updated_entries.where(entry_id: entry_ids).pluck(:entry_id)
     entries.each_with_object({}) do |entry, hash|
       locals = {
         entry: entry,
         services: sharing_services(entry),
         content_view: false,
         user: @user,
-        subscriptions: subscriptions
+        subscriptions: subscriptions,
+        updated_entries: updated_entries,
       }
       hash[entry.id] = {
         content: render_to_string(partial: "entries/show", formats: [:html], locals: locals),

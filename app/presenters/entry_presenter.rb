@@ -403,6 +403,10 @@ class EntryPresenter < BasePresenter
     entry.content.present? && entry.original.present? && entry.original['content'].present? && entry.original['content'].length != entry.content.length
   end
 
+  def is_updated_entry?
+    @locals && @locals[:updated_entries].respond_to?(:include?) && @locals[:updated_entries].include?(entry.id)
+  end
+
   def audio_duration
     if media_duration && parts = media_duration.split(":").map(&:to_i)
       if parts.length == 3

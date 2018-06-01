@@ -6,6 +6,13 @@ $.extend feedbin,
   swipe: false
   panel: 1
 
+  toggleDiff: ->
+    $('[data-behavior~=diff_view_changes]').toggleClass("hide")
+    $('[data-behavior~=diff_view_latest]').toggleClass("hide")
+
+    $('[data-behavior~=diff_latest]').toggleClass("hide")
+    $('[data-behavior~=diff_content]').toggleClass("hide")
+
   drawBarCharts: ->
     $('[data-behavior~=line_graph]').each ()->
       feedbin.drawBarChart(@, $(@).data('values'))
@@ -1498,10 +1505,15 @@ $.extend feedbin,
         event.preventDefault()
         return
 
+    loadViewChanges: ->
+      $(document).on 'ajax:beforeSend', '[data-behavior~=load_view_changes]', (event, xhr) ->
+        if $('[data-behavior~=diff_content]').length
+          xhr.abort()
+          feedbin.toggleDiff()
+
     viewLatest: ->
       $(document).on 'click', '.view-latest-link', ->
-        $('.entries .selected a').click()
-        return
+        feedbin.toggleDiff()
 
     serviceOptions: ->
       $(document).on 'click', '[data-behavior~=show_service_options]', (event) ->

@@ -35,7 +35,7 @@
           <% if entry.tweet? %>
               <%= render partial: "tweet", locals: {entry: entry} %>
           <% else %>
-              <%= render partial: "article", locals: {entry: entry, user: user} %>
+              <%= render partial: "article", locals: {entry: entry, user: user, updated_entries: updated_entries} %>
           <% end %>
         </div>
         <button class="next-entry-preview no-content" data-behavior="open_next_entry">

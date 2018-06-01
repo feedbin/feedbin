@@ -283,6 +283,19 @@ class Entry < ApplicationRecord
     self.content = original
   end
 
+  def content_diff
+    result = nil
+    if self.original && self.original['content'].present?
+      begin
+        before = ContentFormatter.format!(self.original['content'], self)
+        after = ContentFormatter.format!(self.content, self)
+        result = HTMLDiff::Diff.new(before, after).inline_html.html_safe
+      rescue
+      end
+    end
+    result
+  end
+
   private
 
   def base_url
