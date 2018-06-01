@@ -21,6 +21,9 @@
                 <li><%= link_to 'Import & Export', settings_import_export_path %></li>
             </ul>
             <ul class="segmented no-margin">
+                <% if current_user.try(:admin?) %>
+                  <li><%= link_to 'Customers', admin_users_path, class: "no-border" %></li>
+                <% end %>
                 <li><%= link_to 'Log Out', logout_path, method: 'delete' %></li>
             </ul>
         </div>
