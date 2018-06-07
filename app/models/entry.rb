@@ -244,9 +244,6 @@ class Entry < ApplicationRecord
     if self.image && self.image["original_url"] && self.image["width"] && self.image["height"] && self.image["processed_url"]
       image_url = self.image["processed_url"]
       host = ENV['ENTRY_IMAGE_HOST']
-      if ENV['ENTRY_IMAGE_HOST_NEW'] && ENV["AWS_S3_BUCKET_NEW"] && image_url.include?(ENV["AWS_S3_BUCKET_NEW"])
-        host = ENV['ENTRY_IMAGE_HOST_NEW']
-      end
       url = URI(image_url)
       url.host = host if host
       url.scheme = 'https'
@@ -263,9 +260,6 @@ class Entry < ApplicationRecord
       image_url = self.data['itunes_image_processed']
 
       host = ENV['ENTRY_IMAGE_HOST']
-      if ENV['ENTRY_IMAGE_HOST_NEW'] && ENV["AWS_S3_BUCKET_NEW"] && image_url.include?(ENV["AWS_S3_BUCKET_NEW"])
-        host = ENV['ENTRY_IMAGE_HOST_NEW']
-      end
 
       url = URI(image_url)
       url.host = host if host

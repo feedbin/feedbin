@@ -5,7 +5,7 @@ class ImageDeleter
     paths = extract_paths(image_urls)
     S3_POOL.with do |connection|
       paths.each_slice(999) do |slice|
-        connection.delete_multiple_objects(ENV["AWS_S3_BUCKET_NEW"], slice, {quiet: true})
+        connection.delete_multiple_objects(ENV["AWS_S3_BUCKET_IMAGES"], slice, {quiet: true})
       end
     end
     Librato.increment 'entry_image.delete', by: image_urls.length
