@@ -50,8 +50,7 @@
             <% @subscriptions.each do |subscription| %>
                 <% present subscription do |subscription_presenter| %>
                     <%= fields_for "subscriptions[]", subscription do |f| %>
-                        <% tag_names = get_tag_names(@tags, subscription.feed_id) %>
-                        <li class="feeds-wrap <%= subscription_presenter.mute_class %>" data-sort-name="<%= subscription.title.downcase %><%= subscription.site_url %><%= subscription.feed_url %><%= tag_names %><%= subscription_presenter.muted_status %>" data-sort-last-updated="<%= subscription.try(:last_published_entry).try(:to_time).try(:to_i) %>" data-sort-post-volume="<%= subscription.post_volume %>" data-sort-tags="<%= tag_names %>">
+                        <li class="feeds-wrap <%= subscription_presenter.mute_class %>">
                             <i class="status-indicator icon-muted"></i>
                             <label class="checkbox-wrap">
                                 <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "checkbox feeds-checkbox" %>
@@ -84,9 +83,9 @@
 
                                 <span class="subscription-controls">
                                     &nbsp;
-                                    <% if tag_names %>
+                                    <% if subscription.sort_data[:tags] %>
                                         <span class="tags">
-                                            <%= tag_names %>
+                                            <%= subscription.sort_data[:tags] %>
                                         </span>
                                     <% end %>
                                     <%= subscription_presenter.mute_icon %>

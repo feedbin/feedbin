@@ -1,5 +1,5 @@
 class Subscription < ApplicationRecord
-  attr_accessor :entries_count, :post_volume
+  attr_accessor :entries_count, :post_volume, :sort_data
 
   belongs_to :user
   belongs_to :feed, counter_cache: true
@@ -68,7 +68,7 @@ class Subscription < ApplicationRecord
   end
 
   def muted_status
-    if subscription.muted
+    if self.muted
       "muted"
     end
   end
