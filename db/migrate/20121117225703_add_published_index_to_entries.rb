@@ -1,4 +1,4 @@
-class AddPublishedIndexToEntries < ActiveRecord::Migration
+class AddPublishedIndexToEntries < ActiveRecord::Migration[4.2]
   def up
     add_index :entries, :published
   end

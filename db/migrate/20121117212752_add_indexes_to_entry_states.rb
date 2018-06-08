@@ -1,4 +1,4 @@
-class AddIndexesToEntryStates < ActiveRecord::Migration
+class AddIndexesToEntryStates < ActiveRecord::Migration[4.2]
   def up
     add_index :entry_states, :read
     add_index :entry_states, :starred

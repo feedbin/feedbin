@@ -1,4 +1,4 @@
-class DropActsAsTaggableOnMigration < ActiveRecord::Migration
+class DropActsAsTaggableOnMigration < ActiveRecord::Migration[4.2]
   def up
     drop_table :taggings
     drop_table :tags
