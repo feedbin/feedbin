@@ -391,7 +391,7 @@ GEM
     ruby_dep (1.5.0)
     rubyzip (1.1.0)
     safe_yaml (1.0.4)
-    sanitize (4.6.0)
+    sanitize (4.6.5)
       crass (~> 1.0.2)
       nokogiri (>= 1.4.4)
       nokogumbo (~> 1.4)
@@ -582,4 +582,4 @@ DEPENDENCIES
   xipio
 
 BUNDLED WITH
-   1.16.1
+   1.16.2
