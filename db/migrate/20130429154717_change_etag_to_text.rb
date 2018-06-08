@@ -1,4 +1,4 @@
-class ChangeEtagToText < ActiveRecord::Migration
+class ChangeEtagToText < ActiveRecord::Migration[4.2]
   def up
     change_table :feeds do |t|
       t.change :etag, :text

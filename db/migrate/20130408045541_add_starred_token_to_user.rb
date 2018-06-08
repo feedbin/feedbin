@@ -1,4 +1,4 @@
-class AddStarredTokenToUser < ActiveRecord::Migration
+class AddStarredTokenToUser < ActiveRecord::Migration[4.2]
   def up
     add_column :users, :starred_token, :string
     add_index :users, :starred_token, unique: true

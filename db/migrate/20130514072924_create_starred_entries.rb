@@ -1,4 +1,4 @@
-class CreateStarredEntries < ActiveRecord::Migration
+class CreateStarredEntries < ActiveRecord::Migration[4.2]
   def change
     create_table :starred_entries do |t|
       t.references :user, index: true

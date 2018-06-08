@@ -1,4 +1,4 @@
-class RemoveSelectedFeedAndSelectedEntryFromUsers < ActiveRecord::Migration
+class RemoveSelectedFeedAndSelectedEntryFromUsers < ActiveRecord::Migration[4.2]
   def up
     remove_column :users, :selected_feed
     remove_column :users, :selected_entry

@@ -1,4 +1,4 @@
-class CreateInAppPurchases < ActiveRecord::Migration
+class CreateInAppPurchases < ActiveRecord::Migration[4.2]
   def change
     create_table :in_app_purchases do |t|
       t.belongs_to :user, index: true

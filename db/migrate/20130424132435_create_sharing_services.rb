@@ -1,4 +1,4 @@
-class CreateSharingServices < ActiveRecord::Migration
+class CreateSharingServices < ActiveRecord::Migration[4.2]
   def change
     create_table :sharing_services do |t|
       t.references :user

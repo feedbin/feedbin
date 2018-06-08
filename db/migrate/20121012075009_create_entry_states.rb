@@ -1,4 +1,4 @@
-class CreateEntryStates < ActiveRecord::Migration
+class CreateEntryStates < ActiveRecord::Migration[4.2]
 
   def change
     create_table :entry_states do |t|

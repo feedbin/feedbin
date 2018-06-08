@@ -1,4 +1,4 @@
-class CreateUnreadEntries < ActiveRecord::Migration
+class CreateUnreadEntries < ActiveRecord::Migration[4.2]
   def change
     create_table :unread_entries do |t|
       t.references :user, index: true

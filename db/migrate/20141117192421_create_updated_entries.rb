@@ -1,4 +1,4 @@
-class CreateUpdatedEntries < ActiveRecord::Migration
+class CreateUpdatedEntries < ActiveRecord::Migration[4.2]
   def change
     create_table :updated_entries, id: :bigserial do |t|
       t.belongs_to :user, index: true
