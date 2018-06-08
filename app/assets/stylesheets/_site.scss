@@ -3545,6 +3545,7 @@ $saved-search-control-height: 48px;
         .profile-image {
             margin-right: 10px;
             line-height: 1;
+            flex-shrink: 0;
         }
         h1 {
             font-size: 18px;
@@ -3708,6 +3709,9 @@ $saved-search-control-height: 48px;
     .modal-conversation & {
         .tweet-body {
             padding-left: 57px;
+        }
+        .main-tweet-conversation .tweet-body {
+            padding-left: 0;
         }
         .tweet-author-reply {
             border-top: none;
