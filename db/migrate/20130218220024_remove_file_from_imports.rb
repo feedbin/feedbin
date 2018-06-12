@@ -1,4 +1,4 @@
-class RemoveFileFromImports < ActiveRecord::Migration
+class RemoveFileFromImports < ActiveRecord::Migration[4.2]
   def self.up
     drop_attached_file :imports, :file
   end

@@ -1,4 +1,4 @@
-class AddNewsletterTokenToUsers < ActiveRecord::Migration
+class AddNewsletterTokenToUsers < ActiveRecord::Migration[4.2]
   def up
     add_column :users, :newsletter_token, :string
     add_index :users, :newsletter_token, unique: true

@@ -1,4 +1,4 @@
-class DropCreatedAtIndexOnEntries < ActiveRecord::Migration
+class DropCreatedAtIndexOnEntries < ActiveRecord::Migration[4.2]
   def self.up
     remove_index :entries, :created_at
   end

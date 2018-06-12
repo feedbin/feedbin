@@ -1,4 +1,4 @@
-class IndexUsersOnLowercaseEmail < ActiveRecord::Migration
+class IndexUsersOnLowercaseEmail < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
 
   def up
