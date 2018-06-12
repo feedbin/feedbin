@@ -1,5 +1,5 @@
 class Subscription < ApplicationRecord
-  attr_accessor :entries_count, :post_volume, :sort_data
+  attr_accessor :entries_count, :post_volume, :sort_data, :tag_names
 
   belongs_to :user
   belongs_to :feed, counter_cache: true

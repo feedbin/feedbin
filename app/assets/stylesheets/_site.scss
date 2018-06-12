@@ -4765,6 +4765,15 @@ body.settings {
             pointer-events: none;
         }
     }
+    .pagination {
+        padding-bottom: 40px;
+        .previous_page {
+            content: "Previous";
+        }
+        .next_page {
+            content: "Next";
+        }
+    }
 }
 
 input[type="checkbox"] + label .slider-checkbox {
@@ -5112,7 +5121,7 @@ Icons
 /*------------------------------------------------------------------------------
 Buttons
 ------------------------------------------------------------------------------*/
-.button {
+.button, .settings .pagination a, .settings .pagination span {
     appearance: none !important;
     background: $selected;
     border: none;
@@ -5144,7 +5153,7 @@ Buttons
     &:focus {
         box-shadow: $focus-glow;
     }
-    &[disabled] {
+    &[disabled], &.disabled {
         color: #FFF;
         border-color: $text-color-light;
         background-color: $text-color-light;

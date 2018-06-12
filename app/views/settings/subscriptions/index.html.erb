@@ -1,13 +1,13 @@
 <%= render partial: 'shared/svg' %>
 <div class="settings-content-inner">
 
-    <%= form_tag update_multiple_settings_subscriptions_path, method: :patch, autocomplete: 'off' do %>
-    <input type="hidden" name="operation" value="" />
 
     <div class="feed-settings">
         <div class="clearfix">
             <div class="half float-right">
-                <input type="text" class="feed-search" data-behavior="feed_search" placeholder="Search Feeds" />
+                <%= form_tag settings_subscriptions_path, method: :get, autocomplete: 'off' do %>
+                    <input type="text" class="feed-search" placeholder="Search Feeds" name="q" value="<%= params[:q] %>" />
+                <% end %>
             </div>
             <div class="half por">
                 <h2>Feeds</h2>
@@ -17,13 +17,13 @@
         <div class="feed-controls clearfix">
             <div class="half text-right float-right">
                 <div class="dropdown-wrap dropdown-right feed-dropdown">
-                    <button class="feeds-toolbar-button button-caret no-margin" data-behavior="toggle_dropdown sort_label">Sort by name</button>
+                    <button class="feeds-toolbar-button button-caret no-margin" data-behavior="toggle_dropdown sort_label">Sort by <%= params[:sort] || "name" %></button>
                     <div class="dropdown-content">
                         <ul>
-                            <li data-behavior="sort_feeds" data-value="name"><span>Sort by name</span></li>
-                            <li data-behavior="sort_feeds" data-value="last-updated"><span>Sort by last updated</span></li>
-                            <li data-behavior="sort_feeds" data-value="volume"><span>Sort by volume</span></li>
-                            <li data-behavior="sort_feeds" data-value="tags"><span>Sort by tag</span></li>
+                            <li data-behavior="sort_feeds" data-value="name"><a href="?sort=name&amp;q=<%= params[:q] %>">Sort by name</a></li>
+                            <li data-behavior="sort_feeds" data-value="last-updated"><a href="?sort=updated&amp;q=<%= params[:q] %>">Sort by updated</a></li>
+                            <li data-behavior="sort_feeds" data-value="volume"><a href="?sort=volume&amp;q=<%= params[:q] %>">Sort by volume</a></li>
+                            <li data-behavior="sort_feeds" data-value="tags"><a href="?sort=tag&amp;q=<%= params[:q] %>">Sort by tag</a></li>
                         </ul>
                     </div>
                 </div>
@@ -46,58 +46,64 @@
         </div>
     </div>
     <div class="feed-form-wrap">
-        <ul class="pill-list feed-form sortable"  data-behavior="search_results">
-            <% @subscriptions.each do |subscription| %>
-                <% present subscription do |subscription_presenter| %>
-                    <%= fields_for "subscriptions[]", subscription do |f| %>
-                        <li class="feeds-wrap <%= subscription_presenter.mute_class %>">
-                            <i class="status-indicator icon-muted"></i>
-                            <label class="checkbox-wrap">
-                                <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "checkbox feeds-checkbox" %>
-                            </label>
-                            <%= link_to edit_settings_subscription_path(subscription), class: "subscription-link" do %>
+        <%= form_tag update_multiple_settings_subscriptions_path, method: :patch, autocomplete: 'off' do %>
+            <input type="hidden" name="operation" value="" />
+            <ul class="pill-list feed-form sortable"  data-behavior="search_results">
+                <% @subscriptions.each do |subscription| %>
+                    <% present subscription do |subscription_presenter| %>
+                        <%= fields_for "subscriptions[]", subscription do |f| %>
+                            <li class="feeds-wrap <%= subscription_presenter.mute_class %>">
+                                <i class="status-indicator icon-muted"></i>
+                                <label class="checkbox-wrap">
+                                    <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "checkbox feeds-checkbox" %>
+                                </label>
+                                <%= link_to edit_settings_subscription_path(subscription), class: "subscription-link" do %>
 
-                                <span class="subscription-data-wrap">
-                                    <span class="subscription-data">
-                                        <span class="favicon-container">
-                                            <%= subscription_presenter.favicon(subscription.feed) %>
-                                        </span>
-                                        <span class="text-wrap">
-                                            <span class="title-container">
-                                                <%= subscription.title %>
+                                    <span class="subscription-data-wrap">
+                                        <span class="subscription-data">
+                                            <span class="favicon-container">
+                                                <%= subscription_presenter.favicon(subscription.feed) %>
                                             </span>
-                                            <span class="last-updated-wrap">
-                                                <%= timeago(subscription.last_published_entry) %>, <%= number_with_delimiter(subscription.post_volume) %>/mo
+                                            <span class="text-wrap">
+                                                <span class="title-container">
+                                                    <%= subscription.title %>
+                                                </span>
+                                                <span class="last-updated-wrap">
+                                                    <%= timeago(subscription.last_published_entry) %>, <%= number_with_delimiter(subscription.post_volume) %>/mo
+                                                </span>
+                                            </span>
+                                            <span class="canvas-wrap">
+                                                <%= content_tag :canvas, '', width: 97, height: 20, data: { values: subscription.entries_count, fill: "#dcebff", stroke: "#3399FF", behavior: "line_graph" } %>
                                             </span>
                                         </span>
-                                        <span class="canvas-wrap">
-                                            <%= content_tag :canvas, '', width: 97, height: 20, data: { values: subscription.entries_count, fill: "#dcebff", stroke: "#3399FF", behavior: "line_graph" } %>
+                                        <span class="subscription-meta">
+                                            <span class="feed-url-wrap">
+                                                <%= pretty_url(subscription.feed_url) %>
+                                            </span>
                                         </span>
                                     </span>
-                                    <span class="subscription-meta">
-                                        <span class="feed-url-wrap">
-                                            <%= pretty_url(subscription.feed_url) %>
-                                        </span>
-                                    </span>
-                                </span>
 
-                                <span class="subscription-controls">
-                                    &nbsp;
-                                    <% if subscription.sort_data[:tags] %>
-                                        <span class="tags">
-                                            <%= subscription.sort_data[:tags] %>
-                                        </span>
-                                    <% end %>
-                                    <%= subscription_presenter.mute_icon %>
-                                    <%= subscription_presenter.update_icon %>
-                                </span>
-                            <% end %>
-                        </li>
+                                    <span class="subscription-controls">
+                                        &nbsp;
+                                        <% if subscription.tag_names %>
+                                            <span class="tags">
+                                                <%= subscription.tag_names %>
+                                            </span>
+                                        <% end %>
+                                        <%= subscription_presenter.mute_icon %>
+                                        <%= subscription_presenter.update_icon %>
+                                    </span>
+                                <% end %>
+                            </li>
+                        <% end %>
                     <% end %>
                 <% end %>
-            <% end %>
-        </ul>
+            </ul>
+        <% end %>
+        <%= will_paginate @subscriptions, page_links: false, previous_label: "Previous", next_label: "Next" %>
     </div>
 
-    <% end %>
+
+
+
 </div>
