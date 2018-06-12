@@ -3267,9 +3267,29 @@ $saved-search-control-height: 48px;
     }
 }
 
+.theme-day .content-styles a {
+    color: black;
+    border-bottom: 1px solid rgba(#000, .3);
+    &:hover {
+        text-decoration: none;
+        color: $selected;
+        border-bottom: 1px solid $selected;
+    }
+}
+
+.theme-sunset .content-styles a {
+    color: black;
+    border-bottom: 1px solid rgba(#000, .3);
+    &:hover {
+        text-decoration: none;
+        color: $selected;
+        border-bottom: 1px solid $selected;
+    }
+}
+
 .theme-night .content-styles a {
     color: #fff;
-    text-decoration: underline;
+    border-bottom: 1px solid rgba(#FFF, .3);
     &:hover {
         color: $selected;
     }
