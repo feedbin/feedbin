@@ -3,4 +3,10 @@
 
 require File.expand_path('../config/application', __FILE__)
 
+require 'coveralls/rake/task'
+
+Coveralls::RakeTask.new
+
 Feedbin::Application.load_tasks
+
+task run_all_tests: [:test, :'test:system', :'coveralls:push']
