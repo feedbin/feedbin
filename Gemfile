@@ -84,7 +84,7 @@ gem 'rmagick', require: false
 gem 'reverse_markdown'
 gem 'htmlentities'
 gem 'responders', '~> 2.0'
-gem 'dotenv-rails'
+gem 'dotenv-rails', '= 2.2.1'
 gem 'kramdown'
 gem 'premailer-rails'
 gem 'http'
