@@ -184,10 +184,10 @@ GEM
     docile (1.1.5)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
-    dotenv (2.4.0)
-    dotenv-rails (2.4.0)
-      dotenv (= 2.4.0)
-      railties (>= 3.2, < 6.0)
+    dotenv (2.2.1)
+    dotenv-rails (2.2.1)
+      dotenv (= 2.2.1)
+      railties (>= 3.2, < 5.2)
     elasticsearch (2.0.2)
       elasticsearch-api (= 2.0.2)
       elasticsearch-transport (= 2.0.2)
@@ -522,7 +522,7 @@ DEPENDENCIES
   coveralls
   curb
   dalli
-  dotenv-rails
+  dotenv-rails (= 2.2.1)
   elasticsearch (~> 2.0)
   elasticsearch-model (~> 2.0)
   evernote_oauth
