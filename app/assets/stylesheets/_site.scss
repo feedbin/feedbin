@@ -3707,6 +3707,9 @@ $saved-search-control-height: 48px;
         }
     }
     .modal-conversation & {
+        .tweet-body {
+            padding-left: 57px;
+        }
         .tweet-author-reply {
             border-top: none;
             padding-top: 0 !important;
