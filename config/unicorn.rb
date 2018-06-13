@@ -29,8 +29,8 @@ after_fork do |server, worker|
   end
 end
 
-before_exec do |server|
-  if ENV['ENV_PATH']
-    ENV.update Dotenv::Environment.new(ENV['ENV_PATH'], true)
-  end
-end
+# before_exec do |server|
+#   if ENV['ENV_PATH']
+#     ENV.update Dotenv::Environment.new(ENV['ENV_PATH'], true)
+#   end
+# end
