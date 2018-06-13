@@ -3710,6 +3710,9 @@ $saved-search-control-height: 48px;
         .tweet-body {
             padding-left: 57px;
         }
+        .quoted-tweet .tweet-body {
+            padding-left: 0;
+        }
         .tweet-author-reply {
             border-top: none;
             padding-top: 0 !important;
