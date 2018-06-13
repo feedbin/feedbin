@@ -1,4 +1,4 @@
-class CreateDeletedUsers < ActiveRecord::Migration
+class CreateDeletedUsers < ActiveRecord::Migration[4.2]
   def change
     create_table :deleted_users do |t|
       t.text :email

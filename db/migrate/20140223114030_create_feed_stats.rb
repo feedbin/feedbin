@@ -1,4 +1,4 @@
-class CreateFeedStats < ActiveRecord::Migration
+class CreateFeedStats < ActiveRecord::Migration[4.2]
   def change
     create_table :feed_stats do |t|
       t.belongs_to :feed, index: true

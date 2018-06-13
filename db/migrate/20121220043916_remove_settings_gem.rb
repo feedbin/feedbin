@@ -1,4 +1,4 @@
-class RemoveSettingsGem < ActiveRecord::Migration
+class RemoveSettingsGem < ActiveRecord::Migration[4.2]
   def up
     drop_table :settings
   end

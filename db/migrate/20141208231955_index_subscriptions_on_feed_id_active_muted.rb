@@ -1,4 +1,4 @@
-class IndexSubscriptionsOnFeedIdActiveMuted < ActiveRecord::Migration
+class IndexSubscriptionsOnFeedIdActiveMuted < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
   def change
     add_index :subscriptions, [:feed_id, :active, :muted], algorithm: :concurrently

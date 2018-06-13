@@ -1,4 +1,4 @@
-class AddFeedTypeToFeed < ActiveRecord::Migration
+class AddFeedTypeToFeed < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
   def up
     add_column :feeds, :feed_type, :integer
