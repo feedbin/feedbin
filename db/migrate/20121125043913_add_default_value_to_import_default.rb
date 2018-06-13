@@ -1,4 +1,4 @@
-class AddDefaultValueToImportDefault < ActiveRecord::Migration
+class AddDefaultValueToImportDefault < ActiveRecord::Migration[4.2]
   def up
     change_column :imports, :complete, :boolean, default: false
   end

@@ -1,4 +1,4 @@
-class AddInboundEmailTokenToUsers < ActiveRecord::Migration
+class AddInboundEmailTokenToUsers < ActiveRecord::Migration[4.2]
   def up
     add_column :users, :inbound_email_token, :string
     add_index :users, :inbound_email_token, unique: true

@@ -1,4 +1,4 @@
-class AddStateTimestampsToEntryStates < ActiveRecord::Migration
+class AddStateTimestampsToEntryStates < ActiveRecord::Migration[4.2]
   def change
     add_column :entry_states, :starred_at, :datetime
     add_column :entry_states, :read_at, :datetime

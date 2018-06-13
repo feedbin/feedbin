@@ -1,4 +1,4 @@
-class UseTextForFeedAndEntryProperties < ActiveRecord::Migration
+class UseTextForFeedAndEntryProperties < ActiveRecord::Migration[4.2]
   def up
     change_table :entries do |t|
       t.change :title, :text

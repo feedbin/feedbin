@@ -1,4 +1,4 @@
-class AddShowUpdatesAndMutedToSubscriptions < ActiveRecord::Migration
+class AddShowUpdatesAndMutedToSubscriptions < ActiveRecord::Migration[4.2]
 
   def up
     add_column :subscriptions, :show_updates, :boolean

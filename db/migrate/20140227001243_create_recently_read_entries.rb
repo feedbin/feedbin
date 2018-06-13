@@ -1,4 +1,4 @@
-class CreateRecentlyReadEntries < ActiveRecord::Migration
+class CreateRecentlyReadEntries < ActiveRecord::Migration[4.2]
   def change
     create_table :recently_read_entries do |t|
       t.references :user, index: true

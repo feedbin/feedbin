@@ -1,4 +1,4 @@
-class UseTextForEntryId < ActiveRecord::Migration
+class UseTextForEntryId < ActiveRecord::Migration[4.2]
   def up
     change_table :entries do |t|
       t.change :entry_id, :text

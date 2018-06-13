@@ -1,4 +1,4 @@
-class RemoveUnusedIndexes < ActiveRecord::Migration
+class RemoveUnusedIndexes < ActiveRecord::Migration[4.2]
   def change
     remove_index :entry_states, :starred
     remove_index :entry_states, :read
