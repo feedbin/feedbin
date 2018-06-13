@@ -1417,11 +1417,11 @@ $.extend feedbin,
         $('#add_form_modal .modal-dialog').removeClass('done');
 
     formProcessing: ->
-      $(document).on 'submit', '[data-behavior~=subscription_form], [data-behavior~=search_form], [data-behavior~=feeds_search]', ->
+      $(document).on 'submit', '[data-behavior~=spinner], [data-behavior~=subscription_form], [data-behavior~=search_form], [data-behavior~=feeds_search]', ->
         $(@).find('input').addClass('processing')
         return
 
-      $(document).on 'ajax:complete', '[data-behavior~=subscription_form], [data-behavior~=search_form], [data-behavior~=feeds_search]', ->
+      $(document).on 'ajax:complete', '[data-behavior~=spinner], [data-behavior~=subscription_form], [data-behavior~=search_form], [data-behavior~=feeds_search]', ->
         $(@).find('input').removeClass('processing')
         if feedbin.closeSubcription
           setTimeout ( ->
@@ -1721,6 +1721,14 @@ $.extend feedbin,
         if message
           feedbin.showNotification(message)
         event.preventDefault()
+
+    autoSubmit: ->
+
+      $(document).on 'keyup', '[data-behavior~=autosubmit]', (event) ->
+        console.log 'change'
+        _.debounce(->
+          $(@).closest('form').submit();
+        200, true)
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->

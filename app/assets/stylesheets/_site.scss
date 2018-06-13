@@ -4292,12 +4292,17 @@ body.settings {
     }
     .feed-search {
         float: right;
-        padding: 5px 5px 5px 36px !important;
+        padding: 5px 25px 5px 36px !important;
         font-size: 14px;
-        background: #FFF image-url("favicon-search-light.svg") 11px 7px no-repeat;
+        background: #FFF image-url("favicon-search-light.svg") 11px 6px no-repeat;
         max-width: 250px !important;
         display: block;
         margin: 22px 0 0 0 !important;
+        &.processing {
+            background-image: image-url("favicon-search-light.svg"), image-url("spinner-day.svg");
+            background-position: 11px 6px, 97% 6px;
+            background-size: 14px 14px, 16px 16px;
+        }
         @media (max-width: 528px) {
             display: none;
         }
