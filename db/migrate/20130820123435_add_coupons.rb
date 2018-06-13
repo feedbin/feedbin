@@ -1,4 +1,4 @@
-class AddCoupons < ActiveRecord::Migration
+class AddCoupons < ActiveRecord::Migration[4.2]
   def change
     create_table :coupons do |t|
       t.references :user, index: true

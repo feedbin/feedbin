@@ -1,4 +1,4 @@
-class CreatePlans < ActiveRecord::Migration
+class CreatePlans < ActiveRecord::Migration[4.2]
   def change
     create_table :plans do |t|
       t.string :stripe_id

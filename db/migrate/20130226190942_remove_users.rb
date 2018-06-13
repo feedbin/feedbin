@@ -1,4 +1,4 @@
-class RemoveUsers < ActiveRecord::Migration
+class RemoveUsers < ActiveRecord::Migration[4.2]
   def up
     drop_table :users
   end

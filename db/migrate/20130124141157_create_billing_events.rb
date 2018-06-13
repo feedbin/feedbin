@@ -1,4 +1,4 @@
-class CreateBillingEvents < ActiveRecord::Migration
+class CreateBillingEvents < ActiveRecord::Migration[4.2]
   def change
     create_table :billing_events do |t|
       t.text :details

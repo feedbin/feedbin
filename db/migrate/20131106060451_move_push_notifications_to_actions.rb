@@ -1,4 +1,4 @@
-class MovePushNotificationsToActions < ActiveRecord::Migration
+class MovePushNotificationsToActions < ActiveRecord::Migration[4.2]
   def up
     User.find_each do |user|
       begin

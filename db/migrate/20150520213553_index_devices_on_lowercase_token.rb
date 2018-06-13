@@ -1,4 +1,4 @@
-class IndexDevicesOnLowercaseToken < ActiveRecord::Migration
+class IndexDevicesOnLowercaseToken < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
 
   def up
