@@ -50,6 +50,7 @@ $.extend feedbin,
     target.html(html)
 
   showFeedList: ->
+    $('[data-behavior~=feeds_target]').removeClass('hide')
     $('[data-behavior~=feeds_target]').addClass('in')
 
   mobileView: ->
@@ -842,6 +843,7 @@ $.extend feedbin,
 
     hasScrollBars: ->
       if feedbin.scrollBars()
+        console.log 'hasScrollBars'
         $('body').addClass('scroll-bars')
 
     hasScrollSnap: ->
