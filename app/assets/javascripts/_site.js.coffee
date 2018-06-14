@@ -6,6 +6,29 @@ $.extend feedbin,
   swipe: false
   panel: 1
 
+  scrollBars: ->
+    width = 100
+
+    outer = $('<div><div></div></div>').css
+      "width": "#{width}px"
+      "height": "100px"
+      "overflow-y": "scroll"
+      "position": "absolute"
+      "top": "-99999px"
+      "left": "-99999px"
+
+    inner = outer.find('div').css
+      "width": "100%"
+      "height": "200px"
+
+    $("body").append(outer)
+
+    result = inner.outerWidth() < width
+
+    outer.remove()
+
+    result
+
   toggleDiff: ->
     $('[data-behavior~=diff_view_changes]').toggleClass("hide")
     $('[data-behavior~=diff_view_latest]').toggleClass("hide")
@@ -816,6 +839,10 @@ $.extend feedbin,
       $.ajaxSetup(setup);
 
   init:
+
+    hasScrollBars: ->
+      if feedbin.scrollBars()
+        $('body').addClass('scroll-bars')
 
     hasScrollSnap: ->
       if 'scroll-snap-type' of document.body.style

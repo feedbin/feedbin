@@ -874,7 +874,7 @@ Structure
     position: relative;
 }
 
-/*.theme-night {
+.scroll-bars.theme-night {
     .feeds::-webkit-scrollbar,
     .entries::-webkit-scrollbar,
     .entry-content::-webkit-scrollbar {
@@ -897,7 +897,7 @@ Structure
         background-color: $text-color-muted-night;
     }
 }
-*/
+
 .subscribe-toolbar {
     height: $toolbar-height;
     border-bottom: 1px solid transparent;
