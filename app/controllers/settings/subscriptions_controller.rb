@@ -87,7 +87,7 @@ class Settings::SubscriptionsController < ApplicationController
 
     if ["updated", "volume", "tag", "name"].include?(params[:sort])
       key = params[:sort].to_sym
-      subscriptions = subscriptions.sort_by {|subscription| subscription.sort_data[key]}
+      subscriptions = subscriptions.sort_by {|subscription| [subscription.sort_data[key] ? 0 : 1, subscription.sort_data[key]] }
     else
       subscriptions = subscriptions.sort_by {|subscription| subscription.sort_data[:name] }
     end

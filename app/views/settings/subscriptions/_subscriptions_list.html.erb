@@ -1,0 +1,57 @@
+<div class="feed-form-wrap" data-behavior="subscriptions_list">
+    <%= form_tag update_multiple_settings_subscriptions_path, method: :patch, autocomplete: 'off' do %>
+        <input type="hidden" name="operation" value="" />
+        <ul class="pill-list feed-form sortable"  data-behavior="search_results">
+            <% @subscriptions.each do |subscription| %>
+                <% present subscription do |subscription_presenter| %>
+                    <%= fields_for "subscriptions[]", subscription do |f| %>
+                        <li class="feeds-wrap <%= subscription_presenter.mute_class %>">
+                            <i class="status-indicator icon-muted"></i>
+                            <label class="checkbox-wrap">
+                                <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "checkbox feeds-checkbox" %>
+                            </label>
+                            <%= link_to edit_settings_subscription_path(subscription), class: "subscription-link" do %>
+
+                                <span class="subscription-data-wrap">
+                                    <span class="subscription-data">
+                                        <span class="favicon-container">
+                                            <%= subscription_presenter.favicon(subscription.feed) %>
+                                        </span>
+                                        <span class="text-wrap">
+                                            <span class="title-container">
+                                                <%= subscription.title %>
+                                            </span>
+                                            <span class="last-updated-wrap">
+                                                <%= timeago(subscription.last_published_entry) %>, <%= number_with_delimiter(subscription.post_volume) %>/mo
+                                            </span>
+                                        </span>
+                                        <span class="canvas-wrap">
+                                            <%= content_tag :canvas, '', width: 97, height: 20, data: { values: subscription.entries_count, fill: "#dcebff", stroke: "#3399FF", behavior: "line_graph" } %>
+                                        </span>
+                                    </span>
+                                    <span class="subscription-meta">
+                                        <span class="feed-url-wrap">
+                                            <%= pretty_url(subscription.feed_url) %>
+                                        </span>
+                                    </span>
+                                </span>
+
+                                <span class="subscription-controls">
+                                    &nbsp;
+                                    <% if subscription.tag_names %>
+                                        <span class="tags">
+                                            <%= subscription.tag_names %>
+                                        </span>
+                                    <% end %>
+                                    <%= subscription_presenter.mute_icon %>
+                                    <%= subscription_presenter.update_icon %>
+                                </span>
+                            <% end %>
+                        </li>
+                    <% end %>
+                <% end %>
+            <% end %>
+        </ul>
+    <% end %>
+    <%= will_paginate @subscriptions, previous_label: "Previous", next_label: "Next" %>
+</div>

@@ -1723,12 +1723,13 @@ $.extend feedbin,
         event.preventDefault()
 
     autoSubmit: ->
+      throttled = _.throttle((item)->
+        console.log item
+        item.closest('form').submit();
+      1000);
 
-      $(document).on 'keyup', '[data-behavior~=autosubmit]', (event) ->
-        console.log 'change'
-        _.debounce(->
-          $(@).closest('form').submit();
-        200, true)
+      $(document).on 'input', '[data-behavior~=autosubmit]', (event) ->
+        throttled($(@))
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->

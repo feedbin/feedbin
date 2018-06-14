@@ -4304,7 +4304,7 @@ body.settings {
         &.processing {
             background-image: image-url("favicon-search-light.svg"), image-url("spinner-day.svg");
             background-position: 11px 6px, 97% 6px;
-            background-size: 14px 14px, 16px 16px;
+            background-size: auto, 16px 16px;
         }
         @media (max-width: 528px) {
             display: none;
