@@ -874,6 +874,30 @@ Structure
     position: relative;
 }
 
+.scroll-bars.theme-night {
+    .feeds::-webkit-scrollbar,
+    .entries::-webkit-scrollbar,
+    .entry-content::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 15px;
+    }
+    .feeds::-webkit-scrollbar-thumb,
+    .entries::-webkit-scrollbar-thumb,
+    .entry-content::-webkit-scrollbar-thumb {
+        border: 3px solid $text-color-muted-night;
+        background-color: $border-color-night;
+        border-radius: 9px;
+        &:hover {
+            background-color: black;
+        }
+    }
+    .feeds::-webkit-scrollbar-track-piece,
+    .entries::-webkit-scrollbar-track-piece,
+    .entry-content::-webkit-scrollbar-track-piece {
+        background-color: $text-color-muted-night;
+    }
+}
+
 .subscribe-toolbar {
     height: $toolbar-height;
     border-bottom: 1px solid transparent;
@@ -2100,8 +2124,10 @@ $saved-search-control-height: 48px;
     }
     &.entry-settings {
         display: flex;
-        overflow-x: scroll;
         -webkit-overflow-scrolling: touch;
+        .touch & {
+            overflow-x: scroll;
+        }
         .setting-wrap {
             display: flex;
             flex-shrink: 0;
