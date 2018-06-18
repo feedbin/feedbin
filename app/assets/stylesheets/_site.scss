@@ -5176,7 +5176,7 @@ Icons
 /*------------------------------------------------------------------------------
 Buttons
 ------------------------------------------------------------------------------*/
-.button, .settings .pagination a, .settings .pagination span {
+.button {
     appearance: none !important;
     background: $selected;
     border: none;
@@ -5243,6 +5243,41 @@ Buttons
     }
     .theme-night & {
         color: #fff;
+    }
+}
+.settings .pagination {
+    text-align: center;
+    a, span, em {
+        @extend .button;
+        @extend .button-secondary;
+        min-width: auto;
+        padding-top: 7px;
+        padding-bottom: 7px;
+        margin-bottom: 10px;
+        @media (max-width: 550px) {
+            display: none;
+            &.previous_page, &.next_page {
+                display: inline-block;
+            }
+        }
+        &.current {
+            background-color: $selected;
+            font-style: normal;
+            color: #fff !important;
+        }
+        &.gap {
+            border: none;
+            color: $text-color-light !important;
+            padding-left: 7px;
+            padding-right: 7px;
+        }
+        &.disabled {
+            background-color: transparent;
+            color: $text-color-light !important;
+            &:hover {
+                background-color: transparent;
+            }
+        }
     }
 }
 
