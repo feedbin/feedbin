@@ -3,16 +3,12 @@
 
 
     <div class="feed-settings">
-        <div class="clearfix">
-            <div class="half float-right">
-                <%= form_tag settings_subscriptions_path, method: :get, remote: true do %>
-                    <input type="search" class="feed-search" placeholder="Search Feeds" data-behavior="autosubmit" name="q" value="<%= params[:q] %>" />
-                <% end %>
-            </div>
-            <div class="half por">
-                <h2>Subscriptions</h2>
-            </div>
-        </div>
+        <h2>Subscriptions</h2>
+        <%= form_tag settings_subscriptions_path, method: :get, remote: true do %>
+            <input type="search" class="feed-search" placeholder="Search Feeds" data-behavior="autosubmit" name="q" value="<%= params[:q] %>" />
+        <% end %>
+    </div>
+
 
         <div class="feed-controls clearfix">
             <div class="half text-right float-right">

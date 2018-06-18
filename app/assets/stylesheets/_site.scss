@@ -4310,6 +4310,7 @@ body.settings {
         left: 37px;
         right: 20px;
         height: 127px;
+        display: flex;
         @media (max-width: 528px) {
             left: 0;
             right: 0;
