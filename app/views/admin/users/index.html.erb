@@ -1,12 +1,14 @@
 <div class="settings-content-inner">
-  <div class="clearfix">
-      <div class="half float-right">
+
+  <div class="settings-outer">
+      <div class="feed-settings">
+
+          <h2>Customer Admin</h2>
+
           <%= form_tag(admin_users_path, method: "get") do %>
               <input name="q" type="text" class="feed-search" data-behavior="user_search" placeholder="Search Customers" />
           <% end %>
-      </div>
-      <div class="half por">
-          <h2>Customer Admin</h2>
+
       </div>
   </div>
 

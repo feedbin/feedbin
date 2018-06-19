@@ -459,9 +459,10 @@ table {
     margin: 0 0 30px 0;
     padding: 0;
     list-style: none;
-    @media (max-width: 528px) {
+    @media (max-width: 550px) {
         border-left: none;
         border-right: none;
+        border-radius: 0;
     }
     li {
         @include settings-row;
@@ -479,7 +480,7 @@ table {
                 text-decoration: none;
                 @include settings-row;
                 color: $text-header-color;
-                @media (max-width: 528px) {
+                @media (max-width: 550px) {
                     padding-right: 20px;
                 }
                 &:after {
@@ -492,7 +493,7 @@ table {
                     right: 15px;
                     top: 0;
                     bottom: 0;
-                    @media (max-width: 528px) {
+                    @media (max-width: 550px) {
                         right: 5px;
                     }
                 }
@@ -505,7 +506,7 @@ table {
     @extend .pill-list;
     li {
         padding: 0;
-        @media (max-width: 528px) {
+        @media (max-width: 550px) {
             padding-right: 0;
             padding-left: 0;
         }
@@ -540,7 +541,7 @@ table {
         }
     }
     .share-help {
-        @media (max-width: 528px) {
+        @media (max-width: 550px) {
             padding-top: 20px;
         }
     }
@@ -566,7 +567,7 @@ table {
     input[type="password"],
     input[type="url"] {
         display: block;
-        @media (max-width: 528px) {
+        @media (max-width: 550px) {
             max-width: 100%;
         }
     }
@@ -586,7 +587,7 @@ table {
     .half {
         padding-left: 5px;
         padding-right: 5px;
-        @media (max-width: 528px) {
+        @media (max-width: 550px) {
             width: 100%;
             float: none;
         }
@@ -681,7 +682,7 @@ table {
     }
     .inset-content {
         padding: 0 30px;
-        @media (max-width: 528px) {
+        @media (max-width: 550px) {
             padding: 0 15px;
         }
     }
@@ -698,7 +699,7 @@ table {
             padding-top: 30px;
         }
     }
-    @media (max-width: 528px) {
+    @media (max-width: 550px) {
         border: none;
         background-color: transparent;
         border-radius: 0;
@@ -710,18 +711,18 @@ table {
         background: image-url("icon-share-email.svg") 30px 3px no-repeat;
         background-size: 24px 16px;
         padding-left: 64px;
-        @media (max-width: 528px) {
+        @media (max-width: 550px) {
             padding-left: 49px;
             background-position: 15px 3px;
         }
     }
-    @media (max-width: 528px) {
+    @media (max-width: 550px) {
         padding-left: 15px;
         padding-right: 15px;
     }
 }
 .settings-outer {
-    @media (max-width: 528px) {
+    @media (max-width: 550px) {
         padding: 0 15px;
     }
 }
@@ -926,10 +927,6 @@ Structure
     }
 }
 
-.mobile-hamburger {
-    display: none;
-}
-
 .hamburger-menu-wrap {
     position: absolute;
     user-select: none;
@@ -938,6 +935,11 @@ Structure
     height: $toolbar-height;
     width: $toolbar-height;
     cursor: pointer;
+}
+
+.mobile-hamburger {
+    display: none;
+    right: 7px;
 }
 
 .hamburger-menu {
@@ -3260,7 +3262,7 @@ $saved-search-control-height: 48px;
         margin-bottom: 1.1em;
     }
 
-    @media (max-width: 528px) {
+    @media (max-width: 550px) {
         img[data-camo-src] {
             visibility: hidden;
             &.full-width, &.show {
@@ -3808,6 +3810,7 @@ $saved-search-control-height: 48px;
         width: 500px;
         background-color: $selected;
         display: block;
+        visibility: hidden;
         height: $height;
         line-height: $height;
         top: -$height;
@@ -3820,8 +3823,10 @@ $saved-search-control-height: 48px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-
         &.show {
+            visibility: visible;
+        }
+        &.slide {
             top: 0;
         }
         &.error {
@@ -3851,45 +3856,42 @@ Settings
     border-radius: 4px;
 }
 
-.settings-nav {
-    width: 310px;
-    display: table-cell;
-    vertical-align: top;
-    .logo {
-        margin: 23px 0 0 31px;
-        display: block;
-        svg {
-            width: 140px;
-            height: 30px;
-            path {
-                fill: #FFF;
-            }
-        }
-
-    }
-    .desktop-hide {
-        display: none;
-    }
-    .modal & {
-        width: 100%;
-        display: block;
-        border: none;
+    .settings-nav {
+        width: 310px;
         .logo {
+            margin: 23px 0 0 31px;
+            display: block;
+            svg {
+                width: 140px;
+                height: 30px;
+                path {
+                    fill: #FFF;
+                }
+            }
+
+        }
+        .desktop-hide {
             display: none;
         }
+        .modal & {
+            width: 100%;
+            display: block;
+            border: none;
+            .logo {
+                display: none;
+            }
+        }
     }
-}
 
-@media (max-width: 528px) {
-    .settings-nav {
-        display: none;
+    @media (max-width: 550px) {
+        .settings-nav {
+                display: none;
+        }
+        .mobile-hamburger,
+        .desktop-hide {
+            display: block !important;
+        }
     }
-    .mobile-hamburger,
-    .desktop-hide {
-        display: block !important;
-    }
-}
-
 
 .nav {
     margin: 22px 0 0 0;
@@ -3944,21 +3946,22 @@ body.settings {
 .settings {
     font-size: 16px;
     .settings-inner {
-        height: 100%;
-        width: 100%;
-        display: table;
+        display: flex;
+        align-items: stretch;
+        min-height: 100%;
     }
+
     .settings-content {
         position: relative;
-        vertical-align: top;
-        margin-left: 250px;
         padding: 0;
         background-color: $list-background-color;
-        display: table-cell;
+        flex-grow: 1;
+        max-width: 100%;
+        min-width: 0;
         .settings-content-inner {
             max-width: 900px;
             padding: 0 20px 0 37px;
-            @media (max-width: 528px) {
+            @media (max-width: 550px) {
                 padding: 0;
             }
         }
@@ -4042,11 +4045,11 @@ body.settings {
             position: absolute;
             left: 30px;
             top: 15px;
-            @media (max-width: 528px) {
+            @media (max-width: 550px) {
                 left: 15px;
             }
         }
-        @media (max-width: 528px) {
+        @media (max-width: 550px) {
             padding-left: 35px;
         }
     }
@@ -4101,7 +4104,7 @@ body.settings {
         z-index: 1000;
         background-color: $inset-bg-color;
         margin-bottom: 30px;
-        @media (max-width: 528px) {
+        @media (max-width: 550px) {
             background-color: $list-background-color;
         }
         .control-group {
@@ -4201,14 +4204,14 @@ body.settings {
         }
         td:first-child {
             padding-left: 30px !important;
-            @media (max-width: 528px) {
+            @media (max-width: 550px) {
                 padding-left: 15px !important;
             }
         }
         td:last-child {
             padding-right: 30px !important;
             text-align: right;
-            @media (max-width: 528px) {
+            @media (max-width: 550px) {
                 padding-right: 15px !important;
             }
         }
@@ -4225,7 +4228,7 @@ body.settings {
         &.no-margin {
             margin-bottom: 0;
         }
-        @media (max-width: 528px) {
+        @media (max-width: 550px) {
             padding-left: 15px;
             padding-right: 15px;
         }
@@ -4288,7 +4291,7 @@ body.settings {
                 background: image-url("icon-check.svg") 0 0 no-repeat;
                 height: 12px;
                 width: 15px;
-                @media (max-width: 528px) {
+                @media (max-width: 550px) {
                     right: 22px;
                 }
             }
@@ -4298,61 +4301,61 @@ body.settings {
         .card-number-wrap {
             padding: 9px 30px;
             border-bottom: 1px solid $border-color;
-            @media (max-width: 528px) {
+            @media (max-width: 550px) {
                 padding-left: 15px;
                 padding-right: 15px;
             }
         }
     }
     .feed-settings {
-        position: absolute;
-        top: 0;
-        left: 37px;
-        right: 20px;
-        height: 127px;
         display: flex;
-        @media (max-width: 528px) {
-            left: 0;
-            right: 0;
+        margin: 25px 0 24px;
+        h2 {
+            flex-grow: 1;
+            margin: 0;
+        }
+        @media (max-width: 550px) {
             h2 {
-                padding: 0 15px;
+                margin-bottom: 15px;
+            }
+            flex-direction: column;
+            .feed-search {
+                width: 100%;
             }
         }
-
     }
     .feed-search {
-        float: right;
         padding: 5px 25px 5px 36px !important;
         font-size: 14px;
         background: #FFF image-url("favicon-search-light.svg") 11px 6px no-repeat;
-        max-width: 250px !important;
+        max-width: 250px;
         display: block;
-        margin: 22px 0 0 0 !important;
+        margin: 0;
         &.processing {
             background-image: image-url("favicon-search-light.svg"), image-url("spinner-day.svg");
             background-position: 11px 6px, 97% 6px;
             background-size: auto, 16px 16px;
         }
-        @media (max-width: 528px) {
-            display: none;
+        @media (max-width: 550px) {
+            max-width: 100%
         }
     }
     .feed-controls {
+        display: flex;
         border-radius: 8px 8px 0 0;
         background-color: $inset-bg-color;
         border: 1px solid #DCDEE0;
         padding: 15px 30px 12px 30px;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        @media (max-width: 528px) {
+        @media (max-width: 550px) {
             padding-left: 15px;
             padding-right: 15px;
             border-radius: 0;
             border-left: none;
             border-right: none;
         }
+    }
+    .feed-actions {
+        flex-grow: 1;
     }
     .feeds-checkbox {
         margin-right: 15px;
@@ -4363,7 +4366,7 @@ body.settings {
             width: 215px;
             top: 25px;
             left: -81px;
-            @media (max-width: 528px) {
+            @media (max-width: 550px) {
                 left: -10px;
                 li:first-child:after {
                     left: 15px;
@@ -4376,7 +4379,7 @@ body.settings {
             }
         }
         &.dropdown-right .dropdown-content {
-            @media (max-width: 528px) {
+            @media (max-width: 550px) {
                 left: -100px;
                 li:first-child:after {
                     left: 175px;
@@ -4416,20 +4419,6 @@ body.settings {
         }
         &.no-margin {
             margin: 0;
-        }
-    }
-    .feed-form-wrap {
-        position: absolute;
-        top: 127px;
-        bottom: 0;
-        right: 20px;
-        left: 37px;
-        -webkit-overflow-scrolling: touch;
-        overflow-y: auto;
-        overflow-x: hidden;
-        @media (max-width: 528px) {
-            right: 0;
-            left: 0;
         }
     }
     .feed-profile {
@@ -4545,7 +4534,7 @@ body.settings {
             justify-content: space-between;
             display: flex;
             margin-bottom: 15px;
-            @media (max-width: 528px) {
+            @media (max-width: 550px) {
                 flex-direction: column;
                 text-align: left;
                 padding: 0;
@@ -4561,7 +4550,7 @@ body.settings {
                 }
             }
             .stat-title {
-                @media (max-width: 528px) {
+                @media (max-width: 550px) {
                     display: inline;
                     font-size: 16px;
                     @include color($text-color, $text-color-night, $text-color-sunset);
@@ -4574,7 +4563,7 @@ body.settings {
             }
             .stat-body {
                 margin: 0;
-                @media (max-width: 528px) {
+                @media (max-width: 550px) {
                     display: inline;
                     font-weight: normal;
                 }
@@ -4629,7 +4618,7 @@ body.settings {
     .feed-form {
         border-radius: 0 0 8px 8px;
         border-top: none;
-        @media (max-width: 528px) {
+        @media (max-width: 550px) {
             border-radius: 0;
         }
         li {
@@ -4655,7 +4644,7 @@ body.settings {
                 margin: 0 0 0 30px !important;
                 padding: 0;
             }
-            @media (max-width: 528px) {
+            @media (max-width: 550px) {
                 padding-top: 15px;
                 width: $checkbox-offset-narrow;
                 .feeds-checkbox {
@@ -4672,7 +4661,7 @@ body.settings {
             &:hover {
                 text-decoration: none;
             }
-            @media (max-width: 528px) {
+            @media (max-width: 550px) {
                 padding: 13px 15px 13px $checkbox-offset-narrow;
             }
         }
@@ -4763,7 +4752,7 @@ body.settings {
                 width: 100%;
                 height: 100%;
             }
-            @media (max-width: 528px) {
+            @media (max-width: 550px) {
                 display: none;
             }
         }
@@ -4867,7 +4856,7 @@ input[type="checkbox"] + label .slider-checkbox {
         top: 2px;
         transition: left .2s ease;
     }
-    @media (max-width: 528px) {
+    @media (max-width: 550px) {
         right: 15px;
     }
 }

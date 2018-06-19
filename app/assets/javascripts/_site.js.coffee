@@ -113,13 +113,21 @@ $.extend feedbin,
 
     messages.text(text)
     messages.addClass('show')
+    messages.addClass('slide')
     feedbin.messageTimeout = setTimeout ( ->
-      messages.removeClass('show')
+      messages.removeClass('slide')
+      setTimeout ( ->
+        messages.removeClass('show')
+      ), 200
     ), timeout
 
   hideNotification: ->
     messages = $('[data-behavior~=messages]')
-    messages.removeClass('show')
+    messages.removeClass('slide')
+    setTimeout ( ->
+      messages.removeClass('show')
+    ), 200
+
 
   previewHeight: ->
     container = $('[data-behavior~=preview_min_height]')
