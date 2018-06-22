@@ -1770,9 +1770,8 @@ $.extend feedbin,
 
     autoSubmit: ->
       throttled = _.throttle((item)->
-        console.log item
         item.closest('form').submit();
-      1000);
+      800);
 
       $(document).on 'input', '[data-behavior~=autosubmit]', (event) ->
         throttled($(@))
