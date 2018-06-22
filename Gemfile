@@ -97,7 +97,6 @@ gem 'twitter'
 gem 'twitter-text'
 gem 'skylight'
 gem 'bootsnap', require: false
-gem 'scorer'
 
 # Stripe
 gem 'stripe'
