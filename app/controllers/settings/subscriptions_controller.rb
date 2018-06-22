@@ -64,7 +64,8 @@ class Settings::SubscriptionsController < ApplicationController
       feed_ids = subscriptions.map(&:feed_id)
 
       start_date = 29.days.ago
-      entry_counts = FeedStat.get_entry_counts(feed_ids, start_date)
+
+      entry_counts = Rails.cache.fetch("#{@user.id}:entry_counts", expires_in: 24.hours) { FeedStat.get_entry_counts(feed_ids, start_date) }
 
       subscriptions.each do |subscription|
         counts = entry_counts[subscription.feed_id]

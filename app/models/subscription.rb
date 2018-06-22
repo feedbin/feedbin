@@ -8,7 +8,6 @@ class Subscription < ApplicationRecord
   before_destroy :mark_as_read
 
   before_create :expire_stat_cache
-  before_destroy :expire_stat_cache
 
   after_create :add_feed_to_action
   after_commit :remove_feed_from_action, on: [:destroy]
