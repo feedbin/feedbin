@@ -1,38 +1,52 @@
 <div data-behavior="subscriptions_list">
-    <div class="feed-controls">
-        <div class="feed-actions">
-            <input type="checkbox" class="feeds-checkbox" data-behavior="toggle_checked" />
-            <div class="dropdown-wrap dropdown-left feed-dropdown">
-                <button class="feeds-toolbar-button button-caret" data-behavior="toggle_dropdown feed_actions">Actions</button>
-                <div class="dropdown-content">
-                    <ul>
-                        <li data-operation="unsubscribe"><span>Unsubscribe</span></li>
-                        <li data-operation="show_updates"><span class="no-border">Show edits on articles</span></li>
-                        <li data-operation="hide_updates"><span>Hide edits on articles</span></li>
-                        <li data-operation="mute"><span class="no-border">Mute Feed</span></li>
-                        <li data-operation="unmute"><span>Unmute Feed</span></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="dropdown-wrap dropdown-right feed-dropdown">
-            <button class="feeds-toolbar-button button-caret no-margin" data-behavior="toggle_dropdown sort_label">Sort by <%= params[:sort] || "name" %></button>
-            <div class="dropdown-content">
-                <ul>
-                    <li data-value="name"><a href="?sort=name&amp;q=<%= params[:q] %>">Sort by name</a></li>
-                    <li data-value="last-updated"><a href="?sort=updated&amp;q=<%= params[:q] %>">Sort by updated</a></li>
-                    <li data-value="volume"><a href="?sort=volume&amp;q=<%= params[:q] %>">Sort by volume</a></li>
-                    <li data-value="tags"><a href="?sort=tag&amp;q=<%= params[:q] %>">Sort by tag</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
 
     <div class="feed-form-wrap">
-        <%= form_tag update_multiple_settings_subscriptions_path, method: :patch, autocomplete: 'off' do %>
+        <%= form_tag update_multiple_settings_subscriptions_path, method: :patch, autocomplete: 'off' do |update_form| %>
             <input type="hidden" name="operation" value="" />
-            <ul class="pill-list feed-form sortable"  data-behavior="search_results">
+            <div class="feed-controls-wrap">
+                <div class="feed-controls">
+                    <div class="feed-actions">
+                        <input type="checkbox" class="feeds-checkbox" data-behavior="toggle_checked" />
+                        <div class="dropdown-wrap dropdown-left feed-dropdown">
+                            <button class="feeds-toolbar-button button-caret" data-behavior="toggle_dropdown feed_actions">Actions</button>
+                            <div class="dropdown-content">
+                                <ul>
+                                    <li data-operation="unsubscribe"><span>Unsubscribe</span></li>
+                                    <li data-operation="show_updates"><span class="no-border">Show edits on articles</span></li>
+                                    <li data-operation="hide_updates"><span>Hide edits on articles</span></li>
+                                    <li data-operation="mute"><span class="no-border">Mute Feed</span></li>
+                                    <li data-operation="unmute"><span>Unmute Feed</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-wrap dropdown-right feed-dropdown">
+                        <button class="feeds-toolbar-button button-caret no-margin" data-behavior="toggle_dropdown sort_label">Sort by <%= params[:sort] || "name" %></button>
+                        <div class="dropdown-content">
+                            <ul>
+                                <li data-value="name"><a href="?sort=name&amp;q=<%= params[:q] %>">Sort by name</a></li>
+                                <li data-value="last-updated"><a href="?sort=updated&amp;q=<%= params[:q] %>">Sort by updated</a></li>
+                                <li data-value="volume"><a href="?sort=volume&amp;q=<%= params[:q] %>">Sort by volume</a></li>
+                                <li data-value="tags"><a href="?sort=tag&amp;q=<%= params[:q] %>">Sort by tag</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <% if @subscriptions.total_entries > @subscriptions.count  %>
+                    <div class="select-all-wrap hide" data-behavior="toggle_checked_hidden">
+                        <label class="checkbox">
+                            <%= check_box_tag "include_all", 1, false, data: {behavior: "include_all"} %>
+                            <% if params[:q] %>
+                                Include all <%= number_with_delimiter(@subscriptions.total_entries) %> <%= "feed".pluralize(@subscriptions.total_entries) %> matching this search.
+                            <% else %>
+                                Include all <%= number_with_delimiter(@subscriptions.total_entries) %> <%= "feed".pluralize(@subscriptions.total_entries) %>.
+                            <% end %>
+                        </label>
+                    </div>
+                <% end %>
+            </div>
+            <ul class="pill-list feed-form sortable"  data-behavior="search_results toggle_checked_target">
                 <% @subscriptions.each do |subscription| %>
                     <% present subscription do |subscription_presenter| %>
                         <%= fields_for "subscriptions[]", subscription do |f| %>

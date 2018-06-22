@@ -29,8 +29,12 @@ class Settings::SubscriptionsController < ApplicationController
   def update_multiple
     @user = current_user
     notice = "Feeds updated."
-    if params[:operation] && params[:subscription_ids]
-      subscriptions = @user.subscriptions.where(id: params[:subscription_ids])
+    if params[:operation] && params[:subscription_ids] || params[:include_all]
+      if params[:include_all]
+        subscriptions = @user.subscriptions
+      else
+        subscriptions = @user.subscriptions.where(id: params[:subscription_ids])
+      end
       if params[:operation] == "unsubscribe"
         subscriptions.destroy_all
         notice = "You have unsubscribed."

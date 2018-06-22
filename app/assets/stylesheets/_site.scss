@@ -672,7 +672,7 @@ table {
 }
 
 .inset {
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    background-color: $inset-bg-color;
     border-radius: 8px;
     border: 1px solid $border-color;
     margin: 0 0 20px 0;
@@ -4102,7 +4102,6 @@ body.settings {
     }
     .preview-group {
         z-index: 1000;
-        background-color: $inset-bg-color;
         margin-bottom: 30px;
         @media (max-width: 550px) {
             background-color: $list-background-color;
@@ -4340,6 +4339,11 @@ body.settings {
             max-width: 100%
         }
     }
+    .feed-controls-wrap {
+        position: sticky;
+        top: -6px;
+        z-index: 2000;
+    }
     .feed-controls {
         display: flex;
         border-radius: 8px 8px 0 0;
@@ -4350,6 +4354,22 @@ body.settings {
             padding-left: 15px;
             padding-right: 15px;
             border-radius: 0;
+            border-left: none;
+            border-right: none;
+        }
+    }
+    .select-all-wrap {
+        background-color: $inset-bg-color;
+        border: 1px solid #DCDEE0;
+        border-top: none;
+        padding: 15px 30px 12px 30px;
+        .checkbox input {
+            margin-top: 1px;
+            margin-right: 18px;
+        }
+        @media (max-width: 550px) {
+            padding-left: 15px;
+            padding-right: 15px;
             border-left: none;
             border-right: none;
         }

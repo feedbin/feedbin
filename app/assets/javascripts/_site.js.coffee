@@ -1194,11 +1194,20 @@ $.extend feedbin,
         form.submit()
 
     checkBoxToggle: ->
-      $(document).on 'change', '[data-behavior~=toggle_checked]', (event) ->
+      $(document).on 'change', '[data-behavior~=include_all]', (event) ->
         if $(@).is(':checked')
-          $('[type="checkbox"][name]').prop('checked', true)
+          $('[data-behavior~=toggle_checked_target] [type="checkbox"][name]').prop('disabled', true)
         else
-          $('[type="checkbox"][name]').prop('checked', false)
+          $('[data-behavior~=toggle_checked_target] [type="checkbox"][name]').prop('disabled', false)
+
+      $(document).on 'change', '[data-behavior~=toggle_checked]', (event) ->
+
+        $('[data-behavior~=toggle_checked_hidden]').toggleClass('hide')
+
+        if $(@).is(':checked')
+          $('[data-behavior~=toggle_checked_target] [type="checkbox"][name]').prop('checked', true)
+        else
+          $('[data-behavior~=toggle_checked_target] [type="checkbox"][name]').prop('checked', false)
         event.preventDefault()
         return
 
