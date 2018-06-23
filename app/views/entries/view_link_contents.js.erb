@@ -2,7 +2,6 @@ modal = $('#view_link_wrap')
 target = $('[data-behavior~=markup_target]', modal)
 <% if @content %>
     target.html("<%= j render partial: 'shared/view_link_contents', locals: {page: @content_info, content: @content, user: @user} %>")
-    feedbin.affix();
 <% else %>
     target.html("<%= j render partial: 'shared/view_link_contents_error', locals: {url: @url, user: @user} %>")
 <% end %>
