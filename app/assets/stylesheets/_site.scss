@@ -3295,7 +3295,7 @@ $saved-search-control-height: 48px;
     }
 }
 
-.theme-day .content-styles a {
+.theme-day .content-styles a, .theme-day .tweet-body a {
     color: black;
     border-bottom: 1px solid rgba(#000, .3);
     &:hover {
@@ -3305,7 +3305,7 @@ $saved-search-control-height: 48px;
     }
 }
 
-.theme-sunset .content-styles a {
+.theme-sunset .content-styles a, .theme-sunset .tweet-body a {
     color: black;
     border-bottom: 1px solid rgba(#000, .3);
     &:hover {
@@ -3315,11 +3315,17 @@ $saved-search-control-height: 48px;
     }
 }
 
-.theme-night .content-styles a {
+.theme-night .content-styles a, .theme-night .tweet-body a {
     color: #fff;
     border-bottom: 1px solid rgba(#FFF, .3);
     &:hover {
         color: $selected;
+    }
+}
+
+.entry-callout, .tweet-header {
+    a {
+        border-bottom: none !important;
     }
 }
 
