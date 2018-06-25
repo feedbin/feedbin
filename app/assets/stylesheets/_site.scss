@@ -4111,6 +4111,8 @@ body.settings {
     .preview-group {
         z-index: 1000;
         margin-bottom: 30px;
+        top: 0;
+        position: sticky;
         @media (max-width: 550px) {
             background-color: $list-background-color;
         }
@@ -6112,10 +6114,6 @@ input[type="text"].hide {
 
 .invisible {
     visibility: hidden;
-}
-
-.affix {
-    position: fixed;
 }
 
 .hide-text {

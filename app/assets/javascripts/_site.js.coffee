@@ -116,15 +116,6 @@ $.extend feedbin,
     ), 200
 
 
-  previewHeight: ->
-    container = $('[data-behavior~=preview_min_height]')
-    preview = $('[data-behavior~=preview_container]')
-    minHeight = 85
-    if container.length > 0 && preview.length > 0
-      if preview.outerHeight() > minHeight
-        minHeight = container.outerHeight()
-      container.css(height: "#{minHeight}px")
-
   updateEntries: (entries, header) ->
     $('.entries ul').html(entries)
     $('.entries-header').html(header)
@@ -1608,7 +1599,6 @@ $.extend feedbin,
           $('[data-behavior~=class_target]').removeClass("#{setting}-#{option}")
 
         $('[data-behavior~=class_target]').addClass("#{setting}-#{selected}")
-        feedbin.previewHeight()
 
     appearanceCheckbox: ->
       $(document).on 'click', '[data-behavior~=appearance_checkbox]', (event) ->
@@ -1617,7 +1607,6 @@ $.extend feedbin,
         $('[data-behavior~=class_target]').removeClass("#{setting}-1")
         $('[data-behavior~=class_target]').removeClass("#{setting}-0")
         $('[data-behavior~=class_target]').addClass("#{setting}-#{checked}")
-        feedbin.previewHeight()
 
     generalAutocomplete: ->
       $(document).on 'focus', '[data-behavior~=autocomplete_field]', (event) ->
@@ -1643,13 +1632,6 @@ $.extend feedbin,
         $(window).on('resize', throttledResize);
         resize()
 
-
-    minHeight: ->
-      feedbin.previewHeight()
-
-    scrollToFixed: ->
-      unless 'ontouchstart' of document
-        $('.preview-group').scrollToFixed()
 
     tumblrType: ->
       $(document).on 'change', '[data-behavior~=tumblr_type]', ->
