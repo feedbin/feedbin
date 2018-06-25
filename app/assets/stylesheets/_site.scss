@@ -1581,6 +1581,9 @@ $saved-search-control-height: 48px;
     .favicon-wrap {
         top: -2px;
         left: -26px;
+        @media (max-width: 550px) {
+            top: -1px;
+        }
     }
     a {
         text-decoration: none;
@@ -1674,8 +1677,6 @@ $saved-search-control-height: 48px;
         align-items: baseline;
     }
     .feed-title {
-        font-size: 12px;
-        line-height: 1.3;
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         white-space: nowrap;
         overflow: hidden;
@@ -1684,7 +1685,6 @@ $saved-search-control-height: 48px;
     }
     .time {
         align-self: flex-end;
-        font-size: 12px;
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         display: block;
         white-space: nowrap;
@@ -1692,14 +1692,19 @@ $saved-search-control-height: 48px;
             display: none;
         }
     }
+    .feed-title, .time {
+        line-height: 1.3;
+        font-size: 12px;
+        @media (max-width: 550px) {
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+    }
     .icon-play {
         display: inline-block;
     }
     .title {
-        font-weight: bold;
         margin: 0;
-        font-size: 14px;
-        line-height: 1.2;
         display: block;
         margin-bottom: 2px;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
@@ -1712,6 +1717,9 @@ $saved-search-control-height: 48px;
         margin: 0;
         @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         display: block;
+        @media (max-width: 550px) {
+            font-size: 14px;
+        }
     }
     .quoted-summary {
         margin-top: 8px !important;
@@ -1720,11 +1728,32 @@ $saved-search-control-height: 48px;
         border: 1px solid transparent;
         @include border-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
     }
+    .title, &.no-title .feed-title {
+        font-size: 14px;
+        line-height: 1.2;
+        font-weight: bold;
+        display: block;
+        position: relative;
+        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        .title-inner {
+            font-weight: bold;
+            span {
+                font-weight: normal;
+                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            }
+        }
+        @media (max-width: 550px) {
+            font-size: 15px;
+        }
+    }
     &.no-title {
         .favicon-wrap {
             display: flex;
             top: 8px;
             z-index: 3;
+            @media (max-width: 550px) {
+                top: 9px;
+            }
         }
         .title .favicon-wrap {
             display: none;
@@ -1732,22 +1761,6 @@ $saved-search-control-height: 48px;
         .meta-wrap {
             margin-bottom: 2px;
         }
-        .feed-title {
-            font-weight: bold;
-            font-size: 14px;
-            display: block;
-            line-height: 1.2;
-            position: relative;
-            @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-            .title-inner {
-                font-weight: bold;
-                span {
-                    font-weight: normal;
-                    @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-                }
-            }
-        }
-
     }
     &.starred {
         .icon-star {
@@ -8101,8 +8114,8 @@ Media Queries
         width: 250px;
     }
     .feeds ul li .feed-link {
-        font-size: 15px;
-        padding: 13px 40px 13px 38px;
+        font-size: 16px;
+        padding: 13px 40px 13px 40px;
         .favicon-wrap {
             top: 11px;
         }
