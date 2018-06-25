@@ -138,6 +138,10 @@ class EntryPresenter < BasePresenter
     @template.truncate(text, length: length, omission: '…', escape: false)
   end
 
+  def retweet_text
+    HTMLEntities.new.decode(entry.tweet_summary(entry.main_tweet.quoted_status))
+  end
+
   def entry_view_title
     @entry_view_title ||= begin
       text = sanitized_title
