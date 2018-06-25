@@ -5741,7 +5741,7 @@ Link Viewer
 }
 
 #view_link_wrap .link-content-meta {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     .url {
         color: $text-color-light;
         display: block;
@@ -5844,10 +5844,19 @@ Link Viewer
     .entry-inner {
         padding-top: 40px !important;
         padding-bottom: 0 !important;
+        @media (max-width: 920px) {
+            padding-top: 20px !important;
+        }
     }
     &.modal-conversation  {
         .modal-body {
-            padding: 30px 0 10px 0;
+            padding: 0 0 10px 0;
+        }
+        .entry-inner {
+            padding-top: 30px !important;
+        }
+        .sticky-modal-header .entry-inner {
+            padding-top: 0 !important;
         }
         max-width: 580px;
     }
@@ -5861,14 +5870,14 @@ Link Viewer
     }
 }
 
-.sticky-header {
+.modal-sticky-header-inner {
     margin: 0 auto;
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     border-bottom: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     position: relative;
     border-radius: 8px 8px 0 0;
-    padding: 15px;
+    padding: 12px 0;
     .close {
         position: absolute;
         right: 0;
@@ -5877,7 +5886,7 @@ Link Viewer
         height: 50px;
         svg {
             position: absolute;
-            top: 19px;
+            top: 12px;
             right: 16px;
         }
     }
@@ -5886,10 +5895,6 @@ Link Viewer
         align-items: center;
         padding-top: 0 !important;
         padding-bottom: 0 !important;
-        @media (max-width: 550px) {
-            padding-left: 0px;
-            padding-right: 0px;
-        }
     }
     .post-meta {
         margin-bottom: auto !important;
@@ -5909,7 +5914,7 @@ Link Viewer
 }
 
 
-.link-header {
+.sticky-modal-header {
     position: sticky;
     top: 0;
 }
