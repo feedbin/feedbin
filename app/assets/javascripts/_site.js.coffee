@@ -1010,6 +1010,13 @@ $.extend feedbin,
             value = field.val()
             field.val(value)
             feedbin.autocomplete(field)
+          else
+            wrap.animate {
+              height: '0px'
+            }, 200
+            field = wrap.find('.feed_tag_list')
+            field.blur()
+
         return
 
     resizeWindow: ->

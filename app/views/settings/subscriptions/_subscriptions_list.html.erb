@@ -8,7 +8,7 @@
                     <div class="feed-actions">
                         <input type="checkbox" class="feeds-checkbox" data-behavior="toggle_checked" />
                         <div class="dropdown-wrap dropdown-left feed-dropdown">
-                            <button class="feeds-toolbar-button button-caret" data-behavior="toggle_dropdown feed_actions">Actions</button>
+                            <button class="feed-list-toolbar-button button-caret" data-behavior="toggle_dropdown feed_actions">Actions</button>
                             <div class="dropdown-content">
                                 <ul>
                                     <li data-operation="unsubscribe"><span>Unsubscribe</span></li>
@@ -22,7 +22,7 @@
                     </div>
 
                     <div class="dropdown-wrap dropdown-right feed-dropdown">
-                        <button class="feeds-toolbar-button button-caret no-margin" data-behavior="toggle_dropdown sort_label">Sort by <%= params[:sort] || "name" %></button>
+                        <button class="feed-list-toolbar-button button-caret no-margin" data-behavior="toggle_dropdown sort_label">Sort by <%= params[:sort] || "name" %></button>
                         <div class="dropdown-content">
                             <ul>
                                 <li data-value="name"><a href="?sort=name&amp;q=<%= params[:q] %>">Sort by name</a></li>

@@ -3,7 +3,7 @@ Variables
 ------------------------------------------------------------------------------*/
 $toolbar-height: 41px;
 $font-stack: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
-$feeds-toolbar-height: 52px;
+$bottom-toolbar-height: 52px;
 $audio-player-height: 115px;
 $audio-player-height-minimized: 54px;
 $base-button-position: 10px;
@@ -970,20 +970,20 @@ Structure
     background-color: #b4b6b8;
 }
 
-.feeds-toolbar {
-    border-top: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+.bottom-toolbar {
+    height: $bottom-toolbar-height;
     position: absolute;
     z-index: 2;
     bottom: 0;
     left: 0;
     right: 0;
     font-size: 10px;
+    border-top: 1px solid transparent;
+    @include border-color($border-color, $border-color-night, $border-color-sunset);
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-    height: $feeds-toolbar-height;
     .standalone-navigator & {
-        height: calc(#{$feeds-toolbar-height - 8px} + env(safe-area-inset-bottom));
-        min-height: $feeds-toolbar-height !important;
+        height: calc(#{$bottom-toolbar-height - 8px} + env(safe-area-inset-bottom));
+        min-height: $bottom-toolbar-height !important;
     }
     table {
         width: 100%;
@@ -1008,7 +1008,7 @@ Structure
 .feeds-inner {
     position: absolute;
     top: $toolbar-height;
-    bottom: $feeds-toolbar-height;
+    bottom: $bottom-toolbar-height;
     left: 0;
     right: 0;
     z-index: 1;
@@ -4435,7 +4435,7 @@ body.settings {
             }
         }
     }
-    .feeds-toolbar-button {
+    .feed-list-toolbar-button {
         margin-right: 15px;
         color: $selected;
         appearance: none;
@@ -5380,7 +5380,7 @@ Buttons
     height: 0;
     width: 100%;
     position: absolute;
-    bottom: $feeds-toolbar-height;
+    bottom: $bottom-toolbar-height;
     left: 0;
     overflow: hidden;
     z-index: 1;
@@ -6579,7 +6579,7 @@ Media Players
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     position: absolute;
     width: 100%;
-    bottom: $feeds-toolbar-height;
+    bottom: $bottom-toolbar-height;
     left: 0;
     overflow: hidden;
     z-index: 1;
@@ -8055,16 +8055,16 @@ Media Queries
     .entry-content-wrap {
         top: 0;
     }
-    .feeds-column .feeds-toolbar {
+    .feeds-column .bottom-toolbar {
         display: none;
     }
     .feeds-inner {
         bottom: 0;
     }
     .entries-inner {
-        bottom: $feeds-toolbar-height - 1px;
+        bottom: $bottom-toolbar-height - 1px;
         .standalone-navigator & {
-            bottom: calc(#{$feeds-toolbar-height - 9px} + env(safe-area-inset-bottom));
+            bottom: calc(#{$bottom-toolbar-height - 9px} + env(safe-area-inset-bottom));
         }
     }
     .entry-header h1 {
