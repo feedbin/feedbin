@@ -101,12 +101,12 @@ feedbin.Counts.get(feedbin.count_data);
         <div class="entry-content-wrap <%= @user.entry_width %> <%= @user.display_prefs %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
         </div>
         <div class="bottom-toolbar entry-bottom-toolbar">
-            <button class="toolbar-button" data-behavior="open_previous_entry">
+            <button class="toolbar-button" data-behavior="open_previous_entry needs_previous">
                 <div class="icon-previous">
                     <%= svg_tag "icon-arrow", size: "11x18" %>
                 </div>
             </button>
-            <button class="toolbar-button" data-behavior="open_next_entry">
+            <button class="toolbar-button" data-behavior="open_next_entry needs_next">
                 <div class="icon-next">
                     <%= svg_tag "icon-arrow", size: "11x18" %>
                 </div>

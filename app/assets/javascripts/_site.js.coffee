@@ -481,9 +481,21 @@ $.extend feedbin,
       feed = next.find('.feed-title').text()
       $('.next-entry-title').text(title)
       $('.next-entry-feed').text(feed)
-      $('.next-entry-preview').removeClass('no-content')
+      $('[data-behavior~=needs_next]').prop('disabled', false)
+      $('[data-behavior~=needs_next]').removeClass('no-content')
     else
-      $('.next-entry-preview').addClass('no-content')
+      $('[data-behavior~=needs_next]').addClass('no-content')
+      $('[data-behavior~=needs_next]').prop('disabled', true)
+
+    previous = feedbin.selectedEntry.container.parents('li').prev()
+    if previous.length
+      $('[data-behavior~=needs_previous]').prop('disabled', false)
+      $('[data-behavior~=needs_previous]').removeClass('no-content')
+    else
+      $('[data-behavior~=needs_previous]').addClass('no-content')
+      $('[data-behavior~=needs_previous]').prop('disabled', true)
+
+
 
   hideSubscribe: ->
     $('.feeds-inner').removeClass('show-subscribe')

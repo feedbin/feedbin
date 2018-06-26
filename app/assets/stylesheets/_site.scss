@@ -2554,13 +2554,18 @@ $saved-search-control-height: 48px;
         .standalone-navigator & {
             padding-bottom: env(safe-area-inset-bottom);
         }
-    }
-    .icon-next, .icon-previous {
-        display: inline-block;
-        width: 11px;
-        height: 18px;
-        svg * {
-            @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+        .icon-next, .icon-previous {
+            display: inline-block;
+            width: 11px;
+            height: 18px;
+            svg * {
+                @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+            }
+        }
+        &[disabled] {
+            svg * {
+                @include fill($drawer-background-color, $text-color-light-night, $drawer-background-color-sunset);
+            }
         }
     }
     .icon-next {
@@ -2568,10 +2573,7 @@ $saved-search-control-height: 48px;
     }
     .icon-previous {
         transform: rotate(90deg);
-/*        svg * {
-            @include fill($drawer-background-color, $text-color-light-night, $drawer-background-color-sunset);
-        }
-*/    }
+    }
 }
 
 .fluid .entry-inner {
