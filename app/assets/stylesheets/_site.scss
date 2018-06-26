@@ -2551,6 +2551,9 @@ $saved-search-control-height: 48px;
         width: 72px;
         text-align: center;
         padding: 8px 0 8px 0;
+        .standalone-navigator & {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
     }
     .icon-next, .icon-previous {
         display: inline-block;
@@ -2561,10 +2564,10 @@ $saved-search-control-height: 48px;
         }
     }
     .icon-next {
-        transform: rotate(90deg);
+        transform: rotate(270deg);
     }
     .icon-previous {
-        transform: rotate(270deg);
+        transform: rotate(90deg);
 /*        svg * {
             @include fill($drawer-background-color, $text-color-light-night, $drawer-background-color-sunset);
         }
@@ -3204,7 +3207,7 @@ $saved-search-control-height: 48px;
 
     figcaption, caption {
         font-size: 80%;
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         font-style: italic;
         line-height: 1.3;
     }
