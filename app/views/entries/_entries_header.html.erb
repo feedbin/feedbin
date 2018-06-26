@@ -1,4 +1,6 @@
-<button class="back-button" data-behavior="show_feeds"></button>
+<button class="back-button" data-behavior="show_feeds">
+    <%= svg_tag "icon-arrow", size: "11x18" %>
+</button>
 <% if @feed %>
   <% present feed do |feed_presenter| %>
     <span class="feed-title-wrap">

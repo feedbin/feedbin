@@ -1397,17 +1397,19 @@ li.selected > a .favicon-wrap {
 }
 
 .back-button {
-    background-color: transparent;
-    background-size: 11px 15px;
-    background-repeat: no-repeat;
-    background-image: image-url("icon-left-arrow.svg");
-    background-position: center center;
     display: block;
     appearance: none;
     border: none;
     height: 16px;
     width: 11px;
     padding: 0;
+    background-color: transparent;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    svg * {
+        @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+    }
     .full-screen & {
         display: none !important;
     }
@@ -1437,10 +1439,10 @@ li.selected > a .favicon-wrap {
         text-overflow: ellipsis;
     }
     .back-button {
-        display: inline-block;
+        display: flex;
         position: static;
-        height: $toolbar-height;
-        width: $toolbar-height;
+        height: $toolbar-height - 1px;
+        width: $toolbar-height - 1px;
         flex-shrink: 0;
     }
     .search-button {
@@ -2508,8 +2510,24 @@ $saved-search-control-height: 48px;
     margin: 0 15px 20px 15px;
     display: block;
     border-top: 1px solid transparent;
+    position: relative;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
-    background: transparent image-url("icon-next.svg") 50% 100% no-repeat;
+    .next-icon {
+        content: "";
+        display: block;
+        height: 18px;
+        width: 11px;
+        transform: rotate(270deg);
+        position: absolute;
+        margin-left: auto;
+        margin-right: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        svg * {
+            @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+        }
+    }
     .next-entry-feed, .next-entry-title {
         display: block;
         font-size: 14px;
@@ -2530,18 +2548,27 @@ $saved-search-control-height: 48px;
     display: flex;
     justify-content: center;
     .toolbar-button {
-        width: $bottom-toolbar-height;
+        width: 72px;
         text-align: center;
+        padding: 8px 0 8px 0;
     }
     .icon-next, .icon-previous {
         display: inline-block;
-        width: 23px;
-        height: 13px;
-        background: transparent image-url("icon-next.svg") 50% 50% no-repeat;
+        width: 11px;
+        height: 18px;
+        svg * {
+            @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+        }
+    }
+    .icon-next {
+        transform: rotate(90deg);
     }
     .icon-previous {
-        transform: rotate(180deg);
-    }
+        transform: rotate(270deg);
+/*        svg * {
+            @include fill($drawer-background-color, $text-color-light-night, $drawer-background-color-sunset);
+        }
+*/    }
 }
 
 .fluid .entry-inner {

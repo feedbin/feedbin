@@ -102,10 +102,14 @@ feedbin.Counts.get(feedbin.count_data);
         </div>
         <div class="bottom-toolbar entry-bottom-toolbar">
             <button class="toolbar-button" data-behavior="open_previous_entry">
-                <div class="icon-previous"></div>
+                <div class="icon-previous">
+                    <%= svg_tag "icon-arrow", size: "11x18" %>
+                </div>
             </button>
             <button class="toolbar-button" data-behavior="open_next_entry">
-                <div class="icon-next"></div>
+                <div class="icon-next">
+                    <%= svg_tag "icon-arrow", size: "11x18" %>
+                </div>
             </button>
         </div>
     </div>
