@@ -3406,38 +3406,14 @@ $saved-search-control-height: 48px;
     }
 }
 
-
-.tweet-header {
-    a {
-        border-bottom: none !important;
-    }
-}
-
-.theme-day .entry-final-content a, .theme-day .tweet-body a, .theme-day .modal-content .content-styles a {
-    color: black;
-    border-bottom: 1px solid rgba(#000, .3);
+.entry-final-content a, .tweet-text a, .modal-content .content-styles a {
+    border-bottom: 1px solid transparent;
+    @include border-color(rgba(#000, .3), white, rgba(#000, .3));
+    @include color(black, white, black);
     &:hover {
         text-decoration: none;
         color: $selected;
         border-bottom: 1px solid $selected;
-    }
-}
-
-.theme-sunset .entry-final-content a, .theme-sunset .tweet-body a, .theme-sunset .modal-content .content-styles a {
-    color: black;
-    border-bottom: 1px solid rgba(#000, .3);
-    &:hover {
-        text-decoration: none;
-        color: $selected;
-        border-bottom: 1px solid $selected;
-    }
-}
-
-.theme-night .entry-final-content a, .theme-night .tweet-body a, .theme-night .modal-content .content-styles a {
-    color: #fff;
-    text-decoration: underline;
-    &:hover {
-        color: $selected;
     }
 }
 
