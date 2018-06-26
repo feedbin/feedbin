@@ -1003,6 +1003,39 @@ Structure
             display: none;
         }
     }
+    .entries-column &, .entry-column & {
+        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    }
+}
+
+.toolbar-button {
+    @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+    text-decoration: none;
+    appearance: none;
+    display: inline-block;
+    border: none;
+    background: none;
+    margin: 0;
+    cursor: pointer;
+    height: 100%;
+    width: 100%;
+    display: inline-block;
+    padding: 8px 0 0 0;
+    &[disabled] {
+        cursor: default;
+        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    }
+    &:hover {
+        text-decoration: none;
+    }
+    .standalone-navigator & {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+.toolbar-button-inner {
+    height: 23px;
+    display: block;
 }
 
 .feeds-inner {
@@ -2373,6 +2406,14 @@ $saved-search-control-height: 48px;
     .theme-sunset & {
         background-image: image-url("logo-sunset.svg");
     }
+    .bottom-toolbar {
+        display: none;
+    }
+    @media (max-width: 550px) {
+        .bottom-toolbar {
+            display: flex;
+        }
+    }
 }
 
 .entry-content-wrap {
@@ -2399,6 +2440,12 @@ $saved-search-control-height: 48px;
     transition: top .2s ease;
     -webkit-overflow-scrolling: touch;
     z-index: 2;
+    @media (max-width: 550px) {
+        bottom: $bottom-toolbar-height - 1px;
+        .standalone-navigator & {
+            bottom: calc(#{$bottom-toolbar-height - 9px} + env(safe-area-inset-bottom));
+        }
+    }
 }
 
 .entry-inner {
@@ -2451,6 +2498,9 @@ $saved-search-control-height: 48px;
     &:hover {
         text-decoration: none;
     }
+    @media (max-width: 550px) {
+        display: none;
+    }
 }
 
 .next-entry-preview-inner {
@@ -2473,6 +2523,24 @@ $saved-search-control-height: 48px;
     }
     .next-entry-title {
         @include color($text-color, $text-color-night, $text-color-sunset);
+    }
+}
+
+.entry-bottom-toolbar {
+    display: flex;
+    justify-content: center;
+    .toolbar-button {
+        width: $bottom-toolbar-height;
+        text-align: center;
+    }
+    .icon-next, .icon-previous {
+        display: inline-block;
+        width: 23px;
+        height: 13px;
+        background: transparent image-url("icon-next.svg") 50% 50% no-repeat;
+    }
+    .icon-previous {
+        transform: rotate(180deg);
     }
 }
 
@@ -5421,31 +5489,6 @@ Buttons
     }
 }
 
-
-.toolbar-button {
-    @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-    text-decoration: none;
-    appearance: none;
-    display: inline-block;
-    border: none;
-    background: none;
-    margin: 0;
-    padding: 8px 0 0 0;
-    width: 65px;
-    cursor: pointer;
-    &[disabled] {
-        cursor: default;
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-    }
-    &:hover {
-        text-decoration: none;
-    }
-}
-
-.toolbar-button-inner {
-    height: 23px;
-    display: block;
-}
 
 .button-tag {
     width: 21px;

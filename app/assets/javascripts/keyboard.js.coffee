@@ -46,6 +46,13 @@ class feedbin.Keyboard
       @selectItem()
       event.preventDefault()
 
+    $(document).on 'click', '[data-behavior~=open_previous_entry]', (event) =>
+      @selectColumn('entries')
+      @setEnvironment()
+      @item = @previous
+      @selectItem()
+      event.preventDefault()
+
   navigateShareMenu: (combo) ->
     # If share menu is showing intercept up down
     dropdown = $('[data-behavior~=toggle_share_menu]').parents('.dropdown-wrap')
