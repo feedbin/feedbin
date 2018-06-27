@@ -3420,26 +3420,10 @@ $saved-search-control-height: 48px;
 }
 
 .inline-diff {
-    a, a.diff-ins, a.diff-del {
-        color: $selected;
-        text-decoration: none;
-    }
-    a:hover, a:hover.diff-ins, a:hover.diff-del {
-        color: $selected-hover;
-        text-decoration: underline;
-    }
 
     ins, .diff-ins {
         color: #468847;
         background: #dff0d8;
-        a {
-            color: $selected;
-            text-decoration: none;
-        }
-        a:hover {
-            color: $selected-hover;
-            text-decoration: underline;
-        }
     }
 
     ins, .diff-ins {
@@ -3463,14 +3447,6 @@ $saved-search-control-height: 48px;
         background: #f2dede;
         img {
             opacity: .5;
-        }
-        a {
-            color: $selected;
-            text-decoration: none;
-        }
-        a:hover {
-            color: $selected-hover;
-            text-decoration: underline;
         }
     }
 
