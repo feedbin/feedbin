@@ -2559,7 +2559,7 @@ $saved-search-control-height: 48px;
             padding-left: 30px;
         }
         .standalone-navigator & {
-            padding-bottom: unquote('max(8px, env(safe-area-inset-bottom))');
+            padding-bottom: env(safe-area-inset-bottom);
         }
         .icon-next, .icon-previous {
             display: inline-block;
