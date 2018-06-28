@@ -1162,6 +1162,8 @@ Structure
                 border-radius: 0;
                 text-overflow: ellipsis;
                 cursor: text;
+                position: relative;
+                left: -2px;
                 @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
                 &.disabled {
                     cursor: pointer;
@@ -1182,7 +1184,7 @@ Structure
                 display: flex;
             }
             .favicon-wrap {
-                margin-right: 5px;
+                margin-right: 6px;
                 flex-shrink: 0;
             }
             .collection-label-wrap {
@@ -1193,13 +1195,24 @@ Structure
                 text-overflow: ellipsis;
                 overflow: hidden;
                 white-space: nowrap;
+                &.hide {
+                    display: none;
+                }
+            }
+            .count-wrap {
+                margin-left: auto;
+                width: 40px;
+                display: block;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                text-align: right;
+                flex-shrink: 0;
             }
             .count {
                 @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
-                margin-left: auto;
-                padding-left: 5px;
             }
-            .tag-link .count {
+            .tag-link .count-wrap {
                 margin-left: 0;
             }
             .toggle-drawer {
@@ -1631,6 +1644,7 @@ $saved-search-control-height: 48px;
     position: relative;
     word-wrap: break-word;
     .favicon-wrap {
+        position: absolute;
         top: -2px;
         left: -26px;
         @media (max-width: 550px) {
