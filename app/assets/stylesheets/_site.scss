@@ -1397,17 +1397,19 @@ li.selected > a .favicon-wrap {
 }
 
 .back-button {
-    background-color: transparent;
-    background-size: 11px 15px;
-    background-repeat: no-repeat;
-    background-image: image-url("icon-left-arrow.svg");
-    background-position: center center;
     display: block;
     appearance: none;
     border: none;
     height: 16px;
     width: 11px;
     padding: 0;
+    background-color: transparent;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    svg * {
+        @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+    }
     .full-screen & {
         display: none !important;
     }
@@ -1437,10 +1439,10 @@ li.selected > a .favicon-wrap {
         text-overflow: ellipsis;
     }
     .back-button {
-        display: inline-block;
+        display: flex;
         position: static;
-        height: $toolbar-height;
-        width: $toolbar-height;
+        height: $toolbar-height - 1px;
+        width: $toolbar-height - 1px;
         flex-shrink: 0;
     }
     .search-button {
@@ -1729,7 +1731,7 @@ $saved-search-control-height: 48px;
         line-height: 1.3;
         font-size: 12px;
         @media (max-width: 550px) {
-            font-size: 13px;
+            font-size: 14px;
             margin-bottom: 2px;
         }
     }
@@ -1751,7 +1753,7 @@ $saved-search-control-height: 48px;
         @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         display: block;
         @media (max-width: 550px) {
-            font-size: 14px;
+            font-size: 15px;
         }
     }
     .quoted-summary {
@@ -1776,7 +1778,7 @@ $saved-search-control-height: 48px;
             }
         }
         @media (max-width: 550px) {
-            font-size: 15px;
+            font-size: 16px;
         }
     }
     &.no-title {
@@ -2508,8 +2510,24 @@ $saved-search-control-height: 48px;
     margin: 0 15px 20px 15px;
     display: block;
     border-top: 1px solid transparent;
+    position: relative;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
-    background: transparent image-url("icon-next.svg") 50% 100% no-repeat;
+    .next-icon {
+        content: "";
+        display: block;
+        height: 18px;
+        width: 11px;
+        transform: rotate(270deg);
+        position: absolute;
+        margin-left: auto;
+        margin-right: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        svg * {
+            @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+        }
+    }
     .next-entry-feed, .next-entry-title {
         display: block;
         font-size: 14px;
@@ -2530,17 +2548,38 @@ $saved-search-control-height: 48px;
     display: flex;
     justify-content: center;
     .toolbar-button {
-        width: $bottom-toolbar-height;
-        text-align: center;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        &.button-previous {
+            text-align: right;
+            padding-right: 30px;
+        }
+        &.button-next {
+            text-align: left;
+            padding-left: 30px;
+        }
+        .standalone-navigator & {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .icon-next, .icon-previous {
+            display: inline-block;
+            width: 11px;
+            height: 18px;
+            svg * {
+                @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+            }
+        }
+        &[disabled] {
+            svg * {
+                @include fill($drawer-background-color, $text-color-light-night, $drawer-background-color-sunset);
+            }
+        }
     }
-    .icon-next, .icon-previous {
-        display: inline-block;
-        width: 23px;
-        height: 13px;
-        background: transparent image-url("icon-next.svg") 50% 50% no-repeat;
+    .icon-next {
+        transform: rotate(270deg);
     }
     .icon-previous {
-        transform: rotate(180deg);
+        transform: rotate(90deg);
     }
 }
 
@@ -3177,7 +3216,7 @@ $saved-search-control-height: 48px;
 
     figcaption, caption {
         font-size: 80%;
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         font-style: italic;
         line-height: 1.3;
     }
@@ -3376,63 +3415,22 @@ $saved-search-control-height: 48px;
     }
 }
 
-/*
-.entry-callout, .tweet-header {
-    a {
-        border-bottom: none !important;
-    }
-}
-
-.theme-day .content-styles a, .theme-day .tweet-body a {
-    color: black;
-    border-bottom: 1px solid rgba(#000, .3);
+.entry-final-content a, .tweet-text a, .modal-content .content-styles a {
+    border-bottom: 1px solid transparent;
+    @include border-color(rgba(#000, .3), white, rgba(#000, .3));
+    @include color(black, white, black);
     &:hover {
         text-decoration: none;
         color: $selected;
         border-bottom: 1px solid $selected;
-    }
-}
-
-.theme-sunset .content-styles a, .theme-sunset .tweet-body a {
-    color: black;
-    border-bottom: 1px solid rgba(#000, .3);
-    &:hover {
-        text-decoration: none;
-        color: $selected;
-        border-bottom: 1px solid $selected;
-    }
-}
-*/
-
-.theme-night .content-styles a, .theme-night .tweet-body a {
-    color: #fff;
-    text-decoration: underline;
-    &:hover {
-        color: $selected;
     }
 }
 
 .inline-diff {
-    a, a.diff-ins, a.diff-del {
-        color: $selected;
-        text-decoration: none;
-    }
-    a:hover, a:hover.diff-ins, a:hover.diff-del {
-        color: $selected-hover;
-        text-decoration: underline;
-    }
 
     ins, .diff-ins {
         color: #468847;
         background: #dff0d8;
-        a {
-            color: $selected;
-            text-decoration: none;
-        }
-        a:hover {
-            color: $selected-hover;
-            text-decoration: underline;
-        }
     }
 
     ins, .diff-ins {
@@ -3456,14 +3454,6 @@ $saved-search-control-height: 48px;
         background: #f2dede;
         img {
             opacity: .5;
-        }
-        a {
-            color: $selected;
-            text-decoration: none;
-        }
-        a:hover {
-            color: $selected-hover;
-            text-decoration: underline;
         }
     }
 

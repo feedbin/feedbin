@@ -3,7 +3,9 @@
       <%= text_area_tag "source_link_field", entry.fully_qualified_url, class: "visually-hidden" %>
       <div class="entry-toolbar">
         <div class="site-info">
-          <button class="back-button" data-behavior="show_entries"></button>
+          <button class="back-button" data-behavior="show_entries">
+              <%= svg_tag "icon-arrow", size: "11x18" %>
+          </button>
           <button class="entry-button button-full-screen" data-behavior="full_screen" title="Close full screen">
               <%= svg_tag 'icon-full-screen-close-small', size: '16x16' %>
           </button>
@@ -38,10 +40,13 @@
               <%= render partial: "article", locals: {entry: entry, user: user, updated_entries: updated_entries} %>
           <% end %>
         </div>
-        <button class="next-entry-preview no-content" data-behavior="open_next_entry">
+        <button class="next-entry-preview no-content" data-behavior="open_next_entry needs_next">
           <span class="next-entry-preview-inner">
             <span class="next-entry-feed"></span>
             <span class="next-entry-title"></span>
+            <span class="next-icon">
+                <%= svg_tag "icon-arrow", size: "11x18" %>
+            </span>
           </span>
         </button>
       </div>
