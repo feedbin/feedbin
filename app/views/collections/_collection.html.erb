@@ -3,7 +3,7 @@
     <span class="favicon-wrap collection-favicon">
       <%= svg_tag collection[:favicon_class], size: '16x16' %>
     </span>
-    <%= content_tag :span, '', class: 'count', data: collection[:count_data] %>
     <%= collection[:title] %>
+    <%= content_tag :span, '', class: 'count', data: collection[:count_data] %>
   <% end %>
 <% end %>

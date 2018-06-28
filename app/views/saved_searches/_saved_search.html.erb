@@ -4,8 +4,8 @@
       <span class="favicon-wrap collection-favicon">
         <%= svg_tag 'favicon-search', size: '16x16' %>
       </span>
-      <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'bySavedSearch', count_group_id: saved_search.id} %>
       <%= saved_search_presenter.name %>
+      <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'bySavedSearch', count_group_id: saved_search.id} %>
     <% end %>
   </li>
 <% end %>

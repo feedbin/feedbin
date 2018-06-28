@@ -1146,10 +1146,14 @@ Structure
             a {
                 text-decoration: none;
             }
+            .rename-form {
+                margin: 0;
+                padding: 0;
+            }
             .rename-feed-input {
                 appearance: none;
                 padding: 2px;
-                margin: -9px 0 -7px -2px;
+                margin: 0;
                 line-height: 1;
                 border: 0;
                 font-size: 100%;
@@ -1172,23 +1176,60 @@ Structure
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 width: 100%;
-                padding: 9px 40px 10px 38px;
+                padding: 6px 10px;
                 display: block;
-                line-height: 1;
+                align-items: center;
+                display: flex;
             }
-            .tag-link {
-                padding-right: 80px;
+            .favicon-wrap {
+                margin-right: 5px;
+                flex-shrink: 0;
+            }
+            .collection-label-wrap {
+                min-width: 0;
+            }
+            .collection-label {
+                display: block;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
             }
             .count {
-                font-size: 12px;
                 @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
-                position: absolute;
-                right: 10px;
-                top: 10px;
+                margin-left: auto;
+                padding-left: 5px;
+            }
+            .tag-link .count {
+                margin-left: 0;
             }
             .toggle-drawer {
                 padding: 0;
                 margin: 0;
+                margin-left: auto;
+                position: relative;
+                overflow: visible;
+                min-width: 50px;
+                height: 1px;
+                .feed-action-button {
+                    font-weight: bold;
+                    @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+                    font-size: 11px;
+                    display: block;
+                    appearance: none;
+                    background: none;
+                    border: none;
+                    padding: 0;
+                    margin: 0;
+                    display: block;
+                    position: absolute;
+                    width: 50px;
+                    height: 40px;
+                    top: -20px;
+                    right: 0px;
+                    &:hover {
+                        color: #999;
+                    }
+                }
             }
             &.ui-draggable-dragging {
                 background-color: rgba(255,255,255, 1);
@@ -1236,25 +1277,6 @@ Structure
     }
     .droppable-hover > a {
         background-color: $selected !important;
-    }
-}
-
-.feed-action-button {
-    position: absolute;
-    right: 45px;
-    top: 0;
-    font-weight: bold;
-    @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-    font-size: 11px;
-    display: block;
-    appearance: none;
-    background: none;
-    border: none;
-    padding: 9px 3px 10px 3px;
-    margin: 0;
-    display: block;
-    &:hover {
-        color: #999;
     }
 }
 
@@ -1322,17 +1344,13 @@ Structure
 }
 
 .favicon-wrap {
-    pointer-events: none;
-    z-index: 0;
     display: block;
     height: 20px;
     width: 20px;
-    position: absolute;
-    left: 12px;
-    top: 6px;
     background-color: #FFF;
     display: flex;
     align-items: center;
+    justify-content: center;
     box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
     border-radius: 1px;
     .favicon, svg, img {
@@ -1342,7 +1360,6 @@ Structure
         height: 16px;
         width: 16px;
         display: block;
-        margin: auto;
     }
     &.twitter-profile-image {
         border-radius: 20px;
@@ -8148,17 +8165,8 @@ Media Queries
     }
     .feeds ul li .feed-link {
         font-size: 16px;
-        padding: 13px 40px 13px 40px;
-        .favicon-wrap {
-            top: 11px;
-        }
-        .feed-action-button {
-            top: 6px;
-        }
-        .count {
-            top: 15px;
-            font-size: 14px;
-        }
+        padding-top: 11px;
+        padding-bottom: 11px;
     }
     .app-wrap {
         .feeds-column,

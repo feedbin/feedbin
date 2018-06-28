@@ -9,13 +9,13 @@ end
     <span class="favicon-wrap collection-favicon">
       <%= svg_tag 'favicon-tag', size: '16x16' %>
     </span>
-    <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byTag', count_group_id: tag.id} %>
+    <span class="collection-label-wrap" data-behavior="rename_target" data-form-action="<%= tag_path(tag) %>" data-input-name="tag[name]" data-title="<%= tag.name %>", data-original-title="<%= tag.name %>">
+      <span class="collection-label" data-behavior="rename_title"><%= tag.name %></span>
+    </span>
     <% unless hide_drawer %>
       <%= render partial: 'tags/tag_visibility', locals: {user: @user, tag: tag} %>
     <% end %>
-    <span data-behavior="rename_target" data-form-action="<%= tag_path(tag) %>" data-input-name="tag[name]" data-title="<%= tag.name %>", data-original-title="<%= tag.name %>">
-      <span data-behavior="rename_title"><%= tag.name %></span>
-    </span>
+    <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byTag', count_group_id: tag.id} %>
   <% end %>
   <div class="drawer <%= hide_drawer ? ' hide' : '' %>" data-hidden="<%= drawer_visible?(tag.id) ? 'false' : 'true' %>" style="<%= drawer_visible?(tag.id) ? '' : 'height: 0;' %>">
     <ul>

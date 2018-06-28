@@ -879,6 +879,7 @@ $.extend feedbin,
             "method": "post"
             "action": data.formAction
             "data-behavior": "rename_form"
+            "class": "rename-form"
           form = $('<form>', formAttributes)
 
           inputAttributes =
@@ -914,6 +915,10 @@ $.extend feedbin,
 
         $('[data-behavior~=rename_form]').remove()
         $('[data-behavior~=rename_title]').removeClass('hide')
+
+      $(document).on 'click', '[data-behavior~=rename_input]', (event) ->
+        event.stopPropagation()
+        event.preventDefault()
 
       $(document).on 'click', '[data-behavior~=open_item]', (event) ->
         unless $(event.target).is('[data-behavior~=rename_input]')
