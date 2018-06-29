@@ -3664,6 +3664,12 @@ $saved-search-control-height: 48px;
             display: flex;
             align-items: center;
             position: relative;
+            a {
+                border-bottom: none;
+                &:hover {
+                    border-bottom: none;
+                }
+            }
         }
         .profile-info {
             flex-grow: 1;
