@@ -3120,7 +3120,7 @@ $saved-search-control-height: 48px;
     h1, h2, h3, h4, h5, h6 {
         font-weight: bold;
         font-style: normal;
-        margin: 0 0 .5em 0;
+        margin: .5em 0 .5em 0;
         text-rendering: optimizeLegibility;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
     }
@@ -3141,7 +3141,18 @@ $saved-search-control-height: 48px;
     figure,
     blockquote,
     .media-container {
-        margin: 0 0 1.1em 0;
+        margin: 1.1em 0 1.1em 0;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        & + p,
+        & + ul,
+        & + ol,
+        & + figure,
+        & + blockquote,
+        & + .media-container {
+            margin-top: 0;
+        }
     }
 
     blockquote[align="center"] {
@@ -3199,11 +3210,6 @@ $saved-search-control-height: 48px;
         padding: 0 0 0 15px;
         border-left: 4px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
-    }
-
-    blockquote,
-    blockquote p {
-        @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
     }
 
     blockquote p:last-child {
