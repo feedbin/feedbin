@@ -1491,6 +1491,7 @@ li.selected > a .favicon-wrap {
         flex-shrink: 0;
     }
     .favicon-wrap {
+        position: absolute;
         left: 0;
         top: -2px;
     }
@@ -1814,6 +1815,7 @@ $saved-search-control-height: 48px;
     }
     &.no-title {
         .favicon-wrap {
+            position: absolute;
             display: flex;
             top: 8px;
             z-index: 3;
@@ -1992,6 +1994,7 @@ $saved-search-control-height: 48px;
         padding-top: 8px;
         padding-bottom: 8px;
         > .favicon-wrap {
+            position: absolute;
             display: flex;
             top: 5px;
             z-index: 3;
@@ -3373,6 +3376,7 @@ $saved-search-control-height: 48px;
             @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         }
         .favicon-wrap {
+            position: absolute;
             top: 10px;
             left: 8px;
             background-color: #FFF;
@@ -5842,6 +5846,7 @@ Link Viewer
     }
     position: relative;
     .favicon-wrap {
+        position: absolute;
         left: -26px;
         top: 1px;
     }
