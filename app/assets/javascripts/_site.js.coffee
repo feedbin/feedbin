@@ -657,6 +657,8 @@ $.extend feedbin,
     feedbin.closeEntryBasementTimeount = setTimeout ( ->
       $('.basement-panel').addClass('hide')
       $('.field-cluster input').blur()
+      $('.entry-content').css
+        "bottom": "41px"
     ), timeout
 
     clearTimeout(feedbin.openEntryBasementTimeount)
@@ -664,12 +666,16 @@ $.extend feedbin,
     top = $('.entry-toolbar').outerHeight()
     $('.entry-basement').removeClass('open')
     $('.entry-content').css
-      "top": "41px"
+      "transform": "translateY(41px)"
+      "bottom": "41px"
 
   openEntryBasement: (selectedPanel) ->
     feedbin.openEntryBasementTimeount = setTimeout ( ->
       $('.entry-basement').addClass('foreground')
       $('.field-cluster input', selectedPanel).first().select()
+      newTop = selectedPanel.height() + 41
+      $('.entry-content').css
+        "bottom": "#{newTop}px"
     ), 200
 
     clearTimeout(feedbin.closeEntryBasementTimeount)
@@ -681,7 +687,7 @@ $.extend feedbin,
     $('.entry-basement').addClass('open')
     newTop = selectedPanel.height() + 41
     $('.entry-content').css
-      "top": "#{newTop}px"
+      "transform": "translateY(#{newTop}px)"
 
   applyStarred: (entryId) ->
     if feedbin.Counts.get().isStarred(entryId)
