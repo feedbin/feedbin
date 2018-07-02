@@ -134,14 +134,25 @@ $.extend feedbin,
     content_target = $('[data-behavior~=inner_content_target]')
 
     if inner
-      next = $('<div class="next-entry load-next-entry"></div>').html(inner)
+      id = feedbin.selectedEntry.id
+      nextEntry = feedbin.entries[id + 1]
 
-      content_target.html(inner)
-      content_target.append(next)
+      next = $('<div class="next-entry load-next-entry"></div>').html(nextEntry.inner_content)
+
+      # content_target.html(inner)
+      next.insertAfter(content_target)
 
       setTimeout ( ->
         next.removeClass("load-next-entry")
       ), 1
+
+      content_target.fadeOut(200)
+
+      setTimeout ( ->
+        next.removeClass("next-entry")
+        next.attr("data-behavior", "inner_content_target")
+        content_target.remove()
+      ), 200
 
 
 

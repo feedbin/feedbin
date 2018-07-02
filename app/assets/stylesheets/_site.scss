@@ -2488,13 +2488,13 @@ $saved-search-control-height: 48px;
 
 .next-entry {
     height: 100vh;
-    background-color: gray;
     z-index: 1000;
     position: absolute;
     left: 0;
     right: 0;
-    transition: transform .3s ease;
-    transform: translate3d(0, $toolbar-height, 0);
+    transition: transform .2s ease;
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
 }
 
 .load-next-entry {
