@@ -101,6 +101,8 @@ class feedbin.CountsBehavior
     container = $(event.currentTarget)
     entry = $(container).data('entry-info')
 
+    feedbin.previousEntry = feedbin.selectedEntry
+
     feedbin.selectedEntry =
       id: entry.id
       feed_id: entry.feed_id

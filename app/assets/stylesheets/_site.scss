@@ -2446,6 +2446,9 @@ $saved-search-control-height: 48px;
     .bottom-toolbar {
         display: none;
     }
+    &.has-content {
+        background: none;
+    }
     @media (max-width: 550px) {
         .bottom-toolbar {
             display: flex;
@@ -2475,7 +2478,7 @@ $saved-search-control-height: 48px;
     margin: 0;
     bottom: $toolbar-height;
     transform: translate3d(0, $toolbar-height, 0);
-    transition: transform .2s ease;
+    transition: transform .25s ease;
     -webkit-overflow-scrolling: touch;
     z-index: 2;
     @media (max-width: 550px) {
@@ -2488,11 +2491,10 @@ $saved-search-control-height: 48px;
 
 .next-entry {
     height: 100vh;
-    z-index: 1000;
     position: absolute;
     left: 0;
     right: 0;
-    transition: transform .2s ease;
+    transition: transform .25s ease;
     transform: translate3d(0, 0, 0);
     opacity: 1;
 }

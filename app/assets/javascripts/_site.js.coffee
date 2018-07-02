@@ -133,7 +133,12 @@ $.extend feedbin,
 
     content_target = $('[data-behavior~=inner_content_target]')
 
-    if inner
+    if html == ""
+      $('[data-behavior~=content_column]').removeClass("has-content")
+    else
+      $('[data-behavior~=content_column]').addClass("has-content")
+
+    if inner != ""
       id = feedbin.selectedEntry.id
       nextEntry = feedbin.entries[id + 1]
 
@@ -144,15 +149,17 @@ $.extend feedbin,
 
       setTimeout ( ->
         next.removeClass("load-next-entry")
+        $(".entry-content", content_target).css
+          "transform": "translate3d(0, -100vh, 0)"
       ), 1
 
-      content_target.fadeOut(200)
+      content_target.fadeOut(250)
 
       setTimeout ( ->
         next.removeClass("next-entry")
         next.attr("data-behavior", "inner_content_target")
         content_target.remove()
-      ), 200
+      ), 250
 
 
 
