@@ -318,6 +318,7 @@ class EntriesController < ApplicationController
       }
       hash[entry.id] = {
         content: render_to_string(partial: "entries/show", formats: [:html], locals: locals),
+        inner_content: render_to_string(partial: "entries/inner_content", formats: [:html], locals: locals),
         feed_id: entry.feed_id
       }
     end

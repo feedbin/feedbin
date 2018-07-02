@@ -2436,6 +2436,7 @@ $saved-search-control-height: 48px;
     background-position: 50% 50%;
     background-repeat: no-repeat;
     background-size: 120px 120px;
+    overflow: hidden;
     .theme-night & {
         background-image: image-url("logo-night.svg");
     }
@@ -2483,6 +2484,21 @@ $saved-search-control-height: 48px;
             bottom: calc(#{$bottom-toolbar-height - 9px} + env(safe-area-inset-bottom));
         }
     }
+}
+
+.next-entry {
+    height: 100vh;
+    background-color: gray;
+    z-index: 1000;
+    position: absolute;
+    left: 0;
+    right: 0;
+    transition: transform .3s ease;
+    transform: translate3d(0, $toolbar-height, 0);
+}
+
+.load-next-entry {
+    transform: translate3d(0, 100vh, 0);
 }
 
 .entry-inner {

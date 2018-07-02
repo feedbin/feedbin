@@ -127,9 +127,23 @@ $.extend feedbin,
   updatePager: (html) ->
     $('[data-behavior~=pagination]').html(html)
 
-  updateEntryContent: (html) ->
+  updateEntryContent: (html, inner = "") ->
     feedbin.closeEntryBasement(0)
     $('[data-behavior~=entry_content_target]').html(html)
+
+    content_target = $('[data-behavior~=inner_content_target]')
+
+    if inner
+      next = $('<div class="next-entry load-next-entry"></div>').html(inner)
+
+      content_target.html(inner)
+      content_target.append(next)
+
+      setTimeout ( ->
+        next.removeClass("load-next-entry")
+      ), 1
+
+
 
   updateFeeds: (feeds) ->
     $('[data-behavior~=feeds_target]').html(feeds)
@@ -695,7 +709,7 @@ $.extend feedbin,
 
   showEntry: (entryId) ->
     entry = feedbin.entries[entryId]
-    feedbin.updateEntryContent(entry.content)
+    feedbin.updateEntryContent(entry.content, entry.inner_content)
     feedbin.formatEntryContent(entryId, true)
 
   tagFeed: (url, tag, noResponse = true) ->
