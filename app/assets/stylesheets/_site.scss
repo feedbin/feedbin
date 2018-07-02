@@ -3884,6 +3884,9 @@ $saved-search-control-height: 48px;
     .modal-conversation & {
         .tweet-body {
             padding-left: 57px;
+            @media (max-width: 550px) {
+                padding-left: 0;
+            }
         }
         .quoted-tweet .tweet-body {
             padding-left: 0;
