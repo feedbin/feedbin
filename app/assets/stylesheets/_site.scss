@@ -2480,7 +2480,7 @@ $saved-search-control-height: 48px;
     bottom: $toolbar-height;
     will-change: transform, opacity;
     transform: translateY($toolbar-height);
-    transition: transform .2s ease, opacity .2s ease;
+    transition: transform .15s ease, opacity .15s ease;
     opacity: 1;
     -webkit-overflow-scrolling: touch;
     z-index: 2;
@@ -2506,7 +2506,7 @@ $saved-search-control-height: 48px;
     left: 0;
     right: 0;
     will-change: transform;
-    transition: transform .2s ease;
+    transition: transform .15s ease;
     transform: translateY(0, 0, 0);
     opacity: 1;
 }

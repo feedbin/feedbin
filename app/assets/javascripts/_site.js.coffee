@@ -179,7 +179,7 @@ $.extend feedbin,
         next.removeClass("previous-entry")
         next.attr("data-behavior", "inner_content_target")
         innerContent.remove()
-      ), 200
+      ), 150
     else
       innerContent.html(inner)
 
