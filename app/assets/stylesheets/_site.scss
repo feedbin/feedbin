@@ -2477,63 +2477,55 @@ $saved-search-control-height: 48px;
     right: 0;
     margin: 0;
     bottom: $toolbar-height;
-    transform: translate3d(0, $toolbar-height, 0);
-    transition: transform .25s ease;
+    will-change: transform, opacity;
+    transform: translateY($toolbar-height);
+    transition: transform .2s ease, opacity .2s ease;
+    opacity: 1;
     -webkit-overflow-scrolling: touch;
     z-index: 2;
     @media (max-width: 550px) {
-        bottom: $bottom-toolbar-height - 1px;
+        bottom: $bottom-toolbar-height + $toolbar-height - 1px;
         .standalone-navigator & {
-            bottom: calc(#{$bottom-toolbar-height - 9px} + env(safe-area-inset-bottom));
+            bottom: calc(#{$bottom-toolbar-height + $toolbar-height - 9px} + env(safe-area-inset-bottom));
         }
+    }
+    &.slide-up {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    &.slide-down {
+        transform: translateY(100vh);
+        opacity: 0;
     }
 }
 
-.next-entry {
+.next-entry, .previous-entry {
     height: 100vh;
     position: absolute;
     left: 0;
     right: 0;
-    transition: transform .25s ease;
-    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    transition: transform .2s ease;
+    transform: translateY(0, 0, 0);
     opacity: 1;
 }
 
 .load-next-entry {
-    transform: translate3d(0, 100vh, 0);
+    transform: translateY(100vh);
+    &.previous-entry {
+        transform: translateY(-100vh);
+    }
 }
 
 .entry-inner {
-    padding: 40px 20px 40px 20px;
-    margin: 0 auto;
-    max-width: 660px;
     min-height: 100%;
     transition: max-width .3s linear;
 }
 
-.font-size-0,
-.font-size-1 {
-    .entry-inner {
-        max-width: 590px;
-    }
-}
-
-.font-size-2,
-.font-size-3,
-.font-size-4,
-.font-size-5,
-.font-size-6,
-.font-size-7 {
-    .entry-inner {
-        max-width: 660px;
-    }
-}
-
-.font-size-8,
-.font-size-9 {
-    .entry-inner {
-        max-width: 720px;
-    }
+.entry-inner, .next-entry-preview {
+    padding: 40px 20px 40px 20px;
+    margin: 0 auto;
+    max-width: 660px;
 }
 
 .next-entry-preview {
@@ -2544,7 +2536,6 @@ $saved-search-control-height: 48px;
     padding: 0;
     text-align: left;
     width: 100%;
-    max-width: 620px;
     margin: 0 auto;
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     &.no-content {
@@ -2601,8 +2592,7 @@ $saved-search-control-height: 48px;
     display: flex;
     justify-content: center;
     .toolbar-button {
-        padding-top: 8px;
-        padding-bottom: 8px;
+        padding: 0;
         &.button-previous {
             text-align: right;
             padding-right: 30px;

@@ -1,5 +1,17 @@
 window.feedbin ?= {}
 
+(($) ->
+
+  $.fn.isAfter = (sel) ->
+    @prevAll().filter(sel).length != 0
+
+  $.fn.isBefore = (sel) ->
+    @nextAll().filter(sel).length != 0
+
+  return
+) jQuery
+
+
 $.extend feedbin,
 
   messageTimeout: null
@@ -129,39 +141,47 @@ $.extend feedbin,
 
   updateEntryContent: (html, inner = "") ->
     feedbin.closeEntryBasement(0)
-    $('[data-behavior~=entry_content_target]').html(html)
+    outerContent = $('[data-behavior~=entry_content_target]')
+    innerContent = $('[data-behavior~=inner_content_target]')
 
-    content_target = $('[data-behavior~=inner_content_target]')
+    outerContent.html(html)
 
     if html == ""
       $('[data-behavior~=content_column]').removeClass("has-content")
+      innerContent.html("")
+      feedbin.previousEntry = null
+      feedbin.selectedEntry = null
     else
       $('[data-behavior~=content_column]').addClass("has-content")
 
-    if inner != ""
-      id = feedbin.selectedEntry.id
-      nextEntry = feedbin.entries[id + 1]
+    if feedbin.previousEntry && feedbin.previousEntry.container.is(feedbin.selectedEntry.container)
+      innerContent.html(inner)
+    else if feedbin.previousEntry
 
-      next = $('<div class="next-entry load-next-entry"></div>').html(nextEntry.inner_content)
+      if $(feedbin.selectedEntry.container.closest("li")).isAfter(feedbin.previousEntry.container.closest("li"))
+        next = $('<div class="next-entry load-next-entry"></div>')
+        transitionClass = "slide-up"
+      else
+        next = $('<div class="previous-entry load-next-entry"></div>')
+        transitionClass = "slide-down"
 
-      # content_target.html(inner)
-      next.insertAfter(content_target)
+      next.html(inner)
+
+      next.insertAfter(innerContent)
 
       setTimeout ( ->
         next.removeClass("load-next-entry")
-        $(".entry-content", content_target).css
-          "transform": "translate3d(0, -100vh, 0)"
+        $(".entry-content", innerContent).addClass(transitionClass)
       ), 1
-
-      content_target.fadeOut(250)
 
       setTimeout ( ->
         next.removeClass("next-entry")
+        next.removeClass("previous-entry")
         next.attr("data-behavior", "inner_content_target")
-        content_target.remove()
-      ), 250
-
-
+        innerContent.remove()
+      ), 200
+    else
+      innerContent.html(inner)
 
   updateFeeds: (feeds) ->
     $('[data-behavior~=feeds_target]').html(feeds)
@@ -689,17 +709,17 @@ $.extend feedbin,
     feedbin.closeEntryBasementTimeount = setTimeout ( ->
       $('.basement-panel').addClass('hide')
       $('.field-cluster input').blur()
-      $('.entry-content').css
-        "bottom": "41px"
+      if $('.entry-content').length > 0
+        $('.entry-content')[0].style.removeProperty("bottom")
     ), timeout
 
     clearTimeout(feedbin.openEntryBasementTimeount)
     $('.entry-basement').removeClass('foreground')
     top = $('.entry-toolbar').outerHeight()
     $('.entry-basement').removeClass('open')
-    $('.entry-content').css
-      "transform": "translateY(41px)"
-      "bottom": "41px"
+    if $('.entry-content').length > 0
+      $('.entry-content')[0].style.removeProperty("bottom")
+      $('.entry-content')[0].style.removeProperty("transform")
 
   openEntryBasement: (selectedPanel) ->
     feedbin.openEntryBasementTimeount = setTimeout ( ->
