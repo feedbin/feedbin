@@ -1471,8 +1471,8 @@ li.selected > a .favicon-wrap {
     .back-button {
         display: flex;
         position: static;
-        height: $toolbar-height - 1px;
-        width: $toolbar-height - 1px;
+        height: $toolbar-height;
+        width: $toolbar-height;
         flex-shrink: 0;
     }
     .search-button {
@@ -2116,6 +2116,7 @@ $saved-search-control-height: 48px;
         display: none;
         height: $toolbar-height;
         width: $toolbar-height;
+        flex-shrink: 0;
     }
     .button-full-screen {
         display: none;
@@ -8116,7 +8117,7 @@ Media Queries
                 padding: 0 10px 0 5px;
             }
             .back-button {
-                display: block;
+                display: flex;
             }
             .entry-feed-title {
                 display: none;
