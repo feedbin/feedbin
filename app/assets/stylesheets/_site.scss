@@ -1788,6 +1788,13 @@ $saved-search-control-height: 48px;
             font-size: 15px;
         }
     }
+    .body {
+        @media (max-width: 320px) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
     .quoted-summary {
         margin-top: 8px !important;
         padding: 8px;
