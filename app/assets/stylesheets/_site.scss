@@ -2485,9 +2485,9 @@ $saved-search-control-height: 48px;
     -webkit-overflow-scrolling: touch;
     z-index: 2;
     @media (max-width: 550px) {
-        bottom: $bottom-toolbar-height - 1px;
+        bottom: $bottom-toolbar-height + $toolbar-height - 1px;
         .standalone-navigator & {
-            bottom: calc(#{$bottom-toolbar-height - 9px} + env(safe-area-inset-bottom));
+            bottom: calc(#{$bottom-toolbar-height + $toolbar-height - 9px} + env(safe-area-inset-bottom));
         }
     }
 }

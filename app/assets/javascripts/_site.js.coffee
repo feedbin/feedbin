@@ -657,17 +657,17 @@ $.extend feedbin,
     feedbin.closeEntryBasementTimeount = setTimeout ( ->
       $('.basement-panel').addClass('hide')
       $('.field-cluster input').blur()
-      $('.entry-content').css
-        "bottom": "41px"
+      if $('.entry-content').length > 0
+        $('.entry-content')[0].style.removeProperty("bottom")
     ), timeout
 
     clearTimeout(feedbin.openEntryBasementTimeount)
     $('.entry-basement').removeClass('foreground')
     top = $('.entry-toolbar').outerHeight()
     $('.entry-basement').removeClass('open')
-    $('.entry-content').css
-      "transform": "translateY(41px)"
-      "bottom": "41px"
+    if $('.entry-content').length > 0
+      $('.entry-content')[0].style.removeProperty("bottom")
+      $('.entry-content')[0].style.removeProperty("transform")
 
   openEntryBasement: (selectedPanel) ->
     feedbin.openEntryBasementTimeount = setTimeout ( ->
