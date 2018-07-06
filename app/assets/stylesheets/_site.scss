@@ -2464,13 +2464,22 @@ $saved-search-control-height: 48px;
     }
 }
 
+.entry-meta {
+    position: absolute;
+    height: $toolbar-height;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
 .entry-content-wrap {
     overflow: hidden;
     position: absolute;
-    top: 0;
+    top: $toolbar-height;
     bottom: 0;
     left: 0;
     right: 0;
+    z-index: 1;
 }
 
 .entry-content {
@@ -2480,7 +2489,7 @@ $saved-search-control-height: 48px;
     height: auto;
     overflow-y: auto;
     overflow-x: hidden;
-    top: $toolbar-height;
+    top: 0;
     left: 0;
     right: 0;
     margin: 0;
@@ -5861,11 +5870,6 @@ Link Viewer
         white-space: nowrap;
     }
     position: relative;
-    .favicon-wrap {
-        position: absolute;
-        left: -26px;
-        top: 1px;
-    }
 }
 
 .placeholder-content h1:empty, .placeholder-content p:empty {
@@ -6552,9 +6556,6 @@ Fullscreen
         position: absolute !important;
         top: -9999px !important;
         left: -9999px !important;
-    }
-    .entry-content-wrap {
-        top: 0;
     }
     .app-panel {
         border-top: none;
@@ -8148,9 +8149,6 @@ Media Queries
     }
     .account-toolbar {
         display: none;
-    }
-    .entry-content-wrap {
-        top: 0;
     }
     .feeds-column .bottom-toolbar {
         display: none;

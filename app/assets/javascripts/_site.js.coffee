@@ -139,49 +139,51 @@ $.extend feedbin,
   updatePager: (html) ->
     $('[data-behavior~=pagination]').html(html)
 
-  updateEntryContent: (html, inner = "") ->
-    feedbin.closeEntryBasement(0)
-    outerContent = $('[data-behavior~=entry_content_target]')
+  animateEntryContent: (content) ->
     innerContent = $('[data-behavior~=inner_content_target]')
 
-    outerContent.html(html)
+    if $(feedbin.selectedEntry.container.closest("li")).isAfter(feedbin.previousEntry.container.closest("li"))
+      next = $('<div class="next-entry load-next-entry"></div>')
+      transitionClass = "slide-up"
+    else
+      next = $('<div class="previous-entry load-next-entry"></div>')
+      transitionClass = "slide-down"
 
-    if html == ""
-      $('[data-behavior~=content_column]').removeClass("has-content")
-      innerContent.html("")
+    next.html(content)
+
+    next.insertAfter(innerContent)
+
+    setTimeout ( ->
+      next.removeClass("load-next-entry")
+      $(".entry-content", innerContent).addClass(transitionClass)
+    ), 1
+
+    setTimeout ( ->
+      next.removeClass("next-entry")
+      next.removeClass("previous-entry")
+      next.attr("data-behavior", "inner_content_target")
+      innerContent.remove()
+    ), 150
+
+  updateEntryContent: (meta, content = "") ->
+    feedbin.closeEntryBasement(0)
+    metaTarget = $('[data-behavior~=entry_meta_target]')
+    innerContent = $('[data-behavior~=inner_content_target]')
+
+    metaTarget.html(meta)
+
+    if meta == ""
       feedbin.previousEntry = null
       feedbin.selectedEntry = null
+      $('.entry-column').removeClass("has-content")
+      innerContent.html("")
     else
-      $('[data-behavior~=content_column]').addClass("has-content")
+      $('.entry-column').addClass("has-content")
 
-    if feedbin.previousEntry && feedbin.previousEntry.container.is(feedbin.selectedEntry.container)
-      innerContent.html(inner)
-    else if feedbin.previousEntry
-
-      if $(feedbin.selectedEntry.container.closest("li")).isAfter(feedbin.previousEntry.container.closest("li"))
-        next = $('<div class="next-entry load-next-entry"></div>')
-        transitionClass = "slide-up"
-      else
-        next = $('<div class="previous-entry load-next-entry"></div>')
-        transitionClass = "slide-down"
-
-      next.html(inner)
-
-      next.insertAfter(innerContent)
-
-      setTimeout ( ->
-        next.removeClass("load-next-entry")
-        $(".entry-content", innerContent).addClass(transitionClass)
-      ), 1
-
-      setTimeout ( ->
-        next.removeClass("next-entry")
-        next.removeClass("previous-entry")
-        next.attr("data-behavior", "inner_content_target")
-        innerContent.remove()
-      ), 150
+    if feedbin.previousEntry && feedbin.mobileView() && feedbin.panel == 3
+      feedbin.animateEntryContent(content)
     else
-      innerContent.html(inner)
+      innerContent.html(content)
 
   updateFeeds: (feeds) ->
     $('[data-behavior~=feeds_target]').html(feeds)
@@ -731,7 +733,7 @@ $.extend feedbin,
     $('.basement-panel').addClass('hide')
     selectedPanel.removeClass('hide')
     $('.entry-basement').addClass('open')
-    newTop = selectedPanel.height() + 41
+    newTop = selectedPanel.height()
     $('.entry-content').css
       "top": "#{newTop}px"
 

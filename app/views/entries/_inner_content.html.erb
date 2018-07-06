@@ -1,4 +1,5 @@
 <% present entry do |entry_presenter| %>
+<div class="entry-feed-<%= entry.feed_id %>" data-entry-id="<%= entry.id %>">
   <div class="entry-content">
     <div class="entry-inner" <%= rtl(entry_presenter.content) %>>
       <% if entry.tweet? %>
@@ -17,4 +18,5 @@
       </span>
     </button>
   </div>
+</div>
 <% end %>

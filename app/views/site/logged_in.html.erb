@@ -75,6 +75,7 @@ feedbin.Counts.get(feedbin.count_data);
     </div>
 
     <div class="entry-column app-panel" data-behavior="content_column">
+
         <div class="account-toolbar">
             <% if signed_in? && current_user.plan.stripe_id == 'trial' %>
                 <%= link_to settings_billing_path, class: 'subscribe-promo' do %>
@@ -85,6 +86,7 @@ feedbin.Counts.get(feedbin.count_data);
                 <%= render partial: 'shared/app_settings' %>
             </div>
         </div>
+
         <div class="entry-basement">
             <div class="basement-panel hide" data-basement-panel-target="settings_panel">
                 <%= render partial: 'shared/entry_settings' %>
@@ -98,9 +100,13 @@ feedbin.Counts.get(feedbin.count_data);
                 <% end %>
             <% end %>
         </div>
+
+        <div class="entry-meta" data-behavior="entry_meta_target"></div>
+
         <div class="entry-content-wrap <%= @user.entry_width %> <%= @user.display_prefs %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
+            <div data-behavior="inner_content_target"></div>
         </div>
-        <div data-behavior="inner_content_target"></div>
+
         <div class="bottom-toolbar entry-bottom-toolbar">
             <button class="toolbar-button button-previous" data-behavior="open_previous_entry needs_previous">
                 <div class="icon-previous">
