@@ -2475,19 +2475,18 @@ $saved-search-control-height: 48px;
     height: auto;
     overflow-y: auto;
     overflow-x: hidden;
-    top: 0;
+    top: $toolbar-height;
     left: 0;
     right: 0;
     margin: 0;
-    bottom: $toolbar-height;
-    transform: translate3d(0, $toolbar-height, 0);
-    transition: transform .2s ease;
+    bottom: 0;
+    transition: top .2s ease;
     -webkit-overflow-scrolling: touch;
     z-index: 2;
     @media (max-width: 550px) {
-        bottom: $bottom-toolbar-height + $toolbar-height - 1px;
+        bottom: $bottom-toolbar-height - 1px;
         .standalone-navigator & {
-            bottom: calc(#{$bottom-toolbar-height + $toolbar-height - 9px} + env(safe-area-inset-bottom));
+            bottom: calc(#{$bottom-toolbar-height - 9px} + env(safe-area-inset-bottom));
         }
     }
 }
