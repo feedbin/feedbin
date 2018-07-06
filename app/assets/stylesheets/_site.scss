@@ -1788,6 +1788,13 @@ $saved-search-control-height: 48px;
             font-size: 15px;
         }
     }
+    .body {
+        @media (max-width: 320px) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
     .quoted-summary {
         margin-top: 8px !important;
         padding: 8px;
@@ -2473,21 +2480,20 @@ $saved-search-control-height: 48px;
     height: auto;
     overflow-y: auto;
     overflow-x: hidden;
-    top: 0;
+    top: $toolbar-height;
     left: 0;
     right: 0;
     margin: 0;
-    bottom: $toolbar-height;
-    will-change: transform, opacity;
-    transform: translateY($toolbar-height);
-    transition: transform .15s ease, opacity .15s ease;
+    bottom: 0;
+    will-change: transform, opacity, top;
+    transition: transform .15s ease, opacity .15s ease, top .2s ease;
     opacity: 1;
     -webkit-overflow-scrolling: touch;
     z-index: 2;
     @media (max-width: 550px) {
-        bottom: $bottom-toolbar-height + $toolbar-height - 1px;
+        bottom: $bottom-toolbar-height - 1px;
         .standalone-navigator & {
-            bottom: calc(#{$bottom-toolbar-height + $toolbar-height - 9px} + env(safe-area-inset-bottom));
+            bottom: calc(#{$bottom-toolbar-height - 9px} + env(safe-area-inset-bottom));
         }
     }
     &.slide-up {
@@ -3897,11 +3903,8 @@ $saved-search-control-height: 48px;
                 padding-left: 0;
             }
         }
-        .quoted-tweet .tweet-body {
+        .main-tweet-conversation .quoted-tweet .tweet-body {
             padding-left: 0;
-        }
-        .quoted-tweet.reply .tweet-body {
-            padding-left: 57px;
         }
         .tweet-author-reply {
             border-top: none;
