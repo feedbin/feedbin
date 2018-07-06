@@ -2495,7 +2495,7 @@ $saved-search-control-height: 48px;
     margin: 0;
     bottom: 0;
     will-change: transform, opacity, top;
-    transition: transform .15s ease, opacity .15s ease, top .2s ease;
+    transition: transform .2s ease, opacity .15s ease, top .2s ease;
     opacity: 1;
     -webkit-overflow-scrolling: touch;
     z-index: 2;
@@ -2506,11 +2506,11 @@ $saved-search-control-height: 48px;
         }
     }
     &.slide-up {
-        transform: translateY(-100vh);
+        transform: translate3d(0, -100vh, 0);
         opacity: 0;
     }
     &.slide-down {
-        transform: translateY(100vh);
+        transform: translate3d(0, 100vh, 0);
         opacity: 0;
     }
 }
@@ -2521,15 +2521,15 @@ $saved-search-control-height: 48px;
     left: 0;
     right: 0;
     will-change: transform;
-    transition: transform .15s ease;
-    transform: translateY(0, 0, 0);
+    transition: transform .2s ease;
+    transform: translate3d(0, 0, 0);
     opacity: 1;
 }
 
 .load-next-entry {
-    transform: translateY(100vh);
+    transform: translate3d(0, 100vh, 0);
     &.previous-entry {
-        transform: translateY(-100vh);
+        transform: translate3d(0, -100vh, 0);
     }
 }
 
