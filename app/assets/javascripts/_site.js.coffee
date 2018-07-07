@@ -139,6 +139,9 @@ $.extend feedbin,
   updatePager: (html) ->
     $('[data-behavior~=pagination]').html(html)
 
+  entryChanged: ->
+    !feedbin.previousEntry || !feedbin.previousEntry.container.is(feedbin.selectedEntry.container)
+
   animateEntryContent: (content) ->
     innerContent = $('[data-behavior~=inner_content_target]')
 
@@ -180,7 +183,9 @@ $.extend feedbin,
     else
       $('.entry-column').addClass("has-content")
 
-    if feedbin.previousEntry && feedbin.mobileView() && feedbin.panel == 3
+    if !feedbin.entryChanged()
+      innerContent.html(content)
+    else if feedbin.previousEntry && feedbin.mobileView() && feedbin.panel == 3
       feedbin.animateEntryContent(content)
     else
       innerContent.html(content)
