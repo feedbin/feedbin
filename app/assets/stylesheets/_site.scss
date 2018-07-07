@@ -2536,6 +2536,9 @@ $saved-search-control-height: 48px;
 .entry-inner {
     min-height: 100%;
     transition: max-width .3s linear;
+    @media (max-width: 550px) {
+        min-height: 101%;
+    }
 }
 
 .entry-inner, .next-entry-preview {

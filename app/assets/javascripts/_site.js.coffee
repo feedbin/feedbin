@@ -168,6 +168,17 @@ $.extend feedbin,
       innerContent.remove()
     ), 200
 
+  shouldAnimate: ->
+    offset = $('.entry-column')[0].offsetLeft
+    scroll = $('.app-wrap')[0].scrollLeft
+
+    if feedbin.previousEntry && feedbin.mobileView()
+      if scroll > 0
+        if offset == scroll
+          true
+      else if feedbin.panel == 3
+        true
+
   updateEntryContent: (meta, content = "") ->
     feedbin.closeEntryBasement(0)
     metaTarget = $('[data-behavior~=entry_meta_target]')
@@ -185,7 +196,7 @@ $.extend feedbin,
 
     if !feedbin.entryChanged()
       innerContent.html(content)
-    else if feedbin.previousEntry && feedbin.mobileView() && feedbin.panel == 3
+    else if feedbin.shouldAnimate()
       feedbin.animateEntryContent(content)
     else
       innerContent.html(content)
