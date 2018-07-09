@@ -371,7 +371,7 @@ $.extend feedbin,
         url = urlFinder(item)
         if feedbin.embeds["#{url}"]
           item.replaceWith(feedbin.embeds["#{url}"])
-        else
+        else if url
           id = feedbin.randomNumber()
           item.attr("id", id)
           $.get(embed_url, {url: url, dom_id: id}).fail ->
@@ -392,7 +392,7 @@ $.extend feedbin,
     items = $('blockquote.instagram-media')
 
     urlFinder = (item) ->
-      item.data("instgrmPermalink")
+      item.data("instgrmPermalink") || $("a", item).last().attr("href")
 
     feedbin.embed(items, feedbin.data.instagram_embed_path, urlFinder)
 
