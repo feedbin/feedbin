@@ -348,6 +348,9 @@ $.extend feedbin,
     if feedbin.data.readability_settings[feedId] == true && feedbin.data.sticky_readability
       $('.button-toggle-content').find('span').addClass('active')
       content = $('[data-behavior~=readability_loading]').html()
+
+      feedbin.previousContent = $('[data-behavior~=entry_content_wrap]').html()
+
       $('[data-behavior~=entry_content_wrap]').html(content)
       $('[data-behavior~=toggle_content_view]').submit()
 
@@ -1330,6 +1333,7 @@ $.extend feedbin,
 
     updateReadability: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_content_view]', (event, xhr) ->
+        feedId = $(event.currentTarget).data('feed-id')
 
         if !$('.button-toggle-content').hasClass('active')
           $('.button-toggle-content').addClass('loading')
@@ -1338,11 +1342,19 @@ $.extend feedbin,
           feedbin.readabilityXHR.abort()
           xhr.abort()
           feedbin.readabilityXHR = null
+
+          if feedbin.previousContent
+            $('[data-behavior~=entry_content_wrap]').html(feedbin.previousContent)
+            feedbin.previousContent = null
+
+          $("#content_view").val("false")
+          $("#cancel_content_view").val("true")
+          $("[data-behavior~=toggle_content_view]").submit()
+
           $('.button-toggle-content').removeClass('loading')
         else
           feedbin.readabilityXHR = xhr
 
-        feedId = $(event.currentTarget).data('feed-id')
         if feedbin.data.sticky_readability && feedbin.data.readability_settings[feedId] != "undefined"
           unless $("#content_view").val() == "true" && feedbin.data.readability_settings[feedId] == true
             feedbin.data.readability_settings[feedId] = !feedbin.data.readability_settings[feedId]
