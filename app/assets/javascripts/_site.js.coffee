@@ -18,6 +18,20 @@ $.extend feedbin,
   swipe: false
   panel: 1
 
+  setNativeTitleColor: (rgb, timeout = 100) ->
+    ctx = document.createElement('canvas').getContext('2d')
+    ctx.strokeStyle = rgb
+    hex = ctx.strokeStyle
+    setTimeout ( ->
+      feedbin.nativeMessage("performAction", { action: "titleColor", color: hex })
+    ), timeout
+
+  nativeMessage: (name, data) ->
+    if typeof(webkit) != "undefined" && webkit.messageHandlers && webkit.messageHandlers.turbolinksDemo
+      webkit.messageHandlers.turbolinksDemo.postMessage
+        name: name
+        data: data
+
   scrollBars: ->
     width = 100
 
@@ -1468,6 +1482,10 @@ $.extend feedbin,
         return
 
     theme: ->
+      if feedbin.data.theme
+        rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
+        feedbin.setNativeTitleColor(rgb, 200)
+
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
         theme = $(@).data('theme')
         $('[data-behavior~=class_target]').removeClass('theme-day')
@@ -1475,6 +1493,11 @@ $.extend feedbin,
         $('[data-behavior~=class_target]').removeClass('theme-night')
         $('[data-behavior~=class_target]').addClass("theme-#{theme}")
         event.preventDefault()
+
+        if feedbin.native
+          rgb = $(@).css('backgroundColor')
+          feedbin.setNativeTitleColor(rgb)
+
         return
 
     showEntryActions: ->

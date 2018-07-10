@@ -48,6 +48,7 @@ class SiteController < ApplicationController
         proxy_images: !@user.setting_on?(:disable_image_proxy),
         twitter_embed_path: twitter_embeds_path,
         instagram_embed_path: instagram_embeds_path,
+        theme: @user.theme || 'day',
       }
 
       render action: 'logged_in'
