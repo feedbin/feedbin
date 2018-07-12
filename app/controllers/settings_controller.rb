@@ -169,6 +169,14 @@ class SettingsController < ApplicationController
     head :ok
   end
 
+  def sticky
+    @user = current_user
+    @subscription = @user.subscriptions.where(feed_id: params[:feed_id]).first
+    if @subscription.present?
+      @subscription.update(view_inline: !@subscription.view_inline)
+    end
+  end
+
   def entry_width
     @user = current_user
     if @user.entry_width.blank?

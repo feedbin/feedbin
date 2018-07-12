@@ -1,8 +1,11 @@
-$('[data-entry-id=<%= @entry.id %>] [data-behavior~=toggle_content_view]').replaceWith("<%= j render partial: "entries/toggle_content", locals: {content_view: @content_view, entry: @entry} %>");
-feedbin.readabilityXHR = null;
+<% if @content_view %>
+$('[data-entry-id=<%= @entry.id %>] .button-toggle-content').addClass('active')
+$("[data-entry-id=<%= @entry.id %>] #content_view").val("false")
+<% else %>
+$('[data-entry-id=<%= @entry.id %>] .button-toggle-content').removeClass('active')
+$("[data-entry-id=<%= @entry.id %>] #content_view").val("true")
+<% end %>
 
-<% if params[:cancel_content_view] != 'true' %>
 $('[data-entry-id=<%= @entry.id %>] [data-behavior~=entry_content_wrap]').html("<%= j render partial: "entries/content_info", locals: {content: @content, content_info: @content_info, entry: @entry, user: @user} %>");
 feedbin.formatEntryContent(<%= @entry.id %>, false, false);
 feedbin.entryTime();
-<% end %>

@@ -345,13 +345,16 @@ $.extend feedbin,
 
   readability: () ->
     feedId = feedbin.selectedEntry.feed_id
+    entryId = feedbin.selectedEntry.id
+
     if feedbin.data.readability_settings[feedId] == true && feedbin.data.sticky_readability
-      $('.button-toggle-content').find('span').addClass('active')
-      content = $('[data-behavior~=readability_loading]').html()
+      feedbin.automaticSubmit = true
 
-      feedbin.previousContent = $('[data-behavior~=entry_content_wrap]').html()
+      loadingTemplate = $('[data-behavior~=readability_loading]').html()
 
-      $('[data-behavior~=entry_content_wrap]').html(content)
+      feedbin.previousContent = $("[data-entry-id=#{entryId}] [data-behavior~=entry_content_wrap]").html()
+
+      $('[data-behavior~=entry_content_wrap]').html(loadingTemplate)
       $('[data-behavior~=toggle_content_view]').submit()
 
   resetScroll: ->
@@ -439,6 +442,10 @@ $.extend feedbin,
         img.addClass('hide')
 
   formatEntryContent: (entryId, resetScroll=true, readability=true) ->
+    if feedbin.readabilityXHR != null
+      feedbin.readabilityXHR.abort()
+      feedbin.readabilityXHR = null
+
     feedbin.applyStarred(entryId)
     if resetScroll
       feedbin.resetScroll
@@ -1332,34 +1339,31 @@ $.extend feedbin,
       return
 
     updateReadability: ->
+      $(document).on 'ajax:complete', '[data-behavior~=toggle_content_view]', (event, xhr) ->
+        feedbin.readabilityXHR = null;
+        $('.button-toggle-content').removeClass('loading')
+
       $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_content_view]', (event, xhr) ->
-        feedId = $(event.currentTarget).data('feed-id')
-
-        if !$('.button-toggle-content').hasClass('active')
-          $('.button-toggle-content').addClass('loading')
-
         if feedbin.readabilityXHR
           feedbin.readabilityXHR.abort()
           xhr.abort()
+
           feedbin.readabilityXHR = null
+          $('.button-toggle-content').removeClass('loading')
 
           if feedbin.previousContent
             $('[data-behavior~=entry_content_wrap]').html(feedbin.previousContent)
             feedbin.previousContent = null
-
-          $("#content_view").val("false")
-          $("#cancel_content_view").val("true")
-          $("[data-behavior~=toggle_content_view]").submit()
-
-          $('.button-toggle-content').removeClass('loading')
         else
+          $('.button-toggle-content').addClass('loading')
           feedbin.readabilityXHR = xhr
 
-        if feedbin.data.sticky_readability && feedbin.data.readability_settings[feedId] != "undefined"
-          unless $("#content_view").val() == "true" && feedbin.data.readability_settings[feedId] == true
-            feedbin.data.readability_settings[feedId] = !feedbin.data.readability_settings[feedId]
+        if feedbin.automaticSubmit != true
+          $.post($(@).data("sticky-url"))
 
-        return
+        feedbin.automaticSubmit = false
+
+        true
 
     autoUpdate: ->
       setInterval ( ->

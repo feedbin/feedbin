@@ -34,7 +34,7 @@
       </div>
     <% end %>
     <script type="text/javascript">
-      $('[data-basement-panel-target~=feed_panel]').html('<%= j render partial: "shared/feed_settings", locals: { entry: entry } %>');
+        $('[data-basement-panel-target~=feed_panel]').html('<%= j render partial: "shared/feed_settings", locals: { entry: entry } %>');
     </script>
     <div class="hide" data-behavior="feed_link_template">
         <%= render partial: "shared/link_actions", locals: {entry: entry} %>

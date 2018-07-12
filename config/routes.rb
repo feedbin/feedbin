@@ -171,6 +171,8 @@ Rails.application.routes.draw do
     post :audio_panel_size
   end
 
+  post 'settings/sticky/:feed_id', as: :settings_sticky, to: "settings#sticky"
+
   resources :twitter_authentications, only: [:new] do
     collection do
       get :save
