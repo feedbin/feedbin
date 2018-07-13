@@ -12,7 +12,7 @@
                         <%= entry_presenter.tweet_screen_name(tweet) %>
                     </a>
                     <span class="tweet-actions">
-                        <%= link_to thread_tweet_path(entry), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {behavior: "open_modal"} do %>
+                        <%= link_to thread_tweet_path(entry), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {behavior: "open_modal", modal_class: "modal-conversation"} do %>
                             <%= svg_tag "icon-twitter-conversation" %>
                         <% end %>
 

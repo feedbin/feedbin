@@ -5955,7 +5955,7 @@ Link Viewer
             padding-right: 0px;
         }
     }
-    &.modal-feed-edit {
+    .modal-feed-edit & {
         .modal-body {
             padding: 0;
         }
@@ -5967,7 +5967,7 @@ Link Viewer
             padding-top: 20px !important;
         }
     }
-    &.modal-conversation  {
+    .modal-conversation & {
         .modal-body {
             padding: 0 0 10px 0;
         }

@@ -52,10 +52,9 @@ $.extend feedbin,
     $('[data-behavior~=line_graph]').each ()->
       feedbin.drawBarChart(@, $(@).data('values'))
 
-  modalContent: (html, css) ->
+  modalContent: (html) ->
     modal = $('#general_modal')
     target = $('[data-behavior~=markup_target]', modal)
-    $('.modal-dialog', modal).addClass(css)
 
     placeholder = $('[data-behavior~=modal_placeholder]', modal)
     placeholder.addClass('hide')
@@ -833,12 +832,14 @@ $.extend feedbin,
       $.ajax(xhr)
     )
 
-  modal: (selector) ->
+  modal: (selector, cssClass = null) ->
     activeModal = $(selector)
     $('.modal').each ->
       unless $(@).get(0) == activeModal.get(0)
         $(@).modal('hide')
     activeModal.modal('toggle')
+    if cssClass
+      activeModal.addClass(cssClass)
 
   loadLink: (href) ->
     form = $("[data-behavior~=view_link_form]")
@@ -1838,7 +1839,7 @@ $.extend feedbin,
 
         target.html('')
 
-        feedbin.modal(id)
+        feedbin.modal(id, $(@).data("modal-class"))
 
     showMessage: ->
       $(document).on 'click', '[data-behavior~=show_message]', (event) ->
