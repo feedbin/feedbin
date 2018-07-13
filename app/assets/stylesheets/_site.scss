@@ -8103,10 +8103,10 @@ Media Queries
             display: none;
         }
     }
+    .entries-header {
+        display: flex;
+    }
     .feed-selected {
-        .entries-header {
-            display: flex;
-        }
         .feeds-column {
             display: none;
         }
