@@ -5,7 +5,7 @@ class EntryDeleter
   def perform(feed_id)
     if Subscription.where(feed_id: feed_id, active: true).exists?
       feed = Feed.find(feed_id)
-      if !feed.protected && feed.subscriptions_count > 0
+      if !feed.protected
         delete_entries(feed_id)
       end
     else
@@ -14,7 +14,7 @@ class EntryDeleter
   end
 
   def delete_entries(feed_id)
-    entry_limit = ENV['ENTRY_LIMIT'] ? ENV['ENTRY_LIMIT'].to_i : 500
+    entry_limit = ENV['ENTRY_LIMIT'] ? ENV['ENTRY_LIMIT'].to_i : 400
     entry_count = Entry.where(feed_id: feed_id).count
     if entry_count > entry_limit
       entries_to_keep = Entry.where(feed_id: feed_id).order('published DESC').limit(entry_limit).pluck('entries.id')

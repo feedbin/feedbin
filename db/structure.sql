@@ -1476,13 +1476,6 @@ CREATE UNIQUE INDEX index_entries_on_public_id ON public.entries USING btree (pu
 
 
 --
--- Name: index_entries_on_recently_played_entries_count; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_entries_on_recently_played_entries_count ON public.entries USING btree (recently_played_entries_count);
-
-
---
 -- Name: index_entries_on_thread_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2079,6 +2072,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20180102071024'),
 ('20180106031725'),
 ('20180204093407'),
-('20180607200816');
+('20180607200816'),
+('20180714072623');
 
 
