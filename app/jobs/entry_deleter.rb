@@ -5,6 +5,7 @@ class EntryDeleter
   def perform(feed_id)
     if Subscription.where(feed_id: feed_id, active: true).exists?
       feed = Feed.find(feed_id)
+      feed.feed_stats.where("day < ?", 40.days.ago).delete_all
       if !feed.protected
         delete_entries(feed_id)
       end
