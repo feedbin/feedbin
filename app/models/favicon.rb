@@ -10,10 +10,8 @@ class Favicon < ApplicationRecord
     @cdn_url ||= begin
       if self.url
         uri = URI(self.url)
-        if ENV['AWS_S3_BUCKET_FAVICONS'] && ENV['FAVICON_HOST_NEW'] && uri.host.include?(ENV['AWS_S3_BUCKET_FAVICONS'])
-          uri.host = ENV["FAVICON_HOST_NEW"]
-        elsif ENV['FAVICON_HOST']
-          uri.host = ENV['FAVICON_HOST']
+        if ENV['FAVICON_HOST']
+          uri.host = ENV["FAVICON_HOST"]
         end
         uri.scheme = 'https'
         uri.to_s
