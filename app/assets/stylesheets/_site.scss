@@ -1019,7 +1019,7 @@ Structure
     cursor: pointer;
     height: 100%;
     width: 100%;
-    display: inline-block;
+    display: block;
     padding: 8px 0 0 0;
     &[disabled] {
         cursor: default;
