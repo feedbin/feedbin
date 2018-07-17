@@ -6,6 +6,19 @@ class ArticleTest < ApplicationSystemTestCase
     assert_text @entries.first.content
   end
 
+  test "Show tweet" do
+    @user = users(:ben)
+    @feed = create_feeds(@user, 1).first
+
+    entry = create_tweet_entry(@user.feeds.first)
+
+    login_as(@user)
+
+    click_link(entry.tweet_summary)
+
+    assert_selector ".tweet-text", text: entry.tweet_summary
+  end
+
   test "star" do
     show_article
     assert_difference "StarredEntry.count", +1 do
