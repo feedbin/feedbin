@@ -304,8 +304,7 @@ CREATE TABLE public.favicons (
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     data json,
-    url character varying,
-    url_new text
+    url character varying
 );
 
 
@@ -2073,6 +2072,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20180106031725'),
 ('20180204093407'),
 ('20180607200816'),
-('20180714072623');
+('20180714072623'),
+('20180717001048');
 
 
