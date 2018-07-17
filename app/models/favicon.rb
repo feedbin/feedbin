@@ -11,7 +11,7 @@ class Favicon < ApplicationRecord
       if self.url
         uri = URI(self.url)
         if ENV['FAVICON_HOST']
-          uri.host = ENV['FAVICON_HOST']
+          uri.host = ENV["FAVICON_HOST"]
         end
         uri.scheme = 'https'
         uri.to_s

@@ -27,7 +27,7 @@ class FaviconCopy
     def move
       if favicon.url
         url = s3_copy(favicon.url)
-        favicon.update(url_new: url)
+        favicon.update(url: url)
       end
     end
 
