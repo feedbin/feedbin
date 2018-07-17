@@ -1194,6 +1194,7 @@ Structure
                 display: block;
                 text-overflow: ellipsis;
                 overflow: hidden;
+                line-height: 1.3;
                 white-space: nowrap;
                 &.hide {
                     display: none;
@@ -2280,6 +2281,9 @@ $saved-search-control-height: 48px;
             padding: 0;
             @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
             position: relative;
+            &::-ms-expand {
+                display: none;
+            }
         }
         &:after {
             width: 0px;
