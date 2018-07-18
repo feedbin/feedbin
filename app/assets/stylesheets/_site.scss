@@ -2498,7 +2498,6 @@ $saved-search-control-height: 48px;
     right: 0;
     margin: 0;
     bottom: 0;
-    will-change: transform, opacity, top;
     transition: transform .2s ease, opacity .15s ease, top .2s ease;
     opacity: 1;
     -webkit-overflow-scrolling: touch;
