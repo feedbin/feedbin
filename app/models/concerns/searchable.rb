@@ -161,8 +161,13 @@ module Searchable
       end
 
       if params[:query] =~ TAG_ID_REGEX
-        params[:tag_id] = params[:query].match(TAG_ID_REGEX)[1].downcase
-        params[:query] = params[:query].gsub(TAG_ID_REGEX, '')
+        tag_id = params[:query].match(TAG_ID_REGEX)[1].downcase
+        feed_ids = user.taggings.where(tag_id: tag_id).pluck(:feed_id)
+
+        id_string = feed_ids.join(" OR ")
+        id_string = "feed_id:(#{id_string})"
+
+        params[:query] = params[:query].gsub(TAG_ID_REGEX, id_string)
       end
 
       params[:query] = escape_search(params[:query])
@@ -198,8 +203,6 @@ module Searchable
         subscribed_ids = user.subscriptions.pluck(:feed_id)
         requested_ids = params[:feed_ids]
         options[:feed_ids] = (requested_ids & subscribed_ids)
-      elsif params[:tag_id].present?
-        options[:feed_ids] = user.taggings.where(tag_id: params[:tag_id]).pluck(:feed_id)
       else
         options[:feed_ids] = user.subscriptions.pluck(:feed_id)
         options[:starred_ids] = user.starred_entries.pluck(:entry_id)
