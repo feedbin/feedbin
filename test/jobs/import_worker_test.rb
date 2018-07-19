@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ImportWorkerTestTest < ActiveSupport::TestCase
+class ImportWorkerTest < ActiveSupport::TestCase
   test "should build import" do
     user = users(:new)
 

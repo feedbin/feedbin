@@ -6,7 +6,7 @@ class Api::V2::FaviconsControllerTest < ApiControllerTestCase
     @user = users(:new)
     @feeds = create_feeds(@user)
     @favicons = @feeds.map do |feed|
-      Favicon.create(host: feed.host)
+      Favicon.create!(host: feed.host, url: feed.host)
     end
   end
 

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class DevicePushNotificationSendTestTest < ActiveSupport::TestCase
+class DevicePushNotificationSendTest < ActiveSupport::TestCase
   setup do
     @users = [users(:new), users(:ben)]
     @feeds = create_feeds(@users)

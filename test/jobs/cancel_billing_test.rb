@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CancelBillingTestTest < ActiveSupport::TestCase
+class CancelBillingTest < ActiveSupport::TestCase
   test "should cancel subscription" do
     StripeMock.start
     plan = plans(:trial)

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class FeedRefresherTestTest < ActiveSupport::TestCase
+class FeedRefresherTest < ActiveSupport::TestCase
   setup do
     Sidekiq::Queues["feed_refresher_fetcher"].clear
     Feed.all.each do |feed|

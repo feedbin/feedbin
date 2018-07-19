@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SendStatsTestTest < ActiveSupport::TestCase
+class SendStatsTest < ActiveSupport::TestCase
   test "should run" do
     assert_nothing_raised do
       SendStats.new().perform
