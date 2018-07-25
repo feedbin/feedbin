@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class FeedRefresherReceiverTestTest < ActiveSupport::TestCase
+class FeedRefresherReceiverTest < ActiveSupport::TestCase
   setup do
     @user = users(:ben)
     @subscription = @user.subscriptions.first

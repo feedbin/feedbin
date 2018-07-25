@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class EntryTestTest < ActiveSupport::TestCase
+class EntryTest < ActiveSupport::TestCase
   setup do
     user = users(:ben)
     feed = user.feeds.first

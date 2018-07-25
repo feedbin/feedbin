@@ -74,7 +74,7 @@ class FaviconProcessor
     layers.reject do |favicon|
       favicon = favicon.scale(1, 1)
       pixel = favicon.pixel_color(0,0)
-      favicon.to_color(pixel) == "none"
+      %w(none white #FFFFFF).include? layer.to_color(pixel)
     end
   end
 

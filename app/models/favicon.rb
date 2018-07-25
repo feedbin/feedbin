@@ -2,6 +2,8 @@ class Favicon < ApplicationRecord
 
   default_scope { select(*(Favicon.column_names - ["favicon"])) }
 
+  validates :url, presence: true
+
   def data
     self[:data] || {}
   end

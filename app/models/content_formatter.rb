@@ -81,6 +81,10 @@ class ContentFormatter
       href_base_url: entry.feed.site_url,
       href_subpage_url: entry.url || ""
     }
+    if entry.feed.newsletter?
+      filters.push(HTML::Pipeline::SanitizationFilter)
+      context[:whitelist] = Feedbin::Application.config.newsletter_whitelist
+    end
     pipeline = HTML::Pipeline.new filters, context
     result = pipeline.call(content)
     result[:output].to_s

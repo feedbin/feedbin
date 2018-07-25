@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SafariPushNotificationSendTestTest < ActiveSupport::TestCase
+class SafariPushNotificationSendTest < ActiveSupport::TestCase
   setup do
     @users = [users(:new), users(:ben)]
     @feeds = create_feeds(@users.first)

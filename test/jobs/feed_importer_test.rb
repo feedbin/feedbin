@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class FeedImporterTestTest < ActiveSupport::TestCase
+class FeedImporterTest < ActiveSupport::TestCase
   setup do
     @user = users(:new)
     import = @user.imports.create

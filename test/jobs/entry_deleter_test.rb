@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class EntryDeleterTestTest < ActiveSupport::TestCase
+class EntryDeleterTest < ActiveSupport::TestCase
 
   setup do
     count = (5..16).to_a

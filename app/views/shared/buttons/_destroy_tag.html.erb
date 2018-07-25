@@ -1,10 +1,10 @@
 <% if tag.blank? %>
-<div class="toolbar-button" data-behavior="unsubscribe" disabled="disabled">
+<button class="toolbar-button" data-behavior="unsubscribe" disabled="disabled">
   <div class="toolbar-button-inner">
     <%= render partial: "shared/svg/trash" %>
   </div>
   Delete
-</div>
+</button>
 <% else %>
     <%= form_tag tag_path(tag), remote: true, method: "delete", data: {behavior: "unsubscribe"} do %>
     <button title="Delete tag" class="toolbar-button" type="submit" data-confirm="Are you sure you want to delete <%= tag.name %>?">
