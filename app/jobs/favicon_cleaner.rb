@@ -26,7 +26,8 @@ class FaviconCleaner
     layers = Magick::Image.from_blob(data)
     layer = layers.first.scale(1, 1)
     pixel = layer.pixel_color(0,0)
-    %w(none white #FFFFFF).include? layer.to_color(pixel)
+    color = layer.to_color(pixel)
+    %w(none white #FFFFFF).include?(color) || color.include?("#FFFFFF")
   ensure
     layer && layer.destroy!
     layers && layers.map(&:destroy!)
