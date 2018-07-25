@@ -1423,6 +1423,9 @@ li.selected > a .favicon-wrap {
     box-shadow: none;
     svg {
         @include fill($text-color-light, $text-color-muted-night, $text-color-light-sunset);
+        li.selected > .feed-link & {
+            fill: #FFF;
+        }
     }
     .favicon-newsletter {
         @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
