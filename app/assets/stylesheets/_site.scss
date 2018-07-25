@@ -3485,13 +3485,27 @@ $saved-search-control-height: 48px;
 }
 
 .entry-final-content a, .tweet-text a, .modal-content .content-styles a {
-    border-bottom: 1px solid transparent;
-    @include border-color(rgba(#000, .3), white, rgba(#000, .3));
+    background-position: 0 1.05em;
+    background-size: 2px .1em;
+    background-repeat: repeat-x;
+    background-image: linear-gradient(to bottom,rgba(#000,1) 50%,rgba(#000,1) 50%);
     @include color(black, white, black);
+    .theme-night & {
+        background-image: linear-gradient(to bottom,rgba(#FFF,1) 50%,rgba(#FFF,1) 50%);
+    }
+    @include respond-to(hidpi) {
+        background-image: linear-gradient(to bottom,rgba(#000,1) 50%,rgba(#000,0) 50%);
+        .theme-night & {
+            background-image: linear-gradient(to bottom,rgba(#FFF,1) 50%,rgba(#FFF,0) 50%);
+        }
+    }
     &:hover {
         text-decoration: none;
         color: $selected;
-        border-bottom: 1px solid $selected;
+        background-image: linear-gradient(to bottom,rgba($selected,1) 50%,rgba($selected,1) 50%);
+        @include respond-to(hidpi) {
+            background-image: linear-gradient(to bottom,rgba($selected,1) 50%,rgba($selected,0) 50%);
+        }
     }
 }
 
