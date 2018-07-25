@@ -71,10 +71,11 @@ class FaviconProcessor
   end
 
   def remove_blank_images(layers)
-    layers.reject do |favicon|
-      favicon = favicon.scale(1, 1)
-      pixel = favicon.pixel_color(0,0)
-      %w(none white #FFFFFF).include? layer.to_color(pixel)
+    layers.reject do |layer|
+      layer = layer.scale(1, 1)
+      pixel = layer.pixel_color(0,0)
+      color = layer.to_color(pixel)
+      %w(none white).include?(color) || color.include?("#FFFFFF")
     end
   end
 
