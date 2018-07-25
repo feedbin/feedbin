@@ -908,6 +908,7 @@ Structure
     left: 0;
     right: 0;
     overflow: hidden;
+    display: flex;
     .show-subscribe {
         user-select: none;
         color: $selected;
@@ -922,8 +923,8 @@ Structure
         appearance: none;
         border: none;
         background: none;
-        width: 100%;
         text-align: left;
+        flex: 1;
     }
 }
 
@@ -940,6 +941,17 @@ Structure
 .mobile-hamburger {
     display: none;
     right: 7px;
+    .subscribe-toolbar & {
+        position: static;
+    }
+    .settings & {
+        top: 21px;
+        right: 15px;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+        height: 36px;
+        width: 36px;
+    }
 }
 
 .hamburger-menu {
@@ -955,7 +967,7 @@ Structure
         left: 7px;
     }
     .settings & {
-        top: 31px;
+        top: 15px;
         right: 15px;
     }
 }
