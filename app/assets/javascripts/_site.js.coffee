@@ -933,6 +933,8 @@ $.extend feedbin,
     hasTouch: ->
       if 'ontouchstart' of document
         $('body').addClass('touch')
+      else
+        $('body').addClass('no-touch')
 
     isStandalone: ->
       if 'standalone' of window.navigator && window.navigator.standalone
@@ -1799,7 +1801,7 @@ $.extend feedbin,
         feedbin.updateFeedSearchMessage()
 
     linkActionsHover: ->
-      $(document).on 'mouseenter mouseleave', '.entry-final-content a', (event) ->
+      $(document).on 'mouseenter mouseleave', 'body:not(.touch) .entry-final-content a', (event) ->
         link = $(@)
         if link.text().trim().length > 0 && !$(@).has('.mejs__container').length > 0 && !link.closest(".system-content").length
           clearTimeout(feedbin.linkActionsTimer)

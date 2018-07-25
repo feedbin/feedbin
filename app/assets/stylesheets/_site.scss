@@ -2649,6 +2649,14 @@ $saved-search-control-height: 48px;
                 @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
             }
         }
+        &.button-next, &.button-previous {
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            &:active:not([disabled]) {
+                svg * {
+                    fill: $selected;
+                }
+            }
+        }
         &[disabled] {
             svg * {
                 @include fill($drawer-background-color, $text-color-light-night, $drawer-background-color-sunset);
@@ -3507,6 +3515,7 @@ $saved-search-control-height: 48px;
     background-size: 2px .1em;
     background-repeat: repeat-x;
     background-image: linear-gradient(to bottom,rgba(#000,1) 50%,rgba(#000,1) 50%);
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
     @include color(black, white, black);
     .theme-night & {
         background-image: linear-gradient(to bottom,rgba(#FFF,1) 50%,rgba(#FFF,1) 50%);
@@ -3517,7 +3526,7 @@ $saved-search-control-height: 48px;
             background-image: linear-gradient(to bottom,rgba(#FFF,1) 50%,rgba(#FFF,0) 50%);
         }
     }
-    &:hover {
+    .no-touch &:hover, &:active {
         text-decoration: none;
         color: $selected;
         background-image: linear-gradient(to bottom,rgba($selected,1) 50%,rgba($selected,1) 50%);
