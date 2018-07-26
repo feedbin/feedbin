@@ -33,7 +33,7 @@ class ContentFormatter
     context = {
       whitelist: Feedbin::Application.config.whitelist
     }
-    filters = [HTML::Pipeline::LazyLoadFilter, HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer]
+    filters = [HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer]
 
     if ENV['CAMO_HOST'] && ENV['CAMO_KEY'] && image_proxy_enabled
       context[:asset_proxy] = ENV['CAMO_HOST']
@@ -51,6 +51,8 @@ class ContentFormatter
         context[:whitelist] = Feedbin::Application.config.newsletter_whitelist
       end
     end
+
+    filters.unshift(HTML::Pipeline::LazyLoadFilter)
 
     pipeline = HTML::Pipeline.new filters, context
 

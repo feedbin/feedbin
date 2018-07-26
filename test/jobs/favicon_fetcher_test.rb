@@ -74,4 +74,25 @@ class FaviconFetcherTest < ActiveSupport::TestCase
     assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
   end
 
+  test "should skip blank favicon" do
+    body = <<-eot
+    <html>
+        <head>
+        </head>
+    </html>
+    eot
+
+    stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+    stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
+
+    stub_request(:get, @page_url).
+      to_return(body: body, status: 200)
+
+    stub_request_file("favicon-blank.ico", @default_url)
+
+    FaviconFetcher.new().perform(@page_url.host)
+
+    assert_nil Favicon.unscoped.where(host: @page_url.host).take
+  end
+
 end
