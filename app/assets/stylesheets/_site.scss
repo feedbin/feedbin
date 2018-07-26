@@ -598,11 +598,6 @@ table {
     .service-options {
         background-color: $list-background-color;
     }
-    .icon-share-app_dot_net {
-        background-image: image-url("icon-share-app-dot-net.svg");
-        background-size: 25px 25px;
-        @include share-icon(0, 0);
-    }
     .icon-share-facebook {
         background-image: image-url("icon-share-facebook.svg");
         background-size: 25px 25px;
@@ -642,11 +637,6 @@ table {
         background-image: image-url("icon-share-instapaper.svg");
         background-size: 10px 23px;
         @include share-icon(7, 2);
-    }
-    .icon-share-readability {
-        background-image: image-url("icon-share-readability.svg");
-        background-size: 24px 17px;
-        @include share-icon(0, 5);
     }
     .icon-share-pocket {
         background-image: image-url("icon-share-pocket.svg");

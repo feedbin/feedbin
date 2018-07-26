@@ -91,7 +91,6 @@ feedbin.Counts.get(feedbin.count_data);
             <div class="basement-panel hide" data-basement-panel-target="settings_panel">
                 <%= render partial: 'shared/entry_settings' %>
             </div>
-            <div class="basement-panel hide" data-basement-panel-target="feed_panel"></div>
             <% @user.supported_sharing_services.each do |service| %>
                 <% if service.has_share_sheet? %>
                 <div class="basement-panel hide" data-basement-panel-target="<%= service.service_id %>_share_panel">

@@ -155,10 +155,6 @@ class ContentFormatter
     nil
   end
 
-  def self.placeholder_url
-    @placeholder_url ||= ActionController::Base.helpers.asset_path("placeholder.png")
-  end
-
   def self.text_email(content)
     content = Kramdown::Document.new(content).to_html
     ActionController::Base.helpers.auto_link(content)
