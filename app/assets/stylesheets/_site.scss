@@ -3766,6 +3766,7 @@ $saved-search-control-height: 48px;
             position: relative;
             a {
                 border-bottom: none;
+                background: none;
                 &:hover {
                     border-bottom: none;
                 }
@@ -3792,6 +3793,7 @@ $saved-search-control-height: 48px;
                 font-weight: normal;
                 @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
                 text-decoration: none;
+                background: none;
                 display: block;
                 overflow: hidden;
                 text-overflow: ellipsis;
