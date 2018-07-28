@@ -3500,7 +3500,7 @@ $saved-search-control-height: 48px;
     }
 }
 
-.entry-final-content a, .tweet-text a, .modal-content .content-styles a {
+.entry-final-content a, .tweet-text a, .micropost-text a, .modal-content .content-styles a {
     background-position: 0 1.05em;
     background-size: 2px .1em;
     background-repeat: repeat-x;
@@ -3876,13 +3876,16 @@ $saved-search-control-height: 48px;
             position: static;
         }
     }
-    .tweet-text {
+    .tweet-text, .micropost-text {
         white-space: pre-wrap;
         font-size: 1.15em;
         line-height: 1.4;
         @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
         font-family: $font-stack;
         overflow-wrap: break-word
+    }
+    .micropost-text {
+        white-space: normal;
     }
     .header-time {
         display: none;

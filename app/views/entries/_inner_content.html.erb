@@ -4,6 +4,8 @@
     <div class="entry-inner" <%= rtl(entry_presenter.content) %>>
       <% if entry.tweet? %>
           <%= render partial: "tweet", locals: {entry: entry} %>
+      <% elsif entry.micropost? %>
+          <%= render partial: "micropost", locals: {entry: entry} %>
       <% else %>
           <%= render partial: "article", locals: {entry: entry, user: user, updated_entries: updated_entries} %>
       <% end %>

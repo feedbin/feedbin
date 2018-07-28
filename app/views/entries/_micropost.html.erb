@@ -1,0 +1,38 @@
+<% present entry do |entry_presenter| %>
+<div class="tweet-wrap" data-behavior="external_links">
+
+    <div class="tweet entry-main-tweet">
+        <header class="tweet-header">
+            <div class="profile-wrap">
+                <%= link_to entry.micropost.author_url, target: "_blank", title: "Author’s Website", class: "profile-image" do %>
+                    <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry.micropost.author_avatar, size: "47x47", alt: "") %>
+                <% end %>
+                <div class="profile-info">
+                    <h1>
+                        <a href="<%= entry.fully_qualified_url %>" target="_blank" class="link">
+                            <strong><%= entry.micropost.author_name %></strong>
+                            @<%= entry.micropost.author_name %>
+                        </a>
+                        <span class="tweet-actions">
+                            <%= link_to entry.micropost.url, target: "_blank", title: "View original", class: "twitter-link embed" do %>
+                                <%= svg_tag "icon-micro-blog" %>
+                            <% end %>
+                        </span>
+                    </h1>
+                    <p class="post-meta">
+                      <%= link_to entry.fully_qualified_url, target: "_blank", title: "View post" do %>
+                          <time datetime="<%= entry.published.iso8601 %>">
+                              <%= entry.published.to_s(:full_human) %>
+                          </time>
+                      <% end %>
+                    </p>
+                </div>
+            </div>
+        </header>
+        <div class="tweet-body micropost-text">
+            <%= raw(entry_presenter.content) %>
+        </div>
+    </div>
+
+</div>
+<% end %>

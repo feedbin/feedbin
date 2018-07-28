@@ -430,6 +430,11 @@ class EntryPresenter < BasePresenter
         fallback = @template.image_url("favicon-profile-default.png")
         @template.image_tag_with_fallback(fallback, url, alt: "")
       end
+    elsif entry.micropost?
+      @template.content_tag :span, '', class: "favicon-wrap twitter-profile-image" do
+        fallback = @template.image_url("favicon-profile-default.png")
+        @template.image_tag_with_fallback(fallback, entry.micropost.author_avatar, alt: "")
+      end
     else
       favicon(feed)
     end
@@ -439,6 +444,10 @@ class EntryPresenter < BasePresenter
     if entry.tweet?
       @template.content_tag(:span, '', class: "title-inner") do
         "#{tweet_name(entry.main_tweet)} #{@template.content_tag(:span, tweet_screen_name(entry.main_tweet))}".html_safe
+      end
+    elsif entry.micropost?
+      @template.content_tag(:span, '', class: "title-inner") do
+        "#{entry.micropost.author_name} #{@template.content_tag(:span, entry.micropost.author_display_username)}".html_safe
       end
     elsif entry.title.blank? && entry.author.present?
       @template.content_tag(:span, '', class: "title-inner") do
