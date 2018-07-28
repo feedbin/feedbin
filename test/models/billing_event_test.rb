@@ -12,15 +12,19 @@ class BillingEventTest < ActiveSupport::TestCase
 
   test "charge_succeeded?" do
     event = StripeMock.mock_webhook_event('charge.succeeded', webhook_defaults)
-    assert_difference "Sidekiq::Extensions::DelayedMailer.jobs.size", +1 do
-      BillingEvent.create(info: event.as_json)
+    assert_difference "ActionMailer::Base.deliveries.count", +1 do
+      Sidekiq::Testing.inline! do
+        BillingEvent.create(info: event.as_json)
+      end
     end
   end
 
   test "charge_failed?" do
     event = StripeMock.mock_webhook_event('invoice.payment_failed', webhook_defaults)
-    assert_difference "Sidekiq::Extensions::DelayedMailer.jobs.size", +1 do
-      BillingEvent.create(info: event.as_json)
+    assert_difference "ActionMailer::Base.deliveries.count", +1 do
+      Sidekiq::Testing.inline! do
+        BillingEvent.create(info: event.as_json)
+      end
     end
   end
 
