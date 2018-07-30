@@ -42,8 +42,10 @@ class Entry < ApplicationRecord
 
   def micropost
     @micropost ||= begin
-      post = Micropost.new(data["json_feed"], self.title)
-      post.valid? ? post : nil
+      if data.respond_to?(:has_key?)
+        post = Micropost.new(data["json_feed"], self.title)
+        post.valid? ? post : nil
+      end
     end
   end
 
