@@ -3218,8 +3218,13 @@ $saved-search-control-height: 48px;
     ol,
     figure,
     blockquote,
-    .media-container {
+    .media-container,
+    .micropost-wrap {
         margin: 1.1em 0 1.1em 0;
+    }
+
+    .micropost-wrap {
+        margin-bottom: none;
     }
 
     h1, h2, h3, h4, h5, h6 {
