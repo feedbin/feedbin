@@ -146,7 +146,7 @@ class EntryPresenter < BasePresenter
     @entry_view_title ||= begin
       text = sanitized_title
       if text.blank?
-        text = @template.content_tag(:span, entry.feed.title, title: "No title").html_safe
+        text = @template.content_tag(:span, entry.feed.title, data: {behavior: "user_title", feed_id: entry.feed_id}).html_safe
       end
       text
     end
