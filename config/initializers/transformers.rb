@@ -15,90 +15,35 @@ class Transformers
         return
       end
 
-      allowed_hosts = [
-        /^
-          (?:https?:\/\/|\/\/)
-          (?:www\.)?
-          (?:youtube\.com|youtu\.be|youtube-nocookie\.com)
-        /x,
-        /^
-          (?:https?:\/\/|\/\/)
-          (?:www\.|player\.)?
-          (?:vimeo\.com)
-        /x,
-        /^
-          (?:https?:\/\/|\/\/)
-          (?:www\.)?
-          (?:kickstarter\.com)
-        /x,
-        /^
-          (?:https?:\/\/|\/\/)
-          (?:embed\.spotify\.com)
-        /x,
-        /^
-          (?:https?:\/\/|\/\/)
-          (?:w\.soundcloud\.com)
-        /x,
-        /^
-          (?:https?:\/\/|\/\/)
-          (?:view\.vzaar\.com)
-        /x,
-        /^
-          (?:https?:\/\/|\/\/)
-          (?:vine\.co)
-        /x,
-        /^
-          (?:https?:\/\/|\/\/)
-          (?:e\.)?
-          (?:infogr\.am)
-        /x,
-        /^
-          (?:https?:\/\/|\/\/)
-          (?:www\.flickr\.com)
-        /x,
-        /^
-          (?:https?:\/\/|\/\/)
-          (?:mpora\.com)
-        /x,
-        /^
-          (?:https?:\/\/|\/\/)
-          (?:embed-ssl\.ted\.com)
-        /x,
-        /^
-          (?:https?:\/\/|\/\/)
-          (?:embed\.itunes\.apple\.com)
-        /x,
-        /^
-          (?:https?:\/\/|\/\/)
-          (?:www\.tumblr\.com)
-        /x,
-        /^
-          (?:https?:\/\/|\/\/)
-          (?:cdn\.embedly\.com)
-        /x
-      ]
-
-      source_allowed = false
-      allowed_hosts.each do |host|
-        if source =~ host
-          source_allowed = true
-        end
-      end
-
-      return unless source_allowed
-
       # Force protocol relative url
       node['src'] = source.gsub(/^https?:?/, '')
 
-      # Strip attributes
-      Sanitize.clean_node!(node, {
-        :elements => %w[iframe],
-        :attributes => {
-          'iframe'  => %w[allowfullscreen frameborder height src width]
-        }
-      })
+      begin
+        uri = URI(node["src"])
+      rescue
+      end
 
-      {:node_whitelist => [node]}
+      if uri
+        width = node["width"] && node["width"].to_f
+        height = node["height"] && node["height"].to_f
+
+        padding = 56.25
+        if height && width
+          padding = (height / width) * 100
+        end
+
+        replacement = Nokogiri::XML::Element.new("div", node.document)
+        replacement["class"] = "iframe-placeholder"
+        replacement["data-behavior"] = "iframe_placeholder"
+        replacement["data-iframe-src"] = node["src"]
+        replacement["data-iframe-host"] = uri.host
+        replacement["data-iframe-padding"] = padding
+
+
+
+        node.replace(replacement)
+        {:node_whitelist => [replacement]}
+      end
     }
   end
 

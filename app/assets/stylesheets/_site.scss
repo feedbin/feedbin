@@ -3219,8 +3219,17 @@ $saved-search-control-height: 48px;
     figure,
     blockquote,
     .media-container,
-    .micropost-wrap {
+    .micropost-wrap,
+    .fluid-width-video-wrapper,
+    .iframe-placeholder,
+    .entry-callout {
         margin: 1.1em 0 1.1em 0;
+    }
+
+    .iframe-placeholder {
+        width: 100%;
+        position: relative;
+        padding: 0;
     }
 
     .micropost-wrap {
@@ -3345,11 +3354,10 @@ $saved-search-control-height: 48px;
         font-weight: 400 !important;
     }
 
-    .entry-callout {
+    .entry-callout, .iframe-placeholder {
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         position: relative;
-        margin-bottom: 1.1em;
         font-size: 13px;
         font-family: $font-stack !important;
         font-weight: 400 !important;
@@ -3466,10 +3474,6 @@ $saved-search-control-height: 48px;
                 background-image: image-url("spinner-sunset.svg");
             }
         }
-    }
-
-    .fluid-width-video-wrapper {
-        margin-bottom: 1.1em;
     }
 
     @media (max-width: 550px) {

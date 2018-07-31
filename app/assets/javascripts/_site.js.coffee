@@ -412,6 +412,13 @@ $.extend feedbin,
         if node == "TABLE"
           $('.entry-type-default').removeClass("entry-type-default").addClass("entry-type-newsletter");
 
+  formatIframes: ->
+    $("[data-iframe-src]").each ->
+      iframe = $(@)
+      iframe.text "Load embed from #{iframe.data("iframe-host")}?"
+      iframe.css
+        "padding-top": iframe.data("iframe-padding")
+
   formatImages: ->
     $("img[data-camo-src]").each ->
       img = $(@)
@@ -465,6 +472,7 @@ $.extend feedbin,
       feedbin.formatImgur()
       feedbin.formatImages()
       feedbin.checkType()
+      feedbin.formatIframes()
     catch error
       if 'console' of window
         console.log error
@@ -1857,6 +1865,15 @@ $.extend feedbin,
 
       $(document).on 'input', '[data-behavior~=autosubmit]', (event) ->
         throttled($(@))
+
+    loadIframe: ->
+      $(document).on 'click', '[data-behavior~=iframe_placeholder]', (event) ->
+        iframe = $("<iframe>").attr
+          "src": $(@).data("iframe-src")
+          "allowfullscreen": true
+          "frameborder": 0
+
+        $(@).replaceWith(iframe)
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
