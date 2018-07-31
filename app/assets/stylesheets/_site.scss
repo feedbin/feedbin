@@ -1639,10 +1639,10 @@ $saved-search-control-height: 48px;
             }
             background: $body-background-color image-url("spinner-day.svg") 50% 25% no-repeat;
             .theme-sunset & {
-                background: $body-background-color-night image-url("spinner-sunset.svg") 50% 25% no-repeat;
+                background: $body-background-color-sunset image-url("spinner-sunset.svg") 50% 25% no-repeat;
             }
             .theme-night & {
-                background: $body-background-color-sunset image-url("spinner-night.svg") 50% 25% no-repeat;
+                background: $body-background-color-night image-url("spinner-night.svg") 50% 25% no-repeat;
             }
         }
     }

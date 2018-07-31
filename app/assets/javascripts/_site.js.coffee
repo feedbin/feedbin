@@ -1192,13 +1192,13 @@ $.extend feedbin,
         return
 
     entriesLoading: ->
-      $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
+      $(document).on 'click', '[data-behavior~=feed_link]', (event) ->
         $(".entries").addClass("loading")
         title = $(".collection-label-wrap", @).text()
         $("[data-behavior~=entries_header] .feed-title-wrap").text(title)
         true
 
-      $(document).on 'ajax:complete', '[data-behavior~=show_entries]', (event, xhr) ->
+      $(document).on 'ajax:complete', '[data-behavior~=feed_link]', (event, xhr) ->
         $(".entries").removeClass("loading")
         true
 
