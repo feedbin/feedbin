@@ -41,7 +41,7 @@ feedbin.Counts.get(feedbin.count_data);
     </div>
 
     <div class="entries-column app-panel" data-behavior="content_column" <%= resizable 'entries' %>>
-        <div class="entries-header" data-behavior="entries-header"></div>
+        <div class="entries-header" data-behavior="entries_header"></div>
         <div class="entries-inner">
             <%= form_tag search_entries_path, class: 'search-form-wrap', remote: true, method: :get, data: {behavior: 'search_form'} do %>
                 <%= search_field_tag :query, params[:query], placeholder: 'Search', autocomplete: 'off' %>
@@ -68,7 +68,7 @@ feedbin.Counts.get(feedbin.count_data);
             </div>
 
             <div class="entries">
-                <ul data-behavior="entries_target"></ul>
+                <ul data-behavior="entries_target" class="entries-target"></ul>
             </div>
         </div>
         <%= render partial: 'shared/feeds_toolbar' %>
