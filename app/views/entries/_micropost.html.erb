@@ -5,7 +5,7 @@
         <header class="tweet-header">
             <div class="profile-wrap">
                 <%= link_to entry.micropost.author_url, target: "_blank", title: "Author’s Website", class: "profile-image" do %>
-                    <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry.micropost.author_avatar, size: "47x47", alt: "") %>
+                    <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry_presenter.camo_link(entry.micropost.author_avatar), size: "47x47", alt: "") %>
                 <% end %>
                 <div class="profile-info">
                     <h1>

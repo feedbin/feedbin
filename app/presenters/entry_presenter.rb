@@ -433,7 +433,8 @@ class EntryPresenter < BasePresenter
     elsif entry.micropost?
       @template.content_tag :span, '', class: "favicon-wrap twitter-profile-image" do
         fallback = @template.image_url("favicon-profile-default.png")
-        @template.image_tag_with_fallback(fallback, entry.micropost.author_avatar, alt: "")
+        url = camo_link(entry.micropost.author_avatar)
+        @template.image_tag_with_fallback(fallback, url, alt: "")
       end
     else
       favicon(feed)
