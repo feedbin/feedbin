@@ -18,28 +18,19 @@ class Transformers
       # Force protocol relative url
       node['src'] = source.gsub(/^https?:?/, '')
 
-      begin
-        uri = URI(node["src"])
-      rescue
-      end
-
-      if uri
-        width = node["width"] && node["width"].to_f
-        height = node["height"] && node["height"].to_f
-
-        padding = 56.25
-        if height && width
-          padding = (height / width) * 100
-        end
-
+      if uri = URI(node["src"]) rescue nil
         replacement = Nokogiri::XML::Element.new("div", node.document)
         replacement["class"] = "iframe-placeholder"
         replacement["data-behavior"] = "iframe_placeholder"
-        replacement["data-iframe-src"] = node["src"]
+        replacement["data-iframe-src"] = uri.to_s
         replacement["data-iframe-host"] = uri.host
-        replacement["data-iframe-padding"] = padding
 
-
+        width = node["width"] && node["width"].to_i
+        height = node["height"] && node["height"].to_i
+        if height && width
+          replacement["data-iframe-width"] = width
+          replacement["data-iframe-height"] = height
+        end
 
         node.replace(replacement)
         {:node_whitelist => [replacement]}
