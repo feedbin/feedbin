@@ -1632,6 +1632,21 @@ $saved-search-control-height: 48px;
     -webkit-overflow-scrolling: touch;
     transition: transform .2s ease;
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    @media (max-width: 550px) {
+        &.loading {
+            .entries-target {
+                display: none;
+            }
+            background: $body-background-color image-url("spinner-day.svg") 50% 25% no-repeat;
+            .theme-sunset & {
+                background: $body-background-color-sunset image-url("spinner-sunset.svg") 50% 25% no-repeat;
+            }
+            .theme-night & {
+                background: $body-background-color-night image-url("spinner-night.svg") 50% 25% no-repeat;
+            }
+        }
+    }
+
     &.show-search-options {
         transform: translateY($toolbar-height);
         padding-bottom: $toolbar-height;

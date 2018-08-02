@@ -77,21 +77,21 @@ $.extend feedbin,
         window.history.replaceState({panel: 1}, document.title, "/");
       $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
       if feedbin.swipe
-        $('.app-wrap').animate({scrollLeft: 0}, {duration: 250})
+        $('.app-wrap').animate({scrollLeft: 0}, {duration: 150})
     else if panel == 2
       if state && feedbin.mobileView()
         window.history.pushState({panel: 2}, document.title, "/");
       $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
       if feedbin.swipe
         offset = $('.entries-column')[0].offsetLeft
-        $('.app-wrap').animate({scrollLeft: offset}, {duration: 250})
+        $('.app-wrap').animate({scrollLeft: offset}, {duration: 150})
     else if panel == 3
       if state && feedbin.mobileView()
         window.history.pushState({panel: 3}, document.title, "/");
       $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
       if feedbin.swipe
         offset = $('.entry-column')[0].offsetLeft
-        $('.app-wrap').animate({scrollLeft: offset}, {duration: 250})
+        $('.app-wrap').animate({scrollLeft: offset}, {duration: 150})
 
 
   showNotification: (text, timeout = 3000, href = '', error = false) ->
@@ -1198,6 +1198,17 @@ $.extend feedbin,
           id = next.data('entry-id')
           feedbin.preloadImages(id)
         return
+
+    entriesLoading: ->
+      $(document).on 'click', '[data-behavior~=feed_link]', (event) ->
+        $(".entries").addClass("loading")
+        title = $(".collection-label-wrap", @).text()
+        $("[data-behavior~=entries_header] .feed-title-wrap").text(title)
+        true
+
+      $(document).on 'ajax:complete', '[data-behavior~=feed_link]', (event, xhr) ->
+        $(".entries").removeClass("loading")
+        true
 
     feedSelected: ->
       $(document).on 'click', '[data-behavior~=show_feeds]', ->
