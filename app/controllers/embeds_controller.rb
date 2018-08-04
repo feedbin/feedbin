@@ -12,5 +12,9 @@ class EmbedsController < ApplicationController
     @media = InstagramEmbed.new(@url)
   end
 
+  def iframe
+    src = params[:src]
+
+  end
 
 end

@@ -414,10 +414,12 @@ $.extend feedbin,
 
   formatIframes: ->
     $("[data-iframe-src]").each ->
-      iframe = $(@)
-      iframe.text "Load embed from #{iframe.data("iframe-host")}?"
-      iframe.css
-        "padding-top": iframe.data("iframe-padding")
+      container = $(@)
+      contents = []
+
+      contents.push $("<p>Load embed from #{container.data("iframe-host")}?</p>")
+
+      container.html contents
 
   formatImages: ->
     $("img[data-camo-src]").each ->

@@ -16,14 +16,16 @@ class Transformers
       end
 
       # Force protocol relative url
-      node['src'] = source.gsub(/^https?:?/, '')
+      node['src'] = source.gsub(/^https?:?/, 'https:')
 
       if uri = URI(node["src"]) rescue nil
         replacement = Nokogiri::XML::Element.new("div", node.document)
+        replacement["id"] = Digest::SHA1.hexdigest(uri.to_s)
         replacement["class"] = "iframe-placeholder"
         replacement["data-behavior"] = "iframe_placeholder"
         replacement["data-iframe-src"] = uri.to_s
         replacement["data-iframe-host"] = uri.host
+        replacement["data-iframe-embed-url"] = Rails.application.routes.url_helpers.iframe_embeds_path(src: uri.to_s)
 
         width = node["width"] && node["width"].to_i
         height = node["height"] && node["height"].to_i

@@ -90,6 +90,7 @@ Rails.application.routes.draw do
     collection do
       get :twitter
       get :instagram
+      get :iframe
     end
   end
 
