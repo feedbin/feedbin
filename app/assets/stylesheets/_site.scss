@@ -3239,7 +3239,7 @@ $saved-search-control-height: 48px;
     }
 
     .micropost-wrap {
-        margin-bottom: none;
+        margin-bottom: 0;
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -3896,7 +3896,7 @@ $saved-search-control-height: 48px;
             position: static;
         }
     }
-    .tweet-text, .micropost-text {
+    .tweet-text {
         white-space: pre-wrap;
         font-size: 1.15em;
         line-height: 1.4;
@@ -3905,7 +3905,9 @@ $saved-search-control-height: 48px;
         overflow-wrap: break-word
     }
     .micropost-text {
-        white-space: normal;
+        line-height: 1.4;
+        font-family: $font-stack;
+        font-weight: normal;
     }
     .header-time {
         display: none;
