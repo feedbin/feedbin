@@ -1,12 +1,8 @@
 <div class="<%= user.display_prefs %>">
     <div class="entry-inner">
-        <div class="tweet-wrap">
-            <div class="tweet-wrap">
-                <%= render partial: "entries/micropost", collection: tweets, locals: {entry: entry, parent: parent, css: "quoted-tweet reply", include_media: true} %>
-            </div>
-            <script>
-                feedbin.localizeTime();
-            </script>
-        </div>
+        <%= render partial: "entries/micropost", collection: microposts %>
     </div>
 </div>
+<script>
+    feedbin.localizeTime();
+</script>

@@ -3,10 +3,27 @@ class MicropostsController < ApplicationController
   def thread
     @user = current_user
     @entry = Entry.find(params[:id])
-    @replies = get_replies
+    @microposts = Rails.cache.fetch("microblog_thread:#{@entry.id}", expires_in: 2.minutes) do
+      build_microposts
+    end
   end
 
   private
+
+  def build_microposts
+    replies = get_replies
+    items = replies["items"] || []
+    items.reverse.map do |item|
+      data = {
+        micropost: Micropost.new(item, nil),
+        fully_qualified_url: item["url"],
+        published: Time.parse(item["date_published"]),
+        content: item["content_html"],
+        id: item["id"],
+      }
+      OpenStruct.new(data)
+    end
+  end
 
   def get_replies
     auth = "Token #{ENV["MICROBLOG_TOKEN"]}"

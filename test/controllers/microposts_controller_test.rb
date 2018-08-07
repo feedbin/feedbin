@@ -18,7 +18,7 @@ class MicropostsControllerTest < ActionController::TestCase
 
     get :thread, params: {id: entry.id}, xhr: true
 
-    assert assigns(:replies)
+    assert assigns(:microposts)
     assert_response :success
   end
 

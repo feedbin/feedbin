@@ -3233,13 +3233,18 @@ $saved-search-control-height: 48px;
     ol,
     figure,
     blockquote,
-    .media-container,
-    .micropost-wrap {
+    .media-container {
         margin: 1.1em 0 1.1em 0;
     }
 
     .micropost-wrap {
-        margin-bottom: 0;
+        p,
+        ul,
+        ol,
+        figure,
+        blockquote {
+            margin-top: 0;
+        }
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -3521,28 +3526,10 @@ $saved-search-control-height: 48px;
 }
 
 .entry-final-content a, .tweet-text a, .micropost-text a, .modal-content .content-styles a {
-    background-position: 0 1.05em;
-    background-size: 2px .1em;
-    background-repeat: repeat-x;
-    background-image: linear-gradient(to bottom,rgba(#000,1) 50%,rgba(#000,1) 50%);
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    text-decoration: underline;
     @include color(black, white, black);
-    .theme-night & {
-        background-image: linear-gradient(to bottom,rgba(#FFF,1) 50%,rgba(#FFF,1) 50%);
-    }
-    @include respond-to(hidpi) {
-        background-image: linear-gradient(to bottom,rgba(#000,1) 50%,rgba(#000,0) 50%);
-        .theme-night & {
-            background-image: linear-gradient(to bottom,rgba(#FFF,1) 50%,rgba(#FFF,0) 50%);
-        }
-    }
     .no-touch &:hover, &:active {
-        text-decoration: none;
         color: $selected;
-        background-image: linear-gradient(to bottom,rgba($selected,1) 50%,rgba($selected,1) 50%);
-        @include respond-to(hidpi) {
-            background-image: linear-gradient(to bottom,rgba($selected,1) 50%,rgba($selected,0) 50%);
-        }
     }
 }
 
@@ -3902,7 +3889,8 @@ $saved-search-control-height: 48px;
         line-height: 1.4;
         @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
         font-family: $font-stack;
-        overflow-wrap: break-word
+        overflow-wrap: break-word;
+        margin-bottom: 1.1em;
     }
     .micropost-text {
         line-height: 1.4;
@@ -3913,7 +3901,7 @@ $saved-search-control-height: 48px;
         display: none;
     }
     .main-tweet-conversation {
-        .icon-twitter-conversation {
+        .twitter-conversation-link {
             display: none;
         }
     }
@@ -3923,7 +3911,7 @@ $saved-search-control-height: 48px;
         border-radius: 4px;
         border: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
-        .icon-twitter-conversation {
+        .twitter-conversation-link {
             display: none;
         }
         .twitter-link:not(.embed) {
@@ -3932,41 +3920,11 @@ $saved-search-control-height: 48px;
         p:last-child {
             margin-bottom: 0;
         }
-        h1 {
-            display: flex;
-            justify-content: space-between;
-            font-size: 18px;
-            padding-right: 0;
-            align-items: baseline;
-            a {
-                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-                text-decoration: none;
-            }
-            span {
-                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-                font-weight: normal;
-            }
-            time {
-                font-size: 14px;
-                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-                line-height: 1.2;
-                font-weight: normal;
-                margin-left: auto;
-            }
-        }
-        &.reply {
-            padding: 20px 0 0 0;
-            margin-bottom: 20px;
-            border-radius: 0;
-            border-left: none;
-            border-right: none;
-            border-bottom: none;
-            .tweet-text {
-                margin-bottom: 20px;
-            }
-        }
     }
     .modal-conversation & {
+        .twitter-conversation-link {
+            display: none;
+        }
         .tweet-body {
             padding-left: 57px;
             @media (max-width: 550px) {
@@ -3981,8 +3939,34 @@ $saved-search-control-height: 48px;
             padding-top: 0 !important;
         }
         .reply {
-            .tweet-mentions {
-                display: none;
+            .tweet-mentions, .twitter-link {
+                display: none !important;
+            }
+        }
+        .micropost-text p:first-child, .micropost-wrap {
+            margin-top: 0;
+        }
+        .micropost-wrap, .tweet-body-inner {
+            margin-bottom: 1.1em;
+            border-bottom: 1px solid transparent;
+            @include border-color($border-color, $border-color-night, $border-color-sunset);
+        }
+        .micropost-wrap {
+            padding-bottom: 1.1em;
+        }
+        .micropost-wrap {
+            :last-child {
+                margin-bottom: 0;
+            }
+        }
+        &.micropost:last-child {
+            .micropost-wrap {
+                border-bottom: none;
+            }
+        }
+        .tweet:last-child {
+            .tweet-body-inner {
+                border-bottom: none;
             }
         }
     }
