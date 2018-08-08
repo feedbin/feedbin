@@ -14,7 +14,7 @@ class BasePresenter
         end
       elsif feed.twitter_user?
         content = @template.content_tag :span, '', class: "favicon-wrap twitter-profile-image" do
-          url = camo_link(feed.twitter_user.profile_image_uri_https("bigger"))
+          url = @template.camo_link(feed.twitter_user.profile_image_uri_https("bigger"))
           fallback = @template.image_url("favicon-profile-default.png")
           @template.image_tag_with_fallback(fallback, url, alt: "")
         end
@@ -35,15 +35,6 @@ class BasePresenter
       end
       content.html_safe
     end
-  end
-
-  def camo_link(url)
-    options = {
-      asset_proxy:            ENV["CAMO_HOST"],
-      asset_proxy_secret_key: ENV["CAMO_KEY"],
-    }
-    pipeline = HTML::Pipeline::CamoFilter.new(nil, options, nil)
-    pipeline.asset_proxy_url(url.to_s)
   end
 
   private

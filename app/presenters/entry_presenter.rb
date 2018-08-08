@@ -146,7 +146,7 @@ class EntryPresenter < BasePresenter
     @entry_view_title ||= begin
       text = sanitized_title
       if text.blank?
-        text = @template.content_tag(:span, entry.feed.title, title: "No title").html_safe
+        text = @template.content_tag(:span, entry.feed.title, data: {behavior: "user_title", feed_id: entry.feed_id}).html_safe
       end
       text
     end
@@ -430,6 +430,12 @@ class EntryPresenter < BasePresenter
         fallback = @template.image_url("favicon-profile-default.png")
         @template.image_tag_with_fallback(fallback, url, alt: "")
       end
+    elsif entry.micropost?
+      @template.content_tag :span, '', class: "favicon-wrap twitter-profile-image" do
+        fallback = @template.image_url("favicon-profile-default.png")
+        url = @template.camo_link(entry.micropost.author_avatar)
+        @template.image_tag_with_fallback(fallback, url, alt: "")
+      end
     else
       favicon(feed)
     end
@@ -439,6 +445,10 @@ class EntryPresenter < BasePresenter
     if entry.tweet?
       @template.content_tag(:span, '', class: "title-inner") do
         "#{tweet_name(entry.main_tweet)} #{@template.content_tag(:span, tweet_screen_name(entry.main_tweet))}".html_safe
+      end
+    elsif entry.micropost?
+      @template.content_tag(:span, '', class: "title-inner") do
+        "#{entry.micropost.author_name} #{@template.content_tag(:span, entry.micropost.author_display_username)}".html_safe
       end
     elsif entry.title.blank? && entry.author.present?
       @template.content_tag(:span, '', class: "title-inner") do
@@ -532,7 +542,7 @@ class EntryPresenter < BasePresenter
 
   def tweet_retweeted_image
     if entry.tweet.user.profile_image_uri? && entry.tweet.user.profile_image_uri_https("normal")
-      camo_link(entry.tweet.user.profile_image_uri_https("normal"))
+      @template.camo_link(entry.tweet.user.profile_image_uri_https("normal"))
     else
       @template.image_url("favicon-profile-default.png ")
     end
@@ -541,7 +551,7 @@ class EntryPresenter < BasePresenter
   # Sizes: normal, bigger
   def tweet_profile_image_uri(tweet, size = "bigger")
     if tweet.user.profile_image_uri? && tweet.user.profile_image_uri_https(size)
-      camo_link(tweet.user.profile_image_uri_https("bigger"))
+      @template.camo_link(tweet.user.profile_image_uri_https("bigger"))
     else
       @template.image_url("favicon-profile-default.png ")
     end

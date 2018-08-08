@@ -12,7 +12,7 @@
                         <%= entry_presenter.tweet_screen_name(tweet) %>
                     </a>
                     <span class="tweet-actions">
-                        <%= link_to thread_tweet_path(entry), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {behavior: "open_modal"} do %>
+                        <%= link_to thread_tweet_path(entry), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {behavior: "open_modal", modal_class: "modal-conversation"} do %>
                             <%= svg_tag "icon-twitter-conversation" %>
                         <% end %>
 
@@ -38,28 +38,30 @@
     </header>
 
     <div class="tweet-body">
-        <%= entry_presenter.tweet_in_reply_to(tweet) %>
-        <%= entry_presenter.tweet_text(tweet) %>
+        <div class="tweet-body-inner">
+            <%= entry_presenter.tweet_in_reply_to(tweet) %>
+            <%= entry_presenter.tweet_text(tweet) %>
 
-        <% if local_assigns[:tweet_counter] && tweet_counter == 0 %>
-            <% if tweet.quoted_status? %>
-                <%= render partial: "shared/tweet", locals: {entry: entry, tweet: tweet.quoted_status, css: "quoted-tweet"} %>
+            <% if local_assigns[:tweet_counter] && tweet_counter == 0 %>
+                <% if tweet.quoted_status? %>
+                    <%= render partial: "shared/tweet", locals: {entry: entry, tweet: tweet.quoted_status, css: "quoted-tweet"} %>
+                <% end %>
             <% end %>
-        <% end %>
 
-        <% if local_assigns[:include_media] && include_media %>
-            <% tweet.media.take(1).each do |media| %>
-                <div class="content-styles entry-type-default" data-behavior="format_images">
-                    <% if entry_presenter.tweet_video?(media) %>
-                        <%= entry_presenter.tweet_video(media) %>
-                    <% else %>
-                        <%= link_to media.media_url_https.to_s + ":large" do %>
-                            <%= image_tag entry_presenter.camo_link(media.media_url_https.to_s + ":large") %>
+            <% if local_assigns[:include_media] && include_media %>
+                <% tweet.media.take(1).each do |media| %>
+                    <div class="content-styles entry-type-default" data-behavior="format_images">
+                        <% if entry_presenter.tweet_video?(media) %>
+                            <%= entry_presenter.tweet_video(media) %>
+                        <% else %>
+                            <%= link_to media.media_url_https.to_s + ":large" do %>
+                                <%= image_tag camo_link(media.media_url_https.to_s + ":large") %>
+                            <% end %>
                         <% end %>
-                    <% end %>
-                </div>
+                    </div>
+                <% end %>
             <% end %>
-        <% end %>
+        </div>
     </div>
 
 </div>

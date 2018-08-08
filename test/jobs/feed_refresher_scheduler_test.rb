@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class FeedRefresherSchedulerTestTest < ActiveSupport::TestCase
+class FeedRefresherSchedulerTest < ActiveSupport::TestCase
 
   test "should enqueue FeedRefresher" do
     flush_redis

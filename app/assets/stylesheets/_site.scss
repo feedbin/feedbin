@@ -598,11 +598,6 @@ table {
     .service-options {
         background-color: $list-background-color;
     }
-    .icon-share-app_dot_net {
-        background-image: image-url("icon-share-app-dot-net.svg");
-        background-size: 25px 25px;
-        @include share-icon(0, 0);
-    }
     .icon-share-facebook {
         background-image: image-url("icon-share-facebook.svg");
         background-size: 25px 25px;
@@ -642,11 +637,6 @@ table {
         background-image: image-url("icon-share-instapaper.svg");
         background-size: 10px 23px;
         @include share-icon(7, 2);
-    }
-    .icon-share-readability {
-        background-image: image-url("icon-share-readability.svg");
-        background-size: 24px 17px;
-        @include share-icon(0, 5);
     }
     .icon-share-pocket {
         background-image: image-url("icon-share-pocket.svg");
@@ -908,6 +898,7 @@ Structure
     left: 0;
     right: 0;
     overflow: hidden;
+    display: flex;
     .show-subscribe {
         user-select: none;
         color: $selected;
@@ -922,8 +913,8 @@ Structure
         appearance: none;
         border: none;
         background: none;
-        width: 100%;
         text-align: left;
+        flex: 1;
     }
 }
 
@@ -940,6 +931,17 @@ Structure
 .mobile-hamburger {
     display: none;
     right: 7px;
+    .subscribe-toolbar & {
+        position: static;
+    }
+    .settings & {
+        top: 21px;
+        right: 15px;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+        height: 36px;
+        width: 36px;
+    }
 }
 
 .hamburger-menu {
@@ -955,7 +957,7 @@ Structure
         left: 7px;
     }
     .settings & {
-        top: 31px;
+        top: 15px;
         right: 15px;
     }
 }
@@ -1019,7 +1021,7 @@ Structure
     cursor: pointer;
     height: 100%;
     width: 100%;
-    display: inline-block;
+    display: block;
     padding: 8px 0 0 0;
     &[disabled] {
         cursor: default;
@@ -1194,6 +1196,7 @@ Structure
                 display: block;
                 text-overflow: ellipsis;
                 overflow: hidden;
+                line-height: 1.3;
                 white-space: nowrap;
                 &.hide {
                     display: none;
@@ -1410,6 +1413,9 @@ li.selected > a .favicon-wrap {
     box-shadow: none;
     svg {
         @include fill($text-color-light, $text-color-muted-night, $text-color-light-sunset);
+        li.selected > .feed-link & {
+            fill: #FFF;
+        }
     }
     .favicon-newsletter {
         @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
@@ -1626,6 +1632,21 @@ $saved-search-control-height: 48px;
     -webkit-overflow-scrolling: touch;
     transition: transform .2s ease;
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    @media (max-width: 550px) {
+        &.loading {
+            .entries-target {
+                display: none;
+            }
+            background: $body-background-color image-url("spinner-day.svg") 50% 25% no-repeat;
+            .theme-sunset & {
+                background: $body-background-color-sunset image-url("spinner-sunset.svg") 50% 25% no-repeat;
+            }
+            .theme-night & {
+                background: $body-background-color-night image-url("spinner-night.svg") 50% 25% no-repeat;
+            }
+        }
+    }
+
     &.show-search-options {
         transform: translateY($toolbar-height);
         padding-bottom: $toolbar-height;
@@ -2280,6 +2301,9 @@ $saved-search-control-height: 48px;
             padding: 0;
             @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
             position: relative;
+            &::-ms-expand {
+                display: none;
+            }
         }
         &:after {
             width: 0px;
@@ -2494,7 +2518,6 @@ $saved-search-control-height: 48px;
     right: 0;
     margin: 0;
     bottom: 0;
-    will-change: transform, opacity, top;
     transition: transform .2s ease, opacity .15s ease, top .2s ease;
     opacity: 1;
     -webkit-overflow-scrolling: touch;
@@ -2629,6 +2652,14 @@ $saved-search-control-height: 48px;
             height: 18px;
             svg * {
                 @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+            }
+        }
+        &.button-next, &.button-previous {
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            &:active:not([disabled]) {
+                svg * {
+                    fill: $selected;
+                }
             }
         }
         &[disabled] {
@@ -3189,12 +3220,12 @@ $saved-search-control-height: 48px;
 
     h1, h2 {
         font-size: 1.3em;
-        line-height: 1.3;
+        line-height: 1.2;
     }
 
     h3, h4, h5, h6 {
         font-size: 1.1em;
-        line-height: 1.4;
+        line-height: 1.3;
     }
 
     p,
@@ -3204,6 +3235,16 @@ $saved-search-control-height: 48px;
     blockquote,
     .media-container {
         margin: 1.1em 0 1.1em 0;
+    }
+
+    .micropost-wrap {
+        p,
+        ul,
+        ol,
+        figure,
+        blockquote {
+            margin-top: 0;
+        }
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -3484,14 +3525,11 @@ $saved-search-control-height: 48px;
     }
 }
 
-.entry-final-content a, .tweet-text a, .modal-content .content-styles a {
-    border-bottom: 1px solid transparent;
-    @include border-color(rgba(#000, .3), white, rgba(#000, .3));
+.entry-final-content a, .tweet-text a, .micropost-text a, .modal-content .content-styles a {
+    text-decoration: underline;
     @include color(black, white, black);
-    &:hover {
-        text-decoration: none;
+    .no-touch &:hover, &:active {
         color: $selected;
-        border-bottom: 1px solid $selected;
     }
 }
 
@@ -3735,6 +3773,7 @@ $saved-search-control-height: 48px;
             position: relative;
             a {
                 border-bottom: none;
+                background: none;
                 &:hover {
                     border-bottom: none;
                 }
@@ -3761,6 +3800,7 @@ $saved-search-control-height: 48px;
                 font-weight: normal;
                 @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
                 text-decoration: none;
+                background: none;
                 display: block;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -3815,7 +3855,7 @@ $saved-search-control-height: 48px;
         font-size: 1.15em;
         h1 {
             font-size: 1.3em;
-            line-height: 1.4;
+            line-height: 1.2;
         }
     }
     .tweet-meta {
@@ -3849,13 +3889,19 @@ $saved-search-control-height: 48px;
         line-height: 1.4;
         @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
         font-family: $font-stack;
-        overflow-wrap: break-word
+        overflow-wrap: break-word;
+        margin-bottom: 1.1em;
+    }
+    .micropost-text {
+        line-height: 1.4;
+        font-family: $font-stack;
+        font-weight: normal;
     }
     .header-time {
         display: none;
     }
     .main-tweet-conversation {
-        .icon-twitter-conversation {
+        .twitter-conversation-link {
             display: none;
         }
     }
@@ -3865,7 +3911,7 @@ $saved-search-control-height: 48px;
         border-radius: 4px;
         border: 1px solid transparent;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
-        .icon-twitter-conversation {
+        .twitter-conversation-link {
             display: none;
         }
         .twitter-link:not(.embed) {
@@ -3874,41 +3920,11 @@ $saved-search-control-height: 48px;
         p:last-child {
             margin-bottom: 0;
         }
-        h1 {
-            display: flex;
-            justify-content: space-between;
-            font-size: 18px;
-            padding-right: 0;
-            align-items: baseline;
-            a {
-                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-                text-decoration: none;
-            }
-            span {
-                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-                font-weight: normal;
-            }
-            time {
-                font-size: 14px;
-                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-                line-height: 1.2;
-                font-weight: normal;
-                margin-left: auto;
-            }
-        }
-        &.reply {
-            padding: 20px 0 0 0;
-            margin-bottom: 20px;
-            border-radius: 0;
-            border-left: none;
-            border-right: none;
-            border-bottom: none;
-            .tweet-text {
-                margin-bottom: 20px;
-            }
-        }
     }
     .modal-conversation & {
+        .twitter-conversation-link {
+            display: none;
+        }
         .tweet-body {
             padding-left: 57px;
             @media (max-width: 550px) {
@@ -3923,8 +3939,34 @@ $saved-search-control-height: 48px;
             padding-top: 0 !important;
         }
         .reply {
-            .tweet-mentions {
-                display: none;
+            .tweet-mentions, .twitter-link {
+                display: none !important;
+            }
+        }
+        .micropost-text p:first-child, .micropost-wrap {
+            margin-top: 0;
+        }
+        .micropost-wrap, .tweet-body-inner {
+            margin-bottom: 1.1em;
+            border-bottom: 1px solid transparent;
+            @include border-color($border-color, $border-color-night, $border-color-sunset);
+        }
+        .micropost-wrap {
+            padding-bottom: 1.1em;
+        }
+        .micropost-wrap {
+            :last-child {
+                margin-bottom: 0;
+            }
+        }
+        &.micropost:last-child {
+            .micropost-wrap {
+                border-bottom: none;
+            }
+        }
+        .tweet:last-child {
+            .tweet-body-inner {
+                border-bottom: none;
             }
         }
     }
@@ -5955,7 +5997,7 @@ Link Viewer
             padding-right: 0px;
         }
     }
-    &.modal-feed-edit {
+    .modal-feed-edit & {
         .modal-body {
             padding: 0;
         }
@@ -5967,7 +6009,7 @@ Link Viewer
             padding-top: 20px !important;
         }
     }
-    &.modal-conversation  {
+    .modal-conversation & {
         .modal-body {
             padding: 0 0 10px 0;
         }
@@ -8103,10 +8145,10 @@ Media Queries
             display: none;
         }
     }
+    .entries-header {
+        display: flex;
+    }
     .feed-selected {
-        .entries-header {
-            display: flex;
-        }
         .feeds-column {
             display: none;
         }

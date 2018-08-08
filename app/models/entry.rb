@@ -36,6 +36,19 @@ class Entry < ApplicationRecord
     nil
   end
 
+  def micropost?
+    micropost.present?
+  end
+
+  def micropost
+    @micropost ||= begin
+      if data.respond_to?(:has_key?)
+        post = Micropost.new(data["json_feed"], self.title)
+        post.valid? ? post : nil
+      end
+    end
+  end
+
   def twitter_thread_ids
     thread.map do |t|
       t.dig("id")

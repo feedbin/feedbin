@@ -32,8 +32,7 @@ class FaviconProcessor
   def upload(data)
     upload_url = nil
     S3_POOL.with do |connection|
-      connection.put_object(ENV['AWS_S3_BUCKET_FAVICONS'], File.join(favicon_hash[0..2], "#{favicon_hash}.png"), data, s3_options)
-      response = connection.put_object(ENV['AWS_S3_BUCKET'], path, data, s3_options)
+      response = connection.put_object(ENV['AWS_S3_BUCKET_FAVICONS'], File.join(favicon_hash[0..2], "#{favicon_hash}.png"), data, s3_options)
       upload_url = URI::HTTP.build(
         scheme: 'https',
         host: response.data[:host],
@@ -72,10 +71,11 @@ class FaviconProcessor
   end
 
   def remove_blank_images(layers)
-    layers.reject do |favicon|
-      favicon = favicon.scale(1, 1)
-      pixel = favicon.pixel_color(0,0)
-      favicon.to_color(pixel) == "none"
+    layers.reject do |layer|
+      layer = layer.scale(1, 1)
+      pixel = layer.pixel_color(0,0)
+      color = layer.to_color(pixel)
+      %w(none white).include?(color) || color.include?("#FFFFFF")
     end
   end
 

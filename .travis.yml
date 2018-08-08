@@ -38,4 +38,4 @@ before_script:
   - curl http://127.0.0.1:9200/
 
 script:
-  - bin/rails test:system && bin/rails test
+  - bin/rails test:system test

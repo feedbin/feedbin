@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem 'rails', '= 5.1.4'
+gem 'rails', '= 5.1.6'
 
 gem 'rails-deprecated_sanitizer'
 gem 'rails-controller-testing'
@@ -53,7 +53,7 @@ gem 'carrierwave_direct',    github: 'feedbin/carrierwave_direct',  ref: 'a0bc32
 
 gem 'sassc-rails'
 gem 'coffee-rails'
-gem 'uglifier'
+gem 'uglifier', '= 4.1.11'
 gem 'autoprefixer-rails'
 gem 'rubyzip', '= 1.1.0'
 

@@ -3,18 +3,21 @@ class EntryDeleter
   sidekiq_options queue: :worker_slow
 
   def perform(feed_id)
-    if Subscription.where(feed_id: feed_id, active: true).exists?
-      feed = Feed.find(feed_id)
-      if !feed.protected && feed.subscriptions_count > 0
-        delete_entries(feed_id)
-      end
+    feed = Feed.find(feed_id)
+
+    if ENV['ENTRY_LIMIT']
+      entry_limit = ENV['ENTRY_LIMIT'].to_i
     else
-      Librato.increment('entry.destroy_skip')
+      entry_limit = (feed.subscriptions_count == 0) ? 10 : 400
+    end
+
+    feed.feed_stats.where("day < ?", 40.days.ago).delete_all
+    if !feed.protected
+      delete_entries(feed_id, entry_limit)
     end
   end
 
-  def delete_entries(feed_id)
-    entry_limit = ENV['ENTRY_LIMIT'] ? ENV['ENTRY_LIMIT'].to_i : 500
+  def delete_entries(feed_id, entry_limit)
     entry_count = Entry.where(feed_id: feed_id).count
     if entry_count > entry_limit
       entries_to_keep = Entry.where(feed_id: feed_id).order('published DESC').limit(entry_limit).pluck('entries.id')

@@ -1,6 +1,5 @@
-<%= form_tag content_entry_path(entry), remote: true, data: {behavior: 'toggle_content_view', feed_id: entry.feed_id}, class: 'entry-button-wrap' do %>
+<%= form_tag content_entry_path(entry), remote: true, data: {behavior: 'toggle_content_view', entry_id: entry.id, feed_id: entry.feed_id, sticky_url: settings_sticky_path(entry.feed_id)}, class: 'entry-button-wrap' do %>
   <%= hidden_field_tag 'content_view', !content_view %>
-  <%= hidden_field_tag 'cancel_content_view', "false" %>
   <button class="entry-button button-toggle-content <%= 'active' if content_view %>" title="Attempt to load full content">
     <%= svg_tag 'icon-full-content', size: '14x16' %>
   </button>

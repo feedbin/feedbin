@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class EntryIdCacheTestTest < ActiveSupport::TestCase
+class EntryIdCacheTest < ActiveSupport::TestCase
 
   setup do
     flush_redis

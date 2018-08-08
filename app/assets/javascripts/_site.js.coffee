@@ -66,10 +66,9 @@ $.extend feedbin,
     $('[data-behavior~=line_graph]').each ()->
       feedbin.drawBarChart(@, $(@).data('values'))
 
-  modalContent: (html, css) ->
+  modalContent: (html) ->
     modal = $('#general_modal')
     target = $('[data-behavior~=markup_target]', modal)
-    $('.modal-dialog', modal).addClass(css)
 
     placeholder = $('[data-behavior~=modal_placeholder]', modal)
     placeholder.addClass('hide')
@@ -92,21 +91,21 @@ $.extend feedbin,
         window.history.replaceState({panel: 1}, document.title, "/");
       $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
       if feedbin.swipe
-        $('.app-wrap').animate({scrollLeft: 0}, {duration: 250})
+        $('.app-wrap').animate({scrollLeft: 0}, {duration: 150})
     else if panel == 2
       if state && feedbin.mobileView()
         window.history.pushState({panel: 2}, document.title, "/");
       $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
       if feedbin.swipe
         offset = $('.entries-column')[0].offsetLeft
-        $('.app-wrap').animate({scrollLeft: offset}, {duration: 250})
+        $('.app-wrap').animate({scrollLeft: offset}, {duration: 150})
     else if panel == 3
       if state && feedbin.mobileView()
         window.history.pushState({panel: 3}, document.title, "/");
       $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
       if feedbin.swipe
         offset = $('.entry-column')[0].offsetLeft
-        $('.app-wrap').animate({scrollLeft: offset}, {duration: 250})
+        $('.app-wrap').animate({scrollLeft: offset}, {duration: 150})
 
 
   showNotification: (text, timeout = 3000, href = '', error = false) ->
@@ -359,13 +358,16 @@ $.extend feedbin,
 
   readability: () ->
     feedId = feedbin.selectedEntry.feed_id
+    entryId = feedbin.selectedEntry.id
+
     if feedbin.data.readability_settings[feedId] == true && feedbin.data.sticky_readability
-      $('.button-toggle-content').find('span').addClass('active')
-      content = $('[data-behavior~=readability_loading]').html()
+      feedbin.automaticSubmit = true
 
-      feedbin.previousContent = $('[data-behavior~=entry_content_wrap]').html()
+      loadingTemplate = $('[data-behavior~=readability_loading]').html()
 
-      $('[data-behavior~=entry_content_wrap]').html(content)
+      feedbin.previousContent = $("[data-entry-id=#{entryId}] [data-behavior~=entry_content_wrap]").html()
+
+      $('[data-behavior~=entry_content_wrap]').html(loadingTemplate)
       $('[data-behavior~=toggle_content_view]').submit()
 
   resetScroll: ->
@@ -453,6 +455,10 @@ $.extend feedbin,
         img.addClass('hide')
 
   formatEntryContent: (entryId, resetScroll=true, readability=true) ->
+    if feedbin.readabilityXHR != null
+      feedbin.readabilityXHR.abort()
+      feedbin.readabilityXHR = null
+
     feedbin.applyStarred(entryId)
     if resetScroll
       feedbin.resetScroll
@@ -840,12 +846,14 @@ $.extend feedbin,
       $.ajax(xhr)
     )
 
-  modal: (selector) ->
+  modal: (selector, cssClass = null) ->
     activeModal = $(selector)
     $('.modal').each ->
       unless $(@).get(0) == activeModal.get(0)
         $(@).modal('hide')
     activeModal.modal('toggle')
+    if cssClass
+      activeModal.addClass(cssClass)
 
   loadLink: (href) ->
     form = $("[data-behavior~=view_link_form]")
@@ -939,6 +947,8 @@ $.extend feedbin,
     hasTouch: ->
       if 'ontouchstart' of document
         $('body').addClass('touch')
+      else
+        $('body').addClass('no-touch')
 
     isStandalone: ->
       if 'standalone' of window.navigator && window.navigator.standalone
@@ -1195,6 +1205,17 @@ $.extend feedbin,
           feedbin.preloadImages(id)
         return
 
+    entriesLoading: ->
+      $(document).on 'click', '[data-behavior~=feed_link]', (event) ->
+        $(".entries").addClass("loading")
+        title = $(".collection-label-wrap", @).text()
+        $("[data-behavior~=entries_header] .feed-title-wrap").text(title)
+        true
+
+      $(document).on 'ajax:complete', '[data-behavior~=feed_link]', (event, xhr) ->
+        $(".entries").removeClass("loading")
+        true
+
     feedSelected: ->
       $(document).on 'click', '[data-behavior~=show_feeds]', ->
         feedbin.showPanel(1)
@@ -1346,34 +1367,31 @@ $.extend feedbin,
       return
 
     updateReadability: ->
+      $(document).on 'ajax:complete', '[data-behavior~=toggle_content_view]', (event, xhr) ->
+        feedbin.readabilityXHR = null;
+        $('.button-toggle-content').removeClass('loading')
+
       $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_content_view]', (event, xhr) ->
-        feedId = $(event.currentTarget).data('feed-id')
-
-        if !$('.button-toggle-content').hasClass('active')
-          $('.button-toggle-content').addClass('loading')
-
         if feedbin.readabilityXHR
           feedbin.readabilityXHR.abort()
           xhr.abort()
+
           feedbin.readabilityXHR = null
+          $('.button-toggle-content').removeClass('loading')
 
           if feedbin.previousContent
             $('[data-behavior~=entry_content_wrap]').html(feedbin.previousContent)
             feedbin.previousContent = null
-
-          $("#content_view").val("false")
-          $("#cancel_content_view").val("true")
-          $("[data-behavior~=toggle_content_view]").submit()
-
-          $('.button-toggle-content').removeClass('loading')
         else
+          $('.button-toggle-content').addClass('loading')
           feedbin.readabilityXHR = xhr
 
-        if feedbin.data.sticky_readability && feedbin.data.readability_settings[feedId] != "undefined"
-          unless $("#content_view").val() == "true" && feedbin.data.readability_settings[feedId] == true
-            feedbin.data.readability_settings[feedId] = !feedbin.data.readability_settings[feedId]
+        if feedbin.automaticSubmit != true
+          $.post($(@).data("sticky-url"))
 
-        return
+        feedbin.automaticSubmit = false
+
+        true
 
     autoUpdate: ->
       setInterval ( ->
@@ -1817,7 +1835,7 @@ $.extend feedbin,
         feedbin.updateFeedSearchMessage()
 
     linkActionsHover: ->
-      $(document).on 'mouseenter mouseleave', '.entry-final-content a', (event) ->
+      $(document).on 'mouseenter mouseleave', 'body:not(.touch) .entry-final-content a', (event) ->
         link = $(@)
         if link.text().trim().length > 0 && !$(@).has('.mejs__container').length > 0 && !link.closest(".system-content").length
           clearTimeout(feedbin.linkActionsTimer)
@@ -1857,7 +1875,7 @@ $.extend feedbin,
 
         target.html('')
 
-        feedbin.modal(id)
+        feedbin.modal(id, $(@).data("modal-class"))
 
     showMessage: ->
       $(document).on 'click', '[data-behavior~=show_message]', (event) ->

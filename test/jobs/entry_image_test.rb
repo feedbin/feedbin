@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class EntryImageTestTest < ActiveSupport::TestCase
+class EntryImageTest < ActiveSupport::TestCase
   setup do
     Sidekiq::Queues["images"].clear
     @entry = Feed.first.entries.create(
