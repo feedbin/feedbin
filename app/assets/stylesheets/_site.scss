@@ -1242,9 +1242,11 @@ Structure
                     height: 40px;
                     top: -20px;
                     right: 0px;
-                    &:hover {
-                        color: #999;
-                    }
+                }
+            }
+            &.selected {
+                .feed-action-button {
+                    color: $text-color-light !important;
                 }
             }
             &.ui-draggable-dragging {
