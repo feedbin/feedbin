@@ -55,6 +55,26 @@ $.extend feedbin,
 
     result
 
+  scrollToTop: ->
+    element = null
+    if feedbin.panel == 1
+      element = $(".feeds")
+    else if feedbin.panel == 2
+      element = $(".entries")
+    else if feedbin.panel == 3
+      element = $(".entry-content")
+
+    if element
+      element.css
+        "-webkit-overflow-scrolling": "auto"
+      element.animate {scrollTop: 0}, {
+        duration: 150,
+        complete: ()->
+          element.css
+            "-webkit-overflow-scrolling": "touch"
+      }
+
+
   toggleDiff: ->
     $('[data-behavior~=diff_view_changes]').toggleClass("hide")
     $('[data-behavior~=diff_view_latest]').toggleClass("hide")
@@ -1891,6 +1911,10 @@ $.extend feedbin,
 
       $(document).on 'input', '[data-behavior~=autosubmit]', (event) ->
         throttled($(@))
+
+    statsBarTouched: ->
+      $(document).on 'feedbin:native:statusbartouched', (event) ->
+        feedbin.scrollToTop()
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
