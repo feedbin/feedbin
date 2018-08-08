@@ -18,7 +18,7 @@ $.extend feedbin,
   swipe: false
   panel: 1
 
-  setNativeTitleColor: (rgb, timeout = 100) ->
+  setNativeTitleColor: (rgb, timeout = 1) ->
     ctx = document.createElement('canvas').getContext('2d')
     ctx.strokeStyle = rgb
     hex = ctx.strokeStyle
@@ -1522,7 +1522,7 @@ $.extend feedbin,
     theme: ->
       if feedbin.data.theme
         rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
-        feedbin.setNativeTitleColor(rgb, 200)
+        feedbin.setNativeTitleColor(rgb)
 
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
         theme = $(@).data('theme')
