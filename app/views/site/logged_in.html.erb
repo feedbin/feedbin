@@ -31,7 +31,7 @@ feedbin.Counts.get(feedbin.count_data);
                 <%= render partial: 'shared/buttons/view_all' %>
             </div>
             <div class="feeds showing-audio-player" data-behavior="droppable">
-                <ul data-behavior="feeds_target" class="hide fade">
+                <ul data-behavior="feeds_target" class="feeds-target hide fade">
                     <%= render partial: 'feeds/feeds', locals: {collections: @feed_data[:collections], saved_searches: @feed_data[:saved_searches], tags: @feed_data[:tags], feeds: @feed_data[:feeds]} %>
                 </ul>
             </div>

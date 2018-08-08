@@ -1136,6 +1136,9 @@ Structure
     .audio-panel-maximized & {
         bottom: $audio-player-height;
     }
+    .feeds-target {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
     ul {
         margin: 0;
         padding: 0;
