@@ -1412,7 +1412,7 @@ li.selected > a .favicon-wrap {
     background: transparent;
     box-shadow: none;
     svg {
-        @include fill($text-color-light, $text-color-muted-night, $text-color-light-sunset);
+        @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
         li.selected > .feed-link & {
             fill: #FFF;
         }
