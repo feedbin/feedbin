@@ -5725,15 +5725,15 @@ button.close {
     bottom: 0;
     left: 0;
     z-index: 1040;
-    background-color: #333E48;
+    background-color: rgba(#333E48, .6);
 }
 .modal-backdrop.fade {
     opacity: 0;
     filter: alpha(opacity=0);
 }
 .modal-backdrop.in {
-    opacity: 0.6;
-    filter: alpha(opacity=60);
+    opacity: 1;
+    filter: alpha(opacity=100);
 }
 .modal-header {
     padding: 15px;

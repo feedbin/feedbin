@@ -18,10 +18,26 @@ $.extend feedbin,
   swipe: false
   panel: 1
 
+  calculateColor: (backgroundColor, foregroundColor) ->
+    canvas = document.createElement('canvas')
+    canvas.style.display = 'none'
+    canvas.width = 10
+    canvas.height = 10
+    document.body.appendChild canvas
+
+    context = canvas.getContext('2d')
+    context.fillStyle = backgroundColor
+    context.fillRect 0, 0, 10, 10
+    context.fillStyle = foregroundColor
+    context.fillRect 0, 0, 10, 10
+    data = context.getImageData(1, 1, 1, 1)
+    "rgba(#{data.data[0]}, #{data.data[1]}, #{data.data[2]}, #{data.data[3]})"
+
   setNativeTitleColor: (rgb, timeout = 1) ->
     ctx = document.createElement('canvas').getContext('2d')
     ctx.strokeStyle = rgb
     hex = ctx.strokeStyle
+    feedbin.themeColorHex = hex
     setTimeout ( ->
       feedbin.nativeMessage("performAction", { action: "titleColor", color: hex })
     ), timeout
@@ -1519,11 +1535,18 @@ $.extend feedbin,
         event.preventDefault()
         return
 
-    theme: ->
-      if feedbin.data.theme
+    titleBarColor: ->
+      if feedbin.native && feedbin.data.theme
         rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
         feedbin.setNativeTitleColor(rgb)
 
+      $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
+        feedbin.data.theme = $(@).data('theme')
+        if feedbin.native
+          rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
+          feedbin.setNativeTitleColor(rgb)
+
+    theme: ->
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
         theme = $(@).data('theme')
         $('[data-behavior~=class_target]').removeClass('theme-day')
@@ -1531,10 +1554,6 @@ $.extend feedbin,
         $('[data-behavior~=class_target]').removeClass('theme-night')
         $('[data-behavior~=class_target]').addClass("theme-#{theme}")
         event.preventDefault()
-
-        if feedbin.native
-          rgb = $(@).css('backgroundColor')
-          feedbin.setNativeTitleColor(rgb)
 
         return
 
@@ -1911,6 +1930,17 @@ $.extend feedbin,
 
       $(document).on 'input', '[data-behavior~=autosubmit]', (event) ->
         throttled($(@))
+
+    modalShowHide: ->
+      $(document).on 'shown.bs.modal', () ->
+        if background = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
+          color = feedbin.calculateColor(background, "rgba(51, 62, 72, 0.6)")
+          console.log color
+          feedbin.setNativeTitleColor(color)
+
+      $(document).on 'hidden.bs.modal', () ->
+        rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
+        feedbin.setNativeTitleColor(rgb)
 
     statsBarTouched: ->
       $(document).on 'feedbin:native:statusbartouched', (event) ->
