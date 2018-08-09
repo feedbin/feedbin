@@ -3832,13 +3832,15 @@ $saved-search-control-height: 48px;
             display: flex;
             align-items: baseline;
             margin-left: auto;
+            .twitter-link svg, .twitter-conversation-link svg {
+                @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+            }
             .twitter-link {
                 padding-left: 15px;
                 display: block;
                 svg {
                     width: 18px;
                     height: 15px;
-                    @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
                 }
             }
             .twitter-conversation-link {
@@ -3848,7 +3850,6 @@ $saved-search-control-height: 48px;
                 svg {
                     width: 18px;
                     height: 18px;
-                    @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
                 }
             }
         }
@@ -3926,53 +3927,39 @@ $saved-search-control-height: 48px;
             margin-bottom: 0;
         }
     }
-    .modal-conversation & {
-        .twitter-conversation-link {
-            display: none;
-        }
-        .tweet-body {
-            padding-left: 57px;
-            @media (max-width: 550px) {
-                padding-left: 0;
-            }
-        }
-        .main-tweet-conversation .quoted-tweet .tweet-body {
+}
+
+.modal-conversation {
+    .twitter-conversation-link {
+        display: none;
+    }
+    .tweet-body {
+        padding-left: 57px;
+        @media (max-width: 550px) {
             padding-left: 0;
         }
-        .tweet-author-reply {
-            border-top: none;
-            padding-top: 0 !important;
-        }
-        .reply {
-            .tweet-mentions, .twitter-link {
-                display: none !important;
-            }
-        }
-        .micropost-text p:first-child, .micropost-wrap {
-            margin-top: 0;
-        }
-        .micropost-wrap, .tweet-body-inner {
-            margin-bottom: 1.1em;
-            border-bottom: 1px solid transparent;
-            @include border-color($border-color, $border-color-night, $border-color-sunset);
-        }
-        .micropost-wrap {
-            padding-bottom: 1.1em;
-        }
-        .micropost-wrap {
-            :last-child {
-                margin-bottom: 0;
-            }
-        }
-        &.micropost:last-child {
-            .micropost-wrap {
-                border-bottom: none;
-            }
-        }
-        .tweet:last-child {
-            .tweet-body-inner {
-                border-bottom: none;
-            }
+    }
+    .main-tweet-conversation .quoted-tweet .tweet-body {
+        padding-left: 0;
+    }
+    .micropost-text p:first-child {
+        margin-top: 0;
+    }
+    .micropost {
+        margin-bottom: 1.1em;
+    }
+    .micropost + .micropost, .reply {
+        padding-top: 1.1em;
+        border-top: 1px solid transparent;
+        @include border-color($border-color, $border-color-night, $border-color-sunset);
+    }
+    .tweet-author-reply {
+        border-top: none !important;
+        padding-top: 0 !important;
+    }
+    .reply {
+        .tweet-mentions, .twitter-link {
+            display: none !important;
         }
     }
 }
