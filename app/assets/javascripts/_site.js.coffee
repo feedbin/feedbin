@@ -972,7 +972,6 @@ $.extend feedbin,
 
     hasScrollBars: ->
       if feedbin.scrollBars()
-        console.log 'hasScrollBars'
         $('body').addClass('scroll-bars')
 
     hasScrollSnap: ->
@@ -1935,7 +1934,6 @@ $.extend feedbin,
       $(document).on 'shown.bs.modal', () ->
         if background = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
           color = feedbin.calculateColor(background, "rgba(51, 62, 72, 0.6)")
-          console.log color
           feedbin.setNativeTitleColor(color)
 
       $(document).on 'hidden.bs.modal', () ->
