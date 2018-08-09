@@ -1,4 +1,4 @@
-class InstagramEmbed
+class Embed::Instagram
 
   attr_reader :url
 

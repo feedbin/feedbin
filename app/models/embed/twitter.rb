@@ -1,4 +1,4 @@
-class TwitterEmbed
+class Embed::Twitter
 
   attr_reader :url
 
