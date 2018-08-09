@@ -1,4 +1,9 @@
 <% @class = 'login' %>
+<% content_for :head do %>
+<script>
+    feedbin.nativeMessage("performAction", { action: "titleColor", color: "#eff1f3" })
+</script>
+<% end %>
 <div class="login-wrap">
   <a href="/" class="logo hide-text">Feedbin</a>
 

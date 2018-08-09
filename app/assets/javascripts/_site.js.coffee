@@ -18,6 +18,36 @@ $.extend feedbin,
   swipe: false
   panel: 1
 
+  calculateColor: (backgroundColor, foregroundColor) ->
+    canvas = document.createElement('canvas')
+    canvas.style.display = 'none'
+    canvas.width = 10
+    canvas.height = 10
+    document.body.appendChild canvas
+
+    context = canvas.getContext('2d')
+    context.fillStyle = backgroundColor
+    context.fillRect 0, 0, 10, 10
+    context.fillStyle = foregroundColor
+    context.fillRect 0, 0, 10, 10
+    data = context.getImageData(1, 1, 1, 1)
+    "rgba(#{data.data[0]}, #{data.data[1]}, #{data.data[2]}, #{data.data[3]})"
+
+  setNativeTitleColor: (rgb, timeout = 1) ->
+    ctx = document.createElement('canvas').getContext('2d')
+    ctx.strokeStyle = rgb
+    hex = ctx.strokeStyle
+    feedbin.themeColorHex = hex
+    setTimeout ( ->
+      feedbin.nativeMessage("performAction", { action: "titleColor", color: hex })
+    ), timeout
+
+  nativeMessage: (name, data) ->
+    if typeof(webkit) != "undefined" && webkit.messageHandlers && webkit.messageHandlers.turbolinksDemo
+      webkit.messageHandlers.turbolinksDemo.postMessage
+        name: name
+        data: data
+
   scrollBars: ->
     width = 100
 
@@ -40,6 +70,26 @@ $.extend feedbin,
     outer.remove()
 
     result
+
+  scrollToTop: ->
+    element = null
+    if feedbin.panel == 1
+      element = $(".feeds")
+    else if feedbin.panel == 2
+      element = $(".entries")
+    else if feedbin.panel == 3
+      element = $(".entry-content")
+
+    if element
+      element.css
+        "-webkit-overflow-scrolling": "auto"
+      element.animate {scrollTop: 0}, {
+        duration: 150,
+        complete: ()->
+          element.css
+            "-webkit-overflow-scrolling": "touch"
+      }
+
 
   toggleDiff: ->
     $('[data-behavior~=diff_view_changes]').toggleClass("hide")
@@ -932,7 +982,6 @@ $.extend feedbin,
 
     hasScrollBars: ->
       if feedbin.scrollBars()
-        console.log 'hasScrollBars'
         $('body').addClass('scroll-bars')
 
     hasScrollSnap: ->
@@ -1495,6 +1544,17 @@ $.extend feedbin,
         event.preventDefault()
         return
 
+    titleBarColor: ->
+      if feedbin.native && feedbin.data.theme
+        rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
+        feedbin.setNativeTitleColor(rgb)
+
+      $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
+        feedbin.data.theme = $(@).data('theme')
+        if feedbin.native
+          rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
+          feedbin.setNativeTitleColor(rgb)
+
     theme: ->
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
         theme = $(@).data('theme')
@@ -1503,6 +1563,7 @@ $.extend feedbin,
         $('[data-behavior~=class_target]').removeClass('theme-night')
         $('[data-behavior~=class_target]').addClass("theme-#{theme}")
         event.preventDefault()
+
         return
 
     showEntryActions: ->
@@ -1887,6 +1948,20 @@ $.extend feedbin,
           "frameborder": 0
 
         $(@).replaceWith(iframe)
+
+    modalShowHide: ->
+      $(document).on 'shown.bs.modal', () ->
+        if background = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
+          color = feedbin.calculateColor(background, "rgba(51, 62, 72, 0.6)")
+          feedbin.setNativeTitleColor(color)
+
+      $(document).on 'hidden.bs.modal', () ->
+        rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
+        feedbin.setNativeTitleColor(rgb)
+
+    statsBarTouched: ->
+      $(document).on 'feedbin:native:statusbartouched', (event) ->
+        feedbin.scrollToTop()
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->

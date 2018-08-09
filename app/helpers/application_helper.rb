@@ -70,7 +70,6 @@ module ApplicationHelper
     content_tag :svg, options do
       content_tag :use, '', :"xlink:href" => "##{name}"
     end
-
   end
 
   def branch_info
@@ -113,6 +112,15 @@ module ApplicationHelper
 
   def pretty_url(url)
     url && url.sub('http://', '').sub('https://', '').gsub(/\/$/, '').truncate(40, omission: "...")
+  end
+
+  def camo_link(url)
+    options = {
+      asset_proxy:            ENV["CAMO_HOST"],
+      asset_proxy_secret_key: ENV["CAMO_KEY"],
+    }
+    pipeline = HTML::Pipeline::CamoFilter.new(nil, options, nil)
+    pipeline.asset_proxy_url(url.to_s)
   end
 
 end

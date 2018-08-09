@@ -1,28 +1,27 @@
-<% present entry do |entry_presenter| %>
-<div class="tweet-wrap" data-behavior="external_links">
+<div class="tweet-wrap micropost" data-behavior="external_links">
 
     <div class="tweet entry-main-tweet">
         <header class="tweet-header">
             <div class="profile-wrap">
-                <%= link_to entry.micropost.author_url, target: "_blank", title: "Author’s Website", class: "profile-image" do %>
-                    <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry.micropost.author_avatar, size: "47x47", alt: "") %>
+                <%= link_to micropost.micropost.author_url, target: "_blank", title: "Author’s Website", class: "profile-image" do %>
+                    <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), camo_link(micropost.micropost.author_avatar), size: "47x47", alt: "") %>
                 <% end %>
                 <div class="profile-info">
                     <h1>
-                        <a href="<%= entry.fully_qualified_url %>" target="_blank" class="link">
-                            <strong><%= entry.micropost.author_name %></strong>
-                            @<%= entry.micropost.author_name %>
+                        <a href="<%= micropost.fully_qualified_url %>" target="_blank" class="link">
+                            <strong><%= micropost.micropost.author_name %></strong>
+                            @<%= micropost.micropost.author_name %>
                         </a>
                         <span class="tweet-actions">
-                            <%= link_to entry.micropost.url, target: "_blank", title: "View original", class: "twitter-link embed" do %>
+                            <%= link_to thread_micropost_path(micropost), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {behavior: "open_modal", modal_class: "modal-conversation"} do %>
                                 <%= svg_tag "icon-micro-blog" %>
                             <% end %>
                         </span>
                     </h1>
                     <p class="post-meta">
-                      <%= link_to entry.fully_qualified_url, target: "_blank", title: "View post" do %>
-                          <time datetime="<%= entry.published.iso8601 %>">
-                              <%= entry.published.to_s(:full_human) %>
+                      <%= link_to micropost.fully_qualified_url, target: "_blank", title: "View post" do %>
+                          <time datetime="<%= micropost.published.iso8601 %>">
+                              <%= micropost.published.to_s(:full_human) %>
                           </time>
                       <% end %>
                     </p>
@@ -30,11 +29,17 @@
             </div>
         </header>
         <div class="tweet-body content-styles">
-            <div class="system-content micropost-wrap micropost-text">
-                <%= raw(entry_presenter.content) %>
+            <div class="micropost-wrap micropost-text">
+                <%=
+                begin
+                    ContentFormatter.format!(micropost.content).html_safe
+                rescue => e
+                  Rails.logger.info { e.inspect }
+                  content_tag(:p, '&ndash;&ndash;'.html_safe)
+                end
+                %>
             </div>
         </div>
     </div>
 
 </div>
-<% end %>

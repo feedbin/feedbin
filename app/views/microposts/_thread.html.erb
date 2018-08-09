@@ -1,0 +1,8 @@
+<div class="<%= user.display_prefs %>">
+    <div class="entry-inner">
+        <%= render partial: "entries/micropost", collection: microposts %>
+    </div>
+</div>
+<script>
+    feedbin.localizeTime();
+</script>

@@ -187,6 +187,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :microposts, only: [] do
+    member do
+      get :thread
+    end
+  end
+
   resources :recently_read_entries, only: [] do
     collection do
       delete :destroy_all
