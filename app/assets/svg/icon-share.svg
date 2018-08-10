@@ -1,10 +1,1 @@
-<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
-<rect y="14" width="16" height="2"/>
-<rect y="9.982" width="2" height="6"/>
-<rect x="14" y="9.982" width="2" height="6"/>
-<rect x="7" y="1.001" width="2" height="11"/>
-<g>
-	<rect x="2.753" y="2.175" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -0.4533 5.3808)" width="7.031" height="2.125"/>
-	<rect x="6.217" y="2.175" transform="matrix(-0.707 -0.7072 0.7072 -0.707 14.3243 12.4087)" width="7.03" height="2.125"/>
-</g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><path d="M0 14h16v2H0z"/><path d="M0 9.982h2v6H0zm14 0h2v6h-2zM7 1.001h2v11H7z"/><path d="M3.031 4.972L8.003 0l1.502 1.503-4.971 4.972z"/><path d="M11.467 6.474l-4.97-4.971L8 0l4.97 4.972z"/></svg>

@@ -3252,6 +3252,18 @@ $saved-search-control-height: 48px;
         padding: 0;
     }
 
+    .inline-spinner {
+        padding-left: 23px;
+        background: image-url("spinner-day.svg") 0 50% no-repeat;
+        background-size: 16px 16px;
+        .theme-night & {
+            background-image: image-url("spinner-night.svg");
+        }
+        .theme-sunset & {
+            background-image: image-url("spinner-sunset.svg");
+        }
+    }
+
     .micropost-wrap {
         p,
         ul,
@@ -3283,26 +3295,6 @@ $saved-search-control-height: 48px;
 
     li {
         margin: 0 0 .2em 0;
-    }
-
-    img {
-        display: block;
-        margin: 0 0 10px 0;
-        width: auto\9;
-        height: auto;
-        max-width: 100%;
-        vertical-align: middle;
-        border: 0;
-        -ms-interpolation-mode: bicubic;
-        &[align="left"] {
-            float: none;
-        }
-        &[align="right"] {
-            float: none;
-        }
-        &.hide {
-            display: none;
-        }
     }
 
     pre {
@@ -3361,7 +3353,25 @@ $saved-search-control-height: 48px;
     }
 
 }
-
+.content-styles img, .content-styles  .system-content.format-images img {
+    display: block;
+    margin: 0 0 10px 0;
+    width: auto\9;
+    height: auto;
+    max-width: 100%;
+    vertical-align: middle;
+    border: 0;
+    -ms-interpolation-mode: bicubic;
+    &[align="left"] {
+        float: none;
+    }
+    &[align="right"] {
+        float: none;
+    }
+    &.hide {
+        display: none;
+    }
+}
 .content-styles.entry-type-default {
 
     table {
@@ -3380,7 +3390,7 @@ $saved-search-control-height: 48px;
         font-weight: 400 !important;
     }
 
-    .entry-callout, .iframe-placeholder {
+    .entry-callout, .iframe-placeholder, .embed-profile {
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         position: relative;
@@ -3413,7 +3423,7 @@ $saved-search-control-height: 48px;
             top: 11px;
             left: 11px;
             svg {
-                @include fill($text-color-light, $text-color-muted-night, $text-color-light-sunset);
+                @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
             }
         }
         .view-latest-link {
@@ -3502,6 +3512,67 @@ $saved-search-control-height: 48px;
         }
     }
 
+    .iframe-embed {
+        .image-wrap {
+            display: block;
+            position: relative;
+            height: 0;
+            width: 100%;
+            padding-top: 100%; // Default to square
+            background: #f0f0f0;
+            &.intrinsic--square {
+                padding-top: 100%;
+            }
+            &.intrinsic--4x3 {
+                padding-top: 75%;
+            }
+            &.intrinsic--16x9 {
+                padding-top: 56.25%;
+            }
+            .inner {
+                background-color: black;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+        img {
+            margin-bottom: 0;
+        }
+        .embed-profile {
+            display: flex;
+            margin-top: 0;
+            @include color($text-color, $text-color-night, $text-color-sunset);
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            line-height: 1.4;
+        }
+        .embed-icon {
+            width: 28px;
+            height: 28px;
+            margin-right: 10px;
+            svg {
+                max-width: 28px;
+                max-height: 28px;
+                * {
+                    @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+                }
+            }
+        }
+        .embed-title {
+            font-weight: bold !important;
+            font-size: 14px;
+        }
+        .embed-subtitle {
+            font-size: 14px;
+        }
+    }
+
     @media (max-width: 550px) {
         img[data-camo-src] {
             visibility: hidden;
@@ -3534,6 +3605,7 @@ $saved-search-control-height: 48px;
         }
     }
 }
+
 
 .entry-final-content a, .tweet-text a, .micropost-text a, .modal-content .content-styles a {
     text-decoration: underline;

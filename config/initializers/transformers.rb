@@ -25,7 +25,7 @@ class Transformers
         replacement["data-behavior"] = "iframe_placeholder"
         replacement["data-iframe-src"] = uri.to_s
         replacement["data-iframe-host"] = uri.host
-        replacement["data-iframe-embed-url"] = Rails.application.routes.url_helpers.iframe_embeds_path(src: uri.to_s)
+        replacement["data-iframe-embed-url"] = Rails.application.routes.url_helpers.iframe_embeds_path(url: uri.to_s, dom_id: replacement["id"])
 
         width = node["width"] && node["width"].to_i
         height = node["height"] && node["height"].to_i

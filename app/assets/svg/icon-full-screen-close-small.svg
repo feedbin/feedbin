@@ -1,3 +1,1 @@
-<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg"><rect x="7" y="-1" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -3.3135 7.9995)" width="2" height="17.999"/>
-<rect x="7" y="-0.999" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 7.9988 19.3142)" width="2" height="17.999"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><path d="M.93 2.343L2.342.929 15.07 13.656l-1.414 1.414z"/><path d="M2.343 15.07L.929 13.658 13.656.93l1.414 1.414z"/></svg>

@@ -13,8 +13,9 @@ class EmbedsController < ApplicationController
   end
 
   def iframe
-    src = params[:src]
-
+    @url = params[:url]
+    @dom_id = params[:dom_id]
+    @embed = IframeEmbed.fetch(@url)
   end
 
 end
