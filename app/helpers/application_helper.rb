@@ -65,7 +65,8 @@ module ApplicationHelper
 
     name = name.sub('.svg', '')
     options[:width], options[:height] = extract_dimensions(options.delete(:size)) if options[:size]
-    options[:class] = "#{name} #{options[:class]}"
+
+    options[:class] = [name, options[:class]].compact.join(" ")
 
     content_tag :svg, options do
       content_tag :use, '', :"xlink:href" => "##{name}"

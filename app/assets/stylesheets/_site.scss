@@ -3556,13 +3556,16 @@ $saved-search-control-height: 48px;
             line-height: 1.4;
         }
         .embed-icon {
-            width: 28px;
-            height: 28px;
+            width: 34px;
+            height: 34px;
             margin-right: 10px;
             svg {
-                max-width: 28px;
-                max-height: 28px;
+                position: relative;
+                top: 5px;
+                max-width: 100%;
+                max-height: 100%;
                 * {
+                    alignment-baseline: hanging;
                     @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
                 }
             }
