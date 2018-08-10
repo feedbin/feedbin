@@ -3,7 +3,7 @@
     <% if embed.image_url_fallback.present? %>
         <div class="image-wrap intrinsic--16x9">
             <div class="inner">
-                <%= image_tag_with_fallback(@embed.image_url_fallback, @embed.image_url) %>
+                <%= image_tag_with_fallback(camo_link(@embed.image_url_fallback), camo_link(@embed.image_url)) %>
             </div>
         </div>
     <% elsif embed.image_url.present? %>

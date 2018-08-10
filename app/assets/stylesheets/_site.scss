@@ -2729,6 +2729,9 @@ $saved-search-control-height: 48px;
         .starred & {
             .icon-star-on {
                 display: block;
+                * {
+                    fill: $selected;
+                }
             }
             .icon-star-off {
                 display: none;
