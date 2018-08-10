@@ -15,14 +15,12 @@ class IframeEmbed::Youtube < IframeEmbed
     data["thumbnail_url"].sub "hqdefault", "maxresdefault"
   end
 
-  def oembed_params
-    {url: video_url, format: "json"}
+  def canonical_url
+    "https://youtu.be/#{embed_id}"
   end
 
-  private
-
-    def video_url
-      "https://youtu.be/#{embed_id}"
-    end
+  def oembed_params
+    {url: canonical_url, format: "json"}
+  end
 
 end

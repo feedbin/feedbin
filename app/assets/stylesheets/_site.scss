@@ -3565,9 +3565,11 @@ $saved-search-control-height: 48px;
                 max-width: 100%;
                 max-height: 100%;
                 * {
-                    alignment-baseline: hanging;
                     @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
                 }
+            }
+            .icon-embed-source-default {
+                height: 25px;
             }
         }
         .embed-title {

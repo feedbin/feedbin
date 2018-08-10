@@ -5,7 +5,7 @@ class IframeEmbed
   attr_reader :embed_url, :data
 
   def initialize(embed_url)
-    @embed_url = embed_url
+    @embed_url = URI(embed_url)
   end
 
   def title
@@ -16,8 +16,16 @@ class IframeEmbed
     data && data["provider_name"]
   end
 
+  def canonical_url
+    data && data["url"]
+  end
+
   def image_url
     data && data["thumbnail_url"]
+  end
+
+  def type
+    data && data["type"]
   end
 
   def image_url_fallback
@@ -28,7 +36,7 @@ class IframeEmbed
     if oembed_url
       @data ||= begin
         defaults = {
-          url: embed_url
+          url: embed_url.to_s
         }
         response = URLCache.new(oembed_url, params: defaults.merge(oembed_params))
         JSON.parse(response.body)
@@ -41,7 +49,7 @@ class IframeEmbed
   end
 
   def embed_id
-    @embed_id ||= self.class.recognize_url?(embed_url)
+    @embed_id ||= self.class.recognize_url?(embed_url.to_s)
   end
 
   def oembed_url
