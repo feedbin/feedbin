@@ -1,0 +1,27 @@
+<div class="iframe-embed format-images">
+
+    <% if embed.image_url_fallback.present? %>
+        <div class="image-wrap intrinsic--16x9">
+            <div class="inner">
+                <%= image_tag_with_fallback(@embed.image_url_fallback, @embed.image_url) %>
+            </div>
+        </div>
+    <% elsif embed.image_url.present? %>
+        <div class="image-wrap intrinsic--16x9">
+            <div class="inner">
+                <%= image_tag(camo_link(@embed.image_url)) %>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="embed-profile">
+        <div class="embed-icon">
+            <%= svg_tag "icon-embed-source-#{embed.clean_name}" %>
+        </div>
+        <div class="embed-data">
+            <div class="embed-title"><%= embed.title %></div>
+            <div class="embed-subtitle">Embed from <%= embed.subtitle %></div>
+        </div>
+    </div>
+
+</div>
