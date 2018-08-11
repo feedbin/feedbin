@@ -3523,15 +3523,6 @@ $saved-search-control-height: 48px;
             width: 100%;
             padding-top: 100%; // Default to square
             background: #f0f0f0;
-            &.intrinsic--square {
-                padding-top: 100%;
-            }
-            &.intrinsic--4x3 {
-                padding-top: 75%;
-            }
-            &.intrinsic--16x9 {
-                padding-top: 56.25%;
-            }
             .inner {
                 background-color: black;
                 position: absolute;
@@ -3544,10 +3535,10 @@ $saved-search-control-height: 48px;
                 justify-content: center;
             }
         }
-        .image-wrap {
+/*        .image-wrap {
             display: none;
         }
-        .profile-image {
+*/        .profile-image {
             margin-left: auto;
             img {
                 height: 38px;
@@ -3555,6 +3546,7 @@ $saved-search-control-height: 48px;
         }
         img {
             margin-bottom: 0;
+            max-height: 100%;
         }
         .embed-profile {
             display: flex;
@@ -3588,9 +3580,18 @@ $saved-search-control-height: 48px;
         &.embed-type-rich .embed-profile {
             border-radius: 4px;
         }
+        &.embed-type-rich {
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+            .image-wrap {
+                padding-top: 100%;
+            }
+        }
         &.embed-type-video {
             .image-wrap {
                 display: block;
+                padding-top: 56.25%;
             }
             .profile-image {
                 display: none;
