@@ -17,7 +17,9 @@
             <div class="embed-subtitle"><%= embed.subtitle %></div>
         </div>
         <div class="profile-image">
-            <%= image_tag_with_fallback(camo_link(@embed.image_url_fallback), camo_link(@embed.image_url)) %>
+            <% if embed.image_url.present? %>
+                <%= image_tag_with_fallback(camo_link(@embed.image_url_fallback), camo_link(@embed.image_url)) %>
+            <% end %>
         </div>
     </div>
 

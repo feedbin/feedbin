@@ -48,8 +48,8 @@ class IframeEmbed
     self.class.name.demodulize.downcase
   end
 
-  def embed_id
-    @embed_id ||= self.class.recognize_url?(embed_url.to_s)
+  def embed_url_data
+    @embed_url_data ||= self.class.recognize_url?(embed_url.to_s)
   end
 
   def oembed_url
@@ -61,8 +61,8 @@ class IframeEmbed
   end
 
   def self.recognize_url?(embed_url)
-    if supported_urls.find { |url| embed_url =~ url } && $1
-      $1
+    if supported_urls.find { |url| embed_url =~ url }
+      Regexp.last_match
     else
       false
     end
@@ -84,6 +84,7 @@ class IframeEmbed
       IframeEmbed::Youtube,
       IframeEmbed::Vimeo,
       IframeEmbed::Ted,
+      IframeEmbed::Spotify,
       IframeEmbed::Default
     ]
   end

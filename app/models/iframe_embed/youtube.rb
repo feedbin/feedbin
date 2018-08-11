@@ -16,7 +16,7 @@ class IframeEmbed::Youtube < IframeEmbed
   end
 
   def canonical_url
-    "https://youtu.be/#{embed_id}"
+    "https://youtu.be/#{embed_url_data[1]}"
   end
 
   def oembed_params

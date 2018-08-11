@@ -3544,6 +3544,23 @@ $saved-search-control-height: 48px;
                 justify-content: center;
             }
         }
+        .image-wrap {
+            display: none;
+        }
+        &.embed-type-video {
+            .image-wrap {
+                display: block;
+            }
+            .profile-image {
+                display: none;
+            }
+        }
+        .profile-image {
+            margin-left: auto;
+            img {
+                height: 38px;
+            }
+        }
         img {
             margin-bottom: 0;
         }
