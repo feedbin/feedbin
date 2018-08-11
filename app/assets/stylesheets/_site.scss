@@ -3547,14 +3547,6 @@ $saved-search-control-height: 48px;
         .image-wrap {
             display: none;
         }
-        &.embed-type-video {
-            .image-wrap {
-                display: block;
-            }
-            .profile-image {
-                display: none;
-            }
-        }
         .profile-image {
             margin-left: auto;
             img {
@@ -3587,6 +3579,21 @@ $saved-search-control-height: 48px;
             }
             .icon-embed-source-default {
                 height: 25px;
+            }
+            .icon-embed-source-spotify,
+            .icon-embed-source-kickstarter {
+                top: 2px;
+            }
+        }
+        &.embed-type-rich .embed-profile {
+            border-radius: 4px;
+        }
+        &.embed-type-video {
+            .image-wrap {
+                display: block;
+            }
+            .profile-image {
+                display: none;
             }
         }
         .embed-title {

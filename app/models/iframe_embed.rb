@@ -85,6 +85,8 @@ class IframeEmbed
       IframeEmbed::Vimeo,
       IframeEmbed::Ted,
       IframeEmbed::Spotify,
+      IframeEmbed::Kickstarter,
+      IframeEmbed::Soundcloud,
       IframeEmbed::Default
     ]
   end
