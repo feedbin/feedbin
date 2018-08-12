@@ -3244,27 +3244,8 @@ $saved-search-control-height: 48px;
     .media-container,
     .micropost-wrap,
     .fluid-width-video-wrapper,
-    .iframe-placeholder,
     .entry-callout {
         margin: 1.1em 0 1.1em 0;
-    }
-
-    .iframe-placeholder {
-        width: 100%;
-        position: relative;
-        padding: 0;
-    }
-
-    .inline-spinner {
-        padding-left: 23px;
-        background: image-url("spinner-day.svg") 0 50% no-repeat;
-        background-size: 16px 16px;
-        .theme-night & {
-            background-image: image-url("spinner-night.svg");
-        }
-        .theme-sunset & {
-            background-image: image-url("spinner-sunset.svg");
-        }
     }
 
     .micropost-wrap {
@@ -3361,18 +3342,30 @@ $saved-search-control-height: 48px;
         font-weight: 400 !important;
     }
 
-    .entry-callout, .iframe-placeholder, .embed-profile {
+    .entry-callout {
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         position: relative;
         font-size: 13px;
-        font-family: $font-stack !important;
-        font-weight: 400 !important;
         margin-top: 15px;
         padding: 10px 12px;
         border-radius: 4px;
         strong {
             font-weight: 700 !important;
+        }
+    }
+
+    .inline-spinner {
+        padding-left: 23px;
+        background-image: image-url("spinner-day.svg");
+        background-position: 0 50%;
+        background-size: 16px 16px;
+        background-repeat: no-repeat;
+        .theme-night & {
+            background-image: image-url("spinner-night.svg");
+        }
+        .theme-sunset & {
+            background-image: image-url("spinner-sunset.svg");
         }
     }
 
@@ -3578,6 +3571,35 @@ $saved-search-control-height: 48px;
         }
     }
 
+    &.entry-type-default {
+        table {
+            @extend .table;
+            @extend .table-bordered;
+            img {
+                max-width: none;
+                display: inline;
+            }
+        }
+    }
+
+    &.entry-type-newsletter {
+        @media (max-width: 600px) {
+            img {
+                max-width: 380px !important;
+            }
+        }
+        @media (max-width: 400px) {
+            img {
+                max-width: 345px !important;
+            }
+        }
+        @media (max-width: 320px) {
+            img {
+                max-width: 290px !important;
+            }
+        }
+    }
+
     @media (max-width: 550px) {
         img[data-camo-src] {
             visibility: hidden;
@@ -3594,102 +3616,12 @@ $saved-search-control-height: 48px;
 
 }
 
-.content-styles.entry-type-default {
-    table {
-        @extend .table;
-        @extend .table-bordered;
-        img {
-            max-width: none;
-            display: inline;
-        }
-    }
-}
-
-.content-styles.entry-type-newsletter {
-    @media (max-width: 600px) {
-        img {
-            max-width: 380px !important;
-        }
-    }
-    @media (max-width: 400px) {
-        img {
-            max-width: 345px !important;
-        }
-    }
-    @media (max-width: 320px) {
-        img {
-            max-width: 290px !important;
-        }
-    }
-}
-
-.content-styles img, .content-styles  .system-content.format-images img {
-    display: block;
-    margin: 0 0 10px 0;
-    width: auto\9;
-    height: auto;
-    max-width: 100%;
-    vertical-align: middle;
-    border: 0;
-    -ms-interpolation-mode: bicubic;
-    &[align="left"] {
-        float: none;
-    }
-    &[align="right"] {
-        float: none;
-    }
-    &.hide {
-        display: none;
-    }
-}
-
 .entry-final-content a, .tweet-text a, .micropost-text a, .modal-content .content-styles a {
     text-decoration: underline;
     @include color(black, white, black);
     .no-touch &:hover, &:active {
         color: $selected;
     }
-}
-
-.inline-diff {
-
-    ins, .diff-ins {
-        color: #468847;
-        background: #dff0d8;
-    }
-
-    ins, .diff-ins {
-        text-decoration: none;
-        img {
-            opacity: .5;
-        }
-    }
-
-    img.diff-ins, code.diff-ins {
-        border: 2px solid #468847;
-    }
-
-    img.diff-ins {
-        opacity: .75;
-    }
-
-    del, .diff-del {
-        text-decoration: none;
-        color: #b94a48;
-        background: #f2dede;
-        img {
-            opacity: .5;
-        }
-    }
-
-    img.diff-del, code.diff-del {
-        border: 2px solid #b94a48;
-    }
-
-    img.diff-del {
-        opacity: .5;
-    }
-
 }
 
 .font-serif-1 {
@@ -3834,22 +3766,8 @@ $saved-search-control-height: 48px;
 
 .content-styles {
     .system-content {
-        html, body, div, span, applet, object, iframe,
-        h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-        a, abbr, acronym, address, big, cite, code,
-        del, dfn, em, img, ins, kbd, q, s, samp,
-        small, strike, strong, sub, sup, tt, var,
-        b, u, i, center,
-        dl, dt, dd, ol, ul, li,
-        fieldset, form, label, legend,
-        table, caption, tbody, tfoot, thead, tr, th, td,
-        article, aside, canvas, details, embed,
-        figure, figcaption, footer, header, hgroup,
-        menu, nav, output, ruby, section, summary,
-        time, mark, audio, video {
-            font-family: $font-stack;
-            font-weight: normal;
-        }
+        font-family: $font-stack;
+        font-weight: normal;
         a {
             text-decoration: none;
             position: static;
@@ -3859,6 +3777,64 @@ $saved-search-control-height: 48px;
             width: auto;
         }
     }
+}
+
+.content-styles img, img.responsive {
+    max-width: 100%;
+    display: block;
+    height: auto;
+    margin: 0 0 10px 0;
+    vertical-align: middle;
+    &[align="left"] {
+        float: none;
+    }
+    &[align="right"] {
+        float: none;
+    }
+    &.hide {
+        display: none;
+    }
+}
+
+.inline-diff {
+
+    ins, .diff-ins {
+        color: #468847;
+        background: #dff0d8;
+    }
+
+    ins, .diff-ins {
+        text-decoration: none;
+        img {
+            opacity: .5;
+        }
+    }
+
+    img.diff-ins, code.diff-ins {
+        border: 2px solid #468847;
+    }
+
+    img.diff-ins {
+        opacity: .75;
+    }
+
+    del, .diff-del {
+        text-decoration: none;
+        color: #b94a48;
+        background: #f2dede;
+        img {
+            opacity: .5;
+        }
+    }
+
+    img.diff-del, code.diff-del {
+        border: 2px solid #b94a48;
+    }
+
+    img.diff-del {
+        opacity: .5;
+    }
+
 }
 
 .modal form {

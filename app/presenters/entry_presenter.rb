@@ -581,8 +581,8 @@ class EntryPresenter < BasePresenter
     url = url.expanded_url.to_s
     if INSTAGRAM_URLS.find { |format| url =~ format } && $1
       instagram_id = $1
-      @template.link_to url, class: "content-styles entry-type-default", target: "_blank" do
-        @template.image_tag("https://instagram.com/p/#{instagram_id}/media/?size=l")
+      @template.link_to url, target: "_blank" do
+        @template.image_tag(@template.camo_link("https://instagram.com/p/#{instagram_id}/media/?size=l"), class: "responsive")
       end
     else
       false

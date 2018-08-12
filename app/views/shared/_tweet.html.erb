@@ -50,15 +50,13 @@
 
             <% if local_assigns[:include_media] && include_media %>
                 <% tweet.media.take(1).each do |media| %>
-                    <div class="content-styles entry-type-default">
-                        <% if entry_presenter.tweet_video?(media) %>
-                            <%= entry_presenter.tweet_video(media) %>
-                        <% else %>
-                            <%= link_to media.media_url_https.to_s + ":large" do %>
-                                <%= image_tag camo_link(media.media_url_https.to_s + ":large") %>
-                            <% end %>
+                    <% if entry_presenter.tweet_video?(media) %>
+                        <%= entry_presenter.tweet_video(media) %>
+                    <% else %>
+                        <%= link_to media.media_url_https.to_s + ":large" do %>
+                            <%= image_tag camo_link(media.media_url_https.to_s + ":large"), class: "responsive" %>
                         <% end %>
-                    </div>
+                    <% end %>
                 <% end %>
             <% end %>
         </div>

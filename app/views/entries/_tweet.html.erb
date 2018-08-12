@@ -6,15 +6,13 @@
   <% entry.tweet_thread.each do |thread| %>
     <%= entry_presenter.tweet_text(thread) %>
     <% thread.media.each do |media| %>
-      <div class="content-styles entry-type-default">
       <% if entry_presenter.tweet_video?(media) %>
         <%= entry_presenter.tweet_video(media) %>
       <% else %>
         <%= link_to media.media_url_https.to_s + ":large" do %>
-          <%= image_tag camo_link(media.media_url_https.to_s + ":large") %>
+          <%= image_tag camo_link(media.media_url_https.to_s + ":large"), class: "responsive" %>
         <% end %>
       <% end %>
-      </div>
     <% end %>
 
     <% thread.urls.each do |url| %>
@@ -45,15 +43,13 @@
 
 
   <% entry_presenter.tweet_media.each do |media| %>
-    <div class="content-styles entry-type-default">
     <% if entry_presenter.tweet_video?(media) %>
       <%= entry_presenter.tweet_video(media) %>
     <% else %>
       <%= link_to media.media_url_https.to_s + ":large" do %>
-        <%= image_tag camo_link(media.media_url_https.to_s + ":large") %>
+        <%= image_tag camo_link(media.media_url_https.to_s + ":large"), class: "responsive" %>
       <% end %>
     <% end %>
-    </div>
   <% end %>
 
   <% entry_presenter.tweet_urls.each do |url| %>

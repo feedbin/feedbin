@@ -20,7 +20,7 @@ class Transformers
       if uri = URI(node["src"]) rescue nil
         replacement = Nokogiri::XML::Element.new("div", node.document)
         replacement["id"] = Digest::SHA1.hexdigest(uri.to_s)
-        replacement["class"] = "iframe-placeholder"
+        replacement["class"] = "iframe-placeholder entry-callout system-content"
         replacement["data-iframe-src"] = uri.to_s
         replacement["data-iframe-host"] = uri.host
         replacement["data-iframe-embed-url"] = Rails.application.routes.url_helpers.iframe_embeds_path(url: uri.to_s, dom_id: replacement["id"])

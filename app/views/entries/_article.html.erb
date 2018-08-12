@@ -12,13 +12,13 @@
 
   <div data-behavior="entry_content_wrap" class="content-styles <%= entry_presenter.entry_type_class %>">
     <% if entry_presenter.has_diff? %>
-      <p class="diff-wrap entry-callout <%= !entry_presenter.is_updated_entry? ? "" : "hide" %>" data-behavior="diff_view_changes">
+      <p class="diff-wrap system-content entry-callout <%= !entry_presenter.is_updated_entry? ? "" : "hide" %>" data-behavior="diff_view_changes">
         <span class="icon-clock-wrap"><%= svg_tag 'favicon-updated', size: '16x16' %></span>
         <span class="diff-wrap-text">This article was updated <%= link_to "view changes", diff_entry_path(entry), remote: true, data: {behavior: 'load_view_changes'} %></span>
         <%= link_to '×', toggle_updates_feed_path(entry.feed, inline: true), remote: true, method: :post, class: 'ignore-updates', data: {behavior: 'hide_updates'}, title: "Don't tell me when articles from #{strip_tags(entry.feed.title)} have been updated."  %>
       </p>
 
-      <p class="diff-wrap entry-callout <%= entry_presenter.is_updated_entry? ? "" : "hide" %>" data-behavior="diff_view_latest">
+      <p class="diff-wrap system-content entry-callout <%= entry_presenter.is_updated_entry? ? "" : "hide" %>" data-behavior="diff_view_latest">
         <span class="icon-clock-wrap"><%= svg_tag 'favicon-updated', size: '16x16' %></span>
         Viewing changes since original <span class="view-latest-link">view latest</span>
       </p>

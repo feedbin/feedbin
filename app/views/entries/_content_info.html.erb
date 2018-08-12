@@ -2,7 +2,7 @@
 
   <% if content.present? %>
       <% if content_info.present? && !entry_presenter.feed_domain_matches?(content_info.domain) %>
-        <div class="original-content-info entry-callout">
+        <div class="original-content-info system-content entry-callout">
           <%= favicon_with_host(content_info.domain) %>
           <% if content_info.title.present? %>
             <div class="original-title"><a href="<%= content_info.url %>"><%= content_info.title %></a></div>
@@ -31,7 +31,7 @@
       </div>
 
   <% else %>
-      <p class="content-error entry-callout">Unable to get this article’s content.</p>
+      <p class="content-error system-content entry-callout">Unable to get this article’s content.</p>
   <% end %>
 
 <% end %>

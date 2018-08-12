@@ -2,7 +2,7 @@
     <% if content %>
         <%= render partial: 'diff_content', locals: {entry: entry} %>
     <% else %>
-        <p class="diff-wrap entry-callout">
+        <p class="diff-wrap system-content entry-callout">
           <span class="icon-clock-wrap"><%= svg_tag 'favicon-updated', size: '16x16' %></span>
           Error generating diff. Viewing original.
         </p>
