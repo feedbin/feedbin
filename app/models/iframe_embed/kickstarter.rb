@@ -11,16 +11,20 @@ class IframeEmbed::Kickstarter < IframeEmbed
   end
 
   def oembed_params
-    {url: url_param, format: "json"}
+    {url: canonical_url, format: "json"}
   end
 
   def type
     "video"
   end
 
+  def canonical_url
+    "https://www.kickstarter.com/projects/#{embed_url_data[1]}/#{embed_url_data[2]}"
+  end
+
   def image_url
     @image_url ||= begin
-      page = URLCache.new(url_param).body
+      page = URLCache.new(canonical_url).body
       doc = Nokogiri::HTML5(page)
       image = doc.css("meta[property='og:image']")
       if image.empty?
@@ -31,10 +35,5 @@ class IframeEmbed::Kickstarter < IframeEmbed
     end
   end
 
-  private
-
-    def url_param
-      "https://www.kickstarter.com/projects/#{embed_url_data[1]}/#{embed_url_data[2]}"
-    end
 
 end

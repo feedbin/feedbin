@@ -17,7 +17,7 @@ class IframeEmbed
   end
 
   def canonical_url
-    data && data["url"]
+    data && data["url"] || embed_url.to_s
   end
 
   def image_url

@@ -18,5 +18,8 @@ class IframeEmbed::Vimeo < IframeEmbed
     { "autoplay" => "1" }
   end
 
+  def canonical_url
+    "https://vimeo.com/#{embed_url_data[1]}"
+  end
 
 end

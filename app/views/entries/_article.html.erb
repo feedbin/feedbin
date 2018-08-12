@@ -10,7 +10,7 @@
     <p class="post-meta feed-title"><span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
   </header>
 
-  <div data-behavior="entry_content_wrap" class="content-styles <%= entry_presenter.entry_type_class %>">
+  <div data-behavior="entry_content_wrap external_links" class="content-styles <%= entry_presenter.entry_type_class %>">
     <% if entry_presenter.has_diff? %>
       <p class="diff-wrap system-content entry-callout <%= !entry_presenter.is_updated_entry? ? "" : "hide" %>" data-behavior="diff_view_changes">
         <span class="icon-clock-wrap"><%= svg_tag 'favicon-updated', size: '16x16' %></span>
