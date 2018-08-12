@@ -14,4 +14,9 @@ class IframeEmbed::Vimeo < IframeEmbed
     super.gsub /_\d+.jpg/, ".jpg"
   end
 
+  def iframe_params
+    { "autoplay" => "1" }
+  end
+
+
 end

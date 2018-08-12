@@ -6,7 +6,7 @@ class Transformers
   TABLE_SECTIONS = Set.new(%w(thead tbody tfoot).freeze)
 
   def iframe_whitelist
-    lambda { |env|
+    lambda do |env|
       node      = env[:node]
       node_name = env[:node_name]
       source    = node['src']
@@ -15,29 +15,20 @@ class Transformers
         return
       end
 
-      # Force protocol relative url
       node['src'] = source.gsub(/^https?:?/, 'https:')
 
       if uri = URI(node["src"]) rescue nil
         replacement = Nokogiri::XML::Element.new("div", node.document)
         replacement["id"] = Digest::SHA1.hexdigest(uri.to_s)
         replacement["class"] = "iframe-placeholder"
-        replacement["data-behavior"] = "iframe_placeholder"
         replacement["data-iframe-src"] = uri.to_s
         replacement["data-iframe-host"] = uri.host
         replacement["data-iframe-embed-url"] = Rails.application.routes.url_helpers.iframe_embeds_path(url: uri.to_s, dom_id: replacement["id"])
 
-        width = node["width"] && node["width"].to_i
-        height = node["height"] && node["height"].to_i
-        if height && width
-          replacement["data-iframe-width"] = width
-          replacement["data-iframe-height"] = height
-        end
-
         node.replace(replacement)
         {:node_whitelist => [replacement]}
       end
-    }
+    end
   end
 
   def class_whitelist

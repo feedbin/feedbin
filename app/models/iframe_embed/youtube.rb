@@ -19,6 +19,14 @@ class IframeEmbed::Youtube < IframeEmbed
     "https://youtu.be/#{embed_url_data[1]}"
   end
 
+  def iframe_params
+    {
+      "autoplay" => "1",
+      "rel" => "0",
+      "showinfo" => "0"
+    }
+  end
+
   def oembed_params
     {url: canonical_url, format: "json"}
   end

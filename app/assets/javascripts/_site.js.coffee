@@ -1948,7 +1948,7 @@ $.extend feedbin,
           "allowfullscreen": true
           "frameborder": 0
 
-        $(@).replaceWith(iframe)
+        $(@).html(iframe)
 
     modalShowHide: ->
       $(document).on 'shown.bs.modal', () ->
