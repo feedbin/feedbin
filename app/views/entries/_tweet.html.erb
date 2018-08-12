@@ -3,6 +3,16 @@
 
   <%= render partial: "shared/tweet", locals: {entry: entry, tweet: entry.main_tweet, css: "main-tweet entry-main-tweet"} %>
 
+  <% entry_presenter.tweet_media.each do |media| %>
+    <% if entry_presenter.tweet_video?(media) %>
+      <%= entry_presenter.tweet_video(media) %>
+    <% else %>
+      <%= link_to media.media_url_https.to_s + ":large" do %>
+        <%= image_tag camo_link(media.media_url_https.to_s + ":large"), class: "responsive" %>
+      <% end %>
+    <% end %>
+  <% end %>
+
   <% entry.tweet_thread.each do |thread| %>
     <%= entry_presenter.tweet_text(thread) %>
     <% thread.media.each do |media| %>
@@ -39,17 +49,6 @@
           </a>
         </p>
     </div>
-  <% end %>
-
-
-  <% entry_presenter.tweet_media.each do |media| %>
-    <% if entry_presenter.tweet_video?(media) %>
-      <%= entry_presenter.tweet_video(media) %>
-    <% else %>
-      <%= link_to media.media_url_https.to_s + ":large" do %>
-        <%= image_tag camo_link(media.media_url_https.to_s + ":large"), class: "responsive" %>
-      <% end %>
-    <% end %>
   <% end %>
 
   <% entry_presenter.tweet_urls.each do |url| %>
