@@ -26,7 +26,7 @@
 
     <%= render partial: 'media', locals: {entry: entry} %>
 
-    <div class="entry-final-content" data-behavior="entry_final_content format_images">
+    <div class="entry-final-content" data-behavior="entry_final_content">
       <% if entry_presenter.is_updated_entry? %>
         <%= render partial: 'diff_content', locals: {entry: entry, updated_entries: updated_entries} %>
       <% else %>
