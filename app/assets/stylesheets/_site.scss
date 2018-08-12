@@ -3523,7 +3523,7 @@ $saved-search-control-height: 48px;
             width: 100%;
             padding-top: 100%; // Default to square
             background: #f0f0f0;
-            .inner {
+            .inner-wrap, .inner {
                 background-color: black;
                 position: absolute;
                 top: 0;
@@ -3533,6 +3533,13 @@ $saved-search-control-height: 48px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                iframe {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    height: 100%;
+                    width: 100%;
+                }
             }
         }
 /*        .image-wrap {

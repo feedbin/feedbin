@@ -2,8 +2,10 @@
 
     <% if embed.image_url.present? %>
         <div class="image-wrap intrinsic--16x9">
-            <div class="inner">
-                <%= image_tag_with_fallback(camo_link(@embed.image_url_fallback), camo_link(@embed.image_url)) %>
+            <div class="inner-wrap">
+                <div class="inner" data-behavior="iframe_placeholder" data-iframe-src="<%= @embed.iframe_src %>">
+                    <%= image_tag_with_fallback(camo_link(@embed.image_url_fallback), camo_link(@embed.image_url)) %>
+                </div>
             </div>
         </div>
     <% end %>

@@ -32,6 +32,14 @@ class IframeEmbed
     false
   end
 
+  def iframe_src
+    url = embed_url
+    params = Rack::Utils.parse_nested_query(url.query)
+    params = params.merge({"autoplay" => "1"})
+    url.query = params.to_query
+    url.to_s
+  end
+
   def fetch
     if oembed_url
       @data ||= begin
