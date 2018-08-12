@@ -448,11 +448,6 @@ $.extend feedbin,
 
     feedbin.embed(items, feedbin.data.instagram_embed_path, urlFinder)
 
-  formatImgur: ->
-    if typeof(imgurEmbed) != "undefined"
-      if $('blockquote.imgur-embed-pub').length > 0
-        window.imgurEmbed.createIframe()
-
   checkType: ->
     element = $('.entry-final-content')
     if element.length > 0
@@ -466,11 +461,21 @@ $.extend feedbin,
     $("[data-iframe-src]").each ->
       container = $(@)
       url = container.data("iframe-src")
-      if feedbin.embeds["#{url}"]
-        container.replaceWith(feedbin.embeds["#{url}"])
+
+      if feedbin.data.nice_frames
+        if feedbin.embeds["#{url}"]
+          container.replaceWith(feedbin.embeds["#{url}"])
+        else
+          container.html $("<div class='inline-spinner'>Loading embed from #{container.data("iframe-host")}…</div>")
+          $.get container.data("iframe-embed-url")
       else
-        container.html $("<div class='inline-spinner'>Loading embed from #{container.data("iframe-host")}…</div>")
-        $.get container.data("iframe-embed-url")
+        iframe = $("<iframe>").attr
+          "src": container.data("iframe-src")
+          "width": container.data("iframe-width")
+          "height": container.data("iframe-height")
+          "allowfullscreen": true
+          "frameborder": 0
+        container.replaceWith(iframe)
 
   formatImages: ->
     $("img[data-camo-src]").each ->
@@ -511,6 +516,7 @@ $.extend feedbin,
     if readability
       feedbin.readability()
     try
+      feedbin.formatIframes()
       feedbin.playState()
       feedbin.timeRemaining(entryId)
       feedbin.syntaxHighlight()
@@ -522,20 +528,18 @@ $.extend feedbin,
       feedbin.fitVids()
       feedbin.formatTweets()
       feedbin.formatInstagram()
-      feedbin.formatImgur()
       feedbin.formatImages()
       feedbin.checkType()
-      feedbin.formatIframes()
     catch error
       if 'console' of window
         console.log error
 
   formatLinkContents: ->
     try
+      feedbin.formatIframes()
       feedbin.audioVideo("view_link_markup_wrap")
       feedbin.fitVids("view_link_markup_wrap")
       feedbin.formatTweets("view_link_markup_wrap")
-      feedbin.formatImgur()
       feedbin.formatImages()
     catch error
       if 'console' of window

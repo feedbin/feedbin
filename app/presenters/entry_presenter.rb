@@ -582,7 +582,7 @@ class EntryPresenter < BasePresenter
       @template.content_tag(:iframe, "", src: url, height: 9, width: 16, frameborder: 0, allowfullscreen: true).html_safe
     else
       transformers = Transformers.new
-      attributes = transformers.iframe_attributes(url)
+      attributes = transformers.iframe_attributes(url, 16, 9)
       @template.content_tag(:div, "", attributes).html_safe
     end
   end
