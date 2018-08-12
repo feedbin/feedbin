@@ -4,6 +4,8 @@ class IframeEmbed::Youtube < IframeEmbed
     [
       %r(https?://www\.youtube\.com/embed/(.*?)(\?|$)),
       %r(https?://www\.youtube-nocookie\.com/embed/(.*?)(\?|$)),
+      %r(https?://youtube\.com/embed/(.*?)(\?|$)),
+      %r(https?://youtube-nocookie\.com/embed/(.*?)(\?|$)),
     ]
   end
 

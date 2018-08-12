@@ -34,38 +34,10 @@ class ContentFormatterTest < ActiveSupport::TestCase
     assert_equal expected, ContentFormatter.summary(content, 256)
   end
 
-  test "should allow certain iframes" do
-    hosts = %w{
-      www.youtube.com
-      youtube.com
-      youtu.be
-      youtube-nocookie.com
-      www.vimeo.com
-      player.vimeo.com
-      kickstarter.com
-      embed.spotify.com
-      w.soundcloud.com
-      view.vzaar.com
-      vine.co
-      e.infogr.am
-      infogr.am
-      www.flickr.com
-      mpora.com
-      embed-ssl.ted.com
-      embed.itunes.apple.com
-      www.tumblr.com
-      cdn.embedly.com
-    }
-    hosts.each do |host|
-      content = %(<iframe src="http://#{host}"></iframe>)
-      expected = %(<iframe src="//#{host}"></iframe>)
-      assert_equal expected, ContentFormatter.format!(content)
-    end
-  end
-
-  test "should not allow other iframes" do
-    content = %(<iframe src="http://myhost.com"></iframe>)
-    assert_equal "", ContentFormatter.format!(content)
+  test "should replace iframes" do
+    content = %(<iframe src="http://youtu.be/1234"></iframe>)
+    expected = %(<div id="0912e82b697139f31d365493fcb58cd325240bf0" class="iframe-placeholder entry-callout system-content" data-iframe-src="https://youtu.be/1234" data-iframe-host="youtu.be" data-iframe-embed-url="/embeds/iframe?dom_id=0912e82b697139f31d365493fcb58cd325240bf0&amp;url=https%3A%2F%2Fyoutu.be%2F1234"></div>)
+    assert_equal expected, ContentFormatter.format!(content)
   end
 
   test "should allow certain classes" do

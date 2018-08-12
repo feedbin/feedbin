@@ -33,7 +33,7 @@ class IframeEmbed
   end
 
   def iframe_src
-    url = embed_url
+    url = embed_url.dup
     params = Rack::Utils.parse_nested_query(url.query)
     params = params.merge(iframe_params)
     url.query = params.to_query
@@ -72,8 +72,8 @@ class IframeEmbed
     {}
   end
 
-  def self.recognize_url?(embed_url)
-    if supported_urls.find { |url| embed_url =~ url }
+  def self.recognize_url?(src_url)
+    if supported_urls.find { |url| src_url =~ url }
       Regexp.last_match
     else
       false

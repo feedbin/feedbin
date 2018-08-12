@@ -17,7 +17,7 @@ class IframeEmbed::Spotify < IframeEmbed
   private
 
     def url_param
-      url = embed_url
+      url = embed_url.dup
       url.path = url.path.sub("/embed", "")
       url.to_s
     end
