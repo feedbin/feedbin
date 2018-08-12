@@ -26,10 +26,10 @@
     <% end %>
 
     <% thread.urls.each do |url| %>
-      <% if entry_presenter.tweet_youtube_embed(url) %>
-        <p><%= entry_presenter.tweet_youtube_embed(url) %></p>
-      <% elsif entry_presenter.tweet_vimeo_embed(url) %>
-        <%= entry_presenter.tweet_vimeo_embed(url) %>
+      <% if entry_presenter.tweet_youtube_embed(url, :div) %>
+        <p><%= entry_presenter.tweet_youtube_embed(url, :div) %></p>
+      <% elsif entry_presenter.tweet_vimeo_embed(url, :div) %>
+        <%= entry_presenter.tweet_vimeo_embed(url, :div) %>
       <% elsif entry_presenter.tweet_instagram_embed(url) %>
         <%= entry_presenter.tweet_instagram_embed(url) %>
       <% end %>
@@ -53,10 +53,10 @@
 
   <% entry_presenter.tweet_urls.each do |url| %>
 
-    <% if entry_presenter.tweet_youtube_embed(url) %>
-      <%= entry_presenter.tweet_youtube_embed(url) %>
-    <% elsif entry_presenter.tweet_vimeo_embed(url) %>
-      <%= entry_presenter.tweet_vimeo_embed(url) %>
+    <% if entry_presenter.tweet_youtube_embed(url, :div) %>
+      <%= entry_presenter.tweet_youtube_embed(url, :div) %>
+    <% elsif entry_presenter.tweet_vimeo_embed(url, :div) %>
+      <%= entry_presenter.tweet_vimeo_embed(url, :div) %>
     <% elsif entry_presenter.tweet_instagram_embed(url) %>
       <%= entry_presenter.tweet_instagram_embed(url) %>
     <% elsif page = entry_presenter.saved_page(url.expanded_url.to_s) %>

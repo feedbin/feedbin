@@ -5,6 +5,18 @@ class Transformers
   TABLE = 'table'.freeze
   TABLE_SECTIONS = Set.new(%w(thead tbody tfoot).freeze)
 
+  def iframe_attributes(uri)
+    uri = URI(uri)
+    id = Digest::SHA1.hexdigest(uri.to_s)
+    {
+      "id"                    => id,
+      "class"                 => "iframe-placeholder entry-callout system-content",
+      "data-iframe-src"       => uri.to_s,
+      "data-iframe-host"      => uri.host,
+      "data-iframe-embed-url" => Rails.application.routes.url_helpers.iframe_embeds_path(url: uri.to_s, dom_id: id)
+    }
+  end
+
   def iframe_whitelist
     lambda do |env|
       node      = env[:node]
@@ -19,12 +31,9 @@ class Transformers
 
       if uri = URI(node["src"]) rescue nil
         replacement = Nokogiri::XML::Element.new("div", node.document)
-        replacement["id"] = Digest::SHA1.hexdigest(uri.to_s)
-        replacement["class"] = "iframe-placeholder entry-callout system-content"
-        replacement["data-iframe-src"] = uri.to_s
-        replacement["data-iframe-host"] = uri.host
-        replacement["data-iframe-embed-url"] = Rails.application.routes.url_helpers.iframe_embeds_path(url: uri.to_s, dom_id: replacement["id"])
-
+        iframe_attributes(uri).each do |attribute, value|
+          replacement.set_attribute(attribute, value)
+        end
         node.replace(replacement)
         {:node_whitelist => [replacement]}
       end

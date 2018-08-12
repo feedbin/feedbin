@@ -557,23 +557,33 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def tweet_youtube_embed(url)
+  def tweet_youtube_embed(url, tag = :iframe)
     url = url.expanded_url.to_s
     if YOUTUBE_URLS.find { |format| url =~ format } && $1
       youtube_id = $1
-      @template.content_tag(:iframe, "", src: "https://www.youtube.com/embed/#{youtube_id}", height: 9, width: 16, frameborder: 0, allowfullscreen: true).html_safe
+      iframe_embed("https://www.youtube.com/embed/#{youtube_id}", tag)
     else
       false
     end
   end
 
-  def tweet_vimeo_embed(url)
+  def tweet_vimeo_embed(url, tag = :iframe)
     url = url.expanded_url.to_s
     if VIMEO_URLS.find { |format| url =~ format } && $1
       vimeo_id = $1
-      @template.content_tag(:iframe, "", src: "https://player.vimeo.com/video/#{vimeo_id}", height: 9, width: 16, frameborder: 0, allowfullscreen: true).html_safe
+      iframe_embed("https://player.vimeo.com/video/#{vimeo_id}", tag)
     else
       false
+    end
+  end
+
+  def iframe_embed(url, tag)
+    if tag == :iframe
+      @template.content_tag(:iframe, "", src: url, height: 9, width: 16, frameborder: 0, allowfullscreen: true).html_safe
+    else
+      transformers = Transformers.new
+      attributes = transformers.iframe_attributes(url)
+      @template.content_tag(:div, "", attributes).html_safe
     end
   end
 

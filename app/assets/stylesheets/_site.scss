@@ -3342,19 +3342,6 @@ $saved-search-control-height: 48px;
         font-weight: 400 !important;
     }
 
-    .entry-callout {
-        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-        position: relative;
-        font-size: 13px;
-        margin-top: 15px;
-        padding: 10px 12px;
-        border-radius: 4px;
-        strong {
-            font-weight: 700 !important;
-        }
-    }
-
     .inline-spinner {
         padding-left: 23px;
         background-image: image-url("spinner-day.svg");
@@ -3476,101 +3463,6 @@ $saved-search-control-height: 48px;
         }
     }
 
-    .iframe-embed {
-        .image-wrap {
-            display: block;
-            position: relative;
-            height: 0;
-            width: 100%;
-            background: #f0f0f0;
-            .inner {
-                cursor: pointer;
-                background-color: black;
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            iframe {
-                position: absolute;
-                top: 0;
-                left: 0;
-                height: 100%;
-                width: 100%;
-            }
-        }
-        img {
-            margin-bottom: 0;
-            max-height: 100%;
-        }
-        .embed-profile {
-            display: flex;
-            margin-top: 0;
-            @include color($text-color, $text-color-night, $text-color-sunset);
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-            line-height: 1.4;
-        }
-        .embed-icon {
-            width: 34px;
-            height: 34px;
-            margin-right: 10px;
-            svg {
-                position: relative;
-                top: 5px;
-                max-width: 100%;
-                max-height: 100%;
-                * {
-                    @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
-                }
-            }
-            .icon-embed-source-default {
-                height: 25px;
-            }
-            .icon-embed-source-spotify,
-            .icon-embed-source-kickstarter {
-                top: 2px;
-            }
-        }
-        &.embed-type-rich .embed-profile {
-            border-radius: 4px;
-        }
-        &.embed-type-rich {
-            max-width: 300px;
-            margin-left: auto;
-            margin-right: auto;
-            .image-wrap {
-                padding-top: 100%;
-            }
-        }
-        &.embed-type-video {
-            .image-wrap {
-                display: block;
-                padding-top: 56.25%;
-            }
-            .profile-image {
-                display: none;
-            }
-        }
-        .embed-title {
-            font-weight: bold !important;
-            font-size: 14px;
-        }
-        .embed-subtitle {
-            font-size: 14px;
-        }
-        .profile-image {
-            margin-left: auto;
-            img {
-                height: 38px;
-            }
-        }
-    }
-
     &.entry-type-default {
         table {
             @extend .table;
@@ -3614,6 +3506,115 @@ $saved-search-control-height: 48px;
         }
     }
 
+}
+
+.content-styles .entry-callout, .entry-callout {
+    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    position: relative;
+    font-size: 13px;
+    margin-top: 15px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    margin-bottom: 1.1em;
+    strong {
+        font-weight: 700 !important;
+    }
+}
+
+.iframe-embed {
+    .image-wrap {
+        display: block;
+        position: relative;
+        height: 0;
+        width: 100%;
+        background: #f0f0f0;
+        .inner {
+            cursor: pointer;
+            background-color: black;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+        }
+    }
+    img {
+        margin-bottom: 0 !important;
+        max-height: 100%;
+    }
+    .embed-profile {
+        display: flex;
+        margin-top: 0;
+        @include color($text-color, $text-color-night, $text-color-sunset);
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        line-height: 1.4;
+    }
+    .embed-icon {
+        width: 34px;
+        height: 34px;
+        margin-right: 10px;
+        svg {
+            position: relative;
+            top: 5px;
+            max-width: 100%;
+            max-height: 100%;
+            * {
+                @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+            }
+        }
+        .icon-embed-source-default {
+            height: 25px;
+        }
+        .icon-embed-source-spotify,
+        .icon-embed-source-kickstarter {
+            top: 2px;
+        }
+    }
+    &.embed-type-rich .embed-profile {
+        border-radius: 4px;
+    }
+    &.embed-type-rich {
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+        .image-wrap {
+            padding-top: 100%;
+        }
+    }
+    &.embed-type-video {
+        .image-wrap {
+            display: block;
+            padding-top: 56.25%;
+        }
+        .profile-image {
+            display: none;
+        }
+    }
+    .embed-title {
+        font-weight: bold !important;
+        font-size: 14px;
+    }
+    .embed-subtitle {
+        font-size: 14px;
+    }
+    .profile-image {
+        margin-left: auto;
+        img {
+            height: 38px;
+        }
+    }
 }
 
 .entry-final-content a, .tweet-text a, .micropost-text a, .modal-content .content-styles a {
