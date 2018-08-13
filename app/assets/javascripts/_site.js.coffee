@@ -460,11 +460,11 @@ $.extend feedbin,
   formatIframes: ->
     $("[data-iframe-src]").each ->
       container = $(@)
-      url = container.data("iframe-src")
+      id = container.attr("id")
 
       if feedbin.data.nice_frames
-        if feedbin.embeds["#{url}"]
-          container.replaceWith(feedbin.embeds["#{url}"])
+        if feedbin.embeds["#{id}"]
+          container.replaceWith(feedbin.embeds["#{id}"])
         else
           container.html $("<div class='inline-spinner'>Loading embed from #{container.data("iframe-host")}…</div>")
           $.get container.data("iframe-embed-url")
