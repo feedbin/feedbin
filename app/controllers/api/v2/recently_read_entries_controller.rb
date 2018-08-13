@@ -1,7 +1,6 @@
 module Api
   module V2
     class RecentlyReadEntriesController < ApiController
-
       respond_to :json
 
       def index
@@ -16,7 +15,6 @@ module Api
         end
         render json: params[:recently_read_entries].to_json
       end
-
     end
   end
 end

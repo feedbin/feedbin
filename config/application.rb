@@ -1,7 +1,7 @@
-require_relative 'boot'
+require_relative "boot"
 
-require 'rails/all'
-require_relative '../lib/basic_authentication'
+require "rails/all"
+require_relative "../lib/basic_authentication"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -18,16 +18,16 @@ module Feedbin
 
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {
-      address:              ENV['SMTP_ADDRESS'],
-      port:                 587,
+      address: ENV["SMTP_ADDRESS"],
+      port: 587,
       enable_starttls_auto: true,
-      authentication:       'login',
-      user_name:            ENV['SMTP_USERNAME'],
-      password:             ENV['SMTP_PASSWORD'],
-      domain:               ENV['SMTP_DOMAIN'] || ENV['DEFAULT_URL_OPTIONS_HOST']
+      authentication: "login",
+      user_name: ENV["SMTP_USERNAME"],
+      password: ENV["SMTP_PASSWORD"],
+      domain: ENV["SMTP_DOMAIN"] || ENV["DEFAULT_URL_OPTIONS_HOST"],
     }
 
-    config.action_view.sanitized_allowed_tags = 'table', 'tr', 'td', 'th', 'thead', 'tbody'
+    config.action_view.sanitized_allowed_tags = "table", "tr", "td", "th", "thead", "tbody"
 
     config.middleware.use Rack::ContentLength
 
@@ -36,6 +36,5 @@ module Feedbin
     config.exceptions_app = self.routes
 
     config.active_record.schema_format = :sql
-
   end
 end

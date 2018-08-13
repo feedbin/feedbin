@@ -1,8 +1,7 @@
 class Embed::Ted < IframeEmbed
-
   def self.supported_urls
     [
-      %r(https?://embed\.ted\.com/talks/(.*?)(#|\?|$))
+      %r(https?://embed\.ted\.com/talks/(.*?)(#|\?|$)),
     ]
   end
 
@@ -15,5 +14,4 @@ class Embed::Ted < IframeEmbed
     url.query = nil
     url.to_s
   end
-
 end

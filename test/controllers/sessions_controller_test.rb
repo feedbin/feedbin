@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class SessionsControllerTest < ActionController::TestCase
-
   include SessionsHelper
 
   setup do
@@ -30,5 +29,4 @@ class SessionsControllerTest < ActionController::TestCase
     get :refresh
     assert_response :success
   end
-
 end

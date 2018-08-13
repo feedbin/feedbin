@@ -1,8 +1,7 @@
 class Embed::Vimeo < IframeEmbed
-
   def self.supported_urls
     [
-      %r(https?://player\.vimeo\.com/video/(.*?)(#|\?|$))
+      %r(https?://player\.vimeo\.com/video/(.*?)(#|\?|$)),
     ]
   end
 
@@ -15,11 +14,10 @@ class Embed::Vimeo < IframeEmbed
   end
 
   def iframe_params
-    { "autoplay" => "1" }
+    {"autoplay" => "1"}
   end
 
   def canonical_url
     "https://vimeo.com/#{embed_url_data[1]}"
   end
-
 end

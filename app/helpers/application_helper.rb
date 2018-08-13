@@ -21,16 +21,16 @@ module ApplicationHelper
   end
 
   def selected(feed_id)
-    css_class = ''
+    css_class = ""
     if mark_selected? && feed_id == session[:selected_feed]
       @mark_selected = false
-      css_class = 'selected'
+      css_class = "selected"
     end
     css_class
   end
 
   def view_mode_selected(view_mode)
-    'selected' if view_mode == @user.get_view_mode
+    "selected" if view_mode == @user.get_view_mode
   end
 
   def rtl?(string)
@@ -56,20 +56,19 @@ module ApplicationHelper
   end
 
   def last_unread_date
-    current_user.try(:unread_entries).try(:order, 'created_at DESC').try(:first).try(:created_at).try(:iso8601, 6)
+    current_user.try(:unread_entries).try(:order, "created_at DESC").try(:first).try(:created_at).try(:iso8601, 6)
   end
 
-
-  def svg_tag(name, options={})
+  def svg_tag(name, options = {})
     options = options.symbolize_keys
 
-    name = name.sub('.svg', '')
+    name = name.sub(".svg", "")
     options[:width], options[:height] = extract_dimensions(options.delete(:size)) if options[:size]
 
     options[:class] = [name, options[:class]].compact.join(" ")
 
     content_tag :svg, options do
-      content_tag :use, '', :"xlink:href" => "##{name}"
+      content_tag :use, "", :"xlink:href" => "##{name}"
     end
   end
 
@@ -89,8 +88,8 @@ module ApplicationHelper
   end
 
   def favicon_template(favicon_url)
-    content_tag :span, '', class: "favicon-wrap" do
-      content_tag(:span, '', class: "favicon", style: "background-image: url(#{favicon_url});")
+    content_tag :span, "", class: "favicon-wrap" do
+      content_tag(:span, "", class: "favicon", style: "background-image: url(#{favicon_url});")
     end
   end
 
@@ -99,7 +98,7 @@ module ApplicationHelper
       scheme: "https",
       host: "www.google.com",
       path: "/s2/favicons",
-      query: {domain: host}.to_query
+      query: {domain: host}.to_query,
     )
     uri.scheme = "https"
     uri.to_s
@@ -112,16 +111,15 @@ module ApplicationHelper
   end
 
   def pretty_url(url)
-    url && url.sub('http://', '').sub('https://', '').gsub(/\/$/, '').truncate(40, omission: "...")
+    url && url.sub("http://", "").sub("https://", "").gsub(/\/$/, "").truncate(40, omission: "...")
   end
 
   def camo_link(url)
     options = {
-      asset_proxy:            ENV["CAMO_HOST"],
+      asset_proxy: ENV["CAMO_HOST"],
       asset_proxy_secret_key: ENV["CAMO_KEY"],
     }
     pipeline = HTML::Pipeline::CamoFilter.new(nil, options, nil)
     pipeline.asset_proxy_url(url.to_s)
   end
-
 end

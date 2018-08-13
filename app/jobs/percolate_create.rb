@@ -12,9 +12,9 @@ class PercolateCreate
     else
       options = {
         index: Entry.index_name,
-        type: '.percolator',
+        type: ".percolator",
         id: @action.id,
-        body: @action.search_body
+        body: @action.search_body,
       }
       $search.each do |_, client|
         client.index(options)
@@ -29,5 +29,4 @@ class PercolateCreate
   def percolate_destroy
     PercolateDestroy.perform_async(@action.id)
   end
-
 end

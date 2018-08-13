@@ -2,7 +2,7 @@ class ActionsBulk
   include Sidekiq::Worker
   sidekiq_options queue: :default, retry: false
 
-  def perform(action_id, user_id);
+  def perform(action_id, user_id)
     user = User.find(user_id)
     action = user.actions.find(action_id)
 
@@ -31,5 +31,4 @@ class ActionsBulk
       end
     end
   end
-
 end

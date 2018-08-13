@@ -1,5 +1,4 @@
 class StarredExportUploader < CarrierWave::Uploader::Base
-
   storage :fog
 
   def store_dir
@@ -16,8 +15,7 @@ class StarredExportUploader < CarrierWave::Uploader::Base
 
   def fog_attributes
     {
-      'Content-Disposition' => 'attachment; filename=starred.json'
+      "Content-Disposition" => "attachment; filename=starred.json",
     }
   end
-
 end

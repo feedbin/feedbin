@@ -5,7 +5,7 @@ class SendStats
   MEGABYTE = 1024.0 * 1024.0
 
   def perform
-    if ENV['LIBRATO_TOKEN']
+    if ENV["LIBRATO_TOKEN"]
       memcached_stats
       redis_stats
       postgres_stats
@@ -17,7 +17,7 @@ class SendStats
   end
 
   def clear_empty_jobs
-    queue = Sidekiq::Queue.new('')
+    queue = Sidekiq::Queue.new("")
     queue.clear
   end
 
@@ -48,24 +48,24 @@ class SendStats
     if Rails.cache.respond_to?(:stats)
       servers = Rails.cache.stats
       servers.each do |server, stats|
-        server_name = server.gsub(/[^A-Za-z0-9]+/, '_')
+        server_name = server.gsub(/[^A-Za-z0-9]+/, "_")
         Librato.group "memcached.#{server_name}" do |group|
-          group.measure('gets', stats['cmd_get'].to_f)
-          group.measure('sets', stats['cmd_set'].to_f)
-          group.measure('hits', stats['get_hits'].to_f)
-          group.measure('items', stats['curr_items'].to_f)
-          group.measure('connections', stats['curr_connections'].to_i)
+          group.measure("gets", stats["cmd_get"].to_f)
+          group.measure("sets", stats["cmd_set"].to_f)
+          group.measure("hits", stats["get_hits"].to_f)
+          group.measure("items", stats["curr_items"].to_f)
+          group.measure("connections", stats["curr_connections"].to_i)
         end
       end
     end
   end
 
   def redis_stats
-    redis_info = Sidekiq.redis {|c| c.info}
+    redis_info = Sidekiq.redis { |c| c.info }
     Librato.group "redis" do |group|
-      group.measure('connected_clients', redis_info['connected_clients'].to_f)
-      group.measure('used_memory', redis_info['used_memory'].to_f / MEGABYTE)
-      group.measure('operations', redis_info['instantaneous_ops_per_sec'].to_f)
+      group.measure("connected_clients", redis_info["connected_clients"].to_f)
+      group.measure("used_memory", redis_info["used_memory"].to_f / MEGABYTE)
+      group.measure("operations", redis_info["instantaneous_ops_per_sec"].to_f)
     end
   end
 
@@ -94,7 +94,7 @@ class SendStats
     )
     results = query(sql)
     results.each do |result|
-      stats << { name: result['name'].gsub(/[^A-Za-z0-9]+/, '_'), value: result['ratio'].to_f }
+      stats << {name: result["name"].gsub(/[^A-Za-z0-9]+/, "_"), value: result["ratio"].to_f}
     end
     stats
   end
@@ -112,9 +112,9 @@ class SendStats
     )
     results = query(sql)
     results.each do |result|
-      size = (result['size'].to_f * 8) / 1024
+      size = (result["size"].to_f * 8) / 1024
       if size > 100
-        stats << { name: 'index_size', value: size, source: result['name'] }
+        stats << {name: "index_size", value: size, source: result["name"]}
       end
     end
     stats
@@ -122,12 +122,12 @@ class SendStats
 
   def database_size
     stats = []
-    database   = ActiveRecord::Base.connection_config[:database]
+    database = ActiveRecord::Base.connection_config[:database]
     sql = %Q(
       SELECT pg_database_size('#{database}') as size;
     )
     results = query(sql)
-    stats << {name: 'database_size', value: results[0]['size'].to_f / MEGABYTE}
+    stats << {name: "database_size", value: results[0]["size"].to_f / MEGABYTE}
     stats
   end
 

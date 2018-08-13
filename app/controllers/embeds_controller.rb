@@ -1,5 +1,4 @@
 class EmbedsController < ApplicationController
-
   def twitter
     @url = params[:url]
     @dom_id = params[:dom_id]
@@ -17,5 +16,4 @@ class EmbedsController < ApplicationController
     @dom_id = params[:dom_id]
     @embed = IframeEmbed.fetch(@url)
   end
-
 end

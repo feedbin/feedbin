@@ -1,5 +1,4 @@
 class Source::XML < Source
-
   def call
     if @config[:request].format == :xml
       url = @config[:request].last_effective_url
@@ -7,5 +6,4 @@ class Source::XML < Source
       create_feeds!
     end
   end
-
 end

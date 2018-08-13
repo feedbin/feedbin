@@ -1,12 +1,11 @@
 class ActionsController < ApplicationController
-
   layout "settings"
 
   before_action :set_action, only: [:edit, :update, :destroy]
 
   def index
     @authentication_token = authentication_token(@user)
-    @web_service_url = "#{ENV['PUSH_URL']}/apple_push_notifications"
+    @web_service_url = "#{ENV["PUSH_URL"]}/apple_push_notifications"
     @actions = @user.actions.where("action_type <> ?", Action.action_types[:notifier])
   end
 
@@ -26,7 +25,7 @@ class ActionsController < ApplicationController
       if @action.save
         flash[:notice] = "Action was successfully created."
       else
-        flash[:error] = @action.errors.full_messages.join('. ')
+        flash[:error] = @action.errors.full_messages.join(". ")
         flash.discard()
       end
     end
@@ -40,7 +39,7 @@ class ActionsController < ApplicationController
       if @action.update(action_params)
         flash[:notice] = "Action was successfully updated."
       else
-        flash[:error] = @action.errors.full_messages.join('. ')
+        flash[:error] = @action.errors.full_messages.join(". ")
         flash.discard()
       end
     end
@@ -65,5 +64,4 @@ class ActionsController < ApplicationController
   def set_action
     @action = @user.actions.find(params[:id])
   end
-
 end

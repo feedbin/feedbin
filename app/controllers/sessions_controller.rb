@@ -1,5 +1,4 @@
 class SessionsController < ApplicationController
-
   skip_before_action :authorize
 
   def new
@@ -7,7 +6,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    user = User.where('lower(email) = ?', params[:email].try(:strip).try(:downcase)).take
+    user = User.where("lower(email) = ?", params[:email].try(:strip).try(:downcase)).take
     if user && user.authenticate(params[:password])
       sign_in user, params[:remember_me]
 
@@ -16,7 +15,6 @@ class SessionsController < ApplicationController
       else
         redirect_back_or root_url
       end
-
     else
       flash.now.alert = "Invalid email or password"
       render "new"
@@ -31,5 +29,4 @@ class SessionsController < ApplicationController
   def refresh
     head :ok
   end
-
 end

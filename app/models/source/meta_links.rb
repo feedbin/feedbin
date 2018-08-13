@@ -1,5 +1,4 @@
 class Source::MetaLinks < Source
-
   def call
     if @config[:request].format == :html
       find_links
@@ -33,5 +32,4 @@ class Source::MetaLinks < Source
     end
     valid
   end
-
 end

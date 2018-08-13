@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class EntryTest < ActiveSupport::TestCase
   setup do
@@ -6,7 +6,7 @@ class EntryTest < ActiveSupport::TestCase
     feed = user.feeds.first
     @entry = feed.entries.build(
       public_id: SecureRandom.hex,
-      content: "<p>#{Faker::Lorem.paragraph}</p>"
+      content: "<p>#{Faker::Lorem.paragraph}</p>",
     )
   end
 

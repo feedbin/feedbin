@@ -16,10 +16,8 @@ class ImportFileValidator < ActiveModel::EachValidator
       unless is_opml
         raise "No valid outlines found in OPML"
       end
-
     rescue Exception => e
       record.errors[attribute] << (options[:message] || "is invalid OPML")
     end
-
   end
 end

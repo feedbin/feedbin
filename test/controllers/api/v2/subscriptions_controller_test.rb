@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::SubscriptionsControllerTest < ApiControllerTestCase
-
   setup do
     @user = users(:ben)
   end
@@ -25,8 +24,8 @@ class Api::V2::SubscriptionsControllerTest < ApiControllerTestCase
     api_content_type
 
     html_url = "www.example.com/index.html"
-    stub_request_file('index.html', html_url)
-    stub_request_file('atom.xml', "www.example.com/atom.xml")
+    stub_request_file("index.html", html_url)
+    stub_request_file("atom.xml", "www.example.com/atom.xml")
 
     login_as @user
     assert_difference "Subscription.count", +1 do
@@ -47,5 +46,4 @@ class Api::V2::SubscriptionsControllerTest < ApiControllerTestCase
       assert_equal(value, subscription.reload.send(attribute))
     end
   end
-
 end

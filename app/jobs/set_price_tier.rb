@@ -17,5 +17,4 @@ class SetPriceTier
   def _enqueue
     enqueue_all(User, self.class)
   end
-
 end

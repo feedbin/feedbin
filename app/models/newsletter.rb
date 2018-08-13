@@ -1,5 +1,4 @@
 class Newsletter
-
   attr_reader :data
 
   def initialize(params)
@@ -80,7 +79,7 @@ class Newsletter
 
   def headers
     {
-      "List-Unsubscribe" => data["List-Unsubscribe"]
+      "List-Unsubscribe" => data["List-Unsubscribe"],
     }
   end
 
@@ -102,8 +101,7 @@ class Newsletter
     @signature ||= begin
       digest = OpenSSL::Digest::SHA256.new
       signed_data = [data["timestamp"], data["token"]].join
-      OpenSSL::HMAC.hexdigest(digest, ENV['MAILGUN_INBOUND_KEY'], signed_data)
+      OpenSSL::HMAC.hexdigest(digest, ENV["MAILGUN_INBOUND_KEY"], signed_data)
     end
   end
-
 end

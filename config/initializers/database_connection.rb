@@ -11,14 +11,14 @@ if Rails.env.production?
       database = (uri.path || "").split("/")[1]
 
       ActiveRecord::Base.establish_connection(
-        adapter:  'postgresql',
-        host:     uri.host,
-        port:     uri.port,
+        adapter: "postgresql",
+        host: uri.host,
+        port: uri.port,
         username: uri.user,
         password: uri.password,
         database: database,
-        reaping_frequency: ENV['DB_REAP_FREQ'] || 10,
-        pool: ENV['DB_POOL'] || 16
+        reaping_frequency: ENV["DB_REAP_FREQ"] || 10,
+        pool: ENV["DB_POOL"] || 16,
       )
     end
   end

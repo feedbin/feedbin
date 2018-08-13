@@ -1,5 +1,4 @@
 class EntriesController < ApplicationController
-
   skip_before_action :verify_authenticity_token, only: [:push_view, :newsletter]
   skip_before_action :authorize, only: [:push_view, :newsletter]
 
@@ -15,19 +14,19 @@ class EntriesController < ApplicationController
 
     @append = params[:page].present?
 
-    @type = 'all'
+    @type = "all"
     @data = nil
 
-    @collection_title = 'All'
+    @collection_title = "All"
 
     respond_to do |format|
-      format.js { render partial: 'shared/entries' }
+      format.js { render partial: "shared/entries" }
     end
   end
 
   def unread
     @user = current_user
-    update_selected_feed!('collection_unread')
+    update_selected_feed!("collection_unread")
 
     unread_entries = @user.unread_entries.select(:entry_id).page(params[:page]).sort_preference(@user.entry_sort)
     @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort).entries_list
@@ -36,14 +35,14 @@ class EntriesController < ApplicationController
 
     @append = params[:page].present?
 
-    @all_unread = 'true'
-    @type = 'unread'
+    @all_unread = "true"
+    @type = "unread"
     @data = nil
 
-    @collection_title = 'Unread'
+    @collection_title = "Unread"
 
     respond_to do |format|
-      format.js { render partial: 'shared/entries' }
+      format.js { render partial: "shared/entries" }
     end
   end
 
@@ -58,13 +57,13 @@ class EntriesController < ApplicationController
 
     @append = params[:page].present?
 
-    @type = 'starred'
+    @type = "starred"
     @data = nil
 
-    @collection_title = 'Starred'
+    @collection_title = "Starred"
 
     respond_to do |format|
-      format.js { render partial: 'shared/entries' }
+      format.js { render partial: "shared/entries" }
     end
   end
 
@@ -80,18 +79,18 @@ class EntriesController < ApplicationController
     @user = current_user
     @entry = Entry.find params[:id]
 
-    @content_view = params[:content_view] == 'true'
+    @content_view = params[:content_view] == "true"
 
     begin
       if @content_view
         url = @entry.fully_qualified_url
         key = FeedbinUtils.page_cache_key(url)
         @content_info = Rails.cache.fetch(key) do
-          Librato.increment 'readability.first_parse'
+          Librato.increment "readability.first_parse"
           MercuryParser.parse(url)
         end
         @content = @content_info.content
-        Librato.increment 'readability.parse'
+        Librato.increment "readability.parse"
       else
         @content = @entry.content
       end
@@ -119,7 +118,7 @@ class EntriesController < ApplicationController
     @url = params[:url]
     key = FeedbinUtils.page_cache_key(@url)
     @content_info = Rails.cache.fetch(key) do
-      Librato.increment 'readability.first_parse'
+      Librato.increment "readability.first_parse"
       MercuryParser.parse(params[:url])
     end
 
@@ -137,7 +136,7 @@ class EntriesController < ApplicationController
 
   def preload
     @user = current_user
-    ids = params[:ids].split(',').map {|i| i.to_i }
+    ids = params[:ids].split(",").map { |i| i.to_i }
     ViewLinkCacheMultiple.perform_async(@user.id, ids)
     entries = entries_by_id(ids)
     render json: entries.to_json
@@ -153,44 +152,44 @@ class EntriesController < ApplicationController
   def mark_all_as_read
     @user = current_user
 
-    if params[:type] == 'feed'
+    if params[:type] == "feed"
       unread_entries = UnreadEntry.where(user_id: @user.id, feed_id: params[:data])
-    elsif params[:type] == 'tag'
+    elsif params[:type] == "tag"
       feed_ids = @user.taggings.where(tag_id: params[:data]).pluck(:feed_id)
       unread_entries = UnreadEntry.where(user_id: @user.id, feed_id: feed_ids)
-    elsif params[:type] == 'starred'
+    elsif params[:type] == "starred"
       starred = @user.starred_entries.pluck(:entry_id)
       unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: starred)
-    elsif params[:type] == 'recently_read'
+    elsif params[:type] == "recently_read"
       recently_read = @user.recently_read_entries.pluck(:entry_id)
       unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: recently_read)
-    elsif params[:type] == 'updated'
+    elsif params[:type] == "updated"
       updated = @user.updated_entries.pluck(:entry_id)
       unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: updated)
       @user.updated_entries.delete_all
-    elsif  %w{unread all}.include?(params[:type])
+    elsif %w{unread all}.include?(params[:type])
       unread_entries = UnreadEntry.where(user_id: @user.id)
-    elsif params[:type] == 'saved_search'
+    elsif params[:type] == "saved_search"
       saved_search = @user.saved_searches.where(id: params[:data]).first
       if saved_search.present?
         params[:query] = saved_search.query
         ids = matched_search_ids(params)
         unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: ids)
       end
-    elsif params[:type] == 'search'
+    elsif params[:type] == "search"
       params[:query] = params[:data]
       ids = matched_search_ids(params)
       unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: ids)
     end
 
     if params[:date].present?
-      unread_entries = unread_entries.where('created_at <= :last_unread_date', {last_unread_date: params[:date]})
+      unread_entries = unread_entries.where("created_at <= :last_unread_date", {last_unread_date: params[:date]})
     end
 
     unread_entries.delete_all if unread_entries
 
     if params[:ids].present?
-      ids = params[:ids].split(',').map(&:to_i)
+      ids = params[:ids].split(",").map(&:to_i)
       UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
     end
 
@@ -204,28 +203,28 @@ class EntriesController < ApplicationController
 
   def mark_direction_as_read
     @user = current_user
-    ids = params[:ids].split(',').map {|i| i.to_i }
-    if params[:direction] == 'above'
+    ids = params[:ids].split(",").map { |i| i.to_i }
+    if params[:direction] == "above"
       unread_entries = UnreadEntry.where(user: @user, entry_id: ids)
-      if params[:type] == 'updated'
+      if params[:type] == "updated"
         @user.updated_entries.where(entry_id: ids).delete_all
       end
     else
-      if params[:type] == 'feed'
+      if params[:type] == "feed"
         unread_entries = UnreadEntry.where(user: @user, feed_id: params[:data]).where.not(entry_id: ids)
-      elsif params[:type] == 'tag'
+      elsif params[:type] == "tag"
         feed_ids = @user.taggings.where(tag_id: params[:data]).pluck(:feed_id)
         unread_entries = UnreadEntry.where(user: @user, feed_id: feed_ids).where.not(entry_id: ids)
-      elsif params[:type] == 'starred'
+      elsif params[:type] == "starred"
         starred = @user.starred_entries.pluck(:entry_id)
         unread_entries = UnreadEntry.where(user: @user, entry_id: starred).where.not(entry_id: ids)
-      elsif params[:type] == 'updated'
+      elsif params[:type] == "updated"
         updated = @user.updated_entries.pluck(:entry_id)
         unread_entries = UnreadEntry.where(user: @user, entry_id: updated).where.not(entry_id: ids)
         @user.updated_entries.where.not(entry_id: ids).delete_all
-      elsif  %w{unread all}.include?(params[:type])
+      elsif %w{unread all}.include?(params[:type])
         unread_entries = UnreadEntry.where(user: @user).where.not(entry_id: ids)
-      elsif params[:type] == 'saved_search'
+      elsif params[:type] == "saved_search"
         saved_search = @user.saved_searches.where(id: params[:data]).first
         if saved_search.present?
           params[:query] = saved_search.query
@@ -233,7 +232,7 @@ class EntriesController < ApplicationController
           ids = search_ids - ids
           unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: ids)
         end
-      elsif params[:type] == 'search'
+      elsif params[:type] == "search"
         params[:query] = params[:data]
         search_ids = matched_search_ids(params)
         ids = search_ids - ids
@@ -262,17 +261,17 @@ class EntriesController < ApplicationController
 
     @append = params[:page].present?
 
-    @type = 'all'
+    @type = "all"
     @data = nil
 
     @search = true
 
-    @collection_title = 'Search'
+    @collection_title = "Search"
 
     @saved_search = SavedSearch.new
 
     respond_to do |format|
-      format.js { render partial: 'shared/entries' }
+      format.js { render partial: "shared/entries" }
     end
   end
 
@@ -312,14 +311,14 @@ class EntriesController < ApplicationController
       hash[entry.id] = {
         content: render_to_string(partial: "entries/show", formats: [:html], locals: locals),
         inner_content: render_to_string(partial: "entries/inner_content", formats: [:html], locals: locals),
-        feed_id: entry.feed_id
+        feed_id: entry.feed_id,
       }
     end
   end
 
   def sharing_services(entry)
     @user_sharing_services ||= begin
-      (@user.sharing_services + @user.supported_sharing_services).reject {|sharing_service| sharing_service.active? == false }.sort_by{|sharing_service| sharing_service.label}
+      (@user.sharing_services + @user.supported_sharing_services).reject { |sharing_service| sharing_service.active? == false }.sort_by { |sharing_service| sharing_service.label }
     end
 
     services = []
@@ -350,14 +349,13 @@ class EntriesController < ApplicationController
 
   def check_for_image(entry, url)
     response = HTTParty.head(url)
-    if response.headers['content-type'] =~ /^image\//
+    if response.headers["content-type"] =~ /^image\//
       content = "<img src='#{url}' />"
-      Librato.increment 'readability.image_found'
+      Librato.increment "readability.image_found"
     else
       content = nil
-      Librato.increment 'readability.parse_fail'
+      Librato.increment "readability.parse_fail"
     end
     content
   end
-
 end

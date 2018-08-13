@@ -1,5 +1,4 @@
 class FeedOption
-
   attr_reader :source
 
   def initialize(base_url, href, title = nil, source = "unspecified")
@@ -12,8 +11,8 @@ class FeedOption
   def href
     @href_result ||= begin
       result = @href.strip
-      result = result.gsub(/^feed:/, 'http:')
-      if !result.start_with?('http')
+      result = result.gsub(/^feed:/, "http:")
+      if !result.start_with?("http")
         result = URI.join(@base_url, result).to_s
       end
       result

@@ -5,8 +5,8 @@ class EntryDeleter
   def perform(feed_id)
     feed = Feed.find(feed_id)
 
-    if ENV['ENTRY_LIMIT']
-      entry_limit = ENV['ENTRY_LIMIT'].to_i
+    if ENV["ENTRY_LIMIT"]
+      entry_limit = ENV["ENTRY_LIMIT"].to_i
     else
       entry_limit = (feed.subscriptions_count == 0) ? 10 : 400
     end
@@ -20,10 +20,10 @@ class EntryDeleter
   def delete_entries(feed_id, entry_limit)
     entry_count = Entry.where(feed_id: feed_id).count
     if entry_count > entry_limit
-      entries_to_keep = Entry.where(feed_id: feed_id).order('published DESC').limit(entry_limit).pluck('entries.id')
+      entries_to_keep = Entry.where(feed_id: feed_id).order("published DESC").limit(entry_limit).pluck("entries.id")
       entries_to_delete = Entry.where(feed_id: feed_id, starred_entries_count: 0, recently_played_entries_count: 0).where.not(id: entries_to_keep).pluck(:id, :image)
       entries_to_delete_ids = entries_to_delete.map(&:first)
-      entries_to_delete_images = entries_to_delete.map {|array| array.last && array.last["processed_url"] }.compact
+      entries_to_delete_images = entries_to_delete.map { |array| array.last && array.last["processed_url"] }.compact
 
       # Delete records
       UnreadEntry.where(entry_id: entries_to_delete_ids).delete_all
@@ -44,8 +44,7 @@ class EntryDeleter
           redis.zrem(key_published, entries_to_delete_ids)
         end
       end
-      Librato.increment('entry.destroy', by: entries_to_delete_ids.count)
+      Librato.increment("entry.destroy", by: entries_to_delete_ids.count)
     end
   end
-
 end

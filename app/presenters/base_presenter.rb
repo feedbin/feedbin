@@ -1,5 +1,4 @@
 class BasePresenter
-
   def initialize(object, locals, template)
     @object = object
     @locals = locals
@@ -9,11 +8,11 @@ class BasePresenter
   def favicon(feed)
     @favicon ||= begin
       if feed.newsletter?
-        content = @template.content_tag :span, '', class: "favicon-wrap collection-favicon favicon-newsletter-wrap" do
-          @template.svg_tag('favicon-newsletter', size: "16x16")
+        content = @template.content_tag :span, "", class: "favicon-wrap collection-favicon favicon-newsletter-wrap" do
+          @template.svg_tag("favicon-newsletter", size: "16x16")
         end
       elsif feed.twitter_user?
-        content = @template.content_tag :span, '', class: "favicon-wrap twitter-profile-image" do
+        content = @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image" do
           url = @template.camo_link(feed.twitter_user.profile_image_uri_https("bigger"))
           fallback = @template.image_url("favicon-profile-default.png")
           @template.image_tag_with_fallback(fallback, url, alt: "")
@@ -44,5 +43,4 @@ class BasePresenter
       @object
     end
   end
-
 end

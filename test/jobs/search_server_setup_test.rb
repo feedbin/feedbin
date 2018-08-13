@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class SearchServerSetupTest < ActiveSupport::TestCase
   setup do
@@ -23,10 +23,10 @@ class SearchServerSetupTest < ActiveSupport::TestCase
       query: {
         filtered: {
           filter: {
-            terms: { id: @entries.map(&:id) }
-          }
-        }
-      }
+            terms: {id: @entries.map(&:id)},
+          },
+        },
+      },
     }
     assert_equal @entries.count, Entry.search(query).results.total
   end

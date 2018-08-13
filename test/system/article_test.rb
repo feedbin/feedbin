@@ -56,5 +56,4 @@ class ArticleTest < ApplicationSystemTestCase
 
     assert_selector ".embed-title", text: "Samsung Galaxy Note 9 Impressions: Underrated!"
   end
-
 end

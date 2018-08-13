@@ -5,9 +5,8 @@ class ImportWorker
   def perform(id)
     import = Import.find(id)
     extension = import.upload.file.extension.downcase
-    if ['xml', 'opml'].include?(extension)
+    if ["xml", "opml"].include?(extension)
       import.build_opml_import_job
     end
   end
-
 end

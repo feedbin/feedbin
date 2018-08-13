@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class SendStatsTest < ActiveSupport::TestCase
   test "should run" do

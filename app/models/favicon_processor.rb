@@ -1,5 +1,4 @@
 class FaviconProcessor
-
   attr_reader :data, :host
 
   def initialize(data, host)
@@ -32,18 +31,18 @@ class FaviconProcessor
   def upload(data)
     upload_url = nil
     S3_POOL.with do |connection|
-      response = connection.put_object(ENV['AWS_S3_BUCKET_FAVICONS'], File.join(favicon_hash[0..2], "#{favicon_hash}.png"), data, s3_options)
+      response = connection.put_object(ENV["AWS_S3_BUCKET_FAVICONS"], File.join(favicon_hash[0..2], "#{favicon_hash}.png"), data, s3_options)
       upload_url = URI::HTTP.build(
-        scheme: 'https',
+        scheme: "https",
         host: response.data[:host],
-        path: response.data[:path]
+        path: response.data[:path],
       ).to_s
     end
     upload_url
   end
 
   def encoded(blob)
-    Base64.encode64(blob).gsub("\n", '')
+    Base64.encode64(blob).gsub("\n", "")
   end
 
   def image_data
@@ -56,7 +55,7 @@ class FaviconProcessor
     if favicon.columns > 32
       favicon = favicon.resize_to_fit(32, 32)
     end
-    favicon.to_blob { |image| image.format = 'png' }
+    favicon.to_blob { |image| image.format = "png" }
   ensure
     favicon && favicon.destroy!
     layers && layers.map(&:destroy!)
@@ -66,14 +65,14 @@ class FaviconProcessor
     begin
       Magick::Image.from_blob(data)
     rescue Magick::ImageMagickError
-      Magick::Image.from_blob(data) { |image| image.format = 'ico' }
+      Magick::Image.from_blob(data) { |image| image.format = "ico" }
     end
   end
 
   def remove_blank_images(layers)
     layers.reject do |layer|
       layer = layer.scale(1, 1)
-      pixel = layer.pixel_color(0,0)
+      pixel = layer.pixel_color(0, 0)
       color = layer.to_color(pixel)
       %w(none white).include?(color) || color.include?("#FFFFFF")
     end
@@ -93,5 +92,4 @@ class FaviconProcessor
   def path
     @path ||= File.join("public-favicons", favicon_hash[0..3], "#{favicon_hash}.png")
   end
-
 end

@@ -8,10 +8,9 @@ class BatchScheduler
     total_records = klass.last.id
     jobs = job_args(total_records)
     Sidekiq::Client.push_bulk(
-      'args'  => jobs,
-      'class' => worker_class,
-      'queue' => 'worker_slow'
+      "args" => jobs,
+      "class" => worker_class,
+      "queue" => "worker_slow",
     )
   end
-
 end

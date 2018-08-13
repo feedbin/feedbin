@@ -8,7 +8,7 @@ class ImageDeleter
         connection.delete_multiple_objects(ENV["AWS_S3_BUCKET_IMAGES"], slice, {quiet: true})
       end
     end
-    Librato.increment 'entry_image.delete', by: image_urls.length
+    Librato.increment "entry_image.delete", by: image_urls.length
   end
 
   def extract_paths(image_urls)
@@ -16,5 +16,4 @@ class ImageDeleter
       URI.parse(image_url).path[1..-1]
     end
   end
-
 end

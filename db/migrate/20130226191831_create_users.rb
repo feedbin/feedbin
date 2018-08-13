@@ -14,6 +14,3 @@ class CreateUsers < ActiveRecord::Migration[4.2]
     end
   end
 end
-
-
-

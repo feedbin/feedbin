@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class FeedRefresherSchedulerTest < ActiveSupport::TestCase
-
   test "should enqueue FeedRefresher" do
     flush_redis
     assert_difference "Sidekiq::Queues['worker_slow_critical'].count", +1 do

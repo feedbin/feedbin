@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class TouchActionsTest < ActiveSupport::TestCase
   test "should touch action" do

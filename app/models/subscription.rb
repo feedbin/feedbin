@@ -35,8 +35,8 @@ class Subscription < ApplicationRecord
   end
 
   def mark_as_unread
-    base = Entry.select(:id, :feed_id, :published, :created_at).where(feed_id: self.feed_id).order('published DESC')
-    entries = base.where('published > ?', Time.now.ago(2.weeks)).limit(10)
+    base = Entry.select(:id, :feed_id, :published, :created_at).where(feed_id: self.feed_id).order("published DESC")
+    entries = base.where("published > ?", Time.now.ago(2.weeks)).limit(10)
     if entries.length == 0
       entries = base.limit(3)
     end
@@ -63,7 +63,7 @@ class Subscription < ApplicationRecord
   end
 
   def untag
-    self.feed.tag('', self.user)
+    self.feed.tag("", self.user)
   end
 
   def muted_status
@@ -77,5 +77,4 @@ class Subscription < ApplicationRecord
   def refresh_favicon
     FaviconFetcher.perform_async(self.feed.host)
   end
-
 end

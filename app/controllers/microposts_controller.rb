@@ -1,5 +1,4 @@
 class MicropostsController < ApplicationController
-
   def thread
     @user = current_user
     @entry = Entry.find(params[:id])
@@ -37,6 +36,4 @@ class MicropostsController < ApplicationController
   def authorize
     super && current_user.can_read_entry?(params[:id])
   end
-
-
 end

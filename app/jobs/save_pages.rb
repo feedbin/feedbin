@@ -17,7 +17,7 @@ class SavePages
       begin
         page = Rails.cache.fetch(key)
         if !page
-          Librato.increment 'readability.first_parse'
+          Librato.increment "readability.first_parse"
           page = MercuryParser.parse(url)
           Rails.cache.write(key, page)
         end
@@ -50,5 +50,4 @@ class SavePages
       true
     end
   end
-
 end

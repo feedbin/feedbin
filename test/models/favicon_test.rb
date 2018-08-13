@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class FaviconTest < ActiveSupport::TestCase
   test "should add to created_at cache" do

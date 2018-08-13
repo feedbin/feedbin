@@ -12,5 +12,4 @@ class RemoveFeedFromAction
       action.save!
     end
   end
-
 end

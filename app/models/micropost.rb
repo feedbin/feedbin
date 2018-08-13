@@ -1,5 +1,4 @@
 class Micropost
-
   attr_reader :data
 
   def initialize(data, title)
@@ -37,17 +36,15 @@ class Micropost
 
   private
 
-    def id
-      data.dig("id")
-    end
+  def id
+    data.dig("id")
+  end
 
-    def author_profile?
-      !!(author_name && author_username)
-    end
+  def author_profile?
+    !!(author_name && author_username)
+  end
 
-    def title?
-      @title.present?
-    end
-
-
+  def title?
+    @title.present?
+  end
 end

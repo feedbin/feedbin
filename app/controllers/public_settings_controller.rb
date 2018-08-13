@@ -1,5 +1,4 @@
 class PublicSettingsController < ApplicationController
-
   skip_before_action :verify_authenticity_token
   skip_before_action :authorize
 
@@ -13,5 +12,4 @@ class PublicSettingsController < ApplicationController
 
   def account_closed
   end
-
 end

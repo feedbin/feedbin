@@ -1,8 +1,7 @@
-require 'test_helper'
+require "test_helper"
 
 class ActionTagsTest < ActiveSupport::TestCase
   test "updates tag ids" do
-
     action = actions(:api)
     user = action.user
     old_tag_id = action.tag_ids.sample

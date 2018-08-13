@@ -1,5 +1,4 @@
 class MailtoParser
-
   attr_reader :mailto
 
   def initialize(mailto)
@@ -27,5 +26,4 @@ class MailtoParser
   def parsed
     @parsed ||= Addressable::URI.parse(mailto)
   end
-
 end

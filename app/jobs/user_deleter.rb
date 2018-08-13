@@ -18,9 +18,9 @@ class UserDeleter
 
     if billing_event = @user.billing_events.find_by_id(id)
       Stripe::Refund.create(charge: billing_event.event_object["id"])
-      Librato.increment('user.refund.accepted')
+      Librato.increment("user.refund.accepted")
     else
-      Librato.increment('user.refund.declined')
+      Librato.increment("user.refund.declined")
     end
   end
 
@@ -33,5 +33,4 @@ class UserDeleter
     opml = SubscriptionsController.render(:index, assigns: {user: @user, tags: tags, feeds: feeds, titles: titles}, layout: nil)
     UserMailer.account_closed(@user.id, opml).deliver_now
   end
-
 end

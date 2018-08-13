@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class UsersControllerTest < ActionController::TestCase
-
   include SessionsHelper
 
   test "should get new user" do
@@ -14,7 +13,7 @@ class UsersControllerTest < ActionController::TestCase
     plan = plans(:trial)
     create_stripe_plan(plan)
     assert_difference "User.count", +1 do
-      post :create, params: {user: {email: 'example@example.com', password: default_password, plan_id: plan.id}}
+      post :create, params: {user: {email: "example@example.com", password: default_password, plan_id: plan.id}}
       assert_redirected_to root_url
     end
     assert signed_in?
@@ -71,5 +70,4 @@ class UsersControllerTest < ActionController::TestCase
     end
     StripeMock.stop
   end
-
 end

@@ -1,15 +1,14 @@
 class SupportedSharingServicesController < ApplicationController
-
   def create
     @user = current_user
-    if params[:supported_sharing_service][:operation] == 'authorize'
+    if params[:supported_sharing_service][:operation] == "authorize"
       authorize_service(params[:supported_sharing_service][:service_id])
     else
       supported_sharing_service = @user.supported_sharing_services.new(supported_sharing_service_params)
       if supported_sharing_service.save
         redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
       else
-        redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
+        redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join(". ")
       end
     end
   end
@@ -25,13 +24,13 @@ class SupportedSharingServicesController < ApplicationController
   def update
     @user = current_user
     supported_sharing_service = @user.supported_sharing_services.where(id: params[:id]).first!
-    if params[:supported_sharing_service][:operation] == 'authorize'
+    if params[:supported_sharing_service][:operation] == "authorize"
       authorize_service(supported_sharing_service.service_id)
     else
       if supported_sharing_service.update(supported_sharing_service_params)
         redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
       else
-        redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
+        redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join(". ")
       end
     end
   end
@@ -39,7 +38,7 @@ class SupportedSharingServicesController < ApplicationController
   def share
     @user = current_user
     sharing_service = @user.supported_sharing_services.where(id: params[:id]).first!
-    Librato.increment('supported_sharing_services.share', source: sharing_service.service_id)
+    Librato.increment("supported_sharing_services.share", source: sharing_service.service_id)
     @response = sharing_service.share(params.to_unsafe_h)
   end
 
@@ -47,7 +46,7 @@ class SupportedSharingServicesController < ApplicationController
     @user = current_user
     service = @user.supported_sharing_services.where(id: params[:id]).first!
     completions = service.completions.find_all { |completion| completion.downcase.include?(params[:query].downcase) }.first(3)
-    render json: { suggestions: completions.map {|completion| { value: completion, data: completion } } }.to_json
+    render json: {suggestions: completions.map { |completion| {value: completion, data: completion} }}.to_json
   end
 
   def oauth_response
@@ -59,7 +58,7 @@ class SupportedSharingServicesController < ApplicationController
       supported_sharing_service = @user.supported_sharing_services.where(service_id: params[:id]).first_or_initialize
       supported_sharing_service.update(access_token: access_token.token, access_secret: access_token.secret)
       if supported_sharing_service.errors.any?
-        redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
+        redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join(". ")
       else
         supported_sharing_service.try(:after_activate)
         redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
@@ -71,7 +70,7 @@ class SupportedSharingServicesController < ApplicationController
     Honeybadger.notify(
       error_class: "SupportedSharingServicesController#oauth_response",
       error_message: "#{service_info[:label]} failure",
-      parameters: {exception: e}
+      parameters: {exception: e},
     )
     redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
   end
@@ -84,9 +83,9 @@ class SupportedSharingServicesController < ApplicationController
 
   def authorize_service(service_id)
     service_info = SupportedSharingService.info!(service_id)
-    if service_info[:service_type] == 'oauth'
+    if service_info[:service_type] == "oauth"
       oauth_request(service_id)
-    elsif service_info[:service_type] == 'xauth' || service_info[:service_type] == 'pinboard'
+    elsif service_info[:service_type] == "xauth" || service_info[:service_type] == "pinboard"
       xauth_request(service_id)
     end
   end
@@ -102,7 +101,7 @@ class SupportedSharingServicesController < ApplicationController
         supported_sharing_service = @user.supported_sharing_services.where(service_id: service_id).first_or_initialize
         supported_sharing_service.update(access_token: response.token, access_secret: response.secret)
         if supported_sharing_service.errors.any?
-          redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join('. ')
+          redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join(". ")
         else
           redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
         end
@@ -128,7 +127,7 @@ class SupportedSharingServicesController < ApplicationController
       Honeybadger.notify(
         error_class: "SupportedSharingServicesController#oauth_request",
         error_message: "#{service_info[:label]} failure",
-        parameters: {response: response}
+        parameters: {response: response},
       )
       redirect_to sharing_services_url, notice: "Unknown #{SupportedSharingService.info(service_id)[:label]} error."
     end
@@ -136,9 +135,8 @@ class SupportedSharingServicesController < ApplicationController
     Honeybadger.notify(
       error_class: "SupportedSharingServicesController#oauth_request",
       error_message: "#{service_info[:label]} failure",
-      parameters: {exception: e}
+      parameters: {exception: e},
     )
     redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
   end
-
 end

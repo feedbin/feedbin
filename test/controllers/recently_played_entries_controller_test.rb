@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class RecentlyPlayedEntriesControllerTest < ActionController::TestCase
-
   setup do
     @user = users(:new)
     @feeds = create_feeds(@user)
@@ -24,13 +23,11 @@ class RecentlyPlayedEntriesControllerTest < ActionController::TestCase
     params = {
       entry_id: entry.id,
       progress: 7,
-      duration: 8
+      duration: 8,
     }
 
-    assert_difference('RecentlyPlayedEntry.count') do
+    assert_difference("RecentlyPlayedEntry.count") do
       post :create, params: {id: entry.id, recently_played_entry: params}, xhr: true
     end
-
   end
-
 end

@@ -17,18 +17,17 @@ class ItunesImage
 
   def schedule
     Sidekiq::Client.push(
-      'args'  => [@entry_id, @original_url, @entry.public_id],
-      'class' => 'ItunesImage',
-      'queue' => 'images',
-      'retry' => false
+      "args" => [@entry_id, @original_url, @entry.public_id],
+      "class" => "ItunesImage",
+      "queue" => "images",
+      "retry" => false,
     )
   end
 
   def receive
     entry = Entry.find(@entry_id)
     data = entry.data || {}
-    data['itunes_image_processed'] = @processed_url
+    data["itunes_image_processed"] = @processed_url
     entry.update(data: data)
   end
-
 end

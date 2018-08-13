@@ -2,16 +2,16 @@ class Source::Youtube < Source
   URLS = [
     {
       template: "https://www.youtube.com/feeds/videos.xml?channel_id=%s".freeze,
-      regex: Regexp.new(/https:\/\/www\.youtube\.com\/channel\/([^\/#\?]*)/)
+      regex: Regexp.new(/https:\/\/www\.youtube\.com\/channel\/([^\/#\?]*)/),
     },
     {
       template: "https://www.youtube.com/feeds/videos.xml?user=%s".freeze,
-      regex: Regexp.new(/https:\/\/www\.youtube\.com\/user\/([^\/#\?]*)/)
+      regex: Regexp.new(/https:\/\/www\.youtube\.com\/user\/([^\/#\?]*)/),
     },
     {
       template: "https://www.youtube.com/feeds/videos.xml?playlist_id=%s".freeze,
-      regex: Regexp.new(/https:\/\/www\.youtube\.com\/playlist\?list=([^&]*)/)
-    }
+      regex: Regexp.new(/https:\/\/www\.youtube\.com\/playlist\?list=([^&]*)/),
+    },
   ]
 
   def call
@@ -22,5 +22,4 @@ class Source::Youtube < Source
       create_feeds!
     end
   end
-
 end

@@ -4,7 +4,6 @@ class UpdateDefaultColumn
   sidekiq_options queue: :worker_slow
 
   def perform(options = {})
-
     @klass = options.fetch("klass").constantize
     @column = options.fetch("column")
     @default = options.fetch("default")
@@ -33,12 +32,9 @@ class UpdateDefaultColumn
       }]
     end
     Sidekiq::Client.push_bulk(
-      'args'  => jobs,
-      'class' => self.class.name,
-      'queue' => self.class.get_sidekiq_options["queue"].to_s
+      "args" => jobs,
+      "class" => self.class.name,
+      "queue" => self.class.get_sidekiq_options["queue"].to_s,
     )
   end
-
 end
-
-

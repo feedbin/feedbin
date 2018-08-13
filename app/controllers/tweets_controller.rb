@@ -1,5 +1,4 @@
 class TweetsController < ApplicationController
-
   def thread
     @user = current_user
     @entry = Entry.find(params[:id])
@@ -8,11 +7,11 @@ class TweetsController < ApplicationController
       replies = load_replies(parents)
       tweets = load_author_replies(replies, parents)
 
-      if !tweets.find {|tweet| tweet.id == @entry.main_tweet.id }
+      if !tweets.find { |tweet| tweet.id == @entry.main_tweet.id }
         tweets = tweets.unshift(@entry.main_tweet)
       end
       tweets = parents.concat(tweets)
-      tweets.uniq {|tweet| tweet.id }
+      tweets.uniq { |tweet| tweet.id }
     end
     @parent = @tweets.first
   end
@@ -25,9 +24,9 @@ class TweetsController < ApplicationController
 
   def client
     @client ||= ::Twitter::REST::Client.new do |config|
-      config.consumer_key        = ENV['TWITTER_KEY']
-      config.consumer_secret     = ENV['TWITTER_SECRET']
-      config.access_token        = @user.twitter_access_token
+      config.consumer_key = ENV["TWITTER_KEY"]
+      config.consumer_secret = ENV["TWITTER_SECRET"]
+      config.access_token = @user.twitter_access_token
       config.access_token_secret = @user.twitter_access_secret
     end
   end
@@ -55,7 +54,7 @@ class TweetsController < ApplicationController
       tweet.in_reply_to_status_id? &&
       tweet.in_reply_to_status_id == parent.id &&
       tweet.user.id != parent.user.id &&
-      !parents.find {|t| tweet.id == t.id }
+      !parents.find { |t| tweet.id == t.id }
     end.reverse
     OpenStruct.new(tweets: tweets, search_metadata: results.to_h[:search_metadata])
   end
@@ -63,12 +62,12 @@ class TweetsController < ApplicationController
   def load_author_replies(replies, parents)
     parent = (parents.first) ? parents.first : @entry.main_tweet
     options = {
-      include_rts:	false,
-      max_id:	replies.search_metadata[:max_id],
-      since_id:	parent.id,
-      tweet_mode:	"extended",
+      include_rts: false,
+      max_id: replies.search_metadata[:max_id],
+      since_id: parent.id,
+      tweet_mode: "extended",
       count: 200,
-      exclude_replies: false
+      exclude_replies: false,
     }
     author_replies = client.user_timeline(parent.user.id, options)
 
@@ -85,7 +84,7 @@ class TweetsController < ApplicationController
 
     tweets = replies.tweets.each_with_object([]) do |tweet, array|
       array.push(tweet)
-      if reply = author_replies.find {|author_reply| author_reply.in_reply_to_status_id == tweet.id }
+      if reply = author_replies.find { |author_reply| author_reply.in_reply_to_status_id == tweet.id }
         array.push(reply)
       end
     end
@@ -105,5 +104,4 @@ class TweetsController < ApplicationController
   rescue Twitter::Error::Forbidden
     false
   end
-
 end

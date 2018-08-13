@@ -10,19 +10,18 @@ class TwitterFeedRefresher
   def enqueue_feed(feed, user = nil)
     keys = load_keys(feed, user)
     if keys.present?
-
       args = {
-        'args'  => [feed.id, feed.feed_url, keys],
-        'class' => "TwitterFeedRefresher",
-        'queue' => "feed_refresher_fetcher",
-        'retry' => false,
-        'at' => Time.now.to_i + rand(0..6.minutes.to_i)
+        "args" => [feed.id, feed.feed_url, keys],
+        "class" => "TwitterFeedRefresher",
+        "queue" => "feed_refresher_fetcher",
+        "retry" => false,
+        "at" => Time.now.to_i + rand(0..6.minutes.to_i),
       }
 
       if user
-        args['class'] = "TwitterFeedRefresherCritical"
-        args['queue'] = "feed_refresher_fetcher_critical"
-        args.delete('at')
+        args["class"] = "TwitterFeedRefresherCritical"
+        args["queue"] = "feed_refresher_fetcher_critical"
+        args.delete("at")
       end
 
       Sidekiq::Client.push(args)
@@ -46,10 +45,9 @@ class TwitterFeedRefresher
       if user.twitter_access_token.present? && user.twitter_access_secret.present? && user_matches
         {
           twitter_access_token: user.twitter_access_token,
-          twitter_access_secret: user.twitter_access_secret
+          twitter_access_secret: user.twitter_access_secret,
         }
       end
     end.compact
   end
-
 end

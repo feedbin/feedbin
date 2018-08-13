@@ -25,5 +25,4 @@ class FaviconMigration
   def build
     enqueue_all(Favicon, self.class)
   end
-
 end

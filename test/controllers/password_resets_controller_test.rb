@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class PasswordResetsControllerTest < ActionController::TestCase
-
   setup do
     @user = users(:ben)
   end
@@ -31,7 +30,7 @@ class PasswordResetsControllerTest < ActionController::TestCase
     token = @user.generate_token(:password_reset_token, nil, true)
     @user.password_reset_sent_at = Time.now
     @user.save
-    post :update, params: {id: token, user: {password: 'new password'}}
+    post :update, params: {id: token, user: {password: "new password"}}
     assert_redirected_to login_url
   end
 
@@ -39,9 +38,8 @@ class PasswordResetsControllerTest < ActionController::TestCase
     token = @user.generate_token(:password_reset_token, nil, true)
     @user.password_reset_sent_at = 3.hours.ago
     @user.save
-    post :update, params: {id: token, user: {password: 'new password'}}
+    post :update, params: {id: token, user: {password: "new password"}}
     assert_redirected_to new_password_reset_path
     assert flash[:alert].present?
   end
-
 end

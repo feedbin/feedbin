@@ -11,25 +11,24 @@ module Searchable
     SORT_REGEX = /(?<=\s|^)sort:\s*(asc|desc|relevance)(?=\s|$)/i
     TAG_ID_REGEX = /(?<=\s|^)tag_id:\s*([0-9]+)(?=\s|$)/
 
-
     mappings _source: {enabled: false} do
-      indexes :id,            type: 'long', index: :not_analyzed
-      indexes :title,         analyzer: 'snowball'
-      indexes :title_exact,   analyzer: 'whitespace'
-      indexes :content,       analyzer: 'snowball'
-      indexes :content_exact, analyzer: 'whitespace'
-      indexes :author,        analyzer: 'keyword'
-      indexes :url,           analyzer: 'keyword'
-      indexes :feed_id,       type: 'long', index: :not_analyzed, include_in_all: false
-      indexes :published,     type: 'date', include_in_all: false
-      indexes :updated,       type: 'date', include_in_all: false
+      indexes :id, type: "long", index: :not_analyzed
+      indexes :title, analyzer: "snowball"
+      indexes :title_exact, analyzer: "whitespace"
+      indexes :content, analyzer: "snowball"
+      indexes :content_exact, analyzer: "whitespace"
+      indexes :author, analyzer: "keyword"
+      indexes :url, analyzer: "keyword"
+      indexes :feed_id, type: "long", index: :not_analyzed, include_in_all: false
+      indexes :published, type: "date", include_in_all: false
+      indexes :updated, type: "date", include_in_all: false
 
-      indexes :twitter_screen_name, analyzer: 'whitespace'
-      indexes :twitter_name, analyzer: 'whitespace'
-      indexes :twitter_retweet, type: 'boolean'
-      indexes :twitter_media, type: 'boolean'
-      indexes :twitter_image, type: 'boolean'
-      indexes :twitter_link, type: 'boolean'
+      indexes :twitter_screen_name, analyzer: "whitespace"
+      indexes :twitter_name, analyzer: "whitespace"
+      indexes :twitter_retweet, type: "boolean"
+      indexes :twitter_media, type: "boolean"
+      indexes :twitter_image, type: "boolean"
+      indexes :twitter_link, type: "boolean"
     end
 
     def self.saved_search_count(user)
@@ -40,7 +39,7 @@ module Searchable
         queries = searches.map do |search|
           {
             index: Entry.index_name,
-            search: search.query
+            search: search.query,
           }
         end
 
@@ -52,7 +51,7 @@ module Searchable
               hit["_id"].to_i
             end
           end
-          search_ids = searches.map {|search| search.id}
+          search_ids = searches.map { |search| search.id }
           Hash[search_ids.zip(entry_ids)]
         else
           nil
@@ -66,7 +65,7 @@ module Searchable
 
         next if query_string =~ READ_REGEX
 
-        query_string = query_string.gsub(UNREAD_REGEX, '')
+        query_string = query_string.gsub(UNREAD_REGEX, "")
         query_string = {query: "#{query_string} is:unread"}
         options = build_search(query_string, user)
         options[:size] = 50
@@ -106,58 +105,57 @@ module Searchable
               bool: {
                 should: [
                   {terms: {feed_id: options[:feed_ids]}},
-                  {terms: {id: options[:starred_ids]}}
-                ]
-              }
-            }
-          }
+                  {terms: {id: options[:starred_ids]}},
+                ],
+              },
+            },
+          },
         }
         if options[:query].present?
           hash[:query][:bool][:must] = {
             query_string: {
               query: options[:query],
-              default_operator: "AND"
-            }
+              default_operator: "AND",
+            },
           }
         end
         if options[:ids].present?
           hash[:query][:bool][:filter][:bool][:must] = {
-            terms: {id: options[:ids]}
+            terms: {id: options[:ids]},
           }
         end
         if options[:not_ids].present?
           hash[:query][:bool][:filter][:bool][:must_not] = {
-            terms: {id: options[:not_ids]}
+            terms: {id: options[:not_ids]},
           }
         end
       end
     end
 
     def self.build_search(params, user)
-
       if params[:query].respond_to?(:gsub)
         params[:query] = params[:query].gsub("body:", "content:")
       end
 
       if params[:query] =~ UNREAD_REGEX
-        params[:query] = params[:query].gsub(UNREAD_REGEX, '')
+        params[:query] = params[:query].gsub(UNREAD_REGEX, "")
         params[:read] = false
       elsif params[:query] =~ READ_REGEX
-        params[:query] = params[:query].gsub(READ_REGEX, '')
+        params[:query] = params[:query].gsub(READ_REGEX, "")
         params[:read] = true
       end
 
       if params[:query] =~ STARRED_REGEX
-        params[:query] = params[:query].gsub(STARRED_REGEX, '')
+        params[:query] = params[:query].gsub(STARRED_REGEX, "")
         params[:starred] = true
       elsif params[:query] =~ UNSTARRED_REGEX
-        params[:query] = params[:query].gsub(UNSTARRED_REGEX, '')
+        params[:query] = params[:query].gsub(UNSTARRED_REGEX, "")
         params[:starred] = false
       end
 
       if params[:query] =~ SORT_REGEX
         params[:sort] = params[:query].match(SORT_REGEX)[1].downcase
-        params[:query] = params[:query].gsub(SORT_REGEX, '')
+        params[:query] = params[:query].gsub(SORT_REGEX, "")
       end
 
       if params[:query] =~ TAG_ID_REGEX
@@ -221,7 +219,7 @@ module Searchable
     def self.escape_search(query)
       if query.present? && query.respond_to?(:gsub)
         special_characters_regex = /([\+\-\!\{\}\[\]\^\~\?\\])/
-        escape = '\ '.sub(' ', '')
+        escape = '\ '.sub(" ", "")
         query = query.gsub(special_characters_regex) { |character| escape + character }
 
         colon_regex = /(?<!title|title_exact|feed_id|content|content_exact|author|_missing_|_exists_|twitter_screen_name|twitter_name|twitter_retweet|twitter_media|twitter_image|twitter_link):(?=.*)/
@@ -229,6 +227,5 @@ module Searchable
         query
       end
     end
-
   end
 end

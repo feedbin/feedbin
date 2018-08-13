@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class EntryImageTest < ActiveSupport::TestCase
   setup do
@@ -17,10 +17,10 @@ class EntryImageTest < ActiveSupport::TestCase
 
   test "should add image to entry" do
     image = {
-      "original_url"  => "http://example.com/image.jpg",
+      "original_url" => "http://example.com/image.jpg",
       "processed_url" => "http://cdn.example.com/image.jpg",
-      "width"         => 542,
-      "height"        => 304
+      "width" => 542,
+      "height" => 304,
     }
     EntryImage.new().perform(@entry.id, image)
     assert_equal image, @entry.reload.image
@@ -28,11 +28,11 @@ class EntryImageTest < ActiveSupport::TestCase
 
   test "should skip enqueue" do
     @entry.update(image: {
-      "original_url"  => "http://example.com/image.jpg",
-      "processed_url" => "http://cdn.example.com/image.jpg",
-      "width"         => 542,
-      "height"        => 304
-    })
+                    "original_url" => "http://example.com/image.jpg",
+                    "processed_url" => "http://cdn.example.com/image.jpg",
+                    "width" => 542,
+                    "height" => 304,
+                  })
     assert_difference "Sidekiq::Queues['images'].count", 0 do
       EntryImage.new().perform(@entry.id)
     end

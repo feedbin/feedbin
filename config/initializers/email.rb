@@ -1,1 +1,1 @@
-ActionMailer::Base.default from: ENV['FROM_ADDRESS']
+ActionMailer::Base.default from: ENV["FROM_ADDRESS"]

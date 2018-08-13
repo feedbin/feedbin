@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::ActionsControllerTest < ApiControllerTestCase
-
   setup do
     @user = users(:new)
     @feeds = create_feeds(@user)
@@ -11,7 +10,7 @@ class Api::V2::ActionsControllerTest < ApiControllerTestCase
       user: @user,
       query: @entry.title,
       feed_ids: @feeds.map(&:id),
-      actions: ['mark_read']
+      actions: ["mark_read"],
     )
     @actions = [action]
   end
@@ -33,12 +32,12 @@ class Api::V2::ActionsControllerTest < ApiControllerTestCase
     login_as @user
     assert_difference "Action.count", +1 do
       post :create, format: :json, params: {
-        action_params: {
-          query: "query",
-          feed_ids: [@feeds.first.id],
-          actions: ['mark_read']
-        }
-      }
+                 action_params: {
+                   query: "query",
+                   feed_ids: [@feeds.first.id],
+                   actions: ["mark_read"],
+                 },
+               }
       assert_response :success
     end
   end
@@ -64,5 +63,4 @@ class Api::V2::ActionsControllerTest < ApiControllerTestCase
   def action_keys
     %w[title action_type query feed_ids tag_ids actions]
   end
-
 end

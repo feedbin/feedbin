@@ -1,7 +1,6 @@
 module Api
   module V2
     class UnreadEntriesController < ApiController
-
       respond_to :json
 
       before_action :validate_content_type, only: [:create]
@@ -45,21 +44,20 @@ module Api
             valid_entries << {entry_id: entry_id, feed_id: feed_id, published: published, created_at: created_at}
           end
         end
-        entry_ids = valid_entries.map {|entry| entry[:entry_id]}
+        entry_ids = valid_entries.map { |entry| entry[:entry_id] }
 
         {valid_entries: valid_entries, entry_ids: entry_ids}
       end
 
       def validate_create
-        needs 'unread_entries'
+        needs "unread_entries"
 
         if params[:unread_entries].respond_to?(:count)
           if params[:unread_entries].count > 1000
-            status_bad_request([{unread_entries: 'Please send less than or equal to 1,000 ids per request'}])
+            status_bad_request([{unread_entries: "Please send less than or equal to 1,000 ids per request"}])
           end
         end
       end
-
     end
   end
 end

@@ -8,5 +8,4 @@ class TouchActions
       action.save
     end
   end
-
 end

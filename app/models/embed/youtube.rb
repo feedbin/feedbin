@@ -1,5 +1,4 @@
 class Embed::Youtube < IframeEmbed
-
   def self.supported_urls
     [
       %r(https?://www\.youtube\.com/embed/(.*?)(\?|$)),
@@ -25,12 +24,11 @@ class Embed::Youtube < IframeEmbed
     {
       "autoplay" => "1",
       "rel" => "0",
-      "showinfo" => "0"
+      "showinfo" => "0",
     }
   end
 
   def oembed_params
     {url: canonical_url, format: "json"}
   end
-
 end

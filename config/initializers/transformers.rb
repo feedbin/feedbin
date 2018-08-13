@@ -1,19 +1,19 @@
 class Transformers
-  LISTS     = Set.new(%w(ul ol).freeze)
-  LIST_ITEM = 'li'.freeze
+  LISTS = Set.new(%w(ul ol).freeze)
+  LIST_ITEM = "li".freeze
   TABLE_ITEMS = Set.new(%w(tr td th).freeze)
-  TABLE = 'table'.freeze
+  TABLE = "table".freeze
   TABLE_SECTIONS = Set.new(%w(thead tbody tfoot).freeze)
 
   def iframe_attributes(uri, width, height)
     uri = URI(uri)
     id = Digest::SHA1.hexdigest(uri.to_s)
     attributes = {
-      "id"                    => id,
-      "class"                 => "iframe-placeholder entry-callout system-content",
-      "data-iframe-src"       => uri.to_s,
-      "data-iframe-host"      => uri.host,
-      "data-iframe-embed-url" => Rails.application.routes.url_helpers.iframe_embeds_path(url: uri.to_s, dom_id: id)
+      "id" => id,
+      "class" => "iframe-placeholder entry-callout system-content",
+      "data-iframe-src" => uri.to_s,
+      "data-iframe-host" => uri.host,
+      "data-iframe-embed-url" => Rails.application.routes.url_helpers.iframe_embeds_path(url: uri.to_s, dom_id: id),
     }
     if width && height
       attributes["data-iframe-width"] = width
@@ -24,15 +24,15 @@ class Transformers
 
   def iframe_whitelist
     lambda do |env|
-      node      = env[:node]
+      node = env[:node]
       node_name = env[:node_name]
-      source    = node['src']
+      source = node["src"]
 
-      if node_name != 'iframe' || env[:is_whitelisted] || !node.element? || source.nil?
+      if node_name != "iframe" || env[:is_whitelisted] || !node.element? || source.nil?
         return
       end
 
-      node['src'] = source.gsub(/^https?:?/, 'https:')
+      node["src"] = source.gsub(/^https?:?/, "https:")
 
       if uri = URI(node["src"]) rescue nil
         replacement = Nokogiri::XML::Element.new("div", node.document)
@@ -52,23 +52,23 @@ class Transformers
     lambda do |env|
       node = env[:node]
 
-      if env[:node_name] != 'blockquote' || env[:is_whitelisted] || !node.element? || node['class'].nil?
+      if env[:node_name] != "blockquote" || env[:is_whitelisted] || !node.element? || node["class"].nil?
         return
       end
 
-      allowed_classes = ['twitter-tweet', 'instagram-media', 'imgur-embed-pub']
+      allowed_classes = ["twitter-tweet", "instagram-media", "imgur-embed-pub"]
 
       allowed_attributes = []
 
       allowed_classes.each do |allowed_class|
-        if node['class'].include?(allowed_class)
-          node['class'] = allowed_class
-          allowed_attributes = ['class', :data]
+        if node["class"].include?(allowed_class)
+          node["class"] = allowed_class
+          allowed_attributes = ["class", :data]
         end
       end
 
       whitelist = Feedbin::Application.config.base.dup
-      whitelist[:attributes]['blockquote'] = allowed_attributes
+      whitelist[:attributes]["blockquote"] = allowed_attributes
 
       Sanitize.clean_node!(node, whitelist)
 
@@ -81,7 +81,7 @@ class Transformers
   def top_level_li
     lambda do |env|
       name, node = env[:node_name], env[:node]
-      if name == LIST_ITEM && !node.ancestors.any?{ |n| LISTS.include?(n.name) }
+      if name == LIST_ITEM && !node.ancestors.any? { |n| LISTS.include?(n.name) }
         node.replace(node.children)
       end
     end
@@ -96,5 +96,4 @@ class Transformers
       end
     end
   end
-
 end

@@ -1,5 +1,4 @@
 class EmailsController < ApplicationController
-
   skip_before_action :verify_authenticity_token
   skip_before_action :authorize
 
@@ -15,12 +14,8 @@ class EmailsController < ApplicationController
         feed = feeds.first
         user.subscriptions.find_or_create_by(feed: feed)
       end
-
     end
   ensure
     head :ok
   end
-
 end
-
-

@@ -10,5 +10,4 @@ class AddFeedToAction
       action.save!
     end
   end
-
 end

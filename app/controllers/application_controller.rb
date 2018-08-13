@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
 
   def append_info_to_payload(payload)
     super
-    payload[:feedbin_request_id] = request.headers['X-Feedbin-Request-ID']
+    payload[:feedbin_request_id] = request.headers["X-Feedbin-Request-ID"]
   end
 
   def update_selected_feed!(type, data = nil)
@@ -30,76 +30,76 @@ class ApplicationController < ActionController::Base
   end
 
   def render_404
-    render 'errors/not_found', status: 404, layout: 'application', formats: [:html]
+    render "errors/not_found", status: 404, layout: "application", formats: [:html]
   end
 
   def get_collections
     user = current_user
     collections = []
     collections << {
-      title: 'Unread',
+      title: "Unread",
       path: unread_entries_path,
-      count_data: {behavior: 'needs_count', count_group: 'all'},
-      id: 'collection_unread',
-      favicon_class: 'favicon-unread',
-      parent_class: 'collection-unread',
-      parent_data: { behavior: 'all_unread', feed_id: 'collection_unread', count_type: 'unread' },
-      data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'unread', message: 'Mark all items as read?'}.to_json }
+      count_data: {behavior: "needs_count", count_group: "all"},
+      id: "collection_unread",
+      favicon_class: "favicon-unread",
+      parent_class: "collection-unread",
+      parent_data: {behavior: "all_unread", feed_id: "collection_unread", count_type: "unread"},
+      data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "unread", message: "Mark all items as read?"}.to_json},
     }
     collections << {
-      title: 'All',
+      title: "All",
       path: entries_path,
-      count_data: {behavior: 'needs_count', count_group: 'all'},
-      id: 'collection_all',
-      favicon_class: 'favicon-all',
-      parent_class: 'collection-all',
-      parent_data: { behavior: 'all_unread', feed_id: 'collection_all', count_type: 'unread' },
-      data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'all', message: 'Mark all items as read?'}.to_json }
+      count_data: {behavior: "needs_count", count_group: "all"},
+      id: "collection_all",
+      favicon_class: "favicon-all",
+      parent_class: "collection-all",
+      parent_data: {behavior: "all_unread", feed_id: "collection_all", count_type: "unread"},
+      data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "all", message: "Mark all items as read?"}.to_json},
     }
     collections << {
-      title: 'Starred',
+      title: "Starred",
       path: starred_entries_path,
-      count_data: {behavior: 'needs_count', count_group: 'all'},
-      id: 'collection_starred',
-      favicon_class: 'favicon-star',
-      parent_class: 'collection-starred',
-      parent_data: { behavior: 'starred', feed_id: 'collection_starred', count_type: 'starred' },
-      data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'starred', message: 'Mark starred items as read?'}.to_json }
+      count_data: {behavior: "needs_count", count_group: "all"},
+      id: "collection_starred",
+      favicon_class: "favicon-star",
+      parent_class: "collection-starred",
+      parent_data: {behavior: "starred", feed_id: "collection_starred", count_type: "starred"},
+      data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "starred", message: "Mark starred items as read?"}.to_json},
     }
     if !user.setting_on?(:hide_recently_read)
       collections << {
-        title: 'Recently Read',
+        title: "Recently Read",
         path: recently_read_entries_path,
         count_data: nil,
-        id: 'collection_recently_read',
-        favicon_class: 'favicon-recently-read',
-        parent_class: 'collection-recently-read',
-        parent_data: { behavior: 'recently_read', feed_id: 'collection_recently_read', count_type: 'recently_read' },
-        data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'recently_read', message: 'Mark recently read items as read?'}.to_json }
+        id: "collection_recently_read",
+        favicon_class: "favicon-recently-read",
+        parent_class: "collection-recently-read",
+        parent_data: {behavior: "recently_read", feed_id: "collection_recently_read", count_type: "recently_read"},
+        data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "recently_read", message: "Mark recently read items as read?"}.to_json},
       }
     end
     if !user.setting_on?(:hide_updated)
       collections << {
-        title: 'Updated',
+        title: "Updated",
         path: updated_entries_path,
-        count_data: {behavior: 'needs_count', count_group: 'all', count_collection: 'updated', count_hide: 'on'},
-        id: 'collection_updated',
-        favicon_class: 'favicon-updated',
-        parent_class: 'collection-updated',
-        parent_data: { behavior: 'updated', feed_id: 'collection_updated', count_type: 'updated' },
-        data: { behavior: 'selectable show_entries open_item feed_link', special_collection: 'updated', mark_read: {type: 'updated', message: 'Mark updated items as read?'}.to_json }
+        count_data: {behavior: "needs_count", count_group: "all", count_collection: "updated", count_hide: "on"},
+        id: "collection_updated",
+        favicon_class: "favicon-updated",
+        parent_class: "collection-updated",
+        parent_data: {behavior: "updated", feed_id: "collection_updated", count_type: "updated"},
+        data: {behavior: "selectable show_entries open_item feed_link", special_collection: "updated", mark_read: {type: "updated", message: "Mark updated items as read?"}.to_json},
       }
     end
     if !user.setting_on?(:hide_recently_played)
       collections << {
-        title: 'Recently Played',
+        title: "Recently Played",
         path: recently_played_entries_path,
         count_data: nil,
-        id: 'collection_recently_played',
-        favicon_class: 'favicon-recently-played',
-        parent_class: 'collection-recently-played',
-        parent_data: { behavior: 'recently_played', feed_id: 'collection_recently_played', count_type: 'recently_played' },
-        data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'recently_played', message: 'Mark recently played items as read?'}.to_json }
+        id: "collection_recently_played",
+        favicon_class: "favicon-recently-played",
+        parent_class: "collection-recently-played",
+        parent_data: {behavior: "recently_played", feed_id: "collection_recently_played", count_type: "recently_played"},
+        data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "recently_played", message: "Mark recently played items as read?"}.to_json},
       }
     end
     collections
@@ -113,11 +113,11 @@ class ApplicationController < ActionController::Base
     @feeds = @user.feeds.where.not(id: excluded_feeds).includes(:favicon).include_user_title
 
     @count_data = {
-      unread_entries: @user.unread_entries.pluck('feed_id, entry_id'),
-      starred_entries: @user.starred_entries.pluck('feed_id, entry_id'),
-      updated_entries: @user.updated_entries.pluck('feed_id, entry_id'),
+      unread_entries: @user.unread_entries.pluck("feed_id, entry_id"),
+      starred_entries: @user.starred_entries.pluck("feed_id, entry_id"),
+      updated_entries: @user.updated_entries.pluck("feed_id, entry_id"),
       tag_map: @user.taggings.build_map,
-      entry_sort: @user.entry_sort
+      entry_sort: @user.entry_sort,
     }
     @feed_data = {
       feeds: @feeds,
@@ -125,26 +125,26 @@ class ApplicationController < ActionController::Base
       tags: @user.tag_group,
       saved_searches: @user.saved_searches.order(Arel.sql("lower(name)")),
       count_data: @count_data,
-      feed_order: @user.feed_order
+      feed_order: @user.feed_order,
     }
   end
 
   def render_file_or(file, status, &block)
-    if ENV['SITE_PATH'].present? && File.exist?(File.join(ENV['SITE_PATH'], file))
-      render file: File.join(ENV['SITE_PATH'], file), status: status, layout: nil
+    if ENV["SITE_PATH"].present? && File.exist?(File.join(ENV["SITE_PATH"], file))
+      render file: File.join(ENV["SITE_PATH"], file), status: status, layout: nil
     else
       yield
     end
   end
 
   def set_csrf_cookie
-    cookies['XSRF-TOKEN'] = form_authenticity_token if protect_against_forgery?
+    cookies["XSRF-TOKEN"] = form_authenticity_token if protect_against_forgery?
   end
 
   protected
 
   def verified_request?
-    super || valid_authenticity_token?(session, request.headers['X-XSRF-TOKEN'])
+    super || valid_authenticity_token?(session, request.headers["X-XSRF-TOKEN"])
   end
 
   private
@@ -154,16 +154,16 @@ class ApplicationController < ActionController::Base
   end
 
   def feeds_response
-    if 'view_all' == @user.get_view_mode
+    if "view_all" == @user.get_view_mode
       entry_id_cache = EntryIdCache.new(@user.id, @feed_ids)
       @entries = entry_id_cache.page(params[:page])
       @page_query = @entries
-    elsif 'view_starred' == @user.get_view_mode
+    elsif "view_starred" == @user.get_view_mode
       starred_entries = @user.starred_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).order("published DESC")
-      @entries = Entry.entries_with_feed(starred_entries, 'DESC').entries_list
+      @entries = Entry.entries_with_feed(starred_entries, "DESC").entries_list
       @page_query = starred_entries
     else
-      @all_unread = 'true'
+      @all_unread = "true"
       unread_entries = @user.unread_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).sort_preference(@user.entry_sort)
       @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort).entries_list
       @page_query = unread_entries
@@ -182,16 +182,15 @@ class ApplicationController < ActionController::Base
 
   def user_classes
     @classes = []
-    @classes.push("theme-#{@user.theme || 'day'}")
+    @classes.push("theme-#{@user.theme || "day"}")
     @classes.push(@user.get_view_mode)
     @classes.push(@user.entry_width)
-    @classes.push("entries-body-#{@user.entries_body || '1'}")
-    @classes.push("entries-time-#{@user.entries_time || '1'}")
-    @classes.push("entries-feed-#{@user.entries_feed || '1'}")
-    @classes.push("entries-image-#{@user.entries_image || '1'}")
-    @classes.push("entries-display-#{@user.entries_display || 'block'}")
-    @classes.push("setting-view-link-#{@user.view_links_in_app || '0'}")
+    @classes.push("entries-body-#{@user.entries_body || "1"}")
+    @classes.push("entries-time-#{@user.entries_time || "1"}")
+    @classes.push("entries-feed-#{@user.entries_feed || "1"}")
+    @classes.push("entries-image-#{@user.entries_image || "1"}")
+    @classes.push("entries-display-#{@user.entries_display || "block"}")
+    @classes.push("setting-view-link-#{@user.view_links_in_app || "0"}")
     @classes = @classes.join(" ")
   end
-
 end

@@ -1,36 +1,34 @@
 class EntryPresenter < BasePresenter
-
   YOUTUBE_URLS = [
     %r(https?://youtu\.be/(.+)),
     %r(https?://www\.youtube\.com/watch\?v=(.*?)(&|#|$)),
     %r(https?://m\.youtube\.com/watch\?v=(.*?)(&|#|$)),
     %r(https?://www\.youtube\.com/embed/(.*?)(\?|$)),
     %r(https?://www\.youtube\.com/v/(.*?)(#|\?|$)),
-    %r(https?://www\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b)
+    %r(https?://www\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b),
   ]
 
   INSTAGRAM_URLS = [
     %r(https?://www\.instagram\.com/p/(.*?)(/|#|\?|$)),
-    %r(https?://instagram\.com/p/(.*?)(/|#|\?|$))
+    %r(https?://instagram\.com/p/(.*?)(/|#|\?|$)),
   ]
 
   VIMEO_URLS = [
     %r(https?://vimeo\.com/video/(.*?)(#|\?|$)),
-    %r(https?://vimeo\.com/([0-9]+)(#|\?|$))
+    %r(https?://vimeo\.com/([0-9]+)(#|\?|$)),
   ]
-
 
   presents :entry
 
   def entry_link(&block)
     options = {
-      remote: true, class: 'wrap', data: {
-        behavior: 'selectable open_item show_entry_content entry_info',
+      remote: true, class: "wrap", data: {
+        behavior: "selectable open_item show_entry_content entry_info",
         mark_as_read_path: @template.mark_as_read_entry_path(entry),
         recently_read_path: @template.recently_read_entry_path(entry),
         entry_id: entry.id,
-        entry_info: {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}
-      }
+        entry_info: {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i},
+      },
     }
     @template.link_to @template.entry_path(entry), options do
       yield
@@ -44,7 +42,7 @@ class EntryPresenter < BasePresenter
       if entry.published
         entry.published.to_s(:full_human)
       else
-        ''
+        ""
       end
     end
   end
@@ -56,7 +54,7 @@ class EntryPresenter < BasePresenter
       if entry.published
         entry.published.to_s(:datetime)
       else
-        ''
+        ""
       end
     end
   end
@@ -74,21 +72,21 @@ class EntryPresenter < BasePresenter
     ContentFormatter.format!(formatted_content, entry)
   rescue => e
     Rails.logger.info { e.inspect }
-    @template.content_tag(:p, '&ndash;&ndash;'.html_safe)
+    @template.content_tag(:p, "&ndash;&ndash;".html_safe)
   end
 
   def api_content
     ContentFormatter.api_format(formatted_content, entry)
   rescue => e
     Rails.logger.info { e.inspect }
-    @template.content_tag(:p, '&ndash;&ndash;'.html_safe)
+    @template.content_tag(:p, "&ndash;&ndash;".html_safe)
   end
 
   def app_content
     ContentFormatter.app_format(formatted_content, entry)
   rescue => e
     Rails.logger.info { e.inspect }
-    @template.content_tag(:p, '&ndash;&ndash;'.html_safe)
+    @template.content_tag(:p, "&ndash;&ndash;".html_safe)
   end
 
   def formatted_content
@@ -98,7 +96,7 @@ class EntryPresenter < BasePresenter
         formatted_content = ContentFormatter.text_email(formatted_content)
       elsif youtube?
         formatted_content = ContentFormatter.text_email(formatted_content)
-        formatted_content = @template.content_tag(:iframe, '', width: entry.data["media_width"], height: entry.data["media_height"], src: "https://www.youtube-nocookie.com/embed/#{entry.data["youtube_video_id"]}?rel=0&amp;showinfo=0", frameborder: 0, allowfullscreen: true) + formatted_content
+        formatted_content = @template.content_tag(:iframe, "", width: entry.data["media_width"], height: entry.data["media_height"], src: "https://www.youtube-nocookie.com/embed/#{entry.data["youtube_video_id"]}?rel=0&amp;showinfo=0", frameborder: 0, allowfullscreen: true) + formatted_content
       end
       formatted_content
     end
@@ -133,9 +131,9 @@ class EntryPresenter < BasePresenter
     end
 
     if text.blank?
-      text = '--'.html_safe
+      text = "--".html_safe
     end
-    @template.truncate(text, length: length, omission: '…', escape: false)
+    @template.truncate(text, length: length, omission: "…", escape: false)
   end
 
   def retweet_text
@@ -161,18 +159,18 @@ class EntryPresenter < BasePresenter
       clean_author = @template.strip_tags(entry.author)
       clean_author = "by " + @template.content_tag(:span, clean_author, class: "author")
     else
-      clean_author = ''
+      clean_author = ""
     end
     clean_author.html_safe
   end
 
   def media_size
     begin
-      size = Integer(entry.data['enclosure_length'])
+      size = Integer(entry.data["enclosure_length"])
       size = @template.number_to_human_size(size)
       size = "(#{size})"
     rescue Exception
-      size = ''
+      size = ""
     end
   end
 
@@ -181,20 +179,20 @@ class EntryPresenter < BasePresenter
   end
 
   def media
-    output = ''
+    output = ""
     if has_enclosure? && media_type.present?
       if media_type == :video
-        output += @template.video_tag enclosure_url, preload: 'none'
+        output += @template.video_tag enclosure_url, preload: "none"
       elsif media_type == :audio
-        output += @template.audio_tag enclosure_url, preload: 'none'
+        output += @template.audio_tag enclosure_url, preload: "none"
       end
-      output += @template.link_to "Download #{media_size}", enclosure_url, class: 'download-link'
+      output += @template.link_to "Download #{media_size}", enclosure_url, class: "download-link"
     end
     output
   end
 
   def saved_page(url)
-    if entry.data && entry.data['saved_pages'] && page = entry.data['saved_pages'][url]
+    if entry.data && entry.data["saved_pages"] && page = entry.data["saved_pages"][url]
       if page["result"]
         MercuryParser.new(nil, page)
       end
@@ -219,9 +217,9 @@ class EntryPresenter < BasePresenter
   end
 
   def media_type
-    if entry.data && entry.data['enclosure_type'] == 'video/mp4'
+    if entry.data && entry.data["enclosure_type"] == "video/mp4"
       :video
-    elsif entry.data && ['audio/mp3', 'audio/mpeg'].include?(entry.data['enclosure_type'])
+    elsif entry.data && ["audio/mp3", "audio/mpeg"].include?(entry.data["enclosure_type"])
       :audio
     else
       nil
@@ -229,10 +227,10 @@ class EntryPresenter < BasePresenter
   end
 
   def media_duration
-    if entry.data['itunes_duration']
-      entry.data['itunes_duration']
+    if entry.data["itunes_duration"]
+      entry.data["itunes_duration"]
     else
-      ''
+      ""
     end
   end
 
@@ -242,8 +240,8 @@ class EntryPresenter < BasePresenter
 
   def extracted_articles
     articles = []
-    if entry.data && entry.data['saved_pages']
-      entry.data['saved_pages'].each do |url, page|
+    if entry.data && entry.data["saved_pages"]
+      entry.data["saved_pages"].each do |url, page|
         begin
           if page["result"]
             parsed = MercuryParser.new(nil, page)
@@ -253,7 +251,7 @@ class EntryPresenter < BasePresenter
               title: parsed.title,
               host: parsed.domain,
               author: parsed.author,
-              content: content
+              content: content,
             }
             articles.push data
           end
@@ -265,8 +263,8 @@ class EntryPresenter < BasePresenter
   end
 
   def media_subtitle
-    if entry.data && entry.data['itunes_subtitle']
-      subtitle = @template.strip_tags(entry.data['itunes_subtitle'])
+    if entry.data && entry.data["itunes_subtitle"]
+      subtitle = @template.strip_tags(entry.data["itunes_subtitle"])
       body = @template.strip_tags(entry.content)
       decoder = HTMLEntities.new
       body = decoder.decode(body)
@@ -281,7 +279,7 @@ class EntryPresenter < BasePresenter
   def feed_domain_matches?(comparison)
     begin
       uri = URI.parse(entry.feed.site_url)
-      uri.host == comparison || uri.host == comparison.sub('www.', '')
+      uri.host == comparison || uri.host == comparison.sub("www.", "")
     rescue Exception
       false
     end
@@ -299,7 +297,7 @@ class EntryPresenter < BasePresenter
   end
 
   def has_media?
-    !media_type.nil? || content.include?('<iframe')
+    !media_type.nil? || content.include?("<iframe")
   end
 
   def youtube?
@@ -310,7 +308,7 @@ class EntryPresenter < BasePresenter
     if entry.processed_image?
       padding = (entry.image["height"].to_f / entry.image["width"].to_f).round(4) * 100
       @template.content_tag :span, class: "entry-image" do
-        @template.content_tag :span, "", data: {src: entry.processed_image }, style: "padding-top: #{padding}%;"
+        @template.content_tag :span, "", data: {src: entry.processed_image}, style: "padding-top: #{padding}%;"
       end
     end
   end
@@ -328,7 +326,7 @@ class EntryPresenter < BasePresenter
   end
 
   def content_diff
-    before = ContentFormatter.api_format(entry.original['content'], entry)
+    before = ContentFormatter.api_format(entry.original["content"], entry)
     HTMLDiff::Diff.new(before, entry.content).inline_html
   rescue
     nil
@@ -341,20 +339,19 @@ class EntryPresenter < BasePresenter
   def content_text
     @content_text ||= begin
       text = Sanitize.fragment(entry.content,
-        remove_contents: true,
-        elements: %w{html body div span
-                     h1 h2 h3 h4 h5 h6 p blockquote pre
-                     a abbr acronym address big cite code
-                     del dfn em ins kbd q s samp
-                     small strike strong sub sup tt var
-                     b u i center
-                     dl dt dd ol ul li
-                     fieldset form label legend
-                     table caption tbody tfoot thead tr th td
-                     article aside canvas details embed
-                     figure figcaption footer header hgroup
-                     menu nav output ruby section summary}
-      )
+                               remove_contents: true,
+                               elements: %w{html body div span
+                                            h1 h2 h3 h4 h5 h6 p blockquote pre
+                                            a abbr acronym address big cite code
+                                            del dfn em ins kbd q s samp
+                                            small strike strong sub sup tt var
+                                            b u i center
+                                            dl dt dd ol ul li
+                                            fieldset form label legend
+                                            table caption tbody tfoot thead tr th td
+                                            article aside canvas details embed
+                                            figure figcaption footer header hgroup
+                                            menu nav output ruby section summary})
       text = ReverseMarkdown.convert(text)
       text = ActionController::Base.helpers.strip_tags(text)
       decoder.decode(text)
@@ -376,7 +373,7 @@ class EntryPresenter < BasePresenter
 
   def trimmed_summary(text)
     output = ""
-    parts = text.split('. ')
+    parts = text.split(". ")
     a = parts.each_with_index do |part, index|
       new_part = part + ". "
       output << new_part
@@ -404,7 +401,7 @@ class EntryPresenter < BasePresenter
   end
 
   def has_diff?
-    entry.content.present? && entry.original.present? && entry.original['content'].present? && entry.original['content'].length != entry.content.length
+    entry.content.present? && entry.original.present? && entry.original["content"].present? && entry.original["content"].length != entry.content.length
   end
 
   def is_updated_entry?
@@ -425,13 +422,13 @@ class EntryPresenter < BasePresenter
 
   def profile_image(feed)
     if entry.tweet?
-      @template.content_tag :span, '', class: "favicon-wrap twitter-profile-image" do
+      @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image" do
         url = tweet_profile_image_uri(entry.main_tweet)
         fallback = @template.image_url("favicon-profile-default.png")
         @template.image_tag_with_fallback(fallback, url, alt: "")
       end
     elsif entry.micropost?
-      @template.content_tag :span, '', class: "favicon-wrap twitter-profile-image" do
+      @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image" do
         fallback = @template.image_url("favicon-profile-default.png")
         url = @template.camo_link(entry.micropost.author_avatar)
         @template.image_tag_with_fallback(fallback, url, alt: "")
@@ -443,19 +440,19 @@ class EntryPresenter < BasePresenter
 
   def feed_title
     if entry.tweet?
-      @template.content_tag(:span, '', class: "title-inner") do
+      @template.content_tag(:span, "", class: "title-inner") do
         "#{tweet_name(entry.main_tweet)} #{@template.content_tag(:span, tweet_screen_name(entry.main_tweet))}".html_safe
       end
     elsif entry.micropost?
-      @template.content_tag(:span, '', class: "title-inner") do
+      @template.content_tag(:span, "", class: "title-inner") do
         "#{entry.micropost.author_name} #{@template.content_tag(:span, entry.micropost.author_display_username)}".html_safe
       end
     elsif entry.title.blank? && entry.author.present?
-      @template.content_tag(:span, '', class: "title-inner") do
+      @template.content_tag(:span, "", class: "title-inner") do
         entry.author
       end
     else
-      @template.content_tag(:span, '', class: "title-inner", data: {behavior: "user_title", feed_id: entry.feed.id}) do
+      @template.content_tag(:span, "", class: "title-inner", data: {behavior: "user_title", feed_id: entry.feed.id}) do
         entry.feed.title
       end
     end
@@ -494,7 +491,7 @@ class EntryPresenter < BasePresenter
         @template.link_to "@#{mention.screen_name}", "https://twitter.com/#{mention.screen_name}", target: "_blank"
       end
       if !mentions.empty?
-        @template.content_tag(:p, '', class: "tweet-mentions") do
+        @template.content_tag(:p, "", class: "tweet-mentions") do
           "Replying to #{mentions.join(", ")}".html_safe
         end
       end
@@ -611,7 +608,7 @@ class EntryPresenter < BasePresenter
     options = {
       poster: media.media_url_https.to_s + ":large",
       width: media.video_info.aspect_ratio.first,
-      height: media.video_info.aspect_ratio.last
+      height: media.video_info.aspect_ratio.last,
     }
 
     if media.type == "animated_gif"
@@ -650,5 +647,4 @@ class EntryPresenter < BasePresenter
   def quoted_status
     entry.main_tweet.quoted_status
   end
-
 end

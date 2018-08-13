@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class UpdateDefaultColumnTest < ActiveSupport::TestCase
-
   setup do
     UpdateDefaultColumn.jobs.clear
     @user = users(:new)
@@ -11,7 +10,7 @@ class UpdateDefaultColumnTest < ActiveSupport::TestCase
       "klass" => "Entry",
       "column" => "title",
       "default" => SecureRandom.hex,
-      "schedule" => true
+      "schedule" => true,
     }
   end
 
@@ -27,5 +26,4 @@ class UpdateDefaultColumnTest < ActiveSupport::TestCase
 
     assert_equal([@args["default"]], Entry.all.pluck(:title).uniq)
   end
-
 end

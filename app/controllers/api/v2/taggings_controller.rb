@@ -1,7 +1,6 @@
 module Api
   module V2
     class TaggingsController < ApiController
-
       respond_to :json
       before_action :validate_create, only: [:create]
       before_action :validate_content_type, only: [:create]
@@ -53,9 +52,8 @@ module Api
       private
 
       def validate_create
-        needs 'feed_id', 'name'
+        needs "feed_id", "name"
       end
-
     end
   end
 end

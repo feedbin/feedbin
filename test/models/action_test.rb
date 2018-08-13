@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ActionTest < ActiveSupport::TestCase
   def setup
@@ -32,7 +32,7 @@ class ActionTest < ActiveSupport::TestCase
 
   test "recognizes tags" do
     feed = feeds(:daring_fireball)
-    tagging = feed.tag('Favs', @user, false).first
+    tagging = feed.tag("Favs", @user, false).first
     action = @user.actions.create(tag_ids: [tagging.tag.id])
     assert action.computed_feed_ids.include?(feed.id)
   end
@@ -64,7 +64,6 @@ class ActionTest < ActiveSupport::TestCase
   private
 
   def percolator_found?(action)
-    action._percolator && action._percolator['found'] == true
+    action._percolator && action._percolator["found"] == true
   end
-
 end

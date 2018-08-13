@@ -1,12 +1,11 @@
-require 'test_helper'
+require "test_helper"
 
 class SharingServicesControllerTest < ActionController::TestCase
-
   setup do
     @user = users(:ben)
     @services = {
       custom: @user.sharing_services.create(label: "Twitter", url: "${source}${url}${title}"),
-      supported: @user.supported_sharing_services.create(service_id: "email")
+      supported: @user.supported_sharing_services.create(service_id: "email"),
     }
   end
 
@@ -20,7 +19,7 @@ class SharingServicesControllerTest < ActionController::TestCase
   test "should create sharing service" do
     login_as @user
     assert_difference "SharingService.count", 1 do
-      post :create, params: {sharing_service: {label: 'Label', url: 'URL'}}
+      post :create, params: {sharing_service: {label: "Label", url: "URL"}}
       assert_redirected_to sharing_services_url
     end
   end
@@ -37,12 +36,11 @@ class SharingServicesControllerTest < ActionController::TestCase
   test "should update sharing service" do
     login_as @user
     sharing_service = @services[:custom]
-    attributes = {label: "#{sharing_service.label} new",  url: "#{sharing_service.url} new"}
+    attributes = {label: "#{sharing_service.label} new", url: "#{sharing_service.url} new"}
     patch :update, params: {id: sharing_service, sharing_service: attributes}
     assert_redirected_to sharing_services_url
     attributes.each do |attribute, value|
       assert_equal(value, sharing_service.reload.send(attribute))
     end
   end
-
 end

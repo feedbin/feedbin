@@ -1,5 +1,4 @@
 class DiffbotParser
-
   BASE_URL = "https://api.diffbot.com/v3/article"
 
   attr_reader :url, :body
@@ -14,30 +13,30 @@ class DiffbotParser
   end
 
   def title
-    result['title']
+    result["title"]
   end
 
   def content
-    result['html']
+    result["html"]
   end
 
   def author
-    result['author']
+    result["author"]
   end
 
   def published
-    if result['estimatedDate']
-      Time.parse(result['estimatedDate'])
+    if result["estimatedDate"]
+      Time.parse(result["estimatedDate"])
     end
   end
 
   def date_published
-    result['estimatedDate'] if result['estimatedDate']
+    result["estimatedDate"] if result["estimatedDate"]
   end
 
   def domain
     @domain ||= begin
-      parsed_url = result['resolvedPageUrl'] || result['pageUrl']
+      parsed_url = result["resolvedPageUrl"] || result["pageUrl"]
       URI.parse(parsed_url).host
     end
   end
@@ -47,7 +46,7 @@ class DiffbotParser
   def result
     @result ||= begin
       response = request(norender: "norender")
-      if response['text'] && !response['html']
+      if response["text"] && !response["html"]
         response = request
       end
       response
@@ -58,7 +57,7 @@ class DiffbotParser
     query = {
       url: url,
       discussion: false,
-      token: ENV['DIFFBOT_TOKEN']
+      token: ENV["DIFFBOT_TOKEN"],
     }.merge(options)
     uri = URI.parse(BASE_URL)
     uri.query = query.to_query
@@ -68,14 +67,14 @@ class DiffbotParser
     else
       response = response.get(uri)
     end
-    response.parse['objects'].first
+    response.parse["objects"].first
   end
 
   def marshal_dump
     {
       result: result,
       url: url,
-      body: body
+      body: body,
     }
   end
 
@@ -84,5 +83,4 @@ class DiffbotParser
     @url = data[:url]
     @body = data[:body]
   end
-
 end

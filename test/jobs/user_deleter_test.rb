@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class UserDeleterTest < ActiveSupport::TestCase
-
   test "should delete user" do
     StripeMock.start
     user = users(:ben)
@@ -15,7 +14,7 @@ class UserDeleterTest < ActiveSupport::TestCase
   test "should send cancelation email" do
     StripeMock.start
     user = users(:ben)
-    assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+    assert_difference "ActionMailer::Base.deliveries.size", +1 do
       UserDeleter.new().perform(user.id)
     end
     StripeMock.stop
@@ -47,15 +46,13 @@ class UserDeleterTest < ActiveSupport::TestCase
     StripeMock.stop
   end
 
-
   def setup_data
     @user = stripe_user
     customer = Stripe::Customer.retrieve(@user.customer_id)
-    @charge = Stripe::Charge.create(amount: 1, currency: 'usd', customer: customer.id)
-    event = StripeMock.mock_webhook_event('charge.succeeded', {customer: @user.customer_id})
+    @charge = Stripe::Charge.create(amount: 1, currency: "usd", customer: customer.id)
+    event = StripeMock.mock_webhook_event("charge.succeeded", {customer: @user.customer_id})
     event.data["object"] = @charge.to_h
 
     @billing_event = BillingEvent.create!(info: event.as_json)
   end
-
 end

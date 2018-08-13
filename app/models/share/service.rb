@@ -2,7 +2,7 @@ class Share::Service
   def authenticated_share(klass, params)
     response = {}
     entry = Entry.find(params[:entry_id])
-    params['entry_url'] = entry.fully_qualified_url
+    params["entry_url"] = entry.fully_qualified_url
     if klass.active?
       # child classes using this need to implement add
       status = add(params)
@@ -50,5 +50,4 @@ class Share::Service
      label: @klass.label,
      html_options: @klass.html_options}
   end
-
 end

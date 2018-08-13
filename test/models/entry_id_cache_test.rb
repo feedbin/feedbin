@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class EntryIdCacheTest < ActiveSupport::TestCase
-
   setup do
     flush_redis
     @user = users(:new)

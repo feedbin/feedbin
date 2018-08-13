@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class FeedRefresherTest < ActiveSupport::TestCase
   setup do
@@ -16,14 +16,13 @@ class FeedRefresherTest < ActiveSupport::TestCase
         end
         job.perform(1, false)
       end
-      Sidekiq::Queues['feed_refresher_fetcher'].each do |job|
+      Sidekiq::Queues["feed_refresher_fetcher"].each do |job|
         assert_equal(Feed.find(job["args"][0]).feed_url, job["args"][1])
       end
     end
   end
 
   test "should skip cache headers with force refresh" do
-
     feed = Feed.first
     feed.update etag: SecureRandom.uuid, last_modified: Time.now
 

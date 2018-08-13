@@ -44,5 +44,4 @@ class OnboardingMessage
   def send_message
     MarketingMailer.send(@message, @user).deliver
   end
-
 end

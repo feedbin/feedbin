@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class MailtoParserTest < ActiveSupport::TestCase
-
   setup do
     @params = {
       "body" => "this is the body",
@@ -39,5 +38,4 @@ class MailtoParserTest < ActiveSupport::TestCase
     parser = MailtoParser.new(link)
     assert_nil parser.subject
   end
-
 end

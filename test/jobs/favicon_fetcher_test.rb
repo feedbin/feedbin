@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class FaviconFetcherTest < ActiveSupport::TestCase
   setup do
@@ -94,5 +94,4 @@ class FaviconFetcherTest < ActiveSupport::TestCase
 
     assert_nil Favicon.unscoped.where(host: @page_url.host).take
   end
-
 end

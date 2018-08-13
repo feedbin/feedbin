@@ -18,5 +18,4 @@ class DropActsAsTaggableOnMigration < ActiveRecord::Migration[4.2]
     add_index :taggings, :tag_id
     add_index :taggings, [:taggable_id, :taggable_type, :context]
   end
-
 end

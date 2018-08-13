@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::AuthenticationControllerTest < ApiControllerTestCase
-
   setup do
     @user = users(:ben)
   end
@@ -16,5 +15,4 @@ class Api::V2::AuthenticationControllerTest < ApiControllerTestCase
     get :index
     assert_response :unauthorized
   end
-
 end

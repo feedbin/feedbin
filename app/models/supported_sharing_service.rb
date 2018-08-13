@@ -1,116 +1,115 @@
 class SupportedSharingService < ApplicationRecord
-
   SERVICES = [
     {
-      service_id: 'pocket',
-      label: 'Pocket',
+      service_id: "pocket",
+      label: "Pocket",
       requires_auth: true,
-      service_type: 'oauth',
-      klass: 'Share::Pocket'
+      service_type: "oauth",
+      klass: "Share::Pocket",
     },
     {
-      service_id: 'readability',
-      label: 'Readability',
+      service_id: "readability",
+      label: "Readability",
       requires_auth: true,
-      service_type: 'xauth',
-      klass: 'Share::Readability',
-      active: false
+      service_type: "xauth",
+      klass: "Share::Readability",
+      active: false,
     },
     {
-      service_id: 'instapaper',
-      label: 'Instapaper',
+      service_id: "instapaper",
+      label: "Instapaper",
       requires_auth: true,
-      service_type: 'xauth',
-      klass: 'Share::Instapaper'
+      service_type: "xauth",
+      klass: "Share::Instapaper",
     },
     {
-      service_id: 'email',
-      label: 'Email',
+      service_id: "email",
+      label: "Email",
       requires_auth: false,
-      service_type: 'email',
-      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'email_share_panel'}},
-      klass: 'Share::Email',
+      service_type: "email",
+      html_options: {data: {behavior: "show_entry_basement", basement_panel: "email_share_panel"}},
+      klass: "Share::Email",
       has_share_sheet: true,
-      limit: 20
+      limit: 20,
     },
     {
-      service_id: 'kindle',
-      label: 'Kindle',
+      service_id: "kindle",
+      label: "Kindle",
       requires_auth: false,
-      service_type: 'kindle',
-      klass: 'Share::Kindle'
+      service_type: "kindle",
+      klass: "Share::Kindle",
     },
     {
-      service_id: 'pinboard',
-      label: 'Pinboard',
+      service_id: "pinboard",
+      label: "Pinboard",
       requires_auth: true,
-      service_type: 'pinboard',
-      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'pinboard_share_panel'}},
-      klass: 'Share::Pinboard',
-      has_share_sheet: true
+      service_type: "pinboard",
+      html_options: {data: {behavior: "show_entry_basement", basement_panel: "pinboard_share_panel"}},
+      klass: "Share::Pinboard",
+      has_share_sheet: true,
     },
     {
-      service_id: 'tumblr',
-      label: 'Tumblr',
+      service_id: "tumblr",
+      label: "Tumblr",
       requires_auth: true,
-      service_type: 'oauth',
-      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'tumblr_share_panel'}},
-      klass: 'Share::Tumblr',
-      has_share_sheet: true
+      service_type: "oauth",
+      html_options: {data: {behavior: "show_entry_basement", basement_panel: "tumblr_share_panel"}},
+      klass: "Share::Tumblr",
+      has_share_sheet: true,
     },
     {
-      service_id: 'evernote',
-      label: 'Evernote',
+      service_id: "evernote",
+      label: "Evernote",
       requires_auth: true,
-      service_type: 'oauth',
-      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'evernote_share_panel'}},
-      klass: 'Share::EvernoteShare',
-      has_share_sheet: true
+      service_type: "oauth",
+      html_options: {data: {behavior: "show_entry_basement", basement_panel: "evernote_share_panel"}},
+      klass: "Share::EvernoteShare",
+      has_share_sheet: true,
     },
     {
-      service_id: 'twitter',
-      label: 'Twitter',
+      service_id: "twitter",
+      label: "Twitter",
       requires_auth: false,
-      service_type: 'popover',
-      klass: 'Share::Twitter'
+      service_type: "popover",
+      klass: "Share::Twitter",
     },
     {
-      service_id: 'facebook',
-      label: 'Facebook',
+      service_id: "facebook",
+      label: "Facebook",
       requires_auth: false,
-      service_type: 'popover',
-      klass: 'Share::Facebook'
+      service_type: "popover",
+      klass: "Share::Facebook",
     },
     {
-      service_id: 'app_dot_net',
-      label: 'App.net',
+      service_id: "app_dot_net",
+      label: "App.net",
       requires_auth: false,
-      service_type: 'popover',
-      klass: 'Share::AppDotNet',
-      active: false
+      service_type: "popover",
+      klass: "Share::AppDotNet",
+      active: false,
     },
     {
-      service_id: 'buffer',
-      label: 'Buffer',
+      service_id: "buffer",
+      label: "Buffer",
       requires_auth: false,
-      service_type: 'popover',
-      klass: 'Share::Buffer'
+      service_type: "popover",
+      klass: "Share::Buffer",
     },
     {
-      service_id: 'micro_blog',
-      label: 'Micro.blog',
+      service_id: "micro_blog",
+      label: "Micro.blog",
       requires_auth: true,
-      service_type: 'micro_blog',
-      html_options: {data: {behavior: 'show_entry_basement', basement_panel: 'micro_blog_share_panel'}},
-      klass: 'Share::MicroBlog',
-      has_share_sheet: true
-    }
+      service_type: "micro_blog",
+      html_options: {data: {behavior: "show_entry_basement", basement_panel: "micro_blog_share_panel"}},
+      klass: "Share::MicroBlog",
+      has_share_sheet: true,
+    },
   ].freeze
 
   store_accessor :settings, :access_token, :access_secret, :email_name, :email_address,
                  :kindle_address, :default_option, :api_token
 
-  validates :service_id, presence: true, uniqueness: {scope: :user_id}, inclusion: { in: SERVICES.collect {|s| s[:service_id]} }
+  validates :service_id, presence: true, uniqueness: {scope: :user_id}, inclusion: {in: SERVICES.collect { |s| s[:service_id] }}
   belongs_to :user
 
   def share(params)
@@ -164,19 +163,19 @@ class SupportedSharingService < ApplicationRecord
   end
 
   def self.info(service_id)
-    SERVICES.find {|service| service[:service_id] == service_id}
+    SERVICES.find { |service| service[:service_id] == service_id }
   end
 
   def self.info!(service_id)
     data = info(service_id)
     if data.blank?
-      raise ActionController::RoutingError.new('Not Found')
+      raise ActionController::RoutingError.new("Not Found")
     end
     data
   end
 
   def info
-    SERVICES.find {|service| service[:service_id] == service_id}
+    SERVICES.find { |service| service[:service_id] == service_id }
   end
 
   def html_options
@@ -221,14 +220,14 @@ class SupportedSharingService < ApplicationRecord
 
   def completions
     options = service_options || {}
-    options['completions'] || []
+    options["completions"] || []
   end
 
   def update_completions(new_completions)
     old_completions = completions
     final_completions = old_completions.concat(new_completions).uniq
     options = service_options || {}
-    options['completions'] = final_completions
+    options["completions"] = final_completions
     update_attributes(service_options: nil)
     update_attributes(service_options: options)
   end
@@ -237,10 +236,8 @@ class SupportedSharingService < ApplicationRecord
     Honeybadger.notify(
       error_class: "SupportedSharingService",
       error_message: "SupportedSharingService rate limit exceeded",
-      parameters: {user_id: user_id}
+      parameters: {user_id: user_id},
     )
     {error: "Share limit exceeded"}
   end
-
-
 end

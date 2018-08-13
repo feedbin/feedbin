@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::EntriesControllerTest < ApiControllerTestCase
-
   setup do
     @user = users(:new)
     @feeds = create_feeds(@user)
@@ -11,7 +10,7 @@ class Api::V2::EntriesControllerTest < ApiControllerTestCase
   test "should get specific ids" do
     login_as @user
     entries = @entries.sample(2)
-    ids = entries.map(&:id).join(',')
+    ids = entries.map(&:id).join(",")
     get :index, params: {ids: ids}, format: :json
 
     assert_response :success
@@ -40,7 +39,7 @@ class Api::V2::EntriesControllerTest < ApiControllerTestCase
     login_as @user
     entry = @entries.first
 
-    get :show, params: {id: entry, include_content_diff: 'true', include_enclosure: 'true', include_original: 'true'}, format: :json
+    get :show, params: {id: entry, include_content_diff: "true", include_enclosure: "true", include_original: "true"}, format: :json
     assert_response :success
 
     result = parse_json
@@ -61,7 +60,7 @@ class Api::V2::EntriesControllerTest < ApiControllerTestCase
       StarredEntry.create_from_owners(@user, entry)
     end
 
-    get :index, params: {starred: 'true'}, format: :json
+    get :index, params: {starred: "true"}, format: :json
     assert_response :success
     assert_equal_ids(entries, parse_json)
   end
@@ -86,5 +85,4 @@ class Api::V2::EntriesControllerTest < ApiControllerTestCase
     end
     keys
   end
-
 end

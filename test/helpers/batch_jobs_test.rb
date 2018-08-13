@@ -1,4 +1,5 @@
-require 'test_helper'
+require "test_helper"
+
 class BatchJobsTests < ActiveSupport::TestCase
   include BatchJobs
 
@@ -10,7 +11,7 @@ class BatchJobsTests < ActiveSupport::TestCase
 
     queue.clear
 
-    assert_difference -> { queue.count }, +klass.id  do
+    assert_difference -> { queue.count }, +klass.id do
       enqueue_all(klass, sidekiq_class)
     end
 
@@ -37,5 +38,4 @@ class BatchJobsTests < ActiveSupport::TestCase
       1_000
     end
   end
-
 end

@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class ContentFormatterTest < ActiveSupport::TestCase
-
   setup do
     feed = feeds(:kottke)
     content = %(<p><a href="/link"><img src="/img.png"></a></p>)

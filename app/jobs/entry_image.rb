@@ -17,10 +17,10 @@ class EntryImage
     if !@entry.processed_image?
       options = build_options
       Sidekiq::Client.push(
-        'args'  => EntryImage.build_find_image_args(@entry, options),
-        'class' => 'FindImage',
-        'queue' => 'images',
-        'retry' => false
+        "args" => EntryImage.build_find_image_args(@entry, options),
+        "class" => "FindImage",
+        "queue" => "images",
+        "retry" => false,
       )
     end
   end
@@ -32,7 +32,7 @@ class EntryImage
       if tweet.media?
         options["urls"] = [tweet.media.first.media_url_https.to_s]
       elsif tweet.urls?
-        options["urls"] = tweet.urls.map {|url| url.expanded_url.to_s}
+        options["urls"] = tweet.urls.map { |url| url.expanded_url.to_s }
       end
     end
     options
@@ -45,5 +45,4 @@ class EntryImage
   def self.build_find_image_args(entry, options = {})
     [entry.id, entry.feed_id, entry.url, entry.fully_qualified_url, entry.feed.site_url, entry.content, entry.public_id, options]
   end
-
 end

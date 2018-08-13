@@ -1,16 +1,15 @@
-require 'test_helper'
+require "test_helper"
 
 class MicropostTest < ActiveSupport::TestCase
-
   setup do
     @data = {
-      "id"=>"1234",
+      "id" => "1234",
       "author" => {
-        "name"=>"Name",
-        "url"=>"https://example.com",
-        "avatar"=>"https://micro.blog/name/avatar.jpg",
-        "_microblog" => {"username"=>"username"}
-      }
+        "name" => "Name",
+        "url" => "https://example.com",
+        "avatar" => "https://micro.blog/name/avatar.jpg",
+        "_microblog" => {"username" => "username"},
+      },
     }
   end
 
@@ -39,5 +38,4 @@ class MicropostTest < ActiveSupport::TestCase
     assert_equal("@username", micropost.author_display_username)
     assert_equal("https://micro.blog/username/1234", micropost.url)
   end
-
 end

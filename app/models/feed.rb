@@ -19,8 +19,7 @@ class Feed < ApplicationRecord
 
   after_initialize :default_values
 
-  enum feed_type: { xml: 0, newsletter: 1, twitter: 2, twitter_home: 3}
-
+  enum feed_type: {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3}
 
   def twitter_user?
     twitter_user.present?
@@ -82,15 +81,15 @@ class Feed < ApplicationRecord
   end
 
   def self.include_user_title
-    feeds = select('feeds.*, subscriptions.title AS user_title')
+    feeds = select("feeds.*, subscriptions.title AS user_title")
     feeds.map do |feed|
       if feed.user_title
         feed.override_title(feed.user_title)
       end
-      feed.title ||= '(No title)'
+      feed.title ||= "(No title)"
       feed
     end
-    feeds.sort_by {|feed| feed.title.try(:downcase)}
+    feeds.sort_by { |feed| feed.title.try(:downcase) }
   end
 
   def string_id
@@ -101,13 +100,13 @@ class Feed < ApplicationRecord
     begin
       self.host = URI::parse(self.site_url).host
     rescue Exception
-      Rails.logger.info { "Failed to set host for feed: %s" %  self.site_url}
+      Rails.logger.info { "Failed to set host for feed: %s" % self.site_url }
     end
   end
 
   def override_title(title)
     @original_title = self.title
-    self.title=(title)
+    self.title = (title)
   end
 
   def original_title
@@ -121,16 +120,16 @@ class Feed < ApplicationRecord
       end
     else
       Sidekiq::Client.push_bulk(
-        'args'  => [[self.id, self.feed_url]],
-        'class' => 'FeedRefresherFetcherCritical',
-        'queue' => 'feed_refresher_fetcher_critical',
-        'retry' => false
+        "args" => [[self.id, self.feed_url]],
+        "class" => "FeedRefresherFetcherCritical",
+        "queue" => "feed_refresher_fetcher_critical",
+        "retry" => false,
       )
     end
   end
 
   def list_unsubscribe
-    self.options.dig('email_headers', 'List-Unsubscribe')
+    self.options.dig("email_headers", "List-Unsubscribe")
   end
 
   def self.search(url)
@@ -148,5 +147,4 @@ class Feed < ApplicationRecord
       self.options ||= {}
     end
   end
-
 end

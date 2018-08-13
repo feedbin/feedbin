@@ -20,5 +20,4 @@ class FeedImporter
     end
   rescue ActiveRecord::RecordNotFound
   end
-
 end

@@ -1,5 +1,4 @@
 class CreateRecentlyPlayedEntries < ActiveRecord::Migration[5.0]
-
   def change
     create_table :recently_played_entries do |t|
       t.references :user, foreign_key: false, null: false, index: true

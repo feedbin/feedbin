@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::UnreadEntriesControllerTest < ApiControllerTestCase
-
   setup do
     @user = users(:new)
     @feeds = create_feeds(@user)
@@ -36,5 +35,4 @@ class Api::V2::UnreadEntriesControllerTest < ApiControllerTestCase
       assert_response :success
     end
   end
-
 end

@@ -1,5 +1,4 @@
 class User < ApplicationRecord
-
   attr_accessor :stripe_token, :old_password_valid, :update_auth_token,
                 :password_reset, :coupon_code, :is_trialing, :coupon_valid, :deleted
 
@@ -67,8 +66,7 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :sharing_services,
                                 allow_destroy: true,
-                                reject_if: -> attributes { attributes['label'].blank? || attributes['url'].blank? }
-
+                                reject_if: -> attributes { attributes["label"].blank? || attributes["url"].blank? }
 
   after_initialize :set_defaults, if: :new_record?
 
@@ -81,11 +79,11 @@ class User < ApplicationRecord
   before_create { generate_token(:inbound_email_token, 4) }
   before_create { generate_token(:newsletter_token, 4) }
 
-  before_update :update_billing, unless: -> { !ENV['STRIPE_API_KEY'] }
+  before_update :update_billing, unless: -> { !ENV["STRIPE_API_KEY"] }
 
   after_create { schedule_trial_jobs }
 
-  before_destroy :cancel_billing, unless: -> { !ENV['STRIPE_API_KEY'] }
+  before_destroy :cancel_billing, unless: -> { !ENV["STRIPE_API_KEY"] }
   before_destroy :create_deleted_user
   before_destroy :record_stats
 
@@ -118,11 +116,11 @@ class User < ApplicationRecord
       self.coupon_code = params[:coupon_code]
     end
 
-    if self.coupon_valid || !ENV['STRIPE_API_KEY']
+    if self.coupon_valid || !ENV["STRIPE_API_KEY"]
       self.free_ok = true
-      self.plan = Plan.find_by_stripe_id('free')
+      self.plan = Plan.find_by_stripe_id("free")
     else
-      self.plan = Plan.find_by_stripe_id('trial')
+      self.plan = Plan.find_by_stripe_id("trial")
     end
 
     if params[:user] && params[:user][:password]
@@ -144,7 +142,7 @@ class User < ApplicationRecord
   end
 
   def setting_on?(setting_symbol)
-    self.send(setting_symbol) == '1'
+    self.send(setting_symbol) == "1"
   end
 
   def subscribed_to_emails?
@@ -158,7 +156,7 @@ class User < ApplicationRecord
   end
 
   def paid_conversion?
-    plan_id_changed? && plan_id_was == Plan.find_by_stripe_id('trial').id
+    plan_id_changed? && plan_id_was == Plan.find_by_stripe_id("trial").id
   end
 
   def strip_email
@@ -183,7 +181,7 @@ class User < ApplicationRecord
   end
 
   def free_ok
-    @free_ok || plan_id_was == Plan.find_by_stripe_id('free').id
+    @free_ok || plan_id_was == Plan.find_by_stripe_id("free").id
   end
 
   def free_ok=(value)
@@ -194,35 +192,35 @@ class User < ApplicationRecord
     if free_ok
       valid_plans = Plan.all.pluck(:id)
     else
-      valid_plans = Plan.where(price_tier: price_tier).where.not(stripe_id: 'free').pluck(:id)
+      valid_plans = Plan.where(price_tier: price_tier).where.not(stripe_id: "free").pluck(:id)
     end
 
     valid_plans.append(plan_id_was)
 
     unless valid_plans.include?(plan.id)
-      errors.add(:plan_id, 'is invalid')
+      errors.add(:plan_id, "is invalid")
     end
   end
 
   def available_plans
     plan_stripe_id = plan.stripe_id
-    if plan_stripe_id == 'trial'
-      Plan.where(price_tier: price_tier, stripe_id: ['basic-monthly', 'basic-yearly', 'basic-monthly-2', 'basic-yearly-2', 'basic-monthly-3', 'basic-yearly-3']).order('price DESC')
-    elsif plan_stripe_id == 'free'
+    if plan_stripe_id == "trial"
+      Plan.where(price_tier: price_tier, stripe_id: ["basic-monthly", "basic-yearly", "basic-monthly-2", "basic-yearly-2", "basic-monthly-3", "basic-yearly-3"]).order("price DESC")
+    elsif plan_stripe_id == "free"
       Plan.where(price_tier: price_tier)
     else
-      exclude = ['free', 'trial']
-      if plan_stripe_id != 'timed'
-        exclude.push('timed')
+      exclude = ["free", "trial"]
+      if plan_stripe_id != "timed"
+        exclude.push("timed")
       end
       Plan.where(price_tier: price_tier).where.not(stripe_id: exclude)
     end
   end
 
   def trial_plan_valid
-    trial_plan = Plan.find_by_stripe_id('trial')
+    trial_plan = Plan.find_by_stripe_id("trial")
     if plan_id == trial_plan.id && plan_id_was != trial_plan.id && !plan_id_was.nil?
-      errors.add(:plan_id, 'is invalid')
+      errors.add(:plan_id, "is invalid")
     end
   end
 
@@ -333,7 +331,7 @@ class User < ApplicationRecord
   end
 
   def feed_order
-    feeds.include_user_title.map {|feed| feed.id}
+    feeds.include_user_title.map { |feed| feed.id }
   end
 
   def subscribe!(feed)
@@ -380,7 +378,7 @@ class User < ApplicationRecord
     query = ActiveRecord::Base.send(:sanitize_sql_array, [query, self.id, subscriptions.pluck(:feed_id)])
     results = ActiveRecord::Base.connection.execute(query)
     results.each_with_object({}) do |result, hash|
-      hash[result['tag_id'].to_i] = JSON.parse(result['feed_ids'])
+      hash[result["tag_id"].to_i] = JSON.parse(result["feed_ids"])
     end
   end
 
@@ -396,7 +394,7 @@ class User < ApplicationRecord
     query = ActiveRecord::Base.send(:sanitize_sql_array, [query, self.id, subscriptions.pluck(:feed_id)])
     results = ActiveRecord::Base.connection.execute(query)
     results.each_with_object({}) do |result, hash|
-      hash[result['feed_id'].to_i] = JSON.parse(result['tag_ids'])
+      hash[result["feed_id"].to_i] = JSON.parse(result["tag_ids"])
     end
   end
 
@@ -405,10 +403,10 @@ class User < ApplicationRecord
   end
 
   def record_stats
-    if self.plan.stripe_id == 'trial'
-      Librato.increment('user.trial.cancel')
+    if self.plan.stripe_id == "trial"
+      Librato.increment("user.trial.cancel")
     else
-      Librato.increment('user.paid.cancel')
+      Librato.increment("user.paid.cancel")
     end
   end
 
@@ -484,11 +482,10 @@ class User < ApplicationRecord
   end
 
   def trialing?
-    self.plan == Plan.find_by_stripe_id('trial')
+    self.plan == Plan.find_by_stripe_id("trial")
   end
 
   def display_prefs
-    "font-size-#{self.font_size || 5} font-#{ self.font || 'default' }"
+    "font-size-#{self.font_size || 5} font-#{self.font || "default"}"
   end
-
 end

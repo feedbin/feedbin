@@ -1,5 +1,4 @@
 class Source::BodyLinks < Source
-
   def call
     if @config[:request].format == :html
       find_links
@@ -59,5 +58,4 @@ class Source::BodyLinks < Source
   def document
     @document ||= Nokogiri::HTML(@config[:request].body)
   end
-
 end

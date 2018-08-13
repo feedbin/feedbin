@@ -1,10 +1,9 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::TagsControllerTest < ApiControllerTestCase
-
   setup do
     @user = users(:ben)
-    @tagging = @user.feeds.first.tag('new tag', @user, false).first
+    @tagging = @user.feeds.first.tag("new tag", @user, false).first
   end
 
   test "should get index" do
@@ -20,5 +19,4 @@ class Api::V2::TagsControllerTest < ApiControllerTestCase
   def keys
     %w[id name]
   end
-
 end

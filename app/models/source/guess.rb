@@ -12,5 +12,4 @@ class Source::Guess < Source
       create_feeds!
     end
   end
-
 end

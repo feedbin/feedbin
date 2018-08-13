@@ -1,9 +1,8 @@
-require 'test_helper'
+require "test_helper"
 
 include CarrierWaveDirect::Test::Helpers
 
 class SettingsControllerTest < ActionController::TestCase
-
   setup do
     @user = users(:ben)
   end
@@ -22,7 +21,7 @@ class SettingsControllerTest < ActionController::TestCase
 
   test "should get account @last_payment" do
     StripeMock.start
-    event = StripeMock.mock_webhook_event('charge.succeeded', {customer: @user.customer_id})
+    event = StripeMock.mock_webhook_event("charge.succeeded", {customer: @user.customer_id})
     BillingEvent.create(info: event.as_json)
     login_as @user
     get :account
@@ -33,7 +32,7 @@ class SettingsControllerTest < ActionController::TestCase
 
   test "should not get account @last_payment because it is too old" do
     StripeMock.start
-    event = StripeMock.mock_webhook_event('charge.succeeded', {customer: @user.customer_id})
+    event = StripeMock.mock_webhook_event("charge.succeeded", {customer: @user.customer_id})
     BillingEvent.create(info: event.as_json).update(created_at: 8.days.ago)
     login_as @user
     get :account
@@ -51,8 +50,8 @@ class SettingsControllerTest < ActionController::TestCase
   test "should get billing" do
     StripeMock.start
     events = [
-      StripeMock.mock_webhook_event('charge.succeeded', {customer: @user.customer_id}),
-      StripeMock.mock_webhook_event('invoice.payment_succeeded', {customer: @user.customer_id})
+      StripeMock.mock_webhook_event("charge.succeeded", {customer: @user.customer_id}),
+      StripeMock.mock_webhook_event("invoice.payment_succeeded", {customer: @user.customer_id}),
     ]
     events.each do |event|
       BillingEvent.create(info: event.as_json)
@@ -76,7 +75,7 @@ class SettingsControllerTest < ActionController::TestCase
   test "should import" do
     login_as @user
     skip "Figure out how to test CarrierWave direct"
-    get :import_export, params: {key: sample_key(ImportUploader.new, base: 'test.opml')}
+    get :import_export, params: {key: sample_key(ImportUploader.new, base: "test.opml")}
     assert_redirected_to settings_import_export_url
   end
 
@@ -86,7 +85,7 @@ class SettingsControllerTest < ActionController::TestCase
 
     plans = {
       original: plans(:basic_monthly_3),
-      new: plans(:basic_yearly_3)
+      new: plans(:basic_yearly_3),
     }
     plans.each do |_, plan|
       create_stripe_plan(plan)
@@ -111,9 +110,9 @@ class SettingsControllerTest < ActionController::TestCase
     create_stripe_plan(plan)
 
     user = User.create(
-      email: 'cc@example.com',
+      email: "cc@example.com",
       password: default_password,
-      plan: plan
+      plan: plan,
     )
     user.stripe_token = card_1
     user.save
@@ -135,8 +134,8 @@ class SettingsControllerTest < ActionController::TestCase
       :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation,
       :apple_push_notification_device_token, :receipt_info, :entries_display,
       :entries_feed, :entries_time, :entries_body, :ui_typeface, :theme,
-      :hide_recently_read, :hide_updated, :disable_image_proxy, :entries_image
-    ].each_with_object({}) {|setting, hash| hash[setting.to_s] = '1'}
+      :hide_recently_read, :hide_updated, :disable_image_proxy, :entries_image,
+    ].each_with_object({}) { |setting, hash| hash[setting.to_s] = "1" }
 
     patch :settings_update, params: {id: @user, user: settings}
     assert_redirected_to settings_url
@@ -151,8 +150,8 @@ class SettingsControllerTest < ActionController::TestCase
       tag_visibility: true,
       tag: tag.id,
       column_widths: true,
-      column: 'test',
-      width: 1234
+      column: "test",
+      width: 1234,
     }
     patch :view_settings_update, params: params
     assert_equal({tag.id.to_s => true}, @user.reload.tag_visibility)
@@ -188,7 +187,7 @@ class SettingsControllerTest < ActionController::TestCase
 
   test "should change theme" do
     login_as @user
-    ['day', 'night', 'sunset'].each do |theme|
+    ["day", "night", "sunset"].each do |theme|
       post :theme, params: {theme: theme}
       assert_equal(theme, @user.reload.theme)
     end
@@ -226,6 +225,4 @@ class SettingsControllerTest < ActionController::TestCase
       assert_equal(audio_panel_size, @user.reload.audio_panel_size)
     end
   end
-
-
 end

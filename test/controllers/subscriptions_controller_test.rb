@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class SubscriptionsControllerTest < ActionController::TestCase
-
   setup do
     @user = users(:ben)
   end
@@ -15,8 +14,8 @@ class SubscriptionsControllerTest < ActionController::TestCase
   test "should create subscription" do
     html_url = "www.example.com/index.html"
     feed_url = "http://www.example.com/atom.xml"
-    stub_request_file('index.html', html_url)
-    stub_request_file('atom.xml', feed_url)
+    stub_request_file("index.html", html_url)
+    stub_request_file("atom.xml", feed_url)
 
     feed = Feed.create(feed_url: feed_url)
 
@@ -29,9 +28,9 @@ class SubscriptionsControllerTest < ActionController::TestCase
           title: "title",
           tags: "Design",
           subscribe: "1",
-          media_only: "1"
-        }
-      }
+          media_only: "1",
+        },
+      },
     }
     login_as @user
     assert_difference "Subscription.count", +1 do
@@ -73,5 +72,4 @@ class SubscriptionsControllerTest < ActionController::TestCase
       assert_equal(value, subscription.reload.send(attribute))
     end
   end
-
 end

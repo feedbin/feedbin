@@ -9,19 +9,19 @@ class Share::Instapaper < Share::Service
   end
 
   def request_token(username, password)
-    consumer.get_access_token(nil, {}, { x_auth_username: username, x_auth_password: password, x_auth_mode: 'client_auth' })
+    consumer.get_access_token(nil, {}, {x_auth_username: username, x_auth_password: password, x_auth_mode: "client_auth"})
   end
 
   def consumer
     options = {
       site: URL,
-      access_token_path: "/api/1/oauth/access_token"
+      access_token_path: "/api/1/oauth/access_token",
     }
-    OAuth::Consumer.new(ENV['INSTAPAPER_KEY'], ENV['INSTAPAPER_SECRET'], options)
+    OAuth::Consumer.new(ENV["INSTAPAPER_KEY"], ENV["INSTAPAPER_SECRET"], options)
   end
 
   def add(params)
-    response = @client.post('/api/1/bookmarks/add', {url: params['entry_url']})
+    response = @client.post("/api/1/bookmarks/add", {url: params["entry_url"]})
     code = response.code.to_i
     if code == 201
       code = 200
@@ -32,5 +32,4 @@ class Share::Instapaper < Share::Service
   def share(params)
     authenticated_share(@klass, params)
   end
-
 end

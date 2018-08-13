@@ -1,8 +1,7 @@
 class Embed::Kickstarter < IframeEmbed
-
   def self.supported_urls
     [
-      %r(https?://www\.kickstarter\.com/projects/(.*?)/(.*?)/widget/video\.html)
+      %r(https?://www\.kickstarter\.com/projects/(.*?)/(.*?)/widget/video\.html),
     ]
   end
 
@@ -34,6 +33,4 @@ class Embed::Kickstarter < IframeEmbed
       end
     end
   end
-
-
 end

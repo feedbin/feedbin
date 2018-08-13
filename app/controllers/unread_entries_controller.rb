@@ -1,5 +1,4 @@
 class UnreadEntriesController < ApplicationController
-
   def update
     @user = current_user
     @entry = Entry.find(params[:id])
@@ -13,5 +12,4 @@ class UnreadEntriesController < ApplicationController
 
     head :ok
   end
-
 end

@@ -1,9 +1,8 @@
 class Embed::Spotify < IframeEmbed
-
   def self.supported_urls
     [
       %r(https?://open\.spotify\.com/embed/(track|artist)/(.*?)(#|\?|$)),
-      %r(https?://open\.spotify\.com/embed/user/(.*?)/playlist/(.*?)(#|\?|$))
+      %r(https?://open\.spotify\.com/embed/user/(.*?)/playlist/(.*?)(#|\?|$)),
     ]
   end
 
@@ -17,10 +16,9 @@ class Embed::Spotify < IframeEmbed
 
   private
 
-    def url_param
-      url = embed_url.dup
-      url.path = url.path.sub("/embed", "")
-      url.to_s
-    end
-
+  def url_param
+    url = embed_url.dup
+    url.path = url.path.sub("/embed", "")
+    url.to_s
+  end
 end

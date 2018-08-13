@@ -14,14 +14,14 @@ class AddOptionsToSubscriptions < ActiveRecord::Migration[5.1]
       "klass" => Subscription.to_s,
       "column" => "show_retweets",
       "default" => true,
-      "schedule" => true
+      "schedule" => true,
     })
 
     UpdateDefaultColumn.perform_async({
       "klass" => Subscription.to_s,
       "column" => "media_only",
       "default" => false,
-      "schedule" => true
+      "schedule" => true,
     })
   end
 

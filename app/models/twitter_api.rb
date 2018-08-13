@@ -12,12 +12,12 @@ class TwitterAPI
   def consumer
     options = {
       site: API_URL,
-      request_token_path: '/oauth/request_token',
-      authorize_path: '/oauth/authorize',
-      access_token_path: '/oauth/access_token',
-      http_method: :post
+      request_token_path: "/oauth/request_token",
+      authorize_path: "/oauth/authorize",
+      access_token_path: "/oauth/access_token",
+      http_method: :post,
     }
-    OAuth::Consumer.new(ENV['TWITTER_KEY'], ENV['TWITTER_SECRET'], options)
+    OAuth::Consumer.new(ENV["TWITTER_KEY"], ENV["TWITTER_SECRET"], options)
   end
 
   def request_token
@@ -31,12 +31,10 @@ class TwitterAPI
   end
 
   def redirect_uri
-    Rails.application.routes.url_helpers.save_twitter_authentications_url(host: ENV['PUSH_URL'])
+    Rails.application.routes.url_helpers.save_twitter_authentications_url(host: ENV["PUSH_URL"])
   end
 
   def response_valid?(session, params)
     params[:oauth_verifier].present?
   end
-
-
 end

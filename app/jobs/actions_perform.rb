@@ -1,4 +1,4 @@
-require 'sidekiq/api'
+require "sidekiq/api"
 
 class ActionsPerform
   include Sidekiq::Worker
@@ -24,17 +24,17 @@ class ActionsPerform
 
       queues.each do |action_name, user_ids|
         user_ids = user_ids.to_a
-        if action_name == 'send_push_notification'
+        if action_name == "send_push_notification"
           SafariPushNotificationSend.perform_async(user_ids, entry_id)
-        elsif action_name == 'star'
+        elsif action_name == "star"
           star(user_ids, user_actions)
-        elsif action_name == 'mark_read'
+        elsif action_name == "mark_read"
           UnreadEntry.where(user_id: user_ids, entry_id: entry_id).delete_all
-        elsif action_name == 'send_ios_notification'
+        elsif action_name == "send_ios_notification"
           send_ios_notification(user_ids)
         end
       end
-      Librato.increment 'actions_performed', by: 1
+      Librato.increment "actions_performed", by: 1
     end
   end
 
@@ -45,7 +45,7 @@ class ActionsPerform
     users.each do |user|
       message = "action"
       if user_actions[user.id].present?
-        actions = user_actions[user.id].join(',')
+        actions = user_actions[user.id].join(",")
         message = "#{message} #{actions}"
       end
       Throttle.throttle!("starred_entries:create:#{user.id}", 100, 1.day) do
@@ -57,13 +57,12 @@ class ActionsPerform
   def send_ios_notification(user_ids)
     if Sidekiq::Queue.new("images").size > 10
       Sidekiq::Client.push(
-        'args'  => EntryImage.build_find_image_args(@entry),
-        'class' => 'FindImageCritical',
-        'queue' => 'images_critical',
-        'retry' => false
+        "args" => EntryImage.build_find_image_args(@entry),
+        "class" => "FindImageCritical",
+        "queue" => "images_critical",
+        "retry" => false,
       )
     end
     DevicePushNotificationSend.perform_in(1.minute, user_ids, @entry.id, true)
   end
-
 end

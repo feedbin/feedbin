@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class RecentlyReadEntriesControllerTest < ActionController::TestCase
-
   setup do
     @user = users(:new)
     @feeds = create_feeds(@user)
@@ -21,10 +20,9 @@ class RecentlyReadEntriesControllerTest < ActionController::TestCase
       @user.recently_read_entries.create!(entry: entry)
     end
     login_as @user
-    assert_difference('RecentlyReadEntry.count', -@entries.length) do
+    assert_difference("RecentlyReadEntry.count", -@entries.length) do
       delete :destroy_all, xhr: true
       assert_response :success
     end
   end
-
 end

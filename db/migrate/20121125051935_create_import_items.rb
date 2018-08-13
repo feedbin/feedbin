@@ -8,6 +8,5 @@ class CreateImportItems < ActiveRecord::Migration[4.2]
     end
 
     add_index :import_items, :import_id
-
   end
 end

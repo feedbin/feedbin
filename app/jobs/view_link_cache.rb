@@ -8,5 +8,4 @@ class ViewLinkCache
       MercuryParser.parse(url)
     end
   end
-
 end

@@ -1,5 +1,4 @@
 class RecentlyReadEntriesController < ApplicationController
-
   def index
     @user = current_user
     update_selected_feed!("collection_recently_read")
@@ -8,11 +7,11 @@ class RecentlyReadEntriesController < ApplicationController
     @entries = Entry.where(id: recently_read_entry_ids).includes(feed: [:favicon]).entries_list
     @entries = @entries.sort_by { |entry| recently_read_entry_ids.index(entry.id) }
 
-    @type = 'recently_read'
-    @collection_title = 'Recently Read'
+    @type = "recently_read"
+    @collection_title = "Recently Read"
 
     respond_to do |format|
-      format.js { render partial: 'shared/entries' }
+      format.js { render partial: "shared/entries" }
     end
   end
 
@@ -25,12 +24,11 @@ class RecentlyReadEntriesController < ApplicationController
   def destroy_all
     @user = current_user
     @user.recently_read_entries.delete_all
-    @type = 'recently_read'
-    @collection_title = 'Recently Read'
+    @type = "recently_read"
+    @collection_title = "Recently Read"
     @entries = []
     respond_to do |format|
-      format.js { render partial: 'shared/entries' }
+      format.js { render partial: "shared/entries" }
     end
   end
-
 end

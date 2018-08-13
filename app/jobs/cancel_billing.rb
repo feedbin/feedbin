@@ -7,5 +7,4 @@ class CancelBilling
     customer = Stripe::Customer.retrieve(customer_id)
     customer.delete
   end
-
 end

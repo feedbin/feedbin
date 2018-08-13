@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class StarredEntriesControllerTest < ActionController::TestCase
-
   setup do
     @user = users(:new)
     @feeds = create_feeds(@user)
@@ -12,7 +11,7 @@ class StarredEntriesControllerTest < ActionController::TestCase
   end
 
   test "should get index" do
-    @user.starred_feed_enabled = '1'
+    @user.starred_feed_enabled = "1"
     @user.save
     assert @user.setting_on?(:starred_feed_enabled)
     login_as @user
@@ -47,5 +46,4 @@ class StarredEntriesControllerTest < ActionController::TestCase
       assert_response :success
     end
   end
-
 end

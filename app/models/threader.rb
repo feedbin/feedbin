@@ -1,5 +1,4 @@
 class Threader
-
   def initialize(entry_hash, feed)
     @entry_hash = ActiveSupport::HashWithIndifferentAccess.new(entry_hash)
     @feed = feed
@@ -13,7 +12,7 @@ class Threader
       entry.data["thread"] = updated_thread
       entry.thread_id = @thread_id
       entry.save!
-      FeedbinUtils.update_public_id_cache(@entry_hash['public_id'], @entry_hash['content'])
+      FeedbinUtils.update_public_id_cache(@entry_hash["public_id"], @entry_hash["content"])
       create_updated_entries
     end
   rescue => e
@@ -52,5 +51,4 @@ class Threader
     parent = parents.first
     parent.data.dig("tweet", "user", "screen_name") == @entry_hash.dig("data", "tweet", "user", "screen_name")
   end
-
 end

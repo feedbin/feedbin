@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ImportWorkerTest < ActiveSupport::TestCase
   test "should build import" do
@@ -16,7 +16,7 @@ class ImportWorkerTest < ActiveSupport::TestCase
         eot
         OpenStruct.new(
           file: OpenStruct.new(extension: "xml"),
-          read: xml
+          read: xml,
         )
       end
     end

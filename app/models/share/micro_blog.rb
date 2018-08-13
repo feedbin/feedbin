@@ -1,6 +1,6 @@
 class Share::MicroBlog < Share::Service
   include HTTParty
-  base_uri 'https://micro.blog'
+  base_uri "https://micro.blog"
   debug_output
 
   def initialize(klass = nil)
@@ -11,20 +11,19 @@ class Share::MicroBlog < Share::Service
   end
 
   def add(params)
-
     body = {
-      content: params['content']
+      content: params["content"],
     }
 
-    if params['name'].present?
-      body[:name] = params['name']
+    if params["name"].present?
+      body[:name] = params["name"]
     end
 
     headers = {
-      "Authorization" => "Bearer #{@auth_token}"
+      "Authorization" => "Bearer #{@auth_token}",
     }
 
-    response = self.class.post('/micropub', body: body, headers: headers)
+    response = self.class.post("/micropub", body: body, headers: headers)
 
     if response.code == 202
       code = 200
@@ -38,5 +37,4 @@ class Share::MicroBlog < Share::Service
   def share(params)
     authenticated_share(@klass, params)
   end
-
 end

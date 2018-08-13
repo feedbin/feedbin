@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class TwitterFeedRefresherTest < ActiveSupport::TestCase
-
   setup do
     @user = users(:ben)
     @feed = @user.feeds.first
@@ -53,5 +52,4 @@ class TwitterFeedRefresherTest < ActiveSupport::TestCase
       TwitterFeedRefresher.new().perform
     end
   end
-
 end

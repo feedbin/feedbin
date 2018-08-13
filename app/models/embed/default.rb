@@ -1,5 +1,4 @@
 class Embed::Default < IframeEmbed
-
   def fetch
     @page ||= begin
       URLCache.new(canonical_url)
@@ -31,5 +30,4 @@ class Embed::Default < IframeEmbed
   def self.recognize_url?(url)
     true
   end
-
 end

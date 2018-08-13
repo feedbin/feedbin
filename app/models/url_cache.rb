@@ -1,5 +1,4 @@
 class URLCache
-
   attr_reader :url, :options
 
   def initialize(url, options = {})
@@ -27,5 +26,4 @@ class URLCache
       [request.to_s, request.headers.to_h]
     end
   end
-
 end

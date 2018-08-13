@@ -1,5 +1,4 @@
 class FeedbinUtils
-
   FEED_ENTRIES_PUBLISHED_KEY = "feed:%d:entry_ids:published"
   FEED_ENTRIES_CREATED_AT_KEY = "feed:%d:entry_ids:created_at"
 
@@ -38,5 +37,4 @@ class FeedbinUtils
   def self.page_cache_key(url)
     "content_view:%s:v7" % Digest::SHA1.hexdigest(url)
   end
-
 end

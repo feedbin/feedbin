@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class SearchIndexStoreTest < ActiveSupport::TestCase
   setup do
@@ -41,5 +41,4 @@ class SearchIndexStoreTest < ActiveSupport::TestCase
       SearchIndexStore.new().perform("Entry", @entry.id, true)
     end
   end
-
 end

@@ -11,10 +11,10 @@ class FeedRefresher
     jobs = build_arguments(feed_ids, count)
     if jobs.present?
       Sidekiq::Client.push_bulk(
-        'args'  => jobs,
-        'class' => 'FeedRefresherFetcher',
-        'queue' => 'feed_refresher_fetcher',
-        'retry' => false
+        "args" => jobs,
+        "class" => "FeedRefresherFetcher",
+        "queue" => "feed_refresher_fetcher",
+        "retry" => false,
       )
     end
   end
@@ -34,8 +34,8 @@ class FeedRefresher
   def url_template
     @url_template ||= begin
       template = nil
-      if ENV['PUSH_URL']
-        uri = URI(ENV['PUSH_URL'])
+      if ENV["PUSH_URL"]
+        uri = URI(ENV["PUSH_URL"])
         id = 454545
         template = Rails.application.routes.url_helpers.push_feed_url(Feed.new(id: id), protocol: uri.scheme, host: uri.host)
         template = template.sub(id.to_s, "%d")
@@ -46,10 +46,10 @@ class FeedRefresher
 
   def _debug(feed_id)
     Sidekiq::Client.push_bulk(
-      'args'  => build_arguments([feed_id], 0),
-      'class' => 'FeedRefresherFetcher',
-      'queue' => 'feed_refresher_fetcher_debug',
-      'retry' => false
+      "args" => build_arguments([feed_id], 0),
+      "class" => "FeedRefresherFetcher",
+      "queue" => "feed_refresher_fetcher_debug",
+      "retry" => false,
     )
   end
 
@@ -69,7 +69,7 @@ class FeedRefresher
         push_callback: push_callback,
         hub_secret: hub_secret,
         push_mode: push_mode,
-        record_status: @force_refresh
+        record_status: @force_refresh,
       }
       [@feed[:id], @feed[:feed_url], options]
     end
@@ -99,7 +99,5 @@ class FeedRefresher
     def push?
       @push ||= @push_url && @feed[:push_expiration].nil? || @feed[:push_expiration] < Time.now
     end
-
   end
-
 end

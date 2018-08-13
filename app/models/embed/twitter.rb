@@ -1,5 +1,4 @@
 class Embed::Twitter
-
   attr_reader :url
 
   def initialize(url)
@@ -59,26 +58,25 @@ class Embed::Twitter
 
   private
 
-    OEMBED_URL = "https://publish.twitter.com/oembed"
+  OEMBED_URL = "https://publish.twitter.com/oembed"
 
-    def user
-      @user ||= data.dig("author_url") && data.dig("author_url").split("/").last
+  def user
+    @user ||= data.dig("author_url") && data.dig("author_url").split("/").last
+  end
+
+  def document
+    @document ||= Nokogiri::HTML5.fragment(data.dig("html"))
+  end
+
+  def data
+    @data ||= begin
+      options = {
+        params: {
+          url: url,
+          omit_script: true,
+        },
+      }
+      JSON.parse(URLCache.new(OEMBED_URL, options).body)
     end
-
-    def document
-      @document ||= Nokogiri::HTML5.fragment(data.dig("html"))
-    end
-
-    def data
-      @data ||= begin
-        options = {
-          params: {
-            url: url,
-            omit_script: true
-          }
-        }
-        JSON.parse(URLCache.new(OEMBED_URL, options).body)
-      end
-    end
-
+  end
 end

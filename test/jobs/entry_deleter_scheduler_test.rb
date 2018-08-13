@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class EntryDeleterSchedulerTest < ActiveSupport::TestCase
   test "should schedult jobs" do

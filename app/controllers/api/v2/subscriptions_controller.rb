@@ -1,7 +1,6 @@
 module Api
   module V2
     class SubscriptionsController < ApiController
-
       respond_to :json
 
       before_action :validate_content_type, only: [:create]
@@ -33,7 +32,7 @@ module Api
               @user.subscriptions.pluck(:feed_id, :title).each do |feed_id, title|
                 @titles[feed_id] = title
               end
-              render template: 'subscriptions/index'
+              render template: "subscriptions/index"
             end
           end
         end
@@ -79,7 +78,7 @@ module Api
         @subscription = @user.subscriptions.find(params[:id])
         if @subscription.present?
           @subscription.destroy
-          @subscription.feed.tag('', @user)
+          @subscription.feed.tag("", @user)
           head :no_content
         else
           status_forbidden
@@ -104,9 +103,8 @@ module Api
       end
 
       def validate_create
-        needs 'feed_url'
+        needs "feed_url"
       end
-
     end
   end
 end

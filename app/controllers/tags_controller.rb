@@ -1,5 +1,4 @@
 class TagsController < ApplicationController
-
   before_action :user_owns_tag, only: [:show]
 
   def index
@@ -8,7 +7,7 @@ class TagsController < ApplicationController
 
     @tags = @tags.find_all { |tag| tag.downcase.include?(params[:query].downcase) }.first(3)
     respond_to do |format|
-      format.json { render json: { suggestions: @tags.map {|tag| { value: tag, data: tag } } }.to_json }
+      format.json { render json: {suggestions: @tags.map { |tag| {value: tag, data: tag} }}.to_json }
     end
   end
 
@@ -23,13 +22,13 @@ class TagsController < ApplicationController
 
     @append = params[:page].present?
 
-    @type = 'tag'
+    @type = "tag"
     @data = params[:id]
 
     @collection_title = @tag.name
 
     respond_to do |format|
-      format.js { render partial: 'shared/entries' }
+      format.js { render partial: "shared/entries" }
     end
   end
 
@@ -41,7 +40,7 @@ class TagsController < ApplicationController
 
     taggings = user.taggings.where(tag: tag)
     feed_ids = taggings.pluck(:feed_id)
-    tag_name = params[:tag][:name].strip.gsub(',', '')
+    tag_name = params[:tag][:name].strip.gsub(",", "")
 
     if tag_name.present?
       ActiveRecord::Base.transaction do
@@ -82,5 +81,4 @@ class TagsController < ApplicationController
       render_404
     end
   end
-
 end

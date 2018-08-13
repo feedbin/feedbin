@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class MicropostsControllerTest < ActionController::TestCase
-
   setup do
     @user = users(:new)
     @feeds = create_feeds(@user)
@@ -14,12 +13,11 @@ class MicropostsControllerTest < ActionController::TestCase
     entry = @entries.first
 
     html_url = "https://micro.blog/posts/conversation?id=#{entry.entry_id}"
-    stub_request_file('microblog_conversation_response.json', html_url, headers: {"Content-Type" => "application/json; charset=utf-8"})
+    stub_request_file("microblog_conversation_response.json", html_url, headers: {"Content-Type" => "application/json; charset=utf-8"})
 
     get :thread, params: {id: entry.id}, xhr: true
 
     assert assigns(:microposts)
     assert_response :success
   end
-
 end

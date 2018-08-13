@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class UnreadEntriesControllerTest < ActionController::TestCase
-
   setup do
     @user = users(:new)
     @feeds = create_feeds(@user)
@@ -19,5 +18,4 @@ class UnreadEntriesControllerTest < ActionController::TestCase
       assert_response :success
     end
   end
-
 end

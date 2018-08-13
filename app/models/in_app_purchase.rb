@@ -1,5 +1,4 @@
 class InAppPurchase < ApplicationRecord
-
   belongs_to :user
 
   validates :transaction_id, uniqueness: true
@@ -12,7 +11,7 @@ class InAppPurchase < ApplicationRecord
       purchase_date: Time.at(receipt_json["purchase_date_ms"].to_i / 1_000),
       receipt: receipt_json,
       response: response,
-      user: user
+      user: user,
     })
   end
 
@@ -52,6 +51,4 @@ class InAppPurchase < ApplicationRecord
   def currency
     "USD"
   end
-
-
 end

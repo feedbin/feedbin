@@ -1,7 +1,6 @@
 module Api
   module V2
     class SuggestedFeedsController < ApiController
-
       respond_to :json
       skip_before_action :valid_user
 
@@ -24,7 +23,6 @@ module Api
         else
           head :bad_request
         end
-
       end
 
       def unsubscribe
@@ -39,10 +37,7 @@ module Api
         else
           head :bad_request
         end
-
       end
-
-
     end
   end
 end

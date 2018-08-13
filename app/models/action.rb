@@ -1,9 +1,8 @@
 class Action < ApplicationRecord
-
   attr_accessor :automatic_modification, :apply_action
 
   belongs_to :user
-  enum action_type: { standard: 0, notifier: 1 }
+  enum action_type: {standard: 0, notifier: 1}
 
   validate do |action|
     if computed_feed_ids.empty? && self.automatic_modification.blank?
@@ -39,17 +38,17 @@ class Action < ApplicationRecord
         bool: {
           filter: {
             bool: {
-              must: { terms: { feed_id: self.computed_feed_ids } }
-            }
-          }
-        }
+              must: {terms: {feed_id: self.computed_feed_ids}},
+            },
+          },
+        },
       }
       if self.query.present?
         hash[:query][:bool][:must] = {
           query_string: {
             query: self.query,
-            default_operator: "AND"
-          }
+            default_operator: "AND",
+          },
         }
       end
     end
@@ -84,16 +83,16 @@ class Action < ApplicationRecord
   def _percolator
     Entry.__elasticsearch__.client.get(
       index: Entry.index_name,
-      type: '.percolator',
+      type: ".percolator",
       id: self.id,
-      ignore: 404
+      ignore: 404,
     )
   end
 
   def query_valid
     options = {
       index: Entry.index_name,
-      body: {query: search_body[:query]}
+      body: {query: search_body[:query]},
     }
     result = $search[:main].indices.validate_query(options)
     if false == result["valid"]
@@ -106,20 +105,20 @@ class Action < ApplicationRecord
   end
 
   def scrolled_results(&block)
-    scroll = '2m'
+    scroll = "2m"
     response = Entry.__elasticsearch__.client.search(
       index: Entry.index_name,
       type: Entry.document_type,
       scroll: scroll,
-      body: search_options
+      body: search_options,
     )
 
-    while response['hits']['hits'].any? do
+    while response["hits"]["hits"].any?
       yield response
-      response = Entry.__elasticsearch__.client.scroll( { scroll_id: response['_scroll_id'], scroll: scroll } )
+      response = Entry.__elasticsearch__.client.scroll({scroll_id: response["_scroll_id"], scroll: scroll})
     end
 
-    return response['_scroll_id']
+    return response["_scroll_id"]
   end
 
   private
@@ -130,5 +129,4 @@ class Action < ApplicationRecord
       hash[:sort] = [{published: "desc"}]
     end
   end
-
 end

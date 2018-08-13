@@ -1,7 +1,6 @@
 module Api
   module V2
     class InAppPurchasesController < ApiController
-
       respond_to :json
 
       before_action :validate_content_type, only: [:create]
@@ -25,17 +24,16 @@ module Api
           Honeybadger.notify(
             error_class: "InAppPurchasesController#create",
             error_message: error_codes[response["status"]] || "Receipt verification failed",
-            parameters: {status: response["status"]}
+            parameters: {status: response["status"]},
           )
           head :bad_request
         end
-
       end
 
       private
 
       def receipt_response(receipt_data, iap_endpoint)
-        body = {'receipt-data' => receipt_data}.to_json
+        body = {"receipt-data" => receipt_data}.to_json
 
         uri = URI(iap_endpoint)
         http = Net::HTTP.new(uri.host, uri.port)
@@ -43,8 +41,8 @@ module Api
         http.verify_mode = OpenSSL::SSL::VERIFY_PEER
 
         request = Net::HTTP::Post.new(uri.request_uri)
-        request['Accept'] = "application/json"
-        request['Content-Type'] = "application/json"
+        request["Accept"] = "application/json"
+        request["Content-Type"] = "application/json"
         request.body = body
 
         response = http.request(request)
@@ -64,7 +62,6 @@ module Api
           21008 => "This receipt is from the production environment, but it was sent to the test environment for verification. Send it to the production environment instead.",
         }
       end
-
     end
   end
 end

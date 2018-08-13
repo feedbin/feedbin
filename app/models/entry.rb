@@ -73,7 +73,7 @@ class Entry < ApplicationRecord
 
       media = tweets.find do |tweet|
         return true if tweet.media?
-        urls = tweet.urls.reject {|url| url.expanded_url.host == "twitter.com" }
+        urls = tweet.urls.reject { |url| url.expanded_url.host == "twitter.com" }
         return true if !urls.empty?
       end
     end
@@ -128,7 +128,7 @@ class Entry < ApplicationRecord
         hash[:entities][entity].each_with_index do |value, index|
           hash[:entities][entity][index][:indices] = [
             value[:indices][0] - text_start,
-            value[:indices][1] - text_start
+            value[:indices][1] - text_start,
           ]
         end
       end
@@ -142,7 +142,7 @@ class Entry < ApplicationRecord
 
   def tweet_thread
     @tweet_thread ||= begin
-      thread.map {|part| Twitter::Tweet.new(part.deep_symbolize_keys) }
+      thread.map { |part| Twitter::Tweet.new(part.deep_symbolize_keys) }
     end
   rescue
     []
@@ -160,17 +160,17 @@ class Entry < ApplicationRecord
 
   def has_content
     if [title, url, entry_id, content].compact.count == 0
-      errors.add(:base, 'entry has no content')
+      errors.add(:base, "entry has no content")
     end
   end
 
   def self.entries_with_feed(entry_ids, sort)
     entry_ids = entry_ids.map(&:entry_id)
     entries = Entry.where(id: entry_ids).includes(feed: [:favicon])
-    if sort == 'ASC'
-      entries = entries.order('published ASC')
+    if sort == "ASC"
+      entries = entries.order("published ASC")
     else
-      entries = entries.order('published DESC')
+      entries = entries.order("published DESC")
     end
     entries
   end
@@ -184,11 +184,11 @@ class Entry < ApplicationRecord
   end
 
   def self.unread_new
-    where('unread_entries.entry_id IS NOT NULL')
+    where("unread_entries.entry_id IS NOT NULL")
   end
 
   def self.read_new
-    where('unread_entries.entry_id IS NULL')
+    where("unread_entries.entry_id IS NULL")
   end
 
   def self.include_starred_entries(user_id)
@@ -200,7 +200,7 @@ class Entry < ApplicationRecord
   end
 
   def self.sort_preference(sort)
-    if sort == 'ASC'
+    if sort == "ASC"
       order("published ASC")
     else
       order("published DESC")
@@ -227,9 +227,9 @@ class Entry < ApplicationRecord
     self.data && self.data["format"] || "default"
   end
 
-  def as_indexed_json(options={})
-    base = as_json(root: false, only: Entry.mappings.to_hash[:entry][:properties].keys.reject {|key| key.to_s.start_with?("twitter")})
-    base["title"] =  ContentFormatter.summary(self.title)
+  def as_indexed_json(options = {})
+    base = as_json(root: false, only: Entry.mappings.to_hash[:entry][:properties].keys.reject { |key| key.to_s.start_with?("twitter") })
+    base["title"] = ContentFormatter.summary(self.title)
     base["content"] = ContentFormatter.summary(self.content)
     base["title_exact"] = base["title"]
     base["content_exact"] = base["content"]
@@ -242,12 +242,11 @@ class Entry < ApplicationRecord
       base["twitter_retweet"] = self.tweet.retweeted_status?
       base["twitter_quoted"] = self.tweet.quoted_status?
       base["twitter_media"] = self.twitter_media?
-      base["twitter_image"] = !!(tweets.find {|tweet| tweet.media? })
-      base["twitter_link"] = !!(tweets.find {|tweet| tweet.urls? })
+      base["twitter_image"] = !!(tweets.find { |tweet| tweet.media? })
+      base["twitter_link"] = !!(tweets.find { |tweet| tweet.urls? })
     end
     base
   end
-
 
   def public_id_alt
     self.data && self.data["public_id_alt"]
@@ -256,10 +255,10 @@ class Entry < ApplicationRecord
   def processed_image
     if self.image && self.image["original_url"] && self.image["width"] && self.image["height"] && self.image["processed_url"]
       image_url = self.image["processed_url"]
-      host = ENV['ENTRY_IMAGE_HOST']
+      host = ENV["ENTRY_IMAGE_HOST"]
       url = URI(image_url)
       url.host = host if host
-      url.scheme = 'https'
+      url.scheme = "https"
       url.to_s
     end
   end
@@ -269,14 +268,14 @@ class Entry < ApplicationRecord
   end
 
   def itunes_image
-    if self.data && self.data['itunes_image_processed']
-      image_url = self.data['itunes_image_processed']
+    if self.data && self.data["itunes_image_processed"]
+      image_url = self.data["itunes_image_processed"]
 
-      host = ENV['ENTRY_IMAGE_HOST']
+      host = ENV["ENTRY_IMAGE_HOST"]
 
       url = URI(image_url)
       url.host = host if host
-      url.scheme = 'https'
+      url.scheme = "https"
       url.to_s
     end
   end
@@ -292,9 +291,9 @@ class Entry < ApplicationRecord
 
   def content_diff
     result = nil
-    if self.original && self.original['content'].present?
+    if self.original && self.original["content"].present?
       begin
-        before = ContentFormatter.format!(self.original['content'], self)
+        before = ContentFormatter.format!(self.original["content"], self)
         after = ContentFormatter.format!(self.content, self)
         result = HTMLDiff::Diff.new(before, after).inline_html.html_safe
       rescue
@@ -315,7 +314,7 @@ class Entry < ApplicationRecord
   end
 
   def is_fully_qualified(url_string)
-    url_string.respond_to?(:start_with?) && url_string.start_with?('http')
+    url_string.respond_to?(:start_with?) && url_string.start_with?("http")
   end
 
   def ensure_published
@@ -333,7 +332,6 @@ class Entry < ApplicationRecord
 
   def mark_as_unread
     if skip_mark_as_unread.blank? && self.published > 1.month.ago
-
       filters = Hash.new.tap do |hash|
         hash[:feed_id] = self.feed_id
         hash[:active] = true
@@ -398,8 +396,8 @@ class Entry < ApplicationRecord
 
   def find_images
     EntryImage.perform_async(self.id)
-    if self.data && self.data['itunes_image']
-      ItunesImage.perform_async(self.id, self.data['itunes_image'])
+    if self.data && self.data["itunes_image"]
+      ItunesImage.perform_async(self.id, self.data["itunes_image"])
     end
   end
 
@@ -408,5 +406,4 @@ class Entry < ApplicationRecord
       SavePages.perform_async(self.id)
     end
   end
-
 end

@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class FeedsControllerTest < ActionController::TestCase
-
   setup do
     @user = users(:ben)
   end
@@ -9,7 +8,7 @@ class FeedsControllerTest < ActionController::TestCase
   test "update feed" do
     login_as @user
 
-    assert_difference('Tagging.count', 1) do
+    assert_difference("Tagging.count", 1) do
       patch :update, params: {id: @user.feeds.first, feed: {tag_list: "Tag"}}, xhr: true
       assert_response :success
     end
@@ -31,7 +30,6 @@ class FeedsControllerTest < ActionController::TestCase
       assert_response :success
       assert_equal view_mode, @user.reload.view_mode
     end
-
   end
 
   test "gets auto_update" do
@@ -41,46 +39,43 @@ class FeedsControllerTest < ActionController::TestCase
   end
 
   test "push subscribe/unsubscribe" do
-
     feed = Feed.first
     secret = Push::hub_secret(feed.id)
 
     params = {
-      'id' => feed.id,
-      'hub.topic' => feed.feed_url,
-      'hub.verify_token' => secret,
-      'hub.lease_seconds' => 10_000,
+      "id" => feed.id,
+      "hub.topic" => feed.feed_url,
+      "hub.verify_token" => secret,
+      "hub.lease_seconds" => 10_000,
     }
 
     subscribe_challenge = Faker::Internet.slug
-    get :push, params: params.merge('hub.mode' => 'subscribe', 'hub.challenge' => subscribe_challenge)
+    get :push, params: params.merge("hub.mode" => "subscribe", "hub.challenge" => subscribe_challenge)
     assert_response :success
     assert_equal subscribe_challenge, @response.body
     assert_not_nil feed.reload.push_expiration
 
     unsubscribe_challenge = Faker::Internet.slug
-    get :push, params: params.merge('hub.mode' => 'unsubscribe', 'hub.challenge' => unsubscribe_challenge)
+    get :push, params: params.merge("hub.mode" => "unsubscribe", "hub.challenge" => unsubscribe_challenge)
     assert_response :success
     assert_equal unsubscribe_challenge, @response.body
   end
 
   test "push needs valid secret" do
-
     feed = Feed.first
     secret = Push::hub_secret(feed.id)
 
     params = {
-      'id' => feed.id,
-      'hub.topic' => feed.feed_url,
-      'hub.verify_token' => "#{secret}s",
-      'hub.mode' => 'subscribe',
-      'hub.challenge' => Faker::Internet.slug
+      "id" => feed.id,
+      "hub.topic" => feed.feed_url,
+      "hub.verify_token" => "#{secret}s",
+      "hub.mode" => "subscribe",
+      "hub.challenge" => Faker::Internet.slug,
     }
 
     get :push, params: params
     assert_response :not_found
   end
-
 
   test "PuSH new content" do
     feed = @user.feeds.first
@@ -123,11 +118,9 @@ class FeedsControllerTest < ActionController::TestCase
 
   def push_prep(feed)
     secret = Push::hub_secret(feed.id)
-    body = 'BODY'
-    signature = OpenSSL::HMAC.hexdigest('sha1', secret, body)
+    body = "BODY"
+    signature = OpenSSL::HMAC.hexdigest("sha1", secret, body)
     @request.headers["HTTP_X_HUB_SIGNATURE"] = "sha1=#{signature}"
     body
   end
-
-
 end

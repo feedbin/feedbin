@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'optparse'
-require 'redis'
-ENV['TZ'] = 'UTC'
+require "optparse"
+require "redis"
+ENV["TZ"] = "UTC"
 
 def gen_redis_proto(*cmd)
   proto = ""
@@ -16,7 +16,6 @@ end
 
 opts = {}
 OptionParser.new do |options|
-
   banner = <<-EOD
     Usage: redis_protocol.rb [options] [files]\n
     Generate redis protocol from the output of:\n
@@ -40,7 +39,6 @@ end.parse!
 
 while input = ARGF.gets
   input.each_line do |line|
-
     line = line.chop
 
     entry_id, feed_id, public_id, created_at, published = line.split("\t")

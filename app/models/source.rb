@@ -1,5 +1,4 @@
 class Source
-
   attr_reader :options
 
   def initialize(url, config)
@@ -33,5 +32,4 @@ class Source
     end
     feed
   end
-
 end

@@ -1,8 +1,7 @@
 class Embed::Soundcloud < IframeEmbed
-
   def self.supported_urls
     [
-      %r(https?://w\.soundcloud\.com/player)
+      %r(https?://w\.soundcloud\.com/player),
     ]
   end
 
@@ -14,6 +13,4 @@ class Embed::Soundcloud < IframeEmbed
     params = Rack::Utils.parse_nested_query(embed_url.query)
     {url: params["url"], format: "json"}
   end
-
-
 end

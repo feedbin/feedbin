@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class SendToKindleTest < ActiveSupport::TestCase
   test "Should send email" do

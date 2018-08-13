@@ -1,12 +1,11 @@
 class IframeEmbed
-
   SUPPORTED_URLS = []
 
   attr_reader :embed_url, :data
 
   def initialize(embed_url)
     @embed_url = URI(embed_url)
-    Librato.increment('iframe_embed.source', source: @embed_url.host)
+    Librato.increment("iframe_embed.source", source: @embed_url.host)
   end
 
   def title
@@ -53,7 +52,7 @@ class IframeEmbed
     if oembed_url
       @data ||= begin
         defaults = {
-          url: embed_url.to_s
+          url: embed_url.to_s,
         }
         response = URLCache.new(oembed_url, params: defaults.merge(oembed_params))
         JSON.parse(response.body)
@@ -104,12 +103,11 @@ class IframeEmbed
       Embed::Spotify,
       Embed::Kickstarter,
       Embed::Soundcloud,
-      Embed::Default
+      Embed::Default,
     ]
   end
 
   def self.supported_urls
     []
   end
-
 end

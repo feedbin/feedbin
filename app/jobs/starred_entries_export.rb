@@ -3,7 +3,7 @@ class StarredEntriesExport
 
   def perform(user_id)
     user = User.find(user_id)
-    file = Tempfile.new(['starred_', '.json'])
+    file = Tempfile.new(["starred_", ".json"])
     build_file(user, file)
     upload_url = upload_file(file)
     UserMailer.starred_export_download(user_id, upload_url).deliver_now
@@ -13,7 +13,7 @@ class StarredEntriesExport
   end
 
   def build_file(user, file)
-    starred_ids = user.starred_entries.order('created_at desc').pluck(:entry_id)
+    starred_ids = user.starred_entries.order("created_at desc").pluck(:entry_id)
     file.write("[")
     starred_ids.each_slice(100) do |entry_ids|
       entries = Entry.where(id: entry_ids).includes(:feed)
@@ -24,7 +24,7 @@ class StarredEntriesExport
     end
     file.close
     File.truncate(file.path, File.size(file.path) - 2)
-    file = File.open(file.path, 'a')
+    file = File.open(file.path, "a")
     file.write("]")
     file.close
   end
@@ -44,8 +44,7 @@ class StarredEntriesExport
       content: ContentFormatter.api_format(entry.content, entry),
       url: entry.fully_qualified_url,
       published: entry.published.iso8601(6),
-      created_at: entry.created_at.iso8601(6)
+      created_at: entry.created_at.iso8601(6),
     }
   end
-
 end

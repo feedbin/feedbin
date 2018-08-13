@@ -8,5 +8,4 @@ class Coupon < ApplicationRecord
       self.coupon_code = SecureRandom.urlsafe_base64
     end while Coupon.exists?(coupon_code: self.coupon_code)
   end
-
 end

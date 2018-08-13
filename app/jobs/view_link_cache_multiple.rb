@@ -14,11 +14,10 @@ class ViewLinkCacheMultiple
         url = entry.fully_qualified_url
         key = FeedbinUtils.page_cache_key(url)
         Rails.cache.fetch(key) do
-          Librato.increment 'view_link_cache_multiple.cache_miss'
+          Librato.increment "view_link_cache_multiple.cache_miss"
           MercuryParser.parse(url)
         end
       end
     end
   end
-
 end

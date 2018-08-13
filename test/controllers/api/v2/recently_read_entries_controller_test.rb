@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::RecentlyReadEntriesControllerTest < ApiControllerTestCase
-
   setup do
     @user = users(:new)
     @feeds = create_feeds(@user)
@@ -30,5 +29,4 @@ class Api::V2::RecentlyReadEntriesControllerTest < ApiControllerTestCase
       assert_response :success
     end
   end
-
 end

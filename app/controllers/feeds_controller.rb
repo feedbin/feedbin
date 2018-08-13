@@ -1,5 +1,4 @@
 class FeedsController < ApplicationController
-
   before_action :correct_user, only: :update
   skip_before_action :authorize, only: [:push]
   skip_before_action :verify_authenticity_token, only: [:push]
@@ -16,7 +15,6 @@ class FeedsController < ApplicationController
     else
       get_feeds_list
     end
-
   end
 
   def rename
@@ -33,15 +31,15 @@ class FeedsController < ApplicationController
   end
 
   def view_unread
-    update_view_mode('view_unread')
+    update_view_mode("view_unread")
   end
 
   def view_starred
-    update_view_mode('view_starred')
+    update_view_mode("view_starred")
   end
 
   def view_all
-    update_view_mode('view_all')
+    update_view_mode("view_all")
   end
 
   def auto_update
@@ -54,16 +52,16 @@ class FeedsController < ApplicationController
 
     if request.get?
       response = ""
-      if [feed.self_url, feed.feed_url].include?(params['hub.topic']) && secret == params['hub.verify_token']
-        if params['hub.mode'] == 'subscribe'
-          Librato.increment 'push.subscribe'
-          feed.update_attributes(push_expiration: Time.now + (params['hub.lease_seconds'].to_i/2).seconds)
-          response = params['hub.challenge']
+      if [feed.self_url, feed.feed_url].include?(params["hub.topic"]) && secret == params["hub.verify_token"]
+        if params["hub.mode"] == "subscribe"
+          Librato.increment "push.subscribe"
+          feed.update_attributes(push_expiration: Time.now + (params["hub.lease_seconds"].to_i / 2).seconds)
+          response = params["hub.challenge"]
           status = :ok
-        elsif params['hub.mode'] == 'unsubscribe'
-          Librato.increment 'push.unsubscribe'
+        elsif params["hub.mode"] == "unsubscribe"
+          Librato.increment "push.unsubscribe"
           feed.update_attributes(push_expiration: nil)
-          response = params['hub.challenge']
+          response = params["hub.challenge"]
           status = :ok
         end
       else
@@ -73,35 +71,34 @@ class FeedsController < ApplicationController
     else
       if feed.subscriptions_count > 0
         body = request.raw_post.force_encoding("UTF-8")
-        signature = OpenSSL::HMAC.hexdigest('sha1', secret, body)
-        if request.headers['HTTP_X_HUB_SIGNATURE'] == "sha1=#{signature}"
+        signature = OpenSSL::HMAC.hexdigest("sha1", secret, body)
+        if request.headers["HTTP_X_HUB_SIGNATURE"] == "sha1=#{signature}"
           Sidekiq::Client.push_bulk(
-            'args'  => [[feed.id, feed.feed_url, {xml: body}]],
-            'class' => 'FeedRefresherFetcherCritical',
-            'queue' => 'feed_refresher_fetcher_critical',
-            'retry' => false
+            "args" => [[feed.id, feed.feed_url, {xml: body}]],
+            "class" => "FeedRefresherFetcherCritical",
+            "queue" => "feed_refresher_fetcher_critical",
+            "retry" => false,
           )
-          Librato.increment 'entry.push'
+          Librato.increment "entry.push"
         else
           Honeybadger.notify(error_class: "PuSH", error_message: "PuSH Invalid Signature", parameters: params)
         end
       else
-        uri = URI(ENV['PUSH_URL'])
+        uri = URI(ENV["PUSH_URL"])
         options = {
           push_callback: Rails.application.routes.url_helpers.push_feed_url(feed, protocol: uri.scheme, host: uri.host),
           hub_secret: secret,
-          push_mode: "unsubscribe"
+          push_mode: "unsubscribe",
         }
         Sidekiq::Client.push_bulk(
-          'args'  => [[feed.id, feed.feed_url, options]],
-          'class' => 'FeedRefresherFetcher',
-          'queue' => 'feed_refresher_fetcher',
-          'retry' => false
+          "args" => [[feed.id, feed.feed_url, options]],
+          "class" => "FeedRefresherFetcher",
+          "queue" => "feed_refresher_fetcher",
+          "retry" => false,
         )
       end
       head :ok
     end
-
   end
 
   def toggle_updates
@@ -111,7 +108,7 @@ class FeedsController < ApplicationController
     if params.has_key?(:inline)
       @delay = false
       if !@user.setting_on?(:update_message_seen)
-        @user.update_message_seen = '1'
+        @user.update_message_seen = "1"
         @user.save
         @delay = true
       end
@@ -134,10 +131,10 @@ class FeedsController < ApplicationController
       config = {
         twitter_access_token: @user.twitter_access_token,
         twitter_access_secret: @user.twitter_access_secret,
-        twitter_screen_name: @user.twitter_screen_name
+        twitter_screen_name: @user.twitter_screen_name,
       }
       @feeds = FeedFinder.new(params[:q], config).create_feeds!
-      @feeds.map{|feed| feed.priority_refresh(@user) }
+      @feeds.map { |feed| feed.priority_refresh(@user) }
     end
   rescue => exception
     logger.info { "------------------------" }
@@ -174,5 +171,4 @@ class FeedsController < ApplicationController
       render_404
     end
   end
-
 end

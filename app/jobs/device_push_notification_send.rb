@@ -6,9 +6,9 @@ class DevicePushNotificationSend
 
   APNOTIC_POOL = Apnotic::ConnectionPool.new({
     auth_method: :token,
-    cert_path: ENV['APPLE_AUTH_KEY'],
-    team_id:   ENV['APPLE_TEAM_ID'],
-    key_id:    ENV['APPLE_KEY_ID'],
+    cert_path: ENV["APPLE_AUTH_KEY"],
+    team_id: ENV["APPLE_TEAM_ID"],
+    key_id: ENV["APPLE_KEY_ID"],
   }, size: 5)
 
   def perform(user_ids, entry_id, skip_read)
@@ -36,8 +36,8 @@ class DevicePushNotificationSend
       notifications.each do |_, notification|
         push = connection.prepare_push(notification)
         push.on(:response) do |response|
-          Librato.increment('apns.ios.sent', source: response.status)
-          if response.status == '410' || (response.status == '400' && response.body['reason'] == 'BadDeviceToken')
+          Librato.increment("apns.ios.sent", source: response.status)
+          if response.status == "410" || (response.status == "400" && response.body["reason"] == "BadDeviceToken")
             apns_id = response.headers["apns-id"]
             token = notifications[apns_id].token
             Device.where("lower(token) = ?", token.downcase).take&.destroy
@@ -47,7 +47,6 @@ class DevicePushNotificationSend
       end
       connection.join
     end
-
   end
 
   private
@@ -71,7 +70,6 @@ class DevicePushNotificationSend
   end
 
   def build_notification(device_token, feed_title, entry, operating_system)
-
     alert_title = feed_title
     if entry.tweet?
       alert_title = entry.title
@@ -99,8 +97,8 @@ class DevicePushNotificationSend
           feed: feed_title,
           author: author,
           published: published,
-          content: nil
-        }
+          content: nil,
+        },
       }
       if url = image_url(entry)
         notification.custom_payload[:image_url] = url
@@ -109,7 +107,7 @@ class DevicePushNotificationSend
       notification.content_available = true
       notification.sound = "default"
       notification.priority = "10"
-      notification.topic = ENV['APPLE_PUSH_TOPIC']
+      notification.topic = ENV["APPLE_PUSH_TOPIC"]
       notification.apns_id = SecureRandom.uuid
       notification.mutable_content = "1"
     end
@@ -127,5 +125,4 @@ class DevicePushNotificationSend
   def image_url(entry)
     entry.processed_image if entry.processed_image?
   end
-
 end

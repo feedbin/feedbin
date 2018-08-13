@@ -3,7 +3,7 @@ class SubscriptionsController < ApplicationController
   # GET subscriptions.xml
   def index
     @user = current_user
-    if params[:tag] == 'all' || params[:tag].blank?
+    if params[:tag] == "all" || params[:tag].blank?
       @tags = @user.feed_tags
       @feeds = @user.feeds.xml
     else
@@ -15,7 +15,7 @@ class SubscriptionsController < ApplicationController
     end
     respond_to do |format|
       format.xml do
-        send_data(render_to_string, type: 'text/xml', filename: 'subscriptions.xml')
+        send_data(render_to_string, type: "text/xml", filename: "subscriptions.xml")
       end
     end
   end
@@ -48,7 +48,7 @@ class SubscriptionsController < ApplicationController
     destroy_subscription(subscription.id)
     get_feeds_list
     respond_to do |format|
-      format.js { render 'subscriptions/destroy' }
+      format.js { render "subscriptions/destroy" }
     end
   end
 
@@ -74,5 +74,4 @@ class SubscriptionsController < ApplicationController
   def subscription_params
     params.require(:subscription).permit(:muted, :show_updates, :show_retweets, :media_only, :title)
   end
-
 end

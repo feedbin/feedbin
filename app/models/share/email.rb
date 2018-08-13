@@ -1,5 +1,4 @@
 class Share::Email < Share::Service
-
   def initialize(klass)
     @klass = klass
   end
@@ -13,8 +12,7 @@ class Share::Email < Share::Service
   end
 
   def update_completions(to)
-    new_contacts = to.to_s.split(',').map {|contact| contact.strip}
+    new_contacts = to.to_s.split(",").map { |contact| contact.strip }
     @klass.update_completions(new_contacts)
   end
-
 end

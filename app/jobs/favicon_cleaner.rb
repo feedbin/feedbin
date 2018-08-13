@@ -1,4 +1,4 @@
-require 'rmagick'
+require "rmagick"
 
 class FaviconCleaner
   include Sidekiq::Worker
@@ -25,7 +25,7 @@ class FaviconCleaner
     data = Base64.decode64(data)
     layers = Magick::Image.from_blob(data)
     layer = layers.first.scale(1, 1)
-    pixel = layer.pixel_color(0,0)
+    pixel = layer.pixel_color(0, 0)
     color = layer.to_color(pixel)
     %w(none white #FFFFFF).include?(color) || color.include?("#FFFFFF")
   ensure
@@ -36,5 +36,4 @@ class FaviconCleaner
   def build
     enqueue_all(Favicon, self.class)
   end
-
 end

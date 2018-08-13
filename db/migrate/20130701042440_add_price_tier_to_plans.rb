@@ -3,4 +3,3 @@ class AddPriceTierToPlans < ActiveRecord::Migration[4.2]
     add_column :plans, :price_tier, :integer
   end
 end
-

@@ -1,10 +1,9 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::TaggingsControllerTest < ApiControllerTestCase
-
   setup do
     @user = users(:ben)
-    @tagging = @user.feeds.first.tag('new tag', @user, false).first
+    @tagging = @user.feeds.first.tag("new tag", @user, false).first
   end
 
   test "should get index" do
@@ -38,7 +37,6 @@ class Api::V2::TaggingsControllerTest < ApiControllerTestCase
       delete :destroy, params: {id: @tagging}, format: :json
       assert_response :success
     end
-
   end
 
   private
@@ -46,5 +44,4 @@ class Api::V2::TaggingsControllerTest < ApiControllerTestCase
   def keys
     %w[id feed_id name]
   end
-
 end

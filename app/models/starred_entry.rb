@@ -15,5 +15,4 @@ class StarredEntry < ApplicationRecord
     Rails.cache.delete("#{self.user_id}:starred_feed")
     true
   end
-
 end

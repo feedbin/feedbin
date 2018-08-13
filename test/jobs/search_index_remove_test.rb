@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class SearchIndexRemoveTest < ActiveSupport::TestCase
   setup do
@@ -14,5 +14,4 @@ class SearchIndexRemoveTest < ActiveSupport::TestCase
       Entry.__elasticsearch__.refresh_index!
     end
   end
-
 end

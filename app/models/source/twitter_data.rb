@@ -1,5 +1,4 @@
 class Source::TwitterData < Source
-
   def call
     recognized_url = Feedkit::TwitterURLRecognizer.new(@url, @config[:twitter_screen_name])
     if recognized_url.valid?
@@ -11,5 +10,4 @@ class Source::TwitterData < Source
       [feed]
     end
   end
-
 end

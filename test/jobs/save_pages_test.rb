@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class SavePagesTest < ActiveSupport::TestCase
-
   setup do
     user = users(:ben)
     @entry = create_tweet_entry(user.feeds.first)
@@ -10,7 +9,7 @@ class SavePagesTest < ActiveSupport::TestCase
   test "should build" do
     article_url = "https://9to5mac.com/2018/01/12/final-cut-pro-x-how-to-improve-slow-motion-in-your-projects-video/"
     url = "https://mercury.postlight.com/parser?url=#{article_url}"
-    stub_request_file('parsed_page.json', url, headers: {"Content-Type" => "application/json; charset=utf-8"})
+    stub_request_file("parsed_page.json", url, headers: {"Content-Type" => "application/json; charset=utf-8"})
 
     SavePages.new().perform(@entry.id)
 
@@ -21,7 +20,5 @@ class SavePagesTest < ActiveSupport::TestCase
     %w{title author url date_published content domain}.each do |key|
       assert page.has_key?(key), "page is missing #{key}"
     end
-
   end
-
 end

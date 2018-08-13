@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class SubscriptionTest < ActiveSupport::TestCase
-
   test "should enqueue FaviconFetcher" do
     Sidekiq::Worker.clear_all
     user = users(:ben)
@@ -23,8 +22,8 @@ class SubscriptionTest < ActiveSupport::TestCase
         "title" => "title",
         "tags" => "Design",
         "subscribe" => "1",
-        "media_only" => "1"
-      }
+        "media_only" => "1",
+      },
     }
 
     Subscription.create_multiple(feeds, user, [feed.id])
@@ -41,15 +40,12 @@ class SubscriptionTest < ActiveSupport::TestCase
         "title" => "title",
         "tags" => "Design",
         "subscribe" => "1",
-        "media_only" => "0"
-      }
+        "media_only" => "0",
+      },
     }
 
     Subscription.create_multiple(feeds, user, [feed.id])
     subscription = user.subscriptions.where(feed: feed).take!
     assert_not(subscription.media_only, "Subscription should be not media only")
   end
-
-
-
 end

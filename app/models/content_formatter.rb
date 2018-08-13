@@ -1,8 +1,7 @@
-require 'kramdown'
-require 'rails_autolink'
+require "kramdown"
+require "rails_autolink"
 
 class ContentFormatter
-
   LEADING_CHARS = %w|
     (
     [
@@ -31,13 +30,13 @@ class ContentFormatter
 
   def self.format!(content, entry = nil, image_proxy_enabled = true)
     context = {
-      whitelist: Feedbin::Application.config.whitelist
+      whitelist: Feedbin::Application.config.whitelist,
     }
     filters = [HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer]
 
-    if ENV['CAMO_HOST'] && ENV['CAMO_KEY'] && image_proxy_enabled
-      context[:asset_proxy] = ENV['CAMO_HOST']
-      context[:asset_proxy_secret_key] = ENV['CAMO_KEY']
+    if ENV["CAMO_HOST"] && ENV["CAMO_KEY"] && image_proxy_enabled
+      context[:asset_proxy] = ENV["CAMO_HOST"]
+      context[:asset_proxy_secret_key] = ENV["CAMO_KEY"]
       context[:asset_src_attribute] = "data-camo-src"
       filters = filters << HTML::Pipeline::CamoFilter
     end
@@ -66,7 +65,7 @@ class ContentFormatter
       image_base_url: entry.feed.site_url,
       image_subpage_url: entry.url || "",
       href_base_url: entry.feed.site_url,
-      href_subpage_url: entry.url || ""
+      href_subpage_url: entry.url || "",
     }
     pipeline = HTML::Pipeline.new filters, context
     result = pipeline.call(content)
@@ -81,7 +80,7 @@ class ContentFormatter
       image_base_url: entry.feed.site_url,
       image_subpage_url: entry.url || "",
       href_base_url: entry.feed.site_url,
-      href_subpage_url: entry.url || ""
+      href_subpage_url: entry.url || "",
     }
     if entry.feed.newsletter?
       filters.push(HTML::Pipeline::SanitizationFilter)
@@ -102,7 +101,7 @@ class ContentFormatter
       href_base_url: entry.feed.site_url,
       href_subpage_url: entry.url || "",
       placeholder_url: "",
-      placeholder_attribute: "data-feedbin-src"
+      placeholder_attribute: "data-feedbin-src",
     }
     pipeline = HTML::Pipeline.new filters, context
     result = pipeline.call(content)
@@ -118,7 +117,7 @@ class ContentFormatter
       image_base_url: entry.feed.site_url,
       image_subpage_url: entry.url || "",
       href_base_url: entry.feed.site_url,
-      href_subpage_url: entry.url || ""
+      href_subpage_url: entry.url || "",
     }
 
     pipeline = HTML::Pipeline.new filters, context
@@ -134,11 +133,11 @@ class ContentFormatter
     text = text.chars.select(&:valid_encoding?).join
 
     sanitize_config = Sanitize::Config::BASIC.dup
-    sanitize_config = sanitize_config.merge(remove_contents: ['script', 'style', 'iframe', 'object', 'embed', 'figure'])
+    sanitize_config = sanitize_config.merge(remove_contents: ["script", "style", "iframe", "object", "embed", "figure"])
     text = Sanitize.fragment(text, sanitize_config)
 
     text = Nokogiri::HTML(text)
-    text = text.search('//text()').map(&:text).join(" ").squish
+    text = text.search("//text()").map(&:text).join(" ").squish
 
     TRAILING_CHARS.each do |char|
       text = text.gsub(" #{char}", "#{char}")
@@ -163,5 +162,4 @@ class ContentFormatter
   rescue
     content
   end
-
 end

@@ -1,5 +1,4 @@
 class SavedSearchesController < ApplicationController
-
   def show
     @user = current_user
     @saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
@@ -19,13 +18,13 @@ class SavedSearchesController < ApplicationController
 
     @append = params[:page].present?
 
-    @type = 'saved_search'
+    @type = "saved_search"
     @data = nil
 
     @collection_title = @saved_search.name
 
     respond_to do |format|
-      format.js { render partial: 'shared/entries' }
+      format.js { render partial: "shared/entries" }
     end
   end
 
@@ -59,5 +58,4 @@ class SavedSearchesController < ApplicationController
   def saved_search_params
     params.require(:saved_search).permit(:query, :name)
   end
-
 end

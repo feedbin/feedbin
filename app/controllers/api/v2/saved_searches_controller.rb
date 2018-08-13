@@ -1,7 +1,6 @@
 module Api
   module V2
     class SavedSearchesController < ApiController
-
       respond_to :json
 
       before_action :validate_content_type, only: [:create]
@@ -28,10 +27,10 @@ module Api
             render json: []
             return
           else
-            links_header(@entries, 'api_v2_saved_search_url', saved_search.id)
+            links_header(@entries, "api_v2_saved_search_url", saved_search.id)
           end
           if params[:include_entries] != "true"
-            render json: @entries.results.map {|entry| entry.id.to_i}.to_json
+            render json: @entries.results.map { |entry| entry.id.to_i }.to_json
           end
         else
           status_forbidden
@@ -75,13 +74,12 @@ module Api
       end
 
       def validate_create
-        needs_nested params[:saved_search], 'query', 'name'
+        needs_nested params[:saved_search], "query", "name"
       end
 
       def out_of_bounds?
         @entries.out_of_bounds? || (params[:page] && params[:page].to_i > 5)
       end
-
     end
   end
 end

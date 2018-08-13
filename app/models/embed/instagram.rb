@@ -1,5 +1,4 @@
 class Embed::Instagram
-
   attr_reader :url
 
   def initialize(url)
@@ -32,39 +31,38 @@ class Embed::Instagram
 
   private
 
-    OEMBED_URL = "https://api.instagram.com/oembed"
-    PROFILE_URL = "https://i.instagram.com/api/v1/users/%d/info/"
+  OEMBED_URL = "https://api.instagram.com/oembed"
+  PROFILE_URL = "https://i.instagram.com/api/v1/users/%d/info/"
 
-    def shortcode
-      @shortcode ||= URI.parse(@url).path.split("/").last
+  def shortcode
+    @shortcode ||= URI.parse(@url).path.split("/").last
+  end
+
+  def author_id
+    data.dig("author_id")
+  end
+
+  def data
+    @data ||= begin
+      options = {
+        params: {
+          url: url,
+          omitscript: true,
+        },
+      }
+      JSON.parse(URLCache.new(OEMBED_URL, options).body)
     end
+  end
 
-    def author_id
-      data.dig("author_id")
+  def author_data
+    @author_data ||= begin
+      options = {
+        params: {
+          url: url,
+          omitscript: true,
+        },
+      }
+      JSON.parse(URLCache.new((PROFILE_URL % author_id), options).body)
     end
-
-    def data
-      @data ||= begin
-        options = {
-          params: {
-            url: url,
-            omitscript: true
-          }
-        }
-        JSON.parse(URLCache.new(OEMBED_URL, options).body)
-      end
-    end
-
-    def author_data
-      @author_data ||= begin
-        options = {
-          params: {
-            url: url,
-            omitscript: true
-          }
-        }
-        JSON.parse(URLCache.new((PROFILE_URL % author_id), options).body)
-      end
-    end
-
+  end
 end

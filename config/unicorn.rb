@@ -1,13 +1,13 @@
-require 'dotenv'
+require "dotenv"
 
 worker_processes Etc.nprocessors
 timeout 30
 preload_app true
-user 'app', 'app'
+user "app", "app"
 
 listen "/tmp/unicorn.sock"
 
-app_dir  = "/srv/apps/feedbin"
+app_dir = "/srv/apps/feedbin"
 working_directory "#{app_dir}/current"
 stderr_path "#{app_dir}/shared/log/unicorn.log"
 stdout_path "#{app_dir}/shared/log/unicorn.log"
@@ -30,11 +30,11 @@ after_fork do |server, worker|
 end
 
 before_exec do |server|
-  if ENV['ENV_PATH']
+  if ENV["ENV_PATH"]
     begin
-      ENV.update Dotenv::Environment.new(ENV['ENV_PATH'], true)
+      ENV.update Dotenv::Environment.new(ENV["ENV_PATH"], true)
     rescue ArgumentError
-      ENV.update Dotenv::Environment.new(ENV['ENV_PATH'])
+      ENV.update Dotenv::Environment.new(ENV["ENV_PATH"])
     end
   end
 end

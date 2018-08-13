@@ -1,5 +1,4 @@
 class MercuryParser
-
   BASE_URL = "https://mercury.postlight.com/parser"
 
   attr_reader :url
@@ -14,37 +13,37 @@ class MercuryParser
   end
 
   def title
-    result['title']
+    result["title"]
   end
 
   def content
-    result['content']
+    result["content"]
   end
 
   def author
-    result['author']
+    result["author"]
   end
 
   def published
-    if result['date_published']
-      Time.parse(result['date_published'])
+    if result["date_published"]
+      Time.parse(result["date_published"])
     end
   rescue
     nil
   end
 
   def date_published
-    result['date_published'] if result['date_published']
+    result["date_published"] if result["date_published"]
   end
 
   def domain
-    result['domain']
+    result["domain"]
   end
 
   def to_h
     {
       result: result,
-      url: url
+      url: url,
     }
   end
 
@@ -52,10 +51,10 @@ class MercuryParser
 
   def result
     @result ||= begin
-      query = { url: url }
+      query = {url: url}
       uri = URI.parse(BASE_URL)
       uri.query = query.to_query
-      response = HTTP.timeout(:global, write: 3, connect: 3, read: 3).headers("x-api-key" => ENV['MERCURY_API_KEY']).get(uri)
+      response = HTTP.timeout(:global, write: 3, connect: 3, read: 3).headers("x-api-key" => ENV["MERCURY_API_KEY"]).get(uri)
       response.parse
     end
   end
@@ -73,5 +72,4 @@ class MercuryParser
     @result = data["result"]
     @url = data["url"]
   end
-
 end

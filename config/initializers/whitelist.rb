@@ -1,5 +1,4 @@
 class Whitelist
-
   def base
     Hash.new.tap do |hash|
       hash[:elements] = %w[
@@ -9,18 +8,18 @@ class Whitelist
       ]
 
       hash[:attributes] = {
-        "a"          => ["href"],
-        "img"        => ["src", "longdesc"],
-        "div"        => ["itemscope", "itemtype"],
+        "a" => ["href"],
+        "img" => ["src", "longdesc"],
+        "div" => ["itemscope", "itemtype"],
         "blockquote" => ["cite"],
-        "del"        => ["cite"],
-        "ins"        => ["cite"],
-        "q"          => ["cite"],
-        "source"     => ["src"],
-        "video"      => ["src", "poster"],
-        "audio"      => ["src"],
-        "td"         => ["align"],
-        "th"         => ["align"],
+        "del" => ["cite"],
+        "ins" => ["cite"],
+        "q" => ["cite"],
+        "source" => ["src"],
+        "video" => ["src", "poster"],
+        "audio" => ["src"],
+        "td" => ["align"],
+        "th" => ["align"],
         all: %w[
           abbr accept accept-charset accesskey action alt axis border cellpadding
           cellspacing char charoff charset checked clear cols colspan color compact
@@ -34,35 +33,34 @@ class Whitelist
 
       hash[:protocols] = {
         "a" => {
-          "href" => ["http", "https", "mailto", :relative]
+          "href" => ["http", "https", "mailto", :relative],
         },
-        "blockquote"=>{
-          "cite" => ["http", "https", :relative]
+        "blockquote" => {
+          "cite" => ["http", "https", :relative],
         },
-        "del"=>{
-          "cite" => ["http", "https", :relative]
+        "del" => {
+          "cite" => ["http", "https", :relative],
         },
-        "ins"=>{
-          "cite" => ["http", "https", :relative]
+        "ins" => {
+          "cite" => ["http", "https", :relative],
         },
-        "q"=>{
-          "cite" => ["http", "https", :relative]
+        "q" => {
+          "cite" => ["http", "https", :relative],
         },
         "img" => {
           "src" => ["http", "https", :relative, "data"],
-          "longdesc" => ["http", "https", :relative]
+          "longdesc" => ["http", "https", :relative],
         },
         "video" => {
           "src" => ["http", "https"],
-          "poster" => ["http", "https"]
+          "poster" => ["http", "https"],
         },
         "audio" => {
-          "src" => ["http", "https"]
-        }
+          "src" => ["http", "https"],
+        },
       }
 
       hash[:remove_contents] = %w[script style iframe object embed]
-
     end
   end
 
@@ -78,7 +76,6 @@ class Whitelist
       hash[:elements] = hash[:elements] - %w[table thead tbody tfoot tr td]
     end
   end
-
 end
 
 whitelist = Whitelist.new
@@ -86,25 +83,23 @@ Feedbin::Application.config.base = whitelist.base
 Feedbin::Application.config.whitelist = whitelist.default
 Feedbin::Application.config.newsletter_whitelist = whitelist.newsletter
 
-
 Feedbin::Application.config.evernote_whitelist = {
   :elements => %w(
     a abbr acronym address area b bdo big blockquote br caption center cite code col colgroup dd
     del dfn div dl dt em font h1 h2 h3 h4 h5 h6 hr i img ins kbd li map ol p pre q s samp small
     span strike strong sub sup table tbody td tfoot th thead title tr tt u ul var xmp
   ),
-  :remove_contents => ['script', 'style', 'iframe', 'object', 'embed'],
+  :remove_contents => ["script", "style", "iframe", "object", "embed"],
   :attributes => {
-    'a' => ['href'],
-    'img' => ['src'],
-    :all => ['align', 'alt', 'border', 'cellpadding', 'cellspacing', 'cite', 'cols', 'colspan', 'color',
-      'coords', 'datetime', 'dir', 'disabled', 'enctype', 'for', 'height', 'hreflang', 'label', 'lang',
-      'longdesc', 'name', 'rel', 'rev', 'rows', 'rowspan', 'selected', 'shape', 'size', 'span', 'start',
-      'summary', 'target', 'title', 'type','valign', 'value', 'vspace', 'width']
+    "a" => ["href"],
+    "img" => ["src"],
+    :all => ["align", "alt", "border", "cellpadding", "cellspacing", "cite", "cols", "colspan", "color",
+             "coords", "datetime", "dir", "disabled", "enctype", "for", "height", "hreflang", "label", "lang",
+             "longdesc", "name", "rel", "rev", "rows", "rowspan", "selected", "shape", "size", "span", "start",
+             "summary", "target", "title", "type", "valign", "value", "vspace", "width"],
   },
   :protocols => {
-    'a'   => {'href' => ['http', 'https', :relative]},
-    'img' => {'src'  => ['http', 'https', :relative]}
-  }
+    "a" => {"href" => ["http", "https", :relative]},
+    "img" => {"src" => ["http", "https", :relative]},
+  },
 }
-

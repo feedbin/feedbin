@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::SuggestedCategoriesControllerTest < ApiControllerTestCase
-
   setup do
     @user = users(:ben)
     @category = SuggestedCategory.create!(id: 1, name: "Popular")
@@ -21,5 +20,4 @@ class Api::V2::SuggestedCategoriesControllerTest < ApiControllerTestCase
   def keys
     %w[icon_url id name]
   end
-
 end

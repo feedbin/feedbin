@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::UsersControllerTest < ApiControllerTestCase
-
   test "should get index" do
     api_content_type
     StripeMock.start
@@ -9,7 +8,7 @@ class Api::V2::UsersControllerTest < ApiControllerTestCase
     create_stripe_plan(plan)
 
     assert_difference "User.count", +1 do
-      post :create, params: {user: {email: 'example@example.com', password: default_password}}, format: :json
+      post :create, params: {user: {email: "example@example.com", password: default_password}}, format: :json
       assert_response :success
     end
     StripeMock.stop
@@ -27,5 +26,4 @@ class Api::V2::UsersControllerTest < ApiControllerTestCase
   def keys
     %w[expires_at plan]
   end
-
 end

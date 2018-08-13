@@ -1,5 +1,5 @@
-require 'test_helper'
-require 'minitest/stub_any_instance'
+require "test_helper"
+require "minitest/stub_any_instance"
 
 class TweetsControllerTest < ActionController::TestCase
   setup do
@@ -38,5 +38,4 @@ class TweetsControllerTest < ActionController::TestCase
       {search_metadata: {max_id: 1}}
     end
   end
-
 end
