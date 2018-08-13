@@ -10,10 +10,14 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     click_button 'Login'
   end
 
-  def show_article
+  def show_article_setup
     @user = users(:ben)
     @feed = create_feeds(@user, 1).first
     @entries = @user.entries
+  end
+
+  def show_article
+    show_article_setup
 
     login_as(@user)
 

@@ -38,4 +38,23 @@ class ArticleTest < ApplicationSystemTestCase
       find("[data-behavior~=toggle_read]:not(.read)")
     end
   end
+
+  test "media embed" do
+    show_article_setup
+
+    stub_request_file("oembed.json", /www\.youtube\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
+
+    @entries.first.update(content: %(Iframe <iframe src="http://www.youtube.com/embed/1234"></iframe>))
+    @user.update(nice_frames: 1)
+
+    login_as(@user)
+
+    click_link(@entries.first.title)
+
+    sleep 1
+    wait_for_ajax
+
+    assert_selector ".embed-title", text: "Samsung Galaxy Note 9 Impressions: Underrated!"
+  end
+
 end

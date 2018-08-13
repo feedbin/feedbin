@@ -41,7 +41,8 @@ class User < ApplicationRecord
                  :twitter_access_secret,
                  :twitter_access_token,
                  :twitter_screen_name,
-                 :twitter_access_error
+                 :twitter_access_error,
+                 :nice_frames
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
