@@ -3766,7 +3766,8 @@ $saved-search-control-height: 48px;
 }
 
 .content-styles {
-    .system-content {
+    .system-content,
+    .system-content h1 {
         font-family: $font-stack;
         font-weight: normal;
         a {

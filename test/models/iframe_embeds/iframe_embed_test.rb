@@ -22,12 +22,12 @@ class IframeEmbedTest < ActiveSupport::TestCase
     stub_request_file("oembed.json", /.*/, headers: {"Content-Type" => "application/json; charset=utf-8"})
 
     embed_sources = {
-      IframeEmbed::Youtube     => "https://www.youtube-nocookie.com/embed/VfKcLAwFJTo",
-      IframeEmbed::Vimeo       => "https://player.vimeo.com/video/283748810",
-      IframeEmbed::Ted         => "https://embed.ted.com/talks/jill_bolte_taylor_s_powerful_stroke_of_insight",
-      IframeEmbed::Kickstarter => "https://www.kickstarter.com/projects/1115015686/help-support-the-kiggins-theatre-to-go-digital/widget/video.html",
-      IframeEmbed::Soundcloud  => "https://w.soundcloud.com/player/?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F293&show_artwork=true",
-      IframeEmbed::Spotify     => "https://open.spotify.com/embed/artist/7ae4vgLLhir2MCjyhgbGOQ",
+      IframeEmbed::Youtube     => "https://www.youtube-nocookie.com/embed/fKcLAwFJTo",
+      IframeEmbed::Vimeo       => "https://player.vimeo.com/video/83748810",
+      IframeEmbed::Ted         => "https://embed.ted.com/talks/jil_bolte_taylor_s_powerful_stroke_of_insight",
+      IframeEmbed::Kickstarter => "https://www.kickstarter.com/projects/111515686/help-support-the-kiggins-theatre-to-go-digital/widget/video.html",
+      IframeEmbed::Soundcloud  => "https://w.soundcloud.com/player/?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F29&show_artwork=true",
+      IframeEmbed::Spotify     => "https://open.spotify.com/embed/artist/7ae4vgLLhr2MCjyhgbGOQ",
     }
 
     embed_sources.each do |klass, url|

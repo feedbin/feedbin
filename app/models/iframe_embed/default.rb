@@ -1,11 +1,19 @@
 class IframeEmbed::Default < IframeEmbed
 
   def fetch
-
+    @page ||= begin
+      URLCache.new(canonical_url)
+    end
   end
 
   def title
-    "Embed"
+    doc = Nokogiri::HTML5(@page.body)
+    title = doc.css("title")
+    if title.present?
+      title.first.text
+    else
+      "Embed"
+    end
   end
 
   def subtitle
