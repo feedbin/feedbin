@@ -6,6 +6,7 @@ class IframeEmbed
 
   def initialize(embed_url)
     @embed_url = URI(embed_url)
+    Librato.increment('iframe_embed.source', source: @embed_url.host)
   end
 
   def title
