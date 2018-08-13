@@ -1,4 +1,4 @@
-class IframeEmbed::Vimeo < IframeEmbed
+class Embed::Vimeo < IframeEmbed
 
   def self.supported_urls
     [

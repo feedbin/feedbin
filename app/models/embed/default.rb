@@ -1,4 +1,4 @@
-class IframeEmbed::Default < IframeEmbed
+class Embed::Default < IframeEmbed
 
   def fetch
     @page ||= begin

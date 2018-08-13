@@ -1,4 +1,4 @@
-class IframeEmbed::Youtube < IframeEmbed
+class Embed::Youtube < IframeEmbed
 
   def self.supported_urls
     [

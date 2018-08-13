@@ -1,4 +1,4 @@
-class IframeEmbed::Ted < IframeEmbed
+class Embed::Ted < IframeEmbed
 
   def self.supported_urls
     [

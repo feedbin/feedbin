@@ -1,4 +1,4 @@
-class IframeEmbed::Kickstarter < IframeEmbed
+class Embed::Kickstarter < IframeEmbed
 
   def self.supported_urls
     [

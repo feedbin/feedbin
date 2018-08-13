@@ -1,4 +1,4 @@
-class IframeEmbed::Spotify < IframeEmbed
+class Embed::Spotify < IframeEmbed
 
   def self.supported_urls
     [
