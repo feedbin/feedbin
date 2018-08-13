@@ -44,6 +44,10 @@ class IframeEmbed
     {}
   end
 
+  def cache_key
+    Digest::SHA1.hexdigest(embed_url.to_s)
+  end
+
   def fetch
     if oembed_url
       @data ||= begin
