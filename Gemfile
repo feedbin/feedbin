@@ -19,6 +19,7 @@ group :development do
   gem 'benchmark-ips'
   gem 'xipio'
   gem 'listen'
+  gem 'rufo'
 end
 
 group :development, :test do
