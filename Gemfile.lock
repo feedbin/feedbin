@@ -241,6 +241,7 @@ GEM
     hashie (3.5.7)
     hetchy (1.0.0)
     honeybadger (3.3.0)
+    htmlbeautifier (1.3.1)
     htmlentities (4.3.4)
     http-2 (0.9.0)
     http (3.3.0)
@@ -535,6 +536,7 @@ DEPENDENCIES
   honeybadger
   html-pipeline!
   html_diff!
+  htmlbeautifier
   htmlentities
   http
   httparty

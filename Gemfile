@@ -20,6 +20,7 @@ group :development do
   gem "xipio"
   gem "listen"
   gem "rufo"
+  gem "htmlbeautifier"
 end
 
 group :development, :test do
