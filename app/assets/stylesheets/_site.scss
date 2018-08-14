@@ -610,8 +610,8 @@ table {
     }
     .icon-share-evernote {
         background-image: image-url("icon-share-evernote.svg");
-        background-size: 20px 25px;
-        @include share-icon(1, 3);
+        background-size: 22px 25px;
+        @include share-icon(1, 2);
     }
     .icon-share-tumblr {
         background-image: image-url("icon-share-tumblr.svg");
