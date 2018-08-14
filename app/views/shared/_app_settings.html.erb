@@ -22,7 +22,7 @@
             </ul>
             <ul class="segmented no-margin">
                 <% if current_user.try(:admin?) %>
-                  <li><%= link_to 'Customers', admin_users_path, class: "no-border" %></li>
+                    <li><%= link_to 'Customers', admin_users_path, class: "no-border" %></li>
                 <% end %>
                 <li><%= link_to 'Log Out', logout_path, method: 'delete' %></li>
             </ul>

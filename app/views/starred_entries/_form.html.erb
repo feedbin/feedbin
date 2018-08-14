@@ -1,6 +1,6 @@
 <%= form_tag starred_entries_entry_path(entry.id), remote: true, data: {behavior: 'toggle_starred', entry_id: entry.id}, class: 'entry-button-wrap' do %>
-  <button class="entry-button button-toggle-starred" title="Star/remove star">
-      <%= svg_tag 'icon-star-on', size: '17x17' %>
-      <%= svg_tag 'icon-star-off', size: '17x17' %>
-  </button>
+    <button class="entry-button button-toggle-starred" title="Star/remove star">
+        <%= svg_tag 'icon-star-on', size: '17x17' %>
+        <%= svg_tag 'icon-star-off', size: '17x17' %>
+    </button>
 <% end %>

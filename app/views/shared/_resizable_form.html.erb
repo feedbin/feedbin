@@ -1,5 +1,5 @@
 <%= form_for @user, url: view_settings_update_user_path(@user), remote: 'true', html: { class: 'hide', data: {behavior: 'resizable_form'} } do |f| %>
-  <%= hidden_field_tag 'column_widths', 'column_widths' %>
-  <%= hidden_field_tag 'column', '' %>
-  <%= hidden_field_tag 'width', '' %>
+    <%= hidden_field_tag 'column_widths', 'column_widths' %>
+    <%= hidden_field_tag 'column', '' %>
+    <%= hidden_field_tag 'width', '' %>
 <% end %>

@@ -18,16 +18,15 @@
                         </span>
                     </h1>
                     <p class="post-meta">
-                      <%= link_to tweet.permalink, target: "_blank", title: "View on Twitter" do %>
-                          <time datetime="<%= tweet.date.iso8601 %>">
-                              <%= tweet.date.to_s(:full_human) %>
-                          </time>
-                      <% end %>
+                        <%= link_to tweet.permalink, target: "_blank", title: "View on Twitter" do %>
+                            <time datetime="<%= tweet.date.iso8601 %>">
+                                <%= tweet.date.to_s(:full_human) %>
+                            </time>
+                        <% end %>
                     </p>
                 </div>
             </div>
         </header>
-
         <div class="tweet-body">
             <%= tweet.content.html_safe %>
             <% if tweet.image_url %>

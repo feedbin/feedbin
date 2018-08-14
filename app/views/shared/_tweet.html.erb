@@ -15,7 +15,6 @@
                         <%= link_to thread_tweet_path(entry), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {behavior: "open_modal", modal_class: "modal-conversation"} do %>
                             <%= svg_tag "icon-twitter-conversation" %>
                         <% end %>
-
                         <%= link_to tweet.uri.to_s, target: "_blank", title: "View on Twitter", class: "twitter-link", id: "source_link" do %>
                             <%= svg_tag "icon-twitter" %>
                         <% end %>
@@ -36,18 +35,15 @@
             </div>
         </div>
     </header>
-
     <div class="tweet-body">
         <div class="tweet-body-inner">
             <%= entry_presenter.tweet_in_reply_to(tweet) %>
             <%= entry_presenter.tweet_text(tweet) %>
-
             <% if local_assigns[:tweet_counter] && tweet_counter == 0 %>
                 <% if tweet.quoted_status? %>
                     <%= render partial: "shared/tweet", locals: {entry: entry, tweet: tweet.quoted_status, css: "quoted-tweet"} %>
                 <% end %>
             <% end %>
-
             <% if local_assigns[:include_media] && include_media %>
                 <% tweet.media.take(1).each do |media| %>
                     <% if entry_presenter.tweet_video?(media) %>
@@ -61,7 +57,6 @@
             <% end %>
         </div>
     </div>
-
 </div>
 <% end %>
 

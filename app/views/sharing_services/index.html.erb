@@ -2,41 +2,33 @@
     <div class="settings-outer">
         <h2>Share & Save</h2>
     </div>
-
     <div class="inset">
-
         <% if @active_sharing_services.any? %>
             <div class="inset-content">
                 <h4 class="group-header">Active Services</h4>
             </div>
-
             <ul class="sharing-services">
                 <% @active_sharing_services.each do |sharing_service| %>
-                <%= render sharing_service %>
+                    <%= render sharing_service %>
                 <% end %>
             </ul>
         <% end %>
-
         <% unless @active_sharing_services.count == @available_sharing_services.count %>
-
-        <div class="inset-content">
-            <h4 class="group-header">Available Services</h4>
-        </div>
-        <ul class="sharing-services">
-            <% @available_sharing_services.each do |sharing_service| %>
-                <% unless @active_service_ids.include?(sharing_service[:service_id]) %>
-                    <li class="share-icon-wrap <%= "icon-share-#{sharing_service[:service_id]}" %>">
-                        <%= render partial: "supported_sharing_services/service_#{sharing_service[:service_id]}", locals: {sharing_service: sharing_service, record: SupportedSharingService.new, status: :inactive} %>
-                    </li>
+            <div class="inset-content">
+                <h4 class="group-header">Available Services</h4>
+            </div>
+            <ul class="sharing-services">
+                <% @available_sharing_services.each do |sharing_service| %>
+                    <% unless @active_service_ids.include?(sharing_service[:service_id]) %>
+                        <li class="share-icon-wrap <%= "icon-share-#{sharing_service[:service_id]}" %>">
+                            <%= render partial: "supported_sharing_services/service_#{sharing_service[:service_id]}", locals: {sharing_service: sharing_service, record: SupportedSharingService.new, status: :inactive} %>
+                        </li>
+                    <% end %>
                 <% end %>
-            <% end %>
-        </ul>
+            </ul>
         <% end %>
-
     </div>
-
     <div class="inset">
         <%= render 'sharing_services/form' %>
     </div>
-
 </div>

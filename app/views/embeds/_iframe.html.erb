@@ -1,5 +1,4 @@
 <div class="iframe-embed system-content embed-type-<%= embed.type %>">
-
     <% if embed.image_url.present? %>
         <div class="image-wrap">
             <div class="inner" data-behavior="iframe_placeholder" data-iframe-src="<%= @embed.iframe_src %>">
@@ -7,7 +6,6 @@
             </div>
         </div>
     <% end %>
-
     <div class="embed-profile entry-callout">
         <a class="embed-icon" href="<%= embed.canonical_url %>">
             <%= svg_tag "icon-embed-source-#{embed.clean_name}" %>
@@ -22,5 +20,4 @@
             <% end %>
         </div>
     </div>
-
 </div>

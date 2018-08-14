@@ -5,7 +5,6 @@
         <% else %>
             $('#add_form_modal [data-behavior~=feeds_search_favicon_target]').html('<%= j favicon_with_host(@feeds.first.host) %>');
         <% end %>
-
         $('#add_form_modal [data-behavior~=subscribe_target]').html('<%= j render partial: "subscriptions/new", locals: {feeds: @feeds} %>');
         $('#add_form_modal .feed-search-results').slideDown(200)
         $('#add_form_modal .modal-dialog').addClass('done');
@@ -13,7 +12,7 @@
         $('#add_form_modal .title').first().find("input").focus();
         window.history.replaceState({}, document.title, "/");
         feedbin.updateFeedSearchMessage();
-  <% end %>
+    <% end %>
 <% else %>
     feedbin.showNotification('No feed found.', 3000, '', true);
 <% end %>

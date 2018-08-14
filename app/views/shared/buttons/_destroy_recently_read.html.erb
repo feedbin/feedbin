@@ -1,8 +1,8 @@
 <%= form_tag destroy_all_recently_read_entries_path(), remote: true, method: "delete", data: {behavior: "unsubscribe"} do %>
-<button title="Delete recently read items" class="toolbar-button" type="submit" data-confirm="Are you want to delete your recently read items?">
-    <div class="toolbar-button-inner">
-        <%= render partial: "shared/svg/trash" %>
-    </div>
-    Delete
-</button>
+    <button title="Delete recently read items" class="toolbar-button" type="submit" data-confirm="Are you want to delete your recently read items?">
+        <div class="toolbar-button-inner">
+            <%= render partial: "shared/svg/trash" %>
+        </div>
+        Delete
+    </button>
 <% end %>

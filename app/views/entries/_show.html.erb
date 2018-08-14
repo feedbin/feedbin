@@ -1,37 +1,35 @@
 <% present entry do |entry_presenter| %>
     <%= content_tag :div, class: "read", data: {behavior: 'selected_entry_data', entry_id: entry.id} do %>
-      <%= text_area_tag "source_link_field", entry.fully_qualified_url, class: "visually-hidden" %>
-      <div class="entry-toolbar">
-        <div class="site-info">
-          <button class="back-button" data-behavior="show_entries">
-              <%= svg_tag "icon-arrow", size: "11x18" %>
-          </button>
-          <button class="entry-button button-full-screen" data-behavior="full_screen" title="Close full screen">
-              <%= svg_tag 'icon-full-screen-close-small', size: '16x16' %>
-          </button>
-
-          <%
-              if subscriptions.include?(entry.feed.id)
-                link_args = [modal_edit_feed_path(entry.feed), remote: true, class: 'feed-button', data: {behavior: 'open_modal', modal_class: 'modal-feed-edit'}]
-              else
-                link_args = ["#", remote: true, class: 'feed-button', data: {behavior: 'show_message', message: "Cannot edit. You are no longer subscribed to this feed."}]
-              end
-          %>
-          <%= link_to *link_args do %>
-            <%= entry_presenter.favicon(entry.feed) %>
-            <span class="entry-feed-title" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span>
-          <% end %>
-
+        <%= text_area_tag "source_link_field", entry.fully_qualified_url, class: "visually-hidden" %>
+        <div class="entry-toolbar">
+            <div class="site-info">
+                <button class="back-button" data-behavior="show_entries">
+                    <%= svg_tag "icon-arrow", size: "11x18" %>
+                </button>
+                <button class="entry-button button-full-screen" data-behavior="full_screen" title="Close full screen">
+                    <%= svg_tag 'icon-full-screen-close-small', size: '16x16' %>
+                </button>
+                <%
+                if subscriptions.include?(entry.feed.id)
+                  link_args = [modal_edit_feed_path(entry.feed), remote: true, class: 'feed-button', data: {behavior: 'open_modal', modal_class: 'modal-feed-edit'}]
+                else
+                  link_args = ["#", remote: true, class: 'feed-button', data: {behavior: 'show_message', message: "Cannot edit. You are no longer subscribed to this feed."}]
+                end
+                %>
+                <%= link_to *link_args do %>
+                    <%= entry_presenter.favicon(entry.feed) %>
+                    <span class="entry-feed-title" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span>
+                <% end %>
+            </div>
+            <div class="entry-buttons">
+                <%= render partial: 'shared/app_settings' %>
+                <%= render partial: "shared/entry_settings_button" %>
+                <%= render partial: "unread_entries/form", locals: {entry: entry} %>
+                <%= render partial: "starred_entries/form", locals: {entry: entry} %>
+                <%= render partial: "entries/toggle_content", locals: {content_view: content_view, entry: entry} %>
+                <%= render partial: "sharing_services/sharing_service_button", locals: {services: services} %>
+            </div>
         </div>
-        <div class="entry-buttons">
-          <%= render partial: 'shared/app_settings' %>
-          <%= render partial: "shared/entry_settings_button" %>
-          <%= render partial: "unread_entries/form", locals: {entry: entry} %>
-          <%= render partial: "starred_entries/form", locals: {entry: entry} %>
-          <%= render partial: "entries/toggle_content", locals: {content_view: content_view, entry: entry} %>
-          <%= render partial: "sharing_services/sharing_service_button", locals: {services: services} %>
-        </div>
-      </div>
     <% end %>
     <div class="hide" data-behavior="feed_link_template">
         <%= render partial: "shared/link_actions", locals: {entry: entry} %>

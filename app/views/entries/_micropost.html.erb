@@ -1,5 +1,4 @@
 <div class="tweet-wrap micropost" data-behavior="external_links">
-
     <div class="tweet entry-main-tweet">
         <header class="tweet-header">
             <div class="profile-wrap">
@@ -19,11 +18,11 @@
                         </span>
                     </h1>
                     <p class="post-meta">
-                      <%= link_to micropost.fully_qualified_url, target: "_blank", title: "View post" do %>
-                          <time datetime="<%= micropost.published.iso8601 %>">
-                              <%= micropost.published.to_s(:full_human) %>
-                          </time>
-                      <% end %>
+                        <%= link_to micropost.fully_qualified_url, target: "_blank", title: "View post" do %>
+                            <time datetime="<%= micropost.published.iso8601 %>">
+                                <%= micropost.published.to_s(:full_human) %>
+                            </time>
+                        <% end %>
                     </p>
                 </div>
             </div>
@@ -41,5 +40,4 @@
             </div>
         </div>
     </div>
-
 </div>

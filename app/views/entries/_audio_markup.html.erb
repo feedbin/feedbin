@@ -12,7 +12,6 @@
     <%= form_tag settings_audio_panel_size_path, remote: true, class: "hide", data: {behavior: "audio_panel_size"} do |f| %>
         <%= hidden_field_tag :audio_panel_size, nil %>
     <% end %>
-
     <div class="audio-container">
         <div class="audio-image">
             <div class="image-container">
@@ -38,7 +37,9 @@
                     </button>
                 </div>
             </div>
-            <div class="audio-title-wrap"><div class="audio-title" title="<%= entry_presenter.entry_view_title %>"><%= entry_presenter.entry_view_title %></div></div>
+            <div class="audio-title-wrap">
+                <div class="audio-title" title="<%= entry_presenter.entry_view_title %>"><%= entry_presenter.entry_view_title %></div>
+            </div>
             <div class="audio-duration" data-behavior="audio_duration_<%= entry.id %>">
                 <%= entry_presenter.audio_duration %>
             </div>

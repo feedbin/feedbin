@@ -1,115 +1,107 @@
 <%= form_for @user, remote: true, url: settings_update_user_path(@user) do |f| %>
-<div class="settings-content-inner">
-    <div class="settings-outer">
-        <h2>Appearance</h2>
-    </div>
-
-    <div class="inset">
-
-        <div class="preview-group">
-            <div class="inset-content">
-                <h4 class="group-header">Preview</h4>
-            </div>
-            <ul class="control-group">
-                <li class="theme-background <%= @classes %>" data-behavior="entries_max_width class_target">
-
-                    <div data-behavior="preview_min_height">
-                        <div class="entries-wrap hide-search">
-                            <div class="entries">
-                                <ul>
-                                    <li data-behavior="responsive_text_size" data-behavior="preview_container">
-                                        <span class="wrap">
-                                            <span class="entries-inner-wrap">
-                                                <%= favicon_with_host("foodinjars.com") %>
-                                                <div class="meta-wrap">
-                                                    <p class="feed-title"><span class="title-inner">Food in Jars</span></p>
-                                                    <time class="time">1h</time>
-                                                </div>
-                                                <time class="time inline">1h</time>
-                                                <span class="title-wrap">
-                                                    <h2 class="title">
-                                                        <%= favicon_with_host("foodinjars.com") %>
-                                                        Spicy Peach and Yellow Tomato Jam
-                                                    </h2>
-                                                    <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
-                                                    <span class="entry-image">
-                                                        <%= image_tag "image-preview.jpg" %>
+    <div class="settings-content-inner">
+        <div class="settings-outer">
+            <h2>Appearance</h2>
+        </div>
+        <div class="inset">
+            <div class="preview-group">
+                <div class="inset-content">
+                    <h4 class="group-header">Preview</h4>
+                </div>
+                <ul class="control-group">
+                    <li class="theme-background <%= @classes %>" data-behavior="entries_max_width class_target">
+                        <div data-behavior="preview_min_height">
+                            <div class="entries-wrap hide-search">
+                                <div class="entries">
+                                    <ul>
+                                        <li data-behavior="responsive_text_size" data-behavior="preview_container">
+                                            <span class="wrap">
+                                                <span class="entries-inner-wrap">
+                                                    <%= favicon_with_host("foodinjars.com") %>
+                                                    <div class="meta-wrap">
+                                                        <p class="feed-title"><span class="title-inner">Food in Jars</span></p>
+                                                        <time class="time">1h</time>
+                                                    </div>
+                                                    <time class="time inline">1h</time>
+                                                    <span class="title-wrap">
+                                                        <h2 class="title">
+                                                            <%= favicon_with_host("foodinjars.com") %>
+                                                            Spicy Peach and Yellow Tomato Jam
+                                                        </h2>
+                                                        <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
+                                                        <span class="entry-image">
+                                                            <%= image_tag "image-preview.jpg" %>
+                                                        </span>
                                                     </span>
                                                 </span>
                                             </span>
-                                        </span>
-                                    </li>
-                                </ul>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
+                    </li>
+                </ul>
+            </div>
+            <div class="inset-content">
+                <h4 class="group-header">Theme</h4>
+            </div>
+            <ul class="control-group control-group-form">
+                <li>
+                    <%= f.radio_button(:theme, "day", {checked: @user.theme.nil? || @user.theme === 'day', data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
+                    <%= f.label(:theme_day, "Day") %>
+                </li>
+                <li>
+                    <%= f.radio_button(:theme, "sunset", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
+                    <%= f.label(:theme_sunset, "Sunset") %>
+                </li>
+                <li>
+                    <%= f.radio_button(:theme, "night", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
+                    <%= f.label(:theme_night, "Night") %>
+                </li>
+            </ul>
+            <div class="inset-content">
+                <h4 class="group-header">Display</h4>
+            </div>
+            <ul class="control-group control-group-form">
+                <li>
+                    <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block', data: {behavior: 'appearance_radio auto_submit', setting: 'entries-display'}}) %>
+                    <%= f.label(:entries_display_block, "Default") %>
+                </li>
+                <li>
+                    <%= f.radio_button(:entries_display, "inline", {data: {behavior: 'appearance_radio auto_submit', setting: 'entries-display'}}) %>
+                    <%= f.label(:entries_display_inline, "Inline") %>
+                </li>
+            </ul>
+            <div class="inset-content">
+                <h4 class="group-header">Interface Elements</h4>
+            </div>
+            <ul class="control-group control-group-form">
+                <li>
+                    <%= f.check_box :entries_feed, {checked: @user.entries_feed.nil? || @user.setting_on?(:entries_feed), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-feed'} } %>
+                    <%= f.label :entries_feed do %>
+                        Feed Name <span class="slider-checkbox"></span>
+                    <% end %>
+                </li>
+                <li>
+                    <%= f.check_box :entries_time, {checked: @user.entries_time.nil? || @user.setting_on?(:entries_time), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-time'} } %>
+                    <%= f.label :entries_time do %>
+                        Date <span class="slider-checkbox"></span>
+                    <% end %>
+                </li>
+                <li>
+                    <%= f.check_box :entries_body, {checked: @user.entries_body.nil? || @user.setting_on?(:entries_body), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-body'} } %>
+                    <%= f.label :entries_body do %>
+                        Summary <span class="slider-checkbox"></span>
+                    <% end %>
+                </li>
+                <li>
+                    <%= f.check_box :entries_image, {checked: @user.entries_image.nil? || @user.setting_on?(:entries_image), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-image'} } %>
+                    <%= f.label :entries_image do %>
+                        Image Preview <span class="slider-checkbox"></span>
+                    <% end %>
                 </li>
             </ul>
         </div>
-
-        <div class="inset-content">
-            <h4 class="group-header">Theme</h4>
-        </div>
-        <ul class="control-group control-group-form">
-            <li>
-                <%= f.radio_button(:theme, "day", {checked: @user.theme.nil? || @user.theme === 'day', data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
-                <%= f.label(:theme_day, "Day") %>
-            </li>
-            <li>
-                <%= f.radio_button(:theme, "sunset", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
-                <%= f.label(:theme_sunset, "Sunset") %>
-            </li>
-            <li>
-                <%= f.radio_button(:theme, "night", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
-                <%= f.label(:theme_night, "Night") %>
-            </li>
-        </ul>
-
-        <div class="inset-content">
-            <h4 class="group-header">Display</h4>
-        </div>
-        <ul class="control-group control-group-form">
-            <li>
-                <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block', data: {behavior: 'appearance_radio auto_submit', setting: 'entries-display'}}) %>
-                <%= f.label(:entries_display_block, "Default") %>
-            </li>
-            <li>
-                <%= f.radio_button(:entries_display, "inline", {data: {behavior: 'appearance_radio auto_submit', setting: 'entries-display'}}) %>
-                <%= f.label(:entries_display_inline, "Inline") %>
-            </li>
-        </ul>
-
-        <div class="inset-content">
-            <h4 class="group-header">Interface Elements</h4>
-        </div>
-        <ul class="control-group control-group-form">
-            <li>
-                <%= f.check_box :entries_feed, {checked: @user.entries_feed.nil? || @user.setting_on?(:entries_feed), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-feed'} } %>
-                <%= f.label :entries_feed do %>
-                    Feed Name <span class="slider-checkbox"></span>
-                <% end %>
-            </li>
-            <li>
-                <%= f.check_box :entries_time, {checked: @user.entries_time.nil? || @user.setting_on?(:entries_time), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-time'} } %>
-                <%= f.label :entries_time do %>
-                    Date <span class="slider-checkbox"></span>
-                <% end %>
-            </li>
-            <li>
-                <%= f.check_box :entries_body, {checked: @user.entries_body.nil? || @user.setting_on?(:entries_body), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-body'} } %>
-                <%= f.label :entries_body do %>
-                    Summary <span class="slider-checkbox"></span>
-                <% end %>
-            </li>
-            <li>
-                <%= f.check_box :entries_image, {checked: @user.entries_image.nil? || @user.setting_on?(:entries_image), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-image'} } %>
-                <%= f.label :entries_image do %>
-                    Image Preview <span class="slider-checkbox"></span>
-                <% end %>
-            </li>
-        </ul>
-
     </div>
-</div>
 <% end %>

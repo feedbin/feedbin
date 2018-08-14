@@ -1,8 +1,8 @@
 <ul class="control-group control-group-form cc-form-wrap">
-  <li class="card-number-wrap">
-      <div id="card-element">
-      </div>
-  </li>
+    <li class="card-number-wrap">
+        <div id="card-element">
+        </div>
+    </li>
 </ul>
 <script type="text/javascript">
     var style = {
@@ -21,12 +21,12 @@
             color: 'red',
         }
     };
-
+    
     var form = document.getElementById('payment-form');
     var card = feedbinBilling.elements.create('card', {style: style});
-
+    
     card.mount('#card-element');
-
+    
     card.addEventListener('change', function(event) {
         if (event.error) {
             feedbin.showNotification(event.error.message, 3000, '', true);
@@ -34,15 +34,15 @@
             feedbin.hideNotification();
         }
     });
-
+    
     card.addEventListener('ready', function(event) {
         document.getElementById('credit_card_button').disabled = false;
     });
-
+    
     form.addEventListener('submit', function(event) {
         document.getElementById('credit_card_button').disabled = true;
         event.preventDefault();
-
+    
         feedbinBilling.stripe.createToken(card).then(function(result) {
             if (result.error) {
                 document.getElementById('credit_card_button').disabled = false;

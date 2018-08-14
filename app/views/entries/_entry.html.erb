@@ -1,8 +1,8 @@
 <% present entry do |entry_presenter| %>
-<li data-entry-id="<%= entry.id %>" class="feed-id-<%= entry.feed_id %> <%= entry_presenter.media_class %>" <%= rtl(entry.summary) %>>
-    <div class="mark-above-read" data-behavior="mark_above_read"><span><i>Mark Above as Read</i></span></div>
-    <div class="mark-below-read" data-behavior="mark_below_read"><span><i>Mark Below as Read</i></span></div>
-    <a
+    <li data-entry-id="<%= entry.id %>" class="feed-id-<%= entry.feed_id %> <%= entry_presenter.media_class %>" <%= rtl(entry.summary) %>>
+        <div class="mark-above-read" data-behavior="mark_above_read"><span><i>Mark Above as Read</i></span></div>
+        <div class="mark-below-read" data-behavior="mark_below_read"><span><i>Mark Below as Read</i></span></div>
+        <a
         class="wrap"
         data-behavior="selectable open_item show_entry_content entry_info"
         data-entry-id="<%= entry.id %>"
@@ -12,39 +12,36 @@
         data-recently-read-path="/entries/<%= entry.id %>/recently_read"
         href="/entries/<%= entry.id %>"
     >
-    <span class="entries-inner-wrap">
-        <%= entry_presenter.profile_image(entry.feed) %>
-        <div class="inline-content-wrap">
-            <div class="meta-wrap">
-                <p class="feed-title">
-                    <%= entry_presenter.feed_title %>
-                </p>
-                <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
-            </div>
-            <span class="title-wrap">
-                <h2 class="title">
-                    <%= entry_presenter.profile_image(entry.feed) %>
-                    <span><%= entry_presenter.title %></span>
-                </h2>
-                <%= entry_presenter.summary %>
+            <span class="entries-inner-wrap">
+                <%= entry_presenter.profile_image(entry.feed) %>
+                <div class="inline-content-wrap">
+                    <div class="meta-wrap">
+                        <p class="feed-title">
+                            <%= entry_presenter.feed_title %>
+                        </p>
+                        <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
+                    </div>
+                    <span class="title-wrap">
+                        <h2 class="title">
+                            <%= entry_presenter.profile_image(entry.feed) %>
+                            <span><%= entry_presenter.title %></span>
+                        </h2>
+                        <%= entry_presenter.summary %>
+                    </span>
+                    <% if entry.tweet? && entry.main_tweet.quoted_status? %>
+                        <p class="title quoted-summary">
+                            <strong><%= entry_presenter.tweet_name(entry.main_tweet.quoted_status) %></strong> &ndash;
+                            <%= entry_presenter.retweet_text %>
+                        </p>
+                    <% end %>
+                    <%= entry_presenter.image %>
+                </div>
+                <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago inline') %>
+                <i class="status-indicator icon-star"></i>
+                <span class="entry-actions-wrap" data-behavior="show_entry_actions">
+                    <i class="icon-entry-actions"></i>
+                </span>
             </span>
-
-            <% if entry.tweet? && entry.main_tweet.quoted_status? %>
-                <p class="title quoted-summary">
-                    <strong><%= entry_presenter.tweet_name(entry.main_tweet.quoted_status) %></strong> &ndash;
-                    <%= entry_presenter.retweet_text %>
-                </p>
-            <% end %>
-
-            <%= entry_presenter.image %>
-
-        </div>
-        <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago inline') %>
-        <i class="status-indicator icon-star"></i>
-        <span class="entry-actions-wrap" data-behavior="show_entry_actions">
-            <i class="icon-entry-actions"></i>
-        </span>
-    </span>
-</a>
-</li>
+        </a>
+    </li>
 <% end %>

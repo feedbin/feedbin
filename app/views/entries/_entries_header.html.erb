@@ -2,14 +2,14 @@
     <%= svg_tag "icon-arrow", size: "11x18" %>
 </button>
 <% if @feed %>
-  <% present feed do |feed_presenter| %>
-    <span class="feed-title-wrap">
-      <span data-behavior="user_title" data-feed-id="<%= @feed.id %>"><%= @feed.title %></span>
-    </span>
-  <% end %>
+    <% present feed do |feed_presenter| %>
+        <span class="feed-title-wrap">
+            <span data-behavior="user_title" data-feed-id="<%= @feed.id %>"><%= @feed.title %></span>
+        </span>
+    <% end %>
 <% else %>
-  <span class="feed-title-wrap">
-    <%= @collection_title %>
-  </span>
+    <span class="feed-title-wrap">
+        <%= @collection_title %>
+    </span>
 <% end %>
 <button class="search-button" data-behavior="show_search"></button>

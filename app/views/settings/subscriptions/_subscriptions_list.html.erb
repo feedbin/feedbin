@@ -1,5 +1,4 @@
 <div data-behavior="subscriptions_list">
-
     <div class="feed-form-wrap">
         <%= form_tag update_multiple_settings_subscriptions_path, method: :patch, autocomplete: 'off' do |update_form| %>
             <input type="hidden" name="operation" value="" />
@@ -20,7 +19,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="dropdown-wrap dropdown-right feed-dropdown">
                         <button class="feed-list-toolbar-button button-caret no-margin" data-behavior="toggle_dropdown sort_label">Sort by <%= params[:sort] || "name" %></button>
                         <div class="dropdown-content">
@@ -56,7 +54,6 @@
                                     <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "checkbox feeds-checkbox" %>
                                 </label>
                                 <%= link_to edit_settings_subscription_path(subscription), class: "subscription-link" do %>
-
                                     <span class="subscription-data-wrap">
                                         <span class="subscription-data">
                                             <span class="favicon-container">
@@ -80,7 +77,6 @@
                                             </span>
                                         </span>
                                     </span>
-
                                     <span class="subscription-controls">
                                         &nbsp;
                                         <% if subscription.tag_names %>

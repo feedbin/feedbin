@@ -1,124 +1,118 @@
 <%= form_for(subscription, remote: true, html: {class: 'settings'}) do |f| %>
     <% present subscription do |subscription_presenter| %>
-    <div class="feed-profile">
-        <div class="inset smooth-top">
-            <ul class="control-group">
-                <li class="profile-wrap">
-                    <div class="left-column">
-                        <%= subscription_presenter.favicon(subscription.feed) %>
-                    </div>
-                    <div class="right-column">
-                        <div class="header clearfix">
-                            <div class="half">
-                                <%= f.text_field :title, class: 'subscription-title' %>
-                                <% if !subscription.feed.twitter_feed? %>
-                                <p class="subhead">
-                                    <a href="<%= subscription.feed.site_url %>">Website: <span><%= pretty_url(subscription.feed.site_url) %></span></a>
-                                    <a href="<%= subscription.feed.feed_url %>">Feed: <span><%= pretty_url(subscription.feed.feed_url) %></span></a>
-                                </p>
-                                <% end %>
-                            </div>
-                            <div class="half">
-                                <%= unsubscribe %>
-                            </div>
+        <div class="feed-profile">
+            <div class="inset smooth-top">
+                <ul class="control-group">
+                    <li class="profile-wrap">
+                        <div class="left-column">
+                            <%= subscription_presenter.favicon(subscription.feed) %>
                         </div>
-                        <div class="chart-wrap">
-                            <div class="y-axis">
-                                <div class="start"><%= subscription_presenter.graph_max %></div>
-                                <div class="middle"><%= subscription_presenter.graph_mid %></div>
-                                <div class="end">0</div>
-                            </div>
-                            <div class="graph-wrap">
-                                <div class="graph">
-                                  <%= content_tag :canvas, '', data: { values: subscription_presenter.graph_bars, fill: "#3399FF", stroke: "#3399FF", behavior: "resize_graph line_graph" } %>
-                                </div>
-                                <div class="x-axis">
-                                    <div><%= subscription_presenter.graph_date_start %></div>
-                                    <div><%= subscription_presenter.graph_date_mid %></div>
-                                    <div><%= subscription_presenter.graph_date_end %></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="stats">
-                            <div class="stat">
-                                <p class="stat-title stat-header">Subscriber Since</p>
-                                <p class="stat-body"><%= subscription.created_at.to_s(:date) %></p>
-                            </div>
-                            <div class="stat">
-                                <p class="stat-title stat-header">Last Updated</p>
-                                <p class="stat-body"><%= subscription.feed.try(:last_published_entry).try(:to_s, :date) || "N/A" %></p>
-                            </div>
-                            <div class="stat">
-                                <p class="stat-title stat-header">Volume</p>
-                                <p class="stat-body">
-                                    <%= subscription_presenter.graph_volume %>
-                                    <% if subscription.feed.twitter_feed? %>
-                                        tweets / month
-                                    <% else %>
-                                        articles / month
+                        <div class="right-column">
+                            <div class="header clearfix">
+                                <div class="half">
+                                    <%= f.text_field :title, class: 'subscription-title' %>
+                                    <% if !subscription.feed.twitter_feed? %>
+                                        <p class="subhead">
+                                            <a href="<%= subscription.feed.site_url %>">Website: <span><%= pretty_url(subscription.feed.site_url) %></span></a>
+                                            <a href="<%= subscription.feed.feed_url %>">Feed: <span><%= pretty_url(subscription.feed.feed_url) %></span></a>
+                                        </p>
                                     <% end %>
-                                 </p>
+                                </div>
+                                <div class="half">
+                                    <%= unsubscribe %>
+                                </div>
+                            </div>
+                            <div class="chart-wrap">
+                                <div class="y-axis">
+                                    <div class="start"><%= subscription_presenter.graph_max %></div>
+                                    <div class="middle"><%= subscription_presenter.graph_mid %></div>
+                                    <div class="end">0</div>
+                                </div>
+                                <div class="graph-wrap">
+                                    <div class="graph">
+                                        <%= content_tag :canvas, '', data: { values: subscription_presenter.graph_bars, fill: "#3399FF", stroke: "#3399FF", behavior: "resize_graph line_graph" } %>
+                                    </div>
+                                    <div class="x-axis">
+                                        <div><%= subscription_presenter.graph_date_start %></div>
+                                        <div><%= subscription_presenter.graph_date_mid %></div>
+                                        <div><%= subscription_presenter.graph_date_end %></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stats">
+                                <div class="stat">
+                                    <p class="stat-title stat-header">Subscriber Since</p>
+                                    <p class="stat-body"><%= subscription.created_at.to_s(:date) %></p>
+                                </div>
+                                <div class="stat">
+                                    <p class="stat-title stat-header">Last Updated</p>
+                                    <p class="stat-body"><%= subscription.feed.try(:last_published_entry).try(:to_s, :date) || "N/A" %></p>
+                                </div>
+                                <div class="stat">
+                                    <p class="stat-title stat-header">Volume</p>
+                                    <p class="stat-body">
+                                        <%= subscription_presenter.graph_volume %>
+                                        <% if subscription.feed.twitter_feed? %>
+                                            tweets / month
+                                        <% else %>
+                                            articles / month
+                                        <% end %>
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </li>
-            </ul>
-
-            <div class="inset-content">
-                <h4 class="group-header">Feed Options</h4>
-            </div>
-            <ul class="control-group control-group-form">
-                <li>
-                    <%= f.check_box :muted, data: {behavior: "auto_submit"} %>
-                    <%= f.label :muted do %>
-                        Muted <span class="slider-checkbox"></span>
-                    <% end %>
-                </li>
-                <li>
-                    <%= f.check_box :show_updates, data: {behavior: "auto_submit"} %>
-                    <%= f.label :show_updates do %>
-                        Show updates <span class="slider-checkbox"></span>
-                    <% end %>
-                </li>
-            </ul>
-            <p class="control-group-description">
-                Tells you when an article has been changed after being published
-            </p>
-
-            <% if subscription.feed.twitter_feed? %>
-
+                    </li>
+                </ul>
                 <div class="inset-content">
-                    <h4 class="group-header">Twitter Options</h4>
+                    <h4 class="group-header">Feed Options</h4>
                 </div>
                 <ul class="control-group control-group-form">
                     <li>
-                        <%= f.check_box :show_retweets, data: {behavior: "auto_submit"} %>
-                        <%= f.label :show_retweets do %>
-                            Show Retweets <span class="slider-checkbox"></span>
+                        <%= f.check_box :muted, data: {behavior: "auto_submit"} %>
+                        <%= f.label :muted do %>
+                            Muted <span class="slider-checkbox"></span>
                         <% end %>
                     </li>
                     <li>
-                        <%= f.check_box :media_only, data: {behavior: "auto_submit"} %>
-                        <%= f.label :media_only do %>
-                            Media Only <span class="slider-checkbox"></span>
+                        <%= f.check_box :show_updates, data: {behavior: "auto_submit"} %>
+                        <%= f.label :show_updates do %>
+                            Show updates <span class="slider-checkbox"></span>
                         <% end %>
                     </li>
                 </ul>
                 <p class="control-group-description">
-                    Only show tweets that contain links or images
+                    Tells you when an article has been changed after being published
                 </p>
-
-            <% end %>
-
-            <% if !subscription.feed.twitter_feed? %>
-                <ul class="control-group control-group-form">
-                    <li>
-                        <%= link_to 'Refresh Favicon', refresh_favicon_settings_subscription_path(subscription), remote: true, method: :post %>
-                    </li>
-                </ul>
-            <% end %>
-
+                <% if subscription.feed.twitter_feed? %>
+                    <div class="inset-content">
+                        <h4 class="group-header">Twitter Options</h4>
+                    </div>
+                    <ul class="control-group control-group-form">
+                        <li>
+                            <%= f.check_box :show_retweets, data: {behavior: "auto_submit"} %>
+                            <%= f.label :show_retweets do %>
+                                Show Retweets <span class="slider-checkbox"></span>
+                            <% end %>
+                        </li>
+                        <li>
+                            <%= f.check_box :media_only, data: {behavior: "auto_submit"} %>
+                            <%= f.label :media_only do %>
+                                Media Only <span class="slider-checkbox"></span>
+                            <% end %>
+                        </li>
+                    </ul>
+                    <p class="control-group-description">
+                        Only show tweets that contain links or images
+                    </p>
+                <% end %>
+                <% if !subscription.feed.twitter_feed? %>
+                    <ul class="control-group control-group-form">
+                        <li>
+                            <%= link_to 'Refresh Favicon', refresh_favicon_settings_subscription_path(subscription), remote: true, method: :post %>
+                        </li>
+                    </ul>
+                <% end %>
+            </div>
         </div>
-    </div>
     <% end %>
 <% end %>

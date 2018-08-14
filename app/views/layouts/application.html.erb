@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title><%= @title || 'Feedbin' %><%= branch_info if Rails.env.development? %></title>
-  <meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no,viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <link rel="mask-icon" href="<%= asset_path('website-icon.svg') %>" color="#000000" />
-  <link rel="icon" href="<%= asset_path('link-icon.png') %>" sizes="192x192" />
-  <link rel="apple-touch-icon-precomposed" href="<%= asset_path('apple-touch-icon-precomposed.png') %>" sizes="152x152" />
-  <link rel="shortcut icon" href="<%= asset_path('favicon.ico') %>" type="image/vnd.microsoft.icon" />
-  <%= stylesheet_link_tag "application", media: 'all'  %>
-  <%= javascript_include_tag "application" %>
-  <% if native? %>
-    <%= javascript_include_tag "conditional/turbolinks" %>
-    <script>
-        feedbin.native = true
-        $(function() {
-            $('body').addClass('standalone-navigator');
-        });
-    </script>
-  <% end %>
-  <%= yield(:head) %>
-  <%= csrf_meta_tags %>
-  <%= tag :meta, name: "stripe-key", content: STRIPE_PUBLIC_KEY %>
-</head>
-<body class="<%= @class %>" data-behavior="<%= @behavior %>">
-  <%= content_for?(:content) ? yield(:content) : yield %>
-  <%= render partial: 'shared/fonts' %>
-</body>
+    <head>
+        <title><%= @title || 'Feedbin' %><%= branch_info if Rails.env.development? %></title>
+        <meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no,viewport-fit=cover" />
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <link rel="mask-icon" href="<%= asset_path('website-icon.svg') %>" color="#000000" />
+        <link rel="icon" href="<%= asset_path('link-icon.png') %>" sizes="192x192" />
+        <link rel="apple-touch-icon-precomposed" href="<%= asset_path('apple-touch-icon-precomposed.png') %>" sizes="152x152" />
+        <link rel="shortcut icon" href="<%= asset_path('favicon.ico') %>" type="image/vnd.microsoft.icon" />
+        <%= stylesheet_link_tag "application", media: 'all'  %>
+        <%= javascript_include_tag "application" %>
+        <% if native? %>
+            <%= javascript_include_tag "conditional/turbolinks" %>
+            <script>
+                feedbin.native = true
+                $(function() {
+                    $('body').addClass('standalone-navigator');
+                });
+            </script>
+        <% end %>
+        <%= yield(:head) %>
+        <%= csrf_meta_tags %>
+        <%= tag :meta, name: "stripe-key", content: STRIPE_PUBLIC_KEY %>
+    </head>
+    <body class="<%= @class %>" data-behavior="<%= @behavior %>">
+        <%= content_for?(:content) ? yield(:content) : yield %>
+        <%= render partial: 'shared/fonts' %>
+    </body>
 </html>

@@ -1,19 +1,14 @@
 <%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
 feedbin.showNotification('You have subscribed.');
 feedbin.hideSubscribe();
-
 <% @subscriptions.each do |subscription| %>
     <% if subscription.title.present? %>
-    feedbin.data.user_titles[<%= subscription.feed_id %>] = "<%= j subscription.title %>";
+        feedbin.data.user_titles[<%= subscription.feed_id %>] = "<%= j subscription.title %>";
     <% end %>
 <% end %>
-
 $("[data-feed-id=<%= @click_feed %>] a").click();
-
 $('.feeds').animate({
-    scrollTop: feedbin.scrollTo($("[data-feed-id=<%= @click_feed %>]"), $('.feeds'))
+scrollTop: feedbin.scrollTo($("[data-feed-id=<%= @click_feed %>]"), $('.feeds'))
 }, 200);
-
 $('.welcome').remove();
-
 $('#add_form_modal').modal('hide')

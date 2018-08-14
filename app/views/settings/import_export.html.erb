@@ -2,35 +2,28 @@
     <div class="settings-outer">
         <h2>Import & Export</h2>
     </div>
-
     <div class="inset">
-
         <div class="inset-content">
             <h4 class="group-header">Import</h4>
         </div>
-
         <% if ENV['AWS_ACCESS_KEY_ID'] %>
-        <%= direct_upload_form_for @uploader do |f| %>
-        <ul class="control-group">
-            <li>
-                <%= f.file_field :upload %>
-            </li>
-        </ul>
-        <p class="control-group-description">You can import OPML files. Import is done in the background so you may not see every subscription right away.</p>
-
-        <div class="description-inset">
-            <div class="button-wrap">
-                <%= f.submit "Import", class: "button no-margin" %>
-            </div>
-        </div>
-
-        <% end %>
-
+            <%= direct_upload_form_for @uploader do |f| %>
+                <ul class="control-group">
+                    <li>
+                        <%= f.file_field :upload %>
+                    </li>
+                </ul>
+                <p class="control-group-description">You can import OPML files. Import is done in the background so you may not see every subscription right away.</p>
+                <div class="description-inset">
+                    <div class="button-wrap">
+                        <%= f.submit "Import", class: "button no-margin" %>
+                    </div>
+                </div>
+            <% end %>
         <% else %>
             <p class="control-group-description">Import disabled. <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> and <code>AWS_S3_BUCKET</code> are missing.</p>
         <% end %>
     </div>
-
     <div class="inset">
         <div class="inset-content">
             <h4 class="group-header">Export</h4>
@@ -49,11 +42,8 @@
                 </li>
             <% end %>
         </ul>
-
         <% if @user.starred_entries.exists? %>
             <p class="control-group-description">A link will be emailed to you.</p>
         <% end %>
-
     </div>
-
 </div>

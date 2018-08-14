@@ -1,22 +1,17 @@
 <div class="settings-content-inner">
-
-  <div class="settings-outer">
-      <div class="feed-settings">
-
-          <h2>Customer Admin</h2>
-
-          <%= form_tag(admin_users_path, method: "get") do %>
-              <input name="q" type="text" class="feed-search" data-behavior="user_search" placeholder="Search Customers" />
-          <% end %>
-
-      </div>
-  </div>
-
-  <ul class="pill-list">
-    <% @users.each do |user| %>
-      <li data-behavior="<%= user.customer_id %>">
-        <%= render partial: 'user', locals: {user: user} %>
-      </li>
-    <% end %>
-  </ul>
+    <div class="settings-outer">
+        <div class="feed-settings">
+            <h2>Customer Admin</h2>
+            <%= form_tag(admin_users_path, method: "get") do %>
+                <input name="q" type="text" class="feed-search" data-behavior="user_search" placeholder="Search Customers" />
+            <% end %>
+        </div>
+    </div>
+    <ul class="pill-list">
+        <% @users.each do |user| %>
+            <li data-behavior="<%= user.customer_id %>">
+                <%= render partial: 'user', locals: {user: user} %>
+            </li>
+        <% end %>
+    </ul>
 </div>

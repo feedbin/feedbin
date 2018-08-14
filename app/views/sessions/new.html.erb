@@ -1,33 +1,28 @@
 <% @class = 'login' %>
 <% content_for :head do %>
-<script>
-    feedbin.nativeMessage("performAction", { action: "titleColor", color: "#eff1f3" })
-</script>
+    <script>
+        feedbin.nativeMessage("performAction", { action: "titleColor", color: "#eff1f3" })
+    </script>
 <% end %>
 <div class="login-wrap">
-  <a href="/" class="logo hide-text">Feedbin</a>
-
-  <div class="box">
-    <%= render partial: 'shared/flash', locals: {flash: flash} %>
-
-    <h3 class="box-header">Welcome Back</h3>
-
-    <%
+    <a href="/" class="logo hide-text">Feedbin</a>
+    <div class="box">
+        <%= render partial: 'shared/flash', locals: {flash: flash} %>
+        <h3 class="box-header">Welcome Back</h3>
+        <%
       options = {class: 'combined-form', novalidate: true}
       if native?
         options[:remote] = 'true'
       end
     %>
-    <%= form_tag sessions_path, options do %>
-      <p>
-        <%= email_field_tag :email, params[:email], autofocus: true, tabindex: '1', placeholder: 'Email' %>
-        <%= password_field_tag :password, nil, tabindex: '2', placeholder: 'Password' %>
-      </p>
-      <%= submit_tag "Login", class: 'button', tabindex: '3' %>
-      <%= link_to "Forgot password?", new_password_reset_path, class: 'large forgot-link' %>
-    <% end %>
-
-  </div>
-
-  <p class="align-center x-large muted">Don’t have an account? <%= link_to "Sign up", signup_path %></p>
+        <%= form_tag sessions_path, options do %>
+            <p>
+                <%= email_field_tag :email, params[:email], autofocus: true, tabindex: '1', placeholder: 'Email' %>
+                <%= password_field_tag :password, nil, tabindex: '2', placeholder: 'Password' %>
+            </p>
+            <%= submit_tag "Login", class: 'button', tabindex: '3' %>
+            <%= link_to "Forgot password?", new_password_reset_path, class: 'large forgot-link' %>
+        <% end %>
+    </div>
+    <p class="align-center x-large muted">Don’t have an account? <%= link_to "Sign up", signup_path %></p>
 </div>

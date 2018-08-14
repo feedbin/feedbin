@@ -1,56 +1,44 @@
 <% content_for :head do %>
-  <%= javascript_include_tag "https://js.stripe.com/v3/" %>
+    <%= javascript_include_tag "https://js.stripe.com/v3/" %>
 <% end %>
-
 <% @class = 'login' %>
 <div class="login-wrap">
-  <a href="/" class="logo hide-text">Feedbin</a>
-
-  <div class="box">
-    <div data-behavior="stripe_error" class="alert alert-error hide"></div>
-
-    <h3 class="box-header">
-        <% if ENV['STRIPE_API_KEY'] %>
-            Create your <strong>Free 14-Day Trial</strong> Account
-        <% else %>
-            <h3 class="box-header">Create your <strong>Free</strong> Feedbin Account</h3>
+    <a href="/" class="logo hide-text">Feedbin</a>
+    <div class="box">
+        <div data-behavior="stripe_error" class="alert alert-error hide"></div>
+        <h3 class="box-header">
+            <% if ENV['STRIPE_API_KEY'] %>
+                Create your <strong>Free 14-Day Trial</strong> Account
+            <% else %>
+                <h3 class="box-header">Create your <strong>Free</strong> Feedbin Account</h3>
+            <% end %>
+        </h3>
+        <%= form_for @user, html: { class: 'combined-form', data: { behavior: 'credit_card_form' }, novalidate: true } do |f| %>
+            <% if @user.errors.any? %>
+                <div class="alert alert-error">
+                    <%= @user.errors.full_messages.join('. ') %>.
+                </div>
+            <% end %>
+            <% if @user.plan_id %>
+                <%= f.hidden_field :plan_id %>
+            <% end %>
+            <% if @user.coupon_valid %>
+                <%= f.hidden_field :coupon_code %>
+                <div class="alert alert-success">
+                    Your coupon gets you a free account.
+                </div>
+            <% elsif @user.coupon_valid == false %>
+                <div class="alert alert-error">
+                    Invalid coupon.
+                </div>
+            <% end %>
+            <%= f.hidden_field :stripe_token, data: { behavior: 'stripe_token' } %>
+            <p>
+                <%= f.email_field :email, autofocus: true, placeholder: 'Email', tabindex: 1 %>
+                <%= f.password_field :password, placeholder: 'Password', tabindex: 2 %>
+            </p>
+            <%= f.submit "Sign Up", class: 'button', tabindex: 3 %>
         <% end %>
-    </h3>
-
-    <%= form_for @user, html: { class: 'combined-form', data: { behavior: 'credit_card_form' }, novalidate: true } do |f| %>
-      <% if @user.errors.any? %>
-        <div class="alert alert-error">
-          <%= @user.errors.full_messages.join('. ') %>.
-        </div>
-      <% end %>
-
-      <% if @user.plan_id %>
-        <%= f.hidden_field :plan_id %>
-      <% end %>
-
-      <% if @user.coupon_valid %>
-        <%= f.hidden_field :coupon_code %>
-        <div class="alert alert-success">
-          Your coupon gets you a free account.
-        </div>
-      <% elsif @user.coupon_valid == false %>
-        <div class="alert alert-error">
-          Invalid coupon.
-        </div>
-      <% end %>
-
-
-      <%= f.hidden_field :stripe_token, data: { behavior: 'stripe_token' } %>
-
-      <p>
-        <%= f.email_field :email, autofocus: true, placeholder: 'Email', tabindex: 1 %>
-        <%= f.password_field :password, placeholder: 'Password', tabindex: 2 %>
-      </p>
-
-      <%= f.submit "Sign Up", class: 'button', tabindex: 3 %>
-
-    <% end %>
-  </div>
-
-  <p class="align-center x-large muted">Already have an account? <%= link_to "Log In", login_path %></p>
+    </div>
+    <p class="align-center x-large muted">Already have an account? <%= link_to "Log In", login_path %></p>
 </div>

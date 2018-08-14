@@ -1,11 +1,9 @@
 <% if @entries.length == 0 %>
-  var entries = '<%= j render partial: "entries/no_entry" %>';
+    var entries = '<%= j render partial: "entries/no_entry" %>';
 <% else %>
-  var entries = '<%= j render partial: "entries/entry", collection: @entries %>';
+    var entries = '<%= j render partial: "entries/entry", collection: @entries %>';
 <% end %>
-
 var header = '<%= j render partial: "entries/entries_header", locals: {feed: @feed || nil} %>';
-
 if ("<%= @all_unread %>" === 'true') {
     var unreadEntries = <%=  @entries.map {|entry| {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}}.to_json.html_safe %>;
     $.each(unreadEntries, function(index, unreadEntry) {
@@ -15,76 +13,60 @@ if ("<%= @all_unread %>" === 'true') {
     });
     feedbin.applyCounts(true);
 }
-
 <% if @append %>
-	feedbin.appendEntries(entries, header);
+    feedbin.appendEntries(entries, header);
 <% else %>
-	feedbin.updateEntries(entries, header);
-	$('.entries').prop('scrollTop', 0);
+    feedbin.updateEntries(entries, header);
+    $('.entries').prop('scrollTop', 0);
 <% end %>
-
 feedbin.localizeTime();
-
 feedbin.applyUserTitles();
-
 feedbin.loadEntryImages();
-
 $('[data-behavior~=show_tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {feed: @feed || nil, tags: @tags, tag: @tag || nil} %>');
-
 <% if @type && @type == 'tag' %>
-  $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_tag", locals: {tag: @tag} %>');
+    $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_tag", locals: {tag: @tag} %>');
 <% elsif @type && @type == 'saved_search' %>
-  $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_saved_search", locals: {saved_search: @saved_search} %>');
+    $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_saved_search", locals: {saved_search: @saved_search} %>');
 <% elsif @type && @type == 'recently_read' %>
     $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_recently_read" %>');
 <% else %>
-  $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/unsubscribe", locals: {feed: @feed || nil} %>');
+    $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/unsubscribe", locals: {feed: @feed || nil} %>');
 <% end %>
-
 <% if @page_query %>
-feedbin.updatePager('<%= j will_paginate(@page_query) %>');
+    feedbin.updatePager('<%= j will_paginate(@page_query) %>');
 <% else %>
-feedbin.updatePager('');
+    feedbin.updatePager('');
 <% end %>
-
 feedbin.data.viewMode = "<%= j @user.get_view_mode %>";
-
 var entryIds = <%= @entries.map{ |entry| entry.id }.to_json.html_safe %>;
 <% if @force_preload %>
     feedbin.preloadEntries(entryIds, true);
 <% else %>
     feedbin.preloadEntries(entryIds, false);
 <% end %>
-
 <% @user.recently_played_entries.where(entry_id: @entries.map(&:id)).select(:duration, :progress, :entry_id).each do |record| %>
-feedbin.data.progress[<%= record.entry_id %>] = {progress: <%= record.progress %>, duration: <%= record.duration %>}
+    feedbin.data.progress[<%= record.entry_id %>] = {progress: <%= record.progress %>, duration: <%= record.duration %>}
 <% end %>
-
-
 $(document).trigger('feedbin:entriesLoaded');
-
 feedbin.hideSearchControls()
 <% if @search || @saved_search %>
-  feedbin.showSearchControls("<%= params[:sort] %>");
-  $('.search-control').removeClass('edit');
-  <% if @saved_search.persisted? %>
-    $('[data-behavior~=saved_search_form_target]').html('<%= j render partial: "saved_searches/form", locals: {saved_search: @saved_search} %>');
-    $('#query').val('<%= j @saved_search.query.try(:html_safe) %>');
-    $('.search-control').addClass('edit');
-  <% end %>
+    feedbin.showSearchControls("<%= params[:sort] %>");
+    $('.search-control').removeClass('edit');
+    <% if @saved_search.persisted? %>
+        $('[data-behavior~=saved_search_form_target]').html('<%= j render partial: "saved_searches/form", locals: {saved_search: @saved_search} %>');
+        $('#query').val('<%= j @saved_search.query.try(:html_safe) %>');
+        $('.search-control').addClass('edit');
+    <% end %>
 <% end %>
-
 <% if @search %>
-  feedbin.markReadData = {
-      type: "search",
-      data: "<%= @escaped_query %>",
-      message: "Mark <%= number_with_delimiter(@total_results) %> <%= 'article'.pluralize(@total_results) %> that <%= 'match'.pluralize(@total_results == 1 ? 2 : 1) %> the search “<%= @escaped_query %>” as read?"
-  }
-  $('.saved-search-wrap').removeClass('show');
-  $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected');
-  $('[data-behavior~=save_search_link]').removeAttr('disabled');
-  $('[data-behavior~=saved_search_form_target]').html('<%= j render partial: "saved_searches/form", locals: {saved_search: @saved_search} %>');
+    feedbin.markReadData = {
+    type: "search",
+    data: "<%= @escaped_query %>",
+    message: "Mark <%= number_with_delimiter(@total_results) %> <%= 'article'.pluralize(@total_results) %> that <%= 'match'.pluralize(@total_results == 1 ? 2 : 1) %> the search “<%= @escaped_query %>” as read?"
+    }
+    $('.saved-search-wrap').removeClass('show');
+    $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected');
+    $('[data-behavior~=save_search_link]').removeAttr('disabled');
+    $('[data-behavior~=saved_search_form_target]').html('<%= j render partial: "saved_searches/form", locals: {saved_search: @saved_search} %>');
 <% end %>
-
-
 feedbin.markReadData.date = "<%= j last_unread_date %>";

@@ -1,22 +1,21 @@
 <div class="settings-outer">
-  <% if @user.days_left <= 0 %>
-    <p>Your trial has ended. Subscribe now to continue using Feedbin.</p>
-  <% else %>
-    <p>Your trial period will end in <strong><%= pluralize(@user.days_left, 'day') %></strong>. Subscribe now to continue using Feedbin uninterrupted.</p>
-  <% end %>
+    <% if @user.days_left <= 0 %>
+        <p>Your trial has ended. Subscribe now to continue using Feedbin.</p>
+    <% else %>
+        <p>Your trial period will end in <strong><%= pluralize(@user.days_left, 'day') %></strong>. Subscribe now to continue using Feedbin uninterrupted.</p>
+    <% end %>
 </div>
 <div class="inset">
-  <%= form_for @user, html: {id: "payment-form"} do |f| %>
-    <%= f.hidden_field :stripe_token, id: 'stripe_token' %>
-    <%= hidden_field_tag :redirect_to, settings_billing_url %>
-
-    <div class="inset-content">
-      <h4 class="group-header">Plan</h4>
-    </div>
-    <ul class="control-group control-group-form">
-    <% @plans.each do |plan| %>
-      <li>
-        <%
+    <%= form_for @user, html: {id: "payment-form"} do |f| %>
+        <%= f.hidden_field :stripe_token, id: 'stripe_token' %>
+        <%= hidden_field_tag :redirect_to, settings_billing_url %>
+        <div class="inset-content">
+            <h4 class="group-header">Plan</h4>
+        </div>
+        <ul class="control-group control-group-form">
+            <% @plans.each do |plan| %>
+                <li>
+                    <%
         options = {
             id: dom_id(plan),
             data: {
@@ -30,72 +29,66 @@
             options[:checked] = true
         end
         %>
-        <%= f.radio_button :plan_id, plan.id, options %>
-        <%= label_tag nil, for: dom_id(plan) do %>
-          <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
-        <% end %>
-      </li>
-    <% end %>
-    </ul>
-
-    <div data-behavior="payment_method">
-        <div class="inset-content">
-            <h4 class="group-header">Payment Method</h4>
-        </div>
-        <ul class="control-group control-group-form">
-            <li data-behavior="billing_option_apple_pay">
-                <%= radio_button_tag("billing_method", "apple_pay", false, { data: {behavior: 'billing_method_radio'}}) %>
-                <%= label_tag("billing_method_apple_pay", "Apple Pay") %>
-            </li>
-            <li data-behavior="billing_option_payment_request">
-                <%= radio_button_tag("billing_method", "pay_with_google", false, { data: {behavior: 'billing_method_radio'}}) %>
-                <%= label_tag("billing_method_pay_with_google", "Pay with Google") %>
-            </li>
-            <li>
-                <%= radio_button_tag("billing_method", "credit_card", false, { data: {behavior: 'billing_method_radio'}}) %>
-                <%= label_tag("billing_method_credit_card", "Credit Card") %>
-            </li>
+                    <%= f.radio_button :plan_id, plan.id, options %>
+                    <%= label_tag nil, for: dom_id(plan) do %>
+                        <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
+                    <% end %>
+                </li>
+            <% end %>
         </ul>
-    </div>
-
-
-    <div id="credit_card_payment" data-behavior="credit_card_details">
-        <div class="inset-content">
-          <h4 class="group-header">Card Details</h4>
+        <div data-behavior="payment_method">
+            <div class="inset-content">
+                <h4 class="group-header">Payment Method</h4>
+            </div>
+            <ul class="control-group control-group-form">
+                <li data-behavior="billing_option_apple_pay">
+                    <%= radio_button_tag("billing_method", "apple_pay", false, { data: {behavior: 'billing_method_radio'}}) %>
+                    <%= label_tag("billing_method_apple_pay", "Apple Pay") %>
+                </li>
+                <li data-behavior="billing_option_payment_request">
+                    <%= radio_button_tag("billing_method", "pay_with_google", false, { data: {behavior: 'billing_method_radio'}}) %>
+                    <%= label_tag("billing_method_pay_with_google", "Pay with Google") %>
+                </li>
+                <li>
+                    <%= radio_button_tag("billing_method", "credit_card", false, { data: {behavior: 'billing_method_radio'}}) %>
+                    <%= label_tag("billing_method_credit_card", "Credit Card") %>
+                </li>
+            </ul>
         </div>
-        <%= render partial: 'shared/credit_card_form' %>
-    </div>
-
-    <% @plans.each do |plan| %>
-        <% if @user.trial_end.future? %>
-            <% if plan.name == "Monthly" %>
-                <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
-                    Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> when your trial ends on <strong><%= @user.trial_end.to_s(:date) %></strong> and again each month thereafter. You can change plans or cancel any time.
-                </p>
+        <div id="credit_card_payment" data-behavior="credit_card_details">
+            <div class="inset-content">
+                <h4 class="group-header">Card Details</h4>
+            </div>
+            <%= render partial: 'shared/credit_card_form' %>
+        </div>
+        <% @plans.each do |plan| %>
+            <% if @user.trial_end.future? %>
+                <% if plan.name == "Monthly" %>
+                    <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                        Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> when your trial ends on <strong><%= @user.trial_end.to_s(:date) %></strong> and again each month thereafter. You can change plans or cancel any time.
+                    </p>
+                <% else %>
+                    <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                        Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> when your trial ends on <strong><%= @user.trial_end.to_s(:date) %></strong> and again each year thereafter. You can change plans or cancel any time.
+                    </p>
+                <% end %>
             <% else %>
-                <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
-                    Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> when your trial ends on <strong><%= @user.trial_end.to_s(:date) %></strong> and again each year thereafter. You can change plans or cancel any time.
-                </p>
-            <% end %>
-        <% else %>
-            <% if plan.name == "Monthly" %>
-                <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
-                    Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> immediately and again each month thereafter. You can change plans or cancel any time.
-                </p>
-            <% else %>
-                <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
-                    Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> immediately and again each year thereafter. You can change plans or cancel any time.
-                </p>
+                <% if plan.name == "Monthly" %>
+                    <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                        Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> immediately and again each month thereafter. You can change plans or cancel any time.
+                    </p>
+                <% else %>
+                    <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                        Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> immediately and again each year thereafter. You can change plans or cancel any time.
+                    </p>
+                <% end %>
             <% end %>
         <% end %>
-    <% end %>
-
-    <div class="description-inset">
-        <div class="button-wrap">
-            <div id="payment_request_button"><small>Loading…</small></div>
-            <%= f.submit "Subscribe", class: 'button no-margin', id: "credit_card_button", disabled: true, data: { disable_with: false } %>
+        <div class="description-inset">
+            <div class="button-wrap">
+                <div id="payment_request_button"><small>Loading…</small></div>
+                <%= f.submit "Subscribe", class: 'button no-margin', id: "credit_card_button", disabled: true, data: { disable_with: false } %>
+            </div>
         </div>
-    </div>
-
-  <% end %>
+    <% end %>
 </div>

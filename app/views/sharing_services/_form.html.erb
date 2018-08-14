@@ -1,21 +1,17 @@
 <%= form_for @sharing_service, html: {novalidate: 'novalidate'} do |f| %>
-<div class="inset-content">
-  <h4 class="group-header">Custom Services</h4>
-</div>
-
-
-<ul class="control-group control-group-form">
-  <li>
-    <%= f.text_field :label, placeholder: 'Label' %>
-  </li>
-  <li>
-    <%= f.url_field :url, placeholder: 'URL' %>
-  </li>
-</ul>
-
-<p class="control-group-description">Create your own sharing service. <a href="https://feedbin.com/help/sharing-read-it-later-services/">How does this work</a>?</p>
-
-<div class="description-inset">
-  <%= f.submit "Add Service", class: 'button no-margin' %>
-</div>
+    <div class="inset-content">
+        <h4 class="group-header">Custom Services</h4>
+    </div>
+    <ul class="control-group control-group-form">
+        <li>
+            <%= f.text_field :label, placeholder: 'Label' %>
+        </li>
+        <li>
+            <%= f.url_field :url, placeholder: 'URL' %>
+        </li>
+    </ul>
+    <p class="control-group-description">Create your own sharing service. <a href="https://feedbin.com/help/sharing-read-it-later-services/">How does this work</a>?</p>
+    <div class="description-inset">
+        <%= f.submit "Add Service", class: 'button no-margin' %>
+    </div>
 <% end %>

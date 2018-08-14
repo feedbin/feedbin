@@ -1,41 +1,35 @@
 <div class="settings-content-inner">
-  <div class="settings-outer">
-    <h2>Actions</h2>
-
-    <p class="muted">Actions can be performed on articles when they are published. Start by writing the keywords to match, just like you would when <a href="https://feedbin.com/help/search-syntax/">searching</a> for something. Then select the feeds to include. Finally check the actions you would like to perform on the matched incoming articles.</p>
-  </div>
-
-  <div class="push-options hide" id="push-data" data-website-id="<%= ENV['APPLE_PUSH_WEBSITE_ID'] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>">
-    <div class="push-enable hide">
-      <p>Push notifications can be enabled as an action. <a href="#" data-behavior="enable_push">Enable push notifications</a>.</p>
+    <div class="settings-outer">
+        <h2>Actions</h2>
+        <p class="muted">Actions can be performed on articles when they are published. Start by writing the keywords to match, just like you would when <a href="https://feedbin.com/help/search-syntax/">searching</a> for something. Then select the feeds to include. Finally check the actions you would like to perform on the matched incoming articles.</p>
     </div>
-    <div class="push-disable hide">
-      <p>Push notifications are <span class="highlight-positive">enabled</span>. You can disable them in preferences under Notifications.</p>
+    <div class="push-options hide" id="push-data" data-website-id="<%= ENV['APPLE_PUSH_WEBSITE_ID'] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>">
+        <div class="push-enable hide">
+            <p>Push notifications can be enabled as an action. <a href="#" data-behavior="enable_push">Enable push notifications</a>.</p>
+        </div>
+        <div class="push-disable hide">
+            <p>Push notifications are <span class="highlight-positive">enabled</span>. You can disable them in preferences under Notifications.</p>
+        </div>
+        <div class="push-disabled hide">
+            <p>Push notifications are <span class="highlight-negative">disabled</span>. You can enable them in Safari preferences under Notifications.</p>
+        </div>
     </div>
-    <div class="push-disabled hide">
-      <p>Push notifications are <span class="highlight-negative">disabled</span>. You can enable them in Safari preferences under Notifications.</p>
-    </div>
-  </div>
-
-  <div class="inset">
-      <ul class="control-group control-group-form">
-        <li>
-          <%= link_to '+ Add Action', new_action_path, class: 'add-action' %>
-        </li>
-      </ul>
-
-      <% if @actions.any? %>
-        <ul class="pill-list">
-          <% @actions.each do |action| %>
-            <li class="linked">
-                <%= link_to(edit_action_path(action)) do %>
-                    <%= render(partial: 'actions/text_description', locals: {action: action}) %>
-                <% end %>
+    <div class="inset">
+        <ul class="control-group control-group-form">
+            <li>
+                <%= link_to '+ Add Action', new_action_path, class: 'add-action' %>
             </li>
-          <% end %>
         </ul>
-      <% end %>
-
-  </div>
-
+        <% if @actions.any? %>
+            <ul class="pill-list">
+                <% @actions.each do |action| %>
+                    <li class="linked">
+                        <%= link_to(edit_action_path(action)) do %>
+                            <%= render(partial: 'actions/text_description', locals: {action: action}) %>
+                        <% end %>
+                    </li>
+                <% end %>
+            </ul>
+        <% end %>
+    </div>
 </div>

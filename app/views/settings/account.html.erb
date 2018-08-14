@@ -1,78 +1,67 @@
 <div class="settings-content-inner">
-  <div class="settings-outer">
-    <h2>Account</h2>
-  </div>
-
-  <div class="inset">
-    <%= form_for(@user) do |f| %>
-      <div class="inset-content">
-        <h4 class="group-header">Email</h4>
-      </div>
-      <ul class="control-group control-group-form">
-        <li>
-          <%= f.email_field :email, placeholder: 'Email' %>
-        </li>
-      </ul>
-
-      <div class="description-inset">
-          <div class="button-wrap">
-              <%= f.submit "Update", class: "button no-margin" %>
-          </div>
-      </div>
-
-    <% end %>
-  </div>
-
-  <div class="inset">
-    <%= form_for(@user) do |f| %>
-      <div class="inset-content">
-        <h4 class="group-header">Update Password</h4>
-      </div>
-      <ul class="control-group control-group-form">
-        <li>
-          <%= f.password_field :old_password, placeholder: 'Old Password' %>
-        </li>
-        <li>
-          <%= f.password_field :password, placeholder: 'New Password' %>
-        </li>
-      </ul>
-
-      <div class="description-inset">
-          <div class="button-wrap">
-              <%= f.submit "Update", class: "button  no-margin" %>
-          </div>
-      </div>
-    <% end %>
-  </div>
-
-  <div class="inset">
-     <%= form_for(@user, method: :delete, id: "delete_user") do |f| %>
-        <div class="inset-content">
-            <h4 class="group-header">Cancel Account</h4>
-        </div>
-
-        <div class="description-inset">
-            <p class="muted">Canceling your account will end your subscription immediately. All of your data will be deleted. You will receive a confirmation email with your feed subscriptions attached. <strong>You cannot undo this</strong>.</p>
-        </div>
-
-        <% if @last_payment %>
-        <ul class="control-group control-group-form">
-            <li>
-                <%= check_box_tag :billing_event_id, Rails.application.message_verifier(:billing_event_id).generate(@last_payment.id) %>
-                <%= label_tag :billing_event_id do %>
-                    Also refund my recent <strong><%= number_to_currency((@last_payment.event_object["amount"].to_f / 100), precision: 0) %></strong> payment <span class="slider-checkbox"></span>
-                <% end %>
-            </li>
-        </ul>
-        <% end %>
-
-        <div class="description-inset">
-            <div class="button-wrap">
-                <p><%= f.submit "Cancel Account", class: "button button-secondary", data: { confirm: "Are you sure?" } %></p>
+    <div class="settings-outer">
+        <h2>Account</h2>
+    </div>
+    <div class="inset">
+        <%= form_for(@user) do |f| %>
+            <div class="inset-content">
+                <h4 class="group-header">Email</h4>
             </div>
-        </div>
-    <% end %>
-
-  </div>
-
+            <ul class="control-group control-group-form">
+                <li>
+                    <%= f.email_field :email, placeholder: 'Email' %>
+                </li>
+            </ul>
+            <div class="description-inset">
+                <div class="button-wrap">
+                    <%= f.submit "Update", class: "button no-margin" %>
+                </div>
+            </div>
+        <% end %>
+    </div>
+    <div class="inset">
+        <%= form_for(@user) do |f| %>
+            <div class="inset-content">
+                <h4 class="group-header">Update Password</h4>
+            </div>
+            <ul class="control-group control-group-form">
+                <li>
+                    <%= f.password_field :old_password, placeholder: 'Old Password' %>
+                </li>
+                <li>
+                    <%= f.password_field :password, placeholder: 'New Password' %>
+                </li>
+            </ul>
+            <div class="description-inset">
+                <div class="button-wrap">
+                    <%= f.submit "Update", class: "button  no-margin" %>
+                </div>
+            </div>
+        <% end %>
+    </div>
+    <div class="inset">
+        <%= form_for(@user, method: :delete, id: "delete_user") do |f| %>
+            <div class="inset-content">
+                <h4 class="group-header">Cancel Account</h4>
+            </div>
+            <div class="description-inset">
+                <p class="muted">Canceling your account will end your subscription immediately. All of your data will be deleted. You will receive a confirmation email with your feed subscriptions attached. <strong>You cannot undo this</strong>.</p>
+            </div>
+            <% if @last_payment %>
+                <ul class="control-group control-group-form">
+                    <li>
+                        <%= check_box_tag :billing_event_id, Rails.application.message_verifier(:billing_event_id).generate(@last_payment.id) %>
+                        <%= label_tag :billing_event_id do %>
+                            Also refund my recent <strong><%= number_to_currency((@last_payment.event_object["amount"].to_f / 100), precision: 0) %></strong> payment <span class="slider-checkbox"></span>
+                        <% end %>
+                    </li>
+                </ul>
+            <% end %>
+            <div class="description-inset">
+                <div class="button-wrap">
+                    <p><%= f.submit "Cancel Account", class: "button button-secondary", data: { confirm: "Are you sure?" } %></p>
+                </div>
+            </div>
+        <% end %>
+    </div>
 </div>

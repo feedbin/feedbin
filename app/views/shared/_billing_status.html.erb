@@ -1,95 +1,86 @@
 <div class="inset">
-  <%= form_tag settings_update_credit_card_path, id: "payment-form" do %>
-  <%= hidden_field_tag :stripe_token, nil, id: 'stripe_token' %>
-
+    <%= form_tag settings_update_credit_card_path, id: "payment-form" do %>
+        <%= hidden_field_tag :stripe_token, nil, id: 'stripe_token' %>
+        <div class="inset-content">
+            <h4 class="group-header">Update Billing Info</h4>
+        </div>
+        <%= render partial: 'shared/credit_card_form' %>
+        <div class="description-inset">
+            <div class="button-wrap">
+                <%= submit_tag "Update Billing", class: "button no-margin update-cc-button", id: "credit_card_button", disabled: true, data: { disable_with: false } %>
+            </div>
+        </div>
+    <% end %>
+</div>
+<div class="inset">
     <div class="inset-content">
-      <h4 class="group-header">Update Billing Info</h4>
+        <h4 class="group-header">Change Your Plan</h4>
     </div>
-
-    <%= render partial: 'shared/credit_card_form' %>
-
-    <div class="description-inset">
-        <div class="button-wrap">
-            <%= submit_tag "Update Billing", class: "button no-margin update-cc-button", id: "credit_card_button", disabled: true, data: { disable_with: false } %>
-        </div>
-    </div>
-
-  <% end %>
-</div>
-
-<div class="inset">
-  <div class="inset-content">
-    <h4 class="group-header">Change Your Plan</h4>
-  </div>
-  <div class="table-wrap">
-    <table class="table table-rounded" style="margin-bottom: 0;">
-      <% @plans.each do |plan| %>
-        <tr>
-          <td><%= plan.name %></td>
-          <td>
-              <% if plan.stripe_id == "timed" && @user.expires_at %>
-                  Expires <%= @user.expires_at.to_s(:date) %>
-              <% else %>
-                  <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
-              <% end %>
-          </td>
-          <td>
-            <% if @user.plan.id == plan.id %>
-              Your plan
-            <% else %>
-              <%= form_tag settings_update_plan_path, data: { behavior: 'change_plan' }, class: 'no-margin' do %>
-                <%= hidden_field_tag 'plan', plan.id %>
-                <%= button_tag 'Switch to this plan', class: 'button-text' %>
-              <% end %>
+    <div class="table-wrap">
+        <table class="table table-rounded" style="margin-bottom: 0;">
+            <% @plans.each do |plan| %>
+                <tr>
+                    <td><%= plan.name %></td>
+                    <td>
+                        <% if plan.stripe_id == "timed" && @user.expires_at %>
+                            Expires <%= @user.expires_at.to_s(:date) %>
+                        <% else %>
+                            <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
+                        <% end %>
+                    </td>
+                    <td>
+                        <% if @user.plan.id == plan.id %>
+                            Your plan
+                        <% else %>
+                            <%= form_tag settings_update_plan_path, data: { behavior: 'change_plan' }, class: 'no-margin' do %>
+                                <%= hidden_field_tag 'plan', plan.id %>
+                                <%= button_tag 'Switch to this plan', class: 'button-text' %>
+                            <% end %>
+                        <% end %>
+                    </td>
+                </tr>
             <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </table>
-  </div>
-  <p class="control-group-description">Plan changes are pro-rated.</p>
-
-  <div class="inset-content">
-    <h4 class="group-header">Payment History</h4>
-  </div>
-  <div class="table-wrap">
-    <table class="table table-rounded">
-      <% if @next_payment_date && @user.plan.stripe_id != 'timed' %>
-        <tr>
-          <td><time datetime="<%= @next_payment_date.to_s(:date) %>"><%= @next_payment_date.to_s(:date) %></time></td>
-          <td>&nbsp;</td>
-          <td><span class="extra-muted">Scheduled</span></td>
-        </tr>
-      <% end %>
-      <% @billing_events.each do |invoice| %>
-      <tr>
-        <td><%= invoice.receipt_date %></td>
-        <td><%= number_to_currency(invoice.receipt_amount) %> <%= invoice.currency %> <%= invoice.receipt_description %></td>
-        <td><%= link_to 'Receipt', invoice %></td>
-      </tr>
-      <% end %>
-    </table>
-  </div>
-</div>
-
-<div class="inset">
-  <div class="inset-content">
-    <h4 class="group-header">Receipt Info</h4>
-  </div>
-
-  <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
-    <%= hidden_field_tag :redirect_to, settings_billing_url %>
-    <ul class="control-group control-group-form">
-      <li>
-        <%= f.text_area :receipt_info, rows: 3 %>
-      </li>
-    </ul>
-    <p class="control-group-description">This will show up on your receipt. Useful for VAT, address etc&hellip;</p>
-    <div class="description-inset">
-        <div class="button-wrap">
-            <%= f.submit "Save Info", class: "button  no-margin" %>
-        </div>
+        </table>
     </div>
-  <% end %>
+    <p class="control-group-description">Plan changes are pro-rated.</p>
+    <div class="inset-content">
+        <h4 class="group-header">Payment History</h4>
+    </div>
+    <div class="table-wrap">
+        <table class="table table-rounded">
+            <% if @next_payment_date && @user.plan.stripe_id != 'timed' %>
+                <tr>
+                    <td><time datetime="<%= @next_payment_date.to_s(:date) %>"><%= @next_payment_date.to_s(:date) %></time></td>
+                    <td>&nbsp;</td>
+                    <td><span class="extra-muted">Scheduled</span></td>
+                </tr>
+            <% end %>
+            <% @billing_events.each do |invoice| %>
+                <tr>
+                    <td><%= invoice.receipt_date %></td>
+                    <td><%= number_to_currency(invoice.receipt_amount) %> <%= invoice.currency %> <%= invoice.receipt_description %></td>
+                    <td><%= link_to 'Receipt', invoice %></td>
+                </tr>
+            <% end %>
+        </table>
+    </div>
 </div>
-
+<div class="inset">
+    <div class="inset-content">
+        <h4 class="group-header">Receipt Info</h4>
+    </div>
+    <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
+        <%= hidden_field_tag :redirect_to, settings_billing_url %>
+        <ul class="control-group control-group-form">
+            <li>
+                <%= f.text_area :receipt_info, rows: 3 %>
+            </li>
+        </ul>
+        <p class="control-group-description">This will show up on your receipt. Useful for VAT, address etc&hellip;</p>
+        <div class="description-inset">
+            <div class="button-wrap">
+                <%= f.submit "Save Info", class: "button  no-margin" %>
+            </div>
+        </div>
+    <% end %>
+</div>

@@ -1,49 +1,43 @@
 <% present entry do |entry_presenter| %>
-<div class="tweet-wrap" data-behavior="external_links">
-
-  <%= render partial: "shared/tweet", locals: {entry: entry, tweet: entry.main_tweet, css: "main-tweet entry-main-tweet"} %>
-
-  <% entry_presenter.tweet_media.each do |media| %>
-    <% if entry_presenter.tweet_video?(media) %>
-      <%= entry_presenter.tweet_video(media) %>
-    <% else %>
-      <%= link_to media.media_url_https.to_s + ":large" do %>
-        <%= image_tag camo_link(media.media_url_https.to_s + ":large"), class: "responsive" %>
-      <% end %>
-    <% end %>
-  <% end %>
-
-  <% entry.tweet_thread.each do |thread| %>
-    <%= entry_presenter.tweet_text(thread) %>
-    <% thread.media.each do |media| %>
-      <% if entry_presenter.tweet_video?(media) %>
-        <%= entry_presenter.tweet_video(media) %>
-      <% else %>
-        <%= link_to media.media_url_https.to_s + ":large" do %>
-          <%= image_tag camo_link(media.media_url_https.to_s + ":large"), class: "responsive" %>
+    <div class="tweet-wrap" data-behavior="external_links">
+        <%= render partial: "shared/tweet", locals: {entry: entry, tweet: entry.main_tweet, css: "main-tweet entry-main-tweet"} %>
+        <% entry_presenter.tweet_media.each do |media| %>
+            <% if entry_presenter.tweet_video?(media) %>
+                <%= entry_presenter.tweet_video(media) %>
+            <% else %>
+                <%= link_to media.media_url_https.to_s + ":large" do %>
+                    <%= image_tag camo_link(media.media_url_https.to_s + ":large"), class: "responsive" %>
+                <% end %>
+            <% end %>
         <% end %>
-      <% end %>
-    <% end %>
-
-    <% thread.urls.each do |url| %>
-      <% if entry_presenter.tweet_youtube_embed(url, :div) %>
-        <p><%= entry_presenter.tweet_youtube_embed(url, :div) %></p>
-      <% elsif entry_presenter.tweet_vimeo_embed(url, :div) %>
-        <%= entry_presenter.tweet_vimeo_embed(url, :div) %>
-      <% elsif entry_presenter.tweet_instagram_embed(url) %>
-        <%= entry_presenter.tweet_instagram_embed(url) %>
-      <% end %>
-    <% end %>
-  <% end %>
-
-  <% if entry_presenter.quoted_status? %>
-    <%= render partial: "shared/tweet", locals: {entry: entry, tweet: entry_presenter.quoted_status, css: "quoted-tweet"} %>
-  <% end %>
-
-  <% if entry.tweet.retweeted_status? %>
-    <div class="tweet-meta-wrap">
-        <p class="tweet-meta">
-          <a href="<%= entry_presenter.tweet_user_url(entry.tweet) %>">
+        <% entry.tweet_thread.each do |thread| %>
+            <%= entry_presenter.tweet_text(thread) %>
+            <% thread.media.each do |media| %>
+                <% if entry_presenter.tweet_video?(media) %>
+                    <%= entry_presenter.tweet_video(media) %>
+                <% else %>
+                    <%= link_to media.media_url_https.to_s + ":large" do %>
+                        <%= image_tag camo_link(media.media_url_https.to_s + ":large"), class: "responsive" %>
+                    <% end %>
+                <% end %>
+            <% end %>
+            <% thread.urls.each do |url| %>
+                <% if entry_presenter.tweet_youtube_embed(url, :div) %>
+                    <p><%= entry_presenter.tweet_youtube_embed(url, :div) %></p>
+                <% elsif entry_presenter.tweet_vimeo_embed(url, :div) %>
+                    <%= entry_presenter.tweet_vimeo_embed(url, :div) %>
+                <% elsif entry_presenter.tweet_instagram_embed(url) %>
+                    <%= entry_presenter.tweet_instagram_embed(url) %>
+                <% end %>
+            <% end %>
+        <% end %>
+        <% if entry_presenter.quoted_status? %>
+            <%= render partial: "shared/tweet", locals: {entry: entry, tweet: entry_presenter.quoted_status, css: "quoted-tweet"} %>
+        <% end %>
+        <% if entry.tweet.retweeted_status? %>
+            <div class="tweet-meta-wrap">
+                <p class="tweet-meta">
+                    <a href="<%= entry_presenter.tweet_user_url(entry.tweet) %>">
             <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry_presenter.tweet_retweeted_image, size: "16x16", alt: "") %>
             <%= entry_presenter.tweet_retweeted_message %>
           </a>
@@ -71,25 +65,24 @@
 
       <% if link_content && link_content.length > 400 %>
         <hr />
-        <p class="post-meta new-section">
-        <%= favicon_with_host(url.expanded_url.host) %> <%= url.expanded_url.host %>
-        </p>
-        <header class="entry-header">
-            <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
-            <h1><%= page.title || "Untitled" %></h1>
-            <% end %>
-            <p class="post-meta">
-                <% if page.author %>
-                    by <%= page.author %>
+                    <p class="post-meta new-section">
+                        <%= favicon_with_host(url.expanded_url.host) %> <%= url.expanded_url.host %>
+                    </p>
+                    <header class="entry-header">
+                        <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
+                            <h1><%= page.title || "Untitled" %></h1>
+                        <% end %>
+                        <p class="post-meta">
+                            <% if page.author %>
+                                by <%= page.author %>
+                            <% end %>
+                        </p>
+                    </header>
+                    <div class="content-styles entry-final-content entry-type-default" data-behavior="view_link_markup_wrap entry_final_content external_links">
+                        <%= link_content.html_safe %>
+                    </div>
                 <% end %>
-            </p>
-        </header>
-        <div class="content-styles entry-final-content entry-type-default" data-behavior="view_link_markup_wrap entry_final_content external_links">
-            <%= link_content.html_safe %>
-        </div>
-      <% end %>
-    <% end %>
-
-  <% end %>
-</div>
+            <% end %>
+        <% end %>
+    </div>
 <% end %>

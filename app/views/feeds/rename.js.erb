@@ -1,4 +1,4 @@
 <% if @subscription.title.present? %>
-feedbin.data.user_titles[<%= @subscription.feed_id %>] = "<%= j @subscription.title %>";
-feedbin.applyUserTitles();
+    feedbin.data.user_titles[<%= @subscription.feed_id %>] = "<%= j @subscription.title %>";
+    feedbin.applyUserTitles();
 <% end %>

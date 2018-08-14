@@ -1,13 +1,11 @@
 <% user_ids = tweets.map {|tweet| tweet.user.id }.uniq.compact %>
 <% user_ids.each do |user_id| %>
-.modal-conversation .tweet-author-<%= user_id %> + .tweet-author-<%= user_id %> {
+    .modal-conversation .tweet-author-<%= user_id %> + .tweet-author-<%= user_id %> {
     border-top: none !important;
     padding-top: 0 !important;
     margin-bottom: 0 !important;
-}
-
-.modal-conversation .tweet-wrap .tweet-author-<%= user_id %> + .tweet-author-<%= user_id %> .tweet-header {
+    }
+    .modal-conversation .tweet-wrap .tweet-author-<%= user_id %> + .tweet-author-<%= user_id %> .tweet-header {
     display: none !important;
-}
+    }
 <% end %>
-

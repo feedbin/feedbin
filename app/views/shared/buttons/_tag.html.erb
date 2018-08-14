@@ -1,13 +1,13 @@
 <%= content_tag :button, class: 'toolbar-button', data: {behavior: 'show_tags_form'}, disabled: tags.nil? do %>
-  <div class="toolbar-button-inner">
-    <div class="tags-form-wrap">
-      <div data-behavior="tags_form_target" class="tags-form">
-        <% if feed.present? %>
-          <%= render partial: "feeds/form", locals: {feed: feed, tags: tags, tag: tag} %>
-        <% end %>
-      </div>
+    <div class="toolbar-button-inner">
+        <div class="tags-form-wrap">
+            <div data-behavior="tags_form_target" class="tags-form">
+                <% if feed.present? %>
+                    <%= render partial: "feeds/form", locals: {feed: feed, tags: tags, tag: tag} %>
+                <% end %>
+            </div>
+        </div>
+        <%= render partial: "shared/svg/tag" %>
     </div>
-    <%= render partial: "shared/svg/tag" %>
-  </div>
-  Tag
+    Tag
 <% end %>

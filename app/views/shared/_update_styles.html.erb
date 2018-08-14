@@ -1,8 +1,8 @@
 <script>
-jQuery(function() {
-    $("<link>")
-        .appendTo('head')
-        .attr({rel: "stylesheet"})
-        .attr({href: "<%= url_for(update_styles_feeds_path(format: :css)) %>"});
-});
+    jQuery(function() {
+        $("<link>")
+            .appendTo('head')
+            .attr({rel: "stylesheet"})
+            .attr({href: "<%= url_for(update_styles_feeds_path(format: :css)) %>"});
+    });
 </script>

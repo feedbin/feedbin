@@ -1,24 +1,21 @@
 <% @class = "app nothing-selected hide-search #{@classes}" %>
 <% @behavior = "class_target" %>
 <% content_for :head do %>
-<meta name="twitter:widgets:link-color" content="#3399FF">
-<script>
-if (window.feedbin == null) {
-    window.feedbin = {};
-}
-feedbin.data = <%= raw json_escape(@data.to_json) %>;
-feedbin.data.tagNames = <%= raw json_escape(@user.tag_names.to_json) %>;
-feedbin.count_data = <%= raw json_escape(@count_data.to_json) %>;
-feedbin.data.viewMode = "<%= @user.get_view_mode %>";
-feedbin.Counts.get(feedbin.count_data);
-</script>
+    <meta name="twitter:widgets:link-color" content="#3399FF">
+    <script>
+        if (window.feedbin == null) {
+            window.feedbin = {};
+        }
+        feedbin.data = <%= raw json_escape(@data.to_json) %>;
+        feedbin.data.tagNames = <%= raw json_escape(@user.tag_names.to_json) %>;
+        feedbin.count_data = <%= raw json_escape(@count_data.to_json) %>;
+        feedbin.data.viewMode = "<%= @user.get_view_mode %>";
+        feedbin.Counts.get(feedbin.count_data);
+    </script>
 <% end %>
 <%= render partial: 'shared/svg' %>
-
 <div class="application-messages"><a href="" class="message-content" data-behavior="messages">You have subscribed</a></div>
-
 <div class="app-wrap">
-
     <div class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
         <div class="subscribe-toolbar">
             <button type="button" class="show-subscribe" data-behavior="show_subscribe">+ Add</button>
@@ -39,14 +36,12 @@ feedbin.Counts.get(feedbin.count_data);
         <%= render partial: 'shared/feeds_toolbar' %>
         <%= render partial: 'shared/audio_player' %>
     </div>
-
     <div class="entries-column app-panel" data-behavior="content_column" <%= resizable 'entries' %>>
         <div class="entries-header" data-behavior="entries_header"></div>
         <div class="entries-inner">
             <%= form_tag search_entries_path, class: 'search-form-wrap', remote: true, method: :get, data: {behavior: 'search_form'} do %>
                 <%= search_field_tag :query, params[:query], placeholder: 'Search', autocomplete: 'off' %>
             <% end %>
-
             <div class="search-control hide">
                 <div class="sort-control">
                     <div class="dropdown-wrap">
@@ -61,21 +56,16 @@ feedbin.Counts.get(feedbin.count_data);
                     <span class="save-search" data-behavior="save_search_link">Save Search</span>
                     <span class="save-search edit" data-behavior="save_search_link">Edit Saved Search</span>
                 </div>
-
                 <div class="saved-search-wrap" data-behavior="saved_search_form_target">
                 </div>
-
             </div>
-
             <div class="entries">
                 <ul data-behavior="entries_target" class="entries-target"></ul>
             </div>
         </div>
         <%= render partial: 'shared/feeds_toolbar' %>
     </div>
-
     <div class="entry-column app-panel" data-behavior="content_column">
-
         <div class="account-toolbar">
             <% if signed_in? && current_user.plan.stripe_id == 'trial' %>
                 <%= link_to settings_billing_path, class: 'subscribe-promo' do %>
@@ -86,26 +76,22 @@ feedbin.Counts.get(feedbin.count_data);
                 <%= render partial: 'shared/app_settings' %>
             </div>
         </div>
-
         <div class="entry-basement">
             <div class="basement-panel hide" data-basement-panel-target="settings_panel">
                 <%= render partial: 'shared/entry_settings' %>
             </div>
             <% @user.supported_sharing_services.each do |service| %>
                 <% if service.has_share_sheet? %>
-                <div class="basement-panel hide" data-basement-panel-target="<%= service.service_id %>_share_panel">
-                    <%= render partial: "supported_sharing_services/share_form_#{service.service_id}", locals: {service: service} %>
-                </div>
+                    <div class="basement-panel hide" data-basement-panel-target="<%= service.service_id %>_share_panel">
+                        <%= render partial: "supported_sharing_services/share_form_#{service.service_id}", locals: {service: service} %>
+                    </div>
                 <% end %>
             <% end %>
         </div>
-
         <div class="entry-meta" data-behavior="entry_meta_target"></div>
-
         <div class="entry-content-wrap <%= @user.entry_width %> <%= @user.display_prefs %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
             <div data-behavior="inner_content_target"></div>
         </div>
-
         <div class="bottom-toolbar entry-bottom-toolbar">
             <button class="toolbar-button button-previous" data-behavior="open_previous_entry needs_previous">
                 <div class="icon-previous">
@@ -119,9 +105,7 @@ feedbin.Counts.get(feedbin.count_data);
             </button>
         </div>
     </div>
-
 </div>
-
 <div class="hide" data-behavior="pagination"></div>
 <%= render partial: "shared/readability_loading" %>
 <%= render partial: "shared/add_form" %>
@@ -132,5 +116,4 @@ feedbin.Counts.get(feedbin.count_data);
 <%= render partial: 'shared/update_styles' %>
 <%= render partial: 'shared/saved_searches_count' %>
 <%= render partial: 'shared/modal_wrap', locals: {user: @user} %>
-
 <%= one_time_content && one_time_content.html_safe %>

@@ -1,25 +1,19 @@
 <% @class = 'login' %>
 <div class="login-wrap">
-  <a href="/" class="logo hide-text">Feedbin</a>
-
-  <div class="box">
-    <%= render partial: 'shared/flash', locals: {flash: flash} %>
-
-    <h3 class="box-header">Reset Password</h3>
-
-    <%= form_for @user, url: password_reset_path(params[:id]) do |f| %>
-      <% if @user.errors.any? %>
-        <div class="alert alert-error">
-          <%= @user.errors.full_messages.join('. ') %>.
-        </div>
-      <% end %>
-
-      <p>
-        <%= f.password_field :password, placeholder: 'Password' %>
-      </p>
-
-      <%= f.submit "Reset Password", class: 'button' %>
-    <% end %>
-
-  </div>
+    <a href="/" class="logo hide-text">Feedbin</a>
+    <div class="box">
+        <%= render partial: 'shared/flash', locals: {flash: flash} %>
+        <h3 class="box-header">Reset Password</h3>
+        <%= form_for @user, url: password_reset_path(params[:id]) do |f| %>
+            <% if @user.errors.any? %>
+                <div class="alert alert-error">
+                    <%= @user.errors.full_messages.join('. ') %>.
+                </div>
+            <% end %>
+            <p>
+                <%= f.password_field :password, placeholder: 'Password' %>
+            </p>
+            <%= f.submit "Reset Password", class: 'button' %>
+        <% end %>
+    </div>
 </div>

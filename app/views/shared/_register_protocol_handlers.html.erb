@@ -1,6 +1,6 @@
 <iframe src="https://www.subtome.com/register-no-ui.html?name=Feedbin&url=<%= "#{get_protocol}//#{request.host}" %>/?subscribe={feed}" class="hide"></iframe>
 <script>
-if (navigator.registerContentHandler != undefined) {
-  navigator.registerContentHandler("application/vnd.mozilla.maybe.feed", "<%= "#{get_protocol}//#{request.host}" %>/?subscribe=%s", "Feedbin");
-}
+    if (navigator.registerContentHandler != undefined) {
+      navigator.registerContentHandler("application/vnd.mozilla.maybe.feed", "<%= "#{get_protocol}//#{request.host}" %>/?subscribe=%s", "Feedbin");
+    }
 </script>

@@ -1,19 +1,17 @@
 <% @class = "settings settings-#{params[:action]}" %>
 <% content_for :content do %>
-  <div class="application-messages"><a href="" class="message-content" data-behavior="messages"></a></div>
-  <script>
-    <%= render partial: 'shared/message_flash', locals: {flash: flash} %>
-  </script>
-
-
-  <div class="settings-inner">
-    <%= render partial: 'shared/settings_nav' %>
-    <div class="settings-content">
-      <%= render partial: 'shared/hamburger_menu_button' %>
-      <%= yield %>
+    <div class="application-messages"><a href="" class="message-content" data-behavior="messages"></a></div>
+    <script>
+        <%= render partial: 'shared/message_flash', locals: {flash: flash} %>
+    </script>
+    <div class="settings-inner">
+        <%= render partial: 'shared/settings_nav' %>
+        <div class="settings-content">
+            <%= render partial: 'shared/hamburger_menu_button' %>
+            <%= yield %>
+        </div>
     </div>
-  </div>
-  <div class="modal-target"></div>
-  <%= render partial: "shared/settings_modal" %>
+    <div class="modal-target"></div>
+    <%= render partial: "shared/settings_modal" %>
 <% end %>
 <%= render template: 'layouts/application' %>
