@@ -18,7 +18,7 @@
             </p>
             <p class="diff-wrap system-content entry-callout <%= entry_presenter.is_updated_entry? ? "" : "hide" %>" data-behavior="diff_view_latest">
                 <span class="icon-clock-wrap"><%= svg_tag 'favicon-updated', size: '16x16' %></span>
-                Viewing changes since original <span class="view-latest-link">view latest</span>
+                <span class="diff-wrap-text">Viewing changes since original <span class="view-latest-link">view latest</span></span>
             </p>
         <% end %>
         <%= render partial: 'media', locals: {entry: entry} %>

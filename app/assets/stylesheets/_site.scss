@@ -3377,6 +3377,9 @@ $saved-search-control-height: 48px;
                 @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
             }
         }
+        .diff-wrap-text {
+            padding-left: 20px;
+        }
         .view-latest-link {
             @include color($selected, #FFF, $selected);
             &:hover {
