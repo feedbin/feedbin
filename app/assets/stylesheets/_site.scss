@@ -3407,11 +3407,9 @@ $saved-search-control-height: 48px;
     }
 
     .original-content-info {
-        padding-right: 53px;
-        padding-left: 36px;
+        padding-right: 53px !important;
+        padding-left: 36px !important;
         line-height: 1.4;
-        padding-left: 36px;
-        padding-right: 40px;
         &:after {
             position: absolute;
             display: block;
