@@ -985,6 +985,24 @@ $.extend feedbin,
 
   init:
 
+    baseFontSize: ->
+      element = document.createElement('div')
+      content = document.createTextNode('content')
+      element.appendChild content
+      element.style.display = 'none'
+      element.style.font = '-apple-system-body'
+
+      if element.style.font == ""
+        base = "16"
+      else
+        document.body.append element
+        style = window.getComputedStyle(element, null)
+        size = style.getPropertyValue 'font-size'
+        base = parseInt(size) - 1
+
+      $("html").css
+        "font-size": "#{base}px"
+
     hasScrollBars: ->
       if feedbin.scrollBars()
         $('body').addClass('scroll-bars')
