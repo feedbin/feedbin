@@ -3357,7 +3357,7 @@ $saved-search-control-height: 48px;
     }
 
     .diff-wrap {
-        padding-left: 36px;
+        padding-left: 36px !important;
         .ignore-updates {
             @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
             text-decoration: none;
@@ -3431,7 +3431,7 @@ $saved-search-control-height: 48px;
     }
 
     .content-error {
-        padding-left: 36px;
+        padding-left: 36px !important;
         &:after {
             position: absolute;
             display: block;
@@ -3446,7 +3446,7 @@ $saved-search-control-height: 48px;
     }
 
     .readability-loading {
-        padding-left: 36px;
+        padding-left: 36px !important;
         &:after {
             position: absolute;
             display: block;
