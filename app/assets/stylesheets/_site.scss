@@ -3998,7 +3998,7 @@ $saved-search-control-height: 48px;
     }
     .tweet-text {
         white-space: pre-wrap;
-        font-size: $base-size-22px;
+        font-size: 1.15em;
         line-height: 1.4;
         @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
         font-family: $font-stack;
