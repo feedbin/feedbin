@@ -48,7 +48,7 @@ class SiteController < ApplicationController
         twitter_embed_path: twitter_embeds_path,
         instagram_embed_path: instagram_embeds_path,
         theme: @user.theme || "day",
-        nice_frames: @user.setting_on?(:nice_frames),
+        favicon_colors: @user.setting_on?(:favicon_colors),
       }
 
       render action: "logged_in"

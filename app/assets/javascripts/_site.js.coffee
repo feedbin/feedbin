@@ -17,6 +17,15 @@ $.extend feedbin,
   messageTimeout: null
   swipe: false
   panel: 1
+  colorHash: new ColorHash()
+
+  faviconColors: (target) ->
+    if feedbin.data.favicon_colors
+      $(".favicon-default", target).each ->
+        host = $(@).data("host")
+        color = feedbin.colorHash.hex(host)
+        $(@).css
+          "background-color": color
 
   calculateColor: (backgroundColor, foregroundColor) ->
     canvas = document.createElement('canvas')
@@ -982,6 +991,9 @@ $.extend feedbin,
       $.ajaxSetup(setup);
 
   init:
+
+    faviconColors: ->
+      feedbin.faviconColors($(".feeds-column"))
 
     baseFontSize: ->
       element = document.createElement('div')

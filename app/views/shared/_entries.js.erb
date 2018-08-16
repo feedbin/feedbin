@@ -70,3 +70,4 @@ feedbin.hideSearchControls()
     $('[data-behavior~=saved_search_form_target]').html('<%= j render partial: "saved_searches/form", locals: {saved_search: @saved_search} %>');
 <% end %>
 feedbin.markReadData.date = "<%= j last_unread_date %>";
+feedbin.faviconColors($(".entries-column"))

@@ -45,7 +45,6 @@ class ArticleTest < ApplicationSystemTestCase
     stub_request_file("oembed.json", /www\.youtube\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
 
     @entries.first.update(content: %(Iframe <iframe src="http://www.youtube.com/embed/1234"></iframe>))
-    @user.update(nice_frames: 1)
 
     login_as(@user)
 

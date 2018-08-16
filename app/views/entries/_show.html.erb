@@ -34,4 +34,7 @@
     <div class="hide" data-behavior="feed_link_template">
         <%= render partial: "shared/link_actions", locals: {entry: entry} %>
     </div>
+    <script>
+        feedbin.faviconColors($(".entry-toolbar"))
+    </script>
 <% end %>
