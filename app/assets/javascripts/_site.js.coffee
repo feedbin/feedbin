@@ -985,6 +985,24 @@ $.extend feedbin,
 
   init:
 
+    baseFontSize: ->
+      element = document.createElement('div')
+      content = document.createTextNode('content')
+      element.appendChild content
+      element.style.display = 'none'
+      element.style.font = '-apple-system-body'
+
+      if element.style.font == ""
+        base = "16"
+      else
+        document.body.append element
+        style = window.getComputedStyle(element, null)
+        size = style.getPropertyValue 'font-size'
+        base = parseInt(size) - 1
+
+      $("html").css
+        "font-size": "#{base}px"
+
     hasScrollBars: ->
       if feedbin.scrollBars()
         $('body').addClass('scroll-bars')
@@ -1963,6 +1981,22 @@ $.extend feedbin,
       $(document).on 'hidden.bs.modal', () ->
         rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
         feedbin.setNativeTitleColor(rgb)
+
+    scrollLeft: ->
+      entries = $('.entries-column')
+      article = $('.entry-column')
+      $('.app-wrap').on 'scroll', (event) ->
+        position = $(@).prop("scrollLeft")
+
+        entriesPosition = entries.prop("offsetLeft")
+        articlePosition = article.prop("offsetLeft")
+
+        if position == 0
+          feedbin.panel = 1
+        else if position > entriesPosition - 2 && position < entriesPosition + 2
+          feedbin.panel = 2
+        else if position > articlePosition - 2 && position < articlePosition + 2
+          feedbin.panel = 3
 
     statsBarTouched: ->
       $(document).on 'feedbin:native:statusbartouched', (event) ->
