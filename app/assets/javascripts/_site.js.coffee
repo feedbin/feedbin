@@ -409,9 +409,8 @@ $.extend feedbin,
   resetScroll: ->
     $('.entry-content').prop('scrollTop', 0)
 
-  fitVids: (selector = "entry_content_target") ->
-    target = $("[data-behavior~=#{selector}]")
-    target.fitVids({ customSelector: "iframe[src*='youtu.be'], iframe[src*='www.flickr.com'], iframe[src*='view.vzaar.com'], iframe[src*='embed-ssl.ted.com'], iframe[src*='cdn.embedly.com']"});
+  fitVids: (target) ->
+    target.fitVids({ customSelector: "iframe"});
 
   randomNumber: ->
     Math.floor(Math.random() * 1000)
@@ -462,20 +461,21 @@ $.extend feedbin,
       container = $(@)
       id = container.attr("id")
 
-      if feedbin.data.nice_frames
-        if feedbin.embeds["#{id}"]
-          container.replaceWith(feedbin.embeds["#{id}"])
-        else
-          container.html $("<div class='inline-spinner'>Loading embed from #{container.data("iframe-host")}…</div>")
-          $.get container.data("iframe-embed-url")
+      if feedbin.embeds["#{id}"]
+        container.replaceWith(feedbin.embeds["#{id}"])
       else
-        iframe = $("<iframe>").attr
-          "src": container.data("iframe-src")
-          "width": container.data("iframe-width")
-          "height": container.data("iframe-height")
-          "allowfullscreen": true
-          "frameborder": 0
-        container.replaceWith(iframe)
+        container.html $("<div class='inline-spinner'>Loading embed from #{container.data("iframe-host")}…</div>")
+        $.get container.data("iframe-embed-url")
+
+      # if feedbin.data.nice_frames
+      # else
+      #   iframe = $("<iframe>").attr
+      #     "src": container.data("iframe-src")
+      #     "width": container.data("iframe-width")
+      #     "height": container.data("iframe-height")
+      #     "allowfullscreen": true
+      #     "frameborder": 0
+      #   container.replaceWith(iframe)
 
   formatImages: ->
     $("img[data-camo-src]").each ->
@@ -525,7 +525,6 @@ $.extend feedbin,
       feedbin.audioVideo()
       feedbin.entryTime()
       feedbin.applyUserTitles()
-      feedbin.fitVids()
       feedbin.formatTweets()
       feedbin.formatInstagram()
       feedbin.formatImages()
@@ -538,7 +537,6 @@ $.extend feedbin,
     try
       feedbin.formatIframes()
       feedbin.audioVideo("view_link_markup_wrap")
-      feedbin.fitVids("view_link_markup_wrap")
       feedbin.formatTweets("view_link_markup_wrap")
       feedbin.formatImages()
     catch error
@@ -1965,12 +1963,24 @@ $.extend feedbin,
 
     loadIframe: ->
       $(document).on 'click', '[data-behavior~=iframe_placeholder]', (event) ->
+
         iframe = $("<iframe>").attr
           "src": $(@).data("iframe-src")
+          "width": $(@).data("iframe-width")
+          "height": $(@).data("iframe-height")
           "allowfullscreen": true
           "frameborder": 0
 
-        $(@).html(iframe)
+        target = $("[data-behavior~=iframe_target]", @)
+        if target.length == 0
+          $(@).html iframe
+          feedbin.fitVids($(@))
+        else
+          target.html iframe
+
+
+
+        $(@).closest(".iframe-embed").addClass("loaded")
 
     modalShowHide: ->
       $(document).on 'shown.bs.modal', () ->

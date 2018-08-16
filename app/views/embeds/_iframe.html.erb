@@ -1,23 +1,24 @@
-<div class="iframe-embed system-content embed-type-<%= embed.type %>">
+<div class="iframe-embed system-content embed-type-<%= embed.type %>" data-behavior="iframe_placeholder" data-iframe-src="<%= @embed.iframe_src %>" data-iframe-width="<%= params[:width] %>" data-iframe-height="<%= params[:height] %>">
     <% if embed.image_url.present? %>
         <div class="image-wrap">
-            <div class="inner" data-behavior="iframe_placeholder" data-iframe-src="<%= @embed.iframe_src %>">
+            <div class="play-button">
+                <div class="play-button-inner">
+                    <%= svg_tag "icon-embed-source-default" %>
+                </div>
+            </div>
+            <div class="inner" data-behavior="iframe_target">
                 <%= image_tag_with_fallback(camo_link(@embed.image_url_fallback), camo_link(@embed.image_url), class: "responsive") %>
             </div>
         </div>
     <% end %>
     <div class="embed-profile entry-callout">
         <a class="embed-icon" href="<%= embed.canonical_url %>">
+            <%= favicon_with_host(embed.embed_url.host) %>
             <%= svg_tag "icon-embed-source-#{embed.clean_name}" %>
         </a>
         <div class="embed-data">
             <div class="embed-title"><%= embed.title %></div>
             <div class="embed-subtitle"><%= embed.subtitle %></div>
-        </div>
-        <div class="profile-image">
-            <% if embed.image_url.present? %>
-                <%= image_tag_with_fallback(camo_link(@embed.image_url_fallback), camo_link(@embed.image_url), class: "responsive") %>
-            <% end %>
         </div>
     </div>
 </div>

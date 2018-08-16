@@ -3587,12 +3587,24 @@ $saved-search-control-height: 48px;
                 @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
             }
         }
-        .icon-embed-source-default {
-            height: 25px;
-        }
         .icon-embed-source-spotify,
         .icon-embed-source-kickstarter {
             top: 2px;
+        }
+        .favicon-wrap {
+            display: none;
+        }
+    }
+    &.embed-type-default {
+        cursor: pointer;
+        .embed-icon {
+            width: 20px;
+            svg {
+                display: none;
+            }
+            .favicon-wrap {
+                display: flex;
+            }
         }
     }
     &.embed-type-rich .embed-profile {
@@ -3600,10 +3612,38 @@ $saved-search-control-height: 48px;
     }
     &.embed-type-rich {
         max-width: 300px;
-        margin-left: auto;
-        margin-right: auto;
         .image-wrap {
             padding-top: 100%;
+        }
+    }
+    .play-button {
+        display: none;
+        width: 70px;
+        height: 39px;
+        background-color: rgba(black, .8);
+        border-radius: 4px;
+        position: absolute;
+        margin: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        z-index: 100;
+        pointer-events: none;
+        .play-button-inner {
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            margin: auto;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 0;
+            svg {
+                max-width: 100%;
+                max-height: 100%;
+                fill: #FFF;
+            }
         }
     }
     &.embed-type-video {
@@ -3611,8 +3651,8 @@ $saved-search-control-height: 48px;
             display: block;
             padding-top: 56.25%;
         }
-        .profile-image {
-            display: none;
+        &:not(.loaded) .image-wrap:hover .play-button {
+            display: block;
         }
     }
     .embed-title {
@@ -3621,12 +3661,6 @@ $saved-search-control-height: 48px;
     }
     .embed-subtitle {
         font-size: $base-size-14px;
-    }
-    .profile-image {
-        margin-left: auto;
-        img {
-            height: 38px;
-        }
     }
 }
 

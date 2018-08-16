@@ -15,8 +15,12 @@ class Embed::Default < IframeEmbed
     end
   end
 
+  def type
+    clean_name
+  end
+
   def subtitle
-    embed_url.host.split(".").last(2).join(".")
+    "Embed from #{embed_url.host.split(".").last(2).join(".")}"
   end
 
   def canonical_url

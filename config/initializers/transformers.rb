@@ -13,7 +13,7 @@ class Transformers
       "class" => "iframe-placeholder entry-callout system-content",
       "data-iframe-src" => uri.to_s,
       "data-iframe-host" => uri.host,
-      "data-iframe-embed-url" => Rails.application.routes.url_helpers.iframe_embeds_path(url: uri.to_s, dom_id: id),
+      "data-iframe-embed-url" => Rails.application.routes.url_helpers.iframe_embeds_path(url: uri.to_s, dom_id: id, width: width, height: height),
     }
     if width && height
       attributes["data-iframe-width"] = width
