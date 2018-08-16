@@ -1262,7 +1262,7 @@ Structure
             }
             &.selected {
                 .feed-action-button {
-                    color: $text-color-light !important;
+                    color: rgba(white, .7);
                 }
             }
             &.ui-draggable-dragging {
@@ -1318,7 +1318,7 @@ Structure
     > a .count {
         color: rgba(255,255,255,.7);
     }
-    .feed-action-button, input[disabled] {
+    input[disabled] {
         color: rgba(255,255,255,.9);
     }
     .rename-feed-button {
