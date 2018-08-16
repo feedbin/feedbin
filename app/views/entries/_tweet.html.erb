@@ -1,6 +1,18 @@
 <% present entry do |entry_presenter| %>
     <div class="tweet-wrap" data-behavior="external_links">
         <%= render partial: "shared/tweet", locals: {entry: entry, tweet: entry.main_tweet, css: "main-tweet entry-main-tweet"} %>
+
+        <% if entry.tweet.retweeted_status? %>
+            <div class="tweet-meta-wrap">
+                <p class="tweet-meta">
+                    <a href="<%= entry_presenter.tweet_user_url(entry.tweet) %>">
+                    <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry_presenter.tweet_retweeted_image, size: "16x16", alt: "") %>
+                    <%= entry_presenter.tweet_retweeted_message %>
+                  </a>
+                </p>
+            </div>
+        <% end %>
+
         <% entry_presenter.tweet_media.each do |media| %>
             <% if entry_presenter.tweet_video?(media) %>
                 <%= entry_presenter.tweet_video(media) %>
@@ -31,40 +43,31 @@
                 <% end %>
             <% end %>
         <% end %>
+
         <% if entry_presenter.quoted_status? %>
             <%= render partial: "shared/tweet", locals: {entry: entry, tweet: entry_presenter.quoted_status, css: "quoted-tweet"} %>
         <% end %>
-        <% if entry.tweet.retweeted_status? %>
-            <div class="tweet-meta-wrap">
-                <p class="tweet-meta">
-                    <a href="<%= entry_presenter.tweet_user_url(entry.tweet) %>">
-            <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry_presenter.tweet_retweeted_image, size: "16x16", alt: "") %>
-            <%= entry_presenter.tweet_retweeted_message %>
-          </a>
-        </p>
-    </div>
-  <% end %>
 
-  <% entry_presenter.tweet_urls.each do |url| %>
+        <% entry_presenter.tweet_urls.each do |url| %>
 
-    <% if entry_presenter.tweet_youtube_embed(url, :div) %>
-      <%= entry_presenter.tweet_youtube_embed(url, :div) %>
-    <% elsif entry_presenter.tweet_vimeo_embed(url, :div) %>
-      <%= entry_presenter.tweet_vimeo_embed(url, :div) %>
-    <% elsif entry_presenter.tweet_instagram_embed(url) %>
-      <%= entry_presenter.tweet_instagram_embed(url) %>
-    <% elsif page = entry_presenter.saved_page(url.expanded_url.to_s) %>
+            <% if entry_presenter.tweet_youtube_embed(url, :div) %>
+                <%= entry_presenter.tweet_youtube_embed(url, :div) %>
+            <% elsif entry_presenter.tweet_vimeo_embed(url, :div) %>
+                <%= entry_presenter.tweet_vimeo_embed(url, :div) %>
+            <% elsif entry_presenter.tweet_instagram_embed(url) %>
+                <%= entry_presenter.tweet_instagram_embed(url) %>
+            <% elsif page = entry_presenter.saved_page(url.expanded_url.to_s) %>
 
-      <%
-      begin
-          link_content = ContentFormatter.format!(page.content, nil)
-      rescue
-          link_content = nil
-      end
-      %>
+              <%
+              begin
+                  link_content = ContentFormatter.format!(page.content, nil)
+              rescue
+                  link_content = nil
+              end
+              %>
 
-      <% if link_content && link_content.length > 400 %>
-        <hr />
+              <% if link_content && link_content.length > 400 %>
+                <hr />
                     <p class="post-meta new-section">
                         <%= favicon_with_host(url.expanded_url.host) %> <%= url.expanded_url.host %>
                     </p>
