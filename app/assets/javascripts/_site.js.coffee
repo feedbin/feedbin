@@ -1982,6 +1982,22 @@ $.extend feedbin,
         rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
         feedbin.setNativeTitleColor(rgb)
 
+    scrollLeft: ->
+      entries = $('.entries-column')
+      article = $('.entry-column')
+      $('.app-wrap').on 'scroll', (event) ->
+        position = $(@).prop("scrollLeft")
+
+        entriesPosition = entries.prop("offsetLeft")
+        articlePosition = article.prop("offsetLeft")
+
+        if position == 0
+          feedbin.panel = 1
+        else if position > entriesPosition - 2 && position < entriesPosition + 2
+          feedbin.panel = 2
+        else if position > articlePosition - 2 && position < articlePosition + 2
+          feedbin.panel = 3
+
     statsBarTouched: ->
       $(document).on 'feedbin:native:statusbartouched', (event) ->
         feedbin.scrollToTop()
