@@ -111,7 +111,7 @@ class ContentFormatter
   end
 
   def self.evernote_format(content, entry)
-    filters = [HTML::Pipeline::SanitizationFilter, HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter]
+    filters = [HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer, HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter]
     context = {
       whitelist: Feedbin::Application.config.evernote_whitelist.clone,
       image_base_url: entry.feed.site_url,
