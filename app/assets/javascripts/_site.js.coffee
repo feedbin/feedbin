@@ -992,9 +992,6 @@ $.extend feedbin,
 
   init:
 
-    faviconColors: ->
-      feedbin.faviconColors($(".feeds-column"))
-
     baseFontSize: ->
       element = document.createElement('div')
       content = document.createTextNode('content')
@@ -1012,6 +1009,9 @@ $.extend feedbin,
 
       $("html").css
         "font-size": "#{base}px"
+
+    faviconColors: ->
+      feedbin.faviconColors($(".feeds-column"))
 
     hasScrollBars: ->
       if feedbin.scrollBars()
