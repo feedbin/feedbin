@@ -13,6 +13,10 @@
             </div>
         <% end %>
 
+        <% if entry_presenter.quoted_status? %>
+            <%= render partial: "shared/tweet", locals: {entry: entry, tweet: entry_presenter.quoted_status, css: "quoted-tweet"} %>
+        <% end %>
+
         <% entry_presenter.tweet_media.each do |media| %>
             <% if entry_presenter.tweet_video?(media) %>
                 <%= entry_presenter.tweet_video(media) %>
@@ -22,6 +26,7 @@
                 <% end %>
             <% end %>
         <% end %>
+
         <% entry.tweet_thread.each do |thread| %>
             <%= entry_presenter.tweet_text(thread) %>
             <% thread.media.each do |media| %>
@@ -42,10 +47,6 @@
                     <%= entry_presenter.tweet_instagram_embed(url) %>
                 <% end %>
             <% end %>
-        <% end %>
-
-        <% if entry_presenter.quoted_status? %>
-            <%= render partial: "shared/tweet", locals: {entry: entry, tweet: entry_presenter.quoted_status, css: "quoted-tweet"} %>
         <% end %>
 
         <% entry_presenter.tweet_urls.each do |url| %>
