@@ -20,7 +20,7 @@ $.extend feedbin,
   colorHash: new ColorHash()
 
   faviconColors: (target) ->
-    if feedbin.data.favicon_colors
+    if feedbin && feedbin.data && feedbin.data.favicon_colors
       $(".favicon-default", target).each ->
         host = $(@).data("host")
         color = feedbin.colorHash.hex(host)
