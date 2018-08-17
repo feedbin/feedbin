@@ -1005,7 +1005,7 @@ $.extend feedbin,
       if element.style.font == ""
         base = "16"
       else
-        document.body.append element
+        document.body.appendChild element
         style = window.getComputedStyle(element, null)
         size = style.getPropertyValue 'font-size'
         base = parseInt(size) - 1
