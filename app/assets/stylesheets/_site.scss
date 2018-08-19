@@ -3640,6 +3640,7 @@ $saved-search-control-height: 48px;
             bottom: 0;
             top: 0;
             svg {
+                position: absolute;
                 max-width: 100%;
                 max-height: 100%;
                 fill: #FFF;

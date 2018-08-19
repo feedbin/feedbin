@@ -323,10 +323,12 @@ $.extend feedbin,
       for placeholder in placeholders
         feedbin.imagePlaceholders(placeholder)
 
-  preloadImages: (id) ->
+  preloadAssets: (id) ->
     id = parseInt(id)
     if feedbin.entries[id] && !_.contains(feedbin.preloadedImageIds, id)
-      $(feedbin.entries[id].content).find("img[data-camo-src][data-canonical-src]").each ->
+      content = $(feedbin.entries[id].inner_content)
+      feedbin.formatIframes(content.find("[data-iframe-src]"))
+      content.find("img[data-camo-src][data-canonical-src]").each ->
         if feedbin.data.proxy_images
           src = 'camo-src'
         else
@@ -399,7 +401,7 @@ $.extend feedbin,
     if entry_ids.length > 0
       $.getJSON feedbin.data.preload_entries_path, {ids: entry_ids.join(',')}, (data) ->
         $.extend feedbin.entries, data
-        feedbin.preloadImages(entry_ids[0])
+        feedbin.preloadAssets(entry_ids[0])
 
   readability: () ->
     feedId = feedbin.selectedEntry.feed_id
@@ -465,8 +467,8 @@ $.extend feedbin,
         if node == "TABLE"
           $('.entry-type-default').removeClass("entry-type-default").addClass("entry-type-newsletter");
 
-  formatIframes: ->
-    $("[data-iframe-src]").each ->
+  formatIframes: (selector) ->
+    selector.each ->
       container = $(@)
       id = container.attr("id")
 
@@ -475,16 +477,6 @@ $.extend feedbin,
       else
         container.html $("<div class='inline-spinner'>Loading embed from #{container.data("iframe-host")}…</div>")
         $.get container.data("iframe-embed-url")
-
-      # if feedbin.data.nice_frames
-      # else
-      #   iframe = $("<iframe>").attr
-      #     "src": container.data("iframe-src")
-      #     "width": container.data("iframe-width")
-      #     "height": container.data("iframe-height")
-      #     "allowfullscreen": true
-      #     "frameborder": 0
-      #   container.replaceWith(iframe)
 
   formatImages: ->
     $("img[data-camo-src]").each ->
@@ -525,7 +517,7 @@ $.extend feedbin,
     if readability
       feedbin.readability()
     try
-      feedbin.formatIframes()
+      feedbin.formatIframes($("[data-iframe-src]"))
       feedbin.playState()
       feedbin.timeRemaining(entryId)
       feedbin.syntaxHighlight()
@@ -544,7 +536,7 @@ $.extend feedbin,
 
   formatLinkContents: ->
     try
-      feedbin.formatIframes()
+      feedbin.formatIframes($("[data-iframe-src]"))
       feedbin.audioVideo("view_link_markup_wrap")
       feedbin.formatTweets("view_link_markup_wrap")
       feedbin.formatImages()
@@ -1274,13 +1266,13 @@ $.extend feedbin,
         event.preventDefault()
         return
 
-    preloadImages: ->
+    preloadAssets: ->
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
         selected = $(@).parents('li')
         next = selected.next('li')
         if next.length > 0
           id = next.data('entry-id')
-          feedbin.preloadImages(id)
+          feedbin.preloadAssets(id)
         return
 
     entriesLoading: ->
