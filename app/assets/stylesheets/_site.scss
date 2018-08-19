@@ -3578,6 +3578,7 @@ $saved-search-control-height: 48px;
         width: 34px;
         height: 34px;
         margin-right: 10px;
+        flex-shrink: 0;
         svg {
             position: relative;
             top: 5px;
