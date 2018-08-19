@@ -1272,7 +1272,6 @@ $.extend feedbin,
         siblings = selected.nextAll().slice(0,3).add(selected.prevAll().slice(0,3))
         siblings.each ->
           id = $(@).data('entry-id')
-          console.log id
           feedbin.preloadAssets(id)
 
     entriesLoading: ->
