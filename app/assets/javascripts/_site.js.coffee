@@ -1268,12 +1268,12 @@ $.extend feedbin,
 
     preloadAssets: ->
       $(document).on 'click', '[data-behavior~=show_entry_content]', ->
-        selected = $(@).parents('li')
-        next = selected.next('li')
-        if next.length > 0
-          id = next.data('entry-id')
+        selected = $(@).closest('li')
+        siblings = selected.nextAll().slice(0,3).add(selected.prevAll().slice(0,3))
+        siblings.each ->
+          id = $(@).data('entry-id')
+          console.log id
           feedbin.preloadAssets(id)
-        return
 
     entriesLoading: ->
       $(document).on 'click', '[data-behavior~=feed_link]', (event) ->
