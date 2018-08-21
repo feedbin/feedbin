@@ -31,8 +31,10 @@ class ContentFormatter
   def self.format!(content, entry = nil, image_proxy_enabled = true)
     context = {
       whitelist: Feedbin::Application.config.whitelist,
+      embed_url: Rails.application.routes.url_helpers.iframe_embeds_path,
+      embed_classes: "iframe-placeholder entry-callout system-content",
     }
-    filters = [HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer]
+    filters = [HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer, HTML::Pipeline::IframeFilter]
 
     if ENV["CAMO_HOST"] && ENV["CAMO_KEY"] && image_proxy_enabled
       context[:asset_proxy] = ENV["CAMO_HOST"]

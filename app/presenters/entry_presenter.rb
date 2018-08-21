@@ -578,8 +578,12 @@ class EntryPresenter < BasePresenter
     if tag == :iframe
       @template.content_tag(:iframe, "", src: url, height: 9, width: 16, frameborder: 0, allowfullscreen: true).html_safe
     else
-      transformers = Transformers.new
-      attributes = transformers.iframe_attributes(url, 16, 9)
+      context = {
+        embed_url: Rails.application.routes.url_helpers.iframe_embeds_path,
+        embed_classes: "iframe-placeholder entry-callout system-content",
+      }
+      filter = HTML::Pipeline::IframeFilter.new("", context)
+      attributes = filter.iframe_attributes(url, 16, 9)
       @template.content_tag(:div, "", attributes).html_safe
     end
   end
