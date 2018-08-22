@@ -5,6 +5,7 @@ class Whitelist
         h1 h2 h3 h4 h5 h6 h7 h8 br b i strong em a pre code img tt div ins del sup sub
         p ol ul table thead tbody tfoot blockquote dl dt dd kbd q samp var hr ruby rt
         rp li tr td th s strike summary details figure figcaption audio video source
+        iframe
       ]
 
       hash[:attributes] = {
@@ -20,6 +21,7 @@ class Whitelist
         "audio" => ["src"],
         "td" => ["align"],
         "th" => ["align"],
+        "iframe" => ["src", "width", "height"],
         all: %w[
           abbr accept accept-charset accesskey action alt axis border cellpadding
           cellspacing char charoff charset checked clear cols colspan color compact
@@ -67,7 +69,7 @@ class Whitelist
   def default
     transformers = Transformers.new
     base.clone.tap do |hash|
-      hash[:transformers] = [transformers.class_whitelist, transformers.iframe_whitelist, transformers.table_elements, transformers.top_level_li]
+      hash[:transformers] = [transformers.class_whitelist, transformers.table_elements, transformers.top_level_li]
     end
   end
 
