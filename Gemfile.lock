@@ -379,7 +379,7 @@ GEM
       hashie (~> 3.2)
       multi_json (~> 1.10)
       multi_xml (~> 0.5)
-    redis (4.0.1)
+    redis (4.0.2)
     ref (2.0.0)
     request_store (1.4.1)
       rack (>= 1.4)
