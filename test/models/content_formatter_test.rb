@@ -33,12 +33,6 @@ class ContentFormatterTest < ActiveSupport::TestCase
     assert_equal expected, ContentFormatter.summary(content, 256)
   end
 
-  test "should replace iframes" do
-    content = %(<iframe src="http://youtu.be/1234"></iframe>)
-    expected = %(<div id="0912e82b697139f31d365493fcb58cd325240bf0" class="iframe-placeholder entry-callout system-content" data-iframe-src="https://youtu.be/1234" data-iframe-host="youtu.be" data-iframe-embed-url="/embeds/iframe?dom_id=0912e82b697139f31d365493fcb58cd325240bf0&amp;url=https%3A%2F%2Fyoutu.be%2F1234"></div>)
-    assert_equal expected, ContentFormatter.format!(content)
-  end
-
   test "should allow certain classes" do
     classes = %w{twitter-tweet instagram-media}
     classes.each do |css_class|
