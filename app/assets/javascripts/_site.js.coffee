@@ -327,7 +327,11 @@ $.extend feedbin,
     id = parseInt(id)
     if feedbin.entries[id] && !_.contains(feedbin.preloadedImageIds, id)
       content = $(feedbin.entries[id].inner_content)
+
       feedbin.formatIframes(content.find("[data-iframe-src]"))
+      feedbin.formatTweets(content)
+      feedbin.formatInstagram(content)
+
       content.find("img[data-camo-src][data-canonical-src]").each ->
         if feedbin.data.proxy_images
           src = 'camo-src'
@@ -440,8 +444,7 @@ $.extend feedbin,
             item.css({display: "block"})
 
 
-  formatTweets: (selector = "entry_content_wrap") ->
-    target = $("[data-behavior~=#{selector}]")
+  formatTweets: (target = "[data-behavior~=entry_content_wrap]") ->
     items = $('blockquote.twitter-tweet', target)
 
     urlFinder = (item) ->
@@ -450,8 +453,8 @@ $.extend feedbin,
     feedbin.embed(items, feedbin.data.twitter_embed_path, urlFinder)
 
 
-  formatInstagram: ->
-    items = $('blockquote.instagram-media')
+  formatInstagram: (target = "[data-behavior~=entry_content_wrap]") ->
+    items = $('blockquote.instagram-media', target)
 
     urlFinder = (item) ->
       item.data("instgrmPermalink") || $("a", item).last().attr("href")
@@ -506,6 +509,13 @@ $.extend feedbin,
       if img.is("[src*='feeds.feedburner.com'], [data-canonical-src*='feeds.feedburner.com']")
         img.addClass('hide')
 
+  preloadSiblings: ->
+    selected = feedbin.selectedEntry.container.closest('li')
+    siblings = selected.nextAll().slice(0,4).add(selected.prevAll().slice(0,4))
+    siblings.each ->
+      id = $(@).data('entry-id')
+      feedbin.preloadAssets(id)
+
   formatEntryContent: (entryId, resetScroll=true, readability=true) ->
     if feedbin.readabilityXHR != null
       feedbin.readabilityXHR.abort()
@@ -530,6 +540,7 @@ $.extend feedbin,
       feedbin.formatInstagram()
       feedbin.formatImages()
       feedbin.checkType()
+      feedbin.preloadSiblings()
     catch error
       if 'console' of window
         console.log error
@@ -538,7 +549,8 @@ $.extend feedbin,
     try
       feedbin.formatIframes($("[data-iframe-src]"))
       feedbin.audioVideo("view_link_markup_wrap")
-      feedbin.formatTweets("view_link_markup_wrap")
+      feedbin.formatTweets("[data-behavior~=view_link_markup_wrap]")
+      feedbin.formatInstagram("[data-behavior~=view_link_markup_wrap]")
       feedbin.formatImages()
     catch error
       if 'console' of window
@@ -1265,14 +1277,6 @@ $.extend feedbin,
         nextScreenshot.find('a').click()
         event.preventDefault()
         return
-
-    preloadAssets: ->
-      $(document).on 'click', '[data-behavior~=show_entry_content]', ->
-        selected = $(@).closest('li')
-        siblings = selected.nextAll().slice(0,3).add(selected.prevAll().slice(0,3))
-        siblings.each ->
-          id = $(@).data('entry-id')
-          feedbin.preloadAssets(id)
 
     entriesLoading: ->
       $(document).on 'click', '[data-behavior~=feed_link]', (event) ->
