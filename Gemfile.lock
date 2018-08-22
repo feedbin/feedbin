@@ -442,7 +442,7 @@ GEM
     sshkit (1.17.0)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    stripe (3.17.0)
+    stripe (3.22.0)
       faraday (~> 0.10)
     stripe-ruby-mock (2.5.0)
       dante (>= 0.2.0)
