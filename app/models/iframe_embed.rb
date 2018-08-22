@@ -28,10 +28,6 @@ class IframeEmbed
     data && data["type"]
   end
 
-  def image_url_fallback
-    false
-  end
-
   def iframe_src
     url = embed_url.dup
     params = Rack::Utils.parse_nested_query(url.query)

@@ -13,7 +13,15 @@ class Embed::Youtube < IframeEmbed
   end
 
   def image_url
-    data["thumbnail_url"].sub "hqdefault", "maxresdefault"
+    url = data["thumbnail_url"].sub "hqdefault", "maxresdefault"
+    status = Rails.cache.fetch("youtube_thumb_status:#{url}") do
+      HTTP.head(url).status
+    end
+    if status == 200
+      url
+    else
+      data["thumbnail_url"]
+    end
   end
 
   def canonical_url
