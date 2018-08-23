@@ -391,7 +391,7 @@ GEM
       nokogiri
     rmagick (2.16.0)
     ruby_dep (1.5.0)
-    rubyzip (1.1.0)
+    rubyzip (1.2.1)
     rufo (0.4.0)
     safe_yaml (1.0.4)
     sanitize (4.6.6)
@@ -564,7 +564,7 @@ DEPENDENCIES
   responders (~> 2.0)
   reverse_markdown
   rmagick
-  rubyzip (= 1.1.0)
+  rubyzip (= 1.2.1)
   rufo
   sanitize
   sassc-rails
