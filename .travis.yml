@@ -19,6 +19,7 @@ env:
     - KINDLEGEN_PATH=/tmp/kindlegen/kindlegen
     - ES_VERSION=2.3.3
     - CHROME_DRIVER_VERSION=2.36
+    - RAILS_ENV=test
 
 before_install:
   - wget "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" -O /tmp/chromedriver.zip
@@ -38,4 +39,4 @@ before_script:
   - curl http://127.0.0.1:9200/
 
 script:
-  - bin/rails test:system test
+  - bin/rails test_with_coveralls
