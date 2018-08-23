@@ -1,5 +1,5 @@
 require "coveralls"
-Coveralls.wear_merged!
+Coveralls.wear_merged!("rails")
 
 ENV["RAILS_ENV"] ||= "test"
 ENV["REDIS_URL"] = "redis://localhost:7776"
