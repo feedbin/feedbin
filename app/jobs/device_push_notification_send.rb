@@ -4,12 +4,15 @@ class DevicePushNotificationSend
 
   MAX_PAYLOAD_SIZE = 4096
 
-  APNOTIC_POOL = Apnotic::ConnectionPool.new({
+  apnotic_options = {
     auth_method: :token,
     cert_path: ENV["APPLE_AUTH_KEY"],
     team_id: ENV["APPLE_TEAM_ID"],
     key_id: ENV["APPLE_KEY_ID"],
-  }, size: 5)
+  }
+  APNOTIC_POOL = Apnotic::ConnectionPool.new(apnotic_options, size: 5) do |connection|
+    connection.on(:error) { |exception| Honeybadger.notify(exception) }
+  end
 
   def perform(user_ids, entry_id, skip_read)
     Honeybadger.context(user_ids: user_ids, entry_id: entry_id)

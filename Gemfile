@@ -37,10 +37,6 @@ group :development, :test do
   gem "minitest-stub_any_instance"
 end
 
-group :production do
-  gem "therubyracer", require: "v8"
-end
-
 gem "pg", "< 1.0"
 gem "unicorn"
 
@@ -53,6 +49,7 @@ gem "grocer-pushpackager", github: "feedbin/grocer-pushpackager", ref: "6b01b4e"
 gem "html_diff", github: "feedbin/html_diff", ref: "c7c15ce"
 gem "carrierwave_direct", github: "feedbin/carrierwave_direct", ref: "a0bc323"
 
+gem "mini_racer"
 gem "sassc-rails"
 gem "coffee-rails"
 gem "uglifier", "= 4.1.11"

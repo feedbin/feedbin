@@ -2,8 +2,11 @@ class SafariPushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
 
-  APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV["APPLE_PUSH_CERT"]}, size: 5)
   VERIFIER = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)
+
+  APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV["APPLE_PUSH_CERT"]}, size: 5) do |connection|
+    connection.on(:error) { |exception| Honeybadger.notify(exception) }
+  end
 
   def perform(user_ids, entry_id)
     tokens = Device.where(user_id: user_ids).safari.pluck(:user_id, :token)
