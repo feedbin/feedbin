@@ -7,7 +7,7 @@
                 </div>
             </div>
             <div class="inner" data-behavior="iframe_target">
-                <%= image_tag_with_fallback(camo_link(@embed.image_url_fallback), camo_link(@embed.image_url), class: "responsive", alt: "") %>
+                <%= image_tag(camo_link(@embed.image_url), class: "responsive", alt: "") %>
             </div>
         </div>
     <% end %>

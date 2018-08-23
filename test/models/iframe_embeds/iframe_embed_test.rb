@@ -20,6 +20,8 @@ class IframeEmbedTest < ActiveSupport::TestCase
   test "should have embed properties" do
     stub_request_file("oembed.json", /.*/, headers: {"Content-Type" => "application/json; charset=utf-8"})
 
+    stub_request(:head, /i\.ytimg\.com/).to_return(status: 200, body: "", headers: {})
+
     embed_sources = {
       Embed::Youtube => "https://www.youtube-nocookie.com/embed/fKcLAwFJTo",
       Embed::Vimeo => "https://player.vimeo.com/video/83748810",
