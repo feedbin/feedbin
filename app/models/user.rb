@@ -105,8 +105,8 @@ class User < ApplicationRecord
     self.expires_at = Feedbin::Application.config.trial_days.days.from_now
     self.update_auth_token = true
     self.mark_as_read_confirmation = 1
-    self.font = "serif-2"
-    self.font_size = 7
+    self.font = "default"
+    self.font_size = 5
     self.price_tier = Feedbin::Application.config.price_tier
   end
 
