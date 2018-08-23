@@ -40,4 +40,4 @@ before_script:
 
 script:
   - bin/rails test:system test
-  - bin/rails coveralls:push
+  - bundle exec rake coveralls:push
