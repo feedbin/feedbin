@@ -43,6 +43,7 @@ class ArticleTest < ApplicationSystemTestCase
     show_article_setup
 
     stub_request_file("oembed.json", /www\.youtube\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
+    stub_request(:head, /i\.ytimg\.com/).to_return(status: 200, body: "", headers: {})
 
     @entries.first.update(content: %(Iframe <iframe src="http://www.youtube.com/embed/1234"></iframe>))
 
