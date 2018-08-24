@@ -324,7 +324,7 @@ GEM
     nokogumbo (1.4.9)
       nokogiri
     oauth (0.5.4)
-    pg (0.21.0)
+    pg (1.0.0)
     premailer (1.11.1)
       addressable
       css_parser (>= 1.6.0)
@@ -551,7 +551,7 @@ DEPENDENCIES
   nokogumbo (= 1.4.9)
   oauth
   opml_saw!
-  pg (< 1.0)
+  pg (< 2.0)
   premailer-rails
   puma
   rails (= 5.1.6)
