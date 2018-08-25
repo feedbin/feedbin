@@ -18,7 +18,7 @@
 <div class="app-wrap">
     <div class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
         <div class="subscribe-toolbar">
-            <button type="button" class="show-subscribe" data-behavior="show_subscribe">+ Add</button>
+            <button type="button" class="show-subscribe" data-behavior="show_subscribe" data-modal-target="subscribe">+ Add</button>
             <%= render partial: 'shared/hamburger_menu_button' %>
         </div>
         <div class="feeds-inner">
@@ -107,13 +107,16 @@
     </div>
 </div>
 <div class="hide" data-behavior="pagination"></div>
-<%= render partial: "shared/readability_loading" %>
+<%= render partial: "shared/modal" %>
+
 <%= render partial: "shared/add_form" %>
 <%= render partial: "shared/keyboard_shortcuts_wrap" %>
 <%= render partial: "shared/view_link_wrap" %>
 <%= render partial: "shared/settings_modal" %>
+<%= render partial: 'shared/modal_wrap', locals: {user: @user} %>
+
+<%= render partial: "shared/readability_loading" %>
 <%= render partial: "shared/resizable_form" %>
 <%= render partial: 'shared/update_styles' %>
 <%= render partial: 'shared/saved_searches_count' %>
-<%= render partial: 'shared/modal_wrap', locals: {user: @user} %>
 <%= one_time_content && one_time_content.html_safe %>

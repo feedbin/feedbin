@@ -11,7 +11,6 @@ window.feedbin ?= {}
   return
 ) jQuery
 
-
 $.extend feedbin,
 
   messageTimeout: null
@@ -908,6 +907,23 @@ $.extend feedbin,
       $.ajax(xhr)
     )
 
+  showModal: (target) ->
+    modal = $("#modal")
+    classes = modal[0].className.split(/\s+/)
+    classPrefix = "modal-purpose"
+    modalClass = "#{classPrefix}-#{target}"
+
+    content = $("[data-modal-purpose=#{target}]").html()
+
+    $.each classes, (index, className) ->
+      if className.indexOf(classPrefix) != -1
+        modal.removeClass className
+
+    modal.html(content)
+    modal.addClass(modalClass)
+    modal.modal('show')
+    modalClass
+
   modal: (selector, cssClass = null) ->
     activeModal = $(selector)
     $('.modal').each ->
@@ -926,8 +942,8 @@ $.extend feedbin,
   updateFeedSearchMessage: ->
     length = $('[data-behavior~=subscription_option] [data-behavior~=check_toggle]:checked').length
     show = (message) ->
-      $("#add_form_modal [data-behavior~=feeds_search_message]").addClass("hide")
-      $("#add_form_modal [data-behavior~=feeds_search_message][data-behavior~=#{message}]").removeClass("hide")
+      $(".modal-purpose-subscribe [data-behavior~=feeds_search_message]").addClass("hide")
+      $(".modal-purpose-subscribe [data-behavior~=feeds_search_message][data-behavior~=#{message}]").removeClass("hide")
 
     if length == 0
       show("message_none")
@@ -1659,9 +1675,9 @@ $.extend feedbin,
 
     feedsSearch: ->
       $(document).on 'submit', '[data-behavior~=feeds_search]', ->
-        $('#add_form_modal .feed-search-results').hide()
+        $('.modal-purpose-subscribe .feed-search-results').hide()
         $('[data-behavior~=feeds_search_favicon_target]').html('')
-        $('#add_form_modal .modal-dialog').removeClass('done');
+        $('.modal-purpose-subscribe .modal-dialog').removeClass('done');
 
     formProcessing: ->
       $(document).on 'submit', '[data-behavior~=spinner], [data-behavior~=subscription_form], [data-behavior~=search_form], [data-behavior~=feeds_search]', ->
@@ -1679,21 +1695,20 @@ $.extend feedbin,
 
     subscribe: ->
       $(document).on 'click', '[data-behavior~=show_subscribe]', ->
-        modal = $('#add_form_modal')
-        markup = $('[data-behavior~=add_form_markup]')
-        modal.html(markup.html())
-        feedbin.modal('#add_form_modal')
+        target = $(@).data("modal-target")
+        modalClass = feedbin.showModal(target)
 
-      $('#add_form_modal').on 'shown.bs.modal', () ->
-        $('#add_form_modal [data-behavior~=feeds_search_field]').focus()
+        $(document).on 'shown.bs.modal', (event) ->
+          if $(event.target).hasClass(modalClass)
+            $(".#{modalClass} [data-behavior~=feeds_search_field]").focus()
 
-      $('#add_form_modal').on 'hide.bs.modal', () ->
-        $('#add_form_modal input').blur()
+      $(document).on 'hide.bs.modal', (event) ->
+        $('input').blur()
 
       subscription = feedbin.queryString('subscribe')
       if subscription?
         $('[data-behavior~=show_subscribe]').click()
-        field = $('#add_form_modal [data-behavior~=feeds_search_field]')
+        field = $('.modal-purpose-subscribe [data-behavior~=feeds_search_field]')
         field.val(subscription)
         field.closest("form").submit()
 
@@ -1905,9 +1920,9 @@ $.extend feedbin,
       $(document).on 'change', '[data-behavior~=subscription_option] [data-behavior~=check_toggle]', (event) ->
         length = $('[data-behavior~=subscription_option] [data-behavior~=check_toggle]:checked').length
         if length == 0
-          $('#add_form_modal [data-behavior~=submit_add]').attr('disabled', 'disabled')
+          $('.modal-purpose-subscribe [data-behavior~=submit_add]').attr('disabled', 'disabled')
         else
-          $('#add_form_modal [data-behavior~=submit_add]').removeAttr('disabled', 'disabled')
+          $('.modal-purpose-subscribe [data-behavior~=submit_add]').removeAttr('disabled', 'disabled')
         feedbin.updateFeedSearchMessage()
 
     linkActionsHover: ->

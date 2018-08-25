@@ -1,15 +1,15 @@
 <% if @feeds.present? %>
     <% present @feeds.first do |feed_presenter| %>
         <% if @feeds.first.twitter_user? %>
-            $('#add_form_modal [data-behavior~=feeds_search_favicon_target]').html('<%= j feed_presenter.favicon(@feeds.first) %>');
+            $('.modal-purpose-subscribe [data-behavior~=feeds_search_favicon_target]').html('<%= j feed_presenter.favicon(@feeds.first) %>');
         <% else %>
-            $('#add_form_modal [data-behavior~=feeds_search_favicon_target]').html('<%= j favicon_with_host(@feeds.first.host) %>');
+            $('.modal-purpose-subscribe [data-behavior~=feeds_search_favicon_target]').html('<%= j favicon_with_host(@feeds.first.host) %>');
         <% end %>
-        $('#add_form_modal [data-behavior~=subscribe_target]').html('<%= j render partial: "subscriptions/new", locals: {feeds: @feeds} %>');
-        $('#add_form_modal .feed-search-results').slideDown(200)
-        $('#add_form_modal .modal-dialog').addClass('done');
-        $('#add_form_modal [data-behavior~=submit_add]').removeAttr('disabled');
-        $('#add_form_modal .title').first().find("input").focus();
+        $('.modal-purpose-subscribe [data-behavior~=subscribe_target]').html('<%= j render partial: "subscriptions/new", locals: {feeds: @feeds} %>');
+        $('.modal-purpose-subscribe .modal-body, .modal-purpose-subscribe .modal-footer').slideDown(200)
+        $('.modal-purpose-subscribe .modal-dialog').addClass('done');
+        $('.modal-purpose-subscribe [data-behavior~=submit_add]').removeAttr('disabled');
+        $('.modal-purpose-subscribe .title').first().find("input").focus();
         window.history.replaceState({}, document.title, "/");
         feedbin.updateFeedSearchMessage();
     <% end %>

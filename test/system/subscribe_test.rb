@@ -10,9 +10,9 @@ class SubscribeTest < ApplicationSystemTestCase
 
     find("[data-behavior~=show_subscribe]").click
 
-    within("#add_form_modal") do
+    within(".modal-purpose-subscribe") do
       fill_in "q", with: feed_url
-      page.execute_script("$('#add_form_modal [data-behavior~=feeds_search]').submit()")
+      page.execute_script("$('.modal-purpose-subscribe [data-behavior~=feeds_search]').submit()")
       find("[data-behavior~=subscription_options]")
       click_button "Add"
     end

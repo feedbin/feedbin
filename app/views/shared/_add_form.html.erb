@@ -1,21 +1,22 @@
-<div class="modal fade form-only" tabindex="-1" role="dialog" id="add_form_modal">
-</div>
-<div class="hide" data-behavior="add_form_markup">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <%= render partial: 'feeds/search', locals: {query: nil, error: nil} %>
-            <div class="modal-body add-content feed-search-results">
-                <div data-behavior="subscribe_target" class="available-subscriptions"></div>
-            </div>
-            <div class="modal-footer feed-search-results">
-                <span data-behavior="feeds_search_messages" class="modal-footer-message">
-                    <span data-behavior="feeds_search_message message_none" class="hide">Select one or more feeds</span>
-                    <span data-behavior="feeds_search_message message_one" class="hide">Subscribe to the selected feed</span>
-                    <span data-behavior="feeds_search_message message_multiple" class="hide">Subscribe to the selected feeds</span>
-                </span>
-                <button type="button" class="button button-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="button" style="margin-left: 10px;" data-behavior="submit_add" disabled="disabled">Add</button>
-            </div>
-        </div>
-    </div>
-</div>
+<% content_for :modal_content do %>
+    <%= form_tag({controller: "feeds", action: "search"}, remote: true, autocomplete: 'off', novalidate: true, class: 'modal-form', data: { behavior: 'feeds_search'}) do %>
+        <label for="q">+ Add</label><%= url_field_tag(:q, "", placeholder: 'Feed, Website URL or @twitter handle', autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, data: { behavior: 'feeds_search_field'}) %>
+        <span data-behavior="feeds_search_favicon_target" class="favicon-target"></span>
+    <% end %>
+<% end %>
+
+<% content_for :modal_body do %>
+    <div data-behavior="subscribe_target" class="available-subscriptions"></div>
+<% end %>
+
+<% content_for :modal_footer do %>
+    <span data-behavior="feeds_search_messages" class="modal-footer-message">
+        <span data-behavior="feeds_search_message message_none" class="hide">Select one or more feeds</span>
+        <span data-behavior="feeds_search_message message_one" class="hide">Subscribe to the selected feed</span>
+        <span data-behavior="feeds_search_message message_multiple" class="hide">Subscribe to the selected feeds</span>
+    </span>
+    <button type="button" class="button button-secondary" data-dismiss="modal">Cancel</button>
+    <button type="button" class="button" style="margin-left: 10px;" data-behavior="submit_add" disabled="disabled">Add</button>
+<% end %>
+
+<%= render template: "layouts/modal", locals: {purpose: "subscribe", classes: "modal-lg"} %>
