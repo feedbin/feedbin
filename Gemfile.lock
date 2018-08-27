@@ -440,7 +440,7 @@ GEM
       net-ssh (>= 2.8.0)
     stripe (3.23.0)
       faraday (~> 0.10)
-    stripe-ruby-mock (2.5.0)
+    stripe-ruby-mock (2.5.4)
       dante (>= 0.2.0)
       multi_json (~> 1.0)
       stripe (>= 2.0.3)
@@ -568,7 +568,7 @@ DEPENDENCIES
   sidekiq
   silencer
   stripe
-  stripe-ruby-mock (= 2.5.0)
+  stripe-ruby-mock (= 2.5.4)
   stripe_event
   twitter
   twitter-text
