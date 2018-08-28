@@ -435,8 +435,9 @@ $.extend feedbin,
       items.each ->
         item = $(@)
         url = urlFinder(item)
-        if feedbin.embeds["#{url}"]
-          item.replaceWith(feedbin.embeds["#{url}"])
+        embedElement = feedbin.embeds["#{url}"]
+        if embedElement
+          item.replaceWith(embedElement.clone())
         else if url
           id = feedbin.randomNumber()
           item.attr("id", id)
@@ -475,8 +476,9 @@ $.extend feedbin,
       container = $(@)
       id = container.attr("id")
 
-      if feedbin.embeds["#{id}"]
-        container.replaceWith(feedbin.embeds["#{id}"])
+      embedElement = feedbin.embeds["#{id}"]
+      if embedElement
+        container.replaceWith(embedElement.clone())
       else
         container.html $("<div class='inline-spinner'>Loading embed from #{container.data("iframe-host")}…</div>")
         $.get container.data("iframe-embed-url")
