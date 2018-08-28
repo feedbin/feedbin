@@ -1,15 +1,17 @@
-<% content_for :modal_content do %>
+<% content_for :modal_content, flush: true do %>
     <%= form_tag({controller: "feeds", action: "search"}, remote: true, autocomplete: 'off', novalidate: true, class: 'modal-form', data: { behavior: 'feeds_search'}) do %>
         <label for="q">+ Add</label><%= url_field_tag(:q, "", placeholder: 'Feed, Website URL or @twitter handle', autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, data: { behavior: 'feeds_search_field'}) %>
         <span data-behavior="feeds_search_favicon_target" class="favicon-target"></span>
     <% end %>
 <% end %>
 
-<% content_for :modal_body do %>
+<% content_for :modal_title, "", flush: true %>
+
+<% content_for :modal_body, flush: true do %>
     <div data-behavior="subscribe_target" class="available-subscriptions"></div>
 <% end %>
 
-<% content_for :modal_footer do %>
+<% content_for :modal_footer, flush: true do %>
     <span data-behavior="feeds_search_messages" class="modal-footer-message">
         <span data-behavior="feeds_search_message message_none" class="hide">Select one or more feeds</span>
         <span data-behavior="feeds_search_message message_one" class="hide">Subscribe to the selected feed</span>

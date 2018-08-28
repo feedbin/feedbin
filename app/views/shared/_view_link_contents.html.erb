@@ -1,37 +1,26 @@
 <% present page do |page_presenter| %>
-    <div class="<%= user.display_prefs %>">
-        <div class="sticky-modal-header">
-            <div class="modal-sticky-header-inner">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                    <%= svg_tag 'icon-full-screen-close-small', size: '16x16' %>
-                </button>
-                <div class="entry-inner">
-                    <p class="post-meta link-content-meta">
-                        <%= favicon_with_host(page.domain) %>
-                        <a class="url" href="<%= page.url %>" target="_blank" rel="noopener noreferrer"><%= page.url %></a>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="entry-inner">
-            <header class="entry-header">
-                <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
-                    <h1><%= page.title || "Untitled" %></h1>
-                <% end %>
-                <% if page.author || page.published %>
-                    <p class="post-meta link-content-meta">
-                        <% if page.published %>
-                            <time><%= page.published.to_s(:full_human) %></time>
-                        <% end %>
-                        <% if page.author %>
-                            by <%= page.author %>
-                        <% end %>
-                    </p>
-                <% end %>
-            </header>
-            <div class="content-styles entry-type-default" data-behavior="view_link_markup_wrap external_links">
-                <%= content.html_safe %>
-            </div>
+    <div class="entry-inner">
+        <header class="entry-header">
+            <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
+                <h1><%= page.title || "Untitled" %></h1>
+            <% end %>
+
+            <%= favicon_with_host(page.domain) %>
+            <a class="url" href="<%= page.url %>" target="_blank" rel="noopener noreferrer"><%= page.url %></a>
+
+            <% if page.author || page.published %>
+                <p class="post-meta link-content-meta">
+                    <% if page.published %>
+                        <time><%= page.published.to_s(:full_human) %></time>
+                    <% end %>
+                    <% if page.author %>
+                        by <%= page.author %>
+                    <% end %>
+                </p>
+            <% end %>
+        </header>
+        <div class="content-styles entry-type-default" data-behavior="view_link_markup_wrap external_links">
+            <%= content.html_safe %>
         </div>
     </div>
 <% end %>

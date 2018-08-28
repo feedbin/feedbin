@@ -1693,6 +1693,11 @@ $.extend feedbin,
           feedbin.closeSubcription = false
         return
 
+    settingsNav: ->
+      $(document).on 'click', '[data-behavior~=show_settings_nav]', ->
+        target = $(@).data("modal-target")
+        modalClass = feedbin.showModal(target)
+
     subscribe: ->
       $(document).on 'click', '[data-behavior~=show_subscribe]', ->
         target = $(@).data("modal-target")

@@ -107,16 +107,24 @@
     </div>
 </div>
 <div class="hide" data-behavior="pagination"></div>
-<%= render partial: "shared/modal" %>
+<%= render partial: "shared/modals/modal" %>
+<%= render partial: "shared/modals/add_form" %>
+<%= render partial: "shared/modals/keyboard_shortcuts_wrap" %>
+<%= render partial: "shared/modals/view_link_wrap" %>
+<%= render partial: "shared/modals/settings_modal" %>
 
-<%= render partial: "shared/add_form" %>
-<%= render partial: "shared/keyboard_shortcuts_wrap" %>
-<%= render partial: "shared/view_link_wrap" %>
-<%= render partial: "shared/settings_modal" %>
 <%= render partial: 'shared/modal_wrap', locals: {user: @user} %>
 
 <%= render partial: "shared/readability_loading" %>
 <%= render partial: "shared/resizable_form" %>
 <%= render partial: 'shared/update_styles' %>
 <%= render partial: 'shared/saved_searches_count' %>
+
+<%= form_tag(view_link_entries_path, class: 'hide', remote: true, data: {behavior: 'view_link_form'}) do %>
+    <%= hidden_field_tag 'url', nil %>
+<% end %>
+<%= form_tag(view_link_cache_entries_path, class: 'hide', remote: true, data: {behavior: 'view_link_cache_form'}) do %>
+    <%= hidden_field_tag 'url', nil %>
+<% end %>
+
 <%= one_time_content && one_time_content.html_safe %>
