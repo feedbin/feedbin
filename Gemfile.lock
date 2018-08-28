@@ -428,10 +428,6 @@ GEM
       json (>= 1.8, < 3)
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.2)
-    skylight (2.0.2)
-      skylight-core (= 2.0.2)
-    skylight-core (2.0.2)
-      activesupport (>= 4.2.0)
     sprockets (3.7.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -571,7 +567,6 @@ DEPENDENCIES
   selenium-webdriver
   sidekiq
   silencer
-  skylight
   stripe
   stripe-ruby-mock (= 2.5.0)
   stripe_event
