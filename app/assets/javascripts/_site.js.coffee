@@ -110,13 +110,8 @@ $.extend feedbin,
     $('[data-behavior~=line_graph]').each ()->
       feedbin.drawBarChart(@, $(@).data('values'))
 
-  modalContent: (html) ->
-    modal = $('#general_modal')
-    target = $('[data-behavior~=markup_target]', modal)
-
-    placeholder = $('[data-behavior~=modal_placeholder]', modal)
-    placeholder.addClass('hide')
-    target.html(html)
+  modalContent: (html, target) ->
+    $(".#{target} .modal-body").html(html);
 
   showFeedList: ->
     $('[data-behavior~=feeds_target]').removeClass('hide')
@@ -497,7 +492,7 @@ $.extend feedbin,
 
       load = ->
         width = img.get(0).naturalWidth
-        if width > 528
+        if width > 528 && img.parents(".modal").length == 0
           img.addClass("full-width")
         img.addClass("show")
 
@@ -1695,19 +1690,11 @@ $.extend feedbin,
           feedbin.closeSubcription = false
         return
 
-    settingsNav: ->
-      $(document).on 'click', '[data-behavior~=show_settings_nav]', ->
-        target = $(@).data("modal-target")
-        modalClass = feedbin.showModal(target)
-
     subscribe: ->
-      $(document).on 'click', '[data-behavior~=show_subscribe]', ->
-        target = $(@).data("modal-target")
-        modalClass = feedbin.showModal(target)
-
-        $(document).on 'shown.bs.modal', (event) ->
-          if $(event.target).hasClass(modalClass)
-            $(".#{modalClass} [data-behavior~=feeds_search_field]").focus()
+      $(document).on 'shown.bs.modal', (event) ->
+        className = "modal-purpose-subscribe"
+        if $(event.target).hasClass(className)
+          $(".#{className} [data-behavior~=feeds_search_field]").focus()
 
       $(document).on 'hide.bs.modal', (event) ->
         $('input').blur()
@@ -1964,16 +1951,8 @@ $.extend feedbin,
 
     openModal: ->
       $(document).on 'click', '[data-behavior~=open_modal]', (event) ->
-        id = '#general_modal'
-        modal = $(id)
-        target = $('[data-behavior~=markup_target]', modal)
-
-        placeholder = $('[data-behavior~=modal_placeholder]', modal)
-        placeholder.removeClass("hide")
-
-        target.html('')
-
-        feedbin.modal(id, $(@).data("modal-class"))
+        target = $(@).data("modal-target")
+        feedbin.showModal(target)
 
     showMessage: ->
       $(document).on 'click', '[data-behavior~=show_message]', (event) ->

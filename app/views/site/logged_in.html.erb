@@ -18,7 +18,7 @@
 <div class="app-wrap">
     <div class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
         <div class="subscribe-toolbar">
-            <button type="button" class="show-subscribe" data-behavior="show_subscribe" data-modal-target="subscribe">+ Add</button>
+            <button type="button" class="show-subscribe" data-behavior="show_subscribe open_modal" data-modal-target="subscribe">+ Add</button>
             <%= render partial: 'shared/hamburger_menu_button' %>
         </div>
         <div class="feeds-inner">
@@ -110,10 +110,10 @@
 <%= render partial: "shared/modals/modal" %>
 <%= render partial: "shared/modals/add_form" %>
 <%= render partial: "shared/modals/keyboard_shortcuts_wrap" %>
-<%= render partial: "shared/modals/view_link_wrap" %>
+<%= render partial: "shared/modals/view_link" %>
 <%= render partial: "shared/modals/settings_modal" %>
-
-<%= render partial: 'shared/modal_wrap', locals: {user: @user} %>
+<%= render partial: "shared/modals/edit_subscription" %>
+<%= render partial: "shared/modals/conversation" %>
 
 <%= render partial: "shared/readability_loading" %>
 <%= render partial: "shared/resizable_form" %>

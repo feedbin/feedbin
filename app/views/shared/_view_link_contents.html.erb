@@ -5,9 +5,6 @@
                 <h1><%= page.title || "Untitled" %></h1>
             <% end %>
 
-            <%= favicon_with_host(page.domain) %>
-            <a class="url" href="<%= page.url %>" target="_blank" rel="noopener noreferrer"><%= page.url %></a>
-
             <% if page.author || page.published %>
                 <p class="post-meta link-content-meta">
                     <% if page.published %>

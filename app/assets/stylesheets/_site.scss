@@ -4034,7 +4034,7 @@ $saved-search-control-height: 48px;
     }
 }
 
-.modal-conversation {
+.modal-purpose-conversation {
     .twitter-conversation-link {
         display: none;
     }
@@ -5798,57 +5798,6 @@ Link Viewer
         text-align: center;
     }
 }
-
-.modal-sticky-header-inner {
-    margin: 0 auto;
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
-    position: relative;
-    border-radius: 8px 8px 0 0;
-    padding: 12px 0;
-    .close {
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: 50px;
-        height: 50px;
-        svg {
-            position: absolute;
-            top: 13px;
-            right: 16px;
-        }
-    }
-    .entry-inner {
-        display: flex;
-        align-items: center;
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
-    }
-    .post-meta {
-        margin-bottom: auto !important;
-        margin-top: auto !important;
-        display: flex;
-        align-items: center;
-        height: 100%;
-        text-overflow: ellipsis;
-        overflow-x: hidden;
-        white-space: nowrap;
-        margin-right: 20px;
-        .favicon-wrap {
-            margin-right: 10px;
-            position: static;
-        }
-    }
-}
-
-
-.sticky-modal-header {
-    position: sticky;
-    top: 0;
-}
-
-
 
 
 /*------------------------------------------------------------------------------
@@ -7986,6 +7935,10 @@ Media Queries
     }
     .entry-inner {
         padding: 15px;
+        .modal & {
+            padding-left: 0;
+            padding-right: 0;
+        }
     }
     .entries ul li .icon-entry-actions {
         display: none !important;
@@ -8442,7 +8395,7 @@ button.close {
     flex-direction: column;
     width: 100%;
     pointer-events: auto;
-    background-color: #fff;
+    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     background-clip: padding-box;
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: $modal-border-radius;
@@ -8468,13 +8421,21 @@ button.close {
 }
 
 .modal-header {
+    z-index: 100;
+    position: sticky;
+    top: 0;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     padding: 1rem;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid transparent;
+    @include border-color($border-color, $border-color-night, $border-color-sunset);
     border-top-left-radius: $modal-border-radius;
     border-top-right-radius: $modal-border-radius;
+    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    h5 {
+        margin: 0;
+    }
 }
 
 .modal-header .close {

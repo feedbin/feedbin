@@ -12,7 +12,7 @@
                             @<%= micropost.micropost.author_name %>
                         </a>
                         <span class="tweet-actions">
-                            <%= link_to thread_micropost_path(micropost), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {behavior: "open_modal", modal_class: "modal-conversation"} do %>
+                            <%= link_to thread_micropost_path(micropost), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {behavior: "open_modal", modal_target: "conversation"} do %>
                                 <%= svg_tag "icon-micro-blog" %>
                             <% end %>
                         </span>
