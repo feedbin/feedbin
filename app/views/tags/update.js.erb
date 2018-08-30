@@ -1,5 +1,5 @@
 <%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
 $('[data-behavior~=feeds_target] [data-tag-id~=<%= @new_tag.id %>] .tag-link').click()
 feedbin.hideTagsForm();
-$('[data-behavior~=show_tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {feed: nil, tags: nil, tag: @new_tag} %>');
+$('[data-behavior~=tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {feed: nil, tags: nil, tag: @new_tag} %>');
 $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_tag", locals: {tag: @new_tag} %>');
