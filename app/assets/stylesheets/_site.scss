@@ -341,6 +341,12 @@ input.processing {
     background-position: 97% 7px;
     background-repeat: no-repeat;
     background-size: 16px 16px;
+    .theme-sunset & {
+        background-image: image-url("spinner-sunset.svg");
+    }
+    .theme-night & {
+        background-image: image-url("spinner-night.svg");
+    }
 }
 
 select {
@@ -8022,7 +8028,7 @@ button.close {
 }
 
 .modal-form {
-    background-color: $inset-bg-color;
+    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     border-radius: $modal-border-radius;
     border-bottom: 1px solid transparent;
     position: relative;
@@ -8049,7 +8055,7 @@ button.close {
         }
     }
     label {
-        color: $text-summary-color;
+        @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         font-weight: bold;
         white-space: nowrap;
         display: flex;
@@ -8068,6 +8074,7 @@ button.close {
         max-width: 100%;
         padding: 20px 60px 20px 20px;
         font-size: 24px;
+        @include color($text-color, $text-color-night, $text-color-sunset);
         &.processing {
             background-position: 95.5% 26px;
         }
@@ -8106,7 +8113,7 @@ button.close {
                 background-image: image-url("favicon-tag.svg");
             }
             input {
-                background: transparent image-url("favicon-tag-selected.svg") 95% 50% no-repeat;
+                background: #FFF image-url("favicon-tag-selected.svg") 95% 50% no-repeat;
                 background-size: 16px;
                 padding-right: 30px;
                 border-left-color: transparent;
@@ -8123,9 +8130,8 @@ button.close {
             justify-content: center;
             flex-direction: column;
             text-align: center;
-            right: -1px;
             input {
-                background-color: transparent;
+                background-color: #FFF;
                 border-radius: 4px 0 0 4px;
             }
         }
@@ -8134,7 +8140,7 @@ button.close {
             bottom: -37px;
             left: 8px;
             font-size: 12px;
-            color: $text-color-light;
+            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -8188,6 +8194,9 @@ button.close {
         display: block;
     }
 }
+.modal-footer-message {
+    margin-right: auto !important;
+}
 
 .modal-purpose-subscribe {
     .modal-body, .modal-footer {
@@ -8203,7 +8212,7 @@ button.close {
     }
     .modal-form {
         border-radius: $modal-border-radius $modal-border-radius 0 0 !important;
-        border-color: #e5e5e5;
+        @include border-color($border-color, $border-color-night, $border-color-sunset);
     }
     .available-subscriptions {
         opacity: 1;
