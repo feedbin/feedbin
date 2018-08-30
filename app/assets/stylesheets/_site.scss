@@ -4283,10 +4283,17 @@ body.settings {
             margin-bottom: 0;
         }
     }
+    .subscription-title-wrap {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+        .favicon-wrap {
+            margin-right: 8px;
+        }
+    }
     .subscription-title {
         position: relative;
-        left: -5px;
-        margin: 0 0 5px 0;
+        margin: 0;
         background-color: transparent !important;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
         font-size: 18px !important;
@@ -4737,19 +4744,7 @@ body.settings {
         }
     }
     .feed-profile {
-        .profile-wrap {
-            display: flex;
-            .left-column {
-                flex: 0 0 auto;
-                margin-right: 5px;
-            }
-            .right-column {
-                margin-left: 5px;
-                flex: 1 1 auto;
-            }
-        }
         .favicon-wrap {
-            margin-top: 5px;
             position: static;
             box-shadow: none;
         }
@@ -4925,7 +4920,7 @@ body.settings {
         }
     }
     .settings-unsubscribe {
-        margin-top: 8px;
+        margin-left: auto;
     }
     .feed-form {
         border-radius: 0 0 8px 8px;
@@ -5089,7 +5084,13 @@ body.settings {
             margin: auto;
         }
     }
-    #action_results {
+    .modal-purpose-action_preview {
+        .action-description {
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left-width: 1px;
+            border-right-width: 1px;
+        }
         .content {
             padding: 15px;
         }
@@ -5191,14 +5192,17 @@ input[type="checkbox"]:focus + label .slider-checkbox {
     display: inline-block;
     font-size: 16px;
     font-weight: bold;
-    border: 1px solid $border-color;
+    border: 1px solid transparent;
+    @include border-color($border-color, $border-color-night, $border-color-sunset);
     width: 32px;
     line-height: 32px;
     text-align: center;
     border-radius: 4px;
-    box-shadow: 1px 1px 1px $border-color;
+    box-shadow: 1px 1px 1px rgba(black, .4);
     background-color: #FFF;
+    color: $text-color;
 }
+
 .key.wide {
     width: 70px;
 }
@@ -8012,8 +8016,8 @@ button.close {
     background: transparent;
     border: 0;
     color: $text-color-light;
-    &:hover {
-        color: $text-color;
+    svg * {
+        @include fill($text-color, $text-color-night, $text-color-sunset);
     }
 }
 
@@ -8333,6 +8337,24 @@ button.close {
 }
 
 /* Modal */
+.modal-purpose-edit_subscription {
+    .modal-body {
+        padding: 0;
+    }
+    .inset {
+        border: none;
+        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    }
+    .control-group {
+        padding: 0;
+        &:first-child {
+            padding-top: 0 !important;
+        }
+    }
+    .group-header {
+        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    }
+}
 
 .modal-open {
     overflow: hidden;
@@ -8427,20 +8449,23 @@ button.close {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    padding: 1rem;
+    padding: 8px 15px;
     border-bottom: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     border-top-left-radius: $modal-border-radius;
     border-top-right-radius: $modal-border-radius;
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     h5 {
+        font-size: 16px;
         margin: 0;
     }
 }
 
 .modal-header .close {
-    padding: 1rem;
-    margin: -1rem -1rem -1rem auto;
+    position: relative;
+    top: 4px;
+    padding: 8px 15px;
+    margin: -8px -15px -8px auto;
 }
 
 .modal-title {
@@ -8459,7 +8484,8 @@ button.close {
     align-items: center;
     justify-content: flex-end;
     padding: 1rem;
-    border-top: 1px solid #e9ecef;
+    border-top: 1px solid transparent;
+    @include border-color($border-color, $border-color-night, $border-color-sunset);
 }
 
 .modal-footer > :not(:first-child) {

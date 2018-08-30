@@ -9,7 +9,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title"><%= yield :modal_title %></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <%= svg_tag 'icon-full-screen-close-small', size: '16x16' %>
                     </button>
                 </div>
             <% end %>
