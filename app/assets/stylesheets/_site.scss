@@ -1236,7 +1236,7 @@ Structure
             }
             &.selected {
                 .feed-action-button {
-                    color: rgba(white, .7);
+                    color: rgba(white, .7) !important;
                 }
             }
             &.ui-draggable-dragging {
