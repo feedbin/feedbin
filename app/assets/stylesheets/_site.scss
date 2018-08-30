@@ -8035,7 +8035,7 @@ button.close {
     display: flex;
     .favicon-target {
         position: absolute;
-        right: 30px;
+        right: 15px;
         top: 0;
         bottom: 0;
         display: flex;
@@ -8062,7 +8062,7 @@ button.close {
         justify-content: center;
         flex-direction: column;
         text-align: center;
-        padding-left: 30px;
+        padding-left: 15px;
         font-size: 18px;
         padding-top: 5px;
     }
@@ -8076,7 +8076,7 @@ button.close {
         font-size: 24px;
         @include color($text-color, $text-color-night, $text-color-sunset);
         &.processing {
-            background-position: 95.5% 26px;
+            background-position: 97.5% 26px;
         }
     }
 }
