@@ -5,7 +5,7 @@ $('.feed-id-<%= @subscription.feed_id %>').remove();
 }
 feedbin.updateEntryContent('');
 $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
-$('[data-behavior~=show_tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {feed: nil, tags: nil, tag: nil} %>');
+$('[data-behavior~=tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {feed: nil, tags: nil, tag: nil} %>');
 $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/unsubscribe", locals: {feed: nil} %>');
 feedbin.disableMarkRead()
 feedbin.hideSearchControls()

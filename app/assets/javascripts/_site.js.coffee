@@ -18,6 +18,14 @@ $.extend feedbin,
   panel: 1
   colorHash: new ColorHash()
 
+  hideTagsForm: ->
+    tagsForm = $(".tags-form-wrap")
+    tagsForm.animate {
+      height: '0px'
+    }, 200
+    field = tagsForm.find('.feed_tag_list')
+    field.blur()
+
   faviconColors: (target) ->
     if feedbin && feedbin.data && feedbin.data.favicon_colors
       $(".favicon-default", target).each ->
@@ -280,12 +288,6 @@ $.extend feedbin,
       scope: '[data-behavior~=entry_content_wrap]'
       actionOriginalFN: 'ignore'
       buttonMarkup: "<div class='bigfoot-footnote__container'> <button class=\"bigfoot-footnote__button\" id=\"{{SUP:data-footnote-backlink-ref}}\" data-footnote-number=\"{{FOOTNOTENUM}}\" data-footnote-identifier=\"{{FOOTNOTEID}}\" alt=\"See Footnote {{FOOTNOTENUM}}\" rel=\"footnote\" data-bigfoot-footnote=\"{{FOOTNOTECONTENT}}\"> {{FOOTNOTENUM}} </button></div>"
-
-  hideTagsForm: (form) ->
-    if not form
-      form = $('.tags-form-wrap')
-    form.animate
-      height: 0
 
   blogContent: (content) ->
     content = $.parseJSON(content)
@@ -1196,35 +1198,20 @@ $.extend feedbin,
         link[0].click()
 
     tagsForm: ->
-      $(document).on 'click', (event) ->
-        target = $(event.target)
-        if not target.hasClass('toolbar-button')
-          target = target.parents('.toolbar-button')
-        wrap = target.find('.tags-form-wrap')
-        feedbin.hideTagsForm($('.tags-form-wrap').not(wrap))
-        return
-
       $(document).on 'click', '[data-behavior~=show_tags_form]', (event) ->
-        target = $(event.target)
-        if not target.hasClass('toolbar-button')
-          target = target.parentsUntil('.toolbar-button')
-        wrap = target.find('.tags-form-wrap')
-        unless $(@).attr('disabled') == 'disabled'
-          if '0px' == wrap.css('height')
-            wrap.animate {
+        tagsForm = $(".tags-form-wrap")
+        unless $(@).prop('disabled')
+          if '0px' == tagsForm.css('height')
+            tagsForm.animate {
               height: '138px'
             }, 200
-            field = wrap.find('.feed_tag_list')
+            field = tagsForm.find('.feed_tag_list')
             field.focus()
             value = field.val()
             field.val(value)
             feedbin.autocomplete(field)
           else
-            wrap.animate {
-              height: '0px'
-            }, 200
-            field = wrap.find('.feed_tag_list')
-            field.blur()
+            feedbin.hideTagsForm()
 
         return
 
