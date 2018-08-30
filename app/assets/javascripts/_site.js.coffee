@@ -23,7 +23,7 @@ $.extend feedbin,
     tagsForm.animate {
       height: '0px'
     }, 200
-    field = tagsForm.find('.feed_tag_list')
+    field = $('#feed_tag_list')
     field.blur()
 
   faviconColors: (target) ->
@@ -387,9 +387,10 @@ $.extend feedbin,
     anchor.dispatchEvent event
 
   autocomplete: (element) ->
+    target = $("[data-behavior~=tag_completions]").first()
     element.autocomplete
       serviceUrl: feedbin.data.tags_path
-      appendTo: $(element).closest(".tags-form").children("[data-behavior=tag_completions]")
+      appendTo: target
       delimiter: /(,)\s*/
 
   preloadEntries: (entry_ids, forcePreload = false) ->
@@ -1205,7 +1206,7 @@ $.extend feedbin,
             tagsForm.animate {
               height: '138px'
             }, 200
-            field = tagsForm.find('.feed_tag_list')
+            field = $('#feed_tag_list')
             field.focus()
             value = field.val()
             field.val(value)
