@@ -1678,22 +1678,6 @@ $.extend feedbin,
           feedbin.closeSubcription = false
         return
 
-    subscribe: ->
-      $(document).on 'shown.bs.modal', (event) ->
-        className = "modal-purpose-subscribe"
-        if $(event.target).hasClass(className)
-          $(".#{className} [data-behavior~=feeds_search_field]").focus()
-
-      $(document).on 'hide.bs.modal', (event) ->
-        $('input').blur()
-
-      subscription = feedbin.queryString('subscribe')
-      if subscription?
-        $('[data-behavior~=show_subscribe]').click()
-        field = $('.modal-purpose-subscribe [data-behavior~=feeds_search_field]')
-        field.val(subscription)
-        field.closest("form").submit()
-
     searchError: ->
       $(document).on 'ajax:error', '[data-behavior~=search_form]', (event, xhr) ->
         feedbin.showNotification('Search error.', 3000, '', true);
@@ -2029,6 +2013,22 @@ $.extend feedbin,
 
 
         event.preventDefault()
+
+    subscribe: ->
+      $(document).on 'shown.bs.modal', (event) ->
+        className = "modal-purpose-subscribe"
+        if $(event.target).hasClass(className)
+          $(".#{className} [data-behavior~=feeds_search_field]").focus()
+
+      $(document).on 'hide.bs.modal', (event) ->
+        $('input').blur()
+
+      subscription = feedbin.queryString('subscribe')
+      if subscription?
+        $('[data-behavior~=show_subscribe]').click()
+        field = $('.modal-purpose-subscribe [data-behavior~=feeds_search_field]')
+        field.val(subscription)
+        field.closest("form").submit()
 
 $.each feedbin.preInit, (i, item) ->
   item()
