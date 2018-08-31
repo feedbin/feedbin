@@ -49,14 +49,12 @@ $.extend feedbin,
     data = context.getImageData(1, 1, 1, 1)
     "rgba(#{data.data[0]}, #{data.data[1]}, #{data.data[2]}, #{data.data[3]})"
 
-  setNativeTitleColor: (rgb, timeout = 1) ->
+  setNativeTitleColor: (rgb) ->
     ctx = document.createElement('canvas').getContext('2d')
     ctx.strokeStyle = rgb
     hex = ctx.strokeStyle
     feedbin.themeColorHex = hex
-    setTimeout ( ->
-      feedbin.nativeMessage("performAction", { action: "titleColor", color: hex })
-    ), timeout
+    feedbin.nativeMessage("performAction", { action: "titleColor", color: hex })
 
   nativeMessage: (name, data) ->
     if typeof(webkit) != "undefined" && webkit.messageHandlers && webkit.messageHandlers.turbolinksDemo
