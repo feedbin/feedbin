@@ -49,12 +49,14 @@ $.extend feedbin,
     data = context.getImageData(1, 1, 1, 1)
     "rgba(#{data.data[0]}, #{data.data[1]}, #{data.data[2]}, #{data.data[3]})"
 
-  setNativeTitleColor: (rgb) ->
+  setNativeTitleColor: (rgb, timeout = 1) ->
     ctx = document.createElement('canvas').getContext('2d')
     ctx.strokeStyle = rgb
     hex = ctx.strokeStyle
     feedbin.themeColorHex = hex
-    feedbin.nativeMessage("performAction", { action: "titleColor", color: hex })
+    setTimeout ( ->
+      feedbin.nativeMessage("performAction", { action: "titleColor", color: hex })
+    ), timeout
 
   nativeMessage: (name, data) ->
     if typeof(webkit) != "undefined" && webkit.messageHandlers && webkit.messageHandlers.turbolinksDemo
@@ -1959,15 +1961,15 @@ $.extend feedbin,
         $(@).closest(".iframe-embed").addClass("loaded")
 
     modalShowHide: ->
-      $(document).on 'shown.bs.modal', () ->
-
-        setTimeout ( ->
-          $("body").addClass("modal-shown")
-        ), 150
-
+      $(document).on 'show.bs.modal', () ->
         if background = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
           color = feedbin.calculateColor(background, "rgba(0, 0, 0, 0.5)")
           feedbin.setNativeTitleColor(color)
+
+      $(document).on 'shown.bs.modal', () ->
+        setTimeout ( ->
+          $("body").addClass("modal-shown")
+        ), 150
 
       $(document).on 'hidden.bs.modal', () ->
         $("body").removeClass("modal-shown")
