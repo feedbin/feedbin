@@ -123,7 +123,7 @@ $.extend feedbin,
 
   showFeedList: ->
     $('[data-behavior~=feeds_target]').removeClass('hide')
-    $('[data-behavior~=feeds_target]').addClass('in')
+    $('[data-behavior~=feeds_target]').addClass('show')
 
   mobileView: ->
     if $(window).width() <= 550
@@ -1958,17 +1958,21 @@ $.extend feedbin,
         else
           target.html iframe
 
-
-
         $(@).closest(".iframe-embed").addClass("loaded")
 
     modalShowHide: ->
       $(document).on 'shown.bs.modal', () ->
+
+        setTimeout ( ->
+          $("body").addClass("modal-shown")
+        ), 150
+
         if background = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
-          color = feedbin.calculateColor(background, "rgba(51, 62, 72, 0.6)")
+          color = feedbin.calculateColor(background, "rgba(0, 0, 0, 0.5)")
           feedbin.setNativeTitleColor(color)
 
       $(document).on 'hidden.bs.modal', () ->
+        $("body").removeClass("modal-shown")
         rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
         feedbin.setNativeTitleColor(rgb)
 

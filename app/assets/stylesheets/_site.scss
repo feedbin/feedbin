@@ -8375,6 +8375,15 @@ button.close {
     -webkit-overflow-scrolling: touch;
 }
 
+.fade {
+  opacity: 0;
+  transition: opacity 0.15s linear;
+}
+
+.fade.show {
+  opacity: 1;
+}
+
 .modal {
     position: fixed;
     top: 0;
@@ -8453,9 +8462,8 @@ button.close {
 }
 
 .modal-header {
-    z-index: 100;
-    position: sticky;
     top: 0;
+    z-index: 100;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -8468,6 +8476,12 @@ button.close {
     h5 {
         font-size: 16px;
         margin: 0;
+    }
+}
+
+.modal-shown {
+    .modal-header {
+        position: sticky;
     }
 }
 
