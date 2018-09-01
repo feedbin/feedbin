@@ -1962,7 +1962,7 @@ $.extend feedbin,
 
     modalShowHide: ->
       $(document).on 'show.bs.modal', () ->
-        if background = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
+        if feedbin.data && feedbin.data.theme && background = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
           color = feedbin.calculateColor(background, "rgba(0, 0, 0, 0.5)")
           feedbin.setNativeTitleColor(color)
 

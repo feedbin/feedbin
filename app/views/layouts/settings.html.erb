@@ -1,5 +1,6 @@
 <% @class = "settings settings-#{params[:action]}" %>
 <% content_for :content do %>
+    <%= render partial: 'shared/svg' %>
     <div class="application-messages"><a href="" class="message-content" data-behavior="messages"></a></div>
     <script>
         <%= render partial: 'shared/message_flash', locals: {flash: flash} %>
@@ -11,7 +12,6 @@
             <%= yield %>
         </div>
     </div>
-    <div class="modal-target"></div>
     <%= render partial: "shared/modals/settings_modal" %>
 <% end %>
 <%= render template: 'layouts/application' %>
