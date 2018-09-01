@@ -1973,8 +1973,9 @@ $.extend feedbin,
 
       $(document).on 'hidden.bs.modal', () ->
         $("body").removeClass("modal-shown")
-        rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
-        feedbin.setNativeTitleColor(rgb)
+        if feedbin.data && feedbin.data.theme
+          rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
+          feedbin.setNativeTitleColor(rgb)
 
     scrollLeft: ->
       entries = $('.entries-column')
