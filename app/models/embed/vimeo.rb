@@ -10,7 +10,7 @@ class Embed::Vimeo < IframeEmbed
   end
 
   def image_url
-    super.gsub /_\d+.jpg/, ".jpg"
+    super.gsub(/_\d+.jpg/, ".jpg") rescue nil
   end
 
   def iframe_params

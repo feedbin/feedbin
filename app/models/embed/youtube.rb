@@ -1,10 +1,10 @@
 class Embed::Youtube < IframeEmbed
   def self.supported_urls
     [
-      %r(https?://www\.youtube\.com/embed/(.*?)(\?|$)),
-      %r(https?://www\.youtube-nocookie\.com/embed/(.*?)(\?|$)),
-      %r(https?://youtube\.com/embed/(.*?)(\?|$)),
-      %r(https?://youtube-nocookie\.com/embed/(.*?)(\?|$)),
+      %r(.*?//www\.youtube\.com/embed/(.*?)(\?|$)),
+      %r(.*?//www\.youtube-nocookie\.com/embed/(.*?)(\?|$)),
+      %r(.*?//youtube\.com/embed/(.*?)(\?|$)),
+      %r(.*?//youtube-nocookie\.com/embed/(.*?)(\?|$)),
     ]
   end
 
