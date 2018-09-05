@@ -16,7 +16,9 @@ $.extend feedbin,
   messageTimeout: null
   swipe: false
   panel: 1
-  colorHash: new ColorHash()
+  colorHash: new ColorHash
+    lightness: [.3,.4,.5,.6,.7]
+    saturation: [.7,.8]
 
   hideTagsForm: ->
     tagsForm = $(".tags-form-wrap")
@@ -27,12 +29,11 @@ $.extend feedbin,
     field.blur()
 
   faviconColors: (target) ->
-    if feedbin && feedbin.data && feedbin.data.favicon_colors
-      $(".favicon-default", target).each ->
-        host = $(@).data("host")
-        color = feedbin.colorHash.hex(host)
-        $(@).css
-          "background-color": color
+    $(".favicon-default", target).each ->
+      host = $(@).data("host")
+      color = feedbin.colorHash.hex(host)
+      $(@).css
+        "background-color": color
 
   calculateColor: (backgroundColor, foregroundColor) ->
     canvas = document.createElement('canvas')
@@ -924,15 +925,6 @@ $.extend feedbin,
     modal.modal('show')
     modalClass
 
-  modal: (selector, cssClass = null) ->
-    activeModal = $(selector)
-    $('.modal').each ->
-      unless $(@).get(0) == activeModal.get(0)
-        $(@).modal('hide')
-    activeModal.modal('toggle')
-    if cssClass
-      activeModal.addClass(cssClass)
-
   loadLink: (href) ->
     form = $("[data-behavior~=view_link_form]")
     $("#url", form).val(href)
@@ -967,8 +959,6 @@ $.extend feedbin,
   entries: {}
 
   feedCandidates: []
-
-  modalShowing: false
 
   images: []
 
