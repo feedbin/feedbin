@@ -19,7 +19,7 @@ class BasePresenter
         end
       else
         markup = <<-eos
-          <span class="favicon favicon-default" data-host="#{feed.host}"></span>
+          <span class="favicon favicon-default favicon-letter-#{feed.host_letter}" data-host="#{feed.host}"></span>
         eos
         if feed.favicon && feed.favicon.cdn_url
           markup = <<-eos

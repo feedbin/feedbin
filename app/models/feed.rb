@@ -50,6 +50,10 @@ class Feed < ApplicationRecord
     taggings
   end
 
+  def host_letter
+    (host) ? host[0] : "default"
+  end
+
   def self.create_from_parsed_feed(parsed_feed)
     ActiveRecord::Base.transaction do
       record = self.create!(parsed_feed.to_feed)

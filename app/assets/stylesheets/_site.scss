@@ -1399,6 +1399,15 @@ li.selected > a .favicon-wrap {
     @include background-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
 }
 
+$letters: a b c d e f g h i j k l m n o p q r s t u v w x y z;
+
+@each $letter in $letters {
+    .favicon-letter-#{$letter} {
+        background-size: 10px 10px !important;
+        background-image: image-url("letter-#{$letter}.svg") !important;
+    }
+}
+
 .collection-favicon {
     background-size: 16px 16px;
     background: transparent;
