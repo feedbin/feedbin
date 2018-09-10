@@ -20,6 +20,12 @@ $.extend feedbin,
     lightness: [.3,.4,.5,.6,.7]
     saturation: [.7,.8]
 
+  fonts: (font) ->
+    if !feedbin.fontsLoaded && feedbin.data && feedbin.data.font_stylesheet
+      if $.inArray(font, ["sans-serif-1", "sans-serif-2", "serif-1", "serif-2"]) != -1
+        loadCSS(feedbin.data.font_stylesheet)
+        feedbin.fontsLoaded = true
+
   hideTagsForm: ->
     tagsForm = $(".tags-form-wrap")
     tagsForm.animate {
@@ -1510,14 +1516,18 @@ $.extend feedbin,
         $('form', selectedPanel).attr('action', $(@).attr('href'))
 
     formatToolbar: ->
-      $('[data-behavior~=change_font]').val($("[data-font]").data('font'))
+      selectedFont = $("[data-font]").data('font')
+      feedbin.fonts(selectedFont)
+      $('[data-behavior~=change_font]').val(selectedFont)
       $('[data-behavior~=change_font]').change ->
         fontContainer = $("[data-font]")
         currentFont = fontContainer.data('font')
+        newFont = $(@).val()
         fontContainer.removeClass("font-#{currentFont}")
-        fontContainer.addClass("font-#{$(@).val()}")
-        fontContainer.data('font', $(@).val())
+        fontContainer.addClass("font-#{newFont}")
+        fontContainer.data('font', newFont)
         $(@).parents('form').submit()
+        feedbin.fonts(newFont)
 
     feedSettings: ->
       $(document).on 'click', '[data-behavior~=sort_feeds]', (event, xhr) ->
