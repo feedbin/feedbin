@@ -1,7 +1,0 @@
-<%= form_for feed, remote: true, html: {data: {behavior: 'tags_form'}, class: 'tags-form-field'} do |f| %>
-    <div class="tag-field-wrap">
-        <%= text_field_tag 'feed[tag_list]', tags.join(', '), autocomplete: 'off', class: 'feed_tag_list', placeholder: 'Tags (comma separated)' %>
-    </div>
-<% end %>
-<div data-behavior="tag_completions" class="completions">
-</div>

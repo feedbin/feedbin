@@ -22,7 +22,7 @@ if ("<%= @all_unread %>" === 'true') {
 feedbin.localizeTime();
 feedbin.applyUserTitles();
 feedbin.loadEntryImages();
-$('[data-behavior~=tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {feed: @feed || nil, tags: @tags, tag: @tag || nil} %>');
+$('[data-behavior~=tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {feed: @feed || nil} %>');
 <% if @type && @type == 'tag' %>
     $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_tag", locals: {tag: @tag} %>');
 <% elsif @type && @type == 'saved_search' %>

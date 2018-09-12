@@ -1,9 +1,8 @@
 <%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
 feedbin.updateEntries('');
 feedbin.updateEntryContent('');
-feedbin.hideTagsForm();
 $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
-$('[data-behavior~=tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {feed: nil, tags: nil, tag: nil} %>');
+$('[data-behavior~=tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {feed: nil} %>');
 $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_tag", locals: {tag: nil} %>');
 feedbin.disableMarkRead()
 feedbin.hideSearchControls()

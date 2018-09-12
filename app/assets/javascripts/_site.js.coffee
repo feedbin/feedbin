@@ -26,14 +26,6 @@ $.extend feedbin,
         loadCSS(feedbin.data.font_stylesheet)
         feedbin.fontsLoaded = true
 
-  hideTagsForm: ->
-    tagsForm = $(".tags-form-wrap")
-    tagsForm.animate {
-      height: '0px'
-    }, 200
-    field = $('#feed_tag_list')
-    field.blur()
-
   faviconColors: (target) ->
     $(".favicon-default", target).each ->
       host = $(@).data("host")
@@ -1194,24 +1186,6 @@ $.extend feedbin,
       if link.length > 0 && !mobile
         link[0].click()
 
-    tagsForm: ->
-      $(document).on 'click', '[data-behavior~=show_tags_form]', (event) ->
-        tagsForm = $(".tags-form-wrap")
-        unless $(@).prop('disabled')
-          if '0px' == tagsForm.css('height')
-            tagsForm.animate {
-              height: '138px'
-            }, 200
-            field = $('#feed_tag_list')
-            field.focus()
-            value = field.val()
-            field.val(value)
-            feedbin.autocomplete(field)
-          else
-            feedbin.hideTagsForm()
-
-        return
-
     resizeWindow: ->
       feedbin.measureEntryColumn()
       measure = _.throttle(feedbin.measureEntryColumn, 100);
@@ -2018,6 +1992,33 @@ $.extend feedbin,
 
 
         event.preventDefault()
+
+    tagEditor: ->
+      fieldContent = """
+      <li data-behavior="remove_target" class="with-button">
+        <input placeholder="Tag" type="text" name="tag_name[]">
+        <button class="icon-delete" data-behavior="remove_element" type="button">Delete</button>
+      </li>
+      """
+
+      $(document).on 'click', '[data-behavior~=add_tag]', (event) ->
+        field = $(fieldContent)
+        $("[data-behavior~=tags_target]").append(field)
+        field.find("input").focus()
+        event.preventDefault()
+
+      $(document).on 'click', '[data-behavior~=remove_element]', (event) ->
+        target = $(@).closest("[data-behavior~=remove_target]")
+        target.hide 'fast', ->
+          target.remove()
+        event.preventDefault()
+
+      $(document).on 'submit', '[data-behavior~=edit_tags_form]', (event) ->
+        $('.modal-purpose-tags [data-behavior~=submit_tags]').attr('disabled', 'disabled')
+
+      $(document).on 'click', '[data-behavior~=submit_tags]', (event) ->
+        $('[data-behavior~=edit_tags_form]').submit()
+
 
     subscribe: ->
       $(document).on 'shown.bs.modal', (event) ->

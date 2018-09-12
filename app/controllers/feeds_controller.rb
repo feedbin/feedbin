@@ -8,7 +8,13 @@ class FeedsController < ApplicationController
     @mark_selected = true
 
     @feed = Feed.find(params[:id])
-    @feed.tag(params[:feed][:tag_list], @user)
+
+    tags = []
+    tags.concat params[:tag_id].values if params[:tag_id]
+    tags.concat params[:tag_name] if params[:tag_name]
+    tags = tags.join(",")
+
+    @feed.tag(tags, @user)
 
     if params[:no_response].present?
       head :ok

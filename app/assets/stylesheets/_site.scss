@@ -679,10 +679,9 @@ table {
     margin: 0 0 20px 0;
     padding: 30px 0 30px 0;
     .inset-content {
-        padding: 0 30px;
-        @media (max-width: 550px) {
-            padding: 0 15px;
-        }
+        @include settings-row;
+        padding-top: 0;
+        padding-bottom: 0;
     }
     .pill-list {
         border-radius: 0;
@@ -4530,24 +4529,36 @@ body.settings {
         }
     }
     .control-group-description {
+        @include settings-row;
         font-size: 12px;
         color: #999;
-        padding: 0 30px;
         margin-top: -20px;
         margin-bottom: 30px;
         &.no-margin {
             margin-bottom: 0;
         }
-        @media (max-width: 550px) {
-            padding-left: 15px;
-            padding-right: 15px;
-        }
     }
     .control-group-form {
         li {
-            padding: 0;
+            padding: 0 !important;
             border: none;
+            &.with-button {
+                position: relative;
+            }
         }
+        .icon-delete {
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            bottom: 0;
+            width: 80px;
+            padding: 15px;
+            border: none;
+            text-align: right;
+            color: red;
+            background: transparent !important;
+        }
+        $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
         label,
         input[type="text"],
         input[type="email"],
@@ -4559,6 +4570,7 @@ body.settings {
         button,
         textarea,
         a {
+            font-size: 16px;
             display: block;
             text-align: left;
             margin: 0 !important;
@@ -4572,6 +4584,15 @@ body.settings {
             max-width: 100% !important;
             width: 100%;
             @include settings-row;
+            &:focus {
+                box-shadow: $subtle-focus-glow;
+            }
+        }
+        input[type="checkbox"]:focus + label .slider-checkbox {
+            box-shadow: $focus-glow;
+        }
+        input[type="radio"]:focus + label {
+            box-shadow: $subtle-focus-glow;
         }
         label {
             user-select: none;
@@ -4589,7 +4610,7 @@ body.settings {
             background: #FFF;
         }
         input[type="radio"], input[type="checkbox"], input[type="file"] {
-            display: none;
+            @extend .visually-hidden;
         }
         input[type="radio"]:checked + label {
             position: relative;
@@ -5172,6 +5193,9 @@ input[type="checkbox"] + label .slider-checkbox {
         top: 2px;
         transition: left .2s ease;
     }
+    .modal & {
+        right: 15px;
+    }
     @media (max-width: 550px) {
         right: 15px;
     }
@@ -5186,9 +5210,6 @@ input[type="checkbox"]:checked + label .slider-checkbox {
         left: 32px;
         opacity: 0;
     }
-}
-input[type="checkbox"]:focus + label .slider-checkbox {
-    box-shadow: $focus-glow;
 }
 
 .settings-feeds {
@@ -5651,52 +5672,6 @@ Buttons
         }
     }
 }
-
-.tags-form-wrap {
-    height: 0;
-    width: 100%;
-    position: absolute;
-    bottom: $bottom-toolbar-height;
-    left: 0;
-    overflow: hidden;
-    z-index: 1;
-}
-
-.tags-form {
-    position: absolute;
-    height: 138px;
-    width: 100%;
-    top: 0;
-    left: 0;
-    @include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
-    text-align: left;
-}
-
-.tags-form-field {
-    @include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
-    border-top: 1px solid transparent;
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
-    height: 51px;
-    width: 100%;
-    position: relative;
-    padding: 8px;
-    input[type="text"] {
-        height: 32px;
-        width: 100%;
-        max-width: 100%;
-        margin-bottom: 0;
-        padding: 5px 25px 5px 5px;
-        font-size: $base-size-14px;
-    }
-    input[type="submit"] {
-        position: absolute;
-        top: 11px;
-        right: 5px;
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
-    }
-}
-
 
 .button-tag {
     width: 21px;
@@ -8337,7 +8312,7 @@ button.close {
 }
 
 /* Modal */
-.modal-purpose-edit_subscription {
+.modal-purpose-edit_subscription, .modal-purpose-tags {
     .modal-body {
         padding: 0;
     }
@@ -8354,6 +8329,20 @@ button.close {
     }
     .group-header {
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    }
+    .control-group-form button,
+    .control-group-form input {
+        background-color: transparent;
+    }
+}
+
+.modal-purpose-tags {
+    .modal-footer {
+        padding-top: 0;
+        border: 0;
+    }
+    h4 {
+        padding-top: 30px;
     }
 }
 

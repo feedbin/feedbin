@@ -1,15 +1,10 @@
 <div data-behavior="tags_form">
-    <div class="tags-form-wrap">
-        <div data-behavior="tags_form_target" class="tags-form">
-            <% if feed.present? %>
-                <%= render partial: "feeds/form", locals: {feed: feed, tags: tags, tag: tag} %>
-            <% end %>
-        </div>
-    </div>
-    <%= content_tag :button, class: 'toolbar-button', data: {behavior: 'show_tags_form'}, disabled: tags.nil? do %>
-        <div class="toolbar-button-inner">
-            <%= render partial: "shared/svg/tag" %>
-        </div>
-        Tag
+    <%= form_tag (feed) ? edit_tags_feed_path(feed) : nil, remote: true, method: :get do %>
+        <%= content_tag :button, class: 'toolbar-button', data: {behavior: 'open_modal', modal_target: "tags"}, disabled: feed.nil? do %>
+            <div class="toolbar-button-inner">
+                <%= render partial: "shared/svg/tag" %>
+            </div>
+            Tag
+        <% end %>
     <% end %>
 </div>

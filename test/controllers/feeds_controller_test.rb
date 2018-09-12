@@ -8,8 +8,8 @@ class FeedsControllerTest < ActionController::TestCase
   test "update feed" do
     login_as @user
 
-    assert_difference("Tagging.count", 1) do
-      patch :update, params: {id: @user.feeds.first, feed: {tag_list: "Tag"}}, xhr: true
+    assert_difference("Tagging.count", 2) do
+      patch :update, params: {id: @user.feeds.first, tag_id: {"1" => "Tag"}, tag_name: ["Tag 2"]}, xhr: true
       assert_response :success
     end
   end
