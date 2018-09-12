@@ -5,14 +5,17 @@
                 <h1><%= page.title || "Untitled" %></h1>
             <% end %>
 
-            <% if page.author || page.published %>
-                <p class="post-meta link-content-meta">
+            <% if page.author || page.published || page.domain %>
+                <p class="post-meta">
                     <% if page.published %>
                         <time><%= page.published.to_s(:full_human) %></time>
                     <% end %>
                     <% if page.author %>
                         by <%= page.author %>
                     <% end %>
+                </p>
+                <p class="post-meta">
+                    <%= page.domain %>
                 </p>
             <% end %>
         </header>
