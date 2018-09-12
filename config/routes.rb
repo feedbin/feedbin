@@ -116,6 +116,7 @@ Rails.application.routes.draw do
       match :push, via: [:post, :get]
       post :toggle_updates
       get :modal_edit
+      get :edit_tags
     end
   end
 

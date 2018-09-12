@@ -1,0 +1,14 @@
+<%= form_for(@feed, remote: true, html: {class: 'settings'}) do |f| %>
+    <div class="inset smooth-top">
+        <ul class="control-group control-group-form">
+            <% @tag_editor.tags.each do |tag| %>
+            <li>
+                <%= check_box_tag tag.id, tag.name, @tag_editor.checked?(tag) %>
+                <%= label_tag tag.id do %>
+                    <%= tag.name %> <span class="slider-checkbox"></span>
+                <% end %>
+            </li>
+            <% end %>
+        </ul>
+    </div>
+<% end %>

@@ -30,6 +30,12 @@ class FeedsController < ApplicationController
     @subscription = @user.subscriptions.find_by_feed_id(params[:id])
   end
 
+  def edit_tags
+    @user = current_user
+    @feed = @user.feeds.find(params[:id])
+    @tag_editor = TagEditor.new(@user, @feed)
+  end
+
   def view_unread
     update_view_mode("view_unread")
   end
