@@ -8344,6 +8344,7 @@ button.close {
     .inset {
         border: none;
         @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+        padding-bottom: 0;
     }
     .control-group {
         padding: 0;
