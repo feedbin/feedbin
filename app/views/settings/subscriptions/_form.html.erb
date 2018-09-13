@@ -58,6 +58,10 @@
                     </li>
                 </ul>
                 <div class="inset-content">
+                    <h4 class="group-header">Tags</h4>
+                </div>
+                <%= render partial: "feeds/tag_fields", locals: {tag_editor: tag_editor} %>
+                <div class="inset-content">
                     <h4 class="group-header">Feed Options</h4>
                 </div>
                 <ul class="control-group control-group-form">

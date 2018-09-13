@@ -1,0 +1,15 @@
+<ul class="control-group control-group-form" data-behavior="tags_target">
+    <% tag_editor.tags.each do |tag| %>
+    <li>
+        <%= check_box_tag "tag_id[#{tag.id}]", tag.name, tag_editor.checked?(tag) %>
+        <%= label_tag "tag_id[#{tag.id}]" do %>
+            <%= tag.name %> <span class="slider-checkbox"></span>
+        <% end %>
+    </li>
+    <% end %>
+</ul>
+<ul class="control-group control-group-form">
+    <li>
+        <button data-behavior="add_tag" type="button">+ Add Tag</button>
+    </li>
+</ul>

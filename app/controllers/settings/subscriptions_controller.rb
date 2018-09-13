@@ -13,6 +13,7 @@ class Settings::SubscriptionsController < ApplicationController
   def edit
     @user = current_user
     @subscription = @user.subscriptions.find(params[:id])
+    @tag_editor = TagEditor.new(@user, @subscription.feed)
     render layout: "settings"
   end
 
