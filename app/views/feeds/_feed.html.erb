@@ -1,5 +1,5 @@
 <% present feed do |feed_presenter| %>
-    <%= content_tag :li, class: feed_presenter.classes, data: {feed_id: feed.id, behavior: 'draggable sort_feed', sort_id: feed.id, feed_path: feed_path(feed) } do %>
+    <%= content_tag :li, data: {feed_id: feed.id, behavior: 'draggable sort_feed', sort_id: feed.id, feed_path: feed_path(feed) } do %>
         <%= feed_presenter.feed_link do %>
             <%= feed_presenter.favicon(feed) %>
             <span class="collection-label-wrap" data-behavior="rename_target" data-form-action="<%= feed_rename_path(feed.id) %>" data-input-name="feed[title]" data-title="<%= feed.title %>", data-original-title="<%= feed.original_title %>">

@@ -5,7 +5,7 @@ if %w{view_unread view_starred}.include?(@user.get_view_mode) && tag.count == 0 
 end
 %>
 
-<li data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" class="<%= selected("tag_#{tag.id}") %>" data-behavior="droppable">
+<li data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" data-behavior="droppable">
     <% cache [drawer_visible?(tag.id), hide_drawer, tag, tag.user_feeds.map(&:id)] do %>
         <%= link_to tag_path(tag.id), remote: true, class: 'feed-link tag-link', data: { behavior: 'selectable show_entries open_item feed_link renamable', mark_read: {type: 'tag', data: tag.id, message: "Mark #{tag.name} as read?"}.to_json } do %>
             <span class="favicon-wrap collection-favicon">

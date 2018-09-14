@@ -8,3 +8,9 @@ feedbin.draggable();
 feedbin.droppable();
 $.get(feedbin.data.saved_searches_count_path);
 feedbin.faviconColors($(".feeds-column"));
+<% if mark_selected? %>
+    feedbin.reselect();
+<% else %>
+    feedbin.selectedSource = null;
+    feedbin.selectedTag = null;
+<% end %>

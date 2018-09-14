@@ -20,6 +20,13 @@ $.extend feedbin,
     lightness: [.3,.4,.5,.6,.7]
     saturation: [.7,.8]
 
+  reselect: ->
+    if feedbin.selectedSource && feedbin.selectedTag
+      $("[data-tag-id=#{feedbin.selectedTag}]").find("[data-feed-id=#{feedbin.selectedSource}]").addClass("selected")
+      $("[data-tag-id=#{feedbin.selectedTag}][data-feed-id=#{feedbin.selectedSource}]").addClass("selected")
+    else if feedbin.selectedSource
+      $("[data-feed-id=#{feedbin.selectedSource}]").addClass("selected")
+
   fonts: (font) ->
     if !feedbin.fontsLoaded && feedbin.data && feedbin.data.font_stylesheet
       if $.inArray(font, ["sans-serif-1", "sans-serif-2", "serif-1", "serif-2"]) != -1
@@ -1159,6 +1166,12 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=external_links] a', ->
         $(this).attr('target', '_blank').attr('rel', 'noopener noreferrer')
         return
+
+    selected: ->
+      $(document).on 'ajax:success', '[data-behavior~=show_entries]', (event) ->
+        target = $(event.target)
+        feedbin.selectedSource = target.closest('[data-feed-id]').data('feed-id')
+        feedbin.selectedTag = target.closest('[data-tag-id]').data('tag-id')
 
     clearEntry: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event) ->
