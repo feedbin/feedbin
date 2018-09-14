@@ -3,12 +3,20 @@ feedbin.showNotification('You have subscribed.');
 feedbin.hideSubscribe();
 <% @subscriptions.each do |subscription| %>
     <% if subscription.title.present? %>
-        feedbin.data.user_titles[<%= subscription.feed_id %>] = "<%= j subscription.title %>";
+        feedbin.data.user_titles[<%= subscription.feed_id %>] = '<%= j subscription.title %>';
     <% end %>
 <% end %>
-$("[data-feed-id=<%= @click_feed %>] a").click();
+
+var feed = $('[data-feed-id=<%= @click_feed %>] a')
+feed.click();
+
+tagParent = feed.closest('[data-tag-id]')
+if (tagParent.find(".drawer").data('hidden') == true) {
+    tagParent.find('[data-behavior="toggle_drawer"]').click();
+}
+
 $('.feeds').animate({
-scrollTop: feedbin.scrollTo($("[data-feed-id=<%= @click_feed %>]"), $('.feeds'))
+scrollTop: feedbin.scrollTo($('[data-feed-id=<%= @click_feed %>]'), $('.feeds'))
 }, 200);
 $('.welcome').remove();
 $('.modal-purpose-subscribe').modal('hide')

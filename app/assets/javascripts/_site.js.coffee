@@ -1168,6 +1168,9 @@ $.extend feedbin,
 
     cancelFeedRequest: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event, xhr) ->
+        if $(event.target).is(".toggle-drawer")
+          return
+
         if feedbin.feedXhr
           feedbin.feedXhr.abort()
         if $(event.target).is('.edit_feed')
