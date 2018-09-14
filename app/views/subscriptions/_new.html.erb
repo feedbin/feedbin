@@ -1,37 +1,45 @@
-<%= form_tag subscriptions_path, method: :post, remote: true, data: {behavior: "subscription_options"} do %>
+<%= form_tag subscriptions_path, method: :post, remote: true, class: "settings", data: {behavior: "subscription_options"} do %>
     <% valid_feed_ids = Rails.application.message_verifier(:valid_feed_ids).generate(feeds.map(&:id)) %>
     <%= hidden_field_tag "valid_feed_ids", valid_feed_ids %>
-    <% feeds.each_with_index do |feed, index| %>
-        <%= fields_for "feeds[]", feed do |pf| %>
-            <div class="subscription-option" data-behavior="subscription_option">
-                <div class="title">
-                    <%= pf.text_field :title, placeholder: feed.title %>
-                    <p class="feed-url" title="Feed URL"><%= feed.feed_url %></p>
-                </div>
-                <div class="autocomplete-parent category" data-behavior="selected_category autocomplete_parent">
-                    <%= pf.text_field :tags, placeholder: "Tags", data: {behavior: 'autocomplete_field', autocomplete_path: tags_path} %>
-                    <div class="subscribe-tags-autocomplete" data-behavior="autocomplete_target"></div>
-                </div>
-                <div class="action <%= (feeds.length == 1) ? 'hide' : '' %>">
-                    <%= pf.check_box :subscribe, checked: index == 0 ? true : false, data: {behavior: "check_toggle"} %>
-                    <%= pf.label :subscribe do %>
-                        <span class="slider-checkbox"></span>
+    <div class="inset">
+        <div class="inset-content">
+            <h4 class="group-header"><%= "Feed".pluralize(feeds.length) %></h4>
+        </div>
+
+        <div style="padding: 0 15px 20px 15px;">
+            <% feeds.each_with_index do |feed, index| %>
+                <%= fields_for "feeds[]", feed do |pf| %>
+                    <div class="subscription-option" data-behavior="subscription_option">
+                        <div class="title">
+                            <%= pf.text_field :title, placeholder: feed.title %>
+                            <p class="feed-url" title="Feed URL"><%= feed.feed_url %></p>
+                        </div>
+                        <div class="action <%= (feeds.length == 1) ? 'hide' : '' %>">
+                            <%= pf.check_box :subscribe, checked: index == 0 ? true : false, data: {behavior: "check_toggle"} %>
+                            <%= pf.label :subscribe do %>
+                                <span class="slider-checkbox"></span>
+                            <% end %>
+                        </div>
+                        <p class="feed-url" title="Feed URL"><%= feed.feed_url %></p>
+                    </div>
+                    <% if feed.twitter_feed? %>
+                        <div class="subscription-preferences">
+                            <label>
+                                Tweets with media and links only
+                                <%= pf.check_box :media_only, checked: true, data: {behavior: "check_toggle"} %>
+                                <%= pf.label :media_only do %>
+                                    <span class="slider-checkbox"></span>
+                                <% end %>
+                            </label>
+                        </div>
                     <% end %>
-                </div>
-                <p class="feed-url" title="Feed URL"><%= feed.feed_url %></p>
-            </div>
-            <% if feed.twitter_feed? %>
-                <div class="subscription-preferences">
-                    <label>
-                        Tweets with media and links only
-                        <%= pf.check_box :media_only, checked: true, data: {behavior: "check_toggle"} %>
-                        <%= pf.label :media_only do %>
-                            <span class="slider-checkbox"></span>
-                        <% end %>
-                    </label>
-                </div>
+                <% end %>
             <% end %>
-        <% end %>
-    <% end %>
-    <%= submit_tag("Submit", class: "visually-hidden", data: {behavior: "submit_add"}) %>
+        </div>
+        <div class="inset-content">
+            <h4 class="group-header">Tags</h4>
+        </div>
+        <%= render partial: "tag_fields", locals: {tag_editor: tag_editor} %>
+        <%= submit_tag("Submit", class: "visually-hidden", data: {behavior: "submit_add"}) %>
+    </div>
 <% end %>

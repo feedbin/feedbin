@@ -8,13 +8,7 @@ class FeedsController < ApplicationController
     @mark_selected = true
 
     @feed = Feed.find(params[:id])
-
-    tags = []
-    tags.concat params[:tag_id].values if params[:tag_id]
-    tags.concat params[:tag_name] if params[:tag_name]
-    tags = tags.join(",")
-
-    @feed.tag(tags, @user)
+    @feed.tag_with_params(params, @user)
 
     if params[:no_response].present?
       head :ok
@@ -147,6 +141,7 @@ class FeedsController < ApplicationController
       }
       @feeds = FeedFinder.new(params[:q], config).create_feeds!
       @feeds.map { |feed| feed.priority_refresh(@user) }
+      @tag_editor = TagEditor.new(@user, nil)
     end
   rescue => exception
     logger.info { "------------------------" }

@@ -1,4 +1,4 @@
-<% if feed.blank? %>
+<% if subscription.blank? %>
     <button class="toolbar-button" data-behavior="unsubscribe" disabled="disabled">
         <div class="toolbar-button-inner">
             <%= render partial: "shared/svg/trash" %>
@@ -6,8 +6,8 @@
         Delete
     </button>
 <% else %>
-    <%= form_tag subscription_path(feed.subscription_id), remote: true, method: "delete", data: {behavior: "unsubscribe"} do %>
-        <button title="Delete" class="toolbar-button" type="submit" data-confirm="Are you sure you want to unsubscribe from <%= feed.title %>?">
+    <%= form_tag subscription_path(subscription), remote: true, method: "delete", data: {behavior: "unsubscribe"} do %>
+        <button title="Delete" class="toolbar-button" type="submit" data-confirm="Are you sure you want to unsubscribe from <%= subscription.title || subscription.feed.title %>?">
             <div class="toolbar-button-inner">
                 <%= render partial: "shared/svg/trash" %>
             </div>

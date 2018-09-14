@@ -2,7 +2,7 @@
 feedbin.updateEntries('');
 feedbin.updateEntryContent('');
 $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
-$('[data-behavior~=tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {feed: nil} %>');
+$('[data-behavior~=tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {subscription: nil} %>');
 $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_tag", locals: {tag: nil} %>');
 feedbin.disableMarkRead()
 feedbin.hideSearchControls()

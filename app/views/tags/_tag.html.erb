@@ -4,24 +4,35 @@ if %w{view_unread view_starred}.include?(@user.get_view_mode) && tag.count == 0 
   hide_drawer = true
 end
 %>
+
 <li data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" class="<%= selected("tag_#{tag.id}") %>" data-behavior="droppable">
-    <%= link_to tag_path(tag.id), remote: true, class: 'feed-link tag-link', data: { behavior: 'selectable show_entries open_item feed_link renamable', mark_read: {type: 'tag', data: tag.id, message: "Mark #{tag.name} as read?"}.to_json } do %>
-        <span class="favicon-wrap collection-favicon">
-            <%= svg_tag 'favicon-tag', size: '16x16' %>
-        </span>
-        <span class="collection-label-wrap" data-behavior="rename_target" data-form-action="<%= tag_path(tag) %>" data-input-name="tag[name]" data-title="<%= tag.name %>", data-original-title="<%= tag.name %>">
-            <span class="collection-label" data-behavior="rename_title"><%= tag.name %></span>
-        </span>
-        <% unless hide_drawer %>
-            <%= render partial: 'tags/tag_visibility', locals: {user: @user, tag: tag} %>
+    <% cache [drawer_visible?(tag.id), hide_drawer, tag, tag.user_feeds.map(&:id)] do %>
+        <%= link_to tag_path(tag.id), remote: true, class: 'feed-link tag-link', data: { behavior: 'selectable show_entries open_item feed_link renamable', mark_read: {type: 'tag', data: tag.id, message: "Mark #{tag.name} as read?"}.to_json } do %>
+            <span class="favicon-wrap collection-favicon">
+                <%= svg_tag 'favicon-tag', size: '16x16' %>
+            </span>
+            <span class="collection-label-wrap" data-behavior="rename_target" data-form-action="<%= tag_path(tag) %>" data-input-name="tag[name]" data-title="<%= tag.name %>", data-original-title="<%= tag.name %>">
+                <span class="collection-label" data-behavior="rename_title"><%= tag.name %></span>
+            </span>
+            <% unless hide_drawer %>
+                <%= form_for @user, url: view_settings_update_user_path(@user), remote: 'true', html: { class: 'toggle-drawer' } do |f| %>
+                    <%= hidden_field_tag 'tag_visibility', 'tag_visibility' %>
+                    <%= hidden_field_tag 'tag', tag.id %>
+                    <% if drawer_visible?(tag.id) %>
+                        <%= f.button "hide", class: 'feed-action-button', data: { behavior: 'toggle_drawer' } %>
+                    <% else %>
+                        <%= f.button "show", class: 'feed-action-button', data: { behavior: 'toggle_drawer' } %>
+                    <% end %>
+                <% end %>
+            <% end %>
+            <span class="count-wrap">
+                <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byTag', count_group_id: tag.id} %>
+            </span>
         <% end %>
-        <span class="count-wrap">
-            <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byTag', count_group_id: tag.id} %>
-        </span>
+        <div class="drawer <%= hide_drawer ? ' hide' : '' %>" data-hidden="<%= drawer_visible?(tag.id) ? 'false' : 'true' %>" style="<%= drawer_visible?(tag.id) ? '' : 'height: 0;' %>">
+            <ul>
+                <%= render partial: "feeds/feed", collection: tag.user_feeds %>
+            </ul>
+        </div>
     <% end %>
-    <div class="drawer <%= hide_drawer ? ' hide' : '' %>" data-hidden="<%= drawer_visible?(tag.id) ? 'false' : 'true' %>" style="<%= drawer_visible?(tag.id) ? '' : 'height: 0;' %>">
-        <ul>
-            <%= render tag.user_feeds %>
-        </ul>
-    </div>
 </li>

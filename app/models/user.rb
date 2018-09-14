@@ -302,10 +302,6 @@ class User < ApplicationRecord
     CancelBilling.perform_async(customer_id)
   end
 
-  def feed_with_subscription_id(feed_id)
-    feeds.select("feeds.*, subscriptions.id as subscription_id").where("feeds.id = ? AND subscriptions.user_id = #{self.id}", feed_id).first
-  end
-
   def tag_group
     unique_tags = feed_tags
     feeds_by_tag = build_feeds_by_tag

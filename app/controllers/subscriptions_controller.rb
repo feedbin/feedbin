@@ -27,6 +27,9 @@ class SubscriptionsController < ApplicationController
     valid_feed_ids = Rails.application.message_verifier(:valid_feed_ids).verify(params[:valid_feed_ids])
     @subscriptions = Subscription.create_multiple(params[:feeds].to_unsafe_h, user, valid_feed_ids)
     if @subscriptions.present?
+      @subscriptions.each do |subscription|
+        subscription.feed.tag_with_params(params, user)
+      end
       @click_feed = @subscriptions.first.feed_id
     end
     @mark_selected = true

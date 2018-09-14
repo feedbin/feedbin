@@ -906,13 +906,17 @@ $.extend feedbin,
       $.ajax(xhr)
     )
 
-  showModal: (target) ->
+  showModal: (target, title = null) ->
     modal = $("#modal")
     classes = modal[0].className.split(/\s+/)
     classPrefix = "modal-purpose"
     modalClass = "#{classPrefix}-#{target}"
 
-    content = $("[data-modal-purpose=#{target}]").html()
+    content = $($("[data-modal-purpose=#{target}]").html())
+
+    titleElement = content.find(".modal-title")
+    title = title or titleElement.html()
+    titleElement.html(title)
 
     $.each classes, (index, className) ->
       if className.indexOf(classPrefix) != -1
@@ -1048,6 +1052,9 @@ $.extend feedbin,
         if feedbin.panel > 1
           newPanel = feedbin.panel - 1
           feedbin.showPanel(newPanel, false)
+
+    userTitles: ->
+      feedbin.applyUserTitles()
 
     renameFeed: ->
       $(document).on 'dblclick', '[data-behavior~=renamable]', (event) ->
@@ -1898,7 +1905,8 @@ $.extend feedbin,
     openModal: ->
       $(document).on 'click', '[data-behavior~=open_modal]', (event) ->
         target = $(@).data("modal-target")
-        feedbin.showModal(target)
+        title = $(@).data("modal-title")
+        feedbin.showModal(target, title)
 
     showMessage: ->
       $(document).on 'click', '[data-behavior~=show_message]', (event) ->
@@ -2003,7 +2011,7 @@ $.extend feedbin,
 
       $(document).on 'click', '[data-behavior~=add_tag]', (event) ->
         field = $(fieldContent)
-        $("[data-behavior~=tags_target]").append(field)
+        $("[data-behavior~=tags_target]").prepend(field)
         field.find("input").focus()
         event.preventDefault()
 

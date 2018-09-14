@@ -23,9 +23,6 @@ class Subscription < ApplicationRecord
         record = user.subscriptions.find_or_create_by(feed: feed)
         record.update(title: subscription["title"].strip, media_only: subscription["media_only"])
         array.push(record)
-        if subscription["tags"].present?
-          feed.tag(subscription["tags"], user, true)
-        end
       end
     end
   end

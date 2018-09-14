@@ -22,7 +22,7 @@ if ("<%= @all_unread %>" === 'true') {
 feedbin.localizeTime();
 feedbin.applyUserTitles();
 feedbin.loadEntryImages();
-$('[data-behavior~=tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {feed: @feed || nil} %>');
+$('[data-behavior~=tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {subscription: @subscription || nil} %>');
 <% if @type && @type == 'tag' %>
     $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_tag", locals: {tag: @tag} %>');
 <% elsif @type && @type == 'saved_search' %>
@@ -30,7 +30,7 @@ $('[data-behavior~=tags_form]').replaceWith('<%= j render partial: "shared/butto
 <% elsif @type && @type == 'recently_read' %>
     $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_recently_read" %>');
 <% else %>
-    $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/unsubscribe", locals: {feed: @feed || nil} %>');
+    $('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/unsubscribe", locals: {subscription: @subscription || nil} %>');
 <% end %>
 <% if @page_query %>
     feedbin.updatePager('<%= j will_paginate(@page_query) %>');

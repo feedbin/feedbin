@@ -1,7 +1,7 @@
 <%= form_for(feed, remote: true, method: :patch, html: {class: 'settings', data: {behavior: "edit_tags_form"}}) do |f| %>
-    <div class="inset smooth-top">
+    <div class="inset">
         <div class="inset-content">
-            <h4 class="group-header"><span data-behavior="user_title" data-feed-id="<%= feed.id %>"><%= strip_tags(feed.title) %></span></h4>
+            <h4 class="group-header">Tags</h4>
         </div>
         <%= render partial: "tag_fields", locals: {tag_editor: tag_editor} %>
     </div>

@@ -1,4 +1,10 @@
-<ul class="control-group control-group-form" data-behavior="tags_target">
+<ul class="control-group control-group-form">
+    <li>
+        <button data-behavior="add_tag" type="button">+ New Tag</button>
+    </li>
+</ul>
+
+<%= content_tag :ul, class: "control-group control-group-form tag-list", data: {behavior: "tags_target"} do  -%>
     <% tag_editor.tags.each do |tag| %>
     <li>
         <%= check_box_tag "tag_id[#{tag.id}]", tag.name, tag_editor.checked?(tag) %>
@@ -7,9 +13,4 @@
         <% end %>
     </li>
     <% end %>
-</ul>
-<ul class="control-group control-group-form">
-    <li>
-        <button data-behavior="add_tag" type="button">+ Add Tag</button>
-    </li>
-</ul>
+<%- end -%>

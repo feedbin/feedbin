@@ -35,6 +35,14 @@ class Feed < ApplicationRecord
     self.twitter? || self.twitter_home?
   end
 
+  def tag_with_params(params, user)
+    tags = []
+    tags.concat params[:tag_id].values if params[:tag_id]
+    tags.concat params[:tag_name] if params[:tag_name]
+    tags = tags.join(",")
+    self.tag(tags, user)
+  end
+
   def tag(names, user, delete_existing = true)
     taggings = []
     if delete_existing
