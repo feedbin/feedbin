@@ -1,13 +1,4 @@
 GIT
-  remote: https://github.com/feedbin/carrierwave_direct.git
-  revision: a0bc3230e544c0ea88f35d2bb6b7eb6a1fdb9196
-  ref: a0bc323
-  specs:
-    carrierwave_direct (0.0.15)
-      carrierwave
-      fog-aws
-
-GIT
   remote: https://github.com/feedbin/feedjira.git
   revision: a8a90bbc601f695c07e0797688e846d5d561263c
   ref: a8a90bb
@@ -153,6 +144,9 @@ GEM
       activemodel (>= 4.0.0)
       activesupport (>= 4.0.0)
       mime-types (>= 1.16)
+    carrierwave_direct (2.0.0)
+      carrierwave (>= 1.0.0)
+      fog-aws
     childprocess (0.9.0)
       ffi (~> 1.0, >= 1.0.11)
     clockwork (2.0.3)
@@ -220,7 +214,7 @@ GEM
       fog-json (~> 1.1)
       fog-xml (~> 0.1)
       ipaddress (~> 0.8)
-    fog-core (2.1.0)
+    fog-core (2.1.2)
       builder
       excon (~> 0.58)
       formatador (~> 0.2)
@@ -509,7 +503,7 @@ DEPENDENCIES
   capistrano-rbenv
   capybara (~> 2.13)
   carrierwave
-  carrierwave_direct!
+  carrierwave_direct
   clockwork
   coffee-rails
   connection_pool
