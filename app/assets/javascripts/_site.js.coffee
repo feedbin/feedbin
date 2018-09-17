@@ -514,6 +514,9 @@ $.extend feedbin,
       if img.is("[src*='feeds.feedburner.com'], [data-canonical-src*='feeds.feedburner.com']")
         img.addClass('hide')
 
+  removeOuterLinks: ->
+    $('[data-behavior~=entry_final_content] a').find('video').unwrap()
+
   preloadSiblings: ->
     selected = feedbin.selectedEntry.container.closest('li')
     siblings = selected.nextAll().slice(0,4).add(selected.prevAll().slice(0,4))
@@ -532,6 +535,7 @@ $.extend feedbin,
     if readability
       feedbin.readability()
     try
+      feedbin.removeOuterLinks()
       feedbin.formatIframes($("[data-iframe-src]"))
       feedbin.playState()
       feedbin.timeRemaining(entryId)
@@ -552,8 +556,8 @@ $.extend feedbin,
 
   formatLinkContents: ->
     try
+      feedbin.removeOuterLinks()
       feedbin.formatIframes($("[data-iframe-src]"))
-      feedbin.audioVideo("view_link_markup_wrap")
       feedbin.formatTweets("[data-behavior~=view_link_markup_wrap]")
       feedbin.formatInstagram("[data-behavior~=view_link_markup_wrap]")
       feedbin.formatImages()
