@@ -10,7 +10,7 @@ class Share::Pinboard < Share::Service
   end
 
   def request_token(username, password)
-    response = self.class.get("/user/api_token", query: {auth_token: password, format: "json"})
+    response = self.class.get("/user/api_token", query: {auth_token: password, format: "json"}, timeout: 20)
     if response.code == 401
       raise OAuth::Unauthorized
     else
@@ -21,17 +21,19 @@ class Share::Pinboard < Share::Service
   def add(params)
     defaults = {auth_token: @auth_token, format: "json"}
     options = params.slice(:toread, :shared, :tags, :extended, :description, :url)
-    response = self.class.get("/posts/add", query: defaults.merge(options))
+    response = self.class.get("/posts/add", query: defaults.merge(options), timeout: 10)
     if response.code == 200
       data = JSON.load(response.body)
       if data["result_code"] == "done"
-        code = 200
+        200
       else
-        code = 500
+        500
       end
     else
       response.code
     end
+  rescue Net::OpenTimeout
+    500
   end
 
   def share(params)
