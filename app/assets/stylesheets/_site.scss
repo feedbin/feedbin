@@ -5203,11 +5203,14 @@ input[type="checkbox"] + label .slider-checkbox {
         top: 2px;
         transition: left .2s ease;
     }
-    .modal & {
-        right: 15px;
-    }
     @media (max-width: 550px) {
         right: 15px;
+    }
+    .modal & {
+        right: 24px;
+        @media (max-width: 550px) {
+            right: 16px;
+        }
     }
 }
 input[type="checkbox"]:checked + label .slider-checkbox {
@@ -5528,13 +5531,10 @@ Buttons
     text-decoration: none;
     border: 2px solid $selected;
     border-radius: 4px;
-    padding: 11px;
+    padding: 7px;
     min-width: 90px;
     display: inline-block;
     text-align: center;
-    &.small {
-        padding: 7px;
-    }
     &:hover {
         text-decoration: none;
         border-color: $selected-hover;
@@ -8002,7 +8002,7 @@ button.close {
     border: 0;
     color: $text-color-light;
     svg * {
-        @include fill($text-color, $text-color-night, $text-color-sunset);
+        @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
     }
 }
 
@@ -8287,9 +8287,24 @@ button.close {
     .group-header {
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
     }
-    .control-group-form button,
-    .control-group-form input {
-        background-color: transparent;
+    .control-group-form {
+        border: none;
+        button, input {
+            background-color: transparent;
+        }
+        label,
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="submit"],
+        input[type="search"],
+        input[type="url"],
+        input[type="tel"],
+        button,
+        textarea,
+        a {
+            border: none;
+        }
     }
 }
 
@@ -8298,7 +8313,7 @@ button.close {
         position: sticky;
         bottom: -4px;
         z-index: 2;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        border-color: transparent;
         border-bottom-left-radius: $modal-border-radius;
         border-bottom-right-radius: $modal-border-radius;
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
@@ -8418,15 +8433,17 @@ button.close {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    padding: 8px 15px;
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    padding: 14px 15px;
     border-top-left-radius: $modal-border-radius;
     border-top-right-radius: $modal-border-radius;
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    @include padding(14px, 24px, 14px, 24px, 14px, 16px, 14px, 16px);
     h5 {
-        font-size: 16px;
+        font-size: 24px;
         margin: 0;
+        @media (max-width: 550px) {
+            font-size: 16px;
+        }
     }
 }
 
@@ -8462,14 +8479,14 @@ button.close {
 .modal-body {
     position: relative;
     flex: 1 1 auto;
-    padding: 1rem;
+    @include padding(14px, 24px, 14px, 24px, 14px, 16px, 14px, 16px);
 }
 
 .modal-footer {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 1rem;
+    @include padding(14px, 24px, 14px, 24px, 14px, 16px, 14px, 16px);
     border-top: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
 }

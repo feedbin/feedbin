@@ -182,7 +182,14 @@
         padding-left: 15px;
     }
     .modal & {
-        padding-right: 15px;
-        padding-left: 15px;
+        @include padding(14px, 24px, 14px, 24px, 14px, 16px, 14px, 16px);
     }
 }
+
+@mixin padding($top, $right, $bottom, $left, $top-small, $right-small, $bottom-small, $left-small) {
+    padding: $top $right $bottom $left;
+    @media (max-width: 528px) {
+        padding: $top-small $right-small $bottom-small $left-small;
+    }
+}
+
