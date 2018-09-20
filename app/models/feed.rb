@@ -54,7 +54,7 @@ class Feed < ApplicationRecord
     letter = "default"
     if host
       if segment = host.split(".")[-2]
-        letter = segment[0]
+        letter = segment[0].downcase
       end
     end
     letter
