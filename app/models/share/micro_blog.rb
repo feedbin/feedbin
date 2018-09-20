@@ -23,7 +23,7 @@ class Share::MicroBlog < Share::Service
       "Authorization" => "Bearer #{@auth_token}",
     }
 
-    response = self.class.post("/micropub", body: body, headers: headers)
+    response = self.class.post("/micropub", body: body, headers: headers, timeout: 10)
 
     if response.code == 202
       code = 200
@@ -32,6 +32,8 @@ class Share::MicroBlog < Share::Service
     end
 
     code
+  rescue Net::OpenTimeout
+    500
   end
 
   def share(params)

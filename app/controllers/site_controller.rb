@@ -49,6 +49,7 @@ class SiteController < ApplicationController
         instagram_embed_path: instagram_embeds_path,
         theme: @user.theme || "day",
         favicon_colors: @user.setting_on?(:favicon_colors),
+        font_stylesheet: ENV['FONT_STYLESHEET'],
       }
 
       render action: "logged_in"

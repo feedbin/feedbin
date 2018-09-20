@@ -5758,18 +5758,6 @@ Buttons
 /*------------------------------------------------------------------------------
 Link Viewer
 ------------------------------------------------------------------------------*/
-#view_link_wrap .link-content-meta {
-    margin-bottom: 20px;
-    .url {
-        color: $text-color-light;
-        display: block;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    position: relative;
-}
-
 .placeholder-content h1:empty, .placeholder-content p:empty {
     background: rgba($text-color-light, .2);
     .theme-sunset & {
@@ -8365,6 +8353,7 @@ button.close {
     .inset {
         border: none;
         @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+        padding-bottom: 0;
     }
     .control-group {
         padding: 0;
