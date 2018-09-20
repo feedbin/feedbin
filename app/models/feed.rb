@@ -58,6 +58,16 @@ class Feed < ApplicationRecord
     taggings
   end
 
+  def host_letter
+    letter = "default"
+    if host
+      if segment = host.split(".")[-2]
+        letter = segment[0]
+      end
+    end
+    letter
+  end
+
   def self.create_from_parsed_feed(parsed_feed)
     ActiveRecord::Base.transaction do
       record = self.create!(parsed_feed.to_feed)

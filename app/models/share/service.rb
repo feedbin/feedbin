@@ -11,13 +11,14 @@ class Share::Service
       elsif status == 401
         klass.remove_access!
         response[:url] = Rails.application.routes.url_helpers.sharing_services_path
-        response[:message] = "#{klass.label} authentication error."
+        response[:error] = "#{klass.label} authentication error."
       else
-        response[:message] = "There was a problem connecting to #{klass.label}."
+        response[:error] = "There was a problem connecting to #{klass.label}."
+        ShareRetry.perform_in(1.minute, klass.id, params)
       end
     else
       response[:url] = Rails.application.routes.url_helpers.sharing_services_path
-      response[:message] = "#{klass.label} authentication error."
+      response[:error] = "#{klass.label} authentication error."
     end
     response
   end

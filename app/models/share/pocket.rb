@@ -63,9 +63,17 @@ class Share::Pocket < Share::Service
 
   def add(params)
     options = {
-      body: {url: params["entry_url"], access_token: @access_token, consumer_key: ENV["POCKET_CONSUMER_KEY"]}.to_json,
+      body: {
+        url: params["entry_url"],
+        access_token: @access_token,
+        consumer_key: ENV["POCKET_CONSUMER_KEY"]
+      }.to_json,
+      timeout: 10
     }
-    self.class.post(PATHS[:add], options).code
+    response = self.class.post(PATHS[:add], options)
+    response.code
+  rescue Net::OpenTimeout
+    500
   end
 
   def redirect_uri

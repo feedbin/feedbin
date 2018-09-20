@@ -1398,6 +1398,15 @@ li.selected > a .favicon-wrap {
     @include background-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
 }
 
+$characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9;
+
+@each $character in $characters {
+    .favicon-character-#{$character} {
+        background-size: 10px 10px !important;
+        background-image: image-url("character-#{$character}.svg") !important;
+    }
+}
+
 .collection-favicon {
     background-size: 16px 16px;
     background: transparent;
