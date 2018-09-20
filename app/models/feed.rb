@@ -51,7 +51,13 @@ class Feed < ApplicationRecord
   end
 
   def host_letter
-    (host) ? host[0] : "default"
+    letter = "default"
+    if host
+      if segment = host.split(".")[-2]
+        letter = segment[0]
+      end
+    end
+    letter
   end
 
   def self.create_from_parsed_feed(parsed_feed)
