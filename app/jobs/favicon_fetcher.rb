@@ -5,7 +5,6 @@ class FaviconFetcher
   sidekiq_options retry: false
 
   def perform(host, force = false)
-    return
     @favicon = Favicon.unscoped.where(host: host).first_or_initialize
     @force = force
     update if should_update?
