@@ -1394,8 +1394,11 @@ li.selected > a .favicon-wrap {
 }
 
 .favicon-default {
-    background: image-url("favicon-feed-blue.svg") 0 0 no-repeat;
+    background-image: image-url("favicon-default.svg");
+    background-position: 0 0;
+    background-repeat: no-repeat;
     @include background-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    border-radius: 1.5px;
 }
 
 $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9;
@@ -1403,7 +1406,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 @each $character in $characters {
     .favicon-character-#{$character} {
         background-size: 10px 10px !important;
-        background-image: image-url("character-#{$character}.svg") !important;
+        background-image: image-url("character-#{$character}.svg");
     }
 }
 
