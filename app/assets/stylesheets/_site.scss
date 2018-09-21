@@ -8323,14 +8323,11 @@ button.close {
 .modal-purpose-tags, .modal-purpose-subscribe {
     .modal-footer {
         position: sticky;
-        bottom: -4px;
+        bottom: 0;
         z-index: 2;
-        border-color: transparent;
         border-bottom-left-radius: $modal-border-radius;
         border-bottom-right-radius: $modal-border-radius;
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-        padding-top: 10px;
-        padding-bottom: 10px;
     }
     .inset {
         margin-bottom: 0;
@@ -8445,11 +8442,12 @@ button.close {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    padding: 14px 15px;
+    padding: 12px 16px;
     border-top-left-radius: $modal-border-radius;
     border-top-right-radius: $modal-border-radius;
+    border-bottom: 1px solid transparent;
+    @include border-color($border-color, $border-color-night, $border-color-sunset);
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-    @include padding(14px, 24px, 14px, 24px, 14px, 16px, 14px, 16px);
     h5 {
         font-size: 24px;
         margin: 0;
@@ -8486,19 +8484,20 @@ button.close {
     width: 100%;
     overflow: hidden;
     padding-right: 80px;
+    font-weight: 600;
 }
 
 .modal-body {
     position: relative;
     flex: 1 1 auto;
-    @include padding(14px, 24px, 14px, 24px, 14px, 16px, 14px, 16px);
+    padding: 16px;
 }
 
 .modal-footer {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    @include padding(14px, 24px, 14px, 24px, 14px, 16px, 14px, 16px);
+    padding: 16px;
     border-top: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
 }
