@@ -688,20 +688,13 @@ table {
         border-left: none;
         border-right: none;
     }
-    &.smooth-top {
-        padding-top: 0;
-        .control-group:first-child {
-            border-top: none;
-            border-radius: 8px 8px 0 0;
-            padding-top: 30px;
-        }
-    }
     @media (max-width: 550px) {
         border: none;
         background-color: transparent;
         border-radius: 0;
     }
 }
+
 .description-inset {
     padding: 0 30px 0 30px;
     &.icon-email {
@@ -4491,165 +4484,9 @@ body.settings {
             box-shadow: 4px 4px 0 -2px $border-color-night;
         }
     }
-    .control-group,
-    .table-wrap {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        margin-bottom: 30px;
-        border-top: 1px solid $border-color;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
-        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
-        > li {
-            margin: 0;
-            padding: 0;
-            border-bottom: 1px solid $border-color;
-            @include border-color($border-color, $border-color-night, $border-color-sunset);
-            @include settings-row;
-        }
-        &.no-margin {
-            margin-bottom: 0;
-        }
-    }
-    .control-group-borders {
-        border-left: 1px solid $border-color;
-        border-right: 1px solid $border-color;
-    }
-    .table-wrap {
-        border-bottom: 1px solid $border-color;
-        table {
-            margin: 0;
-        }
-        td {
-            width: 33% !important;
-        }
-        td:first-child {
-            padding-left: 30px !important;
-            @media (max-width: 550px) {
-                padding-left: 15px !important;
-            }
-        }
-        td:last-child {
-            padding-right: 30px !important;
-            text-align: right;
-            @media (max-width: 550px) {
-                padding-right: 15px !important;
-            }
-        }
-        td input {
-            margin: 0;
-        }
-    }
-    .control-group-description {
-        @include settings-row;
-        font-size: 12px;
-        color: #999;
-        margin-top: -20px;
-        margin-bottom: 30px;
-        &.no-margin {
-            margin-bottom: 0;
-        }
-    }
-    .control-group-form {
-        li {
-            padding: 0 !important;
-            border: none;
-            &.with-button {
-                position: relative;
-                input {
-                    padding-right: 85px !important;
-                }
-            }
-        }
-        .icon-delete {
-            position: absolute;
-            right: 0px;
-            top: -2px;
-            bottom: 0;
-            width: 80px;
-            padding: 15px;
-            border: none;
-            text-align: right;
-            color: red;
-            background: transparent !important;
-        }
-        $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
-        label,
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="submit"],
-        input[type="search"],
-        input[type="url"],
-        input[type="tel"],
-        button,
-        textarea,
-        a {
-            font-size: 16px;
-            display: block;
-            text-align: left;
-            margin: 0 !important;
-            line-height: 1;
-            position: relative;
-            border: none;
-            border-bottom: 1px solid $border-color;
-            @include border-color($border-color, $border-color-night, $border-color-sunset);
-            display: block;
-            border-radius: 0 !important;
-            max-width: 100% !important;
-            width: 100%;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-            @include settings-row;
-            &:focus {
-                box-shadow: $subtle-focus-glow;
-            }
-        }
-        input[type="checkbox"]:focus + label .slider-checkbox {
-            box-shadow: $focus-glow;
-        }
-        input[type="radio"]:focus + label {
-            box-shadow: $subtle-focus-glow;
-        }
-        label {
-            user-select: none;
-        }
-        a:hover {
-            text-decoration: none;
-        }
-        textarea {
-            line-height: 1.2;
-        }
-        input[type="submit"],
-        button {
-            color: $selected;
-            appearance: none;
-            background: #FFF;
-        }
-        input[type="radio"], input[type="checkbox"], input[type="file"] {
-            @extend .visually-hidden;
-        }
-        input[type="radio"]:checked + label {
-            position: relative;
-            &:after {
-                position: absolute;
-                right: 37px;
-                top: 19px;
-                content: "";
-                background: image-url("icon-check.svg") 0 0 no-repeat;
-                height: 12px;
-                width: 15px;
-                @media (max-width: 550px) {
-                    right: 22px;
-                }
-            }
-        }
-    }
     .cc-form-wrap {
         .card-number-wrap {
             padding: 9px 30px;
-            border-bottom: 1px solid $border-color;
             @media (max-width: 550px) {
                 padding-left: 15px;
                 padding-right: 15px;
@@ -5174,68 +5011,224 @@ body.settings {
         }
     }
 }
-
-.control-group input[type="checkbox"] + label {
-    padding-right: 85px !important;
+.control-group-description {
+    @include settings-row;
+    font-size: 12px;
+    color: #999;
+    margin-top: -20px;
+    margin-bottom: 30px;
+    &.no-margin {
+        margin-bottom: 0;
+    }
 }
-
-input[type="checkbox"] + label .slider-checkbox {
-    width: 56px;
-    height: 26px;
-    display: block;
-    position: absolute;
-    right: 30px;
-    top: 10px;
-    border-radius: 28px;
-    background-color: #9e9e9e;
-    &:before {
-        background-color: #FFF;
-        height: 22px;
-        width: 22px;
-        border-radius: 22px;
-        background-color: #FFF;
-        content: "";
-        top: 2px;
-        left: 2px;
-        position: absolute;
-        z-index: 2;
-        transition: left .2s ease, opacity .3s ease;
-        opacity: 1;
-    }
-    &:after {
-        z-index: 1;
-        position: absolute;
-        display: block;
-        content: "";
-        height: 22px;
-        width: 22px;
-        border-radius: 22px;
-        background-color: #FFF;
-        left: 2px;
-        top: 2px;
-        transition: left .2s ease;
-    }
-    @media (max-width: 550px) {
-        right: 15px;
-    }
-    .modal & {
-        right: 24px;
-        @media (max-width: 550px) {
-            right: 16px;
+.control-group {
+    $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 30px;
+    > li {
+        margin: 0;
+        padding: 0;
+        position: relative;
+        > {
+            label,
+            button,
+            textarea,
+            a,
+            input {
+                font-size: 16px;
+                display: block;
+                text-align: left;
+                margin: 0;
+                line-height: 1;
+                position: relative;
+                border: none;
+                border-radius: 0;
+                max-width: 100%;
+                width: 100%;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                @include settings-row;
+                border-bottom-width: 1px;
+                border-bottom-style: solid;
+                @include border-color($border-color, $border-color-night, $border-color-sunset);
+                @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+                &:focus {
+                    box-shadow: $subtle-focus-glow;
+                }
+            }
+        }
+        &.text {
+            padding: 0 30px;
+            @media (max-width: 550px) {
+                padding: 0 15px;
+            }
+            > input {
+                border-width: 1px;
+                border-style: solid;
+                border-radius: 8px;
+                padding-left: 15px;
+                padding-right: 15px;
+                &:focus {
+                    box-shadow: none;
+                    border: 1px solid $selected;
+                }
+            }
+        }
+        &:first-of-type {
+            > label,
+            > button,
+            > textarea,
+            > a,
+            > input {
+                border-top-width: 1px;
+                border-top-style: solid;
+            }
         }
     }
-}
-input[type="checkbox"]:checked + label .slider-checkbox {
-    background-color: $selected;
-    &:after {
-        left: 32px;
-        background: #FFF image-url("icon-check.svg") 4px 5px no-repeat;
+    input[type="checkbox"]:focus + label .slider-checkbox {
+        box-shadow: $focus-glow;
     }
-    &:before {
-        left: 32px;
-        opacity: 0;
+    input[type="radio"]:focus + label {
+        box-shadow: $subtle-focus-glow;
     }
+    label {
+        user-select: none;
+    }
+    a:hover {
+        text-decoration: none;
+    }
+    textarea {
+        line-height: 1.2;
+    }
+    input[type="submit"],
+    button {
+        color: $selected;
+        appearance: none;
+        background: #FFF;
+    }
+    input[type="radio"], input[type="checkbox"], input[type="file"] {
+        @extend .visually-hidden;
+    }
+    input[type="radio"]:checked + label {
+        position: relative;
+        &:after {
+            position: absolute;
+            right: 37px;
+            top: 19px;
+            content: "";
+            background: image-url("icon-check.svg") 0 0 no-repeat;
+            height: 12px;
+            width: 15px;
+            @media (max-width: 550px) {
+                right: 22px;
+            }
+        }
+    }
+    input[type="checkbox"] + label .slider-checkbox {
+        width: 56px;
+        height: 26px;
+        display: block;
+        position: absolute;
+        right: 30px;
+        top: 10px;
+        border-radius: 28px;
+        background-color: #9e9e9e;
+        &:before {
+            background-color: #FFF;
+            height: 22px;
+            width: 22px;
+            border-radius: 22px;
+            background-color: #FFF;
+            content: "";
+            top: 2px;
+            left: 2px;
+            position: absolute;
+            z-index: 2;
+            transition: left .2s ease, opacity .3s ease;
+            opacity: 1;
+        }
+        &:after {
+            z-index: 1;
+            position: absolute;
+            display: block;
+            content: "";
+            height: 22px;
+            width: 22px;
+            border-radius: 22px;
+            background-color: #FFF;
+            left: 2px;
+            top: 2px;
+            transition: left .2s ease;
+        }
+        @media (max-width: 550px) {
+            right: 15px;
+        }
+        .modal & {
+            right: 24px;
+            @media (max-width: 550px) {
+                right: 16px;
+            }
+        }
+    }
+    input[type="checkbox"]:checked + label .slider-checkbox {
+        background-color: $selected;
+        &:after {
+            left: 32px;
+            background: #FFF image-url("icon-check.svg") 4px 5px no-repeat;
+        }
+        &:before {
+            left: 32px;
+            opacity: 0;
+        }
+    }
+    input[type="checkbox"] + label {
+        padding-right: 85px !important;
+    }
+    &.no-margin {
+        margin-bottom: 0;
+    }
+    .table {
+        margin: 0;
+        td {
+            width: 33% !important;
+        }
+        td:first-child {
+            padding-left: 30px !important;
+            @media (max-width: 550px) {
+                padding-left: 15px !important;
+            }
+        }
+        td:last-child {
+            padding-right: 30px !important;
+            text-align: right;
+            @media (max-width: 550px) {
+                padding-right: 15px !important;
+            }
+        }
+        td input {
+            margin: 0;
+        }
+    }
+
 }
+
+.icon-delete {
+    position: absolute;
+    right: 0px;
+    top: -2px;
+    bottom: 0;
+    width: 80px;
+    padding: 15px;
+    border: none;
+    text-align: right;
+    color: red;
+    background: transparent !important;
+}
+
+
 
 .settings-feeds {
     .alert {
@@ -8299,7 +8292,7 @@ button.close {
     .group-header {
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
     }
-    .control-group-form {
+    .control-group {
         border: none;
         button, input {
             background-color: transparent;

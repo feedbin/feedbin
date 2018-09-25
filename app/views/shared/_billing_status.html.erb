@@ -16,7 +16,7 @@
     <div class="inset-content">
         <h4 class="group-header">Change Your Plan</h4>
     </div>
-    <div class="table-wrap">
+    <div class="control-group">
         <table class="table table-rounded" style="margin-bottom: 0;">
             <% @plans.each do |plan| %>
                 <tr>
@@ -71,7 +71,7 @@
     </div>
     <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
         <%= hidden_field_tag :redirect_to, settings_billing_url %>
-        <ul class="control-group control-group-form">
+        <ul class="control-group">
             <li>
                 <%= f.text_area :receipt_info, rows: 3 %>
             </li>

@@ -7,7 +7,7 @@
             <div class="inset-content">
                 <h4 class="group-header">Unread Sort</h4>
             </div>
-            <ul class="control-group control-group-form">
+            <ul class="control-group">
                 <li>
                     <%= f.radio_button(:entry_sort, "DESC", checked: @user.entry_sort.nil? || @user.entry_sort === 'DESC', data: {behavior: "auto_submit"}) %>
                     <%= f.label('entry_sort_desc', "Newest First") %>
@@ -17,7 +17,7 @@
                     <%= f.label('entry_sort_asc', "Oldest First") %>
                 </li>
             </ul>
-            <ul class="control-group control-group-form">
+            <ul class="control-group">
                 <li>
                     <%= f.check_box :mark_as_read_confirmation, data: {behavior: "auto_submit"} %>
                     <%= f.label :mark_as_read_confirmation do %>
@@ -34,7 +34,7 @@
             <p class="control-group-description">
                 Always attempt to load the full content from the original site
             </p>
-            <ul class="control-group control-group-form">
+            <ul class="control-group">
                 <li>
                     <%= f.check_box :show_unread_count, data: {behavior: "auto_submit"} %>
                     <%= f.label :show_unread_count do %>
@@ -60,7 +60,7 @@
                     <% end %>
                 </li>
             </ul>
-            <ul class="control-group control-group-form">
+            <ul class="control-group">
                 <li>
                     <%= f.check_box :starred_feed_enabled, data: {behavior: "auto_submit"} %>
                     <%= f.label :starred_feed_enabled do %>
@@ -89,7 +89,7 @@
             <div class="inset-content">
                 <h4 class="group-header">Advanced</h4>
             </div>
-            <ul class="control-group control-group-form">
+            <ul class="control-group">
                 <li>
                     <%= f.check_box :view_links_in_app, {checked: @user.setting_on?(:view_links_in_app), data: {behavior: "auto_submit"}}, "1", "0" %>
                     <%= f.label :view_links_in_app do %>
@@ -100,7 +100,7 @@
             <p class="control-group-description">
                 Load article links in Feedbin‘s <a href="https://feedbin.com/blog/2017/07/25/view-links-in-feedbin/">link viewer</a> by default.
             </p>
-            <ul class="control-group control-group-form">
+            <ul class="control-group">
                 <li>
                     <%= f.check_box :disable_image_proxy, {checked: @user.disable_image_proxy.nil? || !@user.setting_on?(:disable_image_proxy), data: {behavior: "auto_submit"}}, "0", "1" %>
                     <%= f.label :disable_image_proxy do %>

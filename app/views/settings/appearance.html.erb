@@ -48,7 +48,7 @@
             <div class="inset-content">
                 <h4 class="group-header">Theme</h4>
             </div>
-            <ul class="control-group control-group-form">
+            <ul class="control-group">
                 <li>
                     <%= f.radio_button(:theme, "day", {checked: @user.theme.nil? || @user.theme === 'day', data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
                     <%= f.label(:theme_day, "Day") %>
@@ -65,7 +65,7 @@
             <div class="inset-content">
                 <h4 class="group-header">Display</h4>
             </div>
-            <ul class="control-group control-group-form">
+            <ul class="control-group">
                 <li>
                     <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block', data: {behavior: 'appearance_radio auto_submit', setting: 'entries-display'}}) %>
                     <%= f.label(:entries_display_block, "Default") %>
@@ -78,7 +78,7 @@
             <div class="inset-content">
                 <h4 class="group-header">Interface Elements</h4>
             </div>
-            <ul class="control-group control-group-form">
+            <ul class="control-group">
                 <li>
                     <%= f.check_box :entries_feed, {checked: @user.entries_feed.nil? || @user.setting_on?(:entries_feed), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-feed'} } %>
                     <%= f.label :entries_feed do %>
