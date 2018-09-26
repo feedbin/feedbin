@@ -8,9 +8,9 @@
     var style = {
         base: {
             fontFamily: '-apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif',
-            fontSize: '14px',
+            fontSize: '16px',
             fontSmoothing: 'antialiased',
-            lineHeight: '22.8571px',
+            lineHeight: '16px',
             color: '#212325',
             '::placeholder': {
                 color: '#b4b6b8'
@@ -21,12 +21,12 @@
             color: 'red',
         }
     };
-    
+
     var form = document.getElementById('payment-form');
     var card = feedbinBilling.elements.create('card', {style: style});
-    
+
     card.mount('#card-element');
-    
+
     card.addEventListener('change', function(event) {
         if (event.error) {
             feedbin.showNotification(event.error.message, 3000, '', true);
@@ -34,15 +34,15 @@
             feedbin.hideNotification();
         }
     });
-    
+
     card.addEventListener('ready', function(event) {
         document.getElementById('credit_card_button').disabled = false;
     });
-    
+
     form.addEventListener('submit', function(event) {
         document.getElementById('credit_card_button').disabled = true;
         event.preventDefault();
-    
+
         feedbinBilling.stripe.createToken(card).then(function(result) {
             if (result.error) {
                 document.getElementById('credit_card_button').disabled = false;

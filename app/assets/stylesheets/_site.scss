@@ -4484,15 +4484,6 @@ body.settings {
             box-shadow: 4px 4px 0 -2px $border-color-night;
         }
     }
-    .cc-form-wrap {
-        .card-number-wrap {
-            padding: 9px 30px;
-            @media (max-width: 550px) {
-                padding-left: 15px;
-                padding-right: 15px;
-            }
-        }
-    }
     .feed-settings {
         display: flex;
         margin: 25px 0 24px;
@@ -5036,7 +5027,8 @@ body.settings {
             button,
             textarea,
             a,
-            input {
+            input,
+            #card-element {
                 font-size: 16px;
                 display: block;
                 text-align: left;
@@ -5069,8 +5061,7 @@ body.settings {
                 border-width: 1px;
                 border-style: solid;
                 border-radius: 8px;
-                padding-left: 15px;
-                padding-right: 15px;
+                padding: 14px 15px;
                 &:focus {
                     box-shadow: none;
                     border: 1px solid $selected;
@@ -5082,7 +5073,8 @@ body.settings {
             > button,
             > textarea,
             > a,
-            > input {
+            > input,
+            > #card-element {
                 border-top-width: 1px;
                 border-top-style: solid;
             }

@@ -22,7 +22,7 @@
                     paymentRequestButton: {
                         type: 'default',
                         theme: 'dark',
-                        height: '40px',
+                        height: '36px',
                     },
                 },
             });
@@ -59,7 +59,7 @@
                 feedbinBilling.defaultPlan = <%= plan.id %>;
             <% end %>
         <% end %>
-        
+
         $(function(){
             if ($("#payment_request_button").length > 0) {
                 feedbinBilling.updatePaymentRequest(feedbinBilling.defaultPlan);
