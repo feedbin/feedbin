@@ -52,9 +52,8 @@ class TagsController < ApplicationController
   def destroy
     @user = current_user
     tag = Tag.find(params[:id])
-    Tagging.where(tag_id: tag, user_id: @user).destroy_all
 
-    ActionTags.perform_async(@user.id, nil, tag.id)
+    Tag.destroy(@user, tag)
 
     get_feeds_list
 
