@@ -36,26 +36,17 @@ class TagsController < ApplicationController
     @new_tag = nil
 
     user = current_user
+
     tag = Tag.find(params[:id])
+    @new_tag = Tag.rename(user, tag, params[:tag][:name])
 
-    taggings = user.taggings.where(tag: tag)
-    feed_ids = taggings.pluck(:feed_id)
-    tag_name = params[:tag][:name].strip.gsub(",", "")
-
-    if tag_name.present?
-      ActiveRecord::Base.transaction do
-        @new_tag = Tag.where(name: tag_name).first_or_create
-        taggings.update_all(tag_id: @new_tag.id)
-      end
+    if @new_tag
       update_selected_feed!("tag", @new_tag.id)
       visibility = user.tag_visibility[tag.id.to_s] ? user.tag_visibility[tag.id.to_s] : false
       user.update_tag_visibility(@new_tag.id.to_s, visibility)
-
-      ActionTags.perform_async(user.id, @new_tag.id, tag.id)
     end
 
     get_feeds_list
-    respond_to :js
   end
 
   def destroy
