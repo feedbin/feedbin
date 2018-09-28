@@ -5,10 +5,12 @@ class FeedsController < ApplicationController
 
   def update
     @user = current_user
-    @mark_selected = true
+    @mark_selected = false
 
     @feed = Feed.find(params[:id])
-    @feed.tag_with_params(params, @user)
+    @taggings = @feed.tag_with_params(params, @user)
+
+    @user.update_tag_visibility(@taggings.first.tag.id.to_s, true)
 
     if params[:no_response].present?
       head :ok

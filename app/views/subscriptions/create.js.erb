@@ -15,8 +15,7 @@ if (tagParent.find(".drawer").data('hidden') == true) {
     tagParent.find('[data-behavior="toggle_drawer"]').click();
 }
 
-$('.feeds').animate({
-scrollTop: feedbin.scrollTo($('[data-feed-id=<%= @click_feed %>]'), $('.feeds'))
-}, 200);
+feedbin.scrollTo($('[data-feed-id=<%= @click_feed %>]'), $('.feeds'))
+
 $('.welcome').remove();
 $('.modal-purpose-subscribe').modal('hide')

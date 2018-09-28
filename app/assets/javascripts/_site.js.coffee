@@ -674,7 +674,10 @@ $.extend feedbin,
     text
 
   scrollTo: (item, container) ->
-    item.offset().top - container.offset().top + container.scrollTop()
+    scroll = item.offset().top - container.offset().top + container.scrollTop()
+    container.animate {
+      scrollTop: scroll
+    }, 200
 
   sortByLastUpdated: (a, b) ->
     aTimestamp = $(a).data('sort-last-updated') * 1
