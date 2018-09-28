@@ -10,7 +10,9 @@
             <%= direct_upload_form_for @uploader do |f| %>
                 <ul class="control-group">
                     <li>
-                        <%= f.file_field :upload %>
+                        <div class="field-wrap">
+                            <%= f.file_field :upload %>
+                        </div>
                     </li>
                 </ul>
                 <p class="control-group-description">You can import OPML files. Import is done in the background so you may not see every subscription right away.</p>

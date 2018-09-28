@@ -3868,7 +3868,7 @@ $saved-search-control-height: 48px;
 }
 
 .checkbox input {
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
 .radio input {
@@ -4296,23 +4296,51 @@ body.settings {
             margin-bottom: 0;
         }
     }
+    .subscription-profile {
+        @include settings-row;
+    }
     .subscription-title-wrap {
         display: flex;
         align-items: center;
         margin-bottom: 5px;
+        .field-wrap {
+            position: relative;
+            flex: 1;
+            padding-right: 20px;
+        }
         .favicon-wrap {
-            margin-right: 8px;
+            position: absolute;
+            right: 28px;
+            top: 14px;
+            box-shadow: none;
+            @media (max-width: 550px) {
+                display: none;
+            }
+        }
+        .twitter-profile-image, .twitter-profile-image img {
+            width: 32px;
+            height: 32px;
+            border-radius: 32px;
+        }
+        .twitter-profile-image {
+            top: 9px;
         }
     }
     .subscription-title {
         position: relative;
         margin: 0;
-        background-color: transparent !important;
         @include border-color($border-color, $border-color-night, $border-color-sunset);
         font-size: 18px !important;
         line-height: 18px !important;
-        padding: 3px !important;
+        padding: 12px 14px !important;
         font-weight: bold;
+        width: 100%;
+        max-width: 100%;
+        padding-right: 50px !important;
+        border-radius: 8px;
+        @media (max-width: 550px) {
+            padding-right: 10px !important;
+        }
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         &:focus {
             background-color: #FFF !important;
@@ -4325,9 +4353,7 @@ body.settings {
         margin: 0 0 10px 0;
     }
     h4.group-header {
-        text-transform: uppercase;
-        color: #878787;
-        font-size: 14px;
+        font-size: 16px;
     }
     h3.box-header {
         margin: 0;
@@ -4620,10 +4646,6 @@ body.settings {
         }
     }
     .feed-profile {
-        .favicon-wrap {
-            position: static;
-            box-shadow: none;
-        }
         .profile-header {
             position: relative;
             padding-left: 25px;
@@ -4667,8 +4689,8 @@ body.settings {
             display: flex;
             margin-bottom: 20px;
             padding: 15px 12px 30px 12px;
-            border-radius: 4px;
-            @include background-color($inset-bg-color, $list-background-color-night, $list-background-color-sunset);
+            border-radius: 8px;
+            background-color: #FFF;
             border: 1px solid $border-color;
             @include border-color($border-color, $border-color-night, $border-color-sunset);
             .graph-wrap {
@@ -5004,10 +5026,11 @@ body.settings {
 }
 .control-group-description {
     @include settings-row;
+    padding-top: 0;
     font-size: 12px;
     color: #999;
-    margin-top: -20px;
-    margin-bottom: 30px;
+    margin-top: -20px !important;
+    margin-bottom: 12px;
     &.no-margin {
         margin-bottom: 0;
     }
@@ -5028,7 +5051,8 @@ body.settings {
             textarea,
             a,
             input,
-            #card-element {
+            #card-element,
+            .field-wrap {
                 font-size: 16px;
                 display: block;
                 text-align: left;
@@ -5057,7 +5081,7 @@ body.settings {
             @media (max-width: 550px) {
                 padding: 0 15px;
             }
-            > input {
+            > input, > textarea {
                 border-width: 1px;
                 border-style: solid;
                 border-radius: 8px;
@@ -5068,17 +5092,35 @@ body.settings {
                 }
             }
         }
+        &.card-number-wrap {
+            padding: 0 30px;
+            @media (max-width: 550px) {
+                padding: 0 15px;
+            }
+        }
+        #card-element {
+            border-width: 1px;
+            border-style: solid;
+            border-radius: 8px;
+            padding: 14px 15px;
+        }
         &:first-of-type {
             > label,
             > button,
             > textarea,
             > a,
             > input,
-            > #card-element {
+            > #card-element,
+            > .field-wrap {
                 border-top-width: 1px;
                 border-top-style: solid;
             }
         }
+    }
+    .table {
+        background-color: #FFF;
+        border-top: 1px solid $border-color;
+        border-bottom: 1px solid $border-color;
     }
     input[type="checkbox"]:focus + label .slider-checkbox {
         box-shadow: $focus-glow;
@@ -5101,7 +5143,7 @@ body.settings {
         appearance: none;
         background: #FFF;
     }
-    input[type="radio"], input[type="checkbox"], input[type="file"] {
+    input[type="radio"], input[type="checkbox"] {
         @extend .visually-hidden;
     }
     input[type="radio"]:checked + label {
@@ -5293,29 +5335,42 @@ table.small td {
 }
 
 .filter-feeds-include-all {
-    border: 1px solid $border-color;
-    border-bottom: none;
-    padding: 8px 6px;
+    border-top: 1px solid $border-color;
+    padding: 8px 30px;
     background: $list-background-color;
     position: relative;
+    display: flex;
+    align-items: baseline;
+    @media (max-width: 550px) {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
     .action-feed-search {
-        position: absolute;
-        right: 6px;
-        top: 5px;
         font-size: 13px !important;
         padding: 2px 4px!important;
         max-width: 200px;
+        margin-left: auto;
+        margin-bottom: 0;
     }
 }
-.filter-feeds {
+.filter-wrap {
+    padding: 12px 0 0 0;
+    background-color: #FFF;
+    border-top: 1px solid $border-color;
+    border-bottom: 1px solid $border-color;
+    margin-bottom: 30px;
+}
+.filter {
     overflow-y: auto;
     overflow-x: hidden;
     resize: vertical;
     height: 134px;
-    border: 1px solid $border-color;
-    border-top: none;
-    margin-bottom: 15px;
-    padding: 8px 6px;
+    padding-left: 30px;
+    padding-right: 30px;
+    @media (max-width: 550px) {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
     .checkbox {
         resize: none;
         float: none;
@@ -5329,10 +5384,6 @@ table.small td {
             margin-top: 0;
         }
     }
-}
-.filter-tags {
-	@extend .filter-feeds;
-	border: 1px solid $border-color;
 }
 
 [data-behavior="action_send_push_notification"] {
@@ -8283,25 +8334,6 @@ button.close {
     }
     .group-header {
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
-    }
-    .control-group {
-        border: none;
-        button, input {
-            background-color: transparent;
-        }
-        label,
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="submit"],
-        input[type="search"],
-        input[type="url"],
-        input[type="tel"],
-        button,
-        textarea,
-        a {
-            border: none;
-        }
     }
 }
 

@@ -17,47 +17,43 @@
             <div class="inset-content por">
                 <h4 class="group-header">Article is in Tag</h4>
             </div>
-            <ul class="control-group">
-                <li>
-                    <div class="filter-tags">
-                        <%=
-                          f.collection_check_boxes(:tag_ids, @user.feed_tags, :id, :name) do |b|
-                            b.label(class: "checkbox") do
-                              b.check_box + b.text
-                            end
-                          end
-                        %>
-                    </div>
-                </li>
-            </ul>
-        <% end %>
-        <div class="inset-content por">
-            <h4 class="group-header">Article is in Feed</h4>
-        </div>
-        <ul class="control-group">
-            <li>
-                <div class="filter-feeds-include-all">
-                    <input type="text" class="action-feed-search" data-behavior="feed_search" placeholder="Filter" />
-                    <label class="checkbox">
-                        <%= f.check_box :all_feeds, data: {behavior: 'check_feeds'} %>
-                        Include All
-                    </label>
-                </div>
-                <div class="filter-feeds" data-behavior="search_results">
+            <div class="filter-wrap">
+                <div class="filter">
                     <%=
-                      f.collection_check_boxes(:feed_ids, @user.feeds.include_user_title, :string_id, :title) do |b|
-                        options = {data: {behavior: 'collection_checkbox'}}
-                        if f.object.all_feeds == true
-                          options[:disabled] = 'disabled'
-                        end
-                        b.label(class: "checkbox", title: b.object.feed_url, data: {sort_name: b.text.downcase}) do
-                          b.check_box(options) + b.text
+                      f.collection_check_boxes(:tag_ids, @user.feed_tags, :id, :name) do |b|
+                        b.label(class: "checkbox") do
+                          b.check_box + b.text
                         end
                       end
                     %>
                 </div>
-            </li>
-        </ul>
+            </div>
+        <% end %>
+        <div class="inset-content por">
+            <h4 class="group-header">Article is in Feed</h4>
+        </div>
+        <div class="filter-feeds-include-all">
+            <label class="checkbox">
+                <%= f.check_box :all_feeds, data: {behavior: 'check_feeds'} %>
+                Include All
+            </label>
+            <input type="text" class="action-feed-search" data-behavior="feed_search" placeholder="Filter" />
+        </div>
+        <div class="filter-wrap">
+            <div class="filter" data-behavior="search_results">
+                <%=
+                  f.collection_check_boxes(:feed_ids, @user.feeds.include_user_title, :string_id, :title) do |b|
+                    options = {data: {behavior: 'collection_checkbox'}}
+                    if f.object.all_feeds == true
+                      options[:disabled] = 'disabled'
+                    end
+                    b.label(class: "checkbox", title: b.object.feed_url, data: {sort_name: b.text.downcase}) do
+                      b.check_box(options) + b.text
+                    end
+                  end
+                %>
+            </div>
+        </div>
         <ul class="control-group">
             <%=
                 f.collection_check_boxes(:actions, Feedbin::Application.config.action_names, :value, :label) do |b|

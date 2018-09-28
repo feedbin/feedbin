@@ -72,7 +72,7 @@
     <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
         <%= hidden_field_tag :redirect_to, settings_billing_url %>
         <ul class="control-group">
-            <li>
+            <li class="text">
                 <%= f.text_area :receipt_info, rows: 3 %>
             </li>
         </ul>

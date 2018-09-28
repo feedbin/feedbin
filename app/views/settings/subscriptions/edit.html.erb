@@ -2,5 +2,5 @@
     <div class="settings-outer">
         <h2>Subscriptions</h2>
     </div>
-    <%= render partial: 'form', locals: {subscription: @subscription, tag_editor: @tag_editor, unsubscribe: link_to('Unsubscribe', settings_subscription_path(@subscription), method: :delete, class: 'button-secondary settings-unsubscribe' , data: { confirm: 'Are you sure you want to unsubscribe?' })} %>
+    <%= render partial: 'form', locals: {subscription: @subscription, tag_editor: @tag_editor, unsubscribe: link_to('Unsubscribe', settings_subscription_path(@subscription), method: :delete, class: 'button button-secondary settings-unsubscribe' , data: { confirm: 'Are you sure you want to unsubscribe?' })} %>
 </div>
