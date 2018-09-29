@@ -2026,9 +2026,9 @@ $.extend feedbin,
 
     tagEditor: ->
       fieldContent = """
-      <li data-behavior="remove_target" class="with-button">
+      <li data-behavior="remove_target" class="text">
         <input placeholder="Tag" type="text" name="tag_name[]">
-        <button class="icon-delete" data-behavior="remove_element" type="button">Delete</button>
+        <button class="icon-delete unstyled" data-behavior="remove_element" type="button">&times;</button>
       </li>
       """
 
@@ -2040,8 +2040,7 @@ $.extend feedbin,
 
       $(document).on 'click', '[data-behavior~=remove_element]', (event) ->
         target = $(@).closest("[data-behavior~=remove_target]")
-        target.hide 'fast', ->
-          target.remove()
+        target.remove()
         event.preventDefault()
 
       $(document).on 'submit', '[data-behavior~=edit_tags_form]', (event) ->

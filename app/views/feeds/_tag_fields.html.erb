@@ -4,7 +4,9 @@
     </li>
 </ul>
 
-<%= content_tag :ul, class: "control-group tag-list", data: {behavior: "tags_target"} do  -%>
+<ul class="control-group" data-behavior="tags_target"></ul>
+
+<%= content_tag :ul, class: "control-group" do  -%>
     <% tag_editor.tags.each do |tag| %>
     <li>
         <%= check_box_tag "tag_id[#{tag.id}]", tag.name, tag_editor.checked?(tag) %>

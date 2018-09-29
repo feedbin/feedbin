@@ -5047,7 +5047,7 @@ body.settings {
         position: relative;
         > {
             label,
-            button,
+            button:not(.unstyled),
             textarea,
             a,
             input,
@@ -5106,7 +5106,7 @@ body.settings {
         }
         &:first-of-type {
             > label,
-            > button,
+            > button:not(.unstyled),
             > textarea,
             > a,
             > input,
@@ -5248,21 +5248,6 @@ body.settings {
     }
 
 }
-
-.icon-delete {
-    position: absolute;
-    right: 0px;
-    top: -2px;
-    bottom: 0;
-    width: 80px;
-    padding: 15px;
-    border: none;
-    text-align: right;
-    color: red;
-    background: transparent !important;
-}
-
-
 
 .settings-feeds {
     .alert {
@@ -8324,12 +8309,35 @@ button.close {
     .inset {
         border: none;
         @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+        padding-top: 15px;
         padding-bottom: 0;
     }
     .control-group {
         padding: 0;
         &:first-child {
             padding-top: 0 !important;
+        }
+        .text {
+            padding-left: 15px;
+            padding-right: 45px;
+            margin-bottom: 10px;
+        }
+        .icon-delete {
+            position: absolute;
+            right: 0px;
+            top: -2px;
+            bottom: 0;
+            width: 45px;
+            padding: 0;
+            border: none;
+            text-align: right;
+            color: red;
+            background: transparent !important;
+            font-weight: bold;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     }
     .group-header {
