@@ -8,7 +8,7 @@ module Api
       def index
         @user = current_user
         @taggings = @user.taggings.includes(:tag)
-        fresh_when last_modified: @taggings.maximum(:created_at), etag: @taggings
+        fresh_when last_modified: @taggings.maximum(:updated_at), etag: @taggings
       end
 
       def show

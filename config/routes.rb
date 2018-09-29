@@ -249,9 +249,15 @@ Rails.application.routes.draw do
           end
         end
 
+        resources :tags, only: [:index] do
+          collection do
+            post :update
+            delete :destroy
+          end
+        end
+
         resources :subscriptions, only: [:index, :show, :create, :destroy, :update]
         resources :favicons, only: [:index]
-        resources :tags, only: [:index]
         resources :taggings, only: [:index, :show, :create, :destroy]
         resources :recently_read_entries, only: [:index, :create]
         resources :in_app_purchases, only: [:create]
