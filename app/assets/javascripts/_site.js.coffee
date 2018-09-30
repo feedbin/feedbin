@@ -54,6 +54,7 @@ $.extend feedbin,
     context.fillRect 0, 0, 10, 10
     data = context.getImageData(1, 1, 1, 1)
     "rgba(#{data.data[0]}, #{data.data[1]}, #{data.data[2]}, #{data.data[3]})"
+    canvas.parentNode.removeChild(canvas)
 
   setNativeTitleColor: (rgb, timeout = 1) ->
     ctx = document.createElement('canvas').getContext('2d')
@@ -863,7 +864,11 @@ $.extend feedbin,
     $.ajax
       type: "POST",
       url: url,
-      data: { _method: "patch", feed: {tag_list: tag}, no_response: noResponse }
+      data: {
+        _method: "patch",
+        "tag_name[]": tag
+        no_response: noResponse
+      }
 
   hideEmptyTags: ->
     $('[data-tag-id]').each ->
@@ -1032,6 +1037,7 @@ $.extend feedbin,
         style = window.getComputedStyle(element, null)
         size = style.getPropertyValue 'font-size'
         base = parseInt(size) - 1
+        element.parentNode.removeChild(element)
 
       $("html").css
         "font-size": "#{base}px"

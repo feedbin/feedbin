@@ -104,13 +104,6 @@
     </table>
 <% end %>
 
-<% content_for :modal_footer, flush: true do %>
-    <div class="half text-left">
-        <a href="/home">Home Page</a>
-    </div>
-    <div class="half">
-        <a href="mailto:support@feedbin.com">Support</a>
-    </div>
-<% end %>
+<% content_for :modal_footer, "", flush: true %>
 
 <%= render template: "layouts/modal", locals: {purpose: "help", classes: "modal-lg"} %>

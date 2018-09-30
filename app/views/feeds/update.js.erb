@@ -3,4 +3,4 @@ feedbin.data.tagNames = <%= raw json_escape(@user.tag_names.to_json) %>;
 $('.modal').modal('hide')
 var target = $("[data-tag-id=<%= @taggings.first.tag.id %>]").find("[data-feed-id=<%= @feed.id %>]");
 feedbin.scrollTo(target, $('.feeds'));
-target.addClass("selected");
+target.click();

@@ -6,7 +6,7 @@
             <h4 class="group-header"><%= "Feed".pluralize(feeds.length) %></h4>
         </div>
 
-        <div style="padding: 0 15px 20px 15px;">
+        <div class="inset-content" style="margin-bottom: 50px;">
             <% feeds.each_with_index do |feed, index| %>
                 <%= fields_for "feeds[]", feed do |pf| %>
                     <div class="subscription-option" data-behavior="subscription_option">

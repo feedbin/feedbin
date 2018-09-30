@@ -106,7 +106,10 @@ class ApplicationController < ActionController::Base
   end
 
   def get_feeds_list
-    @mark_selected = true
+    if @mark_selected.nil?
+      @mark_selected = true
+    end
+
     @user = current_user
 
     excluded_feeds = @user.taggings.pluck(:feed_id).uniq
