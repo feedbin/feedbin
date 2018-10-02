@@ -104,10 +104,10 @@ class Feed < ApplicationRecord
       if feed.user_title
         feed.override_title(feed.user_title)
       end
-      feed.title ||= "(No title)"
+      feed.title ||= "Untitled"
       feed
     end
-    feeds.sort_by { |feed| feed.title.try(:downcase) }
+    feeds.natural_sort_by { |feed| feed.title }
   end
 
   def string_id

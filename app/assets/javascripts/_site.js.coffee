@@ -373,6 +373,12 @@ $.extend feedbin,
         if element.prop('tagName') == "INPUT"
           textarea.innerHTML = newTitle
           element.val(textarea.value)
+        else if element.is('[data-behavior~=feed_link]')
+          data = element.data('mark-read')
+          data.message = "Mark #{newTitle} as read?"
+          element.data('mark-read', data)
+        else if element.is('[data-behavior~=rename_target]')
+          element.data('title', newTitle)
         else
           element.html(newTitle)
 
@@ -875,11 +881,23 @@ $.extend feedbin,
       if $(@).find('ul li').length == 0
         $(@).remove()
 
+  sort: (target) ->
+    $('> [data-behavior~=sort_feed]', target).sort(feedbin.sortByFeedOrder).detach().appendTo(target)
+
+  sortFeeds: ->
+      $('.drawer ul').each ->
+        feedbin.sort $(@)
+      feedbin.sort $('[data-behavior~=feeds_target]')
+
+  resort: (order) ->
+    feedbin.data.feed_order = order
+    feedbin.sortFeeds()
+
   appendTag: (target, ui) ->
     appendTarget = target.find('ul').first()
     ui.helper.remove()
     ui.draggable.appendTo(appendTarget)
-    $('> [data-behavior~=sort_feed]', appendTarget).sort(feedbin.sortByFeedOrder).remove().appendTo(appendTarget)
+    feedbin.sortFeeds()
 
   draggable: ->
     $('[data-behavior~=draggable]').draggable
@@ -1322,6 +1340,9 @@ $.extend feedbin,
         $(@).closest('tr').addClass('hide')
         event.preventDefault()
         return
+
+    sortFeeds: ->
+      feedbin.sortFeeds()
 
     dropdown: ->
       $(document).on 'click', (event) ->

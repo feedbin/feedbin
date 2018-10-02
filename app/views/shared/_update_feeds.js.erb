@@ -1,7 +1,7 @@
 feedbin.updateFeeds('<%= j render partial: 'feeds/feeds', locals: {collections: @feed_data[:collections], saved_searches: @feed_data[:saved_searches], tags: @feed_data[:tags], feeds: @feed_data[:feeds]} %>');
 feedbin.applyUserTitles();
 feedbin.count_data = <%= @feed_data[:count_data].to_json.html_safe %>;
-feedbin.data.feed_order = <%= @feed_data[:feed_order].to_json.html_safe %>;
+feedbin.resort(<%= @feed_data[:feed_order].to_json.html_safe %>)
 feedbin.Counts.get().update(feedbin.count_data);
 feedbin.applyCounts(false);
 feedbin.draggable();

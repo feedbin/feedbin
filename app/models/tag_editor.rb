@@ -19,7 +19,4 @@ class TagEditor
     taggings.include? tag.id
   end
 
-
-
-
 end

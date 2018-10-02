@@ -112,8 +112,8 @@ class ApplicationController < ActionController::Base
 
     @user = current_user
 
-    excluded_feeds = @user.taggings.pluck(:feed_id).uniq
-    @feeds = @user.feeds.where.not(id: excluded_feeds).includes(:favicon).include_user_title
+    excluded_feeds = @user.taggings.distinct.pluck(:feed_id)
+    @feeds = @user.feeds.where.not(id: excluded_feeds).includes(:favicon)
 
     @count_data = {
       unread_entries: @user.unread_entries.pluck("feed_id, entry_id"),

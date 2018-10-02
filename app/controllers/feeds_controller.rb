@@ -25,6 +25,7 @@ class FeedsController < ApplicationController
     title = params[:feed][:title]
     @subscription.title = title.empty? ? nil : title
     @subscription.save
+    @feed_order = @user.feed_order
   end
 
   def modal_edit
