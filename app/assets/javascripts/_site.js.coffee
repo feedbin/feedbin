@@ -1061,7 +1061,7 @@ $.extend feedbin,
         "font-size": "#{base}px"
 
     faviconColors: ->
-      feedbin.faviconColors($(".feeds-column"))
+      feedbin.faviconColors($("body"))
 
     hasScrollBars: ->
       if feedbin.scrollBars()
@@ -1999,6 +1999,7 @@ $.extend feedbin,
           feedbin.setNativeTitleColor(color)
 
       $(document).on 'shown.bs.modal', () ->
+        feedbin.faviconColors($(".modal"))
         setTimeout ( ->
           $("body").addClass("modal-shown")
         ), 150
