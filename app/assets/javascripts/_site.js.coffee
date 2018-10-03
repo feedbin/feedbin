@@ -53,8 +53,8 @@ $.extend feedbin,
     context.fillStyle = foregroundColor
     context.fillRect 0, 0, 10, 10
     data = context.getImageData(1, 1, 1, 1)
-    "rgba(#{data.data[0]}, #{data.data[1]}, #{data.data[2]}, #{data.data[3]})"
     canvas.parentNode.removeChild(canvas)
+    "rgba(#{data.data[0]}, #{data.data[1]}, #{data.data[2]}, #{data.data[3]})"
 
   setNativeTitleColor: (rgb, timeout = 1) ->
     ctx = document.createElement('canvas').getContext('2d')
