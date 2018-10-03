@@ -309,7 +309,7 @@ class User < ApplicationRecord
   def tag_group
     unique_tags = feed_tags
     feeds_by_tag = build_feeds_by_tag
-    feeds_by_id = feeds.includes(:favicon)
+    feeds_by_id = feeds.includes(:favicon).include_user_title
     feeds_by_id = feeds_by_id.each_with_object({}) do |feed, hash|
       hash[feed.id] = feed
     end
