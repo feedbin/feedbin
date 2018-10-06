@@ -20,6 +20,29 @@ $.extend feedbin,
     lightness: [.3,.4,.5,.6,.7]
     saturation: [.7,.8]
 
+  timeago: ->
+    strings =
+      prefixAgo: null
+      prefixFromNow: null
+      suffixAgo: ""
+      suffixFromNow: "from now"
+      seconds: "less than 1 min"
+      minute: "1m"
+      minutes: "%dm"
+      hour: "1h"
+      hours: "%dh"
+      day: "1d"
+      days: "%dd"
+      month: "a month"
+      months: "%d months"
+      year: "a year"
+      years: "%d years"
+      wordSeparator: " "
+      numbers: []
+    jQuery.timeago.settings.strings = strings
+    jQuery.timeago.settings.allowFuture = true
+    $("time.timeago").timeago()
+
   reselect: ->
     if feedbin.selectedSource && feedbin.selectedTag
       $("[data-tag-id=#{feedbin.selectedTag}]").find("[data-feed-id=#{feedbin.selectedSource}]").addClass("selected")
@@ -1444,28 +1467,7 @@ $.extend feedbin,
         return
 
     timeago: ->
-      strings =
-        prefixAgo: null
-        prefixFromNow: null
-        suffixAgo: ""
-        suffixFromNow: "from now"
-        seconds: "less than 1 min"
-        minute: "1m"
-        minutes: "%dm"
-        hour: "1h"
-        hours: "%dh"
-        day: "1d"
-        days: "%dd"
-        month: "a month"
-        months: "%d months"
-        year: "a year"
-        years: "%d years"
-        wordSeparator: " "
-        numbers: []
-      jQuery.timeago.settings.strings = strings
-      jQuery.timeago.settings.allowFuture = true
-      $("time.timeago").timeago()
-      return
+      feedbin.timeago()
 
     updateReadability: ->
       $(document).on 'ajax:complete', '[data-behavior~=toggle_content_view]', (event, xhr) ->
