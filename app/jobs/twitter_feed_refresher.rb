@@ -9,6 +9,7 @@ class TwitterFeedRefresher
 
   def enqueue_feed(feed, user = nil)
     keys = load_keys(feed, user)
+
     if keys.present?
       args = {
         "args" => [feed.id, feed.feed_url, keys],

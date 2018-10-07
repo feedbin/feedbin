@@ -93,7 +93,7 @@ class Feed < ApplicationRecord
     request = Feedkit::Request.new(url: self.feed_url, options: options)
     result = request.status
     if request.body
-      result = Feedkit.fetch_and_parse(self.feed_url, request: request)
+      result = Feedkit::Feedkit.new().fetch_and_parse(self.feed_url, request: request)
     end
     result
   end

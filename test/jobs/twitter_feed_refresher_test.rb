@@ -11,12 +11,12 @@ class TwitterFeedRefresherTest < ActiveSupport::TestCase
 
   test "feed gets scheduled" do
     Sidekiq::Worker.clear_all
-    assert_difference "TwitterFeedRefresher.jobs.size", +1 do
+    assert_difference "Sidekiq::Queues['feed_refresher_fetcher_critical'].count", +1 do
       TwitterFeedRefresher.new().perform
     end
 
     args = [@feed.id, @feed.feed_url, [@keys]]
-    job = Sidekiq::Queues["feed_refresher_fetcher"].first
+    job = Sidekiq::Queues["feed_refresher_fetcher_critical"].first
     assert_equal args, job["args"]
     assert(job.has_key?("at"), "job should have an 'at' parameter")
   end
@@ -43,12 +43,12 @@ class TwitterFeedRefresherTest < ActiveSupport::TestCase
     @feed.update(feed_type: :twitter_home, feed_url: "https://twitter.com?screen_name=bsaid")
 
     Sidekiq::Worker.clear_all
-    assert_no_difference "TwitterFeedRefresher.jobs.size" do
+    assert_no_difference "Sidekiq::Queues['feed_refresher_fetcher_critical'].count" do
       TwitterFeedRefresher.new().perform
     end
 
     @user.update(twitter_screen_name: "bsaid")
-    assert_difference "TwitterFeedRefresher.jobs.size", +1 do
+    assert_difference "Sidekiq::Queues['feed_refresher_fetcher_critical'].count", +1 do
       TwitterFeedRefresher.new().perform
     end
   end

@@ -20,7 +20,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: f20e353dfdd7c62e60f5a55abf37824482aa5e38
+  revision: af9150a1a7542c97d51e33198816ac6ba7ccb602
   branch: master
   specs:
     feedkit (0.1.0)
@@ -210,7 +210,7 @@ GEM
     execjs (2.7.0)
     faker (1.9.1)
       i18n (>= 0.7)
-    faraday (0.15.2)
+    faraday (0.15.3)
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.12.2)
       faraday (>= 0.7.4, < 1.0)
@@ -319,7 +319,7 @@ GEM
       net-ssh (>= 2.6.5)
     net-ssh (5.0.2)
     nio4r (2.3.1)
-    nokogiri (1.8.4)
+    nokogiri (1.8.5)
       mini_portile2 (~> 2.3.0)
     nokogumbo (1.4.9)
       nokogiri
@@ -579,4 +579,4 @@ DEPENDENCIES
   xipio
 
 BUNDLED WITH
-   1.16.2
+   1.16.5

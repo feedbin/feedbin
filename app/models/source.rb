@@ -26,7 +26,7 @@ class Source
       feed = Feed.where(feed_url: request.last_effective_url).take
 
       if !feed && [:xml, :json_feed].include?(request.format)
-        parsed_feed = Feedkit.fetch_and_parse(request.last_effective_url, request: request)
+        parsed_feed = Feedkit::Feedkit.new().fetch_and_parse(request.last_effective_url, request: request)
         feed = Feed.create_from_parsed_feed(parsed_feed)
       end
     end
