@@ -12,15 +12,13 @@ class TwitterFeedRefresher
     if keys.present?
       args = {
         "args" => [feed.id, feed.feed_url, keys],
-        "class" => "TwitterFeedRefresher",
-        "queue" => "feed_refresher_fetcher",
+        "class" => "TwitterFeedRefresherCritical",
+        "queue" => "feed_refresher_fetcher_critical",
         "retry" => false,
         "at" => Time.now.to_i + rand(0..6.minutes.to_i),
       }
 
       if user
-        args["class"] = "TwitterFeedRefresherCritical"
-        args["queue"] = "feed_refresher_fetcher_critical"
         args.delete("at")
       end
 
