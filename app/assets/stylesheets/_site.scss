@@ -8411,6 +8411,9 @@ button.close {
     border-bottom: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    .modal-top & {
+        border-radius: 0;
+    }
     @media (max-width: 550px) {
         padding-left: 16px;
         padding-right: 16px;
@@ -8530,12 +8533,17 @@ button.close {
 
 .modal-purpose-tags, .modal-purpose-subscribe {
     .modal-footer {
-        position: sticky;
         bottom: 0;
         z-index: 2;
         border-bottom-left-radius: $modal-border-radius;
         border-bottom-right-radius: $modal-border-radius;
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+        .modal-bottom & {
+            border-radius: 0;
+        }
+        .modal-shown & {
+            position: sticky;
+        }
     }
 }
 
