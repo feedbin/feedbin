@@ -4311,20 +4311,22 @@ body.settings {
         }
         .favicon-wrap {
             position: absolute;
-            right: 28px;
-            top: 14px;
+            right: 21px;
+            top: 0;
+            bottom: 0;
+            width: 50px;
             box-shadow: none;
+            display: flex;
+            background-color: transparent;
+            height: auto;
             @media (max-width: 550px) {
                 display: none;
             }
         }
-        .twitter-profile-image, .twitter-profile-image img {
+        .twitter-profile-image img {
             width: 32px;
             height: 32px;
             border-radius: 32px;
-        }
-        .twitter-profile-image {
-            top: 9px;
         }
     }
     .subscription-title {
