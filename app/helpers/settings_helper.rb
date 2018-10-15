@@ -12,4 +12,11 @@ module SettingsHelper
       names.join(", ")
     end
   end
+
+  def tag_options
+    tags = @user.feed_tags.map do |tag|
+      [tag.name, tag.name]
+    end
+    tags.unshift ["None", ""]
+  end
 end

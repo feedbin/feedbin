@@ -5026,6 +5026,10 @@ body.settings {
             content: "Next";
         }
     }
+    .select {
+        width: 150px;
+        margin-left: 10px;
+    }
 }
 input[type="checkbox"] + label .slider-checkbox {
     width: 56px;
