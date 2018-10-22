@@ -19,8 +19,8 @@
         </ul>
     </div>
     <script>
-        $('#action_results').on('hidden.bs.modal', function (event) {
-            $(event.target).remove();
+        $('.modal').on('hidden.bs.modal', function (event) {
+            $("body > [data-modal-purpose=action_preview]").remove();
         });
         feedbin.localizeTime();
     </script>
