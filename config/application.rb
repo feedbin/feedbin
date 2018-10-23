@@ -2,6 +2,7 @@ require_relative "boot"
 
 require "rails/all"
 require_relative "../lib/basic_authentication"
+require_relative "../lib/tld_length"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -32,6 +33,8 @@ module Feedbin
     config.middleware.use Rack::ContentLength
 
     config.middleware.use BasicAuthentication
+
+    config.middleware.use TLDLength
 
     config.exceptions_app = self.routes
 
