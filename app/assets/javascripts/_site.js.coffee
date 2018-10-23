@@ -2012,6 +2012,24 @@ $.extend feedbin,
           rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
           feedbin.setNativeTitleColor(rgb)
 
+    modalScrollPosition: ->
+      $('.modal').on 'scroll', (event) ->
+        modalHeader = $('.modal .modal-header').get(0)
+        if modalHeader
+          modalAtTop = modalHeader.getBoundingClientRect().top == 0
+          if modalAtTop
+            $("body").addClass("modal-top")
+          else
+            $("body").removeClass("modal-top")
+
+        modalFooter = $('.modal .modal-footer').get(0)
+        if modalFooter
+          modalAtBottom = modalFooter.getBoundingClientRect().bottom == $('body').get(0).getBoundingClientRect().bottom
+          if modalAtBottom
+            $("body").addClass("modal-bottom")
+          else
+            $("body").removeClass("modal-bottom")
+
     scrollLeft: ->
       entries = $('.entries-column')
       article = $('.entry-column')

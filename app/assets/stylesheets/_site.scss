@@ -4311,20 +4311,22 @@ body.settings {
         }
         .favicon-wrap {
             position: absolute;
-            right: 28px;
-            top: 14px;
+            right: 21px;
+            top: 0;
+            bottom: 0;
+            width: 50px;
             box-shadow: none;
+            display: flex;
+            background-color: transparent;
+            height: auto;
             @media (max-width: 550px) {
                 display: none;
             }
         }
-        .twitter-profile-image, .twitter-profile-image img {
+        .twitter-profile-image img {
             width: 32px;
             height: 32px;
             border-radius: 32px;
-        }
-        .twitter-profile-image {
-            top: 9px;
         }
     }
     .subscription-title {
@@ -5023,6 +5025,10 @@ body.settings {
         .next_page {
             content: "Next";
         }
+    }
+    .select {
+        width: 150px;
+        margin-left: 10px;
     }
 }
 input[type="checkbox"] + label .slider-checkbox {
@@ -8411,6 +8417,9 @@ button.close {
     border-bottom: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    .modal-top & {
+        border-radius: 0;
+    }
     @media (max-width: 550px) {
         padding-left: 16px;
         padding-right: 16px;
@@ -8530,12 +8539,17 @@ button.close {
 
 .modal-purpose-tags, .modal-purpose-subscribe {
     .modal-footer {
-        position: sticky;
         bottom: 0;
         z-index: 2;
         border-bottom-left-radius: $modal-border-radius;
         border-bottom-right-radius: $modal-border-radius;
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+        .modal-bottom & {
+            border-radius: 0;
+        }
+        .modal-shown & {
+            position: sticky;
+        }
     }
 }
 

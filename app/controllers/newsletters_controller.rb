@@ -20,6 +20,7 @@ class NewslettersController < ApplicationController
       if should_subscribe?(feed)
         feed.save
         user.subscriptions.find_or_create_by(feed: feed)
+        feed.tag(user.newsletter_tag, user) if user.newsletter_tag.present?
       end
 
       if feed.persisted?

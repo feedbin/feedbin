@@ -34,7 +34,7 @@
             <li>
                 <%= form_tag subscriptions_path(format: :xml), method: :get do %>
                     Subscriptions
-                    <%= select_tag :tag, options_for_select(@download_options), style: "width: 150px; margin-left: 10px;" %>
+                    <%= select_tag :tag, options_for_select(@download_options), class: "select" %>
                     <button class="button-text pull-right">Download</button>
                 <% end %>
             </li>

@@ -42,7 +42,8 @@ class User < ApplicationRecord
                  :twitter_screen_name,
                  :twitter_access_error,
                  :nice_frames,
-                 :favicon_colors
+                 :favicon_colors,
+                 :newsletter_tag
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all

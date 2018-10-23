@@ -240,7 +240,7 @@ class SettingsController < ApplicationController
                                  :apple_push_notification_device_token, :receipt_info, :entries_display,
                                  :entries_feed, :entries_time, :entries_body, :ui_typeface, :theme,
                                  :hide_recently_read, :hide_updated, :disable_image_proxy, :entries_image,
-                                 :now_playing_entry, :hide_recently_played, :view_links_in_app)
+                                 :now_playing_entry, :hide_recently_played, :view_links_in_app, :newsletter_tag)
   end
 
   def user_now_playing_params

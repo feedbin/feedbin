@@ -1,5 +1,5 @@
 <% if @subscription %>
-    feedbin.modalContent("<%= j render partial: 'settings/subscriptions/form', locals: {subscription: @subscription, unsubscribe: link_to('Unsubscribe', feed_destroy_subscription_path(@subscription.feed), method: :delete, remote: true, class: 'button-secondary settings-unsubscribe' , data: { confirm: 'Are you sure you want to unsubscribe?' })} %>", "modal-purpose-edit_subscription");
+    feedbin.modalContent("<%= j render partial: 'settings/subscriptions/form', locals: {subscription: @subscription, unsubscribe: link_to('Unsubscribe', feed_destroy_subscription_path(@subscription.feed), method: :delete, remote: true, class: 'button button-secondary settings-unsubscribe' , data: { confirm: 'Are you sure you want to unsubscribe?' })} %>", "modal-purpose-edit_subscription");
     setTimeout(function() {
         feedbin.drawBarCharts();
     }, 100);

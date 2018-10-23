@@ -27,6 +27,25 @@ class NewslettersControllerTest < ActionController::TestCase
     assert_equal(token, feed.options["newsletter_token"])
   end
 
+  test "puts newsletter in tag" do
+    user = users(:ben)
+    newsletter = Newsletter.new(newsletter_params(user.newsletter_token, "asdf"))
+    signature = newsletter.send(:signature)
+    tag = "Newsletters"
+    user.update(newsletter_tag: tag)
+
+    feed = Feed.create!(feed_url: newsletter.feed_url)
+    user.subscriptions.find_or_create_by(feed: feed)
+
+    assert_difference("Tag.count", 1) do
+      assert_difference("Entry.count", 1) do
+        post :create, params: newsletter_params(user.newsletter_token, signature)
+      end
+    end
+
+    assert_response :success
+  end
+
   test "creates newsletters with existing feed" do
     user = users(:ben)
     newsletter = Newsletter.new(newsletter_params(user.newsletter_token, "asdf"))

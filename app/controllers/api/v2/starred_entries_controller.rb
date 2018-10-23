@@ -22,10 +22,9 @@ module Api
       end
 
       def destroy
-        @user = current_user
-        entries = get_valid_entries
-        StarredEntry.where(user_id: @user.id, entry_id: entries[:entry_ids]).destroy_all
-        render json: entries[:entry_ids].to_json
+        user = current_user
+        user.starred_entries.where(entry_id: params[:starred_entries]).destroy_all
+        render json: params[:starred_entries].to_json
       end
 
       private
