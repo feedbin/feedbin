@@ -485,8 +485,6 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.3)
     will_paginate (3.1.6)
-    xipio (1.0.2)
-      railties (>= 3)
     xpath (3.1.0)
       nokogiri (~> 1.8)
 
@@ -576,7 +574,6 @@ DEPENDENCIES
   unicorn
   webmock
   will_paginate
-  xipio
 
 BUNDLED WITH
    1.16.5

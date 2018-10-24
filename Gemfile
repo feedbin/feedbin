@@ -17,7 +17,6 @@ group :development do
   gem "better_errors"
   gem "silencer"
   gem "benchmark-ips"
-  gem "xipio"
   gem "listen"
   gem "rufo"
   gem "htmlbeautifier"
