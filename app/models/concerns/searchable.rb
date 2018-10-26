@@ -147,9 +147,6 @@ module Searchable
     end
 
     def self.build_search(params, user)
-      if params[:query].respond_to?(:gsub)
-        params[:query] = params[:query].gsub("body:", "content:")
-      end
 
       if params[:query] =~ UNREAD_REGEX
         params[:query] = params[:query].gsub(UNREAD_REGEX, "")
