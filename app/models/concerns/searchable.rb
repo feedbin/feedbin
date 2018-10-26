@@ -126,9 +126,7 @@ module Searchable
         if options[:query].present?
           hash[:query][:bool][:must] = {
             query_string: {
-              fields: ["title", "content", "emoji", "author", "url"],
               default_operator: "AND",
-              quote_field_suffix: ".exact",
               query: options[:query],
             },
           }
