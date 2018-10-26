@@ -25,11 +25,11 @@ module Searchable
     settings search_settings do
       mappings do
         indexes :id, type: "long", index: :not_analyzed
-        indexes :title, analyzer: "snowball", fields: {"exact": {type: "string", analyzer: "lower_exact"}}
-        indexes :content, analyzer: "snowball", fields: {"exact": {type: "string", analyzer: "lower_exact"}}
-        indexes :emoji, analyzer: "whitespace"
-        indexes :author, analyzer: "keyword"
-        indexes :url, analyzer: "keyword"
+        indexes :title, analyzer: "snowball", fields: {exact: {type: "string", analyzer: "lower_exact"}}
+        indexes :content, analyzer: "snowball", fields: {exact: {type: "string", analyzer: "lower_exact"}}
+        indexes :emoji, analyzer: "whitespace", fields: {exact: {type: "string", analyzer: "whitespace"}}
+        indexes :author, analyzer: "lower_exact", fields: {exact: {type: "string", analyzer: "lower_exact"}}
+        indexes :url, analyzer: "keyword", fields: {exact: {type: "string", analyzer: "keyword"}}
         indexes :feed_id, type: "long", index: :not_analyzed, include_in_all: false
         indexes :published, type: "date", include_in_all: false
         indexes :updated, type: "date", include_in_all: false
@@ -126,7 +126,7 @@ module Searchable
         if options[:query].present?
           hash[:query][:bool][:must] = {
             query_string: {
-              fields: ["title.*", "content.*", "emoji", "author", "url"],
+              fields: ["title", "content", "emoji", "author", "url"],
               default_operator: "AND",
               quote_field_suffix: ".exact",
               query: options[:query],

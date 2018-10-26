@@ -44,8 +44,8 @@ class FeedbinUtils
       escape = '\ '.sub(" ", "")
       query = query.gsub(special_characters_regex) { |character| escape + character }
 
-      query = query.gsub("title_exact", "title.exact")
-      query = query.gsub("content_exact", "content.exact")
+      query = query.gsub("title_exact:", "title.exact:")
+      query = query.gsub("content_exact:", "content.exact:")
 
       colon_regex = /(?<!title|title.exact|feed_id|content|content.exact|author|_missing_|_exists_|twitter_screen_name|twitter_name|twitter_retweet|twitter_media|twitter_image|twitter_link|emoji):(?=.*)/
       query = query.gsub(colon_regex, '\:')
