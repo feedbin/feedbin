@@ -23,7 +23,7 @@ module Searchable
     }
 
     settings search_settings do
-      mappings do
+      mappings _source: {enabled: false} do
         indexes :id, type: "long", index: :not_analyzed
         indexes :title, analyzer: "snowball", fields: {exact: {type: "string", analyzer: "lower_exact"}}
         indexes :content, analyzer: "snowball", fields: {exact: {type: "string", analyzer: "lower_exact"}}
