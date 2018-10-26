@@ -11,24 +11,36 @@ module Searchable
     SORT_REGEX = /(?<=\s|^)sort:\s*(asc|desc|relevance)(?=\s|$)/i
     TAG_ID_REGEX = /(?<=\s|^)tag_id:\s*([0-9]+)(?=\s|$)/
 
-    mappings _source: {enabled: false} do
-      indexes :id, type: "long", index: :not_analyzed
-      indexes :title, analyzer: "snowball"
-      indexes :title_exact, analyzer: "whitespace"
-      indexes :content, analyzer: "snowball"
-      indexes :content_exact, analyzer: "whitespace"
-      indexes :author, analyzer: "keyword"
-      indexes :url, analyzer: "keyword"
-      indexes :feed_id, type: "long", index: :not_analyzed, include_in_all: false
-      indexes :published, type: "date", include_in_all: false
-      indexes :updated, type: "date", include_in_all: false
+    search_settings = {
+      "analysis": {
+        "analyzer": {
+          "lower_exact": {
+            "tokenizer": "whitespace",
+            "filter":  ["lowercase"]
+          }
+        }
+      }
+    }
 
-      indexes :twitter_screen_name, analyzer: "whitespace"
-      indexes :twitter_name, analyzer: "whitespace"
-      indexes :twitter_retweet, type: "boolean"
-      indexes :twitter_media, type: "boolean"
-      indexes :twitter_image, type: "boolean"
-      indexes :twitter_link, type: "boolean"
+    settings search_settings do
+      mappings do
+        indexes :id, type: "long", index: :not_analyzed
+        indexes :title, analyzer: "snowball", fields: {"exact": {type: "string", analyzer: "lower_exact"}}
+        indexes :content, analyzer: "snowball", fields: {"exact": {type: "string", analyzer: "lower_exact"}}
+        indexes :emoji, analyzer: "whitespace"
+        indexes :author, analyzer: "keyword"
+        indexes :url, analyzer: "keyword"
+        indexes :feed_id, type: "long", index: :not_analyzed, include_in_all: false
+        indexes :published, type: "date", include_in_all: false
+        indexes :updated, type: "date", include_in_all: false
+
+        indexes :twitter_screen_name, analyzer: "whitespace"
+        indexes :twitter_name, analyzer: "whitespace"
+        indexes :twitter_retweet, type: "boolean"
+        indexes :twitter_media, type: "boolean"
+        indexes :twitter_image, type: "boolean"
+        indexes :twitter_link, type: "boolean"
+      end
     end
 
     def self.saved_search_count(user)
@@ -114,8 +126,10 @@ module Searchable
         if options[:query].present?
           hash[:query][:bool][:must] = {
             query_string: {
-              query: options[:query],
+              fields: ["title.*", "content.*", "emoji", "author", "url"],
               default_operator: "AND",
+              quote_field_suffix: ".exact",
+              query: options[:query],
             },
           }
         end
@@ -168,7 +182,7 @@ module Searchable
         params[:query] = params[:query].gsub(TAG_ID_REGEX, id_string)
       end
 
-      params[:query] = escape_search(params[:query])
+      params[:query] = FeedbinUtils.escape_search(params[:query])
 
       options = {
         query: params[:query],
@@ -216,16 +230,5 @@ module Searchable
       options
     end
 
-    def self.escape_search(query)
-      if query.present? && query.respond_to?(:gsub)
-        special_characters_regex = /([\+\-\!\{\}\[\]\^\~\?\\])/
-        escape = '\ '.sub(" ", "")
-        query = query.gsub(special_characters_regex) { |character| escape + character }
-
-        colon_regex = /(?<!title|title_exact|feed_id|content|content_exact|author|_missing_|_exists_|twitter_screen_name|twitter_name|twitter_retweet|twitter_media|twitter_image|twitter_link):(?=.*)/
-        query = query.gsub(colon_regex, '\:')
-        query
-      end
-    end
   end
 end

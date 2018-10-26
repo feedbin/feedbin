@@ -46,8 +46,10 @@ class Action < ApplicationRecord
       if self.query.present?
         hash[:query][:bool][:must] = {
           query_string: {
-            query: self.query,
+            fields: ["title.*", "content.*", "emoji", "author", "url"],
             default_operator: "AND",
+            quote_field_suffix: ".exact",
+            query: FeedbinUtils.escape_search(self.query),
           },
         }
       end

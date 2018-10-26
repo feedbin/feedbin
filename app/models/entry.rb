@@ -233,6 +233,7 @@ class Entry < ApplicationRecord
     base["content"] = ContentFormatter.summary(self.content)
     base["title_exact"] = base["title"]
     base["content_exact"] = base["content"]
+    base["emoji"] = (base["title"] + base["content"]).scan(Unicode::Emoji::REGEX).join(" ")
 
     if self.tweet?
       tweets = [self.main_tweet]

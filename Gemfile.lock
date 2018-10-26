@@ -474,6 +474,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.5)
+    unicode-emoji (1.1.0)
     unicorn (5.4.1)
       kgio (~> 2.6)
       raindrops (~> 0.7)
@@ -571,6 +572,7 @@ DEPENDENCIES
   twitter
   twitter-text
   uglifier (= 4.1.11)
+  unicode-emoji
   unicorn
   webmock
   will_paginate

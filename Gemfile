@@ -94,6 +94,7 @@ gem "curb"
 gem "twitter"
 gem "twitter-text"
 gem "bootsnap", require: false
+gem "unicode-emoji"
 
 # Stripe
 gem "stripe"
