@@ -47,7 +47,7 @@ class Action < ApplicationRecord
         escaped_query = FeedbinUtils.escape_search(self.query)
         hash[:query][:bool][:must] = {
           query_string: {
-            fields: ["title.*", "content.*", "emoji", "author", "url"],
+            fields: ["title", "content", "emoji", "author", "url"],
             default_operator: "AND",
             query: escaped_query,
           },
