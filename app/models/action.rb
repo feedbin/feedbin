@@ -44,14 +44,17 @@ class Action < ApplicationRecord
         },
       }
       if self.query.present?
+        escaped_query = FeedbinUtils.escape_search(self.query)
         hash[:query][:bool][:must] = {
           query_string: {
             fields: ["title", "content", "emoji", "author", "url"],
-            quote_field_suffix: ".exact",
             default_operator: "AND",
-            query: FeedbinUtils.escape_search(self.query),
+            query: escaped_query,
           },
         }
+        if !escaped_query.include?("title.exact") && !escaped_query.include?("content.exact")
+          hash[:query][:bool][:must][:query_string][:quote_field_suffix] = ".exact"
+        end
       end
     end
   end
