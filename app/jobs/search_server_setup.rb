@@ -44,10 +44,7 @@ class SearchServerSetup
 
   def touch_actions
     Action.find_each do |action|
-      begin
-        action.touch
-      rescue
-      end
+      action.touch rescue nil
     end
   end
 end
