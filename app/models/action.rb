@@ -47,14 +47,11 @@ class Action < ApplicationRecord
         escaped_query = FeedbinUtils.escape_search(self.query)
         hash[:query][:bool][:must] = {
           query_string: {
-            fields: ["title", "content", "emoji", "author", "url"],
+            fields: ["_all", "title.*", "content.*", "emoji", "author", "url"],
             default_operator: "AND",
             query: escaped_query,
           },
         }
-        if !escaped_query.include?("title.exact") && !escaped_query.include?("content.exact")
-          hash[:query][:bool][:must][:query_string][:quote_field_suffix] = ".exact"
-        end
       end
     end
   end
