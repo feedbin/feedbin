@@ -43,6 +43,61 @@ $.extend feedbin,
     jQuery.timeago.settings.allowFuture = true
     $("time.timeago").timeago()
 
+  panelContainerClass: ->
+    hasTwoPanels = $('body').hasClass('two-panels')
+    if hasTwoPanels
+      ".sidebar-column"
+    else
+      ".app-wrap"
+
+
+
+  panelCount: ->
+    body = $('body')
+
+    setPanels = (count) ->
+      body.removeClass("one-up")
+      body.removeClass("two-up")
+      body.removeClass("three-up")
+      body.removeClass("has-offscreen-panels")
+
+      body.addClass("#{count}-up")
+      $(document).trigger("feedbin:panels:#{count}");
+
+    if $('body').hasClass('app')
+
+      largeBreakpoint = 1100
+      smallBreakpoint = 750
+      width = $(window).width()
+
+      if !body.hasClass("three-panels") && width > largeBreakpoint
+        setPanels('three')
+
+      if !body.hasClass("two-panels") && width <= largeBreakpoint && width >= smallBreakpoint
+        setPanels('two')
+        body.addClass("has-offscreen-panels")
+
+      if !body.hasClass("one-panel") && width < smallBreakpoint
+        setPanels('one')
+        body.addClass("has-offscreen-panels")
+
+    #
+    #
+    # modeClassName = 'two-panels'
+    # sidebarClassName = 'sidebar-column'
+    # hasTwoPanels = $('body').hasClass(modeClassName)
+    #
+    # if hasTwoPanels
+    #   if width <= 550 || width > 1024
+    #     console.log 'switching to three panels'
+    #     $(".#{sidebarClassName}").contents().unwrap()
+    #     $('body').removeClass(modeClassName)
+    # else
+    #   if width > 550 && width <= 1024
+    #     console.log 'switching to two panels'
+    #     $(".feeds-column, .entries-column").wrapAll("<div class='#{sidebarClassName}' />")
+    #     $('body').addClass(modeClassName)
+
   reselect: ->
     if feedbin.selectedSource && feedbin.selectedTag
       $("[data-tag-id=#{feedbin.selectedTag}]").find("[data-feed-id=#{feedbin.selectedSource}]").addClass("selected")
@@ -168,21 +223,32 @@ $.extend feedbin,
         window.history.replaceState({panel: 1}, document.title, "/");
       $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
       if feedbin.swipe
-        $('.app-wrap').animate({scrollLeft: 0}, {duration: 150})
+        if feedbin.smoothScroll
+          $(feedbin.panelContainerClass()).prop 'scrollLeft', 0
+        else
+          $(feedbin.panelContainerClass()).animate({scrollLeft: 0}, {duration: 250})
+
     else if panel == 2
       if state && feedbin.mobileView()
         window.history.pushState({panel: 2}, document.title, "/");
       $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
       if feedbin.swipe
         offset = $('.entries-column')[0].offsetLeft
-        $('.app-wrap').animate({scrollLeft: offset}, {duration: 150})
+        if feedbin.smoothScroll
+          $(feedbin.panelContainerClass()).prop 'scrollLeft', offset
+        else
+          $(feedbin.panelContainerClass()).animate({scrollLeft: offset}, {duration: 250})
+
     else if panel == 3
       if state && feedbin.mobileView()
         window.history.pushState({panel: 3}, document.title, "/");
       $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
       if feedbin.swipe
         offset = $('.entry-column')[0].offsetLeft
-        $('.app-wrap').animate({scrollLeft: offset}, {duration: 150})
+        if feedbin.smoothScroll
+          $(feedbin.panelContainerClass()).prop 'scrollLeft', offset
+        else
+          $(feedbin.panelContainerClass()).animate({scrollLeft: offset}, {duration: 250})
 
 
   showNotification: (text, timeout = 3000, href = '', error = false) ->
@@ -1095,6 +1161,11 @@ $.extend feedbin,
         feedbin.swipe = true
         $('body').addClass('swipe')
 
+    hasSmoothScrolling: ->
+      if typeof(CSS) == "function" && CSS.supports("scroll-behavior", "smooth")
+        feedbin.smoothScroll = true
+        $('body').addClass('smooth-scroll')
+
     hasTouch: ->
       if 'ontouchstart' of document
         $('body').addClass('touch')
@@ -1869,7 +1940,6 @@ $.extend feedbin,
         $(window).on('resize', throttledResize);
         resize()
 
-
     tumblrType: ->
       $(document).on 'change', '[data-behavior~=tumblr_type]', ->
         type = $(@).val()
@@ -2113,6 +2183,11 @@ $.extend feedbin,
         field = $('.modal-purpose-subscribe [data-behavior~=feeds_search_field]')
         field.val(subscription)
         field.closest("form").submit()
+
+    panels: ->
+      feedbin.panelCount()
+      throttled = _.throttle feedbin.panelCount, 100
+      $(window).on('resize', throttled);
 
 $.each feedbin.preInit, (i, item) ->
   item()

@@ -823,6 +823,7 @@ Structure
     display: flex;
     height: 100%;
     align-items: flex-start;
+    scroll-behavior: smooth;
     .feeds-column,
     .entries-column {
         flex-grow: 0;
@@ -1463,7 +1464,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     height: $toolbar-height;
     text-align: center;
-    overflow: auto;
+    overflow: hidden;
     .feed-title-wrap {
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         font-weight: bold;
@@ -2478,6 +2479,11 @@ $saved-search-control-height: 48px;
     &.has-content {
         background: none;
     }
+    .full-screen.touch & {
+        .bottom-toolbar {
+            display: flex;
+        }
+    }
     @media (max-width: 550px) {
         .bottom-toolbar {
             display: flex;
@@ -2519,6 +2525,9 @@ $saved-search-control-height: 48px;
     opacity: 1;
     -webkit-overflow-scrolling: touch;
     z-index: 2;
+    .full-screen.touch & {
+        bottom: $bottom-toolbar-height - 1px;
+    }
     @media (max-width: 550px) {
         bottom: $bottom-toolbar-height - 1px;
         .standalone-navigator & {
@@ -2556,7 +2565,7 @@ $saved-search-control-height: 48px;
 .entry-inner {
     min-height: 100%;
     transition: max-width .3s linear;
-    @media (max-width: 550px) {
+    .touch & {
         min-height: 101%;
     }
 }
@@ -2582,6 +2591,9 @@ $saved-search-control-height: 48px;
     }
     &:hover {
         text-decoration: none;
+    }
+    .full-screen.touch & {
+        display: none;
     }
     @media (max-width: 550px) {
         display: none;
@@ -8296,6 +8308,26 @@ button.close {
             -webkit-overflow-scrolling: touch;
             white-space: nowrap;
         }
+        .app-panel {
+            top: 0;
+            height: 100% !important;
+            width: 100% !important;
+            white-space: normal;
+            display: inline-block !important;
+            scroll-snap-align: start;
+        }
+    }
+}
+
+.two-panels {
+    .sidebar-column {
+        height: 100%;
+        width: 280px;
+        scroll-snap-type: x mandatory;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
         .app-panel {
             top: 0;
             height: 100% !important;
