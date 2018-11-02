@@ -471,7 +471,7 @@ table {
     margin: 0 0 30px 0;
     padding: 0;
     list-style: none;
-    @media (max-width: 550px) {
+    @media (max-width: 750px) {
         border-left: none;
         border-right: none;
         border-radius: 0;
@@ -492,7 +492,7 @@ table {
                 text-decoration: none;
                 @include settings-row;
                 color: $text-header-color;
-                @media (max-width: 550px) {
+                @media (max-width: 750px) {
                     padding-right: 20px;
                 }
                 &:after {
@@ -505,7 +505,7 @@ table {
                     right: 15px;
                     top: 0;
                     bottom: 0;
-                    @media (max-width: 550px) {
+                    @media (max-width: 750px) {
                         right: 5px;
                     }
                 }
@@ -518,7 +518,7 @@ table {
     @extend .pill-list;
     li {
         padding: 0;
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             padding-right: 0;
             padding-left: 0;
         }
@@ -553,7 +553,7 @@ table {
         }
     }
     .share-help {
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             padding-top: 20px;
         }
     }
@@ -579,7 +579,7 @@ table {
     input[type="password"],
     input[type="url"] {
         display: block;
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             max-width: 100%;
         }
     }
@@ -599,7 +599,7 @@ table {
     .half {
         padding-left: 5px;
         padding-right: 5px;
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             width: 100%;
             float: none;
         }
@@ -689,7 +689,7 @@ table {
         border-left: none;
         border-right: none;
     }
-    @media (max-width: 550px) {
+    @media (max-width: 750px) {
         border: none;
         background-color: transparent;
         border-radius: 0;
@@ -702,18 +702,18 @@ table {
         background: image-url("icon-share-email.svg") 30px 3px no-repeat;
         background-size: 24px 16px;
         padding-left: 64px;
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             padding-left: 49px;
             background-position: 15px 3px;
         }
     }
-    @media (max-width: 550px) {
+    @media (max-width: 750px) {
         padding-left: 15px;
         padding-right: 15px;
     }
 }
 .settings-outer {
-    @media (max-width: 550px) {
+    @media (max-width: 750px) {
         padding: 0 15px;
     }
 }
@@ -824,6 +824,10 @@ Structure
     height: 100%;
     align-items: flex-start;
     scroll-behavior: smooth;
+    .standalone-navigator.two-up & {
+        border-top: 1px solid transparent;
+        @include border-color($border-color, $border-color-night, $border-color-sunset);
+    }
     .feeds-column,
     .entries-column {
         flex-grow: 0;
@@ -832,7 +836,7 @@ Structure
     }
     .feeds-column {
         width: 245px;
-        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     }
     .entries-column {
         width: 320px;
@@ -964,7 +968,7 @@ Structure
     font-size: $base-size-10px;
     border-top: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     .standalone-navigator & {
         height: calc(#{$bottom-toolbar-height - 8px} + env(safe-area-inset-bottom));
         min-height: $bottom-toolbar-height !important;
@@ -977,12 +981,10 @@ Structure
         text-align: center;
         vertical-align: middle;
     }
-    @media (min-width: 551px) {
-        .entries-column & {
-            display: none;
-        }
+    .three-up .entries-column & {
+        display: none;
     }
-    @media (max-width: 550px) {
+    .has-offscreen-panels {
         .feeds-column & {
             display: none;
         }
@@ -1029,7 +1031,7 @@ Structure
     left: 0;
     right: 0;
     z-index: 1;
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     transition: transform .2s ease;
 }
 
@@ -1099,7 +1101,7 @@ Structure
 }
 
 .feeds {
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     position: absolute;
     top: $toolbar-height;
     bottom: 0;
@@ -1109,7 +1111,7 @@ Structure
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     transition: .1s ease-in bottom;
-    @media (max-width: 550px) {
+    .has-offscreen-panels {
         bottom: 0;
     }
     .audio-panel-minimized & {
@@ -1255,7 +1257,7 @@ Structure
     }
     .drawer {
         position: relative;
-        @include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
+        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
         overflow: hidden;
         ul {
             overflow: hidden;
@@ -1266,9 +1268,9 @@ Structure
             @include arrow(
                 $x-position: 32px,
                 $y-position: 0px,
-                $arrow-color: $list-background-color,
-                $arrow-color-night: $list-background-color-night,
-                $arrow-color-sunset: $list-background-color-sunset,
+                $arrow-color: $body-background-color,
+                $arrow-color-night: $body-background-color-night,
+                $arrow-color-sunset: $body-background-color-sunset,
                 $shadow-color: $arrow-shadow-color,
                 $shadow-color-night: $arrow-shadow-color-night,
                 $shadow-color-sunset: $arrow-shadow-color-sunset)
@@ -1630,19 +1632,17 @@ $saved-search-control-height: 48px;
     -webkit-overflow-scrolling: touch;
     transition: transform .2s ease;
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
-    @media (max-width: 550px) {
-        &.loading {
-            .entries-target {
-                display: none;
-            }
-            background: $body-background-color image-url("spinner-day.svg") 50% 25% no-repeat;
-            .theme-sunset & {
-                background: $body-background-color-sunset image-url("spinner-sunset.svg") 50% 25% no-repeat;
-            }
-            .theme-night & {
-                background: $body-background-color-night image-url("spinner-night.svg") 50% 25% no-repeat;
-            }
+    .has-offscreen-panels &.loading {
+        .entries-target {
+            display: none;
         }
+        background: $body-background-color image-url("spinner-day.svg") 50% 25% no-repeat;
+    }
+    .has-offscreen-panels.theme-sunset &.loading {
+        background: $body-background-color-sunset image-url("spinner-sunset.svg") 50% 25% no-repeat;
+    }
+    .has-offscreen-panels.theme-night &.loading {
+        background: $body-background-color-night image-url("spinner-night.svg") 50% 25% no-repeat;
     }
 
     &.show-search-options {
@@ -1667,7 +1667,7 @@ $saved-search-control-height: 48px;
         position: absolute;
         top: -2px;
         left: -26px;
-        @media (max-width: 550px) {
+        .has-offscreen-panels & {
             top: -1px;
         }
     }
@@ -1781,7 +1781,7 @@ $saved-search-control-height: 48px;
     .feed-title, .time {
         line-height: 1.3;
         font-size: $base-size-12px;
-        @media (max-width: 550px) {
+        .has-offscreen-panels & {
             font-size: $base-size-14px;
             margin-bottom: $base-size-2px;
         }
@@ -1803,8 +1803,15 @@ $saved-search-control-height: 48px;
         margin: 0;
         @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         display: block;
-        @media (max-width: 550px) {
+        .has-offscreen-panels & {
             font-size: $base-size-15px;
+        }
+        @media (max-width: 975px) {
+            .two-up & {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
         }
     }
     .body {
@@ -1835,7 +1842,7 @@ $saved-search-control-height: 48px;
                 @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
             }
         }
-        @media (max-width: 550px) {
+        .has-offscreen-panels & {
             font-size: $base-size-16px;
         }
     }
@@ -1845,7 +1852,7 @@ $saved-search-control-height: 48px;
             display: flex;
             top: 8px;
             z-index: 3;
-            @media (max-width: 550px) {
+            .has-offscreen-panels & {
                 top: 9px;
             }
         }
@@ -2484,7 +2491,7 @@ $saved-search-control-height: 48px;
             display: flex;
         }
     }
-    @media (max-width: 550px) {
+    .one-up & {
         .bottom-toolbar {
             display: flex;
         }
@@ -2528,7 +2535,7 @@ $saved-search-control-height: 48px;
     .full-screen.touch & {
         bottom: $bottom-toolbar-height - 1px;
     }
-    @media (max-width: 550px) {
+    @media (max-width: 750px) {
         bottom: $bottom-toolbar-height - 1px;
         .standalone-navigator & {
             bottom: calc(#{$bottom-toolbar-height - 9px} + env(safe-area-inset-bottom));
@@ -2595,7 +2602,7 @@ $saved-search-control-height: 48px;
     .full-screen.touch & {
         display: none;
     }
-    @media (max-width: 550px) {
+    @media (max-width: 750px) {
         display: none;
     }
 }
@@ -3496,7 +3503,7 @@ $saved-search-control-height: 48px;
         }
     }
 
-    @media (max-width: 550px) {
+    @media (max-width: 750px) {
         img[data-camo-src] {
             visibility: hidden;
             &.full-width, &.show {
@@ -4063,7 +4070,7 @@ $saved-search-control-height: 48px;
     }
     .tweet-body {
         padding-left: 57px;
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             padding-left: 0;
         }
     }
@@ -4202,7 +4209,7 @@ Settings
     }
 }
 
-@media (max-width: 550px) {
+@media (max-width: 750px) {
     .settings-nav {
             display: none;
     }
@@ -4269,7 +4276,12 @@ body.settings {
         align-items: stretch;
         min-height: 100%;
     }
-
+    .settings-nav {
+        flex-shrink: 0;
+        @media (max-width: 900px) {
+            width: 230px;
+        }
+    }
     .settings-content {
         position: relative;
         padding: 0;
@@ -4280,7 +4292,7 @@ body.settings {
         .settings-content-inner {
             max-width: 900px;
             padding: 0 20px 0 37px;
-            @media (max-width: 550px) {
+            @media (max-width: 750px) {
                 padding: 0;
             }
         }
@@ -4331,7 +4343,7 @@ body.settings {
             display: flex;
             background-color: transparent;
             height: auto;
-            @media (max-width: 550px) {
+            @media (max-width: 750px) {
                 display: none;
             }
         }
@@ -4353,7 +4365,7 @@ body.settings {
         max-width: 100%;
         padding-right: 50px !important;
         border-radius: 8px;
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             padding-right: 10px !important;
         }
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
@@ -4399,11 +4411,11 @@ body.settings {
             position: absolute;
             left: 30px;
             top: 15px;
-            @media (max-width: 550px) {
+            @media (max-width: 750px) {
                 left: 15px;
             }
         }
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             padding-left: 35px;
         }
     }
@@ -4459,7 +4471,7 @@ body.settings {
         margin-bottom: 30px;
         top: 0;
         position: sticky;
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             background-color: $list-background-color;
         }
         .control-group {
@@ -4532,7 +4544,7 @@ body.settings {
             flex-grow: 1;
             margin: 0;
         }
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             h2 {
                 margin-bottom: 15px;
             }
@@ -4554,7 +4566,7 @@ body.settings {
             background-position: 11px 6px, 97% 6px;
             background-size: auto, 16px 16px;
         }
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             max-width: 100%
         }
     }
@@ -4569,7 +4581,7 @@ body.settings {
         background-color: $inset-bg-color;
         border: 1px solid #DCDEE0;
         padding: 15px 30px 12px 30px;
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             padding-left: 15px;
             padding-right: 15px;
             border-radius: 0;
@@ -4586,7 +4598,7 @@ body.settings {
             margin-top: 1px;
             margin-right: 18px;
         }
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             padding-left: 15px;
             padding-right: 15px;
             border-left: none;
@@ -4605,7 +4617,7 @@ body.settings {
             width: 215px;
             top: 25px;
             left: -81px;
-            @media (max-width: 550px) {
+            @media (max-width: 750px) {
                 left: -10px;
                 li:first-child:after {
                     left: 15px;
@@ -4618,7 +4630,7 @@ body.settings {
             }
         }
         &.dropdown-right .dropdown-content {
-            @media (max-width: 550px) {
+            @media (max-width: 750px) {
                 left: -100px;
                 li:first-child:after {
                     left: 175px;
@@ -4757,7 +4769,7 @@ body.settings {
             justify-content: space-between;
             display: flex;
             margin-bottom: 15px;
-            @media (max-width: 550px) {
+            @media (max-width: 750px) {
                 flex-direction: column;
                 text-align: left;
                 padding: 0;
@@ -4773,7 +4785,7 @@ body.settings {
                 }
             }
             .stat-title {
-                @media (max-width: 550px) {
+                @media (max-width: 750px) {
                     display: inline;
                     font-size: 16px;
                     @include color($text-color, $text-color-night, $text-color-sunset);
@@ -4786,7 +4798,7 @@ body.settings {
             }
             .stat-body {
                 margin: 0;
-                @media (max-width: 550px) {
+                @media (max-width: 750px) {
                     display: inline;
                     font-weight: normal;
                 }
@@ -4838,7 +4850,7 @@ body.settings {
     .feed-form {
         border-radius: 0 0 8px 8px;
         border-top: none;
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             border-radius: 0;
         }
         li {
@@ -4864,7 +4876,7 @@ body.settings {
                 margin: 0 0 0 30px !important;
                 padding: 0;
             }
-            @media (max-width: 550px) {
+            @media (max-width: 750px) {
                 padding-top: 15px;
                 width: $checkbox-offset-narrow;
                 .feeds-checkbox {
@@ -4881,7 +4893,7 @@ body.settings {
             &:hover {
                 text-decoration: none;
             }
-            @media (max-width: 550px) {
+            @media (max-width: 750px) {
                 padding: 13px 15px 13px $checkbox-offset-narrow;
             }
         }
@@ -4972,7 +4984,7 @@ body.settings {
                 width: 100%;
                 height: 100%;
             }
-            @media (max-width: 550px) {
+            @media (max-width: 750px) {
                 display: none;
             }
         }
@@ -5079,12 +5091,12 @@ input[type="checkbox"] + label .slider-checkbox {
         top: 2px;
         transition: left .2s ease;
     }
-    @media (max-width: 550px) {
+    @media (max-width: 750px) {
         right: 15px;
     }
     .modal & {
         right: 24px;
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             right: 16px;
         }
     }
@@ -5153,7 +5165,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
         }
         &.text {
             padding: 0 30px;
-            @media (max-width: 550px) {
+            @media (max-width: 750px) {
                 padding: 0 15px;
             }
             > input, > textarea {
@@ -5169,7 +5181,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
         }
         &.card-number-wrap {
             padding: 0 30px;
-            @media (max-width: 550px) {
+            @media (max-width: 750px) {
                 padding: 0 15px;
             }
         }
@@ -5231,7 +5243,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
             background: image-url("icon-check.svg") 0 0 no-repeat;
             height: 12px;
             width: 15px;
-            @media (max-width: 550px) {
+            @media (max-width: 750px) {
                 right: 22px;
             }
         }
@@ -5249,14 +5261,14 @@ input[type="checkbox"]:checked + label .slider-checkbox {
         }
         td:first-child {
             padding-left: 30px !important;
-            @media (max-width: 550px) {
+            @media (max-width: 750px) {
                 padding-left: 15px !important;
             }
         }
         td:last-child {
             padding-right: 30px !important;
             text-align: right;
-            @media (max-width: 550px) {
+            @media (max-width: 750px) {
                 padding-right: 15px !important;
             }
         }
@@ -5344,7 +5356,7 @@ table.small td {
     position: relative;
     display: flex;
     align-items: baseline;
-    @media (max-width: 550px) {
+    @media (max-width: 750px) {
         padding-left: 15px;
         padding-right: 15px;
     }
@@ -5370,7 +5382,7 @@ table.small td {
     height: 134px;
     padding-left: 30px;
     padding-right: 30px;
-    @media (max-width: 550px) {
+    @media (max-width: 750px) {
         padding-left: 15px;
         padding-right: 15px;
     }
@@ -5647,7 +5659,7 @@ Buttons
         padding-top: 7px;
         padding-bottom: 7px;
         margin-bottom: 10px;
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             display: none;
             &.previous_page, &.next_page {
                 display: inline-block;
@@ -6354,7 +6366,7 @@ Print
 Fullscreen
 ------------------------------------------------------------------------------*/
 .full-screen {
-    .feeds-column, .entries-column, .account-toolbar {
+    .feeds-column, .entries-column, .account-toolbar, .sidebar-column {
         position: absolute !important;
         top: -9999px !important;
         left: -9999px !important;
@@ -6474,7 +6486,7 @@ Media Players
     font-size: 13px;
     font-family: $font-stack !important;
     font-weight: 400 !important;
-    @include background-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
+    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     border-top: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     position: absolute;
@@ -7807,83 +7819,21 @@ Bigfoot
 /*------------------------------------------------------------------------------
 Media Queries
 ------------------------------------------------------------------------------*/
-@media only screen and (max-width:1125px) {
-    .feeds-column {
-        width: 220px !important;
-    }
-    .entries-column {
-        width: 260px !important;
-    }
-}
-
-@media (max-width:855px) {
-    .entry-selected .content {
-        top: 0;
-    }
-    .nothing-selected, .feed-selected {
-        .entries-column {
-            flex-grow: 1;
-            border-right: none;
-        }
-        .entry-column {
-            display: none !important;
-        }
-    }
-    .entry-selected {
-        .feeds-column {
-            display: none;
-        }
-        .entries-inner {
-            top: $toolbar-height;
-        }
-    }
-    .feed-selected, .entry-selected {
-        .entries-header {
-            display: flex;
-        }
-    }
-    .entry-selected .entries-column, .feeds-column {
-        width: 320px !important;
-    }
-    .entry-toolbar, .entry-feed-title {
-        .entry-feed-title {
-            display: none;
-            .full-screen & {
-                display: block;
-            }
-        }
-    }
-    .ui-resizable-handle {
-        display: none !important;
-    }
-    .search-control .dropdown-wrap {
-        .dropdown-content {
-            left: 8px;
-        }
-        li:first-child:after {
-            left: 15px;
-            margin: 0;
-        }
-        li:first-child:before {
-            left: 14px;
-            margin: 0;
-        }
-    }
-    .search-button {
-        visibility: hidden !important;
-    }
-    .entry-selected .entries {
-        top: 0;
-    }
-}
-
 @media (max-width:680px) {
     .subscribe-promo {
         display: none;
     }
 }
 
-@media (max-width: 550px) {
+.has-offscreen-panels:not(.full-screen) {
+    @media (max-width: 960px) {
+        .entry-inner {
+            padding: 15px;
+        }
+    }
+}
+
+.has-offscreen-panels {
     .audio-panel {
         bottom: 0;
     }
@@ -7891,44 +7841,34 @@ Media Queries
     .desktop-hide {
         display: block !important;
     }
-    .nothing-selected {
+    .ui-resizable-handle {
+        display: none;
+    }
+    &.nothing-selected {
         .feeds-column {
             flex-grow: 1;
             border-right: none;
         }
-        .ui-resizable-handle,
         .entry-column,
         .entries-column {
+            display: none;
+        }
+    }
+    &.feed-selected {
+        .feeds-column {
+            display: none;
+        }
+    }
+    &.entry-selected {
+        .feeds-column {
             display: none;
         }
     }
     .entries-header {
         display: flex;
     }
-    .feed-selected {
-        .feeds-column {
-            display: none;
-        }
-    }
-    .entry-selected {
-        .feeds-column,
-        .entries-column {
-            display: none;
-        }
-    }
-    .entry-toolbar {
-        .site-info {
-            .feed-button {
-                margin-left: 0;
-                padding: 0 10px 0 5px;
-            }
-            .back-button {
-                display: flex;
-            }
-            .entry-feed-title {
-                display: none;
-            }
-        }
+    .feeds-column, .entries-column {
+        width: 100% !important;
     }
     .search-button {
         visibility: visible !important;
@@ -7936,9 +7876,9 @@ Media Queries
     .entries {
         top: 0;
         transform: translateY($toolbar-height);
-        .hide-search & {
-            transform: translateY(0);
-        }
+    }
+    &.hide-search .entries {
+        transform: translateY(0);
     }
     .entry-basement {
         top: $toolbar-height;
@@ -7960,25 +7900,15 @@ Media Queries
     }
     .entries-inner {
         bottom: $bottom-toolbar-height - 1px;
-        .standalone-navigator & {
-            bottom: calc(#{$bottom-toolbar-height - 9px} + env(safe-area-inset-bottom));
-        }
+    }
+    &.standalone-navigator .entries-inner {
+        bottom: calc(#{$bottom-toolbar-height - 9px} + env(safe-area-inset-bottom));
     }
     .entry-header h1 {
         font-size: 1.6em;
     }
     .entry-header .feed-title {
         display: block !important;
-    }
-    .mobile-hide {
-        display: none !important;
-    }
-    .entry-inner {
-        padding: 15px;
-        .modal & {
-            padding-left: 0;
-            padding-right: 0;
-        }
     }
     .entries ul li .icon-entry-actions {
         display: none !important;
@@ -8021,24 +7951,41 @@ Media Queries
         .entries-column {
             border-right: none;
         }
-        .feeds-column, .view-toolbar, .feeds {
-            @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
-        }
-        .feeds .drawer {
-            @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-            ul:after {
-                border-top-color: $body-background-color;
-                .theme-night & {
-                    border-top-color: $body-background-color-night;
-                }
-                .theme-sunset & {
-                    border-top-color: $body-background-color-sunset;
-                }
-            }
-        }
     }
 }
 
+.one-up {
+    .entry-toolbar {
+        .site-info {
+            .feed-button {
+                margin-left: 0;
+                padding: 0 10px 0 5px;
+            }
+            .back-button {
+                display: flex;
+            }
+            .entry-feed-title {
+                display: none;
+            }
+        }
+    }
+    .entry-inner {
+        padding: 15px;
+        .modal & {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+    .mobile-hide {
+        display: none !important;
+    }
+    &.entry-selected {
+        .feeds-column,
+        .entries-column {
+            display: none;
+        }
+    }
+}
 
 /*------------------------------------------------------------------------------
 Add
@@ -8299,7 +8246,7 @@ button.close {
 }
 
 .swipe {
-    @media (max-width: 550px) {
+    @media (max-width: 750px) {
         .app-wrap {
             display: block !important;
             scroll-snap-type: x mandatory;
@@ -8319,23 +8266,35 @@ button.close {
     }
 }
 
-.two-panels {
-    .sidebar-column {
-        height: 100%;
-        width: 280px;
-        scroll-snap-type: x mandatory;
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
+.sidebar-column {
+    height: 100%;
+    width: 320px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    border-right: 1px solid transparent;
+    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    scroll-behavior: smooth;
+    .swipe & {
         white-space: nowrap;
-        .app-panel {
-            top: 0;
-            height: 100% !important;
-            width: 100% !important;
-            white-space: normal;
-            display: inline-block !important;
-            scroll-snap-align: start;
-        }
+        scroll-snap-type: x mandatory;
+    }
+    @media (max-width: 975px) {
+        width: 280px;
+    }
+}
+
+.two-up.swipe {
+    .app-panel {
+        top: 0;
+        height: 100% !important;
+        white-space: normal;
+        display: block;
+    }
+    .sidebar-column .app-panel {
+        display: inline-block !important;
+        scroll-snap-align: start;
+        width: 100% !important;
     }
 }
 
@@ -8452,14 +8411,14 @@ button.close {
     .modal-top & {
         border-radius: 0;
     }
-    @media (max-width: 550px) {
+    @media (max-width: 750px) {
         padding-left: 16px;
         padding-right: 16px;
     }
     h5 {
         font-size: 24px;
         margin: 0;
-        @media (max-width: 550px) {
+        @media (max-width: 750px) {
             font-size: 20px;
         }
     }
@@ -8477,7 +8436,7 @@ button.close {
     bottom: 0;
     width: 64px;
     right: 0;
-    @media (max-width: 550px) {
+    @media (max-width: 750px) {
         width: 51px;
     }
     svg {
@@ -8513,7 +8472,7 @@ button.close {
     padding-right: 24px;
     border-top: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
-    @media (max-width: 550px) {
+    @media (max-width: 750px) {
         padding: 16px;
     }
 }

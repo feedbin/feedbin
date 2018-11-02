@@ -44,13 +44,11 @@ $.extend feedbin,
     $("time.timeago").timeago()
 
   panelContainerClass: ->
-    hasTwoPanels = $('body').hasClass('two-panels')
+    hasTwoPanels = $('body').hasClass('two-up')
     if hasTwoPanels
       ".sidebar-column"
     else
       ".app-wrap"
-
-
 
   panelCount: ->
     body = $('body')
@@ -80,23 +78,6 @@ $.extend feedbin,
       if !body.hasClass("one-panel") && width < smallBreakpoint
         setPanels('one')
         body.addClass("has-offscreen-panels")
-
-    #
-    #
-    # modeClassName = 'two-panels'
-    # sidebarClassName = 'sidebar-column'
-    # hasTwoPanels = $('body').hasClass(modeClassName)
-    #
-    # if hasTwoPanels
-    #   if width <= 550 || width > 1024
-    #     console.log 'switching to three panels'
-    #     $(".#{sidebarClassName}").contents().unwrap()
-    #     $('body').removeClass(modeClassName)
-    # else
-    #   if width > 550 && width <= 1024
-    #     console.log 'switching to two panels'
-    #     $(".feeds-column, .entries-column").wrapAll("<div class='#{sidebarClassName}' />")
-    #     $('body').addClass(modeClassName)
 
   reselect: ->
     if feedbin.selectedSource && feedbin.selectedTag
@@ -2183,6 +2164,19 @@ $.extend feedbin,
         field = $('.modal-purpose-subscribe [data-behavior~=feeds_search_field]')
         field.val(subscription)
         field.closest("form").submit()
+
+    columnCount: ->
+      sidebarClassName = 'sidebar-column'
+
+      $(document).on "feedbin:panels:one", (event) ->
+        $(".#{sidebarClassName}").contents().unwrap()
+
+      $(document).on "feedbin:panels:two", (event) ->
+        if $('.sidebar-column').length == 0
+          $(".feeds-column, .entries-column").wrapAll("<div class='#{sidebarClassName}' />")
+
+      $(document).on "feedbin:panels:three", (event) ->
+        $(".#{sidebarClassName}").contents().unwrap()
 
     panels: ->
       feedbin.panelCount()
