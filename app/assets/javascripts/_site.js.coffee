@@ -1111,6 +1111,24 @@ $.extend feedbin,
 
   init:
 
+    columnCount: ->
+      sidebarClassName = 'sidebar-column'
+
+      $(document).on "feedbin:panels:one", (event) ->
+        $(".#{sidebarClassName}").contents().unwrap()
+
+      $(document).on "feedbin:panels:two", (event) ->
+        if $('.sidebar-column').length == 0
+          $(".feeds-column, .entries-column").wrapAll("<div class='#{sidebarClassName}' />")
+
+      $(document).on "feedbin:panels:three", (event) ->
+        $(".#{sidebarClassName}").contents().unwrap()
+
+    panels: ->
+      feedbin.panelCount()
+      throttled = _.throttle feedbin.panelCount, 100
+      $(window).on('resize', throttled);
+
     baseFontSize: ->
       element = document.createElement('div')
       content = document.createTextNode('content')
@@ -2165,23 +2183,6 @@ $.extend feedbin,
         field.val(subscription)
         field.closest("form").submit()
 
-    columnCount: ->
-      sidebarClassName = 'sidebar-column'
-
-      $(document).on "feedbin:panels:one", (event) ->
-        $(".#{sidebarClassName}").contents().unwrap()
-
-      $(document).on "feedbin:panels:two", (event) ->
-        if $('.sidebar-column').length == 0
-          $(".feeds-column, .entries-column").wrapAll("<div class='#{sidebarClassName}' />")
-
-      $(document).on "feedbin:panels:three", (event) ->
-        $(".#{sidebarClassName}").contents().unwrap()
-
-    panels: ->
-      feedbin.panelCount()
-      throttled = _.throttle feedbin.panelCount, 100
-      $(window).on('resize', throttled);
 
 $.each feedbin.preInit, (i, item) ->
   item()

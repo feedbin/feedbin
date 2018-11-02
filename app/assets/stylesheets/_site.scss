@@ -7842,7 +7842,7 @@ Media Queries
         display: block !important;
     }
     .ui-resizable-handle {
-        display: none;
+        display: none !important;
     }
     &.nothing-selected {
         .feeds-column {
@@ -8275,9 +8275,9 @@ button.close {
     border-right: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
     scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
     .swipe & {
         white-space: nowrap;
-        scroll-snap-type: x mandatory;
     }
     @media (max-width: 975px) {
         width: 280px;
