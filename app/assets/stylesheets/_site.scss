@@ -1,6 +1,8 @@
 /*------------------------------------------------------------------------------
 Variables
 ------------------------------------------------------------------------------*/
+$small-breakpoint: 700px;
+
 $toolbar-height: 41px;
 $font-stack: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $bottom-toolbar-height: 52px;
@@ -471,7 +473,7 @@ table {
     margin: 0 0 30px 0;
     padding: 0;
     list-style: none;
-    @media (max-width: 750px) {
+    @media (max-width: $small-breakpoint) {
         border-left: none;
         border-right: none;
         border-radius: 0;
@@ -492,7 +494,7 @@ table {
                 text-decoration: none;
                 @include settings-row;
                 color: $text-header-color;
-                @media (max-width: 750px) {
+                @media (max-width: $small-breakpoint) {
                     padding-right: 20px;
                 }
                 &:after {
@@ -505,7 +507,7 @@ table {
                     right: 15px;
                     top: 0;
                     bottom: 0;
-                    @media (max-width: 750px) {
+                    @media (max-width: $small-breakpoint) {
                         right: 5px;
                     }
                 }
@@ -518,7 +520,7 @@ table {
     @extend .pill-list;
     li {
         padding: 0;
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             padding-right: 0;
             padding-left: 0;
         }
@@ -553,7 +555,7 @@ table {
         }
     }
     .share-help {
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             padding-top: 20px;
         }
     }
@@ -579,7 +581,7 @@ table {
     input[type="password"],
     input[type="url"] {
         display: block;
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             max-width: 100%;
         }
     }
@@ -599,7 +601,7 @@ table {
     .half {
         padding-left: 5px;
         padding-right: 5px;
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             width: 100%;
             float: none;
         }
@@ -689,7 +691,7 @@ table {
         border-left: none;
         border-right: none;
     }
-    @media (max-width: 750px) {
+    @media (max-width: $small-breakpoint) {
         border: none;
         background-color: transparent;
         border-radius: 0;
@@ -702,18 +704,18 @@ table {
         background: image-url("icon-share-email.svg") 30px 3px no-repeat;
         background-size: 24px 16px;
         padding-left: 64px;
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             padding-left: 49px;
             background-position: 15px 3px;
         }
     }
-    @media (max-width: 750px) {
+    @media (max-width: $small-breakpoint) {
         padding-left: 15px;
         padding-right: 15px;
     }
 }
 .settings-outer {
-    @media (max-width: 750px) {
+    @media (max-width: $small-breakpoint) {
         padding: 0 15px;
     }
 }
@@ -2535,7 +2537,7 @@ $saved-search-control-height: 48px;
     .full-screen.touch & {
         bottom: $bottom-toolbar-height - 1px;
     }
-    @media (max-width: 750px) {
+    @media (max-width: $small-breakpoint) {
         bottom: $bottom-toolbar-height - 1px;
         .standalone-navigator & {
             bottom: calc(#{$bottom-toolbar-height - 9px} + env(safe-area-inset-bottom));
@@ -2602,7 +2604,7 @@ $saved-search-control-height: 48px;
     .full-screen.touch & {
         display: none;
     }
-    @media (max-width: 750px) {
+    @media (max-width: $small-breakpoint) {
         display: none;
     }
 }
@@ -3503,7 +3505,7 @@ $saved-search-control-height: 48px;
         }
     }
 
-    @media (max-width: 750px) {
+    @media (max-width: $small-breakpoint) {
         img[data-camo-src] {
             visibility: hidden;
             &.full-width, &.show {
@@ -4070,7 +4072,7 @@ $saved-search-control-height: 48px;
     }
     .tweet-body {
         padding-left: 57px;
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             padding-left: 0;
         }
     }
@@ -4209,7 +4211,7 @@ Settings
     }
 }
 
-@media (max-width: 750px) {
+@media (max-width: $small-breakpoint) {
     .settings-nav {
             display: none;
     }
@@ -4292,7 +4294,7 @@ body.settings {
         .settings-content-inner {
             max-width: 900px;
             padding: 0 20px 0 37px;
-            @media (max-width: 750px) {
+            @media (max-width: $small-breakpoint) {
                 padding: 0;
             }
         }
@@ -4343,7 +4345,7 @@ body.settings {
             display: flex;
             background-color: transparent;
             height: auto;
-            @media (max-width: 750px) {
+            @media (max-width: $small-breakpoint) {
                 display: none;
             }
         }
@@ -4365,7 +4367,7 @@ body.settings {
         max-width: 100%;
         padding-right: 50px !important;
         border-radius: 8px;
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             padding-right: 10px !important;
         }
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
@@ -4411,11 +4413,11 @@ body.settings {
             position: absolute;
             left: 30px;
             top: 15px;
-            @media (max-width: 750px) {
+            @media (max-width: $small-breakpoint) {
                 left: 15px;
             }
         }
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             padding-left: 35px;
         }
     }
@@ -4471,7 +4473,7 @@ body.settings {
         margin-bottom: 30px;
         top: 0;
         position: sticky;
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             background-color: $list-background-color;
         }
         .control-group {
@@ -4544,7 +4546,7 @@ body.settings {
             flex-grow: 1;
             margin: 0;
         }
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             h2 {
                 margin-bottom: 15px;
             }
@@ -4566,7 +4568,7 @@ body.settings {
             background-position: 11px 6px, 97% 6px;
             background-size: auto, 16px 16px;
         }
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             max-width: 100%
         }
     }
@@ -4581,7 +4583,7 @@ body.settings {
         background-color: $inset-bg-color;
         border: 1px solid #DCDEE0;
         padding: 15px 30px 12px 30px;
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             padding-left: 15px;
             padding-right: 15px;
             border-radius: 0;
@@ -4598,7 +4600,7 @@ body.settings {
             margin-top: 1px;
             margin-right: 18px;
         }
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             padding-left: 15px;
             padding-right: 15px;
             border-left: none;
@@ -4617,7 +4619,7 @@ body.settings {
             width: 215px;
             top: 25px;
             left: -81px;
-            @media (max-width: 750px) {
+            @media (max-width: $small-breakpoint) {
                 left: -10px;
                 li:first-child:after {
                     left: 15px;
@@ -4630,7 +4632,7 @@ body.settings {
             }
         }
         &.dropdown-right .dropdown-content {
-            @media (max-width: 750px) {
+            @media (max-width: $small-breakpoint) {
                 left: -100px;
                 li:first-child:after {
                     left: 175px;
@@ -4769,7 +4771,7 @@ body.settings {
             justify-content: space-between;
             display: flex;
             margin-bottom: 15px;
-            @media (max-width: 750px) {
+            @media (max-width: $small-breakpoint) {
                 flex-direction: column;
                 text-align: left;
                 padding: 0;
@@ -4785,7 +4787,7 @@ body.settings {
                 }
             }
             .stat-title {
-                @media (max-width: 750px) {
+                @media (max-width: $small-breakpoint) {
                     display: inline;
                     font-size: 16px;
                     @include color($text-color, $text-color-night, $text-color-sunset);
@@ -4798,7 +4800,7 @@ body.settings {
             }
             .stat-body {
                 margin: 0;
-                @media (max-width: 750px) {
+                @media (max-width: $small-breakpoint) {
                     display: inline;
                     font-weight: normal;
                 }
@@ -4850,7 +4852,7 @@ body.settings {
     .feed-form {
         border-radius: 0 0 8px 8px;
         border-top: none;
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             border-radius: 0;
         }
         li {
@@ -4876,7 +4878,7 @@ body.settings {
                 margin: 0 0 0 30px !important;
                 padding: 0;
             }
-            @media (max-width: 750px) {
+            @media (max-width: $small-breakpoint) {
                 padding-top: 15px;
                 width: $checkbox-offset-narrow;
                 .feeds-checkbox {
@@ -4893,7 +4895,7 @@ body.settings {
             &:hover {
                 text-decoration: none;
             }
-            @media (max-width: 750px) {
+            @media (max-width: $small-breakpoint) {
                 padding: 13px 15px 13px $checkbox-offset-narrow;
             }
         }
@@ -4984,7 +4986,7 @@ body.settings {
                 width: 100%;
                 height: 100%;
             }
-            @media (max-width: 750px) {
+            @media (max-width: $small-breakpoint) {
                 display: none;
             }
         }
@@ -5091,12 +5093,12 @@ input[type="checkbox"] + label .slider-checkbox {
         top: 2px;
         transition: left .2s ease;
     }
-    @media (max-width: 750px) {
+    @media (max-width: $small-breakpoint) {
         right: 15px;
     }
     .modal & {
         right: 24px;
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             right: 16px;
         }
     }
@@ -5165,7 +5167,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
         }
         &.text {
             padding: 0 30px;
-            @media (max-width: 750px) {
+            @media (max-width: $small-breakpoint) {
                 padding: 0 15px;
             }
             > input, > textarea {
@@ -5181,7 +5183,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
         }
         &.card-number-wrap {
             padding: 0 30px;
-            @media (max-width: 750px) {
+            @media (max-width: $small-breakpoint) {
                 padding: 0 15px;
             }
         }
@@ -5243,7 +5245,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
             background: image-url("icon-check.svg") 0 0 no-repeat;
             height: 12px;
             width: 15px;
-            @media (max-width: 750px) {
+            @media (max-width: $small-breakpoint) {
                 right: 22px;
             }
         }
@@ -5261,14 +5263,14 @@ input[type="checkbox"]:checked + label .slider-checkbox {
         }
         td:first-child {
             padding-left: 30px !important;
-            @media (max-width: 750px) {
+            @media (max-width: $small-breakpoint) {
                 padding-left: 15px !important;
             }
         }
         td:last-child {
             padding-right: 30px !important;
             text-align: right;
-            @media (max-width: 750px) {
+            @media (max-width: $small-breakpoint) {
                 padding-right: 15px !important;
             }
         }
@@ -5356,7 +5358,7 @@ table.small td {
     position: relative;
     display: flex;
     align-items: baseline;
-    @media (max-width: 750px) {
+    @media (max-width: $small-breakpoint) {
         padding-left: 15px;
         padding-right: 15px;
     }
@@ -5382,7 +5384,7 @@ table.small td {
     height: 134px;
     padding-left: 30px;
     padding-right: 30px;
-    @media (max-width: 750px) {
+    @media (max-width: $small-breakpoint) {
         padding-left: 15px;
         padding-right: 15px;
     }
@@ -5659,7 +5661,7 @@ Buttons
         padding-top: 7px;
         padding-bottom: 7px;
         margin-bottom: 10px;
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             display: none;
             &.previous_page, &.next_page {
                 display: inline-block;
@@ -8246,7 +8248,7 @@ button.close {
 }
 
 .swipe {
-    @media (max-width: 750px) {
+    @media (max-width: $small-breakpoint) {
         .app-wrap {
             display: block !important;
             scroll-snap-type: x mandatory;
@@ -8282,6 +8284,7 @@ button.close {
     @media (max-width: 975px) {
         width: 280px;
     }
+
 }
 
 .two-up.swipe {
@@ -8411,14 +8414,14 @@ button.close {
     .modal-top & {
         border-radius: 0;
     }
-    @media (max-width: 750px) {
+    @media (max-width: $small-breakpoint) {
         padding-left: 16px;
         padding-right: 16px;
     }
     h5 {
         font-size: 24px;
         margin: 0;
-        @media (max-width: 750px) {
+        @media (max-width: $small-breakpoint) {
             font-size: 20px;
         }
     }
@@ -8436,7 +8439,7 @@ button.close {
     bottom: 0;
     width: 64px;
     right: 0;
-    @media (max-width: 750px) {
+    @media (max-width: $small-breakpoint) {
         width: 51px;
     }
     svg {
@@ -8472,7 +8475,7 @@ button.close {
     padding-right: 24px;
     border-top: 1px solid transparent;
     @include border-color($border-color, $border-color-night, $border-color-sunset);
-    @media (max-width: 750px) {
+    @media (max-width: $small-breakpoint) {
         padding: 16px;
     }
 }

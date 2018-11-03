@@ -65,17 +65,17 @@ $.extend feedbin,
     if $('body').hasClass('app')
 
       largeBreakpoint = 1100
-      smallBreakpoint = 750
+      smallBreakpoint = 700
       width = $(window).width()
 
       if !body.hasClass("three-panels") && width > largeBreakpoint
         setPanels('three')
 
-      if !body.hasClass("two-panels") && width <= largeBreakpoint && width >= smallBreakpoint
+      if !body.hasClass("two-panels") && width <= largeBreakpoint && width > smallBreakpoint
         setPanels('two')
         body.addClass("has-offscreen-panels")
 
-      if !body.hasClass("one-panel") && width < smallBreakpoint
+      if !body.hasClass("one-panel") && width <= smallBreakpoint
         setPanels('one')
         body.addClass("has-offscreen-panels")
 
