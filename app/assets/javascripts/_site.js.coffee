@@ -43,13 +43,6 @@ $.extend feedbin,
     jQuery.timeago.settings.allowFuture = true
     $("time.timeago").timeago()
 
-  panelContainerClass: ->
-    hasTwoPanels = $('body').hasClass('two-up')
-    if hasTwoPanels
-      ".sidebar-column"
-    else
-      ".app-wrap"
-
   panelCount: ->
     body = $('body')
 
@@ -192,10 +185,27 @@ $.extend feedbin,
     $('[data-behavior~=feeds_target]').addClass('show')
 
   mobileView: ->
-    if $(window).width() <= 550
+    if $(window).width() <= 700
       true
     else
       false
+
+  scrollToPanel: (selector, animate = true) ->
+    containerClass = ".app-wrap"
+    hasTwoPanels = $('body').hasClass('two-up')
+    if hasTwoPanels
+      containerClass = ".sidebar-column"
+    offset = $(selector)[0].offsetLeft
+
+    if !animate
+      $(containerClass).css {'scroll-behavior': 'auto'}
+      $(containerClass).prop 'scrollLeft', offset
+      $(containerClass).css {'scroll-behavior': 'smooth'}
+    else
+      if feedbin.smoothScroll
+        $(containerClass).prop 'scrollLeft', offset
+      else
+        $(containerClass).animate({scrollLeft: offset}, {duration: 250})
 
   showPanel: (panel, state = true) ->
     feedbin.panel = panel
@@ -204,32 +214,21 @@ $.extend feedbin,
         window.history.replaceState({panel: 1}, document.title, "/");
       $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
       if feedbin.swipe
-        if feedbin.smoothScroll
-          $(feedbin.panelContainerClass()).prop 'scrollLeft', 0
-        else
-          $(feedbin.panelContainerClass()).animate({scrollLeft: 0}, {duration: 250})
+        feedbin.scrollToPanel('.feeds-column')
 
     else if panel == 2
       if state && feedbin.mobileView()
         window.history.pushState({panel: 2}, document.title, "/");
       $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
       if feedbin.swipe
-        offset = $('.entries-column')[0].offsetLeft
-        if feedbin.smoothScroll
-          $(feedbin.panelContainerClass()).prop 'scrollLeft', offset
-        else
-          $(feedbin.panelContainerClass()).animate({scrollLeft: offset}, {duration: 250})
+        feedbin.scrollToPanel('.entries-column')
 
     else if panel == 3
       if state && feedbin.mobileView()
         window.history.pushState({panel: 3}, document.title, "/");
       $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
       if feedbin.swipe
-        offset = $('.entry-column')[0].offsetLeft
-        if feedbin.smoothScroll
-          $(feedbin.panelContainerClass()).prop 'scrollLeft', offset
-        else
-          $(feedbin.panelContainerClass()).animate({scrollLeft: offset}, {duration: 250})
+        feedbin.scrollToPanel('.entry-column')
 
 
   showNotification: (text, timeout = 3000, href = '', error = false) ->
@@ -703,6 +702,8 @@ $.extend feedbin,
 
   toggleFullScreen: ->
     $('body').toggleClass('full-screen')
+    if !$('body').hasClass('full-screen')
+      feedbin.scrollToPanel('.entries-column', false)
     feedbin.measureEntryColumn()
 
   isFullScreen: ->
