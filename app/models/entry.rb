@@ -403,7 +403,12 @@ class Entry < ApplicationRecord
 
   def save_pages
     if self.tweet?
-      SavePages.perform_async(self.id)
+      cached = SavePages.new().perform(self.id, false)
+      if cached
+        Librato.increment "readability.cached"
+      else
+        SavePages.perform_async(self.id)
+      end
     end
   end
 end

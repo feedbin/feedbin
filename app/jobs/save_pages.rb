@@ -2,8 +2,9 @@ class SavePages
   include Sidekiq::Worker
   sidekiq_options queue: :low, retry: false
 
-  def perform(entry_id)
+  def perform(entry_id, parse = true)
     entry = Entry.find(entry_id)
+    cached = false
 
     tweets = [entry.main_tweet]
     tweets.push(entry.main_tweet.quoted_status) if entry.main_tweet.quoted_status?
@@ -15,8 +16,8 @@ class SavePages
 
       key = FeedbinUtils.page_cache_key(url)
       begin
-        page = Rails.cache.fetch(key)
-        if !page
+        cached, page = Rails.cache.fetch(key)
+        if !page && parse
           Librato.increment "readability.first_parse"
           page = MercuryParser.parse(url)
           Rails.cache.write(key, page)
@@ -30,6 +31,8 @@ class SavePages
 
     entry.content = ApplicationController.render template: "entries/_tweet_default.html.erb", locals: {entry: entry}, layout: nil
     entry.save!
+
+    cached.present?
   end
 
   def find_urls(tweets)
