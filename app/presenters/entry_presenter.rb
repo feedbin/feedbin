@@ -633,7 +633,7 @@ class EntryPresenter < BasePresenter
 
   def tweet_text(tweet, tag = true)
     text = entry.tweet_text(tweet)
-    if !text.empty?
+    if text.present?
       if tag
         @template.content_tag(:p, class: "tweet-text") do
           text.html_safe
