@@ -130,7 +130,7 @@ class EntriesController < ApplicationController
   end
 
   def view_link_cache
-    ViewLinkCache.perform_async(params[:url])
+    ViewLinkCache.perform_async(params[:url], Expires.expires_in(1.minute))
     head :ok
   end
 

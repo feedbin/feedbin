@@ -1,6 +1,6 @@
 class ViewLinkCacheMultiple
   include Sidekiq::Worker
-  sidekiq_options queue: :low, retry: false
+  sidekiq_options retry: false
 
   def perform(user_id, entry_ids)
     user = User.find(user_id)
@@ -12,11 +12,13 @@ class ViewLinkCacheMultiple
     entries.each do |entry|
       if inline_on.include?(entry.feed_id)
         url = entry.fully_qualified_url
-        key = FeedbinUtils.page_cache_key(url)
-        Rails.cache.fetch(key) do
-          Librato.increment "view_link_cache_multiple.cache_miss"
-          MercuryParser.parse(url)
-        end
+        expires_at = Expires.expires_in(5.minutes)
+        Sidekiq::Client.push(
+          "args" => [url, expires_at],
+          "class" => "ViewLinkCache",
+          "queue" => "low",
+          "retry" => false,
+        )
       end
     end
   end
