@@ -70,7 +70,7 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   if ENV["MEMCACHED_HOSTS"]
-    config.cache_store = :mem_cache_store, ENV["MEMCACHED_HOSTS"].split(",")
+    config.cache_store = :dalli_store, ENV["MEMCACHED_HOSTS"].split(",")
   end
 
   # Use a real queuing backend for Active Job (and separate queues per environment)

@@ -49,8 +49,8 @@ class ActionsPerform
         message = "#{message} #{actions}"
       end
       Throttle.throttle!("starred_entries:create:#{user.id}", 100, 1.day) do
-        StarredEntry.create_from_owners(user, @entry, message)
       end
+      StarredEntry.create_from_owners(user, @entry, message)
     end
   end
 
