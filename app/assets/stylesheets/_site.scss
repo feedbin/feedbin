@@ -827,8 +827,7 @@ Structure
     align-items: flex-start;
     scroll-behavior: smooth;
     .standalone-navigator.two-up & {
-        border-top: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border-top($border-color, $border-color-night, $border-color-sunset, true);
     }
     .feeds-column,
     .entries-column {

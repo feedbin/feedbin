@@ -136,14 +136,54 @@
 	}
 }
 
-@mixin border-color($day, $night, $sunset) {
-	border-color: $day;
-	.theme-night & {
-		border-color: $night;
-	}
-	.theme-sunset & {
-		border-color: $sunset;
-	}
+@mixin theme($property, $default, $night, $sunset, $root: false) {
+    #{$property}: $default;
+    @if $root {
+        @at-root {
+            #{selector-append(".theme-night", &)} {
+                #{$property}: $night;
+            }
+            #{selector-append(".theme-sunset", &)} {
+                #{$property}: $sunset;
+            }
+        }
+    }
+    @else {
+        .theme-night & {
+            #{$property}: $night;
+        }
+        .theme-sunset & {
+            #{$property}: $sunset;
+        }
+    }
+}
+
+@mixin border-color($args...) {
+    @include theme("border-color", $args...);
+}
+
+@mixin border-top($args...) {
+    border-top-width: 1px;
+    border-top-style: solid;
+    @include border-color($args...);
+}
+
+@mixin border-right($args...) {
+    border-right-width: 1px;
+    border-right-style: solid;
+    @include border-color($args...);
+}
+
+@mixin border-bottom($args...) {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    @include border-color($args...);
+}
+
+@mixin border-left($args...) {
+    border-left-width: 1px;
+    border-left-style: solid;
+    @include border-color($args...);
 }
 
 @mixin stroke($day, $night, $sunset) {
