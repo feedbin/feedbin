@@ -305,8 +305,7 @@ input[type="search"],
 input[type="tel"],
 input[type="color"],
 .uneditable-input {
-    border: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border($border-color, $border-color-night, $border-color-sunset);
     @include color($text-header-color, $text-header-color, $text-header-color);
     @include background-color($input-background-color, $input-background-color-night, $input-background-color-sunset);
     font-size: 14px;
@@ -406,8 +405,7 @@ table {
     padding: 8px;
     line-height: 1.428571429;
     vertical-align: top;
-    border-top: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-top($border-color, $border-color-night, $border-color-sunset);
 }
 
 .table thead > tr > th {
@@ -442,8 +440,7 @@ table {
 }
 
 .table-bordered {
-    border: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border($border-color, $border-color-night, $border-color-sunset);
 }
 
 .table-bordered > thead > tr > th,
@@ -452,8 +449,7 @@ table {
 .table-bordered > thead > tr > td,
 .table-bordered > tbody > tr > td,
 .table-bordered > tfoot > tr > td {
-    border: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border($border-color, $border-color-night, $border-color-sunset);
 }
 
 .table-rounded  {
@@ -731,8 +727,7 @@ Structure
     right: 0;
     top: 0;
     margin: 0;
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     height: $toolbar-height;
     input[type="search"] {
@@ -767,8 +762,7 @@ Structure
     right: 0;
     top: 0;
     margin: 0;
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     height: $toolbar-height;
     z-index: 1;
@@ -832,8 +826,7 @@ Structure
     .feeds-column,
     .entries-column {
         flex-grow: 0;
-        border-right: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border-right($border-color, $border-color-night, $border-color-sunset);
     }
     .feeds-column {
         width: 245px;
@@ -878,8 +871,7 @@ Structure
 
 .subscribe-toolbar {
     height: $toolbar-height;
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
     position: absolute;
     top: 0;
     left: 0;
@@ -967,8 +959,7 @@ Structure
     left: 0;
     right: 0;
     font-size: $base-size-10px;
-    border-top: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-top($border-color, $border-color-night, $border-color-sunset);
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     .standalone-navigator & {
         height: calc(#{$bottom-toolbar-height - 8px} + env(safe-area-inset-bottom));
@@ -1039,8 +1030,7 @@ Structure
 .view-toolbar {
     display: flex;
     height: $toolbar-height;
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
     position: absolute;
     left: 0;
     right: 0;
@@ -1055,8 +1045,7 @@ Structure
         text-transform: uppercase;
         font-weight: bold;
         user-select: none;
-        border-left: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border-left($border-color, $border-color-night, $border-color-sunset);
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         &.selected {
             @include color($text-color, $text-color-night, $text-color-sunset);
@@ -1263,8 +1252,7 @@ Structure
         ul {
             overflow: hidden;
             border-top: 1px solid transparent;
-            border-bottom: 1px solid transparent;
-            @include border-color($border-color, $border-color-night, $border-color-sunset);
+            @include border-bottom($border-color, $border-color-night, $border-color-sunset);
             padding: 0;
             @include arrow(
                 $x-position: 32px,
@@ -1463,8 +1451,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     top: 0;
     margin: 0;
     height: $toolbar-height;
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
     height: $toolbar-height;
     text-align: center;
     overflow: hidden;
@@ -1518,8 +1505,7 @@ $saved-search-control-height: 48px;
     .sort-control {
         height: $toolbar-height;
         position: relative;
-        border-bottom: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border-bottom($border-color, $border-color-night, $border-color-sunset);
     }
     .save-search {
         position: absolute;
@@ -1567,8 +1553,7 @@ $saved-search-control-height: 48px;
         padding: 8px;
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
         position: relative;
-        border-bottom: 1px solid $border-color;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border-bottom($border-color, $border-color-night, $border-color-sunset);
         input[type="text"] {
             height: 32px;
             width: 100%;
@@ -1691,9 +1676,8 @@ $saved-search-control-height: 48px;
         display: block;
         padding: $base-size-10px 10px $base-size-10px 0;
         margin-left: 38px;
-        border-bottom: 1px solid transparent;
         position: relative;
-        @include border-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+        @include border-bottom($list-background-color, $list-background-color-night, $list-background-color-sunset);
         > .favicon-wrap {
             display: none;
         }
@@ -1826,8 +1810,7 @@ $saved-search-control-height: 48px;
         margin-top: 8px !important;
         padding: 8px;
         border-radius: 4px;
-        border: 1px solid transparent;
-        @include border-color($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
+        @include border($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
     }
     .title, &.no-title .feed-title {
         font-size: $base-size-14px;
@@ -1895,8 +1878,7 @@ $saved-search-control-height: 48px;
     }
     &.selected {
         .wrap {
-            border-top: 1px solid transparent;
-            @include border-color($selected-off, $selected-off, $selected-off);
+            @include border-top($selected-off, $selected-off, $selected-off);
             margin-top: -1px;
             @include background-color($selected-off, $selected-off, $selected-off);
         }
@@ -2000,10 +1982,9 @@ $saved-search-control-height: 48px;
     }
     .mark-below-read {
         bottom: 0;
-        border-top: 1px solid transparent;
-        border-bottom: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
-                i:before {
+        @include border-top($border-color, $border-color-night, $border-color-sunset);
+        @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+        i:before {
             content: "↓";
             top: -2px;
         }
@@ -2139,9 +2120,8 @@ $saved-search-control-height: 48px;
     z-index: 3;
     width: 100%;
     height: $toolbar-height;
-    border-bottom: 1px solid transparent;
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
     .site-info {
         display: flex;
         align-items: stretch;
@@ -2154,8 +2134,7 @@ $saved-search-control-height: 48px;
     }
     .button-full-screen {
         display: none;
-        border-right: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border-right($border-color, $border-color-night, $border-color-sunset);
         svg {
             position: absolute;
             top: $base-button-position + 3;
@@ -2220,8 +2199,7 @@ $saved-search-control-height: 48px;
 .basement-toolbar {
     height: 49px;
     width: 100%;
-    border-bottom: 1px solid $border-color;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     @include arrow(
         $x-position: 63px,
@@ -2262,8 +2240,7 @@ $saved-search-control-height: 48px;
             text-align: center;
             justify-content: center;
             min-width: 50px;
-            border-right: 1px solid transparent;
-            @include border-color($border-color, $border-color-night, $border-color-sunset);
+            @include border-right($border-color, $border-color-night, $border-color-sunset);
             padding: 0 8px;
             &:hover {
                 text-decoration: none;
@@ -2286,8 +2263,7 @@ $saved-search-control-height: 48px;
         }
     }
     .setting-wrap {
-        border-right: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border-right($border-color, $border-color-night, $border-color-sunset);
         display: block;
         padding: 0;
     }
@@ -2407,9 +2383,8 @@ $saved-search-control-height: 48px;
             left: 13px;
             height: 32px;
             width: 32px;
-            border: 1px solid transparent;
             cursor: pointer;
-            @include border-color($border-color, $border-color-night, $border-color-sunset);
+            @include border($border-color, $border-color-night, $border-color-sunset);
             border-radius: 2px;
             &:before,
             &:after,
@@ -2612,9 +2587,8 @@ $saved-search-control-height: 48px;
     padding: 30px 0 43px 0;
     margin: 0 15px 20px 15px;
     display: block;
-    border-top: 1px solid transparent;
     position: relative;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-top($border-color, $border-color-night, $border-color-sunset);
     .next-icon {
         content: "";
         display: block;
@@ -2819,8 +2793,7 @@ $saved-search-control-height: 48px;
         }
     }
     .button-app-settings {
-        border-left: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border-left($border-color, $border-color-night, $border-color-sunset);
         svg {
             position: absolute;
             top: $base-button-position + 6;
@@ -2860,8 +2833,7 @@ $saved-search-control-height: 48px;
         display: none;
         width: 200px;
         border-radius: 4px;
-        border: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border($border-color, $border-color-night, $border-color-sunset);
         @include background-color(#FFF, $list-background-color-night, $list-background-color-sunset);
         box-shadow: $box-shadow-dropdown;
         position: absolute;
@@ -2887,9 +2859,8 @@ $saved-search-control-height: 48px;
                 padding: 10px 11px;
                 font-family: $font-stack;
                 font-weight: 400 !important;
-                border-bottom: 1px solid transparent;
                 text-align: left;
-                @include border-color($border-color, $border-color-night, $border-color-sunset);
+                @include border-bottom($border-color, $border-color-night, $border-color-sunset);
                 cursor: pointer;
                 &:hover, &.selected {
                     background-color: $selected !important;
@@ -3025,8 +2996,7 @@ $saved-search-control-height: 48px;
 .share-form {
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     padding: 17px 20px;
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
     @include arrow(
         $x-position: 241px,
         $y-position: -1px,
@@ -3076,8 +3046,7 @@ $saved-search-control-height: 48px;
             }
             &:last-child {
                 border-radius: 0 0 4px 4px;
-                border-bottom: 1px solid transparent;
-                @include border-color($border-color, $border-color-night, $border-color-sunset);
+                @include border-bottom($border-color, $border-color-night, $border-color-sunset);
             }
         }
         textarea {
@@ -4051,8 +4020,7 @@ $saved-search-control-height: 48px;
         margin-bottom: 1.1em;
         padding: 14px 16px;
         border-radius: 4px;
-        border: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border($border-color, $border-color-night, $border-color-sunset);
         .twitter-conversation-link {
             display: none;
         }
@@ -4089,8 +4057,7 @@ $saved-search-control-height: 48px;
     }
     .micropost + .micropost, .reply {
         padding-top: 1.1em;
-        border-top: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border-top($border-color, $border-color-night, $border-color-sunset);
     }
     .tweet-author-reply {
         border-top: none !important;
@@ -4719,8 +4686,7 @@ body.settings {
             padding: 15px 12px 30px 12px;
             border-radius: 8px;
             background-color: #FFF;
-            border: 1px solid $border-color;
-            @include border-color($border-color, $border-color-night, $border-color-sunset);
+            @include border($border-color, $border-color-night, $border-color-sunset);
             .graph-wrap {
                 flex: 1 1 auto;
                 padding-top: 25%;
@@ -4764,8 +4730,7 @@ body.settings {
         }
         .stats {
             margin-top: 1px;
-            border-bottom: 1px solid $border-color;
-            @include border-color($border-color, $border-color-night, $border-color-sunset);
+            @include border-bottom($border-color, $border-color-night, $border-color-sunset);
             padding: 0 0 15px 0;
             justify-content: space-between;
             display: flex;
@@ -5155,9 +5120,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
                 overflow: hidden;
                 white-space: nowrap;
                 @include settings-row;
-                border-bottom-width: 1px;
-                border-bottom-style: solid;
-                @include border-color($border-color, $border-color-night, $border-color-sunset);
+                @include border-bottom($border-color, $border-color-night, $border-color-sunset);
                 @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
                 &:focus {
                     box-shadow: $subtle-focus-glow;
@@ -5290,8 +5253,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
     display: inline-block;
     font-size: 16px;
     font-weight: bold;
-    border: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border($border-color, $border-color-night, $border-color-sunset);
     width: 32px;
     line-height: 32px;
     text-align: center;
@@ -5337,10 +5299,9 @@ table.small td {
 
 .filter-search-preview {
     .autocomplete-suggestions {
-        border-left: 1px solid transparent;
-        border-right: 1px solid transparent;
-        border-bottom: 1px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border-left($border-color, $border-color-night, $border-color-sunset);
+        @include border-right($border-color, $border-color-night, $border-color-sunset);
+        @include border-bottom($border-color, $border-color-night, $border-color-sunset);
     }
     .autocomplete-suggestion {
         color: #000;
@@ -6488,8 +6449,7 @@ Media Players
     font-family: $font-stack !important;
     font-weight: 400 !important;
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-    border-top: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-top($border-color, $border-color-night, $border-color-sunset);
     position: absolute;
     width: 100%;
     bottom: $bottom-toolbar-height;
@@ -8186,8 +8146,7 @@ button.close {
     font-size: 14px;
     padding: 6px 11px;
     @include color($text-color, $text-color-night, $text-color-sunset);
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 100%;
@@ -8273,8 +8232,7 @@ button.close {
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
-    border-right: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-right($border-color, $border-color-night, $border-color-sunset);
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
     .swipe & {
@@ -8406,8 +8364,7 @@ button.close {
     padding: 12px 24px 12px 24px;
     border-top-left-radius: $modal-border-radius;
     border-top-right-radius: $modal-border-radius;
-    border-bottom: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     .modal-top & {
         border-radius: 0;
@@ -8471,8 +8428,7 @@ button.close {
     padding: 16px;
     padding-left: 24px;
     padding-right: 24px;
-    border-top: 1px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-top($border-color, $border-color-night, $border-color-sunset);
     @media (max-width: $small-breakpoint) {
         padding: 16px;
     }

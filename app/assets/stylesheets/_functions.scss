@@ -162,6 +162,12 @@
     @include theme("border-color", $args...);
 }
 
+@mixin border($args...) {
+    border-width: 1px;
+    border-style: solid;
+    @include border-color($args...);
+}
+
 @mixin border-top($args...) {
     border-top-width: 1px;
     border-top-style: solid;
