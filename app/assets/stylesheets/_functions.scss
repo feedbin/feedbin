@@ -105,35 +105,30 @@
 	}
 }
 
-@mixin background-color($day, $night, $sunset) {
-	background-color: $day;
-	.theme-night & {
-		background-color: $night;
-	}
-	.theme-sunset & {
-		background-color: $sunset;
-	}
+@mixin share-icon($x-offset, $y-offset) {
+    background-repeat: no-repeat;
+    background-position: 30px + $x-offset 12px + $y-offset;
+    @media (max-width: 528px) {
+        background-position: 15px + $x-offset 12px + $y-offset;
+    }
 }
 
-@mixin color($day, $night, $sunset, $important:false) {
-	@if $important == true {
-    	color: $day !important;
-    	.theme-night & {
-    		color: $night !important;
-    	}
-    	.theme-sunset & {
-    		color: $sunset !important;
-    	}
-	}
-	@else {
-    	color: $day;
-    	.theme-night & {
-    		color: $night;
-    	}
-    	.theme-sunset & {
-    		color: $sunset;
-    	}
-	}
+@mixin settings-row {
+    padding: 15px 30px;
+    @media (max-width: 528px) {
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+    .modal & {
+        @include padding(14px, 24px, 14px, 24px, 14px, 16px, 14px, 16px);
+    }
+}
+
+@mixin padding($top, $right, $bottom, $left, $top-small, $right-small, $bottom-small, $left-small) {
+    padding: $top $right $bottom $left;
+    @media (max-width: 528px) {
+        padding: $top-small $right-small $bottom-small $left-small;
+    }
 }
 
 @mixin theme($property, $default, $night, $sunset, $root: false) {
@@ -156,6 +151,26 @@
             #{$property}: $sunset;
         }
     }
+}
+
+@mixin box-shadow($args...) {
+    @include theme("box-shadow", $args...);
+}
+
+@mixin color($args...) {
+    @include theme("color", $args...);
+}
+
+@mixin background($args...) {
+    @include theme("background", $args...);
+}
+
+@mixin background-color($args...) {
+    @include theme("background-color", $args...);
+}
+
+@mixin background-image($args...) {
+    @include theme("background-image", $args...);
 }
 
 @mixin border-color($args...) {
@@ -192,50 +207,10 @@
     @include border-color($args...);
 }
 
-@mixin stroke($day, $night, $sunset) {
-	stroke: $day;
-	.theme-night & {
-		stroke: $night;
-	}
-	.theme-sunset & {
-		stroke: $sunset;
-	}
+@mixin stroke($args...) {
+    @include theme("stoke", $args...);
 }
 
-@mixin fill($day, $night, $sunset) {
-	fill: $day;
-	.theme-night & {
-		fill: $night;
-	}
-	.theme-sunset & {
-		fill: $sunset;
-	}
+@mixin fill($args...) {
+    @include theme("fill", $args...);
 }
-
-@mixin share-icon($x-offset, $y-offset) {
-    background-repeat: no-repeat;
-    background-position: 30px + $x-offset 12px + $y-offset;
-    @media (max-width: 528px) {
-        background-position: 15px + $x-offset 12px + $y-offset;
-    }
-}
-
-
-@mixin settings-row {
-    padding: 15px 30px;
-    @media (max-width: 528px) {
-        padding-right: 15px;
-        padding-left: 15px;
-    }
-    .modal & {
-        @include padding(14px, 24px, 14px, 24px, 14px, 16px, 14px, 16px);
-    }
-}
-
-@mixin padding($top, $right, $bottom, $left, $top-small, $right-small, $bottom-small, $left-small) {
-    padding: $top $right $bottom $left;
-    @media (max-width: 528px) {
-        padding: $top-small $right-small $bottom-small $left-small;
-    }
-}
-

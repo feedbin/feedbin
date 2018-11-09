@@ -339,16 +339,10 @@ input[type="color"],
 }
 
 input.processing {
-    background-image: image-url("spinner-day.svg");
     background-position: 97% 7px;
     background-repeat: no-repeat;
     background-size: 16px 16px;
-    .theme-sunset & {
-        background-image: image-url("spinner-sunset.svg");
-    }
-    .theme-night & {
-        background-image: image-url("spinner-night.svg");
-    }
+    @include background-image(image-url("spinner-day.svg"), image-url("spinner-night.svg"), image-url("spinner-sunset.svg"))
 }
 
 select {
@@ -743,15 +737,13 @@ Structure
         line-height: 1;
         @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         &.processing {
-            background-image: image-url("favicon-search-light.svg"), image-url("spinner-day.svg");
             background-position: 14px ($base-button-position + 3), 97% ($base-button-position + 3);
             background-size: 14px 14px, 16px 16px;
-            .theme-sunset & {
-                background-image: image-url("favicon-search-light.svg"), image-url("spinner-sunset.svg");
-            }
-            .theme-night & {
-                background-image: image-url("favicon-search-light.svg"), image-url("spinner-night.svg");
-            }
+
+            $default: image-url("favicon-search-light.svg"), image-url("spinner-day.svg");
+            $night: image-url("favicon-search-light.svg"), image-url("spinner-sunset.svg");
+            $sunset: image-url("favicon-search-light.svg"), image-url("spinner-night.svg");
+            @include background-image($default, $night, $sunset);
         }
     }
 }
@@ -1315,23 +1307,10 @@ Structure
     .drop-hover > a {
         @include background-color($border-color, $border-color-night, $border-color-sunset);
     }
-
     li.drop-hover .drawer {
-        box-shadow: inset 0 0 0 3px $border-color;
-        .theme-night & {
-            box-shadow: inset 0 0 0 3px $border-color-night;
-        }
-        .theme-sunset & {
-            box-shadow: inset 0 0 0 3px $border-color-sunset;
-        }
+        @include box-shadow(inset 0 0 0 3px $border-color, inset 0 0 0 3px $border-color-night, inset 0 0 0 3px $border-color-sunset);
         ul:after {
-            border-top-color: $border-color;
-            .theme-night & {
-                border-top-color: $border-color-night;
-            }
-            .theme-sunset & {
-                border-top-color: $border-color-sunset;
-            }
+            @include theme("border-top-color", $border-color, $border-color-night, $border-color-sunset)
         }
     }
 }
@@ -1361,18 +1340,14 @@ Structure
         }
     }
     .entries & {
-        background-color: transparent;
-        box-shadow: none;
-        .theme-night & {
-            background-color: #FFF;
-            box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
-        }
+        @include background-color(transparent, #FFF, transparent);
+        @include box-shadow(none, 0px 1px 1px 0px rgba(0, 0, 0, 0.1), none);
     }
 }
 
 li.selected > a .favicon-wrap {
-    background-color: #FFF;
-    box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+    @include background-color(#FFF,#FFF,#FFF);
+    @include box-shadow(0px 1px 1px 0px rgba(0, 0, 0, 0.1), 0px 1px 1px 0px rgba(0, 0, 0, 0.1), 0px 1px 1px 0px rgba(0, 0, 0, 0.1));
     .feeds &.collection-favicon {
         background: transparent;
         box-shadow: none;
@@ -1622,15 +1597,11 @@ $saved-search-control-height: 48px;
         .entries-target {
             display: none;
         }
-        background: $body-background-color image-url("spinner-day.svg") 50% 25% no-repeat;
+        background-repeat: no-repeat;
+        background-position: 50% 25%;
+        @include background-image(image-url("spinner-day.svg"), image-url("spinner-night.svg"), image-url("spinner-sunset.svg"), true);
+        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset, true);
     }
-    .has-offscreen-panels.theme-sunset &.loading {
-        background: $body-background-color-sunset image-url("spinner-sunset.svg") 50% 25% no-repeat;
-    }
-    .has-offscreen-panels.theme-night &.loading {
-        background: $body-background-color-night image-url("spinner-night.svg") 50% 25% no-repeat;
-    }
-
     &.show-search-options {
         transform: translateY($toolbar-height);
         padding-bottom: $toolbar-height;
@@ -2160,16 +2131,8 @@ $saved-search-control-height: 48px;
         }
         .favicon-wrap {
             position: static;
-            box-shadow: none;
-            background-color: transparent;
-            .theme-night & {
-                background-color: #FFF;
-                box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
-            }
-            .theme-sunset & {
-                background-color: transparent;
-                box-shadow: none;
-            }
+            @include background-color(transparent, #FFF, transparent);
+            @include box-shadow(none, 0px 1px 1px 0px rgba(0, 0, 0, 0.1), none);
         }
         .entry-feed-title {
             line-height: 20px;
@@ -2445,17 +2408,11 @@ $saved-search-control-height: 48px;
 }
 
 .entry-column {
-    background-image: image-url("logo.svg");
     background-position: 50% 50%;
     background-repeat: no-repeat;
     background-size: 120px 120px;
     overflow: hidden;
-    .theme-night & {
-        background-image: image-url("logo-night.svg");
-    }
-    .theme-sunset & {
-        background-image: image-url("logo-sunset.svg");
-    }
+    @include background-image(image-url("logo.svg"), image-url("logo-night.svg"), image-url("logo-sunset.svg"));
     .bottom-toolbar {
         display: none;
     }
@@ -2679,13 +2636,12 @@ $saved-search-control-height: 48px;
     width: 270px;
     height: $toolbar-height - 1;
     z-index: 1;
-    background-image: linear-gradient(to right, rgba($body-background-color, 0) 0%, $body-background-color 10%);
-    .theme-night & {
-        background-image: linear-gradient(to right, rgba($body-background-color-night, 0) 0%, $body-background-color-night 10%);
-    }
-    .theme-sunset & {
-        background-image: linear-gradient(to right, rgba($body-background-color-sunset, 0) 0%, $body-background-color-sunset 10%);
-    }
+
+    $default: linear-gradient(to right, rgba($body-background-color, 0) 0%, $body-background-color 10%);
+    $night: linear-gradient(to right, rgba($body-background-color-night, 0) 0%, $body-background-color-night 10%);
+    $sunset: linear-gradient(to right, rgba($body-background-color-sunset, 0) 0%, $body-background-color-sunset 10%);;
+    @include background-image($default, $night, $sunset);
+
     form {
         margin: 0;
     }
@@ -3091,32 +3047,6 @@ $saved-search-control-height: 48px;
     }
 }
 
-.theme-night.full-screen .share-form:before {
-    border-top-color: black;
-}
-.theme-sunset.full-screen .share-form:before {
-    border-top-color: $arrow-shadow-color-sunset;
-}
-.theme-night.full-screen .share-form:after {
-    border-top-color: $body-background-color-night;
-}
-.theme-sunset.full-screen .share-form:after {
-    border-top-color: $body-background-color-sunset;
-}
-
-.theme-night.full-screen .basement-toolbar:before {
-    border-top-color: black;
-}
-.theme-sunset.full-screen .basement-toolbar:before {
-    border-top-color: $arrow-shadow-color-sunset;
-}
-.theme-night.full-screen .basement-toolbar:after {
-    border-top-color: $body-background-color-night;
-}
-.theme-sunset.full-screen .basement-toolbar:after {
-    border-top-color: $body-background-color-sunset;
-}
-
 @keyframes slidein {
   from {
       opacity: 0;
@@ -3126,45 +3056,38 @@ $saved-search-control-height: 48px;
   }
 }
 
-.entry-final-content {
-    a {
-        position: relative;
-        .link-actions {
-            z-index: 100;
-            display: inline-block;
-            position: relative;
-            content: "";
-            height: 18px;
-            width: 18px;
-            border: 1px solid $border-color;
-            border-radius: 3px;
-            cursor: pointer;
-            margin-right: -18px;
-            background: $body-background-color image-url("icon-caret.svg") 50% 50% no-repeat;
-            background-size: 80% 80%;
-            bottom: -2px;
-            box-shadow: 0 0 1px 0 $border-color;
-            animation-duration: .3s;
-            animation-name: slidein;
-            .dropdown-content {
-                top: 15px;
-            }
-            ul {
-                margin: 0 !important;
-            }
-            .theme-sunset & {
-                background-color: $body-background-color-sunset;
-                box-shadow: 0 0 1px 0 $border-color-sunset;
-                border-color: $border-color-sunset;
-            }
-            .theme-night & {
-                background-color: $body-background-color-night;
-                box-shadow: 0 0 1px 0 $border-color-night;
-                border-color: $border-color-night;
-            }
-        }
+.entry-final-content a {
+    position: relative;
+}
+
+.link-actions {
+    z-index: 100;
+    display: inline-block;
+    position: relative;
+    content: "";
+    height: 18px;
+    width: 18px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-right: -18px;
+    background-size: 80% 80%;
+    bottom: -2px;
+    animation-duration: .3s;
+    animation-name: slidein;
+    background-image: image-url("icon-caret.svg");
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    @include border($border-color, $border-color-night, $border-color-sunset);
+    @include box-shadow(0 0 1px 0 $border-color, 0 0 1px 0 $border-color-night, 0 0 1px 0 $border-color-sunset);
+    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    .dropdown-content {
+        top: 15px;
+    }
+    ul {
+        margin: 0 !important;
     }
 }
+
 .setting-view-link-0 {
     .view-link-app {
         display: block;
@@ -3325,16 +3248,10 @@ $saved-search-control-height: 48px;
 
     .inline-spinner {
         padding-left: 23px;
-        background-image: image-url("spinner-day.svg");
         background-position: 0 50%;
         background-size: 16px 16px;
         background-repeat: no-repeat;
-        .theme-night & {
-            background-image: image-url("spinner-night.svg");
-        }
-        .theme-sunset & {
-            background-image: image-url("spinner-sunset.svg");
-        }
+        @include background-image(image-url("spinner-day.svg"), image-url("spinner-night.svg"), image-url("spinner-sunset.svg"));
     }
 
     .diff-wrap {
@@ -3429,18 +3346,14 @@ $saved-search-control-height: 48px;
             position: absolute;
             display: block;
             content: "";
-            background: image-url("spinner-day.svg") 11px 11px no-repeat;
+            background-repeat: no-repeat;
             background-size: 16px 16px;
+            background-position: 11px 11px;
             width: 43px;
             left: 0px;
             top: 0;
             bottom: 0;
-            .theme-night & {
-                background-image: image-url("spinner-night.svg");
-            }
-            .theme-sunset & {
-                background-image: image-url("spinner-sunset.svg");
-            }
+            @include background-image(image-url("spinner-day.svg"), image-url("spinner-night.svg"), image-url("spinner-sunset.svg"));
         }
     }
 
@@ -5763,13 +5676,7 @@ Buttons
 Link Viewer
 ------------------------------------------------------------------------------*/
 .placeholder-content h1:empty, .placeholder-content p:empty {
-    background: rgba($text-color-light, .2);
-    .theme-sunset & {
-        background: rgba($text-color-light-sunset, .2);
-    }
-    .theme-night & {
-        background: rgba($text-color-light-night, .2);
-    }
+    @include background(rgba($text-color-light, .2), rgba($text-color-light-sunset, .2), rgba($text-color-light-night, .2));
 }
 .placeholder-content p:empty {
     height: 14px;
@@ -5785,13 +5692,9 @@ Link Viewer
 }
 .spinner {
     height: 50px;
-    background: image-url("spinner-day.svg") 50% 50% no-repeat;
-    .theme-sunset & {
-        background: image-url("spinner-sunset.svg") 50% 50% no-repeat;
-    }
-    .theme-night & {
-        background: image-url("spinner-night.svg") 50% 50% no-repeat;
-    }
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    @include background-image(image-url("spinner-day.svg"), image-url("spinner-night.svg"), image-url("spinner-sunset.svg"));
 }
 
 .view-link-error-container {
@@ -6367,15 +6270,7 @@ Media Players
             bottom: 0;
         }
         svg {
-            .theme-night & {
-                fill: $text-summary-color-night;
-            }
-            .theme-day & {
-                fill: $text-summary-color;
-            }
-            .theme-sunset & {
-                fill: $text-summary-color-sunset;
-            }
+            @include fill($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         }
     }
     .audio-text {
@@ -6421,15 +6316,7 @@ Media Players
             line-height: 0;
         }
         svg * {
-            .theme-night & {
-                fill: $text-summary-color-night;
-            }
-            .theme-day & {
-                fill: $text-summary-color;
-            }
-            .theme-sunset & {
-                fill: $text-summary-color-sunset;
-            }
+            @include fill($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         }
         button, a {
             display: flex;
@@ -7769,11 +7656,10 @@ Bigfoot
     }
 }
 .theme-night .bigfoot-footnote a {
-	color: $selected !important;
-	text-decoration: none !important;
+	color: #FFF !important;
 }
 .theme-night .bigfoot-footnote a:hover {
-    color: $selected-hover !important;
+    color: $selected !important;
     text-decoration: underline !important;
 }
 
