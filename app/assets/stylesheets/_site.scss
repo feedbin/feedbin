@@ -4246,10 +4246,10 @@ body.settings {
         max-width: 100%;
         padding-right: 50px !important;
         border-radius: 8px;
+        @include color($text-header-color, $text-header-color, $text-header-color-sunset);
         @media (max-width: $small-breakpoint) {
             padding-right: 10px !important;
         }
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
         &:focus {
             background-color: #FFF !important;
             border-color: $selected !important;
