@@ -1173,7 +1173,9 @@ $.extend feedbin,
         $('body').addClass('no-touch')
 
     isStandalone: ->
-      if 'standalone' of window.navigator && window.navigator.standalone
+      ipad = (navigator.userAgent.match(/iPad/i) != null)
+
+      if ipad || 'standalone' of window.navigator && window.navigator.standalone
         $('body').addClass('standalone-navigator')
 
     initSingletons: ->

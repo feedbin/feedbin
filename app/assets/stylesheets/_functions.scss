@@ -208,7 +208,7 @@
 }
 
 @mixin stroke($args...) {
-    @include theme("stoke", $args...);
+    @include theme("stroke", $args...);
 }
 
 @mixin fill($args...) {
