@@ -8413,7 +8413,7 @@ button.close {
             padding: 0;
             border: none;
             text-align: right;
-            color: red;
+            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
             background: transparent !important;
             font-weight: bold;
             font-size: 24px;
