@@ -812,8 +812,10 @@ Structure
     height: 100%;
     align-items: flex-start;
     scroll-behavior: smooth;
-    .standalone-navigator.two-up & {
-        @include border-top($border-color, $border-color-night, $border-color-sunset, true);
+    @media (min-width: 768px) {
+        .standalone-navigator & {
+            @include border-top($border-color, $border-color-night, $border-color-sunset, true);
+        }
     }
     .feeds-column,
     .entries-column {
