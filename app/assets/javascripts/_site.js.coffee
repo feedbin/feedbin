@@ -2192,4 +2192,8 @@ $.each feedbin.preInit, (i, item) ->
 
 jQuery ->
   $.each feedbin.init, (i, item) ->
-    item()
+    try
+      item()
+    catch error
+      if 'console' of window
+        console.log error
