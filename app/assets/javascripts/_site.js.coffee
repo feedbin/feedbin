@@ -1064,6 +1064,11 @@ $.extend feedbin,
       else
         $(".entry-column").addClass("narrow")
 
+      if width < 700
+        $(".entry-column").addClass("constrained")
+      else
+        $(".entry-column").removeClass("constrained")
+
   embeds: {}
 
   entries: {}

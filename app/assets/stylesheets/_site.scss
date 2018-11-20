@@ -1626,7 +1626,7 @@ $saved-search-control-height: 48px;
         position: absolute;
         top: -2px;
         left: -26px;
-        .has-offscreen-panels & {
+        .has-offscreen-panels.touch & {
             top: -1px;
         }
     }
@@ -1739,7 +1739,7 @@ $saved-search-control-height: 48px;
     .feed-title, .time {
         line-height: 1.3;
         font-size: $base-size-12px;
-        .has-offscreen-panels & {
+        .has-offscreen-panels.touch & {
             font-size: $base-size-14px;
             margin-bottom: $base-size-2px;
         }
@@ -1761,15 +1761,8 @@ $saved-search-control-height: 48px;
         margin: 0;
         @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
         display: block;
-        .has-offscreen-panels & {
+        .has-offscreen-panels.touch & {
             font-size: $base-size-15px;
-        }
-        @media (max-width: 975px) {
-            .two-up & {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
         }
     }
     .body {
@@ -1799,7 +1792,7 @@ $saved-search-control-height: 48px;
                 @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
             }
         }
-        .has-offscreen-panels & {
+        .has-offscreen-panels.touch & {
             font-size: $base-size-16px;
         }
     }
@@ -1809,7 +1802,7 @@ $saved-search-control-height: 48px;
             display: flex;
             top: 8px;
             z-index: 3;
-            .has-offscreen-panels & {
+            .has-offscreen-panels.touch & {
                 top: 9px;
             }
         }
@@ -7674,11 +7667,9 @@ Media Queries
     }
 }
 
-.has-offscreen-panels:not(.full-screen) {
-    @media (max-width: 960px) {
-        .entry-inner {
-            padding: 15px;
-        }
+.constrained {
+    .entry-inner {
+        padding: 15px;
     }
 }
 
@@ -7790,16 +7781,19 @@ Media Queries
     .entry-buttons {
         width: 250px;
     }
-    .feeds ul li .feed-link {
-        font-size: $base-size-16px;
-        padding-top: 11px;
-        padding-bottom: 11px;
-    }
     .app-wrap {
         .feeds-column,
         .entries-column {
             border-right: none;
         }
+    }
+}
+
+.has-offscreen-panels.touch {
+    .feeds ul li .feed-link {
+        font-size: $base-size-16px;
+        padding-top: 11px;
+        padding-bottom: 11px;
     }
 }
 
@@ -8126,8 +8120,8 @@ button.close {
     .swipe & {
         white-space: nowrap;
     }
-    @media (max-width: 975px) {
-        width: 280px;
+    @media (max-width: 800px) {
+        width: 300px;
     }
 }
 
