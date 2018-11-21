@@ -1160,6 +1160,7 @@ Structure
             }
             .collection-label-wrap {
                 min-width: 0;
+                flex: 1 1 auto;
             }
             .collection-label {
                 display: block;
@@ -1172,14 +1173,14 @@ Structure
                 }
             }
             .count-wrap {
-                margin-left: auto;
-                width: 40px;
+                margin-left: 5px;
+                min-width: 40px;
                 display: block;
                 text-overflow: ellipsis;
                 overflow: hidden;
                 white-space: nowrap;
                 text-align: right;
-                flex-shrink: 0;
+                flex: 0 1 auto;
             }
             .count {
                 @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
