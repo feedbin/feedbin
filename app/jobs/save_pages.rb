@@ -16,7 +16,7 @@ class SavePages
 
       key = FeedbinUtils.page_cache_key(url)
       begin
-        cached, page = Rails.cache.fetch(key)
+        cached = page = Rails.cache.fetch(key)
         if !page && parse
           Librato.increment "readability.first_parse"
           page = MercuryParser.parse(url)
