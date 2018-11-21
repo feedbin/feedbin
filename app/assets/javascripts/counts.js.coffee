@@ -7,13 +7,20 @@ class _Counts
   update: (options) ->
     @setData(options)
 
+  flatten: (data) ->
+    shouldFlatten = !!(data && data[0] && data[0][0] && data[0][0][0])
+    if shouldFlatten
+      [].concat.apply([], data)
+    else
+      data
+
   setData: (options) ->
     @tagMap = options.tag_map
     @savedSearches = options.saved_searches
     @collections =
-      unread: options.unread_entries
-      starred: options.starred_entries
-      updated: options.updated_entries
+      unread: @flatten(options.unread_entries)
+      starred: @flatten(options.starred_entries)
+      updated: @flatten(options.updated_entries)
     @counts = @allCounts()
 
   allCounts: ->

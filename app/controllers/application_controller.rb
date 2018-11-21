@@ -116,9 +116,9 @@ class ApplicationController < ActionController::Base
     @feeds = @user.feeds.where.not(id: excluded_feeds).includes(:favicon)
 
     @count_data = {
-      unread_entries: @user.unread_entries.pluck("feed_id, entry_id"),
-      starred_entries: @user.starred_entries.pluck("feed_id, entry_id"),
-      updated_entries: @user.updated_entries.pluck("feed_id, entry_id"),
+      unread_entries: @user.unread_entries.pluck("feed_id, entry_id").each_slice(10_000).to_a,
+      starred_entries: @user.starred_entries.pluck("feed_id, entry_id").each_slice(10_000).to_a,
+      updated_entries: @user.updated_entries.pluck("feed_id, entry_id").each_slice(10_000).to_a,
       tag_map: @user.taggings.build_map,
       entry_sort: @user.entry_sort,
     }
