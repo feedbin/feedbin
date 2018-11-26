@@ -541,7 +541,7 @@ class EntryPresenter < BasePresenter
     if entry.tweet.user.profile_image_uri? && entry.tweet.user.profile_image_uri_https("normal")
       @template.camo_link(entry.tweet.user.profile_image_uri_https("normal"))
     else
-      @template.image_url("favicon-profile-default.png ")
+      @template.image_url("favicon-profile-default.png")
     end
   end
 
@@ -550,7 +550,7 @@ class EntryPresenter < BasePresenter
     if tweet.user.profile_image_uri? && tweet.user.profile_image_uri_https(size)
       @template.camo_link(tweet.user.profile_image_uri_https("bigger"))
     else
-      @template.image_url("favicon-profile-default.png ")
+      @template.image_url("favicon-profile-default.png")
     end
   end
 
