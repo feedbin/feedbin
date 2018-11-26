@@ -747,20 +747,7 @@ Structure
     }
 }
 
-.account-toolbar {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    margin: 0;
-    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
-    height: $toolbar-height;
-    z-index: 1;
-}
-
 .subscribe-promo {
-    position: absolute;
     right: 60px;
     top: 7px;
     color: $selected;
@@ -811,11 +798,6 @@ Structure
     height: 100%;
     align-items: flex-start;
     scroll-behavior: smooth;
-    @media (min-width: 768px) {
-        .standalone-navigator & {
-            @include border-top($border-color, $border-color-night, $border-color-sunset, true);
-        }
-    }
     .feeds-column,
     .entries-column {
         flex-grow: 0;
@@ -895,9 +877,12 @@ Structure
     user-select: none;
     top: 0;
     right: 0;
-    height: $toolbar-height;
     width: $toolbar-height;
+    height: $toolbar-height;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .mobile-hamburger {
@@ -917,28 +902,28 @@ Structure
 }
 
 .hamburger-menu {
-    $bar-height: 3px;
     cursor: pointer;
-    top: $base-button-position + 8;
-    right: 19px;
     z-index: 2;
+    position: relative;
     &:before {
-        left: -7px;
+        left: -8px;
+        position: absolute;
     }
     &:after {
-        left: 7px;
+        position: absolute;
+        left: 8px;
     }
     .settings & {
         top: 15px;
         right: 15px;
     }
 }
+
 .hamburger-menu, .hamburger-menu:before, .hamburger-menu:after {
-    $dot: 4px;
+    $dot: 5px;
     width: $dot;
     height: $dot;
     border-radius: $dot/2;
-    position: absolute;
     content: '';
     display: inline-block;
     background-color: #b4b6b8;
@@ -2076,8 +2061,6 @@ $saved-search-control-height: 48px;
     }
 }
 
-
-
 .entry-toolbar {
     display: flex;
     position: absolute;
@@ -2089,6 +2072,7 @@ $saved-search-control-height: 48px;
     @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
     @include border-bottom($border-color, $border-color-night, $border-color-sunset);
     .site-info {
+        flex: 1 1 auto;
         display: flex;
         align-items: stretch;
     }
@@ -2624,24 +2608,13 @@ $saved-search-control-height: 48px;
 }
 
 .entry-buttons {
-    display: block;
-    position: absolute;
-    top: 0;
-    right: 0px;
-    width: 270px;
-    height: $toolbar-height - 1;
+    display: flex;
+    flex: 0 0 auto;
     z-index: 1;
-
-    $default: linear-gradient(to right, rgba($body-background-color, 0) 0%, $body-background-color 10%);
-    $night: linear-gradient(to right, rgba($body-background-color-night, 0) 0%, $body-background-color-night 10%);
-    $sunset: linear-gradient(to right, rgba($body-background-color-sunset, 0) 0%, $body-background-color-sunset 10%);;
-    @include background-image($default, $night, $sunset);
+    align-items: stretch;
 
     form {
         margin: 0;
-    }
-    .entry-button-wrap {
-        float: right;
     }
     .button-toggle-read {
         .circle {
@@ -2651,15 +2624,13 @@ $saved-search-control-height: 48px;
             height: 16px;
             width: 16px;
             border-radius: 16px;
-            position: absolute;
-            top: $base-button-position + 2;
-            left: 15px;
             .read & {
                 @include background-color(transparent, transparent, transparent);
             }
         }
     }
     .button-toggle-starred {
+
         .icon-star-on {
             display: none;
         }
@@ -2675,26 +2646,14 @@ $saved-search-control-height: 48px;
             }
         }
         svg {
-            position: absolute;
-            top: $base-button-position + 1;
-            left: 16px;
             height: 17px;
             width: 17px;
         }
     }
     .button-toggle-content {
         svg {
-            position: absolute;
-            top: $base-button-position + 2;
-            left: 12px;
-            height: 15px;
-            width: 20px;
-        }
-        svg {
-            top: $base-button-position + 3;
-            left: 16px;
-            height: 16px;
-            width: 14px;
+            height: 14px;
+            width: 16px;
         }
         &.loading {
             @keyframes flip {
@@ -2721,9 +2680,6 @@ $saved-search-control-height: 48px;
     }
     .button-toggle-share-menu {
         svg {
-            position: absolute;
-            top: $base-button-position + 2;
-            left: 11px;
             height: 16px;
             width: 16px;
         }
@@ -2737,39 +2693,51 @@ $saved-search-control-height: 48px;
         color: #333;
         svg {
             position: absolute;
-            top: $base-button-position + 2;
-            left: 11px;
             height: 16px;
             width: 16px;
         }
     }
     .button-app-settings {
-        @include border-left($border-color, $border-color-night, $border-color-sunset);
-        svg {
-            position: absolute;
-            top: $base-button-position + 6;
-            left: 14px;
-            height: 8px;
-            width: 14px;
-        }
         .dropdown-content {
             top: $toolbar-height - 6;
             right: 8px !important;
         }
+        .hamburger-menu-wrap {
+            width: 100%;
+        }
     }
 }
 
+
+.account-toolbar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    margin: 0;
+    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    height: $toolbar-height;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
 .entry-button {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: #ddd;
     z-index: 2;
     appearance: none;
     border: none;
     background: none;
-    width: 44px;
-    height: $toolbar-height - 1;
+    width: 45px;
+    height: $toolbar-height;
     padding: 0;
     position: relative;
+
     svg {
         pointer-events: none;
     }
