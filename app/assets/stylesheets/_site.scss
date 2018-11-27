@@ -1303,7 +1303,6 @@ Structure
 }
 
 .favicon-wrap {
-    display: block;
     height: 20px;
     width: 20px;
     background-color: #FFF;
@@ -1312,6 +1311,7 @@ Structure
     justify-content: center;
     box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
     border-radius: 1px;
+    flex: 0 0 auto;
     .favicon, svg, img {
         background-repeat: no-repeat;
         background-position: center center;
@@ -2075,6 +2075,7 @@ $saved-search-control-height: 48px;
         flex: 1 1 auto;
         display: flex;
         align-items: stretch;
+        min-width: 0;
     }
     .back-button {
         display: none;
@@ -2105,6 +2106,7 @@ $saved-search-control-height: 48px;
         background: none;
         padding: 0;
         cursor: pointer;
+        overflow: hidden;
         &:hover {
             text-decoration: none;
         }
@@ -2119,11 +2121,13 @@ $saved-search-control-height: 48px;
             font-size: $base-size-14px;
             @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
             text-decoration: none;
-            white-space: nowrap;
             user-select: none;
             appearance: none !important;
             border: none;
             background: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
 }
@@ -2612,6 +2616,8 @@ $saved-search-control-height: 48px;
     flex: 0 0 auto;
     z-index: 1;
     align-items: stretch;
+    justify-content: flex-end;
+    margin-left: 10px;
 
     form {
         margin: 0;
@@ -6022,6 +6028,18 @@ a:hover.danger {
     }
 }
 
+.theme-color-body {
+    width: 5px;
+    height: 5px;
+    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+}
+
+.theme-color-border {
+    width: 5px;
+    height: 5px;
+    @include background-color($border-color, $border-color-night, $border-color-sunset);
+}
+
 
 
 /*------------------------------------------------------------------------------
@@ -7648,7 +7666,9 @@ Media Queries
     .audio-panel {
         bottom: 0;
     }
-    .mobile-hamburger,
+    .mobile-hamburger {
+        display: flex !important;
+    }
     .desktop-hide {
         display: block !important;
     }
@@ -7748,9 +7768,6 @@ Media Queries
     }
     .toolbar-tag {
         display: none !important;
-    }
-    .entry-buttons {
-        width: 250px;
     }
     .app-wrap {
         .feeds-column,

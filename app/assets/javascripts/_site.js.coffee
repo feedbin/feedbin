@@ -108,14 +108,25 @@ $.extend feedbin,
     canvas.parentNode.removeChild(canvas)
     "rgba(#{data.data[0]}, #{data.data[1]}, #{data.data[2]}, #{data.data[3]})"
 
-  setNativeTitleColor: (rgb, timeout = 1) ->
-    ctx = document.createElement('canvas').getContext('2d')
-    ctx.strokeStyle = rgb
-    hex = ctx.strokeStyle
-    feedbin.themeColorHex = hex
-    setTimeout ( ->
-      feedbin.nativeMessage("performAction", { action: "titleColor", color: hex })
-    ), timeout
+  setNativeTheme: (calculateOverlay = false) ->
+    if feedbin.native && feedbin.data && feedbin.data.theme
+      message = {
+        action: "titleColor"
+      }
+      themeColors = ["body", "border"]
+      for themeColor in themeColors
+        color = $("[data-theme-#{themeColor}]").css("backgroundColor")
+        if calculateOverlay
+          color = feedbin.calculateColor(color, "rgba(0, 0, 0, 0.5)")
+
+        ctx = document.createElement('canvas').getContext('2d')
+        ctx.strokeStyle = color
+        hex = ctx.strokeStyle
+        message[themeColor] = hex
+
+      setTimeout ( ->
+        feedbin.nativeMessage("performAction", message)
+      ), 1
 
   nativeMessage: (name, data) ->
     if typeof(webkit) != "undefined" && webkit.messageHandlers && webkit.messageHandlers.turbolinksDemo
@@ -1684,17 +1695,6 @@ $.extend feedbin,
         event.preventDefault()
         return
 
-    titleBarColor: ->
-      if feedbin.native && feedbin.data.theme
-        rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
-        feedbin.setNativeTitleColor(rgb)
-
-      $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
-        feedbin.data.theme = $(@).data('theme')
-        if feedbin.native
-          rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
-          feedbin.setNativeTitleColor(rgb)
-
     theme: ->
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
         theme = $(@).data('theme')
@@ -1705,6 +1705,11 @@ $.extend feedbin,
         event.preventDefault()
 
         return
+
+    titleBarColor: ->
+      feedbin.setNativeTheme()
+      $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
+        feedbin.setNativeTheme()
 
     showEntryActions: ->
       $(document).on 'click', '[data-behavior~=show_entry_actions]', (event) ->
@@ -1933,6 +1938,36 @@ $.extend feedbin,
           deferRequestBy: 50
           autoSelectFirst: true
 
+    nativeResize: ->
+
+      hasBorder = (element) ->
+        element.css("border-right-style") == "solid"
+
+      borderPostion = (element) ->
+        element.offset().left + element.outerWidth() - 1
+
+      sendPositions = ->
+        message = {
+          action: "borderLayout"
+          borders: []
+        }
+
+        columns = ["feeds-column", "entries-column", "sidebar-column"]
+        for column in columns
+          element = $(".#{column}")
+          if hasBorder(element)
+            postion = borderPostion(element)
+            if postion > 0
+              message.borders.push(postion)
+
+        feedbin.nativeMessage("performAction", message)
+
+
+      if feedbin.native
+        sendPositions()
+        $(window).on 'resize', () ->
+          sendPositions()
+
     entriesMaxWidth: ->
       container = $('[data-behavior~=entries_max_width]')
       resize = ->
@@ -2073,9 +2108,7 @@ $.extend feedbin,
 
     modalShowHide: ->
       $(document).on 'show.bs.modal', () ->
-        if feedbin.data && feedbin.data.theme && background = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
-          color = feedbin.calculateColor(background, "rgba(0, 0, 0, 0.5)")
-          feedbin.setNativeTitleColor(color)
+          feedbin.setNativeTheme(true)
 
       $(document).on 'shown.bs.modal', () ->
         feedbin.faviconColors($(".modal"))
@@ -2085,9 +2118,7 @@ $.extend feedbin,
 
       $(document).on 'hidden.bs.modal', () ->
         $("body").removeClass("modal-shown")
-        if feedbin.data && feedbin.data.theme
-          rgb = $("[data-theme=#{feedbin.data.theme}]").css("backgroundColor")
-          feedbin.setNativeTitleColor(rgb)
+        feedbin.setNativeTheme()
 
     modalScrollPosition: ->
       $('.modal').on 'scroll', (event) ->
