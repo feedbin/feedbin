@@ -294,7 +294,7 @@ class Entry < ApplicationRecord
       begin
         before = ContentFormatter.format!(self.original["content"], self)
         after = ContentFormatter.format!(self.content, self)
-        result = HTMLDiff::Diff.new(before, after).inline_html
+        result = HTMLDiff::Diff.new("<div>#{before}</div>", "<div>#{after}</div>").inline_html
         result = (result.length > after.length) ? result.html_safe : after.html_safe
       rescue
       end
