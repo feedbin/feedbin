@@ -113,7 +113,7 @@ $.extend feedbin,
       message = {
         action: "titleColor"
       }
-      themeColors = ["body", "border"]
+      themeColors = ["border", "body"]
       for themeColor in themeColors
         color = $("[data-theme-#{themeColor}]").css("backgroundColor")
         if calculateOverlay
@@ -123,6 +123,7 @@ $.extend feedbin,
         ctx.strokeStyle = color
         hex = ctx.strokeStyle
         message[themeColor] = hex
+        message["color"] = hex
 
       setTimeout ( ->
         feedbin.nativeMessage("performAction", message)
