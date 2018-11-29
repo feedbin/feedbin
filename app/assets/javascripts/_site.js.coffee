@@ -130,10 +130,12 @@ $.extend feedbin,
       ), 1
 
   nativeMessage: (name, data) ->
-    if typeof(webkit) != "undefined" && webkit.messageHandlers && webkit.messageHandlers.turbolinksDemo
-      webkit.messageHandlers.turbolinksDemo.postMessage
-        name: name
-        data: data
+    if typeof(webkit) != "undefined"
+      if webkit.messageHandlers
+        if handler = webkit.messageHandlers.feedbin || webkit.messageHandlers.turbolinksDemo
+          handler.postMessage
+            name: name
+            data: data
 
   scrollBars: ->
     width = 100
