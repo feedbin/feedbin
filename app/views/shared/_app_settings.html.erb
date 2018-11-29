@@ -1,5 +1,13 @@
-<div class="entry-button-wrap">
-    <div class="dropdown-wrap dropdown-right button-app-settings">
+<div class="entry-button-wrap settings-button-wrap">
+    <%= link_to settings_path, class: "app-settings-button" do %>
+        <div class="entry-button">
+            <div class="hamburger-menu-wrap" data-behavior="settings_button_dropdown" title="Settings" role="button">
+                <div class="hamburger-menu"></div>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="dropdown-wrap dropdown-right web-settings-button">
         <div class="entry-button">
             <div class="hamburger-menu-wrap" data-behavior="toggle_dropdown" title="Settings" role="button">
                 <div class="hamburger-menu"></div>

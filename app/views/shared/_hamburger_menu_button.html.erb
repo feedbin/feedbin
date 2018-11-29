@@ -1,3 +1,10 @@
-<div class="hamburger-menu-wrap mobile-hamburger" data-behavior="open_modal" data-modal-target="settings_nav" role="button">
-    <div class="hamburger-menu"></div>
+<div class="settings-button-wrap">
+    <%= link_to settings_path, class: "app-settings-button" do %>
+        <div class="hamburger-menu-wrap">
+            <div class="hamburger-menu"></div>
+        </div>
+    <% end %>
+    <div class="web-settings-button hamburger-menu-wrap mobile-hamburger" data-behavior="open_modal" data-modal-target="settings_nav" role="button">
+        <div class="hamburger-menu"></div>
+    </div>
 </div>
