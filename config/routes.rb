@@ -50,6 +50,13 @@ Rails.application.routes.draw do
   # Error log
   post "apple_push_notifications/:version/log", as: :apple_push_notifications_log, to: "apple_push_notifications#log"
 
+  resource :app, only: [] do
+    member do
+      get :login
+      get :redirect
+    end
+  end
+
   resources :tags, only: [:index, :show, :update, :destroy]
   resources :billing_events, only: [:show]
   resources :in_app_purchases, only: [:show]
