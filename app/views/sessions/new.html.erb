@@ -4,13 +4,7 @@
     <div class="box">
         <%= render partial: 'shared/flash', locals: {flash: flash} %>
         <h3 class="box-header">Welcome Back</h3>
-        <%
-          options = {class: 'combined-form', novalidate: true}
-          if native?
-            options[:remote] = 'true'
-          end
-        %>
-        <%= form_tag sessions_path, options do %>
+        <%= form_tag sessions_path, {class: 'combined-form', novalidate: true} do %>
             <p>
                 <%= email_field_tag :email, params[:email], autofocus: true, tabindex: '1', placeholder: 'Email' %>
                 <%= password_field_tag :password, nil, tabindex: '2', placeholder: 'Password' %>

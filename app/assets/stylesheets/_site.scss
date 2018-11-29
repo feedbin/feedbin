@@ -883,6 +883,9 @@ Structure
     display: flex;
     align-items: center;
     justify-content: center;
+    .native & {
+        display: none !important;
+    }
 }
 
 .mobile-hamburger {
@@ -2711,6 +2714,9 @@ $saved-search-control-height: 48px;
         .hamburger-menu-wrap {
             width: 100%;
         }
+        .native & {
+            display: none !important;
+        }
     }
 }
 
@@ -4061,11 +4067,10 @@ Settings
 
 @media (max-width: $small-breakpoint) {
     .settings-nav {
-            display: none;
+        display: none;
     }
-    .mobile-hamburger,
     .desktop-hide {
-        display: block !important;
+        display: block;
     }
 }
 
@@ -7667,7 +7672,7 @@ Media Queries
         bottom: 0;
     }
     .mobile-hamburger {
-        display: flex !important;
+        display: flex;
     }
     .desktop-hide {
         display: block !important;
