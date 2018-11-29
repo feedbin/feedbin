@@ -108,7 +108,7 @@ $.extend feedbin,
     canvas.parentNode.removeChild(canvas)
     "rgba(#{data.data[0]}, #{data.data[1]}, #{data.data[2]}, #{data.data[3]})"
 
-  setNativeTheme: (calculateOverlay = false) ->
+  setNativeTheme: (calculateOverlay = false, timeout = 10) ->
     if feedbin.native && feedbin.data && feedbin.data.theme
       message = {
         action: "titleColor"
@@ -127,7 +127,7 @@ $.extend feedbin,
 
       setTimeout ( ->
         feedbin.nativeMessage("performAction", message)
-      ), 1
+      ), timeout
 
   nativeMessage: (name, data) ->
     if typeof(webkit) != "undefined"
@@ -2121,7 +2121,7 @@ $.extend feedbin,
 
       $(document).on 'hidden.bs.modal', () ->
         $("body").removeClass("modal-shown")
-        feedbin.setNativeTheme()
+        feedbin.setNativeTheme(false, 40)
 
     modalScrollPosition: ->
       $('.modal').on 'scroll', (event) ->
