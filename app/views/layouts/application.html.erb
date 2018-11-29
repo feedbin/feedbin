@@ -27,5 +27,6 @@
     <body class="<%= @class %>" data-behavior="<%= @behavior %>">
         <%= content_for?(:content) ? yield(:content) : yield %>
         <%= render partial: "shared/modals/modal" %>
+        <%= render partial: "shared/theme_colors" %>
     </body>
 </html>
