@@ -72,6 +72,28 @@ $.extend feedbin,
         setPanels('one')
         body.addClass("has-offscreen-panels")
 
+  setNativeBorders: ->
+    hasBorder = (element) ->
+      element.css("border-right-style") == "solid"
+
+    borderPostion = (element) ->
+      element.offset().left + element.outerWidth() - 1
+
+    message = {
+      action: "borderLayout"
+      borders: []
+    }
+
+    columns = ["feeds-column", "entries-column", "sidebar-column"]
+    for column in columns
+      element = $(".#{column}")
+      if hasBorder(element)
+        postion = borderPostion(element)
+        if postion > 0
+          message.borders.push(postion)
+
+    feedbin.nativeMessage("performAction", message)
+
   reselect: ->
     if feedbin.selectedSource && feedbin.selectedTag
       $("[data-tag-id=#{feedbin.selectedTag}]").find("[data-feed-id=#{feedbin.selectedSource}]").addClass("selected")
@@ -719,6 +741,7 @@ $.extend feedbin,
     if !$('body').hasClass('full-screen')
       feedbin.scrollToPanel('.entries-column', false)
     feedbin.measureEntryColumn()
+    feedbin.setNativeBorders()
 
   isFullScreen: ->
     $('body').hasClass('full-screen')
@@ -1942,34 +1965,10 @@ $.extend feedbin,
           autoSelectFirst: true
 
     nativeResize: ->
-
-      hasBorder = (element) ->
-        element.css("border-right-style") == "solid"
-
-      borderPostion = (element) ->
-        element.offset().left + element.outerWidth() - 1
-
-      sendPositions = ->
-        message = {
-          action: "borderLayout"
-          borders: []
-        }
-
-        columns = ["feeds-column", "entries-column", "sidebar-column"]
-        for column in columns
-          element = $(".#{column}")
-          if hasBorder(element)
-            postion = borderPostion(element)
-            if postion > 0
-              message.borders.push(postion)
-
-        feedbin.nativeMessage("performAction", message)
-
-
       if feedbin.native
-        sendPositions()
+        feedbin.setNativeBorders()
         $(window).on 'resize', () ->
-          sendPositions()
+          feedbin.setNativeBorders()
 
     entriesMaxWidth: ->
       container = $('[data-behavior~=entries_max_width]')

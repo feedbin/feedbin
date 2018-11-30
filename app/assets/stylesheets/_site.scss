@@ -2079,6 +2079,9 @@ $saved-search-control-height: 48px;
         .full-screen & {
             display: block;
         }
+        .native & {
+            border: none;
+        }
     }
     .feed-button {
         margin-left: 13px;
