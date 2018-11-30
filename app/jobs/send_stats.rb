@@ -13,6 +13,13 @@ class SendStats
       active_users_count
       queue_depth
       clear_empty_jobs
+      sidekiq_queue_depth
+    end
+  end
+
+  def sidekiq_queue_depth
+    Sidekiq::Queue.all.each do |queue|
+      Librato.measure "sidekiq.queue_depth.#{queue.name}", queue.size
     end
   end
 
