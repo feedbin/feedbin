@@ -168,6 +168,9 @@ body {
     @include respond-to(hidpi) {
         -webkit-font-smoothing: antialiased;
     }
+    &.native.app {
+        overflow: hidden;
+    }
 }
 
 a {
@@ -2474,6 +2477,9 @@ $saved-search-control-height: 48px;
 .entry-inner {
     min-height: 100%;
     transition: max-width .3s linear;
+}
+
+.feeds-target, .entries-target, .entry-inner {
     .touch & {
         min-height: 101%;
     }
