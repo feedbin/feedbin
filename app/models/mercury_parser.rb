@@ -1,5 +1,8 @@
 class MercuryParser
-  BASE_URL = "https://mercury.postlight.com/parser"
+
+  host = ENV["MERCURY_HOST"] || "mercury.postlight.com"
+
+  BASE_URL = "https://#{host}/parser"
 
   attr_reader :url
 
