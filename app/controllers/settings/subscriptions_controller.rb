@@ -57,7 +57,7 @@ class Settings::SubscriptionsController < ApplicationController
     ids = @user.subscriptions.pluck(:feed_id)
     key = Digest::SHA1.hexdigest(ids.join)
 
-    subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}:3", expires_in: 24.hours) do
+    subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}:4", expires_in: 24.hours) do
       tags = @user.tags_on_feed
       subscriptions = @user.subscriptions.select("subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host").joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}").includes(feed: [:favicon])
       feed_ids = subscriptions.map(&:feed_id)
@@ -114,6 +114,9 @@ class Settings::SubscriptionsController < ApplicationController
       array.push subscription.feed_url
       array.push subscription.muted_status
       array.push subscription.tag_names
+      if subscription.feed.newsletter?
+        array.push "newsletter"
+      end
     end.compact.join
 
     {
