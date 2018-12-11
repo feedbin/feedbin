@@ -168,6 +168,9 @@ body {
     @include respond-to(hidpi) {
         -webkit-font-smoothing: antialiased;
     }
+    &.native.app {
+        overflow: hidden;
+    }
 }
 
 a {
@@ -2474,6 +2477,9 @@ $saved-search-control-height: 48px;
 .entry-inner {
     min-height: 100%;
     transition: max-width .3s linear;
+}
+
+.feeds-target, .entries-target, .entry-inner {
     .touch & {
         min-height: 101%;
     }
@@ -5030,6 +5036,11 @@ input[type="checkbox"]:checked + label .slider-checkbox {
                     box-shadow: $subtle-focus-glow;
                 }
             }
+            textarea,
+            input,
+            #card-element {
+                @include background-color(#fff, #fff, #fff);
+            }
         }
         &.text {
             padding: 0 30px;
@@ -5043,7 +5054,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
                 border-width: 1px;
                 border-style: solid;
                 border-radius: 8px;
-                padding: 10px 12px;
+                padding: 8px 10px;
                 &:focus {
                     box-shadow: none;
                     border: 1px solid $selected;
@@ -7930,8 +7941,9 @@ button.close {
             flex-direction: column;
             text-align: center;
             input {
+                padding: 8px 10px;
+                border-radius: 8px;
                 background-color: #FFF;
-                border-radius: 4px;
             }
         }
         .feed-url {

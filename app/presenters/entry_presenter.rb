@@ -126,7 +126,7 @@ class EntryPresenter < BasePresenter
     elsif sanitized_title.present?
       text = sanitized_title
     elsif !entry.summary.blank?
-      text = entry.summary.html_safe
+      text = entry.summary
       length = 240
     end
 
@@ -364,7 +364,7 @@ class EntryPresenter < BasePresenter
 
   def summary
     if !entry.tweet && title?
-      summary = entry.summary.truncate(120, separator: " ", omission: "…").html_safe
+      summary = entry.summary.truncate(120, separator: " ", omission: "…")
       @template.content_tag(:p, summary, class: "body")
     end
   rescue
