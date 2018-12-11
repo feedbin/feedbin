@@ -22,7 +22,9 @@ class Embed::Instagram
   end
 
   def profile_image_url
-    author_data.dig("user", "profile_pic_url")
+    page_data.scan(/"profile_pic_url":"([^"]+)","username":"#{Regexp.quote(screen_name)}"/).flatten.first
+  rescue
+    nil
   end
 
   def content
@@ -32,7 +34,6 @@ class Embed::Instagram
   private
 
   OEMBED_URL = "https://api.instagram.com/oembed"
-  PROFILE_URL = "https://i.instagram.com/api/v1/users/%d/info/"
 
   def shortcode
     @shortcode ||= URI.parse(@url).path.split("/").last
@@ -50,19 +51,14 @@ class Embed::Instagram
           omitscript: true,
         },
       }
-      JSON.parse(URLCache.new(OEMBED_URL, options).body)
+      response = URLCache.new(OEMBED_URL, options).body
+      JSON.parse(response)
     end
   end
 
-  def author_data
-    @author_data ||= begin
-      options = {
-        params: {
-          url: url,
-          omitscript: true,
-        },
-      }
-      JSON.parse(URLCache.new((PROFILE_URL % author_id), options).body)
+  def page_data
+    @page_data ||= begin
+      URLCache.new(permalink).body
     end
   end
 end
