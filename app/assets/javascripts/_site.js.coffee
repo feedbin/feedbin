@@ -72,17 +72,17 @@ $.extend feedbin,
         setPanels('one')
         body.addClass("has-offscreen-panels")
 
-  setNativeBorders: ->
+  setNativeBorders: (zIndex = "front") ->
     hasBorder = (element) ->
       element.css("border-right-style") == "solid"
 
     borderPostion = (element) ->
       element.offset().left + element.outerWidth() - 1
 
-    message = {
+    message =
       action: "borderLayout"
       borders: []
-    }
+      zIndex: zIndex
 
     columns = ["feeds-column", "entries-column", "sidebar-column"]
     for column in columns
@@ -132,20 +132,21 @@ $.extend feedbin,
 
   setNativeTheme: (calculateOverlay = false, timeout = 10) ->
     if feedbin.native && feedbin.data && feedbin.data.theme
+      statusBar = if $("body").hasClass("theme-night") then "lightContent" else "default"
       message = {
-        action: "titleColor"
+        action: "titleColor",
+        statusBar: statusBar
       }
-      themeColors = ["border", "body"]
-      for themeColor in themeColors
-        color = $("[data-theme-#{themeColor}]").css("backgroundColor")
+      sections = ["border", "body"]
+      for section in sections
+        color = $("[data-theme-#{section}]").css("backgroundColor")
         if calculateOverlay
           color = feedbin.calculateColor(color, "rgba(0, 0, 0, 0.5)")
 
         ctx = document.createElement('canvas').getContext('2d')
         ctx.strokeStyle = color
         hex = ctx.strokeStyle
-        message[themeColor] = hex
-        message["color"] = hex
+        message[section] = hex
 
       setTimeout ( ->
         feedbin.nativeMessage("performAction", message)
@@ -182,14 +183,26 @@ $.extend feedbin,
 
     result
 
-  scrollToTop: ->
+  range: (element) ->
+    start = element.offset().left
+    width = element.outerWidth()
+    end = start + width
+    [start, end]
+
+  inRange: (element, xCoordinate) ->
+    range = feedbin.range element
+    if xCoordinate >= range[0] && xCoordinate <= range[1]
+      return true
+    else
+      return false
+
+  scrollToTop: (xCoordinate) ->
     element = null
-    if feedbin.panel == 1
-      element = $(".feeds")
-    else if feedbin.panel == 2
-      element = $(".entries")
-    else if feedbin.panel == 3
-      element = $(".entry-content")
+    sections = [$(".feeds"), $(".entries"), $(".entry-content")]
+
+    for section in sections
+      if section.length > 0 && feedbin.inRange(section, xCoordinate)
+        element = section
 
     if element
       element.css
@@ -2110,6 +2123,7 @@ $.extend feedbin,
 
     modalShowHide: ->
       $(document).on 'show.bs.modal', () ->
+          feedbin.setNativeBorders("back")
           feedbin.setNativeTheme(true)
 
       $(document).on 'shown.bs.modal', () ->
@@ -2120,6 +2134,7 @@ $.extend feedbin,
 
       $(document).on 'hidden.bs.modal', () ->
         $("body").removeClass("modal-shown")
+        feedbin.setNativeBorders()
         feedbin.setNativeTheme(false, 40)
 
     modalScrollPosition: ->
@@ -2157,8 +2172,8 @@ $.extend feedbin,
           feedbin.panel = 3
 
     statsBarTouched: ->
-      $(document).on 'feedbin:native:statusbartouched', (event) ->
-        feedbin.scrollToTop()
+      $(document).on 'feedbin:native:statusbartouched', (event, xCoordinate) ->
+        feedbin.scrollToTop(xCoordinate)
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
