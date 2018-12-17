@@ -1,9 +1,8 @@
 require "bcrypt"
 
 module LoginHelper
-
   def login_as(user)
-    if @request.subdomain == 'api'
+    if @request.subdomain == "api"
       @request.headers[:authorization] = ActionController::HttpAuthentication::Basic.encode_credentials(user.email, default_password)
     else
       cookies.signed[:auth_token] = user.auth_token

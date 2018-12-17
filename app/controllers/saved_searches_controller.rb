@@ -1,5 +1,4 @@
 class SavedSearchesController < ApplicationController
-
   def show
     @user = current_user
     @saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
@@ -9,8 +8,9 @@ class SavedSearchesController < ApplicationController
     params[:query] = @saved_search.query
 
     begin
-      @entries = Entry.scoped_search(params, @user)
-      @page_query = @entries
+      query = Entry.scoped_search(params, @user)
+      @entries = query.records
+      @page_query = query
     rescue => exception
       Honeybadger.notify(exception)
       @entries = Entry.none
@@ -18,13 +18,13 @@ class SavedSearchesController < ApplicationController
 
     @append = params[:page].present?
 
-    @type = 'saved_search'
+    @type = "saved_search"
     @data = nil
 
     @collection_title = @saved_search.name
 
     respond_to do |format|
-      format.js { render partial: 'shared/entries' }
+      format.js { render partial: "shared/entries" }
     end
   end
 
@@ -48,10 +48,14 @@ class SavedSearchesController < ApplicationController
     get_feeds_list
   end
 
+  def count
+    @user = current_user
+    @count = Entry.saved_search_count(@user) || []
+  end
+
   private
 
   def saved_search_params
     params.require(:saved_search).permit(:query, :name)
   end
-
 end

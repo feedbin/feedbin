@@ -2,7 +2,7 @@ class Share::Service
   def authenticated_share(klass, params)
     response = {}
     entry = Entry.find(params[:entry_id])
-    params['entry_url'] = entry.fully_qualified_url
+    params["entry_url"] = entry.fully_qualified_url
     if klass.active?
       # child classes using this need to implement add
       status = add(params)
@@ -11,13 +11,14 @@ class Share::Service
       elsif status == 401
         klass.remove_access!
         response[:url] = Rails.application.routes.url_helpers.sharing_services_path
-        response[:message] = "#{klass.label} authentication error."
+        response[:error] = "#{klass.label} authentication error."
       else
-        response[:message] = "There was a problem connecting to #{klass.label}."
+        response[:error] = "There was a problem connecting to #{klass.label}."
+        ShareRetry.perform_in(1.minute, klass.id, params)
       end
     else
       response[:url] = Rails.application.routes.url_helpers.sharing_services_path
-      response[:message] = "#{klass.label} authentication error."
+      response[:error] = "#{klass.label} authentication error."
     end
     response
   end
@@ -26,7 +27,8 @@ class Share::Service
     entry = Entry.find(params[:entry_id])
     if params[:readability] == "on"
       url = entry.fully_qualified_url
-      content_info = Rails.cache.fetch("content_view:#{Digest::SHA1.hexdigest(url)}:v6") do
+      key = FeedbinUtils.page_cache_key(url)
+      content_info = Rails.cache.fetch(key) do
         MercuryParser.parse(url)
       end
       content = content_info.content
@@ -41,10 +43,7 @@ class Share::Service
   end
 
   def render_popover_template(url)
-    action_view = ActionView::Base.new()
-    action_view.view_paths = ActionController::Base.view_paths
-    action_view.extend(ApplicationHelper)
-    action_view.render(template: "supported_sharing_services/popover.js.erb", locals: {url: url})
+    ApplicationController.render template: "supported_sharing_services/popover.js.erb", locals: {url: url}, layout: nil
   end
 
   def link_options(entry)
@@ -52,5 +51,4 @@ class Share::Service
      label: @klass.label,
      html_options: @klass.html_options}
   end
-
 end

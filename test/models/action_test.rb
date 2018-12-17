@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ActionTest < ActiveSupport::TestCase
   def setup
@@ -24,37 +24,46 @@ class ActionTest < ActiveSupport::TestCase
 
   test "must save to elasticsearch" do
     feed = feeds(:daring_fireball)
-    action = @user.actions.create(feed_ids: [feed.id])
+    action = Sidekiq::Testing.inline! do
+      @user.actions.create(feed_ids: [feed.id])
+    end
     assert percolator_found?(action)
   end
 
   test "recognizes tags" do
     feed = feeds(:daring_fireball)
-    tagging = feed.tag('Favs', @user, false).first
+    tagging = feed.tag("Favs", @user, false).first
     action = @user.actions.create(tag_ids: [tagging.tag.id])
     assert action.computed_feed_ids.include?(feed.id)
   end
 
   test "doesn't percolate when empty" do
     feed = feeds(:daring_fireball)
-    action = @user.actions.create(feed_ids: [feed.id])
+    action = Sidekiq::Testing.inline! do
+      @user.actions.create(feed_ids: [feed.id])
+    end
     assert percolator_found?(action)
     action.automatic_modification = true
-    action.update(feed_ids: [])
+    Sidekiq::Testing.inline! do
+      action.update(feed_ids: [])
+    end
     assert_not percolator_found?(action)
   end
 
   test "doesn't percolate when empty iOS" do
-    action = @user.actions.create(query: "hello", all_feeds: true, action_type: :notifier)
+    action = Sidekiq::Testing.inline! do
+      @user.actions.create(query: "hello", all_feeds: true, action_type: :notifier)
+    end
     assert percolator_found?(action)
-    action.update(query: "")
+    Sidekiq::Testing.inline! do
+      action.update(query: "")
+    end
     assert_not percolator_found?(action)
   end
 
   private
 
   def percolator_found?(action)
-    action._percolator && action._percolator['found'] == true
+    action._percolator && action._percolator["found"] == true
   end
-
 end

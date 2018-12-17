@@ -14,7 +14,7 @@ class Import < ApplicationRecord
     feeds = parse_opml
     create_tags(feeds)
     feeds.each do |feed|
-      self.import_items << ImportItem.new(details: feed, item_type: 'feed')
+      self.import_items << ImportItem.new(details: feed, item_type: "feed")
     end
   end
 
@@ -27,8 +27,7 @@ class Import < ApplicationRecord
 
   def create_tags(feeds)
     tags = Set.new
-    feeds.each {|feed| tags.add(feed[:tag]) unless feed[:tag].nil? }
-    tags.each {|tag| Tag.where(name: tag).first_or_create! }
+    feeds.each { |feed| tags.add(feed[:tag]) unless feed[:tag].nil? }
+    tags.each { |tag| Tag.where(name: tag).first_or_create! }
   end
-
 end

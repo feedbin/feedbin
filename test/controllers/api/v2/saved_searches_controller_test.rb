@@ -1,13 +1,12 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::SavedSearchesControllerTest < ApiControllerTestCase
-
   setup do
     @user = users(:new)
     @feeds = create_feeds(@user)
     @entries = @user.entries
     @entry = @entries.first
-    @saved_search = @user.saved_searches.create(query: "\"#{@entry.title}\"", name: 'search')
+    @saved_search = @user.saved_searches.create(query: "\"#{@entry.title}\"", name: "search")
   end
 
   test "should get index" do
@@ -24,7 +23,7 @@ class Api::V2::SavedSearchesControllerTest < ApiControllerTestCase
     assert_response :success
     assert_equal Set.new([@entry.id]), Set.new(parse_json)
 
-    get :show, params: {id: @saved_search, include_entries: 'true'}, format: :json
+    get :show, params: {id: @saved_search, include_entries: "true"}, format: :json
     assert_response :success
     assert_equal_ids [@entry], parse_json
   end
@@ -32,15 +31,15 @@ class Api::V2::SavedSearchesControllerTest < ApiControllerTestCase
   test "should create saved search" do
     api_content_type
     login_as @user
-    assert_difference('SavedSearch.count', 1) do
-      post :create, params: {saved_search: {query: 'test', name: 'test'}}, format: :json
+    assert_difference("SavedSearch.count", 1) do
+      post :create, params: {saved_search: {query: "test", name: "test"}}, format: :json
       assert_response :success
     end
   end
 
   test "should destroy saved search" do
     login_as @user
-    assert_difference('SavedSearch.count', -1) do
+    assert_difference("SavedSearch.count", -1) do
       delete :destroy, params: {id: @saved_search}, format: :json
       assert_response :success
     end

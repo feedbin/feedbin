@@ -12,9 +12,9 @@ class FeedStat < ApplicationRecord
       results = ActiveRecord::Base.connection.execute(query)
       results.each do |result|
         if entry_counts.has_key?(feed_id)
-          entry_counts[feed_id] << result['entries_count'].to_i
+          entry_counts[feed_id] << result["entries_count"].to_i
         else
-          entry_counts[feed_id] = [result['entries_count'].to_i]
+          entry_counts[feed_id] = [result["entries_count"].to_i]
         end
       end
     end
@@ -25,7 +25,7 @@ class FeedStat < ApplicationRecord
     max_query = "SELECT COALESCE(MAX(entries_count), 0) as max FROM feed_stats WHERE feed_id IN(?) and day >= ?"
     max_query = ActiveRecord::Base.send(:sanitize_sql_array, [max_query, feed_ids, start_date])
     max = ActiveRecord::Base.connection.execute(max_query)
-    max.first['max'].to_i
+    max.first["max"].to_i
   end
 
   def self.relative_entry_count_query
@@ -50,5 +50,4 @@ class FeedStat < ApplicationRecord
       ON (date = results.day)
     eos
   end
-
 end

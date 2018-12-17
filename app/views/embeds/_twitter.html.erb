@@ -1,0 +1,37 @@
+<div class="tweet-wrap system-content">
+    <div class="tweet quoted-tweet">
+        <header class="tweet-header">
+            <div class="profile-wrap">
+                <%= link_to tweet.author_url, target: "_blank", title: "View on Twitter", class: "profile-image" do %>
+                    <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), camo_link(tweet.profile_image_url), size: "47x47", alt: "") %>
+                <% end %>
+                <div class="profile-info">
+                    <h1>
+                        <a href="<%= tweet.permalink %>" target="_blank" class="link">
+                            <strong><%= tweet.name %></strong>
+                            <%= tweet.screen_name %>
+                        </a>
+                        <span class="tweet-actions">
+                            <%= link_to tweet.permalink, target: "_blank", title: "View on Twitter", class: "twitter-link embed" do %>
+                                <%= svg_tag "icon-twitter" %>
+                            <% end %>
+                        </span>
+                    </h1>
+                    <p class="post-meta">
+                        <%= link_to tweet.permalink, target: "_blank", title: "View on Twitter" do %>
+                            <time datetime="<%= tweet.date.iso8601 %>">
+                                <%= tweet.date.to_s(:full_human) %>
+                            </time>
+                        <% end %>
+                    </p>
+                </div>
+            </div>
+        </header>
+        <div class="tweet-body">
+            <%= tweet.content.html_safe %>
+            <% if tweet.image_url %>
+                <p><a href="<%= tweet.image_url %>"><img src="<%= camo_link(tweet.image_url) %>"></a></p>
+            <% end %>
+        </div>
+    </div>
+</div>

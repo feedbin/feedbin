@@ -1,5 +1,3 @@
-require_relative '../../lib/batch_jobs'
-
 class SetPriceTier
   include Sidekiq::Worker
   include BatchJobs
@@ -19,5 +17,4 @@ class SetPriceTier
   def _enqueue
     enqueue_all(User, self.class)
   end
-
 end

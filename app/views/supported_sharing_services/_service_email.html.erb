@@ -1,8 +1,8 @@
 <% if status == :active %>
     <div class="service-header">
-      <% from_email = (sharing_service.email_address.present?) ? sharing_service.email_address : @user.email %>
-      <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
-      <small class="show-service-options pad-top">Emails will be sent from <%= sharing_service.email_name %> &lt;<%= from_email %>&gt;, <a href="#" data-behavior="show_service_options">edit</a>.</small>
+        <% from_email = (sharing_service.email_address.present?) ? sharing_service.email_address : @user.email %>
+        <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
+        <small class="show-service-options pad-top">Emails will be sent from <%= sharing_service.email_name %> &lt;<%= from_email %>&gt;, <a href="#" data-behavior="show_service_options">edit</a>.</small>
     </div>
     <%= render partial: "supported_sharing_services/email_form", locals: {sharing_service: sharing_service, record: sharing_service} %>
 <% else %>

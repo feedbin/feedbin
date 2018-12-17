@@ -4,18 +4,16 @@
         <small class="show-service-options pad-top">URL: <%= sharing_service.url %>, <a href="#" data-behavior="show_service_options">edit</a>.</small>
     </div>
     <%= link_to 'Deactivate', sharing_service_path(sharing_service), class: 'button-text-secondary list-action show-service-options', method: :delete, data: { confirm: 'Are you sure you want to delete this sharing service?' } %>
-
     <div class="service-options-wrap">
         <div class="service-options">
             <%= form_for(sharing_service) do |f| %>
-            <%= f.text_field :label, placeholder: 'Label', class: 'no-margin' %>
-            <%= f.url_field :url, placeholder: 'URL' %>
-            <div class="button-wrap">
-                <%= button_tag 'Cancel', type: "button", class: 'button button-secondary button-inline', data: {behavior: "hide_service_options"} %>
-                <%= submit_tag "Save", class: 'button button-primary-plain' %>
-            </div>
+                <%= f.text_field :label, placeholder: 'Label', class: 'no-margin' %>
+                <%= f.url_field :url, placeholder: 'URL' %>
+                <div class="button-wrap">
+                    <%= button_tag 'Cancel', type: "button", class: 'button button-secondary button-inline', data: {behavior: "hide_service_options"} %>
+                    <%= submit_tag "Save", class: 'button button-primary-plain' %>
+                </div>
             <% end %>
         </div>
     </div>
 </li>
-

@@ -1,18 +1,17 @@
 <% if tag.blank? %>
-<div class="toolbar-button" data-behavior="unsubscribe" disabled="disabled">
-  <div class="toolbar-button-inner">
-    <%= render partial: "shared/svg/trash" %>
-  </div>
-  Delete
-</div>
+    <button class="toolbar-button" data-behavior="unsubscribe" disabled="disabled">
+        <div class="toolbar-button-inner">
+            <%= render partial: "shared/svg/trash" %>
+        </div>
+        Delete
+    </button>
 <% else %>
-  <%= link_to tag_path(tag),
-        method: :delete, remote: true, class: 'toolbar-button', title: 'Delete tag',
-        data: { behavior: 'unsubscribe', confirm: "Are you sure you want to delete #{tag.name}?" } do %>
-    <span class="toolbar-button-inner">
-      <%= render partial: "shared/svg/trash" %>
-    </span>
-    Delete
-  <% end %>
+    <%= form_tag tag_path(tag), remote: true, method: "delete", data: {behavior: "unsubscribe"} do %>
+        <button title="Delete tag" class="toolbar-button" type="submit" data-confirm="Are you sure you want to delete <%= tag.name %>?">
+            <div class="toolbar-button-inner">
+                <%= render partial: "shared/svg/trash" %>
+            </div>
+            Delete
+        </button>
+    <% end %>
 <% end %>
-

@@ -1,5 +1,5 @@
 <%= form_tag unread_entries_entry_path(entry.id), remote: true, data: {behavior: 'toggle_read', entry_id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}, class: 'entry-button-wrap' do %>
-  <button class="entry-button button-toggle-read" title="Mark as read/unread">
-      <span class="circle"></span>
-  </button>
+    <button class="entry-button button-toggle-read" title="Mark as read/unread">
+        <span class="circle"></span>
+    </button>
 <% end %>

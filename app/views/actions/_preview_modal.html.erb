@@ -1,0 +1,32 @@
+<% results ||= action.results %>
+
+<% content_for :modal_content, "", flush: true %>
+
+<% content_for :modal_title, flush: true do %>
+    Action Results
+<% end %>
+
+<% content_for :modal_body, flush: true do %>
+    <div class="action-description">
+        <div class="content">
+            <%= render partial: 'text_description', locals: {action: action} %>
+        </div>
+    </div>
+    <p><%= number_to_human(results.total) %> <%= 'result'.pluralize(results.total) %></p>
+    <div class="entries action-preview-entries">
+        <ul>
+            <%= render partial: "entries/entry", collection: results %>
+        </ul>
+    </div>
+    <script>
+        $('.modal').on('hidden.bs.modal', function (event) {
+            $("body > [data-modal-purpose=action_preview]").remove();
+        });
+        feedbin.localizeTime();
+    </script>
+<% end %>
+
+<% content_for :modal_footer, "", flush: true %>
+
+<%= render template: "layouts/modal", locals: {purpose: "action_preview"} %>
+

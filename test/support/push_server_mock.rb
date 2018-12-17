@@ -1,5 +1,4 @@
 class PushServerMock
-
   attr_reader :status, :count
 
   def initialize(status)
@@ -25,7 +24,6 @@ class PushServerMock
   end
 
   class ResponseMock
-
     def initialize(status, notification)
       @status = status
       @notification = notification
@@ -46,7 +44,5 @@ class PushServerMock
     def on(event)
       yield self
     end
-
   end
-
 end

@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::FeedsEntriesControllerTest < ApiControllerTestCase
-
   setup do
     @user = users(:new)
     @feeds = create_feeds(@user)
@@ -21,5 +20,4 @@ class Api::V2::FeedsEntriesControllerTest < ApiControllerTestCase
     get :show, params: {feed_id: entry.feed_id, id: entry}, format: :json
     assert_response :success
   end
-
 end

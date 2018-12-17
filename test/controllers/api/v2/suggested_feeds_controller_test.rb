@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::SuggestedFeedsControllerTest < ApiControllerTestCase
-
   setup do
     @user = users(:ben)
     @category = SuggestedCategory.create!(name: "Popular")
@@ -41,6 +40,4 @@ class Api::V2::SuggestedFeedsControllerTest < ApiControllerTestCase
   def keys
     %w[id feed_id suggested_category_id title host]
   end
-
-
 end

@@ -1,5 +1,4 @@
 class BasePresenter
-
   def initialize(object, locals, template)
     @object = object
     @locals = locals
@@ -9,12 +8,18 @@ class BasePresenter
   def favicon(feed)
     @favicon ||= begin
       if feed.newsletter?
-        content = @template.content_tag :span, '', class: "favicon-wrap collection-favicon favicon-newsletter-wrap" do
-          @template.svg_tag('favicon-newsletter', size: "16x16")
+        content = @template.content_tag :span, "", class: "favicon-wrap collection-favicon favicon-newsletter-wrap" do
+          @template.svg_tag("favicon-newsletter", size: "16x16")
+        end
+      elsif feed.twitter_user?
+        content = @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image" do
+          url = @template.camo_link(feed.twitter_user.profile_image_uri_https("bigger"))
+          fallback = @template.image_url("favicon-profile-default.png")
+          @template.image_tag_with_fallback(fallback, url, alt: "")
         end
       else
         markup = <<-eos
-          <span class="favicon favicon-default"></span>
+          <span class="favicon favicon-default favicon-character-#{feed.host_letter}" data-host="#{feed.host}"></span>
         eos
         if feed.favicon && feed.favicon.cdn_url
           markup = <<-eos
@@ -31,31 +36,6 @@ class BasePresenter
     end
   end
 
-  def favicon_with_url(host)
-    @template.content_tag :span, '', class: "favicon-wrap" do
-      @template.content_tag(:span, '', class: "favicon", style: "background-image: url(#{favicon_url(host)});")
-    end
-  end
-
-  def favicon_with_fallback
-    if @object.favicon && @object.favicon.cdn_url
-      favicon(@object)
-    else
-      favicon_with_url(@object.host)
-    end
-  end
-
-  def favicon_url(host)
-    uri = URI::HTTP.build(
-      scheme: "https",
-      host: "www.google.com",
-      path: "/s2/favicons",
-      query: {domain: host}.to_query
-    )
-    uri.scheme = "https"
-    uri.to_s
-  end
-
   private
 
   def self.presents(name)
@@ -63,5 +43,4 @@ class BasePresenter
       @object
     end
   end
-
 end

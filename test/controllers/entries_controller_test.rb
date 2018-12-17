@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class EntriesControllerTest < ActionController::TestCase
   setup do
@@ -37,12 +37,23 @@ class EntriesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "should get show with tweet" do
+    entry = create_tweet_entry(@user.feeds.first)
+    url = "https://mercury.postlight.com/parser?url=https://9to5mac.com/2018/01/12/final-cut-pro-x-how-to-improve-slow-motion-in-your-projects-video/"
+    stub_request_file("parsed_page.json", url, headers: {"Content-Type" => "application/json; charset=utf-8"})
+    SavePages.new().perform(entry.id)
+
+    login_as @user
+    get :show, params: {id: entry}, xhr: true
+    assert_response :success
+  end
+
   test "should get content" do
     login_as @user
     content = Faker::Lorem.paragraph
     struct = OpenStruct.new(content: content)
     MercuryParser.stub :parse, struct do
-      post :content, params: {id: @entries.first, content_view: 'true'}, xhr: true
+      post :content, params: {id: @entries.first, content_view: "true"}, xhr: true
     end
     assert_equal assigns(:content), content
     assert_response :success
@@ -50,7 +61,7 @@ class EntriesControllerTest < ActionController::TestCase
 
   test "should preload" do
     login_as @user
-    get :preload, params: {ids: @entries.map(&:id).join(',')}, format: :json
+    get :preload, params: {ids: @entries.map(&:id).join(",")}, format: :json
     data = JSON.parse(@response.body)
     @entries.each do |entry|
       assert data.key?(entry.id.to_s)
@@ -60,8 +71,8 @@ class EntriesControllerTest < ActionController::TestCase
   test "marks feed read" do
     login_as @user
     feed = @feeds.first
-    assert_difference('UnreadEntry.count', -feed.entries.length) do
-      post :mark_all_as_read, params: {type: 'feed', data: feed.id}, xhr: true
+    assert_difference("UnreadEntry.count", -feed.entries.length) do
+      post :mark_all_as_read, params: {type: "feed", data: feed.id}, xhr: true
       assert_response :success
     end
   end
@@ -72,8 +83,8 @@ class EntriesControllerTest < ActionController::TestCase
     taggings = feed.tag(Faker::Name.name, @user)
     feed_ids = taggings.map(&:feed_id)
     feeds = Feed.where(id: feed_ids)
-    assert_difference('UnreadEntry.count', -feeds.entries.length) do
-      post :mark_all_as_read, params: {type: 'tag', data: taggings.first.tag_id}, xhr: true
+    assert_difference("UnreadEntry.count", -feeds.entries.length) do
+      post :mark_all_as_read, params: {type: "tag", data: taggings.first.tag_id}, xhr: true
       assert_response :success
     end
   end
@@ -85,8 +96,8 @@ class EntriesControllerTest < ActionController::TestCase
       StarredEntry.create_from_owners(@user, entry)
     end
 
-    assert_difference('UnreadEntry.count', -starred_entries.length) do
-      post :mark_all_as_read, params: {type: 'starred'}, xhr: true
+    assert_difference("UnreadEntry.count", -starred_entries.length) do
+      post :mark_all_as_read, params: {type: "starred"}, xhr: true
       assert_response :success
     end
   end
@@ -98,8 +109,8 @@ class EntriesControllerTest < ActionController::TestCase
       @user.recently_read_entries.create!(entry: entry)
     end
 
-    assert_difference('UnreadEntry.count', -recently_read_entries.length) do
-      post :mark_all_as_read, params: {type: 'recently_read'}, xhr: true
+    assert_difference("UnreadEntry.count", -recently_read_entries.length) do
+      post :mark_all_as_read, params: {type: "recently_read"}, xhr: true
       assert_response :success
     end
   end
@@ -108,11 +119,11 @@ class EntriesControllerTest < ActionController::TestCase
     login_as @user
 
     updated_entries = @user.entries.limit(2).map do |entry|
-      @user.updated_entries.create!(entry: entry)
+      @user.updated_entries.create!(entry: entry, feed: entry.feed)
     end
 
-    assert_difference('UpdatedEntry.count', -updated_entries.length) do
-      post :mark_all_as_read, params: {type: 'updated'}, xhr: true
+    assert_difference("UpdatedEntry.count", -updated_entries.length) do
+      post :mark_all_as_read, params: {type: "updated"}, xhr: true
       assert_response :success
     end
   end
@@ -120,8 +131,8 @@ class EntriesControllerTest < ActionController::TestCase
   test "marks unread read" do
     login_as @user
     count = @user.unread_entries.count
-    assert_difference('UnreadEntry.count', -count) do
-      post :mark_all_as_read, params: {type: 'unread'}, xhr: true
+    assert_difference("UnreadEntry.count", -count) do
+      post :mark_all_as_read, params: {type: "unread"}, xhr: true
       assert_response :success
     end
   end
@@ -129,8 +140,8 @@ class EntriesControllerTest < ActionController::TestCase
   test "marks all read" do
     login_as @user
     count = @user.unread_entries.count
-    assert_difference('UnreadEntry.count', -count) do
-      post :mark_all_as_read, params: {type: 'all'}, xhr: true
+    assert_difference("UnreadEntry.count", -count) do
+      post :mark_all_as_read, params: {type: "all"}, xhr: true
       assert_response :success
     end
   end
@@ -143,18 +154,18 @@ class EntriesControllerTest < ActionController::TestCase
 
     entries = @user.entries.first(2)
 
-    saved_search = @user.saved_searches.create(query: "\"#{entries.first.title}\" OR \"#{entries.last.title}\"", name: 'test')
+    saved_search = @user.saved_searches.create(query: "\"#{entries.first.title}\" OR \"#{entries.last.title}\"", name: "test")
     entries = Entry.scoped_search({query: saved_search.query}, @user)
 
-    assert_difference('UnreadEntry.count', -entries.total_entries) do
-      post :mark_all_as_read, params: {type: 'saved_search', data: saved_search.id}, xhr: true
+    assert_difference("UnreadEntry.count", -entries.total_entries) do
+      post :mark_all_as_read, params: {type: "saved_search", data: saved_search.id}, xhr: true
       assert_response :success
     end
 
     mark_unread(@user)
 
-    assert_difference('UnreadEntry.count', -entries.total_entries) do
-      post :mark_all_as_read, params: {type: 'search', data: saved_search.query}, xhr: true
+    assert_difference("UnreadEntry.count", -entries.total_entries) do
+      post :mark_all_as_read, params: {type: "search", data: saved_search.query}, xhr: true
       assert_response :success
     end
 
@@ -164,8 +175,8 @@ class EntriesControllerTest < ActionController::TestCase
   test "mark specific ids read" do
     login_as @user
     entries = @user.entries.first(2)
-    assert_difference('UnreadEntry.count', -entries.length) do
-      post :mark_all_as_read, params: {ids: entries.map(&:id).join(',')}, xhr: true
+    assert_difference("UnreadEntry.count", -entries.length) do
+      post :mark_all_as_read, params: {ids: entries.map(&:id).join(",")}, xhr: true
       assert_response :success
     end
   end
@@ -174,8 +185,8 @@ class EntriesControllerTest < ActionController::TestCase
     login_as @user
     date = @user.unread_entries.order(created_at: :asc).limit(1).take.created_at.iso8601(6)
     assert @user.unread_entries.count > 1
-    assert_difference('UnreadEntry.count', -1) do
-      post :mark_all_as_read, params: {type: 'all', date: date}, xhr: true
+    assert_difference("UnreadEntry.count", -1) do
+      post :mark_all_as_read, params: {type: "all", date: date}, xhr: true
       assert_response :success
     end
   end
@@ -190,8 +201,8 @@ class EntriesControllerTest < ActionController::TestCase
   test "should get diff" do
     login_as @user
     entry = @user.entries.first
-    entry.update(content: '<p>This is the test.</p>')
-    entry.update(content: '<p>This is the text.</p>', original: {content: entry.content})
+    entry.update(content: "<p>This is the test.</p>")
+    entry.update(content: "<p>This is the text.</p>", original: {content: entry.content})
     get :diff, params: {id: entry}, xhr: true
     assert_response :success
     assert_match /inline-diff/, assigns(:content)
@@ -202,5 +213,4 @@ class EntriesControllerTest < ActionController::TestCase
     get :newsletter, params: {id: entry.public_id}
     assert_response :success
   end
-
 end

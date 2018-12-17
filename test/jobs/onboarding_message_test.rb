@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class OnboardingMessageTest < ActionMailer::TestCase
   setup do
@@ -52,7 +52,7 @@ class OnboardingMessageTest < ActionMailer::TestCase
   test "should send onboarding_5_expired" do
     Sidekiq::Worker.clear_all
     @user = users(:ann)
-    assert_difference "Sidekiq::Extensions::DelayedMailer.jobs.size", 1 do
+    assert_emails 1 do
       OnboardingMessage.new().perform(@user.id, MarketingMailer.method(:onboarding_5_expired).name.to_s)
     end
   end
@@ -68,7 +68,7 @@ class OnboardingMessageTest < ActionMailer::TestCase
 
   test "should skip because unsubscribed" do
     @user = users(:ann)
-    @user.update(marketing_unsubscribe: '1')
+    @user.update(marketing_unsubscribe: "1")
     assert_emails 0 do
       %i(onboarding_5_expired onboarding_4_expiring onboarding_3_subscribe onboarding_2_mobile onboarding_1_welcome).each do |method|
         OnboardingMessage.new().perform(@user.id, MarketingMailer.method(method).name.to_s)

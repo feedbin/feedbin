@@ -1,14 +1,4 @@
 class FaviconProcessor
-
-  S3_POOL = ConnectionPool.new(size: 10, timeout: 5) do
-    Fog::Storage.new(
-      provider: "AWS",
-      aws_access_key_id: ENV["AWS_ACCESS_KEY_ID"],
-      aws_secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"],
-      persistent: true
-    )
-  end
-
   attr_reader :data, :host
 
   def initialize(data, host)
@@ -41,18 +31,18 @@ class FaviconProcessor
   def upload(data)
     upload_url = nil
     S3_POOL.with do |connection|
-      response = connection.put_object(ENV['AWS_S3_BUCKET'], path, data, s3_options)
+      response = connection.put_object(ENV["AWS_S3_BUCKET_FAVICONS"], File.join(favicon_hash[0..2], "#{favicon_hash}.png"), data, s3_options)
       upload_url = URI::HTTP.build(
-        scheme: 'https',
+        scheme: "https",
         host: response.data[:host],
-        path: response.data[:path]
+        path: response.data[:path],
       ).to_s
     end
     upload_url
   end
 
   def encoded(blob)
-    Base64.encode64(blob).gsub("\n", '')
+    Base64.encode64(blob).gsub("\n", "")
   end
 
   def image_data
@@ -65,7 +55,7 @@ class FaviconProcessor
     if favicon.columns > 32
       favicon = favicon.resize_to_fit(32, 32)
     end
-    favicon.to_blob { |image| image.format = 'png' }
+    favicon.to_blob { |image| image.format = "png" }
   ensure
     favicon && favicon.destroy!
     layers && layers.map(&:destroy!)
@@ -75,15 +65,16 @@ class FaviconProcessor
     begin
       Magick::Image.from_blob(data)
     rescue Magick::ImageMagickError
-      Magick::Image.from_blob(data) { |image| image.format = 'ico' }
+      Magick::Image.from_blob(data) { |image| image.format = "ico" }
     end
   end
 
   def remove_blank_images(layers)
-    layers.reject do |favicon|
-      favicon = favicon.scale(1, 1)
-      pixel = favicon.pixel_color(0,0)
-      favicon.to_color(pixel) == "none"
+    layers.reject do |layer|
+      layer = layer.scale(1, 1)
+      pixel = layer.pixel_color(0, 0)
+      color = layer.to_color(pixel)
+      %w(none white).include?(color) || color.include?("#FFFFFF")
     end
   end
 
@@ -101,5 +92,4 @@ class FaviconProcessor
   def path
     @path ||= File.join("public-favicons", favicon_hash[0..3], "#{favicon_hash}.png")
   end
-
 end

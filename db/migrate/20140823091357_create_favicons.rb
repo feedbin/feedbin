@@ -1,4 +1,4 @@
-class CreateFavicons < ActiveRecord::Migration
+class CreateFavicons < ActiveRecord::Migration[4.2]
   def change
     create_table :favicons do |t|
       t.text :host

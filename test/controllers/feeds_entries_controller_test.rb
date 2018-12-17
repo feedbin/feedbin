@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class FeedsEntriesControllerTest < ActionController::TestCase
-
   test "gets the index" do
     user = users(:new)
     feeds = create_feeds(user)
@@ -13,5 +12,4 @@ class FeedsEntriesControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal feeds.first.entries.length, assigns(:entries).length
   end
-
 end

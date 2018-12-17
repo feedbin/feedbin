@@ -17,5 +17,4 @@ class ActionTags
       action.save
     end
   end
-
 end

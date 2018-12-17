@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'time'
-require 'optparse'
-ENV['TZ'] = 'UTC'
+require "optparse"
+require "redis"
+ENV["TZ"] = "UTC"
 
 def gen_redis_proto(*cmd)
   proto = ""
@@ -14,16 +14,15 @@ def gen_redis_proto(*cmd)
   proto
 end
 
-def get_score(time)
-  score = Time.parse(time)
-  "%10.6f" % score.to_f
-end
-
 opts = {}
 OptionParser.new do |options|
-  options.set_banner "Usage: redis_protocol.rb [options] [files]\n" \
-    "Generate redis protocol from the output of:\n" \
-    "COPY entries (id, feed_id, public_id, created_at, published) TO '/tmp/redis_data';"
+  banner = <<-EOD
+    Usage: redis_protocol.rb [options] [files]\n
+    Generate redis protocol from the output of:\n
+    psql -d feedbin -c "COPY (SELECT id, feed_id, public_id, EXTRACT(EPOCH FROM created_at AT TIME ZONE 'UTC'), EXTRACT(EPOCH FROM published AT TIME ZONE 'UTC') FROM entries) TO STDOUT;" | ./redis_protocol.rb --data internal | redis-cli --pipe
+  EOD
+
+  options.set_banner banner
 
   options.separator ""
   options.separator "Options:"
@@ -40,7 +39,6 @@ end.parse!
 
 while input = ARGF.gets
   input.each_line do |line|
-
     line = line.chop
 
     entry_id, feed_id, public_id, created_at, published = line.split("\t")
@@ -48,13 +46,10 @@ while input = ARGF.gets
     begin
       case opts[:data]
       when "public_id"
-        $stdout.write(gen_redis_proto("HSET", "entry:public_ids:#{public_id[0..4]}", public_id, 1))
+        $stdout.write(gen_redis_proto("SET", public_id, 1))
       when "internal"
-        score = get_score(created_at)
-        $stdout.write(gen_redis_proto("ZADD", "feed:#{feed_id}:entry_ids:created_at", score, entry_id))
-
-        score = get_score(published)
-        $stdout.write(gen_redis_proto("ZADD", "feed:#{feed_id}:entry_ids:published", score, entry_id))
+        $stdout.write(gen_redis_proto("ZADD", "feed:#{feed_id}:entry_ids:created_at", created_at, entry_id))
+        $stdout.write(gen_redis_proto("ZADD", "feed:#{feed_id}:entry_ids:published", published, entry_id))
       else
         $stderr.puts "--data needs to be specified"
         exit 1

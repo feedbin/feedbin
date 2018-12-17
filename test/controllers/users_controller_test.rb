@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class UsersControllerTest < ActionController::TestCase
-
   include SessionsHelper
 
   test "should get new user" do
@@ -14,7 +13,7 @@ class UsersControllerTest < ActionController::TestCase
     plan = plans(:trial)
     create_stripe_plan(plan)
     assert_difference "User.count", +1 do
-      post :create, params: {user: {email: 'example@example.com', password: default_password, plan_id: plan.id}}
+      post :create, params: {user: {email: "example@example.com", password: default_password, plan_id: plan.id}}
       assert_redirected_to root_url
     end
     assert signed_in?
@@ -59,12 +58,16 @@ class UsersControllerTest < ActionController::TestCase
   test "should destroy user" do
     StripeMock.start
     user = users(:ben)
+    customer = Stripe::Customer.create({email: user.email})
+    user.update(customer_id: customer.id)
+
     login_as user
     assert_difference "User.count", -1 do
-      delete :destroy, params: {id: user}
-      assert_redirected_to root_url
+      Sidekiq::Testing.inline! do
+        delete :destroy, params: {id: user}
+        assert_redirected_to account_closed_public_settings_url
+      end
     end
     StripeMock.stop
   end
-
 end

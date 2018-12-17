@@ -1,0 +1,8 @@
+<% present entry, local_assigns do |entry_presenter| %>
+    <div data-behavior="diff_content">
+        <%= entry.content_diff %>
+    </div>
+    <div class="hide" data-behavior="diff_latest">
+        <%= raw(entry_presenter.content) %>
+    </div>
+<% end %>

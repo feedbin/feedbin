@@ -20,11 +20,11 @@ class Share::EvernoteShare < Share::Service
   def consumer
     options = {
       site: URL,
-      request_token_path: '/oauth',
-      authorize_path: '/OAuth.action',
-      access_token_path: '/oauth'
+      request_token_path: "/oauth",
+      authorize_path: "/OAuth.action",
+      access_token_path: "/oauth",
     }
-    OAuth::Consumer.new(ENV['EVERNOTE_KEY'], ENV['EVERNOTE_SECRET'], options)
+    OAuth::Consumer.new(ENV["EVERNOTE_KEY"], ENV["EVERNOTE_SECRET"], options)
   end
 
   def request_token
@@ -38,7 +38,7 @@ class Share::EvernoteShare < Share::Service
   end
 
   def redirect_uri
-    Rails.application.routes.url_helpers.oauth_response_supported_sharing_service_url('evernote', host: ENV['PUSH_URL'])
+    Rails.application.routes.url_helpers.oauth_response_supported_sharing_service_url("evernote", host: ENV["PUSH_URL"])
   end
 
   def response_valid?(session, params)
@@ -56,7 +56,7 @@ class Share::EvernoteShare < Share::Service
     content = ContentFormatter.evernote_format(content, entry)
     view_paths = Rails::Application::Configuration.new(Rails.root).paths["app/views"]
     action_view = ActionView::Base.new(view_paths)
-    params[:content] = action_view.render(partial: 'supported_sharing_services/evernote_note', locals: {content: content.html_safe})
+    params[:content] = action_view.render(partial: "supported_sharing_services/evernote_note", locals: {content: content.html_safe})
 
     attributes = Evernote::EDAM::Type::NoteAttributes.new
     attributes.subjectDate = entry.published.to_i
@@ -73,7 +73,7 @@ class Share::EvernoteShare < Share::Service
     note.content = params[:content]
     note.notebookGuid = params[:notebook_guid]
     if params[:tags].present?
-      note.tagNames = params[:tags].split(',').map {|tag| tag.strip}
+      note.tagNames = params[:tags].split(",").map { |tag| tag.strip }
     end
     note_store.createNote(@token, note)
     200
@@ -91,7 +91,7 @@ class Share::EvernoteShare < Share::Service
       Honeybadger.notify(
         error_class: "EvernoteShare#add",
         error_message: "EvernoteShare add failure",
-        parameters: parameters
+        parameters: parameters,
       )
       500
     end
@@ -116,5 +116,4 @@ class Share::EvernoteShare < Share::Service
   def notebooks
     note_store.listNotebooks(@token)
   end
-
 end

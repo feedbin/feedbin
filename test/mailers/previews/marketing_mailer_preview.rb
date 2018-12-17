@@ -1,6 +1,5 @@
 # Preview all emails at http://localhost:3000/rails/mailers/marketing_mailer
 class MarketingMailerPreview < ActionMailer::Preview
-
   def member_discount
     MarketingMailer.member_discount(User.first)
   end
@@ -24,6 +23,4 @@ class MarketingMailerPreview < ActionMailer::Preview
   def onboarding_5_expired
     MarketingMailer.onboarding_5_expired(User.first)
   end
-
-
 end

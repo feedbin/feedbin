@@ -2,12 +2,28 @@ class DevicePushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
 
-  APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV['APPLE_PUSH_CERT_IOS']}, size: 5)
+  MAX_PAYLOAD_SIZE = 4096
 
-  def perform(user_ids, entry_id)
+  apnotic_options = {
+    auth_method: :token,
+    cert_path: ENV["APPLE_AUTH_KEY"],
+    team_id: ENV["APPLE_TEAM_ID"],
+    key_id: ENV["APPLE_KEY_ID"],
+  }
+  APNOTIC_POOL = Apnotic::ConnectionPool.new(apnotic_options, size: 5) do |connection|
+    connection.on(:error) { |exception| Honeybadger.notify(exception) }
+  end
+
+  def perform(user_ids, entry_id, skip_read)
     Honeybadger.context(user_ids: user_ids, entry_id: entry_id)
-    tokens = Device.where(user_id: user_ids).ios.pluck(:user_id, :token, :operating_system)
+
     entry = Entry.find(entry_id)
+
+    if skip_read
+      user_ids = UnreadEntry.where(entry: entry, user_id: user_ids).pluck(:user_id)
+    end
+
+    tokens = Device.where(user_id: user_ids).ios.pluck(:user_id, :token, :operating_system)
     feed = entry.feed
 
     feed_titles = subscription_titles(user_ids, feed)
@@ -23,8 +39,8 @@ class DevicePushNotificationSend
       notifications.each do |_, notification|
         push = connection.prepare_push(notification)
         push.on(:response) do |response|
-          Librato.increment('apns.ios.sent', source: response.status)
-          if response.status == '410' || (response.status == '400' && response.body['reason'] == 'BadDeviceToken')
+          Librato.increment("apns.ios.sent", source: response.status)
+          if response.status == "410" || (response.status == "400" && response.body["reason"] == "BadDeviceToken")
             apns_id = response.headers["apns-id"]
             token = notifications[apns_id].token
             Device.where("lower(token) = ?", token.downcase).take&.destroy
@@ -34,7 +50,6 @@ class DevicePushNotificationSend
       end
       connection.join
     end
-
   end
 
   private
@@ -58,19 +73,24 @@ class DevicePushNotificationSend
   end
 
   def build_notification(device_token, feed_title, entry, operating_system)
+    alert_title = feed_title
+    if entry.tweet?
+      alert_title = entry.title
+    end
+
     body = format_text(entry.title)
-    if body.empty?
+    if body.empty? || entry.tweet?
       body = format_text(entry.summary)
     end
     author = format_text(entry.author)
     title = format_text(entry.title)
     published = entry.published.iso8601(6)
-    unless operating_system =~ /^iPhone OS 1[0-9]/
+    if operating_system =~ /^iPhone OS 9/
       body = "#{feed_title}: #{body}"
     end
-    Apnotic::Notification.new(device_token).tap do |notification|
+    notification = Apnotic::Notification.new(device_token).tap do |notification|
       notification.alert = {
-        title: feed_title,
+        title: alert_title,
         body: body,
       }
       notification.custom_payload = {
@@ -79,16 +99,33 @@ class DevicePushNotificationSend
           title: title,
           feed: feed_title,
           author: author,
-          published: published
-        }
+          published: published,
+          content: nil,
+        },
       }
+      if url = image_url(entry)
+        notification.custom_payload[:image_url] = url
+      end
       notification.category = "singleArticle"
       notification.content_available = true
-      notification.sound = ""
+      notification.sound = "default"
       notification.priority = "10"
-      notification.topic = ENV['APPLE_PUSH_TOPIC']
+      notification.topic = ENV["APPLE_PUSH_TOPIC"]
       notification.apns_id = SecureRandom.uuid
+      notification.mutable_content = "1"
     end
+
+    notification_size = notification.body.bytesize
+    available = MAX_PAYLOAD_SIZE - notification_size
+    content = EntriesHelper.text_format(entry.content)
+    if content && content.bytesize < available
+      notification.custom_payload[:feedbin][:content] = content
+    end
+
+    notification
   end
 
+  def image_url(entry)
+    entry.processed_image if entry.processed_image?
+  end
 end

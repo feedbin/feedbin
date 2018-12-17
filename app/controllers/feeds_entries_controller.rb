@@ -13,13 +13,13 @@ class FeedsEntriesController < ApplicationController
     @append = params[:page].present?
 
     # Extra data for updating buttons
-    @feed = @user.feed_with_subscription_id(params[:feed_id])
-    @tags = @user.tags.where(taggings: {feed_id: @feed}).order(:name).pluck(:name)
-    @type = 'feed'
+    @subscription = @user.subscriptions.where(feed_id: params[:feed_id]).take!
+    @feed = @subscription.feed
+    @type = "feed"
     @data = params[:feed_id]
 
     respond_to do |format|
-      format.js { render partial: 'shared/entries' }
+      format.js { render partial: "shared/entries" }
     end
   end
 
@@ -30,5 +30,4 @@ class FeedsEntriesController < ApplicationController
       render_404
     end
   end
-
 end

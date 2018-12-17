@@ -1,12 +1,14 @@
 module FactoryHelper
-
-  def create_feeds(user, count = 3)
+  def create_feeds(users, count = 3)
     flush_redis
+    users = [*users]
     feeds = count.times.map do
       url = Faker::Internet.url
       host = URI(url).host
-      Feed.create(feed_url: url, host: host).tap do |feed|
-        user.subscriptions.where(feed: feed).first_or_create
+      Feed.create(feed_url: url, host: host, title: Faker::Lorem.sentence).tap do |feed|
+        users.map do |user|
+          user.subscriptions.where(feed: feed).first_or_create
+        end
         entry = create_entry(feed)
         SearchIndexStore.new().perform("Entry", entry.id)
       end
@@ -21,9 +23,10 @@ module FactoryHelper
       url: Faker::Internet.url,
       content: Faker::Lorem.paragraph,
       public_id: SecureRandom.hex,
+      entry_id: SecureRandom.hex,
       data: {
-        enclosure_url: Faker::Internet.url
-      }
+        enclosure_url: Faker::Internet.url,
+      },
     )
   end
 
@@ -31,5 +34,26 @@ module FactoryHelper
     user.entries.each do |entry|
       UnreadEntry.create_from_owners(user, entry)
     end
+  end
+
+  def create_tweet_entry(feed)
+    entry = create_entry(feed)
+    entry.data["tweet"] = load_tweet
+    entry.save!
+    entry
+  end
+
+  def stripe_user
+    plan = plans(:trial)
+    card = StripeMock.generate_card_token(last4: "4242", exp_month: 99, exp_year: 3005)
+    create_stripe_plan(plan)
+    user = User.create(
+      email: "cc@example.com",
+      password: default_password,
+      plan: plan,
+    )
+    user.stripe_token = card
+    user.save
+    user
   end
 end

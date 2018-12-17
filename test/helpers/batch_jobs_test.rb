@@ -1,5 +1,4 @@
-require 'test_helper'
-require_relative '../../lib/batch_jobs'
+require "test_helper"
 
 class BatchJobsTests < ActiveSupport::TestCase
   include BatchJobs
@@ -39,5 +38,4 @@ class BatchJobsTests < ActiveSupport::TestCase
       1_000
     end
   end
-
 end

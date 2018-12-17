@@ -39,6 +39,20 @@ class feedbin.Keyboard
         @selectColumn('entry-content')
       return
 
+    $(document).on 'click', '[data-behavior~=open_next_entry]', (event) =>
+      @selectColumn('entries')
+      @setEnvironment()
+      @item = @next
+      @selectItem()
+      event.preventDefault()
+
+    $(document).on 'click', '[data-behavior~=open_previous_entry]', (event) =>
+      @selectColumn('entries')
+      @setEnvironment()
+      @item = @previous
+      @selectItem()
+      event.preventDefault()
+
   navigateShareMenu: (combo) ->
     # If share menu is showing intercept up down
     dropdown = $('[data-behavior~=toggle_share_menu]').parents('.dropdown-wrap')
@@ -60,10 +74,10 @@ class feedbin.Keyboard
 
   navigateFeedbin: (combo) ->
     @setEnvironment()
-    if 'pagedown' == combo
+    if 'pagedown' == combo || 'shift+j' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
         @scrollContent(@contentHeight() - 100, 'down')
-    else if 'pageup' == combo
+    else if 'pageup' == combo || 'shift+k' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
         @scrollContent(@contentHeight() - 100, 'up')
     else if 'down' == combo || 'j' == combo
@@ -119,7 +133,7 @@ class feedbin.Keyboard
     if $('body.app').length == 0
       return
 
-    Mousetrap.bind ['pageup', 'pagedown', 'up', 'down', 'left', 'right', 'j', 'k', 'h', 'l'], (event, combo) =>
+    Mousetrap.bind ['pageup', 'pagedown', 'up', 'down', 'left', 'right', 'j', 'k', 'h', 'l', 'shift+j', 'shift+k'], (event, combo) =>
       if feedbin.shareOpen()
         @navigateShareMenu(combo)
       else if feedbin.isFullScreen()
@@ -194,7 +208,7 @@ class feedbin.Keyboard
 
     # Show Keyboard shortcuts
     Mousetrap.bind '?', (event, combo) =>
-      feedbin.modal("#keyboard_shortcuts")
+      feedbin.showModal("help")
       event.preventDefault()
 
     # Focus search
@@ -205,12 +219,12 @@ class feedbin.Keyboard
 
     # Open original article
     Mousetrap.bind 'v', (event, combo) =>
-      content = $('.entry-header').find('a')[0].click()
+      content = $('#source_link')[0].click()
       event.preventDefault()
 
     # Open original article
     Mousetrap.bind 'V', (event, combo) =>
-      href = $('.entry-header').find('a').attr('href')
+      href = $('#source_link').attr('href')
       if href
         feedbin.openLinkInBackground(href)
       event.preventDefault()
@@ -266,6 +280,35 @@ class feedbin.Keyboard
       if feedbin.shareOpen()
         dropdown = $('.dropdown-wrap')
         dropdown.removeClass('open')
+        event.preventDefault()
+
+    Mousetrap.bind 'C', (event, combo) =>
+      link = $('#source_link_field')
+      if link.length > 0
+        link.select()
+        try
+          document.execCommand('copy');
+          link.blur()
+        catch error
+          if 'console' of window
+            console.log error
+      event.preventDefault()
+
+    $(window).on 'keydown', (event) =>
+      keys = {
+        UIKeyInputUpArrow: "up",
+        UIKeyInputDownArrow: "down",
+        UIKeyInputLeftArrow: "left",
+        UIKeyInputRightArrow: "right"
+      }
+
+      if keys[event.key]
+        if feedbin.shareOpen()
+          @navigateShareMenu(keys[event.key])
+        else if feedbin.isFullScreen()
+          @navigateEntryContent(keys[event.key])
+        else
+          @navigateFeedbin(keys[event.key])
         event.preventDefault()
 
   setEnvironment: ->

@@ -1,4 +1,4 @@
-class AddFeedIdToEntryStates < ActiveRecord::Migration
+class AddFeedIdToEntryStates < ActiveRecord::Migration[4.2]
   def up
     add_column :entry_states, :feed_id, :integer
     add_index :entry_states, :feed_id

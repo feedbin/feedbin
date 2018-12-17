@@ -1,0 +1,309 @@
+{
+   "favorited" : false,
+   "id_str" : "952239648633491457",
+   "in_reply_to_status_id" : null,
+   "entities" : {
+      "symbols" : [],
+      "user_mentions" : [],
+      "hashtags" : [],
+      "urls" : [
+         {
+            "display_url" : "twitter.com/9to5mac/status…",
+            "indices" : [
+               157,
+               180
+            ],
+            "url" : "https://t.co/FBmfM51NmF",
+            "expanded_url" : "https://twitter.com/9to5mac/status/952159774744989696"
+         }
+      ]
+   },
+   "quoted_status" : {
+      "retweet_count" : 11,
+      "geo" : null,
+      "lang" : "en",
+      "retweeted" : false,
+      "created_at" : "Sat Jan 13 12:45:55 +0000 2018",
+      "in_reply_to_user_id_str" : null,
+      "display_text_range" : [
+         0,
+         93
+      ],
+      "possibly_sensitive" : false,
+      "id" : 952159774744989696,
+      "in_reply_to_user_id" : null,
+      "coordinates" : null,
+      "in_reply_to_status_id_str" : null,
+      "source" : "<a href=\"http://tapbots.com/software/tweetbot/mac\" rel=\"nofollow\">Tweetbot for Mac</a>",
+      "full_text" : "Final Cut Pro X: How to improve slow motion in your projects [Video]\n https://t.co/jOOuhZJ1Ic https://t.co/4OpIJ3WGTU",
+      "place" : null,
+      "truncated" : false,
+      "is_quote_status" : false,
+      "user" : {
+         "created_at" : "Fri Aug 22 13:06:35 +0000 2008",
+         "profile_link_color" : "2FC2EF",
+         "id" : 15944436,
+         "location" : "Cupertino, California",
+         "profile_sidebar_border_color" : "181A1E",
+         "notifications" : false,
+         "favourites_count" : 368,
+         "profile_background_image_url_https" : "https://abs.twimg.com/images/themes/theme9/bg.gif",
+         "statuses_count" : 50161,
+         "id_str" : "15944436",
+         "is_translator" : false,
+         "default_profile_image" : false,
+         "protected" : false,
+         "profile_sidebar_fill_color" : "252429",
+         "profile_banner_url" : "https://pbs.twimg.com/profile_banners/15944436/1468953558",
+         "translator_type" : "none",
+         "friends_count" : 18,
+         "profile_background_image_url" : "http://abs.twimg.com/images/themes/theme9/bg.gif",
+         "profile_background_tile" : false,
+         "verified" : true,
+         "profile_image_url_https" : "https://pbs.twimg.com/profile_images/659486593649012736/-TGFT8rs_normal.png",
+         "followers_count" : 506834,
+         "is_translation_enabled" : false,
+         "listed_count" : 12314,
+         "profile_text_color" : "666666",
+         "screen_name" : "9to5mac",
+         "contributors_enabled" : false,
+         "has_extended_profile" : false,
+         "utc_offset" : -28800,
+         "name" : "9to5Mac ",
+         "geo_enabled" : true,
+         "lang" : "en",
+         "entities" : {
+            "description" : {
+               "urls" : [
+                  {
+                     "indices" : [
+                        38,
+                        60
+                     ],
+                     "url" : "http://t.co/08acwjc8Rl",
+                     "display_url" : "facebook.com/9to5mac",
+                     "expanded_url" : "http://facebook.com/9to5mac"
+                  },
+                  {
+                     "indices" : [
+                        65,
+                        87
+                     ],
+                     "url" : "http://t.co/0nnwbET9zQ",
+                     "display_url" : "9to5toys.com",
+                     "expanded_url" : "http://9to5toys.com"
+                  }
+               ]
+            },
+            "url" : {
+               "urls" : [
+                  {
+                     "display_url" : "9to5mac.com",
+                     "url" : "http://t.co/TJfPn7EXwx",
+                     "indices" : [
+                        0,
+                        22
+                     ],
+                     "expanded_url" : "http://www.9to5mac.com"
+                  }
+               ]
+            }
+         },
+         "follow_request_sent" : false,
+         "profile_background_color" : "636363",
+         "time_zone" : "Pacific Time (US & Canada)",
+         "description" : "We break Apple News. Tips@9to5mac.com http://t.co/08acwjc8Rl and http://t.co/0nnwbET9zQ for the best gear and deals.",
+         "following" : false,
+         "profile_image_url" : "http://pbs.twimg.com/profile_images/659486593649012736/-TGFT8rs_normal.png",
+         "default_profile" : false,
+         "url" : "http://t.co/TJfPn7EXwx",
+         "profile_use_background_image" : false
+      },
+      "extended_entities" : {
+         "media" : [
+            {
+               "display_url" : "pic.twitter.com/4OpIJ3WGTU",
+               "sizes" : {
+                  "medium" : {
+                     "resize" : "fit",
+                     "h" : 675,
+                     "w" : 1200
+                  },
+                  "thumb" : {
+                     "w" : 150,
+                     "h" : 150,
+                     "resize" : "crop"
+                  },
+                  "large" : {
+                     "resize" : "fit",
+                     "h" : 1080,
+                     "w" : 1920
+                  },
+                  "small" : {
+                     "resize" : "fit",
+                     "w" : 680,
+                     "h" : 383
+                  }
+               },
+               "media_url" : "http://pbs.twimg.com/media/DTbAQ9QVoAAq0OY.jpg",
+               "url" : "https://t.co/4OpIJ3WGTU",
+               "id_str" : "952159768788967424",
+               "media_url_https" : "https://pbs.twimg.com/media/DTbAQ9QVoAAq0OY.jpg",
+               "type" : "photo",
+               "expanded_url" : "https://twitter.com/9to5mac/status/952159774744989696/photo/1",
+               "indices" : [
+                  94,
+                  117
+               ],
+               "id" : 952159768788967424
+            }
+         ]
+      },
+      "id_str" : "952159774744989696",
+      "favorited" : false,
+      "in_reply_to_status_id" : null,
+      "entities" : {
+         "user_mentions" : [],
+         "hashtags" : [],
+         "symbols" : [],
+         "urls" : [
+            {
+               "display_url" : "9to5mac.com/2018/01/12/fin…",
+               "indices" : [
+                  70,
+                  93
+               ],
+               "url" : "https://t.co/jOOuhZJ1Ic",
+               "expanded_url" : "https://9to5mac.com/2018/01/12/final-cut-pro-x-how-to-improve-slow-motion-in-your-projects-video/"
+            }
+         ],
+         "media" : [
+            {
+               "sizes" : {
+                  "medium" : {
+                     "w" : 1200,
+                     "h" : 675,
+                     "resize" : "fit"
+                  },
+                  "thumb" : {
+                     "resize" : "crop",
+                     "h" : 150,
+                     "w" : 150
+                  },
+                  "large" : {
+                     "h" : 1080,
+                     "w" : 1920,
+                     "resize" : "fit"
+                  },
+                  "small" : {
+                     "h" : 383,
+                     "w" : 680,
+                     "resize" : "fit"
+                  }
+               },
+               "media_url" : "http://pbs.twimg.com/media/DTbAQ9QVoAAq0OY.jpg",
+               "url" : "https://t.co/4OpIJ3WGTU",
+               "display_url" : "pic.twitter.com/4OpIJ3WGTU",
+               "expanded_url" : "https://twitter.com/9to5mac/status/952159774744989696/photo/1",
+               "id_str" : "952159768788967424",
+               "media_url_https" : "https://pbs.twimg.com/media/DTbAQ9QVoAAq0OY.jpg",
+               "type" : "photo",
+               "indices" : [
+                  94,
+                  117
+               ],
+               "id" : 952159768788967424
+            }
+         ]
+      },
+      "contributors" : null,
+      "favorite_count" : 49,
+      "in_reply_to_screen_name" : null
+   },
+   "contributors" : null,
+   "favorite_count" : 10,
+   "in_reply_to_screen_name" : null,
+   "in_reply_to_user_id" : null,
+   "coordinates" : null,
+   "in_reply_to_status_id_str" : null,
+   "source" : "<a href=\"http://tapbots.com/tweetbot\" rel=\"nofollow\">Tweetbot for iΟS</a>",
+   "full_text" : "Slow motion is useful for all sorts of things, including smoothing out jittery pans and pedestals. Final Cut Pro X has a few built in tools that can assist. https://t.co/FBmfM51NmF",
+   "place" : null,
+   "truncated" : false,
+   "is_quote_status" : true,
+   "user" : {
+      "profile_banner_url" : "https://pbs.twimg.com/profile_banners/252691456/1514482287",
+      "friends_count" : 721,
+      "translator_type" : "none",
+      "protected" : false,
+      "profile_sidebar_fill_color" : "EFEFEF",
+      "id_str" : "252691456",
+      "default_profile_image" : false,
+      "is_translator" : false,
+      "profile_background_image_url_https" : "https://pbs.twimg.com/profile_background_images/403512223/twitter2.jpg",
+      "statuses_count" : 21250,
+      "verified" : true,
+      "profile_image_url_https" : "https://pbs.twimg.com/profile_images/946448045415256064/bmEy3r8A_normal.jpg",
+      "followers_count" : 33816,
+      "profile_background_tile" : false,
+      "profile_background_image_url" : "http://pbs.twimg.com/profile_background_images/403512223/twitter2.jpg",
+      "location" : "USA",
+      "profile_sidebar_border_color" : "FFFFFF",
+      "profile_link_color" : "ABB8C2",
+      "id" : 252691456,
+      "created_at" : "Tue Feb 15 18:22:21 +0000 2011",
+      "favourites_count" : 2350,
+      "notifications" : false,
+      "profile_background_color" : "FFFFFF",
+      "follow_request_sent" : false,
+      "entities" : {
+         "description" : {
+            "urls" : []
+         },
+         "url" : {
+            "urls" : [
+               {
+                  "expanded_url" : "http://9to5mac.com/author/bnjmorg/",
+                  "indices" : [
+                     0,
+                     23
+                  ],
+                  "url" : "https://t.co/Nh9V5l7sWO",
+                  "display_url" : "9to5mac.com/author/bnjmorg/"
+               }
+            ]
+         }
+      },
+      "profile_use_background_image" : true,
+      "url" : "https://t.co/Nh9V5l7sWO",
+      "profile_image_url" : "http://pbs.twimg.com/profile_images/946448045415256064/bmEy3r8A_normal.jpg",
+      "default_profile" : false,
+      "description" : "Writer, videos @9to5Mac\nReach out: jeff@9to5mac.com",
+      "time_zone" : "Eastern Time (US & Canada)",
+      "following" : true,
+      "screen_name" : "JeffBenjam",
+      "profile_text_color" : "000000",
+      "is_translation_enabled" : false,
+      "listed_count" : 744,
+      "lang" : "en",
+      "has_extended_profile" : true,
+      "utc_offset" : -18000,
+      "name" : "Jeff Benjamin",
+      "geo_enabled" : true,
+      "contributors_enabled" : false
+   },
+   "created_at" : "Sat Jan 13 18:03:18 +0000 2018",
+   "in_reply_to_user_id_str" : null,
+   "display_text_range" : [
+      0,
+      156
+   ],
+   "possibly_sensitive" : false,
+   "id" : 952239648633491457,
+   "retweet_count" : 1,
+   "quoted_status_id_str" : "952159774744989696",
+   "retweeted" : false,
+   "lang" : "en",
+   "geo" : null,
+   "quoted_status_id" : 952159774744989696
+}

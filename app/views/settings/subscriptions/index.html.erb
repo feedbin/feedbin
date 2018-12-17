@@ -1,0 +1,11 @@
+<div class="settings-content-inner">
+    <div class="settings-outer">
+        <div class="feed-settings">
+            <h2>Subscriptions</h2>
+            <%= form_tag settings_subscriptions_path, method: :get, remote: true do %>
+                <input type="search" class="feed-search" placeholder="Search Feeds" data-behavior="autosubmit" name="q" value="<%= params[:q] %>" />
+            <% end %>
+        </div>
+    </div>
+    <%= render partial: "subscriptions_list" %>
+</div>

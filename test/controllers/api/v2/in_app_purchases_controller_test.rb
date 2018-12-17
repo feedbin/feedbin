@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::InAppPurchasesControllerTest < ApiControllerTestCase
-
   setup do
     @user = users(:timed)
   end
@@ -14,13 +13,13 @@ class Api::V2::InAppPurchasesControllerTest < ApiControllerTestCase
     receipt = {
       transaction_id: SecureRandom.hex,
       purchase_date_ms: Time.now.to_i * 1_000,
-      product_id: product_id
+      product_id: product_id,
     }
     response = {
       status: 0,
       receipt: {
-        in_app: [receipt]
-      }
+        in_app: [receipt],
+      },
     }
     stub_request(:post, Feedbin::Application.config.iap_endpoint[:production]).
       to_return(body: response.to_json, status: 200)
@@ -34,5 +33,4 @@ class Api::V2::InAppPurchasesControllerTest < ApiControllerTestCase
     end
     assert_equal((time + product_options[:time]).iso8601, @user.reload.expires_at.iso8601)
   end
-
 end

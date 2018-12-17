@@ -1,5 +1,4 @@
 class SiteController < ApplicationController
-
   skip_before_action :authorize, only: [:index]
   before_action :check_user, if: :signed_in?
 
@@ -17,6 +16,9 @@ class SiteController < ApplicationController
       readability_settings = subscriptions.each_with_object({}) do |subscription, hash|
         hash[subscription.feed_id] = subscription.view_inline
       end
+
+      @now_playing = Entry.where(id: @user.now_playing_entry).first
+      @recently_played = @user.recently_played_entries.where(entry_id: @user.now_playing_entry).first
 
       @show_welcome = (subscriptions.present?) ? false : true
       @classes = user_classes
@@ -37,10 +39,20 @@ class SiteController < ApplicationController
         entry_sort: @user.entry_sort,
         update_message_seen: @user.setting_on?(:update_message_seen),
         feed_order: @user.feed_order,
-        refresh_sessions_path: refresh_sessions_path
+        refresh_sessions_path: refresh_sessions_path,
+        progress: {},
+        audio_panel_size: @user.audio_panel_size,
+        view_links_in_app: @user.setting_on?(:view_links_in_app),
+        saved_searches_count_path: count_saved_searches_path,
+        proxy_images: !@user.setting_on?(:disable_image_proxy),
+        twitter_embed_path: twitter_embeds_path,
+        instagram_embed_path: instagram_embeds_path,
+        theme: @user.theme || "day",
+        favicon_colors: @user.setting_on?(:favicon_colors),
+        font_stylesheet: ENV['FONT_STYLESHEET'],
       }
 
-      render action: 'logged_in'
+      render action: "logged_in"
     else
       render_file_or("home/index.html", :ok) {
         redirect_to login_url
@@ -55,7 +67,7 @@ class SiteController < ApplicationController
   def headers
     @user = current_user
     if @user.admin?
-      @headers = request.env.select {|k,v| k =~ /^HTTP_/}
+      @headers = request.env.select { |k, v| k =~ /^HTTP_/ }
     end
   end
 
@@ -63,8 +75,7 @@ class SiteController < ApplicationController
 
   def check_user
     if current_user.suspended
-      redirect_to settings_billing_url, alert: 'Please update your billing information to use Feedbin.'
+      redirect_to settings_billing_url, alert: "Please update your billing information to use Feedbin."
     end
   end
-
 end

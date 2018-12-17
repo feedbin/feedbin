@@ -1,5 +1,4 @@
 class BillingEvent < ApplicationRecord
-
   attr_accessor :details
 
   belongs_to :billable, polymorphic: true
@@ -42,11 +41,11 @@ class BillingEvent < ApplicationRecord
   end
 
   def charge_succeeded?
-    'charge.succeeded' == event_type
+    "charge.succeeded" == event_type
   end
 
   def charge_failed?
-    'invoice.payment_failed' == event_type
+    "invoice.payment_failed" == event_type
   end
 
   def subscription_deactivated?
@@ -103,5 +102,4 @@ class BillingEvent < ApplicationRecord
   def currency
     event_object["currency"].upcase
   end
-
 end

@@ -1,0 +1,2 @@
+feedbin.embeds["<%= @embed.cache_key %>"] = $("<%= j render partial: 'iframe', locals: {embed: @embed} %>");
+$("#<%= @dom_id %>").replaceWith(feedbin.embeds["<%= @embed.cache_key %>"]);

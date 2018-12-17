@@ -1,7 +1,6 @@
 module Api
   module V2
     class ActionsController < ApiController
-
       respond_to :json
 
       before_action :set_action, only: [:update, :results]
@@ -43,13 +42,35 @@ module Api
         if @action.computed_feed_ids.any?
           query[:feed_ids] = @action.computed_feed_ids
           if params[:read].present?
-            query[:read] = (params[:read] == 'true') ? true : false
+            query[:read] = (params[:read] == "true") ? true : false
           end
           @entries = Entry.scoped_search(query, @user)
         else
           @entries = []
         end
+      end
 
+      def results_watch
+        @user = current_user
+
+        if action = @user.actions.notifier.take
+          query = {}
+          if action.query.present?
+            query[:query] = @action.query
+          end
+          if action.computed_feed_ids.any?
+            query[:feed_ids] = action.computed_feed_ids
+            query[:read] = false
+            @entries = Entry.scoped_search(query, @user).limit(10).includes(:feed)
+            @titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) do |(feed_id, title), hash|
+              hash[feed_id] = title
+            end
+          else
+            @entries = []
+          end
+        else
+          @entries = []
+        end
       end
 
       private
@@ -65,9 +86,6 @@ module Api
       def all_feeds?(action)
         action[:feed_ids].blank? && action[:tag_ids].blank?
       end
-
     end
   end
 end
-
-

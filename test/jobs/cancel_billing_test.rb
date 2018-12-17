@@ -1,15 +1,15 @@
-require 'test_helper'
+require "test_helper"
 
-class CancelBillingTestTest < ActiveSupport::TestCase
+class CancelBillingTest < ActiveSupport::TestCase
   test "should cancel subscription" do
     StripeMock.start
     plan = plans(:trial)
     create_stripe_plan(plan)
 
     user = User.create(
-      email: 'cc@example.com',
+      email: "cc@example.com",
       password: default_password,
-      plan: plan
+      plan: plan,
     )
 
     CancelBilling.new().perform(user.customer_id)

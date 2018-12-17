@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class PublicSettingsControllerTest < ActionController::TestCase
-
   test "should unsubscribe from emails" do
     @user = users(:ben)
     assert @user.reload.subscribed_to_emails?
@@ -11,5 +10,4 @@ class PublicSettingsControllerTest < ActionController::TestCase
     assert_response :success
     assert !@user.reload.subscribed_to_emails?
   end
-
 end

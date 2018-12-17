@@ -1,7 +1,6 @@
 module Api
   module V2
     class EntryCountsController < ApiController
-
       respond_to :json
       skip_before_action :valid_user
 
@@ -24,7 +23,7 @@ module Api
         results = ActiveRecord::Base.connection.execute(query)
 
         results.each_with_object([]) do |result, array|
-          array.push(result['entries_count'].to_i)
+          array.push(result["entries_count"].to_i)
         end
       end
 
@@ -51,7 +50,6 @@ module Api
           ON (date = results.day)
         eos
       end
-
     end
   end
 end

@@ -1,8 +1,10 @@
-require 'test_helper'
+require "test_helper"
 
-class ImportWorkerTestTest < ActiveSupport::TestCase
+class ImportWorkerTest < ActiveSupport::TestCase
   test "should build import" do
-    import = Import.create().tap do |record|
+    user = users(:new)
+
+    import = Import.create!(user: user).tap do |record|
       def record.upload
         xml = <<-eot
           <?xml version="1.0" encoding="UTF-8"?>
@@ -14,7 +16,7 @@ class ImportWorkerTestTest < ActiveSupport::TestCase
         eot
         OpenStruct.new(
           file: OpenStruct.new(extension: "xml"),
-          read: xml
+          read: xml,
         )
       end
     end

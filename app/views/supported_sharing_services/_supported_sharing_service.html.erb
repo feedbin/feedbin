@@ -1,9 +1,9 @@
 <% if supported_sharing_service.active? %>
-  <li class="share-icon-wrap <%= "icon-share-#{supported_sharing_service.service_id}" %>">
-    <%= render partial: "supported_sharing_services/service_#{supported_sharing_service.service_id}", locals: {sharing_service: supported_sharing_service, record: supported_sharing_service, status: :active} %>
-  </li>
+    <li class="share-icon-wrap <%= "icon-share-#{supported_sharing_service.service_id}" %>">
+        <%= render partial: "supported_sharing_services/service_#{supported_sharing_service.service_id}", locals: {sharing_service: supported_sharing_service, record: supported_sharing_service, status: :active} %>
+    </li>
 <% else %>
-  <li class="share-icon-wrap <%= "icon-share-#{supported_sharing_service.service_id}" %>">
-    <%= render partial: "supported_sharing_services/service_#{supported_sharing_service.service_id}", locals: {sharing_service: supported_sharing_service, record: supported_sharing_service, status: :issue} %>
-  </li>
+    <li class="share-icon-wrap <%= "icon-share-#{supported_sharing_service.service_id}" %>">
+        <%= render partial: "supported_sharing_services/service_#{supported_sharing_service.service_id}", locals: {sharing_service: supported_sharing_service, record: supported_sharing_service, status: :issue} %>
+    </li>
 <% end %>

@@ -1,7 +1,6 @@
 module Api
   module V2
     class StarredEntriesController < ApiController
-
       respond_to :json
 
       before_action :validate_content_type, only: [:create]
@@ -23,10 +22,9 @@ module Api
       end
 
       def destroy
-        @user = current_user
-        entries = get_valid_entries
-        StarredEntry.where(user_id: @user.id, entry_id: entries[:entry_ids]).destroy_all
-        render json: entries[:entry_ids].to_json
+        user = current_user
+        user.starred_entries.where(entry_id: params[:starred_entries]).destroy_all
+        render json: params[:starred_entries].to_json
       end
 
       private
@@ -45,21 +43,20 @@ module Api
             valid_entries << {entry_id: entry_id, feed_id: feed_id, published: published}
           end
         end
-        entry_ids = valid_entries.map {|entry| entry[:entry_id]}
+        entry_ids = valid_entries.map { |entry| entry[:entry_id] }
 
         {valid_entries: valid_entries, entry_ids: entry_ids}
       end
 
       def validate_create
-        needs 'starred_entries'
+        needs "starred_entries"
 
         if params[:starred_entries].respond_to?(:count)
           if params[:starred_entries].count > 1000
-            status_bad_request([{starred_entries: 'Please send less than or equal to 1,000 ids per request'}])
+            status_bad_request([{starred_entries: "Please send less than or equal to 1,000 ids per request"}])
           end
         end
       end
-
     end
   end
 end

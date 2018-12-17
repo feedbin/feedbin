@@ -1,0 +1,19 @@
+<div class="service-options-wrap">
+    <div class="service-options">
+        <div class="clearfix">
+            <div class="half">
+                <%= form_for(record) do |f| %>
+                    <%= f.hidden_field :service_id, value: sharing_service[:service_id] %>
+                    <%= f.text_field :api_token, placeholder: 'App Token', class: 'no-margin' %>
+                    <div class="button-wrap">
+                        <%= button_tag 'Cancel', type: "button", class: 'button button-secondary button-inline', data: {behavior: "hide_service_options"} %>
+                        <%= submit_tag "Save", class: 'button button-primary-plain' %>
+                    </div>
+                <% end %>
+            </div>
+            <div class="half">
+                <small class="share-help">You can create a new app token on this <a href="https://micro.blog/account/apps" target="_blank" rel="noopener noreferrer">Micro.blog account page</a>.</small>
+            </div>
+        </div>
+    </div>
+</div>

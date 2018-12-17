@@ -1,7 +1,6 @@
 class User < ApplicationRecord
-
   attr_accessor :stripe_token, :old_password_valid, :update_auth_token,
-                :password_reset, :coupon_code, :is_trialing, :coupon_valid
+                :password_reset, :coupon_code, :is_trialing, :coupon_valid, :deleted
 
   has_secure_password
 
@@ -33,7 +32,18 @@ class User < ApplicationRecord
                  :view_mode,
                  :disable_image_proxy,
                  :api_client,
-                 :marketing_unsubscribe
+                 :marketing_unsubscribe,
+                 :hide_recently_played,
+                 :now_playing_entry,
+                 :audio_panel_size,
+                 :view_links_in_app,
+                 :twitter_access_secret,
+                 :twitter_access_token,
+                 :twitter_screen_name,
+                 :twitter_access_error,
+                 :nice_frames,
+                 :favicon_colors,
+                 :newsletter_tag
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -50,6 +60,7 @@ class User < ApplicationRecord
   has_many :saved_searches, dependent: :delete_all
   has_many :actions, dependent: :destroy
   has_many :recently_read_entries, dependent: :delete_all
+  has_many :recently_played_entries, dependent: :delete_all
   has_many :updated_entries, dependent: :delete_all
   has_many :devices, dependent: :delete_all
   has_many :in_app_purchases
@@ -57,8 +68,7 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :sharing_services,
                                 allow_destroy: true,
-                                reject_if: -> attributes { attributes['label'].blank? || attributes['url'].blank? }
-
+                                reject_if: -> attributes { attributes["label"].blank? || attributes["url"].blank? }
 
   after_initialize :set_defaults, if: :new_record?
 
@@ -71,11 +81,11 @@ class User < ApplicationRecord
   before_create { generate_token(:inbound_email_token, 4) }
   before_create { generate_token(:newsletter_token, 4) }
 
-  before_update :update_billing, unless: -> { !ENV['STRIPE_API_KEY'] }
+  before_update :update_billing, unless: -> { !ENV["STRIPE_API_KEY"] }
 
   after_create { schedule_trial_jobs }
 
-  before_destroy :cancel_billing, unless: -> { !ENV['STRIPE_API_KEY'] }
+  before_destroy :cancel_billing, unless: -> { !ENV["STRIPE_API_KEY"] }
   before_destroy :create_deleted_user
   before_destroy :record_stats
 
@@ -88,12 +98,16 @@ class User < ApplicationRecord
   validates_uniqueness_of :email, case_sensitive: false
   validates_presence_of :password, on: :create
 
+  def twitter_enabled?
+    twitter_access_secret && twitter_access_token
+  end
+
   def set_defaults
     self.expires_at = Feedbin::Application.config.trial_days.days.from_now
     self.update_auth_token = true
     self.mark_as_read_confirmation = 1
-    self.font = "serif-2"
-    self.font_size = 7
+    self.font = "default"
+    self.font_size = 5
     self.price_tier = Feedbin::Application.config.price_tier
   end
 
@@ -104,11 +118,11 @@ class User < ApplicationRecord
       self.coupon_code = params[:coupon_code]
     end
 
-    if self.coupon_valid || !ENV['STRIPE_API_KEY']
+    if self.coupon_valid || !ENV["STRIPE_API_KEY"]
       self.free_ok = true
-      self.plan = Plan.find_by_stripe_id('free')
+      self.plan = Plan.find_by_stripe_id("free")
     else
-      self.plan = Plan.find_by_stripe_id('trial')
+      self.plan = Plan.find_by_stripe_id("trial")
     end
 
     if params[:user] && params[:user][:password]
@@ -126,11 +140,11 @@ class User < ApplicationRecord
     OnboardingMessage.perform_in(3.days, self.id, MarketingMailer.method(:onboarding_2_mobile).name.to_s)
     OnboardingMessage.perform_in(5.days, self.id, MarketingMailer.method(:onboarding_3_subscribe).name.to_s)
     OnboardingMessage.perform_in(Feedbin::Application.config.trial_days.days - 1.days, self.id, MarketingMailer.method(:onboarding_4_expiring).name.to_s)
-    OnboardingMessage.perform_at(Feedbin::Application.config.trial_days.days.from_now, self.id, MarketingMailer.method(:onboarding_5_expired).name.to_s)
+    OnboardingMessage.perform_at(Feedbin::Application.config.trial_days.days.from_now + 1.days, self.id, MarketingMailer.method(:onboarding_5_expired).name.to_s)
   end
 
   def setting_on?(setting_symbol)
-    self.send(setting_symbol) == '1'
+    self.send(setting_symbol) == "1"
   end
 
   def subscribed_to_emails?
@@ -144,7 +158,7 @@ class User < ApplicationRecord
   end
 
   def paid_conversion?
-    plan_id_changed? && plan_id_was == Plan.find_by_stripe_id('trial').id
+    plan_id_changed? && plan_id_was == Plan.find_by_stripe_id("trial").id
   end
 
   def strip_email
@@ -152,7 +166,11 @@ class User < ApplicationRecord
   end
 
   def feed_tags
-    tags.where(id: taggings.pluck(:tag_id)).order(:name).distinct
+    @feed_tags ||= begin
+      Tag.where(id: taggings.distinct.pluck(:tag_id)).natural_sort_by do |tag|
+        tag.name
+      end
+    end
   end
 
   def tag_names
@@ -169,7 +187,7 @@ class User < ApplicationRecord
   end
 
   def free_ok
-    @free_ok || plan_id_was == Plan.find_by_stripe_id('free').id
+    @free_ok || plan_id_was == Plan.find_by_stripe_id("free").id
   end
 
   def free_ok=(value)
@@ -180,33 +198,35 @@ class User < ApplicationRecord
     if free_ok
       valid_plans = Plan.all.pluck(:id)
     else
-      valid_plans = Plan.where(price_tier: price_tier).where.not(stripe_id: 'free').pluck(:id)
+      valid_plans = Plan.where(price_tier: price_tier).where.not(stripe_id: "free").pluck(:id)
     end
 
+    valid_plans.append(plan_id_was)
+
     unless valid_plans.include?(plan.id)
-      errors.add(:plan_id, 'is invalid')
+      errors.add(:plan_id, "is invalid")
     end
   end
 
   def available_plans
     plan_stripe_id = plan.stripe_id
-    if plan_stripe_id == 'trial'
-      Plan.where(price_tier: price_tier, stripe_id: ['basic-monthly-2', 'basic-yearly-2', 'basic-monthly-3', 'basic-yearly-3']).order('price DESC')
-    elsif plan_stripe_id == 'free'
+    if plan_stripe_id == "trial"
+      Plan.where(price_tier: price_tier, stripe_id: ["basic-monthly", "basic-yearly", "basic-monthly-2", "basic-yearly-2", "basic-monthly-3", "basic-yearly-3"]).order("price DESC")
+    elsif plan_stripe_id == "free"
       Plan.where(price_tier: price_tier)
     else
-      exclude = ['free', 'trial']
-      if plan_stripe_id != 'timed'
-        exclude.push('timed')
+      exclude = ["free", "trial"]
+      if plan_stripe_id != "timed"
+        exclude.push("timed")
       end
       Plan.where(price_tier: price_tier).where.not(stripe_id: exclude)
     end
   end
 
   def trial_plan_valid
-    trial_plan = Plan.find_by_stripe_id('trial')
+    trial_plan = Plan.find_by_stripe_id("trial")
     if plan_id == trial_plan.id && plan_id_was != trial_plan.id && !plan_id_was.nil?
-      errors.add(:plan_id, 'is invalid')
+      errors.add(:plan_id, "is invalid")
     end
   end
 
@@ -287,10 +307,6 @@ class User < ApplicationRecord
     CancelBilling.perform_async(customer_id)
   end
 
-  def feed_with_subscription_id(feed_id)
-    feeds.select("feeds.*, subscriptions.id as subscription_id").where("feeds.id = ? AND subscriptions.user_id = #{self.id}", feed_id).first
-  end
-
   def tag_group
     unique_tags = feed_tags
     feeds_by_tag = build_feeds_by_tag
@@ -309,8 +325,15 @@ class User < ApplicationRecord
     unique_tags
   end
 
+  def tags_on_feed
+    names = tag_names
+    build_tags_by_feed.each_with_object({}) do |(feed_id, tag_ids), hash|
+      hash[feed_id] = tag_ids.map { |tag_id| names[tag_id] }
+    end
+  end
+
   def feed_order
-    feeds.include_user_title.map {|feed| feed.id}
+    feeds.include_user_title.map { |feed| feed.id }
   end
 
   def subscribe!(feed)
@@ -357,7 +380,23 @@ class User < ApplicationRecord
     query = ActiveRecord::Base.send(:sanitize_sql_array, [query, self.id, subscriptions.pluck(:feed_id)])
     results = ActiveRecord::Base.connection.execute(query)
     results.each_with_object({}) do |result, hash|
-      hash[result['tag_id'].to_i] = JSON.parse(result['feed_ids'])
+      hash[result["tag_id"].to_i] = JSON.parse(result["feed_ids"])
+    end
+  end
+
+  def build_tags_by_feed
+    query = <<-eos
+      SELECT
+        feed_id, array_to_json(array_agg(tag_id)) as tag_ids
+      FROM
+        taggings
+      WHERE user_id = ? AND feed_id IN (?)
+      GROUP BY feed_id
+    eos
+    query = ActiveRecord::Base.send(:sanitize_sql_array, [query, self.id, subscriptions.pluck(:feed_id)])
+    results = ActiveRecord::Base.connection.execute(query)
+    results.each_with_object({}) do |result, hash|
+      hash[result["feed_id"].to_i] = JSON.parse(result["tag_ids"])
     end
   end
 
@@ -366,10 +405,10 @@ class User < ApplicationRecord
   end
 
   def record_stats
-    if self.plan.stripe_id == 'trial'
-      Librato.increment('user.trial.cancel')
+    if self.plan.stripe_id == "trial"
+      Librato.increment("user.trial.cancel")
     else
-      Librato.increment('user.paid.cancel')
+      Librato.increment("user.paid.cancel")
     end
   end
 
@@ -400,7 +439,7 @@ class User < ApplicationRecord
   end
 
   def deleted?
-    false
+    self.deleted || false
   end
 
   def can_read_feed?(feed)
@@ -420,8 +459,35 @@ class User < ApplicationRecord
     can_read
   end
 
-  def trialing?
-    self.plan == Plan.find_by_stripe_id('trial')
+  def can_read_entry?(entry_id)
+    can_read = false
+
+    entry = Entry.find(entry_id)
+
+    if subscribed_to?(entry.feed)
+      can_read = true
+    end
+
+    if !can_read && starred_entries.where(entry: entry).exists?
+      can_read = true
+    end
+
+    if !can_read && recently_read_entries.where(entry: entry).exists?
+      can_read = true
+    end
+
+    if !can_read && recently_played_entries.where(entry: entry).exists?
+      can_read = true
+    end
+
+    can_read
   end
 
+  def trialing?
+    self.plan == Plan.find_by_stripe_id("trial")
+  end
+
+  def display_prefs
+    "font-size-#{self.font_size || 5} font-#{self.font || "default"}"
+  end
 end

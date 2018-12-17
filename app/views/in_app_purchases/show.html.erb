@@ -1,61 +1,59 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Feedbin Receipt</title>
-    <%= stylesheet_link_tag "application", media: 'all' %>
-    <style type="text/css" media="screen">
-    body {
-        padding: 20px;
-    }
-    td,th,table {
-        border-color: #000 !important;
-    }
-    </style>
-</head>
-<body>
-    <h2 class="no-margin">Receipt</h2>
-    <p>
-        <small>Invoice: <%= @billing_event.transaction_id %></small>
-        <br /><small><%= @billing_event.receipt_date %></small>
-    </p>
-
-    <div class="customer-info">
-        <strong>Account</strong>
-        <% unless @user.receipt_info.blank? %>
+    <head>
+        <title>Feedbin Receipt</title>
+        <%= stylesheet_link_tag "application", media: 'all' %>
+        <style type="text/css" media="screen">
+            body {
+                padding: 20px;
+            }
+            td,th,table {
+                border-color: #000 !important;
+            }
+        </style>
+    </head>
+    <body>
+        <h2 class="no-margin">Receipt</h2>
+        <p>
+            <small>Invoice: <%= @billing_event.transaction_id %></small>
             <br />
-            <%= strip_tags(@user.receipt_info).gsub("\n", "<br />").html_safe %>
-        <% end %>
-        <br />
-        <%= @user.email %>
-    </div>
-    <div class="company-info">
-        <strong>Feedbin, Inc.</strong>
-        <br />1535 Green St.
-        <br />Suite 205
-        <br />San Francisco, CA 94123
-    </div>
-
-    <hr class="space" />
-
-    <table class="table table-bordered">
-        <thead>
+            <small><%= @billing_event.receipt_date %></small>
+        </p>
+        <div class="customer-info">
+            <strong>Account</strong>
+            <% unless @user.receipt_info.blank? %>
+                <br />
+                <%= strip_tags(@user.receipt_info).gsub("\n", "<br />").html_safe %>
+            <% end %>
+            <br />
+            <%= @user.email %>
+        </div>
+        <div class="company-info">
+            <strong>Feedbin, Inc.</strong>
+            <br />
+            1535 Green St.
+            <br />
+            Suite 205
+            <br />
+            San Francisco, CA 94123
+        </div>
+        <hr class="space" />
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th width="50%">Description</th>
+                    <th width="50%">Price</th>
+                </tr>
+            </thead>
             <tr>
-                <th width="50%">Description</th>
-                <th width="50%">Price</th>
+                <td>
+                    <%= @billing_event.receipt_description %>
+                </td>
+                <td align="right">
+                    <%= number_to_currency(@billing_event.receipt_amount) %> <%= @billing_event.currency %>
+                </td>
             </tr>
-        </thead>
-        <tr>
-            <td>
-                <%= @billing_event.receipt_description %>
-            </td>
-            <td align="right">
-                <%= number_to_currency(@billing_event.receipt_amount) %> <%= @billing_event.currency %>
-            </td>
-        </tr>
-    </table>
-
-    <p><strong>Thank You!</strong></p>
-
-</body>
+        </table>
+        <p><strong>Thank You!</strong></p>
+    </body>
 </html>
-

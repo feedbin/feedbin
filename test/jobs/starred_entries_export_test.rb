@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class StarredEntriesExportTest < ActiveSupport::TestCase
   test "should send email" do
@@ -15,6 +15,5 @@ class StarredEntriesExportTest < ActiveSupport::TestCase
         job.perform(user.id)
       end
     end
-
   end
 end

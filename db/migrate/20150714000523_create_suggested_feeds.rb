@@ -1,4 +1,4 @@
-class CreateSuggestedFeeds < ActiveRecord::Migration
+class CreateSuggestedFeeds < ActiveRecord::Migration[4.2]
   def change
     create_table :suggested_feeds do |t|
       t.belongs_to :suggested_category, index: true

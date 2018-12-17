@@ -1,17 +1,17 @@
 class Admin::UsersController < ApplicationController
   def index
     if params.has_key?(:q)
-      @users = User.page(params[:page]).where("email ILIKE :query", query: "%#{params[:q]}%")  + DeletedUser.page(params[:page]).where("email ILIKE :query", query: "%#{params[:q]}%")
+      @users = User.page(params[:page]).where("email ILIKE :query", query: "%#{params[:q]}%") + DeletedUser.page(params[:page]).where("email ILIKE :query", query: "%#{params[:q]}%")
     else
       @users = User.page(params[:page]) + DeletedUser.page(params[:page])
     end
-    render layout: 'settings'
+    render layout: "settings"
   end
 
   def destroy
-    user = User.find(params[:id])
-    user.destroy
-    @user = DeletedUser.where(customer_id: user.customer_id).take!
+    @user = User.find(params[:id])
+    @user.deleted = true
+    UserDeleter.perform_async(@user.id)
   end
 
   def authorize
@@ -19,5 +19,4 @@ class Admin::UsersController < ApplicationController
       render_404
     end
   end
-
 end

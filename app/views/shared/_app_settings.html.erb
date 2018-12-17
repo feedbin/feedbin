@@ -1,5 +1,13 @@
-<div class="entry-button-wrap">
-    <div class="dropdown-wrap dropdown-right button-app-settings">
+<div class="entry-button-wrap settings-button-wrap">
+    <%= link_to settings_path, class: "app-settings-button" do %>
+        <div class="entry-button">
+            <div class="hamburger-menu-wrap" data-behavior="settings_button_dropdown" title="Settings" role="button">
+                <div class="hamburger-menu"></div>
+            </div>
+        </div>
+    <% end %>
+
+    <div class="dropdown-wrap dropdown-right web-settings-button">
         <div class="entry-button">
             <div class="hamburger-menu-wrap" data-behavior="toggle_dropdown" title="Settings" role="button">
                 <div class="hamburger-menu"></div>
@@ -9,18 +17,21 @@
             <ul class="segmented no-border">
                 <li><%= link_to 'Settings', settings_path, class: "no-border" %></li>
                 <li><%= link_to 'Appearance', settings_appearance_path, class: "no-border" %></li>
-                <li><%= link_to 'Feeds', settings_feeds_path %></li>
+                <li><%= link_to 'Subscriptions', settings_subscriptions_path %></li>
             </ul>
             <ul class="segmented">
                 <li><%= link_to 'Actions', actions_path, class: "no-border" %></li>
-                <li><%= link_to 'Sharing', sharing_services_path %></li>
+                <li><%= link_to 'Share & Save', sharing_services_path %></li>
             </ul>
             <ul class="segmented">
                 <li><%= link_to 'Account', settings_account_path, class: "no-border" %></li>
                 <li><%= link_to 'Billing', settings_billing_path, class: "no-border" %></li>
-                <li><%= link_to 'Import/Export', settings_import_export_path %></li>
+                <li><%= link_to 'Import & Export', settings_import_export_path %></li>
             </ul>
             <ul class="segmented no-margin">
+                <% if current_user.try(:admin?) %>
+                    <li><%= link_to 'Customers', admin_users_path, class: "no-border" %></li>
+                <% end %>
                 <li><%= link_to 'Log Out', logout_path, method: 'delete' %></li>
             </ul>
         </div>

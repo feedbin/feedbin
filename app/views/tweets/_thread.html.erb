@@ -1,0 +1,9 @@
+<style>
+    <%= render partial: "thread_css", locals: {entry: entry, tweets: tweets} %>
+</style>
+<div class="tweet-wrap">
+    <%= render partial: "shared/tweet", collection: tweets, locals: {entry: entry, parent: parent, css: "reply", include_media: true} %>
+</div>
+<script>
+    feedbin.localizeTime();
+</script>

@@ -1,10 +1,9 @@
-require 'test_helper'
+require "test_helper"
 
 class TagsControllerTest < ActionController::TestCase
-
   def setup
     @user = users(:ben)
-    @tag = @user.feeds.first.tag('Tag', @user).first.tag
+    @tag = @user.feeds.first.tag("Tag", @user).first.tag
   end
 
   test "should get index" do
@@ -12,9 +11,9 @@ class TagsControllerTest < ActionController::TestCase
     get :index, params: {query: @tag.name}, format: :json
     assert_response :success
     data = JSON.parse(@response.body)
-    assert_kind_of Array, data['suggestions']
-    ['value', 'data'].each do |key|
-      assert data['suggestions'].first.key?(key)
+    assert_kind_of Array, data["suggestions"]
+    ["value", "data"].each do |key|
+      assert data["suggestions"].first.key?(key)
     end
   end
 
@@ -39,5 +38,4 @@ class TagsControllerTest < ActionController::TestCase
       assert_response :success
     end
   end
-
 end

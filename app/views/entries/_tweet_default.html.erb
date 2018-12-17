@@ -1,0 +1,76 @@
+<% present entry do |entry_presenter| %>
+    <div class="feedbin--wrap">
+        <p class="feedbin--content-text"><%= entry_presenter.tweet_text(entry.main_tweet, false) %></p>
+        <% if entry_presenter.quoted_status? %>
+            <blockquote class="feedbin--quoted">
+                <p>
+                    <a href="<%= entry_presenter.tweet_user_url(entry_presenter.quoted_status) %>">
+                        <strong class="feedbin--name"><%= entry_presenter.tweet_name(entry_presenter.quoted_status) %></strong>
+                        <span class="feedbin--screen-name"><%= entry_presenter.tweet_screen_name(entry_presenter.quoted_status) %></span>
+                    </a>
+                </p>
+                <p class="feedbin--content-text"><%= entry_presenter.tweet_text(entry_presenter.quoted_status, false) %></p>
+            </blockquote>
+        <% end %>
+        <% if entry.tweet.retweeted_status? %>
+            <div class="feedbin--meta-wrap">
+                <p class="feedbin--meta">
+                    <a href="<%= entry_presenter.tweet_user_url(entry.tweet) %>">
+                        <small><%= entry_presenter.tweet_retweeted_message %></small>
+                    </a>
+                </p>
+            </div>
+        <% end %>
+        <% entry_presenter.tweet_media.each do |media| %>
+            <p class="feedbin--media-wrap">
+                <% if entry_presenter.tweet_video?(media) %>
+                    <%= entry_presenter.tweet_video(media) %>
+                <% else %>
+                    <%= link_to media.media_url_https.to_s + ":large" do %>
+                        <%= image_tag media.media_url_https.to_s + ":large" %>
+                    <% end %>
+                <% end %>
+            </p>
+        <% end %>
+        <% entry_presenter.tweet_urls.each do |url| %>
+            <% if entry_presenter.tweet_youtube_embed(url) %>
+                <div class="feedbin--embed-wrap"><%= entry_presenter.tweet_youtube_embed(url) %></div>
+            <% elsif entry_presenter.tweet_vimeo_embed(url) %>
+                <div class="feedbin--embed-wrap"><%= entry_presenter.tweet_vimeo_embed(url) %></div>
+            <% elsif entry_presenter.tweet_instagram_embed(url) %>
+                <div class="feedbin--embed-wrap"><%= entry_presenter.tweet_instagram_embed(url) %></div>
+            <% elsif page = entry_presenter.saved_page(url.expanded_url.to_s) %>
+                <%
+      begin
+          link_content = ContentFormatter.format!(page.content, nil)
+      rescue
+          link_content = nil
+      end
+      %>
+                <% if link_content && link_content.length > 400 %>
+                    <div class="feedbin--article-wrap">
+                        <header class="feedbin--article-header">
+                            <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
+                                <h2><%= page.title || "Untitled" %></h2>
+                            <% end %>
+                            <p class="feedbin--article-meta">
+                                <span class="feedbin--host">
+                                    <%= url.expanded_url.host %>
+                                </span>
+                                <br />
+                                <span class="feedbin--author">
+                                    <% if page.author %>
+                                        by <%= page.author %>
+                                    <% end %>
+                                </span>
+                            </p>
+                        </header>
+                        <div class="feedbin--article-content">
+                            <%= link_content.html_safe %>
+                        </div>
+                    </div>
+                <% end %>
+            <% end %>
+        <% end %>
+    </div>
+<% end %>

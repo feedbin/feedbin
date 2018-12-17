@@ -1,5 +1,3 @@
-require_relative '../../lib/batch_jobs'
-
 class FaviconMigration
   include Sidekiq::Worker
   include BatchJobs
@@ -27,5 +25,4 @@ class FaviconMigration
   def build
     enqueue_all(Favicon, self.class)
   end
-
 end

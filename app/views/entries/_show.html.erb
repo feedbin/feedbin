@@ -1,70 +1,40 @@
 <% present entry do |entry_presenter| %>
-    <%= content_tag :div, class: "read entry-feed-#{entry.feed_id}", data: {behavior: 'selected_entry_data', entry_id: entry.id} do %>
-      <div class="entry-toolbar">
-        <div class="site-info">
-          <button class="back-button" data-behavior="show_entries"></button>
-          <button class="entry-button button-full-screen" data-behavior="full_screen" title="Close full screen">
-              <%= svg_tag 'icon-full-screen-close-small', size: '16x16' %>
-          </button>
-          <div class="feed-button" data-behavior="show_entry_basement" data-basement-panel="feed_panel" title="Feed Options" role="button">
-            <%= entry_presenter.favicon(entry.feed) %>
-            <%= content_tag :div, strip_tags(entry.feed.title), class: 'entry-feed-title', data: {behavior: 'user_title', feed_id: entry.feed.id} %>
-          </div>
-        </div>
-        <div class="entry-buttons">
-          <%= render partial: 'shared/app_settings' %>
-          <%= render partial: "shared/entry_settings_button" %>
-          <%= render partial: "unread_entries/form", locals: {entry: entry} %>
-          <%= render partial: "starred_entries/form", locals: {entry: entry} %>
-          <%= render partial: "entries/toggle_content", locals: {content_view: content_view, entry: entry} %>
-          <%= render partial: "sharing_services/sharing_service_button", locals: {services: services} %>
-        </div>
-      </div>
-      <div class="entry-content">
-        <div class="entry-inner" <%= rtl(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>>
-          <header class="entry-header">
-            <%= link_to entry.fully_qualified_url, target: '_blank', rel: 'noopener noreferrer', id: 'source_link' do  %>
-            <h1><%= entry_presenter.entry_view_title %></h1>
-            <% end %>
-            <p class="post-meta">
-              <time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time>
-              <%= entry_presenter.author %>
-            </p>
-            <p class="post-meta feed-title"><span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
-          </header>
-          <div data-behavior="entry_content_wrap" class="content-styles <%= entry_presenter.entry_type_class %>">
-            <%
-              if entry.content.present? &&
-              entry.original.present? &&
-              entry.original['content'].present? &&
-              entry.original['content'].length != entry.content.length
-            %>
-              <p class="diff-wrap entry-callout">
-                <span class="icon-clock-wrap"><%= svg_tag 'favicon-updated', size: '16x16' %></span>
-                <span class="diff-wrap-text">This article was updated <%= link_to "view changes", diff_entry_path(entry), remote: true %></span>
-                <%= link_to '×', toggle_updates_feed_path(entry.feed, inline: true), remote: true, method: :post, class: 'ignore-updates', data: {behavior: 'hide_updates'}, title: "Don't tell me when articles from #{strip_tags(entry.feed.title)} have been updated."  %>
-              </p>
-            <% end %>
-            <% if entry_presenter.media_type %>
-            <div class="media-container">
-              <%= entry_presenter.media.html_safe %>
+    <%= content_tag :div, class: "read", data: {behavior: 'selected_entry_data', entry_id: entry.id} do %>
+        <%= text_area_tag "source_link_field", entry.fully_qualified_url, class: "visually-hidden" %>
+        <div class="entry-toolbar">
+            <div class="site-info">
+                <button class="back-button" data-behavior="show_entries">
+                    <%= svg_tag "icon-arrow", size: "11x18" %>
+                </button>
+                <button class="entry-button button-full-screen" data-behavior="full_screen" title="Close full screen">
+                    <%= svg_tag 'icon-full-screen-close-small', size: '16x16' %>
+                </button>
+                <%
+                if subscriptions.include?(entry.feed.id)
+                  link_args = [modal_edit_feed_path(entry.feed), remote: true, class: 'feed-button', data: {behavior: 'open_modal', modal_target: 'edit_subscription'}]
+                else
+                  link_args = ["#", remote: true, class: 'feed-button', data: {behavior: 'show_message', message: "Cannot edit. You are no longer subscribed to this feed."}]
+                end
+                %>
+                <%= link_to *link_args do %>
+                    <%= entry_presenter.favicon(entry.feed) %>
+                    <span class="entry-feed-title" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span>
+                <% end %>
             </div>
-            <% end %>
-            <div class="entry-final-content">
-                <%= raw(entry_presenter.content(!user.setting_on?(:disable_image_proxy))) %>
+            <div class="entry-buttons">
+                <%= render partial: "sharing_services/sharing_service_button", locals: {services: services} %>
+                <%= render partial: "entries/toggle_content", locals: {content_view: content_view, entry: entry} %>
+                <%= render partial: "starred_entries/form", locals: {entry: entry} %>
+                <%= render partial: "unread_entries/form", locals: {entry: entry} %>
+                <%= render partial: "shared/entry_settings_button" %>
+                <%= render partial: "shared/app_settings" %>
             </div>
-          </div>
         </div>
-        <a class="next-entry-preview no-content" data-behavior="open_next_entry" href="#">
-          <span class="next-entry-preview-inner">
-            <span class="next-entry-link">Next</span>
-            <span class="next-entry-feed"></span>
-            <span class="next-entry-title"></span>
-          </span>
-        </a>
-      </div>
     <% end %>
-    <script type="text/javascript">
-      $('[data-basement-panel-target~=feed_panel]').html('<%= j render partial: "shared/feed_settings", locals: { entry: entry } %>');
+    <div class="hide" data-behavior="feed_link_template">
+        <%= render partial: "shared/link_actions", locals: {entry: entry} %>
+    </div>
+    <script>
+        feedbin.faviconColors($(".entry-toolbar"))
     </script>
 <% end %>

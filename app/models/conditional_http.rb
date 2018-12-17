@@ -1,5 +1,4 @@
 class ConditionalHTTP
-
   attr_reader :etag, :last_modified
 
   def initialize(etag, last_modified)

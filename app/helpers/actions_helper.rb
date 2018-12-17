@@ -1,5 +1,4 @@
 module ActionsHelper
-
   def action_feed_names(action)
     output = []
 
@@ -11,17 +10,17 @@ module ActionsHelper
 
     feed_names.sort!
 
-    output << feed_names.shift(2).join(', ')
+    output << feed_names.shift(2).join(", ")
 
     if feed_names.any?
       output << "and #{feed_names.length} more feeds"
     end
 
-    output.join(' ')
+    output.join(" ")
   end
 
   def action_tag_names(action)
-    Tag.where(id: action.tag_ids).order(name: :asc).pluck(:name).join(', ')
+    Tag.where(id: action.tag_ids).order(name: :asc).pluck(:name).join(", ")
   end
 
   def action_names(action)
@@ -32,14 +31,14 @@ module ActionsHelper
       end
     end
     if actions.any?
-      actions.join(' and ')
+      actions.join(" and ")
     else
-      'do nothing'
+      "do nothing"
     end
   end
 
   def action_label(value)
-    action_label = ''
+    action_label = ""
     Feedbin::Application.config.action_names.each do |action_name|
       if action_name.value == value
         action_label = action_name.label.downcase
@@ -47,5 +46,4 @@ module ActionsHelper
     end
     action_label
   end
-
 end

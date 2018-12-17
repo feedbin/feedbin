@@ -1,6 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
-class SearchIndexStoreTestTest < ActiveSupport::TestCase
+class SearchIndexStoreTest < ActiveSupport::TestCase
   setup do
     clear_search
     @user = users(:ben)
@@ -16,7 +16,10 @@ class SearchIndexStoreTestTest < ActiveSupport::TestCase
   end
 
   test "should percolate entry" do
-    action = @user.actions.create(feed_ids: [@entry.feed.id], query: "\"#{@entry.title}\"")
+    action = nil
+    Sidekiq::Testing.inline! do
+      action = @user.actions.create(feed_ids: [@entry.feed.id], query: "\"#{@entry.title}\"")
+    end
     Entry.__elasticsearch__.refresh_index!
 
     assert_difference "ActionsPerform.jobs.size", +1 do
@@ -29,12 +32,13 @@ class SearchIndexStoreTestTest < ActiveSupport::TestCase
   end
 
   test "should not percolate entry" do
-    action = @user.actions.create(feed_ids: [@entry.feed.id], query: "\"#{@entry.title}\"")
+    Sidekiq::Testing.inline! do
+      action = @user.actions.create(feed_ids: [@entry.feed.id], query: "\"#{@entry.title}\"")
+    end
     Entry.__elasticsearch__.refresh_index!
 
     assert_no_difference "ActionsPerform.jobs.size", +1 do
       SearchIndexStore.new().perform("Entry", @entry.id, true)
     end
   end
-
 end

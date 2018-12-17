@@ -1,16 +1,16 @@
-require 'test_helper'
+require "test_helper"
 
-class FeedImporterTestTest < ActiveSupport::TestCase
+class FeedImporterTest < ActiveSupport::TestCase
   setup do
     @user = users(:new)
     import = @user.imports.create
     details = {
       xml_url: "http://www.example.com/atom.xml",
       tag: "Favorites",
-      title: "My Title"
+      title: "My Title",
     }
     @import_item = import.import_items.create(details: details)
-    stub_request_file('atom.xml', @import_item.details[:xml_url])
+    stub_request_file("atom.xml", @import_item.details[:xml_url])
   end
 
   test "should create subscription" do
@@ -31,5 +31,4 @@ class FeedImporterTestTest < ActiveSupport::TestCase
     subscription = @user.subscriptions.where(feed: feed).take!
     assert_equal(@import_item.details[:title], subscription.title)
   end
-
 end

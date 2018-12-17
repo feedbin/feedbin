@@ -1,6 +1,1 @@
-<svg version="1.2" baseProfile="tiny" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-	 x="0px" y="0px" width="16px" height="16px" viewBox="0 0 16 16" xml:space="preserve">
-<path d="M8,2.999c2.761,0,5,2.239,5,5.001s-2.239,4.999-5,4.999S2.999,10.762,2.999,8S5.239,2.999,8,2.999 M8,1
-	C4.141,1,1,4.14,1,8c0,3.86,3.141,7,7,7s7-3.14,7-7C15,4.14,11.859,1,8,1L8,1z"/>
-<polygon points="8.936,7 8.938,7 8.938,4 6.938,4 6.938,6.792 6.938,7 6.938,7.83 10.046,10.938 11.46,9.524 "/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" baseProfile="tiny" version="1.2"><path d="M8 2.999a5 5 0 1 1-.002 10.002A5 5 0 0 1 8 2.999M8 1C4.141 1 1 4.14 1 8s3.141 7 7 7 7-3.14 7-7-3.141-7-7-7z"/><path d="M8.936 7h.002V4h-2v3.83l3.108 3.108 1.414-1.414z"/></svg>

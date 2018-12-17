@@ -19,7 +19,29 @@ class Feed < ApplicationRecord
 
   after_initialize :default_values
 
-  enum feed_type: { xml: 0, newsletter: 1 }
+  enum feed_type: {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3}
+
+  def twitter_user?
+    twitter_user.present?
+  end
+
+  def twitter_user
+    @twitter_user ||= Twitter::User.new(options["twitter_user"].deep_symbolize_keys)
+  rescue
+    nil
+  end
+
+  def twitter_feed?
+    self.twitter? || self.twitter_home?
+  end
+
+  def tag_with_params(params, user)
+    tags = []
+    tags.concat params[:tag_id].values if params[:tag_id]
+    tags.concat params[:tag_name] if params[:tag_name]
+    tags = tags.join(",")
+    self.tag(tags, user)
+  end
 
   def tag(names, user, delete_existing = true)
     taggings = []
@@ -36,11 +58,25 @@ class Feed < ApplicationRecord
     taggings
   end
 
+  def host_letter
+    letter = "default"
+    if host
+      if segment = host.split(".")[-2]
+        letter = segment[0].downcase
+      end
+    end
+    letter
+  end
+
   def self.create_from_parsed_feed(parsed_feed)
     ActiveRecord::Base.transaction do
       record = self.create!(parsed_feed.to_feed)
       parsed_feed.entries.each do |parsed_entry|
-        record.entries.create!(parsed_entry.to_entry)
+        entry_hash = parsed_entry.to_entry
+        threader = Threader.new(entry_hash, record)
+        if !threader.thread
+          record.entries.create!(entry_hash)
+        end
       end
       record
     end
@@ -54,24 +90,24 @@ class Feed < ApplicationRecord
     unless etag.blank?
       options[:if_none_match] = etag
     end
-    request = FeedRequest.new(url: self.feed_url, options: options)
+    request = Feedkit::Request.new(url: self.feed_url, options: options)
     result = request.status
     if request.body
-      result = ParsedFeed.new(request.body, request)
+      result = Feedkit::Feedkit.new().fetch_and_parse(self.feed_url, request: request)
     end
     result
   end
 
   def self.include_user_title
-    feeds = select('feeds.*, subscriptions.title AS user_title')
+    feeds = select("feeds.*, subscriptions.title AS user_title")
     feeds.map do |feed|
       if feed.user_title
         feed.override_title(feed.user_title)
       end
-      feed.title ||= '(No title)'
+      feed.title ||= "Untitled"
       feed
     end
-    feeds.sort_by {|feed| feed.title.try(:downcase)}
+    feeds.natural_sort_by { |feed| feed.title }
   end
 
   def string_id
@@ -82,30 +118,40 @@ class Feed < ApplicationRecord
     begin
       self.host = URI::parse(self.site_url).host
     rescue Exception
-      Rails.logger.info { "Failed to set host for feed: %s" %  self.site_url}
+      Rails.logger.info { "Failed to set host for feed: %s" % self.site_url }
     end
   end
 
   def override_title(title)
     @original_title = self.title
-    self.title=(title)
+    self.title = (title)
   end
 
   def original_title
     @original_title or self.title
   end
 
-  def priority_refresh
-    Sidekiq::Client.push_bulk(
-      'args'  => [[self.id, self.feed_url]],
-      'class' => 'FeedRefresherFetcherCritical',
-      'queue' => 'feed_refresher_fetcher_critical',
-      'retry' => false
-    )
+  def priority_refresh(user = nil)
+    if self.twitter_feed?
+      if 10.minutes.ago > self.updated_at
+        TwitterFeedRefresher.new().enqueue_feed(self, user)
+      end
+    else
+      Sidekiq::Client.push_bulk(
+        "args" => [[self.id, self.feed_url]],
+        "class" => "FeedRefresherFetcherCritical",
+        "queue" => "feed_refresher_fetcher_critical",
+        "retry" => false,
+      )
+    end
   end
 
   def list_unsubscribe
-    self.options.dig('email_headers', 'List-Unsubscribe')
+    self.options.dig("email_headers", "List-Unsubscribe")
+  end
+
+  def self.search(url)
+    where("feed_url ILIKE :query", query: "%#{url}%")
   end
 
   private
@@ -119,5 +165,4 @@ class Feed < ApplicationRecord
       self.options ||= {}
     end
   end
-
 end

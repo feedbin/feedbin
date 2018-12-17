@@ -1,5 +1,4 @@
 class EntryImageUploader < CarrierWave::Uploader::Base
-
   storage :fog
 
   def store_dir
@@ -10,8 +9,7 @@ class EntryImageUploader < CarrierWave::Uploader::Base
     {
       "Cache-Control" => "max-age=315360000, public",
       "Expires" => 20.years.from_now.httpdate,
-      "x-amz-storage-class" => "REDUCED_REDUNDANCY"
+      "x-amz-storage-class" => "REDUCED_REDUNDANCY",
     }
   end
-
 end

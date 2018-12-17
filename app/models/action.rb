@@ -1,9 +1,8 @@
 class Action < ApplicationRecord
-
-  attr_accessor :automatic_modification
+  attr_accessor :automatic_modification, :apply_action
 
   belongs_to :user
-  enum action_type: { standard: 0, notifier: 1 }
+  enum action_type: {standard: 0, notifier: 1}
 
   validate do |action|
     if computed_feed_ids.empty? && self.automatic_modification.blank?
@@ -14,70 +13,47 @@ class Action < ApplicationRecord
   before_validation :compute_tag_ids
   before_validation :compute_feed_ids
 
-  validate :query_valid
+  validate :query_valid, unless: :automatic_modification
 
-  after_destroy :percolate_remove
-  after_commit :percolate_setup, on: [:create, :update]
+  after_destroy :percolate_destroy
+  after_commit :percolate_create, on: [:create, :update]
+  after_commit :bulk_actions, on: [:create, :update]
 
-  def percolate_setup
-    percolator_query = self.query
-    percolator_ids = self.computed_feed_ids
-    if percolator_ids.empty?
-      percolate_remove
-    elsif empty_notifier_action?
-      percolate_remove
-    else
-      options = {
-        index: Entry.index_name,
-        type: '.percolator',
-        id: self.id,
-        body: body(percolator_query, percolator_ids)
-      }
-      $search.each do |_, client|
-        client.index(options)
-      end
-    end
-  rescue Elasticsearch::Transport::Transport::Errors::InternalServerError => exception
-    Honeybadger.notify(exception)
+  def percolate_create
+    PercolateCreate.perform_async(self.id)
   end
 
-  def body(percolator_query, percolator_ids)
+  def percolate_destroy
+    PercolateDestroy.perform_async(self.id)
+  end
+
+  def bulk_actions
+    ActionsBulk.perform_async(self.id, self.user.id) if apply_action == "1"
+  end
+
+  def search_body
     Hash.new.tap do |hash|
-      hash[:feed_id] = percolator_ids
+      hash[:feed_id] = self.computed_feed_ids
       hash[:query] = {
         bool: {
           filter: {
             bool: {
-              must: { terms: { feed_id: percolator_ids } }
-            }
-          }
-        }
+              must: {terms: {feed_id: self.computed_feed_ids}},
+            },
+          },
+        },
       }
-      if percolator_query.present?
+      if self.query.present?
+        escaped_query = FeedbinUtils.escape_search(self.query)
         hash[:query][:bool][:must] = {
           query_string: {
-            query: percolator_query,
-            default_operator: "AND"
-          }
+            fields: ["_all", "title.*", "content.*", "emoji", "author", "url"],
+            default_operator: "AND",
+            query: escaped_query,
+          },
         }
       end
     end
-  end
-
-  def empty_notifier_action?
-    self.all_feeds && self.notifier? && (self.query.nil? || self.query == "")
-  end
-
-  def percolate_remove
-    options = {
-      index: Entry.index_name,
-      type: '.percolator',
-      id: self.id
-    }
-    $search.each do |_, client|
-      client.delete(options)
-    end
-  rescue Elasticsearch::Transport::Transport::Errors::NotFound
   end
 
   def compute_feed_ids
@@ -109,17 +85,16 @@ class Action < ApplicationRecord
   def _percolator
     Entry.__elasticsearch__.client.get(
       index: Entry.index_name,
-      type: '.percolator',
+      type: ".percolator",
       id: self.id,
-      ignore: 404
+      ignore: 404,
     )
   end
 
   def query_valid
-    body = body(self.query, self.computed_feed_ids)
     options = {
       index: Entry.index_name,
-      body: {query: body[:query]}
+      body: {query: search_body[:query]},
     }
     result = $search[:main].indices.validate_query(options)
     if false == result["valid"]
@@ -127,4 +102,33 @@ class Action < ApplicationRecord
     end
   end
 
+  def results
+    Entry.search(search_options).page(1).records(includes: :feed)
+  end
+
+  def scrolled_results(&block)
+    scroll = "2m"
+    response = Entry.__elasticsearch__.client.search(
+      index: Entry.index_name,
+      type: Entry.document_type,
+      scroll: scroll,
+      body: search_options,
+    )
+
+    while response["hits"]["hits"].any?
+      yield response
+      response = Entry.__elasticsearch__.client.scroll({scroll_id: response["_scroll_id"], scroll: scroll})
+    end
+
+    return response["_scroll_id"]
+  end
+
+  private
+
+  def search_options
+    Hash.new.tap do |hash|
+      hash[:query] = search_body[:query]
+      hash[:sort] = [{published: "desc"}]
+    end
+  end
 end

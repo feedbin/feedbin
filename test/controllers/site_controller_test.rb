@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class SiteControllerTest < ActionController::TestCase
-
   setup do
     @user = users(:ben)
   end
@@ -17,5 +16,4 @@ class SiteControllerTest < ActionController::TestCase
     get :index
     assert_response :success
   end
-
 end

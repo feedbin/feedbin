@@ -1,6 +1,6 @@
-# Be sure to restart your server when you modify this file.
-
-# ApplicationController.renderer.defaults.merge!(
-#   http_host: 'example.org',
-#   https: false
-# )
+ActiveSupport::Reloader.to_prepare do
+  ApplicationController.renderer.defaults.merge!(
+    http_host: ENV["DEFAULT_URL_OPTIONS_HOST"],
+    https: Feedbin::Application.config.force_ssl,
+  )
+end

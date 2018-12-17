@@ -61,6 +61,7 @@ feedbin.applyCounts = (useHideQueue) ->
           container.addClass('zero-count')
 
   feedbin.updateTitle()
+  feedbin.showFeedList()
 
 class feedbin.CountsBehavior
   constructor: ->
@@ -99,6 +100,8 @@ class feedbin.CountsBehavior
   showEntryContent: (event, xhr) =>
     container = $(event.currentTarget)
     entry = $(container).data('entry-info')
+
+    feedbin.previousEntry = feedbin.selectedEntry
 
     feedbin.selectedEntry =
       id: entry.id
@@ -176,7 +179,7 @@ class feedbin.CountsBehavior
     if feedbin.selectedFeed && feedbin.selectedFeed[0] != $(event.currentTarget)[0]
       $.each feedbin.hideQueue, (index, feed_id) ->
         if feed_id != undefined
-          item = $("[data-feed-id=#{feed_id}]", '.feeds')
+          item = $("li[data-feed-id=#{feed_id}]", '.feeds')
           $(item).addClass('zero-count')
       feedbin.hideQueue.length = 0
 

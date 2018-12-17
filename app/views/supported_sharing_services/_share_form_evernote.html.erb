@@ -1,22 +1,21 @@
 <div class="share-form">
-  <div class="share-form-inner icon-share-evernote">
-    <h2>Save to Evernote</h2>
-    <%= form_tag('', remote: true) do %>
-    <%= hidden_field_tag :readability, 'off', class: 'readability-placeholder' %>
-    <div class="field-cluster">
-      <%= text_field_tag :title, '', placeholder: 'Title', class: 'title-placeholder' %>
-      <%= text_field_tag :tags, '', placeholder: 'Tags (comma separated)' %>
+    <div class="share-form-inner icon-share-evernote">
+        <h2>Save to Evernote</h2>
+        <%= form_tag('', remote: true) do %>
+            <%= hidden_field_tag :readability, 'off', class: 'readability-placeholder' %>
+            <div class="field-cluster">
+                <%= text_field_tag :title, '', placeholder: 'Title', class: 'title-placeholder' %>
+                <%= text_field_tag :tags, '', placeholder: 'Tags (comma separated)' %>
+            </div>
+            <div class="share-controls">
+                <div class="control">
+                    Notebook <%= select_tag "notebook_guid", options_for_select(service.service_options, service.default_option) %>
+                </div>
+            </div>
+            <div class="button-wrap">
+                <%= button_tag "Cancel", type: "button", class: 'button button-secondary', data: {behavior: 'close_entry_basement'} %>
+                <%= submit_tag "Save", class: 'button' %>
+            </div>
+        <% end %>
     </div>
-    <div class="share-controls">
-      <div class="control">
-        Notebook <%= select_tag "notebook_guid", options_for_select(service.service_options, service.default_option) %>
-      </div>
-    </div>
-    <div class="button-wrap">
-      <%= button_tag "Cancel", type: "button", class: 'button button-secondary', data: {behavior: 'close_entry_basement'} %>
-      <%= submit_tag "Save", class: 'button' %>
-    </div>
-    <% end %>
-  </div>
 </div>
-

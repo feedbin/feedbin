@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class Api::V2::EntryCountsControllerTest < ApiControllerTestCase
-
   setup do
     @user = users(:new)
     @feeds = create_feeds(@user)
@@ -14,5 +13,4 @@ class Api::V2::EntryCountsControllerTest < ApiControllerTestCase
     assert_response :success
     assert_kind_of Array, parse_json
   end
-
 end

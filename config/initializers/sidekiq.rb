@@ -1,4 +1,4 @@
-require 'sidekiq'
+require "sidekiq"
 
 Sidekiq::Extensions.enable_delay!
 Sidekiq.configure_server do |config|

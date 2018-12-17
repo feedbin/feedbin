@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class AuthConstraintTest < ActiveSupport::TestCase
-
   test "should allow existing admins" do
     user = users(:ben)
     request = request_mock(user.auth_token)

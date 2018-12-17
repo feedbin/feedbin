@@ -1,7 +1,6 @@
-require 'test_helper'
+require "test_helper"
 
 class UpdatedEntriesControllerTest < ActionController::TestCase
-
   setup do
     @user = users(:new)
     @feeds = create_feeds(@user)
@@ -17,5 +16,4 @@ class UpdatedEntriesControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal @updated.length, assigns(:entries).length
   end
-
 end

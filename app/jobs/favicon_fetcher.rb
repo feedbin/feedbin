@@ -1,4 +1,5 @@
-require 'rmagick'
+require "rmagick"
+
 class FaviconFetcher
   include Sidekiq::Worker
   sidekiq_options retry: false
@@ -8,7 +9,7 @@ class FaviconFetcher
     @force = force
     update if should_update?
   rescue
-    Librato.increment('favicon.failed')
+    Librato.increment("favicon.failed")
   end
 
   def update
@@ -33,9 +34,9 @@ class FaviconFetcher
         @favicon.favicon = processor.encoded_favicon if processor.encoded_favicon
         @favicon.url = processor.favicon_url if processor.favicon_url
         @favicon.data = get_data(response, processor.favicon_hash)
-        Librato.increment('favicon.updated')
+        Librato.increment("favicon.updated")
       end
-      Librato.increment('favicon.status', source: response.code)
+      Librato.increment("favicon.status", source: response.code)
     end
 
     @favicon.save
@@ -62,9 +63,9 @@ class FaviconFetcher
     if favicon_links.present?
       favicon_url = favicon_links.last.to_s
       favicon_url = URI.parse(favicon_url)
-      favicon_url.scheme = 'http'
+      favicon_url.scheme = "http"
       if !favicon_url.host
-        favicon_url = URI::HTTP.build(scheme: 'http', host: @favicon.host)
+        favicon_url = URI::HTTP.build(scheme: "http", host: @favicon.host)
         favicon_url = favicon_url.merge(favicon_links.last.to_s)
       end
     end
@@ -117,5 +118,4 @@ class FaviconFetcher
     end
     icon_names.join(" | ")
   end
-
 end

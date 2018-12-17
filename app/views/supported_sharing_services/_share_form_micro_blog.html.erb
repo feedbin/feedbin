@@ -1,0 +1,15 @@
+<div class="share-form">
+    <div class="share-form-inner icon-share-micro-blog">
+        <h2>Post to Micro.blog</h2>
+        <%= form_tag('', remote: true) do %>
+            <div class="field-cluster">
+                <%= text_field_tag :name, '', placeholder: 'Title (optional)', class: 'title-placeholder' %>
+                <%= text_area_tag :content, '', rows: 5, class: 'description-placeholder' %>
+            </div>
+            <div class="button-wrap">
+                <%= button_tag "Cancel", type: "button", class: 'button button-secondary', data: {behavior: 'close_entry_basement'} %>
+                <%= submit_tag "Post", class: 'button' %>
+            </div>
+        <% end %>
+    </div>
+</div>

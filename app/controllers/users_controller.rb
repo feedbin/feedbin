@@ -11,9 +11,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params).with_params(user_params)
     if @user.save
-      Librato.increment('user.trial.signup')
-      @analytics_event = {eventCategory: 'customer', eventAction: 'new', eventLabel: 'trial', eventValue: 0}
-      flash[:analytics_event] = render_to_string(partial: "shared/analytics_event")
+      Librato.increment("user.trial.signup")
       flash[:one_time_content] = render_to_string(partial: "shared/register_protocol_handlers")
       sign_in @user
       redirect_to root_url
@@ -32,29 +30,28 @@ class UsersController < ApplicationController
     end
     if @user.save
       new_plan_name = @user.plan.stripe_id
-      if old_plan_name == 'trial' && new_plan_name != 'trial'
-        Librato.increment('user.paid.signup')
-        @analytics_event = {eventCategory: 'customer', eventAction: 'upgrade', eventLabel: @user.plan.stripe_id, eventValue: @user.plan.price.to_i}
-        flash[:analytics_event] = render_to_string(partial: "shared/analytics_event")
+      if old_plan_name == "trial" && new_plan_name != "trial"
+        Librato.increment("user.paid.signup")
       end
       sign_in @user
       if params[:redirect_to]
-        redirect_to params[:redirect_to], notice: 'Account updated.'
+        redirect_to params[:redirect_to], notice: "Account updated."
       else
-        redirect_to settings_account_path, notice: 'Account updated.'
+        redirect_to settings_account_path, notice: "Account updated."
       end
     else
       if params[:redirect_to]
-        redirect_to params[:redirect_to], alert: @user.errors.full_messages.join('. ')
+        redirect_to params[:redirect_to], alert: @user.errors.full_messages.join(". ")
       else
-        redirect_to settings_account_path, alert: @user.errors.full_messages.join('. ')
+        redirect_to settings_account_path, alert: @user.errors.full_messages.join(". ")
       end
     end
   end
 
   def destroy
-    @user.destroy
-    redirect_to root_url
+    UserDeleter.perform_async(@user.id, params[:billing_event_id])
+    sign_out
+    redirect_to account_closed_public_settings_url
   end
 
   private
@@ -72,6 +69,4 @@ class UsersController < ApplicationController
   def user_params
     params.require(:user).permit(:email, :password, :stripe_token, :coupon_code, :plan_id)
   end
-
-
 end

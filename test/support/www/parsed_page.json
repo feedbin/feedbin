@@ -1,0 +1,16 @@
+{
+   "title" : "Title",
+   "author" : "Author",
+   "direction" : "ltr",
+   "next_page_url" : null,
+   "url" : "https://example.com",
+   "excerpt" : "Excerpt",
+   "date_published" : "2018-01-13T04:23:45.000Z",
+   "rendered_pages" : 1,
+   "word_count" : 1062,
+   "total_pages" : 1,
+   "lead_image_url" : "https://example.com/image.jpg",
+   "content" : "<p>Content</p>",
+   "domain" : "example.com",
+   "dek" : null
+}

@@ -2,8 +2,11 @@ class SafariPushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :critical
 
-  APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV['APPLE_PUSH_CERT']}, size: 5)
-  VERIFIER = ActiveSupport::MessageVerifier.new(Feedbin::Application.config.secret_key_base)
+  VERIFIER = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)
+
+  APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV["APPLE_PUSH_CERT"]}, size: 5) do |connection|
+    connection.on(:error) { |exception| Honeybadger.notify(exception) }
+  end
 
   def perform(user_ids, entry_id)
     tokens = Device.where(user_id: user_ids).safari.pluck(:user_id, :token)
@@ -25,8 +28,8 @@ class SafariPushNotificationSend
       notifications.each do |_, notification|
         push = connection.prepare_push(notification)
         push.on(:response) do |response|
-          Librato.increment('apns.safari.sent', source: response.status)
-          if response.status == '410' || (response.status == '400' && response.body['reason'] == 'BadDeviceToken')
+          Librato.increment("apns.safari.sent", source: response.status)
+          if response.status == "410" || (response.status == "400" && response.body["reason"] == "BadDeviceToken")
             apns_id = response.headers["apns-id"]
             token = notifications[apns_id].token
             Device.where("lower(token) = ?", token.downcase).take&.destroy
@@ -50,9 +53,9 @@ class SafariPushNotificationSend
       string = CGI.unescapeHTML(string)
       string = ApplicationController.helpers.sanitize(string, tags: []).squish.mb_chars
       if string.length > max_bytes
-        omission = '...'
+        omission = "..."
       else
-        omission = ''
+        omission = ""
       end
       string = string.limit(max_bytes).to_s
       string + omission
@@ -64,13 +67,10 @@ class SafariPushNotificationSend
     Apnotic::Notification.new(device_token).tap do |notification|
       notification.alert = {
         title: title,
-        body: body
+        body: body,
       }
       notification.url_args = [entry_id.to_s, CGI::escape(VERIFIER.generate(user_id))]
       notification.apns_id = SecureRandom.uuid
     end
   end
-
 end
-
-

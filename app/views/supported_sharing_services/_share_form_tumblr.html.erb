@@ -1,39 +1,38 @@
 <div class="share-form">
-  <div class="share-form-inner icon-share-tumblr">
-    <h2>Post <span class="type-text">Link</span> to Tumblr</h2>
-    <%= form_tag('', remote: true) do %>
-    <%= hidden_field_tag :url, '', class: 'url-placeholder' %>
-    <div class="field-cluster">
-      <%= text_field_tag :title, '', placeholder: 'Title', class: 'title-placeholder' %>
-      <%= text_area_tag :description, '', rows: 5, placeholder: 'Description', class: 'description-placeholder' %>
-      <%= text_field_tag :source, '', placeholder: 'Source', class: 'source-placeholder hide' %>
-      <%= text_field_tag :tags, '', placeholder: 'Tags (comma separated)' %>
+    <div class="share-form-inner icon-share-tumblr">
+        <h2>Post <span class="type-text">Link</span> to Tumblr</h2>
+        <%= form_tag('', remote: true) do %>
+            <%= hidden_field_tag :url, '', class: 'url-placeholder' %>
+            <div class="field-cluster">
+                <%= text_field_tag :title, '', placeholder: 'Title', class: 'title-placeholder' %>
+                <%= text_area_tag :description, '', rows: 5, placeholder: 'Description', class: 'description-placeholder' %>
+                <%= text_field_tag :source, '', placeholder: 'Source', class: 'source-placeholder hide' %>
+                <%= text_field_tag :tags, '', placeholder: 'Tags (comma separated)' %>
+            </div>
+            <div class="share-controls">
+                <div class="control">
+                    Type
+                    <select id="type" name="type" data-behavior="tumblr_type">
+                        <option selected="selected" value="link" data-description-name="Description">Link</option>
+                        <option value="quote" data-description-name="Quote">Quote</option>
+                    </select>
+                </div>
+                <div class="control">
+                    Format <%= select_tag "format", options_for_select({'Markdown' => 'markdown', 'HTML' => 'html'}, "markdown") %>
+                </div>
+                <% if service.service_options.present? %>
+                    <div class="control">
+                        Site <%= select_tag "site", options_for_select(service.service_options, service.default_option) %>
+                    </div>
+                <% end %>
+                <div class="control">
+                    Status <%= select_tag "state", options_for_select({'Published' => 'published', 'Draft' => 'draft', 'Queue' => 'queue', 'Private' => 'private'}, "published") %>
+                </div>
+            </div>
+            <div class="button-wrap">
+                <%= button_tag "Cancel", type: "button", class: 'button button-secondary', data: {behavior: 'close_entry_basement'} %>
+                <%= submit_tag "Post", class: 'button' %>
+            </div>
+        <% end %>
     </div>
-    <div class="share-controls">
-      <div class="control">
-        Type
-        <select id="type" name="type" data-behavior="tumblr_type">
-          <option selected="selected" value="link" data-description-name="Description">Link</option>
-          <option value="quote" data-description-name="Quote">Quote</option>
-        </select>
-      </div>
-      <div class="control">
-        Format <%= select_tag "format", options_for_select({'Markdown' => 'markdown', 'HTML' => 'html'}, "markdown") %>
-      </div>
-      <% if service.service_options.present? %>
-        <div class="control">
-          Site <%= select_tag "site", options_for_select(service.service_options, service.default_option) %>
-        </div>
-      <% end %>
-      <div class="control">
-        Status <%= select_tag "state", options_for_select({'Published' => 'published', 'Draft' => 'draft', 'Queue' => 'queue', 'Private' => 'private'}, "published") %>
-      </div>
-    </div>
-    <div class="button-wrap">
-      <%= button_tag "Cancel", type: "button", class: 'button button-secondary', data: {behavior: 'close_entry_basement'} %>
-      <%= submit_tag "Post", class: 'button' %>
-    </div>
-    <% end %>
-  </div>
 </div>
-

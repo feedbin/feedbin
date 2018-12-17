@@ -1,5 +1,4 @@
 class SubscriptionPresenter < BasePresenter
-
   presents :subscription
 
   def graph_volume
@@ -42,16 +41,28 @@ class SubscriptionPresenter < BasePresenter
     end
   end
 
+  def muted_status
+    if subscription.muted
+      "muted"
+    end
+  end
+
+  def mute_class
+    if subscription.muted
+      "status-muted"
+    end
+  end
+
   def mute_icon
-    css_classes = ['mute-icon']
-    css_classes.push('hidden') unless subscription.muted
-    @template.content_tag(:span, '', class: css_classes.join)
+    css_classes = ["mute-icon"]
+    css_classes.push("hidden") unless subscription.muted
+    @template.content_tag(:span, "", class: css_classes.join)
   end
 
   def update_icon
-    css_classes = ['update-icon']
-    css_classes.push('hidden') if subscription.show_updates
-    @template.content_tag(:span, '', class: css_classes.join)
+    css_classes = ["update-icon"]
+    css_classes.push("hidden") if subscription.show_updates
+    @template.content_tag(:span, "", class: css_classes.join)
   end
 
   private
@@ -63,5 +74,4 @@ class SubscriptionPresenter < BasePresenter
   def days
     29.days
   end
-
 end

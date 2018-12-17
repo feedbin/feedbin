@@ -1,0 +1,2 @@
+feedbin.embeds["<%= @url %>"] = $("<%= j render partial: 'twitter', locals: {tweet: @tweet} %>");
+$("#<%= @dom_id %>").replaceWith(feedbin.embeds["<%= @url %>"]);

@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ActionsPerformTest < ActiveSupport::TestCase
   setup do
@@ -11,7 +11,7 @@ class ActionsPerformTest < ActiveSupport::TestCase
       user: @user,
       query: @entry.title,
       feed_ids: @feeds.map(&:id),
-      actions: ['send_push_notification', 'mark_read', 'star', 'mark_read', 'send_ios_notification']
+      actions: ["send_push_notification", "mark_read", "star", "mark_read", "send_ios_notification"],
     )
   end
 

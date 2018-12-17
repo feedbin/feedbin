@@ -1,7 +1,6 @@
 module Api
   module V2
     class FeedsController < ApiController
-
       before_action :correct_user
 
       respond_to :json
@@ -18,7 +17,6 @@ module Api
           render_404
         end
       end
-
     end
   end
 end

@@ -1,4 +1,4 @@
-class CreateSupportedSharingServices < ActiveRecord::Migration
+class CreateSupportedSharingServices < ActiveRecord::Migration[4.2]
   def change
     create_table :supported_sharing_services do |t|
       t.belongs_to :user, index: true, null: false

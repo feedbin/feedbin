@@ -1,0 +1,33 @@
+<% present entry, local_assigns do |entry_presenter| %>
+    <header class="entry-header">
+        <%= link_to entry.fully_qualified_url, target: '_blank', rel: 'noopener noreferrer', id: 'source_link' do  %>
+            <h1><%= entry_presenter.entry_view_title %></h1>
+        <% end %>
+        <p class="post-meta">
+            <time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time>
+            <%= entry_presenter.author %>
+        </p>
+        <p class="post-meta feed-title"><span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
+    </header>
+    <div data-behavior="entry_content_wrap external_links" class="content-styles <%= entry_presenter.entry_type_class %>">
+        <% if entry_presenter.has_diff? %>
+            <p class="diff-wrap system-content entry-callout <%= !entry_presenter.is_updated_entry? ? "" : "hide" %>" data-behavior="diff_view_changes">
+                <span class="icon-clock-wrap"><%= svg_tag 'favicon-updated', size: '16x16' %></span>
+                <span class="diff-wrap-text">This article was updated <%= link_to "view changes", diff_entry_path(entry), remote: true, data: {behavior: 'load_view_changes'} %></span>
+                <%= link_to '×', toggle_updates_feed_path(entry.feed, inline: true), remote: true, method: :post, class: 'ignore-updates', data: {behavior: 'hide_updates'}, title: "Don't tell me when articles from #{strip_tags(entry.feed.title)} have been updated."  %>
+            </p>
+            <p class="diff-wrap system-content entry-callout <%= entry_presenter.is_updated_entry? ? "" : "hide" %>" data-behavior="diff_view_latest">
+                <span class="icon-clock-wrap"><%= svg_tag 'favicon-updated', size: '16x16' %></span>
+                <span class="diff-wrap-text">Viewing changes since original <span class="view-latest-link">view latest</span></span>
+            </p>
+        <% end %>
+        <%= render partial: 'media', locals: {entry: entry} %>
+        <div class="entry-final-content" data-behavior="entry_final_content">
+            <% if entry_presenter.is_updated_entry? %>
+                <%= render partial: 'diff_content', locals: {entry: entry, updated_entries: updated_entries} %>
+            <% else %>
+                <%= raw(entry_presenter.content) %>
+            <% end %>
+        </div>
+    </div>
+<% end %>

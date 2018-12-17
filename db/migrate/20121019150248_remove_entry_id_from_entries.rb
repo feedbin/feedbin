@@ -1,4 +1,4 @@
-class RemoveEntryIdFromEntries < ActiveRecord::Migration
+class RemoveEntryIdFromEntries < ActiveRecord::Migration[4.2]
   def up
     remove_index :entries, :entry_id
     remove_column :entries, :entry_id
@@ -8,6 +8,4 @@ class RemoveEntryIdFromEntries < ActiveRecord::Migration
     add_column :entries, :entry_id, :string
     add_index :entries, :entry_id
   end
-
-
 end

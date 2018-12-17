@@ -1,5 +1,4 @@
 class Newsletter
-
   attr_reader :data
 
   def initialize(params)
@@ -12,6 +11,12 @@ class Newsletter
 
   def token
     @token ||= begin
+      full_token.split("+").first
+    end
+  end
+
+  def full_token
+    @full_token ||= begin
       to_email.sub("@newsletters.feedbin.com", "").sub("@development.newsletters.feedbin.com", "").sub("test-subscribe+", "").sub("subscribe+", "")
     end
   end
@@ -49,7 +54,7 @@ class Newsletter
   end
 
   def feed_id
-    @feed_id ||= Digest::SHA1.hexdigest("#{token}#{from_email}")
+    @feed_id ||= Digest::SHA1.hexdigest("#{full_token}#{from_email}")
   end
 
   def entry_id
@@ -74,7 +79,7 @@ class Newsletter
 
   def headers
     {
-      "List-Unsubscribe" => data["List-Unsubscribe"]
+      "List-Unsubscribe" => data["List-Unsubscribe"],
     }
   end
 
@@ -96,8 +101,7 @@ class Newsletter
     @signature ||= begin
       digest = OpenSSL::Digest::SHA256.new
       signed_data = [data["timestamp"], data["token"]].join
-      OpenSSL::HMAC.hexdigest(digest, ENV['MAILGUN_INBOUND_KEY'], signed_data)
+      OpenSSL::HMAC.hexdigest(digest, ENV["MAILGUN_INBOUND_KEY"], signed_data)
     end
   end
-
 end

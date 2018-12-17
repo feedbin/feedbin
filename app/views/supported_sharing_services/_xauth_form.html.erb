@@ -5,7 +5,6 @@
             <%= f.hidden_field :operation, value: 'authorize' %>
             <%= text_field_tag 'username', '', placeholder: 'Username', class: 'no-margin' %>
             <%= password_field_tag 'password', '', placeholder: 'Password' %>
-
             <div class="button-wrap">
                 <%= button_tag 'Cancel', type: "button", class: 'button button-secondary button-inline', data: {behavior: "hide_service_options"} %>
                 <%= submit_tag "Save", class: 'button button-primary-plain' %>

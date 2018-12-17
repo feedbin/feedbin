@@ -1,0 +1,27 @@
+<div class="tweet-wrap system-content">
+    <div class="tweet quoted-tweet">
+        <header class="tweet-header">
+            <div class="profile-wrap">
+                <%= link_to media.author_url, target: "_blank", title: "View on Instagram", class: "profile-image" do %>
+                    <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), camo_link(media.profile_image_url), size: "47x47", alt: "") %>
+                <% end %>
+                <div class="profile-info">
+                    <h1>
+                        <a href="<%= media.permalink %>" target="_blank" class="link">
+                            <strong><%= media.screen_name %></strong>
+                        </a>
+                        <span class="tweet-actions">
+                            <%= link_to media.permalink, target: "_blank", title: "View on Instagram", class: "twitter-link embed" do %>
+                                <%= svg_tag "icon-instagram" %>
+                            <% end %>
+                        </span>
+                    </h1>
+                </div>
+            </div>
+        </header>
+        <div class="tweet-body">
+            <a href="<%= media.media_url %>"><img src="<%= camo_link(media.media_url) %>"></a>
+            <p><%= media.content %></p>
+        </div>
+    </div>
+</div>

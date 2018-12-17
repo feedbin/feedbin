@@ -10,5 +10,4 @@ class UpdatedEntry < ApplicationRecord
   def self.create_from_owners(user_id, entry)
     new_from_owners(user_id, entry).save
   end
-
 end

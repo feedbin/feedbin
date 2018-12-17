@@ -1,23 +1,23 @@
 <% if services.any? %>
-<div class="entry-button-wrap">
-    <div class="dropdown-wrap button-toggle-share-menu entry-button">
-        <a class="entry-button" data-behavior="toggle_share_menu toggle_dropdown" href="#" title="Share">
-            <%= svg_tag 'icon-share', size: '16x16' %>
-        </a>
-        <div class="dropdown-content">
-            <ul data-behavior="share_options">
-                <% services.each_with_index do |service, row| %>
-                <li>
-                    <%= link_to service[:url], service[:html_options] do %>
-                    <%= service[:label] %>
-                    <% if row + 1 < 10 %>
-                    <i class="share-keyboard"><%= row + 1 %></i>
+    <div class="entry-button-wrap">
+        <div class="dropdown-wrap button-toggle-share-menu entry-button">
+            <a class="entry-button" data-behavior="toggle_share_menu toggle_dropdown" href="#" title="Share">
+                <%= svg_tag 'icon-share', size: '16x16' %>
+            </a>
+            <div class="dropdown-content">
+                <ul data-behavior="share_options">
+                    <% services.each_with_index do |service, row| %>
+                        <li>
+                            <%= link_to service[:url], service[:html_options] do %>
+                                <%= service[:label] %>
+                                <% if row + 1 < 10 %>
+                                    <i class="share-keyboard"><%= row + 1 %></i>
+                                <% end %>
+                            <% end %>
+                        </li>
                     <% end %>
-                    <% end %>
-                </li>
-                <% end %>
-            </ul>
+                </ul>
+            </div>
         </div>
     </div>
-</div>
 <% end %>

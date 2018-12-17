@@ -1,0 +1,18 @@
+<% if status == :active %>
+    <div class="service-header">
+        <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
+    </div>
+<% elsif status == :issue %>
+    <div class="service-header">
+        <p class="service-title"><%= sharing_service.label %></p>
+        <small class="show-service-options pad-top">Feedbin can no longer access <%= sharing_service.label %>, <a href="#" data-behavior="show_service_options">reactivate</a>?</small>
+        <%= link_to 'Deactivate', supported_sharing_service_path(sharing_service), class: 'list-action show-service-options button-text-secondary', method: :delete %>
+    </div>
+    <%= render partial: "supported_sharing_services/micro_blog_form", locals: {sharing_service: sharing_service, record: record} %>
+<% else %>
+    <div class="service-header">
+        <p class="service-title"><%= sharing_service[:label] %></p>
+        <%= button_tag 'Activate', class: 'list-action show-service-options button-text', data: {behavior: "show_service_options"} %>
+    </div>
+    <%= render partial: "supported_sharing_services/micro_blog_form", locals: {sharing_service: sharing_service, record: record} %>
+<% end %>
