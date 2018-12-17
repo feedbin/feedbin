@@ -43,6 +43,6 @@ class Api::V2::FeedsControllerTest < ApiControllerTestCase
   private
 
   def feed_keys
-    %w[id title feed_url site_url]
+    %w[id title feed_url site_url last_published_entry]
   end
 end
