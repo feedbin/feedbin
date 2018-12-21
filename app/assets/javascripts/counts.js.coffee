@@ -111,7 +111,11 @@ class _Counts
     _.contains(@counts.starred.all, entryId)
 
   entriesInFeed: (feedId) ->
-    @counts["unread"]["byFeed"][feedId]
+    result = @counts["unread"]["byFeed"][feedId]
+    if typeof(result) == "undefined"
+      0
+    else
+      result.length
 
   updateTagMap: (feedId, tagId) ->
     if tagId?
