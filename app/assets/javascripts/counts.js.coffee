@@ -110,6 +110,9 @@ class _Counts
   isStarred: (entryId) ->
     _.contains(@counts.starred.all, entryId)
 
+  entriesInFeed: (feedId) ->
+    @counts["unread"]["byFeed"][feedId]
+
   updateTagMap: (feedId, tagId) ->
     if tagId?
       @tagMap[feedId] = [tagId]

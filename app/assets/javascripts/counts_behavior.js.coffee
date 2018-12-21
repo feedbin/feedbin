@@ -178,7 +178,8 @@ class feedbin.CountsBehavior
     # Drain hide queue if this isn't the same collection
     if feedbin.selectedFeed && feedbin.selectedFeed[0] != $(event.currentTarget)[0]
       $.each feedbin.hideQueue, (index, feed_id) ->
-        if feed_id != undefined
+        count = feedbin.Counts.get().entriesInFeed(feed_id)
+        if feed_id != undefined && count.length == 0
           item = $("li[data-feed-id=#{feed_id}]", '.feeds')
           $(item).addClass('zero-count')
       feedbin.hideQueue.length = 0
