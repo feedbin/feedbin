@@ -7,10 +7,10 @@
             <div class="dropdown-content">
                 <ul data-behavior="share_options">
                     <% services.each_with_index do |service, row| %>
-                        <li>
+                        <li class="share-option">
                             <%= link_to service[:url], service[:html_options] do %>
-                                <%= service[:label] %>
-                                <% if row + 1 < 10 %>
+                                <div class="label"><%= service[:label] %></div>
+                                <% if row < 9 %>
                                     <i class="share-keyboard"><%= row + 1 %></i>
                                 <% end %>
                             <% end %>

@@ -277,8 +277,20 @@ body {
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
     font-family: $font-stack;
-    @include background-color($color-base, true);
-    @include color($color-contrast-700, true);
+    background-color: map-get($color-base, day);
+    color: map-get($color-contrast-700, day);
+    &.theme-sunset {
+        background-color: map-get($color-base, sunset);
+        color: map-get($color-contrast-700, sunset);
+    }
+    &.theme-night {
+        background-color: map-get($color-base, dusk);
+        color: map-get($color-contrast-700, dusk);
+    }
+    &.theme-midnight {
+        background-color: map-get($color-base, midnight);
+        color: map-get($color-contrast-700, midnight);
+    }
     @include respond-to(hidpi) {
         -webkit-font-smoothing: antialiased;
     }
@@ -423,7 +435,7 @@ input[type="tel"],
 input[type="color"],
 .uneditable-input {
     @include border($color-contrast-200);
-    @include color($color-contrast-700);
+    color: map-get($color-contrast-700, day);
     background-color: #FFF;
     font-size: 14px;
     padding: 5px 8px;
@@ -1022,7 +1034,8 @@ Structure
     border-radius: $dot/2;
     content: '';
     display: inline-block;
-    background-color: #b4b6b8;
+    @include background-color($color-contrast-400);
+
 }
 
 .bottom-toolbar {
@@ -1340,7 +1353,7 @@ Structure
         }
     }
     .droppable-hover > a {
-        @include new-theme(background-color, $color-selected, $extra: !important);
+        @include theme(background-color, $color-selected, $extra: !important);
     }
 }
 
@@ -1395,7 +1408,7 @@ Structure
         @include box-shadow($shadow);
 
         ul:after {
-            @include new-theme("border-top-color", $color-contrast-200)
+            @include theme("border-top-color", $color-contrast-200)
         }
     }
 }
@@ -1436,7 +1449,7 @@ Structure
 }
 
 li.selected > a .favicon-wrap {
-    background-color: #FFF !important;
+    @include background-color(#FFF);
     $shadow: (
         day: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
         dusk: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
@@ -1468,7 +1481,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 
 .collection-favicon {
     background-size: 16px 16px;
-    background: transparent;
+    background: transparent !important;
     box-shadow: none;
     svg {
         @include fill($color-contrast-400);
@@ -1689,7 +1702,7 @@ $saved-search-control-height: 48px;
         background-repeat: no-repeat;
         background-position: 50% 25%;
         @include background-image($image-spinners, true);
-        @include background-color($color-base);
+        @include background-color($color-base, true);
     }
     &.show-search-options {
         transform: translateY($toolbar-height);
@@ -3012,11 +3025,13 @@ $saved-search-control-height: 48px;
             left: 0 !important;
         }
     }
+    .share-option a {
+        display: flex;
+        align-items: baseline;
+    }
     .share-keyboard {
         font-size: $base-size-11px;
-        position: absolute;
-        right: 10px;
-        top: 13px;
+        margin-left: auto;
         font-style: normal;
         margin-top: 2px;
         color: map-get($color-contrast-400, day);
@@ -4361,7 +4376,6 @@ body.settings {
         max-width: 100%;
         padding-right: 50px !important;
         border-radius: 8px;
-        @include color($color-contrast-700);
         @media (max-width: $small-breakpoint) {
             padding-right: 10px !important;
         }

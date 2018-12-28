@@ -131,16 +131,19 @@
     }
 }
 
-@mixin new-theme($property, $map, $root: false, $extra: null) {
+@mixin theme($property, $map, $root: false, $extra: null) {
+    @if type-of($map) != 'map' {
+        $map: (day: $map, sunset: $map, dusk: $map, midnight: $map);
+    }
     /* map name: $#{map-get($map, debug)} */
     #{$property}: map-get($map, day) $extra;
     @if $root {
         @at-root {
-            #{selector-append(&, ".theme-night")} {
+            #{selector-append(".theme-night", &)} {
                 /* map name: $#{map-get($map, debug)} */
                 #{$property}: map-get($map, dusk) $extra;
             }
-            #{selector-append(&, ".theme-sunset")} {
+            #{selector-append(".theme-sunset", &)} {
                 /* map name: $#{map-get($map, debug)} */
                 #{$property}: map-get($map, sunset) $extra;
             }
@@ -155,37 +158,6 @@
             /* map name: $#{map-get($map, debug)} */
             #{$property}: map-get($map, sunset) $extra;
         }
-    }
-}
-
-@mixin deprecated-theme($property, $default, $night, $sunset, $root: false) {
-    @warn "deprecated-theme called for: #{$property}";
-    #{$property}: $default;
-    @if $root {
-        @at-root {
-            #{selector-append(".theme-night", &)} {
-                #{$property}: $night;
-            }
-            #{selector-append(".theme-sunset", &)} {
-                #{$property}: $sunset;
-            }
-        }
-    }
-    @else {
-        .theme-night & {
-            #{$property}: $night;
-        }
-        .theme-sunset & {
-            #{$property}: $sunset;
-        }
-    }
-}
-
-@mixin theme($args...) {
-    @if length($args) > 3 {
-        @include deprecated-theme($args...);
-    } @else {
-        @include new-theme($args...);
     }
 }
 
