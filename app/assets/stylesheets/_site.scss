@@ -186,6 +186,8 @@ $image-spinners: (
     midnight: image-url("spinner-night.svg"),
 );
 
+$color-icons: $color-contrast-400;
+
 $inset-bg-color: #f4f6f8;
 
 $box-shadow-dropdown: 0px 4px 6px 0 rgba(0, 0, 0, 0.1);
@@ -1034,7 +1036,7 @@ Structure
     border-radius: $dot/2;
     content: '';
     display: inline-block;
-    @include background-color($color-contrast-400);
+    @include background-color($color-icons);
 
 }
 
@@ -1456,7 +1458,7 @@ li.selected > a .favicon-wrap {
     background-image: image-url("favicon-default.svg");
     background-position: 0 0;
     background-repeat: no-repeat;
-    @include background-color($color-contrast-400);
+    @include background-color($color-icons);
     border-radius: 1.5px;
 }
 
@@ -1474,13 +1476,13 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     background: transparent !important;
     box-shadow: none;
     svg {
-        @include fill($color-contrast-400);
+        @include fill($color-icons);
         li.selected > .feed-link & {
             fill: #FFF;
         }
     }
     .favicon-newsletter {
-        @include fill($color-contrast-400);
+        @include fill($color-icons);
     }
 }
 
@@ -1506,7 +1508,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     justify-content: center;
     display: flex;
     svg * {
-        @include fill($color-contrast-400);
+        @include fill($color-icons);
     }
     .full-screen & {
         display: none !important;
@@ -2655,7 +2657,7 @@ $saved-search-control-height: 48px;
         right: 0;
         bottom: 0;
         svg * {
-            @include fill($color-contrast-400);
+            @include fill($color-icons);
         }
     }
     .next-entry-feed, .next-entry-title {
@@ -2695,7 +2697,7 @@ $saved-search-control-height: 48px;
             width: 11px;
             height: 18px;
             svg * {
-                @include fill($color-contrast-400);
+                @include fill($color-icons);
             }
         }
         &.button-next, &.button-previous {
@@ -2737,8 +2739,8 @@ $saved-search-control-height: 48px;
     .button-toggle-read {
         .circle {
             border: 2px solid transparent;
-            @include border-color($color-contrast-400);
-            @include background-color($color-contrast-400);
+            @include border-color($color-icons);
+            @include background-color($color-icons);
             height: 16px;
             width: 16px;
             border-radius: 16px;
@@ -2846,12 +2848,11 @@ $saved-search-control-height: 48px;
     height: $toolbar-height;
     padding: 0;
     position: relative;
-
     svg {
         pointer-events: none;
     }
     svg * {
-        @include fill($color-contrast-400);
+        @include fill($color-icons);
     }
 }
 
@@ -3583,7 +3584,7 @@ $saved-search-control-height: 48px;
             max-width: 100%;
             max-height: 100%;
             * {
-                @include fill($color-contrast-400);
+                @include fill($color-icons);
             }
         }
         .icon-embed-source-spotify,
@@ -3967,7 +3968,7 @@ $saved-search-control-height: 48px;
             align-items: baseline;
             margin-left: auto;
             .twitter-link svg, .twitter-conversation-link svg {
-                @include fill($color-contrast-400);
+                @include fill($color-icons);
             }
             .twitter-link {
                 padding-left: 15px;
@@ -6404,7 +6405,7 @@ Media Players
             bottom: 0;
         }
         svg {
-            @include fill($color-contrast-500);
+            @include fill($color-icons);
         }
     }
     .audio-text {
@@ -6450,7 +6451,7 @@ Media Players
             line-height: 0;
         }
         svg * {
-            @include fill($color-contrast-500);
+            @include fill($color-icons);
         }
         button, a {
             display: flex;
@@ -7761,7 +7762,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 Bigfoot
 ------------------------------------------------------------------------------*/
 .bigfoot-footnote__button {
-    @include background-color($color-contrast-400);
+    @include background-color($color-icons);
     padding: 0.1em;
     border-radius: 8px;
     min-width: 30px;
@@ -7771,7 +7772,7 @@ Bigfoot
     font-weight: bold;
 }
 .footnote-circle {
-    @include fill($color-contrast-400);
+    @include fill($color-icons);
 }
 .bigfoot-footnote__content, .bigfoot-footnote__tooltip {
     background-color: map-get($color-contrast-100, day);
@@ -7975,7 +7976,7 @@ button.close {
     border: 0;
     color: map-get($color-contrast-400, day);
     svg * {
-        @include fill($color-contrast-400);
+        @include fill($color-icons);
     }
 }
 
@@ -8542,7 +8543,7 @@ button.close {
             padding: 0;
             border: none;
             text-align: right;
-            @include color($color-contrast-400);
+            @include color($color-icons);
             background: transparent !important;
             font-weight: bold;
             font-size: 24px;
