@@ -131,24 +131,24 @@
     }
 }
 
-@mixin new-theme($property, $map, $root: false) {
-    #{$property}: map-get($map, day);
+@mixin new-theme($property, $map, $root: false, $extra: null) {
+    #{$property}: map-get($map, day) $extra;
     @if $root {
         @at-root {
             #{selector-append(&, ".theme-night")} {
-                #{$property}: map-get($map, dusk);
+                #{$property}: map-get($map, dusk) $extra;
             }
             #{selector-append(&, ".theme-sunset")} {
-                #{$property}: map-get($map, sunset);
+                #{$property}: map-get($map, sunset) $extra;
             }
         }
     }
     @else {
         .theme-night & {
-            #{$property}: map-get($map, dusk);
+            #{$property}: map-get($map, dusk) $extra;
         }
         .theme-sunset & {
-            #{$property}: map-get($map, sunset);
+            #{$property}: map-get($map, sunset) $extra;
         }
     }
 }

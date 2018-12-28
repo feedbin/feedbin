@@ -267,7 +267,7 @@ body {
 }
 
 a {
-    color: $selected;
+    @include color($color-selected);
     text-decoration: none;
 }
 
@@ -414,7 +414,7 @@ input[type="color"],
     border-radius: 4px;
     &:focus {
         outline: none;
-        border-color: $selected;
+        @include border-color($color-selected);
     }
 }
 
@@ -842,11 +842,11 @@ Structure
 .subscribe-promo {
     right: 60px;
     top: 7px;
-    color: $selected;
+    @include color($color-selected);
     font-size: 13px;
     display: inline-block;
     padding: 4px 8px;
-    border: 1px solid $selected;
+    @include border($color-selected);
     border-radius: 4px;
     z-index: 100;
     .entry-selected & {
@@ -950,7 +950,7 @@ Structure
     display: flex;
     .show-subscribe {
         user-select: none;
-        color: $selected;
+        @include color($color-selected);
         line-height: $toolbar-height;
         font-size: $base-size-13px;
         padding: 0 0 0 16px;
@@ -1281,7 +1281,7 @@ Structure
             }
             &.ui-draggable-dragging {
                 background-color: rgba(255,255,255, 1);
-                background-color: $selected;
+                @include background-color($color-selected);
                 opacity: .8;
                 border-radius: 4px;
                 .count {
@@ -1319,7 +1319,7 @@ Structure
         }
     }
     .droppable-hover > a {
-        background-color: $selected !important;
+        @include new-theme(background-color, $color-selected, $extra: !important);
     }
 }
 
@@ -1331,7 +1331,7 @@ Structure
         color: rgba(255,255,255,.9);
     }
     .rename-feed-button {
-        background-color: $selected;
+        @include background-color($color-selected);
     }
 }
 
@@ -1347,9 +1347,9 @@ Structure
 }
 
 .selected .feeds:not(.dragging) .selected > a {
-    background: $selected;
+    @include background($color-selected);
     &:hover {
-        background: $selected;
+        @include background($color-selected);
     }
 }
 
@@ -1358,7 +1358,7 @@ Structure
 }
 
 .selected .feeds:not(.dragging) li.selected .drawer ul:after {
-    border-top-color: $selected;
+    @include theme(border-top-color, $color-selected);
 }
 
 .feeds {
@@ -1932,7 +1932,7 @@ $saved-search-control-height: 48px;
     .selected &.selected {
         .icon-star {
             &:after {
-                background: $selected;
+                @include background($color-selected);
             }
         }
         .entry-actions-wrap {
@@ -1942,9 +1942,9 @@ $saved-search-control-height: 48px;
             display: none;
         }
         .wrap {
-            border-color: $selected;
-            border-top: 1px solid $selected;
-            background: $selected;
+            @include border-color($color-selected);
+            @include border-top($color-selected);
+            @include background($color-selected);
         }
         .feed-title, .title-inner span {
             color: #add6ff !important;
@@ -1985,7 +1985,7 @@ $saved-search-control-height: 48px;
             bottom: 0;
             right: 8px;
             line-height: 1;
-            color: $selected;
+            @include color($color-selected);
         }
         i {
             font-style: normal;
@@ -2428,14 +2428,14 @@ $saved-search-control-height: 48px;
         .theme-button-day {
             background-color: map-get($color-base, day);
             .theme-day & {
-                border-color: $selected;
+                @include border-color($color-selected);
             }
         }
         .theme-button-sunset {
             background-color: map-get($color-base, sunset);
             left: 54px;
             .theme-sunset & {
-                border-color: $selected;
+                @include border-color($color-selected);
             }
         }
         .theme-button-night {
@@ -2448,7 +2448,7 @@ $saved-search-control-height: 48px;
                 background-color: #FFF;
             }
             .theme-night & {
-                border-color: $selected;
+                @include border-color($color-selected);
             }
         }
     }
@@ -2569,7 +2569,7 @@ $saved-search-control-height: 48px;
 .next-entry-preview {
     display: block;
     appearance: none !important;
-    background: $selected;
+    @include background($color-selected);
     border: none;
     padding: 0;
     text-align: left;
@@ -2656,7 +2656,7 @@ $saved-search-control-height: 48px;
             -webkit-tap-highlight-color: rgba(0,0,0,0);
             &:active:not([disabled]) {
                 svg * {
-                    fill: $selected;
+                    @include fill($color-selected);
                 }
             }
         }
@@ -2711,7 +2711,7 @@ $saved-search-control-height: 48px;
             .icon-star-on {
                 display: block;
                 * {
-                    fill: $selected;
+                    @include fill($color-selected);
                 }
             }
             .icon-star-off {
@@ -2892,7 +2892,7 @@ $saved-search-control-height: 48px;
                 @include border-bottom($color-contrast-200);
                 cursor: pointer;
                 &:hover, &.selected {
-                    background-color: $selected !important;
+                    @include background-color($color-selected, $extra: !important);
                     color: #fff  !important;
                     text-decoration: none;
                 }
@@ -3621,7 +3621,7 @@ $saved-search-control-height: 48px;
     text-decoration: underline;
     @include color(black, white, black);
     .no-touch &:hover, &:active {
-        color: $selected;
+        @include color($color-selected);
     }
 }
 
@@ -4084,7 +4084,7 @@ $saved-search-control-height: 48px;
     .message-content {
         position: relative;
         width: 500px;
-        background-color: $selected;
+        @include background-color($color-selected);
         display: block;
         visibility: hidden;
         height: $height;
@@ -4185,7 +4185,7 @@ Settings
         }
         &.active {
             color: #FFF;
-            background-color: $selected;
+            @include background-color($color-selected);
         }
     }
     .modal & {
@@ -4320,7 +4320,7 @@ body.settings {
         }
         &:focus {
             background-color: #FFF !important;
-            border-color: $selected !important;
+            @include border-color($color-selected, $extra: !important);
             @include color($color-contrast-700);
         }
     }
@@ -4389,19 +4389,19 @@ body.settings {
     .theme-day {
         .theme-button-day {
             background-color: #FFF;
-            border-color: $selected;
+            @include border-color($color-selected);
         }
     }
     .theme-sunset {
         .theme-button-sunset {
             background-color: #FFF;
-            border-color: $selected;
+            @include border-color($color-selected);
         }
     }
     .theme-night {
         .theme-button-night {
             background-color: #FFF;
-            border-color: $selected;
+            @include border-color($color-selected);
         }
     }
     .theme-background {
@@ -4594,7 +4594,7 @@ body.settings {
     }
     .feed-list-toolbar-button {
         margin-right: 15px;
-        color: $selected;
+        @include color($color-selected);
         appearance: none;
         background: transparent;
         padding: 0;
@@ -5049,7 +5049,7 @@ input[type="checkbox"] + label .slider-checkbox {
     }
 }
 input[type="checkbox"]:checked + label .slider-checkbox {
-    background-color: $selected;
+    @include background-color($color-selected);
     &:after {
         left: 32px;
         background: #FFF image-url("icon-check.svg") 4px 5px no-repeat;
@@ -5128,7 +5128,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
                 padding: 8px 10px;
                 &:focus {
                     box-shadow: none;
-                    border: 1px solid $selected;
+                    @include border($color-selected);
                 }
             }
         }
@@ -5179,7 +5179,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
     }
     input[type="submit"],
     button {
-        color: $selected;
+        @include color($color-selected);
         appearance: none;
         background: #FFF;
     }
@@ -5534,7 +5534,7 @@ Buttons
 ------------------------------------------------------------------------------*/
 .button {
     appearance: none !important;
-    background: $selected;
+    @include background($color-selected);
     border: none;
     margin: 0;
     padding: 0;
@@ -5543,7 +5543,8 @@ Buttons
     font-family: $font-stack;
     color: #FFF;
     text-decoration: none;
-    border: 2px solid $selected;
+    @include border($color-selected);
+    border-width: 2px;
     border-radius: 4px;
     padding: 7px;
     min-width: 90px;
@@ -5579,10 +5580,10 @@ Buttons
 }
 
 .button-secondary {
-    background-color: transparent;
-    color: $selected !important;
+    background-color: transparent !important;
+    @include color($color-selected, $extra: !important);
     &[disabled] {
-        background-color: transparent;
+        background-color: transparent !important;
         color: map-get($color-contrast-400, day) !important;
         &:hover {
             background-color: transparent;
@@ -5596,9 +5597,6 @@ Buttons
     &:active {
         background-color: transparent;
         @include color($color-selected-active);
-    }
-    .theme-night & {
-        color: #fff;
     }
 }
 .settings .pagination {
@@ -5617,7 +5615,7 @@ Buttons
             }
         }
         &.current {
-            background-color: $selected;
+            @include background-color($color-selected);
             font-style: normal;
             color: #fff !important;
         }
@@ -5645,7 +5643,7 @@ Buttons
     padding: 0;
     font-weight: normal;
     font-family: $font-stack;
-    color: $selected;
+    @include color($color-selected);
     &:hover {
         text-decoration: underline;
         @include color($color-selected-hover);
@@ -5841,7 +5839,7 @@ select {
 .alert {
     padding: 8px 35px 8px 14px;
     margin-bottom: 20px;
-    background-color: $selected;
+    @include background-color($color-selected);
     color: #FFF;
 }
 
@@ -5862,7 +5860,7 @@ select {
 }
 
 .alert-success {
-    background-color: $selected;
+    @include background-color($color-selected);
 }
 
 .alert-info,
@@ -6112,7 +6110,7 @@ a:hover.danger {
         left: -38px;
         top: -1px;
         &:before {
-            background-color: $selected;
+            @include background-color($color-selected);
             background-image: image-url("icon-star.svg");
             background-position: 2px 2px, 0 0;
         }
@@ -6760,7 +6758,7 @@ Media Players
 
     .mejs_empty__time-current,
     .mejs_empty__time-handle-content {
-        background: $selected;
+        @include background($color-selected);
     }
 
     .mejs_empty__time-hovered {
@@ -7279,7 +7277,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 
 .mejs__time-current,
 .mejs__time-handle-content {
-    background: $selected;
+    @include background($color-selected);
 }
 
 .mejs__time-hovered {
@@ -7747,7 +7745,7 @@ Bigfoot
 	color: #FFF !important;
 }
 .theme-night .bigfoot-footnote a:hover {
-    color: $selected !important;
+    @include color($color-selected, $extra: !important);
     text-decoration: underline !important;
 }
 
@@ -8127,7 +8125,7 @@ button.close {
         border-bottom: none;
     }
     &:hover, &.autocomplete-selected {
-        background-color: $selected;
+        @include background-color($color-selected);
         color: #fff;
     }
 }
@@ -8145,8 +8143,8 @@ button.close {
         border-color: map-get($color-contrast-200, day);
         padding: 10px 11px;
         &:hover, &.autocomplete-selected {
-            background-color: $selected !important;
-            color: #fff  !important;
+            @include background-color($color-selected, $extra: !important);
+            color: #fff !important;
         }
     }
     .autocomplete-suggestion:first-child {
