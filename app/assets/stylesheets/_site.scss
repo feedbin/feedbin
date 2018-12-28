@@ -1,6 +1,9 @@
 /*------------------------------------------------------------------------------
 Variables
 ------------------------------------------------------------------------------*/
+
+/*- Colors -*/
+
 $small-breakpoint: 700px;
 
 $toolbar-height: 41px;
@@ -11,49 +14,154 @@ $audio-player-height-minimized: 54px;
 $base-button-position: 10px;
 
 /*-- Colors --*/
+$gray-100:  hsl(240, 13%, 95%);
+$gray-200:  hsl(240, 5%, 92%);
+$gray-300:  hsl(220, 5%, 75%);
+$gray-400:  hsl(216, 5%, 59%);
+$gray-500:  hsl(219, 6%, 42%);
+$gray-600:  hsl(217, 14%, 26%);
+$gray-700:  hsl(215, 46%, 9%);
+
+$sunset-100:  hsl(49, 48%, 95%);
+$sunset-200:  hsl(53, 8%, 78%);
+$sunset-300:  hsl(51, 4%, 61%);
+$sunset-400:  hsl(48, 2%, 44%);
+$sunset-500:  hsl(60, 2%, 26%);
+$sunset-600:  hsl(60, 2%, 9%);
+
+$blue-100:  hsl(213, 77%, 95%);
+$blue-200:  hsl(214, 79%, 85%);
+$blue-300:  hsl(214, 78%, 75%);
+$blue-400:  hsl(214, 79%, 65%);
+$blue-500:  hsl(214, 79%, 55%);
+$blue-600:  hsl(214, 93%, 46%);
+$blue-700:  hsl(214, 93%, 38%);
+$blue-800:  hsl(214, 92%, 29%);
+$blue-900:  hsl(214, 93%, 21%);
+$blue-1000: hsl(214, 91%, 13%);
+
+$red-100:  hsl(345, 53%, 94%);
+$red-200:  hsl(348, 56%, 83%);
+$red-300:  hsl(348, 56%, 72%);
+$red-400:  hsl(348, 56%, 61%);
+$red-500:  hsl(348, 57%, 50%);
+$red-600:  hsl(348, 89%, 39%);
+$red-700:  hsl(348, 88%, 32%);
+$red-800:  hsl(348, 87%, 25%);
+$red-900:  hsl(347, 89%, 18%);
+$red-1000: hsl(348, 89%, 11%);
+
+$green-100:  hsl(144, 48%, 94%);
+$green-200:  hsl(143, 49%, 82%);
+$green-300:  hsl(143, 50%, 70%);
+$green-400:  hsl(143, 50%, 59%);
+$green-500:  hsl(143, 56%, 47%);
+$green-600:  hsl(143, 92%, 35%);
+$green-700:  hsl(144, 92%, 29%);
+$green-800:  hsl(143, 91%, 23%);
+$green-900:  hsl(143, 90%, 16%);
+$green-1000: hsl(144, 92%, 10%);
+
+$orange-100:  hsl(23, 67%, 95%);
+$orange-200:  hsl(24, 71%, 86%);
+$orange-300:  hsl(24, 72%, 77%);
+$orange-400:  hsl(24, 73%, 68%);
+$orange-500:  hsl(24, 73%, 59%);
+$orange-600:  hsl(24, 73%, 50%);
+$orange-700:  hsl(24, 72%, 41%);
+$orange-800:  hsl(24, 72%, 32%);
+$orange-900:  hsl(24, 71%, 23%);
+$orange-1000: hsl(24, 72%, 14%);
+
 $body-background-color: #FFFFFF;
 $body-background-color-sunset: #efeee4;
 $body-background-color-night: #353739;
+
+$color-base: (
+    day:      #FFFFFF,
+    sunset:   #efeee4,
+    dusk:     #353739,
+    midnight: black,
+);
 
 $list-background-color: #eff1f3;
 $list-background-color-sunset: #e5e4db;
 $list-background-color-night: #2d2d2f;
 
-$drawer-background-color: #e5e7e9;
-$drawer-background-color-sunset: #dcdbd1;
-$drawer-background-color-night: #212325;
+$color-contrast-100: (
+    day:      #eff1f3,
+    sunset:   #e5e4db,
+    dusk:     #2d2d2f,
+    midnight: #2d2d2f,
+);
 
 $border-color: #dcdee0;
 $border-color-sunset: #d2d1c8;
 $border-color-night: #181a1c;
 
-$input-background-color: #FFFFFF;
-$input-background-color-sunset: #FFFFFF;
-$input-background-color-night: #FFFFFF;
-
-$text-header-color: #212325;
-$text-header-color-sunset: #222424;
-$text-header-color-night: #FFFFFF;
-
-$text-color: #212325;
-$text-color-sunset: #353636;
-$text-color-night: #FFFFFF;
-
-$text-color-body: #353739;
-$text-color-body-sunset: #353739;
-$text-color-body-night: #c8cacc;
-
-$text-color-light: #b4b6b8;
-$text-color-light-sunset: #b4b4ad;
-$text-color-light-night: #66686a;
+$color-contrast-200: (
+    day:      #dcdee0,
+    sunset:   #d2d1c8,
+    dusk:     #181a1c,
+    midnight: #181a1c,
+);
 
 $text-color-muted: #c8cacc;
 $text-color-muted-sunset: #c8cacc;
 $text-color-muted-night: #3f4143;
 
+$color-contrast-300: (
+    day:      #c8cacc,
+    sunset:   #c8cacc,
+    dusk:     #3f4143,
+    midnight: #3f4143,
+);
+
+$text-color-light: #b4b6b8;
+$text-color-light-sunset: #b4b4ad;
+$text-color-light-night: #66686a;
+
+$color-contrast-400: (
+    day:      #b4b6b8,
+    sunset:   #b4b4ad,
+    dusk:     #66686a,
+    midnight: #66686a,
+);
+
 $text-summary-color: #7a7c7e;
 $text-summary-color-sunset: #7a7b78;
 $text-summary-color-night: #97999b;
+
+$color-contrast-500: (
+    day:      #7a7c7e,
+    sunset:   #7a7b78,
+    dusk:     #97999b,
+    midnight: #97999b,
+);
+
+$text-color-body: #353739;
+$text-color-body-sunset: #353739;
+$text-color-body-night: #c8cacc;
+
+$color-contrast-600: (
+    day:      #353739,
+    sunset:   #353739,
+    dusk:     #c8cacc,
+    midnight: #c8cacc,
+);
+
+$text-header-color: #212325;
+$text-header-color-sunset: #222424;
+$text-header-color-night: #FFFFFF;
+
+$color-contrast-700: (
+    day:      #212325,
+    sunset:   #222424,
+    dusk:     #FFFFFF,
+    midnight: #181a1c,
+);
+
+
 
 $arrow-shadow-color: #d2d4d6;
 $arrow-shadow-color-night: #000000;
@@ -69,6 +177,8 @@ $inset-bg-color: #f4f6f8;
 $box-shadow-dropdown: 0px 4px 6px 0 rgba(0, 0, 0, 0.1);
 $focus-glow: 0px 0px 10px 0 rgba($selected, 0.6);
 $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
+
+
 
 $base-size-1px: 0.0625rem;
 $base-size-2px: 0.125rem;
@@ -156,13 +266,13 @@ body {
     padding-right: env(safe-area-inset-right);
     font-family: $font-stack;
     background-color: $body-background-color;
-    color: $text-color;
+    color: map-get($color-contrast-700, day);
     &.theme-night {
-        color: $text-color-night;
+        color: map-get($color-contrast-700, dusk);
         background-color: $body-background-color-night;
     }
     &.theme-sunset {
-        color: $text-color-sunset;
+        color: map-get($color-contrast-700, sunset);
         background-color: $body-background-color-sunset;
     }
     @include respond-to(hidpi) {
@@ -308,9 +418,9 @@ input[type="search"],
 input[type="tel"],
 input[type="color"],
 .uneditable-input {
-    @include border($border-color, $border-color-night, $border-color-sunset);
-    @include color($text-header-color, $text-header-color, $text-header-color);
-    @include background-color($input-background-color, $input-background-color-night, $input-background-color-sunset);
+    @include border($color-contrast-200);
+    @include color($color-contrast-700);
+    background-color: #FFF;
     font-size: 14px;
     padding: 5px 8px;
     max-width: 300px;
@@ -402,7 +512,7 @@ table {
     padding: 8px;
     line-height: 1.428571429;
     vertical-align: top;
-    @include border-top($border-color, $border-color-night, $border-color-sunset);
+    @include border-top($color-contrast-200);
 }
 
 .table thead > tr > th {
@@ -420,7 +530,7 @@ table {
 
 .table tbody + tbody {
     border-top: 2px solid transparent;
-    @include border-color($border-color, $border-color-night, $border-color-sunset);
+    @include border-color($color-contrast-200);
 }
 
 .table .table {
@@ -437,7 +547,7 @@ table {
 }
 
 .table-bordered {
-    @include border($border-color, $border-color-night, $border-color-sunset);
+    @include border($color-contrast-200);
 }
 
 .table-bordered > thead > tr > th,
@@ -446,7 +556,7 @@ table {
 .table-bordered > thead > tr > td,
 .table-bordered > tbody > tr > td,
 .table-bordered > tfoot > tr > td {
-    @include border($border-color, $border-color-night, $border-color-sunset);
+    @include border($color-contrast-200);
 }
 
 .table-rounded  {
@@ -723,8 +833,8 @@ Structure
     right: 0;
     top: 0;
     margin: 0;
-    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    @include border-bottom($color-contrast-200);
+    @include background-color($color-base);
     height: $toolbar-height;
     input[type="search"] {
         height: $toolbar-height;
@@ -779,7 +889,7 @@ Structure
     align-items: center;
     position: absolute;
     z-index: 100;
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    @include background-color($color-base);
     .welcome-inner {
         width: 100%;
         text-align: center;
@@ -807,11 +917,11 @@ Structure
     .feeds-column,
     .entries-column {
         flex-grow: 0;
-        @include border-right($border-color, $border-color-night, $border-color-sunset);
+        @include border-right($color-contrast-200);
     }
     .feeds-column {
         width: 245px;
-        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+        @include background-color($color-base);
     }
     .entries-column {
         width: 320px;
@@ -852,7 +962,7 @@ Structure
 
 .subscribe-toolbar {
     height: $toolbar-height;
-    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($color-contrast-200);
     position: absolute;
     top: 0;
     left: 0;
@@ -923,8 +1033,8 @@ Structure
     left: 0;
     right: 0;
     font-size: $base-size-10px;
-    @include border-top($border-color, $border-color-night, $border-color-sunset);
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    @include border-top($color-contrast-200);
+    @include background-color($color-base);
     .standalone-navigator & {
         height: calc(#{$bottom-toolbar-height - 8px} + env(safe-area-inset-bottom));
         min-height: $bottom-toolbar-height !important;
@@ -946,7 +1056,7 @@ Structure
         }
     }
     .entries-column &, .entry-column & {
-        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+        @include background-color($color-base);
     }
 }
 
@@ -987,14 +1097,14 @@ Structure
     left: 0;
     right: 0;
     z-index: 1;
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    @include background-color($color-base);
     transition: transform .2s ease;
 }
 
 .view-toolbar {
     display: flex;
     height: $toolbar-height;
-    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($color-contrast-200);
     position: absolute;
     left: 0;
     right: 0;
@@ -1009,10 +1119,10 @@ Structure
         text-transform: uppercase;
         font-weight: bold;
         user-select: none;
-        @include border-left($border-color, $border-color-night, $border-color-sunset);
+        @include border-left($color-contrast-200);
         @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
         &.selected {
-            @include color($text-color, $text-color-night, $text-color-sunset);
+            @include color($color-contrast-700);
         }
         &:first-child {
             border: none;
@@ -1055,7 +1165,7 @@ Structure
 }
 
 .feeds {
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    @include background-color($color-base);
     position: absolute;
     top: $toolbar-height;
     bottom: 0;
@@ -1217,7 +1327,7 @@ Structure
         ul {
             overflow: hidden;
             border-top: 1px solid transparent;
-            @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+            @include border-bottom($color-contrast-200);
             padding: 0;
             @include arrow(
                 $x-position: 32px,
@@ -1278,12 +1388,12 @@ Structure
 
 .feeds {
     .drop-hover > a {
-        @include background-color($border-color, $border-color-night, $border-color-sunset);
+        @include background-color($color-contrast-200);
     }
     li.drop-hover .drawer {
         @include box-shadow(inset 0 0 0 3px $border-color, inset 0 0 0 3px $border-color-night, inset 0 0 0 3px $border-color-sunset);
         ul:after {
-            @include theme("border-top-color", $border-color, $border-color-night, $border-color-sunset)
+            @include deprecated-theme("border-top-color", $border-color, $border-color-night, $border-color-sunset)
         }
     }
 }
@@ -1399,7 +1509,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     top: 0;
     margin: 0;
     height: $toolbar-height;
-    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($color-contrast-200);
     height: $toolbar-height;
     text-align: center;
     overflow: hidden;
@@ -1453,7 +1563,7 @@ $saved-search-control-height: 48px;
     .sort-control {
         height: $toolbar-height;
         position: relative;
-        @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+        @include border-bottom($color-contrast-200);
     }
     .save-search {
         position: absolute;
@@ -1501,7 +1611,7 @@ $saved-search-control-height: 48px;
         padding: 8px;
         @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
         position: relative;
-        @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+        @include border-bottom($color-contrast-200);
         input[type="text"] {
             height: 32px;
             width: 100%;
@@ -1565,7 +1675,7 @@ $saved-search-control-height: 48px;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     transition: transform .2s ease;
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    @include background-color($color-base);
     .has-offscreen-panels &.loading {
         .entries-target {
             display: none;
@@ -1607,7 +1717,7 @@ $saved-search-control-height: 48px;
     }
     .wrap {
         position: relative;
-        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+        @include background-color($color-base);
         display: block;
         padding: 0;
         left: 0;
@@ -1747,7 +1857,7 @@ $saved-search-control-height: 48px;
         margin-top: 8px !important;
         padding: 8px;
         border-radius: 4px;
-        @include border($drawer-background-color, $drawer-background-color-night, $drawer-background-color-sunset);
+        @include border($color-contrast-100);
     }
     .title, &.no-title .feed-title {
         font-size: $base-size-14px;
@@ -1919,16 +2029,16 @@ $saved-search-control-height: 48px;
     }
     .mark-below-read {
         bottom: 0;
-        @include border-top($border-color, $border-color-night, $border-color-sunset);
-        @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+        @include border-top($color-contrast-200);
+        @include border-bottom($color-contrast-200);
         i:before {
             content: "↓";
             top: -2px;
         }
     }
     &.no-entries {
-        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
-        @include color($text-color, $text-color-night, $text-color-sunset);
+        @include background-color($color-base);
+        @include color($color-contrast-700);
         padding: 8px;
     }
 }
@@ -2055,8 +2165,8 @@ $saved-search-control-height: 48px;
     z-index: 3;
     width: 100%;
     height: $toolbar-height;
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
-    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+    @include background-color($color-base);
+    @include border-bottom($color-contrast-200);
     .site-info {
         flex: 1 1 auto;
         display: flex;
@@ -2071,7 +2181,7 @@ $saved-search-control-height: 48px;
     }
     .button-full-screen {
         display: none;
-        @include border-right($border-color, $border-color-night, $border-color-sunset);
+        @include border-right($color-contrast-200);
         svg {
             position: absolute;
             top: $base-button-position + 3;
@@ -2134,7 +2244,7 @@ $saved-search-control-height: 48px;
 .basement-toolbar {
     height: 49px;
     width: 100%;
-    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($color-contrast-200);
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     @include arrow(
         $x-position: 63px,
@@ -2175,7 +2285,7 @@ $saved-search-control-height: 48px;
             text-align: center;
             justify-content: center;
             min-width: 50px;
-            @include border-right($border-color, $border-color-night, $border-color-sunset);
+            @include border-right($color-contrast-200);
             padding: 0 8px;
             &:hover {
                 text-decoration: none;
@@ -2198,7 +2308,7 @@ $saved-search-control-height: 48px;
         }
     }
     .setting-wrap {
-        @include border-right($border-color, $border-color-night, $border-color-sunset);
+        @include border-right($color-contrast-200);
         display: block;
         padding: 0;
     }
@@ -2319,7 +2429,7 @@ $saved-search-control-height: 48px;
             height: 32px;
             width: 32px;
             cursor: pointer;
-            @include border($border-color, $border-color-night, $border-color-sunset);
+            @include border($color-contrast-200);
             border-radius: 2px;
             &:before,
             &:after,
@@ -2422,7 +2532,7 @@ $saved-search-control-height: 48px;
 }
 
 .entry-content {
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    @include background-color($color-base);
     display: block;
     position: absolute;
     height: auto;
@@ -2500,7 +2610,7 @@ $saved-search-control-height: 48px;
     text-align: left;
     width: 100%;
     margin: 0 auto;
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    @include background-color($color-base);
     &.no-content {
         display: none;
     }
@@ -2520,7 +2630,7 @@ $saved-search-control-height: 48px;
     margin: 0 15px 20px 15px;
     display: block;
     position: relative;
-    @include border-top($border-color, $border-color-night, $border-color-sunset);
+    @include border-top($color-contrast-200);
     .next-icon {
         content: "";
         display: block;
@@ -2549,7 +2659,7 @@ $saved-search-control-height: 48px;
         white-space: nowrap;
     }
     .next-entry-title {
-        @include color($text-color, $text-color-night, $text-color-sunset);
+        @include color($color-contrast-700);
     }
 }
 
@@ -2587,7 +2697,7 @@ $saved-search-control-height: 48px;
         }
         &[disabled] {
             svg * {
-                @include fill($drawer-background-color, $text-color-light-night, $drawer-background-color-sunset);
+                @include fill($color-contrast-100);
             }
         }
     }
@@ -2704,8 +2814,8 @@ $saved-search-control-height: 48px;
     right: 0;
     top: 0;
     margin: 0;
-    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    @include border-bottom($color-contrast-200);
+    @include background-color($color-base);
     height: $toolbar-height;
     z-index: 1;
     display: flex;
@@ -2787,7 +2897,7 @@ $saved-search-control-height: 48px;
         display: none;
         width: 200px;
         border-radius: 4px;
-        @include border($border-color, $border-color-night, $border-color-sunset);
+        @include border($color-contrast-200);
         @include background-color(#FFF, $list-background-color-night, $list-background-color-sunset);
         box-shadow: $box-shadow-dropdown;
         position: absolute;
@@ -2805,7 +2915,7 @@ $saved-search-control-height: 48px;
                 text-decoration: none;
                 display: block;
                 font-size: $base-size-16px;
-                @include color($text-color, $text-color-night, $text-color-sunset);
+                @include color($color-contrast-700);
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -2814,7 +2924,7 @@ $saved-search-control-height: 48px;
                 font-family: $font-stack;
                 font-weight: 400 !important;
                 text-align: left;
-                @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+                @include border-bottom($color-contrast-200);
                 cursor: pointer;
                 &:hover, &.selected {
                     background-color: $selected !important;
@@ -2847,7 +2957,7 @@ $saved-search-control-height: 48px;
         &:before {
             width: 180px;
             height: 1px;
-            @include background-color($border-color, $border-color-night, $border-color-sunset);
+            @include background-color($color-contrast-200);
             top: -4px;
             left: 10px;
             content: "";
@@ -2950,7 +3060,7 @@ $saved-search-control-height: 48px;
 .share-form {
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     padding: 17px 20px;
-    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($color-contrast-200);
     @include arrow(
         $x-position: 241px,
         $y-position: -1px,
@@ -2982,7 +3092,7 @@ $saved-search-control-height: 48px;
     .field-cluster {
         margin-bottom: 15px;
         input, textarea {
-            @include background-color($input-background-color, $input-background-color, $input-background-color);
+            background-color: #FFF;
             @include color($text-header-color, $text-header-color, $text-header-color);
             width: 100%;
             max-width: 100%;
@@ -2993,14 +3103,14 @@ $saved-search-control-height: 48px;
             padding: 10px 10px 8px 10px !important;
             font-size: $base-size-16px;
             &:focus {
-                @include border-color($border-color, $border-color-night, $border-color-sunset);
+                @include border-color($color-contrast-200);
             }
             &:first-child {
                 border-radius: 4px 4px 0 0;
             }
             &:last-child {
                 border-radius: 0 0 4px 4px;
-                @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+                @include border-bottom($color-contrast-200);
             }
         }
         textarea {
@@ -3075,9 +3185,9 @@ $saved-search-control-height: 48px;
     background-image: image-url("icon-caret.svg");
     background-position: 50% 50%;
     background-repeat: no-repeat;
-    @include border($border-color, $border-color-night, $border-color-sunset);
+    @include border($color-contrast-200);
     @include box-shadow(0 0 1px 0 $border-color, 0 0 1px 0 $border-color-night, 0 0 1px 0 $border-color-sunset);
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    @include background-color($color-base);
     .dropdown-content {
         top: 15px;
     }
@@ -3205,7 +3315,7 @@ $saved-search-control-height: 48px;
     blockquote {
         padding: 0 0 0 15px;
         border-left: 4px solid transparent;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border-color($color-contrast-200);
     }
 
     blockquote p:last-child {
@@ -3449,7 +3559,7 @@ $saved-search-control-height: 48px;
     .embed-profile {
         display: flex;
         margin-top: 0;
-        @include color($text-color, $text-color-night, $text-color-sunset);
+        @include color($color-contrast-700);
         border-top-left-radius: 0;
         border-top-right-radius: 0;
         line-height: 1.4;
@@ -3931,7 +4041,7 @@ $saved-search-control-height: 48px;
         margin-bottom: 1.1em;
         padding: 14px 16px;
         border-radius: 4px;
-        @include border($border-color, $border-color-night, $border-color-sunset);
+        @include border($color-contrast-200);
         .twitter-conversation-link {
             display: none;
         }
@@ -3968,7 +4078,7 @@ $saved-search-control-height: 48px;
     }
     .micropost + .micropost, .reply {
         padding-top: 1.1em;
-        @include border-top($border-color, $border-color-night, $border-color-sunset);
+        @include border-top($color-contrast-200);
     }
     .tweet-author-reply {
         border-top: none !important;
@@ -4144,7 +4254,7 @@ Settings
 
 body.settings {
     background-color: $list-background-color-night;
-    color: $text-color;
+    color: map-get($color-contrast-700, day);
 }
 
 .settings {
@@ -4234,7 +4344,7 @@ body.settings {
     .subscription-title {
         position: relative;
         margin: 0;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border-color($color-contrast-200);
         font-size: 18px !important;
         line-height: 18px !important;
         padding: 12px 14px !important;
@@ -4563,7 +4673,7 @@ body.settings {
                 @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
             }
             a {
-                color: $text-color;
+                color: map-get($color-contrast-700, day);
                 @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
                 &:hover {
                     text-decoration: none;
@@ -4596,7 +4706,7 @@ body.settings {
             padding: 15px 12px 30px 12px;
             border-radius: 8px;
             background-color: #FFF;
-            @include border($border-color, $border-color-night, $border-color-sunset);
+            @include border($color-contrast-200);
             .graph-wrap {
                 flex: 1 1 auto;
                 padding-top: 25%;
@@ -4640,7 +4750,7 @@ body.settings {
         }
         .stats {
             margin-top: 1px;
-            @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+            @include border-bottom($color-contrast-200);
             padding: 0 0 15px 0;
             justify-content: space-between;
             display: flex;
@@ -4664,7 +4774,7 @@ body.settings {
                 @media (max-width: $small-breakpoint) {
                     display: inline;
                     font-size: 16px;
-                    @include color($text-color, $text-color-night, $text-color-sunset);
+                    @include color($color-contrast-700);
                     text-transform: none;
                     font-weight: bold;
                     &:after {
@@ -4763,7 +4873,7 @@ body.settings {
         .subscription-link {
             display: flex;
             justify-content: space-between;
-            color: $text-color;
+            color: map-get($color-contrast-700, day);
             padding: 13px 30px 13px $checkbox-offset;
             align-items: center;
             &:hover {
@@ -5030,8 +5140,8 @@ input[type="checkbox"]:checked + label .slider-checkbox {
                 overflow: hidden;
                 white-space: nowrap;
                 @include settings-row;
-                @include border-bottom($border-color, $border-color-night, $border-color-sunset);
-                @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+                @include border-bottom($color-contrast-200);
+                @include background-color($color-base);
                 &:focus {
                     box-shadow: $subtle-focus-glow;
                 }
@@ -5171,14 +5281,14 @@ input[type="checkbox"]:checked + label .slider-checkbox {
     display: inline-block;
     font-size: 16px;
     font-weight: bold;
-    @include border($border-color, $border-color-night, $border-color-sunset);
+    @include border($color-contrast-200);
     width: 32px;
     line-height: 32px;
     text-align: center;
     border-radius: 4px;
     box-shadow: 1px 1px 1px rgba(black, .4);
     background-color: #FFF;
-    color: $text-color;
+    color: map-get($color-contrast-700, day);
 }
 
 .key.wide {
@@ -5217,9 +5327,9 @@ table.small td {
 
 .filter-search-preview {
     .autocomplete-suggestions {
-        @include border-left($border-color, $border-color-night, $border-color-sunset);
-        @include border-right($border-color, $border-color-night, $border-color-sunset);
-        @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+        @include border-left($color-contrast-200);
+        @include border-right($color-contrast-200);
+        @include border-bottom($color-contrast-200);
     }
     .autocomplete-suggestion {
         color: #000;
@@ -5835,8 +5945,8 @@ select {
 }
 
 hr {
-    @include background-color($border-color, $border-color-night, $border-color-sunset);
-    @include color($border-color, $border-color-night, $border-color-sunset);
+    @include background-color($color-contrast-200);
+    @include color($color-contrast-200);
     clear: both;
     float: none;
     width: 100%;
@@ -6030,7 +6140,7 @@ a:hover.danger {
         position: absolute;
         top: 4px;
         left: 9px;
-        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+        @include background-color($color-base);
         height: 44px;
         width: 35px;
         content: '';
@@ -6064,13 +6174,13 @@ a:hover.danger {
 .theme-color-body {
     width: 5px;
     height: 5px;
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    @include background-color($color-base);
 }
 
 .theme-color-border {
     width: 5px;
     height: 5px;
-    @include background-color($border-color, $border-color-night, $border-color-sunset);
+    @include background-color($color-contrast-200);
 }
 
 
@@ -6274,7 +6384,7 @@ Media Players
         display: flex;
         align-items: center;
         justify-content: center;
-        @include background-color($border-color, $border-color-night, $border-color-sunset);
+        @include background-color($color-contrast-200);
         position: relative;
         border: 2px solid #FFF;
         box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
@@ -6300,7 +6410,7 @@ Media Players
         }
         .entry-feed-title {
             font-weight: bold;
-            @include color($text-color, $text-color-night, $text-color-sunset);
+            @include color($color-contrast-700);
         }
         .audio-title, .audio-duration {
             @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
@@ -6353,7 +6463,7 @@ Media Players
     font-family: $font-stack !important;
     font-weight: 400 !important;
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-    @include border-top($border-color, $border-color-night, $border-color-sunset);
+    @include border-top($color-contrast-200);
     position: absolute;
     width: 100%;
     bottom: $bottom-toolbar-height;
@@ -7033,7 +7143,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 }
 
 .mejs__controls:not([style*='display: none']) {
-    background: rgba($text-color, 0.35)
+    background: rgba(map-get($color-contrast-700, day), 0.35)
 }
 
 .mejs__button,
@@ -7658,7 +7768,7 @@ Bigfoot
 }
 .bigfoot-footnote__content, .bigfoot-footnote__tooltip {
     background-color: $list-background-color;
-    color: $text-color;
+    color: map-get($color-contrast-700, day);
     line-height: 1.6;
 }
 .bigfoot-footnote.is-active {
@@ -7909,7 +8019,7 @@ button.close {
         max-width: 100%;
         padding: 20px 60px 20px 20px;
         font-size: 24px;
-        @include color($text-color, $text-color-night, $text-color-sunset);
+        @include color($color-contrast-700);
         &.processing {
             background-position: 97.5% 26px;
         }
@@ -8026,7 +8136,7 @@ button.close {
     }
     .modal-form {
         border-radius: $modal-border-radius $modal-border-radius 0 0 !important;
-        @include border-color($border-color, $border-color-night, $border-color-sunset);
+        @include border-color($color-contrast-200);
     }
     .available-subscriptions {
         opacity: 1;
@@ -8043,8 +8153,8 @@ button.close {
 .autocomplete-suggestion {
     font-size: 14px;
     padding: 6px 11px;
-    @include color($text-color, $text-color-night, $text-color-sunset);
-    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+    @include color($color-contrast-700);
+    @include border-bottom($color-contrast-200);
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 100%;
@@ -8070,7 +8180,7 @@ button.close {
         box-shadow: $box-shadow-dropdown;
     }
     .autocomplete-suggestion {
-        color: $text-color;
+        color: map-get($color-contrast-700, day);
         border-color: $border-color;
         padding: 10px 11px;
         &:hover, &.autocomplete-selected {
@@ -8130,7 +8240,7 @@ button.close {
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
-    @include border-right($border-color, $border-color-night, $border-color-sunset);
+    @include border-right($color-contrast-200);
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
     .swipe & {
@@ -8227,7 +8337,7 @@ button.close {
     flex-direction: column;
     width: 100%;
     pointer-events: auto;
-    @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+    @include background-color($color-base);
     background-clip: padding-box;
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: $modal-border-radius;
@@ -8262,7 +8372,7 @@ button.close {
     padding: 12px 24px 12px 24px;
     border-top-left-radius: $modal-border-radius;
     border-top-right-radius: $modal-border-radius;
-    @include border-bottom($border-color, $border-color-night, $border-color-sunset);
+    @include border-bottom($color-contrast-200);
     @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
     .modal-top & {
         border-radius: 0;
@@ -8326,7 +8436,7 @@ button.close {
     padding: 16px;
     padding-left: 24px;
     padding-right: 24px;
-    @include border-top($border-color, $border-color-night, $border-color-sunset);
+    @include border-top($color-contrast-200);
     @media (max-width: $small-breakpoint) {
         padding: 16px;
     }
@@ -8402,7 +8512,7 @@ button.close {
 .modal {
     .inset {
         border: none;
-        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset);
+        @include background-color($color-base);
         padding-bottom: 0;
         margin-bottom: 0;
     }
