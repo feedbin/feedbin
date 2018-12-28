@@ -178,6 +178,14 @@ $color-selected-off: (
     midnight: #505a65,
 );
 
+$image-spinners: (
+    debug: image-spinners,
+    day: image-url("spinner-day.svg"),
+    sunset: image-url("spinner-sunset.svg"),
+    dusk: image-url("spinner-night.svg"),
+    midnight: image-url("spinner-night.svg"),
+);
+
 $inset-bg-color: #f4f6f8;
 
 $box-shadow-dropdown: 0px 4px 6px 0 rgba(0, 0, 0, 0.1);
@@ -451,7 +459,7 @@ input.processing {
     background-position: 97% 7px;
     background-repeat: no-repeat;
     background-size: 16px 16px;
-    @include background-image(image-url("spinner-day.svg"), image-url("spinner-night.svg"), image-url("spinner-sunset.svg"))
+    @include background-image($image-spinners)
 }
 
 select {
@@ -847,7 +855,7 @@ Structure
             $default: image-url("favicon-search-light.svg"), image-url("spinner-day.svg");
             $night: image-url("favicon-search-light.svg"), image-url("spinner-sunset.svg");
             $sunset: image-url("favicon-search-light.svg"), image-url("spinner-night.svg");
-            @include background-image($default, $night, $sunset);
+            @include background-image((day: $default, dusk: $night, sunset: $sunset, midnight: $night));
         }
     }
 }
@@ -1379,9 +1387,15 @@ Structure
         @include background-color($color-contrast-200);
     }
     li.drop-hover .drawer {
-        @include box-shadow(inset 0 0 0 3px map-get($color-contrast-200, day), inset 0 0 0 3px map-get($color-contrast-200, dusk), inset 0 0 0 3px map-get($color-contrast-200, sunset));
+        $shadow: (
+            day: inset 0 0 0 3px map-get($color-contrast-200, day),
+            dusk: inset 0 0 0 3px map-get($color-contrast-200, dusk),
+            sunset: inset 0 0 0 3px map-get($color-contrast-200, sunset)
+        );
+        @include box-shadow($shadow);
+
         ul:after {
-            @include deprecated-theme("border-top-color", map-get($color-contrast-200, day), map-get($color-contrast-200, dusk), map-get($color-contrast-200, sunset))
+            @include new-theme("border-top-color", $color-contrast-200)
         }
     }
 }
@@ -1411,14 +1425,24 @@ Structure
         }
     }
     .entries & {
-        @include background-color(transparent, #FFF, transparent);
-        @include box-shadow(none, 0px 1px 1px 0px rgba(0, 0, 0, 0.1), none);
+        @include background-color((day: transparent, dusk: #FFF, sunset: transparent, midnight: #FFF));
+        $shadow: (
+            day: none,
+            dusk: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
+            sunset: none,
+        );
+        @include box-shadow($shadow);
     }
 }
 
 li.selected > a .favicon-wrap {
-    @include background-color(#FFF,#FFF,#FFF);
-    @include box-shadow(0px 1px 1px 0px rgba(0, 0, 0, 0.1), 0px 1px 1px 0px rgba(0, 0, 0, 0.1), 0px 1px 1px 0px rgba(0, 0, 0, 0.1));
+    background-color: #FFF !important;
+    $shadow: (
+        day: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
+        dusk: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
+        sunset: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
+    );
+    @include box-shadow($shadow);
     .feeds &.collection-favicon {
         background: transparent;
         box-shadow: none;
@@ -1664,7 +1688,7 @@ $saved-search-control-height: 48px;
         }
         background-repeat: no-repeat;
         background-position: 50% 25%;
-        @include background-image(image-url("spinner-day.svg"), image-url("spinner-night.svg"), image-url("spinner-sunset.svg"), true);
+        @include background-image($image-spinners, true);
         @include background-color($color-base);
     }
     &.show-search-options {
@@ -2193,8 +2217,14 @@ $saved-search-control-height: 48px;
         }
         .favicon-wrap {
             position: static;
-            @include background-color(transparent, #FFF, transparent);
-            @include box-shadow(none, 0px 1px 1px 0px rgba(0, 0, 0, 0.1), none);
+            background-color: #FFF;
+            @include background-color((day: transparent, dusk: #FFF, sunset: transparent, midnight: #FFF));
+            $shadow: (
+                day: none,
+                dusk: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
+                sunset: none
+            );
+            @include box-shadow($shadow);
         }
         .entry-feed-title {
             line-height: 20px;
@@ -2332,7 +2362,7 @@ $saved-search-control-height: 48px;
         .icon-larger-text {
             width: 48px;
             pointer-events: none;
-            @include fill(#000000, #fbfdff, #000000);
+            @include fill($color-contrast-700);
         }
     }
     .button-decrease-font {
@@ -2341,7 +2371,7 @@ $saved-search-control-height: 48px;
         .icon-smaller-text {
             width: 48px;
             pointer-events: none;
-            @include fill(#000000, #fbfdff, #000000);
+            @include fill($color-contrast-700);
         }
     }
     .button-entry-width {
@@ -2355,7 +2385,7 @@ $saved-search-control-height: 48px;
             left: 7px;
             height: 24px;
             width: 34px;
-            @include fill(#000000, #fbfdff, #000000);
+            @include fill($color-contrast-700);
             pointer-events: none;
         }
         .icon-entry-width-fixed {
@@ -2382,7 +2412,7 @@ $saved-search-control-height: 48px;
             left: 7px;
             width: 34px;
             height: 26px;
-            @include fill(#000000, #fbfdff, #000000);
+            @include fill($color-contrast-700);
             pointer-events: none;
         }
         .icon-full-screen-close {
@@ -2472,7 +2502,7 @@ $saved-search-control-height: 48px;
     background-repeat: no-repeat;
     background-size: 120px 120px;
     overflow: hidden;
-    @include background-image(image-url("logo.svg"), image-url("logo-night.svg"), image-url("logo-sunset.svg"));
+    @include background-image((day: image-url("logo.svg"), dusk: image-url("logo-night.svg"), sunset: image-url("logo-sunset.svg")));
     .bottom-toolbar {
         display: none;
     }
@@ -2698,7 +2728,6 @@ $saved-search-control-height: 48px;
     align-items: stretch;
     justify-content: flex-end;
     margin-left: 10px;
-
     form {
         margin: 0;
     }
@@ -2711,7 +2740,7 @@ $saved-search-control-height: 48px;
             width: 16px;
             border-radius: 16px;
             .read & {
-                @include background-color(transparent, transparent, transparent);
+                background-color: transparent !important;
             }
         }
     }
@@ -2876,7 +2905,7 @@ $saved-search-control-height: 48px;
         width: 200px;
         border-radius: 4px;
         @include border($color-contrast-200);
-        @include background-color(#FFF, map-get($color-contrast-100, dusk), map-get($color-contrast-100, sunset));
+        @include background-color((day: #FFF, dusk: map-get($color-contrast-100, dusk), sunset: map-get($color-contrast-100, sunset)));
         box-shadow: $box-shadow-dropdown;
         position: absolute;
         z-index: 10000;
@@ -3160,7 +3189,12 @@ $saved-search-control-height: 48px;
     background-position: 50% 50%;
     background-repeat: no-repeat;
     @include border($color-contrast-200);
-    @include box-shadow(0 0 1px 0 map-get($color-contrast-200, day), 0 0 1px 0 map-get($color-contrast-200, dusk), 0 0 1px 0 map-get($color-contrast-200, sunset));
+    $shadow: (
+        day: 0 0 1px 0 map-get($color-contrast-200, day),
+        dusk: 0 0 1px 0 map-get($color-contrast-200, dusk),
+        sunset: 0 0 1px 0 map-get($color-contrast-200, sunset)
+    );
+    @include box-shadow($shadow);
     @include background-color($color-base);
     .dropdown-content {
         top: 15px;
@@ -3333,7 +3367,7 @@ $saved-search-control-height: 48px;
         background-position: 0 50%;
         background-size: 16px 16px;
         background-repeat: no-repeat;
-        @include background-image(image-url("spinner-day.svg"), image-url("spinner-night.svg"), image-url("spinner-sunset.svg"));
+        @include background-image($image-spinners);
     }
 
     .diff-wrap {
@@ -3358,7 +3392,7 @@ $saved-search-control-height: 48px;
             }
         }
         .view-latest-link {
-            @include color($selected, #FFF, $selected);
+            @include color((day: map-get($color-selected, day), dusk: white, sunset: map-get($color-selected, sunset)));
             &:hover {
                 text-decoration: underline;
                 cursor: pointer;
@@ -3435,7 +3469,7 @@ $saved-search-control-height: 48px;
             left: 0px;
             top: 0;
             bottom: 0;
-            @include background-image(image-url("spinner-day.svg"), image-url("spinner-night.svg"), image-url("spinner-sunset.svg"));
+            @include background-image($image-spinners);
         }
     }
 
@@ -3632,7 +3666,7 @@ $saved-search-control-height: 48px;
 
 .entry-final-content a, .tweet-text a, .micropost-text a, .modal-content .content-styles a {
     text-decoration: underline;
-    @include color(black, white, black);
+    @include color((day: black, dusk: white, sunset: black));
     .no-touch &:hover, &:active {
         @include color($color-selected);
     }
@@ -5123,7 +5157,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
             textarea,
             input,
             #card-element {
-                @include background-color(#fff, #fff, #fff);
+                background-color: #fff !important;
             }
         }
         &.text {
@@ -5781,7 +5815,7 @@ Link Viewer
     height: 50px;
     background-position: 50% 50%;
     background-repeat: no-repeat;
-    @include background-image(image-url("spinner-day.svg"), image-url("spinner-night.svg"), image-url("spinner-sunset.svg"));
+    @include background-image($image-spinners);
 }
 
 .view-link-error-container {
