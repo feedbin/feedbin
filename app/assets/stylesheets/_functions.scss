@@ -107,17 +107,16 @@
 
 @mixin share-icon($x-offset, $y-offset) {
     background-repeat: no-repeat;
-    background-position: 30px + $x-offset 12px + $y-offset;
-    @media (max-width: 528px) {
-        background-position: 15px + $x-offset 12px + $y-offset;
+    background-position: 15px + $x-offset 12px + $y-offset;
+    @include respond-to(screen-sm) {
+        background-position: 30px + $x-offset 12px + $y-offset;
     }
 }
 
 @mixin settings-row {
-    padding: 15px 30px;
-    @media (max-width: 528px) {
-        padding-right: 15px;
-        padding-left: 15px;
+    padding: 15px;
+    @include respond-to(screen-sm) {
+        padding: 15px 30px;
     }
     .modal & {
         @include padding(14px, 24px, 14px, 24px, 14px, 16px, 14px, 16px);
@@ -125,9 +124,9 @@
 }
 
 @mixin padding($top, $right, $bottom, $left, $top-small, $right-small, $bottom-small, $left-small) {
-    padding: $top $right $bottom $left;
-    @media (max-width: 528px) {
-        padding: $top-small $right-small $bottom-small $left-small;
+    padding: $top-small $right-small $bottom-small $left-small;
+    @include respond-to(screen-sm) {
+        padding: $top $right $bottom $left;
     }
 }
 
@@ -161,7 +160,19 @@
     }
 }
 
-@mixin box-shadow($args...) {
+@mixin box-shadow($map, $properties, $args...) {
+    @if type-of($map) != 'map' {
+        $map: (day: $map, sunset: $map, dusk: $map, midnight: $map);
+    }
+    $shadow: (
+        day: $properties map-get($map, day),
+        dusk: $properties map-get($map, dusk),
+        sunset: $properties map-get($map, sunset),
+    );
+    @include theme("box-shadow", $shadow, $args...);
+}
+
+@mixin box-shadow-irregular($args...) {
     @include theme("box-shadow", $args...);
 }
 

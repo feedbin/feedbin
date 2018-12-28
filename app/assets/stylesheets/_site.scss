@@ -1400,12 +1400,7 @@ Structure
         @include background-color($color-contrast-200);
     }
     li.drop-hover .drawer {
-        $shadow: (
-            day: inset 0 0 0 3px map-get($color-contrast-200, day),
-            dusk: inset 0 0 0 3px map-get($color-contrast-200, dusk),
-            sunset: inset 0 0 0 3px map-get($color-contrast-200, sunset)
-        );
-        @include box-shadow($shadow);
+        @include box-shadow($color-contrast-200, inset 0 0 0 3px);
 
         ul:after {
             @include theme("border-top-color", $color-contrast-200)
@@ -1444,18 +1439,13 @@ Structure
             dusk: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
             sunset: none,
         );
-        @include box-shadow($shadow);
+        @include box-shadow-irregular($shadow);
     }
 }
 
 li.selected > a .favicon-wrap {
     @include background-color(#FFF);
-    $shadow: (
-        day: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
-        dusk: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
-        sunset: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
-    );
-    @include box-shadow($shadow);
+    @include box-shadow(rgba(0, 0, 0, 0.1), 0px 1px 1px 0px);
     .feeds &.collection-favicon {
         background: transparent;
         box-shadow: none;
@@ -2237,7 +2227,7 @@ $saved-search-control-height: 48px;
                 dusk: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
                 sunset: none
             );
-            @include box-shadow($shadow);
+            @include box-shadow-irregular($shadow);
         }
         .entry-feed-title {
             line-height: 20px;
@@ -3204,12 +3194,7 @@ $saved-search-control-height: 48px;
     background-position: 50% 50%;
     background-repeat: no-repeat;
     @include border($color-contrast-200);
-    $shadow: (
-        day: 0 0 1px 0 map-get($color-contrast-200, day),
-        dusk: 0 0 1px 0 map-get($color-contrast-200, dusk),
-        sunset: 0 0 1px 0 map-get($color-contrast-200, sunset)
-    );
-    @include box-shadow($shadow);
+    @include box-shadow($color-contrast-200, 0 0 1px 0);
     @include background-color($color-base);
     .dropdown-content {
         top: 15px;
@@ -4208,9 +4193,6 @@ Settings
         }
 
     }
-    .desktop-hide {
-        display: none;
-    }
     .modal & {
         width: 100%;
         display: block;
@@ -4221,11 +4203,16 @@ Settings
     }
 }
 
-@media (max-width: $small-breakpoint) {
-    .settings-nav {
+.desktop-hide {
+    display: block;
+    @include respond-to(screen-sm) {
         display: none;
     }
-    .desktop-hide {
+}
+
+.settings-nav {
+    display: none;
+    @include respond-to(screen-sm) {
         display: block;
     }
 }
