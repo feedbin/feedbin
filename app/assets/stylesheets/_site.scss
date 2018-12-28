@@ -847,7 +847,7 @@ Structure
         background-size: 14px 14px, 16px 16px;
         border: none;
         line-height: 1;
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include color($color-contrast-700);
         &.processing {
             background-position: 14px ($base-button-position + 3), 97% ($base-button-position + 3);
             background-size: 14px 14px, 16px 16px;
@@ -901,7 +901,7 @@ Structure
     }
     .sub-head {
         font-size: 18px;
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include color($color-contrast-400);
     }
     .description {
         font-size: 13px;
@@ -1061,7 +1061,7 @@ Structure
 }
 
 .toolbar-button {
-    @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+    @include color($color-contrast-700);
     text-decoration: none;
     appearance: none;
     display: inline-block;
@@ -1075,7 +1075,7 @@ Structure
     padding: 8px 0 0 0;
     &[disabled] {
         cursor: default;
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include color($color-contrast-400);
     }
     &:hover {
         text-decoration: none;
@@ -1120,7 +1120,7 @@ Structure
         font-weight: bold;
         user-select: none;
         @include border-left($color-contrast-200);
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include color($color-contrast-400);
         &.selected {
             @include color($color-contrast-700);
         }
@@ -1216,7 +1216,7 @@ Structure
                 cursor: text;
                 position: relative;
                 left: -2px;
-                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+                @include color($color-contrast-700);
                 &.disabled {
                     cursor: pointer;
                     pointer-events: none;
@@ -1225,7 +1225,7 @@ Structure
             }
             .feed-link {
                 font-size: $base-size-13px;
-                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+                @include color($color-contrast-700);
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -1264,7 +1264,7 @@ Structure
                 flex: 0 1 auto;
             }
             .count {
-                @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+                @include color($color-contrast-500);
             }
             .tag-link .count-wrap {
                 margin-left: 0;
@@ -1279,7 +1279,7 @@ Structure
                 height: 1px;
                 .feed-action-button {
                     font-weight: bold;
-                    @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+                    @include color($color-contrast-400);
                     font-size: $base-size-11px;
                     display: block;
                     appearance: none;
@@ -1322,7 +1322,7 @@ Structure
     }
     .drawer {
         position: relative;
-        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+        @include background-color($color-contrast-100);
         overflow: hidden;
         ul {
             overflow: hidden;
@@ -1441,7 +1441,7 @@ li.selected > a .favicon-wrap {
     background-image: image-url("favicon-default.svg");
     background-position: 0 0;
     background-repeat: no-repeat;
-    @include background-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    @include background-color($color-contrast-400);
     border-radius: 1.5px;
 }
 
@@ -1459,13 +1459,13 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     background: transparent;
     box-shadow: none;
     svg {
-        @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include fill($color-contrast-400);
         li.selected > .feed-link & {
             fill: #FFF;
         }
     }
     .favicon-newsletter {
-        @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+        @include fill($color-contrast-400);
     }
 }
 
@@ -1491,7 +1491,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     justify-content: center;
     display: flex;
     svg * {
-        @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+        @include fill($color-contrast-400);
     }
     .full-screen & {
         display: none !important;
@@ -1501,7 +1501,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 .entries-header {
     align-items: center;
     justify-content: space-between;
-    @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    @include color($color-contrast-400);
     display: none;
     position: absolute;
     left: 0;
@@ -1514,7 +1514,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     text-align: center;
     overflow: hidden;
     .feed-title-wrap {
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include color($color-contrast-700);
         font-weight: bold;
         white-space: nowrap;
         overflow: hidden;
@@ -1552,7 +1552,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 $saved-search-control-height: 48px;
 
 .search-control {
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    @include background-color($color-contrast-100);
     font-size: $base-size-11px;
     line-height: 14px;
     height: $toolbar-height + $saved-search-control-height;
@@ -1573,13 +1573,13 @@ $saved-search-control-height: 48px;
         font-weight: bold;
         cursor: pointer;
         user-select: none;
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include color($color-contrast-700);
     }
     .sort-order {
-        @include background-color($list-background-color, $body-background-color-night, $list-background-color-sunset);
+        @include background-color($color-contrast-100);
         border-radius: 12px;
         margin: 7px 0 0 8px;
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include color($color-contrast-700);
         padding: 5px 22px 5px 10px;
         display: inline-block;
         position: relative;
@@ -1609,7 +1609,7 @@ $saved-search-control-height: 48px;
     .saved-search-wrap {
         height: $saved-search-control-height;
         padding: 8px;
-        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+        @include background-color($color-contrast-100);
         position: relative;
         @include border-bottom($color-contrast-200);
         input[type="text"] {
@@ -1683,7 +1683,7 @@ $saved-search-control-height: 48px;
         background-repeat: no-repeat;
         background-position: 50% 25%;
         @include background-image(image-url("spinner-day.svg"), image-url("spinner-night.svg"), image-url("spinner-sunset.svg"), true);
-        @include background-color($body-background-color, $body-background-color-night, $body-background-color-sunset, true);
+        @include background-color($color-base);
     }
     &.show-search-options {
         transform: translateY($toolbar-height);
@@ -1713,7 +1713,7 @@ $saved-search-control-height: 48px;
     }
     a {
         text-decoration: none;
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include color($color-contrast-400);
     }
     .wrap {
         position: relative;
@@ -1731,7 +1731,7 @@ $saved-search-control-height: 48px;
         padding: $base-size-10px 10px $base-size-10px 0;
         margin-left: 38px;
         position: relative;
-        @include border-bottom($list-background-color, $list-background-color-night, $list-background-color-sunset);
+        @include border-bottom($color-contrast-100);
         > .favicon-wrap {
             display: none;
         }
@@ -1742,7 +1742,7 @@ $saved-search-control-height: 48px;
         border-radius: 4px;
         &.is-loading {
             position: relative;
-            @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+            @include background-color($color-contrast-100);
         }
         img {
             border-radius: 4px;
@@ -1802,7 +1802,7 @@ $saved-search-control-height: 48px;
         align-items: baseline;
     }
     .feed-title {
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include color($color-contrast-400);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1810,7 +1810,7 @@ $saved-search-control-height: 48px;
     }
     .time {
         align-self: flex-end;
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include color($color-contrast-400);
         display: block;
         white-space: nowrap;
         &.inline {
@@ -1832,7 +1832,7 @@ $saved-search-control-height: 48px;
         margin: 0;
         display: block;
         margin-bottom: 2px;
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include color($color-contrast-700);
         position: relative;
     }
     .body, &.no-title .title {
@@ -1840,7 +1840,7 @@ $saved-search-control-height: 48px;
         line-height: 1.35;
         font-size: $base-size-13px;
         margin: 0;
-        @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+        @include color($color-contrast-500);
         display: block;
         .has-offscreen-panels.touch & {
             font-size: $base-size-15px;
@@ -1865,12 +1865,12 @@ $saved-search-control-height: 48px;
         font-weight: bold;
         display: block;
         position: relative;
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include color($color-contrast-700);
         .title-inner {
             font-weight: bold;
             span {
                 font-weight: normal;
-                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+                @include color($color-contrast-400);
             }
         }
         .has-offscreen-panels.touch & {
@@ -1903,12 +1903,12 @@ $saved-search-control-height: 48px;
         .title,
         .feed-title,
         .body {
-            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            @include color($color-contrast-400);
         }
     }
     &.read.tweet {
         .feed-title {
-            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            @include color($color-contrast-400);
         }
     }
     &.media {
@@ -1996,12 +1996,12 @@ $saved-search-control-height: 48px;
     .mark-below-read {
         position: absolute;
         height: 50%;
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include color($color-contrast-400);
         width: 100%;
         text-align: right;
         cursor: pointer;
         &:hover {
-            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+            @include color($color-contrast-500);
         }
         span {
             font-size: $base-size-12px;
@@ -2066,7 +2066,7 @@ $saved-search-control-height: 48px;
         display: inline-block;
     }
     .feed-title, .no-title .feed-title {
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include color($color-contrast-400);
         .title-inner {
             font-weight: normal;
         }
@@ -2093,7 +2093,7 @@ $saved-search-control-height: 48px;
         }
     }
     .no-title .title {
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include color($color-contrast-700);
         font-weight: bold;
         font-size: $base-size-14px;
     }
@@ -2218,7 +2218,7 @@ $saved-search-control-height: 48px;
             line-height: 20px;
             margin-left: 6px;
             font-size: $base-size-14px;
-            @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+            @include color($color-contrast-700);
             text-decoration: none;
             user-select: none;
             appearance: none !important;
@@ -2245,7 +2245,7 @@ $saved-search-control-height: 48px;
     height: 49px;
     width: 100%;
     @include border-bottom($color-contrast-200);
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    @include background-color($color-contrast-100);
     @include arrow(
         $x-position: 63px,
         $y-position: -1px,
@@ -2315,7 +2315,7 @@ $saved-search-control-height: 48px;
     .font-settings {
         position: relative;
         select {
-            @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+            @include background-color($color-contrast-100);
             width: 115px;
             padding: 0;
             font-size: $base-size-13px;
@@ -2326,7 +2326,7 @@ $saved-search-control-height: 48px;
             appearance: none;
             margin: 0 0 0 8px;
             padding: 0;
-            @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+            @include color($color-contrast-700);
             position: relative;
             &::-ms-expand {
                 display: none;
@@ -2644,13 +2644,13 @@ $saved-search-control-height: 48px;
         right: 0;
         bottom: 0;
         svg * {
-            @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+            @include fill($color-contrast-400);
         }
     }
     .next-entry-feed, .next-entry-title {
         display: block;
         font-size: $base-size-14px;
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include color($color-contrast-400);
         margin-bottom: 5px;
         font-family: $font-stack !important;
         font-weight: 400 !important;
@@ -2684,7 +2684,7 @@ $saved-search-control-height: 48px;
             width: 11px;
             height: 18px;
             svg * {
-                @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+                @include fill($color-contrast-400);
             }
         }
         &.button-next, &.button-previous {
@@ -2727,8 +2727,8 @@ $saved-search-control-height: 48px;
     .button-toggle-read {
         .circle {
             border: 2px solid transparent;
-            @include border-color($text-color-light, $text-summary-color-night, $text-color-light-sunset);
-            @include background-color($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+            @include border-color($color-contrast-400);
+            @include background-color($color-contrast-400);
             height: 16px;
             width: 16px;
             border-radius: 16px;
@@ -2841,7 +2841,7 @@ $saved-search-control-height: 48px;
         pointer-events: none;
     }
     svg * {
-        @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+        @include fill($color-contrast-400);
     }
 }
 
@@ -3023,12 +3023,12 @@ $saved-search-control-height: 48px;
     a {
         display: block;
         text-decoration: none;
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include color($color-contrast-700);
     }
     h1 {
         font-size: 2em;
         line-height: 1.1;
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include color($color-contrast-700);
         margin: 0 0 .2em 0;
         padding: 0;
         font-weight: bold;
@@ -3041,11 +3041,11 @@ $saved-search-control-height: 48px;
 }
 .post-meta {
     font-size: $base-size-14px;
-    @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    @include color($color-contrast-400);
     line-height: 1.2;
     margin-bottom: .2em;
     a {
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include color($color-contrast-400);
     }
     .icon-clock {
         float: left;
@@ -3058,7 +3058,7 @@ $saved-search-control-height: 48px;
 
 
 .share-form {
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    @include background-color($color-contrast-100);
     padding: 17px 20px;
     @include border-bottom($color-contrast-200);
     @include arrow(
@@ -3085,7 +3085,7 @@ $saved-search-control-height: 48px;
     }
     h2 {
         font-size: $base-size-16px;
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include color($color-contrast-700);
         font-weight: bold;
         margin: 0 0 15px 0;
     }
@@ -3093,7 +3093,7 @@ $saved-search-control-height: 48px;
         margin-bottom: 15px;
         input, textarea {
             background-color: #FFF;
-            @include color($text-header-color, $text-header-color, $text-header-color);
+            @include color($color-contrast-700);
             width: 100%;
             max-width: 100%;
             margin: 0;
@@ -3217,7 +3217,7 @@ $saved-search-control-height: 48px;
     font-style: normal;
     font-size: 1.15em;
     line-height: 1.6;
-    @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
+    @include color($color-contrast-600);
     text-rendering: optimizeLegibility;
     overflow-wrap: break-word
 
@@ -3235,7 +3235,7 @@ $saved-search-control-height: 48px;
         font-style: normal;
         margin: .5em 0 .5em 0;
         text-rendering: optimizeLegibility;
-        @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include color($color-contrast-700);
     }
 
     h1, h2 {
@@ -3298,8 +3298,8 @@ $saved-search-control-height: 48px;
     }
 
     pre code {
-        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-        @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
+        @include background-color($color-contrast-100);
+        @include color($color-contrast-600);
         display: block;
         overflow-x: auto;
         white-space: pre;
@@ -3328,7 +3328,7 @@ $saved-search-control-height: 48px;
 
     figcaption, caption {
         font-size: 80%;
-        @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+        @include color($color-contrast-500);
         font-style: italic;
         line-height: 1.3;
     }
@@ -3365,7 +3365,7 @@ $saved-search-control-height: 48px;
     .diff-wrap {
         padding-left: 36px !important;
         .ignore-updates {
-            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            @include color($color-contrast-400);
             text-decoration: none;
             font-weight: bold;
             float: right;
@@ -3380,7 +3380,7 @@ $saved-search-control-height: 48px;
             top: 11px;
             left: 11px;
             svg {
-                @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+                @include fill($color-contrast-400);
             }
         }
         .view-latest-link {
@@ -3415,7 +3415,7 @@ $saved-search-control-height: 48px;
         .original-title a {
             font-size: $base-size-14px;
             font-weight: bold;
-            @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+            @include color($color-contrast-700);
             margin-bottom: .3em;
             &:hover {
                 text-decoration: underline;
@@ -3423,7 +3423,7 @@ $saved-search-control-height: 48px;
         }
         .original-meta {
             font-size: $base-size-12px;
-            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+            @include color($color-contrast-500);
         }
         .favicon-wrap {
             position: absolute;
@@ -3511,8 +3511,8 @@ $saved-search-control-height: 48px;
 }
 
 .content-styles .entry-callout, .entry-callout {
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
-    @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    @include background-color($color-contrast-100);
+    @include color($color-contrast-400);
     position: relative;
     font-size: $base-size-13px;
     margin-top: 15px;
@@ -3575,7 +3575,7 @@ $saved-search-control-height: 48px;
             max-width: 100%;
             max-height: 100%;
             * {
-                @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+                @include fill($color-contrast-400);
             }
         }
         .icon-embed-source-spotify,
@@ -3889,10 +3889,10 @@ $saved-search-control-height: 48px;
 .tweet-wrap {
     .tweet-mentions {
         font-size: $base-size-14px;
-        @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+        @include color($color-contrast-500);
         margin-bottom: 10px;
         a {
-            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+            @include color($color-contrast-500);
         }
     }
     .tweet-header {
@@ -3929,7 +3929,7 @@ $saved-search-control-height: 48px;
             flex-grow: 1;
             .link {
                 font-weight: normal;
-                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+                @include color($color-contrast-400);
                 text-decoration: none;
                 background: none;
                 display: block;
@@ -3938,7 +3938,7 @@ $saved-search-control-height: 48px;
                 white-space: nowrap;
                 strong {
                     font-weight: bold;
-                    @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+                    @include color($color-contrast-700);
                 }
             }
         }
@@ -3959,7 +3959,7 @@ $saved-search-control-height: 48px;
             align-items: baseline;
             margin-left: auto;
             .twitter-link svg, .twitter-conversation-link svg {
-                @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+                @include fill($color-contrast-400);
             }
             .twitter-link {
                 padding-left: 15px;
@@ -3992,7 +3992,7 @@ $saved-search-control-height: 48px;
     }
     .tweet-meta {
         font-size: $base-size-14px;
-        @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+        @include color($color-contrast-400);
         img {
             position: relative;
             border-radius: 16px;
@@ -4001,7 +4001,7 @@ $saved-search-control-height: 48px;
         a {
             display: flex;
             align-items: center;
-            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            @include color($color-contrast-400);
             text-decoration: none;
         }
     }
@@ -4019,7 +4019,7 @@ $saved-search-control-height: 48px;
         white-space: pre-wrap;
         font-size: 1.15em;
         line-height: 1.4;
-        @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
+        @include color($color-contrast-600);
         font-family: $font-stack;
         overflow-wrap: break-word;
         margin-bottom: 1.1em;
@@ -4353,14 +4353,14 @@ body.settings {
         max-width: 100%;
         padding-right: 50px !important;
         border-radius: 8px;
-        @include color($text-header-color, $text-header-color, $text-header-color-sunset);
+        @include color($color-contrast-700);
         @media (max-width: $small-breakpoint) {
             padding-right: 10px !important;
         }
         &:focus {
             background-color: #FFF !important;
             border-color: $selected !important;
-            @include color($text-header-color, $text-header-color, $text-header-color);
+            @include color($color-contrast-700);
         }
     }
     h4 {
@@ -4670,11 +4670,11 @@ body.settings {
             margin: 0;
             span {
                 font-weight: normal;
-                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+                @include color($color-contrast-400);
             }
             a {
                 color: map-get($color-contrast-700, day);
-                @include color($text-header-color, $text-header-color-night, $text-header-color-sunset);
+                @include color($color-contrast-700);
                 &:hover {
                     text-decoration: none;
                 }
@@ -4903,7 +4903,7 @@ body.settings {
             .tags {
                 text-align: right;
                 font-size: 14px;
-                @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+                @include color($color-contrast-400);
                 display: block;
                 text-overflow: ellipsis;
                 overflow: hidden;
@@ -4949,7 +4949,7 @@ body.settings {
         }
         .last-updated-wrap, .subscription-meta {
             font-size: 14px;
-            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            @include color($color-contrast-400);
         }
         .subscription-meta {
             margin-left: 24px;
@@ -5742,24 +5742,24 @@ Buttons
 .button-tag {
     width: 21px;
     path {
-        @include stroke($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include stroke($color-contrast-700);
         [disabled] & {
-            @include stroke($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            @include stroke($color-contrast-400);
         }
     }
     circle {
-        @include fill($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include fill($color-contrast-700);
         [disabled] & {
-            @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            @include fill($color-contrast-400);
         }
     }
 }
 .button-check {
     width: 22px;
     * {
-        @include fill($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include fill($color-contrast-700);
         [disabled] & {
-            @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            @include fill($color-contrast-400);
         }
     }
 }
@@ -5768,17 +5768,17 @@ Buttons
 .button-trash {
     width: 18px;
     * {
-        @include stroke($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include stroke($color-contrast-700);
         [disabled] & {
-            @include stroke($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            @include stroke($color-contrast-400);
         }
     }
     .lid {
         stroke: none;
-        @include fill($text-header-color, $text-header-color-night, $text-header-color-sunset);
+        @include fill($color-contrast-700);
         [disabled] & {
             stroke: none;
-            @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            @include fill($color-contrast-400);
         }
     }
 }
@@ -6397,7 +6397,7 @@ Media Players
             bottom: 0;
         }
         svg {
-            @include fill($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+            @include fill($color-contrast-500);
         }
     }
     .audio-text {
@@ -6413,11 +6413,11 @@ Media Players
             @include color($color-contrast-700);
         }
         .audio-title, .audio-duration {
-            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+            @include color($color-contrast-500);
         }
         .audio-duration {
             font-size: 12px;
-            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            @include color($color-contrast-400);
         }
         .entry-feed-title, .audio-title {
             display: block;
@@ -6443,7 +6443,7 @@ Media Players
             line-height: 0;
         }
         svg * {
-            @include fill($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+            @include fill($color-contrast-500);
         }
         button, a {
             display: flex;
@@ -6462,7 +6462,7 @@ Media Players
     font-size: 13px;
     font-family: $font-stack !important;
     font-weight: 400 !important;
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    @include background-color($color-contrast-100);
     @include border-top($color-contrast-200);
     position: absolute;
     width: 100%;
@@ -6519,7 +6519,7 @@ Media Players
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+            @include color($color-contrast-500);
             &:hover {
                 text-decoration: none;
             }
@@ -6586,15 +6586,15 @@ Media Players
             justify-content: center;
             height: 40px;
             width: 40px;
-            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+            @include color($color-contrast-500);
             margin-left: 20px;
             &:first-child {
                 margin-left: 0;
             }
         }
         svg {
-            @include fill($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
-            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+            @include fill($color-contrast-500);
+            @include color($color-contrast-500);
         }
     }
 }
@@ -7754,7 +7754,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 Bigfoot
 ------------------------------------------------------------------------------*/
 .bigfoot-footnote__button {
-    @include background-color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    @include background-color($color-contrast-400);
     padding: 0.1em;
     border-radius: 8px;
     min-width: 30px;
@@ -7764,7 +7764,7 @@ Bigfoot
     font-weight: bold;
 }
 .footnote-circle {
-    @include fill($text-color-light, $text-color-light-night, $text-color-light-sunset);
+    @include fill($color-contrast-400);
 }
 .bigfoot-footnote__content, .bigfoot-footnote__tooltip {
     background-color: $list-background-color;
@@ -7968,12 +7968,12 @@ button.close {
     border: 0;
     color: $text-color-light;
     svg * {
-        @include fill($text-color-light, $text-summary-color-night, $text-color-light-sunset);
+        @include fill($color-contrast-400);
     }
 }
 
 .modal-form {
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    @include background-color($color-contrast-100);
     border-radius: $modal-border-radius;
     border-bottom: 1px solid transparent;
     position: relative;
@@ -8000,7 +8000,7 @@ button.close {
         }
     }
     label {
-        @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+        @include color($color-contrast-500);
         font-weight: bold;
         white-space: nowrap;
         display: flex;
@@ -8061,7 +8061,7 @@ button.close {
             bottom: -37px;
             left: 8px;
             font-size: 12px;
-            @include color($text-summary-color, $text-summary-color-night, $text-summary-color-sunset);
+            @include color($color-contrast-500);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -8373,7 +8373,7 @@ button.close {
     border-top-left-radius: $modal-border-radius;
     border-top-right-radius: $modal-border-radius;
     @include border-bottom($color-contrast-200);
-    @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+    @include background-color($color-contrast-100);
     .modal-top & {
         border-radius: 0;
     }
@@ -8499,7 +8499,7 @@ button.close {
         z-index: 2;
         border-bottom-left-radius: $modal-border-radius;
         border-bottom-right-radius: $modal-border-radius;
-        @include background-color($list-background-color, $list-background-color-night, $list-background-color-sunset);
+        @include background-color($color-contrast-100);
         .modal-bottom & {
             border-radius: 0;
         }
@@ -8535,7 +8535,7 @@ button.close {
             padding: 0;
             border: none;
             text-align: right;
-            @include color($text-color-light, $text-color-light-night, $text-color-light-sunset);
+            @include color($color-contrast-400);
             background: transparent !important;
             font-weight: bold;
             font-size: 24px;
@@ -8548,6 +8548,6 @@ button.close {
         }
     }
     .group-header {
-        @include color($text-color-body, $text-color-body-night, $text-color-body-sunset);
+        @include color($color-contrast-600);
     }
 }

@@ -131,7 +131,31 @@
     }
 }
 
-@mixin theme($property, $default, $night, $sunset, $root: false) {
+@mixin new-theme($property, $map, $root: false) {
+    #{$property}: map-get($map, day);
+    @if $root {
+        @at-root {
+            #{selector-append(".theme-night", &)} {
+                #{$property}: map-get($map, dusk);
+            }
+            #{selector-append(".theme-sunset", &)} {
+                #{$property}: map-get($map, sunset);
+            }
+        }
+    }
+    @else {
+        .theme-night & {
+            #{$property}: map-get($map, dusk);
+        }
+        .theme-sunset & {
+            #{$property}: map-get($map, sunset);
+        }
+    }
+}
+
+@mixin deprecated-theme($property, $default, $night, $sunset, $root: false) {
+    @warn "deprecated-theme called for: #{$property}";
+
     #{$property}: $default;
     @if $root {
         @at-root {
@@ -150,6 +174,14 @@
         .theme-sunset & {
             #{$property}: $sunset;
         }
+    }
+}
+
+@mixin theme($args...) {
+    @if length($args) > 3 {
+        @include deprecated-theme($args...);
+    } @else {
+        @include new-theme($args...);
     }
 }
 
