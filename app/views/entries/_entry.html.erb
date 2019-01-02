@@ -20,7 +20,15 @@
                         <p class="feed-title">
                             <%= entry_presenter.feed_title %>
                         </p>
-                        <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
+                        <div class="entry-status">
+                            <i class="status-indicator icon-star">
+                                <%= svg_tag("favicon-star", size: "10x10") %>
+                            </i>
+                            <i class="status-indicator icon-unread"></i>
+                            <i class="status-indicator icon-entry-actions" data-behavior="show_entry_actions">
+                                <%= svg_tag("favicon-newsletter", size: "16x16") %>
+                            </i>
+                        </div>
                     </div>
                     <span class="title-wrap">
                         <h2 class="title">
@@ -29,19 +37,24 @@
                         </h2>
                         <%= entry_presenter.summary %>
                     </span>
+                    <div class="footer-meta-wrap">
+                        <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
+                        <i class="status-indicator icon-retweet">
+                            <%= svg_tag("favicon-newsletter", size: "16x16") %>
+                        </i>
+                        <i class="status-indicator icon-play">
+                            <%= svg_tag("favicon-newsletter", size: "16x16") %>
+                        </i>
+                    </div>
                     <% if entry.tweet? && entry.main_tweet.quoted_status? %>
                         <p class="title quoted-summary">
                             <strong><%= entry_presenter.tweet_name(entry.main_tweet.quoted_status) %></strong> &ndash;
                             <%= entry_presenter.retweet_text %>
                         </p>
                     <% end %>
+
                     <%= entry_presenter.image %>
                 </div>
-                <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago inline') %>
-                <i class="status-indicator icon-star"></i>
-                <span class="entry-actions-wrap" data-behavior="show_entry_actions">
-                    <i class="icon-entry-actions"></i>
-                </span>
             </span>
         </a>
     </li>
