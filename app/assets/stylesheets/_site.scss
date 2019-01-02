@@ -1707,7 +1707,7 @@ $saved-search-control-height: 48px;
     }
     a {
         text-decoration: none;
-        @include color($color-contrast-700);
+        @include color($color-contrast-600);
     }
     .wrap {
         position: relative;
@@ -1756,36 +1756,6 @@ $saved-search-control-height: 48px;
             display: block;
         }
     }
-    .entry-actions-wrap {
-        top: 0;
-        right: 0;
-        position: absolute;
-        height: 23px;
-        width: 30px;
-        display: none;
-        cursor: pointer;
-        .icon-entry-actions {
-            pointer-events: none;
-            position: absolute;
-            top: 17px;
-            right: 20px;
-            &:before {
-                left: -6px;
-            }
-            &:after {
-                left: 6px;
-            }
-        }
-        &:hover {
-            .icon-entry-actions {
-                background-color: #FFF;
-                &:before,
-                &:after {
-                    background-color: #FFF;
-                }
-            }
-        }
-    }
     .meta-wrap {
         display: flex;
         justify-content: space-between;
@@ -1795,6 +1765,10 @@ $saved-search-control-height: 48px;
     .entry-status {
         margin-left: auto;
         flex-shrink: 0;
+        height: 12px;
+        width: 12px;
+        display: flex;
+        align-items: center;
     }
     .footer-meta-wrap {
         display: flex;
@@ -1806,7 +1780,7 @@ $saved-search-control-height: 48px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        margin: 0 5px 0 0;
+        margin: 0 8px 0 0;
     }
     .time {
         align-self: flex-end;
@@ -1848,6 +1822,7 @@ $saved-search-control-height: 48px;
         .title-inner {
             font-weight: bold;
             span {
+                @include color($color-contrast-500);
                 font-weight: normal;
             }
         }
@@ -1857,14 +1832,23 @@ $saved-search-control-height: 48px;
         width: $dot;
         height: $dot;
         border-radius: $dot/2;
-        position: absolute;
         content: '';
         display: inline-block;
         background-color: #FFF;
     }
     .icon-entry-actions {
         position: relative;
+        cursor: pointer;
+        overflow: visible;
         display: none;
+        &:before {
+            position: absolute;
+            left: -6px;
+        }
+        &:after {
+            position: absolute;
+            left: 6px;
+        }
     }
     .icon-star {
         display: none;
@@ -1876,11 +1860,17 @@ $saved-search-control-height: 48px;
         border-radius: 10px;
         background-color: map-get($color-selected, day);
     }
+    .icon-play {
+        display: none;
+    }
+    .icon-retweet {
+        display: none;
+    }
     &.no-title {
         .favicon-wrap {
             position: absolute;
             display: flex;
-            top: 8px;
+            top: 12px;
             z-index: 3;
             .has-offscreen-panels.touch & {
                 top: 9px;
@@ -1898,10 +1888,9 @@ $saved-search-control-height: 48px;
     &.starred {
         .icon-star {
             display: flex;
-            svg {
-                height: 10px;
-                width: 10px;
-            }
+        }
+        .icon-unread {
+            display: none;
         }
     }
     &.media {
@@ -1941,9 +1930,8 @@ $saved-search-control-height: 48px;
             color: white !important;
         }
     }
-
     .selected &.selected {
-        .entry-actions-wrap {
+        .icon-entry-actions {
             display: block;
         }
         .wrap {
