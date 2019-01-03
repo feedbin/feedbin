@@ -47,6 +47,8 @@ $theme-color-midnight-700: #FFFFFF;
 $color-accent-blue-400: #619EEC;
 $color-accent-blue-600: #0867E2;
 
+$color-accent-orange-600: #E96A0E;
+
 $color-base: (
     debug: color-base,
     day:      #FFFFFF,
@@ -1206,7 +1208,7 @@ Structure
                 margin: 0;
                 line-height: 1;
                 border: 0;
-                font-size: $base-size-13px;
+                font-size: $base-size-14px;
                 max-width: 100%;
                 border-radius: 0;
                 text-overflow: ellipsis;
@@ -1221,7 +1223,7 @@ Structure
                 }
             }
             .feed-link {
-                font-size: $base-size-13px;
+                font-size: $base-size-14px;
                 @include color($color-contrast-700);
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -1277,7 +1279,7 @@ Structure
                 .feed-action-button {
                     font-weight: bold;
                     @include color($color-contrast-400);
-                    font-size: $base-size-11px;
+                    font-size: $base-size-12px;
                     display: block;
                     appearance: none;
                     background: none;
@@ -1699,8 +1701,8 @@ $saved-search-control-height: 48px;
 
     .favicon-wrap {
         position: absolute;
-        top: -2px;
-        left: -26px;
+        top: 0;
+        left: -25px;
         .has-offscreen-panels.touch & {
             top: -1px;
         }
@@ -1718,9 +1720,9 @@ $saved-search-control-height: 48px;
         transition: transform .2s ease;
 
         line-height: 1.35;
-        font-size: $base-size-13px;
+        font-size: $base-size-14px;
         .has-offscreen-panels.touch & {
-            font-size: $base-size-15px;
+            font-size: $base-size-16px;
         }
 
         &:hover {
@@ -1730,7 +1732,7 @@ $saved-search-control-height: 48px;
     .entries-inner-wrap {
         display: block;
         padding: $base-size-10px 10px $base-size-10px 0;
-        margin-left: 38px;
+        margin-left: 39px;
         position: relative;
         @include border-bottom($color-borders);
         > .favicon-wrap {
@@ -1815,9 +1817,9 @@ $saved-search-control-height: 48px;
         font-weight: bold;
         display: block;
         position: relative;
-        font-size: $base-size-14px;
+        font-size: $base-size-16px;
         .has-offscreen-panels.touch & {
-            font-size: $base-size-16px;
+            font-size: $base-size-18px;
         }
         .title-inner {
             font-weight: bold;
@@ -1828,7 +1830,7 @@ $saved-search-control-height: 48px;
         }
     }
     .icon-entry-actions, .icon-entry-actions:before, .icon-entry-actions:after {
-        $dot: 3px;
+        $dot: 4px;
         width: $dot;
         height: $dot;
         border-radius: $dot/2;
@@ -1837,10 +1839,12 @@ $saved-search-control-height: 48px;
         background-color: #FFF;
     }
     .icon-entry-actions {
-        position: relative;
+        position: absolute;
         cursor: pointer;
         overflow: visible;
         display: none;
+        bottom: 13px;
+        right: 15px;
         &:before {
             position: absolute;
             left: -6px;
@@ -1850,9 +1854,16 @@ $saved-search-control-height: 48px;
             left: 6px;
         }
     }
+    .entry-actions-wrap {
+        height: 40px;
+        width: 40px;
+        right: 0;
+        top: 0;
+        position: absolute;
+    }
     .icon-star {
         display: none;
-        fill: #E96A0E;
+        fill: $color-accent-orange-600;
     }
     .icon-unread {
         height: 10px;
@@ -1860,20 +1871,30 @@ $saved-search-control-height: 48px;
         border-radius: 10px;
         background-color: map-get($color-selected, day);
     }
-    .icon-play {
+    .icon-play-small {
         display: none;
+        margin-left: 8px;
+        fill: map-get($color-selected, day);
     }
     .icon-retweet {
         display: none;
+        fill: map-get($color-selected, day);
+        margin-left: 8px;
     }
     &.no-title {
         .favicon-wrap {
             position: absolute;
             display: flex;
-            top: 12px;
+            top: 14px;
             z-index: 3;
             .has-offscreen-panels.touch & {
                 top: 9px;
+            }
+        }
+        .title {
+            font-size: $base-size-14px;
+            .has-offscreen-panels.touch & {
+                font-size: $base-size-16px;
             }
         }
         .title .favicon-wrap {
@@ -1894,7 +1915,7 @@ $saved-search-control-height: 48px;
         }
     }
     &.media {
-        .icon-play {
+        .icon-play-small {
             display: flex;
         }
     }
@@ -1912,11 +1933,11 @@ $saved-search-control-height: 48px;
         .entries-inner-wrap {
             border-bottom-color: transparent;
         }
-        .icon-star, .icon-unread {
-            display: none;
-        }
         .title, .feed-title, .title-inner span, .quoted-summary, .body, .time {
             color: #FFFFFF !important;
+        }
+        .icon-retweet, .icon-star, .icon-play-small {
+            fill: #FFFFFF;
         }
         .quoted-summary {
             border-color: #FFFFFF !important;
@@ -1931,6 +1952,12 @@ $saved-search-control-height: 48px;
         }
     }
     .selected &.selected {
+        .icon-unread {
+            display: none;
+        }
+        .icon-star {
+            display: none;
+        }
         .icon-entry-actions {
             display: block;
         }
@@ -1953,9 +1980,9 @@ $saved-search-control-height: 48px;
         text-align: right;
         cursor: pointer;
         span {
-            font-size: $base-size-12px;
+            font-size: $base-size-14px;
             display: block;
-            height: $base-size-12px;
+            height: $base-size-14px;
             overflow: auto;
             margin: auto;
             position: absolute;
@@ -2667,12 +2694,13 @@ $saved-search-control-height: 48px;
     .button-toggle-read {
         .circle {
             border: 2px solid transparent;
-            @include border-color($color-icons);
-            @include background-color($color-icons);
+            @include border-color(map-get($color-selected, day));
+            @include background-color(map-get($color-selected, day));
             height: 16px;
             width: 16px;
             border-radius: 16px;
             .read & {
+                @include border-color($color-icons);
                 background-color: transparent !important;
             }
         }
@@ -2686,7 +2714,7 @@ $saved-search-control-height: 48px;
             .icon-star-on {
                 display: block;
                 * {
-                    @include fill($color-selected);
+                    fill: $color-accent-orange-600;
                 }
             }
             .icon-star-off {
