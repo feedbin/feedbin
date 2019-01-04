@@ -2603,7 +2603,7 @@ $saved-search-control-height: 48px;
 }
 
 .feeds-target, .entries-target, .entry-inner {
-    .touch & {
+    .touch:not(.scroll-bars) & {
         min-height: 101%;
     }
 }
