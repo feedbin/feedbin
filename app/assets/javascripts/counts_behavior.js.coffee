@@ -178,8 +178,13 @@ class feedbin.CountsBehavior
 
     # Drain hide queue if this isn't the same collection
     if feedbin.selectedFeed
-      isParent = $(event.currentTarget).parent('li[data-tag-id]').parent(feedbin.selectedFeed).length != 0
       isSelf = feedbin.selectedFeed.is(event.currentTarget)
+      isTag = $(event.currentTarget).is('.tag-link')
+
+      isParent = false
+      if isTag && !feedbin.selectedFeed.is('.tag-link')
+        isParent = $($(event.currentTarget).parents('li')[0]).find(feedbin.selectedFeed).length != 0
+
       if !isParent && !isSelf
         $.each feedbin.hideQueue, (index, feed_id) ->
           if feed_id != undefined
