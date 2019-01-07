@@ -53,7 +53,7 @@ $color-base: (
     debug: color-base,
     day:      #FFFFFF,
     sunset:   #F9F7EE,
-    dusk:     #2F3338,
+    dusk:     #3C444E,
     midnight: #000000,
 );
 
@@ -117,8 +117,8 @@ $color-borders: (
     debug:    color-borders,
     day:      $theme-color-200,
     sunset:   $theme-color-sunset-200,
-    dusk:     black,
-    midnight: $theme-color-midnight-100,
+    dusk:     $theme-color-dusk-100,
+    midnight: $theme-color-midnight-200,
 );
 
 $color-arrow-shadow: (
@@ -156,10 +156,10 @@ $color-selected-active: (
 
 $color-selected-off: (
     debug:    color-selected-off,
-    day:      #505a65,
+    day:      #223D4F,
     sunset:   #5B5A57,
-    dusk:     #505a65,
-    midnight: #505a65,
+    dusk:     #5D6B80,
+    midnight: #223D4F,
 );
 
 $image-spinners: (
@@ -3009,12 +3009,12 @@ $saved-search-control-height: 48px;
     }
 }
 .post-meta {
-    font-size: $base-size-14px;
-    @include color($color-contrast-400);
+    font-size: $base-size-16px;
+    @include color($color-contrast-500);
     line-height: 1.2;
     margin-bottom: .2em;
     a {
-        @include color($color-contrast-400);
+        @include color($color-contrast-500);
     }
     .icon-clock {
         float: left;
@@ -3956,8 +3956,8 @@ $saved-search-control-height: 48px;
         }
     }
     .tweet-meta {
-        font-size: $base-size-14px;
-        @include color($color-contrast-400);
+        font-size: $base-size-16px;
+        @include color($color-contrast-500);
         img {
             position: relative;
             border-radius: 16px;
@@ -3966,7 +3966,7 @@ $saved-search-control-height: 48px;
         a {
             display: flex;
             align-items: center;
-            @include color($color-contrast-400);
+            @include color($color-contrast-500);
             text-decoration: none;
         }
     }
