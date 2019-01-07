@@ -2558,7 +2558,7 @@ $saved-search-control-height: 48px;
 }
 
 .feeds-target, .entries-target, .entry-inner {
-    .touch & {
+    .touch:not(.scroll-bars) & {
         min-height: 101%;
     }
 }
@@ -7725,7 +7725,7 @@ Bigfoot
     }
 }
 .theme-night .bigfoot-footnote a {
-	color: #FFF !important;
+	color: black !important;
 }
 .theme-night .bigfoot-footnote a:hover {
     @include color($color-selected, $extra: !important);

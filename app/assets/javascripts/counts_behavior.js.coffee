@@ -18,10 +18,11 @@ feedbin.updateTitle = () ->
 
 feedbin.applyCounts = (useHideQueue) ->
   $('[data-behavior~=needs_count]').each (index, countContainer) =>
-    group = $(countContainer).data('count-group')
-    groupId = $(countContainer).data('count-group-id')
-    collection = $(countContainer).data('count-collection')
-    countHide = $(countContainer).data('count-hide') == 'on'
+    countContainer = $(countContainer)
+    group = countContainer.data('count-group')
+    groupId = countContainer.data('count-group-id')
+    collection = countContainer.data('count-collection')
+    countHide = countContainer.data('count-hide') == 'on'
 
     if !collection
       collection = 'unread'
@@ -29,7 +30,7 @@ feedbin.applyCounts = (useHideQueue) ->
         collection = 'starred'
 
     counts = feedbin.Counts.get().counts[collection][group]
-    countWas = $(countContainer).text() * 1
+    countWas = countContainer.text() * 1
     count = 0
 
     if groupId
@@ -37,15 +38,15 @@ feedbin.applyCounts = (useHideQueue) ->
         count = counts[groupId].length
     else
       count = counts.length
-    $(countContainer).text(count)
+    countContainer.text(count)
 
     if count == 0
-      $(countContainer).addClass('hide')
+      countContainer.addClass('hide')
     else
-      $(countContainer).removeClass('hide')
+      countContainer.removeClass('hide')
 
     if groupId || countHide
-      container = $(countContainer).parents('li').first()
+      container = countContainer.parents('li').first()
       feedId = $(container).data('feed-id')
       if useHideQueue
         if count == 0 && countWas > 0
@@ -176,13 +177,22 @@ class feedbin.CountsBehavior
     feedbin.specialCollection = $(event.currentTarget).data('special-collection')
 
     # Drain hide queue if this isn't the same collection
-    if feedbin.selectedFeed && feedbin.selectedFeed[0] != $(event.currentTarget)[0]
-      $.each feedbin.hideQueue, (index, feed_id) ->
-        count = feedbin.Counts.get().entriesInFeed(feed_id)
-        if feed_id != undefined && count == 0
-          item = $("li[data-feed-id=#{feed_id}]", '.feeds')
-          $(item).addClass('zero-count')
-      feedbin.hideQueue.length = 0
+    if feedbin.selectedFeed
+      isSelf = feedbin.selectedFeed.is(event.currentTarget)
+      isTag = $(event.currentTarget).is('.tag-link')
+
+      isParent = false
+      if isTag && !feedbin.selectedFeed.is('.tag-link')
+        isParent = $($(event.currentTarget).parents('li')[0]).find(feedbin.selectedFeed).length != 0
+
+      if !isParent && !isSelf
+        $.each feedbin.hideQueue, (index, feed_id) ->
+          if feed_id != undefined
+            item = $(".feeds li[data-feed-id=#{feed_id}]")
+            count = $('[data-behavior~=needs_count]', item).text() * 1
+            if count == 0
+              $(item).addClass('zero-count')
+        feedbin.hideQueue.length = 0
 
     feedbin.selectedFeed = $(event.currentTarget)
     return
