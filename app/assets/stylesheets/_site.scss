@@ -2311,7 +2311,7 @@ $saved-search-control-height: 48px;
             right: 9px;
             top: 23px;
             pointer-events: none;
-            .theme-night & {
+            .theme-night &, .theme-midnight & {
                 border-top-color: #FFF;
             }
         }
@@ -2388,23 +2388,23 @@ $saved-search-control-height: 48px;
         }
     }
     .theme-settings {
-        width: 140px;
         position: relative;
+        padding-right: 10px;
+        align-items: center;
         .theme-button {
-            position: absolute;
-            top: 9px;
-            left: 13px;
+            position: relative;
             height: 32px;
             width: 32px;
             cursor: pointer;
             @include border($color-borders);
             border-radius: 2px;
+            margin-left: 10px;
             &:before,
             &:after,
             .theme-button-inner:before,
             .theme-button-inner:after {
-                height: 2px;
                 left: 6px;
+                height: 2px;
                 position: absolute;
                 content: "";
                 display: block;
@@ -2436,14 +2436,12 @@ $saved-search-control-height: 48px;
         }
         .theme-button-sunset {
             background-color: map-get($color-base, sunset);
-            left: 54px;
             .theme-sunset & {
                 @include border-color($color-selected);
             }
         }
         .theme-button-night {
             background-color: map-get($color-base, dusk);
-            left: 95px;
             &:before,
             &:after,
             .theme-button-inner:before,
@@ -2451,6 +2449,18 @@ $saved-search-control-height: 48px;
                 background-color: #FFF;
             }
             .theme-night & {
+                @include border-color($color-selected);
+            }
+        }
+        .theme-button-midnight {
+            background-color: map-get($color-base, midnight);
+            &:before,
+            &:after,
+            .theme-button-inner:before,
+            .theme-button-inner:after {
+                background-color: #FFF;
+            }
+            .theme-midnight & {
                 @include border-color($color-selected);
             }
         }
@@ -2462,7 +2472,7 @@ $saved-search-control-height: 48px;
     background-repeat: no-repeat;
     background-size: 120px 120px;
     overflow: hidden;
-    @include background-image((day: image-url("logo.svg"), dusk: image-url("logo-night.svg"), sunset: image-url("logo-sunset.svg")));
+    @include background-image((day: image-url("logo.svg"), dusk: image-url("logo-night.svg"), sunset: image-url("logo-sunset.svg"), midnight: image-url("logo-night.svg")));
     .bottom-toolbar {
         display: none;
     }
@@ -2865,7 +2875,7 @@ $saved-search-control-height: 48px;
         width: 200px;
         border-radius: 4px;
         @include border($color-borders);
-        @include background-color((day: #FFF, dusk: map-get($color-contrast-100, dusk), sunset: map-get($color-contrast-100, sunset)));
+        @include background-color((day: #FFF, dusk: map-get($color-contrast-100, dusk), sunset: map-get($color-contrast-100, sunset), midnight: map-get($color-contrast-100, midnight)));
         box-shadow: $box-shadow-dropdown;
         position: absolute;
         z-index: 10000;
@@ -3349,13 +3359,13 @@ $saved-search-control-height: 48px;
             }
         }
         .view-latest-link {
-            @include color((day: map-get($color-selected, day), dusk: white, sunset: map-get($color-selected, sunset)));
+            @include color((day: map-get($color-selected, day), dusk: white, sunset: map-get($color-selected, sunset), midnight: white));
             &:hover {
                 text-decoration: underline;
                 cursor: pointer;
                 @include color($color-selected-hover);
             }
-            .theme-night & {
+            .theme-night &, .theme-midnight & {
                 text-decoration: underline;
             }
         }
@@ -3623,7 +3633,7 @@ $saved-search-control-height: 48px;
 
 .entry-final-content a, .tweet-text a, .micropost-text a, .modal-content .content-styles a {
     text-decoration: underline;
-    @include color((day: black, dusk: white, sunset: black));
+    @include color((day: black, dusk: white, sunset: black, midnight: white));
     .no-touch &:hover, &:active {
         @include color($color-selected);
     }

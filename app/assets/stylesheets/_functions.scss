@@ -56,14 +56,22 @@
 				border-top-color: map-get($shadow-color, dusk);
 			}
 		}
-		.theme-sunset & {
-			@if $invert == true {
-				border-bottom-color: map-get($shadow-color, sunset);
-			}
-			@else {
-				border-top-color: map-get($shadow-color, sunset);
-			}
-		}
+        .theme-sunset & {
+            @if $invert == true {
+                border-bottom-color: map-get($shadow-color, sunset);
+            }
+            @else {
+                border-top-color: map-get($shadow-color, sunset);
+            }
+        }
+        .theme-midnight & {
+            @if $invert == true {
+                border-bottom-color: map-get($shadow-color, midnight);
+            }
+            @else {
+                border-top-color: map-get($shadow-color, midnight);
+            }
+        }
 		@content;
 	}
 	&:after {
@@ -85,14 +93,22 @@
 		border-right: 5px solid rgba(0, 0, 0, 0);
 		border-left: 5px solid rgba(0, 0, 0, 0);
 		content: '';
-		.theme-night & {
-			@if $invert == true {
-				border-bottom-color: map-get($arrow-color, dusk);
-			}
-			@else {
-				border-top-color: map-get($arrow-color, dusk);
-			}
-		}
+        .theme-night & {
+            @if $invert == true {
+                border-bottom-color: map-get($arrow-color, dusk);
+            }
+            @else {
+                border-top-color: map-get($arrow-color, dusk);
+            }
+        }
+        .theme-midnight & {
+            @if $invert == true {
+                border-bottom-color: map-get($arrow-color, midnight);
+            }
+            @else {
+                border-top-color: map-get($arrow-color, midnight);
+            }
+        }
 		.theme-sunset & {
 			@if $invert == true {
 				border-bottom-color: map-get($arrow-color, sunset);
@@ -146,6 +162,10 @@
                 /* map name: $#{map-get($map, debug)} */
                 #{$property}: map-get($map, sunset) $extra;
             }
+            #{selector-append(".theme-midnight", &)} {
+                /* map name: $#{map-get($map, debug)} */
+                #{$property}: map-get($map, midnight) $extra;
+            }
         }
     }
     @else {
@@ -156,6 +176,10 @@
         .theme-sunset & {
             /* map name: $#{map-get($map, debug)} */
             #{$property}: map-get($map, sunset) $extra;
+        }
+        .theme-midnight & {
+            /* map name: $#{map-get($map, debug)} */
+            #{$property}: map-get($map, midnight) $extra;
         }
     }
 }

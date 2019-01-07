@@ -33,7 +33,10 @@
         <%= link_to settings_theme_path(theme: 'sunset'), remote: true, method: :post, class: 'theme-button theme-button-sunset', title: 'Switch to sunset theme', data: {behavior: 'switch_theme', theme: 'sunset'} do %>
             <span class="theme-button-inner"></span>
         <% end %>
-        <%= link_to settings_theme_path(theme: 'night'), remote: true, method: :post, class: 'theme-button theme-button-night', title: 'Switch to night theme', data: {behavior: 'switch_theme', theme: 'night'} do %>
+        <%= link_to settings_theme_path(theme: 'night'), remote: true, method: :post, class: 'theme-button theme-button-night', title: 'Switch to dusk theme', data: {behavior: 'switch_theme', theme: 'night'} do %>
+            <span class="theme-button-inner"></span>
+        <% end %>
+        <%= link_to settings_theme_path(theme: 'midnight'), remote: true, method: :post, class: 'theme-button theme-button-midnight', title: 'Switch to midnight theme', data: {behavior: 'switch_theme', theme: 'midnight'} do %>
             <span class="theme-button-inner"></span>
         <% end %>
     </div>
