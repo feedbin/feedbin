@@ -5,14 +5,28 @@
         <meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no,viewport-fit=cover" />
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <script>
+            function retryAsset(element) {
+                var url = element.src || element.href;
+                if (url) {
+                    url = url.replace("<%= ENV["ASSET_HOST"] %>", "");
+                    element.onerror = null;
+                    if (element.src) {
+                        element.src = url;
+                    } else if (element.href) {
+                        element.href = url;
+                    }
+                }
+            }
+        </script>
         <link rel="mask-icon" href="<%= asset_path('website-icon.svg') %>" color="#000000" />
         <link rel="icon" href="<%= asset_path('link-icon.png') %>" sizes="192x192" />
         <link rel="apple-touch-icon-precomposed" href="<%= asset_path('apple-touch-icon-precomposed.png') %>" sizes="152x152" />
         <link rel="shortcut icon" href="<%= asset_path('favicon.ico') %>" type="image/vnd.microsoft.icon" />
-        <%= stylesheet_link_tag "application", media: 'all'  %>
-        <%= javascript_include_tag "application" %>
+        <%= stylesheet_link_tag "application", media: "all", onerror: "retryAsset(this)"  %>
+        <%= javascript_include_tag "application", onerror: "retryAsset(this)"  %>
         <% if native? %>
-            <%= javascript_include_tag "conditional/turbolinks" %>
+            <%= javascript_include_tag "conditional/turbolinks", onerror: "retryAsset(this)"  %>
             <script>
                 feedbin.native = true
                 $(function() {
