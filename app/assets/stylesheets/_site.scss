@@ -20,13 +20,13 @@ $theme-color-500: #656A73;
 $theme-color-600: #39404B;
 $theme-color-700: #0D1623;
 
-$theme-color-dusk-100: $theme-color-700;
-$theme-color-dusk-200: $theme-color-600;
-$theme-color-dusk-300: $theme-color-500;
-$theme-color-dusk-400: $theme-color-400;
-$theme-color-dusk-500: $theme-color-300;
-$theme-color-dusk-600: $theme-color-200;
-$theme-color-dusk-700: $theme-color-100;
+$theme-color-dusk-100: #47494B;
+$theme-color-dusk-200: #595B5D;
+$theme-color-dusk-300: #7E7F81;
+$theme-color-dusk-400: #A3A4A5;
+$theme-color-dusk-500: #C7C8C9;
+$theme-color-dusk-600: #ECECED;
+$theme-color-dusk-700: #FFFFFF;
 
 $theme-color-sunset-100: #E3E1D9;
 $theme-color-sunset-200: #CCCBC3;
@@ -46,14 +46,17 @@ $theme-color-midnight-700: #FFFFFF;
 
 $color-accent-blue-400: #619EEC;
 $color-accent-blue-600: #0867E2;
+$color-accent-blue-700: #0755B9;
 
 $color-accent-orange-600: #E96A0E;
+
+$color-accent-green-600: #07AC47;
 
 $color-base: (
     debug: color-base,
     day:      #FFFFFF,
     sunset:   #F9F7EE,
-    dusk:     #3C444E,
+    dusk:     #353739,
     midnight: #000000,
 );
 
@@ -117,7 +120,7 @@ $color-borders: (
     debug:    color-borders,
     day:      $theme-color-200,
     sunset:   $theme-color-sunset-200,
-    dusk:     $theme-color-dusk-100,
+    dusk:     $theme-color-dusk-200,
     midnight: $theme-color-midnight-200,
 );
 
@@ -140,18 +143,18 @@ $color-selected: (
 
 $color-selected-hover: (
     debug:    color-selected-hover,
-    day:      $color-accent-blue-400,
-    sunset:   $color-accent-blue-400,
-    dusk:     $color-accent-blue-400,
-    midnight: $color-accent-blue-400,
+    day:      $color-accent-blue-700,
+    sunset:   $theme-color-sunset-500,
+    dusk:     $color-accent-blue-700,
+    midnight: $color-accent-blue-700,
 );
 
 $color-selected-active: (
     debug:    color-selected-active,
-    day:      $color-accent-blue-400,
-    sunset:   $color-accent-blue-400,
-    dusk:     $color-accent-blue-400,
-    midnight: $color-accent-blue-400,
+    day:      $color-accent-blue-600,
+    sunset:   #171716,
+    dusk:     $color-accent-blue-600,
+    midnight: $color-accent-blue-600,
 );
 
 $color-selected-off: (
@@ -170,7 +173,7 @@ $image-spinners: (
     midnight: image-url("spinner-night.svg"),
 );
 
-$color-icons: $color-contrast-400;
+$color-icons: $color-contrast-600;
 
 $inset-bg-color: #f4f6f8;
 
@@ -2417,7 +2420,7 @@ $saved-search-control-height: 48px;
             height: 32px;
             width: 32px;
             cursor: pointer;
-            @include border($color-borders);
+            border: 1px solid black;
             border-radius: 2px;
             margin-left: 10px;
             &:before,
@@ -2896,7 +2899,7 @@ $saved-search-control-height: 48px;
         width: 200px;
         border-radius: 4px;
         @include border($color-borders);
-        @include background-color((day: #FFF, dusk: map-get($color-contrast-100, dusk), sunset: map-get($color-contrast-100, sunset), midnight: map-get($color-contrast-100, midnight)));
+        @include background-color($color-base);
         box-shadow: $box-shadow-dropdown;
         position: absolute;
         z-index: 10000;
@@ -4258,7 +4261,7 @@ Settings
 }
 
 body.settings {
-    background-color: map-get($color-contrast-100, dusk);
+    background-color: map-get($color-contrast-700, day);
     color: map-get($color-contrast-700, day);
 }
 
@@ -5744,24 +5747,24 @@ Buttons
 .button-tag {
     width: 21px;
     path {
-        @include stroke($color-contrast-700);
+        @include stroke($color-icons);
         [disabled] & {
-            @include stroke($color-contrast-400);
+            @include stroke($color-contrast-300);
         }
     }
     circle {
-        @include fill($color-contrast-700);
+        @include fill($color-icons);
         [disabled] & {
-            @include fill($color-contrast-400);
+            @include fill($color-contrast-300);
         }
     }
 }
 .button-check {
     width: 22px;
     * {
-        @include fill($color-contrast-700);
+        @include fill($color-icons);
         [disabled] & {
-            @include fill($color-contrast-400);
+            @include fill($color-contrast-300);
         }
     }
 }
@@ -5770,23 +5773,23 @@ Buttons
 .button-trash {
     width: 18px;
     * {
-        @include stroke($color-contrast-700);
+        @include stroke($color-icons);
         [disabled] & {
-            @include stroke($color-contrast-400);
+            @include stroke($color-contrast-300);
         }
     }
     .lid {
         stroke: none;
-        @include fill($color-contrast-700);
+        @include fill($color-icons);
         [disabled] & {
             stroke: none;
-            @include fill($color-contrast-400);
+            @include fill($color-contrast-300);
         }
     }
 }
 
 .button-toggle-content.active * {
-    fill: #860000 !important;
+    fill: $color-accent-green-600 !important;
 }
 
 /*------------------------------------------------------------------------------
@@ -8279,6 +8282,7 @@ button.close {
     width: auto;
     margin: 0.5rem;
     pointer-events: none;
+    box-shadow: 0 20px 60px 0 rgba(0,0,0,.4);
 }
 
 .modal.animate .modal-dialog {
@@ -8328,7 +8332,7 @@ button.close {
     bottom: 0;
     left: 0;
     z-index: 1040;
-    background-color: #000;
+    background-color: map-get($color-base, dusk);
 }
 
 .modal-backdrop.fade {
@@ -8350,7 +8354,7 @@ button.close {
     border-top-left-radius: $modal-border-radius;
     border-top-right-radius: $modal-border-radius;
     @include border-bottom($color-borders);
-    @include background-color($color-contrast-100);
+    @include background-color($color-base);
     .modal-top & {
         border-radius: 0;
     }
@@ -8476,7 +8480,7 @@ button.close {
         z-index: 2;
         border-bottom-left-radius: $modal-border-radius;
         border-bottom-right-radius: $modal-border-radius;
-        @include background-color($color-contrast-100);
+        @include background-color($color-base);
         .modal-bottom & {
             border-radius: 0;
         }
