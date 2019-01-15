@@ -38,6 +38,13 @@
                         <%= entry_presenter.summary %>
                     </span>
                     <div class="footer-meta-wrap">
+                        <div class="entry-status">
+                            <i class="status-indicator icon-star">
+                                <%= svg_tag("favicon-star", size: "12x12") %>
+                            </i>
+                            <i class="status-indicator icon-unread"></i>
+                        </div>
+
                         <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
                         <%= svg_tag "icon-retweet", size: "16x8" %>
                         <%= svg_tag "icon-play-small", size: "10x10" %>

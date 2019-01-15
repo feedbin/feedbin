@@ -1703,9 +1703,6 @@ $saved-search-control-height: 48px;
         position: absolute;
         top: 0;
         left: -25px;
-        .has-offscreen-panels.touch & {
-            top: -1px;
-        }
     }
     a {
         text-decoration: none;
@@ -1778,6 +1775,9 @@ $saved-search-control-height: 48px;
         justify-content: flex-start;
         align-items: center;
         margin: 8px 0;
+        .entry-status {
+            display: none;
+        }
     }
     .feed-title {
         white-space: nowrap;
@@ -1843,7 +1843,6 @@ $saved-search-control-height: 48px;
         position: absolute;
         cursor: pointer;
         overflow: visible;
-        display: none;
         bottom: 13px;
         right: 15px;
         &:before {
@@ -1856,6 +1855,7 @@ $saved-search-control-height: 48px;
         }
     }
     .entry-actions-wrap {
+        display: none;
         height: 40px;
         width: 40px;
         right: 0;
@@ -1889,7 +1889,7 @@ $saved-search-control-height: 48px;
             top: 14px;
             z-index: 3;
             .has-offscreen-panels.touch & {
-                top: 9px;
+                top: 15px;
             }
         }
         .title {
@@ -1953,13 +1953,10 @@ $saved-search-control-height: 48px;
         }
     }
     .selected &.selected {
-        .icon-unread {
-            display: none;
+        .entry-status {
+            visibility: hidden;
         }
-        .icon-star {
-            display: none;
-        }
-        .icon-entry-actions {
+        .entry-actions-wrap {
             display: block;
         }
         .wrap {
@@ -2020,21 +2017,30 @@ $saved-search-control-height: 48px;
 }
 
 .entries-display-inline .entries {
+    .entry-actions-wrap {
+        top: 0;
+        bottom: 0;
+        height: auto;
+    }
     .inline-content-wrap {
         display: flex;
         align-items: baseline;
         min-width: 0;
+        width: 100%;
+    }
+    .meta-wrap .entry-status {
+        display: none;
     }
     .entries-inner-wrap {
         display: flex;
-        align-items: baseline;
+        align-items: center;
         justify-content: space-between;
         padding-top: 8px;
         padding-bottom: 8px;
         > .favicon-wrap {
             position: absolute;
             display: flex;
-            top: 5px;
+            top: 8px;
             z-index: 3;
         }
     }
@@ -2042,7 +2048,6 @@ $saved-search-control-height: 48px;
         display: inline-block;
     }
     .feed-title, .no-title .feed-title {
-        @include color($color-contrast-400);
         .title-inner {
             font-weight: normal;
         }
@@ -2053,8 +2058,6 @@ $saved-search-control-height: 48px;
         text-overflow: ellipsis;
         white-space: nowrap;
         padding: 0 10px 0 0;
-        font-size: $base-size-12px !important;
-        line-height: 1.3 !important;
         margin: 0 !important;
     }
     .title-wrap {
@@ -2062,7 +2065,7 @@ $saved-search-control-height: 48px;
         text-overflow: ellipsis;
         white-space: nowrap;
         display: block;
-        line-height: 1.1;
+        line-height: 1.2;
         padding-right: 26px;
         .favicon-wrap {
             display: none;
@@ -2071,14 +2074,31 @@ $saved-search-control-height: 48px;
     .no-title .title {
         @include color($color-contrast-700);
         font-weight: bold;
+        font-size: $base-size-16px;
+    }
+    .no-title .feed-title {
         font-size: $base-size-14px;
     }
     .title, .body {
         display: inline;
-        line-height: 1;
         text-overflow: ellipsis !important;
         white-space: nowrap !important;
         overflow: hidden !important;
+        line-height: 1.2;
+    }
+    .meta-wrap {
+        margin: 0;
+    }
+    .footer-meta-wrap {
+        flex-direction: row-reverse;
+        margin: 0 0 0 auto;
+        .entry-status {
+            display: flex;
+            margin-left: 8px;
+        }
+        time {
+            margin-left: 8px;
+        }
     }
     .quoted-summary {
         display: none !important;
@@ -7840,9 +7860,6 @@ Media Queries
     }
     .entry-header .feed-title {
         display: block !important;
-    }
-    .entries ul li .icon-entry-actions {
-        display: none !important;
     }
     .entries ul li:hover.starred .icon-star {
         display: block !important;
