@@ -20,6 +20,9 @@ $.extend feedbin,
     lightness: [.3,.4,.5,.6,.7]
     saturation: [.7,.8]
 
+  isRelated: (selector, element) ->
+    !!($(element).is(selector) || $(element).parents(selector).length)
+
   timeago: ->
     strings =
       prefixAgo: null
@@ -2105,22 +2108,22 @@ $.extend feedbin,
 
     loadIframe: ->
       $(document).on 'click', '[data-behavior~=iframe_placeholder]', (event) ->
+        if !feedbin.isRelated('.embed-link', event.target)
+          iframe = $("<iframe>").attr
+            "src": $(@).data("iframe-src")
+            "width": $(@).data("iframe-width")
+            "height": $(@).data("iframe-height")
+            "allowfullscreen": true
+            "frameborder": 0
 
-        iframe = $("<iframe>").attr
-          "src": $(@).data("iframe-src")
-          "width": $(@).data("iframe-width")
-          "height": $(@).data("iframe-height")
-          "allowfullscreen": true
-          "frameborder": 0
+          target = $("[data-behavior~=iframe_target]", @)
+          if target.length == 0
+            $(@).html iframe
+            feedbin.fitVids($(@))
+          else
+            target.html iframe
 
-        target = $("[data-behavior~=iframe_target]", @)
-        if target.length == 0
-          $(@).html iframe
-          feedbin.fitVids($(@))
-        else
-          target.html iframe
-
-        $(@).closest(".iframe-embed").addClass("loaded")
+          $(@).closest(".iframe-embed").addClass("loaded")
 
     modalShowHide: ->
       $(document).on 'show.bs.modal', () ->

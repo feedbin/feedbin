@@ -3539,12 +3539,16 @@ $saved-search-control-height: 48px;
         border-top-left-radius: 0;
         border-top-right-radius: 0;
         line-height: 1.4;
+        &:hover {
+            @include color($color-contrast-700, $extra: !important);
+        }
     }
     .embed-icon {
         width: 34px;
         height: 34px;
         margin-right: 10px;
         flex-shrink: 0;
+        display: block;
         svg {
             position: relative;
             top: 5px;
@@ -3626,10 +3630,13 @@ $saved-search-control-height: 48px;
     .embed-title {
         font-weight: bold !important;
         font-size: $base-size-14px;
+        display: block;
     }
     .embed-subtitle {
         font-size: $base-size-14px;
+        display: block;
     }
+
 }
 
 .entry-final-content a, .tweet-text a, .micropost-text a, .modal-content .content-styles a {
