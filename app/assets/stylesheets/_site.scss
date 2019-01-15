@@ -132,7 +132,7 @@ $color-arrow-shadow: (
     midnight: #000000,
 );
 
-$selected: #3399FF;
+$selected: #0867E2;
 $color-selected: (
     debug:    color-selected,
     day:      $color-accent-blue-600,
@@ -1707,7 +1707,7 @@ $saved-search-control-height: 48px;
         top: 0;
         left: -25px;
     }
-    a {
+    a, .wrap {
         text-decoration: none;
         @include color($color-contrast-600);
     }
@@ -2075,7 +2075,7 @@ $saved-search-control-height: 48px;
         }
     }
     .no-title .title {
-        @include color($color-contrast-700);
+        @include color($color-contrast-700, $root: true);
         font-weight: bold;
         font-size: $base-size-16px;
     }
@@ -2088,6 +2088,7 @@ $saved-search-control-height: 48px;
         white-space: nowrap !important;
         overflow: hidden !important;
         line-height: 1.2;
+        margin: 0;
     }
     .meta-wrap {
         margin: 0;
@@ -3846,36 +3847,35 @@ $saved-search-control-height: 48px;
 .inline-diff {
 
     ins, .diff-ins {
-        color: #468847;
-        background: #dff0d8;
+        background: #8ED9AB;
+        color: #022F14;
+        a {
+            color: #022F14;
+        }
     }
 
     ins, .diff-ins {
         text-decoration: none;
-        img {
-            opacity: .5;
-        }
     }
 
     img.diff-ins, code.diff-ins {
-        border: 2px solid #468847;
-    }
-
-    img.diff-ins {
-        opacity: .75;
+        border: 2px solid #8ED9AB;
     }
 
     del, .diff-del {
         text-decoration: none;
-        color: #b94a48;
-        background: #f2dede;
+        background: #E090A0;
+        color: #33030D;
+        a {
+            color: #33030D;
+        }
         img {
             opacity: .5;
         }
     }
 
     img.diff-del, code.diff-del {
-        border: 2px solid #b94a48;
+        border: 2px solid #E090A0;
     }
 
     img.diff-del {
@@ -4238,7 +4238,7 @@ Settings
     .modal & {
         margin: 0;
         a, a.active {
-            color: #3399FF;
+            color: #0867E2;
             padding: 5px 0;
             background-color: transparent;
             &:hover {
@@ -4404,7 +4404,7 @@ body.settings {
             height: 16px;
             width: 16px;
             position: absolute;
-            left: 30px;
+            left: 28px;
             top: 15px;
             @media (max-width: $small-breakpoint) {
                 left: 15px;
@@ -4432,6 +4432,12 @@ body.settings {
             border: 1px solid map-get($color-borders, dusk);
         }
     }
+    label[for="user_theme_midnight"] {
+        &:before {
+            background-color: map-get($color-base, midnight);
+            border: 1px solid map-get($color-borders, midnight);
+        }
+    }
     .theme-day {
         .theme-button-day {
             background-color: #FFF;
@@ -4453,12 +4459,27 @@ body.settings {
     .theme-background {
         &.theme-day {
             background-color: map-get($color-contrast-100, day);
+            .title {
+                color: map-get($color-contrast-700, day);
+            }
         }
         &.theme-sunset {
             background-color: map-get($color-contrast-100, sunset);
+            .title {
+                color: map-get($color-contrast-700, sunset);
+            }
         }
         &.theme-night {
             background-color: map-get($color-contrast-100, dusk);
+            .title {
+                color: map-get($color-contrast-700, dusk);
+            }
+        }
+        &.theme-midnight {
+            background-color: map-get($color-contrast-100, midnight);
+            .title {
+                color: map-get($color-contrast-700, midnight);
+            }
         }
     }
     .preview-group {
@@ -4530,6 +4551,12 @@ body.settings {
         .entries {
             border: 1px solid map-get($color-borders, dusk);
             box-shadow: 4px 4px 0 -2px map-get($color-contrast-200, dusk);
+        }
+    }
+    .theme-midnight {
+        .entries {
+            border: 1px solid map-get($color-borders, midnight);
+            box-shadow: 4px 4px 0 -2px map-get($color-contrast-200, midnight);
         }
     }
     .feed-settings {
@@ -7742,7 +7769,7 @@ Bigfoot
     border-radius: 8px;
     min-width: 30px;
     line-height: 1;
-    color: #FFF;
+    @include color((day: white, dusk: black, sunset: white, midnight: black));
     font-size: 70%;
     font-weight: bold;
 }
@@ -7765,10 +7792,10 @@ Bigfoot
         background-image: linear-gradient(to bottom, rgba(255,255,255,0) 0%, map-get($color-contrast-100, day) 50%)
     }
 }
-.theme-night .bigfoot-footnote a {
+.theme-night .bigfoot-footnote a, .theme-midnight .bigfoot-footnote a {
 	color: black !important;
 }
-.theme-night .bigfoot-footnote a:hover {
+.theme-night .bigfoot-footnote a:hover, .theme-midnight .bigfoot-footnote a:hover {
     @include color($color-selected, $extra: !important);
     text-decoration: underline !important;
 }

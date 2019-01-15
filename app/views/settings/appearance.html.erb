@@ -17,25 +17,47 @@
                                         <li data-behavior="responsive_text_size" data-behavior="preview_container">
                                             <span class="wrap">
                                                 <span class="entries-inner-wrap">
+                                                    <button class="button-text entry-actions-wrap" data-behavior="show_entry_actions">
+                                                        <i class="status-indicator icon-entry-actions"></i>
+                                                    </button>
                                                     <%= favicon_with_host("foodinjars.com") %>
                                                     <div class="inline-content-wrap">
                                                         <div class="meta-wrap">
                                                             <p class="feed-title"><span class="title-inner">Food in Jars</span></p>
-                                                            <time class="time">1h</time>
+                                                            <div class="entry-status">
+                                                                <i class="status-indicator icon-star">
+                                                                    <%= svg_tag("favicon-star", size: "12x12") %>
+                                                                </i>
+                                                                <i class="status-indicator icon-unread"></i>
+                                                            </div>
                                                         </div>
                                                         <span class="title-wrap">
                                                             <h2 class="title">
                                                                 <%= favicon_with_host("foodinjars.com") %>
-                                                                Spicy Peach and Yellow Tomato Jam
+                                                                <span>Spicy Peach and Yellow Tomato Jam</span>
                                                             </h2>
                                                             <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
-                                                            <span class="entry-image">
-                                                                <%= image_tag "image-preview.jpg" %>
-                                                            </span>
                                                         </span>
+                                                        <div class="footer-meta-wrap">
+                                                            <div class="entry-status">
+                                                                <i class="status-indicator icon-star">
+                                                                    <%= svg_tag("favicon-star", size: "12x12") %>
+                                                                </i>
+                                                                <i class="status-indicator icon-unread"></i>
+                                                            </div>
+
+                                                            <time class="time inline">1h</time>
+                                                            <%= svg_tag "icon-retweet", size: "16x8" %>
+                                                            <%= svg_tag "icon-play-small", size: "10x10" %>
+                                                        </div>
+
+                                                        <span class="entry-image">
+                                                            <%= image_tag "image-preview.jpg" %>
+                                                        </span>
+
                                                     </div>
-                                                    <time class="time inline">1h</time>
                                                 </span>
+
                                             </span>
                                         </li>
                                     </ul>
@@ -59,7 +81,11 @@
                 </li>
                 <li>
                     <%= f.radio_button(:theme, "night", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
-                    <%= f.label(:theme_night, "Night") %>
+                    <%= f.label(:theme_night, "Dusk") %>
+                </li>
+                <li>
+                    <%= f.radio_button(:theme, "midnight", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
+                    <%= f.label(:theme_midnight, "Midnight") %>
                 </li>
             </ul>
             <div class="inset-content">
