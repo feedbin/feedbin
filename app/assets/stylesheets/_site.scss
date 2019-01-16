@@ -124,13 +124,7 @@ $color-borders: (
     midnight: $theme-color-midnight-200,
 );
 
-$color-arrow-shadow: (
-    debug: color-arrow-shadow,
-    day: #d2d4d6,
-    sunset: #c8c7be,
-    dusk: #000000,
-    midnight: #000000,
-);
+$color-arrow-shadow: $color-borders;
 
 $selected: #0867E2;
 $color-selected: (
