@@ -4425,6 +4425,7 @@ body.settings {
         }
     }
     .theme-background {
+        padding: 10px;
         &.theme-day {
             background-color: map-get($color-contrast-100, day);
             .title {
@@ -8278,6 +8279,7 @@ button.close {
     margin: 0.5rem;
     pointer-events: none;
     box-shadow: 0 20px 60px 0 rgba(0,0,0,.4);
+    border-radius: 16px;
 }
 
 .modal.animate .modal-dialog {
@@ -8491,6 +8493,9 @@ button.close {
         @include background-color($color-base);
         padding-bottom: 0;
         margin-bottom: 0;
+    }
+    .feed-profile > .inset {
+        padding-top: 2px;
     }
     .control-group {
         padding: 0;
