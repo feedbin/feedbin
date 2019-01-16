@@ -99,10 +99,12 @@ class User < ApplicationRecord
   validates_presence_of :password, on: :create
 
   def theme
-    if self.settings["theme"] == "night"
-      "dusk"
-    else
-      self.settings["theme"]
+    if self.settings
+      if self.settings["theme"] == "night"
+        "dusk"
+      else
+        self.settings["theme"]
+      end
     end
   end
 
