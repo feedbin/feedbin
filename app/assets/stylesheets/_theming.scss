@@ -1,0 +1,111 @@
+@mixin theme($property, $map, $root: false, $extra: null) {
+    @if type-of($map) != 'map' {
+        $map: (day: $map, sunset: $map, dusk: $map, midnight: $map);
+    }
+    /* map name: $#{map-get($map, debug)} */
+    #{$property}: map-get($map, day) $extra;
+    @if $root {
+        @at-root {
+            #{selector-append(".theme-night", &)} {
+                /* map name: $#{map-get($map, debug)} */
+                #{$property}: map-get($map, dusk) $extra;
+            }
+            #{selector-append(".theme-sunset", &)} {
+                /* map name: $#{map-get($map, debug)} */
+                #{$property}: map-get($map, sunset) $extra;
+            }
+            #{selector-append(".theme-midnight", &)} {
+                /* map name: $#{map-get($map, debug)} */
+                #{$property}: map-get($map, midnight) $extra;
+            }
+        }
+    }
+    @else {
+        .theme-night & {
+            /* map name: $#{map-get($map, debug)} */
+            #{$property}: map-get($map, dusk) $extra;
+        }
+        .theme-sunset & {
+            /* map name: $#{map-get($map, debug)} */
+            #{$property}: map-get($map, sunset) $extra;
+        }
+        .theme-midnight & {
+            /* map name: $#{map-get($map, debug)} */
+            #{$property}: map-get($map, midnight) $extra;
+        }
+    }
+}
+
+@mixin box-shadow($map, $properties, $args...) {
+    @if type-of($map) != 'map' {
+        $map: (day: $map, sunset: $map, dusk: $map, midnight: $map);
+    }
+    $shadow: (
+        day: $properties map-get($map, day),
+        dusk: $properties map-get($map, dusk),
+        sunset: $properties map-get($map, sunset),
+    );
+    @include theme("box-shadow", $shadow, $args...);
+}
+
+@mixin box-shadow-irregular($args...) {
+    @include theme("box-shadow", $args...);
+}
+
+@mixin color($args...) {
+    @include theme("color", $args...);
+}
+
+@mixin background($args...) {
+    @include theme("background", $args...);
+}
+
+@mixin background-color($args...) {
+    @include theme("background-color", $args...);
+}
+
+@mixin background-image($args...) {
+    @include theme("background-image", $args...);
+}
+
+@mixin border-color($args...) {
+    @include theme("border-color", $args...);
+}
+
+@mixin border($args...) {
+    border-width: 1px;
+    border-style: solid;
+    @include border-color($args...);
+}
+
+@mixin border-top($args...) {
+    border-top-width: 1px;
+    border-top-style: solid;
+    @include border-color($args...);
+}
+
+@mixin border-right($args...) {
+    border-right-width: 1px;
+    border-right-style: solid;
+    @include border-color($args...);
+}
+
+@mixin border-bottom($args...) {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    @include border-color($args...);
+}
+
+@mixin border-left($args...) {
+    border-left-width: 1px;
+    border-left-style: solid;
+    @include border-color($args...);
+}
+
+@mixin stroke($args...) {
+    @include theme("stroke", $args...);
+}
+
+@mixin fill($args...) {
+    @include theme("fill", $args...);
+}
