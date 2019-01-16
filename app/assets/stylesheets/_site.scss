@@ -181,40 +181,6 @@ $box-shadow-dropdown: 0px 4px 6px 0 rgba(0, 0, 0, 0.1);
 $focus-glow: 0px 0px 10px 0 rgba($selected, 0.6);
 $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
 
-$base-size-1px: 0.0625rem;
-$base-size-2px: 0.125rem;
-$base-size-3px: 0.1875rem;
-$base-size-4px: 0.25rem;
-$base-size-5px: 0.3125rem;
-$base-size-6px: 0.375rem;
-$base-size-7px: 0.4375rem;
-$base-size-8px: 0.5rem;
-$base-size-9px: 0.5625rem;
-$base-size-10px: 0.625rem;
-$base-size-11px: 0.6875rem;
-$base-size-12px: 0.75rem;
-$base-size-13px: 0.8125rem;
-$base-size-14px: 0.875rem;
-$base-size-15px: 0.9375rem;
-$base-size-16px: 1rem;
-$base-size-18px: 1.125rem;
-$base-size-20px: 1.25rem;
-$base-size-22px: 1.375rem;
-$base-size-24px: 1.5rem;
-$base-size-26px: 1.625rem;
-$base-size-28px: 1.75rem;
-$base-size-30px: 1.875rem;
-$base-size-22px: 1.375rem;
-$base-size-24px: 1.5rem;
-$base-size-26px: 1.625rem;
-$base-size-28px: 1.75rem;
-$base-size-30px: 1.875rem;
-$base-size-32px: 2rem;
-$base-size-34px: 2.125rem;
-$base-size-36px: 2.25rem;
-$base-size-38px: 2.375rem;
-$base-size-40px: 2.5rem;
-
 /*------------------------------------------------------------------------------
 Grid
 ------------------------------------------------------------------------------*/
@@ -843,7 +809,7 @@ Structure
         max-width: 100%;
         margin: 0;
         padding: 4px 36px 3px 36px;
-        font-size: $base-size-14px;
+        @include font-size(14);
         background: image-url("favicon-search-light.svg") 14px ($base-button-position + 3) no-repeat;
         background-size: 14px 14px, 16px 16px;
         border: none;
@@ -974,7 +940,7 @@ Structure
         user-select: none;
         @include color($color-selected);
         line-height: $toolbar-height;
-        font-size: $base-size-13px;
+        @include font-size(13);
         padding: 0 0 0 16px;
         cursor: pointer;
         position: relative;
@@ -1034,7 +1000,7 @@ Structure
     bottom: 0;
     left: 0;
     right: 0;
-    font-size: $base-size-10px;
+    @include font-size(10);
     @include border-top($color-borders);
     @include background-color($color-base);
     .standalone-navigator & {
@@ -1117,7 +1083,7 @@ Structure
         height: 100%;
         text-decoration: none;
         display: block;
-        font-size: $base-size-10px;
+        @include font-size(10);
         text-transform: uppercase;
         font-weight: bold;
         user-select: none;
@@ -1211,7 +1177,7 @@ Structure
                 margin: 0;
                 line-height: 1;
                 border: 0;
-                font-size: $base-size-14px;
+                @include font-size(14);
                 max-width: 100%;
                 border-radius: 0;
                 text-overflow: ellipsis;
@@ -1226,13 +1192,13 @@ Structure
                 }
             }
             .feed-link {
-                font-size: $base-size-14px;
+                @include font-size(14);
                 @include color($color-contrast-700);
+                @include size-in-rems(padding, 6 10)
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 width: 100%;
-                padding: $base-size-6px $base-size-10px;
                 display: block;
                 align-items: center;
                 display: flex;
@@ -1282,7 +1248,7 @@ Structure
                 .feed-action-button {
                     font-weight: bold;
                     @include color($color-contrast-400);
-                    font-size: $base-size-12px;
+                    @include font-size(12);
                     display: block;
                     appearance: none;
                     background: none;
@@ -1557,7 +1523,7 @@ $saved-search-control-height: 48px;
 
 .search-control {
     @include background-color($color-contrast-100);
-    font-size: $base-size-11px;
+    @include font-size(11);
     line-height: 14px;
     height: $toolbar-height + $saved-search-control-height;
     position: absolute;
@@ -1620,7 +1586,7 @@ $saved-search-control-height: 48px;
             max-width: 100%;
             margin-bottom: 0;
             padding: 5px 25px 5px 5px;
-            font-size: $base-size-14px;
+            @include font-size(14);
             border-radius: 0;
         }
         @include arrow(
@@ -1720,9 +1686,9 @@ $saved-search-control-height: 48px;
         transition: transform .2s ease;
 
         line-height: 1.35;
-        font-size: $base-size-14px;
+        @include font-size(14);
         .has-offscreen-panels.touch & {
-            font-size: $base-size-16px;
+            @include font-size(16);
         }
 
         &:hover {
@@ -1731,7 +1697,7 @@ $saved-search-control-height: 48px;
     }
     .entries-inner-wrap {
         display: block;
-        padding: $base-size-10px 10px $base-size-10px 0;
+        @include size-in-rems(padding, 10 10px 10 0)
         margin-left: 39px;
         position: relative;
         @include border-bottom($color-borders);
@@ -1740,7 +1706,7 @@ $saved-search-control-height: 48px;
         }
     }
     .entry-image {
-        margin: $base-size-8px 0;
+        @include size-in-rems(margin, 8 0)
         display: block;
         border-radius: 4px;
         &.is-loading {
@@ -1821,9 +1787,9 @@ $saved-search-control-height: 48px;
         font-weight: bold;
         display: block;
         position: relative;
-        font-size: $base-size-16px;
+        @include font-size(16);
         .has-offscreen-panels.touch & {
-            font-size: $base-size-18px;
+            @include font-size(18);
         }
         .title-inner {
             font-weight: bold;
@@ -1896,9 +1862,9 @@ $saved-search-control-height: 48px;
             }
         }
         .title {
-            font-size: $base-size-14px;
+            @include font-size(14);
             .has-offscreen-panels.touch & {
-                font-size: $base-size-16px;
+                @include font-size(16);
             }
         }
         .title .favicon-wrap {
@@ -1981,9 +1947,9 @@ $saved-search-control-height: 48px;
         text-align: right;
         cursor: pointer;
         span {
-            font-size: $base-size-14px;
+            @include font-size(14);
+            @include size-in-rems(height, 14)
             display: block;
-            height: $base-size-14px;
             overflow: auto;
             margin: auto;
             position: absolute;
@@ -2077,10 +2043,10 @@ $saved-search-control-height: 48px;
     .no-title .title {
         @include color($color-contrast-700, $root: true);
         font-weight: bold;
-        font-size: $base-size-16px;
+        @include font-size(16);
     }
     .no-title .feed-title {
-        font-size: $base-size-14px;
+        @include font-size(14);
     }
     .title, .body {
         display: inline;
@@ -2214,7 +2180,7 @@ $saved-search-control-height: 48px;
         .entry-feed-title {
             line-height: 20px;
             margin-left: 6px;
-            font-size: $base-size-14px;
+            @include font-size(14);
             @include color($color-contrast-700);
             text-decoration: none;
             user-select: none;
@@ -2311,7 +2277,7 @@ $saved-search-control-height: 48px;
             @include background-color($color-contrast-100);
             width: 115px;
             padding: 0;
-            font-size: $base-size-13px;
+            @include font-size(13);
             line-height: 1.1;
             border: none;
             border-radius: 0;
@@ -2652,7 +2618,7 @@ $saved-search-control-height: 48px;
     }
     .next-entry-feed, .next-entry-title {
         display: block;
-        font-size: $base-size-14px;
+        @include font-size(14);
         @include color($color-contrast-400);
         margin-bottom: 5px;
         font-family: $font-stack !important;
@@ -2916,7 +2882,7 @@ $saved-search-control-height: 48px;
                 position: relative;
                 text-decoration: none;
                 display: block;
-                font-size: $base-size-16px;
+                @include font-size(16);
                 @include color($color-contrast-700);
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -3012,7 +2978,7 @@ $saved-search-control-height: 48px;
         align-items: baseline;
     }
     .share-keyboard {
-        font-size: $base-size-11px;
+        @include font-size(11);
         margin-left: auto;
         font-style: normal;
         margin-top: 2px;
@@ -3044,7 +3010,7 @@ $saved-search-control-height: 48px;
     }
 }
 .post-meta {
-    font-size: $base-size-16px;
+    @include font-size(16);
     @include color($color-contrast-500);
     line-height: 1.2;
     margin-bottom: .2em;
@@ -3084,7 +3050,7 @@ $saved-search-control-height: 48px;
         margin: 0 auto;
     }
     h2 {
-        font-size: $base-size-16px;
+        @include font-size(16);
         @include color($color-contrast-700);
         font-weight: bold;
         margin: 0 0 15px 0;
@@ -3101,7 +3067,7 @@ $saved-search-control-height: 48px;
             border-radius: 0;
             border-bottom: none;
             padding: 10px 10px 8px 10px !important;
-            font-size: $base-size-16px;
+            @include font-size(16);
             &:focus {
                 @include border-color($color-borders);
             }
@@ -3123,7 +3089,7 @@ $saved-search-control-height: 48px;
         .checkbox, .radio, .control {
             float: left;
             margin-left: 15px;
-            font-size: $base-size-14px;
+            @include font-size(14);
             @include color($color-contrast-700);
             &:first-child {
                 margin-left: 0
@@ -3349,7 +3315,7 @@ $saved-search-control-height: 48px;
     }
 
     .download-link {
-        font-size: $base-size-12px;
+        @include font-size(12);
         font-family: $font-stack;
         font-weight: 400 !important;
     }
@@ -3369,7 +3335,7 @@ $saved-search-control-height: 48px;
             text-decoration: none;
             font-weight: bold;
             float: right;
-            font-size: $base-size-16px;
+            @include font-size(16);
             line-height: 1;
         }
         .icon-clock-wrap {
@@ -3413,7 +3379,7 @@ $saved-search-control-height: 48px;
         }
         .original-title,
         .original-title a {
-            font-size: $base-size-14px;
+            @include font-size(14);
             font-weight: bold;
             @include color($color-contrast-700);
             margin-bottom: .3em;
@@ -3422,7 +3388,7 @@ $saved-search-control-height: 48px;
             }
         }
         .original-meta {
-            font-size: $base-size-12px;
+            @include font-size(12);
             @include color($color-contrast-500);
         }
         .favicon-wrap {
@@ -3514,7 +3480,7 @@ $saved-search-control-height: 48px;
     @include background-color($color-contrast-100);
     @include color($color-contrast-400);
     position: relative;
-    font-size: $base-size-13px;
+    @include font-size(13);
     margin-top: 15px;
     padding: 10px 12px;
     border-radius: 4px;
@@ -3653,11 +3619,11 @@ $saved-search-control-height: 48px;
     }
     .embed-title {
         font-weight: bold !important;
-        font-size: $base-size-14px;
+        @include font-size(14);
         display: block;
     }
     .embed-subtitle {
-        font-size: $base-size-14px;
+        @include font-size(14);
         display: block;
     }
 
@@ -3894,7 +3860,7 @@ $saved-search-control-height: 48px;
 
 .tweet-wrap {
     .tweet-mentions {
-        font-size: $base-size-14px;
+        @include font-size(14);
         @include color($color-contrast-500);
         margin-bottom: 10px;
         a {
@@ -3926,7 +3892,7 @@ $saved-search-control-height: 48px;
             flex-shrink: 0;
         }
         h1 {
-            font-size: $base-size-18px;
+            @include font-size(18);
             margin: 0;
             margin: 0 0 .2em 0;
             display: flex;
@@ -3997,7 +3963,7 @@ $saved-search-control-height: 48px;
         }
     }
     .tweet-meta {
-        font-size: $base-size-16px;
+        @include font-size(16);
         @include color($color-contrast-500);
         img {
             position: relative;
@@ -5611,7 +5577,7 @@ Buttons
     border: none;
     margin: 0;
     padding: 0;
-    font-size: $base-size-16px;
+    @include font-size(16);
     font-weight: bold;
     font-family: $font-stack;
     color: #FFF;
@@ -7923,7 +7889,7 @@ Media Queries
 
 .has-offscreen-panels.touch {
     .feeds ul li .feed-link {
-        font-size: $base-size-16px;
+        @include font-size(16);
         padding-top: 11px;
         padding-bottom: 11px;
     }

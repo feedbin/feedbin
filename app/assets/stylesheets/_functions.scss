@@ -1,3 +1,25 @@
+@function to_rem($pixels) {
+    $base: 16;
+    @if unitless($pixels) and $pixels != 0 {
+        @return ($pixels / $base) * 1rem;
+    } @else {
+        @return $pixels;
+    }
+}
+
+@mixin size-in-rems($property, $values) {
+    $result: ();
+    @each $value in $values {
+      $result: append($result, to_rem($value));
+    }
+    /* pixel value: #{$values} */
+    #{$property}: $result;
+}
+
+@mixin font-size($size-in-pixels) {
+    @include size-in-rems(font-size, $size-in-pixels);
+}
+
 @mixin respond-to($media) {
 	@if $media == ipad {
 		@media only screen and (max-width: 1024px) { @content; }
@@ -27,123 +49,6 @@
 			@content;
 		}
 	}
-}
-
-@mixin arrow($x-position, $y-position, $arrow-color, $shadow-color, $origin:left, $invert:false) {
-	&:before {
-		@if $origin == left {
-			left: $x-position;
-		}
-		@else {
-			right: $x-position;
-		}
-		@if $invert == true {
-			border-bottom: 6px solid map-get($shadow-color, day);
-		}
-		@else {
-			border-top: 6px solid map-get($shadow-color, day);
-		}
-		top: $y-position;
-		position: absolute;
-		border-right: 6px solid rgba(0, 0, 0, 0);
-		border-left: 6px solid rgba(0, 0, 0, 0);
-		content: '';
-		.theme-night & {
-			@if $invert == true {
-				border-bottom-color: map-get($shadow-color, dusk);
-			}
-			@else {
-				border-top-color: map-get($shadow-color, dusk);
-			}
-		}
-        .theme-sunset & {
-            @if $invert == true {
-                border-bottom-color: map-get($shadow-color, sunset);
-            }
-            @else {
-                border-top-color: map-get($shadow-color, sunset);
-            }
-        }
-        .theme-midnight & {
-            @if $invert == true {
-                border-bottom-color: map-get($shadow-color, midnight);
-            }
-            @else {
-                border-top-color: map-get($shadow-color, midnight);
-            }
-        }
-		@content;
-	}
-	&:after {
-		@if $origin == left {
-			left: $x-position + 1;
-		}
-		@else {
-			right: $x-position + 1;
-		}
-		@if $invert == true {
-			border-bottom: 5px solid map-get($arrow-color, day);
-			top: $y-position + 2;
-		}
-		@else {
-			border-top: 5px solid map-get($arrow-color, day);
-			top: $y-position;
-		}
-		position: absolute;
-		border-right: 5px solid rgba(0, 0, 0, 0);
-		border-left: 5px solid rgba(0, 0, 0, 0);
-		content: '';
-        .theme-night & {
-            @if $invert == true {
-                border-bottom-color: map-get($arrow-color, dusk);
-            }
-            @else {
-                border-top-color: map-get($arrow-color, dusk);
-            }
-        }
-        .theme-midnight & {
-            @if $invert == true {
-                border-bottom-color: map-get($arrow-color, midnight);
-            }
-            @else {
-                border-top-color: map-get($arrow-color, midnight);
-            }
-        }
-		.theme-sunset & {
-			@if $invert == true {
-				border-bottom-color: map-get($arrow-color, sunset);
-			}
-			@else {
-				border-top-color: map-get($arrow-color, sunset);
-			}
-		}
-		@content;
-	}
-}
-
-@mixin share-icon($x-offset, $y-offset) {
-    background-repeat: no-repeat;
-    background-position: 15px + $x-offset 12px + $y-offset;
-    @include respond-to(screen-sm) {
-        background-position: 30px + $x-offset 12px + $y-offset;
-    }
-}
-
-@mixin settings-row {
-    padding: 15px;
-    @include respond-to(screen-sm) {
-        padding: 15px 30px;
-    }
-    .modal & {
-        @include padding(14px, 24px, 14px, 24px, 14px, 16px, 14px, 16px);
-    }
-}
-
-@mixin padding($top, $right, $bottom, $left, $top-small, $right-small, $bottom-small, $left-small) {
-    padding: $top-small $right-small $bottom-small $left-small;
-    @include respond-to(screen-sm) {
-        padding: $top $right $bottom $left;
-    }
 }
 
 @mixin theme($property, $map, $root: false, $extra: null) {
@@ -256,4 +161,121 @@
 
 @mixin fill($args...) {
     @include theme("fill", $args...);
+}
+
+@mixin share-icon($x-offset, $y-offset) {
+    background-repeat: no-repeat;
+    background-position: 15px + $x-offset 12px + $y-offset;
+    @include respond-to(screen-sm) {
+        background-position: 30px + $x-offset 12px + $y-offset;
+    }
+}
+
+@mixin settings-row {
+    padding: 15px;
+    @include respond-to(screen-sm) {
+        padding: 15px 30px;
+    }
+    .modal & {
+        @include padding(14px, 24px, 14px, 24px, 14px, 16px, 14px, 16px);
+    }
+}
+
+@mixin padding($top, $right, $bottom, $left, $top-small, $right-small, $bottom-small, $left-small) {
+    padding: $top-small $right-small $bottom-small $left-small;
+    @include respond-to(screen-sm) {
+        padding: $top $right $bottom $left;
+    }
+}
+
+@mixin arrow($x-position, $y-position, $arrow-color, $shadow-color, $origin:left, $invert:false) {
+	&:before {
+		@if $origin == left {
+			left: $x-position;
+		}
+		@else {
+			right: $x-position;
+		}
+		@if $invert == true {
+			border-bottom: 6px solid map-get($shadow-color, day);
+		}
+		@else {
+			border-top: 6px solid map-get($shadow-color, day);
+		}
+		top: $y-position;
+		position: absolute;
+		border-right: 6px solid rgba(0, 0, 0, 0);
+		border-left: 6px solid rgba(0, 0, 0, 0);
+		content: '';
+		.theme-night & {
+			@if $invert == true {
+				border-bottom-color: map-get($shadow-color, dusk);
+			}
+			@else {
+				border-top-color: map-get($shadow-color, dusk);
+			}
+		}
+        .theme-sunset & {
+            @if $invert == true {
+                border-bottom-color: map-get($shadow-color, sunset);
+            }
+            @else {
+                border-top-color: map-get($shadow-color, sunset);
+            }
+        }
+        .theme-midnight & {
+            @if $invert == true {
+                border-bottom-color: map-get($shadow-color, midnight);
+            }
+            @else {
+                border-top-color: map-get($shadow-color, midnight);
+            }
+        }
+		@content;
+	}
+	&:after {
+		@if $origin == left {
+			left: $x-position + 1;
+		}
+		@else {
+			right: $x-position + 1;
+		}
+		@if $invert == true {
+			border-bottom: 5px solid map-get($arrow-color, day);
+			top: $y-position + 2;
+		}
+		@else {
+			border-top: 5px solid map-get($arrow-color, day);
+			top: $y-position;
+		}
+		position: absolute;
+		border-right: 5px solid rgba(0, 0, 0, 0);
+		border-left: 5px solid rgba(0, 0, 0, 0);
+		content: '';
+        .theme-night & {
+            @if $invert == true {
+                border-bottom-color: map-get($arrow-color, dusk);
+            }
+            @else {
+                border-top-color: map-get($arrow-color, dusk);
+            }
+        }
+        .theme-midnight & {
+            @if $invert == true {
+                border-bottom-color: map-get($arrow-color, midnight);
+            }
+            @else {
+                border-top-color: map-get($arrow-color, midnight);
+            }
+        }
+		.theme-sunset & {
+			@if $invert == true {
+				border-bottom-color: map-get($arrow-color, sunset);
+			}
+			@else {
+				border-top-color: map-get($arrow-color, sunset);
+			}
+		}
+		@content;
+	}
 }
