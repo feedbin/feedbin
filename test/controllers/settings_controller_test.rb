@@ -187,7 +187,7 @@ class SettingsControllerTest < ActionController::TestCase
 
   test "should change theme" do
     login_as @user
-    ["day", "night", "sunset"].each do |theme|
+    ["day", "dusk", "sunset", "midnight"].each do |theme|
       post :theme, params: {theme: theme}
       assert_equal(theme, @user.reload.theme)
     end

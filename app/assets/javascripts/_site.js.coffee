@@ -135,7 +135,7 @@ $.extend feedbin,
 
   setNativeTheme: (calculateOverlay = false, timeout = 10) ->
     if feedbin.native && feedbin.data && feedbin.data.theme
-      statusBar = if $("body").hasClass("theme-night") || $("body").hasClass("theme-midnight") then "lightContent" else "default"
+      statusBar = if $("body").hasClass("theme-dusk") || $("body").hasClass("theme-midnight") then "lightContent" else "default"
       message = {
         action: "titleColor",
         statusBar: statusBar
@@ -1742,7 +1742,7 @@ $.extend feedbin,
         theme = $(@).data('theme')
         $('[data-behavior~=class_target]').removeClass('theme-day')
         $('[data-behavior~=class_target]').removeClass('theme-sunset')
-        $('[data-behavior~=class_target]').removeClass('theme-night')
+        $('[data-behavior~=class_target]').removeClass('theme-dusk')
         $('[data-behavior~=class_target]').removeClass('theme-midnight')
         $('[data-behavior~=class_target]').addClass("theme-#{theme}")
         event.preventDefault()

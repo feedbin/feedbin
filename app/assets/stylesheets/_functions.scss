@@ -1,3 +1,8 @@
+@function map-set($map, $key, $value) {
+    $new: ($key: $value);
+    @return map-merge($map, $new);
+}
+
 @function to_rem($pixels) {
     $base: 16;
     @if unitless($pixels) and $pixels != 0 {
@@ -95,7 +100,7 @@
 		border-right: 6px solid rgba(0, 0, 0, 0);
 		border-left: 6px solid rgba(0, 0, 0, 0);
 		content: '';
-		.theme-night & {
+		.theme-dusk & {
 			@if $invert == true {
 				border-bottom-color: map-get($shadow-color, dusk);
 			}
@@ -140,7 +145,7 @@
 		border-right: 5px solid rgba(0, 0, 0, 0);
 		border-left: 5px solid rgba(0, 0, 0, 0);
 		content: '';
-        .theme-night & {
+        .theme-dusk & {
             @if $invert == true {
                 border-bottom-color: map-get($arrow-color, dusk);
             }

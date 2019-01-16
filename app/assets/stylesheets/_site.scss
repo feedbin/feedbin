@@ -238,7 +238,7 @@ body {
         background-color: map-get($color-base, sunset);
         color: map-get($color-contrast-700, sunset);
     }
-    &.theme-night {
+    &.theme-dusk {
         background-color: map-get($color-base, dusk);
         color: map-get($color-contrast-700, dusk);
     }
@@ -820,9 +820,9 @@ Structure
             background-size: 14px 14px, 16px 16px;
 
             $default: image-url("favicon-search-light.svg"), image-url("spinner-day.svg");
-            $night: image-url("favicon-search-light.svg"), image-url("spinner-sunset.svg");
+            $dusk: image-url("favicon-search-light.svg"), image-url("spinner-sunset.svg");
             $sunset: image-url("favicon-search-light.svg"), image-url("spinner-night.svg");
-            @include background-image((day: $default, dusk: $night, sunset: $sunset, midnight: $night));
+            @include background-image((day: $default, dusk: $dusk, sunset: $sunset, midnight: $dusk));
         }
     }
 }
@@ -903,7 +903,7 @@ Structure
     position: relative;
 }
 
-.scroll-bars.theme-night {
+.scroll-bars.theme-dusk {
     .feeds::-webkit-scrollbar,
     .entries::-webkit-scrollbar,
     .entry-content::-webkit-scrollbar {
@@ -1393,6 +1393,7 @@ Structure
             day: none,
             dusk: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
             sunset: none,
+            midnight: none,
         );
         @include box-shadow-irregular($shadow);
     }
@@ -2173,7 +2174,8 @@ $saved-search-control-height: 48px;
             $shadow: (
                 day: none,
                 dusk: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
-                sunset: none
+                sunset: none,
+                midnight: none
             );
             @include box-shadow-irregular($shadow);
         }
@@ -2302,7 +2304,7 @@ $saved-search-control-height: 48px;
             right: 9px;
             top: 23px;
             pointer-events: none;
-            .theme-night &, .theme-midnight & {
+            .theme-dusk &, .theme-midnight & {
                 border-top-color: #FFF;
             }
         }
@@ -2431,7 +2433,7 @@ $saved-search-control-height: 48px;
                 @include border-color($color-selected);
             }
         }
-        .theme-button-night {
+        .theme-button-dusk {
             background-color: map-get($color-base, dusk);
             &:before,
             &:after,
@@ -2439,7 +2441,7 @@ $saved-search-control-height: 48px;
             .theme-button-inner:after {
                 background-color: #FFF;
             }
-            .theme-night & {
+            .theme-dusk & {
                 @include border-color($color-selected);
             }
         }
@@ -3356,7 +3358,7 @@ $saved-search-control-height: 48px;
                 cursor: pointer;
                 @include color($color-selected-hover);
             }
-            .theme-night &, .theme-midnight & {
+            .theme-dusk &, .theme-midnight & {
                 text-decoration: underline;
             }
         }
@@ -4392,7 +4394,7 @@ body.settings {
             border: 1px solid map-get($color-borders, sunset);
         }
     }
-    label[for="user_theme_night"] {
+    label[for="user_theme_dusk"] {
         &:before {
             background-color: map-get($color-base, dusk);
             border: 1px solid map-get($color-borders, dusk);
@@ -4416,8 +4418,8 @@ body.settings {
             @include border-color($color-selected);
         }
     }
-    .theme-night {
-        .theme-button-night {
+    .theme-dusk {
+        .theme-button-dusk {
             background-color: #FFF;
             @include border-color($color-selected);
         }
@@ -4435,7 +4437,7 @@ body.settings {
                 color: map-get($color-contrast-700, sunset);
             }
         }
-        &.theme-night {
+        &.theme-dusk {
             background-color: map-get($color-contrast-100, dusk);
             .title {
                 color: map-get($color-contrast-700, dusk);
@@ -4513,7 +4515,7 @@ body.settings {
             box-shadow: 4px 4px 0 -2px map-get($color-contrast-200, sunset);
         }
     }
-    .theme-night {
+    .theme-dusk {
         .entries {
             border: 1px solid map-get($color-borders, dusk);
             box-shadow: 4px 4px 0 -2px map-get($color-contrast-200, dusk);
@@ -7758,10 +7760,10 @@ Bigfoot
         background-image: linear-gradient(to bottom, rgba(255,255,255,0) 0%, map-get($color-contrast-100, day) 50%)
     }
 }
-.theme-night .bigfoot-footnote a, .theme-midnight .bigfoot-footnote a {
+.theme-dusk .bigfoot-footnote a, .theme-midnight .bigfoot-footnote a {
 	color: black !important;
 }
-.theme-night .bigfoot-footnote a:hover, .theme-midnight .bigfoot-footnote a:hover {
+.theme-dusk .bigfoot-footnote a:hover, .theme-midnight .bigfoot-footnote a:hover {
     @include color($color-selected, $extra: !important);
     text-decoration: underline !important;
 }

@@ -1,37 +1,34 @@
+$themes: day sunset dusk midnight;
+
 @mixin theme($property, $map, $root: false, $extra: null) {
     @if type-of($map) != 'map' {
         $map: (day: $map, sunset: $map, dusk: $map, midnight: $map);
     }
+
+    @each $theme in $themes {
+        @if false == map_has_key($map, $theme) {
+            @error "Missing value for `#{$theme}` theme";
+        }
+    }
+
     /* map name: $#{map-get($map, debug)} */
     #{$property}: map-get($map, day) $extra;
     @if $root {
         @at-root {
-            #{selector-append(".theme-night", &)} {
-                /* map name: $#{map-get($map, debug)} */
-                #{$property}: map-get($map, dusk) $extra;
-            }
-            #{selector-append(".theme-sunset", &)} {
-                /* map name: $#{map-get($map, debug)} */
-                #{$property}: map-get($map, sunset) $extra;
-            }
-            #{selector-append(".theme-midnight", &)} {
-                /* map name: $#{map-get($map, debug)} */
-                #{$property}: map-get($map, midnight) $extra;
+            @each $theme in $themes {
+                #{selector-append(".theme-#{$theme}", &)} {
+                    /* map name: $#{map-get($map, debug)} */
+                    #{$property}: map-get($map, $theme) $extra;
+                }
             }
         }
     }
     @else {
-        .theme-night & {
-            /* map name: $#{map-get($map, debug)} */
-            #{$property}: map-get($map, dusk) $extra;
-        }
-        .theme-sunset & {
-            /* map name: $#{map-get($map, debug)} */
-            #{$property}: map-get($map, sunset) $extra;
-        }
-        .theme-midnight & {
-            /* map name: $#{map-get($map, debug)} */
-            #{$property}: map-get($map, midnight) $extra;
+        @each $theme in $themes {
+            .theme-#{$theme} & {
+                /* map name: $#{map-get($map, debug)} */
+                #{$property}: map-get($map, $theme) $extra;
+            }
         }
     }
 }
@@ -44,6 +41,7 @@
         day: $properties map-get($map, day),
         dusk: $properties map-get($map, dusk),
         sunset: $properties map-get($map, sunset),
+        midnight: $properties map-get($map, midnight),
     );
     @include theme("box-shadow", $shadow, $args...);
 }

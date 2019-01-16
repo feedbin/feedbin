@@ -72,7 +72,7 @@
             </div>
             <ul class="control-group">
                 <li>
-                    <%= f.radio_button(:theme, "day", {checked: @user.theme.nil? || @user.theme === 'day', data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
+                    <%= f.radio_button(:theme, "day", {checked: @user.theme.nil? || @user.theme == 'day', data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
                     <%= f.label(:theme_day, "Day") %>
                 </li>
                 <li>
@@ -80,8 +80,8 @@
                     <%= f.label(:theme_sunset, "Sunset") %>
                 </li>
                 <li>
-                    <%= f.radio_button(:theme, "night", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
-                    <%= f.label(:theme_night, "Dusk") %>
+                    <%= f.radio_button(:theme, "dusk", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
+                    <%= f.label(:theme_dusk, "Dusk") %>
                 </li>
                 <li>
                     <%= f.radio_button(:theme, "midnight", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>

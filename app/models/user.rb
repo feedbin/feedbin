@@ -98,6 +98,14 @@ class User < ApplicationRecord
   validates_uniqueness_of :email, case_sensitive: false
   validates_presence_of :password, on: :create
 
+  def theme
+    if self.settings["theme"] == "night"
+      "dusk"
+    else
+      self.settings["theme"]
+    end
+  end
+
   def twitter_enabled?
     twitter_access_secret && twitter_access_token
   end

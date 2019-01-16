@@ -159,7 +159,7 @@ class SettingsController < ApplicationController
 
   def theme
     @user = current_user
-    themes = ["day", "night", "sunset", "midnight"]
+    themes = ["day", "dusk", "sunset", "midnight"]
     if themes.include?(params[:theme])
       @user.theme = params[:theme]
       @user.save
