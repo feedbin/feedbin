@@ -1494,10 +1494,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
     .search-button {
         background-color: transparent;
-        background-size: 15px 15px;
-        background-repeat: no-repeat;
-        background-image: image-url("icon-search.svg");
-        background-position: center center;
         display: block;
         visibility: visible;
         appearance: none;
@@ -1506,6 +1502,11 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         height: $toolbar-height;
         width: $toolbar-height;
         flex-shrink: 0;
+        svg {
+            height: 15px;
+            width: 15px;
+            @include fill($color-icons);
+        }
     }
     .favicon-wrap {
         position: absolute;
