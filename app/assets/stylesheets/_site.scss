@@ -1683,9 +1683,6 @@ $saved-search-control-height: 48px;
 
         line-height: 1.35;
         @include font-size(14);
-        .has-offscreen-panels.touch & {
-            @include font-size(16);
-        }
 
         &:hover {
             text-decoration: none;
@@ -1696,13 +1693,13 @@ $saved-search-control-height: 48px;
         @include size-in-rems(padding, 10 10px 10 0)
         margin-left: 39px;
         position: relative;
-        @include border-bottom($color-borders);
+        @include border-bottom($color-contrast-100);
         > .favicon-wrap {
             display: none;
         }
     }
     .entry-image {
-        @include size-in-rems(margin, 8 0)
+        @include size-in-rems(margin, 8 0 0 0)
         display: block;
         border-radius: 4px;
         &.is-loading {
@@ -1723,7 +1720,7 @@ $saved-search-control-height: 48px;
     .meta-wrap {
         display: flex;
         justify-content: space-between;
-        margin: 4px 0;
+        margin: 0 0 4px 0;
         align-items: baseline;
     }
     .entry-status {
@@ -1739,7 +1736,7 @@ $saved-search-control-height: 48px;
         display: flex;
         justify-content: flex-start;
         align-items: center;
-        margin: 8px 0;
+        margin: 8px 0 0 0;
         .entry-status {
             display: none;
         }
@@ -1772,9 +1769,12 @@ $saved-search-control-height: 48px;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+        .has-offscreen-panels.touch & {
+            @include font-size(16);
+        }
     }
     .quoted-summary {
-        margin: 8px 0 !important;
+        margin: 8px 0 0 0 !important;
         padding: 8px;
         border-radius: 4px;
         @include border($color-borders);
@@ -1784,9 +1784,6 @@ $saved-search-control-height: 48px;
         display: block;
         position: relative;
         @include font-size(16);
-        .has-offscreen-panels.touch & {
-            @include font-size(18);
-        }
         .title-inner {
             font-weight: bold;
             span {
@@ -1808,7 +1805,7 @@ $saved-search-control-height: 48px;
         position: absolute;
         cursor: pointer;
         overflow: visible;
-        bottom: 13px;
+        bottom: 19px;
         right: 15px;
         &:before {
             position: absolute;
@@ -1851,11 +1848,8 @@ $saved-search-control-height: 48px;
         .favicon-wrap {
             position: absolute;
             display: flex;
-            top: 14px;
+            top: 10px;
             z-index: 3;
-            .has-offscreen-panels.touch & {
-                top: 15px;
-            }
         }
         .title {
             @include font-size(14);
@@ -5612,6 +5606,7 @@ Buttons
         }
         &:hover {
             background-color: map-get($color-contrast-400, day);
+            border-color: map-get($color-contrast-400, day);
         }
     }
 }
@@ -8207,7 +8202,7 @@ button.close {
 
 .sidebar-column {
     height: 100%;
-    width: 320px;
+    width: 350px;
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
@@ -8216,6 +8211,9 @@ button.close {
     scroll-snap-type: x mandatory;
     .swipe & {
         white-space: nowrap;
+    }
+    @media (max-width: 980px) {
+        width: 320px;
     }
     @media (max-width: 800px) {
         width: 300px;
