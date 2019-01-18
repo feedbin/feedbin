@@ -452,7 +452,7 @@ $.extend feedbin,
     if feedbin.entries[id] && !_.contains(feedbin.preloadedImageIds, id)
       content = $(feedbin.entries[id].inner_content)
 
-      feedbin.formatIframes(content.find("[data-iframe-src]"))
+      feedbin.formatIframes(content.find("[data-iframe-src]").not("[data-behavior~=iframe_placeholder]"))
       feedbin.formatTweets(content)
       feedbin.formatInstagram(content)
 
@@ -664,7 +664,7 @@ $.extend feedbin,
       feedbin.readability()
     try
       feedbin.removeOuterLinks()
-      feedbin.formatIframes($("[data-iframe-src]"))
+      feedbin.formatIframes($("[data-iframe-src]").not("[data-behavior~=iframe_placeholder]"))
       feedbin.playState()
       feedbin.timeRemaining(entryId)
       feedbin.syntaxHighlight()
@@ -685,7 +685,7 @@ $.extend feedbin,
   formatLinkContents: ->
     try
       feedbin.removeOuterLinks()
-      feedbin.formatIframes($("[data-iframe-src]"))
+      feedbin.formatIframes($("[data-iframe-src]").not("[data-behavior~=iframe_placeholder]"))
       feedbin.formatTweets("[data-behavior~=view_link_markup_wrap]")
       feedbin.formatInstagram("[data-behavior~=view_link_markup_wrap]")
       feedbin.formatImages()

@@ -2447,6 +2447,11 @@ $saved-search-control-height: 48px;
             }
         }
     }
+    .touch.has-offscreen-panels & {
+        &:before, &:after {
+            display: none;
+        }
+    }
 }
 
 .entry-column {
@@ -3461,7 +3466,7 @@ $saved-search-control-height: 48px;
         img.full-width, .fluid-width-video-wrapper {
             width: 100vw !important;
             max-width: none !important;
-            margin-left: -15px !important;
+            margin-left: -10px !important;
         }
     }
 
@@ -7904,7 +7909,7 @@ Media Queries
         }
     }
     .entry-inner {
-        padding: 15px;
+        padding: 15px 10px;
         .modal & {
             padding-left: 0;
             padding-right: 0;
