@@ -1688,7 +1688,7 @@ $saved-search-control-height: 48px;
     }
     a, .wrap {
         text-decoration: none;
-        @include color($color-contrast-700);
+        @include color($color-contrast-600);
     }
     .wrap {
         position: relative;
