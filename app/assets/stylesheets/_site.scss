@@ -1865,6 +1865,11 @@ $saved-search-control-height: 48px;
         .icon-unread {
             display: none;
         }
+        &:not(.selected) {
+            a, .wrap, time, &.no-title .feed-title, &.no-title .feed-title span {
+                @include color($color-contrast-400);
+            }
+        }
     }
     &.starred {
         .icon-star {
