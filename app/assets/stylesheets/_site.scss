@@ -885,7 +885,10 @@ Structure
         @include background-color($color-base);
     }
     .entries-column {
-        width: 320px;
+        width: 380px;
+        @media (max-width: 1300px) {
+            width: 320px;
+        }
     }
     .entry-column {
         flex-grow: 1;
