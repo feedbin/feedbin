@@ -3,18 +3,23 @@
         <% if content_info.present? && !entry_presenter.feed_domain_matches?(content_info.domain) %>
             <div class="original-content-info system-content entry-callout">
                 <%= favicon_with_host(content_info.domain) %>
-                <% if content_info.title.present? %>
-                    <div class="original-title"><a href="<%= content_info.url %>"><%= content_info.title %></a></div>
-                <% end %>
-                <div class="original-meta">
-                    <strong>Originally from:</strong>
-                    <%= content_info.domain %>
-                    <% if content_info.date_published.present? %>
-                        - <time datetime="<%= entry_presenter.parsed_date(content_info.date_published, :datetime) %>"><%= entry_presenter.parsed_date(content_info.date_published, :date) %></time>
+                <div class="meta-wrap">
+                    <% if content_info.title.present? %>
+                        <div class="original-title"><a href="<%= content_info.url %>"><%= content_info.title %></a></div>
                     <% end %>
-                    <% if content_info.author.present? %>
-                        by <%= content_info.author %>
-                    <% end %>
+                    <div class="original-meta">
+                        <strong>Originally from:</strong>
+                        <%= content_info.domain %>
+                        <% if content_info.date_published.present? %>
+                            - <time datetime="<%= entry_presenter.parsed_date(content_info.date_published, :datetime) %>"><%= entry_presenter.parsed_date(content_info.date_published, :date) %></time>
+                        <% end %>
+                        <% if content_info.author.present? %>
+                            by <%= content_info.author %>
+                        <% end %>
+                    </div>
+                </div>
+                <div class="icon-wrap">
+                    <%= svg_tag "icon-full-content", size: "16x14" %>
                 </div>
             </div>
         <% end %>

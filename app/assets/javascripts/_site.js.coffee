@@ -144,7 +144,8 @@ $.extend feedbin,
       for section in sections
         color = $("[data-theme-#{section}]").css("backgroundColor")
         if calculateOverlay
-          color = feedbin.calculateColor(color, "rgba(0, 0, 0, 0.5)")
+          overlayColor = $("[data-theme-overlay]").css("backgroundColor")
+          color = feedbin.calculateColor(color, overlayColor)
 
         ctx = document.createElement('canvas').getContext('2d')
         ctx.strokeStyle = color

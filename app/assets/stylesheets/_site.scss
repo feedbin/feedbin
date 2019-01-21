@@ -797,6 +797,21 @@ Structure
     @include border-bottom($color-borders);
     @include background-color($color-base);
     height: $toolbar-height;
+    .icon-wrap {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    svg {
+        width: 14px;
+        height: 14px;
+        @include fill($color-contrast-400);
+    }
     input[type="search"] {
         height: $toolbar-height;
         width: 100%;
@@ -804,18 +819,17 @@ Structure
         margin: 0;
         padding: 4px 36px 3px 36px;
         @include font-size(14);
-        background: image-url("favicon-search-light.svg") 14px ($base-button-position + 3) no-repeat;
-        background-size: 14px 14px, 16px 16px;
         border: none;
+        background-color: transparent;
         line-height: 1;
         @include color($color-contrast-700);
         &.processing {
-            background-position: 14px ($base-button-position + 3), 97% ($base-button-position + 3);
-            background-size: 14px 14px, 16px 16px;
+            background-position: 97% ($base-button-position + 3);
+            background-size: 16px 16px;
 
-            $default: image-url("favicon-search-light.svg"), image-url("spinner-day.svg");
-            $dusk: image-url("favicon-search-light.svg"), image-url("spinner-sunset.svg");
-            $sunset: image-url("favicon-search-light.svg"), image-url("spinner-night.svg");
+            $default: image-url("spinner-day.svg");
+            $dusk: image-url("spinner-sunset.svg");
+            $sunset: image-url("spinner-night.svg");
             @include background-image((day: $default, dusk: $dusk, sunset: $sunset, midnight: $dusk));
         }
     }
@@ -1040,7 +1054,7 @@ Structure
     padding: 8px 0 0 0;
     &[disabled] {
         cursor: default;
-        @include color($color-contrast-400);
+        @include color($color-contrast-300);
     }
     &:hover {
         text-decoration: none;
@@ -1674,7 +1688,7 @@ $saved-search-control-height: 48px;
     }
     a, .wrap {
         text-decoration: none;
-        @include color($color-contrast-600);
+        @include color($color-contrast-700);
     }
     .wrap {
         position: relative;
@@ -2670,7 +2684,7 @@ $saved-search-control-height: 48px;
         }
         &[disabled] {
             svg * {
-                @include fill($color-contrast-100);
+                @include fill($color-contrast-300);
             }
         }
     }
@@ -3367,19 +3381,28 @@ $saved-search-control-height: 48px;
     }
 
     .original-content-info {
-        padding-right: 53px !important;
-        padding-left: 36px !important;
         line-height: 1.4;
-        &:after {
-            position: absolute;
-            display: block;
-            content: "";
-            background: image-url("icon-full-content.svg") 10px 50% no-repeat;
-            background-size: 16px 14px;
-            width: 43px;
-            right: 0px;
-            top: 0;
-            bottom: 0;
+        display: flex;
+        align-items: stretch;
+        .favicon-wrap {
+            margin-right: 8px;
+            position: static;
+            background-color: #FFF;
+            flex: 0 0 auto;
+        }
+        .meta-wrap {
+            flex: 1 1 auto;
+            margin-right: 8px;
+        }
+        .icon-wrap {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            .icon-full-content {
+                @include fill($color-icons);
+            }
         }
         .original-title,
         .original-title a {
@@ -3394,12 +3417,6 @@ $saved-search-control-height: 48px;
         .original-meta {
             @include font-size(12);
             @include color($color-contrast-500);
-        }
-        .favicon-wrap {
-            position: absolute;
-            top: 10px;
-            left: 8px;
-            background-color: #FFF;
         }
     }
 
@@ -5611,15 +5628,15 @@ Buttons
     }
     &[disabled], &.disabled {
         color: #FFF;
-        border-color: map-get($color-contrast-400, day);
-        background-color: map-get($color-contrast-400, day);
+        @include border-color($color-contrast-300);
+        @include background-color($color-contrast-300);
         cursor: default;
         &:focus {
             box-shadow: none;
         }
         &:hover {
-            background-color: map-get($color-contrast-400, day);
-            border-color: map-get($color-contrast-400, day);
+            @include border-color($color-contrast-300);
+            @include background-color($color-contrast-300);
         }
     }
 }
@@ -5629,10 +5646,10 @@ Buttons
     @include color($color-selected, $extra: !important);
     &[disabled] {
         background-color: transparent !important;
-        color: map-get($color-contrast-400, day) !important;
+        @include color($color-contrast-300, $extra: !important);
         &:hover {
             background-color: transparent;
-            color: map-get($color-contrast-400, day) !important;
+            @include color($color-contrast-300, $extra: !important);
         }
     }
     &:hover {
@@ -7952,7 +7969,7 @@ button.close {
 }
 
 .modal-form {
-    @include background-color($color-contrast-100);
+    @include background-color($color-base);
     border-radius: $modal-border-radius;
     border-bottom: 1px solid transparent;
     position: relative;
@@ -8284,7 +8301,7 @@ button.close {
     width: auto;
     margin: 0.5rem;
     pointer-events: none;
-    box-shadow: 0 20px 60px 0 rgba(0,0,0,.4);
+    box-shadow: 0 20px 40px 0 rgba(0,0,0,.4);
     border-radius: 16px;
 }
 
@@ -8335,15 +8352,10 @@ button.close {
     bottom: 0;
     left: 0;
     z-index: 1040;
-    background-color: map-get($color-base, dusk);
 }
 
-.modal-backdrop.fade {
-    opacity: 0;
-}
-
-.modal-backdrop.show {
-    opacity: 0.5;
+.modal-backdrop, .theme-color-overlay {
+    background-color: rgba(map-get($color-base, dusk), .5);
 }
 
 .modal-header {
@@ -8445,7 +8457,7 @@ button.close {
 @media (min-width: 576px) {
     .modal-dialog {
         max-width: 500px;
-        margin: 1.75rem auto;
+        margin: 2.6rem auto 1.75rem auto;
     }
     .modal-dialog-centered {
         min-height: calc(100% - (1.75rem * 2));
