@@ -1921,8 +1921,11 @@ $saved-search-control-height: 48px;
         .entries-inner-wrap {
             border-bottom-color: transparent;
         }
-        .title, .feed-title, .title-inner span, .quoted-summary, .body, .time {
+        .title, .feed-title, .quoted-summary, .body {
             color: #FFFFFF !important;
+        }
+        .title-inner span, .time {
+            color: rgba(#FFFFFF, .5) !important;
         }
         .icon-retweet, .icon-star, .icon-play-small {
             fill: #FFFFFF;
@@ -5112,7 +5115,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
     padding-top: 0;
     font-size: 12px;
     color: #999;
-    margin-top: -20px !important;
+    margin-top: -35px !important;
     margin-bottom: 12px;
     &.no-margin {
         margin-bottom: 0;
@@ -8046,7 +8049,7 @@ button.close {
         }
         .feed-url {
             position: absolute;
-            bottom: -37px;
+            bottom: -40px;
             left: 8px;
             font-size: 12px;
             @include color($color-contrast-500);
