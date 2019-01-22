@@ -38,6 +38,10 @@ class FeedbinUtils
     "content_view:%s:v7" % Digest::SHA1.hexdigest(url)
   end
 
+  def self.payment_details_key(user_id)
+    "payment_details:%s:v4" % user_id
+  end
+
   def self.escape_search(query)
     if query.present? && query.respond_to?(:gsub)
       special_characters_regex = /([\+\-\!\{\}\[\]\^\~\?\\])/

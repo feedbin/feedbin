@@ -3,6 +3,7 @@ class Customer
   attr_reader :customer
 
   delegate :id, to: :customer
+  delegate :sources, to: :customer
 
   def self.create(email, plan, trial_end)
     new_customer = new(Stripe::Customer.create({email: email}))

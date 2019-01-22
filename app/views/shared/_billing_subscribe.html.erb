@@ -16,19 +16,19 @@
             <% @plans.each do |plan| %>
                 <li>
                     <%
-        options = {
-            id: dom_id(plan),
-            data: {
-                plan_id: plan.id,
-                name: plan.name,
-                amount: number_to_currency(plan.price, unit: ""),
-                behavior: "plan_select"
-            }
-        }
-        if plan == @default_plan
-            options[:checked] = true
-        end
-        %>
+                    options = {
+                        id: dom_id(plan),
+                        data: {
+                            plan_id: plan.id,
+                            name: plan.name,
+                            amount: number_to_currency(plan.price, unit: ""),
+                            behavior: "plan_select"
+                        }
+                    }
+                    if plan == @default_plan
+                        options[:checked] = true
+                    end
+                    %>
                     <%= f.radio_button :plan_id, plan.id, options %>
                     <%= label_tag nil, for: dom_id(plan) do %>
                         <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>

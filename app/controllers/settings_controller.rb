@@ -43,6 +43,16 @@ class SettingsController < ApplicationController
     @plans = @user.available_plans
   end
 
+  def payment_details
+    @message = Rails.cache.fetch(FeedbinUtils.payment_details_key(current_user.id)) do
+      customer = Customer.retrieve(@user.customer_id)
+      card = customer.sources.first
+      "#{card.brand} ××#{card.last4[-2..-1]}"
+    end
+  rescue
+    @message = "Error loading payment info"
+  end
+
   def import_export
     @user = current_user
     @uploader = Import.new.upload
@@ -84,6 +94,7 @@ class SettingsController < ApplicationController
     if params[:stripe_token].present?
       @user.stripe_token = params[:stripe_token]
       if @user.save
+        Rails.cache.delete(FeedbinUtils.payment_details_key(current_user.id))
         customer = Customer.retrieve(@user.customer_id)
         customer.reopen_account if customer.unpaid?
         redirect_to settings_billing_url, notice: "Your credit card has been updated."
