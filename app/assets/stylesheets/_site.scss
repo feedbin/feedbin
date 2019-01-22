@@ -5161,11 +5161,6 @@ input[type="checkbox"]:checked + label .slider-checkbox {
                     box-shadow: $subtle-focus-glow;
                 }
             }
-            textarea,
-            input,
-            #card-element {
-                background-color: #fff !important;
-            }
         }
         &.text {
             padding: 0 30px;
@@ -5189,6 +5184,24 @@ input[type="checkbox"]:checked + label .slider-checkbox {
                 }
             }
         }
+        &.card-meta {
+            display: flex;
+            margin-bottom: 10px;
+            input {
+                flex: 1;
+                width: auto;
+                max-width: auto;
+                margin-right: 10px;
+            }
+            select {
+                flex: 1;
+                border: none;
+                @include background-color($color-contrast-200);
+                @include font-size(16);
+                padding: 13px 10px;
+                border-radius: 8px;
+            }
+        }
         &.card-number-wrap {
             padding: 0 30px;
             @media (max-width: $small-breakpoint) {
@@ -5196,10 +5209,16 @@ input[type="checkbox"]:checked + label .slider-checkbox {
             }
         }
         #card-element {
-            border-width: 1px;
+            border-width: 2px;
             border-style: solid;
+            border-color: transparent;
             border-radius: 8px;
-            padding: 14px 15px;
+            padding: 17px 15px;
+            @include background-color($color-contrast-200);
+            &.StripeElement--focus {
+                border-color: $color-accent-blue-600;
+                background-color: #FFF;
+            }
         }
         &:first-of-type {
             > label,
