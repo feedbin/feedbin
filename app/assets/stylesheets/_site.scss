@@ -386,7 +386,7 @@ input[type="color"],
     border-width: 2px;
     border-style: solid;
     @include border-color(transparent);
-    color: map-get($color-contrast-700, day);
+    @include color($color-contrast-700);
     @include background-color($color-contrast-200);
     @include font-size(16);
     padding: 13px 10px;
@@ -397,26 +397,39 @@ input[type="color"],
     vertical-align: middle;
     border-radius: 8px;
     &:focus {
+        @include color(map-get($color-contrast-700, day));
         @include background-color(#FFF);
         outline: none;
         @include border-color($color-selected);
     }
 }
 
-::-webkit-input-placeholder {
-    color: map-get($color-contrast-400, day);
+input::-webkit-input-placeholder {
+    @include color($color-contrast-400);
+}
+input:focus::-webkit-input-placeholder {
+    @include color(map-get($color-contrast-400, day));
 }
 
-:-moz-placeholder {
-    color: map-get($color-contrast-400, day);
+input:-moz-placeholder {
+    @include color($color-contrast-400);
+}
+input:focus:-moz-placeholder {
+    @include color(map-get($color-contrast-400, day));
 }
 
-::-moz-placeholder {
-    color: map-get($color-contrast-400, day);
+input::-moz-placeholder {
+    @include color($color-contrast-400);
+}
+input:focus::-moz-placeholder {
+    @include color(map-get($color-contrast-400, day));
 }
 
-:-ms-input-placeholder {
-    color: map-get($color-contrast-400, day);
+input:-ms-input-placeholder {
+    @include color($color-contrast-400);
+}
+input:focus:-ms-input-placeholder {
+    @include color(map-get($color-contrast-400, day));
 }
 
 input.processing {
