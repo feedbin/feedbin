@@ -1927,7 +1927,10 @@ $saved-search-control-height: 48px;
         .title-inner span, .time {
             color: rgba(#FFFFFF, .5) !important;
         }
-        .icon-retweet, .icon-star, .icon-play-small {
+        .icon-retweet, .icon-play-small {
+            fill: rgba(#FFFFFF, .5);
+        }
+        .icon-star {
             fill: #FFFFFF;
         }
         .quoted-summary {
@@ -7966,7 +7969,7 @@ button.close {
     border: 0;
     color: map-get($color-contrast-400, day);
     svg * {
-        @include fill($color-icons);
+        @include fill($color-contrast-400);
     }
 }
 
