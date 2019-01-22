@@ -5,16 +5,22 @@
             <h4 class="group-header">Billing Info</h4>
         </div>
         <ul class="pill-list">
-            <li>
-                Visa **** **** **** **77 <a class="pull-right">Update payment method</a>
+            <li class="text-with-accessory">
+                <% if @user.plan.stripe_id == "timed" && @user.expires_at %>
+                    <span class="text">Prepaid</span>
+                    <button class="button-text accessory" data-behavior="show_container" data-target="credit_card_form">Add card</button>
+                <% else %>
+                    <span data-behavior="billing_details" class="text">Loading…</span>
+                    <button class="button-text accessory" data-behavior="show_container" data-target="credit_card_form">Update card</button>
+                <% end %>
             </li>
         </ul>
 
-        <div class="hide">
+        <div class="hide" data-container="credit_card_form">
             <%= render partial: 'shared/credit_card_form' %>
             <div class="description-inset">
                 <div class="button-wrap">
-                    <%= submit_tag "Update Billing", class: "button no-margin update-cc-button", id: "credit_card_button", disabled: true, data: { disable_with: false } %>
+                    <%= submit_tag "Update", class: "button no-margin update-cc-button", id: "credit_card_button", disabled: true, data: { disable_with: false } %>
                 </div>
             </div>
         </div>

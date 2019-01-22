@@ -96,3 +96,6 @@
         <p>Billing disabled. <code>STRIPE_API_KEY</code> and <code>STRIPE_PUBLIC_KEY</code> are missing.</p>
     <% end %>
 </div>
+<script>
+    $.get("<%= settings_payment_details_path %>");
+</script>

@@ -585,6 +585,20 @@ table {
             }
         }
     }
+    .text-with-accessory {
+        display: flex;
+        align-items: center;
+        .text {
+            flex: 1 1 auto;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .accessory {
+            flex: 0 0 auto;
+            margin-left: auto;
+        }
+    }
 }
 
 .sharing-services {
@@ -5189,17 +5203,37 @@ input[type="checkbox"]:checked + label .slider-checkbox {
             margin-bottom: 10px;
             input {
                 flex: 1;
-                width: auto;
+                width: 50%;
                 max-width: auto;
-                margin-right: 10px;
+                margin: 0 10px 0 0;
             }
             select {
                 flex: 1;
+                width: 50%;
                 border: none;
                 @include background-color($color-contrast-200);
                 @include font-size(16);
-                padding: 13px 10px;
                 border-radius: 8px;
+                height: 52px;
+
+
+                padding: 0 15px;
+                line-height: 1.1;
+                border: none;
+                appearance: none;
+                @include color($color-contrast-700);
+                position: relative;
+
+            }
+            @media (max-width: $small-breakpoint) {
+                flex-direction: column;
+                input, select {
+                    width: auto;
+                    flex: 0;
+                }
+                input {
+                    margin: 0 0 10px 0;
+                }
             }
         }
         &.card-number-wrap {

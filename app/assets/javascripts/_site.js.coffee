@@ -2228,6 +2228,12 @@ $.extend feedbin,
         $('[data-behavior~=edit_tags_form]').submit()
 
 
+    showContainer: ->
+      $(document).on 'click', '[data-behavior~=show_container]', (event) ->
+        target = $(@).data('target')
+        $("[data-container~=#{target}]").slideDown("fast")
+        event.preventDefault()
+
     subscribe: ->
       $(document).on 'shown.bs.modal', (event) ->
         className = "modal-purpose-subscribe"

@@ -172,6 +172,7 @@ Rails.application.routes.draw do
     end
     get :account
     get :billing
+    get :payment_details
     get :import_export
     get :appearance
     post :update_credit_card
