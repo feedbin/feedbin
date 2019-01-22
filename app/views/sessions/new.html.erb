@@ -6,8 +6,8 @@
         <h3 class="box-header">Welcome Back</h3>
         <%= form_tag sessions_path, {class: 'combined-form', novalidate: true} do %>
             <p>
-                <%= email_field_tag :email, params[:email], autofocus: true, tabindex: '1', placeholder: 'Email' %>
-                <%= password_field_tag :password, nil, tabindex: '2', placeholder: 'Password' %>
+                <%= email_field_tag :email, params[:email], autofocus: true, tabindex: '1', placeholder: 'Email', class: "text" %>
+                <%= password_field_tag :password, nil, tabindex: '2', placeholder: 'Password', class: "text" %>
             </p>
             <%= submit_tag "Login", class: 'button', tabindex: '3' %>
             <%= link_to "Forgot password?", new_password_reset_path, class: 'large forgot-link' %>

@@ -383,18 +383,21 @@ input[type="search"],
 input[type="tel"],
 input[type="color"],
 .uneditable-input {
-    @include border($color-borders);
+    border-width: 2px;
+    border-style: solid;
+    @include border-color(transparent);
     color: map-get($color-contrast-700, day);
-    background-color: #FFF;
-    font-size: 14px;
-    padding: 5px 8px;
+    @include background-color($color-contrast-200);
+    @include font-size(16);
+    padding: 13px 10px;
     max-width: 300px;
     width: 100%;
     display: inline-block;
     margin-bottom: 7px;
     vertical-align: middle;
-    border-radius: 4px;
+    border-radius: 8px;
     &:focus {
+        @include background-color(#FFF);
         outline: none;
         @include border-color($color-selected);
     }
@@ -823,7 +826,12 @@ Structure
         background-color: transparent;
         line-height: 1;
         @include color($color-contrast-700);
+        &:focus {
+            border: none;
+            background: transparent;
+        }
         &.processing {
+            background-repeat: no-repeat;
             background-position: 97% ($base-button-position + 3);
             background-size: 16px 16px;
 
@@ -1594,13 +1602,11 @@ $saved-search-control-height: 48px;
         position: relative;
         @include border-bottom($color-borders);
         input[type="text"] {
-            height: 32px;
             width: 100%;
             max-width: 100%;
             margin-bottom: 0;
             padding: 5px 25px 5px 5px;
             @include font-size(14);
-            border-radius: 0;
         }
         @include arrow(
             $x-position: 12px,
@@ -1766,7 +1772,7 @@ $saved-search-control-height: 48px;
     }
     .time {
         align-self: flex-end;
-        @include color($color-contrast-500);
+        @include color($color-contrast-400);
         display: block;
         white-space: nowrap;
     }
@@ -1804,7 +1810,7 @@ $saved-search-control-height: 48px;
         .title-inner {
             font-weight: bold;
             span {
-                @include color($color-contrast-500);
+                @include color($color-contrast-400);
                 font-weight: normal;
             }
         }
@@ -1922,7 +1928,7 @@ $saved-search-control-height: 48px;
             fill: #FFFFFF;
         }
         .quoted-summary {
-            border-color: rgba(#FFFFFF, .5) !important;
+            border-color: rgba(#FFFFFF, .3) !important;
         }
         .feed-title {
             margin-right: 26px;
@@ -3076,26 +3082,10 @@ $saved-search-control-height: 48px;
     .field-cluster {
         margin-bottom: 15px;
         input, textarea {
-            background-color: #FFF;
-            color: map-get($color-contrast-700, day);
             width: 100%;
             max-width: 100%;
-            margin: 0;
             position: relative;
-            border-radius: 0;
-            border-bottom: none;
-            padding: 10px 10px 8px 10px !important;
             @include font-size(16);
-            &:focus {
-                @include border-color($color-borders);
-            }
-            &:first-child {
-                border-radius: 4px 4px 0 0;
-            }
-            &:last-child {
-                border-radius: 0 0 4px 4px;
-                @include border-bottom($color-borders);
-            }
         }
         textarea {
             resize: none;
@@ -3653,8 +3643,11 @@ $saved-search-control-height: 48px;
 .entry-final-content a, .tweet-text a, .micropost-text a, .modal-content .content-styles a {
     text-decoration: underline;
     @include color((day: black, dusk: white, sunset: black, midnight: white));
-    .no-touch &:hover, &:active {
-        @include color($color-selected);
+    &:hover, &:active {
+        @include color((day: $color-accent-blue-600, dusk: $theme-color-dusk-500, sunset: $color-accent-blue-600, midnight: $theme-color-midnight-500));
+    }
+    .touch &:hover {
+        @include color((day: black, dusk: white, sunset: black, midnight: white));
     }
 }
 
@@ -4339,7 +4332,6 @@ body.settings {
     .subscription-title {
         position: relative;
         margin: 0;
-        @include border-color($color-borders);
         font-size: 18px !important;
         line-height: 18px !important;
         padding: 12px 14px !important;
@@ -4350,11 +4342,6 @@ body.settings {
         border-radius: 8px;
         @media (max-width: $small-breakpoint) {
             padding-right: 10px !important;
-        }
-        &:focus {
-            background-color: #FFF !important;
-            @include border-color($color-selected, $extra: !important);
-            @include color($color-contrast-700);
         }
     }
     h4 {
@@ -5183,11 +5170,14 @@ input[type="checkbox"]:checked + label .slider-checkbox {
                 margin-top: 10px;
             }
             > input, > textarea {
-                border-width: 1px;
+                @include background-color($color-contrast-200, $extra: !important);
+                border-width: 2px !important;
                 border-style: solid;
                 border-radius: 8px;
-                padding: 8px 10px;
+                padding-left: 8px;
+                padding-right: 8px;
                 &:focus {
+                    @include background-color(#FFF, $extra: !important);
                     box-shadow: none;
                     @include border($color-selected);
                 }
@@ -5642,8 +5632,11 @@ Buttons
 }
 
 .button-secondary {
-    background-color: transparent !important;
-    @include color($color-selected, $extra: !important);
+    @include background-color(transparent);
+    @include color($color-selected);
+    .theme-dusk &, .theme-midnight & {
+        color: #fff;
+    }
     &[disabled] {
         background-color: transparent !important;
         @include color($color-contrast-300, $extra: !important);
@@ -5653,12 +5646,18 @@ Buttons
         }
     }
     &:hover {
-        background-color: transparent;
+        @include background-color(transparent);
         @include color($color-selected-hover);
+        .theme-dusk &, .theme-midnight & {
+            color: #fff;
+        }
     }
     &:active {
-        background-color: transparent;
+        @include background-color(transparent);
         @include color($color-selected-active);
+        .theme-dusk &, .theme-midnight & {
+            color: #fff;
+        }
     }
 }
 .settings .pagination {
@@ -6236,12 +6235,7 @@ Login and Sign Up
         width: 100%;
         max-width: 100%;
         padding: 14px 10px 12px 10px;
-        border-radius: 4px;
-        background-color: #fafafa;
         margin: 0;
-        &:focus {
-            border-color: map-get($color-borders, day);
-        }
     }
     input[type="submit"] {
         padding: 15px 0;
@@ -6250,20 +6244,31 @@ Login and Sign Up
         display: block;
         color: #fff;
     }
-    .combined-form {
-        input[type="email"] {
-            border-radius: 4px 4px 0 0;
-        }
-        input[type="password"] {
-            border-top: none;
-            border-radius: 0 0 4px 4px;
-        }
+    input + input {
+        margin-top: 10px !important;
     }
     .forgot-link {
         display: block;
         margin: 10px 0 0 0;
         text-align: center;
         color: #999;
+    }
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    textarea:-webkit-autofill,
+    textarea:-webkit-autofill:hover
+    select:-webkit-autofill,
+    select:-webkit-autofill:hover {
+        -webkit-text-fill-color: map-get($color-contrast-700, day);
+        -webkit-box-shadow: 0 0 0px 1000px map-get($color-contrast-200, day) inset;
+        transition: none;
+        border: 2px solid map-get($color-contrast-200, day);
+    }
+    select:-webkit-autofill:focus,
+    textarea:-webkit-autofill:focus,
+    input:-webkit-autofill:focus {
+        -webkit-box-shadow: 0 0 0px 1000px #FFF inset;
+        border: 2px solid $color-accent-blue-600;
     }
 }
 
@@ -7798,12 +7803,6 @@ Media Queries
     }
 }
 
-.constrained {
-    .entry-inner {
-        padding: 15px;
-    }
-}
-
 .has-offscreen-panels {
     .audio-panel {
         bottom: 0;
@@ -8010,7 +8009,7 @@ button.close {
     input[type=text], input[type=url] {
         border: none;
         margin: 0;
-        background-color: transparent;
+        background-color: transparent !important;
         width: 100%;
         max-width: 100%;
         padding: 20px 60px 20px 20px;
@@ -8027,8 +8026,6 @@ button.close {
     input[type=text] {
         max-width: 100%;
         margin-bottom: 0;
-        line-height: 28px;
-        font-size: 16px;
     }
     h5 {
         font-size: 16px;
@@ -8046,11 +8043,6 @@ button.close {
             justify-content: center;
             flex-direction: column;
             text-align: center;
-            input {
-                padding: 8px 10px;
-                border-radius: 8px;
-                background-color: #FFF;
-            }
         }
         .feed-url {
             position: absolute;
