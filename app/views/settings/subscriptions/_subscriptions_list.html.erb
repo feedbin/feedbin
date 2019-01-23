@@ -2,6 +2,8 @@
     <div class="feed-form-wrap">
         <%= form_tag update_multiple_settings_subscriptions_path, method: :patch, autocomplete: 'off' do |update_form| %>
             <input type="hidden" name="operation" value="" />
+            <%= hidden_field_tag :q, params[:q] %>
+
             <div class="feed-controls-wrap">
                 <div class="feed-controls">
                     <div class="feed-actions">

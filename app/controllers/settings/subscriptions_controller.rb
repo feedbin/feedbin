@@ -30,7 +30,10 @@ class Settings::SubscriptionsController < ApplicationController
     @user = current_user
     notice = "Feeds updated."
     if params[:operation] && params[:subscription_ids] || params[:include_all]
-      if params[:include_all]
+      if params[:include_all] && params[:q].present?
+        ids = subscriptions_with_sort_data.map(&:id)
+        subscriptions = @user.subscriptions.where(id: ids)
+      elsif params[:include_all]
         subscriptions = @user.subscriptions
       else
         subscriptions = @user.subscriptions.where(id: params[:subscription_ids])
