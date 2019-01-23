@@ -18,8 +18,12 @@ class NewslettersControllerTest < ActionController::TestCase
     user = users(:ben)
     signature = Newsletter.new(newsletter_params("asdf", "asdf")).send(:signature)
     token = "#{user.newsletter_token}+other"
-    assert_difference("Entry.count", 1) do
-      post :create, params: newsletter_params(token, signature)
+
+    Sidekiq::Worker.clear_all
+    assert_difference "NewsletterSaver.jobs.size", +1 do
+      assert_difference("Entry.count", 1) do
+        post :create, params: newsletter_params(token, signature)
+      end
     end
     assert_response :success
 

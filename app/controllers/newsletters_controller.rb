@@ -24,12 +24,13 @@ class NewslettersController < ApplicationController
       end
 
       if feed.persisted?
-        feed.entries.create!(entry)
+        entry = feed.entries.create!(entry)
         options = {
           "email_headers" => newsletter.headers,
           "newsletter_token" => newsletter.full_token,
         }
         feed.update(feed_type: :newsletter, options: options)
+        NewsletterSaver.perform_async(entry.id)
       end
     end
   end
