@@ -23,28 +23,20 @@
                         <p class="feed-title">
                             <%= entry_presenter.feed_title %>
                         </p>
-                        <div class="entry-status">
-                            <i class="status-indicator icon-star">
-                                <%= svg_tag("favicon-star", size: "12x12") %>
-                            </i>
-                            <i class="status-indicator icon-unread"></i>
-                        </div>
+                        <%= render partial: "shared/entry_status" %>
                     </div>
-                    <span class="title-wrap">
-                        <h2 class="title">
-                            <%= entry_presenter.profile_image(entry.feed) %>
-                            <span><%= entry_presenter.title %></span>
-                        </h2>
-                        <%= entry_presenter.summary %>
-                    </span>
-                    <div class="footer-meta-wrap">
-                        <div class="entry-status">
-                            <i class="status-indicator icon-star">
-                                <%= svg_tag("favicon-star", size: "12x12") %>
-                            </i>
-                            <i class="status-indicator icon-unread"></i>
+                    <div class="title-wrap">
+                        <div class="title-inner-wrap">
+                            <h2 class="title">
+                                <%= entry_presenter.profile_image(entry.feed) %>
+                                <span><%= entry_presenter.title %></span>
+                            </h2>
+                            <%= render partial: "shared/entry_status" %>
                         </div>
-
+                        <%= entry_presenter.summary %>
+                    </div>
+                    <div class="footer-meta-wrap">
+                        <%= render partial: "shared/entry_status" %>
                         <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
                         <%= svg_tag "icon-retweet", size: "16x8" %>
                         <%= svg_tag "icon-play-small", size: "10x10" %>

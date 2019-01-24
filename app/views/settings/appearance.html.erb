@@ -24,28 +24,20 @@
                                                     <div class="inline-content-wrap">
                                                         <div class="meta-wrap">
                                                             <p class="feed-title"><span class="title-inner">Food in Jars</span></p>
-                                                            <div class="entry-status">
-                                                                <i class="status-indicator icon-star">
-                                                                    <%= svg_tag("favicon-star", size: "12x12") %>
-                                                                </i>
-                                                                <i class="status-indicator icon-unread"></i>
-                                                            </div>
+                                                            <%= render partial: "shared/entry_status" %>
                                                         </div>
-                                                        <span class="title-wrap">
-                                                            <h2 class="title">
-                                                                <%= favicon_with_host("foodinjars.com") %>
-                                                                <span>Spicy Peach and Yellow Tomato Jam</span>
-                                                            </h2>
-                                                            <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
-                                                        </span>
-                                                        <div class="footer-meta-wrap">
-                                                            <div class="entry-status">
-                                                                <i class="status-indicator icon-star">
-                                                                    <%= svg_tag("favicon-star", size: "12x12") %>
-                                                                </i>
-                                                                <i class="status-indicator icon-unread"></i>
+                                                        <div class="title-wrap">
+                                                            <div class="title-inner-wrap">
+                                                                <h2 class="title">
+                                                                    <%= favicon_with_host("foodinjars.com") %>
+                                                                    <span>Spicy Peach and Yellow Tomato Jam</span>
+                                                                </h2>
+                                                                <%= render partial: "shared/entry_status" %>
                                                             </div>
-
+                                                            <p class="body">I made this jam back before my trip to Portland and have been meaning to share it&hellip;</p>
+                                                        </div>
+                                                        <div class="footer-meta-wrap">
+                                                            <%= render partial: "shared/entry_status" %>
                                                             <time class="time inline">1h</time>
                                                             <%= svg_tag "icon-retweet", size: "16x8" %>
                                                             <%= svg_tag "icon-play-small", size: "10x10" %>
