@@ -1729,7 +1729,9 @@ $saved-search-control-height: 48px;
 
         line-height: 1.25;
         @include font-size(14);
-
+        .has-offscreen-panels.touch & {
+            @include font-size(16);
+        }
         &:hover {
             text-decoration: none;
         }
@@ -1824,9 +1826,6 @@ $saved-search-control-height: 48px;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        .has-offscreen-panels.touch & {
-            @include font-size(16);
-        }
     }
     .quoted-summary {
         margin: 8px 0 0 0 !important;
@@ -1839,6 +1838,9 @@ $saved-search-control-height: 48px;
         display: block;
         position: relative;
         @include font-size(15);
+        .has-offscreen-panels.touch & {
+            @include font-size(17);
+        }
         .title-inner {
             font-weight: bold;
             span {
