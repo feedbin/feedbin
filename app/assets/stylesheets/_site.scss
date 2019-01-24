@@ -1727,7 +1727,7 @@ $saved-search-control-height: 48px;
         left: 0;
         transition: transform .2s ease;
 
-        line-height: 1.35;
+        line-height: 1.25;
         @include font-size(14);
 
         &:hover {
@@ -1838,7 +1838,7 @@ $saved-search-control-height: 48px;
         font-weight: bold;
         display: block;
         position: relative;
-        @include font-size(16);
+        @include font-size(15);
         .title-inner {
             font-weight: bold;
             span {
