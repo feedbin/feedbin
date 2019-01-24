@@ -8,6 +8,7 @@ class NewsletterSaver
     content = entry.content
     if entry.content_format == "text"
       content = ContentFormatter.text_email(content)
+      content = "<h1>#{entry.title}</h1>#{content}"
     end
 
     S3_POOL.with do |connection|
