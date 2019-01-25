@@ -18,7 +18,7 @@ class NewsletterSaver
 
   def s3_options
     {
-      "Content-Type" => "text/html",
+      "Content-Type" => "text/html; charset=utf-8",
       "Cache-Control" => "max-age=315360000, public",
       "Expires" => "Sun, 29 Jun 2036 17:48:34 GMT",
       "x-amz-acl" => "public-read",
