@@ -124,6 +124,8 @@ $color-borders: (
     midnight: $theme-color-midnight-200,
 );
 
+$color-borders-alt: map-merge($color-borders, (debug: color-borders-alt, midnight: black));
+
 $color-arrow-shadow: $color-borders;
 
 $selected: #0867E2;
@@ -1049,6 +1051,9 @@ Structure
     @include font-size(10);
     @include border-top($color-borders);
     @include background-color($color-base);
+    .one-up & {
+        @include border-top($color-borders-alt, $root: true);
+    }
     .standalone-navigator & {
         height: calc(#{$bottom-toolbar-height - 8px} + env(safe-area-inset-bottom));
         min-height: $bottom-toolbar-height !important;
@@ -1521,11 +1526,13 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     right: 0;
     top: 0;
     margin: 0;
-    height: $toolbar-height;
     @include border-bottom($color-borders);
     height: $toolbar-height;
     text-align: center;
     overflow: hidden;
+    .one-up & {
+        @include border-bottom($color-borders-alt, $root: true);
+    }
     .feed-title-wrap {
         @include color($color-contrast-700);
         font-weight: bold;
@@ -2210,6 +2217,9 @@ $saved-search-control-height: 48px;
     height: $toolbar-height;
     @include background-color($color-base);
     @include border-bottom($color-borders);
+    .one-up & {
+        @include border-bottom($color-borders-alt, $root: true);
+    }
     .site-info {
         flex: 1 1 auto;
         display: flex;
@@ -2305,6 +2315,9 @@ $saved-search-control-height: 48px;
     {
         z-index: 10;
         visibility: hidden;
+    }
+    .one-up & {
+        @include border-bottom($color-borders-alt, $root: true);
     }
     .entry-basement.open &:after,
     .entry-basement.open &:before {
