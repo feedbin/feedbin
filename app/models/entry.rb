@@ -302,6 +302,13 @@ class Entry < ApplicationRecord
     result
   end
 
+  def newsletter_url
+    URI::HTTPS.build(
+      host: ENV["NEWSLETTER_HOST"],
+      path: "/#{self.public_id[0..2]}/#{self.public_id}.html"
+    ).to_s
+  end
+
   private
 
   def base_url
