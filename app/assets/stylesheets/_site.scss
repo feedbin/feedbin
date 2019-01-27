@@ -767,7 +767,6 @@ table {
         background-size: 21px 21px;
         @include share-icon(1, 2);
     }
-
 }
 
 .inset {
@@ -787,6 +786,7 @@ table {
         border-right: none;
     }
     @media (max-width: $small-breakpoint) {
+        padding: 0;
         border: none;
         background-color: transparent;
         border-radius: 0;
@@ -3728,7 +3728,7 @@ $saved-search-control-height: 48px;
         @include color((day: $color-accent-blue-600, dusk: $theme-color-dusk-500, sunset: $color-accent-blue-600, midnight: $theme-color-midnight-500));
     }
     .touch &:hover {
-        @include color((day: black, dusk: white, sunset: black, midnight: white));
+        @include color((day: black, dusk: white, sunset: black, midnight: white), $root: true);
     }
 }
 
@@ -5193,6 +5193,9 @@ input[type="checkbox"]:checked + label .slider-checkbox {
     color: #999;
     margin-top: -35px !important;
     margin-bottom: 12px;
+    @media (max-width: $small-breakpoint) {
+        margin-top: -20px !important;
+    }
     &.no-margin {
         margin-bottom: 0;
     }
