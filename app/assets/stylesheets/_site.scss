@@ -786,7 +786,7 @@ table {
         border-right: none;
     }
     @media (max-width: $small-breakpoint) {
-        padding: 0;
+        padding: 15px 0 0 0;
         border: none;
         background-color: transparent;
         border-radius: 0;
