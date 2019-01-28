@@ -17,7 +17,7 @@
     @each $value in $values {
       $result: append($result, to_rem($value));
     }
-    /* pixel value: #{$values} */
+    /* size in pixels: #{$values} */
     #{$property}: $result;
 }
 

@@ -53,7 +53,7 @@ $color-accent-orange-600: #E96A0E;
 $color-accent-green-600: #07AC47;
 
 $color-base: (
-    debug: color-base,
+    debug:    color-base,
     day:      #FFFFFF,
     sunset:   #F9F7EE,
     dusk:     #353739,
@@ -61,7 +61,7 @@ $color-base: (
 );
 
 $color-contrast-100: (
-    debug: color-contrast-100,
+    debug:    color-contrast-100,
     day:      $theme-color-100,
     sunset:   $theme-color-sunset-100,
     dusk:     $theme-color-dusk-100,
@@ -69,7 +69,7 @@ $color-contrast-100: (
 );
 
 $color-contrast-200: (
-    debug: color-contrast-200,
+    debug:    color-contrast-200,
     day:      $theme-color-200,
     sunset:   $theme-color-sunset-200,
     dusk:     $theme-color-dusk-200,
@@ -77,7 +77,7 @@ $color-contrast-200: (
 );
 
 $color-contrast-300: (
-    debug: color-contrast-300,
+    debug:    color-contrast-300,
     day:      $theme-color-300,
     sunset:   $theme-color-sunset-300,
     dusk:     $theme-color-dusk-300,
@@ -85,7 +85,7 @@ $color-contrast-300: (
 );
 
 $color-contrast-400: (
-    debug: color-contrast-400,
+    debug:    color-contrast-400,
     day:      $theme-color-400,
     sunset:   $theme-color-sunset-400,
     dusk:     $theme-color-dusk-400,
@@ -93,7 +93,7 @@ $color-contrast-400: (
 );
 
 $color-contrast-500: (
-    debug: color-contrast-500,
+    debug:    color-contrast-500,
     day:      $theme-color-500,
     sunset:   $theme-color-sunset-500,
     dusk:     $theme-color-dusk-500,
@@ -101,7 +101,7 @@ $color-contrast-500: (
 );
 
 $color-contrast-600: (
-    debug: color-contrast-600,
+    debug:    color-contrast-600,
     day:      $theme-color-600,
     sunset:   $theme-color-sunset-600,
     dusk:     $theme-color-dusk-600,
@@ -109,7 +109,7 @@ $color-contrast-600: (
 );
 
 $color-contrast-700: (
-    debug: color-contrast-700,
+    debug:    color-contrast-700,
     day:      $theme-color-700,
     sunset:   $theme-color-sunset-700,
     dusk:     $theme-color-dusk-700,
@@ -123,12 +123,8 @@ $color-borders: (
     dusk:     $theme-color-dusk-200,
     midnight: $theme-color-midnight-200,
 );
-
 $color-borders-alt: map-merge($color-borders, (debug: color-borders-alt, midnight: black));
 
-$color-arrow-shadow: $color-borders;
-
-$selected: #0867E2;
 $color-selected: (
     debug:    color-selected,
     day:      $color-accent-blue-600,
@@ -162,17 +158,17 @@ $color-selected-off: (
 );
 
 $image-spinners: (
-    debug: image-spinners,
-    day: image-url("spinner-day.svg"),
-    sunset: image-url("spinner-sunset.svg"),
-    dusk: image-url("spinner-night.svg"),
+    debug:    image-spinners,
+    day:      image-url("spinner-day.svg"),
+    sunset:   image-url("spinner-sunset.svg"),
+    dusk:     image-url("spinner-night.svg"),
     midnight: image-url("spinner-night.svg"),
 );
 
+$color-arrow-shadow: $color-borders;
+$selected: #0867E2;
 $color-icons: $color-contrast-600;
-
 $inset-bg-color: #f4f6f8;
-
 $box-shadow-dropdown: 0px 4px 6px 0 rgba(0, 0, 0, 0.1);
 $focus-glow: 0px 0px 10px 0 rgba($selected, 0.6);
 $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
@@ -385,12 +381,12 @@ input[type="search"],
 input[type="tel"],
 input[type="color"],
 .uneditable-input {
-    border-width: 2px;
-    border-style: solid;
     @include border-color(transparent);
     @include color($color-contrast-700);
     @include background-color($color-contrast-200);
     @include font-size(16);
+    border-width: 2px;
+    border-style: solid;
     padding: 13px 10px;
     max-width: 300px;
     width: 100%;
@@ -401,8 +397,8 @@ input[type="color"],
     &:focus {
         @include color(map-get($color-contrast-700, day));
         @include background-color(#FFF);
-        outline: none;
         @include border-color($color-selected);
+        outline: none;
     }
 }
 
@@ -435,10 +431,10 @@ input:focus:-ms-input-placeholder {
 }
 
 input.processing {
+    @include background-image($image-spinners)
     background-position: 97% 7px;
     background-repeat: no-repeat;
     background-size: 16px 16px;
-    @include background-image($image-spinners)
 }
 
 select {
@@ -492,10 +488,10 @@ table {
 .table thead > tr > td,
 .table tbody > tr > td,
 .table tfoot > tr > td {
+    @include border-top($color-borders);
     padding: 8px;
     line-height: 1.428571429;
     vertical-align: top;
-    @include border-top($color-borders);
 }
 
 .table thead > tr > th {

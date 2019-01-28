@@ -4,6 +4,7 @@ require "rails/all"
 require_relative "../lib/basic_authentication"
 require_relative "../lib/tld_length"
 require_relative "../lib/no_compression"
+require_relative "../lib/conditional_compression"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -40,5 +41,10 @@ module Feedbin
     config.exceptions_app = self.routes
 
     config.active_record.schema_format = :sql
+
+    config.sass.line_comments = true
+    config.assets.compress = true
+    config.assets.js_compressor = ConditionalCompression.new
+    config.assets.css_compressor = NoCompression.new
   end
 end

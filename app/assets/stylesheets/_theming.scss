@@ -11,13 +11,13 @@ $themes: day sunset dusk midnight;
         }
     }
 
-    /* map name: $#{map-get($map, debug)} */
+    /* variable name: $#{map-get($map, debug)} */
     #{$property}: map-get($map, day) $extra;
     @if $root {
         @at-root {
             @each $theme in $themes {
                 #{selector-append(".theme-#{$theme}", &)} {
-                    /* map name: $#{map-get($map, debug)} */
+                    /* variable name: $#{map-get($map, debug)} */
                     #{$property}: map-get($map, $theme) $extra;
                 }
             }
@@ -26,7 +26,7 @@ $themes: day sunset dusk midnight;
     @else {
         @each $theme in $themes {
             .theme-#{$theme} & {
-                /* map name: $#{map-get($map, debug)} */
+                /* variable name: $#{map-get($map, debug)} */
                 #{$property}: map-get($map, $theme) $extra;
             }
         }

@@ -13,8 +13,8 @@ window.feedbin ?= {}
 
 $.extend feedbin,
 
-  messageTimeout: null
   swipe: false
+  messageTimeout: null
   panel: 1
   colorHash: new ColorHash
     lightness: [.3,.4,.5,.6,.7]

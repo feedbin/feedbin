@@ -43,11 +43,6 @@ Rails.application.configure do
   # number of complex assets.
   config.assets.debug = false
 
-  config.sass.line_comments = true
-  config.assets.compress = true
-  config.assets.js_compressor = NoCompression.new
-  config.assets.css_compressor = NoCompression.new
-
   # Suppress logger output for asset requests.
   config.assets.quiet = true
 
