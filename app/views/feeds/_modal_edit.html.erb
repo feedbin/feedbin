@@ -1,0 +1,18 @@
+<%= form_for(subscription.feed, remote: true, method: :patch, html: {class: 'settings', data: {behavior: "edit_tags_form"}}) do |f| %>
+    <div class="inset">
+        <div class="inset-content">
+            <h4 class="group-header">Name</h4>
+        </div>
+        <ul class="control-group">
+            <li class="text">
+                <%= text_field_tag :name, subscription.title, placeholder: subscription.feed.title %>
+            </li>
+        </ul>
+
+        <div class="inset-content">
+            <h4 class="group-header">Tags</h4>
+        </div>
+        <%= render partial: "tag_fields", locals: {tag_editor: tag_editor} %>
+    </div>
+    <button class="hide" type="submit"></button>
+<% end %>

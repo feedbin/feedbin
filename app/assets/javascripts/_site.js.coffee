@@ -1353,6 +1353,18 @@ $.extend feedbin,
         $(this).attr('target', '_blank').attr('rel', 'noopener noreferrer')
         return
 
+    feedSettingsButton: ->
+      $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
+
+        element = $(@)
+        button = $('[data-behavior~=feed_settings]')
+        if element.is('[data-behavior~=has_settings]')
+          button.attr('href', element.data('settings-path'))
+          button.data('modal-target', element.data('settings-modal'))
+          button.removeAttr('disabled')
+        else
+          button.attr('disabled', 'disabled')
+
     selected: ->
       $(document).on 'ajax:success', '[data-behavior~=show_entries]', (event) ->
         target = $(event.target)

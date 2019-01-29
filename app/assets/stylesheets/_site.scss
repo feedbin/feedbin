@@ -1091,6 +1091,9 @@ Structure
         align-items: center;
         flex-direction: column;
         background-color: transparent;
+        &:hover {
+            text-decoration: none;
+        }
         span {
             @include color($color-icons);
         }
@@ -1098,6 +1101,8 @@ Structure
             @include fill($color-icons);
         }
         &[disabled] {
+            pointer-events: none;
+            cursor: default;
             span {
                 @include color($color-contrast-300);
             }
@@ -8607,8 +8612,13 @@ button.close {
         }
         .text {
             padding-left: 15px;
-            padding-right: 45px;
+            padding-right: 15px;
             margin-bottom: 10px;
+        }
+        &.tags-target {
+            .text {
+                padding-right: 45px;
+            }
         }
         .icon-delete {
             position: absolute;

@@ -7,7 +7,9 @@ class FeedPresenter < BasePresenter
       remote: true,
       class: "feed-link",
       data: {
-        behavior: "selectable show_entries open_item feed_link renamable user_title",
+        behavior: "selectable show_entries open_item feed_link renamable user_title has_settings",
+        settings_modal: "edit_subscription",
+        settings_path: @template.modal_edit_feed_path(feed),
         feed_id: feed.id,
         mark_read: {
           type: "feed",

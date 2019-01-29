@@ -31,12 +31,7 @@ class FeedsController < ApplicationController
   def modal_edit
     @user = current_user
     @subscription = @user.subscriptions.find_by_feed_id(params[:id])
-  end
-
-  def edit_tags
-    @user = current_user
-    @feed = @user.feeds.find(params[:id])
-    @tag_editor = TagEditor.new(@user, @feed)
+    @tag_editor = TagEditor.new(@user, @subscription.feed)
   end
 
   def view_unread

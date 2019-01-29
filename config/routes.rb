@@ -270,6 +270,7 @@ Rails.application.routes.draw do
         end
 
         resources :subscriptions, only: [:index, :show, :create, :destroy, :update]
+
         resources :favicons, only: [:index]
         resources :taggings, only: [:index, :show, :create, :destroy]
         resources :recently_read_entries, only: [:index, :create]
