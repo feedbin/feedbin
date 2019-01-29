@@ -1075,34 +1075,40 @@ Structure
     }
 }
 
-.toolbar-button {
-    @include color($color-contrast-700);
-    text-decoration: none;
-    appearance: none;
-    display: inline-block;
-    border: none;
-    background: none;
-    margin: 0;
-    cursor: pointer;
-    height: 100%;
-    width: 100%;
-    display: block;
-    padding: 8px 0 0 0;
-    &[disabled] {
-        cursor: default;
-        @include color($color-contrast-300);
+.feed-toolbar {
+    display: flex;
+    justify-content: space-evenly;
+    .toolbar-button {
+        flex: 1;
+        appearance: none !important;
+        border: none;
+        margin: 0;
+        padding: 0;
+        @include font-size(12);
+        font-family: $font-stack;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-color: transparent;
+        span {
+            @include color($color-icons);
+        }
+        svg {
+            @include fill($color-icons);
+        }
+        &[disabled] {
+            span {
+                @include color($color-contrast-300);
+            }
+            svg {
+                @include fill($color-contrast-300);
+            }
+        }
     }
-    &:hover {
-        text-decoration: none;
+    .toolbar-button-inner {
+        height: 20px;
     }
-    .standalone-navigator & {
-        padding-bottom: env(safe-area-inset-bottom);
-    }
-}
-
-.toolbar-button-inner {
-    height: 23px;
-    display: block;
 }
 
 .feeds-inner {
@@ -2736,8 +2742,33 @@ $saved-search-control-height: 48px;
 .entry-bottom-toolbar {
     display: flex;
     justify-content: center;
-    .toolbar-button {
+    .navigation-button {
+        @include color($color-contrast-700);
+        text-decoration: none;
+        appearance: none;
+        display: inline-block;
+        border: none;
+        background: none;
+        margin: 0;
+        cursor: pointer;
+        height: 100%;
+        width: 100%;
+        display: block;
         padding: 0;
+        &[disabled] {
+            cursor: default;
+            @include color($color-contrast-300);
+        }
+        &:hover {
+            text-decoration: none;
+        }
+        .standalone-navigator & {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .toolbar-button-inner {
+            height: 23px;
+            display: block;
+        }
         &.button-previous {
             text-align: right;
             padding-right: 30px;
@@ -5862,61 +5893,6 @@ Buttons
     }
     input {
         margin-left: 5px;
-    }
-}
-
-.button-group {
-    display: flex;
-    margin-top: -20px;
-    .button-plain {
-        margin: 0;
-        &:not(:first-child) {
-            margin-left: 20px
-        }
-    }
-}
-
-.button-tag {
-    width: 21px;
-    path {
-        @include stroke($color-icons);
-        [disabled] & {
-            @include stroke($color-contrast-300);
-        }
-    }
-    circle {
-        @include fill($color-icons);
-        [disabled] & {
-            @include fill($color-contrast-300);
-        }
-    }
-}
-.button-check {
-    width: 22px;
-    * {
-        @include fill($color-icons);
-        [disabled] & {
-            @include fill($color-contrast-300);
-        }
-    }
-}
-
-
-.button-trash {
-    width: 18px;
-    * {
-        @include stroke($color-icons);
-        [disabled] & {
-            @include stroke($color-contrast-300);
-        }
-    }
-    .lid {
-        stroke: none;
-        @include fill($color-icons);
-        [disabled] & {
-            stroke: none;
-            @include fill($color-contrast-300);
-        }
     }
 }
 

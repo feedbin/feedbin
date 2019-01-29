@@ -1,17 +1,14 @@
-<div class="bottom-toolbar">
-    <table cellpadding="0">
-        <tbody>
-            <tr>
-                <td>
-                    <%= render partial: "shared/buttons/tag", locals: {subscription: nil} %>
-                </td>
-                <td>
-                    <%= render partial: "shared/buttons/mark_all_as_read", locals: {type: nil, data: nil} %>
-                </td>
-                <td>
-                    <%= render partial: "shared/buttons/unsubscribe", locals: {subscription: nil} %>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+<div class="bottom-toolbar feed-toolbar">
+    <button class="toolbar-button" disabled="disabled">
+        <div class="toolbar-button-inner">
+            <%= svg_tag "icon-settings", size: "18x18" %>
+        </div>
+        <span>Settings</span>
+    </button>
+    <button class="toolbar-button" disabled="disabled" data-behavior="mark_all_as_read">
+        <div class="toolbar-button-inner">
+            <%= svg_tag "mark-read", size: "19x17" %>
+        </div>
+        <span>Read</span>
+    </button>
 </div>

@@ -5,8 +5,6 @@ $('.feed-id-<%= @subscription.feed_id %>').remove();
 }
 feedbin.updateEntryContent('');
 $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
-$('[data-behavior~=tags_form]').replaceWith('<%= j render partial: "shared/buttons/tag", locals: {subscription: nil} %>');
-$('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/unsubscribe", locals: {subscription: nil} %>');
 feedbin.disableMarkRead()
 feedbin.hideSearchControls()
 $('.modal').modal('hide')

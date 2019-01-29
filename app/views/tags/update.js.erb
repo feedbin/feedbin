@@ -1,3 +1,2 @@
 <%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
 $('[data-behavior~=feeds_target] [data-tag-id~=<%= @new_tag.id %>] .tag-link').click()
-$('[data-behavior~=unsubscribe]').replaceWith('<%= j render partial: "shared/buttons/destroy_tag", locals: {tag: @new_tag} %>');

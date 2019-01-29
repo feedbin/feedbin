@@ -1,8 +1,0 @@
-<%= form_tag saved_search_path(saved_search), remote: true, method: "delete", data: {behavior: "unsubscribe"} do %>
-    <button title="Delete saved search" class="toolbar-button" type="submit" data-confirm="Are you sure you want to delete <%= saved_search.name %>?">
-        <div class="toolbar-button-inner">
-            <%= render partial: "shared/svg/trash" %>
-        </div>
-        Delete
-    </button>
-<% end %>
