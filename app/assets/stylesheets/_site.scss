@@ -4629,7 +4629,9 @@ body.settings {
     .feed-search {
         padding: 5px 25px 5px 36px !important;
         font-size: 14px;
-        background: #FFF image-url("favicon-search-light.svg") 11px 6px no-repeat;
+        background-image: image-url("favicon-search-light.svg");
+        background-position: 11px 6px;
+        background-repeat: no-repeat;
         max-width: 250px;
         display: block;
         margin: 0;
