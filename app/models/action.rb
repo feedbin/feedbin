@@ -3,6 +3,7 @@ class Action < ApplicationRecord
 
   belongs_to :user
   enum action_type: {standard: 0, notifier: 1}
+  enum status: {active: 0, suspended: 1, invalid: 2}
 
   validate do |action|
     if computed_feed_ids.empty? && self.automatic_modification.blank?
