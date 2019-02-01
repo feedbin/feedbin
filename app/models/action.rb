@@ -123,6 +123,14 @@ class Action < ApplicationRecord
     return response["_scroll_id"]
   end
 
+  def error_hint
+    if valid?
+      ""
+    else
+      "Invalid Action: #{errors.full_messages.to_sentence(words_connector: ".")}"
+    end
+  end
+
   private
 
   def search_options

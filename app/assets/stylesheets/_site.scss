@@ -52,6 +52,8 @@ $color-accent-orange-600: #E96A0E;
 
 $color-accent-green-600: #07AC47;
 
+$color-accent-red-600: #BB0B2F;
+
 $color-base: (
     debug:    color-base,
     day:      #FFFFFF,
@@ -593,6 +595,14 @@ table {
                         right: 5px;
                     }
                 }
+            }
+        }
+        .status-indicator {
+            display: none;
+        }
+        &.error  {
+            .status-indicator {
+                display: block;
             }
         }
     }
@@ -1952,7 +1962,6 @@ $saved-search-control-height: 48px;
     &.selected {
         .wrap {
             @include border-top($color-selected-off);
-            margin-top: -1px;
             @include background-color($color-selected-off);
         }
         .entries-inner-wrap {
@@ -5126,6 +5135,12 @@ body.settings {
         width: 150px;
         margin-left: 10px;
     }
+    .error-message {
+        background-color: $color-accent-red-600;
+        border-radius: 8px;
+        padding: 10px;
+        color: #fff;
+    }
 }
 input[type="checkbox"] + label .slider-checkbox {
     width: 56px;
@@ -6260,23 +6275,37 @@ a:hover.danger {
 }
 
 .status-indicator {
+    width: 38px;
+    height: 21px;
+    position: absolute;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    .settings &.icon-star {
-        left: -38px;
-        top: -1px;
-        &:before {
-            @include background-color($color-selected);
-            background-image: image-url("icon-star.svg");
-            background-position: 2px 2px, 0 0;
-        }
+    display: none;
+    &:before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-repeat: no-repeat;
+        width: 38px;
+        height: 21px;
+        content: '';
+        z-index: 1;
     }
-    .settings &.icon-muted {
+    &:after {
+        position: absolute;
+        top: 4px;
+        left: 9px;
+        background-color: #FFF;
+        height: 44px;
+        width: 35px;
+        content: '';
+        transform: rotate(63deg);
+        z-index: 2;
+    }
+    &.icon-muted {
         left: 0;
         top: -1px;
         &:before {
-            background-color: map-get($color-contrast-100, dusk);
+            background-color: $theme-color-dusk-100;
             background-image: image-url("icon-muted.svg");
             background-position: 4px 3px;
             background-size: 9.693px 9.693px;
@@ -6285,8 +6314,20 @@ a:hover.danger {
             display: block;
         }
     }
+    &.icon-error {
+        left: 0;
+        top: -1px;
+        &:before {;
+            background-color: $color-accent-red-600;
+            background-image: image-url("icon-bang.svg");
+            background-position: 4px 3px;
+            background-size: 3px 10px;
+        }
+        .status-muted & {
+            display: block;
+        }
+    }
 }
-
 
 .theme-color-body {
     width: 5px;

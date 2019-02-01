@@ -6,7 +6,7 @@ class ActionsController < ApplicationController
   def index
     @authentication_token = authentication_token(@user)
     @web_service_url = "#{ENV["PUSH_URL"]}/apple_push_notifications"
-    @actions = @user.actions.where("action_type <> ?", Action.action_types[:notifier])
+    @actions = @user.actions.where("action_type <> ?", Action.action_types[:notifier]).natural_sort_by { |action| action.title }
   end
 
   def new
