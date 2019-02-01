@@ -1,4 +1,4 @@
-<%= form_for(subscription, remote: true, html: {class: 'settings'}) do |f| %>
+<%= form_with model: subscription, url: settings_subscription_path, html: {class: 'settings'} do |f| %>
     <% present subscription do |subscription_presenter| %>
         <div class="feed-profile">
             <div class="inset">
@@ -66,13 +66,13 @@
                 </div>
                 <ul class="control-group">
                     <li>
-                        <%= f.check_box :muted, data: {behavior: "auto_submit"} %>
+                        <%= f.check_box :muted, data: {behavior: "auto_submit"}, id: "subscription_muted" %>
                         <%= f.label :muted do %>
                             Muted <span class="slider-checkbox"></span>
                         <% end %>
                     </li>
                     <li>
-                        <%= f.check_box :show_updates, data: {behavior: "auto_submit"} %>
+                        <%= f.check_box :show_updates, data: {behavior: "auto_submit"}, id: "subscription_show_updates" %>
                         <%= f.label :show_updates do %>
                             Show updates <span class="slider-checkbox"></span>
                         <% end %>

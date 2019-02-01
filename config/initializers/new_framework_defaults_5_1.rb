@@ -7,7 +7,7 @@
 # Read the Guide for Upgrading Ruby on Rails for more info on each option.
 
 # Make `form_with` generate non-remote forms.
-Rails.application.config.action_view.form_with_generates_remote_forms = false
+Rails.application.config.action_view.form_with_generates_remote_forms = true
 
 # Unknown asset fallback will return the path passed in when the given
 # asset is not present in the asset pipeline.

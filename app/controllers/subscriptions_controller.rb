@@ -1,5 +1,5 @@
 class SubscriptionsController < ApplicationController
-  # GET subscriptions.xml
+
   def index
     @user = current_user
     if params[:tag] == "all" || params[:tag].blank?
@@ -19,8 +19,6 @@ class SubscriptionsController < ApplicationController
     end
   end
 
-  # POST /subscriptions
-  # POST /subscriptions.json
   def create
     user = current_user
     valid_feed_ids = Rails.application.message_verifier(:valid_feed_ids).verify(params[:valid_feed_ids])
@@ -35,34 +33,29 @@ class SubscriptionsController < ApplicationController
     get_feeds_list
   end
 
-  # DELETE /subscriptions/1
-  # DELETE /subscriptions/1.json
-  def destroy
-    destroy_subscription(params[:id])
-    get_feeds_list
-    respond_to do |format|
-      format.js
-    end
-  end
-
-  def feed_destroy
-    subscription = @user.subscriptions.where(feed_id: params[:id]).take!
-    destroy_subscription(subscription.id)
-    get_feeds_list
-    respond_to do |format|
-      format.js { render "subscriptions/destroy" }
-    end
+  def edit
+    @user = current_user
+    @subscription = @user.subscriptions.find_by_feed_id(params[:id])
+    @tag_editor = TagEditor.new(@user, @subscription.feed)
+    render layout: "settings"
   end
 
   def update
     @user = current_user
+    @mark_selected = false
     @subscription = @user.subscriptions.find(params[:id])
-    if @subscription.update(subscription_params)
-      flash[:notice] = "Settings updated."
-    else
-      flash[:alert] = "Update failed."
+    @subscription.update(subscription_params)
+    @taggings = @subscription.feed.tag_with_params(params, @user)
+    if @taggings.present?
+      @user.update_tag_visibility(@taggings.first.tag.id.to_s, true)
     end
-    flash.discard
+    get_feeds_list
+  end
+
+  def destroy
+    subscription = @user.subscriptions.where(feed_id: params[:id]).take!
+    destroy_subscription(subscription.id)
+    get_feeds_list
   end
 
   private
@@ -74,6 +67,6 @@ class SubscriptionsController < ApplicationController
   end
 
   def subscription_params
-    params.require(:subscription).permit(:muted, :show_updates, :show_retweets, :media_only, :title)
+    params.require(:subscription).permit(:title)
   end
 end

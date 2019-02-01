@@ -6,17 +6,9 @@ class FeedsController < ApplicationController
   def update
     @user = current_user
     @mark_selected = false
-
     @feed = Feed.find(params[:id])
     @taggings = @feed.tag_with_params(params, @user)
-
-    @user.update_tag_visibility(@taggings.first.tag.id.to_s, true)
-
-    if params[:no_response].present?
-      head :ok
-    else
-      get_feeds_list
-    end
+    head :ok
   end
 
   def rename
@@ -26,12 +18,6 @@ class FeedsController < ApplicationController
     @subscription.title = title.empty? ? nil : title
     @subscription.save
     @feed_order = @user.feed_order
-  end
-
-  def modal_edit
-    @user = current_user
-    @subscription = @user.subscriptions.find_by_feed_id(params[:id])
-    @tag_editor = TagEditor.new(@user, @subscription.feed)
   end
 
   def view_unread

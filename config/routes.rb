@@ -90,7 +90,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :subscriptions, only: [:index, :create, :destroy, :update] do
+  resources :subscriptions, only: [:index, :edit, :create, :destroy, :update] do
     member do
       delete :feed_destroy
     end
@@ -160,7 +160,7 @@ Rails.application.routes.draw do
 
   get :settings, to: "settings#settings"
   namespace :settings do
-    resources :subscriptions do
+    resources :subscriptions, only: [:index, :edit, :destroy, :update] do
       collection do
         patch :update_multiple
       end

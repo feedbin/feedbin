@@ -13,8 +13,18 @@ class Settings::SubscriptionsController < ApplicationController
   def edit
     @user = current_user
     @subscription = @user.subscriptions.find(params[:id])
-    @tag_editor = TagEditor.new(@user, @subscription.feed)
     render layout: "settings"
+  end
+
+  def update
+    @user = current_user
+    @subscription = @user.subscriptions.find(params[:id])
+    if @subscription.update(subscription_params)
+      flash[:notice] = "Settings updated."
+    else
+      flash[:alert] = "Update failed."
+    end
+    flash.discard
   end
 
   def refresh_favicon
@@ -55,6 +65,10 @@ class Settings::SubscriptionsController < ApplicationController
   end
 
   private
+
+  def subscription_params
+    params.require(:subscription).permit(:muted, :show_updates, :show_retweets, :media_only, :title)
+  end
 
   def subscriptions_with_sort_data
     ids = @user.subscriptions.pluck(:feed_id)

@@ -1,3 +1,9 @@
-<%= render partial: 'shared/message_flash', locals: {flash: flash} %>
+<%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
+feedbin.data.tagNames = <%= raw json_escape(@user.tag_names.to_json) %>;
+$('.modal').modal('hide')
 feedbin.data.user_titles[<%= @subscription.feed_id %>] = "<%= j @subscription.title %>";
 feedbin.applyUserTitles();
+
+var target = $(".feeds .feed-link[data-feed-id=<%= @subscription.feed.id %>]").first();
+feedbin.scrollTo(target, $('.feeds'));
+target.click();
