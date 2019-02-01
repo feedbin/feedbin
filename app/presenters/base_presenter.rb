@@ -21,7 +21,7 @@ class BasePresenter
         markup = <<-eos
           <span class="favicon favicon-default favicon-character-#{feed.host_letter}" data-host="#{feed.host}"></span>
         eos
-        if feed.favicon && feed.favicon.cdn_url
+        if feed.favicon&.cdn_url
           markup = <<-eos
             <span class="favicon" style="background-image: url(#{feed.favicon.cdn_url});"></span>
           eos

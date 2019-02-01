@@ -10,9 +10,9 @@ class DevicePushNotificationSend
     team_id: ENV["APPLE_TEAM_ID"],
     key_id: ENV["APPLE_KEY_ID"],
   }
-  APNOTIC_POOL = Apnotic::ConnectionPool.new(apnotic_options, size: 5) do |connection|
+  APNOTIC_POOL = Apnotic::ConnectionPool.new(apnotic_options, size: 5) { |connection|
     connection.on(:error) { |exception| Honeybadger.notify(exception) }
-  end
+  }
 
   def perform(user_ids, entry_id, skip_read)
     Honeybadger.context(user_ids: user_ids, entry_id: entry_id)
@@ -29,11 +29,11 @@ class DevicePushNotificationSend
     feed_titles = subscription_titles(user_ids, feed)
     feed_title = format_text(feed.title)
 
-    notifications = tokens.each_with_object({}) do |(user_id, token, operating_system), hash|
+    notifications = tokens.each_with_object({}) { |(user_id, token, operating_system), hash|
       feed_title = feed_titles[user_id] || feed_title
       notification = build_notification(token, feed_title, entry, operating_system)
       hash[notification.apns_id] = notification
-    end
+    }
 
     APNOTIC_POOL.with do |connection|
       notifications.each do |_, notification|
@@ -58,7 +58,7 @@ class DevicePushNotificationSend
     titles = Subscription.where(feed: feed, user_id: user_ids).pluck(:user_id, :title)
     titles.each_with_object({}) do |(user_id, feed_title), hash|
       title = format_text(feed_title)
-      hash[user_id] = (title.present?) ? title : nil
+      hash[user_id] = title.present? ? title : nil
     end
   end
 
@@ -66,8 +66,8 @@ class DevicePushNotificationSend
     text ||= ""
     decoder = HTMLEntities.new
     text = ActionController::Base.helpers.strip_tags(text)
-    text = text.gsub("\n", "")
-    text = text.gsub(/\t/, "")
+    text = text.delete("\n")
+    text = text.delete("\t")
     text = decoder.decode(text)
     text
   end
@@ -85,7 +85,7 @@ class DevicePushNotificationSend
     author = format_text(entry.author)
     title = format_text(entry.title)
     published = entry.published.iso8601(6)
-    if operating_system =~ /^iPhone OS 9/
+    if /^iPhone OS 9/.match?(operating_system)
       body = "#{feed_title}: #{body}"
     end
     notification = Apnotic::Notification.new(device_token).tap do |notification|

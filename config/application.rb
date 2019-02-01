@@ -38,7 +38,7 @@ module Feedbin
 
     config.middleware.use TLDLength
 
-    config.exceptions_app = self.routes
+    config.exceptions_app = routes
 
     config.active_record.schema_format = :sql
 

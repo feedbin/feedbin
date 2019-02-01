@@ -11,7 +11,7 @@ class TweetsControllerTest < ActionController::TestCase
     login_as @user
     entry = create_tweet_entry(@user.feeds.first)
 
-    client = Client.new()
+    client = Client.new
     TweetsController.stub_any_instance :client, client do
       get :thread, params: {id: entry}, xhr: true
     end

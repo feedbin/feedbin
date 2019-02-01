@@ -13,18 +13,20 @@ class FeedRefresherSchedulerTest < ActiveSupport::TestCase
 
   test "should periodically force_refresh" do
     flush_redis
-    results = 16.times.each_with_object([]) do |count, array|
+    results = 16.times.each_with_object([]) { |count, array|
       job = perform
       array.push job.force_refresh?
-    end
+    }
     assert_equal(3, results.count(true))
   end
 
   private
 
   def perform
-    FeedRefresherScheduler.new().tap do |job|
-      def job.job_args(*args); [[1]]; end
+    FeedRefresherScheduler.new.tap do |job|
+      def job.job_args(*args)
+        [[1]]
+      end
       job.perform
     end
   end

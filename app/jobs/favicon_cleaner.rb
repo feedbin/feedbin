@@ -27,10 +27,10 @@ class FaviconCleaner
     layer = layers.first.scale(1, 1)
     pixel = layer.pixel_color(0, 0)
     color = layer.to_color(pixel)
-    %w(none white #FFFFFF).include?(color) || color.include?("#FFFFFF")
+    %w[none white #FFFFFF].include?(color) || color.include?("#FFFFFF")
   ensure
-    layer && layer.destroy!
-    layers && layers.map(&:destroy!)
+    layer&.destroy!
+    layers&.map(&:destroy!)
   end
 
   def build

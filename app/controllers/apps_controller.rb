@@ -20,7 +20,7 @@ class AppsController < ApplicationController
   private
 
   def basic_auth
-    authenticate_or_request_with_http_basic('Feedbin') do |username, password|
+    authenticate_or_request_with_http_basic("Feedbin") do |username, password|
       @current_user ||= User.where("lower(email) = ?", username.try(:downcase)).take.try(:authenticate, password)
     end
   end

@@ -22,7 +22,7 @@ class Settings::SubscriptionsController < ApplicationController
     @subscription = @user.subscriptions.find(params[:id])
     FaviconFetcher.perform_async(@subscription.feed.host)
     flash[:notice] = "Favicon will be refreshed shortly"
-    flash.discard()
+    flash.discard
     render "subscriptions/update"
   end
 
@@ -60,7 +60,7 @@ class Settings::SubscriptionsController < ApplicationController
     ids = @user.subscriptions.pluck(:feed_id)
     key = Digest::SHA1.hexdigest(ids.join)
 
-    subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}:4", expires_in: 24.hours) do
+    subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}:4", expires_in: 24.hours) {
       tags = @user.tags_on_feed
       subscriptions = @user.subscriptions.select("subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host").joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}").includes(feed: [:favicon])
       feed_ids = subscriptions.map(&:feed_id)
@@ -71,16 +71,16 @@ class Settings::SubscriptionsController < ApplicationController
 
       subscriptions.each do |subscription|
         counts = entry_counts[subscription.feed_id]
-        max = (counts.present?) ? counts.max.to_i : 0
-        percentages = (counts.present?) ? counts.map { |count| count.to_f / max.to_f } : nil
-        volume = (counts.present?) ? counts.sum : 0
+        max = counts.present? ? counts.max.to_i : 0
+        percentages = counts.present? ? counts.map { |count| count.to_f / max.to_f } : nil
+        volume = counts.present? ? counts.sum : 0
 
-        if subscription.title
-          subscription.title = subscription.title
+        subscription.title = if subscription.title
+          subscription.title
         elsif subscription.original_title
-          subscription.title = subscription.original_title
+          subscription.original_title
         else
-          subscription.title = "(No title)"
+          "(No title)"
         end
 
         subscription.entries_count = percentages
@@ -89,7 +89,7 @@ class Settings::SubscriptionsController < ApplicationController
 
         subscription.sort_data = feed_search_data(subscription)
       end
-    end
+    }
 
     if ["updated", "volume", "tag", "name"].include?(params[:sort])
       key = params[:sort].to_sym
@@ -99,9 +99,9 @@ class Settings::SubscriptionsController < ApplicationController
     end
 
     if params[:q].present?
-      subscriptions = subscriptions.select do |subscription|
+      subscriptions = subscriptions.select { |subscription|
         subscription.sort_data[:name].include?(params[:q].downcase)
-      end
+      }
       if params[:sort].blank?
         subscriptions = subscriptions.sort_by { |subscription| subscription.sort_data[:score] }.reverse
       end
@@ -111,7 +111,7 @@ class Settings::SubscriptionsController < ApplicationController
   end
 
   def feed_search_data(subscription)
-    name = Array.new.tap do |array|
+    name = [].tap do |array|
       array.push subscription.title.downcase
       array.push subscription.site_url
       array.push subscription.feed_url

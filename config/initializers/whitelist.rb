@@ -1,6 +1,6 @@
 class Whitelist
   def base
-    Hash.new.tap do |hash|
+    {}.tap do |hash|
       hash[:elements] = %w[
         h1 h2 h3 h4 h5 h6 h7 h8 br b i strong em a pre code img tt div ins del sup sub
         p ol ul table thead tbody tfoot blockquote dl dt dd kbd q samp var hr ruby rt
@@ -22,7 +22,7 @@ class Whitelist
         "td" => ["align"],
         "th" => ["align"],
         "iframe" => ["src", "width", "height"],
-        all: %w[
+        :all => %w[
           abbr accept accept-charset accesskey action alt axis border cellpadding
           cellspacing char charoff charset checked clear cols colspan color compact
           coords datetime dir disabled enctype for frame headers height hreflang hspace
@@ -86,21 +86,21 @@ Feedbin::Application.config.whitelist = whitelist.default
 Feedbin::Application.config.newsletter_whitelist = whitelist.newsletter
 
 Feedbin::Application.config.evernote_whitelist = {
-  :elements => %w(
+  elements: %w[
     a abbr acronym address area b bdo big blockquote br caption center cite code col colgroup dd
     del dfn div dl dt em font h1 h2 h3 h4 h5 h6 hr i img ins kbd li map ol p pre q s samp small
     span strike strong sub sup table tbody td tfoot th thead title tr tt u ul var xmp
-  ),
-  :remove_contents => ["script", "style", "iframe", "object", "embed"],
-  :attributes => {
+  ],
+  remove_contents: ["script", "style", "iframe", "object", "embed"],
+  attributes: {
     "a" => ["href"],
     "img" => ["src"],
     :all => ["align", "alt", "border", "cellpadding", "cellspacing", "cite", "cols", "colspan", "color",
              "coords", "datetime", "dir", "disabled", "enctype", "for", "height", "hreflang", "label", "lang",
              "longdesc", "name", "rel", "rev", "rows", "rowspan", "selected", "shape", "size", "span", "start",
-             "summary", "target", "title", "type", "valign", "value", "vspace", "width"],
+             "summary", "target", "title", "type", "valign", "value", "vspace", "width",],
   },
-  :protocols => {
+  protocols: {
     "a" => {"href" => ["http", "https", :relative]},
     "img" => {"src" => ["http", "https", :relative]},
   },

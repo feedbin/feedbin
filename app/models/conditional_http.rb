@@ -8,8 +8,8 @@ class ConditionalHTTP
 
   def to_h
     headers = {}
-    headers.merge!("If-None-Match" => if_none_match) if if_none_match
-    headers.merge!("If-Modified-Since" => if_modified_since) if if_modified_since
+    headers["If-None-Match"] = if_none_match if if_none_match
+    headers["If-Modified-Since"] = if_modified_since if if_modified_since
     headers
   end
 
@@ -17,7 +17,7 @@ class ConditionalHTTP
 
   def if_none_match
     @if_none_match ||= begin
-      etag if etag
+      etag
     end
   end
 

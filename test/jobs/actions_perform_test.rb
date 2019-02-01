@@ -19,7 +19,7 @@ class ActionsPerformTest < ActiveSupport::TestCase
     Sidekiq::Worker.clear_all
     assert_difference "SafariPushNotificationSend.jobs.size", +1 do
       Throttle.stub :throttle!, true do
-        ActionsPerform.new().perform(@entry.id, [@action.id])
+        ActionsPerform.new.perform(@entry.id, [@action.id])
       end
     end
   end
@@ -27,7 +27,7 @@ class ActionsPerformTest < ActiveSupport::TestCase
   test "should mark_read" do
     assert_difference "UnreadEntry.count", -1 do
       Throttle.stub :throttle!, true do
-        ActionsPerform.new().perform(@entry.id, [@action.id])
+        ActionsPerform.new.perform(@entry.id, [@action.id])
       end
     end
   end
@@ -35,7 +35,7 @@ class ActionsPerformTest < ActiveSupport::TestCase
   test "should star" do
     assert_difference "StarredEntry.count", +1 do
       Throttle.stub :throttle!, true do
-        ActionsPerform.new().perform(@entry.id, [@action.id])
+        ActionsPerform.new.perform(@entry.id, [@action.id])
       end
     end
   end
@@ -43,7 +43,7 @@ class ActionsPerformTest < ActiveSupport::TestCase
   test "should send_ios_notification" do
     assert_difference "DevicePushNotificationSend.jobs.size", +1 do
       Throttle.stub :throttle!, true do
-        ActionsPerform.new().perform(@entry.id, [@action.id])
+        ActionsPerform.new.perform(@entry.id, [@action.id])
       end
     end
   end

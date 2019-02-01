@@ -7,7 +7,7 @@ class URLCache
   end
 
   def cache_key
-    "#{url}#{options.to_s}"
+    "#{url}#{options}"
   end
 
   def body
@@ -21,9 +21,9 @@ class URLCache
   private
 
   def result
-    @body, @headers = Rails.cache.fetch(cache_key) do
+    @body, @headers = Rails.cache.fetch(cache_key) {
       request = HTTP.follow(max_hops: 5).get(url, options)
       [request.to_s, request.headers.to_h]
-    end
+    }
   end
 end

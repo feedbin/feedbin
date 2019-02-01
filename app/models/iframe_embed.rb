@@ -84,7 +84,7 @@ class IframeEmbed
   def self.fetch(url)
     parser = find_embed_source(url)
     parser = parser.new(url)
-    parser.fetch()
+    parser.fetch
     parser
   end
 

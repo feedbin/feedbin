@@ -21,10 +21,10 @@ class EntryIdCacheTest < ActiveSupport::TestCase
     cache = EntryIdCache.new(@user.id, @feeds.map(&:id))
     page_1 = cache.page(1)
 
-    ids = 1.upto(page_1.total_pages).each_with_object([]) do |page, array|
+    ids = 1.upto(page_1.total_pages).each_with_object([]) { |page, array|
       results = cache.page(page)
       array.push(results.first.id)
-    end
+    }
 
     assert_equal(@entries.map(&:id), ids)
 

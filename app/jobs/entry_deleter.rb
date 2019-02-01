@@ -5,14 +5,14 @@ class EntryDeleter
   def perform(feed_id)
     feed = Feed.find(feed_id)
 
-    if ENV["ENTRY_LIMIT"]
-      entry_limit = ENV["ENTRY_LIMIT"].to_i
+    entry_limit = if ENV["ENTRY_LIMIT"]
+      ENV["ENTRY_LIMIT"].to_i
     else
-      entry_limit = (feed.subscriptions_count == 0) ? 10 : 400
+      feed.subscriptions_count == 0 ? 10 : 400
     end
 
     feed.feed_stats.where("day < ?", 40.days.ago).delete_all
-    if !feed.protected
+    unless feed.protected
       delete_entries(feed_id, entry_limit)
     end
   end

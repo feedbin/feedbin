@@ -37,17 +37,17 @@ class Embed::Twitter
     @image_url ||= begin
       url = nil
 
-      pics = document.search("a").each_with_object([]) do |anchor, array|
-        if anchor.text && anchor.text.start_with?("pic.twitter.com")
+      pics = document.search("a").each_with_object([]) { |anchor, array|
+        if anchor.text&.start_with?("pic.twitter.com")
           array.push anchor.attr("href")
         end
-      end
+      }
 
-      if !pics.empty?
+      unless pics.empty?
         page = URLCache.new(pics.last).body
         doc = Nokogiri::HTML5(page)
         image = doc.css("meta[property='og:image']")
-        if !image.empty?
+        unless image.empty?
           url = image.first.attributes["content"].value
         end
       end
@@ -61,7 +61,7 @@ class Embed::Twitter
   OEMBED_URL = "https://publish.twitter.com/oembed"
 
   def user
-    @user ||= data.dig("author_url") && data.dig("author_url").split("/").last
+    @user ||= data.dig("author_url")&.split("/")&.last
   end
 
   def document

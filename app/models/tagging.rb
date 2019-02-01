@@ -6,7 +6,7 @@ class Tagging < ApplicationRecord
   after_commit :update_actions, on: [:create, :destroy]
 
   def update_actions
-    actions = self.user.actions.where("? = ANY (tag_ids)", tag_id).pluck(:id)
+    actions = user.actions.where("? = ANY (tag_ids)", tag_id).pluck(:id)
     TouchActions.perform_async(actions)
   end
 

@@ -7,7 +7,7 @@ module ApplicationHelper
   end
 
   def native?
-    request.user_agent && request.user_agent.include?("TurbolinksFeedbin")
+    request.user_agent&.include?("TurbolinksFeedbin")
   end
 
   def is_active?(controller, action)
@@ -27,7 +27,7 @@ module ApplicationHelper
   def rtl?(string)
     unless string.blank?
       rtl_test = /[\u0600-\u06FF]|[\u0750-\u077F]|[\u0590-\u05FF]|[\uFE70-\uFEFF]/m
-      if string =~ rtl_test
+      if string&.match?(rtl_test)
         string = strip_tags(string)
         rtl_length = string.scan(rtl_test).size
         percentage = (rtl_length.to_f / string.length.to_f) * 100
@@ -59,7 +59,7 @@ module ApplicationHelper
     options[:class] = [name, options[:class]].compact.join(" ")
 
     content_tag :svg, options do
-      content_tag :use, "", :"xlink:href" => "##{name}"
+      content_tag :use, "", "xlink:href": "##{name}"
     end
   end
 
@@ -96,7 +96,7 @@ module ApplicationHelper
   end
 
   def image_tag_with_fallback(fallback, *image_args)
-    options = (image_args.length > 1) ? image_args.last : {}
+    options = image_args.length > 1 ? image_args.last : {}
     options["onerror"] = "this.onerror=null;this.src='%s';" % fallback
     image_tag(image_args.first, options)
   end

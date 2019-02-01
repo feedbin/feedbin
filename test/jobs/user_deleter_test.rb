@@ -4,7 +4,7 @@ class UserDeleterTest < ActiveSupport::TestCase
   test "should delete user" do
     StripeMock.start
     user = users(:ben)
-    UserDeleter.new().perform(user.id)
+    UserDeleter.new.perform(user.id)
     assert_raise ActiveRecord::RecordNotFound do
       User.find(user.id)
     end
@@ -15,7 +15,7 @@ class UserDeleterTest < ActiveSupport::TestCase
     StripeMock.start
     user = users(:ben)
     assert_difference "ActionMailer::Base.deliveries.size", +1 do
-      UserDeleter.new().perform(user.id)
+      UserDeleter.new.perform(user.id)
     end
     StripeMock.stop
   end
@@ -25,7 +25,7 @@ class UserDeleterTest < ActiveSupport::TestCase
     setup_data
     signed_id = Rails.application.message_verifier(:billing_event_id).generate(@billing_event.id)
 
-    UserDeleter.new().perform(@user.id, signed_id)
+    UserDeleter.new.perform(@user.id, signed_id)
 
     charge = Stripe::Charge.retrieve(@charge.id)
     assert charge.refunded, "Charge should have been refunded"
@@ -38,7 +38,7 @@ class UserDeleterTest < ActiveSupport::TestCase
     setup_data
     signed_id = Rails.application.message_verifier(:billing_event_id).generate(@billing_event.id)
 
-    UserDeleter.new().perform(@user.id, signed_id + "something to make signature invalid")
+    UserDeleter.new.perform(@user.id, signed_id + "something to make signature invalid")
 
     charge = Stripe::Charge.retrieve(@charge.id)
     assert_not charge.refunded, "Charge should not have been refunded"

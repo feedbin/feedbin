@@ -6,6 +6,7 @@ class AddSubscriptionsCountToFeeds < ActiveRecord::Migration[4.2]
       Feed.reset_counters(feed.id, :subscriptions)
     end
   end
+
   def self.down
     remove_column :feeds, :subscriptions_count
   end

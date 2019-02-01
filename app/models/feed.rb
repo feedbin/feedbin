@@ -32,7 +32,7 @@ class Feed < ApplicationRecord
   end
 
   def twitter_feed?
-    self.twitter? || self.twitter_home?
+    twitter? || twitter_home?
   end
 
   def tag_with_params(params, user)
@@ -40,13 +40,13 @@ class Feed < ApplicationRecord
     tags.concat params[:tag_id].values if params[:tag_id]
     tags.concat params[:tag_name] if params[:tag_name]
     tags = tags.join(",")
-    self.tag(tags, user)
+    tag(tags, user)
   end
 
   def tag(names, user, delete_existing = true)
     taggings = []
     if delete_existing
-      Tagging.where(user_id: user, feed_id: self.id).destroy_all
+      Tagging.where(user_id: user, feed_id: id).destroy_all
     end
     names.split(",").map do |name|
       name = name.strip
@@ -70,11 +70,11 @@ class Feed < ApplicationRecord
 
   def self.create_from_parsed_feed(parsed_feed)
     ActiveRecord::Base.transaction do
-      record = self.create!(parsed_feed.to_feed)
+      record = create!(parsed_feed.to_feed)
       parsed_feed.entries.each do |parsed_entry|
         entry_hash = parsed_entry.to_entry
         threader = Threader.new(entry_hash, record)
-        if !threader.thread
+        unless threader.thread
           record.entries.create!(entry_hash)
         end
       end
@@ -90,10 +90,10 @@ class Feed < ApplicationRecord
     unless etag.blank?
       options[:if_none_match] = etag
     end
-    request = Feedkit::Request.new(url: self.feed_url, options: options)
+    request = Feedkit::Request.new(url: feed_url, options: options)
     result = request.status
     if request.body
-      result = Feedkit::Feedkit.new().fetch_and_parse(self.feed_url, request: request)
+      result = Feedkit::Feedkit.new.fetch_and_parse(feed_url, request: request)
     end
     result
   end
@@ -111,34 +111,32 @@ class Feed < ApplicationRecord
   end
 
   def string_id
-    self.id.to_s
+    id.to_s
   end
 
   def set_host
-    begin
-      self.host = URI::parse(self.site_url).host
-    rescue Exception
-      Rails.logger.info { "Failed to set host for feed: %s" % self.site_url }
-    end
+    self.host = URI.parse(site_url).host
+  rescue Exception
+    Rails.logger.info { "Failed to set host for feed: %s" % site_url }
   end
 
   def override_title(title)
     @original_title = self.title
-    self.title = (title)
+    self.title = title
   end
 
   def original_title
-    @original_title or self.title
+    @original_title || title
   end
 
   def priority_refresh(user = nil)
-    if self.twitter_feed?
-      if 10.minutes.ago > self.updated_at
-        TwitterFeedRefresher.new().enqueue_feed(self, user)
+    if twitter_feed?
+      if 10.minutes.ago > updated_at
+        TwitterFeedRefresher.new.enqueue_feed(self, user)
       end
     else
       Sidekiq::Client.push_bulk(
-        "args" => [[self.id, self.feed_url]],
+        "args" => [[id, feed_url]],
         "class" => "FeedRefresherFetcherCritical",
         "queue" => "feed_refresher_fetcher_critical",
         "retry" => false,
@@ -147,7 +145,7 @@ class Feed < ApplicationRecord
   end
 
   def list_unsubscribe
-    self.options.dig("email_headers", "List-Unsubscribe")
+    options.dig("email_headers", "List-Unsubscribe")
   end
 
   def self.search(url)
@@ -157,11 +155,11 @@ class Feed < ApplicationRecord
   private
 
   def refresh_favicon
-    FaviconFetcher.perform_async(self.host)
+    FaviconFetcher.perform_async(host)
   end
 
   def default_values
-    if self.respond_to?(:options)
+    if respond_to?(:options)
       self.options ||= {}
     end
   end

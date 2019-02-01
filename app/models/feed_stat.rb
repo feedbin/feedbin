@@ -11,7 +11,7 @@ class FeedStat < ApplicationRecord
       query = ActiveRecord::Base.send(:sanitize_sql_array, [stats_query, start_date, end_date, start_date, feed_id])
       results = ActiveRecord::Base.connection.execute(query)
       results.each do |result|
-        if entry_counts.has_key?(feed_id)
+        if entry_counts.key?(feed_id)
           entry_counts[feed_id] << result["entries_count"].to_i
         else
           entry_counts[feed_id] = [result["entries_count"].to_i]

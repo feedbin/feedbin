@@ -26,7 +26,7 @@ module Api
 
       def update
         @action.all_feeds = all_feeds?(action_params)
-        if !@action.update(action_params)
+        unless @action.update(action_params)
           head :bad_request
         end
       end
@@ -42,7 +42,7 @@ module Api
         if @action.computed_feed_ids.present?
           query[:feed_ids] = @action.computed_feed_ids
           if params[:read].present?
-            query[:read] = (params[:read] == "true") ? true : false
+            query[:read] = params[:read] == "true"
           end
           @entries = Entry.scoped_search(query, @user)
         else
@@ -62,9 +62,9 @@ module Api
             query[:feed_ids] = action.computed_feed_ids
             query[:read] = false
             @entries = Entry.scoped_search(query, @user).limit(10).includes(:feed)
-            @titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) do |(feed_id, title), hash|
+            @titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) { |(feed_id, title), hash|
               hash[feed_id] = title
-            end
+            }
           else
             @entries = []
           end
@@ -76,7 +76,7 @@ module Api
       private
 
       def action_params
-        params.require(:action_params).permit(:query, :action_type, :feed_ids, :tag_ids, :feed_ids => [], :tag_ids => [], :actions => [])
+        params.require(:action_params).permit(:query, :action_type, :feed_ids, :tag_ids, feed_ids: [], tag_ids: [], actions: [])
       end
 
       def set_action

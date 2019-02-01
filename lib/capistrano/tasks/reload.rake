@@ -1,5 +1,5 @@
 namespace :deploy do
-  desc 'Reload services'
+  desc "Reload services"
   task :reload do
     on roles :app do
       invoke "deploy:quiet"

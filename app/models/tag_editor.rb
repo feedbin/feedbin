@@ -1,5 +1,4 @@
 class TagEditor
-
   attr_reader :user, :feed
 
   def initialize(user, feed)
@@ -18,5 +17,4 @@ class TagEditor
   def checked?(tag)
     taggings.include? tag.id
   end
-
 end

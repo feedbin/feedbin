@@ -8,9 +8,9 @@ class ActionsBulk
 
     entry_ids = []
     action.scrolled_results do |result|
-      ids = result["hits"]["hits"].map do |hit|
+      ids = result["hits"]["hits"].map { |hit|
         hit["_id"].to_i
-      end
+      }
       entry_ids.concat(ids)
     end
 

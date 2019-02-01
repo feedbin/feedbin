@@ -22,7 +22,7 @@ module SessionsHelper
   end
 
   def authorize
-    if !signed_in?
+    unless signed_in?
       if request.subdomain == "api"
         request_http_basic_authentication
       else

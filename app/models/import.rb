@@ -14,7 +14,7 @@ class Import < ApplicationRecord
     feeds = parse_opml
     create_tags(feeds)
     feeds.each do |feed|
-      self.import_items << ImportItem.new(details: feed, item_type: "feed")
+      import_items << ImportItem.new(details: feed, item_type: "feed")
     end
   end
 

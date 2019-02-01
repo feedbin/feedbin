@@ -9,7 +9,7 @@ class TrialExpirationTest < ActiveSupport::TestCase
     user.save(validate: false)
 
     assert_not user.suspended
-    TrialExpiration.new().perform
+    TrialExpiration.new.perform
     assert user.reload.suspended
     StripeMock.stop
   end

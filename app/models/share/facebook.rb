@@ -11,7 +11,7 @@ class Share::Facebook < Share::Service
     end
     uri = URI.parse(URL)
     uri.query = {"u" => entry.fully_qualified_url, "display" => "popup"}.to_query
-    {text: "feedbin.sharePopup('#{uri.to_s}'); return false;"}
+    {text: "feedbin.sharePopup('#{uri}'); return false;"}
   end
 
   def link_options(entry)

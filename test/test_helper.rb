@@ -22,9 +22,9 @@ StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
 WebMock.disable_net_connect!(allow_localhost: true, allow: "codeclimate.com")
 
 redis_test_instance = IO.popen("redis-server --port 7776")
-Minitest.after_run {
+Minitest.after_run do
   Process.kill("INT", redis_test_instance.pid)
-}
+end
 
 $redis = {
   sorted_entries: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) },
@@ -90,7 +90,15 @@ class ActiveSupport::TestCase
   end
 
   def clear_search
-    Entry.__elasticsearch__.delete_index! rescue nil
-    Entry.__elasticsearch__.create_index! rescue nil
+    begin
+      Entry.__elasticsearch__.delete_index!
+    rescue
+      nil
+    end
+    begin
+      Entry.__elasticsearch__.create_index!
+    rescue
+      nil
+    end
   end
 end

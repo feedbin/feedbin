@@ -32,12 +32,12 @@ class Api::V2::ActionsControllerTest < ApiControllerTestCase
     login_as @user
     assert_difference "Action.count", +1 do
       post :create, format: :json, params: {
-                 action_params: {
-                   query: "query",
-                   feed_ids: [@feeds.first.id],
-                   actions: ["mark_read"],
-                 },
-               }
+        action_params: {
+          query: "query",
+          feed_ids: [@feeds.first.id],
+          actions: ["mark_read"],
+        },
+      }
       assert_response :success
     end
   end

@@ -3,7 +3,7 @@ class SearchServerSetup
   include BatchJobs
   sidekiq_options queue: :worker_slow
 
-  Client = $search[:alt] ? $search[:alt] : $search[:main]
+  Client = $search[:alt] || $search[:main]
 
   def perform(batch = nil, schedule = false, last_entry_id = nil)
     if schedule
@@ -16,14 +16,14 @@ class SearchServerSetup
 
   def index(batch)
     ids = build_ids(batch)
-    data = Entry.where(id: ids).map do |entry|
+    data = Entry.where(id: ids).map { |entry|
       {
         index: {
           _id: entry.id,
           data: entry.as_indexed_json,
         },
       }
-    end
+    }
     if data.present?
       Client.bulk(
         index: Entry.index_name,
@@ -44,7 +44,9 @@ class SearchServerSetup
 
   def touch_actions
     Action.find_each do |action|
-      action.touch rescue nil
+      action.touch
+    rescue
+      nil
     end
   end
 end

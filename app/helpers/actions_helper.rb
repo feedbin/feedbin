@@ -4,9 +4,9 @@ module ActionsHelper
 
     user = User.find(action.user_id)
 
-    feed_names = user.feeds.where(id: action.feed_ids).include_user_title.map do |feed|
+    feed_names = user.feeds.where(id: action.feed_ids).include_user_title.map { |feed|
       feed.title
-    end
+    }
 
     feed_names.sort!
 

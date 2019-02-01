@@ -1,5 +1,4 @@
 class SmartSort
-
   SCAN = /[$-\/:-?{-~!"^_`\[\]]|[^\d\.]+|[\d\.]+/
   DIGITS = /\d+(\.\d+)?/
   SYMBOLS = /^[$-\/:-?{-~!"^_`\[\]]/
@@ -11,7 +10,7 @@ class SmartSort
   end
 
   def <=>(other)
-    other.is_a?(self.class) or raise "Sort error"
+    other.is_a?(self.class) || raise("Sort error")
     left_value = value
     right_value = other.value
     if left_value.class == right_value.class
@@ -25,10 +24,10 @@ class SmartSort
 
   def self.parse(string)
     string.scan(SCAN).collect do |atom|
-      if atom.match(SYMBOLS)
+      if atom.match?(SYMBOLS)
         ord = atom.ord
         atom = "-1.#{ord}".to_f
-      elsif atom.match(DIGITS)
+      elsif atom.match?(DIGITS)
         atom = atom.to_f
       else
         atom = normalize_string(atom)
@@ -43,7 +42,6 @@ class SmartSort
     string = ActiveSupport::Inflector.transliterate(string)
     string.downcase
   end
-
 end
 
 String.class_eval do
@@ -53,16 +51,14 @@ String.class_eval do
 end
 
 module Enumerable
-
   def natural_sort
     natural_sort_by
   end
 
   def natural_sort_by(&stringifier)
     sort_by do |element|
-      element = stringifier.call(element) if stringifier
+      element = yield(element) if stringifier
       element.to_s.to_sort_atoms
     end
   end
-
 end

@@ -10,20 +10,20 @@ module Api
 
       def index
         @user = current_user
-        if params.has_key?(:ids)
+        if params.key?(:ids)
           allowed_feed_ids = []
           allowed_feed_ids = allowed_feed_ids.concat(@user.starred_entries.select("DISTINCT feed_id").map { |entry| entry.feed_id })
           allowed_feed_ids = allowed_feed_ids.concat(@user.subscriptions.pluck(:feed_id))
           @entries = Entry.where(id: @ids, feed_id: allowed_feed_ids).page(nil).includes(:feed)
           entries_response "api_v2_entries_url"
-        elsif params.has_key?(:starred) && "true" == params[:starred]
-          if params[:page]
-            page = params[:page].to_i
+        elsif params.key?(:starred) && params[:starred] == "true"
+          page = if params[:page]
+            params[:page].to_i
           else
-            page = 1
+            1
           end
           @starred_entries = @user.starred_entries.select(:entry_id).order("created_at DESC").page(page)
-          if params.has_key?(:per_page)
+          if params.key?(:per_page)
             @starred_entries = @starred_entries.per_page(params[:per_page].to_i)
           end
           @entries = Entry.where(id: @starred_entries.map { |starred_entry| starred_entry.entry_id }).includes(:feed)
@@ -45,9 +45,9 @@ module Api
       def watch
         @user = current_user
         if @user.can_read_entry?(params[:id])
-          @titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) do |(feed_id, title), hash|
+          @titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) { |(feed_id, title), hash|
             hash[feed_id] = title
-          end
+          }
           @entry = Entry.find(params[:id])
         else
           render_404
@@ -57,7 +57,7 @@ module Api
       private
 
       def limit_ids
-        if params.has_key?(:ids)
+        if params.key?(:ids)
           @ids = params[:ids].split(",").map { |i| i.to_i }
           if @ids.respond_to?(:count)
             if @ids.count > 100

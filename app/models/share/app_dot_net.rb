@@ -11,7 +11,7 @@ class Share::AppDotNet < Share::Service
     end
     uri = URI.parse(URL)
     uri.query = {"url" => entry.fully_qualified_url, "text" => entry.title}.to_query
-    {text: "feedbin.sharePopup('#{uri.to_s}'); return false;"}
+    {text: "feedbin.sharePopup('#{uri}'); return false;"}
   end
 
   def link_options(entry)

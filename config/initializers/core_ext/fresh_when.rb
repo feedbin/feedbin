@@ -1,6 +1,6 @@
 module ActionController
   module ConditionalGet
-    alias_method :original_fresh_when, :fresh_when
+    alias original_fresh_when fresh_when
 
     def fresh_when(*args)
       unless request.user_agent =~ /^Mr\. Reader 2\.1/ || request.user_agent =~ /^Unread/

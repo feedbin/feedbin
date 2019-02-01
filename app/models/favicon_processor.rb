@@ -42,7 +42,7 @@ class FaviconProcessor
   end
 
   def encoded(blob)
-    Base64.encode64(blob).gsub("\n", "")
+    Base64.encode64(blob).delete("\n")
   end
 
   def image_data
@@ -57,16 +57,14 @@ class FaviconProcessor
     end
     favicon.to_blob { |image| image.format = "png" }
   ensure
-    favicon && favicon.destroy!
-    layers && layers.map(&:destroy!)
+    favicon&.destroy!
+    layers&.map(&:destroy!)
   end
 
   def load_layers
-    begin
-      Magick::Image.from_blob(data)
-    rescue Magick::ImageMagickError
-      Magick::Image.from_blob(data) { |image| image.format = "ico" }
-    end
+    Magick::Image.from_blob(data)
+  rescue Magick::ImageMagickError
+    Magick::Image.from_blob(data) { |image| image.format = "ico" }
   end
 
   def remove_blank_images(layers)
@@ -74,7 +72,7 @@ class FaviconProcessor
       layer = layer.scale(1, 1)
       pixel = layer.pixel_color(0, 0)
       color = layer.to_color(pixel)
-      %w(none white).include?(color) || color.include?("#FFFFFF")
+      %w[none white].include?(color) || color.include?("#FFFFFF")
     end
   end
 

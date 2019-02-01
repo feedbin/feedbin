@@ -16,10 +16,10 @@ module Searchable
         "analyzer": {
           "lower_exact": {
             "tokenizer": "whitespace",
-            "filter":  ["lowercase"]
-          }
-        }
-      }
+            "filter": ["lowercase"],
+          },
+        },
+      },
     }
 
     settings search_settings do
@@ -48,31 +48,29 @@ module Searchable
       if saved_searches.length < 10
         unread_entries = user.unread_entries.pluck(:entry_id)
         searches = build_multi_search(user, saved_searches)
-        queries = searches.map do |search|
+        queries = searches.map { |search|
           {
             index: Entry.index_name,
             search: search.query,
           }
-        end
+        }
 
         if queries.present?
           result = Entry.__elasticsearch__.client.msearch body: queries
-          entry_ids = result["responses"].map do |response|
+          entry_ids = result["responses"].map { |response|
             hits = response.dig("hits", "hits") || []
             hits.map do |hit|
               hit["_id"].to_i
             end
-          end
+          }
           search_ids = searches.map { |search| search.id }
           Hash[search_ids.zip(entry_ids)]
-        else
-          nil
         end
       end
     end
 
     def self.build_multi_search(user, saved_searches)
-      saved_searches.map do |saved_search|
+      saved_searches.map { |saved_search|
         query_string = saved_search.query
 
         next if query_string =~ READ_REGEX
@@ -86,7 +84,7 @@ module Searchable
         query[:fields] = ["id", "feed_id"]
 
         OpenStruct.new({id: saved_search.id, query: query})
-      end.compact
+      }.compact
     end
 
     def self.scoped_search(params, user)
@@ -96,10 +94,10 @@ module Searchable
     end
 
     def self.build_query(options)
-      Hash.new.tap do |hash|
+      {}.tap do |hash|
         hash[:fields] = ["id"]
         if options[:sort]
-          if %w{desc asc}.include?(options[:sort])
+          if %w[desc asc].include?(options[:sort])
             hash[:sort] = [{published: options[:sort]}]
           end
         else
@@ -147,29 +145,28 @@ module Searchable
     end
 
     def self.build_search(params, user)
-
-      if params[:query] =~ UNREAD_REGEX
+      if UNREAD_REGEX.match?(params[:query])
         params[:query] = params[:query].gsub(UNREAD_REGEX, "")
         params[:read] = false
-      elsif params[:query] =~ READ_REGEX
+      elsif READ_REGEX.match?(params[:query])
         params[:query] = params[:query].gsub(READ_REGEX, "")
         params[:read] = true
       end
 
-      if params[:query] =~ STARRED_REGEX
+      if STARRED_REGEX.match?(params[:query])
         params[:query] = params[:query].gsub(STARRED_REGEX, "")
         params[:starred] = true
-      elsif params[:query] =~ UNSTARRED_REGEX
+      elsif UNSTARRED_REGEX.match?(params[:query])
         params[:query] = params[:query].gsub(UNSTARRED_REGEX, "")
         params[:starred] = false
       end
 
-      if params[:query] =~ SORT_REGEX
+      if SORT_REGEX.match?(params[:query])
         params[:sort] = params[:query].match(SORT_REGEX)[1].downcase
         params[:query] = params[:query].gsub(SORT_REGEX, "")
       end
 
-      if params[:query] =~ TAG_ID_REGEX
+      if TAG_ID_REGEX.match?(params[:query])
         tag_id = params[:query].match(TAG_ID_REGEX)[1].downcase
         feed_ids = user.taggings.where(tag_id: tag_id).pluck(:feed_id)
 
@@ -190,7 +187,7 @@ module Searchable
         feed_ids: [],
       }
 
-      if params[:sort] && %w{desc asc relevance}.include?(params[:sort])
+      if params[:sort] && %w[desc asc relevance].include?(params[:sort])
         options[:sort] = params[:sort]
       end
 
@@ -226,6 +223,5 @@ module Searchable
       end
       options
     end
-
   end
 end

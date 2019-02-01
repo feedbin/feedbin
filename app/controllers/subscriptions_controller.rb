@@ -1,5 +1,4 @@
 class SubscriptionsController < ApplicationController
-
   # GET subscriptions.xml
   def index
     @user = current_user
@@ -10,9 +9,9 @@ class SubscriptionsController < ApplicationController
       @feeds = []
       @tags = Tag.where(id: params[:tag])
     end
-    @titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) do |(feed_id, title), hash|
+    @titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) { |(feed_id, title), hash|
       hash[feed_id] = title
-    end
+    }
     respond_to do |format|
       format.xml do
         send_data(render_to_string, type: "text/xml", filename: "subscriptions.xml")
@@ -63,7 +62,7 @@ class SubscriptionsController < ApplicationController
     else
       flash[:alert] = "Update failed."
     end
-    flash.discard()
+    flash.discard
   end
 
   private

@@ -5,31 +5,27 @@ module Api
       before_action :valid_user, if: :signed_in?
 
       def entries_response(path_helper)
-        if params.has_key?(:read)
+        if params.key?(:read)
           @entries = @entries.include_unread_entries(@user.id)
 
-          if "true" == params[:read]
+          if params[:read] == "true"
             @entries = @entries.read_new
-          elsif "false" == params[:read]
+          elsif params[:read] == "false"
             @entries = @entries.unread_new
           end
         end
 
-        if params.has_key?(:starred) && "false" == params[:starred]
+        if params.key?(:starred) && params[:starred] == "false"
           @entries = @entries.include_starred_entries(@user.id)
           @entries = @entries.unstarred_new
         end
 
-        if params.has_key?(:since)
+        if params.key?(:since)
           time = Time.iso8601(params[:since])
           @entries = @entries.where("entries.created_at > :time", {time: time})
         end
 
-        if @starred_entries
-          page_query = @starred_entries
-        else
-          page_query = @entries
-        end
+        page_query = @starred_entries || @entries
 
         if page_query.out_of_bounds?
           status_not_found
@@ -43,7 +39,7 @@ module Api
 
       rescue_from ArgumentError do |exception|
         @error = {status: 400, message: "Bad Request", errors: []}
-        if "invalid date" == exception.message
+        if exception.message == "invalid date"
           @error[:errors] << {since: "invalid date format"}
         end
         render partial: "api/v2/shared/api_error", status: 400
@@ -91,11 +87,11 @@ module Api
       end
 
       def needs_nested(parameters, *keys)
-        missing = keys.reject { |key| parameters.has_key? key }
+        missing = keys.reject { |key| parameters.key? key }
         if missing.present?
           @error = {status: 400, errors: []}
           missing.map { |key| @error[:errors] << {key => "Missing parameter: #{key}"} }
-          render partial: "api/v2/shared/api_error", status: 400 and return
+          render(partial: "api/v2/shared/api_error", status: 400) && return
         end
       end
 

@@ -31,7 +31,7 @@ class DiffbotParser
   end
 
   def date_published
-    result["estimatedDate"] if result["estimatedDate"]
+    result["estimatedDate"]
   end
 
   def domain
@@ -62,10 +62,10 @@ class DiffbotParser
     uri = URI.parse(BASE_URL)
     uri.query = query.to_query
     response = HTTP.timeout(:global, write: 10, connect: 10, read: 10)
-    if body
-      response = response.headers(content_type: "text/html; charset=utf-8").post(uri, body: body)
+    response = if body
+      response.headers(content_type: "text/html; charset=utf-8").post(uri, body: body)
     else
-      response = response.get(uri)
+      response.get(uri)
     end
     response.parse["objects"].first
   end

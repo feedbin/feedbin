@@ -53,7 +53,5 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
-  config.action_mailer.default_url_options = { host: ENV.fetch("DEFAULT_URL_OPTIONS_HOST", "feedbin.dev") }
-
-
+  config.action_mailer.default_url_options = {host: ENV.fetch("DEFAULT_URL_OPTIONS_HOST", "feedbin.dev")}
 end

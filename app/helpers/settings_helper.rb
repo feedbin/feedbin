@@ -14,9 +14,9 @@ module SettingsHelper
   end
 
   def tag_options
-    tags = @user.feed_tags.map do |tag|
+    tags = @user.feed_tags.map { |tag|
       [tag.name, tag.name]
-    end
+    }
     tags.unshift ["None", ""]
   end
 end

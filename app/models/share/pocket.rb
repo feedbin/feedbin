@@ -66,9 +66,9 @@ class Share::Pocket < Share::Service
       body: {
         url: params["entry_url"],
         access_token: @access_token,
-        consumer_key: ENV["POCKET_CONSUMER_KEY"]
+        consumer_key: ENV["POCKET_CONSUMER_KEY"],
       }.to_json,
-      timeout: 10
+      timeout: 10,
     }
     response = self.class.post(PATHS[:add], options)
     response.code

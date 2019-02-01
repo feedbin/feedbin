@@ -23,14 +23,14 @@ class UpdateDefaultColumn
   end
 
   def schedule
-    jobs = job_args(@klass.last.id, @klass.first.id).map do |arg|
+    jobs = job_args(@klass.last.id, @klass.first.id).map { |arg|
       [{
         "batch" => arg.first,
         "klass" => @klass.to_s,
         "column" => @column,
         "default" => @default,
       }]
-    end
+    }
     Sidekiq::Client.push_bulk(
       "args" => jobs,
       "class" => self.class.name,

@@ -13,7 +13,7 @@ class BatchSchedulerTest < ActiveSupport::TestCase
     count = (StarredEntry.last.id.to_f / BatchJobs::BATCH_SIZE.to_f).ceil
 
     assert_difference "Sidekiq::Queues['worker_slow'].size", +count do
-      BatchScheduler.new().perform("StarredEntry", worker)
+      BatchScheduler.new.perform("StarredEntry", worker)
     end
     assert_equal worker, Sidekiq::Queues["worker_slow"].first["class"]
   end

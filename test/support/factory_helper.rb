@@ -2,7 +2,7 @@ module FactoryHelper
   def create_feeds(users, count = 3)
     flush_redis
     users = [*users]
-    feeds = count.times.map do
+    feeds = count.times.map {
       url = Faker::Internet.url
       host = URI(url).host
       Feed.create(feed_url: url, host: host, title: Faker::Lorem.sentence).tap do |feed|
@@ -10,9 +10,9 @@ module FactoryHelper
           user.subscriptions.where(feed: feed).first_or_create
         end
         entry = create_entry(feed)
-        SearchIndexStore.new().perform("Entry", entry.id)
+        SearchIndexStore.new.perform("Entry", entry.id)
       end
-    end
+    }
     Entry.__elasticsearch__.refresh_index!
     feeds
   end

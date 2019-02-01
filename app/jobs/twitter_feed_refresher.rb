@@ -28,14 +28,14 @@ class TwitterFeedRefresher
   end
 
   def load_keys(feed, user = nil)
-    if user
-      user_ids = [user.id]
+    user_ids = if user
+      [user.id]
     else
-      user_ids = feed.subscriptions.where(active: true, muted: false).pluck(:user_id)
+      feed.subscriptions.where(active: true, muted: false).pluck(:user_id)
     end
 
     users = User.where(id: user_ids)
-    users.map do |user|
+    users.map { |user|
       user_matches = true
       if feed.twitter_home?
         url = Feedkit::TwitterURLRecognizer.new(feed.feed_url, nil)
@@ -47,6 +47,6 @@ class TwitterFeedRefresher
           twitter_access_secret: user.twitter_access_secret,
         }
       end
-    end.compact
+    }.compact
   end
 end

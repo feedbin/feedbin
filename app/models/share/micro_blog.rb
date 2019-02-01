@@ -25,10 +25,10 @@ class Share::MicroBlog < Share::Service
 
     response = self.class.post("/micropub", body: body, headers: headers, timeout: 10)
 
-    if response.code == 202
-      code = 200
+    code = if response.code == 202
+      200
     else
-      code = 500
+      500
     end
 
     code

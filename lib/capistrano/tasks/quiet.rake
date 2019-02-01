@@ -1,12 +1,10 @@
 namespace :deploy do
-  desc 'Pause Sidekiq'
+  desc "Pause Sidekiq"
   task :quiet do
     on roles :app do
-      begin
-        execute :sudo, :pkill, "--signal USR1 -f '^sidekiq'"
-      rescue SSHKit::Command::Failed
-        puts "No workers running"
-      end
+      execute :sudo, :pkill, "--signal USR1 -f '^sidekiq'"
+    rescue SSHKit::Command::Failed
+      puts "No workers running"
     end
   end
 end

@@ -15,7 +15,7 @@ module Api
           respond_to do |format|
             format.json do
               @subscriptions = @user.subscriptions.includes(:feed).order("subscriptions.created_at DESC")
-              if params.has_key?(:since)
+              if params.key?(:since)
                 time = Time.iso8601(params[:since])
                 @subscriptions = @subscriptions.where("subscriptions.created_at > :time", {time: time})
               end

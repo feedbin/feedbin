@@ -6,12 +6,12 @@ class Source::MetaLinks < Source
   end
 
   def find_links
-    @feed_options = document.search("link[rel='alternate']").each_with_object([]) do |link, array|
+    @feed_options = document.search("link[rel='alternate']").each_with_object([]) { |link, array|
       if link_valid?(link)
         option = FeedOption.new(@config[:request].last_effective_url, link["href"], link["title"], "page_links")
         array.push(option)
       end
-    end
+    }
     @feed_options = @feed_options.uniq { |option| option.title }
     @feed_options = @feed_options.uniq { |option| option.href }
     create_feeds!

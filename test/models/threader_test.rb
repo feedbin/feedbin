@@ -33,7 +33,7 @@ class ThreaderTest < ActiveSupport::TestCase
   end
 
   def threaded_entry(reply_to = nil)
-    thread_id = Random.new().rand(10000)
+    thread_id = Random.new.rand(10000)
     data = {
       "tweet" => {
         "id" => thread_id,

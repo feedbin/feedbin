@@ -15,18 +15,18 @@ class FeedImporterTest < ActiveSupport::TestCase
 
   test "should create subscription" do
     assert_difference "Subscription.count", +1 do
-      FeedImporter.new().perform(@import_item.id)
+      FeedImporter.new.perform(@import_item.id)
     end
   end
 
   test "should tag subscription" do
     assert_difference "Tag.count", +1 do
-      FeedImporter.new().perform(@import_item.id)
+      FeedImporter.new.perform(@import_item.id)
     end
   end
 
   test "should title subscription" do
-    FeedImporter.new().perform(@import_item.id)
+    FeedImporter.new.perform(@import_item.id)
     feed = Feed.where(feed_url: @import_item.details[:xml_url]).take!
     subscription = @user.subscriptions.where(feed: feed).take!
     assert_equal(@import_item.details[:title], subscription.title)

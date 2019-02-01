@@ -15,7 +15,7 @@ def gen_redis_proto(*cmd)
 end
 
 opts = {}
-OptionParser.new do |options|
+OptionParser.new { |options|
   banner = <<-EOD
     Usage: redis_protocol.rb [options] [files]\n
     Generate redis protocol from the output of:\n
@@ -32,10 +32,10 @@ OptionParser.new do |options|
   end
 
   options.on_tail("-h", "--help") do
-    $stderr.puts options
+    warn options
     exit 1
   end
-end.parse!
+}.parse!
 
 while input = ARGF.gets
   input.each_line do |line|
@@ -51,7 +51,7 @@ while input = ARGF.gets
         $stdout.write(gen_redis_proto("ZADD", "feed:#{feed_id}:entry_ids:created_at", created_at, entry_id))
         $stdout.write(gen_redis_proto("ZADD", "feed:#{feed_id}:entry_ids:published", published, entry_id))
       else
-        $stderr.puts "--data needs to be specified"
+        warn "--data needs to be specified"
         exit 1
       end
     rescue Errno::EPIPE

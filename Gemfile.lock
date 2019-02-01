@@ -113,6 +113,7 @@ GEM
       connection_pool (~> 2.0)
       net-http2 (>= 0.18, < 2)
     arel (8.0.0)
+    ast (2.4.0)
     autoprefixer-rails (9.4.3)
       execjs
     bcrypt (3.1.12)
@@ -259,6 +260,7 @@ GEM
       concurrent-ruby (~> 1.0)
     idn-ruby (0.1.0)
     ipaddress (0.8.3)
+    jaro_winkler (1.5.2)
     jbuilder (2.8.0)
       activesupport (>= 4.2.0)
       multi_json (>= 1.2)
@@ -326,7 +328,11 @@ GEM
     nokogumbo (1.4.9)
       nokogiri
     oauth (0.5.4)
+    parallel (1.13.0)
+    parser (2.6.0.0)
+      ast (~> 2.4.0)
     pg (0.21.0)
+    powerpack (0.1.2)
     premailer (1.11.1)
       addressable
       css_parser (>= 1.6.0)
@@ -372,6 +378,7 @@ GEM
       method_source
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
+    rainbow (3.0.0)
     raindrops (0.19.0)
     rake (12.3.2)
     rb-fsevent (0.10.3)
@@ -392,9 +399,17 @@ GEM
     reverse_markdown (1.1.0)
       nokogiri
     rmagick (2.16.0)
+    rubocop (0.63.1)
+      jaro_winkler (~> 1.5.1)
+      parallel (~> 1.10)
+      parser (>= 2.5, != 2.5.1.1)
+      powerpack (~> 0.1)
+      rainbow (>= 2.2.2, < 4.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (~> 1.4.0)
+    ruby-progressbar (1.10.0)
     ruby_dep (1.5.0)
     rubyzip (1.1.0)
-    rufo (0.4.1)
     safe_yaml (1.0.4)
     sanitize (4.6.6)
       crass (~> 1.0.2)
@@ -434,6 +449,8 @@ GEM
     sshkit (1.18.0)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
+    standard (0.0.25)
+      rubocop (>= 0.63)
     stripe (4.5.0)
       faraday (~> 0.13)
       net-http-persistent (~> 3.0)
@@ -471,6 +488,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.5)
+    unicode-display_width (1.4.1)
     unicode-emoji (1.1.0)
     unicorn (5.4.1)
       kgio (~> 2.6)
@@ -557,12 +575,12 @@ DEPENDENCIES
   reverse_markdown
   rmagick
   rubyzip (= 1.1.0)
-  rufo
   sanitize
   sassc-rails
   selenium-webdriver
   sidekiq
   silencer
+  standard
   stripe
   stripe-ruby-mock (= 2.5.0)
   stripe_event

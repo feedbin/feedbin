@@ -12,7 +12,7 @@ class CancelBillingTest < ActiveSupport::TestCase
       plan: plan,
     )
 
-    CancelBilling.new().perform(user.customer_id)
+    CancelBilling.new.perform(user.customer_id)
 
     customer = Stripe::Customer.retrieve(user.customer_id)
     assert customer.deleted

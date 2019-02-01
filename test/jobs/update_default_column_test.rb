@@ -15,7 +15,7 @@ class UpdateDefaultColumnTest < ActiveSupport::TestCase
   end
 
   test "should enqueue jobs" do
-    UpdateDefaultColumn.new().perform(@args)
+    UpdateDefaultColumn.new.perform(@args)
     assert_equal([["schedule", true]], (@args.to_a - UpdateDefaultColumn.jobs.first["args"].first.to_a))
   end
 

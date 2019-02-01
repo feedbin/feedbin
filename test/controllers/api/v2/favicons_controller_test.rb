@@ -4,9 +4,9 @@ class Api::V2::FaviconsControllerTest < ApiControllerTestCase
   setup do
     @user = users(:new)
     @feeds = create_feeds(@user)
-    @favicons = @feeds.map do |feed|
+    @favicons = @feeds.map { |feed|
       Favicon.create!(host: feed.host, url: feed.host)
-    end
+    }
   end
 
   test "should get index" do

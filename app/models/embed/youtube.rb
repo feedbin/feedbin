@@ -1,10 +1,10 @@
 class Embed::Youtube < IframeEmbed
   def self.supported_urls
     [
-      %r(.*?//www\.youtube\.com/embed/(.*?)(\?|$)),
-      %r(.*?//www\.youtube-nocookie\.com/embed/(.*?)(\?|$)),
-      %r(.*?//youtube\.com/embed/(.*?)(\?|$)),
-      %r(.*?//youtube-nocookie\.com/embed/(.*?)(\?|$)),
+      %r{.*?//www\.youtube\.com/embed/(.*?)(\?|$)},
+      %r{.*?//www\.youtube-nocookie\.com/embed/(.*?)(\?|$)},
+      %r{.*?//youtube\.com/embed/(.*?)(\?|$)},
+      %r{.*?//youtube-nocookie\.com/embed/(.*?)(\?|$)},
     ]
   end
 
@@ -14,9 +14,9 @@ class Embed::Youtube < IframeEmbed
 
   def image_url
     url = data["thumbnail_url"].sub "hqdefault", "maxresdefault"
-    status = Rails.cache.fetch("youtube_thumb_status:#{url}") do
+    status = Rails.cache.fetch("youtube_thumb_status:#{url}") {
       HTTP.head(url).status
-    end
+    }
     if status == 200
       url
     else

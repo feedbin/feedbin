@@ -1,5 +1,5 @@
 namespace :deploy do
-  desc 'Restart services'
+  desc "Restart services"
   task :restart do
     on roles :app do
       begin
@@ -31,7 +31,6 @@ namespace :deploy do
       rescue SSHKit::Command::Failed
         execute :sudo, :start, :workers_low
       end
-
     end
   end
 end

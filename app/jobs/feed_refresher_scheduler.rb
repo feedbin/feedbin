@@ -55,7 +55,7 @@ class FeedRefresherScheduler
   end
 
   def queue_empty?(queue)
-    @queues ||= Sidekiq::Stats.new().queues
+    @queues ||= Sidekiq::Stats.new.queues
     @queues[queue].blank? || @queues[queue] == 0
   end
 end

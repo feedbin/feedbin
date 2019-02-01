@@ -3,7 +3,7 @@ require "test_helper"
 class ApplePushNotificationsControllerTest < ActionController::TestCase
   def setup
     @user = users(:ben)
-    @token = ActionsController.new().send(:authentication_token, @user)
+    @token = ActionsController.new.send(:authentication_token, @user)
     ENV["APPLE_PUSH_CERT"] = create_cert("/tmp/p12.p12")
   end
 
@@ -49,11 +49,11 @@ class ApplePushNotificationsControllerTest < ActionController::TestCase
 
   def create_cert(path)
     rsa_key = OpenSSL::PKey::RSA.new(2048)
-    cert = OpenSSL::X509::Certificate.new()
-    cert.not_before = Time.new()
+    cert = OpenSSL::X509::Certificate.new
+    cert.not_before = Time.new
     cert.not_after = cert.not_before + 10_000
     cert.public_key = rsa_key.public_key
-    cert.sign rsa_key, OpenSSL::Digest::SHA1.new()
+    cert.sign rsa_key, OpenSSL::Digest::SHA1.new
     p12 = OpenSSL::PKCS12.create(nil, nil, rsa_key, cert)
     File.open(path, "wb") { |file| file.write p12.to_der }
     path

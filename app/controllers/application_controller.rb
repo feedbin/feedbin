@@ -66,7 +66,7 @@ class ApplicationController < ActionController::Base
       parent_data: {behavior: "starred", feed_id: "collection_starred", count_type: "starred"},
       data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "starred", message: "Mark starred items as read?"}.to_json},
     }
-    if !user.setting_on?(:hide_recently_read)
+    unless user.setting_on?(:hide_recently_read)
       collections << {
         title: "Recently Read",
         path: recently_read_entries_path,
@@ -78,7 +78,7 @@ class ApplicationController < ActionController::Base
         data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "recently_read", message: "Mark recently read items as read?"}.to_json},
       }
     end
-    if !user.setting_on?(:hide_updated)
+    unless user.setting_on?(:hide_updated)
       collections << {
         title: "Updated",
         path: updated_entries_path,
@@ -90,7 +90,7 @@ class ApplicationController < ActionController::Base
         data: {behavior: "selectable show_entries open_item feed_link", special_collection: "updated", mark_read: {type: "updated", message: "Mark updated items as read?"}.to_json},
       }
     end
-    if !user.setting_on?(:hide_recently_played)
+    unless user.setting_on?(:hide_recently_played)
       collections << {
         title: "Recently Played",
         path: recently_played_entries_path,
@@ -157,11 +157,11 @@ class ApplicationController < ActionController::Base
   end
 
   def feeds_response
-    if "view_all" == @user.get_view_mode
+    if @user.get_view_mode == "view_all"
       entry_id_cache = EntryIdCache.new(@user.id, @feed_ids)
       @entries = entry_id_cache.page(params[:page])
       @page_query = @entries
-    elsif "view_starred" == @user.get_view_mode
+    elsif @user.get_view_mode == "view_starred"
       starred_entries = @user.starred_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).order("published DESC")
       @entries = Entry.entries_with_feed(starred_entries, "DESC").entries_list
       @page_query = starred_entries
@@ -178,7 +178,7 @@ class ApplicationController < ActionController::Base
   end
 
   def verify_push_token(authentication_token)
-    authentication_token = CGI::unescape(authentication_token)
+    authentication_token = CGI.unescape(authentication_token)
     verifier = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)
     verifier.verify(authentication_token)
   end

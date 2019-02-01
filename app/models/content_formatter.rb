@@ -142,11 +142,11 @@ class ContentFormatter
     text = text.search("//text()").map(&:text).join(" ").squish
 
     TRAILING_CHARS.each do |char|
-      text = text.gsub(" #{char}", "#{char}")
+      text = text.gsub(" #{char}", char.to_s)
     end
 
     LEADING_CHARS.each do |char|
-      text = text.gsub("#{char} ", "#{char}")
+      text = text.gsub("#{char} ", char.to_s)
     end
 
     if length

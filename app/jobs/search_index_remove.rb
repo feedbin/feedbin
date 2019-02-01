@@ -2,9 +2,9 @@ class SearchIndexRemove
   include Sidekiq::Worker
 
   def perform(ids)
-    data = ids.map do |id|
+    data = ids.map { |id|
       {delete: {_id: id}}
-    end
+    }
     $search.each do |_, client|
       client.bulk(
         index: Entry.index_name,

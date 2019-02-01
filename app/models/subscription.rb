@@ -17,34 +17,34 @@ class Subscription < ApplicationRecord
   after_create :refresh_favicon
 
   def self.create_multiple(feeds, user, valid_feed_ids)
-    @subscriptions = feeds.each_with_object([]) do |(feed_id, subscription), array|
+    @subscriptions = feeds.each_with_object([]) { |(feed_id, subscription), array|
       feed = Feed.find(feed_id)
       if valid_feed_ids.include?(feed.id) && subscription["subscribe"] == "1"
         record = user.subscriptions.find_or_create_by(feed: feed)
         record.update(title: subscription["title"].strip, media_only: subscription["media_only"])
         array.push(record)
       end
-    end
+    }
   end
 
   def title
-    self[:title] || self.feed.title
+    self[:title] || feed.title
   end
 
   def mark_as_unread
-    base = Entry.select(:id, :feed_id, :published, :created_at).where(feed_id: self.feed_id).order("published DESC")
+    base = Entry.select(:id, :feed_id, :published, :created_at).where(feed_id: feed_id).order("published DESC")
     entries = base.where("published > ?", Time.now.ago(2.weeks)).limit(10)
     if entries.length == 0
       entries = base.limit(3)
     end
-    unread_entries = entries.map do |entry|
-      UnreadEntry.new_from_owners(self.user, entry)
-    end
+    unread_entries = entries.map { |entry|
+      UnreadEntry.new_from_owners(user, entry)
+    }
     UnreadEntry.import(unread_entries, validate: false)
   end
 
   def mark_as_read
-    UnreadEntry.where(user_id: self.user_id, feed_id: self.feed_id).delete_all
+    UnreadEntry.where(user_id: user_id, feed_id: feed_id).delete_all
   end
 
   def add_feed_to_action
@@ -52,19 +52,19 @@ class Subscription < ApplicationRecord
   end
 
   def remove_feed_from_action
-    RemoveFeedFromAction.perform_async(self.user_id, self.feed_id)
+    RemoveFeedFromAction.perform_async(user_id, feed_id)
   end
 
   def expire_stat_cache
-    Rails.cache.delete("#{self.user_id}:entry_counts")
+    Rails.cache.delete("#{user_id}:entry_counts")
   end
 
   def untag
-    self.feed.tag("", self.user)
+    feed.tag("", user)
   end
 
   def muted_status
-    if self.muted
+    if muted
       "muted"
     end
   end
@@ -72,6 +72,6 @@ class Subscription < ApplicationRecord
   private
 
   def refresh_favicon
-    FaviconFetcher.perform_async(self.feed.host)
+    FaviconFetcher.perform_async(feed.host)
   end
 end
