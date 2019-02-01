@@ -124,10 +124,12 @@ class Action < ApplicationRecord
   end
 
   def error_hint
-    if valid?
-      ""
-    else
-      "Invalid Action: #{errors.full_messages.to_sentence(words_connector: ".")}"
+    @error_hint ||= begin
+      if valid?
+        ""
+      else
+        "Invalid Action: #{errors.full_messages.to_sentence(words_connector: ".")}"
+      end
     end
   end
 
