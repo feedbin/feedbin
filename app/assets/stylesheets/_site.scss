@@ -578,6 +578,8 @@ table {
                 text-decoration: none;
                 @include settings-row;
                 color: map-get($color-contrast-700, day);
+                z-index: 10;
+                position: relative;
                 @media (max-width: $small-breakpoint) {
                     padding-right: 20px;
                 }
@@ -597,11 +599,11 @@ table {
                 }
             }
         }
-        .status-indicator {
+        .status-flag {
             display: none;
         }
         &.error  {
-            .status-indicator {
+            .status-flag {
                 display: block;
             }
         }
@@ -1961,7 +1963,6 @@ $saved-search-control-height: 48px;
     }
     &.selected {
         .wrap {
-            @include border-top($color-selected-off);
             @include background-color($color-selected-off);
         }
         .entries-inner-wrap {
@@ -2000,7 +2001,6 @@ $saved-search-control-height: 48px;
         }
         .wrap {
             @include border-color($color-selected);
-            @include border-top($color-selected);
             @include background($color-selected);
         }
     }
@@ -6275,8 +6275,14 @@ a:hover.danger {
 }
 
 .status-indicator {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.status-flag {
     width: 38px;
-    height: 21px;
+    height: 20px;
     position: absolute;
     overflow: hidden;
     display: none;

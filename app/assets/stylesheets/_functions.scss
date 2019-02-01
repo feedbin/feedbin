@@ -65,9 +65,9 @@
 }
 
 @mixin settings-row {
-    padding: 17px 15px;
+    padding: 15px;
     @include respond-to(screen-sm) {
-        padding: 17px 30px;
+        padding: 15px 30px;
     }
     .modal & {
         @include padding(14px, 24px, 14px, 24px, 14px, 16px, 14px, 16px);

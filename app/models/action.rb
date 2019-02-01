@@ -20,6 +20,14 @@ class Action < ApplicationRecord
   after_commit :percolate_create, on: [:create, :update]
   after_commit :bulk_actions, on: [:create, :update]
 
+  before_save :record_status
+
+  def record_status
+    if self.automatic_modification.blank?
+      self.status = Action.statuses[:active]
+    end
+  end
+
   def percolate_create
     PercolateCreate.perform_async(self.id)
   end

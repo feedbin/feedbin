@@ -23,8 +23,8 @@
         <% if @actions.any? %>
             <ul class="pill-list">
                 <% @actions.each do |action| %>
-                    <li class="linked">
-                        <i class="status-indicator icon-error"></i>
+                    <li class="linked <%= action.broken? ? "error" : "" %>">
+                        <i class="status-flag icon-error"></i>
                         <%= link_to(edit_action_path(action)) do %>
                             <%= render(partial: 'actions/text_description', locals: {action: action}) %>
                         <% end %>
