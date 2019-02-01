@@ -11,7 +11,7 @@
                                         <%= f.text_field :title, class: 'subscription-title' %>
                                         <%= subscription_presenter.favicon(subscription.feed) %>
                                     </div>
-                                    <%= unsubscribe %>
+                                    <%= link_to "Unsubscribe", settings_subscription_path(@subscription), method: :delete, class: "button button-secondary settings-unsubscribe" , data: { confirm: "Are you sure you want to unsubscribe?" } %>
                                 </div>
                                 <% if !subscription.feed.twitter_feed? %>
                                     <p class="subhead">
