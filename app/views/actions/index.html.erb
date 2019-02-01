@@ -23,9 +23,9 @@
         <% if @actions.any? %>
             <ul class="pill-list">
                 <% @actions.each do |action| %>
-                    <li class="linked <%= action.error_hint.present? ? "error" : "" %>">
-                        <i class="status-indicator icon-error" title="<%= action.error_hint %>"></i>
-                        <%= link_to(edit_action_path(action), title: action.error_hint) do %>
+                    <li class="linked">
+                        <i class="status-indicator icon-error"></i>
+                        <%= link_to(edit_action_path(action)) do %>
                             <%= render(partial: 'actions/text_description', locals: {action: action}) %>
                         <% end %>
                     </li>
