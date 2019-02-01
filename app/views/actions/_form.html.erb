@@ -13,7 +13,7 @@
                 <%= f.search_field :query, placeholder: "Search" %>
             </li>
         </ul>
-        <% if @user.taggings.any? %>
+        <% if @user.taggings.present? %>
             <div class="inset-content por">
                 <h4 class="group-header">Article is in Tag</h4>
             </div>

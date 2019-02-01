@@ -14,7 +14,7 @@
             <% end %>
         </h3>
         <%= form_for @user, html: { class: 'combined-form', data: { behavior: 'credit_card_form' }, novalidate: true } do |f| %>
-            <% if @user.errors.any? %>
+            <% if @user.errors.present? %>
                 <div class="alert alert-error">
                     <%= @user.errors.full_messages.join('. ') %>.
                 </div>

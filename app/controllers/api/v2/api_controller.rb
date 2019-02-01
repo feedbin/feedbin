@@ -92,7 +92,7 @@ module Api
 
       def needs_nested(parameters, *keys)
         missing = keys.reject { |key| parameters.has_key? key }
-        if missing.any?
+        if missing.present?
           @error = {status: 400, errors: []}
           missing.map { |key| @error[:errors] << {key => "Missing parameter: #{key}"} }
           render partial: "api/v2/shared/api_error", status: 400 and return
@@ -120,7 +120,7 @@ module Api
             links << link_template % [send(url_helper, resource, options.merge(page: collection.total_pages)), "last"]
           end
         end
-        if links.any?
+        if links.present?
           headers["Links"] = links.join(", ")
         end
       end

@@ -12,7 +12,7 @@ module ActionsHelper
 
     output << feed_names.shift(2).join(", ")
 
-    if feed_names.any?
+    if feed_names.present?
       output << "and #{feed_names.length} more feeds"
     end
 
@@ -30,7 +30,7 @@ module ActionsHelper
         actions << action_label(action_name)
       end
     end
-    if actions.any?
+    if actions.present?
       actions.join(" and ")
     else
       "do nothing"

@@ -19,7 +19,7 @@ module Api
                 time = Time.iso8601(params[:since])
                 @subscriptions = @subscriptions.where("subscriptions.created_at > :time", {time: time})
               end
-              if @subscriptions.any?
+              if @subscriptions.present?
                 fresh_when(etag: @subscriptions, last_modified: @subscriptions.maximum(:updated_at))
               else
                 @subscriptions = []

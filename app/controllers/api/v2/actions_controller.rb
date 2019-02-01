@@ -39,7 +39,7 @@ module Api
           query[:query] = @action.query
         end
 
-        if @action.computed_feed_ids.any?
+        if @action.computed_feed_ids.present?
           query[:feed_ids] = @action.computed_feed_ids
           if params[:read].present?
             query[:read] = (params[:read] == "true") ? true : false
@@ -58,7 +58,7 @@ module Api
           if action.query.present?
             query[:query] = @action.query
           end
-          if action.computed_feed_ids.any?
+          if action.computed_feed_ids.present?
             query[:feed_ids] = action.computed_feed_ids
             query[:read] = false
             @entries = Entry.scoped_search(query, @user).limit(10).includes(:feed)

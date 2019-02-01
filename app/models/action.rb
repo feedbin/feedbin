@@ -124,7 +124,7 @@ class Action < ApplicationRecord
       body: search_options,
     )
 
-    while response["hits"]["hits"].any?
+    while response["hits"]["hits"].present?
       yield response
       response = Entry.__elasticsearch__.client.scroll({scroll_id: response["_scroll_id"], scroll: scroll})
     end

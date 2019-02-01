@@ -4,7 +4,7 @@ class FeedRefresherReceiver
 
   def perform(params)
     feed = Feed.find(params["feed"]["id"])
-    if params["entries"].any?
+    if params["entries"].present?
       params["entries"].each do |entry|
         update = entry.delete("update")
         begin

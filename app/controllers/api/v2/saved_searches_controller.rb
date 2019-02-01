@@ -9,7 +9,7 @@ module Api
       def index
         @user = current_user
         @saved_searches = @user.saved_searches.order(Arel.sql("lower(name)"))
-        if @saved_searches.any?
+        if @saved_searches.present?
           fresh_when(etag: @saved_searches, last_modified: @saved_searches.maximum(:updated_at))
         else
           @saved_searches = []

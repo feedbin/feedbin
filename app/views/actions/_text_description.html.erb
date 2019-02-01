@@ -10,10 +10,10 @@
     <% end %>
     <% if action.all_feeds %>
         in <strong>any</strong> feed
-    <% elsif feed_ids.any? %>
+    <% elsif feed_ids.present? %>
         in the feed<%= feed_ids.length > 1 ? 's' : '' %> <strong><%= action_feed_names(action) %></strong>
     <% end %>
-    <% if tag_ids.any? %>
+    <% if tag_ids.present? %>
         in the <%= 'tag'.pluralize(tag_ids.length) %> <strong><%= action_tag_names(action) %></strong>
     <% end %>
     then <%= action_names(action) %>.
