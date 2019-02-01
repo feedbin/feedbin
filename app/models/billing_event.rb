@@ -41,46 +41,42 @@ class BillingEvent < ApplicationRecord
   end
 
   def charge_succeeded?
-    "charge.succeeded" == event_type
+    event_type == "charge.succeeded"
   end
 
   def charge_failed?
-    "invoice.payment_failed" == event_type
+    event_type == "invoice.payment_failed"
   end
 
   def subscription_deactivated?
-    "customer.subscription.updated" == event_type &&
-    event_object["status"] == "unpaid"
+    event_type == "customer.subscription.updated" &&
+      event_object["status"] == "unpaid"
   end
 
   def subscription_reactivated?
-    "customer.subscription.updated" == event_type &&
-    event_object["status"] == "active" &&
-    info.dig("data", "previous_attributes", "status") == "unpaid"
+    event_type == "customer.subscription.updated" &&
+      event_object["status"] == "active" &&
+      info.dig("data", "previous_attributes", "status") == "unpaid"
   end
 
   def invoice
     if event_type == "charge.succeeded"
-      Rails.cache.fetch("#{event_object["invoice"]}") do
+      Rails.cache.fetch(event_object["invoice"].to_s) do
         JSON.parse(Stripe::Invoice.retrieve(event_object["invoice"]).to_json)
       end
-    else
-      nil
     end
   end
 
   def invoice_items
-    if self.event_type == "charge.succeeded"
+    if event_type == "charge.succeeded"
       Rails.cache.fetch("#{event_object["invoice"]}:lines") do
         JSON.parse(Stripe::Invoice.retrieve(event_object["invoice"]).lines.all(limit: 10).to_json)
       end
-    else
-      nil
     end
   end
 
   def details
-    @details ||= Stripe::StripeObject.construct_from(self.info)
+    @details ||= Stripe::StripeObject.construct_from(info)
   end
 
   def event_object

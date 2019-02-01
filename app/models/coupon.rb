@@ -6,6 +6,6 @@ class Coupon < ApplicationRecord
   def generate_coupon
     begin
       self.coupon_code = SecureRandom.urlsafe_base64
-    end while Coupon.exists?(coupon_code: self.coupon_code)
+    end while Coupon.exists?(coupon_code: coupon_code)
   end
 end

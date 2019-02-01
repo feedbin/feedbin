@@ -22,7 +22,7 @@ class ImportWorkerTest < ActiveSupport::TestCase
     end
     assert_difference "ImportItem.count", +1 do
       Import.stub :find, import do
-        ImportWorker.new().perform(1)
+        ImportWorker.new.perform(1)
       end
     end
   end

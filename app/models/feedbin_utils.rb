@@ -3,7 +3,7 @@ class FeedbinUtils
   FEED_ENTRIES_CREATED_AT_KEY = "feed:%d:entry_ids:created_at"
 
   def self.update_public_id_cache(public_id, content, public_id_alt = nil)
-    content_length = (content.present?) ? content.length : 1
+    content_length = content.present? ? content.length : 1
     $redis[:id_cache].with do |redis|
       redis.set(public_id, content_length)
     end
@@ -57,5 +57,4 @@ class FeedbinUtils
       query
     end
   end
-
 end

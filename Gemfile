@@ -18,7 +18,6 @@ group :development do
   gem "silencer"
   gem "benchmark-ips"
   gem "listen"
-  gem "rufo"
   gem "htmlbeautifier"
 end
 
@@ -34,6 +33,7 @@ group :development, :test do
   gem "capybara", "~> 2.13"
   gem "selenium-webdriver"
   gem "minitest-stub_any_instance"
+  gem "standard"
 end
 
 gem "pg", "< 1.0"

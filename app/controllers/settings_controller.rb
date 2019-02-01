@@ -44,11 +44,11 @@ class SettingsController < ApplicationController
   end
 
   def payment_details
-    @message = Rails.cache.fetch(FeedbinUtils.payment_details_key(current_user.id)) do
+    @message = Rails.cache.fetch(FeedbinUtils.payment_details_key(current_user.id)) {
       customer = Customer.retrieve(@user.customer_id)
       card = customer.sources.first
       "#{card.brand} ××#{card.last4[-2..-1]}"
-    end
+    }
   rescue
     @message = "Error loading payment info"
   end
@@ -59,9 +59,9 @@ class SettingsController < ApplicationController
     @uploader.success_action_redirect = settings_import_export_url
     @tags = @user.feed_tags
 
-    @download_options = @tags.map do |tag|
+    @download_options = @tags.map { |tag|
       [tag.name, tag.id]
-    end
+    }
 
     @download_options.unshift(["All", "all"])
 
@@ -113,7 +113,7 @@ class SettingsController < ApplicationController
     if @user.save
       respond_to do |format|
         flash[:notice] = "Settings updated."
-        format.js { flash.discard() }
+        format.js { flash.discard }
         format.html do
           if params[:redirect_to]
             redirect_to params[:redirect_to]
@@ -125,7 +125,7 @@ class SettingsController < ApplicationController
     else
       respond_to do |format|
         flash[:alert] = @user.errors.full_messages.join(". ") + "."
-        format.js { flash.discard() }
+        format.js { flash.discard }
         format.html do
           redirect_to settings_url
         end
@@ -161,7 +161,7 @@ class SettingsController < ApplicationController
 
   def font
     @user = current_user
-    if Feedbin::Application.config.fonts.has_value?(params[:font])
+    if Feedbin::Application.config.fonts.value?(params[:font])
       @user.font = params[:font]
       @user.save
     end
@@ -188,10 +188,10 @@ class SettingsController < ApplicationController
 
   def entry_width
     @user = current_user
-    if @user.entry_width.blank?
-      new_width = "fluid"
+    new_width = if @user.entry_width.blank?
+      "fluid"
     else
-      new_width = ""
+      ""
     end
     @user.entry_width = new_width
     @user.save
@@ -215,7 +215,7 @@ class SettingsController < ApplicationController
 
   def audio_panel_size
     user = current_user
-    if %w{minimized maximized}.include?(params[:audio_panel_size])
+    if %w[minimized maximized].include?(params[:audio_panel_size])
       user.update(audio_panel_size: params[:audio_panel_size])
     end
     head :ok
@@ -227,10 +227,10 @@ class SettingsController < ApplicationController
     @user = current_user
 
     current_font_size = @user.font_size.try(:to_i) || 5
-    if direction == "increase"
-      new_font_size = current_font_size + 1
+    new_font_size = if direction == "increase"
+      current_font_size + 1
     else
-      new_font_size = current_font_size - 1
+      current_font_size - 1
     end
 
     if Feedbin::Application.config.font_sizes[new_font_size] && new_font_size >= 0
@@ -247,11 +247,11 @@ class SettingsController < ApplicationController
 
   def user_settings_params
     params.require(:user).permit(:entry_sort, :starred_feed_enabled, :precache_images,
-                                 :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation,
-                                 :apple_push_notification_device_token, :receipt_info, :entries_display,
-                                 :entries_feed, :entries_time, :entries_body, :ui_typeface, :theme,
-                                 :hide_recently_read, :hide_updated, :disable_image_proxy, :entries_image,
-                                 :now_playing_entry, :hide_recently_played, :view_links_in_app, :newsletter_tag)
+      :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation,
+      :apple_push_notification_device_token, :receipt_info, :entries_display,
+      :entries_feed, :entries_time, :entries_body, :ui_typeface, :theme,
+      :hide_recently_read, :hide_updated, :disable_image_proxy, :entries_image,
+      :now_playing_entry, :hide_recently_played, :view_links_in_app, :newsletter_tag)
   end
 
   def user_now_playing_params

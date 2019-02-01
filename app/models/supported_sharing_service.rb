@@ -107,7 +107,7 @@ class SupportedSharingService < ApplicationRecord
   ].freeze
 
   store_accessor :settings, :access_token, :access_secret, :email_name, :email_address,
-                 :kindle_address, :default_option, :api_token
+    :kindle_address, :default_option, :api_token
 
   validates :service_id, presence: true, uniqueness: {scope: :user_id}, inclusion: {in: SERVICES.collect { |s| s[:service_id] }}
   belongs_to :user
@@ -115,12 +115,12 @@ class SupportedSharingService < ApplicationRecord
   def share(params)
     key = "SupportedSharingService:share:#{user_id}:#{service_id}"
 
-    if info[:limit]
-      result = Throttle.throttle!(key, info[:limit], 1.hour) do
+    result = if info[:limit]
+      Throttle.throttle!(key, info[:limit], 1.hour) do
         service.share(params)
       end
     else
-      result = service.share(params)
+      service.share(params)
     end
 
     if result == false
@@ -157,7 +157,7 @@ class SupportedSharingService < ApplicationRecord
   end
 
   def link_options(entry)
-    service_info = SupportedSharingService.info!(self.service_id)
+    service_info = SupportedSharingService.info!(service_id)
     klass = service_info[:klass].constantize.new(self)
     klass.link_options(entry)
   end
@@ -183,7 +183,7 @@ class SupportedSharingService < ApplicationRecord
   end
 
   def active?
-    if info.has_key?(:active)
+    if info.key?(:active)
       info[:active]
     else
       true

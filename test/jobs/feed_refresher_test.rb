@@ -10,7 +10,7 @@ class FeedRefresherTest < ActiveSupport::TestCase
 
   test "should enqueue feed_refresher_fetcher jobs" do
     assert_difference "Sidekiq::Queues['feed_refresher_fetcher'].count", Feed.count do
-      FeedRefresher.new().tap do |job|
+      FeedRefresher.new.tap do |job|
         def job.build_ids(*args)
           Feed.all.map(&:id)
         end

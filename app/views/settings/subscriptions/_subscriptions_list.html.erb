@@ -51,7 +51,7 @@
                     <% present subscription do |subscription_presenter| %>
                         <%= fields_for "subscriptions[]", subscription do |f| %>
                             <li class="feeds-wrap <%= subscription_presenter.mute_class %>">
-                                <i class="status-indicator icon-muted"></i>
+                                <i class="status-flag icon-muted"></i>
                                 <label class="checkbox-wrap">
                                     <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "checkbox feeds-checkbox" %>
                                 </label>

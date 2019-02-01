@@ -25,7 +25,7 @@ class FeedRefresher
     feeds = Feed.xml.where(id: feed_ids, active: true).where("subscriptions_count > ?", count).pluck(*fields)
     feeds.each_with_object([]) do |result, array|
       feed = Hash[fields.zip(result)]
-      if subscriptions.has_key?(feed[:id])
+      if subscriptions.key?(feed[:id])
         array << Arguments.new(feed, url_template, force_refresh).to_a
       end
     end
@@ -85,15 +85,15 @@ class FeedRefresher
     end
 
     def push_callback
-      (push?) ? @push_url % @feed[:id] : nil
+      push? ? @push_url % @feed[:id] : nil
     end
 
     def hub_secret
-      (push?) ? Push::hub_secret(@feed[:id]) : nil
+      push? ? Push.hub_secret(@feed[:id]) : nil
     end
 
     def push_mode
-      (push?) ? "subscribe" : nil
+      push? ? "subscribe" : nil
     end
 
     def push?

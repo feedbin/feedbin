@@ -85,10 +85,10 @@ class EntriesController < ApplicationController
       if @content_view
         url = @entry.fully_qualified_url
         key = FeedbinUtils.page_cache_key(url)
-        @content_info = Rails.cache.fetch(key) do
+        @content_info = Rails.cache.fetch(key) {
           Librato.increment "readability.first_parse"
           MercuryParser.parse(url)
-        end
+        }
         @content = @content_info.content
         Librato.increment "readability.parse"
       else
@@ -106,7 +106,7 @@ class EntriesController < ApplicationController
   end
 
   def view_link
-    @host = URI::parse(params[:url]).host
+    @host = URI.parse(params[:url]).host
     @user = current_user
     @url = params[:url]
   rescue
@@ -117,10 +117,10 @@ class EntriesController < ApplicationController
     @user = current_user
     @url = params[:url]
     key = FeedbinUtils.page_cache_key(@url)
-    @content_info = Rails.cache.fetch(key) do
+    @content_info = Rails.cache.fetch(key) {
       Librato.increment "readability.first_parse"
       MercuryParser.parse(params[:url])
-    end
+    }
 
     begin
       @content = ContentFormatter.format!(@content_info.content, nil)
@@ -167,7 +167,7 @@ class EntriesController < ApplicationController
       updated = @user.updated_entries.pluck(:entry_id)
       unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: updated)
       @user.updated_entries.delete_all
-    elsif %w{unread all}.include?(params[:type])
+    elsif %w[unread all].include?(params[:type])
       unread_entries = UnreadEntry.where(user_id: @user.id)
     elsif params[:type] == "saved_search"
       saved_search = @user.saved_searches.where(id: params[:data]).first
@@ -186,7 +186,7 @@ class EntriesController < ApplicationController
       unread_entries = unread_entries.where("created_at <= :last_unread_date", {last_unread_date: params[:date]})
     end
 
-    unread_entries.delete_all if unread_entries
+    unread_entries&.delete_all
 
     if params[:ids].present?
       ids = params[:ids].split(",").map(&:to_i)
@@ -222,7 +222,7 @@ class EntriesController < ApplicationController
         updated = @user.updated_entries.pluck(:entry_id)
         unread_entries = UnreadEntry.where(user: @user, entry_id: updated).where.not(entry_id: ids)
         @user.updated_entries.where.not(entry_id: ids).delete_all
-      elsif %w{unread all}.include?(params[:type])
+      elsif %w[unread all].include?(params[:type])
         unread_entries = UnreadEntry.where(user: @user).where.not(entry_id: ids)
       elsif params[:type] == "saved_search"
         saved_search = @user.saved_searches.where(id: params[:data]).first
@@ -253,7 +253,7 @@ class EntriesController < ApplicationController
 
   def search
     @user = current_user
-    @escaped_query = params[:query].gsub("\"", "'").html_safe if params[:query]
+    @escaped_query = params[:query].tr("\"", "'").html_safe if params[:query]
 
     @entries = Entry.scoped_search(params, @user)
     @page_query = @entries
@@ -327,10 +327,8 @@ class EntriesController < ApplicationController
 
     services = []
     @user_sharing_services.each do |sharing_service|
-      begin
-        services << sharing_service.link_options(entry)
-      rescue
-      end
+      services << sharing_service.link_options(entry)
+    rescue
     end
     services
   end
@@ -353,7 +351,7 @@ class EntriesController < ApplicationController
 
   def check_for_image(entry, url)
     response = HTTParty.head(url)
-    if response.headers["content-type"] =~ /^image\//
+    if /^image\//.match?(response.headers["content-type"])
       content = "<img src='#{url}' />"
       Librato.increment "readability.image_found"
     else

@@ -14,7 +14,7 @@ module Api
       private
 
       def get_post_frequency(feed_ids)
-        days = (params[:days].present?) ? params[:days].to_i : 6
+        days = params[:days].present? ? params[:days].to_i : 6
         start_date = days.days.ago
         end_date = Time.now
 

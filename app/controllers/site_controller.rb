@@ -7,20 +7,20 @@ class SiteController < ApplicationController
       get_feeds_list
       subscriptions = @user.subscriptions
 
-      user_titles = subscriptions.each_with_object({}) do |subscription, hash|
+      user_titles = subscriptions.each_with_object({}) { |subscription, hash|
         if subscription.title.present?
           hash[subscription.feed_id] = ERB::Util.html_escape_once(subscription.title)
         end
-      end
+      }
 
-      readability_settings = subscriptions.each_with_object({}) do |subscription, hash|
+      readability_settings = subscriptions.each_with_object({}) { |subscription, hash|
         hash[subscription.feed_id] = subscription.view_inline
-      end
+      }
 
       @now_playing = Entry.where(id: @user.now_playing_entry).first
       @recently_played = @user.recently_played_entries.where(entry_id: @user.now_playing_entry).first
 
-      @show_welcome = (subscriptions.present?) ? false : true
+      @show_welcome = subscriptions.present? ? false : true
       @classes = user_classes
       @data = {
         login_url: login_url,
@@ -49,7 +49,7 @@ class SiteController < ApplicationController
         instagram_embed_path: instagram_embeds_path,
         theme: @user.theme || "day",
         favicon_colors: @user.setting_on?(:favicon_colors),
-        font_stylesheet: ENV['FONT_STYLESHEET'],
+        font_stylesheet: ENV["FONT_STYLESHEET"],
       }
 
       render action: "logged_in"

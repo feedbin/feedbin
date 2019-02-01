@@ -7,7 +7,7 @@ class SessionsController < ApplicationController
 
   def create
     user = User.where("lower(email) = ?", params[:email].try(:strip).try(:downcase)).take
-    if user && user.authenticate(params[:password])
+    if user&.authenticate(params[:password])
       sign_in user, params[:remember_me]
 
       if request.xhr?

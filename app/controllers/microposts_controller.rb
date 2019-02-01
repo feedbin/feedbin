@@ -2,9 +2,9 @@ class MicropostsController < ApplicationController
   def thread
     @user = current_user
     @entry = Entry.find(params[:id])
-    @microposts = Rails.cache.fetch("microblog_thread:#{@entry.id}", expires_in: 2.minutes) do
+    @microposts = Rails.cache.fetch("microblog_thread:#{@entry.id}", expires_in: 2.minutes) {
       build_microposts
-    end
+    }
   end
 
   private

@@ -6,7 +6,7 @@ class ActionsController < ApplicationController
   def index
     @authentication_token = authentication_token(@user)
     @web_service_url = "#{ENV["PUSH_URL"]}/apple_push_notifications"
-    @actions = @user.actions.where("action_type <> ?", Action.action_types[:notifier])
+    @actions = @user.actions.where("action_type <> ?", Action.action_types[:notifier]).natural_sort_by { |action| action.title }
   end
 
   def new
@@ -19,20 +19,20 @@ class ActionsController < ApplicationController
   def create
     @action = @user.actions.new(action_params)
 
-    if params.has_key?(:preview)
+    if params.key?(:preview)
       @preview = true
     else
       if @action.save
         flash[:notice] = "Action was successfully created."
       else
         flash[:error] = @action.errors.full_messages.join(". ")
-        flash.discard()
+        flash.discard
       end
     end
   end
 
   def update
-    if params.has_key?(:preview)
+    if params.key?(:preview)
       @preview = true
       @action = @user.actions.new(action_params)
     else
@@ -40,7 +40,7 @@ class ActionsController < ApplicationController
         flash[:notice] = "Action was successfully updated."
       else
         flash[:error] = @action.errors.full_messages.join(". ")
-        flash.discard()
+        flash.discard
       end
     end
   end
@@ -54,11 +54,11 @@ class ActionsController < ApplicationController
 
   def authentication_token(user)
     verifier = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)
-    CGI::escape(verifier.generate(user.id))
+    CGI.escape(verifier.generate(user.id))
   end
 
   def action_params
-    params.require(:action_params).permit(:query, :all_feeds, :title, :apply_action, :feed_ids => [], :actions => [], :tag_ids => [])
+    params.require(:action_params).permit(:query, :all_feeds, :title, :apply_action, feed_ids: [], actions: [], tag_ids: [])
   end
 
   def set_action

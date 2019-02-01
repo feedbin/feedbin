@@ -39,11 +39,11 @@ class Threader
     unread_entries_user_ids = UnreadEntry.where(entry_id: parent_entry.id, user_id: subscription_user_ids).pluck(:user_id)
     updated_entries_user_ids = UpdatedEntry.where(entry_id: parent_entry.id, user_id: subscription_user_ids).pluck(:user_id)
 
-    updated_entries = subscription_user_ids.each_with_object([]) do |user_id, array|
+    updated_entries = subscription_user_ids.each_with_object([]) { |user_id, array|
       if !unread_entries_user_ids.include?(user_id) && !updated_entries_user_ids.include?(user_id)
         array << UpdatedEntry.new_from_owners(user_id, parent_entry)
       end
-    end
+    }
     UpdatedEntry.import(updated_entries, validate: false)
   end
 

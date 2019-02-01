@@ -14,7 +14,7 @@ class EntryImage
   end
 
   def schedule
-    if !@entry.processed_image?
+    unless @entry.processed_image?
       options = build_options
       Sidekiq::Client.push(
         "args" => EntryImage.build_find_image_args(@entry, options),
@@ -28,7 +28,7 @@ class EntryImage
   def build_options
     options = {}
     if @entry.tweet?
-      tweet = (@entry.tweet.retweeted_status?) ? @entry.tweet.retweeted_status : @entry.tweet
+      tweet = @entry.tweet.retweeted_status? ? @entry.tweet.retweeted_status : @entry.tweet
       if tweet.media?
         options["urls"] = [tweet.media.first.media_url_https.to_s]
       elsif tweet.urls?

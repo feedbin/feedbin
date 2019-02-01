@@ -39,14 +39,13 @@ class ImageSaver
   def upload(file)
     path = file.download
 
-    response = S3_POOL.with do |connection|
+    response = S3_POOL.with { |connection|
       connection.put_object(ENV["AWS_S3_BUCKET_STARRED"], file.path, File.open(path), STORAGE_OPTIONS.dup.merge("Content-Type" => file.content_type))
-    end
+    }
 
     URI::HTTPS.build(
       host: response.data[:host],
       path: response.data[:path],
     ).to_s
   end
-
 end

@@ -4,9 +4,9 @@ class SafariPushNotificationSend
 
   VERIFIER = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)
 
-  APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV["APPLE_PUSH_CERT"]}, size: 5) do |connection|
+  APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV["APPLE_PUSH_CERT"]}, size: 5) { |connection|
     connection.on(:error) { |exception| Honeybadger.notify(exception) }
-  end
+  }
 
   def perform(user_ids, entry_id)
     tokens = Device.where(user_id: user_ids).safari.pluck(:user_id, :token)
@@ -18,11 +18,11 @@ class SafariPushNotificationSend
     titles = subscription_titles(user_ids, feed)
     title = format_text(feed.title, 36)
 
-    notifications = tokens.each_with_object({}) do |(user_id, token), hash|
+    notifications = tokens.each_with_object({}) { |(user_id, token), hash|
       title = titles[user_id] || title
       notification = build_notification(token, title, body, entry_id, user_id)
       hash[notification.apns_id] = notification
-    end
+    }
 
     APNOTIC_POOL.with do |connection|
       notifications.each do |_, notification|
@@ -52,10 +52,10 @@ class SafariPushNotificationSend
     if string.present?
       string = CGI.unescapeHTML(string)
       string = ApplicationController.helpers.sanitize(string, tags: []).squish.mb_chars
-      if string.length > max_bytes
-        omission = "..."
+      omission = if string.length > max_bytes
+        "..."
       else
-        omission = ""
+        ""
       end
       string = string.limit(max_bytes).to_s
       string + omission
@@ -69,7 +69,7 @@ class SafariPushNotificationSend
         title: title,
         body: body,
       }
-      notification.url_args = [entry_id.to_s, CGI::escape(VERIFIER.generate(user_id))]
+      notification.url_args = [entry_id.to_s, CGI.escape(VERIFIER.generate(user_id))]
       notification.apns_id = SecureRandom.uuid
     end
   end

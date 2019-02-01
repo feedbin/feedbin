@@ -4,7 +4,6 @@ Sidekiq::Web.set :session_secret, Rails.application.secrets.secret_key_base
 Sidekiq::Web.app_url = ENV["FEEDBIN_URL"]
 
 Rails.application.routes.draw do
-
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
@@ -32,7 +31,6 @@ Rails.application.routes.draw do
   get ".well-known/apple-app-site-association", to: "well_known#apple_site_association"
   get ".well-known/apple-developer-merchantid-domain-association", to: "well_known#apple_pay"
   get ".well-known/change-password", to: "well_known#change_password"
-
 
   # Apple Push
 

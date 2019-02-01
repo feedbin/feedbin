@@ -1,6 +1,6 @@
 <%
 hide_drawer = false
-if %w{view_unread view_starred}.include?(@user.get_view_mode) && tag.count == 0 && !tag.user_feeds.any?
+if %w{view_unread view_starred}.include?(@user.get_view_mode) && tag.count == 0 && !tag.user_feeds.present?
   hide_drawer = true
 end
 %>

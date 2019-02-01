@@ -1,7 +1,6 @@
 require "application_system_test_case"
 
 class SubscribeTest < ApplicationSystemTestCase
-
   test "Subscribe URL" do
     feed_url = "http://www.example.com/atom.xml"
     stub_request_file("atom.xml", feed_url)
@@ -46,5 +45,4 @@ class SubscribeTest < ApplicationSystemTestCase
       expect_text(entry.title)
     end
   end
-
 end

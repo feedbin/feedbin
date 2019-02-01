@@ -8,5 +8,4 @@ class ShareRetry
     raise "ShareRetry failed" if result != 200
   rescue ActiveRecord::RecordNotFound
   end
-
 end

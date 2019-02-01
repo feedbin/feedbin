@@ -1,21 +1,21 @@
 class EntryPresenter < BasePresenter
   YOUTUBE_URLS = [
-    %r(https?://youtu\.be/(.+)),
-    %r(https?://www\.youtube\.com/watch\?v=(.*?)(&|#|$)),
-    %r(https?://m\.youtube\.com/watch\?v=(.*?)(&|#|$)),
-    %r(https?://www\.youtube\.com/embed/(.*?)(\?|$)),
-    %r(https?://www\.youtube\.com/v/(.*?)(#|\?|$)),
-    %r(https?://www\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b),
+    %r{https?://youtu\.be/(.+)},
+    %r{https?://www\.youtube\.com/watch\?v=(.*?)(&|#|$)},
+    %r{https?://m\.youtube\.com/watch\?v=(.*?)(&|#|$)},
+    %r{https?://www\.youtube\.com/embed/(.*?)(\?|$)},
+    %r{https?://www\.youtube\.com/v/(.*?)(#|\?|$)},
+    %r{https?://www\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b},
   ]
 
   INSTAGRAM_URLS = [
-    %r(https?://www\.instagram\.com/p/(.*?)(/|#|\?|$)),
-    %r(https?://instagram\.com/p/(.*?)(/|#|\?|$)),
+    %r{https?://www\.instagram\.com/p/(.*?)(/|#|\?|$)},
+    %r{https?://instagram\.com/p/(.*?)(/|#|\?|$)},
   ]
 
   VIMEO_URLS = [
-    %r(https?://vimeo\.com/video/(.*?)(#|\?|$)),
-    %r(https?://vimeo\.com/([0-9]+)(#|\?|$)),
+    %r{https?://vimeo\.com/video/(.*?)(#|\?|$)},
+    %r{https?://vimeo\.com/([0-9]+)(#|\?|$)},
   ]
 
   presents :entry
@@ -60,12 +60,10 @@ class EntryPresenter < BasePresenter
   end
 
   def parsed_date(date, format)
-    begin
-      date = Time.parse(date)
-      date.to_s(format)
-    rescue Exception
-      nil
-    end
+    date = Time.parse(date)
+    date.to_s(format)
+  rescue Exception
+    nil
   end
 
   def content
@@ -165,13 +163,11 @@ class EntryPresenter < BasePresenter
   end
 
   def media_size
-    begin
-      size = Integer(entry.data["enclosure_length"])
-      size = @template.number_to_human_size(size)
-      size = "(#{size})"
-    rescue Exception
-      size = ""
-    end
+    size = Integer(entry.data["enclosure_length"])
+    size = @template.number_to_human_size(size)
+    size = "(#{size})"
+  rescue Exception
+    size = ""
   end
 
   def download_title
@@ -221,17 +217,11 @@ class EntryPresenter < BasePresenter
       :video
     elsif entry.data && ["audio/mp3", "audio/mpeg"].include?(entry.data["enclosure_type"])
       :audio
-    else
-      nil
     end
   end
 
   def media_duration
-    if entry.data["itunes_duration"]
-      entry.data["itunes_duration"]
-    else
-      ""
-    end
+    entry.data["itunes_duration"] || ""
   end
 
   def media_image
@@ -242,21 +232,19 @@ class EntryPresenter < BasePresenter
     articles = []
     if entry.data && entry.data["saved_pages"]
       entry.data["saved_pages"].each do |url, page|
-        begin
-          if page["result"]
-            parsed = MercuryParser.new(nil, page)
-            content = ContentFormatter.api_format(parsed.content, nil)
-            data = {
-              url: url,
-              title: parsed.title,
-              host: parsed.domain,
-              author: parsed.author,
-              content: content,
-            }
-            articles.push data
-          end
-        rescue
+        if page["result"]
+          parsed = MercuryParser.new(nil, page)
+          content = ContentFormatter.api_format(parsed.content, nil)
+          data = {
+            url: url,
+            title: parsed.title,
+            host: parsed.domain,
+            author: parsed.author,
+            content: content,
+          }
+          articles.push data
         end
+      rescue
       end
     end
     articles
@@ -268,7 +256,7 @@ class EntryPresenter < BasePresenter
       body = @template.strip_tags(entry.content)
       decoder = HTMLEntities.new
       body = decoder.decode(body)
-      if !body.include?(subtitle)
+      unless body.include?(subtitle)
         @template.content_tag :figcaption do
           @template.raw(subtitle)
         end
@@ -277,12 +265,10 @@ class EntryPresenter < BasePresenter
   end
 
   def feed_domain_matches?(comparison)
-    begin
-      uri = URI.parse(entry.feed.site_url)
-      uri.host == comparison || uri.host == comparison.sub("www.", "")
-    rescue Exception
-      false
-    end
+    uri = URI.parse(entry.feed.site_url)
+    uri.host == comparison || uri.host == comparison.sub("www.", "")
+  rescue Exception
+    false
   end
 
   def has_enclosure?
@@ -339,19 +325,19 @@ class EntryPresenter < BasePresenter
   def content_text
     @content_text ||= begin
       text = Sanitize.fragment(entry.content,
-                               remove_contents: true,
-                               elements: %w{html body div span
-                                            h1 h2 h3 h4 h5 h6 p blockquote pre
-                                            a abbr acronym address big cite code
-                                            del dfn em ins kbd q s samp
-                                            small strike strong sub sup tt var
-                                            b u i center
-                                            dl dt dd ol ul li
-                                            fieldset form label legend
-                                            table caption tbody tfoot thead tr th td
-                                            article aside canvas details embed
-                                            figure figcaption footer header hgroup
-                                            menu nav output ruby section summary})
+        remove_contents: true,
+        elements: %w[html body div span
+                     h1 h2 h3 h4 h5 h6 p blockquote pre
+                     a abbr acronym address big cite code
+                     del dfn em ins kbd q s samp
+                     small strike strong sub sup tt var
+                     b u i center
+                     dl dt dd ol ul li
+                     fieldset form label legend
+                     table caption tbody tfoot thead tr th td
+                     article aside canvas details embed
+                     figure figcaption footer header hgroup
+                     menu nav output ruby section summary])
       text = ReverseMarkdown.convert(text)
       text = ActionController::Base.helpers.strip_tags(text)
       decoder.decode(text)
@@ -393,11 +379,11 @@ class EntryPresenter < BasePresenter
   end
 
   def app_title
-    (entry.title.present?) ? decoder.decode(@template.strip_tags(entry.title.strip)) : nil
+    entry.title.present? ? decoder.decode(@template.strip_tags(entry.title.strip)) : nil
   end
 
   def app_author
-    (entry.author.present?) ? decoder.decode(@template.strip_tags(entry.author.strip)) : nil
+    entry.author.present? ? decoder.decode(@template.strip_tags(entry.author.strip)) : nil
   end
 
   def has_diff?
@@ -464,7 +450,7 @@ class EntryPresenter < BasePresenter
 
   def tweet_classes(tweet)
     classes = ["tweet-author-#{tweet.user.id}"]
-    parent = (@locals[:parent]) ? @locals[:parent] : entry.main_tweet
+    parent = @locals[:parent] || entry.main_tweet
     if @locals[:tweet_counter].present? && tweet.user.id == parent.user.id
       if tweet.in_reply_to_user_id? && tweet.in_reply_to_user_id != parent.user.id && tweet.id != parent.id
         classes.push("tweet-author-reply")
@@ -481,16 +467,16 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_in_reply_to(tweet)
-    tweet = tweet ? tweet : entry.main_tweet
+    tweet ||= entry.main_tweet
     if tweet.to_h[:display_text_range] && tweet.in_reply_to_status_id?
       range = tweet.to_h[:display_text_range]
       content_start = range.last
-      mentions = tweet.user_mentions.select do |mention|
+      mentions = tweet.user_mentions.select { |mention|
         mention.indices.last <= content_start
-      end.map do |mention|
+      }.map { |mention|
         @template.link_to "@#{mention.screen_name}", "https://twitter.com/#{mention.screen_name}", target: "_blank"
-      end
-      if !mentions.empty?
+      }
+      unless mentions.empty?
         @template.content_tag(:p, "", class: "tweet-mentions") do
           "Replying to #{mentions.join(", ")}".html_safe
         end
@@ -527,7 +513,7 @@ class EntryPresenter < BasePresenter
   end
 
   def all_tweets
-    Array.new.tap do |array|
+    [].tap do |array|
       array.push(entry.main_tweet)
       array.push(entry.main_tweet.quoted_status) if entry.main_tweet.quoted_status?
     end
@@ -601,7 +587,7 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_location(tweet)
-    (tweet.place?) ? tweet.place.full_name : nil
+    tweet.place? ? tweet.place.full_name : nil
   end
 
   def tweet_video?(media)
@@ -620,13 +606,13 @@ class EntryPresenter < BasePresenter
       options["loop"] = true
     end
 
-    highest_quality_video = media.video_info.variants.max_by do |element|
+    highest_quality_video = media.video_info.variants.max_by { |element|
       if element.content_type == "video/mp4" && element.bitrate
         element.bitrate
       else
         0
       end
-    end
+    }
 
     @template.video_tag highest_quality_video.url.to_s, options
   end

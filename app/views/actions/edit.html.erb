@@ -2,5 +2,8 @@
     <div class="settings-outer">
         <h2>Actions</h2>
     </div>
+    <% if @action.error_hint.present? %>
+        <p class="error-message"><%= @action.error_hint %></p>
+    <% end %>
     <%= render 'form' %>
 </div>

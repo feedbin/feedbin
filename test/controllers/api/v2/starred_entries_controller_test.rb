@@ -8,9 +8,9 @@ class Api::V2::StarredEntriesControllerTest < ApiControllerTestCase
   end
 
   test "should get starred entries" do
-    starred = @entries.map do |entry|
+    starred = @entries.map { |entry|
       StarredEntry.create_from_owners(@user, entry)
-    end
+    }
     login_as @user
     get :index, format: :json
     results = parse_json
@@ -28,9 +28,9 @@ class Api::V2::StarredEntriesControllerTest < ApiControllerTestCase
   end
 
   test "should destroy starred entry" do
-    starred = @entries.sample(2).map do |entry|
+    starred = @entries.sample(2).map { |entry|
       StarredEntry.create_from_owners(@user, entry)
-    end
+    }
     login_as @user
     assert_difference "StarredEntry.count", -starred.count do
       delete :destroy, params: {starred_entries: starred.map(&:entry_id)}, format: :json

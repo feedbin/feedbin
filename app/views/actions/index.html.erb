@@ -20,11 +20,12 @@
                 <%= link_to '+ Add Action', new_action_path, class: 'add-action' %>
             </li>
         </ul>
-        <% if @actions.any? %>
+        <% if @actions.present? %>
             <ul class="pill-list">
                 <% @actions.each do |action| %>
-                    <li class="linked">
-                        <%= link_to(edit_action_path(action)) do %>
+                    <li class="linked <%= action.broken? ? "error" : "" %>">
+                        <%= link_to(edit_action_path(action), title: action.broken? ? "Invalid Action" : "") do %>
+                            <i class="status-flag icon-error"></i>
                             <%= render(partial: 'actions/text_description', locals: {action: action}) %>
                         <% end %>
                     </li>

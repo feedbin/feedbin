@@ -11,7 +11,7 @@ class EntryImageTest < ActiveSupport::TestCase
 
   test "should enqueue FindImage" do
     assert_difference "Sidekiq::Queues['images'].count", +1 do
-      EntryImage.new().perform(@entry.id)
+      EntryImage.new.perform(@entry.id)
     end
   end
 
@@ -22,19 +22,19 @@ class EntryImageTest < ActiveSupport::TestCase
       "width" => 542,
       "height" => 304,
     }
-    EntryImage.new().perform(@entry.id, image)
+    EntryImage.new.perform(@entry.id, image)
     assert_equal image, @entry.reload.image
   end
 
   test "should skip enqueue" do
     @entry.update(image: {
-                    "original_url" => "http://example.com/image.jpg",
-                    "processed_url" => "http://cdn.example.com/image.jpg",
-                    "width" => 542,
-                    "height" => 304,
-                  })
+      "original_url" => "http://example.com/image.jpg",
+      "processed_url" => "http://cdn.example.com/image.jpg",
+      "width" => 542,
+      "height" => 304,
+    })
     assert_difference "Sidekiq::Queues['images'].count", 0 do
-      EntryImage.new().perform(@entry.id)
+      EntryImage.new.perform(@entry.id)
     end
   end
 end

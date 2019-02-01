@@ -1,49 +1,49 @@
 class User < ApplicationRecord
   attr_accessor :stripe_token, :old_password_valid, :update_auth_token,
-                :password_reset, :coupon_code, :is_trialing, :coupon_valid, :deleted
+    :password_reset, :coupon_code, :is_trialing, :coupon_valid, :deleted
 
   has_secure_password
 
   store_accessor :settings,
-                 :entry_sort,
-                 :previous_read_count,
-                 :starred_feed_enabled,
-                 :precache_images,
-                 :show_unread_count,
-                 :sticky_view_inline,
-                 :mark_as_read_confirmation,
-                 :font_size,
-                 :font,
-                 :entry_width,
-                 :apple_push_notification_device_token,
-                 :mark_as_read_push_view,
-                 :keep_unread_entries,
-                 :receipt_info,
-                 :theme,
-                 :entries_display,
-                 :entries_feed,
-                 :entries_time,
-                 :entries_body,
-                 :entries_image,
-                 :ui_typeface,
-                 :update_message_seen,
-                 :hide_recently_read,
-                 :hide_updated,
-                 :view_mode,
-                 :disable_image_proxy,
-                 :api_client,
-                 :marketing_unsubscribe,
-                 :hide_recently_played,
-                 :now_playing_entry,
-                 :audio_panel_size,
-                 :view_links_in_app,
-                 :twitter_access_secret,
-                 :twitter_access_token,
-                 :twitter_screen_name,
-                 :twitter_access_error,
-                 :nice_frames,
-                 :favicon_colors,
-                 :newsletter_tag
+    :entry_sort,
+    :previous_read_count,
+    :starred_feed_enabled,
+    :precache_images,
+    :show_unread_count,
+    :sticky_view_inline,
+    :mark_as_read_confirmation,
+    :font_size,
+    :font,
+    :entry_width,
+    :apple_push_notification_device_token,
+    :mark_as_read_push_view,
+    :keep_unread_entries,
+    :receipt_info,
+    :theme,
+    :entries_display,
+    :entries_feed,
+    :entries_time,
+    :entries_body,
+    :entries_image,
+    :ui_typeface,
+    :update_message_seen,
+    :hide_recently_read,
+    :hide_updated,
+    :view_mode,
+    :disable_image_proxy,
+    :api_client,
+    :marketing_unsubscribe,
+    :hide_recently_played,
+    :now_playing_entry,
+    :audio_panel_size,
+    :view_links_in_app,
+    :twitter_access_secret,
+    :twitter_access_token,
+    :twitter_screen_name,
+    :twitter_access_error,
+    :nice_frames,
+    :favicon_colors,
+    :newsletter_tag
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -67,8 +67,8 @@ class User < ApplicationRecord
   belongs_to :plan
 
   accepts_nested_attributes_for :sharing_services,
-                                allow_destroy: true,
-                                reject_if: -> attributes { attributes["label"].blank? || attributes["url"].blank? }
+    allow_destroy: true,
+    reject_if: ->(attributes) { attributes["label"].blank? || attributes["url"].blank? }
 
   after_initialize :set_defaults, if: :new_record?
 
@@ -89,8 +89,8 @@ class User < ApplicationRecord
   before_destroy :create_deleted_user
   before_destroy :record_stats
 
-  validate :changed_password, on: :update, unless: -> user { user.password_reset }
-  validate :coupon_code_valid, on: :create, if: -> user { user.coupon_code }
+  validate :changed_password, on: :update, unless: ->(user) { user.password_reset }
+  validate :coupon_code_valid, on: :create, if: ->(user) { user.coupon_code }
   validate :plan_type_valid, on: :update
   validate :trial_plan_valid
 
@@ -99,11 +99,11 @@ class User < ApplicationRecord
   validates_presence_of :password, on: :create
 
   def theme
-    if self.settings
-      if self.settings["theme"] == "night"
+    if settings
+      if settings["theme"] == "night"
         "dusk"
       else
-        self.settings["theme"]
+        settings["theme"]
       end
     end
   end
@@ -128,7 +128,7 @@ class User < ApplicationRecord
       self.coupon_code = params[:coupon_code]
     end
 
-    if self.coupon_valid || !ENV["STRIPE_API_KEY"]
+    if coupon_valid || !ENV["STRIPE_API_KEY"]
       self.free_ok = true
       self.plan = Plan.find_by_stripe_id("free")
     else
@@ -146,15 +146,15 @@ class User < ApplicationRecord
   end
 
   def schedule_trial_jobs
-    OnboardingMessage.perform_async(self.id, MarketingMailer.method(:onboarding_1_welcome).name.to_s)
-    OnboardingMessage.perform_in(3.days, self.id, MarketingMailer.method(:onboarding_2_mobile).name.to_s)
-    OnboardingMessage.perform_in(5.days, self.id, MarketingMailer.method(:onboarding_3_subscribe).name.to_s)
-    OnboardingMessage.perform_in(Feedbin::Application.config.trial_days.days - 1.days, self.id, MarketingMailer.method(:onboarding_4_expiring).name.to_s)
-    OnboardingMessage.perform_at(Feedbin::Application.config.trial_days.days.from_now + 1.days, self.id, MarketingMailer.method(:onboarding_5_expired).name.to_s)
+    OnboardingMessage.perform_async(id, MarketingMailer.method(:onboarding_1_welcome).name.to_s)
+    OnboardingMessage.perform_in(3.days, id, MarketingMailer.method(:onboarding_2_mobile).name.to_s)
+    OnboardingMessage.perform_in(5.days, id, MarketingMailer.method(:onboarding_3_subscribe).name.to_s)
+    OnboardingMessage.perform_in(Feedbin::Application.config.trial_days.days - 1.days, id, MarketingMailer.method(:onboarding_4_expiring).name.to_s)
+    OnboardingMessage.perform_at(Feedbin::Application.config.trial_days.days.from_now + 1.days, id, MarketingMailer.method(:onboarding_5_expired).name.to_s)
   end
 
   def setting_on?(setting_symbol)
-    self.send(setting_symbol) == "1"
+    send(setting_symbol) == "1"
   end
 
   def subscribed_to_emails?
@@ -172,7 +172,7 @@ class User < ApplicationRecord
   end
 
   def strip_email
-    self.email.strip!
+    email.strip!
   end
 
   def feed_tags
@@ -200,15 +200,13 @@ class User < ApplicationRecord
     @free_ok || plan_id_was == Plan.find_by_stripe_id("free").id
   end
 
-  def free_ok=(value)
-    @free_ok = value
-  end
+  attr_writer :free_ok
 
   def plan_type_valid
-    if free_ok
-      valid_plans = Plan.all.pluck(:id)
+    valid_plans = if free_ok
+      Plan.all.pluck(:id)
     else
-      valid_plans = Plan.where(price_tier: price_tier).where.not(stripe_id: "free").pluck(:id)
+      Plan.where(price_tier: price_tier).where.not(stripe_id: "free").pluck(:id)
     end
 
     valid_plans.append(plan_id_was)
@@ -255,10 +253,10 @@ class User < ApplicationRecord
   def generate_token(column, length = nil, hash = false)
     begin
       random_string = SecureRandom.hex(length)
-      if hash
-        self[column] = Digest::SHA1.hexdigest(random_string)
+      self[column] = if hash
+        Digest::SHA1.hexdigest(random_string)
       else
-        self[column] = random_string
+        random_string
       end
     end while User.exists?(column => self[column])
     random_string
@@ -299,7 +297,7 @@ class User < ApplicationRecord
     self.stripe_token = nil
   rescue Stripe::StripeError => exception
     Honeybadger.notify(exception)
-    errors.add :base, "#{exception.message}"
+    errors.add :base, exception.message.to_s
     self.stripe_token = nil
     throw(:abort)
   end
@@ -321,9 +319,9 @@ class User < ApplicationRecord
     unique_tags = feed_tags
     feeds_by_tag = build_feeds_by_tag
     feeds_by_id = feeds.includes(:favicon).include_user_title
-    feeds_by_id = feeds_by_id.each_with_object({}) do |feed, hash|
+    feeds_by_id = feeds_by_id.each_with_object({}) { |feed, hash|
       hash[feed.id] = feed
-    end
+    }
 
     unique_tags.map do |tag|
       feed_ids = feeds_by_tag[tag.id] || []
@@ -362,20 +360,20 @@ class User < ApplicationRecord
     now = Time.now.to_i
     seconds_left = trial_end.to_i - now
     days = (seconds_left.to_f / 86400.to_f).ceil
-    (days > 0) ? days : 0
+    days > 0 ? days : 0
   end
 
   def trial_end
     @trial_end ||= begin
-      date = self.created_at || Time.now
+      date = created_at || Time.now
       date + Feedbin::Application.config.trial_days.days
     end
   end
 
   def update_tag_visibility(tag, visible)
     tag_visibility_will_change!
-    self.tag_visibility[tag] = visible
-    update_attributes tag_visibility: self.tag_visibility
+    tag_visibility[tag] = visible
+    update_attributes tag_visibility: tag_visibility
   end
 
   def build_feeds_by_tag
@@ -387,7 +385,7 @@ class User < ApplicationRecord
       WHERE user_id = ? AND feed_id IN (?)
       GROUP BY tag_id
     eos
-    query = ActiveRecord::Base.send(:sanitize_sql_array, [query, self.id, subscriptions.pluck(:feed_id)])
+    query = ActiveRecord::Base.send(:sanitize_sql_array, [query, id, subscriptions.pluck(:feed_id)])
     results = ActiveRecord::Base.connection.execute(query)
     results.each_with_object({}) do |result, hash|
       hash[result["tag_id"].to_i] = JSON.parse(result["feed_ids"])
@@ -403,7 +401,7 @@ class User < ApplicationRecord
       WHERE user_id = ? AND feed_id IN (?)
       GROUP BY feed_id
     eos
-    query = ActiveRecord::Base.send(:sanitize_sql_array, [query, self.id, subscriptions.pluck(:feed_id)])
+    query = ActiveRecord::Base.send(:sanitize_sql_array, [query, id, subscriptions.pluck(:feed_id)])
     results = ActiveRecord::Base.connection.execute(query)
     results.each_with_object({}) do |result, hash|
       hash[result["feed_id"].to_i] = JSON.parse(result["tag_ids"])
@@ -411,11 +409,11 @@ class User < ApplicationRecord
   end
 
   def create_deleted_user
-    DeletedUser.create(email: self.email, customer_id: self.customer_id)
+    DeletedUser.create(email: email, customer_id: customer_id)
   end
 
   def record_stats
-    if self.plan.stripe_id == "trial"
+    if plan.stripe_id == "trial"
       Librato.increment("user.trial.cancel")
     else
       Librato.increment("user.paid.cancel")
@@ -441,7 +439,7 @@ class User < ApplicationRecord
   end
 
   def newsletter_address
-    "#{self.newsletter_token}@newsletters.feedbin.com"
+    "#{newsletter_token}@newsletters.feedbin.com"
   end
 
   def stripe_url
@@ -449,7 +447,7 @@ class User < ApplicationRecord
   end
 
   def deleted?
-    self.deleted || false
+    deleted || false
   end
 
   def can_read_feed?(feed)
@@ -494,10 +492,10 @@ class User < ApplicationRecord
   end
 
   def trialing?
-    self.plan == Plan.find_by_stripe_id("trial")
+    plan == Plan.find_by_stripe_id("trial")
   end
 
   def display_prefs
-    "font-size-#{self.font_size || 5} font-#{self.font || "default"}"
+    "font-size-#{font_size || 5} font-#{font || "default"}"
   end
 end

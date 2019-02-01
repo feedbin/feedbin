@@ -57,12 +57,12 @@ class ApplePushNotificationsController < ApplicationController
       certificate: p12.certificate,
       key: p12.key,
       iconSet: {
-        :'16x16' => push_icon_path("16x16"),
-        :'16x16@2x' => push_icon_path("16x16@2x"),
-        :'32x32' => push_icon_path("32x32"),
-        :'32x32@2x' => push_icon_path("32x32@2x"),
-        :'128x128' => push_icon_path("128x128"),
-        :'128x128@2x' => push_icon_path("128x128@2x"),
+        '16x16': push_icon_path("16x16"),
+        '16x16@2x': push_icon_path("16x16@2x"),
+        '32x32': push_icon_path("32x32"),
+        '32x32@2x': push_icon_path("32x32@2x"),
+        '128x128': push_icon_path("128x128"),
+        '128x128@2x': push_icon_path("128x128@2x"),
       },
     })
   end

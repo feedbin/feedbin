@@ -34,7 +34,7 @@ class ContentFormatterTest < ActiveSupport::TestCase
   end
 
   test "should allow certain classes" do
-    classes = %w{twitter-tweet instagram-media}
+    classes = %w[twitter-tweet instagram-media]
     classes.each do |css_class|
       content = %(<blockquote class="#{css_class}"></blockquote>)
       assert_equal content, ContentFormatter.format!(content)
@@ -42,7 +42,7 @@ class ContentFormatterTest < ActiveSupport::TestCase
   end
 
   test "should not allow certain classes" do
-    classes = %w{other-class}
+    classes = %w[other-class]
     classes.each do |css_class|
       content = %(<blockquote class="#{css_class}"></blockquote>)
       assert_equal "<blockquote></blockquote>", ContentFormatter.format!(content)

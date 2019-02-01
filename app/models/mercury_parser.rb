@@ -1,5 +1,4 @@
 class MercuryParser
-
   host = ENV["MERCURY_HOST"] || "mercury.postlight.com"
 
   BASE_URL = "https://#{host}/parser"
@@ -36,7 +35,7 @@ class MercuryParser
   end
 
   def date_published
-    result["date_published"] if result["date_published"]
+    result["date_published"]
   end
 
   def domain

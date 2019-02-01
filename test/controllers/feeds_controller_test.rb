@@ -25,7 +25,7 @@ class FeedsControllerTest < ActionController::TestCase
   test "view modes" do
     login_as @user
 
-    %w{view_unread view_starred view_all}.each do |view_mode|
+    %w[view_unread view_starred view_all].each do |view_mode|
       get view_mode, xhr: true
       assert_response :success
       assert_equal view_mode, @user.reload.view_mode
@@ -40,7 +40,7 @@ class FeedsControllerTest < ActionController::TestCase
 
   test "push subscribe/unsubscribe" do
     feed = Feed.first
-    secret = Push::hub_secret(feed.id)
+    secret = Push.hub_secret(feed.id)
 
     params = {
       "id" => feed.id,
@@ -63,7 +63,7 @@ class FeedsControllerTest < ActionController::TestCase
 
   test "push needs valid secret" do
     feed = Feed.first
-    secret = Push::hub_secret(feed.id)
+    secret = Push.hub_secret(feed.id)
 
     params = {
       "id" => feed.id,
@@ -117,7 +117,7 @@ class FeedsControllerTest < ActionController::TestCase
   private
 
   def push_prep(feed)
-    secret = Push::hub_secret(feed.id)
+    secret = Push.hub_secret(feed.id)
     body = "BODY"
     signature = OpenSSL::HMAC.hexdigest("sha1", secret, body)
     @request.headers["HTTP_X_HUB_SIGNATURE"] = "sha1=#{signature}"

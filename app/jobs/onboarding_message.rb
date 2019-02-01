@@ -5,7 +5,7 @@ class OnboardingMessage
   def perform(user_id, message)
     @user = User.find(user_id)
     @message = message.to_sym
-    self.send(@message)
+    send(@message)
   rescue ActiveRecord::RecordNotFound
   end
 

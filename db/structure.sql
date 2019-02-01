@@ -70,7 +70,8 @@ CREATE TABLE public.actions (
     title text,
     tag_ids integer[] DEFAULT '{}'::integer[],
     action_type integer DEFAULT 0,
-    computed_feed_ids integer[] DEFAULT '{}'::integer[]
+    computed_feed_ids integer[] DEFAULT '{}'::integer[],
+    status integer DEFAULT 0
 );
 
 
@@ -2073,6 +2074,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20180204093407'),
 ('20180607200816'),
 ('20180714072623'),
-('20180717001048');
+('20180717001048'),
+('20190201020722');
 
 

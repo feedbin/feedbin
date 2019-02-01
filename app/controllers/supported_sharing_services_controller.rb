@@ -57,7 +57,7 @@ class SupportedSharingServicesController < ApplicationController
       access_token = klass.request_access(session.delete(:oauth_token), session.delete(:oauth_secret), params[:oauth_verifier])
       supported_sharing_service = @user.supported_sharing_services.where(service_id: params[:id]).first_or_initialize
       supported_sharing_service.update(access_token: access_token.token, access_secret: access_token.secret)
-      if supported_sharing_service.errors.any?
+      if supported_sharing_service.errors.present?
         redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join(". ")
       else
         supported_sharing_service.try(:after_activate)
@@ -100,7 +100,7 @@ class SupportedSharingServicesController < ApplicationController
       if response.token && response.secret
         supported_sharing_service = @user.supported_sharing_services.where(service_id: service_id).first_or_initialize
         supported_sharing_service.update(access_token: response.token, access_secret: response.secret)
-        if supported_sharing_service.errors.any?
+        if supported_sharing_service.errors.present?
           redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join(". ")
         else
           redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"

@@ -15,7 +15,7 @@ class FeedRefresherReceiverTest < ActiveSupport::TestCase
       "entries" => [build_entry],
     }
     assert_difference "Entry.count", +1 do
-      FeedRefresherReceiver.new().perform(params)
+      FeedRefresherReceiver.new.perform(params)
     end
   end
 
@@ -30,12 +30,12 @@ class FeedRefresherReceiverTest < ActiveSupport::TestCase
       "entries" => [build_entry(public_id)],
     }
     assert_no_difference "Entry.count" do
-      FeedRefresherReceiver.new().perform(params)
+      FeedRefresherReceiver.new.perform(params)
     end
   end
 
   test "should not create entry public_id_alt" do
-    entry = build_entry()
+    entry = build_entry
     params = {
       "feed" => {
         "id" => @feed.id,
@@ -44,7 +44,7 @@ class FeedRefresherReceiverTest < ActiveSupport::TestCase
     }
     FeedbinUtils.update_public_id_cache(entry["data"]["public_id_alt"], "")
     assert_no_difference "Entry.count" do
-      FeedRefresherReceiver.new().perform(params)
+      FeedRefresherReceiver.new.perform(params)
     end
   end
 
@@ -58,7 +58,7 @@ class FeedRefresherReceiverTest < ActiveSupport::TestCase
       },
       "entries" => [update],
     }
-    FeedRefresherReceiver.new().perform(params)
+    FeedRefresherReceiver.new.perform(params)
     update.each do |attribute, value|
       assert_equal value, entry.reload.send(attribute), "entry.#{attribute} didn't match"
     end
@@ -68,7 +68,7 @@ class FeedRefresherReceiverTest < ActiveSupport::TestCase
     params = update_params
     @user.unread_entries.delete_all
     assert_difference -> { @user.updated_entries.count }, +1 do
-      FeedRefresherReceiver.new().perform(params)
+      FeedRefresherReceiver.new.perform(params)
     end
   end
 
@@ -77,7 +77,7 @@ class FeedRefresherReceiverTest < ActiveSupport::TestCase
     @user.unread_entries.delete_all
     @subscription.update(muted: true)
     assert_no_difference -> { @user.updated_entries.count } do
-      FeedRefresherReceiver.new().perform(params)
+      FeedRefresherReceiver.new.perform(params)
     end
   end
 
@@ -86,7 +86,7 @@ class FeedRefresherReceiverTest < ActiveSupport::TestCase
     @user.unread_entries.delete_all
     @subscription.update(show_updates: false)
     assert_no_difference -> { @user.updated_entries.count } do
-      FeedRefresherReceiver.new().perform(params)
+      FeedRefresherReceiver.new.perform(params)
     end
   end
 

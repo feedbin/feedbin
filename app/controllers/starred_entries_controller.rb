@@ -4,7 +4,7 @@ class StarredEntriesController < ApplicationController
   def index
     @user = User.find_by_starred_token(params[:starred_token])
 
-    if @user && @user.setting_on?(:starred_feed_enabled)
+    if @user&.setting_on?(:starred_feed_enabled)
       @title = "Feedbin Starred Entries for #{@user.email}"
       @entries = Rails.cache.fetch("#{@user.id}:starred_feed") {
         @starred_entries = @user.starred_entries.order("created_at DESC").limit(50)

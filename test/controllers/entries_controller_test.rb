@@ -41,7 +41,7 @@ class EntriesControllerTest < ActionController::TestCase
     entry = create_tweet_entry(@user.feeds.first)
     url = "https://mercury.postlight.com/parser?url=https://9to5mac.com/2018/01/12/final-cut-pro-x-how-to-improve-slow-motion-in-your-projects-video/"
     stub_request_file("parsed_page.json", url, headers: {"Content-Type" => "application/json; charset=utf-8"})
-    SavePages.new().perform(entry.id)
+    SavePages.new.perform(entry.id)
 
     login_as @user
     get :show, params: {id: entry}, xhr: true
@@ -92,9 +92,9 @@ class EntriesControllerTest < ActionController::TestCase
   test "marks starred read" do
     login_as @user
 
-    starred_entries = @user.entries.limit(2).map do |entry|
+    starred_entries = @user.entries.limit(2).map { |entry|
       StarredEntry.create_from_owners(@user, entry)
-    end
+    }
 
     assert_difference("UnreadEntry.count", -starred_entries.length) do
       post :mark_all_as_read, params: {type: "starred"}, xhr: true
@@ -105,9 +105,9 @@ class EntriesControllerTest < ActionController::TestCase
   test "marks recently read" do
     login_as @user
 
-    recently_read_entries = @user.entries.limit(2).map do |entry|
+    recently_read_entries = @user.entries.limit(2).map { |entry|
       @user.recently_read_entries.create!(entry: entry)
-    end
+    }
 
     assert_difference("UnreadEntry.count", -recently_read_entries.length) do
       post :mark_all_as_read, params: {type: "recently_read"}, xhr: true
@@ -118,9 +118,9 @@ class EntriesControllerTest < ActionController::TestCase
   test "marks updated read" do
     login_as @user
 
-    updated_entries = @user.entries.limit(2).map do |entry|
+    updated_entries = @user.entries.limit(2).map { |entry|
       @user.updated_entries.create!(entry: entry, feed: entry.feed)
-    end
+    }
 
     assert_difference("UpdatedEntry.count", -updated_entries.length) do
       post :mark_all_as_read, params: {type: "updated"}, xhr: true

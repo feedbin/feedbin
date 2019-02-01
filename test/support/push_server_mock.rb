@@ -29,9 +29,7 @@ class PushServerMock
       @notification = notification
     end
 
-    def status
-      @status
-    end
+    attr_reader :status
 
     def body
       {"reason" => "BadDeviceToken"}

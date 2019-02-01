@@ -6,9 +6,9 @@ class SafariPushNotificationSendTest < ActiveSupport::TestCase
     @feeds = create_feeds(@users.first)
     @entries = @users.first.entries
 
-    @devices = @users.map do |user|
+    @devices = @users.map { |user|
       user.devices.create(token: "token#{user.id}", device_type: Device.device_types[:safari])
-    end
+    }
   end
 
   test "should send push notification" do
@@ -18,7 +18,7 @@ class SafariPushNotificationSendTest < ActiveSupport::TestCase
     SafariPushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
       assert_no_difference "Device.count" do
         assert_difference -> { pool.count }, +count do
-          SafariPushNotificationSend.new().perform(user_ids, @entries.first.id)
+          SafariPushNotificationSend.new.perform(user_ids, @entries.first.id)
         end
       end
     end
@@ -30,7 +30,7 @@ class SafariPushNotificationSendTest < ActiveSupport::TestCase
     count = Device.where(user_id: user_ids).count
     SafariPushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
       assert_difference "Device.count", -count do
-        SafariPushNotificationSend.new().perform(user_ids, @entries.first.id)
+        SafariPushNotificationSend.new.perform(user_ids, @entries.first.id)
       end
     end
   end

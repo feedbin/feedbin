@@ -52,7 +52,7 @@ class FeedsController < ApplicationController
 
   def push
     feed = Feed.find(params[:id])
-    secret = Push::hub_secret(feed.id)
+    secret = Push.hub_secret(feed.id)
 
     if request.get?
       response = ""
@@ -109,9 +109,9 @@ class FeedsController < ApplicationController
     @user = current_user
     subscription = @user.subscriptions.where(feed_id: params[:id]).take!
     subscription.toggle!(:show_updates)
-    if params.has_key?(:inline)
+    if params.key?(:inline)
       @delay = false
-      if !@user.setting_on?(:update_message_seen)
+      unless @user.setting_on?(:update_message_seen)
         @user.update_message_seen = "1"
         @user.save
         @delay = true
@@ -130,7 +130,7 @@ class FeedsController < ApplicationController
     @user = current_user
     if twitter_feed?(params[:q]) && !@user.twitter_enabled?
       session[:subscribe_query] = params[:q]
-      render :js => "window.location = '#{new_twitter_authentication_path}';"
+      render js: "window.location = '#{new_twitter_authentication_path}';"
     else
       config = {
         twitter_access_token: @user.twitter_access_token,
@@ -154,14 +154,7 @@ class FeedsController < ApplicationController
 
   def twitter_feed?(url)
     url = url.strip
-    url.start_with?("@") ||
-    url.start_with?("#") ||
-    url.start_with?("http://twitter.com") ||
-    url.start_with?("https://twitter.com") ||
-    url.start_with?("http://mobile.twitter.com") ||
-    url.start_with?("https://mobile.twitter.com") ||
-    url.start_with?("twitter.com") ||
-    url.start_with?("mobile.twitter.com")
+    url.start_with?("@", "#", "http://twitter.com", "https://twitter.com", "http://mobile.twitter.com", "https://mobile.twitter.com", "twitter.com", "mobile.twitter.com")
   end
 
   def update_view_mode(view_mode)

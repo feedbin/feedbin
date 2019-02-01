@@ -3,6 +3,6 @@ class ImportItem < ApplicationRecord
   belongs_to :import
 
   after_commit(on: :create) do
-    FeedImporter.perform_async(self.id)
+    FeedImporter.perform_async(id)
   end
 end

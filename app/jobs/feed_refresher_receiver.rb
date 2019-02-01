@@ -4,7 +4,7 @@ class FeedRefresherReceiver
 
   def perform(params)
     feed = Feed.find(params["feed"]["id"])
-    if params["entries"].any?
+    if params["entries"].present?
       params["entries"].each do |entry|
         update = entry.delete("update")
         begin
@@ -16,7 +16,7 @@ class FeedRefresherReceiver
         rescue ActiveRecord::RecordNotUnique
           FeedbinUtils.update_public_id_cache(entry["public_id"], entry["content"], entry["data"]["public_id_alt"])
           Librato.increment "entry.record_not_unique"
-        rescue StandardError => error
+        rescue => error
           message = update ? "update" : "create"
           Honeybadger.notify(
             error_class: "FeedRefresherReceiver#" + message,

@@ -28,9 +28,9 @@ class Share::Service
     if params[:readability] == "on"
       url = entry.fully_qualified_url
       key = FeedbinUtils.page_cache_key(url)
-      content_info = Rails.cache.fetch(key) do
+      content_info = Rails.cache.fetch(key) {
         MercuryParser.parse(url)
-      end
+      }
       content = content_info.content
     else
       content = entry.content
@@ -39,7 +39,7 @@ class Share::Service
   end
 
   def self.determine_content(params)
-    new().determine_content(params)
+    new.determine_content(params)
   end
 
   def render_popover_template(url)
@@ -49,6 +49,6 @@ class Share::Service
   def link_options(entry)
     {url: Rails.application.routes.url_helpers.share_supported_sharing_service_path(@klass, entry),
      label: @klass.label,
-     html_options: @klass.html_options}
+     html_options: @klass.html_options,}
   end
 end

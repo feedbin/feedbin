@@ -1,7 +1,7 @@
 class SendToKindle
   include Sidekiq::Worker
   sidekiq_options queue: :critical
-  SUPPORTED_IMAGES = %w{.jpg .jpeg .gif .png .bmp}
+  SUPPORTED_IMAGES = %w[.jpg .jpeg .gif .png .bmp]
 
   def perform(entry_id, kindle_address)
     if ENV["KINDLEGEN_PATH"].blank?

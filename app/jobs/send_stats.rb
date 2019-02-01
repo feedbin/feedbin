@@ -88,7 +88,7 @@ class SendStats
 
   def cache_hit
     stats = []
-    sql = %q(
+    sql = "
       SELECT
         'index hit rate' AS name,
         (sum(idx_blks_hit)) / sum(idx_blks_hit + idx_blks_read) AS ratio
@@ -98,7 +98,7 @@ class SendStats
        'cache hit rate' AS name,
         sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)) AS ratio
       FROM pg_statio_user_tables;
-    )
+    "
     results = query(sql)
     results.each do |result|
       stats << {name: result["name"].gsub(/[^A-Za-z0-9]+/, "_"), value: result["ratio"].to_f}
@@ -108,7 +108,7 @@ class SendStats
 
   def index_size
     stats = []
-    sql = %q(
+    sql = '
       SELECT
         relname AS name,
         sum(relpages) AS size
@@ -116,7 +116,7 @@ class SendStats
       WHERE reltype = 0
       GROUP BY relname
       ORDER BY sum(relpages) DESC;
-    )
+    '
     results = query(sql)
     results.each do |result|
       size = (result["size"].to_f * 8) / 1024
@@ -130,7 +130,7 @@ class SendStats
   def database_size
     stats = []
     database = ActiveRecord::Base.connection_config[:database]
-    sql = %Q(
+    sql = %(
       SELECT pg_database_size('#{database}') as size;
     )
     results = query(sql)

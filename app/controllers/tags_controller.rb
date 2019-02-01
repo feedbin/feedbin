@@ -42,7 +42,7 @@ class TagsController < ApplicationController
 
     if @new_tag
       update_selected_feed!("tag", @new_tag.id)
-      visibility = user.tag_visibility[tag.id.to_s] ? user.tag_visibility[tag.id.to_s] : false
+      visibility = user.tag_visibility[tag.id.to_s] || false
       user.update_tag_visibility(@new_tag.id.to_s, visibility)
     end
 

@@ -13,7 +13,7 @@ module Api
       private
 
       def correct_user
-        if !current_user.can_read_feed?(params[:id])
+        unless current_user.can_read_feed?(params[:id])
           render_404
         end
       end

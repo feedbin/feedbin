@@ -6,7 +6,7 @@ class SearchIndexStore
     klass = klass.constantize
     record = klass.find(id)
     index(record, klass)
-    percolate(record, klass) if !update
+    percolate(record, klass) unless update
   rescue ActiveRecord::RecordNotFound
   end
 

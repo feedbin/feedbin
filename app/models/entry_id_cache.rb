@@ -41,24 +41,24 @@ class EntryIdCache
 
   def get_ids
     ids[page_number] ||= begin
-      key_exists, entry_ids = $redis[:sorted_entries].with do |redis|
+      key_exists, entry_ids = $redis[:sorted_entries].with { |redis|
         redis.multi do
           redis.exists(cache_key)
           redis.zrevrange(cache_key, start, stop)
         end
-      end
+      }
 
-      if !key_exists
-        keys = feed_ids.map do |feed_id|
+      unless key_exists
+        keys = feed_ids.map { |feed_id|
           FeedbinUtils.redis_feed_entries_published_key(feed_id)
-        end
-        count, expire, entry_ids = $redis[:sorted_entries].with do |redis|
+        }
+        count, expire, entry_ids = $redis[:sorted_entries].with { |redis|
           redis.multi do
             redis.zunionstore(cache_key, keys)
             redis.expire(cache_key, 2.minutes.to_i)
             redis.zrevrange(cache_key, start, stop)
           end
-        end
+        }
       end
       entry_ids
     end

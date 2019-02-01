@@ -1,7 +1,6 @@
 require "test_helper"
 
 class SelfUrlTest < ActiveSupport::TestCase
-
   # test "should build" do
   #   assert_difference "Sidekiq::Queues['worker_slow'].count", +Feed.count do
   #     SelfUrl.new().perform(nil, true)
@@ -26,5 +25,4 @@ class SelfUrlTest < ActiveSupport::TestCase
   #
   #   assert_equal self_url, feed.reload.self_url
   # end
-
 end

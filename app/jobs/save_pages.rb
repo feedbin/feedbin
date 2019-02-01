@@ -47,10 +47,6 @@ class SavePages
   end
 
   def url_valid?(url)
-    if url.host == "twitter.com"
-      false
-    else
-      true
-    end
+    !(url.host == "twitter.com")
   end
 end

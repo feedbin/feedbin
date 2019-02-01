@@ -8,9 +8,9 @@ class Api::V2::RecentlyReadEntriesControllerTest < ApiControllerTestCase
   end
 
   test "should get index" do
-    recently_read = @entries.map do |entry|
+    recently_read = @entries.map { |entry|
       RecentlyReadEntry.create(user: @user, entry: entry)
-    end
+    }
 
     login_as @user
     get :index, format: :json

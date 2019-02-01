@@ -5,8 +5,8 @@ class WellKnownController < ApplicationController
   def apple_site_association
     render json: {
       "webcredentials": {
-        "apps": ENV["APPLE_SITE_ASSOCIATION"].split(",")
-      }
+        "apps": ENV["APPLE_SITE_ASSOCIATION"].split(","),
+      },
     }
   end
 
@@ -17,5 +17,4 @@ class WellKnownController < ApplicationController
   def change_password
     redirect_to settings_account_url, status: :moved_permanently
   end
-
 end

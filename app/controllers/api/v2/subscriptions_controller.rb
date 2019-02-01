@@ -15,11 +15,11 @@ module Api
           respond_to do |format|
             format.json do
               @subscriptions = @user.subscriptions.includes(:feed).order("subscriptions.created_at DESC")
-              if params.has_key?(:since)
+              if params.key?(:since)
                 time = Time.iso8601(params[:since])
                 @subscriptions = @subscriptions.where("subscriptions.created_at > :time", {time: time})
               end
-              if @subscriptions.any?
+              if @subscriptions.present?
                 fresh_when(etag: @subscriptions, last_modified: @subscriptions.maximum(:updated_at))
               else
                 @subscriptions = []

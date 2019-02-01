@@ -10,7 +10,7 @@ class SearchIndexRemoveTest < ActiveSupport::TestCase
 
   test "should remove entries from search index" do
     assert_difference "Entry.__elasticsearch__.client.count['count']", -@entries.count do
-      SearchIndexRemove.new().perform(@entries.map(&:id))
+      SearchIndexRemove.new.perform(@entries.map(&:id))
       Entry.__elasticsearch__.refresh_index!
     end
   end

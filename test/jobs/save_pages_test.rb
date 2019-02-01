@@ -11,14 +11,14 @@ class SavePagesTest < ActiveSupport::TestCase
     url = "https://mercury.postlight.com/parser?url=#{article_url}"
     stub_request_file("parsed_page.json", url, headers: {"Content-Type" => "application/json; charset=utf-8"})
 
-    SavePages.new().perform(@entry.id)
+    SavePages.new.perform(@entry.id)
 
     saved_pages = @entry.reload.data["saved_pages"]
-    assert saved_pages.has_key?(article_url), "Entry should have saved page"
+    assert saved_pages.key?(article_url), "Entry should have saved page"
     page = saved_pages[article_url]["result"]
 
-    %w{title author url date_published content domain}.each do |key|
-      assert page.has_key?(key), "page is missing #{key}"
+    %w[title author url date_published content domain].each do |key|
+      assert page.key?(key), "page is missing #{key}"
     end
   end
 end

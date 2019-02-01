@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   before_action :ensure_permission, only: [:update, :destroy]
 
   def new
-    @user = User.new().with_params(params)
+    @user = User.new.with_params(params)
   end
 
   def create

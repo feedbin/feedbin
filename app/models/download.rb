@@ -1,5 +1,4 @@
 class Download
-
   attr_reader :url, :response
 
   def initialize(url)
@@ -36,6 +35,4 @@ class Download
   def key
     @key ||= Digest::SHA1.hexdigest url
   end
-
-
 end

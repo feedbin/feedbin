@@ -25,7 +25,4 @@ class NewsletterSaver
       "x-amz-storage-class" => "REDUCED_REDUNDANCY",
     }
   end
-
-
-
 end

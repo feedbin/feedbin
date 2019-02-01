@@ -48,10 +48,10 @@ class Customer
   end
 
   def update_plan(plan_id, trial_end)
-    if trial_end.future?
-      subscription.trial_end = trial_end.to_i
+    subscription.trial_end = if trial_end.future?
+      trial_end.to_i
     else
-      subscription.trial_end = "now"
+      "now"
     end
     subscription.plan = plan_id
     subscription.save

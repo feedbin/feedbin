@@ -1,9 +1,9 @@
 class Transformers
-  LISTS = Set.new(%w(ul ol).freeze)
+  LISTS = Set.new(%w[ul ol].freeze)
   LIST_ITEM = "li".freeze
-  TABLE_ITEMS = Set.new(%w(tr td th).freeze)
+  TABLE_ITEMS = Set.new(%w[tr td th].freeze)
   TABLE = "table".freeze
-  TABLE_SECTIONS = Set.new(%w(thead tbody tfoot).freeze)
+  TABLE_SECTIONS = Set.new(%w[thead tbody tfoot].freeze)
 
   def class_whitelist
     lambda do |env|
@@ -29,7 +29,7 @@ class Transformers
 
       Sanitize.node!(node, whitelist)
 
-      {:node_whitelist => [node]}
+      {node_whitelist: [node]}
     end
   end
 

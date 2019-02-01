@@ -25,7 +25,6 @@ module Api
 
         @taggings = user.taggings.includes(:tag)
       end
-
     end
   end
 end

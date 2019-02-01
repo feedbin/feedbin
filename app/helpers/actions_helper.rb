@@ -4,15 +4,15 @@ module ActionsHelper
 
     user = User.find(action.user_id)
 
-    feed_names = user.feeds.where(id: action.feed_ids).include_user_title.map do |feed|
+    feed_names = user.feeds.where(id: action.feed_ids).include_user_title.map { |feed|
       feed.title
-    end
+    }
 
     feed_names.sort!
 
     output << feed_names.shift(2).join(", ")
 
-    if feed_names.any?
+    if feed_names.present?
       output << "and #{feed_names.length} more feeds"
     end
 
@@ -30,7 +30,7 @@ module ActionsHelper
         actions << action_label(action_name)
       end
     end
-    if actions.any?
+    if actions.present?
       actions.join(" and ")
     else
       "do nothing"
