@@ -9,7 +9,8 @@ module Searchable
     STARRED_REGEX = /(?<=\s|^)is:\s*starred(?=\s|$)/
     UNSTARRED_REGEX = /(?<=\s|^)is:\s*unstarred(?=\s|$)/
     SORT_REGEX = /(?<=\s|^)sort:\s*(asc|desc|relevance)(?=\s|$)/i
-    TAG_ID_REGEX = /(?<=\s|^)tag_id:\s*([0-9]+)(?=\s|$)/
+    TAG_ID_REGEX = /tag_id:\s*(\d+)/
+    TAG_GROUP_REGEX = /tag_id:\((.*?)\)/
 
     search_settings = {
       "analysis": {
@@ -166,14 +167,19 @@ module Searchable
         params[:query] = params[:query].gsub(SORT_REGEX, "")
       end
 
-      if TAG_ID_REGEX.match?(params[:query])
-        tag_id = params[:query].match(TAG_ID_REGEX)[1].downcase
+      params[:query] = params[:query].gsub(TAG_ID_REGEX) do |s|
+        tag_id = Regexp.last_match[1]
         feed_ids = user.taggings.where(tag_id: tag_id).pluck(:feed_id)
-
         id_string = feed_ids.join(" OR ")
-        id_string = "feed_id:(#{id_string})"
+        "feed_id:(#{id_string})"
+      end
 
-        params[:query] = params[:query].gsub(TAG_ID_REGEX, id_string)
+      params[:query] = params[:query].gsub(TAG_GROUP_REGEX) do |s|
+        tag_group = Regexp.last_match[1]
+        tag_ids = tag_group.split(" OR ")
+        feed_ids = user.taggings.where(tag_id: tag_ids).pluck(:feed_id).uniq
+        id_string = feed_ids.join(" OR ")
+        "feed_id:(#{id_string})"
       end
 
       params[:query] = FeedbinUtils.escape_search(params[:query])
