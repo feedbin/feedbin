@@ -8584,6 +8584,9 @@ button.close {
     padding-left: 24px;
     padding-right: 24px;
     @include border-top($color-borders);
+    &.hide {
+        display: none;
+    }
     @media (max-width: $small-breakpoint) {
         padding: 16px;
     }
@@ -8640,13 +8643,13 @@ button.close {
 }
 
 
-.modal-purpose-edit_subscription, .modal-purpose-tags, .modal-purpose-subscribe {
+.modal-purpose-generic, .modal-purpose-subscribe {
     .modal-body {
         padding: 0;
     }
 }
 
-.modal-purpose-tags, .modal-purpose-subscribe {
+.modal-purpose-generic, .modal-purpose-subscribe {
     .modal-footer {
         bottom: 0;
         z-index: 2;

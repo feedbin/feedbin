@@ -53,7 +53,7 @@ class SubscriptionsController < ApplicationController
   end
 
   def destroy
-    subscription = @user.subscriptions.where(feed_id: params[:id]).take!
+    subscription = @user.subscriptions.find(params[:id])
     destroy_subscription(subscription.id)
     get_feeds_list
   end

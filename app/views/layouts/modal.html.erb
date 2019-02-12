@@ -18,11 +18,9 @@
                     <%= yield :modal_body %>
                 </div>
             <% end %>
-            <% if content_for?(:modal_footer) %>
-                <div class="modal-footer">
-                    <%= yield :modal_footer %>
-                </div>
-            <% end %>
+            <div class="modal-footer <%= content_for?(:modal_footer) ? "" : "hide" %>">
+                <%= yield :modal_footer %>
+            </div>
         </div>
     </div>
 </div>

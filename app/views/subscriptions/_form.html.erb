@@ -9,7 +9,7 @@
                                 <%= f.text_field :title, class: 'subscription-title', placeholder: subscription.feed.title, class: 'subscription-title' %>
                                 <%= subscription_presenter.favicon(subscription.feed) %>
                             </div>
-                            <%= link_to "Unsubscribe", settings_subscription_path(subscription), method: :delete, class: "button button-secondary settings-unsubscribe", data: { confirm: "Are you sure you want to unsubscribe?" } %>
+                            <%= link_to "Unsubscribe", subscription_path(subscription), method: :delete, remote: true, class: "button button-secondary settings-unsubscribe", data: { confirm: "Are you sure you want to unsubscribe?" } %>
                         </div>
                     </li>
                 </ul>
@@ -17,7 +17,7 @@
             <div class="inset-content">
                 <h4 class="group-header">Tags</h4>
             </div>
-            <%= render partial: "tag_fields", locals: {tag_editor: tag_editor} %>
+            <%= render partial: "shared/tag_fields", locals: {tag_editor: tag_editor} %>
         </div>
         <button class="hide" type="submit"></button>
     <% end %>

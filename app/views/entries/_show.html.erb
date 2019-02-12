@@ -11,7 +11,7 @@
                 </button>
                 <%
                 if subscriptions.include?(entry.feed.id)
-                  link_args = [modal_edit_feed_path(entry.feed), remote: true, class: 'feed-button', data: {behavior: 'open_modal', modal_target: 'edit_subscription'}]
+                  link_args = [edit_subscription_path(entry.feed), remote: true, class: 'feed-button', data: {behavior: 'open_modal', modal_target: 'generic'}]
                 else
                   link_args = ["#", remote: true, class: 'feed-button', data: {behavior: 'show_message', message: "Cannot edit. You are no longer subscribed to this feed."}]
                 end

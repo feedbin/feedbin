@@ -39,7 +39,7 @@
         <div class="inset-content">
             <h4 class="group-header">Tags</h4>
         </div>
-        <%= render partial: "tag_fields", locals: {tag_editor: tag_editor} %>
+        <%= render partial: "shared/tag_fields", locals: {tag_editor: tag_editor} %>
         <%= submit_tag("Submit", class: "visually-hidden", data: {behavior: "submit_add"}) %>
     </div>
 <% end %>

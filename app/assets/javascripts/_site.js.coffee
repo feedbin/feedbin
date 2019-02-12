@@ -230,8 +230,12 @@ $.extend feedbin,
     $('[data-behavior~=line_graph]').each ()->
       feedbin.drawBarChart(@, $(@).data('values'))
 
-  modalContent: (html, target) ->
-    $(".#{target} .modal-body").html(html);
+  modalContent: (target, body, footer = null) ->
+    modal = $(".#{target}")
+    $(".modal-body", modal).html(body);
+    if footer
+      $(".modal-footer", modal).removeClass("hide");
+      $(".modal-footer", modal).html(footer);
 
   showFeedList: ->
     $('[data-behavior~=feeds_target]').removeClass('hide')
@@ -1361,6 +1365,7 @@ $.extend feedbin,
         if element.is('[data-behavior~=has_settings]')
           button.attr('href', element.data('settings-path'))
           button.data('modal-target', element.data('settings-modal'))
+          button.data('modal-title', "Subscription Settings")
           button.removeAttr('disabled')
         else
           button.attr('disabled', 'disabled')
@@ -2234,7 +2239,7 @@ $.extend feedbin,
         event.preventDefault()
 
       $(document).on 'submit', '[data-behavior~=edit_tags_form]', (event) ->
-        $('.modal-purpose-tags [data-behavior~=submit_tags]').attr('disabled', 'disabled')
+        $('.modal-purpose-generic [data-behavior~=submit_tags]').attr('disabled', 'disabled')
 
       $(document).on 'click', '[data-behavior~=submit_tags]', (event) ->
         $('[data-behavior~=edit_tags_form]').submit()
