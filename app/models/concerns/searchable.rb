@@ -167,19 +167,21 @@ module Searchable
         params[:query] = params[:query].gsub(SORT_REGEX, "")
       end
 
-      params[:query] = params[:query].gsub(TAG_ID_REGEX) do |s|
-        tag_id = Regexp.last_match[1]
-        feed_ids = user.taggings.where(tag_id: tag_id).pluck(:feed_id)
-        id_string = feed_ids.join(" OR ")
-        "feed_id:(#{id_string})"
-      end
+      if params[:query]
+        params[:query] = params[:query].gsub(TAG_ID_REGEX) do |s|
+          tag_id = Regexp.last_match[1]
+          feed_ids = user.taggings.where(tag_id: tag_id).pluck(:feed_id)
+          id_string = feed_ids.join(" OR ")
+          "feed_id:(#{id_string})"
+        end
 
-      params[:query] = params[:query].gsub(TAG_GROUP_REGEX) do |s|
-        tag_group = Regexp.last_match[1]
-        tag_ids = tag_group.split(" OR ")
-        feed_ids = user.taggings.where(tag_id: tag_ids).pluck(:feed_id).uniq
-        id_string = feed_ids.join(" OR ")
-        "feed_id:(#{id_string})"
+        params[:query] = params[:query].gsub(TAG_GROUP_REGEX) do |s|
+          tag_group = Regexp.last_match[1]
+          tag_ids = tag_group.split(" OR ")
+          feed_ids = user.taggings.where(tag_id: tag_ids).pluck(:feed_id).uniq
+          id_string = feed_ids.join(" OR ")
+          "feed_id:(#{id_string})"
+        end
       end
 
       params[:query] = FeedbinUtils.escape_search(params[:query])
