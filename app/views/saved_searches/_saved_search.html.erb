@@ -1,12 +1,12 @@
 <% present saved_search do |saved_search_presenter| %>
     <li data-saved-search-id="<%= saved_search.id %>" data-feed-id="saved-search-<%= saved_search.id %>" class="collection-saved-search">
-        <%= link_to saved_search_path(saved_search.id), remote: true, class: 'feed-link saved-search-link', data: { behavior: 'selectable show_entries open_item feed_link', mark_read: {type: 'saved_search', data: saved_search.id, message: "Mark #{saved_search.name} as read?"}.to_json } do %>
+        <%= link_to saved_search_path(saved_search.id), remote: true, class: "feed-link saved-search-link", data: { behavior: "selectable show_entries open_item feed_link has_settings", mark_read: {type: "saved_search", data: saved_search.id, message: "Mark #{saved_search.name} as read?"}.to_json, settings_modal: "generic", settings_path: edit_saved_search_path(saved_search), settings_title: "Edit Saved Search" } do %>
             <span class="favicon-wrap collection-favicon">
-                <%= svg_tag 'favicon-search', size: '16x16' %>
+                <%= svg_tag "favicon-search", size: "16x16" %>
             </span>
             <span class="collection-label-wrap"><%= saved_search_presenter.name %></span>
             <span class="count-wrap">
-                <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'bySavedSearch', count_group_id: saved_search.id} %>
+                <%= content_tag :span, "", class: "count", data: {behavior: "needs_count", count_group: "bySavedSearch", count_group_id: saved_search.id} %>
             </span>
         <% end %>
     </li>

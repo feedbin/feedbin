@@ -28,10 +28,19 @@ class SavedSearchesController < ApplicationController
     end
   end
 
+  def edit
+    @user = current_user
+    @saved_search = @user.saved_searches.find(params[:id])
+  end
+
   def create
     @user = current_user
     @saved_search = @user.saved_searches.create(saved_search_params)
     get_feeds_list
+  end
+
+  def new
+    @saved_search = @user.saved_searches.build(query: params[:query])
   end
 
   def update

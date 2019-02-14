@@ -55,13 +55,13 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :tags, only: [:index, :show, :update, :destroy]
+  resources :tags, only: [:index, :show, :update, :destroy, :edit]
   resources :billing_events, only: [:show]
   resources :in_app_purchases, only: [:show]
   resources :password_resets
   resources :sharing_services, path: "settings/sharing", only: [:index, :create, :update, :destroy]
   resources :actions, path: "settings/actions", only: [:index, :create, :new, :update, :destroy, :edit]
-  resources :saved_searches, only: [:show, :update, :destroy, :create] do
+  resources :saved_searches, only: [:show, :update, :destroy, :create, :edit, :new] do
     collection do
       get :count
     end
@@ -208,12 +208,14 @@ Rails.application.routes.draw do
   resources :recently_read_entries, only: [] do
     collection do
       delete :destroy_all
+      get :settings
     end
   end
 
   resources :recently_played_entries, only: [] do
     collection do
       delete :destroy_all
+      get :settings
     end
   end
 

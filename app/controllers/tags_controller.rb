@@ -11,6 +11,10 @@ class TagsController < ApplicationController
     end
   end
 
+  def edit
+    @tag = Tag.find(params[:id])
+  end
+
   def show
     @user = current_user
     update_selected_feed!("tag", params[:id])

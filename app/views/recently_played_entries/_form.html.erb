@@ -1,0 +1,7 @@
+<div class="inset">
+    <ul class="control-group">
+        <li>
+            <%= link_to "Clear Recently Played list", destroy_all_recently_played_entries_path, method: :delete, remote: true, data: { confirm: "Are you sure you want to clear your recently played list?" } %>
+        </li>
+    </ul>
+</div>

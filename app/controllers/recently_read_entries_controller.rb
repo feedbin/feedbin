@@ -15,6 +15,10 @@ class RecentlyReadEntriesController < ApplicationController
     end
   end
 
+  def settings
+
+  end
+
   def create
     @user = current_user
     RecentlyReadEntry.create(user: @user, entry_id: params[:id])
@@ -24,11 +28,5 @@ class RecentlyReadEntriesController < ApplicationController
   def destroy_all
     @user = current_user
     @user.recently_read_entries.delete_all
-    @type = "recently_read"
-    @collection_title = "Recently Read"
-    @entries = []
-    respond_to do |format|
-      format.js { render partial: "shared/entries" }
-    end
   end
 end

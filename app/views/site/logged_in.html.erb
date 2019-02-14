@@ -53,10 +53,8 @@
                             </ul>
                         </div>
                     </div>
-                    <span class="save-search" data-behavior="save_search_link">Save Search</span>
+                    <%= link_to "Save Search", new_saved_search_path, remote: true, class: "save-search", data: {behavior: "new_saved_search open_modal", modal_target: "generic"} %>
                     <span class="save-search edit" data-behavior="save_search_link">Edit Saved Search</span>
-                </div>
-                <div class="saved-search-wrap" data-behavior="saved_search_form_target">
                 </div>
             </div>
             <div class="entries">

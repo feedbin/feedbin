@@ -75,7 +75,7 @@ class ApplicationController < ActionController::Base
         favicon_class: "favicon-recently-read",
         parent_class: "collection-recently-read",
         parent_data: {behavior: "recently_read", feed_id: "collection_recently_read", count_type: "recently_read"},
-        data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "recently_read", message: "Mark recently read items as read?"}.to_json},
+        data: {behavior: "selectable show_entries open_item feed_link has_settings", mark_read: {type: "recently_read", message: "Mark recently read items as read?"}.to_json, settings_modal: "generic", settings_path: settings_recently_read_entries_path, settings_title: "Recently Read Settings"},
       }
     end
     unless user.setting_on?(:hide_updated)
@@ -99,7 +99,7 @@ class ApplicationController < ActionController::Base
         favicon_class: "favicon-recently-played",
         parent_class: "collection-recently-played",
         parent_data: {behavior: "recently_played", feed_id: "collection_recently_played", count_type: "recently_played"},
-        data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "recently_played", message: "Mark recently played items as read?"}.to_json},
+        data: {behavior: "selectable show_entries open_item feed_link has_settings", mark_read: {type: "recently_played", message: "Mark recently played items as read?"}.to_json, settings_modal: "generic", settings_path: settings_recently_played_entries_path, settings_title: "Recently Played Settings"},
       }
     end
     collections

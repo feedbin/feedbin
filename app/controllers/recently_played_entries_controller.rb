@@ -17,6 +17,10 @@ class RecentlyPlayedEntriesController < ApplicationController
     end
   end
 
+  def settings
+
+  end
+
   def create
     @user = current_user
     if record = @user.recently_played_entries.find_or_create_by(entry_id: params[:id])
@@ -28,12 +32,6 @@ class RecentlyPlayedEntriesController < ApplicationController
   def destroy_all
     @user = current_user
     @user.recently_played_entries.delete_all
-    @type = "recently_played"
-    @collection_title = "Recently Played"
-    @entries = []
-    respond_to do |format|
-      format.js { render partial: "shared/entries" }
-    end
   end
 
   private
