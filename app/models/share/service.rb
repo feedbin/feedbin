@@ -28,9 +28,7 @@ class Share::Service
     if params[:readability] == "on"
       url = entry.fully_qualified_url
       key = FeedbinUtils.page_cache_key(url)
-      content_info = Rails.cache.fetch(key) {
-        MercuryParser.parse(url)
-      }
+      content_info = MercuryParser.parse(url)
       content = content_info.content
     else
       content = entry.content
