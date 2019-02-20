@@ -352,6 +352,10 @@ class Entry < ApplicationRecord
         array << UnreadEntry.new(user_id: user_id, feed_id: feed_id, entry_id: id, published: published, entry_created_at: created_at)
       }
       UnreadEntry.import(unread_entries, validate: false)
+      unread_entries = subscriptions.each_with_object([]) { |user_id, array|
+        array << UnreadEntry.new(user_id: user_id, feed_id: feed_id, entry_id: id, published: published, entry_created_at: created_at)
+      }
+      Unread.import(unread_entries, validate: false)
     end
     SearchIndexStore.perform_async(self.class.name, id)
   end

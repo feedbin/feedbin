@@ -27,6 +27,7 @@ class EntryDeleter
 
       # Delete records
       UnreadEntry.where(entry_id: entries_to_delete_ids).delete_all
+      Unread.where(entry_id: entries_to_delete_ids).delete_all
       UpdatedEntry.where(entry_id: entries_to_delete_ids).delete_all
       RecentlyReadEntry.where(entry_id: entries_to_delete_ids).delete_all
       Entry.where(id: entries_to_delete_ids).delete_all

@@ -28,6 +28,7 @@ class ActionsBulk
         end
       when "mark_read"
         user.unread_entries.where(entry_id: entry_ids).delete_all
+        user.unreads.where(entry_id: entry_ids).delete_all
       end
     end
   end

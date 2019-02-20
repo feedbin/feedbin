@@ -41,10 +41,15 @@ class Subscription < ApplicationRecord
       UnreadEntry.new_from_owners(user, entry)
     }
     UnreadEntry.import(unread_entries, validate: false)
+    unread_entries = entries.map { |entry|
+      Unread.new_from_owners(user, entry)
+    }
+    Unread.import(unread_entries, validate: false)
   end
 
   def mark_as_read
     UnreadEntry.where(user_id: user_id, feed_id: feed_id).delete_all
+    Unread.where(user_id: user_id, feed_id: feed_id).delete_all
   end
 
   def add_feed_to_action

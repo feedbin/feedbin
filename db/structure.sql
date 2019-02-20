@@ -933,6 +933,41 @@ CREATE TABLE public.unread_entries (
 
 
 --
+-- Name: unreads; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.unreads (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    feed_id bigint NOT NULL,
+    entry_id bigint NOT NULL,
+    published timestamp without time zone NOT NULL,
+    entry_created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: unreads_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.unreads_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: unreads_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.unreads_id_seq OWNED BY public.unreads.id;
+
+
+--
 -- Name: updated_entries; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1183,6 +1218,13 @@ ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id
 
 
 --
+-- Name: unreads id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.unreads ALTER COLUMN id SET DEFAULT nextval('public.unreads_id_seq'::regclass);
+
+
+--
 -- Name: updated_entries id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1394,6 +1436,14 @@ ALTER TABLE ONLY public.taggings
 
 ALTER TABLE ONLY public.tags
     ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: unreads unreads_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.unreads
+    ADD CONSTRAINT unreads_pkey PRIMARY KEY (id);
 
 
 --
@@ -1840,6 +1890,55 @@ CREATE INDEX index_unread_entries_on_user_id_and_published ON public.unread_entr
 
 
 --
+-- Name: index_unreads_on_entry_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_unreads_on_entry_id ON public.unreads USING btree (entry_id);
+
+
+--
+-- Name: index_unreads_on_feed_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_unreads_on_feed_id ON public.unreads USING btree (feed_id);
+
+
+--
+-- Name: index_unreads_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_unreads_on_user_id ON public.unreads USING btree (user_id);
+
+
+--
+-- Name: index_unreads_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_unreads_on_user_id_and_created_at ON public.unreads USING btree (user_id, created_at);
+
+
+--
+-- Name: index_unreads_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_unreads_on_user_id_and_entry_id ON public.unreads USING btree (user_id, entry_id);
+
+
+--
+-- Name: index_unreads_on_user_id_and_feed_id_and_published; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_unreads_on_user_id_and_feed_id_and_published ON public.unreads USING btree (user_id, feed_id, published);
+
+
+--
+-- Name: index_unreads_on_user_id_and_published; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_unreads_on_user_id_and_published ON public.unreads USING btree (user_id, published);
+
+
+--
 -- Name: index_updated_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2075,6 +2174,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20180607200816'),
 ('20180714072623'),
 ('20180717001048'),
-('20190201020722');
+('20190201020722'),
+('20190220004135');
 
 
