@@ -2030,6 +2030,14 @@ CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING b
 
 
 --
+-- Name: unreads fk_rails_90f07702a3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.unreads
+    ADD CONSTRAINT fk_rails_90f07702a3 FOREIGN KEY (entry_id) REFERENCES public.entries(id) ON DELETE CASCADE;
+
+
+--
 -- PostgreSQL database dump complete
 --
 

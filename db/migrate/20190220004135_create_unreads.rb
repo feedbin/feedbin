@@ -9,6 +9,9 @@ class CreateUnreads < ActiveRecord::Migration[5.1]
 
       t.timestamps
     end
+
+    add_foreign_key :unreads, :entries, on_delete: :cascade
+
     add_index :unreads, [:user_id, :entry_id], unique: true
     add_index :unreads, [:user_id, :created_at]
     add_index :unreads, [:user_id, :feed_id, :published]
