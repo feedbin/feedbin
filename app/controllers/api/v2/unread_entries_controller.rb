@@ -17,7 +17,6 @@ module Api
         ActiveRecord::Base.transaction do
           entries[:valid_entries].each do |entry|
             UnreadEntry.create(user_id: @user.id, feed_id: entry[:feed_id], entry_id: entry[:entry_id], published: entry[:published], entry_created_at: entry[:created_at])
-            Unread.create(user_id: @user.id, feed_id: entry[:feed_id], entry_id: entry[:entry_id], published: entry[:published], entry_created_at: entry[:created_at])
           end
         end
         render json: entries[:entry_ids].to_json
@@ -26,7 +25,6 @@ module Api
       def destroy
         @user = current_user
         @user.unread_entries.where(entry_id: params[:unread_entries]).delete_all
-        @user.unreads.where(entry_id: params[:unread_entries]).delete_all
         render json: params[:unread_entries].to_json
       end
 

@@ -30,7 +30,6 @@ class ActionsPerform
           star(user_ids, user_actions)
         elsif action_name == "mark_read"
           UnreadEntry.where(user_id: user_ids, entry_id: entry_id).delete_all
-          Unread.where(user_id: user_ids, entry_id: entry_id).delete_all
         elsif action_name == "send_ios_notification"
           send_ios_notification(user_ids)
         end
