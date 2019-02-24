@@ -11,6 +11,7 @@ class MigrateUnreads
       unread_entries = user.unread_entries.where(entry_id: entry_ids).map(&:attributes)
       Unread.import unread_entries, on_duplicate_key_ignore: true
     end
+  rescue ActiveRecord::RecordNotFound
   end
 
   def build
