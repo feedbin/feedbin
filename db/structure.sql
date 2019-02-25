@@ -918,21 +918,6 @@ ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
 
 
 --
--- Name: unread_entries; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.unread_entries (
-    user_id integer,
-    feed_id integer,
-    entry_id integer,
-    published timestamp without time zone,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    entry_created_at timestamp without time zone
-);
-
-
---
 -- Name: unreads; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1841,55 +1826,6 @@ CREATE INDEX index_tags_on_name ON public.tags USING btree (name);
 
 
 --
--- Name: index_unread_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_unread_entries_on_entry_id ON public.unread_entries USING btree (entry_id);
-
-
---
--- Name: index_unread_entries_on_feed_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_unread_entries_on_feed_id ON public.unread_entries USING btree (feed_id);
-
-
---
--- Name: index_unread_entries_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_unread_entries_on_user_id ON public.unread_entries USING btree (user_id);
-
-
---
--- Name: index_unread_entries_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_unread_entries_on_user_id_and_created_at ON public.unread_entries USING btree (user_id, created_at);
-
-
---
--- Name: index_unread_entries_on_user_id_and_entry_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_unread_entries_on_user_id_and_entry_id ON public.unread_entries USING btree (user_id, entry_id);
-
-
---
--- Name: index_unread_entries_on_user_id_and_feed_id_and_published; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_unread_entries_on_user_id_and_feed_id_and_published ON public.unread_entries USING btree (user_id, feed_id, published);
-
-
---
--- Name: index_unread_entries_on_user_id_and_published; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_unread_entries_on_user_id_and_published ON public.unread_entries USING btree (user_id, published);
-
-
---
 -- Name: index_unreads_on_entry_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2183,6 +2119,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20180714072623'),
 ('20180717001048'),
 ('20190201020722'),
-('20190220004135');
+('20190220004135'),
+('20190225200600');
 
 

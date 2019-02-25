@@ -17,7 +17,6 @@ class Api::V2::UnreadEntriesControllerTest < ApiControllerTestCase
 
   test "should create unread entry" do
     UnreadEntry.delete_all
-    Unread.delete_all
     api_content_type
     login_as @user
     entries = @entries.sample(2)
