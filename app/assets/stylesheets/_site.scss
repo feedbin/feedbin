@@ -8112,7 +8112,7 @@ Media Queries
 /*------------------------------------------------------------------------------
 Add
 ------------------------------------------------------------------------------*/
-$modal-border-radius: 16px;
+$modal-border-radius: 8px;
 
 button.close {
     appearance: none;
@@ -8453,7 +8453,7 @@ button.close {
     margin: 0.5rem;
     pointer-events: none;
     box-shadow: 0 20px 40px 0 rgba(0,0,0,.4);
-    border-radius: 16px;
+    border-radius: $modal-border-radius;
 }
 
 .modal.animate .modal-dialog {
