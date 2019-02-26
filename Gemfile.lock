@@ -411,7 +411,7 @@ GEM
       unicode-display_width (~> 1.4.0)
     ruby-progressbar (1.10.0)
     ruby_dep (1.5.0)
-    rubyzip (1.1.0)
+    rubyzip (1.2.2)
     safe_yaml (1.0.5)
     sanitize (4.6.6)
       crass (~> 1.0.2)
@@ -577,7 +577,7 @@ DEPENDENCIES
   responders (~> 2.0)
   reverse_markdown
   rmagick
-  rubyzip (= 1.1.0)
+  rubyzip (= 1.2.2)
   sanitize
   sassc-rails
   selenium-webdriver
