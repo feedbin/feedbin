@@ -9,13 +9,21 @@
                     <h1>
                         <a href="<%= micropost.fully_qualified_url %>" target="_blank" class="link">
                             <strong><%= micropost.micropost.author_name %></strong>
-                            @<%= micropost.micropost.author_name %>
+                            <%= micropost.micropost.author_display_username %>
                         </a>
+                        <% if micropost.micropost.microblog? %>
                         <span class="tweet-actions">
                             <%= link_to thread_micropost_path(micropost), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {behavior: "open_modal", modal_target: "conversation"} do %>
                                 <%= svg_tag "icon-micro-blog" %>
                             <% end %>
                         </span>
+                        <% elsif micropost.micropost.instagram? %>
+                        <span class="tweet-actions">
+                            <%= link_to micropost.fully_qualified_url, class: "twitter-conversation-link", title: "View on Instagram" do %>
+                                <%= svg_tag "icon-instagram" %>
+                            <% end %>
+                        </span>
+                        <% end %>
                     </h1>
                     <p class="post-meta">
                         <%= link_to micropost.fully_qualified_url, target: "_blank", title: "View post" do %>

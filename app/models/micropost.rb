@@ -23,7 +23,7 @@ class Micropost
   end
 
   def author_username
-    data.dig("author", "_microblog", "username")
+    data.dig("author", "_microblog", "username") || data.dig("author", "_instagram", "username")
   end
 
   def author_display_username
@@ -32,6 +32,22 @@ class Micropost
 
   def url
     "https://micro.blog/#{author_username}/#{id}"
+  end
+
+  def source
+    if data.dig("author", "_microblog")
+      :microblog
+    elsif data.dig("author", "_instagram")
+      :instagram
+    end
+  end
+
+  def microblog?
+    source == :microblog
+  end
+
+  def instagram?
+    source == :instagram
   end
 
   private
