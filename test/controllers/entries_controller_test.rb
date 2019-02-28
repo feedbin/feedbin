@@ -39,7 +39,7 @@ class EntriesControllerTest < ActionController::TestCase
 
   test "should get show with tweet" do
     entry = create_tweet_entry(@user.feeds.first)
-    url = "https://mercury.postlight.com/parser?url=https://9to5mac.com/2018/01/12/final-cut-pro-x-how-to-improve-slow-motion-in-your-projects-video/"
+    url = "https://extract.example.com/parser/user/4e4143c7bd4d8c935741d37a3c14f61a268a5b79?base64_url=aHR0cHM6Ly85dG81bWFjLmNvbS8yMDE4LzAxLzEyL2ZpbmFsLWN1dC1wcm8teC1ob3ctdG8taW1wcm92ZS1zbG93LW1vdGlvbi1pbi15b3VyLXByb2plY3RzLXZpZGVvLw=="
     stub_request_file("parsed_page.json", url, headers: {"Content-Type" => "application/json; charset=utf-8"})
     SavePages.new.perform(entry.id)
 

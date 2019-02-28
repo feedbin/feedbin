@@ -178,15 +178,15 @@ class Entry < ApplicationRecord
   end
 
   def self.include_unread_entries(user_id)
-    joins("LEFT OUTER JOIN unread_entries ON entries.id = unread_entries.entry_id AND unread_entries.user_id = #{user_id.to_i}")
+    joins("LEFT OUTER JOIN unreads ON entries.id = unreads.entry_id AND unreads.user_id = #{user_id.to_i}")
   end
 
   def self.unread_new
-    where("unread_entries.entry_id IS NOT NULL")
+    where("unreads.entry_id IS NOT NULL")
   end
 
   def self.read_new
-    where("unread_entries.entry_id IS NULL")
+    where("unreads.entry_id IS NULL")
   end
 
   def self.include_starred_entries(user_id)
@@ -407,13 +407,6 @@ class Entry < ApplicationRecord
   end
 
   def save_pages
-    if tweet?
-      cached = SavePages.new.perform(id, false)
-      if cached
-        Librato.increment "readability.cached"
-      else
-        SavePages.perform_async(id)
-      end
-    end
+    SavePages.perform_async(id) if tweet?
   end
 end

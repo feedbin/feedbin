@@ -5,9 +5,7 @@ class ViewLinkCache
   def perform(url, expires_at = nil)
     unless Expires.expired?(expires_at)
       key = FeedbinUtils.page_cache_key(url)
-      Rails.cache.fetch(key) do
-        MercuryParser.parse(url)
-      end
+      MercuryParser.parse(url)
     end
   end
 end

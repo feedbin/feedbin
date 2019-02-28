@@ -1,7 +1,4 @@
 class MercuryParser
-  host = ENV["MERCURY_HOST"] || "mercury.postlight.com"
-
-  BASE_URL = "https://#{host}/parser"
 
   attr_reader :url
 
@@ -53,11 +50,21 @@ class MercuryParser
 
   def result
     @result ||= begin
-      query = {url: url}
-      uri = URI.parse(BASE_URL)
-      uri.query = query.to_query
-      response = HTTP.timeout(:global, write: 3, connect: 3, read: 3).headers("x-api-key" => ENV["MERCURY_API_KEY"]).get(uri)
+      response = HTTP.timeout(:global, write: 5, connect: 5, read: 5).use(:auto_inflate).headers("Accept-Encoding" => "gzip").get(service_url)
       response.parse
+    end
+  end
+
+  def service_url
+    @service_url ||= begin
+      digest = OpenSSL::Digest.new("sha1")
+      signature = OpenSSL::HMAC.hexdigest(digest, ENV["EXTRACT_SECRET"], url)
+      base64_url = Base64.urlsafe_encode64(url).gsub("\n", "")
+      URI::HTTPS.build({
+        host: ENV["EXTRACT_HOST"],
+        path: "/parser/#{ENV["EXTRACT_USER"]}/#{signature}",
+        query: "base64_url=#{base64_url}"
+      }).to_s
     end
   end
 

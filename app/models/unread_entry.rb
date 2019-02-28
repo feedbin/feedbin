@@ -3,6 +3,8 @@ class UnreadEntry < ApplicationRecord
   belongs_to :feed
   belongs_to :entry
 
+  self.table_name = "unreads"
+
   validates_uniqueness_of :user_id, scope: :entry_id
 
   def self.new_from_owners(user, entry)

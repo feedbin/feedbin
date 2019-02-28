@@ -85,12 +85,9 @@ class EntriesController < ApplicationController
       if @content_view
         url = @entry.fully_qualified_url
         key = FeedbinUtils.page_cache_key(url)
-        @content_info = Rails.cache.fetch(key) {
-          Librato.increment "readability.first_parse"
-          MercuryParser.parse(url)
-        }
+        @content_info = MercuryParser.parse(url)
         @content = @content_info.content
-        Librato.increment "readability.parse"
+        Librato.increment "readability.first_parse"
       else
         @content = @entry.content
       end
@@ -117,11 +114,8 @@ class EntriesController < ApplicationController
     @user = current_user
     @url = params[:url]
     key = FeedbinUtils.page_cache_key(@url)
-    @content_info = Rails.cache.fetch(key) {
-      Librato.increment "readability.first_parse"
-      MercuryParser.parse(params[:url])
-    }
-
+    Librato.increment "readability.first_parse"
+    @content_info = MercuryParser.parse(params[:url])
     begin
       @content = ContentFormatter.format!(@content_info.content, nil)
     rescue
