@@ -7,5 +7,10 @@
         <span class="count-wrap">
             <%= content_tag :span, '', class: 'count', data: collection[:count_data] %>
         </span>
+        <% if collection[:clear] %>
+            <%= form_tag collection[:clear][:path], remote: true, method: :delete, class: 'feed-action-form clear-form' do |f| %>
+                <%= submit_tag "clear", class: 'feed-action-button', data: { confirm: collection[:clear][:message] } %>
+            <% end %>
+        <% end %>
     <% end %>
 <% end %>

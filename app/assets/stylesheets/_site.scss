@@ -1307,7 +1307,7 @@ Structure
             .tag-link .count-wrap {
                 margin-left: 0;
             }
-            .toggle-drawer {
+            .feed-action-form {
                 padding: 0;
                 margin: 0;
                 margin-left: auto;
@@ -1333,9 +1333,15 @@ Structure
                     right: 0px;
                 }
             }
+            .clear-form {
+                display: none;
+            }
             &.selected {
                 .feed-action-button {
                     color: rgba(white, .7) !important;
+                }
+                .clear-form {
+                    display: block;
                 }
             }
             &.ui-draggable-dragging {

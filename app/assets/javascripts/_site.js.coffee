@@ -1378,13 +1378,13 @@ $.extend feedbin,
 
     clearEntry: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event) ->
-        unless $(event.target).is('.toggle-drawer')
+        unless $(event.target).is('.feed-action-form')
           feedbin.clearEntry()
         return
 
     cancelFeedRequest: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event, xhr) ->
-        if $(event.target).is(".toggle-drawer")
+        if $(event.target).is(".feed-action-form")
           return
 
         if feedbin.feedXhr
