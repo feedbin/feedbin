@@ -1,9 +1,9 @@
 <div class="modal-dialog" role="document">
-    <%= form_for(tag, remote: true, method: :patch, html: {class: 'settings', data: {behavior: "disable_on_submit"}}) do |f| %>
+    <%= form_for(tag, remote: true, method: :patch, html: {class: 'settings tags-form', data: {behavior: "disable_on_submit"}}) do |f| %>
         <% content_for :modal_content do %>
-            <div class="edit-field-wrap">
+            <div class="modal-header-input">
                 <%= f.text_field :name, placeholder: tag.name %>
-                <span class="icon">T</span>
+                <span class="icon">📦</span>
             </div>
         <% end %>
 

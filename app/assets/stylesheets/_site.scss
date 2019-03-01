@@ -8132,7 +8132,7 @@ button.close {
     }
 }
 
-.edit-field-wrap {
+.modal-header-input {
     position: sticky;
     top: 0;
     z-index: 100;
@@ -8147,16 +8147,20 @@ button.close {
         justify-content: center;
     }
     input {
-        border-bottom-left-radius: 0 !important;
-        border-bottom-right-radius: 0 !important;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
         margin: 0;
-        font-size: 18px;
-        line-height: 18px;
-        padding: 12px 14px;
-        padding-left: 47px !important;
-        font-weight: bold;
+        border: none;
+        margin: 0;
         width: 100%;
         max-width: 100%;
+        padding: 20px 60px 20px 47px;
+        font-size: 24px;
+        @include color($color-contrast-700);
+        @include background-color($color-contrast-200);
+        &.processing {
+            background-position: 97.5% 26px;
+        }
         .modal-top & {
             border-radius: 0;
         }
@@ -8167,12 +8171,15 @@ button.close {
     }
 }
 
-.modal-form {
-    @include background-color($color-base);
+.feeds-search {
+    @include background-color($color-contrast-200);
     border-radius: $modal-border-radius;
-    border-bottom: 1px solid transparent;
     position: relative;
     display: flex;
+    input {
+        border-radius: $modal-border-radius;
+        padding-left: 20px;
+    }
     .favicon-target {
         position: absolute;
         right: 15px;
@@ -8206,20 +8213,8 @@ button.close {
         font-size: 18px;
         padding-top: 5px;
     }
-    input[type=text], input[type=url] {
-        border: none;
-        margin: 0;
-        background-color: transparent !important;
-        width: 100%;
-        max-width: 100%;
-        padding: 20px 60px 20px 20px;
-        font-size: 24px;
-        @include color($color-contrast-700);
-        &.processing {
-            background-position: 97.5% 26px;
-        }
-    }
 }
+
 .available-subscriptions {
     opacity: 0;
     transition: opacity .2s linear;
@@ -8322,9 +8317,8 @@ button.close {
     .modal-footer {
         display: flex !important;
     }
-    .modal-form {
+    .feeds-search {
         border-radius: $modal-border-radius $modal-border-radius 0 0 !important;
-        @include border-color($color-borders);
     }
     .available-subscriptions {
         opacity: 1;
@@ -8706,6 +8700,19 @@ button.close {
         .modal-shown & {
             position: sticky;
         }
+    }
+}
+
+.modal-purpose-edit {
+    .modal-footer {
+        margin-top: -30px;
+        border-color: transparent;
+        .modal-bottom & {
+            @include border-color($color-borders);
+        }
+    }
+    .tags-form .modal-footer {
+        margin-top: 0;
     }
 }
 

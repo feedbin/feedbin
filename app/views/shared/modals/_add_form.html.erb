@@ -1,5 +1,5 @@
 <% content_for :modal_content, flush: true do %>
-    <%= form_tag({controller: "feeds", action: "search"}, remote: true, autocomplete: 'off', novalidate: true, class: 'modal-form', data: { behavior: 'feeds_search'}) do %>
+    <%= form_tag({controller: "feeds", action: "search"}, remote: true, autocomplete: 'off', novalidate: true, class: 'feeds-search modal-header-input', data: { behavior: 'feeds_search'}) do %>
         <label for="q">+ Add</label><%= url_field_tag(:q, "", placeholder: 'Feed, Website URL or @twitter handle', autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, data: { behavior: 'feeds_search_field'}) %>
         <span data-behavior="feeds_search_favicon_target" class="favicon-target"></span>
     <% end %>

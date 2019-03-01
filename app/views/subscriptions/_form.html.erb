@@ -2,7 +2,7 @@
     <div class="modal-dialog" role="document">
         <%= form_for(subscription, remote: true, method: :patch, html: {class: 'settings', data: {behavior: "disable_on_submit"}}) do |f| %>
             <% content_for :modal_content do %>
-                <div class="edit-field-wrap">
+                <div class="modal-header-input">
                     <%= f.text_field :title, placeholder: subscription.feed.title %>
                     <span class="icon"><%= subscription_presenter.favicon(subscription.feed) %></span>
                 </div>
