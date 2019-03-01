@@ -2,3 +2,4 @@
 $('.saved-search-wrap').removeClass('show');
 $('#query').val('');
 $("[data-saved-search-id=<%= @saved_search.id %>] a.feed-link").click();
+$('.modal').modal('hide')

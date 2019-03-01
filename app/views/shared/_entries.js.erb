@@ -39,15 +39,12 @@ var entryIds = <%= @entries.map{ |entry| entry.id }.to_json.html_safe %>;
 <% end %>
 $(document).trigger('feedbin:entriesLoaded');
 feedbin.hideSearchControls()
-<% if @search || @saved_search %>
-    feedbin.showSearchControls("<%= params[:sort] %>");
-    $('.search-control').removeClass('edit');
-    <% if @saved_search.persisted? %>
-        $('#query').val('<%= j @saved_search.query.try(:html_safe) %>');
-        $('.search-control').addClass('edit');
-    <% end %>
+<% if @saved_search && @saved_search.persisted? %>
+    $('#query').val('<%= j @saved_search.query.try(:html_safe) %>');
 <% end %>
 <% if @search %>
+    feedbin.showSearchControls("<%= params[:sort] %>");
+    $('.search-control').removeClass('edit');
     feedbin.markReadData = {
         type: "search",
         data: "<%= @escaped_query %>",

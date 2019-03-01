@@ -53,7 +53,7 @@
                             </ul>
                         </div>
                     </div>
-                    <%= link_to "Save Search", new_saved_search_path, remote: true, class: "save-search", data: {behavior: "new_saved_search open_modal", modal_target: "generic"} %>
+                    <%= link_to "Save Search", new_saved_search_path, remote: true, class: "save-search", data: {behavior: "new_saved_search open_settings_modal"} %>
                     <span class="save-search edit" data-behavior="save_search_link">Edit Saved Search</span>
                 </div>
             </div>
@@ -111,6 +111,7 @@
 <%= render partial: "shared/modals/settings_modal" %>
 <%= render partial: "shared/modals/conversation" %>
 <%= render partial: "shared/modals/generic" %>
+<%= render partial: "shared/modals/edit" %>
 
 <%= render partial: "shared/readability_loading" %>
 <%= render partial: "shared/resizable_form" %>

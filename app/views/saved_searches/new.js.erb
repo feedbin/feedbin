@@ -1,2 +1,2 @@
-feedbin.modalContent("modal-purpose-generic", "<%= j render partial: 'form', locals: {saved_search: @saved_search} %>", '<button type="button" class="button" data-behavior="submit_tags">Save</button>');
+feedbin.replaceModal("modal-purpose-edit", "<%= j render partial: 'form', locals: {saved_search: @saved_search} %>");
 $('.modal #saved_search_name').focus();

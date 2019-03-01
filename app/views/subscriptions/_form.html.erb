@@ -1,24 +1,28 @@
 <% present subscription do |subscription_presenter| %>
-    <%= form_for(subscription, remote: true, method: :patch, html: {class: 'settings', data: {behavior: "edit_tags_form"}}) do |f| %>
-        <div class="inset">
-            <div class="inset-content">
-                <ul class="control-group">
-                    <li>
-                        <div class="subscription-title-wrap">
-                            <div class="field-wrap">
-                                <%= f.text_field :title, class: 'subscription-title', placeholder: subscription.feed.title, class: 'subscription-title' %>
-                                <%= subscription_presenter.favicon(subscription.feed) %>
-                            </div>
-                            <%= link_to "Unsubscribe", subscription_path(subscription), method: :delete, remote: true, class: "button button-secondary settings-unsubscribe", data: { confirm: "Are you sure you want to unsubscribe?" } %>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="inset-content">
-                <h4 class="group-header">Tags</h4>
-            </div>
-            <%= render partial: "shared/tag_fields", locals: {tag_editor: tag_editor} %>
-        </div>
-        <button class="hide" type="submit"></button>
-    <% end %>
+    <div class="modal-dialog" role="document">
+        <%= form_for(subscription, remote: true, method: :patch, html: {class: 'settings', data: {behavior: "disable_on_submit"}}) do |f| %>
+            <% content_for :modal_content do %>
+                <div class="edit-field-wrap">
+                    <%= f.text_field :title, placeholder: subscription.feed.title %>
+                    <span class="icon"><%= subscription_presenter.favicon(subscription.feed) %></span>
+                </div>
+            <% end %>
+
+            <% content_for :modal_body do %>
+                <div class="inset">
+                    <div class="inset-content">
+                        <h4 class="group-header">Tags</h4>
+                    </div>
+                    <%= render partial: "shared/tag_fields", locals: {tag_editor: tag_editor} %>
+                </div>
+            <% end %>
+
+            <% content_for :modal_footer do %>
+                <%= link_to "Unsubscribe", subscription_path(subscription), method: :delete, remote: true, class: "button-text", data: { confirm: "Are you sure you want to unsubscribe?" } %>
+                <input type="submit" class="button" value="Save">
+            <% end %>
+
+            <%= render template: "layouts/modal_inner", locals: {purpose: "edit"} %>
+        <% end %>
+    </div>
 <% end %>

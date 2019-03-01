@@ -1,31 +1,28 @@
-<%= form_for(saved_search, remote: true, method: :patch, html: {class: 'settings', data: {behavior: "edit_tags_form"}}) do |f| %>
-    <div class="inset">
-        <div class="inset-content">
-            <ul class="control-group">
-                <li>
-                    <div class="subscription-title-wrap">
-                        <div class="field-wrap">
+<div class="modal-dialog" role="document">
+    <%= form_for(saved_search, remote: true, html: {class: 'settings', data: {behavior: "disable_on_submit"}}) do |f| %>
+        <% content_for :modal_content do %>
+            <div class="edit-field-wrap">
+                <%= f.text_field :name, placeholder: saved_search.name || "Title" %>
+                <span class="icon">T</span>
+            </div>
+        <% end %>
 
-                            <label>
-                                <h4 class="group-header">Name</h4>
-                                <%= f.text_field :name, class: 'subscription-title', placeholder: saved_search.name, class: 'subscription-title' %>
-                            </label>
-                        </div>
-                        <% if saved_search.persisted? %>
-                            <%= link_to "Delete", saved_search_path(saved_search), method: :delete, remote: true, class: "button button-secondary settings-unsubscribe", data: { confirm: "Are you sure you want to delete this saved search?" } %>
-                        <% end %>
-                    </div>
-                </li>
-                <li>
-                    <div class="subscription-title-wrap">
-                        <label>
-                            <h4 class="group-header">Search</h4>
-                            <%= f.text_field :query, class: 'subscription-title', placeholder: saved_search.query, class: 'subscription-title' %>
-                        </label>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
-    <button class="hide" type="submit"></button>
-<% end %>
+        <% content_for :modal_body do %>
+            <div class="inset">
+                <div class="inset-content">
+                    <h4 class="group-header">Query</h4>
+                    <%= f.text_field :query, placeholder: saved_search.query %>
+                </div>
+            </div>
+        <% end %>
+
+        <% content_for :modal_footer do %>
+            <% if saved_search.persisted? %>
+                <%= link_to "Delete", saved_search_path(saved_search), method: :delete, remote: true, class: "button button-secondary settings-unsubscribe", data: { confirm: "Are you sure you want to delete this saved search?" } %>
+            <% end %>
+            <input type="submit" class="button" value="Save">
+        <% end %>
+
+        <%= render template: "layouts/modal_inner", locals: {purpose: "edit"} %>
+    <% end %>
+</div>

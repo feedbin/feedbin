@@ -1,3 +1,3 @@
 <% if @subscription %>
-    feedbin.modalContent("modal-purpose-generic", "<%= j render partial: 'form', locals: {tag_editor: @tag_editor, subscription: @subscription} %>", '<button type="button" class="button" data-behavior="submit_tags">Save</button>');
+    feedbin.replaceModal("modal-purpose-edit", "<%= j render partial: 'form', locals: {tag_editor: @tag_editor, subscription: @subscription} %>");
 <% end %>

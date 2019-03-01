@@ -8132,6 +8132,41 @@ button.close {
     }
 }
 
+.edit-field-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    .icon {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    input {
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        margin: 0;
+        font-size: 18px;
+        line-height: 18px;
+        padding: 12px 14px;
+        padding-left: 47px !important;
+        font-weight: bold;
+        width: 100%;
+        max-width: 100%;
+        .modal-top & {
+            border-radius: 0;
+        }
+        &:focus {
+            border-color: transparent !important;
+            @include background-color($color-contrast-200);
+        }
+    }
+}
+
 .modal-form {
     @include background-color($color-base);
     border-radius: $modal-border-radius;
@@ -8649,13 +8684,16 @@ button.close {
 }
 
 
-.modal-purpose-generic, .modal-purpose-subscribe {
+.modal-purpose-generic, .modal-purpose-subscribe, .modal-purpose-edit {
     .modal-body {
         padding: 0;
     }
+    input[type="submit"] {
+        margin-left: 16px;
+    }
 }
 
-.modal-purpose-generic, .modal-purpose-subscribe {
+.modal-purpose-generic, .modal-purpose-subscribe, .modal-purpose-edit {
     .modal-footer {
         bottom: 0;
         z-index: 2;

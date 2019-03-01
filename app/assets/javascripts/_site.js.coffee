@@ -230,6 +230,10 @@ $.extend feedbin,
     $('[data-behavior~=line_graph]').each ()->
       feedbin.drawBarChart(@, $(@).data('values'))
 
+  replaceModal: (target, body) ->
+    modal = $(".#{target}")
+    modal.html(body);
+
   modalContent: (target, body, footer = null) ->
     modal = $(".#{target}")
     $(".modal-body", modal).html(body);
@@ -2109,6 +2113,10 @@ $.extend feedbin,
         title = $(@).data("modal-title")
         feedbin.showModal(target, title)
 
+    settingsModal: ->
+      $(document).on 'click', '[data-behavior~=open_settings_modal]', (event) ->
+        feedbin.showModal('edit')
+
     showMessage: ->
       $(document).on 'click', '[data-behavior~=show_message]', (event) ->
         message = $(@).data("message")
@@ -2161,9 +2169,9 @@ $.extend feedbin,
 
     modalScrollPosition: ->
       $('.modal').on 'scroll', (event) ->
-        modalHeader = $('.modal .modal-header').get(0)
+        modalHeader = $('.modal .modal-content').get(0)
         if modalHeader
-          modalAtTop = modalHeader.getBoundingClientRect().top == 0
+          modalAtTop = modalHeader.getBoundingClientRect().top <= 0
           if modalAtTop
             $("body").addClass("modal-top")
           else
@@ -2238,12 +2246,9 @@ $.extend feedbin,
         target.remove()
         event.preventDefault()
 
-      $(document).on 'submit', '[data-behavior~=edit_tags_form]', (event) ->
-        $('.modal-purpose-generic [data-behavior~=submit_tags]').attr('disabled', 'disabled')
-
-      $(document).on 'click', '[data-behavior~=submit_tags]', (event) ->
-        $('[data-behavior~=edit_tags_form]').submit()
-
+    disableSubmit: ->
+      $(document).on 'submit', '[data-behavior~=disable_on_submit]', (event) ->
+        $('[type=submit]', @).attr('disabled', 'disabled')
 
     showContainer: ->
       $(document).on 'click', '[data-behavior~=show_container]', (event) ->

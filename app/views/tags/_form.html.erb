@@ -1,17 +1,17 @@
-<%= form_for(tag, remote: true, method: :patch, html: {class: 'settings', data: {behavior: "edit_tags_form"}}) do |f| %>
-    <div class="inset">
-        <div class="inset-content">
-            <ul class="control-group">
-                <li>
-                    <div class="subscription-title-wrap">
-                        <div class="field-wrap">
-                            <%= f.text_field :name, class: 'subscription-title', placeholder: tag.name, class: 'subscription-title' %>
-                        </div>
-                        <%= link_to "Delete", tag_path(tag), method: :delete, remote: true, class: "button button-secondary settings-unsubscribe", data: { confirm: "Are you sure you want to delete this tag?" } %>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
-    <button class="hide" type="submit"></button>
-<% end %>
+<div class="modal-dialog" role="document">
+    <%= form_for(tag, remote: true, method: :patch, html: {class: 'settings', data: {behavior: "disable_on_submit"}}) do |f| %>
+        <% content_for :modal_content do %>
+            <div class="edit-field-wrap">
+                <%= f.text_field :name, placeholder: tag.name %>
+                <span class="icon">T</span>
+            </div>
+        <% end %>
+
+        <% content_for :modal_footer do %>
+            <%= link_to "Delete", tag_path(tag), method: :delete, remote: true, class: "button-text settings-unsubscribe", data: { confirm: "Are you sure you want to delete this tag?" } %>
+            <input type="submit" class="button" value="Save">
+        <% end %>
+
+        <%= render template: "layouts/modal_inner", locals: {purpose: "edit"} %>
+    <% end %>
+</div>

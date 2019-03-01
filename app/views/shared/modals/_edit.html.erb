@@ -1,0 +1,15 @@
+<% content_for :modal_content, "", flush: true %>
+
+<% content_for :modal_title, "", flush: true %>
+
+<% content_for :modal_body, flush: true do %>
+    <div class="entry-inner">
+        <div class="placeholder-content">
+        </div>
+        <div class="spinner"></div>
+    </div>
+<% end %>
+
+<% content_for :modal_footer, "", flush: true %>
+
+<%= render template: "layouts/modal", locals: {purpose: "edit"} %>

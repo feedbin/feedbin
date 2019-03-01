@@ -1,26 +1,5 @@
 <div class="hide" data-behavior="modal_content" data-modal-purpose="<%= purpose %>">
     <div class="modal-dialog <%= (local_assigns.has_key?(:classes)) ? classes : nil  %>" role="document">
-        <div class="modal-content">
-            <% if content_for?(:modal_content) %>
-                <%= yield :modal_content %>
-            <% end %>
-
-            <% if content_for?(:modal_title) %>
-                <div class="modal-header">
-                    <h5 class="modal-title"><%= yield :modal_title %></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <%= svg_tag 'icon-full-screen-close-small', size: '16x16' %>
-                    </button>
-                </div>
-            <% end %>
-            <% if content_for?(:modal_body) %>
-                <div class="modal-body">
-                    <%= yield :modal_body %>
-                </div>
-            <% end %>
-            <div class="modal-footer <%= content_for?(:modal_footer) ? "" : "hide" %>">
-                <%= yield :modal_footer %>
-            </div>
-        </div>
+        <%= render template: "layouts/modal_inner", locals: local_assigns %>
     </div>
 </div>
