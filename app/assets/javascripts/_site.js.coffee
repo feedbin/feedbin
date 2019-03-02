@@ -247,7 +247,7 @@ $.extend feedbin,
     setTimeout ( ->
       modal.find('.modal-dialog').css({height: 'auto'})
       modal.find('.modal-dialog').removeClass('loading')
-    ), 200
+    ), 150
 
 
   modalContent: (target, body) ->

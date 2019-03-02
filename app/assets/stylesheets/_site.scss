@@ -4377,7 +4377,7 @@ Settings
 }
 
 body.settings {
-    background-color: map-get($color-contrast-100, day);
+    background-color: map-get($color-contrast-700, day);
     color: map-get($color-contrast-700, day);
 }
 
@@ -4390,7 +4390,6 @@ body.settings {
     }
     .settings-nav {
         flex-shrink: 0;
-        background-color: map-get($color-contrast-700, day);
         @media (max-width: 900px) {
             width: 230px;
         }
@@ -4398,6 +4397,7 @@ body.settings {
     .settings-content {
         position: relative;
         padding: 0;
+        background-color: map-get($color-contrast-100, day);
         flex-grow: 1;
         max-width: 100%;
         min-width: 0;
@@ -8497,10 +8497,13 @@ button.close {
     pointer-events: none;
     box-shadow: 0 20px 40px 0 rgba(0,0,0,.4);
     border-radius: $modal-border-radius;
+    .native & {
+        box-shadow: none;
+    }
 }
 
-.modal.animate .modal-dialog {
-    transition: transform 0.3s ease-out, height 0.2s ease-in;
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out, height 0.15s ease-in;
     transform: translate(0, -25%);
 }
 
@@ -8546,6 +8549,11 @@ button.close {
     bottom: 0;
     left: 0;
     z-index: 1040;
+    opacity: 0;
+    transition: opacity 0.15s linear;
+    .native & {
+        transition: none;
+    }
 }
 
 .modal-backdrop, .theme-color-overlay {
@@ -8724,11 +8732,13 @@ button.close {
     }
     .modal-dialog {
         .modal-content * {
-            opacity: 0;
-            transition: opacity .2s linear;
+            transition: opacity .15s linear;
         }
         &.loading {
             overflow: hidden;
+            .modal-content * {
+                opacity: 0;
+            }
             .modal-footer {
                 position: static;
             }
