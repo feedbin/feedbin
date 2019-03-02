@@ -801,6 +801,14 @@ table {
     }
 }
 
+.inset, .feed-form-wrap {
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+}
+
+.feed-form-wrap {
+    border-radius: 8px;
+}
+
 .description-inset {
     padding: 0 30px 0 30px;
     &.icon-email {
@@ -4369,7 +4377,7 @@ Settings
 }
 
 body.settings {
-    background-color: map-get($color-contrast-700, day);
+    background-color: map-get($color-contrast-100, day);
     color: map-get($color-contrast-700, day);
 }
 
@@ -4382,6 +4390,7 @@ body.settings {
     }
     .settings-nav {
         flex-shrink: 0;
+        background-color: map-get($color-contrast-700, day);
         @media (max-width: 900px) {
             width: 230px;
         }
@@ -4389,7 +4398,6 @@ body.settings {
     .settings-content {
         position: relative;
         padding: 0;
-        background-color: map-get($color-contrast-100, day);
         flex-grow: 1;
         max-width: 100%;
         min-width: 0;
@@ -8492,7 +8500,7 @@ button.close {
 }
 
 .modal.animate .modal-dialog {
-    transition: transform 0.3s ease-out;
+    transition: transform 0.3s ease-out, height 0.2s ease-in;
     transform: translate(0, -25%);
 }
 
@@ -8713,6 +8721,23 @@ button.close {
     }
     .tags-form .modal-footer {
         margin-top: 0;
+    }
+    .modal-dialog {
+        .modal-content * {
+            opacity: 0;
+            transition: opacity .2s linear;
+        }
+        &.loading {
+            overflow: hidden;
+            .modal-footer {
+                position: static;
+            }
+        }
+        &.loaded {
+            .modal-content * {
+                opacity: 1;
+            }
+        }
     }
 }
 

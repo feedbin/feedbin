@@ -232,14 +232,27 @@ $.extend feedbin,
 
   replaceModal: (target, body) ->
     modal = $(".#{target}")
-    modal.html(body);
+    height = modal.find('.modal-dialog').outerHeight()
+    body = $(body)
+    body.css({height: "#{height}px"}).addClass('loading')
 
-  modalContent: (target, body, footer = null) ->
+    modal.html(body)
+    contentHeight = modal.find('.modal-content').outerHeight()
+
+    setTimeout ( ->
+      modal.find('.modal-dialog').addClass('loaded')
+      modal.find('.modal-dialog').css({height: "#{contentHeight}px"})
+    ), 1
+
+    setTimeout ( ->
+      modal.find('.modal-dialog').css({height: 'auto'})
+      modal.find('.modal-dialog').removeClass('loading')
+    ), 200
+
+
+  modalContent: (target, body) ->
     modal = $(".#{target}")
     $(".modal-body", modal).html(body);
-    if footer
-      $(".modal-footer", modal).removeClass("hide");
-      $(".modal-footer", modal).html(footer);
 
   showFeedList: ->
     $('[data-behavior~=feeds_target]').removeClass('hide')
