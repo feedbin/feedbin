@@ -22,7 +22,7 @@
 
         <% content_for :modal_footer do %>
             <% if saved_search.persisted? %>
-                <%= link_to "Delete", saved_search_path(saved_search), method: :delete, remote: true, class: "button button-secondary settings-unsubscribe", data: { confirm: "Are you sure you want to delete this saved search?" } %>
+                <%= link_to "Delete", saved_search_path(saved_search), method: :delete, remote: true, class: "button-text settings-unsubscribe", data: { confirm: "Are you sure you want to delete this saved search?" } %>
             <% end %>
             <input type="submit" class="button" value="Save">
         <% end %>

@@ -232,22 +232,24 @@ $.extend feedbin,
 
   replaceModal: (target, body) ->
     modal = $(".#{target}")
-    height = modal.find('.modal-dialog').outerHeight()
+    placeholderHeight = modal.find('.modal-dialog').outerHeight()
     body = $(body)
-    body.css({height: "#{height}px"}).addClass('loading')
+    body.css({height: "#{placeholderHeight}px"}).addClass('loading')
 
     modal.html(body)
     contentHeight = modal.find('.modal-content').outerHeight()
 
-    setTimeout ( ->
-      modal.find('.modal-dialog').addClass('loaded')
-      modal.find('.modal-dialog').css({height: "#{contentHeight}px"})
-    ), 1
+    modal.find('.modal-dialog').addClass('loaded')
 
-    setTimeout ( ->
+    if placeholderHeight == contentHeight
       modal.find('.modal-dialog').css({height: 'auto'})
-      modal.find('.modal-dialog').removeClass('loading')
-    ), 150
+    else
+      modal.find('.modal-dialog').css({height: "#{contentHeight}px"})
+
+      setTimeout ( ->
+        modal.find('.modal-dialog').css({height: 'auto'})
+        modal.find('.modal-dialog').removeClass('loading')
+      ), 150
 
 
   modalContent: (target, body) ->
