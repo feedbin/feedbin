@@ -12,7 +12,6 @@
         feedbin.Counts.get(feedbin.count_data);
     </script>
 <% end %>
-<%= render partial: 'shared/svg' %>
 <div class="application-messages"><a href="" class="message-content" data-behavior="messages">You have subscribed</a></div>
 <div class="app-wrap">
     <div class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
@@ -126,3 +125,5 @@
 <% end %>
 
 <%= one_time_content && one_time_content.html_safe %>
+
+<%= render partial: 'shared/svg' %>
