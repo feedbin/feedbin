@@ -9,7 +9,7 @@
         </span>
         <% if collection[:clear] %>
             <%= form_tag collection[:clear][:path], remote: true, method: :delete, class: 'feed-action-form clear-form' do |f| %>
-                <%= submit_tag "clear", class: 'feed-action-button', data: { confirm: collection[:clear][:message] } %>
+                <%= submit_tag "clear", class: 'feed-action-button', data: { confirm: collection[:clear][:message], behavior: "feed_action" } %>
             <% end %>
         <% end %>
     <% end %>

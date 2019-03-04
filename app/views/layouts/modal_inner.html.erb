@@ -1,4 +1,5 @@
-    <div class="modal-content">
+<div class="modal-content">
+    <div class="modal-content-inner">
         <% if content_for?(:modal_content) %>
             <%= yield :modal_content %>
         <% end %>
@@ -20,3 +21,4 @@
             <%= yield :modal_footer %>
         </div>
     </div>
+</div>

@@ -241,16 +241,16 @@ $.extend feedbin,
 
     modal.find('.modal-dialog').addClass('loaded')
 
-    if placeholderHeight == contentHeight
-      modal.find('.modal-dialog').css({height: 'auto'})
-    else
+    if placeholderHeight != contentHeight
       modal.find('.modal-dialog').css({height: "#{contentHeight}px"})
 
-      setTimeout ( ->
-        modal.find('.modal-dialog').css({height: 'auto'})
-        modal.find('.modal-dialog').removeClass('loading')
-      ), 150
-
+    setTimeout ( ->
+      modal.find('.modal-dialog').css({height: 'auto'})
+      modal.find('.modal-dialog').removeClass('loading')
+      input = modal.find('.modal-header-input input').focus()
+      length = input.val().length
+      input[0].setSelectionRange(length, length)
+    ), 150
 
   modalContent: (target, body) ->
     modal = $(".#{target}")
@@ -1558,6 +1558,12 @@ $.extend feedbin,
       $(document).on 'mouseover', '.dropdown-wrap li', (event) ->
         $('.dropdown-wrap li').not(@).removeClass('selected')
         return
+
+    feedAction: ->
+      $(document).on 'click', '[data-behavior~=feed_action]', (event) =>
+        button.parent('form').submit()
+        event.stopPropagation()
+        event.preventDefault()
 
     drawer: ->
       $(document).on 'click', '[data-behavior~=toggle_drawer]', (event) =>
