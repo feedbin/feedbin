@@ -117,10 +117,7 @@
 <%= render partial: 'shared/update_styles' %>
 <%= render partial: 'shared/saved_searches_count' %>
 
-<%= form_tag(view_link_entries_path, class: 'hide', remote: true, data: {behavior: 'view_link_form'}) do %>
-    <%= hidden_field_tag 'url', nil %>
-<% end %>
-<%= form_tag(view_link_cache_entries_path, class: 'hide', remote: true, data: {behavior: 'view_link_cache_form'}) do %>
+<%= form_tag(cache_extracts_path, method: :get, class: 'hide', remote: true, data: {behavior: 'extract_cache_form'}) do %>
     <%= hidden_field_tag 'url', nil %>
 <% end %>
 

@@ -33,7 +33,7 @@ class Settings::SubscriptionsController < ApplicationController
     FaviconFetcher.perform_async(@subscription.feed.host)
     flash[:notice] = "Favicon will be refreshed shortly"
     flash.discard
-    render "subscriptions/update"
+    render "settings/subscriptions/update"
   end
 
   def update_multiple

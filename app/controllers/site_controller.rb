@@ -50,6 +50,7 @@ class SiteController < ApplicationController
         theme: @user.theme || "day",
         favicon_colors: @user.setting_on?(:favicon_colors),
         font_stylesheet: ENV["FONT_STYLESHEET"],
+        modal_extracts_path: modal_extracts_path,
       }
 
       render action: "logged_in"

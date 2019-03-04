@@ -242,15 +242,21 @@ $.extend feedbin,
     modal.find('.modal-dialog').addClass('loaded')
 
     if placeholderHeight != contentHeight
+      windowHeight = window.innerHeight
+      if windowHeight < contentHeight
+        contentHeight = windowHeight - modal.find('.modal-dialog').offset().top
+      console.log contentHeight
       modal.find('.modal-dialog').css({height: "#{contentHeight}px"})
 
     setTimeout ( ->
       modal.find('.modal-dialog').css({height: 'auto'})
       modal.find('.modal-dialog').removeClass('loading')
-      input = modal.find('.modal-header-input input').focus()
-      length = input.val().length
-      input[0].setSelectionRange(length, length)
-    ), 150
+      input = modal.find('.modal-header-input input')
+      if input.length
+        input.focus()
+        length = input.val().length
+        input[0].setSelectionRange(length, length)
+    ), 200
 
   modalContent: (target, body) ->
     modal = $(".#{target}")
@@ -574,7 +580,7 @@ $.extend feedbin,
       feedbin.previousContent = $("[data-entry-id=#{entryId}] [data-behavior~=entry_content_wrap]").html()
 
       $('[data-behavior~=entry_content_wrap]').html(loadingTemplate)
-      $('[data-behavior~=toggle_content_view]').submit()
+      $('[data-behavior~=toggle_extract]').submit()
 
   resetScroll: ->
     $('.entry-content').prop('scrollTop', 0)
@@ -936,7 +942,7 @@ $.extend feedbin,
       context.stroke()
 
   readabilityActive: ->
-    $('[data-behavior~=toggle_content_view]').find('.active').length > 0
+    $('[data-behavior~=toggle_extract]').find('.active').length > 0
 
   prepareShareForm: ->
     $('.field-cluster input, .field-cluster textarea').val('')
@@ -1113,9 +1119,8 @@ $.extend feedbin,
     modalClass
 
   loadLink: (href) ->
-    form = $("[data-behavior~=view_link_form]")
-    $("#url", form).val(href)
-    form.submit()
+    feedbin.showModal("view_link");
+    $.get(feedbin.data.modal_extracts_path, {url: href});
     $('.entry-final-content a [data-behavior~=link_actions]').remove()
 
   updateFeedSearchMessage: ->
@@ -1644,11 +1649,11 @@ $.extend feedbin,
       feedbin.timeago()
 
     updateReadability: ->
-      $(document).on 'ajax:complete', '[data-behavior~=toggle_content_view]', (event, xhr) ->
+      $(document).on 'ajax:complete', '[data-behavior~=toggle_extract]', (event, xhr) ->
         feedbin.readabilityXHR = null;
         $('.button-toggle-content').removeClass('loading')
 
-      $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_content_view]', (event, xhr) ->
+      $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_extract]', (event, xhr) ->
         if feedbin.readabilityXHR
           feedbin.readabilityXHR.abort()
           xhr.abort()
@@ -2111,7 +2116,7 @@ $.extend feedbin,
 
           if event.type == "mouseenter"
             feedbin.linkCacheTimer = setTimeout ( ->
-              form = $("[data-behavior~=view_link_cache_form]")
+              form = $("[data-behavior~=extract_cache_form]")
               $("#url", form).val(link.attr('href'))
               form.submit()
             ), 100
@@ -2189,6 +2194,14 @@ $.extend feedbin,
         feedbin.setNativeTheme(false, 40)
 
     modalScrollPosition: ->
+      $(document).on 'hide.bs.modal', (event) ->
+        $("body").removeClass("modal-top")
+        $("body").removeClass("modal-bottom")
+
+      $(document).on 'shown.bs.modal', (event) ->
+        $("body").removeClass("modal-top")
+        $("body").removeClass("modal-bottom")
+
       $('.modal').on 'scroll', (event) ->
         modalHeader = $('.modal .modal-content').get(0)
         if modalHeader

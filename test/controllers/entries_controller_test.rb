@@ -48,17 +48,6 @@ class EntriesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "should get content" do
-    login_as @user
-    content = Faker::Lorem.paragraph
-    struct = OpenStruct.new(content: content)
-    MercuryParser.stub :parse, struct do
-      post :content, params: {id: @entries.first, content_view: "true"}, xhr: true
-    end
-    assert_equal assigns(:content), content
-    assert_response :success
-  end
-
   test "should preload" do
     login_as @user
     get :preload, params: {ids: @entries.map(&:id).join(",")}, format: :json

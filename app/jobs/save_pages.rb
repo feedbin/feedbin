@@ -8,7 +8,6 @@ class SavePages
     tweets.push(entry.main_tweet.quoted_status) if entry.main_tweet.quoted_status?
     urls = find_urls(tweets)
     if url = urls.first
-      Librato.increment "readability.first_parse"
       page = MercuryParser.parse(url)
       entry.data["saved_pages"] = {url => page.to_h}
       entry.save!

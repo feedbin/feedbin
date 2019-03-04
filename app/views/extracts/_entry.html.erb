@@ -24,7 +24,7 @@
             </div>
         <% end %>
         <% if content_info.blank? %>
-            <%= render partial: 'media', locals: {entry: entry} %>
+            <%= render partial: 'entries/media', locals: {entry: entry} %>
         <% end %>
         <div class="entry-final-content" data-behavior="entry_final_content">
             <%= content.html_safe %>

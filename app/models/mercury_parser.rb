@@ -8,6 +8,7 @@ class MercuryParser
   end
 
   def self.parse(url)
+    Librato.increment "readability.first_parse"
     new(url)
   end
 

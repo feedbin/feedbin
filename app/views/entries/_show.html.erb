@@ -23,7 +23,7 @@
             </div>
             <div class="entry-buttons">
                 <%= render partial: "sharing_services/sharing_service_button", locals: {services: services} %>
-                <%= render partial: "entries/toggle_content", locals: {content_view: content_view, entry: entry} %>
+                <%= render partial: "entries/toggle_content", locals: {extract: extract, entry: entry} %>
                 <%= render partial: "starred_entries/form", locals: {entry: entry} %>
                 <%= render partial: "unread_entries/form", locals: {entry: entry} %>
                 <%= render partial: "shared/entry_settings_button" %>

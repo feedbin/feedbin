@@ -75,59 +75,6 @@ class EntriesController < ApplicationController
     end
   end
 
-  def content
-    @user = current_user
-    @entry = Entry.find params[:id]
-
-    @content_view = params[:content_view] == "true"
-
-    begin
-      if @content_view
-        url = @entry.fully_qualified_url
-        key = FeedbinUtils.page_cache_key(url)
-        @content_info = MercuryParser.parse(url)
-        @content = @content_info.content
-        Librato.increment "readability.first_parse"
-      else
-        @content = @entry.content
-      end
-    rescue => e
-      @content = check_for_image(@entry, url)
-    end
-
-    begin
-      @content = ContentFormatter.format!(@content, @entry)
-    rescue
-      @content = nil
-    end
-  end
-
-  def view_link
-    @host = URI.parse(params[:url]).host
-    @user = current_user
-    @url = params[:url]
-  rescue
-    @host = nil
-  end
-
-  def view_link_contents
-    @user = current_user
-    @url = params[:url]
-    key = FeedbinUtils.page_cache_key(@url)
-    Librato.increment "readability.first_parse"
-    @content_info = MercuryParser.parse(params[:url])
-    begin
-      @content = ContentFormatter.format!(@content_info.content, nil)
-    rescue
-      @content = nil
-    end
-  end
-
-  def view_link_cache
-    ViewLinkCache.perform_async(params[:url], Expires.expires_in(1.minute))
-    head :ok
-  end
-
   def preload
     @user = current_user
     ids = params[:ids].split(",").map { |i| i.to_i }
@@ -301,7 +248,7 @@ class EntriesController < ApplicationController
       locals = {
         entry: entry,
         services: sharing_services(entry),
-        content_view: false,
+        extract: false,
         user: @user,
         subscriptions: subscriptions,
         updated_entries: updated_entries,

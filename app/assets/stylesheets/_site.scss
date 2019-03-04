@@ -5788,7 +5788,7 @@ Buttons
     @include font-size(16);
     font-weight: bold;
     font-family: $font-stack;
-    color: #FFF;
+    @include color(#FFF);
     text-decoration: none;
     @include border($color-selected);
     border-width: 2px;
@@ -5801,7 +5801,7 @@ Buttons
         text-decoration: none;
         @include border-color($color-selected-hover);
         @include background-color($color-selected-hover);
-        color: #FFF;
+        @include color(#FFF);
         cursor: pointer;
     }
     &:active {
@@ -5813,7 +5813,7 @@ Buttons
         box-shadow: $focus-glow;
     }
     &[disabled], &.disabled {
-        color: #FFF;
+        @include color(#FFF);
         @include border-color($color-contrast-300);
         @include background-color($color-contrast-300);
         cursor: default;
@@ -8173,6 +8173,7 @@ button.close {
             border-radius: 0;
         }
         &:focus {
+            @include color($color-contrast-700);
             border-color: transparent !important;
             @include background-color($color-contrast-200);
         }
@@ -8503,7 +8504,7 @@ button.close {
 }
 
 .modal.fade .modal-dialog {
-    transition: transform 0.3s ease-out, height 0.15s ease-in;
+    transition: transform 0.3s ease-out, height 0.2s ease-in;
     transform: translate(0, -25%);
 }
 
@@ -8730,23 +8731,27 @@ button.close {
     .tags-form .modal-footer {
         margin-top: 0;
     }
-    .modal-dialog {
+}
+
+.modal-dialog {
+    .modal-content *:not(.modal-header) {
+        transition: opacity .2s linear;
+    }
+    &.loading {
+        overflow: hidden;
         .modal-content * {
-            transition: opacity .15s linear;
+            opacity: 0;
         }
-        &.loading {
-            overflow: hidden;
-            .modal-content * {
-                opacity: 0;
-            }
-            .modal-footer {
-                position: static;
-            }
+        .modal-header, .modal-header * {
+            opacity: 1;
         }
-        &.loaded {
-            .modal-content * {
-                opacity: 1;
-            }
+        .modal-footer {
+            position: static;
+        }
+    }
+    &.loaded {
+        .modal-content * {
+            opacity: 1;
         }
     }
 }

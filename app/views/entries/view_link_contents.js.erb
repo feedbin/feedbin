@@ -1,8 +1,0 @@
-target = $('.modal-purpose-view_link .modal-body')
-<% if @content %>
-    target.html("<%= j render partial: 'shared/view_link_contents', locals: {page: @content_info, content: @content} %>");
-    target.addClass("<%= @user.display_prefs %>");
-<% else %>
-    target.html("<%= j render partial: 'shared/view_link_contents_error', locals: {url: @url} %>")
-<% end %>
-feedbin.formatLinkContents();

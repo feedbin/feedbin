@@ -1,0 +1,7 @@
+target = $('.modal-purpose-view_link .modal-body')
+<% if @content %>
+    feedbin.replaceModal("modal-purpose-view_link", "<%= j render partial: 'modal', locals: {page: @content_info, content: @content, user: @user} %>");
+<% else %>
+    target.html("<%= j render partial: 'modal_error', locals: {url: @url} %>")
+<% end %>
+feedbin.formatLinkContents();

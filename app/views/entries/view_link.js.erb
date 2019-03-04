@@ -1,6 +1,0 @@
-<% if @host %>
-    feedbin.showModal("view_link");
-    $.post("<%= view_link_contents_entries_path %>", {url: "<%= @url %>"});
-<% else %>
-    feedbin.showNotification('Unable to load content.', 3000, '', true);
-<% end %>

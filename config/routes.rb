@@ -90,11 +90,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :subscriptions, only: [:index, :edit, :create, :destroy, :update] do
-    member do
-      delete :feed_destroy
-    end
-  end
+  resources :subscriptions, only: [:index, :edit, :create, :destroy, :update]
 
   resources :embeds, only: [] do
     collection do
@@ -150,9 +146,6 @@ Rails.application.routes.draw do
       get :recently_read, to: "recently_read_entries#index"
       get :recently_played, to: "recently_played_entries#index"
       get :updated, to: "updated_entries#index"
-      post :view_link
-      post :view_link_contents
-      post :view_link_cache
       post :mark_all_as_read
       post :mark_direction_as_read
     end
@@ -214,6 +207,16 @@ Rails.application.routes.draw do
   resources :recently_played_entries, only: [] do
     collection do
       delete :destroy_all
+    end
+  end
+
+  resources :extracts, only: [] do
+    member do
+      get :entry
+    end
+    collection do
+      get :modal
+      get :cache
     end
   end
 

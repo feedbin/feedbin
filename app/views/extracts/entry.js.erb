@@ -1,0 +1,10 @@
+<% if @extract %>
+    $('[data-entry-id=<%= @entry.id %>] .button-toggle-content').addClass('active')
+    $("[data-entry-id=<%= @entry.id %>] #extract").val("false")
+<% else %>
+    $('[data-entry-id=<%= @entry.id %>] .button-toggle-content').removeClass('active')
+    $("[data-entry-id=<%= @entry.id %>] #extract").val("true")
+<% end %>
+$('[data-entry-id=<%= @entry.id %>] [data-behavior~=entry_content_wrap]').html("<%= j render partial: "entry", locals: {content: @content, content_info: @content_info, entry: @entry, user: @user} %>");
+feedbin.formatEntryContent(<%= @entry.id %>, false, false);
+feedbin.entryTime();

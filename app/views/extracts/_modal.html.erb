@@ -1,0 +1,34 @@
+<div class="modal-dialog modal-lg" role="document">
+    <% content_for :modal_title do %>
+        Link Contents
+    <% end %>
+
+    <% content_for :modal_body do %>
+        <div class="entry-inner <%= user.display_prefs %>">
+            <header class="entry-header">
+                <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
+                    <h1><%= page.title || "Untitled" %></h1>
+                <% end %>
+
+                <% if page.author || page.published || page.domain %>
+                    <p class="post-meta">
+                        <% if page.published %>
+                            <time><%= page.published.to_s(:full_human) %></time>
+                        <% end %>
+                        <% if page.author %>
+                            by <%= page.author %>
+                        <% end %>
+                    </p>
+                    <p class="post-meta">
+                        <%= page.domain %>
+                    </p>
+                <% end %>
+            </header>
+            <div class="content-styles entry-type-default" data-behavior="view_link_markup_wrap external_links">
+                <%= content.html_safe %>
+            </div>
+        </div>
+    <% end %>
+
+    <%= render template: "layouts/modal_inner", locals: {purpose: "edit"} %>
+</div>

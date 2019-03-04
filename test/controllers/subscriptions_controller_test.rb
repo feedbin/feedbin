@@ -51,25 +51,4 @@ class SubscriptionsControllerTest < ActionController::TestCase
     end
   end
 
-  test "should destroy subscription with feed id" do
-    login_as @user
-    subscription = @user.subscriptions.first
-    assert_difference "Subscription.count", -1 do
-      delete :feed_destroy, params: {id: subscription.feed_id}, xhr: true
-      assert_response :success
-    end
-  end
-
-  test "should update subscription" do
-    login_as @user
-    subscription = @user.subscriptions.first
-
-    attributes = {muted: true, show_updates: false}
-    patch :update, params: {id: subscription, subscription: attributes}, xhr: true
-
-    assert_response :success
-    attributes.each do |attribute, value|
-      assert_equal(value, subscription.reload.send(attribute))
-    end
-  end
 end
