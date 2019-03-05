@@ -255,7 +255,7 @@ $.extend feedbin,
         input.focus()
         length = input.val().length
         input[0].setSelectionRange(length, length)
-    ), 200
+    ), 150
 
   modalContent: (target, body) ->
     modal = $(".#{target}")

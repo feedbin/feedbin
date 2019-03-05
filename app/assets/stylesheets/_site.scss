@@ -1036,7 +1036,7 @@ Structure
 }
 
 .hamburger-menu, .hamburger-menu:before, .hamburger-menu:after {
-    $dot: 5px;
+    $dot: 4px;
     width: $dot;
     height: $dot;
     border-radius: $dot/2;
@@ -8546,7 +8546,7 @@ button.close {
 }
 
 .modal.fade .modal-dialog {
-    transition: transform 0.3s ease-out, height 0.2s ease-in;
+    transition: transform 0.3s ease-out, height 0.15s ease-in;
     transform: translate(0, -25%);
 }
 
@@ -8777,7 +8777,7 @@ button.close {
 
 .modal-dialog {
     .modal-content *:not(.modal-header) {
-        transition: opacity .2s linear;
+        transition: opacity .15s linear;
     }
     &.loading {
         overflow: hidden;
