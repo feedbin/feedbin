@@ -15,17 +15,24 @@
 <div class="application-messages"><a href="" class="message-content" data-behavior="messages">You have subscribed</a></div>
 <div class="app-wrap">
     <div class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
-        <div class="subscribe-toolbar">
-            <button type="button" class="show-subscribe" data-behavior="show_subscribe open_modal" data-modal-target="subscribe">+ Add</button>
+        <div class="top-toolbar">
+            <button type="button" class="show-subscribe" data-behavior="show_subscribe open_modal" data-modal-target="subscribe">+</button>
             <%= render partial: 'shared/hamburger_menu_button' %>
         </div>
         <div class="feeds-inner">
-            <div class="view-toolbar">
-                <%= render partial: 'shared/buttons/view_unread' %>
-                <%= render partial: 'shared/buttons/view_starred' %>
-                <%= render partial: 'shared/buttons/view_all' %>
-            </div>
             <div class="feeds showing-audio-player" data-behavior="droppable">
+                <%= form_tag settings_view_mode_path, remote: true, class: "view-mode" do %>
+                    <div class="select-wrap">
+                        <select name="mode" data-behavior="change_view_mode">
+                            <option value="view_unread" <%= view_mode_selected("view_unread") %>>Unread</option>
+                            <option value="view_starred" <%= view_mode_selected("view_starred") %>>Starred</option>
+                            <option value="view_all" <%= view_mode_selected("view_all") %>>All</option>
+                        </select>
+                        <span class="view-mode-icon">
+                            <span class="hamburger-menu"></span>
+                        </span>
+                    </div>
+                <% end %>
                 <ul data-behavior="feeds_target" class="feeds-target hide fade">
                     <%= render partial: 'feeds/feeds', locals: {collections: @feed_data[:collections], saved_searches: @feed_data[:saved_searches], tags: @feed_data[:tags], feeds: @feed_data[:feeds]} %>
                 </ul>

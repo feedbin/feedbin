@@ -245,7 +245,6 @@ $.extend feedbin,
       windowHeight = window.innerHeight
       if windowHeight < contentHeight
         contentHeight = windowHeight - modal.find('.modal-dialog').offset().top
-      console.log contentHeight
       modal.find('.modal-dialog').css({height: "#{contentHeight}px"})
 
     setTimeout ( ->

@@ -6,7 +6,7 @@ $small-breakpoint: 700px;
 
 $toolbar-height: 41px;
 $font-stack: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
-$bottom-toolbar-height: 52px;
+$bottom-toolbar-height: 76px;
 $audio-player-height: 115px;
 $audio-player-height-minimized: 54px;
 $base-button-position: 10px;
@@ -801,8 +801,11 @@ table {
     }
 }
 
-.inset, .feed-form-wrap {
+.settings-page .inset, .settings-page .feed-form-wrap {
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+    @media (max-width: $small-breakpoint) {
+        box-shadow: none;
+    }
 }
 
 .feed-form-wrap {
@@ -991,7 +994,7 @@ Structure
     }
 }
 
-.subscribe-toolbar {
+.top-toolbar {
     height: $toolbar-height;
     @include border-bottom($color-borders);
     position: absolute;
@@ -999,23 +1002,9 @@ Structure
     left: 0;
     right: 0;
     overflow: hidden;
-    display: flex;
-    .show-subscribe {
-        user-select: none;
-        @include color($color-selected);
-        line-height: $toolbar-height;
-        @include font-size(13);
-        padding: 0 0 0 16px;
-        cursor: pointer;
-        position: relative;
-        font-weight: bold;
-        touch-action: manipulation;
-        display: block;
-        appearance: none;
-        border: none;
-        background: none;
-        text-align: left;
-        flex: 1;
+    display: none;
+    @media (max-width: $small-breakpoint) {
+        display: flex;
     }
 }
 
@@ -1098,6 +1087,42 @@ Structure
 .feed-toolbar {
     display: flex;
     justify-content: space-evenly;
+    padding-bottom: 8px;
+    .show-subscribe {
+        @include font-size(12);
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        flex-direction: column;
+        appearance: none;
+        border: none;
+        flex: 1;
+        padding: 0;
+        .subscribe-inner {
+            $size: 40px;
+            margin-top: auto;
+            flex: 0 0 auto;
+            @include color(#FFF);
+            @include background-color($color-selected);
+            user-select: none;
+            line-height: 1;
+            cursor: pointer;
+            font-weight: bold;
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: $size;
+            height: $size;
+            border-radius: $size;
+            svg {
+                fill: #FFF;
+            }
+        }
+        span {
+            padding-top: 4px;
+        }
+    }
     .toolbar-button {
         flex: 1;
         appearance: none !important;
@@ -1107,7 +1132,7 @@ Structure
         @include font-size(12);
         font-family: $font-stack;
         display: flex;
-        justify-content: center;
+        justify-content: flex-end;
         align-items: center;
         flex-direction: column;
         background-color: transparent;
@@ -1115,7 +1140,9 @@ Structure
             text-decoration: none;
         }
         span {
+            padding-top: 4px;
             @include color($color-icons);
+            flex: 0 0 auto;
         }
         svg {
             @include fill($color-icons);
@@ -1138,41 +1165,15 @@ Structure
 
 .feeds-inner {
     position: absolute;
-    top: $toolbar-height;
+    top: 0;
     bottom: $bottom-toolbar-height;
     left: 0;
     right: 0;
     z-index: 1;
     @include background-color($color-base);
     transition: transform .2s ease;
-}
-
-.view-toolbar {
-    display: flex;
-    height: $toolbar-height;
-    @include border-bottom($color-borders);
-    position: absolute;
-    left: 0;
-    right: 0;
-    .view-button {
-        flex: 1;
-        text-align: center;
-        line-height: $toolbar-height;
-        height: 100%;
-        text-decoration: none;
-        display: block;
-        @include font-size(10);
-        text-transform: uppercase;
-        font-weight: bold;
-        user-select: none;
-        @include border-left($color-borders);
-        @include color($color-contrast-400);
-        &.selected {
-            @include color($color-contrast-700);
-        }
-        &:first-child {
-            border: none;
-        }
+    @media (max-width: $small-breakpoint) {
+        top: $toolbar-height;
     }
 }
 
@@ -1213,7 +1214,7 @@ Structure
 .feeds {
     @include background-color($color-base);
     position: absolute;
-    top: $toolbar-height;
+    top: 0;
     bottom: 0;
     left: 0;
     right: 0;
@@ -1232,6 +1233,47 @@ Structure
     }
     .feeds-target {
         padding-bottom: env(safe-area-inset-bottom);
+    }
+    .view-mode {
+        padding: 25px 10px 19px 12px;
+        .select-wrap {
+            position: relative;
+        }
+        .view-mode-icon {
+            pointer-events: none;
+            position: absolute;
+            top: -2px;
+            left: 100px;
+            $size: 30px;
+            border-radius: $size;
+            height: $size;
+            width: $size;
+            @include background-color($color-contrast-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .view_all & {
+                left: 50px;
+            }
+        }
+        select {
+            background-color: transparent;
+            width: 100%;
+            padding: 0;
+            @include font-size(24);
+            font-weight: bold;
+            line-height: 1.1;
+            border: none;
+            border-radius: 0;
+            appearance: none;
+            padding: 0;
+            @include color($color-contrast-700);
+            position: relative;
+            &::-ms-expand {
+                display: none;
+            }
+
+        }
     }
     ul {
         margin: 0;

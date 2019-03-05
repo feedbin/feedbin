@@ -175,6 +175,7 @@ Rails.application.routes.draw do
     post :entry_width
     post :now_playing
     post :audio_panel_size
+    post :view_mode
   end
 
   post "settings/sticky/:feed_id", as: :settings_sticky, to: "settings#sticky"

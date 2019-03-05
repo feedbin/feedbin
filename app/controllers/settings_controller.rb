@@ -221,6 +221,14 @@ class SettingsController < ApplicationController
     head :ok
   end
 
+  def view_mode
+    modes = ["view_unread", "view_starred", "view_all"]
+    if modes.include?(params[:mode])
+      update_view_mode(params[:mode])
+    end
+    head :ok
+  end
+
   private
 
   def change_font_size(direction)
@@ -257,4 +265,11 @@ class SettingsController < ApplicationController
   def user_now_playing_params
     params.require(:user).permit(:now_playing_entry)
   end
+
+  def update_view_mode(view_mode)
+    @user = current_user
+    @view_mode = view_mode
+    @user.update_attributes(view_mode: @view_mode)
+  end
+
 end

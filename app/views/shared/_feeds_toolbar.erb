@@ -5,6 +5,14 @@
         </div>
         <span>Edit</span>
     </a>
+
+    <button type="button" class="show-subscribe" data-behavior="show_subscribe open_modal" data-modal-target="subscribe">
+        <div class="subscribe-inner">
+            <%= svg_tag "icon-plus", size: "18x18" %>
+        </div>
+        <span>Add</span>
+    </button>
+
     <button class="toolbar-button" disabled="disabled" data-behavior="mark_all_as_read">
         <div class="toolbar-button-inner">
             <%= svg_tag "mark-read", size: "19x17" %>

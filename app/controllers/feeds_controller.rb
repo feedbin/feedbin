@@ -20,18 +20,6 @@ class FeedsController < ApplicationController
     @feed_order = @user.feed_order
   end
 
-  def view_unread
-    update_view_mode("view_unread")
-  end
-
-  def view_starred
-    update_view_mode("view_starred")
-  end
-
-  def view_all
-    update_view_mode("view_all")
-  end
-
   def auto_update
     get_feeds_list
   end
@@ -141,13 +129,6 @@ class FeedsController < ApplicationController
   def twitter_feed?(url)
     url = url.strip
     url.start_with?("@", "#", "http://twitter.com", "https://twitter.com", "http://mobile.twitter.com", "https://mobile.twitter.com", "twitter.com", "mobile.twitter.com")
-  end
-
-  def update_view_mode(view_mode)
-    @user = current_user
-    @view_mode = view_mode
-    @user.update_attributes(view_mode: @view_mode)
-    head :ok
   end
 
   def correct_user
