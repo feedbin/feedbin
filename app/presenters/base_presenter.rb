@@ -17,6 +17,12 @@ class BasePresenter
           fallback = @template.image_url("favicon-profile-default.png")
           @template.image_tag_with_fallback(fallback, url, alt: "")
         end
+      elsif feed.icon
+        content = @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image" do
+          url = @template.camo_link(feed.icon)
+          fallback = @template.image_url("favicon-profile-default.png")
+          @template.image_tag_with_fallback(fallback, url, alt: "")
+        end
       else
         markup = <<-eos
           <span class="favicon favicon-default favicon-character-#{feed.host_letter}" data-host="#{feed.host}"></span>
