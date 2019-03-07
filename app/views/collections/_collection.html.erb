@@ -1,7 +1,7 @@
 <%= content_tag :li, class: collection[:parent_class], data: collection[:parent_data] do %>
     <%= link_to collection[:path], remote: true, class: 'feed-link', data: collection[:data] do %>
         <span class="favicon-wrap collection-favicon">
-            <%= svg_tag collection[:favicon_class], size: '16x16' %>
+            <%= svg_tag collection[:favicon_class] %>
         </span>
         <span class="collection-label-wrap"><%= collection[:title] %></span>
         <span class="count-wrap">

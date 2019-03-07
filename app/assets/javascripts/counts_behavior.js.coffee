@@ -85,8 +85,6 @@ class feedbin.CountsBehavior
   changeViewMode: (event) =>
     feedbin.hideQueue.length = 0
     element = $(event.currentTarget)
-    $('[data-behavior~=change_view_mode]').removeClass('selected')
-    element.addClass('selected')
 
     feedbin.data.viewMode = element.val()
 
@@ -94,7 +92,7 @@ class feedbin.CountsBehavior
     $('body').addClass(feedbin.data.viewMode);
     feedbin.applyCounts(false)
 
-    element.parent('form').submit()
+    element.closest('form').submit()
 
     if feedbin.openFirstItem
       $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click();

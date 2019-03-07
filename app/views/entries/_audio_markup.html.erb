@@ -18,12 +18,12 @@
                 <% if entry_presenter.media_image %>
                     <%= image_tag entry_presenter.media_image %>
                 <% else %>
-                    <%= svg_tag 'icon-podcast', size: '12x21' %>
+                    <%= svg_tag 'icon-podcast', size: '10x17' %>
                 <% end %>
             </div>
             <button class="button-text button-empty play-button" data-behavior="audio_play audio_play_<%= entry.id %>" title="Play/Pause">
-                <%= svg_tag('icon-play', size: "14x16") %>
-                <%= svg_tag('icon-pause', size: "13x17") %>
+                <%= svg_tag('icon-play', size: "12x16") %>
+                <%= svg_tag('icon-pause', size: "12x16") %>
             </button>
         </div>
         <div class="audio-text">
@@ -47,14 +47,14 @@
     </div>
     <div class="audio-player-controls">
         <button class="button-text button-empty" data-behavior="audio_skip_backward" title="Skip Backward 30 Seconds">
-            <%= svg_tag('icon-skip-backward', size: "18x19") %>
+            <%= svg_tag('icon-skip-backward', size: "18x20") %>
         </button>
         <button class="button-text button-empty play-button" data-behavior="audio_play audio_play_<%= entry.id %>" title="Play/Pause">
-            <%= svg_tag('icon-play', size: "14x16") %>
-            <%= svg_tag('icon-pause', size: "13x17") %>
+            <%= svg_tag('icon-play', size: "12x16") %>
+            <%= svg_tag('icon-pause', size: "12x16") %>
         </button>
         <button class="button-text button-empty" data-behavior="audio_skip_forward" title="Skip Forward 30 Seconds">
-            <%= svg_tag('icon-skip-forward', size: "18x19") %>
+            <%= svg_tag('icon-skip-forward', size: "18x20") %>
         </button>
     </div>
     <div class="audio-progress">

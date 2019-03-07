@@ -1026,12 +1026,12 @@ Structure
     z-index: 2;
     position: relative;
     &:before {
-        left: -8px;
+        left: -7px;
         position: absolute;
     }
     &:after {
         position: absolute;
-        left: 8px;
+        left: 7px;
     }
 }
 
@@ -1561,6 +1561,21 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             fill: #FFF;
         }
     }
+}
+
+.favicon-all {
+    width: 12px !important;
+    height: 10px !important;
+}
+
+.favicon-recently-read, .favicon-unread {
+    width: 12px !important;
+    height: 12px !important;
+}
+
+.favicon-recently-played {
+    width: 12px !important;
+    height: 14px !important;
 }
 
 .entries .favicon-newsletter-wrap {
@@ -2924,16 +2939,8 @@ $saved-search-control-height: 48px;
                 display: none;
             }
         }
-        svg {
-            height: 17px;
-            width: 17px;
-        }
     }
     .button-toggle-content {
-        svg {
-            height: 14px;
-            width: 16px;
-        }
         &.loading {
             @keyframes flip {
                 50% {
@@ -2970,11 +2977,6 @@ $saved-search-control-height: 48px;
     }
     .button-settings {
         color: #333;
-        svg {
-            position: absolute;
-            height: 16px;
-            width: 16px;
-        }
     }
 }
 
@@ -6607,6 +6609,9 @@ Media Players
         position: relative;
         border: 2px solid #FFF;
         box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+        .image-container {
+            line-height: 0;
+        }
         img {
             max-width: 100%;
             position: absolute;
@@ -6633,10 +6638,7 @@ Media Players
         }
         .audio-title, .audio-duration {
             @include color($color-contrast-500);
-        }
-        .audio-duration {
-            font-size: 12px;
-            @include color($color-contrast-400);
+            @include font-size(12);
         }
         .entry-feed-title, .audio-title {
             display: block;
@@ -6812,8 +6814,8 @@ Media Players
             }
         }
         svg {
-            @include fill($color-contrast-500);
-            @include color($color-contrast-500);
+            @include fill($color-icons);
+            @include color($color-icons);
         }
     }
 }
