@@ -68,6 +68,10 @@ class Feed < ApplicationRecord
     letter
   end
 
+  def icon
+    options.dig("json_feed", "icon")
+  end
+
   def self.create_from_parsed_feed(parsed_feed)
     ActiveRecord::Base.transaction do
       record = create!(parsed_feed.to_feed)
