@@ -6,7 +6,7 @@ $small-breakpoint: 700px;
 
 $toolbar-height: 41px;
 $font-stack: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
-$bottom-toolbar-height: 76px;
+$bottom-toolbar-height: 74px;
 $audio-player-height: 115px;
 $audio-player-height-minimized: 54px;
 $base-button-position: 10px;
@@ -848,6 +848,11 @@ Structure
     @include border-bottom($color-borders);
     @include background-color($color-base);
     height: $toolbar-height;
+    transition: opacity .2s ease-in;
+    opacity: 0;
+    .search & {
+        opacity: 1;
+    }
     .icon-wrap {
         position: absolute;
         top: 0;
@@ -1043,7 +1048,6 @@ Structure
     content: '';
     display: inline-block;
     @include background-color($color-icons);
-
 }
 
 .bottom-toolbar {
@@ -1086,49 +1090,15 @@ Structure
 
 .feed-toolbar {
     display: flex;
-    justify-content: space-evenly;
-    padding-bottom: 8px;
-    .show-subscribe {
-        @include font-size(12);
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        flex-direction: column;
-        appearance: none;
-        border: none;
-        flex: 1;
-        padding: 0;
-        .subscribe-inner {
-            $size: 40px;
-            margin-top: auto;
-            flex: 0 0 auto;
-            @include color(#FFF);
-            @include background-color($color-selected);
-            user-select: none;
-            line-height: 1;
-            cursor: pointer;
-            font-weight: bold;
-            touch-action: manipulation;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: $size;
-            height: $size;
-            border-radius: $size;
-            svg {
-                fill: #FFF;
-            }
-        }
-        span {
-            padding-top: 4px;
-        }
-    }
+    justify-content: center;
     .toolbar-button {
+        min-width: 66px;
+        max-width: 100px;
         flex: 1;
         appearance: none !important;
         border: none;
         margin: 0;
-        padding: 0;
+        padding: 0 0 8px 0;
         @include font-size(12);
         font-family: $font-stack;
         display: flex;
@@ -1140,7 +1110,6 @@ Structure
             text-decoration: none;
         }
         span {
-            padding-top: 4px;
             @include color($color-icons);
             flex: 0 0 auto;
         }
@@ -1159,7 +1128,28 @@ Structure
         }
     }
     .toolbar-button-inner {
-        height: 20px;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+    }
+    .icon-subscribe {
+        $size: 38px;
+        @include color(#FFF);
+        @include background-color($color-selected);
+        user-select: none;
+        line-height: 1;
+        cursor: pointer;
+        touch-action: manipulation;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: $size;
+        height: $size;
+        border-radius: $size;
+        svg {
+            fill: #FFF !important;
+        }
     }
 }
 
@@ -1240,11 +1230,11 @@ Structure
             position: relative;
         }
         .view-mode-icon {
+            $size: 26px;
             pointer-events: none;
             position: absolute;
-            top: -2px;
+            top: 1px;
             left: 100px;
-            $size: 30px;
             border-radius: $size;
             height: $size;
             width: $size;
@@ -1273,6 +1263,21 @@ Structure
                 display: none;
             }
 
+        }
+        .toggle-search {
+            position: absolute;
+            right: -11px;
+            top: -7px;
+            @include centered;
+            appearance: none !important;
+            border: none;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            background-color: transparent;
+            svg {
+                @include fill($color-selected);
+            }
         }
     }
     ul {
@@ -1770,15 +1775,18 @@ $saved-search-control-height: 48px;
 
 .entries {
     position: absolute;
-    top: $toolbar-height;
+    top: 0;
     bottom: 0;
     left: 0;
     right: 0;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    transition: transform .2s ease;
+    transition: transform .2s ease, top .15s ease-in;
     @include background-color($color-base);
+    .search & {
+        top: $toolbar-height;
+    }
     .has-offscreen-panels &.loading {
         .entries-target {
             display: none;
@@ -2494,38 +2502,19 @@ $saved-search-control-height: 48px;
             }
         }
     }
-    .button-increase-font {
+    .button-increase-font, .button-decrease-font, .button-entry-width, .button-full-screen {
         width: 48px;
         display: block;
-        .icon-larger-text {
-            width: 48px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        svg {
+            @include fill($color-icons);
             pointer-events: none;
-            @include fill($color-contrast-700);
-        }
-    }
-    .button-decrease-font {
-        width: 48px;
-        display: block;
-        .icon-smaller-text {
-            width: 48px;
-            pointer-events: none;
-            @include fill($color-contrast-700);
         }
     }
     .button-entry-width {
-        width: 48px;
-        position: relative;
-        display: block;
-        .icon-entry-width-fixed,
-        .icon-entry-width-fluid {
-            position: absolute;
-            top: 12px;
-            left: 7px;
-            height: 24px;
-            width: 34px;
-            @include fill($color-contrast-700);
-            pointer-events: none;
-        }
         .icon-entry-width-fixed {
             display: none;
         }
@@ -2539,20 +2528,6 @@ $saved-search-control-height: 48px;
         }
     }
     .button-full-screen {
-        width: 48px;
-        position: relative;
-        display: block;
-        cursor: pointer;
-        .icon-full-screen-open,
-        .icon-full-screen-close {
-            position: absolute;
-            top: 11px;
-            left: 7px;
-            width: 34px;
-            height: 26px;
-            @include fill($color-contrast-700);
-            pointer-events: none;
-        }
         .icon-full-screen-close {
             display: none;
         }
@@ -6740,7 +6715,7 @@ Media Players
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            @include color($color-contrast-500);
+            @include color($color-contrast-400);
             &:hover {
                 text-decoration: none;
             }

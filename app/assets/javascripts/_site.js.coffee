@@ -23,6 +23,21 @@ $.extend feedbin,
   isRelated: (selector, element) ->
     !!($(element).is(selector) || $(element).parents(selector).length)
 
+  showSearch: ->
+    $('body').addClass('search')
+    $('[data-behavior~=search_form] input[type=search]').focus()
+
+  hideSearch: ->
+    $('body').removeClass('search')
+    $('[data-behavior~=search_form] input[type=search]').blur()
+
+  toggleSearch: ->
+    console.log 'click'
+    if $('body').hasClass('search')
+      feedbin.hideSearch()
+    else
+      feedbin.showSearch()
+
   timeago: ->
     strings =
       prefixAgo: null
@@ -2288,6 +2303,10 @@ $.extend feedbin,
         target = $(@).data('target')
         $("[data-container~=#{target}]").slideDown("fast")
         event.preventDefault()
+
+    toggleSearch: ->
+      $(document).on 'click', '[data-behavior~=toggle_search]', (event) ->
+        feedbin.toggleSearch()
 
     subscribe: ->
       $(document).on 'shown.bs.modal', (event) ->

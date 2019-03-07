@@ -214,7 +214,7 @@ class feedbin.Keyboard
     # Focus search
     Mousetrap.bind '/', (event, combo) =>
       $('body').removeClass('full-screen')
-      $('[name="query"]').focus()
+      feedbin.showSearch()
       event.preventDefault()
 
     # Open original article
@@ -268,7 +268,7 @@ class feedbin.Keyboard
     # Unfocus field,
     Mousetrap.bindGlobal 'escape', (event, combo) =>
       feedbin.hideSubscribe()
-
+      feedbin.hideSearch()
       if $('[name="subscription[feeds][feed_url]"]').is(':focus')
         $('[name="subscription[feeds][feed_url]"]').blur()
         event.preventDefault()

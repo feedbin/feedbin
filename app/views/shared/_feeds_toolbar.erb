@@ -6,9 +6,11 @@
         <span>Edit</span>
     </a>
 
-    <button type="button" class="show-subscribe" data-behavior="show_subscribe open_modal" data-modal-target="subscribe">
-        <div class="subscribe-inner">
-            <%= svg_tag "icon-plus", size: "18x18" %>
+    <button type="button" class="toolbar-button" data-behavior="show_subscribe open_modal" data-modal-target="subscribe">
+        <div class="toolbar-button-inner">
+            <div class="icon-subscribe">
+                <%= svg_tag "icon-plus", size: "18x18" %>
+            </div>
         </div>
         <span>Add</span>
     </button>
