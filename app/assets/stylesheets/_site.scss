@@ -1580,7 +1580,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 
 .favicon-recently-played {
     width: 12px !important;
-    height: 14px !important;
+    height: 12px !important;
 }
 
 .entries .favicon-newsletter-wrap {
@@ -2962,7 +2962,7 @@ $saved-search-control-height: 48px;
     right: 0;
     top: 0;
     margin: 0;
-    @include border-bottom($color-borders);
+    @include border-bottom(transparent);
     @include background-color($color-base);
     height: $toolbar-height;
     z-index: 1;

@@ -15,7 +15,7 @@ end
             settings_path: edit_tag_path(tag)
         } do %>
         <span class="favicon-wrap collection-favicon">
-            <%= svg_tag 'favicon-tag', size: '16x16' %>
+            <%= svg_tag 'favicon-tag', size: '14x14' %>
         </span>
         <span class="collection-label-wrap" data-behavior="rename_target" data-form-action="<%= tag_path(tag) %>" data-input-name="tag[name]" data-title="<%= tag.name %>", data-original-title="<%= tag.name %>">
             <span class="collection-label" data-behavior="rename_title"><%= tag.name %></span>
