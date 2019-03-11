@@ -1,6 +1,9 @@
 <%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
 feedbin.data.tagNames = <%= raw json_escape(@user.tag_names.to_json) %>;
 $('.modal').modal('hide')
+
+<% if @taggings.present? %>
 var target = $("[data-tag-id=<%= @taggings.first.tag.id %>]").find("[data-feed-id=<%= @feed.id %>]");
 feedbin.scrollTo(target, $('.feeds'));
 target.click();
+<% end %>

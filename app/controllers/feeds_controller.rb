@@ -10,7 +10,7 @@ class FeedsController < ApplicationController
     @feed = Feed.find(params[:id])
     @taggings = @feed.tag_with_params(params, @user)
 
-    @user.update_tag_visibility(@taggings.first.tag.id.to_s, true)
+    @user.update_tag_visibility(@taggings.first.tag.id.to_s, true) if @taggings.present?
 
     if params[:no_response].present?
       head :ok

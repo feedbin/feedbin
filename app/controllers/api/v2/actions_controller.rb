@@ -56,7 +56,7 @@ module Api
         if action = @user.actions.notifier.take
           query = {}
           if action.query.present?
-            query[:query] = @action.query
+            query[:query] = action.query
           end
           if action.computed_feed_ids.present?
             query[:feed_ids] = action.computed_feed_ids
