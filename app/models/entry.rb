@@ -309,6 +309,8 @@ class Entry < ApplicationRecord
 
   def extracted_content_url
     MercuryParser.new(fully_qualified_url).service_url
+  rescue
+    nil
   end
 
   private
