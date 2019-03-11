@@ -47,15 +47,6 @@ class MercuryParser
     }
   end
 
-  private
-
-  def result
-    @result ||= begin
-      response = HTTP.timeout(:global, write: 5, connect: 5, read: 5).use(:auto_inflate).headers("Accept-Encoding" => "gzip").get(service_url)
-      response.parse
-    end
-  end
-
   def service_url
     @service_url ||= begin
       digest = OpenSSL::Digest.new("sha1")
@@ -66,6 +57,15 @@ class MercuryParser
         path: "/parser/#{ENV["EXTRACT_USER"]}/#{signature}",
         query: "base64_url=#{base64_url}"
       }).to_s
+    end
+  end
+
+  private
+
+  def result
+    @result ||= begin
+      response = HTTP.timeout(:global, write: 5, connect: 5, read: 5).use(:auto_inflate).headers("Accept-Encoding" => "gzip").get(service_url)
+      response.parse
     end
   end
 

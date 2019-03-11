@@ -307,6 +307,12 @@ class Entry < ApplicationRecord
     ).to_s
   end
 
+  def extracted_content_url
+    MercuryParser.new(fully_qualified_url).service_url
+  rescue
+    nil
+  end
+
   private
 
   def base_url
