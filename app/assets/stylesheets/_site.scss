@@ -6,7 +6,7 @@ $small-breakpoint: 700px;
 
 $toolbar-height: 41px;
 $font-stack: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
-$bottom-toolbar-height: 90px;
+$bottom-toolbar-height: 93px;
 $audio-player-height: 115px;
 $audio-player-height-minimized: 54px;
 $base-button-position: 10px;
@@ -1031,17 +1031,17 @@ Structure
     z-index: 2;
     position: relative;
     &:before {
-        left: -7px;
+        left: -6px;
         position: absolute;
     }
     &:after {
         position: absolute;
-        left: 7px;
+        left: 6px;
     }
 }
 
 .hamburger-menu, .hamburger-menu:before, .hamburger-menu:after {
-    $dot: 4px;
+    $dot: 3px;
     width: $dot;
     height: $dot;
     border-radius: $dot/2;
@@ -1091,14 +1091,13 @@ Structure
 .feed-toolbar {
     display: flex;
     justify-content: center;
+    @include border-color(transparent);
     .toolbar-button {
-        min-width: 66px;
-        max-width: 100px;
         flex: 1;
         appearance: none !important;
         border: none;
         margin: 0;
-        padding: 0 0 8px 0;
+        padding: 0 0 16px 0;
         @include font-size(12);
         font-family: $font-stack;
         display: flex;
@@ -1110,6 +1109,7 @@ Structure
             text-decoration: none;
         }
         span {
+            padding-top: 8px;
             @include color($color-icons);
             flex: 0 0 auto;
         }
@@ -1130,7 +1130,7 @@ Structure
     .toolbar-button-inner {
         flex: 1;
         justify-content: center;
-        align-items: center;
+        align-items: flex-end;
         display: flex;
     }
     .icon-subscribe {
@@ -1230,7 +1230,7 @@ Structure
             position: relative;
         }
         .view-mode-icon {
-            $size: 26px;
+            $size: 27px;
             pointer-events: none;
             position: absolute;
             top: 1px;
@@ -1276,7 +1276,7 @@ Structure
             height: 40px;
             background-color: transparent;
             svg {
-                @include fill($color-selected);
+                @include fill($color-icons);
             }
         }
     }
@@ -1573,7 +1573,12 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     height: 10px !important;
 }
 
-.favicon-recently-read, .favicon-unread {
+.favicon-unread {
+    width: 14px !important;
+    height: 13px !important;
+}
+
+.favicon-recently-read {
     width: 12px !important;
     height: 12px !important;
 }
@@ -1999,11 +2004,11 @@ $saved-search-control-height: 48px;
     .icon-play-small {
         display: none;
         margin-left: 8px;
-        fill: map-get($color-selected, day);
+        @include fill($color-contrast-400);
     }
     .icon-retweet {
         display: none;
-        fill: map-get($color-selected, day);
+        @include fill($color-contrast-400);
         margin-left: 8px;
     }
     &.no-title {
