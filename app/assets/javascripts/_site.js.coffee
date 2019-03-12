@@ -29,10 +29,10 @@ $.extend feedbin,
 
   hideSearch: ->
     $('body').removeClass('search')
+    $('body').removeClass('show-search-options')
     $('[data-behavior~=search_form] input[type=search]').blur()
 
   toggleSearch: ->
-    console.log 'click'
     if $('body').hasClass('search')
       feedbin.hideSearch()
     else
@@ -890,20 +890,13 @@ $.extend feedbin,
     a - b
 
   showSearchControls: (sort) ->
-    $('.search-control').removeClass('hide');
     text = null
     if sort
       text = $("[data-sort-option=#{sort}]").text()
     if !text
       text = $("[data-sort-option=desc]").text()
     $('.sort-order').text(text)
-    $('.entries').addClass('show-search-options')
-
-  hideSearchControls: ->
-    $('.search-control').addClass('hide');
-    $('.entries').removeClass('show-search-options')
-    $('.entries').removeClass('show-saved-search')
-    $('.saved-search-wrap').removeClass('open')
+    $('body').addClass('show-search-options')
 
   buildPoints: (percentages, width, height) ->
     barWidth = width / (percentages.length - 1)
@@ -1793,12 +1786,6 @@ $.extend feedbin,
         event.preventDefault()
         return
 
-    showSearch: ->
-      $(document).on 'click', '[data-behavior~=show_search]', (event) ->
-        $('body').toggleClass('hide-search')
-        event.preventDefault()
-        return
-
     theme: ->
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
         theme = $(@).data('theme')
@@ -1904,18 +1891,6 @@ $.extend feedbin,
         feedbin.showNotification('Search error.', 3000, '', true);
 
         return
-
-    savedSearch: ->
-      $(document).on 'click', '[data-behavior~=save_search_link]', ->
-        query = $('#query').val()
-        $('#saved_search_query').val(query)
-        $('.entries').toggleClass('show-saved-search')
-        $('.saved-search-wrap').toggleClass('open')
-        $('#saved_search_name').focus()
-        return
-
-      $(document).on 'click', '[data-behavior~=feed_link]:not(.saved-search-link)', ->
-        $('#query').val('')
 
     showPushOptions: ->
       if "safari" of window and "pushNotification" of window.safari

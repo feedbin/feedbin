@@ -2,6 +2,9 @@
     <%= link_to collection[:path], remote: true, class: 'feed-link', data: collection[:data] do %>
         <span class="favicon-wrap collection-favicon">
             <%= svg_tag collection[:favicon_class] %>
+            <% if collection[:favicon_alt_class] %>
+                <%= svg_tag collection[:favicon_alt_class] %>
+            <% end %>
         </span>
         <span class="collection-label-wrap"><%= collection[:title] %></span>
         <span class="count-wrap">

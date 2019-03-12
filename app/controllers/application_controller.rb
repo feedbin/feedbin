@@ -42,6 +42,7 @@ class ApplicationController < ActionController::Base
       count_data: {behavior: "needs_count", count_group: "all"},
       id: "collection_unread",
       favicon_class: "favicon-unread",
+      favicon_alt_class: "favicon-unread-active",
       parent_class: "collection-unread",
       parent_data: {behavior: "all_unread", feed_id: "collection_unread", count_type: "unread"},
       data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "unread", message: "Mark all items as read?"}.to_json},

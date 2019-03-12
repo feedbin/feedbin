@@ -845,10 +845,9 @@ Structure
     right: 0;
     top: 0;
     margin: 0;
-    @include border-bottom($color-borders);
     @include background-color($color-base);
     height: $toolbar-height;
-    transition: opacity .2s ease-in;
+    transition: opacity .3s ease-in;
     opacity: 0;
     .search & {
         opacity: 1;
@@ -1199,6 +1198,20 @@ Structure
 
 .collection-saved-search.zero-count {
     display: block;
+}
+
+.collection-unread {
+    .favicon-unread-active {
+        display: none;
+    }
+    &.selected {
+        .favicon-unread {
+            display: none;
+        }
+        .favicon-unread-active {
+            display: inline;
+        }
+    }
 }
 
 .feeds {
@@ -1578,6 +1591,11 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     height: 13px !important;
 }
 
+.favicon-unread-active {
+    width: 14px !important;
+    height: 13px !important;
+}
+
 .favicon-recently-read {
     width: 12px !important;
     height: 12px !important;
@@ -1670,38 +1688,49 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
 }
 
-$saved-search-control-height: 48px;
-
 .search-control {
     @include background-color($color-contrast-100);
     @include font-size(11);
     line-height: 14px;
-    height: $toolbar-height + $saved-search-control-height;
+    height: $toolbar-height;
     position: absolute;
     top: $toolbar-height;
     left: 0;
     right: 0;
-    .sort-control {
+    .search-toolbar {
         height: $toolbar-height;
-        position: relative;
-        @include border-bottom($color-borders);
+        @include border-top($color-borders);
+        display: flex;
+        justify-content: center;
+        transition: opacity .3s ease-in;
+        opacity: 0;
+        .show-search-options & {
+            opacity: 1;
+        }
     }
     .save-search {
-        position: absolute;
-        right: 8px;
-        top: 12px;
-        float: right;
         font-weight: bold;
         cursor: pointer;
         user-select: none;
         @include color($color-contrast-700);
+        display: flex;
+        align-items: center;
+        padding-right: 8px;
+        &:hover {
+            text-decoration: none;
+        }
+    }
+    .dropdown-wrap {
+        margin-right: auto;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
     }
     .sort-order {
         @include background-color($color-contrast-100);
         border-radius: 12px;
-        margin: 7px 0 0 8px;
+        margin: 0 0 0 8px;
         @include color($color-contrast-700);
-        padding: 5px 22px 5px 10px;
         display: inline-block;
         position: relative;
         cursor: pointer;
@@ -1715,56 +1744,14 @@ $saved-search-control-height: 48px;
             @include theme("border-top-color", $color-contrast-700);
             content: "";
             position: absolute;
-            right: 8px;
-            top: 10px;
+            right: -13px;
+            bottom: 4px;
         }
     }
     .dropdown-wrap {
         .dropdown-content {
             top: 35px;
             left: 8px;
-        }
-    }
-    .saved-search-wrap {
-        height: $saved-search-control-height;
-        padding: 8px;
-        @include background-color($color-contrast-100);
-        position: relative;
-        @include border-bottom($color-borders);
-        input[type="text"] {
-            width: 100%;
-            max-width: 100%;
-            margin-bottom: 0;
-            padding: 5px 25px 5px 5px;
-            @include font-size(14);
-        }
-        @include arrow(
-            $x-position: 12px,
-            $y-position: -1px,
-            $arrow-color: $color-contrast-100,
-            $shadow-color: $color-arrow-shadow,
-            $origin: right)
-        {
-            display: none;
-        }
-        &.open {
-            &:before {
-                display: block;
-            }
-            &:after {
-                display: block;
-            }
-        }
-    }
-    .save-search.edit {
-        display: none;
-    }
-    &.edit {
-        .save-search {
-            display: none;
-        }
-        .save-search.edit {
-            display: block;
         }
     }
 }
@@ -1780,17 +1767,20 @@ $saved-search-control-height: 48px;
 
 .entries {
     position: absolute;
-    top: 0;
+    top: -1px;
     bottom: 0;
     left: 0;
     right: 0;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    transition: transform .2s ease, top .15s ease-in;
+    transition: transform .15s ease-in;
     @include background-color($color-base);
+    @include border-top(transparent);
     .search & {
-        top: $toolbar-height;
+        transform: translateY($toolbar-height);
+        padding-bottom: $toolbar-height;
+        @include border-color($color-borders);
     }
     .has-offscreen-panels &.loading {
         .entries-target {
@@ -1801,13 +1791,9 @@ $saved-search-control-height: 48px;
         @include background-image($image-spinners, true);
         @include background-color($color-base, true);
     }
-    &.show-search-options {
-        transform: translateY($toolbar-height);
-        padding-bottom: $toolbar-height;
-    }
-    &.show-saved-search {
-        transform: translateY($toolbar-height + $saved-search-control-height);
-        padding-bottom: $toolbar-height + $saved-search-control-height;
+    .search.show-search-options & {
+        transform: translateY($toolbar-height * 2);
+        padding-bottom: $toolbar-height * 2;
     }
     ul {
         margin: 0;

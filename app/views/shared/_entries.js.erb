@@ -38,7 +38,6 @@ var entryIds = <%= @entries.map{ |entry| entry.id }.to_json.html_safe %>;
     feedbin.data.progress[<%= record.entry_id %>] = {progress: <%= record.progress %>, duration: <%= record.duration %>}
 <% end %>
 $(document).trigger('feedbin:entriesLoaded');
-feedbin.hideSearchControls()
 <% if @saved_search && @saved_search.persisted? %>
     $('#query').val('<%= j @saved_search.query.try(:html_safe) %>');
 <% end %>

@@ -6,5 +6,5 @@ $('.feed-id-<%= @subscription.feed_id %>').remove();
 feedbin.updateEntryContent('');
 $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
 feedbin.disableMarkRead()
-feedbin.hideSearchControls()
+feedbin.hideSearch()
 $('.modal').modal('hide')

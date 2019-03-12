@@ -49,8 +49,8 @@
                 <div class="icon-wrap"><%= svg_tag "icon-search" %></div>
                 <%= search_field_tag :query, params[:query], placeholder: 'Search', autocomplete: 'off' %>
             <% end %>
-            <div class="search-control hide">
-                <div class="sort-control">
+            <div class="search-control">
+                <div class="search-toolbar">
                     <div class="dropdown-wrap">
                         <span class="sort-order" data-behavior="toggle_dropdown">Sort by date</span>
                         <div class="dropdown-content">
@@ -61,7 +61,6 @@
                         </div>
                     </div>
                     <%= link_to "Save Search", new_saved_search_path, remote: true, class: "save-search", data: {behavior: "new_saved_search open_settings_modal"} %>
-                    <span class="save-search edit" data-behavior="save_search_link">Edit Saved Search</span>
                 </div>
             </div>
             <div class="entries">
