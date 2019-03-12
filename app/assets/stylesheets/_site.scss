@@ -1096,7 +1096,7 @@ Structure
         appearance: none !important;
         border: none;
         margin: 0;
-        padding: 0 0 16px 0;
+        padding: 0 0 18px 0;
         @include font-size(12);
         font-family: $font-stack;
         display: flex;
@@ -1987,7 +1987,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         border-radius: 10px;
         background-color: map-get($color-selected, day);
     }
-    .icon-play-small {
+    .icon-media {
         display: none;
         margin-left: 8px;
         @include fill($color-contrast-400);
@@ -2033,7 +2033,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         }
     }
     &.media {
-        .icon-play-small {
+        .icon-media {
             display: flex;
         }
     }
@@ -2055,7 +2055,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         .title-inner span, .time {
             color: rgba(#FFFFFF, .5) !important;
         }
-        .icon-retweet, .icon-play-small {
+        .icon-retweet, .icon-media {
             fill: rgba(#FFFFFF, .5);
         }
         .icon-star {
@@ -4997,9 +4997,6 @@ body.settings {
             }
         }
     }
-    .settings-unsubscribe {
-        margin-left: auto;
-    }
     .feed-form {
         border-radius: 0 0 8px 8px;
         border-top: none;
@@ -5796,7 +5793,7 @@ Buttons
     margin: 0;
     padding: 0;
     @include font-size(16);
-    font-weight: bold;
+    font-weight: normal;
     font-family: $font-stack;
     @include color(#FFF);
     text-decoration: none;
@@ -8163,6 +8160,9 @@ button.close {
         display: flex;
         align-items: center;
         justify-content: center;
+        svg {
+            @include fill($color-icons);
+        }
     }
     input {
         border-bottom-left-radius: 0;
@@ -8709,9 +8709,6 @@ button.close {
     .modal-body {
         padding: 0;
     }
-    input[type="submit"] {
-        margin-left: 16px;
-    }
 }
 
 .modal-purpose-generic, .modal-purpose-subscribe, .modal-purpose-edit {
@@ -8727,6 +8724,15 @@ button.close {
         .modal-shown & {
             position: sticky;
         }
+        .delete-button {
+            display: flex;
+            align-items: center;
+            margin-right: auto;
+            svg {
+                margin-right: 5px;
+                @include fill($color-icons);
+            }
+        }
     }
 }
 
@@ -8740,6 +8746,9 @@ button.close {
     }
     .tags-form .modal-footer {
         margin-top: 0;
+    }
+    .modal-body {
+        padding-bottom: 16px;
     }
 }
 

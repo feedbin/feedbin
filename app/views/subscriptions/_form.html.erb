@@ -4,7 +4,7 @@
             <% content_for :modal_content do %>
                 <div class="modal-header-input">
                     <%= f.text_field :title, placeholder: subscription.feed.title %>
-                    <span class="icon"><%= subscription_presenter.favicon(subscription.feed) %></span>
+                    <span class="icon"><%= svg_tag "favicon-feeds", size: "16x16" %></span>
                 </div>
             <% end %>
 
@@ -18,7 +18,11 @@
             <% end %>
 
             <% content_for :modal_footer do %>
-                <%= link_to "Unsubscribe", subscription_path(subscription), method: :delete, remote: true, class: "button-text", data: { confirm: "Are you sure you want to unsubscribe?" } %>
+                <%= link_to subscription_path(subscription), method: :delete, remote: true, class: "button-text delete-button", data: { confirm: "Are you sure you want to unsubscribe?" } do %>
+                    <%= svg_tag "icon-delete", size: "16x16" %> Unsubscribe
+                <% end %>
+
+                <button type="button" class="button button-secondary" data-dismiss="modal" aria-label="Cancel">Cancel</button>
                 <input type="submit" class="button" value="Save">
             <% end %>
 

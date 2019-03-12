@@ -39,7 +39,7 @@
                         <%= render partial: "shared/entry_status" %>
                         <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
                         <%= svg_tag "icon-retweet", size: "13x9" %>
-                        <%= svg_tag "icon-play-small", size: "10x10" %>
+                        <%= svg_tag "icon-media", size: "8x9" %>
                     </div>
                     <% if entry.tweet? && entry.main_tweet.quoted_status? %>
                         <p class="title quoted-summary">

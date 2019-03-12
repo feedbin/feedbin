@@ -3,12 +3,15 @@
         <% content_for :modal_content do %>
             <div class="modal-header-input">
                 <%= f.text_field :name, placeholder: tag.name %>
-                <span class="icon">📦</span>
+                <span class="icon"><%= svg_tag "favicon-tag", size: "16x16" %></span>
             </div>
         <% end %>
 
         <% content_for :modal_footer do %>
-            <%= link_to "Delete", tag_path(tag), method: :delete, remote: true, class: "button-text settings-unsubscribe", data: { confirm: "Are you sure you want to delete this tag?" } %>
+            <%= link_to tag_path(tag), method: :delete, remote: true, class: "button-text delete-button", data: { confirm: "Are you sure you want to delete this tag?" } do %>
+                <%= svg_tag "icon-delete", size: "16x16" %> Delete
+            <% end %>
+            <button type="button" class="button button-secondary" data-dismiss="modal" aria-label="Cancel">Cancel</button>
             <input type="submit" class="button" value="Save">
         <% end %>
 
