@@ -23,6 +23,7 @@ env:
     - RAILS_ENV=test
 
 before_install:
+  - mkdir /tmp/elasticsearch
   - wget -O - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1
   - /tmp/elasticsearch/bin/elasticsearch --daemonize --path.data /tmp
   - curl http://127.0.0.1:9200/
@@ -30,7 +31,6 @@ before_install:
   - wget "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" -O /tmp/chromedriver.zip
   - unzip /tmp/chromedriver.zip -d /tmp/
   - mv /tmp/chromedriver /home/travis/bin/
-  - mkdir /tmp/elasticsearch
   - mkdir /tmp/kindlegen
   - wget -O - http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz | tar xz --directory=/tmp/kindlegen
 
