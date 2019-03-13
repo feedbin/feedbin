@@ -2,6 +2,7 @@ language: ruby
 cache: bundler
 sudo: required
 bundler_args: --without development --jobs 2
+dist: xenial
 
 services:
   - redis-server
@@ -22,14 +23,8 @@ env:
     - RAILS_ENV=test
 
 before_install:
-  - sudo apt-get install -y build-essential checkinstall
-  - sudo apt-get build-dep -y imagemagick
-  - mkdir /tmp/imagemagick
-  - wget -O - http://www.imagemagick.org/download/ImageMagick-6.9.10-33.tar.gz | tar xz --directory=/tmp/imagemagick --strip-components=1
-  - cd /tmp/imagemagick/
-  - ./configure --prefix=/opt/imagemagick-6.9.1-10
-  - sudo make
-  - checkinstall
+  - sudo apt-get update
+  - sudo apt-get install -y imagemagick
   - wget "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" -O /tmp/chromedriver.zip
   - unzip /tmp/chromedriver.zip -d /tmp/
   - mv /tmp/chromedriver /home/travis/bin/
