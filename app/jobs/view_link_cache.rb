@@ -4,7 +4,7 @@ class ViewLinkCache
 
   def perform(url, expires_at = nil)
     unless Expires.expired?(expires_at)
-      MercuryParser.parse(url)
+      MercuryParser.parse(url).content
     end
   end
 end
