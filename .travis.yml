@@ -24,6 +24,7 @@ env:
 
 before_install:
   - sudo apt-get remove elasticsearch
+  - sudo apt-get install -y openjdk-8-jre
   - mkdir /tmp/elasticsearch
   - wget -O - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1
   - /tmp/elasticsearch/bin/elasticsearch --daemonize --path.data /tmp
