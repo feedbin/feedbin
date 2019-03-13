@@ -22,6 +22,7 @@ env:
     - RAILS_ENV=test
 
 before_install:
+  - apt-get install imagemagick
   - wget "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" -O /tmp/chromedriver.zip
   - unzip /tmp/chromedriver.zip -d /tmp/
   - mv /tmp/chromedriver /home/travis/bin/
