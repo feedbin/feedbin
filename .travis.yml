@@ -27,7 +27,9 @@ before_install:
   - mkdir /tmp/imagemagick
   - wget -O - http://www.imagemagick.org/download/ImageMagick-6.9.10-33.tar.gz | tar xz --directory=/tmp/imagemagick --strip-components=1
   - cd /tmp/imagemagick/
-  - ./configure --prefix=/opt/imagemagick-6.9.1-10 && make
+  - ./configure --prefix=/opt/imagemagick-6.9.1-10
+  - sudo make
+  - checkinstall
   - wget "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" -O /tmp/chromedriver.zip
   - unzip /tmp/chromedriver.zip -d /tmp/
   - mv /tmp/chromedriver /home/travis/bin/
