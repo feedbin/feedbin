@@ -24,7 +24,7 @@ env:
 
 before_install:
   - sudo apt-get update
-  - sudo apt-get install -y imagemagick
+  - sudo apt-get install -y libidn11-dev
   - wget "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" -O /tmp/chromedriver.zip
   - unzip /tmp/chromedriver.zip -d /tmp/
   - mv /tmp/chromedriver /home/travis/bin/
