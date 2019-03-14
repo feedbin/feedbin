@@ -269,6 +269,7 @@ Rails.application.routes.draw do
 
         resources :subscriptions, only: [:index, :show, :create, :destroy, :update]
         resources :favicons, only: [:index]
+        resources :icons, only: [:index]
         resources :taggings, only: [:index, :show, :create, :destroy]
         resources :recently_read_entries, only: [:index, :create]
         resources :in_app_purchases, only: [:create]
