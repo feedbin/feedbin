@@ -127,7 +127,7 @@ $.extend feedbin,
 
   faviconColors: (target) ->
     $(".favicon-default", target).each ->
-      host = $(@).data("host")
+      host = $(@).data("color-hash-seed")
       color = feedbin.colorHash.hex(host)
       $(@).css
         "background-color": color
@@ -1286,7 +1286,7 @@ $.extend feedbin,
 
     renameFeed: ->
       $(document).on 'dblclick', '[data-behavior~=renamable]', (event) ->
-        unless $(event.target).is('.feed-action-button')
+        unless feedbin.isRelated('.feed-action-button', event.target)
           target = $(@).find('[data-behavior~=rename_target]')
           title = $(@).find('[data-behavior~=rename_title]')
           data = target.data()
@@ -1409,13 +1409,13 @@ $.extend feedbin,
 
     clearEntry: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event) ->
-        unless $(event.target).is('.feed-action-form')
+        unless $(event.target).is('[data-behavior~=feed_action_parent]')
           feedbin.clearEntry()
         return
 
     cancelFeedRequest: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event, xhr) ->
-        if $(event.target).is(".feed-action-form")
+        if $(event.target).is("[data-behavior~=feed_action_parent]")
           return
 
         if feedbin.feedXhr
@@ -1571,25 +1571,19 @@ $.extend feedbin,
         $('.dropdown-wrap li').not(@).removeClass('selected')
         return
 
-    feedAction: ->
-      $(document).on 'click', '[data-behavior~=feed_action]', (event) =>
-        button.parent('form').submit()
-        event.stopPropagation()
-        event.preventDefault()
-
     drawer: ->
-      $(document).on 'click', '[data-behavior~=toggle_drawer]', (event) =>
-        button = $(event.currentTarget)
+      $(document).on 'submit', '[data-behavior~=toggle_drawer]', (event) =>
+        button = $(event.currentTarget).find('button')
         drawer = button.parents('li').find('.drawer')
 
         if drawer.data('hidden') == true
           height = $('ul', drawer).height() + 2
           hidden = false
-          text = 'hide'
+          klass = 'icon-hide'
         else
           height = 0
           hidden = true
-          text = 'show'
+          klass = 'icon-show'
 
         drawer.animate {
           height: height
@@ -1599,12 +1593,20 @@ $.extend feedbin,
               height: 'auto'
 
         drawer.data('hidden', hidden)
-        button.text(text)
+        drawer.toggleClass('hidden')
+        button.removeClass('icon-hide')
+        button.removeClass('icon-show')
+        button.addClass(klass)
 
-        button.parent('form').submit()
         event.stopPropagation()
         event.preventDefault()
         return
+
+    feedAction: ->
+      $(document).on 'click', '[data-behavior~=feed_action]', (event) =>
+        $(event.currentTarget).closest('form').submit()
+        event.stopPropagation()
+        event.preventDefault()
 
     feedActions: ->
       $(document).on 'click', '[data-operation]', (event) ->

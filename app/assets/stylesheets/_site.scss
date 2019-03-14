@@ -1238,7 +1238,12 @@ Structure
         padding-bottom: env(safe-area-inset-bottom);
     }
     .view-mode {
-        padding: 25px 10px 19px 12px;
+        position: sticky;
+        top: -15px;
+        z-index: 2;
+        @include background-color($color-base);
+        @include size-in-rems(padding, 25px 16px 10px 16px)
+        margin-bottom: 9px;
         .select-wrap {
             position: relative;
         }
@@ -1263,6 +1268,7 @@ Structure
             background-color: transparent;
             width: 100%;
             padding: 0;
+            margin-left: 2px;
             @include font-size(24);
             font-weight: bold;
             line-height: 1.1;
@@ -1329,10 +1335,22 @@ Structure
                     background-color: transparent;
                 }
             }
-            .feed-link {
+            .feed-link, &.source-section {
                 @include font-size(14);
                 @include color($color-contrast-700);
-                @include size-in-rems(padding, 6 10)
+                @include size-in-rems(padding, 8 16)
+            }
+            &.source-section {
+                @include size-in-rems(padding-top, 32)
+                font-weight: bold;
+                text-transform: uppercase;
+                display: flex;
+                align-items: center;
+                svg {
+                    @include fill($color-icons);
+                }
+            }
+            .feed-link {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -1396,9 +1414,10 @@ Structure
                     display: block;
                     position: absolute;
                     width: 50px;
-                    height: 40px;
-                    top: -20px;
+                    height: 36px;
+                    top: -18px;
                     right: 0px;
+                    text-align: right;
                 }
             }
             .clear-form {
@@ -1406,7 +1425,46 @@ Structure
             }
             &.selected {
                 .feed-action-button {
-                    color: rgba(white, .7) !important;
+                    @include color(#FFF);
+                }
+                .clear-form {
+                    display: block;
+                }
+            }
+            .tag-visibility-control {
+                padding: 0;
+                margin: 0;
+                margin-left: auto;
+                position: relative;
+                overflow: visible;
+                .feed-action-button {
+                    font-weight: bold;
+                    @include color($color-contrast-400);
+                    @include font-size(12);
+                    display: block;
+                    appearance: none;
+                    background: none;
+                    border: none;
+                    padding: 0;
+                    margin: 0;
+                    display: block;
+                    width: 20px;
+                    height: 20px;
+                    margin-right: 6px;
+                    svg {
+                        @include fill($color-icons);
+                        transition: transform .15s linear;
+                    }
+                    &.icon-hide svg {
+                        transform: rotate(90deg);
+                    }
+                }
+            }
+            &.selected {
+                .feed-action-button {
+                    svg {
+                        @include fill(#FFF);
+                    }
                 }
                 .clear-form {
                     display: block;
@@ -1434,21 +1492,18 @@ Structure
     }
     .drawer {
         position: relative;
-        @include background-color($color-contrast-100);
         overflow: hidden;
+        opacity: 1;
+        transition: opacity .2s linear;
+        @include background-color($color-contrast-100);
+        @include border-top($color-contrast-200);
+        @include border-bottom($color-contrast-200);
+        &.hidden {
+            opacity: 0;
+        }
         ul {
             overflow: hidden;
-            border-top: 1px solid transparent;
-            @include border-bottom($color-borders);
             padding: 0;
-            @include arrow(
-                $x-position: 32px,
-                $y-position: 0px,
-                $arrow-color: $color-base,
-                $shadow-color: $color-arrow-shadow)
-            {
-                z-index: 4;
-            }
         }
     }
     .droppable-hover > a {
@@ -1458,7 +1513,7 @@ Structure
 
 .feeds:not(.dragging) .selected  {
     > a .count {
-        color: rgba(255,255,255,.7);
+        color: rgba(255,255,255,.5);
     }
     input[disabled] {
         color: rgba(255,255,255,.9);
@@ -1543,7 +1598,13 @@ Structure
     }
 }
 
-li.selected > a .favicon-wrap {
+.theme-day {
+    .favicon-wrap {
+        box-shadow: none;
+    }
+}
+
+li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
     @include background-color(#FFF);
     @include box-shadow(rgba(0, 0, 0, 0.1), 0px 1px 1px 0px);
     .feeds &.collection-favicon {

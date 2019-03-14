@@ -9,9 +9,11 @@
                 settings_path: edit_saved_search_path(saved_search)
             } do
         %>
-            <span class="favicon-wrap collection-favicon">
-                <%= svg_tag "favicon-saved-search", size: "16x16" %>
+
+            <span class="favicon-wrap">
+              <span class="favicon favicon-default favicon-character-<%= saved_search.first_letter %>" data-color-hash-seed="<%= saved_search.id %>"></span>
             </span>
+
             <span class="collection-label-wrap"><%= saved_search_presenter.name %></span>
             <span class="count-wrap">
                 <%= content_tag :span, "", class: "count", data: {behavior: "needs_count", count_group: "bySavedSearch", count_group_id: saved_search.id} %>
