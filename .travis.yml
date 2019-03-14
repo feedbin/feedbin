@@ -2,6 +2,7 @@ language: ruby
 cache: bundler
 sudo: required
 bundler_args: --without development --jobs 2
+dist: xenial
 
 services:
   - redis-server
@@ -22,12 +23,15 @@ env:
     - RAILS_ENV=test
 
 before_install:
+  - sudo apt-get remove elasticsearch
+  - sudo wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+  - echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | sudo tee /etc/apt/sources.list.d/elasticsearch-2.x.list
+  - sudo apt-get update
+  - sudo apt-get install -y openjdk-8-jre elasticsearch libidn11-dev
+  - sudo service elasticsearch restart
   - wget "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" -O /tmp/chromedriver.zip
   - unzip /tmp/chromedriver.zip -d /tmp/
   - mv /tmp/chromedriver /home/travis/bin/
-  - mkdir /tmp/elasticsearch
-  - wget -O - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1
-  - /tmp/elasticsearch/bin/elasticsearch --daemonize --path.data /tmp
   - mkdir /tmp/kindlegen
   - wget -O - http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz | tar xz --directory=/tmp/kindlegen
 
