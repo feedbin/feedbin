@@ -28,6 +28,7 @@ before_install:
   - echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | sudo tee /etc/apt/sources.list.d/elasticsearch-2.x.list
   - sudo apt-get update
   - sudo apt-get install -y openjdk-8-jre elasticsearch libidn11-dev
+  - sudo service elasticsearch restart
   - wget "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip" -O /tmp/chromedriver.zip
   - unzip /tmp/chromedriver.zip -d /tmp/
   - mv /tmp/chromedriver /home/travis/bin/
