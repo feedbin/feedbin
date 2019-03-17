@@ -313,7 +313,9 @@ class EntryPresenter < BasePresenter
 
   def content_diff
     before = ContentFormatter.api_format(entry.original["content"], entry)
-    HTMLDiff::Diff.new(before, entry.content).inline_html
+    after = ContentFormatter.api_format(entry.content, entry)
+    result = HTMLDiff::Diff.new("<div>#{before}</div>", "<div>#{after}</div>").inline_html
+    Sanitize.fragment(result, Sanitize::Config::RELAXED)
   rescue
     nil
   end
