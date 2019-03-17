@@ -1576,14 +1576,21 @@ $.extend feedbin,
         button = $(event.currentTarget).find('button')
         drawer = button.parents('li').find('.drawer')
 
+        windowHeight = window.innerHeight
+        targetHeight = $('ul', drawer).height() + 2
+        if windowHeight < targetHeight
+          targetHeight = windowHeight - drawer.offset().top
+
         if drawer.data('hidden') == true
-          height = $('ul', drawer).height() + 2
+          height = targetHeight
           hidden = false
           klass = 'icon-hide'
         else
           height = 0
           hidden = true
           klass = 'icon-show'
+          drawer.css
+            height: targetHeight
 
         drawer.animate {
           height: height

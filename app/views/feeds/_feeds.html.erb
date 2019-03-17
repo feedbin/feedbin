@@ -1,25 +1,31 @@
 <%= render partial: 'collections/collection', collection: collections %>
 
-<li class="source-section section-saved-searches">
-    <span class="favicon-wrap collection-favicon">
-        <%= svg_tag "favicon-saved-search", size: "16x16" %>
-    </span>
-    Saved Searches
-</li>
-<%= render partial: 'saved_searches/saved_search', collection: saved_searches %>
+<% if saved_searches.present? %>
+    <li class="source-section section-saved-searches">
+        <span class="favicon-wrap collection-favicon">
+            <%= svg_tag "favicon-saved-search", size: "16x16" %>
+        </span>
+        Saved Searches
+    </li>
+    <%= render partial: 'saved_searches/saved_search', collection: saved_searches %>
+<% end %>
 
-<li class="source-section section-tags">
-    <span class="favicon-wrap collection-favicon">
-        <%= svg_tag "favicon-tag", size: "16x16" %>
-    </span>
-    Tags
-</li>
-<%= render partial: 'tags/tag', collection: tags %>
+<% if tags.present? %>
+    <li class="source-section section-tags">
+        <span class="favicon-wrap collection-favicon">
+            <%= svg_tag "favicon-tag", size: "16x16" %>
+        </span>
+        Tags
+    </li>
+    <%= render partial: 'tags/tag', collection: tags %>
+<% end %>
 
-<li class="source-section section-feeds">
-    <span class="favicon-wrap collection-favicon">
-        <%= svg_tag "favicon-feeds", size: "16x16" %>
-    </span>
-    Feeds
-</li>
-<%= render feeds %>
+<% if feeds.present? %>
+    <li class="source-section section-feeds">
+        <span class="favicon-wrap collection-favicon">
+            <%= svg_tag "favicon-feeds", size: "16x16" %>
+        </span>
+        Feeds
+    </li>
+    <%= render feeds %>
+<% end %>
