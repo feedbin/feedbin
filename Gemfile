@@ -19,6 +19,7 @@ group :development do
   gem "benchmark-ips"
   gem "listen"
   gem "htmlbeautifier"
+  gem "spring"
 end
 
 group :development, :test do
