@@ -172,7 +172,7 @@ $selected: #0867E2;
 $color-icons: $color-contrast-600;
 $inset-bg-color: #f4f6f8;
 $box-shadow-dropdown: 0px 4px 6px 0 rgba(0, 0, 0, 0.1);
-$focus-glow: 0px 0px 10px 0 rgba($selected, 0.6);
+$focus-glow: 0px 0px 10px 0 rgba($color-accent-green-600, 0.6);
 $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
 
 /*------------------------------------------------------------------------------
@@ -1338,10 +1338,12 @@ Structure
             .feed-link, &.source-section {
                 @include font-size(14);
                 @include color($color-contrast-700);
-                @include size-in-rems(padding, 8 16)
+                @include size-in-rems(padding, 6 16)
             }
             &.source-section {
-                @include size-in-rems(padding-top, 32)
+                @include font-size(13);
+                @include size-in-rems(padding-top, 16)
+                @include color($color-contrast-400);
                 font-weight: bold;
                 text-transform: uppercase;
                 display: flex;
@@ -1451,12 +1453,13 @@ Structure
                     width: 20px;
                     height: 20px;
                     margin-right: 6px;
+                    transition: transform .15s linear;
+                    transform: rotate(-90deg);
                     svg {
                         @include fill($color-icons);
-                        transition: transform .15s linear;
                     }
-                    &.icon-hide svg {
-                        transform: rotate(90deg);
+                    &.icon-hide {
+                        transform: rotate(0deg);
                     }
                 }
             }
@@ -1513,7 +1516,7 @@ Structure
 
 .feeds:not(.dragging) .selected  {
     > a .count {
-        color: rgba(255,255,255,.5);
+        color: white;
     }
     input[disabled] {
         color: rgba(255,255,255,.9);
@@ -5319,7 +5322,7 @@ input[type="checkbox"] + label .slider-checkbox {
     }
 }
 input[type="checkbox"]:checked + label .slider-checkbox {
-    @include background-color($color-selected);
+    @include background-color($color-accent-green-600);
     &:after {
         left: 32px;
         background: #FFF image-url("icon-check.svg") 4px 5px no-repeat;
@@ -8236,7 +8239,7 @@ button.close {
         padding: 20px 60px 20px 47px;
         font-size: 24px;
         @include color($color-contrast-700);
-        @include background-color($color-contrast-200);
+        @include background-color($color-contrast-100);
         &.processing {
             background-position: 97.5% 26px;
         }
@@ -8246,13 +8249,13 @@ button.close {
         &:focus {
             @include color($color-contrast-700);
             border-color: transparent !important;
-            @include background-color($color-contrast-200);
+            @include background-color($color-contrast-100);
         }
     }
 }
 
 .feeds-search {
-    @include background-color($color-contrast-200);
+    @include background-color($color-contrast-100);
     border-radius: $modal-border-radius;
     position: relative;
     display: flex;
@@ -8789,9 +8792,10 @@ button.close {
             display: flex;
             align-items: center;
             margin-right: auto;
+            @include color($color-contrast-600);
             svg {
                 margin-right: 5px;
-                @include fill($color-icons);
+                @include fill($color-contrast-600);
             }
         }
     }
