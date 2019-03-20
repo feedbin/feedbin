@@ -386,15 +386,15 @@ class feedbin.Keyboard
 
   previousItem: ->
     if @selectedColumnName() == 'feeds'
-      @drawer = @selected.prevAll().not(":hidden").first().find('.drawer')
+      @drawer = @selected.prevAll().not(":hidden, .source-section").first().find('.drawer')
       if @inDrawer()
-        prev = @selected.prevAll().not(":hidden").first();
+        prev = @selected.prevAll().not(":hidden, .source-section").first();
         if prev.length == 0
           prev = @selected.parents('li[data-tag-id]');
       else if @hasDrawer()
-        prev = $('ul li', @drawer).not(":hidden").last();
+        prev = $('ul li', @drawer).not(":hidden, .source-section").last();
       else
-        prev = @selected.prevAll().not(":hidden").first();
+        prev = @selected.prevAll().not(":hidden, .source-section").first();
     else
       prev = @selectedItem().prev()
     prev
@@ -403,13 +403,13 @@ class feedbin.Keyboard
     if @selectedColumnName() == 'feeds'
       @drawer = $('.drawer', @selectedItem())
       if @inDrawer()
-        next = @selected.nextAll().not(":hidden").first();
+        next = @selected.nextAll().not(":hidden, .source-section").first();
         if next.length == 0
-          next = @selected.parents('li[data-tag-id]').nextAll().not(":hidden").first();
+          next = @selected.parents('li[data-tag-id]').nextAll().not(":hidden, .source-section").first();
       else if @hasDrawer()
-        next = $('ul li', @drawer).not(":hidden").first();
+        next = $('ul li', @drawer).not(":hidden, .source-section").first();
       else
-        next = @selected.nextAll().not(":hidden").first();
+        next = @selected.nextAll().not(":hidden, .source-section").first();
     else
       next = @selectedItem().next()
     next
@@ -447,7 +447,7 @@ class feedbin.Keyboard
     @columns['feeds'].find('.selected').nextAll('li').find('.count').not('.hide').length
 
   selectNextUnreadFeed: ->
-    @item = @columns['feeds'].find('.selected').nextAll('li').find('.count').not(':hidden').first().parents('li')
+    @item = @columns['feeds'].find('.selected').nextAll('li').find('.count').not(':hidden, .source-section').first().parents('li')
     @selectItem()
 
   hasUnreadEntries: ->

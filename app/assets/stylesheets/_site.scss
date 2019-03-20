@@ -246,6 +246,9 @@ body {
     &.native.app {
         overflow: hidden;
     }
+    &.touch.app {
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+    }
 }
 
 a {
@@ -1009,6 +1012,7 @@ Structure
     display: none;
     @media (max-width: $small-breakpoint) {
         display: flex;
+        display: none;
     }
 }
 
@@ -1163,6 +1167,7 @@ Structure
     transition: transform .2s ease;
     @media (max-width: $small-breakpoint) {
         top: $toolbar-height;
+        top: 0;
     }
 }
 
@@ -1358,7 +1363,7 @@ Structure
                 white-space: nowrap;
                 width: 100%;
                 display: block;
-                align-items: center;
+                align-items: stretch;
                 display: flex;
             }
             .favicon-wrap {
@@ -1368,6 +1373,9 @@ Structure
             .collection-label-wrap {
                 min-width: 0;
                 flex: 1 1 auto;
+                line-height: 1;
+                display: flex;
+                align-items: center;
             }
             .collection-label {
                 display: block;
@@ -1382,12 +1390,14 @@ Structure
             .count-wrap {
                 margin-left: 5px;
                 min-width: 40px;
-                display: block;
                 text-overflow: ellipsis;
                 overflow: hidden;
                 white-space: nowrap;
                 text-align: right;
                 flex: 0 1 auto;
+                display: flex;
+                align-items: stretch;
+                justify-content: flex-end;
             }
             .count {
                 @include color($color-contrast-500);
@@ -1416,9 +1426,10 @@ Structure
                     display: block;
                     position: absolute;
                     width: 50px;
-                    height: 36px;
-                    top: -18px;
-                    right: 0px;
+                    height: 32px;
+                    top: -6px;
+                    right: -16px;
+                    padding-right: 16px;
                     text-align: right;
                 }
             }
@@ -1433,32 +1444,35 @@ Structure
                     display: block;
                 }
             }
+            /* link padding + favicon outerwidth */
+            $tag-offset: 16px + 26px;
+            .tag-link {
+                padding-left: $tag-offset;
+                position: relative;
+            }
             .tag-visibility-control {
                 padding: 0;
                 margin: 0;
-                margin-left: auto;
-                position: relative;
-                overflow: visible;
                 .feed-action-button {
-                    font-weight: bold;
-                    @include color($color-contrast-400);
-                    @include font-size(12);
-                    display: block;
+                    position: absolute;
+                    width: $tag-offset;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
                     appearance: none;
                     background: none;
                     border: none;
-                    padding: 0;
+                    padding: 0 0 0 20px;
                     margin: 0;
-                    display: block;
-                    width: 20px;
-                    height: 20px;
-                    margin-right: 6px;
-                    transition: transform .15s linear;
-                    transform: rotate(-90deg);
                     svg {
+                        transition: transform .15s linear;
+                        transform: rotate(-90deg);
                         @include fill($color-icons);
                     }
-                    &.icon-hide {
+                    &.icon-hide svg {
                         transform: rotate(0deg);
                     }
                 }
@@ -1499,14 +1513,14 @@ Structure
         opacity: 1;
         transition: opacity .2s linear;
         @include background-color($color-contrast-100);
-        @include border-top($color-contrast-200);
-        @include border-bottom($color-contrast-200);
         &.hidden {
             opacity: 0;
         }
         ul {
             overflow: hidden;
             padding: 0;
+            @include border-top($color-contrast-200);
+            @include border-bottom($color-contrast-200);
         }
     }
     .droppable-hover > a {
@@ -3852,6 +3866,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 
 .entry-final-content a, .tweet-text a, .micropost-text a, .modal-content .content-styles a {
     text-decoration: underline;
+    -webkit-tap-highlight-color: rgba(0,0,0,0.2);
     @include color((day: black, dusk: white, sunset: black, midnight: white));
     &:hover, &:active {
         @include color((day: $color-accent-blue-600, dusk: $theme-color-dusk-500, sunset: $color-accent-blue-600, midnight: $theme-color-midnight-500));
