@@ -1,32 +1,120 @@
 <div class="settings-nav">
-    <a href="/" class="logo"><%= render partial: 'shared/svg/logo' %></a>
+    <a href="/" class="logo"><%= render partial: "shared/svg/logo" %></a>
     <ul class="nav">
-        <li class="desktop-hide"><%= link_to 'Feedbin', '/' %></li>
-        <li><%= link_to 'Settings', settings_path, class: is_active?('settings', 'settings') %></li>
-        <li><%= link_to 'Appearance', settings_appearance_path, class: is_active?('settings', 'appearance') %></li>
-        <li><%= link_to 'Subscriptions', settings_subscriptions_path, class: is_active?(['settings/subscriptions'], ['index', 'edit']) %></li>
-        <li><%= link_to 'Actions', actions_path, class: is_active?('actions', ['index', 'new', 'edit']) %></li>
-        <li><%= link_to 'Share & Save', sharing_services_path, class: is_active?('sharing_services', 'index') %></li>
-        <li><%= link_to 'Account', settings_account_path, class: is_active?('settings', 'account') %></li>
-        <% if ENV['STRIPE_API_KEY'] %>
-            <li><%= link_to 'Billing', settings_billing_path, class: is_active?('settings', 'billing') %></li>
+        <li class="nav-header">
+            <div class="icon-wrap"><%= svg_tag "icon-settings-general", size: "22x22" %></div>
+            <div>General</div>
+        </li>
+        <li class="desktop-hide"><%= link_to "Feedbin", "/" %></li>
+        <li>
+            <%= link_to settings_path, class: is_active?("settings", "settings") do %>
+                <span>Settings</span>
+            <% end %>
+        </li>
+        <li>
+            <%= link_to settings_appearance_path, class: is_active?("settings", "appearance") do %>
+                <span>Appearance</span>
+            <% end %>
+        </li>
+        <li>
+            <%= link_to settings_subscriptions_path, class: is_active?(["settings/subscriptions"], ["index", "edit"]) do %>
+                <span>Subscriptions</span>
+            <% end %>
+        </li>
+
+
+        <li class="nav-header">
+            <div class="icon-wrap"><%= svg_tag "icon-settings-tools", size: "22x22" %></div>
+            <div>Tools</div>
+        </li>
+        <li>
+            <%= link_to actions_path, class: is_active?("actions", ["index", "new", "edit"]) do %>
+                <span>Actions</span>
+            <% end %>
+        </li>
+        <li>
+            <%= link_to sharing_services_path, class: is_active?("sharing_services", "index") do %>
+                <span>Share & Save</span>
+            <% end %>
+        </li>
+        <li>
+            <%= link_to settings_import_export_path, class: is_active?("settings", "import_export") do %>
+                <span>Import & Export</span>
+            <% end %>
+        </li>
+
+        <li class="nav-header">
+            <div class="icon-wrap"><%= svg_tag "icon-settings-account", size: "18x22" %></div>
+            <div>Admin</div>
+        </li>
+        <li>
+            <%= link_to settings_account_path, class: is_active?("settings", "account") do %>
+                <span>Account</span>
+            <% end %>
+        </li>
+        <% if ENV["STRIPE_API_KEY"] %>
+            <li>
+                <%= link_to settings_billing_path, class: is_active?("settings", "billing") do %>
+                    <span>Billing</span>
+                <% end %>
+            </li>
         <% end %>
-        <li><%= link_to 'Import & Export', settings_import_export_path, class: is_active?('settings', 'import_export') %></li>
         <% if current_user.try(:admin?) %>
-            <li><%= link_to 'Customers', admin_users_path, class: is_active?('admin/users', 'index') %></li>
+            <li>
+                <%= link_to admin_users_path, class: is_active?("admin/users", "index") do %>
+                    <span>Customers</span>
+                <% end %>
+            </li>
         <% end %>
     </ul>
-    <ul class="nav nav-small">
-        <li><a href="/home">Home</a></li>
-        <li><a href="http://blog.feedbin.com">Blog</a></li>
-        <li><a href="/apps">Apps</a></li>
-        <li><a href="https://feedbin.com/help">Help</a></li>
-        <li><a href="https://github.com/feedbin/feedbin-api#readme">API</a></li>
-        <li><a href="/privacy-policy">Privacy Policy</a></li>
-        <li><a href="mailto:support@feedbin.com">Email</a></li>
-        <li class="mobile-hide"><a href="https://twitter.com/feedbin">Twitter</a></li>
+    <ul class="nav nav-small border">
+        <li>
+            <a href="/home">
+                <span>Home</span>
+            </a>
+        </li>
+        <li>
+            <a href="http://blog.feedbin.com">
+                <span>Blog</span>
+            </a>
+        </li>
+        <li>
+            <a href="/apps">
+                <span>Apps</span>
+            </a>
+        </li>
+        <li>
+            <a href="https://feedbin.com/help">
+                <span>Help</span>
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/feedbin/feedbin-api#readme">
+                <span>API</span>
+            </a>
+        </li>
+        <li>
+            <a href="/privacy-policy">
+                <span>Privacy Policy</span>
+            </a>
+        </li>
+        <li>
+            <a href="mailto:support@feedbin.com">
+                <span>Email</span>
+            </a>
+        </li>
+        <li class="mobile-hide">
+            <a href="https://twitter.com/feedbin">
+                <span>Twitter</span>
+            </a>
+        </li>
     </ul>
-    <ul class="nav nav-small">
-        <li><%= link_to 'Log Out', logout_path, method: 'delete' %></li>
+    <ul class="nav nav-small bottom">
+        <li class="has-icon logout">
+            <%= link_to logout_path, method: "delete" do %>
+                <div class="icon-wrap"><%= svg_tag "icon-log-out", size: "16x20" %></div>
+                <div>Log Out</div>
+            <% end %>
+        </li>
     </ul>
 </div>

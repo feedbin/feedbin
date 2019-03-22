@@ -1396,7 +1396,7 @@ Structure
                 text-align: right;
                 flex: 0 1 auto;
                 display: flex;
-                align-items: stretch;
+                align-items: center;
                 justify-content: flex-end;
             }
             .count {
@@ -4383,9 +4383,11 @@ Settings
 }
 
 .settings-nav {
+    flex-direction: column;
     width: 310px;
     .logo {
-        margin: 23px 0 0 31px;
+        padding: 39px 0 0 21px;
+        background-color: $theme-color-700;
         display: block;
         svg {
             width: 140px;
@@ -4416,28 +4418,58 @@ Settings
 .settings-nav {
     display: none;
     @include respond-to(screen-sm) {
-        display: block;
+        display: flex;
     }
 }
 
 .nav {
-    margin: 22px 0 0 0;
+    margin: 18px 0 0 0;
     padding: 0;
     list-style: none;
+    .nav-header {
+        font-weight: bold;
+        text-transform: uppercase;
+        padding: 0 35px;
+        color: $theme-color-400;
+        margin: 40px 0 8px 0;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+    }
+    .icon-wrap {
+        line-height: 0;
+        width: 22px;
+        margin-right: 16px;
+        display: flex;
+        justify-content: center;
+        svg {
+            fill: $theme-color-400;
+        }
+    }
     a {
         text-align: left;
-        padding: 6px 35px;
+        padding: 0 35px 0 57px;
         display: block;
         font-size: 18px;
         color: #FFF;
+        padding-bottom: 4px;
+        span {
+            display: block;
+            padding: 6px 8px 6px 16px;
+            border-radius: 4px;
+        }
         &:hover {
             color: #FFF;
             text-decoration: none;
-            background-color: #2b2e30;
+            span {
+                background-color: #223D4F;
+            }
         }
         &.active {
             color: #FFF;
-            @include background-color($color-selected);
+            span {
+                @include background-color($color-selected);
+            }
         }
     }
     .modal & {
@@ -4456,12 +4488,48 @@ Settings
 }
 
 .nav-small {
-    padding-top: 10px;
-    margin-top: 10px;
-    margin-left: auto;
+    position: relative;
+    padding-top: 32px;
+    margin: 32px 0 0 0;
     a {
-        font-size: 14px;
-        color: #b8b8b8;
+        font-size: 16px;
+        color: $theme-color-400;
+        &:hover span {
+            background-color: transparent;
+        }
+    }
+    .has-icon a {
+        display: flex;
+        align-items: center;
+        padding-left: 35px;
+    }
+    &.border {
+        &:before {
+            content: "";
+            display: block;
+            position: absolute;
+            height: 1px;
+            left: 57px;
+            right: 35px;
+            top: 0;
+            background-color: $theme-color-600;
+        }
+    }
+    &.bottom {
+        margin-top: auto;
+        position: sticky;
+        bottom: 0;
+        a {
+            padding-top: 20px;
+            padding-bottom: 20px;
+            background-color: $theme-color-700;
+        }
+    }
+    .logout {
+        a {
+            color: #FFF;
+            font-weight: bold;
+        }
     }
 }
 
@@ -4509,10 +4577,10 @@ body.settings {
         margin-top: 20px;
     }
     h2 {
-        margin: 25px 0 24px;
-        font-size: 24px;
-        font-weight: normal;
-        color: #535353;
+        margin: 32px 0 32px;
+        font-size: 32px;
+        font-weight: bold;
+        color: $theme-color-700;
         -webkit-font-smoothing: antialiased;
     }
     h3 {
