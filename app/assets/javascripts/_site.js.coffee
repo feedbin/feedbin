@@ -2180,6 +2180,12 @@ $.extend feedbin,
       $(document).on 'feedbin:native:statusbartouched', (event, xCoordinate) ->
         feedbin.scrollToTop(xCoordinate)
 
+    userChangedTextSize: ->
+      $(document).on 'feedbin:native:userchangedtextsize', (event, size) ->
+        size = size - 1
+        $("html").css
+          "font-size": "#{size}px"
+
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
         href = $(@).parents("a:first").attr('href')
