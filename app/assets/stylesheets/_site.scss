@@ -1283,6 +1283,7 @@ Structure
             padding: 0;
             @include color($color-contrast-700);
             position: relative;
+            transition: font-size 0.1s ease;
             &::-ms-expand {
                 display: none;
             }
