@@ -172,7 +172,7 @@ $selected: #0867E2;
 $color-icons: $color-contrast-600;
 $inset-bg-color: #f4f6f8;
 $box-shadow-dropdown: 0px 4px 6px 0 rgba(0, 0, 0, 0.1);
-$focus-glow: 0px 0px 10px 0 rgba($color-accent-green-600, 0.6);
+$focus-glow: 0px 0px 10px 0 rgba($theme-color-500, 0.6);
 $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
 
 /*------------------------------------------------------------------------------
@@ -781,7 +781,7 @@ table {
 }
 
 .inset {
-    background-color: $inset-bg-color;
+    background-color: map-get($color-contrast-100, day);
     border-radius: 8px;
     border: 1px solid map-get($color-borders, day);
     margin: 0 0 20px 0;
@@ -805,7 +805,7 @@ table {
 }
 
 .settings-page .inset, .settings-page .feed-form-wrap {
-    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
     @media (max-width: $small-breakpoint) {
         box-shadow: none;
     }
@@ -1244,11 +1244,11 @@ Structure
     }
     .view-mode {
         position: sticky;
-        top: -15px;
+        top: -10px;
         z-index: 2;
         @include background-color($color-base);
-        @include size-in-rems(padding, 25px 16px 10px 16px)
-        margin-bottom: 9px;
+        @include size-in-rems(padding, 25 16 7 16)
+        margin-bottom: 19px;
         .select-wrap {
             position: relative;
         }
@@ -1257,14 +1257,17 @@ Structure
             pointer-events: none;
             position: absolute;
             top: 1px;
-            left: 100px;
+            left: 86px;
             border-radius: $size;
             height: $size;
             width: $size;
-            @include background-color($color-contrast-200);
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: transform 0.2s ease;
+            svg {
+                @include fill($color-contrast-400);
+            }
             .view_all & {
                 left: 50px;
             }
@@ -1283,11 +1286,11 @@ Structure
             padding: 0;
             @include color($color-contrast-700);
             position: relative;
-            transition: font-size 0.1s ease;
+            transition: transform 0.2s ease;
+            transform-origin: top left;
             &::-ms-expand {
                 display: none;
             }
-
         }
         .toggle-search {
             position: absolute;
@@ -1300,8 +1303,25 @@ Structure
             width: 40px;
             height: 40px;
             background-color: transparent;
+            transition: transform 0.2s ease;
             svg {
                 @include fill($color-icons);
+            }
+        }
+        .feed-scrolled & {
+            select {
+                transform: scale(0.666);
+            }
+            .view-mode-icon {
+                transform: scale(1) translate3d(-28px, -5px, 0);
+            }
+            .toggle-search {
+                transform: translate3d(0, -3px, 0);
+            }
+        }
+        .view_all.feed-scrolled & {
+            .view-mode-icon {
+                transform: scale(0.8) translate3d(-25px, -6px, 0);
             }
         }
     }
@@ -1347,15 +1367,14 @@ Structure
                 @include size-in-rems(padding, 6 16)
             }
             &.source-section {
-                @include font-size(13);
-                @include size-in-rems(padding-top, 16)
-                @include color($color-contrast-400);
+                @include font-size(14);
+                @include size-in-rems(padding-top, 22)
+                @include color($color-contrast-600);
                 font-weight: bold;
-                text-transform: uppercase;
                 display: flex;
                 align-items: center;
                 svg {
-                    @include fill($color-icons);
+                    @include fill($color-contrast-600);
                 }
             }
             .feed-link {
@@ -1513,15 +1532,23 @@ Structure
         overflow: hidden;
         opacity: 1;
         transition: opacity .2s linear;
-        @include background-color($color-contrast-100);
         &.hidden {
             opacity: 0;
         }
         ul {
             overflow: hidden;
             padding: 0;
-            @include border-top($color-contrast-200);
-            @include border-bottom($color-contrast-200);
+            position: relative;
+            &:before {
+                content: "";
+                @include background-color($color-contrast-200);
+                display: block;
+                position: absolute;
+                top: -1px;
+                left: 42px;
+                right: 15px;
+                height: 1px;
+            }
         }
     }
     .droppable-hover > a {
@@ -4427,13 +4454,14 @@ Settings
     margin: 18px 0 0 0;
     padding: 0;
     list-style: none;
+    li {
+        font-size: 16px;
+    }
     .nav-header {
         font-weight: bold;
-        text-transform: uppercase;
         padding: 0 35px;
-        color: $theme-color-400;
+        color: $theme-color-100;
         margin: 40px 0 8px 0;
-        font-size: 15px;
         display: flex;
         align-items: center;
     }
@@ -4444,16 +4472,14 @@ Settings
         display: flex;
         justify-content: center;
         svg {
-            fill: $theme-color-400;
+            fill: $theme-color-100;
         }
     }
     a {
         text-align: left;
         padding: 0 35px 0 57px;
         display: block;
-        font-size: 18px;
         color: #FFF;
-        padding-bottom: 4px;
         span {
             display: block;
             padding: 6px 8px 6px 16px;
@@ -4462,15 +4488,11 @@ Settings
         &:hover {
             color: #FFF;
             text-decoration: none;
-            span {
-                background-color: #223D4F;
-            }
+            background-color: #223D4F;
         }
         &.active {
             color: #FFF;
-            span {
-                @include background-color($color-selected);
-            }
+            @include background-color($color-selected);
         }
     }
     .modal & {
@@ -4555,7 +4577,7 @@ body.settings {
     .settings-content {
         position: relative;
         padding: 0;
-        background-color: map-get($color-contrast-100, day);
+        background-color: #FFF;
         flex-grow: 1;
         max-width: 100%;
         min-width: 0;
@@ -5373,7 +5395,7 @@ input[type="checkbox"] + label .slider-checkbox {
         height: 22px;
         width: 22px;
         border-radius: 22px;
-        background-color: #FFF;
+        background-color: $theme-color-200;
         content: "";
         top: 2px;
         left: 2px;
@@ -5390,7 +5412,7 @@ input[type="checkbox"] + label .slider-checkbox {
         height: 22px;
         width: 22px;
         border-radius: 22px;
-        background-color: #FFF;
+        background-color: $theme-color-200;
         left: 2px;
         top: 2px;
         transition: left .2s ease;
@@ -5410,6 +5432,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
     &:after {
         left: 32px;
         background: #FFF image-url("icon-check.svg") 4px 5px no-repeat;
+        box-shadow: 0 4px 3px 0 rgba(0, 0, 0, 0.2);
     }
     &:before {
         left: 32px;
@@ -5450,7 +5473,6 @@ input[type="checkbox"]:checked + label .slider-checkbox {
                 font-size: 16px;
                 display: block;
                 text-align: left;
-                margin: 0;
                 line-height: 1;
                 position: relative;
                 border: none;
@@ -5461,7 +5483,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
                 overflow: hidden;
                 white-space: nowrap;
                 @include settings-row;
-                @include border-bottom($color-borders);
+                @include border-color($color-borders);
                 @include background-color($color-base);
                 &:focus {
                     box-shadow: $subtle-focus-glow;
@@ -5564,7 +5586,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
         border-top: 1px solid map-get($color-borders, day);
         border-bottom: 1px solid map-get($color-borders, day);
     }
-    input[type="checkbox"]:focus + label .slider-checkbox {
+    input[type="checkbox"]:focus + label .slider-checkbox, input[type="checkbox"]:active + label .slider-checkbox {
         box-shadow: $focus-glow;
     }
     input[type="radio"]:focus + label {

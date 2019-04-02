@@ -2220,16 +2220,12 @@ $.extend feedbin,
     viewModeEffects: ->
       scrollStop = $('.view-mode').css("top")
       scrollStop = Math.abs(parseInt(scrollStop))
-      multiplier = 0.5 / scrollStop
       $('.feeds').on 'scroll', (event) ->
         top = $(@)[0].scrollTop
-        if top <= scrollStop && top >= 0
-          size = 1.5 - (top * multiplier)
-        else if top < 0
-          size = 1.5
+        if top > scrollStop
+          $('body').addClass('feed-scrolled')
         else
-          size = 1
-        $('[data-behavior~=change_view_mode]').css("font-size", "#{size}rem")
+          $('body').removeClass('feed-scrolled')
 
 
     scrollLeft: ->

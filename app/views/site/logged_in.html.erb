@@ -29,7 +29,7 @@
                             <option value="view_all" <%= view_mode_selected("view_all") %>>All</option>
                         </select>
                         <span class="view-mode-icon">
-                            <span class="hamburger-menu"></span>
+                            <%= svg_tag "icon-caret", size: "12x7" %>
                         </span>
                         <button class="toggle-search" data-behavior="toggle_search"><%= svg_tag "icon-search", size: "16x16" %></button>
                     </div>
