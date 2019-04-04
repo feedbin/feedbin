@@ -5584,7 +5584,6 @@ input[type="checkbox"]:checked + label .slider-checkbox {
     .table {
         background-color: #FFF;
         border-top: 1px solid map-get($color-borders, day);
-        border-bottom: 1px solid map-get($color-borders, day);
     }
     input[type="checkbox"]:focus + label .slider-checkbox, input[type="checkbox"]:active + label .slider-checkbox {
         box-shadow: $focus-glow;

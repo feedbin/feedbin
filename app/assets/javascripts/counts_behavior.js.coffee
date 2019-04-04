@@ -109,7 +109,7 @@ class feedbin.CountsBehavior
     if selectFirst
       $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click();
     else
-      selected[0].scrollIntoView({behavior: "smooth", block: "center"})
+      selected[0].scrollIntoView({behavior: "smooth", block: "center"}) if selected[0]
 
     $('[data-behavior~=change_view_mode]').blur()
 

@@ -1395,8 +1395,6 @@ $.extend feedbin,
         button = $('[data-behavior~=feed_settings]')
         if element.is('[data-behavior~=has_settings]')
           button.attr('href', element.data('settings-path'))
-          button.data('modal-target', element.data('settings-modal'))
-          button.data('modal-title', element.data('settings-title'))
           button.removeAttr('disabled')
         else
           button.attr('disabled', 'disabled')
