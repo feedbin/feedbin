@@ -1247,7 +1247,7 @@ Structure
         top: -10px;
         z-index: 2;
         @include background-color($color-base);
-        @include size-in-rems(padding, 25 16 7 16)
+        @include size-in-rems(padding, 25 16 14 16)
         margin-bottom: 19px;
         .select-wrap {
             position: relative;
@@ -1277,7 +1277,7 @@ Structure
             width: 100%;
             padding: 0;
             margin-left: 2px;
-            @include font-size(24);
+            @include font-size(16);
             font-weight: bold;
             line-height: 1.1;
             border: none;
@@ -1288,6 +1288,8 @@ Structure
             position: relative;
             transition: transform 0.2s ease;
             transform-origin: top left;
+            transform: scale(1.5);
+            width: 150px;
             &::-ms-expand {
                 display: none;
             }
@@ -1310,7 +1312,8 @@ Structure
         }
         .feed-scrolled & {
             select {
-                transform: scale(0.666);
+                transform: scale(1);
+                width: 225px;
             }
             .view-mode-icon {
                 transform: scale(1) translate3d(-28px, -5px, 0);

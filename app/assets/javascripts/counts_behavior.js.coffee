@@ -94,9 +94,16 @@ class feedbin.CountsBehavior
 
     element.closest('form').submit()
 
+    $('[data-behavior~=change_view_mode]').blur()
+
     if feedbin.openFirstItem
       $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click();
       feedbin.openFirstItem = false
+    else if $(".feeds .selected ").is(":visible")
+      $(".feeds .selected [data-behavior~=feed_link]").click()
+    else
+      feedbin.clearEntries()
+      $(".feeds .selected").removeClass('selected')
 
   showEntryContent: (event, xhr) =>
     container = $(event.currentTarget)

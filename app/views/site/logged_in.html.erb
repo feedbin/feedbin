@@ -21,7 +21,7 @@
         </div>
         <div class="feeds-inner">
             <div class="feeds showing-audio-player" data-behavior="droppable">
-                <%= form_tag settings_view_mode_path, remote: true, class: "view-mode" do %>
+                <%= form_tag settings_view_mode_path, remote: true, class: "view-mode", data: {behavior: "view_mode"} do %>
                     <div class="select-wrap">
                         <select name="mode" data-behavior="change_view_mode">
                             <option value="view_unread" <%= view_mode_selected("view_unread") %>>Unread</option>
