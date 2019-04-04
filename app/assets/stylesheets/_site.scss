@@ -8321,6 +8321,11 @@ button.close {
     position: sticky;
     top: 0;
     z-index: 100;
+    .favicon-wrap {
+        .theme-day & {
+            background-color: transparent;
+        }
+    }
     .icon {
         position: absolute;
         top: 0;
@@ -8333,6 +8338,27 @@ button.close {
         svg {
             @include fill($color-icons);
         }
+        &.favicon-icon {
+            right: 0;
+            left: auto;
+            .favicon-wrap {
+                .theme-day & {
+                    background-color: transparent;
+                }
+            }
+            .twitter-profile-image {
+                height: 34px;
+                width: 34px;
+                img {
+                    height: 30px;
+                    width: 30px;
+                }
+            }
+        }
+    }
+    .favicon-wrap {
+        position: absolute;
+        right: 15px;
     }
     input {
         border-bottom-left-radius: 0;

@@ -228,7 +228,12 @@ class feedbin.Keyboard
 
     # Expand tag
     Mousetrap.bind 'e', (event, combo) =>
-      content = $('[data-behavior~=feeds_target]').find('.selected').find('[data-behavior~=toggle_drawer]').click()
+      content = $('[data-behavior~=feeds_target]').find('.selected').find('[data-behavior~=toggle_drawer]').submit()
+      event.preventDefault()
+
+    # Edit
+    Mousetrap.bind 'shift+e', (event, combo) =>
+      $('[data-behavior~=feed_settings]').click()
       event.preventDefault()
 
     # refresh

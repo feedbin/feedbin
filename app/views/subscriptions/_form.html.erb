@@ -5,6 +5,7 @@
                 <div class="modal-header-input">
                     <%= f.text_field :title, placeholder: subscription.feed.title %>
                     <span class="icon"><%= svg_tag "favicon-feeds", size: "16x16" %></span>
+                    <span class="icon favicon-icon"><%= subscription_presenter.favicon(subscription.feed) %></span>
                 </div>
             <% end %>
 
