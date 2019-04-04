@@ -171,21 +171,18 @@ class feedbin.Keyboard
 
     # Go to unread
     Mousetrap.bind ['g 1', 'g u'], (event, combo) =>
-      feedbin.openFirstItem = true
       $('body').removeClass('full-screen')
       $('[data-behavior~=change_view_mode]').val("view_unread").trigger("change");
       event.preventDefault()
 
     # Go to starred
     Mousetrap.bind ['g 2', 'g s'], (event, combo) =>
-      feedbin.openFirstItem = true
       $('body').removeClass('full-screen')
       $('[data-behavior~=change_view_mode]').val("view_starred").trigger("change")
       event.preventDefault()
 
     # Go to all
     Mousetrap.bind ['g 3', 'g a'], (event, combo) =>
-      feedbin.openFirstItem = true
       $('body').removeClass('full-screen')
       $('[data-behavior~=change_view_mode]').val("view_all").trigger("change");
       event.preventDefault()
@@ -380,7 +377,7 @@ class feedbin.Keyboard
           return false
 
       unless selectedItem.length
-        selectedItem = $('[data-behavior~=feeds_target] li:first-child')
+        selectedItem = $('[data-behavior~=feeds_target] li:visible').eq(0)
 
     selectedItem
 

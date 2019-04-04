@@ -8,7 +8,7 @@
         feedbin.data = <%= raw json_escape(@data.to_json) %>;
         feedbin.data.tagNames = <%= raw json_escape(@user.tag_names.to_json) %>;
         feedbin.count_data = <%= raw json_escape(@count_data.to_json) %>;
-        feedbin.data.viewMode = "<%= @user.get_view_mode %>";
+        feedbin.data.viewMode = "<%= view_mode %>";
         feedbin.Counts.get(feedbin.count_data);
     </script>
 <% end %>

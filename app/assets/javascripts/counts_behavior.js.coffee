@@ -86,24 +86,32 @@ class feedbin.CountsBehavior
     feedbin.hideQueue.length = 0
     element = $(event.currentTarget)
 
+    element.closest('form').submit()
+
     feedbin.data.viewMode = element.val()
 
     $('body').removeClass('view_all view_unread view_starred');
     $('body').addClass(feedbin.data.viewMode);
+
+    selected = $(".feeds .selected")
+    feedID = selected.data('feed-id')
+    selectFirst = false
+
+    specialCollections = ["collection_unread", "collection_starred", "collection_all"]
+    if _.contains specialCollections, feedID
+      selectFirst = true
+    else
+      $("[data-behavior~=feed_link]", selected).click()
+      feedbin.hideQueue.push(feedID) if !selected.is(":visible")
+
     feedbin.applyCounts(false)
 
-    element.closest('form').submit()
+    if selectFirst
+      $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click();
+    else
+      selected[0].scrollIntoView({behavior: "smooth", block: "center"})
 
     $('[data-behavior~=change_view_mode]').blur()
-
-    if feedbin.openFirstItem
-      $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click();
-      feedbin.openFirstItem = false
-    else if $(".feeds .selected ").is(":visible")
-      $(".feeds .selected [data-behavior~=feed_link]").click()
-    else
-      feedbin.clearEntries()
-      $(".feeds .selected").removeClass('selected')
 
   showEntryContent: (event, xhr) =>
     container = $(event.currentTarget)

@@ -5461,10 +5461,18 @@ input[type="checkbox"]:checked + label .slider-checkbox {
     margin: 0;
     padding: 0;
     margin-bottom: 30px;
+    @include border-bottom($color-borders);
+    &.no-border {
+        @include border-bottom(transparent);
+    }
     > li {
         margin: 0;
         padding: 0;
         position: relative;
+        @include border-top($color-borders);
+        &.no-border {
+            @include border-top(transparent);
+        }
         > {
             label,
             button:not(.unstyled),
@@ -5473,6 +5481,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
             input,
             #card-element,
             .field-wrap {
+                margin: 0;
                 font-size: 16px;
                 display: block;
                 text-align: left;
@@ -5489,7 +5498,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
                 @include border-color($color-borders);
                 @include background-color($color-base);
                 &:focus {
-                    box-shadow: $subtle-focus-glow;
+                    box-shadow: inset 0px 0px 2px 0 rgba($selected, 0.5);
                 }
             }
         }
@@ -5571,18 +5580,6 @@ input[type="checkbox"]:checked + label .slider-checkbox {
                 background-color: #FFF;
             }
         }
-        &:first-of-type {
-            > label,
-            > button:not(.unstyled),
-            > textarea,
-            > a,
-            > input,
-            > #card-element,
-            > .field-wrap {
-                border-top-width: 1px;
-                border-top-style: solid;
-            }
-        }
     }
     .table {
         background-color: #FFF;
@@ -5593,7 +5590,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
         box-shadow: $focus-glow;
     }
     input[type="radio"]:focus + label {
-        box-shadow: $subtle-focus-glow;
+        box-shadow: inset 0px 0px 2px 0 rgba($selected, 0.5);
     }
     label {
         user-select: none;
@@ -8970,6 +8967,7 @@ button.close {
             margin-bottom: 10px;
         }
         &.tags-target {
+            border-bottom: none;
             .text {
                 padding-right: 45px;
             }

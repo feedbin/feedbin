@@ -20,8 +20,12 @@ module ApplicationHelper
     @mark_selected || false
   end
 
-  def view_mode_selected(view_mode)
-    "selected" if view_mode == @user.get_view_mode
+  def view_mode
+    params[:view] || @user.get_view_mode
+  end
+
+  def view_mode_selected(mode)
+    "selected" if mode == view_mode
   end
 
   def rtl?(string)
