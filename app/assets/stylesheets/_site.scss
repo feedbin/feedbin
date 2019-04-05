@@ -1247,7 +1247,7 @@ Structure
         top: -10px;
         z-index: 2;
         @include background-color($color-base);
-        @include size-in-rems(padding, 25 16 7 16)
+        @include size-in-rems(padding, 25 16 14 16)
         margin-bottom: 19px;
         .select-wrap {
             position: relative;
@@ -1277,7 +1277,7 @@ Structure
             width: 100%;
             padding: 0;
             margin-left: 2px;
-            @include font-size(24);
+            @include font-size(16);
             font-weight: bold;
             line-height: 1.1;
             border: none;
@@ -1288,6 +1288,8 @@ Structure
             position: relative;
             transition: transform 0.2s ease;
             transform-origin: top left;
+            transform: scale(1.5);
+            width: 150px;
             &::-ms-expand {
                 display: none;
             }
@@ -1310,7 +1312,8 @@ Structure
         }
         .feed-scrolled & {
             select {
-                transform: scale(0.666);
+                transform: scale(1);
+                width: 225px;
             }
             .view-mode-icon {
                 transform: scale(1) translate3d(-28px, -5px, 0);
@@ -5458,10 +5461,18 @@ input[type="checkbox"]:checked + label .slider-checkbox {
     margin: 0;
     padding: 0;
     margin-bottom: 30px;
+    @include border-bottom($color-borders);
+    &.no-border {
+        @include border-bottom(transparent);
+    }
     > li {
         margin: 0;
         padding: 0;
         position: relative;
+        @include border-top($color-borders);
+        &.no-border {
+            @include border-top(transparent);
+        }
         > {
             label,
             button:not(.unstyled),
@@ -5470,6 +5481,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
             input,
             #card-element,
             .field-wrap {
+                margin: 0;
                 font-size: 16px;
                 display: block;
                 text-align: left;
@@ -5486,7 +5498,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
                 @include border-color($color-borders);
                 @include background-color($color-base);
                 &:focus {
-                    box-shadow: $subtle-focus-glow;
+                    box-shadow: inset 0px 0px 2px 0 rgba($selected, 0.5);
                 }
             }
         }
@@ -5568,29 +5580,16 @@ input[type="checkbox"]:checked + label .slider-checkbox {
                 background-color: #FFF;
             }
         }
-        &:first-of-type {
-            > label,
-            > button:not(.unstyled),
-            > textarea,
-            > a,
-            > input,
-            > #card-element,
-            > .field-wrap {
-                border-top-width: 1px;
-                border-top-style: solid;
-            }
-        }
     }
     .table {
         background-color: #FFF;
         border-top: 1px solid map-get($color-borders, day);
-        border-bottom: 1px solid map-get($color-borders, day);
     }
     input[type="checkbox"]:focus + label .slider-checkbox, input[type="checkbox"]:active + label .slider-checkbox {
         box-shadow: $focus-glow;
     }
     input[type="radio"]:focus + label {
-        box-shadow: $subtle-focus-glow;
+        box-shadow: inset 0px 0px 2px 0 rgba($selected, 0.5);
     }
     label {
         user-select: none;
@@ -8321,6 +8320,11 @@ button.close {
     position: sticky;
     top: 0;
     z-index: 100;
+    .favicon-wrap {
+        .theme-day & {
+            background-color: transparent;
+        }
+    }
     .icon {
         position: absolute;
         top: 0;
@@ -8333,6 +8337,27 @@ button.close {
         svg {
             @include fill($color-icons);
         }
+        &.favicon-icon {
+            right: 0;
+            left: auto;
+            .favicon-wrap {
+                .theme-day & {
+                    background-color: transparent;
+                }
+            }
+            .twitter-profile-image {
+                height: 34px;
+                width: 34px;
+                img {
+                    height: 30px;
+                    width: 30px;
+                }
+            }
+        }
+    }
+    .favicon-wrap {
+        position: absolute;
+        right: 15px;
     }
     input {
         border-bottom-left-radius: 0;
@@ -8967,6 +8992,7 @@ button.close {
             margin-bottom: 10px;
         }
         &.tags-target {
+            border-bottom: none;
             .text {
                 padding-right: 45px;
             }

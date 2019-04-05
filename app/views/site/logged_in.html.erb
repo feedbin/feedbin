@@ -8,7 +8,7 @@
         feedbin.data = <%= raw json_escape(@data.to_json) %>;
         feedbin.data.tagNames = <%= raw json_escape(@user.tag_names.to_json) %>;
         feedbin.count_data = <%= raw json_escape(@count_data.to_json) %>;
-        feedbin.data.viewMode = "<%= @user.get_view_mode %>";
+        feedbin.data.viewMode = "<%= view_mode %>";
         feedbin.Counts.get(feedbin.count_data);
     </script>
 <% end %>
@@ -21,7 +21,7 @@
         </div>
         <div class="feeds-inner">
             <div class="feeds showing-audio-player" data-behavior="droppable">
-                <%= form_tag settings_view_mode_path, remote: true, class: "view-mode" do %>
+                <%= form_tag settings_view_mode_path, remote: true, class: "view-mode", data: {behavior: "view_mode"} do %>
                     <div class="select-wrap">
                         <select name="mode" data-behavior="change_view_mode">
                             <option value="view_unread" <%= view_mode_selected("view_unread") %>>Unread</option>

@@ -27,7 +27,7 @@ feedbin.loadEntryImages();
 <% else %>
     feedbin.updatePager('');
 <% end %>
-feedbin.data.viewMode = "<%= j @user.get_view_mode %>";
+feedbin.data.viewMode = "<%= j view_mode %>";
 var entryIds = <%= @entries.map{ |entry| entry.id }.to_json.html_safe %>;
 <% if @force_preload %>
     feedbin.preloadEntries(entryIds, true);

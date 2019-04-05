@@ -1395,8 +1395,6 @@ $.extend feedbin,
         button = $('[data-behavior~=feed_settings]')
         if element.is('[data-behavior~=has_settings]')
           button.attr('href', element.data('settings-path'))
-          button.data('modal-target', element.data('settings-modal'))
-          button.data('modal-title', element.data('settings-title'))
           button.removeAttr('disabled')
         else
           button.attr('disabled', 'disabled')
@@ -1406,6 +1404,10 @@ $.extend feedbin,
         target = $(event.target)
         feedbin.selectedSource = target.closest('[data-feed-id]').data('feed-id')
         feedbin.selectedTag = target.closest('[data-tag-id]').data('tag-id')
+
+    setViewMode: ->
+      $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event, xhr, settings) ->
+        settings.url = "#{settings.url}?view=#{feedbin.data.viewMode}"
 
     clearEntry: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event) ->
@@ -2139,7 +2141,8 @@ $.extend feedbin,
 
     settingsModal: ->
       $(document).on 'click', '[data-behavior~=open_settings_modal]', (event) ->
-        feedbin.showModal('edit')
+        unless $(@).is('[disabled]')
+          feedbin.showModal('edit')
 
     showMessage: ->
       $(document).on 'click', '[data-behavior~=show_message]', (event) ->
@@ -2248,12 +2251,6 @@ $.extend feedbin,
       $(document).on 'feedbin:native:statusbartouched', (event, xCoordinate) ->
         feedbin.scrollToTop(xCoordinate)
 
-    userChangedTextSize: ->
-      $(document).on 'feedbin:native:userchangedtextsize', (event, size) ->
-        size = size - 1
-        $("html").css
-          "font-size": "#{size}px"
-
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
         href = $(@).parents("a:first").attr('href')
@@ -2278,7 +2275,7 @@ $.extend feedbin,
 
     tagEditor: ->
       fieldContent = """
-      <li data-behavior="remove_target" class="text">
+      <li data-behavior="remove_target" class="text no-border">
         <input placeholder="Tag" type="text" name="tag_name[]">
         <button class="icon-delete unstyled" data-behavior="remove_element" type="button">&times;</button>
       </li>

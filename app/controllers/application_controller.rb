@@ -160,11 +160,11 @@ class ApplicationController < ActionController::Base
   end
 
   def feeds_response
-    if @user.get_view_mode == "view_all"
+    if helpers.view_mode == "view_all"
       entry_id_cache = EntryIdCache.new(@user.id, @feed_ids)
       @entries = entry_id_cache.page(params[:page])
       @page_query = @entries
-    elsif @user.get_view_mode == "view_starred"
+    elsif helpers.view_mode == "view_starred"
       starred_entries = @user.starred_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).order("published DESC")
       @entries = Entry.entries_with_feed(starred_entries, "DESC").entries_list
       @page_query = starred_entries
@@ -189,7 +189,7 @@ class ApplicationController < ActionController::Base
   def user_classes
     @classes = []
     @classes.push("theme-#{@user.theme || "day"}")
-    @classes.push(@user.get_view_mode)
+    @classes.push(helpers.view_mode)
     @classes.push(@user.entry_width)
     @classes.push("entries-body-#{@user.entries_body || "1"}")
     @classes.push("entries-time-#{@user.entries_time || "1"}")

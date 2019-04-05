@@ -1,15 +1,15 @@
 <%= form_for(@action, as: :action_params, remote: true) do |f| %>
     <div class="inset">
-        <ul class="control-group">
-            <li class="text">
+        <ul class="control-group no-border">
+            <li class="text no-border">
                 <%= f.text_field :title, placeholder: "Action Name" %>
             </li>
         </ul>
         <div class="inset-content">
             <h4 class="group-header">Article Matches Search</h4>
         </div>
-        <ul class="control-group">
-            <li class="text">
+        <ul class="control-group no-border">
+            <li class="text no-border">
                 <%= f.search_field :query, placeholder: "Search" %>
             </li>
         </ul>
