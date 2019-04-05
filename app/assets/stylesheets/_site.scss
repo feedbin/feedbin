@@ -6,7 +6,6 @@ $small-breakpoint: 700px;
 
 $toolbar-height: 41px;
 $font-stack: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
-$bottom-toolbar-height: 93px;
 $audio-player-height: 115px;
 $audio-player-height-minimized: 54px;
 $base-button-position: 10px;
@@ -174,6 +173,19 @@ $inset-bg-color: #f4f6f8;
 $box-shadow-dropdown: 0px 4px 6px 0 rgba(0, 0, 0, 0.1);
 $focus-glow: 0px 0px 10px 0 rgba($theme-color-500, 0.6);
 $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
+
+
+$bottom-toolbar-height: 93px;
+$bottom-toolbar-height-alt: 54px;
+
+body {
+    --bottom-toolbar-height: 93px;
+    &.has-offscreen-panels {
+        --bottom-toolbar-height: 54px;
+    }
+}
+
+$safe-area-toolbar-height: max(var(--bottom-toolbar-height), calc(var(--bottom-toolbar-height) + env(safe-area-inset-bottom)));
 
 /*------------------------------------------------------------------------------
 Grid
@@ -1001,21 +1013,6 @@ Structure
     }
 }
 
-.top-toolbar {
-    height: $toolbar-height;
-    @include border-bottom($color-borders);
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    overflow: hidden;
-    display: none;
-    @media (max-width: $small-breakpoint) {
-        display: flex;
-        display: none;
-    }
-}
-
 .hamburger-menu-wrap {
     position: absolute;
     user-select: none;
@@ -1055,52 +1052,46 @@ Structure
 
 .bottom-toolbar {
     height: $bottom-toolbar-height;
+    height: var(--bottom-toolbar-height);
+    .has-offscreen-panels & {
+        @supports(height: max(0px)) {
+            height: $safe-area-toolbar-height;
+        }
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: absolute;
     z-index: 2;
     bottom: 0;
     left: 0;
     right: 0;
     @include font-size(10);
-    @include border-top($color-borders);
     @include background-color($color-base);
-    .one-up & {
-        @include border-top($color-borders-alt, $root: true);
-    }
-    .standalone-navigator & {
-        height: calc(#{$bottom-toolbar-height - 8px} + env(safe-area-inset-bottom));
-        min-height: $bottom-toolbar-height !important;
-    }
-    table {
-        width: 100%;
-    }
-    td {
-        width: 33%;
-        text-align: center;
-        vertical-align: middle;
-    }
-    .three-up .entries-column & {
+    .entries-column & {
         display: none;
     }
-    .has-offscreen-panels {
-        .feeds-column & {
-            display: none;
-        }
+    .has-offscreen-panels .feeds-column & {
+        display: none;
     }
-    .entries-column &, .entry-column & {
-        @include background-color($color-base);
+    .has-offscreen-panels .entries-column & {
+        display: flex;
+    }
+    .toolbar-inner {
+        display: flex;
+        width: 100%;
+        justify-content: flex-end;
     }
 }
 
 .feed-toolbar {
-    display: flex;
-    justify-content: center;
-    @include border-color(transparent);
     .toolbar-button {
         flex: 1;
         appearance: none !important;
         border: none;
         margin: 0;
-        padding: 0 0 18px 0;
+        padding: 0;
         @include font-size(12);
         font-family: $font-stack;
         display: flex;
@@ -1115,6 +1106,9 @@ Structure
             padding-top: 8px;
             @include color($color-icons);
             flex: 0 0 auto;
+            .has-offscreen-panels & {
+                padding-top: 4px;
+            }
         }
         svg {
             @include fill($color-icons);
@@ -1131,10 +1125,14 @@ Structure
         }
     }
     .toolbar-button-inner {
-        flex: 1;
         justify-content: center;
         align-items: flex-end;
         display: flex;
+    }
+    .subscribe-button {
+        .has-offscreen-panels & {
+            display: none;
+        }
     }
     .icon-subscribe {
         $size: 38px;
@@ -1160,14 +1158,19 @@ Structure
     position: absolute;
     top: 0;
     bottom: $bottom-toolbar-height;
+    bottom: var(--bottom-toolbar-height);
+    .standalone-navigator & {
+        @supports(bottom: max(0px)) {
+            bottom: $safe-area-toolbar-height;
+        }
+    }
     left: 0;
     right: 0;
     z-index: 1;
     @include background-color($color-base);
     transition: transform .2s ease;
-    @media (max-width: $small-breakpoint) {
+    .has-offscreen-panels & {
         top: $toolbar-height;
-        top: 0;
     }
 }
 
@@ -1219,6 +1222,131 @@ Structure
     }
 }
 
+.view-mode {
+    position: sticky;
+    top: -10px;
+    z-index: 2;
+    @include background-color($color-base);
+    @include size-in-rems(padding, 25 16 14 16)
+    margin-bottom: 19px;
+    .select-wrap {
+        position: relative;
+    }
+    .view-mode-icon {
+        $size: 27px;
+        pointer-events: none;
+        position: absolute;
+        top: 1px;
+        left: 86px;
+        border-radius: $size;
+        height: $size;
+        width: $size;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+        svg {
+            @include fill($color-contrast-400);
+        }
+        .view_all & {
+            left: 50px;
+        }
+    }
+    select {
+        background-color: transparent;
+        width: 100%;
+        padding: 0;
+        margin-left: 2px;
+        @include font-size(16);
+        font-weight: bold;
+        line-height: 1.1;
+        border: none;
+        border-radius: 0;
+        appearance: none;
+        padding: 0;
+        @include color($color-contrast-700);
+        position: relative;
+        transition: transform 0.2s ease;
+        transform-origin: top left;
+        transform: scale(1.5);
+        width: 150px;
+        &::-ms-expand {
+            display: none;
+        }
+    }
+    .toggle-search {
+        position: absolute;
+        right: -11px;
+        top: -7px;
+        @include centered;
+        appearance: none !important;
+        border: none;
+        padding: 0;
+        width: 40px;
+        height: 40px;
+        background-color: transparent;
+        transition: transform 0.2s ease;
+        svg {
+            @include fill($color-icons);
+        }
+    }
+    .feed-scrolled:not(.has-offscreen-panels) .feeds & {
+        select {
+            transform: scale(1);
+            width: 225px;
+        }
+        .view-mode-icon {
+            transform: scale(1) translate3d(-28px, -5px, 0);
+        }
+        .toggle-search {
+            transform: translate3d(0, -3px, 0);
+        }
+    }
+    .feed-scrolled.has-offscreen-panels .feeds & {
+        position: static;
+    }
+    .view_all.feed-scrolled & {
+        .view-mode-icon {
+            transform: scale(0.8) translate3d(-25px, -6px, 0);
+        }
+    }
+}
+
+.top-toolbar {
+    height: $toolbar-height;
+    @include border-bottom($color-borders);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    align-items: center;
+    justify-content: space-between;
+    display: none;
+    .view-mode {
+        margin: 0;
+        padding: 0;
+        transition: opacity 0.2s ease;
+        opacity: 0;
+        .feed-scrolled & {
+            opacity: 1;
+        }
+        select {
+            transform: scale(1);
+        }
+    }
+    .view-mode-icon {
+        top: -2px;
+        left: 61px;
+    }
+    .has-offscreen-panels & {
+        display: flex;
+    }
+    .toggle-search {
+        display: none;
+    }
+}
+
 .feeds {
     @include background-color($color-base);
     position: absolute;
@@ -1241,92 +1369,6 @@ Structure
     }
     .feeds-target {
         padding-bottom: env(safe-area-inset-bottom);
-    }
-    .view-mode {
-        position: sticky;
-        top: -10px;
-        z-index: 2;
-        @include background-color($color-base);
-        @include size-in-rems(padding, 25 16 14 16)
-        margin-bottom: 19px;
-        .select-wrap {
-            position: relative;
-        }
-        .view-mode-icon {
-            $size: 27px;
-            pointer-events: none;
-            position: absolute;
-            top: 1px;
-            left: 86px;
-            border-radius: $size;
-            height: $size;
-            width: $size;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s ease;
-            svg {
-                @include fill($color-contrast-400);
-            }
-            .view_all & {
-                left: 50px;
-            }
-        }
-        select {
-            background-color: transparent;
-            width: 100%;
-            padding: 0;
-            margin-left: 2px;
-            @include font-size(16);
-            font-weight: bold;
-            line-height: 1.1;
-            border: none;
-            border-radius: 0;
-            appearance: none;
-            padding: 0;
-            @include color($color-contrast-700);
-            position: relative;
-            transition: transform 0.2s ease;
-            transform-origin: top left;
-            transform: scale(1.5);
-            width: 150px;
-            &::-ms-expand {
-                display: none;
-            }
-        }
-        .toggle-search {
-            position: absolute;
-            right: -11px;
-            top: -7px;
-            @include centered;
-            appearance: none !important;
-            border: none;
-            padding: 0;
-            width: 40px;
-            height: 40px;
-            background-color: transparent;
-            transition: transform 0.2s ease;
-            svg {
-                @include fill($color-icons);
-            }
-        }
-        .feed-scrolled & {
-            select {
-                transform: scale(1);
-                width: 225px;
-            }
-            .view-mode-icon {
-                transform: scale(1) translate3d(-28px, -5px, 0);
-            }
-            .toggle-search {
-                transform: translate3d(0, -3px, 0);
-            }
-        }
-        .view_all.feed-scrolled & {
-            .view-mode-icon {
-                transform: scale(0.8) translate3d(-25px, -6px, 0);
-            }
-        }
     }
     ul {
         margin: 0;
@@ -2784,12 +2826,15 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     -webkit-overflow-scrolling: touch;
     z-index: 2;
     .full-screen.touch & {
-        bottom: $bottom-toolbar-height - 1px;
+        bottom: $bottom-toolbar-height-alt;
     }
     @media (max-width: $small-breakpoint) {
-        bottom: $bottom-toolbar-height - 1px;
+        bottom: $bottom-toolbar-height-alt;
+        bottom: var(--bottom-toolbar-height);
         .standalone-navigator & {
-            bottom: calc(#{$bottom-toolbar-height - 9px} + env(safe-area-inset-bottom));
+            @supports(bottom: max(0px)) {
+                bottom: $safe-area-toolbar-height;
+            }
         }
     }
     &.slide-up {
@@ -2922,9 +2967,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         &:hover {
             text-decoration: none;
         }
-        .standalone-navigator & {
-            padding-bottom: env(safe-area-inset-bottom);
-        }
         .toolbar-button-inner {
             height: 23px;
             display: block;
@@ -2936,9 +2978,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         &.button-next {
             text-align: left;
             padding-left: 30px;
-        }
-        .standalone-navigator & {
-            padding-bottom: env(safe-area-inset-bottom);
         }
         .icon-next, .icon-previous {
             display: inline-block;
@@ -6819,7 +6858,7 @@ Media Players
     @include border-top($color-borders);
     position: absolute;
     width: 100%;
-    bottom: $bottom-toolbar-height;
+    @include offscreen-panels(bottom, $bottom-toolbar-height, $bottom-toolbar-height-alt)
     left: 0;
     overflow: hidden;
     z-index: 1;
@@ -8210,17 +8249,18 @@ Media Queries
     .account-toolbar {
         display: none;
     }
-    .feeds-column .bottom-toolbar {
-        display: none;
-    }
     .feeds-inner {
         bottom: 0;
     }
     .entries-inner {
-        bottom: $bottom-toolbar-height - 1px;
+        bottom: $bottom-toolbar-height-alt - 1px;
     }
     &.standalone-navigator .entries-inner {
-        bottom: calc(#{$bottom-toolbar-height - 9px} + env(safe-area-inset-bottom));
+        bottom: $bottom-toolbar-height-alt;
+        bottom: var(--bottom-toolbar-height);
+        @supports(bottom: max(0px)) {
+            bottom: $safe-area-toolbar-height;
+        }
     }
     .entry-header h1 {
         font-size: 1.6em;

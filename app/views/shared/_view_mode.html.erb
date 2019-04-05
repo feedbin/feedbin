@@ -1,0 +1,13 @@
+<%= form_tag settings_view_mode_path, remote: true, class: "view-mode", data: {behavior: "view_mode"} do %>
+    <div class="select-wrap">
+        <select name="mode" data-behavior="change_view_mode">
+            <option value="view_unread" <%= view_mode_selected("view_unread") %>>Unread</option>
+            <option value="view_starred" <%= view_mode_selected("view_starred") %>>Starred</option>
+            <option value="view_all" <%= view_mode_selected("view_all") %>>All</option>
+        </select>
+        <span class="view-mode-icon">
+            <%= svg_tag "icon-caret", size: "12x7" %>
+        </span>
+        <button class="toggle-search" data-behavior="toggle_search"><%= svg_tag "icon-search", size: "16x16" %></button>
+    </div>
+<% end %>

@@ -1,24 +1,26 @@
 <div class="bottom-toolbar feed-toolbar">
-    <a class="toolbar-button" disabled="disabled" data-behavior="open_settings_modal feed_settings" data-remote="true" href="" data-modal-target="">
-        <div class="toolbar-button-inner">
-            <%= svg_tag "icon-edit", size: "21x20" %>
-        </div>
-        <span>Edit</span>
-    </a>
-
-    <button type="button" class="toolbar-button" data-behavior="show_subscribe open_modal" data-modal-target="subscribe">
-        <div class="toolbar-button-inner">
-            <div class="icon-subscribe">
-                <%= svg_tag "icon-plus", size: "16x16" %>
+    <div class="toolbar-inner">
+        <a class="toolbar-button" disabled="disabled" data-behavior="open_settings_modal feed_settings" data-remote="true" href="" data-modal-target="">
+            <div class="toolbar-button-inner">
+                <%= svg_tag "icon-edit", size: "21x20" %>
             </div>
-        </div>
-        <span>Add</span>
-    </button>
+            <span>Edit</span>
+        </a>
 
-    <button class="toolbar-button" disabled="disabled" data-behavior="mark_all_as_read">
-        <div class="toolbar-button-inner">
-            <%= svg_tag "icon-mark-read", size: "21x21" %>
-        </div>
-        <span>Read</span>
-    </button>
+        <button type="button" class="toolbar-button subscribe-button" data-behavior="show_subscribe open_modal" data-modal-target="subscribe">
+            <div class="toolbar-button-inner">
+                <div class="icon-subscribe">
+                    <%= svg_tag "icon-plus", size: "16x16" %>
+                </div>
+            </div>
+            <span>Add</span>
+        </button>
+
+        <button class="toolbar-button" disabled="disabled" data-behavior="mark_all_as_read">
+            <div class="toolbar-button-inner">
+                <%= svg_tag "icon-mark-read", size: "21x21" %>
+            </div>
+            <span>Read</span>
+        </button>
+    </div>
 </div>
