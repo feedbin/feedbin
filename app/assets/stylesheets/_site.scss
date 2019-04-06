@@ -8841,7 +8841,7 @@ button.close {
     display: flex;
     flex-direction: column;
     width: 100%;
-    pointer-events: auto;
+    pointer-events: all;
     @include background-color($color-base);
     background-clip: padding-box;
     border: 1px solid rgba(0, 0, 0, 0.2);

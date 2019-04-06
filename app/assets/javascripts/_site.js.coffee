@@ -2225,7 +2225,6 @@ $.extend feedbin,
       scrollStop = Math.abs(parseInt(scrollStop))
 
       scrollStopAlt = $('.feeds .view-mode').outerHeight() - 11
-      console.log scrollStopAlt
       $('.feeds').on 'scroll', (event) ->
         top = $(@)[0].scrollTop
         if top > scrollStop
