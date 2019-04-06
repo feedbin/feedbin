@@ -1314,7 +1314,7 @@ Structure
 
 .top-toolbar {
     height: $toolbar-height;
-    @include border-bottom($color-borders);
+    @include border-bottom(transparent);
     position: absolute;
     top: 0;
     left: 0;
@@ -1323,6 +1323,9 @@ Structure
     align-items: center;
     justify-content: space-between;
     display: none;
+    .feed-scrolled & {
+        @include border-bottom($color-borders);
+    }
     .view-mode {
         margin: 0;
         padding: 0;
