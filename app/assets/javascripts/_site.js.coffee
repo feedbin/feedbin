@@ -2223,12 +2223,20 @@ $.extend feedbin,
     viewModeEffects: ->
       scrollStop = $('.view-mode').css("top")
       scrollStop = Math.abs(parseInt(scrollStop))
+
+      scrollStopAlt = $('.feeds .view-mode').outerHeight() - 11
+      console.log scrollStopAlt
       $('.feeds').on 'scroll', (event) ->
         top = $(@)[0].scrollTop
         if top > scrollStop
           $('body').addClass('feed-scrolled')
         else
           $('body').removeClass('feed-scrolled')
+
+        if top > scrollStopAlt
+          $('body').addClass('feed-scrolled-alt')
+        else
+          $('body').removeClass('feed-scrolled-alt')
 
 
     scrollLeft: ->

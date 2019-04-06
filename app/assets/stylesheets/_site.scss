@@ -1256,7 +1256,6 @@ $hamburger-dot: 4px;
         pointer-events: none;
         position: absolute;
         top: 1px;
-        left: 86px;
         border-radius: $size;
         height: $size;
         width: $size;
@@ -1264,11 +1263,15 @@ $hamburger-dot: 4px;
         align-items: center;
         justify-content: center;
         transition: transform 0.2s ease;
-        svg {
-            @include fill($color-contrast-400);
+        left: 85px;
+        .view_starred & {
+            left: 88px;
         }
         .view_all & {
-            left: 30px;
+            left: 31px;
+        }
+        svg {
+            @include fill($color-contrast-400);
         }
     }
     select {
@@ -1326,7 +1329,7 @@ $hamburger-dot: 4px;
     }
     .view_all.feed-scrolled:not(.has-offscreen-panels) & {
         .view-mode-icon {
-            transform: scale(0.8) translate3d(-15px, -6px, 0);
+            transform: scale(1) translate3d(-10px, -5px, 0);
         }
     }
 }
@@ -1351,32 +1354,44 @@ $hamburger-dot: 4px;
         padding: 0;
         border: none;
         background: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         svg {
             @include fill($color-icons);
         }
     }
-    .feed-scrolled & {
+    .feed-scrolled-alt & {
         @include border-bottom($color-borders-alt, $root: true);
+    }
+    .view-mode, .select-wrap, select {
+        height: 100%;
     }
     .view-mode {
         margin: 0;
         padding: 0;
         transition: opacity 0.2s ease;
         opacity: 0;
-        .feed-scrolled & {
+        .feed-scrolled-alt & {
             opacity: 1;
         }
         select {
+            margin: 0;
             transform: scale(1);
             width: auto;
         }
     }
     .view-mode-icon {
-        top: -2px;
-        left: 57px;
+        top: 0;
+        bottom: 0;
+        height: auto;
+        left: 55px;
         transition: none;
+        .view_starred & {
+            left: 57px;
+        }
         .view_all & {
-            left: 20px;
+            left: 19px;
         }
     }
     .has-offscreen-panels & {
