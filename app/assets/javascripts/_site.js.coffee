@@ -1579,7 +1579,7 @@ $.extend feedbin,
         drawer = button.parents('li').find('.drawer')
 
         windowHeight = window.innerHeight
-        targetHeight = $('ul', drawer).height() + 2
+        targetHeight = $('ul', drawer).height()
         if windowHeight < targetHeight
           targetHeight = windowHeight - drawer.offset().top
 
@@ -1596,7 +1596,7 @@ $.extend feedbin,
 
         drawer.animate {
           height: height
-        }, 200, ->
+        }, 150, ->
           if height > 0
             drawer.css
               height: 'auto'
