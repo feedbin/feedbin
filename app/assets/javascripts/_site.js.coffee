@@ -148,7 +148,7 @@ $.extend feedbin,
     canvas.parentNode.removeChild(canvas)
     "rgba(#{data.data[0]}, #{data.data[1]}, #{data.data[2]}, #{data.data[3]})"
 
-  setNativeTheme: (calculateOverlay = false, timeout = 10) ->
+  setNativeTheme: (calculateOverlay = false, timeout = 1) ->
     if feedbin.native && feedbin.data && feedbin.data.theme
       statusBar = if $("body").hasClass("theme-dusk") || $("body").hasClass("theme-midnight") then "lightContent" else "default"
       message = {
@@ -2189,10 +2189,10 @@ $.extend feedbin,
           $("body").addClass("modal-shown")
         ), 150
 
-      $(document).on 'hidden.bs.modal', () ->
+      $(document).on 'hide.bs.modal', () ->
         $("body").removeClass("modal-shown")
         feedbin.setNativeBorders()
-        feedbin.setNativeTheme(false, 40)
+        feedbin.setNativeTheme(false, 160)
 
     modalScrollPosition: ->
       $(document).on 'hide.bs.modal', (event) ->

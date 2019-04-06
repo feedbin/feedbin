@@ -8748,6 +8748,9 @@ button.close {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
+.modal-open.touch:not(.scroll-bars) .modal {
+    min-height: 101%;
+}
 
 .fade {
   opacity: 0;
