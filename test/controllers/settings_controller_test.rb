@@ -225,4 +225,15 @@ class SettingsControllerTest < ActionController::TestCase
       assert_equal(audio_panel_size, @user.reload.audio_panel_size)
     end
   end
+
+  test "view modes" do
+    login_as @user
+
+    %w[view_unread view_starred view_all].each do |view_mode|
+      get :view_mode, xhr: true, params: {mode: view_mode}
+      assert_response :success
+      assert_equal view_mode, @user.reload.view_mode
+    end
+  end
+
 end

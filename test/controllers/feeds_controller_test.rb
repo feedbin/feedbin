@@ -22,16 +22,6 @@ class FeedsControllerTest < ActionController::TestCase
     assert @user.subscriptions.where(title: title, feed: feed).length == 1
   end
 
-  test "view modes" do
-    login_as @user
-
-    %w[view_unread view_starred view_all].each do |view_mode|
-      get view_mode, xhr: true
-      assert_response :success
-      assert_equal view_mode, @user.reload.view_mode
-    end
-  end
-
   test "gets auto_update" do
     login_as @user
     get :auto_update, xhr: true
