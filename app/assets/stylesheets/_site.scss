@@ -853,6 +853,16 @@ table {
 /*------------------------------------------------------------------------------
 Structure
 ------------------------------------------------------------------------------*/
+.loading-app {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    svg {
+        @include fill((day: $theme-color-200, sunset: $theme-color-sunset-100, dusk: $theme-color-500, midnight: $theme-color-500));
+    }
+}
 
 .search-form-wrap {
     position: absolute;
@@ -982,6 +992,9 @@ Structure
     .entry-column {
         flex-grow: 1;
     }
+    &.show {
+        display: flex !important;
+    }
 }
 
 .app-panel {
@@ -1026,29 +1039,29 @@ Structure
     justify-content: center;
 }
 
+$hamburger-dot: 4px;
 .hamburger-menu {
     cursor: pointer;
     z-index: 2;
     position: relative;
     &:before {
-        left: -6px;
+        left: -7px;
         position: absolute;
     }
     &:after {
         position: absolute;
-        left: 6px;
+        left: 7px;
     }
 }
-
 .hamburger-menu, .hamburger-menu:before, .hamburger-menu:after {
-    $dot: 3px;
-    width: $dot;
-    height: $dot;
-    border-radius: $dot/2;
+    width: $hamburger-dot;
+    height: $hamburger-dot;
+    border-radius: $hamburger-dot/2;
     content: '';
     display: inline-block;
     @include background-color($color-icons);
 }
+
 
 .bottom-toolbar {
     height: $bottom-toolbar-height;
@@ -1249,7 +1262,7 @@ Structure
             @include fill($color-contrast-400);
         }
         .view_all & {
-            left: 50px;
+            left: 30px;
         }
     }
     select {
@@ -1305,9 +1318,9 @@ Structure
     .feed-scrolled.has-offscreen-panels .feeds & {
         position: static;
     }
-    .view_all.feed-scrolled & {
+    .view_all.feed-scrolled:not(.has-offscreen-panels) & {
         .view-mode-icon {
-            transform: scale(0.8) translate3d(-25px, -6px, 0);
+            transform: scale(0.8) translate3d(-15px, -6px, 0);
         }
     }
 }
@@ -1323,8 +1336,21 @@ Structure
     align-items: center;
     justify-content: space-between;
     display: none;
+    .hamburger-menu-wrap, .show-subscribe {
+        position: static;
+        height: $toolbar-height - 1px;
+        width: 54px;
+    }
+    .show-subscribe {
+        padding: 0;
+        border: none;
+        background: none;
+        svg {
+            @include fill($color-icons);
+        }
+    }
     .feed-scrolled & {
-        @include border-bottom($color-borders);
+        @include border-bottom($color-borders-alt, $root: true);
     }
     .view-mode {
         margin: 0;
@@ -1336,11 +1362,16 @@ Structure
         }
         select {
             transform: scale(1);
+            width: auto;
         }
     }
     .view-mode-icon {
         top: -2px;
-        left: 61px;
+        left: 57px;
+        transition: none;
+        .view_all & {
+            left: 20px;
+        }
     }
     .has-offscreen-panels & {
         display: flex;

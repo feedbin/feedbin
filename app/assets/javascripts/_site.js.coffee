@@ -2306,6 +2306,10 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=toggle_search]', (event) ->
         feedbin.toggleSearch()
 
+    showApp: ->
+      $('.app-wrap').addClass('show')
+      $('.loading-app').addClass('hide')
+
     subscribe: ->
       $(document).on 'shown.bs.modal', (event) ->
         className = "modal-purpose-subscribe"

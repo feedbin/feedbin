@@ -89,6 +89,7 @@ class feedbin.CountsBehavior
     element.closest('form').submit()
 
     feedbin.data.viewMode = element.val()
+    $('[data-behavior~=change_view_mode]').val(feedbin.data.viewMode)
 
     $('body').removeClass('view_all view_unread view_starred');
     $('body').addClass(feedbin.data.viewMode);
@@ -97,19 +98,20 @@ class feedbin.CountsBehavior
     feedID = selected.data('feed-id')
     selectFirst = false
 
-    specialCollections = ["collection_unread", "collection_starred", "collection_all"]
-    if _.contains specialCollections, feedID
-      selectFirst = true
-    else
-      $("[data-behavior~=feed_link]", selected).click()
-      feedbin.hideQueue.push(feedID) if !selected.is(":visible")
+    unless $('body').hasClass('has-offscreen-panels')
+      specialCollections = ["collection_unread", "collection_starred", "collection_all"]
+      if _.contains specialCollections, feedID
+        selectFirst = true
+      else
+        $("[data-behavior~=feed_link]", selected).click()
+        feedbin.hideQueue.push(feedID) if !selected.is(":visible")
 
     feedbin.applyCounts(false)
 
     if selectFirst
       $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click();
-    else
-      selected[0].scrollIntoView({behavior: "smooth", block: "center"}) if selected[0]
+    # else
+    #   selected[0].scrollIntoView({behavior: "smooth", block: "center"}) if selected[0]
 
     $('[data-behavior~=change_view_mode]').blur()
 
