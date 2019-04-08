@@ -175,11 +175,11 @@ $focus-glow: 0px 0px 10px 0 rgba($theme-color-500, 0.6);
 $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
 
 
-$bottom-toolbar-height: 93px;
+$bottom-toolbar-height: 95px;
 $bottom-toolbar-height-alt: 54px;
 
 body {
-    --bottom-toolbar-height: 93px;
+    --bottom-toolbar-height: 95px;
     &.has-offscreen-panels {
         --bottom-toolbar-height: 54px;
     }
@@ -1066,6 +1066,7 @@ $hamburger-dot: 4px;
 .bottom-toolbar {
     height: $bottom-toolbar-height;
     height: var(--bottom-toolbar-height);
+    padding-bottom: 4px;
     .has-offscreen-panels & {
         @supports(height: max(0px)) {
             height: $safe-area-toolbar-height;
@@ -1116,7 +1117,7 @@ $hamburger-dot: 4px;
             text-decoration: none;
         }
         span {
-            padding-top: 8px;
+            padding-top: 6px;
             @include color($color-icons);
             flex: 0 0 auto;
             .has-offscreen-panels & {
@@ -1285,7 +1286,6 @@ $hamburger-dot: 4px;
         border: none;
         border-radius: 0;
         appearance: none;
-        padding: 0;
         @include color($color-contrast-700);
         position: relative;
         transition: transform 0.2s ease;
