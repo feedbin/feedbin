@@ -1099,7 +1099,7 @@ $hamburger-dot: 4px;
         justify-content: flex-end;
     }
     @media (max-width: $small-breakpoint) {
-        @include border-top($border-color);
+        @include border-top($color-borders);
     }
 }
 
@@ -1471,14 +1471,15 @@ $hamburger-dot: 4px;
                 @include size-in-rems(padding, 6 16)
             }
             &.source-section {
-                @include font-size(14);
+                @include font-size(12);
                 @include size-in-rems(padding-top, 22)
-                @include color($color-contrast-600);
+                @include color($color-contrast-400);
                 font-weight: bold;
+                text-transform: uppercase;
                 display: flex;
                 align-items: center;
                 svg {
-                    @include fill($color-contrast-600);
+                    @include fill($color-icons);
                 }
             }
             .feed-link {
@@ -1594,7 +1595,7 @@ $hamburger-dot: 4px;
                     svg {
                         transition: transform .15s linear;
                         transform: rotate(-90deg);
-                        @include fill($color-icons);
+                        @include fill($color-contrast-400);
                     }
                     &.icon-hide svg {
                         transform: rotate(0deg);
