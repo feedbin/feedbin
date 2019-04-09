@@ -1064,15 +1064,10 @@ $hamburger-dot: 4px;
 
 
 .bottom-toolbar {
-    height: $bottom-toolbar-height;
-    height: var(--bottom-toolbar-height);
+    @include font-size(10);
+    @include background-color($color-base);
+    @include border-top(transparent);
     padding-bottom: 4px;
-    .has-offscreen-panels & {
-        @supports(height: max(0px)) {
-            height: $safe-area-toolbar-height;
-        }
-        padding-bottom: env(safe-area-inset-bottom);
-    }
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1081,8 +1076,14 @@ $hamburger-dot: 4px;
     bottom: 0;
     left: 0;
     right: 0;
-    @include font-size(10);
-    @include background-color($color-base);
+    height: $bottom-toolbar-height;
+    height: var(--bottom-toolbar-height);
+    .has-offscreen-panels & {
+        @supports(height: max(0px)) {
+            height: $safe-area-toolbar-height;
+        }
+        padding-bottom: env(safe-area-inset-bottom);
+    }
     .entries-column & {
         display: none;
     }
@@ -1096,6 +1097,9 @@ $hamburger-dot: 4px;
         display: flex;
         width: 100%;
         justify-content: flex-end;
+    }
+    @media (max-width: $small-breakpoint) {
+        @include border-top($border-color);
     }
 }
 
