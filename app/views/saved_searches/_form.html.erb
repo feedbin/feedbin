@@ -2,7 +2,7 @@
     <%= form_for(saved_search, remote: true, html: {class: 'settings', data: {behavior: "disable_on_submit"}}) do |f| %>
         <% content_for :modal_content do %>
             <div class="modal-header-input">
-                <%= f.text_field :name, placeholder: saved_search.name || "Title" %>
+                <%= f.text_field :name, placeholder: saved_search.name || "Title", data: {behavior: "autofocus"} %>
                 <span class="icon"><%= svg_tag "favicon-saved-search", size: "16x16" %></span>
             </div>
         <% end %>

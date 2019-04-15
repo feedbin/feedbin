@@ -2,7 +2,7 @@
     <%= form_for(tag, remote: true, method: :patch, html: {class: 'settings tags-form', data: {behavior: "disable_on_submit"}}) do |f| %>
         <% content_for :modal_content do %>
             <div class="modal-header-input">
-                <%= f.text_field :name, placeholder: tag.name %>
+                <%= f.text_field :name, placeholder: tag.name, data: {behavior: "autofocus"} %>
                 <span class="icon"><%= svg_tag "favicon-tag", size: "16x16" %></span>
             </div>
         <% end %>

@@ -265,7 +265,7 @@ $.extend feedbin,
     setTimeout ( ->
       modal.find('.modal-dialog').css({height: 'auto'})
       modal.find('.modal-dialog').removeClass('loading')
-      input = modal.find('.modal-header-input input')
+      input = modal.find('[data-behavior~=autofocus]')
       if input.length
         input.focus()
         length = input.val().length

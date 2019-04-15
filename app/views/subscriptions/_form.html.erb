@@ -3,7 +3,7 @@
         <%= form_for(subscription, remote: true, method: :patch, html: {class: 'settings', data: {behavior: "disable_on_submit"}}) do |f| %>
             <% content_for :modal_content do %>
                 <div class="modal-header-input">
-                    <%= f.text_field :title, placeholder: subscription.feed.title %>
+                    <%= f.text_field :title, placeholder: subscription.feed.title, data: {behavior: "autofocus"} %>
                     <span class="icon"><%= svg_tag "favicon-feeds", size: "16x16" %></span>
                     <span class="icon favicon-icon"><%= subscription_presenter.favicon(subscription.feed) %></span>
                 </div>
