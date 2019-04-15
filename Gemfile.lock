@@ -344,6 +344,8 @@ GEM
     public_suffix (3.0.3)
     puma (3.12.0)
     rack (2.0.6)
+    rack-attack (5.4.2)
+      rack (>= 1.0, < 3)
     rack-protection (2.0.5)
       rack
     rack-test (1.1.0)
@@ -569,6 +571,7 @@ DEPENDENCIES
   pg (< 1.0)
   premailer-rails
   puma
+  rack-attack
   rails (= 5.1.6.2)
   rails-controller-testing
   rails-deprecated_sanitizer
