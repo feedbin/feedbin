@@ -96,6 +96,7 @@ gem "twitter"
 gem "twitter-text"
 gem "bootsnap", require: false
 gem "unicode-emoji"
+gem "rack-attack"
 
 # Stripe
 gem "stripe"

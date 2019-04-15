@@ -22,6 +22,7 @@ class UserDeleter
     else
       Librato.increment("user.refund.declined")
     end
+  rescue Stripe::InvalidRequestError
   end
 
   def email_subscriptions
