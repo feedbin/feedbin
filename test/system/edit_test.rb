@@ -47,7 +47,6 @@ class EditTest < ApplicationSystemTestCase
       find("[data-behavior~=feed_settings]").click
     end
 
-
     wait_for_ajax
 
     find(".modal [data-behavior~=autofocus]").set(new_tag_name)
@@ -86,8 +85,6 @@ class EditTest < ApplicationSystemTestCase
     click_link new_search_name
 
     assert_equal new_search_name, search.reload.name
-
-    assert_equal(true, false)
 
   end
 
