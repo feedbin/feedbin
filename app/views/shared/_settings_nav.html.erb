@@ -8,17 +8,17 @@
         <li class="desktop-hide"><%= link_to "Feedbin", "/" %></li>
         <li>
             <%= link_to settings_path, class: is_active?("settings", "settings") do %>
-                <span>Settings</span>
+                Settings
             <% end %>
         </li>
         <li>
             <%= link_to settings_appearance_path, class: is_active?("settings", "appearance") do %>
-                <span>Appearance</span>
+                Appearance
             <% end %>
         </li>
         <li>
             <%= link_to settings_subscriptions_path, class: is_active?(["settings/subscriptions"], ["index", "edit"]) do %>
-                <span>Subscriptions</span>
+                Subscriptions
             <% end %>
         </li>
 
@@ -29,17 +29,17 @@
         </li>
         <li>
             <%= link_to actions_path, class: is_active?("actions", ["index", "new", "edit"]) do %>
-                <span>Actions</span>
+                Actions
             <% end %>
         </li>
         <li>
             <%= link_to sharing_services_path, class: is_active?("sharing_services", "index") do %>
-                <span>Share & Save</span>
+                Share & Save
             <% end %>
         </li>
         <li>
             <%= link_to settings_import_export_path, class: is_active?("settings", "import_export") do %>
-                <span>Import & Export</span>
+                Import & Export
             <% end %>
         </li>
 
@@ -49,20 +49,20 @@
         </li>
         <li>
             <%= link_to settings_account_path, class: is_active?("settings", "account") do %>
-                <span>Account</span>
+                Account
             <% end %>
         </li>
         <% if ENV["STRIPE_API_KEY"] %>
             <li>
                 <%= link_to settings_billing_path, class: is_active?("settings", "billing") do %>
-                    <span>Billing</span>
+                    Billing
                 <% end %>
             </li>
         <% end %>
         <% if current_user.try(:admin?) %>
             <li>
                 <%= link_to admin_users_path, class: is_active?("admin/users", "index") do %>
-                    <span>Customers</span>
+                    Customers
                 <% end %>
             </li>
         <% end %>
@@ -70,50 +70,47 @@
     <ul class="nav nav-small border">
         <li>
             <a href="/home">
-                <span>Home</span>
+                Home
             </a>
         </li>
         <li>
             <a href="http://blog.feedbin.com">
-                <span>Blog</span>
+                Blog
             </a>
         </li>
         <li>
             <a href="/apps">
-                <span>Apps</span>
+                Apps
             </a>
         </li>
         <li>
             <a href="https://feedbin.com/help">
-                <span>Help</span>
+                Help
             </a>
         </li>
         <li>
             <a href="https://github.com/feedbin/feedbin-api#readme">
-                <span>API</span>
+                API
             </a>
         </li>
         <li>
             <a href="/privacy-policy">
-                <span>Privacy Policy</span>
+                Privacy Policy
             </a>
         </li>
         <li>
             <a href="mailto:support@feedbin.com">
-                <span>Email</span>
+                Email
             </a>
         </li>
         <li class="mobile-hide">
             <a href="https://twitter.com/feedbin">
-                <span>Twitter</span>
+                Twitter
             </a>
         </li>
-    </ul>
-    <ul class="nav nav-small bottom">
-        <li class="has-icon logout">
+        <li style="margin-top: 16px;">
             <%= link_to logout_path, method: "delete" do %>
-                <div class="icon-wrap"><%= svg_tag "icon-log-out", size: "16x20" %></div>
-                <div>Log Out</div>
+                Log Out
             <% end %>
         </li>
     </ul>

@@ -1481,6 +1481,9 @@ $hamburger-dot: 4px;
                 svg {
                     @include fill($color-icons);
                 }
+                &.hide {
+                    display: none;
+                }
             }
             .feed-link {
                 overflow: hidden;
@@ -4553,6 +4556,10 @@ Settings
 }
 
 .nav {
+    $nav-padding: 35px;
+    $icon-width: 22px;
+    $icon-margin: 16px;
+
     margin: 18px 0 0 0;
     padding: 0;
     list-style: none;
@@ -4561,54 +4568,60 @@ Settings
     }
     .nav-header {
         font-weight: bold;
-        padding: 0 35px;
-        color: $theme-color-100;
-        margin: 40px 0 8px 0;
         display: flex;
         align-items: center;
+        margin: 16px 0;
     }
     .icon-wrap {
         line-height: 0;
-        width: 22px;
-        margin-right: 16px;
+        width: $icon-width;
+        margin-right: $icon-margin;
         display: flex;
         justify-content: center;
         svg {
-            fill: $theme-color-100;
+            @include fill($color-contrast-400);
         }
     }
     a {
+        @include color($color-selected);
         text-align: left;
-        padding: 0 35px 0 57px;
         display: block;
-        color: #FFF;
-        span {
-            display: block;
-            padding: 6px 8px 6px 16px;
-            border-radius: 4px;
+        display: block;
+        padding: 6px 8px 6px ($icon-width + $icon-margin);
+        .settings-inner & {
+            padding-left: $nav-padding + $icon-width + $icon-margin;
+            padding-right: $nav-padding;
         }
-        &:hover {
+        body:not(.touch) &:hover {
             color: #FFF;
             text-decoration: none;
             background-color: #223D4F;
         }
         &.active {
             color: #FFF;
-            @include background-color($color-selected);
-        }
-    }
-    .modal & {
-        margin: 0;
-        a, a.active {
-            color: #0867E2;
-            padding: 5px 0;
-            background-color: transparent;
-            &:hover {
-                background-color: transparent;
-                @include color($color-selected-hover);
+            @include background-color($color-selected, $extra: !important);
+            .modal & {
+                @include color($color-selected);
+                @include background-color(transparent, $extra: !important);
                 text-decoration: underline;
             }
         }
+    }
+    .settings-inner & {
+        a {
+            color: #fff;
+        }
+        .nav-header {
+            padding: 0 $nav-padding;
+            color: $theme-color-100;
+            margin: 40px 0 8px 0;
+        }
+        .icon-wrap {
+            svg {
+                fill: $theme-color-100;
+            }
+        }
+
     }
 }
 
@@ -4618,9 +4631,12 @@ Settings
     margin: 32px 0 0 0;
     a {
         font-size: 16px;
-        color: $theme-color-400;
+        @include color($color-selected);
         &:hover span {
             background-color: transparent;
+        }
+        .settings-inner & {
+            color: $theme-color-400;
         }
     }
     .has-icon a {
@@ -4634,26 +4650,17 @@ Settings
             display: block;
             position: absolute;
             height: 1px;
-            left: 57px;
-            right: 35px;
+            left: 38px;
+            right: 38px;
             top: 0;
-            background-color: $theme-color-600;
+            @include background-color($color-borders);
         }
     }
-    &.bottom {
-        margin-top: auto;
-        position: sticky;
-        bottom: 0;
-        a {
-            padding-top: 20px;
-            padding-bottom: 20px;
-            background-color: $theme-color-700;
-        }
-    }
-    .logout {
-        a {
-            color: #FFF;
-            font-weight: bold;
+    .settings-inner & {
+        &.border {
+            &:before {
+                background-color: $theme-color-600;
+            }
         }
     }
 }
@@ -4673,7 +4680,7 @@ body.settings {
         align-items: stretch;
         min-height: 100%;
     }
-    .settings-nav {
+    .settings-inner .settings-nav {
         flex-shrink: 0;
         @media (max-width: 900px) {
             width: 230px;

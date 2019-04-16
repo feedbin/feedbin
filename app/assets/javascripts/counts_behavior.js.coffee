@@ -16,6 +16,16 @@ feedbin.updateTitle = () ->
     docTitle = $('title')
     docTitle.text(title) unless docTitle.text() is title
 
+feedbin.sectionHeaders = () ->
+  $('.source-section').each (index, element) =>
+    element = $(element)
+    visibleSiblings = element.nextUntil('.source-section', ':visible')
+
+    if visibleSiblings.length > 0
+      element.removeClass('hide')
+    else
+      element.addClass('hide')
+
 feedbin.applyCounts = (useHideQueue) ->
   $('[data-behavior~=needs_count]').each (index, countContainer) =>
     countContainer = $(countContainer)
@@ -61,6 +71,7 @@ feedbin.applyCounts = (useHideQueue) ->
         if count == 0 && !_.contains(feedbin.hideQueue, feedId)
           container.addClass('zero-count')
 
+  feedbin.sectionHeaders()
   feedbin.updateTitle()
   feedbin.showFeedList()
 
@@ -210,6 +221,7 @@ class feedbin.CountsBehavior
             if count == 0
               $(item).addClass('zero-count')
         feedbin.hideQueue.length = 0
+        feedbin.sectionHeaders()
 
     feedbin.selectedFeed = $(event.currentTarget)
     return
