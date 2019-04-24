@@ -26,6 +26,7 @@ module Api
           if @entries.present?
             if out_of_bounds?
               render json: []
+              return
             else
               links_header(@entries, "api_v2_saved_search_url", saved_search.id)
             end
