@@ -96,6 +96,8 @@ module Api
       end
 
       def links_header(collection, url_helper, resource = nil)
+        return if collection.empty?
+
         links = []
         link_template = '<%s>; rel="%s"'
 
