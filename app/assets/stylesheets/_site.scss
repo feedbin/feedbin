@@ -1721,6 +1721,13 @@ $saved-search-control-height: 48px;
     }
 }
 
+@mixin body-size {
+    @include font-size(14);
+    .has-offscreen-panels.touch & {
+        @include font-size(15);
+    }
+}
+
 .entries ul li {
     position: relative;
     word-wrap: break-word;
@@ -1745,7 +1752,7 @@ $saved-search-control-height: 48px;
         line-height: 1.25;
         @include font-size(14);
         .has-offscreen-panels.touch & {
-            @include font-size(16);
+            @include font-size(15);
         }
         &:hover {
             text-decoration: none;
@@ -1854,7 +1861,7 @@ $saved-search-control-height: 48px;
         position: relative;
         @include font-size(15);
         .has-offscreen-panels.touch & {
-            @include font-size(17);
+            @include font-size(16);
         }
         .title-inner {
             font-weight: bold;
@@ -1862,6 +1869,23 @@ $saved-search-control-height: 48px;
                 @include color($color-contrast-400);
                 font-weight: normal;
             }
+        }
+    }
+    &.no-title {
+        .favicon-wrap {
+            position: absolute;
+            display: flex;
+            top: 10px;
+            z-index: 3;
+        }
+        .title {
+            @include font-size(14);
+            .has-offscreen-panels.touch & {
+                @include font-size(15);
+            }
+        }
+        .title .favicon-wrap {
+            display: none;
         }
     }
     .icon-entry-actions, .icon-entry-actions:before, .icon-entry-actions:after {
@@ -1915,23 +1939,6 @@ $saved-search-control-height: 48px;
         display: none;
         fill: map-get($color-selected, day);
         margin-left: 8px;
-    }
-    &.no-title {
-        .favicon-wrap {
-            position: absolute;
-            display: flex;
-            top: 10px;
-            z-index: 3;
-        }
-        .title {
-            @include font-size(14);
-            .has-offscreen-panels.touch & {
-                @include font-size(16);
-            }
-        }
-        .title .favicon-wrap {
-            display: none;
-        }
     }
     &.read {
         .icon-unread {
@@ -2117,10 +2124,10 @@ $saved-search-control-height: 48px;
     .no-title .title {
         @include color($color-contrast-700, $root: true);
         font-weight: bold;
-        @include font-size(16);
-        & .read {
-            @include color($color-contrast-400, $root: true);
-        }
+        @include font-size(15);
+    }
+    .no-title.read .title {
+        @include color($color-contrast-400, $root: true);
     }
     .icon-entry-actions {
         bottom: 15px;
