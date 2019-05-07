@@ -459,7 +459,7 @@ GEM
     stripe (4.16.0)
       faraday (~> 0.13)
       net-http-persistent (~> 3.0)
-    stripe-ruby-mock (2.5.0)
+    stripe-ruby-mock (2.5.6)
       dante (>= 0.2.0)
       multi_json (~> 1.0)
       stripe (>= 2.0.3)
@@ -589,7 +589,7 @@ DEPENDENCIES
   spring
   standard
   stripe
-  stripe-ruby-mock (= 2.5.0)
+  stripe-ruby-mock (= 2.5.6)
   stripe_event
   twitter
   twitter-text
