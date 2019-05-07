@@ -17,4 +17,5 @@ class feedbin.EntriesPager
 
   nearBottom: =>
     height = @container.prop('scrollHeight') - @container.prop('offsetHeight')
-    height - @container.scrollTop() < 1500
+    distance = height - @container.scrollTop()
+    distance < 1500 && distance != 0
