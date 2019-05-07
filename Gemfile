@@ -54,7 +54,7 @@ gem "sassc-rails"
 gem "coffee-rails"
 gem "uglifier", "= 4.1.11"
 gem "autoprefixer-rails"
-gem "rubyzip", "= 1.1.0"
+gem "rubyzip"
 
 gem "apnotic"
 gem "json"
