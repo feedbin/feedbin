@@ -31,7 +31,7 @@ module SessionsHelper
           head :unauthorized
         else
           store_location
-          redirect_to login_url
+          redirect_to login_url, status: :unauthorized
         end
       end
     end
