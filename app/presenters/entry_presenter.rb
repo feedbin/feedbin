@@ -280,6 +280,8 @@ class EntryPresenter < BasePresenter
       base = Addressable::URI.parse(entry.fully_qualified_url)
       base.join(entry.data["enclosure_url"]).to_s
     end
+  rescue
+    nil
   end
 
   def has_media?
