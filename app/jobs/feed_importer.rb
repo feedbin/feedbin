@@ -4,20 +4,31 @@ class FeedImporter
 
   def perform(import_item_id)
     import_item = ImportItem.find(import_item_id)
-    user = import_item.import.user
+    import = import_item.import
+    user = import.user
 
-    finder = FeedFinder.new(import_item.details[:xml_url])
-    feeds = finder.create_feeds!
-    if feeds
+    feeds = find_feeds(import_item)
+    if feeds.present?
       feed = feeds.first
-      subscription = user.subscriptions.find_or_create_by(feed: feed)
-      if import_item.details[:title] && subscription
-        subscription.update(title: import_item.details[:title])
-      end
-      if import_item.details[:tag]
-        feed.tag(import_item.details[:tag], user, false)
+      user.subscriptions.create_with(title: import_item.details[:title]).find_or_create_by(feed: feed)
+      feed.tag(import_item.details[:tag], user, false) if import_item.details[:tag]
+      import_item.complete!
+    else
+      import_item.failed!
+    end
+
+    import.with_lock do
+      unless import.import_items.where(status: :pending).exists?
+        import.update(complete: true)
       end
     end
-  rescue ActiveRecord::RecordNotFound
   end
+
+  def find_feeds(import_item)
+    finder = FeedFinder.new(import_item.details[:xml_url])
+    finder.create_feeds!
+  rescue
+    []
+  end
+
 end
