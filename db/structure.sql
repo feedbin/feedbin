@@ -416,7 +416,7 @@ CREATE TABLE public.import_items (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     item_type character varying(255),
-    status bigint DEFAULT 1 NOT NULL
+    status bigint DEFAULT 0 NOT NULL
 );
 
 
@@ -2129,6 +2129,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190201020722'),
 ('20190220004135'),
 ('20190225200600'),
-('20190516024925');
+('20190516024925'),
+('20190516210058');
 
 
