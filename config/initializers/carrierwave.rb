@@ -7,6 +7,6 @@ if ENV["AWS_ACCESS_KEY_ID"] && ENV["AWS_SECRET_ACCESS_KEY"]
       aws_secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"],
     }
     config.fog_directory = ENV["AWS_S3_BUCKET"]
-    config.max_file_size = 75.megabytes
+    config.max_file_size = 5.megabytes
   end
 end
