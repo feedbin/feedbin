@@ -7,7 +7,7 @@ module Api
 
       def index
         user = current_user
-        @imports = user.imports
+        @imports = user.imports.order(created_at: :desc)
       end
 
       def create
