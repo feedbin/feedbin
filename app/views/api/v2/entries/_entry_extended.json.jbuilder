@@ -34,4 +34,5 @@ present entry do |entry_presenter|
   json.extracted_articles entry_presenter.extracted_articles do |article|
     json.merge! article
   end
+  json.extract! entry, :json_feed
 end
