@@ -15,7 +15,6 @@ module Api
           allowed_feed_ids = allowed_feed_ids.concat(@user.starred_entries.select("DISTINCT feed_id").map { |entry| entry.feed_id })
           allowed_feed_ids = allowed_feed_ids.concat(@user.subscriptions.pluck(:feed_id))
           @entries = Entry.where(id: @ids, feed_id: allowed_feed_ids).page(nil).includes(:feed)
-          entries_response "api_v2_entries_url"
         elsif params.key?(:starred) && params[:starred] == "true"
           page = if params[:page]
             params[:page].to_i
@@ -27,10 +26,14 @@ module Api
             @starred_entries = @starred_entries.per_page(params[:per_page].to_i)
           end
           @entries = Entry.where(id: @starred_entries.map { |starred_entry| starred_entry.entry_id }).includes(:feed)
-          entries_response "api_v2_entries_url"
         else
-          sorted_set_response
+          feed_ids = @user.subscriptions.pluck(:feed_id)
+          @entries = Entry.where(feed_id: feed_ids).includes(:feed).order("entries.created_at DESC").page(params[:page])
+          if params.has_key?(:per_page)
+            @entries = @entries.per_page(params[:per_page])
+          end
         end
+        entries_response 'api_v2_entries_url'
       end
 
       def show
@@ -101,6 +104,32 @@ module Api
           links_header(pagination[:will_paginate], "api_v2_entries_url")
         end
       end
+
+      # def sorted_set_response
+      #   begin
+      #     since = Time.parse(params[:since])
+      #     since = "(%10.6f" % since.to_f
+      #   rescue TypeError
+      #     since = "-inf"
+      #   end
+      #
+      #   cache_key = [since, params[:starred], params[:read]]
+      #   cache_key = Digest::SHA1.hexdigest(cache_key.join(":"))
+      #   cache_key = "user:#{@user.id}:sorted_entry_ids:#{cache_key}"
+      #
+      #   entry_ids = get_cached_entry_ids(cache_key, FeedbinUtils::FEED_ENTRIES_CREATED_AT_KEY, since, params[:read], params[:starred])
+      #   pagination = build_pagination(entry_ids)
+      #
+      #   if entry_ids.blank?
+      #     @entries = []
+      #   elsif pagination[:page] <= 0 || pagination[:paged_entry_ids][pagination[:page_index]].nil?
+      #     status_not_found
+      #   else
+      #     @entries = Entry.where(id: pagination[:paged_entry_ids][pagination[:page_index]]).includes(:feed).order(created_at: :desc)
+      #     links_header(pagination[:will_paginate], "api_v2_entries_url")
+      #   end
+      # end
+
     end
   end
 end

@@ -7,9 +7,9 @@ class EntriesController < ApplicationController
     update_selected_feed!("collection_all")
 
     feed_ids = @user.subscriptions.pluck(:feed_id)
-    entry_id_cache = EntryIdCache.new(@user.id, feed_ids)
 
-    @entries = entry_id_cache.page(params[:page])
+    @entries = Entry.where(feed_id:feed_ids).page(params[:page]).includes(:feed).sort_preference('DESC').entries_list
+
     @page_query = @entries
 
     @append = params[:page].present?
