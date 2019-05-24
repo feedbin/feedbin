@@ -1077,8 +1077,8 @@ $.extend feedbin,
     content = $($("[data-modal-purpose=#{target}]").html())
 
     titleElement = content.find(".modal-title")
-    title = title or titleElement.html()
-    titleElement.html(title)
+    if title
+      titleElement.text(title)
 
     $.each classes, (index, className) ->
       if className.indexOf(classPrefix) != -1
