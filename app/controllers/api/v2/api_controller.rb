@@ -107,6 +107,7 @@ module Api
         options[:starred] = params[:starred] if params[:starred]
         options[:ids] = params[:ids] if params[:ids]
         options[:per_page] = params[:per_page] if params[:per_page]
+        options[:mode] = params[:mode] if params[:mode]
 
         if collection.total_pages > 1
           unless collection.previous_page.nil?
