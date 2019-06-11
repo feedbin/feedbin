@@ -17,12 +17,22 @@ class FeedImporterTest < ActiveSupport::TestCase
     assert_difference "Subscription.count", +1 do
       FeedImporter.new.perform(@import_item.id)
     end
+    assert_equal("complete", @import_item.reload.status)
   end
 
   test "should tag subscription" do
     assert_difference "Tag.count", +1 do
       FeedImporter.new.perform(@import_item.id)
     end
+  end
+
+  test "should mark failed" do
+    import = @user.imports.create
+    details = { xml_url: "http://www.example.com/atom.xml" }
+    import_item = import.import_items.create(details: details)
+    stub_request(:get, import_item.details[:xml_url]).to_return(status: 404)
+    FeedImporter.new.perform(import_item.id)
+    assert_equal("failed", import_item.reload.status)
   end
 
   test "should title subscription" do

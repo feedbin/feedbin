@@ -69,6 +69,7 @@ class SettingsController < ApplicationController
       @import = Import.new(key: params[:key], user: @user)
 
       if @import.save
+        @import.process
         redirect_to settings_import_export_url, notice: "Import has started."
       else
         @messages = @import.errors.full_messages

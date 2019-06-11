@@ -272,6 +272,7 @@ Rails.application.routes.draw do
           end
         end
 
+        resources :imports, only: [:index, :create, :show]
         resources :subscriptions, only: [:index, :show, :create, :destroy, :update]
 
         resources :favicons, only: [:index]

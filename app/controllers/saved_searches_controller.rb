@@ -7,14 +7,9 @@ class SavedSearchesController < ApplicationController
 
     params[:query] = @saved_search.query
 
-    begin
-      query = Entry.scoped_search(params, @user)
-      @entries = query.records
-      @page_query = query
-    rescue => exception
-      Honeybadger.notify(exception)
-      @entries = Entry.none
-    end
+    query = Entry.scoped_search(params, @user)
+    @entries = query.records
+    @page_query = query
 
     @append = params[:page].present?
 

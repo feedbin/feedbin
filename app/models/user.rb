@@ -498,4 +498,22 @@ class User < ApplicationRecord
   def display_prefs
     "font-size-#{font_size || 5} font-#{font || "default"}"
   end
+
+  def twitter_credentials_valid?
+    twitter_client&.home_timeline && true
+  rescue Twitter::Error::Unauthorized
+    false
+  end
+
+  def twitter_client
+    if twitter_enabled?
+      @twitter_client ||= ::Twitter::REST::Client.new { |config|
+        config.consumer_key = ENV["TWITTER_KEY"]
+        config.consumer_secret = ENV["TWITTER_SECRET"]
+        config.access_token = twitter_access_token
+        config.access_token_secret = twitter_access_secret
+      }
+    end
+  end
+
 end

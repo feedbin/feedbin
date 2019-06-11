@@ -415,7 +415,8 @@ CREATE TABLE public.import_items (
     details text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    item_type character varying(255)
+    item_type character varying(255),
+    status bigint DEFAULT 0 NOT NULL
 );
 
 
@@ -1581,6 +1582,13 @@ CREATE INDEX index_import_items_on_import_id ON public.import_items USING btree 
 
 
 --
+-- Name: index_import_items_on_import_id_and_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_import_items_on_import_id_and_status ON public.import_items USING btree (import_id, status);
+
+
+--
 -- Name: index_in_app_purchases_on_transaction_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2120,6 +2128,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20180717001048'),
 ('20190201020722'),
 ('20190220004135'),
-('20190225200600');
+('20190225200600'),
+('20190516024925'),
+('20190516210058');
 
 

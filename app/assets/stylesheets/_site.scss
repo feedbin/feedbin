@@ -2016,6 +2016,13 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
 }
 
+@mixin body-size {
+    @include font-size(14);
+    .has-offscreen-panels.touch & {
+        @include font-size(15);
+    }
+}
+
 .entries ul li {
     position: relative;
     word-wrap: break-word;
@@ -2040,7 +2047,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         line-height: 1.25;
         @include font-size(14);
         .has-offscreen-panels.touch & {
-            @include font-size(16);
+            @include font-size(15);
         }
         &:hover {
             text-decoration: none;
@@ -2149,7 +2156,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         position: relative;
         @include font-size(15);
         .has-offscreen-panels.touch & {
-            @include font-size(17);
+            @include font-size(16);
         }
         .title-inner {
             font-weight: bold;
@@ -2157,6 +2164,23 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                 @include color($color-contrast-400);
                 font-weight: normal;
             }
+        }
+    }
+    &.no-title {
+        .favicon-wrap {
+            position: absolute;
+            display: flex;
+            top: 10px;
+            z-index: 3;
+        }
+        .title {
+            @include font-size(14);
+            .has-offscreen-panels.touch & {
+                @include font-size(15);
+            }
+        }
+        .title .favicon-wrap {
+            display: none;
         }
     }
     .icon-entry-actions, .icon-entry-actions:before, .icon-entry-actions:after {
@@ -2210,23 +2234,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         display: none;
         @include fill($color-contrast-400);
         margin-left: 8px;
-    }
-    &.no-title {
-        .favicon-wrap {
-            position: absolute;
-            display: flex;
-            top: 10px;
-            z-index: 3;
-        }
-        .title {
-            @include font-size(14);
-            .has-offscreen-panels.touch & {
-                @include font-size(16);
-            }
-        }
-        .title .favicon-wrap {
-            display: none;
-        }
     }
     &.read {
         .icon-unread {
@@ -2412,10 +2419,10 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .no-title .title {
         @include color($color-contrast-700, $root: true);
         font-weight: bold;
-        @include font-size(16);
-        & .read {
-            @include color($color-contrast-400, $root: true);
-        }
+        @include font-size(15);
+    }
+    .no-title.read .title {
+        @include color($color-contrast-400, $root: true);
     }
     .icon-entry-actions {
         bottom: 15px;

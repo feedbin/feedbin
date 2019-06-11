@@ -4,23 +4,24 @@ class Import < ApplicationRecord
   belongs_to :user
   has_many :import_items, dependent: :delete_all
 
-  after_save :enqueue_processing
-
-  def enqueue_processing
+  def process
     ImportWorker.perform_async(id)
   end
 
-  def build_opml_import_job
-    feeds = parse_opml
+  def build_opml_import_job(xml = nil)
+    if xml.nil?
+      xml = upload.read
+    end
+    feeds = parse_opml(xml)
     create_tags(feeds)
     feeds.each do |feed|
       import_items << ImportItem.new(details: feed, item_type: "feed")
     end
+    update(complete: true) if import_items.empty?
   end
 
-  def parse_opml
-    contents = upload.read
-    opml = OpmlSaw::Parser.new(contents)
+  def parse_opml(xml)
+    opml = OpmlSaw::Parser.new(xml)
     opml.parse
     opml.feeds
   end

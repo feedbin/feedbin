@@ -23,21 +23,22 @@ module Api
         if saved_search.present?
           params[:query] = saved_search.query
           @entries = Entry.scoped_search(params, @user)
-          if out_of_bounds?
-            render json: []
-            return
+          if @entries.present?
+            if out_of_bounds?
+              render json: []
+              return
+            else
+              links_header(@entries, "api_v2_saved_search_url", saved_search.id)
+            end
+            if params[:include_entries] != "true"
+              render json: @entries.results.map { |entry| entry.id.to_i }.to_json
+            end
           else
-            links_header(@entries, "api_v2_saved_search_url", saved_search.id)
-          end
-          if params[:include_entries] != "true"
-            render json: @entries.results.map { |entry| entry.id.to_i }.to_json
+            render json: []
           end
         else
           status_forbidden
         end
-      rescue Elasticsearch::Transport::Transport::Errors => exception
-        Honeybadger.notify(exception)
-        render json: []
       end
 
       def create
@@ -78,7 +79,7 @@ module Api
       end
 
       def out_of_bounds?
-        @entries.out_of_bounds? || (params[:page] && params[:page].to_i > 5)
+        @entries.respond_to?(:out_of_bounds?) && @entries.out_of_bounds? || (params[:page] && params[:page].to_i > 5)
       end
     end
   end
