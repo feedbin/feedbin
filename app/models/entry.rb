@@ -50,6 +50,10 @@ class Entry < ApplicationRecord
     end
   end
 
+  def json_feed
+    data&.respond_to?(:dig) && data.dig("json_feed")
+  end
+
   def twitter_thread_ids
     thread.map do |t|
       t.dig("id")

@@ -6712,6 +6712,9 @@ Login and Sign Up
     input + input {
         margin-top: 10px !important;
     }
+    .field_with_errors + input {
+        margin-top: 10px !important;
+    }
     .forgot-link {
         display: block;
         margin: 10px 0 0 0;

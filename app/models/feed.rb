@@ -156,6 +156,10 @@ class Feed < ApplicationRecord
     where("feed_url ILIKE :query", query: "%#{url}%")
   end
 
+  def json_feed
+    options&.respond_to?(:dig) && options.dig("json_feed")
+  end
+
   private
 
   def refresh_favicon
