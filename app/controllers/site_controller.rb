@@ -51,6 +51,7 @@ class SiteController < ApplicationController
         favicon_colors: @user.setting_on?(:favicon_colors),
         font_stylesheet: ENV["FONT_STYLESHEET"],
         modal_extracts_path: modal_extracts_path,
+        settings_view_mode_path: settings_view_mode_path,
       }
 
       render action: "logged_in"

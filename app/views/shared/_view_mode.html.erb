@@ -1,13 +1,20 @@
-<%= form_tag settings_view_mode_path, remote: true, class: "view-mode", data: {behavior: "view_mode"} do %>
-    <div class="select-wrap">
-        <select name="mode" data-behavior="change_view_mode">
-            <option value="view_unread" <%= view_mode_selected("view_unread") %>>Unread</option>
-            <option value="view_starred" <%= view_mode_selected("view_starred") %>>Starred</option>
-            <option value="view_all" <%= view_mode_selected("view_all") %>>All</option>
-        </select>
-        <span class="view-mode-icon">
-            <%= svg_tag "icon-caret", size: "12x7" %>
-        </span>
-        <button class="toggle-search" data-behavior="toggle_search"><%= svg_tag "icon-search", size: "16x16" %></button>
+<div class="view-mode">
+    <div class="dropdown-wrap dropdown-right view-mode-dropdown" data-behavior="toggle_dropdown">
+        <h2 data-behavior="selected_view_mode" class="selected-view-mode">
+            <span class="view-mode-unread">Unread</span>
+            <span class="view-mode-starred">Starred</span>
+            <span class="view-mode-all">All</span>
+            <span class="view-mode-icon">
+                <%= svg_tag "icon-caret", size: "12x7" %>
+            </span>
+        </h2>
+        <div class="dropdown-content">
+            <ul>
+                <li data-behavior="change_view_mode" data-view-mode="view_unread" class="view-mode-unread"><span>Unread</span></li>
+                <li data-behavior="change_view_mode" data-view-mode="view_starred" class="view-mode-starred"><span>Starred</span></li>
+                <li data-behavior="change_view_mode" data-view-mode="view_all" class="view-mode-all"><span>All</span></li>
+            </ul>
+        </div>
     </div>
-<% end %>
+    <button class="toggle-search" data-behavior="toggle_search"><%= svg_tag "icon-search", size: "16x16" %></button>
+</div>

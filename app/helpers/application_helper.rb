@@ -25,7 +25,7 @@ module ApplicationHelper
   end
 
   def view_mode_selected(mode)
-    "selected" if mode == view_mode
+    "selected-mode" if mode == view_mode
   end
 
   def rtl?(string)

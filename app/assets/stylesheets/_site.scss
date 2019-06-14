@@ -1252,59 +1252,57 @@ $hamburger-dot: 4px;
     z-index: 2;
     @include background-color($color-base);
     @include size-in-rems(padding, 25 16 14 16)
-    margin-bottom: 19px;
-    .select-wrap {
-        position: relative;
-    }
+    margin-bottom: 12px;
+    display: flex;
     .view-mode-icon {
         $size: 27px;
-        pointer-events: none;
-        position: absolute;
-        top: 1px;
-        border-radius: $size;
         height: $size;
         width: $size;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: transform 0.2s ease;
-        left: 85px;
-        .view_starred & {
-            left: 88px;
-        }
-        .view_all & {
-            left: 31px;
-        }
         svg {
             @include fill($color-contrast-400);
         }
     }
-    select {
-        background-color: transparent;
-        width: 100%;
-        padding: 0;
-        margin-left: 2px;
-        @include font-size(16);
+    .view-mode-dropdown {
+        display: flex;
+        flex: 1;
+        align-items: center;
+        cursor: pointer;
+        .dropdown-content {
+            top: 40px;
+        }
+    }
+    .selected-view-mode {
+        margin: 0;
+        @include font-size(24);
         font-weight: bold;
         line-height: 1.1;
-        border: none;
-        border-radius: 0;
-        appearance: none;
         @include color($color-contrast-700);
-        position: relative;
         transition: transform 0.2s ease;
         transform-origin: top left;
-        transform: scale(1.5);
-        width: 150px;
-        &::-ms-expand {
+        display: flex;
+        .view-mode-unread,
+        .view-mode-starred,
+        .view-mode-all {
             display: none;
+        }
+        .view_unread & .view-mode-unread {
+            display: block;
+        }
+        .view_starred & .view-mode-starred {
+            display: block;
+        }
+        .view_all & .view-mode-all {
+            display: block;
         }
     }
     .toggle-search {
-        position: absolute;
-        right: -11px;
-        top: -7px;
-        @include centered;
+        align-items: center;
+        justify-content: flex-end;
+        display: flex;
         appearance: none !important;
         border: none;
         padding: 0;
@@ -1317,12 +1315,8 @@ $hamburger-dot: 4px;
         }
     }
     .feed-scrolled:not(.has-offscreen-panels) .feeds & {
-        select {
-            transform: scale(1);
-            width: 225px;
-        }
-        .view-mode-icon {
-            transform: scale(1) translate3d(-28px, -5px, 0);
+        .selected-view-mode {
+            transform: scale(.75);
         }
         .toggle-search {
             transform: translate3d(0, -3px, 0);
@@ -1330,11 +1324,6 @@ $hamburger-dot: 4px;
     }
     .feed-scrolled.has-offscreen-panels .feeds & {
         position: static;
-    }
-    .view_all.feed-scrolled:not(.has-offscreen-panels) & {
-        .view-mode-icon {
-            transform: scale(1) translate3d(-10px, -5px, 0);
-        }
     }
 }
 
@@ -1383,19 +1372,6 @@ $hamburger-dot: 4px;
             margin: 0;
             transform: scale(1);
             width: auto;
-        }
-    }
-    .view-mode-icon {
-        top: 0;
-        bottom: 0;
-        height: auto;
-        left: 55px;
-        transition: none;
-        .view_starred & {
-            left: 57px;
-        }
-        .view_all & {
-            left: 19px;
         }
     }
     .has-offscreen-panels & {

@@ -79,7 +79,7 @@ class feedbin.CountsBehavior
   constructor: ->
     feedbin.applyCounts(false)
     $(document).on('feedbin:entriesLoaded', @applyState)
-    $(document).on('change', '[data-behavior~=change_view_mode]', @changeViewMode)
+    $(document).on('click', '[data-behavior~=change_view_mode]', @changeViewMode)
     $(document).on('click', '[data-behavior~=show_entries]', @showEntries)
     $(document).on('ajax:beforeSend', '[data-behavior~=show_entry_content]', @showEntryContent)
     $(document).on('ajax:beforeSend', '[data-behavior~=toggle_read]', @toggleRead)
@@ -99,8 +99,8 @@ class feedbin.CountsBehavior
 
     element.closest('form').submit()
 
-    feedbin.data.viewMode = element.val()
-    $('[data-behavior~=change_view_mode]').val(feedbin.data.viewMode)
+    feedbin.data.viewMode = element.data('view-mode')
+    $.post(feedbin.data.settings_view_mode_path, {mode: feedbin.data.viewMode})
 
     $('body').removeClass('view_all view_unread view_starred');
     $('body').addClass(feedbin.data.viewMode);
