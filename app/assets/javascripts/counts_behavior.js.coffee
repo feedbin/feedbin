@@ -73,7 +73,6 @@ feedbin.applyCounts = (useHideQueue) ->
 
   feedbin.sectionHeaders()
   feedbin.updateTitle()
-  feedbin.showFeedList()
 
 class feedbin.CountsBehavior
   constructor: ->

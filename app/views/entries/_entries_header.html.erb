@@ -1,5 +1,5 @@
 <button class="back-button" data-behavior="show_feeds">
-    <%= svg_tag "icon-arrow", size: "11x18" %>
+    <%= svg_tag "icon-arrow", size: "9x15" %>
 </button>
 <% if @feed %>
     <% present feed do |feed_presenter| %>
@@ -12,4 +12,4 @@
         <%= @collection_title %>
     </span>
 <% end %>
-<button class="search-button" data-behavior="toggle_search"><%= svg_tag "icon-search" %></button>
+<button class="search-button" data-behavior="toggle_search"><%= svg_tag "icon-search", size: "16x16" %></button>

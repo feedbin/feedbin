@@ -1251,7 +1251,7 @@ $hamburger-dot: 4px;
     top: -10px;
     z-index: 2;
     @include background-color($color-base);
-    @include size-in-rems(padding, 25 16 14 16)
+    @include size-in-rems(padding, 25 16 8 16)
     margin-bottom: 12px;
     display: flex;
     .view-mode-icon {
@@ -1273,6 +1273,7 @@ $hamburger-dot: 4px;
         cursor: pointer;
         .dropdown-content {
             top: 40px;
+            left: 0;
         }
     }
     .selected-view-mode {
@@ -1313,6 +1314,9 @@ $hamburger-dot: 4px;
         svg {
             @include fill($color-icons);
         }
+        .has-offscreen-panels .feeds-column & {
+            display: none;
+        }
     }
     .feed-scrolled:not(.has-offscreen-panels) .feeds & {
         .selected-view-mode {
@@ -1334,7 +1338,6 @@ $hamburger-dot: 4px;
     top: 0;
     left: 0;
     right: 0;
-    overflow: hidden;
     align-items: center;
     justify-content: space-between;
     display: none;
@@ -1379,6 +1382,21 @@ $hamburger-dot: 4px;
     }
     .toggle-search {
         display: none;
+    }
+    .selected-view-mode {
+        font-size: 16px;
+        align-items: center;
+    }
+    .view-mode {
+        position: static;
+    }
+    .view-mode-dropdown {
+        position: static;
+        .dropdown-content {
+            left: 16px;
+            right: auto;
+            top: 42px;
+        }
     }
 }
 
@@ -1866,8 +1884,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         width: $toolbar-height;
         flex-shrink: 0;
         svg {
-            height: 15px;
-            width: 15px;
             @include fill($color-icons);
         }
     }
@@ -2203,7 +2219,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
     .icon-media {
         display: none;
-        margin-left: 8px;
+        margin: 1px 0 0 8px;
         @include fill($color-contrast-400);
     }
     .icon-retweet {

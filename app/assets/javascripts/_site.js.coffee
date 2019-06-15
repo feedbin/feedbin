@@ -276,10 +276,6 @@ $.extend feedbin,
     modal = $(".#{target}")
     $(".modal-body", modal).html(body);
 
-  showFeedList: ->
-    $('[data-behavior~=feeds_target]').removeClass('hide')
-    $('[data-behavior~=feeds_target]').addClass('show')
-
   mobileView: ->
     if $(window).width() <= 700
       true
@@ -1219,10 +1215,14 @@ $.extend feedbin,
       $(document).on "feedbin:panels:three", (event) ->
         $(".#{sidebarClassName}").contents().unwrap()
 
+    throttledResize: ->
+      resize = ->
+        $(document).trigger("window:throttledResize")
+      $(window).on('resize', _.throttle(resize, 100))
+
     panels: ->
       feedbin.panelCount()
-      throttled = _.throttle feedbin.panelCount, 100
-      $(window).on('resize', throttled);
+      $(window).on('window:throttledResize', feedbin.panelCount);
 
     baseFontSize: ->
       element = document.createElement('div')
@@ -1447,8 +1447,7 @@ $.extend feedbin,
 
     resizeWindow: ->
       feedbin.measureEntryColumn()
-      measure = _.throttle(feedbin.measureEntryColumn, 100);
-      $(window).on "resize", measure
+      $(window).on "window:throttledResize", feedbin.measureEntryColumn
 
     resizeColumns: ->
       measure = _.throttle(feedbin.measureEntryColumn, 100);
@@ -1571,7 +1570,14 @@ $.extend feedbin,
 
       $(document).on 'mouseover', '.dropdown-wrap li', (event) ->
         $('.dropdown-wrap li').not(@).removeClass('selected')
-        return
+
+      $(document).on 'click', '[data-behavior~=view_mode_dropdown]', (event) ->
+        dropdown = $(@)
+        if dropdown.hasClass('open')
+          width = 200
+          feedsWidth = $('.feeds-column').outerWidth()
+          width = feedsWidth - 32 if feedsWidth > width
+          $('.dropdown-content', dropdown).css({width: "#{width}px"})
 
     drawer: ->
       $(document).on 'submit', '[data-behavior~=toggle_drawer]', (event) =>
@@ -2045,8 +2051,7 @@ $.extend feedbin,
           width = windowWidth - 350
         $('.settings .entries-display-inline .entries').css({"max-width": "#{width}px"})
       if container
-        throttledResize = _.throttle(resize, 50)
-        $(window).on('resize', throttledResize);
+        $(window).on('window:throttledResize', resize);
         resize()
 
     tumblrType: ->
@@ -2074,10 +2079,9 @@ $.extend feedbin,
 
     resizeGraph: ->
       if $("[data-behavior~=resize_graph]").length
-        $(window).resize(_.debounce(->
+        $(window).on 'window:throttledResize', () ->
           $('[data-behavior~=resize_graph]').each ()->
             feedbin.drawBarChart(@, $(@).data('values'))
-        20))
 
     settingsCheckbox: ->
       $(document).on 'change', '[data-behavior~=auto_submit]', (event) ->
@@ -2224,7 +2228,7 @@ $.extend feedbin,
       scrollStop = $('.view-mode').css("top")
       scrollStop = Math.abs(parseInt(scrollStop))
 
-      scrollStopAlt = $('.feeds .view-mode').outerHeight() - 11
+      scrollStopAlt = $('.feeds .view-mode').outerHeight() - 25
       $('.feeds').on 'scroll', (event) ->
         top = $(@)[0].scrollTop
         if top > scrollStop
