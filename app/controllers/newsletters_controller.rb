@@ -45,7 +45,7 @@ class NewslettersController < ApplicationController
       published: Time.now,
       updated: Time.now,
       public_id: newsletter.entry_id,
-      data: {newsletter_text: newsletter.text, type: "newsletter", format: newsletter.format},
+      data: {newsletter_text: newsletter.text, type: "newsletter", format: newsletter.format, newsletter: newsletter},
     }
   end
 

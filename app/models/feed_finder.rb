@@ -34,6 +34,10 @@ class FeedFinder
     end
 
     if feeds.blank?
+      feeds = Source::Reddit.new(@url, @config).call
+    end
+
+    if feeds.blank?
       feeds = Source::BodyLinks.new(@url, @config).call
     end
 
