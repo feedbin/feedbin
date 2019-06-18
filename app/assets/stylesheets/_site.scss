@@ -186,6 +186,12 @@ body {
 }
 
 $safe-area-toolbar-height: max(var(--bottom-toolbar-height), calc(var(--bottom-toolbar-height) + env(safe-area-inset-bottom)));
+@mixin safe-area-toolbar-height($property) {
+    @supports(height: max(0px)) {
+        #{$property}: max(var(--bottom-toolbar-height), calc(var(--bottom-toolbar-height) + env(safe-area-inset-bottom)));
+    }
+}
+
 
 /*------------------------------------------------------------------------------
 Grid
@@ -1067,7 +1073,11 @@ $hamburger-dot: 4px;
     @include font-size(10);
     @include background-color($color-base);
     @include border-top(transparent);
+    height: $bottom-toolbar-height;
+    height: var(--bottom-toolbar-height);
+    @include safe-area-toolbar-height(height);
     padding-bottom: 4px;
+    padding-bottom: env(safe-area-inset-bottom);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1076,14 +1086,6 @@ $hamburger-dot: 4px;
     bottom: 0;
     left: 0;
     right: 0;
-    height: $bottom-toolbar-height;
-    height: var(--bottom-toolbar-height);
-    .has-offscreen-panels & {
-        @supports(height: max(0px)) {
-            height: $safe-area-toolbar-height;
-        }
-        padding-bottom: env(safe-area-inset-bottom);
-    }
     .entries-column & {
         display: none;
     }
@@ -8303,7 +8305,7 @@ Media Queries
         visibility: visible !important;
     }
     .entries {
-        top: 0;
+        top: -1px;
         transform: translateY($toolbar-height);
     }
     &.hide-search .entries {
