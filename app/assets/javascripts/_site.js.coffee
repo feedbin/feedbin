@@ -1578,7 +1578,7 @@ $.extend feedbin,
         if dropdown.hasClass('open')
           width = 200
           feedsWidth = $('.feeds-column').outerWidth()
-          width = feedsWidth - 32 if feedsWidth > width
+          width = feedsWidth - 16 if feedsWidth > width
           $('.dropdown-content', dropdown).css({width: "#{width}px"})
 
     drawer: ->

@@ -10,9 +10,34 @@
         </h2>
         <div class="dropdown-content">
             <ul>
-                <li data-behavior="change_view_mode" data-view-mode="view_unread" class="view-mode-unread"><span>Unread</span></li>
-                <li data-behavior="change_view_mode" data-view-mode="view_starred" class="view-mode-starred"><span>Starred</span></li>
-                <li data-behavior="change_view_mode" data-view-mode="view_all" class="view-mode-all"><span>All</span></li>
+                <li data-behavior="change_view_mode" data-view-mode="view_unread" class="view-mode-unread">
+                    <span class="no-border with-icon">
+                        <i class="favicon-wrap collection-favicon">
+                            <%= svg_tag "favicon-unread" %>
+                            <%= svg_tag "favicon-unread-active" %>
+                        </i>
+                        <strong>Unread</strong>
+                        <%= svg_tag "icon-settings-check", size: "12x10" %>
+                    </span>
+                </li>
+                <li data-behavior="change_view_mode" data-view-mode="view_starred" class="view-mode-starred">
+                    <span class="no-border with-icon">
+                        <i class="favicon-wrap collection-favicon">
+                            <%= svg_tag "favicon-star" %>
+                        </i>
+                        <strong>Starred</strong>
+                        <%= svg_tag "icon-settings-check", size: "12x10" %>
+                    </span>
+                </li>
+                <li data-behavior="change_view_mode" data-view-mode="view_all" class="view-mode-all">
+                    <span class="no-border with-icon">
+                        <i class="favicon-wrap collection-favicon">
+                            <%= svg_tag "favicon-all" %>
+                        </i>
+                        <strong>All</strong>
+                        <%= svg_tag "icon-settings-check", size: "12x10" %>
+                    </span>
+                </li>
             </ul>
         </div>
     </div>

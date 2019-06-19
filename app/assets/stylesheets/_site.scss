@@ -1275,7 +1275,7 @@ $hamburger-dot: 4px;
         cursor: pointer;
         .dropdown-content {
             top: 40px;
-            left: 0;
+            left: -8px;
         }
     }
     .selected-view-mode {
@@ -1395,7 +1395,7 @@ $hamburger-dot: 4px;
     .view-mode-dropdown {
         position: static;
         .dropdown-content {
-            left: 16px;
+            left: 8px;
             right: auto;
             top: 42px;
         }
@@ -3260,7 +3260,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         li {
             margin: 0;
             padding: 0;
-            a,span,button {
+            a, span, button {
                 position: relative;
                 text-decoration: none;
                 display: block;
@@ -3270,20 +3270,50 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 width: 100%;
-                padding: 10px 11px;
+                padding: 12px 16px;
                 font-family: $font-stack;
                 font-weight: 400 !important;
                 text-align: left;
                 @include border-bottom($color-borders);
                 cursor: pointer;
+                .favicon-unread-active {
+                    display: none;
+                }
                 &:hover, &.selected {
                     @include background-color($color-selected, $extra: !important);
                     color: #fff  !important;
                     text-decoration: none;
+                    &.with-icon {
+                        svg {
+                            fill: white;
+                        }
+                    }
+                    .favicon-unread-active {
+                        display: inline;
+                    }
+                    .favicon-unread {
+                        display: none;
+                    }
                 }
-
                 &.no-border {
                     border: none;
+                }
+                &.with-icon {
+                    display: flex;
+                    align-items: center;
+                    strong {
+                        font-weight: 500;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        flex: 1;
+                        margin-left: 8px;
+                    }
+                    .icon-settings-check {
+                        margin-left: auto;
+                        fill: $color-accent-green-600;
+                        visibility: hidden;
+                    }
                 }
             }
             &:last-child a,
@@ -3298,6 +3328,13 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             &:first-child span {
                 border-top-left-radius: 4px;
                 border-top-right-radius: 4px;
+            }
+            .view_unread &.view-mode-unread,
+            .view_starred &.view-mode-starred,
+            .view_all &.view-mode-all {
+                .icon-settings-check {
+                    visibility: visible;
+                }
             }
         }
     }
