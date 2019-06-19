@@ -175,24 +175,6 @@ $focus-glow: 0px 0px 10px 0 rgba($theme-color-500, 0.6);
 $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
 
 
-$bottom-toolbar-height: 95px;
-$bottom-toolbar-height-alt: 54px;
-
-body {
-    --bottom-toolbar-height: 95px;
-    &.has-offscreen-panels {
-        --bottom-toolbar-height: 54px;
-    }
-}
-
-$safe-area-toolbar-height: max(var(--bottom-toolbar-height), calc(var(--bottom-toolbar-height) + env(safe-area-inset-bottom)));
-@mixin safe-area-toolbar-height($property) {
-    @supports(height: max(0px)) {
-        #{$property}: max(var(--bottom-toolbar-height), calc(var(--bottom-toolbar-height) + env(safe-area-inset-bottom)));
-    }
-}
-
-
 /*------------------------------------------------------------------------------
 Grid
 ------------------------------------------------------------------------------*/
@@ -989,6 +971,15 @@ Structure
         width: 245px;
         @include background-color($color-base);
     }
+    .feeds-column-inner {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        flex-direction: column;
+    }
     .entries-column {
         width: 380px;
         @media (max-width: 1300px) {
@@ -1073,19 +1064,11 @@ $hamburger-dot: 4px;
     @include font-size(10);
     @include background-color($color-base);
     @include border-top(transparent);
-    height: $bottom-toolbar-height;
-    height: var(--bottom-toolbar-height);
-    @include safe-area-toolbar-height(height);
     padding-bottom: 4px;
     padding-bottom: env(safe-area-inset-bottom);
     display: flex;
     justify-content: center;
     align-items: center;
-    position: absolute;
-    z-index: 2;
-    bottom: 0;
-    left: 0;
-    right: 0;
     .entries-column & {
         display: none;
     }
@@ -1106,6 +1089,10 @@ $hamburger-dot: 4px;
 }
 
 .feed-toolbar {
+    padding-bottom: env(safe-area-inset-bottom);
+    .toolbar-inner {
+        padding: 16px 0;
+    }
     .toolbar-button {
         flex: 1;
         appearance: none !important;
@@ -1180,26 +1167,6 @@ $hamburger-dot: 4px;
     }
 }
 
-.feeds-inner {
-    position: absolute;
-    top: 0;
-    bottom: $bottom-toolbar-height;
-    bottom: var(--bottom-toolbar-height);
-    .standalone-navigator & {
-        @supports(bottom: max(0px)) {
-            bottom: $safe-area-toolbar-height;
-        }
-    }
-    left: 0;
-    right: 0;
-    z-index: 1;
-    @include background-color($color-base);
-    transition: transform .2s ease;
-    .has-offscreen-panels & {
-        top: $toolbar-height;
-    }
-}
-
 .view_unread {
     .zero-count {
         display: none;
@@ -1254,7 +1221,6 @@ $hamburger-dot: 4px;
     z-index: 2;
     @include background-color($color-base);
     @include size-in-rems(padding, 25 16 8 16)
-    margin-bottom: 12px;
     display: flex;
     .view-mode-icon {
         $size: 27px;
@@ -1320,7 +1286,7 @@ $hamburger-dot: 4px;
             display: none;
         }
     }
-    .feed-scrolled:not(.has-offscreen-panels) .feeds & {
+    .feed-scrolled:not(.has-offscreen-panels) & {
         .selected-view-mode {
             transform: scale(.75);
         }
@@ -1328,39 +1294,31 @@ $hamburger-dot: 4px;
             transform: translate3d(0, -3px, 0);
         }
     }
-    .feed-scrolled.has-offscreen-panels .feeds & {
+    .feed-scrolled.has-offscreen-panels & {
         position: static;
     }
 }
 
 .top-toolbar {
+    .show-subscribe,
+    .settings-button-wrap {
+        display: none;
+    }
+}
+.has-offscreen-panels .top-toolbar {
     height: $toolbar-height;
     @include border-bottom(transparent);
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
     align-items: center;
     justify-content: space-between;
-    display: none;
+    display: flex;
+    .show-subscribe,
+    .settings-button-wrap {
+        display: block;
+    }
     .hamburger-menu-wrap, .show-subscribe {
         position: static;
         height: $toolbar-height - 1px;
         width: 54px;
-    }
-    .show-subscribe {
-        padding: 0;
-        border: none;
-        background: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        svg {
-            @include fill($color-icons);
-        }
-    }
-    .feed-scrolled-alt & {
-        @include border-bottom($color-borders-alt, $root: true);
     }
     .view-mode, .select-wrap, select {
         height: 100%;
@@ -1378,9 +1336,6 @@ $hamburger-dot: 4px;
             transform: scale(1);
             width: auto;
         }
-    }
-    .has-offscreen-panels & {
-        display: flex;
     }
     .toggle-search {
         display: none;
@@ -1401,26 +1356,19 @@ $hamburger-dot: 4px;
         }
     }
 }
+.feed-scrolled-alt.has-offscreen-panels .top-toolbar {
+    @include border-bottom($color-borders-alt, $root: true);
+}
 
 .feeds {
     @include background-color($color-base);
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    transition: .1s ease-in bottom;
-    .has-offscreen-panels {
-        bottom: 0;
-    }
-    .audio-panel-minimized & {
-        bottom: $audio-player-height-minimized;
-    }
-    .audio-panel-maximized & {
-        bottom: $audio-player-height;
+    flex: 1;
+    padding-top: 12px;
+    .has-offscreen-panels & {
+        padding-top: 0;
     }
     .feeds-target {
         padding-bottom: env(safe-area-inset-bottom);
@@ -2889,18 +2837,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     opacity: 1;
     -webkit-overflow-scrolling: touch;
     z-index: 2;
-    .full-screen.touch & {
-        bottom: $bottom-toolbar-height-alt;
-    }
-    @media (max-width: $small-breakpoint) {
-        bottom: $bottom-toolbar-height-alt;
-        bottom: var(--bottom-toolbar-height);
-        .standalone-navigator & {
-            @supports(bottom: max(0px)) {
-                bottom: $safe-area-toolbar-height;
-            }
-        }
-    }
     &.slide-up {
         transform: translate3d(0, -100vh, 0);
         opacity: 0;
@@ -6969,7 +6905,6 @@ Media Players
     @include border-top($color-borders);
     position: absolute;
     width: 100%;
-    @include offscreen-panels(bottom, $bottom-toolbar-height, $bottom-toolbar-height-alt)
     left: 0;
     overflow: hidden;
     z-index: 1;
@@ -8362,16 +8297,6 @@ Media Queries
     }
     .feeds-inner {
         bottom: 0;
-    }
-    .entries-inner {
-        bottom: $bottom-toolbar-height-alt - 1px;
-    }
-    &.standalone-navigator .entries-inner {
-        bottom: $bottom-toolbar-height-alt;
-        bottom: var(--bottom-toolbar-height);
-        @supports(bottom: max(0px)) {
-            bottom: $safe-area-toolbar-height;
-        }
     }
     .entry-header h1 {
         font-size: 1.6em;
