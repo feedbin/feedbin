@@ -852,16 +852,26 @@ Structure
     }
 }
 
-.search-form-wrap {
+.search-wrap {
     position: absolute;
+    top: 0;
     left: 0;
     right: 0;
-    top: 0;
+    display: flex;
+    flex-direction: column;
+    height: $toolbar-height * 2;
+    .has-offscreen-panels & {
+        top: $toolbar-height;
+        z-index: 0;
+    }
+}
+.search-form {
     margin: 0;
     @include background-color($color-base);
-    height: $toolbar-height;
     transition: opacity .3s ease-in;
     opacity: 0;
+    display: flex;
+    position: relative;
     .search & {
         opacity: 1;
     }
@@ -874,6 +884,7 @@ Structure
         display: flex;
         align-items: center;
         justify-content: center;
+        padding-bottom: 1px;
     }
     svg {
         width: 14px;
@@ -885,12 +896,12 @@ Structure
         width: 100%;
         max-width: 100%;
         margin: 0;
-        padding: 4px 36px 3px 36px;
+        padding: 0 36px 0 36px;
         @include font-size(14);
         border: none;
         background-color: transparent;
-        line-height: 1;
         @include color($color-contrast-700);
+        line-height: auto;
         &:focus {
             border: none;
             background: transparent;
@@ -904,6 +915,74 @@ Structure
             $dusk: image-url("spinner-sunset.svg");
             $sunset: image-url("spinner-night.svg");
             @include background-image((day: $default, dusk: $dusk, sunset: $sunset, midnight: $dusk));
+        }
+    }
+}
+
+.search-control {
+    @include background-color($color-contrast-100);
+    @include font-size(11);
+    line-height: 14px;
+    height: $toolbar-height;
+    position: absolute;
+    top: $toolbar-height;
+    left: 0;
+    right: 0;
+    .search-toolbar {
+        height: $toolbar-height;
+        @include border-top($color-borders);
+        display: flex;
+        justify-content: center;
+        transition: opacity .3s ease-in;
+        opacity: 0;
+        .show-search-options & {
+            opacity: 1;
+        }
+    }
+    .save-search {
+        font-weight: bold;
+        cursor: pointer;
+        user-select: none;
+        @include color($color-contrast-700);
+        display: flex;
+        align-items: center;
+        padding-right: 8px;
+        &:hover {
+            text-decoration: none;
+        }
+    }
+    .dropdown-wrap {
+        margin-right: auto;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+    .sort-order {
+        @include background-color($color-contrast-100);
+        border-radius: 12px;
+        margin: 0 0 0 8px;
+        @include color($color-contrast-700);
+        display: inline-block;
+        position: relative;
+        cursor: pointer;
+        user-select: none;
+        &:after {
+            width: 0px;
+            height: 0px;
+            border-style: solid;
+            border-width: 5px 4px 0 4px;
+            border-color: black transparent transparent transparent;
+            @include theme("border-top-color", $color-contrast-700);
+            content: "";
+            position: absolute;
+            right: -13px;
+            bottom: 4px;
+        }
+    }
+    .dropdown-wrap {
+        .dropdown-content {
+            top: 35px;
+            left: 8px;
         }
     }
 }
@@ -968,10 +1047,10 @@ Structure
         @include border-right($color-borders);
     }
     .feeds-column {
-        width: 245px;
+        width: 280px;
         @include background-color($color-base);
     }
-    .feeds-column-inner {
+    .inner-column {
         position: absolute;
         top: 0;
         bottom: 0;
@@ -1064,8 +1143,11 @@ $hamburger-dot: 4px;
     @include font-size(10);
     @include background-color($color-base);
     @include border-top(transparent);
-    padding-bottom: 4px;
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: 16px;
+    z-index: 2;
+    @supports(padding-bottom: max(0px)) {
+        padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1084,14 +1166,18 @@ $hamburger-dot: 4px;
         justify-content: flex-end;
     }
     @media (max-width: $small-breakpoint) {
-        @include border-top($color-borders);
+        @include border-top($color-borders-alt);
     }
 }
 
 .feed-toolbar {
     padding-bottom: env(safe-area-inset-bottom);
+    z-index: 2;
     .toolbar-inner {
         padding: 16px 0;
+        .entries-column & {
+            padding: 8px 0;
+        }
     }
     .toolbar-button {
         flex: 1;
@@ -1299,7 +1385,18 @@ $hamburger-dot: 4px;
     }
 }
 
+.feeds .view-mode {
+    display: none;
+    @include size-in-rems(padding-bottom, 25)
+    .has-offscreen-panels & {
+        display: flex;
+    }
+}
+
 .top-toolbar {
+    .show-subscribe svg {
+        @include fill($color-icons);
+    }
     .show-subscribe,
     .settings-button-wrap {
         display: none;
@@ -1313,7 +1410,12 @@ $hamburger-dot: 4px;
     display: flex;
     .show-subscribe,
     .settings-button-wrap {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        appearance: none;
+        border: none;
+        background: none;
     }
     .hamburger-menu-wrap, .show-subscribe {
         position: static;
@@ -1328,9 +1430,6 @@ $hamburger-dot: 4px;
         padding: 0;
         transition: opacity 0.2s ease;
         opacity: 0;
-        .feed-scrolled-alt & {
-            opacity: 1;
-        }
         select {
             margin: 0;
             transform: scale(1);
@@ -1358,6 +1457,9 @@ $hamburger-dot: 4px;
 }
 .feed-scrolled-alt.has-offscreen-panels .top-toolbar {
     @include border-bottom($color-borders-alt, $root: true);
+    .view-mode {
+        opacity: 1;
+    }
 }
 
 .feeds {
@@ -1797,15 +1899,13 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     justify-content: space-between;
     @include color($color-contrast-400);
     display: none;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
     margin: 0;
     @include border-bottom($color-borders);
     height: $toolbar-height;
     text-align: center;
     overflow: hidden;
+    flex-shrink: 0;
+    z-index: 2;
     .one-up & {
         @include border-bottom($color-borders-alt, $root: true);
     }
@@ -1844,95 +1944,15 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
 }
 
-.search-control {
-    @include background-color($color-contrast-100);
-    @include font-size(11);
-    line-height: 14px;
-    height: $toolbar-height;
-    position: absolute;
-    top: $toolbar-height;
-    left: 0;
-    right: 0;
-    .search-toolbar {
-        height: $toolbar-height;
-        @include border-top($color-borders);
-        display: flex;
-        justify-content: center;
-        transition: opacity .3s ease-in;
-        opacity: 0;
-        .show-search-options & {
-            opacity: 1;
-        }
-    }
-    .save-search {
-        font-weight: bold;
-        cursor: pointer;
-        user-select: none;
-        @include color($color-contrast-700);
-        display: flex;
-        align-items: center;
-        padding-right: 8px;
-        &:hover {
-            text-decoration: none;
-        }
-    }
-    .dropdown-wrap {
-        margin-right: auto;
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-    }
-    .sort-order {
-        @include background-color($color-contrast-100);
-        border-radius: 12px;
-        margin: 0 0 0 8px;
-        @include color($color-contrast-700);
-        display: inline-block;
-        position: relative;
-        cursor: pointer;
-        user-select: none;
-        &:after {
-            width: 0px;
-            height: 0px;
-            border-style: solid;
-            border-width: 5px 4px 0 4px;
-            border-color: black transparent transparent transparent;
-            @include theme("border-top-color", $color-contrast-700);
-            content: "";
-            position: absolute;
-            right: -13px;
-            bottom: 4px;
-        }
-    }
-    .dropdown-wrap {
-        .dropdown-content {
-            top: 35px;
-            left: 8px;
-        }
-    }
-}
-
-.entries-inner {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    overflow: hidden;
-}
-
 .entries {
-    position: absolute;
-    top: -1px;
-    bottom: 0;
-    left: 0;
-    right: 0;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     transition: transform .15s ease-in;
     @include background-color($color-base);
     @include border-top(transparent);
+    flex: 1;
+    z-index: 1;
     .search & {
         transform: translateY($toolbar-height);
         padding-bottom: $toolbar-height;
@@ -2458,9 +2478,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 
 .entry-toolbar {
     display: flex;
-    position: absolute;
-    top: 0;
-    left: 0;
     z-index: 3;
     width: 100%;
     height: $toolbar-height;
@@ -2804,35 +2821,29 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 }
 
 .entry-meta {
-    position: absolute;
     height: $toolbar-height;
-    top: 0;
-    left: 0;
-    right: 0;
+    flex-shrink: 0;
+    z-index: 2;
+    @include background-color($color-base);
 }
 
 .entry-content-wrap {
-    overflow: hidden;
-    position: absolute;
-    top: $toolbar-height;
-    bottom: 0;
-    left: 0;
-    right: 0;
     z-index: 0;
+    flex: 1;
+    position: relative;
 }
 
 .entry-content {
     @include background-color($color-base);
     display: block;
-    position: absolute;
     height: auto;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    top: 0;
-    left: 0;
-    right: 0;
-    margin: 0;
-    bottom: 0;
     transition: transform .2s ease, opacity .15s ease, top .2s ease;
     opacity: 1;
     -webkit-overflow-scrolling: touch;
@@ -2856,6 +2867,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     transition: transform .2s ease;
     transform: translate3d(0, 0, 0);
     opacity: 1;
+    z-index: 1;
 }
 
 .load-next-entry {
@@ -2947,6 +2959,8 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 .entry-bottom-toolbar {
     display: flex;
     justify-content: center;
+    flex-shrink: 0;
+    padding-top: 8px;
     .navigation-button {
         @include color($color-contrast-700);
         text-decoration: none;
@@ -3094,12 +3108,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
 }
 
-
 .account-toolbar {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
     margin: 0;
     @include border-bottom(transparent);
     @include background-color($color-base);
@@ -3108,6 +3117,10 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    flex-shrink: 0;
+    .entry-column.has-content & {
+        display: none;
+    }
 }
 
 .entry-button {
@@ -8286,9 +8299,6 @@ Media Queries
     .entry-basement {
         top: $toolbar-height;
     }
-    .entries-inner {
-        top: $toolbar-height;
-    }
     .theme-settings {
         border-right: none !important;
     }
@@ -8393,9 +8403,12 @@ button.close {
 }
 
 .modal-header-input {
-    position: sticky;
+    position: relative;
     top: 0;
     z-index: 100;
+    .modal-shown & {
+        position: sticky;
+    }
     .favicon-wrap {
         .theme-day & {
             background-color: transparent;

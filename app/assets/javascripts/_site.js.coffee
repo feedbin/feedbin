@@ -26,13 +26,16 @@ $.extend feedbin,
   showSearch: ->
     $('body').addClass('search')
     $('body').removeClass('hide-search')
-    $('[data-behavior~=search_form] input[type=search]').focus()
+    field = $('[data-behavior~=search_form] input[type=search]')
+    field.focus()
+    field.val('')
 
   hideSearch: ->
     $('body').removeClass('search')
     $('body').removeClass('show-search-options')
     $('body').addClass('hide-search')
-    $('[data-behavior~=search_form] input[type=search]').blur()
+    field = $('[data-behavior~=search_form] input[type=search]')
+    field.blur()
 
   toggleSearch: ->
     if $('body').hasClass('search')

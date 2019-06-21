@@ -19,7 +19,7 @@
 </div>
 <div class="app-wrap fade">
     <div class="feeds-column app-panel" data-behavior="content_column" <%= resizable 'feeds' %>>
-        <div class="feeds-column-inner">
+        <div class="inner-column">
             <div class="top-toolbar">
                 <button type="button" class="show-subscribe" data-behavior="show_subscribe open_modal" data-modal-target="subscribe"><%= svg_tag "icon-plus", size: "16x16" %></button>
                 <%= render partial: 'shared/view_mode' %>
@@ -36,70 +36,74 @@
         </div>
     </div>
     <div class="entries-column app-panel" data-behavior="content_column" <%= resizable 'entries' %>>
-        <div class="entries-header" data-behavior="entries_header"></div>
-        <div class="entries-inner">
-            <%= form_tag search_entries_path, class: 'search-form-wrap', remote: true, method: :get, data: {behavior: 'search_form'} do %>
-                <div class="icon-wrap"><%= svg_tag "icon-search" %></div>
-                <%= search_field_tag :query, params[:query], placeholder: 'Search', autocomplete: 'off' %>
-            <% end %>
-            <div class="search-control">
-                <div class="search-toolbar">
-                    <div class="dropdown-wrap">
-                        <span class="sort-order" data-behavior="toggle_dropdown">Sort by date</span>
-                        <div class="dropdown-content">
-                            <ul>
-                                <li data-sort-option="desc"><span>Sort by date</span></li>
-                                <li data-sort-option="relevance"><span>Sort by relevance</span></li>
-                            </ul>
+        <div class="inner-column">
+            <div class="entries-header" data-behavior="entries_header"></div>
+            <div class="search-wrap">
+                <%= form_tag search_entries_path, class: 'search-form', remote: true, method: :get, data: {behavior: 'search_form'} do %>
+                    <div class="icon-wrap"><%= svg_tag "icon-search" %></div>
+                    <%= search_field_tag :query, params[:query], placeholder: 'Search', autocomplete: 'off' %>
+                <% end %>
+                <div class="search-control">
+                    <div class="search-toolbar">
+                        <div class="dropdown-wrap">
+                            <span class="sort-order" data-behavior="toggle_dropdown">Sort by date</span>
+                            <div class="dropdown-content">
+                                <ul>
+                                    <li data-sort-option="desc"><span>Sort by date</span></li>
+                                    <li data-sort-option="relevance"><span>Sort by relevance</span></li>
+                                </ul>
+                            </div>
                         </div>
+                        <%= link_to "Save Search", new_saved_search_path, remote: true, class: "save-search", data: {behavior: "new_saved_search open_settings_modal"} %>
                     </div>
-                    <%= link_to "Save Search", new_saved_search_path, remote: true, class: "save-search", data: {behavior: "new_saved_search open_settings_modal"} %>
                 </div>
             </div>
             <div class="entries">
                 <ul data-behavior="entries_target" class="entries-target"></ul>
             </div>
+            <%= render partial: 'shared/feeds_toolbar' %>
         </div>
-        <%= render partial: 'shared/feeds_toolbar' %>
     </div>
     <div class="entry-column app-panel" data-behavior="content_column">
-        <div class="account-toolbar">
-            <% if signed_in? && current_user.plan.stripe_id == 'trial' %>
-                <%= link_to settings_billing_path, class: 'subscribe-promo' do %>
-                    <%= pluralize(current_user.days_left, 'Day') %> Left &mdash; <strong>Subscribe Now</strong>
+        <div class="inner-column">
+            <div class="account-toolbar">
+                <% if signed_in? && current_user.plan.stripe_id == 'trial' %>
+                    <%= link_to settings_billing_path, class: 'subscribe-promo' do %>
+                        <%= pluralize(current_user.days_left, 'Day') %> Left &mdash; <strong>Subscribe Now</strong>
+                    <% end %>
                 <% end %>
-            <% end %>
-            <div class="entry-buttons">
-                <%= render partial: 'shared/app_settings' %>
+                <div class="entry-buttons">
+                    <%= render partial: 'shared/app_settings' %>
+                </div>
             </div>
-        </div>
-        <div class="entry-basement">
-            <div class="basement-panel hide" data-basement-panel-target="settings_panel">
-                <%= render partial: 'shared/entry_settings' %>
+            <div class="entry-basement">
+                <div class="basement-panel hide" data-basement-panel-target="settings_panel">
+                    <%= render partial: 'shared/entry_settings' %>
+                </div>
+                <% @user.supported_sharing_services.each do |service| %>
+                    <% if service.has_share_sheet? %>
+                        <div class="basement-panel hide" data-basement-panel-target="<%= service.service_id %>_share_panel">
+                            <%= render partial: "supported_sharing_services/share_form_#{service.service_id}", locals: {service: service} %>
+                        </div>
+                    <% end %>
+                <% end %>
             </div>
-            <% @user.supported_sharing_services.each do |service| %>
-                <% if service.has_share_sheet? %>
-                    <div class="basement-panel hide" data-basement-panel-target="<%= service.service_id %>_share_panel">
-                        <%= render partial: "supported_sharing_services/share_form_#{service.service_id}", locals: {service: service} %>
+            <div class="entry-meta" data-behavior="entry_meta_target"></div>
+            <div class="entry-content-wrap <%= @user.entry_width %> <%= @user.display_prefs %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
+                <div data-behavior="inner_content_target"></div>
+            </div>
+            <div class="bottom-toolbar entry-bottom-toolbar">
+                <button class="navigation-button button-previous" data-behavior="open_previous_entry needs_previous">
+                    <div class="icon-previous">
+                        <%= svg_tag "icon-arrow", size: "9x15" %>
                     </div>
-                <% end %>
-            <% end %>
-        </div>
-        <div class="entry-meta" data-behavior="entry_meta_target"></div>
-        <div class="entry-content-wrap <%= @user.entry_width %> <%= @user.display_prefs %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
-            <div data-behavior="inner_content_target"></div>
-        </div>
-        <div class="bottom-toolbar entry-bottom-toolbar">
-            <button class="navigation-button button-previous" data-behavior="open_previous_entry needs_previous">
-                <div class="icon-previous">
-                    <%= svg_tag "icon-arrow", size: "9x15" %>
-                </div>
-            </button>
-            <button class="navigation-button button-next" data-behavior="open_next_entry needs_next">
-                <div class="icon-next">
-                    <%= svg_tag "icon-arrow", size: "9x15" %>
-                </div>
-            </button>
+                </button>
+                <button class="navigation-button button-next" data-behavior="open_next_entry needs_next">
+                    <div class="icon-next">
+                        <%= svg_tag "icon-arrow", size: "9x15" %>
+                    </div>
+                </button>
+            </div>
         </div>
     </div>
 </div>
