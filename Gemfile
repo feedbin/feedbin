@@ -37,7 +37,7 @@ group :development, :test do
   gem "standard"
 end
 
-gem "pg", "< 1.0"
+gem "pg", "< 2.0"
 gem "unicorn"
 
 gem "feedjira", github: "feedbin/feedjira", ref: "e6b7b11"
