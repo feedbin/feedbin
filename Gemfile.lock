@@ -9,8 +9,8 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedjira.git
-  revision: a8a90bbc601f695c07e0797688e846d5d561263c
-  ref: a8a90bb
+  revision: e6b7b11b4b20cfb01ce6a73806a59308298a10c7
+  ref: e6b7b11
   specs:
     feedjira (2.1.2)
       faraday (>= 0.9)
@@ -20,7 +20,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: af9150a1a7542c97d51e33198816ac6ba7ccb602
+  revision: ee83560e02078e557f76ab34511e72440924f6ae
   branch: master
   specs:
     feedkit (0.1.0)
@@ -339,7 +339,7 @@ GEM
       actionmailer (>= 3, < 6)
       premailer (~> 1.7, >= 1.7.9)
     psych (3.1.0)
-    public_suffix (3.1.0)
+    public_suffix (3.1.1)
     puma (3.12.1)
     rack (2.0.7)
     rack-attack (6.0.0)
