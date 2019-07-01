@@ -40,7 +40,7 @@ end
 gem "pg", "< 1.0"
 gem "unicorn"
 
-gem "feedjira", github: "feedbin/feedjira", ref: "a8a90bb"
+gem "feedjira", github: "feedbin/feedjira", ref: "e6b7b11"
 gem "feedkit", github: "feedbin/feedkit", branch: "master"
 
 gem "opml_saw", github: "feedbin/opml_saw", ref: "61d8c2d"
