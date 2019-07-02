@@ -3241,7 +3241,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                     text-decoration: none;
                     &.with-icon {
                         svg {
-                            fill: white;
+                            @include fill(#FFF);
                         }
                     }
                     .favicon-unread-active {
@@ -3267,7 +3267,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                     }
                     .icon-settings-check {
                         margin-left: auto;
-                        fill: $color-accent-green-600;
+                        @include fill($color-contrast-700);
                         visibility: hidden;
                     }
                 }
@@ -6923,6 +6923,7 @@ Media Players
     font-weight: 400 !important;
     @include background-color($color-contrast-100);
     @include border-top($color-borders);
+    @include border-bottom($color-borders);
     width: 100%;
     left: 0;
     overflow: hidden;
@@ -9046,7 +9047,8 @@ button.close {
     }
 }
 
-.modal-dialog {
+.modal-wrapper {
+    transition: height .2s ease;
     .modal-content *:not(.modal-header) {
         transition: opacity .15s linear;
     }

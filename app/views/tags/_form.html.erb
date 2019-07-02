@@ -1,4 +1,4 @@
-<div class="modal-dialog" role="document">
+<div class="modal-wrapper">
     <%= form_for(tag, remote: true, method: :patch, html: {class: 'settings tags-form', data: {behavior: "disable_on_submit"}}) do |f| %>
         <% content_for :modal_content do %>
             <div class="modal-header-input">

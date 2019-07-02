@@ -256,20 +256,20 @@ $.extend feedbin,
     body = $(body)
     body.css({height: "#{placeholderHeight}px"}).addClass('loading')
 
-    modal.html(body)
+    modal.find('.modal-dialog').html(body)
     contentHeight = modal.find('.modal-content').outerHeight()
 
-    modal.find('.modal-dialog').addClass('loaded')
+    modal.find('.modal-wrapper').addClass('loaded')
 
     if placeholderHeight != contentHeight
       windowHeight = window.innerHeight
       if windowHeight < contentHeight
         contentHeight = windowHeight - modal.find('.modal-dialog').offset().top
-      modal.find('.modal-dialog').css({height: "#{contentHeight}px"})
+      modal.find('.modal-wrapper').css({height: "#{contentHeight}px"})
 
     setTimeout ( ->
-      modal.find('.modal-dialog').css({height: 'auto'})
-      modal.find('.modal-dialog').removeClass('loading')
+      modal.find('.modal-wrapper').css({height: 'auto'})
+      modal.find('.modal-wrapper').removeClass('loading')
       input = modal.find('[data-behavior~=autofocus]')
       if input.length
         input.focus()

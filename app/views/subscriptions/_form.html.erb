@@ -1,5 +1,5 @@
 <% present subscription do |subscription_presenter| %>
-    <div class="modal-dialog" role="document">
+    <div class="modal-wrapper">
         <%= form_for(subscription, remote: true, method: :patch, html: {class: 'settings', data: {behavior: "disable_on_submit"}}) do |f| %>
             <% content_for :modal_content do %>
                 <div class="modal-header-input">
