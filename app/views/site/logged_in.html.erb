@@ -31,8 +31,8 @@
                     <%= render partial: 'feeds/feeds', locals: {collections: @feed_data[:collections], saved_searches: @feed_data[:saved_searches], tags: @feed_data[:tags], feeds: @feed_data[:feeds]} %>
                 </ul>
             </div>
-            <%= render partial: 'shared/feeds_toolbar' %>
             <%= render partial: 'shared/audio_player' %>
+            <%= render partial: 'shared/feeds_toolbar' %>
         </div>
     </div>
     <div class="entries-column app-panel" data-behavior="content_column" <%= resizable 'entries' %>>
