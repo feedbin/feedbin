@@ -277,6 +277,11 @@ $.extend feedbin,
         input[0].setSelectionRange(length, length)
     ), 150
 
+    setTimeout ( ->
+      $("body").addClass("modal-replaced")
+    ), 300
+
+
   modalContent: (target, body) ->
     modal = $(".#{target}")
     $(".modal-body", modal).html(body);
@@ -997,8 +1002,8 @@ $.extend feedbin,
     ), timeout
 
     $('.entry-basement').removeClass('foreground')
-    if $('.entry-content').length > 0
-      $('.entry-content')[0].style.removeProperty("top")
+    $('.entry-content').each ->
+      @.style.removeProperty("top")
 
     clearTimeout(feedbin.openEntryBasementTimeount)
 
@@ -2200,6 +2205,7 @@ $.extend feedbin,
 
       $(document).on 'hide.bs.modal', () ->
         $("body").removeClass("modal-shown")
+        $("body").removeClass("modal-replaced")
         feedbin.setNativeBorders()
         feedbin.setNativeTheme(false, 160)
 
@@ -2234,8 +2240,9 @@ $.extend feedbin,
       scrollStop = Math.abs(parseInt(scrollStop))
 
       scrollStopAlt = $('.feeds .view-mode').outerHeight() - 25
-      $('.feeds').on 'scroll', (event) ->
-        top = $(@)[0].scrollTop
+
+      scrolled = (element) ->
+        top = $(element)[0].scrollTop
         if top > scrollStop
           $('body').addClass('feed-scrolled')
         else
@@ -2246,6 +2253,11 @@ $.extend feedbin,
         else
           $('body').removeClass('feed-scrolled-alt')
 
+      $(window).on 'window:throttledResize', (event) ->
+        scrolled($('.feeds'))
+
+      $('.feeds').on 'scroll', (event) ->
+        scrolled(@)
 
     scrollLeft: ->
       entries = $('.entries-column')

@@ -6,7 +6,7 @@
 
 <ul class="control-group tags-target no-border" data-behavior="tags_target"></ul>
 
-<%= content_tag :ul, class: "control-group no-border" do  -%>
+<%= content_tag :ul, class: "control-group" do  -%>
     <% tag_editor.tags.each do |tag| %>
     <li>
         <%= check_box_tag "tag_id[#{tag.id}]", tag.name, tag_editor.checked?(tag) %>

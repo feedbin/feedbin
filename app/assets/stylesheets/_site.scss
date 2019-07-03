@@ -1108,8 +1108,8 @@ Structure
     user-select: none;
     top: 0;
     right: 0;
-    width: $toolbar-height;
-    height: $toolbar-height;
+    width: $toolbar-height - 1;
+    height: $toolbar-height - 1;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -2967,12 +2967,14 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     display: flex;
     justify-content: center;
     flex-shrink: 0;
-    padding-top: 8px;
+    padding: 0;
     .navigation-button {
         @include color($color-contrast-700);
+        padding: 11px 0;
+        padding-bottom: env(safe-area-inset-bottom);
         text-decoration: none;
         appearance: none;
-        display: inline-block;
+        display: block;
         border: none;
         background: none;
         margin: 0;
@@ -2980,7 +2982,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         height: 100%;
         width: 100%;
         display: block;
-        padding: 0;
         &[disabled] {
             cursor: default;
             @include color($color-contrast-300);
@@ -8413,7 +8414,7 @@ button.close {
     position: relative;
     top: 0;
     z-index: 100;
-    .modal-shown & {
+    .modal-replaced & {
         position: sticky;
     }
     .favicon-wrap {
@@ -8802,6 +8803,7 @@ button.close {
     pointer-events: none;
     box-shadow: 0 20px 40px 0 rgba(0,0,0,.4);
     border-radius: $modal-border-radius;
+    margin-bottom: env(safe-area-inset-bottom);
     .native & {
         box-shadow: none;
     }
@@ -9048,7 +9050,7 @@ button.close {
 }
 
 .modal-wrapper {
-    transition: height .2s ease;
+    transition: height .15s ease;
     .modal-content *:not(.modal-header) {
         transition: opacity .15s linear;
     }
@@ -9085,6 +9087,9 @@ button.close {
         padding: 0;
         &:first-child {
             padding-top: 0 !important;
+        }
+        &:empty {
+            border-bottom: none;
         }
         .text {
             padding-left: 15px;
