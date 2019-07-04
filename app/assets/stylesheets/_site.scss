@@ -1175,7 +1175,7 @@ $hamburger-dot: 4px;
     padding-bottom: env(safe-area-inset-bottom);
     z-index: 2;
     .toolbar-inner {
-        padding: 20px 0;
+        padding: 16px 0 20px 0;
         .entries-column & {
             padding: 8px 0;
         }
@@ -6931,19 +6931,18 @@ Media Players
     overflow: hidden;
     z-index: 1;
     height: 0;
-    visibility: hidden;
+    display: none;
     position: relative;
     .animate-panel & {
         transition: .1s ease-in height;
     }
-
     .audio-panel-minimized & {
-        visibility: visible;
+        display: block;
         height: $audio-player-height-minimized;
         padding: 0;
     }
     .audio-panel-maximized & {
-        visibility: visible;
+        display: block;
         height: $audio-player-height;
         .audio-container {
             margin: 0 0 5px 0;
