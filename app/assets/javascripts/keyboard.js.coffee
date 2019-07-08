@@ -172,19 +172,22 @@ class feedbin.Keyboard
     # Go to unread
     Mousetrap.bind ['g 1', 'g u'], (event, combo) =>
       $('body').removeClass('full-screen')
-      $('[data-behavior~=change_view_mode]').val("view_unread").trigger("change");
+      $('[data-behavior~=change_view_mode][data-view-mode=view_unread]').click()
+      $('.dropdown-wrap').removeClass('open')
       event.preventDefault()
 
     # Go to starred
     Mousetrap.bind ['g 2', 'g s'], (event, combo) =>
       $('body').removeClass('full-screen')
-      $('[data-behavior~=change_view_mode]').val("view_starred").trigger("change")
+      $('[data-behavior~=change_view_mode][data-view-mode=view_starred]').click()
+      $('.dropdown-wrap').removeClass('open')
       event.preventDefault()
 
     # Go to all
     Mousetrap.bind ['g 3', 'g a'], (event, combo) =>
       $('body').removeClass('full-screen')
-      $('[data-behavior~=change_view_mode]').val("view_all").trigger("change");
+      $('[data-behavior~=change_view_mode][data-view-mode=view_all]').click()
+      $('.dropdown-wrap').removeClass('open')
       event.preventDefault()
 
     # Mark as read
