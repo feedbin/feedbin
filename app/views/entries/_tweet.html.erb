@@ -61,7 +61,7 @@
 
               <%
               begin
-                  link_content = ContentFormatter.format!(page.content, nil, page.url)
+                  link_content = ContentFormatter.format!(page.content, nil, true, page.url)
               rescue
                   link_content = nil
               end
