@@ -1798,6 +1798,9 @@ $hamburger-dot: 4px;
         );
         @include box-shadow-irregular($shadow);
     }
+    .favicon-newsletter {
+        height: 12px !important;
+    }
 }
 
 .theme-day {
