@@ -28,7 +28,7 @@ class ContentFormatter
     ”
   |
 
-  def self.format!(content, entry = nil, image_proxy_enabled = true)
+  def self.format!(content, entry = nil, image_proxy_enabled = true, base_url = nil)
     context = {
       whitelist: Feedbin::Application.config.whitelist,
       embed_url: Rails.application.routes.url_helpers.iframe_embeds_path,
@@ -51,6 +51,9 @@ class ContentFormatter
       if entry.feed.newsletter?
         context[:whitelist] = Feedbin::Application.config.newsletter_whitelist
       end
+    elsif base_url
+      context[:image_base_url] = context[:href_base_url] = base_url
+      context[:image_subpage_url] = context[:href_subpage_url] = base_url
     end
 
     filters.unshift(HTML::Pipeline::LazyLoadFilter)
