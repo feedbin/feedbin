@@ -860,9 +860,9 @@ Structure
     display: flex;
     flex-direction: column;
     height: $toolbar-height * 2;
+    z-index: 0;
     .has-offscreen-panels & {
         top: $toolbar-height;
-        z-index: 0;
     }
 }
 .search-form {
@@ -870,10 +870,11 @@ Structure
     @include background-color($color-base);
     transition: opacity .3s ease-in;
     opacity: 0;
-    display: flex;
     position: relative;
+    display: none;
     .search & {
         opacity: 1;
+        display: flex;
     }
     .icon-wrap {
         position: absolute;
@@ -928,6 +929,10 @@ Structure
     top: $toolbar-height;
     left: 0;
     right: 0;
+    display: none;
+    .show-search-options & {
+        display: block;
+    }
     .search-toolbar {
         height: $toolbar-height;
         @include border-top($color-borders);
@@ -1904,7 +1909,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     text-align: center;
     overflow: hidden;
     flex-shrink: 0;
-    z-index: 2;
+    z-index: 5;
     .one-up & {
         @include border-bottom($color-borders-alt, $root: true);
     }
@@ -1951,7 +1956,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     @include background-color($color-base);
     @include border-top(transparent);
     flex: 1;
-    z-index: 1;
+    z-index: 4;
     margin-top: -1px;
     .search & {
         transform: translateY($toolbar-height);
