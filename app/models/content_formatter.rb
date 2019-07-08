@@ -52,6 +52,8 @@ class ContentFormatter
         context[:whitelist] = Feedbin::Application.config.newsletter_whitelist
       end
     elsif base_url
+      filters.unshift(HTML::Pipeline::AbsoluteSourceFilter)
+      filters.unshift(HTML::Pipeline::AbsoluteHrefFilter)
       context[:image_base_url] = context[:href_base_url] = base_url
       context[:image_subpage_url] = context[:href_subpage_url] = base_url
     end
