@@ -1694,6 +1694,9 @@ $hamburger-dot: 4px;
         overflow: hidden;
         opacity: 1;
         transition: opacity .3s linear;
+        @include background-color($color-contrast-100);
+        @include border-top($color-contrast-200);
+        @include border-bottom($color-contrast-200);
         &.hidden {
             opacity: 0;
         }
