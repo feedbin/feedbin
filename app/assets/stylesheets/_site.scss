@@ -2978,7 +2978,9 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .navigation-button {
         @include color($color-contrast-700);
         padding: 11px 0;
-        padding-bottom: env(safe-area-inset-bottom);
+        @supports(padding-bottom: max(0px)) {
+            padding-bottom: max(11px, env(safe-area-inset-bottom));
+        }
         text-decoration: none;
         appearance: none;
         display: block;
