@@ -1184,12 +1184,15 @@ $hamburger-dot: 4px;
 }
 
 .feed-toolbar {
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: 0;
     z-index: 2;
     .toolbar-inner {
         padding: 16px 0 20px 0;
         .entries-column & {
             padding: 8px 0;
+            @supports(padding-bottom: max(0px)) {
+                padding-bottom: max(8px, env(safe-area-inset-bottom));
+            }
         }
     }
     .toolbar-button {
