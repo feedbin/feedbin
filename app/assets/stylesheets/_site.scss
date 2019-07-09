@@ -857,14 +857,20 @@ Structure
     top: 0;
     left: 0;
     right: 0;
-    display: flex;
     flex-direction: column;
-    height: $toolbar-height * 2;
     z-index: 0;
+    display: none;
+    .search & {
+        display: flex;
+    }
+    .show-search-options & {
+        z-index: 10;
+    }
     .has-offscreen-panels & {
         top: $toolbar-height;
     }
 }
+
 .search-form {
     margin: 0;
     @include background-color($color-base);
@@ -872,6 +878,8 @@ Structure
     opacity: 0;
     position: relative;
     display: none;
+    height: $toolbar-height;
+    @include border-bottom($color-borders);
     .search & {
         opacity: 1;
         display: flex;
@@ -893,8 +901,8 @@ Structure
         @include fill($color-contrast-400);
     }
     input[type="search"] {
-        height: $toolbar-height;
         width: 100%;
+        height: 100%;
         max-width: 100%;
         margin: 0;
         padding: 0 36px 0 36px;
@@ -911,7 +919,6 @@ Structure
             background-repeat: no-repeat;
             background-position: 97% ($base-button-position + 3);
             background-size: 16px 16px;
-
             $default: image-url("spinner-day.svg");
             $dusk: image-url("spinner-sunset.svg");
             $sunset: image-url("spinner-night.svg");
@@ -922,6 +929,7 @@ Structure
 
 .search-control {
     @include background-color($color-contrast-100);
+    @include border-bottom($color-borders);
     @include font-size(11);
     line-height: 14px;
     height: $toolbar-height;
@@ -935,7 +943,6 @@ Structure
     }
     .search-toolbar {
         height: $toolbar-height;
-        @include border-top($color-borders);
         display: flex;
         justify-content: center;
         transition: opacity .3s ease-in;
@@ -1954,10 +1961,8 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     -webkit-overflow-scrolling: touch;
     transition: transform .15s ease-in;
     @include background-color($color-base);
-    @include border-top(transparent);
     flex: 1;
     z-index: 4;
-    margin-top: -1px;
     .search & {
         transform: translateY($toolbar-height);
         padding-bottom: $toolbar-height;
