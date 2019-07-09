@@ -87,13 +87,13 @@
                     </div>
                     <ul class="control-group">
                         <li>
-                            <%= f.check_box :show_retweets, data: {behavior: "auto_submit"} %>
+                            <%= f.check_box :show_retweets, data: {behavior: "auto_submit"}, id: "subscription_show_retweets" %>
                             <%= f.label :show_retweets do %>
                                 Show Retweets <span class="slider-checkbox"></span>
                             <% end %>
                         </li>
                         <li>
-                            <%= f.check_box :media_only, data: {behavior: "auto_submit"} %>
+                            <%= f.check_box :media_only, data: {behavior: "auto_submit"}, id: "subscription_media_only" %>
                             <%= f.label :media_only do %>
                                 Media Only <span class="slider-checkbox"></span>
                             <% end %>

@@ -2242,6 +2242,7 @@ $.extend feedbin,
       scrollStopAlt = $('.feeds .view-mode').outerHeight() - 25
 
       scrolled = (element) ->
+        return if element.length == 0
         top = $(element)[0].scrollTop
         if top > scrollStop
           $('body').addClass('feed-scrolled')
