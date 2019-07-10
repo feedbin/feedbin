@@ -1208,6 +1208,7 @@ $hamburger-dot: 4px;
         align-items: center;
         flex-direction: column;
         background-color: transparent;
+        cursor: pointer;
         &:hover {
             text-decoration: none;
         }
