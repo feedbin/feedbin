@@ -5,7 +5,7 @@ class BasePresenter
     @template = template
   end
 
-  def favicon(feed)
+  def favicon(feed, entry = nil)
     @favicon ||= begin
       if feed.newsletter?
         content = @template.content_tag :span, "", class: "favicon-wrap collection-favicon favicon-newsletter-wrap" do
@@ -22,6 +22,12 @@ class BasePresenter
           url = @template.camo_link(feed.icon)
           fallback = @template.image_url("favicon-profile-default.png")
           @template.image_tag_with_fallback(fallback, url, alt: "")
+        end
+      elsif feed.webpage? && entry
+        icon = Favicon.find_by_host(entry.hostname)
+        icon_url = icon&.cdn_url || @template.image_url("favicon-profile-default.png")
+        content = @template.content_tag :span, "", class: "favicon-wrap" do
+          @template.image_tag(icon_url, alt: "Favicon")
         end
       else
         markup = <<-eos

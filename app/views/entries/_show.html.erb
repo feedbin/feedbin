@@ -9,16 +9,9 @@
                 <button class="entry-button button-full-screen" data-behavior="full_screen" title="Close full screen">
                     <%= svg_tag "icon-full-screen-close-small", size: "16x16" %>
                 </button>
-                <%
-                if subscriptions.include?(entry.feed.id)
-                  link_args = [edit_subscription_path(entry.feed), remote: true, class: "feed-button", data: {behavior: "open_settings_modal"}]
-                else
-                  link_args = ["#", remote: true, class: "feed-button", data: {behavior: "show_message", message: "Cannot edit. You are no longer subscribed to this feed."}]
-                end
-                %>
-                <%= link_to *link_args do %>
-                    <%= entry_presenter.favicon(entry.feed) %>
-                    <span class="entry-feed-title" data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span>
+                <%= entry_presenter.feed_wrapper(subscriptions) do %>
+                    <%= entry_presenter.favicon(entry.feed, entry) %>
+                    <%= entry_presenter.entry_header_title %>
                 <% end %>
             </div>
             <div class="entry-buttons">

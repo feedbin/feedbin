@@ -10,7 +10,7 @@ class Download
   end
 
   def path
-    @path ||= "#{key[0..3]}/#{filename}"
+    @path ||= "#{key[0..2]}/#{filename}"
   end
 
   def download

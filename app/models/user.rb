@@ -80,6 +80,7 @@ class User < ApplicationRecord
   before_create { generate_token(:starred_token) }
   before_create { generate_token(:inbound_email_token, 4) }
   before_create { generate_token(:newsletter_token, 4) }
+  before_create { generate_token(:page_token) }
 
   before_update :update_billing, unless: -> { !ENV["STRIPE_API_KEY"] }
 

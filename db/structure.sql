@@ -5,22 +5,9 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
+SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
 
 --
 -- Name: hstore; Type: EXTENSION; Schema: -; Owner: -
@@ -1012,7 +999,8 @@ CREATE TABLE public.users (
     tag_visibility json DEFAULT '{}'::json,
     expires_at timestamp without time zone,
     newsletter_token character varying,
-    price_tier integer
+    price_tier integer,
+    page_token character varying
 );
 
 
@@ -1953,6 +1941,13 @@ CREATE UNIQUE INDEX index_users_on_newsletter_token ON public.users USING btree 
 
 
 --
+-- Name: index_users_on_page_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_users_on_page_token ON public.users USING btree (page_token);
+
+
+--
 -- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2130,6 +2125,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190220004135'),
 ('20190225200600'),
 ('20190516024925'),
-('20190516210058');
+('20190516210058'),
+('20190710112843');
 
 

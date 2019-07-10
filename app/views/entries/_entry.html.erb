@@ -17,7 +17,7 @@
                 <button class="button-text entry-actions-wrap" data-behavior="show_entry_actions">
                     <i class="status-indicator icon-entry-actions"></i>
                 </button>
-                <%= entry_presenter.profile_image(entry.feed) %>
+                <%= entry_presenter.profile_image %>
                 <div class="inline-content-wrap">
                     <div class="meta-wrap">
                         <p class="feed-title">
@@ -28,7 +28,7 @@
                     <div class="title-wrap">
                         <div class="title-inner-wrap">
                             <h2 class="title">
-                                <%= entry_presenter.profile_image(entry.feed) %>
+                                <%= entry_presenter.profile_image %>
                                 <span><%= entry_presenter.title %></span>
                             </h2>
                             <%= render partial: "shared/entry_status" %>

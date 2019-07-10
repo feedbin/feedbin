@@ -410,7 +410,7 @@ class EntryPresenter < BasePresenter
     nil
   end
 
-  def profile_image(feed)
+  def profile_image
     if entry.tweet?
       @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image" do
         url = tweet_profile_image_uri(entry.main_tweet)
@@ -424,7 +424,7 @@ class EntryPresenter < BasePresenter
         @template.image_tag_with_fallback(fallback, url, alt: "")
       end
     else
-      favicon(feed)
+      favicon(entry.feed, entry)
     end
   end
 
@@ -437,6 +437,10 @@ class EntryPresenter < BasePresenter
       @template.content_tag(:span, "", class: "title-inner") do
         "#{entry.micropost.author_name} #{@template.content_tag(:span, entry.micropost.author_display_username)}".html_safe
       end
+    elsif entry.feed.webpage?
+      @template.content_tag(:span, "", class: "title-inner") do
+        entry.hostname
+      end
     elsif entry.title.blank? && entry.author.present?
       @template.content_tag(:span, "", class: "title-inner") do
         entry.author
@@ -444,6 +448,18 @@ class EntryPresenter < BasePresenter
     else
       @template.content_tag(:span, "", class: "title-inner", data: {behavior: "user_title", feed_id: entry.feed.id}) do
         entry.feed.title
+      end
+    end
+  end
+
+  def entry_header_title
+    if entry.feed.webpage?
+      @template.content_tag(:span, "", class: "entry-feed-title") do
+        entry.hostname
+      end
+    else
+      @template.content_tag(:span, "", class: "entry-feed-title", data: {behavior: "user_title", feed_id: entry.feed.id}) do
+        @template.strip_tags(entry.feed.title)
       end
     end
   end
@@ -641,4 +657,21 @@ class EntryPresenter < BasePresenter
   def quoted_status
     entry.main_tweet.quoted_status
   end
+
+  def feed_wrapper(subscriptions, &block)
+    if entry.feed.webpage?
+      @template.content_tag :span, class: "feed-button" do
+        yield
+      end
+    elsif subscriptions.include?(entry.feed.id)
+      @template.link_to @template.edit_subscription_path(entry.feed), remote: true, class: "feed-button link", data: {behavior: "open_settings_modal"} do
+        yield
+      end
+    else
+      @template.content_tag :span, class: "feed-button" do
+        yield
+      end
+    end
+  end
+
 end

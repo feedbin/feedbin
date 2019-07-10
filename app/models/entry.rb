@@ -319,6 +319,12 @@ class Entry < ApplicationRecord
     nil
   end
 
+  def hostname
+    URI(url).host
+  rescue
+    nil
+  end
+
   private
 
   def base_url

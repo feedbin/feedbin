@@ -46,7 +46,7 @@ class ContentFormatter
     if entry
       filters.unshift(HTML::Pipeline::AbsoluteSourceFilter)
       filters.unshift(HTML::Pipeline::AbsoluteHrefFilter)
-      context[:image_base_url] = context[:href_base_url] = entry.feed.site_url
+      context[:image_base_url] = context[:href_base_url] = entry.url
       context[:image_subpage_url] = context[:href_subpage_url] = entry.url || ""
       if entry.feed.newsletter?
         context[:whitelist] = Feedbin::Application.config.newsletter_whitelist
@@ -66,13 +66,13 @@ class ContentFormatter
     result[:output].to_s
   end
 
-  def self.absolute_source(content, entry)
+  def self.absolute_source(content, entry, base_url = nil)
     filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter]
     context = {
-      image_base_url: entry.feed.site_url,
-      image_subpage_url: entry.url || "",
-      href_base_url: entry.feed.site_url,
-      href_subpage_url: entry.url || "",
+      image_base_url: base_url || entry.feed.site_url,
+      image_subpage_url: base_url || entry.url || "",
+      href_base_url: base_url || entry.feed.site_url,
+      href_subpage_url: base_url || entry.url || "",
     }
     pipeline = HTML::Pipeline.new filters, context
     result = pipeline.call(content)
