@@ -7,11 +7,15 @@ class SavePage
   def perform(user_id, url)
     @user = User.find(user_id)
     @url = url
-    feed = Feed.create_with(build_feed).find_or_create_by(feed_url: feed_url)
-    user.subscriptions.find_or_create_by(feed: feed)
-    entry = feed.entries.create_with(build_entry).find_or_create_by!(public_id: public_id)
+    entry = create_webpage_entry
     ImageSaver.perform_async(entry.id, entry.url)
     FaviconFetcher.perform_async(host, true)
+  end
+
+  def create_webpage_entry
+    feed = Feed.create_with(build_feed).find_or_create_by!(feed_url: feed_url)
+    user.subscriptions.find_or_create_by!(feed: feed)
+    feed.entries.create_with(build_entry).find_or_create_by!(public_id: public_id)
   end
 
   def feed_url

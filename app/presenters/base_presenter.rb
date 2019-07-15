@@ -8,7 +8,7 @@ class BasePresenter
   def favicon(feed, entry = nil)
     @favicon ||= begin
       if feed.newsletter?
-        content = @template.content_tag :span, "", class: "favicon-wrap collection-favicon favicon-newsletter-wrap" do
+        content = @template.content_tag :span, "", class: "favicon-wrap collection-favicon" do
           @template.svg_tag("favicon-newsletter", size: "16x16")
         end
       elsif feed.twitter_user?
@@ -25,9 +25,15 @@ class BasePresenter
         end
       elsif feed.webpage? && entry
         icon = Favicon.find_by_host(entry.hostname)
-        icon_url = icon&.cdn_url || @template.image_url("favicon-profile-default.png")
-        content = @template.content_tag :span, "", class: "favicon-wrap" do
-          @template.image_tag(icon_url, alt: "Favicon")
+        icon_url = icon&.cdn_url
+        if icon_url
+          content = @template.content_tag :span, "", class: "favicon-wrap" do
+            @template.image_tag(icon_url, alt: "Favicon")
+          end
+        else
+          content = @template.content_tag :span, "", class: "favicon-wrap collection-favicon" do
+            @template.svg_tag("favicon-saved", size: "14x16")
+          end
         end
       else
         markup = <<-eos
