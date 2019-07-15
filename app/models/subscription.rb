@@ -16,6 +16,8 @@ class Subscription < ApplicationRecord
 
   after_create :refresh_favicon
 
+  enum kind: {default: 0, generated: 1}
+
   def self.create_multiple(feeds, user, valid_feed_ids)
     @subscriptions = feeds.each_with_object([]) { |(feed_id, subscription), array|
       feed = Feed.find(feed_id)

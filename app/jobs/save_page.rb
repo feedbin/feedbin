@@ -14,7 +14,7 @@ class SavePage
 
   def create_webpage_entry
     feed = Feed.create_with(build_feed).find_or_create_by!(feed_url: feed_url)
-    user.subscriptions.find_or_create_by!(feed: feed)
+    user.subscriptions.create_with(kind: Subscription.kinds[:generated]).find_or_create_by!(feed: feed)
     feed.entries.create_with(build_entry).find_or_create_by!(public_id: public_id)
   end
 

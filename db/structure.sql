@@ -721,7 +721,8 @@ CREATE TABLE public.subscriptions (
     show_updates boolean DEFAULT true,
     muted boolean DEFAULT false,
     show_retweets boolean DEFAULT true,
-    media_only boolean DEFAULT false
+    media_only boolean DEFAULT false,
+    kind bigint DEFAULT 0
 );
 
 
@@ -1724,6 +1725,13 @@ CREATE INDEX index_subscriptions_on_feed_id_and_active_and_muted ON public.subsc
 
 
 --
+-- Name: index_subscriptions_on_kind; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_subscriptions_on_kind ON public.subscriptions USING btree (kind);
+
+
+--
 -- Name: index_subscriptions_on_media_only; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2126,6 +2134,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190225200600'),
 ('20190516024925'),
 ('20190516210058'),
-('20190710112843');
+('20190710112843'),
+('20190715152451');
 
 
