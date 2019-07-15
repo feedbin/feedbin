@@ -1,5 +1,21 @@
 <%= render partial: 'collections/collection', collection: collections %>
 
+<% if page_feed.present? %>
+    <% present page_feed do |feed_presenter| %>
+        <%= content_tag :li, class: "collection-pages", data: {feed_id: page_feed.id, feed_path: feed_path(page_feed) } do %>
+            <%= feed_presenter.feed_link do %>
+                <%= feed_presenter.favicon(page_feed) %>
+                <span class="collection-label-wrap" >
+                    <span class="collection-label">Pages</span>
+                </span>
+                <span class="count-wrap">
+                    <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byFeed', count_group_id: page_feed.id} %>
+                </span>
+            <% end %>
+        <% end %>
+    <% end %>
+<% end %>
+
 <% if saved_searches.present? %>
     <li class="source-section section-saved-searches">
         <span class="favicon-wrap collection-favicon">

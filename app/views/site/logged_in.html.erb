@@ -28,7 +28,7 @@
             <div class="feeds showing-audio-player" data-behavior="droppable">
                 <%= render partial: 'shared/view_mode' %>
                 <ul data-behavior="feeds_target" class="feeds-target">
-                    <%= render partial: 'feeds/feeds', locals: {collections: @feed_data[:collections], saved_searches: @feed_data[:saved_searches], tags: @feed_data[:tags], feeds: @feed_data[:feeds]} %>
+                    <%= render partial: 'feeds/feeds', locals: {collections: @feed_data[:collections], saved_searches: @feed_data[:saved_searches], tags: @feed_data[:tags], feeds: @feed_data[:feeds], page_feed: @feed_data[:page_feed]} %>
                 </ul>
             </div>
             <%= render partial: 'shared/audio_player' %>

@@ -114,8 +114,10 @@ class ApplicationController < ActionController::Base
     end
 
     @user = current_user
+    @page_feed = @user.feeds.webpage.first
 
     excluded_feeds = @user.taggings.distinct.pluck(:feed_id)
+    excluded_feeds += [@page_feed&.id]
     @feeds = @user.feeds.where.not(id: excluded_feeds).includes(:favicon)
 
     @count_data = {
@@ -127,6 +129,7 @@ class ApplicationController < ActionController::Base
     }
     @feed_data = {
       feeds: @feeds,
+      page_feed: @page_feed,
       collections: get_collections,
       tags: @user.tag_group,
       saved_searches: @user.saved_searches.order(Arel.sql("lower(name)")),

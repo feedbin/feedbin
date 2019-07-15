@@ -35,6 +35,10 @@ class BasePresenter
             @template.svg_tag("favicon-saved", size: "14x16")
           end
         end
+      elsif feed.webpage?
+        content = @template.content_tag :span, "", class: "favicon-wrap collection-favicon" do
+          @template.svg_tag("favicon-saved", size: "14x16")
+        end
       else
         markup = <<-eos
           <span class="favicon favicon-default favicon-character-#{feed.host_letter}" data-color-hash-seed="#{feed.host}"></span>
