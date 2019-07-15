@@ -1,0 +1,28 @@
+<div class="inset">
+    <div class="inset-content">
+        <h4 class="group-header">Your Plan</h4>
+    </div>
+    <div class="control-group">
+        <table class="table table-rounded" style="margin-bottom: 0;">
+            <tr>
+                <td>Prepaid</td>
+                <td>
+                    <% if @user.timed_plan_expired? %>
+                        <span class="danger">Expired</span>
+                    <% else %>
+                        Expires: <%= @user.expires_at.to_s(:date) %>
+                    <% end %>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <p class="control-group-description">You can purchase more time using Feedbin Notifier.</p>
+</div>
+
+<%= render partial: 'shared/billing/billing_subscribe', locals: {subscribe_title: "Switch to Subscription"} %>
+
+<div class="inset">
+    <%= render partial: 'shared/billing/payment_history' %>
+</div>
+
+<%= render partial: 'shared/billing/receipt_info' %>

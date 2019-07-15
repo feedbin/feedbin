@@ -224,12 +224,17 @@ class User < ApplicationRecord
     elsif plan_stripe_id == "free"
       Plan.where(price_tier: price_tier)
     else
-      exclude = ["free", "trial"]
-      if plan_stripe_id != "timed"
-        exclude.push("timed")
-      end
+      exclude = ["free", "trial", "timed"]
       Plan.where(price_tier: price_tier).where.not(stripe_id: exclude)
     end
+  end
+
+  def timed_plan_expired?
+    timed_plan? && expires_at.past?
+  end
+
+  def timed_plan?
+    plan.stripe_id == "timed"
   end
 
   def trial_plan_valid
@@ -366,8 +371,7 @@ class User < ApplicationRecord
 
   def trial_end
     @trial_end ||= begin
-      date = created_at || Time.now
-      date + Feedbin::Application.config.trial_days.days
+      expires_at || Time.now + Feedbin::Application.config.trial_days.days
     end
   end
 

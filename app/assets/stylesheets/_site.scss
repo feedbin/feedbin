@@ -1208,6 +1208,7 @@ $hamburger-dot: 4px;
         align-items: center;
         flex-direction: column;
         background-color: transparent;
+        cursor: pointer;
         &:hover {
             text-decoration: none;
         }
@@ -1238,7 +1239,7 @@ $hamburger-dot: 4px;
         align-items: flex-end;
         display: flex;
     }
-    .subscribe-button {
+    .add-button {
         .has-offscreen-panels & {
             display: none;
         }

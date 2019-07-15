@@ -1,0 +1,7 @@
+<% if @user.plan.stripe_id == "free" %>
+    <%= render partial: 'shared/billing/plan_free' %>
+<% elsif @user.plan.stripe_id == "timed" %>
+    <%= render partial: 'shared/billing/plan_timed' %>
+<% else %>
+    <%= render partial: 'shared/billing/plan_default' %>
+<% end %>

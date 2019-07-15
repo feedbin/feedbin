@@ -7,20 +7,20 @@
             <span>Edit</span>
         </a>
 
-        <button type="button" class="toolbar-button subscribe-button" data-behavior="show_subscribe open_modal" data-modal-target="subscribe">
+        <div class="toolbar-button add-button" data-behavior="show_subscribe open_modal" data-modal-target="subscribe">
             <div class="toolbar-button-inner">
                 <div class="icon-subscribe">
                     <%= svg_tag "icon-plus", size: "16x16" %>
                 </div>
             </div>
             <span>Add</span>
-        </button>
+        </div>
 
-        <button class="toolbar-button" disabled="disabled" data-behavior="mark_all_as_read">
+        <div class="toolbar-button" disabled="disabled" data-behavior="mark_all_as_read">
             <div class="toolbar-button-inner">
                 <%= svg_tag "icon-mark-read", size: "21x21" %>
             </div>
             <span>Read</span>
-        </button>
+        </div>
     </div>
 </div>

@@ -34,12 +34,11 @@ class SettingsController < ApplicationController
       end
     end
 
-    if @user.plan.stripe_id == "timed"
-      @billing_events = @user.in_app_purchases.order(purchase_date: :desc)
-    else
-      @billing_events = @user.billing_events.where(event_type: "charge.succeeded")
-      @billing_events = @billing_events.to_a.sort_by { |billing_event| -billing_event.event_object["created"] }
-    end
+    stripe_purchases = @user.billing_events.where(event_type: "charge.succeeded")
+    in_app_purchases = @user.in_app_purchases
+    all_purchases = (stripe_purchases.to_a + in_app_purchases.to_a)
+    @billing_events = all_purchases.sort_by { |billing_event| billing_event.purchase_date }.reverse
+
     @plans = @user.available_plans
   end
 

@@ -24,6 +24,11 @@ class UserMailer < ApplicationMailer
     mail to: @user.email, subject: "[Feedbin] Your Trial is About to End"
   end
 
+  def timed_plan_expiration(user_id)
+    @user = User.find(user_id)
+    mail to: @user.email, subject: "[Feedbin] Your Account has Expired"
+  end
+
   def starred_export_download(user_id, download_link)
     @user = User.find(user_id)
     @download_link = download_link

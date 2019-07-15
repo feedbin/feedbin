@@ -1,0 +1,19 @@
+<div class="inset">
+    <div class="inset-content">
+        <h4 class="group-header">Receipt Info</h4>
+    </div>
+    <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
+        <%= hidden_field_tag :redirect_to, settings_billing_url %>
+        <ul class="control-group no-border">
+            <li class="text no-border">
+                <%= f.text_area :receipt_info, rows: 3 %>
+            </li>
+        </ul>
+        <p class="control-group-description">This will show up on your receipt. Useful for VAT, address etc&hellip;</p>
+        <div class="description-inset">
+            <div class="button-wrap">
+                <%= f.submit "Save Info", class: "button  no-margin" %>
+            </div>
+        </div>
+    <% end %>
+</div>

@@ -1,0 +1,21 @@
+<div class="inset-content">
+    <h4 class="group-header">Payment History</h4>
+</div>
+<div class="control-group">
+    <table class="table table-rounded">
+        <% if @next_payment_date %>
+            <tr>
+                <td><time datetime="<%= @next_payment_date.to_s(:date) %>"><%= @next_payment_date.to_s(:date) %></time></td>
+                <td>&nbsp;</td>
+                <td><span class="extra-muted">Scheduled</span></td>
+            </tr>
+        <% end %>
+        <% @billing_events.each do |invoice| %>
+            <tr>
+                <td><%= invoice.receipt_date %></td>
+                <td><%= number_to_currency(invoice.receipt_amount) %> <%= invoice.currency %> <%= invoice.receipt_description %></td>
+                <td><%= link_to 'Receipt', invoice %></td>
+            </tr>
+        <% end %>
+    </table>
+</div>
