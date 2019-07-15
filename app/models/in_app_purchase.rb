@@ -26,6 +26,7 @@ class InAppPurchase < ApplicationRecord
     user.expires_at = new_expires_at
     user.suspended = false
     user.save
+    user.subscriptions.update_all(active: true)
   end
 
   def product_id

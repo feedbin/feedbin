@@ -88,9 +88,9 @@
     </div>
     <% if ENV['STRIPE_API_KEY'] %>
         <% if @user.plan.stripe_id == 'trial' %>
-            <%= render partial: 'shared/billing_subscribe' %>
+            <%= render partial: 'shared/billing/billing_subscribe', locals: {subscribe_title: "Plan"} %>
         <% else %>
-            <%= render partial: 'shared/billing_status' %>
+            <%= render partial: 'shared/billing/billing_status' %>
         <% end %>
     <% else %>
         <p>Billing disabled. <code>STRIPE_API_KEY</code> and <code>STRIPE_PUBLIC_KEY</code> are missing.</p>

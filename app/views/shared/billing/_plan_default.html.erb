@@ -1,0 +1,53 @@
+<div class="inset">
+    <%= form_tag settings_update_credit_card_path, id: "payment-form" do %>
+        <%= hidden_field_tag :stripe_token, nil, id: 'stripe_token' %>
+        <div class="inset-content">
+            <h4 class="group-header">Billing Info</h4>
+        </div>
+        <ul class="pill-list">
+            <li class="text-with-accessory">
+                <span data-behavior="billing_details" class="text">Loading…</span>
+                <button class="button-text accessory" data-behavior="show_container" data-target="credit_card_form">Update card</button>
+            </li>
+        </ul>
+
+        <div class="hide" data-container="credit_card_form">
+            <%= render partial: 'shared/credit_card_form' %>
+            <div class="description-inset">
+                <div class="button-wrap">
+                    <%= submit_tag "Update", class: "button no-margin update-cc-button", id: "credit_card_button", disabled: true, data: { disable_with: false } %>
+                </div>
+            </div>
+        </div>
+
+    <% end %>
+</div>
+<div class="inset">
+    <div class="inset-content">
+        <h4 class="group-header">Change Your Plan</h4>
+    </div>
+    <div class="control-group">
+        <table class="table table-rounded" style="margin-bottom: 0;">
+            <% @plans.each do |plan| %>
+                <tr>
+                    <td><%= plan.name %></td>
+                    <td><%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %></td>
+                    <td>
+                        <% if @user.plan.id == plan.id %>
+                            Your plan
+                        <% else %>
+                            <%= form_tag settings_update_plan_path, data: { behavior: 'change_plan' }, class: 'no-margin' do %>
+                                <%= hidden_field_tag 'plan', plan.id %>
+                                <%= button_tag 'Switch to this plan', class: 'button-text', data: { confirm: "Are you sure you want to switch to #{plan.name.downcase} billing?" } %>
+                            <% end %>
+                        <% end %>
+                    </td>
+                </tr>
+            <% end %>
+        </table>
+    </div>
+    <p class="control-group-description">Plan changes are pro-rated.</p>
+    <%= render partial: 'shared/billing/payment_history' %>
+</div>
+
+<%= render partial: 'shared/billing/receipt_info' %>

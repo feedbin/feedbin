@@ -19,4 +19,12 @@ module SettingsHelper
     }
     tags.unshift ["None", ""]
   end
+
+  def plan_name
+    if @user.plan.stripe_id == "timed"
+      "prepaid plan"
+    else
+      "trial"
+    end
+  end
 end
