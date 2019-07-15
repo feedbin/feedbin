@@ -98,4 +98,8 @@ class BillingEvent < ApplicationRecord
   def currency
     event_object["currency"].upcase
   end
+
+  def purchase_date
+    Time.at(event_object["created"])
+  end
 end
