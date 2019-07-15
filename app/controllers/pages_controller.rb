@@ -4,7 +4,7 @@ class PagesController < ApplicationController
   skip_before_action :authorize
 
   def create
-    user = User.find_by_page_token(params[:page_token])
+    user = User.find_by_page_token!(params[:page_token])
     SavePage.perform_async(user.id, params[:url])
   end
 end

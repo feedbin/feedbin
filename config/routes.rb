@@ -222,6 +222,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :pages, only: [:create]
+
   constraints subdomain: "api" do
     namespace :api, path: nil do
       namespace :v1 do

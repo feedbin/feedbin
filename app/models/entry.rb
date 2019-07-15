@@ -19,7 +19,7 @@ class Entry < ApplicationRecord
   after_commit :add_to_published_set, on: :create
   after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
-  after_commit :save_pages, on: :create
+  after_commit :harvest_links, on: :create
   after_commit :cache_extracted_content, on: :create
 
   validate :has_content
@@ -424,8 +424,8 @@ class Entry < ApplicationRecord
     end
   end
 
-  def save_pages
-    SavePages.perform_async(id) if tweet?
+  def harvest_links
+    HarvestLinks.perform_async(id) if tweet?
   end
 
   def cache_extracted_content

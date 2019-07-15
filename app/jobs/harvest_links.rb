@@ -1,4 +1,4 @@
-class SavePages
+class HarvestLinks
   include Sidekiq::Worker
   sidekiq_options queue: :low, retry: false
 

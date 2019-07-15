@@ -5,6 +5,7 @@ ben:
   customer_id: cus_123
   plan: basic_monthly_3
   newsletter_token: <%= SecureRandom.hex %>
+  page_token: <%= SecureRandom.hex %>
   admin: true
   price_tier: 3
 

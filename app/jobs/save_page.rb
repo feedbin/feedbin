@@ -19,11 +19,10 @@ class SavePage
   end
 
   def feed_url
-    digest = OpenSSL::Digest.new("sha1")
-    signature = OpenSSL::HMAC.hexdigest(digest, user.page_token, user.id.to_s)
+    hash = Digest::SHA1.hexdigest(user.page_token + user.id.to_s)
     URI::HTTPS.build(
       host: ENV["PAGES_DOMAIN"],
-      path: "/#{signature}"
+      path: "/#{hash}"
     ).to_s
   end
 

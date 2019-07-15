@@ -46,7 +46,7 @@ class ContentFormatter
     if entry
       filters.unshift(HTML::Pipeline::AbsoluteSourceFilter)
       filters.unshift(HTML::Pipeline::AbsoluteHrefFilter)
-      context[:image_base_url] = context[:href_base_url] = entry.url
+      context[:image_base_url] = context[:href_base_url] = entry.url || entry.feed.site_url
       context[:image_subpage_url] = context[:href_subpage_url] = entry.url || ""
       if entry.feed.newsletter?
         context[:whitelist] = Feedbin::Application.config.newsletter_whitelist

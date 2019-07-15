@@ -1,6 +1,6 @@
 require "test_helper"
 
-class SavePagesTest < ActiveSupport::TestCase
+class HarvestLinksTest < ActiveSupport::TestCase
   setup do
     user = users(:ben)
     @entry = create_tweet_entry(user.feeds.first)
@@ -11,7 +11,7 @@ class SavePagesTest < ActiveSupport::TestCase
     url = "https://extract.example.com/parser/user/4e4143c7bd4d8c935741d37a3c14f61a268a5b79?base64_url=aHR0cHM6Ly85dG81bWFjLmNvbS8yMDE4LzAxLzEyL2ZpbmFsLWN1dC1wcm8teC1ob3ctdG8taW1wcm92ZS1zbG93LW1vdGlvbi1pbi15b3VyLXByb2plY3RzLXZpZGVvLw=="
     stub_request_file("parsed_page.json", url, headers: {"Content-Type" => "application/json; charset=utf-8"})
 
-    SavePages.new.perform(@entry.id)
+    HarvestLinks.new.perform(@entry.id)
 
     saved_pages = @entry.reload.data["saved_pages"]
     assert saved_pages.key?(article_url), "Entry should have saved page"
