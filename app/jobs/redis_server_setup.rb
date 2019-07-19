@@ -20,6 +20,7 @@ class RedisServerSetup
   end
 
   def insert_data
+    return if values.first.empty?
     hash = Hash[keys.zip(values)]
     $redis[:sorted_entries].with do |redis|
       redis.multi do
@@ -38,11 +39,13 @@ class RedisServerSetup
   end
 
   def values
-    arrays = feed.entries.pluck("id, EXTRACT(EPOCH FROM created_at), EXTRACT(EPOCH FROM published)")
-    [
-      arrays.map {|array| [array[1], array[0]] },
-      arrays.map {|array| [array[2], array[0]] }
-    ]
+    @values ||= begin
+      arrays = feed.entries.pluck("id, EXTRACT(EPOCH FROM created_at), EXTRACT(EPOCH FROM published)")
+      [
+        arrays.map {|array| [array[1], array[0]] },
+        arrays.map {|array| [array[2], array[0]] }
+      ]
+    end
   end
 
   def keys
