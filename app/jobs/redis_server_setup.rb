@@ -22,7 +22,7 @@ class RedisServerSetup
   def insert_data
     return if values.first.empty?
     hash = Hash[keys.zip(values)]
-    $redis[:sorted_entries].with do |redis|
+    $redis[:entries].with do |redis|
       redis.multi do
         hash.each do |key, value|
           redis.del(key)
@@ -33,7 +33,7 @@ class RedisServerSetup
   end
 
   def delete_data
-    $redis[:sorted_entries].with do |redis|
+    $redis[:entries].with do |redis|
       keys.each {|key| redis.del(key)}
     end
   end
@@ -50,8 +50,8 @@ class RedisServerSetup
 
   def keys
     [
-      FeedbinUtils.redis_feed_entries_created_at_key(feed.id),
-      FeedbinUtils.redis_feed_entries_published_key(feed.id)
+      FeedbinUtils.redis_created_at_key(feed.id),
+      FeedbinUtils.redis_published_key(feed.id)
     ]
   end
 
