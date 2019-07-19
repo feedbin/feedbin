@@ -160,6 +160,10 @@ class Feed < ApplicationRecord
     options&.respond_to?(:dig) && options.dig("json_feed")
   end
 
+  def has_subscribers?
+    subscriptions_count > 0
+  end
+
   private
 
   def refresh_favicon

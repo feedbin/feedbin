@@ -1,38 +1,58 @@
 class RedisServerSetup
   include Sidekiq::Worker
   include BatchJobs
-  sidekiq_options queue: :default
+  sidekiq_options queue: :worker_slow
 
-  def perform(batch = nil, schedule = false, last_entry_id = nil)
-    if schedule
-      build(last_entry_id)
+  attr_reader :feed
+
+  def perform(feed_id = nil, schedule = false)
+    schedule ? build : index(feed_id)
+  rescue ActiveRecord::RecordNotFound
+  end
+
+  def index(feed_id)
+    @feed = Feed.find(feed_id)
+    if feed.has_subscribers?
+      insert_data
     else
-      index(batch)
+      delete_data
     end
   end
 
-  def index(batch)
-    ids = build_ids(batch)
-    entries = Entry.where(id: ids).select("id, feed_id, public_id, EXTRACT(EPOCH FROM created_at AT TIME ZONE 'UTC') as score_created_at, EXTRACT(EPOCH FROM published AT TIME ZONE 'UTC') as score_published")
+  def insert_data
+    hash = Hash[keys.zip(values)]
     $redis[:sorted_entries].with do |redis|
-      redis.pipelined do
-        entries.each do |entry|
-          key1 = FeedbinUtils.redis_feed_entries_created_at_key(entry.feed_id)
-          redis.zadd(key1, entry.score_created_at, entry.id)
-
-          key2 = FeedbinUtils.redis_feed_entries_published_key(entry.feed_id)
-          redis.zadd(key2, entry.score_published, entry.id)
+      redis.multi do
+        hash.each do |key, value|
+          redis.del(key)
+          redis.zadd(key, value)
         end
       end
     end
   end
 
-  def build(last_entry_id)
-    jobs = job_args(last_entry_id)
-    Sidekiq::Client.push_bulk(
-      "args" => jobs,
-      "class" => self.class.name,
-      "queue" => self.class.get_sidekiq_options["queue"].to_s,
-    )
+  def delete_data
+    $redis[:sorted_entries].with do |redis|
+      keys.each {|key| redis.del(key)}
+    end
+  end
+
+  def values
+    arrays = feed.entries.pluck("id, EXTRACT(EPOCH FROM created_at), EXTRACT(EPOCH FROM published)")
+    [
+      arrays.map {|array| [array[1], array[0]] },
+      arrays.map {|array| [array[2], array[0]] }
+    ]
+  end
+
+  def keys
+    [
+      FeedbinUtils.redis_feed_entries_created_at_key(feed.id),
+      FeedbinUtils.redis_feed_entries_published_key(feed.id)
+    ]
+  end
+
+  def build
+    enqueue_all(Feed, self.class)
   end
 end

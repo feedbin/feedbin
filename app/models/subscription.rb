@@ -11,6 +11,7 @@ class Subscription < ApplicationRecord
 
   after_create :add_feed_to_action
   after_commit :remove_feed_from_action, on: [:destroy]
+  after_commit :cache_entry_ids, on: [:create, :destroy]
 
   before_destroy :untag
 
@@ -75,5 +76,9 @@ class Subscription < ApplicationRecord
 
   def refresh_favicon
     FaviconFetcher.perform_async(feed.host)
+  end
+
+  def cache_entry_ids
+    RedisServerSetup.new.perform(feed_id)
   end
 end
