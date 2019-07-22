@@ -1,11 +1,11 @@
 namespace :deploy do
-  desc 'Commands for unicorn application'
+  desc 'Restart refresher processes'
   task :restart do
     on roles :all do
       begin
-        execute :sudo, :restart, :workers
+        execute :sudo, :systemctl, :restart, "refresher.target"
       rescue SSHKit::Command::Failed
-        execute :sudo, :start, :workers
+        execute :sudo, :systemctl, :start, "refresher.target"
       end
     end
   end
