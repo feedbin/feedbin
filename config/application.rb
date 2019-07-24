@@ -10,6 +10,10 @@ require_relative "../lib/conditional_compression"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+if ENV["ENV_PATH"].present?
+  Dotenv::Railtie.load(ENV["ENV_PATH"])
+end
+
 module Feedbin
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
