@@ -5,9 +5,9 @@ timeout 30
 preload_app true
 user "app", "app"
 
-listen "/tmp/unicorn.sock"
-
 app_dir = "/srv/apps/feedbin"
+
+listen "#{app_dir}/shared/tmp/sockets/unicorn.sock"
 working_directory "#{app_dir}/current"
 stderr_path "#{app_dir}/shared/log/unicorn.log"
 stdout_path "#{app_dir}/shared/log/unicorn.log"
@@ -30,11 +30,5 @@ after_fork do |server, worker|
 end
 
 before_exec do |server|
-  if ENV["ENV_PATH"]
-    begin
-      ENV.update Dotenv::Environment.new(ENV["ENV_PATH"], true)
-    rescue ArgumentError
-      ENV.update Dotenv::Environment.new(ENV["ENV_PATH"])
-    end
-  end
+  Dotenv.load
 end
