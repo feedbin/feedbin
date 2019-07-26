@@ -3,7 +3,7 @@ namespace :deploy do
   task :restart do
     on roles :app do
 
-      execute :sudo, :service, :unicorn, :upgrade
+      # execute :sudo, :service, :unicorn, :upgrade
 
       #
       # begin
