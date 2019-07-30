@@ -114,7 +114,7 @@ class ApplicationController < ActionController::Base
     end
 
     @user = current_user
-    @page_feed = @user.feeds.webpage.first
+    @page_feed = @user.feeds.pages.first
 
     excluded_feeds = @user.taggings.distinct.pluck(:feed_id)
     excluded_feeds += [@page_feed&.id]
