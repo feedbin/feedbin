@@ -6,12 +6,14 @@ preload_app true
 user "app", "app"
 
 app_dir = "/srv/apps/feedbin"
+shared_dir = "#{app_dir}/shared"
 
-listen "#{app_dir}/shared/tmp/sockets/unicorn.sock"
 working_directory "#{app_dir}/current"
-stderr_path "#{app_dir}/shared/log/unicorn.log"
-stdout_path "#{app_dir}/shared/log/unicorn.log"
-pid "#{app_dir}/shared/tmp/pids/unicorn.pid"
+
+listen      "#{shared_dir}/tmp/sockets/unicorn.sock"
+pid         "#{shared_dir}/tmp/pids/unicorn.pid"
+stderr_path "#{shared_dir}/log/unicorn.log"
+stdout_path "#{shared_dir}/log/unicorn.log"
 
 before_fork do |server, worker|
   defined?(ActiveRecord::Base) && ActiveRecord::Base.connection.disconnect!
