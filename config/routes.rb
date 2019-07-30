@@ -20,6 +20,7 @@ Rails.application.routes.draw do
 
   post "/emails" => "emails#create"
   post "/newsletters" => "newsletters#create"
+  get "bookmarklet/:cache_buster", to: "bookmarklet#script", as: "bookmarklet"
 
   match "/404", to: "errors#not_found", via: :all
   get "/starred/:starred_token", to: "starred_entries#index", as: "starred"
@@ -167,6 +168,7 @@ Rails.application.routes.draw do
     get :payment_details
     get :import_export
     get :appearance
+    get :save
     post :update_credit_card
     post :update_plan
     post :font

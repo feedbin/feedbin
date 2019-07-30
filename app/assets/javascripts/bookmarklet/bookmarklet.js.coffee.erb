@@ -1,0 +1,41 @@
+class Bookmarklet
+
+  baseURL: '<%= ENV["FEEDBIN_URL"] %>'
+  createPath: '<%= Rails.application.routes.url_helpers.pages_path %>'
+
+  save: ->
+    form = @buildForm()
+    document.body.appendChild(form)
+    form.submit()
+    form.parentNode.removeChild(form);
+
+  buildForm: ->
+    form = document.createElement("form");
+    form.setAttribute("method", "post")
+    form.setAttribute("action", @createURL())
+    for field in @fields()
+      form.appendChild(field)
+    form
+
+  createURL: ->
+    "#{@url(@createPath)}"
+
+  fields: ->
+    [
+      @createField('page_token', _rlvalue),
+      @createField('title', document.title),
+      @createField('url', window.location.href),
+    ]
+
+  createField: (name, value) ->
+    field = document.createElement("input")
+    field.setAttribute("type", "hidden")
+    field.setAttribute("name", name)
+    field.setAttribute("value", value)
+    field
+
+  url: (path) ->
+    @baseURL + path
+
+bookmarklet = new Bookmarklet
+bookmarklet.save()
