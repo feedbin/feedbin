@@ -49,7 +49,7 @@ class SavePage
       site_url: feed_url,
       protected: true,
       host: ENV["PAGES_DOMAIN"],
-      feed_type: :webpage,
+      feed_type: :pages,
     }
   end
 

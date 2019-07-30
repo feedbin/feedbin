@@ -437,7 +437,7 @@ class EntryPresenter < BasePresenter
       @template.content_tag(:span, "", class: "title-inner") do
         "#{entry.micropost.author_name} #{@template.content_tag(:span, entry.micropost.author_display_username)}".html_safe
       end
-    elsif entry.feed.webpage?
+    elsif entry.feed.pages?
       @template.content_tag(:span, "", class: "title-inner") do
         entry.hostname
       end
@@ -453,7 +453,7 @@ class EntryPresenter < BasePresenter
   end
 
   def entry_header_title
-    if entry.feed.webpage?
+    if entry.feed.pages?
       @template.content_tag(:span, "", class: "entry-feed-title") do
         entry.hostname
       end
@@ -659,7 +659,7 @@ class EntryPresenter < BasePresenter
   end
 
   def feed_wrapper(subscriptions, &block)
-    if entry.feed.webpage?
+    if entry.feed.pages?
       @template.content_tag :span, class: "feed-button" do
         yield
       end

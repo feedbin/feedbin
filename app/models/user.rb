@@ -390,7 +390,7 @@ class User < ApplicationRecord
       WHERE user_id = ? AND feed_id IN (?)
       GROUP BY tag_id
     eos
-    query = ActiveRecord::Base.send(:sanitize_sql_array, [query, id, subscriptions.pluck(:feed_id)])
+    query = ActiveRecord::Base.send(:sanitize_sql_array, [query, id, subscriptions.default.pluck(:feed_id)])
     results = ActiveRecord::Base.connection.execute(query)
     results.each_with_object({}) do |result, hash|
       hash[result["tag_id"].to_i] = JSON.parse(result["feed_ids"])

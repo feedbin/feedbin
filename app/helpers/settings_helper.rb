@@ -27,4 +27,22 @@ module SettingsHelper
       "trial"
     end
   end
+
+  def bookmarklet
+    script = <<~EOD
+    (function() {
+        var _feedbinURL = "#{bookmarklet_url(cache_buster: 'replace_me')}";
+        _feedbinURL = _feedbinURL.replace("replace_me", Date.now());
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.async = true;
+        script.src = _feedbinURL;
+        var head = document.getElementsByTagName("body")[0];
+        _rlvalue = "#{@user.page_token}";
+        head.appendChild(script);
+    })();
+    EOD
+    script = script.gsub("\n", "").gsub('"', "%22").gsub(" ", "%20")
+    link_to "Send to Feedbin", "javascript:void%20#{script}"
+  end
 end
