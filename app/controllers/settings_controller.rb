@@ -272,4 +272,7 @@ class SettingsController < ApplicationController
     @user.update_attributes(view_mode: @view_mode)
   end
 
+  def save
+  end
+
 end
