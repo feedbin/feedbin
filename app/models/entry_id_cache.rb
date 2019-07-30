@@ -18,7 +18,7 @@ class EntryIdCache
   private
 
   def count
-    $redis[:sorted_entries].with do |redis|
+    $redis[:entries].with do |redis|
       redis.zcard(cache_key)
     end
   end
@@ -33,7 +33,7 @@ class EntryIdCache
 
   def cache_key
     if feed_ids.length == 1
-      FeedbinUtils.redis_feed_entries_published_key(feed_ids.first)
+      FeedbinUtils.redis_published_key(feed_ids.first)
     else
       FeedbinUtils.redis_user_entries_published_key(user_id, feed_ids)
     end
@@ -41,7 +41,7 @@ class EntryIdCache
 
   def get_ids
     ids[page_number] ||= begin
-      key_exists, entry_ids = $redis[:sorted_entries].with { |redis|
+      key_exists, entry_ids = $redis[:entries].with { |redis|
         redis.multi do
           redis.exists(cache_key)
           redis.zrevrange(cache_key, start, stop)
@@ -50,9 +50,9 @@ class EntryIdCache
 
       unless key_exists
         keys = feed_ids.map { |feed_id|
-          FeedbinUtils.redis_feed_entries_published_key(feed_id)
+          FeedbinUtils.redis_published_key(feed_id)
         }
-        count, expire, entry_ids = $redis[:sorted_entries].with { |redis|
+        count, expire, entry_ids = $redis[:entries].with { |redis|
           redis.multi do
             redis.zunionstore(cache_key, keys)
             redis.expire(cache_key, 2.minutes.to_i)

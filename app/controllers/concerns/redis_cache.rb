@@ -2,7 +2,7 @@ module RedisCache
   extend ActiveSupport::Concern
 
   def get_cached_entry_ids(cache_key, feed_key, since = "-inf", read = nil, starred = nil)
-    key_exists, entry_ids = $redis[:sorted_entries].with { |redis|
+    key_exists, entry_ids = $redis[:entries].with { |redis|
       redis.multi do
         redis.exists(cache_key)
         redis.lrange(cache_key, 0, -1)
@@ -16,7 +16,7 @@ module RedisCache
         feed_key % feed_id
       }
 
-      scores = $redis[:sorted_entries].with { |redis|
+      scores = $redis[:entries].with { |redis|
         redis.pipelined do
           keys.each do |key|
             redis.zrangebyscore(key, since, "+inf", with_scores: true)
@@ -73,7 +73,7 @@ module RedisCache
 
   def cache_entry_ids(cache_key, entry_ids)
     if entry_ids.present?
-      $redis[:sorted_entries].with do |redis|
+      $redis[:entries].with do |redis|
         redis.multi do
           redis.del(cache_key)
           redis.rpush(cache_key, entry_ids)

@@ -376,16 +376,16 @@ class Entry < ApplicationRecord
 
   def add_to_created_at_set
     score = "%10.6f" % created_at.to_f
-    key = FeedbinUtils.redis_feed_entries_created_at_key(feed_id)
-    $redis[:sorted_entries].with do |redis|
+    key = FeedbinUtils.redis_created_at_key(feed_id)
+    $redis[:entries].with do |redis|
       redis.zadd(key, score, id)
     end
   end
 
   def add_to_published_set
     score = "%10.6f" % published.to_f
-    key = FeedbinUtils.redis_feed_entries_published_key(feed_id)
-    $redis[:sorted_entries].with do |redis|
+    key = FeedbinUtils.redis_published_key(feed_id)
+    $redis[:entries].with do |redis|
       redis.zadd(key, score, id)
     end
   end

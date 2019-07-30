@@ -27,8 +27,8 @@ Minitest.after_run do
 end
 
 $redis = {
-  sorted_entries: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) },
-  id_cache: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) },
+  entries: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) },
+  refresher: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) },
 }
 
 Capybara.register_driver(:headless_chrome) do |app|
