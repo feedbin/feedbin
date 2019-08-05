@@ -1,162 +1,102 @@
-/*
+.theme-dusk,.theme-midnight {
+    .hljs {
+      display: block;
+      overflow-x: auto;
+      padding: 0.5em;
+      background: #232323;
+      color: #e6e1dc;
+    }
 
-Sunburst-like style (c) Vasily Polovnyov <vast@whiteants.net>
+    .hljs-comment,
+    .hljs-quote {
+      color: #bc9458;
+      font-style: italic;
+    }
 
-*/
-.theme-dusk {
-	/**
-	 * Obsidian style
-	 * ported by Alexander Marenin (http://github.com/ioncreature)
-	 */
+    .hljs-keyword,
+    .hljs-selector-tag {
+      color: #c26230;
+    }
 
-	.hljs {
-	    display: block; padding: 0.5em;
-	    background: #1d1f21;
-	}
+    .hljs-string,
+    .hljs-number,
+    .hljs-regexp,
+    .hljs-variable,
+    .hljs-template-variable {
+      color: #a5c261;
+    }
 
-	.hljs-keyword,
-	.hljs-literal,
-	.hljs-change,
-	.hljs-winutils,
-	.hljs-flow,
-	.lisp .hljs-title,
-	.clojure .hljs-built_in,
-	.nginx .hljs-title,
-	.css .hljs-id,
-	.tex .hljs-special {
-	    color: #93C763;
-	}
+    .hljs-subst {
+      color: #519f50;
+    }
 
-	.hljs-number {
-	    color: #FFCD22;
-	}
+    .hljs-tag,
+    .hljs-name {
+      color: #e8bf6a;
+    }
 
-	.hljs {
-	    color: #E0E2E4;
-	}
+    .hljs-type {
+      color: #da4939;
+    }
 
-	.css .hljs-tag,
-	.css .hljs-pseudo {
-	    color: #D0D2B5;
-	}
 
-	.hljs-attribute,
-	.hljs .hljs-constant {
-	    color: #668BB0;
-	}
+    .hljs-symbol,
+    .hljs-bullet,
+    .hljs-built_in,
+    .hljs-builtin-name,
+    .hljs-attr,
+    .hljs-link {
+      color: #6d9cbe;
+    }
 
-	.xml .hljs-attribute {
-	    color: #B3B689;
-	}
+    .hljs-params {
+      color: #d0d0ff;
+    }
 
-	.xml .hljs-tag .hljs-value {
-	    color: #E8E2B7;
-	}
+    .hljs-attribute {
+      color: #cda869;
+    }
 
-	.hljs-code,
-	.hljs-class .hljs-title,
-	.hljs-header {
-	    color: white;
-	}
+    .hljs-meta {
+      color: #9b859d;
+    }
 
-	.hljs-class,
-	.hljs-hexcolor {
-	    color: #93C763;
-	}
+    .hljs-title,
+    .hljs-section {
+      color: #ffc66d;
+    }
 
-	.hljs-regexp {
-	    color: #D39745;
-	}
+    .hljs-addition {
+      background-color: #144212;
+      color: #e6e1dc;
+      display: inline-block;
+      width: 100%;
+    }
 
-	.hljs-at_rule,
-	.hljs-at_rule .hljs-keyword {
-	    color: #A082BD;
-	}
+    .hljs-deletion {
+      background-color: #600;
+      color: #e6e1dc;
+      display: inline-block;
+      width: 100%;
+    }
 
-	.hljs-doctype {
-	    color: #557182;
-	}
+    .hljs-selector-class {
+      color: #9b703f;
+    }
 
-	.hljs-link_url,
-	.hljs-tag,
-	.hljs-tag .hljs-title,
-	.hljs-bullet,
-	.hljs-subst,
-	.hljs-emphasis,
-	.haskell .hljs-type,
-	.hljs-preprocessor,
-	.hljs-pragma,
-	.ruby .hljs-class .hljs-parent,
-	.hljs-built_in,
-	.sql .hljs-aggregate,
-	.django .hljs-template_tag,
-	.django .hljs-variable,
-	.smalltalk .hljs-class,
-	.hljs-javadoc,
-	.django .hljs-filter .hljs-argument,
-	.smalltalk .hljs-localvars,
-	.smalltalk .hljs-array,
-	.hljs-attr_selector,
-	.hljs-pseudo,
-	.hljs-addition,
-	.hljs-stream,
-	.hljs-envvar,
-	.apache .hljs-tag,
-	.apache .hljs-cbracket,
-	.tex .hljs-command,
-	.hljs-prompt {
-	    color: #8CBBAD;
-	}
+    .hljs-selector-id {
+      color: #8b98ab;
+    }
 
-	.hljs-string {
-	    color: #EC7600;
-	}
+    .hljs-emphasis {
+      font-style: italic;
+    }
 
-	.hljs-comment,
-	.java .hljs-annotation,
-	.hljs-blockquote,
-	.hljs-horizontal_rule,
-	.python .hljs-decorator,
-	.hljs-template_comment,
-	.hljs-pi,
-	.hljs-deletion,
-	.hljs-shebang,
-	.apache .hljs-sqbracket,
-	.tex .hljs-formula {
-	    color: #818E96;
-	}
+    .hljs-strong {
+      font-weight: bold;
+    }
 
-	.hljs-keyword,
-	.hljs-literal,
-	.css .hljs-id,
-	.hljs-phpdoc,
-	.hljs-title,
-	.hljs-header,
-	.haskell .hljs-type,
-	.vbscript .hljs-built_in,
-	.sql .hljs-aggregate,
-	.rsl .hljs-built_in,
-	.smalltalk .hljs-class,
-	.diff .hljs-header,
-	.hljs-chunk,
-	.hljs-winutils,
-	.bash .hljs-variable,
-	.apache .hljs-tag,
-	.tex .hljs-special,
-	.hljs-request,
-	.hljs-at_rule .hljs-keyword,
-	.hljs-status {
-	    font-weight: bold;
-	}
-
-	.coffeescript .javascript,
-	.javascript .xml,
-	.tex .hljs-formula,
-	.xml .javascript,
-	.xml .vbscript,
-	.xml .css,
-	.xml .hljs-cdata {
-	    opacity: 0.5;
-	}
-
+    .hljs-link {
+      text-decoration: underline;
+    }
 }
