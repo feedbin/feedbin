@@ -2,11 +2,12 @@ class SavePage
   include Sidekiq::Worker
   sidekiq_options queue: :critical
 
-  attr_reader :user, :url
+  attr_reader :user, :url, :title
 
-  def perform(user_id, url)
+  def perform(user_id, url, title)
     @user = User.find(user_id)
     @url = url
+    @title = title
     entry = create_webpage_entry
     ImageSaver.perform_async(entry.id, entry.url)
     FaviconFetcher.perform_async(host, true)
@@ -57,10 +58,11 @@ class SavePage
     {
       author: parsed_result&.author,
       content: parsed_result&.content,
-      title: parsed_result&.title || host,
+      title: parsed_result&.title || title,
       url: url,
-      published: parsed_result&.title || Time.now,
-      public_id: public_id
+      published: parsed_result&.published || Time.now,
+      public_id: public_id,
+      skip_recent_post_check: true
     }
   end
 

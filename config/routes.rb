@@ -224,7 +224,8 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :pages, only: [:create]
+  match "pages", to: "pages#create", via: [:post]
+  match "pages", to: "pages#options", via: [:options]
 
   constraints subdomain: "api" do
     namespace :api, path: nil do

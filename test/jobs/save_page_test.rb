@@ -11,7 +11,7 @@ class SavePageTest < ActiveSupport::TestCase
     Sidekiq::Worker.clear_all
     assert_difference "Feed.count", +1 do
       assert_difference "Entry.count", +1 do
-        SavePage.new.perform(@user.id, url)
+        SavePage.new.perform(@user.id, url, "Title")
       end
     end
     entry = Entry.find_by_url url

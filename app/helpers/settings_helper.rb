@@ -31,15 +31,13 @@ module SettingsHelper
   def bookmarklet
     script = <<~EOD
     (function() {
-        var _feedbinURL = "#{bookmarklet_url(cache_buster: 'replace_me')}";
-        _feedbinURL = _feedbinURL.replace("replace_me", Date.now());
         var script = document.createElement("script");
+        var body = document.querySelector("body");
         script.type = "text/javascript";
         script.async = true;
-        script.src = _feedbinURL;
-        var head = document.getElementsByTagName("body")[0];
-        _rlvalue = "#{@user.page_token}";
-        head.appendChild(script);
+        script.src = "#{bookmarklet_url(cache_buster: 'replace_me')}".replace("replace_me", Date.now());
+        script.setAttribute("data-feedbin-token", "#{@user.page_token}");
+        body.appendChild(script);
     })();
     EOD
     script = script.gsub("\n", "").gsub('"', "%22").gsub(" ", "%20")
