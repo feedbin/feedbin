@@ -1,13 +1,11 @@
 class PagesController < ApplicationController
 
   skip_before_action :verify_authenticity_token
-  skip_before_action :authorize
 
   after_action :cors_headers
 
   def create
-    user = User.find_by_page_token!(params[:page_token])
-    SavePage.perform_async(user.id, params[:url], params[:title])
+    SavePage.perform_async(current_user.id, params[:url], params[:title])
   end
 
   def options
@@ -15,6 +13,18 @@ class PagesController < ApplicationController
   end
 
   private
+
+  def authorize
+    @current_user ||= begin
+      if params[:page_token]
+        User.find_by_page_token!(params[:page_token])
+      else
+        authenticate_or_request_with_http_basic("Feedbin") do |username, password|
+          User.where("lower(email) = ?", username.try(:downcase)).take.try(:authenticate, password)
+        end
+      end
+    end
+  end
 
   def cors_headers
     headers["Access-Control-Allow-Origin"] = "*"
