@@ -125,6 +125,7 @@ Rails.application.routes.draw do
       post :toggle_updates
       get :modal_edit
       get :edit_tags
+      get :pages, to: "pages_entries#index"
     end
   end
 
