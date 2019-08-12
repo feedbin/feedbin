@@ -562,6 +562,7 @@ DEPENDENCIES
   minitest
   minitest-stub-const
   minitest-stub_any_instance
+  net-http-persistent
   nokogumbo (= 1.4.9)
   oauth
   opml_saw!
