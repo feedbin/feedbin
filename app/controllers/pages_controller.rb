@@ -1,6 +1,7 @@
 class PagesController < ApplicationController
 
   skip_before_action :verify_authenticity_token
+  skip_before_action :authorize, only: [:options]
 
   after_action :cors_headers
 

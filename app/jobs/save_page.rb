@@ -21,7 +21,7 @@ class SavePage
 
   def feed_url
     hash = Digest::SHA1.hexdigest(user.page_token + user.id.to_s)
-    URI::HTTPS.build(
+    URI::HTTP.build(
       host: ENV["PAGES_DOMAIN"],
       path: "/#{hash}"
     ).to_s
@@ -47,7 +47,7 @@ class SavePage
     {
       title: "Pages",
       feed_url: feed_url,
-      site_url: feed_url,
+      site_url: URI::HTTP.build(host: ENV["PAGES_DOMAIN"]).to_s,
       protected: true,
       host: ENV["PAGES_DOMAIN"],
       feed_type: :pages,

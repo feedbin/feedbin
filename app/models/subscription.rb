@@ -14,8 +14,15 @@ class Subscription < ApplicationRecord
   after_commit :cache_entry_ids, on: [:create, :destroy]
 
   before_destroy :untag
+  before_destroy :prevent_generated_destroy
 
   after_create :refresh_favicon
+
+  validate :reject_title_chages, on: :update, if: :generated?
+
+  def reject_title_chages
+   errors[:title] << "can not be changed" if self.title_changed?
+  end
 
   enum kind: {default: 0, generated: 1}
 
@@ -64,6 +71,14 @@ class Subscription < ApplicationRecord
 
   def untag
     feed.tag("", user)
+  end
+
+  def prevent_generated_destroy
+    if generated?
+      throw(:abort)
+    else
+      true
+    end
   end
 
   def muted_status
