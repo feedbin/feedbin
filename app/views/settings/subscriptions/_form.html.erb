@@ -29,7 +29,7 @@
                                 <div class="graph-wrap">
                                     <div class="graph">
                                         <% subscription_presenter.graph_bars.each do |data| %>
-                                           <div style="height: <%= data.percent %>%;" title="<%= "#{data.day}: #{data.count} #{"article".pluralize(data.count)}" %>"></div>
+                                           <div style="height: <%= data.percent %>%;" title="<%= subscription_presenter.bar_title(data) %>"></div>
                                         <% end %>
                                     </div>
                                     <div class="x-axis">

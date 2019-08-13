@@ -47,6 +47,11 @@ class SubscriptionPresenter < BasePresenter
     end
   end
 
+  def bar_title(data)
+    type = (subscription.feed.twitter_feed?) ? "tweet" : "article"
+    "#{data.day}: #{data.count} #{type.pluralize(data.count)}"
+  end
+
   def muted_status
     if subscription.muted
       "muted"
