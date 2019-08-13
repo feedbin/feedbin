@@ -21,7 +21,7 @@ class SubscriptionPresenter < BasePresenter
   def graph_bars
     max = counts.max
     counts.each_with_index.map do |count, index|
-      percent = ((count.to_f / max.to_f) * 100).round
+      percent = (count == 0) ? 0 : ((count.to_f / max.to_f) * 100).round
       date = (days.ago + index.days)
       ordinal = date.day.ordinalize
       display_date = "#{date.strftime("%B")} #{ordinal}"
