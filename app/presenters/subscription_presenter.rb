@@ -20,7 +20,13 @@ class SubscriptionPresenter < BasePresenter
 
   def graph_bars
     max = counts.max
-    counts.map { |count| (count.to_f / max.to_f) }.to_json
+    counts.each_with_index.map do |count, index|
+      percent = ((count.to_f / max.to_f) * 100).round
+      date = (days.ago + index.days)
+      ordinal = date.day.ordinalize
+      display_date = "#{date.strftime("%B")} #{ordinal}"
+      OpenStruct.new(percent: percent, count: count, day: display_date)
+    end
   end
 
   def graph_max
