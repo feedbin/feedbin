@@ -14,9 +14,8 @@ class SavePage
   end
 
   def create_webpage_entry
-    feed = Feed.create_with(build_feed).find_or_create_by!(feed_url: feed_url)
-    user.subscriptions.create_with(kind: Subscription.kinds[:generated]).find_or_create_by!(feed: feed)
-    feed.entries.create_with(build_entry).find_or_create_by!(public_id: public_id)
+    user.subscriptions.create_with(kind: Subscription.kinds[:generated]).find_or_create_by!(feed: pages_feed)
+    pages_feed.entries.create_with(build_entry).find_or_create_by!(public_id: public_id)
   end
 
   def feed_url
@@ -41,6 +40,10 @@ class SavePage
 
   def public_id
     Digest::SHA1.hexdigest(feed_url + url)
+  end
+
+  def pages_feed
+    @pages_feed ||= user.feeds.pages.take || Feed.create_with(build_feed).find_or_create_by!(feed_url: feed_url)
   end
 
   def build_feed
