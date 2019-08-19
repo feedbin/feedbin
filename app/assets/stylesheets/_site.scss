@@ -1446,8 +1446,7 @@ $hamburger-dot: 4px;
     .view-mode {
         margin: 0;
         padding: 0;
-        transition: opacity 0.2s ease;
-        opacity: 0;
+        display: none;
         select {
             margin: 0;
             transform: scale(1);
@@ -1476,7 +1475,7 @@ $hamburger-dot: 4px;
 .feed-scrolled-alt.has-offscreen-panels .top-toolbar {
     @include border-bottom($color-borders-alt, $root: true);
     .view-mode {
-        opacity: 1;
+        display: flex;
     }
 }
 
