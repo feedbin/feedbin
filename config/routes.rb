@@ -169,7 +169,7 @@ Rails.application.routes.draw do
     get :payment_details
     get :import_export
     get :appearance
-    get :save
+    get :newsletters_pages
     post :update_credit_card
     post :update_plan
     post :font

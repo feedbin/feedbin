@@ -21,7 +21,11 @@
                 Subscriptions
             <% end %>
         </li>
-
+        <li>
+            <%= link_to settings_newsletters_pages_path, class: is_active?("settings", "newsletters_pages") do %>
+                Newsletters & Pages
+            <% end %>
+        </li>
 
         <li class="nav-header">
             <div class="icon-wrap"><%= svg_tag "icon-settings-tools", size: "22x22" %></div>
