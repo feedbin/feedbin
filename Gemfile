@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "= 5.1.7"
+gem "rails", "5.2.3"
 
 gem "rails-deprecated_sanitizer"
 gem "rails-controller-testing"
