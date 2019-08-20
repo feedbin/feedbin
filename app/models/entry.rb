@@ -3,6 +3,8 @@ class Entry < ApplicationRecord
 
   attr_accessor :fully_qualified_url, :read, :starred, :skip_mark_as_unread, :skip_recent_post_check
 
+  store :settings, accessors: [:archived_images], coder: JSON
+
   belongs_to :feed
   has_many :unread_entries, dependent: :delete_all
   has_many :starred_entries
@@ -26,6 +28,10 @@ class Entry < ApplicationRecord
   validates :feed, :public_id, presence: true
 
   self.per_page = 100
+
+  def archived_images?
+    !!archived_images
+  end
 
   def tweet?
     tweet.present?
