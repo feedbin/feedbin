@@ -15,8 +15,8 @@ class PagesEntriesController < ApplicationController
       @page_query = starred_entries
     else
       @all_unread = "true"
-      unread_entries = @user.unread_entries.select(:entry_id).where(feed_id: @feed.id).page(params[:page]).order("created_at DESC")
-      @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort).entries_list
+      unread_entries = @user.unread_entries.select(:entry_id).where(feed_id: @feed.id).page(params[:page]).order("entry_created_at DESC")
+      @entries = Entry.where(id: unread_entries).includes(feed: [:favicon]).order("created_at DESC").entries_list
       @page_query = unread_entries
     end
 
