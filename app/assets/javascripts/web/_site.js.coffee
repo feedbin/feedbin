@@ -2280,6 +2280,10 @@ $.extend feedbin,
       $(document).on 'feedbin:native:statusbartouched', (event, xCoordinate) ->
         feedbin.scrollToTop(xCoordinate)
 
+    didBecomeActive: ->
+      $(document).on 'feedbin:native:didBecomeActive', (event, value) ->
+        feedbin.refresh()
+
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
         href = $(@).parents("a:first").attr('href')
