@@ -390,6 +390,8 @@ $.extend feedbin,
       next = $('<div class="previous-entry load-next-entry"></div>')
       transitionClass = "slide-down"
 
+    $('.entry-toolbar').addClass("animate")
+
     next.html(content)
 
     next.insertAfter(innerContent)
@@ -400,6 +402,7 @@ $.extend feedbin,
     ), 1
 
     setTimeout ( ->
+      $('.entry-toolbar').removeClass("animate")
       next.removeClass("next-entry")
       next.removeClass("previous-entry")
       next.attr("data-behavior", "inner_content_target")
