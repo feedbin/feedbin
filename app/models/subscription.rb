@@ -13,8 +13,8 @@ class Subscription < ApplicationRecord
   after_commit :remove_feed_from_action, on: [:destroy]
   after_commit :cache_entry_ids, on: [:create, :destroy]
 
-  before_destroy :untag
   before_destroy :prevent_generated_destroy
+  before_destroy :untag
 
   after_create :refresh_favicon
 
@@ -75,6 +75,7 @@ class Subscription < ApplicationRecord
 
   def prevent_generated_destroy
     if generated?
+      touch
       throw(:abort)
     else
       true
