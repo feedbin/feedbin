@@ -79,6 +79,10 @@ module Api
         if @subscription.present?
           @subscription.destroy
           @subscription.feed.tag("", @user)
+
+          # touch generated subscriptions that cannot be destroyed
+          # this will help them get reloaded in clients
+          @subscription.touch unless @subscription.destroyed?
           head :no_content
         else
           status_forbidden
