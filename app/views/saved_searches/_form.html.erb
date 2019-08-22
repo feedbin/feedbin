@@ -23,7 +23,7 @@
         <% content_for :modal_footer do %>
             <% if saved_search.persisted? %>
                 <%= link_to saved_search_path(saved_search), method: :delete, remote: true, class: "button-text delete-button", data: { confirm: "Are you sure you want to delete this saved search?" } do %>
-                    <%= svg_tag "icon-delete", size: "13x18" %> Delete
+                    <%= svg_tag "icon-delete", size: "13x16" %> Delete
                 <% end %>
             <% end %>
 

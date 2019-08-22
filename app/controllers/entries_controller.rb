@@ -238,6 +238,14 @@ class EntriesController < ApplicationController
     end
   end
 
+  def destroy
+    @user = current_user
+    @entry = @user.entries.find(params[:id])
+    if @entry.feed.pages?
+
+    end
+  end
+
   private
 
   def entries_by_id(entry_ids)

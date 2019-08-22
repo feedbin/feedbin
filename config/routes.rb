@@ -129,7 +129,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :entries, only: [:show, :index] do
+  resources :entries, only: [:show, :index, :destroy] do
     member do
       post :content
       post :unread_entries, to: "unread_entries#update"
