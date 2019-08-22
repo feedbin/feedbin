@@ -242,7 +242,7 @@ class EntriesController < ApplicationController
     @user = current_user
     @entry = @user.entries.find(params[:id])
     if @entry.feed.pages?
-
+      EntryDeleter.new.delete_entries(@entry.feed_id, @entry.id)
     end
   end
 
