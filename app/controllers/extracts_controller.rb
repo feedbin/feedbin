@@ -29,8 +29,9 @@ class ExtractsController < ApplicationController
     @user = current_user
     @url = params[:url]
     @content_info = MercuryParser.parse(params[:url])
+
     begin
-      @content = ContentFormatter.format!(@content_info.content, nil)
+      @content = ContentFormatter.format!(@content_info.content, nil, true, params[:url])
     rescue
       @content = nil
     end
