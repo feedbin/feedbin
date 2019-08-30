@@ -8,6 +8,7 @@ class Bookmarklet
     xhr.open 'POST', @url()
     xhr.setRequestHeader 'Content-Type', 'application/json'
     xhr.onload = =>
+      @originalTitle()
       @currentScript().parentNode.removeChild(@currentScript())
     xhr.send @data()
 
@@ -22,6 +23,11 @@ class Bookmarklet
 
   pageToken: ->
     @currentScript().getAttribute('data-feedbin-token')
+
+  originalTitle: ->
+    title = @currentScript().getAttribute('data-original-title')
+    if title != null
+      document.title = title
 
   currentScript: ->
     document.querySelector('script[data-feedbin-token]')

@@ -33,10 +33,17 @@ module SettingsHelper
     (function() {
         var script = document.createElement("script");
         var body = document.querySelector("body");
+        var title = document.title;
+        document.title = "Sending to Feedbin: " + title;
         script.type = "text/javascript";
         script.async = true;
         script.src = "#{bookmarklet_url(cache_buster: 'replace_me')}".replace("replace_me", Date.now());
         script.setAttribute("data-feedbin-token", "#{@user.page_token}");
+        script.setAttribute("data-original-title", title);
+        script.onerror = function() {
+           window.location = "#{pages_url}?url=" + encodeURIComponent(window.location.href) + "&title=" + encodeURIComponent(title) + "&page_token=#{@user.page_token}";
+           document.title = title;
+        };
         body.appendChild(script);
     })();
     EOD

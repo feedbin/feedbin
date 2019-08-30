@@ -49,7 +49,7 @@ class SettingsController < ApplicationController
       "#{card.brand} ××#{card.last4[-2..-1]}"
     }
   rescue
-    @message = "Error loading payment info"
+    @message = "No payment info"
   end
 
   def import_export
