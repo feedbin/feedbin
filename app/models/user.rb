@@ -154,6 +154,10 @@ class User < ApplicationRecord
     OnboardingMessage.perform_at(Feedbin::Application.config.trial_days.days.from_now + 1.days, id, MarketingMailer.method(:onboarding_5_expired).name.to_s)
   end
 
+  def disable_image_proxy
+    "1"
+  end
+
   def setting_on?(setting_symbol)
     send(setting_symbol) == "1"
   end
