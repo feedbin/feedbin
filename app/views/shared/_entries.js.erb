@@ -1,60 +1,76 @@
-<% if @entries.length == 0 %>
-    var entries = '<%= j render partial: "entries/no_entry" %>';
-<% else %>
-    var entries = '<%= j render partial: "entries/entry", collection: @entries %>';
-<% end %>
-var header = '<%= j render partial: "entries/entries_header", locals: {feed: @feed || nil} %>';
-if ("<%= @all_unread %>" === 'true') {
-    var unreadEntries = <%=  @entries.map {|entry| {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}}.to_json.html_safe %>;
-    $.each(unreadEntries, function(index, unreadEntry) {
-        if (feedbin.Counts.get().isRead(unreadEntry.id)) {
-            feedbin.Counts.get().addEntry(unreadEntry.id, unreadEntry.feed_id, 'unread')
-        }
-    });
-    feedbin.applyCounts(true);
-}
-<% if @append %>
-    feedbin.appendEntries(entries, header);
-<% else %>
-    feedbin.updateEntries(entries, header);
-    $('.entries').prop('scrollTop', 0);
-<% end %>
-feedbin.localizeTime();
-feedbin.applyUserTitles();
-feedbin.loadEntryImages();
-<% if @page_query %>
-    feedbin.updatePager('<%= j will_paginate(@page_query) %>');
-<% else %>
-    feedbin.updatePager('');
-<% end %>
-feedbin.data.viewMode = "<%= j view_mode %>";
-var entryIds = <%= @entries.map{ |entry| entry.id }.to_json.html_safe %>;
-<% if @force_preload %>
-    feedbin.preloadEntries(entryIds, true);
-<% else %>
-    feedbin.preloadEntries(entryIds, false);
-<% end %>
-<% @user.recently_played_entries.where(entry_id: @entries.map(&:id)).select(:duration, :progress, :entry_id).each do |record| %>
-    feedbin.data.progress[<%= record.entry_id %>] = {progress: <%= record.progress %>, duration: <%= record.duration %>}
-<% end %>
-$(document).trigger('feedbin:entriesLoaded');
-<% if @saved_search && @saved_search.persisted? %>
-    $('#query').val('<%= j @saved_search.query.try(:html_safe) %>');
-<% end %>
-<% if @search %>
-    feedbin.showSearchControls("<%= params[:sort] %>");
-    $('.search-control').removeClass('edit');
-    feedbin.markReadData = {
-        type: "search",
-        data: "<%= @escaped_query %>",
-        message: "Mark <%= number_with_delimiter(@total_results) %> <%= 'article'.pluralize(@total_results) %> that <%= 'match'.pluralize(@total_results == 1 ? 2 : 1) %> the search “<%= @escaped_query %>” as read?"
+var update = function() {
+    $(".entries").removeClass("loading");
+
+    <% if @entries.length == 0 %>
+        var entries = '<%= j render partial: "entries/no_entry" %>';
+    <% else %>
+        var entries = '<%= j render partial: "entries/entry", collection: @entries %>';
+    <% end %>
+    var header = '<%= j render partial: "entries/entries_header", locals: {feed: @feed || nil} %>';
+    if ("<%= @all_unread %>" === 'true') {
+        var unreadEntries = <%=  @entries.map {|entry| {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}}.to_json.html_safe %>;
+        $.each(unreadEntries, function(index, unreadEntry) {
+            if (feedbin.Counts.get().isRead(unreadEntry.id)) {
+                feedbin.Counts.get().addEntry(unreadEntry.id, unreadEntry.feed_id, 'unread')
+            }
+        });
+        feedbin.applyCounts(true);
     }
-    $('.saved-search-wrap').removeClass('show');
-    $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected');
-    $('[data-behavior~=save_search_link]').removeAttr('disabled');
-    $('[data-behavior~=new_saved_search]').attr('href', '<%= new_saved_search_path(query: params[:query]) %>');
-<% else %>
-    feedbin.hideSearch()
-<% end %>
-feedbin.markReadData.date = "<%= j last_unread_date %>";
-feedbin.faviconColors($(".entries-column"))
+    <% if @append %>
+        feedbin.appendEntries(entries, header);
+    <% else %>
+        feedbin.updateEntries(entries, header);
+        $('.entries').prop('scrollTop', 0);
+    <% end %>
+    feedbin.localizeTime();
+    feedbin.applyUserTitles();
+    feedbin.loadEntryImages();
+    <% if @page_query %>
+        feedbin.updatePager('<%= j will_paginate(@page_query) %>');
+    <% else %>
+        feedbin.updatePager('');
+    <% end %>
+    feedbin.data.viewMode = "<%= j view_mode %>";
+    var entryIds = <%= @entries.map{ |entry| entry.id }.to_json.html_safe %>;
+    <% if @force_preload %>
+        feedbin.preloadEntries(entryIds, true);
+    <% else %>
+        feedbin.preloadEntries(entryIds, false);
+    <% end %>
+    <% @user.recently_played_entries.where(entry_id: @entries.map(&:id)).select(:duration, :progress, :entry_id).each do |record| %>
+        feedbin.data.progress[<%= record.entry_id %>] = {progress: <%= record.progress %>, duration: <%= record.duration %>}
+    <% end %>
+    $(document).trigger('feedbin:entriesLoaded');
+    <% if @saved_search && @saved_search.persisted? %>
+        $('#query').val('<%= j @saved_search.query.try(:html_safe) %>');
+    <% end %>
+    <% if @search %>
+        feedbin.showSearchControls("<%= params[:sort] %>");
+        $('.search-control').removeClass('edit');
+        feedbin.markReadData = {
+            type: "search",
+            data: "<%= @escaped_query %>",
+            message: "Mark <%= number_with_delimiter(@total_results) %> <%= 'article'.pluralize(@total_results) %> that <%= 'match'.pluralize(@total_results == 1 ? 2 : 1) %> the search “<%= @escaped_query %>” as read?"
+        }
+        $('.saved-search-wrap').removeClass('show');
+        $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected');
+        $('[data-behavior~=save_search_link]').removeAttr('disabled');
+        $('[data-behavior~=new_saved_search]').attr('href', '<%= new_saved_search_path(query: params[:query]) %>');
+    <% else %>
+        feedbin.hideSearch()
+    <% end %>
+    feedbin.markReadData.date = "<%= j last_unread_date %>";
+    feedbin.faviconColors($(".entries-column"))
+}
+
+if (feedbin.panelScrollComplete) {
+    update();
+} else {
+    var interval = setInterval(checkForCompletion, 10);
+    function checkForCompletion() {
+        if (feedbin.panelScrollComplete) {
+            clearInterval(interval);
+            update();
+        }
+    }
+}
