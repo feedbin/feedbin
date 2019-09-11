@@ -4,38 +4,33 @@ class Bookmarklet
   createPath: '<%= Rails.application.routes.url_helpers.pages_path %>'
 
   save: ->
-    form = @buildForm()
-    document.body.appendChild(form)
-    form.submit()
-    form.parentNode.removeChild(form);
+    xhr = new XMLHttpRequest
+    xhr.open 'POST', @url()
+    xhr.setRequestHeader 'Content-Type', 'application/json'
+    xhr.onload = =>
+      @originalTitle()
+      @currentScript().parentNode.removeChild(@currentScript())
+    xhr.send @data()
 
-  buildForm: ->
-    form = document.createElement("form");
-    form.setAttribute("method", "post")
-    form.setAttribute("action", @createURL())
-    for field in @fields()
-      form.appendChild(field)
-    form
-
-  createURL: ->
-    "#{@url(@createPath)}"
-
-  fields: ->
-    [
-      @createField('page_token', _rlvalue),
-      @createField('title', document.title),
-      @createField('url', window.location.href),
-    ]
-
-  createField: (name, value) ->
-    field = document.createElement("input")
-    field.setAttribute("type", "hidden")
-    field.setAttribute("name", name)
-    field.setAttribute("value", value)
-    field
+  data: ->
+    JSON.stringify
+      page_token: @pageToken()
+      url: window.location.href
+      title: document.title
 
   url: (path) ->
-    @baseURL + path
+    @baseURL + @createPath
+
+  pageToken: ->
+    @currentScript().getAttribute('data-feedbin-token')
+
+  originalTitle: ->
+    title = @currentScript().getAttribute('data-original-title')
+    if title != null
+      document.title = title
+
+  currentScript: ->
+    document.querySelector('script[data-feedbin-token]')
 
 bookmarklet = new Bookmarklet
 bookmarklet.save()

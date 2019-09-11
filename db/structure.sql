@@ -258,7 +258,8 @@ CREATE TABLE public.entries (
     processed_image_url text,
     image json,
     recently_played_entries_count integer DEFAULT 0,
-    thread_id bigint
+    thread_id bigint,
+    settings jsonb
 );
 
 
@@ -2135,6 +2136,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190516024925'),
 ('20190516210058'),
 ('20190710112843'),
-('20190715152451');
+('20190715152451'),
+('20190820134157');
 
 

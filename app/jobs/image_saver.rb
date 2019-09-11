@@ -1,17 +1,17 @@
 class ImageSaver
   include Sidekiq::Worker
 
-  attr_reader :entry, :base_url
+  attr_reader :entry
 
-  def perform(entry_id, base_url)
+  def perform(entry_id)
     @entry = Entry.find(entry_id)
-    @base_url = base_url
     Nokogiri::HTML5(content).css("img").each do |image|
       file = Download.new(image["src"])
       unless already_uploaded? file
         upload file
       end
     end
+    @entry.update(archived_images: true)
   rescue ActiveRecord::RecordNotFound
   end
 
@@ -24,10 +24,8 @@ class ImageSaver
   }
 
   def content
-    ContentFormatter.absolute_source(entry.content, entry, base_url)
+    ContentFormatter.absolute_source(entry.content, entry, entry.url)
   end
-
-  private
 
   def already_uploaded?(file)
     S3_POOL.with do |connection|
@@ -39,14 +37,8 @@ class ImageSaver
 
   def upload(file)
     path = file.download
-
-    response = S3_POOL.with { |connection|
+    S3_POOL.with do |connection|
       connection.put_object(ENV["AWS_S3_BUCKET_ARCHIVE"], file.path, File.open(path), STORAGE_OPTIONS.dup.merge("Content-Type" => file.content_type))
-    }
-
-    URI::HTTPS.build(
-      host: response.data[:host],
-      path: response.data[:path],
-    ).to_s
+    end
   end
 end

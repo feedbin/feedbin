@@ -63,6 +63,11 @@ class ContentFormatter
     pipeline = HTML::Pipeline.new filters, context
 
     result = pipeline.call(content)
+
+    if entry && entry.archived_images?
+      result[:output] = ImageFallback.new(result[:output]).add_fallbacks
+    end
+
     result[:output].to_s
   end
 

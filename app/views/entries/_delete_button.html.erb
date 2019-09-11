@@ -1,0 +1,7 @@
+<% if entry.feed.pages? %>
+    <%= form_tag entry_path(entry), method: :delete, remote: true, data: {behavior: 'delete_entry', entry_id: entry.id, confirm: "Are you sure you want to delete this page?"}, class: 'entry-button-wrap' do %>
+        <button class="entry-button " title="Delete page">
+            <%= svg_tag "icon-delete", size: "13x16" %>
+        </button>
+    <% end %>
+<% end %>

@@ -1,3 +1,5 @@
+require "net/http/persistent"
+
 defaults = {
   log: Rails.env.development?,
   transport_options: {

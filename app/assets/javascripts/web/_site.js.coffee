@@ -16,6 +16,7 @@ $.extend feedbin,
   swipe: false
   messageTimeout: null
   panel: 1
+  panelScrollComplete: true
   colorHash: new ColorHash
     lightness: [.3,.4,.5,.6,.7]
     saturation: [.7,.8]
@@ -299,15 +300,20 @@ $.extend feedbin,
       containerClass = ".sidebar-column"
     offset = $(selector)[0].offsetLeft
 
-    if !animate
-      $(containerClass).css {'scroll-behavior': 'auto'}
-      $(containerClass).prop 'scrollLeft', offset
-      $(containerClass).css {'scroll-behavior': 'smooth'}
-    else
+    if animate
+      timeout = 200
+      feedbin.panelScrollComplete = false
       if feedbin.smoothScroll
         $(containerClass).prop 'scrollLeft', offset
       else
-        $(containerClass).animate({scrollLeft: offset}, {duration: 250})
+        $(containerClass).animate({scrollLeft: offset}, {duration: timeout})
+      setTimeout ( ->
+        feedbin.panelScrollComplete = true
+      ), timeout
+    else
+      $(containerClass).css {'scroll-behavior': 'auto'}
+      $(containerClass).prop 'scrollLeft', offset
+      $(containerClass).css {'scroll-behavior': 'smooth'}
 
   showPanel: (panel, state = true) ->
     feedbin.panel = panel
@@ -315,21 +321,21 @@ $.extend feedbin,
       if feedbin.mobileView()
         window.history.replaceState({panel: 1}, document.title, "/");
       $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
-      if feedbin.swipe
+      if feedbin.swipe && $('body').hasClass('has-offscreen-panels')
         feedbin.scrollToPanel('.feeds-column')
 
     else if panel == 2
       if state && feedbin.mobileView()
         window.history.pushState({panel: 2}, document.title, "/");
       $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
-      if feedbin.swipe
+      if feedbin.swipe && $('body').hasClass('has-offscreen-panels')
         feedbin.scrollToPanel('.entries-column')
 
     else if panel == 3
       if state && feedbin.mobileView()
         window.history.pushState({panel: 3}, document.title, "/");
       $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
-      if feedbin.swipe
+      if feedbin.swipe && $('body').hasClass('has-offscreen-panels')
         feedbin.scrollToPanel('.entry-column')
 
 
@@ -390,6 +396,8 @@ $.extend feedbin,
       next = $('<div class="previous-entry load-next-entry"></div>')
       transitionClass = "slide-down"
 
+    $('.entry-toolbar').addClass("animate")
+
     next.html(content)
 
     next.insertAfter(innerContent)
@@ -400,6 +408,7 @@ $.extend feedbin,
     ), 1
 
     setTimeout ( ->
+      $('.entry-toolbar').removeClass("animate")
       next.removeClass("next-entry")
       next.removeClass("previous-entry")
       next.attr("data-behavior", "inner_content_target")
@@ -1524,10 +1533,6 @@ $.extend feedbin,
         $("[data-behavior~=entries_header] .feed-title-wrap").text(title)
         true
 
-      $(document).on 'ajax:complete', '[data-behavior~=feed_link]', (event, xhr) ->
-        $(".entries").removeClass("loading")
-        true
-
     feedSelected: ->
       $(document).on 'click', '[data-behavior~=show_feeds]', ->
         feedbin.showPanel(1)
@@ -2279,6 +2284,10 @@ $.extend feedbin,
     statsBarTouched: ->
       $(document).on 'feedbin:native:statusbartouched', (event, xCoordinate) ->
         feedbin.scrollToTop(xCoordinate)
+
+    didBecomeActive: ->
+      $(document).on 'feedbin:native:didBecomeActive', (event, value) ->
+        feedbin.refresh()
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->

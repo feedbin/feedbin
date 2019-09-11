@@ -20,7 +20,7 @@
 
             <% content_for :modal_footer do %>
                 <%= link_to subscription_path(subscription), method: :delete, remote: true, class: "button-text delete-button", data: { confirm: "Are you sure you want to unsubscribe?" } do %>
-                    <%= svg_tag "icon-delete", size: "13x18" %> Unsubscribe
+                    <%= svg_tag "icon-delete", size: "13x16" %> Unsubscribe
                 <% end %>
 
                 <button type="button" class="button button-secondary" data-dismiss="modal" aria-label="Cancel">Cancel</button>

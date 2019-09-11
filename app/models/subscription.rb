@@ -5,7 +5,6 @@ class Subscription < ApplicationRecord
   belongs_to :feed, counter_cache: true
 
   after_commit :mark_as_unread, on: [:create]
-  before_destroy :mark_as_read
 
   before_create :expire_stat_cache
 
@@ -13,9 +12,17 @@ class Subscription < ApplicationRecord
   after_commit :remove_feed_from_action, on: [:destroy]
   after_commit :cache_entry_ids, on: [:create, :destroy]
 
+  before_destroy :prevent_generated_destroy
+  before_destroy :mark_as_read
   before_destroy :untag
 
   after_create :refresh_favicon
+
+  validate :reject_title_chages, on: :update, if: :generated?
+
+  def reject_title_chages
+   errors[:title] << "can not be changed" if self.title_changed?
+  end
 
   enum kind: {default: 0, generated: 1}
 
@@ -64,6 +71,14 @@ class Subscription < ApplicationRecord
 
   def untag
     feed.tag("", user)
+  end
+
+  def prevent_generated_destroy
+    if generated?
+      throw(:abort)
+    else
+      true
+    end
   end
 
   def muted_status

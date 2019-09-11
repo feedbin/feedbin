@@ -49,7 +49,7 @@ class SettingsController < ApplicationController
       "#{card.brand} ××#{card.last4[-2..-1]}"
     }
   rescue
-    @message = "Error loading payment info"
+    @message = "No payment info"
   end
 
   def import_export
@@ -272,7 +272,8 @@ class SettingsController < ApplicationController
     @user.update_attributes(view_mode: @view_mode)
   end
 
-  def save
+  def newsletters_pages
+    @user = current_user
   end
 
 end

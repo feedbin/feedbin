@@ -108,6 +108,7 @@ $color-contrast-600: (
     dusk:     $theme-color-dusk-600,
     midnight: $theme-color-midnight-600,
 );
+$color-icons: map-merge($color-contrast-600, (debug: color-icons, midnight: white));
 
 $color-contrast-700: (
     debug:    color-contrast-700,
@@ -152,11 +153,12 @@ $color-selected-active: (
 
 $color-selected-off: (
     debug:    color-selected-off,
-    day:      #223D4F,
-    sunset:   #5B5A57,
-    dusk:     #5D6B80,
-    midnight: #223D4F,
+    day:      $theme-color-500,
+    sunset:   $theme-color-sunset-500,
+    dusk:     $theme-color-dusk-200,
+    midnight: $theme-color-midnight-200,
 );
+
 
 $image-spinners: (
     debug:    image-spinners,
@@ -168,7 +170,6 @@ $image-spinners: (
 
 $color-arrow-shadow: $color-borders;
 $selected: #0867E2;
-$color-icons: $color-contrast-600;
 $inset-bg-color: #f4f6f8;
 $box-shadow-dropdown: 0px 4px 6px 0 rgba(0, 0, 0, 0.1);
 $focus-glow: 0px 0px 10px 0 rgba($theme-color-500, 0.6);
@@ -930,7 +931,7 @@ Structure
 .search-control {
     @include background-color($color-contrast-100);
     @include border-bottom($color-borders);
-    @include font-size(11);
+    @include font-size(12);
     line-height: 14px;
     height: $toolbar-height;
     position: absolute;
@@ -1253,7 +1254,7 @@ $hamburger-dot: 4px;
     .icon-subscribe {
         $size: 38px;
         @include color(#FFF);
-        @include background-color($color-selected);
+        @include background-color($color-icons);
         user-select: none;
         line-height: 1;
         cursor: pointer;
@@ -1265,7 +1266,7 @@ $hamburger-dot: 4px;
         height: $size;
         border-radius: $size;
         svg {
-            fill: #FFF !important;
+            @include fill($color-base);
         }
     }
 }
@@ -1446,8 +1447,7 @@ $hamburger-dot: 4px;
     .view-mode {
         margin: 0;
         padding: 0;
-        transition: opacity 0.2s ease;
-        opacity: 0;
+        display: none;
         select {
             margin: 0;
             transform: scale(1);
@@ -1476,7 +1476,7 @@ $hamburger-dot: 4px;
 .feed-scrolled-alt.has-offscreen-panels .top-toolbar {
     @include border-bottom($color-borders-alt, $root: true);
     .view-mode {
-        opacity: 1;
+        display: flex;
     }
 }
 
@@ -1533,6 +1533,18 @@ $hamburger-dot: 4px;
             .feed-link, &.source-section {
                 @include font-size(14);
                 @include color($color-contrast-700);
+                @include size-in-rems(padding, 6 16)
+            }
+            .feed-link {
+                @include size-in-rems(padding, 6 16 6 40)
+            }
+            &.collection-unread .feed-link,
+            &.collection-all .feed-link,
+            &.collection-starred .feed-link,
+            &.collection-recently-played .feed-link,
+            &.collection-updated .feed-link,
+            &.collection-recently-read .feed-link,
+            &.collection-pages .feed-link {
                 @include size-in-rems(padding, 6 16)
             }
             &.source-section {
@@ -2500,6 +2512,11 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     height: $toolbar-height;
     @include background-color($color-base);
     @include border-bottom($color-borders);
+    transition: transform .2s ease;
+    transform: translate3d(0, 0, 0);
+    &.animate {
+        transform: translate3d(0, 0, 0);
+    }
     .one-up & {
         @include border-bottom($color-borders-alt, $root: true);
     }
@@ -3269,6 +3286,9 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                     .favicon-unread {
                         display: none;
                     }
+                    .share-keyboard {
+                        color: #FFF;
+                    }
                 }
                 &.no-border {
                     border: none;
@@ -3372,7 +3392,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         align-items: baseline;
     }
     .share-keyboard {
-        @include font-size(11);
+        @include font-size(16);
         margin-left: auto;
         font-style: normal;
         margin-top: 2px;
@@ -5178,15 +5198,20 @@ body.settings {
                 position: relative;
                 .graph {
                     display: flex;
+                    justify-content: space-around;
                     align-items: flex-end;
                     position: absolute;
                     top: 0;
                     left: 1px;
                     bottom: 1px;
                     right: 0;
-                    canvas {
-                        width: 100%;
-                        height: 100%;
+                    flex-wrap: nowrap;
+                    div {
+                        border-left: 1px solid white;
+                        content: "";
+                        flex: 1;
+                        background-color: $color-accent-blue-600;
+                        min-height: 1px;
                     }
                 }
             }

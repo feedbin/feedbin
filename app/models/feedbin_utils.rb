@@ -35,7 +35,7 @@ class FeedbinUtils
   end
 
   def self.payment_details_key(user_id)
-    "payment_details:%s:v4" % user_id
+    "payment_details:%s:v5" % user_id
   end
 
   def self.escape_search(query)

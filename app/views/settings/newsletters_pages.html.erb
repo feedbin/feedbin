@@ -1,0 +1,39 @@
+<%= form_for @user, remote: true, url: settings_update_user_path(@user) do |f| %>
+<div class="settings-content-inner">
+    <div class="settings-outer">
+        <h2>Newsletters & Pages</h2>
+    </div>
+    <div class="inset">
+        <div class="inset-content">
+            <h4 class="group-header">Newsletters</h4>
+        </div>
+        <ul class="pill-list">
+            <li><%= mail_to @user.newsletter_address %></li>
+        </ul>
+        <p class="control-group-description">
+            Use this address to <a href="https://feedbin.com/blog/2016/02/03/subscribe-to-email-newsletters-in-feedbin/">receive emails</a> in Feedbin.
+        </p>
+        <ul class="pill-list">
+            <li>
+                Default Tag
+                <%= f.select :newsletter_tag, tag_options, {}, {class: "select", data: {behavior: "auto_submit"}} %>
+            </li>
+        </ul>
+        <p class="control-group-description no-margin">
+            Automatically put incoming newsletters in this tag.
+        </p>
+    </div>
+
+    <div class="inset">
+        <div class="inset-content">
+            <h4 class="group-header">Pages</h4>
+        </div>
+        <ul class="pill-list">
+            <li>Bookmarklet: <%= bookmarklet %></li>
+        </ul>
+        <p class="control-group-description">
+            Drag this to your bookmarks bar. Use it to <a href="https://feedbin.com/blog/2019/08/20/save-webpages-to-read-later/">save articles from the web</a> to Feedbin.
+        </p>
+    </div>
+</div>
+<% end %>

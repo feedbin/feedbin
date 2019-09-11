@@ -8,6 +8,7 @@ present entry do |entry_presenter|
   json.content_diff entry_presenter.content_diff if params[:include_content_diff] == "true"
   json.twitter_id entry.twitter_id
   json.twitter_thread_ids entry.twitter_thread_ids
+  json.extracted_content_url entry.extracted_content_url
   json.images do
     if entry.processed_image?
       json.original_url entry.image["original_url"]

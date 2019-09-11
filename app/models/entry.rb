@@ -1,7 +1,9 @@
 class Entry < ApplicationRecord
   include Searchable
 
-  attr_accessor :fully_qualified_url, :read, :starred, :skip_mark_as_unread
+  attr_accessor :fully_qualified_url, :read, :starred, :skip_mark_as_unread, :skip_recent_post_check
+
+  store :settings, accessors: [:archived_images], coder: JSON
 
   belongs_to :feed
   has_many :unread_entries, dependent: :delete_all
@@ -26,6 +28,10 @@ class Entry < ApplicationRecord
   validates :feed, :public_id, presence: true
 
   self.per_page = 100
+
+  def archived_images?
+    !!archived_images
+  end
 
   def tweet?
     tweet.present?
@@ -354,7 +360,7 @@ class Entry < ApplicationRecord
   end
 
   def mark_as_unread
-    if skip_mark_as_unread.blank? && published > 1.month.ago
+    if skip_mark_as_unread.blank? && recent_post
       filters = {}.tap do |hash|
         hash[:feed_id] = feed_id
         hash[:active] = true
@@ -372,6 +378,10 @@ class Entry < ApplicationRecord
       UnreadEntry.import(unread_entries, validate: false)
     end
     SearchIndexStore.perform_async(self.class.name, id)
+  end
+
+  def recent_post
+    skip_recent_post_check || published > 1.month.ago
   end
 
   def add_to_created_at_set
