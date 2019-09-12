@@ -4,7 +4,8 @@ namespace :deploy do
     on roles :app do
       invoke "deploy:quiet"
       sleep(10)
-      execute :sudo, :service, "feedbin.target", :stop
+      execute :sudo, :systemctl, :stop, "feedbin.target"
+      execute "/etc/init.d/unicorn", :stop
     end
   end
 end

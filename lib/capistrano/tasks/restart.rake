@@ -2,11 +2,11 @@ namespace :deploy do
   desc "Restart services"
   task :restart do
     on roles :app do
-      execute :service, :unicorn, :upgrade
+      execute "/etc/init.d/unicorn", :upgrade
       begin
-        execute :sudo, :service, "feedbin.target", :restart
+        execute :sudo, :systemctl, :restart, "feedbin.target"
       rescue SSHKit::Command::Failed
-        execute :sudo, :service, "feedbin.target", :start
+        execute :sudo, :systemctl, :start, "feedbin.target"
       end
     end
   end
