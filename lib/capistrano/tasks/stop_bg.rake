@@ -3,15 +3,8 @@ namespace :deploy do
   task :stop_bg do
     on roles :app do
       invoke "deploy:quiet"
-
       sleep(10)
-
-      processes = [:clock, :workers, :workers_slow, :workers_low]
-
-      processes.each do |process|
-        execute :sudo, :stop, process
-      rescue SSHKit::Command::Failed
-      end
+      execute :sudo, :service, "feedbin.target", :stop
     end
   end
 end
