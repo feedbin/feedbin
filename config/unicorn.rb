@@ -32,5 +32,5 @@ after_fork do |server, worker|
 end
 
 before_exec do |server|
-  # Dotenv.load
+  Dotenv.load
 end
