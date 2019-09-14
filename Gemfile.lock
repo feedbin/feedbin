@@ -109,7 +109,7 @@ GEM
     aggregate (0.2.2)
     airbrussh (1.3.3)
       sshkit (>= 1.6.1, != 1.7.0)
-    apnotic (1.5.0)
+    apnotic (1.6.0)
       connection_pool (~> 2)
       net-http2 (>= 0.18, < 2)
     arel (8.0.0)
