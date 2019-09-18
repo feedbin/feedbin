@@ -117,4 +117,14 @@ module ApplicationHelper
     pipeline = HTML::Pipeline::CamoFilter.new(nil, options, nil)
     pipeline.asset_proxy_url(url.to_s)
   end
+
+  def business_address(format = nil)
+    address = ENV["BUSINESS_ADDRESS"] || ""
+    address = address.split("\n")
+    if format == :text
+      address.join("\n")
+    else
+      address.join("<br>").html_safe
+    end
+  end
 end

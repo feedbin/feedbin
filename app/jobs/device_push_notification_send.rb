@@ -107,12 +107,12 @@ class DevicePushNotificationSend
         notification.custom_payload[:image_url] = url
       end
       notification.category = "singleArticle"
-      notification.content_available = true
+      notification.content_available = 1
       notification.sound = "default"
-      notification.priority = "10"
+      notification.priority = 10
       notification.topic = ENV["APPLE_PUSH_TOPIC"]
       notification.apns_id = SecureRandom.uuid
-      notification.mutable_content = "1"
+      notification.mutable_content = 1
     end
 
     notification_size = notification.body.bytesize

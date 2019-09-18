@@ -74,7 +74,7 @@ class Settings::SubscriptionsController < ApplicationController
     ids = @user.subscriptions.pluck(:feed_id)
     key = Digest::SHA1.hexdigest(ids.join)
 
-    subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}:5", expires_in: 24.hours) {
+    subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}:6", expires_in: 24.hours) {
       tags = @user.tags_on_feed
       subscriptions = @user.subscriptions.default.select("subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host").joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}").includes(feed: [:favicon])
       feed_ids = subscriptions.map(&:feed_id)
@@ -116,9 +116,6 @@ class Settings::SubscriptionsController < ApplicationController
       subscriptions = subscriptions.select { |subscription|
         subscription.sort_data[:name].include?(params[:q].downcase)
       }
-      if params[:sort].blank?
-        subscriptions = subscriptions.sort_by { |subscription| subscription.sort_data[:score] }.reverse
-      end
     end
 
     subscriptions
