@@ -1,2 +1,7 @@
 $('[data-behavior~=entries_target] [data-entry-id=<%= @entry.id %>]').remove();
+
+feedbin.Counts.get().removeEntry(<%= @entry.id %>, <%= @entry.feed_id %>, 'unread')
+feedbin.Counts.get().removeEntry(<%= @entry.id %>, <%= @entry.feed_id %>, 'starred')
+feedbin.applyCounts(true)
+
 feedbin.clearEntry();

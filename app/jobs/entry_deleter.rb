@@ -41,6 +41,7 @@ class EntryDeleter
       UnreadEntry.where(entry_id: entry_ids).delete_all
       UpdatedEntry.where(entry_id: entry_ids).delete_all
       RecentlyReadEntry.where(entry_id: entry_ids).delete_all
+      StarredEntry.where(entry_id: entry_ids).delete_all
       Entry.where(id: entry_ids).delete_all
 
       key_created_at = FeedbinUtils.redis_created_at_key(feed_id)
