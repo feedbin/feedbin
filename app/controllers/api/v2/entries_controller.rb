@@ -91,6 +91,7 @@ module Api
 
         entry_ids = get_cached_entry_ids(cache_key, FeedbinUtils::FEED_ENTRIES_CREATED_AT_KEY, since, params[:read], params[:starred])
         pagination = build_pagination(entry_ids)
+        entry_count(pagination[:will_paginate])
 
         if entry_ids.blank?
           @entries = []
