@@ -65,19 +65,27 @@
             <ul class="control-group">
                 <li>
                     <%= f.radio_button(:theme, "day", {checked: @user.theme.nil? || @user.theme == 'day', data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
-                    <%= f.label(:theme_day, "Day") %>
+                    <%= f.label :theme_day do %>
+                        Day <span class="color-preview color-preview-day"></span>
+                    <% end %>
                 </li>
                 <li>
                     <%= f.radio_button(:theme, "sunset", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
-                    <%= f.label(:theme_sunset, "Sunset") %>
+                    <%= f.label(:theme_sunset) do %>
+                        Sunset <span class="color-preview color-preview-sunset"></span>
+                    <% end %>
                 </li>
                 <li>
                     <%= f.radio_button(:theme, "dusk", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
-                    <%= f.label(:theme_dusk, "Dusk") %>
+                    <%= f.label(:theme_dusk) do %>
+                        Dusk <span class="color-preview color-preview-dusk"></span>
+                    <% end %>
                 </li>
                 <li>
                     <%= f.radio_button(:theme, "midnight", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
-                    <%= f.label(:theme_midnight, "Midnight") %>
+                    <%= f.label(:theme_midnight) do %>
+                        Midnight <span class="color-preview color-preview-midnight"></span>
+                    <% end %>
                 </li>
             </ul>
             <div class="inset-content">

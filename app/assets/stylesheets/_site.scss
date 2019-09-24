@@ -4845,45 +4845,37 @@ body.settings {
     }
     input[name="user[theme]"] + label {
         padding-left: 50px;
-        &:before {
-            content: "";
-            display: block;
-            height: 16px;
-            width: 16px;
-            position: absolute;
-            left: 28px;
-            top: 15px;
-            @media (max-width: $small-breakpoint) {
-                left: 15px;
-            }
-        }
         @media (max-width: $small-breakpoint) {
             padding-left: 35px;
         }
     }
-    label[for="user_theme_day"] {
-        &:before {
-            background-color: map-get($color-base, day);
-            border: 1px solid map-get($color-borders, day);
+    .color-preview {
+        content: "";
+        display: block;
+        height: 16px;
+        width: 16px;
+        position: absolute;
+        left: 28px;
+        top: 15px;
+        @media (max-width: $small-breakpoint) {
+            left: 15px;
         }
     }
-    label[for="user_theme_sunset"] {
-        &:before {
-            background-color: map-get($color-base, sunset);
-            border: 1px solid map-get($color-borders, sunset);
-        }
+    .color-preview-day {
+        background-color: map-get($color-base, day);
+        border: 1px solid map-get($color-borders, day);
     }
-    label[for="user_theme_dusk"] {
-        &:before {
-            background-color: map-get($color-base, dusk);
-            border: 1px solid map-get($color-borders, dusk);
-        }
+    .color-preview-sunset {
+        background-color: map-get($color-base, sunset);
+        border: 1px solid map-get($color-borders, sunset);
     }
-    label[for="user_theme_midnight"] {
-        &:before {
-            background-color: map-get($color-base, midnight);
-            border: 1px solid map-get($color-borders, midnight);
-        }
+    .color-preview-dusk {
+        background-color: map-get($color-base, dusk);
+        border: 1px solid map-get($color-borders, dusk);
+    }
+    .color-preview-midnight {
+        background-color: map-get($color-base, midnight);
+        border: 1px solid map-get($color-borders, midnight);
     }
     .theme-day {
         .theme-button-day {
@@ -5532,7 +5524,7 @@ body.settings {
     }
 }
 input[type="checkbox"] + label .slider-checkbox {
-    width: 56px;
+    width: 55px;
     height: 26px;
     display: block;
     position: absolute;
@@ -5540,31 +5532,26 @@ input[type="checkbox"] + label .slider-checkbox {
     top: 10px;
     border-radius: 28px;
     background-color: #9e9e9e;
-    &:before {
-        background-color: #FFF;
-        height: 22px;
-        width: 22px;
-        border-radius: 22px;
-        background-color: $theme-color-200;
-        content: "";
-        top: 2px;
-        left: 2px;
-        position: absolute;
-        z-index: 2;
-        transition: left .2s ease, opacity .3s ease;
-        opacity: 1;
-    }
-    &:after {
-        z-index: 1;
+    $size: 20px;
+    &:before, &:after {
         position: absolute;
         display: block;
         content: "";
-        height: 22px;
-        width: 22px;
-        border-radius: 22px;
+        height: $size;
+        width: $size;
+        border-radius: $size;
         background-color: $theme-color-200;
-        left: 2px;
-        top: 2px;
+        top: 3px;
+        left: 3px;
+    }
+    &:before {
+        z-index: 2;
+        transition: left .2s ease, opacity .3s ease;
+        opacity: 1;
+        background-color: #FFF;
+    }
+    &:after {
+        z-index: 1;
         transition: left .2s ease;
     }
     @media (max-width: $small-breakpoint) {
@@ -5581,12 +5568,44 @@ input[type="checkbox"]:checked + label .slider-checkbox {
     @include background-color($color-accent-green-600);
     &:after {
         left: 32px;
-        background: #FFF image-url("icon-check.svg") 4px 5px no-repeat;
-        box-shadow: 0 4px 3px 0 rgba(0, 0, 0, 0.2);
+        background: #FFF image-url("icon-check.svg") 3px 5px no-repeat;
     }
     &:before {
         left: 32px;
         opacity: 0;
+    }
+}
+.control-group {
+    input[type="radio"] + label {
+        position: relative;
+        $size: 20px;
+        &:before, &:after {
+            position: absolute;
+            right: 33px;
+            top: 13px;
+            content: "";
+            height: $size;
+            width: $size;
+            border-radius: $size;
+            @media (max-width: $small-breakpoint) {
+                right: 18px;
+            }
+        }
+        &:before {
+            z-index: 2;
+            background-color: transparent;
+            border: 3px solid $theme-color-300;
+        }
+    }
+    input[type="radio"]:checked + label {
+        &:before {
+            border-color: $color-accent-green-600;
+        }
+        &:after {
+            z-index: 1;
+            border: 6px solid white;
+            background-color: $color-accent-green-600;
+        }
     }
 }
 .control-group-description {
@@ -5755,21 +5774,6 @@ input[type="checkbox"]:checked + label .slider-checkbox {
     }
     input[type="radio"], input[type="checkbox"] {
         @extend .visually-hidden;
-    }
-    input[type="radio"]:checked + label {
-        position: relative;
-        &:after {
-            position: absolute;
-            right: 37px;
-            top: 19px;
-            content: "";
-            background: image-url("icon-check.svg") 0 0 no-repeat;
-            height: 12px;
-            width: 15px;
-            @media (max-width: $small-breakpoint) {
-                right: 22px;
-            }
-        }
     }
     input[type="checkbox"] + label {
         padding-right: 85px !important;
