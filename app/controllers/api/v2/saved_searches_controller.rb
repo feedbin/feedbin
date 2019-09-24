@@ -23,6 +23,7 @@ module Api
         if saved_search.present?
           params[:query] = saved_search.query
           @entries = Entry.scoped_search(params, @user)
+          entry_count(@entries)
           if @entries.present?
             if out_of_bounds?
               render json: []

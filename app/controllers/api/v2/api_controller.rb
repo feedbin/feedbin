@@ -35,6 +35,17 @@ module Api
           links_header(page_query, path_helper, params[:feed_id])
           fresh_when(etag: @entries)
         end
+        entry_count(page_query)
+      end
+
+      def entry_count(collection)
+        count = 0
+        if collection.respond_to?(:total_entries)
+          count = collection.total_entries
+        elsif collection.respond_to?(:length)
+          count = collection.length
+        end
+        headers["X-Feedbin-Record-Count"] = count.to_s
       end
 
       rescue_from ArgumentError do |exception|
