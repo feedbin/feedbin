@@ -4,7 +4,7 @@ var update = function() {
     <% if @entries.length == 0 %>
     var entries = '<%= j render partial: "entries/no_entry" %>';
 <% else %>
-    var entries = '<%= j render partial: "entries/entry", collection: @entries, cached: true %>';
+    var entries = '<%= j render partial: "entries/entry", collection: @entries %>';
 <% end %>
 var header = '<%= j render partial: "entries/entries_header", locals: {feed: @feed || nil} %>';
 if ("<%= @all_unread %>" === 'true') {
