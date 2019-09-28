@@ -46,8 +46,8 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE public.actions (
-    id integer NOT NULL,
-    user_id integer,
+    id bigint NOT NULL,
+    user_id bigint,
     query text,
     actions text[] DEFAULT '{}'::text[],
     feed_ids text[] DEFAULT '{}'::text[],
@@ -55,10 +55,10 @@ CREATE TABLE public.actions (
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     title text,
-    tag_ids integer[] DEFAULT '{}'::integer[],
-    action_type integer DEFAULT 0,
-    computed_feed_ids integer[] DEFAULT '{}'::integer[],
-    status integer DEFAULT 0
+    tag_ids bigint[] DEFAULT '{}'::bigint[],
+    action_type bigint DEFAULT 0,
+    computed_feed_ids bigint[] DEFAULT '{}'::bigint[],
+    status bigint DEFAULT 0
 );
 
 
@@ -98,10 +98,10 @@ CREATE TABLE public.ar_internal_metadata (
 --
 
 CREATE TABLE public.billing_events (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     details text,
     event_type character varying(255),
-    billable_id integer,
+    billable_id bigint,
     billable_type character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -134,8 +134,8 @@ ALTER SEQUENCE public.billing_events_id_seq OWNED BY public.billing_events.id;
 --
 
 CREATE TABLE public.coupons (
-    id integer NOT NULL,
-    user_id integer,
+    id bigint NOT NULL,
+    user_id bigint,
     coupon_code character varying(255),
     sent_to character varying(255),
     redeemed boolean DEFAULT false,
@@ -168,7 +168,7 @@ ALTER SEQUENCE public.coupons_id_seq OWNED BY public.coupons.id;
 --
 
 CREATE TABLE public.deleted_users (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     email text,
     customer_id text,
     created_at timestamp without time zone,
@@ -200,11 +200,11 @@ ALTER SEQUENCE public.deleted_users_id_seq OWNED BY public.deleted_users.id;
 --
 
 CREATE TABLE public.devices (
-    id integer NOT NULL,
-    user_id integer,
+    id bigint NOT NULL,
+    user_id bigint,
     token text,
     model text,
-    device_type integer,
+    device_type bigint,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     application text,
@@ -236,8 +236,8 @@ ALTER SEQUENCE public.devices_id_seq OWNED BY public.devices.id;
 --
 
 CREATE TABLE public.entries (
-    id integer NOT NULL,
-    feed_id integer,
+    id bigint NOT NULL,
+    feed_id bigint,
     title text,
     url text,
     author text,
@@ -250,14 +250,14 @@ CREATE TABLE public.entries (
     entry_id text,
     public_id character varying(255),
     old_public_id character varying(255),
-    starred_entries_count integer DEFAULT 0 NOT NULL,
+    starred_entries_count bigint DEFAULT 0 NOT NULL,
     data json,
     original json,
     source text,
     image_url text,
     processed_image_url text,
     image json,
-    recently_played_entries_count integer DEFAULT 0,
+    recently_played_entries_count bigint DEFAULT 0,
     thread_id bigint,
     settings jsonb
 );
@@ -287,7 +287,7 @@ ALTER SEQUENCE public.entries_id_seq OWNED BY public.entries.id;
 --
 
 CREATE TABLE public.favicons (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     host text,
     favicon text,
     created_at timestamp without time zone,
@@ -321,10 +321,10 @@ ALTER SEQUENCE public.favicons_id_seq OWNED BY public.favicons.id;
 --
 
 CREATE TABLE public.feed_stats (
-    id integer NOT NULL,
-    feed_id integer,
+    id bigint NOT NULL,
+    feed_id bigint,
     day date,
-    entries_count integer DEFAULT 0,
+    entries_count bigint DEFAULT 0,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -354,7 +354,7 @@ ALTER SEQUENCE public.feed_stats_id_seq OWNED BY public.feed_stats.id;
 --
 
 CREATE TABLE public.feeds (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     title text,
     feed_url text,
     site_url text,
@@ -362,13 +362,13 @@ CREATE TABLE public.feeds (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     last_modified timestamp without time zone,
-    subscriptions_count integer DEFAULT 0 NOT NULL,
+    subscriptions_count bigint DEFAULT 0 NOT NULL,
     protected boolean DEFAULT false,
     push_expiration timestamp without time zone,
     last_published_entry timestamp without time zone,
     host text,
     self_url text,
-    feed_type integer DEFAULT 0,
+    feed_type bigint DEFAULT 0,
     active boolean DEFAULT true,
     options json
 );
@@ -398,8 +398,8 @@ ALTER SEQUENCE public.feeds_id_seq OWNED BY public.feeds.id;
 --
 
 CREATE TABLE public.import_items (
-    id integer NOT NULL,
-    import_id integer,
+    id bigint NOT NULL,
+    import_id bigint,
     details text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -432,8 +432,8 @@ ALTER SEQUENCE public.import_items_id_seq OWNED BY public.import_items.id;
 --
 
 CREATE TABLE public.imports (
-    id integer NOT NULL,
-    user_id integer,
+    id bigint NOT NULL,
+    user_id bigint,
     complete boolean DEFAULT false,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -465,8 +465,8 @@ ALTER SEQUENCE public.imports_id_seq OWNED BY public.imports.id;
 --
 
 CREATE TABLE public.in_app_purchases (
-    id integer NOT NULL,
-    user_id integer,
+    id bigint NOT NULL,
+    user_id bigint,
     transaction_id text,
     purchase_date timestamp without time zone,
     receipt json,
@@ -500,13 +500,13 @@ ALTER SEQUENCE public.in_app_purchases_id_seq OWNED BY public.in_app_purchases.i
 --
 
 CREATE TABLE public.plans (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     stripe_id character varying(255),
     name character varying(255),
     price numeric,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    price_tier integer
+    price_tier bigint
 );
 
 
@@ -534,11 +534,11 @@ ALTER SEQUENCE public.plans_id_seq OWNED BY public.plans.id;
 --
 
 CREATE TABLE public.recently_played_entries (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    entry_id integer NOT NULL,
-    progress integer DEFAULT 0 NOT NULL,
-    duration integer DEFAULT 0 NOT NULL,
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    entry_id bigint NOT NULL,
+    progress bigint DEFAULT 0 NOT NULL,
+    duration bigint DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -568,9 +568,9 @@ ALTER SEQUENCE public.recently_played_entries_id_seq OWNED BY public.recently_pl
 --
 
 CREATE TABLE public.recently_read_entries (
-    id integer NOT NULL,
-    user_id integer,
-    entry_id integer,
+    id bigint NOT NULL,
+    user_id bigint,
+    entry_id bigint,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -600,8 +600,8 @@ ALTER SEQUENCE public.recently_read_entries_id_seq OWNED BY public.recently_read
 --
 
 CREATE TABLE public.saved_searches (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
     name text NOT NULL,
     query text,
     created_at timestamp without time zone,
@@ -642,8 +642,8 @@ CREATE TABLE public.schema_migrations (
 --
 
 CREATE TABLE public.sharing_services (
-    id integer NOT NULL,
-    user_id integer,
+    id bigint NOT NULL,
+    user_id bigint,
     label text,
     url text,
     created_at timestamp without time zone,
@@ -675,10 +675,10 @@ ALTER SEQUENCE public.sharing_services_id_seq OWNED BY public.sharing_services.i
 --
 
 CREATE TABLE public.starred_entries (
-    id integer NOT NULL,
-    user_id integer,
-    feed_id integer,
-    entry_id integer,
+    id bigint NOT NULL,
+    user_id bigint,
+    feed_id bigint,
+    entry_id bigint,
     published timestamp without time zone,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
@@ -710,9 +710,9 @@ ALTER SEQUENCE public.starred_entries_id_seq OWNED BY public.starred_entries.id;
 --
 
 CREATE TABLE public.subscriptions (
-    id integer NOT NULL,
-    user_id integer,
-    feed_id integer,
+    id bigint NOT NULL,
+    user_id bigint,
+    feed_id bigint,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     title text,
@@ -751,7 +751,7 @@ ALTER SEQUENCE public.subscriptions_id_seq OWNED BY public.subscriptions.id;
 --
 
 CREATE TABLE public.suggested_categories (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     name text,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
@@ -782,9 +782,9 @@ ALTER SEQUENCE public.suggested_categories_id_seq OWNED BY public.suggested_cate
 --
 
 CREATE TABLE public.suggested_feeds (
-    id integer NOT NULL,
-    suggested_category_id integer,
-    feed_id integer,
+    id bigint NOT NULL,
+    suggested_category_id bigint,
+    feed_id bigint,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -814,8 +814,8 @@ ALTER SEQUENCE public.suggested_feeds_id_seq OWNED BY public.suggested_feeds.id;
 --
 
 CREATE TABLE public.supported_sharing_services (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
     service_id character varying(255) NOT NULL,
     settings public.hstore,
     service_options json,
@@ -848,12 +848,12 @@ ALTER SEQUENCE public.supported_sharing_services_id_seq OWNED BY public.supporte
 --
 
 CREATE TABLE public.taggings (
-    id integer NOT NULL,
-    feed_id integer,
-    user_id integer,
+    id bigint NOT NULL,
+    feed_id bigint,
+    user_id bigint,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    tag_id integer
+    tag_id bigint
 );
 
 
@@ -881,7 +881,7 @@ ALTER SEQUENCE public.taggings_id_seq OWNED BY public.taggings.id;
 --
 
 CREATE TABLE public.tags (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     name character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -948,9 +948,9 @@ ALTER SEQUENCE public.unreads_id_seq OWNED BY public.unreads.id;
 
 CREATE TABLE public.updated_entries (
     id bigint NOT NULL,
-    user_id integer,
-    entry_id integer,
-    feed_id integer,
+    user_id bigint,
+    entry_id bigint,
+    feed_id bigint,
     published timestamp without time zone,
     updated timestamp without time zone,
     created_at timestamp without time zone,
@@ -982,12 +982,12 @@ ALTER SEQUENCE public.updated_entries_id_seq OWNED BY public.updated_entries.id;
 --
 
 CREATE TABLE public.users (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     email character varying(255),
     password_digest character varying(255),
     customer_id character varying(255),
     last_4_digits character varying(255),
-    plan_id integer,
+    plan_id bigint,
     admin boolean DEFAULT false,
     suspended boolean DEFAULT false,
     created_at timestamp without time zone NOT NULL,
@@ -1001,7 +1001,7 @@ CREATE TABLE public.users (
     tag_visibility json DEFAULT '{}'::json,
     expires_at timestamp without time zone,
     newsletter_token character varying,
-    price_tier integer,
+    price_tier bigint,
     page_token character varying
 );
 

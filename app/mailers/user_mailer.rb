@@ -1,5 +1,6 @@
 class UserMailer < ApplicationMailer
   default from: "Feedbin <#{ENV["FROM_ADDRESS"]}>", skip_premailer: true
+  add_template_helper(ApplicationHelper)
 
   def payment_receipt(billing_event)
     @billing_event = BillingEvent.find(billing_event)
