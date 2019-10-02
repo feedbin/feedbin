@@ -113,15 +113,12 @@ class feedbin.CountsBehavior
       if _.contains specialCollections, feedID
         selectFirst = true
       else
-        $("[data-behavior~=feed_link]", selected).click()
+        $("[data-behavior~=feed_link]", selected).first().click()
         feedbin.hideQueue.push(feedID) if !selected.is(":visible")
-
     feedbin.applyCounts(false)
 
     if selectFirst
       $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click();
-    # else
-    #   selected[0].scrollIntoView({behavior: "smooth", block: "center"}) if selected[0]
 
     $('[data-behavior~=change_view_mode]').blur()
 
