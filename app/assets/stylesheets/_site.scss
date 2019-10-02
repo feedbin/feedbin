@@ -6157,9 +6157,6 @@ Buttons
 .button-secondary {
     @include background-color(transparent);
     @include color($color-selected);
-    .theme-dusk &, .theme-midnight & {
-        color: #fff;
-    }
     &[disabled] {
         background-color: transparent !important;
         @include color($color-contrast-300, $extra: !important);
