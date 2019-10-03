@@ -1,6 +1,7 @@
 <% content_for :modal_content, flush: true do %>
-    <form class="feeds-search modal-header-input">
+    <form class="jump-search modal-header-input">
         <%= search_field_tag(:q, "", placeholder: 'Search', autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, data: { behavior: 'jump_menu autofocus'}) %>
+        <span class="icon"><%= svg_tag "icon-search", size: "16x16" %></span>
     </form>
 <% end %>
 
@@ -9,9 +10,11 @@
 <% content_for :modal_body, flush: true do %>
     <ul data-behavior="results_target" class="jump-options"></ul>
     <div class="hide" data-behavior="result_template">
-        <li>
+        <li class="feed-item-common feed-item" data-behavior="jump_to">
             <span class="icon-wrap"></span>
-            <span class="text-wrap"></span>
+            <span class="collection-label-wrap">
+                <span class="text-wrap collection-label"></span>
+            </span>
         </li>
     </div>
 <% end %>

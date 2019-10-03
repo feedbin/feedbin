@@ -1,5 +1,4 @@
 <%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
-$('[data-behavior~=save_search_link]').click();
-$('#query').val('');
-$("[data-saved-search-id=<%= @saved_search.id %>] a.feed-link").click();
+element = $("[data-saved-search-id=<%= @saved_search.id %>] a.feed-link");
 $('.modal').modal('hide');
+feedbin.reveal(element);

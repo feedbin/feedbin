@@ -43,9 +43,6 @@ var update = function() {
         feedbin.data.progress[<%= record.entry_id %>] = {progress: <%= record.progress %>, duration: <%= record.duration %>}
     <% end %>
     $(document).trigger('feedbin:entriesLoaded');
-    <% if @saved_search && @saved_search.persisted? %>
-        $('#query').val('<%= j @saved_search.query.try(:html_safe) %>');
-    <% end %>
     <% if @search %>
         feedbin.showSearchControls("<%= params[:sort] %>");
         $('.search-control').removeClass('edit');

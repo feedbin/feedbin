@@ -17,19 +17,33 @@ $.extend feedbin,
   messageTimeout: null
   panel: 1
   panelScrollComplete: true
+  jumpResultTemplate: null
   colorHash: new ColorHash
     lightness: [.3,.4,.5,.6,.7]
     saturation: [.7,.8]
 
+  reveal: (element) ->
+    element.click()
+    tagParent = element.closest('[data-tag-id]')
+    timeout = 150
+    if tagParent.find(".drawer").data('hidden') == true
+      tagParent.find('[data-behavior~=toggle_drawer]').submit();
+      timeout = 250
+
+    setTimeout ( ->
+      feedbin.scrollTo(element, $('.feeds'))
+    ), timeout
+
+
   isRelated: (selector, element) ->
     !!($(element).is(selector) || $(element).parents(selector).length)
 
-  showSearch: ->
+  showSearch: (val = '') ->
     $('body').addClass('search')
     $('body').removeClass('hide-search')
     field = $('[data-behavior~=search_form] input[type=search]')
     field.focus()
-    field.val('')
+    field.val(val)
 
   hideSearch: ->
     $('body').removeClass('search')
@@ -247,25 +261,39 @@ $.extend feedbin,
     $('[data-behavior~=diff_latest]').toggleClass("hide")
     $('[data-behavior~=diff_content]').toggleClass("hide")
 
+  jumpTemplate: ->
+    if feedbin.jumpResultTemplate == null
+      feedbin.jumpResultTemplate = $($('.modal [data-behavior~=result_template]').html())
+    feedbin.jumpResultTemplate
+
+  jumpResultItem: (title, icon, index = null) ->
+    markup = feedbin.jumpTemplate().clone()
+    markup.find('.text-wrap').html(title)
+    markup.find('.icon-wrap').replaceWith(icon)
+    markup.attr('data-index', index)
+    markup
+
   jumpMenu: ->
     target = "search"
     title = "Search"
     feedbin.showModal(target, title)
+    $("body").addClass("jump-search-empty")
     setTimeout ( ->
       $(".modal [data-behavior~=autofocus]").focus()
     ), 150
 
-    template = $($('.modal [data-behavior~=result_template]').html())
     options = []
     $('[data-jumpable]').each (index, element)->
       element = $(element)
       jumpable = element.data('jumpable')
-      markup = template.clone()
-      markup.find('.text-wrap').text(jumpable.title)
+      icon = element.find('.favicon-wrap').prop('outerHTML')
+      markup = feedbin.jumpResultItem(jumpable.title, icon, index)
       options.push
         element: element
         jumpable: jumpable
         markup: markup
+        action: () ->
+          feedbin.reveal(element)
     feedbin.jumpOptions = options
 
   drawBarCharts: ->
@@ -2373,6 +2401,15 @@ $.extend feedbin,
       $('.app-wrap').addClass('show')
       $('.loading-app').addClass('hide')
 
+    jumpTo: ->
+      $(document).on 'click', '[data-behavior~=jump_to]', (event) ->
+        $('.modal').modal('hide')
+        if action = $(@).data('action')
+          action()
+        else
+          index = $(@).data('index')
+          feedbin.jumpOptions[index].action()
+
     jumpMenu: ->
       $(document).on 'keyup', '[data-behavior~=jump_menu]', (event) ->
         template = $($('.modal [data-behavior~=result_template]').html())
@@ -2380,18 +2417,22 @@ $.extend feedbin,
         query = $(@).val()
         target = $('.modal [data-behavior~=results_target]')
         if query.length > 0
+          $('body').removeClass('jump-search-empty')
           results = _.filter feedbin.jumpOptions, (option) ->
             option.jumpable.title.toLowerCase().includes(query.toLowerCase())
           results = _.pluck(results, 'markup')
 
-          console.log results
+          search = feedbin.jumpResultItem("#{query}", '<span class="favicon-wrap"><svg width="16" height="16" class="icon-search"><use xlink:href="#icon-search"></use></svg></span>')
+          search.addClass('selected')
+          search.data 'action', () ->
+            feedbin.showSearch(query)
+            $('[data-behavior~=search_form]').submit()
 
-          search = template.clone()
-          search.find('.text-wrap').text("Search for: #{query}")
+          results.unshift search
 
-          results.unshift(search)
           target.html(results)
         else
+          $('body').addClass('jump-search-empty')
           target.html('')
 
     subscribe: ->
