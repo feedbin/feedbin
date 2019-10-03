@@ -1,0 +1,22 @@
+<% content_for :modal_content, flush: true do %>
+    <form class="feeds-search modal-header-input">
+        <%= search_field_tag(:q, "", placeholder: 'Search', autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, data: { behavior: 'jump_menu autofocus'}) %>
+    </form>
+<% end %>
+
+<% content_for :modal_title, "", flush: true %>
+
+<% content_for :modal_body, flush: true do %>
+    <ul data-behavior="results_target" class="jump-options"></ul>
+    <div class="hide" data-behavior="result_template">
+        <li>
+            <span class="icon-wrap"></span>
+            <span class="text-wrap"></span>
+        </li>
+    </div>
+<% end %>
+
+<% content_for :modal_footer, flush: true do %>
+<% end %>
+
+<%= render template: "layouts/modal", locals: {purpose: "search", classes: "modal-md"} %>

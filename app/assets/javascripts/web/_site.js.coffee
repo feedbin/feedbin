@@ -247,6 +247,27 @@ $.extend feedbin,
     $('[data-behavior~=diff_latest]').toggleClass("hide")
     $('[data-behavior~=diff_content]').toggleClass("hide")
 
+  jumpMenu: ->
+    target = "search"
+    title = "Search"
+    feedbin.showModal(target, title)
+    setTimeout ( ->
+      $(".modal [data-behavior~=autofocus]").focus()
+    ), 150
+
+    template = $($('.modal [data-behavior~=result_template]').html())
+    options = []
+    $('[data-jumpable]').each (index, element)->
+      element = $(element)
+      jumpable = element.data('jumpable')
+      markup = template.clone()
+      markup.find('.text-wrap').text(jumpable.title)
+      options.push
+        element: element
+        jumpable: jumpable
+        markup: markup
+    feedbin.jumpOptions = options
+
   drawBarCharts: ->
     $('[data-behavior~=line_graph]').each ()->
       feedbin.drawBarChart(@, $(@).data('values'))
@@ -561,6 +582,10 @@ $.extend feedbin,
           element.data('title', newTitle)
         else
           element.html(newTitle)
+      if element.is('[data-jumpable]')
+        jumpable = element.data('jumpable')
+        jumpable["title"] = newTitle
+        element.data('jumpable', jumpable)
 
   queryString: (name) ->
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]")
@@ -2347,6 +2372,27 @@ $.extend feedbin,
     showApp: ->
       $('.app-wrap').addClass('show')
       $('.loading-app').addClass('hide')
+
+    jumpMenu: ->
+      $(document).on 'keyup', '[data-behavior~=jump_menu]', (event) ->
+        template = $($('.modal [data-behavior~=result_template]').html())
+
+        query = $(@).val()
+        target = $('.modal [data-behavior~=results_target]')
+        if query.length > 0
+          results = _.filter feedbin.jumpOptions, (option) ->
+            option.jumpable.title.toLowerCase().includes(query.toLowerCase())
+          results = _.pluck(results, 'markup')
+
+          console.log results
+
+          search = template.clone()
+          search.find('.text-wrap').text("Search for: #{query}")
+
+          results.unshift(search)
+          target.html(results)
+        else
+          target.html('')
 
     subscribe: ->
       $(document).on 'shown.bs.modal', (event) ->

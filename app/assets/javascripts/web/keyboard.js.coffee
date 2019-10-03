@@ -206,6 +206,11 @@ class feedbin.Keyboard
       $('[data-behavior~=show_subscribe]').click()
       event.preventDefault()
 
+    # Add subscription
+    Mousetrap.bind ';', (event, combo) =>
+      feedbin.jumpMenu()
+      event.preventDefault()
+
     # Show Keyboard shortcuts
     Mousetrap.bind '?', (event, combo) =>
       feedbin.showModal("help")

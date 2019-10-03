@@ -11,6 +11,7 @@ class FeedPresenter < BasePresenter
         behavior: behavior || "selectable show_entries open_item feed_link renamable user_title has_settings",
         settings_path: @template.edit_subscription_path(feed),
         feed_id: feed.id,
+        jumpable: {title: feed.title},
         mark_read: {
           type: "feed",
           data: feed.id,
