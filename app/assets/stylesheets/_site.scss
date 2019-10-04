@@ -3679,7 +3679,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     blockquote {
         padding: 0 0 0 15px;
         border-left: 4px solid transparent;
-        @include border-color($color-borders);
+        @include border-color(map-merge($color-borders, (dusk: $theme-color-dusk-200)));
     }
 
     blockquote p:last-child {
