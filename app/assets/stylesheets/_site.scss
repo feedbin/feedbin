@@ -4242,11 +4242,11 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         img {
             opacity: .5;
         }
-        text-decoration: none;
+        text-decoration: line-through;
     }
 
-    del {
-        text-decoration: line-through;
+    ins {
+        text-decoration: none !important;
     }
 
     img.diff-del, code.diff-del {
