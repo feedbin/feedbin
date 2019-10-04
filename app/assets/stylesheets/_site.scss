@@ -3747,12 +3747,12 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                 @include fill($color-contrast-400);
             }
         }
-        .view-latest-link {
+        .diff-wrap-text a, .view-latest-link {
             @include color((day: map-get($color-selected, day), dusk: white, sunset: map-get($color-selected, sunset), midnight: white));
             &:hover {
                 text-decoration: underline;
                 cursor: pointer;
-                @include color($color-selected-hover);
+                @include color((day: $color-accent-blue-600, dusk: $theme-color-dusk-500, sunset: $color-accent-blue-600, midnight: $theme-color-midnight-500));
             }
             .theme-dusk &, .theme-midnight & {
                 text-decoration: underline;
@@ -4218,7 +4218,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 .inline-diff {
 
     ins, .diff-ins {
-        background: #8ED9AB;
+        background: #C1EAD1;
         color: #022F14;
         a {
             color: #022F14;
@@ -4230,12 +4230,11 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
 
     img.diff-ins, code.diff-ins {
-        border: 2px solid #8ED9AB;
+        border: 2px solid #C1EAD1;
     }
 
     del, .diff-del {
-        text-decoration: none;
-        background: #E090A0;
+        background: #EEC2CB;
         color: #33030D;
         a {
             color: #33030D;
@@ -4243,10 +4242,11 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         img {
             opacity: .5;
         }
+        text-decoration: line-through;
     }
 
     img.diff-del, code.diff-del {
-        border: 2px solid #E090A0;
+        border: 2px solid #EEC2CB;
     }
 
     img.diff-del {
