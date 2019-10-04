@@ -4217,7 +4217,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 
 .inline-diff {
 
-    ins, .diff-ins {
+    ins {
         background: #C1EAD1;
         color: #022F14;
         a {
@@ -4233,7 +4233,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         border: 2px solid #C1EAD1;
     }
 
-    del, .diff-del {
+    del {
         background: #EEC2CB;
         color: #33030D;
         a {
@@ -4243,10 +4243,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             opacity: .5;
         }
         text-decoration: line-through;
-    }
-
-    ins {
-        text-decoration: none !important;
     }
 
     img.diff-del, code.diff-del {
