@@ -19,21 +19,21 @@ $theme-color-500: #656A73;
 $theme-color-600: #39404B;
 $theme-color-700: #0D1623;
 
-$theme-color-dusk-100: #47494B;
-$theme-color-dusk-200: #595B5D;
-$theme-color-dusk-300: #7E7F81;
-$theme-color-dusk-400: #A3A4A5;
-$theme-color-dusk-500: #C7C8C9;
-$theme-color-dusk-600: #ECECED;
-$theme-color-dusk-700: #FFFFFF;
+$theme-color-dusk-100: #333333;
+$theme-color-dusk-200: #6f6f6f;
+$theme-color-dusk-300: #949494;
+$theme-color-dusk-400: #b8b8b8;
+$theme-color-dusk-500: #dddddd;
+$theme-color-dusk-600: #eeeeee;
+$theme-color-dusk-700: #ffffff;
 
-$theme-color-sunset-100: #E3E1D9;
-$theme-color-sunset-200: #CCCBC3;
-$theme-color-sunset-300: #9F9E98;
-$theme-color-sunset-400: #72716D;
-$theme-color-sunset-500: #444441;
-$theme-color-sunset-600: #2E2D2C;
-$theme-color-sunset-700: #171716;
+$theme-color-sunset-100: #e9e6e1;
+$theme-color-sunset-200: #dddad6;
+$theme-color-sunset-300: #c8c6c4;
+$theme-color-sunset-400: #acaaa9;
+$theme-color-sunset-500: #858484;
+$theme-color-sunset-600: #525252;
+$theme-color-sunset-700: #1a1a1a;
 
 $theme-color-midnight-100: #1A1A1A;
 $theme-color-midnight-200: #333333;
@@ -56,8 +56,8 @@ $color-accent-red-600: #BB0B2F;
 $color-base: (
     debug:    color-base,
     day:      #FFFFFF,
-    sunset:   #F9F7EE,
-    dusk:     #353739,
+    sunset:   #f5f2eb,
+    dusk:     #262626,
     midnight: #000000,
 );
 
@@ -122,7 +122,7 @@ $color-borders: (
     debug:    color-borders,
     day:      $theme-color-200,
     sunset:   $theme-color-sunset-200,
-    dusk:     $theme-color-dusk-200,
+    dusk:     black,
     midnight: $theme-color-midnight-200,
 );
 $color-borders-alt: map-merge($color-borders, (debug: color-borders-alt, midnight: black));
@@ -130,7 +130,7 @@ $color-borders-alt: map-merge($color-borders, (debug: color-borders-alt, midnigh
 $color-selected: (
     debug:    color-selected,
     day:      $color-accent-blue-600,
-    sunset:   #171716,
+    sunset:   $theme-color-sunset-700,
     dusk:     $color-accent-blue-600,
     midnight: $color-accent-blue-600,
 );
@@ -155,8 +155,8 @@ $color-selected-off: (
     debug:    color-selected-off,
     day:      $theme-color-500,
     sunset:   $theme-color-sunset-500,
-    dusk:     $theme-color-dusk-200,
-    midnight: $theme-color-midnight-200,
+    dusk:     $theme-color-dusk-100,
+    midnight: $theme-color-midnight-100,
 );
 
 
@@ -1809,7 +1809,7 @@ $hamburger-dot: 4px;
     align-items: center;
     justify-content: center;
     box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
-    border-radius: 1px;
+    border-radius: 2px;
     flex: 0 0 auto;
     .favicon, svg, img {
         background-repeat: no-repeat;
@@ -2058,7 +2058,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         @include size-in-rems(padding, 10 10px 10 0)
         margin-left: 39px;
         position: relative;
-        @include border-bottom($color-contrast-100);
+        @include border-bottom(map-merge($color-contrast-100, (debug: seperator, dusk: #1c1c1c)));
         > .favicon-wrap {
             display: none;
         }
@@ -3688,7 +3688,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     blockquote {
         padding: 0 0 0 15px;
         border-left: 4px solid transparent;
-        @include border-color($color-borders);
+        @include border-color(map-merge($color-borders, (dusk: $theme-color-dusk-200)));
     }
 
     blockquote p:last-child {
@@ -3756,12 +3756,12 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                 @include fill($color-contrast-400);
             }
         }
-        .view-latest-link {
+        .diff-wrap-text a, .view-latest-link {
             @include color((day: map-get($color-selected, day), dusk: white, sunset: map-get($color-selected, sunset), midnight: white));
             &:hover {
                 text-decoration: underline;
                 cursor: pointer;
-                @include color($color-selected-hover);
+                @include color((day: $color-accent-blue-600, dusk: $theme-color-dusk-500, sunset: $color-accent-blue-600, midnight: $theme-color-midnight-500));
             }
             .theme-dusk &, .theme-midnight & {
                 text-decoration: underline;
@@ -4226,8 +4226,8 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 
 .inline-diff {
 
-    ins, .diff-ins {
-        background: #8ED9AB;
+    ins {
+        background: #C1EAD1;
         color: #022F14;
         a {
             color: #022F14;
@@ -4239,12 +4239,11 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
 
     img.diff-ins, code.diff-ins {
-        border: 2px solid #8ED9AB;
+        border: 2px solid #C1EAD1;
     }
 
-    del, .diff-del {
-        text-decoration: none;
-        background: #E090A0;
+    del {
+        background: #EEC2CB;
         color: #33030D;
         a {
             color: #33030D;
@@ -4252,10 +4251,11 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         img {
             opacity: .5;
         }
+        text-decoration: line-through;
     }
 
     img.diff-del, code.diff-del {
-        border: 2px solid #E090A0;
+        border: 2px solid #EEC2CB;
     }
 
     img.diff-del {
@@ -5558,7 +5558,7 @@ input[type="checkbox"] + label .slider-checkbox {
     right: 30px;
     top: 10px;
     border-radius: 28px;
-    background-color: #9e9e9e;
+    @include background-color($color-contrast-400);
     $size: 20px;
     &:before, &:after {
         position: absolute;
@@ -5567,7 +5567,13 @@ input[type="checkbox"] + label .slider-checkbox {
         height: $size;
         width: $size;
         border-radius: $size;
-        background-color: $theme-color-200;
+        @include background-color((
+            debug:    color-contrast-inverted-100,
+            day:      $theme-color-100,
+            sunset:   $theme-color-sunset-100,
+            dusk:     $theme-color-dusk-600,
+            midnight: $theme-color-midnight-600,
+        ));
         top: 3px;
         left: 3px;
     }
