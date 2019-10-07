@@ -6708,7 +6708,7 @@ a:hover.danger {
 .theme-color-border {
     width: 5px;
     height: 5px;
-    @include background-color($color-contrast-200);
+    @include background-color($color-borders);
 }
 
 
