@@ -2469,7 +2469,7 @@ $.extend feedbin,
 
           results = _.filter feedbin.jumpOptions, (option) ->
             option.score = option.jumpable.title.score(query)
-            option.score > 0.4
+            option.score > 0
 
           results = _.sortBy results, (option) ->
             -option.score
