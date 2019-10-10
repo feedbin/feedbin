@@ -12,9 +12,13 @@ end
         data: {
             behavior: 'selectable show_entries open_item feed_link renamable has_settings',
             mark_read: {type: 'tag', data: tag.id, message: "Mark #{tag.name} as read?"}.to_json,
+            jumpable: {title: tag.name, section: "Tags"},
             settings_path: edit_tag_path(tag)
         } do
     %>
+        <span class="favicon-wrap collection-favicon">
+            <%= svg_tag "favicon-tag", size: "15x15" %>
+        </span>
         <%= form_for @user, url: view_settings_update_user_path(@user), remote: 'true', html: { class: 'tag-visibility-control', data: {behavior: "toggle_drawer feed_action_parent"} } do |f| %>
             <%= hidden_field_tag 'tag_visibility', 'tag_visibility' %>
             <%= hidden_field_tag 'tag', tag.id %>
