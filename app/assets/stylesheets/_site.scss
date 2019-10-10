@@ -69,6 +69,14 @@ $color-contrast-100: (
     midnight: $theme-color-midnight-100,
 );
 
+$color-base-alt: (
+    debug:    color-base-alt,
+    day:      #FFFFFF,
+    sunset:   #f5f2eb,
+    dusk:     $theme-color-dusk-100,
+    midnight: $theme-color-midnight-100,
+);
+
 $color-contrast-200: (
     debug:    color-contrast-200,
     day:      $theme-color-200,
@@ -3250,7 +3258,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         width: 200px;
         border-radius: 4px;
         @include border($color-borders);
-        @include background-color($color-base);
+        @include background-color($color-base-alt);
         box-shadow: $box-shadow-dropdown;
         position: absolute;
         z-index: 10000;
@@ -3561,7 +3569,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     background-repeat: no-repeat;
     @include border($color-borders);
     @include box-shadow($color-contrast-200, 0 0 1px 0);
-    @include background-color($color-base);
+    @include background-color($color-base-alt);
     .dropdown-content {
         top: 15px;
     }
