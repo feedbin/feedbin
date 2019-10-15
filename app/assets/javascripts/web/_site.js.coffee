@@ -23,33 +23,30 @@ $.extend feedbin,
     saturation: [.7,.8]
 
   reveal: (element, callback = null) ->
-    timeout = 150
+    hideFeed = false
+    hideTag = false
     parent = element.closest('li')
     if parent.is('.zero-count')
       feedbin.data.viewMode = 'view_all'
       parent.removeClass('zero-count')
-      setTimeout ( ->
-        feedbin.hideQueue.push parent.data('feed-id')
-      ), timeout
+      hideFeed = true
 
     unless element.is('.tag-link')
       tagParent = element.closest('[data-tag-id]')
       if tagParent.find(".drawer").data('hidden') == true
         tagParent.find('[data-behavior~=toggle_drawer]').submit();
-        timeout = 250
       if tagParent.is('.zero-count')
         tagParent.removeClass('zero-count')
-        setTimeout ( ->
-          feedbin.hideQueue.push tagParent.data('feed-id')
-        ), timeout
+        hideTag = true
 
     element.click()
+    feedbin.hideQueue.push(tagParent.data('feed-id')) if hideTag
+    feedbin.hideQueue.push(parent.data('feed-id')) if hideFeed
 
     setTimeout ( ->
       feedbin.scrollTo(element, $('.feeds'))
-      if typeof(callback) == 'function'
-        callback()
-    ), timeout
+      callback() if typeof(callback) == 'function'
+    ), 250
 
   jumpOpen: ->
     ($(".modal.modal-purpose-search").data('bs.modal') || {})._isShown
