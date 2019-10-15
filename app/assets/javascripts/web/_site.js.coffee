@@ -2459,16 +2459,18 @@ $.extend feedbin,
         # Don't run on arrow up or down
         return if event.keyCode == 38 || event.keyCode == 40
 
-        template = $($('.modal [data-behavior~=result_template]').html())
+        template = feedbin.jumpTemplate()
 
         query = $(@).val()
         target = $('.modal [data-behavior~=results_target]')
+
         if query.length > 0
           $('body').removeClass('jump-search-empty')
 
-
           results = _.filter feedbin.jumpOptions, (option) ->
-            option.score = option.jumpable.title.score(query)
+            titleFolded = option.jumpable.title.foldToASCII()
+            queryFolded = query.foldToASCII()
+            option.score = titleFolded.score(queryFolded)
             option.score > 0
 
           results = _.sortBy results, (option) ->
