@@ -1,5 +1,5 @@
 class Share::Tumblr < Share::Service
-  URL = "http://www.tumblr.com"
+  URL = "https://www.tumblr.com"
   API_URL = "https://api.tumblr.com/v2"
 
   # 1. tumblr = Tumblr.new
