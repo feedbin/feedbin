@@ -19,28 +19,28 @@ $theme-color-500: #656A73;
 $theme-color-600: #39404B;
 $theme-color-700: #0D1623;
 
-$theme-color-dusk-100: #333333;
-$theme-color-dusk-200: #6f6f6f;
-$theme-color-dusk-300: #949494;
-$theme-color-dusk-400: #b8b8b8;
-$theme-color-dusk-500: #dddddd;
-$theme-color-dusk-600: #eeeeee;
+$theme-color-dusk-100: #2D2D2D;
+$theme-color-dusk-200: #353535;
+$theme-color-dusk-300: #4D4D4D;
+$theme-color-dusk-400: #707070;
+$theme-color-dusk-500: #9B9B9B;
+$theme-color-dusk-600: #D4D4D4;
 $theme-color-dusk-700: #ffffff;
 
-$theme-color-sunset-100: #e9e6e1;
-$theme-color-sunset-200: #dddad6;
-$theme-color-sunset-300: #c8c6c4;
-$theme-color-sunset-400: #acaaa9;
-$theme-color-sunset-500: #858484;
-$theme-color-sunset-600: #525252;
-$theme-color-sunset-700: #1a1a1a;
+$theme-color-sunset-100: #EBE8E2;
+$theme-color-sunset-200: #DFDCD6;
+$theme-color-sunset-300: #B8B6B0;
+$theme-color-sunset-400: #8E8C88;
+$theme-color-sunset-500: #646360;
+$theme-color-sunset-600: #3B3A38;
+$theme-color-sunset-700: #191818;
 
-$theme-color-midnight-100: #1A1A1A;
-$theme-color-midnight-200: #333333;
-$theme-color-midnight-300: #666666;
-$theme-color-midnight-400: #999999;
-$theme-color-midnight-500: #CCCCCC;
-$theme-color-midnight-600: #E6E6E6;
+$theme-color-midnight-100: #141414;
+$theme-color-midnight-200: #242424;
+$theme-color-midnight-300: #3B3B3B;
+$theme-color-midnight-400: #595959;
+$theme-color-midnight-500: #828282;
+$theme-color-midnight-600: #BABABA;
 $theme-color-midnight-700: #FFFFFF;
 
 $color-accent-blue-400: #619EEC;
@@ -1756,7 +1756,7 @@ $hamburger-dot: 4px;
 
         .feed-link, &.feed-link, &.source-section {
             @include font-size(14);
-            @include color($color-contrast-700);
+            @include color($color-contrast-600);
             @include size-in-rems(padding-top, 6)
             @include size-in-rems(padding-bottom, 6)
             padding-left: 40px;
@@ -2426,7 +2426,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         display: inline;
     }
     .no-title .title {
-        @include color($color-contrast-700, $root: true);
+        @include color($color-contrast-600, $root: true);
         font-weight: bold;
         @include font-size(15);
     }
@@ -2598,7 +2598,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             line-height: 20px;
             margin-left: 6px;
             @include font-size(14);
-            @include color($color-contrast-700);
+            @include color($color-contrast-600);
             text-decoration: none;
             user-select: none;
             appearance: none !important;
