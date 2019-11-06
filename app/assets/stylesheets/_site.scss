@@ -250,7 +250,9 @@ body {
         color: map-get($color-contrast-700, midnight);
     }
     @include respond-to(hidpi) {
+        -moz-osx-font-smoothing: grayscale;
         -webkit-font-smoothing: antialiased;
+        font-smoothing: antialiased;
     }
     &.native.app {
         overflow: hidden;
