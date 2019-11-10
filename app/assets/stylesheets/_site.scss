@@ -4347,12 +4347,17 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             margin: 0;
             $size: 47px;
             border: 2px solid white;
-            border-radius: $size;
+            border-radius: 50%;
             height: $size;
             width: $size;
             box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
             .theme-day & {
                 box-shadow: none;
+            }
+            &.large {
+                $size: 136px;
+                height: $size;
+                width: $size;
             }
         }
         .tweet-actions {
@@ -4451,6 +4456,13 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         }
         p:last-child {
             margin-bottom: 0;
+        }
+    }
+    &.profile {
+        .profile-info {
+            strong {
+                display: block;
+            }
         }
     }
 }

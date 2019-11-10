@@ -552,9 +552,9 @@ class EntryPresenter < BasePresenter
   end
 
   # Sizes: normal, bigger
-  def tweet_profile_image_uri(tweet, size = "bigger")
+  def tweet_profile_image_uri(tweet, size = :bigger)
     if tweet.user.profile_image_uri? && tweet.user.profile_image_uri_https(size)
-      @template.camo_link(tweet.user.profile_image_uri_https("bigger"))
+      @template.camo_link(tweet.user.profile_image_uri_https(size))
     else
       @template.image_url("favicon-profile-default.png")
     end
@@ -648,6 +648,24 @@ class EntryPresenter < BasePresenter
         text.html_safe
       end
     end
+  end
+
+  def tweet_author_description
+    @template.content_tag(:p, class: "tweet-text") do
+      Twitter::TwitterText::Autolink.auto_link(entry.main_tweet.user.description).html_safe
+    end
+  end
+
+  def tweet_author_verified?
+    entry.main_tweet.user.verified?
+  end
+
+  def tweet_author_joined
+    "#{entry.main_tweet.user.created_at.strftime("%B")} #{entry.main_tweet.user.created_at.year}"
+  end
+
+  def tweet_author_location
+    entry.main_tweet.user.location? ? entry.main_tweet.user.location : nil
   end
 
   def quoted_status?

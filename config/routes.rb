@@ -194,6 +194,7 @@ Rails.application.routes.draw do
   resources :tweets, only: [] do
     member do
       get :thread
+      get :profile
     end
   end
 

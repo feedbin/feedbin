@@ -16,6 +16,10 @@ class TweetsController < ApplicationController
     @parent = @tweets.first
   end
 
+  def profile
+    @entry = Entry.find(params[:id])
+  end
+
   private
 
   def authorize

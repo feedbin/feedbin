@@ -2,7 +2,7 @@
 <div class="tweet <%= entry_presenter.tweet_classes(tweet) %>">
     <header class="tweet-header">
         <div class="profile-wrap">
-            <%= link_to entry_presenter.tweet_user_url(tweet), target: "_blank", title: "View on Twitter", class: "profile-image" do %>
+            <%= link_to profile_tweet_path(entry), title: "Author Profile", class: "profile-image", remote: true, data: {behavior: "open_modal", modal_target: "generic"}  do %>
                 <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry_presenter.tweet_profile_image_uri(tweet), size: "47x47", alt: "") %>
             <% end %>
             <div class="profile-info">
