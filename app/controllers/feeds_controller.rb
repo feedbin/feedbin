@@ -51,7 +51,8 @@ class FeedsController < ApplicationController
         body = request.raw_post.force_encoding("UTF-8")
         signature = OpenSSL::HMAC.hexdigest("sha1", secret, body)
         if request.headers["HTTP_X_HUB_SIGNATURE"] == "sha1=#{signature}"
-          Sidekiq::Client.push_bulk(
+          client = Sidekiq::Client.new(SIDEKIQ_ALT)
+          client.push_bulk(
             "args" => [[feed.id, feed.feed_url, {xml: body}]],
             "class" => "FeedRefresherFetcherCritical",
             "queue" => "feed_refresher_fetcher_critical",
