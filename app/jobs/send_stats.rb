@@ -29,7 +29,7 @@ class SendStats
   end
 
   def queue_depth
-    socket = "/tmp/unicorn.sock"
+    socket = ENV["UNICORN_SOCKET"]
     if File.exist?(socket)
       result = Raindrops::Linux.unix_listener_stats([socket])
       stats = result.values.first
