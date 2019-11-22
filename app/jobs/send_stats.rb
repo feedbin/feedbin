@@ -30,7 +30,7 @@ class SendStats
 
   def queue_depth
     socket = ENV["UNICORN_SOCKET"]
-    if File.exist?(socket)
+    if socket && File.exist?(socket)
       result = Raindrops::Linux.unix_listener_stats([socket])
       stats = result.values.first
       Librato.measure "server_queue_depth.active", stats.active, source: Socket.gethostname
