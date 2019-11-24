@@ -5,7 +5,6 @@ namespace :deploy do
       invoke "deploy:quiet"
       sleep(10)
       execute :sudo, :systemctl, :stop, "feedbin.target"
-      execute "/etc/init.d/unicorn", :stop
     end
   end
 end
