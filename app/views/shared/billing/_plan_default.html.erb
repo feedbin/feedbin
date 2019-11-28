@@ -26,27 +26,29 @@
     <div class="inset-content">
         <h4 class="group-header">Change Your Plan</h4>
     </div>
-    <div class="control-group">
-        <table class="table table-rounded" style="margin-bottom: 0;">
-            <% @plans.each do |plan| %>
-                <tr>
-                    <td><%= plan.name %></td>
-                    <td><%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %></td>
-                    <td>
-                        <% if @user.plan.id == plan.id %>
-                            Your plan
-                        <% else %>
-                            <%= form_tag settings_update_plan_path, data: { behavior: 'change_plan' }, class: 'no-margin' do %>
-                                <%= hidden_field_tag 'plan', plan.id %>
-                                <%= button_tag 'Switch to this plan', class: 'button-text', data: { confirm: "Are you sure you want to switch to #{plan.name.downcase} billing?" } %>
+    <div class="has-description">
+        <div class="control-group">
+            <table class="table table-striped" style="margin-bottom: 0;">
+                <% @plans.each do |plan| %>
+                    <tr>
+                        <td><%= plan.name %></td>
+                        <td><%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %></td>
+                        <td>
+                            <% if @user.plan.id == plan.id %>
+                                Your plan
+                            <% else %>
+                                <%= form_tag settings_update_plan_path, data: { behavior: 'change_plan' }, class: 'no-margin' do %>
+                                    <%= hidden_field_tag 'plan', plan.id %>
+                                    <%= button_tag 'Switch to this plan', class: 'button-text', data: { confirm: "Are you sure you want to switch to #{plan.name.downcase} billing?" } %>
+                                <% end %>
                             <% end %>
-                        <% end %>
-                    </td>
-                </tr>
-            <% end %>
-        </table>
+                        </td>
+                    </tr>
+                <% end %>
+            </table>
+        </div>
+        <p class="control-description">Plan changes are pro-rated.</p>
     </div>
-    <p class="control-group-description">Plan changes are pro-rated.</p>
     <%= render partial: 'shared/billing/payment_history' %>
 </div>
 

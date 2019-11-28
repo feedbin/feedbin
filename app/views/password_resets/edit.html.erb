@@ -1,6 +1,8 @@
 <% @class = 'login' %>
 <div class="login-wrap">
-    <a href="/" class="logo hide-text">Feedbin</a>
+    <a href="/" class="logo">
+        <%= svg_tag "logo-full" %>
+    </a>
     <div class="box">
         <%= render partial: 'shared/flash', locals: {flash: flash} %>
         <h3 class="box-header">Reset Password</h3>
@@ -10,10 +12,14 @@
                     <%= @user.errors.full_messages.join('. ') %>.
                 </div>
             <% end %>
-            <p>
-                <%= f.password_field :password, placeholder: 'Password' %>
-            </p>
-            <%= f.submit "Reset Password", class: 'button' %>
+            <div class="input-group-wrap">
+                <%= f.label :password, "Password" %>
+                <%= render "shared/input" do %>
+                    <%= f.password_field :password %>
+                <% end %>
+            </div>
+            <button type="submit" class="button flex">Reset Password</button>
         <% end %>
     </div>
 </div>
+<%= render partial: 'shared/svg' %>

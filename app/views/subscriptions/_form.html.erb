@@ -1,6 +1,9 @@
 <% present subscription do |subscription_presenter| %>
     <div class="modal-wrapper">
         <%= form_for(subscription, remote: true, method: :patch, html: {class: 'settings', data: {behavior: "disable_on_submit"}}) do |f| %>
+            <% if app %>
+                <%= hidden_field_tag :app, 1 %>
+            <% end %>
             <% content_for :modal_content do %>
                 <div class="modal-header-input">
                     <%= f.text_field :title, placeholder: subscription.feed.title, data: {behavior: "autofocus"} %>
@@ -19,12 +22,18 @@
             <% end %>
 
             <% content_for :modal_footer do %>
-                <%= link_to subscription_path(subscription), method: :delete, remote: true, class: "button-text delete-button", data: { confirm: "Are you sure you want to unsubscribe?" } do %>
-                    <%= svg_tag "icon-delete", size: "13x16" %> Unsubscribe
+                <% if params[:app] %>
+                    <%= link_to subscription_path(subscription), method: :delete, remote: true, class: "button-text delete-button", data: { confirm: "Are you sure you want to unsubscribe?" } do %>
+                        <%= svg_tag "icon-delete", size: "13x16" %> Unsubscribe
+                    <% end %>
+                <% else %>
+                    <%= link_to settings_subscription_path(subscription), method: :delete, class: "button-text delete-button", data: { confirm: "Are you sure you want to unsubscribe?" } do %>
+                        <%= svg_tag "icon-delete", size: "13x16" %> Unsubscribe
+                    <% end %>
                 <% end %>
 
-                <button type="button" class="button button-secondary" data-dismiss="modal" aria-label="Cancel">Cancel</button>
-                <input type="submit" class="button" value="Save">
+                <button type="button" class="button button-tertiary" data-dismiss="modal" aria-label="Cancel">Cancel</button>
+                <button type="submit" class="button" aria-label="Save" value="Save">Save</button>
             <% end %>
 
             <%= render template: "layouts/modal_inner", locals: {purpose: "edit"} %>

@@ -37,7 +37,6 @@ class SubscriptionsController < ApplicationController
     @user = current_user
     @subscription = @user.subscriptions.find_by_feed_id(params[:id])
     @tag_editor = TagEditor.new(@user, @subscription.feed)
-    render layout: "settings"
   end
 
   def update
@@ -46,10 +45,12 @@ class SubscriptionsController < ApplicationController
     @subscription = @user.subscriptions.find(params[:id])
     @subscription.update(subscription_params)
     @taggings = @subscription.feed.tag_with_params(params, @user)
-    if @taggings.present?
-      @user.update_tag_visibility(@taggings.first.tag.id.to_s, true)
+    if params[:app]
+      if @taggings.present?
+        @user.update_tag_visibility(@taggings.first.tag.id.to_s, true)
+      end
+      get_feeds_list
     end
-    get_feeds_list
   end
 
   def destroy

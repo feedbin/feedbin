@@ -5,12 +5,13 @@ Variables
 $small-breakpoint: 700px;
 
 $toolbar-height: 41px;
-$font-stack: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-stack: -apple-system, system-ui, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $audio-player-height: 115px;
 $audio-player-height-minimized: 54px;
 $base-button-position: 10px;
 
 /*-- Colors --*/
+$theme-color-base: white;
 $theme-color-100: #F5F5F7;
 $theme-color-200: #E9E9EB;
 $theme-color-300: #BDBFC3;
@@ -19,14 +20,7 @@ $theme-color-500: #656A73;
 $theme-color-600: #39404B;
 $theme-color-700: #0D1623;
 
-$theme-color-dusk-100: #2D2D2D;
-$theme-color-dusk-200: #353535;
-$theme-color-dusk-300: #4D4D4D;
-$theme-color-dusk-400: #707070;
-$theme-color-dusk-500: #9B9B9B;
-$theme-color-dusk-600: #D4D4D4;
-$theme-color-dusk-700: #ffffff;
-
+$theme-color-sunset-base: #f5f2eb;
 $theme-color-sunset-100: #EBE8E2;
 $theme-color-sunset-200: #DFDCD6;
 $theme-color-sunset-300: #B8B6B0;
@@ -35,13 +29,23 @@ $theme-color-sunset-500: #646360;
 $theme-color-sunset-600: #3B3A38;
 $theme-color-sunset-700: #191818;
 
+$theme-color-dusk-base: #262626;
+$theme-color-dusk-100: #2D2D2D;
+$theme-color-dusk-200: #353535;
+$theme-color-dusk-300: #4D4D4D;
+$theme-color-dusk-400: #707070;
+$theme-color-dusk-500: #9B9B9B;
+$theme-color-dusk-600: #D4D4D4;
+$theme-color-dusk-700: #F6F6F6;
+
+$theme-color-midnight-base: black;
 $theme-color-midnight-100: #141414;
 $theme-color-midnight-200: #242424;
 $theme-color-midnight-300: #3B3B3B;
 $theme-color-midnight-400: #595959;
 $theme-color-midnight-500: #828282;
 $theme-color-midnight-600: #BABABA;
-$theme-color-midnight-700: #FFFFFF;
+$theme-color-midnight-700: #F5F5F5;
 
 $color-accent-blue-400: #619EEC;
 $color-accent-blue-600: #0867E2;
@@ -50,15 +54,16 @@ $color-accent-blue-700: #0755B9;
 $color-accent-orange-600: #E96A0E;
 
 $color-accent-green-600: #07AC47;
+$color-accent-green-700: #068D3B;
 
 $color-accent-red-600: #BB0B2F;
 
 $color-base: (
     debug:    color-base,
-    day:      #FFFFFF,
-    sunset:   #f5f2eb,
-    dusk:     #262626,
-    midnight: #000000,
+    day:      $theme-color-base,
+    sunset:   $theme-color-sunset-base,
+    dusk:     $theme-color-dusk-base,
+    midnight: $theme-color-midnight-base,
 );
 
 $color-contrast-100: (
@@ -71,7 +76,7 @@ $color-contrast-100: (
 
 $color-base-alt: (
     debug:    color-base-alt,
-    day:      #FFFFFF,
+    day:      white,
     sunset:   #f5f2eb,
     dusk:     $theme-color-dusk-100,
     midnight: $theme-color-midnight-100,
@@ -116,7 +121,7 @@ $color-contrast-600: (
     dusk:     $theme-color-dusk-600,
     midnight: $theme-color-midnight-600,
 );
-$color-icons: map-merge($color-contrast-600, (debug: color-icons, midnight: white));
+$color-icons: $color-contrast-600;
 
 $color-contrast-700: (
     debug:    color-contrast-700,
@@ -138,7 +143,7 @@ $color-borders-alt: map-merge($color-borders, (debug: color-borders-alt, midnigh
 $color-selected: (
     debug:    color-selected,
     day:      $color-accent-blue-600,
-    sunset:   $theme-color-sunset-700,
+    sunset:   $color-accent-blue-600,
     dusk:     $color-accent-blue-600,
     midnight: $color-accent-blue-600,
 );
@@ -146,7 +151,7 @@ $color-selected: (
 $color-selected-hover: (
     debug:    color-selected-hover,
     day:      $color-accent-blue-700,
-    sunset:   $theme-color-sunset-500,
+    sunset:   $color-accent-blue-700,
     dusk:     $color-accent-blue-700,
     midnight: $color-accent-blue-700,
 );
@@ -154,7 +159,7 @@ $color-selected-hover: (
 $color-selected-active: (
     debug:    color-selected-active,
     day:      $color-accent-blue-600,
-    sunset:   #171716,
+    sunset:   $color-accent-blue-600,
     dusk:     $color-accent-blue-600,
     midnight: $color-accent-blue-600,
 );
@@ -166,7 +171,6 @@ $color-selected-off: (
     dusk:     $theme-color-dusk-100,
     midnight: $theme-color-midnight-100,
 );
-
 
 $image-spinners: (
     debug:    image-spinners,
@@ -180,8 +184,75 @@ $color-arrow-shadow: $color-borders;
 $selected: #0867E2;
 $inset-bg-color: #f4f6f8;
 $box-shadow-dropdown: 0px 4px 6px 0 rgba(0, 0, 0, 0.1);
-$focus-glow: 0px 0px 10px 0 rgba($theme-color-500, 0.6);
+$focus-glow: 0px 0px 0px 4px $color-accent-blue-400;
+$focus-glow-inset: inset $focus-glow;
 $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
+
+
+$color-sidebar: (
+    debug:    color-sidebar,
+    day:      $theme-color-100,
+    sunset:   $theme-color-sunset-100,
+    dusk:     map-get($color-base, dusk),
+    midnight: map-get($color-base, midnight),
+);
+
+$color-base-light-100: (
+    debug:    color-base-light-100,
+    day:      $theme-color-100,
+    sunset:   $theme-color-sunset-100,
+    dusk:     $theme-color-dusk-600,
+    midnight: $theme-color-midnight-600,
+);
+
+$color-base-light-200: (
+    debug:    color-base-light-200,
+    day:      $theme-color-200,
+    sunset:   $theme-color-sunset-200,
+    dusk:     $theme-color-dusk-500,
+    midnight: $theme-color-midnight-500,
+);
+
+$color-base-dark-300: (
+    debug:    color-base-dark-300,
+    day:      $theme-color-500,
+    sunset:   $theme-color-sunset-500,
+    dusk:     $theme-color-dusk-300,
+    midnight: $theme-color-midnight-300,
+);
+
+$color-base-dark-700: (
+    debug:    color-base-dark-300,
+    day:      $theme-color-700,
+    sunset:   $theme-color-sunset-700,
+    dusk:     $theme-color-dusk-200,
+    midnight: $theme-color-midnight-200,
+);
+
+$color-base-dark-600: (
+    debug:    color-base-dark-600,
+    day:      $theme-color-600,
+    sunset:   $theme-color-sunset-600,
+    dusk:     $theme-color-dusk-200,
+    midnight: $theme-color-midnight-200,
+);
+
+$color-disabled-foreground: (
+    debug:    color-base-light-200,
+    day:      $theme-color-200,
+    sunset:   $theme-color-sunset-200,
+    dusk:     $theme-color-dusk-400,
+    midnight: $theme-color-midnight-400,
+);
+
+$color-control-border: (
+    debug:    color-base-light-200,
+    day:      $theme-color-400,
+    sunset:   $theme-color-sunset-400,
+    dusk:     $theme-color-dusk-500,
+    midnight: $theme-color-midnight-500,
+);
+
 
 
 /*------------------------------------------------------------------------------
@@ -262,13 +333,27 @@ body {
     }
 }
 
-a {
-    @include color($color-selected);
+$color-link: (
+    debug:    color-link,
+    day:      $color-accent-blue-600,
+    sunset:   $color-accent-blue-600,
+    dusk:     $theme-color-dusk-700,
+    midnight: $theme-color-midnight-700,
+);
+a, .link {
+    @include color($color-link);
     text-decoration: none;
 }
 
+$color-hover: (
+    debug:    color-hover,
+    day:      $color-accent-blue-700,
+    sunset:   $color-accent-blue-700,
+    dusk:     $theme-color-dusk-600,
+    midnight: $theme-color-midnight-600,
+);
 a:hover {
-    @include color($color-selected-hover);
+    @include color($color-hover);
     text-decoration: underline;
 }
 
@@ -284,7 +369,7 @@ a:active {
 }
 
 p {
-    margin: 0 0 15px 0;
+    margin: 0 0 16px 0;
 }
 
 sub,
@@ -381,6 +466,21 @@ textarea {
     vertical-align: top;
 }
 
+@mixin form-control {
+    @include color($color-contrast-600);
+    @include font-size(16);
+    max-width: 100%;
+    width: 100%;
+    display: block;
+}
+
+@mixin focus {
+    @include color($color-contrast-700);
+    @include background-color($color-contrast-100);
+    outline: none;
+    @include border(transparent);
+}
+
 textarea,
 input[type="text"],
 input[type="password"],
@@ -397,53 +497,52 @@ input[type="search"],
 input[type="tel"],
 input[type="color"],
 .uneditable-input {
-    @include border-color(transparent);
-    @include color($color-contrast-700);
+    font-size: 16px;
     @include background-color($color-contrast-200);
-    @include font-size(16);
-    border-width: 2px;
-    border-style: solid;
-    padding: 13px 10px;
-    max-width: 300px;
-    width: 100%;
-    display: inline-block;
-    margin-bottom: 7px;
-    vertical-align: middle;
-    border-radius: 8px;
+    padding: 7px 8px;
+    border-radius: 4px;
+    border: none;
+    text-align: left;
+    margin: 0;
+    position: relative;
+    line-height: normal;
+    @include color($color-contrast-600);
+    border: 1px solid transparent;
     &:focus {
-        @include color(map-get($color-contrast-700, day));
-        @include background-color(#FFF);
-        @include border-color($color-selected);
-        outline: none;
+        @include focus;
+    }
+    &.small-field {
+        max-width: 340px;
+    }
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover {
+        -webkit-text-fill-color: map-get($color-contrast-700, day);
+        -webkit-box-shadow: none !important;
+        transition: none !important;
+        @include border(transparent);
+    }
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:focus {
+        -webkit-text-fill-color: map-get($color-contrast-700, day);
+        -webkit-box-shadow: none !important;
+        transition: none !important;
+        @include focus;
+    }
+    &::-webkit-contacts-auto-fill-button {
+        @include background-color($color-contrast-600);
     }
 }
 
-input::-webkit-input-placeholder {
+input::placeholder,
+input:focus::placeholder,
+textarea::placeholder,
+textarea:focus::placeholder {
     @include color($color-contrast-400);
-}
-input:focus::-webkit-input-placeholder {
-    @include color(map-get($color-contrast-400, day));
-}
-
-input:-moz-placeholder {
-    @include color($color-contrast-400);
-}
-input:focus:-moz-placeholder {
-    @include color(map-get($color-contrast-400, day));
-}
-
-input::-moz-placeholder {
-    @include color($color-contrast-400);
-}
-input:focus::-moz-placeholder {
-    @include color(map-get($color-contrast-400, day));
-}
-
-input:-ms-input-placeholder {
-    @include color($color-contrast-400);
-}
-input:focus:-ms-input-placeholder {
-    @include color(map-get($color-contrast-400, day));
 }
 
 input.processing {
@@ -458,22 +557,431 @@ select {
 }
 
 label {
-    margin-bottom: 1px;
     display: block;
 }
 
-.radio, .checkbox {
-    min-height: 20px;
-    padding-left: 20px;
+.checkbox {
+    padding-left: 24px;
+    $size: 16px;
+    display: flex;
+    align-items: center;
+    input[type="checkbox"] {
+        position: absolute;
+        z-index: -1;
+        opacity: 0;
+    }
+    label {
+        position: relative;
+        &:before {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: -24px;
+            content: "";
+            height: $size;
+            width: $size;
+            @include background-color($color-contrast-200);
+            @include border-color($color-control-border);
+            border-radius: 3px;
+            border: 2px solid transparent;
+        }
+        &:after {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: -29px;
+            height: $size + 10px;
+            width: $size + 10px;
+            content: "";
+            display: block;
+            position: absolute;
+            border: 4px solid transparent;
+            border-radius: 8px;
+        }
+    }
+    svg {
+        position: absolute;
+        left: -21px;
+        top: 50%;
+        transform: translateY(-50%);
+        @include fill(white);
+        display: none;
+    }
+    :focus ~ label {
+        &:after {
+            border-color: $color-accent-blue-400;
+        }
+    }
+    :checked ~ label {
+        &:before {
+            @include border-color(transparent);
+            background-color: $color-accent-green-600;
+        }
+        svg {
+            display: block;
+        }
+    }
+    :active ~ label {
+        &:before {
+            @include background-color($color-contrast-300);
+            @include border-color($color-contrast-600);
+        }
+        &:after {
+            border-color: $color-accent-blue-400;
+        }
+    }
+    :checked:active ~ label {
+        &:before {
+            @include background-color($color-accent-green-700);
+            @include border-color(transparent);
+        }
+        &:after {
+            border-color: $color-accent-blue-400;
+        }
+    }
+    [disabled] ~ label {
+        &:before {
+            @include background-color($color-contrast-200);
+            @include border-color($color-contrast-300);
+        }
+    }
+    [disabled]:checked ~ label {
+        &:before {
+            @include background-color($color-contrast-300);
+        }
+        svg {
+            @include fill($color-base-light-200);
+        }
+    }
+    [disabled]:active ~ label {
+        &:after {
+            border-color: transparent;
+        }
+    }
 }
 
-.radio input[type="radio"], .checkbox input[type="checkbox"] {
-    float: left;
-    margin-left: -20px;
+.select {
+    appearance: none;
+    border: none;
+    @include background-color($color-contrast-200);
+    @include color($color-contrast-600);
+    @include border(transparent);
+    font-size: 16px;
+    line-height: normal;
+    padding: 7px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    &::-ms-expand {
+        display: none;
+    }
+    &:focus {
+        @include focus;
+    }
+    &[disabled] {
+        @include background-color($color-contrast-300);
+        @include color($color-disabled-foreground);
+        cursor: default;
+    }
 }
 
 label select {
     margin-bottom: 0;
+}
+
+.switch {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .switch-inner {
+        width: 43px;
+        height: 24px;
+        display: block;
+        position: relative;
+        border-radius: 24px;
+        @include background-color($color-contrast-400);
+        &:before {
+            height: 34px;
+            width: 53px;
+            border-radius: 34px;
+            border: 4px solid transparent;
+            display: block;
+            content: "";
+            z-index: 1;
+            transition: border-width .2s ease;
+            position: absolute;
+            top: -5px;
+            left: -5px;
+        }
+        &:after {
+            $size: 18px;
+            position: absolute;
+            display: block;
+            content: "";
+            height: $size;
+            width: $size;
+            border-radius: $size;
+            @include background-color($color-base-light-100);
+            top: 3px;
+            left: 3px;
+        }
+        &:after {
+            z-index: 2;
+            transition: transform .2s ease;
+            opacity: 1;
+        }
+        svg {
+            position: absolute;
+            transition: transform .2s ease, opacity .3s ease !important;
+            top: 9px;
+            left: 7px;
+            z-index: 3;
+            opacity: 0;
+            fill: $color-accent-green-600;
+        }
+    }
+}
+label .switch-inner {
+    :checked ~ & {
+        @include background-color($color-accent-green-600);
+        &:after, svg {
+            transform: translateX(19px);
+        }
+        &:after {
+            box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+            @include background-color(white);
+        }
+        svg {
+            opacity: 1;
+        }
+    }
+    :focus ~ &, :active ~ & {
+        &:before {
+            border-color: $color-accent-blue-400;
+        }
+    }
+    :active ~ & {
+        &:after {
+            @include background-color(white);
+        }
+    }
+    :checked:active ~ & {
+        @include background-color($color-accent-green-700);
+        svg {
+            @include fill($color-accent-green-700);
+        }
+    }
+}
+.radio-button {
+    $radio-button-size: 18px;
+    position: absolute;
+    right: 3px;
+    top: 0;
+    bottom: 0;
+    width: $radio-button-size;
+    display: flex;
+    align-items: center;
+    .radio-button-inner {
+        border-radius: 50%;
+        border: 2px solid transparent;
+        height: $radio-button-size;
+        width: $radio-button-size;
+        &:before {
+            $size: 28px;
+            position: absolute;
+            display: block;
+            content: "";
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            height: $size;
+            width: $size;
+            z-index: 1;
+            border: 4px solid transparent;
+        }
+        &:after {
+            $size: 8px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: block;
+            content: "";
+            border-radius: $size;
+            height: $size;
+            width: $size;
+            z-index: 2;
+        }
+    }
+}
+label .radio-button .radio-button-inner {
+    @include border-color($color-control-border);
+    @include background-color($color-contrast-200);
+    :checked ~ & {
+        @include border-color($color-accent-green-600);
+        background-color: transparent;
+        &:after {
+            @include background-color($color-accent-green-600);
+        }
+    }
+    :active ~ & {
+        @include background-color($color-contrast-300);
+        @include border-color($color-contrast-600);
+        &:before {
+            @include border-color($color-accent-blue-400);
+        }
+    }
+    :focus ~ & {
+        &:before {
+            @include border-color($color-accent-blue-400);
+        }
+    }
+    :checked:active ~ & {
+        @include border-color($color-accent-green-600);
+        background-color: transparent;
+        &:after {
+            @include background-color($color-accent-green-600);
+        }
+    }
+}
+
+.input-group-wrap {
+    margin-bottom: 16px;
+    label {
+        display: block;
+        padding-bottom: 8px;
+    }
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    line-height: 1;
+    .input-helper {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        bottom: -5px;
+        left: -5px;
+        border: 4px solid transparent;
+        border-radius: 9px;
+        pointer-events: none;
+    }
+    &.accessory-left {
+        input, .button {
+            padding-left: 32px !important;
+        }
+    }
+    &.accessory-right {
+        input, .button {
+            padding-right: 40px !important;
+        }
+    }
+    .select {
+        padding-right: 32px;
+    }
+    .accessory {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        &.right {
+            right: 0;
+            left: auto;
+        }
+    }
+    button.accessory {
+        border: none;
+        pointer-events: all;
+        appearance: none;
+        @include background($color-selected);
+        border-radius: 0 4px 4px 0;
+        &:active {
+            @include border-color($color-selected-hover);
+            @include background-color($color-selected-hover);
+            @include color(white);
+            cursor: pointer;
+        }
+        svg {
+            @include fill(white, $extra: !important);
+        }
+    }
+    svg {
+        @include fill($color-icons);
+    }
+    input, select, textarea {
+        flex: 1;
+    }
+    input ~ .accessory.right .spinner {
+        display: none;
+    }
+    input.processing ~ .accessory.right .spinner {
+        display: block;
+    }
+    input:focus.processing ~ .accessory.right .spinner {
+        &:before {
+            @include border-color(map-merge($color-contrast-300, (debug: spinner-bg, dusk: $theme-color-dusk-500, midnight: $theme-color-midnight-500)));
+        }
+        &:after {
+            @include theme("border-left-color", map-merge($color-contrast-400, (debug: spinner-foreground, dusk: $theme-color-dusk-200, midnight: $theme-color-midnight-200)));
+        }
+    }
+    input ~ .accessory svg {
+        @include fill($color-contrast-400);
+    }
+    select ~ .accessory svg {
+        @include fill($color-contrast-500);
+    }
+    input:focus ~ .input-helper,
+    textarea:focus ~ .input-helper,
+    select:focus ~ .input-helper,
+    .StripeElement--focus ~ .input-helper {
+        border-color: $color-accent-blue-400;
+    }
+    input:focus ~ .accessory,
+    select:focus ~ .accessory {
+        svg {
+            @include fill($color-link);
+        }
+    }
+    input[disabled] ~ .accessory,
+    select[disabled] ~ .accessory {
+        svg {
+            @include fill($color-disabled-foreground);
+        }
+    }
+    @media (max-width: $small-breakpoint) {
+        input, select {
+            width: 100%;
+            max-width: 100% !important;
+        }
+    }
+    &.tag-input {
+        margin-bottom: 8px;
+        input {
+            cursor: pointer;
+        }
+        input::placeholder {
+            @include color($color-contrast-600);
+            text-align: center;
+            font-weight: bold;
+        }
+        input:focus::placeholder {
+            text-align: left;
+            font-weight: normal;
+            @include color($color-contrast-400);
+        }
+    }
 }
 
 .field_with_errors input,
@@ -532,15 +1040,6 @@ table {
     background-color: transparent;
 }
 
-.table-condensed thead > tr > th,
-.table-condensed tbody > tr > th,
-.table-condensed tfoot > tr > th,
-.table-condensed thead > tr > td,
-.table-condensed tbody > tr > td,
-.table-condensed tfoot > tr > td {
-    padding: 5px;
-}
-
 .table-bordered {
     @include border($color-borders);
 }
@@ -554,7 +1053,7 @@ table {
     @include border($color-borders);
 }
 
-.table-rounded  {
+.table-striped  {
     tr:first-child th,
     tr:first-child td {
         border: none !important;
@@ -562,13 +1061,32 @@ table {
     td, th {
         padding: 11px !important;
     }
+    border-bottom: none !important;
+}
+
+.pill {
+    @include border($color-borders);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    &.form {
+        justify-content: flex-end;
+        flex-direction: column;
+        .form-control {
+            margin-top: 16px;
+            flex: 1;
+            display: flex;
+            button {
+                margin-left: auto;
+            }
+        }
+    }
 }
 
 .pill-list {
-    background-color: #FFF;
     border-radius: 8px;
-    border: 1px solid map-get($color-borders, day);
-    margin: 0 0 30px 0;
+    @include border($color-borders);
+    margin: 0 0 32px 0;
     padding: 0;
     list-style: none;
     @media (max-width: $small-breakpoint) {
@@ -579,9 +1097,8 @@ table {
     li {
         @include settings-row;
         margin: 0;
-        border-bottom: 1px solid map-get($color-borders, day);
+        @include border-bottom($color-borders);
         position: relative;
-        overflow: hidden;
         &:last-child {
             border-bottom: none;
         }
@@ -591,27 +1108,23 @@ table {
                 display: block;
                 text-decoration: none;
                 @include settings-row;
-                color: map-get($color-contrast-700, day);
+                @include color($color-contrast-700);
                 z-index: 10;
                 position: relative;
                 @media (max-width: $small-breakpoint) {
                     padding-right: 20px;
                 }
-                &:after {
-                    content: "";
-                    display: block;
-                    position: absolute;
-                    background: image-url("icon-arrow.svg") 0 50% no-repeat;
-                    background-size: 12px 22px;
-                    width: 12px;
-                    right: 15px;
-                    top: 0;
-                    bottom: 0;
-                    @media (max-width: $small-breakpoint) {
-                        right: 5px;
-                    }
-                }
             }
+            a:hover .link {
+                text-decoration: underline;
+            }
+            .icon-arrow {
+                @include fill($color-contrast-400);
+                transform: scaleX(-1);
+            }
+        }
+        .description {
+            margin-right: 48px;
         }
         .status-flag {
             display: none;
@@ -619,6 +1132,23 @@ table {
         &.error  {
             .status-flag {
                 display: block;
+            }
+        }
+    }
+    &.segmented {
+        border: none;
+        li {
+            margin-bottom: 16px;
+            border: none;
+            &.linked a {
+                border-radius: 8px;
+                padding-left: 16px;
+                padding-right: 16px;
+                @include border($color-borders);
+            }
+            .status-flag {
+                border-radius: 8px 0 0 0;
+                left: -1px;
             }
         }
     }
@@ -640,36 +1170,66 @@ table {
 
 .sharing-services {
     @extend .pill-list;
+    border: none;
     li {
         padding: 0;
-        @media (max-width: $small-breakpoint) {
-            padding-right: 0;
-            padding-left: 0;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        @include border($color-borders);
+        &:last-child {
+            @include border($color-borders);
+        }
+        .icon-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 25px;
+            margin-right: 16px;
+        }
+        svg {
+            @include fill($color-icons);
+            flex-shrink: 0;
         }
     }
     .service-header {
-        @include settings-row;
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        .last-control {
+            margin-left: auto;
+        }
+        .control-group-description {
+            margin-left: 41px;
+            margin-top: 1px;
+        }
+    }
+    .header {
+        display: flex;
     }
     .service-options-wrap {
         position: relative;
         height: 0;
-        transition: height .2s ease;
+        transition: height .2s ease, opacity .2s ease;
+        opacity: 0;
         overflow: hidden;
-        &.open {
-            @include arrow(
-                $x-position: 35px,
-                $y-position: 0,
-                $arrow-color: $color-base,
-                $shadow-color: $color-arrow-shadow);
-
+        border-radius: 0 0 8px 8px;
+        p {
+            @include color($color-contrast-500);
+        }
+        &.fully-open {
+            overflow: visible;
         }
         .service-options {
-            @include settings-row;
-            border-top: 1px solid map-get($color-borders, day);
-            overflow: hidden;
-            form {
-                max-width: 300px;
+            display: none;
+            padding: 16px;
+            @include border-top($color-borders);
+        }
+        &.open {
+            .service-options {
+                display: block;
             }
+            opacity: 1;
         }
     }
     .share-help {
@@ -677,16 +1237,10 @@ table {
             padding-top: 20px;
         }
     }
-    .list-action {
-        position: absolute;
-        right: 15px;
-        top: 16px;
-    }
     .service-title {
-        color: #212121;
+        @include color($color-contrast-700);
         font-size: 16px;
         margin: 0;
-        padding: 0 0 0 40px;
         overflow: visible;
     }
     .service-error {
@@ -711,9 +1265,6 @@ table {
             padding-left: 0;
             max-width: 100%;
         }
-        &.show-service-options {
-            margin-left: 40px;
-        }
     }
     .half {
         padding-left: 5px;
@@ -726,77 +1277,10 @@ table {
     .pad-top {
         padding-top: 7px;
     }
-    .service-options {
-        background-color: map-get($color-contrast-100, day);
-    }
-    .icon-share-facebook {
-        background-image: image-url("icon-share-facebook.svg");
-        background-size: 25px 25px;
-        @include share-icon(0, 0);
-    }
-    .icon-share-twitter {
-        background-image: image-url("icon-share-twitter.svg");
-        background-size: 21px 25px;
-        @include share-icon(1, 3);
-    }
-    .icon-share-evernote {
-        background-image: image-url("icon-share-evernote.svg");
-        background-size: 22px 25px;
-        @include share-icon(1, 2);
-    }
-    .icon-share-tumblr {
-        background-image: image-url("icon-share-tumblr.svg");
-        background-size: 14px 24px;
-        @include share-icon(4, 3);
-    }
-    .icon-share-pinboard {
-        background-image: image-url("icon-share-pinboard.svg");
-        background-size: 25px 25px;
-        @include share-icon(0, 3);
-    }
-    .icon-share-kindle {
-        background-image: image-url("icon-share-kindle.svg");
-        background-size: 26px 23px;
-        @include share-icon(0, 3);
-    }
-    .icon-share-email {
-        background-image: image-url("icon-share-email.svg");
-        background-size: 24px 16px;
-        @include share-icon(0, 6);
-    }
-    .icon-share-instapaper {
-        background-image: image-url("icon-share-instapaper.svg");
-        background-size: 10px 23px;
-        @include share-icon(7, 2);
-    }
-    .icon-share-pocket {
-        background-image: image-url("icon-share-pocket.svg");
-        background-size: 24px 21px;
-        @include share-icon(0, 5);
-    }
-    .icon-share-buffer {
-        background-image: image-url("icon-share-buffer.svg");
-        background-size: 25px 25px;
-        @include share-icon(0, 2);
-    }
-    .icon-share-micro_blog {
-        background-image: image-url("icon-share-micro-blog.svg");
-        background-size: 25px 25px;
-        @include share-icon(0, 0);
-    }
-    .icon-share-custom {
-        background-image: image-url("icon-share-custom.svg");
-        background-size: 21px 21px;
-        @include share-icon(1, 2);
-    }
 }
 
 .inset {
-    background-color: map-get($color-contrast-100, day);
-    border-radius: 8px;
-    border: 1px solid map-get($color-borders, day);
-    margin: 0 0 20px 0;
-    padding: 30px 0 30px 0;
+    margin: 0 0 56px 0;
     .inset-content {
         @include settings-row;
         padding-top: 0 !important;
@@ -807,27 +1291,11 @@ table {
         border-left: none;
         border-right: none;
     }
-    @media (max-width: $small-breakpoint) {
-        padding: 15px 0 0 0;
-        border: none;
-        background-color: transparent;
-        border-radius: 0;
-    }
 }
 
-.settings-page .inset, .settings-page .feed-form-wrap {
-    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
-    @media (max-width: $small-breakpoint) {
-        box-shadow: none;
-    }
-}
-
-.feed-form-wrap {
-    border-radius: 8px;
-}
 
 .description-inset {
-    padding: 0 30px 0 30px;
+    padding: 0;
     &.icon-email {
         background: image-url("icon-share-email.svg") 30px 3px no-repeat;
         background-size: 24px 16px;
@@ -838,13 +1306,8 @@ table {
         }
     }
     @media (max-width: $small-breakpoint) {
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-}
-.settings-outer {
-    @media (max-width: $small-breakpoint) {
-        padding: 0 15px;
+        padding-left: 8px;
+        padding-right: 8px;
     }
 }
 
@@ -930,10 +1393,7 @@ Structure
             background-repeat: no-repeat;
             background-position: 97% ($base-button-position + 3);
             background-size: 16px 16px;
-            $default: image-url("spinner-day.svg");
-            $dusk: image-url("spinner-sunset.svg");
-            $sunset: image-url("spinner-night.svg");
-            @include background-image((day: $default, dusk: $dusk, sunset: $sunset, midnight: $dusk));
+            @include background-image($image-spinners);
         }
     }
 }
@@ -1102,27 +1562,34 @@ Structure
     position: relative;
 }
 
-.scroll-bars.theme-dusk {
-    .feeds::-webkit-scrollbar,
-    .entries::-webkit-scrollbar,
-    .entry-content::-webkit-scrollbar {
-        -webkit-appearance: none;
-        width: 15px;
+.scroll-bars {
+    ::-webkit-scrollbar, &.settings-body::-webkit-scrollbar {
+        appearance: none;
+        width: 12px;
     }
-    .feeds::-webkit-scrollbar-thumb,
-    .entries::-webkit-scrollbar-thumb,
-    .entry-content::-webkit-scrollbar-thumb {
-        border: 3px solid map-get($color-contrast-300, dusk);
-        background-color: map-get($color-contrast-200, dusk);
-        border-radius: 9px;
+    ::-webkit-scrollbar-thumb, &.settings-body::-webkit-scrollbar-thumb {
+        border: 3px solid transparent;
+        @include border-color($color-contrast-200, $root: true);
+        @include background-color($color-contrast-400, $root: true);
+        border-radius: 6px;
         &:hover {
-            background-color: black;
+            @include background-color($color-contrast-500, $root: true);
         }
     }
-    .feeds::-webkit-scrollbar-track-piece,
-    .entries::-webkit-scrollbar-track-piece,
-    .entry-content::-webkit-scrollbar-track-piece {
-        background-color: map-get($color-contrast-300, dusk);
+    ::-webkit-scrollbar-track-piece, &.settings-body::-webkit-scrollbar-track-piece {
+        @include background-color($color-contrast-200, $root: true);
+    }
+
+    // Firefox
+    scrollbar-color: map-get($color-contrast-400, day) map-get($color-contrast-200, day);
+    &.theme-sunset {
+        scrollbar-color: map-get($color-contrast-400, sunset) map-get($color-contrast-200, sunset);
+    }
+    &.theme-dusk {
+        scrollbar-color: map-get($color-contrast-400, dusk) map-get($color-contrast-200, dusk);
+    }
+    &.theme-midnight {
+        scrollbar-color: map-get($color-contrast-400, midnight) map-get($color-contrast-200, midnight);
     }
 }
 
@@ -1263,7 +1730,7 @@ $hamburger-dot: 4px;
     }
     .icon-subscribe {
         $size: 38px;
-        @include color(#FFF);
+        @include color(white);
         @include background-color($color-icons);
         user-select: none;
         line-height: 1;
@@ -1492,11 +1959,14 @@ $hamburger-dot: 4px;
 
 .feeds {
     @include background-color($color-base);
-    overflow-y: auto;
+    overflow-y: hidden;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     flex: 1;
     padding-top: 12px;
+    &.show {
+        overflow-y: auto;
+    }
     .has-offscreen-panels & {
         padding-top: 0;
     }
@@ -1600,7 +2070,7 @@ $hamburger-dot: 4px;
             }
             &.selected {
                 .feed-action-button {
-                    @include color(#FFF);
+                    @include color(white);
                 }
                 .clear-form {
                     display: block;
@@ -1642,7 +2112,7 @@ $hamburger-dot: 4px;
             &.selected {
                 .feed-action-button {
                     svg {
-                        @include fill(#FFF);
+                        @include fill(white);
                     }
                 }
                 .clear-form {
@@ -1660,9 +2130,9 @@ $hamburger-dot: 4px;
                 .feed-link {
                     background-color: transparent !important;
                     .rename-feed-input {
-                        color: #FFF !important;
+                        color: white !important;
                         &.disabled {
-                            color: #FFF !important;
+                            color: white !important;
                         }
                     }
                 }
@@ -1712,11 +2182,11 @@ $hamburger-dot: 4px;
 
 .feeds:not(.dragging) .selected > a {
     @include background-color($color-selected-off);
-    color: #fff !important;
+    color: white !important;
     .rename-feed-input {
         color: map-get($color-contrast-700, day);
         &.disabled {
-            color: #fff;
+            color: white;
         }
     }
 }
@@ -1815,7 +2285,7 @@ $hamburger-dot: 4px;
 .favicon-wrap {
     height: 20px;
     width: 20px;
-    background-color: #FFF;
+    background-color: white;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1837,7 +2307,7 @@ $hamburger-dot: 4px;
         }
     }
     .entries & {
-        @include background-color((day: transparent, dusk: #FFF, sunset: transparent, midnight: #FFF));
+        @include background-color((day: transparent, dusk: white, sunset: transparent, midnight: white));
         $shadow: (
             day: none,
             dusk: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
@@ -1855,7 +2325,7 @@ $hamburger-dot: 4px;
 }
 
 li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
-    @include background-color(#FFF);
+    @include background-color(white);
     @include box-shadow(rgba(0, 0, 0, 0.1), 0px 1px 1px 0px);
     .feeds &.collection-favicon {
         background: transparent;
@@ -1887,7 +2357,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     svg {
         @include fill($color-icons);
         li.selected > .feed-link &, li.selected.feed-link &, .entries li.selected & {
-            fill: #FFF;
+            fill: white;
         }
     }
     .entries & {
@@ -2201,7 +2671,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         border-radius: $dot/2;
         content: '';
         display: inline-block;
-        background-color: #FFF;
+        background-color: white;
     }
     .icon-entry-actions {
         position: absolute;
@@ -2282,19 +2752,19 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             border-bottom-color: transparent;
         }
         .title, .feed-title, .quoted-summary, .body {
-            color: #FFFFFF !important;
+            color: white !important;
         }
         .title-inner span, .time {
-            color: rgba(#FFFFFF, .5) !important;
+            color: rgba(white, .5) !important;
         }
         .icon-retweet, .icon-media {
-            fill: rgba(#FFFFFF, .5);
+            fill: rgba(white, .5);
         }
         .icon-star {
-            fill: #FFFFFF;
+            fill: white;
         }
         .quoted-summary {
-            border-color: rgba(#FFFFFF, .3) !important;
+            border-color: rgba(white, .3) !important;
         }
         .feed-title {
             margin-right: 26px;
@@ -2586,8 +3056,8 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         }
         .favicon-wrap {
             position: static;
-            background-color: #FFF;
-            @include background-color((day: transparent, dusk: #FFF, sunset: transparent, midnight: #FFF));
+            background-color: white;
+            @include background-color((day: transparent, dusk: white, sunset: transparent, midnight: white));
             $shadow: (
                 day: none,
                 dusk: 0px 1px 1px 0px rgba(0, 0, 0, 0.1),
@@ -2618,6 +3088,8 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     top: $toolbar-height;
     left: 0;
     width: 100%;
+    bottom: 0;
+    overflow-y: scroll;
     &.foreground {
         z-index: 5;
     }
@@ -2629,7 +3101,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     @include border-bottom($color-borders);
     @include background-color($color-contrast-100);
     @include arrow(
-        $x-position: 63px,
+        $x-position: 62px,
         $y-position: -1px,
         $arrow-color: $color-base,
         $shadow-color: $color-arrow-shadow,
@@ -2709,9 +3181,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             padding: 0;
             @include color($color-contrast-700);
             position: relative;
-            &::-ms-expand {
-                display: none;
-            }
         }
         &:after {
             width: 0px;
@@ -2725,7 +3194,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             top: 23px;
             pointer-events: none;
             .theme-dusk &, .theme-midnight & {
-                border-top-color: #FFF;
+                border-top-color: white;
             }
         }
     }
@@ -2789,7 +3258,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                 content: "";
                 display: block;
                 width: 18px;
-                background-color: #000;
+                background-color: black;
             }
             &:before {
                 top: 8px;
@@ -2826,7 +3295,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             &:after,
             .theme-button-inner:before,
             .theme-button-inner:after {
-                background-color: #FFF;
+                background-color: white;
             }
             .theme-dusk & {
                 @include border-color($color-selected);
@@ -2838,7 +3307,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             &:after,
             .theme-button-inner:before,
             .theme-button-inner:after {
-                background-color: #FFF;
+                background-color: white;
             }
             .theme-midnight & {
                 @include border-color($color-selected);
@@ -3166,9 +3635,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             top: 35px;
         }
     }
-    .button-settings {
-        color: #333;
-    }
 }
 
 .account-toolbar {
@@ -3190,7 +3656,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #ddd;
     z-index: 2;
     appearance: none;
     border: none;
@@ -3245,6 +3710,8 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         display: none;
         @media (max-width: $small-breakpoint) {
             display: flex;
+            top: 30px;
+            right: 8px;
         }
         .web-settings-button {
             width: 100%;
@@ -3293,11 +3760,11 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                 }
                 &:hover, &.selected {
                     @include background-color($color-selected, $extra: !important);
-                    color: #fff  !important;
+                    color: white  !important;
                     text-decoration: none;
                     &.with-icon {
                         svg {
-                            @include fill(#FFF);
+                            @include fill(white);
                         }
                     }
                     .favicon-unread-active {
@@ -3307,7 +3774,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                         display: none;
                     }
                     .share-keyboard {
-                        color: #FFF;
+                        color: white;
                     }
                 }
                 &.no-border {
@@ -3324,7 +3791,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                         flex: 1;
                         margin-left: 8px;
                     }
-                    .icon-settings-check {
+                    .icon-check {
                         margin-left: auto;
                         @include fill($color-contrast-700);
                         visibility: hidden;
@@ -3347,7 +3814,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             .view_unread &.view-mode-unread,
             .view_starred &.view-mode-starred,
             .view_all &.view-mode-all {
-                .icon-settings-check {
+                .icon-check {
                     visibility: visible;
                 }
             }
@@ -3463,7 +3930,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 
 .share-form {
     @include background-color($color-contrast-100);
-    padding: 17px 20px;
+    padding: 24px 16px;
     @include border-bottom($color-borders);
     @include arrow(
         $x-position: 241px,
@@ -3482,12 +3949,23 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .share-form-inner {
         max-width: 620px;
         margin: 0 auto;
+        svg {
+            @include fill($color-icons);
+        }
     }
     h2 {
         @include font-size(16);
         @include color($color-contrast-700);
         font-weight: bold;
-        margin: 0 0 15px 0;
+        margin: 0 0 0 0;
+    }
+    .share-header {
+        display: flex;
+        align-items: center;
+        :last-child {
+            margin-left: auto
+        }
+        margin-bottom: 16px;
     }
     .field-cluster {
         margin-bottom: 15px;
@@ -3502,40 +3980,10 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         }
     }
     .share-controls {
-        overflow: hidden;
-        margin-bottom: 10px;
-        .checkbox, .radio, .control {
-            float: left;
-            margin-left: 15px;
-            @include font-size(14);
-            @include color($color-contrast-700);
-            &:first-child {
-                margin-left: 0
-            }
-            input {
-                margin-top: 2px;
-            }
+        margin-bottom: 16px;
+        .checkbox {
+            margin-bottom: 8px;
         }
-    }
-    .icon-share-email {
-        background: image-url("icon-share-email.svg") 100% 0 no-repeat;
-        background-size: 24px 16px;
-    }
-    .icon-share-evernote {
-        background: image-url("icon-share-evernote.svg") 100% 0 no-repeat;
-        background-size: 20px 25px;
-    }
-    .icon-share-tumblr {
-        background: image-url("icon-share-tumblr.svg") 100% 0 no-repeat;
-        background-size: 14px 24px;
-    }
-    .icon-share-pinboard {
-        background: image-url("icon-share-pinboard.svg") 100% 0 no-repeat;
-        background-size: 25px 25px;
-    }
-    .icon-share-micro-blog {
-        background: image-url("icon-share-micro-blog.svg") 100% 0 no-repeat;
-        background-size: 23px 23px;
     }
 }
 
@@ -3720,7 +4168,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     video, audio {
         display: block;
         width: 100%;
-        background-color: #000;
+        background-color: black;
         max-width: 100%;
     }
 
@@ -3787,7 +4235,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         .favicon-wrap {
             margin-right: 8px;
             position: static;
-            background-color: #FFF;
+            background-color: white;
             flex: 0 0 auto;
         }
         .meta-wrap {
@@ -3917,7 +4365,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         position: relative;
         height: 0;
         width: 100%;
-        background: #f0f0f0;
+        background: black;
         .inner {
             cursor: pointer;
             background-color: black;
@@ -4026,7 +4474,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                 position: absolute;
                 max-width: 100%;
                 max-height: 100%;
-                fill: #FFF;
+                fill: white;
             }
         }
     }
@@ -4057,12 +4505,9 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 .entry-final-content a, .tweet-text a, .micropost-text a, .modal-content .content-styles a {
     text-decoration: underline;
     -webkit-tap-highlight-color: rgba(0,0,0,0.2);
-    @include color((day: black, dusk: white, sunset: black, midnight: white));
-    &:hover, &:active {
-        @include color((day: $color-accent-blue-600, dusk: $theme-color-dusk-500, sunset: $color-accent-blue-600, midnight: $theme-color-midnight-500));
-    }
-    .touch &:hover {
-        @include color((day: black, dusk: white, sunset: black, midnight: white), $root: true);
+    @include color($color-contrast-700);
+    &:hover {
+        @include color($color-hover);
     }
 }
 
@@ -4277,10 +4722,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         opacity: .5;
     }
 
-}
-
-.checkbox input {
-    margin-top: 2px;
 }
 
 .radio input {
@@ -4530,7 +4971,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         height: $height;
         line-height: $height;
         top: -$height;
-        color: #fff;
+        color: white;
         font-size: 16px;
         padding: 0 10px;
         margin: 0 auto;
@@ -4546,11 +4987,11 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             top: 0;
         }
         &.error {
-            background-color: #d61f33;
+            background-color: $color-accent-red-600;
         }
         &:hover {
             text-decoration: none;
-            color: #FFF;
+            color: white;
         }
         &[href=""] {
             cursor: default;
@@ -4584,7 +5025,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
     li.selected {
         @include background-color($color-selected);
-        color: #fff !important;
+        color: white !important;
     }
     .feed-list {
         padding-bottom: 22px;
@@ -4604,7 +5045,7 @@ Settings
 .content-inner {
     margin-top: 20px;
     padding: 4px 20px 12px 20px;
-    background-color: #FFF;
+    background-color: white;
     border: 1px solid map-get($color-borders, day);
     border-radius: 4px;
 }
@@ -4612,23 +5053,22 @@ Settings
 .settings-nav {
     flex-direction: column;
     width: 310px;
+    @include background-color($color-sidebar);
+    @include border-right(map-merge($color-borders, (day: transparent, sunset: transparent)));
     .logo {
         padding: 39px 0 0 21px;
-        background-color: $theme-color-700;
         display: block;
         svg {
             width: 140px;
             height: 30px;
-            path {
-                fill: #FFF;
-            }
+            @include fill($color-contrast-700);
         }
-
     }
     .modal & {
         width: 100%;
         display: block;
         border: none;
+        @include background-color($color-base);
         .logo {
             display: none;
         }
@@ -4644,9 +5084,9 @@ Settings
 
 .settings-nav {
     display: none;
-    @include respond-to(screen-sm) {
+	@media (min-width: 700px) {
         display: flex;
-    }
+	}
 }
 
 .nav {
@@ -4687,12 +5127,11 @@ Settings
             padding-right: $nav-padding;
         }
         body:not(.touch) &:hover {
-            color: #FFF;
+            color: white;
             text-decoration: none;
-            background-color: #223D4F;
+            @include background-color($color-selected-off);
         }
         &.active {
-            color: #FFF;
             @include background-color($color-selected, $extra: !important);
             .modal & {
                 @include color($color-selected);
@@ -4701,21 +5140,23 @@ Settings
             }
         }
     }
-    .settings-inner & {
+    .settings & {
         a {
-            color: #fff;
+            @include color($color-contrast-700);
+            &.active {
+                @include color(white);
+            }
         }
         .nav-header {
             padding: 0 $nav-padding;
-            color: $theme-color-100;
+            @include color($color-contrast-700);
             margin: 40px 0 8px 0;
         }
         .icon-wrap {
             svg {
-                fill: $theme-color-100;
+                @include fill($color-contrast-600);
             }
         }
-
     }
 }
 
@@ -4730,13 +5171,8 @@ Settings
             background-color: transparent;
         }
         .settings-inner & {
-            color: $theme-color-400;
+            @include color($color-contrast-400);
         }
-    }
-    .has-icon a {
-        display: flex;
-        align-items: center;
-        padding-left: 35px;
     }
     &.border {
         &:before {
@@ -4753,64 +5189,40 @@ Settings
     .settings-inner & {
         &.border {
             &:before {
-                background-color: $theme-color-600;
+                @include background-color($color-borders);
             }
         }
-    }
-}
-
-body.settings {
-    background-color: map-get($color-contrast-700, day);
-    color: map-get($color-contrast-700, day);
-    @media (max-width: $small-breakpoint) {
-        background-color: #FFF;
     }
 }
 
 .settings {
+    @include color($color-contrast-600);
     font-size: 16px;
-    .settings-inner {
-        display: flex;
-        align-items: stretch;
-        min-height: 100%;
-    }
-    .settings-inner .settings-nav {
-        flex-shrink: 0;
-        @media (max-width: 900px) {
-            width: 230px;
-        }
-    }
-    .settings-content {
-        position: relative;
-        padding: 0;
-        background-color: #FFF;
-        flex-grow: 1;
-        max-width: 100%;
-        min-width: 0;
-        .settings-content-inner {
-            max-width: 900px;
-            padding: 0 20px 0 37px;
-            @media (max-width: $small-breakpoint) {
-                padding: 0;
-            }
-        }
+    height: 100%;
+    p {
+        line-height: 1.6;
     }
     small {
         font-size: 13px;
-        color: #999;
+        @include color($color-contrast-500);
     }
     code {
         padding: 0;
-    }
-    .alert {
-        margin-top: 20px;
     }
     h2 {
         margin: 32px 0 32px;
         font-size: 32px;
         font-weight: bold;
-        color: $theme-color-700;
+        @include color($color-contrast-700);
         -webkit-font-smoothing: antialiased;
+        @media (max-width: $small-breakpoint) {
+            font-size: 24px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            margin-right: 42px;
+        }
+
     }
     h3 {
         font-size: 18px;
@@ -4819,8 +5231,74 @@ body.settings {
             margin-bottom: 0;
         }
     }
-    .subscription-profile {
-        @include settings-row;
+    .starred-feed-wrap {
+        width: 100%;
+        max-width: 480px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        .input-group {
+            flex: 1;
+        }
+    }
+    .toolbar {
+        display: flex;
+        flex: 1;
+        align-items: center;
+        > :first-child {
+            margin-right: 64px
+        }
+        .last-control {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+        }
+        @media (max-width: $small-breakpoint) {
+            flex-direction: column;
+            align-items: stretch;
+            .last-control {
+                margin-left: unset;
+                margin-top: 16px;
+            }
+            &.row {
+                flex-direction: row;
+                .last-control {
+                    margin-left: auto;
+                    margin-top: unset;
+                    align-items: center;
+                }
+            }
+        }
+    }
+    .settings-inner {
+        display: flex;
+        flex: 1;
+        align-items: stretch;
+        min-height: 100%;
+    }
+    .settings-inner .settings-nav {
+        flex-shrink: 0;
+    }
+    .settings-content {
+        position: relative;
+        padding: 0;
+        @include background-color($color-base);
+        flex-grow: 1;
+        max-width: 100%;
+        min-width: 0;
+        .settings-content-inner {
+            max-width: 700px;
+            padding: 0 20px 0 37px;
+            @media (max-width: $small-breakpoint) {
+                padding: 0 8px;
+            }
+        }
+        a {
+            text-decoration: underline;
+        }
+    }
+    .alert {
+        margin-top: 20px;
     }
     .input-wrap {
         position: relative;
@@ -4857,11 +5335,6 @@ body.settings {
                 display: none;
             }
         }
-        .twitter-profile-image img {
-            width: 32px;
-            height: 32px;
-            border-radius: 32px;
-        }
     }
     .subscription-title {
         position: relative;
@@ -4880,10 +5353,11 @@ body.settings {
     }
     h4 {
         font-size: 18px;
-        margin: 0 0 10px 0;
+        margin: 0 0 16px 0;
     }
     h4.group-header {
         font-size: 16px;
+        @include color($color-contrast-700);
     }
     h3.box-header {
         margin: 0;
@@ -4940,58 +5414,33 @@ body.settings {
     }
     .theme-day {
         .theme-button-day {
-            background-color: #FFF;
+            background-color: white;
             @include border-color($color-selected);
         }
     }
     .theme-sunset {
         .theme-button-sunset {
-            background-color: #FFF;
+            background-color: white;
             @include border-color($color-selected);
         }
     }
     .theme-dusk {
         .theme-button-dusk {
-            background-color: #FFF;
+            background-color: white;
             @include border-color($color-selected);
         }
     }
     .theme-background {
-        padding: 10px;
-        &.theme-day {
-            background-color: map-get($color-contrast-100, day);
-            .title {
-                color: map-get($color-contrast-700, day);
-            }
-        }
-        &.theme-sunset {
-            background-color: map-get($color-contrast-100, sunset);
-            .title {
-                color: map-get($color-contrast-700, sunset);
-            }
-        }
-        &.theme-dusk {
-            background-color: map-get($color-contrast-100, dusk);
-            .title {
-                color: map-get($color-contrast-700, dusk);
-            }
-        }
-        &.theme-midnight {
-            background-color: map-get($color-contrast-100, midnight);
-            .title {
-                color: map-get($color-contrast-700, midnight);
-            }
-        }
+        padding: 16px;
+        @include background-color($color-contrast-100);
+        border-radius: 4px;
     }
     .preview-group {
         z-index: 1000;
         margin-bottom: 30px;
         top: 0;
         position: sticky;
-        background-color: map-get($color-contrast-100, day);
-        @media (max-width: $small-breakpoint) {
-            background-color: map-get($color-contrast-100, day);
-        }
+        @include background-color($color-base);
         .control-group {
             margin-bottom: 0;
         }
@@ -5049,18 +5498,18 @@ body.settings {
     .theme-dusk {
         .entries {
             border: 1px solid map-get($color-borders, dusk);
-            box-shadow: 4px 4px 0 -2px map-get($color-contrast-200, dusk);
+            box-shadow: 4px 4px 0 -2px black;
         }
     }
     .theme-midnight {
         .entries {
             border: 1px solid map-get($color-borders, midnight);
-            box-shadow: 4px 4px 0 -2px map-get($color-contrast-200, midnight);
+            box-shadow: 4px 4px 0 -2px black;
         }
     }
     .feed-settings {
         display: flex;
-        margin: 25px 0 24px;
+        margin: 24px 0 24px;
         h2 {
             flex-grow: 1;
             margin: 0;
@@ -5076,21 +5525,9 @@ body.settings {
         }
     }
     .feed-search {
-        padding: 5px 25px 5px 36px !important;
-        font-size: 14px;
-        background-image: image-url("favicon-search-light.svg");
-        background-position: 11px 6px;
-        background-repeat: no-repeat;
         max-width: 250px;
-        display: block;
-        margin: 0;
         &.processing {
-            background-image: image-url("favicon-search-light.svg"), image-url("spinner-day.svg");
-            background-position: 11px 6px, 97% 6px;
-            background-size: auto, 16px 16px;
-        }
-        @media (max-width: $small-breakpoint) {
-            max-width: 100%
+            background-image: none;
         }
     }
     .feed-controls-wrap {
@@ -5101,38 +5538,40 @@ body.settings {
     .feed-controls {
         display: flex;
         border-radius: 8px 8px 0 0;
-        background-color: $inset-bg-color;
-        border: 1px solid #DCDEE0;
-        padding: 15px 30px 12px 30px;
+        @include background-color($color-base);
+        @include border($color-borders);
+        padding: 16px;
         @media (max-width: $small-breakpoint) {
-            padding-left: 15px;
-            padding-right: 15px;
+            padding: 16px 0;
             border-radius: 0;
             border-left: none;
             border-right: none;
         }
     }
     .select-all-wrap {
-        background-color: $inset-bg-color;
-        border: 1px solid #DCDEE0;
+        @include border($color-borders);
+        @include background-color($color-base);
         border-top: none;
-        padding: 15px 30px 12px 30px;
-        .checkbox input {
-            margin-top: 1px;
-            margin-right: 18px;
-        }
+        padding: 16px;
         @media (max-width: $small-breakpoint) {
-            padding-left: 15px;
-            padding-right: 15px;
+            padding: 16px 0;
             border-left: none;
             border-right: none;
         }
     }
     .feed-actions {
         flex-grow: 1;
+        .checkbox {
+            flex-shrink: 0;
+        }
     }
-    .feeds-checkbox {
-        margin-right: 15px;
+    .select-all-wrap, .feed-actions {
+        .checkbox input {
+            margin-right: 16px !important;
+            @media (max-width: $small-breakpoint) {
+                margin-right: 8px !important;
+            }
+        }
     }
     .feed-dropdown {
         display: inline-block;
@@ -5167,7 +5606,6 @@ body.settings {
         }
     }
     .feed-list-toolbar-button {
-        margin-right: 15px;
         @include color($color-selected);
         appearance: none;
         background: transparent;
@@ -5175,7 +5613,7 @@ body.settings {
         border: none;
         display: inline-block;
         &.button-caret {
-            color: #000;
+            color: black;
             position: relative;
             padding-right: 15px;
             &:before {
@@ -5188,7 +5626,7 @@ body.settings {
                 height: 0;
                 border-left: 5px solid transparent;
                 border-right: 5px solid transparent;
-                border-top: 5px solid #000;
+                border-top: 5px solid black;
             }
         }
         &.no-margin {
@@ -5237,34 +5675,57 @@ body.settings {
         .chart-wrap {
             line-height: 1;
             display: flex;
-            margin-bottom: 20px;
-            padding: 15px 12px 30px 12px;
-            border-radius: 8px;
-            background-color: #FFF;
-            @include border($color-borders);
+            margin-bottom: 32px;
+            padding: 0 0 21px 0;
             .graph-wrap {
                 flex: 1 1 auto;
                 padding-top: 25%;
-                border-left: 1px solid map-get($color-borders, day);
-                border-bottom: 1px solid map-get($color-borders, day);
-                margin-left: 5px;
+                @include border-bottom($color-borders);
+                margin-right: 5px;
                 position: relative;
+                .graph-lines {
+                    display: flex;
+                    flex: 0 0 auto;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    text-align: right;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    bottom: 2px;
+                    right: 0;
+                    div {
+                        width: 100%;
+                        @include border-top($color-contrast-200);
+                        border-top-style: dashed;
+                        &:last-child {
+                            visibility: hidden;
+                        }
+                    }
+                }
                 .graph {
                     display: flex;
                     justify-content: space-around;
                     align-items: flex-end;
                     position: absolute;
                     top: 0;
-                    left: 1px;
-                    bottom: 1px;
+                    left: 0;
+                    bottom: 2px;
                     right: 0;
                     flex-wrap: nowrap;
                     div {
-                        border-left: 1px solid white;
+                        margin-left: 2px;
                         content: "";
                         flex: 1;
-                        background-color: $color-accent-blue-600;
+                        background-color: $color-accent-green-600;
                         min-height: 1px;
+                        border-radius: 2px 2px 0 0;
+                        &:first-child {
+                            margin: 0;
+                        }
+                        &.zero {
+                            border-radius: 0;
+                        }
                     }
                 }
             }
@@ -5275,6 +5736,24 @@ body.settings {
             flex-direction: column;
             justify-content: space-between;
             text-align: right;
+            div {
+                position: relative;
+                &:nth-child(1n) {
+                    top: -5px;
+                }
+                &:nth-child(2n) {
+                    top: -3px;
+                }
+                &:nth-child(3n) {
+                    top: -1px;
+                }
+                &:nth-child(4n) {
+                    top: 1px;
+                }
+                &:nth-child(5n) {
+                    top: 3px;
+                }
+            }
         }
         .x-axis {
             position: absolute;
@@ -5285,80 +5764,14 @@ body.settings {
             display: flex;
         }
         .x-axis, .y-axis {
-            color: map-get($color-contrast-400, day);
+            @include color($color-contrast-400);
             font-size: 12px;
         }
-        .stats {
-            margin-top: 1px;
-            @include border-bottom($color-borders);
-            padding: 0 0 15px 0;
-            justify-content: space-between;
-            display: flex;
-            margin-bottom: 15px;
-            @media (max-width: $small-breakpoint) {
-                flex-direction: column;
-                text-align: left;
-                padding: 0;
-                border: none;
-                .stat {
-                    margin-bottom: 10px;
-                }
-            }
-            .stat {
-                flex: 1 1 auto;
-                &:last-child {
-                    margin-right: 0;
-                }
-            }
-            .stat-title {
-                @media (max-width: $small-breakpoint) {
-                    display: inline;
-                    font-size: 16px;
-                    @include color($color-contrast-700);
-                    text-transform: none;
-                    font-weight: bold;
-                    &:after {
-                        content: ": "
-                    }
-                }
-            }
-            .stat-body {
-                margin: 0;
-                @media (max-width: $small-breakpoint) {
-                    display: inline;
-                    font-weight: normal;
-                }
-            }
-        }
-        .stat-header {
-            margin: 0 0 5px 0;
-            text-transform: uppercase;
-            font-size: 12px;
-            color: map-get($color-contrast-400, day);
-        }
-        .recent-articles {
-            padding-top: 20px;
-            margin-bottom: 15px;
-            ul {
-                margin: 0;
-                padding: 0;
-                list-style: none;
-                li {
-                    display: flex;
-                    justify-content: space-between;
-                    color: map-get($color-contrast-400, day);
-                    border-top: 1px solid map-get($color-borders, day);
-                    a {
-                        padding: 10px 0;
-                        margin-right: 10px;
-                        text-decoration: none;
-                    }
-                    time {
-                        padding: 10px 0;
-                        margin-right: 10px;
-                    }
-                }
-            }
+        .stats td {
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .profile-images {
             .image {
@@ -5377,53 +5790,85 @@ body.settings {
             border-radius: 0;
         }
         li {
-            clear: both;
             position: relative;
             padding: 0;
         }
         .feeds-wrap {
             position: relative;
         }
-        $checkbox-offset: 64px;
-        $checkbox-offset-narrow: 49px;
-        .checkbox-wrap {
-            display: flex;
-            padding-top: 18px;
+        .checkbox {
             position: absolute;
-            z-index: 1000;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            align-items: flex-start;
+            padding: 0;
             left: 0;
             top: 0;
             bottom: 0;
-            width: $checkbox-offset;
-            .feeds-checkbox {
-                margin: 0 0 0 30px !important;
-                padding: 0;
+            width: 40px;
+            label {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                $top: 23px;
+                &:before {
+                    top: $top;
+                    left: 16px;
+                }
+                &:after {
+                    top: $top;
+                    left: 11px;
+                }
+                svg {
+                    top: $top;
+                    left: 19px;
+                }
+                z-index: 10;
             }
             @media (max-width: $small-breakpoint) {
-                padding-top: 15px;
-                width: $checkbox-offset-narrow;
-                .feeds-checkbox {
-                    margin: 0 0 0 15px !important;
+                width: 24px;
+                label {
+                    &:before {
+                        top: 22px;
+                        left: 4px;
+                    }
+                    &:after {
+                        top: 22px;
+                        left: 0px;
+                    }
+                    svg {
+                        top: 22px;
+                        left: 7px;
+                    }
                 }
             }
         }
         .subscription-link {
             display: flex;
+            flex: 1;
             justify-content: space-between;
-            color: map-get($color-contrast-700, day);
-            padding: 13px 30px 13px $checkbox-offset;
+            @include color($color-contrast-700);
+            padding: 13px 16px 13px 8px;
             align-items: center;
+            margin-left: 40px;
+            text-decoration: none;
             &:hover {
                 text-decoration: none;
             }
             @media (max-width: $small-breakpoint) {
-                padding: 13px 15px 13px $checkbox-offset-narrow;
+                margin-left: 22px;
+                padding-right: 0;
             }
         }
         .subscription-data-wrap {
             display: flex;
             min-width: 0;
             flex-direction: column;
+            margin-right: 16px;
         }
         .subscription-data {
             display: flex;
@@ -5433,33 +5878,19 @@ body.settings {
         .subscription-controls {
             display: flex;
             align-items: center;
-            background: image-url("icon-arrow.svg") 100% 50% no-repeat;
-            background-size: 12px 18px;
-            width: 170px;
-            padding-right: 20px;
-            .tags {
-                text-align: right;
-                font-size: 14px;
-                @include color($color-contrast-400);
-                display: block;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                width: 100%;
-                white-space: nowrap;
-                margin-right: 20px;
-                margin-right: 15px;
+            justify-content: flex-end;
+            flex-shrink: 0;
+            svg {
+                @include fill($color-contrast-300);
+                transform: scaleX(-1);
             }
         }
         .favicon-container {
             display: block;
-            height: 16px;
-            width: 16px;
+            height: 20px;
+            width: 20px;
             margin-right: 8px;
             .favicon-wrap {
-                position: static;
-                height: 16px;
-                width: 16px;
-                top: 0;
                 left: 0;
                 box-shadow: none;
             }
@@ -5485,25 +5916,36 @@ body.settings {
             }
         }
         .last-updated-wrap, .subscription-meta {
-            font-size: 14px;
+            @include font-size(14);
             @include color($color-contrast-400);
         }
         .subscription-meta {
-            margin-left: 24px;
+            min-width: 0;
+            margin-left: 28px;
             display: flex;
             .feed-url-wrap {
                 display: block;
                 text-overflow: ellipsis;
                 overflow: hidden;
                 white-space: nowrap;
+                flex-shrink: 1;
             }
         }
         .canvas-wrap {
             width: 97px;
+            height: 20px;
             overflow-x: hidden;
             overflow-y: visible;
             z-index: 0;
+            margin-right: 16px;
+            line-height: 0;
+            position: relative;
+            @include background-color($color-base);
+            background-image: linear-gradient(0deg, rgba($color-accent-green-600, 0), rgba($color-accent-green-600, 0.8));
             canvas {
+                position: absolute;
+                top: 0;
+                left: 0;
                 width: 100%;
                 height: 100%;
             }
@@ -5514,54 +5956,26 @@ body.settings {
         .subscription-item {
             margin-right: 10px;
         }
-        .update-icon {
-            content: "";
-            background: image-url("icon-clock-settings.svg") 0 -16px no-repeat;
-            background-size: 16px 32px;
-            height: 16px;
-            width: 16px;
-            display: none;
-            margin: auto;
-        }
-        .mute-icon {
-            background: image-url("icon-mute-settings.svg") 0 -13px no-repeat;
-            background-size: 12px 26px;
-            height: 13px;
-            width: 12px;
-            display: none;
-            margin: auto;
-        }
     }
-    .modal-purpose-action_preview {
-        .action-description {
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border-left-width: 1px;
-            border-right-width: 1px;
+    .subscription-pill {
+        align-items: center;
+        margin-bottom: 32px;
+        .favicon-wrap {
+            flex-shrink: 0;
+            margin-right: 8px;
         }
-        .content {
-            padding: 15px;
+        h4 {
+            flex: 1;
+            margin: 0 !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
         }
-    }
-    .action-description {
-        border: 1px solid map-get($color-borders, day);
-        border-width: 1px 0 1px 0;
-    }
-    .action-preview-entries {
-        position: static;
-        margin-left: auto;
-        margin-right: auto;
-        ul li .entries-inner-wrap {
-            margin-left: 25px;
-        }
-        .entries-inner-wrap {
-            padding-right: 0;
-        }
-        .entry-image {
-            display: none;
-        }
-        a, div {
-            pointer-events: none;
+        .twitter-profile-image, .twitter-profile-image img {
+            width: 32px;
+            height: 32px;
+            border-radius: 32px;
         }
     }
     .pagination {
@@ -5573,277 +5987,197 @@ body.settings {
             content: "Next";
         }
     }
-    .select {
-        width: 150px;
-        margin-left: 10px;
-    }
     .error-message {
         background-color: $color-accent-red-600;
         border-radius: 8px;
         padding: 10px;
-        color: #fff;
+        color: white;
     }
 }
-input[type="checkbox"] + label .slider-checkbox {
-    width: 55px;
-    height: 26px;
+
+.modal-purpose-action_preview {
+    .action-description {
+        border-radius: 8px;
+        margin-bottom: 16px;
+        border-left-width: 1px;
+        border-right-width: 1px;
+    }
+    .content {
+        padding: 16px;
+    }
+}
+.action-description {
+    @include border($color-borders);
+    border-width: 1px 0 1px 0;
+}
+.action-preview-entries {
+    position: static;
+    margin-left: auto;
+    margin-right: auto;
+    ul li .entries-inner-wrap {
+        margin-left: 25px;
+    }
+    .entries-inner-wrap {
+        padding-right: 0;
+    }
+    .entry-image {
+        display: none;
+    }
+    a, div {
+        pointer-events: none;
+    }
+}
+
+.control-group-description, .control-description {
+    padding-top: 0;
+    @include font-size(14px);
+    @include color($color-contrast-500);
+    white-space: normal;
+    margin: 0;
+    a {
+        text-decoration: underline;
+    }
+}
+
+.control-group-description {
+    margin: 8px 0 0 0;
+}
+
+@keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+.spinner-container {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.spinner {
+    $size: 16px;
+    height: $size;
+    width: $size;
+    position: relative;
     display: block;
-    position: absolute;
-    right: 30px;
-    top: 10px;
-    border-radius: 28px;
-    @include background-color($color-contrast-400);
-    $size: 20px;
     &:before, &:after {
         position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        border-radius: 50%;
         display: block;
         content: "";
         height: $size;
         width: $size;
-        border-radius: $size;
-        @include background-color((
-            debug:    color-contrast-inverted-100,
-            day:      $theme-color-100,
-            sunset:   $theme-color-sunset-100,
-            dusk:     $theme-color-dusk-600,
-            midnight: $theme-color-midnight-600,
-        ));
-        top: 3px;
-        left: 3px;
     }
     &:before {
-        z-index: 2;
-        transition: left .2s ease, opacity .3s ease;
-        opacity: 1;
-        background-color: #FFF;
+        border: 2px solid transparent;
+        @include border-color($color-contrast-300);
     }
     &:after {
-        z-index: 1;
-        transition: left .2s ease;
+        transform: translateZ(0);
+        animation: spin 1s infinite linear;
+        border-top: 2px solid transparent;
+        border-right: 2px solid transparent;
+        border-bottom: 2px solid transparent;
+        border-left: 2px solid transparent;
+        @include theme("border-left-color", $color-contrast-400);
     }
-    @media (max-width: $small-breakpoint) {
-        right: 15px;
-    }
-    .modal & {
-        right: 24px;
-        @media (max-width: $small-breakpoint) {
-            right: 16px;
-        }
-    }
-}
-input[type="checkbox"]:checked + label .slider-checkbox {
-    @include background-color($color-accent-green-600);
-    &:after {
-        left: 32px;
-        background: #FFF image-url("icon-check.svg") 3px 5px no-repeat;
-    }
-    &:before {
-        left: 32px;
-        opacity: 0;
-    }
-}
-.control-group {
-    input[type="radio"] + label {
-        position: relative;
-        $size: 20px;
+    &.large {
+        $size: 32px;
+        height: $size;
+        width: $size;
         &:before, &:after {
-            position: absolute;
-            right: 33px;
-            top: 13px;
-            content: "";
+            border-width: 4px;
             height: $size;
             width: $size;
-            border-radius: $size;
-            @media (max-width: $small-breakpoint) {
-                right: 18px;
-            }
-        }
-        &:before {
-            z-index: 2;
-            background-color: transparent;
-            border: 3px solid $theme-color-300;
-        }
-    }
-    input[type="radio"]:checked + label {
-        &:before {
-            border-color: $color-accent-green-600;
-        }
-        &:after {
-            z-index: 1;
-            border: 6px solid white;
-            background-color: $color-accent-green-600;
         }
     }
 }
-.control-group-description {
-    @include settings-row;
-    padding-top: 0;
-    font-size: 12px;
-    color: #999;
-    margin-top: -35px !important;
-    margin-bottom: 12px;
-    @media (max-width: $small-breakpoint) {
-        margin-top: -20px !important;
+
+label.text-field {
+    display: block;
+    font-weight: bold;
+    @include font-size(16);
+    input {
+        display: block;
+        margin-top: 10px;
     }
-    &.no-margin {
-        margin-bottom: 0;
-    }
+    margin-bottom: 30px;
 }
+
+.has-description {
+    margin-bottom: 32px;
+}
+
 .control-group {
     list-style: none;
     margin: 0;
     padding: 0;
-    margin-bottom: 30px;
+    margin-bottom: 32px;
     @include border-bottom($color-borders);
-    &.no-border {
+    .has-description & {
+        margin-bottom: 8px;
+    }
+    &.no-border, .modal & {
         @include border-bottom(transparent);
+    }
+    li > label,
+    li > a,
+    li > .form-control {
+        @include form-control;
+        padding: 16px 0;
+        margin: 0;
+        text-decoration: none;
+    }
+    li > a {
+        @include color($color-link);
     }
     > li {
         margin: 0;
         padding: 0;
         position: relative;
         @include border-top($color-borders);
-        &.no-border {
+        &.no-border, .modal & {
             @include border-top(transparent);
         }
-        > {
-            label,
-            button:not(.unstyled),
-            textarea,
-            a,
-            input,
-            #card-element,
-            .field-wrap {
-                margin: 0;
-                font-size: 16px;
-                display: block;
-                text-align: left;
-                line-height: 1;
-                position: relative;
-                border: none;
-                border-radius: 0;
-                max-width: 100%;
-                width: 100%;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                white-space: nowrap;
-                @include settings-row;
-                @include border-color($color-borders);
-                @include background-color($color-base);
-                &:focus {
-                    box-shadow: inset 0px 0px 2px 0 rgba($selected, 0.5);
-                }
-            }
-        }
         &.text {
-            padding: 0 30px;
-            @media (max-width: $small-breakpoint) {
-                padding: 0 15px;
-            }
-            & + .text {
-                margin-top: 10px;
-            }
-            > input, > textarea {
-                @include background-color($color-contrast-200, $extra: !important);
-                border-width: 2px !important;
-                border-style: solid;
-                border-radius: 8px;
-                padding-left: 8px;
-                padding-right: 8px;
-                &:focus {
-                    @include background-color(#FFF, $extra: !important);
-                    box-shadow: none;
-                    @include border($color-selected);
-                }
+            padding: 0;
+            label {
+                padding: 0;
             }
         }
-        &.card-meta {
-            display: flex;
-            margin-bottom: 10px;
-            input {
-                flex: 1;
-                width: 50%;
-                max-width: auto;
-                margin: 0 10px 0 0;
-            }
-            select {
-                flex: 1;
-                width: 50%;
-                border: none;
-                @include background-color($color-contrast-200);
-                @include font-size(16);
-                border-radius: 8px;
-                height: 52px;
-
-
-                padding: 0 15px;
-                line-height: 1.1;
-                border: none;
-                appearance: none;
-                @include color($color-contrast-700);
-                position: relative;
-
-            }
-            @media (max-width: $small-breakpoint) {
-                flex-direction: column;
-                input, select {
-                    width: auto;
-                    flex: 0;
-                }
-                input {
-                    margin: 0 0 10px 0;
-                }
+        &.text-label {
+            label {
+                padding: 0;
             }
         }
-        &.card-number-wrap {
-            padding: 0 30px;
-            @media (max-width: $small-breakpoint) {
-                padding: 0 15px;
-            }
-        }
-        #card-element {
-            border-width: 2px;
-            border-style: solid;
-            border-color: transparent;
-            border-radius: 8px;
-            padding: 17px 15px;
-            @include background-color($color-contrast-200);
-            &.StripeElement--focus {
-                border-color: $color-accent-blue-600;
-                background-color: #FFF;
-            }
+        &.right {
+            text-align: right;
         }
     }
     .table {
-        background-color: #FFF;
-        border-top: 1px solid map-get($color-borders, day);
-    }
-    input[type="checkbox"]:focus + label .slider-checkbox, input[type="checkbox"]:active + label .slider-checkbox {
-        box-shadow: $focus-glow;
-    }
-    input[type="radio"]:focus + label {
-        box-shadow: inset 0px 0px 2px 0 rgba($selected, 0.5);
+        @include border-top($color-borders);
+        @include border-bottom($color-borders);
     }
     label {
         user-select: none;
     }
-    a:hover {
-        text-decoration: none;
-    }
     textarea {
         line-height: 1.2;
-    }
-    input[type="submit"],
-    button {
-        @include color($color-selected);
-        appearance: none;
-        background: #FFF;
     }
     input[type="radio"], input[type="checkbox"] {
         @extend .visually-hidden;
     }
-    input[type="checkbox"] + label {
-        padding-right: 85px !important;
+    input[type="checkbox"] + label, input[type="radio"] + label {
+        padding-right: 63px;
     }
     &.no-margin {
         margin-bottom: 0;
@@ -5854,13 +6188,10 @@ input[type="checkbox"]:checked + label .slider-checkbox {
             width: 33% !important;
         }
         td:first-child {
-            padding-left: 30px !important;
-            @media (max-width: $small-breakpoint) {
-                padding-left: 15px !important;
-            }
+            padding-left: 0 !important;
         }
         td:last-child {
-            padding-right: 30px !important;
+            padding-right: 0 !important;
             text-align: right;
             @media (max-width: $small-breakpoint) {
                 padding-right: 15px !important;
@@ -5870,7 +6201,33 @@ input[type="checkbox"]:checked + label .slider-checkbox {
             margin: 0;
         }
     }
+}
 
+.card-meta {
+    display: flex;
+    > * {
+        flex: 1 1 0;
+        margin-left: 16px;
+    }
+    :first-child {
+        margin-left: 0;
+    }
+    @media (max-width: $small-breakpoint) {
+        flex-direction: column;
+        > * {
+            margin-left: 0;
+        }
+    }
+}
+#card-element {
+    flex: 1;
+    border-radius: 4px;
+    padding: 6px 8px 7px 8px;
+    @include background-color($color-contrast-200);
+    @include border(transparent);
+    &.StripeElement--focus {
+        @include focus;
+    }
 }
 
 .settings-feeds {
@@ -5889,7 +6246,7 @@ input[type="checkbox"]:checked + label .slider-checkbox {
     text-align: center;
     border-radius: 4px;
     box-shadow: 1px 1px 1px rgba(black, .4);
-    background-color: #FFF;
+    background-color: white;
     color: map-get($color-contrast-700, day);
 }
 
@@ -5934,7 +6291,7 @@ table.small td {
         @include border-bottom($color-borders);
     }
     .autocomplete-suggestion {
-        color: #000;
+        color: black;
         padding: 5px;
         pointer-events: none;
         border-bottom: none;
@@ -5952,43 +6309,48 @@ table.small td {
         padding-left: 15px;
         padding-right: 15px;
     }
-    .action-feed-search {
-        font-size: 13px !important;
-        padding: 2px 4px!important;
-        max-width: 200px;
-        margin-left: auto;
-        margin-bottom: 0;
-    }
 }
+
 .filter-wrap {
-    padding: 12px 0 0 0;
-    background-color: #FFF;
-    border-top: 1px solid map-get($color-borders, day);
-    border-bottom: 1px solid map-get($color-borders, day);
-    margin-bottom: 30px;
+    @include border($color-borders);
+    border-radius: 8px;
+    margin-bottom: 32px;
+    &.separate-header {
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+    }
+    @media (max-width: $small-breakpoint) {
+        border: none;
+        &.separate-header {
+            .pill-list {
+                border-top: none;
+            }
+        }
+    }
 }
 .filter {
     overflow-y: auto;
     overflow-x: hidden;
     resize: vertical;
-    height: 134px;
-    padding-left: 30px;
-    padding-right: 30px;
-    @media (max-width: $small-breakpoint) {
-        padding-left: 15px;
-        padding-right: 15px;
+    height: 200px;
+    .pill-list {
+        border: none;
+        li {
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+        li:first-child {
+            border-top: none;
+        }
     }
-    .checkbox {
-        resize: none;
-        float: none;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        width: 100%;
-        display: block;
-        line-height: 1;
-        input {
-            margin-top: 0;
+    @media (max-width: $small-breakpoint) {
+        .pill-list {
+            @include border-top($color-borders);
+            @include border-bottom($color-borders);
+            li {
+                padding-left: 0;
+                padding-right: 0;
+            }
         }
     }
 }
@@ -6005,10 +6367,10 @@ table.small td {
 
 .push-options {
     font-size: 13px;
-    color: #999;
+    @include color($color-contrast-600);
     line-height: 1.2;
-    border: 1px solid map-get($color-borders, day);
-    background: map-get($color-contrast-100, day);
+    @include border($color-borders);
+    @include background-color($color-contrast-100);
     margin: 0 0 15px 0;
     padding: 8px 6px;
     button {
@@ -6050,7 +6412,7 @@ table.small td {
     }
 }
 .highlight-positive {
-    color: #6AB042;
+    color: $color-accent-green-600;
     font-weight: bold;
 }
 
@@ -6088,6 +6450,9 @@ Billing/Subscribe
     &.update-cc-button {
         display: inline-block !important;
     }
+}
+#credit_card_payment {
+    margin-bottom: 8px;
 }
 [data-behavior="billing_option_apple_pay"] {
     display: none;
@@ -6174,45 +6539,69 @@ Icons
 Buttons
 ------------------------------------------------------------------------------*/
 .button {
-    appearance: none !important;
+    appearance: none;
     @include background($color-selected);
     border: none;
     margin: 0;
     padding: 0;
-    @include font-size(16);
-    font-weight: normal;
+    @include font-size(14);
+    font-weight: bold;
     font-family: $font-stack;
-    @include color(#FFF);
-    text-decoration: none;
+    @include color(white);
+    text-decoration: none !important;
     @include border($color-selected);
     border-width: 2px;
     border-radius: 4px;
-    padding: 7px;
-    min-width: 90px;
+    padding: 5px 8px;
+    min-width: 96px;
     display: inline-block;
     text-align: center;
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+    line-height: 1.3;
+    &.flex {
+        width: 100%;
+    }
+    &:before {
+        content: "";
+        display: block;
+        border: 4px solid transparent;
+        position: absolute;
+        pointer-events: none;
+        top: -7px;
+        right: -7px;
+        bottom: -7px;
+        left: -7px;
+        border-radius: 9px;
+    }
     &:hover {
         text-decoration: none;
-        @include border-color($color-selected-hover);
-        @include background-color($color-selected-hover);
-        @include color(#FFF);
-        cursor: pointer;
+        @include color(white);
     }
     &:active {
-        text-decoration: none;
-        @include border-color($color-selected-active);
-        @include background-color($color-selected-active);
+        @include border-color($color-selected-hover);
+        @include background-color($color-selected-hover);
+        @include color(white);
+        cursor: pointer;
     }
     &:focus {
-        box-shadow: $focus-glow;
+        outline: none;
+        box-shadow: none;
+        &:before {
+            border-color: $color-accent-blue-400;
+        }
     }
     &[disabled], &.disabled {
-        @include color(#FFF);
+        @include color($color-base-light-200);
         @include border-color($color-contrast-300);
         @include background-color($color-contrast-300);
         cursor: default;
         &:focus {
             box-shadow: none;
+            @include color($color-base-light-200);
+            @include border-color($color-contrast-300);
+            @include background-color($color-contrast-300);
         }
         &:hover {
             @include border-color($color-contrast-300);
@@ -6223,39 +6612,104 @@ Buttons
 
 .button-secondary {
     @include background-color(transparent);
-    @include color($color-selected);
-    &[disabled] {
-        background-color: transparent !important;
-        @include color($color-contrast-300, $extra: !important);
-        &:hover {
-            background-color: transparent;
-            @include color($color-contrast-300, $extra: !important);
-        }
+    @include color($color-contrast-600);
+    @include border-color($color-contrast-300);
+    &:hover {
+        @include color($color-contrast-600);
     }
+    &:active:not([disabled]) {
+        @include background-color(transparent);
+        @include color($color-contrast-700);
+        @include border-color($color-contrast-600);
+    }
+    &[disabled], &.disabled, &[disabled]:active, &.disabled:active {
+        @include color($color-base-light-200);
+        @include border-color($color-contrast-300);
+        @include background-color($color-contrast-300);
+    }
+}
+
+.button-tertiary {
+    min-width: auto;
+    @include background-color(transparent);
+    @include color($color-contrast-600);
+    @include border-color(transparent);
     &:hover {
         @include background-color(transparent);
-        @include color($color-selected-hover);
-        .theme-dusk &, .theme-midnight & {
-            color: #fff;
-        }
+        @include color($color-contrast-600);
     }
     &:active {
         @include background-color(transparent);
-        @include color($color-selected-active);
-        .theme-dusk &, .theme-midnight & {
-            color: #fff;
-        }
+        @include color($color-contrast-700);
+        @include border-color(transparent);
+    }
+    &[disabled] {
+        @include color($color-contrast-400);
     }
 }
+
+.button-huge {
+    @include color($color-contrast-600);
+    @include background-color($color-contrast-200);
+    border: 1px dashed transparent;
+    @include border-color($color-contrast-500);
+    width: 100%;
+    border-radius: 4px;
+    padding: 16px;
+    display: block;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 48px;
+    text-decoration: none !important;
+    &:hover {
+        @include color($color-contrast-700);
+        @include background-color($color-contrast-200);
+        border: 1px dashed transparent;
+        @include border-color($color-contrast-600);
+        text-decoration: none;
+    }
+}
+
+
+.grabber {
+    cursor: move;
+    @include border-color($color-contrast-700);
+    @include background-color($color-contrast-700);
+    @include color($color-base);
+    text-decoration: none !important;
+    &:hover {
+        @include color($color-contrast-100);
+    }
+    &:active {
+        @include border-color($color-contrast-700);
+        @include background-color($color-contrast-700);
+        @include color($color-contrast-100);
+    }
+    ~ .accessory svg {
+        @include fill($color-contrast-400);
+    }
+}
+
+.grabber-icon {
+    @include background-color($color-contrast-600);
+    border-radius: 0 4px 4px 0;
+    svg {
+        @include fill($color-contrast-300);
+    }
+}
+
 .settings .pagination {
     text-align: center;
     a, span, em {
         @extend .button;
         @extend .button-secondary;
         min-width: auto;
-        padding-top: 7px;
-        padding-bottom: 7px;
+        padding: 7px 12px;
         margin-bottom: 10px;
+        margin-left: 4px;
+        &:first-child {
+            margin-left: 0;
+        }
         @media (max-width: $small-breakpoint) {
             display: none;
             &.previous_page, &.next_page {
@@ -6263,22 +6717,16 @@ Buttons
             }
         }
         &.current {
-            @include background-color($color-selected);
             font-style: normal;
-            color: #fff !important;
+            @include background-color(transparent);
+            @include color($color-contrast-700);
+            @include border-color($color-contrast-600);
         }
         &.gap {
             border: none;
             color: map-get($color-contrast-400, day) !important;
             padding-left: 7px;
             padding-right: 7px;
-        }
-        &.disabled {
-            background-color: transparent;
-            color: map-get($color-contrast-400, day) !important;
-            &:hover {
-                background-color: transparent;
-            }
         }
     }
 }
@@ -6291,30 +6739,15 @@ Buttons
     padding: 0;
     font-weight: normal;
     font-family: $font-stack;
-    @include color($color-selected);
-    &:hover {
-        text-decoration: underline;
-        @include color($color-selected-hover);
-    }
+    @include color($color-link);
+    border-radius: 2px;
+    padding: 1px;
+    font-size: 14px;
+    text-decoration: underline;
 }
 
 .button-empty {
     line-height: 0;
-}
-
-.button-text-secondary {
-    appearance: none !important;
-    background: none;
-    border: none;
-    margin: 0;
-    padding: 0;
-    font-weight: normal;
-    font-family: $font-stack;
-    color: map-get($color-contrast-400, day);
-    &:hover {
-        text-decoration: underline;
-        color: map-get($color-contrast-400, day);
-    }
 }
 
 .button::-moz-focus-inner {
@@ -6324,14 +6757,31 @@ Buttons
     margin-bottom: -3px;
 }
 
-.button-wrap {
-    text-align: right;
-    vertical-align: middle;
-    button {
-        margin-left: 5px;
+.stacked-form, .field-cluster {
+    .input-group + .input-group,
+    .autocomplete-parent + .input-group {
+        margin-top: 16px;
     }
-    input {
-        margin-left: 5px;
+}
+
+.button-wrap-inline {
+    display: flex;
+    align-items: center;
+    .button + .button,
+    .button + .input-group,
+    .input-group + .input-group,
+    .input-group + button,
+    .button-text + .button-text {
+        margin-left: 16px;
+    }
+}
+.button-wrap {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    .button + .button {
+        margin-left: 16px;
     }
 }
 
@@ -6343,10 +6793,10 @@ Buttons
 Link Viewer
 ------------------------------------------------------------------------------*/
 .placeholder-content h1:empty, .placeholder-content p:empty {
-    @include background($color-contrast-400);
+    @include background($color-contrast-300);
 }
 .placeholder-content p:empty {
-    height: 14px;
+    height: 12px;
 }
 .placeholder-content p:nth-child(2n) {
     width: 90%;
@@ -6356,12 +6806,6 @@ Link Viewer
 }
 .placeholder-content p:last-child {
     width: 30%;
-}
-.spinner {
-    height: 50px;
-    background-position: 50% 50%;
-    background-repeat: no-repeat;
-    @include background-image($image-spinners);
 }
 
 .view-link-error-container {
@@ -6433,7 +6877,7 @@ select {
     padding: 8px 35px 8px 14px;
     margin-bottom: 20px;
     @include background-color($color-selected);
-    color: #FFF;
+    color: white;
 }
 
 .alert:empty {
@@ -6441,7 +6885,7 @@ select {
 }
 
 .alert h4 {
-    color: #FFF;
+    color: white;
     margin: 0;
 }
 
@@ -6459,7 +6903,7 @@ select {
 .alert-info,
 .alert-danger,
 .alert-error {
-    background-color: #d61f33;
+    background-color: $color-accent-red-600;
 }
 
 .alert-block {
@@ -6564,6 +7008,10 @@ hr.nospace {
     display: none;
 }
 
+.hidden {
+    visibility: hidden;
+}
+
 input[type="text"].hide {
     display: none;
 }
@@ -6584,6 +7032,13 @@ input[type="text"].hide {
     border: 0;
 }
 
+.truncated {
+    display: block;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    white-space: nowrap;
+}
+
 .text-left {
     text-align: left;
 }
@@ -6601,19 +7056,21 @@ input[type="text"].hide {
 }
 
 .muted {
-    color: #666666;
+    @include color($color-contrast-600);
+    @include native-theme("color", $color-contrast-600);
 }
 
 .extra-muted {
-    color: #b7b7b7;
+    @include color($color-contrast-500);
+    @include native-theme("color", $color-contrast-500);
 }
 
 .danger {
-    color: red;
+    @include color($color-accent-red-600);
 }
 
 a:hover.danger {
-    color: #b80000;
+    color: $color-accent-red-600;
 }
 
 .xs-hide {
@@ -6698,7 +7155,7 @@ a:hover.danger {
         position: absolute;
         top: 4px;
         left: 9px;
-        background-color: #FFF;
+        @include background-color($color-base);
         height: 44px;
         width: 35px;
         content: '';
@@ -6709,7 +7166,14 @@ a:hover.danger {
         left: 0;
         top: -1px;
         &:before {
-            background-color: $theme-color-dusk-100;
+            @include background-color((
+                debug:    color-contrast-inverted-600,
+                day:      $theme-color-600,
+                sunset:   $theme-color-sunset-600,
+                dusk:     $theme-color-dusk-200,
+                midnight: $theme-color-midnight-200,
+            ));
+
             background-image: image-url("icon-muted.svg");
             background-position: 4px 3px;
             background-size: 9.693px 9.693px;
@@ -6751,21 +7215,28 @@ a:hover.danger {
 Login and Sign Up
 ------------------------------------------------------------------------------*/
 .login {
-    background-color: map-get($color-contrast-100, day);
+    @include native-theme("background-color", $color-contrast-100)
     padding: 15px;
     display: flex;
     align-items: center;
+    a {
+        @include native-theme("color", $color-link);
+    }
     .login-wrap {
         margin: auto;
         width: 400px;
     }
     .logo {
-        background: image-url('logo-full.svg') no-repeat scroll top left;
         display: block;
-        width: 205px;
-        height: 44px;
-        background-size: 205px 44px !important;
-        margin: 0 auto 30px auto;
+        margin: 0 auto 32px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        svg {
+            width: 180px !important;
+            height: auto !important;
+            @include native-theme("fill", $color-contrast-700);
+        }
     }
     .content {
         position: static;
@@ -6773,15 +7244,17 @@ Login and Sign Up
     }
     .box-header {
         font-size: 18px;
-        font-weight: normal;
-        color: #333;
+        font-weight: bold;
         text-align: center;
         margin: 0 0 15px 0;
+        @include native-theme("color", $color-contrast-700);
     }
     .box {
-        border: 1px solid map-get($color-borders, day);
+        border: 1px solid transparent;
+        @include native-theme("border-color", $color-borders);
         border-radius: 4px;
-        background-color: #FFF;
+        background-color: white;
+        @include native-theme("background-color", $color-base);
         margin: 0 auto 14px auto;
         width: 100%;
         max-width: 400px;
@@ -6793,23 +7266,8 @@ Login and Sign Up
             padding: 36px;
         }
     }
-    input[type="email"],
-    input[type="password"],
-    input[type="text"] {
-        width: 100%;
-        max-width: 100%;
-        padding: 14px 10px 12px 10px;
-        margin: 0;
-    }
-    input[type="submit"] {
-        padding: 15px 0;
-        font-size: 20px;
-        width: 100%;
-        display: block;
-        color: #fff;
-    }
-    input + input {
-        margin-top: 10px !important;
+    .input-group {
+        margin-bottom: 16px;
     }
     .field_with_errors + input {
         margin-top: 10px !important;
@@ -6818,25 +7276,9 @@ Login and Sign Up
         display: block;
         margin: 10px 0 0 0;
         text-align: center;
-        color: #999;
+        @include native-theme("color", $color-contrast-500);
     }
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    textarea:-webkit-autofill,
-    textarea:-webkit-autofill:hover
-    select:-webkit-autofill,
-    select:-webkit-autofill:hover {
-        -webkit-text-fill-color: map-get($color-contrast-700, day);
-        -webkit-box-shadow: 0 0 0px 1000px map-get($color-contrast-200, day) inset;
-        transition: none;
-        border: 2px solid map-get($color-contrast-200, day);
-    }
-    select:-webkit-autofill:focus,
-    textarea:-webkit-autofill:focus,
-    input:-webkit-autofill:focus {
-        -webkit-box-shadow: 0 0 0px 1000px #FFF inset;
-        border: 2px solid $color-accent-blue-600;
-    }
+
 }
 
 
@@ -6957,7 +7399,7 @@ Media Players
         justify-content: center;
         @include background-color($color-contrast-200);
         position: relative;
-        border: 2px solid #FFF;
+        border: 2px solid white;
         box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
         .image-container {
             line-height: 0;
@@ -7305,7 +7747,7 @@ Media Players
     }
     .mejs_empty__time {
         box-sizing: content-box;
-        color: #fff;
+        color: white;
         font-size: 11px;
         font-weight: bold;
         height: 24px;
@@ -7517,7 +7959,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 }
 
 .mejs__container {
-    background: #000;
+    background: black;
     box-sizing: border-box;
     font-family: 'Helvetica', Arial, serif;
     position: relative;
@@ -7565,7 +8007,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 
 .mejs__embed,
 .mejs__embed body {
-    background: #000;
+    background: black;
     height: 100%;
     margin: 0;
     overflow: hidden;
@@ -7759,7 +8201,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 /* Start: Time (Current / Duration) */
 .mejs__time {
     box-sizing: content-box;
-    color: #fff;
+    color: white;
     font-size: 11px;
     font-weight: bold;
     height: 24px;
@@ -7793,7 +8235,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
     height: 0px;
     border-style: solid;
     border-width: 9px 0 9px 15px;
-    border-color: transparent transparent transparent #FFF;
+    border-color: transparent transparent transparent white;
     content: "";
     position: absolute;
     top: 11px;
@@ -7810,7 +8252,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
     top: 11px;
     left: 5px;
     pointer-events: none;
-    background-color: #FFF;
+    background-color: white;
 }
 
 .mejs__controls .mejs__pause button:before {
@@ -8025,7 +8467,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 }
 
 .mejs__broadcast {
-    color: #fff;
+    color: white;
     height: 10px;
     position: absolute;
     top: 15px;
@@ -8202,7 +8644,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 
 .mejs__captions-selector-list-item,
 .mejs__chapters-selector-list-item {
-    color: #fff;
+    color: white;
     cursor: pointer;
     display: block;
     list-style-type: none !important;
@@ -8247,7 +8689,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 
 .mejs__captions-layer {
     bottom: 0;
-    color: #fff;
+    color: white;
     font-size: 16px;
     left: 0;
     line-height: 20px;
@@ -8256,7 +8698,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 }
 
 .mejs__captions-layer a {
-    color: #fff;
+    color: white;
     text-decoration: underline;
 }
 
@@ -8302,7 +8744,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 }
 .mejs__cannotplay,
 .mejs__cannotplay a {
-    color: #fff;
+    color: white;
     font-size: 0.8em;
 }
 
@@ -8521,6 +8963,7 @@ button.close {
 }
 
 .modal-header-input {
+    $icon-width: 64px;
     position: relative;
     top: 0;
     z-index: 100;
@@ -8537,10 +8980,11 @@ button.close {
         top: 0;
         bottom: 0;
         left: 0;
-        width: 50px;
+        width: $icon-width;
         display: flex;
         align-items: center;
         justify-content: center;
+        pointer-events: none;
         svg {
             @include fill($color-icons);
         }
@@ -8562,19 +9006,16 @@ button.close {
             }
         }
     }
-    .favicon-wrap {
-        position: absolute;
-        right: 15px;
-    }
     input {
+        border-radius: 8px;
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
         margin: 0;
-        border: none;
+        @include border(transparent);
         margin: 0;
         width: 100%;
         max-width: 100%;
-        padding: 20px 60px 20px 47px;
+        padding: 18px 60px 18px $icon-width - 8px;
         font-size: 24px;
         @include color($color-contrast-700);
         @include background-color($color-contrast-100);
@@ -8586,7 +9027,7 @@ button.close {
         }
         &:focus {
             @include color($color-contrast-700);
-            border-color: transparent !important;
+            @include border(transparent);
             @include background-color($color-contrast-100);
         }
     }
@@ -8599,11 +9040,12 @@ button.close {
     display: flex;
     input {
         border-radius: $modal-border-radius;
-        padding-left: 20px;
+        padding-left: 16px;
+
     }
     .favicon-target {
         position: absolute;
-        right: 15px;
+        right: 22px;
         top: 0;
         bottom: 0;
         display: flex;
@@ -8630,7 +9072,7 @@ button.close {
         justify-content: center;
         flex-direction: column;
         text-align: center;
-        padding-left: 15px;
+        padding-left: 24px;
         font-size: 18px;
         padding-top: 5px;
     }
@@ -8653,7 +9095,7 @@ button.close {
         align-items: stretch;
         margin-bottom: 35px;
         .title {
-            flex-grow: 1;
+            flex: 1;
             position: relative;
             display: flex;
             justify-content: center;
@@ -8662,7 +9104,7 @@ button.close {
         }
         .feed-url {
             position: absolute;
-            bottom: -40px;
+            bottom: -22px;
             left: 8px;
             font-size: 12px;
             @include color($color-contrast-500);
@@ -8671,18 +9113,21 @@ button.close {
             white-space: nowrap;
             max-width: 90%;
             padding-right: 5px;
+            margin: 0;
         }
         .action {
             display: flex;
             align-items: center;
-            margin: 0 0 0 20px;
+            margin: 0 0 0 24px;
             position: relative;
+            flex-shrink: 0;
+            width: 43px;
             [type=checkbox] {
                 position: absolute !important;
                 top: -9999px !important;
                 left: -9999px !important;
             }
-            .slider-checkbox {
+            .switch-inner {
                 position: relative;
                 right: auto;
                 top: auto;
@@ -8692,26 +9137,6 @@ button.close {
             }
         }
     }
-    .subscription-preferences {
-        label {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            [type=checkbox] {
-                position: absolute !important;
-                top: -9999px !important;
-                left: -9999px !important;
-            }
-            .slider-checkbox {
-                margin-left: 15px;
-                position: relative;
-                display: inline-block;
-                right: 0 !important;
-                top: 0;
-            }
-        }
-
-    }
     .feed-url {
         display: none;
     }
@@ -8720,6 +9145,7 @@ button.close {
     }
 }
 .modal-footer-message {
+    @include font-size(14);
     margin-right: auto !important;
     @media (max-width: 600px) {
         display: none !important;
@@ -8770,25 +9196,26 @@ button.close {
     }
     &:hover, &.autocomplete-selected {
         @include background-color($color-selected);
-        color: #fff;
+        color: white;
     }
 }
 
 .autocomplete-parent {
     position: relative;
     .autocomplete-suggestions {
-        background-color: #FFF;
-        border: 1px solid map-get($color-borders, day);
         border-radius: 4px;
+        @include border($color-borders);
+        @include background-color($color-base-alt);
         box-shadow: $box-shadow-dropdown;
     }
     .autocomplete-suggestion {
-        color: map-get($color-contrast-700, day);
-        border-color: map-get($color-borders, day);
-        padding: 10px 11px;
+        @include color($color-contrast-700);
+        @include border-color($color-borders);
+        padding: 12px 16px;
+        cursor: pointer;
         &:hover, &.autocomplete-selected {
             @include background-color($color-selected, $extra: !important);
-            color: #fff !important;
+            color: white !important;
         }
     }
     .autocomplete-suggestion:first-child {
@@ -8802,7 +9229,7 @@ button.close {
     .share-autocomplete {
         z-index: 2;
         position: absolute;
-        top: 41px;
+        top: 32px;
         left: 7px;
         width: 100%;
         max-width: 400px;
@@ -9041,16 +9468,17 @@ button.close {
 .modal-body {
     position: relative;
     flex: 1 1 auto;
-    padding: 16px;
+    padding: 24px;
+    @media (max-width: $small-breakpoint) {
+        padding: 16px;
+    }
 }
 
 .modal-footer {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 16px;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding: 16px 24px;
     @include border-top($color-borders);
     &.hide {
         display: none;
@@ -9061,11 +9489,7 @@ button.close {
 }
 
 .modal-footer > :not(:first-child) {
-    margin-left: .25rem;
-}
-
-.modal-footer > :not(:last-child) {
-    margin-right: .25rem;
+    margin-left: 16px;
 }
 
 .modal-scrollbar-measure {
@@ -9111,7 +9535,7 @@ button.close {
 }
 
 
-.modal-purpose-generic, .modal-purpose-subscribe, .modal-purpose-edit, .modal-purpose-search {
+.modal-purpose-generic, .modal-purpose-search {
     .modal-body {
         padding: 0;
     }
@@ -9145,17 +9569,19 @@ button.close {
 
 .modal-purpose-edit {
     .modal-footer {
-        margin-top: -30px;
-        border-color: transparent;
+        border-top: none;
         .modal-bottom & {
             @include border-color($color-borders);
         }
     }
-    .tags-form .modal-footer {
-        margin-top: 0;
-    }
     .modal-body {
-        padding-bottom: 16px;
+        padding-bottom: 32px;
+    }
+    .modal-body + .modal-footer {
+        @include border-top($color-borders);
+    }
+    .control-group {
+        margin-bottom: 0;
     }
 }
 
@@ -9177,7 +9603,7 @@ button.close {
         }
     }
     &.loaded {
-        .modal-content * {
+        .modal-content *:not(.icon-check) {
             opacity: 1;
         }
     }
@@ -9200,11 +9626,6 @@ button.close {
         }
         &:empty {
             border-bottom: none;
-        }
-        .text {
-            padding-left: 15px;
-            padding-right: 15px;
-            margin-bottom: 10px;
         }
         &.tags-target {
             border-bottom: none;
@@ -9236,4 +9657,110 @@ button.close {
     .group-header {
         @include color($color-contrast-600);
     }
+}
+
+/* tooltips */
+$tooltip-arrow-width: 12px;
+$tooltip-arrow-height: 6px;
+
+.tooltip {
+    position: absolute;
+    z-index: 1070;
+    display: block;
+    margin: 0;
+    font-family: $font-stack;
+    font-size: 12px;
+    word-wrap: break-word;
+    opacity: 0;
+    &.show { opacity: 1; }
+    .arrow {
+        position: absolute;
+        display: block;
+        width: $tooltip-arrow-width;
+        height: $tooltip-arrow-height;
+        &::before {
+            position: absolute;
+            content: "";
+            border-color: transparent;
+            border-style: solid;
+        }
+    }
+}
+
+.bs-tooltip-top {
+    padding: $tooltip-arrow-height 0;
+    .arrow {
+        bottom: 0;
+        &::before {
+            top: 0;
+            border-width: $tooltip-arrow-height ($tooltip-arrow-width / 2) 0;
+            @include theme(border-top-color, $color-base-dark-700);
+        }
+    }
+}
+
+.bs-tooltip-right {
+    padding: 0 $tooltip-arrow-height;
+    .arrow {
+        left: 0;
+        width: $tooltip-arrow-height;
+        height: $tooltip-arrow-width;
+        &::before {
+            right: 0;
+            border-width: ($tooltip-arrow-width / 2) $tooltip-arrow-height ($tooltip-arrow-width / 2) 0;
+            @include theme(border-right-color, $color-base-dark-700);
+        }
+    }
+}
+
+.bs-tooltip-bottom {
+    padding: $tooltip-arrow-height 0;
+    .arrow {
+        top: 0;
+        &::before {
+            bottom: 0;
+            border-width: 0 ($tooltip-arrow-width / 2) $tooltip-arrow-height;
+            @include theme(border-bottom-color, $color-base-dark-700);
+        }
+    }
+}
+
+.bs-tooltip-left {
+    padding: 0 $tooltip-arrow-height;
+    .arrow {
+        right: 0;
+        width: $tooltip-arrow-height;
+        height: $tooltip-arrow-width;
+        &::before {
+            left: 0;
+            border-width: ($tooltip-arrow-width / 2) 0 ($tooltip-arrow-width / 2) $tooltip-arrow-height;
+            @include theme(border-left-color, $color-base-dark-700);
+        }
+    }
+}
+
+.bs-tooltip-auto {
+    &[x-placement^="top"] {
+        @extend .bs-tooltip-top;
+    }
+    &[x-placement^="right"] {
+        @extend .bs-tooltip-right;
+    }
+    &[x-placement^="bottom"] {
+        @extend .bs-tooltip-bottom;
+    }
+    &[x-placement^="left"] {
+        @extend .bs-tooltip-left;
+    }
+}
+
+// Wrapper for the tooltip content
+.tooltip-inner {
+    max-width: 200px;
+    padding: 8px 8px;
+    color: white;
+    text-align: center;
+    @include background-color($color-base-dark-700);
+    border-radius: 4px;
+    line-height: normal;
 }

@@ -1,8 +1,9 @@
 $('[data-behavior~=subscriptions_list]').replaceWith('<%= j render partial: "subscriptions_list" %>');
 feedbin.timeago();
 feedbin.drawBarCharts();
-<% if params[:q].present? %>
-    window.history.replaceState({}, document.title, window.location.pathname + "?q=<%= j params[:q] %>");
+feedbin.faviconColors();
+<% if params[:q].present? || params[:sort].present? %>
+    window.history.replaceState({}, document.title, window.location.pathname + "?<%= j params.permit(:sort, :q).to_query %>");
 <% else %>
     window.history.replaceState({}, document.title, window.location.pathname);
 <% end %>

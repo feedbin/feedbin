@@ -10,69 +10,85 @@
             <ul class="control-group">
                 <li>
                     <%= f.radio_button(:entry_sort, "DESC", checked: @user.entry_sort.nil? || @user.entry_sort === 'DESC', data: {behavior: "auto_submit"}) %>
-                    <%= f.label('entry_sort_desc', "Newest First") %>
+                    <%= f.label :entry_sort_desc do %>
+                        Newest First <%= radio_button_control %>
+                    <% end %>
                 </li>
                 <li>
                     <%= f.radio_button(:entry_sort, "ASC", data: {behavior: "auto_submit"}) %>
-                    <%= f.label('entry_sort_asc', "Oldest First") %>
-                </li>
-            </ul>
-            <ul class="control-group">
-                <li>
-                    <%= f.check_box :mark_as_read_confirmation, data: {behavior: "auto_submit"} %>
-                    <%= f.label :mark_as_read_confirmation do %>
-                        Ask before marking all as read <span class="slider-checkbox"></span>
-                    <% end %>
-                </li>
-                <li>
-                    <%= f.check_box :sticky_view_inline, data: {behavior: "auto_submit"} %>
-                    <%= f.label :sticky_view_inline do %>
-                        Sticky Full Content <span class="slider-checkbox"></span>
+                    <%= f.label :entry_sort_asc do %>
+                        Oldest First <%= radio_button_control %>
                     <% end %>
                 </li>
             </ul>
-            <p class="control-group-description">
-                Always attempt to load the full content from the original site
-            </p>
+        </div>
+
+        <div class="inset">
+            <div class="inset-content">
+                <h4 class="group-header">Collections</h4>
+            </div>
             <ul class="control-group">
-                <li>
-                    <%= f.check_box :show_unread_count, data: {behavior: "auto_submit"} %>
-                    <%= f.label :show_unread_count do %>
-                        Unread count in title <span class="slider-checkbox"></span>
-                    <% end %>
-                </li>
                 <li>
                     <%= f.check_box :hide_recently_read, {checked: @user.hide_recently_read.nil? || !@user.setting_on?(:hide_recently_read), data: {behavior: "auto_submit"}}, "0", "1" %>
                     <%= f.label :hide_recently_read do %>
-                        Recently Read section <span class="slider-checkbox"></span>
+                        Recently Read section <%= toggle_switch %>
                     <% end %>
                 </li>
                 <li>
                     <%= f.check_box :hide_recently_played, {checked: @user.hide_recently_played.nil? || !@user.setting_on?(:hide_recently_played), data: {behavior: "auto_submit"}}, "0", "1" %>
                     <%= f.label :hide_recently_played do %>
-                        Recently Played section <span class="slider-checkbox"></span>
+                        Recently Played section <%= toggle_switch %>
                     <% end %>
                 </li>
                 <li>
                     <%= f.check_box :hide_updated, {checked: @user.hide_updated.nil? || !@user.setting_on?(:hide_updated), data: {behavior: "auto_submit"}}, "0", "1" %>
                     <%= f.label :hide_updated do %>
-                        Updated section <span class="slider-checkbox"></span>
+                        Updated section <%= toggle_switch %>
                     <% end %>
                 </li>
             </ul>
+        </div>
+
+        <div class="inset">
+            <div class="inset-content">
+                <h4 class="group-header">Features</h4>
+            </div>
+
             <ul class="control-group">
+                <li>
+                    <%= f.check_box :mark_as_read_confirmation, data: {behavior: "auto_submit"} %>
+                    <%= f.label :mark_as_read_confirmation do %>
+                        Ask before marking all as read <%= toggle_switch %>
+                    <% end %>
+                </li>
+                <li>
+                    <%= f.check_box :show_unread_count, data: {behavior: "auto_submit"} %>
+                    <%= f.label :show_unread_count do %>
+                        Unread count in title <%= toggle_switch %>
+                    <% end %>
+                </li>
+                <li>
+                    <%= f.check_box :sticky_view_inline, data: {behavior: "auto_submit"} %>
+                    <%= f.label :sticky_view_inline do %>
+                        Sticky Full Content <%= toggle_switch %></span>
+                        <p class="control-group-description">
+                            Always attempt to load the full content from the original site
+                        </p>
+                    <% end %>
+                </li>
                 <li>
                     <%= f.check_box :starred_feed_enabled, data: {behavior: "auto_submit"} %>
                     <%= f.label :starred_feed_enabled do %>
-                        Starred article feed <span class="slider-checkbox"></span>
+                        Starred article feed
+                        <%= toggle_switch %>
+                        <p class="control-group-description">
+                            <span data-behavior="starred_feed_url">
+                                <%= render partial: 'shared/starred_feed_url', locals: {user: @user} %>
+                            </span>
+                        </p>
                     <% end %>
                 </li>
             </ul>
-            <div data-behavior="starred_feed_url">
-                <% if @user.setting_on?(:starred_feed_enabled) %>
-                    <%= render partial: 'shared/starred_feed_url', locals: {user: @user} %>
-                <% end %>
-            </div>
         </div>
         <div class="inset">
             <div class="inset-content">
@@ -82,32 +98,30 @@
                 <li>
                     <%= f.check_box :view_links_in_app, {checked: @user.setting_on?(:view_links_in_app), data: {behavior: "auto_submit"}}, "1", "0" %>
                     <%= f.label :view_links_in_app do %>
-                        Always view links in Feedbin <span class="slider-checkbox"></span>
+                        Always view links in Feedbin <%= toggle_switch %>
+                        <p class="control-group-description">
+                            Load article links in Feedbin‘s <a href="https://feedbin.com/blog/2017/07/25/view-links-in-feedbin/">link viewer</a> by default.
+                        </p>
                     <% end %>
                 </li>
-            </ul>
-            <p class="control-group-description">
-                Load article links in Feedbin‘s <a href="https://feedbin.com/blog/2017/07/25/view-links-in-feedbin/">link viewer</a> by default.
-            </p>
-            <ul class="control-group">
                 <li>
                     <%= f.check_box :disable_image_proxy, {checked: @user.disable_image_proxy.nil? || !@user.setting_on?(:disable_image_proxy), data: {behavior: "auto_submit"}}, "0", "1" %>
                     <%= f.label :disable_image_proxy do %>
-                        Image proxy <span class="slider-checkbox"></span>
+                        Image proxy <%= toggle_switch %>
+                        <p class="control-group-description">
+                            A TLS enabled image proxy is used to prevent <a href="https://developer.mozilla.org/en-US/docs/Security/MixedContent">mixed content</a> warnings. You can turn it off if you experience image loading issues.
+                        </p>
                     <% end %>
                 </li>
+                <% if @user.twitter_enabled? %>
+                    <li>
+                        <%= link_to "Switch Twitter Account", new_twitter_authentication_path %>
+                        <p class="control-group-description">
+                            You are currently signed in to Twitter as <strong><%= @user.twitter_screen_name %></strong>.
+                        </p>
+                    </li>
+                <% end %>
             </ul>
-            <p class="control-group-description <%= (!@user.twitter_enabled?) ? "no-margin" : "" %>">
-                A TLS enabled image proxy is used to prevent <a href="https://developer.mozilla.org/en-US/docs/Security/MixedContent">mixed content</a> warnings. You can turn it off if you experience image loading issues.
-            </p>
-            <% if @user.twitter_enabled? %>
-                <ul class="pill-list">
-                    <li><%= link_to "Switch Twitter Account", new_twitter_authentication_path %></li>
-                </ul>
-                <p class="control-group-description no-margin">
-                    You are currently signed in to Twitter as <strong><%= @user.twitter_screen_name %></strong>.
-                </p>
-            <% end %>
         </div>
     </div>
 <% end %>

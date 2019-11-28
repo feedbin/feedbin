@@ -1,10 +1,10 @@
-<% if status == :active %>
-    <div class="service-header">
-        <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
+<div class="service-header">
+    <%= render partial: "supported_sharing_services/header", locals: {sharing_service: sharing_service} %>
+    <div class="last-control button-wrap-inline">
+        <% if status == :active %>
+            <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
+        <% else %>
+            <%= link_to 'Activate', supported_sharing_services_path(supported_sharing_service: {service_id: sharing_service[:service_id] }), class: 'button button-secondary', method: :post %>
+        <% end %>
     </div>
-<% else %>
-    <div class="service-header">
-        <p class="service-title"><%= sharing_service[:label] %></p>
-        <%= link_to 'Activate', supported_sharing_services_path(supported_sharing_service: {service_id: sharing_service[:service_id] }), class: 'list-action', method: :post %>
-    </div>
-<% end %>
+</div>

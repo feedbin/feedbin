@@ -2,34 +2,26 @@
     <% present subscription do |subscription_presenter| %>
         <div class="feed-profile">
             <div class="inset">
-                <ul class="control-group no-border">
+                <ul class="control-group">
                     <li class="no-border">
                         <div class="subscription-profile">
-                            <div class="header">
-                                <div class="subscription-title-wrap">
-                                    <div class="field-wrap">
-                                        <%= f.text_field :title, class: 'subscription-title' %>
-                                        <%= subscription_presenter.favicon(subscription.feed) %>
-                                    </div>
-                                    <%= link_to "Unsubscribe", settings_subscription_path(@subscription), method: :delete, class: "button button-secondary settings-unsubscribe" , data: { confirm: "Are you sure you want to unsubscribe?" } %>
-                                </div>
-                                <% if !subscription.feed.twitter_feed? %>
-                                    <p class="subhead">
-                                        <a href="<%= subscription.feed.site_url %>">Website: <span><%= pretty_url(subscription.feed.site_url) %></span></a>
-                                        <a href="<%= subscription.feed.feed_url %>">Feed: <span><%= pretty_url(subscription.feed.feed_url) %></span></a>
-                                    </p>
-                                <% end %>
+                            <div class="pill subscription-pill">
+                                <%= subscription_presenter.favicon(subscription.feed) %>
+                                <h4 data-behavior="user_title"><%= subscription.title %></h4>
+                                <%= link_to "Edit", edit_subscription_path(subscription.feed), remote: true, class: "button button-secondary", data: {behavior: "open_settings_modal feed_settings", modal_target: "edit"} %>
                             </div>
                             <div class="chart-wrap">
-                                <div class="y-axis">
-                                    <div class="start"><%= subscription_presenter.graph_max %></div>
-                                    <div class="middle"><%= subscription_presenter.graph_mid %></div>
-                                    <div class="end">0</div>
-                                </div>
                                 <div class="graph-wrap">
+                                    <div class="graph-lines">
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+                                    </div>
                                     <div class="graph">
                                         <% subscription_presenter.graph_bars.each do |data| %>
-                                           <div style="height: <%= data.percent %>%;" title="<%= subscription_presenter.bar_title(data) %>"></div>
+                                           <div style="height: <%= data.percent %>%;" title="<%= subscription_presenter.bar_title(data) %>" class="<%= subscription_presenter.bar_class(data) %>"></div>
                                         <% end %>
                                     </div>
                                     <div class="x-axis">
@@ -38,28 +30,69 @@
                                         <div><%= subscription_presenter.graph_date_end %></div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="stats">
-                                <div class="stat">
-                                    <p class="stat-title stat-header">Subscriber Since</p>
-                                    <p class="stat-body"><%= subscription.created_at.to_s(:date) %></p>
-                                </div>
-                                <div class="stat">
-                                    <p class="stat-title stat-header">Last Updated</p>
-                                    <p class="stat-body"><%= subscription.feed.try(:last_published_entry).try(:to_s, :date) || "N/A" %></p>
-                                </div>
-                                <div class="stat">
-                                    <p class="stat-title stat-header">Volume</p>
-                                    <p class="stat-body">
-                                        <%= subscription_presenter.graph_volume %>
-                                        <% if subscription.feed.twitter_feed? %>
-                                            tweets / month
-                                        <% else %>
-                                            articles / month
-                                        <% end %>
-                                    </p>
+                                <div class="y-axis">
+                                    <div><%= subscription_presenter.graph_quarter(4) %></div>
+                                    <div><%= subscription_presenter.graph_quarter(3) %></div>
+                                    <div><%= subscription_presenter.graph_quarter(2) %></div>
+                                    <div><%= subscription_presenter.graph_quarter(1) %></div>
+                                    <div>0</div>
                                 </div>
                             </div>
+
+                            <h4 class="group-header">Stats</h4>
+
+                            <table class="table table-striped stats">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            Subscribed
+                                        </td>
+                                        <td>
+                                            <%= subscription.created_at.to_s(:date) %>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Updated
+                                        </td>
+                                        <td>
+                                            <%= subscription.feed.try(:last_published_entry).try(:to_s, :date) || "N/A" %>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Volume
+                                        </td>
+                                        <td>
+                                            <%= subscription_presenter.graph_volume %>
+                                            <% if subscription.feed.twitter_feed? %>
+                                                <%= 'tweet'.pluralize(subscription_presenter.graph_volume) %> / month
+                                            <% else %>
+                                                <%= 'article'.pluralize(subscription_presenter.total_posts) %> / month
+                                            <% end %>
+                                        </td>
+                                    </tr>
+                                    <% if !subscription.feed.twitter_feed? %>
+                                    <tr>
+                                        <td>
+                                            Website
+                                        </td>
+                                        <td>
+                                            <a href="<%= subscription.feed.site_url %>"><span><%= pretty_url(subscription.feed.site_url) %></span></a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Feed
+                                        </td>
+                                        <td>
+                                            <a href="<%= subscription.feed.feed_url %>"><span><%= pretty_url(subscription.feed.feed_url) %></span></a>
+                                        </td>
+                                    </tr>
+                                    <% end %>
+                                </tbody>
+                            </table>
+
                         </div>
                     </li>
                 </ul>
@@ -70,19 +103,24 @@
                     <li>
                         <%= f.check_box :muted, data: {behavior: "auto_submit"}, id: "subscription_muted" %>
                         <%= f.label :muted do %>
-                            Muted <span class="slider-checkbox"></span>
+                            Muted <%= toggle_switch %>
                         <% end %>
                     </li>
                     <li>
                         <%= f.check_box :show_updates, data: {behavior: "auto_submit"}, id: "subscription_show_updates" %>
                         <%= f.label :show_updates do %>
-                            Show updates <span class="slider-checkbox"></span>
+                            Show updates <%= toggle_switch %>
+                            <p class="control-group-description">
+                                Tells you when an article has been changed after being published
+                            </p>
                         <% end %>
                     </li>
+                    <% if !subscription.feed.twitter_feed? %>
+                        <li>
+                            <%= link_to "Refresh Favicon", refresh_favicon_settings_subscription_path(subscription), remote: true, method: :post %>
+                        </li>
+                    <% end %>
                 </ul>
-                <p class="control-group-description">
-                    Tells you when an article has been changed after being published
-                </p>
                 <% if subscription.feed.twitter_feed? %>
                     <div class="inset-content">
                         <h4 class="group-header">Twitter Options</h4>
@@ -91,24 +129,17 @@
                         <li>
                             <%= f.check_box :show_retweets, data: {behavior: "auto_submit"}, id: "subscription_show_retweets" %>
                             <%= f.label :show_retweets do %>
-                                Show Retweets <span class="slider-checkbox"></span>
+                                Show Retweets <%= toggle_switch %>
                             <% end %>
                         </li>
                         <li>
                             <%= f.check_box :media_only, data: {behavior: "auto_submit"}, id: "subscription_media_only" %>
                             <%= f.label :media_only do %>
-                                Media Only <span class="slider-checkbox"></span>
+                                Media Only <%= toggle_switch %>
+                                <p class="control-group-description">
+                                    Only show tweets that contain links or images
+                                </p>
                             <% end %>
-                        </li>
-                    </ul>
-                    <p class="control-group-description">
-                        Only show tweets that contain links or images
-                    </p>
-                <% end %>
-                <% if !subscription.feed.twitter_feed? %>
-                    <ul class="control-group">
-                        <li>
-                            <%= link_to 'Refresh Favicon', refresh_favicon_settings_subscription_path(subscription), remote: true, method: :post %>
                         </li>
                     </ul>
                 <% end %>

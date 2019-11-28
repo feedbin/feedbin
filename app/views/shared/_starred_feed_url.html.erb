@@ -1,3 +1,6 @@
-<p class="control-group-description">
-    Your starred feed: <a href="<%= starred_url(user.starred_token, format: :xml) %>" style="word-break: break-all;"><%= starred_url(user.starred_token, format: :xml) %></a>
-</p>
+<% if @user.setting_on?(:starred_feed_enabled) %>
+    <span class="truncated">Feed URL: <%= link_to starred_url(user.starred_token, format: :xml), starred_url(user.starred_token, format: :xml) %></span>
+<% else %>
+    For <a href="https://feedbin.com/blog/2013/04/10/starred-entry-feed/">integrating with other services</a>.
+<% end %>
+

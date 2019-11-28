@@ -48,6 +48,6 @@ module SettingsHelper
     })();
     EOD
     script = script.gsub("\n", "").gsub('"', "%22").gsub(" ", "%20")
-    link_to "Send to Feedbin", "javascript:void%20#{script}"
+    link_to "Send to Feedbin", "javascript:void%20#{script}", onclick: "return false;", class: "button grabber"
   end
 end

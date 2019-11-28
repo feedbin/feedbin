@@ -34,7 +34,7 @@
                     %>
                     <%= f.radio_button :plan_id, plan.id, options %>
                     <%= label_tag nil, for: dom_id(plan) do %>
-                        <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
+                        <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %> <%= radio_button_control %>
                     <% end %>
                 </li>
             <% end %>
@@ -50,11 +50,15 @@
                 </li>
                 <li data-behavior="billing_option_payment_request">
                     <%= radio_button_tag("billing_method", "pay_with_google", false, { data: {behavior: 'billing_method_radio'}}) %>
-                    <%= label_tag("billing_method_pay_with_google", "Pay with Google") %>
+                    <%= label_tag("billing_method_pay_with_google") do %>
+                         Pay with Browser <%= radio_button_control %>
+                    <% end %>
                 </li>
                 <li>
                     <%= radio_button_tag("billing_method", "credit_card", false, { data: {behavior: 'billing_method_radio'}}) %>
-                    <%= label_tag("billing_method_credit_card", "Credit Card") %>
+                    <%= label_tag("billing_method_credit_card") do %>
+                         Credit Card <%= radio_button_control %>
+                    <% end %>
                 </li>
             </ul>
         </div>
@@ -67,21 +71,21 @@
         <% @plans.each do |plan| %>
             <% if @user.trial_end.future? %>
                 <% if plan.name == "Monthly" %>
-                    <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                    <p class="<%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
                         Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> when your <%= plan_name %> ends on <strong><%= @user.trial_end.to_s(:date) %></strong> and again each month thereafter. You can change plans or cancel any time.
                     </p>
                 <% else %>
-                    <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                    <p class="<%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
                         Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> when your <%= plan_name %> ends on <strong><%= @user.trial_end.to_s(:date) %></strong> and again each year thereafter. You can change plans or cancel any time.
                     </p>
                 <% end %>
             <% else %>
                 <% if plan.name == "Monthly" %>
-                    <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                    <p class="<%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
                         Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> immediately and again each month thereafter. You can change plans or cancel any time.
                     </p>
                 <% else %>
-                    <p class="control-group-description <%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
+                    <p class="<%= plan == @default_plan ? '' : 'hide' %>" data-behavior="billing_help_text" data-plan-id="<%= dom_id(plan) %>">
                         Subscribing will charge your card <strong><%= number_to_currency(plan.price, precision: 0) %></strong> immediately and again each year thereafter. You can change plans or cancel any time.
                     </p>
                 <% end %>
@@ -90,7 +94,7 @@
         <div class="description-inset">
             <div class="button-wrap">
                 <div id="payment_request_button"><small>Loading…</small></div>
-                <%= f.submit "Subscribe", class: 'button no-margin', id: "credit_card_button", disabled: true, data: { disable_with: false } %>
+                <button type="submit" class="button no-margin" id="credit_card_button" disabled data-disable-with="false">Subscribe</button>
             </div>
         </div>
     <% end %>

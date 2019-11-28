@@ -2,7 +2,11 @@ class SubscriptionPresenter < BasePresenter
   presents :subscription
 
   def graph_volume
-    @template.number_with_delimiter(counts.sum)
+    @template.number_with_delimiter(total_posts)
+  end
+
+  def total_posts
+    counts.sum
   end
 
   def graph_date_start
@@ -29,22 +33,17 @@ class SubscriptionPresenter < BasePresenter
     end
   end
 
-  def graph_max
-    max = counts.max
-    if max == 0
+  def graph_quarter(quarter)
+    count = counts.max.to_f / 4.to_f
+    if count == 0 || (quarter != 4 && counts.max < 4)
       nil
     else
-      max
+      (count * quarter).round
     end
   end
 
-  def graph_mid
-    mid = counts.max / 2
-    if mid == 0
-      nil
-    else
-      mid
-    end
+  def bar_class(data)
+    data.count == 0 ? "zero" : ""
   end
 
   def bar_title(data)
@@ -62,18 +61,6 @@ class SubscriptionPresenter < BasePresenter
     if subscription.muted
       "status-muted"
     end
-  end
-
-  def mute_icon
-    css_classes = ["mute-icon"]
-    css_classes.push("hidden") unless subscription.muted
-    @template.content_tag(:span, "", class: css_classes.join)
-  end
-
-  def update_icon
-    css_classes = ["update-icon"]
-    css_classes.push("hidden") if subscription.show_updates
-    @template.content_tag(:span, "", class: css_classes.join)
   end
 
   private

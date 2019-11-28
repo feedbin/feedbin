@@ -1,16 +1,17 @@
-<% if status == :active %>
-    <div class="service-header">
-        <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
+<div class="service-header">
+    <div>
+        <%= render partial: "supported_sharing_services/header", locals: {sharing_service: sharing_service} %>
+        <% if status == :issue %>
+            <p class="control-group-description">Feedbin can no longer access <%= sharing_service.label %>, <%= link_to 'reactivate', supported_sharing_service_path(sharing_service, supported_sharing_service: {operation: 'authorize'}), method: :patch %>?</p>
+        <% end %>
     </div>
-<% elsif status == :issue %>
-    <div class="service-header">
-        <p class="service-title"><span class="service-error"><%= sharing_service.label %></span></p>
-        <small class="show-service-options pad-top">Feedbin can no longer access <%= sharing_service.label %>, <%= link_to 'reactivate', supported_sharing_service_path(sharing_service, supported_sharing_service: {operation: 'authorize'}), method: :patch %>?</small>
-        <%= link_to 'Deactivate', supported_sharing_service_path(sharing_service), class: 'list-action show-service-options button-text-secondary', method: :delete %>
+    <div class="last-control button-wrap-inline">
+        <% if status == :active %>
+            <%= render partial: "supported_sharing_services/delete_supported_service", locals: {editable: false, sharing_service: sharing_service} %>
+        <% elsif status == :issue %>
+            <%= render partial: "supported_sharing_services/delete_supported_service", locals: {editable: false, sharing_service: sharing_service} %>
+        <% else %>
+            <%= link_to 'Activate', supported_sharing_services_path(supported_sharing_service: {service_id: sharing_service[:service_id], operation: 'authorize'}), class: 'button button-secondary', method: :post %>
+        <% end %>
     </div>
-<% else %>
-    <div class="service-header">
-        <p class="service-title"><%= sharing_service[:label] %></p>
-        <%= link_to 'Activate', supported_sharing_services_path(supported_sharing_service: {service_id: sharing_service[:service_id], operation: 'authorize'}), class: 'list-action', method: :post %>
-    </div>
-<% end %>
+</div>

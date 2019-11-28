@@ -2,16 +2,24 @@
     <div class="inset-content">
         <h4 class="group-header">Custom Services</h4>
     </div>
-    <ul class="control-group no-border">
-        <li class="text no-border">
-            <%= f.text_field :label, placeholder: 'Label' %>
-        </li>
-        <li class="text no-border">
-            <%= f.url_field :url, placeholder: 'URL' %>
-        </li>
-    </ul>
-    <p class="control-group-description">Create your own sharing service. <a href="https://feedbin.com/help/sharing-read-it-later-services/">How does this work</a>?</p>
-    <div class="description-inset">
-        <%= f.submit "Add Service", class: 'button no-margin' %>
+    <div class="pill form">
+        <div class="stacked-form">
+            <div class="input-group-wrap">
+                <%= f.label :label, "Label" %>
+                <%= render "shared/input" do %>
+                    <%= f.text_field :label %>
+                <% end %>
+            </div>
+            <div class="input-group-wrap">
+                <%= f.label :url, "URL" %>
+                <%= render "shared/input" do %>
+                    <%= f.url_field :url %>
+                <% end %>
+            </div>
+        </div>
+        <p class="control-group-description">Create your own sharing service. <a href="https://feedbin.com/help/sharing-read-it-later-services/">How does this work</a>?</p>
+        <div class="button-wrap">
+            <button type="submit" class="button no-margin">Add Service</button>
+        </div>
     </div>
 <% end %>

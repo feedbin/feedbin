@@ -9,20 +9,20 @@
             destroy: function(){}
         };
         feedbinBilling.stripeTokenHandler = function(token) {
-            var form = document.getElementById('payment-form');
-            var hiddenInput = document.getElementById('stripe_token');
-            hiddenInput.setAttribute('value', token.id);
+            var form = document.getElementById("payment-form");
+            var hiddenInput = document.getElementById("stripe_token");
+            hiddenInput.setAttribute("value", token.id);
             form.submit();
         };
         feedbinBilling.updatePaymentRequest = function(plan) {
             feedbinBilling.button.destroy()
-            feedbinBilling.button = feedbinBilling.elements.create('paymentRequestButton', {
+            feedbinBilling.button = feedbinBilling.elements.create("paymentRequestButton", {
                 paymentRequest: feedbinBilling.paymentRequests[plan],
                 style: {
                     paymentRequestButton: {
-                        type: 'default',
-                        theme: 'dark',
-                        height: '36px',
+                        type: "default",
+                        theme: (feedbin.theme === "dusk" || feedbin.theme === "midnight") ? "light" : "dark",
+                        height: "36px",
                     },
                 },
             });
@@ -35,23 +35,23 @@
                         $("#billing_method_pay_with_google").prop("checked", true);
                     }
                     $("body").addClass("native-payment");
-                    feedbinBilling.button.mount('#payment_request_button');
+                    feedbinBilling.button.mount("#payment_request_button");
                 } else {
                     $("body").addClass("no-native-payment");
                 }
             });
-            feedbinBilling.paymentRequests[plan].on('token', function(event) {
+            feedbinBilling.paymentRequests[plan].on("token", function(event) {
                 feedbinBilling.stripeTokenHandler(event.token);
                 $("#payment_request_button").html("<small>Loading…</small>");
-                event.complete('success');
+                event.complete("success");
             });
         }
         <% @plans.each do |plan| %>
             feedbinBilling.paymentRequests[<%= plan.id %>] = feedbinBilling.stripe.paymentRequest({
-                country: 'US',
-                currency: 'usd',
+                country: "US",
+                currency: "usd",
                 total: {
-                    label: '<%= "Feedbin #{plan.name} Subscription" %>',
+                    label: "<%= "Feedbin #{plan.name} Subscription" %>",
                     amount: <%= plan.price_in_cents %>,
                 },
             });
@@ -63,20 +63,20 @@
         $(function(){
             if ($("#payment_request_button").length > 0) {
                 feedbinBilling.updatePaymentRequest(feedbinBilling.defaultPlan);
-                $(document).on ('change', '[data-behavior~=billing_method_radio]', function() {
-                    var selected = $(this).attr('id');
-                    $('[data-behavior~=billing_method_radio]').each(function() {
-                        var option = $(this).attr('id');
-                        $('body').removeClass(option);
+                $(document).on ("change", "[data-behavior~=billing_method_radio]", function() {
+                    var selected = $(this).attr("id");
+                    $("[data-behavior~=billing_method_radio]").each(function() {
+                        var option = $(this).attr("id");
+                        $("body").removeClass(option);
                     });
-                    $('body').addClass(selected)
+                    $("body").addClass(selected)
                 });
-                $(document).on ('change', '[data-behavior~=plan_select]', function() {
-                    var selected = $(this).attr('id');
-                    var plan = $(this).data('plan-id');
+                $(document).on ("change", "[data-behavior~=plan_select]", function() {
+                    var selected = $(this).attr("id");
+                    var plan = $(this).data("plan-id");
                     feedbinBilling.updatePaymentRequest(plan);
-                    $('[data-behavior~=billing_help_text]').addClass('hide');
-                    $("[data-plan-id=" + selected + "]").removeClass('hide');
+                    $("[data-behavior~=billing_help_text]").addClass("hide");
+                    $("[data-plan-id=" + selected + "]").removeClass("hide");
                 });
             }
         });
@@ -86,11 +86,11 @@
     <div class="settings-outer">
         <h2>Billing</h2>
     </div>
-    <% if ENV['STRIPE_API_KEY'] %>
-        <% if @user.plan.stripe_id == 'trial' %>
-            <%= render partial: 'shared/billing/billing_subscribe', locals: {subscribe_title: "Plan"} %>
+    <% if ENV["STRIPE_API_KEY"] %>
+        <% if @user.plan.stripe_id == "trial" %>
+            <%= render partial: "shared/billing/billing_subscribe", locals: {subscribe_title: "Plan"} %>
         <% else %>
-            <%= render partial: 'shared/billing/billing_status' %>
+            <%= render partial: "shared/billing/billing_status" %>
         <% end %>
     <% else %>
         <p>Billing disabled. <code>STRIPE_API_KEY</code> and <code>STRIPE_PUBLIC_KEY</code> are missing.</p>

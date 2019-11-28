@@ -1,84 +1,113 @@
-<%= form_for(@action, as: :action_params, remote: true) do |f| %>
+<%= form_for(@action, as: :action_params, remote: true) do |form| %>
     <div class="inset">
         <ul class="control-group no-border">
-            <li class="text no-border">
-                <%= f.text_field :title, placeholder: "Action Name" %>
+            <li class="text-label no-border">
+                <h4 class="group-header">
+                    <%= form.label :title, "Name" %>
+                </h4>
+                <%= render "shared/input" do %>
+                    <%= form.text_field :title %>
+                <% end %>
             </li>
         </ul>
-        <div class="inset-content">
-            <h4 class="group-header">Article Matches Search</h4>
-        </div>
         <ul class="control-group no-border">
-            <li class="text no-border">
-                <%= f.search_field :query, placeholder: "Search" %>
+            <li class="text-label no-border">
+                <h4 class="group-header">
+                    <%= form.label :query, "Search Terms" %>
+                </h4>
+                <%= render "shared/input" do %>
+                    <%= form.search_field :query, placeholder: 'For example: title:"[Sponsor]"' %>
+                <% end %>
             </li>
         </ul>
+
         <% if @user.taggings.present? %>
             <div class="inset-content por">
                 <h4 class="group-header">Article is in Tag</h4>
             </div>
             <div class="filter-wrap">
                 <div class="filter">
-                    <%=
-                      f.collection_check_boxes(:tag_ids, @user.feed_tags, :id, :name) do |b|
-                        b.label(class: "checkbox") do
-                          b.check_box + b.text
-                        end
-                      end
-                    %>
+                    <ul class="pill-list">
+                        <%= form.collection_check_boxes(:tag_ids, @user.feed_tags, :id, :name) do |builder| %>
+                            <li>
+                                <div class="checkbox">
+                                  <%= builder.check_box %>
+                                  <%= builder.label do %>
+                                      <%= builder.text %>
+                                      <%= svg_tag "icon-check" %>
+                                  <% end %>
+                                </div>
+                            </li>
+                         <% end %>
+                    </ul>
                 </div>
             </div>
         <% end %>
         <div class="inset-content por">
             <h4 class="group-header">Article is in Feed</h4>
         </div>
-        <div class="filter-feeds-include-all">
-            <label class="checkbox">
-                <%= f.check_box :all_feeds, data: {behavior: 'check_feeds'} %>
-                Include All
-            </label>
-            <input type="text" class="action-feed-search" data-behavior="feed_search" placeholder="Filter" />
-        </div>
-        <div class="filter-wrap">
-            <div class="filter" data-behavior="search_results">
-                <%=
-                  f.collection_check_boxes(:feed_ids, @user.feeds.include_user_title, :string_id, :title) do |b|
-                    options = {data: {behavior: 'collection_checkbox'}}
-                    if f.object.all_feeds == true
-                      options[:disabled] = 'disabled'
-                    end
-                    b.label(class: "checkbox", title: b.object.feed_url, data: {sort_name: b.text.downcase}) do
-                      b.check_box(options) + b.text
-                    end
-                  end
-                %>
+
+        <div class="feed-controls-wrap">
+            <div class="feed-controls">
+                <div class="feed-actions toolbar">
+
+                    <div class="checkbox">
+                        <input type="checkbox" value="all_feeds" data-behavior="check_feeds" id="include_all_feeds" />
+                        <label for="include_all_feeds"><%= svg_tag "icon-check" %>Include all</label>
+                    </div>
+
+
+                    <%= render "shared/input", class: "last-control" do %>
+                        <input type="text" class="small-field" data-behavior="feed_search" placeholder="Filter" />
+                    <% end %>
+
+                </div>
             </div>
         </div>
+        <div class="filter-wrap separate-header">
+            <div class="filter">
+                <ul class="pill-list" data-behavior="search_results">
+                    <%= form.collection_check_boxes(:feed_ids, @user.feeds.include_user_title, :string_id, :title) do |builder| %>
+                        <li data-sort-name="<%= builder.text.downcase %>">
+                            <div class="checkbox">
+                              <%= builder.check_box(feed_checkbox_options(form)) %>
+                              <%= builder.label title: builder.object.feed_url do %>
+                                  <%= builder.text %>
+                                  <%= svg_tag "icon-check" %>
+                              <% end %>
+                            </div>
+                        </li>
+                     <% end %>
+                </ul>
+            </div>
+        </div>
+        <h4 class="group-header">Actions</h4>
         <ul class="control-group">
             <%=
-                f.collection_check_boxes(:actions, Feedbin::Application.config.action_names, :value, :label) do |b|
-                  content_tag :li, data: {behavior: "action_#{b.value}"} do
-                    b.check_box + b.label {  "#{b.text} <span class='slider-checkbox'></span>".html_safe }
+                form.collection_check_boxes(:actions, Feedbin::Application.config.action_names, :value, :label) do |builder|
+                  content_tag :li, data: {behavior: "action_#{builder.value}"} do
+                    builder.check_box + builder.label {  "#{builder.text} #{toggle_switch}".html_safe }
                   end
                 end
             %>
         </ul>
+        <h4 class="group-header">Options</h4>
         <ul class="control-group">
             <li>
-                <%= f.check_box :apply_action %>
-                <%= f.label :apply_action do %>
-                    Apply to existing matches <span class="slider-checkbox"></span>
+                <%= form.check_box :apply_action %>
+                <%= form.label :apply_action do %>
+                    Apply to existing matches <%= toggle_switch %>
                 <% end %>
             </li>
         </ul>
         <div class="description-inset">
             <div class="button-wrap">
-                <%= f.submit "Save", name: 'commit', class: "button ui-helper-hidden-accessible" %>
+                <%= form.submit "Save", name: 'commit', class: "button ui-helper-hidden-accessible", tabindex: "-1" %>
                 <% if @action.persisted? %>
-                    <%= link_to 'Delete', @action, method: :delete, class: 'button button-secondary' , data: { confirm: 'Are you sure you want to delete this action?' }, style: "position: relative; bottom: -2px;" %>
+                    <%= link_to 'Delete', @action, method: :delete, class: 'button button-secondary' , data: { confirm: 'Are you sure you want to delete this action?' } %>
                 <% end %>
-                <%= f.submit "View Results", name: 'preview', class: "button button-secondary" %>
-                <%= f.submit "Save", name: 'commit', class: "button" %>
+                <button type="submit" name="preview" class="button button-secondary">View Results</button>
+                <button type="submit" name="commit" class="button">Save</button>
             </div>
         </div>
     </div>

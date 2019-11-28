@@ -1,7 +1,10 @@
 <% @class = 'login' %>
 <div class="login-wrap">
-    <a href="/" class="logo hide-text">Feedbin</a>
+    <a href="/" class="logo">
+        <%= svg_tag "logo-full" %>
+    </a>
     <div class="box">
         <strong><%= @user.email %></strong> has unsubscribed from all Feedbin marketing emails.
     </div>
 </div>
+<%= render partial: 'shared/svg' %>

@@ -3,7 +3,7 @@
         <h2>Actions</h2>
         <p class="muted">Actions can be performed on articles when they are published. Start by writing the keywords to match, just like you would when <a href="https://feedbin.com/help/search-syntax/">searching</a> for something. Then select the feeds to include. Finally check the actions you would like to perform on the matched incoming articles.</p>
     </div>
-    <div class="push-options hide" id="push-data" data-website-id="<%= ENV['APPLE_PUSH_WEBSITE_ID'] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>">
+    <div class="push-options hide" id="push-data" data-website-id="<%= ENV["APPLE_PUSH_WEBSITE_ID"] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>">
         <div class="push-enable hide">
             <p>Push notifications can be enabled as an action. <a href="#" data-behavior="enable_push">Enable push notifications</a>.</p>
         </div>
@@ -15,18 +15,22 @@
         </div>
     </div>
     <div class="inset">
-        <ul class="control-group">
-            <li>
-                <%= link_to '+ Add Action', new_action_path, class: 'add-action' %>
-            </li>
-        </ul>
+        <%= link_to "+ Add Action", new_action_path, class: "button button-huge" %>
         <% if @actions.present? %>
-            <ul class="pill-list">
+            <h4 class="group-header">Saved Actions</h4>
+            <ul class="pill-list segmented">
                 <% @actions.each do |action| %>
                     <li class="linked <%= action.broken? ? "error" : "" %>">
                         <%= link_to(edit_action_path(action), title: action.broken? ? "Invalid Action" : "") do %>
                             <i class="status-flag icon-error"></i>
-                            <%= render(partial: 'actions/text_description', locals: {action: action}) %>
+                            <div class="toolbar row">
+                                <div class="description">
+                                    <%= render(partial: "actions/text_description", locals: {action: action}) %>
+                                </div>
+                                <div class="last-control">
+                                    <button class="button button-secondary">Edit</button>
+                                </div>
+                            </div>
                         <% end %>
                     </li>
                 <% end %>

@@ -21,4 +21,8 @@ class SharingService < ApplicationRecord
   def active?
     true
   end
+
+  def [](key)
+    {service_id: "custom", label: label}.fetch(key)
+  end
 end

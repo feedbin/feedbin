@@ -1,17 +1,30 @@
-<li class="icon-share-custom share-icon-wrap">
+<li>
     <div class="service-header">
-        <p class="service-title"><%= sharing_service.label %></p>
-        <small class="show-service-options pad-top">URL: <%= sharing_service.url %>, <a href="#" data-behavior="show_service_options">edit</a>.</small>
+        <div>
+            <%= render partial: "supported_sharing_services/header", locals: {sharing_service: sharing_service} %>
+            <p class="control-group-description">URL: <%= sharing_service.url %></p>
+        </div>
+        <div class="last-control button-wrap-inline">
+            <button class="button button-tertiary" data-behavior="toggle_service_options">Edit</button>
+            <%= link_to 'Deactivate', sharing_service_path(sharing_service), class: 'button button-secondary', method: :delete, data: { confirm: 'Are you sure you want to delete this sharing service?' } %>
+        </div>
     </div>
-    <%= link_to 'Deactivate', sharing_service_path(sharing_service), class: 'button-text-secondary list-action show-service-options', method: :delete, data: { confirm: 'Are you sure you want to delete this sharing service?' } %>
     <div class="service-options-wrap">
         <div class="service-options">
             <%= form_for(sharing_service) do |f| %>
-                <%= f.text_field :label, placeholder: 'Label', class: 'no-margin' %>
-                <%= f.url_field :url, placeholder: 'URL' %>
+                <%= f.hidden_field :service_id, value: sharing_service[:service_id] %>
+                <%= f.hidden_field :operation, value: "" %>
+                <div class="stacked-form">
+                    <%= render "shared/input" do %>
+                        <%= f.text_field :label, placeholder: 'Label', class: 'no-margin' %>
+                    <% end %>
+                    <%= render "shared/input" do %>
+                        <%= f.url_field :url, placeholder: 'URL' %>
+                    <% end %>
+                </div>
                 <div class="button-wrap">
-                    <%= button_tag 'Cancel', type: "button", class: 'button button-secondary button-inline', data: {behavior: "hide_service_options"} %>
-                    <%= submit_tag "Save", class: 'button button-primary-plain' %>
+                    <%= button_tag "Cancel", type: "button", class: "button button-tertiary", data: {behavior: "toggle_service_options"} %>
+                    <%= button_tag "Save", type: "submit", class: "button" %>
                 </div>
             <% end %>
         </div>

@@ -1,6 +1,2 @@
 <%= render partial: 'shared/message_flash', locals: {flash: flash} %>
-<% if @user.setting_on?(:starred_feed_enabled) %>
-    $('[data-behavior~=starred_feed_url]').html('<%= j render partial: 'shared/starred_feed_url', locals: {user: @user} %>')
-<% else %>
-    $('[data-behavior~=starred_feed_url]').html('')
-<% end %>
+$('[data-behavior~=starred_feed_url]').html('<%= j render partial: 'shared/starred_feed_url', locals: {user: @user} %>')

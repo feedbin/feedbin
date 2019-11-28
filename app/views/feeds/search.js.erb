@@ -6,10 +6,7 @@
             $('.modal-purpose-subscribe [data-behavior~=feeds_search_favicon_target]').html('<%= j favicon_with_host(@feeds.first.host) %>');
         <% end %>
         $('.modal-purpose-subscribe [data-behavior~=subscribe_target]').html('<%= j render partial: "subscriptions/new", locals: {feeds: @feeds, tag_editor: @tag_editor} %>');
-        $('.modal-purpose-subscribe .modal-body, .modal-purpose-subscribe .modal-footer').slideDown(200)
-        $('.modal-purpose-subscribe .modal-dialog').addClass('done');
-        $('.modal-purpose-subscribe [data-behavior~=submit_add]').removeAttr('disabled');
-        $('.modal-purpose-subscribe .title').first().find("input").focus();
+        feedbin.showSubscribeResults()
         window.history.replaceState({}, document.title, "/");
         feedbin.updateFeedSearchMessage();
     <% end %>

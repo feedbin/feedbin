@@ -2,7 +2,7 @@
     <h4 class="group-header">Payment History</h4>
 </div>
 <div class="control-group">
-    <table class="table table-rounded">
+    <table class="table table-striped">
         <% if @next_payment_date %>
             <tr>
                 <td><time datetime="<%= @next_payment_date.to_s(:date) %>"><%= @next_payment_date.to_s(:date) %></time></td>

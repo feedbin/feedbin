@@ -58,7 +58,15 @@ module ApplicationHelper
     options = options.symbolize_keys
 
     name = name.sub(".svg", "")
-    options[:width], options[:height] = extract_dimensions(options.delete(:size)) if options[:size]
+
+    options.delete(:size)
+
+    icon = Feedbin::Application.config.icons[name]
+    if !icon
+      raise "Icon missing #{name}"
+    end
+    options[:width] = icon.width
+    options[:height] = icon.height
 
     options[:class] = [name, options[:class]].compact.join(" ")
 
@@ -127,4 +135,20 @@ module ApplicationHelper
       address.join("<br>").html_safe
     end
   end
+
+  def toggle_switch
+    content_tag :span, class: "switch" do
+      content_tag :span, class: "switch-inner" do
+        svg_tag "icon-check"
+      end
+    end
+  end
+
+  def radio_button_control
+    content_tag :span, class: "radio-button" do
+      content_tag :span, class: "radio-button-inner" do
+      end
+    end
+  end
+
 end

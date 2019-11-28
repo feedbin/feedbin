@@ -1,8 +1,8 @@
 <svg class="hide">
     <defs>
-        <% Dir.glob("#{Rails.root}/app/assets/svg/*.svg").sort.each do |svg| %>
-            <g id="<%= File.basename(svg, ".svg") %>">
-                <%= File.read(svg).html_safe %>
+        <% Feedbin::Application.config.icons.each do |name, icon| %>
+            <g id="<%= name %>">
+                <%= icon.markup.html_safe %>
             </g>
         <% end %>
     </defs>

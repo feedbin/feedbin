@@ -1,3 +1,3 @@
 <% if @subscription %>
-    feedbin.replaceModal("modal-purpose-edit", "<%= j render partial: 'form', locals: {tag_editor: @tag_editor, subscription: @subscription} %>");
+    feedbin.replaceModal("modal-purpose-edit", "<%= j render partial: 'form', locals: {tag_editor: @tag_editor, subscription: @subscription, app: params[:app].present?} %>");
 <% end %>

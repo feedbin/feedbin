@@ -1,13 +1,37 @@
-<% if status == :active %>
-    <div class="service-header">
-        <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
-        <small class="show-service-options pad-top">Articles will be sent to <%= sharing_service.kindle_address %>, <a href="#" data-behavior="show_service_options">edit</a>.</small>
+<% record = (status == :active) ? sharing_service : record %>
+<div class="service-header">
+    <div>
+        <%= render partial: "supported_sharing_services/header", locals: {sharing_service: sharing_service} %>
+        <% if status == :active %>
+            <p class="control-group-description">Articles will be sent to <%= sharing_service.kindle_address %></p>
+        <% end %>
     </div>
-    <%= render partial: "supported_sharing_services/kindle_form", locals: {sharing_service: sharing_service, record: sharing_service} %>
-<% else %>
-    <div class="service-header">
-        <p class="service-title"><%= sharing_service[:label] %></p>
-        <%= button_tag 'Activate', class: 'list-action show-service-options button-text', data: {behavior: "show_service_options"} %>
+    <div class="last-control button-wrap-inline">
+        <% if status == :active %>
+            <%= render partial: "supported_sharing_services/delete_supported_service", locals: {editable: true, sharing_service: sharing_service} %>
+        <% else %>
+            <%= button_tag 'Activate', class: 'button button-secondary', data: {behavior: "toggle_service_options"} %>
+        <% end %>
     </div>
-    <%= render partial: "supported_sharing_services/kindle_form", locals: {sharing_service: sharing_service, record: record} %>
-<% end %>
+</div>
+<div class="service-options-wrap">
+    <div class="service-options">
+        <p><strong>How to activate:</strong> Add <em>kindle@feedbin.com</em> to your <a href="https://www.amazon.com/gp/digital/fiona/manage?&amp;#pdocSettings">Approved Personal Document E-mail List</a>. You can get your Kindle email address from the <a href="https://www.amazon.com/gp/digital/fiona/manage?&amp;#manageDevices">Manage your devices</a> page.</p>
+        <%= form_for(record) do |f| %>
+            <%= f.hidden_field :service_id, value: sharing_service[:service_id] %>
+            <%= f.hidden_field :operation, value: '' %>
+            <div class="stacked-form">
+                <div class="input-group-wrap">
+                    <%= f.label :kindle_address, "Kindle Email Address" %>
+                    <%= render "shared/input" do %>
+                        <%= f.text_field :kindle_address %>
+                    <% end %>
+                </div>
+            </div>
+            <div class="button-wrap">
+                <%= button_tag 'Cancel', type: "button", class: 'button button-tertiary button-inline', data: {behavior: "toggle_service_options"} %>
+                <%= button_tag "Save", type: "submit", class: "button" %>
+            </div>
+        <% end %>
+    </div>
+</div>

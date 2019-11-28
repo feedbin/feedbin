@@ -1,12 +1,20 @@
 class Share::MicroBlog < Share::Service
   include HTTParty
   base_uri "https://micro.blog"
-  debug_output
 
   def initialize(klass = nil)
     @klass = klass
     if @klass.present?
-      @auth_token = @klass.api_token
+      @auth_token = @klass.api_token || @klass.access_token
+    end
+  end
+
+  def request_token(username, password)
+    response = self.class.post("/account/verify", query: {token: password}, timeout: 10)
+    if response.parsed_response["token"]
+      OpenStruct.new(token: password, secret: "n/a")
+    else
+      raise OAuth::Unauthorized.new(OpenStruct.new(code: response.code, message: "Unauthorized"))
     end
   end
 

@@ -33,6 +33,13 @@ $themes: day sunset dusk midnight;
     }
 }
 
+@mixin native-theme($property, $map) {
+    #{$property}: map-get($map, day);
+    @media (prefers-color-scheme: dark) {
+        #{$property}: map-get($map, dusk);
+    }
+}
+
 @mixin box-shadow($map, $properties, $args...) {
     @if type-of($map) != 'map' {
         $map: (day: $map, sunset: $map, dusk: $map, midnight: $map);

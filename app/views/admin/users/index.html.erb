@@ -1,17 +1,24 @@
 <div class="settings-content-inner">
     <div class="settings-outer">
+        <h2>Customer Admin</h2>
         <div class="feed-settings">
-            <h2>Customer Admin</h2>
             <%= form_tag(admin_users_path, method: "get") do %>
-                <input name="q" type="text" class="feed-search" data-behavior="user_search" placeholder="Search Customers" />
+                <%= render "shared/input", class: "accessory-left" do %>
+                    <input name="q" type="text" class="feed-search" data-behavior="user_search" placeholder="Search Customers" />
+                    <span class="accessory">
+                        <%= svg_tag "icon-search" %>
+                    </span>
+                <% end %>
             <% end %>
         </div>
     </div>
-    <ul class="pill-list">
-        <% @users.each do |user| %>
-            <li data-behavior="<%= user.customer_id %>">
-                <%= render partial: 'user', locals: {user: user} %>
-            </li>
-        <% end %>
-    </ul>
+    <div class="inset">
+        <ul class="pill-list">
+            <% @users.each do |user| %>
+                <li data-behavior="<%= user.customer_id %>">
+                    <%= render partial: 'user', locals: {user: user} %>
+                </li>
+            <% end %>
+        </ul>
+    </div>
 </div>
