@@ -20,7 +20,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: 0e670f4b380e095b1c382474a88dd451c6ddbecd
+  revision: 3f1475ecbe0a58278ae1c2eee89c1a470e50f88b
   branch: master
   specs:
     feedkit (0.1.0)
