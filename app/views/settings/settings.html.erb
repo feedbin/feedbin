@@ -115,10 +115,12 @@
                 </li>
                 <% if @user.twitter_enabled? %>
                     <li>
-                        <%= link_to "Switch Twitter Account", new_twitter_authentication_path %>
-                        <p class="control-group-description">
-                            You are currently signed in to Twitter as <strong><%= @user.twitter_screen_name %></strong>.
-                        </p>
+                        <div class="form-control">
+                            <%= link_to "Switch Twitter Account", new_twitter_authentication_path %>
+                            <p class="control-group-description">
+                                You are currently signed in to Twitter as <strong><%= @user.twitter_screen_name %></strong>.
+                            </p>
+                        </div>
                     </li>
                 <% end %>
             </ul>
