@@ -52,13 +52,17 @@ class EntryIdCache
         keys = feed_ids.map { |feed_id|
           FeedbinUtils.redis_published_key(feed_id)
         }
-        count, expire, entry_ids = $redis[:entries].with { |redis|
-          redis.multi do
-            redis.zunionstore(cache_key, keys)
-            redis.expire(cache_key, 2.minutes.to_i)
-            redis.zrevrange(cache_key, start, stop)
-          end
-        }
+        if keys.length == 0
+          entry_ids = []
+        else
+          count, expire, entry_ids = $redis[:entries].with { |redis|
+            redis.multi do
+              redis.zunionstore(cache_key, keys)
+              redis.expire(cache_key, 2.minutes.to_i)
+              redis.zrevrange(cache_key, start, stop)
+            end
+          }
+        end
       end
       entry_ids
     end
