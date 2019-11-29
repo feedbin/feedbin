@@ -7,7 +7,7 @@ gem "rails-deprecated_sanitizer"
 gem "rails-controller-testing"
 gem "rails_autolink"
 
-gem "nokogumbo", "= 1.4.9"
+gem "nokogumbo", "1.5.0"
 
 group :development do
   gem "capistrano"

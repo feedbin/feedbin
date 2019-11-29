@@ -333,7 +333,7 @@ GEM
     nio4r (2.4.0)
     nokogiri (1.10.5)
       mini_portile2 (~> 2.4.0)
-    nokogumbo (1.4.9)
+    nokogumbo (1.5.0)
       nokogiri
     oauth (0.5.4)
     parallel (1.17.0)
@@ -574,7 +574,7 @@ DEPENDENCIES
   minitest-stub-const
   minitest-stub_any_instance
   net-http-persistent
-  nokogumbo (= 1.4.9)
+  nokogumbo (= 1.5.0)
   oauth
   opml_saw!
   pg (< 1.0)
