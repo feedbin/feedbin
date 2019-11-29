@@ -47,7 +47,7 @@
                                         <td>
                                             Subscribed
                                         </td>
-                                        <td>
+                                        <td class="extra-muted">
                                             <%= subscription.created_at.to_s(:date) %>
                                         </td>
                                     </tr>
@@ -55,7 +55,7 @@
                                         <td>
                                             Updated
                                         </td>
-                                        <td>
+                                        <td class="extra-muted">
                                             <%= subscription.feed.try(:last_published_entry).try(:to_s, :date) || "N/A" %>
                                         </td>
                                     </tr>
@@ -63,7 +63,7 @@
                                         <td>
                                             Volume
                                         </td>
-                                        <td>
+                                        <td class="extra-muted">
                                             <%= subscription_presenter.graph_volume %>
                                             <% if subscription.feed.twitter_feed? %>
                                                 <%= 'tweet'.pluralize(subscription_presenter.graph_volume) %> / month
@@ -78,7 +78,7 @@
                                             Website
                                         </td>
                                         <td>
-                                            <a href="<%= subscription.feed.site_url %>"><span><%= pretty_url(subscription.feed.site_url) %></span></a>
+                                            <a href="<%= subscription.feed.site_url %>" class="extra-muted"><span><%= pretty_url(subscription.feed.site_url) %></span></a>
                                         </td>
                                     </tr>
                                     <tr>
@@ -86,7 +86,7 @@
                                             Feed
                                         </td>
                                         <td>
-                                            <a href="<%= subscription.feed.feed_url %>"><span><%= pretty_url(subscription.feed.feed_url) %></span></a>
+                                            <a href="<%= subscription.feed.feed_url %>" class="extra-muted"><span><%= pretty_url(subscription.feed.feed_url) %></span></a>
                                         </td>
                                     </tr>
                                     <% end %>

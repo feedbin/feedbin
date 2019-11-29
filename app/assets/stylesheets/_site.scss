@@ -5117,7 +5117,6 @@ Settings
         }
     }
     a {
-        @include color($color-selected);
         text-align: left;
         display: block;
         display: block;
@@ -5134,7 +5133,6 @@ Settings
         &.active {
             @include background-color($color-selected, $extra: !important);
             .modal & {
-                @include color($color-selected);
                 @include background-color(transparent, $extra: !important);
                 text-decoration: underline;
             }
@@ -5166,7 +5164,6 @@ Settings
     margin: 32px 0 0 0;
     a {
         font-size: 16px;
-        @include color($color-selected);
         &:hover span {
             background-color: transparent;
         }
