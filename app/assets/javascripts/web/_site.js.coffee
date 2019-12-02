@@ -893,6 +893,17 @@ $.extend feedbin,
   markRead: () ->
     feedbin.showPanel(1);
     $('.entries li').addClass('read')
+
+    if feedbin.markReadData.type == "feed"
+      feedbin.Counts.get().markFeedRead(feedbin.markReadData.data)
+      feedbin.applyCounts(true)
+    else if feedbin.markReadData.type == "tag"
+      feedbin.Counts.get().markTagRead(feedbin.markReadData.data)
+      feedbin.applyCounts(true)
+    else if feedbin.markReadData.type == "all" || feedbin.markReadData.type == "unread"
+      feedbin.Counts.get().markAllRead()
+      feedbin.applyCounts(false)
+
     feedbin.markReadData.ids = $('.entries li').map(() ->
       $(@).data('entry-id')
     ).get().join()
