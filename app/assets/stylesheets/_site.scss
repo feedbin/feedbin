@@ -6746,6 +6746,9 @@ Buttons
     padding: 1px;
     font-size: 14px;
     text-decoration: underline;
+    .modal & {
+        text-decoration: none;
+    }
 }
 
 .button-empty {
