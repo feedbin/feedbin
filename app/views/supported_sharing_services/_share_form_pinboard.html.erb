@@ -29,11 +29,11 @@
             <div class="share-controls">
                 <div class="checkbox">
                     <%= check_box_tag :shared, "no" %>
-                    <label for="shared">Private</label>
+                    <label for="shared"><%= svg_tag "icon-check" %>Private</label>
                 </div>
                 <div class="checkbox">
                     <%= check_box_tag :toread, "yes" %>
-                    <label for="toread">Read Later</label>
+                    <label for="toread"><%= svg_tag "icon-check" %>Read Later</label>
                 </div>
             </div>
             <div class="button-wrap">

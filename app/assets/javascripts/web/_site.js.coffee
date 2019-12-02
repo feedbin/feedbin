@@ -1166,9 +1166,10 @@ $.extend feedbin,
     $('.basement-panel').addClass('hide')
     selectedPanel.removeClass('hide')
     $('.entry-basement').addClass('open')
-    newTop = selectedPanel.height()
+    newTop = selectedPanel.children(":first").outerHeight()
     $('.entry-content').css
       "top": "#{newTop}px"
+    selectedPanel.prop('scrollTop', 0)
 
   applyStarred: (entryId) ->
     if feedbin.Counts.get().isStarred(entryId)

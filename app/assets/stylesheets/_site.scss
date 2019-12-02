@@ -3088,17 +3088,24 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     top: $toolbar-height;
     left: 0;
     width: 100%;
-    bottom: 0;
-    overflow-y: scroll;
+    @include border-bottom($color-borders);
+    display: none;
+    &.open {
+        display: block;
+    }
     &.foreground {
         z-index: 5;
     }
 }
 
+.basement-panel {
+    max-height: calc(100vh - 41px);
+    overflow-y: scroll;
+}
+
 .basement-toolbar {
     height: 49px;
     width: 100%;
-    @include border-bottom($color-borders);
     @include background-color($color-contrast-100);
     @include arrow(
         $x-position: 62px,
@@ -3931,7 +3938,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 .share-form {
     @include background-color($color-contrast-100);
     padding: 24px 16px;
-    @include border-bottom($color-borders);
     @include arrow(
         $x-position: 241px,
         $y-position: -1px,
@@ -3949,9 +3955,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .share-form-inner {
         max-width: 620px;
         margin: 0 auto;
-        svg {
-            @include fill($color-icons);
-        }
     }
     h2 {
         @include font-size(16);
@@ -3966,6 +3969,9 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             margin-left: auto
         }
         margin-bottom: 16px;
+        svg {
+            @include fill($color-icons);
+        }
     }
     .field-cluster {
         margin-bottom: 15px;
