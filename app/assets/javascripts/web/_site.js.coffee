@@ -1569,7 +1569,6 @@ $.extend feedbin,
 
     feedSettingsButton: ->
       $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
-
         element = $(@)
         button = $('[data-behavior~=feed_settings]')
         if element.is('[data-behavior~=has_settings]')
@@ -2547,6 +2546,22 @@ $.extend feedbin,
 
     tooltips: ->
       $('[data-toggle="tooltip"]').tooltip()
+
+    unsubscribe: ->
+      $(document).on 'click', '[data-behavior~=unsubscribe]', (event) ->
+        $('.modal').modal('hide')
+        if (feedbin.data.viewMode != 'view_starred')
+          $(".feeds [data-feed-id=#{feed}]").remove()
+        feed = $(@).data('feed-id')
+        feedbin.Counts.get().markFeedRead(feed)
+        feedbin.applyCounts(false)
+        feedbin.showPanel(1)
+        feedbin.updateEntries('', '');
+        feedbin.updateEntryContent('');
+        feedbin.disableMarkRead()
+        feedbin.hideSearch()
+        $('[data-behavior~=feed_settings]').attr('disabled', 'disabled')
+        $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
 
     copy: ->
       $(document).on 'click', '[data-behavior~=copy]', (event) ->
