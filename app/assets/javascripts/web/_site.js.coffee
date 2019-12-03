@@ -14,7 +14,7 @@ window.feedbin ?= {}
 $.extend feedbin,
 
   swipe: false
-  messageTimeout: null
+  notificationTimeout: null
   panel: 1
   panelScrollComplete: true
   jumpResultTemplate: null
@@ -435,39 +435,25 @@ $.extend feedbin,
       if feedbin.swipe && $('body').hasClass('has-offscreen-panels')
         feedbin.scrollToPanel('.entry-column')
 
-
-  showNotification: (text, timeout = 3000, href = '', error = false) ->
-
-    clearTimeout(feedbin.messageTimeout)
-
-    messages = $('[data-behavior~=messages]')
-    if error == true
-      messages.addClass('error')
-    else
-      messages.removeClass('error')
-
-    if href == ''
-      messages.removeAttr('href')
-    else
-      messages.attr('href', href)
-
-    messages.text(text)
-    messages.addClass('show')
-    messages.addClass('slide')
-    feedbin.messageTimeout = setTimeout ( ->
-      messages.removeClass('slide')
-      setTimeout ( ->
-        messages.removeClass('show')
-      ), 200
-    ), timeout
-
   hideNotification: ->
-    messages = $('[data-behavior~=messages]')
-    messages.removeClass('slide')
-    setTimeout ( ->
-      messages.removeClass('show')
-    ), 200
+    container = $('[data-behavior~=notification_container]')
+    container.removeClass('visible')
+    callback = -> container.addClass('hide')
+    setTimeout callback, 200
 
+  showNotification: (text, error = false) ->
+    clearTimeout(feedbin.notificationTimeout)
+
+    container = $('[data-behavior~=notification_container]')
+    container.removeClass('error')
+    container.removeClass('hide')
+    container.addClass('visible')
+    container.addClass('error') if error
+
+    content = $('[data-behavior~=notification_content]')
+    content.text(text)
+
+    feedbin.notificationTimeout = setTimeout feedbin.hideNotification, 3000
 
   updateEntries: (entries, header) ->
     $('.entries ul').html(entries)
@@ -2043,7 +2029,7 @@ $.extend feedbin,
 
     searchError: ->
       $(document).on 'ajax:error', '[data-behavior~=search_form]', (event, xhr) ->
-        feedbin.showNotification('Search error.', 3000, '', true);
+        feedbin.showNotification('Search error.', true);
 
         return
 
@@ -2546,6 +2532,10 @@ $.extend feedbin,
 
     tooltips: ->
       $('[data-toggle="tooltip"]').tooltip()
+
+    closeMessage: ->
+      $(document).on 'click', '[data-behavior~=close_message]', (event) ->
+        feedbin.hideNotification()
 
     unsubscribe: ->
       $(document).on 'click', '[data-behavior~=unsubscribe]', (event) ->

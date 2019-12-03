@@ -1,8 +1,8 @@
 <% if flash[:alert] %>
-    feedbin.showNotification('<%= j flash[:alert] %>', 3000, '', true);
+    feedbin.showNotification('<%= j flash[:alert] %>', true);
 <% end %>
 <% if flash[:error] %>
-    feedbin.showNotification('<%= j flash[:error] %>', 3000, '', true);
+    feedbin.showNotification('<%= j flash[:error] %>', true);
 <% end %>
 <% if flash[:notice] %>
     feedbin.showNotification('<%= j flash[:notice] %>');

@@ -52,7 +52,7 @@
 
     card.addEventListener('change', function(event) {
         if (event.error) {
-            feedbin.showNotification(event.error.message, 3000, '', true);
+            feedbin.showNotification(event.error.message, true);
         } else {
             feedbin.hideNotification();
         }
@@ -80,7 +80,7 @@
         feedbinBilling.stripe.createToken(card, options).then(function(result) {
             if (result.error) {
                 document.getElementById('credit_card_button').disabled = false;
-                feedbin.showNotification(result.error.message, 3000, '', true);
+                feedbin.showNotification(result.error.message, true);
             } else {
                 feedbinBilling.stripeTokenHandler(result.token);
             }
