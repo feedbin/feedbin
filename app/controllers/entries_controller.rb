@@ -97,11 +97,11 @@ class EntriesController < ApplicationController
 
     if params[:type] == "feed"
       unread_entries = UnreadEntry.where(user_id: @user.id, feed_id: params[:data])
-      # @full_update = false
+      @full_update = false
     elsif params[:type] == "tag"
       feed_ids = @user.taggings.where(tag_id: params[:data]).pluck(:feed_id)
       unread_entries = UnreadEntry.where(user_id: @user.id, feed_id: feed_ids)
-      # @full_update = false
+      @full_update = false
     elsif params[:type] == "starred"
       starred = @user.starred_entries.pluck(:entry_id)
       unread_entries = UnreadEntry.where(user_id: @user.id, entry_id: starred)
@@ -114,7 +114,7 @@ class EntriesController < ApplicationController
       @user.updated_entries.delete_all
     elsif %w[unread all].include?(params[:type])
       unread_entries = UnreadEntry.where(user_id: @user.id)
-      # @full_update = false
+      @full_update = false
     elsif params[:type] == "saved_search"
       saved_search = @user.saved_searches.where(id: params[:data]).first
       if saved_search.present?

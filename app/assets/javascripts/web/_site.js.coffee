@@ -2550,9 +2550,9 @@ $.extend feedbin,
     unsubscribe: ->
       $(document).on 'click', '[data-behavior~=unsubscribe]', (event) ->
         $('.modal').modal('hide')
+        feed = $(@).data('feed-id')
         if (feedbin.data.viewMode != 'view_starred')
           $(".feeds [data-feed-id=#{feed}]").remove()
-        feed = $(@).data('feed-id')
         feedbin.Counts.get().markFeedRead(feed)
         feedbin.applyCounts(false)
         feedbin.showPanel(1)
