@@ -1391,7 +1391,7 @@ Structure
         }
         &.processing {
             background-repeat: no-repeat;
-            background-position: 97% ($base-button-position + 3);
+            background-position: right 8px top ($base-button-position + 2);
             background-size: 16px 16px;
             @include background-image($image-spinners);
         }
@@ -2567,7 +2567,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         display: flex;
         justify-content: space-between;
         margin: 0;
-        align-items: baseline;
+        align-items: center;
     }
     .entry-status {
         margin-left: auto;
@@ -3608,6 +3608,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         }
     }
     .button-toggle-content {
+        width: 46px;
         &.loading {
             @keyframes flip {
                 50% {
@@ -3668,7 +3669,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     border: none;
     background: none;
     width: 45px;
-    height: $toolbar-height;
+    height: 40px;
     padding: 0;
     position: relative;
     svg {
@@ -7138,6 +7139,10 @@ a:hover.danger {
     overflow: hidden;
     display: flex;
     align-items: center;
+    .icon-star-on {
+        height: 12px !important;
+        width: 12px !important;
+    }
 }
 
 .status-flag {
@@ -9010,6 +9015,9 @@ button.close {
                 }
             }
         }
+        @media (max-width: $small-breakpoint) {
+            width: 48px;
+        }
     }
     input {
         border-radius: 8px;
@@ -9020,12 +9028,15 @@ button.close {
         margin: 0;
         width: 100%;
         max-width: 100%;
-        padding: 18px 60px 18px $icon-width - 8px;
+        padding: 18px 56px 18px $icon-width - 8px;
         font-size: 24px;
         @include color($color-contrast-700);
         @include background-color($color-contrast-100);
         &.processing {
-            background-position: 97.5% 26px;
+            background-position: right 24px top 26px;
+            @media (max-width: $small-breakpoint) {
+                background-position: right 16px top 26px;
+            }
         }
         .modal-top & {
             border-radius: 0;
@@ -9035,6 +9046,11 @@ button.close {
             @include border(transparent);
             @include background-color($color-contrast-100);
         }
+        @media (max-width: $small-breakpoint) {
+            padding-left: 48px;
+            padding-right: 48px;
+        }
+
     }
 }
 
@@ -9050,7 +9066,7 @@ button.close {
     }
     .favicon-target {
         position: absolute;
-        right: 22px;
+        right: 24px;
         top: 0;
         bottom: 0;
         display: flex;
@@ -9077,9 +9093,17 @@ button.close {
         justify-content: center;
         flex-direction: column;
         text-align: center;
-        padding-left: 24px;
+        padding: 5px 0 0 24px;
         font-size: 18px;
         padding-top: 5px;
+    }
+    @media (max-width: $small-breakpoint) {
+        label {
+            padding-left: 16px;
+        }
+        .favicon-target {
+            right: 16px;
+        }
     }
 }
 
