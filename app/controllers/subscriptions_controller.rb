@@ -56,9 +56,6 @@ class SubscriptionsController < ApplicationController
   def destroy
     subscription = @user.subscriptions.find(params[:id])
     destroy_subscription(subscription.id)
-    
-    # TODO remove this
-    get_feeds_list
   end
 
   private
