@@ -2537,6 +2537,14 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=close_message]', (event) ->
         feedbin.hideNotification()
 
+    keyboard: ->
+      $(document).on 'focus', 'input, select', (event) ->
+        $('body').addClass('keyboard-visible')
+        console.log 'visible'
+      $(document).on 'blur', 'input, select', (event) ->
+        $('body').removeClass('keyboard-visible')
+        console.log 'not'
+
     unsubscribe: ->
       $(document).on 'click', '[data-behavior~=unsubscribe]', (event) ->
         $('.modal').modal('hide')
