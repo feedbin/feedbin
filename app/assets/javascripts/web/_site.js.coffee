@@ -435,10 +435,17 @@ $.extend feedbin,
       if feedbin.swipe && $('body').hasClass('has-offscreen-panels')
         feedbin.scrollToPanel('.entry-column')
 
-  hideNotification: ->
+  hideNotification: (animated = true) ->
     container = $('[data-behavior~=notification_container]')
-    container.removeClass('visible')
-    callback = -> container.addClass('hide')
+    if animated
+      container.addClass('fade-out')
+    else
+      container.addClass('hide')
+
+    callback = ->
+      container.addClass('hide')
+      container.removeClass('visible')
+      container.removeClass('fade-out')
     setTimeout callback, 200
 
   showNotification: (text, error = false) ->
@@ -2535,15 +2542,7 @@ $.extend feedbin,
 
     closeMessage: ->
       $(document).on 'click', '[data-behavior~=close_message]', (event) ->
-        feedbin.hideNotification()
-
-    keyboard: ->
-      $(document).on 'focus', 'input, select', (event) ->
-        $('body').addClass('keyboard-visible')
-        console.log 'visible'
-      $(document).on 'blur', 'input, select', (event) ->
-        $('body').removeClass('keyboard-visible')
-        console.log 'not'
+        feedbin.hideNotification(false)
 
     unsubscribe: ->
       $(document).on 'click', '[data-behavior~=unsubscribe]', (event) ->
@@ -2551,10 +2550,10 @@ $.extend feedbin,
         feed = $(@).data('feed-id')
         if (feedbin.data.viewMode != 'view_starred')
           $(".feeds [data-feed-id=#{feed}]").remove()
+        $(".entries .feed-id-#{feed}").remove()
         feedbin.Counts.get().markFeedRead(feed)
         feedbin.applyCounts(false)
         feedbin.showPanel(1)
-        feedbin.updateEntries('', '');
         feedbin.updateEntryContent('');
         feedbin.disableMarkRead()
         feedbin.hideSearch()

@@ -1916,7 +1916,7 @@ $hamburger-dot: 4px;
     .hamburger-menu-wrap, .show-subscribe {
         position: static;
         height: $toolbar-height - 1px;
-        width: 54px;
+        width: 48px;
     }
     .view-mode, .select-wrap, select {
         height: 100%;
@@ -2439,19 +2439,21 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .back-button {
         display: flex;
         position: static;
-        height: $toolbar-height;
-        width: $toolbar-height;
+        height: 100%;
+        width: 40px;
         flex-shrink: 0;
     }
     .search-button {
         background-color: transparent;
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         visibility: visible;
         appearance: none;
         border: none;
         padding: 0;
-        height: $toolbar-height;
-        width: $toolbar-height;
+        height: 100%;
+        width: 40px;
         flex-shrink: 0;
         svg {
             @include fill($color-icons);
@@ -4974,8 +4976,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     visibility: visible;
     padding: 0 8px;
     bottom: -$height;
-    bottom: auto;
-    top: -$height;
     .notification-content-wrap {
         display: flex;
         align-items: center;
@@ -4997,14 +4997,9 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             opacity: 1;
         }
     }
-    .keyboard-visible & {
-        bottom: unset;
-        top: -$height;
-        &.visible {
-            .notification-content-wrap {
-                transform: translateY(100px);
-                opacity: 1;
-            }
+    &.fade-out {
+        .notification-content-wrap {
+            opacity: 0;
         }
     }
     &.hide {
@@ -5042,6 +5037,24 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
     .icon-close {
         @include fill($color-contrast-400);
+    }
+    @media (max-width: $small-breakpoint) {
+        bottom: unset;
+        top: -$height;
+        &.visible {
+            .notification-content-wrap {
+                transform: translateY($height + 8);
+            }
+        }
+    }
+    .native & {
+        bottom: unset;
+        top: -$height;
+        &.visible {
+            .notification-content-wrap {
+                transform: translateY($height + 8);
+            }
+        }
     }
 }
 
@@ -9409,7 +9422,7 @@ button.close {
 .modal-dialog {
     position: relative;
     width: auto;
-    margin: 0.5rem;
+    margin: 48px 8px 8px 8px;
     pointer-events: none;
     box-shadow: 0 20px 40px 0 rgba(0,0,0,.4);
     border-radius: $modal-border-radius;
