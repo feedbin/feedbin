@@ -1916,7 +1916,7 @@ $hamburger-dot: 4px;
     .hamburger-menu-wrap, .show-subscribe {
         position: static;
         height: $toolbar-height - 1px;
-        width: 54px;
+        width: 48px;
     }
     .view-mode, .select-wrap, select {
         height: 100%;
@@ -2439,19 +2439,21 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .back-button {
         display: flex;
         position: static;
-        height: $toolbar-height;
-        width: $toolbar-height;
+        height: 100%;
+        width: 40px;
         flex-shrink: 0;
     }
     .search-button {
         background-color: transparent;
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         visibility: visible;
         appearance: none;
         border: none;
         padding: 0;
-        height: $toolbar-height;
-        width: $toolbar-height;
+        height: 100%;
+        width: 40px;
         flex-shrink: 0;
         svg {
             @include fill($color-icons);
@@ -4963,48 +4965,95 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
 }
 
-.application-messages {
-    $height: 35px;
-    position: fixed;
+.notification {
+    $height: 48px;
     z-index: 10000;
     width: 100%;
-    height: 0;
-    .message-content {
-        position: relative;
-        width: 500px;
-        @include background-color($color-selected);
-        display: block;
-        visibility: hidden;
+    position: fixed;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    visibility: visible;
+    padding: 0 8px;
+    bottom: -$height;
+    .notification-content-wrap {
+        display: flex;
+        align-items: center;
+        @include background-color($color-base-dark-700);
+        min-width: 350px;
+        border-radius: 4px;
         height: $height;
-        line-height: $height;
-        top: -$height;
-        color: white;
+        opacity: 0;
+        transition: transform .2s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity .2s ease-in;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15);
+        @media (max-width: $small-breakpoint) {
+            min-width: 100%;
+            max-width: 100%;
+        }
+    }
+    &.visible {
+        .notification-content-wrap {
+            transform: translateY(-100px);
+            opacity: 1;
+        }
+    }
+    &.fade-out {
+        .notification-content-wrap {
+            opacity: 0;
+        }
+    }
+    &.hide {
+        display: flex;
+        visibility: hidden;
+    }
+    .notification-content {
         font-size: 16px;
-        padding: 0 10px;
-        margin: 0 auto;
-        transition:top .2s ease;
-        cursor: pointer;
-        overflow: hidden;
-        text-overflow: ellipsis;
         white-space: nowrap;
-        &.show {
-            visibility: visible;
+        color: white;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+    .icon-container {
+        height: $height;
+        width: $height;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        &:last-child {
+            margin-left: auto;
         }
-        &.slide {
-            top: 0;
+    }
+    .icon-error-message {
+        display: none;
+    }
+    &.error {
+        .icon-success-message {
+            display: none;
         }
-        &.error {
-            background-color: $color-accent-red-600;
+        .icon-error-message {
+            display: block;
         }
-        &:hover {
-            text-decoration: none;
-            color: white;
+    }
+    .icon-close {
+        @include fill($color-contrast-400);
+    }
+    @media (max-width: $small-breakpoint) {
+        bottom: unset;
+        top: -$height;
+        &.visible {
+            .notification-content-wrap {
+                transform: translateY($height + 8);
+            }
         }
-        &[href=""] {
-            cursor: default;
-        }
-        @media (max-width: 500px) {
-            width: 100%;
+    }
+    .native & {
+        bottom: unset;
+        top: -$height;
+        &.visible {
+            .notification-content-wrap {
+                transform: translateY($height + 8);
+            }
         }
     }
 }
@@ -6541,6 +6590,14 @@ Icons
 /*------------------------------------------------------------------------------
 Buttons
 ------------------------------------------------------------------------------*/
+button.reset {
+    appearance: none;
+    background-color: transparent;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
 .button {
     appearance: none;
     @include background($color-selected);
@@ -9365,7 +9422,7 @@ button.close {
 .modal-dialog {
     position: relative;
     width: auto;
-    margin: 0.5rem;
+    margin: 48px 8px 8px 8px;
     pointer-events: none;
     box-shadow: 0 20px 40px 0 rgba(0,0,0,.4);
     border-radius: $modal-border-radius;

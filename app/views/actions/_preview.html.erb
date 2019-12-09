@@ -2,5 +2,5 @@
     $('body').append("<%= j render partial: 'preview_modal', locals: {action: action} %>");
     feedbin.showModal("action_preview");
 <% else %>
-    feedbin.showNotification('Invalid action: <%= j action.errors.full_messages.join('. ') %>', 3000, '', true);
+    feedbin.showNotification('Invalid action: <%= j action.errors.full_messages.join('. ') %>', true);
 <% end %>
