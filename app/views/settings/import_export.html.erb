@@ -10,17 +10,19 @@
             <%= direct_upload_form_for @uploader do |f| %>
                 <ul class="control-group">
                     <li>
-                        <div class="field-wrap">
-                            <%= f.file_field :upload %>
+                        <div class="form-control">
+                            <div class="toolbar">
+                                <div>
+                                    <%= f.file_field :upload %>
+                                    <p class="control-group-description">You can import OPML files. Import is done in the background so you may not see every subscription right away.</p>
+                                </div>
+                                <div class="last-control">
+                                    <button type="submit" class="button">Import</button>
+                                </div>
+                            </div>
                         </div>
                     </li>
                 </ul>
-                <p class="control-group-description">You can import OPML files. Import is done in the background so you may not see every subscription right away.</p>
-                <div class="description-inset">
-                    <div class="button-wrap">
-                        <%= f.submit "Import", class: "button no-margin" %>
-                    </div>
-                </div>
             <% end %>
         <% else %>
             <p class="control-group-description">Import disabled. <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> and <code>AWS_S3_BUCKET</code> are missing.</p>
@@ -30,22 +32,44 @@
         <div class="inset-content">
             <h4 class="group-header">Export</h4>
         </div>
-        <ul class="pill-list">
+        <ul class="control-group">
             <li>
-                <%= form_tag subscriptions_path(format: :xml), method: :get do %>
-                    Subscriptions
-                    <%= select_tag :tag, options_for_select(@download_options), class: "select" %>
-                    <button class="button-text pull-right">Download</button>
-                <% end %>
+                <div class="form-control">
+                    <%= form_tag subscriptions_path(format: :xml), method: :get do %>
+                    <div class="toolbar">
+                        <div>
+                            Subscriptions
+                        </div>
+                        <div class="last-control button-wrap-inline">
+                            <%= render "shared/input" do %>
+                                <%= select_tag :tag, options_for_select(@download_options), class: "select" %>
+                                <span class="accessory right">
+                                    <%= svg_tag "icon-caret" %>
+                                </span>
+                            <% end %>
+                            <button class="button">Download</button>
+                        </div>
+                    </div>
+                    <% end %>
+                </div>
             </li>
             <% if @user.starred_entries.exists? %>
                 <li>
-                    Starred Articles <%= link_to "Export", starred_export_path, method: :post, class: 'pull-right' %>
+                    <div class="form-control">
+                        <div class="toolbar">
+                            <div>
+                                Starred Articles
+                                <% if @user.starred_entries.exists? %>
+                                    <p class="control-group-description">A link will be emailed to you.</p>
+                                <% end %>
+                            </div>
+                            <div class="last-control">
+                                <%= link_to "Export", starred_export_path, method: :post, class: "button" %>
+                            </div>
+                        </div>
+                    </div>
                 </li>
             <% end %>
         </ul>
-        <% if @user.starred_entries.exists? %>
-            <p class="control-group-description">A link will be emailed to you.</p>
-        <% end %>
     </div>
 </div>

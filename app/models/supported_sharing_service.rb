@@ -99,7 +99,7 @@ class SupportedSharingService < ApplicationRecord
       service_id: "micro_blog",
       label: "Micro.blog",
       requires_auth: true,
-      service_type: "micro_blog",
+      service_type: "xauth",
       html_options: {data: {behavior: "show_entry_basement", basement_panel: "micro_blog_share_panel"}},
       klass: "Share::MicroBlog",
       has_share_sheet: true,
@@ -144,16 +144,6 @@ class SupportedSharingService < ApplicationRecord
 
   def service
     @service ||= klass.constantize.new(self)
-  end
-
-  def active?
-    if requires_auth? && auth_present?
-      true
-    elsif requires_auth?
-      false
-    else
-      true
-    end
   end
 
   def link_options(entry)
@@ -221,6 +211,10 @@ class SupportedSharingService < ApplicationRecord
   def completions
     options = service_options || {}
     options["completions"] || []
+  end
+
+  def [](key)
+    info[key]
   end
 
   def update_completions(new_completions)

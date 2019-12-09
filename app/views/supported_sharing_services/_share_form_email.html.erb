@@ -1,20 +1,41 @@
 <div class="share-form">
-    <div class="share-form-inner icon-share-email">
-        <h2>Send Article via Email</h2>
-        <%= form_tag('', remote: true) do %>
-            <%= hidden_field_tag :readability, 'off', class: 'readability-placeholder' %>
+    <div class="share-form-inner">
+        <div class="share-header">
+            <h2>Send Article via Email</h2>
+            <%= svg_tag "icon-share-email" %>
+        </div>
+        <%= form_tag("", remote: true) do %>
+            <%= hidden_field_tag :readability, "off", class: "readability-placeholder" %>
             <div class="field-cluster">
-                <div class="autocomplete-parent" data-behavior="autocomplete_parent">
-                    <%= text_field_tag :to, '', placeholder: 'To', data: {behavior: 'autocomplete_field', autocomplete_path: autocomplete_supported_sharing_service_path(service)} %>
-                    <div class="share-autocomplete" data-behavior="autocomplete_target"></div>
+                <div class="input-group-wrap">
+                    <label for="email_to">To</label>
+                    <div class="autocomplete-parent" data-behavior="autocomplete_parent">
+                        <%= render "shared/input" do %>
+                            <%= text_field_tag :to, "", placeholder: "Comma-separate multiple recipients", data: {behavior: "autocomplete_field", autocomplete_path: autocomplete_supported_sharing_service_path(service)}, id: "email_to" %>
+                        <% end %>
+                        <div class="share-autocomplete" data-behavior="autocomplete_target"></div>
+                    </div>
                 </div>
-                <%= text_field_tag :subject, '', placeholder: 'Subject', class: 'title-placeholder' %>
-                <%= text_area_tag :body, '', rows: 5, class: 'description-placeholder' %>
+
+                <div class="input-group-wrap">
+                    <label for="email_subject">Subject</label>
+                    <%= render "shared/input" do %>
+                        <%= text_field_tag :subject, "", class: "title-placeholder", id: "email_subject" %>
+                    <% end %>
+                </div>
+                <div class="input-group-wrap">
+                    <label for="email_body">Message</label>
+                    <%= render "shared/input" do %>
+                        <%= text_area_tag :body, "", rows: 5, placeholder: "Message appears above article contents", class: "description-placeholder", id: "email_body" %>
+                    <% end %>
+                </div>
             </div>
             <div class="button-wrap">
-                <%= button_tag "Cancel", type: "button", class: 'button button-secondary', data: {behavior: 'close_entry_basement'} %>
-                <%= submit_tag "Send", class: 'button' %>
+                <%= button_tag "Cancel", type: "button", class: "button button-secondary", data: {behavior: "close_entry_basement"} %>
+                <%= button_tag "Send", type: "submit", class: "button" %>
             </div>
         <% end %>
     </div>
 </div>
+
+

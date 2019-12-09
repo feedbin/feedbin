@@ -1,2 +1,5 @@
-<p class="service-title"><%= sharing_service.label %></p>
-<%= link_to 'Deactivate', supported_sharing_service_path(sharing_service), class: 'list-action show-service-options button-text-secondary', method: :delete %>
+<% if local_assigns[:editable] %>
+    <button class="button button-tertiary" data-behavior="toggle_service_options">Edit</button>
+<% end %>
+
+<%= link_to 'Deactivate', supported_sharing_service_path(sharing_service), class: 'button button-secondary', method: :delete %>

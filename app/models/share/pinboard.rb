@@ -11,8 +11,8 @@ class Share::Pinboard < Share::Service
 
   def request_token(username, password)
     response = self.class.get("/user/api_token", query: {auth_token: password, format: "json"}, timeout: 20)
-    if response.code == 401
-      raise OAuth::Unauthorized
+    if response.code != 200
+      raise OAuth::Unauthorized.new(OpenStruct.new(code: response.code, message: "Unauthorized"))
     else
       OpenStruct.new(token: password, secret: "n/a")
     end

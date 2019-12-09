@@ -60,45 +60,20 @@
                 </ul>
             </div>
             <div class="inset-content">
-                <h4 class="group-header">Theme</h4>
-            </div>
-            <ul class="control-group">
-                <li>
-                    <%= f.radio_button(:theme, "day", {checked: @user.theme.nil? || @user.theme == 'day', data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
-                    <%= f.label :theme_day do %>
-                        Day <span class="color-preview color-preview-day"></span>
-                    <% end %>
-                </li>
-                <li>
-                    <%= f.radio_button(:theme, "sunset", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
-                    <%= f.label(:theme_sunset) do %>
-                        Sunset <span class="color-preview color-preview-sunset"></span>
-                    <% end %>
-                </li>
-                <li>
-                    <%= f.radio_button(:theme, "dusk", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
-                    <%= f.label(:theme_dusk) do %>
-                        Dusk <span class="color-preview color-preview-dusk"></span>
-                    <% end %>
-                </li>
-                <li>
-                    <%= f.radio_button(:theme, "midnight", {data: {behavior: 'appearance_radio auto_submit', setting: 'theme'}}) %>
-                    <%= f.label(:theme_midnight) do %>
-                        Midnight <span class="color-preview color-preview-midnight"></span>
-                    <% end %>
-                </li>
-            </ul>
-            <div class="inset-content">
                 <h4 class="group-header">Display</h4>
             </div>
             <ul class="control-group">
                 <li>
                     <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block', data: {behavior: 'appearance_radio auto_submit', setting: 'entries-display'}}) %>
-                    <%= f.label(:entries_display_block, "Default") %>
+                    <%= f.label :entries_display_block do %>
+                        Default <%= radio_button_control %>
+                    <% end %>
                 </li>
                 <li>
                     <%= f.radio_button(:entries_display, "inline", {data: {behavior: 'appearance_radio auto_submit', setting: 'entries-display'}}) %>
-                    <%= f.label(:entries_display_inline, "Inline") %>
+                    <%= f.label :entries_display_inline do %>
+                        Inline <%= radio_button_control %>
+                    <% end %>
                 </li>
             </ul>
             <div class="inset-content">
@@ -108,25 +83,25 @@
                 <li>
                     <%= f.check_box :entries_feed, {checked: @user.entries_feed.nil? || @user.setting_on?(:entries_feed), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-feed'} } %>
                     <%= f.label :entries_feed do %>
-                        Feed Name <span class="slider-checkbox"></span>
+                        Feed Name <%= toggle_switch %>
                     <% end %>
                 </li>
                 <li>
                     <%= f.check_box :entries_time, {checked: @user.entries_time.nil? || @user.setting_on?(:entries_time), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-time'} } %>
                     <%= f.label :entries_time do %>
-                        Date <span class="slider-checkbox"></span>
+                        Date <%= toggle_switch %>
                     <% end %>
                 </li>
                 <li>
                     <%= f.check_box :entries_body, {checked: @user.entries_body.nil? || @user.setting_on?(:entries_body), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-body'} } %>
                     <%= f.label :entries_body do %>
-                        Summary <span class="slider-checkbox"></span>
+                        Summary <%= toggle_switch %>
                     <% end %>
                 </li>
                 <li>
                     <%= f.check_box :entries_image, {checked: @user.entries_image.nil? || @user.setting_on?(:entries_image), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-image'} } %>
                     <%= f.label :entries_image do %>
-                        Image Preview <span class="slider-checkbox"></span>
+                        Image Preview <%= toggle_switch %>
                     <% end %>
                 </li>
             </ul>

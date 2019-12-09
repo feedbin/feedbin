@@ -12,7 +12,7 @@
                 <%= svg_tag "icon-delete", size: "13x16" %> Delete
             <% end %>
             <button type="button" class="button button-secondary" data-dismiss="modal" aria-label="Cancel">Cancel</button>
-            <input type="submit" class="button" value="Save">
+            <button type="submit" class="button">Save</button>
         <% end %>
 
         <%= render template: "layouts/modal_inner", locals: {purpose: "edit"} %>

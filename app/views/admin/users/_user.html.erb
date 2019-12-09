@@ -2,5 +2,5 @@
     <strike><%= link_to user.email, user.stripe_url %></strike>
 <% else %>
     <%= link_to user.email, user.stripe_url %>
-    <%= link_to "Delete", admin_user_path(user), remote: true, data: { confirm: "Are you sure?" }, method: :delete, class: 'button-text-secondary pull-right' %>
+    <%= link_to "Delete", admin_user_path(user), remote: true, data: { confirm: "Are you sure?" }, method: :delete, class: "pull-right danger" %>
 <% end %>

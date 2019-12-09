@@ -6,32 +6,33 @@
             <h4 class="group-header"><%= "Feed".pluralize(feeds.length) %></h4>
         </div>
 
-        <div class="inset-content" style="margin-bottom: 50px;">
+        <div class="inset-content" style="margin-bottom: 51px;">
             <% feeds.each_with_index do |feed, index| %>
                 <%= fields_for "feeds[]", feed do |pf| %>
                     <div class="subscription-option" data-behavior="subscription_option">
                         <div class="title">
-                            <%= pf.text_field :title, placeholder: feed.title %>
+                            <%= render "shared/input" do %>
+                                <%= pf.text_field :title, placeholder: feed.title %>
+                            <% end %>
                             <p class="feed-url" title="Feed URL"><%= feed.feed_url %></p>
                         </div>
                         <div class="action <%= (feeds.length == 1) ? 'hide' : '' %>">
                             <%= pf.check_box :subscribe, checked: index == 0 ? true : false, data: {behavior: "check_toggle"} %>
                             <%= pf.label :subscribe do %>
-                                <span class="slider-checkbox"></span>
+                                <%= toggle_switch %>
                             <% end %>
                         </div>
                         <p class="feed-url" title="Feed URL"><%= feed.feed_url %></p>
                     </div>
                     <% if feed.twitter_feed? %>
-                        <div class="subscription-preferences">
-                            <label>
-                                Tweets with media and links only
-                                <%= pf.check_box :media_only, checked: true, data: {behavior: "check_toggle"} %>
-                                <%= pf.label :media_only do %>
-                                    <span class="slider-checkbox"></span>
-                                <% end %>
-                            </label>
-                        </div>
+                    <ul class="control-group">
+                        <li class="right">
+                            <%= pf.check_box :media_only, checked: false %>
+                            <%= pf.label :media_only do %>
+                                Tweets with media and links only <%= toggle_switch %>
+                            <% end %>
+                        </li>
+                    </ul>
                     <% end %>
                 <% end %>
             <% end %>
@@ -40,6 +41,6 @@
             <h4 class="group-header">Tags</h4>
         </div>
         <%= render partial: "shared/tag_fields", locals: {tag_editor: tag_editor} %>
-        <%= submit_tag("Submit", class: "visually-hidden", data: {behavior: "submit_add"}) %>
+        <%= submit_tag("Submit", class: "visually-hidden", tabindex: "-1", data: {behavior: "submit_add"}) %>
     </div>
 <% end %>

@@ -39,12 +39,12 @@ module SessionsHelper
 
   def sign_out
     @current_user = nil
+    reset_session
     cookies.delete(:auth_token)
   end
 
-  def redirect_back_or(default)
-    redirect_to(session[:return_to] || default)
-    session.delete(:return_to)
+  def redirect_back_or(default, notice = nil)
+    redirect_to (session.delete(:return_to) || default), notice: notice
   end
 
   def store_location

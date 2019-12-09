@@ -22,6 +22,9 @@
                 });
             </script>
         <% end %>
+        <script>
+            feedbin.theme = "<%= current_user&.theme || "day" %>";
+        </script>
         <%= yield(:head) %>
         <%= csrf_meta_tags %>
         <%= tag :meta, name: "stripe-key", content: STRIPE_PUBLIC_KEY %>

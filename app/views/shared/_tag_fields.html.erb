@@ -1,17 +1,14 @@
-<ul class="control-group">
-    <li>
-        <button data-behavior="add_tag" type="button">+ New Tag</button>
-    </li>
-</ul>
-
-<ul class="control-group tags-target no-border" data-behavior="tags_target"></ul>
-
 <%= content_tag :ul, class: "control-group" do  -%>
+    <li class="text">
+        <%= render "shared/input", class: "tag-input" do %>
+            <input placeholder="+ New Tag" type="text" name="tag_name[]">
+        <% end %>
+    </li>
     <% tag_editor.tags.each do |tag| %>
     <li>
         <%= check_box_tag "tag_id[#{tag.id}]", tag.name, tag_editor.checked?(tag) %>
         <%= label_tag "tag_id[#{tag.id}]" do %>
-            <%= tag.name %> <span class="slider-checkbox"></span>
+            <%= tag.name %> <%= toggle_switch %>
         <% end %>
     </li>
     <% end %>

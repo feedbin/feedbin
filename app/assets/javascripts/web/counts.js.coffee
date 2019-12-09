@@ -16,6 +16,7 @@ class _Counts
 
   setData: (options) ->
     @tagMap = options.tag_map
+    @feedMap = options.feed_map
     @savedSearches = options.saved_searches
     @collections =
       unread: @flatten(options.unread_entries)
@@ -110,19 +111,43 @@ class _Counts
   isStarred: (entryId) ->
     _.contains(@counts.starred.all, entryId)
 
-  entriesInFeed: (feedId) ->
-    result = @counts["unread"]["byFeed"][feedId]
-    if typeof(result) == "undefined"
-      0
-    else
-      result.length
-
   updateTagMap: (feedId, tagId) ->
+    keys = _.keys(@feedMap)
+    _.each keys, (key) =>
+      @feedMap[key] = _.reject @feedMap[key], (feed) =>
+        feedId == feed
+
     if tagId?
       @tagMap[feedId] = [tagId]
+      if !_.contains(@feedMap[tagId], feedId)
+        @feedMap[tagId].push(feedId)
     else
       delete @tagMap[feedId]
+
     @counts = @allCounts()
+
+  markAllRead: (tagId) ->
+    keys = _.keys(@collections)
+    _.each keys, (key) =>
+      @collections[key] = []
+    @counts = @allCounts()
+
+  markTagRead: (tagId) ->
+    if (tagId of @feedMap)
+      feeds = @feedMap[tagId]
+      _.each feeds, (feed) =>
+        @_markFeedRead(feed)
+      @counts = @allCounts()
+
+  markFeedRead: (feedId) ->
+    @_markFeedRead(feedId)
+    @counts = @allCounts()
+
+  _markFeedRead: (feedId) ->
+    keys = _.keys(@collections)
+    _.each keys, (key) =>
+      @collections[key] = _.reject @collections[key], (entry) =>
+        @feedId(entry) == feedId
 
 class Counts
   instance = null

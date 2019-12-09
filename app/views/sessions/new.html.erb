@@ -1,17 +1,24 @@
 <% @class = 'login' %>
 <div class="login-wrap">
-    <a href="/" class="logo hide-text">Feedbin</a>
+    <a href="/" class="logo">
+        <%= svg_tag "logo-full" %>
+    </a>
     <div class="box">
         <%= render partial: 'shared/flash', locals: {flash: flash} %>
         <h3 class="box-header">Welcome Back</h3>
         <%= form_tag sessions_path, {class: 'combined-form', novalidate: true} do %>
-            <p>
+            <%= render "shared/input" do %>
                 <%= email_field_tag :email, params[:email], autofocus: true, tabindex: '1', placeholder: 'Email', class: "text" %>
+            <% end %>
+            <%= render "shared/input" do %>
                 <%= password_field_tag :password, nil, tabindex: '2', placeholder: 'Password', class: "text" %>
-            </p>
-            <%= submit_tag "Login", class: 'button', tabindex: '3' %>
+            <% end %>
+
+            <button type="submit" class="button flex" tabindex="3">Login</button>
             <%= link_to "Forgot password?", new_password_reset_path, class: 'large forgot-link' %>
         <% end %>
     </div>
-    <p class="align-center x-large muted">Don’t have an account? <%= link_to "Sign up", signup_path %></p>
+    <p class="align-center x-large extra-muted">Don’t have an account? <%= link_to "Sign up", signup_path %></p>
 </div>
+<%= render partial: 'shared/svg' %>
+

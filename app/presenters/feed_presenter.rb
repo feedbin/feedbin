@@ -9,7 +9,7 @@ class FeedPresenter < BasePresenter
       class: "feed-link",
       data: {
         behavior: behavior || "selectable show_entries open_item feed_link renamable user_title has_settings",
-        settings_path: @template.edit_subscription_path(feed),
+        settings_path: @template.edit_subscription_path(feed, app: true),
         feed_id: feed.id,
         jumpable: {title: feed.title, section: "Feeds"},
         mark_read: {

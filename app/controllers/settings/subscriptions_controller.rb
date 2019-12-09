@@ -1,13 +1,14 @@
 class Settings::SubscriptionsController < ApplicationController
   def index
     @user = current_user
-    @subscriptions = subscriptions_with_sort_data.paginate(page: params[:page], per_page: 100)
+    @subscriptions = subscriptions_with_sort_data.paginate(page: params[:page], per_page: 50)
+    store_location
     render layout: "settings"
   end
 
   def destroy
     destroy_subscription(params[:id])
-    redirect_to settings_subscriptions_url, notice: "You have successfully unsubscribed."
+    redirect_back_or(settings_subscriptions_url, "You have successfully unsubscribed.")
   end
 
   def edit
