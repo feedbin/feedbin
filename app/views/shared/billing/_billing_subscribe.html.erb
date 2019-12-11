@@ -46,7 +46,9 @@
             <ul class="control-group">
                 <li data-behavior="billing_option_apple_pay">
                     <%= radio_button_tag("billing_method", "apple_pay", false, { data: {behavior: 'billing_method_radio'}}) %>
-                    <%= label_tag("billing_method_apple_pay", "Apple Pay") %>
+                    <%= label_tag("billing_method_apple_pay") do %>
+                         Apple Pay <%= radio_button_control %>
+                    <% end %>
                 </li>
                 <li data-behavior="billing_option_payment_request">
                     <%= radio_button_tag("billing_method", "pay_with_google", false, { data: {behavior: 'billing_method_radio'}}) %>
