@@ -56,10 +56,12 @@ class SendStats
       servers = Rails.cache.stats
       servers.each do |server, stats|
         server_name = server.gsub(/[^A-Za-z0-9]+/, "_")
+        hit_rate = (stats["get_misses"].to_f / stats["get_hits"].to_f).round(3)
         Librato.group "memcached.#{server_name}" do |group|
           group.measure("gets", stats["cmd_get"].to_f)
           group.measure("sets", stats["cmd_set"].to_f)
           group.measure("hits", stats["get_hits"].to_f)
+          group.measure("hit_rate", hit_rate)
           group.measure("items", stats["curr_items"].to_f)
           group.measure("connections", stats["curr_connections"].to_i)
         end
