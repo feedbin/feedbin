@@ -9,7 +9,7 @@ class RequestTiming
     @app.call(env.merge!({
       "request_timing.start" => start,
       "request_timing.received" => received,
-      "request_timing.queued" => received - start
+      "request_timing.queued" => (received - start) * 1000
     }))
   end
 
