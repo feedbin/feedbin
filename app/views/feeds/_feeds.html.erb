@@ -1,4 +1,4 @@
-<%= render partial: 'collections/collection', collection: collections %>
+<%= render partial: "collections/collection", collection: collections %>
 
 <% if page_feed.present? %>
     <% present page_feed do |feed_presenter| %>
@@ -9,7 +9,7 @@
                     <span class="collection-label">Pages</span>
                 </span>
                 <span class="count-wrap">
-                    <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byFeed', count_group_id: page_feed.id} %>
+                    <%= content_tag :span, "", class: "count", data: {behavior: "needs_count", count_group: "byFeed", count_group_id: page_feed.id} %>
                 </span>
             <% end %>
         <% end %>
@@ -23,7 +23,7 @@
         </span>
         Searches
     </li>
-    <%= render partial: 'saved_searches/saved_search', collection: saved_searches %>
+    <%= render partial: "saved_searches/saved_search", collection: saved_searches %>
 <% end %>
 
 <% if tags.present? %>
@@ -33,7 +33,7 @@
         </span>
         Tags
     </li>
-    <%= render partial: 'tags/tag', collection: tags %>
+    <%= render partial: "tags/tag", collection: tags %>
 <% end %>
 
 <% if feeds.present? %>
@@ -43,5 +43,5 @@
         </span>
         Feeds
     </li>
-    <%= render feeds %>
+    <%= render partial: "feeds/feed", collection: feeds, cached: true %>
 <% end %>
