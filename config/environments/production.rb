@@ -51,8 +51,9 @@ Rails.application.configure do
     if event.payload && event.payload[:feedbin_request_id].present?
       custom_options[:feedbin_request_id] = event.payload[:feedbin_request_id]
     end
-    if event.payload && event.payload[:request_start].present?
+    if event.payload && event.payload[:request_start].present? && event.payload[:headers]["request_timing.queued"].present?
       custom_options[:request_start] = event.payload[:request_start]
+      custom_options[:queue_time] = event.payload[:headers]["request_timing.queued"]
     end
     custom_options
   end
