@@ -16,6 +16,7 @@ class ApplicationController < ActionController::Base
   def append_info_to_payload(payload)
     super
     payload[:feedbin_request_id] = request.headers["X-Feedbin-Request-ID"]
+    payload[:request_start] = request.headers["X-Request-Start"]
   end
 
   def update_selected_feed!(type, data = nil)
