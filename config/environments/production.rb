@@ -54,7 +54,7 @@ Rails.application.configure do
     if event.payload && event.payload[:request_start].present? && event.payload[:headers]["request_timing.queued"].present?
       custom_options[:request_start] = event.payload[:request_start]
       custom_options[:queue_time] = event.payload[:headers]["request_timing.queued"]
-      Librato.measure "request_timing.queued", event.payload[:headers]["request_timing.queued"], source: Socket.gethostname
+      Librato.measure "request_timing.queued", event.payload[:headers]["request_timing.queued"], source: Socket.gethostname, percentile: [95]
     end
     custom_options
   end
