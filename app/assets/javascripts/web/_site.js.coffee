@@ -13,6 +13,7 @@ window.feedbin ?= {}
 
 $.extend feedbin,
 
+  popper: null
   swipe: false
   notificationTimeout: null
   panel: 1
@@ -2559,6 +2560,21 @@ $.extend feedbin,
         feedbin.hideSearch()
         $('[data-behavior~=feed_settings]').attr('disabled', 'disabled')
         $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
+
+    profiles: ->
+      feedbin.destroyPopper = ->
+        if feedbin.popper != null
+          feedbin.popper.destroy()
+          feedbin.popper = null
+
+      $(document).on 'click', '[data-behavior~=toggle_profile]', (event) ->
+        element = $(event.currentTarget).closest('[data-behavior~=author_profile_wrap]').find('[data-behavior~=author_profile]')
+        if element.hasClass('hide')
+          element.removeClass('hide')
+          element.addClass('show')
+        else
+          element.addClass('hide')
+          element.removeClass('show')
 
     copy: ->
       $(document).on 'click', '[data-behavior~=copy]', (event) ->

@@ -661,11 +661,15 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_author_joined
-    "#{entry.main_tweet.user.created_at.strftime("%B")} #{entry.main_tweet.user.created_at.year}"
+    "#{entry.main_tweet.user.created_at.strftime("%b")} #{entry.main_tweet.user.created_at.year}"
   end
 
   def tweet_author_location
     entry.main_tweet.user.location? ? entry.main_tweet.user.location : nil
+  end
+
+  def tweet_author_location?
+    entry.main_tweet.user.location?
   end
 
   def quoted_status?
