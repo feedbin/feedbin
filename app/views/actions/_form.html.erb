@@ -52,7 +52,7 @@
                 <div class="feed-actions toolbar">
 
                     <div class="checkbox">
-                        <input type="checkbox" value="all_feeds" data-behavior="check_feeds" id="include_all_feeds" />
+                        <%= form.check_box :all_feeds, id: "include_all_feeds", data: {behavior: 'check_feeds'} %>
                         <label for="include_all_feeds"><%= svg_tag "icon-check" %>Include all</label>
                     </div>
 
