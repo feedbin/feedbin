@@ -1543,12 +1543,12 @@ $hamburger-dot: 4px;
     z-index: 2;
     position: relative;
     &:before {
-        left: -7px;
+        left: -6px;
         position: absolute;
     }
     &:after {
         position: absolute;
-        left: 7px;
+        left: 6px;
     }
 }
 .hamburger-menu, .hamburger-menu:before, .hamburger-menu:after {
