@@ -13,7 +13,6 @@ window.feedbin ?= {}
 
 $.extend feedbin,
 
-  popper: null
   swipe: false
   notificationTimeout: null
   panel: 1
