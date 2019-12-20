@@ -2560,6 +2560,15 @@ $.extend feedbin,
         $('[data-behavior~=feed_settings]').attr('disabled', 'disabled')
         $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
 
+    profiles: ->
+      $(document).on 'click', (event, xhr) ->
+        if $(event.target).closest('[data-behavior~=author_profile]').length == 0 && $(event.target).closest('[data-behavior~=toggle_profile]').length == 0
+          $('[data-behavior~=author_profile]').addClass('hide')
+
+      $(document).on 'click', '[data-behavior~=toggle_profile]', (event) ->
+        element = $(event.currentTarget).closest('[data-behavior~=author_profile_wrap]').find('[data-behavior~=author_profile]')
+        element.toggleClass('hide')
+
     copy: ->
       $(document).on 'click', '[data-behavior~=copy]', (event) ->
         button = $(@)

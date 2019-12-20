@@ -183,7 +183,7 @@ $image-spinners: (
 $color-arrow-shadow: $color-borders;
 $selected: #0867E2;
 $inset-bg-color: #f4f6f8;
-$box-shadow-dropdown: 0px 4px 6px 0 rgba(0, 0, 0, 0.1);
+$box-shadow-dropdown: 0px 4px 6px 2px rgba(0, 0, 0, 0.1);
 $focus-glow: 0px 0px 0px 4px $color-accent-blue-400;
 $focus-glow-inset: inset $focus-glow;
 $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
@@ -4695,11 +4695,98 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         .profile-info {
             flex-grow: 1;
             min-width: 0;
+            h1 {
+                @include font-size(16);
+                svg {
+                    margin-left: 2px;
+                    position: relative;
+                    top: 5px;
+                }
+            }
         }
-        .profile-image {
-            margin-right: 10px;
+        .profile-image-wrap {
+            margin-right: 8px;
             line-height: 1;
             flex-shrink: 0;
+        }
+        .profile-image {
+            position: relative;
+            svg {
+                position: absolute;
+                bottom: 0;
+                right: -5px;
+            }
+        }
+        .profile-meta-wrap {
+            display: flex;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .profile-meta {
+            @include font-size(14);
+            @include color($color-contrast-500);
+            margin-right: 16px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            &:first-child {
+                flex-shrink: 0;
+            }
+            span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                display: block;
+            }
+            svg {
+                flex-shrink: 0;
+                margin-right: 8px;
+                @include fill($color-icons);
+            }
+            strong {
+                @include color($color-contrast-600);
+                margin-right: 4px;
+            }
+        }
+        .author-profile-wrap {
+            position: relative;
+        }
+        .author-profile {
+            z-index: 10000;
+            width: 304px;
+            @include background-color($color-base-alt);
+            @include border($color-borders);
+            box-shadow: $box-shadow-dropdown;
+            border-radius: 8px;
+            position: absolute;
+            top: 47px;
+            left: 0;
+            padding: 16px;
+            transition: opacity .2s ease-in;
+            &.show {
+                opacity: 1;
+            }
+            .profile-image {
+                margin-right: 0;
+                margin-bottom: 16px;
+            }
+            .tweet-text {
+                white-space: normal;
+                @include font-size(15);
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+            .profile-wrap {
+                display: flex;
+                justify-content: center;
+            }
+            .tweet-body {
+                .modal & {
+                    padding-left: 0;
+                }
+            }
         }
         h1 {
             @include font-size(18);
@@ -4728,12 +4815,18 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             margin: 0;
             $size: 47px;
             border: 2px solid white;
-            border-radius: $size;
+            border-radius: 50%;
             height: $size;
             width: $size;
             box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
             .theme-day & {
                 box-shadow: none;
+            }
+            &.large {
+                height: auto;
+                width: 100%;
+                max-height: 270px;
+                object-fit: cover;
             }
         }
         .tweet-actions {
@@ -4834,6 +4927,13 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             margin-bottom: 0;
         }
     }
+    &.profile {
+        .profile-info {
+            strong {
+                display: block;
+            }
+        }
+    }
 }
 
 .modal-purpose-conversation {
@@ -4875,7 +4975,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 
 .entry-column.wide {
     .entry-main-tweet {
-        .profile-image {
+        .profile-image-wrap {
             position: absolute;
             left: -60px;
             .fluid & {

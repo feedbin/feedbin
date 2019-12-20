@@ -1,0 +1,39 @@
+<% present entry do |entry_presenter| %>
+<div class="tweet-wrap profile" data-behavior="external_links">
+    <div class="tweet">
+        <header class="tweet-header">
+            <div class="profile-wrap">
+                <%= link_to profile_tweet_path(entry), title: "Author Profile", class: "profile-image", remote: true, data: {behavior: "open_modal", modal_target: "generic"}  do %>
+                    <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry_presenter.tweet_profile_image_uri(tweet, :original), size: "136x136", alt: "", class: "large") %>
+                    <% if entry_presenter.tweet_author_verified? %>
+                        <%= svg_tag "icon-settings-check" %>
+                    <% end %>
+                <% end %>
+                <div class="profile-info">
+                    <h1>
+                        <a href="<%= tweet.uri.to_s %>" target="_blank" class="link">
+                            <strong><%= entry_presenter.tweet_name(tweet) %></strong>
+                            <%= entry_presenter.tweet_screen_name(tweet) %>
+                        </a>
+                    </h1>
+                </div>
+            </div>
+        </header>
+        <div class="tweet-body">
+            <div class="tweet-body-inner">
+                <p class="tweet-text">
+                    <span class="profile-meta">
+                        <%= svg_tag "icon-settings-check" %>
+                        <%= entry_presenter.tweet_author_joined %>
+                    </span>
+                    <span class="profile-meta">
+                        <%= svg_tag "icon-settings-check" %>
+                        <%= entry_presenter.tweet_author_location %>
+                    </span>
+                </p>
+                <%= entry_presenter.tweet_author_description() %>
+            </div>
+        </div>
+    </div>
+</div>
+<% end %>

@@ -2,9 +2,59 @@
 <div class="tweet <%= entry_presenter.tweet_classes(tweet) %>">
     <header class="tweet-header">
         <div class="profile-wrap">
-            <%= link_to entry_presenter.tweet_user_url(tweet), target: "_blank", title: "View on Twitter", class: "profile-image" do %>
-                <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry_presenter.tweet_profile_image_uri(tweet), size: "47x47", alt: "") %>
-            <% end %>
+            <div class="profile-image-wrap" data-behavior="author_profile_wrap">
+                <%= content_tag :button, title: "View Profile", class: "profile-image reset", data: {behavior: "toggle_profile"}  do %>
+                    <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry_presenter.tweet_profile_image_uri(tweet), size: "47x47", alt: "") %>
+                <% end %>
+                <div class="author-profile hide" data-behavior="author_profile">
+                    <header class="tweet-header">
+                        <div class="profile-wrap">
+                            <%= link_to entry_presenter.tweet_user_url(tweet), target: "_blank", title: "View on Twitter", class: "profile-image" do %>
+                                <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), entry_presenter.tweet_profile_image_uri(tweet, :original), width: "100%", alt: "", class: "large") %>
+                            <% end %>
+                        </div>
+                        <div class="profile-info">
+                            <h1>
+                                <a href="<%= tweet.uri.to_s %>" target="_blank" class="link">
+                                    <strong>
+                                        <%= entry_presenter.tweet_name(tweet) %>
+                                        <% if entry_presenter.tweet_author_verified?(tweet) %>
+                                            <%= svg_tag "icon-verified" %>
+                                        <% end %>
+                                    </strong>
+                                    <br>
+                                    <%= entry_presenter.tweet_screen_name(tweet) %>
+                                </a>
+                            </h1>
+                        </div>
+                    </header>
+                    <div class="tweet-body">
+                        <div class="tweet-body-inner">
+                            <%= entry_presenter.tweet_author_description(tweet) %>
+                            <p class="tweet-text profile-meta-wrap">
+                                <span class="profile-meta" title="Joined">
+                                    <%= svg_tag "icon-calendar" %>
+                                    <%= entry_presenter.tweet_author_joined(tweet) %>
+                                </span>
+                                <% if entry_presenter.tweet_author_location?(tweet) %>
+                                <span class="profile-meta" title="Location">
+                                    <%= svg_tag "icon-location" %>
+                                    <span><%= entry_presenter.tweet_author_location(tweet) %></span>
+                                </span>
+                                <% end %>
+                            </p>
+                            <p class="tweet-text profile-meta-wrap">
+                                <span class="profile-meta">
+                                    <strong><%= short_number(tweet.user.friends_count) %></strong> Following
+                                </span>
+                                <span class="profile-meta">
+                                    <strong><%= short_number(tweet.user.followers_count) %></strong> <%= "Follower".pluralize(tweet.user.followers_count) %>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="profile-info">
                 <h1>
                     <a href="<%= tweet.uri.to_s %>" target="_blank" class="link">
