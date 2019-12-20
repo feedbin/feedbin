@@ -650,26 +650,26 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def tweet_author_description
+  def tweet_author_description(tweet)
     @template.content_tag(:p, class: "tweet-text") do
-      Twitter::TwitterText::Autolink.auto_link(entry.main_tweet.user.description).html_safe
+      Twitter::TwitterText::Autolink.auto_link(tweet.user.description).html_safe
     end
   end
 
-  def tweet_author_verified?
-    entry.main_tweet.user.verified?
+  def tweet_author_verified?(tweet)
+    tweet.user.verified?
   end
 
-  def tweet_author_joined
-    "#{entry.main_tweet.user.created_at.strftime("%b")} #{entry.main_tweet.user.created_at.year}"
+  def tweet_author_joined(tweet)
+    "#{tweet.user.created_at.strftime("%b")} #{tweet.user.created_at.year}"
   end
 
-  def tweet_author_location
-    entry.main_tweet.user.location? ? entry.main_tweet.user.location : nil
+  def tweet_author_location(tweet)
+    tweet.user.location? ? tweet.user.location : nil
   end
 
-  def tweet_author_location?
-    entry.main_tweet.user.location?
+  def tweet_author_location?(tweet)
+    tweet.user.location?
   end
 
   def quoted_status?

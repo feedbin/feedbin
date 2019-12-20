@@ -2,7 +2,7 @@
     <div class="tweet quoted-tweet">
         <header class="tweet-header">
             <div class="profile-wrap">
-                <%= content_tag :button, title: "View profile", class: "profile-image" do %>
+                <%= link_to tweet.author_url, target: "_blank", title: "View on Twitter", class: "profile-image" do %>
                     <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), camo_link(tweet.profile_image_url), size: "47x47", alt: "") %>
                 <% end %>
                 <div class="profile-info">

@@ -4720,6 +4720,9 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         }
         .profile-meta-wrap {
             display: flex;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .profile-meta {
             @include font-size(14);
@@ -4727,10 +4730,24 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             margin-right: 16px;
             display: flex;
             align-items: center;
+            overflow: hidden;
+            &:first-child {
+                flex-shrink: 0;
+            }
+            span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                display: block;
+            }
             svg {
                 flex-shrink: 0;
                 margin-right: 8px;
                 @include fill($color-icons);
+            }
+            strong {
+                @include color($color-contrast-600);
+                margin-right: 4px;
             }
         }
         .author-profile-wrap {
@@ -4747,7 +4764,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             top: 47px;
             left: 0;
             padding: 16px;
-            opacity: 0;
             transition: opacity .2s ease-in;
             &.show {
                 opacity: 1;
@@ -4760,6 +4776,15 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                 white-space: normal;
                 &:last-child {
                     margin-bottom: 0;
+                }
+            }
+            .profile-wrap {
+                display: flex;
+                justify-content: center;
+            }
+            .tweet-body {
+                .modal & {
+                    padding-left: 0;
                 }
             }
         }
@@ -4800,6 +4825,8 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             &.large {
                 height: auto;
                 width: 100%;
+                max-height: 270px;
+                object-fit: cover;
             }
         }
         .tweet-actions {
