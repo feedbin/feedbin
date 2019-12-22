@@ -4695,59 +4695,11 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         .profile-info {
             flex-grow: 1;
             min-width: 0;
-            h1 {
-                @include font-size(16);
-                svg {
-                    margin-left: 2px;
-                    position: relative;
-                    top: 5px;
-                }
-            }
         }
         .profile-image-wrap {
             margin-right: 8px;
             line-height: 1;
             flex-shrink: 0;
-        }
-        .profile-image {
-            position: relative;
-            svg {
-                position: absolute;
-                bottom: 0;
-                right: -5px;
-            }
-        }
-        .profile-meta-wrap {
-            display: flex;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .profile-meta {
-            @include font-size(14);
-            @include color($color-contrast-500);
-            margin-right: 16px;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            &:first-child {
-                flex-shrink: 0;
-            }
-            span {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                display: block;
-            }
-            svg {
-                flex-shrink: 0;
-                margin-right: 8px;
-                @include fill($color-icons);
-            }
-            strong {
-                @include color($color-contrast-600);
-                margin-right: 4px;
-            }
         }
         .author-profile-wrap {
             position: relative;
@@ -4764,6 +4716,59 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             left: 0;
             padding: 16px;
             transition: opacity .2s ease-in;
+            .profile-info h1 {
+                @include font-size(16);
+                svg {
+                    margin-left: 2px;
+                    position: relative;
+                    top: 5px;
+                }
+            }
+            .profile-image-wrap {
+                margin-right: 8px;
+                line-height: 1;
+                flex-shrink: 0;
+            }
+            .profile-image {
+                position: relative;
+                svg {
+                    position: absolute;
+                    bottom: 0;
+                    right: -5px;
+                }
+            }
+            .profile-meta-wrap {
+                display: flex;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .profile-meta {
+                @include font-size(14);
+                @include color($color-contrast-500);
+                margin-right: 16px;
+                display: flex;
+                align-items: center;
+                overflow: hidden;
+                &:first-child {
+                    flex-shrink: 0;
+                }
+                span {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    display: block;
+                }
+                svg {
+                    flex-shrink: 0;
+                    margin-right: 8px;
+                    @include fill($color-icons);
+                }
+                strong {
+                    @include color($color-contrast-600);
+                    margin-right: 4px;
+                }
+            }
             &.show {
                 opacity: 1;
             }

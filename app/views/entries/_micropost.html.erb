@@ -2,9 +2,11 @@
     <div class="tweet entry-main-tweet">
         <header class="tweet-header">
             <div class="profile-wrap">
-                <%= link_to micropost.micropost.author_url, target: "_blank", title: "Author’s Website", class: "profile-image" do %>
-                    <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), camo_link(micropost.micropost.author_avatar), size: "47x47", alt: "") %>
-                <% end %>
+                <div class="profile-image-wrap">
+                    <%= link_to micropost.micropost.author_url, target: "_blank", title: "Author’s Website", class: "profile-image" do %>
+                        <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), camo_link(micropost.micropost.author_avatar), size: "47x47", alt: "") %>
+                    <% end %>
+                </div>
                 <div class="profile-info">
                     <h1>
                         <a href="<%= micropost.fully_qualified_url %>" target="_blank" class="link">
