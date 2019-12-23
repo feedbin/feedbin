@@ -3,6 +3,12 @@ class Favicon < ApplicationRecord
 
   validates :url, presence: true
 
+  after_commit :touch_owners
+
+  def touch_owners
+    Feed.where(host: host).update_all(updated_at: Time.now)
+  end
+
   def data
     self[:data] || {}
   end
