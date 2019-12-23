@@ -1,3 +1,10 @@
+@import "../../../vendor/assets/stylesheets/github";
+@import "../../../vendor/assets/stylesheets/obsidian";
+@import "../../../vendor/assets/stylesheets/bigfoot-default";
+
+@import "theme";
+@import "functions";
+
 /*------------------------------------------------------------------------------
 Variables
 ------------------------------------------------------------------------------*/
@@ -1567,9 +1574,6 @@ $hamburger-dot: 4px;
     @include border-top(transparent);
     padding-bottom: 16px;
     z-index: 2;
-    @supports(padding-bottom: max(0px)) {
-        padding-bottom: max(16px, env(safe-area-inset-bottom));
-    }
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1599,9 +1603,6 @@ $hamburger-dot: 4px;
         padding: 16px 0 20px 0;
         .entries-column & {
             padding: 8px 0;
-            @supports(padding-bottom: max(0px)) {
-                padding-bottom: max(8px, env(safe-area-inset-bottom));
-            }
         }
     }
     .toolbar-button {
@@ -3433,9 +3434,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .navigation-button {
         @include color($color-contrast-700);
         padding: 11px 0;
-        @supports(padding-bottom: max(0px)) {
-            padding-bottom: max(11px, env(safe-area-inset-bottom));
-        }
         text-decoration: none;
         appearance: none;
         display: block;

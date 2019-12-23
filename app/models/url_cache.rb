@@ -1,4 +1,4 @@
-class URLCache
+class UrlCache
   attr_reader :url, :options
 
   def initialize(url, options = {})

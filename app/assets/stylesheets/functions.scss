@@ -75,15 +75,6 @@
     padding: 16px 0;
 }
 
-@function max($numbers...) {
-    @return m#{a}x(#{$numbers})
-}
-
-@function min($numbers...) {
-    @return m#{i}n(#{$numbers})
-}
-
-
 @mixin padding($top, $right, $bottom, $left, $top-small, $right-small, $bottom-small, $left-small) {
     padding: $top-small $right-small $bottom-small $left-small;
     @include respond-to(screen-sm) {

@@ -8,7 +8,7 @@ class ApplePushNotificationsControllerTest < ActionController::TestCase
   end
 
   test "should create push package" do
-    raw_post :create, default_params, {authentication_token: @token}.to_json
+    post :create, params: default_params, body: {authentication_token: @token}.to_json
     assert_response :success
     assert_equal response.header["Content-Type"], "application/zip"
     assert_equal @user, assigns(:user)
@@ -16,7 +16,7 @@ class ApplePushNotificationsControllerTest < ActionController::TestCase
 
   test "should not create push package with invalid token" do
     assert_raises(ActiveSupport::MessageVerifier::InvalidSignature) do
-      raw_post :create, default_params, {authentication_token: "#{@token}s"}.to_json
+      post :create, params: default_params, body: {authentication_token: "#{@token}s"}.to_json
     end
   end
 

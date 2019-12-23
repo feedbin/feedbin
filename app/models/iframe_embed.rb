@@ -51,7 +51,7 @@ class IframeEmbed
         defaults = {
           url: embed_url.to_s,
         }
-        response = URLCache.new(oembed_url, params: defaults.merge(oembed_params))
+        response = UrlCache.new(oembed_url, params: defaults.merge(oembed_params))
         JSON.parse(response.body)
       end
     end

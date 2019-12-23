@@ -89,7 +89,7 @@ class FaviconFetcher
   def request_headers
     headers = {user_agent: "Mozilla/5.0"}
     unless @force
-      conditional_headers = ConditionalHTTP.new(@favicon.data["Etag"], @favicon.data["Last-Modified"])
+      conditional_headers = ConditionalHttp.new(@favicon.data["Etag"], @favicon.data["Last-Modified"])
       headers = headers.merge(conditional_headers.to_h)
     end
     headers

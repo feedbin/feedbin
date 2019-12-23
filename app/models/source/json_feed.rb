@@ -1,4 +1,4 @@
-class Source::JSONFeed < Source
+class Source::JsonFeed < Source
   def call
     if @config[:request].format == :json_feed
       url = @config[:request].last_effective_url

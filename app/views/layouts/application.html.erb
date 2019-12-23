@@ -10,6 +10,19 @@
         <link rel="apple-touch-icon-precomposed" href="<%= asset_path('apple-touch-icon-precomposed.png') %>" sizes="152x152" />
         <link rel="shortcut icon" href="<%= asset_path('favicon.ico') %>" type="image/vnd.microsoft.icon" />
         <%= stylesheet_link_tag "application", media: "all"  %>
+        <style>
+            @supports (padding-bottom: max(0px)) {
+                .bottom-toolbar {
+                    padding-bottom: max(16px, env(safe-area-inset-bottom));
+                }
+                .entries-column .feed-toolbar .toolbar-inner {
+                    padding-bottom: max(8px, env(safe-area-inset-bottom));
+                }
+                .entry-bottom-toolbar .navigation-button {
+                    padding-bottom: max(11px, env(safe-area-inset-bottom));
+                }
+            }
+        </style>
         <%= javascript_include_tag "lib/lib"  %>
         <%= javascript_include_tag "application"  %>
         <% if native? %>

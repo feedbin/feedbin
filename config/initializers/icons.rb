@@ -1,4 +1,4 @@
-class SVGIcon
+class SvgIcon
   attr_reader :name, :markup, :width, :height
 
   def initialize(name, markup, width, height)
@@ -27,7 +27,7 @@ end
 
 Feedbin::Application.config.icons = begin
   Dir.glob("#{Rails.root}/app/assets/svg/*.svg").sort.each_with_object({}) do |file, hash|
-    icon = SVGIcon.new_from_file(file)
+    icon = SvgIcon.new_from_file(file)
     hash[icon.name] = icon
   end
 end

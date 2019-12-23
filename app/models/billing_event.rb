@@ -70,7 +70,7 @@ class BillingEvent < ApplicationRecord
   def invoice_items
     if event_type == "charge.succeeded"
       Rails.cache.fetch("#{event_object["invoice"]}:lines") do
-        JSON.parse(Stripe::Invoice.retrieve(event_object["invoice"]).lines.all(limit: 10).to_json)
+        JSON.parse(Stripe::Invoice.retrieve(event_object["invoice"]).lines.list(limit: 10).to_json)
       end
     end
   end

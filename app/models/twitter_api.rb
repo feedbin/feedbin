@@ -1,4 +1,4 @@
-class TwitterAPI
+class TwitterApi
   API_URL = "https://api.twitter.com"
 
   # 1. twitter = Twitter.new

@@ -269,7 +269,7 @@ class SettingsController < ApplicationController
   def update_view_mode(view_mode)
     @user = current_user
     @view_mode = view_mode
-    @user.update_attributes(view_mode: @view_mode)
+    @user.update(view_mode: @view_mode)
   end
 
   def newsletters_pages

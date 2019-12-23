@@ -1,13 +1,11 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "= 5.1.7"
+gem "rails", github: "rails/rails", branch: "6-0-stable"
 
-gem "rails-deprecated_sanitizer"
 gem "rails-controller-testing"
 gem "rails_autolink"
-
-gem "nokogumbo", "= 1.4.9"
+gem "responders"
 
 group :development do
   gem "capistrano"
@@ -37,7 +35,7 @@ group :development, :test do
   gem "standard"
 end
 
-gem "pg", "< 1.0"
+gem "pg"
 gem "unicorn"
 
 gem "feedjira", github: "feedbin/feedjira", ref: "e6b7b11"
@@ -49,8 +47,8 @@ gem "grocer-pushpackager", github: "feedbin/grocer-pushpackager", ref: "6b01b4e"
 gem "html_diff", github: "feedbin/html_diff", ref: "c7c15ce"
 gem "carrierwave_direct", github: "feedbin/carrierwave_direct", ref: "a0bc323"
 
+gem "sass-rails"
 gem "mini_racer"
-gem "sassc-rails"
 gem "coffee-rails"
 gem "uglifier", "= 4.1.11"
 gem "autoprefixer-rails"
@@ -82,7 +80,6 @@ gem "evernote_oauth"
 gem "rmagick", require: false
 gem "reverse_markdown"
 gem "htmlentities"
-gem "responders", "~> 2.0"
 gem "dotenv-rails"
 gem "kramdown"
 gem "premailer-rails"
@@ -100,5 +97,5 @@ gem "unicode-emoji"
 gem "rack-attack"
 
 # Stripe
-gem "stripe"
+gem "stripe", "~> 4.24.0"
 gem "stripe_event"

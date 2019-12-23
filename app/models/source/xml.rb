@@ -1,4 +1,4 @@
-class Source::XML < Source
+class Source::Xml < Source
   def call
     if @config[:request].format == :xml
       url = @config[:request].last_effective_url

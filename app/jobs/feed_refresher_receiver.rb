@@ -43,7 +43,7 @@ class FeedRefresherReceiver
         if original_entry.original.nil?
           entry_update["original"] = build_original(original_entry)
         end
-        original_entry.update_attributes(entry_update)
+        original_entry.update(entry_update)
 
         if significant_change?(original_content, new_content)
           create_update_notifications(original_entry)

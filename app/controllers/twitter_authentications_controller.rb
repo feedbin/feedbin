@@ -1,6 +1,6 @@
 class TwitterAuthenticationsController < ApplicationController
   def new
-    klass = TwitterAPI.new
+    klass = TwitterApi.new
     response = klass.request_token
     if response.token && response.secret
       session[:oauth_token] = response.token
@@ -16,7 +16,7 @@ class TwitterAuthenticationsController < ApplicationController
     end
   rescue OAuth => e
     Honeybadger.notify(
-      error_class: "TwitterAPIs#new",
+      error_class: "TwitterApis#new",
       error_message: "Twitter failure",
       parameters: {exception: e},
     )
@@ -25,7 +25,7 @@ class TwitterAuthenticationsController < ApplicationController
 
   def save
     @user = current_user
-    klass = TwitterAPI.new
+    klass = TwitterApi.new
     if klass.response_valid?(session, params)
       access_token = klass.request_access(session.delete(:oauth_token), session.delete(:oauth_secret), params[:oauth_verifier])
       @user.update(twitter_access_token: access_token.token, twitter_access_secret: access_token.secret, twitter_screen_name: access_token.params[:screen_name])
@@ -40,7 +40,7 @@ class TwitterAuthenticationsController < ApplicationController
     end
   rescue OAuth => e
     Honeybadger.notify(
-      error_class: "TwitterAPIsController#save",
+      error_class: "TwitterApisController#save",
       error_message: "Twitter failure",
       parameters: {exception: e},
     )

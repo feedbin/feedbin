@@ -33,12 +33,12 @@ class FeedsController < ApplicationController
       if [feed.self_url, feed.feed_url].include?(params["hub.topic"]) && secret == params["hub.verify_token"]
         if params["hub.mode"] == "subscribe"
           Librato.increment "push.subscribe"
-          feed.update_attributes(push_expiration: Time.now + (params["hub.lease_seconds"].to_i / 2).seconds)
+          feed.update(push_expiration: Time.now + (params["hub.lease_seconds"].to_i / 2).seconds)
           response = params["hub.challenge"]
           status = :ok
         elsif params["hub.mode"] == "unsubscribe"
           Librato.increment "push.unsubscribe"
-          feed.update_attributes(push_expiration: nil)
+          feed.update(push_expiration: nil)
           response = params["hub.challenge"]
           status = :ok
         end

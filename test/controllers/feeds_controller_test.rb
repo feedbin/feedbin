@@ -73,7 +73,7 @@ class FeedsControllerTest < ActionController::TestCase
     body = push_prep(feed)
 
     assert_difference "Sidekiq::Queues['feed_refresher_fetcher_critical'].size", +1 do
-      raw_post :push, {id: feed.id}, body
+      post :push, params: {id: feed.id}, body: body
       assert_response :success
     end
   end
@@ -83,7 +83,7 @@ class FeedsControllerTest < ActionController::TestCase
     body = push_prep(feed)
 
     assert_difference "Sidekiq::Queues['feed_refresher_fetcher'].size", +1 do
-      raw_post :push, {id: feed.id}, body
+      post :push, params: {id: feed.id}, body: body
       assert_response :success
     end
   end

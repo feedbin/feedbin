@@ -378,7 +378,7 @@ class User < ApplicationRecord
   def update_tag_visibility(tag, visible)
     tag_visibility_will_change!
     tag_visibility[tag] = visible
-    update_attributes tag_visibility: tag_visibility
+    update tag_visibility: tag_visibility
   end
 
   def build_feeds_by_tag
@@ -426,12 +426,12 @@ class User < ApplicationRecord
   end
 
   def activate
-    update_attributes(suspended: false)
+    update(suspended: false)
     subscriptions.update_all(active: true)
   end
 
   def deactivate
-    update_attributes(suspended: true)
+    update(suspended: true)
     subscriptions.update_all(active: false)
   end
 

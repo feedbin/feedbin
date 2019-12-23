@@ -22,11 +22,11 @@ class FeedFinder
     end
 
     if feeds.blank?
-      feeds = Source::XML.new(@url, @config).call
+      feeds = Source::Xml.new(@url, @config).call
     end
 
     if feeds.blank?
-      feeds = Source::JSONFeed.new(@url, @config).call
+      feeds = Source::JsonFeed.new(@url, @config).call
     end
 
     if feeds.blank?

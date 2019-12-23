@@ -44,7 +44,7 @@ class Embed::Twitter
       }
 
       unless pics.empty?
-        page = URLCache.new(pics.last).body
+        page = UrlCache.new(pics.last).body
         doc = Nokogiri::HTML5(page)
         image = doc.css("meta[property='og:image']")
         unless image.empty?
@@ -76,7 +76,7 @@ class Embed::Twitter
           omit_script: true,
         },
       }
-      JSON.parse(URLCache.new(OEMBED_URL, options).body)
+      JSON.parse(UrlCache.new(OEMBED_URL, options).body)
     end
   end
 end

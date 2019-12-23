@@ -3,7 +3,7 @@ require "test_helper"
 class Api::V2::SuggestedCategoriesControllerTest < ApiControllerTestCase
   setup do
     @user = users(:ben)
-    @category = SuggestedCategory.create!(id: 1, name: "Popular")
+    @category = SuggestedCategory.first_or_create(id: 1, name: "Popular")
   end
 
   test "gets index" do

@@ -1,4 +1,4 @@
-class TLDLength
+class TldLength
   def initialize(app)
     @app = app
   end

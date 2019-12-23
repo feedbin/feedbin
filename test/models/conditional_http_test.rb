@@ -8,7 +8,7 @@ class ConditionalHttpTest < ActiveSupport::TestCase
       "If-None-Match" => etag,
       "If-Modified-Since" => last_modified.httpdate,
     }
-    assert_equal expected, ConditionalHTTP.new(etag, last_modified).to_h
+    assert_equal expected, ConditionalHttp.new(etag, last_modified).to_h
   end
 
   test "should get http headers with string" do
@@ -18,6 +18,6 @@ class ConditionalHttpTest < ActiveSupport::TestCase
       "If-None-Match" => etag,
       "If-Modified-Since" => last_modified,
     }
-    assert_equal expected, ConditionalHTTP.new(etag, last_modified).to_h
+    assert_equal expected, ConditionalHttp.new(etag, last_modified).to_h
   end
 end

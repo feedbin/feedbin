@@ -222,8 +222,8 @@ class SupportedSharingService < ApplicationRecord
     final_completions = old_completions.concat(new_completions).uniq
     options = service_options || {}
     options["completions"] = final_completions
-    update_attributes(service_options: nil)
-    update_attributes(service_options: options)
+    update(service_options: nil)
+    update(service_options: options)
   end
 
   def limit_exceeded

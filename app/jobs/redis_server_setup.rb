@@ -40,7 +40,7 @@ class RedisServerSetup
 
   def values
     @values ||= begin
-      arrays = feed.entries.pluck("id, EXTRACT(EPOCH FROM created_at), EXTRACT(EPOCH FROM published)")
+      arrays = feed.entries.pluck(Arel.sql("id, EXTRACT(EPOCH FROM created_at), EXTRACT(EPOCH FROM published)"))
       [
         arrays.map {|array| [array[1], array[0]] },
         arrays.map {|array| [array[2], array[0]] }
