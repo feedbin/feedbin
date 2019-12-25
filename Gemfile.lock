@@ -147,7 +147,7 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    activerecord-import (1.0.3)
+    activerecord-import (1.0.4)
       activerecord (>= 3.2)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
@@ -521,7 +521,7 @@ GEM
     twitter-text (2.1.0)
       idn-ruby
       unf (~> 0.1.0)
-    tzinfo (1.2.5)
+    tzinfo (1.2.6)
       thread_safe (~> 0.1)
     uglifier (4.1.11)
       execjs (>= 0.3.0, < 3)
