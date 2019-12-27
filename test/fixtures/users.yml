@@ -25,6 +25,7 @@ new:
   plan: basic_monthly_3
   customer_id: cus_new
   price_tier: 3
+  page_token: 123
 
 timed:
   email: timed@example.com

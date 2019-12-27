@@ -302,6 +302,8 @@ Rails.application.routes.draw do
           end
         end
 
+        resources :pages, only: [:create]
+
         get :authentication, to: "authentication#index"
 
         post "subscriptions/:id/update", to: "subscriptions#update"

@@ -11,6 +11,7 @@ class SavePage
     entry = create_webpage_entry
     ImageSaver.perform_async(entry.id)
     FaviconFetcher.perform_async(host, true)
+    entry
   end
 
   def create_webpage_entry
