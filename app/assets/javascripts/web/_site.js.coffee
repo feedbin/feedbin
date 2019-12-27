@@ -1352,11 +1352,7 @@ $.extend feedbin,
 
   preloadedImageIds: []
 
-  linkActionsTimer: null
-
-  linkCacheTimer: null
-
-  linkMenuTimer: null
+  linkActions: {}
 
   ONE_HOUR: 60 * 60 * 1000
 
@@ -2261,22 +2257,31 @@ $.extend feedbin,
       $(document).on 'mouseenter mouseleave', 'body:not(.touch) .entry-final-content a', (event) ->
         link = $(@)
         if link.text().trim().length > 0 && !$(@).has('.mejs__container').length > 0 && !link.closest(".system-content").length
-          clearTimeout(feedbin.linkActionsTimer)
-          clearTimeout(feedbin.linkCacheTimer)
-          clearTimeout(feedbin.linkMenuTimer)
+          url = link.attr('href')
+
+          unless url of feedbin.linkActions
+            feedbin.linkActions[url] =
+              linkActionsTimer: null
+              linkCacheTimer: null
+              linkMenuTimer: null
+
+          clearTimeout(feedbin.linkActions[url].linkActionsTimer)
+          clearTimeout(feedbin.linkActions[url].linkCacheTimer)
+          clearTimeout(feedbin.linkActions[url].linkMenuTimer)
 
           if event.type == "mouseleave"
-            feedbin.linkMenuTimer = setTimeout ( ->
+            feedbin.linkActions[url].linkMenuTimer = setTimeout ( ->
               $('.entry-final-content a [data-behavior~=link_actions]').remove()
+              delete feedbin.linkActions[url]
             ), 350
 
           if event.type == "mouseenter"
-            feedbin.linkCacheTimer = setTimeout ( ->
+            feedbin.linkActions[url].linkCacheTimer = setTimeout ( ->
               form = $("[data-behavior~=extract_cache_form]")
-              $("#url", form).val(link.attr('href'))
+              $("#url", form).val(url)
               form.submit()
             ), 100
-            feedbin.linkActionsTimer = setTimeout ( ->
+            feedbin.linkActions[url].linkActionsTimer = setTimeout ( ->
               actionsVisible = link.find('[data-behavior~=link_actions]').length > 0
               if !actionsVisible
                 contents = $('[data-behavior~=link_actions]').clone()
