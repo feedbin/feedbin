@@ -1356,6 +1356,8 @@ $.extend feedbin,
 
   linkCacheTimer: null
 
+  linkMenuTimer: null
+
   ONE_HOUR: 60 * 60 * 1000
 
   ONE_DAY: 60 * 60 * 1000 * 24
@@ -1703,6 +1705,26 @@ $.extend feedbin,
 
     sortFeeds: ->
       feedbin.sortFeeds()
+
+    linkActions: ->
+      $(document).on 'click', '[data-behavior~=view_link]', (event) ->
+        href = $(@).parents("a:first").attr('href')
+        if feedbin.data.view_links_in_app
+          window.open(href, '_blank');
+        else
+          feedbin.loadLink(href)
+        event.preventDefault()
+
+      $(document).on 'click', '[data-behavior~=link_actions]', (event) ->
+        windowWidth = $(window).width()
+        offset = $(@).offset().left
+        width = $(".dropdown-content", @).outerWidth()
+
+        if offset + width >= windowWidth
+          $(@).addClass('dropdown-right')
+        else
+          $(@).addClass('dropdown-left')
+        event.preventDefault()
 
     dropdown: ->
       $(document).on 'click', (event) ->
@@ -2241,10 +2263,12 @@ $.extend feedbin,
         if link.text().trim().length > 0 && !$(@).has('.mejs__container').length > 0 && !link.closest(".system-content").length
           clearTimeout(feedbin.linkActionsTimer)
           clearTimeout(feedbin.linkCacheTimer)
-          $('.entry-final-content a [data-behavior~=link_actions]').remove()
+          clearTimeout(feedbin.linkMenuTimer)
 
-          contents = $('[data-behavior~=link_actions]').clone()
-          contents = contents[0].outerHTML
+          if event.type == "mouseleave"
+            feedbin.linkMenuTimer = setTimeout ( ->
+              $('.entry-final-content a [data-behavior~=link_actions]').remove()
+            ), 350
 
           if event.type == "mouseenter"
             feedbin.linkCacheTimer = setTimeout ( ->
@@ -2253,7 +2277,11 @@ $.extend feedbin,
               form.submit()
             ), 100
             feedbin.linkActionsTimer = setTimeout ( ->
-              link.append(contents)
+              actionsVisible = link.find('[data-behavior~=link_actions]').length > 0
+              if !actionsVisible
+                contents = $('[data-behavior~=link_actions]').clone()
+                contents = contents[0].outerHTML
+                link.append(contents)
             ), 400
 
     loadLinksInApp: ->
@@ -2401,28 +2429,6 @@ $.extend feedbin,
     didBecomeActive: ->
       $(document).on 'feedbin:native:didBecomeActive', (event, value) ->
         feedbin.refresh()
-
-    linkActions: ->
-      $(document).on 'click', '[data-behavior~=view_link]', (event) ->
-        href = $(@).parents("a:first").attr('href')
-        if feedbin.data.view_links_in_app
-          window.open(href, '_blank');
-        else
-          feedbin.loadLink(href)
-        event.preventDefault()
-
-      $(document).on 'click', '[data-behavior~=link_actions]', (event) ->
-        windowWidth = $(window).width()
-        offset = $(@).offset().left
-        width = $(".dropdown-content", @).outerWidth()
-
-        if offset + width >= windowWidth
-          $(@).addClass('open dropdown-right')
-        else
-          $(@).addClass('open dropdown-left')
-
-
-        event.preventDefault()
 
     disableSubmit: ->
       $(document).on 'submit', '[data-behavior~=disable_on_submit]', (event) ->

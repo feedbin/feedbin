@@ -228,6 +228,14 @@ $color-base-dark-700: (
     midnight: $theme-color-midnight-200,
 );
 
+$color-base-dark-600: (
+    debug:    color-base-dark-300,
+    day:      $theme-color-600,
+    sunset:   $theme-color-sunset-600,
+    dusk:     $theme-color-dusk-200,
+    midnight: $theme-color-midnight-200,
+);
+
 $color-disabled-foreground: (
     debug:    color-base-light-200,
     day:      $theme-color-200,
@@ -3665,7 +3673,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         display: none;
         width: 200px;
         border-radius: 4px;
-        @include border($color-borders);
         @include background-color($color-base-alt);
         box-shadow: $box-shadow-dropdown;
         position: absolute;
@@ -3941,23 +3948,23 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 .link-actions {
     z-index: 100;
     display: inline-block;
-    position: relative;
+    position: absolute;
     content: "";
-    height: 18px;
-    width: 18px;
-    border-radius: 3px;
+    height: 16px;
+    width: 28px;
+    border-radius: 8px;
     cursor: pointer;
     margin-right: -18px;
     background-size: 80% 80%;
-    bottom: -2px;
-    animation-duration: .3s;
-    animation-name: slidein;
-    background-image: image-url("icon-caret.svg");
-    background-position: 50% 50%;
-    background-repeat: no-repeat;
-    @include border($color-borders);
-    @include box-shadow($color-contrast-200, 0 0 1px 0);
-    @include background-color($color-base-alt);
+    bottom: 1px;
+    @include background-color($color-icons);
+    svg {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        @include fill((day: white, sunset: white, dusk: black, midnight: black));
+        pointer-events: none;
+    }
     .dropdown-content {
         top: 15px;
     }
