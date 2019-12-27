@@ -1607,11 +1607,9 @@ $hamburger-dot: 4px;
 .feed-toolbar {
     padding-bottom: 0;
     z-index: 2;
-    .toolbar-inner {
-        padding: 16px 0 20px 0;
-        .entries-column & {
-            padding: 8px 0;
-        }
+    padding: 16px 0 20px 0;
+    .entries-column & {
+        padding: 8px 0;
     }
     .toolbar-button {
         flex: 1;

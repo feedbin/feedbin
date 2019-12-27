@@ -12,8 +12,14 @@
         <%= stylesheet_link_tag "application", media: "all"  %>
         <style>
             @supports (padding-bottom: max(0px)) {
-                .bottom-toolbar {
-                    padding-bottom: max(16px, env(safe-area-inset-bottom));
+                .bottom-toolbar, .entries-column .bottom-toolbar {
+                    padding-bottom: max(20px, env(safe-area-inset-bottom));
+                }
+                .entries-column .bottom-toolbar {
+                    padding-bottom: max(8px, env(safe-area-inset-bottom));
+                }
+                .entry-column .bottom-toolbar {
+                    padding-bottom: max(0, env(safe-area-inset-bottom));
                 }
             }
         </style>
