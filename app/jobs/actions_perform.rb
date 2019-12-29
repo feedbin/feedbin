@@ -4,10 +4,9 @@ class ActionsPerform
   include Sidekiq::Worker
   sidekiq_options queue: :critical, retry: false
 
-  def perform(entry_id, matched_saved_search_ids)
+  def perform(entry_id, action_ids)
     # Looks like [[8, 1, ["mark_read", "star"]], [7, 1, ["mark_read"]]]
-    actions = Rails.cache.fetch("actions:all:array", expires_in: 5.minutes) { Action.all.pluck(:id, :user_id, :actions) }
-    actions = actions.keep_if { |action_id, user_id, actions| matched_saved_search_ids.include?(action_id) }
+    actions = Action.where(id: action_ids).pluck(:id, :user_id, :actions)
     @entry = Entry.find(entry_id)
 
     if actions.present?
