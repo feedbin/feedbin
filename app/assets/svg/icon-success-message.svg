@@ -1,8 +1,1 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="12" cy="12" r="12" fill="#07AC47"/>
-<circle cx="8" cy="12" r="1" fill="white"/>
-<circle cx="11" cy="15" r="1" fill="white"/>
-<circle cx="16" cy="10" r="1" fill="white"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M10.2928 15.7072L7.29285 12.7072L8.70706 11.293L11.7071 14.293L10.2928 15.7072Z" fill="white"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M10.2928 14.293L15.2928 9.29297L16.7071 10.7072L11.7071 15.7072L10.2928 14.293Z" fill="white"/>
-</svg>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="12" cy="12" r="12" fill="#07AC47"/> <circle cx="8" cy="12" r="1" fill="white"/> <circle cx="11" cy="15" r="1" fill="white"/> <circle cx="16" cy="10" r="1" fill="white"/> <path fill-rule="evenodd" clip-rule="evenodd" d="M10.2928 15.7072L7.29285 12.7072L8.70706 11.293L11.7071 14.293L10.2928 15.7072Z" fill="white"/> <path fill-rule="evenodd" clip-rule="evenodd" d="M10.2928 14.293L15.2928 9.29297L16.7071 10.7072L11.7071 15.7072L10.2928 14.293Z" fill="white"/> </svg>

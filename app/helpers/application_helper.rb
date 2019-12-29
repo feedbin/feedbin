@@ -63,7 +63,12 @@ module ApplicationHelper
 
     icon = Feedbin::Application.config.icons[name]
     if !icon
-      raise "Icon missing #{name}"
+      file = "#{Rails.root}/app/assets/svg/#{name}.svg"
+      if File.file?(file)
+        icon = Feedbin::Application.config.icons[name] = SvgIcon.new_from_file(file)
+      else
+        raise "Icon missing #{name}"
+      end
     end
     options[:width] = icon.width
     options[:height] = icon.height
