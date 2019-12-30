@@ -132,5 +132,6 @@ class FeedRefresherReceiver
 
   def update_feed(update, feed)
     feed.update(update["feed"])
+    WarmCache.perform_async(feed.id)
   end
 end

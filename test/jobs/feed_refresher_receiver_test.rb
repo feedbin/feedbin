@@ -19,6 +19,20 @@ class FeedRefresherReceiverTest < ActiveSupport::TestCase
     end
   end
 
+  test "should schedule WarmCache job" do
+    params = {
+      "feed" => {
+        "id" => @feed.id,
+      },
+      "entries" => [build_entry],
+    }
+
+    Sidekiq::Worker.clear_all
+    assert_difference "WarmCache.jobs.size", +1 do
+      FeedRefresherReceiver.new.perform(params)
+    end
+  end
+
   test "should not create entry" do
     public_id = SecureRandom.hex
     entry = @feed.entries.create!(url: "url", public_id: "#{public_id}_alt")
