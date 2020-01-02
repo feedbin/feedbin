@@ -664,6 +664,10 @@ class EntryPresenter < BasePresenter
     "#{tweet.user.created_at.strftime("%b")} #{tweet.user.created_at.year}"
   end
 
+  def tweet_author_joined_day(tweet)
+    tweet.user.created_at.mday.to_s.chars.map(&:to_i)
+  end
+
   def tweet_author_location(tweet)
     tweet.user.location? ? tweet.user.location : nil
   end

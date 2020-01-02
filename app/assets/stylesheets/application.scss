@@ -4756,6 +4756,10 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                 display: flex;
                 align-items: center;
                 overflow: hidden;
+                svg {
+                    margin-right: 4px;
+                    @include fill($color-icons);
+                }
                 &:first-child {
                     flex-shrink: 0;
                 }
@@ -4765,14 +4769,41 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                     white-space: nowrap;
                     display: block;
                 }
-                svg {
-                    flex-shrink: 0;
-                    margin-right: 8px;
-                    @include fill($color-icons);
-                }
                 strong {
                     @include color($color-contrast-600);
                     margin-right: 4px;
+                }
+                .calendar-icon {
+                    flex-shrink: 0;
+                    margin-right: 4px;
+                    position: relative;
+                    width: 15px;
+                    height: 16px;
+                    overflow: visible;
+                    svg {
+                        margin: 0;
+                    }
+                    .icon-calendar {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                    }
+                    .date {
+                        overflow: visible;
+                        position: absolute;
+                        width: 7px;
+                        height: 5px;
+                        display: flex;
+                        justify-content: center;
+                        top: 8px;
+                        left: 4px;
+                        svg {
+                            margin: 0;
+                            &:nth-child(2n) {
+                                margin-left: 1px
+                            }
+                        }
+                    }
                 }
             }
             &.show {

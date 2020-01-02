@@ -33,8 +33,15 @@
                             <%= entry_presenter.tweet_author_description(tweet) %>
                             <p class="tweet-text profile-meta-wrap">
                                 <span class="profile-meta" title="Joined">
-                                    <%= svg_tag "icon-calendar" %>
-                                    <%= entry_presenter.tweet_author_joined(tweet) %>
+                                    <span class="calendar-icon">
+                                        <%= svg_tag "icon-calendar" %>
+                                        <span class="date">
+                                            <% entry_presenter.tweet_author_joined_day(tweet).each do |number| %>
+                                                <%= svg_tag "icon-number-#{number}" %>
+                                            <% end %>
+                                        </span>
+                                    </span>
+                                    <span><%= entry_presenter.tweet_author_joined(tweet) %></span>
                                 </span>
                                 <% if entry_presenter.tweet_author_location?(tweet) %>
                                 <span class="profile-meta" title="Location">
