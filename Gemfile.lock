@@ -64,7 +64,7 @@ GIT
 
 GIT
   remote: https://github.com/rails/rails.git
-  revision: ba63c47d692ccb7058fb66c7b83c32b5f131e08e
+  revision: d585d529bae05710476d0c49a9e6e9d6f94b59bb
   branch: 6-0-stable
   specs:
     actioncable (6.0.2.1)
@@ -521,7 +521,7 @@ GEM
     twitter-text (2.1.0)
       idn-ruby
       unf (~> 0.1.0)
-    tzinfo (1.2.5)
+    tzinfo (1.2.6)
       thread_safe (~> 0.1)
     uglifier (4.1.11)
       execjs (>= 0.3.0, < 3)
