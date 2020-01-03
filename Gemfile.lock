@@ -383,7 +383,7 @@ GEM
     parallel (1.19.1)
     parser (2.6.5.0)
       ast (~> 2.4.0)
-    pg (1.1.4)
+    pg (1.2.1)
     premailer (1.11.1)
       addressable
       css_parser (>= 1.6.0)
