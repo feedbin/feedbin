@@ -18,9 +18,8 @@ class NewslettersController < ApplicationController
       feed = get_feed(newsletter)
       should_subscribe = should_subscribe?(feed)
       feed.save!
-
       log_sender(newsletter, feed)
-
+      
       if should_subscribe
         user.subscriptions.find_or_create_by(feed: feed)
         feed.tag(user.newsletter_tag, user) if user.newsletter_tag.present?
