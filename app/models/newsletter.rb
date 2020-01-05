@@ -33,6 +33,10 @@ class Newsletter
     parsed_from.name || from_email
   end
 
+  def name
+    parsed_from.name
+  end
+
   def subject
     data["subject"]
   end

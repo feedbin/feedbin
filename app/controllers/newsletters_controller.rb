@@ -16,22 +16,23 @@ class NewslettersController < ApplicationController
     if user = User.where(newsletter_token: newsletter.token).take
       entry = build_entry(newsletter)
       feed = get_feed(newsletter)
+      should_subscribe = should_subscribe?(feed)
+      feed.save!
 
-      if should_subscribe?(feed)
-        feed.save
+      log_sender(newsletter, feed)
+
+      if should_subscribe
         user.subscriptions.find_or_create_by(feed: feed)
         feed.tag(user.newsletter_tag, user) if user.newsletter_tag.present?
       end
 
-      if feed.persisted?
-        entry = feed.entries.create!(entry)
-        options = {
-          "email_headers" => newsletter.headers,
-          "newsletter_token" => newsletter.full_token,
-        }
-        feed.update(feed_type: :newsletter, options: options)
-        NewsletterSaver.perform_async(entry.id)
-      end
+      entry = feed.entries.create!(entry)
+      options = {
+        "email_headers" => newsletter.headers,
+        "newsletter_token" => newsletter.full_token,
+      }
+      feed.update(feed_type: :newsletter, options: options)
+      NewsletterSaver.perform_async(entry.id)
     end
   end
 
@@ -57,6 +58,16 @@ class NewslettersController < ApplicationController
       feed_type: :newsletter,
     }
     Feed.create_with(options).find_or_initialize_by(feed_url: newsletter.feed_url)
+  end
+
+  def log_sender(newsletter, feed)
+    options = {
+      token: newsletter.token,
+      full_token: newsletter.full_token,
+      name: newsletter.name,
+      email: newsletter.from_email,
+    }
+    NewsletterSender.create_with(options).find_or_create_by(feed: feed)
   end
 
   def should_subscribe?(feed)

@@ -496,6 +496,41 @@ ALTER SEQUENCE public.in_app_purchases_id_seq OWNED BY public.in_app_purchases.i
 
 
 --
+-- Name: newsletter_senders; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.newsletter_senders (
+    id bigint NOT NULL,
+    feed_id bigint NOT NULL,
+    token text NOT NULL,
+    full_token text NOT NULL,
+    email text NOT NULL,
+    name text,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: newsletter_senders_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.newsletter_senders_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: newsletter_senders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.newsletter_senders_id_seq OWNED BY public.newsletter_senders.id;
+
+
+--
 -- Name: plans; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1110,6 +1145,13 @@ ALTER TABLE ONLY public.in_app_purchases ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
+-- Name: newsletter_senders id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.newsletter_senders ALTER COLUMN id SET DEFAULT nextval('public.newsletter_senders_id_seq'::regclass);
+
+
+--
 -- Name: plans id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1316,6 +1358,14 @@ ALTER TABLE ONLY public.imports
 
 ALTER TABLE ONLY public.in_app_purchases
     ADD CONSTRAINT in_app_purchases_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: newsletter_senders newsletter_senders_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.newsletter_senders
+    ADD CONSTRAINT newsletter_senders_pkey PRIMARY KEY (id);
 
 
 --
@@ -1590,6 +1640,20 @@ CREATE UNIQUE INDEX index_in_app_purchases_on_transaction_id ON public.in_app_pu
 --
 
 CREATE INDEX index_in_app_purchases_on_user_id ON public.in_app_purchases USING btree (user_id);
+
+
+--
+-- Name: index_newsletter_senders_on_feed_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_newsletter_senders_on_feed_id ON public.newsletter_senders USING btree (feed_id);
+
+
+--
+-- Name: index_newsletter_senders_on_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_newsletter_senders_on_token ON public.newsletter_senders USING btree (token);
 
 
 --
@@ -1978,6 +2042,14 @@ CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING b
 
 
 --
+-- Name: newsletter_senders fk_rails_1aa815fea5; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.newsletter_senders
+    ADD CONSTRAINT fk_rails_1aa815fea5 FOREIGN KEY (feed_id) REFERENCES public.feeds(id);
+
+
+--
 -- Name: unreads fk_rails_90f07702a3; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2138,6 +2210,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190710112843'),
 ('20190715152451'),
 ('20190725121939'),
-('20190820134157');
+('20190820134157'),
+('20200103141053');
 
 

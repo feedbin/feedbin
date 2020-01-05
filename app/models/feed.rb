@@ -10,6 +10,7 @@ class Feed < ApplicationRecord
   has_many :tags, through: :taggings
 
   has_one :favicon, foreign_key: "host", primary_key: "host"
+  has_one :newsletter_sender
 
   before_create :set_host
   after_create :refresh_favicon
