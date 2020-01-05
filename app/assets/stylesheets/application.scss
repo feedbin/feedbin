@@ -6458,7 +6458,9 @@ table.small td {
     overflow-x: hidden;
     resize: vertical;
     height: 200px;
+    padding-bottom: 8px;
     .pill-list {
+        margin: 0;
         border: none;
         li {
             padding-left: 16px;

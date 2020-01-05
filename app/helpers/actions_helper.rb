@@ -48,9 +48,10 @@ module ActionsHelper
   end
 
   def feed_checkbox_options(form)
-    options = {data: {behavior: 'collection_checkbox'}}
+    options = {data: {behavior: "collection_checkbox"}}
     if form.object.all_feeds == true
-      options[:disabled] = 'disabled'
+      options[:disabled] = "disabled"
+      options[:checked] = true
     end
     options
   end
