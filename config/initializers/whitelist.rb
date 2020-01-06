@@ -17,7 +17,7 @@ class Whitelist
         "ins" => ["cite"],
         "q" => ["cite"],
         "source" => ["src"],
-        "video" => ["src", "poster"],
+        "video" => ["src", "poster", "playsinline", "loop", "muted"],
         "audio" => ["src"],
         "td" => ["align"],
         "th" => ["align"],
