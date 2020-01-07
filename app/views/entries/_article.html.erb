@@ -5,9 +5,15 @@
         <% end %>
         <p class="post-meta">
             <time datetime="<%= entry_presenter.datetime %>"><%= entry_presenter.published_date %></time>
-            <%= entry_presenter.author %>
+            <% unless entry.feed.newsletter? %>
+                <%= entry_presenter.author %>
+            <% end %>
         </p>
-        <p class="post-meta feed-title"><span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
+        <% if entry_presenter.newsletter_from? %>
+            <p class="post-meta"><%= entry_presenter.newsletter_from.name %> <span class="faded">&lt;<%= entry_presenter.newsletter_from.address %>&gt;</span></p>
+        <% else %>
+            <p class="post-meta feed-title"><span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
+        <% end %>
     </header>
     <div data-behavior="entry_content_wrap external_links" class="content-styles <%= entry_presenter.entry_type_class %>">
         <% if entry_presenter.has_diff? %>
@@ -26,7 +32,23 @@
             <% if entry_presenter.is_updated_entry? %>
                 <%= render partial: 'diff_content', locals: {entry: entry, updated_entries: updated_entries} %>
             <% else %>
-                <%= raw(entry_presenter.content) %>
+                <% if entry.feed.newsletter? %>
+                    <div class="iframe-wrap">
+                        <%=
+                            iframe_id = "iframe_#{SecureRandom.hex}"
+                            entry_presenter.newsletter_content(iframe_id)
+                        %>
+                    </div>
+                    <script>
+                        var iframe = document.getElementById("<%= iframe_id %>");
+                        feedbin.newsletterLoad(iframe)
+                        $(iframe).on("load", function() {
+                            feedbin.newsletterHeight(iframe)
+                        });
+                    </script>
+                <% else %>
+                    <%= raw(entry_presenter.content) %>
+                <% end %>
             <% end %>
         </div>
     </div>

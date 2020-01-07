@@ -5168,6 +5168,13 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         padding-left: 16px;
     }
 }
+
+iframe.newsletter {
+    background-color: white;
+    overflow: hidden;
+    box-shadow: $box-shadow-dropdown;
+}
+
 /*------------------------------------------------------------------------------
 Settings
 ------------------------------------------------------------------------------*/
@@ -7201,6 +7208,10 @@ input[type="text"].hide {
 .extra-muted {
     @include color($color-contrast-500);
     @include native-theme("color", $color-contrast-500);
+}
+
+.faded {
+    @include color($color-contrast-400);
 }
 
 .danger {

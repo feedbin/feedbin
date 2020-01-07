@@ -73,6 +73,25 @@ class EntryPresenter < BasePresenter
     @template.content_tag(:p, "&ndash;&ndash;".html_safe)
   end
 
+  def newsletter_content(id)
+    srcdoc = Sanitize.fragment(formatted_content, Sanitize::Config::RELAXED).gsub('&', '&amp;').gsub('"', '&quot;').html_safe
+    @template.content_tag(:iframe, "", srcdoc: srcdoc, width: "100%", sandbox: "allow-same-origin allow-scripts allow-popups", frameborder: 0, class: "newsletter fade", id: id)
+  rescue => e
+    Rails.logger.info { e.inspect }
+    @template.content_tag(:p, "&ndash;&ndash;".html_safe)
+  end
+
+  def newsletter_from?
+    newsletter_from
+  end
+
+  def newsletter_from
+    name, address = entry.data && entry.data.dig("newsletter", "data", "from").split(/[<>]/).map(&:strip)
+    OpenStruct.new(name: name, address: address)
+  rescue
+    nil
+  end
+
   def api_content
     ContentFormatter.api_format(formatted_content, entry)
   rescue => e

@@ -28,9 +28,111 @@ class ContentFormatter
     ”
   |
 
+  WHITELIST_BASE = {}.tap do |hash|
+    hash[:elements] = %w[
+      h1 h2 h3 h4 h5 h6 h7 h8 br b i strong em a pre code img tt div ins del sup sub
+      p ol ul table thead tbody tfoot blockquote dl dt dd kbd q samp var hr ruby rt
+      rp li tr td th s strike summary details figure figcaption audio video source
+      small iframe
+    ]
+
+    hash[:attributes] = {
+      "a" => ["href"],
+      "img" => ["src", "longdesc"],
+      "div" => ["itemscope", "itemtype"],
+      "blockquote" => ["cite"],
+      "del" => ["cite"],
+      "ins" => ["cite"],
+      "q" => ["cite"],
+      "source" => ["src"],
+      "video" => ["src", "poster", "playsinline", "loop", "muted"],
+      "audio" => ["src"],
+      "td" => ["align"],
+      "th" => ["align"],
+      "iframe" => ["src", "width", "height"],
+      :all => %w[
+        abbr accept accept-charset accesskey action alt axis border cellpadding
+        cellspacing char charoff charset checked clear cols colspan color compact
+        coords datetime dir disabled enctype for frame headers height hreflang hspace
+        ismap label lang maxlength media method multiple name nohref noshade nowrap
+        open prompt readonly rel rev rows rowspan rules scope selected shape size span
+        start summary tabindex target title type usemap valign value vspace width
+        itemprop id
+      ],
+    }
+
+    hash[:protocols] = {
+      "a" => {
+        "href" => ["http", "https", "mailto", :relative],
+      },
+      "blockquote" => {
+        "cite" => ["http", "https", :relative],
+      },
+      "del" => {
+        "cite" => ["http", "https", :relative],
+      },
+      "ins" => {
+        "cite" => ["http", "https", :relative],
+      },
+      "q" => {
+        "cite" => ["http", "https", :relative],
+      },
+      "img" => {
+        "src" => ["http", "https", :relative, "data"],
+        "longdesc" => ["http", "https", :relative],
+      },
+      "video" => {
+        "src" => ["http", "https"],
+        "poster" => ["http", "https"],
+      },
+      "audio" => {
+        "src" => ["http", "https"],
+      },
+    }
+
+    hash[:remove_contents] = %w[script style iframe object embed]
+  end
+
+  WHITELIST_DEFAULT = WHITELIST_BASE.clone.tap do |hash|
+    transformers = Transformers.new
+    hash[:transformers] = [transformers.class_whitelist, transformers.table_elements, transformers.top_level_li]
+  end
+
+  WHITELIST_NEWSLETTER = WHITELIST_BASE.clone.tap do |hash|
+    hash[:elements] = hash[:elements] - %w[table thead tbody tfoot tr td]
+  end
+
+  WHITELIST_EVERNOTE = {
+    elements: %w[
+      a abbr acronym address area b bdo big blockquote br caption center cite code col colgroup dd
+      del dfn div dl dt em font h1 h2 h3 h4 h5 h6 hr i img ins kbd li map ol p pre q s samp small
+      span strike strong sub sup table tbody td tfoot th thead title tr tt u ul var xmp
+    ],
+    remove_contents: ["script", "style", "iframe", "object", "embed"],
+    attributes: {
+      "a" => ["href"],
+      "img" => ["src"],
+      :all => ["align", "alt", "border", "cellpadding", "cellspacing", "cite", "cols", "colspan", "color",
+               "coords", "datetime", "dir", "disabled", "enctype", "for", "height", "hreflang", "label", "lang",
+               "longdesc", "name", "rel", "rev", "rows", "rowspan", "selected", "shape", "size", "span", "start",
+               "summary", "target", "title", "type", "valign", "value", "vspace", "width",],
+    },
+    protocols: {
+      "a" => {"href" => ["http", "https", :relative]},
+      "img" => {"src" => ["http", "https", :relative]},
+    },
+  }
+
   def self.format!(content, entry = nil, image_proxy_enabled = true, base_url = nil)
+    Rails.logger.info { "===================" }
+    Rails.logger.info { caller.inspect }
+    Rails.logger.info { "===================" }
+    new._format!(content, entry = nil, image_proxy_enabled = true, base_url = nil)
+  end
+
+  def _format!(content, entry = nil, image_proxy_enabled = true, base_url = nil)
     context = {
-      whitelist: Feedbin::Application.config.whitelist,
+      whitelist: WHITELIST_DEFAULT,
       embed_url: Rails.application.routes.url_helpers.iframe_embeds_path,
       embed_classes: "iframe-placeholder entry-callout system-content",
     }
@@ -49,7 +151,7 @@ class ContentFormatter
       context[:image_base_url] = context[:href_base_url] = entry.url || entry.feed.site_url
       context[:image_subpage_url] = context[:href_subpage_url] = entry.url || ""
       if entry.feed.newsletter?
-        context[:whitelist] = Feedbin::Application.config.newsletter_whitelist
+        context[:whitelist] = WHITELIST_NEWSLETTER
       end
     elsif base_url
       filters.unshift(HTML::Pipeline::AbsoluteSourceFilter)
@@ -72,6 +174,10 @@ class ContentFormatter
   end
 
   def self.absolute_source(content, entry, base_url = nil)
+    new._absolute_source(content, entry, base_url = nil)
+  end
+
+  def _absolute_source(content, entry, base_url = nil)
     filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter]
     context = {
       image_base_url: base_url || entry.feed.site_url,
@@ -87,6 +193,10 @@ class ContentFormatter
   end
 
   def self.api_format(content, entry)
+    new._api_format(content, entry)
+  end
+
+  def _api_format(content, entry)
     filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter]
     context = {
       image_base_url: entry.feed.site_url,
@@ -96,7 +206,7 @@ class ContentFormatter
     }
     if entry.feed.newsletter?
       filters.push(HTML::Pipeline::SanitizationFilter)
-      context[:whitelist] = Feedbin::Application.config.newsletter_whitelist
+      context[:whitelist] = WHITELIST_NEWSLETTER
     end
     pipeline = HTML::Pipeline.new filters, context
     result = pipeline.call(content)
@@ -106,6 +216,10 @@ class ContentFormatter
   end
 
   def self.app_format(content, entry)
+    new._app_format(content, entry)
+  end
+
+  def _app_format(content, entry)
     filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, HTML::Pipeline::ImagePlaceholderFilter]
     context = {
       image_base_url: entry.feed.site_url,
@@ -123,9 +237,13 @@ class ContentFormatter
   end
 
   def self.evernote_format(content, entry)
+    new._evernote_format(content, entry)
+  end
+
+  def _evernote_format(content, entry)
     filters = [HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer, HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter]
     context = {
-      whitelist: Feedbin::Application.config.evernote_whitelist.clone,
+      whitelist: WHITELIST_EVERNOTE,
       image_base_url: entry.feed.site_url,
       image_subpage_url: entry.url || "",
       href_base_url: entry.feed.site_url,
@@ -140,6 +258,10 @@ class ContentFormatter
   end
 
   def self.summary(text, length = nil)
+    new._summary(text, length = nil)
+  end
+
+  def _summary(text, length = nil)
     decoder = HTMLEntities.new
     text = decoder.decode(text)
     text = text.chars.select(&:valid_encoding?).join
@@ -169,6 +291,10 @@ class ContentFormatter
   end
 
   def self.text_email(content)
+    new._text_email(content)
+  end
+
+  def _text_email(content)
     content = Kramdown::Document.new(content).to_html
     ActionController::Base.helpers.auto_link(content)
   rescue
