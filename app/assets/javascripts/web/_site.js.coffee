@@ -22,43 +22,10 @@ $.extend feedbin,
     lightness: [.3,.4,.5,.6,.7]
     saturation: [.7,.8]
 
-  newsletterHeight: (iframe) ->
-    height = $(iframe.contentDocument).outerHeight()
-    iframe.setAttribute("height", height)
-
   newsletterLoad: (iframe) ->
-
-    load = ->
-      style = document.createElement('style')
-      style.innerHTML = """
-        body {
-          margin: 0 padding: 0;
-        }
-        table, td, img {
-          max-width: 620px !important;
-        }
-        img[width=1] {
-          display: none !important;
-        }
-      """
-      iframe.contentDocument.getElementsByTagName('head')[0].appendChild(style)
-      iframe.contentDocument.querySelectorAll('a').forEach (element) ->
-        element.setAttribute('target', '_blank')
-      iframe.classList.add('show')
-
-    check = ->
-      loaded = iframe.contentDocument.getElementsByTagName('body')[0].hasChildNodes()
-      if (loaded)
-        clearInterval(checkForDocument)
-        setTimeout load, 50
-
-    checkForDocument = setInterval(check, 25)
-    header =  $('.entry-header').outerHeight()
-    body = $('.entry-inner').innerHeight()
-
-    console.log header
-    console.log body
-    $(iframe).css('min-height', "#{(body - header - 80)}px")
+    console.log iframe
+    iframe.querySelectorAll('a').forEach (element) ->
+      element.setAttribute('target', '_blank')
 
 
   placeholderColor: ->

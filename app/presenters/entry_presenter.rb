@@ -73,9 +73,24 @@ class EntryPresenter < BasePresenter
     @template.content_tag(:p, "&ndash;&ndash;".html_safe)
   end
 
-  def newsletter_content(id)
-    srcdoc = Sanitize.fragment(formatted_content, Sanitize::Config::RELAXED).gsub('&', '&amp;').gsub('"', '&quot;').html_safe
-    @template.content_tag(:iframe, "", srcdoc: srcdoc, width: "100%", sandbox: "allow-same-origin allow-scripts allow-popups", frameborder: 0, class: "newsletter fade", id: id)
+  def newsletter_content
+    output = Sanitize.fragment(formatted_content, Sanitize::Config::RELAXED)
+    output = <<-eod
+    <style>
+    body {
+      margin: 0  !important;
+      padding: 0 !important;
+    }
+    table, td, img {
+      max-width: 620px !important;
+    }
+    img[width="1"], img[height="1"] {
+      display: none !important;
+    }
+    </style>
+    #{output}
+    eod
+    output.html_safe
   rescue => e
     Rails.logger.info { e.inspect }
     @template.content_tag(:p, "&ndash;&ndash;".html_safe)

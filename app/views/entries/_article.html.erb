@@ -33,18 +33,11 @@
                 <%= render partial: 'diff_content', locals: {entry: entry, updated_entries: updated_entries} %>
             <% else %>
                 <% if entry.feed.newsletter? %>
-                    <div class="iframe-wrap">
-                        <%=
-                            iframe_id = "iframe_#{SecureRandom.hex}"
-                            entry_presenter.newsletter_content(iframe_id)
-                        %>
-                    </div>
+                    <div class="newsletter-wrap" id="newsletter_embed"></div>
                     <script>
-                        var iframe = document.getElementById("<%= iframe_id %>");
-                        feedbin.newsletterLoad(iframe)
-                        $(iframe).on("load", function() {
-                            feedbin.newsletterHeight(iframe)
-                        });
+                        const newsletter = document.getElementById("newsletter_embed").attachShadow({mode: 'open'});;
+                		newsletter.innerHTML = "<%= j entry_presenter.newsletter_content %>";
+                        feedbin.newsletterLoad(newsletter);
                     </script>
                 <% else %>
                     <%= raw(entry_presenter.content) %>
