@@ -864,6 +864,7 @@ $.extend feedbin,
       fontContainer.removeClass("font-size-#{currentFontSize}")
       fontContainer.addClass("font-size-#{newFontSize}")
       fontContainer.data('font-size', newFontSize)
+      localStorage.setItem('font-size', newFontSize);
 
   matchHeights: (elements) ->
     height = 0
@@ -1943,6 +1944,7 @@ $.extend feedbin,
         fontContainer.data('font', newFont)
         $(@).parents('form').submit()
         feedbin.fonts(newFont)
+        localStorage.setItem('font', newFont);
 
     fontSize: ->
       $(document).on 'click', '[data-behavior~=increase_font]', (event) ->
@@ -1957,6 +1959,8 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=entry_width]', (event) ->
         $('[data-behavior~=entry_content_target]').toggleClass('fluid')
         $('body').toggleClass('fluid')
+        value = if $('body').hasClass('fluid') then 'fluid' else 'fixed'
+        localStorage.setItem('layout-width', value);
         return
 
     fullscreen: ->
@@ -1974,6 +1978,7 @@ $.extend feedbin,
         $('[data-behavior~=class_target]').removeClass('theme-dusk')
         $('[data-behavior~=class_target]').removeClass('theme-midnight')
         $('[data-behavior~=class_target]').addClass("theme-#{theme}")
+        localStorage.setItem('theme', theme);
         event.preventDefault()
 
         return
