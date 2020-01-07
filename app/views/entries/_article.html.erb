@@ -27,21 +27,28 @@
                 <span class="diff-wrap-text">Viewing changes since original <span class="view-latest-link">view latest</span></span>
             </p>
         <% end %>
-        <%= render partial: 'media', locals: {entry: entry} %>
+        <% if entry.feed.newsletter? %>
+            <input type="checkbox" class="visually-hidden" id="newsletter_view">
+            <label class="newsletter-switch system-content entry-callout" for="newsletter_view">
+                <%= svg_tag 'favicon-newsletter' %>
+                View newsletter as rich text <%= toggle_switch class: "small" %>
+            </label>
+        <% end %>
         <div class="entry-final-content" data-behavior="entry_final_content">
             <% if entry_presenter.is_updated_entry? %>
                 <%= render partial: 'diff_content', locals: {entry: entry, updated_entries: updated_entries} %>
             <% else %>
                 <% if entry.feed.newsletter? %>
-                    <div class="newsletter-wrap" id="newsletter_embed"></div>
+                    <div class="newsletter-wrap hide fade" id="newsletter_embed" data-behavior="rich_text"></div>
                     <script>
                         const newsletter = document.getElementById("newsletter_embed").attachShadow({mode: 'open'});;
                 		newsletter.innerHTML = "<%= j entry_presenter.newsletter_content %>";
                         feedbin.newsletterLoad(newsletter);
                     </script>
-                <% else %>
-                    <%= raw(entry_presenter.content) %>
                 <% end %>
+                <div data-behavior="plain_text">
+                    <%= raw(entry_presenter.content) %>
+                </div>
             <% end %>
         </div>
     </div>
