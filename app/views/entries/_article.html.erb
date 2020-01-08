@@ -16,40 +16,6 @@
         <% end %>
     </header>
     <div data-behavior="entry_content_wrap external_links" class="content-styles <%= entry_presenter.entry_type_class %>">
-        <% if entry_presenter.has_diff? %>
-            <p class="diff-wrap system-content entry-callout <%= !entry_presenter.is_updated_entry? ? "" : "hide" %>" data-behavior="diff_view_changes">
-                <span class="icon-clock-wrap"><%= svg_tag 'favicon-updated', size: '16x16' %></span>
-                <span class="diff-wrap-text">This article was updated <%= link_to "view changes", diff_entry_path(entry), remote: true, data: {behavior: 'load_view_changes'} %></span>
-                <%= link_to '×', toggle_updates_feed_path(entry.feed, inline: true), remote: true, method: :post, class: 'ignore-updates', data: {behavior: 'hide_updates'}, title: "Don't tell me when articles from #{strip_tags(entry.feed.title)} have been updated."  %>
-            </p>
-            <p class="diff-wrap system-content entry-callout <%= entry_presenter.is_updated_entry? ? "" : "hide" %>" data-behavior="diff_view_latest">
-                <span class="icon-clock-wrap"><%= svg_tag 'favicon-updated', size: '16x16' %></span>
-                <span class="diff-wrap-text">Viewing changes since original <span class="view-latest-link">view latest</span></span>
-            </p>
-        <% end %>
-        <% if entry.feed.newsletter? %>
-            <input type="checkbox" class="visually-hidden" id="newsletter_view">
-            <label class="newsletter-switch system-content entry-callout" for="newsletter_view">
-                <%= svg_tag 'favicon-newsletter' %>
-                View newsletter as rich text <%= toggle_switch class: "small" %>
-            </label>
-        <% end %>
-        <div class="entry-final-content" data-behavior="entry_final_content">
-            <% if entry_presenter.is_updated_entry? %>
-                <%= render partial: 'diff_content', locals: {entry: entry, updated_entries: updated_entries} %>
-            <% else %>
-                <% if entry.feed.newsletter? %>
-                    <div class="newsletter-wrap hide fade" id="newsletter_embed" data-behavior="rich_text"></div>
-                    <script>
-                        const newsletter = document.getElementById("newsletter_embed").attachShadow({mode: 'open'});;
-                		newsletter.innerHTML = "<%= j entry_presenter.newsletter_content %>";
-                        feedbin.newsletterLoad(newsletter);
-                    </script>
-                <% end %>
-                <div data-behavior="plain_text">
-                    <%= raw(entry_presenter.content) %>
-                </div>
-            <% end %>
-        </div>
+        <%= render partial: "article_content", locals: {entry: entry, user: user, updated_entries: updated_entries} %>
     </div>
 <% end %>

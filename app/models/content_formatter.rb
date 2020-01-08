@@ -123,11 +123,8 @@ class ContentFormatter
     },
   }
 
-  def self.format!(content, entry = nil, image_proxy_enabled = true, base_url = nil)
-    Rails.logger.info { "===================" }
-    Rails.logger.info { caller.inspect }
-    Rails.logger.info { "===================" }
-    new._format!(content, entry = nil, image_proxy_enabled = true, base_url = nil)
+  def self.format!(*args)
+    new._format!(*args)
   end
 
   def _format!(content, entry = nil, image_proxy_enabled = true, base_url = nil)
@@ -173,8 +170,8 @@ class ContentFormatter
     result[:output].to_s
   end
 
-  def self.absolute_source(content, entry, base_url = nil)
-    new._absolute_source(content, entry, base_url = nil)
+  def self.absolute_source(*args)
+    new._absolute_source(*args)
   end
 
   def _absolute_source(content, entry, base_url = nil)
@@ -192,8 +189,8 @@ class ContentFormatter
     content
   end
 
-  def self.api_format(content, entry)
-    new._api_format(content, entry)
+  def self.api_format(*args)
+    new._api_format(*args)
   end
 
   def _api_format(content, entry)
@@ -215,8 +212,8 @@ class ContentFormatter
     content
   end
 
-  def self.app_format(content, entry)
-    new._app_format(content, entry)
+  def self.app_format(*args)
+    new._app_format(*args)
   end
 
   def _app_format(content, entry)
@@ -236,8 +233,8 @@ class ContentFormatter
     content
   end
 
-  def self.evernote_format(content, entry)
-    new._evernote_format(content, entry)
+  def self.evernote_format(*args)
+    new._evernote_format(*args)
   end
 
   def _evernote_format(content, entry)
@@ -257,8 +254,8 @@ class ContentFormatter
     content
   end
 
-  def self.summary(text, length = nil)
-    new._summary(text, length = nil)
+  def self.summary(*args)
+    new._summary(*args)
   end
 
   def _summary(text, length = nil)
@@ -290,8 +287,8 @@ class ContentFormatter
     nil
   end
 
-  def self.text_email(content)
-    new._text_email(content)
+  def self.text_email(*args)
+    new._text_email(*args)
   end
 
   def _text_email(content)
