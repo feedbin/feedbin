@@ -18,15 +18,32 @@ $.extend feedbin,
   panel: 1
   panelScrollComplete: true
   jumpResultTemplate: null
+  extractCache: {}
+  previousContentView: 'default'
   colorHash: new ColorHash
     lightness: [.3,.4,.5,.6,.7]
     saturation: [.7,.8]
 
-  newsletterLoad: (iframe) ->
-    console.log iframe
-    iframe.querySelectorAll('a').forEach (element) ->
-      element.setAttribute('target', '_blank')
+  changeContentView: (view) ->
+    currentView = $('[data-behavior~=content_option]:not(.hide)')
+    nextView = $("[data-behavior~=content_option][data-content-option=#{view}]")
+    console.log view
 
+    if view == 'extract'
+      $('body').addClass('extract-active')
+    else
+      $('body').removeClass('extract-active')
+
+    if !currentView.is(nextView) && nextView.length > 0
+      feedbin.previousContentView = currentView.data('content-option')
+      currentView.addClass('hide')
+      nextView.removeClass('hide')
+
+  newsletterLoad: (context) ->
+    feedbin.formatImages(context)
+    context.querySelectorAll('a').forEach (element) ->
+      element.setAttribute('target', '_blank')
+      element.setAttribute('rel', 'noopener noreferrer')
 
   placeholderColor: ->
     if feedbin.theme == "sunset"
@@ -295,14 +312,6 @@ $.extend feedbin,
             "-webkit-overflow-scrolling": "touch"
       }
 
-
-  toggleDiff: ->
-    $('[data-behavior~=diff_view_changes]').toggleClass("hide")
-    $('[data-behavior~=diff_view_latest]').toggleClass("hide")
-
-    $('[data-behavior~=diff_latest]').toggleClass("hide")
-    $('[data-behavior~=diff_content]').toggleClass("hide")
-
   jumpTemplate: ->
     if feedbin.jumpResultTemplate == null
       feedbin.jumpResultTemplate = $($('.modal [data-behavior~=result_template]').html())
@@ -471,10 +480,29 @@ $.extend feedbin,
   updateEntries: (entries, header) ->
     $('.entries ul').html(entries)
     $('.entries-header').html(header)
+    $('.entries').prop('scrollTop', 0)
+    $(".entries").removeClass("loading");
 
   appendEntries: (entries, header) ->
     $('.entries ul').append(entries)
     $('.entries-header').html(header)
+
+  formatEntries: (viewMode, lastUnread, viewType = null) ->
+    feedbin.viewType = viewType
+    $(document).trigger('feedbin:entriesLoaded')
+    feedbin.data.viewMode = viewMode
+    feedbin.localizeTime()
+    feedbin.applyUserTitles()
+    feedbin.loadEntryImages()
+    feedbin.markReadData.date = lastUnread
+    feedbin.faviconColors($(".entries-column"))
+
+  updateUnreads: (unreadOnly, unreadEntries) ->
+    if unreadOnly
+      $.each unreadEntries, (index, unreadEntry) ->
+        if feedbin.Counts.get().isRead(unreadEntry.id)
+          feedbin.Counts.get().addEntry(unreadEntry.id, unreadEntry.feed_id, 'unread')
+      feedbin.applyCounts(true);
 
   updatePager: (html) ->
     $('[data-behavior~=pagination]').html(html)
@@ -703,12 +731,7 @@ $.extend feedbin,
 
     if feedbin.data.readability_settings[feedId] == true && feedbin.data.sticky_readability
       feedbin.automaticSubmit = true
-
-      loadingTemplate = $('[data-behavior~=readability_loading]').html()
-
-      feedbin.previousContent = $("[data-entry-id=#{entryId}] [data-behavior~=entry_content_wrap]").html()
-
-      $('[data-behavior~=entry_content_wrap]').html(loadingTemplate)
+      feedbin.changeContentView('extract')
       $('[data-behavior~=toggle_extract]').submit()
 
   resetScroll: ->
@@ -773,8 +796,8 @@ $.extend feedbin,
         container.html $("<div class='inline-spinner'>Loading embed from #{container.data("iframe-host")}…</div>")
         $.get container.data("iframe-embed-url")
 
-  formatImages: ->
-    $("img[data-camo-src]").each ->
+  formatImages: (context = document) ->
+    $("img[data-camo-src]", context).each ->
       img = $(@)
 
       if feedbin.data.proxy_images
@@ -1016,14 +1039,23 @@ $.extend feedbin,
 
     a - b
 
-  showSearchControls: (sort) ->
+  showSearchControls: (sort, query, savedSearchPath, message) ->
     text = null
     if sort
       text = $("[data-sort-option=#{sort}]").text()
     if !text
       text = $("[data-sort-option=desc]").text()
-    $('.sort-order').text(text)
     $('body').addClass('show-search-options')
+    $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
+    $('.sort-order').text(text)
+    $('.search-control').removeClass('edit')
+    $('.saved-search-wrap').removeClass('show')
+    $('[data-behavior~=save_search_link]').removeAttr('disabled')
+    $('[data-behavior~=new_saved_search]').attr('href', savedSearchPath)
+    feedbin.markReadData =
+      type: "search"
+      data: query
+      message: message
 
   buildPoints: (percentages, width, height) ->
     barWidth = width / (percentages.length - 1)
@@ -1188,8 +1220,11 @@ $.extend feedbin,
 
   showEntry: (entryId) ->
     entry = feedbin.entries[entryId]
+    $('body').removeClass('extract-active')
     feedbin.updateEntryContent(entry.content, entry.inner_content)
     feedbin.formatEntryContent(entryId, true)
+    if feedbin.viewType == 'updated'
+      $('[data-behavior~=change_content_view][value=diff]').prop('checked', true).change()
 
   tagFeed: (url, tag, noResponse = true) ->
     $.ajax
@@ -1864,24 +1899,39 @@ $.extend feedbin,
         $('.button-toggle-content').removeClass('loading')
 
       $(document).on 'ajax:beforeSend', '[data-behavior~=toggle_extract]', (event, xhr) ->
-        if feedbin.readabilityXHR
+        entry = $(@).data('entry-id')
+
+        if feedbin.automaticSubmit != true
+          $.post($(@).data("sticky-url"))
+        feedbin.automaticSubmit = false
+
+        if entry of feedbin.extractCache
+          xhr.abort()
+
+          if feedbin.readabilityActive()
+            feedbin.changeContentView(feedbin.previousContentView)
+          else
+            $("[data-content-option~=extract]").html(feedbin.extractCache["#{entry}"]);
+            feedbin.changeContentView('extract')
+
+        else if feedbin.readabilityXHR
           feedbin.readabilityXHR.abort()
           xhr.abort()
 
           feedbin.readabilityXHR = null
           $('.button-toggle-content').removeClass('loading')
 
-          if feedbin.previousContent
-            $('[data-behavior~=entry_content_wrap]').html(feedbin.previousContent)
-            feedbin.previousContent = null
+          feedbin.changeContentView('default')
         else
           $('.button-toggle-content').addClass('loading')
           feedbin.readabilityXHR = xhr
 
-        if feedbin.automaticSubmit != true
-          $.post($(@).data("sticky-url"))
-
-        feedbin.automaticSubmit = false
+        if feedbin.readabilityActive()
+          $('.button-toggle-content').removeClass('active')
+          $("#extract").val("true")
+        else
+          $('.button-toggle-content').addClass('active')
+          $("#extract").val("false")
 
         true
 
@@ -2105,16 +2155,6 @@ $.extend feedbin,
         event.stopPropagation()
         event.preventDefault()
         return
-
-    loadViewChanges: ->
-      $(document).on 'ajax:beforeSend', '[data-behavior~=load_view_changes]', (event, xhr) ->
-        if $('[data-behavior~=diff_content]').length
-          xhr.abort()
-          feedbin.toggleDiff()
-
-    viewLatest: ->
-      $(document).on 'click', '.view-latest-link', ->
-        feedbin.toggleDiff()
 
     serviceOptions: ->
       open = (container, height) ->
@@ -2590,6 +2630,13 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=toggle_profile]', (event) ->
         element = $(event.currentTarget).closest('[data-behavior~=author_profile_wrap]').find('[data-behavior~=author_profile]')
         element.toggleClass('hide')
+
+    changeContentView: ->
+      $(document).on 'change', '[data-behavior~=change_content_view]', (event) ->
+        if $(@).is(':checked')
+          feedbin.changeContentView($(@).val())
+        else
+          feedbin.changeContentView('default')
 
     copy: ->
       $(document).on 'click', '[data-behavior~=copy]', (event) ->

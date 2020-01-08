@@ -74,7 +74,7 @@ class EntryPresenter < BasePresenter
   end
 
   def newsletter_content
-    output = Sanitize.fragment(formatted_content, Sanitize::Config::RELAXED)
+    output = ContentFormatter.newsletter_format(formatted_content)
     output = <<-eod
     <style>
     body {
@@ -347,15 +347,6 @@ class EntryPresenter < BasePresenter
     "entry-type-#{entry_type} entry-format-#{entry_type}-#{entry.content_format}"
   end
 
-  def content_diff
-    before = ContentFormatter.api_format(entry.original["content"], entry)
-    after = ContentFormatter.api_format(entry.content, entry)
-    result = HTMLDiff::Diff.new("<div>#{before}</div>", "<div>#{after}</div>").inline_html
-    Sanitize.fragment(result, Sanitize::Config::RELAXED)
-  rescue
-    nil
-  end
-
   def decoder
     @decoder ||= HTMLEntities.new
   end
@@ -425,7 +416,7 @@ class EntryPresenter < BasePresenter
   end
 
   def has_diff?
-    entry.content.present? && entry.original.present? && entry.original["content"].present? && entry.original["content"].length != entry.content.length
+    entry.content_diff.present?
   end
 
   def is_updated_entry?

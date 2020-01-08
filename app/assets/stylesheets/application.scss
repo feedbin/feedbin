@@ -5194,17 +5194,19 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
 }
 
-.newsletter-wrap {
+.newsletter {
     max-width: 100%;
     background-color: white;
     overflow: hidden;
     box-shadow: $box-shadow-dropdown;
+    display: flex;
+    justify-content: center;
 }
 
-.newsletter-switch {
+.content-option-switch {
     display: flex;
     align-items: center;
-    .favicon-newsletter {
+    [class^="favicon"] {
         margin-right: 8px;
         @include fill($color-contrast-400);
     }
@@ -5212,6 +5214,10 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         margin-left: auto;
         position: static;
     }
+}
+
+.extract-active .content-option-form {
+    display: none;
 }
 
 /*------------------------------------------------------------------------------

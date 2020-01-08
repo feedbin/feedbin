@@ -40,7 +40,6 @@ class SiteController < ApplicationController
         update_message_seen: @user.setting_on?(:update_message_seen),
         feed_order: @user.feed_order,
         refresh_sessions_path: refresh_sessions_path,
-        progress: {},
         audio_panel_size: @user.audio_panel_size,
         view_links_in_app: @user.setting_on?(:view_links_in_app),
         saved_searches_count_path: count_saved_searches_path,
@@ -52,6 +51,7 @@ class SiteController < ApplicationController
         font_stylesheet: ENV["FONT_STYLESHEET"],
         modal_extracts_path: modal_extracts_path,
         settings_view_mode_path: settings_view_mode_path,
+        progress: @user.recently_played_entries_progress,
       }
 
       render action: "logged_in"

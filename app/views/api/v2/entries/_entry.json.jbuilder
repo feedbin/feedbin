@@ -19,6 +19,6 @@ present entry do |entry_presenter|
         json.itunes_duration entry.data["itunes_duration"]
       end
     end
-    json.content_diff entry_presenter.content_diff if params[:include_content_diff] == "true"
+    json.content_diff entry.content_diff if params[:include_content_diff] == "true"
   end
 end

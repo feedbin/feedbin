@@ -16,6 +16,6 @@
         <% end %>
     </header>
     <div data-behavior="entry_content_wrap external_links" class="content-styles <%= entry_presenter.entry_type_class %>">
-        <%= render partial: "article_content", locals: {entry: entry, user: user, updated_entries: updated_entries} %>
+        <%= render partial: "article_content", locals: {entry: entry} %>
     </div>
 <% end %>

@@ -7,7 +7,7 @@
                 <% elsif entry.micropost? %>
                     <%= render partial: "micropost", locals: {micropost: entry} %>
                 <% else %>
-                    <%= render partial: "article", locals: {entry: entry, user: user, updated_entries: updated_entries} %>
+                    <%= render partial: "article", locals: {entry: entry} %>
                 <% end %>
             </div>
             <button class="next-entry-preview no-content" data-behavior="open_next_entry needs_next">

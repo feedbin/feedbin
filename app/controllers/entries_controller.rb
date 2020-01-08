@@ -230,11 +230,6 @@ class EntriesController < ApplicationController
     redirect_to @entry.fully_qualified_url, status: :found
   end
 
-  def diff
-    @entry = Entry.find(params[:id])
-    @content = @entry.content_diff
-  end
-
   def newsletter
     @entry = Entry.where(public_id: params[:id]).take!
     if ENV["NEWSLETTER_HOST"]
@@ -257,7 +252,6 @@ class EntriesController < ApplicationController
   def entries_by_id(entry_ids)
     entries = Entry.where(id: entry_ids).includes(feed: [:favicon])
     subscriptions = @user.subscriptions.pluck(:feed_id)
-    updated_entries = @user.updated_entries.where(entry_id: entry_ids).pluck(:entry_id)
     entries.each_with_object({}) do |entry, hash|
       locals = {
         entry: entry,
@@ -265,7 +259,6 @@ class EntriesController < ApplicationController
         extract: false,
         user: @user,
         subscriptions: subscriptions,
-        updated_entries: updated_entries,
       }
       hash[entry.id] = {
         content: render_to_string(partial: "entries/show", formats: [:html], locals: locals),

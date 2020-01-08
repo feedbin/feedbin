@@ -138,7 +138,6 @@ Rails.application.routes.draw do
       post :recently_read, to: "recently_read_entries#create"
       post :recently_played, to: "recently_played_entries#create"
       get :push_view
-      get :diff
       get :newsletter
     end
     collection do

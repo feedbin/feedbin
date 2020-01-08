@@ -170,6 +170,30 @@ class ContentFormatter
     result[:output].to_s
   end
 
+  def self.newsletter_format(*args)
+    new._newsletter_format(*args)
+  end
+
+  def _newsletter_format(content)
+    context = {
+      whitelist: Sanitize::Config::RELAXED,
+    }
+    filters = [HTML::Pipeline::SanitizationFilter]
+
+    if ENV["CAMO_HOST"] && ENV["CAMO_KEY"]
+      context[:asset_proxy] = ENV["CAMO_HOST"]
+      context[:asset_proxy_secret_key] = ENV["CAMO_KEY"]
+      context[:asset_src_attribute] = "data-camo-src"
+      filters = filters << HTML::Pipeline::CamoFilter
+    end
+
+    pipeline = HTML::Pipeline.new filters, context
+
+    result = pipeline.call(content)
+
+    result[:output].to_s
+  end
+
   def self.absolute_source(*args)
     new._absolute_source(*args)
   end
