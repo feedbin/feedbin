@@ -182,6 +182,7 @@ Rails.application.routes.draw do
   end
 
   post "settings/sticky/:feed_id", as: :settings_sticky, to: "settings#sticky"
+  post "settings/subscription_view_mode/:feed_id", as: :settings_subscription_view_mode, to: "settings#subscription_view_mode"
 
   resources :twitter_authentications, only: [:new] do
     collection do

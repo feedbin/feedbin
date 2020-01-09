@@ -13,8 +13,11 @@ class SiteController < ApplicationController
         end
       }
 
-      readability_settings = subscriptions.each_with_object({}) { |subscription, hash|
-        hash[subscription.feed_id] = subscription.view_inline
+      readability_settings = {}
+      subscription_view_settings = {}
+      subscriptions.each { |subscription|
+        readability_settings[subscription.feed_id] = subscription.view_inline
+        subscription_view_settings[subscription.feed_id] = subscription.view_mode
       }
 
       @now_playing = Entry.where(id: @user.now_playing_entry).first
@@ -52,6 +55,7 @@ class SiteController < ApplicationController
         modal_extracts_path: modal_extracts_path,
         settings_view_mode_path: settings_view_mode_path,
         progress: @user.recently_played_entries_progress,
+        subscription_view_mode: subscription_view_settings,
       }
 
       render action: "logged_in"

@@ -1224,7 +1224,9 @@ $.extend feedbin,
     feedbin.updateEntryContent(entry.content, entry.inner_content)
     feedbin.formatEntryContent(entryId, true)
     if feedbin.viewType == 'updated'
-      $('[data-behavior~=change_content_view][value=diff]').prop('checked', true).change()
+      $('[data-behavior~=change_content_view][data-view-mode=diff]').prop('checked', true).change()
+    else if feedbin.data.subscription_view_mode[entry.feed_id] == "newsletter"
+      $('[data-behavior~=change_content_view][data-view-mode=newsletter]').prop('checked', true).change()
 
   tagFeed: (url, tag, noResponse = true) ->
     $.ajax
@@ -1458,9 +1460,9 @@ $.extend feedbin,
     faviconColors: ->
       feedbin.faviconColors($("body"))
 
-    hasShadowDOM: ->
-      if feedbin.hasShadowDOM
-        $('body').addClass('shadow-dom')
+    # hasShadowDOM: ->
+    #   if feedbin.hasShadowDOM
+    #     $('body').addClass('shadow-dom')
 
     hasScrollBars: ->
       if feedbin.scrollBars()
@@ -2638,7 +2640,8 @@ $.extend feedbin,
     changeContentView: ->
       $(document).on 'change', '[data-behavior~=change_content_view]', (event) ->
         if $(@).is(':checked')
-          feedbin.changeContentView($(@).val())
+          mode = $(@).data('view-mode')
+          feedbin.changeContentView(mode)
         else
           feedbin.changeContentView('default')
 
