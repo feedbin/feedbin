@@ -20,6 +20,7 @@ $.extend feedbin,
   jumpResultTemplate: null
   extractCache: {}
   previousContentView: 'default'
+  hasShadowDOM: typeof(document.createElement("div").attachShadow) == "function"
   colorHash: new ColorHash
     lightness: [.3,.4,.5,.6,.7]
     saturation: [.7,.8]
@@ -27,7 +28,6 @@ $.extend feedbin,
   changeContentView: (view) ->
     currentView = $('[data-behavior~=content_option]:not(.hide)')
     nextView = $("[data-behavior~=content_option][data-content-option=#{view}]")
-    console.log view
 
     if view == 'extract'
       $('body').addClass('extract-active')
@@ -1457,6 +1457,10 @@ $.extend feedbin,
 
     faviconColors: ->
       feedbin.faviconColors($("body"))
+
+    hasShadowDOM: ->
+      if feedbin.hasShadowDOM
+        $('body').addClass('shadow-dom')
 
     hasScrollBars: ->
       if feedbin.scrollBars()

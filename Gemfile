@@ -29,7 +29,7 @@ group :development, :test do
   gem "minitest-stub-const"
   gem "coveralls", require: false
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]
-  gem "capybara", "~> 2.13"
+  gem "capybara"
   gem "selenium-webdriver"
   gem "minitest-stub_any_instance"
   gem "standard"

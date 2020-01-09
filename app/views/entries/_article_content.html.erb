@@ -9,7 +9,7 @@
         </form>
     <% end %>
     <% if entry.feed.newsletter? %>
-        <form class="content-option-form">
+        <form class="content-option-form newsletter-content-option-form">
             <input type="checkbox" class="visually-hidden" id="newsletter_view" data-behavior="change_content_view" value="newsletter">
             <label class="content-option-switch system-content entry-callout" for="newsletter_view">
                 <%= svg_tag 'favicon-newsletter' %>
@@ -40,9 +40,11 @@
                     <div class="newsletter-content" id="<%= newsletter_id %>"></div>
                 </div>
                 <script>
-                    const newsletter = document.getElementById("<%= newsletter_id %>").attachShadow({mode: 'open'});;
-            		newsletter.innerHTML = "<%= j entry_presenter.newsletter_content %>";
-                    feedbin.newsletterLoad(newsletter);
+                    if (feedbin.hasShadowDOM) {
+                        const newsletter = document.getElementById("<%= newsletter_id %>").attachShadow({mode: 'open'});;
+                		newsletter.innerHTML = "<%= j entry_presenter.newsletter_content %>";
+                        feedbin.newsletterLoad(newsletter);
+                    }
                 </script>
             </div>
         <% end %>
