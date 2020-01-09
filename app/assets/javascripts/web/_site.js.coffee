@@ -1460,9 +1460,9 @@ $.extend feedbin,
     faviconColors: ->
       feedbin.faviconColors($("body"))
 
-    # hasShadowDOM: ->
-    #   if feedbin.hasShadowDOM
-    #     $('body').addClass('shadow-dom')
+    hasShadowDOM: ->
+      if feedbin.hasShadowDOM
+        $('body').addClass('shadow-dom')
 
     hasScrollBars: ->
       if feedbin.scrollBars()
