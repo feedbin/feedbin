@@ -2,10 +2,10 @@
 
 one:
   user: one
-  token: MyText
+  token: one
   purpose: 1
 
 two:
   user: two
-  token: MyText
+  token: two
   purpose: 1
