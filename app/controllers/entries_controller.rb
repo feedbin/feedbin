@@ -213,6 +213,10 @@ class EntriesController < ApplicationController
 
     @search = true
 
+    @search_message = "Mark #{number_with_delimiter(@total_results)} #{"article".pluralize(@total_results)} %> that #{"match".pluralize(@total_results == 1 ? 2 : 1)} the search “#{@escaped_query}” as read?"
+
+    @saved_search_path = new_saved_search_path(query: params[:query])
+
     @collection_title = "Search"
 
     @saved_search = SavedSearch.new
