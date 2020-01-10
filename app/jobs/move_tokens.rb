@@ -7,6 +7,6 @@ class MoveTokens
     user = User.find(user_id)
     token = user.send(original_name)
     user.authentication_tokens.create!(purpose: new_name, token: token)
-  rescue ActiveRecord::RecordNotUnique
+  rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordNotFound
   end
 end
