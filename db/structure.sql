@@ -723,7 +723,8 @@ CREATE TABLE public.subscriptions (
     muted boolean DEFAULT false,
     show_retweets boolean DEFAULT true,
     media_only boolean DEFAULT false,
-    kind bigint DEFAULT 0
+    kind bigint DEFAULT 0,
+    view_mode bigint DEFAULT 0
 );
 
 
@@ -2138,6 +2139,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190710112843'),
 ('20190715152451'),
 ('20190725121939'),
-('20190820134157');
+('20190820134157'),
+('20200109204853');
 
 
