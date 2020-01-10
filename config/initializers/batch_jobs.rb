@@ -18,7 +18,7 @@ module BatchJobs
     (start..finish).to_a
   end
 
-  def enqueue_all(klass, sidekiq_class)
+  def enqueue_all(klass, sidekiq_class, *args)
     if last_id = klass.last&.id
       defaults = {
         "class" => sidekiq_class.name.freeze,
@@ -26,9 +26,9 @@ module BatchJobs
         "retry" => sidekiq_class.get_sidekiq_options["retry"].freeze,
       }
       (1..last_id).each_slice(10_000) do |slice|
-        ids = slice.map { |id| [id] }
+        args = slice.map { |id| [id, *args] }
         Sidekiq::Client.push_bulk(
-          defaults.merge("args" => ids)
+          defaults.merge("args" => args)
         )
       end
     end
