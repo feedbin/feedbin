@@ -1,50 +1,50 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title><%= @title || 'Feedbin' %><%= branch_info if Rails.env.development? %></title>
-        <meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no,viewport-fit=cover" />
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="default">
-        <link rel="mask-icon" href="<%= asset_path('website-icon.svg') %>" color="#000000" />
-        <link rel="icon" href="<%= asset_path('link-icon.png') %>" sizes="192x192" />
-        <link rel="apple-touch-icon-precomposed" href="<%= asset_path('apple-touch-icon-precomposed.png') %>" sizes="152x152" />
-        <link rel="shortcut icon" href="<%= asset_path('favicon.ico') %>" type="image/vnd.microsoft.icon" />
-        <%= stylesheet_link_tag "application", media: "all"  %>
-        <style>
-            @supports (padding-bottom: max(0px)) {
-                .bottom-toolbar, .entries-column .bottom-toolbar {
-                    padding-bottom: max(20px, env(safe-area-inset-bottom));
-                }
-                .entries-column .bottom-toolbar {
-                    padding-bottom: max(8px, env(safe-area-inset-bottom));
-                }
-                .entry-column .bottom-toolbar {
-                    padding-bottom: max(0px, env(safe-area-inset-bottom));
-                }
+<head>
+    <title><%= @title || 'Feedbin' %><%= branch_info if Rails.env.development? %></title>
+    <meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no,viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="mask-icon" href="<%= asset_path('website-icon.svg') %>" color="#000000" />
+    <link rel="icon" href="<%= asset_path('link-icon.png') %>" sizes="192x192" />
+    <link rel="apple-touch-icon-precomposed" href="<%= asset_path('apple-touch-icon-precomposed.png') %>" sizes="152x152" />
+    <link rel="shortcut icon" href="<%= asset_path('favicon.ico') %>" type="image/vnd.microsoft.icon" />
+    <%= stylesheet_link_tag "application", media: "all"  %>
+    <style>
+        @supports (padding-bottom: max(0px)) {
+            .bottom-toolbar, .entries-column .bottom-toolbar {
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
             }
-        </style>
-        <%= javascript_include_tag "lib/lib"  %>
-        <%= javascript_include_tag "application"  %>
-        <% if native? %>
-            <%= javascript_include_tag "lib/turbolinks"  %>
-            <script>
-                feedbin.native = true
-                $(function() {
-                    $('body').addClass('standalone-navigator');
-                    $('body').addClass('native');
-                });
-            </script>
-        <% end %>
+            .entries-column .bottom-toolbar {
+                padding-bottom: max(8px, env(safe-area-inset-bottom));
+            }
+            .entry-column .bottom-toolbar {
+                padding-bottom: max(0px, env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+    <%= javascript_include_tag "lib/lib"  %>
+    <%= javascript_include_tag "application"  %>
+    <script>
+        feedbin.theme = "<%= current_user&.theme || "day" %>";
+    </script>
+    <% if native? %>
+        <%= javascript_include_tag "lib/turbolinks"  %>
         <script>
-            feedbin.theme = "<%= current_user&.theme || "day" %>";
+            feedbin.native = true
+            $(function() {
+                $('body').addClass('standalone-navigator');
+                $('body').addClass('native');
+            });
         </script>
-        <%= yield(:head) %>
-        <%= csrf_meta_tags %>
-        <%= tag :meta, name: "stripe-key", content: STRIPE_PUBLIC_KEY %>
-    </head>
-    <body class="<%= @class %>" data-behavior="<%= @behavior %>">
-        <%= content_for?(:content) ? yield(:content) : yield %>
-        <%= render partial: "shared/modals/modal" %>
-        <%= render partial: "shared/theme_colors" %>
-    </body>
+    <% end %>
+    <%= yield(:head) %>
+    <%= csrf_meta_tags %>
+    <%= tag :meta, name: "stripe-key", content: STRIPE_PUBLIC_KEY %>
+</head>
+<body class="<%= @class %>" data-behavior="<%= @behavior %>">
+    <%= content_for?(:content) ? yield(:content) : yield %>
+    <%= render partial: "shared/modals/modal" %>
+    <%= render partial: "shared/theme_colors" %>
+</body>
 </html>

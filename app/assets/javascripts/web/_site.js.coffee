@@ -477,15 +477,13 @@ $.extend feedbin,
 
     feedbin.notificationTimeout = setTimeout feedbin.hideNotification, 3000
 
-  updateEntries: (entries, header) ->
+  updateEntries: (entries) ->
     $('.entries ul').html(entries)
-    $('.entries-header').html(header)
     $('.entries').prop('scrollTop', 0)
     $(".entries").removeClass("loading");
 
-  appendEntries: (entries, header) ->
+  appendEntries: (entries) ->
     $('.entries ul').append(entries)
-    $('.entries-header').html(header)
 
   formatEntries: (viewMode, lastUnread, viewType = null) ->
     $(document).trigger('feedbin:entriesLoaded')
@@ -2121,6 +2119,9 @@ $.extend feedbin,
 
     searchError: ->
       $(document).on 'ajax:error', '[data-behavior~=search_form]', (event, xhr) ->
+        console.log @
+        console.log event
+        console.log xhr
         feedbin.showNotification('Search error.', true);
 
         return

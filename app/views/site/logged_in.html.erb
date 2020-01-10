@@ -37,7 +37,13 @@
     </div>
     <div class="entries-column app-panel" data-behavior="content_column" <%= resizable 'entries' %>>
         <div class="inner-column">
-            <div class="entries-header" data-behavior="entries_header"></div>
+            <div class="entries-header" data-behavior="entries_header">
+                <button class="back-button" data-behavior="show_feeds">
+                    <%= svg_tag "icon-arrow", size: "9x15" %>
+                </button>
+                <span class="feed-title-wrap"></span>
+                <button class="search-button" data-behavior="toggle_search"><%= svg_tag "icon-search", size: "16x16" %></button>
+            </div>
             <div class="search-wrap">
                 <%= form_tag search_entries_path, class: 'search-form', remote: true, method: :get, data: {behavior: 'search_form'} do %>
                     <div class="icon-wrap"><%= svg_tag "icon-search" %></div>

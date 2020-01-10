@@ -1,7 +1,4 @@
 var update = function() {
-    var ids = <%= @entries.map{ |entry| entry.id }.to_json.html_safe %>;
-    var header = "<%= j render partial: "entries/entries_header", locals: {feed: @feed || nil} %>";
-
     <% if @entries.length == 0 %>
         var entries = "<%= j render partial: "entries/no_entry" %>";
     <% else %>
@@ -9,9 +6,9 @@ var update = function() {
     <% end %>
 
     <% if @append %>
-        feedbin.appendEntries(entries, header);
+        feedbin.appendEntries(entries, "<%= j render partial: "entries/entries_header", locals: {feed: @feed || nil} %>");
     <% else %>
-        feedbin.updateEntries(entries, header);
+        feedbin.updateEntries(entries, "<%= j render partial: "entries/entries_header", locals: {feed: @feed || nil} %>");
     <% end %>
 
     <% if @page_query %>
@@ -20,14 +17,28 @@ var update = function() {
         feedbin.updatePager("");
     <% end %>
 
-    <% if @force_preload %>
-        feedbin.preloadEntries(ids, true);
-    <% else %>
-        feedbin.preloadEntries(ids, false);
-    <% end %>
-
     <% if @search %>
-        feedbin.showSearchControls("<%= params[:sort] %>", "<%= @escaped_query %>", "<%= new_saved_search_path(query: params[:query]) %>", "Mark <%= number_with_delimiter(@total_results) %> <%= "article".pluralize(@total_results) %> that <%= "match".pluralize(@total_results == 1 ? 2 : 1) %> the search “<%= @escaped_query %>” as read?");
+        // feedbin.showSearchControls("<%= params[:sort] %>", "<%= @escaped_query %>", "<%= new_saved_search_path(query: params[:query]) %>", "Mark <%= number_with_delimiter(@total_results) %> <%= "article".pluralize(@total_results) %> that <%= "match".pluralize(@total_results == 1 ? 2 : 1) %> the search “<%= @escaped_query %>” as read?");
+        var text;
+        text = null;
+        <% if params[:sort] %>
+            text = $("[data-sort-option=<%= params[:sort] %>]").text();
+        <% end %>
+        if (!text) {
+          text = $("[data-sort-option=desc]").text();
+        }
+        $('body').addClass('show-search-options');
+        $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected');
+        $('.sort-order').text(text);
+        $('.search-control').removeClass('edit');
+        $('.saved-search-wrap').removeClass('show');
+        $('[data-behavior~=save_search_link]').removeAttr('disabled');
+        $('[data-behavior~=new_saved_search]').attr('href', "<%= new_saved_search_path(query: params[:query]) %>");
+        feedbin.markReadData = {
+          type: "search",
+          data: "<%= @escaped_query %>",
+          message: "Mark <%= number_with_delimiter(@total_results) %> <%= "article".pluralize(@total_results) %> that <%= "match".pluralize(@total_results == 1 ? 2 : 1) %> the search “<%= @escaped_query %>” as read?"
+        };
     <% else %>
         feedbin.hideSearch()
     <% end %>
@@ -37,7 +48,19 @@ var update = function() {
         feedbin.updateUnreads(<%= @all_unread ? 1 : 0 %>, unreads)
     <% end %>
 
-    feedbin.formatEntries("<%= j view_mode %>", "<%= j last_unread_date %>", "<%= @type %>")
+    // feedbin.formatEntries("<%= j view_mode %>", "<%= j last_unread_date %>", "<%= @type %>")
+
+    $(document).trigger('feedbin:entriesLoaded');
+    feedbin.viewType = "<%= @type %>";
+    feedbin.data.viewMode = "<%= j view_mode %>";
+    feedbin.localizeTime();
+    feedbin.applyUserTitles();
+    feedbin.loadEntryImages();
+    feedbin.markReadData.date = "<%= j last_unread_date %>";
+    feedbin.faviconColors($(".entries-column"));
+
+    feedbin.updatePager("<%= @page_query ? escape_javascript(will_paginate(@page_query)) : nil %>");
+    feedbin.preloadEntries(<%= @entries.map{ |entry| entry.id }.to_json.html_safe %>, <%= !!(@force_preload) ? "true" : "false" %>);
 }
 
 if (feedbin.panelScrollComplete) {
