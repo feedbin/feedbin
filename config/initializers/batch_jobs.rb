@@ -26,9 +26,9 @@ module BatchJobs
         "retry" => sidekiq_class.get_sidekiq_options["retry"].freeze,
       }
       (1..last_id).each_slice(10_000) do |slice|
-        args = slice.map { |id| [id, *args] }
+        ids = slice.map { |id| [id, *args] }
         Sidekiq::Client.push_bulk(
-          defaults.merge("args" => args)
+          defaults.merge("args" => ids)
         )
       end
     end
