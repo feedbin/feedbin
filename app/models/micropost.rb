@@ -7,7 +7,7 @@ class Micropost
   end
 
   def valid?
-    data && author_profile? && !title?
+    data && data.respond_to?(:dig) && author_profile? && !title?
   end
 
   def author_avatar
@@ -20,6 +20,8 @@ class Micropost
 
   def author_name
     data.dig("author", "name")
+  rescue
+    nil
   end
 
   def author_username
