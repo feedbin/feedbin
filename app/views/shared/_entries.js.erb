@@ -29,6 +29,7 @@ var callback = function() {
     <% end %>
 
     feedbin.formatEntries("<%= j view_mode %>", "<%= j last_unread_date %>", "<%= @type %>")
+    feedbin.preloadEntries(<%= @entries.map{ |entry| entry.id }.to_json.html_safe %>, <%= @force_preload ? "true" : "false" %>);
 }
 
 if (feedbin.panelScrollComplete) {
