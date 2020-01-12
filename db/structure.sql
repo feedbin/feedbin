@@ -757,7 +757,8 @@ CREATE TABLE public.subscriptions (
     muted boolean DEFAULT false,
     show_retweets boolean DEFAULT true,
     media_only boolean DEFAULT false,
-    kind bigint DEFAULT 0
+    kind bigint DEFAULT 0,
+    view_mode bigint DEFAULT 0
 );
 
 

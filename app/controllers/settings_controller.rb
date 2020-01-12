@@ -186,6 +186,14 @@ class SettingsController < ApplicationController
     end
   end
 
+  def subscription_view_mode
+    @user = current_user
+    @subscription = @user.subscriptions.where(feed_id: params[:feed_id]).first
+    if @subscription.present?
+      @subscription.update(subscription_view_mode_params)
+    end
+  end
+
   def entry_width
     @user = current_user
     new_width = if @user.entry_width.blank?
@@ -264,6 +272,10 @@ class SettingsController < ApplicationController
 
   def user_now_playing_params
     params.require(:user).permit(:now_playing_entry)
+  end
+
+  def subscription_view_mode_params
+    params.require(:subscription).permit(:view_mode)
   end
 
   def update_view_mode(view_mode)

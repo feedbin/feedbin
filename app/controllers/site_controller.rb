@@ -13,8 +13,11 @@ class SiteController < ApplicationController
         end
       }
 
-      readability_settings = subscriptions.each_with_object({}) { |subscription, hash|
-        hash[subscription.feed_id] = subscription.view_inline
+      readability_settings = {}
+      subscription_view_settings = {}
+      subscriptions.each { |subscription|
+        readability_settings[subscription.feed_id] = subscription.view_inline
+        subscription_view_settings[subscription.feed_id] = subscription.view_mode
       }
 
       @now_playing = Entry.where(id: @user.now_playing_entry).first
@@ -40,7 +43,6 @@ class SiteController < ApplicationController
         update_message_seen: @user.setting_on?(:update_message_seen),
         feed_order: @user.feed_order,
         refresh_sessions_path: refresh_sessions_path,
-        progress: {},
         audio_panel_size: @user.audio_panel_size,
         view_links_in_app: @user.setting_on?(:view_links_in_app),
         saved_searches_count_path: count_saved_searches_path,
@@ -52,6 +54,8 @@ class SiteController < ApplicationController
         font_stylesheet: ENV["FONT_STYLESHEET"],
         modal_extracts_path: modal_extracts_path,
         settings_view_mode_path: settings_view_mode_path,
+        progress: @user.recently_played_entries_progress,
+        subscription_view_mode: subscription_view_settings,
       }
 
       render action: "logged_in"

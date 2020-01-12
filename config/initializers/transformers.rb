@@ -24,10 +24,12 @@ class Transformers
         end
       end
 
-      whitelist = Feedbin::Application.config.base.dup
-      whitelist[:attributes]["blockquote"] = allowed_attributes
-
-      Sanitize.node!(node, whitelist)
+      Sanitize.node!(node, {
+        elements: %w[blockquote],
+        attributes: {
+          'blockquote' => allowed_attributes
+        }
+      })
 
       {node_whitelist: [node]}
     end

@@ -516,6 +516,12 @@ class User < ApplicationRecord
     false
   end
 
+  def recently_played_entries_progress
+    recently_played_entries.select(:duration, :progress, :entry_id).each_with_object({}) do |item, hash|
+      hash[item.entry_id] = {progress: item.progress, duration: item.duration }
+    end
+  end
+
   def twitter_client
     if twitter_enabled?
       @twitter_client ||= ::Twitter::REST::Client.new { |config|

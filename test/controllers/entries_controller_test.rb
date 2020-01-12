@@ -187,16 +187,6 @@ class EntriesControllerTest < ActionController::TestCase
     assert_equal 1, assigns(:entries).total_entries
   end
 
-  test "should get diff" do
-    login_as @user
-    entry = @user.entries.first
-    entry.update(content: "<p>This is the test.</p>")
-    entry.update(content: "<p>This is the text.</p>", original: {content: entry.content})
-    get :diff, params: {id: entry}, xhr: true
-    assert_response :success
-    assert_match /inline-diff/, assigns(:content)
-  end
-
   test "should get newsletter" do
     entry = @user.entries.first
     get :newsletter, params: {id: entry.public_id}

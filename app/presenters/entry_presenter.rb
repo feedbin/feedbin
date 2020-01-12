@@ -73,6 +73,40 @@ class EntryPresenter < BasePresenter
     @template.content_tag(:p, "&ndash;&ndash;".html_safe)
   end
 
+  def newsletter_content
+    output = ContentFormatter.newsletter_format(formatted_content)
+    output = <<-eod
+    <style>
+    body {
+      margin: 0  !important;
+      padding: 0 !important;
+    }
+    table, td, img {
+      max-width: 620px !important;
+    }
+    img[width="1"], img[height="1"] {
+      display: none !important;
+    }
+    </style>
+    #{output}
+    eod
+    output.html_safe
+  rescue => e
+    Rails.logger.info { e.inspect }
+    @template.content_tag(:p, "&ndash;&ndash;".html_safe)
+  end
+
+  def newsletter_from?
+    newsletter_from
+  end
+
+  def newsletter_from
+    name, address = entry.data && entry.data.dig("newsletter", "data", "from").split(/[<>]/).map(&:strip)
+    OpenStruct.new(name: name, address: address)
+  rescue
+    nil
+  end
+
   def api_content
     ContentFormatter.api_format(formatted_content, entry)
   rescue => e
@@ -313,15 +347,6 @@ class EntryPresenter < BasePresenter
     "entry-type-#{entry_type} entry-format-#{entry_type}-#{entry.content_format}"
   end
 
-  def content_diff
-    before = ContentFormatter.api_format(entry.original["content"], entry)
-    after = ContentFormatter.api_format(entry.content, entry)
-    result = HTMLDiff::Diff.new("<div>#{before}</div>", "<div>#{after}</div>").inline_html
-    Sanitize.fragment(result, Sanitize::Config::RELAXED)
-  rescue
-    nil
-  end
-
   def decoder
     @decoder ||= HTMLEntities.new
   end
@@ -391,7 +416,7 @@ class EntryPresenter < BasePresenter
   end
 
   def has_diff?
-    entry.content.present? && entry.original.present? && entry.original["content"].present? && entry.original["content"].length != entry.content.length
+    entry.content_diff.present?
   end
 
   def is_updated_entry?

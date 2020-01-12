@@ -31,6 +31,8 @@ class ArticleTest < ApplicationSystemTestCase
 
   test "mark unread" do
     show_article
+    wait_for_ajax
+
     assert_difference "UnreadEntry.count", +1 do
       find("[data-behavior~=toggle_read].read")
       find("[data-behavior~=toggle_read] button").click
@@ -55,5 +57,52 @@ class ArticleTest < ApplicationSystemTestCase
     wait_for_ajax
 
     assert_selector ".embed-title", text: "Samsung Galaxy Note 9 Impressions: Underrated!"
+  end
+
+  test "diff" do
+    show_article_setup
+
+    entry = @entries.first
+
+    entry.update(content: "<p>This is the text.</p>")
+    entry.update(content: "<p>This is the new text.</p>", original: {content: entry.content})
+
+    login_as(@user)
+
+    click_link(@entries.first.title)
+
+    wait_for_ajax
+
+    find('label[for=diff_view]').click()
+
+    assert_selector "ins", text: "new"
+  end
+
+  test "newsletter" do
+    show_article_setup
+
+    entry = @entries.first
+    entry.feed.newsletter!
+
+    login_as(@user)
+
+    click_link(@entries.first.title)
+
+    wait_for_ajax
+
+    find('label[for=newsletter_view]').click()
+
+    assert_selector ".newsletter-content"
+  end
+
+  test "extract" do
+    show_article
+    wait_for_ajax
+
+    stub_request_file("parsed_page.json", /extract\.example\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
+
+    find('.button-toggle-content').click()
+
+    assert_selector ".original-meta strong", text: "Originally from:"
   end
 end

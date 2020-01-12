@@ -710,6 +710,24 @@ label select {
             fill: $color-accent-green-600;
         }
     }
+    &.small {
+        width: 32px;
+        .switch-inner {
+            width: 32px;
+            height: 19px;
+            &:before {
+                height: 29px;
+                width: 42px;
+            }
+            &:after {
+                height: 13px;
+                width: 13px;
+            }
+            svg {
+                display: none;
+            }
+        }
+    }
 }
 label .switch-inner {
     :checked ~ & {
@@ -739,6 +757,13 @@ label .switch-inner {
         @include background-color($color-accent-green-700);
         svg {
             @include fill($color-accent-green-700);
+        }
+    }
+}
+label .switch.small .switch-inner {
+    :checked ~ & {
+        &:after, svg {
+            transform: translateX(13px);
         }
     }
 }
@@ -5168,6 +5193,41 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         padding-left: 16px;
     }
 }
+
+.newsletter {
+    max-width: 100%;
+    background-color: white;
+    overflow: hidden;
+    box-shadow: $box-shadow-dropdown;
+    display: flex;
+    justify-content: center;
+}
+
+.content-option-switch {
+    display: flex;
+    align-items: center;
+    [class^="favicon"] {
+        margin-right: 8px;
+        @include fill($color-contrast-400);
+    }
+    .switch {
+        margin-left: auto;
+        position: static;
+    }
+}
+
+.extract-active .content-option-form {
+    display: none;
+}
+
+.newsletter-content-option-form {
+    display: none;
+    .shadow-dom & {
+        display: block;
+        display: none;
+    }
+}
+
 /*------------------------------------------------------------------------------
 Settings
 ------------------------------------------------------------------------------*/
@@ -7201,6 +7261,10 @@ input[type="text"].hide {
 .extra-muted {
     @include color($color-contrast-500);
     @include native-theme("color", $color-contrast-500);
+}
+
+.faded {
+    @include color($color-contrast-400);
 }
 
 .danger {

@@ -186,13 +186,14 @@ GEM
     capistrano-rbenv (2.1.4)
       capistrano (~> 3.1)
       sshkit (~> 1.3)
-    capybara (2.18.0)
+    capybara (3.30.0)
       addressable
       mini_mime (>= 0.1.3)
-      nokogiri (>= 1.3.3)
-      rack (>= 1.0.0)
-      rack-test (>= 0.5.4)
-      xpath (>= 2.0, < 4.0)
+      nokogiri (~> 1.8)
+      rack (>= 1.6.0)
+      rack-test (>= 0.6.3)
+      regexp_parser (~> 1.5)
+      xpath (~> 3.2)
     carrierwave (2.0.2)
       activemodel (>= 5.0.0)
       activesupport (>= 5.0.0)
@@ -391,7 +392,7 @@ GEM
     premailer-rails (1.10.3)
       actionmailer (>= 3)
       premailer (~> 1.7, >= 1.7.9)
-    public_suffix (4.0.1)
+    public_suffix (4.0.3)
     puma (4.3.1)
       nio4r (~> 2.0)
     rack (2.0.8)
@@ -425,6 +426,7 @@ GEM
       multi_json (~> 1.10)
       multi_xml (~> 0.5)
     redis (4.1.3)
+    regexp_parser (1.6.0)
     request_store (1.5.0)
       rack (>= 1.4)
     responders (3.0.0)
@@ -562,7 +564,7 @@ DEPENDENCIES
   capistrano-bundler
   capistrano-rails
   capistrano-rbenv
-  capybara (~> 2.13)
+  capybara
   carrierwave
   carrierwave_direct!
   clockwork

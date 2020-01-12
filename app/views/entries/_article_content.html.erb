@@ -1,0 +1,53 @@
+<% present entry do |entry_presenter| %>
+    <% if entry_presenter.has_diff? %>
+        <form class="content-option-form">
+            <input type="checkbox" class="visually-hidden" id="diff_view" data-behavior="change_content_view" data-view-mode="diff">
+            <label class="content-option-switch system-content entry-callout" for="diff_view">
+                <%= svg_tag 'favicon-updated' %>
+                View changes since original <%= toggle_switch class: "small" %>
+            </label>
+        </form>
+    <% end %>
+    <% if entry.feed.newsletter? %>
+        <form action="<%= settings_subscription_view_mode_path(entry.feed_id) %>" class="content-option-form newsletter-content-option-form hide" data-remote="true" method="post">
+            <input name="subscription[view_mode]" type="hidden" value="article">
+            <input name="subscription[view_mode]" type="checkbox" value="newsletter" class="visually-hidden" id="newsletter_view" data-behavior="change_content_view auto_submit" data-view-mode="newsletter">
+            <label class="content-option-switch system-content entry-callout" for="newsletter_view">
+                <%= svg_tag 'favicon-newsletter' %>
+                View as rich text <%= toggle_switch class: "small" %>
+            </label>
+        </form>
+    <% end %>
+    <%= render partial: 'media', locals: {entry: entry} %>
+    <div class="entry-final-content" data-behavior="entry_final_content">
+        <div class="content-option" data-behavior="content_option" data-content-option="default">
+            <%= raw(entry_presenter.content) %>
+        </div>
+
+        <div class="content-option hide" data-behavior="content_option" data-content-option="extract">
+            <div class="readability-loading system-content entry-callout">Loading full content…</div>
+        </div>
+
+        <% if entry_presenter.has_diff? %>
+            <div class="content-option hide" data-behavior="content_option" data-content-option="diff">
+                <%= entry.content_diff %>
+            </div>
+        <% end %>
+
+        <% if entry.feed.newsletter? %>
+            <% newsletter_id = "newsletter_#{SecureRandom.hex}" %>
+            <div class="content-option hide" data-behavior="content_option" data-content-option="newsletter">
+                <div class="newsletter">
+                    <div class="newsletter-content" id="<%= newsletter_id %>"></div>
+                </div>
+                <script>
+                    if (feedbin.hasShadowDOM) {
+                        const newsletter = document.getElementById("<%= newsletter_id %>").attachShadow({mode: 'open'});;
+                		newsletter.innerHTML = "<%= j entry_presenter.newsletter_content %>";
+                        feedbin.newsletterLoad(newsletter);
+                    }
+                </script>
+            </div>
+        <% end %>
+    </div>
+<% end %>
