@@ -104,7 +104,8 @@ CREATE TABLE public.authentication_tokens (
     purpose integer NOT NULL,
     data jsonb DEFAULT '{}'::jsonb,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    active boolean DEFAULT true NOT NULL
 );
 
 
@@ -1503,6 +1504,13 @@ CREATE UNIQUE INDEX index_authentication_tokens_on_purpose_and_token ON public.a
 
 
 --
+-- Name: index_authentication_tokens_on_purpose_and_token_and_active; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_authentication_tokens_on_purpose_and_token_and_active ON public.authentication_tokens USING btree (purpose, token, active);
+
+
+--
 -- Name: index_authentication_tokens_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2213,6 +2221,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190820134157'),
 ('20200102115516'),
 ('20200109204853'),
-('20200110142059');
+('20200110142059'),
+('20200113101112');
 
 
