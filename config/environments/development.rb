@@ -3,6 +3,7 @@ Rails.application.configure do
 
   config.hosts << "feedbin.resolv.app"
   config.hosts << "api.feedbin.resolv.app"
+  config.hosts << "feedbin.mac.resolv.app"
 
   # In the development environment your application's code is reloaded on
   # every request. This slows down response time but is perfect for development

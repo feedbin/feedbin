@@ -63,6 +63,7 @@ class User < ApplicationRecord
   has_many :recently_played_entries, dependent: :delete_all
   has_many :updated_entries, dependent: :delete_all
   has_many :devices, dependent: :delete_all
+  has_many :authentication_tokens, dependent: :delete_all
   has_many :in_app_purchases
   belongs_to :plan
 
@@ -79,7 +80,7 @@ class User < ApplicationRecord
   before_create { create_customer }
   before_create { generate_token(:starred_token) }
   before_create { generate_token(:inbound_email_token, 4) }
-  before_create { generate_token(:newsletter_token, 4) }
+  before_create { generate_newsletter_token }
   before_create { generate_token(:page_token) }
 
   before_update :update_billing, unless: -> { !ENV["STRIPE_API_KEY"] }
@@ -98,6 +99,11 @@ class User < ApplicationRecord
   validates_presence_of :email
   validates_uniqueness_of :email, case_sensitive: false
   validates_presence_of :password, on: :create
+
+  def generate_newsletter_token
+    generate_token(:newsletter_token, 4)
+    authentication_tokens.new(purpose: :newsletters, token: newsletter_token)
+  end
 
   def theme
     if settings
@@ -508,6 +514,12 @@ class User < ApplicationRecord
     twitter_client&.home_timeline && true
   rescue Twitter::Error::Unauthorized
     false
+  end
+
+  def recently_played_entries_progress
+    recently_played_entries.select(:duration, :progress, :entry_id).each_with_object({}) do |item, hash|
+      hash[item.entry_id] = {progress: item.progress, duration: item.duration }
+    end
   end
 
   def twitter_client

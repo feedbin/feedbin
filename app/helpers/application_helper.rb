@@ -141,8 +141,8 @@ module ApplicationHelper
     end
   end
 
-  def toggle_switch
-    content_tag :span, class: "switch" do
+  def toggle_switch(options = {})
+    content_tag :span, class: "switch #{options[:class]}" do
       content_tag :span, class: "switch-inner" do
         svg_tag "icon-check"
       end

@@ -298,18 +298,20 @@ class Entry < ApplicationRecord
   end
 
   def content_diff
-    result = nil
-    if original && original["content"].present?
-      begin
-        before = ContentFormatter.format!(original["content"], self)
-        after = ContentFormatter.format!(content, self)
-        result = HTMLDiff::Diff.new("<div>#{before}</div>", "<div>#{after}</div>").inline_html
-        result = Sanitize.fragment(result, Sanitize::Config::RELAXED)
-        result = result.length > after.length ? result.html_safe : after.html_safe
-      rescue
+    @content_diff ||= begin
+      result = nil
+      if original && original["content"].present? && original["content"].length != content.length
+        begin
+          before = ContentFormatter.format!(original["content"], self)
+          after = ContentFormatter.format!(content, self)
+          result = HTMLDiff::Diff.new("<div>#{before}</div>", "<div>#{after}</div>").inline_html
+          result = Sanitize.fragment(result, Sanitize::Config::RELAXED)
+          result = result.length > after.length ? result.html_safe : after.html_safe
+        rescue
+        end
       end
+      result
     end
-    result
   end
 
   def newsletter_url

@@ -18,9 +18,8 @@ class EditTest < ApplicationSystemTestCase
     wait_for_ajax
 
     find(".modal [data-behavior~=autofocus]").set(feed_name)
-    find("[data-behavior~=add_tag]").click
-    find("[placeholder=Tag]").set(tag_name)
-    find(".modal form input[type=submit]").click
+    find("input[placeholder='+ New Tag']").set(tag_name)
+    find(".modal form button[type=submit]").click
 
     wait_for_ajax
 
@@ -50,7 +49,7 @@ class EditTest < ApplicationSystemTestCase
     wait_for_ajax
 
     find(".modal [data-behavior~=autofocus]").set(new_tag_name)
-    find(".modal form input[type=submit]").click
+    find(".modal form button[type=submit]").click
 
     wait_for_ajax
 
@@ -78,7 +77,7 @@ class EditTest < ApplicationSystemTestCase
     wait_for_ajax
 
     find(".modal [data-behavior~=autofocus]").set(new_search_name)
-    find(".modal form input[type=submit]").click
+    find(".modal form button[type=submit]").click
 
     wait_for_ajax
 

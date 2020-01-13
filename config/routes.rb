@@ -138,7 +138,6 @@ Rails.application.routes.draw do
       post :recently_read, to: "recently_read_entries#create"
       post :recently_played, to: "recently_played_entries#create"
       get :push_view
-      get :diff
       get :newsletter
     end
     collection do
@@ -183,6 +182,7 @@ Rails.application.routes.draw do
   end
 
   post "settings/sticky/:feed_id", as: :settings_sticky, to: "settings#sticky"
+  post "settings/subscription_view_mode/:feed_id", as: :settings_subscription_view_mode, to: "settings#subscription_view_mode"
 
   resources :twitter_authentications, only: [:new] do
     collection do

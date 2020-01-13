@@ -213,6 +213,10 @@ class EntriesController < ApplicationController
 
     @search = true
 
+    @search_message = "Mark #{helpers.number_with_delimiter(@total_results)} #{"article".pluralize(@total_results)} that #{"match".pluralize(@total_results == 1 ? 2 : 1)} the search “#{@escaped_query}” as read?"
+
+    @saved_search_path = new_saved_search_path(query: params[:query])
+
     @collection_title = "Search"
 
     @saved_search = SavedSearch.new
@@ -228,11 +232,6 @@ class EntriesController < ApplicationController
     @entry = Entry.find(params[:id])
     UnreadEntry.where(user: @user, entry: @entry).delete_all
     redirect_to @entry.fully_qualified_url, status: :found
-  end
-
-  def diff
-    @entry = Entry.find(params[:id])
-    @content = @entry.content_diff
   end
 
   def newsletter
@@ -257,7 +256,6 @@ class EntriesController < ApplicationController
   def entries_by_id(entry_ids)
     entries = Entry.where(id: entry_ids).includes(feed: [:favicon])
     subscriptions = @user.subscriptions.pluck(:feed_id)
-    updated_entries = @user.updated_entries.where(entry_id: entry_ids).pluck(:entry_id)
     entries.each_with_object({}) do |entry, hash|
       locals = {
         entry: entry,
@@ -265,7 +263,6 @@ class EntriesController < ApplicationController
         extract: false,
         user: @user,
         subscriptions: subscriptions,
-        updated_entries: updated_entries,
       }
       hash[entry.id] = {
         content: render_to_string(partial: "entries/show", formats: [:html], locals: locals),
