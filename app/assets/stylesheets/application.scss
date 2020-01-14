@@ -3089,18 +3089,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .entry-basement.open &:before {
         visibility: visible;
     }
-    &.entry-settings {
-        display: flex;
-        -webkit-overflow-scrolling: touch;
-        .touch & {
-            overflow-x: scroll;
-        }
-        .setting-wrap {
-            display: flex;
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-    }
     &.feed-settings {
         display: flex;
         align-items: stretch;
@@ -3132,163 +3120,170 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             right: auto;
         }
     }
-    .setting-wrap {
-        @include border-right($color-borders);
-        display: block;
-        padding: 0;
-    }
-    .font-settings {
-        position: relative;
-        select {
-            @include background-color($color-contrast-100);
-            width: 115px;
-            padding: 0;
-            @include font-size(13);
-            line-height: 1.1;
-            border: none;
-            border-radius: 0;
-            height: 47px;
-            appearance: none;
-            margin: 0 0 0 8px;
-            padding: 0;
-            @include color($color-contrast-700);
-            position: relative;
-        }
-        &:after {
-            width: 0px;
-            height: 0px;
-            border-style: solid;
-            border-width: 5px 4px 0 4px;
-            border-color: map-get($color-contrast-700, day) transparent transparent transparent;
-            content: "";
-            position: absolute;
-            right: 9px;
-            top: 23px;
-            pointer-events: none;
-            .theme-dusk &, .theme-midnight & {
-                border-top-color: white;
-            }
-        }
-    }
-    .button-increase-font, .button-decrease-font, .button-entry-width, .button-full-screen {
-        width: 48px;
-        display: block;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        svg {
-            @include fill($color-icons);
-            pointer-events: none;
-        }
-    }
-    .button-entry-width {
-        .icon-entry-width-fixed {
-            display: none;
-        }
-        .fluid & {
-            .icon-entry-width-fluid {
-                display: none;
-            }
-            .icon-entry-width-fixed {
-                display: block;
-            }
-        }
-    }
-    .button-full-screen {
-        .icon-full-screen-close {
-            display: none;
-        }
-        .full-screen & {
-            .icon-full-screen-open {
-                display: none;
-            }
-            .icon-full-screen-close {
-                display: block;
-            }
-        }
-    }
-    .theme-settings {
-        position: relative;
-        padding-right: 10px;
-        align-items: center;
-        .theme-button {
-            position: relative;
-            height: 32px;
-            width: 32px;
-            cursor: pointer;
-            border: 1px solid black;
-            border-radius: 2px;
-            margin-left: 10px;
-            &:before,
-            &:after,
-            .theme-button-inner:before,
-            .theme-button-inner:after {
-                left: 6px;
-                height: 2px;
-                position: absolute;
-                content: "";
-                display: block;
-                width: 18px;
-                background-color: black;
-            }
-            &:before {
-                top: 8px;
-            }
-            &:after {
-                top: 12px;
-            }
-            .theme-button-inner {
-                height: 100%;
-                width: 100%;
-                &:before {
-                    top: 16px;
-                }
-                &:after {
-                    top: 20px;
-                }
-            }
-        }
-        .theme-button-day {
-            background-color: map-get($color-base, day);
-            .theme-day & {
-                @include border-color($color-selected);
-            }
-        }
-        .theme-button-sunset {
-            background-color: map-get($color-base, sunset);
-            .theme-sunset & {
-                @include border-color($color-selected);
-            }
-        }
-        .theme-button-dusk {
-            background-color: map-get($color-base, dusk);
-            &:before,
-            &:after,
-            .theme-button-inner:before,
-            .theme-button-inner:after {
-                background-color: white;
-            }
-            .theme-dusk & {
-                @include border-color($color-selected);
-            }
-        }
-        .theme-button-midnight {
-            background-color: map-get($color-base, midnight);
-            &:before,
-            &:after,
-            .theme-button-inner:before,
-            .theme-button-inner:after {
-                background-color: white;
-            }
-            .theme-midnight & {
-                @include border-color($color-selected);
-            }
-        }
-    }
     .touch.has-offscreen-panels & {
         &:before, &:after {
             display: none;
+        }
+    }
+}
+
+.format-wrap {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.format-palette {
+    width: 335px;
+    padding: 8px 0 32px 0;
+    @include background-color($color-contrast-100);
+    @include border($color-borders);
+    border-radius: 4px;
+    box-shadow: $box-shadow-dropdown;
+    h3 {
+        @include font-size(16);
+        font-weight: bold;
+        margin: 24px 16px 16px 16px;
+    }
+    .control-group {
+        margin: 0;
+    }
+    .control {
+        margin: 0 16px;
+    }
+
+    $size: 40px;
+    .theme-options {
+        margin: 0 16px;
+        display: flex;
+        justify-content: space-between;
+        button {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: $size;
+            @include font-size(12);
+            overflow: visible;
+            .swatch {
+                height: $size;
+                width: $size;
+                border-radius: 50%;
+                @include border($color-contrast-400);
+                margin-bottom: 8px;
+                &:after {
+                    display: block;
+                    content: "";
+                    width: 50px;
+                    height: 50px;
+                    border: 4px solid transparent;
+                    border-radius: 50%;
+                    position: relative;
+                    top: -6px;
+                    left: -6px;
+                    pointer-events: none;
+                }
+            }
+        }
+    }
+    .theme-color-day {
+        background-color: $theme-color-base;
+        .theme-day &.swatch:after {
+            border-color: $color-accent-blue-400;
+        }
+    }
+    .theme-color-sunset {
+        background-color: $theme-color-sunset-base;
+        .theme-sunset &.swatch:after {
+            border-color: $color-accent-blue-400;
+        }
+    }
+    .theme-color-dusk {
+        background-color: $theme-color-dusk-base;
+        .theme-dusk &.swatch:after {
+            border-color: $color-accent-blue-400;
+        }
+    }
+    .theme-color-midnight {
+        background-color: $theme-color-midnight-base;
+        .theme-midnight &.swatch:after {
+            border-color: $color-accent-blue-400;
+        }
+    }
+    .theme-color-auto {
+        position: relative;
+        background-color: $theme-color-base;
+        &:before {
+            $size: $size - 2;
+            right: 0;
+            top: 0;
+            position: absolute;
+            border-top-right-radius: $size * 2;
+            border-bottom-right-radius: $size * 2;
+            width: 19px;
+            height: 38px;
+            background-color: $theme-color-dusk-base;
+            content: "";
+            display: block;
+        }
+        .theme-auto &.swatch:after {
+            border-color: $color-accent-blue-400;
+        }
+    }
+    .font-options {
+        display: flex;
+        flex-wrap: wrap;
+        @include border-top($color-borders);
+        .option {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0 8px;
+            height: 56px;
+            flex: 1 1 50%;
+            font-size: 24px;
+            @include color($color-contrast-600);
+            @include border-right($color-borders);
+            @include border-bottom($color-borders);
+            svg {
+                @include fill($color-contrast-600);
+            }
+            &:nth-child(2n) {
+                border-right: none;
+            }
+            .font-mercury {
+                position: relative;
+                bottom: -3px;
+            }
+            .icon-check {
+                margin-left: auto;
+                display: none;
+            }
+        }
+    }
+    .font-default & .font-option-system,
+    .font-sans-serif-1 & .font-option-whitney,
+    .font-sans-serif-2 & .font-option-ideal-sans,
+    .font-serif-1 & .font-option-sentinel,
+    .font-serif-2 & .font-option-mercury,
+    .font-serif-3 & .font-option-georgia {
+        .icon-check {
+            display: block;
+        }
+    }
+    .font-size {
+        display: flex;
+        @include border-bottom($color-borders);
+        @include border-top($color-borders);
+        button {
+            &:first-child {
+                @include border-right($color-borders);
+            }
+            padding: 16px;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
         }
     }
 }
@@ -7414,7 +7409,6 @@ a:hover.danger {
     height: 5px;
     @include background-color($color-borders);
 }
-
 
 
 /*------------------------------------------------------------------------------

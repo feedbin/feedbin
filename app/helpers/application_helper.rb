@@ -142,7 +142,11 @@ module ApplicationHelper
   end
 
   def toggle_switch(options = {})
-    content_tag :span, class: "switch #{options[:class]}" do
+    css_class = options.delete(:class)
+    defaults = {
+      class: "switch #{css_class}"
+    }
+    content_tag :span, defaults.merge(options) do
       content_tag :span, class: "switch-inner" do
         svg_tag "icon-check"
       end

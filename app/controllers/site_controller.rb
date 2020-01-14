@@ -77,6 +77,9 @@ class SiteController < ApplicationController
     end
   end
 
+  def format
+  end
+
   private
 
   def check_user

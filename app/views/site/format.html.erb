@@ -1,0 +1,103 @@
+<%= render partial: 'shared/svg' %>
+<div class="format-wrap theme-day font-sans-serif-2">
+    <div class="format-palette">
+
+        <h3>Theme</h3>
+
+        <div class="theme-options">
+            <button class="reset">
+                <span class="swatch theme-color-day"></span>
+                Day
+            </button>
+            <button class="reset">
+                <span class="swatch theme-color-sunset"></span>
+                Sunset
+            </button>
+            <button class="reset">
+                <span class="swatch theme-color-dusk"></span>
+                Dusk
+            </button>
+            <button class="reset">
+                <span class="swatch theme-color-midnight"></span>
+                <span>Night</span>
+            </button>
+            <button class="reset">
+                <span class="swatch theme-color-auto"></span>
+                <span>Auto</span>
+            </button>
+        </div>
+
+        <div class="mobile-hide">
+            <h3>Reading Mode</h3>
+
+            <div class="control">
+                <ul class="control-group">
+                    <li>
+                        <input name="user[hide_recently_read]" type="hidden" value="1">
+                        <input data-behavior="auto_submit" type="checkbox" value="0" checked="checked" name="user[hide_recently_read]" id="user_hide_recently_read">
+                        <label for="user_hide_recently_read">
+                            Full Screen
+                            <%= toggle_switch title: "shift + f", data: {toggle: "tooltip"} %>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Typeface</h3>
+
+        <div class="control">
+            <div class="font-options">
+                <button class="reset option font-option-system" title="System">
+                    System
+                    <%= svg_tag "icon-check" %>
+                </button>
+                <button class="reset option font-option-mercury" title="Mercury">
+                    <%= svg_tag "font-mercury" %>
+                    <%= svg_tag "icon-check" %>
+                </button>
+                <button class="reset option font-option-ideal-sans" title="Ideal Sans">
+                    <%= svg_tag "font-ideal-sans" %>
+                    <%= svg_tag "icon-check" %>
+                </button>
+                <button class="reset option font-option-sentinel" title="Sentinel">
+                    <%= svg_tag "font-sentinel" %>
+                    <%= svg_tag "icon-check" %>
+                </button>
+                <button class="reset option font-option-whitney" title="Whitney">
+                    <%= svg_tag "font-whitney" %>
+                    <%= svg_tag "icon-check" %>
+                </button>
+                <button class="reset option font-option-georgia" title="Georgia">
+                    <%= svg_tag "font-georgia" %>
+                    <%= svg_tag "icon-check" %>
+                </button>
+            </div>
+        </div>
+
+        <h3>Text Size</h3>
+        <div class="control">
+            <span class="font-size">
+                <button class="reset">Smaller</button>
+                <button class="reset">Larger</button>
+            </span>
+        </div>
+
+        <div class="mobile-hide">
+            <h3>Paragraph Width</h3>
+
+            <div class="control">
+                <ul class="control-group">
+                    <li>
+                        <input type="checkbox" id="paragraph_width">
+                        <label for="paragraph_width">
+                            Fluid
+                            <%= toggle_switch %>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
