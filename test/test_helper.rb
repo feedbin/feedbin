@@ -31,20 +31,6 @@ $redis = {
   refresher: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) },
 }
 
-Capybara.register_driver(:headless_chrome) do |app|
-  capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
-    chromeOptions: {args: ["headless", "disable-gpu", "window-size=1340,800"]},
-  )
-
-  Capybara::Selenium::Driver.new(
-    app,
-    browser: :chrome,
-    desired_capabilities: capabilities,
-  )
-end
-
-Capybara.default_max_wait_time = 2
-
 class ActiveSupport::TestCase
   include LoginHelper
   include FactoryHelper

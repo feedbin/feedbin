@@ -2,18 +2,22 @@ class NewsletterEntry
 
   attr_reader :newsletter, :user
 
-  def initialize(newsletter, user)
+  def initialize(newsletter, user = nil)
     @newsletter = newsletter
     @user = user
   end
 
+  def self.create(newsletter, user)
+    new(newsletter, user).create
+  end
+
   def create
-    if active?
+    create_feed
+    if active? && user
       subscribe
       tag
     end
     create_entry
-    upload
   end
 
   def subscribe
@@ -30,55 +34,64 @@ class NewsletterEntry
     user.taggings.where(feed: feed).exists?
   end
 
-  def upload
-    NewsletterSaver.perform_async(entry.id)
-  end
-
   def active?
     @active ||= begin
-      result = Feed.find_by_feed_url(feed_url: newsletter.feed_url)
+      result = Feed.find_by_feed_url(newsletter.feed_url)
       !result || result.subscriptions_count > 0
     end
   end
 
+  def create_feed
+    active?
+    feed
+    sender
+  end
+
   def sender
     @sender ||= begin
-      options = {
+      attributes = {
         token: newsletter.token,
         full_token: newsletter.full_token,
-        email: newsletter.email,
+        email: newsletter.from_email,
         name: newsletter.name,
         active: active?
       }
-      NewsletterSender.create_with(options).find_or_create_by(feed: feed)
+      NewsletterSender.create_with(attributes).find_or_create_by(feed: feed).tap do |record|
+        record.update(attributes)
+      end
     end
   end
 
   def feed
     @feed ||= begin
-      options = {
+      attributes = {
         title: newsletter.from_name,
         feed_url: newsletter.feed_url,
         site_url: newsletter.site_url,
         feed_type: :newsletter,
       }
-      Feed.create_with(options).find_or_create_by(feed_url: newsletter.feed_url)
+      Feed.create_with(attributes).find_or_create_by(feed_url: newsletter.feed_url).tap do |record|
+        record.update(attributes)
+      end
     end
   end
 
   def create_entry
-    @entry ||= begin
-      feed.entries.create!({
+    @create_entry ||= begin
+      attributes = {
         author: newsletter.from_name,
         content: newsletter.content,
         title: newsletter.subject,
-        url: newsletter_entry_url(newsletter.entry_id),
+        url: Rails.application.routes.url_helpers.newsletter_entry_url(newsletter.entry_id, host: ENV["PUSH_URL"]),
         entry_id: newsletter.entry_id,
         published: Time.now,
         updated: Time.now,
         public_id: newsletter.entry_id,
         data: {newsletter_text: newsletter.text, type: "newsletter", format: newsletter.format, newsletter: newsletter},
-      })
+      }
+      feed.entries.create!(attributes).tap do |record|
+        NewsletterSaver.perform_async(record.id)
+      end
     end
   end
 end

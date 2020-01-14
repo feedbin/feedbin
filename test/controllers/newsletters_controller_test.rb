@@ -6,11 +6,12 @@ class NewslettersControllerTest < ActionController::TestCase
     newsletter = Newsletter.new(newsletter_params(user.newsletter_token, "asdf"))
     signature = newsletter.send(:signature)
 
-    Feed.create!(feed_url: newsletter.feed_url)
+    feed = Feed.create!(feed_url: newsletter.feed_url)
 
     assert_no_difference("Subscription.count") do
       post :create, params: newsletter_params(user.newsletter_token, signature)
     end
+    assert !feed.newsletter_sender.active?, "Sender should not be active."
     assert_response :success
   end
 
@@ -21,17 +22,18 @@ class NewslettersControllerTest < ActionController::TestCase
 
     Sidekiq::Worker.clear_all
 
-    assert_difference "NewsletterSaver.jobs.size", +1 do
-      assert_difference("NewsletterSender.count", 1) do
-        assert_difference("Entry.count", 1) do
-          post :create, params: newsletter_params(token, signature)
+    assert_difference "Subscription.count", +1 do
+      assert_difference "NewsletterSaver.jobs.size", +1 do
+        assert_difference("NewsletterSender.count", 1) do
+          assert_difference("Entry.count", 1) do
+            post :create, params: newsletter_params(token, signature)
+          end
         end
       end
     end
     assert_response :success
 
     feed = user.feeds.newsletter.take
-    assert_equal(token, feed.options["newsletter_token"])
   end
 
   test "puts newsletter in tag" do
@@ -45,6 +47,26 @@ class NewslettersControllerTest < ActionController::TestCase
     user.subscriptions.find_or_create_by(feed: feed)
 
     assert_difference("Tag.count", 1) do
+      assert_difference("Entry.count", 1) do
+        post :create, params: newsletter_params(user.newsletter_token, signature)
+      end
+    end
+
+    assert_response :success
+  end
+
+  test "does not tag newsletter that already is" do
+    user = users(:ben)
+    newsletter = Newsletter.new(newsletter_params(user.newsletter_token, "asdf"))
+    signature = newsletter.send(:signature)
+    tag = "Newsletters"
+    user.update(newsletter_tag: tag)
+
+    feed = Feed.create!(feed_url: newsletter.feed_url)
+    user.subscriptions.find_or_create_by(feed: feed)
+    feed.tag("New Tag", user)
+
+    assert_no_difference("Tag.count") do
       assert_difference("Entry.count", 1) do
         post :create, params: newsletter_params(user.newsletter_token, signature)
       end
@@ -84,7 +106,6 @@ class NewslettersControllerTest < ActionController::TestCase
     end
     assert_response :success
     feed = Feed.find_by_title(title)
-    assert feed.options["email_headers"].present?
     assert_equal feed.feed_type, "newsletter"
   end
 
