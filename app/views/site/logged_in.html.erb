@@ -95,7 +95,7 @@
                 <% end %>
             </div>
             <div class="entry-meta" data-behavior="entry_meta_target"></div>
-            <div class="entry-content-wrap <%= @user.entry_width %> <%= @user.display_prefs %>" data-font-size="<%= @user.font_size || 5 %>"  data-font="<%= @user.font || 'default' %>" data-behavior="entry_content_target">
+            <div class="entry-content-wrap <%= cookies[:setting_entry_width] || @user.entry_width %> <%= @user.display_prefs(cookies) %>" data-font-size="<%= cookies[:setting_font_size] || @user.font_size || 5 %>"  data-font="<%= cookies[:setting_font] || @user.font || 'default' %>" data-behavior="entry_content_target">
                 <div data-behavior="inner_content_target"></div>
             </div>
             <div class="bottom-toolbar entry-bottom-toolbar">

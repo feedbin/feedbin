@@ -49,7 +49,7 @@ class SiteController < ApplicationController
         proxy_images: !@user.setting_on?(:disable_image_proxy),
         twitter_embed_path: twitter_embeds_path,
         instagram_embed_path: instagram_embeds_path,
-        theme: @user.theme || "day",
+        theme: cookies[:setting_theme] || @user.theme || "day",
         favicon_colors: @user.setting_on?(:favicon_colors),
         font_stylesheet: ENV["FONT_STYLESHEET"],
         modal_extracts_path: modal_extracts_path,

@@ -891,7 +891,7 @@ $.extend feedbin,
       fontContainer.removeClass("font-size-#{currentFontSize}")
       fontContainer.addClass("font-size-#{newFontSize}")
       fontContainer.data('font-size', newFontSize)
-      # localStorage.setItem('font-size', newFontSize);
+      Cookies.set('setting_font_size', newFontSize, { expires: 365 })
 
   matchHeights: (elements) ->
     height = 0
@@ -2004,7 +2004,7 @@ $.extend feedbin,
         fontContainer.data('font', newFont)
         $(@).parents('form').submit()
         feedbin.fonts(newFont)
-        # localStorage.setItem('font', newFont);
+        Cookies.set('setting_font', newFont, { expires: 365 })
 
     fontSize: ->
       $(document).on 'click', '[data-behavior~=increase_font]', (event) ->
@@ -2020,7 +2020,7 @@ $.extend feedbin,
         $('[data-behavior~=entry_content_target]').toggleClass('fluid')
         $('body').toggleClass('fluid')
         value = if $('body').hasClass('fluid') then 'fluid' else 'fixed'
-        # localStorage.setItem('layout-width', value);
+        Cookies.set('setting_entry_width', value, { expires: 365 })
         return
 
     fullscreen: ->
@@ -2038,7 +2038,7 @@ $.extend feedbin,
         $('[data-behavior~=class_target]').removeClass('theme-dusk')
         $('[data-behavior~=class_target]').removeClass('theme-midnight')
         $('[data-behavior~=class_target]').addClass("theme-#{theme}")
-        # localStorage.setItem('theme', theme);
+        Cookies.set('setting_theme', theme, { expires: 365 })
         event.preventDefault()
 
         return

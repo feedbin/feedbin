@@ -506,8 +506,8 @@ class User < ApplicationRecord
     plan == Plan.find_by_stripe_id("trial")
   end
 
-  def display_prefs
-    "font-size-#{font_size || 5} font-#{font || "default"}"
+  def display_prefs(cookies)
+    "font-size-#{cookies[:setting_font_size] || font_size || 5} font-#{cookies[:setting_font] || font || "default"}"
   end
 
   def twitter_credentials_valid?

@@ -193,9 +193,9 @@ class ApplicationController < ActionController::Base
 
   def user_classes
     @classes = []
-    @classes.push("theme-#{@user.theme || "day"}")
+    @classes.push("theme-#{cookies[:setting_theme] || @user.theme || "day"}")
     @classes.push(helpers.view_mode)
-    @classes.push(@user.entry_width)
+    @classes.push(cookies[:setting_entry_width] || @user.entry_width)
     @classes.push("entries-body-#{@user.entries_body || "1"}")
     @classes.push("entries-time-#{@user.entries_time || "1"}")
     @classes.push("entries-feed-#{@user.entries_feed || "1"}")

@@ -4,7 +4,7 @@
     <% end %>
 
     <% content_for :modal_body do %>
-        <div class="entry-inner <%= user.display_prefs %>">
+        <div class="entry-inner <%= user.display_prefs(cookies) %>">
             <header class="entry-header">
                 <%= link_to page.url, target: '_blank', rel: 'noopener noreferrer' do  %>
                     <h1><%= page.title || "Untitled" %></h1>
