@@ -6,6 +6,7 @@ gem "rails", github: "rails/rails", branch: "6-0-stable"
 gem "rails-controller-testing"
 gem "rails_autolink"
 gem "responders"
+gem "rack", github: "rack/rack", ref: "4ebd70b"
 
 group :development do
   gem "capistrano"

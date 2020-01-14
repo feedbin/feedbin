@@ -63,8 +63,15 @@ GIT
       nokogiri
 
 GIT
+  remote: https://github.com/rack/rack.git
+  revision: 4ebd70b243d79cecda1ba55abce8e2ead78395d7
+  ref: 4ebd70b
+  specs:
+    rack (2.2.0)
+
+GIT
   remote: https://github.com/rails/rails.git
-  revision: 779029d6dac7d53f309034db8b27168acb73a97b
+  revision: 04e08ee17fb8dc5374edc01226881a7c4ece3fdf
   branch: 6-0-stable
   specs:
     actioncable (6.0.2.1)
@@ -223,7 +230,7 @@ GEM
       tins (~> 1.6)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
-    crass (1.0.5)
+    crass (1.0.6)
     css_parser (1.7.1)
       addressable
     curb (0.9.10)
@@ -256,8 +263,8 @@ GEM
       oauth (>= 0.4.1)
     excon (0.71.1)
     execjs (2.7.0)
-    faker (2.10.0)
-      i18n (>= 1.6, < 1.8)
+    faker (2.10.1)
+      i18n (>= 1.6, < 2)
     faraday (0.17.3)
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.13.1)
@@ -304,10 +311,10 @@ GEM
     httparty (0.17.3)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
-    i18n (1.7.1)
+    i18n (1.8.2)
       concurrent-ruby (~> 1.0)
     idn-ruby (0.1.0)
-    image_processing (1.10.2)
+    image_processing (1.10.3)
       mini_magick (>= 4.9.5, < 5)
       ruby-vips (>= 2.0.17, < 3)
     ipaddress (0.8.3)
@@ -395,7 +402,6 @@ GEM
     public_suffix (4.0.3)
     puma (4.3.1)
       nio4r (~> 2.0)
-    rack (2.1.1)
     rack-attack (6.2.2)
       rack (>= 1.0, < 3)
     rack-protection (2.0.8.1)
@@ -609,6 +615,7 @@ DEPENDENCIES
   pg
   premailer-rails
   puma
+  rack!
   rack-attack
   rails!
   rails-controller-testing
