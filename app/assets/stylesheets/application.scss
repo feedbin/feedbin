@@ -3133,6 +3133,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0 8px;
 }
 .format-palette {
     width: 335px;
@@ -3234,42 +3235,46 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .font-options {
         display: flex;
         flex-wrap: wrap;
-        @include border-top($color-borders);
         .option {
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            padding: 0 8px;
-            height: 56px;
+            padding: 0;
             flex: 1 1 50%;
-            font-size: 24px;
+            font-size: 18px;
             @include color($color-contrast-600);
-            @include border-right($color-borders);
-            @include border-bottom($color-borders);
             svg {
                 @include fill($color-contrast-600);
             }
-            &:nth-child(2n) {
-                border-right: none;
+            label {
+                width: 100%;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                flex-direction: row-reverse;
+                justify-content: flex-end;
             }
             .font-mercury {
                 position: relative;
-                bottom: -3px;
-            }
-            .icon-check {
-                margin-left: auto;
-                display: none;
+                bottom: -2px;
             }
         }
-    }
-    .font-default & .font-option-system,
-    .font-sans-serif-1 & .font-option-whitney,
-    .font-sans-serif-2 & .font-option-ideal-sans,
-    .font-serif-1 & .font-option-sentinel,
-    .font-serif-2 & .font-option-mercury,
-    .font-serif-3 & .font-option-georgia {
-        .icon-check {
-            display: block;
+        input[type="radio"] {
+            @extend .visually-hidden;
+        }
+        .radio-button {
+            position: relative;
+            margin-right: 8px;
+            top: auto;
+            right: auto;
+            bottom: auto;
+            left: auto;
+        }
+        .option svg {
+            margin-left: 1px;
+        }
+        .font-option-georgia {
+            font-family: Georgia, serif;
         }
     }
     .font-size {
@@ -3286,6 +3291,13 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             flex: 1;
         }
     }
+}
+.fonts {
+    padding: 100px;
+}
+.fonts .content-styles {
+    font-size: 72px !important;
+    color: black !important;
 }
 
 .entry-column {
@@ -5193,7 +5205,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     max-width: 100%;
     background-color: white;
     overflow: hidden;
-    box-shadow: $box-shadow-dropdown;
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.05);;
     display: flex;
     justify-content: center;
 }
