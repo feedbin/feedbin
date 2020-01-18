@@ -774,7 +774,7 @@ $.extend feedbin,
     feedbin.embed(items, feedbin.data.instagram_embed_path, urlFinder)
 
   checkType: ->
-    element = $('.entry-final-content')
+    element = $('.entry-final-content .content-option')
     if element.length > 0
       tag = element.children().get(0)
       if tag
