@@ -24,7 +24,7 @@ class Transformers
         end
       end
 
-      Sanitize.node!(node, Sanitize::Config.merge(Sanitize::Config::BASIC, attributes: {"blockquote" => ["class"]}))
+      Sanitize.node!(node, Sanitize::Config.merge(Sanitize::Config::BASIC, attributes: {"blockquote" => allowed_attributes}))
 
       {node_whitelist: [node]}
     end
