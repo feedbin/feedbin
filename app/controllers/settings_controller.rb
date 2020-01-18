@@ -151,6 +151,18 @@ class SettingsController < ApplicationController
     head :ok
   end
 
+  def format
+    old_settings = JSON.parse(cookies.permanent.signed[:settings]) rescue {}
+    new_settings = user_format_params
+    cookies.permanent.signed[:settings] = {
+      value: JSON.generate(old_settings.merge(new_settings)),
+      httponly: true,
+      secure: Feedbin::Application.config.force_ssl
+    }
+    @user = current_user
+    @user.update!(new_settings)
+  end
+
   def font_increase
     change_font_size("increase")
   end
@@ -272,6 +284,10 @@ class SettingsController < ApplicationController
 
   def user_now_playing_params
     params.require(:user).permit(:now_playing_entry)
+  end
+
+  def user_format_params
+    params.require(:user).permit(:font_size, :theme, :font, :entry_width)
   end
 
   def subscription_view_mode_params

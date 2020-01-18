@@ -887,11 +887,11 @@ $.extend feedbin,
       newFontSize = currentFontSize + 1
     else
       newFontSize = currentFontSize - 1
-    if feedbin.data.font_sizes[newFontSize]
+    if feedbin.data && feedbin.data.font_sizes && feedbin.data.font_sizes[newFontSize]
       fontContainer.removeClass("font-size-#{currentFontSize}")
       fontContainer.addClass("font-size-#{newFontSize}")
       fontContainer.data('font-size', newFontSize)
-      Cookies.set('setting_font_size', newFontSize, { expires: 365 })
+      $('[data-behavior~=font_size]').val(newFontSize)
 
   matchHeights: (elements) ->
     height = 0
@@ -1994,7 +1994,6 @@ $.extend feedbin,
     formatToolbar: ->
       selectedFont = $("[data-font]").data('font')
       feedbin.fonts(selectedFont)
-      $('[data-behavior~=change_font]').val(selectedFont)
       $('[data-behavior~=change_font]').change ->
         fontContainer = $("[data-font]")
         currentFont = fontContainer.data('font')
@@ -2002,9 +2001,7 @@ $.extend feedbin,
         fontContainer.removeClass("font-#{currentFont}")
         fontContainer.addClass("font-#{newFont}")
         fontContainer.data('font', newFont)
-        $(@).parents('form').submit()
         feedbin.fonts(newFont)
-        Cookies.set('setting_font', newFont, { expires: 365 })
 
     fontSize: ->
       $(document).on 'click', '[data-behavior~=increase_font]', (event) ->
@@ -2020,7 +2017,6 @@ $.extend feedbin,
         $('[data-behavior~=entry_content_target]').toggleClass('fluid')
         $('body').toggleClass('fluid')
         value = if $('body').hasClass('fluid') then 'fluid' else 'fixed'
-        Cookies.set('setting_entry_width', value, { expires: 365 })
         return
 
     fullscreen: ->
@@ -2032,16 +2028,13 @@ $.extend feedbin,
 
     theme: ->
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
-        theme = $(@).data('theme')
+        theme = $(@).val()
         $('[data-behavior~=class_target]').removeClass('theme-day')
         $('[data-behavior~=class_target]').removeClass('theme-sunset')
         $('[data-behavior~=class_target]').removeClass('theme-dusk')
         $('[data-behavior~=class_target]').removeClass('theme-midnight')
+        $('[data-behavior~=class_target]').removeClass('theme-auto')
         $('[data-behavior~=class_target]').addClass("theme-#{theme}")
-        Cookies.set('setting_theme', theme, { expires: 365 })
-        event.preventDefault()
-
-        return
 
     titleBarColor: ->
       feedbin.setNativeTheme()

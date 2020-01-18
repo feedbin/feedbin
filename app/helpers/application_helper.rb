@@ -54,22 +54,34 @@ module ApplicationHelper
     current_user.try(:unread_entries).try(:order, "created_at DESC").try(:first).try(:created_at).try(:iso8601, 6)
   end
 
-  def svg_tag(name, options = {})
-    options = options.symbolize_keys
-
+  def get_icon(name)
     name = name.sub(".svg", "")
-
-    options.delete(:size)
-
     icon = Feedbin::Application.config.icons[name]
     if !icon
       file = "#{Rails.root}/app/assets/svg/#{name}.svg"
       if File.file?(file)
         icon = Feedbin::Application.config.icons[name] = SvgIcon.new_from_file(file)
-      else
-        raise "Icon missing #{name}"
       end
     end
+    icon
+  end
+
+  def icon_exists?(name)
+    get_icon(name).present?
+  end
+
+  def svg_tag(name, options = {})
+    options = options.symbolize_keys
+
+    name = name.sub(".svg", "")
+    options.delete(:size)
+
+    icon = get_icon(name)
+
+    unless icon
+      raise "Icon missing #{name}"
+    end
+
     options[:width] = icon.width
     options[:height] = icon.height
 

@@ -1,4 +1,4 @@
-<% @class = "settings-body settings-#{params[:action]} theme-#{cookies[:setting_theme] || @user.theme || "day"}"%>
+<% @class = "settings-body settings-#{params[:action]} theme-auto"%>
 <% content_for :content do %>
 <div class="settings settings-page">
     <%= render partial: 'shared/notification' %>

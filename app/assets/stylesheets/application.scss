@@ -286,6 +286,14 @@ body {
         background-color: map-get($color-base, midnight);
         color: map-get($color-contrast-700, midnight);
     }
+    &.theme-auto {
+        background-color: map-get($color-base, day);
+        color: map-get($color-contrast-700, day);
+        @media (prefers-color-scheme: dark) {
+            background-color: map-get($color-base, dusk);
+            color: map-get($color-contrast-700, dusk);
+        }
+    }
     @include respond-to(hidpi) {
         -moz-osx-font-smoothing: grayscale;
         -webkit-font-smoothing: antialiased;
@@ -1561,6 +1569,12 @@ Structure
     }
     &.theme-midnight {
         scrollbar-color: map-get($color-contrast-400, midnight) map-get($color-contrast-200, midnight);
+    }
+    &.theme-auto {
+        scrollbar-color: map-get($color-contrast-400, day) map-get($color-contrast-200, day);
+        @media (prefers-color-scheme: dark) {
+            scrollbar-color: map-get($color-contrast-400, dusk) map-get($color-contrast-200, dusk);
+        }
     }
 }
 
@@ -3142,6 +3156,10 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     @include border($color-borders);
     border-radius: 4px;
     box-shadow: $box-shadow-dropdown;
+    input[type="radio"] {
+        @extend .visually-hidden;
+    }
+
     h3 {
         @include font-size(16);
         font-weight: bold;
@@ -3153,13 +3171,12 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .control {
         margin: 0 16px;
     }
-
     $size: 40px;
     .theme-options {
         margin: 0 16px;
         display: flex;
         justify-content: space-between;
-        button {
+        label {
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -3187,32 +3204,37 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                 }
             }
         }
+        .theme-auto {
+            display: none;
+            @media (prefers-color-scheme: dark) {
+                display: flex;
+            }
+            @media (prefers-color-scheme: light) {
+                display: flex;
+            }
+        }
     }
-    .theme-color-day {
+    :checked + label {
+        .swatch:after {
+            border-color: $color-accent-blue-400;
+        }
+    }
+    label[for="user_theme_day"] .swatch {
         background-color: $theme-color-base;
-        .theme-day &.swatch:after {
-            border-color: $color-accent-blue-400;
-        }
     }
-    .theme-color-sunset {
+    label[for="user_theme_sunset"] .swatch {
         background-color: $theme-color-sunset-base;
-        .theme-sunset &.swatch:after {
-            border-color: $color-accent-blue-400;
-        }
     }
-    .theme-color-dusk {
+    label[for="user_theme_dusk"] .swatch {
         background-color: $theme-color-dusk-base;
-        .theme-dusk &.swatch:after {
-            border-color: $color-accent-blue-400;
-        }
     }
-    .theme-color-midnight {
+    label[for="user_theme_midnight"] .swatch {
         background-color: $theme-color-midnight-base;
         .theme-midnight &.swatch:after {
             border-color: $color-accent-blue-400;
         }
     }
-    .theme-color-auto {
+    label[for="user_theme_auto"] .swatch {
         position: relative;
         background-color: $theme-color-base;
         &:before {
@@ -3227,9 +3249,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             background-color: $theme-color-dusk-base;
             content: "";
             display: block;
-        }
-        .theme-auto &.swatch:after {
-            border-color: $color-accent-blue-400;
         }
     }
     .font-options {
@@ -3254,13 +3273,14 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                 flex-direction: row-reverse;
                 justify-content: flex-end;
             }
-            .font-mercury {
+            .font-serif-2 {
+                position: relative;
+                bottom: -3px;
+            }
+            .font-sans-serif-1 {
                 position: relative;
                 bottom: -2px;
             }
-        }
-        input[type="radio"] {
-            @extend .visually-hidden;
         }
         .radio-button {
             position: relative;
@@ -3273,7 +3293,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         .option svg {
             margin-left: 1px;
         }
-        .font-option-georgia {
+        label[for="user_font_serif-3"] {
             font-family: Georgia, serif;
         }
     }
@@ -3282,13 +3302,18 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         @include border-bottom($color-borders);
         @include border-top($color-borders);
         button {
-            &:first-child {
-                @include border-right($color-borders);
-            }
+            font-size: 16px;
             padding: 16px;
             align-items: center;
             justify-content: center;
             flex: 1;
+            @include color($color-contrast-600);
+            &:active {
+                @include color($color-contrast-700);
+            }
+            &:first-child {
+                @include border-right($color-borders);
+            }
         }
     }
 }

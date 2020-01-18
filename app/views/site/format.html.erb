@@ -1,108 +1,84 @@
-<link rel="stylesheet" media="all" href="<%= ENV["FONT_STYLESHEET"] %>">
+<% content_for :head do %>
+    <script>
+        if (window.feedbin == null) {
+            window.feedbin = {};
+        }
+        feedbin.data = <%= raw json_escape(@data.to_json) %>;
+        feedbin.data.tagNames = <%= raw json_escape(@user.tag_names.to_json) %>;
+        feedbin.count_data = <%= raw json_escape(@count_data.to_json) %>;
+        feedbin.data.viewMode = "<%= view_mode %>";
+        feedbin.Counts.get(feedbin.count_data);
+    </script>
+<% end %>
+
 <%= render partial: 'shared/svg' %>
-<div class="format-wrap theme-day">
+<div class="format-wrap theme-day" data-font-size="<%= cookies[:setting_font_size] || @user.font_size || 5 %>">
     <div class="format-palette">
-
-        <h3>Theme</h3>
-
-        <div class="theme-options">
-            <button class="reset">
-                <span class="swatch theme-color-day"></span>
-                Day
-            </button>
-            <button class="reset">
-                <span class="swatch theme-color-sunset"></span>
-                Sunset
-            </button>
-            <button class="reset">
-                <span class="swatch theme-color-dusk"></span>
-                Dusk
-            </button>
-            <button class="reset">
-                <span class="swatch theme-color-midnight"></span>
-                <span>Night</span>
-            </button>
-            <button class="reset">
-                <span class="swatch theme-color-auto"></span>
-                <span>Auto</span>
-            </button>
-        </div>
-
-        <h3 style="margin-bottom: 8px;">Typeface</h3>
-
-        <div class="control">
-            <div class="font-options">
-                <div class="option font-option-system" title="System">
-                    <%= radio_button_tag(:font_face, "system") %>
-                    <%= label_tag "font_face_system" do %>
-                        System <%= radio_button_control %>
-                    <% end %>
-                </div>
-                <div class="option font-option-mercury" title="Mercury">
-                    <%= radio_button_tag(:font_face, "mercury") %>
-                    <%= label_tag "font_face_mercury" do %>
-                        <%= svg_tag "font-mercury" %> <%= radio_button_control %>
-                    <% end %>
-                </div>
-                <div class="option font-option-ideal-sans" title="Ideal Sans">
-                    <%= radio_button_tag(:font_face, "ideal_sans") %>
-                    <%= label_tag "font_face_ideal_sans" do %>
-                        <%= svg_tag "font-ideal-sans" %> <%= radio_button_control %>
-                    <% end %>
-                </div>
-                <div class="option font-option-sentinel" title="Sentinel">
-                    <%= radio_button_tag(:font_face, "sentinel") %>
-                    <%= label_tag "font_face_sentinel" do %>
-                        <%= svg_tag "font-sentinel" %> <%= radio_button_control %>
-                    <% end %>
-                </div>
-                <div class="option font-option-whitney" title="Whitney">
-                    <%= radio_button_tag(:font_face, "whitney") %>
-                    <%= label_tag "font_face_whitney" do %>
-                        <%= svg_tag "font-whitney" %> <%= radio_button_control %>
-                    <% end %>
-                </div>
-                <div class="option font-option-georgia" title="Georgia">
-                    <%= radio_button_tag(:font_face, "georgia") %>
-                    <%= label_tag "font_face_georgia" do %>
-                        Georgia <%= radio_button_control %>
-                    <% end %>
-                </div>
+        <%= form_with(model: current_user, url: format_user_path(current_user)) do |f| %>
+            <%= f.hidden_field :font_size, data: {behavior: "font_size"} %>
+            <h3>Theme</h3>
+            <div class="theme-options">
+                <%= f.collection_radio_buttons(:theme, Feedbin::Application.config.themes, :slug, :name) do |b| %>
+                    <div class="option">
+                        <%= b.radio_button data: {behavior: "auto_submit switch_theme"} %>
+                        <%= b.label do %>
+                            <span class="swatch"></span>
+                            <%= b.text %>
+                        <% end %>
+                    </div>
+                <% end %>
             </div>
-        </div>
 
-        <h3>Font Size</h3>
-        <div class="control">
-            <span class="font-size">
-                <button class="reset">Smaller</button>
-                <button class="reset">Larger</button>
-            </span>
-        </div>
-
-
-        <div class="mobile-hide">
-            <h3>Display</h3>
+            <h3 style="margin-bottom: 8px;">Typeface</h3>
 
             <div class="control">
-                <ul class="control-group">
-                    <li>
-                        <input name="user[hide_recently_read]" type="hidden" value="1">
-                        <input data-behavior="auto_submit" type="checkbox" value="0" checked="checked" name="user[hide_recently_read]" id="user_hide_recently_read">
-                        <label for="user_hide_recently_read">
-                            Full screen
-                            <%= toggle_switch title: "shift + f", data: {toggle: "tooltip"} %>
-                        </label>
-                    </li>
-                    <li>
-                        <input type="checkbox" id="paragraph_width">
-                        <label for="paragraph_width">
-                            Fluid width
-                            <%= toggle_switch %>
-                        </label>
-                    </li>
-                </ul>
+                <div class="font-options">
+                    <%= f.collection_radio_buttons(:font, Feedbin::Application.config.fonts, :slug, :name) do |b| %>
+                        <div class="option">
+                            <%= b.radio_button data: {behavior: "auto_submit change_font"} %>
+                            <%= b.label do %>
+                                <% if icon_exists?("font-#{b.value}") %>
+                                    <%= svg_tag "font-#{b.value}" %>
+                                <% else %>
+                                    <%= b.text %>
+                                <% end %>
+                                <%= radio_button_control %>
+                            <% end %>
+                        </div>
+                    <% end %>
+                </div>
             </div>
-        </div>
 
+            <h3 style="margin-top: 16px;">Font Size</h3>
+            <div class="control">
+                <span class="font-size">
+                    <button class="reset" data-behavior="decrease_font">Smaller</button>
+                    <button class="reset" data-behavior="increase_font">Larger</button>
+                </span>
+            </div>
+
+            <div class="mobile-hide">
+                <h3>Display</h3>
+
+                <div class="control">
+                    <ul class="control-group">
+                        <li>
+                            <input data-behavior="auto_submit" type="checkbox" value="1" id="toggle_full_screen">
+                            <label for="toggle_full_screen">
+                                Full screen
+                                <%= toggle_switch title: "shift + f", data: {toggle: "tooltip"} %>
+                            </label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="paragraph_width">
+                            <label for="paragraph_width">
+                                Fluid width
+                                <%= toggle_switch %>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        <% end %>
     </div>
 </div>

@@ -107,6 +107,7 @@ Rails.application.routes.draw do
     member do
       patch :settings_update, controller: :settings
       patch :view_settings_update, controller: :settings
+      patch :format, controller: :settings
     end
   end
 
