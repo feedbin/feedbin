@@ -148,10 +148,6 @@ class User < ApplicationRecord
     self
   end
 
-  def get_view_mode
-    view_mode || "view_unread"
-  end
-
   def schedule_trial_jobs
     OnboardingMessage.perform_async(id, MarketingMailer.method(:onboarding_1_welcome).name.to_s)
     OnboardingMessage.perform_in(3.days, id, MarketingMailer.method(:onboarding_2_mobile).name.to_s)
@@ -504,10 +500,6 @@ class User < ApplicationRecord
 
   def trialing?
     plan == Plan.find_by_stripe_id("trial")
-  end
-
-  def display_prefs(cookies)
-    "font-size-#{cookies[:setting_font_size] || font_size || 5} font-#{cookies[:setting_font] || font || "default"}"
   end
 
   def twitter_credentials_valid?

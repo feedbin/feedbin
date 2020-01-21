@@ -3149,10 +3149,15 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     justify-content: center;
     padding: 0 8px;
 }
+
 .format-palette {
-    width: 335px;
+    width: 304px;
     padding: 8px 0 32px 0;
-    @include background-color($color-contrast-100);
+    z-index: 4;
+    @media (max-width: $small-breakpoint) {
+        padding: 0 0 24px 0;
+    }
+    @include background-color($color-base-alt);
     @include border($color-borders);
     border-radius: 4px;
     box-shadow: $box-shadow-dropdown;

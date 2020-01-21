@@ -1,8 +1,0 @@
-feedbin.updateStyles = function() {
-$("<link>").appendTo('head').attr({rel: "stylesheet"}).attr({href: "<%= url_for(update_styles_feeds_path(format: :css)) %>"});
-}
-<% if @delay %>
-    setTimeout(feedbin.updateStyles, 4000);
-<% else %>
-    feedbin.updateStyles();
-<% end %>

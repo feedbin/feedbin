@@ -1,8 +1,7 @@
-<script>
-    jQuery(function() {
-        $("<link>")
-            .appendTo('head')
-            .attr({rel: "stylesheet"})
-            .attr({href: "<%= url_for(update_styles_feeds_path(format: :css)) %>"});
-    });
-</script>
+<% if @update_ids.present? %>
+    <style>
+        <%= @update_ids %> {
+            display: none;
+        }
+    </style>
+<% end %>

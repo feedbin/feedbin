@@ -20,6 +20,7 @@ $.extend feedbin,
   jumpResultTemplate: null
   extractCache: {}
   previousContentView: 'default'
+  formatMenu: null
   hasShadowDOM: typeof(document.createElement("div").attachShadow) == "function"
   colorHash: new ColorHash
     lightness: [.3,.4,.5,.6,.7]
@@ -95,7 +96,7 @@ $.extend feedbin,
     ($(".modal.modal-purpose-search").data('bs.modal') || {})._isShown
 
   isRelated: (selector, element) ->
-    !!($(element).is(selector) || $(element).parents(selector).length)
+    !!($(element).is(selector) || $(element).closest(selector).length)
 
   showSearch: (val = '') ->
     $('body').addClass('search')
@@ -228,7 +229,7 @@ $.extend feedbin,
     "rgba(#{data.data[0]}, #{data.data[1]}, #{data.data[2]}, #{data.data[3]})"
 
   setNativeTheme: (calculateOverlay = false, timeout = 1) ->
-    if feedbin.native && feedbin.data && feedbin.data.theme
+    if feedbin.native && feedbin.data && feedbin.theme
       statusBar = if $("body").hasClass("theme-dusk") || $("body").hasClass("theme-midnight") then "lightContent" else "default"
       message = {
         action: "titleColor",
@@ -485,10 +486,9 @@ $.extend feedbin,
   appendEntries: (entries) ->
     $('.entries ul').append(entries)
 
-  formatEntries: (viewMode, lastUnread, viewType = null) ->
+  formatEntries: (lastUnread, viewType = null) ->
     $(document).trigger('feedbin:entriesLoaded')
     feedbin.viewType = viewType
-    feedbin.data.viewMode = viewMode
     feedbin.localizeTime()
     feedbin.applyUserTitles()
     feedbin.loadEntryImages()
@@ -1622,7 +1622,7 @@ $.extend feedbin,
 
     setViewMode: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event, xhr, settings) ->
-        settings.url = "#{settings.url}?view=#{feedbin.data.viewMode}"
+        settings.url = "#{settings.url}?view_mode=#{feedbin.data.viewMode}"
 
     clearEntry: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event) ->
@@ -1747,6 +1747,41 @@ $.extend feedbin,
 
     sortFeeds: ->
       feedbin.sortFeeds()
+
+    showFormatMenu: ->
+      $(document).on 'click', (event) ->
+        menu = $('.format-palette')
+        button = $('[data-behavior~=show_format_menu]')
+        if !feedbin.isRelated(menu, event.target) && !feedbin.isRelated(button, event.target) && feedbin.formatMenu
+          feedbin.formatMenu.destroy()
+          feedbin.formatMenu = null
+          menu.addClass('hide')
+
+      $(document).on 'click', '[data-behavior~=show_format_menu]', (event) ->
+        button = $(event.currentTarget)
+        menu = $('.format-palette')
+        if feedbin.formatMenu
+          feedbin.formatMenu.destroy()
+          feedbin.formatMenu = null
+          menu.addClass('hide')
+        else
+          options = {
+            placement: 'bottom',
+            modifiers: {
+              preventOverflow: {
+                padding: 7
+              },
+              offset: {
+                offset: "0, -5"
+              },
+              flip: {
+                enabled: false
+              },
+            }
+          }
+          feedbin.formatMenu = new Popper(button, menu, options)
+          menu.removeClass('hide')
+          event.stopPropagation()
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
@@ -2013,11 +2048,14 @@ $.extend feedbin,
         return
 
     entryWidth: ->
-      $(document).on 'click', '[data-behavior~=entry_width]', (event) ->
-        $('[data-behavior~=entry_content_target]').toggleClass('fluid')
-        $('body').toggleClass('fluid')
-        value = if $('body').hasClass('fluid') then 'fluid' else 'fixed'
-        return
+      $(document).on 'change', '[data-behavior~=entry_width]', (event) ->
+        onClass = "fluid-1"
+        offClass = "fluid-0"
+        target = $('[data-behavior~=entry_content_target], body')
+        if $(event.target).is(':checked')
+          target.removeClass('fluid-0').addClass('fluid-1')
+        else
+          target.removeClass('fluid-1').addClass('fluid-0')
 
     fullscreen: ->
       $(document).on 'click', '[data-behavior~=full_screen]', (event) ->

@@ -80,27 +80,6 @@ class FeedsController < ApplicationController
     end
   end
 
-  def toggle_updates
-    @user = current_user
-    subscription = @user.subscriptions.where(feed_id: params[:id]).take!
-    subscription.toggle!(:show_updates)
-    if params.key?(:inline)
-      @delay = false
-      unless @user.setting_on?(:update_message_seen)
-        @user.update_message_seen = "1"
-        @user.save
-        @delay = true
-      end
-    else
-      head :ok
-    end
-  end
-
-  def update_styles
-    user = current_user
-    @feed_ids = user.subscriptions.where(show_updates: false).pluck(:feed_id)
-  end
-
   def search
     @user = current_user
     if twitter_feed?(params[:q]) && !@user.twitter_enabled?

@@ -25,9 +25,13 @@
     </style>
     <%= javascript_include_tag "lib/lib"  %>
     <%= javascript_include_tag "application"  %>
-    <script>
-        feedbin.theme = "<%= current_user&.theme || "day" %>";
-    </script>
+    <% if current_user %>
+        <% present current_user do |user_presenter| %>
+            <script>
+                feedbin.theme = "<%= user_presenter.theme %>";
+            </script>
+        <% end %>
+    <% end %>
     <% if native? %>
         <%= javascript_include_tag "lib/turbolinks"  %>
         <script>

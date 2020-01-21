@@ -28,7 +28,7 @@ var callback = function() {
         feedbin.updateUnreads(<%= @all_unread ? "true" : "false" %>, unreads)
     <% end %>
 
-    feedbin.formatEntries("<%= j view_mode %>", "<%= j last_unread_date %>", "<%= @type %>")
+    feedbin.formatEntries("<%= j last_unread_date %>", "<%= @type %>")
     feedbin.preloadEntries(<%= @entries.map{ |entry| entry.id }.to_json.html_safe %>, <%= @force_preload ? "true" : "false" %>);
 }
 

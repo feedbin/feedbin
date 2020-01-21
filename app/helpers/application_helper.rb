@@ -20,14 +20,6 @@ module ApplicationHelper
     @mark_selected || false
   end
 
-  def view_mode
-    params[:view] || @user.get_view_mode
-  end
-
-  def view_mode_selected(mode)
-    "selected-mode" if mode == view_mode
-  end
-
   def rtl?(string)
     unless string.blank?
       rtl_test = /[\u0600-\u06FF]|[\u0750-\u077F]|[\u0590-\u05FF]|[\uFE70-\uFEFF]/m

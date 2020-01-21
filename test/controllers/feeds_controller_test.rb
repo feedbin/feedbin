@@ -88,22 +88,6 @@ class FeedsControllerTest < ActionController::TestCase
     end
   end
 
-  test "modify toggle update settings" do
-    login_as @user
-    feed = @user.feeds.first
-    subscription = @user.subscriptions.where(feed: feed).take!
-    post :toggle_updates, params: {id: feed}, xhr: true
-    assert_response :success
-    assert_not_equal subscription.show_updates, subscription.reload.show_updates
-  end
-
-  test "get update_styles" do
-    login_as @user
-    feed = @user.feeds.first
-    get :update_styles, xhr: true
-    assert_response :success
-  end
-
   private
 
   def push_prep(feed)
