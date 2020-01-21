@@ -221,7 +221,7 @@ class SettingsController < ApplicationController
   end
 
   def user_format_params
-    params.require(:user).permit(:font_size, :theme, :font, :entry_width, :view_mode)
+    params.require(:user).permit(:font_size, :theme, :font, :entry_width, :view_mode, :feeds_width, :entries_width)
   end
 
   def subscription_view_mode_params

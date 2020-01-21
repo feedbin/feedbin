@@ -7,7 +7,13 @@ class UserPresenter < BasePresenter
   end
 
   def entry_width
-    settings["entry_width"] || user.entry_width || "fixed"
+    result = settings["entry_width"] || user.entry_width || "fixed"
+    if result == "fluid"
+      result = "1"
+    elsif result == ""
+      result = "0"
+    end
+    result
   end
 
   def font
@@ -50,16 +56,26 @@ class UserPresenter < BasePresenter
     user.view_links_in_app || "0"
   end
 
-  def resizable(column)
-    widths = settings["column_widths"] || {}
-    template = 'data-resizable-name="%s"'
-    replacements = [column]
-    if width = widths[column]
-      template << ' style="width: %ipx"'
-      replacements << width.to_i
+  def feeds_width
+    settings["feeds_width"] || nil
+  end
+
+  def entries_width
+    settings["entries_width"] || nil
+  end
+
+  def feeds_width_style
+    width = feeds_width.try(:to_i)
+    if width.present? && width != 0
+      "width: #{width}px;"
     end
-    result = template % replacements
-    result.html_safe
+  end
+
+  def entries_width_style
+    width = entries_width.try(:to_i)
+    if width.present? && width != 0
+      "width: #{width}px;"
+    end
   end
 
   def display_prefs
@@ -76,7 +92,7 @@ class UserPresenter < BasePresenter
       [].tap do |array|
         array << "theme-" + theme
         array << view_mode
-        array << entry_width
+        array << "fluid-#{entry_width}"
         array << "entries-body-#{entries_body}"
         array << "entries-time-#{entries_time}"
         array << "entries-feed-#{entries_feed}"
@@ -90,7 +106,7 @@ class UserPresenter < BasePresenter
   def content_classes
     @content_classes ||= begin
       [].tap do |array|
-        array << entry_width
+        array << "fluid-#{entry_width}"
         array << display_prefs
       end.flatten.join(" ")
     end

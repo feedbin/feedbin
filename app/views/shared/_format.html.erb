@@ -3,6 +3,9 @@
         <%= form_with(model: user_presenter, url: format_user_path(current_user)) do |f| %>
             <%= f.hidden_field :font_size, data: {behavior: "font_size"} %>
             <%= f.hidden_field :view_mode, data: {behavior: "view_mode"} %>
+            <%= f.hidden_field :feeds_width, data: {behavior: "feeds_width"} %>
+            <%= f.hidden_field :entries_width, data: {behavior: "entries_width"} %>
+
             <h3>Theme</h3>
             <div class="theme-options">
                 <%= f.collection_radio_buttons(:theme, Feedbin::Application.config.themes, :slug, :name) do |b| %>
@@ -57,7 +60,7 @@
                             </label>
                         </li>
                         <li>
-                            <%= f.check_box :entry_width, {data: {behavior: "auto_submit entry_width"}}, "0", "1" %>
+                            <%= f.check_box :entry_width, {data: {behavior: "auto_submit entry_width"}} %>
                             <%= f.label :entry_width do %>
                                 Fluid width <%= toggle_switch %>
                             <% end %>

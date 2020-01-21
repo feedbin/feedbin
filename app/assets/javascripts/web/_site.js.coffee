@@ -1662,11 +1662,12 @@ $.extend feedbin,
         resize: (event, ui) ->
           measure()
         stop: (event, ui) ->
-          form = $('[data-behavior~=resizable_form]')
-          $('[name=column]', form).val($(ui.element).data('resizable-name'))
-          $('[name=width]', form).val(ui.size.width)
-          form.submit()
-          return
+          column = $(ui.element).data('resizable-name')
+          fieldName = "#{column}_width"
+          field = $("[data-behavior~=#{fieldName}]")
+          field.val(ui.size.width)
+          field.closest('form').submit()
+
       $('.feeds-column').resizable($.extend(defaults))
       $('.entries-column').resizable($.extend(defaults))
 

@@ -20,7 +20,7 @@
         <%= svg_tag "logo", size: "120x120" %>
     </div>
     <div class="app-wrap fade">
-        <div class="feeds-column app-panel" data-behavior="content_column" <%= user_presenter.resizable 'feeds' %>>
+        <div class="feeds-column app-panel" data-behavior="content_column" data-resizable-name="feeds" style="<%= user_presenter.feeds_width_style %>">>
             <div class="inner-column">
                 <div class="top-toolbar">
                     <button type="button" class="show-subscribe" data-behavior="show_subscribe open_modal" data-modal-target="subscribe"><%= svg_tag "icon-plus", size: "16x16" %></button>
@@ -37,7 +37,7 @@
                 <%= render partial: 'shared/feeds_toolbar' %>
             </div>
         </div>
-        <div class="entries-column app-panel" data-behavior="content_column" <%= user_presenter.resizable 'entries' %>>
+        <div class="entries-column app-panel" data-behavior="content_column" data-resizable-name="entries" style="<%= user_presenter.entries_width_style %>">
             <div class="inner-column">
                 <div class="entries-header" data-behavior="entries_header">
                     <button class="back-button" data-behavior="show_feeds">
@@ -122,7 +122,6 @@
     <%= render partial: "shared/modals/edit" %>
     <%= render partial: "shared/modals/search" %>
     <%= render partial: "shared/readability_loading" %>
-    <%= render partial: "shared/resizable_form" %>
     <%= render partial: "shared/saved_searches_count" %>
     <%= render partial: 'shared/format' %>
 
