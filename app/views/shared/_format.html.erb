@@ -53,10 +53,10 @@
                 <div class="control">
                     <ul class="control-group">
                         <li>
-                            <input data-behavior="auto_submit" type="checkbox" value="1" id="toggle_full_screen">
-                            <label for="toggle_full_screen">
-                                Full screen
-                                <%= toggle_switch title: "shift + f", data: {toggle: "tooltip"} %>
+                            <input type="checkbox" id="toggle_full_screen" data-behavior="toggle_full_screen">
+                            <label for="toggle_full_screen" class="inline">
+                                Full screen <span class="info">shift + f</span>
+                                <%= toggle_switch %>
                             </label>
                         </li>
                         <li>

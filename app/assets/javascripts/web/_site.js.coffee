@@ -2061,9 +2061,9 @@ $.extend feedbin,
     fullscreen: ->
       $(document).on 'click', '[data-behavior~=full_screen]', (event) ->
         feedbin.toggleFullScreen()
-        feedbin.closeEntryBasement()
-        event.preventDefault()
-        return
+
+      $(document).on 'change', '[data-behavior~=toggle_full_screen]', (event) ->
+        feedbin.toggleFullScreen()
 
     theme: ->
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->

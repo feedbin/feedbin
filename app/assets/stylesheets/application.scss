@@ -6358,6 +6358,14 @@ label.text-field {
         padding: 16px 0;
         margin: 0;
         text-decoration: none;
+        &.inline {
+            display: flex;
+        }
+        .info {
+            margin-left: auto;
+            @include color($color-contrast-400);
+            padding-right: 8px;
+        }
     }
     li > a {
         @include color($color-link);
@@ -6399,7 +6407,7 @@ label.text-field {
         @extend .visually-hidden;
     }
     input[type="checkbox"] + label, input[type="radio"] + label {
-        padding-right: 63px;
+        padding-right: 51px;
     }
     &.no-margin {
         margin-bottom: 0;
