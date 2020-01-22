@@ -49,7 +49,7 @@
                 <div class="search-wrap">
                     <%= form_tag search_entries_path, class: 'search-form', remote: true, method: :get, data: {behavior: 'search_form'} do %>
                         <div class="icon-wrap"><%= svg_tag "icon-search" %></div>
-                        <%= search_field_tag :query, params[:query], placeholder: 'Search', autocomplete: 'off' %>
+                        <%= search_field_tag :query, params[:query], placeholder: 'Search', autocorrect: "off", autocapitalize: "off", spellcheck: false %>
                     <% end %>
                     <div class="search-control">
                         <div class="search-toolbar">

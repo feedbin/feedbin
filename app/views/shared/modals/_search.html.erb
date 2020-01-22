@@ -1,6 +1,6 @@
 <% content_for :modal_content, flush: true do %>
     <form class="jump-search modal-header-input" data-behavior="jump_search">
-        <%= search_field_tag(:q, "", placeholder: 'Search', autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, data: { behavior: 'jump_menu autofocus'}) %>
+        <%= search_field_tag(:q, "", placeholder: 'Search', autocorrect: "off", autocapitalize: "off", spellcheck: false, data: { behavior: 'jump_menu autofocus'}) %>
         <span class="icon"><%= svg_tag "icon-search", size: "16x16" %></span>
     </form>
 <% end %>
