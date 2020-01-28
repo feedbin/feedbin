@@ -3,9 +3,7 @@
         <h2>Import & Export</h2>
     </div>
     <div class="inset">
-        <div class="inset-content">
-            <h4 class="group-header">Import</h4>
-        </div>
+        <h4 class="group-header">Import</h4>
         <% if ENV['AWS_ACCESS_KEY_ID'] %>
             <%= direct_upload_form_for @uploader do |f| %>
                 <ul class="control-group">
@@ -29,9 +27,7 @@
         <% end %>
     </div>
     <div class="inset">
-        <div class="inset-content">
-            <h4 class="group-header">Export</h4>
-        </div>
+        <h4 class="group-header">Export</h4>
         <ul class="control-group">
             <li>
                 <div class="form-control">

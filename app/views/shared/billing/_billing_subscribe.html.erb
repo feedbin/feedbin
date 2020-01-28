@@ -12,9 +12,7 @@
     <%= form_for @user, html: {id: "payment-form"} do |f| %>
         <%= f.hidden_field :stripe_token, id: 'stripe_token' %>
         <%= hidden_field_tag :redirect_to, settings_billing_url %>
-        <div class="inset-content">
-            <h4 class="group-header"><%= subscribe_title %></h4>
-        </div>
+        <h4 class="group-header"><%= subscribe_title %></h4>
         <ul class="control-group">
             <% @plans.each do |plan| %>
                 <li>
@@ -40,9 +38,7 @@
             <% end %>
         </ul>
         <div data-behavior="payment_method">
-            <div class="inset-content">
-                <h4 class="group-header">Payment Method</h4>
-            </div>
+            <h4 class="group-header">Payment Method</h4>
             <ul class="control-group">
                 <li data-behavior="billing_option_apple_pay">
                     <%= radio_button_tag("billing_method", "apple_pay", false, { data: {behavior: 'billing_method_radio'}}) %>
@@ -65,9 +61,7 @@
             </ul>
         </div>
         <div id="credit_card_payment" data-behavior="credit_card_details">
-            <div class="inset-content">
-                <h4 class="group-header">Card Details</h4>
-            </div>
+            <h4 class="group-header">Card Details</h4>
             <%= render partial: 'shared/credit_card_form' %>
         </div>
         <% @plans.each do |plan| %>

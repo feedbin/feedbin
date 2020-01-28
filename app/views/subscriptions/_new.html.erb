@@ -2,9 +2,7 @@
     <% valid_feed_ids = Rails.application.message_verifier(:valid_feed_ids).generate(feeds.map(&:id)) %>
     <%= hidden_field_tag "valid_feed_ids", valid_feed_ids %>
     <div class="inset">
-        <div class="inset-content">
-            <h4 class="group-header"><%= "Feed".pluralize(feeds.length) %></h4>
-        </div>
+        <h4 class="group-header"><%= "Feed".pluralize(feeds.length) %></h4>
 
         <div class="inset-content" style="margin-bottom: 51px;">
             <% feeds.each_with_index do |feed, index| %>
@@ -37,9 +35,8 @@
                 <% end %>
             <% end %>
         </div>
-        <div class="inset-content">
-            <h4 class="group-header">Tags</h4>
-        </div>
+
+        <h4 class="group-header">Tags</h4>
         <%= render partial: "shared/tag_fields", locals: {tag_editor: tag_editor} %>
         <%= submit_tag("Submit", class: "visually-hidden", tabindex: "-1", data: {behavior: "submit_add"}) %>
     </div>

@@ -1,8 +1,6 @@
 <div class="inset">
     <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
-        <div class="inset-content">
-            <h4 class="group-header"><%= f.label :receipt_info, "Receipt Info" %></h4>
-        </div>
+        <h4 class="group-header"><%= f.label :receipt_info, "Receipt Info" %></h4>
         <%= hidden_field_tag :redirect_to, settings_billing_url %>
         <div class="has-description">
             <ul class="control-group no-border">
