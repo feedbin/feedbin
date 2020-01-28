@@ -195,6 +195,13 @@ $focus-glow: 0px 0px 0px 4px $color-accent-blue-400;
 $focus-glow-inset: inset $focus-glow;
 $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
 
+$one-unit: 8px;
+$two-units: $one-unit * 2;
+$three-units: $one-unit * 3;
+$four-units: $one-unit * 4;
+$five-units: $one-unit * 5;
+$six-units: $one-unit * 6;
+$seven-units: $one-unit * 7;
 
 $color-sidebar: (
     debug:    color-sidebar,
@@ -1086,7 +1093,7 @@ table {
         border-radius: 0;
     }
     li {
-        @include settings-row;
+        padding: $two-units 0;
         margin: 0;
         @include border-bottom($color-borders);
         position: relative;
@@ -1098,7 +1105,7 @@ table {
             a {
                 display: block;
                 text-decoration: none;
-                @include settings-row;
+                padding: $two-units 0;
                 @include color($color-contrast-700);
                 z-index: 10;
                 position: relative;
@@ -1271,12 +1278,7 @@ table {
 }
 
 .inset {
-    margin: 0 0 56px 0;
-    .inset-content {
-        @include settings-row;
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
-    }
+    margin: 0 0 $seven-units 0;
     .pill-list {
         border-radius: 0;
         border-left: none;
@@ -6348,10 +6350,6 @@ label.text-field {
             text-align: right;
         }
     }
-    .table {
-        @include border-top($color-borders);
-        @include border-bottom($color-borders);
-    }
     label {
         user-select: none;
     }
@@ -6367,7 +6365,12 @@ label.text-field {
     &.no-margin {
         margin-bottom: 0;
     }
+}
+
+.inset, .control-group {
     .table {
+        @include border-top($color-borders);
+        @include border-bottom($color-borders);
         margin: 0;
         td {
             width: 33% !important;
@@ -9841,9 +9844,6 @@ button.close {
         @include background-color($color-base);
         padding-bottom: 0;
         margin-bottom: 0;
-    }
-    .feed-profile > .inset {
-        padding-top: 2px;
     }
     .control-group {
         padding: 0;

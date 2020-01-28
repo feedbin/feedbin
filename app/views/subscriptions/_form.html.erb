@@ -14,9 +14,7 @@
 
             <% content_for :modal_body do %>
                 <div class="inset">
-                    <div class="inset-content">
-                        <h4 class="group-header">Tags</h4>
-                    </div>
+                    <h4 class="group-header">Tags</h4>
                     <%= render partial: "shared/tag_fields", locals: {tag_editor: tag_editor} %>
                 </div>
             <% end %>

@@ -5,9 +5,7 @@
         </div>
         <div class="inset">
             <div class="preview-group">
-                <div class="inset-content">
-                    <h4 class="group-header">Preview</h4>
-                </div>
+                <h4 class="group-header">Preview</h4>
                 <ul class="control-group no-border">
                     <li class="theme-background <%= @classes %> no-border" data-behavior="entries_max_width class_target">
                         <div data-behavior="preview_min_height">
@@ -59,9 +57,9 @@
                     </li>
                 </ul>
             </div>
-            <div class="inset-content">
-                <h4 class="group-header">Display</h4>
-            </div>
+        </div>
+        <div class="inset">
+            <h4 class="group-header">Display</h4>
             <ul class="control-group">
                 <li>
                     <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block', data: {behavior: 'appearance_radio auto_submit', setting: 'entries-display'}}) %>
@@ -76,9 +74,9 @@
                     <% end %>
                 </li>
             </ul>
-            <div class="inset-content">
-                <h4 class="group-header">Interface Elements</h4>
-            </div>
+        </div>
+        <div class="inset">
+            <h4 class="group-header">Interface Elements</h4>
             <ul class="control-group">
                 <li>
                     <%= f.check_box :entries_feed, {checked: @user.entries_feed.nil? || @user.setting_on?(:entries_feed), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-feed'} } %>

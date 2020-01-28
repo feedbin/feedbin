@@ -4,11 +4,7 @@
     </div>
     <div class="inset">
         <%= form_for(@user) do |f| %>
-            <div class="inset-content">
-                <h4 class="group-header">
-                    <%= f.label :email, "Email" %>
-                </h4>
-            </div>
+            <h4 class="group-header"><%= f.label :email, "Email" %></h4>
             <%= render "shared/input" do %>
                 <%= f.email_field :email, placeholder: 'Email' %>
             <% end %>
@@ -19,9 +15,7 @@
     </div>
     <div class="inset">
         <%= form_for(@user) do |f| %>
-            <div class="inset-content">
-                <h4 class="group-header">Update Password</h4>
-            </div>
+            <h4 class="group-header">Update Password</h4>
             <div class="stacked-form">
                 <div class="input-group-wrap">
                     <%= f.label :old_password, "Old Password" %>
@@ -44,9 +38,7 @@
     <hr>
     <div class="inset">
         <%= form_for(@user, method: :delete, id: "delete_user") do |f| %>
-            <div class="inset-content">
-                <h4 class="group-header">Cancel Account</h4>
-            </div>
+            <h4 class="group-header">Cancel Account</h4>
             <div class="description-inset">
                 <p class="muted">Canceling your account will end your subscription immediately. All of your data will be deleted. You will receive a confirmation email with your feed subscriptions attached. <strong>You cannot undo this</strong>.</p>
             </div>
