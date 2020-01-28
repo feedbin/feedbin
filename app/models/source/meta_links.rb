@@ -19,13 +19,9 @@ class Source::MetaLinks < Source
 
   private
 
-  def document
-    @document ||= Nokogiri::HTML(@config[:request].body)
-  end
-
   def link_valid?(link)
     valid = false
-    types = ["application/rss+xml", "application/atom+xml"]
+    types = ["application/rss+xml", "application/atom+xml", "application/json"]
     if link["type"] && link["href"]
       type = link["type"].strip.downcase
       valid = types.include?(type)
