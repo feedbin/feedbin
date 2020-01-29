@@ -1,6 +1,6 @@
 <%= form_tag entry_extract_path(entry), method: :get, remote: true, data: {behavior: 'toggle_extract', entry_id: entry.id, feed_id: entry.feed_id, sticky_url: settings_sticky_path(entry.feed_id)}, class: 'entry-button-wrap' do %>
     <%= hidden_field_tag 'extract', !extract %>
-    <button class="entry-button button-toggle-content <%= 'active' if extract %>" title="Attempt to load full content">
+    <button class="entry-button button-toggle-content <%= 'active' if extract %>" title="Extract full content <i>c</i>" data-toggle="tooltip" data-html="true">
         <%= svg_tag 'icon-full-content', size: '16x14' %>
     </button>
 <% end %>

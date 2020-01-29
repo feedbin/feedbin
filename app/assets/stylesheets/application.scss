@@ -1010,6 +1010,9 @@ table {
 .table {
     width: 100%;
     margin-bottom: 20px;
+    th {
+        text-align: left;
+    }
 }
 
 .table thead > tr > th,
@@ -1830,15 +1833,17 @@ $hamburger-dot: 4px;
     }
     .toggle-search {
         align-items: center;
-        justify-content: flex-end;
+        justify-content: center;
         display: flex;
         appearance: none !important;
         border: none;
         padding: 0;
-        width: 40px;
+        width: 48px;
         height: 40px;
         background-color: transparent;
         transition: transform 0.2s ease;
+        position: relative;
+        right: -1rem;
         svg {
             @include fill($color-icons);
         }
@@ -4025,7 +4030,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         position: absolute;
         top: 6px;
         left: 6px;
-        @include fill((day: white, sunset: white, dusk: black, midnight: black));
+        @include fill($color-base);
         pointer-events: none;
     }
     .dropdown-content {
@@ -6367,7 +6372,6 @@ label.text-field {
         .info {
             margin-left: auto;
             @include color($color-contrast-400);
-            padding-right: 8px;
         }
     }
     li > a {
@@ -6470,23 +6474,6 @@ label.text-field {
     }
 }
 
-.key {
-    display: inline-block;
-    font-size: 16px;
-    font-weight: bold;
-    @include border($color-borders);
-    width: 32px;
-    line-height: 32px;
-    text-align: center;
-    border-radius: 4px;
-    box-shadow: 1px 1px 1px rgba(black, .4);
-    background-color: white;
-    color: map-get($color-contrast-700, day);
-}
-
-.key.wide {
-    width: 70px;
-}
 table.small td {
     font-size: 13px;
 }
@@ -9588,7 +9575,7 @@ button.close {
 
 .fade {
   opacity: 0;
-  transition: opacity 0.15s linear;
+  transition: opacity 0.1s linear;
 }
 
 .fade.show {
@@ -10034,4 +10021,32 @@ $tooltip-arrow-height: 6px;
     @include background-color($color-base-dark-700);
     border-radius: 4px;
     line-height: normal;
+}
+
+.tooltip i, .key {
+    margin-left: 16px;
+    display: inline-block;
+    font-style: normal;
+    font-weight: bold;
+    @include background-color($color-contrast-400);
+    padding: 2px 5px;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    font-family: $font-stack;
+    line-height: 1;
+    min-width: 16px;
+    color: white;
+    font-size: 12px;
+    text-align: center;
+    text-transform: capitalize;
+}
+.key {
+    box-shadow: none;
+    padding: 5px 7px;
+    margin: 0;
+    min-width: 28px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.1);
+    &.wide {
+        text-transform: lowercase;
+    }
 }

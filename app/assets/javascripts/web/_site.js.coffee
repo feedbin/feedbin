@@ -825,6 +825,13 @@ $.extend feedbin,
   removeOuterLinks: ->
     $('[data-behavior~=entry_final_content] a').find('video').unwrap()
 
+  tooltips: ->
+    $(document).tooltip
+      selector: '[data-toggle="tooltip"]'
+      delay:
+        show: 400
+        hide: 50
+
   preloadSiblings: ->
     selected = feedbin.selectedEntry.container.closest('li')
     siblings = selected.nextAll().slice(0,4).add(selected.prevAll().slice(0,4))
@@ -2635,7 +2642,7 @@ $.extend feedbin,
       feedbin.drawBarCharts()
 
     tooltips: ->
-      $('[data-toggle="tooltip"]').tooltip()
+      feedbin.tooltips()
 
     closeMessage: ->
       $(document).on 'click', '[data-behavior~=close_message]', (event) ->
@@ -2673,6 +2680,10 @@ $.extend feedbin,
           feedbin.changeContentView(mode)
         else
           feedbin.changeContentView('default')
+
+    hideTooltips: ->
+      $(document).on 'click', '[data-toggle="tooltip"]', (event) ->
+        $(@).tooltip('hide')
 
     copy: ->
       $(document).on 'click', '[data-behavior~=copy]', (event) ->
