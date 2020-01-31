@@ -63,6 +63,14 @@ class SubscriptionPresenter < BasePresenter
     end
   end
 
+  def sparkline(width, height)
+    sparkline = Sparkline.new(width, height, subscription.entries_count)
+    @template.content_tag :svg, width: width, height: height do
+      @template.content_tag(:polygon, "", points: sparkline.fill) +
+      @template.content_tag(:polyline, "", points: sparkline.line)
+    end
+  end
+
   private
 
   def counts

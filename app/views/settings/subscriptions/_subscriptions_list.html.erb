@@ -72,9 +72,8 @@
                                     </span>
                                 </span>
                                 <span class="subscription-controls">
-                                    <span class="canvas-wrap hidden" data-values="<%= subscription.entries_count %>" data-stroke="#07AC47" data-behavior="line_graph">
-                                        <%= content_tag :canvas, '', width: 97, height: 20 %>
-                                        <%= content_tag :canvas, '', width: 97, height: 20 %>
+                                    <span class="sparkline-wrap">
+                                        <%= subscription_presenter.sparkline(97, 20) %>
                                     </span>
                                     <%= svg_tag "icon-arrow" %>
                                 </span>

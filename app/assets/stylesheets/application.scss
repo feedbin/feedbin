@@ -6067,7 +6067,7 @@ Settings
             align-items: center;
             justify-content: flex-end;
             flex-shrink: 0;
-            svg {
+            .icon-arrow {
                 @include fill($color-contrast-300);
                 transform: scaleX(-1);
             }
@@ -6118,23 +6118,24 @@ Settings
                 flex-shrink: 1;
             }
         }
-        .canvas-wrap {
+        .sparkline-wrap {
             width: 97px;
-            height: 20px;
-            overflow-x: hidden;
-            overflow-y: visible;
-            z-index: 0;
+            height: 21px;
             margin-right: 16px;
-            line-height: 0;
             position: relative;
             @include background-color($color-base);
             background-image: linear-gradient(0deg, rgba($color-accent-green-600, 0), rgba($color-accent-green-600, 0.8));
-            canvas {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
+            svg {
+                polygon {
+                    @include fill($color-base);
+                }
+                polyline {
+                    stroke: $color-accent-green-600;
+                    fill: transparent;
+                    stroke-width: 2;
+                    stroke-linejoin: round;
+                    stroke-linecap: round;
+                }
             }
             @media (max-width: $small-breakpoint) {
                 display: none;

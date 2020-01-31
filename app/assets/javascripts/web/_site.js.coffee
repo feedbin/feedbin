@@ -353,16 +353,6 @@ $.extend feedbin,
 
     feedbin.jumpOptions = options
 
-  drawBarCharts: ->
-    $('[data-behavior~=line_graph]').each ()->
-      element = $(@)
-      fill = element.find("canvas")[0]
-      line = element.find("canvas")[1]
-
-      feedbin.drawBarChart(line, element.data('values'), element.data('stroke'))
-      feedbin.drawBarChartFill(fill, element.data('values'), element.css("backgroundColor"))
-    $('.canvas-wrap').removeClass('hidden')
-
   replaceModal: (target, body) ->
     modal = $(".#{target}")
     placeholderHeight = modal.find('.modal-dialog').outerHeight()
@@ -1054,86 +1044,6 @@ $.extend feedbin,
       type: "search"
       data: query
       message: message
-
-  buildPoints: (percentages, width, height) ->
-    barWidth = width / (percentages.length - 1)
-    x = 0
-
-    points = []
-    for percentage in percentages
-      y = (height - Math.round(percentage * height))
-      points.push({x: x, y: y})
-      x += barWidth
-
-    points
-
-  drawBarChartFill: (canvas, values, fill) ->
-    if values && canvas.getContext
-
-      context = canvas.getContext("2d")
-      canvasHeight = $(canvas).outerHeight()
-      canvasWidth = $(canvas).outerWidth()
-
-      ratio = 1
-      if 'devicePixelRatio' of window
-        ratio = window.devicePixelRatio
-
-      $(canvas).attr('width', canvasWidth * ratio)
-      $(canvas).attr('height', canvasHeight * ratio)
-      context.scale(ratio, ratio)
-
-      context.fillStyle = fill
-      context.lineWidth = 0
-
-      points = feedbin.buildPoints(values, canvasWidth, canvasHeight)
-
-      context.beginPath()
-      context.lineTo(0, canvasHeight)
-      for point, index in points
-        context.lineTo(point.x, point.y)
-
-      context.lineTo(100, canvasHeight)
-      context.lineTo(100, 0)
-      context.lineTo(0, 0)
-      context.fill()
-
-  drawBarChart: (canvas, values, stroke) ->
-    if values && canvas.getContext
-      lineTo = (x, y, context, height) ->
-        if y == 0
-          y = 1
-        if y == height
-          y = height - 1
-        context.lineTo(x, y)
-
-      context = canvas.getContext("2d")
-      canvasHeight = $(canvas).outerHeight()
-      canvasWidth = $(canvas).outerWidth()
-
-      ratio = 1
-      if 'devicePixelRatio' of window
-        ratio = window.devicePixelRatio
-
-      $(canvas).attr('width', canvasWidth * ratio)
-      $(canvas).attr('height', canvasHeight * ratio)
-      context.scale(ratio, ratio)
-
-      context.lineJoin = 'round'
-      context.strokeStyle = stroke
-      context.lineWidth = 2
-      context.lineCap = 'round'
-
-      points = feedbin.buildPoints(values, canvasWidth, canvasHeight)
-
-      context.beginPath()
-      for point, index in points
-        if index == 0
-          lineTo(point.x + 1, point.y, context, canvasHeight)
-        else if index == points.length - 1
-          lineTo(canvasWidth - 1, point.y, context, canvasHeight)
-        else
-          lineTo(point.x, point.y, context, canvasHeight)
-      context.stroke()
 
   readabilityActive: ->
     $('[data-behavior~=toggle_extract]').find('.active').length > 0
@@ -2598,9 +2508,6 @@ $.extend feedbin,
         field = $('.modal-purpose-subscribe [data-behavior~=feeds_search_field]')
         field.val(subscription)
         field.closest("form").submit()
-
-    drawBarCharts: ->
-      feedbin.drawBarCharts()
 
     tooltips: ->
       $('[data-toggle="tooltip"]').tooltip()
