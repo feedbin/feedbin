@@ -25,7 +25,7 @@ class UserPresenter < BasePresenter
   end
 
   def theme
-    settings["theme"] || user.theme || "day"
+    settings["theme"] || user.theme || "auto"
   end
 
   def view_mode

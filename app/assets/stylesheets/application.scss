@@ -3216,15 +3216,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                 }
             }
         }
-        .theme-auto {
-            display: none;
-            @media (prefers-color-scheme: dark) {
-                display: flex;
-            }
-            @media (prefers-color-scheme: light) {
-                display: flex;
-            }
-        }
     }
     :checked + label {
         .swatch:after {
@@ -7291,12 +7282,10 @@ input[type="text"].hide {
 
 .muted {
     @include color($color-contrast-600);
-    @include native-theme("color", $color-contrast-600);
 }
 
 .extra-muted {
     @include color($color-contrast-500);
-    @include native-theme("color", $color-contrast-500);
 }
 
 .faded {
@@ -7456,12 +7445,12 @@ a:hover.danger {
 Login and Sign Up
 ------------------------------------------------------------------------------*/
 .login {
-    @include native-theme("background-color", $color-contrast-100)
+    @include background-color($color-contrast-100);
     padding: 15px;
     display: flex;
     align-items: center;
     a {
-        @include native-theme("color", $color-link);
+        @include color($color-link);
     }
     .login-wrap {
         margin: auto;
@@ -7476,7 +7465,7 @@ Login and Sign Up
         svg {
             width: 180px !important;
             height: auto !important;
-            @include native-theme("fill", $color-contrast-700);
+            @include fill($color-contrast-700);
         }
     }
     .content {
@@ -7488,14 +7477,14 @@ Login and Sign Up
         font-weight: bold;
         text-align: center;
         margin: 0 0 15px 0;
-        @include native-theme("color", $color-contrast-700);
+        @include color($color-contrast-700);
     }
     .box {
         border: 1px solid transparent;
-        @include native-theme("border-color", $color-borders);
+        @include border-color($color-borders);
         border-radius: 4px;
         background-color: white;
-        @include native-theme("background-color", $color-base);
+        @include background-color($color-base);
         margin: 0 auto 14px auto;
         width: 100%;
         max-width: 400px;
@@ -7517,7 +7506,7 @@ Login and Sign Up
         display: block;
         margin: 10px 0 0 0;
         text-align: center;
-        @include native-theme("color", $color-contrast-500);
+        @include color($color-contrast-500);
     }
 
 }
