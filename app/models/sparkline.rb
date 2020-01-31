@@ -53,5 +53,7 @@ class Sparkline
 
   def y(percentage)
     ((1.00 - percentage.to_f) * (height - 1)).to_i
+  rescue
+    1.00 * (height - 1)
   end
 end
