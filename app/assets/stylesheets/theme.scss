@@ -13,12 +13,22 @@ $themes: day sunset dusk midnight;
 
     /* variable name: $#{map-get($map, debug)} */
     #{$property}: map-get($map, day) $extra;
+
+    @media (prefers-color-scheme: dark) {
+        #{$property}: map-get($map, dusk) $extra;
+    }
     @if $root {
         @at-root {
             @each $theme in $themes {
                 #{selector-append(".theme-#{$theme}", &)} {
                     /* variable name: $#{map-get($map, debug)} */
                     #{$property}: map-get($map, $theme) $extra;
+                }
+            }
+            #{selector-append(".theme-auto", &)} {
+                #{$property}: map-get($map, day) $extra;
+                @media (prefers-color-scheme: dark) {
+                    #{$property}: map-get($map, dusk) $extra;
                 }
             }
         }
@@ -30,13 +40,12 @@ $themes: day sunset dusk midnight;
                 #{$property}: map-get($map, $theme) $extra;
             }
         }
-    }
-}
-
-@mixin native-theme($property, $map) {
-    #{$property}: map-get($map, day);
-    @media (prefers-color-scheme: dark) {
-        #{$property}: map-get($map, dusk);
+        .theme-auto & {
+            #{$property}: map-get($map, day) $extra;
+            @media (prefers-color-scheme: dark) {
+                #{$property}: map-get($map, dusk) $extra;
+            }
+        }
     }
 }
 

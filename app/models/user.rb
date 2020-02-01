@@ -43,7 +43,9 @@ class User < ApplicationRecord
     :twitter_access_error,
     :nice_frames,
     :favicon_colors,
-    :newsletter_tag
+    :newsletter_tag,
+    :feeds_width,
+    :entries_width
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -146,10 +148,6 @@ class User < ApplicationRecord
       self.password_confirmation = params[:user][:password]
     end
     self
-  end
-
-  def get_view_mode
-    view_mode || "view_unread"
   end
 
   def schedule_trial_jobs
@@ -504,10 +502,6 @@ class User < ApplicationRecord
 
   def trialing?
     plan == Plan.find_by_stripe_id("trial")
-  end
-
-  def display_prefs
-    "font-size-#{font_size || 5} font-#{font || "default"}"
   end
 
   def twitter_credentials_valid?

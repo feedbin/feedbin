@@ -1,10 +1,4 @@
-<%
-hide_drawer = false
-if %w{view_unread view_starred}.include?(view_mode) && tag.count == 0 && !tag.user_feeds.present?
-  hide_drawer = true
-end
-%>
-<% cache [tag, tag.user_feeds, hide_drawer, drawer_visible?(tag.id)] do %>
+<% cache [tag, tag.user_feeds, drawer_visible?(tag.id)] do %>
     <li data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" data-behavior="droppable">
         <%= link_to tag_path(tag.id),
             remote: true,
@@ -34,7 +28,7 @@ end
                 <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byTag', count_group_id: tag.id} %>
             </span>
         <% end %>
-        <div class="drawer <%= hide_drawer ? ' hide' : '' %> <%= drawer_visible?(tag.id) ? '' : 'hidden' %>" data-hidden="<%= drawer_visible?(tag.id) ? 'false' : 'true' %>" style="<%= drawer_visible?(tag.id) ? '' : 'height: 0;' %>">
+        <div class="drawer <%= drawer_visible?(tag.id) ? '' : 'hidden' %>" data-hidden="<%= drawer_visible?(tag.id) ? 'false' : 'true' %>" style="<%= drawer_visible?(tag.id) ? '' : 'height: 0;' %>">
             <ul>
                 <%= render partial: "feeds/feed", collection: tag.user_feeds, cached: true %>
             </ul>

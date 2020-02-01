@@ -1,9 +1,9 @@
 <% if services.present? %>
     <div class="entry-button-wrap">
         <div class="dropdown-wrap button-toggle-share-menu entry-button">
-            <a class="entry-button" data-behavior="toggle_share_menu toggle_dropdown" href="#" title="Share">
-                <%= svg_tag 'icon-share', size: '16x16' %>
-            </a>
+            <button class="reset entry-button" data-behavior="toggle_share_menu toggle_dropdown" title="Share <i>f</i>" data-toggle="tooltip" data-html="true">
+                <%= svg_tag 'icon-share' %>
+            </button>
             <div class="dropdown-content">
                 <ul data-behavior="share_options">
                     <% services.each_with_index do |service, row| %>

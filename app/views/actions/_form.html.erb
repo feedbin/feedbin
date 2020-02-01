@@ -16,7 +16,7 @@
                     <%= form.label :query, "Search Terms" %>
                 </h4>
                 <%= render "shared/input" do %>
-                    <%= form.search_field :query, placeholder: 'For example: title:"[Sponsor]"' %>
+                    <%= form.search_field :query, placeholder: 'For example: title:"[Sponsor]"', autocorrect: "off", autocapitalize: "off", spellcheck: false %>
                 <% end %>
             </li>
         </ul>

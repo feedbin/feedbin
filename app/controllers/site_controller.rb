@@ -24,7 +24,7 @@ class SiteController < ApplicationController
       @recently_played = @user.recently_played_entries.where(entry_id: @user.now_playing_entry).first
 
       @show_welcome = subscriptions.present? ? false : true
-      @classes = user_classes
+      @update_ids = @user.subscriptions.where(show_updates: false).pluck(:feed_id).map { |feed_id| ".entry-feed-#{feed_id} .diff-wrap" }.join(', ')
       @data = {
         login_url: login_url,
         tags_path: tags_path(format: :json),
@@ -49,11 +49,9 @@ class SiteController < ApplicationController
         proxy_images: !@user.setting_on?(:disable_image_proxy),
         twitter_embed_path: twitter_embeds_path,
         instagram_embed_path: instagram_embeds_path,
-        theme: @user.theme || "day",
         favicon_colors: @user.setting_on?(:favicon_colors),
         font_stylesheet: ENV["FONT_STYLESHEET"],
         modal_extracts_path: modal_extracts_path,
-        settings_view_mode_path: settings_view_mode_path,
         progress: @user.recently_played_entries_progress,
         subscription_view_mode: subscription_view_settings,
       }

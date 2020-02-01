@@ -20,14 +20,6 @@ module ApplicationHelper
     @mark_selected || false
   end
 
-  def view_mode
-    params[:view] || @user.get_view_mode
-  end
-
-  def view_mode_selected(mode)
-    "selected-mode" if mode == view_mode
-  end
-
   def rtl?(string)
     unless string.blank?
       rtl_test = /[\u0600-\u06FF]|[\u0750-\u077F]|[\u0590-\u05FF]|[\uFE70-\uFEFF]/m
@@ -54,22 +46,34 @@ module ApplicationHelper
     current_user.try(:unread_entries).try(:order, "created_at DESC").try(:first).try(:created_at).try(:iso8601, 6)
   end
 
-  def svg_tag(name, options = {})
-    options = options.symbolize_keys
-
+  def get_icon(name)
     name = name.sub(".svg", "")
-
-    options.delete(:size)
-
     icon = Feedbin::Application.config.icons[name]
     if !icon
       file = "#{Rails.root}/app/assets/svg/#{name}.svg"
       if File.file?(file)
         icon = Feedbin::Application.config.icons[name] = SvgIcon.new_from_file(file)
-      else
-        raise "Icon missing #{name}"
       end
     end
+    icon
+  end
+
+  def icon_exists?(name)
+    get_icon(name).present?
+  end
+
+  def svg_tag(name, options = {})
+    options = options.symbolize_keys
+
+    name = name.sub(".svg", "")
+    options.delete(:size)
+
+    icon = get_icon(name)
+
+    unless icon
+      raise "Icon missing #{name}"
+    end
+
     options[:width] = icon.width
     options[:height] = icon.height
 
@@ -142,7 +146,11 @@ module ApplicationHelper
   end
 
   def toggle_switch(options = {})
-    content_tag :span, class: "switch #{options[:class]}" do
+    css_class = options.delete(:class)
+    defaults = {
+      class: "switch #{css_class}"
+    }
+    content_tag :span, defaults.merge(options) do
       content_tag :span, class: "switch-inner" do
         svg_tag "icon-check"
       end

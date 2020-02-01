@@ -25,7 +25,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   def wait_for_ajax
-    sleep 1
+    sleep 0.5
   end
 
   def finished_all_ajax_requests?

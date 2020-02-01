@@ -16,7 +16,6 @@ class SettingsController < ApplicationController
 
   def appearance
     @user = current_user
-    @classes = user_classes
   end
 
   def billing
@@ -151,31 +150,16 @@ class SettingsController < ApplicationController
     head :ok
   end
 
-  def font_increase
-    change_font_size("increase")
-  end
-
-  def font_decrease
-    change_font_size("decrease")
-  end
-
-  def font
+  def format
+    old_settings = JSON.parse(cookies.permanent.signed[:settings]) rescue {}
+    new_settings = user_format_params
+    cookies.permanent.signed[:settings] = {
+      value: JSON.generate(old_settings.merge(new_settings)),
+      httponly: true,
+      secure: Feedbin::Application.config.force_ssl
+    }
     @user = current_user
-    if Feedbin::Application.config.fonts.value?(params[:font])
-      @user.font = params[:font]
-      @user.save
-    end
-    head :ok
-  end
-
-  def theme
-    @user = current_user
-    themes = ["day", "dusk", "sunset", "midnight"]
-    if themes.include?(params[:theme])
-      @user.theme = params[:theme]
-      @user.save
-    end
-    head :ok
+    @user.update!(new_settings)
   end
 
   def sticky
@@ -192,18 +176,6 @@ class SettingsController < ApplicationController
     if @subscription.present?
       @subscription.update(subscription_view_mode_params)
     end
-  end
-
-  def entry_width
-    @user = current_user
-    new_width = if @user.entry_width.blank?
-      "fluid"
-    else
-      ""
-    end
-    @user.entry_width = new_width
-    @user.save
-    head :ok
   end
 
   def now_playing
@@ -229,33 +201,7 @@ class SettingsController < ApplicationController
     head :ok
   end
 
-  def view_mode
-    modes = ["view_unread", "view_starred", "view_all"]
-    if modes.include?(params[:mode])
-      update_view_mode(params[:mode])
-    end
-    head :ok
-  end
-
   private
-
-  def change_font_size(direction)
-    @user = current_user
-
-    current_font_size = @user.font_size.try(:to_i) || 5
-    new_font_size = if direction == "increase"
-      current_font_size + 1
-    else
-      current_font_size - 1
-    end
-
-    if Feedbin::Application.config.font_sizes[new_font_size] && new_font_size >= 0
-      @user.font_size = new_font_size
-      @user.save
-    end
-
-    head :ok
-  end
 
   def plan_exists
     render_404 unless Plan.exists?(params[:plan].to_i)
@@ -274,14 +220,12 @@ class SettingsController < ApplicationController
     params.require(:user).permit(:now_playing_entry)
   end
 
-  def subscription_view_mode_params
-    params.require(:subscription).permit(:view_mode)
+  def user_format_params
+    params.require(:user).permit(:font_size, :theme, :font, :entry_width, :view_mode, :feeds_width, :entries_width)
   end
 
-  def update_view_mode(view_mode)
-    @user = current_user
-    @view_mode = view_mode
-    @user.update(view_mode: @view_mode)
+  def subscription_view_mode_params
+    params.require(:subscription).permit(:view_mode)
   end
 
   def newsletters_pages

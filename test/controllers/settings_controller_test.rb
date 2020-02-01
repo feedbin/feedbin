@@ -142,63 +142,6 @@ class SettingsControllerTest < ActionController::TestCase
     assert_equal settings, @user.reload.settings
   end
 
-  test "should update view settings" do
-    login_as @user
-    tag = @user.feeds.first.tag("tag", @user).first.tag
-    params = {
-      id: @user,
-      tag_visibility: true,
-      tag: tag.id,
-      column_widths: true,
-      column: "test",
-      width: 1234,
-    }
-    patch :view_settings_update, params: params
-    assert_equal({tag.id.to_s => true}, @user.reload.tag_visibility)
-    assert_response :success
-    assert_equal session[:column_widths], {params[:column] => params[:width].to_s}
-  end
-
-  test "should increase font" do
-    @user.font_size = 7
-    @user.save
-    login_as @user
-
-    post :font_increase
-    assert_response :success
-    assert_equal (@user.font_size.to_i + 1).to_s, @user.reload.font_size
-  end
-
-  test "should decrease font" do
-    @user.font_size = 7
-    @user.save
-    login_as @user
-
-    post :font_decrease
-    assert_response :success
-    assert_equal (@user.font_size.to_i - 1).to_s, @user.reload.font_size
-  end
-
-  test "should change font" do
-    login_as @user
-    post :font, params: {font: Feedbin::Application.config.fonts.values.last}
-    assert_equal @user.reload.font, Feedbin::Application.config.fonts.values.last
-  end
-
-  test "should change theme" do
-    login_as @user
-    ["day", "dusk", "sunset", "midnight"].each do |theme|
-      post :theme, params: {theme: theme}
-      assert_equal(theme, @user.reload.theme)
-    end
-  end
-
-  test "should change entry width" do
-    login_as @user
-    post :entry_width
-    assert_not_equal @user.entry_width, @user.reload.entry_width
-  end
-
   test "should update now playing" do
     @feeds = create_feeds(@user)
     @entries = @user.entries
@@ -223,16 +166,6 @@ class SettingsControllerTest < ActionController::TestCase
     %w[minimized maximized].each do |audio_panel_size|
       post :audio_panel_size, params: {audio_panel_size: audio_panel_size}
       assert_equal(audio_panel_size, @user.reload.audio_panel_size)
-    end
-  end
-
-  test "view modes" do
-    login_as @user
-
-    %w[view_unread view_starred view_all].each do |view_mode|
-      get :view_mode, xhr: true, params: {mode: view_mode}
-      assert_response :success
-      assert_equal view_mode, @user.reload.view_mode
     end
   end
 

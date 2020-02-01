@@ -1,0 +1,73 @@
+<% present @user do |user_presenter| %>
+    <div class="format-palette hide">
+        <%= form_with(model: user_presenter, url: format_user_path(current_user)) do |f| %>
+            <%= f.hidden_field :font_size, data: {behavior: "font_size"} %>
+            <%= f.hidden_field :view_mode, data: {behavior: "view_mode"} %>
+            <%= f.hidden_field :feeds_width, data: {behavior: "feeds_width"} %>
+            <%= f.hidden_field :entries_width, data: {behavior: "entries_width"} %>
+
+            <h3>Theme</h3>
+            <div class="theme-options">
+                <%= f.collection_radio_buttons(:theme, Feedbin::Application.config.themes, :slug, :name) do |b| %>
+                    <div class="option">
+                        <%= b.radio_button data: {behavior: "auto_submit switch_theme"} %>
+                        <%= b.label do %>
+                            <span class="swatch"></span>
+                            <%= b.text %>
+                        <% end %>
+                    </div>
+                <% end %>
+            </div>
+
+            <h3 style="margin-bottom: 8px;">Typeface</h3>
+
+            <div class="control">
+                <div class="font-options">
+                    <%= f.collection_radio_buttons(:font, Feedbin::Application.config.fonts, :slug, :name) do |b| %>
+                        <div class="option">
+                            <%= b.radio_button data: {behavior: "auto_submit change_font"} %>
+                            <%= b.label do %>
+                                <% if icon_exists?("font-#{b.value}") %>
+                                    <%= svg_tag "font-#{b.value}" %>
+                                <% else %>
+                                    <%= b.text %>
+                                <% end %>
+                                <%= radio_button_control %>
+                            <% end %>
+                        </div>
+                    <% end %>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 16px;">Font Size</h3>
+            <div class="control">
+                <span class="font-size">
+                    <button class="reset" data-behavior="decrease_font">Smaller</button>
+                    <button class="reset" data-behavior="increase_font">Larger</button>
+                </span>
+            </div>
+
+            <div class="mobile-hide">
+                <h3>Display</h3>
+
+                <div class="control">
+                    <ul class="control-group">
+                        <li>
+                            <input type="checkbox" id="toggle_full_screen" data-behavior="toggle_full_screen">
+                            <label for="toggle_full_screen" class="inline">
+                                Full screen <span class="info"><span class="key wide">shift</span> <span class="key">f</span></span>
+                                <%= toggle_switch %>
+                            </label>
+                        </li>
+                        <li>
+                            <%= f.check_box :entry_width, {data: {behavior: "auto_submit entry_width"}} %>
+                            <%= f.label :entry_width do %>
+                                Fluid width <%= toggle_switch %>
+                            <% end %>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        <% end %>
+    </div>
+<% end %>

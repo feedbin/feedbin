@@ -293,6 +293,14 @@ body {
         background-color: map-get($color-base, midnight);
         color: map-get($color-contrast-700, midnight);
     }
+    &.theme-auto {
+        background-color: map-get($color-base, day);
+        color: map-get($color-contrast-700, day);
+        @media (prefers-color-scheme: dark) {
+            background-color: map-get($color-base, dusk);
+            color: map-get($color-contrast-700, dusk);
+        }
+    }
     @include respond-to(hidpi) {
         -moz-osx-font-smoothing: grayscale;
         -webkit-font-smoothing: antialiased;
@@ -1002,6 +1010,9 @@ table {
 .table {
     width: 100%;
     margin-bottom: 20px;
+    th {
+        text-align: left;
+    }
 }
 
 .table thead > tr > th,
@@ -1564,6 +1575,12 @@ Structure
     &.theme-midnight {
         scrollbar-color: map-get($color-contrast-400, midnight) map-get($color-contrast-200, midnight);
     }
+    &.theme-auto {
+        scrollbar-color: map-get($color-contrast-400, day) map-get($color-contrast-200, day);
+        @media (prefers-color-scheme: dark) {
+            scrollbar-color: map-get($color-contrast-400, dusk) map-get($color-contrast-200, dusk);
+        }
+    }
 }
 
 .hamburger-menu-wrap {
@@ -1816,15 +1833,17 @@ $hamburger-dot: 4px;
     }
     .toggle-search {
         align-items: center;
-        justify-content: flex-end;
+        justify-content: center;
         display: flex;
         appearance: none !important;
         border: none;
         padding: 0;
-        width: 40px;
+        width: 48px;
         height: 40px;
         background-color: transparent;
         transition: transform 0.2s ease;
+        position: relative;
+        right: -1rem;
         svg {
             @include fill($color-icons);
         }
@@ -3091,18 +3110,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .entry-basement.open &:before {
         visibility: visible;
     }
-    &.entry-settings {
-        display: flex;
-        -webkit-overflow-scrolling: touch;
-        .touch & {
-            overflow-x: scroll;
-        }
-        .setting-wrap {
-            display: flex;
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-    }
     &.feed-settings {
         display: flex;
         align-items: stretch;
@@ -3134,165 +3141,191 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             right: auto;
         }
     }
-    .setting-wrap {
-        @include border-right($color-borders);
-        display: block;
-        padding: 0;
-    }
-    .font-settings {
-        position: relative;
-        select {
-            @include background-color($color-contrast-100);
-            width: 115px;
-            padding: 0;
-            @include font-size(13);
-            line-height: 1.1;
-            border: none;
-            border-radius: 0;
-            height: 47px;
-            appearance: none;
-            margin: 0 0 0 8px;
-            padding: 0;
-            @include color($color-contrast-700);
-            position: relative;
-        }
-        &:after {
-            width: 0px;
-            height: 0px;
-            border-style: solid;
-            border-width: 5px 4px 0 4px;
-            border-color: map-get($color-contrast-700, day) transparent transparent transparent;
-            content: "";
-            position: absolute;
-            right: 9px;
-            top: 23px;
-            pointer-events: none;
-            .theme-dusk &, .theme-midnight & {
-                border-top-color: white;
-            }
-        }
-    }
-    .button-increase-font, .button-decrease-font, .button-entry-width, .button-full-screen {
-        width: 48px;
-        display: block;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        svg {
-            @include fill($color-icons);
-            pointer-events: none;
-        }
-    }
-    .button-entry-width {
-        .icon-entry-width-fixed {
-            display: none;
-        }
-        .fluid & {
-            .icon-entry-width-fluid {
-                display: none;
-            }
-            .icon-entry-width-fixed {
-                display: block;
-            }
-        }
-    }
-    .button-full-screen {
-        .icon-full-screen-close {
-            display: none;
-        }
-        .full-screen & {
-            .icon-full-screen-open {
-                display: none;
-            }
-            .icon-full-screen-close {
-                display: block;
-            }
-        }
-    }
-    .theme-settings {
-        position: relative;
-        padding-right: 10px;
-        align-items: center;
-        .theme-button {
-            position: relative;
-            height: 32px;
-            width: 32px;
-            cursor: pointer;
-            border: 1px solid black;
-            border-radius: 2px;
-            margin-left: 10px;
-            &:before,
-            &:after,
-            .theme-button-inner:before,
-            .theme-button-inner:after {
-                left: 6px;
-                height: 2px;
-                position: absolute;
-                content: "";
-                display: block;
-                width: 18px;
-                background-color: black;
-            }
-            &:before {
-                top: 8px;
-            }
-            &:after {
-                top: 12px;
-            }
-            .theme-button-inner {
-                height: 100%;
-                width: 100%;
-                &:before {
-                    top: 16px;
-                }
-                &:after {
-                    top: 20px;
-                }
-            }
-        }
-        .theme-button-day {
-            background-color: map-get($color-base, day);
-            .theme-day & {
-                @include border-color($color-selected);
-            }
-        }
-        .theme-button-sunset {
-            background-color: map-get($color-base, sunset);
-            .theme-sunset & {
-                @include border-color($color-selected);
-            }
-        }
-        .theme-button-dusk {
-            background-color: map-get($color-base, dusk);
-            &:before,
-            &:after,
-            .theme-button-inner:before,
-            .theme-button-inner:after {
-                background-color: white;
-            }
-            .theme-dusk & {
-                @include border-color($color-selected);
-            }
-        }
-        .theme-button-midnight {
-            background-color: map-get($color-base, midnight);
-            &:before,
-            &:after,
-            .theme-button-inner:before,
-            .theme-button-inner:after {
-                background-color: white;
-            }
-            .theme-midnight & {
-                @include border-color($color-selected);
-            }
-        }
-    }
     .touch.has-offscreen-panels & {
         &:before, &:after {
             display: none;
         }
     }
+}
+
+.format-wrap {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+}
+
+.format-palette {
+    width: 304px;
+    padding: 8px 0 32px 0;
+    z-index: 4;
+    @media (max-width: $small-breakpoint) {
+        padding: 0 0 24px 0;
+    }
+    @include background-color($color-base-alt);
+    @include border($color-borders);
+    border-radius: 4px;
+    box-shadow: $box-shadow-dropdown;
+    input[type="radio"] {
+        @extend .visually-hidden;
+    }
+
+    h3 {
+        @include font-size(16);
+        font-weight: bold;
+        margin: 24px 16px 16px 16px;
+    }
+    .control-group {
+        margin: 0;
+    }
+    .control {
+        margin: 0 16px;
+    }
+    $size: 40px;
+    .theme-options {
+        margin: 0 16px;
+        display: flex;
+        justify-content: space-between;
+        label {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: $size;
+            @include font-size(12);
+            overflow: visible;
+            .swatch {
+                height: $size;
+                width: $size;
+                border-radius: 50%;
+                @include border($color-contrast-400);
+                margin-bottom: 8px;
+                &:after {
+                    display: block;
+                    content: "";
+                    width: 50px;
+                    height: 50px;
+                    border: 4px solid transparent;
+                    border-radius: 50%;
+                    position: relative;
+                    top: -6px;
+                    left: -6px;
+                    pointer-events: none;
+                }
+            }
+        }
+    }
+    :checked + label {
+        .swatch:after {
+            border-color: $color-accent-blue-400;
+        }
+    }
+    label[for="user_theme_day"] .swatch {
+        background-color: $theme-color-base;
+    }
+    label[for="user_theme_sunset"] .swatch {
+        background-color: $theme-color-sunset-base;
+    }
+    label[for="user_theme_dusk"] .swatch {
+        background-color: $theme-color-dusk-base;
+    }
+    label[for="user_theme_midnight"] .swatch {
+        background-color: $theme-color-midnight-base;
+        .theme-midnight &.swatch:after {
+            border-color: $color-accent-blue-400;
+        }
+    }
+    label[for="user_theme_auto"] .swatch {
+        position: relative;
+        background-color: $theme-color-base;
+        &:before {
+            $size: $size - 2;
+            right: 0;
+            top: 0;
+            position: absolute;
+            border-top-right-radius: $size * 2;
+            border-bottom-right-radius: $size * 2;
+            width: 19px;
+            height: 38px;
+            background-color: $theme-color-dusk-base;
+            content: "";
+            display: block;
+        }
+    }
+    .font-options {
+        display: flex;
+        flex-wrap: wrap;
+        .option {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0;
+            flex: 1 1 50%;
+            font-size: 18px;
+            @include color($color-contrast-600);
+            svg {
+                @include fill($color-contrast-600);
+            }
+            label {
+                width: 100%;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                flex-direction: row-reverse;
+                justify-content: flex-end;
+            }
+            .font-serif-2 {
+                position: relative;
+                bottom: -3px;
+            }
+            .font-sans-serif-1 {
+                position: relative;
+                bottom: -2px;
+            }
+        }
+        .radio-button {
+            position: relative;
+            margin-right: 8px;
+            top: auto;
+            right: auto;
+            bottom: auto;
+            left: auto;
+        }
+        .option svg {
+            margin-left: 1px;
+        }
+        label[for="user_font_serif-3"] {
+            font-family: Georgia, serif;
+        }
+    }
+    .font-size {
+        display: flex;
+        @include border-bottom($color-borders);
+        @include border-top($color-borders);
+        button {
+            font-size: 16px;
+            padding: 16px;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            @include color($color-contrast-600);
+            &:active {
+                @include color($color-contrast-700);
+            }
+            &:first-child {
+                @include border-right($color-borders);
+            }
+        }
+    }
+}
+.fonts {
+    padding: 100px;
+}
+.fonts .content-styles {
+    font-size: 72px !important;
+    color: black !important;
 }
 
 .entry-column {
@@ -3526,7 +3559,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
 }
 
-.fluid .entry-inner {
+.fluid .entry-inner, .fluid-1 .entry-inner {
     max-width: 100%;
 }
 
@@ -3699,6 +3732,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         width: 200px;
         border-radius: 4px;
         @include background-color($color-base-alt);
+        @include border($color-borders);
         box-shadow: $box-shadow-dropdown;
         position: absolute;
         z-index: 10000;
@@ -3987,7 +4021,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         position: absolute;
         top: 6px;
         left: 6px;
-        @include fill((day: white, sunset: white, dusk: black, midnight: black));
+        @include fill($color-base);
         pointer-events: none;
     }
     .dropdown-content {
@@ -5047,7 +5081,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         .profile-image-wrap {
             position: absolute;
             left: -60px;
-            .fluid & {
+            .fluid &, .fluid-1 & {
                 position: static;
             }
         }
@@ -5058,7 +5092,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             position: absolute;
             top: -2px;
             left: -30px;
-            .fluid & {
+            .fluid &, .fluid-1 & {
                 position: static;
             }
         }
@@ -5200,7 +5234,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     max-width: 100%;
     background-color: white;
     overflow: hidden;
-    box-shadow: $box-shadow-dropdown;
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.05);;
     display: flex;
     justify-content: center;
 }
@@ -6324,6 +6358,13 @@ label.text-field {
         padding: 16px 0;
         margin: 0;
         text-decoration: none;
+        &.inline {
+            display: flex;
+        }
+        .info {
+            margin-left: auto;
+            @include color($color-contrast-400);
+        }
     }
     li > a {
         @include color($color-link);
@@ -6361,7 +6402,7 @@ label.text-field {
         @extend .visually-hidden;
     }
     input[type="checkbox"] + label, input[type="radio"] + label {
-        padding-right: 63px;
+        padding-right: 51px;
     }
     &.no-margin {
         margin-bottom: 0;
@@ -6425,23 +6466,6 @@ label.text-field {
     }
 }
 
-.key {
-    display: inline-block;
-    font-size: 16px;
-    font-weight: bold;
-    @include border($color-borders);
-    width: 32px;
-    line-height: 32px;
-    text-align: center;
-    border-radius: 4px;
-    box-shadow: 1px 1px 1px rgba(black, .4);
-    background-color: white;
-    color: map-get($color-contrast-700, day);
-}
-
-.key.wide {
-    width: 70px;
-}
 table.small td {
     font-size: 13px;
 }
@@ -7259,12 +7283,10 @@ input[type="text"].hide {
 
 .muted {
     @include color($color-contrast-600);
-    @include native-theme("color", $color-contrast-600);
 }
 
 .extra-muted {
     @include color($color-contrast-500);
-    @include native-theme("color", $color-contrast-500);
 }
 
 .faded {
@@ -7420,17 +7442,16 @@ a:hover.danger {
 }
 
 
-
 /*------------------------------------------------------------------------------
 Login and Sign Up
 ------------------------------------------------------------------------------*/
 .login {
-    @include native-theme("background-color", $color-contrast-100)
+    @include background-color($color-contrast-100);
     padding: 15px;
     display: flex;
     align-items: center;
     a {
-        @include native-theme("color", $color-link);
+        @include color($color-link);
     }
     .login-wrap {
         margin: auto;
@@ -7445,7 +7466,7 @@ Login and Sign Up
         svg {
             width: 180px !important;
             height: auto !important;
-            @include native-theme("fill", $color-contrast-700);
+            @include fill($color-contrast-700);
         }
     }
     .content {
@@ -7457,14 +7478,14 @@ Login and Sign Up
         font-weight: bold;
         text-align: center;
         margin: 0 0 15px 0;
-        @include native-theme("color", $color-contrast-700);
+        @include color($color-contrast-700);
     }
     .box {
         border: 1px solid transparent;
-        @include native-theme("border-color", $color-borders);
+        @include border-color($color-borders);
         border-radius: 4px;
         background-color: white;
-        @include native-theme("background-color", $color-base);
+        @include background-color($color-base);
         margin: 0 auto 14px auto;
         width: 100%;
         max-width: 400px;
@@ -7486,7 +7507,7 @@ Login and Sign Up
         display: block;
         margin: 10px 0 0 0;
         text-align: center;
-        @include native-theme("color", $color-contrast-500);
+        @include color($color-contrast-500);
     }
 
 }
@@ -9544,7 +9565,7 @@ button.close {
 
 .fade {
   opacity: 0;
-  transition: opacity 0.15s linear;
+  transition: opacity 0.1s linear;
 }
 
 .fade.show {
@@ -9990,4 +10011,32 @@ $tooltip-arrow-height: 6px;
     @include background-color($color-base-dark-700);
     border-radius: 4px;
     line-height: normal;
+}
+
+.tooltip i, .key {
+    margin-left: 16px;
+    display: inline-block;
+    font-style: normal;
+    font-weight: bold;
+    @include background-color($color-contrast-400);
+    padding: 2px 5px;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    font-family: $font-stack;
+    line-height: 1;
+    min-width: 16px;
+    color: white;
+    font-size: 12px;
+    text-align: center;
+    text-transform: capitalize;
+}
+.key {
+    box-shadow: none;
+    padding: 5px 7px;
+    margin: 0;
+    min-width: 28px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.1);
+    &.wide {
+        text-transform: lowercase;
+    }
 }

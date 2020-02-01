@@ -1,4 +1,6 @@
-<% @class = "settings-body settings-#{params[:action]} theme-#{@user.theme || "day"}"%>
+<% present @user do |user_presenter| %>
+    <% @class = "settings-body settings-#{params[:action]} theme-#{user_presenter.theme}"%>
+<% end %>
 <% content_for :content do %>
 <div class="settings settings-page">
     <%= render partial: 'shared/notification' %>

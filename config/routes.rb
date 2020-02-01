@@ -106,6 +106,7 @@ Rails.application.routes.draw do
     member do
       patch :settings_update, controller: :settings
       patch :view_settings_update, controller: :settings
+      patch :format, controller: :settings
     end
   end
 
@@ -117,12 +118,10 @@ Rails.application.routes.draw do
       get :view_all
       get :view_starred
       get :auto_update
-      get :update_styles
       post :search
     end
     member do
       match :push, via: [:post, :get]
-      post :toggle_updates
       get :modal_edit
       get :edit_tags
       get :pages, to: "pages_entries#index"
@@ -171,14 +170,8 @@ Rails.application.routes.draw do
     get :newsletters_pages
     post :update_credit_card
     post :update_plan
-    post :font
-    post :theme
-    post :font_increase
-    post :font_decrease
-    post :entry_width
     post :now_playing
     post :audio_panel_size
-    post :view_mode
   end
 
   post "settings/sticky/:feed_id", as: :settings_sticky, to: "settings#sticky"

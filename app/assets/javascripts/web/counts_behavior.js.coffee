@@ -96,13 +96,12 @@ class feedbin.CountsBehavior
     feedbin.hideQueue.length = 0
     element = $(event.currentTarget)
 
-    element.closest('form').submit()
-
     feedbin.data.viewMode = element.data('view-mode')
-    $.post(feedbin.data.settings_view_mode_path, {mode: feedbin.data.viewMode})
 
     $('body').removeClass('view_all view_unread view_starred');
     $('body').addClass(feedbin.data.viewMode);
+    viewModeField = $('[data-behavior~=view_mode]')
+    viewModeField.val(feedbin.data.viewMode)
 
     selected = $(".feeds .selected")
     feedID = selected.data('feed-id')
@@ -121,6 +120,8 @@ class feedbin.CountsBehavior
       $('[data-behavior~=feeds_target] li:visible').first().find('a')[0].click();
 
     $('[data-behavior~=change_view_mode]').blur()
+    viewModeField.closest('form').submit()
+
 
   showEntryContent: (event, xhr) =>
     container = $(event.currentTarget)

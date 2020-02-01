@@ -20,6 +20,7 @@ $.extend feedbin,
   jumpResultTemplate: null
   extractCache: {}
   previousContentView: 'default'
+  formatMenu: null
   hasShadowDOM: typeof(document.createElement("div").attachShadow) == "function"
   colorHash: new ColorHash
     lightness: [.3,.4,.5,.6,.7]
@@ -95,7 +96,7 @@ $.extend feedbin,
     ($(".modal.modal-purpose-search").data('bs.modal') || {})._isShown
 
   isRelated: (selector, element) ->
-    !!($(element).is(selector) || $(element).parents(selector).length)
+    !!($(element).is(selector) || $(element).closest(selector).length)
 
   showSearch: (val = '') ->
     $('body').addClass('search')
@@ -228,7 +229,7 @@ $.extend feedbin,
     "rgba(#{data.data[0]}, #{data.data[1]}, #{data.data[2]}, #{data.data[3]})"
 
   setNativeTheme: (calculateOverlay = false, timeout = 1) ->
-    if feedbin.native && feedbin.data && feedbin.data.theme
+    if feedbin.native && feedbin.data && feedbin.theme
       statusBar = if $("body").hasClass("theme-dusk") || $("body").hasClass("theme-midnight") then "lightContent" else "default"
       message = {
         action: "titleColor",
@@ -475,10 +476,9 @@ $.extend feedbin,
   appendEntries: (entries) ->
     $('.entries ul').append(entries)
 
-  formatEntries: (viewMode, lastUnread, viewType = null) ->
+  formatEntries: (lastUnread, viewType = null) ->
     $(document).trigger('feedbin:entriesLoaded')
     feedbin.viewType = viewType
-    feedbin.data.viewMode = viewMode
     feedbin.localizeTime()
     feedbin.applyUserTitles()
     feedbin.loadEntryImages()
@@ -815,6 +815,13 @@ $.extend feedbin,
   removeOuterLinks: ->
     $('[data-behavior~=entry_final_content] a').find('video').unwrap()
 
+  tooltips: ->
+    $(document).tooltip
+      selector: '[data-toggle="tooltip"]'
+      delay:
+        show: 400
+        hide: 50
+
   preloadSiblings: ->
     selected = feedbin.selectedEntry.container.closest('li')
     siblings = selected.nextAll().slice(0,4).add(selected.prevAll().slice(0,4))
@@ -877,11 +884,11 @@ $.extend feedbin,
       newFontSize = currentFontSize + 1
     else
       newFontSize = currentFontSize - 1
-    if feedbin.data.font_sizes[newFontSize]
+    if feedbin.data && feedbin.data.font_sizes && feedbin.data.font_sizes[newFontSize]
       fontContainer.removeClass("font-size-#{currentFontSize}")
       fontContainer.addClass("font-size-#{newFontSize}")
       fontContainer.data('font-size', newFontSize)
-      # localStorage.setItem('font-size', newFontSize);
+      $('[data-behavior~=font_size]').val(newFontSize)
 
   matchHeights: (elements) ->
     height = 0
@@ -1532,7 +1539,7 @@ $.extend feedbin,
 
     setViewMode: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event, xhr, settings) ->
-        settings.url = "#{settings.url}?view=#{feedbin.data.viewMode}"
+        settings.url = "#{settings.url}?view_mode=#{feedbin.data.viewMode}"
 
     clearEntry: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event) ->
@@ -1572,11 +1579,12 @@ $.extend feedbin,
         resize: (event, ui) ->
           measure()
         stop: (event, ui) ->
-          form = $('[data-behavior~=resizable_form]')
-          $('[name=column]', form).val($(ui.element).data('resizable-name'))
-          $('[name=width]', form).val(ui.size.width)
-          form.submit()
-          return
+          column = $(ui.element).data('resizable-name')
+          fieldName = "#{column}_width"
+          field = $("[data-behavior~=#{fieldName}]")
+          field.val(ui.size.width)
+          field.closest('form').submit()
+
       $('.feeds-column').resizable($.extend(defaults))
       $('.entries-column').resizable($.extend(defaults))
 
@@ -1657,6 +1665,41 @@ $.extend feedbin,
 
     sortFeeds: ->
       feedbin.sortFeeds()
+
+    showFormatMenu: ->
+      $(document).on 'click', (event) ->
+        menu = $('.format-palette')
+        button = $('[data-behavior~=show_format_menu]')
+        if !feedbin.isRelated(menu, event.target) && !feedbin.isRelated(button, event.target) && feedbin.formatMenu
+          feedbin.formatMenu.destroy()
+          feedbin.formatMenu = null
+          menu.addClass('hide')
+
+      $(document).on 'click', '[data-behavior~=show_format_menu]', (event) ->
+        button = $(event.currentTarget)
+        menu = $('.format-palette')
+        if feedbin.formatMenu
+          feedbin.formatMenu.destroy()
+          feedbin.formatMenu = null
+          menu.addClass('hide')
+        else
+          options = {
+            placement: 'bottom',
+            modifiers: {
+              preventOverflow: {
+                padding: 7
+              },
+              offset: {
+                offset: "0, -5"
+              },
+              flip: {
+                enabled: false
+              },
+            }
+          }
+          feedbin.formatMenu = new Popper(button, menu, options)
+          menu.removeClass('hide')
+          event.stopPropagation()
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
@@ -1904,7 +1947,6 @@ $.extend feedbin,
     formatToolbar: ->
       selectedFont = $("[data-font]").data('font')
       feedbin.fonts(selectedFont)
-      $('[data-behavior~=change_font]').val(selectedFont)
       $('[data-behavior~=change_font]').change ->
         fontContainer = $("[data-font]")
         currentFont = fontContainer.data('font')
@@ -1912,9 +1954,7 @@ $.extend feedbin,
         fontContainer.removeClass("font-#{currentFont}")
         fontContainer.addClass("font-#{newFont}")
         fontContainer.data('font', newFont)
-        $(@).parents('form').submit()
         feedbin.fonts(newFont)
-        # localStorage.setItem('font', newFont);
 
     fontSize: ->
       $(document).on 'click', '[data-behavior~=increase_font]', (event) ->
@@ -1926,32 +1966,31 @@ $.extend feedbin,
         return
 
     entryWidth: ->
-      $(document).on 'click', '[data-behavior~=entry_width]', (event) ->
-        $('[data-behavior~=entry_content_target]').toggleClass('fluid')
-        $('body').toggleClass('fluid')
-        value = if $('body').hasClass('fluid') then 'fluid' else 'fixed'
-        # localStorage.setItem('layout-width', value);
-        return
+      $(document).on 'change', '[data-behavior~=entry_width]', (event) ->
+        onClass = "fluid-1"
+        offClass = "fluid-0"
+        target = $('[data-behavior~=entry_content_target], body')
+        if $(event.target).is(':checked')
+          target.removeClass('fluid-0').addClass('fluid-1')
+        else
+          target.removeClass('fluid-1').addClass('fluid-0')
 
     fullscreen: ->
       $(document).on 'click', '[data-behavior~=full_screen]', (event) ->
         feedbin.toggleFullScreen()
-        feedbin.closeEntryBasement()
-        event.preventDefault()
-        return
+
+      $(document).on 'change', '[data-behavior~=toggle_full_screen]', (event) ->
+        feedbin.toggleFullScreen()
 
     theme: ->
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
-        theme = $(@).data('theme')
+        theme = $(@).val()
         $('[data-behavior~=class_target]').removeClass('theme-day')
         $('[data-behavior~=class_target]').removeClass('theme-sunset')
         $('[data-behavior~=class_target]').removeClass('theme-dusk')
         $('[data-behavior~=class_target]').removeClass('theme-midnight')
+        $('[data-behavior~=class_target]').removeClass('theme-auto')
         $('[data-behavior~=class_target]').addClass("theme-#{theme}")
-        # localStorage.setItem('theme', theme);
-        event.preventDefault()
-
-        return
 
     titleBarColor: ->
       feedbin.setNativeTheme()
@@ -2510,7 +2549,7 @@ $.extend feedbin,
         field.closest("form").submit()
 
     tooltips: ->
-      $('[data-toggle="tooltip"]').tooltip()
+      feedbin.tooltips()
 
     closeMessage: ->
       $(document).on 'click', '[data-behavior~=close_message]', (event) ->
@@ -2548,6 +2587,10 @@ $.extend feedbin,
           feedbin.changeContentView(mode)
         else
           feedbin.changeContentView('default')
+
+    hideTooltips: ->
+      $(document).on 'click', '[data-toggle="tooltip"]', (event) ->
+        $(@).tooltip('hide')
 
     copy: ->
       $(document).on 'click', '[data-behavior~=copy]', (event) ->
