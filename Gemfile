@@ -43,7 +43,7 @@ gem "feedjira", github: "feedbin/feedjira", ref: "e6b7b11"
 gem "feedkit", github: "feedbin/feedkit", branch: "master"
 
 gem "opml_saw", github: "feedbin/opml_saw", ref: "61d8c2d"
-gem "html-pipeline", github: "feedbin/html-pipeline", ref: "676376c"
+gem "html-pipeline", github: "feedbin/html-pipeline", ref: "20162f9"
 gem "grocer-pushpackager", github: "feedbin/grocer-pushpackager", ref: "6b01b4e", require: "grocer/pushpackager"
 gem "html_diff", github: "feedbin/html_diff", ref: "c7c15ce"
 gem "carrierwave_direct", github: "feedbin/carrierwave_direct", ref: "a0bc323"

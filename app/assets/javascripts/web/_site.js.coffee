@@ -577,10 +577,6 @@ $.extend feedbin,
     $("[data-behavior~=#{selector}] audio").mediaelementplayer
       stretching: 'responsive'
       features: ['playpause', 'current', 'progress', 'duration', 'tracks', 'fullscreen']
-    $("video").mediaelementplayer
-      stretching: 'responsive'
-      features: ['playpause', 'current', 'progress', 'duration', 'tracks', 'fullscreen']
-
 
   footnotes: ->
     $.bigfoot
@@ -627,6 +623,12 @@ $.extend feedbin,
       feedbin.formatTweets(content)
       feedbin.formatInstagram(content)
 
+      content.find("video[data-camo-poster][data-canonical-poster]").each ->
+        if feedbin.data.proxy_images
+          src = 'camo-poster'
+        else
+          src = 'canonical-poster'
+        $(@).attr("poster", $(@).data(src))
       content.find("img[data-camo-src][data-canonical-src]").each ->
         if feedbin.data.proxy_images
           src = 'camo-src'
@@ -785,6 +787,23 @@ $.extend feedbin,
         $.get container.data("iframe-embed-url")
 
   formatImages: (context = document) ->
+    $("video[data-camo-poster]", context).each ->
+      video = $(@)
+
+      video.attr("controls", "true")
+
+      video.wrap('<div class="media-container"></div>');
+
+      if feedbin.data.proxy_images
+        src = 'camo-poster'
+      else
+        src = 'canonical-poster'
+
+      actualSrc = video.data(src)
+      if actualSrc?
+        video.attr("poster", actualSrc)
+
+
     $("img[data-camo-src]", context).each ->
       img = $(@)
 

@@ -45,7 +45,7 @@ class ContentFormatter
       "ins" => ["cite"],
       "q" => ["cite"],
       "source" => ["src"],
-      "video" => ["src", "poster", "playsinline", "loop", "muted"],
+      "video" => ["src", "poster", "playsinline", "loop", "muted", "controls"],
       "audio" => ["src"],
       "td" => ["align"],
       "th" => ["align"],
