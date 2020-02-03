@@ -579,6 +579,11 @@ $.extend feedbin,
       stretching: 'responsive'
       features: ['playpause', 'current', 'progress', 'duration', 'tracks', 'fullscreen']
 
+    $("video").each ->
+      video = $(@)
+      video.attr("controls", "true")
+      video.wrap('<div class="media-container"></div>');
+
   footnotes: ->
     $.bigfoot
       scope: '[data-behavior~=entry_content_wrap]'
@@ -790,10 +795,6 @@ $.extend feedbin,
   formatImages: (context = document) ->
     $("video[data-camo-poster]", context).each ->
       video = $(@)
-
-      video.attr("controls", "true")
-
-      video.wrap('<div class="media-container"></div>');
 
       if feedbin.data.proxy_images
         src = 'camo-poster'

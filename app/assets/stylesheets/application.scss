@@ -10031,14 +10031,14 @@ $tooltip-arrow-height: 6px;
 }
 
 .tooltip i, .key {
+    @include background-color((day: $theme-color-600, sunset: $theme-color-sunset-600, dusk: $theme-color-dusk-300, midnight: $theme-color-midnight-300));
     margin-left: 16px;
     display: inline-block;
     font-style: normal;
     font-weight: bold;
-    @include background-color($color-contrast-400);
     padding: 2px 5px;
     box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
-    border-radius: 4px;
+    border-radius: 2px;
     font-family: $font-stack;
     line-height: 1;
     min-width: 16px;
