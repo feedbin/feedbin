@@ -2609,12 +2609,15 @@ $.extend feedbin,
       $(document).on 'click', '[data-toggle="tooltip"]', (event) ->
         $(@).tooltip('hide')
 
+    colorSchemePreference: ->
+      darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+      darkModeMediaQuery.addListener (event) ->
+          setTimeout feedbin.setNativeTheme, 300
+
     visibilitychange: ->
       $(document).on 'visibilitychange', (event) ->
         if feedbin.native && document.hidden == false
-          setTimeout ( ->
-            feedbin.setNativeTheme()
-          ), 300
+          setTimeout feedbin.setNativeTheme, 300
           feedbin.refresh()
 
     copy: ->
