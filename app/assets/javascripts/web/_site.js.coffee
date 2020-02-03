@@ -230,7 +230,8 @@ $.extend feedbin,
 
   setNativeTheme: (calculateOverlay = false, timeout = 1) ->
     if feedbin.native && feedbin.data && feedbin.theme
-      statusBar = if $("body").hasClass("theme-dusk") || $("body").hasClass("theme-midnight") then "lightContent" else "default"
+      result = window.matchMedia('(prefers-color-scheme: dark)');
+      statusBar = if $("body").hasClass("theme-dusk") || $("body").hasClass("theme-midnight") || result.matches == true then "lightContent" else "default"
       message = {
         action: "titleColor",
         statusBar: statusBar
@@ -2453,10 +2454,6 @@ $.extend feedbin,
       $(document).on 'feedbin:native:statusbartouched', (event, xCoordinate) ->
         feedbin.scrollToTop(xCoordinate)
 
-    didBecomeActive: ->
-      $(document).on 'feedbin:native:didBecomeActive', (event, value) ->
-        feedbin.refresh()
-
     disableSubmit: ->
       $(document).on 'submit', '[data-behavior~=disable_on_submit]', (event) ->
         $('[type=submit]', @).attr('disabled', 'disabled')
@@ -2610,6 +2607,14 @@ $.extend feedbin,
     hideTooltips: ->
       $(document).on 'click', '[data-toggle="tooltip"]', (event) ->
         $(@).tooltip('hide')
+
+    visibilitychange: ->
+      $(document).on 'visibilitychange', (event) ->
+        if feedbin.native && document.hidden == false
+          setTimeout ( ->
+            feedbin.setNativeTheme()
+          ), 300
+          feedbin.refresh()
 
     copy: ->
       $(document).on 'click', '[data-behavior~=copy]', (event) ->
