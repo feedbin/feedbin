@@ -254,9 +254,9 @@ GEM
       elasticsearch-transport (= 2.0.2)
     elasticsearch-api (2.0.2)
       multi_json
-    elasticsearch-model (2.0.1)
+    elasticsearch-model (7.0.0)
       activesupport (> 3)
-      elasticsearch (~> 2)
+      elasticsearch (> 1)
       hashie
     elasticsearch-transport (2.0.2)
       faraday
@@ -589,7 +589,7 @@ DEPENDENCIES
   dalli!
   dotenv-rails
   elasticsearch (~> 2.0)
-  elasticsearch-model (~> 2.0)
+  elasticsearch-model (~> 7.0)
   evernote_oauth
   faker
   feedjira!
