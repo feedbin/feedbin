@@ -8,6 +8,13 @@ GIT
       fog-aws
 
 GIT
+  remote: https://github.com/feedbin/dalli.git
+  revision: 3c92218fadfc20b6fb839f99ac36703ca96167ea
+  branch: feedbin
+  specs:
+    dalli (2.7.10)
+
+GIT
   remote: https://github.com/feedbin/feedjira.git
   revision: e6b7b11b4b20cfb01ce6a73806a59308298a10c7
   ref: e6b7b11
@@ -234,7 +241,6 @@ GEM
     css_parser (1.7.1)
       addressable
     curb (0.9.10)
-    dalli (2.7.10)
     dante (0.2.0)
     docile (1.3.2)
     domain_name (0.5.20190701)
@@ -580,7 +586,7 @@ DEPENDENCIES
   connection_pool
   coveralls
   curb
-  dalli
+  dalli!
   dotenv-rails
   elasticsearch (~> 2.0)
   elasticsearch-model (~> 2.0)
