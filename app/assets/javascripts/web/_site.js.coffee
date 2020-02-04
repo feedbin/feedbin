@@ -477,13 +477,11 @@ $.extend feedbin,
   appendEntries: (entries) ->
     $('.entries ul').append(entries)
 
-  formatEntries: (lastUnread, viewType = null) ->
+  formatEntries: ->
     $(document).trigger('feedbin:entriesLoaded')
-    feedbin.viewType = viewType
     feedbin.localizeTime()
     feedbin.applyUserTitles()
     feedbin.loadEntryImages()
-    feedbin.markReadData.date = lastUnread
     feedbin.faviconColors($(".entries-column"))
 
   updateUnreads: (unreadOnly, unreadEntries) ->

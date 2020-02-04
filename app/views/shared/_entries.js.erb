@@ -28,8 +28,10 @@ var callback = function() {
         feedbin.updateUnreads(<%= @all_unread ? "true" : "false" %>, unreads)
     <% end %>
 
-    feedbin.formatEntries("<%= j last_unread_date %>", "<%= @type %>")
+    feedbin.formatEntries()
     feedbin.preloadEntries(<%= @entries.map{ |entry| entry.id }.to_json.html_safe %>, <%= @force_preload ? "true" : "false" %>);
+    feedbin.viewType = "<%= @type %>";
+    feedbin.markReadData.date = "<%= j last_unread_date %>";
 }
 
 if (feedbin.panelScrollComplete) {
