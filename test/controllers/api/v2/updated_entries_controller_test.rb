@@ -20,13 +20,13 @@ class Api::V2::UpdatedEntriesControllerTest < ApiControllerTestCase
 
   test "should get updated_entry since specific time" do
     login_as @user
-    last_entry = @user.updated_entries.order(created_at: :desc).limit(1).take
-    since = last_entry.created_at.iso8601(6)
+    last_entry = @user.updated_entries.order(updated_at: :desc).limit(1).take
+    since = last_entry.updated_at.iso8601(6)
     last_entry.touch
     get :index, params: {since: since}, format: :json
     assert_response :success
     results = parse_json
-    assert_equal Set.new([last_entry.id]), Set.new(results)
+    assert_equal Set.new([last_entry.entry_id]), Set.new(results)
   end
 
   test "should destroy updated entry" do
