@@ -81,16 +81,16 @@ class ActiveSupport::TestCase
     end
   end
 
-  def newsletter_params(recipient, signature, title = nil)
+  def newsletter_params(recipient, signature, title = nil, from = nil)
     title = SecureRandom.hex if title.nil?
     {
       "timestamp" => "timestamp",
       "token" => "token",
       "signature" => signature,
       "recipient" => "#{recipient}@development.newsletters.feedbin.com",
-      "sender" => "ben@feedbin.com",
-      "subject" => "This is the subject",
-      "from" => "#{title} <ben@feedbin.com>",
+      "sender" => "#{title}@feedbin.com",
+      "subject" => "#{title} This is the subject",
+      "from" => "#{title} <#{from || "ben"}@feedbin.com>",
       "X-Mailgun-Incoming" => "Yes",
       "X-Envelope-From" => "<ben@feedbin.com>",
       "Received" => "XYZ",
@@ -99,7 +99,7 @@ class ActiveSupport::TestCase
       "X-Gm-Message-State" => "XYZ",
       "X-Received" => "XYZ",
       "Return-Path" => "<ben@feedbin.com>",
-      "From" => "Ben Ubois <ben@feedbin.com>",
+      "From" => "Ben Ubois <#{title}@feedbin.com>",
       "Content-Type" => "multipart/alternative; boundary=\"Apple-Mail=_8AB713F4-14C8-48B5-AD4B-B694CA436A93\"",
       "Subject" => "This is the subject",
       "Message-Id" => "<0B507DA2-3174-4575-8987-C2064F3D532C@feedbin.com>",

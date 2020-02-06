@@ -3,7 +3,7 @@ module SettingsHelper
     if time.nil?
       "N/A"
     else
-      content_tag(:time, time.to_s(:feed), datetime: time.utc.iso8601, class: "timeago", title: "Last updated: #{time.to_s(:feed)}") + " ago"
+      content_tag(:time, time.to_s(:feed), datetime: time.utc.iso8601, class: "timeago hide", title: "Last updated: #{time.to_s(:feed)}") + " ago"
     end
   end
 

@@ -81,4 +81,40 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
       assert_response :success
     end
   end
+
+  test "should unsubscribe from newsletter" do
+    user = users(:new)
+    login_as user
+
+    create_newsletter(user)
+
+    feed_id = user.newsletter_senders.first.feed_id
+
+    assert user.subscriptions.where(feed_id: feed_id).exists?
+
+    patch :newsletter_senders, params: {id: feed_id, newsletter_sender: {feed_id: "0"}}, xhr: true
+
+    assert_not user.subscriptions.where(feed_id: feed_id).exists?
+
+    patch :newsletter_senders, params: {id: feed_id, newsletter_sender: {feed_id: "1"}}, xhr: true
+
+    assert user.subscriptions.where(feed_id: feed_id).exists?
+  end
+
+  test "should not unsubscribe from normal feed" do
+    login_as @user
+    subscription = @user.subscriptions.first
+    assert_no_difference "Subscription.count", +1 do
+      patch :newsletter_senders, params: {id: subscription.feed_id, newsletter_sender: {feed_id: "0"}}, xhr: true
+    end
+  end
+
+
+  def create_newsletter(user)
+    signature = Newsletter.new(newsletter_params("asdf", "asdf")).send(:signature)
+    token = user.newsletter_authentication_token.token
+
+    newsletter = Newsletter.new(newsletter_params(token, signature, SecureRandom.hex, SecureRandom.hex))
+    NewsletterEntry.create(newsletter, user)
+  end
 end

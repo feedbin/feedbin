@@ -201,6 +201,11 @@ class SettingsController < ApplicationController
     head :ok
   end
 
+  def newsletters_pages
+    @user = current_user
+    @subscription_ids = @user.subscriptions.pluck(:feed_id)
+  end
+
   private
 
   def plan_exists
@@ -226,10 +231,6 @@ class SettingsController < ApplicationController
 
   def subscription_view_mode_params
     params.require(:subscription).permit(:view_mode)
-  end
-
-  def newsletters_pages
-    @user = current_user
   end
 
 end

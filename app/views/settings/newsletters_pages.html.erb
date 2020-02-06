@@ -1,45 +1,47 @@
-<%= form_for @user, remote: true, url: settings_update_user_path(@user) do |f| %>
 <div class="settings-content-inner">
     <div class="settings-outer">
         <h2>Newsletters & Pages</h2>
     </div>
-    <div class="inset">
-        <h4 class="group-header">Newsletters</h4>
-        <ul class="pill-list">
-            <li>
-                <div class="toolbar">
-                    <div>
-                        Newsletter Address
-                        <p class="control-group-description">
-                            Use this address to <a href="https://feedbin.com/blog/2016/02/03/subscribe-to-email-newsletters-in-feedbin/">receive emails</a> in Feedbin.
-                        </p>
+
+    <%= form_for @user, remote: true, url: settings_update_user_path(@user) do |f| %>
+        <div class="inset">
+            <h4 class="group-header">Newsletters</h4>
+            <ul class="pill-list">
+                <li>
+                    <div class="toolbar">
+                        <div>
+                            Newsletter Address
+                            <p class="control-group-description">
+                                Use this address to <a href="https://feedbin.com/blog/2016/02/03/subscribe-to-email-newsletters-in-feedbin/">receive emails</a> in Feedbin.
+                            </p>
+                        </div>
+                        <%= render "shared/input", class: "accessory-right last-control" do %>
+                            <input type="text" value="<%= @user.newsletter_address %>" readonly />
+                            <button class="accessory right icon" data-behavior="copy" title="Copy to clipboard" data-toggle="tooltip">
+                                <%= svg_tag "icon-clipboard" %>
+                            </button>
+                        <% end %>
                     </div>
-                    <%= render "shared/input", class: "accessory-right last-control" do %>
-                        <input type="text" value="<%= @user.newsletter_address %>" readonly />
-                        <button class="accessory right icon" data-behavior="copy" title="Copy to clipboard" data-toggle="tooltip">
-                            <%= svg_tag "icon-clipboard" %>
-                        </button>
-                    <% end %>
-                </div>
-            </li>
-            <li>
-                <div class="toolbar">
-                    <div>
-                        Default Tag
-                        <p class="control-group-description">
-                            Automatically put incoming newsletters in this tag.
-                        </p>
+                </li>
+                <li>
+                    <div class="toolbar">
+                        <div>
+                            Default Tag
+                            <p class="control-group-description">
+                                Automatically put incoming newsletters in this tag.
+                            </p>
+                        </div>
+                            <%= render "shared/input", class: "accessory-right last-control" do %>
+                                <%= f.select :newsletter_tag, tag_options, {}, {class: "select", data: {behavior: "auto_submit"}} %>
+                                <span class="accessory right">
+                                    <%= svg_tag "icon-caret" %>
+                                </span>
+                            <% end %>
                     </div>
-                    <%= render "shared/input", class: "accessory-right last-control" do %>
-                        <%= f.select :newsletter_tag, tag_options, {}, {class: "select", data: {behavior: "auto_submit"}} %>
-                        <span class="accessory right">
-                            <%= svg_tag "icon-caret" %>
-                        </span>
-                    <% end %>
-                </div>
-            </li>
-        </ul>
-    </div>
+                </li>
+            </ul>
+        </div>
+    <% end %>
 
     <div class="inset">
         <h4 class="group-header">Pages</h4>
@@ -67,5 +69,46 @@
             </li>
         </ul>
     </div>
+
+    <% if @user.newsletter_senders.exists? %>
+        <div class="inset">
+            <h4 class="group-header">Advanced</h4>
+            <ul class="sharing-services">
+                <li>
+                    <div class="service-header">
+                        <div>
+                            <div class="header">
+                                <p class="service-title">Newsletter Senders</p>
+                            </div>
+                            <p class="control-group-description" style="margin-left: 0;">These are the senders of newsletters you have received. Feedbin blocks messages from senders that have been deactivated. Reactivate a sender to resubscribe.</p>
+                        </div>
+                        <div class="last-control button-wrap-inline">
+                            <%= button_tag "Show Senders", class: 'button button-secondary', data: {behavior: "toggle_service_options", toggle_text: "Hide Senders"} %>
+                        </div>
+                    </div>
+                    <div class="service-options-wrap">
+                        <div class="service-options nested-controls">
+                            <ul class="control-group">
+                                <% @user.newsletter_senders.each do |newsletter_sender| %>
+                                   <li>
+                                        <%= form_with(model: newsletter_sender, url: newsletter_senders_settings_subscription_path(newsletter_sender.feed_id)) do |f| %>
+                                            <%= f.check_box :feed_id, {id: "newsletter_sender_#{newsletter_sender.feed_id}", checked: @subscription_ids.include?(newsletter_sender.feed_id), data: {behavior: "auto_submit"}} %>
+                                            <%= f.label :feed_id, for: "newsletter_sender_#{newsletter_sender.feed_id}" do %>
+                                               <%= newsletter_sender.name %> <span class="extra-muted">&lt;<%= newsletter_sender.email %>&gt;</span> <%= toggle_switch %>
+                                               <% if newsletter_sender.full_token != newsletter_sender.token %>
+                                                   <p class="control-group-description">
+                                                       <%= "Sent to #{newsletter_sender.full_token}@newsletters.feedbin.com" %>
+                                                   </p>
+                                               <% end %>
+                                            <% end %>
+                                        <% end %>
+                                   </li>
+                                <% end %>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    <% end %>
 </div>
-<% end %>

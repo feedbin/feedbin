@@ -1,11 +1,11 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  user: one
-  token: one
-  purpose: 1
+ben_newsletter:
+  user: ben
+  token: token
+  purpose: 2
 
-two:
-  user: two
-  token: two
-  purpose: 1
+new_newsletter:
+  user: new
+  token: token_new
+  purpose: 2

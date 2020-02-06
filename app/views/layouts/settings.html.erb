@@ -10,7 +10,9 @@
     <div class="settings-inner">
         <%= render partial: "shared/settings_nav" %>
         <div class="settings-content">
-            <%= render partial: "shared/hamburger_menu_button" %>
+            <button class="reset settings-menu-button" data-behavior="open_modal" data-modal-target="settings_nav">
+                <%= svg_tag "icon-menu" %>
+            </button>
             <%= yield %>
         </div>
     </div>

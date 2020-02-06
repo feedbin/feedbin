@@ -65,6 +65,21 @@ class Settings::SubscriptionsController < ApplicationController
     redirect_to settings_subscriptions_url, notice: notice
   end
 
+  def newsletter_senders
+    @user = current_user
+    valid = @user.newsletter_senders.pluck(:feed_id)
+    feed_id = params[:id].to_i
+    if valid.include?(feed_id)
+      if params[:newsletter_sender][:feed_id] == "1"
+        @user.subscriptions.create!(feed_id: feed_id)
+      else
+        @user.subscriptions.where(feed_id: feed_id).take.destroy
+      end
+    end
+    flash[:notice] = "Settings updated."
+    flash.discard
+  end
+
   private
 
   def subscription_params

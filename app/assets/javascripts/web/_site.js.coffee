@@ -139,7 +139,10 @@ $.extend feedbin,
       numbers: []
     jQuery.timeago.settings.strings = strings
     jQuery.timeago.settings.allowFuture = true
-    $("time.timeago").timeago()
+    $("time.timeago").each ->
+      element = $(@)
+      element.timeago()
+      element.removeClass('hide')
 
   panelCount: ->
     body = $('body')
@@ -2617,6 +2620,14 @@ $.extend feedbin,
         if feedbin.native && document.hidden == false
           setTimeout feedbin.setNativeTheme, 300
           feedbin.refresh()
+
+    toggleText: ->
+      $(document).on 'click', '[data-toggle-text]', (event) ->
+        button = $(@)
+        text = button.text()
+        newText = button.data('toggle-text')
+        button.text(newText)
+        button.data('toggle-text', text)
 
     copy: ->
       $(document).on 'click', '[data-behavior~=copy]', (event) ->

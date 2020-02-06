@@ -4,7 +4,7 @@ class NewslettersController < ApplicationController
 
   def create
     newsletter = Newsletter.new(params)
-    user = User.where(newsletter_token: newsletter.token).take
+    user = AuthenticationToken.newsletters.active.where(token: newsletter.token).take&.user
     if newsletter.valid?
       NewsletterEntry.create(newsletter, user)
     end

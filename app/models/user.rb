@@ -102,9 +102,12 @@ class User < ApplicationRecord
   validates_uniqueness_of :email, case_sensitive: false
   validates_presence_of :password, on: :create
 
+  def newsletter_senders
+    NewsletterSender.where(token: newsletter_authentication_token.token).order(name: :asc)
+  end
+
   def generate_newsletter_token
-    generate_token(:newsletter_token, 4)
-    authentication_tokens.new(purpose: :newsletters, token: newsletter_token)
+    authentication_tokens.newsletters.new(length: 4)
   end
 
   def theme
@@ -448,7 +451,11 @@ class User < ApplicationRecord
   end
 
   def newsletter_address
-    "#{newsletter_token}@newsletters.feedbin.com"
+    "#{newsletter_authentication_token.token}@newsletters.feedbin.com"
+  end
+
+  def newsletter_authentication_token
+    authentication_tokens.newsletters.active.take
   end
 
   def stripe_url

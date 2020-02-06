@@ -1195,10 +1195,10 @@ table {
             flex-shrink: 0;
             width: 25px;
             margin-right: 16px;
-        }
-        svg {
-            @include fill($color-icons);
-            flex-shrink: 0;
+            svg {
+                @include fill($color-icons);
+                flex-shrink: 0;
+            }
         }
     }
     .service-header {
@@ -1207,10 +1207,11 @@ table {
         padding: 16px;
         .last-control {
             margin-left: auto;
+            padding-left: $two-units;
         }
         .control-group-description {
             margin-left: 41px;
-            margin-top: 1px;
+            margin-top: 3px;
         }
     }
     .header {
@@ -1233,12 +1234,36 @@ table {
             display: none;
             padding: 16px;
             @include border-top($color-borders);
+            &.nested-controls {
+                padding: 0;
+            }
         }
         &.open {
             .service-options {
                 display: block;
             }
             opacity: 1;
+        }
+        .control-group {
+            margin: 0;
+            padding: 0;
+            border: none;
+            li {
+                border: none;
+                @include border-bottom($color-borders);
+                border-radius: 0;
+                margin: 0;
+            }
+            li:last-child {
+                border: none;
+            }
+            li > form > label {
+                padding-left: $two-units;
+                padding-right: $two-units;
+            }
+            .switch {
+                right: $two-units;
+            }
         }
     }
     .share-help {
@@ -1308,10 +1333,6 @@ table {
             padding-left: 49px;
             background-position: 15px 3px;
         }
-    }
-    @media (max-width: $small-breakpoint) {
-        padding-left: 8px;
-        padding-right: 8px;
     }
 }
 
@@ -1594,6 +1615,9 @@ Structure
     display: flex;
     align-items: center;
     justify-content: center;
+    svg {
+        @include fill($color-icons);
+    }
 }
 
 $hamburger-dot: 4px;
@@ -3704,24 +3728,22 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .has-offscreen-panels .entry-toolbar &, .has-offscreen-panels .account-toolbar & {
         display: none;
     }
-    .settings & {
-        position: absolute;
-        top: 21px;
-        right: 15px;
-        border: 1px solid map-get($color-borders, day);
-        border-radius: 4px;
-        height: 36px;
-        width: 36px;
-        display: none;
-        @media (max-width: $small-breakpoint) {
-            display: flex;
-            top: 39px;
-            right: 8px;
-        }
-        .web-settings-button {
-            width: 100%;
-            height: 100%;
-        }
+}
+
+.settings-menu-button {
+    height: 36px;
+    width: 36px;
+    position: absolute;
+    top: 39px;
+    right: 8px;
+    display: none;
+    align-items: center;
+    justify-content: flex-end;
+    svg {
+        @include fill($color-icons);
+    }
+    @media (max-width: $small-breakpoint) {
+        display: flex;
     }
 }
 
@@ -5277,7 +5299,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     display: none;
     .shadow-dom & {
         display: block;
-        display: none;
     }
 }
 
@@ -5396,6 +5417,11 @@ Settings
             svg {
                 @include fill($color-contrast-600);
             }
+        }
+    }
+    .modal & {
+        a {
+            @include color($color-contrast-700);
         }
     }
 }
@@ -6115,7 +6141,7 @@ Settings
         }
         .subscription-controls {
             display: flex;
-            align-items: center;
+            align-items: baseline;
             justify-content: flex-end;
             flex-shrink: 0;
             .icon-arrow {
@@ -6169,29 +6195,6 @@ Settings
                 flex-shrink: 1;
             }
         }
-        .sparkline-wrap {
-            width: 97px;
-            height: 21px;
-            margin-right: 16px;
-            position: relative;
-            @include background-color($color-base);
-            background-image: linear-gradient(0deg, rgba($color-accent-green-600, 0), rgba($color-accent-green-600, 0.8));
-            svg {
-                polygon {
-                    @include fill($color-base);
-                }
-                polyline {
-                    stroke: $color-accent-green-600;
-                    fill: transparent;
-                    stroke-width: 2;
-                    stroke-linejoin: round;
-                    stroke-linecap: round;
-                }
-            }
-            @media (max-width: $small-breakpoint) {
-                display: none;
-            }
-        }
         .subscription-item {
             margin-right: 10px;
         }
@@ -6231,6 +6234,22 @@ Settings
         border-radius: 8px;
         padding: 10px;
         color: white;
+    }
+}
+
+.sparkline {
+    margin-right: 16px;
+    polyline {
+        fill: transparent;
+        stroke: $color-accent-green-600;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+    }
+    .gradient {
+        stop-color: $color-accent-green-600;
+    }
+    @media (max-width: $small-breakpoint) {
+        display: none;
     }
 }
 
@@ -6370,7 +6389,8 @@ label.text-field {
     }
     li > label,
     li > a,
-    li > .form-control {
+    li > .form-control,
+    li > form > label {
         @include form-control;
         padding: 16px 0;
         margin: 0;

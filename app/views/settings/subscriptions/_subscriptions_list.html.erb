@@ -60,7 +60,7 @@
                                             <span class="title-container">
                                                 <%= subscription.title %>
                                             </span>
-                                            <span class="last-updated-wrap hide">
+                                            <span class="last-updated-wrap">
                                                 <%= timeago(subscription.last_published_entry) %>, <%= number_with_delimiter(subscription.post_volume) %>/mo
                                             </span>
                                         </span>
@@ -72,9 +72,7 @@
                                     </span>
                                 </span>
                                 <span class="subscription-controls">
-                                    <span class="sparkline-wrap">
-                                        <%= subscription_presenter.sparkline(97, 20) %>
-                                    </span>
+                                    <%= render partial: "shared/sparkline", locals: {sparkline: subscription_presenter.sparkline} %>
                                     <%= svg_tag "icon-arrow" %>
                                 </span>
                             <% end %>
@@ -85,7 +83,4 @@
         </ul>
     <% end %>
     <%= will_paginate @subscriptions, previous_label: "Previous", next_label: "Next" %>
-    <script>
-        $('.last-updated-wrap').removeClass('hide');
-    </script>
 </div>
