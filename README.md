@@ -12,7 +12,7 @@ Feedbin is a web based RSS reader. It provides a user interface for reading and 
 
 If you would like to try Feedbin out you can [sign up](https://feedbin.com/) for an account.
 
-The main Feedbin project is a [Rails 5](http://rubyonrails.org/) application. In addition to the main project there are several other services that provide additional functionality. None of these services are required to get Feedbin running locally, but they all provide important functionality that you would want for a production install.
+The main Feedbin project is a [Rails 6](http://rubyonrails.org/) application. In addition to the main project there are several other services that provide additional functionality. None of these services are required to get Feedbin running locally, but they all provide important functionality that you would want for a production install.
 
  - [**refresher:**](https://github.com/feedbin/refresher)
    Refresher is the service that does feed refreshing. Feed refreshes are scheduled as background jobs using [Sidekiq](https://github.com/mperham/sidekiq). Refresher is kept separate so it can be scaled independently. It's also a benefit to not have to load all of Rails for this service.
@@ -25,11 +25,11 @@ Requirements
 ------------
 
  - Mac OS X or Linux
- - [Ruby 2.3.1](http://www.ruby-lang.org/en/)
+ - [Ruby 2.6](http://www.ruby-lang.org/en/)
  - [Postgres 10](http://www.postgresql.org/)
  - [Redis > 2.8](http://redis.io/)
  - [Memcached](https://memcached.org/)
- - [Elasticsearch 2.4.X](https://www.elastic.co/downloads/past-releases/elasticsearch-2-4-5)
+ - [Elasticsearch 2.4](https://www.elastic.co/downloads/past-releases/#elasticsearch)
 
 Installation
 -------------
