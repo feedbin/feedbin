@@ -50,7 +50,7 @@ Rails.application.configure do
   # config.action_cable.allowed_request_origins = [ 'http://example.com', /http:\/\/example.*/ ]
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  config.force_ssl = (ENV["FORCE_SSL"] == "false") ? false : true
   config.ssl_options = {hsts: {subdomains: false}}
 
   # Less verbose logs
