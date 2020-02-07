@@ -82,7 +82,7 @@ class FaviconProcessor
       "Cache-Control" => "max-age=315360000, public",
       "Expires" => "Sun, 29 Jun 2036 17:48:34 GMT",
       "x-amz-acl" => "public-read",
-      "x-amz-storage-class" => "REDUCED_REDUNDANCY",
+      "x-amz-storage-class" => ENV["AWS_S3_STORAGE_CLASS"] || "REDUCED_REDUNDANCY",
       "x-amz-meta-favicon-host" => host,
     }
   end
