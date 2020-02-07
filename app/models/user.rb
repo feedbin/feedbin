@@ -86,9 +86,6 @@ class User < ApplicationRecord
   before_create { generate_token(:page_token) }
 
   before_update :update_billing, unless: -> { !ENV["STRIPE_API_KEY"] }
-
-  after_create { schedule_trial_jobs }
-
   before_destroy :cancel_billing, unless: -> { !ENV["STRIPE_API_KEY"] }
   before_destroy :create_deleted_user
   before_destroy :record_stats
