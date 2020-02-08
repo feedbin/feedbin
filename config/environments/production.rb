@@ -5,6 +5,7 @@ Rails.application.configure do
   config.hosts << "api.feedbin.me"
   config.hosts << "feedbin"
   config.hosts << "api.feedbin"
+  config.hosts << ENV['FEEDBIN_HOST']
 
   # Code is not reloaded between requests.
   config.cache_classes = true
