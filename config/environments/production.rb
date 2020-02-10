@@ -1,11 +1,6 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
-  config.hosts << "feedbin.com"
-  config.hosts << "api.feedbin.com"
-  config.hosts << "api.feedbin.me"
-  config.hosts << "feedbin"
-  config.hosts << "api.feedbin"
-  config.hosts << ENV['FEEDBIN_HOST']
+  config.hosts = ENV["FEEDBIN_HOST"]&.split(",")
 
   # Code is not reloaded between requests.
   config.cache_classes = true
