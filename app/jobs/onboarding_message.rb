@@ -3,10 +3,10 @@ class OnboardingMessage
   sidekiq_options queue: :critical
 
   def perform(user_id, message)
-  #   @user = User.find(user_id)
-  #   @message = message.to_sym
-  #   send(@message)
-  # rescue ActiveRecord::RecordNotFound
+    @user = User.find(user_id)
+    @message = message.to_sym
+    send(@message)
+  rescue ActiveRecord::RecordNotFound
   end
 
   private
