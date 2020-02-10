@@ -5389,9 +5389,8 @@ Settings
             padding-right: $nav-padding;
         }
         body:not(.touch) &:hover {
-            color: white;
             text-decoration: none;
-            @include background-color($color-selected-off);
+            @include background-color($theme-color-200);
         }
         &.active {
             @include background-color($color-selected, $extra: !important);
