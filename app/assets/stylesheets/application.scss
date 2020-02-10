@@ -5438,7 +5438,10 @@ Settings
             background-color: transparent;
         }
         .settings-inner & {
-            @include color($color-contrast-400);
+            @include color($color-contrast-500);
+            &:hover {
+                @include color($color-contrast-600);
+            }
         }
     }
     &.border {
