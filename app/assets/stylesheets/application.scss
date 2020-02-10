@@ -5388,9 +5388,12 @@ Settings
             padding-left: $nav-padding + $icon-width + $icon-margin;
             padding-right: $nav-padding;
         }
-        body:not(.touch) &:hover {
+        &:hover {
             text-decoration: none;
-            @include background-color($theme-color-200);
+            @include background-color($color-contrast-200);
+        }
+        body.touch &:hover {
+            background-color: transparent !important;
         }
         &.active {
             @include background-color($color-selected, $extra: !important);
