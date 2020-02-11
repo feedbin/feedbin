@@ -101,8 +101,7 @@ class Settings::SubscriptionsController < ApplicationController
 
       subscriptions.each do |subscription|
         counts = entry_counts[subscription.feed_id]
-        max = counts.present? ? counts.max.to_i : 0
-        percentages = counts.present? ? counts.map { |count| count.to_f / max.to_f } : nil
+        percentages = counts.present? ? calculate_percentages(counts) : nil
         volume = counts.present? ? counts.sum : 0
 
         subscription.title = if subscription.title
@@ -135,6 +134,17 @@ class Settings::SubscriptionsController < ApplicationController
     end
 
     subscriptions
+  end
+
+  def calculate_percentages(counts)
+    max = counts.max.to_i
+    counts.map do |count|
+      if count == 0
+        0.to_f
+      else
+        count.to_f / max.to_f
+      end
+    end
   end
 
   def feed_search_data(subscription)
