@@ -13,27 +13,27 @@
         </div>
     <% end %>
     <a class="embed-profile entry-callout embed-link" href="<%= embed.canonical_url %>" title="Visit embed source">
-        <span class="embed-icon" href="<%= embed.canonical_url %>">
-            <%= favicon_with_host(embed.embed_url.host) %>
-            <%= svg_tag "icon-embed-source-#{embed.clean_name}" %>
-        </span>
         <span class="embed-data">
             <span class="embed-title"><%= embed.title %></span>
             <span class="embed-subtitle"><%= embed.subtitle %></span>
+        </span>
+        <span class="embed-icon" href="<%= embed.canonical_url %>">
+            <%= favicon_with_host(embed.embed_url.host) %>
+            <%= svg_tag "icon-embed-source-#{embed.clean_name}" %>
         </span>
     </a>
 </div>
 <% else %>
 <div class="iframe-embed system-content embed-type-<%= embed.type %>" data-behavior="iframe_placeholder" data-iframe-src="<%= @embed.iframe_src %>" data-iframe-width="<%= params[:width] %>" data-iframe-height="<%= params[:height] %>" title="Load embed">
     <div class="embed-profile entry-callout" href="<%= embed.canonical_url %>">
-        <a class="embed-icon embed-link" href="<%= embed.canonical_url %>">
-            <%= favicon_with_host(embed.embed_url.host) %>
-            <%= svg_tag "icon-embed-source-#{embed.clean_name}" %>
-        </a>
         <span class="embed-data">
             <span class="embed-title"><%= embed.title %></span>
             <span class="embed-subtitle"><%= embed.subtitle %></span>
         </span>
+        <a class="embed-icon embed-link" href="<%= embed.canonical_url %>">
+            <%= favicon_with_host(embed.embed_url.host) %>
+            <%= svg_tag "icon-embed-source-#{embed.clean_name}" %>
+        </a>
     </div>
 </div>
 <% end %>

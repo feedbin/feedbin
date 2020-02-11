@@ -4420,27 +4420,31 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .embed-profile {
         display: flex;
         margin-top: 0;
-        @include color($color-contrast-700);
+        @include color($color-contrast-600);
         border-top-left-radius: 0;
         border-top-right-radius: 0;
         line-height: 1.4;
         &:hover {
-            @include color($color-contrast-700, $extra: !important);
+            @include color($color-contrast-600, $extra: !important);
         }
+    }
+    .embed-data {
+        padding-right: $two-units;
     }
     .embed-icon {
         width: 34px;
         height: 34px;
-        margin-right: 10px;
+        margin-left: auto;
         flex-shrink: 0;
         display: block;
+        align-items: flex-start;
         svg {
             position: relative;
             top: 5px;
             max-width: 100%;
             max-height: 100%;
             * {
-                @include fill($color-icons);
+                @include fill($color-contrast-400);
             }
         }
         .icon-embed-source-spotify,
@@ -4527,6 +4531,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .embed-subtitle {
         @include font-size(14);
         display: block;
+        @include color($color-contrast-400);
     }
 
 }
