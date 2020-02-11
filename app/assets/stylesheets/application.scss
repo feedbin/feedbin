@@ -2478,6 +2478,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+
     transition: transform .15s ease-in;
     @include background-color($color-base);
     flex: 1;
@@ -5520,7 +5521,7 @@ Settings
         flex: 1;
         align-items: center;
         > :first-child {
-            margin-right: 64px
+            margin-right: 32px
         }
         .last-control {
             display: flex;
@@ -6471,9 +6472,6 @@ label.text-field {
         td:last-child {
             padding-right: 0 !important;
             text-align: right;
-            @media (max-width: $small-breakpoint) {
-                padding-right: 15px !important;
-            }
         }
         td input {
             margin: 0;
