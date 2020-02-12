@@ -54,9 +54,7 @@ class Share::EvernoteShare < Share::Service
     entry = Entry.find(params[:entry_id])
     content = determine_content(params)
     content = ContentFormatter.evernote_format(content, entry)
-    view_paths = Rails::Application::Configuration.new(Rails.root).paths["app/views"]
-    action_view = ActionView::Base.new(view_paths)
-    params[:content] = action_view.render(partial: "supported_sharing_services/evernote_note", locals: {content: content.html_safe})
+    params[:content] = ApplicationController.render(partial: "supported_sharing_services/evernote_note", locals: {content: content.html_safe})
 
     attributes = Evernote::EDAM::Type::NoteAttributes.new
     attributes.subjectDate = entry.published.to_i
