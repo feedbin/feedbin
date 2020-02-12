@@ -583,7 +583,10 @@ $.extend feedbin,
     $("video").each ->
       video = $(@)
       video.attr("controls", "true")
-      video.wrap('<div class="media-container"></div>');
+      containerClass = "media-container"
+      unless video.closest(".#{containerClass}").length > 0
+        container = $('<div>').addClass(containerClass)
+        video.wrap container
 
   footnotes: ->
     $.bigfoot
