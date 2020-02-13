@@ -4356,6 +4356,10 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         }
     }
 
+    .newsletter-content {
+        @include color($theme-color-600);
+    }
+
     @media (max-width: $small-breakpoint) {
         img[data-camo-src] {
             visibility: hidden;
@@ -4369,7 +4373,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             margin-left: -10px !important;
         }
     }
-
 }
 
 .content-styles .entry-callout, .entry-callout {
