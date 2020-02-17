@@ -279,8 +279,8 @@ body {
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
     font-family: $font-stack;
-    background-color: map-get($color-base, day);
-    color: map-get($color-contrast-700, day);
+    @include background-color($color-base)
+    @include color($color-contrast-600);
     &.theme-sunset {
         background-color: map-get($color-base, sunset);
         color: map-get($color-contrast-700, sunset);
