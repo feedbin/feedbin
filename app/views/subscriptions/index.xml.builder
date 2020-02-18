@@ -7,12 +7,12 @@ xml.opml version: "1.0" do
   end
   xml.body do
     @feeds.each do |feed|
-      xml << render(partial: "feeds/feed", locals: {feed: feed, titles: @titles})
+      xml << render(partial: "feeds/feed.xml.builder", locals: {feed: feed, titles: @titles})
     end
     @tags.each do |tag|
       xml.outline text: tag.name, title: tag.name do
         Feed.xml.where(id: @user.taggings.where(tag_id: tag).pluck(:feed_id)).each do |feed|
-          xml << render(partial: "feeds/feed", locals: {feed: feed, titles: @titles})
+          xml << render(partial: "feeds/feed.xml.builder", locals: {feed: feed, titles: @titles})
         end
       end
     end
