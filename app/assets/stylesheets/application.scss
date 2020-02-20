@@ -6293,7 +6293,7 @@ Settings
         padding-right: 0;
     }
     .entry-image {
-        display: none;
+        display: none !important;
     }
     a, div {
         pointer-events: none;
