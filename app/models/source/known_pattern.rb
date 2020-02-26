@@ -1,4 +1,4 @@
-class Source::Youtube < Source
+class Source::KnownPattern < Source
   URLS = [
     {
       template: "https://www.youtube.com/feeds/videos.xml?channel_id=%s".freeze,
@@ -12,12 +12,20 @@ class Source::Youtube < Source
       template: "https://www.youtube.com/feeds/videos.xml?playlist_id=%s".freeze,
       regex: Regexp.new(/https:\/\/www\.youtube\.com\/playlist\?list=([^&]*)/),
     },
+    {
+      template: "https://www.reddit.com/r/%s.rss".freeze,
+      regex: Regexp.new(/https:\/\/www\.reddit\.com\/r\/([^\/#\?]*)/),
+    },
+    {
+      template: "https://vimeo.com/%s/videos/rss".freeze,
+      regex: Regexp.new(/https:\/\/vimeo\.com\/([^\/#\?]*)/),
+    }
   ]
 
   def call
     if (match = URLS.find { |candidate| @config[:request].last_effective_url =~ candidate[:regex] }) && $1
       feed_url = match[:template] % $1
-      option = FeedOption.new(feed_url, feed_url, nil, "youtube_options")
+      option = FeedOption.new(feed_url, feed_url, nil, "known_pattern")
       @feed_options.push(option)
       create_feeds!
     elsif youtube_domain? && channel_id

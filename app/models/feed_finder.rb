@@ -30,11 +30,7 @@ class FeedFinder
     end
 
     if feeds.blank?
-      feeds = Source::Youtube.new(@url, @config).call
-    end
-
-    if feeds.blank?
-      feeds = Source::Reddit.new(@url, @config).call
+      feeds = Source::KnownPattern.new(@url, @config).call
     end
 
     if feeds.blank?
