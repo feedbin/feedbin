@@ -4296,17 +4296,10 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
 
     .content-error {
-        padding-left: 36px !important;
-        &:after {
-            position: absolute;
-            display: block;
-            content: "";
-            background: image-url("icon-error.svg") 10px 11px no-repeat;
-            background-size: 20px 15px;
-            width: 43px;
-            left: 0px;
-            top: 0;
-            bottom: 0;
+        display: flex;
+        align-items: center;
+        svg {
+            margin-right: $one-unit;
         }
     }
 

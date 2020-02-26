@@ -27,6 +27,9 @@
             <%= content.html_safe %>
         </div>
     <% else %>
-        <p class="content-error system-content entry-callout">Unable to get this article’s content.</p>
+        <p class="content-error system-content entry-callout">
+            <%= svg_tag "icon-error-message" %>
+            Unable to extract this article’s content.
+        </p>
     <% end %>
 <% end %>
