@@ -44,5 +44,6 @@ module Feedbin
 
     config.sass.line_comments = true
     config.assets.compress = true
+    config.action_view.automatically_disable_submit_tag = false
   end
 end

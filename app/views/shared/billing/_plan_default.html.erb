@@ -1,24 +1,11 @@
 <div class="inset">
-    <%= form_tag settings_update_credit_card_path, id: "payment-form" do %>
-        <%= hidden_field_tag :stripe_token, nil, id: 'stripe_token' %>
-        <h4 class="group-header">Billing Info</h4>
-        <ul class="pill-list">
-            <li class="text-with-accessory">
-                <span data-behavior="billing_details" class="text">Loading…</span>
-                <button class="button-text accessory" data-behavior="show_container" data-target="credit_card_form">Update card</button>
-            </li>
-        </ul>
-
-        <div class="hide" data-container="credit_card_form">
-            <%= render partial: 'shared/credit_card_form' %>
-            <div class="description-inset">
-                <div class="button-wrap">
-                    <%= submit_tag "Update", class: "button no-margin update-cc-button", id: "credit_card_button", disabled: true, data: { disable_with: false } %>
-                </div>
-            </div>
-        </div>
-
-    <% end %>
+    <h4 class="group-header">Billing Info</h4>
+    <ul class="pill-list">
+        <li class="text-with-accessory">
+            <span data-behavior="billing_details" class="text">Loading…</span>
+            <%= link_to "Edit", settings_edit_billing_path %>
+        </li>
+    </ul>
 </div>
 <div class="inset">
     <h4 class="group-header">Change Your Plan</h4>
@@ -35,7 +22,7 @@
                             <% else %>
                                 <%= form_tag settings_update_plan_path, data: { behavior: 'change_plan' }, class: 'no-margin' do %>
                                     <%= hidden_field_tag 'plan', plan.id %>
-                                    <%= button_tag 'Switch to this plan', class: 'button-text', data: { confirm: "Are you sure you want to switch to #{plan.name.downcase} billing?" } %>
+                                    <%= button_tag 'Switch to this plan', class: 'button-text large', data: { confirm: "Are you sure you want to switch to #{plan.name.downcase} billing?" } %>
                                 <% end %>
                             <% end %>
                         </td>

@@ -46,26 +46,6 @@ $.extend feedbin,
       element.setAttribute('target', '_blank')
       element.setAttribute('rel', 'noopener noreferrer')
 
-  placeholderColor: ->
-    if feedbin.theme == "sunset"
-      "#8E8C88"
-    else if feedbin.theme == "dusk"
-      "#707070"
-    else if feedbin.theme == "midnight"
-      "#595959"
-    else
-      "#BDBFC3"
-
-  inputColor: ->
-    if feedbin.theme == "sunset"
-      "#3B3A38"
-    else if feedbin.theme == "dusk"
-      "#D4D4D4"
-    else if feedbin.theme == "midnight"
-      "#BABABA"
-    else
-      "#39404B"
-
   reveal: (element, callback = null) ->
     hideFeed = false
     hideTag = false

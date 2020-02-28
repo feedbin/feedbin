@@ -1,0 +1,141 @@
+window.feedbin ?= {}
+
+class feedbin.Payments
+
+  constructor: (plans, @defaultPlan) ->
+    @stripe = Stripe("<%= STRIPE_PUBLIC_KEY %>")
+    @elements = @stripe.elements()
+    @plans = @formatPlans(plans)
+    @paymentForm = document.getElementById("payment-form")
+    @creditCardButton = document.getElementById("credit_card_button")
+    @createButton()
+    @createCard()
+
+  tokenHandler: (token) ->
+    hiddenInput = document.getElementById("stripe_token")
+    hiddenInput.setAttribute "value", token.id
+    @paymentForm.submit()
+
+  updatePaymentRequest: (id) ->
+    typeof(@button) != "undefined" && @button.destroy()
+    @button = @makeButton(id)
+    @plans[id].canMakePayment().then (result) =>
+      if result && result.applePay == true
+        $("body").addClass "apple-pay"
+        $("body").addClass "native-payment"
+        $("#billing_method_apple_pay").prop "checked", true
+        @button.mount "#payment_request_button"
+      else
+        $("body").addClass "no-native-payment"
+
+    @plans[id].on "token", (event) =>
+      @tokenHandler event.token
+      $("#payment_request_button").html "<small>Loading…</small>"
+      event.complete "success"
+
+  makeButton: (id) ->
+    options =
+      paymentRequest: @plans[id]
+      style: paymentRequestButton:
+        type: "default"
+        theme: @theme()
+        height: "36px"
+    @elements.create "paymentRequestButton", options
+
+  theme: ->
+    if feedbin.theme == "dusk" || feedbin.theme == "midnight"
+      "light"
+    else
+      "dark"
+
+  createButton: ->
+    if $("#payment_request_button").length > 0
+      @updatePaymentRequest @defaultPlan
+      $(document).on "change", "[data-behavior~=billing_method_radio]", (event) =>
+        selected = $(event.target).attr("id")
+        $("[data-behavior~=billing_method_radio]").each (index, element) =>
+          option = $(element).attr("id")
+          $("body").removeClass option
+        $("body").addClass selected
+
+      $(document).on "change", "[data-behavior~=plan_select]", (event) =>
+        selected = $(event.target).attr("id")
+        plan = $(event.target).data("plan-id")
+        @updatePaymentRequest plan
+        $("[data-behavior~=billing_help_text]").addClass "hide"
+        $("[data-plan-id=#{selected}]").removeClass "hide"
+
+  createCard: ->
+    card = @elements.create("card", style: @cardStyle())
+    card.mount "#card-element"
+    card.addEventListener "change", (event) =>
+      if event.error
+        feedbin.showNotification event.error.message, true
+      else
+        feedbin.hideNotification()
+
+    card.addEventListener "ready", (event) =>
+      @creditCardButton.disabled = false
+
+    @paymentForm.addEventListener "submit", (event) =>
+      event.preventDefault()
+      @creditCardButton.disabled = true
+      @stripe.createToken(card, @cardOptions()).then (result) =>
+        if result.error
+          @creditCardButton.disabled = false
+          feedbin.showNotification result.error.message, true
+        else
+          @tokenHandler result.token
+
+  cardOptions: ->
+    name = $("[name=billing_name]").val()
+    country = $("[name=billing_country]").val()
+    options = {}
+    options.name = name if name
+    options.address_country = country if country
+    options
+
+  cardStyle: ->
+    style =
+      base:
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif"
+        fontSize: "16px"
+        fontSmoothing: "antialiased"
+        color: @inputColor()
+        "::placeholder":
+          color: @placeholderColor()
+      invalid:
+        iconColor: "#BB0B2F"
+        color: "#BB0B2F"
+
+  inputColor: ->
+    if feedbin.theme == "sunset"
+      "#3B3A38"
+    else if feedbin.theme == "dusk"
+      "#D4D4D4"
+    else if feedbin.theme == "midnight"
+      "#BABABA"
+    else
+      "#39404B"
+
+  placeholderColor: ->
+    if feedbin.theme == "sunset"
+      "#8E8C88"
+    else if feedbin.theme == "dusk"
+      "#707070"
+    else if feedbin.theme == "midnight"
+      "#595959"
+    else
+      "#BDBFC3"
+
+  formatPlans: (plans) ->
+    output = {}
+    for plan in plans
+      output[plan.id] = @stripe.paymentRequest
+        country: "US"
+        currency: "usd"
+        requestPayerName: true
+        total:
+            label: "Feedbin #{plan.name} Subscription"
+            amount: plan.amount
+    output

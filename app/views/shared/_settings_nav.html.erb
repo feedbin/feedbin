@@ -60,7 +60,7 @@
         </li>
         <% if ENV["STRIPE_API_KEY"] %>
             <li>
-                <%= link_to settings_billing_path, class: is_active?("settings", "billing") do %>
+                <%= link_to settings_billing_path, class: is_active?("settings", "billing") || is_active?("settings", "edit_billing") do %>
                     Billing
                 <% end %>
             </li>

@@ -1,0 +1,22 @@
+<% content_for :head do %>
+    <%= javascript_include_tag "https://js.stripe.com/v3/" %>
+    <%= javascript_include_tag "payments" %>
+    <%= render partial: "shared/billing_plans", locals: {plans: @plans, default_plan: @default_plan} %>
+<% end %>
+<div class="settings-content-inner">
+    <div class="settings-outer">
+        <h2>Billing</h2>
+        <%= form_tag settings_update_credit_card_path, id: "payment-form" do %>
+            <%= hidden_field_tag :stripe_token, nil, id: 'stripe_token' %>
+
+            <%= render partial: 'shared/credit_card_form' %>
+
+            <div class="button-wrap">
+                <div id="payment_request_button"><small>Loading…</small></div>
+                <button type="submit" class="button" id="credit_card_button" disabled>Update</button>
+            </div>
+
+        <% end %>
+
+    </div>
+</div>

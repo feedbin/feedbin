@@ -175,6 +175,7 @@ Rails.application.routes.draw do
     post :audio_panel_size
   end
 
+  get "settings/billing/edit", as: :settings_edit_billing, to: "settings#edit_billing"
   post "settings/sticky/:feed_id", as: :settings_sticky, to: "settings#sticky"
   post "settings/subscription_view_mode/:feed_id", as: :settings_subscription_view_mode, to: "settings#subscription_view_mode"
 

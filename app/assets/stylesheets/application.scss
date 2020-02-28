@@ -7009,6 +7009,9 @@ button.reset {
     padding: 1px;
     font-size: 14px;
     text-decoration: underline;
+    &.large {
+        font-size: 16px;
+    }
     .modal & {
         text-decoration: none;
     }

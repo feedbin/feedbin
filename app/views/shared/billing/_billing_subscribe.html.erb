@@ -37,33 +37,9 @@
                 </li>
             <% end %>
         </ul>
-        <div data-behavior="payment_method">
-            <h4 class="group-header">Payment Method</h4>
-            <ul class="control-group">
-                <li data-behavior="billing_option_apple_pay">
-                    <%= radio_button_tag("billing_method", "apple_pay", false, { data: {behavior: 'billing_method_radio'}}) %>
-                    <%= label_tag("billing_method_apple_pay") do %>
-                         Apple Pay <%= radio_button_control %>
-                    <% end %>
-                </li>
-                <li data-behavior="billing_option_payment_request">
-                    <%= radio_button_tag("billing_method", "pay_with_google", false, { data: {behavior: 'billing_method_radio'}}) %>
-                    <%= label_tag("billing_method_pay_with_google") do %>
-                         Pay with Browser <%= radio_button_control %>
-                    <% end %>
-                </li>
-                <li>
-                    <%= radio_button_tag("billing_method", "credit_card", false, { data: {behavior: 'billing_method_radio'}}) %>
-                    <%= label_tag("billing_method_credit_card") do %>
-                         Credit Card <%= radio_button_control %>
-                    <% end %>
-                </li>
-            </ul>
-        </div>
-        <div id="credit_card_payment" data-behavior="credit_card_details">
-            <h4 class="group-header">Card Details</h4>
-            <%= render partial: 'shared/credit_card_form' %>
-        </div>
+
+        <%= render partial: 'shared/credit_card_form' %>
+
         <% @plans.each do |plan| %>
             <% if @user.trial_end.future? %>
                 <% if plan.name == "Monthly" %>
