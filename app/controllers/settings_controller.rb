@@ -38,13 +38,13 @@ class SettingsController < ApplicationController
     all_purchases = (stripe_purchases.to_a + in_app_purchases.to_a)
     @billing_events = all_purchases.sort_by { |billing_event| billing_event.purchase_date }.reverse
 
-    @plans = @user.available_plans
+    plan_setup
   end
 
   def edit_billing
     @user = current_user
     @default_plan = @user.plan
-    @plans = @user.available_plans
+    plan_setup
   end
 
   def payment_details
@@ -213,6 +213,13 @@ class SettingsController < ApplicationController
   end
 
   private
+
+  def plan_setup
+    @plans = @user.available_plans
+    @plan_data = @plans.map do |plan|
+      {id: plan.id, name: plan.name, amount: plan.price_in_cents}
+    end
+  end
 
   def plan_exists
     render_404 unless Plan.exists?(params[:plan].to_i)

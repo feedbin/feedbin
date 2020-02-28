@@ -1,3 +1,15 @@
+<% content_for :head do %>
+    <%= javascript_include_tag "https://js.stripe.com/v3/" %>
+    <%= javascript_include_tag "payments" %>
+    <script>
+        $(function() {
+            new feedbin.Payments(<%= raw json_escape(@plan_data.to_json) %>, <%= @default_plan.id %>);
+        });
+    </script>
+<% end %>
+
+<div data-behavior="hide_on_load">Loading…</div>
+
 <div data-behavior="payment_method">
     <h4 class="group-header">Payment Method</h4>
     <ul class="control-group">
@@ -21,6 +33,7 @@
         </li>
     </ul>
 </div>
+
 <div id="credit_card_payment" data-behavior="credit_card_details">
     <h4 class="group-header">Card Details</h4>
     <div class="card-meta">

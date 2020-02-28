@@ -20,6 +20,7 @@ class feedbin.Payments
     typeof(@button) != "undefined" && @button.destroy()
     @button = @makeButton(id)
     @plans[id].canMakePayment().then (result) =>
+      $("[data-behavior~=hide_on_load]").addClass("hide")
       if result && result.applePay == true
         $("body").addClass "apple-pay"
         $("body").addClass "native-payment"

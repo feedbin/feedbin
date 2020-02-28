@@ -1,8 +1,3 @@
-<% content_for :head do %>
-    <%= javascript_include_tag "https://js.stripe.com/v3/" %>
-    <%= javascript_include_tag "payments" %>
-    <%= render partial: "shared/billing_plans", locals: {plans: @plans, default_plan: @default_plan} %>
-<% end %>
 <div class="settings-content-inner">
     <div class="settings-outer">
         <h2>Billing</h2>
