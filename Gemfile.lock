@@ -406,7 +406,7 @@ GEM
       actionmailer (>= 3)
       premailer (~> 1.7, >= 1.7.9)
     public_suffix (4.0.3)
-    puma (4.3.1)
+    puma (4.3.2)
       nio4r (~> 2.0)
     rack-attack (6.2.2)
       rack (>= 1.0, < 3)
