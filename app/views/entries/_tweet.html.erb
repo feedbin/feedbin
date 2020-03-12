@@ -21,7 +21,7 @@
             <% if entry_presenter.tweet_video?(media) %>
                 <%= entry_presenter.tweet_video(media) %>
             <% else %>
-                <%= link_to media.media_url_https.to_s + ":large" do %>
+                <%= link_to media.media_url_https.to_s + ":4096x4096" do %>
                     <%= image_tag camo_link(media.media_url_https.to_s + ":large"), class: "responsive" %>
                 <% end %>
             <% end %>
@@ -33,7 +33,7 @@
                 <% if entry_presenter.tweet_video?(media) %>
                     <%= entry_presenter.tweet_video(media) %>
                 <% else %>
-                    <%= link_to media.media_url_https.to_s + ":large" do %>
+                    <%= link_to media.media_url_https.to_s + ":4096x4096" do %>
                         <%= image_tag camo_link(media.media_url_https.to_s + ":large"), class: "responsive" %>
                     <% end %>
                 <% end %>

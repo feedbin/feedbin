@@ -26,7 +26,7 @@
                 <% if entry_presenter.tweet_video?(media) %>
                     <%= entry_presenter.tweet_video(media) %>
                 <% else %>
-                    <%= link_to media.media_url_https.to_s + ":large" do %>
+                    <%= link_to media.media_url_https.to_s + ":4096x4096" do %>
                         <%= image_tag media.media_url_https.to_s + ":large" %>
                     <% end %>
                 <% end %>
@@ -41,12 +41,12 @@
                 <div class="feedbin--embed-wrap"><%= entry_presenter.tweet_instagram_embed(url) %></div>
             <% elsif page = entry_presenter.saved_page(url.expanded_url.to_s) %>
                 <%
-      begin
-          link_content = ContentFormatter.format!(page.content, nil)
-      rescue
-          link_content = nil
-      end
-      %>
+                  begin
+                      link_content = ContentFormatter.format!(page.content, nil)
+                  rescue
+                      link_content = nil
+                  end
+                %>
                 <% if link_content && link_content.length > 400 %>
                     <div class="feedbin--article-wrap">
                         <header class="feedbin--article-header">
