@@ -1,7 +1,10 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
   config.hosts = ENV["FEEDBIN_HOST"]&.split(",")
-
+  
+  # Overwrite length of top level domain for DNS/host name
+  config.action_dispatch.tld_length = Integer(ENV['TLD_LENGTH'] || 1)
+  
   # Code is not reloaded between requests.
   config.cache_classes = true
 
