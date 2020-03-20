@@ -1,5 +1,5 @@
 # config valid only for current version of Capistrano
-lock "3.11.2"
+lock "3.12.1"
 
 set :branch, "master"
 
