@@ -26,7 +26,7 @@ group :development, :test do
   gem "minitest"
   gem "stripe-ruby-mock", "= 2.5.0", require: "stripe_mock"
   gem "faker"
-  gem "webmock"
+  gem "webmock", "= 3.8.0"
   gem "minitest-stub-const"
   gem "coveralls", require: false
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]
