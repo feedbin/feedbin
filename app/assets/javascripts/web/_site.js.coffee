@@ -875,6 +875,12 @@ $.extend feedbin,
       if 'console' of window
         console.log error
 
+  autoUpdate: ->
+    result = feedbin.refresh()
+    if result
+      result.always ->
+        setTimeout feedbin.autoUpdate, 300000
+
   refresh: ->
     if feedbin.data
       $.get(feedbin.data.auto_update_path)
@@ -1891,9 +1897,7 @@ $.extend feedbin,
         true
 
     autoUpdate: ->
-      setInterval ( ->
-        feedbin.refresh()
-      ), 300000
+      setTimeout feedbin.autoUpdate, 300000
 
     entryBasement: ->
 
