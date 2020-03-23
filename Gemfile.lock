@@ -446,7 +446,7 @@ GEM
       railties (>= 5.0)
     reverse_markdown (2.0.0)
       nokogiri
-    rmagick (4.0.0)
+    rmagick (4.1.0)
     rubocop (0.79.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
