@@ -946,13 +946,6 @@ $.extend feedbin,
       $('body').removeClass('push-off')
       $('body').addClass('push-disabled')
 
-  toggleFullScreen: ->
-    $('body').toggleClass('full-screen')
-    if !$('body').hasClass('full-screen')
-      feedbin.scrollToPanel('.entries-column', false)
-    feedbin.measureEntryColumn()
-    feedbin.setNativeBorders()
-
   isFullScreen: ->
     $('body').hasClass('full-screen')
 
@@ -1982,10 +1975,14 @@ $.extend feedbin,
 
     fullscreen: ->
       $(document).on 'click', '[data-behavior~=full_screen]', (event) ->
-        feedbin.toggleFullScreen()
+        $('[data-behavior~=toggle_full_screen]').click()
 
       $(document).on 'change', '[data-behavior~=toggle_full_screen]', (event) ->
-        feedbin.toggleFullScreen()
+        $('body').toggleClass('full-screen')
+        if !$('body').hasClass('full-screen')
+          feedbin.scrollToPanel('.entries-column', false)
+        feedbin.measureEntryColumn()
+        feedbin.setNativeBorders()
 
     theme: ->
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
