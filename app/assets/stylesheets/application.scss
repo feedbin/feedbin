@@ -4072,6 +4072,13 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
 }
 
+.media-container {
+    video {
+        width: 100% !important;
+        height: auto !important;
+    }
+}
+
 .content-styles {
     font-style: normal;
     font-size: 1.15em;
@@ -4117,11 +4124,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .fluid-width-video-wrapper,
     .entry-callout {
         margin: 1.1em 0 1.1em 0;
-    }
-
-    video {
-        width: 100%;
-        height: auto;
     }
 
     .micropost-wrap {
