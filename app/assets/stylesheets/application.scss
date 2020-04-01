@@ -4119,6 +4119,11 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         margin: 1.1em 0 1.1em 0;
     }
 
+    video {
+        width: 100%;
+        height: auto;
+    }
+
     .micropost-wrap {
         p,
         ul,
@@ -4360,10 +4365,10 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                 visibility: visible;
             }
         }
-        img.full-width, .fluid-width-video-wrapper {
+        img.full-width, .fluid-width-video-wrapper, .media-container {
             width: 100vw !important;
             max-width: none !important;
-            margin-left: -10px !important;
+            margin-left: -$two-units !important;
         }
     }
 }
@@ -4531,23 +4536,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         @include color($color-contrast-400);
     }
 
-}
-
-.media-container {
-    margin: 1.1em 0;
-    padding-bottom: 56.25%;
-    width: 100%;
-    position: relative;
-    video {
-        background-color: black;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        height: 100%;
-    }
 }
 
 .entry-final-content a, .tweet-text a, .micropost-text a, .modal-content .content-styles a {
@@ -9205,7 +9193,7 @@ Media Queries
         }
     }
     .entry-inner {
-        padding: 15px 10px;
+        padding: $two-units;
         .modal & {
             padding-left: 0;
             padding-right: 0;
@@ -9295,7 +9283,7 @@ button.close {
         margin: 0;
         width: 100%;
         max-width: 100%;
-        padding: 18px 56px 18px $icon-width - 8px;
+        padding: 18px 64px 18px $icon-width - 8px;
         font-size: 24px;
         @include color($color-contrast-700);
         @include background-color($color-contrast-100);
@@ -9542,20 +9530,18 @@ button.close {
 .swipe {
     @media (max-width: $small-breakpoint) {
         .app-wrap {
-            display: block !important;
             scroll-snap-type: x mandatory;
             overflow-x: auto;
             overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
-            white-space: nowrap;
         }
         .app-panel {
             top: 0;
-            height: 100% !important;
-            width: 100% !important;
-            white-space: normal;
-            display: inline-block !important;
+            height: 100vh !important;
+            width: 100vw !important;
+            display: block !important;
             scroll-snap-align: start;
+            flex-shrink: 0;
         }
     }
 }
