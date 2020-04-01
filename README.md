@@ -20,6 +20,8 @@ The main Feedbin project is a [Rails 6](http://rubyonrails.org/) application. In
    Image is the service that finds images to be [associated with articles](https://feedbin.com/blog/2015/10/22/image-previews/)
  - [**camo:**](https://github.com/atmos/camo)
    Camo is an https image proxy. In production Feedbin is SSL only. One issue with SSL is all assets must be served over SSL as well or the browser will show insecure content warnings. Camo proxies all image requests through an SSL enabled host to prevent this.
+ - [**extract:**](https://github.com/feedbin/extract)
+   Extract is a Node.js service that extract content from web pages. It is used to extract full pages when a feed only provide excerpts.
 
 Requirements
 ------------
