@@ -4073,6 +4073,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 }
 
 .media-container {
+    margin: 1.1em 0 1.1em 0;
     video {
         width: 100% !important;
         height: auto !important;
@@ -4360,8 +4361,11 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         @include color($theme-color-600);
     }
 
+}
+
+.entry-inner {
     @media (max-width: $small-breakpoint) {
-        img[data-camo-src] {
+        img[data-camo-src], .full-width-candidate {
             visibility: hidden;
             &.full-width, &.show {
                 visibility: visible;

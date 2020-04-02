@@ -776,6 +776,19 @@ $.extend feedbin,
         container.html $("<div class='inline-spinner'>Loading embed from #{container.data("iframe-host")}…</div>")
         $.get container.data("iframe-embed-url")
 
+  fullWidthImage: (img) ->
+    load = ->
+      width = img.get(0).naturalWidth
+      if width > 528 && img.parents(".modal").length == 0
+        img.addClass("full-width")
+      img.addClass("show")
+
+    if img.get(0).complete
+      load()
+
+    img.on 'load', (event) ->
+      load()
+
   formatImages: (context = document) ->
     $("video[data-camo-poster]", context).each ->
       video = $(@)
@@ -802,20 +815,13 @@ $.extend feedbin,
       if actualSrc?
         img.attr("src", actualSrc)
 
-      load = ->
-        width = img.get(0).naturalWidth
-        if width > 528 && img.parents(".modal").length == 0
-          img.addClass("full-width")
-        img.addClass("show")
-
-      if img.get(0).complete
-        load()
-
-      img.on 'load', (event) ->
-        load()
-
       if img.is("[src*='feeds.feedburner.com'], [data-canonical-src*='feeds.feedburner.com']")
         img.addClass('hide')
+
+      feedbin.fullWidthImage(img)
+
+    $(".full-width-candidate", context).each ->
+      feedbin.fullWidthImage $(@)
 
   removeOuterLinks: ->
     $('[data-behavior~=entry_final_content] a').find('video').unwrap()
