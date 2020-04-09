@@ -313,7 +313,7 @@ class Entry < ApplicationRecord
           before = ContentFormatter.format!(original["content"], self)
           after = ContentFormatter.format!(content, self)
           result = HTMLDiff::Diff.new("<div>#{before}</div>", "<div>#{after}</div>").inline_html
-          result = Sanitize.fragment(result, Sanitize::Config::RELAXED).html_safe
+          result = result.html_safe
         rescue
         end
       end
