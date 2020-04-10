@@ -15,7 +15,7 @@
     <body>
         <h2 class="no-margin">Receipt</h2>
         <p>
-            <small>Invoice: <%= @billing_event.event_object["invoice"] %></small>
+            <small>Invoice: <%= @billing_event.event_object["invoice"] || @billing_event.event_object["id"] %></small>
             <br />
             <small><%= Time.at(@billing_event.event_object["created"]).to_s(:date) %></small>
         </p>
@@ -40,28 +40,38 @@
                     <th width="50%">Price</th>
                 </tr>
             </thead>
-            <% @billing_event.invoice_items["data"].each do |invoice_item| %>
+
+            <% if @billing_event.invoice_items.present? %>
+                <% @billing_event.invoice_items["data"].each do |invoice_item| %>
+                    <tr>
+                        <td>
+                            <% if invoice_item["plan"] %>
+                                Subscription to <%= invoice_item["plan"]["id"] %>
+                            <% else %>
+                                <%= invoice_item["description"] %>
+                            <% end %>
+                        </td>
+                        <td align="right"><%= invoice_item["currency"].upcase %> <%= number_to_currency(invoice_item["amount"].to_f / 100) %></td>
+                    </tr>
+                <% end %>
+                <% if @billing_event.invoice["starting_balance"] != 0 %>
+                    <tr>
+                        <td>Applied balance</td>
+                        <td align="right"><%= @billing_event.invoice["currency"].upcase %> <%= number_to_currency(@billing_event.invoice["starting_balance"].to_f / 100) %></td>
+                    </tr>
+                <% end %>
                 <tr>
-                    <td>
-                        <% if invoice_item["plan"] %>
-                            Subscription to <%= invoice_item["plan"]["id"] %>
-                        <% else %>
-                            <%= invoice_item["description"] %>
-                        <% end %>
-                    </td>
-                    <td align="right"><%= invoice_item["currency"].upcase %> <%= number_to_currency(invoice_item["amount"].to_f / 100) %></td>
+                    <th align="left"><strong>Paid</strong></th>
+                    <th align="right"><%= @billing_event.event_object["currency"].upcase %> <strong><%= number_to_currency(@billing_event.event_object["amount"].to_f / 100) %></strong></th>
                 </tr>
-            <% end %>
-            <% if @billing_event.invoice["starting_balance"] != 0 %>
-                <tr>
-                    <td>Applied balance</td>
-                    <td align="right"><%= @billing_event.invoice["currency"].upcase %> <%= number_to_currency(@billing_event.invoice["starting_balance"].to_f / 100) %></td>
-                </tr>
-            <% end %>
+            <% else %>
             <tr>
-                <th align="left"><strong>Paid</strong></th>
-                <th align="right"><%= @billing_event.event_object["currency"].upcase %> <strong><%= number_to_currency(@billing_event.event_object["amount"].to_f / 100) %></strong></th>
+                <td>
+                    <%= @billing_event.event_object.dig("calculated_statement_descriptor") %> <%= @billing_event.event_object.dig("description") %>
+                </td>
+                <td align="right"><%= @billing_event.event_object.dig("currency").upcase %> <%= number_to_currency(@billing_event.event_object.dig("amount").to_f / 100) %></td>
             </tr>
+            <% end %>
         </table>
         <p><strong>Thank You!</strong></p>
     </body>

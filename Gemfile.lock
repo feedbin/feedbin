@@ -182,6 +182,8 @@ GEM
       coderay (>= 1.0.0)
       erubi (>= 1.0.0)
       rack (>= 0.9.0)
+    binding_of_caller (0.8.0)
+      debug_inspector (>= 0.0.1)
     bootsnap (1.4.6)
       msgpack (~> 1.0)
     buftok (0.2.0)
@@ -239,6 +241,7 @@ GEM
       addressable
     curb (0.9.10)
     dante (0.2.0)
+    debug_inspector (0.0.3)
     docile (1.3.2)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
@@ -571,6 +574,7 @@ DEPENDENCIES
   bcrypt-ruby
   benchmark-ips
   better_errors
+  binding_of_caller
   bootsnap
   byebug
   capistrano
