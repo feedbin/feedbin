@@ -1,10 +1,10 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
   config.hosts = ENV["FEEDBIN_HOST"]&.split(",")
-  
+
   # Overwrite length of top level domain for DNS/host name
   config.action_dispatch.tld_length = Integer(ENV['TLD_LENGTH'] || 1)
-  
+
   # Code is not reloaded between requests.
   config.cache_classes = true
 
@@ -74,7 +74,7 @@ Rails.application.configure do
 
   # Use a different cache store in production.
   if ENV["MEMCACHED_HOSTS"]
-    config.cache_store = :dalli_store, ENV["MEMCACHED_HOSTS"].split(",")
+    config.cache_store = :dalli_store, ENV["MEMCACHED_HOSTS"].split(","), {value_max_bytes: 1024 * 1024 * 10}
   end
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
