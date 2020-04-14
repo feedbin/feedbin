@@ -59,6 +59,15 @@ class EntryTest < ActiveSupport::TestCase
     end
   end
 
+  test "should enqueue CacheEntryViews" do
+    assert_difference "CacheEntryViews.jobs.size", +1 do
+      @entry.save
+    end
+    assert_difference "CacheEntryViews.jobs.size", +1 do
+      @entry.touch
+    end
+  end
+
   test "should mark unread" do
     assert_difference "UnreadEntry.count", +1 do
       @entry.save
