@@ -573,6 +573,7 @@ DEPENDENCIES
   addressable
   apnotic
   autoprefixer-rails
+  bcrypt
   bcrypt-ruby
   benchmark-ips
   better_errors

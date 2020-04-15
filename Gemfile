@@ -98,6 +98,7 @@ gem "bootsnap", require: false
 gem "unicode-emoji"
 gem "rack-attack"
 gem "jbuilder_cache_multi"
+gem "bcrypt"
 
 # Stripe
 gem "stripe", "~> 4.24.0"
