@@ -509,9 +509,7 @@ GEM
     standard (0.2.3)
       rubocop (~> 0.80.1)
       rubocop-performance (~> 1.5.2)
-    stripe (4.24.0)
-      faraday (~> 0.13)
-      net-http-persistent (~> 3.0)
+    stripe (5.17.0)
     stripe-ruby-mock (2.5.0)
       dante (>= 0.2.0)
       multi_json (~> 1.0)
@@ -646,7 +644,7 @@ DEPENDENCIES
   silencer
   spring
   standard
-  stripe (~> 4.24.0)
+  stripe (~> 5.17.0)
   stripe-ruby-mock (= 2.5.0)
   stripe_event
   twitter
