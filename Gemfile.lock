@@ -78,7 +78,7 @@ GIT
 
 GIT
   remote: https://github.com/rails/rails.git
-  revision: 1db2ae1f5f7cf9615abc83620d282d535e4bc6aa
+  revision: 2c81e32aaa455ae89c557458c79b6fd4b305b887
   branch: 6-0-stable
   specs:
     actioncable (6.0.2.2)
@@ -356,7 +356,7 @@ GEM
       activesupport (>= 4)
       railties (>= 4)
       request_store (~> 1.0)
-    loofah (2.4.0)
+    loofah (2.5.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)
@@ -541,7 +541,7 @@ GEM
     twitter-text (2.1.0)
       idn-ruby
       unf (~> 0.1.0)
-    tzinfo (1.2.6)
+    tzinfo (1.2.7)
       thread_safe (~> 0.1)
     uglifier (4.1.11)
       execjs (>= 0.3.0, < 3)
