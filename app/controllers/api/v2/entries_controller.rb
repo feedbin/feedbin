@@ -100,6 +100,9 @@ module Api
         else
           @entries = Entry.where(id: pagination[:paged_entry_ids][pagination[:page_index]]).includes(:feed).order(created_at: :desc)
           links_header(pagination[:will_paginate], "api_v2_entries_url")
+          if params[:mode] == "extended"
+            json_cache("api/v2/entries/_entry_extended", @entries, :entry, params.key?(:include_content_diff))
+          end
         end
       end
     end

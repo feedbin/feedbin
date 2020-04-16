@@ -26,6 +26,7 @@ module Api
         end
 
         page_query = @starred_entries || @entries
+        entry_count(page_query)
 
         if page_query.out_of_bounds?
           status_not_found
@@ -33,9 +34,18 @@ module Api
           @entries = []
         else
           links_header(page_query, path_helper, params[:feed_id])
-          fresh_when(etag: @entries)
+
+          if params[:mode] == "extended" && stale?(etag: @entries)
+            json_cache("api/v2/entries/_entry_extended", @entries, :entry, params.key?(:include_content_diff))
+          end
         end
-        entry_count(page_query)
+      end
+
+      def json_cache(template_path, records, local, *cache_keys)
+        if perform_caching && Rails.cache.respond_to?(:fetch_multi)
+          results = CacheEntryViews.new.json_cache(template_path, records, local, params, *cache_keys)
+          render json: "[#{results}]"
+        end
       end
 
       def entry_count(collection)
