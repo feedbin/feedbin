@@ -4,7 +4,6 @@ git_source(:github) { |name| "https://github.com/#{name}.git" }
 gem "rails", github: "rails/rails", branch: "6-0-stable"
 
 gem "rails-controller-testing"
-gem "rails_autolink"
 gem "responders"
 gem "rack", github: "rack/rack", ref: "4ebd70b"
 
@@ -83,7 +82,7 @@ gem "rmagick", require: false
 gem "reverse_markdown"
 gem "htmlentities"
 gem "dotenv-rails"
-gem "kramdown"
+gem "redcarpet"
 gem "premailer-rails"
 gem "http"
 gem "net-http-persistent"

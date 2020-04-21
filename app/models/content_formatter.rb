@@ -1,6 +1,3 @@
-require "kramdown"
-require "rails_autolink"
-
 class ContentFormatter
   LEADING_CHARS = %w|
     (
@@ -316,8 +313,9 @@ class ContentFormatter
   end
 
   def _text_email(content)
-    content = ActionController::Base.helpers.auto_link(content)
-    Kramdown::Document.new(content).to_html
+    markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true)
+    content = markdown.render(content)
+    Sanitize.fragment(content, WHITELIST_DEFAULT)
   rescue
     content
   end

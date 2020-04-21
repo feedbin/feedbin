@@ -8,7 +8,7 @@
             </label>
         </form>
     <% end %>
-    <% if entry.feed.newsletter? %>
+    <% if entry.feed.newsletter? && !entry_presenter.text? %>
         <form action="<%= settings_subscription_view_mode_path(entry.feed_id) %>" class="content-option-form newsletter-content-option-form" data-remote="true" method="post">
             <input name="subscription[view_mode]" type="hidden" value="article">
             <input name="subscription[view_mode]" type="checkbox" value="newsletter" class="visually-hidden" id="newsletter_view" data-behavior="change_content_view auto_submit" data-view-mode="newsletter">

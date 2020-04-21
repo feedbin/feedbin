@@ -335,7 +335,6 @@ GEM
       thor (>= 0.14, < 2.0)
     json (2.3.0)
     kgio (2.11.3)
-    kramdown (2.1.0)
     librato-metrics (1.6.1)
       aggregate (~> 0.2.2)
       faraday (~> 0.7)
@@ -425,8 +424,6 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.3.0)
       loofah (~> 2.3)
-    rails_autolink (1.1.6)
-      rails (> 3.1)
     rainbow (3.0.0)
     raindrops (0.19.1)
     rake (13.0.1)
@@ -439,6 +436,7 @@ GEM
       hashie (~> 3.2)
       multi_json (~> 1.10)
       multi_xml (~> 0.5)
+    redcarpet (3.5.0)
     redis (4.1.3)
     regexp_parser (1.7.0)
     request_store (1.5.0)
@@ -613,7 +611,6 @@ DEPENDENCIES
   jbuilder_cache_multi
   jquery-rails
   json
-  kramdown
   librato-rails (= 1.4.2)
   listen
   lograge
@@ -631,9 +628,9 @@ DEPENDENCIES
   rack-attack
   rails!
   rails-controller-testing
-  rails_autolink
   raindrops
   readability_parser
+  redcarpet
   redis
   responders
   reverse_markdown
