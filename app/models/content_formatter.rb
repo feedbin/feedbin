@@ -316,8 +316,8 @@ class ContentFormatter
   end
 
   def _text_email(content)
-    content = Kramdown::Document.new(content).to_html
-    ActionController::Base.helpers.auto_link(content)
+    content = ActionController::Base.helpers.auto_link(content)
+    Kramdown::Document.new(content).to_html
   rescue
     content
   end
