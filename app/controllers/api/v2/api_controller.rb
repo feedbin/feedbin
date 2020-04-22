@@ -31,21 +31,17 @@ module Api
         if page_query.out_of_bounds?
           status_not_found
         elsif !@entries.present?
-          @entries = []
+          render json: []
         else
           links_header(page_query, path_helper, params[:feed_id])
-
-          if params[:mode] == "extended" && stale?(etag: @entries)
-            json_cache("api/v2/entries/_entry_extended", @entries, :entry, params.key?(:include_content_diff))
+          if stale?(etag: @entries)
+            render_json "entries/index"
           end
         end
       end
 
-      def json_cache(template_path, records, local, *cache_keys)
-        if perform_caching && Rails.cache.respond_to?(:fetch_multi)
-          results = CacheEntryViews.new.json_cache(template_path, records, local, params, *cache_keys)
-          render json: "[#{results}]"
-        end
+      def render_json(template)
+        render template: "api/v2/#{template}.html.erb", layout: nil, content_type: "application/json"
       end
 
       def entry_count(collection)

@@ -32,6 +32,10 @@ module ApplicationHelper
     end
   end
 
+  def json_array(&block)
+    raw "[#{yield}]"
+  end
+
   def rtl(string)
     if rtl?(string)
       'dir="rtl"'.html_safe

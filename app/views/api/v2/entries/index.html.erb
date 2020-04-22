@@ -1,0 +1,11 @@
+<%-
+template = "entry_default"
+cached = false
+if params.key?(:private)
+  template = "entry_private"
+elsif params[:mode] == "extended"
+  template = "entry_extended"
+  cached = Proc.new { |item| [params.key?(:include_content_diff), item] }
+end
+-%>
+<%= json_array { render partial: "api/v2/entries/#{template}", collection: @entries, as: :entry, spacer_template: "api/v2/shared/comma", cached: cached } -%>

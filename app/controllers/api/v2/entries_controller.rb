@@ -94,15 +94,13 @@ module Api
         entry_count(pagination[:will_paginate])
 
         if entry_ids.blank?
-          @entries = []
+          render json: []
         elsif pagination[:page] <= 0 || pagination[:paged_entry_ids][pagination[:page_index]].nil?
           status_not_found
         else
           @entries = Entry.where(id: pagination[:paged_entry_ids][pagination[:page_index]]).includes(:feed).order(created_at: :desc)
           links_header(pagination[:will_paginate], "api_v2_entries_url")
-          if params[:mode] == "extended"
-            json_cache("api/v2/entries/_entry_extended", @entries, :entry, params.key?(:include_content_diff))
-          end
+          render_json "entries/index"
         end
       end
     end
