@@ -10,7 +10,7 @@
             <% end %>
         </p>
         <% if entry_presenter.newsletter_from? %>
-            <p class="post-meta"><%= entry_presenter.newsletter_from.name %> <span class="faded">&lt;<%= entry_presenter.newsletter_from.address %>&gt;</span></p>
+            <p class="post-meta"><%= entry_presenter.newsletter_from.name %> <% if entry_presenter.newsletter_from.address.present? %><span class="faded">&lt;<%= entry_presenter.newsletter_from.address %>&gt;</span><% end %></p>
         <% else %>
             <p class="post-meta feed-title"><span data-behavior="user_title" data-feed-id="<%= entry.feed.id %>"><%= strip_tags(entry.feed.title) %></span></p>
         <% end %>
