@@ -315,7 +315,7 @@ class ContentFormatter
   def _text_email(content)
     markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true)
     content = markdown.render(content)
-    Sanitize.fragment(content, WHITELIST_DEFAULT)
+    Sanitize.fragment(content, WHITELIST_DEFAULT).html_safe
   rescue
     content
   end
