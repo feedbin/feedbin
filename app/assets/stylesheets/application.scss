@@ -1818,7 +1818,7 @@ $hamburger-dot: 4px;
         justify-content: center;
         transition: transform 0.2s ease;
         svg {
-            @include fill($color-contrast-400);
+            @include fill($color-icons);
         }
     }
     .view-mode-dropdown {
@@ -2110,7 +2110,7 @@ $hamburger-dot: 4px;
                     svg {
                         transition: transform .15s linear;
                         transform: rotate(-90deg);
-                        @include fill($color-contrast-400);
+                        @include fill($color-icons);
                     }
                     &.icon-hide svg {
                         transform: rotate(0deg);
@@ -2386,16 +2386,6 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
 .favicon-unread-active {
     width: 14px !important;
     height: 13px !important;
-}
-
-.favicon-recently-read {
-    width: 12px !important;
-    height: 12px !important;
-}
-
-.favicon-recently-played {
-    width: 10px !important;
-    height: 12px !important;
 }
 
 .favicon-newsletter {
@@ -2773,6 +2763,9 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         }
         .icon-star {
             fill: white;
+        }
+        .icon-unread {
+            background-color: white;
         }
         .quoted-summary {
             border-color: rgba(white, .3) !important;
@@ -4858,11 +4851,9 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
                 align-items: center;
                 overflow: hidden;
                 svg {
+                    flex-shrink: 0;
                     margin-right: 4px;
                     @include fill($color-icons);
-                }
-                &:first-child {
-                    flex-shrink: 0;
                 }
                 span {
                     overflow: hidden;
@@ -6937,30 +6928,30 @@ button.reset {
 
 .grabber {
     cursor: move;
-    @include border-color($color-contrast-700);
-    @include background-color($color-contrast-700);
-    @include color($color-base);
+    @include border-color($color-accent-blue-600);
+    @include background-color($color-accent-blue-600);
+    @include color($theme-color-100);
     text-decoration: none !important;
     &:hover {
-        @include color($color-contrast-100);
+        @include color($theme-color-100);
     }
     &:active {
-        @include border-color($color-contrast-700);
-        @include background-color($color-contrast-700);
-        @include color($color-contrast-100);
+        @include border-color($color-accent-blue-600);
+        @include background-color($color-accent-blue-600);
+        @include color($theme-color-100);
     }
     ~ .accessory svg {
-        @include fill($color-contrast-400);
+        @include fill($theme-color-100);
+    }
+    ~ .grabber-icon {
+        @include background-color($color-accent-blue-700);
+        border-radius: 0 4px 4px 0;
+        svg {
+            @include fill($color-accent-blue-400);
+        }
     }
 }
 
-.grabber-icon {
-    @include background-color($color-contrast-600);
-    border-radius: 0 4px 4px 0;
-    svg {
-        @include fill($color-contrast-300);
-    }
-}
 
 .settings .pagination {
     text-align: center;

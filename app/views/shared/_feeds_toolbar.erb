@@ -2,23 +2,21 @@
     <div class="toolbar-inner">
         <a class="toolbar-button edit-button" disabled="disabled" data-behavior="open_settings_modal feed_settings" data-remote="true" href="" data-modal-target="">
             <div class="toolbar-button-inner">
-                <%= svg_tag "icon-edit", size: "21x20" %>
+                <%= svg_tag "icon-edit" %>
             </div>
             <span>Edit</span>
         </a>
 
         <div class="toolbar-button add-button" data-behavior="show_subscribe open_modal" data-modal-target="subscribe">
             <div class="toolbar-button-inner">
-                <div class="icon-subscribe">
-                    <%= svg_tag "icon-plus", size: "16x16" %>
-                </div>
+                <%= svg_tag "icon-add" %>
             </div>
             <span>Add</span>
         </div>
 
         <div class="toolbar-button" disabled="disabled" data-behavior="mark_all_as_read">
             <div class="toolbar-button-inner">
-                <%= svg_tag "icon-mark-read", size: "21x21" %>
+                <%= svg_tag "icon-mark-read" %>
             </div>
             <span>Read</span>
         </div>
