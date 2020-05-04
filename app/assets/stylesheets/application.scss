@@ -382,6 +382,10 @@ iframe {
     max-width: 100% !important;
 }
 
+svg {
+    overflow: visible;
+}
+
 :focus {
   outline-color: transparent;
   outline-style: none;
@@ -3029,15 +3033,10 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     .button-full-screen {
         display: none;
         @include border-right($color-borders);
-        svg {
-            position: absolute;
-            top: $base-button-position + 3;
-            left: 15px;
-            height: 14px;
-            width: 14px;
-        }
+        justify-content: center;
+        align-items: center;
         .full-screen & {
-            display: block;
+            display: flex;
         }
         .native & {
             border: none;
@@ -6138,12 +6137,16 @@ Settings
         }
         .subscription-controls {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             justify-content: flex-end;
             flex-shrink: 0;
-            .icon-arrow {
+            .icon-wrap {
+                transform: rotate(270deg);
+                display: flex;
+                width: 15px;
+            }
+            .icon-caret {
                 @include fill($color-contrast-300);
-                transform: scaleX(-1);
             }
         }
         .favicon-container {
@@ -7074,12 +7077,14 @@ Link Viewer
     justify-content: center;
     flex-direction: column;
     .view-link-error {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         margin-top: 40px;
         font-size: 24px;
         margin-bottom: 40px;
-        span {
-            background: image-url("error-sign.svg") 0 50% no-repeat;
-            padding-left: 40px;
+        svg {
+            margin-right: $one-unit;
         }
     }
     p {

@@ -1,5 +1,8 @@
 <div class="view-link-error-container">
-    <p class="view-link-error"><span>Unable to get this content</span></p>
+    <p class="view-link-error">
+        <%= svg_tag "icon-error-message" %>
+        Unable to extract this article’s content.
+    </p>
     <p>
         <a class="button button-secondary" target="_blank" rel="noopener noreferrer" href="<%= url %>">Visit Page</a>
         <a class="button" data-dismiss="modal">Close</a>

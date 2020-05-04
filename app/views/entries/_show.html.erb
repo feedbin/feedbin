@@ -4,10 +4,10 @@
         <div class="entry-toolbar">
             <div class="site-info">
                 <button class="back-button" data-behavior="show_entries">
-                    <%= svg_tag "icon-arrow", size: "9x15" %>
+                    <%= svg_tag "icon-arrow" %>
                 </button>
                 <button class="entry-button button-full-screen" data-behavior="full_screen" title="Exit full screen" data-toggle="tooltip">
-                    <%= svg_tag "icon-full-screen-close-small", size: "16x16" %>
+                    <%= svg_tag "icon-close" %>
                 </button>
                 <%= entry_presenter.feed_wrapper(subscriptions) do %>
                     <%= entry_presenter.favicon(entry.feed, entry) %>

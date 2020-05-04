@@ -73,7 +73,7 @@
                                 </span>
                                 <span class="subscription-controls">
                                     <%= render partial: "shared/sparkline", locals: {sparkline: subscription_presenter.sparkline} %>
-                                    <%= svg_tag "icon-arrow" %>
+                                    <span class="icon-wrap"><%= svg_tag "icon-caret" %></span>
                                 </span>
                             <% end %>
                         </li>
