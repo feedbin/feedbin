@@ -5,7 +5,7 @@ gem "rails", "= 6.0.3"
 
 gem "rails-controller-testing"
 gem "responders"
-gem "rack", github: "rack/rack", ref: "4ebd70b"
+gem "rack"
 
 group :development do
   gem "capistrano"
