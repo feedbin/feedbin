@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", github: "rails/rails", branch: "6-0-stable"
+gem "rails", "= 6.0.3"
 
 gem "rails-controller-testing"
 gem "responders"
