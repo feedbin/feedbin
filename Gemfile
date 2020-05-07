@@ -52,7 +52,7 @@ gem "dalli", github: "feedbin/dalli", branch: "feedbin"
 gem "sass-rails"
 gem "mini_racer"
 gem "coffee-rails"
-gem "uglifier", "= 4.1.11"
+gem "uglifier", "4.2.0"
 gem "autoprefixer-rails"
 gem "rubyzip"
 

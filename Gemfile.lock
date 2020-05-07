@@ -535,7 +535,7 @@ GEM
       unf (~> 0.1.0)
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
-    uglifier (4.1.11)
+    uglifier (4.2.0)
       execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
@@ -644,7 +644,7 @@ DEPENDENCIES
   stripe_event
   twitter
   twitter-text
-  uglifier (= 4.1.11)
+  uglifier (= 4.2.0)
   unicode-emoji
   unicorn
   webmock (= 3.8.0)
