@@ -44,7 +44,7 @@ class StarredEntriesExport
       content: ContentFormatter.api_format(entry.content, entry),
       url: entry.fully_qualified_url,
       published: entry.published.iso8601(6),
-      created_at: entry.created_at.iso8601(6),
+      created_at: entry.created_at.iso8601(6)
     }
   end
 end

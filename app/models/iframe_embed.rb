@@ -48,7 +48,7 @@ class IframeEmbed
     if oembed_url
       @data ||= begin
         defaults = {
-          url: embed_url.to_s,
+          url: embed_url.to_s
         }
         response = UrlCache.new(oembed_url, params: defaults.merge(oembed_params))
         JSON.parse(response.body)
@@ -99,7 +99,7 @@ class IframeEmbed
       Embed::Spotify,
       Embed::Kickstarter,
       Embed::Soundcloud,
-      Embed::Default,
+      Embed::Default
     ]
   end
 

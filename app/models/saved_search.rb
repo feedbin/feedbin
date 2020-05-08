@@ -8,5 +8,4 @@ class SavedSearch < ApplicationRecord
     end
     letter
   end
-
 end

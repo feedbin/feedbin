@@ -28,7 +28,7 @@ end
 
 $redis = {
   entries: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) },
-  refresher: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) },
+  refresher: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) }
 }
 
 class ActiveSupport::TestCase
@@ -55,8 +55,8 @@ class ActiveSupport::TestCase
   def stub_request_file(file, url, response_options = {})
     file = File.join(Rails.root, "test/support/www", file)
     options = {body: File.new(file), status: 200}.merge(response_options)
-    stub_request(:get, url).
-      to_return(options)
+    stub_request(:get, url)
+      .to_return(options)
   end
 
   def load_tweet
@@ -113,7 +113,7 @@ class ActiveSupport::TestCase
       "stripped-html" => "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html charset=us-ascii\"></head><body style=\"word-wrap: break-word; -webkit-nbsp-mode: space; -webkit-line-break: after-white-space;\" class=\"\"><div style=\"margin: 0px; line-height: normal;\" class=\"\"><b class=\"\">Lorem ipsum</b> dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</div></body></html>",
       "stripped-text" => "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation .",
       "stripped-signature" => "",
-      "List-Unsubscribe" => "<http://www.host.com/list.cgi?cmd=unsub&lst=list>, <mailto:list-request@host.com?subject=unsubscribe>",
+      "List-Unsubscribe" => "<http://www.host.com/list.cgi?cmd=unsub&lst=list>, <mailto:list-request@host.com?subject=unsubscribe>"
     }
   end
 end

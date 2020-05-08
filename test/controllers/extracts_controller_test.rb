@@ -36,5 +36,4 @@ class ExtractsControllerTest < ActionController::TestCase
       get :cache, params: {url: "url"}, xhr: true
     end
   end
-
 end

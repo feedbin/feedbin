@@ -16,7 +16,7 @@ class TwitterFeedRefresher
         "class" => "TwitterFeedRefresherCritical",
         "queue" => "feed_refresher_fetcher_critical",
         "retry" => false,
-        "at" => Time.now.to_i + rand(0..6.minutes.to_i),
+        "at" => Time.now.to_i + rand(0..6.minutes.to_i)
       }
 
       if user
@@ -44,7 +44,7 @@ class TwitterFeedRefresher
       if user.twitter_access_token.present? && user.twitter_access_secret.present? && user_matches
         {
           twitter_access_token: user.twitter_access_token,
-          twitter_access_secret: user.twitter_access_secret,
+          twitter_access_secret: user.twitter_access_secret
         }
       end
     }.compact

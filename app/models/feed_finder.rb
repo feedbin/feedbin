@@ -2,7 +2,7 @@ class FeedFinder
   def initialize(url, config = {})
     @url = url
     @config = config.merge({
-      request: Feedkit::Request.new(url: @url, clean: true),
+      request: Feedkit::Request.new(url: @url, clean: true)
     })
   end
 

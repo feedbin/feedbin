@@ -7,11 +7,11 @@ class SettingsController < ApplicationController
 
   def account
     @user = current_user
-    @last_payment = @user.billing_events.
-      order(created_at: :desc).
-      where(event_type: "charge.succeeded").
-      where("created_at >= :expiration_cutoff", {expiration_cutoff: 3.days.ago}).
-      take
+    @last_payment = @user.billing_events
+      .order(created_at: :desc)
+      .where(event_type: "charge.succeeded")
+      .where("created_at >= :expiration_cutoff", {expiration_cutoff: 3.days.ago})
+      .take
   end
 
   def appearance
@@ -157,7 +157,11 @@ class SettingsController < ApplicationController
   end
 
   def format
-    old_settings = JSON.parse(cookies.permanent.signed[:settings]) rescue {}
+    old_settings = begin
+                     JSON.parse(cookies.permanent.signed[:settings])
+                   rescue
+                     {}
+                   end
     new_settings = user_format_params
     cookies.permanent.signed[:settings] = {
       value: JSON.generate(old_settings.merge(new_settings)),
@@ -216,9 +220,9 @@ class SettingsController < ApplicationController
 
   def plan_setup
     @plans = @user.available_plans
-    @plan_data = @plans.map do |plan|
+    @plan_data = @plans.map { |plan|
       {id: plan.id, name: plan.name, amount: plan.price_in_cents}
-    end
+    }
   end
 
   def plan_exists
@@ -245,5 +249,4 @@ class SettingsController < ApplicationController
   def subscription_view_mode_params
     params.require(:subscription).permit(:view_mode)
   end
-
 end

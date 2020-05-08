@@ -14,17 +14,17 @@ module EntriesHelper
     content_text = Sanitize.fragment(text,
       remove_contents: true,
       elements: %w[html body div span
-                   h1 h2 h3 h4 h5 h6 p blockquote pre
-                   a abbr acronym address big cite code
-                   del dfn em ins kbd q s samp
-                   small strike strong sub sup tt var
-                   b u i center
-                   dl dt dd ol ul li
-                   fieldset form label legend
-                   table caption tbody tfoot thead tr th td
-                   article aside canvas details embed
-                   figure figcaption footer header hgroup
-                   menu nav output ruby section summary])
+        h1 h2 h3 h4 h5 h6 p blockquote pre
+        a abbr acronym address big cite code
+        del dfn em ins kbd q s samp
+        small strike strong sub sup tt var
+        b u i center
+        dl dt dd ol ul li
+        fieldset form label legend
+        table caption tbody tfoot thead tr th td
+        article aside canvas details embed
+        figure figcaption footer header hgroup
+        menu nav output ruby section summary])
 
     content_text = ReverseMarkdown.convert(content_text)
     content_text = ActionController::Base.helpers.strip_tags(content_text)

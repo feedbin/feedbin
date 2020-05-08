@@ -10,7 +10,7 @@ class AddRecentlyPlayedCounterToEntries < ActiveRecord::Migration[5.0]
       "klass" => "Entry",
       "column" => "recently_played_entries_count",
       "default" => 0,
-      "schedule" => true,
+      "schedule" => true
     })
   end
 

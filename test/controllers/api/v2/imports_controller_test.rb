@@ -39,6 +39,4 @@ class Api::V2::ImportsControllerTest < ApiControllerTestCase
     import = parse_json
     assert_response :success
   end
-
 end
-

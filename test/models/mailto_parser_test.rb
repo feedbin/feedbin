@@ -4,7 +4,7 @@ class MailtoParserTest < ActiveSupport::TestCase
   setup do
     @params = {
       "body" => "this is the body",
-      "subject" => "this is the subject",
+      "subject" => "this is the subject"
     }
     @email_address = Faker::Internet.email
     @link = "mailto:#{@email_address}?#{@params.to_query}"

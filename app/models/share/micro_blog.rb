@@ -20,7 +20,7 @@ class Share::MicroBlog < Share::Service
 
   def add(params)
     body = {
-      content: params["content"],
+      content: params["content"]
     }
 
     if params["name"].present?
@@ -28,7 +28,7 @@ class Share::MicroBlog < Share::Service
     end
 
     headers = {
-      "Authorization" => "Bearer #{@auth_token}",
+      "Authorization" => "Bearer #{@auth_token}"
     }
 
     response = self.class.post("/micropub", body: body, headers: headers, timeout: 10)

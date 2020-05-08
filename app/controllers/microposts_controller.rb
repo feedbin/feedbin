@@ -18,7 +18,7 @@ class MicropostsController < ApplicationController
         fully_qualified_url: item["url"],
         published: Time.parse(item["date_published"]),
         content: item["content_html"],
-        id: item["id"],
+        id: item["id"]
       }
       OpenStruct.new(data)
     end

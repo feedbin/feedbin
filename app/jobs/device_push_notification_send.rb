@@ -8,7 +8,7 @@ class DevicePushNotificationSend
     auth_method: :token,
     cert_path: ENV["APPLE_AUTH_KEY"],
     team_id: ENV["APPLE_TEAM_ID"],
-    key_id: ENV["APPLE_KEY_ID"],
+    key_id: ENV["APPLE_KEY_ID"]
   }
   APNOTIC_POOL = Apnotic::ConnectionPool.new(apnotic_options, size: 5) { |connection|
     connection.on(:error) { |exception| Honeybadger.notify(exception) }
@@ -91,7 +91,7 @@ class DevicePushNotificationSend
     notification = Apnotic::Notification.new(device_token).tap do |notification|
       notification.alert = {
         title: alert_title,
-        body: body,
+        body: body
       }
       notification.custom_payload = {
         feedbin: {
@@ -100,8 +100,8 @@ class DevicePushNotificationSend
           feed: feed_title,
           author: author,
           published: published,
-          content: nil,
-        },
+          content: nil
+        }
       }
       if url = image_url(entry)
         notification.custom_payload[:image_url] = url

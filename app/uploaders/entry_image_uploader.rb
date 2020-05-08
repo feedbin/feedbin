@@ -9,7 +9,7 @@ class EntryImageUploader < CarrierWave::Uploader::Base
     {
       "Cache-Control" => "max-age=315360000, public",
       "Expires" => 20.years.from_now.httpdate,
-      "x-amz-storage-class" => ENV["AWS_S3_STORAGE_CLASS"] || "REDUCED_REDUNDANCY",
+      "x-amz-storage-class" => ENV["AWS_S3_STORAGE_CLASS"] || "REDUCED_REDUNDANCY"
     }
   end
 end

@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PagesControllerTest < ActionController::TestCase
   test "creates a new job to find page" do
@@ -6,7 +6,7 @@ class PagesControllerTest < ActionController::TestCase
 
     Sidekiq::Worker.clear_all
     assert_difference "SavePage.jobs.size", +1 do
-      post :create, params: { page_token: user.page_token, url: "http://example.com/article" }
+      post :create, params: {page_token: user.page_token, url: "http://example.com/article"}
     end
   end
 end

@@ -36,7 +36,7 @@ class FeedsControllerTest < ActionController::TestCase
       "id" => feed.id,
       "hub.topic" => feed.feed_url,
       "hub.verify_token" => secret,
-      "hub.lease_seconds" => 10_000,
+      "hub.lease_seconds" => 10_000
     }
 
     subscribe_challenge = Faker::Internet.slug
@@ -60,7 +60,7 @@ class FeedsControllerTest < ActionController::TestCase
       "hub.topic" => feed.feed_url,
       "hub.verify_token" => "#{secret}s",
       "hub.mode" => "subscribe",
-      "hub.challenge" => Faker::Internet.slug,
+      "hub.challenge" => Faker::Internet.slug
     }
 
     get :push, params: params

@@ -15,7 +15,7 @@ class SearchIndexStore
       index: klass.index_name,
       type: klass.document_type,
       id: record.id,
-      body: record.as_indexed_json,
+      body: record.as_indexed_json
     }
     $search.each do |_, client|
       client.index(data)
@@ -30,9 +30,9 @@ class SearchIndexStore
       body: {
         doc: record.as_indexed_json,
         filter: {
-          term: {feed_id: record.feed_id},
-        },
-      },
+          term: {feed_id: record.feed_id}
+        }
+      }
     )
 
     ids = result["matches"].map(&:to_i)

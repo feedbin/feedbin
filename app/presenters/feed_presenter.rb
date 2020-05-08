@@ -2,7 +2,6 @@ class FeedPresenter < BasePresenter
   presents :feed
 
   def feed_link(link: nil, behavior: nil, &block)
-
     args = [
       link || @template.feed_entries_path(feed),
       remote: true,
@@ -15,9 +14,9 @@ class FeedPresenter < BasePresenter
         mark_read: {
           type: "feed",
           data: feed.id,
-          message: "Mark #{feed.title} as read?",
-        }.to_json,
-      },
+          message: "Mark #{feed.title} as read?"
+        }.to_json
+      }
     ]
     @template.link_to *args do
       yield

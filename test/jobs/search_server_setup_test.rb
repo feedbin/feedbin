@@ -9,7 +9,7 @@ class SearchServerSetupTest < ActiveSupport::TestCase
     @entries = (1..10).to_a.sample.times.map {
       feed.entries.create!(
         content: Faker::Lorem.paragraph,
-        public_id: SecureRandom.hex,
+        public_id: SecureRandom.hex
       )
     }
   end
@@ -23,10 +23,10 @@ class SearchServerSetupTest < ActiveSupport::TestCase
       query: {
         filtered: {
           filter: {
-            terms: {id: @entries.map(&:id)},
-          },
-        },
-      },
+            terms: {id: @entries.map(&:id)}
+          }
+        }
+      }
     }
     assert_equal @entries.count, Entry.search(query).results.total
   end

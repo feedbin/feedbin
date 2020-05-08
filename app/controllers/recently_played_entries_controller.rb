@@ -18,7 +18,6 @@ class RecentlyPlayedEntriesController < ApplicationController
   end
 
   def settings
-
   end
 
   def create

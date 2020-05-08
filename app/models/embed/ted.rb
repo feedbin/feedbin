@@ -1,7 +1,7 @@
 class Embed::Ted < IframeEmbed
   def self.supported_urls
     [
-      %r{.*?//embed\.ted\.com/talks/(.*?)(#|\?|$)},
+      %r{.*?//embed\.ted\.com/talks/(.*?)(#|\?|$)}
     ]
   end
 

@@ -7,7 +7,7 @@ class Micropost
   end
 
   def valid?
-    data && data.respond_to?(:dig) && author_profile? && !title?
+    data&.respond_to?(:dig) && author_profile? && !title?
   end
 
   def author_avatar

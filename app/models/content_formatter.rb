@@ -55,36 +55,36 @@ class ContentFormatter
         open prompt readonly rel rev rows rowspan rules scope selected shape size span
         start summary tabindex target title type usemap valign value vspace width
         itemprop id
-      ],
+      ]
     }
 
     hash[:protocols] = {
       "a" => {
-        "href" => ["http", "https", "mailto", :relative],
+        "href" => ["http", "https", "mailto", :relative]
       },
       "blockquote" => {
-        "cite" => ["http", "https", :relative],
+        "cite" => ["http", "https", :relative]
       },
       "del" => {
-        "cite" => ["http", "https", :relative],
+        "cite" => ["http", "https", :relative]
       },
       "ins" => {
-        "cite" => ["http", "https", :relative],
+        "cite" => ["http", "https", :relative]
       },
       "q" => {
-        "cite" => ["http", "https", :relative],
+        "cite" => ["http", "https", :relative]
       },
       "img" => {
         "src" => ["http", "https", :relative, "data"],
-        "longdesc" => ["http", "https", :relative],
+        "longdesc" => ["http", "https", :relative]
       },
       "video" => {
         "src" => ["http", "https"],
-        "poster" => ["http", "https"],
+        "poster" => ["http", "https"]
       },
       "audio" => {
-        "src" => ["http", "https"],
-      },
+        "src" => ["http", "https"]
+      }
     }
 
     hash[:remove_contents] = %w[script style iframe object embed]
@@ -110,14 +110,14 @@ class ContentFormatter
       "a" => ["href"],
       "img" => ["src"],
       :all => ["align", "alt", "border", "cellpadding", "cellspacing", "cite", "cols", "colspan", "color",
-               "coords", "datetime", "dir", "disabled", "enctype", "for", "height", "hreflang", "label", "lang",
-               "longdesc", "name", "rel", "rev", "rows", "rowspan", "selected", "shape", "size", "span", "start",
-               "summary", "target", "title", "type", "valign", "value", "vspace", "width",],
+        "coords", "datetime", "dir", "disabled", "enctype", "for", "height", "hreflang", "label", "lang",
+        "longdesc", "name", "rel", "rev", "rows", "rowspan", "selected", "shape", "size", "span", "start",
+        "summary", "target", "title", "type", "valign", "value", "vspace", "width"]
     },
     protocols: {
       "a" => {"href" => ["http", "https", :relative]},
-      "img" => {"src" => ["http", "https", :relative]},
-    },
+      "img" => {"src" => ["http", "https", :relative]}
+    }
   }
 
   def self.format!(*args)
@@ -128,7 +128,7 @@ class ContentFormatter
     context = {
       whitelist: WHITELIST_DEFAULT,
       embed_url: Rails.application.routes.url_helpers.iframe_embeds_path,
-      embed_classes: "iframe-placeholder entry-callout system-content",
+      embed_classes: "iframe-placeholder entry-callout system-content"
     }
     filters = [HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer, HTML::Pipeline::IframeFilter]
 
@@ -160,7 +160,7 @@ class ContentFormatter
 
     result = pipeline.call(content)
 
-    if entry && entry.archived_images?
+    if entry&.archived_images?
       result[:output] = ImageFallback.new(result[:output]).add_fallbacks
     end
 
@@ -173,7 +173,7 @@ class ContentFormatter
 
   def _newsletter_format(content)
     context = {
-      whitelist: Sanitize::Config::RELAXED,
+      whitelist: Sanitize::Config::RELAXED
     }
     filters = [HTML::Pipeline::SanitizationFilter]
 
@@ -201,7 +201,7 @@ class ContentFormatter
       image_base_url: base_url || entry.feed.site_url,
       image_subpage_url: base_url || entry.url || "",
       href_base_url: base_url || entry.feed.site_url,
-      href_subpage_url: base_url || entry.url || "",
+      href_subpage_url: base_url || entry.url || ""
     }
     pipeline = HTML::Pipeline.new filters, context
     result = pipeline.call(content)
@@ -220,7 +220,7 @@ class ContentFormatter
       image_base_url: entry.feed.site_url,
       image_subpage_url: entry.url || "",
       href_base_url: entry.feed.site_url,
-      href_subpage_url: entry.url || "",
+      href_subpage_url: entry.url || ""
     }
     if entry.feed.newsletter?
       filters.push(HTML::Pipeline::SanitizationFilter)
@@ -245,7 +245,7 @@ class ContentFormatter
       href_base_url: entry.feed.site_url,
       href_subpage_url: entry.url || "",
       placeholder_url: "",
-      placeholder_attribute: "data-feedbin-src",
+      placeholder_attribute: "data-feedbin-src"
     }
     pipeline = HTML::Pipeline.new filters, context
     result = pipeline.call(content)
@@ -265,7 +265,7 @@ class ContentFormatter
       image_base_url: entry.feed.site_url,
       image_subpage_url: entry.url || "",
       href_base_url: entry.feed.site_url,
-      href_subpage_url: entry.url || "",
+      href_subpage_url: entry.url || ""
     }
 
     pipeline = HTML::Pipeline.new filters, context

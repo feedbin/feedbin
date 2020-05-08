@@ -46,7 +46,7 @@ class ApplicationController < ActionController::Base
       favicon_alt_class: "favicon-unread-active",
       parent_class: "collection-unread",
       parent_data: {behavior: "all_unread", feed_id: "collection_unread", count_type: "unread"},
-      data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "unread", message: "Mark all items as read?"}.to_json},
+      data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "unread", message: "Mark all items as read?"}.to_json}
     }
     collections << {
       title: "All",
@@ -56,7 +56,7 @@ class ApplicationController < ActionController::Base
       favicon_class: "favicon-all",
       parent_class: "collection-all",
       parent_data: {behavior: "all_unread", feed_id: "collection_all", count_type: "unread"},
-      data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "all", message: "Mark all items as read?"}.to_json},
+      data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "all", message: "Mark all items as read?"}.to_json}
     }
     collections << {
       title: "Starred",
@@ -66,7 +66,7 @@ class ApplicationController < ActionController::Base
       favicon_class: "favicon-star",
       parent_class: "collection-starred",
       parent_data: {behavior: "starred", feed_id: "collection_starred", count_type: "starred"},
-      data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "starred", message: "Mark starred items as read?"}.to_json},
+      data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "starred", message: "Mark starred items as read?"}.to_json}
     }
     unless user.setting_on?(:hide_recently_read)
       collections << {
@@ -78,7 +78,7 @@ class ApplicationController < ActionController::Base
         parent_class: "collection-recently-read",
         parent_data: {behavior: "recently_read", feed_id: "collection_recently_read", count_type: "recently_read"},
         data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "recently_read", message: "Mark recently read items as read?"}.to_json},
-        clear: {path: destroy_all_recently_read_entries_path, message: "Clear all recently read?" }
+        clear: {path: destroy_all_recently_read_entries_path, message: "Clear all recently read?"}
       }
     end
     unless user.setting_on?(:hide_updated)
@@ -90,7 +90,7 @@ class ApplicationController < ActionController::Base
         favicon_class: "favicon-updated",
         parent_class: "collection-updated",
         parent_data: {behavior: "updated", feed_id: "collection_updated", count_type: "updated"},
-        data: {behavior: "selectable show_entries open_item feed_link", special_collection: "updated", mark_read: {type: "updated", message: "Mark updated items as read?"}.to_json},
+        data: {behavior: "selectable show_entries open_item feed_link", special_collection: "updated", mark_read: {type: "updated", message: "Mark updated items as read?"}.to_json}
       }
     end
     unless user.setting_on?(:hide_recently_played)
@@ -127,7 +127,7 @@ class ApplicationController < ActionController::Base
       updated_entries: @user.updated_entries.pluck("feed_id, entry_id").each_slice(10_000).to_a,
       tag_map: @user.taggings.build_tag_map,
       feed_map: @user.taggings.build_feed_map,
-      entry_sort: @user.entry_sort,
+      entry_sort: @user.entry_sort
     }
     @feed_data = {
       feeds: @feeds,
@@ -136,7 +136,7 @@ class ApplicationController < ActionController::Base
       tags: @user.tag_group,
       saved_searches: @user.saved_searches.order(Arel.sql("lower(name)")),
       count_data: @count_data,
-      feed_order: @user.feed_order,
+      feed_order: @user.feed_order
     }
   end
 
@@ -191,5 +191,4 @@ class ApplicationController < ActionController::Base
     verifier = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)
     verifier.verify(authentication_token)
   end
-
 end

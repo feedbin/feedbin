@@ -47,7 +47,7 @@ class TweetsController < ApplicationController
       result_type: "recent",
       include_entities: true,
       tweet_mode: "extended",
-      count: 100,
+      count: 100
     }
     results = client.search(query, options)
     tweets = results.take(100).select { |tweet|
@@ -67,7 +67,7 @@ class TweetsController < ApplicationController
       since_id: parent.id,
       tweet_mode: "extended",
       count: 200,
-      exclude_replies: false,
+      exclude_replies: false
     }
     author_replies = client.user_timeline(parent.user.id, options)
 

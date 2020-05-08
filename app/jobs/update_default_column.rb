@@ -28,13 +28,13 @@ class UpdateDefaultColumn
         "batch" => arg.first,
         "klass" => @klass.to_s,
         "column" => @column,
-        "default" => @default,
+        "default" => @default
       }]
     }
     Sidekiq::Client.push_bulk(
       "args" => jobs,
       "class" => self.class.name,
-      "queue" => self.class.get_sidekiq_options["queue"].to_s,
+      "queue" => self.class.get_sidekiq_options["queue"].to_s
     )
   end
 end

@@ -48,8 +48,8 @@ class Embed::Instagram
       options = {
         params: {
           url: url,
-          omitscript: true,
-        },
+          omitscript: true
+        }
       }
       response = UrlCache.new(OEMBED_URL, options).body
       JSON.parse(response)

@@ -8,7 +8,7 @@ class DeviceTest < ActiveSupport::TestCase
       model: "model",
       device_type: Device.device_types[:ios],
       application: "application",
-      operating_system: "iOS 10",
+      operating_system: "iOS 10"
     )
   end
 

@@ -7,7 +7,7 @@ class EntryDeleterScheduler
         "args" => feeds.map { |feed| feed.attributes.values },
         "class" => "EntryDeleter",
         "queue" => "worker_slow",
-        "retry" => false,
+        "retry" => false
       )
     end
   end

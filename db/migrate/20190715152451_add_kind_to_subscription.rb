@@ -10,7 +10,7 @@ class AddKindToSubscription < ActiveRecord::Migration[5.1]
       "klass" => Subscription.to_s,
       "column" => "kind",
       "default" => 0,
-      "schedule" => true,
+      "schedule" => true
     })
   end
 

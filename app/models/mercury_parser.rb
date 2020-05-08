@@ -1,5 +1,4 @@
 class MercuryParser
-
   attr_reader :url
 
   def initialize(url, data = nil)
@@ -43,7 +42,7 @@ class MercuryParser
   def to_h
     {
       result: result,
-      url: url,
+      url: url
     }
   end
 
@@ -51,7 +50,7 @@ class MercuryParser
     @service_url ||= begin
       digest = OpenSSL::Digest.new("sha1")
       signature = OpenSSL::HMAC.hexdigest(digest, ENV["EXTRACT_SECRET"], url)
-      base64_url = Base64.urlsafe_encode64(url).gsub("\n", "")
+      base64_url = Base64.urlsafe_encode64(url).delete("\n")
       URI::HTTPS.build({
         host: ENV["EXTRACT_HOST"],
         path: "/parser/#{ENV["EXTRACT_USER"]}/#{signature}",

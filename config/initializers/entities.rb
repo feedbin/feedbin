@@ -209,6 +209,6 @@ Feedbin::Application.config.entities_map = {
   "&#103;" => "h",
   "&#102;" => "g",
   "&#101;" => "f",
-  "&#100;" => "e",
+  "&#100;" => "e"
 }
 Feedbin::Application.config.entities_regex = Regexp.new("^#{Feedbin::Application.config.entities_map.keys.join("|")}$")

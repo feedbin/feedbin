@@ -3,8 +3,8 @@ require "net/http/persistent"
 defaults = {
   log: Rails.env.development?,
   transport_options: {
-    ssl: {verify: false},
-  },
+    ssl: {verify: false}
+  }
 }
 $search = {}.tap do |hash|
   hash[:main] = Elasticsearch::Client.new(defaults)

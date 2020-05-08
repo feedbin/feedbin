@@ -3,7 +3,11 @@ class UserPresenter < BasePresenter
   delegate_missing_to :user
 
   def settings
-    @settings ||= JSON.parse(@template.cookies.permanent.signed[:settings]) rescue {}
+    @settings ||= begin
+                    JSON.parse(@template.cookies.permanent.signed[:settings])
+                  rescue
+                    {}
+                  end
   end
 
   def entry_width
@@ -111,5 +115,4 @@ class UserPresenter < BasePresenter
       end.flatten.join(" ")
     end
   end
-
 end

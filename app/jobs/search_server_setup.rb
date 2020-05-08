@@ -20,15 +20,15 @@ class SearchServerSetup
       {
         index: {
           _id: entry.id,
-          data: entry.as_indexed_json,
-        },
+          data: entry.as_indexed_json
+        }
       }
     }
     if data.present?
       Client.bulk(
         index: Entry.index_name,
         type: Entry.document_type,
-        body: data,
+        body: data
       )
     end
   end
@@ -38,7 +38,7 @@ class SearchServerSetup
     Sidekiq::Client.push_bulk(
       "args" => jobs,
       "class" => self.class.name,
-      "queue" => self.class.get_sidekiq_options["queue"].to_s,
+      "queue" => self.class.get_sidekiq_options["queue"].to_s
     )
   end
 

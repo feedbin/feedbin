@@ -15,7 +15,7 @@ class Share::Readability < Share::Service
   def consumer
     options = {
       site: URL,
-      access_token_path: "/api/rest/v1/oauth/access_token/",
+      access_token_path: "/api/rest/v1/oauth/access_token/"
     }
     OAuth::Consumer.new(ENV["READABILITY_READER_KEY"], ENV["READABILITY_READER_SECRET"], options)
   end

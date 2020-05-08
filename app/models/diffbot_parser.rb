@@ -57,7 +57,7 @@ class DiffbotParser
     query = {
       url: url,
       discussion: false,
-      token: ENV["DIFFBOT_TOKEN"],
+      token: ENV["DIFFBOT_TOKEN"]
     }.merge(options)
     uri = URI.parse(BASE_URL)
     uri.query = query.to_query
@@ -74,7 +74,7 @@ class DiffbotParser
     {
       result: result,
       url: url,
-      body: body,
+      body: body
     }
   end
 

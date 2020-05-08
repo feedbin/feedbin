@@ -108,5 +108,4 @@ class NewslettersControllerTest < ActionController::TestCase
     feed = Feed.find_by_title(title)
     assert_equal feed.feed_type, "newsletter"
   end
-
 end

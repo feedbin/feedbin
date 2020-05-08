@@ -21,7 +21,7 @@ class Subscription < ApplicationRecord
   validate :reject_title_changes, on: :update, if: :generated?
 
   def reject_title_changes
-   errors[:title] << "can not be changed" if self.title_changed?
+    errors[:title] << "can not be changed" if title_changed?
   end
 
   enum kind: {default: 0, generated: 1}

@@ -109,7 +109,6 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
     end
   end
 
-
   def create_newsletter(user)
     signature = Newsletter.new(newsletter_params("asdf", "asdf")).send(:signature)
     token = user.newsletter_authentication_token.token

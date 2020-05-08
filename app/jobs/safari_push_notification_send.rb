@@ -67,7 +67,7 @@ class SafariPushNotificationSend
     Apnotic::Notification.new(device_token).tap do |notification|
       notification.alert = {
         title: title,
-        body: body,
+        body: body
       }
       notification.url_args = [entry_id.to_s, CGI.escape(VERIFIER.generate(user_id))]
       notification.apns_id = SecureRandom.uuid

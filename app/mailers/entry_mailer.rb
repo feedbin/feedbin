@@ -3,7 +3,7 @@ class EntryMailer < ApplicationMailer
 
   self.smtp_settings = smtp_settings.merge({
     user_name: ENV["SMTP_BULK_USERNAME"] || ENV["SMTP_USERNAME"],
-    password: ENV["SMTP_BULK_PASSWORD"] || ENV["SMTP_PASSWORD"],
+    password: ENV["SMTP_BULK_PASSWORD"] || ENV["SMTP_PASSWORD"]
   })
 
   def mailer(entry_id, to, subject, body, reply_to, email_name, readability)

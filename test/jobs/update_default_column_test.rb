@@ -10,7 +10,7 @@ class UpdateDefaultColumnTest < ActiveSupport::TestCase
       "klass" => "Entry",
       "column" => "title",
       "default" => SecureRandom.hex,
-      "schedule" => true,
+      "schedule" => true
     }
   end
 

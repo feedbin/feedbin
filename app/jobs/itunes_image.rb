@@ -20,7 +20,7 @@ class ItunesImage
       "args" => [@entry_id, @original_url, @entry.public_id],
       "class" => "ItunesImage",
       "queue" => "images",
-      "retry" => false,
+      "retry" => false
     )
   end
 

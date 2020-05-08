@@ -8,8 +8,8 @@ class MicropostTest < ActiveSupport::TestCase
         "name" => "Name",
         "url" => "https://example.com",
         "avatar" => "https://micro.blog/name/avatar.jpg",
-        "_microblog" => {"username" => "username"},
-      },
+        "_microblog" => {"username" => "username"}
+      }
     }
   end
 

@@ -15,5 +15,4 @@ class AuthenticationToken < ApplicationRecord
     end while AuthenticationToken.exists?(token: self[:token], purpose: purpose)
     self[:token]
   end
-
 end

@@ -25,7 +25,7 @@ class SubscriptionPresenter < BasePresenter
   def graph_bars
     max = counts.max
     counts.each_with_index.map do |count, index|
-      percent = (count == 0) ? 0 : ((count.to_f / max.to_f) * 100).round
+      percent = count == 0 ? 0 : ((count.to_f / max.to_f) * 100).round
       date = (days.ago + index.days)
       ordinal = date.day.ordinalize
       display_date = "#{date.strftime("%B")} #{ordinal}"
@@ -47,7 +47,7 @@ class SubscriptionPresenter < BasePresenter
   end
 
   def bar_title(data)
-    type = (subscription.feed.twitter_feed?) ? "tweet" : "article"
+    type = subscription.feed.twitter_feed? ? "tweet" : "article"
     "#{data.day}: #{data.count} #{type.pluralize(data.count)}"
   end
 

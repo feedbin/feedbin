@@ -20,7 +20,7 @@ class EntryImage
         "args" => EntryImage.build_find_image_args(@entry, options),
         "class" => "FindImage",
         "queue" => "images",
-        "retry" => false,
+        "retry" => false
       )
     end
   end

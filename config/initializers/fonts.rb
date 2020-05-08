@@ -5,5 +5,5 @@ Feedbin::Application.config.fonts = [
   Font.new("Whitney", "sans-serif-1"),
   Font.new("Mercury", "serif-2"),
   Font.new("Ideal Sans", "sans-serif-2"),
-  Font.new("Georgia", "serif-3"),
+  Font.new("Georgia", "serif-3")
 ]

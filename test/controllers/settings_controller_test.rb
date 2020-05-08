@@ -51,7 +51,7 @@ class SettingsControllerTest < ActionController::TestCase
     StripeMock.start
     events = [
       StripeMock.mock_webhook_event("charge.succeeded", {customer: @user.customer_id}),
-      StripeMock.mock_webhook_event("invoice.payment_succeeded", {customer: @user.customer_id}),
+      StripeMock.mock_webhook_event("invoice.payment_succeeded", {customer: @user.customer_id})
     ]
     events.each do |event|
       BillingEvent.create(info: event.as_json)
@@ -85,7 +85,7 @@ class SettingsControllerTest < ActionController::TestCase
 
     plans = {
       original: plans(:basic_monthly_3),
-      new: plans(:basic_yearly_3),
+      new: plans(:basic_yearly_3)
     }
     plans.each do |_, plan|
       create_stripe_plan(plan)
@@ -112,7 +112,7 @@ class SettingsControllerTest < ActionController::TestCase
     user = User.create(
       email: "cc@example.com",
       password: default_password,
-      plan: plan,
+      plan: plan
     )
     user.stripe_token = card_1
     user.save
@@ -134,7 +134,7 @@ class SettingsControllerTest < ActionController::TestCase
       :show_unread_count, :sticky_view_inline, :mark_as_read_confirmation,
       :apple_push_notification_device_token, :receipt_info, :entries_display,
       :entries_feed, :entries_time, :entries_body, :ui_typeface, :theme,
-      :hide_recently_read, :hide_updated, :disable_image_proxy, :entries_image,
+      :hide_recently_read, :hide_updated, :disable_image_proxy, :entries_image
     ].each_with_object({}) { |setting, hash| hash[setting.to_s] = "1" }
 
     patch :settings_update, params: {id: @user, user: settings}
@@ -168,5 +168,4 @@ class SettingsControllerTest < ActionController::TestCase
       assert_equal(audio_panel_size, @user.reload.audio_panel_size)
     end
   end
-
 end

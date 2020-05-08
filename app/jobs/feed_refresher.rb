@@ -14,7 +14,7 @@ class FeedRefresher
         "args" => jobs,
         "class" => "FeedRefresherFetcher",
         "queue" => "feed_refresher_fetcher",
-        "retry" => false,
+        "retry" => false
       )
     end
   end
@@ -49,7 +49,7 @@ class FeedRefresher
       "args" => build_arguments([feed_id], 0),
       "class" => "FeedRefresherFetcher",
       "queue" => "feed_refresher_fetcher_debug",
-      "retry" => false,
+      "retry" => false
     )
   end
 
@@ -69,7 +69,7 @@ class FeedRefresher
         push_callback: push_callback,
         hub_secret: hub_secret,
         push_mode: push_mode,
-        record_status: @force_refresh,
+        record_status: @force_refresh
       }
       [@feed[:id], @feed[:feed_url], options]
     end

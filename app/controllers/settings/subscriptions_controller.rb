@@ -163,7 +163,7 @@ class Settings::SubscriptionsController < ApplicationController
       name: name.downcase,
       tag: subscription.tag_names,
       updated: -(subscription.try(:last_published_entry).try(:to_time).try(:to_i) || 0),
-      volume: -subscription.post_volume,
+      volume: -subscription.post_volume
     }
   end
 

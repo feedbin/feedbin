@@ -9,7 +9,7 @@ class SearchIndexRemove
       client.bulk(
         index: Entry.index_name,
         type: Entry.document_type,
-        body: data,
+        body: data
       )
     end
   end

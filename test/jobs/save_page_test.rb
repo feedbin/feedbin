@@ -16,5 +16,4 @@ class SavePageTest < ActiveSupport::TestCase
     end
     entry = Entry.find_by_url url
   end
-
 end

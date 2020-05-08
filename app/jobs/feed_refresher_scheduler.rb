@@ -21,7 +21,7 @@ class FeedRefresherScheduler
       Sidekiq::Client.push_bulk(
         "args" => jobs,
         "class" => "FeedRefresher",
-        "queue" => "worker_slow_critical",
+        "queue" => "worker_slow_critical"
       )
       increment
       report

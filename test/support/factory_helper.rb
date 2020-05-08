@@ -25,8 +25,8 @@ module FactoryHelper
       public_id: SecureRandom.hex,
       entry_id: SecureRandom.hex,
       data: {
-        enclosure_url: Faker::Internet.url,
-      },
+        enclosure_url: Faker::Internet.url
+      }
     )
   end
 
@@ -50,7 +50,7 @@ module FactoryHelper
     user = User.create(
       email: "cc@example.com",
       password: default_password,
-      plan: plan,
+      plan: plan
     )
     user.stripe_token = card
     user.save

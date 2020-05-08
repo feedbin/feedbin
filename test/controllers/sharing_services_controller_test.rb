@@ -5,7 +5,7 @@ class SharingServicesControllerTest < ActionController::TestCase
     @user = users(:ben)
     @services = {
       custom: @user.sharing_services.create(label: "Twitter", url: "${source}${url}${title}"),
-      supported: @user.supported_sharing_services.create(service_id: "email"),
+      supported: @user.supported_sharing_services.create(service_id: "email")
     }
   end
 

@@ -1,5 +1,4 @@
 class NewsletterEntry
-
   attr_reader :newsletter, :user
 
   def initialize(newsletter, user = nil)
@@ -68,7 +67,7 @@ class NewsletterEntry
         title: newsletter.from_name,
         feed_url: newsletter.feed_url,
         site_url: newsletter.site_url,
-        feed_type: :newsletter,
+        feed_type: :newsletter
       }
       Feed.create_with(attributes).find_or_create_by(feed_url: newsletter.feed_url).tap do |record|
         record.update(attributes)
@@ -87,7 +86,7 @@ class NewsletterEntry
         published: Time.now,
         updated: Time.now,
         public_id: newsletter.entry_id,
-        data: {newsletter_text: newsletter.text, type: "newsletter", format: newsletter.format, newsletter: newsletter},
+        data: {newsletter_text: newsletter.text, type: "newsletter", format: newsletter.format, newsletter: newsletter}
       }
       feed.entries.create!(attributes).tap do |record|
         NewsletterSaver.perform_async(record.id)

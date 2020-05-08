@@ -1,7 +1,7 @@
 class Embed::Soundcloud < IframeEmbed
   def self.supported_urls
     [
-      %r{.*?//w\.soundcloud\.com/player},
+      %r{.*?//w\.soundcloud\.com/player}
     ]
   end
 

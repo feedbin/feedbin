@@ -34,7 +34,7 @@ class RedisServerSetup
 
   def delete_data
     $redis[:entries].with do |redis|
-      keys.each {|key| redis.del(key)}
+      keys.each { |key| redis.del(key) }
     end
   end
 
@@ -42,8 +42,8 @@ class RedisServerSetup
     @values ||= begin
       arrays = feed.entries.pluck(Arel.sql("id, EXTRACT(EPOCH FROM created_at), EXTRACT(EPOCH FROM published)"))
       [
-        arrays.map {|array| [array[1], array[0]] },
-        arrays.map {|array| [array[2], array[0]] }
+        arrays.map { |array| [array[1], array[0]] },
+        arrays.map { |array| [array[2], array[0]] }
       ]
     end
   end

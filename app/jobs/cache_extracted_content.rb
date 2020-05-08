@@ -11,5 +11,4 @@ class CacheExtractedContent
     end
   rescue ActiveRecord::RecordNotFound
   end
-
 end

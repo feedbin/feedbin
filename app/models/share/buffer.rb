@@ -18,7 +18,7 @@ class Share::Buffer < Share::Service
     action = share(nil, entry)
     defaults = super
     defaults.merge({
-      html_options: {onclick: action[:text]},
+      html_options: {onclick: action[:text]}
     })
   end
 end

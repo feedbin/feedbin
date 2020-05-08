@@ -4,7 +4,7 @@ class Embed::Youtube < IframeEmbed
       %r{.*?//www\.youtube\.com/embed/(.*?)(\?|$)},
       %r{.*?//www\.youtube-nocookie\.com/embed/(.*?)(\?|$)},
       %r{.*?//youtube\.com/embed/(.*?)(\?|$)},
-      %r{.*?//youtube-nocookie\.com/embed/(.*?)(\?|$)},
+      %r{.*?//youtube-nocookie\.com/embed/(.*?)(\?|$)}
     ]
   end
 
@@ -32,7 +32,7 @@ class Embed::Youtube < IframeEmbed
     {
       "autoplay" => "1",
       "rel" => "0",
-      "showinfo" => "0",
+      "showinfo" => "0"
     }
   end
 

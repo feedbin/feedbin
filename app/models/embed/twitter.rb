@@ -73,8 +73,8 @@ class Embed::Twitter
       options = {
         params: {
           url: url,
-          omit_script: true,
-        },
+          omit_script: true
+        }
       }
       JSON.parse(UrlCache.new(OEMBED_URL, options).body)
     end

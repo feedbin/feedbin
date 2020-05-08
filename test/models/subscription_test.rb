@@ -22,8 +22,8 @@ class SubscriptionTest < ActiveSupport::TestCase
         "title" => "title",
         "tags" => "Design",
         "subscribe" => "1",
-        "media_only" => "1",
-      },
+        "media_only" => "1"
+      }
     }
 
     Subscription.create_multiple(feeds, user, [feed.id])
@@ -40,8 +40,8 @@ class SubscriptionTest < ActiveSupport::TestCase
         "title" => "title",
         "tags" => "Design",
         "subscribe" => "1",
-        "media_only" => "0",
-      },
+        "media_only" => "0"
+      }
     }
 
     Subscription.create_multiple(feeds, user, [feed.id])

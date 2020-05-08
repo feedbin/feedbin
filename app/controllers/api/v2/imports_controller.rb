@@ -27,11 +27,10 @@ module Api
         @data = request.raw_post.lstrip
         @xml = Nokogiri::XML.parse(@data).css("body outline")
         if @xml.respond_to?(:length) && @xml.length == 0
-          @error = {status: 415, message: 'Data does not appear to be OPML', errors: []}
+          @error = {status: 415, message: "Data does not appear to be OPML", errors: []}
           render partial: "api/v2/shared/api_error", status: 415
         end
       end
-
     end
   end
 end

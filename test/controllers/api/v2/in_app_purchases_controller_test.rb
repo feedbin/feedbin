@@ -13,16 +13,16 @@ class Api::V2::InAppPurchasesControllerTest < ApiControllerTestCase
     receipt = {
       transaction_id: SecureRandom.hex,
       purchase_date_ms: Time.now.to_i * 1_000,
-      product_id: product_id,
+      product_id: product_id
     }
     response = {
       status: 0,
       receipt: {
-        in_app: [receipt],
-      },
+        in_app: [receipt]
+      }
     }
-    stub_request(:post, Feedbin::Application.config.iap_endpoint[:production]).
-      to_return(body: response.to_json, status: 200)
+    stub_request(:post, Feedbin::Application.config.iap_endpoint[:production])
+      .to_return(body: response.to_json, status: 200)
 
     time = Time.now
     assert_difference "InAppPurchase.count", +1 do

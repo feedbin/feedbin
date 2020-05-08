@@ -2,23 +2,23 @@ class Source::KnownPattern < Source
   URLS = [
     {
       template: "https://www.youtube.com/feeds/videos.xml?channel_id=%s".freeze,
-      regex: Regexp.new(/https:\/\/www\.youtube\.com\/channel\/([^\/#\?]*)/),
+      regex: Regexp.new(/https:\/\/www\.youtube\.com\/channel\/([^\/#\?]*)/)
     },
     {
       template: "https://www.youtube.com/feeds/videos.xml?user=%s".freeze,
-      regex: Regexp.new(/https:\/\/www\.youtube\.com\/user\/([^\/#\?]*)/),
+      regex: Regexp.new(/https:\/\/www\.youtube\.com\/user\/([^\/#\?]*)/)
     },
     {
       template: "https://www.youtube.com/feeds/videos.xml?playlist_id=%s".freeze,
-      regex: Regexp.new(/https:\/\/www\.youtube\.com\/playlist\?list=([^&]*)/),
+      regex: Regexp.new(/https:\/\/www\.youtube\.com\/playlist\?list=([^&]*)/)
     },
     {
       template: "https://www.reddit.com/r/%s.rss".freeze,
-      regex: Regexp.new(/https:\/\/www\.reddit\.com\/r\/([^\/#\?]*)/),
+      regex: Regexp.new(/https:\/\/www\.reddit\.com\/r\/([^\/#\?]*)/)
     },
     {
       template: "https://vimeo.com/%s/videos/rss".freeze,
-      regex: Regexp.new(/https:\/\/vimeo\.com\/([^\/#\?]*)/),
+      regex: Regexp.new(/https:\/\/vimeo\.com\/([^\/#\?]*)/)
     }
   ]
 

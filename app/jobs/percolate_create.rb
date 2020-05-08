@@ -14,7 +14,7 @@ class PercolateCreate
         index: Entry.index_name,
         type: ".percolator",
         id: @action.id,
-        body: @action.search_body,
+        body: @action.search_body
       }
       $search.each do |_, client|
         client.index(options)

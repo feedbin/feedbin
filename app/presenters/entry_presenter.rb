@@ -5,17 +5,17 @@ class EntryPresenter < BasePresenter
     %r{https?://m\.youtube\.com/watch\?v=(.*?)(&|#|$)},
     %r{https?://www\.youtube\.com/embed/(.*?)(\?|$)},
     %r{https?://www\.youtube\.com/v/(.*?)(#|\?|$)},
-    %r{https?://www\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b},
+    %r{https?://www\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b}
   ]
 
   INSTAGRAM_URLS = [
     %r{https?://www\.instagram\.com/p/(.*?)(/|#|\?|$)},
-    %r{https?://instagram\.com/p/(.*?)(/|#|\?|$)},
+    %r{https?://instagram\.com/p/(.*?)(/|#|\?|$)}
   ]
 
   VIMEO_URLS = [
     %r{https?://vimeo\.com/video/(.*?)(#|\?|$)},
-    %r{https?://vimeo\.com/([0-9]+)(#|\?|$)},
+    %r{https?://vimeo\.com/([0-9]+)(#|\?|$)}
   ]
 
   presents :entry
@@ -27,8 +27,8 @@ class EntryPresenter < BasePresenter
         mark_as_read_path: @template.mark_as_read_entry_path(entry),
         recently_read_path: @template.recently_read_entry_path(entry),
         entry_id: entry.id,
-        entry_info: {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i},
-      },
+        entry_info: {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}
+      }
     }
     @template.link_to @template.entry_path(entry), options do
       yield
@@ -75,7 +75,11 @@ class EntryPresenter < BasePresenter
 
   def is_numeric?(string)
     string = string.strip
-    string.to_i.to_s == string rescue false
+    begin
+      string.to_i.to_s == string
+    rescue
+      false
+    end
   end
 
   def update_media_queries(html)
@@ -125,7 +129,7 @@ class EntryPresenter < BasePresenter
 
   def newsletter_from
     name, address = entry.data && entry.data.dig("newsletter", "data", "from").split(/[<>]/).map(&:strip)
-    OpenStruct.new(name: name.gsub('"', ''), address: address)
+    OpenStruct.new(name: name.delete('"'), address: address)
   rescue
     nil
   end
@@ -297,7 +301,7 @@ class EntryPresenter < BasePresenter
             title: parsed.title,
             host: parsed.domain,
             author: parsed.author,
-            content: content,
+            content: content
           }
           articles.push data
         end
@@ -379,17 +383,17 @@ class EntryPresenter < BasePresenter
       text = Sanitize.fragment(entry.content,
         remove_contents: true,
         elements: %w[html body div span
-                     h1 h2 h3 h4 h5 h6 p blockquote pre
-                     a abbr acronym address big cite code
-                     del dfn em ins kbd q s samp
-                     small strike strong sub sup tt var
-                     b u i center
-                     dl dt dd ol ul li
-                     fieldset form label legend
-                     table caption tbody tfoot thead tr th td
-                     article aside canvas details embed
-                     figure figcaption footer header hgroup
-                     menu nav output ruby section summary])
+          h1 h2 h3 h4 h5 h6 p blockquote pre
+          a abbr acronym address big cite code
+          del dfn em ins kbd q s samp
+          small strike strong sub sup tt var
+          b u i center
+          dl dt dd ol ul li
+          fieldset form label legend
+          table caption tbody tfoot thead tr th td
+          article aside canvas details embed
+          figure figcaption footer header hgroup
+          menu nav output ruby section summary])
       text = ReverseMarkdown.convert(text)
       text = ActionController::Base.helpers.strip_tags(text)
       decoder.decode(text)
@@ -634,7 +638,7 @@ class EntryPresenter < BasePresenter
     else
       context = {
         embed_url: Rails.application.routes.url_helpers.iframe_embeds_path,
-        embed_classes: "iframe-placeholder entry-callout system-content",
+        embed_classes: "iframe-placeholder entry-callout system-content"
       }
       filter = HTML::Pipeline::IframeFilter.new("", context)
       attributes = filter.iframe_attributes(url, 16, 9)
@@ -666,7 +670,7 @@ class EntryPresenter < BasePresenter
     options = {
       poster: media.media_url_https.to_s + ":large",
       width: media.video_info.aspect_ratio.first,
-      height: media.video_info.aspect_ratio.last,
+      height: media.video_info.aspect_ratio.last
     }
 
     if media.type == "animated_gif"

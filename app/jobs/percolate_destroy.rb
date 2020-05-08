@@ -6,7 +6,7 @@ class PercolateDestroy
     options = {
       index: Entry.index_name,
       type: ".percolator",
-      id: action_id,
+      id: action_id
     }
     $search.each do |_, client|
       client.delete(options)

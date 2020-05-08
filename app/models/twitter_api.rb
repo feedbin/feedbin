@@ -15,7 +15,7 @@ class TwitterApi
       request_token_path: "/oauth/request_token",
       authorize_path: "/oauth/authorize",
       access_token_path: "/oauth/access_token",
-      http_method: :post,
+      http_method: :post
     }
     OAuth::Consumer.new(ENV["TWITTER_KEY"], ENV["TWITTER_SECRET"], options)
   end

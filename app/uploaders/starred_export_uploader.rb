@@ -15,7 +15,7 @@ class StarredExportUploader < CarrierWave::Uploader::Base
 
   def fog_attributes
     {
-      "Content-Disposition" => "attachment; filename=starred.json",
+      "Content-Disposition" => "attachment; filename=starred.json"
     }
   end
 end

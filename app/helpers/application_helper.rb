@@ -53,7 +53,7 @@ module ApplicationHelper
   def get_icon(name)
     name = name.sub(".svg", "")
     icon = Feedbin::Application.config.icons[name]
-    if !icon
+    unless icon
       file = "#{Rails.root}/app/assets/svg/#{name}.svg"
       if File.file?(file)
         icon = Feedbin::Application.config.icons[name] = SvgIcon.new_from_file(file)
@@ -114,7 +114,7 @@ module ApplicationHelper
       scheme: "https",
       host: "www.google.com",
       path: "/s2/favicons",
-      query: {domain: host}.to_query,
+      query: {domain: host}.to_query
     )
     uri.scheme = "https"
     uri.to_s
@@ -133,7 +133,7 @@ module ApplicationHelper
   def camo_link(url)
     options = {
       asset_proxy: ENV["CAMO_HOST"],
-      asset_proxy_secret_key: ENV["CAMO_KEY"],
+      asset_proxy_secret_key: ENV["CAMO_KEY"]
     }
     pipeline = HTML::Pipeline::CamoFilter.new(nil, options, nil)
     pipeline.asset_proxy_url(url.to_s)
@@ -169,7 +169,6 @@ module ApplicationHelper
   end
 
   def short_number(number)
-    number_to_human(number, format: '%n%u', precision: 2, units: { thousand: 'K', million: 'M', billion: 'B' })
+    number_to_human(number, format: "%n%u", precision: 2, units: {thousand: "K", million: "M", billion: "B"})
   end
-
 end

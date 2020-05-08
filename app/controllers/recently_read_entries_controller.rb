@@ -16,7 +16,6 @@ class RecentlyReadEntriesController < ApplicationController
   end
 
   def settings
-
   end
 
   def create

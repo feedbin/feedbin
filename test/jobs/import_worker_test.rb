@@ -16,7 +16,7 @@ class ImportWorkerTest < ActiveSupport::TestCase
         eot
         OpenStruct.new(
           file: OpenStruct.new(extension: "xml"),
-          read: xml,
+          read: xml
         )
       end
     end

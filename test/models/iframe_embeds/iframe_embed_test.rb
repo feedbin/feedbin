@@ -28,7 +28,7 @@ class IframeEmbedTest < ActiveSupport::TestCase
       Embed::Ted => "https://embed.ted.com/talks/jil_bolte_taylor_s_powerful_stroke_of_insight",
       Embed::Kickstarter => "https://www.kickstarter.com/projects/111515686/help-support-the-kiggins-theatre-to-go-digital/widget/video.html",
       Embed::Soundcloud => "https://w.soundcloud.com/player/?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F29&show_artwork=true",
-      Embed::Spotify => "https://open.spotify.com/embed/artist/7ae4vgLLhr2MCjyhgbGOQ",
+      Embed::Spotify => "https://open.spotify.com/embed/artist/7ae4vgLLhr2MCjyhgbGOQ"
     }
 
     embed_sources.each do |klass, url|

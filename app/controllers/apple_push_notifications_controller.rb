@@ -27,7 +27,7 @@ class ApplePushNotificationsController < ApplicationController
     Honeybadger.notify(
       error_class: "Apple Push Notification",
       error_message: "Apple Push Notification Failure",
-      parameters: params,
+      parameters: params
     )
     head :ok
   end
@@ -62,8 +62,8 @@ class ApplePushNotificationsController < ApplicationController
         '32x32': push_icon_path("32x32"),
         '32x32@2x': push_icon_path("32x32@2x"),
         '128x128': push_icon_path("128x128"),
-        '128x128@2x': push_icon_path("128x128@2x"),
-      },
+        '128x128@2x': push_icon_path("128x128@2x")
+      }
     })
   end
 

@@ -7,7 +7,7 @@ class Share::Pocket < Share::Service
     auth_authorize: "/auth/authorize",
     oauth_request: "/v3/oauth/request",
     oauth_authorize: "/v3/oauth/authorize",
-    add: "/v3/add",
+    add: "/v3/add"
   }
 
   def initialize(klass = nil)
@@ -29,7 +29,7 @@ class Share::Pocket < Share::Service
 
   def request_token
     options = {
-      body: {consumer_key: ENV["POCKET_CONSUMER_KEY"], redirect_uri: redirect_uri}.to_json,
+      body: {consumer_key: ENV["POCKET_CONSUMER_KEY"], redirect_uri: redirect_uri}.to_json
     }
     response = self.class.post(PATHS[:oauth_request], options)
     if response.code == 200
@@ -40,7 +40,7 @@ class Share::Pocket < Share::Service
 
   def authorize(code)
     options = {
-      body: {consumer_key: ENV["POCKET_CONSUMER_KEY"], code: code}.to_json,
+      body: {consumer_key: ENV["POCKET_CONSUMER_KEY"], code: code}.to_json
     }
     self.class.post(PATHS[:oauth_authorize], options)
   end
@@ -66,9 +66,9 @@ class Share::Pocket < Share::Service
       body: {
         url: params["entry_url"],
         access_token: @access_token,
-        consumer_key: ENV["POCKET_CONSUMER_KEY"],
+        consumer_key: ENV["POCKET_CONSUMER_KEY"]
       }.to_json,
-      timeout: 10,
+      timeout: 10
     }
     response = self.class.post(PATHS[:add], options)
     response.code

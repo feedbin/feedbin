@@ -1,5 +1,4 @@
 class SubscriptionsController < ApplicationController
-
   def index
     @user = current_user
     if params[:tag] == "all" || params[:tag].blank?

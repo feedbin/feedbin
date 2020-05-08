@@ -15,16 +15,16 @@ class SiteController < ApplicationController
 
       readability_settings = {}
       subscription_view_settings = {}
-      subscriptions.each { |subscription|
+      subscriptions.each do |subscription|
         readability_settings[subscription.feed_id] = subscription.view_inline
         subscription_view_settings[subscription.feed_id] = subscription.view_mode
-      }
+      end
 
       @now_playing = Entry.where(id: @user.now_playing_entry).first
       @recently_played = @user.recently_played_entries.where(entry_id: @user.now_playing_entry).first
 
       @show_welcome = subscriptions.present? ? false : true
-      @update_ids = @user.subscriptions.where(show_updates: false).pluck(:feed_id).map { |feed_id| ".entry-feed-#{feed_id} .diff-wrap" }.join(', ')
+      @update_ids = @user.subscriptions.where(show_updates: false).pluck(:feed_id).map { |feed_id| ".entry-feed-#{feed_id} .diff-wrap" }.join(", ")
       @data = {
         login_url: login_url,
         tags_path: tags_path(format: :json),
@@ -53,7 +53,7 @@ class SiteController < ApplicationController
         font_stylesheet: ENV["FONT_STYLESHEET"],
         modal_extracts_path: modal_extracts_path,
         progress: @user.recently_played_entries_progress,
-        subscription_view_mode: subscription_view_settings,
+        subscription_view_mode: subscription_view_settings
       }
 
       render action: "logged_in"

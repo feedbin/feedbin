@@ -7,7 +7,7 @@ class EmailsControllerTest < ActionController::TestCase
     assert_difference("Subscription.count") do
       post :create, params: {
         TextBody: feed.feed_url,
-        MailboxHash: user.inbound_email_token,
+        MailboxHash: user.inbound_email_token
       }
     end
     assert_response :success

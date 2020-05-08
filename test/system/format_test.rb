@@ -1,9 +1,7 @@
 require "application_system_test_case"
 
 class FormatTest < ApplicationSystemTestCase
-
   test "change format" do
-
     show_article_setup
     @user.update(theme: "sunset")
     @user.update(font: "serif-1")
@@ -31,17 +29,16 @@ class FormatTest < ApplicationSystemTestCase
     new_size = @user.font_size.to_i - 1
     find("[data-behavior~=decrease_font]").click
     wait_for_ajax
-    assert_equal (new_size).to_s, @user.reload.font_size
+    assert_equal new_size.to_s, @user.reload.font_size
 
     find("[data-behavior~=increase_font]").click
     wait_for_ajax
     assert_equal (new_size + 1).to_s, @user.reload.font_size
 
     find("label[for=toggle_full_screen]").click
-    page.has_selector?('body.full-screen')
+    page.has_selector?("body.full-screen")
 
     find("label[for=user_entry_width]").click
-    page.has_selector?('body.fluid-1')
-
+    page.has_selector?("body.fluid-1")
   end
 end

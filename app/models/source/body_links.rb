@@ -54,5 +54,4 @@ class Source::BodyLinks < Source
       false
     end
   end
-
 end

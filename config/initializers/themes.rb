@@ -3,5 +3,5 @@ Feedbin::Application.config.themes = [
   Theme.new("Sunset", "sunset"),
   Theme.new("Dusk", "dusk"),
   Theme.new("Night", "midnight"),
-  Theme.new("Auto", "auto"),
+  Theme.new("Auto", "auto")
 ]

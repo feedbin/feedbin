@@ -38,9 +38,9 @@ class ThreaderTest < ActiveSupport::TestCase
       "tweet" => {
         "id" => thread_id,
         "user" => {
-          "screen_name" => "bsaid",
-        },
-      },
+          "screen_name" => "bsaid"
+        }
+      }
     }
     if reply_to
       data["tweet"]["in_reply_to_status_id"] = reply_to
@@ -49,7 +49,7 @@ class ThreaderTest < ActiveSupport::TestCase
       "thread_id" => thread_id,
       "public_id" => SecureRandom.hex,
       "content" => "<p>#{Faker::Lorem.paragraph}</p>",
-      "data" => data,
+      "data" => data
     }
   end
 end

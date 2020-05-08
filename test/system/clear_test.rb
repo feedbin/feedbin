@@ -1,9 +1,7 @@
 require "application_system_test_case"
 
 class ClearTest < ApplicationSystemTestCase
-
   test "Clear Recently Read" do
-
     user = users(:ben)
     login_as(user)
     show_article_setup
@@ -22,7 +20,6 @@ class ClearTest < ApplicationSystemTestCase
   end
 
   test "Clear Recently Played" do
-
     user = users(:ben)
     login_as(user)
     show_article_setup
@@ -39,5 +36,4 @@ class ClearTest < ApplicationSystemTestCase
 
     assert_equal(0, user.recently_played_entries.count)
   end
-
 end

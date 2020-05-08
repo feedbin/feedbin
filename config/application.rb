@@ -25,7 +25,7 @@ module Feedbin
       authentication: "login",
       user_name: ENV["SMTP_USERNAME"],
       password: ENV["SMTP_PASSWORD"],
-      domain: ENV["SMTP_DOMAIN"] || ENV["DEFAULT_URL_OPTIONS_HOST"],
+      domain: ENV["SMTP_DOMAIN"] || ENV["DEFAULT_URL_OPTIONS_HOST"]
     }
 
     config.action_view.sanitized_allowed_tags = "table", "tr", "td", "th", "thead", "tbody"

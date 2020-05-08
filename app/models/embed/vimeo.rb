@@ -1,7 +1,7 @@
 class Embed::Vimeo < IframeEmbed
   def self.supported_urls
     [
-      %r{.*?//player\.vimeo\.com/video/(.*?)(#|\?|$)},
+      %r{.*?//player\.vimeo\.com/video/(.*?)(#|\?|$)}
     ]
   end
 

@@ -14,4 +14,3 @@ class Api::V2::PagesControllerTest < ApiControllerTestCase
     end
   end
 end
-

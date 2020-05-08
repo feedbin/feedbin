@@ -30,5 +30,4 @@ class FeedImporter
   rescue
     []
   end
-
 end

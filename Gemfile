@@ -48,7 +48,6 @@ gem "html_diff", github: "feedbin/html_diff", ref: "c7c15ce"
 gem "carrierwave_direct", github: "feedbin/carrierwave_direct", ref: "a0bc323"
 gem "dalli", github: "feedbin/dalli", branch: "feedbin"
 
-
 gem "sass-rails"
 gem "mini_racer"
 gem "coffee-rails"

@@ -26,7 +26,7 @@ class SelfUrl
         "args" => feeds.map { |feed| feed.attributes.values },
         "class" => self.class.name,
         "queue" => "worker_slow",
-        "retry" => false,
+        "retry" => false
       )
     end
   end

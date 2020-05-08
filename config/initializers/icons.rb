@@ -19,7 +19,7 @@ class SvgIcon
   end
 
   def self.extract_dimensions(markup)
-    match = (/viewBox\s*=\s*"([^"]*)"/i).match(markup)
+    match = /viewBox\s*=\s*"([^"]*)"/i.match(markup)
     dimensions = match[1].split
     dimensions.last(2)
   end

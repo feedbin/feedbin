@@ -56,7 +56,7 @@ class FeedsController < ApplicationController
             "args" => [[feed.id, feed.feed_url, {xml: body}]],
             "class" => "FeedRefresherFetcherCritical",
             "queue" => "feed_refresher_fetcher_critical",
-            "retry" => false,
+            "retry" => false
           )
           Librato.increment "entry.push"
         else
@@ -67,13 +67,13 @@ class FeedsController < ApplicationController
         options = {
           push_callback: Rails.application.routes.url_helpers.push_feed_url(feed, protocol: uri.scheme, host: uri.host),
           hub_secret: secret,
-          push_mode: "unsubscribe",
+          push_mode: "unsubscribe"
         }
         Sidekiq::Client.push_bulk(
           "args" => [[feed.id, feed.feed_url, options]],
           "class" => "FeedRefresherFetcher",
           "queue" => "feed_refresher_fetcher",
-          "retry" => false,
+          "retry" => false
         )
       end
       head :ok
@@ -89,7 +89,7 @@ class FeedsController < ApplicationController
       config = {
         twitter_access_token: @user.twitter_access_token,
         twitter_access_secret: @user.twitter_access_secret,
-        twitter_screen_name: @user.twitter_screen_name,
+        twitter_screen_name: @user.twitter_screen_name
       }
       @feeds = FeedFinder.new(params[:q], config).create_feeds!
       @feeds.map { |feed| feed.priority_refresh(@user) }

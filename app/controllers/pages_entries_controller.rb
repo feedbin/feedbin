@@ -1,5 +1,4 @@
 class PagesEntriesController < ApplicationController
-
   def index
     @user = current_user
 
@@ -25,5 +24,4 @@ class PagesEntriesController < ApplicationController
 
     render partial: "shared/entries"
   end
-
 end

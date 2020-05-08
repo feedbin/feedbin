@@ -11,7 +11,7 @@ class EntryDeleterTest < ActiveSupport::TestCase
     @entries = (ENV["ENTRY_LIMIT"].to_i + count.sample).times.map {
       @feed.entries.create!(
         content: Faker::Lorem.paragraph,
-        public_id: SecureRandom.hex,
+        public_id: SecureRandom.hex
       )
     }
   end

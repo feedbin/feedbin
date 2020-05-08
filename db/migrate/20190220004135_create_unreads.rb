@@ -18,5 +18,3 @@ class CreateUnreads < ActiveRecord::Migration[5.1]
     add_index :unreads, [:user_id, :published]
   end
 end
-
-

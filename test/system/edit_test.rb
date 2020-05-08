@@ -1,9 +1,7 @@
 require "application_system_test_case"
 
 class EditTest < ApplicationSystemTestCase
-
   test "Edit feed" do
-
     show_article_setup
     login_as(@user)
 
@@ -28,11 +26,9 @@ class EditTest < ApplicationSystemTestCase
     end
 
     assert_equal feed_name, @user.subscriptions.where(feed: @feed).first.title
-
   end
 
   test "Edit tag" do
-
     show_article_setup
 
     tag_name = "Tag Name"
@@ -56,11 +52,9 @@ class EditTest < ApplicationSystemTestCase
     click_link new_tag_name
 
     assert_equal new_tag_name, @user.tags.first.name
-
   end
 
   test "Edit saved search" do
-
     show_article_setup
 
     search_name = "Search Name"
@@ -84,8 +78,5 @@ class EditTest < ApplicationSystemTestCase
     click_link new_search_name
 
     assert_equal new_search_name, search.reload.name
-
   end
-
-
 end

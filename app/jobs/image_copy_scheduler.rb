@@ -22,7 +22,7 @@ class ImageCopyScheduler
       "args" => ids,
       "class" => ImageCopy.name.freeze,
       "queue" => ImageCopy.get_sidekiq_options["queue"].to_s.freeze,
-      "retry" => ImageCopy.get_sidekiq_options["retry"].freeze,
+      "retry" => ImageCopy.get_sidekiq_options["retry"].freeze
     )
     set_finish(finish)
   end

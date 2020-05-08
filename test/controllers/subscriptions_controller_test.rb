@@ -28,9 +28,9 @@ class SubscriptionsControllerTest < ActionController::TestCase
           title: "title",
           tags: "Design",
           subscribe: "1",
-          media_only: "1",
-        },
-      },
+          media_only: "1"
+        }
+      }
     }
     login_as @user
     assert_difference "Subscription.count", +1 do
@@ -50,5 +50,4 @@ class SubscriptionsControllerTest < ActionController::TestCase
       assert_response :success
     end
   end
-
 end

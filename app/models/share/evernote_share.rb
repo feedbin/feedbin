@@ -22,7 +22,7 @@ class Share::EvernoteShare < Share::Service
       site: URL,
       request_token_path: "/oauth",
       authorize_path: "/OAuth.action",
-      access_token_path: "/oauth",
+      access_token_path: "/oauth"
     }
     OAuth::Consumer.new(ENV["EVERNOTE_KEY"], ENV["EVERNOTE_SECRET"], options)
   end
@@ -89,7 +89,7 @@ class Share::EvernoteShare < Share::Service
       Honeybadger.notify(
         error_class: "EvernoteShare#add",
         error_message: "EvernoteShare add failure",
-        parameters: parameters,
+        parameters: parameters
       )
       500
     end

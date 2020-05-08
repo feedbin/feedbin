@@ -24,7 +24,7 @@ module Api
           Honeybadger.notify(
             error_class: "InAppPurchasesController#create",
             error_message: error_codes[response["status"]] || "Receipt verification failed",
-            parameters: {status: response["status"]},
+            parameters: {status: response["status"]}
           )
           head :bad_request
         end
@@ -59,7 +59,7 @@ module Api
           21005 => "The receipt server is not currently available.",
           21006 => "This receipt is valid but the subscription has expired. When this status code is returned to your server, the receipt data is also decoded and returned as part of the response. Only returned for iOS 6 style transaction receipts for auto-renewable subscriptions.",
           21007 => "This receipt is from the test environment, but it was sent to the production environment for verification. Send it to the test environment instead.",
-          21008 => "This receipt is from the production environment, but it was sent to the test environment for verification. Send it to the production environment instead.",
+          21008 => "This receipt is from the production environment, but it was sent to the test environment for verification. Send it to the production environment instead."
         }
       end
     end

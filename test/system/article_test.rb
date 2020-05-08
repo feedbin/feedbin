@@ -71,7 +71,7 @@ class ArticleTest < ApplicationSystemTestCase
 
     wait_for_ajax
 
-    find('label[for=diff_view]').click()
+    find("label[for=diff_view]").click
 
     assert_selector "ins", text: "new"
   end
@@ -99,7 +99,7 @@ class ArticleTest < ApplicationSystemTestCase
 
     stub_request_file("parsed_page.json", /extract\.example\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
 
-    find('.button-toggle-content').click()
+    find(".button-toggle-content").click
 
     assert_selector ".original-meta strong", text: "Originally from:"
   end

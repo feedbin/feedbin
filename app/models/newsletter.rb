@@ -83,7 +83,7 @@ class Newsletter
 
   def headers
     {
-      "List-Unsubscribe" => data["List-Unsubscribe"],
+      "List-Unsubscribe" => data["List-Unsubscribe"]
     }
   end
 

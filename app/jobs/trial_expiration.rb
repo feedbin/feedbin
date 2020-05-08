@@ -23,5 +23,4 @@ class TrialExpiration
       end
     end
   end
-
 end

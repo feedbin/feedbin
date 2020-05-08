@@ -28,7 +28,7 @@ class ActionsControllerTest < ActionController::TestCase
       query: "john",
       all_feeds: 0,
       feed_ids: [feed.id],
-      actions: ["star"],
+      actions: ["star"]
     }
 
     assert_difference("Action.count") do

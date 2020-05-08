@@ -15,7 +15,7 @@ class Share::Instapaper < Share::Service
   def consumer
     options = {
       site: URL,
-      access_token_path: "/api/1/oauth/access_token",
+      access_token_path: "/api/1/oauth/access_token"
     }
     OAuth::Consumer.new(ENV["INSTAPAPER_KEY"], ENV["INSTAPAPER_SECRET"], options)
   end

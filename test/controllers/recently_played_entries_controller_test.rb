@@ -23,7 +23,7 @@ class RecentlyPlayedEntriesControllerTest < ActionController::TestCase
     params = {
       entry_id: entry.id,
       progress: 7,
-      duration: 8,
+      duration: 8
     }
 
     assert_difference("RecentlyPlayedEntry.count") do

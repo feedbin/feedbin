@@ -144,7 +144,7 @@ class Feed < ApplicationRecord
         "args" => [[id, feed_url]],
         "class" => "FeedRefresherFetcherCritical",
         "queue" => "feed_refresher_fetcher_critical",
-        "retry" => false,
+        "retry" => false
       )
     end
   end
@@ -158,7 +158,7 @@ class Feed < ApplicationRecord
   end
 
   def json_feed
-    options&.respond_to?(:dig) && options.dig("json_feed")
+    options&.respond_to?(:dig) && options&.dig("json_feed")
   end
 
   def has_subscribers?

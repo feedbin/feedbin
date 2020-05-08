@@ -23,7 +23,7 @@ class Share::Tumblr < Share::Service
       request_token_path: "/oauth/request_token",
       authorize_path: "/oauth/authorize",
       access_token_path: "/oauth/access_token",
-      http_method: :post,
+      http_method: :post
     }
     OAuth::Consumer.new(ENV["TUMBLR_KEY"], ENV["TUMBLR_SECRET"], options)
   end
@@ -55,7 +55,7 @@ class Share::Tumblr < Share::Service
     @klass.update(default_option: params[:site])
     options = {
       format: params["format"],
-      state: params["state"],
+      state: params["state"]
     }
 
     if params[:type] == "quote"

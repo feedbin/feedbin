@@ -21,8 +21,8 @@ class FaviconFetcherTest < ActiveSupport::TestCase
     stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
     stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
 
-    stub_request(:get, @page_url).
-      to_return(body: body, status: 200)
+    stub_request(:get, @page_url)
+      .to_return(body: body, status: 200)
 
     stub_request_file("favicon.ico", @icon_url)
 
@@ -43,8 +43,8 @@ class FaviconFetcherTest < ActiveSupport::TestCase
     stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
     stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
 
-    stub_request(:get, @page_url).
-      to_return(body: body, status: 200)
+    stub_request(:get, @page_url)
+      .to_return(body: body, status: 200)
 
     stub_request_file("favicon.ico", @icon_url)
 
@@ -64,8 +64,8 @@ class FaviconFetcherTest < ActiveSupport::TestCase
     stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
     stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
 
-    stub_request(:get, @page_url).
-      to_return(body: body, status: 200)
+    stub_request(:get, @page_url)
+      .to_return(body: body, status: 200)
 
     stub_request_file("favicon.ico", @default_url)
 
@@ -85,8 +85,8 @@ class FaviconFetcherTest < ActiveSupport::TestCase
     stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
     stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
 
-    stub_request(:get, @page_url).
-      to_return(body: body, status: 200)
+    stub_request(:get, @page_url)
+      .to_return(body: body, status: 200)
 
     stub_request_file("favicon-blank.ico", @default_url)
 

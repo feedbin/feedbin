@@ -37,7 +37,7 @@ class FaviconProcessor
       upload_url = URI::HTTP.build(
         scheme: "https",
         host: response.data[:host],
-        path: response.data[:path],
+        path: response.data[:path]
       ).to_s
     end
     upload_url
@@ -85,7 +85,7 @@ class FaviconProcessor
       "Expires" => "Sun, 29 Jun 2036 17:48:34 GMT",
       "x-amz-acl" => "public-read",
       "x-amz-storage-class" => ENV["AWS_S3_STORAGE_CLASS"] || "REDUCED_REDUNDANCY",
-      "x-amz-meta-favicon-host" => host,
+      "x-amz-meta-favicon-host" => host
     }
   end
 

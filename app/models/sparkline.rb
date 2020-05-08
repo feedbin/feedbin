@@ -1,5 +1,4 @@
 class Sparkline
-
   attr_reader :width, :height, :percentages, :stroke
 
   def initialize(width:, height:, stroke:, percentages:)
@@ -11,7 +10,7 @@ class Sparkline
 
   def fill
     to_attr([
-      [0,height], *fill_points, [width, height]
+      [0, height], *fill_points, [width, height]
     ])
   end
 
@@ -20,7 +19,7 @@ class Sparkline
   end
 
   def to_attr(items)
-    items.map {|item| item.join(",")}.join(" ")
+    items.map { |item| item.join(",") }.join(" ")
   end
 
   def fill_points
@@ -31,7 +30,6 @@ class Sparkline
 
   def line_points
     percentages.each_with_index.map do |percentage, index|
-
       y_position = y(percentage)
       if y_position == 0.0
         y_position = stroke_width_adjustment
@@ -43,7 +41,7 @@ class Sparkline
       if index == 0
         x_position = stroke_width_adjustment
       elsif index == percentages.count - 1
-        x_position = x_position - stroke_width_adjustment
+        x_position -= stroke_width_adjustment
       end
 
       [x_position, y_position]
@@ -63,7 +61,7 @@ class Sparkline
   end
 
   def y(percentage)
-    ((1.00 - percentage) * (height)).round(1)
+    ((1.00 - percentage) * height).round(1)
   rescue
     1.00 * (height - 1)
   end

@@ -9,8 +9,7 @@ class NewslettersController < ApplicationController
       NewsletterEntry.create(newsletter, user)
     end
     active = user ? !user.suspended : false
-    Librato.increment "newsletter.user_active.#{active.to_s}"
+    Librato.increment "newsletter.user_active.#{active}"
     head :ok
   end
-
 end

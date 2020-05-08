@@ -59,7 +59,7 @@ class ActionsPerform
         "args" => EntryImage.build_find_image_args(@entry),
         "class" => "FindImageCritical",
         "queue" => "images_critical",
-        "retry" => false,
+        "retry" => false
       )
     end
     DevicePushNotificationSend.perform_in(1.minute, user_ids, @entry.id, true)

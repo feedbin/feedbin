@@ -59,7 +59,7 @@ class Entry < ApplicationRecord
   end
 
   def json_feed
-    data&.respond_to?(:dig) && data.dig("json_feed")
+    data&.respond_to?(:dig) && data&.dig("json_feed")
   end
 
   def twitter_thread_ids
@@ -139,7 +139,7 @@ class Entry < ApplicationRecord
         hash[:entities][entity].each_with_index do |value, index|
           hash[:entities][entity][index][:indices] = [
             value[:indices][0] - text_start,
-            value[:indices][1] - text_start,
+            value[:indices][1] - text_start
           ]
         end
       end

@@ -1,5 +1,4 @@
 class ImageFallback
-
   attr_accessor :document
 
   def initialize(document)
@@ -21,5 +20,4 @@ class ImageFallback
       connection.directories.new(key: ENV["AWS_S3_BUCKET_ARCHIVE"]).files.new(key: key).url(24.hours.from_now)
     end
   end
-
 end

@@ -9,7 +9,7 @@ class CancelBillingTest < ActiveSupport::TestCase
     user = User.create(
       email: "cc@example.com",
       password: default_password,
-      plan: plan,
+      plan: plan
     )
 
     CancelBilling.new.perform(user.customer_id)

@@ -26,12 +26,12 @@ class BasePresenter
       elsif feed.pages? && entry
         icon = Favicon.find_by_host(entry.hostname)
         icon_url = icon&.cdn_url
-        if icon_url
-          content = @template.content_tag :span, "", class: "favicon-wrap" do
+        content = if icon_url
+          @template.content_tag :span, "", class: "favicon-wrap" do
             @template.image_tag(icon_url, alt: "Favicon")
           end
         else
-          content = @template.content_tag :span, "", class: "favicon-wrap collection-favicon" do
+          @template.content_tag :span, "", class: "favicon-wrap collection-favicon" do
             @template.svg_tag("favicon-saved", size: "14x16")
           end
         end

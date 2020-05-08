@@ -17,7 +17,7 @@ class ViewLinkCacheMultiple
           "args" => [url, expires_at],
           "class" => "ViewLinkCache",
           "queue" => "low",
-          "retry" => false,
+          "retry" => false
         )
       end
     end

@@ -6,7 +6,7 @@ class ConditionalHttpTest < ActiveSupport::TestCase
     etag = SecureRandom.hex
     expected = {
       "If-None-Match" => etag,
-      "If-Modified-Since" => last_modified.httpdate,
+      "If-Modified-Since" => last_modified.httpdate
     }
     assert_equal expected, ConditionalHttp.new(etag, last_modified).to_h
   end
@@ -16,7 +16,7 @@ class ConditionalHttpTest < ActiveSupport::TestCase
     etag = SecureRandom.hex
     expected = {
       "If-None-Match" => etag,
-      "If-Modified-Since" => last_modified,
+      "If-Modified-Since" => last_modified
     }
     assert_equal expected, ConditionalHttp.new(etag, last_modified).to_h
   end

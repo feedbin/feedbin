@@ -1,4 +1,4 @@
-namespace :feedbin  do
+namespace :feedbin do
   desc "See what is deployed."
   task :deploy_diff do
     response = HTTParty.get("https://feedbin.com/version", {timeout: 20})
@@ -9,6 +9,6 @@ namespace :feedbin  do
       host: "github.com",
       path: path
     )
-    `open #{uri.to_s}`
+    `open #{uri}`
   end
 end

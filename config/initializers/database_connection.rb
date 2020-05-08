@@ -18,7 +18,7 @@ if Rails.env.production?
         password: uri.password,
         database: database,
         reaping_frequency: ENV["DB_REAP_FREQ"] || 10,
-        pool: ENV["DB_POOL"] || 16,
+        pool: ENV["DB_POOL"] || 16
       )
     end
   end

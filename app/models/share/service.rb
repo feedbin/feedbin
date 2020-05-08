@@ -46,6 +46,6 @@ class Share::Service
   def link_options(entry)
     {url: Rails.application.routes.url_helpers.share_supported_sharing_service_path(@klass, entry),
      label: @klass.label,
-     html_options: @klass.html_options,}
+     html_options: @klass.html_options}
   end
 end

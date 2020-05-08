@@ -10,7 +10,7 @@ class Customer
     Stripe::Subscription.create(
       customer: new_customer.id,
       plan: plan,
-      trial_end: trial_end.to_i,
+      trial_end: trial_end.to_i
     )
     new_customer
   end

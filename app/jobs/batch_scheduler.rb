@@ -10,7 +10,7 @@ class BatchScheduler
     Sidekiq::Client.push_bulk(
       "args" => jobs,
       "class" => worker_class,
-      "queue" => "worker_slow",
+      "queue" => "worker_slow"
     )
   end
 end

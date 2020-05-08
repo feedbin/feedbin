@@ -10,7 +10,7 @@ class Api::V2::ActionsControllerTest < ApiControllerTestCase
       user: @user,
       query: @entry.title,
       feed_ids: @feeds.map(&:id),
-      actions: ["mark_read"],
+      actions: ["mark_read"]
     )
     @actions = [action]
   end
@@ -35,8 +35,8 @@ class Api::V2::ActionsControllerTest < ApiControllerTestCase
         action_params: {
           query: "query",
           feed_ids: [@feeds.first.id],
-          actions: ["mark_read"],
-        },
+          actions: ["mark_read"]
+        }
       }
       assert_response :success
     end

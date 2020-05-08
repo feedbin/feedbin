@@ -7,7 +7,7 @@ class FeedImporterTest < ActiveSupport::TestCase
     details = {
       xml_url: "http://www.example.com/atom.xml",
       tag: "Favorites",
-      title: "My Title",
+      title: "My Title"
     }
     @import_item = import.import_items.create(details: details)
     stub_request_file("atom.xml", @import_item.details[:xml_url])
@@ -28,7 +28,7 @@ class FeedImporterTest < ActiveSupport::TestCase
 
   test "should mark failed" do
     import = @user.imports.create
-    details = { xml_url: "http://www.example.com/atom.xml" }
+    details = {xml_url: "http://www.example.com/atom.xml"}
     import_item = import.import_items.create(details: details)
     stub_request(:get, import_item.details[:xml_url]).to_return(status: 404)
     FeedImporter.new.perform(import_item.id)

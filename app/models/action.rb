@@ -47,10 +47,10 @@ class Action < ApplicationRecord
         bool: {
           filter: {
             bool: {
-              must: {terms: {feed_id: computed_feed_ids}},
-            },
-          },
-        },
+              must: {terms: {feed_id: computed_feed_ids}}
+            }
+          }
+        }
       }
       if query.present?
         escaped_query = FeedbinUtils.escape_search(query)
@@ -58,8 +58,8 @@ class Action < ApplicationRecord
           query_string: {
             fields: ["_all", "title.*", "content.*", "emoji", "author", "url"],
             default_operator: "AND",
-            query: escaped_query,
-          },
+            query: escaped_query
+          }
         }
       end
     end
@@ -96,14 +96,14 @@ class Action < ApplicationRecord
       index: Entry.index_name,
       type: ".percolator",
       id: id,
-      ignore: 404,
+      ignore: 404
     )
   end
 
   def query_valid
     options = {
       index: Entry.index_name,
-      body: {query: search_body[:query]},
+      body: {query: search_body[:query]}
     }
     result = $search[:main].indices.validate_query(options)
     if result["valid"] == false
@@ -121,7 +121,7 @@ class Action < ApplicationRecord
       index: Entry.index_name,
       type: Entry.document_type,
       scroll: scroll,
-      body: search_options,
+      body: search_options
     )
 
     while response["hits"]["hits"].present?
