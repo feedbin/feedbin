@@ -72,8 +72,8 @@
                         <%= link_to thread_tweet_path(entry), remote: true, class: "twitter-conversation-link", title: "Show Conversation", data: {behavior: "open_modal", modal_target: "conversation"} do %>
                             <%= svg_tag "icon-twitter-conversation" %>
                         <% end %>
-                        <%= link_to tweet.uri.to_s, target: "_blank", title: "View on Twitter", class: "twitter-link", id: "source_link" do %>
-                            <%= svg_tag "icon-twitter" %>
+                        <%= link_to tweet.uri.to_s, target: "_blank", title: "View on Twitter", class: "tweet-link", id: "source_link" do %>
+                            <%= svg_tag "icon-twitter-logo" %>
                         <% end %>
                     </span>
                 </h1>

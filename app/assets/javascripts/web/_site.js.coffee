@@ -405,22 +405,22 @@ $.extend feedbin,
   showPanel: (panel, state = true) ->
     feedbin.panel = panel
     if panel == 1
-      if feedbin.mobileView()
-        window.history.replaceState({panel: 1}, document.title, "/");
+      if state && feedbin.mobileView()
+        window.history.pushState({panel: 1}, "", "/");
       $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
       if feedbin.swipe && $('body').hasClass('has-offscreen-panels')
         feedbin.scrollToPanel('.feeds-column')
 
     else if panel == 2
       if state && feedbin.mobileView()
-        window.history.pushState({panel: 2}, document.title, "/");
+        window.history.pushState({panel: 2}, "", "/");
       $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
       if feedbin.swipe && $('body').hasClass('has-offscreen-panels')
         feedbin.scrollToPanel('.entries-column')
 
     else if panel == 3
       if state && feedbin.mobileView()
-        window.history.pushState({panel: 3}, document.title, "/");
+        window.history.pushState({panel: 3}, "", "/");
       $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
       if feedbin.swipe && $('body').hasClass('has-offscreen-panels')
         feedbin.scrollToPanel('.entry-column')
@@ -1067,7 +1067,7 @@ $.extend feedbin,
 
   prepareShareForm: ->
     $('.field-cluster input, .field-cluster textarea').val('')
-    $('.share-controls [type="checkbox"]').attr('checked', false);
+    $('.sharing-controls [type="checkbox"]').attr('checked', false);
 
     title = $('.entry-header h1').first().text()
     $('.share-form .title-placeholder').val(title)
@@ -1420,9 +1420,10 @@ $.extend feedbin,
 
     state: ->
       $(window).on 'popstate', (event) ->
-        if feedbin.panel > 1
-          newPanel = feedbin.panel - 1
-          feedbin.showPanel(newPanel, false)
+        panel = 1
+        if event.originalEvent.state && "panel" of event.originalEvent.state
+          panel = event.originalEvent.state.panel
+        feedbin.showPanel(panel, false)
 
     userTitles: ->
       feedbin.applyUserTitles()

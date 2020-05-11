@@ -12,7 +12,7 @@ Variables
 $small-breakpoint: 700px;
 
 $toolbar-height: 41px;
-$font-stack: -apple-system, system-ui, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-stack: -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $audio-player-height: 115px;
 $audio-player-height-minimized: 54px;
 $base-button-position: 10px;
@@ -1268,11 +1268,6 @@ table {
             .switch {
                 right: $two-units;
             }
-        }
-    }
-    .share-help {
-        @media (max-width: $small-breakpoint) {
-            padding-top: 20px;
         }
     }
     .service-title {
@@ -2744,7 +2739,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             display: flex;
         }
     }
-    &.retweet {
+    &.re-tweet {
         .icon-retweet {
             display: flex;
         }
@@ -3975,7 +3970,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         font-weight: bold;
         margin: 0 0 0 0;
     }
-    .share-header {
+    .sharing-header {
         display: flex;
         align-items: center;
         :last-child {
@@ -3998,7 +3993,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             resize: none;
         }
     }
-    .share-controls {
+    .sharing-controls {
         margin-bottom: 16px;
         .checkbox {
             margin-bottom: 8px;
@@ -4966,10 +4961,10 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
             display: flex;
             align-items: baseline;
             margin-left: auto;
-            .twitter-link svg, .twitter-conversation-link svg {
+            .tweet-link svg, .twitter-conversation-link svg {
                 @include fill($color-icons);
             }
-            .twitter-link {
+            .tweet-link {
                 padding-left: 15px;
                 display: block;
                 svg {
@@ -5053,7 +5048,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         .twitter-conversation-link {
             display: none;
         }
-        .twitter-link:not(.embed) {
+        .tweet-link:not(.embed) {
             display: none !important;
         }
         p:last-child {
@@ -5100,7 +5095,7 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
         padding-top: 0 !important;
     }
     .reply {
-        .tweet-mentions, .twitter-link {
+        .tweet-mentions, .tweet-link {
             display: none !important;
         }
     }
