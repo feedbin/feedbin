@@ -10046,7 +10046,7 @@ $tooltip-arrow-height: 6px;
     line-height: normal;
 }
 
-.tooltip i, .key {
+.tooltip i {
     @include background-color((day: $theme-color-600, sunset: $theme-color-sunset-600, dusk: $theme-color-dusk-300, midnight: $theme-color-midnight-300));
     margin-left: 16px;
     display: inline-block;
@@ -10063,13 +10063,38 @@ $tooltip-arrow-height: 6px;
     text-align: center;
     text-transform: capitalize;
 }
+
+.key-group {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.key-group + .key-group {
+    margin-top: $one-unit;
+}
+
 .key {
-    box-shadow: none;
-    padding: 5px 7px;
-    margin: 0;
-    min-width: 28px;
-    box-shadow: 0 1px 1px rgba(0,0,0,.1);
+    margin-left: $one-unit;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 32px;
+    width: 32px;
+    @include background-color((day: $theme-color-100, sunset: $theme-color-sunset-100, dusk: $theme-color-dusk-200, midnight: $theme-color-midnight-200));
+    @include color($color-contrast-700);
+    font-style: normal;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    font-family: $font-stack;
+    line-height: 1;
+    font-size: 16px;
+    text-transform: capitalize;
     &.wide {
-        text-transform: lowercase;
+        width: 72px;
     }
+}
+
+.spacer {
+    margin-left: $one-unit;
 }

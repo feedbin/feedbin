@@ -1,107 +1,195 @@
 <% content_for :modal_content, "", flush: true %>
 
 <% content_for :modal_title, flush: true do %>
-    Help
+Help
 <% end %>
 
 <% content_for :modal_body, flush: true do %>
-    <table class="table">
-        <tr>
-            <th>Action</th>
-            <th>Key</th>
-        </tr>
-        <tr>
-            <td>Navigate through feeds and entries</td>
-            <td>
-                <p><span class="key">↑</span> <span class="key">↓</span> <span class="key">←</span> <span class="key">→</span></p>
+<table class="table">
+    <tr>
+        <th>Action</th>
+        <th>Key</th>
+    </tr>
+    <tr>
+        <td>Navigate through feeds and entries</td>
+        <td>
+            <span class="key-group">
+                <span class="key">↑</span> <span class="key">↓</span> <span class="key">←</span> <span class="key">→</span>
+            </span>
+            <span class="key-group">
                 <span class="key">j</span> <span class="key">k</span> <span class="key">h</span> <span class="key">l</span>
-            </td>
-        </tr>
-        <tr>
-            <td>Page up/down through articles</td>
-            <td><span class="key" title="page up">⇞</span> <span class="key" title="page down">⇟</span></td>
-        </tr>
-        <tr>
-            <td>Navigate through unread items</td>
-            <td><span class="key wide">space</span></td>
-        </tr>
-        <tr>
-            <td>Edit selected feed</td>
-            <td><span class="key wide">shift</span> <span class="key">e</span></td>
-        </tr>
-        <tr>
-            <td>Expand/collapse tag</td>
-            <td><span class="key">e</span></td>
-        </tr>
-        <tr>
-            <td>Star entry</td>
-            <td><span class="key">s</span></td>
-        </tr>
-        <tr>
-            <td>Toggle read/unread</td>
-            <td><span class="key">m</span></td>
-        </tr>
-        <tr>
-            <td>Open original</td>
-            <td><span class="key">v</span></td>
-        </tr>
-        <tr>
-            <td>Full screen</td>
-            <td><span class="key wide">shift</span> <span class="key">f</span></td>
-        </tr>
-        <tr>
-            <td>Extract full content</td>
-            <td><span class="key">c</span></td>
-        </tr>
-        <tr>
-            <td>Open sharing menu</td>
-            <td><span class="key">f</span></td>
-        </tr>
-        <tr>
-            <td>Sharing hotkeys</td>
-            <td><span class="key wide">1 &ndash; 9</span></td>
-        </tr>
-        <tr>
-            <td>Refresh feeds list</td>
-            <td><span class="key">r</span></td>
-        </tr>
-        <tr>
-            <td>Go to unread</td>
-            <td><span class="key">g</span> then <span class="key">u</span></td>
-        </tr>
-        <tr>
-            <td>Go to starred</td>
-            <td><span class="key">g</span> then <span class="key">s</span></td>
-        </tr>
-        <tr>
-            <td>Go to all</td>
-            <td><span class="key">g</span> then <span class="key">a</span></td>
-        </tr>
-        <tr>
-            <td>Mark all as read</td>
-            <td><span class="key wide">shift</span> <span class="key">a</span></td>
-        </tr>
-        <tr>
-            <td>Search</td>
-            <td><span class="key">/</span></td>
-        </tr>
-        <tr>
-            <td>Add subscription</td>
-            <td><span class="key">a</span></td>
-        </tr>
-        <tr>
-            <td>Unfocus field</td>
-            <td><span class="key wide">escape</span></td>
-        </tr>
-        <tr>
-            <td>Copy URL of selected article</td>
-            <td><span class="key wide">shift</span> <span class="key">c</span></td>
-        </tr>
-        <tr>
-            <td>Show help</td>
-            <td><span class="key">?</span></td>
-        </tr>
-    </table>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Page up/down through articles</td>
+        <td>
+            <span class="key-group">
+                <span class="key" title="page up">⇞</span> <span class="key" title="page down">⇟</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Navigate through unread items</td>
+        <td>
+            <span class="key-group">
+                <span class="key wide">space</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Edit selected feed</td>
+        <td>
+            <span class="key-group">
+                <span class="key wide">shift</span> <span class="key">e</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Expand/collapse tag</td>
+        <td>
+            <span class="key-group">
+                <span class="key">e</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Star entry</td>
+        <td>
+            <span class="key-group">
+                <span class="key">s</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Toggle read/unread</td>
+        <td>
+            <span class="key-group">
+                <span class="key">m</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Open original</td>
+        <td>
+            <span class="key-group">
+                <span class="key">v</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Full screen</td>
+        <td>
+            <span class="key-group">
+                <span class="key wide">shift</span> <span class="key">f</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Extract full content</td>
+        <td>
+            <span class="key-group">
+                <span class="key">c</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Open sharing menu</td>
+        <td>
+            <span class="key-group">
+                <span class="key">f</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Sharing hotkeys</td>
+        <td>
+            <span class="key-group">
+                <span class="key wide">1 &ndash; 9</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Refresh feeds list</td>
+        <td>
+            <span class="key-group">
+                <span class="key">r</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Go to unread</td>
+        <td>
+            <span class="key-group">
+                <span class="key">g</span> <span class="spacer">then</span> <span class="key">u</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Go to starred</td>
+        <td>
+            <span class="key-group">
+                <span class="key">g</span> <span class="spacer">then</span> <span class="key">s</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Go to all</td>
+        <td>
+            <span class="key-group">
+                <span class="key">g</span> <span class="spacer">then</span> <span class="key">a</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Mark all as read</td>
+        <td>
+            <span class="key-group">
+                <span class="key wide">shift</span> <span class="key">a</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Search</td>
+        <td>
+            <span class="key-group">
+                <span class="key">/</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Add subscription</td>
+        <td>
+            <span class="key-group">
+                <span class="key">a</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Unfocus field</td>
+        <td>
+            <span class="key-group">
+                <span class="key wide">escape</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Copy URL of selected article</td>
+        <td>
+            <span class="key-group">
+                <span class="key wide">shift</span> <span class="key">c</span>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td>Show help</td>
+        <td>
+            <span class="key-group">
+                <span class="key">?</span>
+            </span>
+        </td>
+    </tr>
+</table>
 <% end %>
 
 <% content_for :modal_footer, "", flush: true %>
