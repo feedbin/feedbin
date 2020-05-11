@@ -558,7 +558,7 @@ $button-transition-properties:      background-color;
   // POSITIONING
   position: relative;
   z-index: ($popover-z-index - 2); // Below fading bars
-
+  margin-bottom: 10px;
   // DISPLAY AND SIZING
   display: inline-block;
   max-height: $popover-max-height;
