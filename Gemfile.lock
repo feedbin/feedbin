@@ -498,7 +498,7 @@ GEM
     sshkit (1.21.0)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    standard (0.3.0)
+    standard (0.4.1)
       rubocop (~> 0.82.0)
       rubocop-performance (~> 1.5.2)
     stripe (4.24.0)
