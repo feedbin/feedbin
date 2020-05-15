@@ -3021,8 +3021,8 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     }
     .back-button {
         display: none;
-        height: $toolbar-height;
-        width: $toolbar-height;
+        height: 100%;
+        width: 40px;
         flex-shrink: 0;
     }
     .button-full-screen {
