@@ -79,7 +79,7 @@ class Share::EvernoteShare < Share::Service
     if exception.respond_to?(:errorCode) && exception.errorCode == Evernote::EDAM::Error::EDAMErrorCode::AUTH_EXPIRED
       401
     else
-      parameters = {exception: exception}
+      parameters = {exception: exception, entry_id: params[:entry_id]}
       if exception.respond_to?(:errorCode)
         parameters[:error_code] = exception.errorCode
       end
