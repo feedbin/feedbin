@@ -46,8 +46,8 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/html_diff.git
-  revision: c7c15ce6c9bbc4cc04971d5e921b0bcb49a5c59b
-  ref: c7c15ce
+  revision: 013e1bbd9cdaa905dd7727ebee8a4efcc8b47f3f
+  ref: 013e1bb
   specs:
     html_diff (1.0.0)
       nokogiri

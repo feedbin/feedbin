@@ -8,7 +8,7 @@ gem "feedjira",            github: "feedbin/feedjira",            ref: "e6b7b11"
 gem "feedkit",             github: "feedbin/feedkit",             branch: "master"
 gem "grocer-pushpackager", github: "feedbin/grocer-pushpackager", ref: "6b01b4e", require: "grocer/pushpackager"
 gem "html-pipeline",       github: "feedbin/html-pipeline",       ref: "20162f9"
-gem "html_diff",           github: "feedbin/html_diff",           ref: "c7c15ce"
+gem "html_diff",           github: "feedbin/html_diff",           ref: "013e1bb"
 gem "opml_saw",            github: "feedbin/opml_saw",            ref: "61d8c2d"
 
 gem "activerecord-import"
