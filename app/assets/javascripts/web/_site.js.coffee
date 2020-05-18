@@ -1880,6 +1880,7 @@ $.extend feedbin,
             feedbin.changeContentView(feedbin.previousContentView)
           else
             $("[data-content-option~=extract]").html(feedbin.extractCache["#{entry}"]);
+            feedbin.formatEntryContent(entry, false, false);
             feedbin.changeContentView('extract')
 
         else if feedbin.readabilityXHR
