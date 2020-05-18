@@ -31,7 +31,7 @@ class ApplicationController < ActionController::Base
   end
 
   def render_404
-    render "errors/not_found", status: 404, layout: "application", formats: [:html]
+    render "errors/not_found", status: 404, layout: "application", formats: [:any]
   end
 
   def get_collections
