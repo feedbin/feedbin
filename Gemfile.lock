@@ -1,4 +1,13 @@
 GIT
+  remote: https://github.com/feedbin/carrierwave_direct.git
+  revision: a0bc3230e544c0ea88f35d2bb6b7eb6a1fdb9196
+  ref: a0bc323
+  specs:
+    carrierwave_direct (0.0.15)
+      carrierwave
+      fog-aws
+
+GIT
   remote: https://github.com/feedbin/dalli.git
   revision: 3c92218fadfc20b6fb839f99ac36703ca96167ea
   branch: feedbin
@@ -171,9 +180,6 @@ GEM
       image_processing (~> 1.1)
       mimemagic (>= 0.3.0)
       mini_mime (>= 0.1.3)
-    carrierwave_direct (2.1.0)
-      carrierwave (>= 1.0.0)
-      fog-aws
     childprocess (3.0.0)
     clockwork (2.0.4)
       activesupport
@@ -555,7 +561,7 @@ DEPENDENCIES
   capistrano-rails
   capybara
   carrierwave
-  carrierwave_direct
+  carrierwave_direct!
   clockwork
   coffee-rails
   connection_pool

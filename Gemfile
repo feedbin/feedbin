@@ -3,6 +3,7 @@ git_source(:github) { |name| "https://github.com/#{name}.git" }
 
 gem "rails", "= 6.0.3.1"
 
+gem "carrierwave_direct",  github: "feedbin/carrierwave_direct",  ref: "a0bc323"
 gem "dalli",               github: "feedbin/dalli",               branch: "feedbin"
 gem "feedjira",            github: "feedbin/feedjira",            ref: "e6b7b11"
 gem "feedkit",             github: "feedbin/feedkit",             branch: "master"
@@ -19,7 +20,6 @@ gem "bcrypt"
 gem "bcrypt-ruby"
 gem "bootsnap", require: false
 gem "carrierwave"
-gem "carrierwave_direct"
 gem "clockwork"
 gem "coffee-rails"
 gem "connection_pool"
