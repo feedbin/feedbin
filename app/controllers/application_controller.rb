@@ -32,9 +32,9 @@ class ApplicationController < ActionController::Base
 
   def render_404
     respond_to do |format|
-      format.any {
-        render "errors/not_found", status: 404, layout: "application"
-      }
+      format.any do
+        render "errors/not_found", layout: nil, status: :not_found
+      end
     end
   end
 
