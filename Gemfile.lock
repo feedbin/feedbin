@@ -15,6 +15,16 @@ GIT
     dalli (2.7.10)
 
 GIT
+  remote: https://github.com/feedbin/elasticsearch-rails.git
+  revision: aa2033bb891a3b2545cb3ff633918fcf64c901e5
+  branch: 2.x
+  specs:
+    elasticsearch-model (2.0.2)
+      activesupport (> 3)
+      elasticsearch (~> 2)
+      hashie
+
+GIT
   remote: https://github.com/feedbin/feedjira.git
   revision: e6b7b11b4b20cfb01ce6a73806a59308298a10c7
   ref: e6b7b11
@@ -116,7 +126,7 @@ GEM
     activerecord (6.0.3.1)
       activemodel (= 6.0.3.1)
       activesupport (= 6.0.3.1)
-    activerecord-import (1.0.4)
+    activerecord-import (1.0.5)
       activerecord (>= 3.2)
     activestorage (6.0.3.1)
       actionpack (= 6.0.3.1)
@@ -220,10 +230,6 @@ GEM
       elasticsearch-transport (= 2.0.2)
     elasticsearch-api (2.0.2)
       multi_json
-    elasticsearch-model (2.0.1)
-      activesupport (> 3)
-      elasticsearch (~> 2)
-      hashie
     elasticsearch-transport (2.0.2)
       faraday
       multi_json
@@ -263,7 +269,7 @@ GEM
     globalid (0.4.2)
       activesupport (>= 4.2.0)
     hashdiff (1.0.1)
-    hashie (3.6.0)
+    hashie (4.1.0)
     hetchy (1.0.0)
     honeybadger (4.6.0)
     htmlbeautifier (1.3.1)
@@ -368,10 +374,10 @@ GEM
       actionmailer (>= 3)
       premailer (~> 1.7, >= 1.7.9)
     public_suffix (4.0.5)
-    puma (4.3.3)
+    puma (4.3.5)
       nio4r (~> 2.0)
     rack (2.2.2)
-    rack-attack (6.3.0)
+    rack-attack (6.3.1)
       rack (>= 1.0, < 3)
     rack-protection (2.0.8.1)
       rack
@@ -480,7 +486,7 @@ GEM
     sshkit (1.21.0)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    standard (0.4.2)
+    standard (0.4.3)
       rubocop (~> 0.83.0)
       rubocop-performance (~> 1.5.2)
     stripe (4.24.0)
@@ -570,7 +576,7 @@ DEPENDENCIES
   dalli!
   dotenv-rails
   elasticsearch (~> 2.0)
-  elasticsearch-model (~> 2.0)
+  elasticsearch-model!
   evernote_oauth
   faker
   feedjira!
