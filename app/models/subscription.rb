@@ -51,7 +51,7 @@ class Subscription < ApplicationRecord
     unread_entries = entries.map { |entry|
       UnreadEntry.new_from_owners(user, entry)
     }
-    UnreadEntry.import(unread_entries, validate: false)
+    UnreadEntry.import(unread_entries, validate: false, on_duplicate_key_ignore: true)
   end
 
   def mark_as_read

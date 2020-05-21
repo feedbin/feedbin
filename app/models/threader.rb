@@ -44,7 +44,7 @@ class Threader
         array << UpdatedEntry.new_from_owners(user_id, parent_entry)
       end
     }
-    UpdatedEntry.import(updated_entries, validate: false)
+    UpdatedEntry.import(updated_entries, validate: false, on_duplicate_key_ignore: true)
   end
 
   def same_user?(parents)

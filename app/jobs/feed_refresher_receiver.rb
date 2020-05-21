@@ -99,7 +99,7 @@ class FeedRefresherReceiver
         updated_entries << UpdatedEntry.new_from_owners(user_id, entry)
       end
     end
-    UpdatedEntry.import(updated_entries, validate: false)
+    UpdatedEntry.import(updated_entries, validate: false, on_duplicate_key_ignore: true)
 
     Librato.increment("entry.update_big")
   rescue Exception => e
