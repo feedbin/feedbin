@@ -478,7 +478,10 @@ $.extend feedbin,
     $('[data-behavior~=pagination]').html(html)
 
   entryChanged: ->
-    !feedbin.previousEntry || !feedbin.previousEntry.container.is(feedbin.selectedEntry.container)
+    if feedbin.previousEntry == null
+      false
+    else
+      !feedbin.previousEntry || !feedbin.previousEntry.container.is(feedbin.selectedEntry.container)
 
   animateEntryContent: (content) ->
     innerContent = $('[data-behavior~=inner_content_target]')
@@ -834,6 +837,7 @@ $.extend feedbin,
         hide: 50
 
   preloadSiblings: ->
+    return if feedbin.selectedEntry.container == null
     selected = feedbin.selectedEntry.container.closest('li')
     siblings = selected.nextAll().slice(0,4).add(selected.prevAll().slice(0,4))
     siblings.each ->
@@ -969,6 +973,7 @@ $.extend feedbin,
       null
 
   nextEntryPreview: () ->
+    return if feedbin.selectedEntry.container == null
     next = feedbin.selectedEntry.container.parents('li').next()
     if next.length
       title = next.find('.title').text()

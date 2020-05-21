@@ -134,4 +134,18 @@
     <script>
         <%= render partial: 'shared/message_flash', locals: {flash: flash} %>
     </script>
+    <% if @entries.present? %>
+    <script>
+        $(function() {
+            feedbin.selectedEntry = {
+              id: <%= @entries.first.first %>,
+              feed_id: <%= @entries.first.last[:feed_id] %>,
+              container: null
+            }
+            $.extend(feedbin.entries, <%= @entries.to_json.html_safe %>);
+            feedbin.showEntry(<%= params[:id] %>);
+            $('[data-behavior~=toggle_full_screen]').click()
+        })
+    </script>
+    <% end %>
 <% end %>

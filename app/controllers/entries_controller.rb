@@ -70,8 +70,13 @@ class EntriesController < ApplicationController
   def show
     @user = current_user
     @entries = entries_by_id(params[:id])
+    UnreadEntry.where(user: @user, entry_id: params[:id]).delete_all
+    UpdatedEntry.where(user: @user, entry_id: params[:id]).delete_all
     respond_to do |format|
       format.js
+      format.html do
+        logged_in
+      end
     end
   end
 
@@ -256,6 +261,7 @@ class EntriesController < ApplicationController
   def entries_by_id(entry_ids)
     entries = Entry.where(id: entry_ids).includes(feed: [:favicon])
     subscriptions = @user.subscriptions.pluck(:feed_id)
+    @title = "#{entries.first.title} - Feedbin"
     entries.each_with_object({}) do |entry, hash|
       locals = {
         entry: entry,
