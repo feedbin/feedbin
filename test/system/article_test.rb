@@ -76,22 +76,34 @@ class ArticleTest < ApplicationSystemTestCase
     assert_selector "ins", text: "new"
   end
 
-  # test "newsletter" do
-  #   show_article_setup
-  #
-  #   entry = @entries.first
-  #   entry.feed.newsletter!
-  #
-  #   login_as(@user)
-  #
-  #   click_link(@entries.first.title)
-  #
-  #   wait_for_ajax
-  #
-  #   find('label[for=newsletter_view]').click()
-  #
-  #   assert_selector ".newsletter-content"
-  # end
+  test "direct link" do
+    show_article_setup
+
+    entry = @entries.first
+
+    login_as(@user)
+
+    visit entry_path(entry)
+
+    assert_selector "#source_link h1", text: entry.title
+  end
+
+  test "newsletter" do
+    show_article_setup
+
+    entry = @entries.first
+    entry.feed.newsletter!
+
+    login_as(@user)
+
+    click_link(@entries.first.title)
+
+    wait_for_ajax
+
+    find('label[for=newsletter_view]').click()
+
+    assert_selector ".newsletter-content"
+  end
 
   test "extract" do
     show_article
