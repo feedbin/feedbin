@@ -703,7 +703,7 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_author_description(tweet)
-    entities = entry.main_tweet.to_h.dig(:user, :entities, :description)
+    entities = tweet.to_h.dig(:user, :entities, :description)
     @template.content_tag(:p, class: "tweet-text") do
       if entities
         Twitter::TwitterText::Autolink.auto_link_usernames_or_lists(Twitter::TwitterText::Autolink.auto_link_with_json(tweet.user.description, entities)).html_safe
