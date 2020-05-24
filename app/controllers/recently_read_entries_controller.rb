@@ -20,7 +20,9 @@ class RecentlyReadEntriesController < ApplicationController
 
   def create
     @user = current_user
-    RecentlyReadEntry.create(user: @user, entry_id: params[:id])
+    if @user.can_read_entry?(params[:id])
+      RecentlyReadEntry.create(user: @user, entry_id: params[:id])
+    end
     head :ok
   end
 

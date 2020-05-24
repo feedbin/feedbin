@@ -22,8 +22,10 @@ class RecentlyPlayedEntriesController < ApplicationController
 
   def create
     @user = current_user
-    if record = @user.recently_played_entries.find_or_create_by(entry_id: params[:id])
-      record.update(recently_played_entry_params)
+    if @user.can_read_entry?(params[:id])
+      if record = @user.recently_played_entries.find_or_create_by(entry_id: params[:id])
+        record.update(recently_played_entry_params)
+      end
     end
     head :ok
   end

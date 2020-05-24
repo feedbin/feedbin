@@ -10,7 +10,8 @@ module Api
 
       def create
         @user = current_user
-        params[:recently_read_entries].each do |entry_id|
+        ids = @user.can_read_filter(params[:recently_read_entries])
+        ids.each do |entry_id|
           @user.recently_read_entries.create!(entry_id: entry_id)
         end
         render json: params[:recently_read_entries].to_json

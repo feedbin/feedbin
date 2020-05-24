@@ -69,20 +69,26 @@ class EntriesController < ApplicationController
 
   def show
     @user = current_user
-    @entries = entries_by_id(params[:id])
-    UnreadEntry.where(user: @user, entry_id: params[:id]).delete_all
-    UpdatedEntry.where(user: @user, entry_id: params[:id]).delete_all
-    respond_to do |format|
-      format.js
-      format.html do
-        logged_in
+    ids = @user.can_read_filter([params[:id].to_i])
+    if ids.present?
+      @entries = entries_by_id(ids)
+      UnreadEntry.where(user: @user, entry_id: params[:id]).delete_all
+      UpdatedEntry.where(user: @user, entry_id: params[:id]).delete_all
+      respond_to do |format|
+        format.js
+        format.html do
+          logged_in
+        end
       end
+    else
+      render_404
     end
   end
 
   def preload
     @user = current_user
     ids = params[:ids].split(",").map { |i| i.to_i }
+    ids = @user.can_read_filter(ids)
     ViewLinkCacheMultiple.perform_async(@user.id, ids)
     entries = entries_by_id(ids)
     render json: entries.to_json

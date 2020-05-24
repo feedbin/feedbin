@@ -504,6 +504,32 @@ class User < ApplicationRecord
     can_read
   end
 
+  def can_read_filter(requested_ids)
+    allowed_ids = []
+
+    feed_ids = subscriptions.pluck(:feed_id)
+
+    ids = Entry.where(feed_id: feed_ids, id: requested_ids).pluck(:id)
+    allowed_ids = allowed_ids.push(ids).flatten
+
+    if requested_ids.length != allowed_ids.length
+      ids = starred_entries.where(entry_id: requested_ids).pluck(:entry_id)
+      allowed_ids = allowed_ids.push(ids).flatten
+    end
+
+    if requested_ids.length != allowed_ids.length
+      ids = recently_read_entries.where(entry_id: requested_ids).pluck(:entry_id)
+      allowed_ids = allowed_ids.push(ids).flatten
+    end
+
+    if requested_ids.length != allowed_ids.length
+      ids = recently_played_entries.where(entry_id: requested_ids).pluck(:entry_id)
+      allowed_ids = allowed_ids.push(ids).flatten
+    end
+
+    allowed_ids.uniq
+  end
+
   def trialing?
     plan == Plan.find_by_stripe_id("trial")
   end

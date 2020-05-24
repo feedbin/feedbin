@@ -1998,6 +1998,7 @@ $.extend feedbin,
         $('body').toggleClass('full-screen')
         if !$('body').hasClass('full-screen')
           feedbin.scrollToPanel('.entries-column', false)
+          window.history.replaceState({}, "", "/");
         feedbin.measureEntryColumn()
         feedbin.setNativeBorders()
 
