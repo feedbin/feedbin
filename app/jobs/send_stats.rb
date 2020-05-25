@@ -163,7 +163,7 @@ class SendStats
       ORDER BY pg_total_relation_size(pg_class.oid) DESC
       LIMIT 20;
     )
-    query = ActiveRecord::Base.send(:sanitize_sql_array, [sql, 1.gigabyte, 1.gigabyte])
+    query = ActiveRecord::Base.send(:sanitize_sql_array, [sql, 1.megabyte, 1.gigabyte])
     results = query(query)
     results.map do |result|
       { name: "table_size", value: result["value"], source: result["table"] }
