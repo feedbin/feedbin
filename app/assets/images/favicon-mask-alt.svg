@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" preserveAspectRatio="xMidYMin meet">
+    <path fill="#FFFFFF" fill-opacity="0" d="M0 0h32v32H0z"/>
+    <path fill="#000000" fill-opacity=".3" d="M16 16L0 32h32L16 16z"/>
+    <path fill="#FFFFFF" fill-opacity=".2" d="M16 16L0 0h32L16 16z"/>
+    <path fill="#000000" fill-opacity=".2" d="M16 16L0 0v32l16-16z"/>
+</svg>

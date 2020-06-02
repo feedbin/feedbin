@@ -23,8 +23,6 @@ $.extend feedbin,
   formatMenu: null
   hasShadowDOM: typeof(document.createElement("div").attachShadow) == "function"
   colorHash: new ColorHash
-    lightness: [.3,.4,.5,.6,.7]
-    saturation: [.7,.8]
 
   changeContentView: (view) ->
     currentView = $('[data-behavior~=content_option]:not(.hide)')
@@ -189,11 +187,18 @@ $.extend feedbin,
         feedbin.fontsLoaded = true
 
   faviconColors: (target) ->
-    $(".favicon-default", target).each ->
+    $("[data-color-hash-seed]", target).each ->
       host = $(@).data("color-hash-seed")
+      [hue, saturation, lightness] = feedbin.colorHash.hsl(host)
       color = feedbin.colorHash.hex(host)
+      rotate = hue % 6
+      translate = 25 - rotate
+
       $(@).css
         "background-color": color
+
+      $('.favicon-inner', @).css
+        "transform": "translate(-#{translate}%, -#{translate}%) rotate(#{hue}deg)"
 
   calculateColor: (backgroundColor, foregroundColor) ->
     canvas = document.createElement('canvas')

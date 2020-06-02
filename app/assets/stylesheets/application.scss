@@ -2341,19 +2341,23 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
 }
 
 .favicon-default {
-    background-image: image-url("favicon-default.svg");
-    background-position: 0 0;
-    background-repeat: no-repeat;
-    @include background-color($color-icons);
-    border-radius: 1.5px;
-}
-
-$characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7 8 9;
-
-@each $character in $characters {
-    .favicon-character-#{$character} {
-        background-size: 10px 10px !important;
-        background-image: image-url("character-#{$character}.svg");
+    height: 16px;
+    width: 16px;
+    overflow: hidden;
+    display: block;
+    border-radius: 2px;
+    .favicon-inner {
+        height: 32px;
+        width: 32px;
+        content: "";
+        display: block;
+        background-repeat: no-repeat;
+    }
+    &.favicon-mask .favicon-inner {
+        background-image: image-url("favicon-mask.svg");
+    }
+    &.favicon-mask-alt .favicon-inner {
+        background-image: image-url("favicon-mask-alt.svg");
     }
 }
 
@@ -4155,11 +4159,14 @@ $characters: a b c d e f g h i j k l m n o p q r s t u v w x y z 0 1 2 3 4 5 6 7
     pre code {
         @include background-color($color-contrast-100);
         @include color($color-contrast-600);
+        padding: $two-units;
+        @include border($color-contrast-200);
         display: block;
         overflow-x: auto;
         white-space: pre;
         word-wrap: normal;
         font-size: 90%;
+        border-radius: 4px;
     }
 
     tt, code, kbd, samp {

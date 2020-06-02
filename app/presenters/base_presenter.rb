@@ -40,9 +40,10 @@ class BasePresenter
           @template.svg_tag("favicon-saved", size: "14x16")
         end
       else
-        markup = <<-eos
-          <span class="favicon favicon-default favicon-character-#{feed.host_letter}" data-color-hash-seed="#{feed.host}"></span>
-        eos
+        variant = ["favicon-mask", "favicon-mask-alt"]
+        markup = @template.content_tag :span, class: "favicon-default #{variant[feed.id % 2]}", data: { color_hash_seed: feed.host || feed.title } do
+          @template.content_tag :span, "", class: "favicon-inner"
+        end
         if feed.favicon&.cdn_url
           markup = <<-eos
             <span class="favicon" style="background-image: url(#{feed.favicon.cdn_url});"></span>
