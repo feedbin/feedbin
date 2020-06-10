@@ -4379,10 +4379,9 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
     @include color($color-contrast-400);
     position: relative;
     @include font-size(13);
-    margin-top: 15px;
     padding: 10px 12px;
     border-radius: 4px;
-    margin-bottom: 1.1em;
+    margin: 1.1em 0 1.1em 0;
     strong {
         font-weight: 700 !important;
     }
@@ -5032,7 +5031,7 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
         @include color($color-contrast-600);
         font-family: $font-stack;
         overflow-wrap: break-word;
-        margin-bottom: 1.1em;
+        margin: 1.1em 0 1.1em 0;
     }
     .micropost-text {
         line-height: 1.4;
@@ -5260,6 +5259,10 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
     li {
         padding-left: 16px;
     }
+}
+
+.content-option {
+    margin-top: 1.1em;
 }
 
 .newsletter {
