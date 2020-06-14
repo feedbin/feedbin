@@ -4,10 +4,10 @@
         <div class="mark-below-read" data-behavior="mark_below_read"><span><i>Mark Below as Read</i></span></div>
         <a
         class="wrap"
+        data-remote="true"
         data-behavior="selectable open_item show_entry_content entry_info"
         data-entry-id="<%= entry.id %>"
         data-entry-info="<%= {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}.to_json %>"
-        data-remote="true"
         data-mark-as-read-path="/entries/<%= entry.id %>/mark_as_read"
         data-recently-read-path="/entries/<%= entry.id %>/recently_read"
         data-url="<%= entry.fully_qualified_url %>"
