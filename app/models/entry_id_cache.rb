@@ -43,7 +43,7 @@ class EntryIdCache
     ids[page_number] ||= begin
       key_exists, entry_ids = $redis[:entries].with { |redis|
         redis.multi do
-          redis.exists(cache_key)
+          redis.exists?(cache_key)
           redis.zrevrange(cache_key, start, stop)
         end
       }

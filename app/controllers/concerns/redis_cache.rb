@@ -4,7 +4,7 @@ module RedisCache
   def get_cached_entry_ids(cache_key, feed_key, since = "-inf", read = nil, starred = nil)
     key_exists, entry_ids = $redis[:entries].with { |redis|
       redis.multi do
-        redis.exists(cache_key)
+        redis.exists?(cache_key)
         redis.lrange(cache_key, 0, -1)
       end
     }

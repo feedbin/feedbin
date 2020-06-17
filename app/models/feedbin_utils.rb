@@ -16,7 +16,7 @@ class FeedbinUtils
 
   def self.public_id_exists?(public_id)
     $redis[:refresher].with do |redis|
-      redis.exists(public_id)
+      redis.exists?(public_id)
     end
   end
 

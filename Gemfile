@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "= 6.0.3.1"
+gem "rails", "= 6.0.3.2"
 gem "will_paginate"
 
 gem "carrierwave_direct",  github: "feedbin/carrierwave_direct",  ref: "a0bc323"
