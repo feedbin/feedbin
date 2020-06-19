@@ -242,7 +242,9 @@ class Entry < ApplicationRecord
     base = as_json(root: false, only: Entry.mappings.to_hash[:entry][:properties].keys.reject { |key| key.to_s.start_with?("twitter") })
     base["title"] = ContentFormatter.summary(title)
     base["content"] = ContentFormatter.summary(content)
-    base["emoji"] = (base["title"] + base["content"]).scan(Unicode::Emoji::REGEX).join(" ")
+
+    full_content = [base["title"], base["content"]].join
+    base["emoji"] = full_content.scan(Unicode::Emoji::REGEX).join(" ")
 
     if tweet?
       tweets = [main_tweet]
