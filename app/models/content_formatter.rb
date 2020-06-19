@@ -94,7 +94,7 @@ class ContentFormatter
     }
   }
 
-  SANITIZE_BASIC = Sanitize::Config::BASIC.merge(remove_contents: ["script", "style", "iframe", "object", "embed", "figure"])
+  SANITIZE_BASIC = Sanitize::Config.merge(Sanitize::Config::BASIC, remove_contents: ["script", "style", "iframe", "object", "embed", "figure"])
 
   def self.format!(*args)
     new._format!(*args)
@@ -102,7 +102,7 @@ class ContentFormatter
 
   def _format!(content, entry = nil, image_proxy_enabled = true, base_url = nil)
     context = {
-      allowlist: ALLOWLIST_DEFAULT,
+      whitelist: ALLOWLIST_DEFAULT,
       embed_url: Rails.application.routes.url_helpers.iframe_embeds_path,
       embed_classes: "iframe-placeholder entry-callout system-content"
     }
@@ -149,7 +149,7 @@ class ContentFormatter
 
   def _newsletter_format(content)
     context = {
-      allowlist: Sanitize::Config::RELAXED
+      whitelist: Sanitize::Config::RELAXED
     }
     filters = [HTML::Pipeline::SanitizationFilter]
 
@@ -237,7 +237,7 @@ class ContentFormatter
   def _evernote_format(content, entry)
     filters = [HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer, HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter]
     context = {
-      allowlist: ALLOWLIST_EVERNOTE,
+      whitelist: ALLOWLIST_EVERNOTE,
       image_base_url: entry.feed.site_url,
       image_subpage_url: entry.url || "",
       href_base_url: entry.feed.site_url,
