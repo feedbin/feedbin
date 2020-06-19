@@ -1,31 +1,5 @@
 class ContentFormatter
-  LEADING_CHARS = %w|
-    (
-    [
-    {
-    @
-    #
-    '
-    "
-    $
-    “
-  |
-  TRAILING_CHARS = %w|
-    )
-    ]
-    }
-    :
-    ;
-    '
-    "
-    ?
-    .
-    ,
-    !
-    ”
-  |
-
-  WHITELIST_BASE = {}.tap do |hash|
+  ALLOWLIST_BASE = {}.tap do |hash|
     hash[:elements] = %w[
       h1 h2 h3 h4 h5 h6 h7 h8 br b i strong em a pre code img tt div ins del sup sub
       p ol ul table thead tbody tfoot blockquote dl dt dd kbd q samp var hr ruby rt
@@ -90,16 +64,16 @@ class ContentFormatter
     hash[:remove_contents] = %w[script style iframe object embed]
   end
 
-  WHITELIST_DEFAULT = WHITELIST_BASE.clone.tap do |hash|
+  ALLOWLIST_DEFAULT = ALLOWLIST_BASE.clone.tap do |hash|
     transformers = Transformers.new
-    hash[:transformers] = [transformers.class_whitelist, transformers.table_elements, transformers.top_level_li]
+    hash[:transformers] = [transformers.class_allowlist, transformers.table_elements, transformers.top_level_li]
   end
 
-  WHITELIST_NEWSLETTER = WHITELIST_BASE.clone.tap do |hash|
+  ALLOWLIST_NEWSLETTER = ALLOWLIST_BASE.clone.tap do |hash|
     hash[:elements] = hash[:elements] - %w[table thead tbody tfoot tr td]
   end
 
-  WHITELIST_EVERNOTE = {
+  ALLOWLIST_EVERNOTE = {
     elements: %w[
       a abbr acronym address area b bdo big blockquote br caption center cite code col colgroup dd
       del dfn div dl dt em font h1 h2 h3 h4 h5 h6 hr i img ins kbd li map ol p pre q s samp small
@@ -120,13 +94,15 @@ class ContentFormatter
     }
   }
 
+  SANITIZE_BASIC = Sanitize::Config::BASIC.merge(remove_contents: ["script", "style", "iframe", "object", "embed", "figure"])
+
   def self.format!(*args)
     new._format!(*args)
   end
 
   def _format!(content, entry = nil, image_proxy_enabled = true, base_url = nil)
     context = {
-      whitelist: WHITELIST_DEFAULT,
+      allowlist: ALLOWLIST_DEFAULT,
       embed_url: Rails.application.routes.url_helpers.iframe_embeds_path,
       embed_classes: "iframe-placeholder entry-callout system-content"
     }
@@ -145,7 +121,7 @@ class ContentFormatter
       context[:image_base_url] = context[:href_base_url] = entry.url || entry.feed.site_url
       context[:image_subpage_url] = context[:href_subpage_url] = entry.url || ""
       if entry.feed.newsletter?
-        context[:whitelist] = WHITELIST_NEWSLETTER
+        context[:allowlist] = ALLOWLIST_NEWSLETTER
       end
     elsif base_url
       filters.unshift(HTML::Pipeline::AbsoluteSourceFilter)
@@ -173,7 +149,7 @@ class ContentFormatter
 
   def _newsletter_format(content)
     context = {
-      whitelist: Sanitize::Config::RELAXED
+      allowlist: Sanitize::Config::RELAXED
     }
     filters = [HTML::Pipeline::SanitizationFilter]
 
@@ -224,7 +200,7 @@ class ContentFormatter
     }
     if entry.feed.newsletter?
       filters.push(HTML::Pipeline::SanitizationFilter)
-      context[:whitelist] = WHITELIST_NEWSLETTER
+      context[:allowlist] = ALLOWLIST_NEWSLETTER
     end
     pipeline = HTML::Pipeline.new filters, context
     result = pipeline.call(content)
@@ -261,7 +237,7 @@ class ContentFormatter
   def _evernote_format(content, entry)
     filters = [HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer, HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter]
     context = {
-      whitelist: WHITELIST_EVERNOTE,
+      allowlist: ALLOWLIST_EVERNOTE,
       image_base_url: entry.feed.site_url,
       image_subpage_url: entry.url || "",
       href_base_url: entry.feed.site_url,
@@ -280,24 +256,9 @@ class ContentFormatter
   end
 
   def _summary(text, length = nil)
-    decoder = HTMLEntities.new
-    text = decoder.decode(text)
     text = text.chars.select(&:valid_encoding?).join
-
-    sanitize_config = Sanitize::Config::BASIC.dup
-    sanitize_config = sanitize_config.merge(remove_contents: ["script", "style", "iframe", "object", "embed", "figure"])
-    text = Sanitize.fragment(text, sanitize_config)
-
-    text = Nokogiri::HTML(text)
-    text = text.search("//text()").map(&:text).join(" ").squish
-
-    TRAILING_CHARS.each do |char|
-      text = text.gsub(" #{char}", char.to_s)
-    end
-
-    LEADING_CHARS.each do |char|
-      text = text.gsub("#{char} ", char.to_s)
-    end
+    text = Sanitize.fragment(text, SANITIZE_BASIC)
+    text = Nokogiri::HTML(text).text&.squish
 
     if length
       text = text.truncate(length, separator: " ", omission: "")
@@ -315,7 +276,7 @@ class ContentFormatter
   def _text_email(content)
     markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true)
     content = markdown.render(content)
-    Sanitize.fragment(content, WHITELIST_DEFAULT).html_safe
+    Sanitize.fragment(content, ALLOWLIST_DEFAULT).html_safe
   rescue
     content
   end
