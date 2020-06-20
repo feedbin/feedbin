@@ -121,7 +121,7 @@ class ContentFormatter
       context[:image_base_url] = context[:href_base_url] = entry.url || entry.feed.site_url
       context[:image_subpage_url] = context[:href_subpage_url] = entry.url || ""
       if entry.feed.newsletter?
-        context[:allowlist] = ALLOWLIST_NEWSLETTER
+        context[:whitelist] = ALLOWLIST_NEWSLETTER
       end
     elsif base_url
       filters.unshift(HTML::Pipeline::AbsoluteSourceFilter)
@@ -200,7 +200,7 @@ class ContentFormatter
     }
     if entry.feed.newsletter?
       filters.push(HTML::Pipeline::SanitizationFilter)
-      context[:allowlist] = ALLOWLIST_NEWSLETTER
+      context[:whitelist] = ALLOWLIST_NEWSLETTER
     end
     pipeline = HTML::Pipeline.new filters, context
     result = pipeline.call(content)
