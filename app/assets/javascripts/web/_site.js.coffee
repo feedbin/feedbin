@@ -1723,6 +1723,11 @@ $.extend feedbin,
           event.stopPropagation()
 
     linkActions: ->
+      $(document).on 'click', '[data-behavior~=add_to_pages]', (event) ->
+        href = $(@).parents("a:first").attr('href')
+        $.post(feedbin.data.pages_internal_path, {url: href});
+        event.preventDefault()
+
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
         href = $(@).parents("a:first").attr('href')
         if feedbin.data.view_links_in_app
@@ -2320,8 +2325,7 @@ $.extend feedbin,
     loadLinksInApp: ->
       $(document).on 'click', '[data-behavior~=entry_final_content] a', (event) ->
         newTab = (event.ctrlKey || event.metaKey)
-        linkActions = $(event.target).is(".link-actions")
-        if feedbin.data.view_links_in_app && !linkActions && !newTab
+        if feedbin.data.view_links_in_app && !feedbin.isRelated(".link-actions", event.target) && !newTab
           href = $(@).attr('href')
           feedbin.loadLink(href)
           event.preventDefault()

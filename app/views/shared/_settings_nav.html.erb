@@ -1,123 +1,195 @@
-<div class="settings-nav">
-    <a href="/" class="logo">
-        <%= svg_tag "logo-full" %>
-    </a>
-    <ul class="nav">
-        <li class="nav-header">
-            <div class="icon-wrap"><%= svg_tag "icon-settings-general", size: "22x22" %></div>
-            <div>General</div>
-        </li>
-        <li class="desktop-hide"><%= link_to "Feedbin", "/" %></li>
-        <li>
-            <%= link_to settings_path, class: is_active?("settings", "settings") do %>
-                Settings
-            <% end %>
-        </li>
-        <li>
-            <%= link_to settings_appearance_path, class: is_active?("settings", "appearance") do %>
-                Appearance
-            <% end %>
-        </li>
-        <li>
-            <%= link_to settings_subscriptions_path, class: is_active?(["settings/subscriptions"], ["index", "edit"]) do %>
-                Subscriptions
-            <% end %>
-        </li>
-        <li>
-            <%= link_to settings_newsletters_pages_path, class: is_active?("settings", "newsletters_pages") do %>
-                Newsletters & Pages
-            <% end %>
-        </li>
-
-        <li class="nav-header">
-            <div class="icon-wrap"><%= svg_tag "icon-settings-tools", size: "22x22" %></div>
-            <div>Tools</div>
-        </li>
-        <li>
-            <%= link_to actions_path, class: is_active?("actions", ["index", "new", "edit"]) do %>
-                Actions
-            <% end %>
-        </li>
-        <li>
-            <%= link_to sharing_services_path, class: is_active?("sharing_services", "index") do %>
-                Share & Save
-            <% end %>
-        </li>
-        <li>
-            <%= link_to settings_import_export_path, class: is_active?("settings", "import_export") do %>
-                Import & Export
-            <% end %>
-        </li>
-
-        <li class="nav-header">
-            <div class="icon-wrap"><%= svg_tag "icon-settings-account", size: "18x22" %></div>
-            <div>Admin</div>
-        </li>
-        <li>
-            <%= link_to settings_account_path, class: is_active?("settings", "account") do %>
-                Account
-            <% end %>
-        </li>
-        <% if ENV["STRIPE_API_KEY"] %>
-            <li>
-                <%= link_to settings_billing_path, class: is_active?("settings", "billing") || is_active?("settings", "edit_billing") do %>
-                    Billing
-                <% end %>
-            </li>
+<ul class="nav">
+    <li class="nav-header">
+        <div>General</div>
+    </li>
+    <li class="desktop-hide">
+        <%= link_to root_path do %>
+            <span class="icon-wrap">
+                <%= svg_tag "menu-icon-app" %>
+            </span>
+            <span class="menu-text">
+                <span class="title">Feedbin</span>
+                <span class="subtitle">Back to the app</span>
+            </span>
         <% end %>
-        <% if current_user.try(:admin?) %>
-            <li>
-                <%= link_to admin_users_path, class: is_active?("admin/users", "index") do %>
-                    Customers
-                <% end %>
-            </li>
+    </li>
+    <li>
+        <%= link_to settings_path, class: is_active?("settings", "settings") do %>
+            <span class="icon-wrap">
+                <%= svg_tag "menu-icon-settings" %>
+            </span>
+            <span class="menu-text">
+                <span class="title">Settings</span>
+                <span class="subtitle">General preferences</span>
+            </span>
         <% end %>
-    </ul>
-    <ul class="nav nav-small border">
+    </li>
+    <li>
+        <%= link_to settings_appearance_path, class: is_active?("settings", "appearance") do %>
+            <span class="icon-wrap">
+                <%= svg_tag "menu-icon-appearance" %>
+            </span>
+            <span class="menu-text">
+                <span class="title">Appearance</span>
+                <span class="subtitle">Customize look & feel</span>
+            </span>
+        <% end %>
+    </li>
+    <li>
+        <%= link_to settings_subscriptions_path, class: is_active?(["settings/subscriptions"], ["index", "edit"]) do %>
+            <span class="icon-wrap">
+                <%= svg_tag "menu-icon-subscriptions" %>
+            </span>
+            <span class="menu-text">
+                <span class="title">Subscriptions</span>
+                <span class="subtitle">Manage feeds</span>
+            </span>
+        <% end %>
+    </li>
+    <li>
+        <%= link_to settings_newsletters_pages_path, class: is_active?("settings", "newsletters_pages") do %>
+            <span class="icon-wrap">
+                <%= svg_tag "menu-icon-newsletters" %>
+            </span>
+            <span class="menu-text">
+                <span class="title">Newsletters & Pages</span>
+                <span class="subtitle">Email address & bookmarklet</span>
+            </span>
+        <% end %>
+    </li>
+
+    <li class="nav-header">
+        <div>Tools</div>
+    </li>
+    <li class="border">
+        <%= link_to actions_path, class: is_active?("actions", ["index", "new", "edit"]) do %>
+            <span class="icon-wrap">
+                <%= svg_tag "menu-icon-actions" %>
+            </span>
+            <span class="menu-text">
+                <span class="title">Actions</span>
+                <span class="subtitle">Filters & more</span>
+            </span>
+        <% end %>
+    </li>
+    <li>
+        <%= link_to sharing_services_path, class: is_active?("sharing_services", "index") do %>
+            <span class="icon-wrap">
+                <%= svg_tag "menu-icon-share-save" %>
+            </span>
+            <span class="menu-text">
+                <span class="title">Share & Save</span>
+                <span class="subtitle">Social plugins</span>
+            </span>
+        <% end %>
+    </li>
+    <li>
+        <%= link_to settings_import_export_path, class: is_active?("settings", "import_export") do %>
+            <span class="icon-wrap">
+                <%= svg_tag "menu-icon-import-export" %>
+            </span>
+            <span class="menu-text">
+                <span class="title">Import & Export</span>
+                <span class="subtitle">Bring your OPML</span>
+            </span>
+        <% end %>
+    </li>
+
+    <li class="nav-header">
+        <div>Admin</div>
+    </li>
+    <li class="border">
+        <%= link_to settings_account_path, class: is_active?("settings", "account") do %>
+            <span class="icon-wrap">
+                <%= svg_tag "menu-icon-account" %>
+            </span>
+            <span class="menu-text">
+                <span class="title">Account</span>
+                <span class="subtitle">Update email & password</span>
+            </span>
+        <% end %>
+    </li>
+    <% if ENV["STRIPE_API_KEY"] %>
         <li>
-            <a href="/home">
-                Home
-            </a>
-        </li>
-        <li>
-            <a href="/blog">
-                Blog
-            </a>
-        </li>
-        <li>
-            <a href="/apps">
-                Apps
-            </a>
-        </li>
-        <li>
-            <a href="/help">
-                Help
-            </a>
-        </li>
-        <li>
-            <a href="https://github.com/feedbin/feedbin-api#readme">
-                API
-            </a>
-        </li>
-        <li>
-            <a href="/privacy-policy">
-                Privacy Policy
-            </a>
-        </li>
-        <li>
-            <a href="mailto:support@feedbin.com">
-                Email
-            </a>
-        </li>
-        <li class="mobile-hide">
-            <a href="https://twitter.com/feedbin">
-                Twitter
-            </a>
-        </li>
-        <li style="margin-top: 16px;">
-            <%= link_to logout_path, method: "delete" do %>
-                Log Out
+            <%= link_to settings_billing_path, class: is_active?("settings", "billing") || is_active?("settings", "edit_billing") do %>
+                <span class="icon-wrap">
+                    <%= svg_tag "menu-icon-billing" %>
+                </span>
+                <span class="menu-text">
+                    <span class="title">Billing</span>
+                    <span class="subtitle">Payment method & plan</span>
+                </span>
             <% end %>
         </li>
-    </ul>
-</div>
+    <% end %>
+    <% if current_user.try(:admin?) %>
+        <li>
+            <%= link_to admin_users_path, class: is_active?("admin/users", "index") do %>
+                <span class="icon-wrap">
+                    <%= svg_tag "menu-icon-customers" %>
+                </span>
+                <span class="menu-text">
+                    <span class="title">Customers</span>
+                    <span class="subtitle">Manage customers</span>
+                </span>
+            <% end %>
+        </li>
+    <% end %>
+    <li class="log-out border">
+        <%= link_to logout_path, method: "delete" do %>
+            <span class="icon-wrap">
+                <%= svg_tag "menu-icon-log-out" %>
+            </span>
+            <span class="menu-text">
+                <span class="title">Log Out</span>
+            </span>
+        <% end %>
+    </li>
+</ul>
+<ul class="nav nav-small border">
+    <li>
+        <a href="/home">
+            Home
+        </a>
+    </li>
+    <li>
+        <a href="/blog">
+            Blog
+        </a>
+    </li>
+    <li>
+        <a href="/apps">
+            Apps
+        </a>
+    </li>
+    <li>
+        <a href="/help">
+            Help
+        </a>
+    </li>
+    <li>
+        <a href="https://github.com/feedbin/feedbin-api#readme">
+            API
+        </a>
+    </li>
+    <li>
+        <a href="/privacy-policy">
+            Privacy Policy
+        </a>
+    </li>
+    <li>
+        <a href="mailto:support@feedbin.com">
+            Email
+        </a>
+    </li>
+    <li class="mobile-hide">
+        <a href="https://twitter.com/feedbin">
+            Twitter
+        </a>
+    </li>
+    <li style="margin-top: 16px;">
+        <%= link_to logout_path, method: "delete" do %>
+            Log Out
+        <% end %>
+    </li>
+</ul>

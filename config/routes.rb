@@ -220,9 +220,10 @@ Rails.application.routes.draw do
     end
   end
 
-  match "pages", to: "pages#create", via: [:post]
-  match "pages", to: "pages#options", via: [:options]
-  match "pages", to: "pages#fallback", via: [:get]
+  match "pages",          to: "pages#create",          via: :post
+  match "pages",          to: "pages#options",         via: :options
+  match "pages",          to: "pages#fallback",        via: :get
+  match "pages_internal", to: "pages_internal#create", via: :post
 
   constraints subdomain: "api" do
     namespace :api, path: nil do

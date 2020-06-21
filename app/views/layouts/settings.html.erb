@@ -8,7 +8,12 @@
         <%= render partial: "shared/message_flash", locals: {flash: flash} %>
     </script>
     <div class="settings-inner">
-        <%= render partial: "shared/settings_nav" %>
+        <div class="settings-nav">
+            <a href="/" class="logo">
+                <%= svg_tag "logo-full" %>
+            </a>
+            <%= render partial: "shared/settings_nav" %>
+        </div>
         <div class="settings-content">
             <button class="reset settings-menu-button" data-behavior="open_modal" data-modal-target="settings_nav">
                 <%= svg_tag "icon-menu" %>

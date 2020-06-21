@@ -3,8 +3,33 @@
     <div class="dropdown-content">
         <ul>
             <li>
-                <span class="skip view-link-app" data-behavior="view_link">View contents</span>
-                <span class="skip view-link-tab" data-behavior="view_link">Open in a new tab</span>
+                <span class="skip view-link-app" data-behavior="view_link">
+                    <span class="icon-wrap">
+                        <%= svg_tag "icon-full-content" %>
+                    </span>
+                    <span class="menu-text">
+                        <span class="title">Extract Content</span>
+                        <span class="subtitle">View link in Feedbin</span>
+                    </span>
+                </span>
+                <span class="skip view-link-tab" data-behavior="view_link">
+                    <span class="icon-wrap">
+                        <%= svg_tag "icon-new-tab" %>
+                    </span>
+                    <span class="menu-text">
+                        <span class="title">Open</span>
+                        <span class="subtitle">View in a new tab</span>
+                    </span>
+                </span>
+                <span class="skip" data-behavior="add_to_pages">
+                    <span class="icon-wrap">
+                        <%= svg_tag "favicon-saved" %>
+                    </span>
+                    <span class="menu-text">
+                        <span class="title">Add to Pages</span>
+                        <span class="subtitle">Save to read later</span>
+                    </span>
+                </span>
             </li>
         </ul>
     </div>

@@ -25,6 +25,11 @@
     @include size-in-rems(font-size, $size-in-pixels);
 }
 
+@function base-units($units) {
+    $base: 8;
+    @return $base * $units * 1px;
+}
+
 @mixin respond-to($media) {
 	@if $media == ipad {
 		@media only screen and (max-width: 1024px) { @content; }
