@@ -5,7 +5,7 @@
     <li class="desktop-hide">
         <%= link_to root_path do %>
             <span class="icon-wrap">
-                <%= svg_tag "menu-icon-app" %>
+                <%= svg_tag "menu-icon-app", inline: true %>
             </span>
             <span class="menu-text">
                 <span class="title">Feedbin</span>
@@ -16,7 +16,7 @@
     <li>
         <%= link_to settings_path, class: is_active?("settings", "settings") do %>
             <span class="icon-wrap">
-                <%= svg_tag "menu-icon-settings" %>
+                <%= svg_tag "menu-icon-settings", inline: true %>
             </span>
             <span class="menu-text">
                 <span class="title">Settings</span>
@@ -27,7 +27,7 @@
     <li>
         <%= link_to settings_appearance_path, class: is_active?("settings", "appearance") do %>
             <span class="icon-wrap">
-                <%= svg_tag "menu-icon-appearance" %>
+                <%= svg_tag "menu-icon-appearance", inline: true %>
             </span>
             <span class="menu-text">
                 <span class="title">Appearance</span>
@@ -38,7 +38,7 @@
     <li>
         <%= link_to settings_subscriptions_path, class: is_active?(["settings/subscriptions"], ["index", "edit"]) do %>
             <span class="icon-wrap">
-                <%= svg_tag "menu-icon-subscriptions" %>
+                <%= svg_tag "menu-icon-subscriptions", inline: true %>
             </span>
             <span class="menu-text">
                 <span class="title">Subscriptions</span>
@@ -49,7 +49,7 @@
     <li>
         <%= link_to settings_newsletters_pages_path, class: is_active?("settings", "newsletters_pages") do %>
             <span class="icon-wrap">
-                <%= svg_tag "menu-icon-newsletters" %>
+                <%= svg_tag "menu-icon-newsletters", inline: true %>
             </span>
             <span class="menu-text">
                 <span class="title">Newsletters & Pages</span>
@@ -64,7 +64,7 @@
     <li class="border">
         <%= link_to actions_path, class: is_active?("actions", ["index", "new", "edit"]) do %>
             <span class="icon-wrap">
-                <%= svg_tag "menu-icon-actions" %>
+                <%= svg_tag "menu-icon-actions", inline: true %>
             </span>
             <span class="menu-text">
                 <span class="title">Actions</span>
@@ -75,7 +75,7 @@
     <li>
         <%= link_to sharing_services_path, class: is_active?("sharing_services", "index") do %>
             <span class="icon-wrap">
-                <%= svg_tag "menu-icon-share-save" %>
+                <%= svg_tag "menu-icon-share-save", inline: true %>
             </span>
             <span class="menu-text">
                 <span class="title">Share & Save</span>
@@ -86,7 +86,7 @@
     <li>
         <%= link_to settings_import_export_path, class: is_active?("settings", "import_export") do %>
             <span class="icon-wrap">
-                <%= svg_tag "menu-icon-import-export" %>
+                <%= svg_tag "menu-icon-import-export", inline: true %>
             </span>
             <span class="menu-text">
                 <span class="title">Import & Export</span>
@@ -101,7 +101,7 @@
     <li class="border">
         <%= link_to settings_account_path, class: is_active?("settings", "account") do %>
             <span class="icon-wrap">
-                <%= svg_tag "menu-icon-account" %>
+                <%= svg_tag "menu-icon-account", inline: true %>
             </span>
             <span class="menu-text">
                 <span class="title">Account</span>
@@ -113,7 +113,7 @@
         <li>
             <%= link_to settings_billing_path, class: is_active?("settings", "billing") || is_active?("settings", "edit_billing") do %>
                 <span class="icon-wrap">
-                    <%= svg_tag "menu-icon-billing" %>
+                    <%= svg_tag "menu-icon-billing", inline: true %>
                 </span>
                 <span class="menu-text">
                     <span class="title">Billing</span>
@@ -126,7 +126,7 @@
         <li>
             <%= link_to admin_users_path, class: is_active?("admin/users", "index") do %>
                 <span class="icon-wrap">
-                    <%= svg_tag "menu-icon-customers" %>
+                    <%= svg_tag "menu-icon-customers", inline: true %>
                 </span>
                 <span class="menu-text">
                     <span class="title">Customers</span>
@@ -138,7 +138,7 @@
     <li class="log-out border">
         <%= link_to logout_path, method: "delete" do %>
             <span class="icon-wrap">
-                <%= svg_tag "menu-icon-log-out" %>
+                <%= svg_tag "menu-icon-log-out", inline: true %>
             </span>
             <span class="menu-text">
                 <span class="title">Log Out</span>

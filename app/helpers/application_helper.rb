@@ -83,8 +83,14 @@ module ApplicationHelper
 
     options[:class] = [name, options[:class]].compact.join(" ")
 
+    inline = options.delete(:inline)
+
     content_tag :svg, options do
-      content_tag :use, "", "xlink:href": "##{name}"
+      if inline
+        icon.markup.html_safe
+      else
+        content_tag :use, "", "href": "##{name}"
+      end
     end
   end
 
