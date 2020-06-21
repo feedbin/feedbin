@@ -4343,7 +4343,7 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
         img.full-width, .fluid-width-video-wrapper, .media-container {
             width: 100vw !important;
             max-width: none !important;
-            margin-left: -base-units(2) !important;
+            margin-left: base-units(-2) !important;
         }
     }
 }
