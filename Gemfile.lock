@@ -248,7 +248,7 @@ GEM
     faraday_middleware (0.14.0)
       faraday (>= 0.7.4, < 1.0)
     ffi (1.13.1)
-    fog-aws (3.6.5)
+    fog-aws (3.6.6)
       fog-core (~> 2.1)
       fog-json (~> 1.1)
       fog-xml (~> 0.1)
