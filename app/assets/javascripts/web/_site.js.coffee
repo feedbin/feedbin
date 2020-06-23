@@ -564,9 +564,9 @@ $.extend feedbin,
       hljs.highlightBlock(e)
 
   audioVideo: (selector = "entry_final_content") ->
-    $("[data-behavior~=#{selector}] audio").mediaelementplayer
-      stretching: 'responsive'
-      features: ['playpause', 'current', 'progress', 'duration', 'tracks', 'fullscreen']
+    $("[data-behavior~=#{selector}] audio").each ->
+      $(@).attr("controls", "controls")
+      $(@).attr("preload", "none")
 
     $("video").each ->
       video = $(@)
