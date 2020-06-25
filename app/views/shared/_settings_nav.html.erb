@@ -134,6 +134,17 @@
                 </span>
             <% end %>
         </li>
+        <li>
+            <%= link_to sidekiq_web_path do %>
+                <span class="icon-wrap">
+                    <%= svg_tag "menu-icon-sidekiq", inline: true %>
+                </span>
+                <span class="menu-text">
+                    <span class="title">Sidekiq</span>
+                    <span class="subtitle">Background jobs</span>
+                </span>
+            <% end %>
+        </li>
     <% end %>
     <li class="log-out border">
         <%= link_to logout_path, method: "delete" do %>
