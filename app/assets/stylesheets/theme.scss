@@ -14,9 +14,12 @@ $themes: day sunset dusk midnight;
     /* variable name: $#{map-get($map, debug)} */
     #{$property}: map-get($map, day) $extra;
 
-    @media (prefers-color-scheme: dark) {
-        #{$property}: map-get($map, dusk) $extra;
+    .theme-auto & {
+        @media (prefers-color-scheme: dark) {
+            #{$property}: map-get($map, dusk) $extra;
+        }
     }
+
     @if $root {
         @at-root {
             @each $theme in $themes {

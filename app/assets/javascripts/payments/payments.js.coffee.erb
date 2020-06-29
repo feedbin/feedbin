@@ -112,7 +112,7 @@ class feedbin.Payments
   inputColor: ->
     if feedbin.theme == "sunset"
       "#3B3A38"
-    else if feedbin.theme == "dusk"
+    else if feedbin.theme == "dusk" || feedbin.darkMode()
       "#D4D4D4"
     else if feedbin.theme == "midnight"
       "#BABABA"
@@ -122,7 +122,7 @@ class feedbin.Payments
   placeholderColor: ->
     if feedbin.theme == "sunset"
       "#8E8C88"
-    else if feedbin.theme == "dusk"
+    else if feedbin.theme == "dusk" || feedbin.darkMode()
       "#707070"
     else if feedbin.theme == "midnight"
       "#595959"

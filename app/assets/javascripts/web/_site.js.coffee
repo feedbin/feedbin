@@ -216,6 +216,12 @@ $.extend feedbin,
     canvas.parentNode.removeChild(canvas)
     "rgba(#{data.data[0]}, #{data.data[1]}, #{data.data[2]}, #{data.data[3]})"
 
+  darkMode: ->
+    if "matchMedia" of window
+      result = window.matchMedia('(prefers-color-scheme: dark)')
+      if result && "matches" of result
+        result.matches == true
+
   setNativeTheme: (calculateOverlay = false, timeout = 1) ->
     if feedbin.native && feedbin.data && feedbin.theme
       result = window.matchMedia('(prefers-color-scheme: dark)');
