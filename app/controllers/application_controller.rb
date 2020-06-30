@@ -19,17 +19,6 @@ class ApplicationController < ActionController::Base
     payload[:request_start] = request.headers["X-Request-Start"]
   end
 
-  def update_selected_feed!(type, data = nil)
-    if data.nil?
-      selected_feed = type
-    else
-      session[:selected_feed_data] = data
-      selected_feed = "#{type}_#{data}"
-    end
-    session[:selected_feed_type] = type
-    session[:selected_feed] = selected_feed
-  end
-
   def render_404
     respond_to do |format|
       format.any do
@@ -89,7 +78,8 @@ class ApplicationController < ActionController::Base
       modal_extracts_path: modal_extracts_path,
       progress: @user.recently_played_entries_progress,
       subscription_view_mode: subscription_view_settings,
-      pages_internal_path: pages_internal_path
+      pages_internal_path: pages_internal_path,
+      tag_visibility: @user.tag_visibility
     }
 
     render "site/logged_in"
@@ -171,10 +161,6 @@ class ApplicationController < ActionController::Base
   end
 
   def get_feeds_list
-    if @mark_selected.nil?
-      @mark_selected = true
-    end
-
     @user = current_user
     @page_feed = @user.feeds.pages.first
 

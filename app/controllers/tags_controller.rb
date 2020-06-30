@@ -17,7 +17,6 @@ class TagsController < ApplicationController
 
   def show
     @user = current_user
-    update_selected_feed!("tag", params[:id])
 
     @tag = Tag.find(params[:id])
     @feed_ids = Tagging.where(tag_id: @tag, user_id: @user).pluck(:feed_id)
@@ -25,9 +24,6 @@ class TagsController < ApplicationController
     feeds_response
 
     @append = params[:page].present?
-
-    @type = "tag"
-    @data = params[:id]
 
     @collection_title = @tag.name
 
@@ -45,7 +41,6 @@ class TagsController < ApplicationController
     @new_tag = Tag.rename(user, tag, params[:tag][:name])
 
     if @new_tag
-      update_selected_feed!("tag", @new_tag.id)
       visibility = user.tag_visibility[tag.id.to_s] || false
       user.update_tag_visibility(@new_tag.id.to_s, visibility)
     end

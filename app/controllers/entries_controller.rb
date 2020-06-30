@@ -4,7 +4,6 @@ class EntriesController < ApplicationController
 
   def index
     @user = current_user
-    update_selected_feed!("collection_all")
 
     feed_ids = @user.subscriptions.pluck(:feed_id)
     entry_id_cache = EntryIdCache.new(@user.id, feed_ids)
@@ -26,19 +25,13 @@ class EntriesController < ApplicationController
 
   def unread
     @user = current_user
-    update_selected_feed!("collection_unread")
 
     unread_entries = @user.unread_entries.select(:entry_id).page(params[:page]).sort_preference(@user.entry_sort)
     @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort).entries_list
 
     @page_query = unread_entries
-
     @append = params[:page].present?
-
     @all_unread = "true"
-    @type = "unread"
-    @data = nil
-
     @collection_title = "Unread"
 
     respond_to do |format|
@@ -48,18 +41,12 @@ class EntriesController < ApplicationController
 
   def starred
     @user = current_user
-    update_selected_feed!("collection_starred")
 
     starred_entries = @user.starred_entries.select(:entry_id).page(params[:page]).order("published DESC")
     @entries = Entry.entries_with_feed(starred_entries, "published DESC").entries_list
 
     @page_query = starred_entries
-
     @append = params[:page].present?
-
-    @type = "starred"
-    @data = nil
-
     @collection_title = "Starred"
 
     respond_to do |format|
@@ -150,8 +137,6 @@ class EntriesController < ApplicationController
       UnreadEntry.where(user_id: @user.id, entry_id: ids).delete_all
     end
 
-    @mark_selected = true
-
     get_feeds_list if @full_update
 
     respond_to do |format|
@@ -201,7 +186,6 @@ class EntriesController < ApplicationController
     entry_ids = unread_entries.map(&:entry_id)
     unread_entries.delete_all
 
-    @mark_selected = true
     get_feeds_list
 
     respond_to do |format|

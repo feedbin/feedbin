@@ -1,7 +1,6 @@
 class RecentlyReadEntriesController < ApplicationController
   def index
     @user = current_user
-    update_selected_feed!("collection_recently_read")
 
     recently_read_entry_ids = @user.recently_read_entries.order(id: :desc).limit(100).pluck(:entry_id)
     @entries = Entry.where(id: recently_read_entry_ids).includes(feed: [:favicon]).entries_list

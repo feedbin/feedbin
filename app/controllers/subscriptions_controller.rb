@@ -28,7 +28,6 @@ class SubscriptionsController < ApplicationController
       end
       @click_feed = @subscriptions.first.feed_id
     end
-    @mark_selected = true
     get_feeds_list
   end
 
@@ -40,7 +39,6 @@ class SubscriptionsController < ApplicationController
 
   def update
     @user = current_user
-    @mark_selected = false
     @subscription = @user.subscriptions.find(params[:id])
     @subscription.update(subscription_params)
     @taggings = @subscription.feed.tag_with_params(params, @user)

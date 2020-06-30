@@ -1,7 +1,6 @@
 class RecentlyPlayedEntriesController < ApplicationController
   def index
     @user = current_user
-    update_selected_feed!("collection_recently_played")
 
     recently_played_entries = @user.recently_played_entries.order("created_at DESC").limit(100)
     recently_played_entry_ids = []
@@ -9,7 +8,6 @@ class RecentlyPlayedEntriesController < ApplicationController
     @entries = Entry.where(id: recently_played_entry_ids).includes(feed: [:favicon]).entries_list
     @entries = @entries.sort_by { |entry| recently_played_entry_ids.index(entry.id) }
 
-    @type = "recently_played"
     @collection_title = "Recently Played"
 
     respond_to do |format|

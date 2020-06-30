@@ -30,8 +30,10 @@ var callback = function() {
 
     feedbin.formatEntries()
     feedbin.preloadEntries(<%= @entries.map{ |entry| entry.id }.to_json.html_safe %>, <%= @force_preload ? "true" : "false" %>);
-    feedbin.viewType = "<%= @type %>";
     feedbin.markReadData.date = "<%= j last_unread_date %>";
+    <% if @type %>
+    feedbin.viewType = "<%= @type %>";
+    <% end %>
 }
 
 if (feedbin.panelScrollComplete) {

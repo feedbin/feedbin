@@ -1,7 +1,6 @@
 class UpdatedEntriesController < ApplicationController
   def index
     @user = current_user
-    update_selected_feed!("collection_updated")
 
     updated_entry_ids = @user.updated_entries.order(updated_at: :desc).limit(100).pluck(:entry_id)
     @entries = Entry.where(id: updated_entry_ids).includes(feed: [:favicon])

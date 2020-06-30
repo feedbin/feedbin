@@ -55,7 +55,7 @@ $.extend feedbin,
 
     unless element.is('.tag-link')
       tagParent = element.closest('[data-tag-id]')
-      if tagParent.find(".drawer").data('hidden') == true
+      if !tagParent.hasClass('open')
         tagParent.find('[data-behavior~=toggle_drawer]').submit();
       if tagParent.is('.zero-count')
         tagParent.removeClass('zero-count')
@@ -172,6 +172,19 @@ $.extend feedbin,
           message.borders.push(postion)
 
     feedbin.nativeMessage("performAction", message)
+
+  tagVisibility: ->
+    $('.feeds [data-tag-id]').each ->
+      tag = $(@)
+      id = tag.data('tag-id')
+      open = false
+      if feedbin.data && feedbin.data.tag_visibility && id of feedbin.data.tag_visibility
+        open = feedbin.data.tag_visibility[id]
+
+      if open
+        tag.addClass('open')
+
+      feedbin.data.tag_visibility[id] = open
 
   reselect: ->
     if feedbin.selectedSource && feedbin.selectedTag
@@ -1785,38 +1798,39 @@ $.extend feedbin,
           $('.dropdown-content', dropdown).css({width: "#{width}px"})
 
     drawer: ->
+      feedbin.tagVisibility()
       $(document).on 'submit', '[data-behavior~=toggle_drawer]', (event) =>
-        button = $(event.currentTarget).find('button')
-        drawer = button.parents('li').find('.drawer')
+        container = $(event.currentTarget).closest('[data-tag-id]')
+        id = container.data('tag-id')
+        container.toggleClass('open')
+        container.addClass('animate')
+
+        open = !feedbin.data.tag_visibility[id]
+        feedbin.data.tag_visibility[id] = open
+
+        drawer = container.find('.drawer')
 
         windowHeight = window.innerHeight
         targetHeight = $('ul', drawer).height()
         if windowHeight < targetHeight
           targetHeight = windowHeight - drawer.offset().top
 
-        if drawer.data('hidden') == true
+        if open
           height = targetHeight
           hidden = false
-          klass = 'icon-hide'
         else
           height = 0
           hidden = true
-          klass = 'icon-show'
           drawer.css
             height: targetHeight
 
         drawer.animate {
           height: height
         }, 150, ->
+          container.removeClass('animate')
           if height > 0
             drawer.css
               height: 'auto'
-
-        drawer.data('hidden', hidden)
-        drawer.toggleClass('hidden')
-        button.removeClass('icon-hide')
-        button.removeClass('icon-show')
-        button.addClass(klass)
 
         event.stopPropagation()
         event.preventDefault()

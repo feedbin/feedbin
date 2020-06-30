@@ -5,7 +5,6 @@ class FeedsEntriesController < ApplicationController
 
   def index
     @user = current_user
-    update_selected_feed!("feed", params[:feed_id])
 
     @feed_ids = params[:feed_id]
     feeds_response
@@ -15,9 +14,6 @@ class FeedsEntriesController < ApplicationController
     # Extra data for updating buttons
     @subscription = @user.subscriptions.where(feed_id: params[:feed_id]).take!
     @feed = @subscription.feed
-    @type = "feed"
-    @data = params[:feed_id]
-
     respond_to do |format|
       format.js { render partial: "shared/entries" }
     end

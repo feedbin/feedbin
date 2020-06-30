@@ -1,5 +1,5 @@
-<% cache [tag, tag.user_feeds, drawer_visible?(tag.id)] do %>
-    <li data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" data-behavior="droppable">
+<% cache [tag, tag.user_feeds] do %>
+    <li class="tag" data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" data-behavior="droppable">
         <%= link_to tag_path(tag.id),
             remote: true,
             class: 'feed-link tag-link',
@@ -16,11 +16,10 @@
             <%= form_for @user, url: view_settings_update_user_path(@user), remote: 'true', html: { class: 'tag-visibility-control', data: {behavior: "toggle_drawer feed_action_parent"} } do |f| %>
                 <%= hidden_field_tag 'tag_visibility', 'tag_visibility' %>
                 <%= hidden_field_tag 'tag', tag.id %>
-                <%= f.button class: "feed-action-button #{drawer_visible?(tag.id) ? "icon-hide" : "icon-show"}", data: { behavior: 'feed_action' } do %>
+                <%= f.button class: "feed-action-button", data: { behavior: 'feed_action' } do %>
                     <%= svg_tag "icon-caret", size: "12x7" %>
                 <% end %>
             <% end %>
-
             <span class="collection-label-wrap" data-behavior="rename_target" data-form-action="<%= tag_path(tag) %>" data-input-name="tag[name]" data-title="<%= tag.name %>", data-original-title="<%= tag.name %>">
                 <span class="collection-label" data-behavior="rename_title"><%= tag.name %></span>
             </span>
@@ -28,7 +27,7 @@
                 <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byTag', count_group_id: tag.id} %>
             </span>
         <% end %>
-        <div class="drawer <%= drawer_visible?(tag.id) ? '' : 'hidden' %>" data-hidden="<%= drawer_visible?(tag.id) ? 'false' : 'true' %>" style="<%= drawer_visible?(tag.id) ? '' : 'height: 0;' %>">
+        <div class="drawer">
             <ul>
                 <%= render partial: "feeds/feed", collection: tag.user_feeds, cached: true %>
             </ul>

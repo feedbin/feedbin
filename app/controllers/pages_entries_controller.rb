@@ -20,8 +20,6 @@ class PagesEntriesController < ApplicationController
       @page_query = unread_entries
     end
 
-    update_selected_feed!("feed", @feed.id)
-
     render partial: "shared/entries"
   end
 end

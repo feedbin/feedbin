@@ -5,7 +5,6 @@ class FeedsController < ApplicationController
 
   def update
     @user = current_user
-    @mark_selected = false
     @feed = Feed.find(params[:id])
     @taggings = @feed.tag_with_params(params, @user)
     head :ok

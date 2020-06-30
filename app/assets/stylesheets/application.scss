@@ -2082,6 +2082,33 @@ $hamburger-dot: 4px;
                 padding-left: $tag-offset;
                 position: relative;
             }
+            &.tag {
+                .drawer {
+                    height: 0;
+                    opacity: 0;
+                }
+                .icon-caret {
+                    @include fill($color-icons);
+                    transform: rotate(-90deg);
+                }
+                &.open {
+                    .drawer {
+                        height: auto;
+                        opacity: 1;
+                    }
+                    .icon-caret {
+                        transform: rotate(0deg);
+                    }
+                }
+                &.animate {
+                    .drawer {
+                        transition: opacity .3s linear;
+                    }
+                    .icon-caret {
+                        transition: transform .15s linear;
+                    }
+                }
+            }
             .tag-visibility-control {
                 padding: 0;
                 margin: 0;
@@ -2099,14 +2126,6 @@ $hamburger-dot: 4px;
                     border: none;
                     padding: 0 0 0 20px;
                     margin: 0;
-                    svg {
-                        transition: transform .15s linear;
-                        transform: rotate(-90deg);
-                        @include fill($color-icons);
-                    }
-                    &.icon-hide svg {
-                        transform: rotate(0deg);
-                    }
                 }
             }
             &.selected {
@@ -2142,11 +2161,6 @@ $hamburger-dot: 4px;
     .drawer {
         position: relative;
         overflow: hidden;
-        opacity: 1;
-        transition: opacity .3s linear;
-        &.hidden {
-            opacity: 0;
-        }
         ul {
             overflow: hidden;
             padding: 0;

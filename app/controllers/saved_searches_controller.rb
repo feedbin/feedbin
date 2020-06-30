@@ -3,8 +3,6 @@ class SavedSearchesController < ApplicationController
     @user = current_user
     @saved_search = SavedSearch.where(user: @user, id: params[:id]).take!
 
-    update_selected_feed!("saved_search", params[:id])
-
     params[:query] = @saved_search.query
 
     query = Entry.scoped_search(params, @user)
@@ -12,9 +10,6 @@ class SavedSearchesController < ApplicationController
     @page_query = query
 
     @append = params[:page].present?
-
-    @type = "saved_search"
-    @data = nil
 
     @collection_title = @saved_search.name
 
