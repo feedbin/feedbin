@@ -64,7 +64,7 @@ Rename [.env.example](.env.example) to `.env` and customize it with your setting
 
 Status Badges
 -------------
-[![Build Status](https://travis-ci.org/feedbin/feedbin.svg?branch=master)](https://travis-ci.org/feedbin/feedbin)
+![Ruby CI](https://github.com/feedbin/feedbin/workflows/Ruby%20CI/badge.svg)
 
 [![Code Climate](https://codeclimate.com/github/feedbin/feedbin.svg)](https://codeclimate.com/github/feedbin/feedbin)
 
