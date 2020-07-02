@@ -2,7 +2,6 @@ require "coveralls"
 Coveralls.wear!("rails")
 
 ENV["RAILS_ENV"] ||= "test"
-ENV["REDIS_URL"] = "redis://localhost:7776"
 
 require File.expand_path("../../config/environment", __FILE__)
 require "rails/test_help"
@@ -21,9 +20,12 @@ ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
 StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
 WebMock.disable_net_connect!(allow_localhost: true, allow: "codeclimate.com")
 
-redis_test_instance = IO.popen("redis-server --port 7776")
-Minitest.after_run do
-  Process.kill("INT", redis_test_instance.pid)
+unless ENV["CI"]
+  ENV["REDIS_URL"] = "redis://localhost:7776"
+  redis_test_instance = IO.popen("redis-server --port 7776")
+  Minitest.after_run do
+    Process.kill("INT", redis_test_instance.pid)
+  end
 end
 
 $redis = {

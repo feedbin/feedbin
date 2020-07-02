@@ -1,0 +1,88 @@
+name: Ruby CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04]
+        ruby: [2.6]
+
+    runs-on: ${{ matrix.os }}
+
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+
+    - name: Install system dependencies
+      run: |
+        sudo gem install bundler
+        sudo wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+        echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | sudo tee /etc/apt/sources.list.d/elasticsearch-2.x.list
+
+        sudo apt-get update
+        sudo apt-get install --yes openjdk-8-jre elasticsearch libidn11-dev libidn11-dev libpq-dev postgresql-client-11 imagemagick libmagickwand-dev libreadline-dev libxml2-dev libxslt1-dev libcurl4-openssl-dev libssl-dev zlib1g-dev libffi-dev memcached
+        sudo service elasticsearch restart
+
+        sudo wget "https://chromedriver.storage.googleapis.com/2.36/chromedriver_linux64.zip" -O /tmp/chromedriver.zip
+        sudo unzip /tmp/chromedriver.zip -d /tmp/
+        sudo mv /tmp/chromedriver /usr/local/bin/
+
+        sudo wget "http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz" -O /tmp/kindlegen.tar.gz
+        sudo tar -xzf /tmp/kindlegen.tar.gz
+        sudo mv kindlegen /usr/local/bin/
+      if: matrix.os == 'ubuntu-18.04'
+
+    - uses: actions/cache@v1
+      with:
+        path: vendor/bundle
+        key: bundle-use-ruby-${{ matrix.os }}-${{ matrix.ruby }}-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          bundle-use-ruby-${{ matrix.os }}-${{ matrix.ruby }}-
+
+    - name: bundle install
+      run: |
+        bundle config path vendor/bundle
+        bundle install --jobs 4
+
+    - name: Build and test with Rake
+      env:
+        PGHOST: 127.0.0.1
+        PGUSER: postgres
+        POSTGRES_PASSWORD: postgres
+        PGPASSWORD: postgres
+        RAILS_ENV: test
+      run: |
+        psql -c 'create database feedbin_test;' -U postgres
+        bundle config path vendor/bundle
+        bundle install --jobs 4 --retry 2
+        bundle exec rake db:setup
+        bundle exec rake db:test:prepare
+        bundle exec rails test:system test

@@ -13,5 +13,5 @@ test:
   database: feedbin_test
   pool: <%= ENV['DB_POOL'] || 5 %>
   username: <%= ENV['POSTGRES_USERNAME'] %>
-  password:
+  password: <%= ENV['POSTGRES_PASSWORD'] %>
   host: localhost
