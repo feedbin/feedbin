@@ -455,10 +455,10 @@ class feedbin.Keyboard
     next
 
   inDrawer: ->
-    @selectedItem().parents('.drawer').length >= 1
+    @selectedItem().closest('.drawer').length >= 1
 
   hasDrawer: ->
-    @drawer.length >= 1 && @drawer.data('hidden') == false
+    @drawer.length >= 1 && @drawer.closest('[data-tag-id]').hasClass('open')
 
   getItemPosition: ->
     try

@@ -174,17 +174,11 @@ $.extend feedbin,
     feedbin.nativeMessage("performAction", message)
 
   tagVisibility: ->
-    $('.feeds [data-tag-id]').each ->
-      tag = $(@)
-      id = tag.data('tag-id')
-      open = false
-      if feedbin.data && feedbin.data.tag_visibility && id of feedbin.data.tag_visibility
-        open = feedbin.data.tag_visibility[id]
-
+    feedbin.data.tag_visibility ?= {}
+    for id, open of feedbin.data.tag_visibility
+      tag = $(".feeds [data-tag-id=#{id}]")
       if open
         tag.addClass('open')
-
-      feedbin.data.tag_visibility[id] = open
 
   reselect: ->
     if feedbin.selectedSource && feedbin.selectedTag
@@ -1574,8 +1568,9 @@ $.extend feedbin,
     selected: ->
       $(document).on 'ajax:success', '[data-behavior~=show_entries]', (event) ->
         target = $(event.target)
-        feedbin.selectedSource = target.closest('[data-feed-id]').data('feed-id')
-        feedbin.selectedTag = target.closest('[data-tag-id]').data('tag-id')
+        unless target.is('[data-behavior~=toggle_drawer]')
+          feedbin.selectedSource = target.closest('[data-feed-id]').data('feed-id')
+          feedbin.selectedTag = target.closest('[data-tag-id]').data('tag-id')
 
     setViewMode: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event, xhr, settings) ->
@@ -1801,26 +1796,23 @@ $.extend feedbin,
       feedbin.tagVisibility()
       $(document).on 'submit', '[data-behavior~=toggle_drawer]', (event) =>
         container = $(event.currentTarget).closest('[data-tag-id]')
+        open = !container.hasClass("open")
         id = container.data('tag-id')
+        feedbin.data.tag_visibility[id] = open
+
         container.toggleClass('open')
         container.addClass('animate')
 
-        open = !feedbin.data.tag_visibility[id]
-        feedbin.data.tag_visibility[id] = open
-
         drawer = container.find('.drawer')
 
-        windowHeight = window.innerHeight
-        targetHeight = $('ul', drawer).height()
-        if windowHeight < targetHeight
-          targetHeight = windowHeight - drawer.offset().top
-
         if open
+          windowHeight = window.innerHeight
+          targetHeight = $('ul', drawer).height()
+          if windowHeight < targetHeight
+            targetHeight = windowHeight - drawer.offset().top
           height = targetHeight
-          hidden = false
         else
           height = 0
-          hidden = true
           drawer.css
             height: targetHeight
 
