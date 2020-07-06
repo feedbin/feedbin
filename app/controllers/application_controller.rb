@@ -79,7 +79,8 @@ class ApplicationController < ActionController::Base
       progress: @user.recently_played_entries_progress,
       subscription_view_mode: subscription_view_settings,
       pages_internal_path: pages_internal_path,
-      tag_visibility: @user.tag_visibility
+      tag_visibility: @user.tag_visibility,
+      visibility_key: "tag_visibility"
     }
 
     render "site/logged_in"

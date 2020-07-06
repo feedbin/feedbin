@@ -1,4 +1,5 @@
 window.feedbin ?= {}
+window.feedbin.data ?= {}
 
 (($) ->
 
@@ -173,9 +174,18 @@ $.extend feedbin,
 
     feedbin.nativeMessage("performAction", message)
 
-  tagVisibility: ->
-    feedbin.data.tag_visibility ?= {}
-    for id, open of feedbin.data.tag_visibility
+  tagVisibility: (values = null) ->
+    if values
+      localStorage.setItem(feedbin.data.visibility_key, JSON.stringify(values))
+      values
+    else
+      JSON.parse(localStorage.getItem(feedbin.data.visibility_key)) || {}
+
+  setTagVisibility: ->
+    visibility = feedbin.tagVisibility()
+    if Object.keys(visibility).length == 0
+      visibility = feedbin.tagVisibility(feedbin.data.tag_visibility)
+    for id, open of visibility
       tag = $(".feeds [data-tag-id=#{id}]")
       if open
         tag.addClass('open')
@@ -1793,12 +1803,15 @@ $.extend feedbin,
           $('.dropdown-content', dropdown).css({width: "#{width}px"})
 
     drawer: ->
-      feedbin.tagVisibility()
+      feedbin.setTagVisibility()
       $(document).on 'submit', '[data-behavior~=toggle_drawer]', (event) =>
         container = $(event.currentTarget).closest('[data-tag-id]')
         open = !container.hasClass("open")
         id = container.data('tag-id')
-        feedbin.data.tag_visibility[id] = open
+
+        visibility = feedbin.tagVisibility()
+        visibility[id] = open
+        feedbin.tagVisibility(visibility)
 
         container.toggleClass('open')
         container.addClass('animate')
