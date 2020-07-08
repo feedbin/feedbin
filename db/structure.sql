@@ -980,6 +980,38 @@ ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
 
 
 --
+-- Name: twitter_users; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.twitter_users (
+    id bigint NOT NULL,
+    screen_name text NOT NULL,
+    data jsonb NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: twitter_users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.twitter_users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: twitter_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.twitter_users_id_seq OWNED BY public.twitter_users.id;
+
+
+--
 -- Name: unreads; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1280,6 +1312,13 @@ ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id
 
 
 --
+-- Name: twitter_users id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.twitter_users ALTER COLUMN id SET DEFAULT nextval('public.twitter_users_id_seq'::regclass);
+
+
+--
 -- Name: unreads id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1514,6 +1553,14 @@ ALTER TABLE ONLY public.taggings
 
 ALTER TABLE ONLY public.tags
     ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: twitter_users twitter_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.twitter_users
+    ADD CONSTRAINT twitter_users_pkey PRIMARY KEY (id);
 
 
 --
@@ -1968,6 +2015,13 @@ CREATE INDEX index_tags_on_name ON public.tags USING btree (name);
 
 
 --
+-- Name: index_twitter_users_on_lower_screen_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_twitter_users_on_lower_screen_name ON public.twitter_users USING btree (lower(screen_name));
+
+
+--
 -- Name: index_unreads_on_entry_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2296,6 +2350,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200103141053'),
 ('20200109204853'),
 ('20200110142059'),
-('20200113101112');
+('20200113101112'),
+('20200708130351');
 
 
