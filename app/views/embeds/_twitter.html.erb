@@ -4,7 +4,7 @@
             <div class="profile-wrap">
                 <div class="profile-image-wrap">
                     <%= link_to tweet.author_url, target: "_blank", title: "View on Twitter", class: "profile-image" do %>
-                        <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), camo_link(tweet.profile_image_url), size: "47x47", alt: "") %>
+                        <%= image_tag(camo_link(tweet.profile_image_url), size: "47x47", alt: "") %>
                     <% end %>
                 </div>
                 <div class="profile-info">
