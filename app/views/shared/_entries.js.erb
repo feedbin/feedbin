@@ -33,6 +33,8 @@ var callback = function() {
     feedbin.markReadData.date = "<%= j last_unread_date %>";
     <% if @type %>
     feedbin.viewType = "<%= @type %>";
+    <% else %>
+    feedbin.viewType = null;
     <% end %>
 }
 
