@@ -10,7 +10,7 @@ class SearchIndexStore
     Sidekiq::Client.push(
       "args" => [id],
       "class" => "SearchIndexStoreAlt",
-      "queue" => "worker_slow_search",
+      "queue" => "worker_slow_search_alt",
       "retry" => false
     )
   rescue ActiveRecord::RecordNotFound
