@@ -388,7 +388,7 @@ class User < ApplicationRecord
   def build_feeds_by_tag
     query = <<-eos
       SELECT
-        tag_id, array_to_json(array_agg(feed_id)) as feed_ids
+        tag_id, array_to_json(array_agg(DISTINCT feed_id)) as feed_ids
       FROM
         taggings
       WHERE user_id = ? AND feed_id IN (?)
