@@ -31,7 +31,7 @@ class TwitterFeedRefresher
     user_ids = if user
       [user.id]
     else
-      feed.subscriptions.where(active: true, muted: false).pluck(:user_id)
+      feed.subscriptions.where(active: true).pluck(:user_id)
     end
 
     users = User.where(id: user_ids)
