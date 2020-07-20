@@ -111,12 +111,12 @@ class Entry < ApplicationRecord
     text
   end
 
-  def tweet_text(tweet)
+  def tweet_text(tweet, options = {})
     hash = tweet.to_h
     if hash[:entities]
       hash = remove_entities(hash)
       text = trim_text(hash, false, true)
-      text = Twitter::TwitterText::Autolink.auto_link_with_json(text, hash[:entities]).html_safe
+      text = Twitter::TwitterText::Autolink.auto_link_with_json(text, hash[:entities], options).html_safe
     else
       text = hash[:full_text]
     end

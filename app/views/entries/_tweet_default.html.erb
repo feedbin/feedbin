@@ -1,6 +1,6 @@
 <% present entry do |entry_presenter| %>
     <div class="feedbin--wrap">
-        <p class="feedbin--content-text"><%= entry_presenter.tweet_text(entry.main_tweet, false) %></p>
+        <p class="feedbin--content-text"><%= entry_presenter.tweet_text(entry.main_tweet, false, invisible_tag_attrs: "") %></p>
         <% if entry_presenter.quoted_status? %>
             <blockquote class="feedbin--quoted">
                 <p>
@@ -9,7 +9,7 @@
                         <span class="feedbin--screen-name"><%= entry_presenter.tweet_screen_name(entry_presenter.quoted_status) %></span>
                     </a>
                 </p>
-                <p class="feedbin--content-text"><%= entry_presenter.tweet_text(entry_presenter.quoted_status, false) %></p>
+                <p class="feedbin--content-text"><%= entry_presenter.tweet_text(entry_presenter.quoted_status, false, invisible_tag_attrs: "") %></p>
             </blockquote>
         <% end %>
         <% if entry.tweet.retweeted_status? %>
@@ -42,7 +42,7 @@
             <% elsif page = entry_presenter.saved_page(url.expanded_url.to_s) %>
                 <%
                   begin
-                      link_content = ContentFormatter.format!(page.content, nil)
+                      link_content = ContentFormatter.absolute_source(page.content, nil, url.expanded_url.to_s)
                   rescue
                       link_content = nil
                   end

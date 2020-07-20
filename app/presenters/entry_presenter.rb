@@ -689,8 +689,8 @@ class EntryPresenter < BasePresenter
     @template.video_tag highest_quality_video.url.to_s, options
   end
 
-  def tweet_text(tweet, tag = true)
-    text = entry.tweet_text(tweet)
+  def tweet_text(tweet, tag = true, options = {})
+    text = entry.tweet_text(tweet, options)
     if text.present?
       if tag
         @template.content_tag(:p, class: "tweet-text") do
