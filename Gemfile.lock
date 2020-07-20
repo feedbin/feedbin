@@ -37,7 +37,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: 72869799777d418de5ed31b4ac23c5b7114670c5
+  revision: 3bdffc026f21edc013902b716c760a37cac546d5
   branch: master
   specs:
     feedkit (0.1.0)
@@ -357,7 +357,7 @@ GEM
       net-ssh (>= 2.6.5, < 7.0.0)
     net-ssh (6.1.0)
     nio4r (2.5.2)
-    nokogiri (1.10.9)
+    nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
     nokogumbo (2.0.2)
       nokogiri (~> 1.8, >= 1.8.4)
