@@ -5,7 +5,7 @@ class NewslettersController < ApplicationController
   def create
     newsletter = Newsletter.new(params)
     user = AuthenticationToken.newsletters.active.where(token: newsletter.token).take&.user
-    if newsletter.valid?
+    if user && newsletter.valid?
       NewsletterEntry.create(newsletter, user)
     end
     active = user ? !user.suspended : false
