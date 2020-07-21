@@ -12,7 +12,7 @@ class StarredEntry < ApplicationRecord
   end
 
   def expire_caches
-    Rails.cache.delete("#{user_id}:starred_feed")
+    Rails.cache.delete("#{user_id}:starred_feed:v2")
     true
   end
 end
