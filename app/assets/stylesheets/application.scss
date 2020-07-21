@@ -2642,6 +2642,33 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
         border-radius: 4px;
         @include border($color-borders);
     }
+    .link-preview {
+        margin: 8px 0 0 0 !important;
+        border-radius: 4px;
+        @include border($color-borders);
+        padding-bottom: 8px;
+        img {
+            width: 100%;
+            height: auto;
+            border-radius: 3px 3px 0 0;
+            margin-bottom: 8px;
+        }
+        span {
+            display: block;
+            margin: 0 8px 2px 8px;
+        }
+        .tweet-link-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .tweet-link-host {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            @include color($color-contrast-400);
+        }
+    }
     .title, &.no-title .feed-title {
         font-weight: bold;
         display: block;
@@ -2762,10 +2789,10 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
         .entries-inner-wrap {
             border-bottom-color: transparent;
         }
-        .title, .feed-title, .quoted-summary, .body {
+        .title, .feed-title, .quoted-summary, .body, .tweet-link-title {
             color: white !important;
         }
-        .title-inner span, .time {
+        .title-inner span, .time, .tweet-link-host {
             color: $color-selected-muted !important;
         }
         .icon-retweet, .icon-media {
@@ -2777,7 +2804,7 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
         .icon-unread {
             background-color: white;
         }
-        .quoted-summary {
+        .quoted-summary, .link-preview {
             border-color: rgba(white, .3) !important;
         }
         .feed-title {
@@ -2940,14 +2967,18 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
         flex-direction: row-reverse;
         margin: 0 0 0 auto;
         .entry-status {
-            display: flex;
+            display: block;
             margin-left: 8px;
+            position: relative;
+            .icon-unread {
+                margin: 2px 0 0 1px;
+            }
         }
         time {
             margin-left: 8px;
         }
     }
-    .quoted-summary {
+    .quoted-summary, .link-preview {
         display: none !important;
     }
 }

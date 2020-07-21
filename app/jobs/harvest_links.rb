@@ -11,6 +11,7 @@ class HarvestLinks
       page = MercuryParser.parse(url)
       entry.data["saved_pages"] = {url => page.to_h}
       entry.save!
+      TwitterLinkImage.perform_async(entry.id, url) if entry.link_tweet?
     end
     entry.content = ApplicationController.render template: "entries/_tweet_default.html.erb", locals: {entry: entry}, layout: nil
     entry.save!

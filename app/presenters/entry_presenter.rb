@@ -180,7 +180,7 @@ class EntryPresenter < BasePresenter
   def title
     length = 100
     if entry.tweet?
-      text = entry.tweet_summary.html_safe
+      text = entry.tweet_summary(nil, true).html_safe
       length = 280
     elsif sanitized_title.present?
       text = sanitized_title
@@ -739,6 +739,14 @@ class EntryPresenter < BasePresenter
 
   def quoted_status
     entry.main_tweet.quoted_status
+  end
+
+  def tweet_link_title
+    saved_page(entry.main_tweet.urls.first.expanded_url.to_s)&.title
+  end
+
+  def tweet_link_host
+    saved_page(entry.main_tweet.urls.first.expanded_url.to_s)&.domain
   end
 
   def feed_wrapper(subscriptions, &block)

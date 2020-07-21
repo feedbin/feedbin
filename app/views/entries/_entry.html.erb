@@ -48,6 +48,14 @@
                         </p>
                     <% end %>
 
+                    <% if entry.show_link_preview? %>
+                        <p class="link-preview">
+                            <%= image_tag entry.tweet_link_image %>
+                            <span class="tweet-link-title"><%= entry_presenter.tweet_link_title %></span>
+                            <span class="tweet-link-host"><%= entry_presenter.tweet_link_host %></span>
+                        </p>
+                    <% end %>
+
                     <%= entry_presenter.image %>
                 </div>
             </span>

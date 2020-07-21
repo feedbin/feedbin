@@ -98,14 +98,37 @@ class Entry < ApplicationRecord
     tweet? ? tweet.retweeted_status? : false
   end
 
-  def tweet_summary(tweet = nil)
+  def link_tweet?
+    return false unless tweet?
+    return false if main_tweet.quoted_status?
+    main_tweet.urls.length == 1
+  end
+
+  def strip_trailing_link?
+    hash = main_tweet.to_h
+    show_link_preview? && main_tweet.urls.first.indices.last == hash[:full_text].length
+  end
+
+  def show_link_preview?
+    return false unless link_tweet?
+    return false if image.present?
+    return false unless data.dig("saved_pages", main_tweet.urls.first.expanded_url.to_s).present?
+    return false if data.dig("saved_pages", main_tweet.urls.first.expanded_url.to_s, "result", "error")
+    data.dig("twitter_link_image_processed").present?
+  end
+
+  def tweet_summary(tweet = nil, strip_trailing_link = false)
     tweet ||= main_tweet
     hash = tweet.to_h
 
     text = trim_text(hash, true)
     tweet.urls.reverse_each do |url|
       range = Range.new(*url.indices, true)
-      text[range] = url.display_url
+      if strip_trailing_link && strip_trailing_link?
+        text[range] = ""
+      else
+        text[range] = url.display_url
+      end
     rescue
     end
     text
@@ -283,6 +306,19 @@ class Entry < ApplicationRecord
   def itunes_image
     if data && data["itunes_image_processed"]
       image_url = data["itunes_image_processed"]
+
+      host = ENV["ENTRY_IMAGE_HOST"]
+
+      url = URI(image_url)
+      url.host = host if host
+      url.scheme = "https"
+      url.to_s
+    end
+  end
+
+  def tweet_link_image
+    if data && data["twitter_link_image_processed"]
+      image_url = data["twitter_link_image_processed"]
 
       host = ENV["ENTRY_IMAGE_HOST"]
 
