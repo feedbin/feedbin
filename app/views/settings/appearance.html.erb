@@ -97,7 +97,7 @@
                     <li>
                         <%= f.check_box :entries_image, {checked: @user.entries_image.nil? || @user.setting_on?(:entries_image), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-image'} } %>
                         <%= f.label :entries_image do %>
-                            Image Preview <%= toggle_switch %>
+                            Media Preview <%= toggle_switch %>
                         <% end %>
                     </li>
                 </ul>
