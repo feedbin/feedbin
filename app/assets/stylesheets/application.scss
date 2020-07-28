@@ -3227,7 +3227,7 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
     }
 
     h3 {
-        @include font-size(16);
+        @include font-size(14);
         font-weight: bold;
         margin: 24px 16px 16px 16px;
     }
@@ -3359,7 +3359,7 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
         @include border-bottom($color-borders);
         @include border-top($color-borders);
         button {
-            font-size: 16px;
+            @include font-size(14);
             padding: 16px;
             align-items: center;
             justify-content: center;
@@ -3372,6 +3372,9 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
                 @include border-right($color-borders);
             }
         }
+    }
+    .control-group li > label {
+        @include font-size(14);
     }
 }
 .fonts {
@@ -3771,7 +3774,7 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
                 position: relative;
                 text-decoration: none;
                 display: flex;
-                @include font-size(16);
+                @include font-size(14);
                 @include color($color-contrast-700);
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -3834,8 +3837,7 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
                 &.with-icon {
                     display: flex;
                     align-items: center;
-                    strong {
-                        font-weight: 500;
+                    span {
                         overflow: hidden;
                         text-overflow: ellipsis;
                         white-space: nowrap;
@@ -3917,7 +3919,7 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
         align-items: baseline;
     }
     .share-keyboard {
-        @include font-size(16);
+        @include font-size(14);
         margin-left: auto;
         font-style: normal;
         margin-top: 2px;
