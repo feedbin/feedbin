@@ -3,7 +3,7 @@ namespace :deploy do
   task :quiet do
     on roles :all do
       begin
-        execute :sudo, :pkill, "--signal USR1 -f '^sidekiq'"
+        execute :sudo, :systemctl, :reload, "refresher.target"
       rescue SSHKit::Command::Failed
         puts "No workers running"
       end
