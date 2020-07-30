@@ -14,10 +14,9 @@ class SelfUrl
   def update(feed_id)
     feed = Feed.find(feed_id)
     request = Feedkit::Feedkit.new.fetch_and_parse(feed.feed_url)
-    self_url = request.self_url
-    feed.update(self_url: self_url)
+    feed.update(self_url: request.self_url, hubs: request.hubs)
   rescue
-    feed.update(self_url: feed.feed_url)
+    feed.update(self_url: nil, hubs: nil)
   end
 
   def build
