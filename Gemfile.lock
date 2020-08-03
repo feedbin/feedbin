@@ -148,7 +148,7 @@ GEM
       connection_pool (~> 2)
       net-http2 (>= 0.18, < 2)
     ast (2.4.1)
-    autoprefixer-rails (9.7.6)
+    autoprefixer-rails (9.8.6.1)
       execjs
     bcrypt (3.1.13)
     bcrypt-ruby (3.1.5)
