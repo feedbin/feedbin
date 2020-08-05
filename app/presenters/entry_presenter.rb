@@ -603,6 +603,14 @@ class EntryPresenter < BasePresenter
     end
   end
 
+  def tweet_profile_banner(tweet)
+    @template.content_tag(:div, class: "profile-banner") do
+      if tweet.user.profile_banner_url?
+        @template.image_tag(@template.camo_link(tweet.user.profile_banner_url_https("1500x500")))
+      end
+    end
+  end
+
   # Sizes: normal, bigger
   def tweet_profile_image_uri(tweet, size = :bigger)
     if tweet.user.profile_image_uri? && tweet.user.profile_image_uri_https(size)
@@ -723,6 +731,10 @@ class EntryPresenter < BasePresenter
 
   def tweet_author_joined_day(tweet)
     tweet.user.created_at.mday.to_s.chars.map(&:to_i)
+  end
+
+  def tweet_author_joined_datetime(tweet)
+    tweet.user.created_at.iso8601
   end
 
   def tweet_author_location(tweet)
