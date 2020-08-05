@@ -97,7 +97,7 @@ class FeedRefresher
     end
 
     def push?
-      @push ||= @push_url && @feed[:push_expiration].nil? || @feed[:push_expiration] < Time.now
+      false
     end
   end
 end

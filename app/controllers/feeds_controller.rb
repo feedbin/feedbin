@@ -27,57 +27,22 @@ class FeedsController < ApplicationController
     feed = Feed.find(params[:id])
     secret = Push.hub_secret(feed.id)
 
+    response = ""
+    status = :not_found
     if request.get?
-      response = ""
-      if [feed.self_url, feed.feed_url].include?(params["hub.topic"]) && secret == params["hub.verify_token"]
-        if params["hub.mode"] == "subscribe"
-          Librato.increment "push.subscribe"
-          feed.update(push_expiration: Time.now + (params["hub.lease_seconds"].to_i / 2).seconds)
-          response = params["hub.challenge"]
-          status = :ok
-        elsif params["hub.mode"] == "unsubscribe"
-          Librato.increment "push.unsubscribe"
-          feed.update(push_expiration: nil)
-          response = params["hub.challenge"]
-          status = :ok
-        end
-      else
-        SelfUrl.perform_async(feed.id)
-        status = :not_found
+      if params["hub.mode"] == "unsubscribe"
+        Librato.increment "push.unsubscribe"
+        feed.update(push_expiration: nil)
+        response = params["hub.challenge"]
+        status = :ok
       end
-      render plain: response, status: status
     else
-      if feed.subscriptions_count > 0
-        body = request.raw_post.force_encoding("UTF-8")
-        signature = OpenSSL::HMAC.hexdigest("sha1", secret, body)
-        if request.headers["HTTP_X_HUB_SIGNATURE"] == "sha1=#{signature}"
-          client = Sidekiq::Client.new(SIDEKIQ_ALT)
-          client.push_bulk(
-            "args" => [[feed.id, feed.feed_url, {xml: body}]],
-            "class" => "FeedRefresherFetcherCritical",
-            "queue" => "feed_refresher_fetcher_critical",
-            "retry" => false
-          )
-          Librato.increment "entry.push"
-        else
-          Honeybadger.notify(error_class: "PuSH", error_message: "PuSH Invalid Signature", parameters: params)
-        end
-      else
-        uri = URI(ENV["PUSH_URL"])
-        options = {
-          push_callback: Rails.application.routes.url_helpers.push_feed_url(feed, protocol: uri.scheme, host: uri.host),
-          hub_secret: secret,
-          push_mode: "unsubscribe"
-        }
-        Sidekiq::Client.push_bulk(
-          "args" => [[feed.id, feed.feed_url, options]],
-          "class" => "FeedRefresherFetcher",
-          "queue" => "feed_refresher_fetcher",
-          "retry" => false
-        )
-      end
-      head :ok
+      status = :ok
+      PushUnsubscribe.perform_async(feed.id, params["hub.topic"])
+      WebSubSubscribe.perform_async(feed.id)
     end
+
+    render plain: response, status: status
   end
 
   def search

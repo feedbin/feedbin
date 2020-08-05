@@ -15,6 +15,8 @@ class Feed < ApplicationRecord
   before_create :set_host
   after_create :refresh_favicon
 
+  after_commit :web_sub_subscribe, on: :create
+
   attr_accessor :count, :tags
   attr_readonly :feed_url
 
@@ -163,6 +165,24 @@ class Feed < ApplicationRecord
 
   def has_subscribers?
     subscriptions_count > 0
+  end
+
+  def web_sub_secret
+    Digest::SHA256.hexdigest([id, Rails.application.secrets.secret_key_base].join("-"))
+  end
+
+  def web_sub_callback
+    uri = URI(ENV["PUSH_URL"])
+    signature = OpenSSL::HMAC.hexdigest("sha256", web_sub_secret, id.to_s)
+    Rails.application.routes.url_helpers.web_sub_verify_url(id, web_sub_callback_signature, protocol: uri.scheme, host: uri.host)
+  end
+
+  def web_sub_callback_signature
+    OpenSSL::HMAC.hexdigest("sha256", web_sub_secret, id.to_s)
+  end
+
+  def web_sub_subscribe
+    WebSubSubscribe.perform_async(id)
   end
 
   private

@@ -14,7 +14,7 @@ class FeedRefresherReceiver
             create_entry(entry, feed)
           end
         rescue ActiveRecord::RecordNotUnique
-          FeedbinUtils.update_public_id_cache(entry["public_id"], entry["content"], entry["data"]["public_id_alt"])
+          FeedbinUtils.update_public_id_cache(entry["public_id"], entry["content"], entry.dig("data", "public_id_alt"))
           Librato.increment "entry.record_not_unique"
         rescue => error
           message = update ? "update" : "create"
