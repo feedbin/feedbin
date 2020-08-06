@@ -604,7 +604,7 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_profile_banner(tweet)
-    @template.content_tag(:div, class: "profile-banner") do
+    @template.content_tag(:div, class: "profile-banner", data: { color_hash_seed: tweet.user.screen_name }) do
       if tweet.user.profile_banner_url?
         @template.image_tag(@template.camo_link(tweet.user.profile_banner_url_https("1500x500")))
       end

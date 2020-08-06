@@ -4850,7 +4850,7 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
                 height: 100px;
                 @include background-color($color-contrast-200);
                 img {
-                    height: 100%;
+                    width: 100%;
                 }
             }
             .profile-info h1 {

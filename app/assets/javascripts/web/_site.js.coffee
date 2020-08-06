@@ -2628,6 +2628,7 @@ $.extend feedbin,
 
       $(document).on 'click', '[data-behavior~=toggle_profile]', (event) ->
         element = $(event.currentTarget).closest('[data-behavior~=author_profile_wrap]').find('[data-behavior~=author_profile]')
+        feedbin.faviconColors(element)
         element.toggleClass('hide')
 
     changeContentView: ->
