@@ -1832,6 +1832,7 @@ $hamburger-dot: 4px;
         transition: transform 0.2s ease;
         transform-origin: top left;
         display: flex;
+        align-items: center;
         .view-mode-unread,
         .view-mode-starred,
         .view-mode-all {
@@ -2040,11 +2041,12 @@ $hamburger-dot: 4px;
             .feed-action-form {
                 padding: 0;
                 margin: 0;
-                margin-left: auto;
-                position: relative;
                 overflow: visible;
                 min-width: 50px;
-                height: 1px;
+                position: absolute;
+                right: 0;
+                top: 0;
+                bottom: 0;
                 .feed-action-button {
                     font-weight: bold;
                     @include color($color-contrast-400);
@@ -2053,16 +2055,13 @@ $hamburger-dot: 4px;
                     appearance: none;
                     background: none;
                     border: none;
-                    padding: 0;
+                    padding: 0 16px 0 0;
                     margin: 0;
-                    display: block;
-                    position: absolute;
-                    width: 50px;
-                    height: 32px;
-                    top: -6px;
-                    right: -16px;
-                    padding-right: 16px;
                     text-align: right;
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                    bottom: 0;
                 }
             }
             .clear-form {
@@ -2290,7 +2289,7 @@ $hamburger-dot: 4px;
             white-space: nowrap;
             width: 100%;
             display: block;
-            align-items: stretch;
+            align-items: center;
             display: flex;
         }
     }
