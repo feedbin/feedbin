@@ -16,7 +16,7 @@ class TwitterFeedRefresher
         "class" => "TwitterRefresherCritical",
         "queue" => "feed_downloader_critical",
         "retry" => false,
-        "at" => Time.now.to_i + rand(0..6.minutes.to_i)
+        "at" => Time.now.to_i + rand(0..12.minutes.to_i)
       }
 
       if user
