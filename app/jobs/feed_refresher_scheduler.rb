@@ -10,7 +10,7 @@ class FeedRefresherScheduler
   def perform
     if queue_empty?("feed_refresher_receiver") && queue_empty?("feed_downloader")
       refresh_feeds
-      TwitterFeedRefresher.perform_async
+      TwitterFeedRefresher.perform_async unless priority?
     end
   end
 
