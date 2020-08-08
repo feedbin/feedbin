@@ -1,15 +1,10 @@
 class Source::Guess < Source
-  def call
-    if @config[:request].format == :html
-      host = URI.parse(@config[:request].last_effective_url).host
-
-      rss = URI::HTTP.build(host: host, path: "/rss").to_s
-      @feed_options.push(FeedOption.new(rss, rss, rss, "guess"))
-
-      feed = URI::HTTP.build(host: host, path: "/feed").to_s
-      @feed_options.push(FeedOption.new(feed, feed, feed, "guess"))
-
-      create_feeds!
+  def find
+    url = Addressable::URI.parse(response.url)
+    ["/rss", "/feed"].each do |path|
+      guess = Addressable::URI.new(scheme: url.scheme, host: url.host, path: path).to_s
+      feeds.push create_from_url!(guess)
+    rescue Feedkit::Error
     end
   end
 end

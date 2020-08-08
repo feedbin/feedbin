@@ -1,20 +1,17 @@
 class Source::MetaLinks < Source
-  def call
-    if @config[:request].format == :html
-      find_links
-    end
-  end
+  def find
+    return unless document?
 
-  def find_links
-    @feed_options = document.search("link[rel='alternate']").each_with_object([]) { |link, array|
+    urls = document.css("link[rel=alternate]").each_with_object([]) do |link, array|
       if link_valid?(link)
-        option = FeedOption.new(@config[:request].last_effective_url, link["href"], link["title"], "page_links")
-        array.push(option)
+        array.push join_url(response.url, link["href"])
       end
-    }
-    @feed_options = @feed_options.uniq { |option| option.title }
-    @feed_options = @feed_options.uniq { |option| option.href }
-    create_feeds!
+    end
+
+    urls.uniq.each do |url|
+      feeds.push(create_from_url!(url))
+    rescue Feedkit::Error
+    end
   end
 
   private

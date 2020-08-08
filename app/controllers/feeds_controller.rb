@@ -51,12 +51,7 @@ class FeedsController < ApplicationController
       session[:subscribe_query] = params[:q]
       render js: "window.location = '#{new_twitter_authentication_path}';"
     else
-      config = {
-        twitter_access_token: @user.twitter_access_token,
-        twitter_access_secret: @user.twitter_access_secret,
-        twitter_screen_name: @user.twitter_screen_name
-      }
-      @feeds = FeedFinder.new(params[:q], config).create_feeds!
+      @feeds = FeedFinder.feeds(params[:q], twitter_auth: @user.twitter_auth)
       @feeds.map { |feed| feed.priority_refresh(@user) }
       @tag_editor = TagEditor.new(@user, nil)
     end

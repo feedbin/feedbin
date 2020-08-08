@@ -546,6 +546,14 @@ class User < ApplicationRecord
     end
   end
 
+  def twitter_auth
+    if twitter_enabled?
+      TwitterAuth.new(screen_name: twitter_screen_name, token: twitter_access_token, secret: twitter_access_secret)
+    else
+      nil
+    end
+  end
+
   def twitter_client
     if twitter_enabled?
       @twitter_client ||= ::Twitter::REST::Client.new { |config|

@@ -50,13 +50,7 @@ module Api
 
       def create
         @user = current_user
-        finder = FeedFinder.new(params[:feed_url])
-        begin
-          feeds = finder.create_feeds!
-        rescue
-          feeds = []
-        end
-
+        feeds = FeedFinder.feeds(params[:feed_url])
         if feeds.length == 0
           status_not_found
         elsif feeds.length == 1
@@ -68,9 +62,13 @@ module Api
           @options = feeds
           render status: :multiple_choices
         end
-      rescue Exception => e
-        status_not_found
-        Honeybadger.notify(e)
+      rescue => exception
+        if Rails.env.production?
+          status_not_found
+          Honeybadger.notify(e)
+        else
+          raise exception
+        end
       end
 
       def destroy

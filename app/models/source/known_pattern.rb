@@ -22,22 +22,20 @@ class Source::KnownPattern < Source
     }
   ]
 
-  def call
-    if (match = URLS.find { |candidate| @config[:request].last_effective_url =~ candidate[:regex] }) && $1
+  def find
+    if (match = URLS.find { |candidate| response.url =~ candidate[:regex] }) && $1
       feed_url = match[:template] % $1
-      option = FeedOption.new(feed_url, feed_url, nil, "known_pattern")
-      @feed_options.push(option)
-      create_feeds!
-    elsif youtube_domain? && channel_id
+      feed = create_from_url!(feed_url)
+      feeds.push(feed) if feed
+    elsif document? && youtube_domain? && channel_id
       feed_url = "https://www.youtube.com/feeds/videos.xml?channel_id=#{channel_id}"
-      option = FeedOption.new(feed_url, feed_url, nil, "youtube_options")
-      @feed_options.push(option)
-      create_feeds!
+      feed = create_from_url!(feed_url)
+      feeds.push(feed) if feed
     end
   end
 
   def youtube_domain?
-    @config[:request].last_effective_url.start_with?("https://www.youtube.com")
+    response.url.start_with?("https://www.youtube.com")
   end
 
   def channel_id

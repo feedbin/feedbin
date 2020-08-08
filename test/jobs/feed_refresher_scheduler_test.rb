@@ -11,15 +11,6 @@ class FeedRefresherSchedulerTest < ActiveSupport::TestCase
     assert_not perform.priority?
   end
 
-  test "should periodically force_refresh" do
-    flush_redis
-    results = 16.times.each_with_object([]) { |count, array|
-      job = perform
-      array.push job.force_refresh?
-    }
-    assert_equal(3, results.count(true))
-  end
-
   private
 
   def perform

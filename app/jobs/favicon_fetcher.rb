@@ -54,7 +54,7 @@ class FaviconFetcher
     favicon_url = nil
     url = URI::HTTP.build(host: @favicon.host)
     response = HTTP
-      .timeout(:global, write: 5, connect: 5, read: 5)
+      .timeout(write: 5, connect: 5, read: 5)
       .follow
       .get(url)
       .to_s
@@ -80,7 +80,7 @@ class FaviconFetcher
 
   def download_favicon(url)
     response = HTTP
-      .timeout(:global, write: 5, connect: 5, read: 5)
+      .timeout(write: 5, connect: 5, read: 5)
       .follow
       .headers(request_headers)
       .get(url)

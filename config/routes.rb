@@ -18,7 +18,6 @@ Rails.application.routes.draw do
   get :subscribe, to: "site#subscribe"
   get :headers, to: "site#headers"
 
-  post "/emails" => "emails#create"
   post "/newsletters" => "newsletters#create"
   get "bookmarklet/:cache_buster", to: "bookmarklet#script", as: "bookmarklet"
 

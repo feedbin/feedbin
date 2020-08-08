@@ -75,6 +75,7 @@ class Feed < ApplicationRecord
     options.dig("json_feed", "icon")
   end
 
+  # TODO get last effective url from a feedburner feed
   def self.create_from_parsed_feed(parsed_feed)
     ActiveRecord::Base.transaction do
       record = create!(parsed_feed.to_feed)
@@ -90,19 +91,7 @@ class Feed < ApplicationRecord
   end
 
   def check
-    options = {}
-    unless last_modified.blank?
-      options[:if_modified_since] = last_modified
-    end
-    unless etag.blank?
-      options[:if_none_match] = etag
-    end
-    request = Feedkit::Request.new(url: feed_url, options: options)
-    result = request.status
-    if request.body
-      result = Feedkit::Feedkit.new.fetch_and_parse(feed_url, request: request)
-    end
-    result
+    Feedkit::Request.download(feed_url)
   end
 
   def self.include_user_title
@@ -144,8 +133,8 @@ class Feed < ApplicationRecord
     else
       Sidekiq::Client.push_bulk(
         "args" => [[id, feed_url]],
-        "class" => "FeedRefresherFetcherCritical",
-        "queue" => "feed_refresher_fetcher_critical",
+        "class" => "FeedDownloaderCritical",
+        "queue" => "feed_downloader_critical",
         "retry" => false
       )
     end

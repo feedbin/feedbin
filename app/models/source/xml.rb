@@ -1,9 +1,6 @@
 class Source::Xml < Source
-  def call
-    if @config[:request].format == :xml
-      url = @config[:request].last_effective_url
-      @feed_options.push(FeedOption.new(url, url, url, "xml"))
-      create_feeds!
-    end
+  def find
+    feeds.push(create_from_request!(response))
+  rescue Feedkit::NotFeed
   end
 end

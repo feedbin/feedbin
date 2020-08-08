@@ -63,7 +63,7 @@ class MercuryParser
 
   def result
     @result ||= begin
-      response = HTTP.timeout(:global, write: 5, connect: 5, read: 5).use(:auto_inflate).headers("Accept-Encoding" => "gzip").get(service_url)
+      response = HTTP.timeout(write: 5, connect: 5, read: 5).use(:auto_inflate).headers("Accept-Encoding" => "gzip").get(service_url)
       response.parse
     end
   end

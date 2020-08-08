@@ -8,7 +8,7 @@ class FeedRefresherScheduler
   COUNT_KEY = "feed_refresher_scheduler:count".freeze
 
   def perform
-    if queue_empty?("feed_refresher_receiver") && queue_empty?("feed_refresher_fetcher")
+    if queue_empty?("feed_refresher_receiver") && queue_empty?("feed_downloader")
       refresh_feeds
       TwitterFeedRefresher.perform_async
     end
@@ -17,7 +17,7 @@ class FeedRefresherScheduler
   def refresh_feeds
     feed = Feed.last
     if feed
-      jobs = job_args(feed.id, 1, priority?, force_refresh?)
+      jobs = job_args(feed.id, 1, priority?)
       Sidekiq::Client.push_bulk(
         "args" => jobs,
         "class" => "FeedRefresher",
@@ -30,10 +30,6 @@ class FeedRefresherScheduler
 
   def priority?
     @priority ||= count % 2 == 0
-  end
-
-  def force_refresh?
-    @force_refresh ||= count % 2 != 0 && count % 3 == 0
   end
 
   def increment

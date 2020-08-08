@@ -25,9 +25,12 @@ class FeedImporter
   end
 
   def find_feeds(import_item)
-    finder = FeedFinder.new(import_item.details[:xml_url])
-    finder.create_feeds!
-  rescue
-    []
+    FeedFinder.feeds(import_item.details[:xml_url], import_mode: true)
+  rescue => e
+    if Rails.env.development?
+      raise e
+    else
+      []
+    end
   end
 end

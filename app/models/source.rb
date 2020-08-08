@@ -1,39 +1,45 @@
 class Source
-  attr_reader :options
+  attr_accessor :response, :feeds
 
-  def initialize(url, config)
-    @url = url
-    @config = config
-    @feed_options = []
+  def initialize(response)
+    @response = response
+    @feeds = []
   end
 
-  def create_feeds!
-    @feed_options.each_with_object([]) { |feed_option, array|
-      array.push(create_feed(feed_option))
-    }.compact.uniq
-  end
-
-  def create_feed(option)
-    Librato.increment("feed_finder.#{option.source}")
-    feed = Feed.where(feed_url: option.href).take
-
-    unless feed
-      request = @config[:request]
-      if request.nil? || request.last_effective_url != option.href
-        request = Feedkit::Request.new(url: option.href)
-      end
-
-      feed = Feed.where(feed_url: request.last_effective_url).take
-
-      if !feed && [:xml, :json_feed].include?(request.format)
-        parsed_feed = Feedkit::Feedkit.new.fetch_and_parse(request.last_effective_url, request: request)
-        feed = Feed.create_from_parsed_feed(parsed_feed)
-      end
-    end
-    feed
+  def self.find(*args)
+    source = new(*args)
+    source.find
+    source.feeds
   end
 
   def document
-    @document ||= Nokogiri::HTML(@config[:request].body)
+    @document ||= begin
+      parsed = response.parse(validate: false)
+      parsed.document if parsed.respond_to?(:document)
+    end
+  end
+
+  def document?
+    !document.nil?
+  end
+
+  def create_from_url!(url)
+    create_from_request!(Feedkit::Request.download(url))
+  end
+
+  def create_from_request!(result)
+    feed = Feed.xml.where(feed_url: result.url).take
+    if feed.nil?
+      feed = Feed.create_from_parsed_feed(result.parse)
+    end
+    feed
+  rescue
+    raise unless Rails.env.production?
+  end
+
+  def join_url(base, path)
+    base = Addressable::URI.parse(base)
+    path = Addressable::URI.parse(path)
+    Addressable::URI.join(base, path).to_s
   end
 end

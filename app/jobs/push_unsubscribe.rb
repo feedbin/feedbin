@@ -8,7 +8,7 @@ class PushUnsubscribe
     uri = URI(ENV["PUSH_URL"])
 
     feed.hubs.each do |hub|
-      HTTP.timeout(:global, write: 5, connect: 5, read: 5).follow(max_hops: 2).post(hub, form: {
+      HTTP.timeout(write: 5, connect: 5, read: 5).follow(max_hops: 2).post(hub, form: {
         "hub.mode"     => "unsubscribe",
         "hub.verify"   => "async",
         "hub.topic"    => feed.self_url,
