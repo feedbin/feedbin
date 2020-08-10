@@ -1,6 +1,7 @@
 class Source::Xml < Source
   def find
-    feeds.push(create_from_request!(response))
+    feed = create_from_request!(response)
+    feeds.push(feed) if feed
   rescue Feedkit::NotFeed
   end
 end

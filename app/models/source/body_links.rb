@@ -9,7 +9,8 @@ class Source::BodyLinks < Source
     end
 
     urls.first(4).each do |url|
-      feeds.push(create_from_url!(url))
+      feed = create_from_url!(url)
+      feeds.push(feed) if feed
     rescue Feedkit::Error
     end
   end
