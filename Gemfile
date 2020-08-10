@@ -8,7 +8,7 @@ gem "http",                github: "feedbin/http",                branch: "feedb
 gem "carrierwave_direct",  github: "feedbin/carrierwave_direct",  ref: "a0bc323"
 gem "dalli",               github: "feedbin/dalli",               branch: "feedbin"
 gem "feedjira",            github: "feedbin/feedjira",            branch: "f2"
-gem "feedkit",             github: "feedbin/feedkit",             branch: "http"
+gem "feedkit",             github: "feedbin/feedkit",             branch: "master"
 gem "grocer-pushpackager", github: "feedbin/grocer-pushpackager", ref: "6b01b4e", require: "grocer/pushpackager"
 gem "html-pipeline",       github: "feedbin/html-pipeline",       ref: "1e77ecf"
 gem "html_diff",           github: "feedbin/html_diff",           ref: "013e1bb"
