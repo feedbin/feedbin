@@ -9,6 +9,7 @@ class TwitterValidateCredentials
         user.increment!(:twitter_auth_failures)
         if user.twitter_auth_failures > 1
           user.twitter_log_out
+          UserMailer.delay(retry: false).twitter_connection_error(user.id)
         end
       end
     end

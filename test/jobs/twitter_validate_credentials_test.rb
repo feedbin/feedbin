@@ -13,6 +13,8 @@ class TwitterValidateCredentialsTest < ActiveSupport::TestCase
       twitter_auth_failures: 0
     )
 
+    assert_equal 0, Sidekiq::Extensions::DelayedMailer.jobs.size
+
     TwitterValidateCredentials.stub_any_instance :account_credentials_valid?, true do
       User.stub_any_instance :twitter_credentials_valid?, false do
         TwitterValidateCredentials.new.perform
@@ -22,6 +24,8 @@ class TwitterValidateCredentialsTest < ActiveSupport::TestCase
         TwitterValidateCredentials.new.perform
       end
     end
+
+    assert_equal 1, Sidekiq::Extensions::DelayedMailer.jobs.size
 
     assert_not @user.reload.twitter_enabled?
 
