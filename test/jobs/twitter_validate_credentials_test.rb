@@ -2,6 +2,7 @@ require "test_helper"
 
 class TwitterValidateCredentialsTest < ActiveSupport::TestCase
   setup do
+    Sidekiq::Worker.clear_all
     @user = users(:ben)
   end
 
