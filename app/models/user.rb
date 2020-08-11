@@ -535,7 +535,7 @@ class User < ApplicationRecord
   end
 
   def twitter_credentials_valid?
-    twitter_client&.home_timeline && true
+    twitter_client.verify_credentials && true
   rescue Twitter::Error::Unauthorized
     false
   end
@@ -552,6 +552,15 @@ class User < ApplicationRecord
     else
       nil
     end
+  end
+
+  def twitter_log_out
+    update(
+      twitter_access_token: nil,
+      twitter_access_secret: nil,
+      twitter_screen_name: nil,
+      twitter_auth_failures: nil
+    )
   end
 
   def twitter_client

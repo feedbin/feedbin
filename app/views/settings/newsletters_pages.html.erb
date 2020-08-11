@@ -1,7 +1,49 @@
 <div class="settings-content-inner">
     <div class="settings-outer">
-        <h2>Newsletters & Pages</h2>
+        <h2>Sources</h2>
     </div>
+
+    <div class="inset">
+        <h4 class="group-header">Twitter</h4>
+        <ul class="pill-list">
+            <% if @user.twitter_enabled? %>
+            <li>
+                <div class="toolbar">
+                    <div>
+                    Account
+                    <p class="control-group-description">
+                        You are logged in to Twitter as <strong>@<%= @user.twitter_screen_name %></strong>.
+                    </p>
+                    </div>
+                    <%= render "shared/input", class: "last-control accessory-left" do %>
+                        <%= link_to "Log Out", delete_twitter_authentications_path, method: :delete, class: "button button-secondary", data: {confirm: "Are you sure? This will deactivate your Twitter subscriptions."} %>
+                        <span class="accessory">
+                            <%= svg_tag "icon-twitter-logo" %>
+                        </span>
+                    <% end %>
+                </div>
+            </li>
+            <% else %>
+            <li>
+                <div class="toolbar">
+                    <div>
+                    Account
+                    <p class="control-group-description">
+                        Sign in to enable <a href="/blog/2018/01/11/feedbin-is-the-best-way-to-read-twitter/">Twitter subscriptions</a>.
+                    </p>
+                    </div>
+                    <%= render "shared/input", class: "last-control accessory-left" do %>
+                        <%= link_to "Sign In", new_twitter_authentication_path({mode: "settings"}), class: "button button-secondary" %>
+                        <span class="accessory">
+                            <%= svg_tag "icon-twitter-logo" %>
+                        </span>
+                    <% end %>
+                </div>
+            </li>
+            <% end %>
+        </ul>
+    </div>
+
 
     <%= form_for @user, remote: true, url: settings_update_user_path(@user) do |f| %>
         <div class="inset">

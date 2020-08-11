@@ -1107,7 +1107,8 @@ CREATE TABLE public.users (
     expires_at timestamp without time zone,
     newsletter_token character varying,
     price_tier bigint,
-    page_token character varying
+    page_token character varying,
+    twitter_auth_failures bigint
 );
 
 
@@ -2177,6 +2178,13 @@ CREATE UNIQUE INDEX index_users_on_starred_token ON public.users USING btree (st
 
 
 --
+-- Name: index_users_on_twitter_auth_failures; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_twitter_auth_failures ON public.users USING btree (twitter_auth_failures);
+
+
+--
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2367,6 +2375,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200110142059'),
 ('20200113101112'),
 ('20200708130351'),
-('20200730134217');
+('20200730134217'),
+('20200810160825');
 
 
