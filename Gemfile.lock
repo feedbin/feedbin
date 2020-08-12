@@ -90,6 +90,23 @@ GIT
     opml_saw (0.0.2)
       nokogiri
 
+GIT
+  remote: https://github.com/feedbin/twitter.git
+  revision: 56b2ee834ab8d2bafc12e89f8147523c8954a1d7
+  branch: feedbin
+  specs:
+    twitter (7.0.0)
+      addressable (~> 2.3)
+      buftok (~> 0.2.0)
+      equalizer (~> 0.0.11)
+      http (~> 4.0)
+      http-form_data (~> 2.0)
+      http_parser.rb (~> 0.6.0)
+      memoizable (~> 0.4.0)
+      multipart-post (~> 2.0)
+      naught (~> 1.0)
+      simple_oauth (~> 0.3.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -519,17 +536,6 @@ GEM
     tilt (2.0.10)
     tins (1.25.0)
       sync
-    twitter (7.0.0)
-      addressable (~> 2.3)
-      buftok (~> 0.2.0)
-      equalizer (~> 0.0.11)
-      http (~> 4.0)
-      http-form_data (~> 2.0)
-      http_parser.rb (~> 0.6.0)
-      memoizable (~> 0.4.0)
-      multipart-post (~> 2.0)
-      naught (~> 1.0)
-      simple_oauth (~> 0.3.0)
     twitter-text (3.1.0)
       idn-ruby
       unf (~> 0.1.0)
@@ -638,7 +644,7 @@ DEPENDENCIES
   stripe (~> 4.24.0)
   stripe-ruby-mock (= 2.5.0)
   stripe_event
-  twitter
+  twitter!
   twitter-text
   uglifier
   unicode-emoji
