@@ -1,5 +1,6 @@
 class ImageSaver
   include Sidekiq::Worker
+  sidekiq_options retry: false
 
   attr_reader :entry
 
