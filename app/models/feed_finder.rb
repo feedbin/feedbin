@@ -9,7 +9,8 @@ class FeedFinder
   end
 
   def self.feeds(url, **args)
-    new(url, **args).find
+    options = new(url, **args).find
+    options.uniq { |option| option.id }
   end
 
   def find
