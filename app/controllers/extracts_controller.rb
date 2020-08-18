@@ -14,7 +14,7 @@ class ExtractsController < ApplicationController
         @content = @entry.content
       end
     rescue => e
-      @content = check_for_image(@entry, url)
+      @content = nil
     end
 
     begin

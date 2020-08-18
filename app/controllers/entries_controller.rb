@@ -296,16 +296,4 @@ class EntriesController < ApplicationController
     end
     ids
   end
-
-  def check_for_image(entry, url)
-    response = HTTParty.head(url)
-    if /^image\//.match?(response.headers["content-type"])
-      content = "<img src='#{url}' />"
-      Librato.increment "readability.image_found"
-    else
-      content = nil
-      Librato.increment "readability.parse_fail"
-    end
-    content
-  end
 end

@@ -21,20 +21,20 @@ class WebSubController < ApplicationController
   end
 
   def publish
-    body = request.raw_post
-    if signature_valid?(body)
-      parsed = Feedjira.parse(body)
-      entries = parsed.entries.map do |entry|
-        Feedkit::Parser::XMLEntry.new(entry, @feed.feed_url).to_entry
-      end
-      if entries.present?
-        FeedRefresherReceiver.new.perform({
-          "feed" => {"id" => @feed.id},
-          "entries" => entries
-        })
-        Librato.increment "entry.push"
-      end
-    end
+    # body = request.raw_post
+    # if signature_valid?(body)
+    #   parsed = Feedjira.parse(body)
+    #   entries = parsed.entries.map do |entry|
+    #     Feedkit::Parser::XMLEntry.new(entry, @feed.feed_url).to_entry
+    #   end
+    #   if entries.present?
+    #     FeedRefresherReceiver.new.perform({
+    #       "feed" => {"id" => @feed.id},
+    #       "entries" => entries
+    #     })
+    #     Librato.increment "entry.push"
+    #   end
+    # end
     head :ok
   end
 
