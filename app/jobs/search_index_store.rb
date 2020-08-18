@@ -7,12 +7,12 @@ class SearchIndexStore
     record = klass.find(id)
     index(record, klass)
     percolate(record, klass) unless update
-    Sidekiq::Client.push(
-      "args" => [id],
-      "class" => "SearchIndexStoreAlt",
-      "queue" => "worker_slow_search_alt",
-      "retry" => false
-    )
+    # Sidekiq::Client.push(
+    #   "args" => [id],
+    #   "class" => "SearchIndexStoreAlt",
+    #   "queue" => "worker_slow_search_alt",
+    #   "retry" => false
+    # )
   rescue ActiveRecord::RecordNotFound
   end
 
