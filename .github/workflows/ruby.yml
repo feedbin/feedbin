@@ -55,9 +55,8 @@ jobs:
         sudo unzip /tmp/chromedriver.zip -d /tmp/
         sudo mv /tmp/chromedriver /usr/local/bin/
 
-        sudo wget "http://kindlegen.s3.amazonaws.com/kindlegen_linux_2.6_i386_v2_9.tar.gz" -O /tmp/kindlegen.tar.gz
-        sudo tar -xzf /tmp/kindlegen.tar.gz
-        sudo mv kindlegen /usr/local/bin/
+        sudo wget "https://feedbin-ci.s3.amazonaws.com/kindlegen/kindlegen" -O /tmp/kindlegen
+        sudo mv /tmp/kindlegen /usr/local/bin/
       if: matrix.os == 'ubuntu-18.04'
 
     - uses: actions/cache@v1
