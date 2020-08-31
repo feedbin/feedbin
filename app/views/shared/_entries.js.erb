@@ -31,16 +31,20 @@ var callback = function() {
     feedbin.formatEntries()
     feedbin.preloadEntries(<%= @entries.map{ |entry| entry.id }.to_json.html_safe %>, <%= @force_preload ? "true" : "false" %>);
     feedbin.markReadData.date = "<%= j last_unread_date %>";
-    feedbin.loadMore()
     <% if @type %>
     feedbin.viewType = "<%= @type %>";
     <% else %>
     feedbin.viewType = null;
     <% end %>
+
+    try {
+      feedbin.loadMore();
+    } catch (e) {
+    }
 }
 
 if (feedbin.panelScrollComplete) {
-    callback();
+  callback();
 } else {
     var interval = setInterval(function() {
         if (feedbin.panelScrollComplete) {
