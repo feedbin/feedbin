@@ -57,6 +57,8 @@ jobs:
 
         sudo wget "https://feedbin-ci.s3.amazonaws.com/kindlegen/kindlegen" -O /tmp/kindlegen
         sudo mv /tmp/kindlegen /usr/local/bin/
+        sudo chmod +x /usr/local/bin/kindlegen
+
       if: matrix.os == 'ubuntu-18.04'
 
     - uses: actions/cache@v1
@@ -78,6 +80,7 @@ jobs:
         POSTGRES_PASSWORD: postgres
         PGPASSWORD: postgres
         RAILS_ENV: test
+        KINDLEGEN_PATH: /usr/local/bin/kindlegen
       run: |
         psql -c 'create database feedbin_test;' -U postgres
         bundle exec rake db:setup
