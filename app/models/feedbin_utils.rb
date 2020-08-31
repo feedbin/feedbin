@@ -40,7 +40,7 @@ class FeedbinUtils
 
   def self.escape_search(query)
     if query.present? && query.respond_to?(:gsub)
-      special_characters_regex = /([\+\-\!\{\}\[\]\^\~\?\\])/
+      special_characters_regex = /([\+\-\!\{\}\[\]\^\~\?\\\/])/
       escape = '\ '.sub(" ", "")
       query = query.gsub(special_characters_regex) { |character| escape + character }
 
@@ -48,7 +48,7 @@ class FeedbinUtils
       query = query.gsub("content_exact:", "content.exact:")
       query = query.gsub("body:", "content:")
 
-      colon_regex = /(?<!title|title.exact|feed_id|content|content.exact|author|_missing_|_exists_|twitter_screen_name|twitter_name|twitter_retweet|twitter_media|twitter_image|twitter_link|emoji):(?=.*)/
+      colon_regex = /(?<!title|title.exact|feed_id|content|content.exact|author|_missing_|_exists_|twitter_screen_name|twitter_name|twitter_retweet|twitter_media|twitter_image|twitter_link|emoji|url|url.exact):(?=.*)/
       query = query.gsub(colon_regex, '\:')
       query
     end
