@@ -24,6 +24,8 @@ $.extend feedbin,
   formatMenu: null
   hasShadowDOM: typeof(document.createElement("div").attachShadow) == "function"
   colorHash: new ColorHash
+  scrollStarted: false
+  loadingMore: false
 
   changeContentView: (view) ->
     currentView = $('[data-behavior~=content_option]:not(.hide)')
@@ -38,6 +40,15 @@ $.extend feedbin,
       feedbin.previousContentView = currentView.data('content-option')
       currentView.addClass('hide')
       nextView.removeClass('hide')
+
+  loadMore: () ->
+    if feedbin.scrollStarted == false
+      element = $('.entries')[0]
+      url = $('.pagination .next_page').attr('href')
+      if url && element.scrollHeight <= element.offsetHeight
+        feedbin.loadingMore = true
+        $.getScript url, =>
+          feedbin.loadingMore = false
 
   newsletterLoad: (context) ->
     feedbin.formatImages(context)
@@ -2661,6 +2672,10 @@ $.extend feedbin,
         newText = button.data('toggle-text')
         button.text(newText)
         button.data('toggle-text', text)
+
+    scrollStarted: ->
+      $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
+        feedbin.scrollStarted = false
 
     copy: ->
       $(document).on 'click', '[data-behavior~=copy]', (event) ->

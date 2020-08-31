@@ -9,6 +9,7 @@ class feedbin.EntriesPager
     @container.on('scroll', @check)
 
   check: =>
+    feedbin.scrollStarted = true unless feedbin.loadingMore
     url = $('.pagination .next_page').attr('href')
     if @nearBottom() && url
       @container.unbind('scroll', @check)
