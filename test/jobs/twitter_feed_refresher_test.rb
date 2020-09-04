@@ -11,24 +11,24 @@ class TwitterFeedRefresherTest < ActiveSupport::TestCase
 
   test "feed gets scheduled" do
     Sidekiq::Worker.clear_all
-    assert_difference "Sidekiq::Queues['twitter_downloader'].count", +1 do
+    assert_difference "Sidekiq::Queues['twitter_refresher'].count", +1 do
       TwitterFeedRefresher.new.perform
     end
 
     args = [@feed.id, @feed.feed_url, [@keys]]
-    job = Sidekiq::Queues["twitter_downloader"].first
+    job = Sidekiq::Queues["twitter_refresher"].first
     assert_equal args, job["args"]
   end
 
   test "feed gets with passed user" do
     Sidekiq::Worker.clear_all
 
-    assert_difference "Sidekiq::Queues['twitter_downloader_critical'].count", +1 do
+    assert_difference "Sidekiq::Queues['twitter_refresher_critical'].count", +1 do
       TwitterFeedRefresher.new.enqueue_feed(@feed, @user)
     end
 
     args = [@feed.id, @feed.feed_url, [@keys]]
-    job = Sidekiq::Queues["twitter_downloader_critical"].first
+    job = Sidekiq::Queues["twitter_refresher_critical"].first
     assert_equal args, job["args"]
   end
 
@@ -46,7 +46,7 @@ class TwitterFeedRefresherTest < ActiveSupport::TestCase
     end
 
     @user.update(twitter_screen_name: "bsaid")
-    assert_difference "Sidekiq::Queues['twitter_downloader'].count", +1 do
+    assert_difference "Sidekiq::Queues['twitter_refresher'].count", +1 do
       TwitterFeedRefresher.new.perform
     end
   end
