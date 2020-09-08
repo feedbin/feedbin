@@ -550,7 +550,7 @@ GEM
     unicode-emoji (2.5.0)
       unicode-version (~> 1.0)
     unicode-version (1.0.0)
-    unicorn (5.6.0)
+    unicorn (5.7.0)
       kgio (~> 2.6)
       raindrops (~> 0.7)
     webmock (3.8.0)
