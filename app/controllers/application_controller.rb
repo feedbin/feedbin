@@ -200,6 +200,10 @@ class ApplicationController < ActionController::Base
     cookies["XSRF-TOKEN"] = form_authenticity_token if protect_against_forgery?
   end
 
+  def native?
+    request.user_agent&.include?("TurbolinksFeedbin")
+  end
+
   protected
 
   def verified_request?
