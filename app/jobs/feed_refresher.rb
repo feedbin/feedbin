@@ -23,7 +23,7 @@ class FeedRefresher
         "args"      => jobs.shuffle,
         "class"     => "FeedDownloader",
         "queue"     => "feed_downloader",
-        "retry"     => true,
+        "retry"     => false,
         "dead"      => false,
         "backtrace" => false
       )
