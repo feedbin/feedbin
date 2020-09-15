@@ -11,7 +11,7 @@ class EntryDeleter
       feed.subscriptions_count == 0 ? 10 : 400
     end
 
-    feed.feed_stats.where("day < ?", 40.days.ago).delete_all
+    feed.feed_stats.where("day < ?", 90.days.ago).delete_all
     unless feed.protected
       prune_entries(feed_id, entry_limit)
     end
