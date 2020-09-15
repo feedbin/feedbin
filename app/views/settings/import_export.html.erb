@@ -11,7 +11,7 @@
                         <div class="form-control">
                             <div class="toolbar">
                                 <div>
-                                    <%= f.file_field :upload %>
+                                    <%= f.file_field :upload, accept: ".xml, .opml, text/xml, application/xml, text/x-opml, text/x-opml+xml" %>
                                     <p class="control-group-description">You can import OPML files. Import is done in the background so you may not see every subscription right away.</p>
                                 </div>
                                 <div class="last-control">
