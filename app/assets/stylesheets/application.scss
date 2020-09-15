@@ -1496,20 +1496,30 @@ Structure
 }
 
 .subscribe-promo {
-    right: 60px;
-    top: 7px;
-    @include color($color-selected);
-    font-size: 13px;
-    display: inline-block;
-    padding: 4px 8px;
-    @include border($color-selected);
-    border-radius: 4px;
-    z-index: 100;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .subscribe-promo-inner {
+        margin-top: 195px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        .remaining-time {
+            margin-bottom: base-units(1);
+            @include color($color-contrast-600);
+        }
+        @media (max-height: 450px) {
+            margin-top: 120px;
+        }
+    }
     .entry-selected & {
         display: none;
-    }
-    &:hover {
-        text-decoration: none;
     }
     .native & {
         display: none;
@@ -3387,7 +3397,7 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
 .entry-column {
     background-position: 50% 50%;
     background-repeat: no-repeat;
-    background-size: 120px 120px;
+    background-size: 80px 80px;
     overflow: hidden;
     @include background-image((day: image-url("logo.svg"), dusk: image-url("logo-night.svg"), sunset: image-url("logo-sunset.svg"), midnight: image-url("logo-night.svg")));
     .bottom-toolbar {
