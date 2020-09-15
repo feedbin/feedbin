@@ -1,0 +1,13 @@
+<li class="linked <%= action.broken? ? "error" : "" %>">
+    <%= link_to(edit_action_path(action), title: action.broken? ? "Invalid Action" : "") do %>
+        <i class="status-flag icon-error"></i>
+        <div class="toolbar row">
+            <div class="description">
+                <%= render(partial: "actions/text_description", locals: {action: action}) %>
+            </div>
+            <div class="last-control">
+                <button class="button button-secondary">Edit</button>
+            </div>
+        </div>
+    <% end %>
+</li>

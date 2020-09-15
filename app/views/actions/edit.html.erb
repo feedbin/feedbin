@@ -3,7 +3,12 @@
         <h2>Actions</h2>
     </div>
     <% if @action.error_hint.present? %>
-        <p class="error-message"><%= @action.error_hint %></p>
+        <p class="error-message">
+          <span class="icon-container">
+            <%= svg_tag "icon-error-message" %>
+          </span>
+          <span><%= @action.error_hint %></span>
+        </p>
     <% end %>
     <%= render 'form' %>
 </div>

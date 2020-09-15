@@ -63,6 +63,7 @@ $color-accent-orange-600: #E96A0E;
 $color-accent-green-600: #07AC47;
 $color-accent-green-700: #068D3B;
 
+$color-accent-red-200: #F8E7EA;
 $color-accent-red-600: #BB0B2F;
 
 $color-base: (
@@ -6361,10 +6362,19 @@ Settings
         }
     }
     .error-message {
-        background-color: $color-accent-red-600;
-        border-radius: 8px;
-        padding: 10px;
-        color: white;
+        display: flex;
+        align-items: center;
+        background-color: $color-accent-red-200;
+        border-radius: 4px;
+        padding-right: 8px;
+        .icon-container {
+            height: 48px;
+            width: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+        }
     }
 }
 
