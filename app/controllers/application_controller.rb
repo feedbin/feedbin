@@ -28,6 +28,7 @@ class ApplicationController < ActionController::Base
   end
 
   def logged_in
+    clear_location
     get_feeds_list
     subscriptions = @user.subscriptions
 

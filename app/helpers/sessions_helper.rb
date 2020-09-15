@@ -44,10 +44,14 @@ module SessionsHelper
   end
 
   def redirect_back_or(default, notice = nil)
-    redirect_to (session.delete(:return_to) || default), notice: notice
+    redirect_to (clear_location || default), notice: notice
   end
 
   def store_location
     session[:return_to] = request.url
+  end
+
+  def clear_location
+    session.delete(:return_to)
   end
 end
