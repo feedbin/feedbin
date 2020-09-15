@@ -7,10 +7,14 @@ class ImageSaver
   def perform(entry_id)
     @entry = Entry.find(entry_id)
     Nokogiri::HTML5(content).css("img").each do |image|
-      file = Download.new(image["src"])
+      src = image["src"]
+      next unless src.start_with?("http")
+      file = Download.new(src)
       unless already_uploaded? file
         upload file
       end
+    ensure
+      file.delete if file
     end
     @entry.update(archived_images: true)
   rescue ActiveRecord::RecordNotFound

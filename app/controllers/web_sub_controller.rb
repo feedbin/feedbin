@@ -36,6 +36,8 @@ class WebSubController < ApplicationController
       end
     end
     head :ok
+  rescue Feedjira::NoParserAvailable
+    head :ok
   end
 
   private
