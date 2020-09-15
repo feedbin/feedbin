@@ -17,7 +17,7 @@ class ImageSaver
       file.delete if file
     end
     @entry.update(archived_images: true)
-  rescue ActiveRecord::RecordNotFound
+  rescue ActiveRecord::RecordNotFound, HTTP
   end
 
   private
