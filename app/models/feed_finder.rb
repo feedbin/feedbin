@@ -47,6 +47,8 @@ class FeedFinder
     end
 
     feeds
+  rescue Feedkit::Unauthorized
+    raise
   rescue => exception
     if Rails.env.production?
       Rails.logger.error exception.message
