@@ -27,7 +27,7 @@ $.extend feedbin,
   scrollStarted: false
   loadingMore: false
 
-    changeContentView: (view) ->
+  changeContentView: (view) ->
     currentView = $('[data-behavior~=content_option]:not(.hide)')
     nextView = $("[data-behavior~=content_option][data-content-option=#{view}]")
 
@@ -1303,7 +1303,7 @@ $.extend feedbin,
     $('.modal-purpose-subscribe .subscribe-footer').addClass('hide')
     window.history.replaceState({}, document.title, "/");
 
-  basicAuthForm: () ->
+  basicAuthForm: ->
     $('.modal-purpose-subscribe [data-behavior~=submit_add]').removeAttr('disabled')
     $('.modal-purpose-subscribe #basic_username').focus()
 
