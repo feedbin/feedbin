@@ -51,9 +51,15 @@ class FeedsController < ApplicationController
       session[:subscribe_query] = params[:q]
       render js: "window.location = '#{new_twitter_authentication_path}';"
     else
-      @feeds = FeedFinder.feeds(params[:q], twitter_auth: @user.twitter_auth)
+      @feeds = FeedFinder.feeds(params[:q], twitter_auth: @user.twitter_auth, username: params[:username], password: params[:password])
       @feeds.map { |feed| feed.priority_refresh(@user) }
       @tag_editor = TagEditor.new(@user, nil)
+    end
+  rescue Feedkit::Unauthorized => exception
+    @feeds = nil
+    if exception.basic_auth?
+      @basic_auth = true
+      @feed_url = params[:q]
     end
   rescue => exception
     logger.info { "------------------------" }

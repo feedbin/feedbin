@@ -1,4 +1,11 @@
-<% if @feeds.present? %>
+<% if @basic_auth.present? %>
+    if ($('[data-behavior~=feed_password_form]').length > 0) {
+        feedbin.showNotification('Incorrect username or password.', true);
+    } else {
+        feedbin.showAuthField('<%= j render partial: "subscriptions/password", locals: {feed_url: @feed_url} %>');
+    }
+    feedbin.basicAuthForm();
+<% elsif @feeds.present? %>
     <% present @feeds.first do |feed_presenter| %>
         <% if @feeds.first.twitter_user? %>
             $('.modal-purpose-subscribe [data-behavior~=feeds_search_favicon_target]').html('<%= j feed_presenter.favicon(@feeds.first) %>');
@@ -12,4 +19,5 @@
     <% end %>
 <% else %>
     feedbin.showNotification('No feed found.', true);
+    feedbin.hideSubscribeResults();
 <% end %>

@@ -45,4 +45,39 @@ class SubscribeTest < ApplicationSystemTestCase
       expect_text(entry.title)
     end
   end
+
+  test "Basic auth form" do
+    feed_url = "http://www.example.com/atom.xml"
+
+    username = "user"
+    password = "password"
+    valid_auth = "Basic #{Base64.strict_encode64("#{username}:#{password}")}"
+
+    stub_request(:get, feed_url, ).with { |request| request.headers["Authorization"] != valid_auth }.to_return(status: 401, headers: {www_authenticate: "Basic"})
+    stub_request_file("atom.xml", feed_url).with(headers: {"Authorization" => valid_auth})
+
+    user = users(:ben)
+    login_as(user)
+
+    find("[data-behavior~=show_subscribe]").click
+
+    within(".modal-purpose-subscribe") do
+      fill_in "q", with: feed_url
+      page.execute_script("$('.modal-purpose-subscribe [data-behavior~=feeds_search]').submit()")
+      wait_for_ajax
+      page.execute_script("$('.modal-purpose-subscribe [data-behavior~=submit_add]').submit()")
+      wait_for_ajax
+    end
+
+    assert_selector "[data-behavior~=notification_container]", text: "Incorrect username or password."
+
+    within(".modal-purpose-subscribe") do
+      fill_in "username", with: username
+      fill_in "password", with: password
+      page.execute_script("$('.modal-purpose-subscribe [data-behavior~=submit_add]').submit()")
+      wait_for_ajax
+      assert_selector ".feed-url", text: feed_url
+    end
+
+  end
 end

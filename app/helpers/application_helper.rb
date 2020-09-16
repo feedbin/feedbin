@@ -129,7 +129,19 @@ module ApplicationHelper
   end
 
   def pretty_url(url)
-    url && url.sub("http://", "").sub("https://", "").gsub(/\/$/, "").truncate(40, omission: "...")
+    if url
+      url = strip_basic_auth(url)
+      url.sub("http://", "").sub("https://", "").gsub(/\/$/, "").truncate(40, omission: "…")
+    end
+  rescue => exception
+    Honeybadger.notify(exception)
+    url
+  end
+
+  def strip_basic_auth(url)
+    Feedkit::BasicAuth.parse(url).url
+  rescue
+    url
   end
 
   def camo_link(url)

@@ -2,10 +2,12 @@ class FeedFinder
 
   attr_reader :url, :twitter_auth, :response, :import_mode
 
-  def initialize(url, import_mode: false, twitter_auth: nil)
+  def initialize(url, import_mode: false, twitter_auth: nil, username: nil, password: nil)
     @url          = url
     @import_mode  = import_mode
     @twitter_auth = twitter_auth
+    @username     = username
+    @password     = password
   end
 
   def self.feeds(url, **args)
@@ -61,7 +63,7 @@ class FeedFinder
   end
 
   def response
-    @response ||= Feedkit::Request.download(clean_url(url))
+    @response ||= Feedkit::Request.download(clean_url(url), username: @username, password: @password)
   end
 
   def clean_url(url)
