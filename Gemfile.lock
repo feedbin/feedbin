@@ -37,12 +37,13 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: 573e7222bf7d1f60f69e710c5b058ba56f38bd28
+  revision: dd964a0d7a2cd740573debab2071aac8dc42aceb
   branch: master
   specs:
     feedkit (0.1.0)
       feedjira (~> 2.0)
       http (~> 4.4)
+      rchardet (~> 1.8.0)
       twitter (~> 7.0)
       twitter-text (~> 3.1.0)
 
@@ -445,6 +446,7 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    rchardet (1.8.0)
     redcarpet (3.5.0)
     redis (4.2.2)
     regexp_parser (1.7.1)
