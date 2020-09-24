@@ -7,7 +7,7 @@ class FeedImporter
     import = import_item.import
     user = import.user
 
-    feeds = find_feeds(import_item)
+    feeds = find_feeds(import_item, user)
     if feeds.present?
       feed = feeds.first
       user.subscriptions.create_with(title: import_item.details[:title]).find_or_create_by(feed: feed)
@@ -24,8 +24,8 @@ class FeedImporter
     end
   end
 
-  def find_feeds(import_item)
-    FeedFinder.feeds(import_item.details[:xml_url], import_mode: true)
+  def find_feeds(import_item, user)
+    FeedFinder.feeds(import_item.details[:xml_url], import_mode: true, twitter_auth: user.twitter_auth)
   rescue => e
     if Rails.env.development?
       raise e

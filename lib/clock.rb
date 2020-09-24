@@ -17,7 +17,7 @@ every(1.minutes, "clockwork.frequent") do
   end
 end
 
-every(1.day, "clockwork.daily", at: "12:00", tz: "UTC") do
+every(1.day, "clockwork.daily", at: "7:00", tz: "UTC") do
   if RedisLock.acquire("clockwork:delete_entries:v2")
     EntryDeleterScheduler.perform_async
   end
