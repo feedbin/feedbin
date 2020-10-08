@@ -12,7 +12,7 @@
             <%= render partial: 'text_description', locals: {action: action} %>
         </div>
     </div>
-    <p><%= number_to_human(results.total) %> <%= 'result'.pluralize(results.total) %></p>
+    <p><%= number_to_human(results.total, precision: 2).downcase %> <%= 'match'.pluralize(results.total) %></p>
     <div class="entries action-preview-entries">
         <ul>
             <%= render partial: "entries/entry", collection: results %>

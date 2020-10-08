@@ -499,12 +499,12 @@ $.extend feedbin,
     feedbin.notificationTimeout = setTimeout feedbin.hideNotification, 3000
 
   updateEntries: (entries) ->
-    $('.entries ul').html(entries)
+    $('.entries [data-behavior~=entries_target]').html(entries)
     $('.entries').prop('scrollTop', 0)
     $(".entries").removeClass("loading");
 
   appendEntries: (entries) ->
-    $('.entries ul').append(entries)
+    $('.entries [data-behavior~=entries_target]').append(entries)
 
   formatEntries: ->
     $(document).trigger('feedbin:entriesLoaded')
@@ -696,9 +696,11 @@ $.extend feedbin,
       date = new Date(date)
       $(@).text(date.format("%B %e, %Y at %l:%M %p"))
 
-  applyUserTitles: ->
+  applyUserTitles: (cached = true) ->
     textarea = document.createElement("textarea")
-    $('[data-behavior~=user_title]').each ->
+    selector = '[data-behavior~=user_title]'
+    selector = "#{selector}:not(.renamed)" if cached
+    $(selector).each ->
       element = $(@)
       feed = element.data('feed-id')
       if (feed of feedbin.data.user_titles)
@@ -718,6 +720,7 @@ $.extend feedbin,
         jumpable = element.data('jumpable')
         jumpable["title"] = newTitle
         element.data('jumpable', jumpable)
+      element.addClass('renamed')
 
   queryString: (name) ->
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]")
@@ -1754,6 +1757,7 @@ $.extend feedbin,
           menu.addClass('hide')
 
       $(document).on 'click', '[data-behavior~=show_format_menu]', (event) ->
+        $('.dropdown-wrap.open').removeClass('open')
         button = $(event.currentTarget)
         menu = $('.format-palette')
         if feedbin.formatMenu
@@ -2102,6 +2106,7 @@ $.extend feedbin,
         return
 
       $(document).on 'click', '[data-behavior~=show_entry_content]', (event) ->
+        $('.dropdown-wrap.open').removeClass('open')
         unless $(event.target).is('[data-behavior~=show_entry_actions]')
           $('.entries li').removeClass('show-actions')
         return

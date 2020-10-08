@@ -20,7 +20,7 @@ class feedbin.Keyboard
 
   bindEvents: ->
     $(document).on 'click', '[data-behavior~=open_item]',  (event) =>
-      parent = $(event.currentTarget).parents('div')
+      parent = $(event.currentTarget).closest('.entries,.feeds')
       if parent.hasClass('entries')
         @selectColumn('entries')
       else if parent.hasClass('feeds')
@@ -296,6 +296,7 @@ class feedbin.Keyboard
 
     # Unfocus field,
     Mousetrap.bindGlobal 'escape', (event, combo) =>
+      $('.dropdown-wrap.open').removeClass('open')
       feedbin.hideSubscribe()
       feedbin.hideSearch()
       if $('[name="subscription[feeds][feed_url]"]').is(':focus')
@@ -393,7 +394,7 @@ class feedbin.Keyboard
 
   selectColumn: (column) ->
     @selectedColumn = $(".#{column}")
-    $("[data-behavior~=content_column]").removeClass('selected')
+    $("[data-behavior~=content_column].selected").removeClass('selected')
     $(".#{column}").closest("[data-behavior~=content_column]").addClass('selected')
 
   itemInView: ->

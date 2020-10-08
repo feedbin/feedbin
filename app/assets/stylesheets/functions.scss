@@ -21,6 +21,12 @@
     #{$property}: $result;
 }
 
+@mixin ellipse {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 @mixin font-size($size-in-pixels) {
     @include size-in-rems(font-size, $size-in-pixels);
 }
