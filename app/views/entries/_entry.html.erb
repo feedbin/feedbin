@@ -1,64 +1,76 @@
 <% present entry do |entry_presenter| %>
-    <li data-entry-id="<%= entry.id %>" class="feed-id-<%= entry.feed_id %> <%= entry_presenter.media_class %> entry-preview" <%= rtl(entry.summary) %>>
-        <div class="mark-above-read" data-behavior="mark_above_read"><span><i>Mark Above as Read</i></span></div>
-        <div class="mark-below-read" data-behavior="mark_below_read"><span><i>Mark Below as Read</i></span></div>
-        <a
-        class="wrap"
-        data-remote="true"
-        data-behavior="selectable open_item show_entry_content entry_info"
-        data-entry-id="<%= entry.id %>"
-        data-entry-info="<%= {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}.to_json %>"
-        data-mark-as-read-path="/entries/<%= entry.id %>/mark_as_read"
-        data-recently-read-path="/entries/<%= entry.id %>/recently_read"
-        data-url="<%= entry.fully_qualified_url %>"
-        href="/entries/<%= entry.id %>"
-    >
-            <span class="entries-inner-wrap">
-                <button class="button-text entry-actions-wrap" data-behavior="show_entry_actions">
-                    <i class="status-indicator icon-entry-actions"></i>
-                </button>
+    <%= entry_presenter.entry_summary do %>
+        <%= entry_presenter.entry_link do %>
+            <div class="feed-title-inline">
                 <%= entry_presenter.profile_image %>
-                <div class="inline-content-wrap">
-                    <div class="meta-wrap">
-                        <p class="feed-title">
-                            <%= entry_presenter.feed_title %>
-                        </p>
-                        <%= render partial: "shared/entry_status" %>
-                    </div>
-                    <div class="title-wrap">
-                        <div class="title-inner-wrap">
-                            <h2 class="title">
-                                <%= entry_presenter.profile_image %>
-                                <span><%= entry_presenter.title %></span>
-                            </h2>
-                            <%= render partial: "shared/entry_status" %>
+                <%= entry_presenter.feed_title %>
+            </div>
+            <div class="title-wrap">
+                <%= entry_presenter.profile_image %>
+                <div class="title"><%= entry_presenter.title %></div>
+            </div>
+            <div class="summary-content">
+
+                <%= entry_presenter.feed_title %>
+                <%= entry_presenter.summary %>
+                <%= entry_presenter.quoted_tweet %>
+
+                <% if entry.link_preview? %>
+                    <div class="link-preview">
+                        <%= entry_presenter.image entry.tweet_link_image %>
+                        <div class="link-preview-content">
+                            <div class="light"><%= entry_presenter.tweet_link_title %></div>
+                            <div class="link-host extra-light"><%= entry_presenter.tweet_link_host %></div>
                         </div>
-                        <%= entry_presenter.summary %>
                     </div>
-                    <div class="footer-meta-wrap">
-                        <%= render partial: "shared/entry_status" %>
-                        <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: 'time timeago') %>
-                        <%= svg_tag "icon-retweet", size: "13x9" %>
-                        <%= svg_tag "icon-media", size: "8x9" %>
-                    </div>
-                    <% if entry.tweet? && entry.main_tweet.quoted_status? %>
-                        <p class="title quoted-summary">
-                            <strong><%= entry_presenter.tweet_name(entry.main_tweet.quoted_status) %></strong> &ndash;
-                            <%= entry_presenter.retweet_text %>
-                        </p>
-                    <% end %>
+                <% end %>
 
-                    <% if entry.show_link_preview? %>
-                        <p class="link-preview">
-                            <%= image_tag entry.tweet_link_image %>
-                            <span class="tweet-link-title"><%= entry_presenter.tweet_link_title %></span>
-                            <span class="tweet-link-host"><%= entry_presenter.tweet_link_host %></span>
-                        </p>
-                    <% end %>
+                <%= entry_presenter.attached_image %>
 
-                    <%= entry_presenter.image %>
+                <div class="summary-status light">
+                    <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: "time timeago") %>
+                    <%= svg_tag "icon-retweet", class: "light" %>
+                    <%= svg_tag "icon-media", class: "light" %>
+                    <%= svg_tag "icon-star-on" %>
                 </div>
-            </span>
-        </a>
-    </li>
+            </div>
+            <div class="summary-status summary-status-inline light">
+                <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: "time timeago") %>
+                <%= svg_tag "icon-retweet", class: "light" %>
+                <%= svg_tag "icon-media", class: "light" %>
+                <%= svg_tag "icon-star-on" %>
+            </div>
+        <% end %>
+        <div class="summary-menu dropdown-wrap dropdown-right">
+            <button class="summary-menu-button" data-behavior="toggle_dropdown">
+                <%= svg_tag "icon-dots" %>
+            </button>
+            <div class="dropdown-wrap">
+                <div class="dropdown-content">
+                    <ul class="nav">
+                        <li>
+                            <%= button_tag data: {behavior: "mark_above_read"} do %>
+                                <span class="icon-wrap">
+                                    <%= svg_tag "icon-direction", inline: true %>
+                                </span>
+                                <span class="menu-text">
+                                    <span class="title">Mark above as read</span>
+                                </span>
+                            <% end %>
+                        </li>
+                        <li>
+                            <%= button_tag data: {behavior: "mark_below_read"} do %>
+                                <span class="icon-wrap">
+                                    <%= svg_tag "icon-direction", inline: true, class: "flip" %>
+                                </span>
+                                <span class="menu-text">
+                                    <span class="title">Mark below as read</span>
+                                </span>
+                            <% end %>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    <% end %>
 <% end %>

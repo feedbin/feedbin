@@ -20,20 +20,34 @@ class EntryPresenter < BasePresenter
 
   presents :entry
 
+  def entry_summary(&block)
+    options = {
+      class: entry_summary_class,
+      data: {entry_id: entry.id}
+    }
+    options[:dir] = "rtl" if @template.rtl?(entry.summary)
+    @template.content_tag :li, options do
+      yield
+    end
+  end
+
   def entry_link(&block)
     options = {
-      remote: true, class: "wrap", data: {
+      class: "entry-summary-link",
+      data: {
         behavior: "selectable open_item show_entry_content entry_info",
+        remote: true,
+        entry_info: {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}.to_json,
         mark_as_read_path: @template.mark_as_read_entry_path(entry),
         recently_read_path: @template.recently_read_entry_path(entry),
-        entry_id: entry.id,
-        entry_info: {id: entry.id, feed_id: entry.feed_id, published: entry.published.to_i}
+        url: entry.fully_qualified_url
       }
     }
     @template.link_to @template.entry_path(entry), options do
       yield
     end
   end
+
 
   def published_date
     if entry.tweet?
@@ -150,14 +164,16 @@ class EntryPresenter < BasePresenter
 
   def formatted_content
     @formatted_content ||= begin
-      formatted_content = entry.content
       if text?
-        formatted_content = ContentFormatter.text_email(formatted_content)
+        ContentFormatter.text_email(entry.content)
       elsif youtube?
-        formatted_content = ContentFormatter.text_email(formatted_content)
-        formatted_content = @template.content_tag(:iframe, "", width: entry.data["media_width"], height: entry.data["media_height"], src: "https://www.youtube-nocookie.com/embed/#{entry.data["youtube_video_id"]}?rel=0&amp;showinfo=0", frameborder: 0, allowfullscreen: true) + formatted_content
+        @template.capture do
+          @template.concat @template.content_tag(:iframe, "", width: entry.data["media_width"], height: entry.data["media_height"], src: "https://www.youtube-nocookie.com/embed/#{entry.data["youtube_video_id"]}?rel=0&amp;showinfo=0", frameborder: 0, allowfullscreen: true)
+          @template.concat ContentFormatter.text_email(entry.content)
+        end
+      else
+        entry.content
       end
-      formatted_content
     end
   end
 
@@ -175,24 +191,6 @@ class EntryPresenter < BasePresenter
     else
       has_content? && sanitized_title.present?
     end
-  end
-
-  def title
-    length = 100
-    if entry.tweet?
-      text = entry.tweet_summary(nil, true).html_safe
-      length = 280
-    elsif sanitized_title.present?
-      text = sanitized_title
-    elsif !entry.summary.blank?
-      text = entry.summary
-      length = 240
-    end
-
-    if text.blank?
-      text = "--".html_safe
-    end
-    @template.truncate(text, length: length, omission: "…", escape: false)
   end
 
   def retweet_text
@@ -256,13 +254,14 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def media_class
-    classes = []
+  def entry_summary_class
+    classes = ["entry-summary", "feed-id-#{entry.feed_id}"]
+
     if media_type == :audio
       classes.push("media")
     end
 
-    if !title? || entry.tweet?
+    if entry.tweet? || entry.micropost?
       classes.push("no-title")
     end
 
@@ -353,12 +352,15 @@ class EntryPresenter < BasePresenter
     entry.data && entry.data["youtube_video_id"].present?
   end
 
-  def image
+  def attached_image
     if entry.processed_image?
-      padding = (entry.image["height"].to_f / entry.image["width"].to_f).round(4) * 100
-      @template.content_tag :span, class: "entry-image" do
-        @template.content_tag :span, "", data: {src: entry.processed_image}, style: "padding-top: #{padding}%;"
-      end
+      image(entry.processed_image)
+    end
+  end
+
+  def image(src)
+    @template.content_tag :span, class: "entry-image" do
+      @template.content_tag :span, "", data: {src: src}
     end
   end
 
@@ -402,15 +404,6 @@ class EntryPresenter < BasePresenter
 
   def app_summary
     decoder.decode(@template.strip_tags(entry.summary))
-  end
-
-  def summary
-    if !entry.tweet && title?
-      summary = entry.summary.truncate(120, separator: " ", omission: "…")
-      @template.content_tag(:p, summary, class: "body")
-    end
-  rescue
-    nil
   end
 
   def trimmed_summary(text)
@@ -480,26 +473,80 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def feed_title
+  def summary
+    if entry.tweet?
+      text = entry.tweet_summary(nil, true).html_safe
+      summary = @template.truncate(text, length: 280, omission: "", escape: false)
+      @template.content_tag(:div, class: "summary light") do
+        @template.content_tag(:span, summary)
+      end
+    elsif entry.micropost?
+      summary = entry.summary.truncate(250, separator: " ", omission: "…")
+      @template.content_tag(:div, class: "summary light") do
+        @template.content_tag(:span, summary)
+      end
+    elsif title?
+      summary = entry.summary.truncate(250, separator: " ", omission: "…")
+      @template.content_tag(:div, class: "summary light") do
+        @template.concat @template.content_tag(:span, title_text, class: "inline-title")
+        @template.concat @template.content_tag(:span, summary, class: "summary-inner")
+      end
+    else
+      @template.content_tag(:div, class: "summary light") do
+        @template.concat @template.content_tag(:span, title, class: "inline-title")
+      end
+    end
+  rescue
+    nil
+  end
+
+  def title
+    length = 240
     if entry.tweet?
       @template.content_tag(:span, "", class: "title-inner") do
-        "#{tweet_name(entry.main_tweet)} #{@template.content_tag(:span, tweet_screen_name(entry.main_tweet))}".html_safe
+        "#{tweet_name(entry.main_tweet)} #{@template.content_tag(:span, tweet_screen_name(entry.main_tweet), class: "light")}".html_safe
       end
     elsif entry.micropost?
       @template.content_tag(:span, "", class: "title-inner") do
-        "#{entry.micropost.author_name} #{@template.content_tag(:span, entry.micropost.author_display_username)}".html_safe
-      end
-    elsif entry.feed.pages?
-      @template.content_tag(:span, "", class: "title-inner") do
-        entry.hostname
-      end
-    elsif entry.title.blank? && entry.author.present?
-      @template.content_tag(:span, "", class: "title-inner") do
-        entry.author
+        "#{entry.micropost.author_name} #{@template.content_tag(:span, entry.micropost.author_display_username, class: "light")}".html_safe
       end
     else
-      @template.content_tag(:span, "", class: "title-inner", data: {behavior: "user_title", feed_id: entry.feed.id}) do
-        entry.feed.title
+      if sanitized_title.present?
+        text = sanitized_title
+      elsif !entry.summary.blank?
+        text = entry.summary
+      end
+      if text.blank?
+        text = "--".html_safe
+      end
+      @template.truncate(text, length: length, omission: "…", escape: false)
+    end
+  end
+
+  def title_text
+    sanitized_title || "--".html_safe
+  end
+
+  def feed_title
+    if entry.tweet? || entry.micropost?
+      ""
+    elsif entry.feed.pages?
+      @template.content_tag(:div, class: "feed-title") do
+        @template.content_tag(:span, "", class: "title-inner") do
+          entry.hostname
+        end
+      end
+    elsif entry.title.blank? && entry.author.present?
+      @template.content_tag(:div, class: "feed-title") do
+        @template.content_tag(:span, "", class: "title-inner") do
+          entry.author
+        end
+      end
+    else
+      @template.content_tag(:div, class: "feed-title") do
+        @template.content_tag(:span, "", class: "title-inner", data: {behavior: "user_title", feed_id: entry.feed.id}) do
+          entry.feed.title
+        end
       end
     end
   end
@@ -759,6 +806,19 @@ class EntryPresenter < BasePresenter
 
   def tweet_link_host
     saved_page(entry.main_tweet.urls.first.expanded_url.to_s)&.domain
+  end
+
+  def quoted_tweet
+    return unless quoted_tweet?
+    @template.content_tag :div, class: "quoted-tweet light" do
+      @template.concat @template.content_tag(:strong) { tweet_name(entry.main_tweet.quoted_status) }
+      @template.concat " – "
+      @template.concat retweet_text
+    end
+  end
+
+  def quoted_tweet?
+    entry.tweet? && entry.main_tweet.quoted_status?
   end
 
   def feed_wrapper(subscriptions, &block)

@@ -27,11 +27,7 @@
                         <div class="option">
                             <%= b.radio_button data: {behavior: "auto_submit change_font"} %>
                             <%= b.label do %>
-                                <% if icon_exists?("font-#{b.value}") %>
-                                    <%= svg_tag "font-#{b.value}" %>
-                                <% else %>
-                                    <%= b.text %>
-                                <% end %>
+                                <%= b.text %>
                                 <%= radio_button_control %>
                             <% end %>
                         </div>

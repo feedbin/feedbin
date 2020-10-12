@@ -106,10 +106,10 @@ class Entry < ApplicationRecord
 
   def strip_trailing_link?
     hash = main_tweet.to_h
-    show_link_preview? && main_tweet.urls.first.indices.last == hash[:full_text].length
+    link_preview? && main_tweet.urls.first.indices.last == hash[:full_text].length
   end
 
-  def show_link_preview?
+  def link_preview?
     return false unless link_tweet?
     return false if image.present?
     return false unless data.dig("saved_pages", main_tweet.urls.first.expanded_url.to_s).present?
