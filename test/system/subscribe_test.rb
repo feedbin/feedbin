@@ -47,7 +47,7 @@ class SubscribeTest < ApplicationSystemTestCase
   end
 
   test "Basic auth form" do
-    feed_url = "http://www.example.com/atom.xml"
+    feed_url = "www.example.com/atom.xml"
 
     username = "user"
     password = "password"
