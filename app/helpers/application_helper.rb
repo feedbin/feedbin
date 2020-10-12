@@ -128,10 +128,15 @@ module ApplicationHelper
     image_tag(image_args.first, options)
   end
 
+  def short_url(url)
+    pretty_url(url).truncate(40, omission: "…") if url
+  end
+
   def pretty_url(url)
     if url
       url = strip_basic_auth(url)
-      url.sub("http://", "").sub("https://", "").gsub(/\/$/, "").truncate(40, omission: "…")
+      url = strip_screen_name(url)
+      url.sub("http://", "").sub("https://", "").gsub(/\/$/, "")
     end
   rescue => exception
     Honeybadger.notify(exception)
@@ -140,6 +145,16 @@ module ApplicationHelper
 
   def strip_basic_auth(url)
     Feedkit::BasicAuth.parse(url).url
+  rescue
+    url
+  end
+
+  def strip_screen_name(url)
+    uri = Addressable::URI.heuristic_parse(url)
+    query = uri.query_values.except("screen_name")
+    query = nil if query.empty?
+    uri.query_values = query
+    uri.to_s
   rescue
     url
   end

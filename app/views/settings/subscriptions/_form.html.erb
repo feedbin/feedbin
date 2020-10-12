@@ -81,7 +81,7 @@
                                 Website
                             </td>
                             <td>
-                                <a href="<%= subscription.feed.site_url %>" class="extra-muted"><span><%= pretty_url(subscription.feed.site_url) %></span></a>
+                                <a href="<%= subscription.feed.site_url %>" class="extra-muted"><span><%= short_url(subscription.feed.site_url) %></span></a>
                             </td>
                         </tr>
                         <tr>
@@ -89,7 +89,7 @@
                                 Feed
                             </td>
                             <td>
-                                <a href="<%= subscription.feed.feed_url %>" class="extra-muted"><span><%= pretty_url(subscription.feed.feed_url) %></span></a>
+                                <a href="<%= subscription.feed.feed_url %>" class="extra-muted"><span><%= short_url(subscription.feed.feed_url) %></span></a>
                             </td>
                         </tr>
                         <% end %>
