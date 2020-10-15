@@ -2727,7 +2727,7 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
 @mixin title-font {
     @include font-size(14);
     font-weight: bold;
-    @include color($color-contrast-600);
+    @include color($color-contrast-600, $root: true);
 }
 
 $feed-title-width: 115px;
@@ -2777,6 +2777,7 @@ $feed-title-width: 115px;
             display: inline;
             margin: 0 base-units(1) 0 0;
             @include title-font;
+
         }
     }
     .summary-status {
