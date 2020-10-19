@@ -30,15 +30,4 @@ class SearchIndexStoreTest < ActiveSupport::TestCase
     assert_equal entry_id, @entry.id
     assert_equal action_ids, [action.id]
   end
-
-  test "should not percolate entry" do
-    Sidekiq::Testing.inline! do
-      action = @user.actions.create(feed_ids: [@entry.feed.id], query: "\"#{@entry.title}\"")
-    end
-    Entry.__elasticsearch__.refresh_index!
-
-    assert_no_difference "ActionsPerform.jobs.size", +1 do
-      SearchIndexStore.new.perform("Entry", @entry.id, true)
-    end
-  end
 end

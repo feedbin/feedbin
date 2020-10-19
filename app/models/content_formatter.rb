@@ -256,17 +256,15 @@ class ContentFormatter
   end
 
   def _summary(text, length = nil)
-    text = text.chars.select(&:valid_encoding?).join
-    text = Sanitize.fragment(text, SANITIZE_BASIC)
-    text = Nokogiri::HTML(text).text&.squish
+    text = Loofah.fragment(text)
+      .scrub!(:prune)
+      .to_text(encode_special_chars: false)
+      .gsub(/\s+/, " ")
+      .squish
 
-    if length
-      text = text.truncate(length, separator: " ", omission: "")
-    end
+    text = text.truncate(length, separator: " ", omission: "") if length
 
     text
-  rescue
-    nil
   end
 
   def self.text_email(*args)

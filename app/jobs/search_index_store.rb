@@ -3,47 +3,41 @@ class SearchIndexStore
   sidekiq_options queue: :critical
 
   def perform(klass, id, update = false)
-    klass = klass.constantize
-    record = klass.find(id)
-    index(record, klass)
-    percolate(record, klass) unless update
-    # Sidekiq::Client.push(
-    #   "args" => [id],
-    #   "class" => "SearchIndexStoreAlt",
-    #   "queue" => "worker_slow_search_alt",
-    #   "retry" => false
-    # )
+    entry = Entry.find(id)
+    document = entry.search_data
+    index(entry, document)
+    percolate(entry, document, update)
   rescue ActiveRecord::RecordNotFound
   end
 
-  def index(record, klass)
+  def index(entry, document)
     data = {
-      index: klass.index_name,
-      type: klass.document_type,
-      id: record.id,
-      body: record.as_indexed_json
+      index: Entry.index_name,
+      type: Entry.document_type,
+      id: entry.id,
+      body: document
     }
     $search.each do |_, client|
       client.index(data)
     end
   end
 
-  def percolate(record, klass)
-    result = klass.__elasticsearch__.client.percolate(
-      index: klass.index_name,
-      type: klass.document_type,
+  def percolate(entry, document, update)
+    result = Entry.__elasticsearch__.client.percolate(
+      index: Entry.index_name,
+      type: Entry.document_type,
       percolate_format: "ids",
       body: {
-        doc: record.as_indexed_json,
+        doc: document,
         filter: {
-          term: {feed_id: record.feed_id}
+          term: {feed_id: entry.feed_id}
         }
       }
     )
 
     ids = result["matches"].map(&:to_i)
     if ids.present?
-      ActionsPerform.perform_async(record.id, ids)
+      ActionsPerform.perform_async(entry.id, ids, update)
     end
   end
 end

@@ -85,11 +85,13 @@ class Entry < ApplicationRecord
       tweets = [main_tweet]
       tweets.push(main_tweet.quoted_status) if main_tweet.quoted_status?
 
-      media = tweets.find { |tweet|
+      media = tweets.find do |tweet|
         return true if tweet.media?
         urls = tweet.urls.reject { |url| url.expanded_url.host == "twitter.com" }
         return true unless urls.empty?
-      }
+      rescue
+        false
+      end
     end
     !!media
   end
@@ -262,26 +264,8 @@ class Entry < ApplicationRecord
     data && data["format"] || "default"
   end
 
-  def as_indexed_json(options = {})
-    base = as_json(root: false, only: Entry.mappings.to_hash[:entry][:properties].keys.reject { |key| key.to_s.start_with?("twitter") })
-    base["title"] = ContentFormatter.summary(title)
-    base["content"] = ContentFormatter.summary(content)
-
-    full_content = [base["title"], base["content"]].join
-    base["emoji"] = full_content.scan(Unicode::Emoji::REGEX).join(" ")
-
-    if tweet?
-      tweets = [main_tweet]
-      tweets.push(main_tweet.quoted_status) if main_tweet.quoted_status?
-      base["twitter_screen_name"] = "#{main_tweet.user.screen_name} @#{main_tweet.user.screen_name}"
-      base["twitter_name"] = main_tweet.user.name
-      base["twitter_retweet"] = tweet.retweeted_status?
-      base["twitter_quoted"] = tweet.quoted_status?
-      base["twitter_media"] = twitter_media?
-      base["twitter_image"] = !!(tweets.find { |tweet| tweet.media? })
-      base["twitter_link"] = !!(tweets.find { |tweet| tweet.urls? })
-    end
-    base
+  def search_data
+    SearchData.new(self).to_h
   end
 
   def public_id_alt

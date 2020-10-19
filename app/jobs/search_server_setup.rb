@@ -20,7 +20,7 @@ class SearchServerSetup
       {
         index: {
           _id: entry.id,
-          data: entry.as_indexed_json
+          data: entry.search_data
         }
       }
     }

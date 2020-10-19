@@ -15,6 +15,7 @@ class EntryDeleter
     unless feed.protected
       prune_entries(feed_id, entry_limit)
     end
+    UnreadLimiter.new.perform(feed_id)
   end
 
   def prune_entries(feed_id, entry_limit)

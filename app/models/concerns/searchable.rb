@@ -11,8 +11,11 @@ module Searchable
     SORT_REGEX = /(?<=\s|^)sort:\s*(asc|desc|relevance)(?=\s|$)/i
     TAG_ID_REGEX = /tag_id:\s*(\d+)/
     TAG_GROUP_REGEX = /tag_id:\((.*?)\)/
+    PUBLISHED_REGEX = /published:\(.*?\)|published:\[.*?\]|updated:\(.*?\)|updated:\[.*?\]/
+    DATE_UNBOUNDED_REGEX = /published:[<>=+].*?(?=\s|$)|updated:[<>=+].*?(?=\s|$)/
 
     search_settings = {
+      "number_of_shards": 16,
       "analysis": {
         "analyzer": {
           "lower_exact": {
@@ -34,6 +37,7 @@ module Searchable
         indexes :feed_id, type: "long", index: :not_analyzed, include_in_all: false
         indexes :published, type: "date", include_in_all: false
         indexes :updated, type: "date", include_in_all: false
+        indexes :link, analyzer: "lower_exact"
 
         indexes :twitter_screen_name, analyzer: "whitespace"
         indexes :twitter_name, analyzer: "whitespace"
@@ -173,6 +177,8 @@ module Searchable
         params[:query] = params[:query].gsub(SORT_REGEX, "")
       end
 
+      extracted_fields = []
+
       if params[:query]
         params[:query] = params[:query].gsub(TAG_ID_REGEX) { |s|
           tag_id = Regexp.last_match[1]
@@ -188,9 +194,21 @@ module Searchable
           id_string = feed_ids.join(" OR ")
           "feed_id:(#{id_string})"
         }
+
+        params[:query] = params[:query].gsub(PUBLISHED_REGEX) { |match|
+          extracted_fields.push(match)
+          ""
+        }
+
+        params[:query] = params[:query].gsub(DATE_UNBOUNDED_REGEX) { |match|
+          extracted_fields.push(match)
+          ""
+        }
       end
 
       params[:query] = FeedbinUtils.escape_search(params[:query])
+
+      params[:query] = extracted_fields.push(params[:query]).join(" ")
 
       options = {
         query: params[:query],

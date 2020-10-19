@@ -2,9 +2,17 @@ class UnreadLimiter
   include Sidekiq::Worker
 
   def perform(feed_id)
-    subscriptions = Subscription.where(feed_id: feed_id)
+    entry_limit = if ENV["ENTRY_LIMIT"]
+      ENV["ENTRY_LIMIT"].to_i
+    else
+      400
+    end
+
+    subscriptions = Subscription.where(feed_id: feed_id).where(active: true)
     subscriptions.each do |subscription|
-      subscription.user.unread_entries.where(feed_id: feed_id).order(published: :desc).offset(400).delete_all
+      ids = subscription.user.unread_entries.where(feed_id: subscription.feed_id).order(published: :desc).offset(entry_limit).pluck(:id)
+      ids = ids.last(ids.size * 0.05)
+      UnreadEntry.where(id: ids).delete_all
     end
   end
 end

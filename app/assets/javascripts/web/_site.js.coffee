@@ -1025,8 +1025,8 @@ $.extend feedbin,
     return if feedbin.selectedEntry.container == null
     next = feedbin.selectedEntry.container.parents('li').next()
     if next.length
-      title = next.find('.title').text()
-      feed = next.find('.feed-title').text()
+      title = next.find('.title').first().text()
+      feed = next.find('.feed-title').first().text()
       $('.next-entry-title').text(title)
       $('.next-entry-feed').text(feed)
       $('[data-behavior~=needs_next]').prop('disabled', false)

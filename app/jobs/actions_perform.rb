@@ -4,7 +4,7 @@ class ActionsPerform
   include Sidekiq::Worker
   sidekiq_options queue: :critical, retry: false
 
-  def perform(entry_id, action_ids)
+  def perform(entry_id, action_ids, update = false)
     # Looks like [[8, 1, ["mark_read", "star"]], [7, 1, ["mark_read"]]]
     actions = Action.where(id: action_ids).pluck(:id, :user_id, :actions)
     @entry = Entry.find(entry_id)
@@ -24,13 +24,14 @@ class ActionsPerform
       queues.each do |action_name, user_ids|
         user_ids = user_ids.to_a
         if action_name == "send_push_notification"
-          SafariPushNotificationSend.perform_async(user_ids, entry_id)
+          SafariPushNotificationSend.perform_async(user_ids, entry_id) unless update
         elsif action_name == "star"
-          star(user_ids, user_actions)
+          star(user_ids, user_actions) unless update
         elsif action_name == "mark_read"
           UnreadEntry.where(user_id: user_ids, entry_id: entry_id).delete_all
+          UpdatedEntry.where(user_id: user_ids, entry_id: entry_id).delete_all
         elsif action_name == "send_ios_notification"
-          send_ios_notification(user_ids)
+          send_ios_notification(user_ids) unless update
         end
       end
       Librato.increment "actions_performed", by: 1
