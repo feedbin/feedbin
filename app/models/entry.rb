@@ -380,8 +380,8 @@ class Entry < ApplicationRecord
   end
 
   def ensure_published
-    now = DateTime.now
-    if published.nil? || published > now || published.to_i == 0
+    now = Time.now
+    if published.nil? || published > now || published.to_i <= 0
       self.published = now
     end
     true
