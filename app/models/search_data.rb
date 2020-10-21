@@ -14,7 +14,7 @@ class SearchData
       hash[:published] = @entry.published.iso8601
       hash[:updated]   = @entry.updated_at.iso8601
       hash[:link]      = links
-      hash[:emoji]     = hash[:content].scan(Unicode::Emoji::REGEX).join(" ")
+      hash[:emoji]     = emoji(hash[:content])
       if @entry.tweet?
         hash[:twitter_screen_name] = "#{@entry.main_tweet.user.screen_name} @#{@entry.main_tweet.user.screen_name}"
         hash[:twitter_name]        = @entry.main_tweet.user.name
@@ -29,6 +29,10 @@ class SearchData
 
   def document
     @document ||= Loofah.fragment(@entry.content).scrub!(:prune)
+  end
+
+  def emoji(content)
+    content.respond_to?(:scan) ? content.scan(Unicode::Emoji::REGEX).join(" ") : nil
   end
 
   def text
