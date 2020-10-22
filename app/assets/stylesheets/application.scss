@@ -180,6 +180,22 @@ $color-selected-off: (
     midnight: $theme-color-midnight-100,
 );
 
+$color-logo-foreground: (
+    debug:    color-logo-foreground,
+    day:      $theme-color-200,
+    sunset:   $theme-color-sunset-200,
+    dusk:     $theme-color-dusk-base,
+    midnight: $theme-color-midnight-base,
+);
+
+$color-logo-background: (
+    debug:    color-logo-background,
+    day:      transparent,
+    sunset:   transparent,
+    dusk:     $theme-color-dusk-200,
+    midnight: $theme-color-midnight-200,
+);
+
 $image-spinners: (
     debug:    image-spinners,
     day:      image-url("spinner-day.svg"),
@@ -1518,6 +1534,51 @@ Structure
         }
         @media (max-height: 450px) {
             margin-top: 120px;
+        }
+    }
+    .entry-selected & {
+        display: none;
+    }
+    .native & {
+        display: none;
+    }
+}
+
+.splash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .logo {
+        max-height: 80px;
+        max-width: 80px;
+        #logo_foreground {
+            @include fill($color-logo-foreground);
+        }
+        #logo_background {
+            @include fill($color-logo-background);
+        }
+    }
+    .splash-inner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .trial-time {
+        position: relative;
+        top: 48px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        .remaining-time {
+            margin-bottom: base-units(1);
+            @include color($color-contrast-600);
         }
     }
     .entry-selected & {
@@ -3259,7 +3320,6 @@ $feed-title-width: 115px;
     background-repeat: no-repeat;
     background-size: 80px 80px;
     overflow: hidden;
-    @include background-image((day: image-url("logo.svg"), dusk: image-url("logo-night.svg"), sunset: image-url("logo-sunset.svg"), midnight: image-url("logo-night.svg")));
     .bottom-toolbar {
         display: none;
     }
@@ -5218,6 +5278,31 @@ $feed-title-width: 115px;
 /*------------------------------------------------------------------------------
 Settings
 ------------------------------------------------------------------------------*/
+
+.logo-full {
+    @include fill($color-contrast-700);
+    $color-full-logo-foreground: (
+        debug:    color-logo-foreground,
+        day:      $theme-color-700,
+        sunset:   $theme-color-sunset-700,
+        dusk:     $theme-color-dusk-base,
+        midnight: $theme-color-midnight-base,
+    );
+    $color-full-logo-background: (
+        debug:    color-logo-foreground,
+        day:      transparent,
+        sunset:   transparent,
+        dusk:     $theme-color-dusk-700,
+        midnight: $theme-color-midnight-700,
+    );
+    #logo_foreground {
+        @include fill($color-full-logo-foreground);
+    }
+    #logo_background {
+        @include fill($color-full-logo-background);
+    }
+}
+
 .content-inner {
     margin-top: 20px;
     padding: 4px 20px 12px 20px;
@@ -5236,8 +5321,7 @@ Settings
         display: block;
         svg {
             width: 140px;
-            height: 30px;
-            @include fill($color-contrast-700);
+            height: 38px;
         }
     }
     .modal & {
@@ -7512,7 +7596,7 @@ a:hover.danger {
 Login and Sign Up
 ------------------------------------------------------------------------------*/
 .login {
-    @include background-color($color-contrast-100);
+    @include background-color($color-contrast-100, $root: true);
     padding: 15px;
     display: flex;
     align-items: center;
@@ -7532,7 +7616,11 @@ Login and Sign Up
         svg {
             width: 180px !important;
             height: auto !important;
-            @include fill($color-contrast-700);
+            #logo_foreground {
+                @media (prefers-color-scheme: dark) {
+                    fill: $theme-color-dusk-100;
+                }
+            }
         }
     }
     .content {
@@ -7544,14 +7632,14 @@ Login and Sign Up
         font-weight: bold;
         text-align: center;
         margin: 0 0 15px 0;
-        @include color($color-contrast-700);
+        @include color($color-contrast-700, $root: true);
     }
     .box {
         border: 1px solid transparent;
-        @include border-color($color-borders);
+        @include border-color($color-borders, $root: true);
         border-radius: 4px;
         background-color: white;
-        @include background-color($color-base);
+        @include background-color($color-base, $root: true);
         margin: 0 auto 14px auto;
         width: 100%;
         max-width: 400px;

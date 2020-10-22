@@ -1,10 +1,10 @@
 <% content_for :head do %>
     <%= javascript_include_tag "https://js.stripe.com/v3/" %>
 <% end %>
-<% @class = 'login' %>
+<% @class = 'login theme-auto' %>
 <div class="login-wrap">
     <a href="/" class="logo">
-        <%= svg_tag "logo-full" %>
+        <%= svg_tag "logo-full", inline: true %>
     </a>
     <div class="box">
         <div data-behavior="stripe_error" class="alert alert-error hide"></div>
