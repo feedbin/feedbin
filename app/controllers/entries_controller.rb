@@ -225,7 +225,7 @@ class EntriesController < ApplicationController
     user_id = verify_push_token(params[:user])
     user = User.find(user_id)
     entry = Entry.find(params[:id])
-    redirect_to entry_path(entry), status: :found
+    redirect_to entry_url(entry), status: :found
   end
 
   def newsletter
