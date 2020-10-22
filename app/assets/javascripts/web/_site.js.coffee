@@ -429,17 +429,14 @@ $.extend feedbin,
     if animate
       timeout = 200
       feedbin.panelScrollComplete = false
-      if feedbin.smoothScroll
-        $(containerClass).prop 'scrollLeft', offset
-      else
-        $(containerClass).animate({scrollLeft: offset}, {duration: timeout})
+      $(containerClass).css {'scroll-snap-type': 'unset'}
+      $(containerClass).animate({scrollLeft: offset}, {duration: timeout})
       setTimeout ( ->
         feedbin.panelScrollComplete = true
+        $(containerClass).css {'scroll-snap-type': 'x mandatory'}
       ), timeout
     else
-      $(containerClass).css {'scroll-behavior': 'auto'}
       $(containerClass).prop 'scrollLeft', offset
-      $(containerClass).css {'scroll-behavior': 'smooth'}
 
   showPanel: (panel, state = true) ->
     feedbin.panel = panel

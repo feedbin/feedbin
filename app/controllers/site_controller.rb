@@ -1,5 +1,6 @@
 class SiteController < ApplicationController
-  skip_before_action :authorize, only: [:index]
+  skip_before_action :authorize, only: [:index, :manifest, :service_worker]
+  skip_before_action :verify_authenticity_token, only: [:service_worker]
   before_action :check_user, if: :signed_in?
 
   def index
@@ -20,6 +21,36 @@ class SiteController < ApplicationController
     @user = current_user
     if @user.admin?
       @headers = request.env.select { |k, v| k =~ /^HTTP_/ }
+    end
+  end
+
+  def service_worker
+  end
+
+  def manifest
+    theme_options = {
+      "day" => "#FFFFFF",
+      "sunset" => "#f5f2eb",
+      "dusk" => "#262626",
+      "midnight" => "#000000"
+    }
+    @color = theme_options.fetch(params[:theme], theme_options["day"])
+    @icons = [
+      {
+        src: helpers.asset_url("icon-manifest.png"),
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "maskable"
+      },
+      {
+        src: helpers.asset_url("icon-manifest-large.png"),
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any"
+      }
+    ]
+    respond_to do |format|
+      format.any {render "manifest.json.jbuilder", content_type: "application/manifest+json" }
     end
   end
 

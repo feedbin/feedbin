@@ -1533,7 +1533,6 @@ Structure
     height: 100%;
     overflow: hidden;
     align-items: flex-start;
-    scroll-behavior: smooth;
     .feeds-column,
     .entries-column {
         flex-grow: 0;
@@ -8776,7 +8775,6 @@ button.close {
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     @include border-right($color-borders);
-    scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
     .swipe & {
         white-space: nowrap;
