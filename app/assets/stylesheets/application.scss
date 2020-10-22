@@ -1364,8 +1364,15 @@ Structure
     display: flex;
     align-items: center;
     justify-content: center;
-    svg {
-        @include fill((day: $theme-color-200, sunset: $theme-color-sunset-100, dusk: $theme-color-500, midnight: $theme-color-500));
+    .logo {
+        max-height: 80px;
+        max-width: 80px;
+        #logo_foreground {
+            @include fill($color-logo-foreground);
+        }
+        #logo_background {
+            @include fill($color-logo-background);
+        }
     }
 }
 

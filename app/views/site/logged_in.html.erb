@@ -17,7 +17,7 @@
     <%= render partial: 'shared/svg' %>
     <%= render partial: 'shared/notification' %>
     <div class="loading-app">
-        <%= svg_tag "logo", size: "120x120" %>
+        <%= svg_tag "logo", inline: true %>
     </div>
     <div class="app-wrap fade">
         <div class="feeds-column app-panel" data-behavior="content_column" data-resizable-name="feeds" style="<%= user_presenter.feeds_width_style %>">
