@@ -211,7 +211,7 @@ $box-shadow-dropdown: 0px 4px 6px 2px rgba(0, 0, 0, 0.1);
 $focus-glow: 0px 0px 0px 4px $color-accent-blue-400;
 $focus-glow-inset: inset $focus-glow;
 $subtle-focus-glow: 0px 0px 1px 0 rgba($selected, 1);
-$color-selected-muted: rgba(white, .5);
+$color-selected-muted: rgba(white, .7);
 $color-selected-muted-light: rgba(white, .3);
 
 $color-sidebar: (
@@ -2405,6 +2405,12 @@ $hamburger-dot: 4px;
             midnight: none,
         );
         @include box-shadow-irregular($shadow);
+    }
+}
+
+.host-feedbin-resolv-app, .host-feedbin-com, .host-feedbin-me {
+    &.favicon {
+        background-image: image-url("logo.svg") !important;
     }
 }
 

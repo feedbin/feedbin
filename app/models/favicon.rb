@@ -13,6 +13,10 @@ class Favicon < ApplicationRecord
     self[:data] || {}
   end
 
+  def host_class
+    "host-#{host}".parameterize
+  end
+
   def cdn_url
     @cdn_url ||= begin
       if url

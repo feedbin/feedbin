@@ -46,7 +46,7 @@ class BasePresenter
         end
         if feed.favicon&.cdn_url
           markup = <<-eos
-            <span class="favicon" style="background-image: url(#{feed.favicon.cdn_url});"></span>
+            <span class="favicon #{feed.favicon.host_class}" style="background-image: url(#{feed.favicon.cdn_url});"></span>
           eos
         end
         content = <<-eos
