@@ -1587,11 +1587,11 @@ Structure
             margin-bottom: base-units(1);
             @include color($color-contrast-600);
         }
+        .native & {
+            display: none;
+        }
     }
     .entry-selected & {
-        display: none;
-    }
-    .native & {
         display: none;
     }
 }
