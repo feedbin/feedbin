@@ -13,7 +13,6 @@ class FaviconFetcher
   end
 
   def update
-    data = nil
     favicon_found = false
     response = nil
 
@@ -61,7 +60,7 @@ class FaviconFetcher
     html = Nokogiri::HTML(response)
     favicon_links = html.search(xpath)
     if favicon_links.present?
-      favicon_url = favicon_links.last.to_s
+      favicon_url = favicon_links.first.to_s
       favicon_url = URI.parse(favicon_url)
       favicon_url.scheme = "http"
       unless favicon_url.host
@@ -112,7 +111,7 @@ class FaviconFetcher
   end
 
   def xpath
-    icon_names = ["icon", "shortcut icon"]
+    icon_names = ["shortcut icon", "icon", "apple-touch-icon", "apple-touch-icon-precomposed"]
     icon_names = icon_names.map { |icon_name|
       "//link[not(@mask) and translate(@rel, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = '#{icon_name}']/@href"
     }

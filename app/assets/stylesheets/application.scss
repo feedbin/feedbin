@@ -2413,6 +2413,11 @@ $hamburger-dot: 4px;
         background-image: image-url("logo.svg") !important;
     }
 }
+.host-twitter-com {
+    &.favicon {
+        background-image: image-url("replacement-favicon-twitter.svg") !important;
+    }
+}
 
 .theme-day {
     .favicon-wrap {
