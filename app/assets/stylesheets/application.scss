@@ -2904,6 +2904,9 @@ $feed-title-width: 115px;
     .quoted-tweet, .link-preview {
         @include border-color($color-selected-muted-light);
     }
+    .quoted-tweet strong {
+        @include color(white);
+    }
     .entries-column.selected & {
         @include background-color($color-selected);
     }
