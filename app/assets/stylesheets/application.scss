@@ -2785,6 +2785,9 @@ li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
             }
         }
     }
+    .summary-inner, .summary {
+        overflow-wrap: break-word;
+    }
     .summary-status-inline, .feed-title-inline {
         display: none;
     }

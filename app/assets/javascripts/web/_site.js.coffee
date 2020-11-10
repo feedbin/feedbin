@@ -2068,6 +2068,8 @@ $.extend feedbin,
         if !$('body').hasClass('full-screen')
           feedbin.scrollToPanel('.entries-column', false)
           window.history.replaceState({}, "", "/");
+          document.title = "Feedbin"
+          feedbin.updateTitle()
         feedbin.measureEntryColumn()
         feedbin.setNativeBorders()
 
