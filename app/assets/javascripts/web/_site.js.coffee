@@ -2733,7 +2733,7 @@ $.extend feedbin,
         if bar.offsetLeft < parentWidth / 2
           tooltipTarget.removeClass("right")
           tooltipTarget.css
-            left: "#{bar.offsetLeft - 18}px"
+            left: "#{bar.offsetLeft - 14}px"
         else
           tooltipTarget.addClass("right")
           tooltipTarget.css
