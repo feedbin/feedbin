@@ -2703,6 +2703,42 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=show_entries]', (event) ->
         feedbin.scrollStarted = false
 
+    dataTooltip: ->
+      $(document).on 'mouseout', '[data-behavior~=hide_tooltip]', (event) ->
+        target = event.currentTarget
+        controller = $(target).closest('[data-behavior~=tooltip_controller]')
+        tooltipTarget = $('[data-behavior~=tooltip_target]', controller)
+        tooltipTarget.addClass("hide")
+
+      $(document).on 'mouseover', '[data-behavior~=show_tooltip]', (event) ->
+        bar = event.currentTarget
+        parentWidth = bar.offsetParent.offsetWidth
+
+        controller = $(bar).closest('[data-behavior~=tooltip_controller]')
+        tooltipTarget = $('[data-behavior~=tooltip_target]', controller)
+        dayTarget = $('[data-behavior~=tooltip_day]', tooltipTarget)
+        countTarget = $('[data-behavior~=tooltip_count]', tooltipTarget)
+
+        tooltipTarget.removeClass('hide')
+        dayTarget.text(bar.dataset.day)
+        countTarget.text(bar.dataset.count)
+
+        topOffset = tooltipTarget.prop("offsetHeight") + 4
+
+        tooltipTarget.css
+          top: "#{-topOffset}px"
+          right: 'auto'
+          left: 'auto'
+
+        if bar.offsetLeft < parentWidth / 2
+          tooltipTarget.removeClass("right")
+          tooltipTarget.css
+            left: "#{bar.offsetLeft - 18}px"
+        else
+          tooltipTarget.addClass("right")
+          tooltipTarget.css
+            right: "#{parentWidth - bar.offsetLeft - 18}px"
+
     copy: ->
       $(document).on 'click', '[data-behavior~=copy]', (event) ->
         button = $(@)

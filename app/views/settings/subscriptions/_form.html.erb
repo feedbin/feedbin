@@ -19,9 +19,15 @@
                                 <div></div>
                                 <div></div>
                             </div>
-                            <div class="graph">
+                            <div class="graph" data-behavior="hide_tooltip tooltip_controller">
+                                <div class="tooltip-large hide" data-behavior="tooltip_target">
+                                    <div class="date" data-behavior="tooltip_day"></div>
+                                    <div class="count" data-behavior="tooltip_count"></div>
+                                </div>
                                 <% subscription_presenter.graph_bars.each do |data| %>
-                                   <div style="height: <%= data.percent %>%;" title="<%= subscription_presenter.bar_title(data) %>" class="<%= subscription_presenter.bar_class(data) %>"></div>
+                                    <div class="bar-sleeve" data-day="<%= data.day %>" data-count="<%= subscription_presenter.bar_count(data) %>" data-behavior="show_tooltip">
+                                        <div style="height: <%= data.percent %>%;" class="bar <%= subscription_presenter.bar_class(data) %>"></div>
+                                    </div>
                                 <% end %>
                             </div>
                             <div class="x-axis">

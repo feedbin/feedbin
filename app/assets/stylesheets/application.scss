@@ -6067,28 +6067,96 @@ Settings
                 }
                 .graph {
                     display: flex;
-                    justify-content: space-around;
-                    align-items: flex-end;
+                    align-items: stretch;
+                    flex-wrap: nowrap;
                     position: absolute;
                     top: 0;
                     left: 0;
                     bottom: 2px;
                     right: 0;
-                    flex-wrap: nowrap;
-                    div {
+                    .bar-sleeve {
+                        flex-wrap: nowrap;
+                        display: flex;
+                        align-items: flex-end;
+                        flex: 1;
+                        &:first-child .bar {
+                            margin: 0;
+                        }
+                    }
+                    .bar {
                         margin-left: 2px;
                         content: "";
                         flex: 1;
                         background-color: $color-accent-green-600;
                         min-height: 1px;
                         border-radius: 2px 2px 0 0;
-                        &:first-child {
-                            margin: 0;
-                        }
                         &.zero {
                             border-radius: 0;
                         }
                     }
+                }
+            }
+            .tooltip-large {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                @include background-color($color-contrast-100);
+                @include border($color-borders);
+                padding: 0.5rem;
+                font-size: to_rem(10);
+                border-radius: 3px;
+                white-space: nowrap;
+                opacity: 1;
+                transition: opacity .2s ease;
+                &:after {
+                    width: 0;
+                    height: 0;
+                    border: 0 solid transparent;
+                    border-left-width: 3px;
+                    border-right-width: 3px;
+                    border-top-width: 3px;
+                    @include theme("border-top-color", $color-contrast-100);
+                    content: "";
+                    display: block;
+                    position: absolute;
+                    bottom: -3px;
+                    left: 14px;
+                }
+                &:before {
+                    width: 0;
+                    height: 0;
+                    border: 0 solid transparent;
+                    border-left-width: 4px;
+                    border-right-width: 4px;
+                    border-top-width: 4px;
+                    @include theme("border-top-color", $color-borders);
+                    content: "";
+                    display: block;
+                    position: absolute;
+                    bottom: -4px;
+                    left: 13px;
+                }
+                &.right {
+                    &:after {
+                        right: 10px;
+                        left: auto;
+                    }
+                    &:before {
+                        right: 9px;
+                        left: auto;
+                    }
+                }
+                &.hide {
+                    opacity: 0;
+                }
+                .date {
+                    text-transform: uppercase;
+                    @include color($color-contrast-500);
+                    margin-bottom: .25rem;
+                }
+                .count {
+                    @include color($color-contrast-600);
+                    font-weight: bold;
                 }
             }
         }

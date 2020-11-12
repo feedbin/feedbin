@@ -6,7 +6,7 @@ class SubscriptionPresenter < BasePresenter
   end
 
   def total_posts
-    counts.sum
+    counts.last(30).sum
   end
 
   def graph_date_start
@@ -46,9 +46,9 @@ class SubscriptionPresenter < BasePresenter
     data.count == 0 ? "zero" : ""
   end
 
-  def bar_title(data)
+  def bar_count(data)
     type = subscription.feed.twitter_feed? ? "tweet" : "article"
-    "#{data.day}: #{data.count} #{type.pluralize(data.count)}"
+    @template.pluralize(data.count, type)
   end
 
   def muted_status
@@ -74,6 +74,6 @@ class SubscriptionPresenter < BasePresenter
   end
 
   def days
-    29.days
+    89.days
   end
 end
