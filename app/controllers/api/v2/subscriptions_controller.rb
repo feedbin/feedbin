@@ -50,7 +50,7 @@ module Api
 
       def create
         @user = current_user
-        feeds = FeedFinder.feeds(params[:feed_url])
+        feeds = FeedFinder.feeds(params[:feed_url], twitter_auth: @user.twitter_auth)
         if feeds.length == 0
           status_not_found
         elsif feeds.length == 1
