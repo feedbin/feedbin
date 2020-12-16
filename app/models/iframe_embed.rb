@@ -47,6 +47,9 @@ class IframeEmbed
   def fetch
     if oembed_url
       @data ||= begin
+        Rails.cache.fetch(Digest::SHA1.hexdigest("iframe_embed_counter:#{oembed_params.to_s}")) {
+          Librato.increment("iframe_embed.fetch", source: self.class.name.parameterize)
+        }
         defaults = {
           url: embed_url.to_s
         }
