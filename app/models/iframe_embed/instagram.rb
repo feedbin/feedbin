@@ -1,4 +1,4 @@
-class Embed::Instagram
+class IframeEmbed::Instagram
   attr_reader :url
 
   def initialize(url)
@@ -14,41 +14,32 @@ class Embed::Instagram
   end
 
   def author_url
-    data.dig("author_url")
+    "https://instagram.com/#{screen_name}"
   end
 
   def media_url
-    "https://instagram.com/p/#{shortcode}/media/?size=l"
+    data.dig("thumbnail_url")
   end
 
   def profile_image_url
-    page_data.scan(/"profile_pic_url":"([^"]+)","username":"#{Regexp.quote(screen_name)}"/).flatten.first
-  rescue
     nil
-  end
-
-  def content
-    data.dig("title")
   end
 
   private
 
-  OEMBED_URL = "https://api.instagram.com/oembed"
+  OEMBED_URL = "https://graph.facebook.com/v9.0/instagram_oembed"
 
   def shortcode
     @shortcode ||= URI.parse(@url).path.split("/").last
-  end
-
-  def author_id
-    data.dig("author_id")
   end
 
   def data
     @data ||= begin
       options = {
         params: {
+          access_token: ENV["FACEBOOK_ACCESS_TOKEN"],
           url: url,
-          omitscript: true
+          fields: "thumbnail_url,author_name"
         }
       }
       response = UrlCache.new(OEMBED_URL, options).body

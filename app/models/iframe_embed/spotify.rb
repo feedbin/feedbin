@@ -1,4 +1,4 @@
-class Embed::Spotify < IframeEmbed
+class IframeEmbed::Spotify < IframeEmbed
   def self.supported_urls
     [
       %r{.*?//open\.spotify\.com/embed/(track|artist)/(.*?)(#|\?|$)},

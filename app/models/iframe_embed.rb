@@ -27,6 +27,11 @@ class IframeEmbed
   def type
     data && data["type"]
   end
+    
+  # subclass should implement these
+  def channel_name; end
+  def duration; end
+  def profile_image; end
 
   def iframe_src
     url = embed_url.dup
@@ -96,13 +101,13 @@ class IframeEmbed
 
   def self.embed_sources
     [
-      Embed::Youtube,
-      Embed::Vimeo,
-      Embed::Ted,
-      Embed::Spotify,
-      Embed::Kickstarter,
-      Embed::Soundcloud,
-      Embed::Default
+      IframeEmbed::Youtube,
+      IframeEmbed::Vimeo,
+      IframeEmbed::Ted,
+      IframeEmbed::Spotify,
+      IframeEmbed::Kickstarter,
+      IframeEmbed::Soundcloud,
+      IframeEmbed::Default
     ]
   end
 

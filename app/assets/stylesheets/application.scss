@@ -4353,12 +4353,19 @@ $feed-title-width: 115px;
     @include color($color-contrast-500);
     position: relative;
     @include font-size(13);
-    padding: 10px 12px;
-    border-radius: 4px;
+    border-radius: 8px;
     margin: 1.1em 0 1.1em 0;
+    padding: 8px 16px;
+    @media (max-width: $small-breakpoint) {
+        padding: 8px;
+    }
     strong {
         font-weight: 700 !important;
     }
+}
+
+.content-styles .iframe-embed .entry-callout, .iframe-embed .entry-callout {
+    @include background-color($theme-color-midnight-100);
 }
 
 .iframe-embed {
@@ -4397,15 +4404,27 @@ $feed-title-width: 115px;
         display: flex;
         margin-top: 0;
         @include color($color-contrast-600);
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
         line-height: 1.4;
         &:hover {
             @include color($color-contrast-600, $extra: !important);
         }
     }
+    &.embed-with-image .embed-profile {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
     .embed-data {
         padding-right: base-units(2);
+    }
+    .embed-profile-image {
+        width: 68px;
+        height: 68px;
+        margin-left: auto;
+        flex-shrink: 0;
+        display: block;
+        img {
+            border-radius: 50%;
+        }
     }
     .embed-icon {
         width: 34px;
@@ -4420,7 +4439,7 @@ $feed-title-width: 115px;
             max-width: 100%;
             max-height: 100%;
             * {
-                @include fill($color-contrast-400);
+                @include fill($theme-color-midnight-400);
             }
         }
         .icon-embed-source-spotify,
@@ -4444,13 +4463,29 @@ $feed-title-width: 115px;
         }
     }
     &.embed-type-rich .embed-profile {
-        border-radius: 4px;
+        border-radius: 8px;
     }
     &.embed-type-rich {
         max-width: 300px;
         .image-wrap {
             padding-top: 100%;
         }
+    }
+    .embed-duration {
+        display: none;
+        position: absolute;
+        right: 16px;
+        bottom: 16px;
+        text-align: right;
+        padding: 8px;
+        line-height: 1;
+        border-radius: 8px;
+        z-index: 1;
+        font-weight: bold !important;
+        background-color: rgba(black, .3);
+        backdrop-filter: blur(8px);
+        @include font-size(14);
+        @include color($theme-color-midnight-700);
     }
     .play-button {
         display: none;
@@ -4492,6 +4527,9 @@ $feed-title-width: 115px;
             display: block;
             padding-top: 56.25%;
         }
+        &:not(.loaded) .embed-duration {
+            display: inline-block;
+        }
         &:not(.loaded) .image-wrap:hover .play-button {
             display: block;
             .touch & {
@@ -4503,11 +4541,17 @@ $feed-title-width: 115px;
         font-weight: bold !important;
         @include font-size(14);
         display: block;
+        @include color($theme-color-midnight-700);
+    }
+    .embed-subhead {
+        @include font-size(14);
+        display: block;
+        @include color($theme-color-midnight-700);
     }
     .embed-subtitle {
         @include font-size(14);
         display: block;
-        @include color($color-contrast-500);
+        @include color($theme-color-midnight-500);
     }
 
 }

@@ -1,4 +1,4 @@
-class Embed::Twitter
+class IframeEmbed::Twitter
   attr_reader :url
 
   def initialize(url)

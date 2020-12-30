@@ -1,4 +1,4 @@
-class Embed::Default < IframeEmbed
+class IframeEmbed::Default < IframeEmbed
   def fetch
     @page ||= begin
       UrlCache.new(canonical_url)
@@ -6,13 +6,9 @@ class Embed::Default < IframeEmbed
   end
 
   def title
-    doc = Nokogiri::HTML5(@page.body)
-    title = doc.css("title")
-    if title.present?
-      title.first.text
-    else
-      "Embed"
-    end
+    doc = Nokogiri::HTML5(@page.body) rescue nil
+    title = doc&.css("title")
+    title&.first&.text || "Embed"
   end
 
   def type
@@ -20,7 +16,7 @@ class Embed::Default < IframeEmbed
   end
 
   def subtitle
-    "Embed from #{embed_url.host.split(".").last(2).join(".")}"
+    embed_url.host.split(".").last(2).join(".")
   end
 
   def canonical_url

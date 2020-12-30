@@ -72,7 +72,7 @@ class Feed < ApplicationRecord
   end
 
   def icon
-    options.dig("json_feed", "icon")
+    options.dig("json_feed", "icon") || options.dig("icon")
   end
 
   def self.create_from_parsed_feed(parsed_feed)

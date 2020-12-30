@@ -22,7 +22,7 @@ WebMock.disable_net_connect!(allow_localhost: true, allow: "codeclimate.com")
 
 unless ENV["CI"]
   ENV["REDIS_URL"] = "redis://localhost:7776"
-  redis_test_instance = IO.popen("redis-server --port 7776")
+  redis_test_instance = IO.popen("redis-server --port 7776 --save ''")
   Minitest.after_run do
     Process.kill("INT", redis_test_instance.pid)
   end

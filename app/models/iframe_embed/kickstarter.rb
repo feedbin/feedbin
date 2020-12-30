@@ -1,4 +1,4 @@
-class Embed::Kickstarter < IframeEmbed
+class IframeEmbed::Kickstarter < IframeEmbed
   def self.supported_urls
     [
       %r{.*?//www\.kickstarter\.com/projects/(.*?)/(.*?)/widget/video\.html}
