@@ -39,7 +39,7 @@ COMMENT ON EXTENSION pg_stat_statements IS 'track execution statistics of all SQ
 
 SET default_tablespace = '';
 
-SET default_with_oids = false;
+SET default_table_access_method = heap;
 
 --
 -- Name: actions; Type: TABLE; Schema: public; Owner: -
@@ -264,6 +264,40 @@ CREATE SEQUENCE public.devices_id_seq
 --
 
 ALTER SEQUENCE public.devices_id_seq OWNED BY public.devices.id;
+
+
+--
+-- Name: embeds; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.embeds (
+    id bigint NOT NULL,
+    provider_id text NOT NULL,
+    parent_id text,
+    source integer NOT NULL,
+    data jsonb NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: embeds_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.embeds_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: embeds_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.embeds_id_seq OWNED BY public.embeds.id;
 
 
 --
@@ -1174,6 +1208,13 @@ ALTER TABLE ONLY public.devices ALTER COLUMN id SET DEFAULT nextval('public.devi
 
 
 --
+-- Name: embeds id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.embeds ALTER COLUMN id SET DEFAULT nextval('public.embeds_id_seq'::regclass);
+
+
+--
 -- Name: entries id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1395,6 +1436,14 @@ ALTER TABLE ONLY public.deleted_users
 
 ALTER TABLE ONLY public.devices
     ADD CONSTRAINT devices_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: embeds embeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.embeds
+    ADD CONSTRAINT embeds_pkey PRIMARY KEY (id);
 
 
 --
@@ -1657,6 +1706,20 @@ CREATE UNIQUE INDEX index_devices_on_lower_tokens ON public.devices USING btree 
 --
 
 CREATE INDEX index_devices_on_user_id ON public.devices USING btree (user_id);
+
+
+--
+-- Name: index_embeds_on_parent_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_embeds_on_parent_id ON public.embeds USING btree (parent_id);
+
+
+--
+-- Name: index_embeds_on_source_and_provider_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_embeds_on_source_and_provider_id ON public.embeds USING btree (source, provider_id);
 
 
 --
@@ -2376,6 +2439,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200113101112'),
 ('20200708130351'),
 ('20200730134217'),
-('20200810160825');
+('20200810160825'),
+('20201230004844');
 
 
