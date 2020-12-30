@@ -343,6 +343,7 @@ GEM
       railties (>= 3.0)
     libv8 (8.4.255.0)
     libv8 (8.4.255.0-x86_64-darwin-20)
+    libv8 (8.4.255.0-x86_64-linux)
     listen (3.2.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -570,6 +571,7 @@ GEM
 PLATFORMS
   ruby
   x86_64-darwin-20
+  x86_64-linux
 
 DEPENDENCIES
   activerecord-import
@@ -656,4 +658,4 @@ DEPENDENCIES
   will_paginate
 
 BUNDLED WITH
-   2.2.2
+   2.2.3
