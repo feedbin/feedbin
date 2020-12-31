@@ -1,5 +1,6 @@
 class HarvestEmbeds
   include Sidekiq::Worker
+  sidekiq_options retry: false
   
   def perform(entry_id)
     entry = Entry.find(entry_id)

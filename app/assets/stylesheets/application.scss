@@ -4369,6 +4369,9 @@ $feed-title-width: 115px;
 }
 
 .iframe-embed {
+    a:hover {
+        text-decoration: none;
+    }
     .image-wrap {
         display: block;
         position: relative;
