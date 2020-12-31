@@ -3,6 +3,8 @@ class HarvestEmbeds
   sidekiq_options retry: false
   
   def perform(entry_id)
+    return
+    
     entry = Entry.find(entry_id)
     items = []
     
