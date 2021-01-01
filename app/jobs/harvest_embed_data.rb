@@ -48,7 +48,7 @@ class HarvestEmbedData
   def update_feed_icons(ids)
     channel_ids = Embed.youtube_video.where(provider_id: ids).pluck(:parent_id)
     channels = Embed.youtube_channel.where(provider_id: channel_ids).distinct
-    channels.each do |channel, array|
+    channels.each do |channel|
       if feed = Feed.find_by_feed_url("https://www.youtube.com/feeds/videos.xml?channel_id=#{channel.provider_id}")
         options = feed.options
         options["icon"] = channel.data.dig("snippet", "thumbnails", "default", "url")
