@@ -27,11 +27,15 @@ class IframeEmbed
   def type
     data && data["type"]
   end
-    
+
   # subclass should implement these
   def channel_name; end
   def duration; end
   def profile_image; end
+
+  def cache_key
+    "v1"
+  end
 
   def iframe_src
     url = embed_url.dup

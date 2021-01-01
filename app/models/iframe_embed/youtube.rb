@@ -27,7 +27,7 @@ class IframeEmbed::Youtube < IframeEmbed
   def canonical_url
     "https://youtu.be/#{provider_id}"
   end
-  
+
   def provider_id
     embed_url_data[1]
   end
@@ -43,17 +43,17 @@ class IframeEmbed::Youtube < IframeEmbed
   def oembed_params
     {url: canonical_url, format: "json"}
   end
-  
+
   def channel_name
     channel && channel.data.dig("snippet", "title")
   end
-  
+
   def duration
     if seconds = duration_in_seconds
       hours = seconds / (60 * 60)
       minutes = (seconds / 60) % 60
       seconds = seconds % 60
-      
+
       parts = [minutes, seconds]
       parts.unshift(hours) unless hours == 0
       parts.map {|part| part.to_s.rjust(2, "0") }.join(":")
@@ -63,9 +63,13 @@ class IframeEmbed::Youtube < IframeEmbed
   def profile_image
     channel && channel.data.dig("snippet", "thumbnails", "medium", "url")
   end
-  
+
+  def cache_key
+    video && video.updated_at.to_i || super
+  end
+
   private
-  
+
   def duration_in_seconds
     if duration = video && video.data.dig("contentDetails", "duration")
       match = duration.match %r{^P(?:|(?<weeks>\d*?)W)(?:|(?<days>\d*?)D)(?:|T(?:|(?<hours>\d*?)H)(?:|(?<min>\d*?)M)(?:|(?<sec>\d*?)S))$}
@@ -77,16 +81,16 @@ class IframeEmbed::Youtube < IframeEmbed
       (((((weeks * 7) + days) * 24 + hours) * 60) + minutes) * 60 + seconds
     end
   end
-  
+
   def channel
-    if @channel.nil? 
+    if @channel.nil?
       @channel = video && video&.channel || false
     end
     @channel
   end
-  
+
   def video
-    if @video.nil? 
+    if @video.nil?
       @video = Embed.youtube_video.find_by_provider_id(provider_id) || false
     end
     @video
