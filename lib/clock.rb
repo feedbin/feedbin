@@ -15,6 +15,10 @@ every(1.minutes, "clockwork.frequent") do
   if RedisLock.acquire("clockwork:feed:refresher:scheduler:v2")
     FeedRefresherScheduler.perform_async
   end
+
+  if RedisLock.acquire("clockwork:harvest:embed:data")
+    HarvestEmbedData.perform_async
+  end
 end
 
 every(1.day, "clockwork.daily", at: "7:00", tz: "UTC") do
