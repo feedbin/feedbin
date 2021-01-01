@@ -42,13 +42,17 @@ class HarvestEmbedData
     end
 
     Embed.import(items, on_duplicate_key_update: {conflict_target: [:source, :provider_id], columns: [:data]}) if items.present?
+
+    update_feed_icons(ids)
   end
 
-  def update_feed_icons(channels)
-    channels.dig("items")&.each do |item, array|
-      if feed = Feed.find_by_feed_url("https://www.youtube.com/feeds/videos.xml?channel_id=#{item.dig("id")}")
+  def update_feed_icons(ids)
+    channel_ids = Embed.youtube_video.where(provider_id: ids).pluck(:parent_id)
+    channels = Embed.youtube_channel.where(provider_id: channel_ids).distinct
+    channels.each do |channel, array|
+      if feed = Feed.find_by_feed_url("https://www.youtube.com/feeds/videos.xml?channel_id=#{channel.provider_id}")
         options = feed.options
-        options["icon"] = item.dig("snippet", "thumbnails", "default", "url")
+        options["icon"] = channel.data.dig("snippet", "thumbnails", "default", "url")
         feed.update(options: options)
       end
     end
