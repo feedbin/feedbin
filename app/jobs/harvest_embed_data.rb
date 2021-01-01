@@ -38,7 +38,6 @@ class HarvestEmbedData
       items.concat(channels.dig("items")&.map { |item|
         Embed.new(data: item, provider_id: item.dig("id"), source: :youtube_channel)
       })
-      update_feed_icons(channels)
     end
 
     Embed.import(items, on_duplicate_key_update: {conflict_target: [:source, :provider_id], columns: [:data]}) if items.present?
