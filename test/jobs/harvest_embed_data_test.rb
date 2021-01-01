@@ -1,17 +1,13 @@
 require "test_helper"
 
 class HarvestEmbedDataTest < ActiveSupport::TestCase
-  setup do
 
   test "should create embed records" do
     Sidekiq.redis {|r| r.sadd(HarvestEmbeds::SET_NAME, "id") }
-
     stub_youtube_api
-
     assert_difference "Embed.count", +2 do
       HarvestEmbedData.new.perform
     end
-
   end
 
   def stub_youtube_api
