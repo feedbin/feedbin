@@ -24,6 +24,8 @@ class Feed < ApplicationRecord
 
   enum feed_type: {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3, pages: 4}
 
+  store :settings, accessors: [:custom_icon], coder: JSON
+
   def twitter_user?
     twitter_user.present?
   end
@@ -72,7 +74,7 @@ class Feed < ApplicationRecord
   end
 
   def icon
-    options.dig("json_feed", "icon") || options.dig("icon")
+    options.dig("json_feed", "icon") || custom_icon
   end
 
   def self.create_from_parsed_feed(parsed_feed)

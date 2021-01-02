@@ -440,7 +440,8 @@ CREATE TABLE public.feeds (
     feed_type bigint DEFAULT 0,
     active boolean DEFAULT true,
     options json,
-    hubs text[]
+    hubs text[],
+    settings jsonb
 );
 
 
@@ -2440,6 +2441,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200708130351'),
 ('20200730134217'),
 ('20200810160825'),
-('20201230004844');
+('20201230004844'),
+('20210102005228');
 
 
