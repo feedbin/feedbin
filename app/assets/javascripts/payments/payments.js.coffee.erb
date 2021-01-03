@@ -135,7 +135,6 @@ class feedbin.Payments
       output[plan.id] = @stripe.paymentRequest
         country: "US"
         currency: "usd"
-        requestPayerName: true
         total:
             label: "Feedbin #{plan.name} Subscription"
             amount: plan.amount
