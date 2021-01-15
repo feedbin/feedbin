@@ -20,7 +20,7 @@ class NewsletterEntry
   end
 
   def subscribe
-    user.subscriptions.find_or_create_by(feed: feed)
+    user.subscriptions.create_with(view_mode: :newsletter).find_or_create_by(feed: feed)
   end
 
   def tag
