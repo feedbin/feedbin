@@ -8481,7 +8481,7 @@ Bigfoot
 .footnote-circle {
     @include fill($color-icons);
 }
-.bigfoot-footnote__content, .bigfoot-footnote__tooltip {
+.bigfoot-footnote__wrapper, .bigfoot-footnote__content, .bigfoot-footnote__tooltip {
     background-color: map-get($color-contrast-100, day);
     color: map-get($color-contrast-700, day);
     line-height: 1.6;
@@ -8500,10 +8500,22 @@ Bigfoot
 .theme-dusk .bigfoot-footnote a, .theme-midnight .bigfoot-footnote a {
 	color: black !important;
 }
+.theme-auto .bigfoot-footnote a {
+    @media (prefers-color-scheme: dark) {
+    	color: black !important;
+    }
+}
 .theme-dusk .bigfoot-footnote a:hover, .theme-midnight .bigfoot-footnote a:hover {
     @include color($color-selected, $extra: !important);
     text-decoration: underline !important;
 }
+.theme-auto .bigfoot-footnote a:hover {
+    @media (prefers-color-scheme: dark) {
+        @include color($color-selected, $extra: !important);
+        text-decoration: underline !important;
+    }
+}
+
 
 /*------------------------------------------------------------------------------
 Media Queries
