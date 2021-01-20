@@ -90,15 +90,19 @@
                                 <a href="<%= subscription.feed.site_url %>" class="extra-muted"><span><%= short_url(subscription.feed.site_url) %></span></a>
                             </td>
                         </tr>
+                        <% end %>
                         <tr>
                             <td>
-                                Feed
+                                <% if subscription.feed.twitter_feed? %>
+                                    Source
+                                <% else %>
+                                    Feed
+                                <% end %>
                             </td>
                             <td>
                                 <a href="<%= subscription.feed.feed_url %>" class="extra-muted"><span><%= short_url(subscription.feed.feed_url) %></span></a>
                             </td>
                         </tr>
-                        <% end %>
                     </tbody>
                 </table>
             </div>
