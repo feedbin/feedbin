@@ -1,9 +1,7 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
-  config.hosts << "feedbin.resolv.app"
-  config.hosts << "api.feedbin.resolv.app"
-  config.hosts << "feedbin.mac.resolv.app"
+  config.hosts = ENV["FEEDBIN_HOST"]&.split(",")
 
   # In the development environment your application's code is reloaded on
   # every request. This slows down response time but is perfect for development
