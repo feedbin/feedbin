@@ -58,7 +58,6 @@ class SafariPushNotificationSend
 
   def format_text(string, max_bytes)
     if string.present?
-      string = CGI.unescapeHTML(string)
       string = ApplicationController.helpers.sanitize(string, tags: []).squish.mb_chars
       omission = if string.length > max_bytes
         "…"
@@ -66,7 +65,8 @@ class SafariPushNotificationSend
         ""
       end
       string = string.limit(max_bytes).to_s
-      string = string + omission
+      string = string.strip + omission
+      string = CGI.unescapeHTML(string)
     end
     string
   end
