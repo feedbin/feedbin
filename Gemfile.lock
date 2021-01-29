@@ -49,8 +49,8 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/grocer-pushpackager.git
-  revision: 6309711a3dc007a322a0d84eb729dc60af8eda1e
-  branch: feedbin
+  revision: 6b01b4e4e71af26edf55f095251366294527afaf
+  ref: 6b01b4e
   specs:
     grocer-pushpackager (0.0.1)
       rubyzip
