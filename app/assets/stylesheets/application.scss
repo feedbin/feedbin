@@ -1598,9 +1598,12 @@ Structure
 
 .app-wrap {
     display: flex;
-    height: 100vh;
     overflow: hidden;
     align-items: flex-start;
+    height: 100%;
+    .native & {
+        height: 100vh;
+    }
     .feeds-column,
     .entries-column {
         flex-grow: 0;
