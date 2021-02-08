@@ -55,7 +55,11 @@ class Share::Pocket < Share::Service
       Honeybadger.notify(
         error_class: "Share::Pocket#response_valid?",
         error_message: "response invalid",
-        parameters: {code: response.code, body: response.body}
+        parameters: {
+          code: response.code,
+          body: response.body,
+          headers: response.headers
+        }
       )
       raise OAuth::Unauthorized
     end
