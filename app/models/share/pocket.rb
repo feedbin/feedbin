@@ -52,6 +52,11 @@ class Share::Pocket < Share::Service
       valid = true
       @access_token = response.parsed_response["access_token"]
     elsif response.code != 403
+      Honeybadger.notify(
+        error_class: "Share::Pocket#response_valid?",
+        error_message: "response invalid",
+        parameters: {code: response.code, body: response.body}
+      )
       raise OAuth::Unauthorized
     end
     valid

@@ -66,7 +66,7 @@ class SupportedSharingServicesController < ApplicationController
     else
       redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{service_info[:label]}."
     end
-  rescue OAuth => e
+  rescue OAuth::Unauthorized => e
     Honeybadger.notify(
       error_class: "SupportedSharingServicesController#oauth_response",
       error_message: "#{service_info[:label]} failure",
