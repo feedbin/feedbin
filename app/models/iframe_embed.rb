@@ -5,7 +5,7 @@ class IframeEmbed
 
   def initialize(embed_url)
     @embed_url = URI(embed_url)
-    @embed_url.scheme ||= "http"
+    @embed_url.scheme = "https"
   end
 
   def title
