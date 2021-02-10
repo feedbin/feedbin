@@ -278,7 +278,7 @@ GEM
       oauth (>= 0.4.1)
     excon (0.79.0)
     execjs (2.7.0)
-    faker (2.15.1)
+    faker (2.16.0)
       i18n (>= 1.6, < 2)
     faraday (0.17.4)
       multipart-post (>= 1.2, < 3)
