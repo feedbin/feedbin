@@ -15,7 +15,7 @@ module Searchable
     DATE_UNBOUNDED_REGEX = /published:[<>=+].*?(?=\s|$)|updated:[<>=+].*?(?=\s|$)/
 
     search_settings = {
-      "number_of_shards": 16,
+      "number_of_shards": 12,
       "analysis": {
         "analyzer": {
           "lower_exact": {
