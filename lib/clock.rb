@@ -9,6 +9,10 @@ every(10.seconds, "clockwork.very_frequent") do
   if RedisLock.acquire("clockwork:send_stats:v3", 8)
     SendStats.perform_async
   end
+
+  if RedisLock.acquire("clockwork:warm_cache")
+    WarmCache.perform_async(nil, true)
+  end
 end
 
 every(1.minutes, "clockwork.frequent") do
@@ -18,7 +22,6 @@ every(1.minutes, "clockwork.frequent") do
 
   if RedisLock.acquire("clockwork:harvest:embed:data")
     HarvestEmbedData.perform_async
-    WarmCache.perform_async(nil, true)
   end
 end
 
