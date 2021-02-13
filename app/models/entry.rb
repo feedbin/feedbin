@@ -214,7 +214,7 @@ class Entry < ApplicationRecord
   end
 
   def self.entries_list
-    select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at)
+    select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings)
   end
 
   def self.include_unread_entries(user_id)
