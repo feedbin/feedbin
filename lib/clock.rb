@@ -10,7 +10,7 @@ every(10.seconds, "clockwork.very_frequent") do
     SendStats.perform_async
   end
 
-  if RedisLock.acquire("clockwork:warm_cache")
+  if RedisLock.acquire("clockwork:warm_cache", 8)
     WarmCache.perform_async(nil, true)
   end
 end
