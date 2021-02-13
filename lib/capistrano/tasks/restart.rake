@@ -7,12 +7,15 @@ namespace :deploy do
       rescue SSHKit::Command::Failed
         execute :sudo, "/etc/init.d/unicorn", :start
       end
+    end
 
+    on roles :background do
       begin
         execute :sudo, :systemctl, :restart, "feedbin.target"
       rescue SSHKit::Command::Failed
         execute :sudo, :systemctl, :start, "feedbin.target"
       end
     end
+
   end
 end

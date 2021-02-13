@@ -18,6 +18,7 @@ every(1.minutes, "clockwork.frequent") do
 
   if RedisLock.acquire("clockwork:harvest:embed:data")
     HarvestEmbedData.perform_async
+    WarmCache.perform_async(nil, true)
   end
 end
 
