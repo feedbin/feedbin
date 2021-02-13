@@ -7,7 +7,7 @@ $('.modal').modal('hide')
     feedbin.scrollTo(target, $('.feeds'));
     target.click();
     feedbin.data.user_titles[<%= @subscription.feed_id %>] = "<%= j @subscription.title %>";
-    feedbin.applyUserTitles();
+    feedbin.applyUserTitles(false);
 <% else %>
     $('[data-behavior~=user_title]').text("<%= j @subscription.title %>");
 <% end %>
