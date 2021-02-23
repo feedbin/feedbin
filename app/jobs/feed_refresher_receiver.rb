@@ -55,6 +55,9 @@ class FeedRefresherReceiver
 
         Librato.increment("entry.update")
       end
+    elsif original_entry.nil?
+      Sidekiq.logger.info "Unknown entry #{entry["public_id"]}"
+      Librato.increment("entry.update_issue")
     end
   end
 
