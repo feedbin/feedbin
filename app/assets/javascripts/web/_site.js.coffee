@@ -1709,9 +1709,13 @@ $.extend feedbin,
 
     entriesLoading: ->
       $(document).on 'click', '[data-behavior~=feed_link]', (event) ->
+        feedId = $(@).data('feed-id')
         $(".entries").addClass("loading")
         title = $(".collection-label-wrap", @).text()
-        $("[data-behavior~=entries_header] .feed-title-wrap").text(title)
+        titleContainer = $("[data-behavior~=entries_header] .feed-title-wrap [data-behavior~=user_title]")
+        titleContainer.text(title)
+        if feedId
+          titleContainer.data('feed-id', feedId)
         true
 
     feedSelected: ->

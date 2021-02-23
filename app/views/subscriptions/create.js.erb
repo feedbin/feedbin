@@ -4,6 +4,7 @@ feedbin.hideSubscribe();
 <% @subscriptions.each do |subscription| %>
     <% if subscription.title.present? %>
         feedbin.data.user_titles[<%= subscription.feed_id %>] = '<%= j subscription.title %>';
+        feedbin.applyUserTitles(false);
     <% end %>
 <% end %>
 

@@ -9,7 +9,7 @@
     <% end %>
 <% else %>
     <span class="feed-title-wrap">
-        <%= @collection_title %>
+        <span data-behavior="user_title"><%= @collection_title %></span>
     </span>
 <% end %>
 <button class="search-button" data-behavior="toggle_search"><%= svg_tag "icon-search", size: "16x16" %></button>
