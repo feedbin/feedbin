@@ -3,6 +3,7 @@ class FeedRefresherReceiver
   sidekiq_options queue: :feed_refresher_receiver
 
   def perform(params)
+    Sidekiq.logger.info "feed_id=#{params["feed"]["id"]}"
     feed = Feed.find(params["feed"]["id"])
     if params["entries"].present?
       params["entries"].each do |entry|
@@ -14,15 +15,19 @@ class FeedRefresherReceiver
             create_entry(entry, feed)
           end
         rescue ActiveRecord::RecordNotUnique
+          Sidekiq.logger.info "duplicate public_id=#{entry["public_id"]}"
           FeedbinUtils.update_public_id_cache(entry["public_id"], entry["content"], entry.dig("data", "public_id_alt"))
           Librato.increment "entry.record_not_unique"
-        rescue => error
-          message = update ? "update" : "create"
-          Honeybadger.notify(
-            error_class: "FeedRefresherReceiver#" + message,
-            error_message: "Entry #{message} failed",
-            parameters: {feed_id: feed.id, entry: entry, exception: error, backtrace: error.backtrace}
-          )
+        rescue => exception
+          Sidekiq.logger.info "exception=#{exception.message} public_id=#{entry["public_id"]}"
+          unless exception.message =~ /Validation failed/i
+            message = update ? "update" : "create"
+            Honeybadger.notify(
+              error_class: "FeedRefresherReceiver#" + message,
+              error_message: "Entry #{message} failed",
+              parameters: {feed_id: feed.id, entry: entry, exception: exception, backtrace: exception.backtrace}
+            )
+          end
         end
       end
     end
@@ -56,7 +61,7 @@ class FeedRefresherReceiver
         Librato.increment("entry.update")
       end
     elsif original_entry.nil?
-      Sidekiq.logger.info "Unknown entry #{entry["public_id"]}"
+      Sidekiq.logger.info "unknown update public_id=#{entry["public_id"]}"
       Librato.increment("entry.update_issue")
     end
   end
@@ -119,7 +124,9 @@ class FeedRefresherReceiver
     else
       threader = Threader.new(entry, feed)
       if !threader.thread
+        Sidekiq.logger.info "creating public_id=#{entry["public_id"]}"
         feed.entries.create!(entry)
+        Sidekiq.logger.info "created public_id=#{entry["public_id"]}"
         Librato.increment("entry.create")
       else
         Librato.increment("entry.thread")
