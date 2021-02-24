@@ -3996,18 +3996,19 @@ $feed-title-width: 115px;
 }
 
 .link-actions {
-    z-index: 100;
     display: inline-block;
-    position: absolute;
     content: "";
     height: 16px;
     width: 28px;
     border-radius: 8px;
     cursor: pointer;
-    margin-right: -18px;
     background-size: 80% 80%;
-    bottom: 1px;
-    @include background-color($color-icons);
+    opacity: 1;
+    transition: opacity .15s ease;
+    @include background-color($color-contrast-500);
+    &:not([x-placement]) {
+        display: none !important;
+    }
     > svg {
         position: absolute;
         top: 6px;
@@ -4020,6 +4021,10 @@ $feed-title-width: 115px;
     }
     ul {
         margin: 0 !important;
+    }
+    &.hide {
+        display: inline-block;
+        opacity: 0;
     }
 }
 

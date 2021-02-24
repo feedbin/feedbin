@@ -1331,7 +1331,6 @@ $.extend feedbin,
   loadLink: (href) ->
     feedbin.showModal("view_link");
     $.get(feedbin.data.modal_extracts_path, {url: href});
-    $('.entry-final-content a [data-behavior~=link_actions]').remove()
 
   updateFeedSearchMessage: ->
     length = $('[data-behavior~=subscription_option] [data-behavior~=check_toggle]:checked').length
@@ -1786,12 +1785,16 @@ $.extend feedbin,
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=add_to_pages]', (event) ->
-        href = $(@).parents("a:first").attr('href')
+        tooltip = $(@).closest("[data-behavior~=link_actions]")
+        tooltip.addClass('hide')
+        href = tooltip.data('url')
         $.post(feedbin.data.pages_internal_path, {url: href});
         event.preventDefault()
 
       $(document).on 'click', '[data-behavior~=view_link]', (event) ->
-        href = $(@).parents("a:first").attr('href')
+        tooltip = $(@).closest("[data-behavior~=link_actions]")
+        tooltip.addClass('hide')
+        href = tooltip.data('url')
         if feedbin.data.view_links_in_app
           window.open(href, '_blank');
         else
@@ -2353,40 +2356,75 @@ $.extend feedbin,
         feedbin.updateFeedSearchMessage()
 
     linkActionsHover: ->
+      cacheLink = (url) ->
+        form = $("[data-behavior~=extract_cache_form]")
+        $("#url", form).val(url)
+        form.submit()
+
+      hideLinkActions = (url) ->
+        if url of feedbin.linkActions
+          tooltip = feedbin.linkActions[url].tooltip
+          feedbin.linkActions[url].linkMenuTimer = setTimeout ( ->
+            if url of feedbin.linkActions && !tooltip.is(':hover')
+              tooltip.addClass('hide')
+              tooltip.removeClass('open')
+              feedbin.linkActions[url].linkMenuCleanup = setTimeout ->
+                tooltip.remove()
+                feedbin.linkActions[url].popper.destroy() if feedbin.linkActions[url].popper
+                delete feedbin.linkActions[url]
+              , 150
+          ), 350
+
+      showLinkActions = (url, link) ->
+        if url of feedbin.linkActions && !feedbin.linkActions[url].visible
+          tooltip = feedbin.linkActions[url].tooltip
+          $('body').append(tooltip)
+          position = link[0].getClientRects()
+          lastLine = position[position.length - 1]
+          offset = (lastLine.width + tooltip.outerWidth()) * -1
+          options =
+            placement: 'right-end'
+            modifiers:
+              preventOverflow:
+                enabled: false
+              offset:
+                offset: "-2, #{offset}"
+
+          feedbin.linkActions[url].visible = true
+          feedbin.linkActions[url].popper = new Popper(link, tooltip, options)
+          tooltip.removeClass('hide')
+
+      $(document).on 'mouseleave', '[data-behavior~=link_actions]', (event) ->
+        hideLinkActions($(@).data('url'))
+
       $(document).on 'mouseenter mouseleave', 'body:not(.touch) .entry-final-content a', (event) ->
         link = $(@)
         if link.text().trim().length > 0 && !$(@).has('.mejs__container').length > 0 && !link.closest(".system-content").length && !link.closest(".bigfoot-footnote").length
           url = link.attr('href')
+          tooltip = $('[data-behavior~=link_actions_template] [data-behavior~=link_actions]').clone()
+          tooltip.data('url', url)
 
           unless url of feedbin.linkActions
             feedbin.linkActions[url] =
               linkActionsTimer: null
               linkCacheTimer: null
               linkMenuTimer: null
+              linkMenuCleanup: null
+              visible: false
+              popper: null
+              tooltip: tooltip
 
           clearTimeout(feedbin.linkActions[url].linkActionsTimer)
           clearTimeout(feedbin.linkActions[url].linkCacheTimer)
           clearTimeout(feedbin.linkActions[url].linkMenuTimer)
+          clearTimeout(feedbin.linkActions[url].linkMenuCleanup)
 
           if event.type == "mouseleave"
-            feedbin.linkActions[url].linkMenuTimer = setTimeout ( ->
-              $('.entry-final-content a [data-behavior~=link_actions]').remove()
-              delete feedbin.linkActions[url]
-            ), 350
+            hideLinkActions(url)
 
           if event.type == "mouseenter"
-            feedbin.linkActions[url].linkCacheTimer = setTimeout ( ->
-              form = $("[data-behavior~=extract_cache_form]")
-              $("#url", form).val(url)
-              form.submit()
-            ), 100
-            feedbin.linkActions[url].linkActionsTimer = setTimeout ( ->
-              actionsVisible = link.find('[data-behavior~=link_actions]').length > 0
-              if !actionsVisible
-                contents = $('[data-behavior~=link_actions]').clone()
-                contents = contents[0].outerHTML
-                link.append(contents)
-            ), 400
+            feedbin.linkActions[url].linkCacheTimer = setTimeout((-> cacheLink(url)), 100)
+            feedbin.linkActions[url].linkActionsTimer = setTimeout((-> showLinkActions(url, link)), 400)
 
     loadLinksInApp: ->
       $(document).on 'click', '[data-behavior~=entry_final_content] a', (event) ->

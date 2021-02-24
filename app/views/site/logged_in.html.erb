@@ -132,8 +132,9 @@
     <%= render partial: "shared/modals/search" %>
     <%= render partial: "shared/readability_loading" %>
     <%= render partial: "shared/saved_searches_count" %>
-    <%= render partial: 'shared/format' %>
-
+    <%= render partial: "shared/format" %>
+    <%= render partial: "shared/link_actions" %>
+    
     <%= form_tag(cache_extracts_path, method: :get, class: 'hide', remote: true, data: {behavior: 'extract_cache_form'}) do %>
         <%= hidden_field_tag 'url', nil %>
     <% end %>
