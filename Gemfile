@@ -89,5 +89,5 @@ group :development, :test do
   gem "selenium-webdriver"
   gem "standard"
   gem "stripe-ruby-mock", "= 2.5.0", require: "stripe_mock"
-  gem "webmock", "= 3.8.0"
+  gem "webmock", "3.11.3"
 end
