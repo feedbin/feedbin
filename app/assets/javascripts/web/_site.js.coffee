@@ -2362,23 +2362,23 @@ $.extend feedbin,
         form.submit()
 
       hideLinkActions = (url) ->
-        if url of feedbin.linkActions
-          tooltip = feedbin.linkActions[url].tooltip
-          feedbin.linkActions[url].linkMenuTimer = setTimeout ( ->
-            if url of feedbin.linkActions && !tooltip.is(':hover')
-              tooltip.addClass('hide')
-              tooltip.removeClass('open')
-              feedbin.linkActions[url].linkMenuCleanup = setTimeout ->
+          hideTooltip = ->
+            if url of feedbin.linkActions
+              tooltip = feedbin.linkActions[url].tooltip
+              if url of feedbin.linkActions && !tooltip.is(':hover')
+                tooltip.addClass('hide')
+                tooltip.removeClass('open')
                 tooltip.remove()
                 feedbin.linkActions[url].popper.destroy() if feedbin.linkActions[url].popper
                 delete feedbin.linkActions[url]
-              , 150
-          ), 350
+
+          feedbin.linkActions[url].linkMenuTimer = setTimeout hideTooltip, 350
 
       showLinkActions = (url, link) ->
         if url of feedbin.linkActions && !feedbin.linkActions[url].visible
           tooltip = feedbin.linkActions[url].tooltip
           $('body').append(tooltip)
+          tooltip.removeClass('hide')
           position = link[0].getClientRects()
           lastLine = position[position.length - 1]
           offset = (lastLine.width + tooltip.outerWidth()) * -1
@@ -2392,7 +2392,6 @@ $.extend feedbin,
 
           feedbin.linkActions[url].visible = true
           feedbin.linkActions[url].popper = new Popper(link, tooltip, options)
-          tooltip.removeClass('hide')
 
       $(document).on 'mouseleave', '[data-behavior~=link_actions]', (event) ->
         hideLinkActions($(@).data('url'))
