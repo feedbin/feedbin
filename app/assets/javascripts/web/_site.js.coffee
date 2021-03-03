@@ -1626,7 +1626,7 @@ $.extend feedbin,
 
     cancelFeedRequest: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event, xhr) ->
-        if $(event.target).is("[data-behavior~=feed_action_parent]")
+        if $(event.target).is("[data-behavior~=feed_action_parent]") || $(event.target).is("[data-behavior~=rename_form]")
           return
 
         if feedbin.feedXhr
