@@ -1524,28 +1524,23 @@ $.extend feedbin,
           form.append(input)
           form.append(methodInput)
 
-          title.addClass('hide')
-          target.append(form)
+          target.closest('li').append(form)
+
           input.select()
+
+      $(document).on 'submit', '[data-behavior~=rename_form]', (event, xhr) ->
+        input = $(@).find('[data-behavior~=rename_input]')
+        container = $(@).closest('li').find('> [data-behavior~=renamable]')
+        title = container.find('[data-behavior~=rename_title]')
+        target = container.find('[data-behavior~=rename_target]')
+        target.data('title', input.val())
+        title.text(input.val())
+        $('[data-behavior~=rename_form]').remove()
+        $('[data-behavior~=rename_title]').removeClass('hide')
 
       $(document).on 'blur', '[data-behavior~=rename_input]', (event) ->
         $('[data-behavior~=rename_form]').remove()
         $('[data-behavior~=rename_title]').removeClass('hide')
-
-      $(document).on 'submit', '[data-behavior~=rename_form]', (event, xhr) ->
-        container = $(@).closest('[data-behavior~=renamable]')
-        title = container.find('[data-behavior~=rename_title]')
-        input = container.find('[data-behavior~=rename_input]')
-        target = container.find('[data-behavior~=rename_target]')
-        target.data('title', input.val())
-        title.text(input.val())
-
-        $('[data-behavior~=rename_form]').remove()
-        $('[data-behavior~=rename_title]').removeClass('hide')
-
-      $(document).on 'click', '[data-behavior~=rename_input]', (event) ->
-        event.stopPropagation()
-        event.preventDefault()
 
       $(document).on 'click', '[data-behavior~=open_item]', (event) ->
         unless $(event.target).is('[data-behavior~=rename_input]')
@@ -1626,7 +1621,7 @@ $.extend feedbin,
 
     cancelFeedRequest: ->
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event, xhr) ->
-        if $(event.target).is("[data-behavior~=feed_action_parent]") || $(event.target).is("[data-behavior~=rename_form]")
+        if $(event.target).is("[data-behavior~=feed_action_parent]")
           return
 
         if feedbin.feedXhr

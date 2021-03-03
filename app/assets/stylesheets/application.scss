@@ -2065,12 +2065,22 @@ $hamburger-dot: 4px;
                 text-decoration: none;
             }
             .rename-form {
+                position: absolute;
+                top: 0;
+                right: 0;
+                left: 0;
                 margin: 0;
                 padding: 0;
+                z-index: 10;
+                height: 30px;
             }
             .rename-feed-input {
+                position: absolute;
+                top: 5px;
+                left: 64px;
+                right: 40px;
                 appearance: none;
-                padding: 1px 2px;
+                padding: 2px;
                 margin: 0;
                 line-height: 1;
                 border: 0;
@@ -2079,15 +2089,15 @@ $hamburger-dot: 4px;
                 border-radius: 0;
                 text-overflow: ellipsis;
                 cursor: text;
-                position: relative;
-                left: -2px;
-                top: -1px;
                 @include color($color-contrast-700);
                 &.disabled {
                     cursor: pointer;
                     pointer-events: none;
                     background-color: transparent;
                 }
+            }
+            &.tag > .rename-form .rename-feed-input {
+                left: 40px;
             }
             &.source-section,
             &.collection-unread .feed-link,
@@ -2325,6 +2335,10 @@ $hamburger-dot: 4px;
             @include color($color-contrast-600);
             @include size-in-rems(padding-top, 6)
             @include size-in-rems(padding-bottom, 6)
+            &.tag-link {
+                @include size-in-rems(padding-top, 7)
+                @include size-in-rems(padding-bottom, 7)
+            }
             padding-left: 40px;
             padding-right: 16px;
             .favicon-wrap {
