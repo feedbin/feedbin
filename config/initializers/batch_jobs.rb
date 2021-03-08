@@ -33,4 +33,28 @@ module BatchJobs
       end
     end
   end
+
+  def add_to_queue(queue, id)
+    Sidekiq.redis { |redis| redis.sadd(queue, id) }
+  end
+
+  def dequeue_ids(queue)
+    temporary_set = "#{self.class.name}-#{jid}"
+
+    (_, _, ids) = Sidekiq.redis do |redis|
+      redis.pipelined do
+        redis.renamenx(queue, temporary_set)
+        redis.expire(temporary_set, 60)
+        redis.smembers(temporary_set)
+      end
+    end
+
+    ids
+  rescue Redis::CommandError => exception
+    if exception.message =~ /no such key/i
+      logger.info("Nothing to do")
+      return nil
+    end
+    raise
+  end
 end

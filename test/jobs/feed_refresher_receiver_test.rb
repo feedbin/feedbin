@@ -28,9 +28,6 @@ class FeedRefresherReceiverTest < ActiveSupport::TestCase
     }
 
     Sidekiq::Worker.clear_all
-    assert_difference "WarmCache.jobs.size", +1 do
-      FeedRefresherReceiver.new.perform(params)
-    end
   end
 
   test "should not create entry" do
