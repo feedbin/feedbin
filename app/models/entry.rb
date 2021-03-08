@@ -24,7 +24,6 @@ class Entry < ApplicationRecord
   after_commit :touch_feed_last_published_entry, on: :create
   after_commit :harvest_links, on: :create
   after_commit :harvest_embeds, on: [:create, :update]
-  after_commit :cache_extracted_content, on: :create
   after_commit :cache_views, on: [:create, :update]
   after_commit :save_twitter_users, on: [:create]
 
@@ -365,6 +364,10 @@ class Entry < ApplicationRecord
     nil
   end
 
+  def youtube?
+    entry.data && entry.data["youtube_video_id"].present?
+  end
+
   private
 
   def base_url
@@ -474,10 +477,6 @@ class Entry < ApplicationRecord
 
   def harvest_links
     HarvestLinks.perform_async(id) if tweet?
-  end
-
-  def cache_extracted_content
-    CacheExtractedContent.perform_async(id, feed_id)
   end
 
   def cache_views

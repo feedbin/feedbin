@@ -1,7 +1,6 @@
 class NewsletterSaver
   include Sidekiq::Worker
-
-  attr_reader :entry
+  sidekiq_options queue: :critical
 
   def perform(entry_id)
     entry = Entry.find(entry_id)
