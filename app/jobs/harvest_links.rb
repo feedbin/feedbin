@@ -1,6 +1,6 @@
 class HarvestLinks
   include Sidekiq::Worker
-  sidekiq_options retry: false
+  sidekiq_options retry: false, queue: :low
 
   def perform(entry_id)
     entry = Entry.find(entry_id)
