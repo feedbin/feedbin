@@ -9,7 +9,7 @@ namespace :deploy do
       end
     end
 
-    on roles :background do
+    on roles :app do
       begin
         execute :sudo, :systemctl, :restart, "feedbin.target"
       rescue SSHKit::Command::Failed
