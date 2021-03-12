@@ -359,7 +359,7 @@ class Entry < ApplicationRecord
   end
 
   def extracted_content_url
-    MercuryParser.new(fully_qualified_url).service_url
+    MercuryParser.new(fully_qualified_url, nil, ENV["EXTRACT_USER_ALT"]).service_url
   rescue
     nil
   end

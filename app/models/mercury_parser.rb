@@ -1,14 +1,15 @@
 class MercuryParser
   attr_reader :url
 
-  def initialize(url, data = nil)
+  def initialize(url, data = nil, user = ENV["EXTRACT_USER"])
     @url = url
+    @user = user
     load_data(data) if data
   end
 
-  def self.parse(url)
+  def self.parse(*args)
     Librato.increment "readability.first_parse"
-    new(url)
+    new(*args)
   end
 
   def title
@@ -53,7 +54,7 @@ class MercuryParser
       base64_url = Base64.urlsafe_encode64(url).delete("\n")
       URI::HTTPS.build({
         host: ENV["EXTRACT_HOST"],
-        path: "/parser/#{ENV["EXTRACT_USER"]}/#{signature}",
+        path: "/parser/#{@user}/#{signature}",
         query: "base64_url=#{base64_url}"
       }).to_s
     end

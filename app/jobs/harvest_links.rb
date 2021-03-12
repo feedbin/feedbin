@@ -8,7 +8,7 @@ class HarvestLinks
     tweets.push(entry.main_tweet.quoted_status) if entry.main_tweet.quoted_status?
     urls = find_urls(tweets)
     if url = urls.first
-      page = MercuryParser.parse(url)
+      page = MercuryParser.parse(url, nil, ENV["EXTRACT_USER_ALT"])
       entry.data["saved_pages"] = {url => page.to_h}
       entry.save!
       TwitterLinkImage.perform_async(entry.id, url) if entry.link_tweet?
