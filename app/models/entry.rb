@@ -472,7 +472,7 @@ class Entry < ApplicationRecord
 
   def find_images
     EntryImage.perform_async(id)
-    EntryImageAlt.perform_async(public_id)
+    # EntryImageAlt.perform_async(public_id)
     if data && data["itunes_image"]
       ItunesImage.perform_async(id, data["itunes_image"])
     end
