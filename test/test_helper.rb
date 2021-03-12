@@ -61,8 +61,8 @@ class ActiveSupport::TestCase
       .to_return(options)
   end
 
-  def load_tweet
-    file = File.join(Rails.root, "test/support/tweet_one.json")
+  def load_tweet(option)
+    file = File.join(Rails.root, "test/support/tweet_#{option}.json")
     JSON.parse(File.read(file))
   end
 

@@ -2,28 +2,31 @@ class TwitterLinkImage
   include Sidekiq::Worker
   sidekiq_options retry: false
 
-  def perform(entry_id, page_url = nil, processed_url = nil)
-    @entry = Entry.find(entry_id)
-    if processed_url
-      receive(processed_url)
+  def perform(public_id, image = nil, page_url = nil)
+    public_id = public_id.split("-").first
+    @entry = Entry.find_by_public_id(public_id)
+    @image = image
+    @page_url = page_url
+
+    if @image
+      receive
     else
-      schedule(page_url)
+      schedule
     end
   rescue ActiveRecord::RecordNotFound
   end
 
-  def schedule(page_url)
+  def schedule
     Sidekiq::Client.push(
-      "args" => [@entry.id, @entry.feed_id, page_url, @entry.public_id],
-      "class" => "TwitterLinkImage",
-      "queue" => "images",
+      "args" => ["#{@entry.public_id}-twitter", "twitter", [], @page_url],
+      "class" => "FindImage",
+      "queue" => "image_parallel",
       "retry" => false
     )
   end
 
-  def receive(processed_url)
-    entry = Entry.find(@entry.id)
-    entry.data["twitter_link_image_processed"] = processed_url
-    entry.save!
+  def receive
+    @entry.data["twitter_link_image_processed"] = @image["processed_url"]
+    @entry.save!
   end
 end

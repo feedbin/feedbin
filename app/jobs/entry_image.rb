@@ -2,47 +2,72 @@ class EntryImage
   include Sidekiq::Worker
   sidekiq_options retry: false
 
-  def perform(entry_id, image = nil)
-    @entry = Entry.find(entry_id)
+  def perform(public_id, image = nil)
+    @entry = Entry.find_by_public_id(public_id)
     @image = image
     if @image
       receive
-    else
+    elsif !@entry.processed_image?
       schedule
     end
   rescue ActiveRecord::RecordNotFound
   end
 
   def schedule
-    unless @entry.processed_image?
-      options = build_options
+    if job = build_job
       Sidekiq::Client.push(
-        "args" => EntryImage.build_find_image_args(@entry, options),
+        "args" => job,
         "class" => "FindImage",
-        "queue" => "images",
+        "queue" => "image_parallel",
         "retry" => false
       )
     end
   end
 
-  def build_options
-    options = {}
+  def build_job
+    image_urls = []
+    entry_url = nil
+    preset_name = "primary"
     if @entry.tweet?
-      tweet = @entry.tweet.retweeted_status? ? @entry.tweet.retweeted_status : @entry.tweet
-      if tweet.media?
-        options["urls"] = [tweet.media.first.media_url_https.to_s]
-      elsif tweet.urls?
-        options["urls"] = tweet.urls.map { |url| url.expanded_url.to_s }
-      end
+      image_urls = [@entry.main_tweet.media.first.media_url_https.to_s] if @entry.main_tweet.media?
+    elsif @entry.youtube?
+      image_urls = [@entry.fully_qualified_url]
+      preset_name = "youtube"
+    else
+      entry_url = @entry.fully_qualified_url if same_domain?
+      image_urls = find_image_urls
     end
-    options
+
+    if image_urls.present? || entry_url.present?
+      [@entry.public_id, preset_name, image_urls, entry_url]
+    end
+  end
+
+  def same_domain?
+    entry_host = Addressable::URI.heuristic_parse(@entry.fully_qualified_url).host
+    feed_host = @entry.feed.host
+    entry_host == feed_host
   end
 
   def receive
     @entry.update(image: @image)
   end
 
-  def self.build_find_image_args(entry, options = {})
-    [entry.id, entry.feed_id, entry.url, entry.fully_qualified_url, entry.feed.site_url, entry.content, entry.public_id, options]
+  def find_image_urls
+    Nokogiri::HTML5(@entry.content).css("img, iframe, video").each_with_object([]) do |element, array|
+      source = case element.name
+        when "img" then element["src"]
+        when "iframe" then element["src"]
+        when "video" then element["poster"]
+      end
+
+      if source.present?
+        array.push @entry.rebase_url(source)
+      end
+    end
+  end
+
+  def entry=(entry)
+    @entry = entry
   end
 end
