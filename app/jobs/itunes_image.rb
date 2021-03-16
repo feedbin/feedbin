@@ -2,12 +2,12 @@ class ItunesImage
   include Sidekiq::Worker
   sidekiq_options retry: false
 
-  def perform(entry_id, original_url = nil, processed_url = nil)
-    @entry = Entry.find(entry_id)
-    @entry_id = entry_id
-    @original_url = original_url
-    @processed_url = processed_url
-    if @processed_url
+  def perform(public_id, image = nil)
+    public_id = public_id.split("-").first
+    @entry = Entry.find_by_public_id(public_id)
+    @image = image
+
+    if @image
       receive
     else
       schedule
@@ -17,17 +17,14 @@ class ItunesImage
 
   def schedule
     Sidekiq::Client.push(
-      "args" => [@entry_id, @original_url, @entry.public_id],
-      "class" => "ItunesImage",
-      "queue" => "images",
+      "args" => ["#{@entry.public_id}-itunes", "podcast", [@entry.rebase_url(@entry.data["itunes_image"])]],
+      "class" => "FindImage",
+      "queue" => "image_parallel",
       "retry" => false
     )
   end
 
   def receive
-    entry = Entry.find(@entry_id)
-    data = entry.data || {}
-    data["itunes_image_processed"] = @processed_url
-    entry.update(data: data)
+    @entry.update(media_image: @image["processed_url"])
   end
 end

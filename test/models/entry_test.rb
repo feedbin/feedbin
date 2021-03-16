@@ -55,7 +55,7 @@ class EntryTest < ActiveSupport::TestCase
     assert_difference "EntryImage.jobs.size", +1 do
       @entry.save
       job = EntryImage.jobs.last
-      assert_equal([@entry.reload.id], job["args"])
+      assert_equal([@entry.reload.public_id], job["args"])
     end
   end
 

@@ -359,7 +359,7 @@ class Entry < ApplicationRecord
   end
 
   def extracted_content_url
-    MercuryParser.new(fully_qualified_url, nil, ENV["EXTRACT_USER_ALT"]).service_url
+    MercuryParser.new(fully_qualified_url).service_url
   rescue
     nil
   end
@@ -471,10 +471,9 @@ class Entry < ApplicationRecord
   end
 
   def find_images
-    EntryImage.perform_async(id)
-    EntryImageAlt.perform_async(public_id)
+    EntryImage.perform_async(public_id)
     if data && data["itunes_image"]
-      ItunesImage.perform_async(id, data["itunes_image"])
+      ItunesImage.perform_async(public_id)
     end
   end
 

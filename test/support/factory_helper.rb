@@ -36,9 +36,9 @@ module FactoryHelper
     end
   end
 
-  def create_tweet_entry(feed)
+  def create_tweet_entry(feed, option = "one")
     entry = create_entry(feed)
-    entry.data["tweet"] = load_tweet
+    entry.data["tweet"] = load_tweet(option)
     entry.save!
     entry
   end
