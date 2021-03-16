@@ -2,8 +2,11 @@ require "test_helper"
 
 class EntryImageTest < ActiveSupport::TestCase
   setup do
-    Sidekiq::Queues["images"].clear
-    @entry = Feed.first.entries.create(
+    Sidekiq::Queues["image_parallel"].clear
+    @feed = Feed.first
+    @feed.update(host: "example.com")
+    @feed.reload
+    @entry = @feed.entries.create(
       content: Faker::Lorem.paragraph,
       public_id: SecureRandom.hex,
       url: "http://example.com"
@@ -11,8 +14,8 @@ class EntryImageTest < ActiveSupport::TestCase
   end
 
   test "should enqueue FindImage" do
-    assert_difference "Sidekiq::Queues['images'].count", +1 do
-      EntryImage.new.perform(@entry.id)
+    assert_difference "Sidekiq::Queues['image_parallel'].count", +1 do
+      EntryImage.new.perform(@entry.public_id)
     end
   end
 
@@ -30,29 +33,30 @@ class EntryImageTest < ActiveSupport::TestCase
       url: "http://example.com"
     )
 
-    EntryImage.new.perform(entry.id)
+    EntryImage.new.perform(entry.public_id)
 
-    extracted_urls = Sidekiq::Queues['images'].first["args"][1]
+    extracted_urls = Sidekiq::Queues['image_parallel'].first["args"][2]
     assert extracted_urls.include?("http://example.com/iframe")
     assert extracted_urls.include?("http://example.com/img")
     assert extracted_urls.include?("http://example.com/video")
 
-    assert_equal(entry.public_id, Sidekiq::Queues['images'].first["args"].first)
-    assert_equal(entry.fully_qualified_url, Sidekiq::Queues['images'].first["args"].last)
+    assert_equal(entry.public_id, Sidekiq::Queues['image_parallel'].first["args"].first)
+    assert_equal(entry.fully_qualified_url, Sidekiq::Queues['image_parallel'].first["args"].last)
   end
 
   test "should enqueue FindImage with youtube url" do
     @entry.update(data: {youtube_video_id: "youtube_video_id"})
     @entry.reload
-    EntryImage.new.perform(@entry.id)
-    extracted_urls = Sidekiq::Queues['images'].first["args"][1]
+    EntryImage.new.perform(@entry.public_id)
+
+    extracted_urls = Sidekiq::Queues['image_parallel'].first["args"][2]
     assert_equal([@entry.url], extracted_urls)
   end
 
   test "should enqueue FindImage with tweet url" do
     entry = create_tweet_entry(Feed.first, "two")
-    EntryImage.new.perform(entry.id)
-    extracted_urls = Sidekiq::Queues['images'].first["args"][1]
+    EntryImage.new.perform(entry.public_id)
+    extracted_urls = Sidekiq::Queues['image_parallel'].first["args"][2]
     assert_equal(["https://pbs.twimg.com/media/EwDoQHMVIAAGbaP.jpg"], extracted_urls)
   end
 
@@ -63,7 +67,7 @@ class EntryImageTest < ActiveSupport::TestCase
       "width" => 542,
       "height" => 304
     }
-    EntryImage.new.perform(@entry.id, image)
+    EntryImage.new.perform(@entry.public_id, image)
     assert_equal image, @entry.reload.image
   end
 
@@ -74,8 +78,8 @@ class EntryImageTest < ActiveSupport::TestCase
       "width" => 542,
       "height" => 304
     })
-    assert_difference "Sidekiq::Queues['images'].count", 0 do
-      EntryImage.new.perform(@entry.id)
+    assert_difference "Sidekiq::Queues['image_parallel'].count", 0 do
+      EntryImage.new.perform(@entry.public_id)
     end
   end
 end
