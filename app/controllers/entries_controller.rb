@@ -197,6 +197,7 @@ class EntriesController < ApplicationController
     @user = current_user
     @escaped_query = params[:query].tr("\"", "'").html_safe if params[:query]
 
+    @saved_search_path = new_saved_search_path(query: params[:query])
     @entries = Entry.scoped_search(params, @user)
     @page_query = @entries
     @total_results = @entries.total
@@ -210,7 +211,6 @@ class EntriesController < ApplicationController
 
     @search_message = "Mark #{helpers.number_with_delimiter(@total_results)} #{"article".pluralize(@total_results)} that #{"match".pluralize(@total_results == 1 ? 2 : 1)} the search “#{@escaped_query}” as read?"
 
-    @saved_search_path = new_saved_search_path(query: params[:query])
 
     @collection_title = "Search"
 
