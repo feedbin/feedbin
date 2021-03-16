@@ -29,7 +29,13 @@ class EntryImage
     entry_url = nil
     preset_name = "primary"
     if @entry.tweet?
-      image_urls = [@entry.main_tweet.media.first.media_url_https.to_s] if @entry.main_tweet.media?
+      tweets = []
+      tweets.push(@entry.main_tweet)
+      tweets.push(@entry.main_tweet.quoted_status) if @entry.main_tweet.quoted_status?
+      tweet = tweets.find do |tweet|
+        tweet.media?
+      end
+      image_urls = [tweet.media.first.media_url_https.to_s] unless tweet.nil?
     elsif @entry.youtube?
       image_urls = [@entry.fully_qualified_url]
       preset_name = "youtube"
