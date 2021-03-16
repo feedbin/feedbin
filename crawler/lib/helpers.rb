@@ -1,27 +1,31 @@
 module Helpers
-  def copy_image(url)
-    url = URI.parse(url)
-    source_object_name = url.path[1..-1]
-
-    S3_POOL.with do |connection|
-      connection.copy_object(ENV['AWS_S3_BUCKET'], source_object_name, ENV['AWS_S3_BUCKET'], path, options)
-    end
-    final_url = url.path = "/#{path}"
-    url.to_s
+  def preset
+    OpenStruct.new(IMAGE_PRESETS[@preset_name.to_sym])
   end
 
-  def path
-    @path ||= begin
-      File.join(@public_id[0..6], "#{@public_id}.jpg")
-    end
+  def send_to_feedbin(original_url:, storage_url:)
+    Sidekiq::Client.push(
+      "args"  => [@public_id, {
+        "original_url"  => original_url,
+        "processed_url" => storage_url,
+        "width"         => preset.width,
+        "height"        => preset.height
+      }],
+      "class" => preset.job_class,
+      "queue" => "default"
+    )
   end
 
-  def options
+  def image_name
+    File.join(@public_id[0..6], "#{@public_id}.jpg")
+  end
+
+  def storage_options
     {
-      "Cache-Control" => "max-age=315360000, public",
-      "Expires" => "Sun, 29 Jun 2036 17:48:34 GMT",
-      "x-amz-storage-class" => "REDUCED_REDUNDANCY"
+      "Cache-Control"       => "max-age=315360000, public",
+      "Expires"             => "Sun, 29 Jun 2036 17:48:34 GMT",
+      "x-amz-storage-class" => ENV["AWS_S3_STORAGE_CLASS"] || "REDUCED_REDUNDANCY",
+      "x-amz-acl"           => "public-read"
     }
   end
-
 end
