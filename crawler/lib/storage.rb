@@ -1,8 +1,7 @@
 STORAGE_OPTIONS = {
   provider: "AWS",
   aws_access_key_id: ENV["AWS_ACCESS_KEY_ID"],
-  aws_secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"],
-  persistent: true
+  aws_secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"]
 }
 STORAGE_OPTIONS[:region] = ENV["AWS_S3_REGION"] if ENV["AWS_S3_REGION"]
 STORAGE_OPTIONS[:host] = ENV["AWS_S3_HOST"] if ENV["AWS_S3_HOST"]
