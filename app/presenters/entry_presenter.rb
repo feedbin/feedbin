@@ -214,9 +214,18 @@ class EntryPresenter < BasePresenter
   def author
     if entry.author
       clean_author = @template.strip_tags(entry.author)
-      clean_author = "by " + @template.content_tag(:span, clean_author, class: "author")
+    elsif entry.data&.dig("json_feed", "authors").respond_to?(:map)
+      authors = entry.data.dig("json_feed", "authors").map {|a| @template.strip_tags(a["name"]) }
+      if authors.length > 1
+        authors[-1] = "and #{authors[-1]}"
+      end
+      clean_author = authors.join(", ")
     else
       clean_author = ""
+    end
+
+    if clean_author.present?
+      clean_author = "by " + @template.content_tag(:span, clean_author, class: "author")
     end
     clean_author.html_safe
   end

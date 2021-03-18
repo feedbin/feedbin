@@ -37,7 +37,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: 3bfb58277849c83c459ef1878100e179d5f0902d
+  revision: 77e1555ca4a2d35663973bcb1ceaaf00e064fdf0
   branch: master
   specs:
     feedkit (0.1.0)
@@ -284,7 +284,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.14.0)
       faraday (>= 0.7.4, < 1.0)
-    ffi (1.14.2)
+    ffi (1.15.0)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -396,12 +396,12 @@ GEM
       net-ssh (>= 2.6.5, < 7.0.0)
     net-ssh (6.1.0)
     nio4r (2.5.5)
-    nokogiri (1.11.1)
+    nokogiri (1.11.2)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
-    nokogiri (1.11.1-x86_64-darwin)
+    nokogiri (1.11.2-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.11.1-x86_64-linux)
+    nokogiri (1.11.2-x86_64-linux)
       racc (~> 1.4)
     nokogumbo (2.0.4)
       nokogiri (~> 1.8, >= 1.8.4)
@@ -673,4 +673,4 @@ DEPENDENCIES
   will_paginate
 
 BUNDLED WITH
-   2.2.3
+   2.2.9

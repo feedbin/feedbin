@@ -19,7 +19,7 @@ class Source::MetaLinks < Source
 
   def link_valid?(link)
     valid = false
-    types = ["application/rss+xml", "application/atom+xml", "application/json"]
+    types = ["application/rss+xml", "application/atom+xml", "application/feed+json", "application/json"]
     if link["type"] && link["href"]
       type = link["type"].strip.downcase
       valid = types.include?(type)
