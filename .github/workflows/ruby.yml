@@ -48,7 +48,9 @@ jobs:
         echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | sudo tee /etc/apt/sources.list.d/elasticsearch-2.x.list
 
         sudo apt-get update
-        sudo apt-get install --yes openjdk-8-jre elasticsearch libidn11-dev libidn11-dev libpq-dev postgresql-client-11 imagemagick libmagickwand-dev libreadline-dev libxml2-dev libxslt1-dev libcurl4-openssl-dev libssl-dev zlib1g-dev libffi-dev memcached
+        sudo apt-get install --yes openjdk-8-jre elasticsearch libidn11-dev libidn11-dev libpq-dev  \
+        postgresql-client-11 imagemagick libmagickwand-dev libreadline-dev libxml2-dev libxslt1-dev \
+        libcurl4-openssl-dev libssl-dev zlib1g-dev libffi-dev memcached nodejs
         sudo service elasticsearch restart
 
         sudo wget "https://chromedriver.storage.googleapis.com/2.36/chromedriver_linux64.zip" -O /tmp/chromedriver.zip
