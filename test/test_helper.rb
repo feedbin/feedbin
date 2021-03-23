@@ -19,10 +19,17 @@ require "support/push_server_mock"
 ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
 StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
 WebMock.disable_net_connect!(allow_localhost: true, allow: "codeclimate.com")
+Sidekiq.logger.level = Logger::WARN
 
 unless ENV["CI"]
-  ENV["REDIS_URL"] = "redis://localhost:7776"
-  redis_test_instance = IO.popen("redis-server --port 7776 --save ''")
+  socket = Socket.new(:INET, :STREAM, 0)
+  socket.bind(Addrinfo.tcp("127.0.0.1", 0))
+  port = socket.local_address.ip_port
+  socket.close
+
+  ENV["REDIS_URL"] = "redis://localhost:%d" % port
+  redis_test_instance = IO.popen("redis-server --port %d --save '' --appendonly no" % port)
+
   Minitest.after_run do
     Process.kill("INT", redis_test_instance.pid)
   end
