@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "= 6.0.3.4"
+gem "rails", "= 6.0.3.5"
 gem "will_paginate"
 
 gem "http",                github: "feedbin/http",                branch: "feedbin"
