@@ -339,16 +339,15 @@ GEM
       thor (>= 0.14, < 2.0)
     json (2.5.1)
     kgio (2.11.3)
-    librato-metrics (1.6.2)
+    librato-metrics (2.1.2)
       aggregate (~> 0.2.2)
-      faraday (>= 0.7, < 2.0)
-      multi_json
-    librato-rack (1.1.1)
+      faraday
+    librato-rack (2.0.5)
       hetchy (~> 1.0)
-      librato-metrics (~> 1.6)
-    librato-rails (1.4.2)
+      librato-metrics (~> 2.1, >= 2.1.0)
+    librato-rails (2.1.0)
       activesupport (>= 3.0)
-      librato-rack (~> 1.1.0)
+      librato-rack (~> 2.0.0)
       railties (>= 3.0)
     listen (3.4.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
@@ -629,7 +628,7 @@ DEPENDENCIES
   httparty
   jbuilder
   jquery-rails
-  librato-rails (~> 1.4.2)
+  librato-rails (~> 2.1.0)
   listen
   lograge
   minitest
