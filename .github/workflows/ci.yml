@@ -1,4 +1,4 @@
-name: Ruby CI
+name: CI
 
 on: [push, pull_request]
 
@@ -90,3 +90,11 @@ jobs:
         bundle exec rake db:setup
         bundle exec rake db:test:prepare
         bundle exec rails test:system test
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: screenshots ${{ matrix.os }}-${{ matrix.ruby }}
+        path: tmp/screenshots
+        if-no-files-found: ignore
