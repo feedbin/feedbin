@@ -6,7 +6,6 @@ gem "will_paginate"
 
 gem "http",                github: "feedbin/http",                branch: "feedbin"
 gem "carrierwave_direct",  github: "feedbin/carrierwave_direct",  ref: "a0bc323"
-gem "dalli",               github: "feedbin/dalli",               branch: "feedbin"
 gem "feedjira",            github: "feedbin/feedjira",            branch: "f2"
 gem "feedkit",             github: "feedbin/feedkit",             branch: "master"
 gem "grocer-pushpackager", github: "feedbin/grocer-pushpackager", ref: "6b01b4e", require: "grocer/pushpackager"

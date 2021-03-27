@@ -14,7 +14,7 @@ class IframeEmbed::Youtube < IframeEmbed
 
   def image_url
     url = data["thumbnail_url"].sub "hqdefault", "maxresdefault"
-    status = Rails.cache.fetch("youtube_thumb_status:#{url}") {
+    status = Rails.cache.fetch("youtube_thumb_status:#{Digest::SHA1.hexdigest(url)}") {
       HTTP.head(url).status
     }
     if status == 200

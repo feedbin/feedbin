@@ -22,13 +22,6 @@ GIT
       fog-aws
 
 GIT
-  remote: https://github.com/feedbin/dalli.git
-  revision: 3c92218fadfc20b6fb839f99ac36703ca96167ea
-  branch: feedbin
-  specs:
-    dalli (2.7.10)
-
-GIT
   remote: https://github.com/feedbin/elasticsearch-rails.git
   revision: aa2033bb891a3b2545cb3ff633918fcf64c901e5
   branch: 2.x
@@ -613,7 +606,6 @@ DEPENDENCIES
   connection_pool
   coveralls
   curb
-  dalli!
   dotenv-rails
   elasticsearch (~> 2.0)
   elasticsearch-model!
