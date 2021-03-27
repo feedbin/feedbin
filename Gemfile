@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "= 6.0.3.5"
+gem "rails", "= 6.0.3.6"
 gem "will_paginate"
 
 gem "http",                github: "feedbin/http",                branch: "feedbin"
@@ -16,6 +16,7 @@ gem "opml_saw",            github: "feedbin/opml_saw",            ref: "61d8c2d"
 gem "elasticsearch-model", github: "feedbin/elasticsearch-rails", branch: "2.x"
 gem "twitter",             github: "feedbin/twitter",             branch: "feedbin"
 gem "oauth",               github: "feedbin/oauth-ruby",          branch: "feedbin"
+gem "carrierwave",         github: "feedbin/carrierwave",         branch: "feedbin"
 
 gem "activerecord-import"
 gem "addressable", require: "addressable/uri"
@@ -24,7 +25,6 @@ gem "autoprefixer-rails"
 gem "bcrypt"
 gem "bcrypt-ruby"
 gem "bootsnap", require: false
-gem "carrierwave"
 gem "clockwork"
 gem "coffee-rails"
 gem "connection_pool"
