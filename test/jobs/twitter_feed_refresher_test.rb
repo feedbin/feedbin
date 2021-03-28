@@ -33,12 +33,7 @@ class TwitterFeedRefresherTest < ActiveSupport::TestCase
   end
 
   test "feed does not get scheduled because user doesn't match" do
-    Feed.class_eval do
-      def self.readonly_attributes
-        []
-      end
-    end
-    @feed.update(feed_type: :twitter_home, feed_url: "https://twitter.com?screen_name=bsaid")
+    Feed.where(id: @feed.id).update_all(feed_type: :twitter_home, feed_url: "https://twitter.com?screen_name=bsaid")
 
     Sidekiq::Worker.clear_all
     assert_no_difference "Sidekiq::Queues['feed_downloader_critical'].count" do

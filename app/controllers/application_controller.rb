@@ -22,7 +22,7 @@ class ApplicationController < ActionController::Base
   def render_404
     respond_to do |format|
       format.any do
-        render "errors/not_found.html.erb", layout: nil, status: :not_found, content_type: "text/html"
+        render "errors/not_found", formats: :html, layout: nil, status: :not_found, content_type: "text/html"
       end
     end
   end

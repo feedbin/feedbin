@@ -7,8 +7,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04]
-        ruby: [2.6]
+        os: [ubuntu-20.04]
+        ruby: [2.7]
 
     runs-on: ${{ matrix.os }}
 
@@ -43,27 +43,48 @@ jobs:
 
     - name: Install system dependencies
       run: |
+        set -eux
+
         sudo gem install bundler
-        sudo wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+
+        wget --quiet --output-document - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
         echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | sudo tee /etc/apt/sources.list.d/elasticsearch-2.x.list
 
         curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 
         sudo apt-get update
-        sudo apt-get install --yes openjdk-8-jre elasticsearch libidn11-dev libidn11-dev libpq-dev  \
-        postgresql-client-11 imagemagick libmagickwand-dev libreadline-dev libxml2-dev libxslt1-dev \
-        libcurl4-openssl-dev libssl-dev zlib1g-dev libffi-dev memcached nodejs
-        sudo service elasticsearch restart
 
-        sudo wget "https://chromedriver.storage.googleapis.com/2.36/chromedriver_linux64.zip" -O /tmp/chromedriver.zip
-        sudo unzip /tmp/chromedriver.zip -d /tmp/
+        sudo apt-get remove adoptopenjdk-11-hotspot
+
+        sudo apt-get install --quiet --yes \
+        adoptopenjdk-8-hotspot             \
+        elasticsearch                      \
+        imagemagick                        \
+        libcurl4-openssl-dev               \
+        libffi-dev                         \
+        libidn11-dev                       \
+        libmagickwand-dev                  \
+        libpq-dev                          \
+        libreadline-dev                    \
+        libssl-dev                         \
+        libxml2-dev                        \
+        libxslt1-dev                       \
+        memcached                          \
+        nodejs                             \
+        postgresql-client-11               \
+        zlib1g-dev
+
+        sudo systemctl start elasticsearch
+
+        chromedriver_version=$(curl https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+        wget --quiet "https://chromedriver.storage.googleapis.com/${chromedriver_version}/chromedriver_linux64.zip" --output-document /tmp/chromedriver.zip
+        unzip /tmp/chromedriver.zip -d /tmp/
         sudo mv /tmp/chromedriver /usr/local/bin/
 
-        sudo wget "https://feedbin-ci.s3.amazonaws.com/kindlegen/kindlegen" -O /tmp/kindlegen
-        sudo mv /tmp/kindlegen /usr/local/bin/
+        sudo wget --quiet "https://feedbin-ci.s3.amazonaws.com/kindlegen/kindlegen" --output-document /usr/local/bin/kindlegen
         sudo chmod +x /usr/local/bin/kindlegen
 
-      if: matrix.os == 'ubuntu-18.04'
+      if: matrix.os == 'ubuntu-18.04' || matrix.os == 'ubuntu-20.04'
 
     - uses: actions/cache@v1
       with:
@@ -75,7 +96,7 @@ jobs:
     - name: bundle install
       run: |
         bundle config path vendor/bundle
-        bundle install --jobs 4
+        bundle install --jobs 2
 
     - name: Build and test with Rake
       env:

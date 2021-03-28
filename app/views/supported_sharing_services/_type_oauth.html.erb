@@ -11,7 +11,7 @@
         <% elsif status == :issue %>
             <%= render partial: "supported_sharing_services/delete_supported_service", locals: {editable: false, sharing_service: sharing_service} %>
         <% else %>
-            <%= link_to 'Activate', supported_sharing_services_path(supported_sharing_service: {service_id: sharing_service[:service_id], operation: 'authorize'}), class: 'button button-secondary', method: :post %>
+            <%= link_to 'Activate', supported_sharing_services_path(supported_sharing_service: {service_id: sharing_service.service_id, operation: 'authorize'}), class: 'button button-secondary', method: :post %>
         <% end %>
     </div>
 </div>

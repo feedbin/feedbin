@@ -17,13 +17,6 @@ class SiteController < ApplicationController
     redirect_to root_url(request.query_parameters)
   end
 
-  def headers
-    @user = current_user
-    if @user.admin?
-      @headers = request.env.select { |k, v| k =~ /^HTTP_/ }
-    end
-  end
-
   def service_worker
   end
 

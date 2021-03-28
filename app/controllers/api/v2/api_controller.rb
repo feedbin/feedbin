@@ -41,7 +41,7 @@ module Api
       end
 
       def render_json(template)
-        render template: "api/v2/#{template}.html.erb", layout: nil, content_type: "application/json"
+        render template: "api/v2/#{template}", formats: :html, layout: nil, content_type: "application/json"
       end
 
       def entry_count(collection)

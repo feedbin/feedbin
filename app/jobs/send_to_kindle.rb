@@ -42,7 +42,7 @@ class SendToKindle
   end
 
   def render_content(content)
-    ApplicationController.render template: "supported_sharing_services/kindle_content.html.erb", locals: {entry: @entry, content: content}, layout: nil
+    ApplicationController.render template: "supported_sharing_services/kindle_content", formats: :html, locals: {entry: @entry, content: content}, layout: nil
   end
 
   def write_html

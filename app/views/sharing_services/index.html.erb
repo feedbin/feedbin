@@ -15,9 +15,9 @@
             <h4 class="group-header">Available Services</h4>
             <ul class="sharing-services">
                 <% @available_sharing_services.each do |sharing_service| %>
-                    <% unless @active_service_ids.include?(sharing_service[:service_id]) %>
+                    <% unless @active_service_ids.include?(sharing_service.service_id) %>
                         <li>
-                            <%= render partial: "supported_sharing_services/service_#{sharing_service[:service_id]}", locals: {sharing_service: sharing_service, record: SupportedSharingService.new, status: :inactive} %>
+                            <%= render partial: "supported_sharing_services/service_#{sharing_service.service_id}", locals: {sharing_service: sharing_service, record: SupportedSharingService.new, status: :inactive} %>
                         </li>
                     <% end %>
                 <% end %>

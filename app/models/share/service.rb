@@ -40,7 +40,7 @@ class Share::Service
   end
 
   def render_popover_template(url)
-    ApplicationController.render template: "supported_sharing_services/popover.js.erb", locals: {url: url}, layout: nil
+    ApplicationController.render template: "supported_sharing_services/popover", formats: :js, locals: {url: url}, layout: nil
   end
 
   def link_options(entry)

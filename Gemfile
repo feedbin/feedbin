@@ -1,11 +1,13 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "= 6.0.3.6"
+gem "rails", "= 6.1.3.1"
 gem "will_paginate"
 
 gem "http",                github: "feedbin/http",                branch: "feedbin"
+gem "carrierwave",         github: "feedbin/carrierwave",         branch: "feedbin"
 gem "carrierwave_direct",  github: "feedbin/carrierwave_direct",  ref: "a0bc323"
+gem "dalli",               github: "feedbin/dalli",               branch: "feedbin"
 gem "feedjira",            github: "feedbin/feedjira",            branch: "f2"
 gem "feedkit",             github: "feedbin/feedkit",             branch: "master"
 gem "grocer-pushpackager", github: "feedbin/grocer-pushpackager", ref: "6b01b4e", require: "grocer/pushpackager"
@@ -15,7 +17,6 @@ gem "opml_saw",            github: "feedbin/opml_saw",            ref: "61d8c2d"
 gem "elasticsearch-model", github: "feedbin/elasticsearch-rails", branch: "2.x"
 gem "twitter",             github: "feedbin/twitter",             branch: "feedbin"
 gem "oauth",               github: "feedbin/oauth-ruby",          branch: "feedbin"
-gem "carrierwave",         github: "feedbin/carrierwave",         branch: "feedbin"
 
 gem "activerecord-import"
 gem "addressable", require: "addressable/uri"

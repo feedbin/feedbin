@@ -22,7 +22,7 @@ class SharingService < ApplicationRecord
     true
   end
 
-  def [](key)
-    {service_id: "custom", label: label}.fetch(key)
+  def service_id
+    "custom"
   end
 end

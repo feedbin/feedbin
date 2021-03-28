@@ -12,7 +12,7 @@
     <div class="service-options-wrap">
         <div class="service-options">
             <%= form_for(sharing_service) do |f| %>
-                <%= f.hidden_field :service_id, value: sharing_service[:service_id] %>
+                <%= f.hidden_field :service_id, value: sharing_service.service_id %>
                 <%= f.hidden_field :operation, value: "" %>
                 <div class="stacked-form">
                     <%= render "shared/input" do %>

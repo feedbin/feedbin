@@ -8,4 +8,4 @@ elsif params[:mode] == "extended"
   cached = Proc.new { |item| [params.key?(:include_content_diff), item] }
 end
 -%>
-<%= json_array { render partial: "api/v2/entries/#{template}", collection: @entries, as: :entry, spacer_template: "api/v2/shared/comma", cached: cached } -%>
+<%= json_array { render partial: "api/v2/entries/#{template}", formats: :json, collection: @entries, as: :entry, spacer_template: "api/v2/shared/comma", cached: cached } -%>

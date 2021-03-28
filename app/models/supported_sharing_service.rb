@@ -1,28 +1,28 @@
 class SupportedSharingService < ApplicationRecord
   SERVICES = [
-    {
+    OpenStruct.new({
       service_id: "pocket",
       label: "Pocket",
       requires_auth: true,
       service_type: "oauth",
       klass: "Share::Pocket"
-    },
-    {
+    }),
+    OpenStruct.new({
       service_id: "readability",
       label: "Readability",
       requires_auth: true,
       service_type: "xauth",
       klass: "Share::Readability",
       active: false
-    },
-    {
+    }),
+    OpenStruct.new({
       service_id: "instapaper",
       label: "Instapaper",
       requires_auth: true,
       service_type: "xauth",
       klass: "Share::Instapaper"
-    },
-    {
+    }),
+    OpenStruct.new({
       service_id: "email",
       label: "Email",
       requires_auth: false,
@@ -31,15 +31,15 @@ class SupportedSharingService < ApplicationRecord
       klass: "Share::Email",
       has_share_sheet: true,
       limit: 20
-    },
-    {
+    }),
+    OpenStruct.new({
       service_id: "kindle",
       label: "Kindle",
       requires_auth: false,
       service_type: "kindle",
       klass: "Share::Kindle"
-    },
-    {
+    }),
+    OpenStruct.new({
       service_id: "pinboard",
       label: "Pinboard",
       requires_auth: true,
@@ -47,8 +47,8 @@ class SupportedSharingService < ApplicationRecord
       html_options: {data: {behavior: "show_entry_basement", basement_panel: "pinboard_share_panel"}},
       klass: "Share::Pinboard",
       has_share_sheet: true
-    },
-    {
+    }),
+    OpenStruct.new({
       service_id: "tumblr",
       label: "Tumblr",
       requires_auth: true,
@@ -56,8 +56,8 @@ class SupportedSharingService < ApplicationRecord
       html_options: {data: {behavior: "show_entry_basement", basement_panel: "tumblr_share_panel"}},
       klass: "Share::Tumblr",
       has_share_sheet: true
-    },
-    {
+    }),
+    OpenStruct.new({
       service_id: "evernote",
       label: "Evernote",
       requires_auth: true,
@@ -65,37 +65,37 @@ class SupportedSharingService < ApplicationRecord
       html_options: {data: {behavior: "show_entry_basement", basement_panel: "evernote_share_panel"}},
       klass: "Share::EvernoteShare",
       has_share_sheet: true
-    },
-    {
+    }),
+    OpenStruct.new({
       service_id: "twitter",
       label: "Twitter",
       requires_auth: false,
       service_type: "popover",
       klass: "Share::Twitter"
-    },
-    {
+    }),
+    OpenStruct.new({
       service_id: "facebook",
       label: "Facebook",
       requires_auth: false,
       service_type: "popover",
       klass: "Share::Facebook"
-    },
-    {
+    }),
+    OpenStruct.new({
       service_id: "app_dot_net",
       label: "App.net",
       requires_auth: false,
       service_type: "popover",
       klass: "Share::AppDotNet",
       active: false
-    },
-    {
+    }),
+    OpenStruct.new({
       service_id: "buffer",
       label: "Buffer",
       requires_auth: false,
       service_type: "popover",
       klass: "Share::Buffer"
-    },
-    {
+    }),
+    OpenStruct.new({
       service_id: "micro_blog",
       label: "Micro.blog",
       requires_auth: true,
@@ -103,20 +103,20 @@ class SupportedSharingService < ApplicationRecord
       html_options: {data: {behavior: "show_entry_basement", basement_panel: "micro_blog_share_panel"}},
       klass: "Share::MicroBlog",
       has_share_sheet: true
-    }
+    })
   ].freeze
 
   store_accessor :settings, :access_token, :access_secret, :email_name, :email_address,
     :kindle_address, :default_option, :api_token
 
-  validates :service_id, presence: true, uniqueness: {scope: :user_id}, inclusion: {in: SERVICES.collect { |s| s[:service_id] }}
+  validates :service_id, presence: true, uniqueness: {scope: :user_id}, inclusion: {in: SERVICES.collect { |s| s.service_id }}
   belongs_to :user
 
   def share(params)
     key = "SupportedSharingService:share:#{user_id}:#{service_id}"
 
-    result = if info[:limit]
-      Throttle.throttle!(key, info[:limit], 1.hour) do
+    result = if info.limit
+      Throttle.throttle!(key, info.limit, 1.hour) do
         service.share(params)
       end
     else
@@ -148,12 +148,12 @@ class SupportedSharingService < ApplicationRecord
 
   def link_options(entry)
     service_info = SupportedSharingService.info!(service_id)
-    klass = service_info[:klass].constantize.new(self)
+    klass = service_info.klass.constantize.new(self)
     klass.link_options(entry)
   end
 
   def self.info(service_id)
-    SERVICES.find { |service| service[:service_id] == service_id }
+    SERVICES.find { |service| service.service_id == service_id }
   end
 
   def self.info!(service_id)
@@ -165,43 +165,43 @@ class SupportedSharingService < ApplicationRecord
   end
 
   def info
-    SERVICES.find { |service| service[:service_id] == service_id }
+    SERVICES.find { |service| service.service_id == service_id }
   end
 
   def html_options
-    info[:html_options] || {remote: true}
+    info.html_options || {remote: true}
   end
 
   def active?
-    if info.key?(:active)
-      info[:active]
+    if info.respond_to?(:active)
+      info.active
     else
       true
     end
   end
 
   def label
-    info[:label]
+    info.label
   end
 
   def requires_auth?
-    info[:requires_auth]
+    info.requires_auth
   end
 
   def service_type
-    info[:service_type]
+    info.service_type
   end
 
   def klass
-    info[:klass]
+    info.klass
   end
 
   def args
-    info[:args]
+    info.args
   end
 
   def has_share_sheet?
-    info[:has_share_sheet].present?
+    info.respond_to? :has_share_sheet
   end
 
   def auth_present?
@@ -211,10 +211,6 @@ class SupportedSharingService < ApplicationRecord
   def completions
     options = service_options || {}
     options["completions"] || []
-  end
-
-  def [](key)
-    info[key]
   end
 
   def update_completions(new_completions)

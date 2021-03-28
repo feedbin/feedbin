@@ -322,7 +322,7 @@ class Entry < ApplicationRecord
   def update_content
     original = content
     if tweet?
-      self.content = ApplicationController.render(template: "entries/_tweet_default.html.erb", locals: {entry: self}, layout: nil)
+      self.content = ApplicationController.render(template: "entries/_tweet_default", formats: :html, locals: {entry: self}, layout: nil)
     end
   rescue
     self.content = original

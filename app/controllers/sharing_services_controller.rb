@@ -10,7 +10,7 @@ class SharingServicesController < ApplicationController
     @active_sharing_services = @active_sharing_services.reject { |sharing_service| sharing_service.active? == false }.sort_by { |sharing_service| sharing_service.label }
 
     @active_service_ids = @active_sharing_services.collect { |service| service.try(:service_id) }.compact
-    @available_sharing_services = SupportedSharingService::SERVICES.reject { |supported_service| supported_service[:active] == false }.sort_by { |supported_service| supported_service[:service_id] }
+    @available_sharing_services = SupportedSharingService::SERVICES.reject { |supported_service| supported_service.active == false }.sort_by { |supported_service| supported_service.service_id }
     @sharing_service = @user.sharing_services.new
   end
 

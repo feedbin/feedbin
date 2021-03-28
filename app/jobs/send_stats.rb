@@ -141,7 +141,7 @@ class SendStats
 
   def database_size
     stats = []
-    database = ActiveRecord::Base.connection_config[:database]
+    database = ActiveRecord::Base.connection_db_config.database
     sql = %(
       SELECT pg_database_size('#{database}') as size;
     )

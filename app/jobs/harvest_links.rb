@@ -13,7 +13,7 @@ class HarvestLinks
       entry.save!
       TwitterLinkImage.perform_async(entry.public_id, nil, url) if entry.link_tweet?
     end
-    entry.content = ApplicationController.render template: "entries/_tweet_default.html.erb", locals: {entry: entry}, layout: nil
+    entry.content = ApplicationController.render template: "entries/_tweet_default", formats: :html, locals: {entry: entry}, layout: nil
     entry.save!
   end
 
