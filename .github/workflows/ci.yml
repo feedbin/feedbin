@@ -36,11 +36,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-
     - name: Install system dependencies
       run: |
         set -eux
@@ -69,7 +64,6 @@ jobs:
         libssl-dev                         \
         libxml2-dev                        \
         libxslt1-dev                       \
-        memcached                          \
         nodejs                             \
         postgresql-client-11               \
         zlib1g-dev
@@ -84,19 +78,11 @@ jobs:
         sudo wget --quiet "https://feedbin-ci.s3.amazonaws.com/kindlegen/kindlegen" --output-document /usr/local/bin/kindlegen
         sudo chmod +x /usr/local/bin/kindlegen
 
-      if: matrix.os == 'ubuntu-18.04' || matrix.os == 'ubuntu-20.04'
-
-    - uses: actions/cache@v1
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
       with:
-        path: vendor/bundle
-        key: bundle-use-ruby-${{ matrix.os }}-${{ matrix.ruby }}-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          bundle-use-ruby-${{ matrix.os }}-${{ matrix.ruby }}-
-
-    - name: bundle install
-      run: |
-        bundle config path vendor/bundle
-        bundle install --jobs 2
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true
 
     - name: Build and test with Rake
       env:
@@ -109,7 +95,6 @@ jobs:
       run: |
         psql -c 'create database feedbin_test;' -U postgres
         bundle exec rake db:setup
-        bundle exec rake db:test:prepare
         bundle exec rails test:system test
 
     - name: Upload artifacts
