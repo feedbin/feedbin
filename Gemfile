@@ -23,7 +23,6 @@ gem "addressable", require: "addressable/uri"
 gem "apnotic"
 gem "autoprefixer-rails"
 gem "bcrypt"
-gem "bcrypt-ruby"
 gem "bootsnap", require: false
 gem "clockwork"
 gem "coffee-rails"
