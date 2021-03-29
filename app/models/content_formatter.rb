@@ -108,11 +108,11 @@ class ContentFormatter
     }
     filters = [HTML::Pipeline::SmileyFilter, HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer, HTML::Pipeline::IframeFilter]
 
-    if ENV["CAMO_HOST"] && ENV["CAMO_KEY"] && image_proxy_enabled
-      context[:asset_proxy] = ENV["CAMO_HOST"]
-      context[:asset_proxy_secret_key] = ENV["CAMO_KEY"]
+    if ENV["IMAGEPROXY_HOST"] && ENV["IMAGEPROXY_KEY"] && image_proxy_enabled
+      context[:asset_proxy] = ENV["IMAGEPROXY_HOST"]
+      context[:asset_proxy_secret_key] = ENV["IMAGEPROXY_KEY"]
       context[:asset_src_attribute] = "data-camo-src"
-      filters = filters << HTML::Pipeline::CamoFilter
+      filters = filters << HTML::Pipeline::ImageproxyFilter
     end
 
     if entry
@@ -153,11 +153,11 @@ class ContentFormatter
     }
     filters = [HTML::Pipeline::SanitizationFilter]
 
-    if ENV["CAMO_HOST"] && ENV["CAMO_KEY"]
-      context[:asset_proxy] = ENV["CAMO_HOST"]
-      context[:asset_proxy_secret_key] = ENV["CAMO_KEY"]
+    if ENV["IMAGEPROXY_HOST"] && ENV["IMAGEPROXY_KEY"]
+      context[:asset_proxy] = ENV["IMAGEPROXY_HOST"]
+      context[:asset_proxy_secret_key] = ENV["IMAGEPROXY_KEY"]
       context[:asset_src_attribute] = "data-camo-src"
-      filters = filters << HTML::Pipeline::CamoFilter
+      filters = filters << HTML::Pipeline::ImageproxyFilter
     end
 
     pipeline = HTML::Pipeline.new filters, context

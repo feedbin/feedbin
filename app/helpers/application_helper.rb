@@ -161,10 +161,10 @@ module ApplicationHelper
 
   def camo_link(url)
     options = {
-      asset_proxy: ENV["CAMO_HOST"],
-      asset_proxy_secret_key: ENV["CAMO_KEY"]
+      asset_proxy: ENV["IMAGEPROXY_HOST"],
+      asset_proxy_secret_key: ENV["IMAGEPROXY_KEY"]
     }
-    pipeline = HTML::Pipeline::CamoFilter.new(nil, options, nil)
+    pipeline = HTML::Pipeline::ImageproxyFilter.new(nil, options, nil)
     pipeline.asset_proxy_url(url.to_s)
   end
 
