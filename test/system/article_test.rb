@@ -75,7 +75,7 @@ class ArticleTest < ApplicationSystemTestCase
     sleep 1
     wait_for_ajax
 
-    pipeline = HTML::Pipeline::ImageproxyFilter.new(nil, { asset_proxy: ENV["IMAGEPROXY_HOST"], asset_proxy_secret_key: ENV["IMAGEPROXY_KEY"] }, nil)
+    pipeline = HTML::Pipeline::CamoFilter.new(nil, { asset_proxy: ENV["CAMO_HOST"], asset_proxy_secret_key: ENV["CAMO_KEY"] }, nil)
     url = pipeline.asset_proxy_url("https://pbs.twimg.com/profile_images/659486593649012736/-TGFT8rs_bigger.png")
 
     assert_selector ".profile-image img[src='#{url}']"
