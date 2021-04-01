@@ -736,7 +736,7 @@ class EntryPresenter < BasePresenter
 
   def tweet_video(media)
     options = {
-      poster: media.media_url_https.to_s + ":large",
+      poster: @template.camo_link(media.media_url_https.to_s + ":large"),
       width: media.video_info.aspect_ratio.first,
       height: media.video_info.aspect_ratio.last,
       preload: "none"
