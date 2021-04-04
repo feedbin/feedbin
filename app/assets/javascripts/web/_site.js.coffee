@@ -27,6 +27,20 @@ $.extend feedbin,
   scrollStarted: false
   loadingMore: false
 
+  hideLinkAction: (url) ->
+    if url of feedbin.linkActions
+      tooltip = feedbin.linkActions[url].tooltip
+      if url of feedbin.linkActions && !tooltip.is(':hover')
+        tooltip.addClass('hide')
+        tooltip.removeClass('open')
+        tooltip.remove()
+        feedbin.linkActions[url].popper.destroy() if feedbin.linkActions[url].popper
+        delete feedbin.linkActions[url]
+
+  hideLinkActions: ->
+    for url, _ of feedbin.linkActions
+      feedbin.hideLinkAction(url)
+
   changeContentView: (view) ->
     currentView = $('[data-behavior~=content_option]:not(.hide)')
     nextView = $("[data-behavior~=content_option][data-content-option=#{view}]")
@@ -2356,19 +2370,6 @@ $.extend feedbin,
         $("#url", form).val(url)
         form.submit()
 
-      hideLinkActions = (url) ->
-          hideTooltip = ->
-            if url of feedbin.linkActions
-              tooltip = feedbin.linkActions[url].tooltip
-              if url of feedbin.linkActions && !tooltip.is(':hover')
-                tooltip.addClass('hide')
-                tooltip.removeClass('open')
-                tooltip.remove()
-                feedbin.linkActions[url].popper.destroy() if feedbin.linkActions[url].popper
-                delete feedbin.linkActions[url]
-
-          feedbin.linkActions[url].linkMenuTimer = setTimeout hideTooltip, 350
-
       showLinkActions = (url, link) ->
         if url of feedbin.linkActions && !feedbin.linkActions[url].visible
           tooltip = feedbin.linkActions[url].tooltip
@@ -2388,8 +2389,11 @@ $.extend feedbin,
           feedbin.linkActions[url].visible = true
           feedbin.linkActions[url].popper = new Popper(link, tooltip, options)
 
+      $(document).on 'click', '[data-behavior~=open_item]', (event) ->
+        feedbin.hideLinkActions()
+
       $(document).on 'mouseleave', '[data-behavior~=link_actions]', (event) ->
-        hideLinkActions($(@).data('url'))
+        setTimeout((-> feedbin.hideLinkAction($(@).data('url'))), 350)
 
       $(document).on 'mouseenter mouseleave', 'body:not(.touch) .entry-final-content a', (event) ->
         link = $(@)
@@ -2414,7 +2418,7 @@ $.extend feedbin,
           clearTimeout(feedbin.linkActions[url].linkMenuCleanup)
 
           if event.type == "mouseleave"
-            hideLinkActions(url)
+            setTimeout((-> feedbin.hideLinkAction(url)), 350)
 
           if event.type == "mouseenter"
             feedbin.linkActions[url].linkCacheTimer = setTimeout((-> cacheLink(url)), 100)
