@@ -2393,7 +2393,8 @@ $.extend feedbin,
         feedbin.hideLinkActions()
 
       $(document).on 'mouseleave', '[data-behavior~=link_actions]', (event) ->
-        setTimeout((-> feedbin.hideLinkAction($(@).data('url'))), 350)
+        url = $(@).data('url')
+        setTimeout((-> feedbin.hideLinkAction(url)), 350)
 
       $(document).on 'mouseenter mouseleave', 'body:not(.touch) .entry-final-content a', (event) ->
         link = $(@)
