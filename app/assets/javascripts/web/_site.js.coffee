@@ -30,7 +30,7 @@ $.extend feedbin,
   hideLinkAction: (url) ->
     if url of feedbin.linkActions
       tooltip = feedbin.linkActions[url].tooltip
-      if url of feedbin.linkActions && !tooltip.is(':hover')
+      if url of feedbin.linkActions && !tooltip.is(':hover') && !$(feedbin.linkActions[url].popper.reference).is(':hover')
         tooltip.addClass('hide')
         tooltip.removeClass('open')
         tooltip.remove()
@@ -2365,29 +2365,17 @@ $.extend feedbin,
         feedbin.updateFeedSearchMessage()
 
     linkActionsHover: ->
-      cacheLink = (url) ->
-        form = $("[data-behavior~=extract_cache_form]")
-        $("#url", form).val(url)
-        form.submit()
+      cacheLink = (link) ->
+        unless link.is("[data-link-cached]")
+          link.attr('data-link-cached', "true")
+          url = link.attr('href')
+          form = $("[data-behavior~=extract_cache_form]")
+          $("#url", form).val(url)
+          form.submit()
 
       showLinkActions = (url, link) ->
-        if url of feedbin.linkActions && !feedbin.linkActions[url].visible
-          tooltip = feedbin.linkActions[url].tooltip
-          $('body').append(tooltip)
-          tooltip.removeClass('hide')
-          position = link[0].getClientRects()
-          lastLine = position[position.length - 1]
-          offset = (lastLine.width + tooltip.outerWidth()) * -1
-          options =
-            placement: 'right-end'
-            modifiers:
-              preventOverflow:
-                enabled: false
-              offset:
-                offset: "-2, #{offset}"
-
-          feedbin.linkActions[url].visible = true
-          feedbin.linkActions[url].popper = new Popper(link, tooltip, options)
+        if url of feedbin.linkActions
+          feedbin.linkActions[url].tooltip.removeClass('hide')
 
       $(document).on 'click', '[data-behavior~=open_item]', (event) ->
         feedbin.hideLinkActions()
@@ -2398,32 +2386,41 @@ $.extend feedbin,
 
       $(document).on 'mouseenter mouseleave', 'body:not(.touch) .entry-final-content a', (event) ->
         link = $(@)
-        if link.text().trim().length > 0 && !$(@).has('.mejs__container').length > 0 && !link.closest(".system-content").length && !link.closest(".bigfoot-footnote").length
-          url = link.attr('href')
-          tooltip = $('[data-behavior~=link_actions_template] [data-behavior~=link_actions]').clone()
-          tooltip.data('url', url)
+        url = link.attr('href')
 
-          unless url of feedbin.linkActions
-            feedbin.linkActions[url] =
-              linkActionsTimer: null
-              linkCacheTimer: null
-              linkMenuTimer: null
-              linkMenuCleanup: null
-              visible: false
-              popper: null
-              tooltip: tooltip
-
+        if event.type == "mouseenter" && url of feedbin.linkActions
           clearTimeout(feedbin.linkActions[url].linkActionsTimer)
           clearTimeout(feedbin.linkActions[url].linkCacheTimer)
-          clearTimeout(feedbin.linkActions[url].linkMenuTimer)
-          clearTimeout(feedbin.linkActions[url].linkMenuCleanup)
 
+        if link.text().trim().length > 0 && !$(@).has('.mejs__container').length > 0 && !link.closest(".system-content").length && !link.closest(".bigfoot-footnote").length
           if event.type == "mouseleave"
-            setTimeout((-> feedbin.hideLinkAction(url)), 350)
+            setTimeout((-> feedbin.hideLinkAction(url)), 200)
 
           if event.type == "mouseenter"
-            feedbin.linkActions[url].linkCacheTimer = setTimeout((-> cacheLink(url)), 100)
-            feedbin.linkActions[url].linkActionsTimer = setTimeout((-> showLinkActions(url, link)), 400)
+            unless url of feedbin.linkActions
+              tooltip = $('[data-behavior~=link_actions_template] [data-behavior~=link_actions]').clone()
+              tooltip.data('url', url)
+              $('body').append(tooltip)
+              position = link[0].getClientRects()
+              lastLine = position[position.length - 1]
+              offset = (lastLine.width + tooltip.outerWidth()) * -1
+              options =
+                placement: 'right-end'
+                modifiers:
+                  preventOverflow:
+                    enabled: false
+                  offset:
+                    offset: "-2, #{offset}"
+
+              feedbin.linkActions[url] =
+                linkActionsTimer: null
+                linkCacheTimer: null
+                popper: new Popper(link, tooltip, options)
+                tooltip: tooltip
+
+            feedbin.linkActions[url].linkCacheTimer = setTimeout((-> cacheLink(link)), 100)
+            feedbin.linkActions[url].linkActionsTimer = setTimeout((-> showLinkActions(url, link)), 250)
+
 
     loadLinksInApp: ->
       $(document).on 'click', '[data-behavior~=entry_final_content] a', (event) ->
