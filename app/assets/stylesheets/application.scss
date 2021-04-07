@@ -2442,6 +2442,14 @@ $hamburger-dot: 4px;
     }
 }
 
+.theme-auto {
+    @media (prefers-color-scheme: light) {
+        .favicon-wrap {
+            box-shadow: none;
+        }
+    }
+}
+
 li.selected > a .favicon-wrap, .theme-day li.selected > a .favicon-wrap {
     @include background-color(white);
     @include box-shadow(rgba(0, 0, 0, 0.1), 0px 1px 1px 0px);
