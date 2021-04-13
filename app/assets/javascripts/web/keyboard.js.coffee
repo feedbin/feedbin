@@ -172,6 +172,7 @@ class feedbin.Keyboard
       else if @hasUnreadFeeds()
         @selectNextUnreadFeed()
       event.preventDefault()
+      event.stopPropagation()
 
     # Star
     Mousetrap.bind 's', (event, combo) =>
