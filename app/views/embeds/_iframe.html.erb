@@ -1,4 +1,4 @@
-<% cache [@embed.iframe_src, @embed.cache_key] do %>
+<% cache [Digest::SHA1.hexdigest(@embed.iframe_src), @embed.cache_key] do %>
     <% if embed.image_url.present? %>
     <div class="iframe-embed system-content embed-type-<%= embed.type %> embed-with-image" data-behavior="iframe_placeholder" data-iframe-src="<%= @embed.iframe_src %>" data-iframe-width="<%= params[:width] %>" data-iframe-height="<%= params[:height] %>">
         <% if embed.image_url.present? %>

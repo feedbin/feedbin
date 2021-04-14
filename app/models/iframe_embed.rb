@@ -33,10 +33,6 @@ class IframeEmbed
   def duration; end
   def profile_image; end
 
-  def cache_key
-    "v1"
-  end
-
   def iframe_src
     url = embed_url.dup
     params = Rack::Utils.parse_nested_query(url.query)
@@ -50,7 +46,7 @@ class IframeEmbed
   end
 
   def cache_key
-    Digest::SHA1.hexdigest(embed_url.to_s)
+    "iframe_embed_#{Digest::SHA1.hexdigest(embed_url.to_s)}"
   end
 
   def fetch

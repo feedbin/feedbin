@@ -65,7 +65,7 @@ class IframeEmbed::Youtube < IframeEmbed
   end
 
   def cache_key
-    video && video.updated_at.to_i || super
+    video && "youtube_embed_#{video.updated_at.to_i}" || super
   end
 
   private
