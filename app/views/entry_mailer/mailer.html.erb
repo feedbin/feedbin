@@ -3,16 +3,15 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width" />
+        <meta name="color-scheme" content="light dark">
+        <meta name="supported-color-schemes" content="light dark">
         <style>
-            iframe {
-                display: none!important;
-            }
             * {
                 margin: 0;
                 padding: 0;
             }
             * {
-                font-family: Helvetica, Arial, sans-serif;
+                font-family: -apple-system, system-ui, Helvetica, Arial, sans-serif;
             }
             img {
                 text-decoration:none;
@@ -26,24 +25,19 @@
                 display: block;
                 border: 0;
             }
-            .collapse {
-                margin: 0;
-                padding: 0;
-            }
             body {
                 -webkit-font-smoothing: antialiased;
                 min-width: 100%;
-                -webkit-text-size-adjust:100%;
-                -ms-text-size-adjust:100%;
-                margin:0;
-                padding:0;
-                color: #353739;
+                -webkit-text-size-adjust: 100%;
+                -ms-text-size-adjust: 100%;
+                margin: 0;
+                padding: 0;
+                color: #0D1623;
                 font-size: 17px;
             }
             blockquote {
                 padding: 0 0 0 15px;
-                border-left: 2px solid #DCDEE0;
-                color: #7a7c7e;
+                border-left: 2px solid #E9E9EB;
             }
             a {
                 color: #0867E2;
@@ -51,16 +45,8 @@
             hr {
                 border: 0;
                 height: 1px;
-                background: #DCDEE0;
+                background: #E9E9EB;
                 margin: 25px 0;
-            }
-            table.body-wrap {
-                width: 100%;
-                max-width: 600px;
-                margin: 0 auto;
-            }
-            .collapse {
-                margin: 0!important;
             }
             h1, h2, h3, h4, h5, h6 {
                 font-weight: bold;
@@ -73,8 +59,8 @@
             h3, h4, h5, h6 {
                 font-size: 18px;
             }
-            p,ul,ol {
-                margin-bottom: 15px;
+            p, ul, ol {
+                margin-bottom: 16px;
                 font-weight: normal;
                 line-height: 1.6;
             }
@@ -96,61 +82,62 @@
                 white-space: pre-wrap;
                 font-family: monospace;
                 font-size: 16px;
-                margin-bottom: 10px;
+                margin-bottom: 16px;
+            }
+            iframe {
+                display: none !important;
             }
             .container {
-                display: block!important;
-                max-width: 600px!important;
-                margin: 0 auto!important;/* makes it centered */
-                clear:both!important;
+                display: block !important;
+                max-width: 600px !important;
+                margin: 0 auto !important;
+                clear:both !important;
             }
             .content {
-                padding: 15px;
+                padding: 16px;
                 max-width: 600px;
                 margin: 0 auto;
                 display: block;
             }
-            .content table {
-                width: 100%;
-            }
             .smaller {
                 font-size: 16px;
-                color: #b4b6b8;
+                color: #707680;
             }
-            @media (max-width: 600px) {
-                table.body-wrap {
-                    border: none;
+            @media (prefers-color-scheme: dark) {
+                body {
+                    background: #262626 !important;
+                    color: #D4D4D4 !important;
+                }
+                blockquote {
+                    border-left-color: #353535 !important;
+                }
+                hr {
+                    background: #353535 !important;
+                }
+                a {
+                    color: #FFF !important;
+                }
+                .smaller {
+                    color: #8C8C8C !important;
                 }
             }
         </style>
     </head>
-    <body bgcolor="#FFFFFF">
-        <table class="body-wrap" cellspacing="0">
-            <tr>
-                <td></td>
-                <td class="container" bgcolor="#FFFFFF">
-                    <div class="content">
-                        <table>
-                            <tr>
-                                <td>
-                                    <% if @message.present? %>
-                                        <p class="pre"><%= @message %></p>
-                                        <hr />
-                                    <% end %>
-                                    <h1><%= link_to strip_tags(@entry.title), @entry.fully_qualified_url  %></h1>
-                                    <p class="smaller">
-                                        <%= strip_tags(@entry.feed.title) %>
-                                        <br />
-                                        <%= @entry.published.to_s(:full_human) %>
-                                    </p>
-                                    <%= raw(ContentFormatter.api_format(@content, @entry)) %>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </td>
-                <td></td>
-            </tr>
-        </table>
+    <body>
+        <div class="container">
+            <div class="content">
+                <% if @message.present? %>
+                    <p class="pre"><%= @message %></p>
+                    <hr />
+                <% end %>
+                <h1><%= link_to strip_tags(@entry.title), @entry.fully_qualified_url  %></h1>
+                <p class="smaller">
+                    <%= strip_tags(@entry.feed.title) %>
+                    <br />
+                    <%= @entry.published.to_s(:full_human) %>
+                </p>
+                <%= raw(ContentFormatter.api_format(@content, @entry)) %>
+            </div>
+        </div>
     </body>
 </html>
