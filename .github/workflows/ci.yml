@@ -68,7 +68,8 @@ jobs:
 
         sudo systemctl start elasticsearch
 
-        chromedriver_version=$(curl https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+        major_version=$(google-chrome --version | awk '{print $NF}' | awk --field-separator "." '{ print $1 }')
+        chromedriver_version=$(curl "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${major_version}")
         wget --quiet "https://chromedriver.storage.googleapis.com/${chromedriver_version}/chromedriver_linux64.zip" --output-document /tmp/chromedriver.zip
         unzip /tmp/chromedriver.zip -d /tmp/
         sudo mv /tmp/chromedriver /usr/local/bin/
