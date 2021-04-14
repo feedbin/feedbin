@@ -50,8 +50,12 @@ class Share::Service
   end
 
   def share_link
-    {url: Rails.application.routes.url_helpers.share_supported_sharing_service_path(@klass, 9_999_999_999),
-     label: @klass.label,
-     html_options: @klass.html_options}
+    {
+      url: Rails.application.routes.url_helpers.share_supported_sharing_service_path(@klass, 9_999_999_999),
+      label: @klass.label,
+      html_options: @klass.html_options
+    }
+  rescue
+    nil
   end
 end
