@@ -27,7 +27,7 @@ class SupportedSharingService < ApplicationRecord
       label: "Email",
       requires_auth: false,
       service_type: "email",
-      html_options: {data: {behavior: "show_entry_basement", basement_panel: "email_share_panel"}},
+      html_options: {"data-behavior" => "show_entry_basement", "data-basement-panel" => "email_share_panel"},
       klass: "Share::Email",
       has_share_sheet: true,
       limit: 20
@@ -44,7 +44,7 @@ class SupportedSharingService < ApplicationRecord
       label: "Pinboard",
       requires_auth: true,
       service_type: "pinboard",
-      html_options: {data: {behavior: "show_entry_basement", basement_panel: "pinboard_share_panel"}},
+      html_options: {"data-behavior" => "show_entry_basement", "data-basement-panel" => "pinboard_share_panel"},
       klass: "Share::Pinboard",
       has_share_sheet: true
     }),
@@ -53,7 +53,7 @@ class SupportedSharingService < ApplicationRecord
       label: "Tumblr",
       requires_auth: true,
       service_type: "oauth",
-      html_options: {data: {behavior: "show_entry_basement", basement_panel: "tumblr_share_panel"}},
+      html_options: {"data-behavior" => "show_entry_basement", "data-basement-panel" => "tumblr_share_panel"},
       klass: "Share::Tumblr",
       has_share_sheet: true
     }),
@@ -62,7 +62,7 @@ class SupportedSharingService < ApplicationRecord
       label: "Evernote",
       requires_auth: true,
       service_type: "oauth",
-      html_options: {data: {behavior: "show_entry_basement", basement_panel: "evernote_share_panel"}},
+      html_options: {"data-behavior" => "show_entry_basement", "data-basement-panel" => "evernote_share_panel"},
       klass: "Share::EvernoteShare",
       has_share_sheet: true
     }),
@@ -100,7 +100,7 @@ class SupportedSharingService < ApplicationRecord
       label: "Micro.blog",
       requires_auth: true,
       service_type: "xauth",
-      html_options: {data: {behavior: "show_entry_basement", basement_panel: "micro_blog_share_panel"}},
+      html_options: {"data-behavior" => "show_entry_basement", "data-basement-panel" => "micro_blog_share_panel"},
       klass: "Share::MicroBlog",
       has_share_sheet: true
     })
@@ -152,6 +152,12 @@ class SupportedSharingService < ApplicationRecord
     klass.link_options(entry)
   end
 
+  def share_link
+    service_info = SupportedSharingService.info!(service_id)
+    klass = service_info.klass.constantize.new(self)
+    klass.share_link
+  end
+
   def self.info(service_id)
     SERVICES.find { |service| service.service_id == service_id }
   end
@@ -169,7 +175,7 @@ class SupportedSharingService < ApplicationRecord
   end
 
   def html_options
-    info.html_options || {remote: true}
+    info.html_options || {"data-remote" => true}
   end
 
   def active?

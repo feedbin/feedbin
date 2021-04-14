@@ -21,4 +21,11 @@ class Share::Facebook < Share::Service
       html_options: {onclick: action[:text]}
     })
   end
+
+  def share_link
+    super.merge({
+      url: "#{URL}?u=${url}&display=popup",
+      html_options: {"data-behavior" => "share_popup"}
+    })
+  end
 end

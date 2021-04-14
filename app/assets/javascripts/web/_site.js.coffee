@@ -27,6 +27,48 @@ $.extend feedbin,
   scrollStarted: false
   loadingMore: false
 
+  prepareShareMenu: ->
+    buildLink = (item, index) ->
+      href = item.url
+        .replace('${url}',        encodeURIComponent(feedbin.selectedEntryData.url))
+        .replace('${title}',      encodeURIComponent(feedbin.selectedEntryData.title))
+        .replace('${source}',     encodeURIComponent(feedbin.selectedEntryData.feed_title))
+        .replace('${id}',         feedbin.selectedEntryData.id)
+        .replace('${raw_url}',    feedbin.selectedEntryData.url)
+        .replace('${twitter_id}', feedbin.selectedEntryData.twitter_id)
+        .replace('9999999999',    feedbin.selectedEntryData.id)
+
+      li       = $('<li>').addClass('share-option')
+      label    = $('<div>').addClass('label').text(item.label)
+      keyboard = $('<i>').addClass('share-keyboard').text(index)
+      link     = $('<a>').attr('href', href)
+
+      if "html_options" of item
+        link.attr(item.html_options)
+
+      link.attr('data-keyboard-shortcut', index)
+      link.append(label)
+      if index < 10
+        link.append(keyboard)
+      li.append(link)
+
+    $('[data-behavior~=share_button_wrap]').removeClass('hide')
+    services = [].concat(feedbin.data.sharing)
+    offset = 1
+    if "share" of navigator
+      if services.length > 0
+        offset = 0
+        services.unshift({url: '#', label: "Share using…", html_options: {"data-behavior": "navigator_share"}})
+      else
+        $('[data-behavior~=toggle_share_menu]').attr("data-behavior", "navigator_share toggle_share_menu")
+    else if services.length == 0
+      services.unshift({url: feedbin.data.sharing_path, label: "Configure…"})
+
+    if services.length > 0
+      markup = services.map (service, index) ->
+        buildLink(service, index + offset)
+      $('[data-behavior~=share_options]').html(markup)
+
   hideLinkAction: (url) ->
     if url of feedbin.linkActions
       tooltip = feedbin.linkActions[url].tooltip
@@ -1209,14 +1251,19 @@ $.extend feedbin,
       $('[data-behavior~=selected_entry_data]').addClass('starred')
 
   showEntry: (entryId) ->
-    entry = feedbin.entries[entryId]
-    $('body').removeClass('extract-active')
-    feedbin.updateEntryContent(entry.content, entry.inner_content)
-    feedbin.formatEntryContent(entryId, true)
-    if feedbin.viewType == 'updated'
-      $('[data-behavior~=change_content_view][data-view-mode=diff]').prop('checked', true).change()
-    else if feedbin.data.subscription_view_mode[entry.feed_id] == "newsletter"
-      $('[data-behavior~=change_content_view][data-view-mode=newsletter]').prop('checked', true).change()
+    try
+      entry = feedbin.entries[entryId]
+      $('body').removeClass('extract-active')
+      feedbin.updateEntryContent(entry.content, entry.inner_content)
+      feedbin.formatEntryContent(entryId, true)
+      feedbin.prepareShareMenu()
+      if feedbin.viewType == 'updated'
+        $('[data-behavior~=change_content_view][data-view-mode=diff]').prop('checked', true).change()
+      else if feedbin.data.subscription_view_mode[entry.feed_id] == "newsletter"
+        $('[data-behavior~=change_content_view][data-view-mode=newsletter]').prop('checked', true).change()
+    catch error
+      console.log ["error showing article", error]
+
 
   tagFeed: (url, tag, noResponse = true) ->
     $.ajax
@@ -2776,6 +2823,29 @@ $.extend feedbin,
           tooltipTarget.addClass("right")
           tooltipTarget.css
             right: "#{parentWidth - bar.offsetLeft - 18}px"
+
+    sharePopup: ->
+      $(document).on 'click', '[data-behavior~=share_popup]', (event) ->
+        url = $(@).attr('href')
+        feedbin.sharePopup(url)
+        event.preventDefault()
+        event.stopPropagation()
+
+    navigatorShare: ->
+      $(document).on 'click', '[data-behavior~=navigator_share]', (event) ->
+        data =
+          title: feedbin.selectedEntryData.title,
+          url: feedbin.selectedEntryData.url,
+
+        selection = feedbin.getSelectedText()
+        if selection != ""
+          data.text = selection
+
+        navigator.share(data).catch (error) ->
+          console.log error
+
+        event.preventDefault()
+        event.stopPropagation()
 
     copy: ->
       $(document).on 'click', '[data-behavior~=copy]', (event) ->

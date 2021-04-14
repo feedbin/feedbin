@@ -19,6 +19,6 @@
         <%= render partial: "article_content", locals: {entry: entry} %>
     </div>
     <script>
-        feedbin.selectedEntryData = <%= raw json_escape({id: entry.id, url: entry.fully_qualified_url, title: entry.title, feed_id: entry.feed_id, feed_title: entry.feed.title}.to_json) %>;
+        feedbin.selectedEntryData = <%= raw json_escape({id: entry.id, url: entry.fully_qualified_url, title: entry.title, feed_id: entry.feed_id, feed_title: entry.feed.title, twitter_id: entry.twitter_id || ""}.to_json) %>;
     </script>
 <% end %>

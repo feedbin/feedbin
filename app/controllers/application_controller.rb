@@ -81,7 +81,9 @@ class ApplicationController < ActionController::Base
       subscription_view_mode: subscription_view_settings,
       pages_internal_path: pages_internal_path,
       tag_visibility: @user.tag_visibility,
-      visibility_key: "tag_visibility"
+      visibility_key: "tag_visibility",
+      sharing: @user.combined_sharing_services,
+      sharing_path: sharing_services_path
     }
 
     render "site/logged_in"

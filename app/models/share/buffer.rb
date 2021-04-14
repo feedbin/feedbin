@@ -21,4 +21,11 @@ class Share::Buffer < Share::Service
       html_options: {onclick: action[:text]}
     })
   end
+
+  def share_link
+    super.merge({
+      url: "#{URL}?url=${url}&text=${title}",
+      html_options: {"data-behavior" => "share_popup"}
+    })
+  end
 end

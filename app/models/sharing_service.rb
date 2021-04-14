@@ -18,6 +18,11 @@ class SharingService < ApplicationRecord
     {url: share_url, label: label, html_options: {target: target, rel: "noopener noreferrer"}}
   end
 
+  def share_link
+    target = url.start_with?("http") ? "_blank" : "_self"
+    {url: url, label: label, html_options: {target: target, rel: "noopener noreferrer"}}
+  end
+
   def active?
     true
   end
