@@ -98,13 +98,6 @@ GIT
       http-parser (~> 1.2.0)
 
 GIT
-  remote: https://github.com/feedbin/oauth-ruby.git
-  revision: 3b749b49f54d7f4e1fbdfa9f4b23f20d22a7357e
-  branch: feedbin
-  specs:
-    oauth (0.5.5)
-
-GIT
   remote: https://github.com/feedbin/opml_saw.git
   revision: 61d8c2dd3d46e9cae38178754469dd9da7c8bd6a
   ref: 61d8c2d
@@ -219,7 +212,7 @@ GEM
       rack (>= 0.9.0)
     binding_of_caller (1.0.0)
       debug_inspector (>= 0.0.1)
-    bootsnap (1.7.3)
+    bootsnap (1.7.4)
       msgpack (~> 1.0)
     buftok (0.2.0)
     builder (3.2.4)
@@ -255,7 +248,7 @@ GEM
       execjs
     coffee-script-source (1.12.2)
     concurrent-ruby (1.1.8)
-    connection_pool (2.2.3)
+    connection_pool (2.2.5)
     coveralls (0.8.23)
       json (>= 1.8, < 3)
       simplecov (~> 0.16.1)
@@ -290,7 +283,7 @@ GEM
     evernote_oauth (0.2.3)
       evernote-thrift
       oauth (>= 0.4.1)
-    excon (0.79.0)
+    excon (0.80.1)
     execjs (2.7.0)
     faker (2.17.0)
       i18n (>= 1.6, < 2)
@@ -338,7 +331,7 @@ GEM
     httparty (0.18.1)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
-    i18n (1.8.9)
+    i18n (1.8.10)
       concurrent-ruby (~> 1.0)
     idn-ruby (0.1.0)
     image_processing (1.12.1)
@@ -364,7 +357,7 @@ GEM
       activesupport (>= 3.0)
       librato-rack (~> 1.1.0)
       railties (>= 3.0)
-    listen (3.5.0)
+    listen (3.5.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
     lograge (0.11.2)
@@ -372,12 +365,12 @@ GEM
       activesupport (>= 4)
       railties (>= 4)
       request_store (~> 1.0)
-    loofah (2.9.0)
+    loofah (2.9.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)
       mini_mime (>= 0.1.1)
-    marcel (1.0.0)
+    marcel (1.0.1)
     memoizable (0.4.2)
       thread_safe (~> 0.3, >= 0.3.1)
     method_source (1.0.0)
@@ -403,20 +396,21 @@ GEM
       net-ssh (>= 2.6.5, < 7.0.0)
     net-ssh (6.1.0)
     nio4r (2.5.7)
-    nokogiri (1.11.2)
+    nokogiri (1.11.3)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
-    nokogiri (1.11.2-x86_64-darwin)
+    nokogiri (1.11.3-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.11.2-x86_64-linux)
+    nokogiri (1.11.3-x86_64-linux)
       racc (~> 1.4)
     nokogumbo (2.0.5)
       nokogiri (~> 1.8, >= 1.8.4)
+    oauth (0.5.6)
     parallel (1.20.1)
-    parser (3.0.0.0)
+    parser (3.0.1.0)
       ast (~> 2.4.1)
     pg (1.2.3)
-    premailer (1.14.2)
+    premailer (1.14.3)
       addressable
       css_parser (>= 1.6.0)
       htmlentities (>= 4.0.0)
@@ -479,9 +473,9 @@ GEM
       railties (>= 5.0)
     reverse_markdown (2.0.0)
       nokogiri
-    rexml (3.2.4)
+    rexml (3.2.5)
     rmagick (4.2.2)
-    rubocop (1.11.0)
+    rubocop (1.12.1)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
@@ -516,7 +510,7 @@ GEM
     selenium-webdriver (3.142.7)
       childprocess (>= 0.5, < 4.0)
       rubyzip (>= 1.2.2)
-    sidekiq (6.2.0)
+    sidekiq (6.2.1)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
@@ -539,8 +533,8 @@ GEM
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     ssrf_filter (1.0.7)
-    standard (1.0.4)
-      rubocop (= 1.11.0)
+    standard (1.0.5)
+      rubocop (= 1.12.1)
       rubocop-performance (= 1.10.1)
     stripe (4.24.0)
       faraday (~> 0.13)
@@ -571,7 +565,7 @@ GEM
       unf_ext
     unf_ext (0.0.7.7)
     unicode-display_width (2.0.0)
-    unicode-emoji (2.7.1)
+    unicode-emoji (2.8.0)
       unicode-version (~> 1.0)
     unicode-version (1.1.0)
     unicorn (6.0.0)
@@ -642,7 +636,7 @@ DEPENDENCIES
   minitest-stub-const
   minitest-stub_any_instance
   net-http-persistent
-  oauth!
+  oauth
   opml_saw!
   pg
   premailer-rails
