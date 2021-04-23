@@ -14,14 +14,6 @@ class Share::Twitter < Share::Service
     {text: "feedbin.sharePopup('#{uri}'); return false;"}
   end
 
-  def link_options(entry)
-    action = share(nil, entry)
-    defaults = super
-    defaults.merge({
-      html_options: {onclick: action[:text]}
-    })
-  end
-
   def share_link
     super.merge({
       url: "#{URL}?url=${url}&text=${title}",

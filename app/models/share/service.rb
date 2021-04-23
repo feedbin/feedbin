@@ -43,12 +43,6 @@ class Share::Service
     ApplicationController.render template: "supported_sharing_services/popover", formats: :js, locals: {url: url}, layout: nil
   end
 
-  def link_options(entry)
-    {url: Rails.application.routes.url_helpers.share_supported_sharing_service_path(@klass, entry),
-     label: @klass.label,
-     html_options: @klass.html_options}
-  end
-
   def share_link
     {
       url: Rails.application.routes.url_helpers.share_supported_sharing_service_path(@klass, 9_999_999_999),

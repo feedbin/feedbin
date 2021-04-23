@@ -1,20 +1,10 @@
-<div class="entry-button-wrap <%= services.present? ? '' : 'hide' %>" data-behavior="share_button_wrap">
+<div class="entry-button-wrap" data-behavior="share_button_wrap">
     <div class="dropdown-wrap button-toggle-share-menu entry-button">
         <button class="reset entry-button" data-behavior="toggle_share_menu toggle_dropdown" title="Share <i>f</i>" data-toggle="tooltip" data-html="true">
             <%= svg_tag 'icon-share-arrow' %>
         </button>
         <div class="dropdown-content">
             <ul data-behavior="share_options">
-                <% services.each_with_index do |service, row| %>
-                    <li class="share-option">
-                        <%= link_to service[:url], service[:html_options] do %>
-                            <div class="label"><%= service[:label] %></div>
-                            <% if row < 9 %>
-                                <i class="share-keyboard"><%= row + 1 %></i>
-                            <% end %>
-                        <% end %>
-                    </li>
-                <% end %>
             </ul>
         </div>
     </div>

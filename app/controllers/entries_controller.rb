@@ -254,7 +254,6 @@ class EntriesController < ApplicationController
     entries.each_with_object({}) do |entry, hash|
       locals = {
         entry: entry,
-        services: sharing_services(entry),
         extract: false,
         user: @user,
         subscriptions: subscriptions
@@ -265,19 +264,6 @@ class EntriesController < ApplicationController
         feed_id: entry.feed_id
       }
     end
-  end
-
-  def sharing_services(entry)
-    @user_sharing_services ||= begin
-      (@user.sharing_services + @user.supported_sharing_services).reject { |sharing_service| sharing_service.active? == false }.sort_by { |sharing_service| sharing_service.label }
-    end
-
-    services = []
-    @user_sharing_services.each do |sharing_service|
-      services << sharing_service.link_options(entry)
-    rescue
-    end
-    services
   end
 
   def matched_search_ids(params)

@@ -146,12 +146,6 @@ class SupportedSharingService < ApplicationRecord
     @service ||= klass.constantize.new(self)
   end
 
-  def link_options(entry)
-    service_info = SupportedSharingService.info!(service_id)
-    klass = service_info.klass.constantize.new(self)
-    klass.link_options(entry)
-  end
-
   def share_link
     service_info = SupportedSharingService.info!(service_id)
     klass = service_info.klass.constantize.new(self)

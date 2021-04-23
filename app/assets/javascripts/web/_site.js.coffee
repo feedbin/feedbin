@@ -52,7 +52,6 @@ $.extend feedbin,
         link.append(keyboard)
       li.append(link)
 
-    $('[data-behavior~=share_button_wrap]').removeClass('hide')
     services = [].concat(feedbin.data.sharing)
     offset = 1
     if "share" of navigator
