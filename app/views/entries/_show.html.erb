@@ -26,6 +26,12 @@
         </div>
     <% end %>
     <script>
-        feedbin.faviconColors($(".entry-toolbar"))
+        try {
+            feedbin.selectedEntryData = <%= raw json_escape({id: entry.id, url: entry.fully_qualified_url, title: entry.title, feed_id: entry.feed_id, feed_title: entry.feed.title, twitter_id: entry.twitter_id || ""}.to_json) %>;
+            feedbin.prepareShareMenu(feedbin.selectedEntryData);
+            feedbin.faviconColors($(".entry-toolbar"));
+        } catch (e) {
+            console.log(e);
+        }
     </script>
 <% end %>

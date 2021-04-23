@@ -27,16 +27,16 @@ $.extend feedbin,
   scrollStarted: false
   loadingMore: false
 
-  prepareShareMenu: ->
-    buildLink = (item, index) ->
+  prepareShareMenu: (data) ->
+    buildLink = (item, data, index) ->
       href = item.url
-        .replace('${url}',        encodeURIComponent(feedbin.selectedEntryData.url))
-        .replace('${title}',      encodeURIComponent(feedbin.selectedEntryData.title))
-        .replace('${source}',     encodeURIComponent(feedbin.selectedEntryData.feed_title))
-        .replace('${id}',         feedbin.selectedEntryData.id)
-        .replace('${raw_url}',    feedbin.selectedEntryData.url)
-        .replace('${twitter_id}', feedbin.selectedEntryData.twitter_id)
-        .replace('9999999999',    feedbin.selectedEntryData.id)
+        .replace('${url}',        encodeURIComponent(data.url))
+        .replace('${title}',      encodeURIComponent(data.title))
+        .replace('${source}',     encodeURIComponent(data.feed_title))
+        .replace('${id}',         data.id)
+        .replace('${raw_url}',    data.url)
+        .replace('${twitter_id}', data.twitter_id)
+        .replace('9999999999',    data.id)
 
       li       = $('<li>').addClass('share-option')
       label    = $('<div>').addClass('label').text(item.label)
@@ -65,7 +65,7 @@ $.extend feedbin,
 
     if services.length > 0
       markup = services.map (service, index) ->
-        buildLink(service, index + offset)
+        buildLink(service, data, index + offset)
       $('[data-behavior~=share_options]').html(markup)
 
   hideLinkAction: (url) ->
@@ -1255,7 +1255,6 @@ $.extend feedbin,
       $('body').removeClass('extract-active')
       feedbin.updateEntryContent(entry.content, entry.inner_content)
       feedbin.formatEntryContent(entryId, true)
-      feedbin.prepareShareMenu()
       if feedbin.viewType == 'updated'
         $('[data-behavior~=change_content_view][data-view-mode=diff]').prop('checked', true).change()
       else if feedbin.data.subscription_view_mode[entry.feed_id] == "newsletter"
