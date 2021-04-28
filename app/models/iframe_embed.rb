@@ -89,6 +89,7 @@ class IframeEmbed
   end
 
   def self.fetch(url)
+    url = normalize_url(url)
     parser = find_embed_source(url)
     parser = parser.new(url)
     parser.fetch
@@ -109,6 +110,16 @@ class IframeEmbed
       IframeEmbed::Soundcloud,
       IframeEmbed::Default
     ]
+  end
+
+  def self.normalize_url(url)
+    if url.start_with?("https://cdn.embedly.com/widgets")
+      parsed = Addressable::URI.parse(url)
+      if parsed.query_values && parsed.query_values["src"]
+        url = parsed.query_values["src"]
+      end
+    end
+    url
   end
 
   def self.supported_urls
