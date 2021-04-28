@@ -809,6 +809,14 @@ $.extend feedbin,
         $.extend feedbin.entries, data
         feedbin.preloadAssets(entry_ids[0])
 
+  hash: (string) ->
+    result = 0
+    for i in [0..(string.length-1)]
+      char = string.charCodeAt(i)
+      result = ((result << 5) - result) + char
+      result = result & result
+    result
+
   readability: () ->
     feedId = feedbin.selectedEntry.feed_id
     entryId = feedbin.selectedEntry.id
@@ -824,22 +832,20 @@ $.extend feedbin,
   fitVids: (target) ->
     target.fitVids({ customSelector: "iframe"});
 
-  randomNumber: ->
-    Math.floor(Math.random() * 1000)
-
   embed: (items, embed_url, urlFinder) ->
     if items.length > 0
       items.each ->
         item = $(@)
         url = urlFinder(item)
-        embedElement = feedbin.embeds["#{url}"]
-        if embedElement
-          item.replaceWith(embedElement.clone())
-        else if url
-          id = feedbin.randomNumber()
+        if url
+          id = feedbin.hash(url)
           item.attr("id", id)
-          $.get(embed_url, {url: url, dom_id: id}).fail ->
-            item.css({display: "block"})
+          embedElement = feedbin.embeds["#{id}"]
+          if embedElement
+            item.replaceWith(embedElement.clone())
+          else
+            $.get(embed_url, {url: url, dom_id: id}).fail ->
+              item.css({display: "block"})
 
 
   formatTweets: (target = "[data-behavior~=entry_content_wrap]") ->
@@ -849,7 +855,6 @@ $.extend feedbin,
       $("a", item).last().attr("href")
 
     feedbin.embed(items, feedbin.data.twitter_embed_path, urlFinder)
-
 
   formatInstagram: (target = "[data-behavior~=entry_content_wrap]") ->
     items = $('blockquote.instagram-media', target)

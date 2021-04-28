@@ -3,26 +3,26 @@
         <header class="tweet-header">
             <div class="profile-wrap">
                 <div class="profile-image-wrap">
-                    <%= link_to tweet.author_url, target: "_blank", title: "View on Twitter", class: "profile-image" do %>
-                        <%= image_tag(camo_link(tweet.profile_image_url), size: "47x47", alt: "") %>
+                    <%= link_to media.author_url, target: "_blank", title: "View on Twitter", class: "profile-image" do %>
+                        <%= image_tag(camo_link(media.profile_image_url), size: "47x47", alt: "") %>
                     <% end %>
                 </div>
                 <div class="profile-info">
                     <h1>
-                        <a href="<%= tweet.permalink %>" target="_blank" class="link">
-                            <strong><%= tweet.name %></strong>
-                            <%= tweet.screen_name %>
+                        <a href="<%= media.permalink %>" target="_blank" class="link">
+                            <strong><%= media.name %></strong>
+                            <%= media.screen_name %>
                         </a>
                         <span class="tweet-actions">
-                            <%= link_to tweet.permalink, target: "_blank", title: "View on Twitter", class: "tweet-link embed" do %>
+                            <%= link_to media.permalink, target: "_blank", title: "View on Twitter", class: "tweet-link embed" do %>
                                 <%= svg_tag "icon-twitter-logo" %>
                             <% end %>
                         </span>
                     </h1>
                     <p class="post-meta">
-                        <%= link_to tweet.permalink, target: "_blank", title: "View on Twitter" do %>
-                            <time datetime="<%= tweet.date.iso8601 %>">
-                                <%= tweet.date.to_s(:date) %>
+                        <%= link_to media.permalink, target: "_blank", title: "View on Twitter" do %>
+                            <time datetime="<%= media.date.iso8601 %>">
+                                <%= media.date.to_s(:date) %>
                             </time>
                         <% end %>
                     </p>
@@ -30,9 +30,9 @@
             </div>
         </header>
         <div class="tweet-body">
-            <%= tweet.content.html_safe %>
-            <% if tweet.image_url %>
-                <p><a href="<%= tweet.image_url %>"><img src="<%= camo_link(tweet.image_url) %>"></a></p>
+            <%= media.content.html_safe %>
+            <% if media.image_url %>
+                <p><a href="<%= media.image_url %>"><img src="<%= camo_link(media.image_url) %>"></a></p>
             <% end %>
         </div>
     </div>

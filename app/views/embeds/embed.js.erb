@@ -1,0 +1,2 @@
+feedbin.embeds["<%= @dom_id %>"] = $("<%= j render partial: source, locals: {media: @media} %>");
+$("#<%= @dom_id %>").replaceWith(feedbin.embeds["<%= @dom_id %>"]);

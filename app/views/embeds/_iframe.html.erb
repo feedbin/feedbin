@@ -1,51 +1,51 @@
-<% cache [Digest::SHA1.hexdigest(@embed.iframe_src), @embed.cache_key] do %>
-    <% if embed.image_url.present? %>
-    <div class="iframe-embed system-content embed-type-<%= embed.type %> embed-with-image" data-behavior="iframe_placeholder" data-iframe-src="<%= @embed.iframe_src %>" data-iframe-width="<%= params[:width] %>" data-iframe-height="<%= params[:height] %>">
-        <% if embed.image_url.present? %>
+<% cache [Digest::SHA1.hexdigest(media.iframe_src), media.cache_key] do %>
+    <% if media.image_url.present? %>
+    <div class="iframe-embed system-content embed-type-<%= media.type %> embed-with-image" data-behavior="iframe_placeholder" data-iframe-src="<%= media.iframe_src %>" data-iframe-width="<%= params[:width] %>" data-iframe-height="<%= params[:height] %>">
+        <% if media.image_url.present? %>
             <div class="image-wrap" title="Load embed">
                 <div class="play-button">
                     <div class="play-button-inner">
                         <%= svg_tag "icon-play" %>
                     </div>
                 </div>
-                <% if embed.duration %>
-                  <div class="embed-duration"><%= embed.duration %></div>
+                <% if media.duration %>
+                  <div class="embed-duration"><%= media.duration %></div>
                 <% end %>
                 <div class="inner" data-behavior="iframe_target">
-                    <%= image_tag(camo_link(@embed.image_url), class: "responsive", alt: "") %>
+                    <%= image_tag(camo_link(media.image_url), class: "responsive", alt: "") %>
                 </div>
             </div>
         <% end %>
-        <a class="embed-profile entry-callout embed-link" href="<%= embed.canonical_url %>" title="Visit embed source">
+        <a class="embed-profile entry-callout embed-link" href="<%= media.canonical_url %>" title="Visit embed source">
             <span class="embed-data">
-                <span class="embed-title"><%= embed.title %></span>
-                <% if embed.channel_name %>
-                    <span class="embed-subhead"><%= embed.channel_name %></span>
+                <span class="embed-title"><%= media.title %></span>
+                <% if media.channel_name %>
+                    <span class="embed-subhead"><%= media.channel_name %></span>
                 <% end %>
-                <span class="embed-subtitle"><%= embed.subtitle %></span>
+                <span class="embed-subtitle"><%= media.subtitle %></span>
             </span>
-            <% if embed.profile_image %>
+            <% if media.profile_image %>
             <span class="embed-profile-image">
-                <%= image_tag(camo_link(@embed.profile_image), class: "responsive", alt: "") %>
+                <%= image_tag(camo_link(media.profile_image), class: "responsive", alt: "") %>
             </span>
             <% else %>
-            <span class="embed-icon" href="<%= embed.canonical_url %>">
-                <%= favicon_with_host(embed.embed_url.host) %>
-                <%= svg_tag "icon-embed-source-#{embed.clean_name}" %>
+            <span class="embed-icon" href="<%= media.canonical_url %>">
+                <%= favicon_with_host(media.embed_url.host) %>
+                <%= svg_tag "icon-embed-source-#{media.clean_name}" %>
             </span>
             <% end %>
         </a>
     </div>
     <% else %>
-    <div class="iframe-embed system-content embed-type-<%= embed.type %>" data-behavior="iframe_placeholder" data-iframe-src="<%= @embed.iframe_src %>" data-iframe-width="<%= params[:width] %>" data-iframe-height="<%= params[:height] %>" title="Load embed">
-        <div class="embed-profile entry-callout" href="<%= embed.canonical_url %>">
+    <div class="iframe-embed system-content embed-type-<%= media.type %>" data-behavior="iframe_placeholder" data-iframe-src="<%= media.iframe_src %>" data-iframe-width="<%= params[:width] %>" data-iframe-height="<%= params[:height] %>" title="Load embed">
+        <div class="embed-profile entry-callout" href="<%= media.canonical_url %>">
             <span class="embed-data">
-                <span class="embed-title"><%= embed.title %></span>
-                <span class="embed-subtitle"><%= embed.subtitle %></span>
+                <span class="embed-title"><%= media.title %></span>
+                <span class="embed-subtitle"><%= media.subtitle %></span>
             </span>
-            <a class="embed-icon embed-link" href="<%= embed.canonical_url %>">
-                <%= favicon_with_host(embed.embed_url.host) %>
-                <%= svg_tag "icon-embed-source-#{embed.clean_name}" %>
+            <a class="embed-icon embed-link" href="<%= media.canonical_url %>">
+                <%= favicon_with_host(media.embed_url.host) %>
+                <%= svg_tag "icon-embed-source-#{media.clean_name}" %>
             </a>
         </div>
     </div>
