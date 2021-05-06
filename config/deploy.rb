@@ -2,7 +2,7 @@ set :branch, "master"
 
 set :application, "feedbin"
 set :repo_url, "git@github.com:feedbin/#{fetch(:application)}.git"
-set :deploy_to, "/srv/apps/#{fetch(:application)}"
+set :deploy_to, ENV["CAP_DEPLOY_TO"] || "/srv/apps/#{fetch(:application)}"
 set :bundle_jobs, 6
 set :log_level, :warn
 
