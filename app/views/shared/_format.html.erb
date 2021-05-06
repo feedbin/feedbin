@@ -1,6 +1,6 @@
 <% present @user do |user_presenter| %>
     <div class="format-palette hide">
-        <%= form_with(model: user_presenter, url: format_user_path(current_user)) do |f| %>
+        <%= form_with(model: user_presenter, url: format_user_path(current_user), data: {remote: true}) do |f| %>
             <%= f.hidden_field :font_size, data: {behavior: "font_size"} %>
             <%= f.hidden_field :view_mode, data: {behavior: "view_mode"} %>
             <%= f.hidden_field :feeds_width, data: {behavior: "feeds_width"} %>

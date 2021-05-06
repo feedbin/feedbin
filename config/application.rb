@@ -11,7 +11,7 @@ Bundler.require(*Rails.groups)
 module Feedbin
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 6.0
+    config.load_defaults 6.1
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
@@ -45,5 +45,6 @@ module Feedbin
     config.sass.line_comments = true
     config.assets.compress = true
     config.action_view.automatically_disable_submit_tag = false
+    config.active_record.belongs_to_required_by_default = false
   end
 end

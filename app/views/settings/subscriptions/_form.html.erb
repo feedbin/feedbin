@@ -1,4 +1,4 @@
-<%= form_with model: subscription, url: settings_subscription_path, html: {class: 'settings'} do |f| %>
+<%= form_with model: subscription, url: settings_subscription_path, html: {class: 'settings'}, data: {remote: true} do |f| %>
     <% present subscription do |subscription_presenter| %>
         <div class="feed-profile">
             <div class="inset">

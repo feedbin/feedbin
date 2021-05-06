@@ -133,7 +133,7 @@
                             <ul class="control-group">
                                 <% @user.newsletter_senders.each do |newsletter_sender| %>
                                    <li>
-                                        <%= form_with(model: newsletter_sender, url: newsletter_senders_settings_subscription_path(newsletter_sender.feed_id)) do |f| %>
+                                        <%= form_with(model: newsletter_sender, url: newsletter_senders_settings_subscription_path(newsletter_sender.feed_id), data: {remote: true}) do |f| %>
                                             <%= f.check_box :feed_id, {id: "newsletter_sender_#{newsletter_sender.feed_id}", checked: @subscription_ids.include?(newsletter_sender.feed_id), data: {behavior: "auto_submit"}} %>
                                             <%= f.label :feed_id, for: "newsletter_sender_#{newsletter_sender.feed_id}" do %>
                                                <%= newsletter_sender.name %> <span class="extra-muted">&lt;<%= newsletter_sender.email %>&gt;</span> <%= toggle_switch %>
