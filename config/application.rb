@@ -46,5 +46,6 @@ module Feedbin
     config.assets.compress = true
     config.action_view.automatically_disable_submit_tag = false
     config.active_record.belongs_to_required_by_default = false
+    config.action_view.default_enforce_utf8 = true
   end
 end
