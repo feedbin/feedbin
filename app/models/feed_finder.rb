@@ -30,7 +30,7 @@ class FeedFinder
       feeds = Source::Xml.find(response)
     end
 
-    if feeds.empty? && !import_mode?
+    if feeds.empty?
       feeds = Source::KnownPattern.find(response)
     end
 
