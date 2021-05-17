@@ -16,7 +16,7 @@ class ContentFormatter
       "ins" => ["cite"],
       "q" => ["cite"],
       "source" => ["src"],
-      "video" => ["src", "poster", "playsinline", "loop", "muted", "controls"],
+      "video" => ["src", "poster", "playsinline", "loop", "muted", "controls", "preload"],
       "audio" => ["src"],
       "td" => ["align"],
       "th" => ["align"],
@@ -66,7 +66,7 @@ class ContentFormatter
 
   ALLOWLIST_DEFAULT = ALLOWLIST_BASE.clone.tap do |hash|
     transformers = Transformers.new
-    hash[:transformers] = [transformers.class_allowlist, transformers.table_elements, transformers.top_level_li]
+    hash[:transformers] = [transformers.class_allowlist, transformers.table_elements, transformers.top_level_li, transformers.video]
   end
 
   ALLOWLIST_NEWSLETTER = ALLOWLIST_BASE.clone.tap do |hash|

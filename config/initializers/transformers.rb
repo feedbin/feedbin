@@ -4,6 +4,7 @@ class Transformers
   TABLE_ITEMS = Set.new(%w[tr td th].freeze)
   TABLE = "table".freeze
   TABLE_SECTIONS = Set.new(%w[thead tbody tfoot].freeze)
+  VIDEO = "video".freeze
 
   def class_allowlist
     lambda do |env|
@@ -47,6 +48,15 @@ class Transformers
       name, node = env[:node_name], env[:node]
       if (TABLE_SECTIONS.include?(name) || TABLE_ITEMS.include?(name)) && !node.ancestors.any? { |n| n.name == TABLE }
         node.replace(node.children)
+      end
+    end
+  end
+
+  def video
+    lambda do |env|
+      name, node = env[:node_name], env[:node]
+      if name == VIDEO
+        node["preload"] = "none"
       end
     end
   end
