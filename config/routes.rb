@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   get "manifest/:theme", to: "site#manifest", as: "manifest"
 
   post "/newsletters" => "newsletters#create"
+  post "/newsletters/:token" => "newsletters#raw"
   get "bookmarklet/:cache_buster", to: "bookmarklet#script", as: "bookmarklet"
 
   match "/404", to: "errors#not_found", via: :all

@@ -1,0 +1,24 @@
+From: Ben Ubois <ben@benubois.com>
+Content-Type: multipart/alternative;
+	boundary="Apple-Mail=_69C10757-6147-4747-A7B0-FD3DD432EF31"
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.80.0.2.43\))
+Subject: HTML
+X-Universally-Unique-Identifier: 6DDB98CF-12C5-4820-8B2C-DD6658CFA8A7
+Message-Id: <3A9FA79A-26AB-4BC6-B483-ECBE7768B504@benubois.com>
+Date: Tue, 18 May 2021 14:17:41 -0700
+To: token@newsletters.feedbin.com
+
+
+--Apple-Mail=_69C10757-6147-4747-A7B0-FD3DD432EF31
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+	charset=us-ascii
+
+This is an HTML email.
+--Apple-Mail=_69C10757-6147-4747-A7B0-FD3DD432EF31
+Content-Transfer-Encoding: 7bit
+Content-Type: text/html;
+	charset=us-ascii
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=us-ascii"></head><body style="word-wrap: break-word; -webkit-nbsp-mode: space; line-break: after-white-space;" class="">This is an <b class="">HTML</b> email.</body></html>
+--Apple-Mail=_69C10757-6147-4747-A7B0-FD3DD432EF31--
