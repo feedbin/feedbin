@@ -16,7 +16,12 @@ class NewslettersController < ApplicationController
   def raw
     token = params[:token].split("+").first
     if AuthenticationToken.newsletters.active.where(token: token).exists?
-      NewsletterReceiver.perform_async(params[:token], request.body.read)
+      body = request.body.read
+      begin
+        NewsletterReceiver.perform_async(params[:token], body)
+      rescue Encoding::UndefinedConversionError
+        NewsletterReceiver.perform_async(params[:token], body.force_encoding(Encoding::UTF_8))
+      end
     end
     head :ok
   end
