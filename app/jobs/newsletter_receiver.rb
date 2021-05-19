@@ -9,7 +9,8 @@ class NewsletterReceiver
     if @user
       email = Mail.from_source(email)
       @newsletter = EmailNewsletter.new(email, full_token)
-      create
+      entry = create
+      Sidekiq.logger.info "Newsletter created public_id=#{entry.public_id}"
     end
     active = @user ? !@user.suspended : false
     Librato.increment "newsletter.user_active.#{active}"
