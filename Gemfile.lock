@@ -410,6 +410,11 @@ GEM
     parser (3.0.1.1)
       ast (~> 2.4.1)
     pg (1.2.3)
+    postmark (1.21.3)
+      json
+    postmark-rails (0.21.0)
+      actionmailer (>= 3.0.0)
+      postmark (>= 1.21.3, < 2.0)
     premailer (1.15.0)
       addressable
       css_parser (>= 1.6.0)
@@ -639,6 +644,7 @@ DEPENDENCIES
   oauth
   opml_saw!
   pg
+  postmark-rails
   premailer-rails
   puma
   rack-attack

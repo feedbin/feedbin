@@ -1,10 +1,7 @@
 class EntryMailer < ApplicationMailer
   default from: "Feedbin <#{ENV["NOTIFICATION_EMAIL"]}>"
 
-  self.smtp_settings = smtp_settings.merge({
-    user_name: ENV["SMTP_BULK_USERNAME"] || ENV["SMTP_USERNAME"],
-    password: ENV["SMTP_BULK_PASSWORD"] || ENV["SMTP_PASSWORD"]
-  })
+  self.postmark_settings = { api_key: ENV["POSTMARK_API_KEY_BULK"] || ENV["POSTMARK_API_KEY"] }
 
   def mailer(entry_id, to, subject, body, reply_to, email_name, readability)
     @entry = Entry.find(entry_id)
