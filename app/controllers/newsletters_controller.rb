@@ -16,17 +16,26 @@ class NewslettersController < ApplicationController
   def raw
     token = params[:token].split("+").first
     if AuthenticationToken.newsletters.active.where(token: token).exists?
-      body = request.body.read
-      begin
-        NewsletterReceiver.perform_async(params[:token], body)
-      rescue Encoding::UndefinedConversionError
-        NewsletterReceiver.perform_async(params[:token], body.force_encoding(Encoding::UTF_8))
-      end
+      NewsletterReceiver.perform_async(params[:token], decoded(request.body.read))
     end
     head :ok
   end
 
   private
+
+  def decoded(body)
+    begin
+      JSON.generate(body)
+    rescue Encoding::UndefinedConversionError
+      begin
+        body = body.force_encoding(Encoding::UTF_8)
+        JSON.generate(body)
+      rescue JSON::GeneratorError
+        body = body.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: "?")
+      end
+    end
+    body
+  end
 
   def authorize
     http_basic_authenticate_or_request_with name: "newsletters", password: ENV["NEWSLETTER_PASSWORD"], realm: "Feedbin Newsletters"
