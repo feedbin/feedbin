@@ -36,11 +36,11 @@ class EmailNewsletter
   end
 
   def text
-    @email.text? ? @email.decoded : @email.text_part&.decoded
+    @email.text_part&.decoded || !html? && @email.decoded || nil
   end
 
   def html
-    @email.html_part&.decoded
+    @email.html_part&.decoded || html? && @email.decoded || nil
   end
 
   def content
@@ -86,6 +86,16 @@ class EmailNewsletter
   end
 
   private
+
+  def html?
+    return true if !@email.html_part.nil?
+    return true if content_type.respond_to?(:starts_with?) && content_type.starts_with?("text/html")
+    return false
+  end
+
+  def content_type
+    @email.content_type&.strip
+  end
 
   def parsed_from
     @email[:from].address_list.addresses.first
