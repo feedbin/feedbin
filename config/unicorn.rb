@@ -13,8 +13,7 @@ user             "app"
 pid    File.join(shared_directory, "tmp", "unicorn.pid")
 listen File.join(shared_directory, "tmp", "unicorn.sock")
 
-stderr_path File.join(shared_directory, "log", "unicorn.log")
-stdout_path File.join(shared_directory, "log", "unicorn.log")
+logger Logger.new($stdout)
 
 before_fork do |server, worker|
   defined?(ActiveRecord::Base) && ActiveRecord::Base.connection.disconnect!
