@@ -5,11 +5,11 @@ module Helpers
 
   def send_to_feedbin(original_url:, storage_url:)
     Sidekiq::Client.push(
-      "args"  => [@public_id, {
-        "original_url"  => original_url,
+      "args" => [@public_id, {
+        "original_url" => original_url,
         "processed_url" => storage_url,
-        "width"         => preset.width,
-        "height"        => preset.height
+        "width" => preset.width,
+        "height" => preset.height
       }],
       "class" => preset.job_class,
       "queue" => "default"
@@ -22,10 +22,10 @@ module Helpers
 
   def storage_options
     {
-      "Cache-Control"       => "max-age=315360000, public",
-      "Expires"             => "Sun, 29 Jun 2036 17:48:34 GMT",
+      "Cache-Control" => "max-age=315360000, public",
+      "Expires" => "Sun, 29 Jun 2036 17:48:34 GMT",
       "x-amz-storage-class" => ENV["AWS_S3_STORAGE_CLASS"] || "REDUCED_REDUNDANCY",
-      "x-amz-acl"           => "public-read"
+      "x-amz-acl" => "public-read"
     }
   end
 end

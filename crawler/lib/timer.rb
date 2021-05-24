@@ -5,7 +5,7 @@ class Timer
   end
 
   def expired?
-     now > @deadline
+    now > @deadline
   end
 
   def now
