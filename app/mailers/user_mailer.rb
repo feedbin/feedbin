@@ -39,7 +39,12 @@ class UserMailer < ApplicationMailer
 
   def kindle(kindle_address, mobi_file)
     attachments["kindle.mobi"] = File.read(mobi_file)
-    mail to: kindle_address, subject: "Kindle Content", body: "", from: ENV["KINDLE_EMAIL"]
+    mail to: kindle_address, subject: "Kindle Content", body: " ", from: ENV["KINDLE_EMAIL"]
+  end
+
+  def mailtest(user_id)
+    @user = User.find(user_id)
+    mail to: @user.email, subject: "[Feedbin] Starred Items Export Complete", body: ""
   end
 
   def account_closed(user_id, opml)
