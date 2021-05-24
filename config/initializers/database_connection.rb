@@ -1,3 +1,5 @@
+require "etc"
+
 if Rails.env.production?
   Rails.application.config.after_initialize do
     ActiveRecord::Base.connection_pool.disconnect!
@@ -18,7 +20,7 @@ if Rails.env.production?
         password: uri.password,
         database: database,
         reaping_frequency: ENV["DB_REAP_FREQ"] || 10,
-        pool: ENV["DB_POOL"] || 16
+        pool: ENV["DB_POOL"] || Etc.nprocessors
       )
     end
   end
