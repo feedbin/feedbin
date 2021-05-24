@@ -196,8 +196,6 @@ GEM
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
     aggregate (0.2.3)
-    airbrussh (1.4.0)
-      sshkit (>= 1.6.1, != 1.7.0)
     apnotic (1.6.1)
       connection_pool (~> 2)
       net-http2 (>= 0.18.3, < 2)
@@ -217,16 +215,6 @@ GEM
     buftok (0.2.0)
     builder (3.2.4)
     byebug (11.1.3)
-    capistrano (3.16.0)
-      airbrussh (>= 1.0.0)
-      i18n
-      rake (>= 10.0.0)
-      sshkit (>= 1.9.0)
-    capistrano-bundler (2.0.1)
-      capistrano (~> 3.1)
-    capistrano-rails (1.6.1)
-      capistrano (~> 3.1)
-      capistrano-bundler (>= 1.1, < 3)
     capybara (3.35.3)
       addressable
       mini_mime (>= 0.1.3)
@@ -392,9 +380,6 @@ GEM
       connection_pool (~> 2.2)
     net-http2 (0.18.4)
       http-2 (~> 0.11)
-    net-scp (3.0.0)
-      net-ssh (>= 2.6.5, < 7.0.0)
-    net-ssh (6.1.0)
     nio4r (2.5.7)
     nokogiri (1.11.4)
       mini_portile2 (~> 2.5.0)
@@ -534,9 +519,6 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    sshkit (1.21.2)
-      net-scp (>= 1.1.2)
-      net-ssh (>= 2.8.0)
     ssrf_filter (1.0.7)
     standard (1.1.1)
       rubocop (= 1.14.0)
@@ -604,9 +586,6 @@ DEPENDENCIES
   binding_of_caller
   bootsnap
   byebug
-  capistrano
-  capistrano-bundler
-  capistrano-rails
   capybara
   carrierwave!
   carrierwave_direct!
