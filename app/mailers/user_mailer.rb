@@ -39,7 +39,7 @@ class UserMailer < ApplicationMailer
 
   def kindle(kindle_address, mobi_file)
     attachments["kindle.mobi"] = File.read(mobi_file)
-    mail to: kindle_address, subject: "Kindle Content", body: " ", from: ENV["KINDLE_EMAIL"]
+    mail to: kindle_address, subject: "Kindle Content", body: ".", from: ENV["KINDLE_EMAIL"]
   end
 
   def mailtest(user_id)
