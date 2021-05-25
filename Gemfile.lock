@@ -200,10 +200,10 @@ GEM
       connection_pool (~> 2)
       net-http2 (>= 0.18.3, < 2)
     ast (2.4.2)
-    autoprefixer-rails (10.2.5.0)
-      execjs (< 2.8.0)
+    autoprefixer-rails (10.2.5.1)
+      execjs (> 0)
     bcrypt (3.1.16)
-    benchmark-ips (2.8.4)
+    benchmark-ips (2.9.1)
     better_errors (2.9.1)
       coderay (>= 1.0.0)
       erubi (>= 1.0.0)
@@ -272,14 +272,14 @@ GEM
       evernote-thrift
       oauth (>= 0.4.1)
     excon (0.81.0)
-    execjs (2.7.0)
+    execjs (2.8.1)
     faker (2.18.0)
       i18n (>= 1.6, < 2)
     faraday (0.17.4)
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.14.0)
       faraday (>= 0.7.4, < 1.0)
-    ffi (1.15.0)
+    ffi (1.15.1)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -381,12 +381,14 @@ GEM
     net-http2 (0.18.4)
       http-2 (~> 0.11)
     nio4r (2.5.7)
-    nokogiri (1.11.4)
+    nokogiri (1.11.5)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
-    nokogiri (1.11.4-x86_64-darwin)
+    nokogiri (1.11.5-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.11.4-x86_64-linux)
+    nokogiri (1.11.5-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.11.5-x86_64-linux)
       racc (~> 1.4)
     nokogumbo (2.0.5)
       nokogiri (~> 1.8, >= 1.8.4)
@@ -408,7 +410,7 @@ GEM
       actionmailer (>= 3)
       premailer (~> 1.7, >= 1.7.9)
     public_suffix (4.0.6)
-    puma (5.3.1)
+    puma (5.3.2)
       nio4r (~> 2.0)
     racc (1.5.2)
     rack (2.2.3)
@@ -539,7 +541,7 @@ GEM
     thor (1.1.0)
     thread_safe (0.3.6)
     tilt (2.0.10)
-    tins (1.29.0)
+    tins (1.29.1)
       sync
     twitter-text (3.1.0)
       idn-ruby
@@ -571,6 +573,7 @@ GEM
     zeitwerk (2.4.2)
 
 PLATFORMS
+  arm64-darwin-20
   ruby
   x86_64-darwin-20
   x86_64-linux
