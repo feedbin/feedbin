@@ -8,4 +8,9 @@ Sidekiq.configure_server do |config|
   config.server_middleware do |chain|
     chain.add WorkerStat
   end
+  config.redis = {id: "feedbin-server-#{::Process.pid}"}
+end
+
+Sidekiq.configure_client do |config|
+  config.redis = {id: "feedbin-client-#{::Process.pid}"}
 end
