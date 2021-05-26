@@ -4,6 +4,7 @@ git_source(:github) { |name| "https://github.com/#{name}.git" }
 gem "rails", "= 6.1.3.2"
 gem "will_paginate"
 
+gem "resolv",              github: "feedbin/resolv",              branch: "feedbin"
 gem "http",                github: "feedbin/http",                branch: "feedbin"
 gem "carrierwave",         github: "feedbin/carrierwave",         branch: "feedbin"
 gem "carrierwave_direct",  github: "feedbin/carrierwave_direct",  ref: "a0bc323"
