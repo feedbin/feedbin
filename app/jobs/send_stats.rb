@@ -14,12 +14,19 @@ class SendStats
       queue_depth
       clear_empty_jobs
       sidekiq_queue_depth
+      sidekiq_latency
     end
   end
 
   def sidekiq_queue_depth
     Sidekiq::Queue.all.each do |queue|
       Librato.measure "sidekiq.queue_depth.#{queue.name}", queue.size
+    end
+  end
+
+  def sidekiq_latency
+    Sidekiq::ProcessSet.new.each do |process|
+      Librato.measure "sidekiq.latency", process["rtt_us"], source: process["tag"]
     end
   end
 
