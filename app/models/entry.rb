@@ -477,8 +477,14 @@ class Entry < ApplicationRecord
     end
   end
 
+  def has_embeds?
+    return true if youtube?
+    return true if content.respond_to?(:include?) && content.include?("iframe")
+    return false
+  end
+
   def harvest_embeds
-    HarvestEmbeds.perform_async(id)
+    HarvestEmbeds.perform_async(id) if has_embeds?
   end
 
   def harvest_links
@@ -486,7 +492,7 @@ class Entry < ApplicationRecord
   end
 
   def cache_views
-    CacheEntryViews.perform_async(id)
+    CacheEntryViews.new.perform(id)
   end
 
   def save_twitter_users
