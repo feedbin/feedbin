@@ -7,6 +7,7 @@ class CacheEntryViewsTest < ActiveSupport::TestCase
     @feeds = create_feeds(@user)
     @entries = @user.entries
     @entry = @entries.first
+    flush_redis
   end
 
   test "enqueues ids" do

@@ -30,7 +30,30 @@ class FeedRefresherReceiverTest < ActiveSupport::TestCase
     Sidekiq::Worker.clear_all
   end
 
-  test "should not create entry" do
+  test "should not create entry with existing public_id" do
+    public_id = SecureRandom.hex
+    entry = @feed.entries.create!(url: "url", public_id: public_id)
+
+    assert FeedbinUtils.public_id_exists?(public_id)
+    $redis[:refresher].with do |redis|
+      redis.del(public_id)
+    end
+    assert_not FeedbinUtils.public_id_exists?(public_id)
+
+    params = {
+      "feed" => {
+        "id" => @feed.id
+      },
+      "entries" => [build_entry(public_id)]
+    }
+    assert_no_difference "Entry.count" do
+      FeedRefresherReceiver.new.perform(params)
+    end
+
+    assert FeedbinUtils.public_id_exists?(public_id)
+  end
+
+  test "should not create entry with existing public_id_alt" do
     public_id = SecureRandom.hex
     entry = @feed.entries.create!(url: "url", public_id: "#{public_id}_alt")
 
