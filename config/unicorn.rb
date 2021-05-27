@@ -25,7 +25,6 @@ before_fork do |server, worker|
     rescue Errno::ENOENT, Errno::ESRCH
     end
   end
-  sleep 1
 end
 
 after_fork do |server, worker|
