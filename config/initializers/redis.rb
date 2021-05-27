@@ -9,8 +9,8 @@ $redis = {}.tap do |hash|
   hash[:entries] = ConnectionPool.new(size: 10) { Redis.new(options1) }
 
   options2 = defaults.dup
-  if ENV["REDIS_URL_CACHE"]
-    options2[:url] = ENV["REDIS_URL_CACHE"]
+  if ENV["REDIS_URL_PUBLIC_IDS"] || ENV["REDIS_URL_CACHE"]
+    options2[:url] = ENV["REDIS_URL_PUBLIC_IDS"] || ENV["REDIS_URL_CACHE"]
   end
   hash[:refresher] = ConnectionPool.new(size: 10) { Redis.new(options2) }
 end
