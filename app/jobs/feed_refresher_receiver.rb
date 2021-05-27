@@ -3,67 +3,63 @@ class FeedRefresherReceiver
   sidekiq_options queue: :feed_refresher_receiver
 
   def perform(params)
-    Sidekiq.logger.info "feed_id=#{params["feed"]["id"]}"
     feed = Feed.find(params["feed"]["id"])
-    if params["entries"].present?
-      params["entries"].each do |entry|
-        update = entry.delete("update")
-        begin
-          if update == true
-            update_entry(entry)
-          else
-            create_entry(entry, feed)
-          end
-        rescue ActiveRecord::RecordNotUnique
-          Sidekiq.logger.info "duplicate public_id=#{entry["public_id"]}"
-          FeedbinUtils.update_public_id_cache(entry["public_id"], entry["content"], entry.dig("data", "public_id_alt"))
-          Librato.increment "entry.record_not_unique"
-        rescue => exception
-          Sidekiq.logger.info "exception=#{exception.message} public_id=#{entry["public_id"]}"
-          unless exception.message =~ /Validation failed/i
-            message = update ? "update" : "create"
-            Honeybadger.notify(
-              error_class: "FeedRefresherReceiver#" + message,
-              error_message: "Entry #{message} failed",
-              parameters: {feed_id: feed.id, entry: entry, exception: exception, backtrace: exception.backtrace}
-            )
-          end
-        end
-      end
-    end
+    receive_entries(params["entries"], feed) if params["entries"].present?
     update_feed(params, feed)
   end
 
-  def update_entry(entry)
-    original_entry = Entry.find_by_public_id(entry["public_id"])
-    if original_entry.present? && !original_entry.tweet?
-      FeedbinUtils.update_public_id_cache(entry["public_id"], entry["content"], entry["data"]["public_id_alt"])
-      if published_recently?(original_entry.published)
-        entry_update = entry.slice("author", "content", "title", "url", "entry_id", "data")
-        entry_update["summary"] = ContentFormatter.summary(entry_update["content"], 256)
-
-        original_content = original_entry.content.to_s.clone
-        new_content = entry_update["content"].to_s.clone
-
-        if original_entry.original.nil?
-          entry_update["original"] = build_original(original_entry)
-        end
-        original_entry.update(entry_update)
-
-        if significant_change?(original_content, new_content)
-          create_update_notifications(original_entry)
-        end
-
-        if new_content.length == original_content.length
-          Librato.increment("entry.no_change")
-        end
-
-        Librato.increment("entry.update")
+  def receive_entries(entries, feed)
+    public_ids = entries.map { |entry| entry["public_id"] }
+    existing_entries = Entry.where(public_id: public_ids).index_by(&:public_id)
+    entries.each do |entry|
+      existing_entry = existing_entries[entry["public_id"]]
+      update = entry.delete("update")
+      if existing_entry && update == true
+        update_entry(entry, existing_entry)
+      elsif existing_entry
+        cache_public_id(entry)
+      else
+        create_entry(entry, feed)
       end
-    elsif original_entry.nil?
-      Sidekiq.logger.info "unknown update public_id=#{entry["public_id"]}"
-      Librato.increment("entry.update_issue")
+    rescue ActiveRecord::RecordNotUnique
+      cache_public_id(entry)
+    rescue => exception
+      unless exception.message =~ /Validation failed/i
+        message = update ? "update" : "create"
+        Honeybadger.notify(
+          error_class: "FeedRefresherReceiver#" + message,
+          error_message: "Entry #{message} failed",
+          parameters: {feed_id: feed.id, entry: entry, exception: exception, backtrace: exception.backtrace}
+        )
+      end
     end
+  end
+
+  def update_entry(entry, original_entry)
+    cache_public_id(entry)
+
+    return unless published_recently?(original_entry.published)
+
+    entry_update = entry.slice("author", "content", "title", "url", "entry_id", "data")
+    entry_update["summary"] = ContentFormatter.summary(entry_update["content"], 256)
+    original_content = original_entry.content.to_s.clone
+    new_content = entry_update["content"].to_s.clone
+
+    if original_entry.original.nil?
+      entry_update["original"] = build_original(original_entry)
+    end
+
+    original_entry.update(entry_update)
+
+    if significant_change?(original_content, new_content)
+      create_update_notifications(original_entry)
+    end
+
+    if new_content.length == original_content.length
+      Librato.increment("entry.no_change")
+    end
+
+    Librato.increment("entry.update")
   end
 
   def build_original(original_entry)
@@ -76,10 +72,6 @@ class FeedRefresherReceiver
       "published" => original_entry.published,
       "data" => original_entry.data
     }
-  end
-
-  def published_recently?(published_date)
-    published_date > 7.days.ago
   end
 
   def significant_change?(original_content, new_content)
@@ -124,9 +116,7 @@ class FeedRefresherReceiver
     else
       threader = Threader.new(entry, feed)
       if !threader.thread
-        Sidekiq.logger.info "creating public_id=#{entry["public_id"]}"
         feed.entries.create!(entry)
-        Sidekiq.logger.info "created public_id=#{entry["public_id"]}"
         Librato.increment("entry.create")
       else
         Librato.increment("entry.thread")
@@ -134,9 +124,17 @@ class FeedRefresherReceiver
     end
   end
 
+  def published_recently?(published_date)
+    published_date > 7.days.ago
+  end
+
+  def cache_public_id(entry)
+    FeedbinUtils.update_public_id_cache(entry["public_id"], entry["content"], entry.dig("data", "public_id_alt"))
+  end
+
   def alternate_exists?(entry)
     if entry["data"] && entry["data"]["public_id_alt"]
-      Entry.where(public_id: entry["data"]["public_id_alt"]).exists? || FeedbinUtils.public_id_exists?(entry["data"]["public_id_alt"])
+      FeedbinUtils.public_id_exists?(entry["data"]["public_id_alt"])
     end
   end
 
