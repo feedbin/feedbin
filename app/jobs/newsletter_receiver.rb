@@ -4,7 +4,7 @@ class NewsletterReceiver
   sidekiq_options queue: :feed_refresher_receiver
 
   def perform(full_token, email)
-    token = full_token.split("+").first
+    token = EmailNewsletter.token(full_token)
     @user = AuthenticationToken.newsletters.active.where(token: token).take&.user
     if @user
       email = Mail.from_source(email)

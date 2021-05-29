@@ -7,12 +7,16 @@ class EmailNewsletter
     @full_token = full_token
   end
 
+  def self.token(full_token)
+    full_token.sub("subscribe+", "").split("+").first
+  end
+
   def valid?
     true
   end
 
   def token
-    full_token.split("+").first
+    self.class.token(full_token)
   end
 
   def from_email

@@ -32,6 +32,19 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
     assert @user.feeds.newsletter.exists?
   end
 
+  test "creates newsletters with old token" do
+    assert_difference "Subscription.count", +1 do
+      assert_difference "NewsletterSaver.jobs.size", +1 do
+        assert_difference("NewsletterSender.count", 1) do
+          assert_difference("Entry.count", 1) do
+            NewsletterReceiver.new.perform("subscribe+#{@token}", @newsletter_html)
+          end
+        end
+      end
+    end
+    assert @user.feeds.newsletter.exists?
+  end
+
   test "puts newsletter in tag" do
     newsletter = EmailNewsletter.new(Mail.from_source(@newsletter_text), @token)
 
