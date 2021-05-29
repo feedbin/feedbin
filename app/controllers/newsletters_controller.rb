@@ -14,7 +14,7 @@ class NewslettersController < ApplicationController
   end
 
   def raw
-    token = EmailNewsletter.token(full_token)
+    token = EmailNewsletter.token(params[:token])
     if AuthenticationToken.newsletters.active.where(token: token).exists?
       NewsletterReceiver.perform_async(params[:token], decoded(request.body.read))
     end
