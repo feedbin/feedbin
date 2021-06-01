@@ -328,7 +328,8 @@ CREATE TABLE public.entries (
     image json,
     recently_played_entries_count bigint DEFAULT 0,
     thread_id bigint,
-    settings jsonb
+    settings jsonb,
+    main_tweet_id text
 );
 
 
@@ -1731,6 +1732,13 @@ CREATE INDEX index_entries_on_feed_id ON public.entries USING btree (feed_id);
 
 
 --
+-- Name: index_entries_on_main_tweet_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_entries_on_main_tweet_id ON public.entries USING btree (main_tweet_id) WHERE (main_tweet_id IS NOT NULL);
+
+
+--
 -- Name: index_entries_on_public_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2442,6 +2450,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200730134217'),
 ('20200810160825'),
 ('20201230004844'),
-('20210102005228');
+('20210102005228'),
+('20210601200027');
 
 
