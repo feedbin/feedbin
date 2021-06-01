@@ -3,10 +3,7 @@ class BackfillMainTweetIds
   sidekiq_options queue: :worker_slow
 
   def perform(feed_id)
-    feed = Feed.find(feed_id)
-    feed.entries.each do |entry|
-      entry.update(main_tweet_id: entry.main_tweet.id)
-    end
+    Entry.where(feed_id: feed_id).update_all("main_tweet_id = COALESCE(data->'tweet'->'retweeted_status'->>'id', data->'tweet'->>'id')")
   end
 
   def schedule
