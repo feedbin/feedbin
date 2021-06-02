@@ -417,8 +417,9 @@ class Entry < ApplicationRecord
 
       user_ids = Subscription.where(filters).pluck(:user_id)
       unread_entries = user_ids.each_with_object([]) { |user_id, array|
-        if tweet? && User.where(id: user_id).take&.has_tweet?(main_tweet_id)
-          Librato.increment("user.has_tweet")
+        if tweet?
+          has_tweet = User.where(id: user_id).take&.has_tweet?(main_tweet_id)
+          Librato.increment("user.has_tweet", source: has_tweet.to_s)
         end
         array << UnreadEntry.new(user_id: user_id, feed_id: feed_id, entry_id: id, published: published, entry_created_at: created_at)
       }
