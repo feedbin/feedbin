@@ -27,7 +27,7 @@ class TweetPage
   end
 
   def tweet_id
-    matches = %r{https://(?:mobile\.)?twitter.com/[^/]*/status/(\d+)}.match(@url)
+    matches = %r{https://(?:mobile\.)?twitter.com/[^/]*/status/(\d+)/?(?:$|\?|#)}.match(@url)
     matches&.captures&.first
   end
 end
