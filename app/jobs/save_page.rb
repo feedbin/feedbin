@@ -66,7 +66,8 @@ class SavePage
       url: url,
       published: parsed_result&.published || Time.now,
       public_id: public_id,
-      skip_recent_post_check: true
+      skip_recent_post_check: true,
+      data: TweetPage.tweet(url, user)
     }
   end
 end
