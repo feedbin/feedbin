@@ -542,6 +542,10 @@ class User < ApplicationRecord
     plan == Plan.find_by_stripe_id("trial")
   end
 
+  def has_tweet?(main_tweet_id)
+    entries.where(main_tweet_id: main_tweet_id).limit(2).count > 1
+  end
+
   def twitter_credentials_valid?
     twitter_client.verify_credentials && true
   rescue Twitter::Error::Unauthorized
