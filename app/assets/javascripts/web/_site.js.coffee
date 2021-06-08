@@ -1944,6 +1944,7 @@ $.extend feedbin,
     feedAction: ->
       $(document).on 'click', '[data-behavior~=feed_action]', (event) =>
         $(event.currentTarget).closest('form').submit()
+        event.currentTarget.blur()
         event.stopPropagation()
         event.preventDefault()
 
