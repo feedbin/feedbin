@@ -37,7 +37,7 @@ module Api
             page_data = WillPaginate::Collection.create(page, per_page, limit) { |pager| pager.replace((1..limit).to_a) }
           end
 
-          render(json: [], status: 404) and return if page_data.out_of_bounds?
+          render(json: []) and return if page_data.out_of_bounds?
 
           entry_count(page_data)
           links_header(page_data, "api_v2_saved_search_url", saved_search.id)
