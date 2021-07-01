@@ -119,12 +119,13 @@ module Api
         link_template = '<%s>; rel="%s"'
 
         options = {format: :json}
-        options[:since] = Time.iso8601(params[:since]).iso8601(6) if params[:since]
-        options[:read] = params[:read] if params[:read]
-        options[:starred] = params[:starred] if params[:starred]
-        options[:ids] = params[:ids] if params[:ids]
-        options[:per_page] = params[:per_page] if params[:per_page]
-        options[:mode] = params[:mode] if params[:mode]
+        options[:since]           = Time.iso8601(params[:since]).iso8601(6) if params[:since]
+        options[:read]            = params[:read]                           if params[:read]
+        options[:starred]         = params[:starred]                        if params[:starred]
+        options[:ids]             = params[:ids]                            if params[:ids]
+        options[:per_page]        = params[:per_page]                       if params[:per_page]
+        options[:mode]            = params[:mode]                           if params[:mode]
+        options[:include_entries] = params[:include_entries]                if params[:include_entries]
 
         if collection.total_pages > 1
           unless collection.previous_page.nil?

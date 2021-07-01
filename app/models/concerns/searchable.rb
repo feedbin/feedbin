@@ -93,14 +93,16 @@ module Searchable
     end
 
     def self.scoped_search(params, user)
-      options = build_search(params, user)
-      query = build_query(options)
+      per_page = params.delete(:per_page)
+      options  = build_search(params, user)
+      query    = build_query(options)
+
 
       result = $search[:main].indices.validate_query({index: Entry.index_name, body: {query: query[:query]}})
       if result["valid"] == false
         Entry.search(nil).records
       else
-        Entry.search(query).page(params[:page]).records(includes: :feed)
+        Entry.search(query).paginate(page: params[:page], per_page: per_page || 100).records(includes: :feed)
       end
     end
 

@@ -21,25 +21,35 @@ module Api
         saved_search = @user.saved_searches.where(id: params[:id]).first
 
         if saved_search.present?
+          limit = 1_000
           params[:query] = saved_search.query
-          @entries = Entry.scoped_search(params, @user)
-          entry_count(@entries)
-          if @entries.present?
-            if out_of_bounds?
-              render json: []
-              return
-            else
-              links_header(@entries, "api_v2_saved_search_url", saved_search.id)
-            end
-            if params[:include_entries] != "true"
-              render json: @entries.results.map { |entry| entry.id.to_i }.to_json
-            end
+          page = params[:page] || 1
+          per_page = params[:per_page] = if params[:include_entries] == "true"
+            100
           else
-            render json: []
+            limit
+          end
+
+          @entries = Entry.scoped_search(params, @user)
+
+          page_data = @entries
+          if @entries.total_entries > limit
+            page_data = WillPaginate::Collection.create(page, per_page, limit) { |pager| pager.replace((1..limit).to_a) }
+          end
+
+          render(json: [], status: 404) and return if page_data.out_of_bounds?
+
+          entry_count(page_data)
+          links_header(page_data, "api_v2_saved_search_url", saved_search.id)
+
+          if params[:include_entries] != "true"
+            render json: @entries.results.map { |entry| entry.id.to_i }.to_json
           end
         else
           status_forbidden
         end
+      rescue Elasticsearch::Transport::Transport::Errors::InternalServerError
+        render(json: [], status: 404)
       end
 
       def create
