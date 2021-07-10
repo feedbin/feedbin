@@ -5,7 +5,7 @@ Feedbin Installation on Fedora
 
 Install a bunch of dependencies:
 
-    sudo dnf install gcc gcc-c++ git libcurl-devel libxml2-devel libxslt-devel postgresql postgresql-devel rubygems ruby-devel rubygem-bundler ImageMagick-devel opencv-devel
+    sudo dnf install gcc gcc-c++ git libcurl-devel libxml2-devel libxslt-devel nodejs postgresql postgresql-devel redhat-rpm-config rubygems ruby-devel rubygem-bundler ImageMagick-devel opencv-devel which
 
 Get Feedbin:
 
