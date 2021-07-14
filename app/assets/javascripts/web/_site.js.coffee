@@ -484,11 +484,14 @@ $.extend feedbin,
     if animate
       timeout = 200
       feedbin.panelScrollComplete = false
-      $(containerClass).css {'scroll-snap-type': 'unset'} if feedbin.smoothScroll
+      $(containerClass).css {'scroll-snap-type': 'unset'} if feedbin.aspectRatio
       $(containerClass).animate({scrollLeft: offset}, {duration: timeout})
       setTimeout ( ->
         feedbin.panelScrollComplete = true
-        $(containerClass).css {'scroll-snap-type': 'x mandatory'} if feedbin.smoothScroll
+      ), timeout
+
+      setTimeout ( ->
+        $(containerClass).css {'scroll-snap-type': 'x mandatory'}  if feedbin.aspectRatio
       ), timeout
     else
       $(containerClass).prop 'scrollLeft', offset
@@ -1528,9 +1531,14 @@ $.extend feedbin,
         $('body').addClass('swipe')
 
     hasSmoothScrolling: ->
-      if typeof(CSS) == "function" && CSS.supports("scroll-behavior", "smooth")
+      if typeof(CSS) != "undefined" && CSS.supports("scroll-behavior", "smooth")
         feedbin.smoothScroll = true
         $('body').addClass('smooth-scroll')
+
+    hasAspectRatio: ->
+      if typeof(CSS) != "undefined" && CSS.supports("aspect-ratio", "1")
+        feedbin.aspectRatio = true
+        $('body').addClass('aspect-ratio')
 
     hasTouch: ->
       if 'ontouchstart' of document

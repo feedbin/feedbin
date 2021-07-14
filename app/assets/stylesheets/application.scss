@@ -1601,6 +1601,11 @@ Structure
     overflow: hidden;
     align-items: flex-start;
     height: 100%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
     .native & {
         height: 100vh;
     }
@@ -9086,7 +9091,7 @@ button.close {
 
 .fade {
   opacity: 0;
-  transition: opacity 0.1s linear;
+  transition: opacity 0.1s ease;
 }
 
 .fade.show {
