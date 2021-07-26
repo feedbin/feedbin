@@ -233,7 +233,10 @@ class feedbin.Keyboard
 
     # Show Keyboard shortcuts
     Mousetrap.bind '?', (event, combo) =>
-      feedbin.showModal("help")
+      if $('.modal-purpose-help').hasClass('show')
+        $('.modal').modal('hide')
+      else
+        feedbin.showModal("help")
       event.preventDefault()
 
     # Focus search
@@ -299,7 +302,7 @@ class feedbin.Keyboard
     # Unfocus field,
     Mousetrap.bindGlobal 'escape', (event, combo) =>
       $('.dropdown-wrap.open').removeClass('open')
-      feedbin.hideSubscribe()
+      $('.modal').modal('hide')
       feedbin.hideSearch()
       if $('[name="subscription[feeds][feed_url]"]').is(':focus')
         $('[name="subscription[feeds][feed_url]"]').blur()
