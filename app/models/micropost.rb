@@ -26,6 +26,8 @@ class Micropost
 
   def author_username
     data.dig("author", "_microblog", "username") || data.dig("author", "_instagram", "username") || data.dig("authors", 0, "_instagram", "username")
+  rescue
+    nil
   end
 
   def author_display_username
