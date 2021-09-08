@@ -30,7 +30,7 @@ class TwitterAuthenticationsController < ApplicationController
     else
       redirect_to root_url, alert: "Twitter API is not responding."
     end
-  rescue OAuth => e
+  rescue OAuth::Error => e
     Honeybadger.notify(
       error_class: "TwitterApis#new",
       error_message: "Twitter failure",
@@ -69,7 +69,7 @@ class TwitterAuthenticationsController < ApplicationController
         redirect_to root_url, alert: "Feedbin needs your permission to activate Twitter."
       end
     end
-  rescue OAuth => e
+  rescue OAuth::Error => e
     Honeybadger.notify(
       error_class: "TwitterApisController#save",
       error_message: "Twitter failure",

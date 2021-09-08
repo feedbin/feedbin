@@ -131,7 +131,7 @@ class SupportedSharingServicesController < ApplicationController
       )
       redirect_to sharing_services_url, notice: "Unknown #{SupportedSharingService.info(service_id)[:label]} error."
     end
-  rescue OAuth => e
+  rescue OAuth::Error => e
     Honeybadger.notify(
       error_class: "SupportedSharingServicesController#oauth_request",
       error_message: "#{service_info[:label]} failure",
