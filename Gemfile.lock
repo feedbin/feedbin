@@ -51,10 +51,11 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: 775d560f4d85451c1fb6fffab46a65826cb5417b
+  revision: 3bac4eebdd31e1a5ecc2600b58f12064dea2b7ad
   branch: master
   specs:
     feedkit (0.1.0)
+      addressable (~> 2.8.0)
       feedjira (~> 2.0)
       http (~> 4.4)
       rchardet (~> 1.8.0)
@@ -556,7 +557,7 @@ GEM
       execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.7)
+    unf_ext (0.0.8)
     unicode-display_width (2.0.0)
     unicode-emoji (2.8.0)
       unicode-version (~> 1.0)
