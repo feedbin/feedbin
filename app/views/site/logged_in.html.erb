@@ -13,6 +13,8 @@
             feedbin.Counts.get(feedbin.count_data);
         </script>
         <%= render partial: 'shared/update_styles' %>
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="<%= @user.theme == "auto" ? Colors.fetch("day") : Colors.fetch(@user.theme) %>">
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="<%= @user.theme == "auto" ? Colors.fetch("dusk") : Colors.fetch(@user.theme) %>">
     <% end %>
     <%= render partial: 'shared/svg' %>
     <%= render partial: 'shared/notification' %>
@@ -134,7 +136,7 @@
     <%= render partial: "shared/saved_searches_count" %>
     <%= render partial: "shared/format" %>
     <%= render partial: "shared/link_actions" %>
-    
+
     <%= form_tag(cache_extracts_path, method: :get, class: 'hide', remote: true, data: {behavior: 'extract_cache_form'}) do %>
         <%= hidden_field_tag 'url', nil %>
     <% end %>

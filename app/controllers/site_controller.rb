@@ -21,13 +21,7 @@ class SiteController < ApplicationController
   end
 
   def manifest
-    theme_options = {
-      "day" => "#FFFFFF",
-      "sunset" => "#f5f2eb",
-      "dusk" => "#262626",
-      "midnight" => "#000000"
-    }
-    @color = theme_options.fetch(params[:theme], theme_options["day"])
+    @color = Colors.fetch(params[:theme])
     @icons = [
       {
         src: helpers.asset_url("icon-manifest.png"),

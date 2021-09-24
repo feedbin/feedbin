@@ -305,6 +305,20 @@ $.extend feedbin,
       if result && "matches" of result
         result.matches == true
 
+  setThemeColor: ->
+    color = feedbin.colorForSection("body")
+    $('meta[name=theme-color]').attr("content", color)
+
+  colorForSection: (section, overlay = false) ->
+    color = $("[data-theme-#{section}]").css("backgroundColor")
+    if overlay
+      overlayColor = $("[data-theme-overlay]").css("backgroundColor")
+      color = feedbin.calculateColor(color, overlayColor)
+
+    ctx = document.createElement('canvas').getContext('2d')
+    ctx.strokeStyle = color
+    ctx.strokeStyle
+
   setNativeTheme: (calculateOverlay = false, timeout = 1) ->
     if feedbin.native && feedbin.data && feedbin.theme
       result = window.matchMedia('(prefers-color-scheme: dark)');
@@ -315,15 +329,7 @@ $.extend feedbin,
       }
       sections = ["border", "body"]
       for section in sections
-        color = $("[data-theme-#{section}]").css("backgroundColor")
-        if calculateOverlay
-          overlayColor = $("[data-theme-overlay]").css("backgroundColor")
-          color = feedbin.calculateColor(color, overlayColor)
-
-        ctx = document.createElement('canvas').getContext('2d')
-        ctx.strokeStyle = color
-        hex = ctx.strokeStyle
-        message[section] = hex
+        message[section] = feedbin.colorForSection(section, calculateOverlay)
 
       setTimeout ( ->
         feedbin.nativeMessage("performAction", message)
@@ -2157,6 +2163,7 @@ $.extend feedbin,
         $('[data-behavior~=class_target]').removeClass('theme-midnight')
         $('[data-behavior~=class_target]').removeClass('theme-auto')
         $('[data-behavior~=class_target]').addClass("theme-#{theme}")
+        feedbin.setThemeColor()
 
     titleBarColor: ->
       feedbin.setNativeTheme()
@@ -2780,6 +2787,7 @@ $.extend feedbin,
     colorSchemePreference: ->
       darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
       darkModeMediaQuery.addListener (event) ->
+          feedbin.setThemeColor()
           setTimeout feedbin.setNativeTheme, 300
 
     visibilitychange: ->
