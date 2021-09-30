@@ -124,7 +124,6 @@ Rails.application.routes.draw do
       post :search
     end
     member do
-      match :push, via: [:post, :get]
       get :modal_edit
       get :edit_tags
       get :pages, to: "pages_entries#index"

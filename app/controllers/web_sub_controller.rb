@@ -4,6 +4,9 @@ class WebSubController < ApplicationController
   before_action :set_feed
 
   def verify
+    Rails.logger.info { "--------------------------" }
+    Rails.logger.info { params }
+    Rails.logger.info { "--------------------------" }
     valid_topic = @feed.self_url == params["hub.topic"]
     if "subscribe" == params["hub.mode"] && valid_topic
       @feed.update(push_expiration: Time.now + (params["hub.lease_seconds"].to_i / 2).seconds)

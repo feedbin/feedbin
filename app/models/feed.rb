@@ -174,6 +174,25 @@ class Feed < ApplicationRecord
     WebSubSubscribe.perform_async(id)
   end
 
+  def hubs
+    if self[:hubs].blank? && !known_hubs.blank?
+      known_hubs
+    else
+      self[:hubs]
+    end
+  end
+
+  def known_hubs
+    if youtube?
+      ["https://pubsubhubbub.appspot.com"]
+    end
+  end
+
+  def youtube?
+    youtube_prefix = Regexp.new(/^https?:\/\/www\.youtube\.com\//)
+    feed_url =~ youtube_prefix && self_url =~ youtube_prefix
+  end
+
   private
 
   def refresh_favicon

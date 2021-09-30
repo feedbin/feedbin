@@ -1,7 +1,5 @@
 class FeedsController < ApplicationController
   before_action :correct_user, only: :update
-  skip_before_action :authorize, only: [:push]
-  skip_before_action :verify_authenticity_token, only: [:push]
 
   def update
     @user = current_user
@@ -21,28 +19,6 @@ class FeedsController < ApplicationController
 
   def auto_update
     get_feeds_list
-  end
-
-  def push
-    feed = Feed.find(params[:id])
-    secret = Push.hub_secret(feed.id)
-
-    response = ""
-    status = :not_found
-    if request.get?
-      if params["hub.mode"] == "unsubscribe"
-        Librato.increment "push.unsubscribe"
-        feed.update(push_expiration: nil)
-        response = params["hub.challenge"]
-        status = :ok
-      end
-    else
-      status = :ok
-      PushUnsubscribe.perform_async(feed.id, params["hub.topic"])
-      WebSubSubscribe.perform_async(feed.id)
-    end
-
-    render plain: response, status: status
   end
 
   def search
