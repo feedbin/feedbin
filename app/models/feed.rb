@@ -160,10 +160,12 @@ class Feed < ApplicationRecord
     Digest::SHA256.hexdigest([id, Rails.application.secrets.secret_key_base].join("-"))
   end
 
-  def web_sub_callback
+  def web_sub_callback(debug: false)
     uri = URI(ENV["PUSH_URL"])
     signature = OpenSSL::HMAC.hexdigest("sha256", web_sub_secret, id.to_s)
-    Rails.application.routes.url_helpers.web_sub_verify_url(id, web_sub_callback_signature, protocol: uri.scheme, host: uri.host)
+    params = {}
+    params[:debug] = true if debug
+    Rails.application.routes.url_helpers.web_sub_verify_url(id, web_sub_callback_signature, protocol: uri.scheme, host: uri.host, params: params)
   end
 
   def web_sub_callback_signature
