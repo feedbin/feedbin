@@ -4,9 +4,6 @@ class WebSubController < ApplicationController
   before_action :set_feed
 
   def verify
-    Rails.logger.info { "--------------------------" }
-    Rails.logger.info { params }
-    Rails.logger.info { "--------------------------" }
     valid_topic = @feed.self_url == params["hub.topic"]
     if "subscribe" == params["hub.mode"] && valid_topic
       @feed.update(push_expiration: Time.now + (params["hub.lease_seconds"].to_i / 2).seconds)
@@ -25,6 +22,9 @@ class WebSubController < ApplicationController
 
   def publish
     body = request.raw_post
+    if params.key?(:debug)
+      Rails.logger.info "WebSubDebug valid=#{signature_valid?(body)} signature=#{request.headers["HTTP_X_HUB_SIGNATURE"].inspect} body=#{body.inspect}"
+    end
     if signature_valid?(body)
       parsed = Feedjira.parse(body)
       entries = parsed.entries.map do |entry|
@@ -47,7 +47,7 @@ class WebSubController < ApplicationController
 
   def signature_valid?(body)
     valid_algorithms = ["sha1", "sha256", "sha384", "sha512"]
-    algorithm, signature = request.headers["HTTP_X_HUB_SIGNATURE"].split("=")
+    algorithm, signature = request.headers["HTTP_X_HUB_SIGNATURE"]&.split("=")
     valid_algorithms.include?(algorithm) && signature == OpenSSL::HMAC.hexdigest(algorithm, @feed.web_sub_secret, body)
   end
 
