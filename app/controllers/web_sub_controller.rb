@@ -28,7 +28,7 @@ class WebSubController < ApplicationController
     if signature_valid?(body)
       parsed = Feedjira.parse(body)
       entries = parsed.entries.map do |entry|
-        Feedkit::Parser::XMLEntry.new(entry, @feed.feed_url).to_entry
+        ActiveSupport::HashWithIndifferentAccess.new(Feedkit::Parser::XMLEntry.new(entry, @feed.feed_url).to_entry)
       end
       if entries.present?
         FeedRefresherReceiver.new.perform({
