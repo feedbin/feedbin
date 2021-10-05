@@ -1433,6 +1433,20 @@ $.extend feedbin,
       else
         $(".entry-column").removeClass("constrained")
 
+  fullScreen: (toggle = true) ->
+    className = 'full-screen'
+    if toggle
+      $('body').toggleClass(className)
+    else
+      $('body').removeClass(className)
+    if !$('body').hasClass(className)
+      feedbin.scrollToPanel('.entries-column', false)
+      window.history.replaceState({}, "", "/");
+      document.title = "Feedbin"
+      feedbin.updateTitle()
+    feedbin.measureEntryColumn()
+    feedbin.setNativeBorders()
+
   embeds: {}
 
   entries: {}
@@ -2145,14 +2159,7 @@ $.extend feedbin,
         $('[data-behavior~=toggle_full_screen]').click()
 
       $(document).on 'change', '[data-behavior~=toggle_full_screen]', (event) ->
-        $('body').toggleClass('full-screen')
-        if !$('body').hasClass('full-screen')
-          feedbin.scrollToPanel('.entries-column', false)
-          window.history.replaceState({}, "", "/");
-          document.title = "Feedbin"
-          feedbin.updateTitle()
-        feedbin.measureEntryColumn()
-        feedbin.setNativeBorders()
+        feedbin.fullScreen()
 
     theme: ->
       $(document).on 'click', '[data-behavior~=switch_theme]', (event) ->
