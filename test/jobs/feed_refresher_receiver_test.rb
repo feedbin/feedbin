@@ -84,7 +84,7 @@ class FeedRefresherReceiverTest < ActiveSupport::TestCase
 
   test "should update entry" do
     public_id = SecureRandom.hex
-    entry = @feed.entries.create!(url: "url", public_id: public_id)
+    entry = @feed.entries.create!(url: "url", public_id: public_id, content: "content")
     update = build_entry(entry.public_id, true)
     params = {
       "feed" => {
@@ -96,6 +96,19 @@ class FeedRefresherReceiverTest < ActiveSupport::TestCase
     update.each do |attribute, value|
       assert_equal value, entry.reload.send(attribute), "entry.#{attribute} didn't match"
     end
+  end
+
+  test "should not create original nil content" do
+    entry = @feed.entries.create!(url: "url", public_id: SecureRandom.hex, content: nil)
+    update = build_entry(entry.public_id, true)
+    params = {
+      "feed" => {
+        "id" => @feed.id
+      },
+      "entries" => [update]
+    }
+    FeedRefresherReceiver.new.perform(params)
+    assert_nil entry.reload.original
   end
 
   test "should create UpdatedEntry" do
@@ -144,7 +157,7 @@ class FeedRefresherReceiverTest < ActiveSupport::TestCase
 
   def update_params
     public_id = SecureRandom.hex
-    entry = @feed.entries.create!(url: "url", public_id: public_id)
+    entry = @feed.entries.create!(url: "url", public_id: public_id, content: "content")
     update = build_entry(entry.public_id, true)
     update["content"] = update["content"] * 10
     {

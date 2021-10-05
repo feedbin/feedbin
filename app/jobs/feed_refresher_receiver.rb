@@ -45,7 +45,7 @@ class FeedRefresherReceiver
     original_content = original_entry.content.to_s.clone
     new_content = entry_update["content"].to_s.clone
 
-    if original_entry.original.nil?
+    if trackable_change?(original_content) && original_entry.original.nil?
       entry_update["original"] = build_original(original_entry)
     end
 
@@ -75,6 +75,8 @@ class FeedRefresherReceiver
   end
 
   def significant_change?(original_content, new_content)
+    return false unless trackable_change?(original_content)
+
     original_length = Sanitize.fragment(original_content).length
     new_length = Sanitize.fragment(new_content).length
     new_length - original_length > 50
@@ -85,6 +87,10 @@ class FeedRefresherReceiver
       parameters: {exception: e, backtrace: e.backtrace}
     )
     false
+  end
+
+  def trackable_change?(original_content)
+    original_content != ""
   end
 
   def create_update_notifications(entry)
