@@ -2,82 +2,99 @@ class FeedRefresherReceiver
   include Sidekiq::Worker
   sidekiq_options queue: :feed_refresher_receiver
 
-  def perform(params)
-    feed = Feed.find(params["feed"]["id"])
-    receive_entries(params["entries"], feed) if params["entries"].present?
-    update_feed(params, feed)
+  def perform(data)
+    feed = Feed.find(data["feed"]["id"])
+    if data["entries"].present?
+      receive_entries(data["entries"], feed)
+    end
+    feed.update(data["feed"])
   end
 
-  def receive_entries(entries, feed)
-    public_ids = entries.map { |entry| entry["public_id"] }
-    existing_entries = Entry.where(public_id: public_ids).index_by(&:public_id)
-    entries.each do |entry|
-      existing_entry = existing_entries[entry["public_id"]]
-      update = entry.delete("update")
-      if existing_entry && update == true
-        update_entry(entry, existing_entry)
-      elsif existing_entry
-        cache_public_id(entry)
+  def receive_entries(items, feed)
+    public_ids = items.map { |entry| entry["public_id"] }
+    entries = Entry.where(public_id: public_ids).index_by(&:public_id)
+    items.each do |item|
+      entry = entries[item["public_id"]]
+      update = item.delete("update")
+      if entry && update == true
+        update_entry(item, entry)
+      elsif entry
+        cache_public_id(item)
       else
-        create_entry(entry, feed)
+        create_entry(item, feed)
       end
     rescue ActiveRecord::RecordNotUnique
-      cache_public_id(entry)
+      cache_public_id(item)
     rescue => exception
       unless exception.message =~ /Validation failed/i
         message = update ? "update" : "create"
         Honeybadger.notify(
           error_class: "FeedRefresherReceiver#" + message,
           error_message: "Entry #{message} failed",
-          parameters: {feed_id: feed.id, entry: entry, exception: exception, backtrace: exception.backtrace}
+          parameters: {feed_id: feed.id, item: item, exception: exception, backtrace: exception.backtrace}
         )
       end
     end
   end
 
-  def update_entry(entry, original_entry)
-    cache_public_id(entry)
+  def create_entry(item, feed)
+    if alternate_exists?(item)
+      Librato.increment("entry.alternate_exists")
+    else
+      threader = Threader.new(item, feed)
+      if !threader.thread
+        feed.entries.create!(item)
+        Librato.increment("entry.create")
+      else
+        Librato.increment("entry.thread")
+      end
+    end
+  end
 
-    return unless published_recently?(original_entry.published)
+  def update_entry(item, entry)
+    cache_public_id(item)
 
-    entry_update = entry.slice("author", "content", "title", "url", "entry_id", "data")
-    entry_update["summary"] = ContentFormatter.summary(entry_update["content"], 256)
-    original_content = original_entry.content.to_s.clone
-    new_content = entry_update["content"].to_s.clone
+    return unless entry.published_recently?
 
-    if trackable_change?(original_content) && original_entry.original.nil?
-      entry_update["original"] = build_original(original_entry)
+    update = item.slice("author", "content", "title", "url", "entry_id", "data")
+    update["summary"] = ContentFormatter.summary(update["content"], 256)
+
+    current_content = entry.content.to_s.clone
+    new_content = update["content"].to_s.clone
+
+    if current_content.present? && entry.original.nil?
+      update["original"] = build_original(entry)
     end
 
-    original_entry.update(entry_update)
+    entry.update(update)
 
-    if significant_change?(original_content, new_content)
-      create_update_notifications(original_entry)
+    if significant_change?(current_content, new_content)
+      create_update_notifications(entry)
     end
 
-    if new_content.length == original_content.length
+    if new_content.length == current_content.length
       Librato.increment("entry.no_change")
     end
 
     Librato.increment("entry.update")
   end
 
-  def build_original(original_entry)
+  def build_original(entry)
     {
-      "author" => original_entry.author,
-      "content" => original_entry.content,
-      "title" => original_entry.title,
-      "url" => original_entry.url,
-      "entry_id" => original_entry.entry_id,
-      "published" => original_entry.published,
-      "data" => original_entry.data
+      "author"    => entry.author,
+      "content"   => entry.content,
+      "title"     => entry.title,
+      "url"       => entry.url,
+      "entry_id"  => entry.entry_id,
+      "published" => entry.published,
+      "data"      => entry.data
     }
   end
 
-  def significant_change?(original_content, new_content)
-    return false unless trackable_change?(original_content)
+  def significant_change?(current_content, new_content)
+    return false if current_content.empty?
 
-    original_length = Sanitize.fragment(original_content).length
+    original_length = Sanitize.fragment(current_content).length
     new_length = Sanitize.fragment(new_content).length
     new_length - original_length > 50
   rescue Exception => e
@@ -87,10 +104,6 @@ class FeedRefresherReceiver
       parameters: {exception: e, backtrace: e.backtrace}
     )
     false
-  end
-
-  def trackable_change?(original_content)
-    original_content != ""
   end
 
   def create_update_notifications(entry)
@@ -116,35 +129,13 @@ class FeedRefresherReceiver
     )
   end
 
-  def create_entry(entry, feed)
-    if alternate_exists?(entry)
-      Librato.increment("entry.alternate_exists")
-    else
-      threader = Threader.new(entry, feed)
-      if !threader.thread
-        feed.entries.create!(entry)
-        Librato.increment("entry.create")
-      else
-        Librato.increment("entry.thread")
-      end
+  def cache_public_id(item)
+    FeedbinUtils.update_public_id_cache(item["public_id"], item["content"], item.dig("data", "public_id_alt"))
+  end
+
+  def alternate_exists?(item)
+    if item["data"] && item["data"]["public_id_alt"]
+      FeedbinUtils.public_id_exists?(item["data"]["public_id_alt"])
     end
-  end
-
-  def published_recently?(published_date)
-    published_date > 7.days.ago
-  end
-
-  def cache_public_id(entry)
-    FeedbinUtils.update_public_id_cache(entry["public_id"], entry["content"], entry.dig("data", "public_id_alt"))
-  end
-
-  def alternate_exists?(entry)
-    if entry["data"] && entry["data"]["public_id_alt"]
-      FeedbinUtils.public_id_exists?(entry["data"]["public_id_alt"])
-    end
-  end
-
-  def update_feed(update, feed)
-    feed.update(update["feed"])
   end
 end

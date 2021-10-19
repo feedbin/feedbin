@@ -115,19 +115,18 @@ class ContentFormatter
       filters = filters << HTML::Pipeline::CamoFilter
     end
 
-    if entry
+    if entry || base_url
       filters.unshift(HTML::Pipeline::AbsoluteSourceFilter)
       filters.unshift(HTML::Pipeline::AbsoluteHrefFilter)
-      context[:image_base_url] = context[:href_base_url] = entry.url || entry.feed.site_url
-      context[:image_subpage_url] = context[:href_subpage_url] = entry.url || ""
-      if entry.feed.newsletter?
+
+      context[:image_base_url]    = base_url || entry.feed.site_url
+      context[:image_subpage_url] = base_url || entry.url || ""
+      context[:href_base_url]     = base_url || entry.feed.site_url
+      context[:href_subpage_url]  = base_url || entry.url || ""
+
+      if entry && entry.feed.newsletter?
         context[:whitelist] = ALLOWLIST_NEWSLETTER
       end
-    elsif base_url
-      filters.unshift(HTML::Pipeline::AbsoluteSourceFilter)
-      filters.unshift(HTML::Pipeline::AbsoluteHrefFilter)
-      context[:image_base_url] = context[:href_base_url] = base_url
-      context[:image_subpage_url] = context[:href_subpage_url] = base_url
     end
 
     filters.unshift(HTML::Pipeline::LazyLoadFilter)
@@ -174,10 +173,10 @@ class ContentFormatter
   def _absolute_source(content, entry, base_url = nil)
     filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter]
     context = {
-      image_base_url: base_url || entry.feed.site_url,
-      image_subpage_url: base_url || entry.url || "",
-      href_base_url: base_url || entry.feed.site_url,
-      href_subpage_url: base_url || entry.url || ""
+      image_base_url:    base_url || entry.feed.site_url,
+      image_subpage_url: base_url || entry.url            || "",
+      href_base_url:     base_url || entry.feed.site_url,
+      href_subpage_url:  base_url || entry.url            || ""
     }
     pipeline = HTML::Pipeline.new filters, context
     result = pipeline.call(content)

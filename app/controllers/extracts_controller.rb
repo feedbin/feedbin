@@ -18,7 +18,7 @@ class ExtractsController < ApplicationController
     end
 
     begin
-      @content = ContentFormatter.format!(@content, @entry)
+      @content = ContentFormatter.format!(@content, nil, true, url)
     rescue
       @content = nil
     end

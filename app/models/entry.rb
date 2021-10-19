@@ -375,6 +375,10 @@ class Entry < ApplicationRecord
     data && data["youtube_video_id"].present?
   end
 
+  def published_recently?
+    published > 7.days.ago
+  end
+
   private
 
   def base_url
