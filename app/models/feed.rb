@@ -13,6 +13,7 @@ class Feed < ApplicationRecord
   has_one :newsletter_sender
 
   before_create :set_host
+  before_save :set_hubs
   after_create :refresh_favicon
 
   after_commit :web_sub_subscribe, on: :create
@@ -195,6 +196,12 @@ class Feed < ApplicationRecord
   def known_hubs
     if youtube_channel_id
       ["https://pubsubhubbub.appspot.com"]
+    end
+  end
+
+  def set_hubs
+    if known_hubs.present?
+      self[:hubs] = known_hubs
     end
   end
 
