@@ -137,6 +137,15 @@ GIT
       naught (~> 1.0)
       simple_oauth (~> 0.3.0)
 
+GIT
+  remote: https://github.com/ostinelli/apnotic.git
+  revision: 664ac2f6f56d46ae7bf69963b58c92caebf2abe9
+  branch: monotonic
+  specs:
+    apnotic (1.7.0)
+      connection_pool (~> 2)
+      net-http2 (>= 0.18.3, < 2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -204,9 +213,6 @@ GEM
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     aggregate (0.2.3)
-    apnotic (1.7.0)
-      connection_pool (~> 2)
-      net-http2 (>= 0.18.3, < 2)
     ast (2.4.2)
     autoprefixer-rails (10.3.3.0)
       execjs (~> 2)
@@ -586,7 +592,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import
   addressable
-  apnotic
+  apnotic!
   autoprefixer-rails
   bcrypt
   benchmark-ips
