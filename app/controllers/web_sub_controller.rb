@@ -33,7 +33,7 @@ class WebSubController < ApplicationController
           "entries" => entries
         }
         if entries.first.dig(:data, :youtube_video_id)
-          YouTubeReceiver.perform_in(2.minutes, data)
+          YoutubeReceiver.perform_in(2.minutes, data)
         else
           FeedRefresherReceiver.new.perform(data)
         end
