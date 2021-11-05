@@ -24,10 +24,12 @@ class HarvestEmbeds
     video_id = entry.data&.dig("youtube_video_id")
     want.push(video_id) if video_id
 
+    add_missing_to_queue(want)
+  end
+
+  def add_missing_to_queue(want)
     have = Embed.youtube_video.where(provider_id: want).pluck(:provider_id)
     want = (want - have).uniq
-
-
     add_to_queue(SET_NAME, want) if want.present?
   end
 
