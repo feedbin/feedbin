@@ -22,19 +22,21 @@ class WebSubController < ApplicationController
 
   def publish
     body = request.raw_post
-    if params.key?(:debug)
-      Rails.logger.info "WebSubDebug valid=#{signature_valid?(body)} signature=#{request.headers["HTTP_X_HUB_SIGNATURE"].inspect} body=#{body.inspect}"
-    end
     if signature_valid?(body)
       parsed = Feedjira.parse(body)
       entries = parsed.entries.map do |entry|
         ActiveSupport::HashWithIndifferentAccess.new(Feedkit::Parser::XMLEntry.new(entry, @feed.feed_url).to_entry)
       end
       if entries.present?
-        FeedRefresherReceiver.new.perform({
+        data = {
           "feed" => {"id" => @feed.id},
           "entries" => entries
-        })
+        }
+        if entries.first.dig(:data, :youtube_video_id)
+          YouTubeReceiver.perform_in(2.minutes, data)
+        else
+          FeedRefresherReceiver.new.perform(data)
+        end
         Librato.increment "entry.push"
       end
     end
