@@ -1,4 +1,6 @@
 module Helpers
+  AWS_S3_BUCKET_IMAGES = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
+
   def preset
     OpenStruct.new(IMAGE_PRESETS[@preset_name.to_sym])
   end
