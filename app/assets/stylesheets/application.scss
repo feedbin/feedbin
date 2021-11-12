@@ -3182,7 +3182,7 @@ $feed-title-width: 115px;
 .format-palette {
     width: 304px;
     padding: 8px 0 32px 0;
-    z-index: 4;
+    z-index: 11;
     @media (max-width: $small-breakpoint) {
         padding: 0 0 24px 0;
     }

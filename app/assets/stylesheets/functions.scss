@@ -136,6 +136,16 @@
                 border-top-color: map-get($shadow-color, midnight);
             }
         }
+        .theme-auto & {
+            @media (prefers-color-scheme: dark) {
+                @if $invert == true {
+                    border-bottom-color: map-get($shadow-color, dusk);
+                }
+                @else {
+                    border-top-color: map-get($shadow-color, dusk);
+                }
+            }
+        }
 		@content;
 	}
 	&:after {
@@ -181,6 +191,16 @@
 				border-top-color: map-get($arrow-color, sunset);
 			}
 		}
+        .theme-auto & {
+            @media (prefers-color-scheme: dark) {
+                @if $invert == true {
+                    border-bottom-color: map-get($arrow-color, dusk);
+                }
+                @else {
+                    border-top-color: map-get($arrow-color, dusk);
+                }
+            }
+        }
 		@content;
 	}
 }
