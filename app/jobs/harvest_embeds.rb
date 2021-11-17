@@ -44,21 +44,15 @@ class HarvestEmbeds
     items = []
 
     videos = youtube_api(type: "videos", ids: ids, parts: ["snippet", "contentDetails"])
-
-    want = videos.dig("items")&.map { |video| video.dig("snippet", "channelId") }
-    have = Embed.youtube_channel.where(provider_id: want).pluck(:provider_id)
-    want = (want - have).uniq
-
     items.concat(videos.dig("items")&.map { |item, array|
       Embed.new(data: item, provider_id: item.dig("id"), parent_id: item.dig("snippet", "channelId"), source: :youtube_video)
     })
 
-    if want.present?
-      channels = youtube_api(type: "channels", ids: want, parts: ["snippet"])
-      items.concat(channels.dig("items")&.map { |item|
-        Embed.new(data: item, provider_id: item.dig("id"), source: :youtube_channel)
-      })
-    end
+    channel_ids = videos.dig("items")&.map { |video| video.dig("snippet", "channelId") }.uniq
+    channels = youtube_api(type: "channels", ids: channel_ids, parts: ["snippet"])
+    items.concat(channels.dig("items")&.map { |item|
+      Embed.new(data: item, provider_id: item.dig("id"), source: :youtube_channel)
+    })
 
     Embed.import(items, on_duplicate_key_update: {conflict_target: [:source, :provider_id], columns: [:data]}) if items.present?
 
