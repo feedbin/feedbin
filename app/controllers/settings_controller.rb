@@ -110,6 +110,8 @@ class SettingsController < ApplicationController
       redirect_to settings_edit_billing_url, alert: "There was a problem updating your card. Please try again."
       Librato.increment("billing.token_missing")
     end
+  rescue Stripe::CardError => exception
+    redirect_to settings_edit_billing_url, alert: exception.message
   end
 
   def settings_update
