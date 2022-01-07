@@ -140,6 +140,7 @@ module Searchable
               fields: ["_all", "title.*", "content.*", "emoji", "author", "url"],
               quote_field_suffix: ".exact",
               default_operator: "AND",
+              allow_leading_wildcard: false,
               query: options[:query]
             }
           }
