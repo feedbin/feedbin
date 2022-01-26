@@ -84,7 +84,7 @@ class BillingEvent < ApplicationRecord
   end
 
   def receipt_date
-    Time.at(event_object["created"]).to_s(:date)
+    Time.at(event_object["created"]).to_formatted_s(:date)
   end
 
   def receipt_description

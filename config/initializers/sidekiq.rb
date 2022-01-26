@@ -1,4 +1,5 @@
 require "sidekiq"
+require ::File.expand_path("../../../lib/worker_stat", __FILE__)
 
 SIDEKIQ_ALT = ConnectionPool.new(size: 1, timeout: 2) { Redis.new(timeout: 1.0) }
 

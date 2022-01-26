@@ -10,7 +10,7 @@
     <item>
       <title><![CDATA[<%= xml_format(entry.title, entry) %>]]></title>
       <description><![CDATA[<%= xml_format(entry.content, entry) %>]]></description>
-      <pubDate><%= entry.published.to_s(:rfc822) %></pubDate>
+      <pubDate><%= entry.published.to_formatted_s(:rfc822) %></pubDate>
       <link><%= entry.fully_qualified_url %></link>
       <dc:creator><%= entry.feed.title %></dc:creator>
       <guid isPermaLink="false"><%= "https://feedbin.me#{entry_path(entry)}" %></guid>

@@ -93,7 +93,7 @@ module Api
       end
 
       def validate_content_type
-        unless request.content_type == "application/json"
+        unless request.media_type == "application/json"
           @error = {status: 415, message: 'Please use the "Content-Type: application/json; charset=utf-8" header', errors: []}
           render partial: "api/v2/shared/api_error", status: 415
         end

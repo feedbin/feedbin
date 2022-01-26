@@ -30,7 +30,7 @@
                     <p class="post-meta">
                         <%= link_to micropost.fully_qualified_url, target: "_blank", title: "View post" do %>
                             <time datetime="<%= micropost.published.iso8601 %>">
-                                <%= micropost.published.to_s(:full_human) %>
+                                <%= micropost.published.to_formatted_s(:full_human) %>
                             </time>
                         <% end %>
                     </p>

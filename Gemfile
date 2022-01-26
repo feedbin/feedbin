@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "= 6.1.4.1"
+gem "rails", "= 7.0.1"
 gem "will_paginate"
 
 gem "resolv",              github: "feedbin/resolv",              branch: "feedbin"
@@ -69,7 +69,6 @@ group :development do
   gem "htmlbeautifier"
   gem "listen"
   gem "silencer"
-  gem "spring"
   gem "foreman"
 end
 

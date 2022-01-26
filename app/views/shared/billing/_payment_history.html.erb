@@ -4,7 +4,7 @@
         <table class="table table-striped">
             <% if @next_payment_date %>
                 <tr>
-                    <td><time datetime="<%= @next_payment_date.to_s(:date) %>"><%= @next_payment_date.to_s(:date) %></time></td>
+                    <td><time datetime="<%= @next_payment_date.to_formatted_s(:date) %>"><%= @next_payment_date.to_formatted_s(:date) %></time></td>
                     <td>&nbsp;</td>
                     <td><span class="extra-muted">Scheduled</span></td>
                 </tr>

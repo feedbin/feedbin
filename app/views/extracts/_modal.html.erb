@@ -14,7 +14,7 @@
                     <% if page.author || page.published || page.domain %>
                         <p class="post-meta">
                             <% if page.published %>
-                                <time><%= page.published.to_s(:full_human) %></time>
+                                <time><%= page.published.to_formatted_s(:full_human) %></time>
                             <% end %>
                             <% if page.author %>
                                 by <%= page.author %>

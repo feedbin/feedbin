@@ -6,7 +6,7 @@ You can view a detailed printable receipt here: <%= billing_event_url(@billing_e
 
 Thanks for being a Feedbin customer!
 
-<%= Time.at(@billing_event.event_object["created"]).to_s(:date) %>
+<%= Time.at(@billing_event.event_object["created"]).to_formatted_s(:date) %>
 -------------------------------------------------
 <%- @billing_event.invoice_items["data"].each do |invoice_item| %>
 <%- if invoice_item["plan"] %>

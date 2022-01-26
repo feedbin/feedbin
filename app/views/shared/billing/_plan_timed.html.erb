@@ -8,7 +8,7 @@
                     <% if @user.timed_plan_expired? %>
                         <span class="danger">Expired</span>
                     <% else %>
-                        Expires: <%= @user.expires_at.to_s(:date) %>
+                        Expires: <%= @user.expires_at.to_formatted_s(:date) %>
                     <% end %>
                 </td>
             </tr>

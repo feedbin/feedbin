@@ -51,10 +51,10 @@ class EntryPresenter < BasePresenter
 
   def published_date
     if entry.tweet?
-      entry.main_tweet.created_at.to_s(:full_human)
+      entry.main_tweet.created_at.to_formatted_s(:full_human)
     else
       if entry.published
-        entry.published.to_s(:full_human)
+        entry.published.to_formatted_s(:full_human)
       else
         ""
       end
@@ -63,10 +63,10 @@ class EntryPresenter < BasePresenter
 
   def datetime
     if entry.tweet?
-      entry.main_tweet.created_at.to_s(:datetime)
+      entry.main_tweet.created_at.to_formatted_s(:datetime)
     else
       if entry.published
-        entry.published.to_s(:datetime)
+        entry.published.to_formatted_s(:datetime)
       else
         ""
       end

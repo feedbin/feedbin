@@ -10,7 +10,7 @@
             <p>
                 <%= strip_tags(entry.feed.title) %>
                 <br />
-                <%= entry.published.to_s(:full_human) %>
+                <%= entry.published.to_formatted_s(:full_human) %>
             </p>
             <%= raw(content) %>
         </body>

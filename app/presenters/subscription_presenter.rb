@@ -10,16 +10,16 @@ class SubscriptionPresenter < BasePresenter
   end
 
   def graph_date_start
-    days.ago.to_s(:day_month).upcase
+    days.ago.to_formatted_s(:day_month).upcase
   end
 
   def graph_date_mid
     total_days = (Time.now - days.ago).to_i
-    (days.ago + total_days / 2).to_s(:day_month).upcase
+    (days.ago + total_days / 2).to_formatted_s(:day_month).upcase
   end
 
   def graph_date_end
-    Time.now.to_s(:day_month).upcase
+    Time.now.to_formatted_s(:day_month).upcase
   end
 
   def graph_bars

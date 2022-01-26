@@ -35,6 +35,10 @@ jobs:
           - 5432:5432
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-java@v2
+      with:
+        distribution: temurin
+        java-version: 8
 
     - name: Install system dependencies
       run: |
@@ -42,15 +46,13 @@ jobs:
 
         wget --quiet --output-document - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
         echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | sudo tee /etc/apt/sources.list.d/elasticsearch-2.x.list
+        sudo sed -e '/UseParNewGC/ s/^#*/#/g' -i /usr/share/elasticsearch/bin/elasticsearch.in.sh
 
         curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 
         sudo apt-get update
 
-        sudo apt-get remove adoptopenjdk-11-hotspot
-
         sudo apt-get install --quiet --yes \
-        adoptopenjdk-8-hotspot             \
         elasticsearch                      \
         imagemagick                        \
         libffi-dev                         \

@@ -42,7 +42,7 @@ class InAppPurchase < ApplicationRecord
   end
 
   def receipt_date
-    purchase_date.to_s(:date)
+    purchase_date.to_formatted_s(:date)
   end
 
   def receipt_description

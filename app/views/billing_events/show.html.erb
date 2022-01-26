@@ -17,7 +17,7 @@
         <p>
             <small>Invoice: <%= @billing_event.event_object["invoice"] || @billing_event.event_object["id"] %></small>
             <br />
-            <small><%= Time.at(@billing_event.event_object["created"]).to_s(:date) %></small>
+            <small><%= Time.at(@billing_event.event_object["created"]).to_formatted_s(:date) %></small>
         </p>
         <div class="customer-info">
             <strong>Account</strong>
