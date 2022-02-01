@@ -46,7 +46,6 @@ jobs:
 
         wget --quiet --output-document - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
         echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | sudo tee /etc/apt/sources.list.d/elasticsearch-2.x.list
-        sudo sed -e '/UseParNewGC/ s/^#*/#/g' -i /usr/share/elasticsearch/bin/elasticsearch.in.sh
 
         curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 
@@ -66,6 +65,7 @@ jobs:
         nodejs                             \
         zlib1g-dev
 
+        sudo sed -e '/UseParNewGC/ s/^#*/#/g' -i /usr/share/elasticsearch/bin/elasticsearch.in.sh
         sudo systemctl start elasticsearch
 
         major_version=$(google-chrome --version | awk '{print $NF}' | awk --field-separator "." '{ print $1 }')
