@@ -36,9 +36,8 @@ class SiteController < ApplicationController
         purpose: "any"
       }
     ]
-    respond_to do |format|
-      format.any {render "manifest.json.jbuilder", content_type: "application/manifest+json" }
-    end
+
+    render formats: :json, content_type: "application/manifest+json"
   end
 
   private
