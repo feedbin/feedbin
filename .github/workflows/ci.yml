@@ -77,6 +77,8 @@ jobs:
         sudo wget --quiet "https://feedbin-ci.s3.amazonaws.com/kindlegen/kindlegen" --output-document /usr/local/bin/kindlegen
         sudo chmod +x /usr/local/bin/kindlegen
 
+        sudo systemctl status elasticsearch
+
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
