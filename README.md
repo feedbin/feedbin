@@ -80,5 +80,3 @@ Status Badges
 ![Ruby CI](https://github.com/feedbin/feedbin/workflows/Ruby%20CI/badge.svg)
 
 [![Code Climate](https://codeclimate.com/github/feedbin/feedbin.svg)](https://codeclimate.com/github/feedbin/feedbin)
-
-[![Coverage Status](https://coveralls.io/repos/github/feedbin/feedbin/badge.svg)](https://coveralls.io/github/feedbin/feedbin)
