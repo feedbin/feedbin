@@ -25,7 +25,7 @@ class Feed < ApplicationRecord
 
   enum feed_type: {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3, pages: 4}
 
-  store :settings, accessors: [:custom_icon], coder: JSON
+  store :settings, accessors: [:custom_icon, :current_feed_url], coder: JSON
 
   def twitter_user?
     twitter_user.present?
@@ -212,6 +212,10 @@ class Feed < ApplicationRecord
     else
       nil
     end
+  end
+
+  def redirect_key
+    "refresher_redirect_stable_%d" % id
   end
 
   private

@@ -53,4 +53,11 @@ class FeedbinUtils
       query
     end
   end
+
+  def self.shared_cache(key)
+    hash = Sidekiq.redis do |redis|
+      redis.hgetall key
+    end
+    hash.transform_keys(&:to_sym)
+  end
 end
