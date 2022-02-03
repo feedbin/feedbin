@@ -17,7 +17,7 @@ class FeedUpdate
     entries = result.entries.map do |entry|
       entry.to_entry.tap do |hash|
         hash[:feed_id] = feed_id
-      end.compact_blank
+      end
     end
 
     want_public_ids = entries.map {|entry| entry[:public_id] }
