@@ -23,10 +23,10 @@ class RedisServerSetup
     return if values.first.empty?
     hash = Hash[keys.zip(values)]
     $redis[:entries].with do |redis|
-      redis.multi do
+      redis.multi do  |pipeline|
         hash.each do |key, value|
-          redis.del(key)
-          redis.zadd(key, value)
+          pipeline.del(key)
+          pipeline.zadd(key, value)
         end
       end
     end

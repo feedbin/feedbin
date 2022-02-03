@@ -40,7 +40,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedjira.git
-  revision: 518d15689df28ca66c6fcccd9aed6104ba2c8166
+  revision: 7afc7f011a04c8376bbfb84c5ce22b639459dab2
   branch: f2
   specs:
     feedjira (2.1.2)
@@ -51,7 +51,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: eda7aa60cdda5df76042987b4239482b4c351ea6
+  revision: 1b27c1347d3a9bb6c37cc4038c63fa787ebcebb8
   branch: master
   specs:
     feedkit (0.1.0)
@@ -230,7 +230,7 @@ GEM
       rack (>= 0.9.0)
     binding_of_caller (1.0.0)
       debug_inspector (>= 0.0.1)
-    bootsnap (1.10.2)
+    bootsnap (1.10.3)
       msgpack (~> 1.2)
     buftok (0.2.0)
     builder (3.2.4)
@@ -334,7 +334,7 @@ GEM
     httparty (0.20.0)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
-    i18n (1.8.11)
+    i18n (1.9.1)
       concurrent-ruby (~> 1.0)
     idn-ruby (0.1.4)
     image_processing (1.12.1)
@@ -427,7 +427,7 @@ GEM
     parallel (1.21.0)
     parser (3.1.0.0)
       ast (~> 2.4.1)
-    pg (1.3.0)
+    pg (1.3.1)
     postmark (1.22.0)
       json
     postmark-rails (0.22.0)
@@ -441,11 +441,11 @@ GEM
       actionmailer (>= 3)
       premailer (~> 1.7, >= 1.7.9)
     public_suffix (4.0.6)
-    puma (5.6.0)
+    puma (5.6.1)
       nio4r (~> 2.0)
     racc (1.6.0)
     rack (2.2.3)
-    rack-attack (6.5.0)
+    rack-attack (6.6.0)
       rack (>= 1.0, < 3)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -487,7 +487,7 @@ GEM
       ffi (~> 1.0)
     rchardet (1.8.0)
     redcarpet (3.5.1)
-    redis (4.5.1)
+    redis (4.6.0)
     regexp_parser (2.2.0)
     request_store (1.5.1)
       rack (>= 1.4)
@@ -592,7 +592,7 @@ GEM
     will_paginate (3.3.1)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    zeitwerk (2.5.3)
+    zeitwerk (2.5.4)
 
 PLATFORMS
   arm64-darwin-20
@@ -680,4 +680,4 @@ DEPENDENCIES
   will_paginate
 
 BUNDLED WITH
-   2.2.26
+   2.3.6

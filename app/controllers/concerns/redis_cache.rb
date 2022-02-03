@@ -3,9 +3,9 @@ module RedisCache
 
   def get_cached_entry_ids(cache_key, feed_key, since = "-inf", read = nil, starred = nil)
     key_exists, entry_ids = $redis[:entries].with { |redis|
-      redis.multi do
-        redis.exists?(cache_key)
-        redis.lrange(cache_key, 0, -1)
+      redis.multi do |pipeline|
+        pipeline.exists?(cache_key)
+        pipeline.lrange(cache_key, 0, -1)
       end
     }
 
@@ -17,9 +17,9 @@ module RedisCache
       }
 
       scores = $redis[:entries].with { |redis|
-        redis.pipelined do
+        redis.pipelined do |pipeline|
           keys.each do |key|
-            redis.zrangebyscore(key, since, "+inf", with_scores: true)
+            pipeline.zrangebyscore(key, since, "+inf", with_scores: true)
           end
         end
       }
@@ -74,10 +74,10 @@ module RedisCache
   def cache_entry_ids(cache_key, entry_ids)
     if entry_ids.present?
       $redis[:entries].with do |redis|
-        redis.multi do
-          redis.del(cache_key)
-          redis.rpush(cache_key, entry_ids)
-          redis.expire(cache_key, 2.minutes.to_i)
+        redis.multi do  |pipeline|
+          pipeline.del(cache_key)
+          pipeline.rpush(cache_key, entry_ids)
+          pipeline.expire(cache_key, 2.minutes.to_i)
         end
       end
     end

@@ -20,7 +20,7 @@
 .env
 .env-tmp
 .env.development
-public
+/public
 coverage
 .byebug_history
 /node_modules

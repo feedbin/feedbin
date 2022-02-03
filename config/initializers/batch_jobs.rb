@@ -42,10 +42,10 @@ module BatchJobs
     temporary_set = "#{self.class.name}-#{jid}"
 
     (_, _, ids) = Sidekiq.redis do |redis|
-      redis.pipelined do
-        redis.renamenx(queue, temporary_set)
-        redis.expire(temporary_set, 60)
-        redis.smembers(temporary_set)
+      redis.pipelined do  |pipeline|
+        pipeline.renamenx(queue, temporary_set)
+        pipeline.expire(temporary_set, 60)
+        pipeline.smembers(temporary_set)
       end
     end
 

@@ -42,9 +42,9 @@ class EntryIdCache
   def get_ids
     ids[page_number] ||= begin
       key_exists, entry_ids = $redis[:entries].with { |redis|
-        redis.multi do
-          redis.exists?(cache_key)
-          redis.zrevrange(cache_key, start, stop)
+        redis.multi do  |pipeline|
+          pipeline.exists?(cache_key)
+          pipeline.zrevrange(cache_key, start, stop)
         end
       }
 
@@ -56,10 +56,10 @@ class EntryIdCache
           entry_ids = []
         else
           count, expire, entry_ids = $redis[:entries].with { |redis|
-            redis.multi do
-              redis.zunionstore(cache_key, keys)
-              redis.expire(cache_key, 2.minutes.to_i)
-              redis.zrevrange(cache_key, start, stop)
+            redis.multi do  |pipeline|
+              pipeline.zunionstore(cache_key, keys)
+              pipeline.expire(cache_key, 2.minutes.to_i)
+              pipeline.zrevrange(cache_key, start, stop)
             end
           }
         end

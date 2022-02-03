@@ -17,24 +17,10 @@ CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION hstore; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION hstore IS 'data type for storing sets of (key, value) pairs';
-
-
---
 -- Name: pg_stat_statements; Type: EXTENSION; Schema: -; Owner: -
 --
 
 CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA public;
-
-
---
--- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION pg_stat_statements IS 'track execution statistics of all SQL statements executed';
 
 
 SET default_tablespace = '';
@@ -442,7 +428,8 @@ CREATE TABLE public.feeds (
     active boolean DEFAULT true,
     options json,
     hubs text[],
-    settings jsonb
+    settings jsonb,
+    standalone_request_at timestamp(6) without time zone
 );
 
 
@@ -1823,6 +1810,13 @@ CREATE INDEX index_feeds_on_push_expiration ON public.feeds USING btree (push_ex
 
 
 --
+-- Name: index_feeds_on_standalone_request_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_feeds_on_standalone_request_at ON public.feeds USING btree (standalone_request_at DESC) WHERE (standalone_request_at IS NOT NULL);
+
+
+--
 -- Name: index_import_items_on_import_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2451,6 +2445,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200810160825'),
 ('20201230004844'),
 ('20210102005228'),
-('20210601200027');
+('20210601200027'),
+('20220128221704');
 
 
