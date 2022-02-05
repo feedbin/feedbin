@@ -246,7 +246,7 @@ Rails.application.routes.draw do
       namespace :podcasts do
         namespace :v1 do
           resources :feeds, only: :show
-          resources :subscriptions, only: [:index, :create, :destroy]
+          resources :subscriptions, only: [:index, :create, :update, :destroy]
           resources :queued_entries, only: [:index, :create, :destroy]
         end
       end

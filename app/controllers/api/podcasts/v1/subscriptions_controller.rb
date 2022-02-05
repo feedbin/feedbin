@@ -2,8 +2,8 @@ module Api
   module Podcasts
     module V1
       class SubscriptionsController < ApiController
-        before_action :set_subscription, only: [:destroy]
-        before_action :validate_content_type, only: [:create]
+        before_action :set_subscription, only: [:destroy, :update]
+        before_action :validate_content_type, only: [:create, :update]
 
         def index
           @user = current_user
@@ -33,6 +33,11 @@ module Api
           else
             raise exception
           end
+        end
+
+        def update
+          @subscription.update(subscription_params)
+          head :no_content
         end
 
         def destroy

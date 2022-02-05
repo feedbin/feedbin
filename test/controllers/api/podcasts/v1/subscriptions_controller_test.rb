@@ -48,4 +48,16 @@ class Api::Podcasts::V1::SubscriptionsControllerTest < ApiControllerTestCase
       assert_response :success
     end
   end
+
+  test "should update" do
+    api_content_type
+    login_as @user
+
+    subscription = @user.subscriptions.first
+
+    patch :update, params: {id: subscription.id, show_status: "bookmarked"}, format: :json
+    assert_response :success
+
+    assert_equal("bookmarked", subscription.reload.show_status)
+  end
 end

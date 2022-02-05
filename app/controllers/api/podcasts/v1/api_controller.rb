@@ -16,6 +16,11 @@ module Api
           status_not_found
         end
 
+        rescue_from ArgumentError do |exception|
+          @error = {status: 400, message: "Bad Request", errors: [exception.message]}
+          render partial: "api/v2/shared/api_error", status: 400
+        end
+
         def status_not_found
           @error = {status: 404, errors: []}
           render partial: "api/v2/shared/api_error", status: :not_found
