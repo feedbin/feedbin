@@ -26,6 +26,7 @@ class Subscription < ApplicationRecord
 
   enum kind: {default: 0, generated: 1}
   enum view_mode: {article: 0, extract: 1, newsletter: 2}
+  enum show_status: {not_show: 0, hidden: 1, subscribed: 2, bookmarked: 3}
 
   def self.create_multiple(feeds, user, valid_feed_ids)
     @subscriptions = feeds.each_with_object([]) { |(feed_id, subscription), array|

@@ -1,0 +1,1 @@
+json.partial! "queued_entry", queued_entry: @queued_entry

@@ -1,7 +1,10 @@
 module Api
-  module Public
+  module Podcasts
     module V1
       class FeedsController < ApiController
+        skip_before_action :authorize
+        skip_before_action :set_user
+
         def show
           url = hex_decode(params[:id])
           @feed = Feed.find_by_feed_url(url)
@@ -17,6 +20,13 @@ module Api
 
           if @feed.present?
             @feed.touch(:standalone_request_at)
+          end
+        rescue => exception
+          if Rails.env.production?
+            Honeybadger.notify(exception)
+            status_not_found
+          else
+            raise exception
           end
         end
       end
