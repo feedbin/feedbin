@@ -3,7 +3,7 @@ class AuthenticationToken < ApplicationRecord
 
   attr_accessor :length
 
-  enum purpose: {cookies: 0, feeds: 1, newsletters: 2, pages: 2}
+  enum purpose: {cookies: 0, feeds: 1, newsletters: 2, pages: 3}
 
   scope :active, -> { where(active: true) }
 
