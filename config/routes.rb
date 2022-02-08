@@ -343,4 +343,9 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :users
   end
+
+  namespace :app_store do
+    resources :notifications_v2, only: :create
+  end
+
 end
