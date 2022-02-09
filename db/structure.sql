@@ -23,6 +23,13 @@ CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA public;
 CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA public;
 
 
+--
+-- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -91,7 +98,8 @@ CREATE TABLE public.authentication_tokens (
     data jsonb DEFAULT '{}'::jsonb,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    active boolean DEFAULT true NOT NULL
+    active boolean DEFAULT true NOT NULL,
+    uuid uuid DEFAULT public.uuid_generate_v4() NOT NULL
 );
 
 
@@ -1709,6 +1717,13 @@ CREATE INDEX index_authentication_tokens_on_user_id ON public.authentication_tok
 
 
 --
+-- Name: index_authentication_tokens_on_uuid; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_authentication_tokens_on_uuid ON public.authentication_tokens USING btree (uuid);
+
+
+--
 -- Name: index_billing_events_on_billable_id_and_billable_type; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2560,6 +2575,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220128221704'),
 ('20220204123745'),
 ('20220204142012'),
-('20220204194100');
+('20220204194100'),
+('20220208094739');
 
 

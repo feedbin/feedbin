@@ -81,10 +81,7 @@ class User < ApplicationRecord
   before_save { reset_auth_token }
 
   before_create :create_customer, unless: -> { !ENV["STRIPE_API_KEY"] }
-  before_create { generate_token(:starred_token) }
-  before_create { generate_token(:inbound_email_token, 4) }
-  before_create { generate_newsletter_token }
-  before_create { generate_token(:page_token) }
+  before_create { generate_tokens }
 
   before_update :update_billing, unless: -> { !ENV["STRIPE_API_KEY"] }
   before_destroy :cancel_billing, unless: -> { !ENV["STRIPE_API_KEY"] }
@@ -104,8 +101,12 @@ class User < ApplicationRecord
     NewsletterSender.where(token: newsletter_authentication_token.token).order(name: :asc)
   end
 
-  def generate_newsletter_token
+  def generate_tokens
+    generate_token(:starred_token)
+    generate_token(:inbound_email_token, 4)
+    generate_token(:page_token)
     authentication_tokens.newsletters.new(length: 4)
+    authentication_tokens.app.new
   end
 
   def theme

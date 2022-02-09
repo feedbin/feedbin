@@ -61,6 +61,7 @@ gem "twitter-text"
 gem "uglifier"
 gem "unicode-emoji"
 gem "unicorn"
+gem "jwt"
 
 group :development do
   gem "benchmark-ips"
