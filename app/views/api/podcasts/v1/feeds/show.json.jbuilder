@@ -2,7 +2,7 @@ json.id            @feed.id
 json.title         @feed.try(:title).clean
 json.home_page_url @feed.try(:site_url).clean
 json.feed_url      @feed.try(:feed_url).clean
-json.description   @feed.options&.dig("description").clean(transform: [:to_text])
+json.description   @feed.options&.dig("description").clean(transform: [:to_plain_text])
 
 json.podcast do
   json.author       @feed.options&.dig("itunes_author").clean
@@ -40,7 +40,7 @@ json.items @feed.entries.order(published: :desc) do |entry|
     json.image            entry.data&.dig("itunes_image").clean
     json.keywords         entry.data&.dig("itunes_keywords").clean
     json.order            entry.data&.dig("itunes_order").clean
-    json.summary          entry.data&.dig("itunes_subtitle").clean(transform: :to_text) || entry.summary
+    json.summary          entry.data&.dig("itunes_subtitle").clean(transform: :to_plain_text) || entry.summary
     json.content          entry.content.clean
   end
 end

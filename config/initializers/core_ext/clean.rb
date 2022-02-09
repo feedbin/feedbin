@@ -34,7 +34,7 @@ class NilClass
 end
 
 class String
-  def to_text
+  def to_plain_text
     Loofah.fragment(self)
       .scrub!(:prune)
       .to_text(encode_special_chars: false)
