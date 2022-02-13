@@ -139,8 +139,8 @@ GIT
 
 GIT
   remote: https://github.com/ostinelli/apnotic.git
-  revision: 664ac2f6f56d46ae7bf69963b58c92caebf2abe9
-  branch: monotonic
+  revision: 5e804cd0c9b394472e17c84f679727ec4501766f
+  branch: master
   specs:
     apnotic (1.7.0)
       connection_pool (~> 2)
@@ -286,7 +286,7 @@ GEM
     evernote_oauth (0.2.3)
       evernote-thrift
       oauth (>= 0.4.1)
-    excon (0.90.0)
+    excon (0.91.0)
     execjs (2.8.1)
     faker (2.19.0)
       i18n (>= 1.6, < 2)
@@ -483,7 +483,7 @@ GEM
     rainbow (3.1.1)
     raindrops (0.20.0)
     rake (13.0.6)
-    rb-fsevent (0.11.0)
+    rb-fsevent (0.11.1)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     rchardet (1.8.0)
@@ -499,7 +499,7 @@ GEM
       nokogiri
     rexml (3.2.5)
     rmagick (4.2.4)
-    rubocop (1.25.0)
+    rubocop (1.25.1)
       parallel (~> 1.10)
       parser (>= 3.1.0.0)
       rainbow (>= 2.2.2, < 4.0)
@@ -534,7 +534,7 @@ GEM
       childprocess (>= 0.5, < 5.0)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2)
-    sidekiq (6.4.0)
+    sidekiq (6.4.1)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
@@ -548,8 +548,8 @@ GEM
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
     ssrf_filter (1.0.7)
-    standard (1.7.0)
-      rubocop (= 1.25.0)
+    standard (1.7.1)
+      rubocop (= 1.25.1)
       rubocop-performance (= 1.13.2)
     stripe (4.24.0)
       faraday (~> 0.13)

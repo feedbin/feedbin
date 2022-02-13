@@ -45,7 +45,8 @@ class User < ApplicationRecord
     :favicon_colors,
     :newsletter_tag,
     :feeds_width,
-    :entries_width
+    :entries_width,
+    :billing_issue
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -68,6 +69,7 @@ class User < ApplicationRecord
   has_many :devices, dependent: :delete_all
   has_many :authentication_tokens, dependent: :delete_all
   has_many :in_app_purchases
+  has_many :app_store_notifications
   belongs_to :plan
 
   accepts_nested_attributes_for :sharing_services,
@@ -431,8 +433,16 @@ class User < ApplicationRecord
     end
   end
 
+  def billing_issue?
+    billing_issue == "1"
+  end
+
+  def billing_issue!
+    update(billing_issue: "1")
+  end
+
   def activate
-    update(suspended: false)
+    update(suspended: false, billing_issue: "0")
     subscriptions.update_all(active: true)
   end
 

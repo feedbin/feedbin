@@ -21,7 +21,7 @@ gem "twitter",             github: "feedbin/twitter",             branch: "feedb
 
 gem "activerecord-import"
 gem "addressable", require: "addressable/uri"
-gem "apnotic", github: "ostinelli/apnotic", branch: "monotonic"
+gem "apnotic", github: "ostinelli/apnotic", branch: "master"
 gem "autoprefixer-rails"
 gem "bcrypt"
 gem "bootsnap", require: false

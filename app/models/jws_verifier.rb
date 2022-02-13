@@ -21,6 +21,8 @@ class JwsVerifier
       header = JSON.parse(parts.first)
       header["x5c"].map { |part| OpenSSL::X509::Certificate.new(Base64.decode64(part))}
     end
+  rescue JSON::ParserError
+    []
   end
 
   def root_ends_chain?
@@ -34,7 +36,7 @@ class JwsVerifier
   end
 
   def jwt_valid?
-    decoded = JWT.decode(@token, chain.first.public_key, true, { algorithms: ["ES256"] })
+    decoded = JWT.decode(@token, chain.first&.public_key, true, { algorithms: ["ES256"] })
     !decoded.nil?
   rescue JWT::JWKError
     false

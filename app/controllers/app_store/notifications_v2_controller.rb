@@ -1,21 +1,13 @@
 class AppStore::NotificationsV2Controller < ApplicationController
   skip_before_action :verify_authenticity_token
   skip_before_action :authorize
+  skip_before_action :set_user
+  skip_before_action :honeybadger_context
 
   def create
     payload = params[:signedPayload]
-    decoded = decode(payload).tap do |data|
-      data["data"]["signedTransactionInfo"] = decode(data["data"]["signedTransactionInfo"])
-      data["data"]["signedRenewalInfo"] = decode(data["data"]["signedRenewalInfo"])
-    end
-
-    logger.info { decoded }
-  end
-
-  private
-
-  def decode(data)
-    _, payload, _ = data.split(".")
-    JSON.load(Base64.decode64(payload))
+    valid = JwsVerifier.valid?(payload)
+    AppStoreNotificationProcessor.perform_async(payload) if valid
+    head valid ? :ok : :not_found
   end
 end
