@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "= 7.0.1"
+gem "rails", "= 7.0.2.2"
 gem "will_paginate"
 
 gem "resolv",              github: "feedbin/resolv",              branch: "feedbin"
@@ -21,7 +21,7 @@ gem "twitter",             github: "feedbin/twitter",             branch: "feedb
 
 gem "activerecord-import"
 gem "addressable", require: "addressable/uri"
-gem "apnotic", github: "ostinelli/apnotic", branch: "monotonic"
+gem "apnotic", github: "ostinelli/apnotic", branch: "master"
 gem "autoprefixer-rails"
 gem "bcrypt"
 gem "bootsnap", require: false
