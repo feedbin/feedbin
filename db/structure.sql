@@ -638,6 +638,61 @@ ALTER SEQUENCE public.newsletter_senders_id_seq OWNED BY public.newsletter_sende
 
 
 --
+-- Name: next_entries; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.next_entries (
+    id bigint NOT NULL,
+    entry_id bigint NOT NULL,
+    feed_id bigint NOT NULL,
+    entry_ids bigint[] DEFAULT '{}'::bigint[] NOT NULL,
+    title text,
+    url text NOT NULL,
+    author text,
+    source_id text,
+    public_id uuid NOT NULL,
+    title_id uuid NOT NULL,
+    url_id uuid NOT NULL,
+    tweet_id bigint,
+    tweet_thread_id bigint,
+    starred_entries_count bigint DEFAULT 0 NOT NULL,
+    recently_played_entries_count bigint DEFAULT 0 NOT NULL,
+    queued_entries_count bigint DEFAULT 0 NOT NULL,
+    published_at timestamp(6) without time zone NOT NULL,
+    source_updated_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    summary text,
+    content text,
+    image jsonb,
+    tweet jsonb,
+    newsletter jsonb,
+    original jsonb,
+    settings jsonb DEFAULT '{}'::jsonb NOT NULL,
+    data jsonb DEFAULT '{}'::jsonb NOT NULL
+);
+
+
+--
+-- Name: next_entries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.next_entries_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: next_entries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.next_entries_id_seq OWNED BY public.next_entries.id;
+
+
+--
 -- Name: plans; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1351,6 +1406,13 @@ ALTER TABLE ONLY public.newsletter_senders ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
+-- Name: next_entries id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.next_entries ALTER COLUMN id SET DEFAULT nextval('public.next_entries_id_seq'::regclass);
+
+
+--
 -- Name: plans id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1603,6 +1665,14 @@ ALTER TABLE ONLY public.in_app_purchases
 
 ALTER TABLE ONLY public.newsletter_senders
     ADD CONSTRAINT newsletter_senders_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: next_entries next_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.next_entries
+    ADD CONSTRAINT next_entries_pkey PRIMARY KEY (id);
 
 
 --
@@ -1998,6 +2068,62 @@ CREATE UNIQUE INDEX index_newsletter_senders_on_feed_id ON public.newsletter_sen
 --
 
 CREATE INDEX index_newsletter_senders_on_token ON public.newsletter_senders USING btree (token);
+
+
+--
+-- Name: index_next_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_next_entries_on_entry_id ON public.next_entries USING btree (entry_id);
+
+
+--
+-- Name: index_next_entries_on_entry_ids; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_next_entries_on_entry_ids ON public.next_entries USING btree (entry_ids);
+
+
+--
+-- Name: index_next_entries_on_feed_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_next_entries_on_feed_id ON public.next_entries USING btree (feed_id);
+
+
+--
+-- Name: index_next_entries_on_public_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_next_entries_on_public_id ON public.next_entries USING btree (public_id);
+
+
+--
+-- Name: index_next_entries_on_title_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_next_entries_on_title_id ON public.next_entries USING btree (title_id);
+
+
+--
+-- Name: index_next_entries_on_tweet_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_next_entries_on_tweet_id ON public.next_entries USING btree (tweet_id) WHERE (tweet_id IS NOT NULL);
+
+
+--
+-- Name: index_next_entries_on_tweet_thread_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_next_entries_on_tweet_thread_id ON public.next_entries USING btree (tweet_thread_id) WHERE (tweet_thread_id IS NOT NULL);
+
+
+--
+-- Name: index_next_entries_on_url_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_next_entries_on_url_id ON public.next_entries USING btree (url_id);
 
 
 --
@@ -2450,6 +2576,14 @@ ALTER TABLE ONLY public.newsletter_senders
 
 
 --
+-- Name: next_entries fk_rails_4b841dd6e7; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.next_entries
+    ADD CONSTRAINT fk_rails_4b841dd6e7 FOREIGN KEY (entry_id) REFERENCES public.entries(id) ON DELETE CASCADE;
+
+
+--
 -- Name: queued_entries fk_rails_83978fda52; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2471,6 +2605,14 @@ ALTER TABLE ONLY public.unreads
 
 ALTER TABLE ONLY public.queued_entries
     ADD CONSTRAINT fk_rails_9556652818 FOREIGN KEY (entry_id) REFERENCES public.entries(id) ON DELETE CASCADE;
+
+
+--
+-- Name: next_entries fk_rails_a0070036d9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.next_entries
+    ADD CONSTRAINT fk_rails_a0070036d9 FOREIGN KEY (feed_id) REFERENCES public.feeds(id) ON DELETE CASCADE;
 
 
 --
@@ -2651,6 +2793,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220204142012'),
 ('20220204194100'),
 ('20220208094739'),
-('20220209131258');
+('20220209131258'),
+('20220213023715');
 
 
