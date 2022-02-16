@@ -31,6 +31,14 @@ class UnreadLimiterTest < ActiveSupport::TestCase
     end
   end
 
+  test "should not remove protected UnreadEntries" do
+    subscription = @user.subscriptions.where(feed: @feed).sole
+    subscription.generated!
+    assert_no_difference -> { UnreadEntry.where(entry_id: @entries.map(&:id)).count } do
+      UnreadLimiter.new.perform(@feed.id)
+    end
+  end
+
   private
 
   def change

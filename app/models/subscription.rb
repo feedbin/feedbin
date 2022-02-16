@@ -89,6 +89,10 @@ class Subscription < ApplicationRecord
     end
   end
 
+  def protected?
+    generated?
+  end
+
   private
 
   def refresh_favicon
