@@ -33,6 +33,6 @@ class UserDeleter
     }
     opml = SubscriptionsController.render(:index, assigns: {user: @user, tags: tags, feeds: feeds, titles: titles}, layout: nil)
     UserMailer.account_closed(@user.id, opml).deliver_now
-  rescue Net::SMTPSyntaxError
+  rescue Net::SMTPSyntaxError, Postmark::InactiveRecipientError
   end
 end
