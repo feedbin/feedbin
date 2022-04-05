@@ -1,0 +1,13 @@
+{
+    "feeds":
+    [
+        {
+            "title":"Daring Fireball",
+            "feed_id":290,
+            "feed_url":"http://daringfireball.net/index.xml",
+            "site_url":"http://daringfireball.net/"
+        }
+    ],
+    "error":null,
+    "result":"success"
+}

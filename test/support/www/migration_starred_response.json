@@ -1,0 +1,41 @@
+{
+    "count" : 5,
+    "error" : null,
+    "feed_items" : [
+        {
+            "author" : "Ben Ubois",
+            "body" : "<p>Feedbin now features image previews in the center column.</p>\n\n<figure>\n\t<a href=\"https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2015-10-22/screenshot_one_large-b08bfd8618a62a09fbad6b70ba28c973a70f1815a2e4fe00a78392b76f05720b.jpg\">\n        <img src=\"https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2015-10-22/screenshot_one_small-8e3180a61ba1fb72768ab7e21037dd431d40c07e64d146a24adfed06e6fa6158.jpg\" />\n    </a>\n\t<figcaption>Feedbin, now with more images.</figcaption>\n</figure>\n\n<p>The most important thing to me when building this feature was that only images that are reasonably high quality would show up here. To do this Feedbin uses a set of criteria that an image must meet in order to be chosen.</p>\n\n<p>Feedbin can find a variety of images including:</p>\n\n<ul>\n  <li>Images in the RSS post</li>\n  <li>Poster frames from YouTube and Vimeo embeds</li>\n  <li><a href=\"http://ogp.me/\">Open Graph</a> and <a href=\"https://dev.twitter.com/cards/overview\">Twitter Card</a> meta data</li>\n</ul>\n\n<p>One of my favorite operations that Feedbin does to ensure the quality of these image previews is facial detection using <a href=\"http://opencv.org/\">OpenCV</a>. By getting a rough idea about where faces in an image might be, Feedbin is able to get a better crop. I first saw this idea used in <a href=\"http://blog.iconfactory.com/2015/06/twitterrifics-new-facial-recognition-keeps-faces-front-center/\">Twitterrific</a> and loved the results.</p>\n\n<figure>\n    <img src=\"https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2015-10-22/crop_smart-cf421c97e5ff5181774b0655490144581705d8cd1fea64e9045a23814c72daa7.jpg\" />\n    <figcaption>Crop with face detection. Sample image from <a href=\"https://thegreatdiscontent.com/interview/jim-riswold\">The Great Discontent</a>.</figcaption>\n</figure>\n\n<figure>\n    <img src=\"https://dhy5vgj5baket.cloudfront.net/assets-site/blog/2015-10-22/crop_naive-16be8a0d9b8f9edbfcc413049e68cc17354a18678b3adb6efd92787684e7ccac.jpg\" />\n    <figcaption>Crop without face detection. Sample image from <a href=\"https://thegreatdiscontent.com/interview/jim-riswold\">The Great Discontent</a>.</figcaption>\n</figure>\n\n<p>Adding images is a big visual change and if you prefer the old look you can turn off image previews in the <a href=\"https://feedbin.com/settings/appearance\">Appearance settings</a>.</p>",
+            "created_at" : 1646572426,
+            "feed_id" : 512048,
+            "feed_item_id" : 4810362354,
+            "feed_name" : "Feedbin",
+            "guid" : "/2015/10/22/image-previews",
+            "published_at" : 1445490000,
+            "read" : false,
+            "read_later" : false,
+            "starred" : true,
+            "title" : "Image Previews",
+            "updated_at" : 1646572426,
+            "url" : "https://feedbin.com/blog/2015/10/22/image-previews/",
+            "version_key" : 1646572426
+        },
+        {
+            "author" : "Ben Ubois",
+            "body" : "<p>This <a href=\"https://chrome.google.com/webstore/detail/feedbin-link-opener/naflkhnfmneiigdcphekaemdmeajiand\">official extension</a> restores the ability for Chrome users to open article links in a background tab using a configurable keyboard shortcut.</p>\n\n<p>Previously this was possible without an extension, however the Chrome team <a href=\"https://code.google.com/p/chromium/issues/detail?id=456910\">recently removed this feature</a>.</p>\n\n<p>The default shortcut to open a link is <code class=\"highlighter-rouge\">option/alt + v</code>. This can be customized in Chromeâs <a href=\"chrome://extensions/configureCommands\">Keyboard Shortcuts for Extensions and Apps</a> page.</p>\n\n<p>The <a href=\"https://github.com/feedbin/feedbin-link-opener-chrome\">extension is open source</a> and ideas for improvements are welcome.</p>\n\n<p>An extension for Safari is not necessary because WebKit still supports the browser API to create background tabs.</p>\n\n<p><strong>Update:</strong> Martijn van der Ven has created a <a href=\"https://github.com/Zegnat/feedbin-link-opener-firefox/releases/\">FireFox version of this extension</a>. Thanks Martijn!</p>",
+            "created_at" : 1646572426,
+            "feed_id" : 512048,
+            "feed_item_id" : 4810362355,
+            "feed_name" : "Feedbin",
+            "guid" : "new",
+            "published_at" : 1425877200,
+            "read" : false,
+            "read_later" : false,
+            "starred" : true,
+            "title" : "Link Opener for Chrome",
+            "updated_at" : 1646572426,
+            "url" : "https://feedbin.com/blog/2015/03/09/link-opener-for-chrome/",
+            "version_key" : 1646572426
+        }
+    ],
+    "result" : "success"
+}

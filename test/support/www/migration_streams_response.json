@@ -1,0 +1,51 @@
+{
+    "error" : null,
+    "result" : "success",
+    "streams" : [
+        {
+            "all_feeds" : false,
+            "only_unread" : false,
+            "search_term" : null,
+            "stream_id" : 82716,
+            "title" : "Videos",
+            "feeds" : [
+                {
+                    "title":"Daring Fireball",
+                    "feed_id":290,
+                    "feed_url":"http://daringfireball.net/index.xml",
+                    "site_url":"http://daringfireball.net/"
+                }
+            ]
+        },
+        {
+            "all_feeds" : false,
+            "only_unread" : false,
+            "search_term" : null,
+            "stream_id" : 82717,
+            "title" : "Favorites",
+            "feeds" : [
+                {
+                    "title":"Daring Fireball",
+                    "feed_id":290,
+                    "feed_url":"http://daringfireball.net/index.xml",
+                    "site_url":"http://daringfireball.net/"
+                }
+            ]
+        },
+        {
+            "all_feeds" : false,
+            "only_unread" : false,
+            "search_term" : "search term",
+            "stream_id" : 82718,
+            "title" : "Exclude",
+            "feeds" : [
+                {
+                    "title":"Daring Fireball",
+                    "feed_id":290,
+                    "feed_url":"http://daringfireball.net/index.xml",
+                    "site_url":"http://daringfireball.net/"
+                }
+            ]
+        }
+    ]
+}

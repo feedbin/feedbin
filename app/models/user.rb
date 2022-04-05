@@ -67,6 +67,7 @@ class User < ApplicationRecord
   has_many :updated_entries, dependent: :delete_all
   has_many :devices, dependent: :delete_all
   has_many :authentication_tokens, dependent: :delete_all
+  has_many :account_migrations, dependent: :delete_all
   has_many :in_app_purchases
   belongs_to :plan
 

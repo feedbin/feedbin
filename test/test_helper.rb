@@ -69,7 +69,14 @@ class ActiveSupport::TestCase
   end
 
   def load_tweet(option)
-    JSON.parse(File.read(support_file("tweet_#{option}.json")))
+    load_support_json("tweet_#{option}")
+  end
+
+  def load_support_json(file_name)
+    unless file_name.end_with?(".json")
+      file_name = "#{file_name}.json"
+    end
+    JSON.parse(File.read(support_file(file_name)))
   end
 
   def create_stripe_plan(plan)

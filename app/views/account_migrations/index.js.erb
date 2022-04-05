@@ -1,0 +1,4 @@
+$("[data-content-src='<%= j account_migrations_path %>']").html('<%= j render partial: "account_migration" %>');
+<% if @migration.complete? || @migration.failed? %>
+clearInterval(feedbin.remoteContentIntervals["<%= j request.path_info %>"]);
+<% end %>

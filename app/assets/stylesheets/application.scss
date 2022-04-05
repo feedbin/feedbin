@@ -1092,7 +1092,7 @@ table {
     border-bottom: none !important;
 }
 
-.pill {
+.pill, .pill-block {
     @include border($color-borders);
     border-radius: 8px;
     padding: 16px;
@@ -1109,6 +1109,10 @@ table {
             }
         }
     }
+}
+
+.pill-block {
+    display: block;
 }
 
 .pill-list {
@@ -5691,35 +5695,6 @@ Settings
             flex: 1;
         }
     }
-    .toolbar {
-        display: flex;
-        flex: 1;
-        align-items: center;
-        > :first-child {
-            margin-right: 32px
-        }
-        .last-control {
-            display: flex;
-            align-items: center;
-            margin-left: auto;
-        }
-        @media (max-width: $small-breakpoint) {
-            flex-direction: column;
-            align-items: stretch;
-            .last-control {
-                margin-left: unset;
-                margin-top: 16px;
-            }
-            &.row {
-                flex-direction: row;
-                .last-control {
-                    margin-left: auto;
-                    margin-top: unset;
-                    align-items: center;
-                }
-            }
-        }
-    }
     .settings-inner {
         display: flex;
         flex: 1;
@@ -5811,6 +5786,53 @@ Settings
     }
     h3.box-header {
         margin: 0;
+    }
+    .toolbar {
+        display: flex;
+        flex: 1;
+        align-items: center;
+        > :first-child {
+            margin-right: 32px
+        }
+        .last-control {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+        }
+        &.baseline {
+            align-items: baseline;
+        }
+        h4.group-header {
+            margin: 0;
+        }
+        @media (max-width: $small-breakpoint) {
+            flex-direction: column;
+            align-items: stretch;
+            .last-control {
+                margin-left: unset;
+                margin-top: 16px;
+            }
+            &.row {
+                flex-direction: row;
+                .last-control {
+                    margin-left: auto;
+                    margin-top: unset;
+                    align-items: center;
+                }
+            }
+        }
+    }
+    .progress-bar {
+        margin: 16px 0 32px;
+        @include background-color($color-contrast-100);
+        border-radius: 4px;
+        display: block;
+        width: 100%;
+        overflow: hidden;
+        .progress-bar-inner {
+            background-color: $color-accent-green-600;
+            height: 8px;
+        }
     }
     .subscribe-email {
         word-break: break-all;
@@ -6493,6 +6515,7 @@ Settings
         background-color: $color-accent-red-200;
         border-radius: 4px;
         padding-right: 8px;
+        color: map-get($color-contrast-700, day);
         .icon-container {
             height: 48px;
             width: 48px;
@@ -6578,11 +6601,14 @@ Settings
         transform: rotate(360deg);
     }
 }
-.spinner-container {
+.spinner-container, .spinner-container-small {
     height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+.spinner-container-small {
+    height: auto;
 }
 .spinner {
     $size: 16px;
@@ -9599,4 +9625,37 @@ $tooltip-arrow-height: 6px;
 
 .spacer {
     margin-left: base-units(1);
+}
+
+.badge-failed, .badge-pending, .badge-complete {
+    padding: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    @include color($color-contrast-700);
+    font-style: normal;
+    border-radius: 4px;
+    font-family: $font-stack;
+    line-height: 1;
+    font-size: 14px;
+    text-transform: capitalize !important;
+    font-weight: bold;
+    color: #fff !important;
+    &.wide {
+        width: 72px;
+    }
+}
+
+.badge-failed {
+    @include background-color($color-accent-red-600);
+}
+.badge-pending {
+    @include background-color($color-accent-blue-400);
+}
+.badge-complete {
+    @include background-color($color-accent-green-600);
+}
+
+.horizontal-stack {
+    display: flex;
 }

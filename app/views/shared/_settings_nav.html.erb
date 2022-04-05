@@ -94,7 +94,19 @@
             </span>
         <% end %>
     </li>
-
+    <% if current_user.try(:account_migrations)&.exists? %>
+    <li>
+        <%= link_to account_migrations_path, class: is_active?("account_migrations", "index") do %>
+            <span class="icon-wrap">
+                <%= svg_tag "menu-icon-migration", inline: true %>
+            </span>
+            <span class="menu-text">
+                <span class="title">Account Migration</span>
+                <span class="subtitle">Howdy, Feed Wrangler!</span>
+            </span>
+        <% end %>
+    </li>
+    <% end %>
     <li class="nav-header">
         <div>Admin</div>
     </li>

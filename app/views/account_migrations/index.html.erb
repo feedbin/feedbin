@@ -1,0 +1,9 @@
+<div class="settings-content-inner">
+    <div class="settings-outer">
+        <h2>Feed Wrangler Migration</h2>
+    </div>
+
+    <%= content_tag :div, data: {content_src: account_migrations_path} do %>
+        <%= render partial: "account_migration" %>
+    <% end %>
+</div>

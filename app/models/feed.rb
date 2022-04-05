@@ -54,7 +54,8 @@ class Feed < ApplicationRecord
     if delete_existing
       Tagging.where(user_id: user, feed_id: id).destroy_all
     end
-    names.split(",").map do |name|
+    names = names.split(",") if names.is_a?(String)
+    names.map do |name|
       name = name.strip
       unless name.blank?
         tag = Tag.where(name: name.strip).first_or_create!

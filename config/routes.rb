@@ -66,6 +66,11 @@ Rails.application.routes.draw do
   resources :password_resets
   resources :sharing_services, path: "settings/sharing", only: [:index, :create, :update, :destroy]
   resources :actions, path: "settings/actions", only: [:index, :create, :new, :update, :destroy, :edit]
+  resources :account_migrations, path: "settings/account_migrations" do
+    member do
+      patch :start
+    end
+  end
   resources :saved_searches, only: [:show, :update, :destroy, :create, :edit, :new] do
     collection do
       get :count

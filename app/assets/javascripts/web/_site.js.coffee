@@ -26,6 +26,7 @@ $.extend feedbin,
   colorHash: new ColorHash
   scrollStarted: false
   loadingMore: false
+  remoteContentIntervals: {}
 
   prepareShareMenu: (data) ->
     buildLink = (item, data, index) ->
@@ -2873,6 +2874,16 @@ $.extend feedbin,
 
         event.preventDefault()
         event.stopPropagation()
+
+    updateContent: ->
+      $('[data-content-src]').each ->
+        element = $(@)
+        src = element.data('content-src')
+
+        callback = ->
+          $.get(src)
+
+        feedbin.remoteContentIntervals[src] = setInterval callback, 3000
 
     copy: ->
       $(document).on 'click', '[data-behavior~=copy]', (event) ->

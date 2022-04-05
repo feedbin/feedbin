@@ -5,6 +5,7 @@ class UsersController < ApplicationController
   before_action :ensure_permission, only: [:update, :destroy]
 
   def new
+    session[:feed_wrangler_token] = params[:feed_wrangler_token]
     @user = User.new.with_params(params)
   end
 
@@ -14,7 +15,13 @@ class UsersController < ApplicationController
       Librato.increment("user.trial.signup")
       flash[:one_time_content] = render_to_string(partial: "shared/register_protocol_handlers")
       sign_in @user
-      redirect_to root_url
+      if session[:feed_wrangler_token].present?
+        @user.account_migrations.create(api_token: session.delete(:feed_wrangler_token))
+        redirect_to account_migrations_url
+      else
+        redirect_to root_url
+      end
+
     else
       render "new"
     end
