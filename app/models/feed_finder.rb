@@ -50,6 +50,13 @@ class FeedFinder
   rescue Feedkit::Unauthorized
     raise
   rescue => exception
+    if import_mode?
+      if feed = Feed.xml.where(feed_url: url).take
+        return [feed]
+      end
+      raise exception
+    end
+
     if Rails.env.production?
       Rails.logger.error exception.message
       Rails.logger.error exception.backtrace.join("\n")
