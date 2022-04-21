@@ -9,3 +9,8 @@ new_newsletter:
   user: new
   token: token_new
   purpose: 2
+
+timed_newsletter:
+  user: timed
+  token: token_timed
+  purpose: 2

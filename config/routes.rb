@@ -63,6 +63,7 @@ Rails.application.routes.draw do
   resources :tags, only: [:index, :show, :update, :destroy, :edit]
   resources :billing_events, only: [:show]
   resources :in_app_purchases, only: [:show]
+  resources :app_store_notifications, only: [:show]
   resources :password_resets
   resources :sharing_services, path: "settings/sharing", only: [:index, :create, :update, :destroy]
   resources :actions, path: "settings/actions", only: [:index, :create, :new, :update, :destroy, :edit]
@@ -305,6 +306,7 @@ Rails.application.routes.draw do
         resources :recently_read_entries, only: [:index, :create]
         resources :in_app_purchases, only: [:create]
         resources :suggested_categories, only: [:index]
+        resources :authentication_tokens, only: [:create]
 
         resources :entries, only: [:index, :show] do
           member do
@@ -348,4 +350,9 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :users
   end
+
+  namespace :app_store do
+    resources :notifications_v2, only: :create
+  end
+
 end

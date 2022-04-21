@@ -45,7 +45,8 @@ class User < ApplicationRecord
     :favicon_colors,
     :newsletter_tag,
     :feeds_width,
-    :entries_width
+    :entries_width,
+    :billing_issue
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -69,6 +70,7 @@ class User < ApplicationRecord
   has_many :authentication_tokens, dependent: :delete_all
   has_many :account_migrations, dependent: :delete_all
   has_many :in_app_purchases
+  has_many :app_store_notifications
   belongs_to :plan
 
   accepts_nested_attributes_for :sharing_services,
@@ -82,10 +84,7 @@ class User < ApplicationRecord
   before_save { reset_auth_token }
 
   before_create :create_customer, unless: -> { !ENV["STRIPE_API_KEY"] }
-  before_create { generate_token(:starred_token) }
-  before_create { generate_token(:inbound_email_token, 4) }
-  before_create { generate_newsletter_token }
-  before_create { generate_token(:page_token) }
+  before_create { generate_tokens }
 
   before_update :update_billing, unless: -> { !ENV["STRIPE_API_KEY"] }
   before_destroy :cancel_billing, unless: -> { !ENV["STRIPE_API_KEY"] }
@@ -105,8 +104,12 @@ class User < ApplicationRecord
     NewsletterSender.where(token: newsletter_authentication_token.token).order(name: :asc)
   end
 
-  def generate_newsletter_token
+  def generate_tokens
+    generate_token(:starred_token)
+    generate_token(:inbound_email_token, 4)
+    generate_token(:page_token)
     authentication_tokens.newsletters.new(length: 4)
+    authentication_tokens.app.new
   end
 
   def theme
@@ -213,7 +216,7 @@ class User < ApplicationRecord
     valid_plans = if free_ok
       Plan.all.pluck(:id)
     else
-      Plan.where(price_tier: price_tier).where.not(stripe_id: "free").pluck(:id)
+      Plan.where(price_tier: price_tier).where.not(stripe_id: ["free", "app-subscription"]).pluck(:id)
     end
 
     valid_plans.append(plan_id_was)
@@ -230,7 +233,7 @@ class User < ApplicationRecord
     elsif plan_stripe_id == "free"
       Plan.where(price_tier: price_tier)
     else
-      exclude = ["free", "trial", "timed"]
+      exclude = ["free", "trial", "timed", "app-subscription"]
       Plan.where(price_tier: price_tier).where.not(stripe_id: exclude)
     end
   end
@@ -241,6 +244,10 @@ class User < ApplicationRecord
 
   def timed_plan?
     plan.stripe_id == "timed"
+  end
+
+  def app_plan?
+    plan.stripe_id == "app-subscription"
   end
 
   def trial_plan_valid
@@ -431,8 +438,16 @@ class User < ApplicationRecord
     end
   end
 
+  def billing_issue?
+    billing_issue == "1"
+  end
+
+  def billing_issue!
+    update(billing_issue: "1")
+  end
+
   def activate
-    update(suspended: false)
+    update(suspended: false, billing_issue: "0")
     subscriptions.update_all(active: true)
   end
 

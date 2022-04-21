@@ -23,6 +23,13 @@ CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA public;
 CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA public;
 
 
+--
+-- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -137,6 +144,44 @@ ALTER SEQUENCE public.actions_id_seq OWNED BY public.actions.id;
 
 
 --
+-- Name: app_store_notifications; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.app_store_notifications (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    original_transaction_id text NOT NULL,
+    notification_id uuid NOT NULL,
+    notification_type text NOT NULL,
+    subtype text,
+    version text NOT NULL,
+    processed_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    data jsonb NOT NULL
+);
+
+
+--
+-- Name: app_store_notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.app_store_notifications_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: app_store_notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.app_store_notifications_id_seq OWNED BY public.app_store_notifications.id;
+
+
+--
 -- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -160,7 +205,8 @@ CREATE TABLE public.authentication_tokens (
     data jsonb DEFAULT '{}'::jsonb,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    active boolean DEFAULT true NOT NULL
+    active boolean DEFAULT true NOT NULL,
+    uuid uuid DEFAULT public.uuid_generate_v4() NOT NULL
 );
 
 
@@ -1283,6 +1329,13 @@ ALTER TABLE ONLY public.actions ALTER COLUMN id SET DEFAULT nextval('public.acti
 
 
 --
+-- Name: app_store_notifications id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.app_store_notifications ALTER COLUMN id SET DEFAULT nextval('public.app_store_notifications_id_seq'::regclass);
+
+
+--
 -- Name: authentication_tokens id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1521,6 +1574,14 @@ ALTER TABLE ONLY public.account_migrations
 
 ALTER TABLE ONLY public.actions
     ADD CONSTRAINT actions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: app_store_notifications app_store_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.app_store_notifications
+    ADD CONSTRAINT app_store_notifications_pkey PRIMARY KEY (id);
 
 
 --
@@ -1801,6 +1862,27 @@ CREATE INDEX index_actions_on_user_id ON public.actions USING btree (user_id);
 
 
 --
+-- Name: index_app_store_notifications_on_notification_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_app_store_notifications_on_notification_id ON public.app_store_notifications USING btree (notification_id);
+
+
+--
+-- Name: index_app_store_notifications_on_original_transaction_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_app_store_notifications_on_original_transaction_id ON public.app_store_notifications USING btree (original_transaction_id);
+
+
+--
+-- Name: index_app_store_notifications_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_app_store_notifications_on_user_id ON public.app_store_notifications USING btree (user_id);
+
+
+--
 -- Name: index_authentication_tokens_on_purpose_and_token; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1819,6 +1901,13 @@ CREATE INDEX index_authentication_tokens_on_purpose_and_token_and_active ON publ
 --
 
 CREATE INDEX index_authentication_tokens_on_user_id ON public.authentication_tokens USING btree (user_id);
+
+
+--
+-- Name: index_authentication_tokens_on_uuid; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_authentication_tokens_on_uuid ON public.authentication_tokens USING btree (uuid);
 
 
 --
@@ -2674,6 +2763,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220204123745'),
 ('20220204142012'),
 ('20220204194100'),
+('20220208094739'),
+('20220209131258'),
 ('20220302204617'),
 ('20220302204713');
 

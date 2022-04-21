@@ -320,10 +320,14 @@ $.extend feedbin,
     ctx.strokeStyle = color
     ctx.strokeStyle
 
-  setNativeTheme: (calculateOverlay = false, timeout = 1) ->
+  nativeTheme: ->
     if feedbin.native && feedbin.data && feedbin.theme
-      result = window.matchMedia('(prefers-color-scheme: dark)');
-      statusBar = if $("body").hasClass("theme-dusk") || $("body").hasClass("theme-midnight") || result.matches == true then "lightContent" else "default"
+      feedbin.nativeMessage("performAction", { themeName: feedbin.theme })
+
+  setNativeTheme: (calculateOverlay = false, timeout = 1) ->
+    feedbin.nativeTheme()
+    if feedbin.native && feedbin.data && feedbin.theme
+      statusBar = if $("body").hasClass("theme-dusk") || $("body").hasClass("theme-midnight") then "lightContent" else "default"
       message = {
         action: "titleColor",
         statusBar: statusBar
@@ -2171,6 +2175,7 @@ $.extend feedbin,
         $('[data-behavior~=class_target]').removeClass('theme-midnight')
         $('[data-behavior~=class_target]').removeClass('theme-auto')
         $('[data-behavior~=class_target]').addClass("theme-#{theme}")
+        feedbin.theme = theme
         feedbin.setThemeColor()
 
     titleBarColor: ->
@@ -2795,8 +2800,8 @@ $.extend feedbin,
     colorSchemePreference: ->
       darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
       darkModeMediaQuery.addListener (event) ->
-          feedbin.setThemeColor()
-          setTimeout feedbin.setNativeTheme, 300
+        feedbin.setThemeColor()
+        setTimeout feedbin.setNativeTheme, 300
 
     visibilitychange: ->
       $(document).on 'visibilitychange', (event) ->

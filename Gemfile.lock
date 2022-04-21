@@ -347,6 +347,7 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (2.6.1)
+    jwt (2.3.0)
     kgio (2.11.4)
     librato-metrics (1.6.2)
       aggregate (~> 0.2.2)
@@ -633,6 +634,7 @@ DEPENDENCIES
   httparty
   jbuilder
   jquery-rails
+  jwt
   librato-rails (~> 1.4.2)
   listen
   lograge

@@ -39,3 +39,9 @@ timed:
   name: Timed
   price: 0
   price_tier: 3
+
+app_subscription:
+  stripe_id: app-subscription
+  name: App Subscription
+  price: 0
+  price_tier: 3
