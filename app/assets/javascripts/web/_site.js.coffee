@@ -871,12 +871,13 @@ $.extend feedbin,
     feedbin.embed(items, feedbin.data.twitter_embed_path, urlFinder)
 
   formatInstagram: (target = "[data-behavior~=entry_content_wrap]") ->
-    items = $('blockquote.instagram-media', target)
-
-    urlFinder = (item) ->
-      item.data("instgrmPermalink") || $("a", item).last().attr("href")
-
-    feedbin.embed(items, feedbin.data.instagram_embed_path, urlFinder)
+    true
+    # items = $('blockquote.instagram-media', target)
+    #
+    # urlFinder = (item) ->
+    #   item.data("instgrmPermalink") || $("a", item).last().attr("href")
+    #
+    # feedbin.embed(items, feedbin.data.instagram_embed_path, urlFinder)
 
   checkType: ->
     element = $('.entry-final-content .content-option')
