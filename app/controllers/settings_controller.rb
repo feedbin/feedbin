@@ -25,7 +25,7 @@ class SettingsController < ApplicationController
 
     @next_payment = @user.billing_events.where(event_type: "invoice.payment_succeeded")
     @next_payment = @next_payment.to_a.sort_by { |next_payment| -next_payment.event_object["date"] }
-    if @next_payment.present?
+    if @next_payment.present? && !@user.timed_plan? && !@user.app_plan?
       @next_payment.first.event_object["lines"]["data"].each do |event|
         if event.dig("type") == "subscription"
           @next_payment_date = Time.at(event["period"]["end"]).utc.to_datetime
