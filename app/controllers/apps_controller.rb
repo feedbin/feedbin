@@ -2,7 +2,6 @@ class AppsController < ApplicationController
   skip_before_action :verify_authenticity_token
 
   skip_before_action :authorize
-  before_action :basic_auth, only: :login
 
   def redirect
     if signed_in?
@@ -13,15 +12,11 @@ class AppsController < ApplicationController
   end
 
   def login
-    sign_in current_user
-    head :ok
-  end
-
-  private
-
-  def basic_auth
-    authenticate_or_request_with_http_basic("Feedbin") do |username, password|
-      @current_user ||= User.where("lower(email) = ?", username.try(:downcase)).take.try(:authenticate, password)
+    if user = authenticate_with_http_basic { |username, password| User.where("lower(email) = ?", username.try(:downcase)).take.try(:authenticate, password) }
+      sign_in user
+      head :ok
+    else
+      request_http_basic_authentication
     end
   end
 end
