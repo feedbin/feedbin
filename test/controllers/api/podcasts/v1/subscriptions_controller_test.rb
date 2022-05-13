@@ -69,8 +69,10 @@ class Api::Podcasts::V1::SubscriptionsControllerTest < ApiControllerTestCase
     login_as @user
 
     subscription = @user.podcast_subscriptions.first
+    subscription.bookmarked!
+    subscription.subscribed!
 
-    patch :update, params: {id: subscription.feed_id, status: "bookmarked", status_updated_at: 1.second.ago.iso8601(6)}, format: :json
+    patch :update, params: {id: subscription.feed_id, status: "bookmarked", status_updated_at: 10.seconds.ago.iso8601(6)}, format: :json
     assert_response :success
 
     assert_equal("subscribed", subscription.reload.status)
