@@ -441,6 +441,7 @@ class Entry < ApplicationRecord
       end
       QueuedEntry.import(entries, validate: false, on_duplicate_key_ignore: true)
       increment!(:queued_entries_count, entries.count)
+      Sidekiq::Client.push_bulk("args" => user_ids.map {|user_id| [user_id, id]}, "class" => PodcastPushNotification)
     end
   end
 
