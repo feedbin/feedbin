@@ -6,7 +6,7 @@ class DeviceTest < ActiveSupport::TestCase
     @device = user.devices.build(
       token: "token",
       model: "model",
-      device_type: Device.device_types[:ios],
+      device_type: Device.device_types[:notifier],
       application: "application",
       operating_system: "iOS 10"
     )

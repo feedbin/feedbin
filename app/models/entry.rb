@@ -18,6 +18,7 @@ class Entry < ApplicationRecord
   after_commit :cache_public_id, on: :create
   after_commit :find_images, on: :create
   after_commit :mark_as_unread, on: :create
+  after_commit :mark_as_unplayed, on: :create
   after_commit :add_to_created_at_set, on: :create
   after_commit :add_to_published_set, on: :create
   after_commit :increment_feed_stat, on: :create
@@ -430,6 +431,17 @@ class Entry < ApplicationRecord
       UnreadEntry.import(unread_entries, validate: false, on_duplicate_key_ignore: true)
     end
     SearchIndexStore.perform_async(self.class.name, id)
+  end
+
+  def mark_as_unplayed
+    if skip_mark_as_unread.blank? && recent_post
+      user_ids = PodcastSubscription.subscribed.where(feed_id: feed_id).pluck(:user_id)
+      entries = user_ids.map do |user_id|
+        QueuedEntry.new(user_id: user_id, feed_id: feed_id, entry_id: id, order: Time.now.to_i, progress: 0)
+      end
+      QueuedEntry.import(entries, validate: false, on_duplicate_key_ignore: true)
+      increment!(:queued_entries_count, entries.count)
+    end
   end
 
   def recent_post

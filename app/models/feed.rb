@@ -1,5 +1,6 @@
 class Feed < ApplicationRecord
   has_many :subscriptions
+  has_many :podcast_subscriptions
   has_many :entries
   has_many :users, through: :subscriptions
   has_many :unread_entries

@@ -194,6 +194,39 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 --
+-- Name: attribute_changes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.attribute_changes (
+    id bigint NOT NULL,
+    trackable_type character varying,
+    trackable_id bigint,
+    name text,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: attribute_changes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.attribute_changes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: attribute_changes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.attribute_changes_id_seq OWNED BY public.attribute_changes.id;
+
+
+--
 -- Name: authentication_tokens; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -738,6 +771,40 @@ CREATE SEQUENCE public.plans_id_seq
 --
 
 ALTER SEQUENCE public.plans_id_seq OWNED BY public.plans.id;
+
+
+--
+-- Name: podcast_subscriptions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.podcast_subscriptions (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    feed_id bigint NOT NULL,
+    status bigint DEFAULT 0 NOT NULL,
+    title text,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: podcast_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.podcast_subscriptions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: podcast_subscriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.podcast_subscriptions_id_seq OWNED BY public.podcast_subscriptions.id;
 
 
 --
@@ -1336,6 +1403,13 @@ ALTER TABLE ONLY public.app_store_notifications ALTER COLUMN id SET DEFAULT next
 
 
 --
+-- Name: attribute_changes id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.attribute_changes ALTER COLUMN id SET DEFAULT nextval('public.attribute_changes_id_seq'::regclass);
+
+
+--
 -- Name: authentication_tokens id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1438,6 +1512,13 @@ ALTER TABLE ONLY public.newsletter_senders ALTER COLUMN id SET DEFAULT nextval('
 --
 
 ALTER TABLE ONLY public.plans ALTER COLUMN id SET DEFAULT nextval('public.plans_id_seq'::regclass);
+
+
+--
+-- Name: podcast_subscriptions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.podcast_subscriptions ALTER COLUMN id SET DEFAULT nextval('public.podcast_subscriptions_id_seq'::regclass);
 
 
 --
@@ -1593,6 +1674,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 
 --
+-- Name: attribute_changes attribute_changes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.attribute_changes
+    ADD CONSTRAINT attribute_changes_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: authentication_tokens authentication_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1710,6 +1799,14 @@ ALTER TABLE ONLY public.newsletter_senders
 
 ALTER TABLE ONLY public.plans
     ADD CONSTRAINT plans_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: podcast_subscriptions podcast_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.podcast_subscriptions
+    ADD CONSTRAINT podcast_subscriptions_pkey PRIMARY KEY (id);
 
 
 --
@@ -1880,6 +1977,13 @@ CREATE INDEX index_app_store_notifications_on_original_transaction_id ON public.
 --
 
 CREATE INDEX index_app_store_notifications_on_user_id ON public.app_store_notifications USING btree (user_id);
+
+
+--
+-- Name: index_attribute_changes_on_trackable_and_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_attribute_changes_on_trackable_and_name ON public.attribute_changes USING btree (trackable_id, trackable_type, name);
 
 
 --
@@ -2111,6 +2215,27 @@ CREATE UNIQUE INDEX index_newsletter_senders_on_feed_id ON public.newsletter_sen
 --
 
 CREATE INDEX index_newsletter_senders_on_token ON public.newsletter_senders USING btree (token);
+
+
+--
+-- Name: index_podcast_subscriptions_on_feed_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_podcast_subscriptions_on_feed_id ON public.podcast_subscriptions USING btree (feed_id);
+
+
+--
+-- Name: index_podcast_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_podcast_subscriptions_on_user_id ON public.podcast_subscriptions USING btree (user_id);
+
+
+--
+-- Name: index_podcast_subscriptions_on_user_id_and_feed_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_podcast_subscriptions_on_user_id_and_feed_id ON public.podcast_subscriptions USING btree (user_id, feed_id);
 
 
 --
@@ -2555,11 +2680,27 @@ CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING b
 
 
 --
+-- Name: podcast_subscriptions fk_rails_146c1d2d35; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.podcast_subscriptions
+    ADD CONSTRAINT fk_rails_146c1d2d35 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
 -- Name: newsletter_senders fk_rails_1aa815fea5; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.newsletter_senders
     ADD CONSTRAINT fk_rails_1aa815fea5 FOREIGN KEY (feed_id) REFERENCES public.feeds(id);
+
+
+--
+-- Name: podcast_subscriptions fk_rails_4bb4824ec6; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.podcast_subscriptions
+    ADD CONSTRAINT fk_rails_4bb4824ec6 FOREIGN KEY (feed_id) REFERENCES public.feeds(id) ON DELETE CASCADE;
 
 
 --
@@ -2766,6 +2907,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220208094739'),
 ('20220209131258'),
 ('20220302204617'),
-('20220302204713');
+('20220302204713'),
+('20220422075327'),
+('20220505093250');
 
 

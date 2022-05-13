@@ -7,7 +7,7 @@ class DevicePushNotificationSendTest < ActiveSupport::TestCase
     @entries = @users.first.entries
 
     @devices = @users.map { |user|
-      user.devices.create(token: "token#{user.id}", device_type: Device.device_types[:ios])
+      user.devices.create(token: "token#{user.id}", device_type: Device.device_types[:notifier])
     }
   end
 

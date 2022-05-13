@@ -12,7 +12,7 @@ class EntryDeleter
     end
 
     feed.feed_stats.where("day < ?", 90.days.ago).delete_all
-    unless feed.protected?
+    unless feed.protected? || feed.standalone_request_at.present?
       prune_entries(feed_id, entry_limit)
     end
     UnreadLimiter.new.perform(feed_id)

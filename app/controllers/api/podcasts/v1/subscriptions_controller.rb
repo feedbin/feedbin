@@ -5,25 +5,33 @@ module Api
         before_action :set_subscription, only: [:destroy, :update]
         before_action :validate_content_type, only: [:create, :update]
 
+        wrap_parameters PodcastSubscription
+
         def index
           @user = current_user
           @subscriptions = @user
-            .subscriptions
+            .podcast_subscriptions
             .preload(:feed)
             .order(created_at: :desc)
-            .where.not(show_status: :not_show)
         end
 
         def create
           @user = current_user
-          feeds = FeedFinder.feeds(params[:feed_url])
+
+          feeds = Feed.xml.where(feed_url: params[:feed_url])
+          if feeds.length == 0
+            feeds = FeedFinder.feeds(params[:feed_url])
+          end
+
           if feeds.length == 0
             status_not_found
           else
             @feed = feeds.first
-            @subscription = @user.subscriptions.create_with(show_status: :hidden).find_or_create_by(feed: @feed)
+            subscribed = @user.podcast_subscriptions.where(feed: @feed).exists?
+            @subscription = @user.podcast_subscriptions.find_or_create_by(feed: @feed)
             @subscription.update(subscription_params)
-            status = @user.subscribed_to?(@feed) ? :found : :created
+
+            status = subscribed ? :found : :created
             render status: status, location: api_podcasts_v1_subscription_url(@subscription, format: :json)
           end
         rescue => exception
@@ -36,7 +44,8 @@ module Api
         end
 
         def update
-          @subscription.update(subscription_params)
+          update_params = remove_stale_updates(@subscription, subscription_params)
+          @subscription.update(update_params)
           head :no_content
         end
 
@@ -48,11 +57,11 @@ module Api
         private
 
         def subscription_params
-          params.require(:subscription).permit(:show_status)
+          params.require(:podcast_subscription).permit(:status)
         end
 
         def set_subscription
-          @subscription = @user.subscriptions.find(params[:id])
+          @subscription = @user.podcast_subscriptions.find_by_feed_id!(params[:id])
         end
       end
     end

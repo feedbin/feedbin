@@ -2,8 +2,8 @@ module Api
   module Podcasts
     module V1
       class QueuedEntriesController < ApiController
-        before_action :set_queued_entry, only: [:destroy]
-        before_action :validate_content_type, only: [:create]
+        before_action :set_queued_entry, only: [:update, :destroy]
+        before_action :validate_content_type, only: [:create, :update]
 
         def index
           @user = current_user
@@ -11,9 +11,10 @@ module Api
         end
 
         def create
-          entry_id = queued_entry_params[:entry_id]
-          if @user.can_read_entry?(entry_id)
-            entry = Entry.find(entry_id)
+          entry_id = params[:entry_id]
+          entry = Entry.find(entry_id)
+
+          if @user.podcast_subscriptions.where(feed: entry.feed).exists?
             @queued_entry = @user.queued_entries.create_with(feed_id: entry.feed_id).find_or_create_by(entry_id: entry.id)
             @queued_entry.update(queued_entry_params)
           else
@@ -26,14 +27,20 @@ module Api
           head :no_content
         end
 
+        def update
+          update_params = remove_stale_updates(@queued_entry, queued_entry_params)
+          @queued_entry.update(update_params)
+          head :no_content
+        end
+
         private
 
         def queued_entry_params
-          params.require(:queued_entry).permit(:entry_id, :order, :progress)
+          params.require(:queued_entry).permit(:order, :progress)
         end
 
         def set_queued_entry
-          @queued_entry = @user.queued_entries.find(params[:id])
+          @queued_entry = @user.queued_entries.find_by_entry_id!(params[:id])
         end
       end
     end

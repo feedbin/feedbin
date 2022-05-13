@@ -23,7 +23,7 @@ class DevicePushNotificationSend
       user_ids = UnreadEntry.where(entry: entry, user_id: user_ids).pluck(:user_id)
     end
 
-    tokens = Device.where(user_id: user_ids).ios.pluck(:user_id, :token, :operating_system)
+    tokens = Device.where(user_id: user_ids).notifier.pluck(:user_id, :token, :operating_system)
     feed = entry.feed
 
     feed_titles = subscription_titles(user_ids, feed)

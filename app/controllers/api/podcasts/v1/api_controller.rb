@@ -11,9 +11,38 @@ module Api
           string.scan(/../).map { |x| x.hex.chr }.join
         end
 
+        def remove_stale_updates(record, update_params)
+          attributes = update_params.keys
+          attributes.each do |attribute|
+            updated_attribute = "#{attribute}_updated_at".to_sym
+            proposed_updated_at = params.fetch(updated_attribute)
+            proposed_updated_at = Time.parse(proposed_updated_at)
+
+            next unless record.respond_to?(updated_attribute)
+
+            updated_at = record.public_send(updated_attribute)
+
+            if proposed_updated_at < updated_at
+              update_params.delete(attribute)
+            end
+          end
+          update_params
+        end
+
+        def updated_at(attribute)
+          param_name = "#{attribute}_updated_at"
+          updated_at = params.fetch(param_name)
+          Time.parse(updated_at)
+        end
+
         rescue_from ActiveRecord::RecordNotFound do |exception|
           Honeybadger.notify(exception)
           status_not_found
+        end
+
+        rescue_from ActionController::ParameterMissing do |exception|
+          @error = {status: 400, message: "Bad Request", errors: [exception.message]}
+          render partial: "api/v2/shared/api_error", status: 400
         end
 
         rescue_from ArgumentError do |exception|
