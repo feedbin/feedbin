@@ -25,7 +25,9 @@ class PagesController < ApplicationController
 
   def authorize
     @current_user ||= begin
-      if params[:page_token]
+      if signed_in?
+        current_user
+      elsif params[:page_token]
         User.find_by_page_token!(params[:page_token])
       else
         authenticate_or_request_with_http_basic("Feedbin") do |username, password|

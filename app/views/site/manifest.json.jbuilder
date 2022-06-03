@@ -8,3 +8,11 @@ json.description "Follow your passions with RSS, Twitter, and email newsletters.
 json.icons @icons do |icon|
   json.extract! icon, :src, :sizes, :type, :purpose
 end
+json.share_target do
+  json.action pages_path
+  json.params do
+    json.title "title"
+    json.text "url"
+    json.url "url"
+  end
+end
