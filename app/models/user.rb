@@ -217,7 +217,7 @@ class User < ApplicationRecord
     valid_plans = if free_ok
       Plan.all.pluck(:id)
     else
-      Plan.where(price_tier: price_tier).where.not(stripe_id: ["free", "app-subscription"]).pluck(:id)
+      Plan.where(price_tier: price_tier).where.not(stripe_id: ["free", "app-subscription", "podcast-subscription"]).pluck(:id)
     end
 
     valid_plans.append(plan_id_was)
@@ -234,7 +234,7 @@ class User < ApplicationRecord
     elsif plan_stripe_id == "free"
       Plan.where(price_tier: price_tier)
     else
-      exclude = ["free", "trial", "timed", "app-subscription"]
+      exclude = ["free", "trial", "timed", "app-subscription", "podcast-subscription"]
       Plan.where(price_tier: price_tier).where.not(stripe_id: exclude)
     end
   end

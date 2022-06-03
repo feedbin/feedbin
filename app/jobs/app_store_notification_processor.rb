@@ -2,6 +2,13 @@ class AppStoreNotificationProcessor
   include Sidekiq::Worker
   sidekiq_options queue: :critical
 
+  PRODUCTS = {
+    "yearly_v1"         => "app-subscription",
+    "yearly_pro_v1"     => "app-subscription",
+    "monthly_pro_v1"    => "app-subscription",
+    "yearly_podcast_v1" => "podcast-subscription",
+  }
+
   def perform(token)
     @token = token
     notification = user.app_store_notifications.create_with(
@@ -21,7 +28,7 @@ class AppStoreNotificationProcessor
     if notification.notification_type == "DID_RENEW" || notification.notification_type == "SUBSCRIBED"
       user.activate
       user.free_ok = true
-      user.plan = Plan.find_by_stripe_id("app-subscription")
+      user.plan = plan(notification)
       user.save
     end
 
@@ -33,6 +40,11 @@ class AppStoreNotificationProcessor
   end
 
   private
+
+  def plan(notification)
+    plan_name = PRODUCTS.fetch(product_id, "app-subscription")
+    Plan.find_by_stripe_id(plan_name)
+  end
 
   def user
     @user ||= begin
@@ -57,6 +69,10 @@ class AppStoreNotificationProcessor
 
   def app_account_token
     data.dig("data", "signedTransactionInfo", "appAccountToken")
+  end
+
+  def product_id
+    data.dig("data", "signedTransactionInfo", "productId")
   end
 
   def decode(data)

@@ -49,7 +49,7 @@ class SettingsController < ApplicationController
   end
 
   def payment_details
-    @message = Rails.cache.fetch(FeedbinUtils.payment_details_key(current_user.id)) {
+    @message = Rails.cache.fetch(FeedbinUtils.payment_details_key(current_user.id), expires_in: 5.minutes) {
       customer = Customer.retrieve(@user.customer_id)
       card = customer.sources.first
       "#{card.brand} ××#{card.last4[-2..-1]}"

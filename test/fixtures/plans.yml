@@ -45,3 +45,9 @@ app_subscription:
   name: App Subscription
   price: 0
   price_tier: 3
+
+podcast_subscription:
+  stripe_id: podcast-subscription
+  name: Podcast Subscription
+  price: 0
+  price_tier: 3

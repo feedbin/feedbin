@@ -20,11 +20,9 @@ class FeedUpdate
       end
     end
 
-    want_public_ids = entries.map {|entry| entry[:public_id] }
-    have_public_ids = Entry.where(public_id: want_public_ids).pluck(:public_id)
-    entries = entries.select { |entry| have_public_ids.include?(entry[:public_id]) }
-
     Entry.import!(entries, on_duplicate_key_update: {conflict_target: :public_id, columns: [:title, :url, :author, :content, :data]})
+
+    RedisServerSetup.new.perform(feed_id)
   rescue Feedkit::NotFeed
   end
 end
