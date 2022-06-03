@@ -54,6 +54,16 @@ module Api
         headers["X-Feedbin-Record-Count"] = count.to_s
       end
 
+      def rate_limited?(count, period)
+        slug = ["limit", request.method, params[:controller], params[:action], current_user.id]
+        !Throttle.throttle!(slug.join(":"), count, period)
+      end
+
+      def status_too_many_requests
+        @error = {status: 429, errors: []}
+        render partial: "api/v2/shared/api_error", status: :too_many_requests
+      end
+
       rescue_from ArgumentError do |exception|
         @error = {status: 400, message: "Bad Request", errors: []}
         if exception.message == "invalid date"

@@ -4,6 +4,7 @@ module Api
       respond_to :json
 
       def create
+        status_too_many_requests and return if rate_limited?(100, 1.day)
         if params[:url]
           @entry = SavePage.new.perform(current_user.id, params[:url], params[:title])
           render status: :created
