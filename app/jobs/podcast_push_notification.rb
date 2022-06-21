@@ -27,6 +27,7 @@ class PodcastPushNotification
     text = ActionController::Base.helpers.strip_tags(text)
     text = text.delete("\n")
     text = text.delete("\t")
+    text = text.strip
     text = decoder.decode(text)
     text
   end
