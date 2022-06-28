@@ -11,11 +11,11 @@ module Api
           string.scan(/../).map { |x| x.hex.chr }.join
         end
 
-        def remove_stale_updates(record, update_params)
+        def remove_stale_updates(record, update_params, original_params)
           attributes = update_params.keys
           attributes.each do |attribute|
             updated_attribute = "#{attribute}_updated_at".to_sym
-            proposed_updated_at = params.fetch(updated_attribute)
+            proposed_updated_at = original_params.fetch(updated_attribute)
             proposed_updated_at = Time.parse(proposed_updated_at)
 
             next unless record.respond_to?(updated_attribute)

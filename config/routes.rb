@@ -253,6 +253,9 @@ Rails.application.routes.draw do
         namespace :v1 do
           resources :feeds, only: :show
           resources :subscriptions, only: [:index, :create, :update, :destroy]
+          namespace :queued_entries do
+            resource :bulk, controller: :bulk, only: [:update]
+          end
           resources :queued_entries, only: [:index, :create, :update, :destroy]
         end
       end

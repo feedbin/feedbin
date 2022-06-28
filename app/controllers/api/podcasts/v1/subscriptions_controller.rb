@@ -44,7 +44,7 @@ module Api
         end
 
         def update
-          update_params = remove_stale_updates(@subscription, subscription_params)
+          update_params = remove_stale_updates(@subscription, subscription_params, params)
           @subscription.update(update_params)
           head :no_content
         end

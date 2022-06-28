@@ -28,7 +28,7 @@ module Api
         end
 
         def update
-          update_params = remove_stale_updates(@queued_entry, queued_entry_params)
+          update_params = remove_stale_updates(@queued_entry, queued_entry_params, params)
           @queued_entry.update(update_params)
           head :no_content
         end
