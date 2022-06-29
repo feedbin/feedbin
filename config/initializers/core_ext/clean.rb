@@ -16,7 +16,6 @@ module Cleanable #:nodoc:
     result = nil if result == ""
     result
   end
-  ruby2_keywords(:clean)
 end
 
 class Object

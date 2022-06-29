@@ -39,6 +39,7 @@ gem "jbuilder"
 gem "jquery-rails"
 gem "librato-rails", "~> 1.4.2"
 gem "lograge"
+gem "net-http"
 gem "net-http-persistent"
 gem "oauth"
 gem "pg"
@@ -55,7 +56,7 @@ gem "rubyzip"
 gem "sanitize"
 gem "sass-rails"
 gem "sidekiq"
-gem "stripe", "~> 4.24.0"
+gem "stripe", "~> 5.55.0"
 gem "stripe_event"
 gem "twitter-text"
 gem "uglifier"
@@ -71,6 +72,9 @@ group :development do
   gem "listen"
   gem "silencer"
   gem "foreman"
+  gem "ruby-debug-ide", require: false
+  gem "debase", "= 0.2.5.beta2", require: false
+  gem "solargraph", require: false
 end
 
 group :development, :test do

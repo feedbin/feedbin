@@ -34,74 +34,74 @@ jobs:
         ports:
           - 5432:5432
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-java@v2
-      with:
-        distribution: temurin
-        java-version: 8
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 8
 
-    - name: Install system dependencies
-      run: |
-        set -eux
+      - name: Install system dependencies
+        run: |
+          set -eux
 
-        wget --quiet --output-document - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-        echo "deb [trusted=yes] http://packages.elastic.co/elasticsearch/2.x/debian stable main" | sudo tee /etc/apt/sources.list.d/elasticsearch-2.x.list
+          wget --quiet --output-document - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+          echo "deb [trusted=yes] http://packages.elastic.co/elasticsearch/2.x/debian stable main" | sudo tee /etc/apt/sources.list.d/elasticsearch-2.x.list
 
-        curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+          curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 
-        sudo apt-get update
+          sudo apt-get update
 
-        sudo apt-get install --quiet --yes \
-        elasticsearch                      \
-        imagemagick                        \
-        libffi-dev                         \
-        libidn11-dev                       \
-        libmagickwand-dev                  \
-        libpq-dev                          \
-        libreadline-dev                    \
-        libssl-dev                         \
-        libxml2-dev                        \
-        libxslt1-dev                       \
-        nodejs                             \
-        zlib1g-dev
+          sudo apt-get install --quiet --yes \
+          elasticsearch                      \
+          imagemagick                        \
+          libffi-dev                         \
+          libidn11-dev                       \
+          libmagickwand-dev                  \
+          libpq-dev                          \
+          libreadline-dev                    \
+          libssl-dev                         \
+          libxml2-dev                        \
+          libxslt1-dev                       \
+          nodejs                             \
+          zlib1g-dev
 
-        sudo sed -e '/UseParNewGC/ s/^#*/#/g' -i /usr/share/elasticsearch/bin/elasticsearch.in.sh
-        sudo systemctl start elasticsearch
+          sudo sed -e '/UseParNewGC/ s/^#*/#/g' -i /usr/share/elasticsearch/bin/elasticsearch.in.sh
+          sudo systemctl start elasticsearch
 
-        major_version=$(google-chrome --version | awk '{print $NF}' | awk --field-separator "." '{ print $1 }')
-        chromedriver_version=$(curl "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${major_version}")
-        wget --quiet "https://chromedriver.storage.googleapis.com/${chromedriver_version}/chromedriver_linux64.zip" --output-document /tmp/chromedriver.zip
-        unzip /tmp/chromedriver.zip -d /tmp/
-        sudo mv /tmp/chromedriver /usr/local/bin/
+          major_version=$(google-chrome --version | awk '{print $NF}' | awk --field-separator "." '{ print $1 }')
+          chromedriver_version=$(curl "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${major_version}")
+          wget --quiet "https://chromedriver.storage.googleapis.com/${chromedriver_version}/chromedriver_linux64.zip" --output-document /tmp/chromedriver.zip
+          unzip /tmp/chromedriver.zip -d /tmp/
+          sudo mv /tmp/chromedriver /usr/local/bin/
 
-        sudo wget --quiet "https://feedbin-ci.s3.amazonaws.com/kindlegen/kindlegen" --output-document /usr/local/bin/kindlegen
-        sudo chmod +x /usr/local/bin/kindlegen
+          sudo wget --quiet "https://feedbin-ci.s3.amazonaws.com/kindlegen/kindlegen" --output-document /usr/local/bin/kindlegen
+          sudo chmod +x /usr/local/bin/kindlegen
 
-        sudo systemctl status elasticsearch
+          sudo systemctl status elasticsearch
 
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
 
-    - name: Build and test with Rake
-      env:
-        PGHOST: 127.0.0.1
-        PGUSER: postgres
-        POSTGRES_PASSWORD: postgres
-        PGPASSWORD: postgres
-        RAILS_ENV: test
-        KINDLEGEN_PATH: /usr/local/bin/kindlegen
-      run: |
-        psql -c 'create database feedbin_test;' -U postgres
-        bundle exec rake db:setup
-        bundle exec rails test:system test
+      - name: Build and test with Rake
+        env:
+          PGHOST: 127.0.0.1
+          PGUSER: postgres
+          POSTGRES_PASSWORD: postgres
+          PGPASSWORD: postgres
+          RAILS_ENV: test
+          KINDLEGEN_PATH: /usr/local/bin/kindlegen
+        run: |
+          psql -c 'create database feedbin_test;' -U postgres
+          bundle exec rake db:setup
+          bundle exec rails test:system test
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      if: failure()
-      with:
-        name: screenshots ${{ matrix.os }}-${{ matrix.ruby }}
-        path: tmp/screenshots
-        if-no-files-found: ignore
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: screenshots ${{ matrix.os }}-${{ matrix.ruby }}
+          path: tmp/screenshots
+          if-no-files-found: ignore
