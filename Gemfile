@@ -1,6 +1,10 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
+# TODO see if this can be removed after 3.x upgrade
+gem "net-http"
+gem "uri", "0.10.0"
+
 gem "rails", "= 7.0.3"
 gem "will_paginate"
 
@@ -39,7 +43,6 @@ gem "jbuilder"
 gem "jquery-rails"
 gem "librato-rails", "~> 1.4.2"
 gem "lograge"
-gem "net-http"
 gem "net-http-persistent"
 gem "oauth"
 gem "pg"
