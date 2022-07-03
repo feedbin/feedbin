@@ -369,7 +369,7 @@ class User < ApplicationRecord
   end
 
   def subscribed_to?(feed_id)
-    subscriptions.where(feed_id: feed_id).exists?
+    subscriptions.where(feed_id: feed_id).exists? || podcast_subscriptions.where(feed_id: feed_id).exists?
   end
 
   def self.search(query)
@@ -519,6 +519,10 @@ class User < ApplicationRecord
       can_read = true
     end
 
+    if !can_read && queued_entries.where(entry: entry).exists?
+      can_read = true
+    end
+
     can_read
   end
 
@@ -553,6 +557,11 @@ class User < ApplicationRecord
       allowed_ids = allowed_ids.push(ids).flatten
     end
 
+    if requested_ids.length != allowed_ids.length
+      ids = queued_entries.where(entry_id: requested_ids).pluck(:entry_id)
+      allowed_ids = allowed_ids.push(ids).flatten
+    end
+
     allowed_ids.uniq
   end
 
@@ -571,8 +580,12 @@ class User < ApplicationRecord
   end
 
   def recently_played_entries_progress
-    recently_played_entries.select(:duration, :progress, :entry_id).each_with_object({}) do |item, hash|
-      hash[item.entry_id] = {progress: item.progress, duration: item.duration}
+    (queued_entries + recently_played_entries).each_with_object({}) do |item, hash|
+      progress = item.progress
+      if existing = hash[item.entry_id]
+        progress = [existing[:progress], progress].max
+      end
+      hash[item.entry_id] = {progress: progress, duration: item.duration}
     end
   end
 

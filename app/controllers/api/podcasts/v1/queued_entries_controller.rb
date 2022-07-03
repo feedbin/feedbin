@@ -36,7 +36,7 @@ module Api
         private
 
         def queued_entry_params
-          params.require(:queued_entry).permit(:order, :progress)
+          params.require(:queued_entry).permit(:order, :progress, :duration)
         end
 
         def set_queued_entry

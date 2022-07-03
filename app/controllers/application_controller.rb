@@ -46,7 +46,7 @@ class ApplicationController < ActionController::Base
     end
 
     @now_playing = Entry.where(id: @user.now_playing_entry).first
-    @recently_played = @user.recently_played_entries.where(entry_id: @user.now_playing_entry).first
+    @recently_played = @user.recently_played_entries.where(entry_id: @user.now_playing_entry).first || @user.queued_entries.where(entry_id: @user.now_playing_entry).first
 
     @show_welcome = subscriptions.present? ? false : true
     @update_ids = @user.subscriptions.where(show_updates: false).pluck(:feed_id).map { |feed_id| ".entry-feed-#{feed_id} .diff-wrap" }.join(", ")
@@ -123,6 +123,18 @@ class ApplicationController < ActionController::Base
       parent_data: {behavior: "starred", feed_id: "collection_starred", count_type: "starred"},
       data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "starred", message: "Mark starred items as read?"}.to_json}
     }
+    if @user.podcast_subscriptions.exists?
+      collections << {
+        title: "Airshow",
+        path: queued_entries_path,
+        count_data: nil,
+        id: "collection_queued_entries",
+        favicon_class: "favicon-queued-entries",
+        parent_class: "collection-queued-entries",
+        parent_data: {behavior: "queued_entries", feed_id: "collection_queued_entries", count_type: "queued_entries"},
+        data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "queued_entries", message: "Mark queued entries as read?"}.to_json},
+      }
+    end
     unless user.setting_on?(:hide_recently_read)
       collections << {
         title: "Recently Read",

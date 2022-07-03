@@ -212,6 +212,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :queued_entries, only: [:index]
+
   resources :recently_played_entries, only: [] do
     collection do
       delete :destroy_all
