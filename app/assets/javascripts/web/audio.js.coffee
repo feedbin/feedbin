@@ -81,6 +81,7 @@ $.extend feedbin,
 
   timeRemaining: (entryId) ->
     if progress = feedbin.loadProgress(entryId)
+      return if progress.duration == 0
       durationElement = $("[data-behavior~=audio_duration_#{entryId}]")
       left = progress.duration - progress.progress
       minutes = Math.floor(left / 60);
