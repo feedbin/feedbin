@@ -97,6 +97,7 @@ class Subscription < ApplicationRecord
 
   def refresh_favicon
     FaviconFetcher.perform_async(feed.host)
+    ItunesFeedImage.perform_async(feed_id)
   end
 
   def cache_entry_ids
