@@ -31,5 +31,12 @@ IMAGE_PRESETS = {
     minimum_size: nil,
     crop: :fill_crop,
     job_class: "ItunesImage"
+  },
+  podcast_feed: {
+    width: 200,
+    height: 200,
+    minimum_size: nil,
+    crop: :fill_crop,
+    job_class: "ItunesFeedImage"
   }
 }
