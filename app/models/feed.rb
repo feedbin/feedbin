@@ -26,7 +26,7 @@ class Feed < ApplicationRecord
 
   enum feed_type: {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3, pages: 4}
 
-  store :settings, accessors: [:custom_icon, :current_feed_url], coder: JSON
+  store :settings, accessors: [:custom_icon, :current_feed_url, :custom_icon_format], coder: JSON
 
   def twitter_user?
     twitter_user.present?
@@ -218,6 +218,12 @@ class Feed < ApplicationRecord
 
   def redirect_key
     "refresher_redirect_stable_%d" % id
+  end
+
+  def rebase_url(original_url)
+    base_url = Addressable::URI.heuristic_parse(site_url)
+    original_url = Addressable::URI.heuristic_parse(original_url)
+    Addressable::URI.join(base_url, original_url)
   end
 
   private

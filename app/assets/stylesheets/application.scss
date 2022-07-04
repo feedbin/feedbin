@@ -2477,6 +2477,12 @@ $hamburger-dot: 4px;
       border-radius: 16px;
     }
   }
+  &.twitter-profile-image.icon-format-square {
+      border-radius: 2px;
+      img {
+        border-radius: 2px;
+      }
+  }
   .entries & {
     @include background-color(
       (
