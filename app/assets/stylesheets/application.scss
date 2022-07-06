@@ -9374,6 +9374,7 @@ button.close {
 .modal {
   position: fixed;
   top: 0;
+  top: env(safe-area-inset-top);
   right: 0;
   bottom: 0;
   left: 0;
@@ -9386,7 +9387,7 @@ button.close {
 .modal-dialog {
   position: relative;
   width: auto;
-  margin: calc(48px + env(safe-area-inset-top)) 8px 8px 8px;
+  margin: 48px 8px 8px 8px;
   pointer-events: none;
   box-shadow: 0 20px 40px 0 rgba(0, 0, 0, 0.4);
   border-radius: $modal-border-radius;
