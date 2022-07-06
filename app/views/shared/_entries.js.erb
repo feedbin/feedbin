@@ -36,6 +36,7 @@ var callback = function() {
     <% else %>
     feedbin.viewType = null;
     <% end %>
+    $('.entries [data-behavior~=entries_target]').attr('data-entry-type', "<%= @type %>")
 
     try {
       feedbin.loadMore();

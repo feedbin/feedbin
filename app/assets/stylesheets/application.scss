@@ -2845,6 +2845,9 @@ li.selected > a .favicon-wrap,
       padding-top: 56.088560885%;
       display: block;
     }
+    .entry-summary.media & {
+      display: none;
+    }
   }
   .link-preview {
     padding: 0;

@@ -295,7 +295,7 @@ class EntryPresenter < BasePresenter
   end
 
   def media_image
-    entry.itunes_image
+    entry.itunes_image || entry.feed.custom_icon
   end
 
   def extracted_articles
