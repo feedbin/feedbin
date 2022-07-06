@@ -1452,6 +1452,25 @@ $.extend feedbin,
     feedbin.measureEntryColumn()
     feedbin.setNativeBorders()
 
+  baseFontSize: ->
+    element = document.createElement('div')
+    content = document.createTextNode('content')
+    element.appendChild content
+    element.style.display = 'none'
+    element.style.font = '-apple-system-body'
+
+    if element.style.font != "" && "ontouchend" of document
+      document.body.appendChild element
+      style = window.getComputedStyle(element, null)
+      size = style.getPropertyValue 'font-size'
+      base = parseInt(size) - 1
+      element.parentNode.removeChild(element)
+    else
+      base = "16"
+
+    $("html").css
+      "font-size": "#{base}px"
+
   embeds: {}
 
   entries: {}
@@ -1521,24 +1540,8 @@ $.extend feedbin,
       $(window).on('window:throttledResize', feedbin.panelCount);
 
     baseFontSize: ->
-      element = document.createElement('div')
-      content = document.createTextNode('content')
-      element.appendChild content
-      element.style.display = 'none'
-      element.style.font = '-apple-system-body'
-
-      if element.style.font != "" && "ontouchend" of document
-        document.body.appendChild element
-        style = window.getComputedStyle(element, null)
-        size = style.getPropertyValue 'font-size'
-        base = parseInt(size) - 1
-        element.parentNode.removeChild(element)
-      else
-        base = "16"
-
-      $("html").css
-        "font-size": "#{base}px"
-
+      feedbin.baseFontSize()
+      
     faviconColors: ->
       feedbin.faviconColors($("body"))
 
