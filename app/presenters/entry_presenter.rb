@@ -454,13 +454,9 @@ class EntryPresenter < BasePresenter
   end
 
   def audio_duration
-    if media_duration && parts = media_duration.split(":").map(&:to_i)
-      if parts.length == 3
-        hours, minutes, seconds = parts
-        result = hours * 60 + minutes
-        "#{result} minutes"
-      end
-    end
+    minutes = entry.audio_duration && entry.audio_duration / 60
+    return nil if minutes.nil?
+    "#{minutes} #{'minute'.pluralize(minutes)}"
   rescue
     nil
   end

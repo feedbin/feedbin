@@ -70,19 +70,19 @@ module Api
           @error[:errors] << {since: "invalid date format"}
         end
         render partial: "api/v2/shared/api_error", status: 400
-        Honeybadger.notify(exception)
+        ErrorService.notify(exception)
       end
 
       rescue_from ActiveRecord::RecordNotFound do |exception|
         @error = {status: 404, message: "Not Found", errors: []}
         render partial: "api/v2/shared/api_error", status: 404
-        Honeybadger.notify(exception)
+        ErrorService.notify(exception)
       end
 
       rescue_from MultiJson::DecodeError do |exception|
         @error = {status: 400, message: "Problem parsing JSON", errors: []}
         render partial: "api/v2/shared/api_error", status: 400
-        Honeybadger.notify(exception)
+        ErrorService.notify(exception)
       end
 
       private

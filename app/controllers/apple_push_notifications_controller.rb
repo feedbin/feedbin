@@ -24,7 +24,7 @@ class ApplePushNotificationsController < ApplicationController
   end
 
   def log
-    Honeybadger.notify(
+    ErrorService.notify(
       error_class: "Apple Push Notification",
       error_message: "Apple Push Notification Failure",
       parameters: params

@@ -86,7 +86,7 @@ class Share::EvernoteShare < Share::Service
       if exception.respond_to?(:parameter)
         parameters[:parameter] = exception.parameter
       end
-      Honeybadger.notify(
+      ErrorService.notify(
         error_class: "EvernoteShare#add",
         error_message: "EvernoteShare add failure",
         parameters: parameters

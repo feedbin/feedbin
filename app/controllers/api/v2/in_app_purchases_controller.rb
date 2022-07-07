@@ -21,7 +21,7 @@ module Api
             InAppPurchase.create_from_receipt_json(@user, receipt, response)
           end
         else
-          Honeybadger.notify(
+          ErrorService.notify(
             error_class: "InAppPurchasesController#create",
             error_message: error_codes[response["status"]] || "Receipt verification failed",
             parameters: {status: response["status"]}

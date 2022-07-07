@@ -316,7 +316,7 @@ class User < ApplicationRecord
 
     self.stripe_token = nil
   rescue Stripe::StripeError => exception
-    Honeybadger.notify(exception)
+    ErrorService.notify(exception)
     errors.add :base, exception.message.to_s
     self.stripe_token = nil
     throw(:abort)

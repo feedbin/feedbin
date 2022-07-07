@@ -139,7 +139,7 @@ module ApplicationHelper
       url.sub("http://", "").sub("https://", "").gsub(/\/$/, "")
     end
   rescue => exception
-    Honeybadger.notify(exception)
+    ErrorService.notify(exception)
     url
   end
 

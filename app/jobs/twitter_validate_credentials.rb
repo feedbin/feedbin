@@ -21,7 +21,7 @@ class TwitterValidateCredentials
       config.consumer_secret = ENV["TWITTER_SECRET"]
     }.search("example", count: 1) && true
   rescue Twitter::Error => e
-    Honeybadger.notify(e)
+    ErrorService.notify(e)
     false
   end
 end

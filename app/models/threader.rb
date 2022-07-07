@@ -16,7 +16,7 @@ class Threader
       create_updated_entries
     end
   rescue => e
-    Honeybadger.notify(e)
+    ErrorService.notify(e)
     false
   end
 

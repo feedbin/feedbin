@@ -13,7 +13,7 @@ class WebSubController < ApplicationController
       render plain: params["hub.challenge"]
     elsif "denied" == params["hub.mode"] && valid_topic
       @feed.update(push_expiration: Time.now + 1.week)
-      Honeybadger.notify(error_class: "WebSubController#denied", error_message: "Request denied", parameters: params)
+      ErrorService.notify(error_class: "WebSubController#denied", error_message: "Request denied", parameters: params)
       head :ok
     else
       head :not_found

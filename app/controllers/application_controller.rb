@@ -250,7 +250,7 @@ class ApplicationController < ActionController::Base
   end
 
   def honeybadger_context
-    Honeybadger.context(user_id: current_user.id) if current_user
+    ErrorService.context(user_id: current_user.id) if current_user
   end
 
   def verify_push_token(authentication_token)

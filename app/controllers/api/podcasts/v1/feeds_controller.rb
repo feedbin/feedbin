@@ -23,7 +23,7 @@ module Api
           end
         rescue => exception
           if Rails.env.production?
-            Honeybadger.notify(exception)
+            ErrorService.notify(exception)
             status_not_found
           else
             raise exception

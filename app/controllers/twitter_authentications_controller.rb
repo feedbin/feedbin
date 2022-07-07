@@ -12,7 +12,7 @@ class TwitterAuthenticationsController < ApplicationController
 
       redirect_to response.authorize_url
     else
-      Honeybadger.notify(
+      ErrorService.notify(
         error_class: "SupportedSharingServicesController#oauth_request",
         error_message: "#{service_info[:label]} failure",
         parameters: {response: response}
@@ -20,7 +20,7 @@ class TwitterAuthenticationsController < ApplicationController
       redirect_to settings_url, notice: "Unknown Twitter error."
     end
   rescue Net::HTTPFatalError => e
-    Honeybadger.notify(
+    ErrorService.notify(
       error_class: "TwitterApis#new",
       error_message: "Twitter API failure",
       parameters: {exception: e}
@@ -31,9 +31,9 @@ class TwitterAuthenticationsController < ApplicationController
       redirect_to root_url, alert: "Twitter API is not responding."
     end
   rescue OAuth::Error => e
-    Honeybadger.notify(
+    ErrorService.notify(
       error_class: "TwitterApis#new",
-      error_message: "Twitter failure",
+      error_message: "Twitter failure #{e.request.body}",
       parameters: {exception: e}
     )
     if session.delete(:twitter_settings_redirect)
@@ -70,9 +70,9 @@ class TwitterAuthenticationsController < ApplicationController
       end
     end
   rescue OAuth::Error => e
-    Honeybadger.notify(
+    ErrorService.notify(
       error_class: "TwitterApisController#save",
-      error_message: "Twitter failure",
+      error_message: "Twitter failure #{e.request.body}",
       parameters: {exception: e}
     )
     redirect_to settings_url, alert: "Unknown Twitter error."

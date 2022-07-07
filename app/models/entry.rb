@@ -380,6 +380,19 @@ class Entry < ApplicationRecord
     published > 7.days.ago
   end
 
+  def audio_duration
+    seconds = 0
+    duration = data["itunes_duration"]
+
+    return seconds if duration.nil?
+
+    parts = duration.to_s.split(":").map(&:to_i).compact
+    parts.first(3).reverse.each_with_index do |item, index|
+      seconds += item * 60 ** index
+    end
+    seconds
+  end
+
   private
 
   def base_url
@@ -437,7 +450,7 @@ class Entry < ApplicationRecord
     if skip_mark_as_unread.blank? && recent_post
       user_ids = PodcastSubscription.subscribed.where(feed_id: feed_id).pluck(:user_id)
       entries = user_ids.map do |user_id|
-        QueuedEntry.new(user_id: user_id, feed_id: feed_id, entry_id: id, order: Time.now.to_i, progress: 0)
+        QueuedEntry.new(user_id: user_id, feed_id: feed_id, entry_id: id, order: Time.now.to_i, progress: 0, duration: audio_duration)
       end
       QueuedEntry.import(entries, validate: false, on_duplicate_key_ignore: true)
       increment!(:queued_entries_count, entries.count)

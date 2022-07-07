@@ -36,7 +36,7 @@ module Api
         end
 
         rescue_from ActiveRecord::RecordNotFound do |exception|
-          Honeybadger.notify(exception)
+          ErrorService.notify(exception)
           status_not_found
         end
 

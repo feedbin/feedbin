@@ -38,11 +38,7 @@ class FeedsController < ApplicationController
       @feed_url = params[:q]
     end
   rescue => exception
-    logger.info { "------------------------" }
-    logger.info { exception.message }
-    logger.info { exception.backtrace }
-    logger.info { "------------------------" }
-    Honeybadger.notify(exception)
+    ErrorService.notify(exception)
     @feeds = nil
   end
 

@@ -63,7 +63,7 @@ class FeedFinder
     else
       Rails.logger.error exception.message
       Rails.logger.error exception.backtrace.join("\n")
-      Honeybadger.notify(exception)
+      ErrorService.notify(exception)
       feeds
     end
   end

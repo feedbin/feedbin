@@ -11,7 +11,7 @@ class AppStore::NotificationsV2Controller < ApplicationController
       AppStoreNotificationProcessor.perform_async(payload)
       head :ok
     else
-      Honeybadger.notify(error_class: "AppStore::NotificationsV2Controller", error_message: "Bad Request", parameters: params, context: {payload: payload})
+      ErrorService.notify(error_class: "AppStore::NotificationsV2Controller", error_message: "Bad Request", parameters: params, context: {payload: payload})
       head :bad_request
     end
   end

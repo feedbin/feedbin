@@ -28,7 +28,7 @@ class FeedRefresherReceiver
     rescue => exception
       unless exception.message =~ /Validation failed/i
         message = update ? "update" : "create"
-        Honeybadger.notify(
+        ErrorService.notify(
           error_class: "FeedRefresherReceiver#" + message,
           error_message: "Entry #{message} failed",
           parameters: {feed_id: feed.id, item: item, exception: exception, backtrace: exception.backtrace}
@@ -98,7 +98,7 @@ class FeedRefresherReceiver
     new_length = Sanitize.fragment(new_content).length
     new_length - original_length > 50
   rescue Exception => e
-    Honeybadger.notify(
+    ErrorService.notify(
       error_class: "FeedRefresherReceiver#detect_significant_change",
       error_message: "detect_significant_change failed",
       parameters: {exception: e, backtrace: e.backtrace}
@@ -122,7 +122,7 @@ class FeedRefresherReceiver
 
     Librato.increment("entry.update_big")
   rescue Exception => e
-    Honeybadger.notify(
+    ErrorService.notify(
       error_class: "FeedRefresherReceiver#create_update_notifications",
       error_message: "create_update_notifications failed",
       parameters: {exception: e, backtrace: e.backtrace}

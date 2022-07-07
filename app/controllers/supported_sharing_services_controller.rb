@@ -67,9 +67,9 @@ class SupportedSharingServicesController < ApplicationController
       redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{service_info[:label]}."
     end
   rescue OAuth::Unauthorized => e
-    Honeybadger.notify(
+    ErrorService.notify(
       error_class: "SupportedSharingServicesController#oauth_response",
-      error_message: "#{service_info[:label]} failure",
+      error_message: "#{service_info[:label]} failure #{e.request.body}",
       parameters: {exception: e}
     )
     redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
@@ -124,7 +124,7 @@ class SupportedSharingServicesController < ApplicationController
       session[:oauth_secret] = response.secret
       redirect_to response.authorize_url
     else
-      Honeybadger.notify(
+      ErrorService.notify(
         error_class: "SupportedSharingServicesController#oauth_request",
         error_message: "#{service_info[:label]} failure",
         parameters: {response: response}
@@ -132,9 +132,9 @@ class SupportedSharingServicesController < ApplicationController
       redirect_to sharing_services_url, notice: "Unknown #{SupportedSharingService.info(service_id)[:label]} error."
     end
   rescue OAuth::Error => e
-    Honeybadger.notify(
+    ErrorService.notify(
       error_class: "SupportedSharingServicesController#oauth_request",
-      error_message: "#{service_info[:label]} failure",
+      error_message: "#{service_info[:label]} failure #{e.request.body}",
       parameters: {exception: e}
     )
     redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."

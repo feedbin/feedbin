@@ -223,7 +223,7 @@ class SupportedSharingService < ApplicationRecord
   end
 
   def limit_exceeded
-    Honeybadger.notify(
+    ErrorService.notify(
       error_class: "SupportedSharingService",
       error_message: "SupportedSharingService rate limit exceeded",
       parameters: {user_id: user_id}
