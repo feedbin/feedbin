@@ -382,7 +382,7 @@ class Entry < ApplicationRecord
 
   def audio_duration
     seconds = 0
-    duration = data["itunes_duration"]
+    duration = data && data["itunes_duration"]
 
     return seconds if duration.nil?
 
