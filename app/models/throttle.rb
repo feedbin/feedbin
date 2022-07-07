@@ -1,7 +1,16 @@
 class Throttle
   def self.throttle!(key, limit, period, &block)
-    key = "#{key}:v2"
-    count = Rails.application.config.cache_store != :null_store ? Rails.cache.increment(key, 1, expires_in: period.to_i, initial: 1) : 1
+    key = "#{key}:throttle"
+
+    count, expiration = Sidekiq.redis do |client|
+      client.multi do |transaction|
+        transaction.incr key
+        transaction.ttl key
+      end
+    end
+
+    Sidekiq.redis {|client| client.expire(key, period.to_i) } if expiration == -1
+
     if count <= limit
       block_given? ? yield : true
     else
