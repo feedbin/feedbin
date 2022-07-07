@@ -8,6 +8,7 @@ class QueuedEntriesController < ApplicationController
 
     @type = "queued_entries"
     @collection_title = "Queued Entries"
+    @entry_class = "always-unread"
 
     respond_to do |format|
       format.js { render partial: "shared/entries" }

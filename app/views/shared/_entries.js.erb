@@ -11,6 +11,10 @@ var callback = function() {
         feedbin.updateEntries(entries);
     <% end %>
 
+    <% if @entry_class %>
+        $('.entries .entry-summary').addClass("<%= @entry_class %>");
+    <% end %>
+
     <% if @page_query %>
         feedbin.updatePager("<%= j will_paginate(@page_query) %>");
     <% else %>

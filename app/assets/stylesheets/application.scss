@@ -3034,7 +3034,7 @@ $feed-title-width: 115px;
     @include color(white);
   }
 }
-.entry-summary.read:not(.selected) .entry-summary-link {
+.entry-summary.read:not(.selected):not(.always-unread) .entry-summary-link {
   @include color($color-contrast-400);
   .inline-title {
     @include color($color-contrast-400);
@@ -3054,9 +3054,7 @@ $feed-title-width: 115px;
   }
 }
 
-.entries-display-inline
-  .entry-summary.read.no-title:not(.selected)
-  .entry-summary-link {
+.entries-display-inline .entry-summary.read.no-title:not(.selected):not(.always-unread) .entry-summary-link {
   .summary {
     @include color($color-contrast-400);
   }
