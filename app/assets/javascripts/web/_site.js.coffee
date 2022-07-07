@@ -84,8 +84,9 @@ $.extend feedbin,
       feedbin.hideLinkAction(url)
 
   changeContentView: (view) ->
-    currentView = $('[data-behavior~=content_option]:not(.hide)')
-    nextView = $("[data-behavior~=content_option][data-content-option=#{view}]")
+    id = feedbin.selectedEntry.id
+    currentView = $("[data-entry-id=#{id}] [data-behavior~=content_option]:not(.hide)")
+    nextView = $("[data-entry-id=#{id}] [data-behavior~=content_option][data-content-option=#{view}]")
 
     if view == 'extract'
       $('body').addClass('extract-active')
