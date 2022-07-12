@@ -5,7 +5,7 @@ git_source(:github) { |name| "https://github.com/#{name}.git" }
 gem "net-http"
 gem "uri", "0.10.0"
 
-gem "rails", "= 7.0.3"
+gem "rails", "= 7.0.3.1"
 gem "will_paginate"
 
 gem "resolv",              github: "feedbin/resolv",              branch: "feedbin"
