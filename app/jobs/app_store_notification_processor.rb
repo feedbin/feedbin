@@ -7,6 +7,7 @@ class AppStoreNotificationProcessor
     "yearly_pro_v1"     => "app-subscription",
     "monthly_pro_v1"    => "app-subscription",
     "yearly_podcast_v1" => "podcast-subscription",
+    "yearly_podcast_v2" => "podcast-subscription",
   }
 
   def perform(token)
