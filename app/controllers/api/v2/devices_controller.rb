@@ -8,9 +8,12 @@ module Api
 
       def create
         @user = current_user
-        Device.where("lower(token) = ?", params[:device][:token].downcase).destroy_all
-        token = params[:device][:old_token] || params[:device][:token]
-        @user.devices.where("lower(token) = ?", token.downcase).first_or_create.update(device_params)
+        @user
+          .devices
+          .create_with(device_params)
+          .where("lower(token) = ?", params.dig(:device, :token)&.downcase)
+          .first_or_create
+          .update(device_params)
         head :ok
       end
 
@@ -33,7 +36,7 @@ module Api
       private
 
       def device_params
-        params.require(:device).permit(:token, :device_type, :model, :application, :operating_system)
+        params.require(:device).permit(:token, :device_type, :model, :application, :operating_system, :active)
       end
     end
   end

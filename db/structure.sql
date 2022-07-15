@@ -17,6 +17,13 @@ CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA public;
 
 
 --
+-- Name: EXTENSION hstore; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION hstore IS 'data type for storing sets of (key, value) pairs';
+
+
+--
 -- Name: pg_stat_statements; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -24,10 +31,24 @@ CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA public;
 
 
 --
+-- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_stat_statements IS 'track planning and execution statistics of all SQL statements executed';
+
+
+--
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
 SET default_tablespace = '';
@@ -370,14 +391,15 @@ ALTER SEQUENCE public.deleted_users_id_seq OWNED BY public.deleted_users.id;
 
 CREATE TABLE public.devices (
     id bigint NOT NULL,
-    user_id bigint,
-    token text,
+    user_id bigint NOT NULL,
+    token text NOT NULL,
     model text,
-    device_type bigint,
+    device_type bigint NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     application text,
-    operating_system text
+    operating_system text,
+    active boolean DEFAULT true
 );
 
 
@@ -2909,6 +2931,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220302204617'),
 ('20220302204713'),
 ('20220422075327'),
-('20220505093250');
+('20220505093250'),
+('20220715154209');
 
 
