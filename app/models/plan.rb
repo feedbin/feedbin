@@ -8,4 +8,8 @@ class Plan < ApplicationRecord
   def price_in_cents
     price.to_i * 100
   end
+
+  def restricted?
+    ["podcast-subscription"].include?(stripe_id)
+  end
 end

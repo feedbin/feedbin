@@ -153,7 +153,7 @@ module Api
       end
 
       def valid_user
-        if current_user.suspended
+        if current_user.suspended || current_user.plan.restricted?
           status_forbidden
         end
       end

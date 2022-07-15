@@ -3,11 +3,15 @@ module Api
     class AuthenticationController < ApiController
       respond_to :json
 
-      skip_before_action :valid_user
-
       def index
         expires_now
         head :ok
+      end
+
+      def valid_user
+        if current_user.plan.restricted?
+          status_forbidden
+        end
       end
     end
   end
