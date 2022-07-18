@@ -70,7 +70,7 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
     Sidekiq::Worker.clear_all
     @service.update(kindle_address: "example@example.com")
     login_as @user
-    assert_difference "SendToKindle.jobs.size", +1 do
+    assert_difference "MakeEpub.jobs.size", +1 do
       post :share, params: {id: @service, entry_id: 1}, xhr: true
       assert_response :success
     end

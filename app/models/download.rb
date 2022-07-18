@@ -1,8 +1,9 @@
 class Download
   attr_reader :url, :response
 
-  def initialize(url)
+  def initialize(url, directory = nil)
     @url = url
+    @directory = directory || Dir.tmpdir
   end
 
   def filename
@@ -14,7 +15,7 @@ class Download
   end
 
   def file_path
-    @file_path ||= Pathname.new(File.join(Dir.tmpdir, SecureRandom.hex))
+    @file_path ||= Pathname.new(File.join(@directory, filename))
   end
 
   def download
@@ -33,10 +34,18 @@ class Download
     response&.mime_type
   end
 
+  def size
+    File.size file_path
+  end
+
   private
 
   def extension
-    @extension ||= File.extname url
+    @extension ||= File.extname parsed_url.path
+  end
+
+  def parsed_url
+    URI.parse url
   end
 
   def key

@@ -37,8 +37,8 @@ class UserMailer < ApplicationMailer
     mail to: @user.email, subject: "[Feedbin] Starred Items Export Complete"
   end
 
-  def kindle(kindle_address, mobi_file)
-    attachments["kindle.mobi"] = File.read(mobi_file)
+  def kindle(kindle_address, epub)
+    attachments["epub.epub"] = File.read(epub)
     mail to: kindle_address, subject: "Kindle Content", body: ".", from: ENV["KINDLE_EMAIL"]
   end
 

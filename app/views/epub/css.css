@@ -1,0 +1,21 @@
+h1 {
+  line-height: 1;
+}
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+dl, dt, dd, ol, ul, li, table, video, hr, img {
+  display: block;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+h2, h3, h4, h5, h6 {
+  page-break-after: avoid;
+}
+p {
+  text-indent: 0;
+  widows: 2;
+  orphans: 2;
+}
+.gray {
+  color: gray;
+  text-indent: 0;
+}
