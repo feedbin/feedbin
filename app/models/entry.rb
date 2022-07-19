@@ -203,14 +203,7 @@ class Entry < ApplicationRecord
   end
 
   def self.entries_with_feed(entry_ids, sort)
-    entry_ids = entry_ids.map(&:entry_id)
-    entries = Entry.where(id: entry_ids).includes(feed: [:favicon])
-    entries = if sort == "ASC"
-      entries.order("published ASC")
-    else
-      entries.order("published DESC")
-    end
-    entries
+    Entry.where(id: entry_ids).order_by_ids(entry_ids).includes(feed: [:favicon])
   end
 
   def self.entries_list
@@ -235,6 +228,10 @@ class Entry < ApplicationRecord
 
   def self.unstarred_new
     where("starred_entries.entry_id IS NULL")
+  end
+
+  def self.starred_new
+    where("starred_entries.entry_id IS NOT NULL")
   end
 
   def self.sort_preference(sort)
@@ -391,6 +388,15 @@ class Entry < ApplicationRecord
       seconds += item * 60 ** index
     end
     seconds
+  end
+
+  def self.order_by_ids(ids)
+    table = Entry.arel_table
+    condition = Arel::Nodes::Case.new(table[:id])
+    ids.each_with_index do |id, index|
+      condition.when(id).then(index)
+    end
+    order(condition)
   end
 
   private

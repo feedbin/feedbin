@@ -6,34 +6,40 @@ module Api
 
       def entries_response(path_helper)
         if params.key?(:read)
-          @entries = @entries.include_unread_entries(@user.id)
-
+          @page_query = @page_query.include_unread_entries(@user.id)
           if params[:read] == "true"
-            @entries = @entries.read_new
+            @page_query = @page_query.read_new
           elsif params[:read] == "false"
-            @entries = @entries.unread_new
+            @page_query = @page_query.unread_new
           end
         end
 
-        if params.key?(:starred) && params[:starred] == "false"
-          @entries = @entries.include_starred_entries(@user.id)
-          @entries = @entries.unstarred_new
+        if params.key?(:starred) &&
+          @page_query = @page_query.include_starred_entries(@user.id)
+
+          if params[:starred] == "true"
+            @page_query = @page_query.starred_new
+          elsif params[:starred] == "false"
+            @page_query = @page_query.unstarred_new
+          end
         end
 
-        if params.key?(:since)
-          time = Time.iso8601(params[:since])
-          @entries = @entries.where("entries.created_at > :time", {time: time})
+        time = Time.iso8601(params[:since]) rescue nil
+        if time
+          @page_query = @page_query.where("entries.created_at > :time", {time: time})
         end
 
-        page_query = @starred_entries || @entries
-        entry_count(page_query)
+        ids = @page_query.pluck(:id)
+        @entries = Entry.where(id: ids).order_by_ids(ids).includes(:feed)
 
-        if page_query.out_of_bounds?
+        entry_count(@page_query)
+
+        if @page_query.out_of_bounds?
           status_not_found
         elsif !@entries.present?
           render json: []
         else
-          links_header(page_query, path_helper, params[:feed_id])
+          links_header(@page_query, path_helper, params[:feed_id])
           if stale?(etag: @entries)
             render_json "entries/index"
           end

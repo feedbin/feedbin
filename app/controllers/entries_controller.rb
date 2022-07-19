@@ -5,13 +5,8 @@ class EntriesController < ApplicationController
   def index
     @user = current_user
 
-    feed_ids = @user.subscriptions.pluck(:feed_id)
-    entry_id_cache = EntryIdCache.new(@user.id, feed_ids)
-
-    @entries = entry_id_cache.page(params[:page])
-    @page_query = @entries
-
-    @append = params[:page].present?
+    @feed_ids = @user.subscriptions.pluck(:feed_id)
+    feeds_response
 
     @type = "all"
     @data = nil
@@ -26,10 +21,9 @@ class EntriesController < ApplicationController
   def unread
     @user = current_user
 
-    unread_entries = @user.unread_entries.select(:entry_id).page(params[:page]).sort_preference(@user.entry_sort)
-    @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort).entries_list
+    @page_query = @user.unread_entries.select(:entry_id).page(params[:page]).sort_preference(@user.entry_sort)
+    @entries = Entry.entries_with_feed(@page_query.pluck(:entry_id), @user.entry_sort).entries_list
 
-    @page_query = unread_entries
     @append = params[:page].present?
     @all_unread = "true"
     @collection_title = "Unread"
@@ -42,10 +36,9 @@ class EntriesController < ApplicationController
   def starred
     @user = current_user
 
-    starred_entries = @user.starred_entries.select(:entry_id).page(params[:page]).order("published DESC")
-    @entries = Entry.entries_with_feed(starred_entries, "published DESC").entries_list
+    @page_query = @user.starred_entries.select(:entry_id).page(params[:page]).order("published DESC")
+    @entries = Entry.entries_with_feed(@page_query.pluck(:entry_id), "published DESC").entries_list
 
-    @page_query = starred_entries
     @append = params[:page].present?
     @collection_title = "Starred"
 
