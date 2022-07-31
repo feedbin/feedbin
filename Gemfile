@@ -75,9 +75,9 @@ group :development do
   gem "listen"
   gem "silencer"
   gem "foreman"
-  gem "ruby-debug-ide", require: false
-  gem "debase", "= 0.2.5.beta2", require: false
-  gem "solargraph", require: false
+  # gem "ruby-debug-ide", require: false
+  # gem "debase", "= 0.2.5.beta2", require: false
+  # gem "solargraph", require: false
 end
 
 group :development, :test do

@@ -222,9 +222,7 @@ GEM
     ast (2.4.2)
     autoprefixer-rails (10.4.7.0)
       execjs (~> 2)
-    backport (1.2.0)
     bcrypt (3.1.18)
-    benchmark (0.2.0)
     benchmark-ips (2.10.0)
     better_errors (2.9.1)
       coderay (>= 1.0.0)
@@ -266,11 +264,7 @@ GEM
     css_parser (1.11.0)
       addressable
     dante (0.2.0)
-    debase (0.2.5.beta2)
-      debase-ruby_core_source (>= 0.10.12)
-    debase-ruby_core_source (0.10.16)
     debug_inspector (1.1.0)
-    diff-lcs (1.5.0)
     digest (3.1.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
@@ -278,7 +272,6 @@ GEM
     dotenv-rails (2.7.6)
       dotenv (= 2.7.6)
       railties (>= 3.2)
-    e2mmap (0.1.0)
     elasticsearch (2.0.2)
       elasticsearch-api (= 2.0.2)
       elasticsearch-transport (= 2.0.2)
@@ -367,7 +360,6 @@ GEM
     image_processing (1.12.2)
       mini_magick (>= 4.9.5, < 5)
       ruby-vips (>= 2.0.17, < 3)
-    jaro_winkler (1.5.4)
     jbuilder (2.11.5)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
@@ -378,10 +370,6 @@ GEM
     json (2.6.2)
     jwt (2.4.1)
     kgio (2.11.4)
-    kramdown (2.4.0)
-      rexml
-    kramdown-parser-gfm (1.1.0)
-      kramdown (~> 2.0)
     librato-metrics (1.6.2)
       aggregate (~> 0.2.2)
       faraday (>= 0.7, < 2.0)
@@ -544,8 +532,6 @@ GEM
     rubocop-performance (1.13.3)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
-    ruby-debug-ide (0.7.3)
-      rake (>= 0.8.1)
     ruby-progressbar (1.11.0)
     ruby-vips (2.1.4)
       ffi (~> 1.12)
@@ -575,21 +561,6 @@ GEM
       redis (>= 4.2.0)
     silencer (2.0.0)
     simple_oauth (0.3.1)
-    solargraph (0.45.0)
-      backport (~> 1.2)
-      benchmark
-      bundler (>= 1.17.2)
-      diff-lcs (~> 1.4)
-      e2mmap
-      jaro_winkler (~> 1.5)
-      kramdown (~> 2.3)
-      kramdown-parser-gfm (~> 1.1)
-      parser (~> 3.0)
-      reverse_markdown (>= 1.0.5, < 3)
-      rubocop (>= 0.52)
-      thor (~> 1.0)
-      tilt (~> 2.0)
-      yard (~> 0.9, >= 0.9.24)
     sprockets (4.1.1)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -636,7 +607,6 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    webrick (1.7.0)
     websocket (1.2.9)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
@@ -644,8 +614,6 @@ GEM
     will_paginate (3.3.1)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    yard (0.9.28)
-      webrick (~> 1.7.0)
     zeitwerk (2.6.0)
 
 PLATFORMS
@@ -672,7 +640,6 @@ DEPENDENCIES
   coffee-rails
   connection_pool
   dalli!
-  debase (= 0.2.5.beta2)
   dotenv-rails
   elasticsearch (~> 2.0)
   elasticsearch-model!
@@ -717,7 +684,6 @@ DEPENDENCIES
   responders
   reverse_markdown
   rmagick
-  ruby-debug-ide
   rubyzip
   sanitize
   sass-rails
@@ -725,7 +691,6 @@ DEPENDENCIES
   selenium-webdriver
   sidekiq
   silencer
-  solargraph
   standard
   stripe (~> 5.55.0)
   stripe-ruby-mock (= 2.5.0)
