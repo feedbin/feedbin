@@ -2100,6 +2100,13 @@ CREATE INDEX index_entries_on_feed_id ON public.entries USING btree (feed_id);
 
 
 --
+-- Name: index_entries_on_feed_id_include_id_published_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_entries_on_feed_id_include_id_published_created_at ON public.entries USING btree (feed_id) INCLUDE (id, published, created_at);
+
+
+--
 -- Name: index_entries_on_main_tweet_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2932,6 +2939,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220302204713'),
 ('20220422075327'),
 ('20220505093250'),
-('20220715154209');
+('20220715154209'),
+('20220719142811');
 
 
