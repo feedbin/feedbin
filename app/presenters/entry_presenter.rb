@@ -75,7 +75,7 @@ class EntryPresenter < BasePresenter
 
   def parsed_date(date, format)
     date = Time.parse(date)
-    date.to_s(format)
+    date.to_formatted_s(format)
   rescue Exception
     nil
   end
