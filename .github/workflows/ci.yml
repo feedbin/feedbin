@@ -93,7 +93,9 @@ jobs:
           PGPASSWORD: postgres
           RAILS_ENV: test
           KINDLEGEN_PATH: /usr/local/bin/kindlegen
+          RUBYOPT: "--yjit --yjit-exec-mem-size=1024"
         run: |
+          ruby -v
           psql -c 'create database feedbin_test;' -U postgres
           bundle exec rake db:setup
           bundle exec rails test:system test
