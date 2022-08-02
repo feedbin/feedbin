@@ -20,20 +20,6 @@ class FeedbinUtils
     end
   end
 
-  def self.redis_created_at_key(feed_id)
-    FEED_ENTRIES_CREATED_AT_KEY % feed_id
-  end
-
-  def self.redis_published_key(feed_id)
-    FEED_ENTRIES_PUBLISHED_KEY % feed_id
-  end
-
-  def self.redis_user_entries_published_key(user_id, feed_ids)
-    feed_key = feed_ids.sort.join
-    feed_key = Digest::SHA1.hexdigest(feed_key)
-    "user:%d:feed_key:%s:entry_ids:published" % [user_id, feed_key]
-  end
-
   def self.payment_details_key(user_id)
     "payment_details:%s:v5" % user_id
   end

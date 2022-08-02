@@ -62,20 +62,6 @@ class EntryDeleterTest < ActiveSupport::TestCase
     end
   end
 
-  test "should remove ids from created_at cache" do
-    key_created_at = FeedbinUtils.redis_created_at_key(@feed.id)
-    assert_difference -> { $redis[:entries].with { |redis| redis.zcard(key_created_at) } }, -removed_count do
-      EntryDeleter.new.perform(@feed.id)
-    end
-  end
-
-  test "should remove ids from published cache" do
-    key_published = FeedbinUtils.redis_published_key(@feed.id)
-    assert_difference -> { $redis[:entries].with { |redis| redis.zcard(key_published) } }, -removed_count do
-      EntryDeleter.new.perform(@feed.id)
-    end
-  end
-
   private
 
   def removed_count

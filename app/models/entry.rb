@@ -19,8 +19,6 @@ class Entry < ApplicationRecord
   after_commit :find_images, on: :create
   after_commit :mark_as_unread, on: :create
   after_commit :mark_as_unplayed, on: :create
-  after_commit :add_to_created_at_set, on: :create
-  after_commit :add_to_published_set, on: :create
   after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
   after_commit :harvest_links, on: :create
@@ -444,22 +442,6 @@ class Entry < ApplicationRecord
 
   def recent_post
     skip_recent_post_check || published > 1.month.ago
-  end
-
-  def add_to_created_at_set
-    score = "%10.6f" % created_at.to_f
-    key = FeedbinUtils.redis_created_at_key(feed_id)
-    $redis[:entries].with do |redis|
-      redis.zadd(key, score, id)
-    end
-  end
-
-  def add_to_published_set
-    score = "%10.6f" % published.to_f
-    key = FeedbinUtils.redis_published_key(feed_id)
-    $redis[:entries].with do |redis|
-      redis.zadd(key, score, id)
-    end
   end
 
   def increment_feed_stat

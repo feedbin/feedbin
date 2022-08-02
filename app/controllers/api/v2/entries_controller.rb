@@ -64,33 +64,6 @@ module Api
           status_forbidden
         end
       end
-
-      def sorted_set_response
-        begin
-          since = Time.parse(params[:since])
-          since = "(%10.6f" % since.to_f
-        rescue TypeError
-          since = "-inf"
-        end
-
-        cache_key = [since, params[:starred], params[:read]]
-        cache_key = Digest::SHA1.hexdigest(cache_key.join(":"))
-        cache_key = "user:#{@user.id}:sorted_entry_ids:#{cache_key}"
-
-        entry_ids = get_cached_entry_ids(cache_key, FeedbinUtils::FEED_ENTRIES_CREATED_AT_KEY, since, params[:read], params[:starred])
-        pagination = build_pagination(entry_ids)
-        entry_count(pagination[:will_paginate])
-
-        if entry_ids.blank?
-          render json: []
-        elsif pagination[:page] <= 0 || pagination[:paged_entry_ids][pagination[:page_index]].nil?
-          status_not_found
-        else
-          @entries = Entry.where(id: pagination[:paged_entry_ids][pagination[:page_index]]).includes(:feed).order(created_at: :desc)
-          links_header(pagination[:will_paginate], "api_v2_entries_url")
-          render_json "entries/index"
-        end
-      end
     end
   end
 end

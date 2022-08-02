@@ -45,12 +45,6 @@ class EntryDeleter
       StarredEntry.where(entry_id: entry_ids).delete_all
       Entry.where(id: entry_ids).delete_all
 
-      key_created_at = FeedbinUtils.redis_created_at_key(feed_id)
-      key_published = FeedbinUtils.redis_published_key(feed_id)
-      $redis[:entries].with do |redis|
-        redis.zrem(key_created_at, entry_ids)
-        redis.zrem(key_published, entry_ids)
-      end
       Librato.increment("entry.destroy", by: entry_ids.count)
     end
   end
