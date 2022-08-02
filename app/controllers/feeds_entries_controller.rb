@@ -9,8 +9,6 @@ class FeedsEntriesController < ApplicationController
     @feed_ids = params[:feed_id]
     feeds_response
 
-    @append = params[:page].present?
-
     # Extra data for updating buttons
     @subscription = @user.subscriptions.where(feed_id: params[:feed_id]).take!
     @feed = @subscription.feed

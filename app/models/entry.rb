@@ -203,38 +203,11 @@ class Entry < ApplicationRecord
   end
 
   def self.entries_with_feed(entry_ids, sort)
-    entry_ids = entry_ids.map(&:entry_id)
-    entries = Entry.where(id: entry_ids).includes(feed: [:favicon])
-    entries = if sort == "ASC"
-      entries.order("published ASC")
-    else
-      entries.order("published DESC")
-    end
-    entries
+    Entry.where(id: entry_ids).order_by_ids(entry_ids).includes(feed: [:favicon])
   end
 
   def self.entries_list
     select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings)
-  end
-
-  def self.include_unread_entries(user_id)
-    joins("LEFT OUTER JOIN unreads ON entries.id = unreads.entry_id AND unreads.user_id = #{user_id.to_i}")
-  end
-
-  def self.unread_new
-    where("unreads.entry_id IS NOT NULL")
-  end
-
-  def self.read_new
-    where("unreads.entry_id IS NULL")
-  end
-
-  def self.include_starred_entries(user_id)
-    joins("LEFT OUTER JOIN starred_entries ON entries.id = starred_entries.entry_id AND starred_entries.user_id = #{user_id.to_i}")
-  end
-
-  def self.unstarred_new
-    where("starred_entries.entry_id IS NULL")
   end
 
   def self.sort_preference(sort)
@@ -391,6 +364,15 @@ class Entry < ApplicationRecord
       seconds += item * 60 ** index
     end
     seconds
+  end
+
+  def self.order_by_ids(ids)
+    table = Entry.arel_table
+    condition = Arel::Nodes::Case.new(table[:id])
+    ids.each_with_index do |id, index|
+      condition.when(id).then(index)
+    end
+    order(condition)
   end
 
   private

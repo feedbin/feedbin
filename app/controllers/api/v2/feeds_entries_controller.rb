@@ -6,10 +6,7 @@ module Api
 
       def index
         @user = current_user
-        @entries = Entry.where(feed_id: params[:feed_id]).includes(:feed).order("entries.created_at DESC").page(params[:page])
-        if params.key?(:per_page)
-          @entries = @entries.per_page(params[:per_page])
-        end
+        @page_query = Entry.where(feed_id: params[:feed_id]).order(created_at: :desc).page(params[:page])
         entries_response "api_v2_feed_entries_url"
       end
 

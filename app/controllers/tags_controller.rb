@@ -23,8 +23,6 @@ class TagsController < ApplicationController
 
     feeds_response
 
-    @append = params[:page].present?
-
     @collection_title = @tag.name
 
     respond_to do |format|

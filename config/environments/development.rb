@@ -1,6 +1,9 @@
 require "active_support/core_ext/integer/time"
+require_relative "../../lib/tld_length"
 
 Rails.application.configure do
+  config.middleware.use TldLength
+  
   # Settings specified here will take precedence over those in config/application.rb.
   config.hosts = ENV["FEEDBIN_HOST"]&.split(",")
   # In the development environment your application's code is reloaded any time

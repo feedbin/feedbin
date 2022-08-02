@@ -234,19 +234,17 @@ class ApplicationController < ActionController::Base
   def feeds_response
     view_mode = params[:view] || params[:view_mode]
     if view_mode == "view_all"
-      entry_id_cache = EntryIdCache.new(@user.id, @feed_ids)
-      @entries = entry_id_cache.page(params[:page])
-      @page_query = @entries
+      @page_query = Entry.where(feed: @feed_ids).order(published: :desc).page(params[:page])
+      @entries = Entry.entries_with_feed(@page_query.pluck(:id), "DESC").entries_list
     elsif view_mode == "view_starred"
-      starred_entries = @user.starred_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).order("published DESC")
-      @entries = Entry.entries_with_feed(starred_entries, "DESC").entries_list
-      @page_query = starred_entries
+      @page_query = @user.starred_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).order("published DESC")
+      @entries = Entry.entries_with_feed(@page_query.pluck(:entry_id), "DESC").entries_list
     else
       @all_unread = "true"
-      unread_entries = @user.unread_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).sort_preference(@user.entry_sort)
-      @entries = Entry.entries_with_feed(unread_entries, @user.entry_sort).entries_list
-      @page_query = unread_entries
+      @page_query = @user.unread_entries.select(:entry_id).where(feed_id: @feed_ids).page(params[:page]).sort_preference(@user.entry_sort)
+      @entries = Entry.entries_with_feed(@page_query.pluck(:entry_id), @user.entry_sort).entries_list
     end
+    @append = params[:page].present?
   end
 
   def honeybadger_context
