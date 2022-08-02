@@ -8,7 +8,7 @@ class EntryDeleter
     entry_limit = if ENV["ENTRY_LIMIT"]
       ENV["ENTRY_LIMIT"].to_i
     else
-      feed.subscriptions_count == 0 ? 10 : 400
+      feed.subscriptions.where(active: true).exists? ? 400 : 10
     end
 
     feed.feed_stats.where("day < ?", 90.days.ago).delete_all
