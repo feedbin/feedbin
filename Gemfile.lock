@@ -40,7 +40,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedjira.git
-  revision: 2c60a4cc2052827e7722883c68c7fe04bbaa46d5
+  revision: da48b21c09604c797854e095504626ac25d0892a
   branch: f2
   specs:
     feedjira (2.1.2)
@@ -279,7 +279,7 @@ GEM
       faraday
       multi_json
     equalizer (0.0.11)
-    erubi (1.10.0)
+    erubi (1.11.0)
     evernote-thrift (1.25.2)
     evernote_oauth (0.2.3)
       evernote-thrift
@@ -409,8 +409,6 @@ GEM
     multi_xml (0.6.0)
     multipart-post (2.2.3)
     naught (1.1.0)
-    net-http (0.2.2)
-      uri
     net-http-persistent (4.0.1)
       connection_pool (~> 2.2)
     net-http2 (0.18.4)
@@ -599,7 +597,6 @@ GEM
     unicorn (6.1.0)
       kgio (~> 2.6)
       raindrops (~> 0.7)
-    uri (0.10.0)
     webmock (3.8.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -663,7 +660,6 @@ DEPENDENCIES
   minitest
   minitest-stub-const
   minitest-stub_any_instance
-  net-http
   net-http-persistent
   oauth
   opml_saw!
@@ -697,7 +693,6 @@ DEPENDENCIES
   uglifier
   unicode-emoji
   unicorn
-  uri (= 0.10.0)
   webmock (= 3.8.0)
   will_paginate
 
