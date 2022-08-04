@@ -82,8 +82,8 @@ class MakeEpub
     content = ContentFormatter.evernote_format(@entry.content, @entry)
     document = Nokogiri::HTML5(content)
 
-    # max size for a kindle email is 50MB
-    max_size = 49.megabytes
+    # max size for a postmark email is 10MB
+    max_size = 9.megabytes
     document.css("img").each do |image|
       src = image["src"]
       unless src.start_with?("http")
