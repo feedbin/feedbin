@@ -3,8 +3,7 @@
 github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 
 */
-.theme-day,.theme-sunset {
-
+.theme-day, .theme-sunset, .theme-auto.prefers-light {
     .hljs {
       display: block;
       overflow-x: auto;

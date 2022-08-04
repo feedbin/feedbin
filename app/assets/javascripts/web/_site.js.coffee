@@ -310,6 +310,10 @@ $.extend feedbin,
   setThemeColor: ->
     color = feedbin.colorForSection("body")
     $('meta[name=theme-color]').attr("content", color)
+    if feedbin.darkMode()
+      $('body').addClass("prefers-dark")
+    else
+      $('body').addClass("prefers-light")
 
   colorForSection: (section, overlay = false) ->
     color = $("[data-theme-#{section}]").css("backgroundColor")
@@ -1542,7 +1546,7 @@ $.extend feedbin,
 
     baseFontSize: ->
       feedbin.baseFontSize()
-      
+
     faviconColors: ->
       feedbin.faviconColors($("body"))
 
@@ -2802,6 +2806,7 @@ $.extend feedbin,
         $(@).tooltip('hide')
 
     colorSchemePreference: ->
+      feedbin.setThemeColor()
       darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
       darkModeMediaQuery.addListener (event) ->
         feedbin.setThemeColor()
