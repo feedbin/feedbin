@@ -4296,7 +4296,7 @@ $feed-title-width: 115px;
     overflow-x: auto;
     white-space: pre;
     word-wrap: normal;
-    font-size: 90%;
+    font-size: 80%;
     border-radius: 4px;
   }
 
@@ -4304,7 +4304,7 @@ $feed-title-width: 115px;
   code,
   kbd,
   samp {
-    font-family: Consolas, Monaco, monospace;
+    font-family: ui-monospace, "SF Mono", Consolas, Monaco, monospace;
     overflow-x: scroll;
   }
 
