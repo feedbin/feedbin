@@ -8,7 +8,7 @@ Feedbin is a simple, fast and nice looking RSS reader.
 Support
 -------
 
-Support for Feedbin customers is available by emailing [support@feedbin.com](mailto:support@feedbin.com). No support is provided for installing/running Feedbin. 
+Support for Feedbin customers is available by emailing [support@feedbin.com](mailto:support@feedbin.com). No support is provided for installing/running Feedbin.
 
 Introduction
 ------------
@@ -40,10 +40,9 @@ Requirements
 ------------
 
  - Mac OS X or Linux
- - [Ruby 2.6](http://www.ruby-lang.org/en/)
- - [Postgres 10](http://www.postgresql.org/)
- - [Redis > 2.8](http://redis.io/)
- - [Memcached](https://memcached.org/)
+ - [Ruby 3.1](http://www.ruby-lang.org/en/)
+ - [Postgres 11](http://www.postgresql.org/)
+ - [Redis > 6.0](http://redis.io/)
  - [Elasticsearch 2.4](https://www.elastic.co/downloads/past-releases/#elasticsearch)
 
 Installation
