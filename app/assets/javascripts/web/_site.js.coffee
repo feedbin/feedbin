@@ -311,8 +311,10 @@ $.extend feedbin,
     color = feedbin.colorForSection("body")
     $('meta[name=theme-color]').attr("content", color)
     if feedbin.darkMode()
+      $('body').removeClass("prefers-light")
       $('body').addClass("prefers-dark")
     else
+      $('body').removeClass("prefers-dark")
       $('body').addClass("prefers-light")
 
   colorForSection: (section, overlay = false) ->
@@ -2809,6 +2811,7 @@ $.extend feedbin,
       feedbin.setThemeColor()
       darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
       darkModeMediaQuery.addListener (event) ->
+        console.log "called"
         feedbin.setThemeColor()
         setTimeout feedbin.setNativeTheme, 300
 
