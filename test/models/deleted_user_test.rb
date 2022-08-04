@@ -2,7 +2,7 @@ require "test_helper"
 
 class DeletedUserTest < ActiveSupport::TestCase
   setup do
-    @deleted_user = DeletedUser.create(email: "example@example.com", customer_id: "cus_123")
+    @deleted_user = DeletedUser.create(email: "example@example.com", customer_id: "cus_123", original_user_id: 123)
   end
 
   test "should search" do

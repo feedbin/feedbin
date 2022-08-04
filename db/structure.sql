@@ -362,7 +362,8 @@ CREATE TABLE public.deleted_users (
     email text,
     customer_id text,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    original_user_id bigint
 );
 
 
@@ -2940,6 +2941,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220422075327'),
 ('20220505093250'),
 ('20220715154209'),
-('20220719142811');
+('20220719142811'),
+('20220804145624');
 
 

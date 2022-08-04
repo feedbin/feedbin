@@ -428,7 +428,7 @@ class User < ApplicationRecord
   end
 
   def create_deleted_user
-    DeletedUser.create(email: email, customer_id: customer_id)
+    DeletedUser.create(email: email, customer_id: customer_id, original_user_id: id)
   end
 
   def record_stats
