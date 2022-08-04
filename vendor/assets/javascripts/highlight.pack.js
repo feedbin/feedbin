@@ -1,8 +1,3 @@
-/*!
-  Highlight.js v11.6.0 (git: bed790f3f3)
-  (c) 2006-2022 undefined and other contributors
-  License: BSD-3-Clause
- */
 var hljs=function(){"use strict";var e={exports:{}};function t(e){
 return e instanceof Map?e.clear=e.delete=e.set=()=>{
 throw Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=()=>{
