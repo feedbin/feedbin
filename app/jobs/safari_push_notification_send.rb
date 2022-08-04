@@ -4,7 +4,7 @@ class SafariPushNotificationSend
 
   VERIFIER = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)
 
-  APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV["APPLE_PUSH_CERT"]}, size: 5) { |connection|
+  APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV["APPLE_PUSH_CERT"], cert_pass: ENV["APPLE_PUSH_CERT_PASSWORD"]}, size: 5) { |connection|
     connection.on(:error) { |exception| ErrorService.notify(exception) }
   }
 
