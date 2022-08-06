@@ -49,7 +49,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: 6c5b3592c1bdb4f383bb82f1fefe50e23d028e86
+  revision: 7923bab690f9c37ace4f05b660f8ca9ed18771b6
   branch: master
   specs:
     feedkit (0.1.0)
@@ -550,10 +550,10 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
-    sidekiq (6.5.1)
+    sidekiq (6.5.3)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
-      redis (>= 4.2.0)
+      redis (>= 4.5.0)
     silencer (2.0.0)
     simple_oauth (0.3.1)
     sprockets (4.1.1)
@@ -563,7 +563,7 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
-    ssrf_filter (1.0.7)
+    ssrf_filter (1.0.8)
     standard (1.14.0)
       rubocop (= 1.32.0)
       rubocop-performance (= 1.14.3)
@@ -572,9 +572,9 @@ GEM
       dante (>= 0.2.0)
       multi_json (~> 1.0)
       stripe (>= 2.0.3)
-    stripe_event (2.4.0)
+    stripe_event (2.5.0)
       activesupport (>= 3.1)
-      stripe (>= 2.8, < 7)
+      stripe (>= 2.8, < 8)
     strong_migrations (1.2.0)
       activerecord (>= 5.2)
     strscan (3.0.4)
