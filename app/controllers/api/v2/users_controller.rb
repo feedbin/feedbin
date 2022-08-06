@@ -24,7 +24,11 @@ module Api
 
       def destroy
         @user = current_user
-        @user.destroy
+        if params[:silent] == "false"
+          UserDeleter.perform_async(@user.id)
+        else
+          @user.destroy
+        end
       end
 
       private
