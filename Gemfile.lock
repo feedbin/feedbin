@@ -550,10 +550,10 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
-    sidekiq (6.5.3)
+    sidekiq (6.5.1)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
-      redis (>= 4.5.0)
+      redis (>= 4.2.0)
     silencer (2.0.0)
     simple_oauth (0.3.1)
     sprockets (4.1.1)
@@ -684,7 +684,7 @@ DEPENDENCIES
   sass-rails
   sax-machine!
   selenium-webdriver
-  sidekiq
+  sidekiq (= 6.5.1)
   silencer
   standard
   stripe (~> 5.55.0)

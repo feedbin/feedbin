@@ -58,7 +58,7 @@ gem "rmagick", require: false
 gem "rubyzip"
 gem "sanitize"
 gem "sass-rails"
-gem "sidekiq"
+gem "sidekiq", "= 6.5.1"
 gem "stripe", "~> 5.55.0"
 gem "stripe_event"
 gem "strong_migrations"
