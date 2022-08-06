@@ -20,7 +20,12 @@ if Rails.env.production?
         password: uri.password,
         database: database,
         reaping_frequency: ENV["DB_REAP_FREQ"] || 10,
-        pool: ENV["DB_POOL"] || Etc.nprocessors
+        pool: ENV["DB_POOL"] || Etc.nprocessors,
+        connect_timeout: 5,
+        variables: {
+          statement_timeout: "15s",
+          lock_timeout: "10s"
+        }
       )
     end
   end

@@ -2094,13 +2094,6 @@ CREATE UNIQUE INDEX index_embeds_on_source_and_provider_id ON public.embeds USIN
 
 
 --
--- Name: index_entries_on_feed_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_entries_on_feed_id ON public.entries USING btree (feed_id);
-
-
---
 -- Name: index_entries_on_feed_id_include_id_published_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2942,6 +2935,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220505093250'),
 ('20220715154209'),
 ('20220719142811'),
-('20220804145624');
+('20220804145624'),
+('20220806155622');
 
 

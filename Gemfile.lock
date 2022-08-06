@@ -575,6 +575,8 @@ GEM
     stripe_event (2.4.0)
       activesupport (>= 3.1)
       stripe (>= 2.8, < 7)
+    strong_migrations (1.2.0)
+      activerecord (>= 5.2)
     strscan (3.0.4)
     thor (1.2.1)
     thread_safe (0.3.6)
@@ -688,6 +690,7 @@ DEPENDENCIES
   stripe (~> 5.55.0)
   stripe-ruby-mock (= 2.5.0)
   stripe_event
+  strong_migrations
   twitter!
   twitter-text
   uglifier
