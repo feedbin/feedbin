@@ -217,6 +217,7 @@ Rails.application.routes.draw do
   resources :recently_played_entries, only: [] do
     collection do
       delete :destroy_all
+      get :progress
     end
   end
 

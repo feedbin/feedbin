@@ -985,7 +985,7 @@ $.extend feedbin,
       feedbin.removeOuterLinks()
       feedbin.formatIframes($("[data-iframe-src]").not("[data-behavior~=iframe_placeholder]"))
       feedbin.playState()
-      feedbin.timeRemaining(entryId)
+      feedbin.timeRemaining(entryId, true)
       feedbin.syntaxHighlight()
       feedbin.footnotes()
       feedbin.nextEntryPreview()

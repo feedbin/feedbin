@@ -79,7 +79,7 @@ $.extend feedbin,
       minutes = Math.floor(duration / 60);
       durationElement.text("#{minutes} minutes")
 
-  timeRemaining: (entryId) ->
+  timeRemaining: (entryId, reload = false) ->
     if progress = feedbin.loadProgress(entryId)
       return if progress.duration == 0
       durationElement = $("[data-behavior~=audio_duration_#{entryId}]")
@@ -93,6 +93,10 @@ $.extend feedbin,
       else
         message = "#{minutes} minutes left"
       durationElement.text(message)
+    if reload
+      $.get(feedbin.data.progress_path).success (data) ->
+        feedbin.data.progress = data
+        feedbin.timeRemaining(entryId)
 
   playState: ->
     if typeof(window.player) != "undefined"

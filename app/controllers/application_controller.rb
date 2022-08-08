@@ -78,6 +78,7 @@ class ApplicationController < ActionController::Base
       font_stylesheet: ENV["FONT_STYLESHEET"],
       modal_extracts_path: modal_extracts_path,
       progress: @user.recently_played_entries_progress,
+      progress_path: progress_recently_played_entries_path,
       subscription_view_mode: subscription_view_settings,
       pages_internal_path: pages_internal_path,
       tag_visibility: @user.tag_visibility,

@@ -27,7 +27,7 @@ class RecentlyPlayedEntriesController < ApplicationController
       if recent = @user.recently_played_entries.find_by(entry_id: params[:id])
         recent.update(recently_played_entry_params)
       end
-      if !recent && !queued 
+      if !recent && !queued
         recent = @user.recently_played_entries.find_or_create_by(entry_id: params[:id])
         recent.update(recently_played_entry_params)
       end
@@ -38,6 +38,11 @@ class RecentlyPlayedEntriesController < ApplicationController
   def destroy_all
     @user = current_user
     @user.recently_played_entries.delete_all
+  end
+
+  def progress
+    @user = current_user
+    render json: @user.recently_played_entries_progress.to_json
   end
 
   private
