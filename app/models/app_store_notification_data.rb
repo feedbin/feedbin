@@ -1,17 +1,17 @@
 class AppStoreNotificationData
 
-  def initialize(token)
-    @token = token
+  def initialize(notification)
+    @notification = notification
   end
 
   def self.from_notification_history(start_date: nil, end_date: nil)
     body = {}
 
     start_date = start_date || most_recent_possible_start
-    body[:startDate] = start_date.to_i * 1_000
+    body[:startDate] = format_date(start_date)
 
     end_date = end_date || Time.now
-    body[:endDate] = end_date.to_i * 1_000
+    body[:endDate] = format_date(end_date)
 
     response = HTTP
       .auth("Bearer %<token>s" % {token: token})
@@ -23,14 +23,36 @@ class AppStoreNotificationData
     end
   end
 
-  def most_recent_possible_start
-    # can be either 180 days or when the API became available 2022-06-06
-    [Time.now - 180.days, Time.parse("2022-06-06")].max
+  def self.from_order_id(order_id)
+    response = HTTP
+      .auth("Bearer %<token>s" % {token: token})
+      .get("https://api.storekit.itunes.apple.com/inApps/v1/lookup/%<order_id>s" % {order_id: order_id})
+      .parse
+
+    original_transaction_id = JWT
+      .decode(response["signedTransactions"].first, nil, false, algorithm: "ES256")
+      .first
+      .dig("originalTransactionId")
+
+    body = {
+      startDate: format_date(most_recent_possible_start),
+      endDate: format_date(Time.now),
+      originalTransactionId: original_transaction_id
+    }
+
+    response = HTTP
+      .auth("Bearer %<token>s" % {token: token})
+      .post("https://api.storekit.itunes.apple.com/inApps/v1/notifications/history", json: body)
+      .parse
+
+    response["notificationHistory"].map do |item|
+      new(item["signedPayload"])
+    end
   end
 
   def data
     @data ||= begin
-      decode(@token).tap do |hash|
+      decode(@notification).tap do |hash|
         hash["data"]["signedTransactionInfo"] = decode(hash["data"]["signedTransactionInfo"])
         hash["data"]["signedRenewalInfo"] = decode(hash["data"]["signedRenewalInfo"])
       end
@@ -49,22 +71,20 @@ class AppStoreNotificationData
     data.dig("data", "signedTransactionInfo", "productId")
   end
 
+  private
+
   def decode(data)
     _, payload, _ = data.split(".")
     JSON.load(Base64.decode64(payload))
   end
 
-  def download(order_id)
-    response = HTTP
-      .auth("Bearer %<token>s" % {token: token})
-      .get("https://api.storekit.itunes.apple.com/inApps/v1/lookup/%<order_id>s" % {order_id: order_id})
-      .parse
+  def self.format_date(date)
+    date.to_i * 1_000
+  end
 
-    result = JWT.decode(response["signedTransactions"].first, nil, false, algorithm: "ES256").first.dig("originalTransactionId")
-
-    response["signedTransactions"].map do |data|
-      JWT.decode(data, nil, false, algorithm: "ES256")
-    end
+  def self.most_recent_possible_start
+    # can be either 180 days or when the API became available 2022-06-06
+    [Time.now - 180.days, Time.parse("2022-06-06")].max
   end
 
   def self.token
