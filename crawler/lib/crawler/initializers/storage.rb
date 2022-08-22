@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 STORAGE_OPTIONS = {
   provider: "AWS",
   aws_access_key_id: ENV["AWS_ACCESS_KEY_ID"],

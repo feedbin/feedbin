@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WorkerStat
   def call(worker, item, queue)
     title = "worker.#{worker.class}"

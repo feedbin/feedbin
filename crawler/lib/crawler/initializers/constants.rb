@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 pigo_name = "pigo_#{Etc.uname[:sysname].downcase}_#{Etc.uname[:machine]}"
 CASCADE = File.expand_path("../image/cascade/facefinder", __dir__)
 PIGO = File.expand_path("../../../bin/#{pigo_name}", __dir__)
