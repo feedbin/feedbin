@@ -1,36 +1,42 @@
-class Throttle
+# frozen_string_literal: true
 
-  TIMEOUT = 60 * 30
+module Crawler
+  module Refresher
+    class Throttle
 
-  def initialize(feed_url, last_download)
-    @feed_url = feed_url
-    @last_download = last_download
-  end
+      TIMEOUT = 60 * 30
 
-  def self.throttled?(*args)
-    new(*args).throttled?
-  end
+      def initialize(feed_url, last_download)
+        @feed_url = feed_url
+        @last_download = last_download
+      end
 
-  def throttled?
-    throttled_hosts.include?(host) && downloaded_recently?
-  end
+      def self.throttled?(*args)
+        new(*args).throttled?
+      end
 
-  def downloaded_recently?
-    return false if @last_download.nil?
-    (Time.now.to_i - @last_download) < random_timeout
-  end
+      def throttled?
+        throttled_hosts.include?(host) && downloaded_recently?
+      end
 
-  def random_timeout
-    rand(TIMEOUT..(TIMEOUT * 2))
-  end
+      def downloaded_recently?
+        return false if @last_download.nil?
+        (Time.now.to_i - @last_download) < random_timeout
+      end
 
-  def throttled_hosts
-    ENV["THROTTLED_HOSTS"]&.split(",") || []
-  end
+      def random_timeout
+        rand(TIMEOUT..(TIMEOUT * 2))
+      end
 
-  def host
-    Addressable::URI.heuristic_parse(@feed_url).host.split(".").last(2).join(".")
-  rescue
-    nil
+      def throttled_hosts
+        ENV["THROTTLED_HOSTS"]&.split(",") || []
+      end
+
+      def host
+        Addressable::URI.heuristic_parse(@feed_url).host.split(".").last(2).join(".")
+      rescue
+        nil
+      end
+    end
   end
 end
