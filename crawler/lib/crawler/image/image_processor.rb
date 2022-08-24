@@ -2,7 +2,7 @@
 
 module Crawler
   module Image
-    class Image
+    class ImageProcessor
       attr_reader :path
 
       def initialize(file, target_width:, target_height:)
