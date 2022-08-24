@@ -23,9 +23,10 @@ require "connection_pool"
 require "redis"
 require "feedkit"
 
-require "lib/crawler/sidekiq"
-require "lib/crawler/redis"
-require "lib/crawler/cache"
+require "lib/crawler/initializers/sidekiq"
+require "lib/crawler/initializers/redis"
+
+require "lib/crawler/refresher/cache"
 require "lib/crawler/refresher/feed_status"
 require "lib/crawler/refresher/redirect_cache"
 require "lib/crawler/refresher/http_cache"
