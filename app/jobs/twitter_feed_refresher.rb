@@ -14,13 +14,13 @@ class TwitterFeedRefresher
     if keys.present?
       args = {
         "args" => [feed.id, feed.feed_url, keys],
-        "class" => "TwitterRefresher",
+        "class" => "Crawler::Refresher::TwitterRefresher",
         "queue" => "twitter_refresher",
         "retry" => false
       }
 
       if user
-        args["class"] = "TwitterRefresherCritical"
+        args["class"] = "Crawler::Refresher::TwitterRefresherCritical"
         args["queue"] = "twitter_refresher_critical"
       end
 

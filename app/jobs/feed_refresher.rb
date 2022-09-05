@@ -28,7 +28,7 @@ class FeedRefresher
     if jobs.present?
       Sidekiq::Client.push_bulk(
         "args"      => jobs.shuffle,
-        "class"     => "FeedDownloader",
+        "class"     => "Crawler::Refresher::FeedDownloader",
         "queue"     => "feed_downloader",
         "retry"     => false,
         "dead"      => false,

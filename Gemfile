@@ -1,10 +1,6 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-# TODO see if this can be removed after 3.x upgrade
-# gem "net-http"
-# gem "uri", "0.10.0"
-
 gem "rails", "= 7.0.3.1"
 gem "will_paginate"
 
@@ -76,9 +72,6 @@ group :development do
   gem "listen"
   gem "silencer"
   gem "foreman"
-  # gem "ruby-debug-ide", require: false
-  # gem "debase", "= 0.2.5.beta2", require: false
-  # gem "solargraph", require: false
 end
 
 group :development, :test do

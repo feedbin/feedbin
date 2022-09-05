@@ -17,7 +17,7 @@ class EntryImage
     if job = build_job
       Sidekiq::Client.push(
         "args" => job,
-        "class" => "FindImage",
+        "class" => "Crawler::Image::FindImage",
         "queue" => "image_parallel",
         "retry" => false
       )

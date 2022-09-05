@@ -21,7 +21,7 @@ class ItunesFeedImage
       url = @feed.rebase_url(url)
       Sidekiq::Client.push(
         "args" => ["#{@feed.id}-#{name}-itunes", "podcast_feed", [url]],
-        "class" => "FindImage",
+        "class" => "Crawler::Image::FindImage",
         "queue" => "image_parallel",
         "retry" => false
       )

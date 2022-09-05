@@ -64,7 +64,7 @@ class ActionsPerform
       if job_args = job.build_job
         Sidekiq::Client.push(
           "args" => job_args,
-          "class" => "FindImageCritical",
+          "class" => "Crawler::Image::FindImageCritical",
           "queue" => "image_parallel_critical",
           "retry" => false
         )
