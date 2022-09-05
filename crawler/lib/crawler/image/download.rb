@@ -57,7 +57,7 @@ module Crawler
       end
 
       def self.recognize_url?(src_url)
-        if supported_urls.find { |url| src_url =~ url }
+        if supported_urls.find { src_url.to_s =~ _1 }
           Regexp.last_match[1]
         else
           false

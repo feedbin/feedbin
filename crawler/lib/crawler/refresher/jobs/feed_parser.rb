@@ -2,7 +2,6 @@
 
 module Crawler
   module Refresher
-
     class FeedParser
       include Sidekiq::Worker
       sidekiq_options queue: "feed_parser_#{Socket.gethostname}", retry: false
@@ -29,43 +28,43 @@ module Crawler
 
       def save(feed, entries)
         Sidekiq::Client.push(
-        "class" => "FeedRefresherReceiver",
-        "queue" => "feed_refresher_receiver",
-        "args" => [{
-          "feed" => feed.merge({"id" => @feed_id}),
-          "entries" => entries
+          "class" => "FeedRefresherReceiver",
+          "queue" => "feed_refresher_receiver",
+          "args" => [{
+            "feed" => feed.merge({"id" => @feed_id}),
+            "entries" => entries
           }]
-          )
-        end
+        )
+      end
 
-        def parsed_feed
-          @parsed_feed ||= begin
-            body = File.read(@path, binmode: true)
-            Feedkit::Parser.parse!(body, url: @feed_url, encoding: @encoding)
-          end
-        end
-
-        def counts(all_entries, new_entries)
-          all_entries_count = all_entries.count
-          new_entries_count = new_entries.count
-          unique_dates_count = new_entries.map {|e| e[:published] }.uniq.count
-
-          if new_entries_count > 1 && unique_dates_count == 1
-            Sidekiq.logger.info("Same date: id=#{@feed_id} url=#{@feed_url} new=#{new_entries_count} unique=#{unique_dates_count}")
-          end
-        end
-
-        def cleanup
-          File.unlink(@path) rescue Errno::ENOENT
+      def parsed_feed
+        @parsed_feed ||= begin
+          body = File.read(@path, binmode: true)
+          Feedkit::Parser.parse!(body, url: @feed_url, encoding: @encoding)
         end
       end
 
-      class FeedParserCritical
-        include Sidekiq::Worker
-        sidekiq_options queue: "feed_parser_critical_#{Socket.gethostname}", retry: false
-        def perform(*args)
-          FeedParser.new.perform(*args)
+      def counts(all_entries, new_entries)
+        all_entries_count = all_entries.count
+        new_entries_count = new_entries.count
+        unique_dates_count = new_entries.map {|e| e[:published] }.uniq.count
+
+        if new_entries_count > 1 && unique_dates_count == 1
+          Sidekiq.logger.info("Same date: id=#{@feed_id} url=#{@feed_url} new=#{new_entries_count} unique=#{unique_dates_count}")
         end
+      end
+
+      def cleanup
+        File.unlink(@path) rescue Errno::ENOENT
+      end
+    end
+
+    class FeedParserCritical
+      include Sidekiq::Worker
+      sidekiq_options queue: "feed_parser_critical_#{Socket.gethostname}", retry: false
+      def perform(*args)
+        FeedParser.new.perform(*args)
       end
     end
   end
+end

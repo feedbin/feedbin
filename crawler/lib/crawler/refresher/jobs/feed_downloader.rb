@@ -45,13 +45,13 @@ module Crawler
         url = @feed.redirect ? @feed.redirect : parsed_url.url
         Sidekiq.logger.info "Redirect: from=#{@feed_url} to=#{@feed.redirect} id=#{@feed_id}" if @feed.redirect
         Feedkit::Request.download(url,
-        on_redirect:   on_redirect,
-        username:      parsed_url.username,
-        password:      parsed_url.password,
-        last_modified: @feed.last_modified,
-        etag:          @feed.etag,
-        auto_inflate:  auto_inflate,
-        user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
+          on_redirect:   on_redirect,
+          username:      parsed_url.username,
+          password:      parsed_url.password,
+          last_modified: @feed.last_modified,
+          etag:          @feed.etag,
+          auto_inflate:  auto_inflate,
+          user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
         )
       end
 
@@ -67,10 +67,6 @@ module Crawler
         job_id = parser.perform_async(@feed_id, @feed_url, @response.path, @response.encoding.to_s)
         Sidekiq.logger.info "Parse enqueued job_id: #{job_id}"
         @feed.save(@response)
-      end
-
-      def throttled?
-
       end
     end
 
