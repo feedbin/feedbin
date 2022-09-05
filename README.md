@@ -27,12 +27,13 @@ And if you really want to run the whole Feedbin stack, take a look at this [Dock
 
 The main Feedbin project is a [Rails 6](http://rubyonrails.org/) application. In addition to the main project there are several other services that provide additional functionality. None of these services are required to get Feedbin running locally, but they all provide important functionality that you would want for a production install.
 
- - [**refresher:**](https://github.com/feedbin/refresher)
-   Refresher is the service that does feed refreshing. Feed refreshes are scheduled as background jobs using [Sidekiq](https://github.com/mperham/sidekiq). Refresher is kept separate so it can be scaled independently. It's also a benefit to not have to load all of Rails for this service.
- - [**image:**](https://github.com/feedbin/image)
-   Image is the service that finds images to be [associated with articles](https://feedbin.com/blog/2015/10/22/image-previews/)
- - [**camo:**](https://github.com/atmos/camo)
-   camo is an https image proxy. In production Feedbin is SSL only. One issue with SSL is all assets must be served over SSL as well or the browser will show insecure content warnings. camo proxies all image requests through an SSL enabled host to prevent this.
+ - [**crawler:**](https://github.com/feedbin/crawler)
+   Crawler is the service that does feed refreshing and image processing. Crawler is kept separate so it can be scaled independently. It's also a benefit to not have to load all of Rails for this service.
+   
+**Optional services**
+ 
+ - [**Privacy Please:**](https://github.com/feedbin/privacy-please)
+   Privacy Please is an https image proxy. In production Feedbin is TLS only. One issue with TLS is all assets must be served over TLS as well or the browser will show insecure content warnings. Privacy Please proxies all image requests through an TLS enabled host to prevent this. Using a proxy has the added benefit of providing privacy while using Feedbin.
  - [**extract:**](https://github.com/feedbin/extract)
    Extract is a Node.js service that extract content from web pages. It is used to extract full pages when a feed only provide excerpts.
 
