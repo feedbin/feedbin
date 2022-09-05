@@ -35,12 +35,12 @@ The main Feedbin project is a [Rails 6](http://rubyonrails.org/) application. In
  - [**Privacy Please:**](https://github.com/feedbin/privacy-please)
    Privacy Please is an https image proxy. In production Feedbin is TLS only. One issue with TLS is all assets must be served over TLS as well or the browser will show insecure content warnings. Privacy Please proxies all image requests through an TLS enabled host to prevent this. Using a proxy has the added benefit of providing privacy while using Feedbin.
  - [**extract:**](https://github.com/feedbin/extract)
-   Extract is a Node.js service that extract content from web pages. It is used to extract full pages when a feed only provide excerpts.
+   Extract is a Node.js service that extract content from web pages. It is used to extract the full content of an article when a feed only provide excerpts.
 
 Requirements
 ------------
 
- - Mac OS X or Linux
+ - Linux or macOS
  - [Ruby 3.1](http://www.ruby-lang.org/en/)
  - [Postgres 11](http://www.postgresql.org/)
  - [Redis > 6.0](http://redis.io/)
@@ -48,7 +48,7 @@ Requirements
 
 Installation
 -------------
-Ultimately, you'll need a Ruby environment and a Rack compatible application server. For development [Pow](http://pow.cx/) is recommended.
+Ultimately, you'll need a Ruby environment and a Rack compatible application server.
 
 First, install the dependencies listed under requirements.
 
