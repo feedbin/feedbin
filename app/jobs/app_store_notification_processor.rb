@@ -12,8 +12,9 @@ class AppStoreNotificationProcessor
     "yearly_podcast_v4" => "podcast-subscription",
   }
 
-  def perform(token)
+  def perform(token, user_id = nil)
     @token = token
+    @user = User.find_by_id(user_id)
     notification = user.app_store_notifications.create_with(
       notification_type: data.dig("notificationType"),
       subtype: data.dig("subtype"),

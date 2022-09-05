@@ -1,5 +1,7 @@
 class AppStoreNotificationData
 
+  attr_reader :notification
+
   def initialize(notification)
     @notification = notification
   end
