@@ -43,16 +43,52 @@ module Crawler
       end
 
       def fingerprint_entries
-        fingerprints = @entries.first(300).each_with_object([]) do |entry, array|
-          data = JSON.dump(entry.to_entry)
-          fingerprint = Digest::MD5.hexdigest(data)
-          array.push("f:#{entry.public_id}", fingerprint)
+        candidates = @entries.first(300)
+
+        old_fingerprints = $redis.with do |redis|
+          keys = candidates.map do |entry|
+            "f:#{entry.public_id}"
+          end
+
+          keys.empty? ? {} : redis.mapped_mget(*keys)
         end
 
-        return if fingerprints.empty?
+        new_fingerprints = {}
+        new_lengths = {}
+
+        candidates.each do |entry|
+          new_fingerprints["f:#{entry.public_id}"] = entry.fingerprint
+          new_lengths[entry.public_id] = entry.content&.length
+        end
+
+        fingerprint_results = new_fingerprints.each_with_object([]) do |(key, value), array|
+          old_value = old_fingerprints[key]
+          if old_value.nil?
+            array.push(:new)
+          elsif old_value != value
+            array.push(:updated)
+          else
+            array.push(:unchanged)
+          end
+        end
+
+        length_results = new_lengths.each_with_object([]) do |(key, value), array|
+          old_value = saved_entries[key]
+          if old_value.nil?
+            array.push(:new)
+          elsif old_value != value
+            array.push(:updated)
+          else
+            array.push(:unchanged)
+          end
+        end
+
+        Sidekiq.logger.info "fingerprint_results=#{fingerprint_results.tally} length_results=#{length_results.tally}"
+
+        return if new_fingerprints.empty?
 
         $redis.with do |redis|
-          redis.mset(*fingerprints)
+          redis.mapped_mset(new_fingerprints)
         end
       end
 
