@@ -12,20 +12,6 @@ module Crawler
         @entries = entries
         @check_for_updates = check_for_updates
         @date_filter = date_filter
-        unless $redis_alt.nil?
-          ids = @entries.first(300).each_with_object([]) do |entry, array|
-            content_length = entry.content.respond_to?(:length) ? entry.content.length : 1
-            array.push(entry.public_id, content_length)
-            unless entry.public_id_alt.nil?
-              array.push(entry.public_id_alt, content_length)
-            end
-          end
-          unless ids.empty?
-            $redis_alt.with do |connection|
-              connection.mset(*ids)
-            end
-          end
-        end
       end
 
       def filter

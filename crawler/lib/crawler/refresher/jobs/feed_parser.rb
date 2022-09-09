@@ -17,7 +17,6 @@ module Crawler
 
         save(parsed_feed.to_feed, entries) unless entries.empty?
         FeedStatus.clear!(@feed_id)
-        counts(parsed_feed.entries, entries)
         filter.fingerprint_entries
       rescue Feedkit::NotFeed => exception
         Sidekiq.logger.info "Feedkit::NotFeed: id=#{@feed_id} url=#{@feed_url}"
@@ -41,16 +40,6 @@ module Crawler
         @parsed_feed ||= begin
           body = File.read(@path, binmode: true)
           Feedkit::Parser.parse!(body, url: @feed_url, encoding: @encoding)
-        end
-      end
-
-      def counts(all_entries, new_entries)
-        all_entries_count = all_entries.count
-        new_entries_count = new_entries.count
-        unique_dates_count = new_entries.map {|e| e[:published] }.uniq.count
-
-        if new_entries_count > 1 && unique_dates_count == 1
-          Sidekiq.logger.info("Same date: id=#{@feed_id} url=#{@feed_url} new=#{new_entries_count} unique=#{unique_dates_count}")
         end
       end
 
