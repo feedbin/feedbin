@@ -2439,7 +2439,7 @@ $hamburger-dot: 4px;
       }
     }
     .feed-link,
-    &.feed-link {
+    &.feed-link, .link-inner {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
