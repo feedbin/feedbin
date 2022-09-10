@@ -1308,7 +1308,7 @@ $.extend feedbin,
     $('> [data-behavior~=sort_feed]', target).sort(feedbin.sortByFeedOrder).detach().appendTo(target)
 
   sortFeeds: ->
-      $('.drawer ul').each ->
+      $('[data-behavior~=feed_drawer] ul').each ->
         feedbin.sort $(@)
       feedbin.sort $('[data-behavior~=feeds_target]')
 
@@ -1959,7 +1959,7 @@ $.extend feedbin,
         container.toggleClass('open')
         container.addClass('animate')
 
-        drawer = container.find('.drawer')
+        drawer = container.find('[data-behavior~=feed_drawer]')
 
         if open
           windowHeight = window.innerHeight

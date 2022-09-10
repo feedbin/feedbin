@@ -2363,11 +2363,11 @@ $hamburger-dot: 4px;
   }
 }
 
-.feeds:not(.dragging) li.selected .drawer ul:after {
+.feeds:not(.dragging) li.selected .feed-drawer ul:after {
   @include theme(border-top-color, $color-selected-off);
 }
 
-.selected .feeds:not(.dragging) li.selected .drawer ul:after {
+.selected .feeds:not(.dragging) li.selected .feed-drawer ul:after {
   @include theme(border-top-color, $color-selected);
 }
 

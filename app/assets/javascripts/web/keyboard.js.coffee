@@ -404,7 +404,7 @@ class feedbin.Keyboard
 
   itemInView: ->
     try
-      drawer = @item.find('.drawer').outerHeight()
+      drawer = @item.find('[data-behavior~=feed_drawer]').outerHeight()
     catch error
       drawer = 0
     @itemAboveView = @itemPosition.bottom < @item.outerHeight() - drawer
@@ -432,7 +432,7 @@ class feedbin.Keyboard
 
   previousItem: ->
     if @selectedColumnName() == 'feeds'
-      @drawer = @selected.prevAll().not(":hidden, .source-section").first().find('.drawer')
+      @drawer = @selected.prevAll().not(":hidden, .source-section").first().find('[data-behavior~=feed_drawer]')
       if @inDrawer()
         prev = @selected.prevAll().not(":hidden, .source-section").first();
         if prev.length == 0
@@ -447,7 +447,7 @@ class feedbin.Keyboard
 
   nextItem: ->
     if @selectedColumnName() == 'feeds'
-      @drawer = $('.drawer', @selectedItem())
+      @drawer = $('[data-behavior~=feed_drawer]', @selectedItem())
       if @inDrawer()
         next = @selected.nextAll().not(":hidden, .source-section").first();
         if next.length == 0
@@ -461,14 +461,14 @@ class feedbin.Keyboard
     next
 
   inDrawer: ->
-    @selectedItem().closest('.drawer').length >= 1
+    @selectedItem().closest('[data-behavior~=feed_drawer]').length >= 1
 
   hasDrawer: ->
     @drawer.length >= 1 && @drawer.closest('[data-tag-id]').hasClass('open')
 
   getItemPosition: ->
     try
-      drawer = @item.find('.drawer').outerHeight()
+      drawer = @item.find('[data-behavior~=feed_drawer]').outerHeight()
     catch error
       drawer = 0
     bottom: (@item.offset().top - @columnOffsetTop) + @item.outerHeight() - drawer
