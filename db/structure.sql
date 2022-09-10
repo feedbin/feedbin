@@ -487,7 +487,9 @@ CREATE TABLE public.entries (
     thread_id bigint,
     settings jsonb,
     main_tweet_id text,
-    queued_entries_count bigint DEFAULT 0 NOT NULL
+    queued_entries_count bigint DEFAULT 0 NOT NULL,
+    fingerprint uuid,
+    guid uuid
 );
 
 
@@ -601,7 +603,8 @@ CREATE TABLE public.feeds (
     options json,
     hubs text[],
     settings jsonb,
-    standalone_request_at timestamp(6) without time zone
+    standalone_request_at timestamp(6) without time zone,
+    fingerprint uuid
 );
 
 
@@ -2936,6 +2939,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220715154209'),
 ('20220719142811'),
 ('20220804145624'),
-('20220806155622');
+('20220806155622'),
+('20220909105317');
 
 
