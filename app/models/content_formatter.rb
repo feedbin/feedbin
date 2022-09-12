@@ -81,12 +81,13 @@ class ContentFormatter
     ],
     remove_contents: ["script", "style", "iframe", "object", "embed", "title"],
     attributes: {
-      "a" => ["href"],
-      "img" => ["src"],
-      :all => ["align", "alt", "border", "cellpadding", "cellspacing", "cite", "cols", "colspan", "color",
-        "coords", "datetime", "dir", "disabled", "enctype", "for", "height", "hreflang", "label", "lang",
-        "longdesc", "name", "rel", "rev", "rows", "rowspan", "selected", "shape", "size", "span", "start",
-        "summary", "target", "title", "type", "valign", "value", "vspace", "width"]
+        "a"     => ["href"],
+        "img"   => ["src", "width", "height", "alt"],
+        "ol"    => Sanitize::Config::RELAXED[:attributes]["ol"],
+        "ul"    => Sanitize::Config::RELAXED[:attributes]["ul"],
+        "table" => Sanitize::Config::RELAXED[:attributes]["table"],
+        "td"    => Sanitize::Config::RELAXED[:attributes]["td"],
+        "th"    => Sanitize::Config::RELAXED[:attributes]["th"]
     },
     protocols: {
       "a" => {"href" => ["http", "https", :relative]},
