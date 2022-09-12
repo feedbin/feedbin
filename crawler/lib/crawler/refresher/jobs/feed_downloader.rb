@@ -32,8 +32,9 @@ module Crawler
           request(auto_inflate: false)
         end
 
-        Sidekiq.logger.info "Downloaded status=#{@response.status} url=#{@feed_url}"
-        parse unless @response.not_modified?(@feed.checksum)
+        not_modified = @response.not_modified?(@feed.checksum)
+        Sidekiq.logger.info "Downloaded modified=#{!not_modified} http_status=\"#{@response.status}\" url=#{@feed_url}"
+        parse unless not_modified
         @feed.download_success
       rescue Feedkit::Error => exception
         @feed.download_error(exception)
@@ -63,8 +64,11 @@ module Crawler
 
       def parse
         @response.persist!
-        parser = @critical ? FeedParserCritical : FeedParser
-        job_id = parser.perform_async(@feed_id, @feed_url, @response.path, @response.encoding.to_s)
+        job_id = Sidekiq::Client.push(
+          "args" => [@feed_id, @feed_url, @response.path, @response.encoding.to_s],
+          "class" => @critical ? "FeedParserCritical" : "FeedParser",
+          "queue" => @critical ? "feed_parser_critical_#{Socket.gethostname}" : "feed_parser_#{Socket.gethostname}",
+        )
         Sidekiq.logger.info "Parse enqueued job_id: #{job_id}"
         @feed.save(@response)
       end

@@ -16,15 +16,16 @@ module Crawler
         Cache.delete(cache_key, errors_cache_key, log_cache_key)
       end
 
-      def error!(exception)
+      def error!(exception, formatted: false)
         @count = count + 1
         Cache.write(cache_key, {
           count: @count,
           failed_at: Time.now.to_i
         })
+        exception = formatted ? exception : error_json(exception)
         Sidekiq.redis do |redis|
           redis.pipelined do |pipeline|
-            pipeline.lpush(errors_cache_key, error_json(exception))
+            pipeline.lpush(errors_cache_key, exception)
             pipeline.ltrim(errors_cache_key, 0, 25)
           end
         end
