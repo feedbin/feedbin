@@ -15,7 +15,7 @@ if Rails.env.production?
       ActiveRecord::Base.establish_connection(
         adapter: "postgresql",
         host: uri.host,
-        port: uri.port,
+        port: ENV["DB_PORT"]&.to_i || uri.port,
         username: uri.user,
         password: uri.password,
         database: database,
