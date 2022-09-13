@@ -26,6 +26,8 @@ class FeedParser
   def update_fingerprints(updates)
     public_ids = updates.keys
 
+    return if public_ids.empty?
+
     cases = Entry.where(public_id: public_ids).select(:id, :fingerprint, :public_id).each_with_object([]) do  |entry, array|
       data = {
         id: entry.id,
