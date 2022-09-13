@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "= 7.0.3.1"
+gem "rails", "= 7.0.4"
 gem "will_paginate"
 
 gem "resolv",              github: "feedbin/resolv",              branch: "feedbin"
@@ -54,7 +54,7 @@ gem "rmagick", require: false
 gem "rubyzip"
 gem "sanitize"
 gem "sass-rails"
-gem "sidekiq", "= 6.5.1"
+gem "sidekiq"
 gem "stripe", "~> 5.55.0"
 gem "stripe_event"
 gem "strong_migrations"
