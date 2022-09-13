@@ -17,7 +17,8 @@ class FeedRefresherReceiver
       entry = entries[item["public_id"]]
       update = item.delete("update")
       if entry && update == true
-        update_entry(item, entry)
+        EntryUpdate.create!(item, entry)
+        cache_public_id(item)
       elsif entry
         cache_public_id(item)
       else
@@ -51,44 +52,54 @@ class FeedRefresherReceiver
     end
   end
 
-  def update_entry(item, entry)
-    cache_public_id(item)
+  def cache_public_id(item)
+    FeedbinUtils.update_public_id_cache(item["public_id"], item["content"], item.dig("data", "public_id_alt"))
+  end
 
-    return unless entry.published_recently?
+  def alternate_exists?(item)
+    if item["data"] && item["data"]["public_id_alt"]
+      FeedbinUtils.public_id_exists?(item["data"]["public_id_alt"])
+    end
+  end
+end
 
-    update = item.slice("author", "content", "title", "url", "entry_id", "data")
+class EntryUpdate
+  def initialize(updated_data, original_entry)
+    @updated_data = updated_data
+    @original_entry = original_entry
+  end
+
+  def self.create!(updated_data, original_entry)
+    new(updated_data, original_entry).create
+  end
+
+  def create
+    update = @updated_data.slice("author", "content", "title", "url", "entry_id", "data")
+
     update["summary"] = ContentFormatter.summary(update["content"], 256)
 
-    current_content = entry.content.to_s.clone
+    current_content = @original_entry.content.to_s.clone
     new_content = update["content"].to_s.clone
 
-    if current_content.present? && entry.original.nil?
-      update["original"] = build_original(entry)
+    if current_content.present? && @original_entry.original.nil?
+      update["original"] = {
+        "author"    => @original_entry.author,
+        "content"   => @original_entry.content,
+        "title"     => @original_entry.title,
+        "url"       => @original_entry.url,
+        "entry_id"  => @original_entry.entry_id,
+        "published" => @original_entry.published,
+        "data"      => @original_entry.data
+      }
     end
 
-    entry.update(update)
+    @original_entry.update(update)
 
-    if significant_change?(current_content, new_content)
-      create_update_notifications(entry)
-    end
-
-    if new_content.length == current_content.length
-      Librato.increment("entry.no_change")
+    if significant_change?(current_content, new_content) && @original_entry.published_recently?
+      create_update_notifications(@original_entry)
     end
 
     Librato.increment("entry.update")
-  end
-
-  def build_original(entry)
-    {
-      "author"    => entry.author,
-      "content"   => entry.content,
-      "title"     => entry.title,
-      "url"       => entry.url,
-      "entry_id"  => entry.entry_id,
-      "published" => entry.published,
-      "data"      => entry.data
-    }
   end
 
   def significant_change?(current_content, new_content)
@@ -109,13 +120,13 @@ class FeedRefresherReceiver
   def create_update_notifications(entry)
     updated_entries = []
 
-    subscription_user_ids = Subscription.where(feed_id: entry.feed_id, active: true, muted: false, show_updates: true).pluck(:user_id)
-    unread_entries_user_ids = UnreadEntry.where(entry_id: entry.id, user_id: subscription_user_ids).pluck(:user_id)
-    updated_entries_user_ids = UpdatedEntry.where(entry_id: entry.id, user_id: subscription_user_ids).pluck(:user_id)
+    subscription_user_ids = Subscription.where(feed_id: @original_entry.feed_id, active: true, muted: false, show_updates: true).pluck(:user_id)
+    unread_entries_user_ids = UnreadEntry.where(entry_id: @original_entry.id, user_id: subscription_user_ids).pluck(:user_id)
+    updated_entries_user_ids = UpdatedEntry.where(entry_id: @original_entry.id, user_id: subscription_user_ids).pluck(:user_id)
 
     subscription_user_ids.each do |user_id|
       if !unread_entries_user_ids.include?(user_id) && !updated_entries_user_ids.include?(user_id)
-        updated_entries << UpdatedEntry.new_from_owners(user_id, entry)
+        updated_entries << UpdatedEntry.new_from_owners(user_id, @original_entry)
       end
     end
     UpdatedEntry.import(updated_entries, validate: false, on_duplicate_key_ignore: true)
@@ -127,15 +138,5 @@ class FeedRefresherReceiver
       error_message: "create_update_notifications failed",
       parameters: {exception: e, backtrace: e.backtrace}
     )
-  end
-
-  def cache_public_id(item)
-    FeedbinUtils.update_public_id_cache(item["public_id"], item["content"], item.dig("data", "public_id_alt"))
-  end
-
-  def alternate_exists?(item)
-    if item["data"] && item["data"]["public_id_alt"]
-      FeedbinUtils.public_id_exists?(item["data"]["public_id_alt"])
-    end
   end
 end

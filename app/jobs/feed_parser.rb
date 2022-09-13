@@ -14,12 +14,33 @@ class FeedParser
     save(parsed_feed.to_feed, entries) unless entries.empty?
     clear_feed_status!
 
-    filter.fingerprint_entries
+    updates = filter.fingerprint_entries
+    update_fingerprints(updates)
   rescue Feedkit::NotFeed => exception
     Sidekiq.logger.info "Feedkit::NotFeed: id=#{@feed_id} url=#{@feed_url}"
     record_feed_error!(exception)
   ensure
     cleanup
+  end
+
+  def update_fingerprints(updates)
+    public_ids = updates.keys
+
+    cases = Entry.where(public_id: public_ids).select(:id, :fingerprint, :public_id).each_with_object([]) do  |entry, array|
+      data = {
+        id: entry.id,
+        value: updates[entry.public_id]
+      }
+      array.push(Entry.sanitize_sql(["WHEN :id THEN :value::uuid", data]))
+    end
+
+    return if cases.empty?
+
+    Sidekiq.logger.info "Updating fingerprints: id=#{@feed_id}"
+
+    query = "fingerprint = CASE id %<cases>s END" % { cases: cases.join(" ")}
+
+    Entry.where(public_id: public_ids).update_all(query)
   end
 
   private

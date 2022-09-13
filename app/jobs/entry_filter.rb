@@ -72,6 +72,10 @@ class EntryFilter
     $redis[:refresher].with do |redis|
       redis.mapped_mset(new_fingerprints)
     end
+
+    new_fingerprints.transform_keys do |key|
+      key.sub("f:", "")
+    end
   end
 
   private
