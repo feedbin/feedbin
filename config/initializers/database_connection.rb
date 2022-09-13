@@ -22,6 +22,8 @@ if Rails.env.production?
         reaping_frequency: ENV["DB_REAP_FREQ"] || 10,
         pool: ENV["DB_POOL"] || Etc.nprocessors,
         connect_timeout: 5,
+        prepared_statements: ENV["PG_BOUNCER"]&.to_i == 1 ? false : true,
+        advisory_locks: ENV["PG_BOUNCER"]&.to_i == 1 ? false : true,
         variables: {
           statement_timeout: "15s",
           lock_timeout: "10s"
