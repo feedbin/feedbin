@@ -69,7 +69,7 @@ module Crawler
           "class" => @critical ? "FeedParserCritical" : "FeedParser",
           "queue" => @critical ? "feed_parser_critical_#{Socket.gethostname}" : "feed_parser_#{Socket.gethostname}",
         )
-        Sidekiq.logger.info "Parse enqueued job_id: #{job_id}"
+        Sidekiq.logger.info "Parse enqueued job_id: #{job_id} path=#{@response.path}"
         @feed.save(@response)
       end
     end
