@@ -12,19 +12,8 @@ class TwitterFeedRefresher
     keys = load_keys(feed, user)
 
     if keys.present?
-      args = {
-        "args" => [feed.id, feed.feed_url, keys],
-        "class" => "Crawler::Refresher::TwitterRefresher",
-        "queue" => "twitter_refresher",
-        "retry" => false
-      }
-
-      if user
-        args["class"] = "Crawler::Refresher::TwitterRefresherCritical"
-        args["queue"] = "twitter_refresher_critical"
-      end
-
-      Sidekiq::Client.push(args)
+      job_class = user ? TwitterRefresherCritical : TwitterRefresher
+      job_class.perform_async(feed.id, feed.feed_url, keys)
     end
   end
 
@@ -36,6 +25,7 @@ class TwitterFeedRefresher
     end
 
     users = User.where(id: user_ids)
+
     users.map { |user|
       user_matches = true
       if feed.twitter_home?
