@@ -9,20 +9,26 @@ class EntryFilter
     @public_ids = @entries.map(&:public_id)
     @check_for_updates = check_for_updates
     @date_filter = date_filter
+    @stats = []
   end
 
   def filter
-    @filter ||= begin
-      @entries.each_with_object([]) do |entry, array|
-        if new?(entry)
-          array.push(entry.to_entry)
-        elsif updated?(entry)
-          result = entry.to_entry
-          result[:update] = true
-          array.push(result)
-        end
+    @filter ||= @entries.each_with_object([]) do |entry, array|
+      if new?(entry)
+        @stats.push(:new)
+        array.push(entry.to_entry)
+      elsif updated?(entry)
+        @stats.push(:updated)
+        result = entry.to_entry
+        array.push(result)
+      else
+        @stats.push(:unchanged)
       end
     end
+  end
+
+  def stats
+    @stats.tally
   end
 
   private

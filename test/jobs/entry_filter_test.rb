@@ -7,8 +7,10 @@ class EntryFilterTest < ActiveSupport::TestCase
 
   def test_should_get_new_entries
     entries = sample_entries
-    results = EntryFilter.filter!(entries)
+    filter = EntryFilter.new(entries)
+    results = filter.filter
     assert_equal entries.length, results.length
+    assert_equal({new: 1}, filter.stats)
     results.each do |entry|
       assert_nil entry[:update]
     end
@@ -25,12 +27,11 @@ class EntryFilterTest < ActiveSupport::TestCase
       end
     end
 
-    results = EntryFilter.filter!(entries)
-    assert_equal entries.length, results.length
+    filter = EntryFilter.new(entries)
+    results = filter.filter
 
-    results.each do |entry|
-      assert entry[:update]
-    end
+    assert_equal entries.length, results.length
+    assert_equal({updated: 1}, filter.stats)
   end
 
   def test_should_ignore_updated_entries
@@ -77,8 +78,10 @@ class EntryFilterTest < ActiveSupport::TestCase
       sample_entries(published: (Date.today - 3).to_time),
       sample_entries(published: nil),
     ].flatten
-    results = EntryFilter.filter!(entries, date_filter: (Date.today - 2).to_time, check_for_updates: false)
+    filter = EntryFilter.new(entries, date_filter: (Date.today - 2).to_time, check_for_updates: false)
+    results = filter.filter
     assert_equal 2, results.length
+    assert_equal({new: 2, unchanged: 1}, filter.stats)
   end
 
   private

@@ -12,8 +12,9 @@ class FeedParser
       encoding: encoding
     )
 
-    entries = EntryFilter.filter!(parsed.entries)
-    save(feed: parsed.to_feed, entries: entries)
+    filter = EntryFilter.new(parsed.entries)
+    save(feed: parsed.to_feed, entries: filter.filter)
+    Sidekiq.logger.info "FeedParser: stats=#{filter.stats} url=#{@feed_url} id=#{@feed_id}"
   rescue Feedkit::NotFeed => exception
     record_feed_error!(exception)
   ensure
