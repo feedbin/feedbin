@@ -61,7 +61,7 @@ class EntryFilter
     database_fingerprint_results = new_fingerprints.each_with_object([]) do |(key, value), array|
       key = key.sub("f:", "")
       old_value = old_database_fingerprints[key]
-      if !old_database_fingerprints.key?(key)
+      if !old_database_fingerprints.key?(key) && !saved_entries.key?(key)
 
         if new_entries.nil?
           entry = entries_map[key]
@@ -69,7 +69,7 @@ class EntryFilter
         end
 
         array.push(:new)
-      elsif old_value != value
+      elsif old_database_fingerprints.key?(key) && old_value != value
         array.push(:updated)
       else
         array.push(:unchanged)
