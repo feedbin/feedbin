@@ -74,7 +74,7 @@ class EntryUpdate
   end
 
   def create
-    update = @updated_data.slice("author", "content", "title", "url", "entry_id", "data")
+    update = @updated_data.slice("author", "content", "title", "url", "entry_id", "data", "fingerprint")
 
     update["summary"] = ContentFormatter.summary(update["content"], 256)
 

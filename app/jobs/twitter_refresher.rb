@@ -19,19 +19,14 @@ class TwitterRefresher
 
     if feed
       entries = EntryFilter.filter!(feed.entries, check_for_updates: false, date_filter: (Date.today - 2).to_time)
-      unless entries.empty?
-        Sidekiq::Client.push(
-          "class" => "FeedRefresherReceiver",
-          "queue" => "feed_refresher_receiver",
-          "args" => [{
-            feed: {
-              id: feed_id,
-              options: feed.options
-            },
-            entries: entries
-          }],
-        )
-      end
+      return if entries.empty?
+      FeedRefresherReceiver.perform_async({
+        feed: {
+          id: feed_id,
+          options: feed.options
+        },
+        entries: entries
+      })
     end
   end
 end

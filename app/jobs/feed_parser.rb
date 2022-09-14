@@ -18,7 +18,7 @@ class FeedParser
     Sidekiq.logger.info "FeedParser feed=#{feed.inspect}"
 
     updates = filter.fingerprint_entries
-    update_fingerprints(updates)
+    # update_fingerprints(updates)
   rescue Feedkit::NotFeed => exception
     Sidekiq.logger.info "Feedkit::NotFeed: id=#{@feed_id} url=#{@feed_url}"
     record_feed_error!(exception)
@@ -62,14 +62,10 @@ class FeedParser
   end
 
   def save(feed, entries)
-    Sidekiq::Client.push(
-      "class" => "FeedRefresherReceiver",
-      "queue" => "feed_refresher_receiver",
-      "args" => [{
-        "feed" => feed.merge({"id" => @feed_id}),
-        "entries" => entries
-      }]
-    )
+    FeedRefresherReceiver.perform_async({
+      "feed" => feed.merge({"id" => @feed_id}),
+      "entries" => entries
+    })
   end
 
   def clear_feed_status!
