@@ -2,7 +2,7 @@
 
 <% if page_feed.present? %>
     <% present page_feed do |feed_presenter| %>
-        <%= content_tag :li, class: "collection-pages", data: {feed_id: page_feed.id } do %>
+        <%= content_tag :li, class: "collection-pages collection-source", data: {feed_id: page_feed.id } do %>
             <%= feed_presenter.feed_link(link: pages_feed_path(page_feed), behavior: "selectable show_entries open_item feed_link") do %>
                 <span class="link-inner">
                     <%= feed_presenter.favicon(page_feed) %>
