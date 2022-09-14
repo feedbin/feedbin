@@ -11,16 +11,17 @@ class FeedParser
     filter = EntryFilter.new(parsed_feed.entries)
     entries = filter.filter
 
-    save(parsed_feed.to_feed, entries) unless entries.empty?
+    feed = parsed_feed.to_feed
+    save(feed, entries) unless entries.empty?
     clear_feed_status!
+
+    Sidekiq.logger.info "FeedParser feed=#{feed.inspect}"
 
     updates = filter.fingerprint_entries
     update_fingerprints(updates)
   rescue Feedkit::NotFeed => exception
     Sidekiq.logger.info "Feedkit::NotFeed: id=#{@feed_id} url=#{@feed_url}"
     record_feed_error!(exception)
-  rescue Errno::ENOENT
-    # TODO remove after processing completes
   ensure
     cleanup
   end
