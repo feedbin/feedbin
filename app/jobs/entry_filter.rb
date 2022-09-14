@@ -37,11 +37,13 @@ class EntryFilter
 
     new_fingerprints = {}
     new_lengths = {}
+    entries_map = {}
     old_database_fingerprints = Entry.where(public_id: candidates.map(&:public_id)).pluck(Arel.sql("public_id, REPLACE(fingerprint::text, '-', '')")).to_h
 
     candidates.each do |entry|
       new_fingerprints["f:#{entry.public_id}"] = entry.fingerprint
       new_lengths[entry.public_id] = entry.content&.length
+      entries_map[entry.public_id] = entry
     end
 
     fingerprint_results = new_fingerprints.each_with_object([]) do |(key, value), array|
@@ -62,6 +64,7 @@ class EntryFilter
       if !old_database_fingerprints.key?(key)
 
         if new_entries.nil?
+          entry = entries_map[key]
           new_entries = {public_id: key, title: entry.title, published: entry.published&.iso8601}
         end
 
