@@ -2744,6 +2744,9 @@ li.selected > a .favicon-wrap,
       height: auto;
       top: 0;
       .summary-menu-button {
+        top: 2px;
+        right: 2px;
+        position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -2935,11 +2938,14 @@ li.selected > a .favicon-wrap,
 }
 
 $feed-title-width: 115px;
-.entries-display-inline .entry-summary-link {
+.entries-display-inline .entry-summary-inner {
   display: flex;
   @include ellipse;
   align-items: center;
   padding: 8px 8px;
+}
+.entries-display-inline .entry-summary-link {
+  @include size-in-rems(padding, 4 4px 0 4px)
   .title-wrap .favicon-wrap,
   .quoted-tweet,
   .link-preview,
