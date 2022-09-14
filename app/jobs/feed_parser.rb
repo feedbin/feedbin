@@ -14,7 +14,7 @@ class FeedParser
 
     filter = EntryFilter.new(parsed.entries)
     save(feed: parsed.to_feed, entries: filter.filter)
-    Sidekiq.logger.info "FeedParser: stats=#{filter.stats} url=#{@feed_url} id=#{@feed_id}"
+    Sidekiq.logger.info "FeedParser: stats=#{filter.stats} url=#{@feed_url} feed_id=#{@feed_id}"
   rescue Feedkit::NotFeed => exception
     record_feed_error!(exception)
   ensure
@@ -24,10 +24,11 @@ class FeedParser
   private
 
   def save(feed:, entries:)
-    FeedRefresherReceiver.perform_async({
+    job_id = FeedRefresherReceiver.perform_async({
       "feed" => feed.merge({"id" => @feed_id}),
       "entries" => entries
     })
+    Sidekiq.logger.info "Enqueued FeedRefresherReceiver job_id=#{job_id} feed_id=#{@feed_id}"
     clear_feed_errors!
   end
 
@@ -46,7 +47,7 @@ class FeedParser
       "class" => "Crawler::Refresher::FeedStatusUpdate",
       "queue" => "feed_downloader_critical"
     )
-    Sidekiq.logger.info "Feedkit::NotFeed: id=#{@feed_id} url=#{@feed_url}"
+    Sidekiq.logger.info "Feedkit::NotFeed: feed_id=#{@feed_id} url=#{@feed_url}"
   end
 end
 
