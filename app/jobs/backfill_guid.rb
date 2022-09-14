@@ -5,11 +5,12 @@ class BackfillGuid
 
   def perform(feed_id)
     @feed = Feed.find(feed_id)
-    entries = Entry.where(feed: @feed).select(:id, :entry_id, :url, :title)
-    data = entries.each_with_object({}) do |entry, hash|
-      hash[entry.id] = guid(entry)
+    Entry.where(feed: @feed).find_in_batches(batch_size: 500) do |entries|
+      data = entries.each_with_object({}) do |entry, hash|
+        hash[entry.id] = guid(entry)
+      end
+      Entry.update_multiple(column: :guid, data: data)
     end
-    Entry.update_multiple(column: :guid, data: data)
   rescue ActiveRecord::RecordNotFound
   end
 
