@@ -71,9 +71,9 @@ class EntryUpdate
   def create
     Sidekiq.logger.info "Updating entry=#{@original_entry.public_id}"
 
-    update            = @updated_data.slice("author", "content", "title", "url", "entry_id", "data", "fingerprint")
-    current_content   = @original_entry.content.to_s.clone
-    new_content       = update["content"].to_s.clone
+    update          = @updated_data.slice("author", "content", "title", "url", "entry_id", "data", "fingerprint")
+    current_content = @original_entry.content.to_s.clone
+    new_content     = update["content"].to_s.clone
 
     if significant_change?(current_content, new_content) && @original_entry.published_recently?
       create_update_notifications(@original_entry)
@@ -91,14 +91,13 @@ class EntryUpdate
       end
     end
 
-    update["summary"] = ContentFormatter.summary(new_content, 256)
     @original_entry.update(update)
-
     Librato.increment("entry.update")
   end
 
   def significant_change?(current_content, new_content)
     return false if current_content.empty?
+    return false if current_content == new_content
 
     original_length = Sanitize.fragment(current_content).length
     new_length = Sanitize.fragment(new_content).length
