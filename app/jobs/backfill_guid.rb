@@ -10,6 +10,7 @@ class BackfillGuid
       hash[entry.id] = guid(entry)
     end
     Entry.update_multiple(column: :guid, data: data)
+  rescue ActiveRecord::RecordNotFound
   end
 
   def build
