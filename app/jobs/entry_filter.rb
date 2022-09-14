@@ -55,12 +55,16 @@ class EntryFilter
       end
     end
 
-    new_entries = []
+    new_entries = nil
     database_fingerprint_results = new_fingerprints.each_with_object([]) do |(key, value), array|
       key = key.sub("f:", "")
       old_value = old_database_fingerprints[key]
       if !old_database_fingerprints.key?(key)
-        new_entries.push(key)
+
+        if new_entries.nil?
+          new_entries = {public_id: key, title: entry.title, published: entry.published&.iso8601}
+        end
+
         array.push(:new)
       elsif old_value != value
         array.push(:updated)
@@ -81,7 +85,7 @@ class EntryFilter
     end
 
 
-    mismatch = (fingerprint_results.tally[:new] != database_fingerprint_results.tally[:new]) ? new_entries.join(", ") : ""
+    mismatch = (fingerprint_results.tally[:new].nil? && database_fingerprint_results.tally[:new].present?) ? new_entries : "none"
 
     Sidekiq.logger.info "fingerprint_results=#{fingerprint_results.tally} database_fingerprint_results=#{database_fingerprint_results.tally}  length_results=#{length_results.tally} mismatch=#{mismatch}"
 
