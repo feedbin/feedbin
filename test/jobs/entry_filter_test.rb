@@ -1,6 +1,9 @@
 require "test_helper"
 
 class EntryFilterTest < ActiveSupport::TestCase
+  setup do
+    @feed = Feed.first
+  end
 
   def test_should_get_new_entries
     entries = sample_entries
@@ -15,12 +18,14 @@ class EntryFilterTest < ActiveSupport::TestCase
     entries = sample_entries
     $redis[:refresher].with do |connection|
       entries.each do |entry|
+        data = entry.to_entry
+        data[:fingerprint] = SecureRandom.hex
+        @feed.entries.create!(data)
         connection.set(entry.public_id, 1000)
       end
     end
 
     filter = EntryFilter.new(entries)
-    filter.fingerprint_entries
     results = filter.filter
     assert_equal entries.length, results.length
 
@@ -33,7 +38,9 @@ class EntryFilterTest < ActiveSupport::TestCase
     entries = sample_entries
     $redis[:refresher].with do |connection|
       entries.each do |entry|
-        connection.set(entry.public_id, 1000)
+        data = entry.to_entry
+        data[:fingerprint] = SecureRandom.hex
+        @feed.entries.create!(data)
       end
     end
 
@@ -41,7 +48,20 @@ class EntryFilterTest < ActiveSupport::TestCase
     assert_equal 0, results.length
   end
 
-  def test_should_ignore_existing_entries
+  def test_should_ignore_existing_entries_database
+    entries = sample_entries
+    $redis[:refresher].with do |connection|
+      entries.each do |entry|
+        @feed.entries.create!(entry.to_entry)
+      end
+    end
+
+    filter = EntryFilter.new(entries)
+    results = filter.filter
+    assert_equal 0, results.length
+  end
+
+  def test_should_ignore_existing_entries_cache
     entries = sample_entries
     $redis[:refresher].with do |connection|
       entries.each do |entry|
@@ -50,7 +70,6 @@ class EntryFilterTest < ActiveSupport::TestCase
     end
 
     filter = EntryFilter.new(entries)
-    filter.fingerprint_entries
     results = filter.filter
     assert_equal 0, results.length
   end
@@ -65,28 +84,16 @@ class EntryFilterTest < ActiveSupport::TestCase
     assert_equal 2, results.length
   end
 
-  def test_should_ignore_content_length_one
-    entries = sample_entries
-    $redis[:refresher].with do |connection|
-      entries.each do |entry|
-        connection.set(entry.public_id, 1)
-      end
-    end
-
-    results = EntryFilter.filter!(entries)
-    assert_equal 0, results.length
-  end
-
   private
 
   def sample_entries(published: Time.now)
-    entry = OpenStruct.new(
+    data = {
       public_id: SecureRandom.hex,
       content: SecureRandom.hex,
       published: published,
       fingerprint: SecureRandom.hex,
-      to_entry: {data: SecureRandom.hex}
-    )
-    [entry]
+    }
+    data[:to_entry] = data.clone
+    [OpenStruct.new(data)]
   end
 end

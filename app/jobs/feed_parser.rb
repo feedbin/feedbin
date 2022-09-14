@@ -16,8 +16,6 @@ class FeedParser
     clear_feed_status!
 
     Sidekiq.logger.info "FeedParser feed=#{feed.inspect}"
-
-    updates = filter.fingerprint_entries
   rescue Feedkit::NotFeed => exception
     Sidekiq.logger.info "Feedkit::NotFeed: id=#{@feed_id} url=#{@feed_url}"
     record_feed_error!(exception)

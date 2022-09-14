@@ -16,16 +16,13 @@ class FeedRefresherReceiver
     items.each do |item|
       entry = entries[item["public_id"]]
       update = item.delete("update")
-      if entry && update == true
+      if entry
         EntryUpdate.create!(item, entry)
-        cache_public_id(item)
-      elsif entry
-        cache_public_id(item)
       else
         create_entry(item, feed)
       end
     rescue ActiveRecord::RecordNotUnique
-      cache_public_id(item)
+      # Ignore
     rescue => exception
       unless exception.message =~ /Validation failed/i
         message = update ? "update" : "create"
@@ -34,6 +31,7 @@ class FeedRefresherReceiver
           error_message: "Entry #{message} failed",
           parameters: {feed_id: feed.id, item: item, exception: exception, backtrace: exception.backtrace}
         )
+        Sidekiq.logger.info "Entry Error: feed=#{feed.id} exception=#{exception.inspect}"
       end
     end
   end
@@ -49,11 +47,8 @@ class FeedRefresherReceiver
       else
         Librato.increment("entry.thread")
       end
+      Sidekiq.logger.info "Creating entry=#{item["public_id"]}"
     end
-  end
-
-  def cache_public_id(item)
-    FeedbinUtils.update_public_id_cache(item["public_id"], item["content"], item.dig("data", "public_id_alt"))
   end
 
   def alternate_exists?(item)
@@ -74,6 +69,8 @@ class EntryUpdate
   end
 
   def create
+    Sidekiq.logger.info "Updating entry=#{@original_entry.public_id}"
+
     update = @updated_data.slice("author", "content", "title", "url", "entry_id", "data", "fingerprint")
 
     update["summary"] = ContentFormatter.summary(update["content"], 256)

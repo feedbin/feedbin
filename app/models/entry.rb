@@ -15,7 +15,7 @@ class Entry < ApplicationRecord
   before_create :update_content
   before_create :tweet_metadata
   before_update :create_summary
-  after_commit :cache_public_id, on: :create
+  after_commit :cache_public_id, on: [:create, :update]
   after_commit :find_images, on: :create
   after_commit :mark_as_unread, on: :create
   after_commit :mark_as_unplayed, on: :create
