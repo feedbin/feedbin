@@ -25,8 +25,7 @@ class EntryFilterTest < ActiveSupport::TestCase
       end
     end
 
-    filter = EntryFilter.new(entries)
-    results = filter.filter
+    results = EntryFilter.filter!(entries)
     assert_equal entries.length, results.length
 
     results.each do |entry|
@@ -56,8 +55,7 @@ class EntryFilterTest < ActiveSupport::TestCase
       end
     end
 
-    filter = EntryFilter.new(entries)
-    results = filter.filter
+    results = EntryFilter.filter!(entries)
     assert_equal 0, results.length
   end
 
@@ -69,8 +67,7 @@ class EntryFilterTest < ActiveSupport::TestCase
       end
     end
 
-    filter = EntryFilter.new(entries)
-    results = filter.filter
+    results = EntryFilter.filter!(entries)
     assert_equal 0, results.length
   end
 

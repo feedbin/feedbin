@@ -5,45 +5,32 @@ class FeedParser
   def perform(feed_id, feed_url, path, encoding = nil)
     @feed_id = feed_id
     @feed_url = feed_url
-    @path = path
-    @encoding = encoding
 
-    filter = EntryFilter.new(parsed_feed.entries)
-    entries = filter.filter
+    parsed = Feedkit::Parser.parse!(
+      File.read(path, binmode: true),
+      url: @feed_url,
+      encoding: encoding
+    )
 
-    feed = parsed_feed.to_feed
-    save(feed, entries)
-    clear_feed_status!
-
-    Sidekiq.logger.info "FeedParser feed=#{feed.inspect}"
+    entries = EntryFilter.filter!(parsed.entries)
+    save(feed: parsed.to_feed, entries: entries)
   rescue Feedkit::NotFeed => exception
-    Sidekiq.logger.info "Feedkit::NotFeed: id=#{@feed_id} url=#{@feed_url}"
     record_feed_error!(exception)
   ensure
-    cleanup
+    File.unlink(path) rescue Errno::ENOENT
   end
 
   private
 
-  def parsed_feed
-    @parsed_feed ||= begin
-      body = File.read(@path, binmode: true)
-      Feedkit::Parser.parse!(body, url: @feed_url, encoding: @encoding)
-    end
-  end
-
-  def cleanup
-    File.unlink(@path) rescue Errno::ENOENT
-  end
-
-  def save(feed, entries)
+  def save(feed:, entries:)
     FeedRefresherReceiver.perform_async({
       "feed" => feed.merge({"id" => @feed_id}),
       "entries" => entries
     })
+    clear_feed_errors!
   end
 
-  def clear_feed_status!
+  def clear_feed_errors!
     Sidekiq::Client.push(
       "args" => [@feed_id],
       "class" => "Crawler::Refresher::FeedStatusUpdate",
@@ -58,6 +45,7 @@ class FeedParser
       "class" => "Crawler::Refresher::FeedStatusUpdate",
       "queue" => "feed_downloader_critical"
     )
+    Sidekiq.logger.info "Feedkit::NotFeed: id=#{@feed_id} url=#{@feed_url}"
   end
 end
 
