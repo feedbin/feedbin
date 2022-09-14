@@ -35,7 +35,7 @@ module BatchJobs
   end
 
   def add_to_queue(queue, id)
-    Sidekiq.redis { |redis| redis.sadd(queue, id) }
+    Sidekiq.redis { |redis| redis.sadd?(queue, id) }
   end
 
   def dequeue_ids(queue)
