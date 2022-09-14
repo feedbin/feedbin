@@ -12,7 +12,7 @@ class FeedParser
     entries = filter.filter
 
     feed = parsed_feed.to_feed
-    save(feed, entries) unless entries.empty?
+    save(feed, entries)
     clear_feed_status!
 
     Sidekiq.logger.info "FeedParser feed=#{feed.inspect}"
