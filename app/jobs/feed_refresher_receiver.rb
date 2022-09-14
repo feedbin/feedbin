@@ -80,13 +80,14 @@ class EntryUpdate
 
     if current_content.present? && @original_entry.original.nil?
       update["original"] = {
-        "author"    => @original_entry.author,
-        "content"   => @original_entry.content,
-        "title"     => @original_entry.title,
-        "url"       => @original_entry.url,
-        "entry_id"  => @original_entry.entry_id,
-        "published" => @original_entry.published,
-        "data"      => @original_entry.data
+        "author"      => @original_entry.author,
+        "content"     => @original_entry.content,
+        "title"       => @original_entry.title,
+        "url"         => @original_entry.url,
+        "entry_id"    => @original_entry.entry_id,
+        "published"   => @original_entry.published,
+        "data"        => @original_entry.data,
+        "fingerprint" => @original_entry.fingerprint,
       }
     end
 
