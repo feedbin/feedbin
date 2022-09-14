@@ -4,12 +4,14 @@
     <% present page_feed do |feed_presenter| %>
         <%= content_tag :li, class: "collection-pages", data: {feed_id: page_feed.id } do %>
             <%= feed_presenter.feed_link(link: pages_feed_path(page_feed), behavior: "selectable show_entries open_item feed_link") do %>
-                <%= feed_presenter.favicon(page_feed) %>
-                <span class="collection-label-wrap" >
-                    <span class="collection-label">Pages</span>
-                </span>
-                <span class="count-wrap">
-                    <%= content_tag :span, "", class: "count", data: {behavior: "needs_count", count_group: "byFeed", count_group_id: page_feed.id} %>
+                <span class="link-inner">
+                    <%= feed_presenter.favicon(page_feed) %>
+                    <span class="collection-label-wrap" >
+                        <span class="collection-label">Pages</span>
+                    </span>
+                    <span class="count-wrap">
+                        <%= content_tag :span, "", class: "count", data: {behavior: "needs_count", count_group: "byFeed", count_group_id: page_feed.id} %>
+                    </span>
                 </span>
             <% end %>
         <% end %>
@@ -18,9 +20,6 @@
 
 <% if saved_searches.present? %>
     <li class="source-section section-saved-searches">
-        <span class="favicon-wrap collection-favicon">
-            <%= svg_tag "favicon-saved-search", size: "16x16" %>
-        </span>
         Searches
     </li>
     <%= render partial: "saved_searches/saved_search", collection: saved_searches %>
@@ -28,9 +27,6 @@
 
 <% if tags.present? %>
     <li class="source-section section-tags">
-        <span class="favicon-wrap collection-favicon">
-            <%= svg_tag "favicon-tag", size: "16x16" %>
-        </span>
         Tags
     </li>
     <%= render partial: "tags/tag", collection: tags %>
@@ -38,9 +34,6 @@
 
 <% if feeds.present? %>
     <li class="source-section section-feeds">
-        <span class="favicon-wrap collection-favicon">
-            <%= svg_tag "favicon-feeds", size: "16x16" %>
-        </span>
         Feeds
     </li>
     <%= render partial: "feeds/feed", collection: feeds, cached: -> (feed) { [feed, feed.favicon, "v2"] } %>

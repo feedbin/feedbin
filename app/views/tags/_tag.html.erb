@@ -10,21 +10,21 @@
                 settings_path: edit_tag_path(tag)
             } do
         %>
-            <span class="favicon-wrap collection-favicon">
-                <%= svg_tag "favicon-tag", size: "15x15" %>
-            </span>
-            <%= form_for @user, url: view_settings_update_user_path(@user), remote: 'true', html: { class: 'tag-visibility-control', data: {behavior: "toggle_drawer feed_action_parent"} } do |f| %>
-                <%= hidden_field_tag 'tag_visibility', 'tag_visibility' %>
-                <%= hidden_field_tag 'tag', tag.id %>
-                <%= f.button class: "feed-action-button", data: { behavior: 'feed_action' } do %>
-                    <%= svg_tag "icon-caret", size: "12x7" %>
+            <span class="link-inner">
+                <div style="height: 20px; width: 0;"></div>
+                <%= form_for @user, url: view_settings_update_user_path(@user), remote: 'true', html: { class: 'tag-visibility-control', data: {behavior: "toggle_drawer feed_action_parent"} } do |f| %>
+                    <%= hidden_field_tag 'tag_visibility', 'tag_visibility' %>
+                    <%= hidden_field_tag 'tag', tag.id %>
+                    <%= f.button class: "feed-action-button feed-action-expand", data: { behavior: 'feed_action' } do %>
+                        <%= svg_tag "icon-caret", size: "12x7" %>
+                    <% end %>
                 <% end %>
-            <% end %>
-            <span class="collection-label-wrap" data-behavior="rename_target" data-form-action="<%= tag_path(tag) %>" data-input-name="tag[name]" data-title="<%= tag.name %>", data-original-title="<%= tag.name %>">
-                <span class="collection-label" data-behavior="rename_title"><%= tag.name %></span>
-            </span>
-            <span class="count-wrap">
-                <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byTag', count_group_id: tag.id} %>
+                <span class="collection-label-wrap" data-behavior="rename_target" data-form-action="<%= tag_path(tag) %>" data-input-name="tag[name]" data-title="<%= tag.name %>", data-original-title="<%= tag.name %>">
+                    <span class="collection-label" data-behavior="rename_title"><%= tag.name %></span>
+                </span>
+                <span class="count-wrap">
+                    <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byTag', count_group_id: tag.id} %>
+                </span>
             </span>
         <% end %>
         <div class="drawer feed-drawer" data-behavior="feed_drawer expandable">

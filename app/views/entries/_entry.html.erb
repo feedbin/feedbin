@@ -1,43 +1,45 @@
 <% present entry do |entry_presenter| %>
     <%= entry_presenter.entry_summary do %>
         <%= entry_presenter.entry_link do %>
-            <div class="feed-title-inline">
-                <%= entry_presenter.profile_image %>
-                <%= entry_presenter.feed_title %>
-            </div>
-            <div class="title-wrap">
-                <%= entry_presenter.profile_image %>
-                <div class="title"><%= entry_presenter.title %></div>
-            </div>
-            <div class="summary-content">
-                <%= entry_presenter.feed_title %>
-                <%= entry_presenter.summary %>
-                <%= entry_presenter.quoted_tweet %>
+            <div class="entry-summary-inner">
+                <div class="feed-title-inline">
+                    <%= entry_presenter.profile_image %>
+                    <%= entry_presenter.feed_title %>
+                </div>
+                <div class="title-wrap">
+                    <%= entry_presenter.profile_image %>
+                    <div class="title"><%= entry_presenter.title %></div>
+                </div>
+                <div class="summary-content">
+                    <%= entry_presenter.feed_title %>
+                    <%= entry_presenter.summary %>
+                    <%= entry_presenter.quoted_tweet %>
 
-                <% if entry.link_preview? %>
-                    <div class="link-preview">
-                        <%= entry_presenter.image entry.tweet_link_image %>
-                        <div class="link-preview-content">
-                            <div class="light"><%= entry_presenter.tweet_link_title %></div>
-                            <div class="link-host extra-light"><%= entry_presenter.tweet_link_host %></div>
+                    <% if entry.link_preview? %>
+                        <div class="link-preview">
+                            <%= entry_presenter.image entry.tweet_link_image %>
+                            <div class="link-preview-content">
+                                <div class="light"><%= entry_presenter.tweet_link_title %></div>
+                                <div class="link-host extra-light"><%= entry_presenter.tweet_link_host %></div>
+                            </div>
                         </div>
+                    <% end %>
+
+                    <%= entry_presenter.attached_image %>
+
+                    <div class="summary-status light">
+                        <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: "time timeago") %>
+                        <%= svg_tag "icon-retweet", class: "light" %>
+                        <%= svg_tag "icon-media", class: "light" %>
+                        <%= svg_tag "icon-star-on" %>
                     </div>
-                <% end %>
-
-                <%= entry_presenter.attached_image %>
-
-                <div class="summary-status light">
+                </div>
+                <div class="summary-status summary-status-inline light">
                     <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: "time timeago") %>
                     <%= svg_tag "icon-retweet", class: "light" %>
                     <%= svg_tag "icon-media", class: "light" %>
                     <%= svg_tag "icon-star-on" %>
                 </div>
-            </div>
-            <div class="summary-status summary-status-inline light">
-                <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: "time timeago") %>
-                <%= svg_tag "icon-retweet", class: "light" %>
-                <%= svg_tag "icon-media", class: "light" %>
-                <%= svg_tag "icon-star-on" %>
             </div>
         <% end %>
         <div class="summary-menu dropdown-wrap dropdown-right">

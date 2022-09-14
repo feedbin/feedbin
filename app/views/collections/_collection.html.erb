@@ -1,19 +1,21 @@
-<%= content_tag :li, class: collection[:parent_class], data: collection[:parent_data] do %>
+<%= content_tag :li, class: "#{collection[:parent_class]} collection-source", data: collection[:parent_data] do %>
     <%= link_to collection[:path], remote: true, class: 'feed-link', data: collection[:data] do %>
-        <span class="favicon-wrap collection-favicon">
-            <%= svg_tag collection[:favicon_class] %>
-            <% if collection[:favicon_alt_class] %>
-                <%= svg_tag collection[:favicon_alt_class] %>
+        <span class="link-inner">
+            <span class="favicon-wrap collection-favicon">
+                <%= svg_tag collection[:favicon_class] %>
+                <% if collection[:favicon_alt_class] %>
+                    <%= svg_tag collection[:favicon_alt_class] %>
+                <% end %>
+            </span>
+            <span class="collection-label-wrap"><%= collection[:title] %></span>
+            <span class="count-wrap">
+                <%= content_tag :span, '', class: 'count', data: collection[:count_data] %>
+            </span>
+            <% if collection[:clear] %>
+                <%= form_tag collection[:clear][:path], remote: true, method: :delete, class: 'feed-action-form clear-form', data: {behavior: "feed_action_parent"} do |f| %>
+                    <%= submit_tag "clear", class: 'feed-action-button feed-action-clear', data: { confirm: collection[:clear][:message], behavior: "feed_action" } %>
+                <% end %>
             <% end %>
         </span>
-        <span class="collection-label-wrap"><%= collection[:title] %></span>
-        <span class="count-wrap">
-            <%= content_tag :span, '', class: 'count', data: collection[:count_data] %>
-        </span>
-        <% if collection[:clear] %>
-            <%= form_tag collection[:clear][:path], remote: true, method: :delete, class: 'feed-action-form clear-form', data: {behavior: "feed_action_parent"} do |f| %>
-                <%= submit_tag "clear", class: 'feed-action-button', data: { confirm: collection[:clear][:message], behavior: "feed_action" } %>
-            <% end %>
-        <% end %>
     <% end %>
 <% end %>

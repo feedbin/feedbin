@@ -2159,17 +2159,6 @@ $hamburger-dot: 4px;
       &.tag > .rename-form .rename-feed-input {
         left: 40px;
       }
-      &.source-section,
-      &.collection-unread .feed-link,
-      &.collection-all .feed-link,
-      &.collection-starred .feed-link,
-      &.collection-recently-played .feed-link,
-      &.collection-updated .feed-link,
-      &.collection-recently-read .feed-link,
-      &.collection-pages .feed-link,
-      &.collection-queued-entries .feed-link {
-        padding-left: 16px;
-      }
       .count-wrap {
         margin-left: 8px;
         text-overflow: ellipsis;
@@ -2199,7 +2188,7 @@ $hamburger-dot: 4px;
         right: 0;
         top: 0;
         bottom: 0;
-        .feed-action-button {
+        .feed-action-clear {
           font-weight: bold;
           @include color($color-contrast-400);
           @include font-size(12);
@@ -2220,17 +2209,14 @@ $hamburger-dot: 4px;
         display: none;
       }
       &.selected {
-        .feed-action-button {
+        .feed-action-clear {
           @include color(white);
         }
         .clear-form {
           display: block;
         }
       }
-      /* link padding + favicon outerwidth */
-      $tag-offset: 16px + 26px;
       .tag-link {
-        padding-left: $tag-offset;
         position: relative;
       }
       &.tag {
@@ -2239,8 +2225,10 @@ $hamburger-dot: 4px;
           opacity: 0;
         }
         .icon-caret {
-          @include fill($color-icons);
+          @include fill($color-contrast-500);
           transform: rotate(-90deg);
+          position: relative;
+          left: -3px;
         }
         &.open {
           .drawer {
@@ -2263,24 +2251,23 @@ $hamburger-dot: 4px;
       .tag-visibility-control {
         padding: 0;
         margin: 0;
-        .feed-action-button {
+        .feed-action-expand {
+          padding: 0;
           position: absolute;
-          width: $tag-offset;
           top: 0;
           left: 0;
           bottom: 0;
           display: flex;
           align-items: center;
-          justify-content: flex-start;
+          justify-content: center;
           appearance: none;
           background: none;
           border: none;
-          padding: 0 0 0 20px;
           margin: 0;
         }
       }
       &.selected {
-        .feed-action-button {
+        .feed-action-expand {
           svg {
             @include fill(white);
           }
@@ -2297,7 +2284,7 @@ $hamburger-dot: 4px;
         .count {
           display: none;
         }
-        .feed-link {
+        .feed-link .link-inner {
           background-color: transparent !important;
           .rename-feed-input {
             color: white !important;
@@ -2335,7 +2322,7 @@ $hamburger-dot: 4px;
 
 .feeds:not(.dragging) .selected {
   > a .count {
-    color: white;
+    @include color($color-selected-muted);
   }
   input[disabled] {
     color: rgba(255, 255, 255, 0.9);
@@ -2345,7 +2332,7 @@ $hamburger-dot: 4px;
   }
 }
 
-.feeds:not(.dragging) .selected > a {
+.feeds:not(.dragging) .selected > a .link-inner {
   @include background-color($color-selected-off);
   color: white !important;
   .rename-feed-input {
@@ -2356,7 +2343,7 @@ $hamburger-dot: 4px;
   }
 }
 
-.selected .feeds:not(.dragging) .selected > a {
+.selected .feeds:not(.dragging) .selected > a .link-inner {
   @include background($color-selected);
   &:hover {
     @include background($color-selected);
@@ -2386,23 +2373,14 @@ $hamburger-dot: 4px;
 
 .feed-list {
   li {
-    padding: 0;
-    margin: 0;
     position: relative;
     z-index: 0;
 
-    .feed-link,
-    &.feed-link,
-    &.source-section {
+    .link-inner, &.source-section {
       @include font-size(14);
       @include color($color-contrast-600);
-      @include size-in-rems(padding-top, 6) @include
-        size-in-rems(padding-bottom, 6) &.tag-link {
-        @include size-in-rems(padding-top, 7) @include
-          size-in-rems(padding-bottom, 7);
-      }
-      padding-left: 40px;
-      padding-right: 16px;
+      @include size-in-rems(padding-top, 6)
+      @include size-in-rems(padding-bottom, 6)
       .favicon-wrap {
         margin-right: 6px;
         flex-shrink: 0;
@@ -2426,8 +2404,9 @@ $hamburger-dot: 4px;
       }
     }
     &.source-section {
-      @include font-size(15);
-      @include size-in-rems(padding-top, 22) @include color($color-contrast-600);
+      @include font-size(12);
+      @include size-in-rems(padding-top, 22);
+      @include color($color-contrast-500);
       font-weight: bold;
       display: flex;
       align-items: center;
@@ -2438,8 +2417,7 @@ $hamburger-dot: 4px;
         display: none;
       }
     }
-    .feed-link,
-    &.feed-link, .link-inner {
+    .link-inner {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -2447,7 +2425,36 @@ $hamburger-dot: 4px;
       display: block;
       align-items: center;
       display: flex;
+      border-radius: 4px;
     }
+  }
+
+  $outer-padding: 8px;
+  $inner-padding: 8px;
+  $favicon-width: 26px; /* width + margin */
+  $favicon-padding: 2px;
+
+  .feed-link {
+    display: flex;
+    padding: 0 $outer-padding;
+  }
+  .source-section {
+    padding-left: $outer-padding + $inner-padding + $favicon-padding;
+    padding-right: $outer-padding + $inner-padding;
+  }
+  .link-inner {
+    padding-left: $inner-padding + $favicon-width - $favicon-padding;
+    padding-right: $inner-padding;
+  }
+  .tag-link .link-inner {
+    padding-left: $inner-padding + $favicon-width;
+  }
+  .collection-source .link-inner {
+    padding-left: $inner-padding;
+  }
+  .feed-action-expand {
+    padding-left: $outer-padding + $inner-padding !important;
+    width: $favicon-width + $outer-padding + $inner-padding;
   }
 }
 
@@ -2565,9 +2572,9 @@ li.selected > a .favicon-wrap,
   background: transparent !important;
   box-shadow: none;
   svg {
-    @include fill($color-icons);
-    li.selected > .feed-link &,
-    li.selected.feed-link &,
+    @include fill($color-contrast-500);
+    li.selected > .feed-link .link-inner &,
+    li.selected.feed-link .link-inner &,
     .entries li.selected & {
       fill: white;
     }
@@ -2763,9 +2770,12 @@ li.selected > a .favicon-wrap,
   display: block;
   line-height: 1.3;
   @include font-size(14);
-  @include size-in-rems(padding, 12 16px 12 16) @include
-    color($color-contrast-600);
+  @include size-in-rems(padding, 8 8px 0 8px)
+  @include color($color-contrast-600);
   text-decoration: none !important;
+  .entry-summary-inner {
+    @include size-in-rems(padding, 8 8px 8 8px)
+  }
   .title-wrap {
     display: flex;
     margin-bottom: $margin;
@@ -3010,7 +3020,8 @@ $feed-title-width: 115px;
   }
 }
 
-.entry-summary.selected .entry-summary-link {
+.entry-summary.selected .entry-summary-inner {
+  border-radius: 4px;
   @include color(white);
   @include background-color($color-selected-off);
   .light,
@@ -5495,7 +5506,7 @@ img.responsive {
     overflow-y: scroll;
     max-height: 60vh;
   }
-  li.feed-link,
+  li.feed-link .link-inner,
   li.source-section {
     padding-left: 16px;
   }
@@ -8926,7 +8937,7 @@ Media Queries
 }
 
 .has-offscreen-panels.touch {
-  .feeds ul li .feed-link {
+  .feeds ul li .feed-link .link-inner {
     @include font-size(16);
     padding-top: 11px;
     padding-bottom: 11px;
