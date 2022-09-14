@@ -6,7 +6,7 @@ class Favicon < ApplicationRecord
   after_commit :touch_owners
 
   def touch_owners
-    Feed.where(host: host).update_all(updated_at: Time.now)
+    TouchFeeds.perform_async(host)
   end
 
   def data
