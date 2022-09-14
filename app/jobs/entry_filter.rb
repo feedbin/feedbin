@@ -37,6 +37,7 @@ class EntryFilter
 
     new_fingerprints = {}
     new_lengths = {}
+    old_database_fingerprints = Entry.where(public_id: candidates.map(&:public_id)).pluck(Arel.sql("public_id, REPLACE(fingerprint::text, '-', '')")).to_h
 
     candidates.each do |entry|
       new_fingerprints["f:#{entry.public_id}"] = entry.fingerprint
@@ -45,6 +46,17 @@ class EntryFilter
 
     fingerprint_results = new_fingerprints.each_with_object([]) do |(key, value), array|
       old_value = old_fingerprints[key]
+      if old_value.nil?
+        array.push(:new)
+      elsif old_value != value
+        array.push(:updated)
+      else
+        array.push(:unchanged)
+      end
+    end
+
+    database_fingerprint_results = new_fingerprints.each_with_object([]) do |(key, value), array|
+      old_value = old_database_fingerprints[key.sub("f:", "")]
       if old_value.nil?
         array.push(:new)
       elsif old_value != value
@@ -65,7 +77,7 @@ class EntryFilter
       end
     end
 
-    Sidekiq.logger.info "fingerprint_results=#{fingerprint_results.tally} length_results=#{length_results.tally}"
+    Sidekiq.logger.info "fingerprint_results=#{fingerprint_results.tally} database_fingerprint_results=#{database_fingerprint_results.tally}  length_results=#{length_results.tally}"
 
     return if new_fingerprints.empty?
 
