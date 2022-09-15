@@ -69,7 +69,6 @@ class EntryUpdate
   end
 
   def create
-    Sidekiq.logger.info "Updating entry=#{@original_entry.public_id}"
 
     update          = @updated_data.slice("author", "content", "title", "url", "entry_id", "data", "fingerprint")
     current_content = @original_entry.content.to_s.clone
@@ -94,7 +93,16 @@ class EntryUpdate
       Librato.increment("entry.change", source: "small")
     end
 
+    changes = update.each_with_object([]) do |(attribute, value), array|
+      if value != @original_entry.public_send(attribute)
+        array.push(attribute)
+      end
+    end
+
+    Sidekiq.logger.info "Updating entry=#{@original_entry.public_id} changes=#{changes.join(",")}"
+
     @original_entry.update(update)
+
     Librato.increment("entry.update")
   end
 
