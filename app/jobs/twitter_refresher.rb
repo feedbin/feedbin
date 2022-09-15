@@ -3,6 +3,10 @@ class TwitterRefresher
   sidekiq_options queue: :twitter_refresher, retry: false
 
   def perform(feed_id, feed_url, keys)
+    f = Feed.find(feed_id)
+
+    Sidekiq.logger.info "id=#{f.id}"
+
     feed = nil
 
     recognized_url = Feedkit::TwitterURLRecognizer.new(feed_url, nil)
