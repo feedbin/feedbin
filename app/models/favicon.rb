@@ -6,7 +6,7 @@ class Favicon < ApplicationRecord
   after_commit :touch_owners
 
   def touch_owners
-    TouchFeeds.perform_async(host)
+    TouchFeeds.perform_in(rand(1..10).seconds, host) if saved_change_to_attribute?(:url)
   end
 
   def data
