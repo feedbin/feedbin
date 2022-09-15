@@ -15,6 +15,9 @@ class FeedParser
     filter = EntryFilter.new(parsed.entries)
     save(feed: parsed.to_feed, entries: filter.filter)
     Sidekiq.logger.info "FeedParser: stats=#{filter.stats} url=#{@feed_url} feed_id=#{@feed_id}"
+    filter.stats.each do |stat, count|
+      Librato.increment("feed.parser", source: stat, by: count)
+    end
   rescue Feedkit::NotFeed => exception
     record_feed_error!(exception)
   ensure

@@ -89,6 +89,9 @@ class EntryUpdate
           "fingerprint" => @original_entry.fingerprint,
         }
       end
+      Librato.increment("entry.change", source: "large")
+    else
+      Librato.increment("entry.change", source: "small")
     end
 
     @original_entry.update(update)
