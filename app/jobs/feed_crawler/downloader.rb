@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module FeedCrawler
   class Downloader
     include Sidekiq::Worker

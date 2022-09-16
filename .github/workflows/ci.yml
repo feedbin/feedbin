@@ -51,10 +51,6 @@ jobs:
           # Node setup
           curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 
-          # Install pigo
-          wget --quiet --output-document - https://github.com/esimov/pigo/releases/download/v1.4.5/pigo-1.4.5-linux-amd64.tar.gz | tar --extract --gunzip --directory=/tmp/
-          sudo mv /tmp/pigo-1.4.5-linux-amd64/pigo /usr/local/bin/
-
           sudo apt-get update
 
           sudo apt-get install --quiet --yes \
@@ -75,14 +71,16 @@ jobs:
           sudo sed -e '/UseParNewGC/ s/^#*/#/g' -i /usr/share/elasticsearch/bin/elasticsearch.in.sh
           sudo systemctl start elasticsearch
 
+          # Install chromedriver
           major_version=$(google-chrome --version | awk '{print $NF}' | awk --field-separator "." '{ print $1 }')
           chromedriver_version=$(curl "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${major_version}")
           wget --quiet "https://chromedriver.storage.googleapis.com/${chromedriver_version}/chromedriver_linux64.zip" --output-document /tmp/chromedriver.zip
           unzip /tmp/chromedriver.zip -d /tmp/
           sudo mv /tmp/chromedriver /usr/local/bin/
 
-          sudo wget --quiet "https://feedbin-ci.s3.amazonaws.com/kindlegen/kindlegen" --output-document /usr/local/bin/kindlegen
-          sudo chmod +x /usr/local/bin/kindlegen
+          # Install pigo
+          wget --quiet --output-document - https://github.com/esimov/pigo/releases/download/v1.4.5/pigo-1.4.5-linux-amd64.tar.gz | tar --extract --gunzip --directory=/tmp/
+          sudo mv /tmp/pigo-1.4.5-linux-amd64/pigo /usr/local/bin/
 
           sudo systemctl status elasticsearch
 

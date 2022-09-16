@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module FeedCrawler
   class Redirect
     PERMANENT_REDIRECTS = [301, 308].to_set.freeze
