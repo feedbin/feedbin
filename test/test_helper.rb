@@ -18,17 +18,6 @@ StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
 WebMock.disable_net_connect!(allow_localhost: true, allow: "codeclimate.com")
 Sidekiq.logger.level = Logger::WARN
 
-# Patch kwargs issue
-module StripeMock
-  def self.alias_stripe_method(new_name, method_object)
-    Stripe::StripeClient.active_client.define_singleton_method(new_name) {|*args|
-      kwargs = (args.count == 3) ? args.pop : {}
-      method_object.call(*args, **kwargs)
-    }
-  end
-end
-
-
 unless ENV["CI"]
   socket = Socket.new(:INET, :STREAM, 0)
   socket.bind(Addrinfo.tcp("127.0.0.1", 0))
