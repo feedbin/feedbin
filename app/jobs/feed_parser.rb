@@ -32,7 +32,12 @@ class FeedParser
   def check_for_changes?
     return @check_for_changes if defined?(@check_for_changes)
     last_check = @feed.last_change_check
-    return true if last_check.nil?
+
+    if last_check.nil?
+      @check_for_changes = true
+      return @check_for_changes
+    end
+
     random_timeout = rand(12..24).hours.ago
     @check_for_changes = last_check.before?(random_timeout)
   end
