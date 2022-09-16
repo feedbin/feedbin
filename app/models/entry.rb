@@ -472,9 +472,9 @@ class Entry < ApplicationRecord
   end
 
   def find_images
-    EntryImage.perform_async(public_id)
+    ImageCrawler::EntryImage.perform_async(public_id)
     if data && data["itunes_image"]
-      ItunesImage.perform_async(public_id)
+      ImageCrawler::ItunesImage.perform_async(public_id)
     end
   end
 

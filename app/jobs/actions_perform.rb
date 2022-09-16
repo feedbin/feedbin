@@ -59,7 +59,7 @@ class ActionsPerform
 
   def send_ios_notification(user_ids)
     if Sidekiq::Queue.new("images").size > 10
-      job = EntryImage.new
+      job = ImageCrawler::EntryImage.new
       job.entry = @entry
       if job_args = job.build_job
         ImageCrawler::FindImageCritical.perform_async(*job_args)
