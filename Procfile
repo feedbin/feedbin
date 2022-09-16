@@ -1,6 +1,2 @@
-feedbin_core:     env DB_POOL=2 LIBRATO_AUTORUN=1 bundle exec sidekiq -c 2 -q critical,4 -q feed_refresher_receiver,3 -q default,2
-feedbin_slow:     env DB_POOL=2 bundle exec sidekiq -c 2 -q worker_slow_critical,2 -q worker_slow,1
-feedbin_network:  env DB_POOL=2 bundle exec sidekiq -c 2 -q search,2 -q low,1
-feedbin_parser:   env DB_POOL=1 bundle exec sidekiq --concurrency 1  --queue feed_parser_critical_$HOSTNAME,2  --queue feed_parser_$HOSTNAME
-feedbin_twitter:  env DB_POOL=2 bundle exec sidekiq --concurrency 2  --queue twitter_refresher_critical,2  --queue twitter_refresher
-clock:           bundle exec clockwork lib/clock.rb
+feedbin_clock: bundle exec clockwork lib/clock.rb
+feedbin_jobs: DB_POOL=10 bundle exec sidekiq --concurrency 10 --queue critical,4 --queue default,2 --queue feed_downloader --queue feed_downloader_critical,2 --queue feed_parser_$HOSTNAME --queue feed_parser_critical_$HOSTNAME,2 --queue feed_refresher_receiver,3 --queue image_parallel --queue image_parallel_$HOSTNAME --queue image_parallel_critical,2 --queue image_serial_$HOSTNAME --queue image_serial_critical_$HOSTNAME,2 --queue low,1 --queue search,2 --queue twitter_refresher --queue twitter_refresher_critical,2 --queue worker_slow,1 --queue worker_slow_critical,2

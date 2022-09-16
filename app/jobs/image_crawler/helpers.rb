@@ -1,19 +1,11 @@
 module ImageCrawler
   module Helpers
-    AWS_S3_BUCKET_IMAGES = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
     CASCADE = Rails.root.join("lib/cascade/facefinder")
     PIGO = ENV["PIGO_PATH"] || `which pigo`.chomp
     puts "Pigo missing. Add it to your path or set ENV['PIGO_PATH']. From https://github.com/esimov/pigo" unless File.executable?(PIGO)
 
-    STORAGE_OPTIONS = {
-      provider: "AWS",
-      aws_access_key_id: ENV["AWS_ACCESS_KEY_ID"],
-      aws_secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"]
-    }
-    STORAGE_OPTIONS[:region] = ENV["AWS_S3_REGION"] if ENV["AWS_S3_REGION"]
-    STORAGE_OPTIONS[:host] = ENV["AWS_S3_HOST"] if ENV["AWS_S3_HOST"]
-    STORAGE_OPTIONS[:endpoint] = ENV["AWS_S3_ENDPOINT"] if ENV["AWS_S3_ENDPOINT"]
-    STORAGE_OPTIONS[:path_style] = ENV["AWS_S3_PATH_STYLE"] if ENV["AWS_S3_PATH_STYLE"]
+    IMAGE_STORAGE = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
+    STORAGE_OPTIONS = CarrierWave.configure { _1.fog_credentials }
 
     IMAGE_PRESETS = {
       primary: {

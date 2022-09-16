@@ -29,7 +29,7 @@ class FeedRefresher
       job_class = FeedCrawler::FeedDownloader
       Sidekiq::Client.push_bulk(
         "args"      => jobs.shuffle,
-        "class"     => job_class.class.name,
+        "class"     => job_class.name,
         "queue"     => job_class.get_sidekiq_options["queue"].to_s,
         "retry"     => false,
         "dead"      => false,
