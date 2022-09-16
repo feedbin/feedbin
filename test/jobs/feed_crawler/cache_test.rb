@@ -42,9 +42,9 @@ module FeedCrawler
       cache_key = "cache_key"
 
       Cache.write(cache_key, {
-        key: "value",
-      },
-      options: {expires_in: 1}
+          key: "value",
+        },
+        options: {expires_in: 1}
       )
 
       result = Sidekiq.redis do |redis|
