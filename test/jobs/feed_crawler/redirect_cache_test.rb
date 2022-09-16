@@ -10,9 +10,9 @@ module FeedCrawler
     def test_should_collapse_stable_redirects
       feed_id = 2
 
-      redirect1 = RedirectCache::Redirect.new(feed_id, status: 301, from: "http://example.com", to: "http://example.com/second")
-      redirect2 = RedirectCache::Redirect.new(feed_id, status: 301, from: "http://example.com/second", to: "http://example.com/third")
-      redirect3 = RedirectCache::Redirect.new(feed_id, status: 301, from: "http://example.com/third", to: "http://example.com/final")
+      redirect1 = Redirect.new(feed_id, status: 301, from: "http://example.com", to: "http://example.com/second")
+      redirect2 = Redirect.new(feed_id, status: 301, from: "http://example.com/second", to: "http://example.com/third")
+      redirect3 = Redirect.new(feed_id, status: 301, from: "http://example.com/third", to: "http://example.com/final")
 
       (RedirectCache::PERSIST_AFTER).times do
         RedirectCache.new(feed_id).save([redirect1, redirect2])
@@ -32,7 +32,7 @@ module FeedCrawler
     end
 
     def test_should_not_temporary_redirects
-      redirect1 = RedirectCache::Redirect.new(1, status: 302, from: "http://example.com", to: "http://example.com/second")
+      redirect1 = Redirect.new(1, status: 302, from: "http://example.com", to: "http://example.com/second")
       assert_nil RedirectCache.new(1).save([redirect1])
     end
 

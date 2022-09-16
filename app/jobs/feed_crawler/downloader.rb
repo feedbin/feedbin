@@ -57,7 +57,7 @@ module FeedCrawler
 
     def on_redirect
       proc do |from, to|
-        @feed_cache.redirects.push RedirectCache::Redirect.new(@feed_id, status: from.status.code, from: from.uri.to_s, to: to.uri.to_s)
+        @feed_cache.redirects.push Redirect.new(@feed_id, status: from.status.code, from: from.uri.to_s, to: to.uri.to_s)
       end
     end
 
