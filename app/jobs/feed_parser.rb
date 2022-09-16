@@ -12,9 +12,12 @@ class FeedParser
       encoding: encoding
     )
 
-    filter = EntryFilter.new(parsed.entries)
+    filter = EntryFilter.new(parsed.entries, check_for_changes: check_for_changes?, always_check_recent: true)
     save(feed: parsed.to_feed, entries: filter.filter)
-    Sidekiq.logger.info "FeedParser: stats=#{filter.stats} url=#{@feed.feed_url} feed_id=#{@feed.id}"
+    clear_feed_errors!
+    @feed.update(last_change_check: Time.now) if check_for_changes?
+
+    Sidekiq.logger.info "FeedParser: stats=#{filter.stats} check_for_changes=#{check_for_changes?} url=#{@feed.feed_url} feed_id=#{@feed.id}"
     filter.stats.each do |stat, count|
       Librato.increment("feed.parser", source: stat, by: count)
     end
@@ -26,13 +29,20 @@ class FeedParser
 
   private
 
+  def check_for_changes?
+    return @check_for_changes if defined?(@check_for_changes)
+    last_check = @feed.last_change_check
+    return true if last_check.nil?
+    random_timeout = rand(12..24).hours.ago
+    @check_for_changes = last_check.before?(random_timeout)
+  end
+
   def save(feed:, entries:)
     job_id = FeedRefresherReceiver.perform_async({
       "feed" => feed.merge({"id" => @feed.id}),
       "entries" => entries
     })
     Sidekiq.logger.info "Enqueued FeedRefresherReceiver job_id=#{job_id} feed_id=#{@feed.id}"
-    clear_feed_errors!
   end
 
   def clear_feed_errors!

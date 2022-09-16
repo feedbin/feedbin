@@ -18,7 +18,7 @@ class TwitterRefresher
     end
 
     if feed
-      entries = EntryFilter.filter!(feed.entries, check_for_updates: false, date_filter: (Date.today - 2).to_time)
+      entries = EntryFilter.filter!(feed.entries, check_for_changes: false, date_filter: (Date.today - 2).to_time)
       return if entries.empty?
       FeedRefresherReceiver.perform_async({
         feed: {

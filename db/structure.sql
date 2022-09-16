@@ -604,7 +604,8 @@ CREATE TABLE public.feeds (
     hubs text[],
     settings jsonb,
     standalone_request_at timestamp(6) without time zone,
-    fingerprint uuid
+    fingerprint uuid,
+    last_change_check timestamp(6) without time zone
 );
 
 
@@ -2940,6 +2941,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220719142811'),
 ('20220804145624'),
 ('20220806155622'),
-('20220909105317');
+('20220909105317'),
+('20220916104628');
 
 

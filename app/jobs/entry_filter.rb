@@ -4,10 +4,11 @@ class EntryFilter
     new(*args, **kwargs).filter
   end
 
-  def initialize(entries, check_for_updates: true, date_filter: nil)
+  def initialize(entries, check_for_changes: true, always_check_recent: false, date_filter: nil)
     @entries = entries.first(300)
     @public_ids = @entries.map(&:public_id)
-    @check_for_updates = check_for_updates
+    @check_for_changes = check_for_changes
+    @always_check_recent = always_check_recent
     @date_filter = date_filter
     @stats = []
   end
@@ -41,9 +42,18 @@ class EntryFilter
   end
 
   def updated?(entry)
-    return false unless @check_for_updates
+    return false unless check_for_changes?(entry)
     return false unless in_database?(entry)
     fingerprints[entry.public_id] != entry.fingerprint
+  end
+
+  # always check for changes made to articles published within the last 24 hours if @always_check_recent == true
+  def check_for_changes?(entry)
+    if @always_check_recent && entry.published.present?
+      entry.published.after?(24.hours.ago)
+    else
+      @check_for_changes
+    end
   end
 
   def fresh?(entry)
