@@ -62,12 +62,7 @@ class ActionsPerform
       job = EntryImage.new
       job.entry = @entry
       if job_args = job.build_job
-        Sidekiq::Client.push(
-          "args" => job_args,
-          "class" => "Crawler::Image::FindImageCritical",
-          "queue" => "image_parallel_critical",
-          "retry" => false
-        )
+        ImageCrawler::FindImageCritical.perform_async(*job_args)
       end
     end
     DevicePushNotificationSend.perform_in(1.minute, user_ids, @entry.id, true)

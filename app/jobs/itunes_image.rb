@@ -16,12 +16,7 @@ class ItunesImage
   end
 
   def schedule
-    Sidekiq::Client.push(
-      "args" => ["#{@entry.public_id}-itunes", "podcast", [@entry.rebase_url(@entry.data["itunes_image"])]],
-      "class" => "Crawler::Image::FindImage",
-      "queue" => "image_parallel",
-      "retry" => false
-    )
+    ImageCrawler::FindImage.perform_async("#{@entry.public_id}-itunes", "podcast", [@entry.rebase_url(@entry.data["itunes_image"])])
   end
 
   def receive

@@ -51,20 +51,12 @@ class FeedParser
   end
 
   def clear_feed_errors!
-    Sidekiq::Client.push(
-      "args" => [@feed.id],
-      "class" => "Crawler::Refresher::FeedStatusUpdate",
-      "queue" => "feed_downloader_critical"
-    )
+    FeedCrawler::FeedStatusUpdate.new.perform(@feed.id)
   end
 
   def record_feed_error!(exception)
     exception = JSON.dump({date: Time.now.to_i, class: exception.class, message: exception.message, status: nil})
-    Sidekiq::Client.push(
-      "args" => [@feed.id, exception],
-      "class" => "Crawler::Refresher::FeedStatusUpdate",
-      "queue" => "feed_downloader_critical"
-    )
+    FeedCrawler::FeedStatusUpdate.new.perform(@feed.id, exception)
     Sidekiq.logger.info "Feedkit::NotFeed: feed_id=#{@feed.id} url=#{@feed.feed_url}"
   end
 end

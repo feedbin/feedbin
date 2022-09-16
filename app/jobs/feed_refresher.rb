@@ -26,10 +26,11 @@ class FeedRefresher
     jobs = subscriptions + standalone
 
     if jobs.present?
+      job_class = FeedCrawler::FeedDownloader
       Sidekiq::Client.push_bulk(
         "args"      => jobs.shuffle,
-        "class"     => "Crawler::Refresher::FeedDownloader",
-        "queue"     => "feed_downloader",
+        "class"     => job_class.class.name,
+        "queue"     => job_class.get_sidekiq_options["queue"].to_s,
         "retry"     => false,
         "dead"      => false,
         "backtrace" => false

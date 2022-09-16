@@ -15,12 +15,7 @@ class EntryImage
 
   def schedule
     if job = build_job
-      Sidekiq::Client.push(
-        "args" => job,
-        "class" => "Crawler::Image::FindImage",
-        "queue" => "image_parallel",
-        "retry" => false
-      )
+      ImageCrawler::FindImage.perform_async(*job)
     end
   end
 

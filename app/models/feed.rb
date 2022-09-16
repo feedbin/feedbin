@@ -134,12 +134,7 @@ class Feed < ApplicationRecord
         TwitterFeedRefresher.new.enqueue_feed(self, user)
       end
     else
-      Sidekiq::Client.push_bulk(
-        "args" => [[id, feed_url, subscriptions_count]],
-        "class" => "Crawler::Refresher::FeedDownloaderCritical",
-        "queue" => "feed_downloader_critical",
-        "retry" => false
-      )
+      FeedCrawler::FeedDownloaderCritical.perform_async(id, feed_url, subscriptions_count)
     end
   end
 

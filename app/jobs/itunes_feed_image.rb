@@ -19,12 +19,7 @@ class ItunesFeedImage
     if url = @feed.options&.dig("itunes_image")
       name = Digest::SHA1.hexdigest(url)
       url = @feed.rebase_url(url)
-      Sidekiq::Client.push(
-        "args" => ["#{@feed.id}-#{name}-itunes", "podcast_feed", [url]],
-        "class" => "Crawler::Image::FindImage",
-        "queue" => "image_parallel",
-        "retry" => false
-      )
+      ImageCrawler::FindImage.perform_async("#{@feed.id}-#{name}-itunes", "podcast_feed", [url])
     end
   end
 

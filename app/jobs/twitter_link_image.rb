@@ -17,12 +17,7 @@ class TwitterLinkImage
   end
 
   def schedule
-    Sidekiq::Client.push(
-      "args" => ["#{@entry.public_id}-twitter", "twitter", [], @page_url],
-      "class" => "Crawler::Image::FindImage",
-      "queue" => "image_parallel",
-      "retry" => false
-    )
+    ImageCrawler::FindImage.perform_async("#{@entry.public_id}-twitter", "twitter", [], @page_url)
   end
 
   def receive
