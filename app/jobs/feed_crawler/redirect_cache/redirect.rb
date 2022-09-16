@@ -1,27 +1,25 @@
 # frozen_string_literal: true
 
-module Crawler
-  module Refresher
-    class RedirectCache
-      class Redirect
-        PERMANENT_REDIRECTS = [301, 308].to_set.freeze
+module FeedCrawler
+  class RedirectCache
+    class Redirect
+      PERMANENT_REDIRECTS = [301, 308].to_set.freeze
 
-        attr_reader :from, :to
+      attr_reader :from, :to
 
-        def initialize(feed_id, status:, from:, to:)
-          @feed_id = feed_id
-          @status = status
-          @from = from
-          @to = to
-        end
+      def initialize(feed_id, status:, from:, to:)
+        @feed_id = feed_id
+        @status = status
+        @from = from
+        @to = to
+      end
 
-        def permanent?
-          PERMANENT_REDIRECTS.include?(@status)
-        end
+      def permanent?
+        PERMANENT_REDIRECTS.include?(@status)
+      end
 
-        def cache_key
-          @cache_key ||= Digest::SHA1.hexdigest([@feed_id, @status, @from, @to].join)
-        end
+      def cache_key
+        @cache_key ||= Digest::SHA1.hexdigest([@feed_id, @status, @from, @to].join)
       end
     end
   end

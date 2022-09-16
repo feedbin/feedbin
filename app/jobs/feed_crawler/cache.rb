@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-module Crawler
-  module Refresher
+module FeedCrawler
     class Cache
       def self.read(*args)
         new.read(*args)
@@ -63,6 +62,5 @@ module Crawler
           end
         end
       end
-    end
   end
 end
