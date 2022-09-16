@@ -1,5 +1,5 @@
 class FeedRefresher
-  include BatchJobs
+  include SidekiqHelper
   include Sidekiq::Worker
 
   attr_accessor :force_refresh

@@ -1,11 +1,11 @@
 require "test_helper"
 
-class BatchJobsTests < ActiveSupport::TestCase
-  include BatchJobs
+class SidekiqHelperTests < ActiveSupport::TestCase
+  include SidekiqHelper
 
   test "should enqueue all records" do
     klass = MockModel
-    sidekiq_class = BatchJobsJob
+    sidekiq_class = SidekiqHelperJob
     queue_name = sidekiq_class.get_sidekiq_options["queue"].to_s
     queue = Sidekiq::Queues[queue_name]
 
@@ -24,7 +24,7 @@ class BatchJobsTests < ActiveSupport::TestCase
 
   private
 
-  class BatchJobsJob
+  class SidekiqHelperJob
     include Sidekiq::Worker
     sidekiq_options queue: :my_queue, retry: true
   end

@@ -1,5 +1,9 @@
-module BatchJobs
+module SidekiqHelper
   BATCH_SIZE = 5_000
+
+  def self.included(base)
+    base.extend(ClassMethods)
+  end
 
   def job_args(ending_id, starting_id = 1, *args)
     start_batch = (starting_id.to_f / BATCH_SIZE.to_f).floor
@@ -56,5 +60,11 @@ module BatchJobs
       return nil
     end
     raise
+  end
+
+  module ClassMethods
+    def local_queue(name)
+      "#{name}_#{Socket.gethostname}"
+    end
   end
 end

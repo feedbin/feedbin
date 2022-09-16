@@ -1,6 +1,6 @@
 class BackfillGuid
   include Sidekiq::Worker
-  include BatchJobs
+  include SidekiqHelper
   sidekiq_options queue: :worker_slow
 
   def perform(feed_id)

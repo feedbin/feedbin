@@ -2,7 +2,7 @@ require "sidekiq/api"
 
 class FeedRefresherScheduler
   include Sidekiq::Worker
-  include BatchJobs
+  include SidekiqHelper
   sidekiq_options queue: :worker_slow_critical
 
   COUNT_KEY = "feed_refresher_scheduler:count".freeze

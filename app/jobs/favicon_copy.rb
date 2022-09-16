@@ -1,6 +1,6 @@
 class FaviconCopy
   include Sidekiq::Worker
-  include BatchJobs
+  include SidekiqHelper
   sidekiq_options queue: :worker_slow
 
   attr_reader :favicon

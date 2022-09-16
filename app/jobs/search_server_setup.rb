@@ -1,6 +1,6 @@
 class SearchServerSetup
   include Sidekiq::Worker
-  include BatchJobs
+  include SidekiqHelper
   sidekiq_options queue: :worker_slow
 
   Client = $search[:alt] || $search[:main]

@@ -1,6 +1,6 @@
 class HarvestEmbeds
   include Sidekiq::Worker
-  include BatchJobs
+  include SidekiqHelper
   sidekiq_options retry: false
   SET_NAME = "#{name}-ids"
 

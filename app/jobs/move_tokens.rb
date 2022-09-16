@@ -1,6 +1,6 @@
 class MoveTokens
   include Sidekiq::Worker
-  include BatchJobs
+  include SidekiqHelper
   sidekiq_options queue: :worker_slow
 
   def perform(user_id, original_name, new_name)

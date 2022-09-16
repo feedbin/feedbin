@@ -1,6 +1,6 @@
 class CacheEntryViews
   include Sidekiq::Worker
-  include BatchJobs
+  include SidekiqHelper
 
   SET_NAME = "#{name}-ids"
 

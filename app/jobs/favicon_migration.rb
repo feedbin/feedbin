@@ -1,6 +1,6 @@
 class FaviconMigration
   include Sidekiq::Worker
-  include BatchJobs
+  include SidekiqHelper
   sidekiq_options queue: :worker_slow
 
   def perform(favicon_id = nil, schedule = false)

@@ -1,6 +1,6 @@
 class BatchScheduler
   include Sidekiq::Worker
-  include BatchJobs
+  include SidekiqHelper
   sidekiq_options queue: :worker_slow
 
   def perform(klass, worker_class)

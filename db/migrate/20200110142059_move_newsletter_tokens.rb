@@ -1,5 +1,5 @@
 class MoveNewsletterTokens < ActiveRecord::Migration[6.0]
-  include BatchJobs
+  include SidekiqHelper
 
   def up
     enqueue_all(User, MoveTokens, "newsletter_token", "newsletters")
