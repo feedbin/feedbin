@@ -20,17 +20,6 @@ module FeedCrawler
       end
     end
 
-    test "should schedule WarmCache job" do
-      params = {
-        "feed" => {
-          "id" => @feed.id
-        },
-        "entries" => [build_entry]
-      }
-
-      Sidekiq::Worker.clear_all
-    end
-
     test "should not create entry with existing public_id" do
       public_id = SecureRandom.hex
       entry = @feed.entries.create!(url: "url", public_id: public_id)
