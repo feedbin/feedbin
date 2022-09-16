@@ -3,6 +3,8 @@ module FeedCrawler
     include SidekiqHelper
     include Sidekiq::Worker
 
+    sidekiq_options queue: :worker_slow_critical
+
     attr_accessor :force_refresh
 
     def perform(batch, priority_refresh)

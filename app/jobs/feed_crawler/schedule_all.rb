@@ -18,10 +18,11 @@ module FeedCrawler
       feed = Feed.last
       if feed
         jobs = job_args(feed.id, 1, priority?)
+        job_class = ScheduleBatch
         Sidekiq::Client.push_bulk(
           "args" => jobs,
-          "class" => "ScheduleBatch",
-          "queue" => "worker_slow_critical"
+          "class" => job_class.name,
+          "queue" => job_class.get_sidekiq_options["queue"]
         )
         increment
         report
