@@ -63,12 +63,8 @@ module FeedCrawler
 
     def parse
       @response.persist!
-      job_id = Sidekiq::Client.push(
-      "args" => [@feed_id, @feed_url, @response.path, @response.encoding.to_s],
-      "class" => @critical ? "FeedParserCritical" : "FeedParser",
-      "queue" => @critical ? "feed_parser_critical_#{Socket.gethostname}" : "feed_parser_#{Socket.gethostname}",
-      "retry" => false
-      )
+      job_class = @critical ? FeedParserCritical : FeedParser
+      job_id = job_class.perform_async(@feed_id, @feed_url, @response.path, @response.encoding.to_s)
       Sidekiq.logger.info "Parse enqueued job_id: #{job_id} path=#{@response.path}"
       @feed.save(@response)
     end

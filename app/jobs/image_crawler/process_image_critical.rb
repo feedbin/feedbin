@@ -1,7 +1,10 @@
 module ImageCrawler
   class ProcessImageCritical
     include Sidekiq::Worker
-    sidekiq_options queue: "image_serial_critical_#{Socket.gethostname}", retry: false
+    include SidekiqHelper
+
+    sidekiq_options queue: local_queue("image_serial_critical"), retry: false
+
     def perform(*args)
       ProcessImage.new.perform(*args)
     end

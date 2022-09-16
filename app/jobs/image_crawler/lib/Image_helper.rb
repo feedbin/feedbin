@@ -13,35 +13,35 @@ module ImageCrawler
         height: 304,
         minimum_size: 20_000,
         crop: :smart_crop,
-        job_class: "EntryImage"
+        job_class: EntryImage
       },
       twitter: {
         width: 542,
         height: 304,
         minimum_size: 10_000,
         crop: :smart_crop,
-        job_class: "TwitterLinkImage"
+        job_class: TwitterLinkImage
       },
       youtube: {
         width: 542,
         height: 304,
         minimum_size: nil,
         crop: :fill_crop,
-        job_class: "EntryImage"
+        job_class: EntryImage
       },
       podcast: {
         width: 200,
         height: 200,
         minimum_size: nil,
         crop: :fill_crop,
-        job_class: "ItunesImage"
+        job_class: ItunesImage
       },
       podcast_feed: {
         width: 200,
         height: 200,
         minimum_size: nil,
         crop: :fill_crop,
-        job_class: "ItunesFeedImage"
+        job_class: ItunesFeedImage
       }
     }
 
@@ -50,16 +50,12 @@ module ImageCrawler
     end
 
     def send_to_feedbin(original_url:, storage_url:)
-      Sidekiq::Client.push(
-        "args" => [@public_id, {
-          "original_url" => original_url,
-          "processed_url" => storage_url,
-          "width" => preset.width,
-          "height" => preset.height
-        }],
-        "class" => preset.job_class,
-        "queue" => "default"
-      )
+      preset.job_class.perform_async(@public_id, {
+        "original_url" => original_url,
+        "processed_url" => storage_url,
+        "width" => preset.width,
+        "height" => preset.height
+      })
     end
 
     def image_name

@@ -2,7 +2,9 @@ module ImageCrawler
   class ProcessImage
     include Sidekiq::Worker
     include ImageHelper
-    sidekiq_options queue: "image_serial_#{Socket.gethostname}", retry: false
+    include SidekiqHelper
+
+    sidekiq_options queue: local_queue("image_serial"), retry: false
 
     def perform(public_id, preset_name, original_path, original_url, image_url, candidate_urls)
       @preset_name = preset_name
