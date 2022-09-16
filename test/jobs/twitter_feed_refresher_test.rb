@@ -1,6 +1,6 @@
 require "test_helper"
 
-class TwitterFeedRefresherTest < ActiveSupport::TestCase
+class TwitterScheduleTest < ActiveSupport::TestCase
   setup do
     @user = users(:ben)
     @feed = @user.feeds.first
@@ -12,7 +12,7 @@ class TwitterFeedRefresherTest < ActiveSupport::TestCase
   test "feed gets scheduled" do
     Sidekiq::Worker.clear_all
     assert_difference "Sidekiq::Queues['twitter_refresher'].count", +1 do
-      TwitterFeedRefresher.new.perform
+      TwitterSchedule.new.perform
     end
 
     args = [@feed.id, @feed.feed_url, [@keys]]
@@ -24,7 +24,7 @@ class TwitterFeedRefresherTest < ActiveSupport::TestCase
     Sidekiq::Worker.clear_all
 
     assert_difference "Sidekiq::Queues['twitter_refresher_critical'].count", +1 do
-      TwitterFeedRefresher.new.enqueue_feed(@feed, @user)
+      TwitterSchedule.new.enqueue_feed(@feed, @user)
     end
 
     args = [@feed.id, @feed.feed_url, [@keys]]
@@ -37,12 +37,12 @@ class TwitterFeedRefresherTest < ActiveSupport::TestCase
 
     Sidekiq::Worker.clear_all
     assert_no_difference "Sidekiq::Queues['feed_downloader_critical'].count" do
-      TwitterFeedRefresher.new.perform
+      TwitterSchedule.new.perform
     end
 
     @user.update(twitter_screen_name: "bsaid")
     assert_difference "Sidekiq::Queues['twitter_refresher'].count", +1 do
-      TwitterFeedRefresher.new.perform
+      TwitterSchedule.new.perform
     end
   end
 end

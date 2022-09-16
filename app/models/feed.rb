@@ -131,7 +131,7 @@ class Feed < ApplicationRecord
   def priority_refresh(user = nil)
     if twitter_feed?
       if 10.minutes.ago > updated_at
-        TwitterFeedRefresher.new.enqueue_feed(self, user)
+        FeedCrawler::TwitterSchedule.new.enqueue_feed(self, user)
       end
     else
       FeedCrawler::DownloaderCritical.perform_async(id, feed_url, subscriptions_count)

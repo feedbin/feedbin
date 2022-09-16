@@ -10,7 +10,7 @@ module FeedCrawler
     def perform
       if queue_empty?("feed_refresher_receiver") && queue_empty?("feed_downloader")
         refresh_feeds
-        TwitterFeedRefresher.perform_async if queue_empty?("twitter_refresher")
+        TwitterSchedule.perform_async if queue_empty?("twitter_refresher")
       end
     end
 
@@ -20,7 +20,7 @@ module FeedCrawler
         jobs = job_args(feed.id, 1, priority?)
         Sidekiq::Client.push_bulk(
           "args" => jobs,
-          "class" => "FeedRefresher",
+          "class" => "ScheduleBatch",
           "queue" => "worker_slow_critical"
         )
         increment

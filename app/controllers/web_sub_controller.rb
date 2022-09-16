@@ -35,7 +35,7 @@ class WebSubController < ApplicationController
         video_ids = entries.map {|entry| entry.dig(:data, :youtube_video_id) }.compact
         if video_ids.present?
           HarvestEmbeds.new.add_missing_to_queue(video_ids)
-          YoutubeReceiver.perform_in(2.minutes, data)
+          FeedCrawler::YoutubeReceiver.perform_in(2.minutes, data)
         else
           FeedCrawler::Receiver.new.perform(data)
         end

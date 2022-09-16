@@ -1,5 +1,5 @@
 module FeedCrawler
-  class FeedRefresher
+  class ScheduleBatch
     include SidekiqHelper
     include Sidekiq::Worker
 

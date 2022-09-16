@@ -1,6 +1,6 @@
 require "test_helper"
 
-class FeedRefresherTest < ActiveSupport::TestCase
+class ScheduleBatchTest < ActiveSupport::TestCase
   setup do
     Sidekiq::Queues["feed_downloader"].clear
     Feed.all.each do |feed|
@@ -10,7 +10,7 @@ class FeedRefresherTest < ActiveSupport::TestCase
 
   test "should enqueue feed_downloader jobs" do
     assert_difference "Sidekiq::Queues['feed_downloader'].count", Feed.count do
-      FeedRefresher.new.tap do |job|
+      ScheduleBatch.new.tap do |job|
         def job.build_ids(*args)
           Feed.all.map(&:id)
         end
