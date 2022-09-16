@@ -56,7 +56,7 @@ class FeedParser
 
   def record_feed_error!(exception)
     exception = JSON.dump({date: Time.now.to_i, class: exception.class, message: exception.message, status: nil})
-    FeedCrawler::FeedStatusUpdate.new.perform(@feed.id, exception)
+    FeedCrawler::FeedStatusUpdate.perform_async(@feed.id, exception)
     Sidekiq.logger.info "Feedkit::NotFeed: feed_id=#{@feed.id} url=#{@feed.feed_url}"
   end
 end

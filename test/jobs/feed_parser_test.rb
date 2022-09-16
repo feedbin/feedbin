@@ -28,7 +28,7 @@ class FeedParserTest < ActiveSupport::TestCase
   def test_should_enqueue_error
     queue = Sidekiq::Queues['feed_downloader_critical']
     FeedParser.new.perform(@feed.id, "http://example.com", html_path)
-    assert_equal("Crawler::Refresher::FeedStatusUpdate", queue.first["class"])
+    assert_equal("FeedCrawler::FeedStatusUpdate", queue.first["class"])
   end
 
   private
