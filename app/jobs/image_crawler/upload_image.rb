@@ -1,7 +1,7 @@
 module ImageCrawler
   class UploadImage
     include Sidekiq::Worker
-    include Helpers
+    include ImageHelper
     sidekiq_options queue: "image_parallel_#{Socket.gethostname}", retry: false
 
     def perform(public_id, preset_name, image_path, original_url, image_url)

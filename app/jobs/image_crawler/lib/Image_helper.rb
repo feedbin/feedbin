@@ -1,5 +1,5 @@
 module ImageCrawler
-  module Helpers
+  module ImageHelper
     CASCADE = Rails.root.join("lib/cascade/facefinder")
     PIGO = ENV["PIGO_PATH"] || `which pigo`.chomp
     puts "Pigo missing. Add it to your path or set ENV['PIGO_PATH']. From https://github.com/esimov/pigo" unless File.executable?(PIGO)
