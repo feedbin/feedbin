@@ -1,5 +1,5 @@
 module FeedCrawler
-  class Feed
+  class FeedCache
     extend Forwardable
 
     def_delegators :http_cache, :etag, :last_modified, :checksum, :save

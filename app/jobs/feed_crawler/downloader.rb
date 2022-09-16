@@ -11,45 +11,45 @@ module FeedCrawler
       @feed_url    = feed_url
       @subscribers = subscribers
       @critical    = critical
-      @feed        = Feed.new(feed_id)
+      @feed_cache        = FeedCache.new(feed_id)
 
-      throttle = Throttle.new(@feed_url, @feed.downloaded_at)
+      throttle = Throttle.new(@feed_url, @feed_cache.downloaded_at)
       if @critical
         download
       elsif throttle.throttled?
-        Sidekiq.logger.info "Throttled downloaded_at=#{Time.at(@feed.downloaded_at)} url=#{@feed_url}"
-      elsif @feed.ok?
+        Sidekiq.logger.info "Throttled downloaded_at=#{Time.at(@feed_cache.downloaded_at)} url=#{@feed_url}"
+      elsif @feed_cache.ok?
         download
       end
     end
 
     def download
-      @feed.log_download!
+      @feed_cache.log_download!
       @response = begin
         request
       rescue Feedkit::ZlibError
         request(auto_inflate: false)
       end
 
-      not_modified = @response.not_modified?(@feed.checksum)
+      not_modified = @response.not_modified?(@feed_cache.checksum)
       Sidekiq.logger.info "Downloaded modified=#{!not_modified} http_status=\"#{@response.status}\" url=#{@feed_url}"
       parse unless not_modified
-      @feed.download_success
+      @feed_cache.download_success
     rescue Feedkit::Error => exception
-      @feed.download_error(exception)
-      Sidekiq.logger.info "Feedkit::Error: attempts=#{@feed.attempt_count} exception=#{exception.inspect} id=#{@feed_id} url=#{@feed_url}"
+      @feed_cache.download_error(exception)
+      Sidekiq.logger.info "Feedkit::Error: attempts=#{@feed_cache.attempt_count} exception=#{exception.inspect} id=#{@feed_id} url=#{@feed_url}"
     end
 
     def request(auto_inflate: true)
       parsed_url = Feedkit::BasicAuth.parse(@feed_url)
-      url = @feed.redirect ? @feed.redirect : parsed_url.url
-      Sidekiq.logger.info "Redirect: from=#{@feed_url} to=#{@feed.redirect} id=#{@feed_id}" if @feed.redirect
+      url = @feed_cache.redirect ? @feed_cache.redirect : parsed_url.url
+      Sidekiq.logger.info "Redirect: from=#{@feed_url} to=#{@feed_cache.redirect} id=#{@feed_id}" if @feed_cache.redirect
       Feedkit::Request.download(url,
       on_redirect:   on_redirect,
       username:      parsed_url.username,
       password:      parsed_url.password,
-      last_modified: @feed.last_modified,
-      etag:          @feed.etag,
+      last_modified: @feed_cache.last_modified,
+      etag:          @feed_cache.etag,
       auto_inflate:  auto_inflate,
       user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
       )
@@ -57,7 +57,7 @@ module FeedCrawler
 
     def on_redirect
       proc do |from, to|
-        @feed.redirects.push RedirectCache::Redirect.new(@feed_id, status: from.status.code, from: from.uri.to_s, to: to.uri.to_s)
+        @feed_cache.redirects.push RedirectCache::Redirect.new(@feed_id, status: from.status.code, from: from.uri.to_s, to: to.uri.to_s)
       end
     end
 
@@ -66,7 +66,7 @@ module FeedCrawler
       job_class = @critical ? ParserCritical : Parser
       job_id = job_class.perform_async(@feed_id, @feed_url, @response.path, @response.encoding.to_s)
       Sidekiq.logger.info "Parse enqueued job_id: #{job_id} path=#{@response.path}"
-      @feed.save(@response)
+      @feed_cache.save(@response)
     end
   end
 end

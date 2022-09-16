@@ -35,9 +35,9 @@ class EntryTest < ActiveSupport::TestCase
 
   test "should enqueue find_images" do
     flush_redis
-    assert_difference "EntryImage.jobs.size", +1 do
+    assert_difference -> { ImageCrawler::EntryImage.jobs.size }, +1 do
       @entry.save
-      job = EntryImage.jobs.last
+      job = ImageCrawler::EntryImage.jobs.last
       assert_equal([@entry.reload.public_id], job["args"])
     end
   end

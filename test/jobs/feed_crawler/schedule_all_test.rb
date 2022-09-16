@@ -15,7 +15,7 @@ module FeedCrawler
     private
 
     def perform
-      FeedRefresherScheduler.new.tap do |job|
+      ScheduleAll.new.tap do |job|
         def job.job_args(*args)
           [[1]]
         end
