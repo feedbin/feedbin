@@ -16,7 +16,7 @@ class YoutubeReceiver
       end
     end
 
-    FeedRefresherReceiver.new.perform(data)
+    Receiver.new.perform(data)
   end
 
 end

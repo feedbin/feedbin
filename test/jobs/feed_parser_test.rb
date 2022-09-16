@@ -1,17 +1,17 @@
 require "test_helper"
 
-class FeedParserTest < ActiveSupport::TestCase
+class ParserTest < ActiveSupport::TestCase
   setup do
     Sidekiq::Worker.clear_all
     @feed = Feed.first
   end
 
   def test_should_parse_xml
-    assert_difference -> { FeedRefresherReceiver.jobs.size }, 1 do
-      FeedParser.new.perform(@feed.id, @feed.feed_url, xml_path)
+    assert_difference -> { Receiver.jobs.size }, 1 do
+      Parser.new.perform(@feed.id, @feed.feed_url, xml_path)
     end
 
-    job = FeedRefresherReceiver.jobs.first
+    job = Receiver.jobs.first
     feed = job["args"].first["feed"]
 
     assert_equal(@feed.feed_url, feed["feed_url"])
@@ -20,15 +20,14 @@ class FeedParserTest < ActiveSupport::TestCase
   end
 
   def test_should_parse_json
-    assert_difference -> { FeedRefresherReceiver.jobs.size }, 1 do
-      FeedParser.new.perform(@feed.id, "http://example.com", json_path)
+    assert_difference -> { Receiver.jobs.size }, 1 do
+      Parser.new.perform(@feed.id, "http://example.com", json_path)
     end
   end
 
   def test_should_enqueue_error
     queue = Sidekiq::Queues['feed_downloader_critical']
-    FeedParser.new.perform(@feed.id, "http://example.com", html_path)
-    assert_equal("FeedCrawler::FeedStatusUpdate", queue.first["class"])
+    Parser.new.perform(@feed.id, "http://example.com", html_path)
   end
 
   private

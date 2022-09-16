@@ -37,7 +37,7 @@ class WebSubController < ApplicationController
           HarvestEmbeds.new.add_missing_to_queue(video_ids)
           YoutubeReceiver.perform_in(2.minutes, data)
         else
-          FeedRefresherReceiver.new.perform(data)
+          FeedCrawler::Receiver.new.perform(data)
         end
         Librato.increment "entry.push"
       end

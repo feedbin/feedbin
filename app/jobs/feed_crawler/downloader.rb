@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FeedCrawler
-  class FeedDownloader
+  class Downloader
     include Sidekiq::Worker
 
     sidekiq_options queue: :feed_downloader, retry: false, backtrace: false
@@ -63,7 +63,7 @@ module FeedCrawler
 
     def parse
       @response.persist!
-      job_class = @critical ? FeedParserCritical : FeedParser
+      job_class = @critical ? ParserCritical : Parser
       job_id = job_class.perform_async(@feed_id, @feed_url, @response.path, @response.encoding.to_s)
       Sidekiq.logger.info "Parse enqueued job_id: #{job_id} path=#{@response.path}"
       @feed.save(@response)

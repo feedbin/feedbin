@@ -1,7 +1,7 @@
 require "test_helper"
 
 module FeedCrawler
-  class FeedDownloaderTest < ActiveSupport::TestCase
+  class DownloaderTest < ActiveSupport::TestCase
     def setup
       flush_redis
     end
@@ -11,10 +11,10 @@ module FeedCrawler
       stub_request_file("atom.xml", url)
 
       assert_equal 0, Sidekiq::Queues["feed_parser_#{Socket.gethostname}"].size
-      FeedDownloader.new.perform(1, url, 10)
+      Downloader.new.perform(1, url, 10)
       assert_equal 1, Sidekiq::Queues["feed_parser_#{Socket.gethostname}"].size
 
-      FeedDownloader.new.perform(1, url, 10)
+      Downloader.new.perform(1, url, 10)
       assert_equal 1, Sidekiq::Queues["feed_parser_#{Socket.gethostname}"].size
     end
 
@@ -23,14 +23,14 @@ module FeedCrawler
       stub_request_file("atom.xml", url)
 
       assert_equal 0, Sidekiq::Queues["feed_parser_critical_#{Socket.gethostname}"].size
-      FeedDownloaderCritical.new.perform(1, url, 10)
+      DownloaderCritical.new.perform(1, url, 10)
       assert_equal 1, Sidekiq::Queues["feed_parser_critical_#{Socket.gethostname}"].size
     end
 
     def test_should_send_user_agent
       url = "http://example.com/atom.xml"
       stub_request_file("atom.xml", url).with(headers: {"User-Agent" => "Feedbin feed-id:1 - 10 subscribers"})
-      FeedDownloader.new.perform(1, url, 10)
+      Downloader.new.perform(1, url, 10)
     end
 
     def test_should_send_authorization
@@ -39,7 +39,7 @@ module FeedCrawler
       url = "http://#{username}:#{password}@example.com/atom.xml"
 
       stub_request(:get, "http://example.com/atom.xml").with(headers: {"Authorization" => "Basic #{Base64.strict_encode64("#{username}:#{password}")}"})
-      FeedDownloader.new.perform(1, url, 10)
+      Downloader.new.perform(1, url, 10)
     end
 
     def test_should_use_saved_redirect
@@ -51,7 +51,7 @@ module FeedCrawler
       Cache.write(redirect_cache.stable_key, {to: url_two})
 
       stub_request(:get, url_two)
-      FeedDownloader.new.perform(feed_id, url_one, 10)
+      Downloader.new.perform(feed_id, url_one, 10)
     end
 
     def test_should_use_saved_redirect_with_basic_auth
@@ -65,7 +65,7 @@ module FeedCrawler
       Cache.write(redirect_cache.stable_key, {to: url_two})
 
       stub_request(:get, url_two).with(headers: {"Authorization" => "Basic #{Base64.strict_encode64("#{username}:#{password}")}"})
-      FeedDownloader.new.perform(feed_id, url_one, 10)
+      Downloader.new.perform(feed_id, url_one, 10)
     end
 
     def test_should_do_nothing_if_not_modified
@@ -80,7 +80,7 @@ module FeedCrawler
 
       url = "http://example.com/atom.xml"
       stub_request(:get, url).with(headers: {"If-None-Match" => etag, "If-Modified-Since" => last_modified}).to_return(status: 304)
-      FeedDownloader.new.perform(feed_id, url, 10)
+      Downloader.new.perform(feed_id, url, 10)
       assert_equal 0, Sidekiq::Queues["feed_parser_critical_#{Socket.gethostname}"].size
     end
 
@@ -90,7 +90,7 @@ module FeedCrawler
       url = "http://example.com/atom.xml"
       stub_request(:get, url).to_return(status: 429)
 
-      FeedDownloader.new.perform(feed_id, url, 10)
+      Downloader.new.perform(feed_id, url, 10)
 
       refute FeedStatus.new(feed_id).ok?, "Should not be ok?"
     end
@@ -108,7 +108,7 @@ module FeedCrawler
       stub_request(:get, first_url).to_return(response)
       stub_request(:get, last_url)
 
-      FeedDownloader.new.perform(1, first_url, 10)
+      Downloader.new.perform(1, first_url, 10)
     end
   end
 end

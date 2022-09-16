@@ -134,7 +134,7 @@ class Feed < ApplicationRecord
         TwitterFeedRefresher.new.enqueue_feed(self, user)
       end
     else
-      FeedCrawler::FeedDownloaderCritical.perform_async(id, feed_url, subscriptions_count)
+      FeedCrawler::DownloaderCritical.perform_async(id, feed_url, subscriptions_count)
     end
   end
 
