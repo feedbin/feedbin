@@ -21,7 +21,7 @@ Sidekiq.logger.level = Logger::WARN
 # Patch kwargs issue
 module StripeMock
   def self.alias_stripe_method(new_name, method_object)
-    Stripe::StripeClient.active_client.define_singleton_method(new_name) {|*args| 
+    Stripe::StripeClient.active_client.define_singleton_method(new_name) {|*args|
       kwargs = (args.count == 3) ? args.pop : {}
       method_object.call(*args, **kwargs)
     }
@@ -55,6 +55,8 @@ class ActiveSupport::TestCase
   fixtures :all
 
   def flush_redis
+    Sidekiq::Worker.clear_all
+
     Sidekiq.redis do |redis|
       redis.flushdb
     end
@@ -72,6 +74,31 @@ class ActiveSupport::TestCase
   def support_file(file)
     File.join(Rails.root, "test/support/www", file)
   end
+
+  def copy_support_file(file_name)
+    path = File.join Dir.tmpdir, SecureRandom.hex
+    FileUtils.cp File.join("test/support/www", file_name), path
+    path
+  end
+
+  def load_xml
+    File.read("test/support/www/atom.xml")
+  end
+
+  def random_string
+    (0...50).map { ("a".."z").to_a[rand(26)] }.join
+  end
+
+  def aws_copy_body
+    <<~EOT
+      <?xml version="1.0" encoding="UTF-8"?>
+      <CopyObjectResult>
+         <ETag>string</ETag>
+         <LastModified>Tue, 02 Mar 2021 12:58:45 GMT</LastModified>
+      </CopyObjectResult>
+    EOT
+  end
+
 
   def stub_request_file(file, url, response_options = {})
     options = {body: File.new(support_file(file)), status: 200}.merge(response_options)

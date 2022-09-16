@@ -29,6 +29,14 @@ GIT
     dalli (2.7.10)
 
 GIT
+  remote: https://github.com/feedbin/down.git
+  revision: df69f03b65453bbbabc99678c3f6a3a1c4d1a0b2
+  branch: normalize
+  specs:
+    down (5.3.1)
+      addressable (~> 2.8)
+
+GIT
   remote: https://github.com/feedbin/elasticsearch-rails.git
   revision: aa2033bb891a3b2545cb3ff633918fcf64c901e5
   branch: 2.x
@@ -646,6 +654,7 @@ DEPENDENCIES
   connection_pool
   dalli!
   dotenv-rails
+  down!
   elasticsearch (~> 2.0)
   elasticsearch-model!
   evernote_oauth
@@ -662,6 +671,7 @@ DEPENDENCIES
   htmlentities
   http!
   httparty
+  image_processing
   jbuilder
   jquery-rails
   jwt
@@ -688,6 +698,7 @@ DEPENDENCIES
   responders
   reverse_markdown
   rmagick
+  ruby-vips
   rubyzip
   sanitize
   sass-rails

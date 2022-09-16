@@ -41,7 +41,7 @@ module Crawler
       end
 
       def http_cache
-        @http_cache ||= HTTPCache.new(@feed_id)
+        @http_cache ||= HttpCache.new(@feed_id)
       end
 
       def inspect

@@ -58,7 +58,7 @@ module Crawler
 
       def on_redirect
         proc do |from, to|
-          @feed.redirects.push Redirect.new(@feed_id, status: from.status.code, from: from.uri.to_s, to: to.uri.to_s)
+          @feed.redirects.push RedirectCache::Redirect.new(@feed_id, status: from.status.code, from: from.uri.to_s, to: to.uri.to_s)
         end
       end
 

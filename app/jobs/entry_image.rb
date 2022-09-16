@@ -3,7 +3,7 @@ class EntryImage
   sidekiq_options retry: false
 
   def perform(public_id, image = nil)
-    @entry = Entry.find_by_public_id(public_id)
+    @entry = Entry.find_by_public_id!(public_id)
     @image = image
     if @image
       receive

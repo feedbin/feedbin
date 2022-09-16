@@ -2,7 +2,7 @@
 
 module Crawler
   module Refresher
-    class HTTPCache
+    class HttpCache
       def initialize(feed_id)
         @feed_id = feed_id
       end
