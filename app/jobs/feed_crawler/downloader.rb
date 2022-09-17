@@ -9,7 +9,7 @@ module FeedCrawler
       @feed_url    = feed_url
       @subscribers = subscribers
       @critical    = critical
-      @feed_cache        = FeedCache.new(feed_id)
+      @feed_cache  = FeedCache.new(feed_id)
 
       throttle = Throttle.new(@feed_url, @feed_cache.downloaded_at)
       if @critical
@@ -43,13 +43,13 @@ module FeedCrawler
       url = @feed_cache.redirect ? @feed_cache.redirect : parsed_url.url
       Sidekiq.logger.info "Redirect: from=#{@feed_url} to=#{@feed_cache.redirect} id=#{@feed_id}" if @feed_cache.redirect
       Feedkit::Request.download(url,
-      on_redirect:   on_redirect,
-      username:      parsed_url.username,
-      password:      parsed_url.password,
-      last_modified: @feed_cache.last_modified,
-      etag:          @feed_cache.etag,
-      auto_inflate:  auto_inflate,
-      user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
+        on_redirect:   on_redirect,
+        username:      parsed_url.username,
+        password:      parsed_url.password,
+        last_modified: @feed_cache.last_modified,
+        etag:          @feed_cache.etag,
+        auto_inflate:  auto_inflate,
+        user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
       )
     end
 
