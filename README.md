@@ -25,7 +25,7 @@ If you're looking for a self-hosted RSS reader check out:
 
 And if you really want to run the whole Feedbin stack, take a look at this [Docker version](https://github.com/angristan/feedbin-docker). If you would like to try Feedbin out you can [sign up](https://feedbin.com/) for an account.
 
-The main Feedbin project is a [Rails 6](http://rubyonrails.org/) application. In addition to the main project there are several other services that provide additional functionality. None of these services are required to get Feedbin running locally, but they all provide important functionality that you would want for a production install.
+The main Feedbin project is a [Rails 7](http://rubyonrails.org/) application. In addition to the main project there are several other services that provide additional functionality. None of these services are required to get Feedbin running locally, but they all provide important functionality that you would want for a production install.
 
  - [**crawler:**](https://github.com/feedbin/crawler)
    Crawler is the service that does feed refreshing and image processing. Crawler is kept separate so it can be scaled independently. It's also a benefit to not have to load all of Rails for this service.
