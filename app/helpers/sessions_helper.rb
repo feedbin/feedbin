@@ -21,6 +21,13 @@ module SessionsHelper
     end
   end
 
+  def current_user_has_migrations?
+    if @current_user_has_migrations.nil?
+      @current_user_has_migrations = !!current_user.try(:account_migrations)&.exists?
+    end
+    @current_user_has_migrations
+  end
+
   def authorize
     unless signed_in?
       if request.subdomain == "api"
