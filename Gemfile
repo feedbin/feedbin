@@ -78,7 +78,6 @@ end
 
 group :development, :test do
   gem "stripe-ruby-mock", github: "feedbin/stripe-ruby-mock", branch: "feedbin", require: "stripe_mock"
-
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]
   gem "capybara"
   gem "faker"
@@ -90,5 +89,4 @@ group :development, :test do
   gem "selenium-webdriver"
   gem "standard"
   gem "webmock", "= 3.8.0"
-
 end

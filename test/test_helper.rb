@@ -38,7 +38,6 @@ require "support/push_server_mock"
 
 ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
 StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
-WebMock.disable_net_connect!(allow_localhost: true, allow: "codeclimate.com")
 Sidekiq.logger.level = Logger::WARN
 
 class ActiveSupport::TestCase

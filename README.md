@@ -25,17 +25,16 @@ If you're looking for a self-hosted RSS reader check out:
 
 And if you really want to run the whole Feedbin stack, take a look at this [Docker version](https://github.com/angristan/feedbin-docker). If you would like to try Feedbin out you can [sign up](https://feedbin.com/) for an account.
 
-The main Feedbin project is a [Rails 7](https://rubyonrails.org/) application. In addition to the main project there are several other services that provide additional functionality. None of these services are required to get Feedbin running locally, but they all provide important functionality that you would want for a production install.
+The main Feedbin project is a [Rails 7](https://rubyonrails.org/) application. In addition to the main project there are several other services that provide additional functionality. None of these services are required to get Feedbin running locally.
 
- - [**crawler:**](https://github.com/feedbin/crawler)
-   Crawler is the service that does feed refreshing and image processing. Crawler is kept separate so it can be scaled independently. It's also a benefit to not have to load all of Rails for this service.
-   
-**Optional services**
- 
+**Optional Extras**
+
  - [**Privacy Please:**](https://github.com/feedbin/privacy-please)
-   Privacy Please is an https image proxy. In production Feedbin is TLS only. One issue with TLS is all assets must be served over TLS as well or the browser will show insecure content warnings. Privacy Please proxies all image requests through an TLS enabled host to prevent this. Using a proxy has the added benefit of providing privacy while using Feedbin.
+   Privacy Please is an https image proxy. In production Feedbin is https only. One issue with https is all assets must be served over https as well or the browser will show insecure content warnings. Privacy Please proxies all image requests through an https enabled host to prevent this. Using a proxy has the added benefit of providing privacy while using Feedbin.
  - [**extract:**](https://github.com/feedbin/extract)
    Extract is a Node.js service that extract content from web pages. It is used to extract the full content of an article when a feed only provide excerpts.
+ - [**pigo:**](https://github.com/esimov/pigo/releases)
+   pigo provides face detection for better [preview image cropping](https://feedbin.com/blog/2015/10/22/image-previews/). Make sure it's available in your PATH or provide a PIGO_PATH environment variable.
 
 Requirements
 ------------
@@ -43,7 +42,7 @@ Requirements
  - Linux or macOS
  - [Ruby 3.1](http://www.ruby-lang.org/en/)
  - [Postgres 11](http://www.postgresql.org/)
- - [Redis > 6.0](http://redis.io/)
+ - [Redis 6](http://redis.io/)
  - [Elasticsearch 2.4](https://www.elastic.co/downloads/past-releases/#elasticsearch)
 
 Installation
@@ -78,5 +77,3 @@ Rename [.env.example](.env.example) to `.env` and customize it with your setting
 Status Badges
 -------------
 ![Ruby CI](https://github.com/feedbin/feedbin/workflows/Ruby%20CI/badge.svg)
-
-[![Code Climate](https://codeclimate.com/github/feedbin/feedbin.svg)](https://codeclimate.com/github/feedbin/feedbin)
