@@ -15,7 +15,7 @@ Introduction
 
 Feedbin is a web based RSS reader. It provides a user interface for reading and managing feeds as well as a [REST-like API](https://github.com/feedbin/feedbin-api) for clients to connect to.
 
-Feedbin's goal is to be a great web-based RSS service. This goal is at odds with being a great self-hosted RSS reader. There are a lot of moving parts and things to configure, so for that reason I do not recommend that you run Feedbin in production.
+Feedbin's goal is to be a great web-based RSS service. This goal is at odds with being a great self-hosted RSS reader. There are a lot of moving parts and things to configure, and for that reason I do not recommend that you run Feedbin in production unless you have plenty of time to get it properly configured.
 
 If you're looking for a self-hosted RSS reader check out:
 
