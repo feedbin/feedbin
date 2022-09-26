@@ -1,4 +1,6 @@
 class Feed < ApplicationRecord
+  self.ignored_columns = ["etag", "last_modified", "fingerprint"]
+
   has_many :subscriptions
   has_many :podcast_subscriptions
   has_many :entries
