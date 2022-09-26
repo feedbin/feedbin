@@ -1,7 +1,7 @@
 module ImageCrawler
   class UploadImage
     include Sidekiq::Worker
-    include ImageHelper
+    include ImageCrawlerHelper
     include SidekiqHelper
 
     sidekiq_options queue: local_queue("image_parallel"), retry: false

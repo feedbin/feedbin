@@ -1,7 +1,7 @@
 module ImageCrawler
   class ProcessImage
     include Sidekiq::Worker
-    include ImageHelper
+    include ImageCrawlerHelper
     include SidekiqHelper
 
     sidekiq_options queue: local_queue("image_serial"), retry: false

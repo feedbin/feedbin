@@ -1,6 +1,6 @@
 module ImageCrawler
   class DownloadCache
-    include ImageHelper
+    include ImageCrawlerHelper
 
     attr_reader :storage_url
 

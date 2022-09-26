@@ -1,7 +1,7 @@
 module ImageCrawler
   class ImageProcessor
     attr_reader :path
-    include ImageHelper
+    include ImageCrawlerHelper
 
     def initialize(file, target_width:, target_height:)
       @file = file
