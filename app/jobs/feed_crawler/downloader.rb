@@ -10,9 +10,6 @@ module FeedCrawler
       @subscribers = subscribers
       @critical    = critical
       @feed_cache  = FeedCache.new(feed_id)
-      @feed        = Feed.find(feed_id)
-
-      Sidekiq.logger.info "Refreshing id=#{@feed.id} url=#{@feed_url}"
 
       throttle = Throttle.new(@feed_url, @feed_cache.downloaded_at)
       if @critical
