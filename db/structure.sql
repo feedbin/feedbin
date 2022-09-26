@@ -588,10 +588,8 @@ CREATE TABLE public.feeds (
     title text,
     feed_url text,
     site_url text,
-    etag text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    last_modified timestamp without time zone,
     subscriptions_count bigint DEFAULT 0 NOT NULL,
     protected boolean DEFAULT false,
     push_expiration timestamp without time zone,
@@ -604,8 +602,8 @@ CREATE TABLE public.feeds (
     hubs text[],
     settings jsonb,
     standalone_request_at timestamp(6) without time zone,
-    fingerprint uuid,
-    last_change_check timestamp(6) without time zone
+    last_change_check timestamp(6) without time zone,
+    crawl_data jsonb
 );
 
 
@@ -2942,6 +2940,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220804145624'),
 ('20220806155622'),
 ('20220909105317'),
-('20220916104628');
+('20220916104628'),
+('20220926154041');
 
 
