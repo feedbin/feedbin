@@ -69,7 +69,7 @@ module ImageCrawler
         max = resized.height - @target_height
       end
 
-      if center = average_face_position(axis, image.call)
+      if PIGO_INSTALLED && center = average_face_position(axis, image.call)
         point = {"x" => 0, "y" => 0}
         point[axis] = (center.to_f - contraint.to_f / 2.0).floor
 
