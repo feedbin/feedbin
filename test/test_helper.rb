@@ -1,22 +1,9 @@
 ENV["RAILS_ENV"] ||= "test"
 
-require File.expand_path("../../config/environment", __FILE__)
-require "rails/test_help"
 require "minitest"
 require "minitest/mock"
-require "sidekiq/testing"
-require "webmock/minitest"
-
-require "support/login_helper"
-require "support/factory_helper"
-require "support/assertions"
-require "support/api_controller_test_case"
-require "support/push_server_mock"
-
-ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
-StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
-WebMock.disable_net_connect!(allow_localhost: true, allow: "codeclimate.com")
-Sidekiq.logger.level = Logger::WARN
+require "socket"
+require "connection_pool"
 
 unless ENV["CI"]
   socket = Socket.new(:INET, :STREAM, 0)
@@ -36,6 +23,23 @@ $redis = {
   entries: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) },
   refresher: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) }
 }
+
+require File.expand_path("../../config/environment", __FILE__)
+
+require "rails/test_help"
+require "sidekiq/testing"
+require "webmock/minitest"
+
+require "support/login_helper"
+require "support/factory_helper"
+require "support/assertions"
+require "support/api_controller_test_case"
+require "support/push_server_mock"
+
+ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
+StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
+WebMock.disable_net_connect!(allow_localhost: true, allow: "codeclimate.com")
+Sidekiq.logger.level = Logger::WARN
 
 class ActiveSupport::TestCase
   include LoginHelper
