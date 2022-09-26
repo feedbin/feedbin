@@ -8,7 +8,9 @@ Feedbin is a simple, fast and nice looking RSS reader.
 Support
 -------
 
-Support for Feedbin customers is available by emailing [support@feedbin.com](mailto:support@feedbin.com). No support is provided for installing/running Feedbin.
+Support is available to Feedbin customers by emailing [support@feedbin.com](mailto:support@feedbin.com). This is also the best way to [submit feature requests](https://feedbin.com/help/making-a-feature-request/).
+
+No support is provided for installing/running Feedbin.
 
 Introduction
 ------------
