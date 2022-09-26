@@ -3,7 +3,7 @@ Feedbin
 
 Feedbin is a simple, fast and nice looking RSS reader.
 
-![Feedbin Screenshot](https://user-images.githubusercontent.com/133809/188482632-a4245b74-474a-4a93-9b9c-2a66b5718225.png)
+![Feedbin Screenshot](https://user-images.githubusercontent.com/133809/192301669-ffc7f86e-ad0a-434d-9b76-219f41b62f4b.png)
 
 Support
 -------
