@@ -61,7 +61,7 @@ class MakeEpub
       end
     end
 
-    UserMailer.kindle(@address, epub_path).deliver_now
+    UserMailer.kindle(@address, @entry.title, epub_path).deliver_now
   ensure
     FileUtils.remove_entry(@directory)
     FileUtils.remove_entry(epub_path) rescue Errno::ENOENT
