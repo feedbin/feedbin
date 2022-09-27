@@ -12,7 +12,9 @@ module FeedCrawler
 
     def save(redirects)
       @redirects = redirects
-      Cache.write(stable_key, {to: @redirects.last.to}) if redirect_stable?
+      return unless redirect_stable?
+      Cache.write(stable_key, {to: @redirects.last.to})
+      @redirects.last.to
     end
 
     def redirect_stable?

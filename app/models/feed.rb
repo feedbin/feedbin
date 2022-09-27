@@ -1,6 +1,4 @@
 class Feed < ApplicationRecord
-  self.ignored_columns = ["etag", "last_modified", "fingerprint"]
-
   has_many :subscriptions
   has_many :podcast_subscriptions
   has_many :entries
@@ -21,6 +19,7 @@ class Feed < ApplicationRecord
 
   after_commit :web_sub_subscribe, on: :create
 
+  attribute :crawl_data, CrawlDataType.new
   attr_accessor :count, :tags
   attr_readonly :feed_url
 

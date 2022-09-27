@@ -13,6 +13,10 @@ every(10.seconds, "clockwork.very_frequent") do
   if RedisLock.acquire("clockwork:cache_entry_views", 8)
     CacheEntryViews.perform_async(nil, true)
   end
+
+  if RedisLock.acquire("clockwork:downloader_migration", 8)
+    FeedCrawler::DownloaderMigration.perform_async
+  end
 end
 
 every(1.minutes, "clockwork.frequent") do

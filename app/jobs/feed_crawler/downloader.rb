@@ -1,15 +1,18 @@
 module FeedCrawler
   class Downloader
     include Sidekiq::Worker
+    include SidekiqHelper
 
     sidekiq_options queue: :feed_downloader, retry: false, backtrace: false
 
-    def perform(feed_id, feed_url, subscribers, critical = false)
+    def perform(feed_id, feed_url, subscribers, critical = false, crawl_data = {})
       @feed_id     = feed_id
       @feed_url    = feed_url
       @subscribers = subscribers
       @critical    = critical
       @feed_cache  = FeedCache.new(feed_id)
+      @crawl_data  = CrawlData.new(crawl_data)
+      @updates     = {}
 
       throttle = Throttle.new(@feed_url, @feed_cache.downloaded_at)
       if @critical
@@ -19,6 +22,8 @@ module FeedCrawler
       elsif @feed_cache.ok?
         download
       end
+    ensure
+      migrate_data
     end
 
     def download
@@ -65,6 +70,22 @@ module FeedCrawler
       job_id = job_class.perform_async(@feed_id, @feed_url, @response.path, @response.encoding.to_s)
       Sidekiq.logger.info "Parse enqueued job_id: #{job_id} path=#{@response.path}"
       @feed_cache.save(@response)
+    end
+
+    def migrate_data
+      @updates = {
+        id: @feed_id,
+        crawl_data: {
+          etag:                 @feed_cache.etag,
+          last_modified:        @feed_cache.last_modified,
+          downloaded_at:        @feed_cache.downloaded_at,
+          download_fingerprint: @feed_cache.checksum,
+          error_count:          @feed_cache.attempt_count,
+          redirected_to:        @feed_cache.redirect,
+          last_error:           @feed_cache.last_error,
+        }
+      }
+      # add_to_queue(FeedCrawler::DownloaderMigration::SET_NAME, @updates.to_json)
     end
   end
 end
