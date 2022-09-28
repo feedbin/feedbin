@@ -85,7 +85,7 @@ module FeedCrawler
           last_error:           @feed_cache.last_error,
         }
       }
-      # add_to_queue(FeedCrawler::DownloaderMigration::SET_NAME, @updates.to_json)
+      add_to_queue(FeedCrawler::DownloaderMigration::SET_NAME, @updates.to_json)
     end
   end
 end
