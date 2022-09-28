@@ -16,7 +16,7 @@ module FeedCrawler
         .distinct
         .pluck(:feed_id)
 
-      columns = [:id, :feed_url, :subscriptions_count, :crawl_data]
+      columns = [:id, :feed_url, :subscriptions_count]
       subscriptions = Feed.xml
         .where(id: active, active: true)
         .where("subscriptions_count > ?", count)
