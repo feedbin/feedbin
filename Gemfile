@@ -72,10 +72,8 @@ group :development do
   gem "binding_of_caller"
   gem "htmlbeautifier"
   gem "listen"
-  gem "silencer"
   gem "foreman"
   gem "pry"
-  gem "pry-byebug"
 end
 
 group :development, :test do
