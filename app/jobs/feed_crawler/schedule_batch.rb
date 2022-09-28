@@ -16,15 +16,15 @@ module FeedCrawler
         .distinct
         .pluck(:feed_id)
 
+      columns = [:id, :feed_url, :subscriptions_count, :crawl_data]
       subscriptions = Feed.xml
         .where(id: active, active: true)
         .where("subscriptions_count > ?", count)
-        .pluck(:id, :feed_url, :subscriptions_count)
+        .pluck(*columns)
 
-      standalone = Feed.where(
-        standalone_request_at: 1.month.ago..,
-        id: feed_ids - active
-      ).pluck(:id, :feed_url).map {|args| args.push(1)}
+      standalone = Feed
+        .where(id: feed_ids - active, standalone_request_at: 1.month.ago..)
+        .pluck(*columns)
 
       jobs = subscriptions + standalone
 
