@@ -15,6 +15,8 @@ module FeedCrawler
       @crawl_data  = CrawlData.new(crawl_data)
       @updates     = {}
 
+      Sidekiq.logger.info "Comparison crawl_data=#{@crawl_data.to_h.sort.to_h} cache_data=#{cached_data.sort.to_h}"
+
       throttle = Throttle.new(@feed_url, @feed_cache.downloaded_at)
       if critical
         download
@@ -76,17 +78,21 @@ module FeedCrawler
     def migrate_data
       @updates = {
         id: @feed_id,
-        crawl_data: {
-          etag:                 @feed_cache.etag,
-          last_modified:        @feed_cache.last_modified,
-          downloaded_at:        @feed_cache.downloaded_at,
-          download_fingerprint: @feed_cache.checksum,
-          error_count:          @feed_cache.attempt_count,
-          redirected_to:        @feed_cache.redirect,
-          last_error:           @feed_cache.last_error,
-        }
+        crawl_data: cached_data
       }
       add_to_queue(FeedCrawler::DownloaderMigration::SET_NAME, @updates.to_json)
+    end
+
+    def cached_data
+      {
+        etag:                 @feed_cache.etag,
+        last_modified:        @feed_cache.last_modified,
+        downloaded_at:        @feed_cache.downloaded_at,
+        download_fingerprint: @feed_cache.checksum,
+        error_count:          @feed_cache.attempt_count,
+        redirected_to:        @feed_cache.redirect,
+        last_error:           @feed_cache.last_error,
+      }
     end
   end
 end
