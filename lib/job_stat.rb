@@ -3,7 +3,7 @@ class JobStat
     title = "job.#{job.class.to_s.underscore.parameterize}"
     Librato.increment "#{title}.count"
     Librato.increment "job.count"
-    Librato.timing title
+    Librato.timing title do
       yield
     end
   end
