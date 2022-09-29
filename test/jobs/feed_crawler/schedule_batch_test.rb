@@ -18,7 +18,10 @@ module FeedCrawler
           job.perform(1, false)
         end
         Sidekiq::Queues["feed_downloader"].each do |job|
-          assert_equal(Feed.find(job["args"][0]).feed_url, job["args"][1])
+          feed = Feed.find(job["args"][0])
+          assert_equal(feed.feed_url, job["args"][1])
+          assert_equal(feed.subscriptions_count, job["args"][2])
+          assert_equal(feed.crawl_data.to_h, job["args"][3].symbolize_keys)
         end
       end
     end

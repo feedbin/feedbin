@@ -16,7 +16,7 @@ module FeedCrawler
         .distinct
         .pluck(:feed_id)
 
-      columns = [:id, :feed_url, :subscriptions_count]
+      columns = [:id, :feed_url, :subscriptions_count, :crawl_data]
       subscriptions = Feed.xml
         .where(id: active, active: true)
         .where("subscriptions_count > ?", count)
@@ -27,6 +27,11 @@ module FeedCrawler
         .pluck(*columns)
 
       jobs = subscriptions + standalone
+      jobs = jobs.map do |data|
+        data.tap do
+          data[-1] = data[-1].to_h
+        end
+      end
 
       if jobs.present?
         job_class = Downloader

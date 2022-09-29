@@ -5,17 +5,18 @@ module FeedCrawler
 
     sidekiq_options queue: :feed_downloader, retry: false, backtrace: false
 
-    def perform(feed_id, feed_url, subscribers, critical = false, crawl_data = {})
+    attr_accessor :critical
+
+    def perform(feed_id, feed_url, subscribers, crawl_data = {})
       @feed_id     = feed_id
       @feed_url    = feed_url
       @subscribers = subscribers
-      @critical    = critical
       @feed_cache  = FeedCache.new(feed_id)
       @crawl_data  = CrawlData.new(crawl_data)
       @updates     = {}
 
       throttle = Throttle.new(@feed_url, @feed_cache.downloaded_at)
-      if @critical
+      if critical
         download
       elsif throttle.throttled?
         Sidekiq.logger.info "Throttled downloaded_at=#{Time.at(@feed_cache.downloaded_at)} url=#{@feed_url}"
@@ -66,7 +67,7 @@ module FeedCrawler
 
     def parse
       @response.persist!
-      job_class = @critical ? ParserCritical : Parser
+      job_class = critical ? ParserCritical : Parser
       job_id = job_class.perform_async(@feed_id, @feed_url, @response.path, @response.encoding.to_s)
       Sidekiq.logger.info "Parse enqueued job_id: #{job_id} path=#{@response.path}"
       @feed_cache.save(@response)

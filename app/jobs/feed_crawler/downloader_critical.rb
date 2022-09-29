@@ -3,7 +3,9 @@ module FeedCrawler
     include Sidekiq::Worker
     sidekiq_options queue: :feed_downloader_critical, retry: false
     def perform(*args)
-      Downloader.new.perform(*args, true)
+      job = Downloader.new
+      job.critical = true
+      job.perform(*args)
     end
   end
 end

@@ -11,3 +11,5 @@ kottke:
   site_url: http://kottke.org/
   self_url: http://feeds.kottke.org/main
   host: kottke.org
+  crawl_data:
+    etag: 1234

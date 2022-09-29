@@ -23,7 +23,7 @@ module FeedCrawler
       stub_request_file("atom.xml", url)
 
       assert_equal 0, Sidekiq::Queues["feed_parser_critical_#{Socket.gethostname}"].size
-      DownloaderCritical.new.perform(1, url, 10)
+      DownloaderCritical.new.perform(1, url, 10, {})
       assert_equal 1, Sidekiq::Queues["feed_parser_critical_#{Socket.gethostname}"].size
     end
 
