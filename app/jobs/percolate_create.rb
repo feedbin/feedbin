@@ -1,6 +1,6 @@
 class PercolateCreate
   include Sidekiq::Worker
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :search
 
   def perform(action_id)
     @action = Action.find(action_id)

@@ -1,6 +1,6 @@
 class PercolateDestroy
   include Sidekiq::Worker
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :search
 
   def perform(action_id)
     options = {

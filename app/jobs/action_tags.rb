@@ -1,6 +1,6 @@
 class ActionTags
   include Sidekiq::Worker
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :search
 
   def perform(user_id, tag_id, tag_id_was)
     user = User.find(user_id)

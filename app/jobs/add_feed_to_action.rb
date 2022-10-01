@@ -1,6 +1,6 @@
 class AddFeedToAction
   include Sidekiq::Worker
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :search
 
   def perform(user_id)
     user = User.find(user_id)

@@ -1,6 +1,6 @@
 class SearchIndexStore
   include Sidekiq::Worker
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :search
 
   def perform(klass, id, update = false)
     entry = Entry.find(id)
