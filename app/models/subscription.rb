@@ -63,7 +63,7 @@ class Subscription < ApplicationRecord
   end
 
   def remove_feed_from_action
-    RemoveFeedFromAction.perform_async(user_id, feed_id)
+    Search::RemoveFeedFromAction.perform_async(user_id, feed_id)
   end
 
   def expire_stat_cache
