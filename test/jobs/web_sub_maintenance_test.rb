@@ -1,6 +1,6 @@
 require "test_helper"
 
-module WebSubJob
+module WebSub
   class MaintenanceTest < ActiveSupport::TestCase
 
     test "should schedule subscribe job" do

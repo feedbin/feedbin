@@ -1,4 +1,4 @@
-class WebSub
+class WebSubHelper
   def initialize(feed)
     @feed = feed
   end

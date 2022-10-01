@@ -1,6 +1,6 @@
 require "test_helper"
 
-module WebSubJob
+module WebSub
   class UnsubscribeTest < ActiveSupport::TestCase
     test "should unsubscribe" do
       hub_url = "http://hub.example.com/"

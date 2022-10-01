@@ -1,4 +1,4 @@
-module WebSubJob
+module WebSub
   class Subscribe
     include Sidekiq::Worker
     sidekiq_options retry: false

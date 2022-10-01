@@ -172,7 +172,7 @@ class Feed < ApplicationRecord
   end
 
   def web_sub_subscribe
-    WebSubJob::Subscribe.perform_async(id)
+    WebSub::Subscribe.perform_async(id)
   end
 
   def hubs
