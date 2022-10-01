@@ -1,6 +1,6 @@
 class ActionsBulk
   include Sidekiq::Worker
-  sidekiq_options queue: :default, retry: false
+  sidekiq_options queue: :search, retry: false
 
   def perform(action_id, user_id)
     user = User.find(user_id)
