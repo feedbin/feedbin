@@ -56,8 +56,8 @@ class EntryDeleterTest < ActiveSupport::TestCase
     end
   end
 
-  test "should enqueue SearchIndexRemove" do
-    assert_difference "SearchIndexRemove.jobs.size", +1 do
+  test "should enqueue Search::SearchIndexRemove" do
+    assert_difference "Search::SearchIndexRemove.jobs.size", +1 do
       EntryDeleter.new.perform(@feed.id)
     end
   end

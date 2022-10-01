@@ -29,15 +29,15 @@ class Action < ApplicationRecord
   end
 
   def percolate_create
-    PercolateCreate.perform_async(id)
+    Search:: PercolateCreate.perform_async(id)
   end
 
   def percolate_destroy
-    PercolateDestroy.perform_async(id)
+    Search::PercolateDestroy.perform_async(id)
   end
 
   def bulk_actions
-    ActionsBulk.perform_async(id, user.id) if apply_action == "1"
+    Search::ActionsBulk.perform_async(id, user.id) if apply_action == "1"
   end
 
   def search_body

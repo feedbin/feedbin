@@ -59,7 +59,7 @@ class Subscription < ApplicationRecord
   end
 
   def add_feed_to_action
-    AddFeedToAction.perform_async(user_id)
+    Search::AddFeedToAction.perform_async(user_id)
   end
 
   def remove_feed_from_action

@@ -10,7 +10,7 @@ module FactoryHelper
           user.subscriptions.where(feed: feed).first_or_create
         end
         entry = create_entry(feed)
-        SearchIndexStore.new.perform("Entry", entry.id)
+        Search::SearchIndexStore.new.perform("Entry", entry.id)
       end
     }
     Entry.__elasticsearch__.refresh_index!
