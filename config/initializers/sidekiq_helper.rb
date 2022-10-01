@@ -25,9 +25,7 @@ module SidekiqHelper
   def enqueue_all(klass, sidekiq_class, *args)
     if last_id = klass.last&.id
       defaults = {
-        "class" => sidekiq_class.name.freeze,
-        "queue" => sidekiq_class.get_sidekiq_options["queue"].to_s.freeze,
-        "retry" => sidekiq_class.get_sidekiq_options["retry"].freeze
+        "class" => sidekiq_class
       }
       (1..last_id).each_slice(10_000) do |slice|
         ids = slice.map { |id| [id, *args] }

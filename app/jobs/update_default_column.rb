@@ -33,8 +33,7 @@ class UpdateDefaultColumn
     }
     Sidekiq::Client.push_bulk(
       "args" => jobs,
-      "class" => self.class.name,
-      "queue" => self.class.get_sidekiq_options["queue"].to_s
+      "class" => self.class
     )
   end
 end

@@ -32,16 +32,10 @@ module FeedCrawler
           data[-1] = data[-1].to_h
         end
       end
-
       if jobs.present?
-        job_class = Downloader
         Sidekiq::Client.push_bulk(
           "args"      => jobs.shuffle,
-          "class"     => job_class.name,
-          "queue"     => job_class.get_sidekiq_options["queue"].to_s,
-          "retry"     => false,
-          "dead"      => false,
-          "backtrace" => false
+          "class"     => Downloader
         )
       end
     end
