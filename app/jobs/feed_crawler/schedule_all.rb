@@ -8,7 +8,7 @@ module FeedCrawler
     COUNT_KEY = "feed_refresher_scheduler:count".freeze
 
     def perform
-      queues = [Receiver, Downloader, Parser]
+      queues = [Downloader, Parser, Receiver]
       if queues.all? {|queue| queue_empty?(queue.get_sidekiq_options["queue"]) }
         refresh_feeds
         TwitterSchedule.perform_async if queue_empty?("twitter_refresher")
