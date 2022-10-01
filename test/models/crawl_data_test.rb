@@ -12,7 +12,7 @@ class CrawlDataTest < ActiveSupport::TestCase
     feed.download_error(Exception.new)
 
     feed = CrawlData.new
-    feed.download_success
+    feed.download_success(feed_id)
 
     feed = CrawlData.new
     assert feed.ok?
@@ -24,7 +24,7 @@ class CrawlDataTest < ActiveSupport::TestCase
     feed.download_error(Feedkit::NotFeed.new)
 
     feed = CrawlData.new(feed.to_h)
-    feed.download_success
+    feed.download_success(feed_id)
 
     feed = CrawlData.new(feed.to_h)
     assert_equal("Feedkit::NotFeed", feed.last_error["class"])

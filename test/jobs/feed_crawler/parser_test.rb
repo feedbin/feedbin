@@ -8,9 +8,11 @@ module FeedCrawler
     end
 
     def test_should_parse_xml
+      assert_nil(@feed.last_change_check)
       assert_difference -> { Receiver.jobs.size }, 1 do
-        Parser.new.perform(@feed.id, @feed.feed_url, xml_path)
+        Parser.new.perform(@feed.id, xml_path)
       end
+      assert_not_nil(@feed.reload.last_change_check)
 
       job = Receiver.jobs.first
       feed = job["args"].first["feed"]
@@ -22,13 +24,21 @@ module FeedCrawler
 
     def test_should_parse_json
       assert_difference -> { Receiver.jobs.size }, 1 do
-        Parser.new.perform(@feed.id, "http://example.com", json_path)
+        Parser.new.perform(@feed.id, json_path)
       end
     end
 
-    def test_should_enqueue_error
-      queue = Sidekiq::Queues['feed_downloader_critical']
-      Parser.new.perform(@feed.id, "http://example.com", html_path)
+    def test_should_save_not_feed_error
+      Parser.new.perform(@feed.id, html_path)
+      assert_equal("Feedkit::NotFeed", @feed.reload.crawl_data.last_error["class"])
+    end
+
+    def test_should_clear_error
+      Parser.new.perform(@feed.id, html_path)
+      refute @feed.reload.crawl_data.ok?
+
+      Parser.new.perform(@feed.id, xml_path, nil, @feed.reload.crawl_data.to_h)
+      assert @feed.reload.crawl_data.ok?
     end
 
     private

@@ -1,12 +1,6 @@
 class CrawlData
-  delegate :last_modified,  :etag,  :download_fingerprint,  to: :@data
-  delegate :last_modified=, :etag=, :download_fingerprint=, to: :@data
-
-  delegate :download_count,  :downloaded_at,  :redirected_to,  to: :@data
-  delegate :download_count=, :downloaded_at=, :redirected_to=, to: :@data
-
-  delegate :last_error,  to: :@data
-  delegate :last_error=, to: :@data
+  delegate :last_modified, :etag, :download_fingerprint, to: :@data
+  delegate :downloaded_at, :redirected_to, :last_error, to: :@data
 
   attr_accessor :redirects
 
@@ -31,11 +25,9 @@ class CrawlData
     @data.downloaded_at = Time.now.to_i
   end
 
-  def download_success
+  def download_success(feed_id)
     clear! unless last_error && last_error["class"] == "Feedkit::NotFeed"
-
-    # TODO call save when switching to CrawlData only
-    # @data.redirected_to = RedirectCache.new(feed_id).save(redirects)
+    @data.redirected_to = FeedCrawler::RedirectCache.new(feed_id).save(redirects)
   end
 
   def download_error(exception)
@@ -51,8 +43,8 @@ class CrawlData
   end
 
   def save(response)
-    @data.etag                 = response.etag,
-    @data.last_modified        = response.last_modified,
+    @data.etag                 = response.etag
+    @data.last_modified        = response.last_modified
     @data.download_fingerprint = response.checksum
   end
 
@@ -64,15 +56,15 @@ class CrawlData
     @data.to_h
   end
 
+  def next_retry
+    failed_at + backoff
+  end
+
   private
 
   def error_data(exception)
     status = exception.respond_to?(:response) ? exception.response.status.code : nil
     {"date" => Time.now.to_i, "class" => exception.class.name, "message" => exception.message, "status" => status}
-  end
-
-  def next_retry
-    failed_at + backoff
   end
 
   def backoff

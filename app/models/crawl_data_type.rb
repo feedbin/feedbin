@@ -4,7 +4,7 @@ class CrawlDataType < ActiveModel::Type::Value
   end
 
   def cast(value)
-    CrawlData.new(value) unless value.nil?
+    CrawlData.new(value)
   end
 
   def deserialize(value)

@@ -4,17 +4,47 @@ module FeedCrawler
   class DownloaderTest < ActiveSupport::TestCase
     def setup
       flush_redis
+      @feed = feeds(:daring_fireball)
+    end
+
+    def test_should_persist_crawl_data_on_parse
+      etag = "etag"
+      last_modified = "last_modified"
+      download_fingerprint = "694b08e"
+
+      stub_request(:get, /dhy5vgj5baket\.cloudfront\.net/).to_return(status: 404)
+      stub_request_file("atom.xml", @feed.feed_url,{
+        headers: {
+          "Etag" => etag,
+          "Last-Modified" => last_modified
+        }
+      })
+
+      Sidekiq::Testing.inline! do
+        Downloader.perform_async(@feed.id, @feed.feed_url, 10, {})
+      end
+
+      assert_equal(etag, @feed.reload.crawl_data.etag)
+      assert_equal(last_modified, @feed.reload.crawl_data.last_modified)
+      assert_equal(download_fingerprint, @feed.reload.crawl_data.download_fingerprint)
+
+      Downloader.new.perform(@feed.id, @feed.feed_url, 10, @feed.reload.crawl_data.to_h)
+      assert_equal 0, Sidekiq::Queues["feed_parser_#{Socket.gethostname}"].size, "should be empty because fingerprint will match"
+    end
+
+    def test_should_not_persist_crawl_before_parse
+      stub_request(:get, /dhy5vgj5baket\.cloudfront\.net/).to_return(status: 404)
+      stub_request_file("atom.xml", @feed.feed_url)
+      Downloader.new.perform(@feed.id, @feed.feed_url, 10, {})
+      PersistCrawlData.new.perform
+      assert_equal({}, @feed.reload.crawl_data.to_h)
     end
 
     def test_should_schedule_feed_parser
-      url = "http://example.com/atom.xml"
-      stub_request_file("atom.xml", url)
+      stub_request_file("atom.xml", @feed.feed_url)
 
       assert_equal 0, Sidekiq::Queues["feed_parser_#{Socket.gethostname}"].size
-      Downloader.new.perform(1, url, 10)
-      assert_equal 1, Sidekiq::Queues["feed_parser_#{Socket.gethostname}"].size
-
-      Downloader.new.perform(1, url, 10)
+      Downloader.new.perform(@feed.id, @feed.feed_url, 10)
       assert_equal 1, Sidekiq::Queues["feed_parser_#{Socket.gethostname}"].size
     end
 
@@ -47,11 +77,10 @@ module FeedCrawler
       url_one = "http://example.com/one"
       url_two = "http://example.com/two"
 
-      redirect_cache = RedirectCache.new(feed_id)
-      Cache.write(redirect_cache.stable_key, {to: url_two})
+      data = CrawlData.new(redirected_to: url_two)
 
       stub_request(:get, url_two)
-      Downloader.new.perform(feed_id, url_one, 10)
+      Downloader.new.perform(feed_id, url_one, 10, data.to_h)
     end
 
     def test_should_use_saved_redirect_with_basic_auth
@@ -61,18 +90,18 @@ module FeedCrawler
       url_one = "http://#{username}:#{password}@example.com/one"
       url_two = "http://example.com/two"
 
-      redirect_cache = RedirectCache.new(feed_id)
-      Cache.write(redirect_cache.stable_key, {to: url_two})
+      data = CrawlData.new(redirected_to: url_two)
 
       stub_request(:get, url_two).with(headers: {"Authorization" => "Basic #{Base64.strict_encode64("#{username}:#{password}")}"})
-      Downloader.new.perform(feed_id, url_one, 10)
+      Downloader.new.perform(feed_id, url_one, 10, data.to_h)
     end
 
     def test_should_do_nothing_if_not_modified
       feed_id = 1
       etag = "etag"
       last_modified = "last_modified"
-      Cache.write("refresher_http_#{feed_id}", {
+
+      data = CrawlData.new({
         etag: etag,
         last_modified: last_modified,
         checksum: nil
@@ -80,19 +109,29 @@ module FeedCrawler
 
       url = "http://example.com/atom.xml"
       stub_request(:get, url).with(headers: {"If-None-Match" => etag, "If-Modified-Since" => last_modified}).to_return(status: 304)
-      Downloader.new.perform(feed_id, url, 10)
+      Downloader.new.perform(feed_id, url, 10, data.to_h)
       assert_equal 0, Sidekiq::Queues["feed_parser_critical_#{Socket.gethostname}"].size
     end
 
     def test_should_not_be_ok_after_error
-      feed_id = 1
+      stub_request(:get, @feed.feed_url).to_return(status: 429)
 
-      url = "http://example.com/atom.xml"
-      stub_request(:get, url).to_return(status: 429)
+      Downloader.new.perform(@feed.id, @feed.feed_url, 10, {})
+      migration = PersistCrawlData.new
+      migration.jid = SecureRandom.hex
+      migration.perform
 
-      Downloader.new.perform(feed_id, url, 10)
+      refute @feed.reload.crawl_data.ok?, "Should not be ok?"
 
-      refute FeedStatus.new(feed_id).ok?, "Should not be ok?"
+      job = Downloader.new
+      job.critical = true
+      job.perform(@feed.id, @feed.feed_url, 10, @feed.reload.crawl_data.to_h)
+
+      migration = PersistCrawlData.new
+      migration.jid = SecureRandom.hex
+      migration.perform
+
+      assert_equal(2, @feed.reload.crawl_data.error_count)
     end
 
     def test_should_follow_redirects
@@ -109,6 +148,35 @@ module FeedCrawler
       stub_request(:get, last_url)
 
       Downloader.new.perform(1, first_url, 10)
+    end
+
+    def test_should_save_redirected_to
+      last_url = URI.join(@feed.feed_url, "/final")
+
+      response = {
+        status: 301,
+        headers: {
+          "Location" => "/final"
+        }
+      }
+      stub_request(:get, @feed.feed_url).to_return(response)
+      stub_request(:get, last_url)
+
+      (RedirectCache::PERSIST_AFTER).times do
+        Downloader.new.perform(@feed.id, @feed.feed_url, 10, @feed.reload.crawl_data.to_h)
+        migration = PersistCrawlData.new
+        migration.jid = SecureRandom.hex
+        migration.perform
+        assert_nil(@feed.reload.crawl_data.redirected_to)
+      end
+
+      stub_request(:get, /dhy5vgj5baket\.cloudfront\.net/).to_return(status: 404)
+
+      Sidekiq::Testing.inline! do
+        Downloader.perform_async(@feed.id, @feed.feed_url, 10, @feed.reload.crawl_data.to_h)
+      end
+
+      assert_equal(last_url.to_s, @feed.reload.crawl_data.redirected_to)
     end
   end
 end

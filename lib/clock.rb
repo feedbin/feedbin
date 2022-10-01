@@ -15,7 +15,7 @@ every(10.seconds, "clockwork.very_frequent") do
   end
 
   if RedisLock.acquire("clockwork:downloader_migration", 8)
-    FeedCrawler::DownloaderMigration.perform_async
+    FeedCrawler::PersistCrawlData.perform_async
   end
 end
 

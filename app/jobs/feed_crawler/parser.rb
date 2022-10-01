@@ -4,8 +4,9 @@ module FeedCrawler
     include SidekiqHelper
     sidekiq_options queue: local_queue("feed_parser"), retry: false
 
-    def perform(feed_id, feed_url, path, encoding = nil)
+    def perform(feed_id, path, encoding = nil, crawl_data = {})
       @feed = Feed.find(feed_id)
+      @feed.crawl_data = crawl_data
 
       parsed = Feedkit::Parser.parse!(
         File.read(path, binmode: true),
@@ -16,19 +17,19 @@ module FeedCrawler
       filter = EntryFilter.new(parsed.entries, check_for_changes: check_for_changes?, always_check_recent: true)
       save(feed: parsed.to_feed, entries: filter.filter)
 
-      @feed.update(last_change_check: Time.now) if check_for_changes?
-
-      FeedStatus.clear!(@feed.id)
+      @feed.last_change_check = Time.now if check_for_changes?
+      @feed.crawl_data.clear!
 
       Sidekiq.logger.info "Parser: stats=#{filter.stats} check_for_changes=#{check_for_changes?} url=#{@feed.feed_url} feed_id=#{@feed.id}"
       filter.stats.each do |stat, count|
         Librato.increment("feed.parser", source: stat, by: count)
       end
     rescue Feedkit::NotFeed => exception
-      FeedStatus.new(@feed.id).error!(exception)
+      @feed.crawl_data.download_error(exception)
       Sidekiq.logger.info "Feedkit::NotFeed: feed_id=#{@feed.id} url=#{@feed.feed_url}"
     ensure
       File.unlink(path) rescue Errno::ENOENT
+      @feed.save!
     end
 
     private
