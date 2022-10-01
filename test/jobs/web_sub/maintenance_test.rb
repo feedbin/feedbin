@@ -1,6 +1,6 @@
 require "test_helper"
 
-module WebSubJob
+module WebSub
   class MaintenanceTest < ActiveSupport::TestCase
 
     test "should schedule subscribe job" do
@@ -25,7 +25,7 @@ module WebSubJob
       feeds = Feed.all
       feeds.update_all(push_expiration: Time.now - 1.second, hubs: ["hub.example.com"], subscriptions_count: 0)
 
-      assert_difference "WebSubUnsubscribe.jobs.size", +feeds.count do
+      assert_difference "Unsubscribe.jobs.size", +feeds.count do
         Maintenance.new.perform
       end
     end

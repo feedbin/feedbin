@@ -1,4 +1,4 @@
-module WebSubJob
+module WebSub
   class Maintenance
     include Sidekiq::Worker
     sidekiq_options retry: false
