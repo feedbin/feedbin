@@ -43,6 +43,6 @@ every(1.day, "clockwork.daily", at: "7:00", tz: "UTC") do
   end
 
   if RedisLock.acquire("clockwork:web_sub_maintenance")
-    WebSub::Maintenance.perform_async
+    WebSubJob::Maintenance.perform_async
   end
 end
