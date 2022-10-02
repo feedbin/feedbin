@@ -37,7 +37,7 @@ class EntryDeleter
     end
 
     if entry_ids.present?
-      SearchIndexRemove.perform_async(entry_ids)
+      Search::SearchIndexRemove.perform_async(entry_ids)
 
       UnreadEntry.where(entry_id: entry_ids).delete_all
       UpdatedEntry.where(entry_id: entry_ids).delete_all

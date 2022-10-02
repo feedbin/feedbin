@@ -7,7 +7,7 @@ class Tagging < ApplicationRecord
 
   def update_actions
     actions = user.actions.where("? = ANY (tag_ids)", tag_id).pluck(:id)
-    TouchActions.perform_async(actions)
+    Search::TouchActions.perform_async(actions)
   end
 
   def self.build_tag_map

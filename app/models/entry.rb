@@ -423,7 +423,7 @@ class Entry < ApplicationRecord
       }
       UnreadEntry.import(unread_entries, validate: false, on_duplicate_key_ignore: true)
     end
-    SearchIndexStore.perform_async(self.class.name, id)
+    Search::SearchIndexStore.perform_async(self.class.name, id)
   end
 
   def mark_as_unplayed
