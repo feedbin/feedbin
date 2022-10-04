@@ -60,6 +60,22 @@ module FeedCrawler
       assert_difference -> { Downloader.jobs.size }, +1 do
         ScheduleBatch.new.perform(batch, false)
       end
+
+    end
+
+    test "enqueue for feeds with errors after backoff" do
+      @feed.crawl_data.download_error(Exception.new)
+      @feed.save!
+
+      assert_no_difference -> { Downloader.jobs.size } do
+        ScheduleBatch.new.perform(batch, false)
+      end
+
+      travel 2.hours do
+        assert_difference -> { Downloader.jobs.size }, +1 do
+          ScheduleBatch.new.perform(batch, false)
+        end
+      end
     end
 
     private
