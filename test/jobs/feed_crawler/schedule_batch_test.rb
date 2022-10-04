@@ -2,8 +2,11 @@ require "test_helper"
 
 module FeedCrawler
   class ScheduleBatchTest < ActiveSupport::TestCase
+
     setup do
-      Sidekiq::Queues["feed_downloader"].clear
+      flush_redis
+      @user = users(:ben)
+      @feed = @user.feeds.first
       Feed.all.each do |feed|
         Feed.reset_counters(feed.id, :subscriptions)
       end
@@ -24,6 +27,45 @@ module FeedCrawler
           assert_equal(feed.crawl_data.to_h, job["args"][3].symbolize_keys)
         end
       end
+    end
+
+    test "skips enqueue for throttled feed" do
+      ENV["THROTTLED_HOSTS"] = URI.parse(@feed.feed_url).host
+
+      @feed.crawl_data.log_download
+      @feed.save!
+
+      assert_no_difference -> { Downloader.jobs.size } do
+        ScheduleBatch.new.perform(batch, false)
+      end
+
+      travel (Throttle::TIMEOUT * 2).seconds do
+        assert_difference -> { Downloader.jobs.size }, +1 do
+          ScheduleBatch.new.perform(batch, false)
+        end
+      end
+    end
+
+    test "skips enqueue for feeds with errors" do
+      @feed.crawl_data.download_error(Exception.new)
+      @feed.save!
+
+      assert_no_difference -> { Downloader.jobs.size } do
+        ScheduleBatch.new.perform(batch, false)
+      end
+
+      @feed.crawl_data.clear!
+      @feed.save!
+
+      assert_difference -> { Downloader.jobs.size }, +1 do
+        ScheduleBatch.new.perform(batch, false)
+      end
+    end
+
+    private
+
+    def batch
+      (@feed.id + SidekiqHelper::BATCH_SIZE / 2) / SidekiqHelper::BATCH_SIZE
     end
   end
 end

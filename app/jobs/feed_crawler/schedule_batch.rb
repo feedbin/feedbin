@@ -16,26 +16,23 @@ module FeedCrawler
         .distinct
         .pluck(:feed_id)
 
-      columns = [:id, :feed_url, :subscriptions_count, :crawl_data]
       subscriptions = Feed.xml
         .where(id: active, active: true)
         .where("subscriptions_count > ?", count)
-        .pluck(*columns)
 
       standalone = Feed
         .where(id: feed_ids - active, standalone_request_at: 1.month.ago..)
-        .pluck(*columns)
 
-      jobs = subscriptions + standalone
-      jobs = jobs.map do |data|
-        data.tap do
-          data[-1] = data[-1].to_h
+      jobs = (subscriptions + standalone).filter_map do |feed|
+        if feed.crawl_data.ok?(feed.feed_url)
+          [feed.id, feed.feed_url, feed.subscriptions_count, feed.crawl_data.to_h]
         end
       end
+
       if jobs.present?
         Sidekiq::Client.push_bulk(
-          "args"      => jobs.shuffle,
-          "class"     => Downloader
+          "args"  => jobs.shuffle,
+          "class" => Downloader
         )
       end
     end

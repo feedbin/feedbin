@@ -121,7 +121,7 @@ module FeedCrawler
       migration.jid = SecureRandom.hex
       migration.perform
 
-      refute @feed.reload.crawl_data.ok?, "Should not be ok?"
+      refute @feed.reload.crawl_data.ok?(@feed.feed_url), "Should not be ok?"
 
       job = Downloader.new
       job.critical = true

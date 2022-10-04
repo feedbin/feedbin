@@ -2,7 +2,7 @@ module FeedCrawler
   class RedirectCache
 
     # 4 redirect/hr 24hrs a day for 6 days
-    PERSIST_AFTER = 24
+    PERSIST_AFTER = 4 * 24 * 6
 
     attr_reader :redirects
 

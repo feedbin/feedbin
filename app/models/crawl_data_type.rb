@@ -26,4 +26,8 @@ class CrawlDataType < ActiveModel::Type::Value
       super
     end
   end
+
+  def changed_in_place?(raw_old_value, new_value)
+    raw_old_value != serialize(new_value) if new_value.is_a?(::CrawlData)
+  end
 end

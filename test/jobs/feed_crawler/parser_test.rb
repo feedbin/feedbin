@@ -35,10 +35,10 @@ module FeedCrawler
 
     def test_should_clear_error
       Parser.new.perform(@feed.id, html_path)
-      refute @feed.reload.crawl_data.ok?
+      refute @feed.reload.crawl_data.ok?(@feed.feed_url)
 
       Parser.new.perform(@feed.id, xml_path, nil, @feed.reload.crawl_data.to_h)
-      assert @feed.reload.crawl_data.ok?
+      assert @feed.reload.crawl_data.ok?(@feed.feed_url)
     end
 
     private

@@ -13,17 +13,8 @@ module FeedCrawler
       @subscribers = subscribers
       @crawl_data  = CrawlData.new(crawl_data)
       @parsing     = false
-
-      throttle = Throttle.new(@feed_url, @crawl_data.downloaded_at)
-      if critical
-        download
-      elsif throttle.throttled?
-        Sidekiq.logger.info "Throttled downloaded_at=#{Time.at(@crawl_data.downloaded_at)} url=#{@feed_url}"
-      elsif @crawl_data.ok?
-        download
-      else
-        Sidekiq.logger.info "Backing off error_count=#{@crawl_data.error_count} next_retry=#{Time.at(@crawl_data.next_retry)} downloaded_at=#{Time.at(@crawl_data.downloaded_at)} url=#{@feed_url}"
-      end
+      
+      download
     ensure
       persist_crawl_data unless @parsing
     end

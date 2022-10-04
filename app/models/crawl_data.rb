@@ -1,6 +1,6 @@
 class CrawlData
   delegate :last_modified, :etag, :download_fingerprint, to: :@data
-  delegate :downloaded_at, :redirected_to, :last_error, to: :@data
+  delegate :redirected_to, :last_error, to: :@data
 
   attr_accessor :redirects
 
@@ -17,8 +17,17 @@ class CrawlData
     @data.failed_at.to_i
   end
 
-  def ok?
+  def ok?(feed_url)
+    return false if throttled?(feed_url)
     Time.now.to_i > next_retry
+  end
+
+  def throttled?(feed_url)
+    FeedCrawler::Throttle.throttled?(feed_url, downloaded_at)
+  end
+
+  def downloaded_at
+    @data.downloaded_at.to_i
   end
 
   def log_download
