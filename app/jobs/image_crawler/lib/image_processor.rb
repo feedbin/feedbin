@@ -26,13 +26,13 @@ module ImageCrawler
     def color
       hex = nil
       file = ImageProcessing::Vips
-      .source(source)
-      .resize_to_fill(1, 1, sharpen: false)
-      .custom { |image|
-        image.tap do |data|
-          hex = data.getpoint(0, 0).map { |value| "%02x" % value }.join
-        end
-      }.call
+        .source(source)
+        .resize_to_fill(1, 1, sharpen: false)
+        .custom { |image|
+          image.tap do |data|
+            hex = data.getpoint(0, 0).map { |value| "%02x" % value }.first(3).join
+          end
+        }.call
       file.unlink
       hex
     end
@@ -43,10 +43,10 @@ module ImageCrawler
 
     def pipeline(resized_width, resized_height)
       ImageProcessing::Vips
-      .source(source)
-      .resize_to_fill(resized_width, resized_height)
-      .convert("jpg")
-      .saver(strip: true, quality: 90)
+        .source(source)
+        .resize_to_fill(resized_width, resized_height)
+        .convert("jpg")
+        .saver(strip: true, quality: 90)
     end
 
     def fill_crop

@@ -514,7 +514,6 @@ GEM
     reverse_markdown (2.1.1)
       nokogiri
     rexml (3.2.5)
-    rmagick (4.3.0)
     rubocop (1.35.1)
       json (~> 2.3)
       parallel (~> 1.10)
@@ -680,7 +679,6 @@ DEPENDENCIES
   resolv!
   responders
   reverse_markdown
-  rmagick
   ruby-vips
   rubyzip
   sanitize

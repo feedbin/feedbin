@@ -7,18 +7,18 @@ module FaviconCrawler
       @favicon = Favicon.unscoped.where(host: host).first_or_initialize
       @force = force
       update if should_update?
-    rescue
-      Librato.increment("favicon.failed")
     end
+
+    private
 
     def update
       favicon_found = false
       response = nil
 
-      favicon_url = find_favicon_link
+      favicon_url = find_meta_links
       if favicon_url
         response = download_favicon(favicon_url)
-        favicon_found = true unless response.to_s.empty?
+        favicon_found = true unless response.nil?
       end
 
       unless favicon_found
@@ -27,36 +27,31 @@ module FaviconCrawler
       end
 
       if response
-        processor = Processor.new(response.to_s, @favicon.host)
-        if processor.valid? && @favicon.data["favicon_hash"] != processor.favicon_hash
-          @favicon.favicon = processor.encoded_favicon if processor.encoded_favicon
-          @favicon.url = processor.favicon_url if processor.favicon_url
-          @favicon.data = get_data(response, processor.favicon_hash)
+        processor = Processor.new(response.path, @favicon.host)
+        if @favicon.data["favicon_hash"] != processor.favicon_hash
+          processor.process
+          @favicon.favicon = processor.encoded_favicon
+          @favicon.url = processor.favicon_url
+          @favicon.data = {
+            "favicon_hash"  => processor.favicon_hash,
+            "Etag"          => response.etag,
+            "Last-Modified" => response.last_modified
+          }
           Librato.increment("favicon.updated")
         end
-        Librato.increment("favicon.status", source: response.code)
       end
 
       @favicon.save
-    end
-
-    def get_data(response, favicon_hash)
-      data = {favicon_hash: favicon_hash}
-      if response
-        data = data.merge!(response.headers.to_h.extract!("Last-Modified", "Etag"))
+    ensure
+      if response.respond_to?(:path)
+        File.unlink(response.path) rescue Errno::ENOENT
       end
-      data
     end
 
-    def find_favicon_link
+    def find_meta_links
       favicon_url = nil
-      url = URI::HTTP.build(host: @favicon.host)
-      response = HTTP
-        .timeout(write: 5, connect: 5, read: 5)
-        .follow
-        .get(url)
-        .to_s
-      html = Nokogiri::HTML(response)
+      homepage = download_homepage
+      html = Nokogiri::HTML5(homepage)
       favicon_links = html.search(xpath)
       if favicon_links.present?
         favicon_url = favicon_links.first.to_s
@@ -68,7 +63,8 @@ module FaviconCrawler
         end
       end
       favicon_url
-    rescue
+    rescue => exception
+      Sidekiq.logger.info "find_meta_links exception=#{exception.inspect} host=#{@favicon.host}"
       nil
     end
 
@@ -76,37 +72,33 @@ module FaviconCrawler
       URI::HTTP.build(host: @favicon.host, path: "/favicon.ico")
     end
 
-    def download_favicon(url)
+    def download_homepage
+      url = URI::HTTP.build(host: @favicon.host)
       response = HTTP
         .timeout(write: 5, connect: 5, read: 5)
         .follow
-        .headers(request_headers)
         .get(url)
+        .to_s
     end
 
-    def request_headers
-      headers = {user_agent: "Mozilla/5.0"}
-      unless @force
-        conditional_headers = ConditionalHttp.new(@favicon.data["Etag"], @favicon.data["Last-Modified"])
-        headers = headers.merge(conditional_headers.to_h)
-      end
-      headers
+    def download_favicon(url)
+      Feedkit::Request.download(url.to_s,
+        user_agent: "Mozilla/5.0",
+        etag: @favicon.data["Etag"],
+        last_modified: @favicon.data["Last-Modified"]
+      )
+    rescue Feedkit::Error => exception
+      Sidekiq.logger.info "download_favicon exception=#{exception.inspect} url=#{url}"
+      nil
     end
 
     def should_update?
-      if @force
-        true
-      else
-        !updated_recently?
-      end
+      return true if @force
+      !updated_recently?
     end
 
     def updated_recently?
-      if @favicon.updated_at
-        @favicon.updated_at > 1.hour.ago
-      else
-        false
-      end
+      @favicon.updated_at && @favicon.updated_at.after?(1.hour.ago)
     end
 
     def xpath

@@ -49,7 +49,6 @@ gem "redcarpet"
 gem "redis"
 gem "responders"
 gem "reverse_markdown"
-gem "rmagick", require: false
 gem "ruby-vips"
 gem "rubyzip"
 gem "sanitize"
