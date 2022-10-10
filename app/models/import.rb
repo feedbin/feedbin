@@ -1,29 +1,17 @@
 class Import < ApplicationRecord
-  mount_uploader :upload, ImportUploader
-
   belongs_to :user
   has_many :import_items, dependent: :delete_all
+  before_create :parse
 
-  def process
-    ImportWorker.perform_async(id)
-  end
+  attr_accessor :xml
 
-  def build_opml_import_job(xml = nil)
-    if xml.nil?
-      xml = upload.read
-    end
-    feeds = parse_opml(xml)
+  def parse
+    feeds = Opml::Parser.parse(xml)
     create_tags(feeds)
     feeds.each do |feed|
-      import_items << ImportItem.new(details: feed, item_type: "feed")
+      import_items << ImportItem.new(details: feed)
     end
-    update(complete: true) if import_items.empty?
-  end
-
-  def parse_opml(xml)
-    opml = OpmlSaw::Parser.new(xml)
-    opml.parse
-    opml.feeds
+    complete = true if import_items.empty?
   end
 
   def create_tags(feeds)

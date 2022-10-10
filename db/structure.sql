@@ -637,7 +637,8 @@ CREATE TABLE public.import_items (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     item_type character varying(255),
-    status bigint DEFAULT 0 NOT NULL
+    status bigint DEFAULT 0 NOT NULL,
+    error jsonb
 );
 
 
@@ -670,7 +671,8 @@ CREATE TABLE public.imports (
     complete boolean DEFAULT false,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    upload character varying(255)
+    upload character varying(255),
+    filename text
 );
 
 
@@ -2941,6 +2943,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220806155622'),
 ('20220909105317'),
 ('20220916104628'),
-('20220926154041');
+('20220926154041'),
+('20221004142045');
 
 

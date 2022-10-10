@@ -13,15 +13,6 @@ GIT
       ssrf_filter (~> 1.0)
 
 GIT
-  remote: https://github.com/feedbin/carrierwave_direct.git
-  revision: a0bc3230e544c0ea88f35d2bb6b7eb6a1fdb9196
-  ref: a0bc323
-  specs:
-    carrierwave_direct (0.0.15)
-      carrierwave
-      fog-aws
-
-GIT
   remote: https://github.com/feedbin/dalli.git
   revision: 3c92218fadfc20b6fb839f99ac36703ca96167ea
   branch: feedbin
@@ -103,14 +94,6 @@ GIT
       http-cookie (~> 1.0)
       http-form_data (~> 2.2)
       http-parser (~> 1.2.0)
-
-GIT
-  remote: https://github.com/feedbin/opml_saw.git
-  revision: 61d8c2dd3d46e9cae38178754469dd9da7c8bd6a
-  ref: 61d8c2d
-  specs:
-    opml_saw (0.0.2)
-      nokogiri
 
 GIT
   remote: https://github.com/feedbin/resolv.git
@@ -650,7 +633,6 @@ DEPENDENCIES
   byebug
   capybara
   carrierwave!
-  carrierwave_direct!
   clockwork
   coffee-rails
   connection_pool
@@ -685,7 +667,6 @@ DEPENDENCIES
   minitest-stub_any_instance
   net-http-persistent
   oauth
-  opml_saw!
   pg
   postmark-rails
   premailer-rails

@@ -257,4 +257,9 @@ class ApplicationController < ActionController::Base
     verifier = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)
     verifier.verify(authentication_token)
   end
+
+  def rate_limited?(count, period)
+    slug = ["limit", request.method, params[:controller], params[:action], current_user.id]
+    !Throttle.throttle!(slug.join(":"), count, period)
+  end
 end

@@ -12,8 +12,7 @@ module Api
 
       def create
         user = current_user
-        @import = user.imports.create!
-        @import.build_opml_import_job(@data)
+        @import = user.imports.create!(xml: @data, filename: "api-upload.opml")
       end
 
       def show

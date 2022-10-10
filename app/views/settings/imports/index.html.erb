@@ -4,26 +4,22 @@
     </div>
     <div class="inset">
         <h4 class="group-header">Import</h4>
-        <% if ENV['AWS_ACCESS_KEY_ID'] %>
-            <%= direct_upload_form_for @uploader do |f| %>
-                <ul class="control-group">
-                    <li>
-                        <div class="form-control">
-                            <div class="toolbar">
-                                <div>
-                                    <%= f.file_field :upload, accept: ".xml, .opml, text/xml, application/xml, text/x-opml, text/x-opml+xml" %>
-                                    <p class="control-group-description">You can import OPML files. Import is done in the background so you may not see every subscription right away.</p>
-                                </div>
-                                <div class="last-control">
-                                    <button type="submit" class="button">Import</button>
-                                </div>
+        <%= form_with model: Import.new, url: settings_imports_path do |f| %>
+            <ul class="control-group">
+                <li>
+                    <div class="form-control">
+                        <div class="toolbar">
+                            <div>
+                                <%= f.file_field :upload, accept: ".xml, .opml, text/xml, application/xml, text/x-opml, text/x-opml+xml" %>
+                                <p class="control-group-description">You can import OPML files. Import is done in the background so you may not see every subscription right away.</p>
+                            </div>
+                            <div class="last-control">
+                                <button type="submit" class="button">Import</button>
                             </div>
                         </div>
-                    </li>
-                </ul>
-            <% end %>
-        <% else %>
-            <p class="control-group-description">Import disabled. <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> and <code>AWS_S3_BUCKET</code> are missing.</p>
+                    </div>
+                </li>
+            </ul>
         <% end %>
     </div>
     <div class="inset">

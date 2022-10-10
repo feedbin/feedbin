@@ -11,6 +11,5 @@ if ENV["AWS_ACCESS_KEY_ID"] && ENV["AWS_SECRET_ACCESS_KEY"]
     options[:path_style] = ENV["AWS_S3_PATH_STYLE"] if ENV["AWS_S3_PATH_STYLE"]
     config.fog_credentials = options
     config.fog_directory = ENV["AWS_S3_BUCKET"]
-    config.max_file_size = 5.megabytes
   end
 end

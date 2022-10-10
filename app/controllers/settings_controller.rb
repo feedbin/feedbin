@@ -58,32 +58,6 @@ class SettingsController < ApplicationController
     @message = "No payment info"
   end
 
-  def import_export
-    @user = current_user
-    @uploader = Import.new.upload
-    @uploader.success_action_redirect = settings_import_export_url
-    @tags = @user.feed_tags
-
-    @download_options = @tags.map { |tag|
-      [tag.name, tag.id]
-    }
-
-    @download_options.unshift(["All", "all"])
-
-    if params[:key]
-      @import = Import.new(key: params[:key], user: @user)
-
-      if @import.save
-        @import.process
-        redirect_to settings_import_export_url, notice: "Import has started."
-      else
-        @messages = @import.errors.full_messages
-        flash[:error] = render_to_string partial: "shared/messages"
-        redirect_to settings_import_export_url
-      end
-    end
-  end
-
   def update_plan
     @user = current_user
     plan = Plan.find(params[:plan])

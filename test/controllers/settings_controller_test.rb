@@ -1,7 +1,5 @@
 require "test_helper"
 
-include CarrierWaveDirect::Test::Helpers
-
 class SettingsControllerTest < ActionController::TestCase
   setup do
     @user = users(:ben)
@@ -64,19 +62,6 @@ class SettingsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:next_payment_date)
     assert assigns(:billing_events).present?
     StripeMock.stop
-  end
-
-  test "should get import_export" do
-    login_as @user
-    get :import_export
-    assert_response :success
-  end
-
-  test "should import" do
-    login_as @user
-    skip "Figure out how to test CarrierWave direct"
-    get :import_export, params: {key: sample_key(ImportUploader.new, base: "test.opml")}
-    assert_redirected_to settings_import_export_url
   end
 
   test "should update plan" do

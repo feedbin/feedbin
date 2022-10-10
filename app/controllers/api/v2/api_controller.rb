@@ -20,11 +20,11 @@ module Api
         if time = Time.iso8601(params[:since]) rescue nil
           @page_query = @page_query.where("entries.created_at > :time", time: time)
         end
-        
+
         if params.key?(:per_page) && params[:per_page].respond_to?(:to_i)
           @page_query = @page_query.per_page(params[:per_page].to_i)
         end
-        
+
         ids = @page_query.pluck(:id)
         @entries = Entry.where(id: ids).order_by_ids(ids).includes(:feed)
 
@@ -54,11 +54,6 @@ module Api
           count = collection.length
         end
         headers["X-Feedbin-Record-Count"] = count.to_s
-      end
-
-      def rate_limited?(count, period)
-        slug = ["limit", request.method, params[:controller], params[:action], current_user.id]
-        !Throttle.throttle!(slug.join(":"), count, period)
       end
 
       def status_too_many_requests

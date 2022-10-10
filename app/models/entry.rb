@@ -16,7 +16,7 @@ class Entry < ApplicationRecord
   before_create :tweet_metadata
   before_update :create_summary
   after_commit :cache_public_id, on: [:create, :update]
-  after_commit :find_images, on: :create
+  after_commit :find_images, on: :create, unless: :skip_images?
   after_commit :mark_as_unread, on: :create
   after_commit :mark_as_unplayed, on: :create
   after_commit :increment_feed_stat, on: :create
@@ -498,5 +498,11 @@ class Entry < ApplicationRecord
 
   def save_twitter_users
     SaveTwitterUsers.perform_async(id) if tweet?
+  end
+
+  def skip_images?
+    if ENV["SKIP_IMAGES"].present?
+      Rails.logger.info("SKIP_IMAGES is present, no images will be processed")
+    end
   end
 end

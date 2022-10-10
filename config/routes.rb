@@ -171,10 +171,13 @@ Rails.application.routes.draw do
         patch :newsletter_senders
       end
     end
+
+    resources :imports, only: [:create, :show]
+    get :import_export, to: "imports#index"
+
     get :account
     get :billing
     get :payment_details
-    get :import_export
     get :appearance
     get :newsletters_pages
     post :update_credit_card
