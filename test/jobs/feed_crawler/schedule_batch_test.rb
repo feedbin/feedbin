@@ -13,14 +13,14 @@ module FeedCrawler
     end
 
     test "should enqueue feed_downloader jobs" do
-      assert_difference "Sidekiq::Queues['feed_downloader'].count", Feed.count do
+      assert_difference -> { Downloader.jobs.size }, Feed.count do
         ScheduleBatch.new.tap do |job|
           def job.build_ids(*args)
             Feed.all.map(&:id)
           end
           job.perform(1, false)
         end
-        Sidekiq::Queues["feed_downloader"].each do |job|
+        Downloader.jobs.each do |job|
           feed = Feed.find(job["args"][0])
           assert_equal(feed.feed_url, job["args"][1])
           assert_equal(feed.subscriptions_count, job["args"][2])

@@ -1,9 +1,12 @@
 require "test_helper"
 
 class EntryDeleterSchedulerTest < ActiveSupport::TestCase
+  setup do
+    flush_redis
+  end
+
   test "should schedule jobs" do
-    Sidekiq::Queues["worker_slow"].clear
-    assert_difference "Sidekiq::Queues['worker_slow'].count", +Feed.count do
+    assert_difference -> { EntryDeleter.jobs.size }, +Feed.count do
       EntryDeleterScheduler.new.perform
     end
   end

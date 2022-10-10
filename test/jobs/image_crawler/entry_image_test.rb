@@ -3,7 +3,7 @@ require "test_helper"
 module ImageCrawler
   class EntryImageTest < ActiveSupport::TestCase
     setup do
-      Sidekiq::Queues["image_parallel"].clear
+      flush_redis
       @feed = Feed.first
       @feed.update(host: "example.com")
       @feed.reload
@@ -15,7 +15,7 @@ module ImageCrawler
     end
 
     test "should enqueue FindImage" do
-      assert_difference "Sidekiq::Queues['image_parallel'].count", +1 do
+      assert_difference -> { FindImage.jobs.size }, +1 do
         EntryImage.new.perform(@entry.public_id)
       end
     end
@@ -36,13 +36,13 @@ module ImageCrawler
 
       EntryImage.new.perform(entry.public_id)
 
-      extracted_urls = Sidekiq::Queues['image_parallel'].first["args"][2]
+      extracted_urls = FindImage.jobs.first["args"][2]
       assert extracted_urls.include?("http://example.com/iframe")
       assert extracted_urls.include?("http://example.com/img")
       assert extracted_urls.include?("http://example.com/video")
 
-      assert_equal(entry.public_id, Sidekiq::Queues['image_parallel'].first["args"].first)
-      assert_equal(entry.fully_qualified_url, Sidekiq::Queues['image_parallel'].first["args"].last)
+      assert_equal(entry.public_id, FindImage.jobs.first["args"].first)
+      assert_equal(entry.fully_qualified_url, FindImage.jobs.first["args"].last)
     end
 
     test "should enqueue FindImage with youtube url" do
@@ -50,14 +50,14 @@ module ImageCrawler
       @entry.reload
       EntryImage.new.perform(@entry.public_id)
 
-      extracted_urls = Sidekiq::Queues['image_parallel'].first["args"][2]
+      extracted_urls = FindImage.jobs.first["args"][2]
       assert_equal([@entry.url], extracted_urls)
     end
 
     test "should enqueue FindImage with tweet url" do
       entry = create_tweet_entry(Feed.first, "two")
       EntryImage.new.perform(entry.public_id)
-      extracted_urls = Sidekiq::Queues['image_parallel'].first["args"][2]
+      extracted_urls = FindImage.jobs.first["args"][2]
       assert_equal(["https://pbs.twimg.com/media/EwDoQHMVIAAGbaP.jpg"], extracted_urls)
     end
 
@@ -79,7 +79,7 @@ module ImageCrawler
         "width" => 542,
         "height" => 304
       })
-      assert_difference "Sidekiq::Queues['image_parallel'].count", 0 do
+      assert_no_difference -> { FindImage.jobs.size } do
         EntryImage.new.perform(@entry.public_id)
       end
     end

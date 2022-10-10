@@ -7,14 +7,14 @@ class AppStore::NotificationsV2ControllerTest < ActionController::TestCase
   end
 
   test "should schedule processing job" do
-    assert_difference "Sidekiq::Queues['critical'].count", +1 do
+    assert_difference -> { AppStoreNotificationProcessor.jobs.size }, +1 do
       post :create, params: @notification, as: :json, format: :json
     end
     assert_response :success
   end
 
   test "should not schedule processing job" do
-    assert_no_difference "Sidekiq::Queues['critical'].count" do
+    assert_no_difference -> { AppStoreNotificationProcessor.jobs.size } do
       post :create, params: {signedPayload: "asdf"}, as: :json, format: :json
     end
     assert_response :bad_request

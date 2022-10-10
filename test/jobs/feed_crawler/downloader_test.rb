@@ -29,7 +29,7 @@ module FeedCrawler
       assert_equal(download_fingerprint, @feed.reload.crawl_data.download_fingerprint)
 
       Downloader.new.perform(@feed.id, @feed.feed_url, 10, @feed.reload.crawl_data.to_h)
-      assert_equal 0, Sidekiq::Queues["feed_parser_#{Socket.gethostname}"].size, "should be empty because fingerprint will match"
+      assert_equal 0, Parser.jobs.size, "should be empty because fingerprint will match"
     end
 
     def test_should_not_persist_crawl_before_parse
@@ -43,18 +43,18 @@ module FeedCrawler
     def test_should_schedule_feed_parser
       stub_request_file("atom.xml", @feed.feed_url)
 
-      assert_equal 0, Sidekiq::Queues["feed_parser_#{Socket.gethostname}"].size
-      Downloader.new.perform(@feed.id, @feed.feed_url, 10)
-      assert_equal 1, Sidekiq::Queues["feed_parser_#{Socket.gethostname}"].size
+      assert_difference -> { Parser.jobs.size }, +1 do
+        Downloader.new.perform(@feed.id, @feed.feed_url, 10)
+      end
     end
 
     def test_should_schedule_critical_feed_parser
       url = "http://example.com/atom.xml"
       stub_request_file("atom.xml", url)
 
-      assert_equal 0, Sidekiq::Queues["feed_parser_critical_#{Socket.gethostname}"].size
-      DownloaderCritical.new.perform(1, url, 10, {})
-      assert_equal 1, Sidekiq::Queues["feed_parser_critical_#{Socket.gethostname}"].size
+      assert_difference -> { ParserCritical.jobs.size }, +1 do
+        DownloaderCritical.new.perform(1, url, 10, {})
+      end
     end
 
     def test_should_send_user_agent
@@ -110,7 +110,7 @@ module FeedCrawler
       url = "http://example.com/atom.xml"
       stub_request(:get, url).with(headers: {"If-None-Match" => etag, "If-Modified-Since" => last_modified}).to_return(status: 304)
       Downloader.new.perform(feed_id, url, 10, data.to_h)
-      assert_equal 0, Sidekiq::Queues["feed_parser_critical_#{Socket.gethostname}"].size
+      assert_equal 0, ParserCritical.jobs.size
     end
 
     def test_should_not_be_ok_after_error

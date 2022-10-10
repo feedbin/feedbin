@@ -3,7 +3,7 @@ require "test_helper"
 module Search
   class SearchServerSetupTest < ActiveSupport::TestCase
     setup do
-      Sidekiq::Queues["worker_slow"].clear
+      flush_redis
       clear_search
       @user = users(:ben)
       feed = @user.feeds.first
