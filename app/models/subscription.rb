@@ -95,7 +95,7 @@ class Subscription < ApplicationRecord
   private
 
   def refresh_favicon
-    FaviconFetcher.perform_async(feed.host)
+    FaviconCrawler::Fetcher.perform_async(feed.host)
     ImageCrawler::ItunesFeedImage.perform_async(feed_id)
   end
 end
