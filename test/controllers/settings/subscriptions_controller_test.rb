@@ -76,7 +76,7 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
     login_as @user
     subscription = @user.subscriptions.first
 
-    assert_difference "FaviconCrawler::Fetcher.jobs.size", +1 do
+    assert_difference "FaviconCrawler::Finder.jobs.size", +1 do
       post :refresh_favicon, params: {id: subscription}, xhr: true
       assert_response :success
     end

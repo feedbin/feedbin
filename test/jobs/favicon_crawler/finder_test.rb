@@ -1,6 +1,6 @@
 require "test_helper"
 
-class FaviconCrawler::FetcherTest < ActiveSupport::TestCase
+class FaviconCrawler::FinderTest < ActiveSupport::TestCase
   setup do
     @page_url = URI.parse("http://example.com")
     @icon_url = @page_url.dup
@@ -26,7 +26,7 @@ class FaviconCrawler::FetcherTest < ActiveSupport::TestCase
 
     stub_request_file("favicon.ico", @icon_url)
 
-    FaviconCrawler::Fetcher.new.perform(@page_url.host)
+    FaviconCrawler::Finder.new.perform(@page_url.host)
 
     assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
   end
@@ -48,7 +48,7 @@ class FaviconCrawler::FetcherTest < ActiveSupport::TestCase
 
     stub_request_file("favicon.ico", @icon_url)
 
-    FaviconCrawler::Fetcher.new.perform(@page_url.host)
+    FaviconCrawler::Finder.new.perform(@page_url.host)
 
     assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
   end
@@ -69,7 +69,7 @@ class FaviconCrawler::FetcherTest < ActiveSupport::TestCase
 
     stub_request_file("favicon.ico", @default_url)
 
-    FaviconCrawler::Fetcher.new.perform(@page_url.host)
+    FaviconCrawler::Finder.new.perform(@page_url.host)
 
     assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
   end
@@ -90,7 +90,7 @@ class FaviconCrawler::FetcherTest < ActiveSupport::TestCase
 
     stub_request_file("favicon-blank.ico", @default_url)
 
-    FaviconCrawler::Fetcher.new.perform(@page_url.host)
+    FaviconCrawler::Finder.new.perform(@page_url.host)
 
     assert_nil Favicon.unscoped.where(host: @page_url.host).take
   end

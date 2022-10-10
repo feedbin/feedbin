@@ -225,7 +225,7 @@ class Feed < ApplicationRecord
   private
 
   def refresh_favicon
-    FaviconCrawler::Fetcher.perform_async(host)
+    FaviconCrawler::Finder.perform_async(host)
     ImageCrawler::ItunesFeedImage.perform_async(id)
   end
 
