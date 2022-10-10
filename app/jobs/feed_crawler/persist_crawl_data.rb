@@ -3,7 +3,7 @@ module FeedCrawler
     include Sidekiq::Worker
     include SidekiqHelper
 
-    sidekiq_options queue: :worker_slow_critical
+    sidekiq_options queue: :utility_critical
 
     SET_NAME = "#{name}-updates"
 

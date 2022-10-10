@@ -1,7 +1,7 @@
 module FeedCrawler
   class TwitterSchedule
     include Sidekiq::Worker
-    sidekiq_options queue: :worker_slow_critical
+    sidekiq_options queue: :utility_critical
 
     def perform
       Feed.where(feed_type: [:twitter, :twitter_home]).find_each do |feed|

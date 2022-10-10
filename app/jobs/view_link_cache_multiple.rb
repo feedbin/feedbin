@@ -15,8 +15,7 @@ class ViewLinkCacheMultiple
         expires_at = Expires.expires_in(5.minutes)
         Sidekiq::Client.push(
           "args" => [url, expires_at],
-          "class" => "ViewLinkCache",
-          "queue" => "low",
+          "class" => ViewLinkCache,
           "retry" => false
         )
       end

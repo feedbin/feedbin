@@ -1,7 +1,7 @@
 class UpdateDefaultColumn
   include Sidekiq::Worker
   include SidekiqHelper
-  sidekiq_options queue: :worker_slow
+  sidekiq_options queue: :utility
 
   def perform(options = {})
     @klass = options.fetch("klass").constantize

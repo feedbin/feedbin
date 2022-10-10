@@ -3,7 +3,7 @@ module FeedCrawler
   class ScheduleAll
     include Sidekiq::Worker
     include SidekiqHelper
-    sidekiq_options queue: :worker_slow_critical
+    sidekiq_options queue: :utility_critical
 
     COUNT_KEY = "feed_refresher_scheduler:count".freeze
 
@@ -11,7 +11,7 @@ module FeedCrawler
       queues = [Downloader, Parser, Receiver]
       if queues.all? {|queue| queue_empty?(queue.get_sidekiq_options["queue"]) }
         refresh_feeds
-        TwitterSchedule.perform_async if queue_empty?("twitter_refresher")
+        TwitterSchedule.perform_async if queue_empty?("twitter")
       end
     end
 

@@ -1,7 +1,7 @@
 module FeedCrawler
   class YoutubeReceiver
     include Sidekiq::Worker
-    sidekiq_options queue: :feed_refresher_receiver
+    sidekiq_options queue: :parse
 
     def perform(data)
       ids = data["entries"].map { |entry| entry.dig("data", "youtube_video_id") }

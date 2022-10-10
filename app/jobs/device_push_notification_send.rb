@@ -1,6 +1,6 @@
 class DevicePushNotificationSend
   include Sidekiq::Worker
-  sidekiq_options retry: false, queue: :critical
+  sidekiq_options retry: false, queue: :default_critical
 
   MAX_PAYLOAD_SIZE = 4096
 

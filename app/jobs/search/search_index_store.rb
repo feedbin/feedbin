@@ -1,7 +1,7 @@
 module Search
   class SearchIndexStore
     include Sidekiq::Worker
-    sidekiq_options queue: :search
+    sidekiq_options queue: :network_search
 
     def perform(klass, id, update = false)
       entry = Entry.find(id)

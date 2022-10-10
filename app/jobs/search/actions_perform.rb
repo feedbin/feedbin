@@ -3,7 +3,7 @@ require "sidekiq/api"
 module Search
   class ActionsPerform
     include Sidekiq::Worker
-    sidekiq_options queue: :search, retry: false
+    sidekiq_options queue: :network_search, retry: false
 
     def perform(entry_id, action_ids, update = false)
       # Looks like [[8, 1, ["mark_read", "star"]], [7, 1, ["mark_read"]]]

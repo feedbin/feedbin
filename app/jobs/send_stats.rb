@@ -1,6 +1,6 @@
 class SendStats
   include Sidekiq::Worker
-  sidekiq_options queue: :critical, retry: false
+  sidekiq_options queue: :default_critical, retry: false
 
   MEGABYTE = 1024.0 * 1024.0
 

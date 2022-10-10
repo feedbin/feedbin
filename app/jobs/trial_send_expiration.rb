@@ -1,6 +1,6 @@
 class TrialSendExpiration
   include Sidekiq::Worker
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :default_critical
 
   def perform(user_id)
     user = User.where(id: user_id).first

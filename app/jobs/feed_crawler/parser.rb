@@ -2,7 +2,7 @@ module FeedCrawler
   class Parser
     include Sidekiq::Worker
     include SidekiqHelper
-    sidekiq_options queue: local_queue("feed_parser"), retry: false
+    sidekiq_options queue: local_queue("parse"), retry: false
 
     def perform(feed_id, path, encoding = nil, crawl_data = {})
       @feed = Feed.find(feed_id)

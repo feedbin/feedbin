@@ -1,7 +1,7 @@
 module FeedCrawler
   class Receiver
     include Sidekiq::Worker
-    sidekiq_options queue: :feed_refresher_receiver
+    sidekiq_options queue: :parse
 
     def perform(data)
       feed = Feed.find(data["feed"]["id"])

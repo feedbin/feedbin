@@ -2,7 +2,7 @@ module Search
   class SearchServerSetup
     include Sidekiq::Worker
     include SidekiqHelper
-    sidekiq_options queue: :worker_slow
+    sidekiq_options queue: :utility
 
     Client = $search[:alt] || $search[:main]
 

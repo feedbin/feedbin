@@ -1,7 +1,7 @@
 module Search
   class AddFeedToAction
     include Sidekiq::Worker
-    sidekiq_options queue: :search
+    sidekiq_options queue: :network_search
 
     def perform(user_id)
       user = User.find(user_id)

@@ -3,7 +3,7 @@ module FeedCrawler
     include SidekiqHelper
     include Sidekiq::Worker
 
-    sidekiq_options queue: :worker_slow_critical
+    sidekiq_options queue: :utility_critical
 
     attr_accessor :force_refresh
 

@@ -1,7 +1,7 @@
 module Search
   class ActionsBulk
     include Sidekiq::Worker
-    sidekiq_options queue: :search, retry: false
+    sidekiq_options queue: :network_search, retry: false
 
     def perform(action_id, user_id)
       user = User.find(user_id)

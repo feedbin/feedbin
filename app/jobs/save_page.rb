@@ -1,6 +1,6 @@
 class SavePage
   include Sidekiq::Worker
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :default_critical
 
   attr_reader :user, :url, :title
 

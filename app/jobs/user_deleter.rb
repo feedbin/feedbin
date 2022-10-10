@@ -1,6 +1,6 @@
 class UserDeleter
   include Sidekiq::Worker
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :default_critical
 
   def perform(user_id, signed_id = nil)
     @user = User.find(user_id)

@@ -1,6 +1,6 @@
 class FeedImporter
   include Sidekiq::Worker
-  sidekiq_options queue: :critical, retry: false
+  sidekiq_options queue: :default_critical, retry: false
 
   def perform(import_item_id)
     import_item = ImportItem.find(import_item_id)

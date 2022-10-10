@@ -1,2 +1,2 @@
 feedbin_clock: bundle exec clockwork lib/clock.rb
-feedbin_jobs: DB_POOL=10 bundle exec sidekiq --concurrency 10 --queue critical,4 --queue default,2 --queue feed_downloader --queue feed_downloader_critical,2 --queue feed_parser_$HOSTNAME --queue feed_parser_critical_$HOSTNAME,2 --queue feed_refresher_receiver,3 --queue image_parallel --queue image_parallel_$HOSTNAME --queue image_parallel_critical,2 --queue image_serial_$HOSTNAME --queue image_serial_critical_$HOSTNAME,2 --queue low,1 --queue search,2 --queue twitter_refresher --queue twitter_refresher_critical,2 --queue worker_slow,1 --queue worker_slow_critical,2
+feedbin_jobs: DB_POOL=10 bundle exec sidekiq --config config/sidekiq-development.yml

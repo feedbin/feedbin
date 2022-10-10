@@ -1,7 +1,7 @@
 module FeedCrawler
   class TwitterDownloader
     include Sidekiq::Worker
-    sidekiq_options queue: :twitter_refresher, retry: false
+    sidekiq_options queue: :twitter, retry: false
 
     def perform(feed_id, feed_url, keys)
       feed = nil

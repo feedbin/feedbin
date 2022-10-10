@@ -1,7 +1,7 @@
 module AccountMigrator
   class Setup
     include Sidekiq::Worker
-    sidekiq_options queue: :worker_slow_critical
+    sidekiq_options queue: :utility_critical
 
     def perform(migration_id)
       @migration = AccountMigration.find(migration_id)

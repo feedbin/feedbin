@@ -1,6 +1,6 @@
 class EntryDeleter
   include Sidekiq::Worker
-  sidekiq_options queue: :worker_slow
+  sidekiq_options queue: :utility
 
   def perform(feed_id)
     feed = Feed.find(feed_id)

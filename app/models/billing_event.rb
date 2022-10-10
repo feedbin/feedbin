@@ -24,11 +24,11 @@ class BillingEvent < ApplicationRecord
 
   def process_event
     if charge_succeeded?
-      UserMailer.delay(queue: :critical).payment_receipt(id)
+      UserMailer.delay(queue: :default_critical).payment_receipt(id)
     end
 
     if charge_failed?
-      UserMailer.delay(queue: :critical).payment_failed(id)
+      UserMailer.delay(queue: :default_critical).payment_failed(id)
     end
 
     if subscription_deactivated?

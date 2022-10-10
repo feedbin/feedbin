@@ -1,6 +1,6 @@
 class OnboardingMessage
   include Sidekiq::Worker
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :default_critical
 
   def perform(user_id, message)
     @user = User.find(user_id)

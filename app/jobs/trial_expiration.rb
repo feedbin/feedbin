@@ -1,6 +1,6 @@
 class TrialExpiration
   include Sidekiq::Worker
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :default_critical
 
   def perform
     expire_plan("trial")

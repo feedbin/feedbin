@@ -3,7 +3,7 @@ module FeedCrawler
     include Sidekiq::Worker
     include SidekiqHelper
 
-    sidekiq_options queue: :feed_downloader, retry: false, backtrace: false
+    sidekiq_options queue: :crawl, retry: false, backtrace: false
 
     attr_accessor :critical
 
@@ -13,7 +13,7 @@ module FeedCrawler
       @subscribers = subscribers
       @crawl_data  = CrawlData.new(crawl_data)
       @parsing     = false
-      
+
       download
     ensure
       persist_crawl_data unless @parsing

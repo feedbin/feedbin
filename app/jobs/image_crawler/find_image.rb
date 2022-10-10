@@ -2,7 +2,7 @@ module ImageCrawler
   class FindImage
     include Sidekiq::Worker
     include ImageCrawlerHelper
-    sidekiq_options queue: "image_parallel", retry: false
+    sidekiq_options queue: :crawl_images, retry: false
 
     def perform(public_id, preset_name, candidate_urls, entry_url = nil)
       @public_id = public_id

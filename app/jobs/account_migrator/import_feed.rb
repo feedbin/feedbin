@@ -1,7 +1,7 @@
 module AccountMigrator
   class ImportFeed
     include Sidekiq::Worker
-    sidekiq_options queue: :search
+    sidekiq_options queue: :network_search
 
     def perform(item_id)
       @item = AccountMigrationItem.find(item_id)

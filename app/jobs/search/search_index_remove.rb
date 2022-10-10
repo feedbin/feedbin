@@ -16,7 +16,7 @@ module Search
       # Sidekiq::Client.push(
       #   "args" => [ids],
       #   "class" => "Search::SearchIndexRemoveAlt",
-      #   "queue" => "worker_slow_search_alt",
+      #   "queue" => "utility_search_alt",
       #   "retry" => false
       # )
     end

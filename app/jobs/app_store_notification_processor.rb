@@ -1,6 +1,6 @@
 class AppStoreNotificationProcessor
   include Sidekiq::Worker
-  sidekiq_options queue: :critical
+  sidekiq_options queue: :default_critical
 
   PRODUCTS = {
     "yearly_v1"         => "app-subscription",

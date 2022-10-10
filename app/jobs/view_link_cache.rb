@@ -1,6 +1,6 @@
 class ViewLinkCache
   include Sidekiq::Worker
-  sidekiq_options queue: :critical, retry: false
+  sidekiq_options queue: :network_default, retry: false
 
   def perform(url, expires_at = nil)
     unless Expires.expired?(expires_at)

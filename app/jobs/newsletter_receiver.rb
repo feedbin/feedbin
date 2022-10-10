@@ -1,7 +1,7 @@
 class NewsletterReceiver
   attr_reader :newsletter, :user
   include Sidekiq::Worker
-  sidekiq_options queue: :feed_refresher_receiver
+  sidekiq_options queue: :parse
 
   def perform(full_token, email)
     token = EmailNewsletter.token(full_token)

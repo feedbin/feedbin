@@ -1,7 +1,7 @@
 module Search
   class RemoveFeedFromAction
     include Sidekiq::Worker
-    sidekiq_options queue: :search
+    sidekiq_options queue: :network_search
 
     def perform(user_id, feed_id)
       user = User.find(user_id)

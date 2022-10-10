@@ -1,7 +1,7 @@
 module Search
   class ActionTags
     include Sidekiq::Worker
-    sidekiq_options queue: :search
+    sidekiq_options queue: :network_search
 
     def perform(user_id, tag_id, tag_id_was)
       user = User.find(user_id)
