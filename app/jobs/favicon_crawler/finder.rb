@@ -1,4 +1,4 @@
-module Favicon
+module FaviconCrawler
   class Finder
     include Sidekiq::Worker
     sidekiq_options retry: false

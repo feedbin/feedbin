@@ -1,4 +1,4 @@
-module Favicon
+module FaviconCrawler
   class Processor
     attr_reader :data, :host
 
