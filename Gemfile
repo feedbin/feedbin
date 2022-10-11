@@ -57,6 +57,7 @@ gem "sidekiq"
 gem "stripe", "~> 5.55.0"
 gem "stripe_event"
 gem "strong_migrations"
+gem "tailwindcss-rails"
 gem "twitter-text"
 gem "uglifier"
 gem "unicode-emoji"
@@ -87,3 +88,4 @@ group :development, :test do
   gem "standard"
   gem "webmock", "= 3.8.0"
 end
+

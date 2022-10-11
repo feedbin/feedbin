@@ -25,3 +25,5 @@ coverage
 .byebug_history
 /node_modules
 .vscode
+/app/assets/builds/*
+!/app/assets/builds/.keep
