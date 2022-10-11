@@ -28,7 +28,7 @@ module FaviconCrawler
 
       if response
         processor = Processor.new(response.path, @favicon.host)
-        if @force && @favicon.data["favicon_hash"] != processor.favicon_hash
+        if @force || @favicon.data["favicon_hash"] != processor.favicon_hash
           processor.process
           return if processor.favicon_url.nil?
           @favicon.favicon = processor.encoded_favicon
