@@ -28,8 +28,9 @@ module FaviconCrawler
 
       if response
         processor = Processor.new(response.path, @favicon.host)
-        if @favicon.data["favicon_hash"] != processor.favicon_hash
+        if @force && @favicon.data["favicon_hash"] != processor.favicon_hash
           processor.process
+          return if processor.favicon_url.nil?
           @favicon.favicon = processor.encoded_favicon
           @favicon.url = processor.favicon_url
           @favicon.data = {
@@ -82,11 +83,14 @@ module FaviconCrawler
     end
 
     def download_favicon(url)
-      Feedkit::Request.download(url.to_s,
-        user_agent: "Mozilla/5.0",
-        etag: @favicon.data["Etag"],
-        last_modified: @favicon.data["Last-Modified"]
-      )
+      options = {}.tap do |hash|
+        hash[:user_agent] = "Mozilla/5.0"
+        unless @force
+          hash[:etag]          = @favicon.data["Etag"]
+          hash[:last_modified] = @favicon.data["Last-Modified"]
+        end
+      end
+      Feedkit::Request.download(url.to_s, **options)
     rescue Feedkit::Error => exception
       Sidekiq.logger.info "download_favicon exception=#{exception.inspect} url=#{url}"
       nil
