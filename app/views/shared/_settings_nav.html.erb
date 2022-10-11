@@ -61,7 +61,7 @@
     <li class="nav-header">
         <div>Tools</div>
     </li>
-    <li class="border">
+    <li class="divider">
         <%= link_to actions_path, class: is_active?("actions", ["index", "new", "edit"]) do %>
             <span class="icon-wrap">
                 <%= svg_tag "menu-icon-actions", inline: true %>
@@ -110,7 +110,7 @@
     <li class="nav-header">
         <div>Admin</div>
     </li>
-    <li class="border">
+    <li class="divider">
         <%= link_to settings_account_path, class: is_active?("settings", "account") do %>
             <span class="icon-wrap">
                 <%= svg_tag "menu-icon-account", inline: true %>
@@ -169,7 +169,7 @@
         <% end %>
     </li>
 </ul>
-<ul class="nav nav-small border">
+<ul class="nav nav-small divider">
     <li>
         <a href="/home">
             Home

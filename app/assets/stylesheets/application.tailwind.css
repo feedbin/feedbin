@@ -1,12 +1,64 @@
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/*
+.theme-day {
+    --color-base: theme('colors.feedkit-day.DEFAULT');
+    --color-100:  theme("colors.feedkit-day.100");
+    --color-200:  theme("colors.feedkit-day.200");
+    --color-300:  theme("colors.feedkit-day.300");
+    --color-400:  theme("colors.feedkit-day.400");
+    --color-500:  theme("colors.feedkit-day.500");
+    --color-600:  theme("colors.feedkit-day.600");
+    --color-700:  theme("colors.feedkit-day.700");
+}
+.theme-sunset {
+    --color-base: theme('colors.feedkit-sunset.DEFAULT');
+    --color-100:  theme("colors.feedkit-sunset.100");
+    --color-200:  theme("colors.feedkit-sunset.200");
+    --color-300:  theme("colors.feedkit-sunset.300");
+    --color-400:  theme("colors.feedkit-sunset.400");
+    --color-500:  theme("colors.feedkit-sunset.500");
+    --color-600:  theme("colors.feedkit-sunset.600");
+    --color-700:  theme("colors.feedkit-sunset.700");
+}
+.theme-dusk {
+    --color-base: theme('colors.feedkit-dusk.DEFAULT');
+    --color-100:  theme("colors.feedkit-dusk.100");
+    --color-200:  theme("colors.feedkit-dusk.200");
+    --color-300:  theme("colors.feedkit-dusk.300");
+    --color-400:  theme("colors.feedkit-dusk.400");
+    --color-500:  theme("colors.feedkit-dusk.500");
+    --color-600:  theme("colors.feedkit-dusk.600");
+    --color-700:  theme("colors.feedkit-dusk.700");
+}
+.theme-midnight {
+    --color-base: theme('colors.feedkit-midnight.DEFAULT');
+    --color-100:  theme("colors.feedkit-midnight.100");
+    --color-200:  theme("colors.feedkit-midnight.200");
+    --color-300:  theme("colors.feedkit-midnight.300");
+    --color-400:  theme("colors.feedkit-midnight.400");
+    --color-500:  theme("colors.feedkit-midnight.500");
+    --color-600:  theme("colors.feedkit-midnight.600");
+    --color-700:  theme("colors.feedkit-midnight.700");
+}
 
-@layer components {
-  .btn-primary {
-    @apply py-2 px-4 bg-blue-200;
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-width: 0;
+    border-style: solid;
+    border-color: theme('borderColor.DEFAULT', currentColor);
+  }
+  ul, li {
+    margin: 0;
+    padding: 0;
   }
 }
 
-*/
+@layer utilities {
+  .border-shim {
+    border: 0px solid black;
+  }
+}

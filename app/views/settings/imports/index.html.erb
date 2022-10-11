@@ -67,6 +67,9 @@
 
     <%= render(Settings::SectionComponent.new) do %>
         <%= render(Settings::HeadingComponent.new) { "Import History" } %>
+        <%= render(Settings::ControlGroupComponent.new) do %>
+            Inner
+        <% end %>
     <% end %>
 
 </div>

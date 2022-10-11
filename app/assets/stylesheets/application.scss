@@ -5767,7 +5767,7 @@ Settings
       }
     }
   }
-  &.border {
+  &.divider {
     &:before {
       content: "";
       display: block;
@@ -5780,7 +5780,7 @@ Settings
     }
   }
   .settings-inner & {
-    &.border {
+    &.divider {
       &:before {
         @include background-color($color-borders);
       }
@@ -5822,7 +5822,7 @@ Settings
   .nav-small {
     display: none;
   }
-  li.border {
+  li.divider {
     margin-top: base-units(1);
     padding-top: base-units(1);
     position: relative;
