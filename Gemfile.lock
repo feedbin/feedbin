@@ -608,6 +608,10 @@ GEM
       kgio (~> 2.6)
       raindrops (~> 0.7)
     version_gem (1.1.1)
+    view_component (2.74.1)
+      activesupport (>= 5.0.0, < 8.0)
+      concurrent-ruby (~> 1.0)
+      method_source (~> 1.0)
     webmock (3.8.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -705,6 +709,7 @@ DEPENDENCIES
   uglifier
   unicode-emoji
   unicorn
+  view_component
   webmock (= 3.8.0)
   will_paginate
 

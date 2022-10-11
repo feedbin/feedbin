@@ -2,8 +2,8 @@
     <div class="settings-outer">
         <h2>Import & Export</h2>
     </div>
-    <div class="inset">
-        <h4 class="group-header">Import</h4>
+    <%= render(Settings::SectionComponent.new) do %>
+        <%= render(Settings::HeadingComponent.new) { "Import" } %>
         <%= form_with model: Import.new, url: settings_imports_path do |f| %>
             <ul class="control-group">
                 <li>
@@ -21,9 +21,9 @@
                 </li>
             </ul>
         <% end %>
-    </div>
-    <div class="inset">
-        <h4 class="group-header">Export</h4>
+    <% end %>
+    <%= render(Settings::SectionComponent.new) do %>
+        <%= render(Settings::HeadingComponent.new) { "Export" } %>
         <ul class="control-group">
             <li>
                 <div class="form-control">
@@ -63,5 +63,10 @@
                 </li>
             <% end %>
         </ul>
-    </div>
+    <% end %>
+
+    <%= render(Settings::SectionComponent.new) do %>
+        <%= render(Settings::HeadingComponent.new) { "Import History" } %>
+    <% end %>
+
 </div>

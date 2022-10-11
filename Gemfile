@@ -62,6 +62,7 @@ gem "twitter-text"
 gem "uglifier"
 gem "unicode-emoji"
 gem "unicorn"
+gem "view_component"
 gem "jwt"
 
 group :development do
