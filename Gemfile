@@ -63,6 +63,7 @@ gem "uglifier"
 gem "unicode-emoji"
 gem "unicorn"
 gem "view_component"
+gem "lookbook"
 gem "jwt"
 
 group :development do

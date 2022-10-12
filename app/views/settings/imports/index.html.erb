@@ -65,10 +65,27 @@
         </ul>
     <% end %>
 
+    <%= render(Settings::BoxComponent.new) do |box| %>
+      <% box.with_header do %>
+        Import History
+      <% end %>
+
+      <% box.with_item do %>
+        One
+      <% end %>
+
+      <% box.with_item do %>
+        Two
+      <% end %>
+
+    <% end %>
+
     <%= render(Settings::SectionComponent.new) do %>
         <%= render(Settings::HeadingComponent.new) { "Import History" } %>
         <%= render(Settings::ControlGroupComponent.new) do %>
-            Inner
+          <%= render(Settings::ControlComponent.new) do %>
+              Inner
+          <% end %>
         <% end %>
     <% end %>
 

@@ -1,0 +1,13 @@
+<%= render(Settings::SectionComponent.new) do %>
+    <%= render(Settings::HeadingComponent.new) do %>
+      <%= header %>
+    <% end %>
+
+    <%= render(Settings::ControlGroupComponent.new) do %>
+      <% items.each do |item| %>
+        <%= render(Settings::ControlComponent.new) do %>
+            <%= item %>
+        <% end %>
+      <% end %>
+    <% end %>
+<% end %>

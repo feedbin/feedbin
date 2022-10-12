@@ -2,3 +2,4 @@
 
 require ::File.expand_path("../config/environment", __FILE__)
 run Feedbin::Application
+Rails.application.load_server

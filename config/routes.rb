@@ -7,6 +7,10 @@ Rails.application.routes.draw do
 
   root to: "site#index"
 
+  if Rails.env.development?
+    mount Lookbook::Engine, at: "/lookbook"
+  end
+
   mount StripeEvent::Engine, at: "/stripe"
   constraints lambda { |request| AuthConstraint.admin?(request) } do
     mount Sidekiq::Web => "sidekiq"

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-.theme-day, .theme-auto.prefers-light {
+:root, .theme-day, .theme-auto.prefers-light {
     --color-base: theme('colors.day.DEFAULT');
     --color-100:  theme("colors.day.100");
     --color-200:  theme("colors.day.200");
@@ -61,6 +61,7 @@
   ul, li {
     margin: 0;
     padding: 0;
+    list-style: none;
   }
 }
 
