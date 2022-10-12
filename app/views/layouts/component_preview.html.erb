@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", media: "all"  %>
+    <%= javascript_include_tag "lib/lib"  %>
+    <%= javascript_include_tag "application"  %>
+</head>
+<body>
+  <div class="theme-day bg-day p-2">
+    <%= yield %>
+  </div>
+  <div class="theme-dusk bg-dusk p-2">
+    <%= yield %>
+  </div>
+  <div class="theme-sunset bg-sunset p-2">
+    <%= yield %>
+  </div>
+  <div class="theme-midnight bg-midnight p-2">
+    <%= yield %>
+  </div>
+</body>
+</html>

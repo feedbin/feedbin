@@ -4,25 +4,69 @@
     </div>
 
     <%= render(Settings::BoxComponent.new) do |box| %>
-      <% box.header do %>
-        Import History
-      <% end %>
-
-      <% @imports.each do |import| %>
+        <% box.header { "Import" } %>
         <% box.item do %>
-          <div class="grow">
-            <div>
-              <%= import.created_at.to_formatted_s(:date) %>
-            </div>
-            <div class="text-500 text-sm mt-2 ">
-              <%= import.filename %>
-            </div>
-          </div>
-          <div class="items-center">
-            <a href="XX">Details</a>
-          </div>
+            <%= render(Settings::ControlTextComponent.new) do |control| %>
+                <% control.title do %>
+                    <%= form_with model: Import.new, url: settings_imports_path do |f| %>
+                        <%= f.file_field :upload, accept: ".xml, .opml, text/xml, application/xml, text/x-opml, text/x-opml+xml" %>
+                    <% end %>
+                <% end %>
+                <% control.description { "You can import OPML files. Import is done in the background so you may not see every subscription right away." } %>
+                <% control.control do %>
+                    <button type="submit" class="button">Import</button>
+                <% end %>
+            <% end %>
         <% end %>
-      <% end %>
     <% end %>
 
+    <%= form_tag subscriptions_path(format: :xml), method: :get do %>
+        <%= render(Settings::BoxComponent.new) do |box| %>
+            <% box.header { "Export" } %>
+            <% box.item do %>
+                <%= render(Settings::ControlTextComponent.new) do |control| %>
+                    <% control.title { "Subscriptions" } %>
+                    <% control.control do %>
+                        <%= render "shared/input" do %>
+                            <%= select_tag :tag, options_for_select(@download_options), class: "select" %>
+                            <span class="accessory right">
+                                <%= svg_tag "icon-caret" %>
+                            </span>
+                        <% end %>
+                        <button class="button">Download</button>
+                    <% end %>
+                <% end %>
+            <% end %>
+
+            <% if @user.starred_entries.exists? %>
+                <% box.item do %>
+                    <%= render(Settings::ControlTextComponent.new) do |control| %>
+                        <% control.title { "Starred Articles" } %>
+                        <% control.description { "A link will be emailed to you." } %>
+                        <% control.control do %>
+                            <%= link_to "Export", starred_export_path, method: :post, class: "button" %>
+                        <% end %>
+                    <% end %>
+                <% end %>
+            <% end %>
+
+        <% end %>
+    <% end %>
+
+    <%= render(Settings::BoxComponent.new) do |box| %>
+        <% box.header do %>
+            Import History
+        <% end %>
+        <% @imports.each do |import| %>
+            <% box.item do %>
+                <%= render(Settings::ControlTextComponent.new) do |control| %>
+                    <% control.title { import.created_at.to_formatted_s(:date) } %>
+                    <% control.description { import.filename } %>
+                    <% control.control do %>
+                        <a href="XX">Details</a>
+                    <% end %>
+                <% end %>
+            <% end %>
+        <% end %>
+    <% end %>
 </div>

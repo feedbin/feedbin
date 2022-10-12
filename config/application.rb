@@ -2,6 +2,7 @@ require_relative "boot"
 
 require "rails/all"
 require_relative "../lib/basic_authentication"
+require_relative "../lib/conditional_sass_compressor"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -35,5 +36,12 @@ module Feedbin
     config.active_record.belongs_to_required_by_default = false
     config.action_view.default_enforce_utf8 = true
     config.active_record.yaml_column_permitted_classes = [Symbol]
+    config.assets.css_compressor = ConditionalSassCompressor.new
+    config.view_component.default_preview_layout = "component_preview"
+
+    config.lookbook.project_name = "Feedkit"
+    config.lookbook.ui_theme_overrides = {
+      header_bg: "#000000"
+    }
   end
 end

@@ -1,12 +1,9 @@
-# frozen_string_literal: true
-
 require "test_helper"
 
 class Settings::BoxComponentTest < ViewComponent::TestCase
-  def test_component_renders_something_useful
-    # assert_equal(
-    #   %(<span>Hello, components!</span>),
-    #   render_inline(Settings::BoxComponent.new(message: "Hello, components!")).css("span").to_html
-    # )
+  def test_render_preview
+    render_preview(:default)
+    assert_text("Setting")
+    assert_selector(".text-600", text: "Control")
   end
 end

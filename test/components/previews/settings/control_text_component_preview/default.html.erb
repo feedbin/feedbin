@@ -1,0 +1,9 @@
+<div class="flex items-center gap-4">
+  <%= render(Settings::ControlTextComponent.new) do |control| %>
+      <% control.title { "Title" } %>
+      <% control.description { "Description" } %>
+      <% control.control do %>
+          <a href="XX">Details</a>
+      <% end %>
+  <% end %>
+</div>
