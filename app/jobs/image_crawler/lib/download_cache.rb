@@ -57,7 +57,9 @@ module ImageCrawler
     def copy_image
       url = URI.parse(storage_url)
       source_object_name = url.path[1..-1]
-      Fog::Storage.new(STORAGE_OPTIONS).copy_object(IMAGE_STORAGE, source_object_name, IMAGE_STORAGE, image_name, storage_options)
+      S3_POOL.with do |connection|
+        connection.copy_object(IMAGE_STORAGE, source_object_name, IMAGE_STORAGE, image_name, storage_options)
+      end
       final_url = url.path = "/#{image_name}"
       url.to_s
     rescue Excon::Error::NotFound

@@ -6,8 +6,6 @@ module ImageCrawler
     puts "Pigo missing. Add it to your path or set ENV['PIGO_PATH']. From https://github.com/esimov/pigo" unless PIGO_INSTALLED
 
     IMAGE_STORAGE = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
-    STORAGE_OPTIONS = CarrierWave.configure { _1.fog_credentials }
-
     IMAGE_PRESETS = {
       primary: {
         width: 542,
