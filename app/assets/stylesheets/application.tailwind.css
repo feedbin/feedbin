@@ -58,7 +58,7 @@
     border-style: solid;
     border-color: theme('borderColor.DEFAULT', currentColor);
   }
-  ul, li {
+  ul, li, h6, p {
     margin: 0;
     padding: 0;
     list-style: none;

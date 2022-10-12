@@ -66,18 +66,25 @@
     <% end %>
 
     <%= render(Settings::BoxComponent.new) do |box| %>
-      <% box.with_header do %>
+      <% box.header do %>
         Import History
       <% end %>
 
-      <% box.with_item do %>
-        One
+      <% @imports.each do |import| %>
+        <% box.item do %>
+          <div class="grow">
+            <div>
+              <%= import.created_at.to_formatted_s(:date) %>
+            </div>
+            <div class="text-500 text-sm mt-2 ">
+              <%= import.filename %>
+            </div>
+          </div>
+          <div class="items-center">
+            <a href="XX">Details</a>
+          </div>
+        <% end %>
       <% end %>
-
-      <% box.with_item do %>
-        Two
-      <% end %>
-
     <% end %>
 
     <%= render(Settings::SectionComponent.new) do %>

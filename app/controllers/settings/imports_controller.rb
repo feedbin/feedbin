@@ -7,7 +7,7 @@ class Settings::ImportsController < ApplicationController
       [tag.name, tag.id]
     }
     @download_options.unshift(["All", "all"])
-
+    @imports = @user.imports.where.not(filename: nil).order(created_at: :desc)
     render layout: "settings"
   end
 

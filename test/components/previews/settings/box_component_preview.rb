@@ -3,10 +3,10 @@
 class Settings::BoxComponentPreview < ViewComponent::Preview
   def default
     render Settings::BoxComponent.new do |component|
-      component.with_header { "Setting" }
-      component.with_item { "Item One" }
-      component.with_item { "Item Two" }
-      component.with_item { "Item Three" }
+      component.header { "Setting" }
+      component.item { "Item One" }
+      component.item { "Item Two" }
+      component.item { "Item Three" }
     end
   end
 end
