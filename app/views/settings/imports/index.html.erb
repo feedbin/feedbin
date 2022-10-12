@@ -2,68 +2,6 @@
     <div class="settings-outer">
         <h2>Import & Export</h2>
     </div>
-    <%= render(Settings::SectionComponent.new) do %>
-        <%= render(Settings::HeadingComponent.new) { "Import" } %>
-        <%= form_with model: Import.new, url: settings_imports_path do |f| %>
-            <ul class="control-group">
-                <li>
-                    <div class="form-control">
-                        <div class="toolbar">
-                            <div>
-                                <%= f.file_field :upload, accept: ".xml, .opml, text/xml, application/xml, text/x-opml, text/x-opml+xml" %>
-                                <p class="control-group-description">You can import OPML files. Import is done in the background so you may not see every subscription right away.</p>
-                            </div>
-                            <div class="last-control">
-                                <button type="submit" class="button">Import</button>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        <% end %>
-    <% end %>
-    <%= render(Settings::SectionComponent.new) do %>
-        <%= render(Settings::HeadingComponent.new) { "Export" } %>
-        <ul class="control-group">
-            <li>
-                <div class="form-control">
-                    <%= form_tag subscriptions_path(format: :xml), method: :get do %>
-                    <div class="toolbar">
-                        <div>
-                            Subscriptions
-                        </div>
-                        <div class="last-control button-wrap-inline">
-                            <%= render "shared/input" do %>
-                                <%= select_tag :tag, options_for_select(@download_options), class: "select" %>
-                                <span class="accessory right">
-                                    <%= svg_tag "icon-caret" %>
-                                </span>
-                            <% end %>
-                            <button class="button">Download</button>
-                        </div>
-                    </div>
-                    <% end %>
-                </div>
-            </li>
-            <% if @user.starred_entries.exists? %>
-                <li>
-                    <div class="form-control">
-                        <div class="toolbar">
-                            <div>
-                                Starred Articles
-                                <% if @user.starred_entries.exists? %>
-                                    <p class="control-group-description">A link will be emailed to you.</p>
-                                <% end %>
-                            </div>
-                            <div class="last-control">
-                                <%= link_to "Export", starred_export_path, method: :post, class: "button" %>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-            <% end %>
-        </ul>
-    <% end %>
 
     <%= render(Settings::BoxComponent.new) do |box| %>
       <% box.header do %>
@@ -85,15 +23,6 @@
           </div>
         <% end %>
       <% end %>
-    <% end %>
-
-    <%= render(Settings::SectionComponent.new) do %>
-        <%= render(Settings::HeadingComponent.new) { "Import History" } %>
-        <%= render(Settings::ControlGroupComponent.new) do %>
-          <%= render(Settings::ControlComponent.new) do %>
-              Inner
-          <% end %>
-        <% end %>
     <% end %>
 
 </div>
