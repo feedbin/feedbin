@@ -583,7 +583,6 @@ $.extend feedbin,
     $(document).trigger('feedbin:entriesLoaded')
     feedbin.localizeTime()
     feedbin.applyUserTitles()
-    feedbin.loadEntryImages()
     feedbin.faviconColors($(".entries-column"))
 
   updateUnreads: (unreadOnly, unreadEntries) ->
@@ -703,6 +702,13 @@ $.extend feedbin,
 
   isRead: (entryId) ->
     feedbin.Counts.get().isRead(entryId)
+
+  imageLoaded: (element) ->
+    $(element).closest(".entry-image").addClass("loaded")
+
+  imageError: (element) ->
+    $(element).closest(".entry-image").css
+      display: "none"
 
   imagePlaceholders: (element) ->
     image = new Image()

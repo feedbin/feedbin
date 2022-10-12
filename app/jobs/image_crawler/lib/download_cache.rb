@@ -33,6 +33,10 @@ module ImageCrawler
       @image_url ||= cache[:image_url]
     end
 
+    def placeholder_color
+      @placeholder_color ||= cache[:placeholder_color]
+    end
+
     def download?
       !previously_attempted? && storage_url != false
     end
@@ -41,8 +45,8 @@ module ImageCrawler
       !cache.empty?
     end
 
-    def save(storage_url:, image_url:)
-      @cache = {storage_url: storage_url, image_url: image_url}
+    def save(storage_url:, image_url:, placeholder_color:)
+      @cache = {storage_url:, image_url:, placeholder_color:}
       Cache.write(cache_key, @cache, options: {expires_in: 7 * 24 * 60 * 60})
     end
 

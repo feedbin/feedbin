@@ -23,6 +23,7 @@ module ImageCrawler
 
     def receive
       @entry.data["twitter_link_image_processed"] = @image["processed_url"]
+      @entry.data["twitter_link_image_placeholder_color"] = @image["placeholder_color"]
       @entry.save!
     end
   end

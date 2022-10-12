@@ -10,12 +10,16 @@ module ImageCrawler
       path = copy_support_file("image.jpeg")
       url = "http://example.com/image.jpg"
 
-      assert_equal 0, UploadImage.jobs.size
-      ProcessImage.new.perform(public_id, "primary", path, url, url, [])
-      assert_equal 1, UploadImage.jobs.size
+      assert_difference -> { UploadImage.jobs.size }, +1 do
+        ProcessImage.new.perform(public_id, "primary", path, url, url, [])
+      end
 
-      assert_equal(public_id, UploadImage.jobs.first["args"].first)
-      assert_equal(url, UploadImage.jobs.first["args"].last)
+      assert_equal(public_id, UploadImage.jobs.first["args"][0])
+      assert_equal("primary", UploadImage.jobs.first["args"][1])
+      assert(UploadImage.jobs.first["args"][2].include?("image_processed"), "Should contain path to image")
+      assert_equal(url, UploadImage.jobs.first["args"][3])
+      assert_equal(url, UploadImage.jobs.first["args"][4])
+      assert_equal("bbbabe", UploadImage.jobs.first["args"][5])
     end
 
     def test_should_enqueue_find
@@ -24,9 +28,9 @@ module ImageCrawler
       url = "http://example.com/image.jpg"
       all_urls = ["http://example.com/image_2.jpg", "http://example.com/image_3.jpg"]
 
-      assert_equal 0, FindImageCritical.jobs.size
-      ProcessImage.new.perform(public_id, "primary", path, url, url, all_urls)
-      assert_equal 1, FindImageCritical.jobs.size
+      assert_difference -> { FindImageCritical.jobs.size }, +1 do
+        ProcessImage.new.perform(public_id, "primary", path, url, url, all_urls)
+      end
 
       assert_equal([public_id, "primary", all_urls], FindImageCritical.jobs.first["args"])
     end

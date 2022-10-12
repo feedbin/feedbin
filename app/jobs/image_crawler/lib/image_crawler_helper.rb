@@ -48,12 +48,13 @@ module ImageCrawler
       OpenStruct.new(IMAGE_PRESETS[@preset_name.to_sym])
     end
 
-    def send_to_feedbin(original_url:, storage_url:)
+    def send_to_feedbin(original_url:, storage_url:, placeholder_color:)
       preset.job_class.perform_async(@public_id, {
-        "original_url" => original_url,
-        "processed_url" => storage_url,
-        "width" => preset.width,
-        "height" => preset.height
+        "original_url"      => original_url,
+        "processed_url"     => storage_url,
+        "width"             => preset.width,
+        "height"            => preset.height,
+        "placeholder_color" => placeholder_color
       })
     end
 

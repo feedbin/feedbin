@@ -364,13 +364,13 @@ class EntryPresenter < BasePresenter
 
   def attached_image
     if entry.processed_image?
-      image(entry.processed_image)
+      image(entry.processed_image, entry.placeholder_color)
     end
   end
 
-  def image(src)
-    @template.content_tag :span, class: "entry-image" do
-      @template.content_tag :span, "", data: {src: src}
+  def image(src, placeholder_color = nil)
+    @template.content_tag :span, class: "entry-image", style: placeholder_color ? "background-color: ##{placeholder_color}" : "" do
+      @template.image_tag src, loading: "lazy", onerror: "feedbin.imageError(this);", onload: "feedbin.imageLoaded(this);"
     end
   end
 

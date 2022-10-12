@@ -29,7 +29,7 @@ module ImageCrawler
 
         download_cache = DownloadCache.copy(original_url, public_id: @public_id, preset_name: @preset_name)
         if download_cache.copied?
-          send_to_feedbin(original_url: download_cache.image_url, storage_url: download_cache.storage_url)
+          send_to_feedbin(original_url: download_cache.image_url, storage_url: download_cache.storage_url, placeholder_color: download_cache.placeholder_color)
           Sidekiq.logger.info "Copied image: public_id=#{@public_id} image_url=#{download_cache.image_url} storage_url=#{download_cache.storage_url}"
           break
         elsif download_cache.download?

@@ -261,6 +261,12 @@ class Entry < ApplicationRecord
     end
   end
 
+  def placeholder_color
+    if image && image["placeholder_color"].respond_to?(:length) && image["placeholder_color"].length == 6
+      image["placeholder_color"]
+    end
+  end
+
   def processed_image?
     processed_image ? true : false
   end
@@ -288,6 +294,12 @@ class Entry < ApplicationRecord
       url.host = host if host
       url.scheme = "https"
       url.to_s
+    end
+  end
+
+  def tweet_link_image_placeholder_color
+    if data && data["twitter_link_image_placeholder_color"].respond_to?(:length) && data["twitter_link_image_placeholder_color"].length == 6
+      data["twitter_link_image_placeholder_color"]
     end
   end
 
