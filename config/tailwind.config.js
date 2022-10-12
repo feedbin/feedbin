@@ -13,7 +13,7 @@ module.exports = {
   theme: {
     extend: {
       borderColor: {
-        DEFAULT: "var(--color-200)"
+        DEFAULT: "var(--border-color)"
       },
       textColor: {
         400: "var(--color-400)",
@@ -21,11 +21,8 @@ module.exports = {
         600: "var(--color-600)",
         700: "var(--color-700)",
       },
-      backgroundImage: {
-        "apple-logo": "url('/assets-site/images/logo-apple.svg')",
-      },
       colors: {
-        "feedkit-day": {
+        "day": {
           DEFAULT: "#FFFFFF",
           100:     "#f5f5f7",
           200:     "#e9e9eb",
@@ -35,7 +32,7 @@ module.exports = {
           600:     "#39404b",
           700:     "#0d1623",
         },
-        "feedkit-sunset": {
+        "sunset": {
           DEFAULT: "#f5f2eb",
           100:     "#ebe8e2",
           200:     "#dfdcd6",
@@ -45,7 +42,7 @@ module.exports = {
           600:     "#3b3a38",
           700:     "#191818",
         },
-        "feedkit-dusk": {
+        "dusk": {
           DEFAULT: "#262626",
           100:     "#2d2d2d",
           200:     "#353535",
@@ -55,7 +52,7 @@ module.exports = {
           600:     "#d4d4d4",
           700:     "#f6f6f6",
         },
-        "feedkit-midnight": {
+        "midnight": {
           DEFAULT: "black",
           100:     "#141414",
           200:     "#242424",
@@ -65,19 +62,19 @@ module.exports = {
           600:     "#bababa",
           700:     "#f5f5f5",
         },
-        "feedkit-blue": {
+        "blue": {
           400: "#619EEC",
           600: "#0867E2",
           700: "#0755B9",
         },
-        "feedkit-orange": {
+        "orange": {
           600: "#E96A0E",
         },
-        "feedkit-green": {
+        "green": {
           600: "#07AC47",
           700: "#068D3B",
         },
-        "feedkit-red": {
+        "red": {
           200: "#F8E7EA",
           600: "#BB0B2F",
         },

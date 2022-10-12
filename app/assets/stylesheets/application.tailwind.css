@@ -2,45 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
-.theme-day {
-    --color-base: theme('colors.feedkit-day.DEFAULT');
-    --color-100:  theme("colors.feedkit-day.100");
-    --color-200:  theme("colors.feedkit-day.200");
-    --color-300:  theme("colors.feedkit-day.300");
-    --color-400:  theme("colors.feedkit-day.400");
-    --color-500:  theme("colors.feedkit-day.500");
-    --color-600:  theme("colors.feedkit-day.600");
-    --color-700:  theme("colors.feedkit-day.700");
+.theme-day, .theme-auto.prefers-light {
+    --color-base: theme('colors.day.DEFAULT');
+    --color-100:  theme("colors.day.100");
+    --color-200:  theme("colors.day.200");
+    --color-300:  theme("colors.day.300");
+    --color-400:  theme("colors.day.400");
+    --color-500:  theme("colors.day.500");
+    --color-600:  theme("colors.day.600");
+    --color-700:  theme("colors.day.700");
+    --border-color: var(--color-200);
 }
+
 .theme-sunset {
-    --color-base: theme('colors.feedkit-sunset.DEFAULT');
-    --color-100:  theme("colors.feedkit-sunset.100");
-    --color-200:  theme("colors.feedkit-sunset.200");
-    --color-300:  theme("colors.feedkit-sunset.300");
-    --color-400:  theme("colors.feedkit-sunset.400");
-    --color-500:  theme("colors.feedkit-sunset.500");
-    --color-600:  theme("colors.feedkit-sunset.600");
-    --color-700:  theme("colors.feedkit-sunset.700");
+    --color-base: theme('colors.sunset.DEFAULT');
+    --color-100:  theme("colors.sunset.100");
+    --color-200:  theme("colors.sunset.200");
+    --color-300:  theme("colors.sunset.300");
+    --color-400:  theme("colors.sunset.400");
+    --color-500:  theme("colors.sunset.500");
+    --color-600:  theme("colors.sunset.600");
+    --color-700:  theme("colors.sunset.700");
+    --border-color: var(--color-200);
 }
-.theme-dusk {
-    --color-base: theme('colors.feedkit-dusk.DEFAULT');
-    --color-100:  theme("colors.feedkit-dusk.100");
-    --color-200:  theme("colors.feedkit-dusk.200");
-    --color-300:  theme("colors.feedkit-dusk.300");
-    --color-400:  theme("colors.feedkit-dusk.400");
-    --color-500:  theme("colors.feedkit-dusk.500");
-    --color-600:  theme("colors.feedkit-dusk.600");
-    --color-700:  theme("colors.feedkit-dusk.700");
+
+.theme-dusk, .theme-auto.prefers-dark {
+    --color-base: theme('colors.dusk.DEFAULT');
+    --color-100:  theme("colors.dusk.100");
+    --color-200:  theme("colors.dusk.200");
+    --color-300:  theme("colors.dusk.300");
+    --color-400:  theme("colors.dusk.400");
+    --color-500:  theme("colors.dusk.500");
+    --color-600:  theme("colors.dusk.600");
+    --color-700:  theme("colors.dusk.700");
+    --border-color: black;
 }
+
 .theme-midnight {
-    --color-base: theme('colors.feedkit-midnight.DEFAULT');
-    --color-100:  theme("colors.feedkit-midnight.100");
-    --color-200:  theme("colors.feedkit-midnight.200");
-    --color-300:  theme("colors.feedkit-midnight.300");
-    --color-400:  theme("colors.feedkit-midnight.400");
-    --color-500:  theme("colors.feedkit-midnight.500");
-    --color-600:  theme("colors.feedkit-midnight.600");
-    --color-700:  theme("colors.feedkit-midnight.700");
+    --color-base: theme('colors.midnight.DEFAULT');
+    --color-100:  theme("colors.midnight.100");
+    --color-200:  theme("colors.midnight.200");
+    --color-300:  theme("colors.midnight.300");
+    --color-400:  theme("colors.midnight.400");
+    --color-500:  theme("colors.midnight.500");
+    --color-600:  theme("colors.midnight.600");
+    --color-700:  theme("colors.midnight.700");
+    --border-color: var(--color-200);
 }
 
 @layer base {
