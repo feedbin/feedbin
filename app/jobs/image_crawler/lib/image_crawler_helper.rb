@@ -6,8 +6,6 @@ module ImageCrawler
     puts "Pigo missing. Add it to your path or set ENV['PIGO_PATH']. From https://github.com/esimov/pigo" unless PIGO_INSTALLED
 
     IMAGE_STORAGE = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
-    STORAGE_OPTIONS = CarrierWave.configure { _1.fog_credentials }
-
     IMAGE_PRESETS = {
       primary: {
         width: 542,
@@ -50,12 +48,13 @@ module ImageCrawler
       OpenStruct.new(IMAGE_PRESETS[@preset_name.to_sym])
     end
 
-    def send_to_feedbin(original_url:, storage_url:)
+    def send_to_feedbin(original_url:, storage_url:, placeholder_color:)
       preset.job_class.perform_async(@public_id, {
-        "original_url" => original_url,
-        "processed_url" => storage_url,
-        "width" => preset.width,
-        "height" => preset.height
+        "original_url"      => original_url,
+        "processed_url"     => storage_url,
+        "width"             => preset.width,
+        "height"            => preset.height,
+        "placeholder_color" => placeholder_color
       })
     end
 

@@ -33,6 +33,10 @@ module ImageCrawler
       @image_url ||= cache[:image_url]
     end
 
+    def placeholder_color
+      @placeholder_color ||= cache[:placeholder_color]
+    end
+
     def download?
       !previously_attempted? && storage_url != false
     end
@@ -41,8 +45,8 @@ module ImageCrawler
       !cache.empty?
     end
 
-    def save(storage_url:, image_url:)
-      @cache = {storage_url: storage_url, image_url: image_url}
+    def save(storage_url:, image_url:, placeholder_color:)
+      @cache = {storage_url:, image_url:, placeholder_color:}
       Cache.write(cache_key, @cache, options: {expires_in: 7 * 24 * 60 * 60})
     end
 
@@ -57,7 +61,9 @@ module ImageCrawler
     def copy_image
       url = URI.parse(storage_url)
       source_object_name = url.path[1..-1]
-      Fog::Storage.new(STORAGE_OPTIONS).copy_object(IMAGE_STORAGE, source_object_name, IMAGE_STORAGE, image_name, storage_options)
+      S3_POOL.with do |connection|
+        connection.copy_object(IMAGE_STORAGE, source_object_name, IMAGE_STORAGE, image_name, storage_options)
+      end
       final_url = url.path = "/#{image_name}"
       url.to_s
     rescue Excon::Error::NotFound

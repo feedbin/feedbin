@@ -2845,21 +2845,31 @@ li.selected > a .favicon-wrap,
     display: block;
     border-radius: 8px;
     overflow: hidden;
-    &.is-loading {
-      position: relative;
-      @include background-color($color-contrast-100);
-    }
+    position: relative;
+    padding-top: 56.088560885%;
+    display: block;
+    @include background-color($color-contrast-100);
+    z-index: 1;
+    transition: background-color 1s ease;
     img {
-      display: block;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      left: 0;
       max-width: 100%;
-      height: auto;
-    }
-    span {
-      padding-top: 56.088560885%;
-      display: block;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 0;
     }
     .entry-summary.media & {
       display: none;
+    }
+    &.loaded {
+      background-color: transparent !important;
+      img {
+        opacity: 1;
+      }
     }
   }
   .link-preview {
@@ -2867,7 +2877,7 @@ li.selected > a .favicon-wrap,
     overflow: hidden;
     .entry-image {
       margin: 0;
-      border-radius: 0;
+      border-radius: 8px 8px 0 0;
     }
     img {
       width: 100%;

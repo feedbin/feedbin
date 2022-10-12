@@ -17,7 +17,7 @@
 
                     <% if entry.link_preview? %>
                         <div class="link-preview">
-                            <%= entry_presenter.image entry.tweet_link_image %>
+                            <%= entry_presenter.image entry.tweet_link_image, entry.tweet_link_image_placeholder_color %>
                             <div class="link-preview-content">
                                 <div class="light"><%= entry_presenter.tweet_link_title %></div>
                                 <div class="link-host extra-light"><%= entry_presenter.tweet_link_host %></div>

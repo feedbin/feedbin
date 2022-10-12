@@ -84,7 +84,7 @@
         <% end %>
     </li>
     <li>
-        <%= link_to settings_import_export_path, class: is_active?("settings", "import_export") do %>
+        <%= link_to settings_import_export_path, class: is_active?(["settings/imports"], ["index", "show"]) do %>
             <span class="icon-wrap">
                 <%= svg_tag "menu-icon-import-export", inline: true %>
             </span>
