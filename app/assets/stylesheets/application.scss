@@ -2846,30 +2846,19 @@ li.selected > a .favicon-wrap,
     border-radius: 8px;
     overflow: hidden;
     position: relative;
-    padding-top: 56.088560885%;
-    display: block;
-    @include background-color($color-contrast-100);
     z-index: 1;
-    transition: background-color 1s ease;
+    span {
+      padding-top: 56.088560885%;
+      display: block;
+      @include background-color($color-contrast-100);
+    }
     img {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      right: 0;
-      left: 0;
       max-width: 100%;
-      opacity: 0;
-      transition: opacity 0.5s ease;
-      z-index: 0;
+      height: auto;
+      display: block;
     }
     .entry-summary.media & {
       display: none;
-    }
-    &.loaded {
-      background-color: transparent !important;
-      img {
-        opacity: 1;
-      }
     }
   }
   .link-preview {

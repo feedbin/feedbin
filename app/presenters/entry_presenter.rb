@@ -369,8 +369,8 @@ class EntryPresenter < BasePresenter
   end
 
   def image(src, placeholder_color = nil)
-    @template.content_tag :span, class: "entry-image", style: placeholder_color ? "background-color: ##{placeholder_color}" : "" do
-      @template.image_tag src, loading: "lazy", onerror: "feedbin.imageError(this);", onload: "feedbin.imageLoaded(this);"
+    @template.content_tag :span, class: "entry-image" do
+      @template.content_tag :span, "", data: {src:}, style: placeholder_color ? "background-color: ##{placeholder_color}" : ""
     end
   end
 

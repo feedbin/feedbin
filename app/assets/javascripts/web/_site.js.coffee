@@ -583,6 +583,7 @@ $.extend feedbin,
     $(document).trigger('feedbin:entriesLoaded')
     feedbin.localizeTime()
     feedbin.applyUserTitles()
+    feedbin.loadEntryImages()
     feedbin.faviconColors($(".entries-column"))
 
   updateUnreads: (unreadOnly, unreadEntries) ->
@@ -713,7 +714,6 @@ $.extend feedbin,
   imagePlaceholders: (element) ->
     image = new Image()
     placehold = element.children[0]
-    element.className += ' is-loading'
 
     image.onload = ->
       element.className = element.className.replace('is-loading', 'is-loaded')
