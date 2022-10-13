@@ -19,7 +19,7 @@ module ImageCrawler
       assert(UploadImage.jobs.first["args"][2].include?("image_processed"), "Should contain path to image")
       assert_equal(url, UploadImage.jobs.first["args"][3])
       assert_equal(url, UploadImage.jobs.first["args"][4])
-      assert_equal("bbbabe", UploadImage.jobs.first["args"][5])
+      assert_equal(6, UploadImage.jobs.first["args"][5].length)
     end
 
     def test_should_enqueue_find
