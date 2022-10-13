@@ -716,7 +716,6 @@ $.extend feedbin,
     placehold = element.children[0]
 
     image.onload = ->
-      element.className = element.className.replace('is-loading', 'is-loaded')
       element.replaceChild(image, placehold)
 
     image.onerror = ->
