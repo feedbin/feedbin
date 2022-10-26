@@ -31,7 +31,7 @@ module FeedCrawler
       @crawl_data.download_success(@feed_id)
 
       modified = !@response.not_modified?(@crawl_data.download_fingerprint)
-      Sidekiq.logger.info "Downloaded modified=#{modified} http_status=\"#{@response.status}\" url=#{@feed_url}"
+      Sidekiq.logger.info "Downloaded modified=#{modified} http_status=\"#{@response.status}\" url=#{@feed_url} ignore_http_caching=#{@crawl_data.ignore_http_caching?}"
 
       parse if modified
     rescue Feedkit::Error => exception
@@ -47,8 +47,8 @@ module FeedCrawler
         on_redirect:   on_redirect,
         username:      parsed_url.username,
         password:      parsed_url.password,
-        last_modified: @crawl_data.last_modified,
-        etag:          @crawl_data.etag,
+        last_modified: @crawl_data.ignore_http_caching? ? nil : @crawl_data.last_modified,
+        etag:          @crawl_data.ignore_http_caching? ? nil : @crawl_data.etag,
         auto_inflate:  auto_inflate,
         user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
       )

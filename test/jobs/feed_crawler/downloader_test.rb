@@ -24,9 +24,15 @@ module FeedCrawler
         Downloader.perform_async(@feed.id, @feed.feed_url, 10, {})
       end
 
-      assert_equal(etag, @feed.reload.crawl_data.etag)
-      assert_equal(last_modified, @feed.reload.crawl_data.last_modified)
-      assert_equal(download_fingerprint, @feed.reload.crawl_data.download_fingerprint)
+      crawl_data = @feed.reload.crawl_data
+
+      assert_equal(etag, crawl_data.etag)
+      assert_equal(last_modified, crawl_data.last_modified)
+      assert_equal(download_fingerprint, crawl_data.download_fingerprint)
+      assert_not_nil(crawl_data.last_uncached_download)
+      assert_not_nil(crawl_data.downloaded_at)
+
+      refute crawl_data.ignore_http_caching?, "should be false with recent uncached download"
 
       Downloader.new.perform(@feed.id, @feed.feed_url, 10, @feed.reload.crawl_data.to_h)
       assert_equal 0, Parser.jobs.size, "should be empty because fingerprint will match"
@@ -104,13 +110,40 @@ module FeedCrawler
       data = CrawlData.new({
         etag: etag,
         last_modified: last_modified,
-        checksum: nil
+        checksum: nil,
+        last_uncached_download: Time.now.to_i
       })
 
       url = "http://example.com/atom.xml"
       stub_request(:get, url).with(headers: {"If-None-Match" => etag, "If-Modified-Since" => last_modified}).to_return(status: 304)
       Downloader.new.perform(feed_id, url, 10, data.to_h)
       assert_equal 0, ParserCritical.jobs.size
+    end
+
+    def test_should_ignore_http_caching
+      defaults = {
+        etag: "etag",
+        last_modified: "last_modified",
+        checksum: nil,
+        last_uncached_download: 24.hours.ago.to_i
+      }
+      data = CrawlData.new(defaults)
+
+      url = "http://example.com/atom.xml"
+      stub_request(:get, url)
+
+      Downloader.new.perform(1, url, 10, data.to_h)
+
+      assert_requested(:get, url, times: 1) { _1.headers["If-None-Match"] == nil && _1.headers["If-Modified-Since"] == nil }
+
+      WebMock.reset!
+
+      stub_request(:get, url)
+
+      data = CrawlData.new(defaults.merge!({last_uncached_download: Time.now.to_i}))
+      Downloader.new.perform(1, url, 10, data.to_h)
+      assert_requested(:get, url, times: 1) { _1.headers["If-None-Match"] == defaults[:etag] && _1.headers["If-Modified-Since"] == defaults[:last_modified] }
+
     end
 
     def test_should_not_be_ok_after_error
