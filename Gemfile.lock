@@ -145,6 +145,20 @@ GIT
       connection_pool (~> 2)
       net-http2 (>= 0.18.3, < 2)
 
+GIT
+  remote: https://github.com/teamcapybara/capybara.git
+  revision: 2d05c203d79bca7b3b093c37f866ee41f294925b
+  specs:
+    capybara (3.38.0)
+      addressable
+      matrix
+      mini_mime (>= 0.1.3)
+      nokogiri (~> 1.8)
+      rack (>= 1.6.0)
+      rack-test (>= 0.6.3)
+      regexp_parser (>= 1.5, < 3.0)
+      xpath (~> 3.2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -234,15 +248,6 @@ GEM
     buftok (0.2.0)
     builder (3.2.4)
     byebug (11.1.3)
-    capybara (3.37.1)
-      addressable
-      matrix
-      mini_mime (>= 0.1.3)
-      nokogiri (~> 1.8)
-      rack (>= 1.6.0)
-      rack-test (>= 0.6.3)
-      regexp_parser (>= 1.5, < 3.0)
-      xpath (~> 3.2)
     childprocess (4.1.0)
     clockwork (3.0.0)
       activesupport
@@ -626,7 +631,7 @@ DEPENDENCIES
   binding_of_caller
   bootsnap
   byebug
-  capybara
+  capybara!
   carrierwave!
   clockwork
   coffee-rails
