@@ -201,7 +201,7 @@ GEM
     activerecord (7.0.4)
       activemodel (= 7.0.4)
       activesupport (= 7.0.4)
-    activerecord-import (1.4.0)
+    activerecord-import (1.4.1)
       activerecord (>= 4.2)
     activestorage (7.0.4)
       actionpack (= 7.0.4)
@@ -264,7 +264,6 @@ GEM
       addressable
     dante (0.2.0)
     debug_inspector (1.1.0)
-    digest (3.1.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     dotenv (2.8.1)
@@ -285,7 +284,7 @@ GEM
     evernote_oauth (0.2.3)
       evernote-thrift
       oauth (>= 0.4.1)
-    excon (0.92.5)
+    excon (0.93.1)
     execjs (2.8.1)
     faker (2.23.0)
       i18n (>= 1.8.11, < 2)
@@ -338,7 +337,7 @@ GEM
     hashdiff (1.0.1)
     hashie (5.0.0)
     hetchy (1.0.0)
-    honeybadger (4.12.2)
+    honeybadger (5.0.0)
     htmlbeautifier (1.4.2)
     htmlentities (4.3.4)
     http-2 (0.11.0)
@@ -405,7 +404,7 @@ GEM
     minitest (5.16.3)
     minitest-stub-const (0.6)
     minitest-stub_any_instance (1.0.3)
-    msgpack (1.5.6)
+    msgpack (1.6.0)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.2.3)
@@ -414,10 +413,8 @@ GEM
       connection_pool (~> 2.2)
     net-http2 (0.18.4)
       http-2 (~> 0.11)
-    net-imap (0.2.3)
-      digest
+    net-imap (0.3.1)
       net-protocol
-      strscan
     net-pop (0.1.2)
       net-protocol
     net-protocol (0.1.3)
@@ -425,14 +422,14 @@ GEM
     net-smtp (0.3.2)
       net-protocol
     nio4r (2.5.8)
-    nokogiri (1.13.8)
+    nokogiri (1.13.9)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
-    nokogiri (1.13.8-arm64-darwin)
+    nokogiri (1.13.9-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.13.8-x86_64-darwin)
+    nokogiri (1.13.9-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.13.8-x86_64-linux)
+    nokogiri (1.13.9-x86_64-linux)
       racc (~> 1.4)
     oauth (1.1.0)
       oauth-tty (~> 1.0, >= 1.0.1)
@@ -443,13 +440,13 @@ GEM
     parallel (1.22.1)
     parser (3.1.2.1)
       ast (~> 2.4.1)
-    pg (1.4.3)
+    pg (1.4.4)
     postmark (1.22.1)
       json
     postmark-rails (0.22.1)
       actionmailer (>= 3.0.0)
       postmark (>= 1.21.3, < 2.0)
-    premailer (1.17.0)
+    premailer (1.18.0)
       addressable
       css_parser (>= 1.12.0)
       htmlentities (>= 4.0.0)
@@ -460,7 +457,7 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (5.0.0)
-    puma (5.6.5)
+    puma (6.0.0)
       nio4r (~> 2.0)
     racc (1.6.0)
     rack (2.2.4)
@@ -524,7 +521,7 @@ GEM
       rubocop-ast (>= 1.20.1, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
-    rubocop-ast (1.21.0)
+    rubocop-ast (1.23.0)
       parser (>= 3.1.1.0)
     rubocop-performance (1.14.3)
       rubocop (>= 1.7.0, < 2.0)
@@ -547,7 +544,7 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
-    selenium-webdriver (4.4.0)
+    selenium-webdriver (4.5.0)
       childprocess (>= 0.5, < 5.0)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
@@ -575,9 +572,8 @@ GEM
     stripe_event (2.6.0)
       activesupport (>= 3.1)
       stripe (>= 2.8, < 8)
-    strong_migrations (1.3.1)
+    strong_migrations (1.3.2)
       activerecord (>= 5.2)
-    strscan (3.0.4)
     thor (1.2.1)
     thread_safe (0.3.6)
     tilt (2.0.11)
@@ -593,7 +589,7 @@ GEM
       unf_ext
     unf_ext (0.0.8.2)
     unicode-display_width (2.3.0)
-    unicode-emoji (3.3.0)
+    unicode-emoji (3.3.1)
       unicode-version (~> 1.0)
     unicode-version (1.2.0)
     unicorn (6.1.0)
@@ -611,7 +607,7 @@ GEM
     will_paginate (3.3.1)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    zeitwerk (2.6.0)
+    zeitwerk (2.6.1)
 
 PLATFORMS
   arm64-darwin-20
