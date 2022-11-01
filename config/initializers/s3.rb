@@ -1,5 +1,5 @@
 if ENV["AWS_ACCESS_KEY_ID"]
-  S3_POOL = ConnectionPool.new(size: 10, timeout: 5) {
+  S3_POOL = ConnectionPool.new(size: ENV.fetch("DB_POOL", 10), timeout: 5) {
     options = {
       provider: "AWS",
       aws_access_key_id: ENV["AWS_ACCESS_KEY_ID"],
