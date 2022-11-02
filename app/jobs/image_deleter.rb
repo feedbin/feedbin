@@ -2,11 +2,10 @@ class ImageDeleter
   include Sidekiq::Worker
 
   def perform(image_urls)
+    client = Fog::Storage.new(STORAGE)
     paths = extract_paths(image_urls)
-    S3_POOL.with do |connection|
-      paths.each_slice(999) do |slice|
-        connection.delete_multiple_objects(ENV["AWS_S3_BUCKET_IMAGES"], slice, {quiet: true})
-      end
+    paths.each_slice(999) do |slice|
+      client.delete_multiple_objects(ENV["AWS_S3_BUCKET_IMAGES"], slice, {quiet: true})
     end
     Librato.increment "entry_image.delete", by: image_urls.length
   end

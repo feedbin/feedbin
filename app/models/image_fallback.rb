@@ -16,8 +16,6 @@ class ImageFallback
 
   def fallback_url(url)
     key = Download.new(url).path
-    S3_POOL.with do |connection|
-      connection.directories.new(key: ENV["AWS_S3_BUCKET_ARCHIVE"]).files.new(key: key).url(24.hours.from_now)
-    end
+    Fog::Storage.new(STORAGE).directories.new(key: ENV["AWS_S3_BUCKET_ARCHIVE"]).files.new(key: key).url(24.hours.from_now)
   end
 end

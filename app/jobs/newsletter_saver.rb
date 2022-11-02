@@ -10,9 +10,7 @@ class NewsletterSaver
       content = "<h1>#{entry.title}</h1>#{content}"
     end
 
-    S3_POOL.with do |connection|
-      connection.put_object(ENV["AWS_S3_BUCKET_NEWSLETTERS"], File.join(entry.public_id[0..2], "#{entry.public_id}.html"), content, s3_options)
-    end
+    Fog::Storage.new(STORAGE).put_object(ENV["AWS_S3_BUCKET_NEWSLETTERS"], File.join(entry.public_id[0..2], "#{entry.public_id}.html"), content, s3_options)
   end
 
   def s3_options
