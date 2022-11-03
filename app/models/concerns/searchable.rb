@@ -128,7 +128,7 @@ module Searchable
               bool: {
                 should: [
                   {terms: {feed_id: options[:feed_ids]}},
-                  {terms: {id: options[:starred_ids]}}
+                  {ids: {values: options[:starred_ids]}}
                 ]
               }
             }
@@ -147,12 +147,12 @@ module Searchable
         end
         if options[:ids].present?
           hash[:query][:bool][:filter][:bool][:must] = {
-            terms: {id: options[:ids]}
+            ids: {values: options[:ids]}
           }
         end
         if options[:not_ids].present?
           hash[:query][:bool][:filter][:bool][:must_not] = {
-            terms: {id: options[:not_ids]}
+            ids: {values: options[:not_ids]}
           }
         end
       end
