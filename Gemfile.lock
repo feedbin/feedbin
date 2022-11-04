@@ -48,13 +48,13 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: ffcd531846727b452971b0f6390d289fa8aff8f0
+  revision: d5561bd9166353102d12e2fd8177f7cf4824f14c
   branch: master
   specs:
     feedkit (0.1.0)
       addressable (~> 2.8.0)
       feedjira (~> 2.0)
-      http (~> 4.4)
+      http (~> 5.0)
       rchardet (~> 1.8.0)
       twitter (~> 7.0)
       twitter-text (~> 3.1.0)
@@ -86,14 +86,14 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/http.git
-  revision: 334b230d2033177ebf535e8277e21408cd8fdfcf
+  revision: abff8b07904a5dab956aa5c2aab8673f758e2edc
   branch: feedbin
   specs:
-    http (4.4.1)
-      addressable (~> 2.3)
+    http (5.1.0)
+      addressable (~> 2.8)
       http-cookie (~> 1.0)
       http-form_data (~> 2.2)
-      http-parser (~> 1.2.0)
+      llhttp-ffi (~> 0.4.0)
 
 GIT
   remote: https://github.com/feedbin/resolv.git
@@ -121,14 +121,14 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/twitter.git
-  revision: 56b2ee834ab8d2bafc12e89f8147523c8954a1d7
+  revision: 4511c868b01382387ed47b7d1176639fd9b429ea
   branch: feedbin
   specs:
     twitter (7.0.0)
       addressable (~> 2.3)
       buftok (~> 0.2.0)
       equalizer (~> 0.0.11)
-      http (~> 4.0)
+      http (~> 5.0)
       http-form_data (~> 2.0)
       http_parser.rb (~> 0.6.0)
       memoizable (~> 0.4.0)
@@ -147,7 +147,7 @@ GIT
 
 GIT
   remote: https://github.com/teamcapybara/capybara.git
-  revision: 2d05c203d79bca7b3b093c37f866ee41f294925b
+  revision: 48fe7018edbbf46c61f1c7632ff49fb8f1116f6c
   specs:
     capybara (3.38.0)
       addressable
@@ -291,7 +291,7 @@ GEM
       oauth (>= 0.4.1)
     excon (0.93.1)
     execjs (2.8.1)
-    faker (2.23.0)
+    faker (3.0.0)
       i18n (>= 1.8.11, < 2)
     faraday (1.10.2)
       faraday-em_http (~> 1.0)
@@ -342,15 +342,13 @@ GEM
     hashdiff (1.0.1)
     hashie (5.0.0)
     hetchy (1.0.0)
-    honeybadger (5.0.0)
+    honeybadger (5.0.1)
     htmlbeautifier (1.4.2)
     htmlentities (4.3.4)
     http-2 (0.11.0)
     http-cookie (1.0.5)
       domain_name (~> 0.5)
     http-form_data (2.3.0)
-    http-parser (1.2.3)
-      ffi-compiler (>= 1.0, < 2.0)
     http_parser.rb (0.6.0)
     httparty (0.20.0)
       mime-types (~> 3.0)
@@ -385,6 +383,9 @@ GEM
     listen (3.7.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
+    llhttp-ffi (0.4.0)
+      ffi-compiler (~> 1.0)
+      rake (~> 13.0)
     lograge (0.12.0)
       actionpack (>= 4)
       activesupport (>= 4)
@@ -424,7 +425,7 @@ GEM
       net-protocol
     net-protocol (0.1.3)
       timeout
-    net-smtp (0.3.2)
+    net-smtp (0.3.3)
       net-protocol
     nio4r (2.5.8)
     nokogiri (1.13.9)
@@ -549,7 +550,7 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
-    selenium-webdriver (4.5.0)
+    selenium-webdriver (4.6.0)
       childprocess (>= 0.5, < 5.0)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
@@ -577,7 +578,7 @@ GEM
     stripe_event (2.6.0)
       activesupport (>= 3.1)
       stripe (>= 2.8, < 8)
-    strong_migrations (1.3.2)
+    strong_migrations (1.4.0)
       activerecord (>= 5.2)
     thor (1.2.1)
     thread_safe (0.3.6)
@@ -612,7 +613,7 @@ GEM
     will_paginate (3.3.1)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    zeitwerk (2.6.1)
+    zeitwerk (2.6.4)
 
 PLATFORMS
   arm64-darwin-20
@@ -676,7 +677,7 @@ DEPENDENCIES
   rails-controller-testing
   raindrops
   redcarpet
-  redis
+  redis (< 5)
   resolv!
   responders
   reverse_markdown
@@ -686,7 +687,7 @@ DEPENDENCIES
   sass-rails
   sax-machine!
   selenium-webdriver
-  sidekiq
+  sidekiq (= 6.5.7)
   standard
   stripe (~> 5.55.0)
   stripe-ruby-mock!
