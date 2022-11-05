@@ -14,5 +14,8 @@ namespace :feedbin do
     Kernel.system "redis-cli -n 2 'flushdb'"
     Kernel.system "echo 'flush_all' | nc localhost 11211"
     Kernel.system "curl -XDELETE 'http://127.0.0.1:9200/_all/'"
+
+    Search::Client.request(:delete, Entry.table_name)
+    Search::Client.request(:delete, Action.table_name)
   end
 end

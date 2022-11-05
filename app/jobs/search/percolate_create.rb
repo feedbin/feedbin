@@ -20,6 +20,7 @@ module Search
         $search.each do |_, client|
           client.index(options)
         end
+        Search::Client.index(Action.table_name, id: @action.id, document: @action.search_body)
       end
     end
 

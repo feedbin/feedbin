@@ -13,12 +13,16 @@ module Search
           body: data
         )
       end
-      # Sidekiq::Client.push(
-      #   "args" => [ids],
-      #   "class" => "Search::SearchIndexRemoveAlt",
-      #   "queue" => "utility_search_alt",
-      #   "retry" => false
-      # )
+      
+      records = ids.map do |id|
+        Search::BulkRecord.new(
+          action: :delete,
+          index: Entry.table_name,
+          id: id,
+          document: nil
+        )
+      end
+      Search::Client.bulk(records) unless records.empty?
     end
   end
 end

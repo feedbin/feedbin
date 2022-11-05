@@ -29,7 +29,7 @@ class Action < ApplicationRecord
   end
 
   def percolate_create
-    Search:: PercolateCreate.perform_async(id)
+    Search::PercolateCreate.perform_async(id)
   end
 
   def percolate_destroy
@@ -56,7 +56,7 @@ class Action < ApplicationRecord
         escaped_query = FeedbinUtils.escape_search(query)
         hash[:query][:bool][:must] = {
           query_string: {
-            fields: ["_all", "title.*", "content.*", "emoji", "author", "url"],
+            fields: ["_all", "title", "title.*", "content", "content.*", "emoji", "author", "url"],
             default_operator: "AND",
             query: escaped_query
           }

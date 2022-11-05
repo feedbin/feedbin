@@ -21,6 +21,7 @@ module Search
       $search.each do |_, client|
         client.index(data)
       end
+      Search::Client.index(Entry.table_name, id: entry.id, document: document)
     end
 
     def percolate(entry, document, update)

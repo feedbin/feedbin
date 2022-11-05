@@ -12,6 +12,7 @@ module Search
       $search.each do |_, client|
         client.delete(options)
       end
+      Search::Client.delete(Action.table_name, id: action_id)
     rescue Elasticsearch::Transport::Transport::Errors::NotFound
     end
   end
