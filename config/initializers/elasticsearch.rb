@@ -160,13 +160,14 @@ Rails.application.reloader.to_prepare do
   end
 end
 
-ActiveSupport::Notifications.subscribe("start_request.search") do |name, start, finish, id, payload|
-  if Rails.env.development?
+if Rails.env.development?
+  ActiveSupport::Notifications.subscribe("start_request.search") do |name, start, finish, id, payload|
     Rails.logger.info(search: "request", payload: payload.dig(:request)&.body&.source)
   end
 end
 
 ActiveSupport::Notifications.subscribe("request.search") do |name, start, finish, id, payload|
+  Librato.timing("search.#{payload.dig(:response).request.uri.path.underscore.parameterize}.time", finish - start, percentile: [95]) if payload.dig(:response)
   if Rails.env.development?
     Rails.logger.info(search: "response", payload: payload.dig(:response)&.parse)
   end
