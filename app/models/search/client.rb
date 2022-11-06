@@ -18,7 +18,11 @@ module Search
     end
 
     def self.bulk(records)
-      Search::Client.request(:post, "_bulk", body: prepare_bulk_request(records))
+      options = {
+        body: prepare_bulk_request(records),
+        params: {"filter_path" => "took"}
+      }
+      Search::Client.request(:post, "_bulk", options)
     end
 
     def self.validate(index_name, query:)
