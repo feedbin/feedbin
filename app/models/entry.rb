@@ -35,8 +35,20 @@ class Entry < ApplicationRecord
     !!archived_images
   end
 
+  def newsletter?
+    feed.newsletter?
+  end
+
   def tweet?
     tweet.present?
+  end
+
+  def youtube?
+    data && data["youtube_video_id"].present?
+  end
+
+  def podcast?
+    data && ["audio/mp3", "audio/mpeg"].include?(data["enclosure_type"])
   end
 
   def tweet
@@ -353,10 +365,6 @@ class Entry < ApplicationRecord
     URI(url).host
   rescue
     nil
-  end
-
-  def youtube?
-    data && data["youtube_video_id"].present?
   end
 
   def published_recently?

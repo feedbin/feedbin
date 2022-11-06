@@ -1,20 +1,23 @@
-class SearchData
+class SearchDataV2
   def initialize(entry)
     @entry = entry
   end
 
   def to_h
     {}.tap do |hash|
-      hash[:id]        = @entry.id
-      hash[:feed_id]   = @entry.feed_id
-      hash[:title]     = title
-      hash[:url]       = @entry.fully_qualified_url
-      hash[:author]    = @entry.author
-      hash[:content]   = text
-      hash[:published] = @entry.published.iso8601
-      hash[:updated]   = @entry.updated_at.iso8601
-      hash[:link]      = links
-      hash[:emoji]     = emoji(hash[:content])
+      hash[:id]             = @entry.id
+      hash[:feed_id]        = @entry.feed_id
+      hash[:title]          = title
+      hash[:url]            = @entry.fully_qualified_url
+      hash[:author]         = @entry.author
+      hash[:content]        = text
+      hash[:published]      = @entry.published.iso8601
+      hash[:updated]        = @entry.updated_at.iso8601
+      hash[:link]           = links
+      hash[:type]           = type
+      hash[:media_duration] = nil
+      hash[:word_count]     = hash[:content].split.length
+
       if @entry.tweet?
         hash[:twitter_screen_name] = "#{@entry.main_tweet.user.screen_name} @#{@entry.main_tweet.user.screen_name}"
         hash[:twitter_name]        = @entry.main_tweet.user.name
@@ -24,6 +27,20 @@ class SearchData
         hash[:twitter_image]       = twitter_image
         hash[:twitter_link]        = twitter_link
       end
+    end
+  end
+
+  def type
+    if @entry.tweet?
+      "tweet"
+    elsif @entry.newsletter?
+      "newsletter"
+    elsif @entry.youtube?
+      "youtube"
+    elsif @entry.podcast?
+      "podcast"
+    else
+      "feed"
     end
   end
 
