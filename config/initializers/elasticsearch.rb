@@ -167,7 +167,7 @@ if Rails.env.development?
 end
 
 ActiveSupport::Notifications.subscribe("request.search") do |name, start, finish, id, payload|
-  Librato.timing("search.#{payload.dig(:response).request.uri.path.underscore.parameterize}.time", finish - start, percentile: [95]) if payload.dig(:response)
+  # Librato.timing("search.#{payload.dig(:response).request.uri.path.underscore.parameterize}.time", finish - start, percentile: [95]) if payload.dig(:response)
   if Rails.env.development?
     Rails.logger.info(search: "response", payload: payload.dig(:response)&.parse)
   end
