@@ -21,6 +21,11 @@ module Search
       Search::Client.request(:post, "_bulk", body: prepare_bulk_request(records))
     end
 
+    def self.validate(index_name, query:)
+      result = Search::Client.request(:get, [index_name, "_validate", "query"].join("/"), json: query)
+      result.dig("valid")
+    end
+
     def self.percolate(feed_id, document:)
       query = {
         :_source => false,

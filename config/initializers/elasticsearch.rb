@@ -44,9 +44,9 @@ Rails.application.reloader.to_prepare do
   entries_mapping = {
     settings: shared_settings,
     mappings: {
-      # _source: {
-      #   enabled: false
-      # },
+      _source: {
+        enabled: false
+      },
       properties: {
         author: {
           analyzer: "stemmed",
