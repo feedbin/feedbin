@@ -16,7 +16,7 @@ class SearchDataV2
       hash[:link]           = links
       hash[:type]           = type
       hash[:media_duration] = nil
-      hash[:word_count]     = hash[:content].split.length
+      hash[:word_count]     = hash[:content]&.split&.length || 0
 
       if @entry.tweet?
         hash[:twitter_screen_name] = "#{@entry.main_tweet.user.screen_name} @#{@entry.main_tweet.user.screen_name}"
