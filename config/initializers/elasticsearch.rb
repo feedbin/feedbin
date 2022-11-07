@@ -45,7 +45,7 @@ Rails.application.reloader.to_prepare do
     settings: shared_settings,
     mappings: {
       _source: {
-        enabled: false
+        enabled: Rails.env.development? ? true : false
       },
       properties: {
         author: {
