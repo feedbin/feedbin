@@ -17,10 +17,10 @@ module Searchable
       if saved_searches.length < 10
         unread_entries = user.unread_entries.pluck(:entry_id)
         searches = build_multi_search(user, saved_searches)
-        queries = searches.map(&:query)
+        records = searches.map { Search::MultiSearchRecord.new(query: _1.query) }
 
-        if queries.present?
-          result = Search::Client.msearch(Entry.table_name, queries: queries)
+        if records.present?
+          result = Search::Client.msearch(Entry.table_name, records: records)
           entry_ids = result["responses"].map { |response|
             hits = response.dig("hits", "hits") || []
             hits.map do |hit|
@@ -41,8 +41,7 @@ module Searchable
 
         query_string = query_string.gsub(UNREAD_REGEX, "")
         query  = build_query(user: user, query: "#{query_string} is:unread", size: 50)
-        query[:fields] = ["id", "feed_id"]
-
+        query = query.slice(:query, :from, :size)
         OpenStruct.new({id: saved_search.id, query: query})
       }.compact
     end

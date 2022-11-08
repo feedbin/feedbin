@@ -58,13 +58,12 @@ module Search
       Search::Client.request(:post, PATHS[:bulk], options)
     end
 
-    def self.msearch(index, queries:)
-      records = queries.each_with_object([]) do |query, array|
-        array.push({}) # blank header
-        array.push(query)
-      end
+    def self.msearch(index, records:)
+      options = {
+        body: prepare_bulk_request(records)
+      }
       path = PATHS[:msearch] % {index:}
-      Search::Client.request(:post, PATHS[:bulk], body: prepare_bulk_request(records))
+      Search::Client.request(:post, path, options)
     end
 
     def self.validate(index, query:)
@@ -110,12 +109,6 @@ module Search
     end
 
     private
-
-    def self.paginate(total_entries:, page: 1, per_page: WillPaginate.per_page)
-      WillPaginate::Collection.create(page, per_page, total) do |pager|
-        pager.replace self[pager.offset, pager.per_page].to_a
-      end
-    end
 
     def self.prepare_bulk_request(records)
       records.map(&:to_request).join("\n") + "\n"
