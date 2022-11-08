@@ -92,44 +92,20 @@ class Action < ApplicationRecord
   end
 
   def _percolator
-    Entry.__elasticsearch__.client.get(
-      index: Entry.index_name,
-      type: ".percolator",
-      id: id,
-      ignore: 404
-    )
+    Search::Client.get(Action.table_name, id: id)
   end
 
   def query_valid
-    options = {
-      index: Entry.index_name,
-      body: {query: search_body[:query]}
-    }
-    result = $search[:main].indices.validate_query(options)
-    if result["valid"] == false
+    result = Search::Client.validate(Entry.table_name, query: {query: search_body[:query]})
+    if result == false
       errors.add :base, "Search syntax invalid"
     end
   end
 
   def results
-    Entry.search(search_options).page(1).records(includes: :feed)
-  end
-
-  def scrolled_results(&block)
-    scroll = "2m"
-    response = Entry.__elasticsearch__.client.search(
-      index: Entry.index_name,
-      type: Entry.document_type,
-      scroll: scroll,
-      body: search_options
-    )
-
-    while response["hits"]["hits"].present?
-      yield response
-      response = Entry.__elasticsearch__.client.scroll({scroll_id: response["_scroll_id"], scroll: scroll})
-    end
-
-    response["_scroll_id"]
+    response = Search::Client.search(Entry.table_name, query: search_options)
+    records = Entry.where(id: response.ids).includes(:feed)
+    OpenStruct.new({total: response.total, records: records})
   end
 
   def error_hint

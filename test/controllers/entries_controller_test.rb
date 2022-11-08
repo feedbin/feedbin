@@ -136,8 +136,8 @@ class EntriesControllerTest < ActionController::TestCase
   end
 
   test "marks saved search read" do
-    original_per_page = Entry.per_page
-    Entry.per_page = 1
+    original_per_page = WillPaginate.per_page
+    WillPaginate.per_page = 1
 
     login_as @user
 
@@ -146,19 +146,25 @@ class EntriesControllerTest < ActionController::TestCase
     saved_search = @user.saved_searches.create(query: "\"#{entries.first.title}\" OR \"#{entries.last.title}\"", name: "test")
     entries = Entry.scoped_search({query: saved_search.query}, @user)
 
-    assert_difference("UnreadEntry.count", -entries.total_entries) do
+    result = Entry.scoped_search({query: saved_search.query}, @user)
+    @entries = result.records
+    @page_query = result.pagination
+    @total_results = result.total
+
+
+    assert_difference("UnreadEntry.count", -result.pagination.total_entries) do
       post :mark_all_as_read, params: {type: "saved_search", data: saved_search.id}, xhr: true
       assert_response :success
     end
 
     mark_unread(@user)
 
-    assert_difference("UnreadEntry.count", -entries.total_entries) do
+    assert_difference("UnreadEntry.count", -result.pagination.total_entries) do
       post :mark_all_as_read, params: {type: "search", data: saved_search.query}, xhr: true
       assert_response :success
     end
 
-    Entry.per_page = original_per_page
+    WillPaginate.per_page = original_per_page
   end
 
   test "mark specific ids read" do
@@ -184,7 +190,7 @@ class EntriesControllerTest < ActionController::TestCase
     login_as @user
     get :search, params: {query: "\"#{@entries.first.title}\""}, xhr: true
     assert_response :success
-    assert_equal 1, assigns(:entries).total_entries
+    assert_equal 1, assigns(:page_query).total_entries
   end
 
   test "should get newsletter" do

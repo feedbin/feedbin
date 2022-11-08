@@ -15,7 +15,7 @@
     <p><%= number_to_human(results.total, precision: 2).downcase %> <%= 'match'.pluralize(results.total) %></p>
     <div class="entries action-preview-entries">
         <ul>
-            <%= render partial: "entries/entry", collection: results %>
+            <%= render partial: "entries/entry", collection: results.records %>
         </ul>
     </div>
     <script>

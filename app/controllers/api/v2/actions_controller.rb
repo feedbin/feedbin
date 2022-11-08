@@ -44,7 +44,8 @@ module Api
           if params[:read].present?
             query[:read] = params[:read] == "true"
           end
-          @entries = Entry.scoped_search(query, @user)
+          result = Entry.scoped_search(params, @user)
+          @entries = result.records
         else
           @entries = []
         end
@@ -61,7 +62,9 @@ module Api
           if action.computed_feed_ids.present?
             query[:feed_ids] = action.computed_feed_ids
             query[:read] = false
-            @entries = Entry.scoped_search(query, @user).limit(10).includes(:feed)
+
+            result = Entry.scoped_search(params, @user)
+            @entries = result.records.first(10)
             @titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) { |(feed_id, title), hash|
               hash[feed_id] = title
             }

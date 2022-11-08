@@ -28,16 +28,6 @@ GIT
       addressable (~> 2.8)
 
 GIT
-  remote: https://github.com/feedbin/elasticsearch-rails.git
-  revision: aa2033bb891a3b2545cb3ff633918fcf64c901e5
-  branch: 2.x
-  specs:
-    elasticsearch-model (2.0.2)
-      activesupport (> 3)
-      elasticsearch (~> 2)
-      hashie
-
-GIT
   remote: https://github.com/feedbin/feedjira.git
   revision: da48b21c09604c797854e095504626ac25d0892a
   branch: f2
@@ -275,14 +265,6 @@ GEM
     dotenv-rails (2.8.1)
       dotenv (= 2.8.1)
       railties (>= 3.2)
-    elasticsearch (2.0.2)
-      elasticsearch-api (= 2.0.2)
-      elasticsearch-transport (= 2.0.2)
-    elasticsearch-api (2.0.2)
-      multi_json
-    elasticsearch-transport (2.0.2)
-      faraday
-      multi_json
     equalizer (0.0.11)
     erubi (1.11.0)
     evernote-thrift (1.25.2)
@@ -640,8 +622,6 @@ DEPENDENCIES
   dalli!
   dotenv-rails
   down!
-  elasticsearch (~> 2.0)
-  elasticsearch-model!
   evernote_oauth
   faker
   feedjira!

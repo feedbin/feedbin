@@ -5,9 +5,9 @@ class SavedSearchesController < ApplicationController
 
     params[:query] = @saved_search.query
 
-    query = Entry.scoped_search(params, @user)
-    @entries = query.records
-    @page_query = query
+    result = Entry.scoped_search(params, @user)
+    @entries = result.records
+    @page_query = result.pagination
 
     @append = params[:page].present?
 

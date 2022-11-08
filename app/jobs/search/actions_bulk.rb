@@ -7,12 +7,13 @@ module Search
       user = User.find(user_id)
       action = user.actions.find(action_id)
 
-      entry_ids = []
-      action.scrolled_results do |result|
-        ids = result["hits"]["hits"].map { |hit|
-          hit["_id"].to_i
-        }
-        entry_ids.concat(ids)
+      result = Search::Client.search(Entry.table_name, query: search_options)
+      entry_ids = result.ids
+      if result.pagination.total_pages > 1
+        2.upto(result.pagination.total_pages) do |page|
+          result = Search::Client.search(Entry.table_name, query: search_options, page: page)
+          entry_ids = entry_ids.concat(result.ids)
+        end
       end
 
       action.actions.each do |task|

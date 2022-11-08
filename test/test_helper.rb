@@ -38,7 +38,7 @@ require "support/push_server_mock"
 
 ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
 StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
-WebMock.disable_net_connect!(allow_localhost: true)
+WebMock.disable_net_connect!(allow_localhost: true, allow: "http://68.183.2.87:9200")
 Sidekiq.logger.level = Logger::WARN
 
 class ActiveSupport::TestCase
@@ -116,12 +116,14 @@ class ActiveSupport::TestCase
 
   def clear_search
     begin
-      Entry.__elasticsearch__.delete_index!
+      Search::Client.request(:delete, Entry.table_name)
+      Search::Client.request(:delete, Action.table_name)
     rescue
       nil
     end
     begin
-      Entry.__elasticsearch__.create_index!
+      Search::Client.request(:put, Entry.table_name, json: $elasticsearch[:config][:mappings][:entries])
+      Search::Client.request(:put, Action.table_name, json: $elasticsearch[:config][:mappings][:actions])
     rescue
       nil
     end

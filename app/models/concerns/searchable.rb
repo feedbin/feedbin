@@ -2,8 +2,6 @@ module Searchable
   extend ActiveSupport::Concern
 
   included do
-    include Elasticsearch::Model
-
     UNREAD_REGEX = /(?<=\s|^)is:\s*unread(?=\s|$)/
     READ_REGEX = /(?<=\s|^)is:\s*read(?=\s|$)/
     STARRED_REGEX = /(?<=\s|^)is:\s*starred(?=\s|$)/
@@ -14,54 +12,14 @@ module Searchable
     PUBLISHED_REGEX = /published:\(.*?\)|published:\[.*?\]|updated:\(.*?\)|updated:\[.*?\]/
     DATE_UNBOUNDED_REGEX = /published:[<>=+].*?(?=\s|$)|updated:[<>=+].*?(?=\s|$)/
 
-    search_settings = {
-      "number_of_shards": 12,
-      "analysis": {
-        "analyzer": {
-          "lower_exact": {
-            "tokenizer": "whitespace",
-            "filter": ["lowercase"]
-          }
-        }
-      }
-    }
-
-    settings search_settings do
-      mappings _source: {enabled: false} do
-        indexes :id, type: "long", index: :not_analyzed
-        indexes :title, analyzer: "snowball", fields: {exact: {type: "string", analyzer: "lower_exact"}}
-        indexes :content, analyzer: "snowball", fields: {exact: {type: "string", analyzer: "lower_exact"}}
-        indexes :emoji, analyzer: "whitespace", fields: {exact: {type: "string", analyzer: "whitespace"}}
-        indexes :author, analyzer: "lower_exact", fields: {exact: {type: "string", analyzer: "lower_exact"}}
-        indexes :url, analyzer: "keyword", fields: {exact: {type: "string", analyzer: "keyword"}}
-        indexes :feed_id, type: "long", index: :not_analyzed, include_in_all: false
-        indexes :published, type: "date", include_in_all: false
-        indexes :updated, type: "date", include_in_all: false
-        indexes :link, analyzer: "lower_exact"
-
-        indexes :twitter_screen_name, analyzer: "whitespace"
-        indexes :twitter_name, analyzer: "whitespace"
-        indexes :twitter_retweet, type: "boolean"
-        indexes :twitter_media, type: "boolean"
-        indexes :twitter_image, type: "boolean"
-        indexes :twitter_link, type: "boolean"
-      end
-    end
-
     def self.saved_search_count(user)
       saved_searches = user.saved_searches
       if saved_searches.length < 10
         unread_entries = user.unread_entries.pluck(:entry_id)
-        searches = build_multi_search(user, saved_searches)
-        queries = searches.map { |search|
-          {
-            index: Entry.index_name,
-            search: search.query
-          }
-        }
+        queries = build_multi_search(user, saved_searches)
 
         if queries.present?
-          result = Entry.__elasticsearch__.client.msearch body: queries
+          result = Search::Client.msearch(Entry.table_name, queries: queries)
           entry_ids = result["responses"].map { |response|
             hits = response.dig("hits", "hits") || []
             hits.map do |hit|
@@ -89,14 +47,18 @@ module Searchable
     end
 
     def self.scoped_search(params, user)
-      per_page = params.delete(:per_page)
-      query  = build_query(user: user, query: params[:query], feed_ids: params[:feed_ids])
+      data = params.clone
+      per_page = data.delete(:per_page) || WillPaginate.per_page
+      page     = data.delete(:page) || 1
+      query    = build_query(user: user, query: data[:query], feed_ids: data[:feed_ids])
 
-      result = $search[:main].indices.validate_query({index: Entry.index_name, body: {query: query[:query]}})
-      if result["valid"] == false
-        Entry.search(nil).records
+      result = Search::Client.validate(Entry.table_name, query: {query: query[:query]})
+      if result == false
+        Entry.where(id: [])
       else
-        Entry.search(query).paginate(page: params[:page], per_page: per_page || 100).records(includes: :feed)
+        Search::Client.search(Entry.table_name, query: query, page: page, per_page: per_page).tap do |response|
+          response.records = Entry.where(id: response.ids).includes(:feed)
+        end
       end
     end
 

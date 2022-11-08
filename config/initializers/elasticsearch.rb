@@ -1,5 +1,3 @@
-require "net/http/persistent"
-
 Rails.application.reloader.to_prepare do
   defaults = {
     log: Rails.env.development?,
@@ -129,46 +127,34 @@ Rails.application.reloader.to_prepare do
     }
   }
 
-  $search = {}.tap do |hash|
-    hash[:main] = Elasticsearch::Client.new(defaults)
-    hash[:alt]  = Elasticsearch::Client.new(defaults.merge(url: ENV["ELASTICSEARCH_ALT_URL"])) if ENV["ELASTICSEARCH_ALT_URL"]
-  end
-
-  Elasticsearch::Model.client = $search[:main]
-
   $elasticsearch = {}.tap do |hash|
     hash[:pool] = ConnectionPool.new(size: ENV.fetch("DB_POOL", 1)) {
       client = HTTP
         .use(instrumentation: { instrumenter: ActiveSupport::Notifications.instrumenter, namespace: "search" })
-        .persistent(ENV["ELASTICSEARCH_NEXT_URL"])
+        .persistent(ENV.fetch("ELASTICSEARCH_NEXT_URL", "http://localhost:9200"))
       if ENV["ELASTICSEARCH_NEXT_USERNAME"] && ENV["ELASTICSEARCH_NEXT_PASSWORD"]
         client = client.basic_auth(user: ENV["ELASTICSEARCH_NEXT_USERNAME"], pass: ENV["ELASTICSEARCH_NEXT_PASSWORD"])
       end
       client
-    } if ENV["ELASTICSEARCH_NEXT_URL"]
+    }
+
+    hash[:config] = {
+      mappings: {
+        entries: entries_mapping,
+        actions: actions_mapping
+      }
+    }
   end
 
-  if Rails.env.development? || Rails.env.test?
-    Elasticsearch::Model.client.transport.tracer = ActiveSupport::Logger.new("log/elasticsearch.log")
-    begin
-      Entry.__elasticsearch__.create_index!
-      Search::Client.request(:put, Entry.table_name, json: entries_mapping)
-      Search::Client.request(:put, Action.table_name, json: actions_mapping)
-    rescue
-      nil
-    end
-  end
-end
-
-if Rails.env.development?
-  ActiveSupport::Notifications.subscribe("start_request.search") do |name, start, finish, id, payload|
-    Rails.logger.info(search: "request", payload: payload.dig(:request)&.body&.source)
+  unless Rails.env.production?
+    Search::Client.request(:put, Entry.table_name, json: entries_mapping)
+    Search::Client.request(:put, Action.table_name, json: actions_mapping)
   end
 end
 
-ActiveSupport::Notifications.subscribe("request.search") do |name, start, finish, id, payload|
-  # Librato.timing("search.#{payload.dig(:response).request.uri.path.underscore.parameterize}.time", finish - start, percentile: [95]) if payload.dig(:response)
-  if Rails.env.development?
-    Rails.logger.info(search: "response", payload: payload.dig(:response)&.parse)
+unless Rails.env.production?
+  ActiveSupport::Notifications.subscribe("request.search") do |name, start, finish, id, payload|
+    Rails.logger.info(search: "request", path: payload.dig(:response).request.uri.path, payload: payload.dig(:response)&.request&.body&.source)
+    Rails.logger.info(search: "response", path: payload.dig(:response).request.uri.path, payload: payload.dig(:response)&.parse)
   end
 end

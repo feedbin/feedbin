@@ -30,22 +30,24 @@ module Api
             limit
           end
 
-          @entries = Entry.scoped_search(params, @user)
+          result = Entry.scoped_search(params, @user)
+          @entries = result.records
+          @page_query = result.pagination
 
-          page_data = @entries
-          if @entries.total_entries > limit
+          page_data = result.pagination
+          if page_data.total_entries > limit
             page_data = WillPaginate::Collection.create(page, per_page, limit) { |pager| pager.replace((1..limit).to_a) }
           end
-          
-          if @entries.total_entries == 0 || page_data.out_of_bounds?
-            render(json: []) and return 
+
+          if page_data.total_entries == 0 || page_data.out_of_bounds?
+            render(json: []) and return
           end
 
           entry_count(page_data)
           links_header(page_data, "api_v2_saved_search_url", saved_search.id)
 
           if params[:include_entries] != "true"
-            render json: @entries.results.map { |entry| entry.id.to_i }.to_json
+            render json: @entries.map { |entry| entry.id.to_i }.to_json
           end
         else
           status_forbidden

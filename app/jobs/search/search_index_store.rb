@@ -12,32 +12,12 @@ module Search
     end
 
     def index(entry, document)
-      data = {
-        index: Entry.index_name,
-        type: Entry.document_type,
-        id: entry.id,
-        body: document
-      }
-      $search.each do |_, client|
-        client.index(data)
-      end
       Search::Client.index(Entry.table_name, id: entry.id, document: SearchDataV2.new(entry).to_h)
     end
 
     def percolate(entry, document, update)
-      result = Entry.__elasticsearch__.client.percolate(
-        index: Entry.index_name,
-        type: Entry.document_type,
-        percolate_format: "ids",
-        body: {
-          doc: document,
-          filter: {
-            term: {feed_id: entry.feed_id}
-          }
-        }
-      )
-
-      ids = result["matches"].map(&:to_i)
+      result = Search::Client.percolate(entry.feed_id, document: document)
+      ids = result.dig("hits", "hits")&.map {|hit| hit["_id"]&.to_i }
       if ids.present?
         ActionsPerform.perform_async(entry.id, ids, update)
       end

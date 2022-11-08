@@ -35,20 +35,15 @@ jobs:
           - 5432:5432
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-java@v2
-        with:
-          distribution: temurin
-          java-version: 8
-
       - name: Install system dependencies
         run: |
           set -eux
 
-          # elasticsearch old version
-          wget --quiet --output-document - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-          echo "deb [trusted=yes] http://packages.elastic.co/elasticsearch/2.x/debian stable main" | sudo tee /etc/apt/sources.list.d/elasticsearch-2.x.list
+          # elasticsearch 8
+          curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elastic.gpg
+          echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-8.x.list
 
-          # Node setup
+          # node
           curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 
           sudo apt-get update

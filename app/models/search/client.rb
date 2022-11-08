@@ -1,9 +1,12 @@
 module Search
   class Client
     PATHS = {
-      search:   "/%{index}/_search",
       document: "/%{index}/_doc/%{id}",
+      search:   "/%{index}/_search",
       validate: "/%{index}/_validate/query",
+      msearch:  "/%{index}/_msearch",
+      count:    "/%{index}/_count",
+      refresh:  "/_refresh",
       bulk:     "/_bulk",
     }
 
@@ -16,9 +19,25 @@ module Search
       end
     end
 
-    def self.search(index, query:)
+    def self.search(index, query:, page: 1, per_page: WillPaginate.per_page)
+      params = {
+        from: page == 1 ? 0 : (page.to_i - 1) * per_page,
+        size: per_page
+      }
+
       path = PATHS[:search] % {index:}
-      Search::Client.request(:get, path, json: query)
+      response = Search::Client.request(:get, path, json: query, params: params)
+
+      total = response.dig("hits", "total", "value") || 0
+      ids = response.dig("hits", "hits")&.map {|hit| hit.dig("_id") } || []
+      pagination = Array.new(total).paginate(page: page)
+
+      OpenStruct.new({total:, ids:, pagination:})
+    end
+
+    def self.get(index, id:)
+      path = PATHS[:document] % {index:, id:}
+      Search::Client.request(:get, path)
     end
 
     def self.index(index, id:, document:)
@@ -39,10 +58,29 @@ module Search
       Search::Client.request(:post, PATHS[:bulk], options)
     end
 
+    def self.msearch(index, queries:)
+      records = queries.each_with_object([]) do |query, array|
+        array.push({}) # blank header
+        array.push(query)
+      end
+      path = PATHS[:msearch] % {index:}
+      Search::Client.request(:post, PATHS[:bulk], body: prepare_bulk_request(records))
+    end
+
     def self.validate(index, query:)
       path = PATHS[:validate] % {index:}
       result = Search::Client.request(:get, path, json: query)
       result.dig("valid")
+    end
+
+    def self.count(index)
+      path = PATHS[:count] % {index:}
+      result = Search::Client.request(:get, path)
+      result.dig("count")
+    end
+
+    def self.refresh
+      Search::Client.request(:post, PATHS[:refresh])
     end
 
     def self.percolate(feed_id, document:)
@@ -72,6 +110,12 @@ module Search
     end
 
     private
+
+    def self.paginate(total_entries:, page: 1, per_page: WillPaginate.per_page)
+      WillPaginate::Collection.create(page, per_page, total) do |pager|
+        pager.replace self[pager.offset, pager.per_page].to_a
+      end
+    end
 
     def self.prepare_bulk_request(records)
       records.map(&:to_request).join("\n") + "\n"
