@@ -16,7 +16,8 @@ module Searchable
       saved_searches = user.saved_searches
       if saved_searches.length < 10
         unread_entries = user.unread_entries.pluck(:entry_id)
-        queries = build_multi_search(user, saved_searches)
+        searches = build_multi_search(user, saved_searches)
+        queries = searches.map(&:query)
 
         if queries.present?
           result = Search::Client.msearch(Entry.table_name, queries: queries)
