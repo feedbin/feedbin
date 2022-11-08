@@ -7,11 +7,11 @@ module Search
       user = User.find(user_id)
       action = user.actions.find(action_id)
 
-      result = Search::Client.search(Entry.table_name, query: search_options)
+      result = Search::Client.search(Entry.table_name, query: action.search_options)
       entry_ids = result.ids
       if result.pagination.total_pages > 1
         2.upto(result.pagination.total_pages) do |page|
-          result = Search::Client.search(Entry.table_name, query: search_options, page: page)
+          result = Search::Client.search(Entry.table_name, query: action.search_options, page: page)
           entry_ids = entry_ids.concat(result.ids)
         end
       end

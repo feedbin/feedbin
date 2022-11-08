@@ -118,8 +118,6 @@ class Action < ApplicationRecord
     end
   end
 
-  private
-
   def search_options
     {}.tap do |hash|
       hash[:query] = search_body[:query]
