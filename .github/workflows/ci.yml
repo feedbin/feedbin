@@ -40,23 +40,17 @@ jobs:
         run: |
           set -eux
 
-          # node
-          curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-
           sudo apt-get update
 
           sudo apt-get install --quiet --yes \
-          imagemagick                        \
           libffi-dev                         \
           libidn11-dev                       \
-          libmagickwand-dev                  \
           libpq-dev                          \
           libreadline-dev                    \
           libssl-dev                         \
           libvips                            \
           libxml2-dev                        \
           libxslt1-dev                       \
-          nodejs                             \
           zlib1g-dev
 
           # Install chromedriver
@@ -82,7 +76,11 @@ jobs:
         with:
           stack-version: 8.5.0
           security-enabled: false
-      
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
