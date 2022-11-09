@@ -64,15 +64,9 @@ module Search
       result.dig("count")
     end
 
-    def self.percolate(index, query:)
-      path = PATHS[:search] % {index: Action.table_name}
-      data = request(:get, path, json: query, params: {from: 0, size: 10_000})
-      Response.new(data).ids
-    end
-
     def self.all_matches(index, query:)
       callback = proc do |page|
-        search(index, query: query, page: page, per_page: 1)
+        search(index, query: query, page: page, per_page: 1_000)
       end
       result = callback.call(1)
       2.upto(result.pagination.total_pages).each_with_object(result.ids) do |page, ids|

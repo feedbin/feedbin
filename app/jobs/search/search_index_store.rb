@@ -39,7 +39,7 @@ module Search
         }
       }
 
-      ids = Search::Client.percolate(Action.table_name, query: query)
+      ids = Search::Client.all_matches(Action.table_name, query: query)
       if ids.present?
         ActionsPerform.perform_async(entry.id, ids, update)
       end
