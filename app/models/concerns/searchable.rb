@@ -57,7 +57,7 @@ module Searchable
         Entry.where(id: [])
       else
         Search::Client.search(Entry.table_name, query: query, page: page, per_page: per_page).tap do |response|
-          response.records = Entry.where(id: response.ids).includes(:feed)
+          response.records = Entry.in_order_of(:id, response.ids).includes(:feed)
         end
       end
     end

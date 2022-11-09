@@ -21,7 +21,7 @@ module Search
 
     def self.search(index, query:, page: 1, per_page: WillPaginate.per_page)
       params = {
-        from: page == 1 ? 0 : (page.to_i - 1) * per_page,
+        from: (page.to_i - 1) * per_page,
         size: per_page
       }
 

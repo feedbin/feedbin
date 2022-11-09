@@ -16,7 +16,7 @@ module Search
     end
 
     def empty_notifier_action?
-      @action.all_feeds && @action.notifier? && (@action.query.nil? || @action.query == "")
+      @action.all_feeds && @action.notifier? && @action.query.blank?
     end
 
     def percolate_destroy
