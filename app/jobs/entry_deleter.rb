@@ -3,6 +3,7 @@ class EntryDeleter
   sidekiq_options queue: :utility
 
   def perform(feed_id)
+    return
     feed = Feed.find(feed_id)
 
     entry_limit = if ENV["ENTRY_LIMIT"]
