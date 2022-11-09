@@ -6,6 +6,7 @@ module Search
     sidekiq_options queue: :network_search, retry: false
 
     def perform(entry_id, action_ids, update = false)
+      Sidekiq.logger.info("#{entry_id} actions_ids=#{action_ids}")
       # Looks like [[8, 1, ["mark_read", "star"]], [7, 1, ["mark_read"]]]
       actions = Action.where(id: action_ids).pluck(:id, :user_id, :actions)
       @entry = Entry.find(entry_id)
