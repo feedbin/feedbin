@@ -5,16 +5,19 @@ class SearchData
 
   def to_h
     {}.tap do |hash|
-      hash[:id]        = @entry.id
-      hash[:feed_id]   = @entry.feed_id
-      hash[:title]     = title
-      hash[:url]       = @entry.fully_qualified_url
-      hash[:author]    = @entry.author
-      hash[:content]   = text
-      hash[:published] = @entry.published.iso8601
-      hash[:updated]   = @entry.updated_at.iso8601
-      hash[:link]      = links
-      hash[:emoji]     = emoji(hash[:content])
+      hash[:id]             = @entry.id
+      hash[:feed_id]        = @entry.feed_id
+      hash[:title]          = title
+      hash[:url]            = @entry.fully_qualified_url
+      hash[:author]         = @entry.author
+      hash[:content]        = text
+      hash[:published]      = @entry.published.iso8601
+      hash[:updated]        = @entry.updated_at.iso8601
+      hash[:link]           = links
+      hash[:type]           = type
+      hash[:media_duration] = nil
+      hash[:word_count]     = hash[:content]&.split&.length || 0
+
       if @entry.tweet?
         hash[:twitter_screen_name] = "#{@entry.main_tweet.user.screen_name} @#{@entry.main_tweet.user.screen_name}"
         hash[:twitter_name]        = @entry.main_tweet.user.name
@@ -27,12 +30,22 @@ class SearchData
     end
   end
 
-  def document
-    @document ||= Loofah.fragment(@entry.content).scrub!(:prune)
+  def type
+    if @entry.tweet?
+      "tweet"
+    elsif @entry.newsletter?
+      "newsletter"
+    elsif @entry.youtube?
+      "youtube"
+    elsif @entry.podcast?
+      "podcast"
+    else
+      "feed"
+    end
   end
 
-  def emoji(content)
-    content.respond_to?(:scan) ? content.scan(Unicode::Emoji::REGEX).join(" ") : nil
+  def document
+    @document ||= Loofah.fragment(@entry.content).scrub!(:prune)
   end
 
   def text

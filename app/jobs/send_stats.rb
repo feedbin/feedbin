@@ -6,7 +6,6 @@ class SendStats
 
   def perform
     if ENV["LIBRATO_TOKEN"]
-      memcached_stats
       redis_stats
       postgres_stats
       plan_count
@@ -55,33 +54,6 @@ class SendStats
     plans = Plan.all.index_by(&:id)
     counts.each do |plan_id, count|
       Librato.measure("plan_count", (plans[plan_id].price * count).to_i, source: plans[plan_id].stripe_id)
-    end
-  end
-
-  def memcached_stats
-    if Rails.cache.respond_to?(:stats)
-      servers = Rails.cache.stats
-      servers.each do |server, stats|
-        server_name = server.gsub(/[^A-Za-z0-9]+/, "_")
-        Librato.group "memcached.#{server_name}" do |group|
-          group.measure("gets", stats["cmd_get"].to_f)
-          group.measure("sets", stats["cmd_set"].to_f)
-          group.measure("hits", stats["get_hits"].to_f)
-          group.measure("hit_rate", hit_rate(stats))
-          group.measure("items", stats["curr_items"].to_f)
-          group.measure("connections", stats["curr_connections"].to_i)
-        end
-      end
-    end
-  end
-
-  def hit_rate(stats)
-    hits = stats["get_hits"].to_f
-    gets = stats["cmd_get"].to_f
-    if gets != 0.0
-      ((hits / gets) * 100).to_i
-    else
-      0
     end
   end
 

@@ -5,7 +5,7 @@ module Search
 
     def perform(klass, id, update = false)
       entry = Entry.find(id)
-      document = SearchDataV2.new(entry).to_h
+      document = entry.search_data
       index(entry, document)
       percolate(entry, document, update)
     rescue ActiveRecord::RecordNotFound

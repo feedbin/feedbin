@@ -11,7 +11,7 @@ module Search
           action: :index,
           index: Entry.table_name,
           id: entry.id,
-          document: SearchDataV2.new(entry).to_h
+          document: entry.search_data
         )
       end
       Search::Client.bulk(records) unless records.empty?
