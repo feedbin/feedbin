@@ -192,7 +192,7 @@ class EntriesController < ApplicationController
 
     @saved_search_path = new_saved_search_path(query: params[:query])
     result = Entry.scoped_search(params, @user)
-    @entries = result.records
+    @entries = result.records(Entry).includes(:feed)
     @page_query = result.pagination
     @total_results = result.total
 
@@ -260,18 +260,7 @@ class EntriesController < ApplicationController
   end
 
   def matched_search_ids(params)
-    params[:load] = false
-    query = params[:query]
-    result = Entry.scoped_search(params, @user)
-    ids = result.ids
-    if result.pagination.total_pages > 1
-      2.upto(result.pagination.total_pages) do |page|
-        params[:page] = page
-        params[:query] = query
-        result = Entry.scoped_search(params, @user)
-        ids = ids.concat(result.ids)
-      end
-    end
-    ids
+    query = Entry.build_query(user: @user, query: params[:query])
+    Search::Client.all_matches(Entry.table_name, query: query)
   end
 end

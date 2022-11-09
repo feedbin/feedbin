@@ -10,6 +10,76 @@ module Search
       bulk:     "/_bulk",
     }
 
+    def self.search(index, query:, page: 1, per_page: WillPaginate.per_page)
+      path = PATHS[:search] % {index:}
+      data = request(:get, path, json: query, params: {
+        from: (page.to_i - 1) * per_page,
+        size: per_page
+      })
+      Response.new(data, page: page, per_page: per_page)
+    end
+
+    def self.index(index, id:, document:)
+      path = PATHS[:document] % {index:, id:}
+      request(:put, path, json: document)
+    end
+
+    def self.get(index, id:)
+      path = PATHS[:document] % {index:, id:}
+      request(:get, path)
+    end
+
+    def self.delete(index, id:)
+      path = PATHS[:document] % {index:, id:}
+      request(:delete, path)
+    end
+
+    def self.bulk(records)
+      options = {
+        body: prepare_bulk_request(records),
+        params: {"filter_path" => "took"}
+      }
+      request(:post, PATHS[:bulk], options)
+    end
+
+    def self.msearch(index, records:)
+      options = {
+        body: prepare_bulk_request(records)
+      }
+      path = PATHS[:msearch] % {index:}
+      request(:post, path, options).dig("responses")&.map do |data|
+        Response.new(data)
+      end
+    end
+
+    def self.validate(index, query:)
+      path = PATHS[:validate] % {index:}
+      result = request(:get, path, json: query)
+      result.dig("valid")
+    end
+
+    def self.count(index)
+      path = PATHS[:count] % {index:}
+      result = request(:get, path)
+      result.dig("count")
+    end
+
+    def self.percolate(index, query:)
+      path = PATHS[:search] % {index: Action.table_name}
+      data = request(:get, path, json: query, params: {from: 0, size: 10_000})
+      Response.new(data).ids
+    end
+
+    def self.all_matches(index, query:)
+      callback = proc do |page|
+        search(index, query: query, page: page, per_page: 1)
+      end
+      result = callback.call(1)
+      2.upto(result.pagination.total_pages).each_with_object(result.ids) do |page, ids|
+        ids.concat callback.call(page).ids
+      end
+    end
+
     def self.request(method, path, options = {})
       unless path.start_with?("/")
         path = "/#{path}"
@@ -19,93 +89,8 @@ module Search
       end
     end
 
-    def self.search(index, query:, page: 1, per_page: WillPaginate.per_page)
-      params = {
-        from: (page.to_i - 1) * per_page,
-        size: per_page
-      }
-
-      path = PATHS[:search] % {index:}
-      response = Search::Client.request(:get, path, json: query, params: params)
-
-      total = response.dig("hits", "total", "value") || 0
-      ids = response.dig("hits", "hits")&.map {|hit| hit.dig("_id") } || []
-      pagination = Array.new(total).paginate(page: page)
-
-      OpenStruct.new({total:, ids:, pagination:})
-    end
-
-    def self.get(index, id:)
-      path = PATHS[:document] % {index:, id:}
-      Search::Client.request(:get, path)
-    end
-
-    def self.index(index, id:, document:)
-      path = PATHS[:document] % {index:, id:}
-      Search::Client.request(:put, path, json: document)
-    end
-
-    def self.delete(index, id:)
-      path = PATHS[:document] % {index:, id:}
-      Search::Client.request(:delete, path)
-    end
-
-    def self.bulk(records)
-      options = {
-        body: prepare_bulk_request(records),
-        params: {"filter_path" => "took"}
-      }
-      Search::Client.request(:post, PATHS[:bulk], options)
-    end
-
-    def self.msearch(index, records:)
-      options = {
-        body: prepare_bulk_request(records)
-      }
-      path = PATHS[:msearch] % {index:}
-      Search::Client.request(:post, path, options)
-    end
-
-    def self.validate(index, query:)
-      path = PATHS[:validate] % {index:}
-      result = Search::Client.request(:get, path, json: query)
-      result.dig("valid")
-    end
-
-    def self.count(index)
-      path = PATHS[:count] % {index:}
-      result = Search::Client.request(:get, path)
-      result.dig("count")
-    end
-
     def self.refresh
-      Search::Client.request(:post, PATHS[:refresh])
-    end
-
-    def self.percolate(feed_id, document:)
-      query = {
-        :_source => false,
-        query: {
-          constant_score: {
-            filter: {
-              bool: {
-                must: [
-                  {term: {feed_id: feed_id}},
-                  {
-                    percolate: {
-                      field: "query",
-                      document: document
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        }
-      }
-
-      path = PATHS[:search] % {index: Action.table_name}
-      Search::Client.request(:get, path, json: query)
+      request(:post, PATHS[:refresh])
     end
 
     private

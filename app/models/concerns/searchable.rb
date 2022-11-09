@@ -20,14 +20,9 @@ module Searchable
         records = searches.map { Search::MultiSearchRecord.new(query: _1.query) }
 
         if records.present?
-          result = Search::Client.msearch(Entry.table_name, records: records)
-          entry_ids = result["responses"].map { |response|
-            hits = response.dig("hits", "hits") || []
-            hits.map do |hit|
-              hit["_id"].to_i
-            end
-          }
-          search_ids = searches.map { |search| search.id }
+          responses = Search::Client.msearch(Entry.table_name, records: records)
+          entry_ids = responses.map(&:ids)
+          search_ids = searches.map(&:id)
           Hash[search_ids.zip(entry_ids)]
         end
       end
@@ -56,9 +51,7 @@ module Searchable
       if result == false
         Entry.where(id: [])
       else
-        Search::Client.search(Entry.table_name, query: query, page: page, per_page: per_page).tap do |response|
-          response.records = Entry.in_order_of(:id, response.ids).includes(:feed)
-        end
+        Search::Client.search(Entry.table_name, query: query, page: page, per_page: per_page)
       end
     end
 

@@ -144,10 +144,8 @@ class EntriesControllerTest < ActionController::TestCase
     entries = @user.entries.first(2)
 
     saved_search = @user.saved_searches.create(query: "\"#{entries.first.title}\" OR \"#{entries.last.title}\"", name: "test")
-    entries = Entry.scoped_search({query: saved_search.query}, @user)
-
     result = Entry.scoped_search({query: saved_search.query}, @user)
-    @entries = result.records
+    @entries = result.records(Entry).includes(:feed)
     @page_query = result.pagination
     @total_results = result.total
 

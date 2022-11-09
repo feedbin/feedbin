@@ -45,7 +45,7 @@ module Api
             query[:read] = params[:read] == "true"
           end
           result = Entry.scoped_search(params, @user)
-          @entries = result.records
+          @entries = result.records(Entry).includes(:feed)
         else
           @entries = []
         end
@@ -64,7 +64,7 @@ module Api
             query[:read] = false
 
             result = Entry.scoped_search(params, @user)
-            @entries = result.records.first(10)
+            @entries = result.records(Entry).limit(10).includes(:feed)
             @titles = @user.subscriptions.pluck(:feed_id, :title).each_with_object({}) { |(feed_id, title), hash|
               hash[feed_id] = title
             }

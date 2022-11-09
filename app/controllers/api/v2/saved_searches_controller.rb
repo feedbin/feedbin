@@ -31,7 +31,7 @@ module Api
           end
 
           result = Entry.scoped_search(params, @user)
-          @entries = result.records
+          @entries = result.records(Entry).includes(:feed)
           @page_query = result.pagination
 
           page_data = result.pagination

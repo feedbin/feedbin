@@ -91,10 +91,6 @@ class Action < ApplicationRecord
     self.tag_ids = new_tag_ids
   end
 
-  def _percolator
-    Search::Client.get(Action.table_name, id: id)
-  end
-
   def query_valid
     result = Search::Client.validate(Entry.table_name, query: {query: search_body[:query]})
     if result == false
@@ -104,8 +100,7 @@ class Action < ApplicationRecord
 
   def results
     response = Search::Client.search(Entry.table_name, query: search_options)
-    records = Entry.where(id: response.ids).includes(:feed)
-    OpenStruct.new({total: response.total, records: records})
+    OpenStruct.new({total: response.total, records: response.records(Entry).includes(:feed)})
   end
 
   def error_hint
@@ -123,5 +118,9 @@ class Action < ApplicationRecord
       hash[:query] = search_body[:query]
       hash[:sort] = [{published: "desc"}]
     end
+  end
+
+  def _percolator
+    Search::Client.get(Action.table_name, id: id)
   end
 end

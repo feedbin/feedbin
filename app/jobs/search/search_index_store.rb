@@ -5,19 +5,41 @@ module Search
 
     def perform(klass, id, update = false)
       entry = Entry.find(id)
-      document = entry.search_data
+      document = SearchDataV2.new(entry).to_h
       index(entry, document)
       percolate(entry, document, update)
     rescue ActiveRecord::RecordNotFound
     end
 
     def index(entry, document)
-      Search::Client.index(Entry.table_name, id: entry.id, document: SearchDataV2.new(entry).to_h)
+      Search::Client.index(Entry.table_name, id: entry.id, document: document)
     end
 
     def percolate(entry, document, update)
-      result = Search::Client.percolate(entry.feed_id, document: document)
-      ids = result.dig("hits", "hits")&.map {|hit| hit["_id"]&.to_i }
+      query = {
+        :_source => false,
+        query: {
+          constant_score: {
+            filter: {
+              bool: {
+                must: [
+                  {
+                    term: {feed_id: entry.feed_id}
+                  },
+                  {
+                    percolate: {
+                      field: "query",
+                      document: document
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+
+      ids = Search::Client.percolate(Action.table_name, query: query)
       if ids.present?
         ActionsPerform.perform_async(entry.id, ids, update)
       end
