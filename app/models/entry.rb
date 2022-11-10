@@ -22,7 +22,7 @@ class Entry < ApplicationRecord
   after_commit :increment_feed_stat, on: :create
   after_commit :touch_feed_last_published_entry, on: :create
   after_commit :harvest_links, on: :create
-  after_commit :harvest_embeds, on: [:create, :update]
+  after_commit :harvest_embeds, on: [:create]
   after_commit :cache_views, on: [:create, :update]
   after_commit :save_twitter_users, on: [:create]
   after_commit :search_index_store_update, on: [:update]
