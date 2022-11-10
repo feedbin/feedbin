@@ -15,6 +15,9 @@ module FeedCrawler
       Embed.youtube_video.create!(provider_id: embed_id, data: {
         "snippet" => {
           "description" => content
+        },
+        "contentDetails" => {
+          "duration" => "PT1H2M49S"
         }
       })
 
@@ -32,6 +35,7 @@ module FeedCrawler
       entry = Entry.find_by_public_id!(public_id)
 
       assert_equal(content, entry.content)
+      assert_equal(3769, entry.embed_duration)
     end
   end
 end

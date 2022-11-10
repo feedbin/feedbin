@@ -116,12 +116,14 @@ class ActiveSupport::TestCase
 
   def clear_search
     begin
-      Entry.__elasticsearch__.delete_index!
+      Search::Client.request(:delete, Entry.table_name)
+      Search::Client.request(:delete, Action.table_name)
     rescue
       nil
     end
     begin
-      Entry.__elasticsearch__.create_index!
+      Search::Client.request(:put, Entry.table_name, json: $elasticsearch[:config][:mappings][:entries])
+      Search::Client.request(:put, Action.table_name, json: $elasticsearch[:config][:mappings][:actions])
     rescue
       nil
     end

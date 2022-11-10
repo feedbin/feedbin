@@ -13,29 +13,12 @@ GIT
       ssrf_filter (~> 1.0)
 
 GIT
-  remote: https://github.com/feedbin/dalli.git
-  revision: 3c92218fadfc20b6fb839f99ac36703ca96167ea
-  branch: feedbin
-  specs:
-    dalli (2.7.10)
-
-GIT
   remote: https://github.com/feedbin/down.git
   revision: df69f03b65453bbbabc99678c3f6a3a1c4d1a0b2
   branch: normalize
   specs:
     down (5.3.1)
       addressable (~> 2.8)
-
-GIT
-  remote: https://github.com/feedbin/elasticsearch-rails.git
-  revision: aa2033bb891a3b2545cb3ff633918fcf64c901e5
-  branch: 2.x
-  specs:
-    elasticsearch-model (2.0.2)
-      activesupport (> 3)
-      elasticsearch (~> 2)
-      hashie
 
 GIT
   remote: https://github.com/feedbin/feedjira.git
@@ -48,7 +31,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: d5561bd9166353102d12e2fd8177f7cf4824f14c
+  revision: 5f3df30e380717d7f925da5d32c18bcefca2b483
   branch: master
   specs:
     feedkit (0.1.0)
@@ -94,13 +77,6 @@ GIT
       http-cookie (~> 1.0)
       http-form_data (~> 2.2)
       llhttp-ffi (~> 0.4.0)
-
-GIT
-  remote: https://github.com/feedbin/resolv.git
-  revision: c80893765dcd50e9d34b3e9dbd427cc651dc55cf
-  branch: feedbin
-  specs:
-    resolv (0.2.0)
 
 GIT
   remote: https://github.com/feedbin/sax-machine.git
@@ -275,14 +251,6 @@ GEM
     dotenv-rails (2.8.1)
       dotenv (= 2.8.1)
       railties (>= 3.2)
-    elasticsearch (2.0.2)
-      elasticsearch-api (= 2.0.2)
-      elasticsearch-transport (= 2.0.2)
-    elasticsearch-api (2.0.2)
-      multi_json
-    elasticsearch-transport (2.0.2)
-      faraday
-      multi_json
     equalizer (0.0.11)
     erubi (1.11.0)
     evernote-thrift (1.25.2)
@@ -595,9 +563,6 @@ GEM
       unf_ext
     unf_ext (0.0.8.2)
     unicode-display_width (2.3.0)
-    unicode-emoji (3.3.1)
-      unicode-version (~> 1.0)
-    unicode-version (1.2.0)
     unicorn (6.1.0)
       kgio (~> 2.6)
       raindrops (~> 0.7)
@@ -637,11 +602,8 @@ DEPENDENCIES
   clockwork
   coffee-rails
   connection_pool
-  dalli!
   dotenv-rails
   down!
-  elasticsearch (~> 2.0)
-  elasticsearch-model!
   evernote_oauth
   faker
   feedjira!
@@ -678,7 +640,6 @@ DEPENDENCIES
   raindrops
   redcarpet
   redis (< 5)
-  resolv!
   responders
   reverse_markdown
   ruby-vips
@@ -696,7 +657,6 @@ DEPENDENCIES
   twitter!
   twitter-text
   uglifier
-  unicode-emoji
   unicorn
   webmock (= 3.8.0)
   will_paginate

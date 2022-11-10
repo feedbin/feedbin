@@ -49,15 +49,15 @@ class IframeEmbed::Youtube < IframeEmbed
   end
 
   def duration
-    if seconds = duration_in_seconds
-      hours = seconds / (60 * 60)
-      minutes = (seconds / 60) % 60
-      seconds = seconds % 60
+    return unless seconds = video && video.duration_in_seconds
 
-      parts = [minutes, seconds]
-      parts.unshift(hours) unless hours == 0
-      parts.map {|part| part.to_s.rjust(2, "0") }.join(":")
-    end
+    hours = seconds / (60 * 60)
+    minutes = (seconds / 60) % 60
+    seconds = seconds % 60
+
+    parts = [minutes, seconds]
+    parts.unshift(hours) unless hours == 0
+    parts.map {|part| part.to_s.rjust(2, "0") }.join(":")
   end
 
   def profile_image
@@ -69,18 +69,6 @@ class IframeEmbed::Youtube < IframeEmbed
   end
 
   private
-
-  def duration_in_seconds
-    if duration = video && video.data.dig("contentDetails", "duration")
-      match = duration.match %r{^P(?:|(?<weeks>\d*?)W)(?:|(?<days>\d*?)D)(?:|T(?:|(?<hours>\d*?)H)(?:|(?<min>\d*?)M)(?:|(?<sec>\d*?)S))$}
-      weeks = (match[:weeks] || '0').to_i
-      days = (match[:days] || '0').to_i
-      hours = (match[:hours] || '0').to_i
-      minutes = (match[:min] || '0').to_i
-      seconds = (match[:sec]).to_i
-      (((((weeks * 7) + days) * 24 + hours) * 60) + minutes) * 60 + seconds
-    end
-  end
 
   def channel
     if @channel.nil?

@@ -3,22 +3,15 @@ module Search
     include Sidekiq::Worker
 
     def perform(ids)
-      data = ids.map { |id|
-        {delete: {_id: id}}
-      }
-      $search.each do |_, client|
-        client.bulk(
-          index: Entry.index_name,
-          type: Entry.document_type,
-          body: data
+      records = ids.map do |id|
+        Search::BulkRecord.new(
+          action: :delete,
+          index: Entry.table_name,
+          id: id,
+          document: nil
         )
       end
-      # Sidekiq::Client.push(
-      #   "args" => [ids],
-      #   "class" => "Search::SearchIndexRemoveAlt",
-      #   "queue" => "utility_search_alt",
-      #   "retry" => false
-      # )
+      Search::Client.bulk(records) unless records.empty?
     end
   end
 end

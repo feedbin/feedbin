@@ -2,8 +2,6 @@ module Searchable
   extend ActiveSupport::Concern
 
   included do
-    include Elasticsearch::Model
-
     UNREAD_REGEX = /(?<=\s|^)is:\s*unread(?=\s|$)/
     READ_REGEX = /(?<=\s|^)is:\s*read(?=\s|$)/
     STARRED_REGEX = /(?<=\s|^)is:\s*starred(?=\s|$)/
@@ -11,64 +9,20 @@ module Searchable
     SORT_REGEX = /(?<=\s|^)sort:\s*(asc|desc|relevance)(?=\s|$)/i
     TAG_ID_REGEX = /tag_id:\s*(\d+)/
     TAG_GROUP_REGEX = /tag_id:\((.*?)\)/
-    PUBLISHED_REGEX = /published:\(.*?\)|published:\[.*?\]|updated:\(.*?\)|updated:\[.*?\]/
-    DATE_UNBOUNDED_REGEX = /published:[<>=+].*?(?=\s|$)|updated:[<>=+].*?(?=\s|$)/
-
-    search_settings = {
-      "number_of_shards": 12,
-      "analysis": {
-        "analyzer": {
-          "lower_exact": {
-            "tokenizer": "whitespace",
-            "filter": ["lowercase"]
-          }
-        }
-      }
-    }
-
-    settings search_settings do
-      mappings _source: {enabled: false} do
-        indexes :id, type: "long", index: :not_analyzed
-        indexes :title, analyzer: "snowball", fields: {exact: {type: "string", analyzer: "lower_exact"}}
-        indexes :content, analyzer: "snowball", fields: {exact: {type: "string", analyzer: "lower_exact"}}
-        indexes :emoji, analyzer: "whitespace", fields: {exact: {type: "string", analyzer: "whitespace"}}
-        indexes :author, analyzer: "lower_exact", fields: {exact: {type: "string", analyzer: "lower_exact"}}
-        indexes :url, analyzer: "keyword", fields: {exact: {type: "string", analyzer: "keyword"}}
-        indexes :feed_id, type: "long", index: :not_analyzed, include_in_all: false
-        indexes :published, type: "date", include_in_all: false
-        indexes :updated, type: "date", include_in_all: false
-        indexes :link, analyzer: "lower_exact"
-
-        indexes :twitter_screen_name, analyzer: "whitespace"
-        indexes :twitter_name, analyzer: "whitespace"
-        indexes :twitter_retweet, type: "boolean"
-        indexes :twitter_media, type: "boolean"
-        indexes :twitter_image, type: "boolean"
-        indexes :twitter_link, type: "boolean"
-      end
-    end
+    RANGE_REGEX = /published:\(.*?\)|published:\[.*?\]|updated:\(.*?\)|updated:\[.*?\]|media_duration:\(.*?\)|media_duration:\[.*?\]|word_count:\(.*?\)|word_count:\[.*?\]/
+    RANGE_UNBOUNDED_REGEX = /published:[<>=+].*?(?=\s|$)|updated:[<>=+].*?(?=\s|$)|media_duration:[<>=+].*?(?=\s|$)|word_count:[<>=+].*?(?=\s|$)/
 
     def self.saved_search_count(user)
       saved_searches = user.saved_searches
       if saved_searches.length < 10
         unread_entries = user.unread_entries.pluck(:entry_id)
         searches = build_multi_search(user, saved_searches)
-        queries = searches.map { |search|
-          {
-            index: Entry.index_name,
-            search: search.query
-          }
-        }
+        records = searches.map { Search::MultiSearchRecord.new(query: _1.query) }
 
-        if queries.present?
-          result = Entry.__elasticsearch__.client.msearch body: queries
-          entry_ids = result["responses"].map { |response|
-            hits = response.dig("hits", "hits") || []
-            hits.map do |hit|
-              hit["_id"].to_i
-            end
-          }
-          search_ids = searches.map { |search| search.id }
+        if records.present?
+          responses = Search::Client.msearch(Entry.table_name, records: records)
+          entry_ids = responses.map(&:ids)
+          search_ids = searches.map(&:id)
           Hash[search_ids.zip(entry_ids)]
         end
       end
@@ -81,32 +35,128 @@ module Searchable
         next if READ_REGEX.match?(query_string)
 
         query_string = query_string.gsub(UNREAD_REGEX, "")
-        query_string = {query: "#{query_string} is:unread"}
-        options = build_search(query_string, user)
-        options[:size] = 50
-
-        query = build_query(options)
-        query[:fields] = ["id", "feed_id"]
-
+        query  = build_query(user: user, query: "#{query_string} is:unread", size: 50)
+        query = query.slice(:query, :from, :size)
         OpenStruct.new({id: saved_search.id, query: query})
       }.compact
     end
 
     def self.scoped_search(params, user)
-      per_page = params.delete(:per_page)
-      options  = build_search(params, user)
-      query    = build_query(options)
+      data = params.clone
+      per_page = data.delete(:per_page) || WillPaginate.per_page
+      page     = data.delete(:page) || 1
+      query    = build_query(user: user, query: data[:query], feed_ids: data[:feed_ids])
 
-
-      result = $search[:main].indices.validate_query({index: Entry.index_name, body: {query: query[:query]}})
-      if result["valid"] == false
-        Entry.search(nil).records
+      result = Search::Client.validate(Entry.table_name, query: {query: query[:query]})
+      if result == false
+        Entry.where(id: [])
       else
-        Entry.search(query).paginate(page: params[:page], per_page: per_page || 100).records(includes: :feed)
+        Search::Client.search(Entry.table_name, query: query, page: page, per_page: per_page)
       end
     end
 
-    def self.build_query(options)
+    def self.build_query(user:, query:, feed_ids: nil, size: nil)
+      read             = nil
+      starred          = nil
+      sort             = nil
+      extracted_fields = []
+
+      if UNREAD_REGEX.match?(query)
+        query = query.gsub(UNREAD_REGEX, "")
+        read = false
+      elsif READ_REGEX.match?(query)
+        query = query.gsub(READ_REGEX, "")
+        read = true
+      end
+
+      if STARRED_REGEX.match?(query)
+        query = query.gsub(STARRED_REGEX, "")
+        starred = true
+      elsif UNSTARRED_REGEX.match?(query)
+        query = query.gsub(UNSTARRED_REGEX, "")
+        starred = false
+      end
+
+      if SORT_REGEX.match?(query)
+        sort = query.match(SORT_REGEX)[1].downcase
+        query = query.gsub(SORT_REGEX, "")
+      end
+
+      if query
+        query = query.gsub(TAG_ID_REGEX) { |s|
+          tag_id = Regexp.last_match[1]
+          feed_ids = user.taggings.where(tag_id: tag_id).pluck(:feed_id)
+          id_string = feed_ids.join(" OR ")
+          "feed_id:(#{id_string})"
+        }
+
+        query = query.gsub(TAG_GROUP_REGEX) { |s|
+          tag_group = Regexp.last_match[1]
+          tag_ids = tag_group.split(" OR ")
+          feed_ids = user.taggings.where(tag_id: tag_ids).pluck(:feed_id).uniq
+          id_string = feed_ids.join(" OR ")
+          "feed_id:(#{id_string})"
+        }
+
+        query = query.gsub(RANGE_REGEX) { |match|
+          extracted_fields.push(match)
+          ""
+        }
+
+        query = query.gsub(RANGE_UNBOUNDED_REGEX) { |match|
+          extracted_fields.push(match)
+          ""
+        }
+      end
+
+      query = FeedbinUtils.escape_search(query)
+      query = extracted_fields.push(query).join(" ")
+
+      options = {
+        query: query,
+        sort: "desc",
+        starred_ids: [],
+        ids: [],
+        not_ids: [],
+        feed_ids: []
+      }
+
+      if sort && %w[desc asc relevance].include?(sort)
+        options[:sort] = sort
+      end
+
+      if read == false
+        ids = [0]
+        ids.concat(user.unread_entries.pluck(:entry_id))
+        options[:ids].push(ids)
+      elsif read == true
+        options[:not_ids].push(user.unread_entries.pluck(:entry_id))
+      end
+
+      if starred == true
+        ids = [0]
+        ids.concat(user.starred_entries.pluck(:entry_id))
+        options[:ids].push(ids)
+      elsif starred == false
+        options[:not_ids].push(user.starred_entries.pluck(:entry_id))
+      end
+
+      subscribed_ids = user.subscriptions.pluck(:feed_id)
+      if feed_ids.present?
+        options[:feed_ids] = (feed_ids & subscribed_ids)
+      else
+        options[:feed_ids] = subscribed_ids
+        options[:starred_ids] = user.starred_entries.pluck(:entry_id)
+      end
+
+      if options[:ids].present?
+        options[:ids] = options[:ids].inject(:&)
+      end
+
+      if options[:not_ids].present?
+        options[:not_ids] = options[:not_ids].flatten.uniq
+      end
+
       {}.tap do |hash|
         hash[:fields] = ["id"]
         if options[:sort]
@@ -117,7 +167,7 @@ module Searchable
           hash[:sort] = [{published: "desc"}]
         end
 
-        if size = options[:size]
+        if size
           hash[:from] = 0
           hash[:size] = size
         end
@@ -137,7 +187,7 @@ module Searchable
         if options[:query].present?
           hash[:query][:bool][:must] = {
             query_string: {
-              fields: ["_all", "title.*", "content.*", "emoji", "author", "url"],
+              fields: ["_all", "title", "title.*", "content", "content.*", "emoji", "author", "url"],
               quote_field_suffix: ".exact",
               default_operator: "AND",
               allow_leading_wildcard: false,
@@ -156,107 +206,6 @@ module Searchable
           }
         end
       end
-    end
-
-    def self.build_search(params, user)
-      if UNREAD_REGEX.match?(params[:query])
-        params[:query] = params[:query].gsub(UNREAD_REGEX, "")
-        params[:read] = false
-      elsif READ_REGEX.match?(params[:query])
-        params[:query] = params[:query].gsub(READ_REGEX, "")
-        params[:read] = true
-      end
-
-      if STARRED_REGEX.match?(params[:query])
-        params[:query] = params[:query].gsub(STARRED_REGEX, "")
-        params[:starred] = true
-      elsif UNSTARRED_REGEX.match?(params[:query])
-        params[:query] = params[:query].gsub(UNSTARRED_REGEX, "")
-        params[:starred] = false
-      end
-
-      if SORT_REGEX.match?(params[:query])
-        params[:sort] = params[:query].match(SORT_REGEX)[1].downcase
-        params[:query] = params[:query].gsub(SORT_REGEX, "")
-      end
-
-      extracted_fields = []
-
-      if params[:query]
-        params[:query] = params[:query].gsub(TAG_ID_REGEX) { |s|
-          tag_id = Regexp.last_match[1]
-          feed_ids = user.taggings.where(tag_id: tag_id).pluck(:feed_id)
-          id_string = feed_ids.join(" OR ")
-          "feed_id:(#{id_string})"
-        }
-
-        params[:query] = params[:query].gsub(TAG_GROUP_REGEX) { |s|
-          tag_group = Regexp.last_match[1]
-          tag_ids = tag_group.split(" OR ")
-          feed_ids = user.taggings.where(tag_id: tag_ids).pluck(:feed_id).uniq
-          id_string = feed_ids.join(" OR ")
-          "feed_id:(#{id_string})"
-        }
-
-        params[:query] = params[:query].gsub(PUBLISHED_REGEX) { |match|
-          extracted_fields.push(match)
-          ""
-        }
-
-        params[:query] = params[:query].gsub(DATE_UNBOUNDED_REGEX) { |match|
-          extracted_fields.push(match)
-          ""
-        }
-      end
-
-      params[:query] = FeedbinUtils.escape_search(params[:query])
-
-      params[:query] = extracted_fields.push(params[:query]).join(" ")
-
-      options = {
-        query: params[:query],
-        sort: "desc",
-        starred_ids: [],
-        ids: [],
-        not_ids: [],
-        feed_ids: []
-      }
-
-      if params[:sort] && %w[desc asc relevance].include?(params[:sort])
-        options[:sort] = params[:sort]
-      end
-
-      if params[:read] == false
-        ids = [0]
-        ids.concat(user.unread_entries.pluck(:entry_id))
-        options[:ids].push(ids)
-      elsif params[:read] == true
-        options[:not_ids].push(user.unread_entries.pluck(:entry_id))
-      end
-
-      if params[:starred] == true
-        options[:ids].push(user.starred_entries.pluck(:entry_id))
-      elsif params[:starred] == false
-        options[:not_ids].push(user.starred_entries.pluck(:entry_id))
-      end
-
-      if params[:feed_ids].present?
-        subscribed_ids = user.subscriptions.pluck(:feed_id)
-        requested_ids = params[:feed_ids]
-        options[:feed_ids] = (requested_ids & subscribed_ids)
-      else
-        options[:feed_ids] = user.subscriptions.pluck(:feed_id)
-        options[:starred_ids] = user.starred_entries.pluck(:entry_id)
-      end
-
-      if options[:ids].present?
-        options[:ids] = options[:ids].inject(:&)
-      end
-
-      if options[:not_ids].present?
-        options[:not_ids] = options[:not_ids].flatten.uniq
-      end
-      options
     end
   end
 end

@@ -13,6 +13,9 @@ module FeedCrawler
           content = embed.data.dig("snippet", "description")
           if content.present? && entry.dig("content").blank?
             entry["content"] = content
+            unless embed.duration_in_seconds == 0
+              entry["embed_duration"] = embed.duration_in_seconds
+            end
           end
         end
       end

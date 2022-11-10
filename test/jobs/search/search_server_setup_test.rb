@@ -17,28 +17,32 @@ module Search
 
     test "should bulk index entries in elasticsearch" do
       Sidekiq::Testing.inline! do
-        SearchServerSetup.new.perform(nil, true, Entry.last.id)
+        SearchServerSetup.new.build
       end
-      Entry.__elasticsearch__.refresh_index!
+      Search::Client.refresh
+
+
       query = {
         query: {
-          filtered: {
+          bool: {
             filter: {
-              terms: {id: @entries.map(&:id)}
+              ids: {
+                values: @entries.map(&:id)
+              }
             }
           }
         }
       }
-      assert_equal @entries.count, Entry.search(query).results.total
+      assert_equal @entries.count, Search::Client.search(Entry.table_name, query: query).total
     end
 
     test "should touch actions" do
       entry = @entries.first
       action = @user.actions.create(feed_ids: [entry.feed.id], query: "\"#{entry.title}\"")
       Sidekiq::Testing.inline! do
-        SearchServerSetup.new.perform(nil, true, Entry.last.id)
+        SearchServerSetup.new.build
       end
-      Entry.__elasticsearch__.refresh_index!
+      Search::Client.refresh
       assert_not_equal(action.updated_at, action.reload.updated_at)
     end
   end

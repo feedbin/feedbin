@@ -11,20 +11,12 @@ module Search
       elsif empty_notifier_action?
         percolate_destroy
       else
-        options = {
-          index: Entry.index_name,
-          type: ".percolator",
-          id: @action.id,
-          body: @action.search_body
-        }
-        $search.each do |_, client|
-          client.index(options)
-        end
+        Search::Client.index(Action.table_name, id: @action.id, document: @action.search_body)
       end
     end
 
     def empty_notifier_action?
-      @action.all_feeds && @action.notifier? && (@action.query.nil? || @action.query == "")
+      @action.all_feeds && @action.notifier? && @action.query.blank?
     end
 
     def percolate_destroy

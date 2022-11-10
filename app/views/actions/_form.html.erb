@@ -16,8 +16,11 @@
                     <%= form.label :query, "Search Terms" %>
                 </h4>
                 <%= render "shared/input" do %>
-                    <%= form.search_field :query, placeholder: 'For example: title:"[Sponsor]"', autocorrect: "off", autocapitalize: "off", spellcheck: false %>
+                    <%= form.text_area :query, rows: @action&.query&.length.to_i > 70 ? 3 : 1, placeholder: 'For example: title.exact:"[Sponsor]"', autocorrect: "off", autocapitalize: "off", spellcheck: false %>
                 <% end %>
+                <p class="control-group-description">
+                    Actions support the same <a href="/help/search-syntax" target="_blank">syntax as searches</a>.
+                </p>
             </li>
         </ul>
 
@@ -92,7 +95,7 @@
             <li>
                 <%= form.check_box :apply_action %>
                 <%= form.label :apply_action do %>
-                    Apply to existing matches <%= toggle_switch %>
+                    Mark existing matches as read <%= toggle_switch %>
                 <% end %>
             </li>
         </ul>

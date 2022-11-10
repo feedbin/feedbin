@@ -1,5 +1,3 @@
-require "net/http/persistent"
-
 Rails.application.reloader.to_prepare do
   defaults = {
     log: Rails.env.development?,
@@ -7,20 +5,156 @@ Rails.application.reloader.to_prepare do
       ssl: {verify: false}
     }
   }
-  $search = {}.tap do |hash|
-    hash[:main] = Elasticsearch::Client.new(defaults)
-    hash[:alt] = Elasticsearch::Client.new(defaults.merge(url: ENV["ELASTICSEARCH_ALT_URL"])) if ENV["ELASTICSEARCH_ALT_URL"]
+
+  exact_field = {
+    exact: {
+      type: "text",
+      analyzer: "lower_exact"
+    }
+  }
+
+  shared_settings = {
+    index: {
+      number_of_shards: "6",
+    },
+    analysis: {
+      analyzer: {
+        lower_exact: {
+          type: "custom",
+          tokenizer: "whitespace",
+          filter: ["lowercase"]
+        },
+        stemmed: {
+          type: "custom",
+          tokenizer: "standard",
+          filter: ["lowercase", "asciifolding", "english_stemmer"]
+        }
+      },
+      filter: {
+        english_stemmer: {
+          type: "stemmer",
+          name: "english"
+        }
+      }
+    }
+  }
+
+  entries_mapping = {
+    settings: shared_settings,
+    mappings: {
+      _source: {
+        enabled: Rails.env.development? ? true : false
+      },
+      properties: {
+        author: {
+          analyzer: "stemmed",
+          fields: exact_field,
+          type: "text"
+        },
+        content: {
+          analyzer: "stemmed",
+          fields: exact_field,
+          type: "text"
+        },
+        feed_id: {
+          type: "keyword"
+        },
+        id: {
+          type: "keyword"
+        },
+        link: {
+          type: "keyword"
+        },
+        published: {
+          type: "date"
+        },
+        title: {
+          analyzer: "stemmed",
+          fields: exact_field,
+          type: "text"
+        },
+        twitter_image: {
+          type: "boolean"
+        },
+        twitter_link: {
+          type: "boolean"
+        },
+        twitter_media: {
+          type: "boolean"
+        },
+        twitter_name: {
+          type: "text",
+          analyzer: "stemmed",
+          fields: exact_field
+        },
+        twitter_retweet: {
+          type: "boolean"
+        },
+        twitter_screen_name: {
+          type: "text",
+          analyzer: "stemmed",
+          fields: exact_field
+        },
+        updated: {
+          type: "date"
+        },
+        url: {
+          type: "text",
+          analyzer: "lower_exact"
+        },
+        type: {
+          type: "text",
+          analyzer: "keyword"
+        },
+        media_duration: {
+          type: "long"
+        },
+        word_count: {
+          type: "long"
+        }
+      }
+    }
+  }
+
+  actions_mapping = {
+    settings: shared_settings,
+    mappings: {
+      properties: entries_mapping[:mappings][:properties].merge({
+        query: {
+          type: "percolator"
+        }
+      })
+    }
+  }
+
+  $elasticsearch = {}.tap do |hash|
+    hash[:pool] = ConnectionPool.new(size: ENV.fetch("DB_POOL", 1)) {
+      client = HTTP
+        .use(instrumentation: { instrumenter: ActiveSupport::Notifications.instrumenter, namespace: "search" })
+        .persistent(ENV.fetch("ELASTICSEARCH_URL", "http://localhost:9200"))
+      if ENV["ELASTICSEARCH_USERNAME"] && ENV["ELASTICSEARCH_PASSWORD"]
+        client = client.basic_auth(user: ENV["ELASTICSEARCH_USERNAME"], pass: ENV["ELASTICSEARCH_PASSWORD"])
+      end
+      client
+    }
+
+    hash[:config] = {
+      mappings: {
+        entries: entries_mapping,
+        actions: actions_mapping
+      }
+    }
   end
 
-  Elasticsearch::Model.client = $search[:main]
-
-  if Rails.env.development? || Rails.env.test?
-    Elasticsearch::Model.client.transport.tracer = ActiveSupport::Logger.new("log/elasticsearch.log")
-    begin
-      Entry.__elasticsearch__.create_index!
-    rescue
-      nil
-    end
+  unless Rails.env.production?
+    Search::Client.request(:put, Entry.table_name, json: entries_mapping)
+    Search::Client.request(:put, Action.table_name, json: actions_mapping)
   end
 end
 
+unless Rails.env.production?
+  ActiveSupport::Notifications.subscribe("request.search") do |name, start, finish, id, payload|
+    Rails.logger.info(search: "request", path: payload.dig(:response).request.uri.path, payload: payload.dig(:response)&.request&.body&.source)
+    Rails.logger.info(search: "response", path: payload.dig(:response).request.uri.path, payload: payload.dig(:response)&.parse)
+  end
+end

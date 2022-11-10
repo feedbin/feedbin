@@ -10,9 +10,9 @@ module Search
     end
 
     test "should remove entries from search index" do
-      assert_difference "Entry.__elasticsearch__.client.count['count']", -@entries.count do
+      assert_difference -> {Search::Client.count(Entry.table_name)}, -@entries.count do
         SearchIndexRemove.new.perform(@entries.map(&:id))
-        Entry.__elasticsearch__.refresh_index!
+        Search::Client.refresh
       end
     end
   end
