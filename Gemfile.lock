@@ -13,13 +13,6 @@ GIT
       ssrf_filter (~> 1.0)
 
 GIT
-  remote: https://github.com/feedbin/dalli.git
-  revision: 3c92218fadfc20b6fb839f99ac36703ca96167ea
-  branch: feedbin
-  specs:
-    dalli (2.7.10)
-
-GIT
   remote: https://github.com/feedbin/down.git
   revision: df69f03b65453bbbabc99678c3f6a3a1c4d1a0b2
   branch: normalize
@@ -84,13 +77,6 @@ GIT
       http-cookie (~> 1.0)
       http-form_data (~> 2.2)
       llhttp-ffi (~> 0.4.0)
-
-GIT
-  remote: https://github.com/feedbin/resolv.git
-  revision: c80893765dcd50e9d34b3e9dbd427cc651dc55cf
-  branch: feedbin
-  specs:
-    resolv (0.2.0)
 
 GIT
   remote: https://github.com/feedbin/sax-machine.git
@@ -577,9 +563,6 @@ GEM
       unf_ext
     unf_ext (0.0.8.2)
     unicode-display_width (2.3.0)
-    unicode-emoji (3.3.1)
-      unicode-version (~> 1.0)
-    unicode-version (1.2.0)
     unicorn (6.1.0)
       kgio (~> 2.6)
       raindrops (~> 0.7)
@@ -619,7 +602,6 @@ DEPENDENCIES
   clockwork
   coffee-rails
   connection_pool
-  dalli!
   dotenv-rails
   down!
   evernote_oauth
@@ -658,7 +640,6 @@ DEPENDENCIES
   raindrops
   redcarpet
   redis (< 5)
-  resolv!
   responders
   reverse_markdown
   ruby-vips
@@ -676,7 +657,6 @@ DEPENDENCIES
   twitter!
   twitter-text
   uglifier
-  unicode-emoji
   unicorn
   webmock (= 3.8.0)
   will_paginate

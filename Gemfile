@@ -4,10 +4,8 @@ git_source(:github) { |name| "https://github.com/#{name}.git" }
 gem "rails", "= 7.0.4"
 gem "will_paginate"
 
-gem "resolv",              github: "feedbin/resolv",              branch: "feedbin"
 gem "http",                github: "feedbin/http",                branch: "feedbin"
 gem "carrierwave",         github: "feedbin/carrierwave",         branch: "feedbin"
-gem "dalli",               github: "feedbin/dalli",               branch: "feedbin"
 gem "sax-machine",         github: "feedbin/sax-machine",         branch: "feedbin"
 gem "feedjira",            github: "feedbin/feedjira",            branch: "f2"
 gem "feedkit",             github: "feedbin/feedkit",             branch: "master"
@@ -57,7 +55,6 @@ gem "stripe_event"
 gem "strong_migrations"
 gem "twitter-text"
 gem "uglifier"
-gem "unicode-emoji"
 gem "unicorn"
 gem "jwt"
 
