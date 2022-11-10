@@ -1,7 +1,7 @@
 module FeedCrawler
   class UpdateYoutubeVideos
     include Sidekiq::Worker
-    sidekiq_options queue: :parse
+    sidekiq_options queue: :utility
 
     def perform(feed_id)
       feed = Feed.find(feed_id)
