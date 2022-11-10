@@ -13,9 +13,9 @@ class HarvestEmbeds
   end
 
   def find_embeds(entry_id)
-    entry = Entry.find(entry_id)
+    return if entry_id < 3870947476
 
-    return if entry.created_at.before?(4.hours.ago)
+    entry = Entry.find(entry_id)
 
     want = Nokogiri::HTML5(entry.content).css("iframe").each_with_object([]) do |iframe, array|
       if match = IframeEmbed::Youtube.recognize_url?(iframe["src"])
