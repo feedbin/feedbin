@@ -12,7 +12,7 @@ module Search
     end
 
     def index(entry, document)
-      Search::Client.index(Entry.table_name, id: entry.id, document: document)
+      $search[:main].with { _1.index(Entry.table_name, id: entry.id, document: document) }
     end
 
     def percolate(entry, document, update)
@@ -40,7 +40,7 @@ module Search
         }
       }
 
-      ids = Search::Client.all_matches(Action.table_name, query: query)
+      ids = $search[:main].with { _1.all_matches(Action.table_name, query: query) }
       if ids.present?
         ActionsPerform.perform_async(entry.id, ids, update)
       end

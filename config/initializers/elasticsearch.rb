@@ -127,16 +127,25 @@ Rails.application.reloader.to_prepare do
     }
   }
 
-  $elasticsearch = {}.tap do |hash|
-    hash[:pool] = ConnectionPool.new(size: ENV.fetch("DB_POOL", 1)) {
-      client = HTTP
-        .use(instrumentation: { instrumenter: ActiveSupport::Notifications.instrumenter, namespace: "search" })
-        .persistent(ENV.fetch("ELASTICSEARCH_URL", "http://localhost:9200"))
-      if ENV["ELASTICSEARCH_USERNAME"] && ENV["ELASTICSEARCH_PASSWORD"]
-        client = client.basic_auth(user: ENV["ELASTICSEARCH_USERNAME"], pass: ENV["ELASTICSEARCH_PASSWORD"])
-      end
-      client
+  $search = {}.tap do |hash|
+    hash[:servers] = {
+      primary: ConnectionPool.new(size: ENV.fetch("DB_POOL", 1)) {
+        Search::Client.new(ENV.fetch("ELASTICSEARCH_URL", "http://localhost:9200"),
+          username: ENV["ELASTICSEARCH_USERNAME"],
+          password: ENV["ELASTICSEARCH_PASSWORD"]
+        )
+      }
     }
+
+    if ENV["ELASTICSEARCH_ALT_URL"]
+      hash[:servers][:secondary] = ConnectionPool.new(size: ENV.fetch("DB_POOL", 1)) {
+        Search::Client.new(ENV.fetch("ELASTICSEARCH_ALT_URL", "http://localhost:9200"),
+          username: ENV["ELASTICSEARCH_ALT_USERNAME"],
+          password: ENV["ELASTICSEARCH_ALT_PASSWORD"]
+        )
+      }
+    end
+    hash[:main] = hash[:servers][:primary]
 
     hash[:config] = {
       mappings: {
@@ -147,8 +156,8 @@ Rails.application.reloader.to_prepare do
   end
 
   unless Rails.env.production?
-    Search::Client.request(:put, Entry.table_name, json: entries_mapping)
-    Search::Client.request(:put, Action.table_name, json: actions_mapping)
+    $search[:main].with { _1.request(:put, Entry.table_name, json: entries_mapping) }
+    $search[:main].with { _1.request(:put, Action.table_name, json: actions_mapping) }
   end
 end
 

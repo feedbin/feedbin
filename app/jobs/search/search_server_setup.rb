@@ -14,7 +14,7 @@ module Search
           document: entry.search_data
         )
       end
-      Search::Client.bulk(records) unless records.empty?
+      $search[:main].with { _1.bulk(records) } unless records.empty?
     end
 
     def build

@@ -11,7 +11,7 @@ module Search
       elsif empty_notifier_action?
         percolate_destroy
       else
-        Search::Client.index(Action.table_name, id: @action.id, document: @action.search_body)
+        $search[:main].with { _1.index(Action.table_name, id: @action.id, document: @action.search_body) }
       end
     end
 

@@ -10,7 +10,13 @@ module Search
       bulk:     "/_bulk",
     }
 
-    def self.search(index, query:, page: 1, per_page: WillPaginate.per_page)
+    def initialize(url, username: nil, password: nil)
+      @url = url
+      @username = username
+      @password = password
+    end
+
+    def search(index, query:, page: 1, per_page: WillPaginate.per_page)
       path = PATHS[:search] % {index:}
       data = request(:get, path, json: query, params: {
         from: (page.to_i - 1) * per_page,
@@ -19,22 +25,22 @@ module Search
       Response.new(data, page: page, per_page: per_page)
     end
 
-    def self.index(index, id:, document:)
+    def index(index, id:, document:)
       path = PATHS[:document] % {index:, id:}
       request(:put, path, json: document)
     end
 
-    def self.get(index, id:)
+    def get(index, id:)
       path = PATHS[:document] % {index:, id:}
       request(:get, path)
     end
 
-    def self.delete(index, id:)
+    def delete(index, id:)
       path = PATHS[:document] % {index:, id:}
       request(:delete, path)
     end
 
-    def self.bulk(records)
+    def bulk(records)
       options = {
         body: prepare_bulk_request(records),
         params: {"filter_path" => "took"}
@@ -42,7 +48,7 @@ module Search
       request(:post, PATHS[:bulk], options)
     end
 
-    def self.msearch(index, records:)
+    def msearch(index, records:)
       options = {
         body: prepare_bulk_request(records)
       }
@@ -52,19 +58,23 @@ module Search
       end
     end
 
-    def self.validate(index, query:)
+    def validate(index, query:)
       path = PATHS[:validate] % {index:}
       result = request(:get, path, json: query)
       result.dig("valid")
     end
 
-    def self.count(index)
+    def count(index)
       path = PATHS[:count] % {index:}
       result = request(:get, path)
       result.dig("count")
     end
 
-    def self.all_matches(index, query:)
+    def refresh
+      request(:post, PATHS[:refresh])
+    end
+
+    def all_matches(index, query:)
       callback = proc do |page|
         search(index, query: query, page: page, per_page: 1_000)
       end
@@ -74,22 +84,33 @@ module Search
       end
     end
 
-    def self.request(method, path, options = {})
+    def request(method, path, options = {})
       unless path.start_with?("/")
         path = "/#{path}"
       end
-      $elasticsearch[:pool].with do |connection|
-        connection.headers(content_type: "application/json").request(method.to_sym, path, options).parse
-      end
+      connection.request(method.to_sym, path, options).parse
     end
 
-    def self.refresh
-      request(:post, PATHS[:refresh])
+    def close
+      Rails.logger.info "closing connection ----------------------------------------"
+      puts "closing connection ----------------------------------------"
+      connection.close
     end
 
     private
 
-    def self.prepare_bulk_request(records)
+    def connection
+      @connection ||= begin
+        client = HTTP
+          .use(instrumentation: { instrumenter: ActiveSupport::Notifications.instrumenter, namespace: "search" })
+          .persistent(@url)
+          .headers(content_type: "application/json")
+        client = client.basic_auth(user: @username, pass: @password) if @username && @password
+        client
+      end
+    end
+
+    def prepare_bulk_request(records)
       records.map(&:to_request).join("\n") + "\n"
     end
   end

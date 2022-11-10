@@ -15,7 +15,7 @@ module Search
       action = Sidekiq::Testing.inline! do
         @user.actions.create(feed_ids: [@entry.feed.id], query: "\"#{@entry.title}\"", actions: ["mark_read"])
       end
-      Search::Client.refresh
+      $search[:main].with { _1.refresh }
 
       assert_difference -> { UnreadEntry.count }, -1 do
         ActionsBulk.new.perform(action.id, @user.id)

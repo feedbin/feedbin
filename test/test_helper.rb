@@ -116,14 +116,14 @@ class ActiveSupport::TestCase
 
   def clear_search
     begin
-      Search::Client.request(:delete, Entry.table_name)
-      Search::Client.request(:delete, Action.table_name)
+      $search[:main].with { _1.request(:delete, Entry.table_name) }
+      $search[:main].with { _1.request(:delete, Action.table_name) }
     rescue
       nil
     end
     begin
-      Search::Client.request(:put, Entry.table_name, json: $elasticsearch[:config][:mappings][:entries])
-      Search::Client.request(:put, Action.table_name, json: $elasticsearch[:config][:mappings][:actions])
+      $search[:main].with { _1.request(:put, Entry.table_name, json: $elasticsearch[:config][:mappings][:entries]) }
+      $search[:main].with { _1.request(:put, Action.table_name, json: $elasticsearch[:config][:mappings][:actions]) }
     rescue
       nil
     end

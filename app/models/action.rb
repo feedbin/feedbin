@@ -92,14 +92,14 @@ class Action < ApplicationRecord
   end
 
   def query_valid
-    result = Search::Client.validate(Entry.table_name, query: {query: search_body[:query]})
+    result = $search[:main].with { _1.validate(Entry.table_name, query: {query: search_body[:query]}) }
     if result == false
       errors.add :base, "Search syntax invalid"
     end
   end
 
   def results
-    response = Search::Client.search(Entry.table_name, query: search_options)
+    response = $search[:main].with { _1.search(Entry.table_name, query: search_options) }
     OpenStruct.new({total: response.total, records: response.records(Entry).includes(:feed)})
   end
 
@@ -121,6 +121,6 @@ class Action < ApplicationRecord
   end
 
   def _percolator
-    Search::Client.get(Action.table_name, id: id)
+    $search[:main].with { _1.get(Action.table_name, id: id) }
   end
 end

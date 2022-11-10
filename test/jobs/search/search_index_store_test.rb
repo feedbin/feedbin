@@ -10,8 +10,8 @@ module Search
 
     test "should index entry" do
       SearchIndexStore.new.perform("Entry", @entry.id)
-      Search::Client.refresh
-      entry = Search::Client.get(Entry.table_name, id: @entry.id)
+      $search[:main].with { _1.refresh }
+      entry = $search[:main].with { _1.get(Entry.table_name, id: @entry.id) }
       assert entry["found"]
     end
 
@@ -20,7 +20,7 @@ module Search
       Sidekiq::Testing.inline! do
         action = @user.actions.create(feed_ids: [@entry.feed.id], query: "\"#{@entry.title}\"")
       end
-      Search::Client.refresh
+      $search[:main].with { _1.refresh }
 
       assert_difference -> { ActionsPerform.jobs.size }, +1 do
         SearchIndexStore.new.perform("Entry", @entry.id)

@@ -13,7 +13,7 @@ module FactoryHelper
         Search::SearchIndexStore.new.perform("Entry", entry.id)
       end
     }
-    Search::Client.refresh
+    $search[:main].with { _1.refresh }
     feeds
   end
 

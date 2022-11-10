@@ -6,7 +6,7 @@ module Search
     def perform(action_id, user_id)
       user   = User.find(user_id)
       action = user.actions.find(action_id)
-      ids    = Search::Client.all_matches(Entry.table_name, query: action.search_options)
+      ids    = $search[:main].with { _1.all_matches(Entry.table_name, query: action.search_options) }
 
       if action.actions.include?("mark_read") && ids.present?
         user.unread_entries.where(entry_id: ids).delete_all
