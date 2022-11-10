@@ -131,9 +131,9 @@ Rails.application.reloader.to_prepare do
     hash[:pool] = ConnectionPool.new(size: ENV.fetch("DB_POOL", 1)) {
       client = HTTP
         .use(instrumentation: { instrumenter: ActiveSupport::Notifications.instrumenter, namespace: "search" })
-        .persistent(ENV.fetch("ELASTICSEARCH_NEXT_URL", "http://localhost:9200"))
-      if ENV["ELASTICSEARCH_NEXT_USERNAME"] && ENV["ELASTICSEARCH_NEXT_PASSWORD"]
-        client = client.basic_auth(user: ENV["ELASTICSEARCH_NEXT_USERNAME"], pass: ENV["ELASTICSEARCH_NEXT_PASSWORD"])
+        .persistent(ENV.fetch("ELASTICSEARCH_URL", "http://localhost:9200"))
+      if ENV["ELASTICSEARCH_USERNAME"] && ENV["ELASTICSEARCH_PASSWORD"]
+        client = client.basic_auth(user: ENV["ELASTICSEARCH_USERNAME"], pass: ENV["ELASTICSEARCH_PASSWORD"])
       end
       client
     }
