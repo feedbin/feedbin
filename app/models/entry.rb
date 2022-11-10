@@ -3,7 +3,7 @@ class Entry < ApplicationRecord
 
   attr_accessor :fully_qualified_url, :read, :starred, :skip_mark_as_unread, :skip_recent_post_check
 
-  store :settings, accessors: [:archived_images, :media_image, :newsletter, :newsletter_from], coder: JSON
+  store :settings, accessors: [:archived_images, :media_image, :newsletter, :newsletter_from, :embed_duration], coder: JSON
 
   belongs_to :feed
   has_many :unread_entries, dependent: :delete_all
@@ -25,6 +25,7 @@ class Entry < ApplicationRecord
   after_commit :harvest_embeds, on: [:create, :update]
   after_commit :cache_views, on: [:create, :update]
   after_commit :save_twitter_users, on: [:create]
+  after_commit :search_index_store_update, on: [:update]
 
   validate :has_content
   validates :feed, :public_id, presence: true
@@ -384,6 +385,12 @@ class Entry < ApplicationRecord
     seconds
   end
 
+  def media_duration
+    duration = embed_duration || audio_duration
+    return nil if duration == 0
+    duration
+  end
+
   def self.order_by_ids(ids)
     table = Entry.arel_table
     condition = Arel::Nodes::Case.new(table[:id])
@@ -444,6 +451,10 @@ class Entry < ApplicationRecord
       UnreadEntry.import(unread_entries, validate: false, on_duplicate_key_ignore: true)
     end
     Search::SearchIndexStore.perform_async(self.class.name, id)
+  end
+
+  def search_index_store_update
+    Search::SearchIndexStore.perform_async(self.class.name, id, true)
   end
 
   def mark_as_unplayed

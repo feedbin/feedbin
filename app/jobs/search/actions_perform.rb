@@ -26,17 +26,16 @@ module Search
         queues.each do |action_name, user_ids|
           user_ids = user_ids.to_a
           if !update && action_name == "send_push_notification"
-            SafariPushNotificationSend.perform_async(user_ids, entry_id) unless update
+            SafariPushNotificationSend.perform_async(user_ids, entry_id)
           elsif !update && action_name == "star"
-            star(user_ids, user_actions) unless update
+            star(user_ids, user_actions)
           elsif action_name == "mark_read"
+            UnreadEntry.where(user_id: user_ids, entry_id: entry_id).delete_all
             if update
               UpdatedEntry.where(user_id: user_ids, entry_id: entry_id).delete_all
-            else
-              UnreadEntry.where(user_id: user_ids, entry_id: entry_id).delete_all
             end
           elsif !update && action_name == "send_ios_notification"
-            send_ios_notification(user_ids) unless update
+            send_ios_notification(user_ids)
           end
         end
         Librato.increment "actions_performed", by: 1

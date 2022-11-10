@@ -15,7 +15,7 @@ class SearchData
       hash[:updated]        = @entry.updated_at.iso8601
       hash[:link]           = links
       hash[:type]           = type
-      hash[:media_duration] = nil
+      hash[:media_duration] = @entry.media_duration
       hash[:word_count]     = hash[:content]&.split&.length || 0
 
       if @entry.tweet?
@@ -32,7 +32,7 @@ class SearchData
 
   def type
     if @entry.tweet?
-      "tweet"
+      "twitter"
     elsif @entry.newsletter?
       "newsletter"
     elsif @entry.youtube?

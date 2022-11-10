@@ -9,8 +9,8 @@ module Searchable
     SORT_REGEX = /(?<=\s|^)sort:\s*(asc|desc|relevance)(?=\s|$)/i
     TAG_ID_REGEX = /tag_id:\s*(\d+)/
     TAG_GROUP_REGEX = /tag_id:\((.*?)\)/
-    PUBLISHED_REGEX = /published:\(.*?\)|published:\[.*?\]|updated:\(.*?\)|updated:\[.*?\]/
-    DATE_UNBOUNDED_REGEX = /published:[<>=+].*?(?=\s|$)|updated:[<>=+].*?(?=\s|$)/
+    RANGE_REGEX = /published:\(.*?\)|published:\[.*?\]|updated:\(.*?\)|updated:\[.*?\]|media_duration:\(.*?\)|media_duration:\[.*?\]|word_count:\(.*?\)|word_count:\[.*?\]/
+    RANGE_UNBOUNDED_REGEX = /published:[<>=+].*?(?=\s|$)|updated:[<>=+].*?(?=\s|$)|media_duration:[<>=+].*?(?=\s|$)|word_count:[<>=+].*?(?=\s|$)/
 
     def self.saved_search_count(user)
       saved_searches = user.saved_searches
@@ -98,12 +98,12 @@ module Searchable
           "feed_id:(#{id_string})"
         }
 
-        query = query.gsub(PUBLISHED_REGEX) { |match|
+        query = query.gsub(RANGE_REGEX) { |match|
           extracted_fields.push(match)
           ""
         }
 
-        query = query.gsub(DATE_UNBOUNDED_REGEX) { |match|
+        query = query.gsub(RANGE_UNBOUNDED_REGEX) { |match|
           extracted_fields.push(match)
           ""
         }
