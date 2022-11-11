@@ -261,6 +261,6 @@ class EntriesController < ApplicationController
 
   def matched_search_ids(params)
     query = Entry.build_query(user: @user, query: params[:query])
-    $search[:main].with { _1.all_matches(Entry.table_name, query: query) }
+    Search.client { _1.all_matches(Entry.table_name, query: query) }
   end
 end

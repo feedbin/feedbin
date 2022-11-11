@@ -145,7 +145,6 @@ Rails.application.reloader.to_prepare do
         )
       }
     end
-    hash[:main] = hash[:servers][:primary]
 
     hash[:config] = {
       mappings: {
@@ -155,10 +154,18 @@ Rails.application.reloader.to_prepare do
     }
   end
 
-  unless Rails.env.production?
-    $search[:main].with { _1.request(:put, Entry.table_name, json: entries_mapping) }
-    $search[:main].with { _1.request(:put, Action.table_name, json: actions_mapping) }
+  module Search
+    def client(mirror = false, &block)
+      $search[:servers][:primary].with(&block)
+    end
+    module_function :client
   end
+
+  unless Rails.env.production?
+    Search.client { _1.request(:put, Entry.table_name, json: entries_mapping) }
+    Search.client { _1.request(:put, Action.table_name, json: actions_mapping) }
+  end
+
 end
 
 unless Rails.env.production?

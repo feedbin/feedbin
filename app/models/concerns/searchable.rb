@@ -20,7 +20,7 @@ module Searchable
         records = searches.map { Search::MultiSearchRecord.new(query: _1.query) }
 
         if records.present?
-          responses = $search[:main].with { _1.msearch(Entry.table_name, records: records) }
+          responses = Search.client { _1.msearch(Entry.table_name, records: records) }
           entry_ids = responses.map(&:ids)
           search_ids = searches.map(&:id)
           Hash[search_ids.zip(entry_ids)]
@@ -47,11 +47,11 @@ module Searchable
       page     = data.delete(:page) || 1
       query    = build_query(user: user, query: data[:query], feed_ids: data[:feed_ids])
 
-      result = $search[:main].with { _1.validate(Entry.table_name, query: {query: query[:query]}) }
+      result = Search.client { _1.validate(Entry.table_name, query: {query: query[:query]}) }
       if result == false
         Entry.where(id: [])
       else
-        $search[:main].with { _1.search(Entry.table_name, query: query, page: page, per_page: per_page) }
+        Search.client { _1.search(Entry.table_name, query: query, page: page, per_page: per_page) }
       end
     end
 

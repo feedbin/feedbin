@@ -115,18 +115,11 @@ class ActiveSupport::TestCase
   end
 
   def clear_search
-    begin
-      $search[:main].with { _1.request(:delete, Entry.table_name) }
-      $search[:main].with { _1.request(:delete, Action.table_name) }
-    rescue
-      nil
-    end
-    begin
-      $search[:main].with { _1.request(:put, Entry.table_name, json: $elasticsearch[:config][:mappings][:entries]) }
-      $search[:main].with { _1.request(:put, Action.table_name, json: $elasticsearch[:config][:mappings][:actions]) }
-    rescue
-      nil
-    end
+    Search.client { _1.request(:delete, Entry.table_name) }
+    Search.client { _1.request(:delete, Action.table_name) }
+
+    Search.client { _1.request(:put, Entry.table_name, json: $search[:config][:mappings][:entries]) }
+    Search.client { _1.request(:put, Action.table_name, json: $search[:config][:mappings][:actions]) }
   end
 
   def newsletter_params(recipient, signature, title = nil, from = nil)

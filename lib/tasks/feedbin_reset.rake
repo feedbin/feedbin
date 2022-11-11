@@ -13,7 +13,7 @@ namespace :feedbin do
     Kernel.system "redis-cli 'flushdb'"
     Kernel.system "redis-cli -n 2 'flushdb'"
     Kernel.system "echo 'flush_all' | nc localhost 11211"
-    $search[:main].with { _1.request(:delete, Entry.table_name) }
-    $search[:main].with { _1.request(:delete, Action.table_name) }
+    Search.client { _1.request(:delete, Entry.table_name) }
+    Search.client { _1.request(:delete, Action.table_name) }
   end
 end

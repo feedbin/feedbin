@@ -19,7 +19,7 @@ module Search
       Sidekiq::Testing.inline! do
         SearchServerSetup.new.build
       end
-      $search[:main].with { _1.refresh }
+      Search.client { _1.refresh }
 
 
       query = {
@@ -33,7 +33,7 @@ module Search
           }
         }
       }
-      assert_equal @entries.count, $search[:main].with { _1.search(Entry.table_name, query: query) }.total
+      assert_equal @entries.count, Search.client { _1.search(Entry.table_name, query: query) }.total
     end
 
     test "should touch actions" do
@@ -42,7 +42,7 @@ module Search
       Sidekiq::Testing.inline! do
         SearchServerSetup.new.build
       end
-      $search[:main].with { _1.refresh }
+      Search.client { _1.refresh }
       assert_not_equal(action.updated_at, action.reload.updated_at)
     end
   end
