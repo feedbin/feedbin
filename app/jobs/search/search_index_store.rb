@@ -16,7 +16,6 @@ module Search
     end
 
     def percolate(entry, document, update)
-      return if update
       query = {
         :_source => false,
         query: {
