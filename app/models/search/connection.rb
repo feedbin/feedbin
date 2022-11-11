@@ -92,8 +92,7 @@ module Search
     end
 
     def close
-      Rails.logger.info "closing connection ----------------------------------------"
-      puts "closing connection ----------------------------------------"
+      Rails.logger.info("Closing search connection")
       connection.close
     end
 
