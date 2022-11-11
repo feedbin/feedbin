@@ -21,13 +21,27 @@ class WebSubController < ApplicationController
   end
 
   def publish
+    content_type = request.headers["CONTENT_TYPE"]
+    encoding = HTTP::ContentType.parse(request.headers["CONTENT_TYPE"])
     body = request.raw_post
     if signature_valid?(body)
+      body = encoding.charset ? body.force_encoding(encoding.charset) : request.raw_post
       path = File.join(Dir.tmpdir, SecureRandom.hex)
+      Rails.logger.info("web_sub content_type=#{content_type} path=#{path}")
       File.write(path, body)
-      FeedCrawler::Parser.new.parse_and_save(@feed, path)
+      FeedCrawler::Parser.new.parse_and_save(@feed, path, encoding.charset)
     end
     head :ok
+  rescue Encoding::UndefinedConversionError => exception
+    ErrorService.notify(
+      error_class: "WebSub",
+      error_message: "UndefinedConversionError",
+      parameters: {
+        exception: exception,
+        backtrace: exception.backtrace,
+        body: request.raw_post
+      }
+    )
   rescue Feedkit::NotFeed
     head :ok
   end
