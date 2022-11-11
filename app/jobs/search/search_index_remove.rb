@@ -11,7 +11,7 @@ module Search
           document: nil
         )
       end
-      Search.client { _1.bulk(records) }  unless records.empty?
+      Search.client(mirror: true) { _1.bulk(records) }  unless records.empty?
     end
   end
 end

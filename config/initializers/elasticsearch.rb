@@ -155,15 +155,18 @@ Rails.application.reloader.to_prepare do
   end
 
   module Search
-    def client(mirror = false, &block)
+    def client(mirror: false, &block)
+      if mirror && $search[:servers][:secondary]
+        $search[:servers][:secondary].with(&block)
+      end
       $search[:servers][:primary].with(&block)
     end
     module_function :client
   end
 
   unless Rails.env.production?
-    Search.client { _1.request(:put, Entry.table_name, json: entries_mapping) }
-    Search.client { _1.request(:put, Action.table_name, json: actions_mapping) }
+    Search.client(mirror: true) { _1.request(:put, Entry.table_name, json: entries_mapping) }
+    Search.client(mirror: true) { _1.request(:put, Action.table_name, json: actions_mapping) }
   end
 
 end

@@ -12,7 +12,7 @@ module Search
     end
 
     def index(entry, document)
-      Search.client { _1.index(Entry.table_name, id: entry.id, document: document) }
+      Search.client(mirror: true) { _1.index(Entry.table_name, id: entry.id, document: document) }
     end
 
     def percolate(entry, document, update)

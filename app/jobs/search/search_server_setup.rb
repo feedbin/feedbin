@@ -4,6 +4,8 @@ module Search
     include SidekiqHelper
     sidekiq_options queue: :utility
 
+    Client = $search[:servers][:secondary] || $search[:servers][:primary]
+
     def perform(batch)
       ids = build_ids(batch)
       records = Entry.where(id: ids).map do |entry|
@@ -14,7 +16,7 @@ module Search
           document: entry.search_data
         )
       end
-      Search.client { _1.bulk(records) } unless records.empty?
+      Client.with { _1.bulk(records) } unless records.empty?
     end
 
     def build
