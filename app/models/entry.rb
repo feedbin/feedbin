@@ -75,6 +75,17 @@ class Entry < ApplicationRecord
     data&.respond_to?(:dig) && data&.dig("json_feed")
   end
 
+  def author
+    return self[:author] unless self[:author].nil?
+    return if json_feed.nil?
+
+    authors = json_feed.dig("authors").flat_map { _1.dig("name") }
+    if authors.length > 1
+      authors[-1] = "and #{authors[-1]}"
+    end
+    authors.join(", ")
+  end
+
   def twitter_thread_ids
     thread.map do |t|
       t.dig("id")
