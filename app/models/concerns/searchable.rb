@@ -49,7 +49,7 @@ module Searchable
 
       result = Search.client { _1.validate(Entry.table_name, query: {query: query[:query]}) }
       if result == false
-        Entry.where(id: [])
+        Search::Response.new({})
       else
         Search.client { _1.search(Entry.table_name, query: query, page: page, per_page: per_page) }
       end
