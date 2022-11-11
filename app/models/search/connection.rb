@@ -1,5 +1,5 @@
 module Search
-  class Client
+  class Connection
     PATHS = {
       document: "/%{index}/_doc/%{id}",
       search:   "/%{index}/_search",

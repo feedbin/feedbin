@@ -130,7 +130,7 @@ Rails.application.reloader.to_prepare do
   $search = {}.tap do |hash|
     hash[:servers] = {
       primary: ConnectionPool.new(size: ENV.fetch("DB_POOL", 1)) {
-        Search::Client.new(ENV.fetch("ELASTICSEARCH_URL", "http://localhost:9200"),
+        Search::Connection.new(ENV.fetch("ELASTICSEARCH_URL", "http://localhost:9200"),
           username: ENV["ELASTICSEARCH_USERNAME"],
           password: ENV["ELASTICSEARCH_PASSWORD"]
         )
@@ -139,7 +139,7 @@ Rails.application.reloader.to_prepare do
 
     if ENV["ELASTICSEARCH_ALT_URL"]
       hash[:servers][:secondary] = ConnectionPool.new(size: ENV.fetch("DB_POOL", 1)) {
-        Search::Client.new(ENV.fetch("ELASTICSEARCH_ALT_URL", "http://localhost:9200"),
+        Search::Connection.new(ENV.fetch("ELASTICSEARCH_ALT_URL", "http://localhost:9200"),
           username: ENV["ELASTICSEARCH_ALT_USERNAME"],
           password: ENV["ELASTICSEARCH_ALT_PASSWORD"]
         )
