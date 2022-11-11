@@ -8,7 +8,8 @@ module Search
 
     def perform(batch)
       ids = build_ids(batch)
-      records = Entry.where(id: ids).map do |entry|
+      entries = Entry.where(id: ids).includes(:feed)
+      records = entries.map do |entry|
         Search::BulkRecord.new(
           action: :index,
           index: Entry.table_name,
