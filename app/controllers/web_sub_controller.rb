@@ -25,7 +25,7 @@ class WebSubController < ApplicationController
     encoding = HTTP::ContentType.parse(request.headers["CONTENT_TYPE"])
     body = request.raw_post
     if signature_valid?(body)
-      body = encoding.charset ? body.force_encoding(encoding.charset) : request.raw_post
+      body = encoding.charset ? body.force_encoding(encoding.charset) : body.force_encoding("UTF-8")
       path = File.join(Dir.tmpdir, SecureRandom.hex)
       Rails.logger.info("web_sub content_type=#{content_type} path=#{path}")
       File.write(path, body)
