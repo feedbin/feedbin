@@ -29,7 +29,7 @@ class WebSubController < ApplicationController
       path = File.join(Dir.tmpdir, SecureRandom.hex)
       Rails.logger.info("web_sub content_type=#{content_type} path=#{path}")
       File.write(path, body)
-      FeedCrawler::Parser.new.parse_and_save(@feed, path, encoding.charset)
+      FeedCrawler::Parser.new.parse_and_save(@feed, path, encoding)
     end
     head :ok
   rescue Encoding::UndefinedConversionError => exception
