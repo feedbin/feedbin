@@ -11,11 +11,13 @@ module FeedCrawler
         id = entry.dig("data", "youtube_video_id")
         if embed = embeds[id]
           content = embed.data.dig("snippet", "description")
+
           if content.present? && entry.dig("content").blank?
             entry["content"] = content
-            unless embed.duration_in_seconds == 0
-              entry["embed_duration"] = embed.duration_in_seconds
-            end
+          end
+
+          unless embed.duration_in_seconds == 0
+            entry["embed_duration"] = embed.duration_in_seconds
           end
         end
       end
