@@ -8,7 +8,7 @@ module FeedCrawler
       @feed = Feed.find(feed_id)
       @feed.crawl_data = crawl_data
 
-      parse_and_save(@feed, path, encoding)
+      parse_and_save(@feed, path, encoding: encoding)
 
       @feed.last_change_check = Time.now if check_for_changes?
       @feed.crawl_data.clear!
@@ -20,7 +20,7 @@ module FeedCrawler
       @feed.save!
     end
 
-    def parse_and_save(feed, path, encoding = nil)
+    def parse_and_save(feed, path, encoding: nil, web_sub: false)
       @feed ||= feed
 
       parsed = Feedkit::Parser.parse!(
@@ -33,8 +33,10 @@ module FeedCrawler
       entries   = filter.filter
       video_ids = entries.filter_map { _1.dig(:data, :youtube_video_id) }
 
+      parsed_feed = parsed.to_feed
+      parsed_feed.delete(:title) if video_ids.present? && web_sub
       data = {
-        "feed" => parsed.to_feed.merge({"id" => @feed.id}),
+        "feed" => parsed_feed.merge({"id" => @feed.id}),
         "entries" => entries
       }
 

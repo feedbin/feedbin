@@ -61,10 +61,11 @@ class WebSubControllerTest < ActionController::TestCase
   test "web_sub publish" do
     feed = @user.feeds.first
     Feed.reset_counters(feed.id, :subscriptions)
-
+    new_title = SecureRandom.hex
     body = <<-EOD
     <?xml version="1.0" encoding="utf-8"?>
     <feed xmlns="http://www.w3.org/2005/Atom">
+      <title>#{new_title}</title>
       <entry>
         <title>Title</title>
         <link href="https://example.com/url/" />
@@ -83,6 +84,8 @@ class WebSubControllerTest < ActionController::TestCase
         assert_response :success
       end
     end
+
+    assert_equal(new_title, feed.reload.title)
   end
 
   test "web_sub publish youtube" do
@@ -93,6 +96,7 @@ class WebSubControllerTest < ActionController::TestCase
     body = <<-EOD
     <?xml version="1.0" encoding="utf-8"?>
     <feed xmlns="http://www.w3.org/2005/Atom" xmlns:yt="http://www.youtube.com/xml/schemas/2015">
+      <title>YouTube video feed</title>
       <entry>
         <yt:videoId>#{video_id}</yt:videoId>
         <title>Title</title>
@@ -110,8 +114,9 @@ class WebSubControllerTest < ActionController::TestCase
       post :publish, params: {id: feed.id, signature: feed.web_sub_callback_signature}, body: body
       assert_response :success
     end
-
+    receiver_job = FeedCrawler::YoutubeReceiver.jobs.first.dig("args", 0)
     assert_equal(video_id, HarvestEmbeds.new.dequeue_ids(HarvestEmbeds::SET_NAME).first)
-    assert_equal(video_id, FeedCrawler::YoutubeReceiver.jobs.first.dig("args", 0, "entries", 0, "data", "youtube_video_id"))
+    assert_equal(video_id, receiver_job.dig("entries", 0, "data", "youtube_video_id"))
+    refute receiver_job.dig("feed", "title"), "Refuse title from youtube WebSub data because it is bogus"
   end
 end
