@@ -79,11 +79,15 @@ class Entry < ApplicationRecord
     return self[:author] unless self[:author].nil?
     return if json_feed.nil?
 
-    authors = json_feed.dig("authors")&.flat_map { _1.dig("name") }
+    authors = json_feed.dig("authors")
+    return authors unless authors.respond_to?(:flat_map)
+    authors = authors.flat_map { _1&.dig("name") }
     if authors.length > 1
       authors[-1] = "and #{authors[-1]}"
     end
     authors.join(", ")
+  rescue
+    nil
   end
 
   def twitter_thread_ids
