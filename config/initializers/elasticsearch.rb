@@ -173,7 +173,7 @@ end
 
 unless Rails.env.production?
   ActiveSupport::Notifications.subscribe("request.search") do |name, start, finish, id, payload|
-    Rails.logger.info(search: "request", path: payload.dig(:response).request.uri.path, payload: payload.dig(:response)&.request&.body&.source)
-    Rails.logger.info(search: "response", path: payload.dig(:response).request.uri.path, payload: payload.dig(:response)&.parse)
+    Rails.logger.info(search: "request", path: payload.dig(:response).request.uri.to_s, payload: payload.dig(:response)&.request&.body&.source)
+    Rails.logger.info(search: "response", path: payload.dig(:response).request.uri.to_s, payload: payload.dig(:response)&.parse)
   end
 end

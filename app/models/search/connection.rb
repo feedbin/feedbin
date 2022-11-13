@@ -19,8 +19,9 @@ module Search
     def search(index, query:, page: 1, per_page: WillPaginate.per_page)
       path = PATHS[:search] % {index:}
       data = request(:get, path, json: query, params: {
-        from: (page.to_i - 1) * per_page,
-        size: per_page
+        :_source => false,
+        :from    => (page.to_i - 1) * per_page,
+        :size    => per_page
       })
       Response.new(data, page: page, per_page: per_page)
     end
