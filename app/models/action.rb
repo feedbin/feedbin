@@ -53,7 +53,7 @@ class Action < ApplicationRecord
         }
       }
       if query.present?
-        escaped_query = FeedbinUtils.escape_search(query)
+        escaped_query = Entry.escape_search(query)
         hash[:query][:bool][:must] = {
           query_string: {
             fields: ["_all", "title", "title.*", "content", "content.*", "emoji", "author", "url"],

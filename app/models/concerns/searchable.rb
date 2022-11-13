@@ -55,6 +55,37 @@ module Searchable
       end
     end
 
+    def self.escape_search(query)
+      if query.present? && query.respond_to?(:gsub)
+        extracted_fields = []
+
+        query = query.gsub(RANGE_REGEX) { |match|
+          extracted_fields.push(match)
+          ""
+        }
+
+        query = query.gsub(RANGE_UNBOUNDED_REGEX) { |match|
+          extracted_fields.push(match)
+          ""
+        }
+
+        special_characters_regex = /([\+\-\!\{\}\[\]\^\~\?\\\/])/
+        escape = '\ '.sub(" ", "")
+        query = query.gsub(special_characters_regex) { |character| escape + character }
+
+        query = query.gsub("title_exact:", "title.exact:")
+        query = query.gsub("content_exact:", "content.exact:")
+        query = query.gsub("body:", "content:")
+        query = query.gsub("emoji:", "")
+        query = query.gsub("_missing_:", "NOT _exists_:")
+
+        colon_regex = /(?<!title|title.exact|feed_id|content|content.exact|author|_missing_|_exists_|twitter_screen_name|twitter_name|twitter_retweet|twitter_media|twitter_image|twitter_link|emoji|url|url.exact|link|type):(?=.*)/
+        query = query.gsub(colon_regex, '\:')
+
+        extracted_fields.push(query).join(" ")
+      end
+    end
+
     def self.build_query(user:, query:, feed_ids: nil, size: nil)
       read             = nil
       starred          = nil
@@ -98,19 +129,9 @@ module Searchable
           "feed_id:(#{id_string})"
         }
 
-        query = query.gsub(RANGE_REGEX) { |match|
-          extracted_fields.push(match)
-          ""
-        }
-
-        query = query.gsub(RANGE_UNBOUNDED_REGEX) { |match|
-          extracted_fields.push(match)
-          ""
-        }
       end
 
-      query = FeedbinUtils.escape_search(query)
-      query = extracted_fields.push(query).join(" ")
+      query = escape_search(query)
 
       options = {
         query: query,
