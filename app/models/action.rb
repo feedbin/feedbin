@@ -56,7 +56,7 @@ class Action < ApplicationRecord
         escaped_query = Entry.escape_search(query)
         hash[:query][:bool][:must] = {
           query_string: {
-            fields: ["_all", "title", "title.*", "content", "content.*", "emoji", "author", "url"],
+            fields: ["title", "title.*", "content", "content.*", "author", "url", "link"],
             default_operator: "AND",
             query: escaped_query
           }
