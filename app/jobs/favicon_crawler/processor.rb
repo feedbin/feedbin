@@ -26,13 +26,11 @@ module FaviconCrawler
 
     def upload
       File.open(@resized_path) do |file|
-        S3_POOL.with do |connection|
-          response = connection.put_object(AWS_S3_BUCKET_FAVICONS, File.join(favicon_hash[0..2], "#{favicon_hash}.png"), file, s3_options)
-          URI::HTTPS.build(
-            host: response.data[:host],
-            path: response.data[:path]
-          ).to_s
-        end
+        response = Fog::Storage.new(STORAGE).put_object(AWS_S3_BUCKET_FAVICONS, File.join(favicon_hash[0..2], "#{favicon_hash}.png"), file, s3_options)
+        URI::HTTPS.build(
+          host: response.data[:host],
+          path: response.data[:path]
+        ).to_s
       end
     end
 

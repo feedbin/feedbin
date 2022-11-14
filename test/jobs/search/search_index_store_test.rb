@@ -10,9 +10,8 @@ module Search
 
     test "should index entry" do
       SearchIndexStore.new.perform("Entry", @entry.id)
-      Entry.__elasticsearch__.refresh_index!
-      entry = Entry.__elasticsearch__.client.get(id: @entry.id, index: Entry.index_name, type: Entry.document_type)
-
+      Search.client { _1.refresh }
+      entry = Search.client { _1.get(Entry.table_name, id: @entry.id) }
       assert entry["found"]
     end
 
@@ -21,9 +20,9 @@ module Search
       Sidekiq::Testing.inline! do
         action = @user.actions.create(feed_ids: [@entry.feed.id], query: "\"#{@entry.title}\"")
       end
-      Entry.__elasticsearch__.refresh_index!
+      Search.client { _1.refresh }
 
-      assert_difference "ActionsPerform.jobs.size", +1 do
+      assert_difference -> { ActionsPerform.jobs.size }, +1 do
         SearchIndexStore.new.perform("Entry", @entry.id)
       end
 

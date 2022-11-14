@@ -2,44 +2,31 @@ module Search
   class SearchServerSetup
     include Sidekiq::Worker
     include SidekiqHelper
-    sidekiq_options queue: :utility
+    sidekiq_options queue: :search_index
 
-    Client = $search[:alt] || $search[:main]
+    Client = $search[:servers][:secondary] || $search[:servers][:primary]
 
-    def perform(batch = nil, schedule = false, last_entry_id = nil)
-      if schedule
-        build(last_entry_id)
-        touch_actions
-      else
-        index(batch)
-      end
-    end
-
-    def index(batch)
+    def perform(batch)
       ids = build_ids(batch)
-      data = Entry.where(id: ids).map { |entry|
-        {
-          index: {
-            _id: entry.id,
-            data: entry.search_data
-          }
-        }
-      }
-      if data.present?
-        Client.bulk(
-          index: Entry.index_name,
-          type: Entry.document_type,
-          body: data
+      entries = Entry.where(id: ids).includes(:feed)
+      records = entries.map do |entry|
+        Search::BulkRecord.new(
+          action: :index,
+          index: Entry.table_name,
+          id: entry.id,
+          document: entry.search_data
         )
       end
+      Client.with { _1.bulk(records) } unless records.empty?
     end
 
-    def build(last_entry_id)
-      jobs = job_args(last_entry_id)
+    def build
+      jobs = job_args(Entry.last.id)
       Sidekiq::Client.push_bulk(
         "args" => jobs,
         "class" => self.class
       )
+      touch_actions
     end
 
     def touch_actions

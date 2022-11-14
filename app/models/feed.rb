@@ -18,6 +18,7 @@ class Feed < ApplicationRecord
   after_create :refresh_favicon
 
   after_commit :web_sub_subscribe, on: :create
+  after_commit :update_youtube_videos, on: :create
 
   attribute :crawl_data, CrawlDataType.new
   attr_accessor :count, :tags
@@ -223,6 +224,12 @@ class Feed < ApplicationRecord
   end
 
   private
+
+  def update_youtube_videos
+    if youtube_channel_id
+      FeedCrawler::UpdateYoutubeVideos.perform_in(2.minutes, id)
+    end
+  end
 
   def refresh_favicon
     FaviconCrawler::Finder.perform_async(host)

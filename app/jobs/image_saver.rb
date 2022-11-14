@@ -33,17 +33,17 @@ class ImageSaver
   end
 
   def already_uploaded?(file)
-    S3_POOL.with do |connection|
-      connection.head_object(ENV["AWS_S3_BUCKET_ARCHIVE"], file.path)
-    end
+    client.head_object(ENV["AWS_S3_BUCKET_ARCHIVE"], file.path)
   rescue Excon::Error::NotFound
     false
   end
 
   def upload(file)
     path = file.download
-    S3_POOL.with do |connection|
-      connection.put_object(ENV["AWS_S3_BUCKET_ARCHIVE"], file.path, File.open(path), STORAGE_OPTIONS.dup.merge("Content-Type" => file.content_type))
-    end
+    client.put_object(ENV["AWS_S3_BUCKET_ARCHIVE"], file.path, File.open(path), STORAGE_OPTIONS.dup.merge("Content-Type" => file.content_type))
+  end
+
+  def client
+    @client ||= Fog::Storage.new(STORAGE)
   end
 end

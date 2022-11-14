@@ -8,7 +8,7 @@ module ImageCrawler
 
     def perform(public_id, preset_name, original_path, original_url, image_url, candidate_urls)
       @preset_name = preset_name
-      Sidekiq.logger.info "ProcessImage: public_id=#{public_id} original_url=#{original_url}"
+      Sidekiq.logger.info "ProcessImage: public_id=#{public_id} image_url=#{image_url}"
       image = ImageProcessor.new(original_path, target_width: preset.width, target_height: preset.height)
       if image.valid?
         processed_path = image.send(preset.crop)

@@ -21,29 +21,28 @@ class WebSubController < ApplicationController
   end
 
   def publish
+    content_type = request.headers["CONTENT_TYPE"]
+    encoding = HTTP::ContentType.parse(request.headers["CONTENT_TYPE"]).charset || "UTF-8"
     body = request.raw_post
     if signature_valid?(body)
-      parsed = Feedjira.parse(body)
-      entries = parsed.entries.map do |entry|
-        ActiveSupport::HashWithIndifferentAccess.new(Feedkit::Parser::XMLEntry.new(entry, @feed.feed_url).to_entry)
-      end
-      if entries.present?
-        data = {
-          "feed" => {"id" => @feed.id},
-          "entries" => entries
-        }
-        video_ids = entries.map {|entry| entry.dig(:data, :youtube_video_id) }.compact
-        if video_ids.present?
-          HarvestEmbeds.new.add_missing_to_queue(video_ids)
-          FeedCrawler::YoutubeReceiver.perform_in(2.minutes, data)
-        else
-          FeedCrawler::Receiver.new.perform(data)
-        end
-        Librato.increment "entry.push"
-      end
+      body = body.force_encoding(encoding)
+      path = File.join(Dir.tmpdir, SecureRandom.hex)
+      Rails.logger.info("web_sub content_type=#{content_type} path=#{path}")
+      File.write(path, body)
+      FeedCrawler::Parser.new.parse_and_save(@feed, path, encoding: encoding, web_sub: true)
     end
     head :ok
-  rescue Feedjira::NoParserAvailable
+  rescue Encoding::UndefinedConversionError => exception
+    ErrorService.notify(
+      error_class: "WebSub",
+      error_message: "UndefinedConversionError",
+      parameters: {
+        exception: exception,
+        backtrace: exception.backtrace,
+        body: request.raw_post
+      }
+    )
+  rescue Feedkit::NotFeed
     head :ok
   end
 

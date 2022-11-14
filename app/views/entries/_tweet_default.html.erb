@@ -15,7 +15,7 @@
         <% if entry.tweet.retweeted_status? %>
             <div class="feedbin--meta-wrap">
                 <p class="feedbin--meta">
-                    <a href="<%= entry_presenter.tweet_user_url(entry.tweet) %>">
+                    <a href="<%= entry.tweet.uri.to_s %>">
                         <small><%= entry_presenter.tweet_retweeted_message %></small>
                     </a>
                 </p>

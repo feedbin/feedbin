@@ -13,7 +13,7 @@ module FactoryHelper
         Search::SearchIndexStore.new.perform("Entry", entry.id)
       end
     }
-    Entry.__elasticsearch__.refresh_index!
+    Search.client { _1.refresh }
     feeds
   end
 

@@ -34,42 +34,24 @@ jobs:
         ports:
           - 5432:5432
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v2
-        with:
-          distribution: temurin
-          java-version: 8
+      - uses: actions/checkout@v3
 
       - name: Install system dependencies
         run: |
           set -eux
 
-          # elasticsearch old version
-          wget --quiet --output-document - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-          echo "deb [trusted=yes] http://packages.elastic.co/elasticsearch/2.x/debian stable main" | sudo tee /etc/apt/sources.list.d/elasticsearch-2.x.list
-
-          # Node setup
-          curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-
           sudo apt-get update
 
           sudo apt-get install --quiet --yes \
-          elasticsearch                      \
-          imagemagick                        \
           libffi-dev                         \
           libidn11-dev                       \
-          libmagickwand-dev                  \
           libpq-dev                          \
           libreadline-dev                    \
           libssl-dev                         \
           libvips                            \
           libxml2-dev                        \
           libxslt1-dev                       \
-          nodejs                             \
           zlib1g-dev
-
-          sudo sed -e '/UseParNewGC/ s/^#*/#/g' -i /usr/share/elasticsearch/bin/elasticsearch.in.sh
-          sudo systemctl start elasticsearch
 
           # Install chromedriver
           major_version=$(google-chrome --version | awk '{print $NF}' | awk --field-separator "." '{ print $1 }')
@@ -82,7 +64,22 @@ jobs:
           wget --quiet --output-document - https://github.com/esimov/pigo/releases/download/v1.4.5/pigo-1.4.5-linux-amd64.tar.gz | tar --extract --gunzip --directory=/tmp/
           sudo mv /tmp/pigo-1.4.5-linux-amd64/pigo /usr/local/bin/
 
-          sudo systemctl status elasticsearch
+      - name: Configure sysctl limits for elasticsearch
+        run: |
+          sudo swapoff -a
+          sudo sysctl -w vm.swappiness=1
+          sudo sysctl -w fs.file-max=262144
+          sudo sysctl -w vm.max_map_count=262144
+
+      - name: Runs Elasticsearch
+        uses: elastic/elastic-github-actions/elasticsearch@master
+        with:
+          stack-version: 8.5.0
+          security-enabled: false
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1

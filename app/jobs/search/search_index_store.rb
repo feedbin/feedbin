@@ -12,31 +12,34 @@ module Search
     end
 
     def index(entry, document)
-      data = {
-        index: Entry.index_name,
-        type: Entry.document_type,
-        id: entry.id,
-        body: document
-      }
-      $search.each do |_, client|
-        client.index(data)
-      end
+      Search.client(mirror: true) { _1.index(Entry.table_name, id: entry.id, document: document) }
     end
 
     def percolate(entry, document, update)
-      result = Entry.__elasticsearch__.client.percolate(
-        index: Entry.index_name,
-        type: Entry.document_type,
-        percolate_format: "ids",
-        body: {
-          doc: document,
-          filter: {
-            term: {feed_id: entry.feed_id}
+      query = {
+        :_source => false,
+        query: {
+          constant_score: {
+            filter: {
+              bool: {
+                must: [
+                  {
+                    term: {feed_id: entry.feed_id}
+                  },
+                  {
+                    percolate: {
+                      field: "query",
+                      document: document
+                    }
+                  }
+                ]
+              }
+            }
           }
         }
-      )
+      }
 
-      ids = result["matches"].map(&:to_i)
+      ids = Search.client { _1.all_matches(Action.table_name, query: query) }
       if ids.present?
         ActionsPerform.perform_async(entry.id, ids, update)
       end

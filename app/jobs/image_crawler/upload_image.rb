@@ -13,7 +13,7 @@ module ImageCrawler
       @image_path = image_path
 
       storage_url = upload
-      send_to_feedbin(original_url:, storage_url:, placeholder_color:)
+      send_to_feedbin(original_url: image_url, storage_url:, placeholder_color:)
       begin
         File.unlink(image_path)
       rescue Errno::ENOENT
@@ -25,13 +25,11 @@ module ImageCrawler
 
     def upload
       File.open(@image_path) do |file|
-        S3_POOL.with do |connection|
-          response = connection.put_object(IMAGE_STORAGE, image_name, file, storage_options)
-          URI::HTTPS.build(
-            host: response.data[:host],
-            path: response.data[:path]
-          ).to_s
-        end
+        response = Fog::Storage.new(STORAGE).put_object(IMAGE_STORAGE, image_name, file, storage_options)
+        URI::HTTPS.build(
+          host: response.data[:host],
+          path: response.data[:path]
+        ).to_s
       end
     end
   end

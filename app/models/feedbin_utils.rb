@@ -24,22 +24,6 @@ class FeedbinUtils
     "payment_details:%s:v5" % user_id
   end
 
-  def self.escape_search(query)
-    if query.present? && query.respond_to?(:gsub)
-      special_characters_regex = /([\+\-\!\{\}\[\]\^\~\?\\\/])/
-      escape = '\ '.sub(" ", "")
-      query = query.gsub(special_characters_regex) { |character| escape + character }
-
-      query = query.gsub("title_exact:", "title.exact:")
-      query = query.gsub("content_exact:", "content.exact:")
-      query = query.gsub("body:", "content:")
-
-      colon_regex = /(?<!title|title.exact|feed_id|content|content.exact|author|_missing_|_exists_|twitter_screen_name|twitter_name|twitter_retweet|twitter_media|twitter_image|twitter_link|emoji|url|url.exact|link):(?=.*)/
-      query = query.gsub(colon_regex, '\:')
-      query
-    end
-  end
-
   def self.shared_cache(key)
     hash = Sidekiq.redis do |redis|
       redis.hgetall key

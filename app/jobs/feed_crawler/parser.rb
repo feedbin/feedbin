@@ -8,28 +8,51 @@ module FeedCrawler
       @feed = Feed.find(feed_id)
       @feed.crawl_data = crawl_data
 
-      parsed = Feedkit::Parser.parse!(
-        File.read(path, binmode: true),
-        url: @feed.feed_url,
-        encoding: encoding
-      )
-
-      filter = EntryFilter.new(parsed.entries, check_for_changes: check_for_changes?, always_check_recent: true)
-      save(feed: parsed.to_feed, entries: filter.filter)
+      parse_and_save(@feed, path, encoding: encoding)
 
       @feed.last_change_check = Time.now if check_for_changes?
       @feed.crawl_data.clear!
-
-      Sidekiq.logger.info "Parser: stats=#{filter.stats} check_for_changes=#{check_for_changes?} url=#{@feed.feed_url} feed_id=#{@feed.id}"
-      filter.stats.each do |stat, count|
-        Librato.increment("feed.parser", source: stat, by: count)
-      end
     rescue Feedkit::NotFeed => exception
       @feed.crawl_data.download_error(exception)
       Sidekiq.logger.info "Feedkit::NotFeed: feed_id=#{@feed.id} url=#{@feed.feed_url}"
     ensure
       File.unlink(path) rescue Errno::ENOENT
       @feed.save!
+    end
+
+    def parse_and_save(feed, path, encoding: nil, web_sub: false)
+      @feed ||= feed
+
+      parsed = Feedkit::Parser.parse!(
+        File.read(path, binmode: true),
+        url: @feed.feed_url,
+        encoding: encoding
+      )
+
+      filter    = EntryFilter.new(parsed.entries, check_for_changes: check_for_changes?, always_check_recent: true)
+      entries   = filter.filter
+      video_ids = entries.filter_map { _1.dig(:data, :youtube_video_id) }
+
+      parsed_feed = parsed.to_feed
+      parsed_feed.delete(:title) if video_ids.present? && web_sub
+      data = {
+        "feed" => parsed_feed.merge({"id" => @feed.id}),
+        "entries" => entries
+      }
+
+      if video_ids.present?
+        HarvestEmbeds.new.add_missing_to_queue(video_ids)
+        job_id = YoutubeReceiver.perform_in(2.minutes, data)
+        Sidekiq.logger.info "Enqueued YoutubeReceiver job_id=#{job_id} feed_id=#{@feed.id}"
+      else
+        job_id = Receiver.perform_async(data)
+        Sidekiq.logger.info "Enqueued Receiver job_id=#{job_id} feed_id=#{@feed.id}"
+      end
+
+      Sidekiq.logger.info "Parser: stats=#{filter.stats} check_for_changes=#{check_for_changes?} url=#{@feed.feed_url} feed_id=#{@feed.id}"
+      filter.stats.each do |stat, count|
+        Librato.increment("feed.parser", source: stat, by: count)
+      end
     end
 
     private
@@ -45,14 +68,6 @@ module FeedCrawler
 
       random_timeout = rand(12..24).hours.ago
       @check_for_changes = last_check.before?(random_timeout)
-    end
-
-    def save(feed:, entries:)
-      job_id = Receiver.perform_async({
-        "feed" => feed.merge({"id" => @feed.id}),
-        "entries" => entries
-      })
-      Sidekiq.logger.info "Enqueued Receiver job_id=#{job_id} feed_id=#{@feed.id}"
     end
   end
 end

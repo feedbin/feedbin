@@ -3,7 +3,7 @@ require_relative "../../lib/tld_length"
 
 Rails.application.configure do
   config.middleware.use TldLength
-  
+
   # Settings specified here will take precedence over those in config/application.rb.
   config.hosts = ENV["FEEDBIN_HOST"]&.split(",")
   # In the development environment your application's code is reloaded any time
@@ -26,7 +26,7 @@ Rails.application.configure do
     config.action_controller.perform_caching = true
     config.action_controller.enable_fragment_cache_logging = true
 
-    config.cache_store = :redis_cache_store, {compress: false}
+    config.cache_store = :redis_cache_store, {compress: false, reconnect_attempts: 3}
     config.public_file_server.headers = {
       "Cache-Control" => "public, max-age=#{2.days.to_i}"
     }

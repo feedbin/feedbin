@@ -45,7 +45,7 @@ Requirements
  - [Ruby 3.1](http://www.ruby-lang.org/en/)
  - [Postgres 11](http://www.postgresql.org/)
  - [Redis 6](http://redis.io/)
- - [Elasticsearch 2.4](https://www.elastic.co/downloads/past-releases/#elasticsearch)
+ - [Elasticsearch 8.5](https://www.elastic.co/downloads/past-releases/#elasticsearch)
 
 Installation
 -------------

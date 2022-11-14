@@ -1,7 +1,6 @@
 require "test_helper"
-
 module FeedCrawler
-  class YoutubeReceiverTest < ActiveSupport::TestCase
+  class UpdateYoutubeVideosTest < ActiveSupport::TestCase
     setup do
       @user = users(:ben)
       @subscription = @user.subscriptions.first
@@ -21,20 +20,14 @@ module FeedCrawler
         }
       })
 
-      data = {
-        "feed" => {"id" => @feed.id},
-        "entries" => [{
-          "title" => "title",
-          "public_id" => public_id,
-          "data" => {"youtube_video_id" => embed_id}
-        }]
-      }
+      @feed.entries.create!({
+        "title" => "title",
+        "public_id" => public_id,
+        "data" => {"youtube_video_id" => embed_id}
+      })
 
-      YoutubeReceiver.new.perform(data)
-
+      UpdateYoutubeVideos.new.perform(@feed.id)
       entry = Entry.find_by_public_id!(public_id)
-
-      assert_equal(content, entry.content)
       assert_equal(3769, entry.embed_duration)
     end
   end
