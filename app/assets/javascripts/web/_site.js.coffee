@@ -2108,18 +2108,6 @@ $.extend feedbin,
 
     entryBasement: ->
 
-      $(document).on 'click', (event, xhr) ->
-        if ($(event.target).hasClass('entry-basement') || $(event.target).parents('.entry-basement').length > 0)
-          false
-
-        isButton = (event) ->
-          $(event.target).is('[data-behavior~=show_entry_basement]') ||
-          $(event.target).parents('[data-behavior~=show_entry_basement]').length > 0
-
-        if !isButton(event) && $(event.target).parents('.entry-basement').length == 0
-          feedbin.closeEntryBasement()
-        return
-
       $(document).on 'click', '[data-behavior~=show_entry_basement]', (event, xhr) ->
         panelName = $(@).data('basement-panel')
         selectedPanel = $("[data-basement-panel-target=#{panelName}]")
