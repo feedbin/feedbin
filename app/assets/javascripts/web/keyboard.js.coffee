@@ -302,6 +302,7 @@ class feedbin.Keyboard
     # Unfocus field,
     Mousetrap.bindGlobal 'escape', (event, combo) =>
       $('.dropdown-wrap.open').removeClass('open')
+      feedbin.hideFormatMenu()
       $('.modal').modal('hide')
       feedbin.hideSearch()
       if $('[name="subscription[feeds][feed_url]"]').is(':focus')

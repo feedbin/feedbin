@@ -28,6 +28,20 @@ $.extend feedbin,
   loadingMore: false
   remoteContentIntervals: {}
 
+  hideFormatMenu: (event) ->
+    menu = $('.format-palette')
+    button = $('[data-behavior~=show_format_menu]')
+    hide = ->
+      if feedbin.formatMenu
+        feedbin.formatMenu.destroy()
+        feedbin.formatMenu = null
+        menu.addClass('hide')
+    if event
+      if !feedbin.isRelated(menu, event.target) && !feedbin.isRelated(button, event.target)
+        hide()
+    else
+      hide()
+
   prepareShareMenu: (data) ->
     buildLink = (item, data, index) ->
       href = item.url
@@ -1402,6 +1416,7 @@ $.extend feedbin,
     classes = modal[0].className.split(/\s+/)
     classPrefix = "modal-purpose"
     modalClass = "#{classPrefix}-#{target}"
+    feedbin.hideFormatMenu()
 
     content = $($("[data-modal-purpose=#{target}]").html())
 
@@ -1856,12 +1871,7 @@ $.extend feedbin,
 
     showFormatMenu: ->
       $(document).on 'click', (event) ->
-        menu = $('.format-palette')
-        button = $('[data-behavior~=show_format_menu]')
-        if !feedbin.isRelated(menu, event.target) && !feedbin.isRelated(button, event.target) && feedbin.formatMenu
-          feedbin.formatMenu.destroy()
-          feedbin.formatMenu = null
-          menu.addClass('hide')
+        feedbin.hideFormatMenu(event)
 
       $(document).on 'click', '[data-behavior~=show_format_menu]', (event) ->
         $('.dropdown-wrap.open').removeClass('open')
@@ -2363,7 +2373,7 @@ $.extend feedbin,
       return
 
     appearanceRadio: ->
-      $('[data-behavior~=appearance_radio]').on 'change', (event) ->
+      $(document).on 'change', '[data-behavior~=appearance_radio]', (event) ->
         selected = $(@).val()
         setting = $(@).data('setting')
         name = $(@).attr('name')
