@@ -124,7 +124,7 @@ class ApplicationController < ActionController::Base
       parent_data: {behavior: "starred", feed_id: "collection_starred", count_type: "starred"},
       data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "starred", message: "Mark starred items as read?"}.to_json}
     }
-    if @user.podcast_subscriptions.exists?
+    if user.queued_entries.exists? && !user.setting_on?(:hide_airshow)
       collections << {
         title: "Airshow",
         path: queued_entries_path,
@@ -161,7 +161,7 @@ class ApplicationController < ActionController::Base
         data: {behavior: "selectable show_entries open_item feed_link", special_collection: "updated", mark_read: {type: "updated", message: "Mark updated items as read?"}.to_json}
       }
     end
-    unless user.setting_on?(:hide_recently_played)
+    if @user.recently_played_entries.exists? && !user.setting_on?(:hide_recently_played)
       collections << {
         title: "Recently Played",
         path: recently_played_entries_path,

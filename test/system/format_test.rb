@@ -40,5 +40,10 @@ class FormatTest < ApplicationSystemTestCase
 
     find("label[for=user_entry_width]").click
     page.has_selector?("body.fluid-1")
+
+    find("a[href='/settings/appearance']").click
+    wait_for_ajax
+    assert_selector ".group-header", text: "Interface Elements"
+
   end
 end

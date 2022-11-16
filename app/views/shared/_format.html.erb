@@ -21,7 +21,7 @@
 
             <h3 style="margin-bottom: 8px;">Typeface</h3>
 
-            <div class="control">
+            <div class="control" style="margin-bottom: 16px;">
                 <div class="font-options">
                     <%= f.collection_radio_buttons(:font, Feedbin::Application.config.fonts, :slug, :name) do |b| %>
                         <div class="option">
@@ -35,7 +35,6 @@
                 </div>
             </div>
 
-            <h3 style="margin-top: 16px;">Font Size</h3>
             <div class="control">
                 <span class="font-size">
                     <button class="reset" data-behavior="decrease_font">Smaller</button>
@@ -64,6 +63,12 @@
                     </ul>
                 </div>
             </div>
+
+            <div style="text-align: center; margin-top: 8px; font-size: 13px;">
+              <%= link_to "Advanced", settings_appearance_path, remote: true, data: {behavior: "open_modal", modal_target: "appearance"} %>
+            </div>
+
+
         <% end %>
     </div>
 <% end %>

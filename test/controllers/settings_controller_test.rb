@@ -39,12 +39,6 @@ class SettingsControllerTest < ActionController::TestCase
     StripeMock.stop
   end
 
-  test "should get appearance" do
-    login_as @user
-    get :appearance
-    assert_response :success
-  end
-
   test "should get billing" do
     StripeMock.start
     events = [

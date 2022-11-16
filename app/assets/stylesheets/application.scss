@@ -2433,6 +2433,9 @@ $hamburger-dot: 4px;
   .feed-link {
     display: flex;
     padding: 0 $outer-padding;
+    &.selected .link-inner {
+      color: white !important;
+    }
   }
   .source-section {
     padding-left: $outer-padding + $inner-padding + $favicon-padding;

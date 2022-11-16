@@ -1,0 +1,55 @@
+<div class="modal-wrapper">
+  <% present @user do |user_presenter| %>
+      <% @classes = user_presenter.setting_classes %>
+      <%= form_for user_presenter, remote: true, url: settings_update_user_path(@user) do |f| %>
+        <% content_for :modal_title do %>
+            Advanced
+        <% end %>
+
+        <% content_for :modal_body do %>
+            <div class="inset settings">
+
+                <h4 class="group-header">Display</h4>
+                <ul class="control-group">
+                    <li>
+                        <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block', data: {behavior: 'appearance_radio auto_submit', setting: 'entries-display'}}) %>
+                        <%= f.label :entries_display_block do %>
+                            Default <%= radio_button_control %>
+                        <% end %>
+                    </li>
+                    <li>
+                        <%= f.radio_button(:entries_display, "inline", {data: {behavior: 'appearance_radio auto_submit', setting: 'entries-display'}}) %>
+                        <%= f.label :entries_display_inline do %>
+                            Inline <%= radio_button_control %>
+                        <% end %>
+                    </li>
+                </ul>
+                <h4 class="group-header">Interface Elements</h4>
+                <ul class="control-group">
+                    <li>
+                        <%= f.check_box :entries_feed, {checked: @user.entries_feed.nil? || @user.setting_on?(:entries_feed), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-feed'} } %>
+                        <%= f.label :entries_feed do %>
+                            Feed <%= toggle_switch %>
+                        <% end %>
+                    </li>
+                    <li>
+                        <%= f.check_box :entries_body, {checked: @user.entries_body.nil? || @user.setting_on?(:entries_body), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-body'} } %>
+                        <%= f.label :entries_body do %>
+                            Summary <%= toggle_switch %>
+                        <% end %>
+                    </li>
+                    <li>
+                        <%= f.check_box :entries_image, {checked: @user.entries_image.nil? || @user.setting_on?(:entries_image), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-image'} } %>
+                        <%= f.label :entries_image do %>
+                            Media <%= toggle_switch %>
+                        <% end %>
+                    </li>
+                </ul>
+            </div>
+        <% end %>
+
+        <%= render template: "layouts/modal_inner", locals: {purpose: "edit"} %>
+
+      <% end %>
+  <% end %>
+</div>

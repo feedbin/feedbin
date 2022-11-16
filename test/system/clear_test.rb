@@ -20,11 +20,11 @@ class ClearTest < ApplicationSystemTestCase
   end
 
   test "Clear Recently Played" do
-    user = users(:ben)
-    login_as(user)
     show_article_setup
 
-    user.recently_played_entries.create!(entry: @entries.first)
+    @user.recently_played_entries.create!(entry: @entries.first)
+
+    login_as(@user)
 
     click_link "Recently Played"
 
@@ -34,6 +34,6 @@ class ClearTest < ApplicationSystemTestCase
 
     wait_for_ajax
 
-    assert_equal(0, user.recently_played_entries.count)
+    assert_equal(0, @user.recently_played_entries.count)
   end
 end

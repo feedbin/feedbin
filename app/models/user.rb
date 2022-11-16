@@ -29,6 +29,7 @@ class User < ApplicationRecord
     :update_message_seen,
     :hide_recently_read,
     :hide_updated,
+    :hide_airshow,
     :view_mode,
     :disable_image_proxy,
     :api_client,
