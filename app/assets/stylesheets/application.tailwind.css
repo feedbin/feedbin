@@ -3,51 +3,55 @@
 @tailwind utilities;
 
 :root, .theme-day, .theme-auto.prefers-light {
-    --color-base: theme('colors.day.DEFAULT');
-    --color-100:  theme("colors.day.100");
-    --color-200:  theme("colors.day.200");
-    --color-300:  theme("colors.day.300");
-    --color-400:  theme("colors.day.400");
-    --color-500:  theme("colors.day.500");
-    --color-600:  theme("colors.day.600");
-    --color-700:  theme("colors.day.700");
-    --border-color: var(--color-200);
+    --color-base:      theme('colors.day.DEFAULT');
+    --color-100:       theme("colors.day.100");
+    --color-200:       theme("colors.day.200");
+    --color-300:       theme("colors.day.300");
+    --color-400:       theme("colors.day.400");
+    --color-500:       theme("colors.day.500");
+    --color-600:       theme("colors.day.600");
+    --color-700:       theme("colors.day.700");
+    --border-color:    var(--color-200);
+    --color-light-100: var(--color-100);
 }
 
 .theme-sunset {
-    --color-base: theme('colors.sunset.DEFAULT');
-    --color-100:  theme("colors.sunset.100");
-    --color-200:  theme("colors.sunset.200");
-    --color-300:  theme("colors.sunset.300");
-    --color-400:  theme("colors.sunset.400");
-    --color-500:  theme("colors.sunset.500");
-    --color-600:  theme("colors.sunset.600");
-    --color-700:  theme("colors.sunset.700");
-    --border-color: var(--color-200);
+    --color-base:      theme('colors.sunset.DEFAULT');
+    --color-100:       theme("colors.sunset.100");
+    --color-200:       theme("colors.sunset.200");
+    --color-300:       theme("colors.sunset.300");
+    --color-400:       theme("colors.sunset.400");
+    --color-500:       theme("colors.sunset.500");
+    --color-600:       theme("colors.sunset.600");
+    --color-700:       theme("colors.sunset.700");
+    --border-color:    var(--color-200);
+    --color-light-100: var(--color-100);
 }
 
 .theme-dusk, .theme-auto.prefers-dark {
-    --color-base: theme('colors.dusk.DEFAULT');
-    --color-100:  theme("colors.dusk.100");
-    --color-200:  theme("colors.dusk.200");
-    --color-300:  theme("colors.dusk.300");
-    --color-400:  theme("colors.dusk.400");
-    --color-500:  theme("colors.dusk.500");
-    --color-600:  theme("colors.dusk.600");
-    --color-700:  theme("colors.dusk.700");
-    --border-color: black;
+    --color-base:       theme('colors.dusk.DEFAULT');
+    --color-100:        theme("colors.dusk.100");
+    --color-200:        theme("colors.dusk.200");
+    --color-300:        theme("colors.dusk.300");
+    --color-400:        theme("colors.dusk.400");
+    --color-500:        theme("colors.dusk.500");
+    --color-600:        theme("colors.dusk.600");
+    --color-700:        theme("colors.dusk.700");
+    --border-color:     black;
+    --color-light-100:  var(--color-600);
 }
 
 .theme-midnight {
-    --color-base: theme('colors.midnight.DEFAULT');
-    --color-100:  theme("colors.midnight.100");
-    --color-200:  theme("colors.midnight.200");
-    --color-300:  theme("colors.midnight.300");
-    --color-400:  theme("colors.midnight.400");
-    --color-500:  theme("colors.midnight.500");
-    --color-600:  theme("colors.midnight.600");
-    --color-700:  theme("colors.midnight.700");
-    --border-color: var(--color-200);
+    --color-base:       theme('colors.midnight.DEFAULT');
+    --color-100:        theme("colors.midnight.100");
+    --color-200:        theme("colors.midnight.200");
+    --color-300:        theme("colors.midnight.300");
+    --color-400:        theme("colors.midnight.400");
+    --color-500:        theme("colors.midnight.500");
+    --color-600:        theme("colors.midnight.600");
+    --color-700:        theme("colors.midnight.700");
+    --border-color:     var(--color-200);
+    --color-light-100:  var(--color-600);
 }
 
 @layer base {
@@ -62,6 +66,9 @@
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+  input[type=radio], input[type=checkbox] {
+    @apply sr-only;
   }
 }
 

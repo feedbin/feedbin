@@ -103,7 +103,7 @@
               <%= component "settings/switch" do |switch| %>
                 <% switch.title { "Starred article feed" } %>
                 <% switch.description do %>
-                  <span data-behavior="starred_feed_url">
+                  <span data-behavior="starred_feed_url" class="overflow-hidden">
                       <%= render partial: 'shared/starred_feed_url', locals: {user: @user} %>
                   </span>
                 <% end %>
