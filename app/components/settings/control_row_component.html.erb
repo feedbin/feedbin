@@ -1,13 +1,15 @@
-<div class="grow">
-  <div class="text-600">
-    <%= title %>
+<div class="py-4 flex items-center gap-4 group">
+  <div class="grow">
+    <div class="text-600">
+      <%= title %>
+    </div>
+    <% if description? %>
+    <div class="text-500 text-sm mt-2 ">
+      <%= description %>
+    </div>
+    <% end %>
   </div>
-  <% if description.present? %>
-  <div class="text-500 text-sm mt-2 ">
-    <%= description %>
+  <div class="items-center flex gap-4">
+    <%= control %>
   </div>
-  <% end %>
-</div>
-<div class="items-center flex gap-4">
-  <%= control %>
 </div>

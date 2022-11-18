@@ -6,6 +6,11 @@ module ApplicationHelper
     presenter
   end
 
+  def component(name, *args, **kwargs, &block)
+    component = "#{name}_component".camelize.constantize
+    render(component.new(*args, **kwargs), &block)
+  end
+
   def native?
     request.user_agent&.include?("TurbolinksFeedbin")
   end
