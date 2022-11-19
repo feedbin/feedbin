@@ -1,0 +1,15 @@
+<li class="mb-1 <%= @classes %>" >
+  <a href="<%= @url %>" data-ui="<%= class_names(selected: @selected) %>" class="flex gap-2 p-2 rounded group !text-600 hover:no-underline hover:bg-200 data-selected:bg-blue-600">
+    <span class="grid place-items-center shrink-0 w-[16px] h-[17px]">
+      <%= svg_tag @icon, class: "fill-600 group-data-selected:fill-white" %>
+    </span>
+    <span>
+      <span class="block leading-none mb-1 group-data-selected:text-white">
+        <%= @title %>
+      </span>
+      <span class="block text-sm text-500 group-data-selected:text-selected-muted">
+        <%= @subtitle %>
+      </span>
+    </span>
+  </a>
+</li>

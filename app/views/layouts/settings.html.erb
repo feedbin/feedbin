@@ -1,28 +1,29 @@
 <% present @user do |user_presenter| %>
     <% @class = "settings-body settings-#{params[:action]} theme-#{user_presenter.theme}"%>
 <% end %>
+
 <% content_for :content do %>
-<div class="settings settings-page">
-    <%= render partial: 'shared/notification' %>
-    <script>
-        <%= render partial: "shared/message_flash", locals: {flash: flash} %>
-    </script>
-    <div class="settings-inner">
-        <div class="settings-nav">
-            <a href="/" class="logo">
-                <%= svg_tag "logo-full", inline: true %>
-            </a>
-            <%= render partial: "shared/settings_nav" %>
-        </div>
-        <div class="settings-content">
-            <button class="reset settings-menu-button" data-behavior="open_modal" data-modal-target="settings_nav">
-                <%= svg_tag "icon-menu" %>
-            </button>
+  <%= render partial: 'shared/notification' %>
+  <script>
+      <%= render partial: "shared/message_flash", locals: {flash: flash} %>
+  </script>
+  <div class="flex antialiased">
+      <div class="w-[310px] bg-sidebar border-r p-6">
+          <a href="/" class="block pt-4">
+              <%= svg_tag "logo-full", inline: true, class: "w-[140px] h-[38px]" %>
+          </a>
+          <%= render partial: "shared/settings_nav" %>
+      </div>
+      <div class="relative bg-base grow max-w-full min-w-0">
+          <button class="reset settings-menu-button" data-behavior="open_modal" data-modal-target="settings_nav">
+              <%= svg_tag "icon-menu" %>
+          </button>
+          <div class="max-w-[700px] px-2 md:pr-[20px] md:pl-[37px]">
             <%= yield %>
-        </div>
-    </div>
-    <%= render partial: "shared/svg" %>
-    <%= render partial: "shared/modals/settings_modal" %>
-</div>
+          </div>
+      </div>
+  </div>
+  <%= render partial: "shared/svg" %>
+  <%= render partial: "shared/modals/settings_modal" %>
 <% end %>
 <%= render template: "layouts/application" %>

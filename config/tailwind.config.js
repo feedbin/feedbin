@@ -10,24 +10,20 @@ module.exports = {
     "./test/components/**/*.{erb,html,rb}"
   ],
   theme: {
+    data: {
+      selected: 'ui~="selected"',
+    },
+    screens: {
+      'sm': '480px',
+      'md': '700px',
+      'lg': '992px',
+      'xl': '1200px',
+    },
     extend: {
       borderColor: {
         DEFAULT: "var(--border-color)",
-        100: "var(--color-100)",
-        200: "var(--color-200)",
-        300: "var(--color-300)",
-        400: "var(--color-400)",
-        500: "var(--color-500)",
-        600: "var(--color-600)",
-        700: "var(--color-700)",
       },
-      textColor: {
-        400: "var(--color-400)",
-        500: "var(--color-500)",
-        600: "var(--color-600)",
-        700: "var(--color-700)",
-      },
-      backgroundColor: {
+      colors: {
         100: "var(--color-100)",
         200: "var(--color-200)",
         300: "var(--color-300)",
@@ -36,8 +32,8 @@ module.exports = {
         600: "var(--color-600)",
         700: "var(--color-700)",
         "light-100": "var(--color-light-100)",
-      },
-      colors: {
+        "sidebar": "var(--color-sidebar)",
+        "selected-muted": "rgba(255,255,255, 0.7)",
         "day": {
           DEFAULT: "#FFFFFF",
           100:     "#f5f5f7",

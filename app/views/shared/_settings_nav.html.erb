@@ -1,152 +1,124 @@
-<ul class="nav">
-    <li class="nav-header">
-        <div>General</div>
-    </li>
-    <li class="desktop-hide">
-        <%= link_to root_path do %>
-            <span class="icon-wrap">
-                <%= svg_tag "menu-icon-app", inline: true %>
-            </span>
-            <span class="menu-text">
-                <span class="title">Feedbin</span>
-                <span class="subtitle">Back to the app</span>
-            </span>
-        <% end %>
-    </li>
-    <li>
-        <%= link_to settings_path, class: is_active?("settings", "settings") do %>
-            <span class="icon-wrap">
-                <%= svg_tag "menu-icon-settings", inline: true %>
-            </span>
-            <span class="menu-text">
-                <span class="title">Settings</span>
-                <span class="subtitle">General preferences</span>
-            </span>
-        <% end %>
-    </li>
-    <li>
-        <%= link_to settings_subscriptions_path, class: is_active?(["settings/subscriptions"], ["index", "edit"]) do %>
-            <span class="icon-wrap">
-                <%= svg_tag "menu-icon-subscriptions", inline: true %>
-            </span>
-            <span class="menu-text">
-                <span class="title">Subscriptions</span>
-                <span class="subtitle">Manage feeds</span>
-            </span>
-        <% end %>
-    </li>
-    <li>
-        <%= link_to settings_newsletters_pages_path, class: is_active?("settings", "newsletters_pages") do %>
-            <span class="icon-wrap">
-                <%= svg_tag "menu-icon-newsletters", inline: true %>
-            </span>
-            <span class="menu-text">
-                <span class="title">Sources</span>
-                <span class="subtitle">Twitter, newsletters & pages</span>
-            </span>
-        <% end %>
-    </li>
+<%= component "settings_nav/header" do %>
+  General
+<% end %>
 
-    <li class="nav-header">
-        <div>Tools</div>
-    </li>
-    <li class="divider">
-        <%= link_to actions_path, class: is_active?("actions", ["index", "new", "edit"]) do %>
-            <span class="icon-wrap">
-                <%= svg_tag "menu-icon-actions", inline: true %>
-            </span>
-            <span class="menu-text">
-                <span class="title">Actions</span>
-                <span class="subtitle">Filters & more</span>
-            </span>
-        <% end %>
-    </li>
-    <li>
-        <%= link_to sharing_services_path, class: is_active?("sharing_services", "index") do %>
-            <span class="icon-wrap">
-                <%= svg_tag "menu-icon-share-save", inline: true %>
-            </span>
-            <span class="menu-text">
-                <span class="title">Share & Save</span>
-                <span class="subtitle">Social plugins</span>
-            </span>
-        <% end %>
-    </li>
-    <li>
-        <%= link_to settings_import_export_path, class: is_active?(["settings/imports"], ["index", "show"]) do %>
-            <span class="icon-wrap">
-                <%= svg_tag "menu-icon-import-export", inline: true %>
-            </span>
-            <span class="menu-text">
-                <span class="title">Import & Export</span>
-                <span class="subtitle">Bring your OPML</span>
-            </span>
-        <% end %>
-    </li>
-    <% if current_user.try(:account_migrations)&.exists? %>
-    <li>
-        <%= link_to account_migrations_path, class: is_active?("account_migrations", "index") do %>
-            <span class="icon-wrap">
-                <%= svg_tag "menu-icon-migration", inline: true %>
-            </span>
-            <span class="menu-text">
-                <span class="title">Account Migration</span>
-                <span class="subtitle">Howdy, Feed Wrangler!</span>
-            </span>
-        <% end %>
-    </li>
-    <% end %>
-    <li class="nav-header">
-        <div>Admin</div>
-    </li>
-    <li class="divider">
-        <%= link_to settings_account_path, class: is_active?("settings", "account") do %>
-            <span class="icon-wrap">
-                <%= svg_tag "menu-icon-account", inline: true %>
-            </span>
-            <span class="menu-text">
-                <span class="title">Account</span>
-                <span class="subtitle">Update email & password</span>
-            </span>
-        <% end %>
-    </li>
-    <% if ENV["STRIPE_API_KEY"] %>
-        <li>
-            <%= link_to settings_billing_path, class: is_active?("settings", "billing") || is_active?("settings", "edit_billing") do %>
-                <span class="icon-wrap">
-                    <%= svg_tag "menu-icon-billing", inline: true %>
-                </span>
-                <span class="menu-text">
-                    <span class="title">Billing</span>
-                    <span class="subtitle">Payment method & plan</span>
-                </span>
-            <% end %>
-        </li>
-    <% end %>
-    <% if current_user.try(:admin?) %>
-        <li>
-            <%= link_to admin_users_path, class: is_active?("admin/users", "index") do %>
-                <span class="icon-wrap">
-                    <%= svg_tag "menu-icon-customers", inline: true %>
-                </span>
-                <span class="menu-text">
-                    <span class="title">Customers</span>
-                    <span class="subtitle">Manage customers</span>
-                </span>
-            <% end %>
-        </li>
-        <li>
-            <%= link_to sidekiq_web_path do %>
-                <span class="icon-wrap">
-                    <%= svg_tag "menu-icon-sidekiq", inline: true %>
-                </span>
-                <span class="menu-text">
-                    <span class="title">Sidekiq</span>
-                    <span class="subtitle">Background jobs</span>
-                </span>
-            <% end %>
-        </li>
-    <% end %>
+<ul>
+  <%= component "settings_nav/nav",
+    title: "Feedbin",
+    subtitle: "Back to the app",
+    url: root_path,
+    icon: "menu-icon-app",
+    classes: "md:hidden"
+
+  %>
+
+  <%= component "settings_nav/nav",
+    title: "Settings",
+    subtitle: "General preferences",
+    url: settings_path,
+    icon: "menu-icon-settings",
+    selected: is_active?("settings", "settings")
+  %>
+
+  <%= component "settings_nav/nav",
+    title: "Subscriptions",
+    subtitle: "Manage feeds",
+    url: settings_subscriptions_path,
+    icon: "menu-icon-subscriptions",
+    selected: is_active?(["settings/subscriptions"], ["index", "edit"])
+  %>
+
+  <%= component "settings_nav/nav",
+    title: "Sources",
+    subtitle: "Twitter, newsletters & pages",
+    url: settings_newsletters_pages_path,
+    icon: "menu-icon-newsletters",
+    selected: is_active?("settings", "newsletters_pages")
+  %>
+</ul>
+
+<%= component "settings_nav/header" do %>
+  Tools
+<% end %>
+
+<ul>
+  <%= component "settings_nav/nav",
+      title: "Actions",
+      subtitle: "Filters & more",
+      url: actions_path,
+      selected: is_active?("sharing_services", "index"),
+      icon: "menu-icon-actions"
+  %>
+
+  <%= component "settings_nav/nav",
+      title: "Share & Save",
+      subtitle: "Social plugins",
+      url: sharing_services_path,
+      selected: is_active?("sharing_services", "index"),
+      icon: "menu-icon-share-save"
+  %>
+
+  <%= component "settings_nav/nav",
+      title: "Import & Export",
+      subtitle: "Bring your OPML",
+      url: settings_import_export_path,
+      selected: is_active?(["settings/imports"], ["index", "show"]),
+      icon: "menu-icon-import-export"
+  %>
+
+  <% if current_user.try(:account_migrations)&.exists? %>
+    <%= component "settings_nav/nav",
+        title: "Account Migration",
+        subtitle: "Howdy, Feed Wrangler",
+        url: account_migrations_path,
+        selected: is_active?("account_migrations", "index"),
+        icon: "menu-icon-migration"
+    %>
+  <% end %>
+</ul>
+
+<%= component "settings_nav/header" do %>
+  Admin
+<% end %>
+
+<ul>
+  <%= component "settings_nav/nav",
+      title: "Account",
+      subtitle: "Update email & password",
+      url: settings_account_path,
+      selected: is_active?("settings", "account"),
+      icon: "menu-icon-account"
+  %>
+
+  <% if ENV["STRIPE_API_KEY"] %>
+    <%= component "settings_nav/nav",
+        title: "Billing",
+        subtitle: "Payment method & plan",
+        url: settings_billing_path,
+        selected: is_active?("settings", "billing") || is_active?("settings", "edit_billing"),
+        icon: "menu-icon-billing"
+    %>
+  <% end %>
+
+  <% if current_user.try(:admin?) %>
+    <%= component "settings_nav/nav",
+        title: "Customers",
+        subtitle: "Manage customers",
+        url: admin_users_path,
+        selected: is_active?("admin/users", "index"),
+        icon: "menu-icon-customers"
+    %>
+    <%= component "settings_nav/nav",
+        title: "Sidekiq",
+        subtitle: "Background jobs",
+        url: sidekiq_web_path,
+        icon: "menu-icon-sidekiq"
+    %>
+  <% end %>
+</ul>
+
+
+<ul class="nav">
     <li class="log-out divider">
         <%= link_to logout_path, method: "delete" do %>
             <span class="icon-wrap">
@@ -158,50 +130,37 @@
         <% end %>
     </li>
 </ul>
-<ul class="nav nav-small divider">
-    <li>
-        <a href="/home">
-            Home
-        </a>
-    </li>
-    <li>
-        <a href="/blog">
-            Blog
-        </a>
-    </li>
-    <li>
-        <a href="/apps">
-            Apps
-        </a>
-    </li>
-    <li>
-        <a href="/help">
-            Help
-        </a>
-    </li>
-    <li>
-        <a href="https://github.com/feedbin/feedbin-api#readme">
-            API
-        </a>
-    </li>
-    <li>
-        <a href="/privacy-policy">
-            Privacy Policy
-        </a>
-    </li>
-    <li>
-        <a href="mailto:support@feedbin.com">
-            Email
-        </a>
-    </li>
-    <li class="mobile-hide">
-        <a href="https://twitter.com/feedbin">
-            Twitter
-        </a>
-    </li>
-    <li style="margin-top: 16px;">
-        <%= link_to logout_path, method: "delete" do %>
-            Log Out
-        <% end %>
-    </li>
+
+<div class="p-4">
+  <hr>
+</div>
+
+<ul>
+  <%= component "settings_nav/nav_small", url: "/home" do %>
+    Home
+  <% end %>
+  <%= component "settings_nav/nav_small", url: "/blog" do %>
+    Blog
+  <% end %>
+  <%= component "settings_nav/nav_small", url: "/apps" do %>
+    Apps
+  <% end %>
+  <%= component "settings_nav/nav_small", url: "/help" do %>
+    Help
+  <% end %>
+  <%= component "settings_nav/nav_small", url: "https://github.com/feedbin/feedbin-api#readme" do %>
+    API
+  <% end %>
+  <%= component "settings_nav/nav_small", url: "/privacy-policy" do %>
+    Privacy Policy
+  <% end %>
+  <%= component "settings_nav/nav_small", url: "mailto:support@feedbin.com" do %>
+    Email
+  <% end %>
+  <%= component "settings_nav/nav_small", url: "https://twitter.com/feedbin" do %>
+    Twitter
+  <% end %>
+  <%= component "settings_nav/nav_small", url: logout_path, method: "delete" do %>
+    Log Out
+  <% end %>
 </ul>

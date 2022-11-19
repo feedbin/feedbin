@@ -13,6 +13,7 @@
     --color-700:       theme("colors.day.700");
     --border-color:    var(--color-200);
     --color-light-100: var(--color-100);
+    --color-sidebar:   var(--color-100);
 }
 
 .theme-sunset {
@@ -26,6 +27,7 @@
     --color-700:       theme("colors.sunset.700");
     --border-color:    var(--color-200);
     --color-light-100: var(--color-100);
+    --color-sidebar:   var(--color-100);
 }
 
 .theme-dusk, .theme-auto.prefers-dark {
@@ -39,6 +41,7 @@
     --color-700:        theme("colors.dusk.700");
     --border-color:     black;
     --color-light-100:  var(--color-600);
+    --color-sidebar:    var(--color-base);
 }
 
 .theme-midnight {
@@ -52,6 +55,7 @@
     --color-700:        theme("colors.midnight.700");
     --border-color:     var(--color-200);
     --color-light-100:  var(--color-600);
+    --color-sidebar:    var(--color-base);
 }
 
 @layer base {
