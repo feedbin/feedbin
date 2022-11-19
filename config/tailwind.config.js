@@ -1,12 +1,13 @@
-const defaultTheme = require('tailwindcss/defaultTheme')
+const defaultTheme = require("tailwindcss/defaultTheme")
 const plugin = require("tailwindcss/plugin")
 
 module.exports = {
   content: [
-    './app/helpers/**/*.rb',
-    './app/javascript/**/*.js',
-    './app/views/**/*.{erb,html}',
-    './app/components/**/*.{erb,html,rb}'
+    "./app/helpers/**/*.rb",
+    "./app/javascript/**/*.js",
+    "./app/views/**/*.{erb,html}",
+    "./app/components/**/*.{erb,html,rb}",
+    "./test/components/**/*.{erb,html,rb}"
   ],
   theme: {
     extend: {
