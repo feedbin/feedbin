@@ -1,4 +1,9 @@
-<div class="flex relative grow">
+<% if label? %>
+<div class="mb-2 text-600">
+  <%= label %>
+</div>
+<% end %>
+<div class="flex relative grow mb-2">
   <%= input %>
   <div class="absolute top-[-5px] right-[-5px] bottom-[-5px] left-[-5px] border-4 border-transparent rounded-[9px] pointer-events-none peer-focus:border-blue-400"></div>
 </div>

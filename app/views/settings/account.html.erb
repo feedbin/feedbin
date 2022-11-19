@@ -5,10 +5,8 @@
     <div class="inset">
         <%= form_for(@user) do |f| %>
 
-          <%= component "settings/control_group" do |group| %>
-            <% group.header do %>
-              <%= f.label :email, "Email" %>
-            <% end %>
+          <%= component "settings/section_header" do %>
+            <%= f.label :email, "Email" %>
           <% end %>
 
           <%= component "settings/text_input" do |text| %>
@@ -25,21 +23,28 @@
     </div>
     <div class="inset">
         <%= form_for(@user) do |f| %>
-            <h4 class="group-header">Update Password</h4>
-            <div class="stacked-form">
-                <div class="input-group-wrap">
-                    <%= f.label :old_password, "Old Password" %>
-                    <%= render "shared/input" do %>
-                        <%= f.password_field :old_password %>
-                    <% end %>
-                </div>
-                <div class="input-group-wrap">
-                    <%= f.label :password, "New Password" %>
-                    <%= render "shared/input" do %>
-                        <%= f.password_field :password %>
-                    <% end %>
-                </div>
-            </div>
+            <%= component "settings/section_header" do %>
+              Update Password
+            <% end %>
+
+            <%= component "settings/text_input" do |text| %>
+              <% text.label do %>
+                <%= f.label :old_password, "Old Password" %>
+              <% end %>
+              <% text.input do %>
+                <%= f.password_field :old_password, class: "peer" %>
+              <% end %>
+            <% end %>
+
+            <%= component "settings/text_input" do |text| %>
+              <% text.label do %>
+                <%= f.label :password, "New Password" %>
+              <% end %>
+              <% text.input do %>
+                <%= f.password_field :password, class: "peer" %>
+              <% end %>
+            <% end %>
+
             <div class="button-wrap">
                 <button type="submit" class="button">Update</button>
             </div>
