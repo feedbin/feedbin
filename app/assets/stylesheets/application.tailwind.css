@@ -76,7 +76,7 @@
   input[type="email"],
   input[type="url"],
   input[type="search"] {
-    @apply text-sm bg-200 py-[8px] px-[7px] rounded text-600 ring-0 block
+    @apply text-sm bg-200 py-[8px] px-[7px] rounded text-600 ring-0 block grow
     focus:outline-none focus:outline-transparent focus:bg-100 focus:text-700;
   }
 }

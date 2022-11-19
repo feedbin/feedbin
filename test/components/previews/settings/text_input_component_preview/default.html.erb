@@ -1,6 +1,6 @@
 <div class="flex gap-4">
-  <div>
-    <label for="input" class="text-600 mb-1 block">Input</label>
+  <div class="grow">
+    <label for="input" class="text-600 mb-2 block">Input</label>
     <%= render(Settings::TextInputComponent.new) do |text| %>
       <% text.input do %>
         <input type="text" class="peer">

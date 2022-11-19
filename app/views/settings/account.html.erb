@@ -4,10 +4,20 @@
     </div>
     <div class="inset">
         <%= form_for(@user) do |f| %>
-            <h4 class="group-header"><%= f.label :email, "Email" %></h4>
-            <%= render "shared/input" do %>
-                <%= f.email_field :email, placeholder: 'Email' %>
+
+          <%= component "settings/control_group" do |group| %>
+            <% group.header do %>
+              <%= f.label :email, "Email" %>
             <% end %>
+          <% end %>
+
+          <%= component "settings/text_input" do |text| %>
+            <% text.input do %>
+              <%= f.email_field :email, placeholder: "Email", class: "peer" %>
+            <% end %>
+          <% end %>
+
+
             <div class="button-wrap">
                 <button type="submit" class="button">Update</button>
             </div>

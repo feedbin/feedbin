@@ -1,5 +1,4 @@
-class Settings::ControlRowComponent < ViewComponent::Base
-  include ApplicationHelper
+class Settings::ControlRowComponent < BaseComponent
   renders_one :title
   renders_one :description
   renders_one :control
