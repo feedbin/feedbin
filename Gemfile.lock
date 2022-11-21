@@ -560,6 +560,8 @@ GEM
     standard (1.18.0)
       rubocop (= 1.39.0)
       rubocop-performance (= 1.15.0)
+    stimulus-rails (1.1.1)
+      railties (>= 6.0.0)
     stripe (5.55.0)
     stripe_event (2.6.0)
       activesupport (>= 3.1)
@@ -685,6 +687,7 @@ DEPENDENCIES
   selenium-webdriver
   sidekiq (= 6.5.7)
   standard
+  stimulus-rails
   stripe (~> 5.55.0)
   stripe-ruby-mock!
   stripe_event
