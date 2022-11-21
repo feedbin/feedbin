@@ -6720,22 +6720,6 @@ Settings
   }
 }
 
-.sparkline {
-  margin-right: 16px;
-  polyline {
-    fill: transparent;
-    stroke: $color-accent-green-600;
-    stroke-linejoin: round;
-    stroke-linecap: round;
-  }
-  .gradient {
-    stop-color: $color-accent-green-600;
-  }
-  @media (max-width: $small-breakpoint) {
-    display: none;
-  }
-}
-
 .modal-purpose-action_preview {
   .action-description {
     border-radius: 8px;

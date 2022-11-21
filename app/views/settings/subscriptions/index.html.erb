@@ -4,7 +4,7 @@
 
 <%= form_tag settings_subscriptions_path, method: :get, remote: true, class: "feed-settings", data: {behavior: "spinner"} do %>
 
-  <div class="flex flex-col md:flex-row justify-between mb-6">
+  <div class="flex flex-col md:flex-row justify-between mb-6 gap-2">
     <div class="md:max-w-[250px]">
       <%= component "settings/text_input" do |input| %>
         <% input.input do %>
