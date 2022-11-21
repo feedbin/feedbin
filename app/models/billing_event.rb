@@ -32,7 +32,7 @@ class BillingEvent < ApplicationRecord
     end
 
     if subscription_deactivated?
-      billable.deactivate
+      billable.deactivate unless billable.plan.stripe_id == "free"
     end
 
     if subscription_reactivated?
