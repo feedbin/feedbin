@@ -1,25 +1,45 @@
-<div class="settings-content-inner">
-    <div class="settings-outer">
-        <h2>Subscriptions</h2>
-        <%= form_tag settings_subscriptions_path, method: :get, remote: true, class: "feed-settings", data: {behavior: "spinner"} do %>
-            <div class="toolbar">
-                <%= render "shared/input", class: "accessory-right accessory-left" do %>
-                    <input type="search" class="feed-search" placeholder="Search Feeds" data-behavior="autosubmit" name="q" value="<%= params[:q] %>" />
-                    <span class="accessory">
-                        <%= svg_tag "icon-search" %>
-                    </span>
-                    <span class="accessory right">
-                        <span class="spinner"></span>
-                    </span>
-                <% end %>
-                <%= render "shared/input", class: "last-control" do %>
-                    <%= select_tag :sort, options_for_select([["Sort by Name", "name"], ["Sort by Last Updated", "updated"], ["Sort by Volume", "volume"]], params[:sort]), class: "select", data: {behavior: "autosubmit"} %>
-                    <span class="accessory right">
-                        <%= svg_tag "icon-caret" %>
-                    </span>
-                <% end %>
-            </div>
+<%= component "settings/header" do %>
+  Settings
+<% end %>
+
+<%= form_tag settings_subscriptions_path, method: :get, remote: true, class: "feed-settings", data: {behavior: "spinner"} do %>
+
+  <div class="flex gap-2">
+    <div class="max-w-[250px]">
+      <%= component "settings/text_input" do |text| %>
+        <% text.input do %>
+          <input type="search" class="feed-search peer" placeholder="Search Feeds" data-behavior="autosubmit" name="q" value="<%= params[:q] %>" />
         <% end %>
+        <% text.accessory_leading do %>
+          <%= svg_tag "icon-search", class: "fill-400 pg-focus:fill-blue-600" %>
+        <% end %>
+        <% text.accessory_trailing position: "trailing" do %>
+          <span class="spinner"></span>
+        <% end %>
+      <% end %>
     </div>
-    <%= render partial: "subscriptions_list" %>
-</div>
+    
+  </div>
+
+  <div class="flex">
+    <%= render "shared/input", class: "accessory-right accessory-left" do %>
+      <input type="search" class="feed-search" placeholder="Search Feeds" data-behavior="autosubmit" name="q" value="<%= params[:q] %>" />
+      <span class="accessory">
+          <%= svg_tag "icon-search" %>
+      </span>
+      <span class="accessory right">
+          <span class="spinner"></span>
+      </span>
+    <% end %>
+
+
+    <%= render "shared/input", class: "last-control" do %>
+      <%= select_tag :sort, options_for_select([["Sort by Name", "name"], ["Sort by Last Updated", "updated"], ["Sort by Volume", "volume"]], params[:sort]), class: "select", data: {behavior: "autosubmit"} %>
+      <span class="accessory right">
+        <%= svg_tag "icon-caret" %>
+      </span>
+    <% end %>
+  </div>
+<% end %>
+
+<%= render partial: "subscriptions_list" %>
