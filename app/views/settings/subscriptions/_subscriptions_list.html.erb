@@ -1,8 +1,8 @@
 <div data-behavior="subscriptions_list">
-  <%= form_tag update_multiple_settings_subscriptions_path, method: :patch, autocomplete: 'off' do |update_form| %>
+  <%= form_tag update_multiple_settings_subscriptions_path, method: :patch, autocomplete: "off", class: "group", data: {controller: "toggle-checkboxes", toggle_checkboxes_include_all_visible_value: "false"} do |update_form| %>
     <%= hidden_field_tag :q, params[:q] %>
     <div class="p-4 flex border rounded-t-lg items-baseline justify-between">
-      <input type="checkbox" class="peer" data-behavior="toggle_checked" id="select_all_feeds" />
+      <input type="checkbox" class="peer" data-behavior="toggle_checked" data-action="toggle-checkboxes#toggle" id="select_all_feeds" />
       <label for="select_all_feeds" class="group flex gap-2 items-center" data-behavior="toggle_checked">
         <%= component "settings/check_box" %>
         Select all
@@ -11,7 +11,7 @@
       <div class="max-w-[250px]">
         <%= component "settings/select_input" do |input| %>
           <% input.input do %>
-            <%= select_tag :operation, options_for_select([["Actions", nil], ["Unsubscribe", "unsubscribe"], ["Show edits on articles", "show_updates"], ["Hide edits on articles", "hide_updates"], ["Mute Feed", "mute"], ["Unmute Feed", "unmute"]]), class: "peer", disabled: true, data: {behavior: "feed_actions enable_control_target"} %>
+            <%= select_tag :operation, options_for_select([["Actions", nil], ["Unsubscribe", "unsubscribe"], ["Show edits on articles", "show_updates"], ["Hide edits on articles", "hide_updates"], ["Mute Feed", "mute"], ["Unmute Feed", "unmute"]]), class: "peer", disabled: true, data: {behavior: "feed_actions", toggle_checkboxes_target: "actions"} %>
           <% end %>
           <% input.accessory_trailing position: "trailing" do %>
             <%= svg_tag "icon-caret", class: "fill-400 pg-focus:fill-blue-600 pg-disabled:fill-200" %>
@@ -20,14 +20,14 @@
       </div>
     </div>
     <% if @subscriptions.total_entries > @subscriptions.count  %>
-      <div class="border border-t-0 py-3 px-4 hide" data-behavior="toggle_checked_hidden">
-        <%= check_box_tag "include_all", 1, false, data: {behavior: "include_all"}, class: "peer", id: "include_all_feeds" %>
+      <div class="border border-t-0 py-3 px-4 block group-data-[toggle-checkboxes-include-all-visible-value=false]:hidden">
+        <%= check_box_tag "include_all", 1, false, data: {behavior: "include_all", action: "toggle-checkboxes#includeAll", toggle_checkboxes_target: "includeAll"}, class: "peer", id: "include_all_feeds" %>
         <label for="include_all_feeds" class="group flex gap-2 items-center">
           <%= component "settings/check_box" %>
           <% if params[:q] %>
-            Include all <%= number_with_delimiter(@subscriptions.total_entries) %> <%= "feed".pluralize(@subscriptions.total_entries) %> matching this search.
+            Include all <%= number_with_delimiter(@subscriptions.total_entries) %> <%= "subscription".pluralize(@subscriptions.total_entries) %> matching this search
           <% else %>
-            Include all <%= number_with_delimiter(@subscriptions.total_entries) %> <%= "feed".pluralize(@subscriptions.total_entries) %>.
+            Include all <%= number_with_delimiter(@subscriptions.total_entries) %> <%= "subscription".pluralize(@subscriptions.total_entries) %>
           <% end %>
         </label>
       </div>
@@ -40,7 +40,7 @@
             <li class="flex items-center relative border-b border-x gap-2 last:rounded-b-lg">
 
               <div class="shrink-0 w-[32px] self-stretch flex">
-                  <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "peer", data: {behavior: "enable_control"} %>
+                  <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "peer", data: {action: "toggle-checkboxes#toggleActions", toggle_checkboxes_target: "checkbox"} %>
                   <label class="group w-full h-full flex justify-end pt-[16px]" for="<%= "subscription_checkbox_#{subscription.id}" %>">
                     <%= component "settings/check_box" %>
                   </label>

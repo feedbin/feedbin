@@ -2013,29 +2013,6 @@ $.extend feedbin,
           $(@).closest('form').submit()
 
     checkBoxToggle: ->
-      $(document).on 'change', '[data-behavior~=include_all]', (event) ->
-        if $(@).is(':checked')
-          $('[data-behavior~=toggle_checked_target] [type="checkbox"][name]').prop('checked', true).change()
-          $('[data-behavior~=toggle_checked_target] [type="checkbox"][name]').prop('disabled', true)
-        else
-          $('[data-behavior~=toggle_checked_target] [type="checkbox"][name]').prop('disabled', false)
-
-      $(document).on 'change', '[data-behavior~=toggle_checked]', (event) ->
-        $('[data-behavior~=toggle_checked_hidden]').toggleClass('hide')
-        $('[data-behavior~=toggle_checked_hidden] [type="checkbox"]').prop('checked', false).change()
-        if $(@).is(':checked')
-          $('[data-behavior~=toggle_checked_target] [type="checkbox"][name]').prop('checked', true).change()
-        else
-          $('[data-behavior~=toggle_checked_target] [type="checkbox"][name]').prop('checked', false).change()
-        event.preventDefault()
-        return
-
-      $(document).on 'change', '[data-behavior~=enable_control]', (event) ->
-        if $('[data-behavior~=enable_control]:checked').length == 0
-          $('[data-behavior~=enable_control_target]').prop('disabled', true)
-        else
-          $('[data-behavior~=enable_control_target]').prop('disabled', false)
-
       $(document).on 'change', '[data-behavior~=check_feeds]', (event) ->
         checkboxes = $('[data-behavior~=collection_checkbox]')
         if $(@).is(':checked')
