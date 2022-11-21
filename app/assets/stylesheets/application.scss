@@ -9509,6 +9509,9 @@ button.close {
   bottom: 0;
   width: 64px;
   right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   @media (max-width: $small-breakpoint) {
     width: 51px;
   }

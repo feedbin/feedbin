@@ -89,4 +89,7 @@
   .border-shim {
     border: 0px solid black;
   }
+  .tw-hidden {
+    display: none;
+  }
 }

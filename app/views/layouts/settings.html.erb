@@ -8,15 +8,15 @@
       <%= render partial: "shared/message_flash", locals: {flash: flash} %>
   </script>
   <div class="flex antialiased">
-      <div class="w-[310px] bg-sidebar border-r p-6">
+      <div class="w-[310px] bg-sidebar border-r p-6 tw-hidden md:block">
           <a href="/" class="block pt-4">
               <%= svg_tag "logo-full", inline: true, class: "w-[140px] h-[38px]" %>
           </a>
           <%= render partial: "shared/settings_nav" %>
       </div>
       <div class="relative bg-base grow max-w-full min-w-0">
-          <button class="reset settings-menu-button" data-behavior="open_modal" data-modal-target="settings_nav">
-              <%= svg_tag "icon-menu" %>
+          <button class="flex h-[36px] w-[36px] absolute top-[45px] right-[8px] items-center justify-end md:hidden" data-behavior="open_modal" data-modal-target="settings_nav">
+              <%= svg_tag "icon-menu", class: "fill-600" %>
           </button>
           <div class="max-w-[700px] px-2 md:pr-[20px] md:pl-[37px]">
             <%= yield %>

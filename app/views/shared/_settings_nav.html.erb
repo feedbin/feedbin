@@ -1,6 +1,8 @@
-<%= component "settings_nav/header" do %>
-  General
-<% end %>
+<div class="group-data-[nav=modal]:-mt-4">
+  <%= component "settings_nav/header" do %>
+    General
+  <% end %>
+</div>
 
 <ul>
   <%= component "settings_nav/nav",
@@ -9,7 +11,6 @@
     url: root_path,
     icon: "menu-icon-app",
     classes: "md:hidden"
-
   %>
 
   <%= component "settings_nav/nav",
@@ -40,6 +41,10 @@
 <%= component "settings_nav/header" do %>
   Tools
 <% end %>
+
+<div class="px-4 pl-10 tw-hidden group-data-[nav=dropdown]:block">
+  <hr class="m-0">
+</div>
 
 <ul>
   <%= component "settings_nav/nav",
@@ -81,6 +86,10 @@
   Admin
 <% end %>
 
+<div class="px-4 pl-10 tw-hidden group-data-[nav=dropdown]:block">
+  <hr class="m-0">
+</div>
+
 <ul>
   <%= component "settings_nav/nav",
       title: "Account",
@@ -117,50 +126,50 @@
   <% end %>
 </ul>
 
-
-<ul class="nav">
-    <li class="log-out divider">
-        <%= link_to logout_path, method: "delete" do %>
-            <span class="icon-wrap">
-                <%= svg_tag "menu-icon-log-out", inline: true %>
-            </span>
-            <span class="menu-text">
-                <span class="title">Log Out</span>
-            </span>
-        <% end %>
-    </li>
-</ul>
-
-<div class="p-4">
-  <hr>
+<div class="px-4 pl-10 tw-hidden group-data-[nav=dropdown]:block">
+  <hr class="m-0">
 </div>
 
-<ul>
-  <%= component "settings_nav/nav_small", url: "/home" do %>
-    Home
-  <% end %>
-  <%= component "settings_nav/nav_small", url: "/blog" do %>
-    Blog
-  <% end %>
-  <%= component "settings_nav/nav_small", url: "/apps" do %>
-    Apps
-  <% end %>
-  <%= component "settings_nav/nav_small", url: "/help" do %>
-    Help
-  <% end %>
-  <%= component "settings_nav/nav_small", url: "https://github.com/feedbin/feedbin-api#readme" do %>
-    API
-  <% end %>
-  <%= component "settings_nav/nav_small", url: "/privacy-policy" do %>
-    Privacy Policy
-  <% end %>
-  <%= component "settings_nav/nav_small", url: "mailto:support@feedbin.com" do %>
-    Email
-  <% end %>
-  <%= component "settings_nav/nav_small", url: "https://twitter.com/feedbin" do %>
-    Twitter
-  <% end %>
-  <%= component "settings_nav/nav_small", url: logout_path, method: "delete" do %>
-    Log Out
-  <% end %>
+<ul class="tw-hidden group-data-[nav=dropdown]:block">
+  <%= component "settings_nav/nav",
+      title: "Log Out",
+      url: [logout_path, {method: :delete}],
+      icon: "menu-icon-log-out"
+  %>
 </ul>
+
+<div class="group-data-[nav=dropdown]:hidden">
+  <div class="p-4 group-data-[nav=modal]:py-0">
+    <hr>
+  </div>
+
+  <ul>
+    <%= component "settings_nav/nav_small", url: "/home" do %>
+      Home
+    <% end %>
+    <%= component "settings_nav/nav_small", url: "/blog" do %>
+      Blog
+    <% end %>
+    <%= component "settings_nav/nav_small", url: "/apps" do %>
+      Apps
+    <% end %>
+    <%= component "settings_nav/nav_small", url: "/help" do %>
+      Help
+    <% end %>
+    <%= component "settings_nav/nav_small", url: "https://github.com/feedbin/feedbin-api#readme" do %>
+      API
+    <% end %>
+    <%= component "settings_nav/nav_small", url: "/privacy-policy" do %>
+      Privacy Policy
+    <% end %>
+    <%= component "settings_nav/nav_small", url: "mailto:support@feedbin.com" do %>
+      Email
+    <% end %>
+    <%= component "settings_nav/nav_small", url: "https://twitter.com/feedbin" do %>
+      Twitter
+    <% end %>
+    <%= component "settings_nav/nav_small", url: logout_path, method: "delete" do %>
+      Log Out
+    <% end %>
+  </ul>
+</div>

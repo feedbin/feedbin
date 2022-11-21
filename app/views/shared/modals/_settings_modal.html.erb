@@ -5,7 +5,9 @@
 <% end %>
 
 <% content_for :modal_body, flush: true do %>
+<div data-nav="modal" class="group">
     <%= render partial: 'shared/settings_nav' %>
+</div>
 <% end %>
 
 <% content_for :modal_footer, "", flush: true %>
