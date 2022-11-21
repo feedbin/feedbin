@@ -75,13 +75,16 @@
     @apply sr-only;
   }
   textarea,
+  select,
   input[type="text"],
   input[type="password"],
   input[type="email"],
   input[type="url"],
   input[type="search"] {
-    @apply py-[8px] px-[7px] max-w-full text-sm bg-200 rounded text-600 ring-0 block grow
-    focus:outline-none focus:outline-transparent focus:bg-100 focus:text-700 ;
+    @apply py-[8px] px-[7px] max-w-full text-sm bg-200 rounded text-600 ring-0 block grow appearance-none border-0
+    disabled:bg-300 disabled:text-200
+    focus:outline-none focus:outline-transparent focus:bg-100 focus:text-700;
+    line-height: normal !important;
   }
 }
 
