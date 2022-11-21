@@ -9,4 +9,4 @@ Rails.application.config.assets.version = "2.0"
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in the app/assets
 # folder are already added.
-Rails.application.config.assets.precompile += %w[lib/lib.js lib/turbolinks.js bookmarklet.js payments.js]
+Rails.application.config.assets.precompile += %w[lib/lib.js lib/turbolinks.js web.js bookmarklet.js payments.js]
