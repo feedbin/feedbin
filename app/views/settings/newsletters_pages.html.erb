@@ -117,12 +117,13 @@
   <% end %>
 <% end %>
 
-  <%= component "settings/control_group", class: "group [&_li]:border-0", data: {controller: "expandable", expandable_open_value: "false"} do |group| %>
-    <% group.header do %>
+<% if @user.newsletter_senders.exists? %>
+  <%= component "settings/expandable" do |expandable| %>
+    <% expandable.header do %>
       Advanced
     <% end %>
 
-    <% group.item do %>
+    <% expandable.description do %>
       <%= component "settings/control_row" do |row| %>
         <% row.title { "Newsletter Senders" } %>
         <% row.description do %>
@@ -134,64 +135,24 @@
       <% end %>
     <% end %>
 
-    <% group.item do %>
-      <div data-expandable-target="container" class="max-h-0 duration-200 transition-all overflow-hidden">
-        <ul data-expandable-target="content" class="border-t transition opacity-100 group-data-[expandable-open-value=false]:opacity-0">
-          <li class="!border-b">
-            <%= component "settings/control_row" do |r| %>
-              <% r.title { "title" } %>
+    <% @user.newsletter_senders.each do |newsletter_sender| %>
+      <% expandable.item do %>
+        <%= form_with(model: newsletter_sender, url: newsletter_senders_settings_subscription_path(newsletter_sender.feed_id), data: {remote: true}) do |f| %>
+          <%= f.check_box :feed_id, {id: "newsletter_sender_#{newsletter_sender.feed_id}", checked: @subscription_ids.include?(newsletter_sender.feed_id), class: "peer", data: {behavior: "auto_submit"}} %>
+          <%= f.label :feed_id, for: "newsletter_sender_#{newsletter_sender.feed_id}", class: "group" do %>
+            <%= component "settings/switch" do |button| %>
+              <% button.title do %>
+                 <%= newsletter_sender.name %> <span class="text-500">&lt;<%= newsletter_sender.email %>&gt;</span>
+              <% end %>
+              <% if newsletter_sender.full_token != newsletter_sender.token %>
+                <% button.description do %>
+                   Sent to <%= newsletter_sender.full_token %>@newsletters.feedbin.com
+                <% end %>
+              <% end %>
             <% end %>
-          </li>
-          <li class="!border-b last:!border-b-0">
-            <%= component "settings/control_row" do |r| %>
-              <% r.title { "title" } %>
-            <% end %>
-          </li>
-        </ul>
-      </div>
+          <% end %>
+        <% end %>
+      <% end %>
     <% end %>
   <% end %>
-
-
-
-    <% if @user.newsletter_senders.exists? %>
-        <div class="inset">
-            <h4 class="group-header">Advanced</h4>
-            <ul class="sharing-services">
-                <li>
-                    <div class="service-header">
-                        <div>
-                            <div class="header">
-                                <p class="service-title">Newsletter Senders</p>
-                            </div>
-                            <p class="control-group-description" style="margin-left: 0;">These are the senders of newsletters you have received. Feedbin blocks messages from senders that have been deactivated. Reactivate a sender to resubscribe.</p>
-                        </div>
-                        <div class="last-control button-wrap-inline">
-                            <%= button_tag "Show Senders", class: 'button button-secondary', data: {behavior: "toggle_service_options", toggle_text: "Hide Senders"} %>
-                        </div>
-                    </div>
-                    <div class="service-options-wrap">
-                        <div class="service-options nested-controls">
-                            <ul class="control-group">
-                                <% @user.newsletter_senders.each do |newsletter_sender| %>
-                                   <li>
-                                        <%= form_with(model: newsletter_sender, url: newsletter_senders_settings_subscription_path(newsletter_sender.feed_id), data: {remote: true}) do |f| %>
-                                            <%= f.check_box :feed_id, {id: "newsletter_sender_#{newsletter_sender.feed_id}", checked: @subscription_ids.include?(newsletter_sender.feed_id), data: {behavior: "auto_submit"}} %>
-                                            <%= f.label :feed_id, for: "newsletter_sender_#{newsletter_sender.feed_id}" do %>
-                                               <%= newsletter_sender.name %> <span class="extra-muted">&lt;<%= newsletter_sender.email %>&gt;</span> <%= toggle_switch %>
-                                               <% if newsletter_sender.full_token != newsletter_sender.token %>
-                                                   <p class="control-group-description">
-                                                       <%= "Sent to #{newsletter_sender.full_token}@newsletters.feedbin.com" %>
-                                                   </p>
-                                               <% end %>
-                                            <% end %>
-                                        <% end %>
-                                   </li>
-                                <% end %>
-                            </ul>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    <% end %>
+<% end %>
