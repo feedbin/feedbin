@@ -6335,170 +6335,6 @@ Settings
         }
       }
     }
-    .chart-wrap {
-      line-height: 1;
-      display: flex;
-      margin-bottom: 32px;
-      padding: 0 0 21px 0;
-      .graph-wrap {
-        flex: 1 1 auto;
-        padding-top: 20%;
-        @include border-bottom($color-borders);
-        margin-right: 5px;
-        position: relative;
-        .graph-lines {
-          display: flex;
-          flex: 0 0 auto;
-          flex-direction: column;
-          justify-content: space-between;
-          text-align: right;
-          position: absolute;
-          top: 0;
-          left: 0;
-          bottom: 2px;
-          right: 0;
-          div {
-            width: 100%;
-            @include border-top($color-contrast-200);
-            border-top-style: dashed;
-            &:last-child {
-              visibility: hidden;
-            }
-          }
-        }
-        .graph {
-          display: flex;
-          align-items: stretch;
-          flex-wrap: nowrap;
-          position: absolute;
-          top: 0;
-          left: 0;
-          bottom: 2px;
-          right: 0;
-          .bar-sleeve {
-            flex-wrap: nowrap;
-            display: flex;
-            align-items: flex-end;
-            flex: 1;
-            &:first-child .bar {
-              margin: 0;
-            }
-          }
-          .bar {
-            margin-left: 2px;
-            content: "";
-            flex: 1;
-            background-color: $color-accent-green-600;
-            min-height: 1px;
-            border-radius: 2px 2px 0 0;
-            &.zero {
-              border-radius: 0;
-            }
-          }
-        }
-      }
-      .tooltip-large {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        @include background-color($color-contrast-100);
-        @include border($color-borders);
-        padding: 0.5rem;
-        font-size: to_rem(10);
-        border-radius: 3px;
-        white-space: nowrap;
-        opacity: 1;
-        transition: opacity 0.2s ease;
-        &:after {
-          width: 0;
-          height: 0;
-          border: 0 solid transparent;
-          border-left-width: 3px;
-          border-right-width: 3px;
-          border-top-width: 3px;
-          @include theme("border-top-color", $color-contrast-100);
-          content: "";
-          display: block;
-          position: absolute;
-          bottom: -3px;
-          left: 14px;
-        }
-        &:before {
-          width: 0;
-          height: 0;
-          border: 0 solid transparent;
-          border-left-width: 4px;
-          border-right-width: 4px;
-          border-top-width: 4px;
-          @include theme("border-top-color", $color-borders);
-          content: "";
-          display: block;
-          position: absolute;
-          bottom: -4px;
-          left: 13px;
-        }
-        &.right {
-          &:after {
-            right: 10px;
-            left: auto;
-          }
-          &:before {
-            right: 9px;
-            left: auto;
-          }
-        }
-        &.hide {
-          opacity: 0;
-        }
-        .date {
-          text-transform: uppercase;
-          @include color($color-contrast-500);
-          margin-bottom: 0.25rem;
-        }
-        .count {
-          @include color($color-contrast-600);
-          font-weight: bold;
-        }
-      }
-    }
-    .y-axis {
-      display: flex;
-      flex: 0 0 auto;
-      flex-direction: column;
-      justify-content: space-between;
-      text-align: right;
-      div {
-        position: relative;
-        &:nth-child(1n) {
-          top: -5px;
-        }
-        &:nth-child(2n) {
-          top: -3px;
-        }
-        &:nth-child(3n) {
-          top: -1px;
-        }
-        &:nth-child(4n) {
-          top: 1px;
-        }
-        &:nth-child(5n) {
-          top: 3px;
-        }
-      }
-    }
-    .x-axis {
-      position: absolute;
-      right: 0;
-      left: 0;
-      bottom: -18px;
-      justify-content: space-between;
-      display: flex;
-    }
-    .x-axis,
-    .y-axis {
-      @include color($color-contrast-400);
-      font-size: 12px;
-    }
     .stats td {
       max-width: 100px;
       overflow: hidden;
@@ -6717,6 +6553,171 @@ Settings
       justify-content: center;
       flex: 0 0 auto;
     }
+  }
+}
+
+.chart-wrap {
+  line-height: 1;
+  display: flex;
+  margin-bottom: 32px;
+  padding: 0 0 21px 0;
+  .graph-wrap {
+    flex: 1 1 auto;
+    padding-top: 20%;
+    @include border-bottom($color-borders);
+    margin-right: 5px;
+    position: relative;
+    .graph-lines {
+      display: flex;
+      flex: 0 0 auto;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: right;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 2px;
+      right: 0;
+      div {
+        width: 100%;
+        @include border-top($color-contrast-200);
+        border-top-style: dashed;
+        &:last-child {
+          visibility: hidden;
+        }
+      }
+    }
+    .graph {
+      display: flex;
+      align-items: stretch;
+      flex-wrap: nowrap;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 2px;
+      right: 0;
+      .bar-sleeve {
+        flex-wrap: nowrap;
+        display: flex;
+        align-items: flex-end;
+        flex: 1;
+        &:first-child .bar {
+          margin: 0;
+        }
+      }
+      .bar {
+        margin-left: 2px;
+        content: "";
+        flex: 1;
+        background-color: $color-accent-green-600;
+        min-height: 1px;
+        border-radius: 2px 2px 0 0;
+        &.zero {
+          border-radius: 0;
+        }
+      }
+    }
+  }
+  .tooltip-large {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    @include background-color($color-contrast-100);
+    @include border($color-borders);
+    padding: 0.5rem;
+    font-size: to_rem(10);
+    border-radius: 3px;
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+    &:after {
+      width: 0;
+      height: 0;
+      border: 0 solid transparent;
+      border-left-width: 3px;
+      border-right-width: 3px;
+      border-top-width: 3px;
+      @include theme("border-top-color", $color-contrast-100);
+      content: "";
+      display: block;
+      position: absolute;
+      bottom: -3px;
+      left: 14px;
+    }
+    &:before {
+      width: 0;
+      height: 0;
+      border: 0 solid transparent;
+      border-left-width: 4px;
+      border-right-width: 4px;
+      border-top-width: 4px;
+      @include theme("border-top-color", $color-borders);
+      content: "";
+      display: block;
+      position: absolute;
+      bottom: -4px;
+      left: 13px;
+    }
+    &.right {
+      &:after {
+        right: 10px;
+        left: auto;
+      }
+      &:before {
+        right: 9px;
+        left: auto;
+      }
+    }
+    &.hide {
+      opacity: 0;
+    }
+    .date {
+      text-transform: uppercase;
+      @include color($color-contrast-500);
+      margin-bottom: 0.25rem;
+    }
+    .count {
+      @include color($color-contrast-600);
+      font-weight: bold;
+    }
+  }
+  .y-axis {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: right;
+    div {
+      position: relative;
+      &:nth-child(1n) {
+        top: -5px;
+      }
+      &:nth-child(2n) {
+        top: -3px;
+      }
+      &:nth-child(3n) {
+        top: -1px;
+      }
+      &:nth-child(4n) {
+        top: 1px;
+      }
+      &:nth-child(5n) {
+        top: 3px;
+      }
+    }
+  }
+  .x-axis {
+    position: absolute;
+    right: 0;
+    left: 0;
+    bottom: -18px;
+    justify-content: space-between;
+    display: flex;
+  }
+  .x-axis,
+  .y-axis {
+    @include color($color-contrast-400);
+    font-size: 12px;
   }
 }
 

@@ -1,3 +1,42 @@
+<%= component "settings/header" do %>
+  Sources
+<% end %>
+
+<%= component "settings/control_group" do |group| %>
+  <% group.header do %>
+    Twitter
+  <% end %>
+
+  <% if @user.twitter_enabled? %>
+    <% group.item do %>
+      <%= component "settings/control_row" do |row| %>
+        <% row.title { "Account" } %>
+        <% row.description do %>
+          You are logged in to Twitter as <strong>@<%= @user.twitter_screen_name %></strong>.
+        <% end %>
+        <% row.control do %>
+          <%= link_to "Log Out", delete_twitter_authentications_path, method: :delete, class: "button button-secondary", data: {confirm: "Are you sure? This will deactivate your Twitter subscriptions."} %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <% group.item do %>
+      <%= component "settings/control_row" do |row| %>
+        <% row.title { "Account" } %>
+        <% row.description do %>
+          You are logged in to Twitter as <strong>@<%= @user.twitter_screen_name %></strong>.
+        <% end %>
+
+        <% row.control do %>
+          <%= link_to "Log Out", delete_twitter_authentications_path, method: :delete, class: "button button-secondary", data: {confirm: "Are you sure? This will deactivate your Twitter subscriptions."} %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+<% end %>
+
+
 <div class="settings-content-inner">
     <div class="settings-outer">
         <h2>Sources</h2>

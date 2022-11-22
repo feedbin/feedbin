@@ -2,8 +2,8 @@
   <%= form_tag update_multiple_settings_subscriptions_path, method: :patch, autocomplete: "off", class: "group", data: {controller: "toggle-checkboxes", toggle_checkboxes_include_all_visible_value: "false"} do |update_form| %>
     <%= hidden_field_tag :q, params[:q] %>
     <div class="p-4 flex border rounded-t-lg items-baseline justify-between">
-      <input type="checkbox" class="peer" data-behavior="toggle_checked" data-action="toggle-checkboxes#toggle" id="select_all_feeds" />
-      <label for="select_all_feeds" class="group flex gap-2 items-center" data-behavior="toggle_checked">
+      <input type="checkbox" class="peer" data-action="toggle-checkboxes#toggle" id="select_all_feeds" />
+      <label for="select_all_feeds" class="group flex gap-2 items-center">
         <%= component "settings/check_box" %>
         Select all
       </label>
@@ -21,7 +21,7 @@
     </div>
     <% if @subscriptions.total_entries > @subscriptions.count  %>
       <div class="border border-t-0 py-3 px-4 block group-data-[toggle-checkboxes-include-all-visible-value=false]:hidden">
-        <%= check_box_tag "include_all", 1, false, data: {behavior: "include_all", action: "toggle-checkboxes#includeAll", toggle_checkboxes_target: "includeAll"}, class: "peer", id: "include_all_feeds" %>
+        <%= check_box_tag "include_all", 1, false, data: {action: "toggle-checkboxes#includeAll", toggle_checkboxes_target: "includeAll"}, class: "peer", id: "include_all_feeds" %>
         <label for="include_all_feeds" class="group flex gap-2 items-center">
           <%= component "settings/check_box" %>
           <% if params[:q] %>
@@ -33,7 +33,7 @@
       </div>
     <% end %>
 
-    <ul class="mb-4" data-behavior="toggle_checked_target">
+    <ul class="mb-4">
       <% @subscriptions.each do |subscription| %>
         <% present subscription do |subscription_presenter| %>
           <%= fields_for "subscriptions[]", subscription do |f| %>
