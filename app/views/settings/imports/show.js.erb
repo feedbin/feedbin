@@ -1,0 +1,5 @@
+$("[data-content-src='<%= j settings_import_path(@import) %>']").html('<%= j render partial: "status" %>');
+feedbin.faviconColors()
+<% if @import.complete? %>
+clearInterval(feedbin.remoteContentIntervals["<%= j request.path_info %>"]);
+<% end %>

@@ -11,6 +11,17 @@ class Settings::ImportsController < ApplicationController
     render layout: "settings"
   end
 
+  def show
+    @import = @user.imports.find(params[:id])
+    @failed_items = @import.import_items.failed.order(updated_at: :asc)
+    respond_to do |format|
+      format.js
+      format.html do
+        render layout: "settings"
+      end
+    end
+  end
+
   def create
     if rate_limited?(3, 1.day)
       redirect_to settings_import_export_url, alert: "Too many upload requests."
@@ -29,7 +40,7 @@ class Settings::ImportsController < ApplicationController
     @import = @user.imports.new(filename: upload.original_filename, xml: upload.tempfile.read)
 
     if @import.save
-      redirect_to settings_import_export_url, notice: "Import has started."
+      redirect_to settings_import_url(@import), notice: "Import has started."
     else
       @messages = @import.errors.full_messages
       flash[:error] = render_to_string partial: "shared/messages"

@@ -100,13 +100,23 @@ module ApplicationHelper
     " [#{branch_name.chomp}]"
   end
 
-  def favicon_with_host(host)
+  def favicon_with_host(host, generated: false)
     record = Favicon.find_by(host: host)
     if record && record.url.present?
       favicon_template(record.cdn_url)
+    elsif generated
+      favicon_placeholder_template(host)
     else
       favicon_url = favicon_service_url(host)
       favicon_template(favicon_url)
+    end
+  end
+
+  def favicon_placeholder_template(host)
+    content_tag :span, "", class: "favicon-wrap" do
+      content_tag :span, class: "favicon-default favicon-mask", data: { color_hash_seed: host } do
+        content_tag :span, "", class: "favicon-inner"
+      end
     end
   end
 

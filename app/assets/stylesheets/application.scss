@@ -6011,18 +6011,6 @@ Settings
       }
     }
   }
-  .progress-bar {
-    margin: 16px 0 32px;
-    @include background-color($color-contrast-100);
-    border-radius: 4px;
-    display: block;
-    width: 100%;
-    overflow: hidden;
-    .progress-bar-inner {
-      background-color: $color-accent-green-600;
-      height: 8px;
-    }
-  }
   .subscribe-email {
     word-break: break-all;
   }

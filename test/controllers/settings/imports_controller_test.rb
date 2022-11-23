@@ -22,7 +22,7 @@ class Settings::ImportsControllerTest < ActionController::TestCase
       }
     end
 
-    assert_redirected_to settings_import_export_url
+    assert_redirected_to settings_import_url(Import.last)
   end
 
   test "should show import error" do
