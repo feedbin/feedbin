@@ -1,86 +1,100 @@
 <% if @migration.pending? %>
-    <p class="muted">Welcome to Feedbin. You can migrate your subscriptions, unread and starred articles. Besides following your favorite feeds, you can now add Twitter, newsletters and more.</p>
-    <%= form_with model: @migration, url: start_account_migration_path(@migration) do |f| %>
-        <%= button_tag "Begin Migration", type: "submit", class: "button button-huge" %>
-    <% end %>
+  <p class="mb-4">Welcome to Feedbin. You can migrate your subscriptions, unread and starred articles. Besides following your favorite feeds, you can now add Twitter, newsletters and more.</p>
+  <%= form_with model: @migration, url: start_account_migration_path(@migration) do |f| %>
+    <%= button_tag "Begin Migration", type: "submit", class: "button button-huge" %>
+  <% end %>
 <% elsif @migration.failed? %>
-    <%= render "shared/error_message" do %>
-        <%= @migration.message %>
-    <% end %>
+  <%= render "shared/error_message" do %>
+    <%= @migration.message %>
+  <% end %>
 <% elsif @migration.started? || @migration.processing? || @migration.complete? %>
-    <div class="inset">
-        <div class="pill-block">
-            <div class="toolbar baseline">
-                <h4 class="group-header">Progress</h4>
-                <div class="last-control">
-                    <h4 class="group-header" style="font-size: 14px;"><%= number_with_delimiter(@migration.account_migration_items.where.not(status: :pending).count) %> of <%= number_with_delimiter(@migration.account_migration_items.count) %> imported</h4>
-                </div>
-            </div>
-
-            <div class="progress-bar">
-                <%= content_tag :div, "", class: "progress-bar-inner", style: "width: #{number_to_percentage(@migration.percentage_complete)};" %>
-            </div>
-
-            <% if @migration.started? %>
-                Initializing…
-            <% else %>
-            <h4 class="group-header">Stats</h4>
-            <div class="feed-profile">
-                <table class="table table-striped stats">
-                    <tbody>
-                        <tr>
-                            <td>
-                                Subscriptions
-                            </td>
-                            <td class="extra-muted">
-                                <%= number_with_delimiter(current_user.subscriptions.count) %>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Starred Articles
-                            </td>
-                            <td class="extra-muted">
-                                <%= number_with_delimiter(current_user.starred_entries.count) %>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Unread Articles
-                            </td>
-                            <td class="extra-muted">
-                                <%= number_with_delimiter(current_user.unread_entries.count) %>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <% end %>
-
+  <%= component "settings/control_group", class: "group", data: {capsule: "true"} do |group| %>
+    <% group.item do %>
+      <div class="py-3 px-4">
+        <div class="flex justify-between">
+          <strong class="text-bold">Progress</strong>
+          <div class="text-500"><%= number_with_delimiter(@migration.account_migration_items.where.not(status: :pending).count) %> of <%= number_with_delimiter(@migration.account_migration_items.count) %> processed</div>
         </div>
+
+        <div class="flex mt-4 mb-2 bg-100 rounded w-full overflow-hidden">
+          <%= content_tag :div, "", class: "h-[26px] bg-green-600", style: "width: #{@migration.percentage_complete}%;" %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% if @migration.started? %>
+      Initializing…
+  <% else %>
+    <%= component "settings/control_group" do |group| %>
+      <% group.header do %>
+        Stats
+      <% end %>
+
+      <% group.item do %>
+        <%= component "settings/control_row" do |row| %>
+          <% row.title { "Subscriptions" } %>
+          <% row.control do %>
+            <span class="text-500">
+              <%= number_with_delimiter(current_user.subscriptions.count) %>
+            </span>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <% group.item do %>
+        <%= component "settings/control_row" do |row| %>
+          <% row.title { "Starred Articles" } %>
+          <% row.control do %>
+            <span class="text-500">
+              <%= number_with_delimiter(current_user.starred_entries.count) %>
+            </span>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <% group.item do %>
+        <%= component "settings/control_row" do |row| %>
+          <% row.title { "Unread Articles" } %>
+          <% row.control do %>
+            <span class="text-500">
+              <%= number_with_delimiter(current_user.unread_entries.count) %>
+            </span>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+<% end %>
+
+<% if @migration.processing? || @migration.complete? %>
+
+  <% if @migration.account_migration_items.failed.exists? %>
+    <div class="flex justify-between items-baseline">
+      <%= component "settings/section_header" do %>
+        Missing Feeds
+      <% end %>
+      <div class="text-500">
+        <%= number_with_delimiter(@migration.account_migration_items.failed.count) %>
+      </div>
     </div>
 
-    <% if @migration.processing? || @migration.complete? %>
-    <div class="inset">
-        <h4 class="group-header">Subscriptions</h4>
-        <ul class="pill-list">
-            <% @migration.account_migration_items.natural_sort_by {|item| item.fw_feed.dig("title")&.gsub(/\s/, "") }.each do |item| %>
-            <li>
-                <div class="toolbar">
-                    <div>
-                        <%= item.fw_feed.dig("title") %>
-                        <br>
-                        <small>
-                            <%= link_to item.fw_feed.dig("feed_url"), target: :_blank, rel: "noopener noreferrer", class: "extra-muted" do  %>
-                                <%= short_url(item.fw_feed.dig("feed_url")) %>
-                            <% end %>
-                        </small>
-                    </div>
-                    <span class="last-control badge-<%= item.status.downcase %>" title="<%= item.message %>"><%= item.status %></span>
-                </div>
-            </li>
+    <div data-stacked="true" class="group">
+      <% @migration.account_migration_items.failed.each do |item| %>
+        <%= component "settings/expandable", capsule: true do |expandable| %>
+          <% expandable.description do %>
+            <%= component "settings/control_row" do |row| %>
+              <% row.title { item.fw_feed.dig("title") } %>
+                <% row.description do %>
+                  <%= link_to item.fw_feed.dig("feed_url"), target: :_blank, rel: "noopener noreferrer", class: "extra-muted" do  %>
+                    <%= short_url(item.fw_feed.dig("feed_url")) %>
+                  <% end %>
+                <% end %>
             <% end %>
-        </ul>
+          <% end %>
+        <% end %>
+      <% end %>
     </div>
-    <% end %>
+  <% end %>
 <% end %>

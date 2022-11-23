@@ -80,8 +80,8 @@ class Entry < ApplicationRecord
     return if json_feed.nil?
 
     authors = json_feed.dig("authors")
-    return authors unless authors.respond_to?(:flat_map)
-    authors = authors.flat_map { _1&.dig("name") }
+    return authors unless authors.respond_to?(:filter_map)
+    authors = authors.filter_map { _1&.dig("name") }
     if authors.length > 1
       authors[-1] = "and #{authors[-1]}"
     end

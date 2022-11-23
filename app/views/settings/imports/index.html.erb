@@ -2,20 +2,20 @@
   Import & Export
 <% end %>
 
-<%= component "settings/control_group" do |group| %>
-  <% group.header do %>
-    Import
-  <% end %>
-  <% group.item do %>
-    <%= component "settings/control_row" do |row| %>
-      <% row.title do %>
-        <%= form_with model: Import.new, url: settings_imports_path do |f| %>
+<%= form_with model: Import.new, url: settings_imports_path do |f| %>
+  <%= component "settings/control_group" do |group| %>
+    <% group.header do %>
+      Import
+    <% end %>
+    <% group.item do %>
+      <%= component "settings/control_row" do |row| %>
+        <% row.title do %>
           <%= f.file_field :upload, accept: ".xml, .opml, text/xml, application/xml, text/x-opml, text/x-opml+xml" %>
         <% end %>
-      <% end %>
-      <% row.description { "You can import OPML files. Import is done in the background so you may not see every subscription right away." } %>
-      <% row.control do %>
-        <button type="submit" class="button">Import</button>
+        <% row.description { "You can import OPML files. Import is done in the background so you may not see every subscription right away." } %>
+        <% row.control do %>
+          <button type="submit" class="button">Import</button>
+        <% end %>
       <% end %>
     <% end %>
   <% end %>
@@ -40,7 +40,7 @@
     <% end %>
   <% end %>
   <% if @user.starred_entries.exists? %>
-    <% box.item do %>
+    <% group.item do %>
       <%= component "settings/control_row" do |row| %>
         <% row.title { "Starred Articles" } %>
         <% row.description { "A link will be emailed to you." } %>
@@ -52,18 +52,20 @@
   <% end %>
 <% end %>
 
-<%= component "settings/control_group" do |group| %>
-  <% group.header do %>
-    Import History
-  <% end %>
+<% if @imports.present? %>
+  <%= component "settings/control_group" do |group| %>
+    <% group.header do %>
+      Import History
+    <% end %>
 
-  <% @imports.each do |import| %>
-    <% group.item do %>
-      <%= component "settings/control_row" do |row| %>
-        <% row.title { import.created_at.to_formatted_s(:date) } %>
-        <% row.description { import.filename } %>
-        <% row.control do %>
-          <%= link_to "Details", settings_import_path(import) %>
+    <% @imports.each do |import| %>
+      <% group.item do %>
+        <%= component "settings/control_row" do |row| %>
+          <% row.title { import.created_at.to_formatted_s(:date) } %>
+          <% row.description { import.filename } %>
+          <% row.control do %>
+            <%= link_to "Details", settings_import_path(import) %>
+          <% end %>
         <% end %>
       <% end %>
     <% end %>
