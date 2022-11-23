@@ -1,15 +1,14 @@
 <div class="mb-14">
   <div <%= tag.attributes(@options) %>>
     <%= header %>
-
     <% if items? %>
-    <ul class="mb-4 border-y mb-8">
-      <% items.each do |item| %>
-      <li class="border-b last:border-b-0">
-        <%= item %>
-      </li>
-      <% end %>
-    </ul>
+      <ul class="border-y">
+        <% items.each do |item| %>
+          <li class="border-b last:border-b-0">
+            <%= item %>
+          </li>
+        <% end %>
+      </ul>
     <% end %>
   </div>
 </div>

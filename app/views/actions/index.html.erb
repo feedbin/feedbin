@@ -1,38 +1,47 @@
-<div class="settings-content-inner">
-    <div class="settings-outer">
-        <h2>Actions</h2>
-        <p class="muted">Actions can be performed on articles when they are published. Start by writing the keywords to match, just like you would when <a href="/help/search-syntax/">searching</a> for something. Then select the feeds to include. Finally check the actions you would like to perform on the matched incoming articles.</p>
-    </div>
-    <div class="push-options hide" id="push-data" data-website-id="<%= ENV["APPLE_PUSH_WEBSITE_ID"] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>">
-        <div class="push-enable hide">
-            <p>Push notifications can be enabled as an action. <a href="#" data-behavior="enable_push">Enable push notifications</a>.</p>
-        </div>
-        <div class="push-disable hide">
-            <p>Push notifications are <span class="highlight-positive">enabled</span>. You can disable them in preferences under Notifications.</p>
-        </div>
-        <div class="push-disabled hide">
-            <p>Push notifications are <span class="highlight-negative">disabled</span>. You can enable them in Safari preferences under Notifications.</p>
-        </div>
-    </div>
-    <div class="inset">
-        <%= link_to "+ Add Action", new_action_path, class: "button button-huge" %>
+<%= component "settings/header" do %>
+  Actions
+<% end %>
 
-        <% if @actions.find {|a| a.broken?} %>
-        <h4 class="group-header">Invalid Actions</h4>
-        <ul class="pill-list segmented">
-            <% @actions.select {|a| a.broken? }.each do |action| %>
-              <%= render partial: "action", locals: {action: action} %>
-            <% end %>
-        </ul>
-        <% end %>
+<p class="text-500 mb-4">Actions can be performed on articles when they are published. Start by writing the keywords to match, just like you would when <a href="/help/search-syntax/">searching</a> for something. Then select the feeds to include. Finally check the actions you would like to perform on the matched incoming articles.</p>
 
-        <% if @actions.find {|a| !a.broken?} %>
-        <h4 class="group-header">Saved Actions</h4>
-        <ul class="pill-list segmented">
-            <% @actions.reject {|a| a.broken? }.each do |action| %>
-              <%= render partial: "action", locals: {action: action} %>
-            <% end %>
-        </ul>
-        <% end %>
-    </div>
+<div class="push-options hide" id="push-data" data-website-id="<%= ENV["APPLE_PUSH_WEBSITE_ID"] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>">
+  <div class="push-enable hide">
+    <p>Push notifications can be enabled as an action. <a href="#" data-behavior="enable_push">Enable push notifications</a>.</p>
+  </div>
+  <div class="push-disable hide">
+    <p>Push notifications are <span class="highlight-positive">enabled</span>. You can disable them in preferences under Notifications.</p>
+  </div>
+  <div class="push-disabled hide">
+    <p>Push notifications are <span class="highlight-negative">disabled</span>. You can enable them in Safari preferences under Notifications.</p>
+  </div>
 </div>
+
+<% if @actions.find { _1.broken? } %>
+  <% @actions.select { _1.broken? }.each do |action| %>
+    <%= component "settings/control_group" do |group| %>
+      <% group.header do %>
+        Saved Actions
+      <% end %>
+
+      <% @actions.reject { _1.broken? }.each do |action| %>
+        <% group.item do %>
+          <%= render partial: "action", locals: {action:} %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if @actions.find { !_1.broken? } %>
+  <%= component "settings/control_group" do |group| %>
+    <% group.header do %>
+      Saved Actions
+    <% end %>
+
+    <% @actions.reject { _1.broken? }.each do |action| %>
+      <% group.item do %>
+        <%= render partial: "action", locals: {action:} %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

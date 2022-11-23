@@ -4,18 +4,16 @@
       <%= header %>
     <% end %>
   <% end %>
-
   <% group.item do %>
     <%= description %>
   <% end %>
-
   <% group.item do %>
     <div data-expandable-target="container" class="max-h-0 duration-200 transition-all overflow-hidden">
       <ul data-expandable-target="content" class="border-t transition opacity-100 group-data-[expandable-open-value=false]:opacity-0">
         <% items.each do |item| %>
-        <li class="!border-b last:!border-b-0">
-          <%= item %>
-        </li>
+          <li class="!border-b last:!border-b-0">
+            <%= item %>
+          </li>
         <% end %>
       </ul>
     </div>

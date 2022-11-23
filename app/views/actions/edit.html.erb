@@ -1,11 +1,10 @@
-<div class="settings-content-inner">
-    <div class="settings-outer">
-        <h2>Actions</h2>
-    </div>
-    <% if @action.error_hint.present? %>
-      <%= render "shared/error_message" do %>
-        <%= @action.error_hint %>
-      <% end %>
-    <% end %>
-    <%= render 'form' %>
-</div>
+<%= component "settings/header" do %>
+  Actions
+<% end %>
+
+<% if @action.error_hint.present? %>
+  <%= render "shared/error_message" do %>
+    <%= @action.error_hint %>
+  <% end %>
+<% end %>
+<%= render "form" %>

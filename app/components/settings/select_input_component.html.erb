@@ -1,7 +1,7 @@
 <% if label? %>
-<div class="mb-2 text-600">
-  <%= label %>
-</div>
+  <div class="mb-2 text-600">
+    <%= label %>
+  </div>
 <% end %>
 <div data-accessories="<%= class_names(leading: accessory_leading?, trailing: accessory_trailing?) %>" class="flex relative grow [&_input]:data-[accessories~=leading]:!pl-8 [&_input]:data-[accessories~=trailing]:!pr-8 [&_select]:data-[accessories~=leading]:!pl-8 [&_select]:data-[accessories~=trailing]:!pr-8">
   <%= input %>
