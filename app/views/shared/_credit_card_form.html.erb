@@ -8,10 +8,16 @@
     </script>
 <% end %>
 
-<div data-behavior="hide_on_load"><p>Loading…</p></div>
+<div data-behavior="hide_on_load">
+  <p class="mb-4">Loading…</p>
+</div>
+
 
 <div data-behavior="payment_method">
-    <h4 class="group-header">Payment Method</h4>
+  <%= component "settings/section_header" do %>
+    Payment Method
+  <% end %>
+
     <ul class="control-group">
         <li data-behavior="billing_option_apple_pay">
             <%= radio_button_tag("billing_method", "apple_pay", false, { data: {behavior: 'billing_method_radio'}}) %>
@@ -35,7 +41,10 @@
 </div>
 
 <div id="credit_card_payment" data-behavior="credit_card_details">
-    <h4 class="group-header">Card Details</h4>
+  <%= component "settings/section_header" do %>
+    Card Details
+  <% end %>
+
     <div class="card-meta">
         <div class="input-group-wrap">
             <label for="billing_name">Name on card</label>

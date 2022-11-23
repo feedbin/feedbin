@@ -1,75 +1,79 @@
-<div class="settings-content-inner">
-    <div class="settings-outer">
-        <h2>Account</h2>
-    </div>
-    <div class="inset">
-        <%= form_for(@user) do |f| %>
+<%= component "settings/header" do %>
+  Account
+<% end %>
 
-          <%= component "settings/section_header" do %>
-            <%= f.label :email, "Email" %>
+<%= form_for(@user) do |f| %>
+
+  <%= component "settings/section_header" do %>
+    <%= f.label :email, "Email" %>
+  <% end %>
+
+  <%= component "settings/text_input" do |text| %>
+    <% text.input do %>
+      <%= f.email_field :email, placeholder: "Email", class: "peer" %>
+    <% end %>
+  <% end %>
+
+  <div class="button-wrap">
+    <button type="submit" class="button">Update</button>
+  </div>
+<% end %>
+
+<%= form_for(@user) do |f| %>
+  <%= component "settings/section_header" do %>
+    Update Password
+  <% end %>
+
+  <div class="mb-4">
+    <%= component "settings/text_input" do |text| %>
+      <% text.label do %>
+        <%= f.label :old_password, "Old Password" %>
+      <% end %>
+      <% text.input do %>
+        <%= f.password_field :old_password, class: "peer" %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%= component "settings/text_input" do |text| %>
+    <% text.label do %>
+      <%= f.label :password, "New Password" %>
+    <% end %>
+    <% text.input do %>
+      <%= f.password_field :password, class: "peer" %>
+    <% end %>
+  <% end %>
+
+  <div class="button-wrap">
+    <button type="submit" class="button">Update</button>
+  </div>
+<% end %>
+
+<%= form_for(@user, method: :delete, id: "delete_user") do |f| %>
+  <%= component "settings/section_header" do %>
+    Cancel Account
+  <% end %>
+
+  <p class="mb-4">Canceling your account will end your subscription immediately. All of your data will be deleted. You will receive a confirmation email with your feed subscriptions attached. <strong>You cannot undo this</strong>.</p>
+
+  <% if @last_payment %>
+    <div data-stacked="true" class="group">
+      <%= component "settings/control_group" do |group| %>
+        <% group.item do %>
+          <%= check_box_tag :billing_event_id, Rails.application.message_verifier(:billing_event_id).generate(@last_payment.id), false, class: "peer" %>
+          <%= label_tag :billing_event_id, class: "group" do %>
+            <%= component "settings/switch" do |button| %>
+              <% button.title do %>
+                Also refund my recent <strong><%= number_to_currency((@last_payment.event_object["amount"].to_f / 100), precision: 0) %></strong> payment
+              <% end %>
+            <% end %>
           <% end %>
-
-          <%= component "settings/text_input" do |text| %>
-            <% text.input do %>
-              <%= f.email_field :email, placeholder: "Email", class: "peer" %>
-            <% end %>
-          <% end %>
-
-
-            <div class="button-wrap">
-                <button type="submit" class="button">Update</button>
-            </div>
         <% end %>
+      <% end %>
     </div>
-    <div class="inset">
-        <%= form_for(@user) do |f| %>
-            <%= component "settings/section_header" do %>
-              Update Password
-            <% end %>
+  <% end %>
 
-            <%= component "settings/text_input" do |text| %>
-              <% text.label do %>
-                <%= f.label :old_password, "Old Password" %>
-              <% end %>
-              <% text.input do %>
-                <%= f.password_field :old_password, class: "peer" %>
-              <% end %>
-            <% end %>
-
-            <%= component "settings/text_input" do |text| %>
-              <% text.label do %>
-                <%= f.label :password, "New Password" %>
-              <% end %>
-              <% text.input do %>
-                <%= f.password_field :password, class: "peer" %>
-              <% end %>
-            <% end %>
-
-            <div class="button-wrap">
-                <button type="submit" class="button">Update</button>
-            </div>
-        <% end %>
-    </div>
-    <hr>
-    <div class="inset">
-        <%= form_for(@user, method: :delete, id: "delete_user") do |f| %>
-            <h4 class="group-header">Cancel Account</h4>
-            <div class="description-inset">
-                <p class="muted">Canceling your account will end your subscription immediately. All of your data will be deleted. You will receive a confirmation email with your feed subscriptions attached. <strong>You cannot undo this</strong>.</p>
-            </div>
-            <% if @last_payment %>
-                <ul class="control-group">
-                    <li>
-                        <%= check_box_tag :billing_event_id, Rails.application.message_verifier(:billing_event_id).generate(@last_payment.id) %>
-                        <%= label_tag :billing_event_id do %>
-                            Also refund my recent <strong><%= number_to_currency((@last_payment.event_object["amount"].to_f / 100), precision: 0) %></strong> payment <%= toggle_switch %>
-                        <% end %>
-                    </li>
-                </ul>
-            <% end %>
-            <div class="button-wrap">
-                <p><%= f.submit "Cancel Account", class: "button button-secondary", data: { confirm: "Are you sure?" } %></p>
-            </div>
-        <% end %>
-    </div>
-</div>
+  <div class="button-wrap">
+    <p><%= f.submit "Cancel Account", class: "button button-secondary", data: { confirm: "Are you sure?" } %></p>
+  </div>
+<% end %>
