@@ -2,13 +2,13 @@
   <div <%= tag.attributes(@options) %>>
     <%= header %>
     <% if items? %>
-      <ul class="border-y group-data-[capsule=true]:border group-data-[capsule=true]:rounded-lg">
+      <div class="border-y group-data-[capsule=true]:border group-data-[capsule=true]:rounded-lg">
         <% items.each do |item| %>
-          <li class="border-b last:border-b-0">
+          <div class="border-b last:border-b-0" data-item>
             <%= item %>
-          </li>
+          </div>
         <% end %>
-      </ul>
+      </div>
     <% end %>
   </div>
 </div>

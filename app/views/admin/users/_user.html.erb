@@ -1,6 +1,14 @@
-<% if user.deleted? %>
-    <strike><%= link_to user.email, user.stripe_url %></strike>
-<% else %>
-    <%= link_to user.email, user.stripe_url %>
-    <%= link_to "Delete", admin_user_path(user), remote: true, data: { confirm: "Are you sure?" }, method: :delete, class: "pull-right danger" %>
+<%= component "settings/control_row" do |row| %>
+  <% row.title do %>
+    <% if user.deleted? %>
+        <span class="line-through"><%= link_to user.email, user.stripe_url %></span>
+    <% else %>
+        <%= link_to user.email, user.stripe_url %>
+    <% end %>
+  <% end %>
+  <% row.control do %>
+    <% unless user.deleted? %>
+      <%= link_to "Delete", admin_user_path(user), remote: true, data: { confirm: "Are you sure?" }, method: :delete, class: "pull-right danger" %>
+    <% end %>
+  <% end %>
 <% end %>
