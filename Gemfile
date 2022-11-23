@@ -60,6 +60,7 @@ gem "twitter-text"
 gem "uglifier"
 gem "unicorn"
 gem "view_component"
+gem "lookbook"
 gem "jwt"
 
 group :development do
@@ -70,7 +71,6 @@ group :development do
   gem "listen"
   gem "foreman"
   gem "pry"
-  gem "lookbook"
 end
 
 group :development, :test do
