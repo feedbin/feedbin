@@ -1,5 +1,5 @@
 <% if local_assigns[:editable] %>
-    <button class="button button-tertiary" data-behavior="toggle_service_options">Edit</button>
+    <button class="button button-tertiary" data-action="expandable#toggle">Edit</button>
 <% end %>
 
 <%= link_to 'Deactivate', supported_sharing_service_path(sharing_service), class: 'button button-secondary', method: :delete %>

@@ -1,23 +1,38 @@
-<%= form_for @sharing_service, html: {novalidate: 'novalidate'} do |f| %>
-    <h4 class="group-header">Custom Services</h4>
-    <div class="pill form">
-        <div class="stacked-form">
-            <div class="input-group-wrap">
-                <%= f.label :label, "Label" %>
-                <%= render "shared/input" do %>
-                    <%= f.text_field :label %>
-                <% end %>
-            </div>
-            <div class="input-group-wrap">
-                <%= f.label :url, "URL" %>
-                <%= render "shared/input" do %>
-                    <%= f.url_field :url %>
-                <% end %>
-            </div>
-        </div>
-        <p class="control-group-description">Create your own sharing service. <a href="/help/sharing-read-it-later-services/">How does this work</a>?</p>
-        <div class="button-wrap">
-            <button type="submit" class="button no-margin">Add Service</button>
-        </div>
+<%= form_for record, html: {novalidate: 'novalidate'} do |f| %>
+  <div class="py-3 px-4">
+    <div class="mb-4">
+      <%= component "settings/text_input" do |text| %>
+        <% text.label do %>
+          <%= f.label :label, "Label" %>
+        <% end %>
+        <% text.input do %>
+          <% f.text_field :label, class: "peer" %>
+        <% end %>
+      <% end %>
     </div>
+
+    <div class="mb-4">
+      <%= component "settings/text_input" do |text| %>
+        <% text.label do %>
+          <%= f.label :url, "URL" %>
+        <% end %>
+        <% text.input do %>
+          <%= f.url_field :url, class: "peer" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <% if record.new_record? %>
+      <p class="mb-4 text-500">Create your own sharing service. <a href="/help/sharing-read-it-later-services/" target="_blank">How does this work</a>?</p>
+    <% end %>
+
+    <div class="button-wrap">
+      <% if record.new_record? %>
+        <%= button_tag "Add Service", type: "submit", class: "button" %>
+      <% else %>
+        <%= button_tag "Cancel", type: "button", class: "button button-tertiary", data: {action: "expandable#toggle"} %>
+        <%= button_tag "Save", type: "submit", class: "button" %>
+      <% end %>
+    </div>
+  </div>
 <% end %>

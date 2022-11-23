@@ -1,8 +1,8 @@
-<div class="mb-14">
+<div class="mb-14 group-data-[stacked=true]:mb-4">
   <div <%= tag.attributes(@options) %>>
     <%= header %>
     <% if items? %>
-      <ul class="border-y">
+      <ul class="border-y group-data-[capsule=true]:border group-data-[capsule=true]:rounded-lg">
         <% items.each do |item| %>
           <li class="border-b last:border-b-0">
             <%= item %>

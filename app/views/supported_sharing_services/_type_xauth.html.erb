@@ -1,17 +1,31 @@
-<div class="service-header">
-    <div>
-        <%= render partial: "supported_sharing_services/header", locals: {sharing_service: sharing_service} %>
-        <% if status == :issue %>
-            <p class="control-group-description">Feedbin can no longer access <%= sharing_service.label %>, <a href="#" data-behavior="toggle_service_options">reactivate</a>?</p>
+<%= component "settings/expandable", capsule: true do |expandable| %>
+  <% expandable.description do %>
+    <%= component "settings/control_row" do |row| %>
+      <% row.icon do %>
+        <%= render "icon", sharing_service: sharing_service %>
+      <% end %>
+      <% row.title { sharing_service.label } %>
+      <% if status == :issue %>
+        <% row.description do %>
+          Feedbin can no longer access <%= sharing_service.label %>, <a href="#" data-behavior="toggle_service_options">reactivate</a>?
         <% end %>
-    </div>
-    <div class="last-control button-wrap-inline">
+      <% end %>
+
+      <% row.control do %>
         <% if status == :active %>
-            <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
+          <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
         <% elsif status == :issue %>
-            <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
+          <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
         <% else %>
-            <%= button_tag 'Activate', class: 'button button-secondary', data: {behavior: "toggle_service_options"} %>
+          <%= button_tag 'Activate', class: 'button button-secondary', data: {action: "expandable#toggle"} %>
         <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% expandable.item do %>
+    <div class="py-3 px-4">
+      <%= yield %>
     </div>
-</div>
+  <% end %>
+<% end %>

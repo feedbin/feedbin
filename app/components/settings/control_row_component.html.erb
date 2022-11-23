@@ -1,4 +1,9 @@
-<div class="py-4 flex items-center gap-4 group">
+<div class="py-4 flex items-center gap-4 group group-data-[capsule=true]:px-4">
+  <% if icon? %>
+    <div class="inset-y-0 self-stretch shrink-0">
+      <%= icon %>
+    </div>
+  <% end %>
   <div class="grow overflow-hidden">
     <div class="text-600">
       <%= title %>

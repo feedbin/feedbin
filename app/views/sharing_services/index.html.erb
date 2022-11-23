@@ -1,30 +1,38 @@
-<div class="settings-content-inner">
-    <div class="settings-outer">
-        <h2>Share & Save</h2>
-    </div>
-    <div class="inset">
-        <% if @active_sharing_services.present? %>
-            <h4 class="group-header">Active Services</h4>
-            <ul class="sharing-services">
-                <% @active_sharing_services.each do |sharing_service| %>
-                    <%= render sharing_service %>
-                <% end %>
-            </ul>
-        <% end %>
-        <% unless @active_sharing_services.count == @available_sharing_services.count %>
-            <h4 class="group-header">Available Services</h4>
-            <ul class="sharing-services">
-                <% @available_sharing_services.each do |sharing_service| %>
-                    <% unless @active_service_ids.include?(sharing_service.service_id) %>
-                        <li>
-                            <%= render partial: "supported_sharing_services/service_#{sharing_service.service_id}", locals: {sharing_service: sharing_service, record: SupportedSharingService.new, status: :inactive} %>
-                        </li>
-                    <% end %>
-                <% end %>
-            </ul>
-        <% end %>
-    </div>
-    <div class="inset">
-        <%= render 'sharing_services/form' %>
-    </div>
-</div>
+<%= component "settings/header" do %>
+  Share & Save
+<% end %>
+
+<% if @active_sharing_services.present? %>
+  <%= component "settings/section_header" do %>
+    Active Services
+  <% end %>
+
+  <div data-stacked="true" class="group mb-14">
+    <% @active_sharing_services.each do |sharing_service| %>
+      <%= render sharing_service %>
+    <% end %>
+  </div>
+<% end %>
+
+<% unless @active_sharing_services.count == @available_sharing_services.count %>
+  <%= component "settings/section_header" do %>
+    Available Services
+  <% end %>
+
+  <div data-stacked="true" class="group mb-14">
+    <% @available_sharing_services.each do |sharing_service| %>
+      <% unless @active_service_ids.include?(sharing_service.service_id) %>
+        <%= render partial: "supported_sharing_services/service_#{sharing_service.service_id}", locals: {sharing_service: sharing_service, record: SupportedSharingService.new, status: :inactive} %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+
+<%= component "settings/control_group", class: "group", data: {capsule: "true"} do |group| %>
+  <% group.header do %>
+    Custom Services
+  <% end %>
+  <% group.item do %>
+    <%= render "form", record: @sharing_service %>
+  <% end %>
+<% end %>
