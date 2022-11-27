@@ -16,6 +16,8 @@
   </div>
 </div>
 
+<%= link_to "+ Add Action", new_action_path, class: "button button-huge" %>
+
 <% if @actions.find { _1.broken? } %>
   <% @actions.select { _1.broken? }.each do |action| %>
     <%= component "settings/control_group" do |group| %>

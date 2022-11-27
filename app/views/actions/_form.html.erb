@@ -6,7 +6,7 @@
     <% end %>
     <%= component "form/text_input" do |text| %>
       <% text.input do %>
-        <%= form.text_field :title %>
+        <%= form.text_field :title, class: "peer" %>
       <% end %>
     <% end %>
   </div>
@@ -16,7 +16,7 @@
     <% end %>
     <%= component "form/text_input" do |text| %>
       <% text.input do %>
-        <%= form.text_area :query, rows: @action&.query&.length.to_i > 70 ? 3 : 1, placeholder: 'For example: title.exact:"[Sponsor]"', autocorrect: "off", autocapitalize: "off", spellcheck: false %>
+        <%= form.text_area :query, rows: @action&.query&.length.to_i > 70 ? 3 : 1, placeholder: 'For example: title.exact:"[Sponsor]"', autocorrect: "off", autocapitalize: "off", spellcheck: false, class: "peer" %>
       <% end %>
     <% end %>
     <p class="text-sm text-500 mt-2">Actions support the same <a href="/help/search-syntax" target="_blank">syntax as searches</a>.</p>
