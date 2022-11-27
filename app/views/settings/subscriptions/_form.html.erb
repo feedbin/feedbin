@@ -124,7 +124,7 @@
           <% group.item do %>
             <%= f.check_box :muted, class: "peer", data: {behavior: "auto_submit"}, id: "subscription_muted" %>
             <%= f.label :muted, class: "group" do %>
-              <%= component "settings/switch" do |button| %>
+              <%= component "form/switch" do |button| %>
                 <% button.title { "Muted" } %>
               <% end %>
             <% end %>
@@ -133,7 +133,7 @@
           <% group.item do %>
             <%= f.check_box :show_updates, class: "peer", data: {behavior: "auto_submit"}, id: "subscription_show_updates" %>
             <%= f.label :show_updates, class: "group" do %>
-              <%= component "settings/switch" do |button| %>
+              <%= component "form/switch" do |button| %>
                 <% button.title { "Show updates" } %>
                 <% button.description { "Tells you when an article has been changed after being published" } %>
               <% end %>
@@ -144,7 +144,7 @@
             <% group.item do %>
               <%= f.check_box :show_retweets, class: "peer", data: {behavior: "auto_submit"}, id: "subscription_show_retweets" %>
               <%= f.label :show_retweets, class: "group" do %>
-                <%= component "settings/switch" do |button| %>
+                <%= component "form/switch" do |button| %>
                   <% button.title { "Show Retweets" } %>
                 <% end %>
               <% end %>
@@ -153,7 +153,7 @@
             <% group.item do %>
               <%= f.check_box :media_only, class: "peer", data: {behavior: "auto_submit"}, id: "subscription_media_only" %>
               <%= f.label :media_only, class: "group" do %>
-                <%= component "settings/switch" do |button| %>
+                <%= component "form/switch" do |button| %>
                   <% button.title { "Media Only" } %>
                   <% button.description { "Only show tweets that contain links or images" } %>
                 <% end %>

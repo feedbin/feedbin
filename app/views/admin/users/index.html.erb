@@ -4,7 +4,7 @@
 
 <div class="mb-4">
   <%= form_tag(admin_users_path, method: "get") do %>
-    <%= component "settings/text_input" do |text| %>
+    <%= component "form/text_input" do |text| %>
       <% text.input do %>
         <input name="q" type="text" class="peer" data-behavior="user_search" placeholder="Search Customers" />
       <% end %>

@@ -2,7 +2,7 @@
 
 require "test_helper"
 
-class Settings::SwitchComponentTest < ViewComponent::TestCase
+class Form::SwitchComponentTest < ViewComponent::TestCase
   def test_component_renders_something_useful
     # assert_equal(
     #   %(<span>Hello, components!</span>),

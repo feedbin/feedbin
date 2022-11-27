@@ -69,7 +69,7 @@
           Automatically put incoming newsletters in this tag.
         <% end %>
         <% row.control do %>
-          <%= component "settings/select_input" do |input| %>
+          <%= component "form/select_input" do |input| %>
             <% input.input do %>
               <%= f.select :newsletter_tag, tag_options, {}, {class: "peer", data: {behavior: "auto_submit"}} %>
             <% end %>
@@ -127,7 +127,7 @@
         <%= form_with(model: newsletter_sender, url: newsletter_senders_settings_subscription_path(newsletter_sender.feed_id), data: {remote: true}) do |f| %>
           <%= f.check_box :feed_id, {id: "newsletter_sender_#{newsletter_sender.feed_id}", checked: @subscription_ids.include?(newsletter_sender.feed_id), class: "peer", data: {behavior: "auto_submit"}} %>
           <%= f.label :feed_id, for: "newsletter_sender_#{newsletter_sender.feed_id}", class: "group" do %>
-            <%= component "settings/switch" do |button| %>
+            <%= component "form/switch" do |button| %>
               <% button.title do %>
                 <%= newsletter_sender.name %> <span class="text-500">&lt;<%= newsletter_sender.email %>&gt;</span>
               <% end %>

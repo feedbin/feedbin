@@ -30,7 +30,7 @@
         <%= f.hidden_field :operation, value: "" %>
 
         <div class="mb-4">
-          <%= component "settings/text_input" do |text| %>
+          <%= component "form/text_input" do |text| %>
             <% text.label do %>
               <%= f.label :email_name, "Full Name" %>
             <% end %>
@@ -40,7 +40,7 @@
           <% end %>
         </div>
 
-        <%= component "settings/text_input" do |text| %>
+        <%= component "form/text_input" do |text| %>
           <% text.label do %>
             <%= f.label :email_address, "Reply-To" %>
           <% end %>

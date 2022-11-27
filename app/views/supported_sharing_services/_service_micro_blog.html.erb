@@ -7,7 +7,7 @@
     <%= f.hidden_field :service_id, value: sharing_service.service_id %>
     <%= f.hidden_field :operation, value: "authorize" %>
 
-    <%= component "settings/text_input" do |text| %>
+    <%= component "form/text_input" do |text| %>
       <% text.label do %>
         <label for="micro_blog_password">App Token</label>
       <% end %>

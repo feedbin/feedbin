@@ -31,7 +31,7 @@
         <%= f.hidden_field :service_id, value: sharing_service.service_id %>
         <%= f.hidden_field :operation, value: "" %>
 
-        <%= component "settings/text_input" do |text| %>
+        <%= component "form/text_input" do |text| %>
           <% text.label do %>
             <%= f.label :kindle_address, "Kindle Email Address" %>
           <% end %>

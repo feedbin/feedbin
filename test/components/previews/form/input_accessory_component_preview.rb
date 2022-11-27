@@ -1,4 +1,4 @@
-class Settings::InputAccessoryComponentPreview < ViewComponent::Preview
+class Form::InputAccessoryComponentPreview < ViewComponent::Preview
   def default
   end
 end

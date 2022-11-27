@@ -1,13 +1,13 @@
 <div class="flex gap-4">
   <label>
     <input type="checkbox" class="peer">
-    <%= render(Settings::RadioButtonComponent.new) do |button| %>
+    <%= render(Form::RadioButtonComponent.new) do |button| %>
       <% button.title { "Title" } %>
     <% end %>
   </label>
   <label>
     <input type="checkbox" class="peer" checked>
-    <%= render(Settings::RadioButtonComponent.new) do |button| %>
+    <%= render(Form::RadioButtonComponent.new) do |button| %>
       <% button.title { "Title" } %>
     <% end %>
   </label>

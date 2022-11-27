@@ -1,4 +1,4 @@
-class Settings::SwitchComponentPreview < ViewComponent::Preview
+class Form::SwitchComponentPreview < ViewComponent::Preview
   def default
   end
 end

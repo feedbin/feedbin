@@ -36,9 +36,12 @@
       <% group.item do %>
         <%= f.radio_button :plan_id, plan.id, options %>
         <%= label_tag nil, for: dom_id(plan), class: "group" do %>
-          <%= component "settings/radio_button" do |button| %>
-            <% button.title do %>
+          <%= component "settings/control_row" do |row| %>
+            <% row.title do %>
               <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
+            <% end %>
+            <% row.control do %>
+              <%= component "form/radio_button" %>
             <% end %>
           <% end %>
         <% end %>

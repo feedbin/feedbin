@@ -1,4 +1,4 @@
-class Settings::InputAccessoryComponent < BaseComponent
+class Form::InputAccessoryComponent < BaseComponent
   def initialize(position: nil)
     @position = position || "leading"
   end

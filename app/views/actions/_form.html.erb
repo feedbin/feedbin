@@ -4,7 +4,7 @@
     <%= component "settings/section_header" do %>
       <%= form.label :title, "Name" %>
     <% end %>
-    <%= component "settings/text_input" do |text| %>
+    <%= component "form/text_input" do |text| %>
       <% text.input do %>
         <%= form.text_field :title %>
       <% end %>
@@ -14,7 +14,7 @@
     <%= component "settings/section_header" do %>
       <%= form.label :query, "Search Terms" %>
     <% end %>
-    <%= component "settings/text_input" do |text| %>
+    <%= component "form/text_input" do |text| %>
       <% text.input do %>
         <%= form.text_area :query, rows: @action&.query&.length.to_i > 70 ? 3 : 1, placeholder: 'For example: title.exact:"[Sponsor]"', autocorrect: "off", autocapitalize: "off", spellcheck: false %>
       <% end %>
@@ -32,7 +32,7 @@
           <li class="group">
             <%= builder.check_box class: "peer" %>
             <%= builder.label class: "group flex gap-2 items-center py-3 px-4 border-b group-last:border-b-0" do %>
-              <%= component "settings/check_box" %>
+              <%= component "form/check_box" %>
               <%= builder.text %>
             <% end %>
           </li>
@@ -60,7 +60,7 @@
         <li class="group">
           <%= builder.check_box feed_checkbox_options(form).merge(class: "peer") %>
           <%= builder.label title: builder.object.feed_url, class: "group flex gap-2 items-center py-3 px-4 border-b group-last:border-b-0" do %>
-            <%= component "settings/check_box" %>
+            <%= component "form/check_box" %>
             <%= builder.text %>
           <% end %>
         </li>
@@ -77,7 +77,7 @@
       <% group.item do %>
         <%= builder.check_box class: "peer" %>
         <%= builder.label class: "group" do %>
-          <%= component "settings/switch" do |button| %>
+          <%= component "form/switch" do |button| %>
             <% button.title { builder.text } %>
           <% end %>
         <% end %>
@@ -93,7 +93,7 @@
     <% group.item do %>
       <%= form.check_box :apply_action, class: "peer" %>
       <%= form.label :apply_action, class: "group" do %>
-        <%= component "settings/switch" do |button| %>
+        <%= component "form/switch" do |button| %>
           <% button.title { "Mark existing matches as read" } %>
         <% end %>
       <% end %>

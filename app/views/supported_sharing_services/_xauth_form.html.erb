@@ -4,7 +4,7 @@
     <%= f.hidden_field :operation, value: "authorize" %>
 
     <div class="mb-4">
-      <%= component "settings/text_input" do |text| %>
+      <%= component "form/text_input" do |text| %>
         <% text.label do %>
           <label for="<%= sharing_service.service_id %>_username">Username</label>
         <% end %>
@@ -14,7 +14,7 @@
       <% end %>
     </div>
 
-    <%= component "settings/text_input" do |text| %>
+    <%= component "form/text_input" do |text| %>
       <% text.label do %>
         <label for="<%= sharing_service.service_id %>_password">Password</label>
       <% end %>

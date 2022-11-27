@@ -1,4 +1,4 @@
-class Settings::SwitchComponent < Settings::ControlRowComponent
+class Form::SwitchComponent < Settings::ControlRowComponent
   def control
     content_tag :span, class: "w-[43px] h-[24px] flex bg-400 rounded-full relative pg-checked:bg-green-600 pg-active:pg-checked:bg-green-700" do
       content_tag :span, class: "absolute flex items-center justify-start -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 w-[53px] h-[34px] rounded-full border-4 border-transparent pg-focus:border-blue-400" do
