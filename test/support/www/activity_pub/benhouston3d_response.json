@@ -1,0 +1,118 @@
+{
+   "@context" : [
+      "https://www.w3.org/ns/activitystreams",
+      "https://w3id.org/security/v1",
+      {
+         "Curve25519Key" : "toot:Curve25519Key",
+         "Device" : "toot:Device",
+         "Ed25519Key" : "toot:Ed25519Key",
+         "Ed25519Signature" : "toot:Ed25519Signature",
+         "EncryptedMessage" : "toot:EncryptedMessage",
+         "PropertyValue" : "schema:PropertyValue",
+         "alsoKnownAs" : {
+            "@id" : "as:alsoKnownAs",
+            "@type" : "@id"
+         },
+         "cipherText" : "toot:cipherText",
+         "claim" : {
+            "@id" : "toot:claim",
+            "@type" : "@id"
+         },
+         "deviceId" : "toot:deviceId",
+         "devices" : {
+            "@id" : "toot:devices",
+            "@type" : "@id"
+         },
+         "discoverable" : "toot:discoverable",
+         "featured" : {
+            "@id" : "toot:featured",
+            "@type" : "@id"
+         },
+         "featuredTags" : {
+            "@id" : "toot:featuredTags",
+            "@type" : "@id"
+         },
+         "fingerprintKey" : {
+            "@id" : "toot:fingerprintKey",
+            "@type" : "@id"
+         },
+         "focalPoint" : {
+            "@container" : "@list",
+            "@id" : "toot:focalPoint"
+         },
+         "identityKey" : {
+            "@id" : "toot:identityKey",
+            "@type" : "@id"
+         },
+         "manuallyApprovesFollowers" : "as:manuallyApprovesFollowers",
+         "messageFranking" : "toot:messageFranking",
+         "messageType" : "toot:messageType",
+         "movedTo" : {
+            "@id" : "as:movedTo",
+            "@type" : "@id"
+         },
+         "publicKeyBase64" : "toot:publicKeyBase64",
+         "schema" : "http://schema.org#",
+         "suspended" : "toot:suspended",
+         "toot" : "http://joinmastodon.org/ns#",
+         "value" : "schema:value"
+      }
+   ],
+   "attachment" : [
+      {
+         "name" : "Company",
+         "type" : "PropertyValue",
+         "value" : "<a href=\"https://threekit.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\"><span class=\"invisible\">https://</span><span class=\"\">threekit.com</span><span class=\"invisible\"></span></a>"
+      },
+      {
+         "name" : "Homepage",
+         "type" : "PropertyValue",
+         "value" : "<a href=\"https://benhouston3d.com\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\"><span class=\"invisible\">https://</span><span class=\"\">benhouston3d.com</span><span class=\"invisible\"></span></a>"
+      },
+      {
+         "name" : "Github",
+         "type" : "PropertyValue",
+         "value" : "<a href=\"https://github.com/bhouston\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\"><span class=\"invisible\">https://</span><span class=\"\">github.com/bhouston</span><span class=\"invisible\"></span></a>"
+      },
+      {
+         "name" : "Astrophotography",
+         "type" : "PropertyValue",
+         "value" : "<a href=\"https://astrobin.com/users/bhouston\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\"><span class=\"invisible\">https://</span><span class=\"\">astrobin.com/users/bhouston</span><span class=\"invisible\"></span></a>"
+      }
+   ],
+   "devices" : "https://mastodon.gamedev.place/users/BenHouston3D/collections/devices",
+   "discoverable" : true,
+   "endpoints" : {
+      "sharedInbox" : "https://mastodon.gamedev.place/inbox"
+   },
+   "featured" : "https://mastodon.gamedev.place/users/BenHouston3D/collections/featured",
+   "featuredTags" : "https://mastodon.gamedev.place/users/BenHouston3D/collections/tags",
+   "followers" : "https://mastodon.gamedev.place/users/BenHouston3D/followers",
+   "following" : "https://mastodon.gamedev.place/users/BenHouston3D/following",
+   "icon" : {
+      "mediaType" : "image/jpeg",
+      "type" : "Image",
+      "url" : "https://cdn.masto.host/mastodongamedevplace/accounts/avatars/109/291/782/547/981/251/original/4ccc5a202b77b95d.jpg"
+   },
+   "id" : "https://mastodon.gamedev.place/users/BenHouston3D",
+   "image" : {
+      "mediaType" : "image/jpeg",
+      "type" : "Image",
+      "url" : "https://cdn.masto.host/mastodongamedevplace/accounts/headers/109/291/782/547/981/251/original/12bd931906eaf585.jpeg"
+   },
+   "inbox" : "https://mastodon.gamedev.place/users/BenHouston3D/inbox",
+   "manuallyApprovesFollowers" : false,
+   "name" : "Ben Houston",
+   "outbox" : "https://mastodon.gamedev.place/users/BenHouston3D/outbox",
+   "preferredUsername" : "BenHouston3D",
+   "publicKey" : {
+      "id" : "https://mastodon.gamedev.place/users/BenHouston3D#main-key",
+      "owner" : "https://mastodon.gamedev.place/users/BenHouston3D",
+      "publicKeyPem" : "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqFqTco5JrliimeFKhHVE\nce3nhN2A4aCrEbLhelL/8Y8O8YkVHplPrFxF2TCzdRIDaVQu+aIkXQ2J+SP3JTir\nf4Nvi6AJl5yc1W0BX0TcbpGqhmwr4L/L0zHxKXUw0JmZi0YKSQJMNosdNd/tB2Nb\nI/6boarg6jjFL6zIlRoI+uiQy0efLedg0OIw0n8MbmhMXcgX+qeFtyiUsKGNsbjc\nXswVCIi5vSLBOXhIo7cylAKfDHY7fLbj64BVKDg4GCavvbAnaCOsieWOFYbN7PdV\noVg1NQzgP5JWSzhAxv5nlFIWfzAEeUpBsWliIOzSN2NEaY1hn1xeDxjhF/ovv4l0\nfwIDAQAB\n-----END PUBLIC KEY-----\n"
+   },
+   "published" : "2022-11-05T00:00:00Z",
+   "summary" : "<p>Girl dad (2x). Founder/CTO of @Threekit, 3D for eCommerce. Astrophotography, glTF standards, Clara.io, Three.js, Exocortex.com, Fluid sims, Krakatoa renderer, Deadline render manager.  Ottawa, Ontario, Canada.</p>",
+   "tag" : [],
+   "type" : "Person",
+   "url" : "https://mastodon.gamedev.place/@BenHouston3D"
+}

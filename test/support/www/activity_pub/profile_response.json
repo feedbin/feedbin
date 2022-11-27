@@ -1,0 +1,110 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/activitystreams",
+    "https://w3id.org/security/v1",
+    {
+      "manuallyApprovesFollowers": "as:manuallyApprovesFollowers",
+      "toot": "http://joinmastodon.org/ns#",
+      "featured": {
+        "@id": "toot:featured",
+        "@type": "@id"
+      },
+      "featuredTags": {
+        "@id": "toot:featuredTags",
+        "@type": "@id"
+      },
+      "alsoKnownAs": {
+        "@id": "as:alsoKnownAs",
+        "@type": "@id"
+      },
+      "movedTo": {
+        "@id": "as:movedTo",
+        "@type": "@id"
+      },
+      "schema": "http://schema.org#",
+      "PropertyValue": "schema:PropertyValue",
+      "value": "schema:value",
+      "discoverable": "toot:discoverable",
+      "Device": "toot:Device",
+      "Ed25519Signature": "toot:Ed25519Signature",
+      "Ed25519Key": "toot:Ed25519Key",
+      "Curve25519Key": "toot:Curve25519Key",
+      "EncryptedMessage": "toot:EncryptedMessage",
+      "publicKeyBase64": "toot:publicKeyBase64",
+      "deviceId": "toot:deviceId",
+      "claim": {
+        "@type": "@id",
+        "@id": "toot:claim"
+      },
+      "fingerprintKey": {
+        "@type": "@id",
+        "@id": "toot:fingerprintKey"
+      },
+      "identityKey": {
+        "@type": "@id",
+        "@id": "toot:identityKey"
+      },
+      "devices": {
+        "@type": "@id",
+        "@id": "toot:devices"
+      },
+      "messageFranking": "toot:messageFranking",
+      "messageType": "toot:messageType",
+      "cipherText": "toot:cipherText",
+      "suspended": "toot:suspended",
+      "focalPoint": {
+        "@container": "@list",
+        "@id": "toot:focalPoint"
+      }
+    }
+  ],
+  "id": "https://mastodon.social/users/siracusa",
+  "type": "Person",
+  "following": "https://mastodon.social/users/siracusa/following",
+  "followers": "https://mastodon.social/users/siracusa/followers",
+  "inbox": "https://mastodon.social/users/siracusa/inbox",
+  "outbox": "https://mastodon.social/users/siracusa/outbox",
+  "featured": "https://mastodon.social/users/siracusa/collections/featured",
+  "featuredTags": "https://mastodon.social/users/siracusa/collections/tags",
+  "preferredUsername": "siracusa",
+  "name": "John Siracusa",
+  "summary": "<p>Programmer, tech writer, and co-host of Accidental Tech Podcast, Reconcilable Differences, and Robot or Not.</p>",
+  "url": "https://mastodon.social/@siracusa",
+  "manuallyApprovesFollowers": false,
+  "discoverable": true,
+  "published": "2017-09-10T00:00:00Z",
+  "devices": "https://mastodon.social/users/siracusa/collections/devices",
+  "publicKey": {
+    "id": "https://mastodon.social/users/siracusa#main-key",
+    "owner": "https://mastodon.social/users/siracusa",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0JZnLSJMtuH+GIbvfJwS\nABQWecEfAMIcAuymrCEoo78i+KY+QYDCdUzjVRQWJEAFRRNC/18puolw61kT/KBf\nuLshPEY8uFmUBwAkcA1VzcmCKV+mTnmSV3zwfYal7BuPIYqPGHA7x2uTyXNpRjxK\ntACwPHfRgB39tWoGCnKotDSRdc3Cs67kmb3oqLHTYdwSa3ipefUZtIjJYo8Ik+p7\nwKMeqDVYfVUWB9S3Y0fZ7xCJMNhIVTUoNwlygvVkq1nPpRsh8GCRhn07pSmAm1KP\nLGEABw0TWssGQNeGtnhfXvhkkFWBuhmBeKTxSbAvy65NChUE3W1Jlt3uR98i9+kZ\niQIDAQAB\n-----END PUBLIC KEY-----\n"
+  },
+  "tag": [
+
+  ],
+  "attachment": [
+    {
+      "type": "PropertyValue",
+      "name": "Website",
+      "value": "<a href=\"https://hypercritical.co\" target=\"_blank\" rel=\"nofollow noopener noreferrer me\"><span class=\"invisible\">https://</span><span class=\"\">hypercritical.co</span><span class=\"invisible\"></span></a>"
+    },
+    {
+      "type": "PropertyValue",
+      "name": "Twitter",
+      "value": "<span class=\"h-card\"><a href=\"https://mastodon.social/@siracusa\" class=\"u-url mention\">@<span>siracusa</span></a></span>"
+    }
+  ],
+  "endpoints": {
+    "sharedInbox": "https://mastodon.social/inbox"
+  },
+  "icon": {
+    "type": "Image",
+    "mediaType": "image/png",
+    "url": "https://files.mastodon.social/accounts/avatars/000/198/650/original/3d92f09fb2262d62.png"
+  },
+  "image": {
+    "type": "Image",
+    "mediaType": "image/jpeg",
+    "url": "https://files.mastodon.social/accounts/headers/000/198/650/original/88ad458e3d7cc525.jpg"
+  }
+}

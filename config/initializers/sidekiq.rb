@@ -16,3 +16,21 @@ end
 Sidekiq.configure_client do |config|
   config.redis = {id: "feedbin-client-#{::Process.pid}"}
 end
+
+module Sidekiq
+  class Batch
+    def self.cleanup_redis(bid)
+      # noop
+    end
+  end
+end
+
+module Sidekiq
+  class Batch
+    class Status
+      def join
+        sleep 0.01 until complete?
+      end
+    end
+  end
+end

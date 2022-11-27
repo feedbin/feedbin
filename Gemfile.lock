@@ -528,6 +528,8 @@ GEM
       connection_pool (>= 2.2.5)
       rack (~> 2.0)
       redis (>= 4.5.0, < 5)
+    sidekiq-batch (0.1.9)
+      sidekiq (>= 3)
     simple_oauth (0.3.1)
     snaky_hash (2.0.1)
       hashie
@@ -650,6 +652,7 @@ DEPENDENCIES
   sax-machine!
   selenium-webdriver
   sidekiq (= 6.5.7)
+  sidekiq-batch
   standard
   stripe (~> 5.55.0)
   stripe-ruby-mock!

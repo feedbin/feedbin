@@ -21,6 +21,10 @@ class FeedFinder
     existing_feed = Feed.xml.where(feed_url: url).take
 
     if feeds.empty?
+      feeds = Source::ActivityPub.find(url)
+    end
+
+    if feeds.empty?
       feeds = Source::TwitterData.find(url, twitter_auth)
     end
 

@@ -1,0 +1,929 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/activitystreams",
+    {
+      "ostatus": "http://ostatus.org#",
+      "atomUri": "ostatus:atomUri",
+      "inReplyToAtomUri": "ostatus:inReplyToAtomUri",
+      "conversation": "ostatus:conversation",
+      "sensitive": "as:sensitive",
+      "toot": "http://joinmastodon.org/ns#",
+      "votersCount": "toot:votersCount",
+      "blurhash": "toot:blurhash",
+      "focalPoint": {
+        "@container": "@list",
+        "@id": "toot:focalPoint"
+      }
+    }
+  ],
+  "id": "https://mastodon.social/users/siracusa/outbox?page=true",
+  "type": "OrderedCollectionPage",
+  "next": "https://mastodon.social/users/siracusa/outbox?max_id=109377970955911427&page=true",
+  "prev": "https://mastodon.social/users/siracusa/outbox?min_id=109396267671370376&page=true",
+  "partOf": "https://mastodon.social/users/siracusa/outbox",
+  "orderedItems": [
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109396267671370376/activity",
+      "type": "Create",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-24T01:49:32Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.social/users/siracusa/followers",
+        "https://hachyderm.io/users/lexfri"
+      ],
+      "object": {
+        "id": "https://mastodon.social/users/siracusa/statuses/109396267671370376",
+        "type": "Note",
+        "summary": null,
+        "inReplyTo": "https://hachyderm.io/users/lexfri/statuses/109395046978274793",
+        "published": "2022-11-24T01:49:32Z",
+        "url": "https://mastodon.social/@siracusa/109396267671370376",
+        "attributedTo": "https://mastodon.social/users/siracusa",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ],
+        "cc": [
+          "https://mastodon.social/users/siracusa/followers",
+          "https://hachyderm.io/users/lexfri"
+        ],
+        "sensitive": false,
+        "atomUri": "https://mastodon.social/users/siracusa/statuses/109396267671370376",
+        "inReplyToAtomUri": "https://hachyderm.io/users/lexfri/statuses/109395046978274793",
+        "conversation": "tag:hachyderm.io,2022-11-23:objectId=3830990:objectType=Conversation",
+        "content": "<p><span class=\"h-card\"><a href=\"https://hachyderm.io/@lexfri\" class=\"u-url mention\">@<span>lexfri</span></a></span> I made this same point/joke on ATP this week.</p>",
+        "contentMap": {
+          "en": "<p><span class=\"h-card\"><a href=\"https://hachyderm.io/@lexfri\" class=\"u-url mention\">@<span>lexfri</span></a></span> I made this same point/joke on ATP this week.</p>"
+        },
+        "attachment": [
+
+        ],
+        "tag": [
+          {
+            "type": "Mention",
+            "href": "https://hachyderm.io/users/lexfri",
+            "name": "@lexfri@hachyderm.io"
+          }
+        ],
+        "replies": {
+          "id": "https://mastodon.social/users/siracusa/statuses/109396267671370376/replies",
+          "type": "Collection",
+          "first": {
+            "type": "CollectionPage",
+            "next": "https://mastodon.social/users/siracusa/statuses/109396267671370376/replies?only_other_accounts=true&page=true",
+            "partOf": "https://mastodon.social/users/siracusa/statuses/109396267671370376/replies",
+            "items": [
+
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109393886886579133/activity",
+      "type": "Announce",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-23T15:44:04Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.gamedev.place/users/BenHouston3D",
+        "https://mastodon.social/users/siracusa/followers"
+      ],
+      "object": "https://mastodon.gamedev.place/users/BenHouston3D/statuses/109387836974966237"
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109390708936714713/activity",
+      "type": "Create",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-23T02:15:53Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.social/users/siracusa/followers",
+        "https://social.vivaldi.net/users/santim"
+      ],
+      "object": {
+        "id": "https://mastodon.social/users/siracusa/statuses/109390708936714713",
+        "type": "Note",
+        "summary": null,
+        "inReplyTo": "https://social.vivaldi.net/users/santim/statuses/109390499201805667",
+        "published": "2022-11-23T02:15:53Z",
+        "url": "https://mastodon.social/@siracusa/109390708936714713",
+        "attributedTo": "https://mastodon.social/users/siracusa",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ],
+        "cc": [
+          "https://mastodon.social/users/siracusa/followers",
+          "https://social.vivaldi.net/users/santim"
+        ],
+        "sensitive": false,
+        "atomUri": "https://mastodon.social/users/siracusa/statuses/109390708936714713",
+        "inReplyToAtomUri": "https://social.vivaldi.net/users/santim/statuses/109390499201805667",
+        "conversation": "tag:mastodon.social,2022-11-20:objectId=337648547:objectType=Conversation",
+        "content": "<p><span class=\"h-card\"><a href=\"https://social.vivaldi.net/@santim\" class=\"u-url mention\">@<span>santim</span></a></span> Undecided.</p>",
+        "contentMap": {
+          "en": "<p><span class=\"h-card\"><a href=\"https://social.vivaldi.net/@santim\" class=\"u-url mention\">@<span>santim</span></a></span> Undecided.</p>"
+        },
+        "attachment": [
+
+        ],
+        "tag": [
+          {
+            "type": "Mention",
+            "href": "https://social.vivaldi.net/users/santim",
+            "name": "@santim@vivaldi.net"
+          }
+        ],
+        "replies": {
+          "id": "https://mastodon.social/users/siracusa/statuses/109390708936714713/replies",
+          "type": "Collection",
+          "first": {
+            "type": "CollectionPage",
+            "next": "https://mastodon.social/users/siracusa/statuses/109390708936714713/replies?only_other_accounts=true&page=true",
+            "partOf": "https://mastodon.social/users/siracusa/statuses/109390708936714713/replies",
+            "items": [
+
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109390706409996349/activity",
+      "type": "Announce",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-23T02:15:14Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://masto.ashfurrow.com/users/ashfurrow",
+        "https://mastodon.social/users/siracusa/followers"
+      ],
+      "object": "https://masto.ashfurrow.com/users/ashfurrow/statuses/109390312390216918"
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109390100946295053/activity",
+      "type": "Create",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-22T23:41:15Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.social/users/siracusa/followers",
+        "https://toot.codatory.com/users/alex"
+      ],
+      "object": {
+        "id": "https://mastodon.social/users/siracusa/statuses/109390100946295053",
+        "type": "Note",
+        "summary": null,
+        "inReplyTo": "https://toot.codatory.com/users/alex/statuses/109390071909306538",
+        "published": "2022-11-22T23:41:15Z",
+        "url": "https://mastodon.social/@siracusa/109390100946295053",
+        "attributedTo": "https://mastodon.social/users/siracusa",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ],
+        "cc": [
+          "https://mastodon.social/users/siracusa/followers",
+          "https://toot.codatory.com/users/alex"
+        ],
+        "sensitive": false,
+        "atomUri": "https://mastodon.social/users/siracusa/statuses/109390100946295053",
+        "inReplyToAtomUri": "https://toot.codatory.com/users/alex/statuses/109390071909306538",
+        "conversation": "tag:codatory.com,2022-11-22:objectId=50078:objectType=Conversation",
+        "content": "<p><span class=\"h-card\"><a href=\"https://toot.codatory.com/@alex\" class=\"u-url mention\">@<span>alex</span></a></span> If it’s permanent, it’s not much of a cache!</p>",
+        "contentMap": {
+          "en": "<p><span class=\"h-card\"><a href=\"https://toot.codatory.com/@alex\" class=\"u-url mention\">@<span>alex</span></a></span> If it’s permanent, it’s not much of a cache!</p>"
+        },
+        "attachment": [
+
+        ],
+        "tag": [
+          {
+            "type": "Mention",
+            "href": "https://toot.codatory.com/users/alex",
+            "name": "@alex@codatory.com"
+          }
+        ],
+        "replies": {
+          "id": "https://mastodon.social/users/siracusa/statuses/109390100946295053/replies",
+          "type": "Collection",
+          "first": {
+            "type": "CollectionPage",
+            "next": "https://mastodon.social/users/siracusa/statuses/109390100946295053/replies?only_other_accounts=true&page=true",
+            "partOf": "https://mastodon.social/users/siracusa/statuses/109390100946295053/replies",
+            "items": [
+
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109389457834979575/activity",
+      "type": "Create",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-22T20:57:42Z",
+      "to": [
+        "https://mastodon.social/users/siracusa/followers"
+      ],
+      "cc": [
+        "https://www.w3.org/ns/activitystreams#Public",
+        "https://1210.nl/users/adnan"
+      ],
+      "object": {
+        "id": "https://mastodon.social/users/siracusa/statuses/109389457834979575",
+        "type": "Note",
+        "summary": null,
+        "inReplyTo": "https://1210.nl/users/adnan/statuses/109389400681184369",
+        "published": "2022-11-22T20:57:42Z",
+        "url": "https://mastodon.social/@siracusa/109389457834979575",
+        "attributedTo": "https://mastodon.social/users/siracusa",
+        "to": [
+          "https://mastodon.social/users/siracusa/followers"
+        ],
+        "cc": [
+          "https://www.w3.org/ns/activitystreams#Public",
+          "https://1210.nl/users/adnan"
+        ],
+        "sensitive": false,
+        "atomUri": "https://mastodon.social/users/siracusa/statuses/109389457834979575",
+        "inReplyToAtomUri": "https://1210.nl/users/adnan/statuses/109389400681184369",
+        "conversation": "tag:mastodon.social,2022-11-20:objectId=337648547:objectType=Conversation",
+        "content": "<p><span class=\"h-card\"><a href=\"https://1210.nl/@adnan\" class=\"u-url mention\">@<span>adnan</span></a></span> If it did, your post would be visible in the “Home” view and not just in the “Notifications” view.</p>",
+        "contentMap": {
+          "en": "<p><span class=\"h-card\"><a href=\"https://1210.nl/@adnan\" class=\"u-url mention\">@<span>adnan</span></a></span> If it did, your post would be visible in the “Home” view and not just in the “Notifications” view.</p>"
+        },
+        "attachment": [
+          {
+            "type": "Document",
+            "mediaType": "image/jpeg",
+            "url": "https://files.mastodon.social/media_attachments/files/109/389/456/850/032/463/original/4d935afe91dec613.jpeg",
+            "name": null,
+            "blurhash": "U9R:HE00R%IU%PxsInj;nf%Mj_Rl~q%3n,%3",
+            "width": 1179,
+            "height": 1017
+          },
+          {
+            "type": "Document",
+            "mediaType": "image/jpeg",
+            "url": "https://files.mastodon.social/media_attachments/files/109/389/456/956/278/553/original/7fd4ff6a9397f90f.jpeg",
+            "name": null,
+            "blurhash": "U9R:KO4nWAM_^*xsWYozD%%Mt7jZ_N%Ns:xu",
+            "width": 1179,
+            "height": 1041
+          }
+        ],
+        "tag": [
+          {
+            "type": "Mention",
+            "href": "https://1210.nl/users/adnan",
+            "name": "@adnan@1210.nl"
+          }
+        ],
+        "replies": {
+          "id": "https://mastodon.social/users/siracusa/statuses/109389457834979575/replies",
+          "type": "Collection",
+          "first": {
+            "type": "CollectionPage",
+            "next": "https://mastodon.social/users/siracusa/statuses/109389457834979575/replies?only_other_accounts=true&page=true",
+            "partOf": "https://mastodon.social/users/siracusa/statuses/109389457834979575/replies",
+            "items": [
+
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109389104868531613/activity",
+      "type": "Create",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-22T19:27:56Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.social/users/siracusa/followers",
+        "https://indieweb.social/users/jameskoole"
+      ],
+      "object": {
+        "id": "https://mastodon.social/users/siracusa/statuses/109389104868531613",
+        "type": "Note",
+        "summary": null,
+        "inReplyTo": "https://indieweb.social/users/jameskoole/statuses/109388993004872362",
+        "published": "2022-11-22T19:27:56Z",
+        "url": "https://mastodon.social/@siracusa/109389104868531613",
+        "attributedTo": "https://mastodon.social/users/siracusa",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ],
+        "cc": [
+          "https://mastodon.social/users/siracusa/followers",
+          "https://indieweb.social/users/jameskoole"
+        ],
+        "sensitive": false,
+        "atomUri": "https://mastodon.social/users/siracusa/statuses/109389104868531613",
+        "inReplyToAtomUri": "https://indieweb.social/users/jameskoole/statuses/109388993004872362",
+        "conversation": "tag:indieweb.social,2022-11-22:objectId=24204701:objectType=Conversation",
+        "content": "<p><span class=\"h-card\"><a href=\"https://indieweb.social/@jameskoole\" class=\"u-url mention\">@<span>jameskoole</span></a></span> Isn’t there a 30-day waiting period once you activate it?</p>",
+        "contentMap": {
+          "en": "<p><span class=\"h-card\"><a href=\"https://indieweb.social/@jameskoole\" class=\"u-url mention\">@<span>jameskoole</span></a></span> Isn’t there a 30-day waiting period once you activate it?</p>"
+        },
+        "attachment": [
+
+        ],
+        "tag": [
+          {
+            "type": "Mention",
+            "href": "https://indieweb.social/users/jameskoole",
+            "name": "@jameskoole@indieweb.social"
+          }
+        ],
+        "replies": {
+          "id": "https://mastodon.social/users/siracusa/statuses/109389104868531613/replies",
+          "type": "Collection",
+          "first": {
+            "type": "CollectionPage",
+            "next": "https://mastodon.social/users/siracusa/statuses/109389104868531613/replies?only_other_accounts=true&page=true",
+            "partOf": "https://mastodon.social/users/siracusa/statuses/109389104868531613/replies",
+            "items": [
+
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109389102666809825/activity",
+      "type": "Create",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-22T19:27:23Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.social/users/siracusa/followers",
+        "https://mastodon.ie/users/Squozen"
+      ],
+      "object": {
+        "id": "https://mastodon.social/users/siracusa/statuses/109389102666809825",
+        "type": "Note",
+        "summary": null,
+        "inReplyTo": "https://mastodon.ie/users/Squozen/statuses/109388903372230413",
+        "published": "2022-11-22T19:27:23Z",
+        "url": "https://mastodon.social/@siracusa/109389102666809825",
+        "attributedTo": "https://mastodon.social/users/siracusa",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ],
+        "cc": [
+          "https://mastodon.social/users/siracusa/followers",
+          "https://mastodon.ie/users/Squozen"
+        ],
+        "sensitive": false,
+        "atomUri": "https://mastodon.social/users/siracusa/statuses/109389102666809825",
+        "inReplyToAtomUri": "https://mastodon.ie/users/Squozen/statuses/109388903372230413",
+        "conversation": "tag:mastodon.ie,2022-11-22:objectId=12835490:objectType=Conversation",
+        "content": "<p><span class=\"h-card\"><a href=\"https://mastodon.ie/@Squozen\" class=\"u-url mention\">@<span>Squozen</span></a></span> I’ve never owned one, so I don’t know.</p>",
+        "contentMap": {
+          "en": "<p><span class=\"h-card\"><a href=\"https://mastodon.ie/@Squozen\" class=\"u-url mention\">@<span>Squozen</span></a></span> I’ve never owned one, so I don’t know.</p>"
+        },
+        "attachment": [
+
+        ],
+        "tag": [
+          {
+            "type": "Mention",
+            "href": "https://mastodon.ie/users/Squozen",
+            "name": "@Squozen@mastodon.ie"
+          }
+        ],
+        "replies": {
+          "id": "https://mastodon.social/users/siracusa/statuses/109389102666809825/replies",
+          "type": "Collection",
+          "first": {
+            "type": "CollectionPage",
+            "next": "https://mastodon.social/users/siracusa/statuses/109389102666809825/replies?only_other_accounts=true&page=true",
+            "partOf": "https://mastodon.social/users/siracusa/statuses/109389102666809825/replies",
+            "items": [
+
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109388788852601202/activity",
+      "type": "Create",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-22T18:07:34Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.social/users/siracusa/followers",
+        "https://mastodon.ie/users/Squozen"
+      ],
+      "object": {
+        "id": "https://mastodon.social/users/siracusa/statuses/109388788852601202",
+        "type": "Note",
+        "summary": null,
+        "inReplyTo": "https://mastodon.ie/users/Squozen/statuses/109387939769498361",
+        "published": "2022-11-22T18:07:34Z",
+        "url": "https://mastodon.social/@siracusa/109388788852601202",
+        "attributedTo": "https://mastodon.social/users/siracusa",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ],
+        "cc": [
+          "https://mastodon.social/users/siracusa/followers",
+          "https://mastodon.ie/users/Squozen"
+        ],
+        "sensitive": false,
+        "atomUri": "https://mastodon.social/users/siracusa/statuses/109388788852601202",
+        "inReplyToAtomUri": "https://mastodon.ie/users/Squozen/statuses/109387939769498361",
+        "conversation": "tag:mastodon.ie,2022-11-22:objectId=12835490:objectType=Conversation",
+        "content": "<p><span class=\"h-card\"><a href=\"https://mastodon.ie/@Squozen\" class=\"u-url mention\">@<span>Squozen</span></a></span> …after a 30-day waiting period, though. Not great.</p>",
+        "contentMap": {
+          "en": "<p><span class=\"h-card\"><a href=\"https://mastodon.ie/@Squozen\" class=\"u-url mention\">@<span>Squozen</span></a></span> …after a 30-day waiting period, though. Not great.</p>"
+        },
+        "attachment": [
+
+        ],
+        "tag": [
+          {
+            "type": "Mention",
+            "href": "https://mastodon.ie/users/Squozen",
+            "name": "@Squozen@mastodon.ie"
+          }
+        ],
+        "replies": {
+          "id": "https://mastodon.social/users/siracusa/statuses/109388788852601202/replies",
+          "type": "Collection",
+          "first": {
+            "type": "CollectionPage",
+            "next": "https://mastodon.social/users/siracusa/statuses/109388788852601202/replies?only_other_accounts=true&page=true",
+            "partOf": "https://mastodon.social/users/siracusa/statuses/109388788852601202/replies",
+            "items": [
+
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109388782136730020/activity",
+      "type": "Create",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-22T18:05:52Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.social/users/siracusa/followers",
+        "https://mastodon.mit.edu/users/Eggfreckles"
+      ],
+      "object": {
+        "id": "https://mastodon.social/users/siracusa/statuses/109388782136730020",
+        "type": "Note",
+        "summary": null,
+        "inReplyTo": "https://mastodon.mit.edu/users/Eggfreckles/statuses/109388710633157727",
+        "published": "2022-11-22T18:05:52Z",
+        "url": "https://mastodon.social/@siracusa/109388782136730020",
+        "attributedTo": "https://mastodon.social/users/siracusa",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ],
+        "cc": [
+          "https://mastodon.social/users/siracusa/followers",
+          "https://mastodon.mit.edu/users/Eggfreckles"
+        ],
+        "sensitive": false,
+        "atomUri": "https://mastodon.social/users/siracusa/statuses/109388782136730020",
+        "inReplyToAtomUri": "https://mastodon.mit.edu/users/Eggfreckles/statuses/109388710633157727",
+        "conversation": "tag:mastodon.mit.edu,2022-11-22:objectId=21567732:objectType=Conversation",
+        "content": "<p><span class=\"h-card\"><a href=\"https://mastodon.mit.edu/@Eggfreckles\" class=\"u-url mention\">@<span>Eggfreckles</span></a></span> Yeah, but that’s quite a penalty!</p>",
+        "contentMap": {
+          "en": "<p><span class=\"h-card\"><a href=\"https://mastodon.mit.edu/@Eggfreckles\" class=\"u-url mention\">@<span>Eggfreckles</span></a></span> Yeah, but that’s quite a penalty!</p>"
+        },
+        "attachment": [
+
+        ],
+        "tag": [
+          {
+            "type": "Mention",
+            "href": "https://mastodon.mit.edu/users/Eggfreckles",
+            "name": "@Eggfreckles@mastodon.mit.edu"
+          }
+        ],
+        "replies": {
+          "id": "https://mastodon.social/users/siracusa/statuses/109388782136730020/replies",
+          "type": "Collection",
+          "first": {
+            "type": "CollectionPage",
+            "next": "https://mastodon.social/users/siracusa/statuses/109388782136730020/replies?only_other_accounts=true&page=true",
+            "partOf": "https://mastodon.social/users/siracusa/statuses/109388782136730020/replies",
+            "items": [
+
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109388772069080342/activity",
+      "type": "Announce",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-22T18:03:18Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.social/users/atpfm",
+        "https://mastodon.social/users/siracusa/followers"
+      ],
+      "object": "https://mastodon.social/users/atpfm/statuses/109388448957664687"
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109383423726673157/activity",
+      "type": "Announce",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-21T19:23:09Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.lol/users/JudeDoyle",
+        "https://mastodon.social/users/siracusa/followers"
+      ],
+      "object": "https://mastodon.lol/users/JudeDoyle/statuses/109383040750847987"
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109382579467746887/activity",
+      "type": "Announce",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-21T15:48:27Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.social/users/jeresig",
+        "https://mastodon.social/users/siracusa/followers"
+      ],
+      "object": "https://mastodon.social/users/jeresig/statuses/109382429105279933"
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109382318445935021/activity",
+      "type": "Announce",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-21T14:42:04Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.social/users/jamesthomson",
+        "https://mastodon.social/users/siracusa/followers"
+      ],
+      "object": "https://mastodon.social/users/jamesthomson/statuses/109382248419541467"
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109382299355577578/activity",
+      "type": "Create",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-21T14:37:13Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.social/users/siracusa/followers",
+        "https://mastodon.social/users/alexito4"
+      ],
+      "object": {
+        "id": "https://mastodon.social/users/siracusa/statuses/109382299355577578",
+        "type": "Note",
+        "summary": null,
+        "inReplyTo": "https://mastodon.social/users/alexito4/statuses/109381246703940658",
+        "published": "2022-11-21T14:37:13Z",
+        "url": "https://mastodon.social/@siracusa/109382299355577578",
+        "attributedTo": "https://mastodon.social/users/siracusa",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ],
+        "cc": [
+          "https://mastodon.social/users/siracusa/followers",
+          "https://mastodon.social/users/alexito4"
+        ],
+        "sensitive": false,
+        "atomUri": "https://mastodon.social/users/siracusa/statuses/109382299355577578",
+        "inReplyToAtomUri": "https://mastodon.social/users/alexito4/statuses/109381246703940658",
+        "conversation": "tag:mastodon.social,2022-11-20:objectId=337648547:objectType=Conversation",
+        "content": "<p><span class=\"h-card\"><a href=\"https://mastodon.social/@alexito4\" class=\"u-url mention\">@<span>alexito4</span></a></span> Individual apps seem to keep track on their own, but I don’t think I’ve seen any state sharing between apps.</p>",
+        "contentMap": {
+          "en": "<p><span class=\"h-card\"><a href=\"https://mastodon.social/@alexito4\" class=\"u-url mention\">@<span>alexito4</span></a></span> Individual apps seem to keep track on their own, but I don’t think I’ve seen any state sharing between apps.</p>"
+        },
+        "attachment": [
+
+        ],
+        "tag": [
+          {
+            "type": "Mention",
+            "href": "https://mastodon.social/users/alexito4",
+            "name": "@alexito4"
+          }
+        ],
+        "replies": {
+          "id": "https://mastodon.social/users/siracusa/statuses/109382299355577578/replies",
+          "type": "Collection",
+          "first": {
+            "type": "CollectionPage",
+            "next": "https://mastodon.social/users/siracusa/statuses/109382299355577578/replies?only_other_accounts=true&page=true",
+            "partOf": "https://mastodon.social/users/siracusa/statuses/109382299355577578/replies",
+            "items": [
+
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109379244315943471/activity",
+      "type": "Announce",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-21T01:40:16Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.cloud/users/timbray",
+        "https://mastodon.social/users/siracusa/followers"
+      ],
+      "object": "https://mastodon.cloud/users/timbray/statuses/109379017349234859"
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109378861590549402/activity",
+      "type": "Create",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-21T00:02:56Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.social/users/siracusa/followers",
+        "https://mas.to/users/leonrobbins"
+      ],
+      "object": {
+        "id": "https://mastodon.social/users/siracusa/statuses/109378861590549402",
+        "type": "Note",
+        "summary": null,
+        "inReplyTo": "https://mas.to/users/leonrobbins/statuses/109378593139061106",
+        "published": "2022-11-21T00:02:56Z",
+        "url": "https://mastodon.social/@siracusa/109378861590549402",
+        "attributedTo": "https://mastodon.social/users/siracusa",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ],
+        "cc": [
+          "https://mastodon.social/users/siracusa/followers",
+          "https://mas.to/users/leonrobbins"
+        ],
+        "sensitive": false,
+        "atomUri": "https://mastodon.social/users/siracusa/statuses/109378861590549402",
+        "inReplyToAtomUri": "https://mas.to/users/leonrobbins/statuses/109378593139061106",
+        "conversation": "tag:mastodon.social,2022-11-20:objectId=337759813:objectType=Conversation",
+        "content": "<p><span class=\"h-card\"><a href=\"https://mas.to/@leonrobbins\" class=\"u-url mention\">@<span>leonrobbins</span></a></span> No idea…</p>",
+        "contentMap": {
+          "en": "<p><span class=\"h-card\"><a href=\"https://mas.to/@leonrobbins\" class=\"u-url mention\">@<span>leonrobbins</span></a></span> No idea…</p>"
+        },
+        "attachment": [
+
+        ],
+        "tag": [
+          {
+            "type": "Mention",
+            "href": "https://mas.to/users/leonrobbins",
+            "name": "@leonrobbins@mas.to"
+          }
+        ],
+        "replies": {
+          "id": "https://mastodon.social/users/siracusa/statuses/109378861590549402/replies",
+          "type": "Collection",
+          "first": {
+            "type": "CollectionPage",
+            "next": "https://mastodon.social/users/siracusa/statuses/109378861590549402/replies?only_other_accounts=true&page=true",
+            "partOf": "https://mastodon.social/users/siracusa/statuses/109378861590549402/replies",
+            "items": [
+
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109378113742084850/activity",
+      "type": "Create",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-20T20:52:45Z",
+      "to": [
+        "https://mastodon.social/users/siracusa/followers"
+      ],
+      "cc": [
+        "https://www.w3.org/ns/activitystreams#Public",
+        "https://twit.social/users/Ciantic",
+        "https://mastodon.social/users/atpfm",
+        "https://mastodon.social/users/RecDiffs",
+        "https://mastodon.social/users/hypercritical"
+      ],
+      "object": {
+        "id": "https://mastodon.social/users/siracusa/statuses/109378113742084850",
+        "type": "Note",
+        "summary": null,
+        "inReplyTo": "https://twit.social/users/Ciantic/statuses/109377998796215517",
+        "published": "2022-11-20T20:52:45Z",
+        "url": "https://mastodon.social/@siracusa/109378113742084850",
+        "attributedTo": "https://mastodon.social/users/siracusa",
+        "to": [
+          "https://mastodon.social/users/siracusa/followers"
+        ],
+        "cc": [
+          "https://www.w3.org/ns/activitystreams#Public",
+          "https://twit.social/users/Ciantic",
+          "https://mastodon.social/users/atpfm",
+          "https://mastodon.social/users/RecDiffs",
+          "https://mastodon.social/users/hypercritical"
+        ],
+        "sensitive": false,
+        "atomUri": "https://mastodon.social/users/siracusa/statuses/109378113742084850",
+        "inReplyToAtomUri": "https://twit.social/users/Ciantic/statuses/109377998796215517",
+        "conversation": "tag:mastodon.social,2022-11-20:objectId=337759813:objectType=Conversation",
+        "content": "<p><span class=\"h-card\"><a href=\"https://twit.social/@Ciantic\" class=\"u-url mention\">@<span>Ciantic</span></a></span> I think it depends on your client app, but let’s try it here:</p><p><span class=\"h-card\"><a href=\"https://mastodon.social/@atpfm\" class=\"u-url mention\">@<span>atpfm</span></a></span><br /><span class=\"h-card\"><a href=\"https://mastodon.social/@RecDiffs\" class=\"u-url mention\">@<span>RecDiffs</span></a></span><br /><span class=\"h-card\"><a href=\"https://mastodon.social/@hypercritical\" class=\"u-url mention\">@<span>hypercritical</span></a></span></p>",
+        "contentMap": {
+          "en": "<p><span class=\"h-card\"><a href=\"https://twit.social/@Ciantic\" class=\"u-url mention\">@<span>Ciantic</span></a></span> I think it depends on your client app, but let’s try it here:</p><p><span class=\"h-card\"><a href=\"https://mastodon.social/@atpfm\" class=\"u-url mention\">@<span>atpfm</span></a></span><br /><span class=\"h-card\"><a href=\"https://mastodon.social/@RecDiffs\" class=\"u-url mention\">@<span>RecDiffs</span></a></span><br /><span class=\"h-card\"><a href=\"https://mastodon.social/@hypercritical\" class=\"u-url mention\">@<span>hypercritical</span></a></span></p>"
+        },
+        "attachment": [
+
+        ],
+        "tag": [
+          {
+            "type": "Mention",
+            "href": "https://twit.social/users/Ciantic",
+            "name": "@Ciantic@twit.social"
+          },
+          {
+            "type": "Mention",
+            "href": "https://mastodon.social/users/atpfm",
+            "name": "@atpfm"
+          },
+          {
+            "type": "Mention",
+            "href": "https://mastodon.social/users/RecDiffs",
+            "name": "@RecDiffs"
+          },
+          {
+            "type": "Mention",
+            "href": "https://mastodon.social/users/hypercritical",
+            "name": "@hypercritical"
+          }
+        ],
+        "replies": {
+          "id": "https://mastodon.social/users/siracusa/statuses/109378113742084850/replies",
+          "type": "Collection",
+          "first": {
+            "type": "CollectionPage",
+            "next": "https://mastodon.social/users/siracusa/statuses/109378113742084850/replies?only_other_accounts=true&page=true",
+            "partOf": "https://mastodon.social/users/siracusa/statuses/109378113742084850/replies",
+            "items": [
+
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109378101776240248/activity",
+      "type": "Create",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-20T20:49:43Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.social/users/siracusa/followers",
+        "https://mastodon.cloud/users/Hanzo55"
+      ],
+      "object": {
+        "id": "https://mastodon.social/users/siracusa/statuses/109378101776240248",
+        "type": "Note",
+        "summary": null,
+        "inReplyTo": "https://mastodon.cloud/users/Hanzo55/statuses/109377824101865365",
+        "published": "2022-11-20T20:49:43Z",
+        "url": "https://mastodon.social/@siracusa/109378101776240248",
+        "attributedTo": "https://mastodon.social/users/siracusa",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ],
+        "cc": [
+          "https://mastodon.social/users/siracusa/followers",
+          "https://mastodon.cloud/users/Hanzo55"
+        ],
+        "sensitive": false,
+        "atomUri": "https://mastodon.social/users/siracusa/statuses/109378101776240248",
+        "inReplyToAtomUri": "https://mastodon.cloud/users/Hanzo55/statuses/109377824101865365",
+        "conversation": "tag:mastodon.social,2022-11-20:objectId=337648547:objectType=Conversation",
+        "content": "<p><span class=\"h-card\"><a href=\"https://mastodon.cloud/@Hanzo55\" class=\"u-url mention\">@<span>Hanzo55</span></a></span> Sorry, Tusker: <a href=\"https://testflight.apple.com/join/wtB7HYvG\" target=\"_blank\" rel=\"nofollow noopener noreferrer\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">testflight.apple.com/join/wtB7</span><span class=\"invisible\">HYvG</span></a></p>",
+        "contentMap": {
+          "en": "<p><span class=\"h-card\"><a href=\"https://mastodon.cloud/@Hanzo55\" class=\"u-url mention\">@<span>Hanzo55</span></a></span> Sorry, Tusker: <a href=\"https://testflight.apple.com/join/wtB7HYvG\" target=\"_blank\" rel=\"nofollow noopener noreferrer\"><span class=\"invisible\">https://</span><span class=\"ellipsis\">testflight.apple.com/join/wtB7</span><span class=\"invisible\">HYvG</span></a></p>"
+        },
+        "attachment": [
+
+        ],
+        "tag": [
+          {
+            "type": "Mention",
+            "href": "https://mastodon.cloud/users/Hanzo55",
+            "name": "@Hanzo55@mastodon.cloud"
+          }
+        ],
+        "replies": {
+          "id": "https://mastodon.social/users/siracusa/statuses/109378101776240248/replies",
+          "type": "Collection",
+          "first": {
+            "type": "CollectionPage",
+            "next": "https://mastodon.social/users/siracusa/statuses/109378101776240248/replies?only_other_accounts=true&page=true",
+            "partOf": "https://mastodon.social/users/siracusa/statuses/109378101776240248/replies",
+            "items": [
+
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "https://mastodon.social/users/siracusa/statuses/109377970955911427/activity",
+      "type": "Create",
+      "actor": "https://mastodon.social/users/siracusa",
+      "published": "2022-11-20T20:16:26Z",
+      "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+      ],
+      "cc": [
+        "https://mastodon.social/users/siracusa/followers",
+        "https://mastodon.lol/users/daveilers"
+      ],
+      "object": {
+        "id": "https://mastodon.social/users/siracusa/statuses/109377970955911427",
+        "type": "Note",
+        "summary": null,
+        "inReplyTo": "https://mastodon.lol/users/daveilers/statuses/109377784628779707",
+        "published": "2022-11-20T20:16:26Z",
+        "url": "https://mastodon.social/@siracusa/109377970955911427",
+        "attributedTo": "https://mastodon.social/users/siracusa",
+        "to": [
+          "https://www.w3.org/ns/activitystreams#Public"
+        ],
+        "cc": [
+          "https://mastodon.social/users/siracusa/followers",
+          "https://mastodon.lol/users/daveilers"
+        ],
+        "sensitive": false,
+        "atomUri": "https://mastodon.social/users/siracusa/statuses/109377970955911427",
+        "inReplyToAtomUri": "https://mastodon.lol/users/daveilers/statuses/109377784628779707",
+        "conversation": "tag:mastodon.social,2022-11-20:objectId=337759813:objectType=Conversation",
+        "content": "<p><span class=\"h-card\"><a href=\"https://mastodon.lol/@daveilers\" class=\"u-url mention\">@<span>daveilers</span></a></span> That’s not what I see:</p>",
+        "contentMap": {
+          "en": "<p><span class=\"h-card\"><a href=\"https://mastodon.lol/@daveilers\" class=\"u-url mention\">@<span>daveilers</span></a></span> That’s not what I see:</p>"
+        },
+        "attachment": [
+
+        ],
+        "tag": [
+          {
+            "type": "Mention",
+            "href": "https://mastodon.lol/users/daveilers",
+            "name": "@daveilers@mastodon.lol"
+          }
+        ],
+        "replies": {
+          "id": "https://mastodon.social/users/siracusa/statuses/109377970955911427/replies",
+          "type": "Collection",
+          "first": {
+            "type": "CollectionPage",
+            "next": "https://mastodon.social/users/siracusa/statuses/109377970955911427/replies?only_other_accounts=true&page=true",
+            "partOf": "https://mastodon.social/users/siracusa/statuses/109377970955911427/replies",
+            "items": [
+
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

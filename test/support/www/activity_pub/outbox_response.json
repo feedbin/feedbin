@@ -1,0 +1,8 @@
+{
+  "@context": "https://www.w3.org/ns/activitystreams",
+  "id": "https://mastodon.social/users/siracusa/outbox",
+  "type": "OrderedCollection",
+  "totalItems": 46,
+  "first": "https://mastodon.social/users/siracusa/outbox?page=true",
+  "last": "https://mastodon.social/users/siracusa/outbox?min_id=0&page=true"
+}

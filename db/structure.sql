@@ -165,6 +165,39 @@ ALTER SEQUENCE public.actions_id_seq OWNED BY public.actions.id;
 
 
 --
+-- Name: activities; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities (
+    id bigint NOT NULL,
+    activity_type text,
+    url text,
+    data jsonb,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: activities_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.activities_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: activities_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.activities_id_seq OWNED BY public.activities.id;
+
+
+--
 -- Name: app_store_notifications; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -603,7 +636,8 @@ CREATE TABLE public.feeds (
     settings jsonb,
     standalone_request_at timestamp(6) without time zone,
     last_change_check timestamp(6) without time zone,
-    crawl_data jsonb
+    crawl_data jsonb,
+    activity_pub_account text
 );
 
 
@@ -1423,6 +1457,13 @@ ALTER TABLE ONLY public.actions ALTER COLUMN id SET DEFAULT nextval('public.acti
 
 
 --
+-- Name: activities id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ALTER COLUMN id SET DEFAULT nextval('public.activities_id_seq'::regclass);
+
+
+--
 -- Name: app_store_notifications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1682,6 +1723,14 @@ ALTER TABLE ONLY public.account_migrations
 
 ALTER TABLE ONLY public.actions
     ADD CONSTRAINT actions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: activities activities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities
+    ADD CONSTRAINT activities_pkey PRIMARY KEY (id);
 
 
 --
@@ -1986,6 +2035,13 @@ CREATE INDEX index_actions_on_user_id ON public.actions USING btree (user_id);
 
 
 --
+-- Name: index_activities_on_url; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_activities_on_url ON public.activities USING btree (url);
+
+
+--
 -- Name: index_app_store_notifications_on_notification_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2151,6 +2207,13 @@ CREATE INDEX index_feed_stats_on_feed_id_and_day ON public.feed_stats USING btre
 --
 
 CREATE INDEX index_feeds_on_active ON public.feeds USING btree (active);
+
+
+--
+-- Name: index_feeds_on_activity_pub_account; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_feeds_on_activity_pub_account ON public.feeds USING btree (activity_pub_account) WHERE (activity_pub_account IS NOT NULL);
 
 
 --
@@ -2944,6 +3007,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220909105317'),
 ('20220916104628'),
 ('20220926154041'),
-('20221004142045');
+('20221004142045'),
+('20221123230245'),
+('20221123233627');
 
 
