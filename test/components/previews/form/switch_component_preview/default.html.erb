@@ -1,14 +1,20 @@
 <div class="flex gap-4">
   <label>
     <input type="checkbox" class="peer">
-    <%= render(Form::SwitchComponent.new) do |switch| %>
-      <% switch.title { "Title" } %>
+    <%= render(Settings::ControlRowComponent.new) do |row| %>
+      <% row.title { "Title" } %>
+      <% row.control do %>
+        <%= render(Form::SwitchComponent.new) %>
+      <% end %>
     <% end %>
   </label>
   <label>
     <input type="checkbox" class="peer" checked>
-    <%= render(Form::SwitchComponent.new) do |switch| %>
-      <% switch.title { "Title" } %>
+    <%= render(Settings::ControlRowComponent.new) do |row| %>
+      <% row.title { "Title" } %>
+      <% row.control do %>
+        <%= render(Form::SwitchComponent.new) %>
+      <% end %>
     <% end %>
   </label>
 </div>

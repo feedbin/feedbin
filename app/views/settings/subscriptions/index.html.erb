@@ -21,9 +21,6 @@
         <% input.input do %>
           <%= select_tag :sort, options_for_select([["Sort by Name", "name"], ["Sort by Last Updated", "updated"], ["Sort by Volume", "volume"]], params[:sort]), class: "peer", data: {behavior: "autosubmit"} %>
         <% end %>
-        <% input.accessory_trailing position: "trailing" do %>
-          <%= svg_tag "icon-caret", class: "fill-400 pg-focus:fill-blue-600" %>
-        <% end %>
       <% end %>
     </div>
   </div>

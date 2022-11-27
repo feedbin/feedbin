@@ -13,9 +13,6 @@
           <% input.input do %>
             <%= select_tag :operation, options_for_select([["Actions", nil], ["Unsubscribe", "unsubscribe"], ["Show edits on articles", "show_updates"], ["Hide edits on articles", "hide_updates"], ["Mute Feed", "mute"], ["Unmute Feed", "unmute"]]), class: "peer", disabled: true, data: {behavior: "feed_actions", toggle_checkboxes_target: "actions"} %>
           <% end %>
-          <% input.accessory_trailing position: "trailing" do %>
-            <%= svg_tag "icon-caret", class: "fill-400 pg-focus:fill-blue-600 pg-disabled:fill-200" %>
-          <% end %>
         <% end %>
       </div>
     </div>

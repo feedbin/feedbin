@@ -1,6 +1,11 @@
-class Form::SelectInputComponent < ViewComponent::Base
-  renders_one :label
-  renders_one :input
-  renders_one :accessory_leading, "Form::InputAccessoryComponent"
-  renders_one :accessory_trailing, "Form::InputAccessoryComponent"
+class Form::SelectInputComponent < Form::TextInputComponent
+  def accessory_trailing
+    super(position: "trailing") do
+      svg_tag "icon-caret", class: "fill-400 pg-focus:fill-blue-600 pg-disabled:fill-200"
+    end
+  end
+
+  def accessory_trailing?
+    true
+  end
 end

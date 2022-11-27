@@ -1,0 +1,13 @@
+<div class="flex gap-4">
+  <div class="grow">
+    <label for="input" class="text-600 mb-2 block">Input</label>
+    <%= render(Form::SelectInputComponent.new) do |text| %>
+      <% text.input do %>
+        <select name="some_name" id="some_name">
+          <option value="option1">option1</option>
+          <option value="option2">option2</option>
+        </select>
+      <% end %>
+    <% end %>
+  </div>
+</div>
