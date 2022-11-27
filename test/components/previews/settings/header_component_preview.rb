@@ -2,6 +2,8 @@
 
 class Settings::HeaderComponentPreview < ViewComponent::Preview
   def default
-    render(Settings::HeaderComponent.new)
+    render(Settings::HeaderComponent.new) do
+      "Header"
+    end
   end
 end
