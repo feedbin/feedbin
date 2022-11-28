@@ -10,9 +10,9 @@
     <% group.item do %>
       <%= component "settings/control_row" do |row| %>
         <% row.title do %>
-          <%= f.file_field :upload, accept: ".xml, .opml, text/xml, application/xml, text/x-opml, text/x-opml+xml" %>
+          <%= f.file_field :upload, accept: ".xml, .opml, text/xml, application/xml, text/x-opml, text/x-opml+xml", class: " file:mr-4 file:py-2 file:px-4 file:rounded file:border-2 file:border-solid file:border-300 file:text-sm file:font-bold file:bg-transparent file:text-600 active:file:border-600 active:file:text-700" %>
         <% end %>
-        <% row.description { "You can import OPML files. Import is done in the background so you may not see every subscription right away." } %>
+        <% row.description { "You can import OPML files." } %>
         <% row.control do %>
           <button type="submit" class="button">Import</button>
         <% end %>
