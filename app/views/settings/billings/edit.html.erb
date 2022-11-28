@@ -1,0 +1,14 @@
+<%= component "settings/header" do %>
+  Billing
+<% end %>
+
+<%= form_tag update_credit_card_settings_billing_path, id: "payment-form" do %>
+  <%= hidden_field_tag :stripe_token, nil, id: "stripe_token" %>
+
+  <%= render partial: "shared/credit_card_form" %>
+
+  <div class="button-wrap">
+    <div id="payment_request_button"><small>Loading&hellip;</small></div>
+    <button type="submit" class="button" id="credit_card_button" disabled>Update</button>
+  </div>
+<% end %>

@@ -1,6 +1,12 @@
-<div class="inset">
-    <h4 class="group-header">Your Plan</h4>
-    <ul class="pill-list">
-        <li><span>Free for life</span></li>
-    </ul>
-</div>
+<%= component "settings/control_group" do |group| %>
+  <% group.header do %>
+    Your Plan
+  <% end %>
+  <% group.item do %>
+    <%= component "settings/control_row" do |row| %>
+      <% row.title do %>
+        Free for life
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

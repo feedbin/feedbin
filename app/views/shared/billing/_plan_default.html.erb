@@ -1,40 +1,48 @@
-<div class="inset">
-    <h4 class="group-header">Billing Info</h4>
-    <ul class="pill-list">
-        <li class="text-with-accessory">
-            <span data-behavior="billing_details" class="text">Loading…</span>
-            <%= link_to "Edit", settings_edit_billing_path %>
-        </li>
-    </ul>
-</div>
-<div class="inset">
-    <h4 class="group-header">Change Your Plan</h4>
-    <div class="has-description">
-        <div class="control-group">
-            <table class="table table-striped" style="margin-bottom: 0;">
-                <% @plans.each do |plan| %>
-                    <tr>
-                        <td><%= plan.name %></td>
-                        <td><%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %></td>
-                        <td>
-                            <% if @user.plan.id == plan.id %>
-                                Your plan
-                            <% else %>
-                                <%= form_tag settings_update_plan_path, data: { behavior: 'change_plan' }, class: 'no-margin' do %>
-                                    <%= hidden_field_tag 'plan', plan.id %>
-                                    <%= button_tag 'Switch to this plan', class: 'button-text large', data: { confirm: "Are you sure you want to switch to #{plan.name.downcase} billing?" } %>
-                                <% end %>
-                            <% end %>
-                        </td>
-                    </tr>
-                <% end %>
-            </table>
-        </div>
-        <p class="control-description">Plan changes are pro-rated.</p>
-    </div>
-</div>
+<%= component "settings/control_group" do |group| %>
+  <% group.header do %>
+    Payment Information
+  <% end %>
+  <% group.item do %>
+    <%= component "settings/control_row" do |row| %>
+      <% row.title do %>
+        <span data-behavior="billing_details" class="text">Loading…</span>
+      <% end %>
+      <% row.control do %>
+        <%= link_to "Edit", edit_settings_billing_path %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
 
 
-<%= render partial: 'shared/billing/payment_history' %>
+<%= component "settings/control_group" do |group| %>
+  <% group.header do %>
+    Change Your Plan
+  <% end %>
+  <% @plans.each do |plan| %>
+    <% group.item do %>
+      <%= component "settings/control_row" do |row| %>
+        <% row.title do %>
+          <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
+        <% end %>
+        <% row.control do %>
+          <% if @user.plan.id == plan.id %>
+              Your plan
+          <% else %>
+              <%= form_tag update_plan_settings_billing_path, data: { behavior: "change_plan" }, class: "no-margin" do %>
+                  <%= hidden_field_tag "plan", plan.id %>
+                  <%= button_tag "Switch to this plan", class: "button-text large", data: { confirm: "Are you sure you want to switch to #{plan.name.downcase} billing?" } %>
+              <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <% group.description do %>
+    Plan changes are pro-rated.
+  <% end %>
+<% end %>
 
-<%= render partial: 'shared/billing/receipt_info' %>
+<%= render partial: "shared/billing/payment_history", locals: {limit: 12} %>
+
+<%= render partial: "shared/billing/receipt_info" %>

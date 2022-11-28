@@ -1,24 +1,28 @@
-<div class="inset has-description">
-    <h4 class="group-header">Your Plan</h4>
-    <div class="control-group">
-        <table class="table table-striped" style="margin-bottom: 0;">
-            <tr>
-                <td>Prepaid</td>
-                <td>
-                    <% if @user.timed_plan_expired? %>
-                        <span class="danger">Expired</span>
-                    <% else %>
-                        Expires: <%= @user.expires_at.to_formatted_s(:date) %>
-                    <% end %>
-                </td>
-            </tr>
-        </table>
-    </div>
-    <p class="control-group-description">You can purchase more time using Feedbin Notifier.</p>
-</div>
+<%= component "settings/control_group" do |group| %>
+  <% group.header do %>
+    Your Plan
+  <% end %>
+  <% group.item do %>
+    <%= component "settings/control_row" do |row| %>
+      <% row.title do %>
+        Prepaid
+      <% end %>
+      <% row.control do %>
+        <% if @user.timed_plan_expired? %>
+            <span class="text-red-600">Expired</span>
+        <% else %>
+            <span><strong class="font-bold">Expires:</strong> <%= @user.expires_at.to_formatted_s(:date) %></span>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <% group.description do %>
+    You can purchase more time using Feedbin Notifier.
+  <% end %>
+<% end %>
 
-<%= render partial: 'shared/billing/billing_subscribe', locals: {subscribe_title: "Switch to Subscription"} %>
+<%= render partial: "shared/billing/billing_subscribe", locals: {subscribe_title: "Switch to Subscription"} %>
 
-<%= render partial: 'shared/billing/payment_history' %>
+<%= render partial: "shared/billing/payment_history", locals: {limit: 12} %>
 
-<%= render partial: 'shared/billing/receipt_info' %>
+<%= render partial: "shared/billing/receipt_info" %>

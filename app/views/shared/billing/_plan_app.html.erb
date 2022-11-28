@@ -1,17 +1,19 @@
-<div class="inset has-description">
-    <h4 class="group-header">Your Plan</h4>
-    <div class="control-group">
-        <table class="table table-striped" style="margin-bottom: 0;">
-            <tr>
-                <td>In-App Subscription</td>
-                <td>
-                </td>
-            </tr>
-        </table>
-    </div>
-    <p class="control-group-description">You can manage your subscription in the Feedbin app.</p>
-</div>
+<%= component "settings/control_group" do |group| %>
+  <% group.header do %>
+    Your Plan
+  <% end %>
+  <% group.item do %>
+    <%= component "settings/control_row" do |row| %>
+      <% row.title do %>
+        In-App Subscription
+      <% end %>
+    <% end %>
+  <% end %>
+  <% group.description do %>
+    You can manage your subscription in the Feedbin app.
+  <% end %>
+<% end %>
 
-<%= render partial: 'shared/billing/payment_history' %>
+<%= render partial: "shared/billing/payment_history", locals: {limit: 12} %>
 
-<%= render partial: 'shared/billing/receipt_info' %>
+<%= render partial: "shared/billing/receipt_info" %>

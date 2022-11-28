@@ -1,21 +1,38 @@
-<div class="inset">
-    <h4 class="group-header">Payment History</h4>
-    <div class="control-group">
-        <table class="table table-striped">
-            <% if @next_payment_date %>
-                <tr>
-                    <td><time datetime="<%= @next_payment_date.to_formatted_s(:date) %>"><%= @next_payment_date.to_formatted_s(:date) %></time></td>
-                    <td>&nbsp;</td>
-                    <td><span class="extra-muted">Scheduled</span></td>
-                </tr>
-            <% end %>
-            <% @billing_events.each do |invoice| %>
-                <tr>
-                    <td><%= invoice.receipt_date %></td>
-                    <td><%= number_to_currency(invoice.receipt_amount) %> <%= invoice.currency %> <%= invoice.receipt_description %></td>
-                    <td><%= link_to 'Receipt', invoice %></td>
-                </tr>
-            <% end %>
-        </table>
-    </div>
-</div>
+<%= component "settings/control_group" do |group| %>
+  <% group.header do %>
+    Payment History
+  <% end %>
+
+  <% if @next_payment_date %>
+    <% group.item do %>
+      <%= component "settings/control_row" do |row| %>
+        <% row.title do %>
+          <time datetime="<%= @next_payment_date.to_formatted_s(:date) %>"><%= @next_payment_date.to_formatted_s(:date) %></time>
+        <% end %>
+        <% row.control do %>
+          <span class="text-500">Scheduled</span>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% @billing_events.first(limit).each do |invoice| %>
+    <% group.item do %>
+      <%= component "settings/control_row" do |row| %>
+        <% row.title do %>
+          <%= invoice.receipt_date %>
+        <% end %>
+        <% row.control do %>
+          <%= link_to invoice do %>
+            <%= number_to_currency(invoice.receipt_amount) %> <%= invoice.currency %> <%= invoice.receipt_description %> Receipt
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <% if limit < @billing_events.count %>
+    <% group.description do %>
+      Showing last <%= limit %> of <%= number_with_delimiter(@billing_events.count) %> payments. <%= link_to "View all", payment_history_settings_billing_path %>.
+    <% end %>
+  <% end %>
+<% end %>

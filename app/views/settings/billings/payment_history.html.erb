@@ -1,0 +1,5 @@
+<%= component "settings/header" do %>
+  Billing
+<% end %>
+
+<%= render partial: "shared/billing/payment_history", locals: {limit: @billing_events.count} %>

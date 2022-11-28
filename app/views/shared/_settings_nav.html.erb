@@ -104,7 +104,7 @@
         title: "Billing",
         subtitle: "Payment method & plan",
         url: settings_billing_path,
-        selected: is_active?("settings", "billing") || is_active?("settings", "edit_billing"),
+        selected: is_active?(["settings/billings"], ["index", "edit", "payment_history"]),
         icon: "menu-icon-billing"
     %>
   <% end %>

@@ -9,7 +9,7 @@
     <%= render partial: "shared/billing/billing_status" %>
   <% end %>
   <script>
-    $.get("<%= settings_payment_details_path %>");
+    $.get("<%= payment_details_settings_billing_path %>");
   </script>
 <% else %>
   <p>Billing disabled. <code>STRIPE_API_KEY</code> and <code>STRIPE_PUBLIC_KEY</code> are missing.</p>

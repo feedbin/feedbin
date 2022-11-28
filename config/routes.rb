@@ -179,18 +179,24 @@ Rails.application.routes.draw do
     resources :imports, only: [:create, :show]
     get :import_export, to: "imports#index"
 
+    get :billing, to: "billings#index"
+    resource :billing, only: [] do
+      collection do
+        get :edit
+        get :payment_history
+        get :payment_details
+        post :update_credit_card
+        post :update_plan
+      end
+    end
+
     get :account
-    get :billing
-    get :payment_details
     get :appearance
     get :newsletters_pages
-    post :update_credit_card
-    post :update_plan
     post :now_playing
     post :audio_panel_size
   end
 
-  get "settings/billing/edit", as: :settings_edit_billing, to: "settings#edit_billing"
   post "settings/sticky/:feed_id", as: :settings_sticky, to: "settings#sticky"
   post "settings/subscription_view_mode/:feed_id", as: :settings_subscription_view_mode, to: "settings#subscription_view_mode"
 
