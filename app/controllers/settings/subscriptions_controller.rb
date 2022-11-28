@@ -87,8 +87,9 @@ class Settings::SubscriptionsController < ApplicationController
   end
 
   def subscriptions_with_sort_data
-    ids = @user.subscriptions.pluck(:id)
-    key = Digest::SHA1.hexdigest(ids.join(","))
+    dates = @user.subscriptions.order(updated_at: :asc).pluck(:updated_at)
+    Rails.logger.info(dates.join(","))
+    key = Digest::SHA1.hexdigest(dates.join(","))
 
     subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}", expires_in: 24.hours) {
       tags = @user.tags_on_feed

@@ -59,7 +59,10 @@
                 </span>
 
                 <span class="ml-auto flex items-center gap-4">
-                  <%= render partial: "shared/sparkline", locals: {sparkline: subscription_presenter.sparkline} %>
+                  <%= svg_tag "menu-icon-mute", class: class_names(["fill-600", {"tw-hidden" => !subscription.muted?}]), title: "Muted", data: {toggle: "tooltip"} %>
+                  <span class="<%= subscription.muted? ? "tw-hidden" : "" %>">
+                    <%= render partial: "shared/sparkline", locals: {sparkline: subscription_presenter.sparkline} %>
+                  </span>
                   <%= svg_tag "icon-caret", class: "fill-300 -rotate-90" %>
                 </span>
               <% end %>

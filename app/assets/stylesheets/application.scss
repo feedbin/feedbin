@@ -7175,6 +7175,12 @@ Billing/Subscribe
     display: inline-block !important;
   }
 }
+.subscribe-description {
+  display: none;
+  .payment-loaded & {
+    display: block;
+  }
+}
 #credit_card_payment {
   margin-bottom: 8px;
 }

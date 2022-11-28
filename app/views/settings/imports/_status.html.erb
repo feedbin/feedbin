@@ -7,8 +7,8 @@
       </div>
 
       <div class="flex mt-4 mb-2 bg-100 rounded w-full overflow-hidden">
-        <%= content_tag :div, "", class: "h-[26px] bg-green-600", style: "width: #{number_to_percentage(@import.percentage_complete)};", title: "#{number_with_delimiter(@import.import_items.complete.count)} imported" %>
-        <%= content_tag :div, "", class: "h-[26px] bg-red-600", style: "width: #{number_to_percentage(@import.percentage_failed)};", title: "#{number_with_delimiter(@failed_items.count)} missing" %>
+        <%= content_tag :div, "", class: "h-[26px] bg-green-600", style: "width: #{number_to_percentage(@import.percentage_complete)};", title: "#{number_with_delimiter(@import.import_items.complete.count)} imported", data: {toggle: "tooltip"} %>
+        <%= content_tag :div, "", class: "h-[26px] bg-red-600", style: "width: #{number_to_percentage(@import.percentage_failed)};", title: "#{number_with_delimiter(@failed_items.count)} missing", data: {toggle: "tooltip"} %>
       </div>
 
       <div class="flex justify-between gap-4">

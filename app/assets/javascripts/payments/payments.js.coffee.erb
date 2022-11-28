@@ -28,6 +28,7 @@ class feedbin.Payments
         @button.mount "#payment_request_button"
       else
         $("body").addClass "no-native-payment"
+      $("body").addClass "payment-loaded"
 
     @plans[id].on "token", (event) =>
       @tokenHandler event.token
