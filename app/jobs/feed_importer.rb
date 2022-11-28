@@ -28,6 +28,11 @@ class FeedImporter
         import.update(complete: true)
       end
     end
+  rescue ActiveRecord::RecordNotUnique
+    import_item.complete!
+  rescue => exception
+    import_item.failed!
+    raise exception
   end
 
   def find_feeds(import_item, user)
