@@ -4,9 +4,7 @@
     <% if items? %>
       <div class="border-y group-data-[capsule=true]:border group-data-[capsule=true]:rounded-lg">
         <% items.each do |item| %>
-          <div class="border-b last:border-b-0" data-item>
-            <%= item %>
-          </div>
+          <%= item %>
         <% end %>
       </div>
     <% end %>

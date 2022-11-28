@@ -12,32 +12,40 @@
   <p class="mb-4">Loading…</p>
 </div>
 
-
 <div data-behavior="payment_method">
-  <%= component "settings/section_header" do %>
-    Payment Method
-  <% end %>
+  <%= component "settings/control_group" do |group| %>
+    <% group.header do %>
+      Payment Method
+    <% end %>
 
-    <ul class="control-group">
-        <li data-behavior="billing_option_apple_pay">
-            <%= radio_button_tag("billing_method", "apple_pay", false, { data: {behavior: 'billing_method_radio'}}) %>
-            <%= label_tag("billing_method_apple_pay") do %>
-                 Apple Pay <%= radio_button_control %>
-            <% end %>
-        </li>
-        <li data-behavior="billing_option_payment_request">
-            <%= radio_button_tag("billing_method", "pay_with_google", false, { data: {behavior: 'billing_method_radio'}}) %>
-            <%= label_tag("billing_method_pay_with_google") do %>
-                 Pay with browser <%= radio_button_control %>
-            <% end %>
-        </li>
-        <li>
-            <%= radio_button_tag("billing_method", "credit_card", false, { data: {behavior: 'billing_method_radio'}}) %>
-            <%= label_tag("billing_method_credit_card") do %>
-                 Credit card <%= radio_button_control %>
-            <% end %>
-        </li>
-    </ul>
+    <% group.item(data: {behavior: "billing_option_apple_pay"}) do %>
+      <%= radio_button_tag("billing_method", "apple_pay", false, { data: {behavior: "billing_method_radio"}, class: "peer"}) %>
+      <%= label_tag("billing_method_apple_pay", class: "group") do %>
+        <%= component "settings/control_row_radio" do |row| %>
+          <% row.title { "Apple Pay" } %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% group.item(data: {behavior: "billing_option_payment_request"}) do %>
+      <%= radio_button_tag("billing_method", "pay_with_google", false, { data: {behavior: "billing_method_radio"}, class: "peer"}) %>
+      <%= label_tag("billing_method_pay_with_google", class: "group") do %>
+        <%= component "settings/control_row_radio" do |row| %>
+          <% row.title { "Pay with browser" } %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% group.item do %>
+      <%= radio_button_tag("billing_method", "credit_card", false, { data: {behavior: "billing_method_radio"}, class: "peer"}) %>
+      <%= label_tag("billing_method_credit_card", class: "group") do %>
+        <%= component "settings/control_row_radio" do |row| %>
+          <% row.title { "Credit card" } %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+  <% end %>
 </div>
 
 <div id="credit_card_payment" data-behavior="credit_card_details">
