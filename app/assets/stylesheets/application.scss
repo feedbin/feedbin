@@ -3213,7 +3213,7 @@ $feed-title-width: 115px;
     display: block;
   }
   &.foreground {
-    z-index: 5;
+    z-index: 2;
   }
 }
 
@@ -3789,6 +3789,17 @@ $feed-title-width: 115px;
     }
   }
   .button-toggle-share-menu {
+    position: relative;
+    @include arrow(
+      $x-position:16px,
+      $y-position: 40px,
+      $arrow-color: $color-base,
+      $shadow-color: $color-arrow-shadow,
+      $origin: right
+    ) {
+      z-index: 10;
+      visibility: hidden;
+    }
     svg {
       height: 16px;
       width: 16px;
@@ -3798,6 +3809,12 @@ $feed-title-width: 115px;
       left: 50%;
       top: 35px;
     }
+  }
+}
+.has-entry-basement .button-toggle-share-menu {
+  &:after,
+  &:before {
+    visibility: visible !important;
   }
 }
 
@@ -4078,20 +4095,6 @@ $feed-title-width: 115px;
 .share-form {
   @include background-color($color-contrast-100);
   padding: 24px 16px;
-  @include arrow(
-    $x-position: 241px,
-    $y-position: -1px,
-    $arrow-color: $color-base,
-    $shadow-color: $color-arrow-shadow,
-    $origin: right
-  ) {
-    z-index: 10;
-    visibility: hidden;
-  }
-  .entry-basement.open &:after,
-  .entry-basement.open &:before {
-    visibility: visible;
-  }
   .share-form-inner {
     max-width: 620px;
     margin: 0 auto;

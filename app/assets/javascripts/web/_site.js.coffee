@@ -1265,7 +1265,8 @@ $.extend feedbin,
       $('.field-cluster input').blur()
       $('.entry-basement').removeClass('open')
     ), timeout
-
+    
+    $('body').removeClass('has-entry-basement')
     $('.entry-basement').removeClass('foreground')
     $('.entry-content').each ->
       @.style.removeProperty("top")
@@ -1289,6 +1290,7 @@ $.extend feedbin,
     $('.entry-content').css
       "top": "#{newTop}px"
     selectedPanel.prop('scrollTop', 0)
+    $('body').addClass('has-entry-basement')
 
   applyStarred: (entryId) ->
     if feedbin.Counts.get().isStarred(entryId)
