@@ -7,8 +7,8 @@
   <script>
       <%= render partial: "shared/message_flash", locals: {flash: flash} %>
   </script>
-  <div class="flex antialiased overflow-hidden">
-      <div class="w-[310px] bg-sidebar border-r p-6 tw-hidden md:block">
+  <div class="flex items-stretch antialiased overflow-hidden">
+      <div class="w-[310px] min-h-[100vh] bg-sidebar border-r p-6 tw-hidden md:block">
           <a href="/" class="block pt-4">
               <%= svg_tag "logo-full", inline: true, class: "w-[140px] h-[38px]" %>
           </a>

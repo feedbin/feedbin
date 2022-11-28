@@ -77,11 +77,8 @@
       <% group.item do %>
         <%= builder.check_box class: "peer" %>
         <%= builder.label class: "group" do %>
-          <%= component "settings/control_row" do |row| %>
+          <%= component "settings/control_row_switch" do |row| %>
             <% row.title { builder.text } %>
-            <% row.control do %>
-              <%= component "form/switch" %>
-            <% end %>
           <% end %>
         <% end %>
       <% end %>
@@ -96,11 +93,8 @@
     <% group.item do %>
       <%= form.check_box :apply_action, class: "peer" %>
       <%= form.label :apply_action, class: "group" do %>
-        <%= component "settings/control_row" do |row| %>
+        <%= component "settings/control_row_switch" do |row| %>
           <% row.title { "Mark existing matches as read" } %>
-          <% row.control do %>
-            <%= component "form/switch" %>
-          <% end %>
         <% end %>
       <% end %>
     <% end %>

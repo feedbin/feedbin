@@ -124,11 +124,8 @@
           <% group.item do %>
             <%= f.check_box :muted, class: "peer", data: {behavior: "auto_submit"}, id: "subscription_muted" %>
             <%= f.label :muted, class: "group" do %>
-              <%= component "settings/control_row" do |row| %>
+              <%= component "settings/control_row_switch" do |row| %>
                 <% row.title { "Muted" } %>
-                <% row.control do %>
-                  <%= component "form/switch" %>
-                <% end %>
               <% end %>
             <% end %>
           <% end %>
@@ -136,12 +133,9 @@
           <% group.item do %>
             <%= f.check_box :show_updates, class: "peer", data: {behavior: "auto_submit"}, id: "subscription_show_updates" %>
             <%= f.label :show_updates, class: "group" do %>
-              <%= component "settings/control_row" do |row| %>
+              <%= component "settings/control_row_switch" do |row| %>
                 <% row.title { "Show updates" } %>
                 <% row.description { "Tells you when an article has been changed after being published" } %>
-                <% row.control do %>
-                  <%= component "form/switch" %>
-                <% end %>
               <% end %>
             <% end %>
           <% end %>
@@ -150,11 +144,8 @@
             <% group.item do %>
               <%= f.check_box :show_retweets, class: "peer", data: {behavior: "auto_submit"}, id: "subscription_show_retweets" %>
               <%= f.label :show_retweets, class: "group" do %>
-                <%= component "settings/control_row" do |row| %>
+                <%= component "settings/control_row_switch" do |row| %>
                   <% row.title { "Show Retweets" } %>
-                  <% row.control do %>
-                    <%= component "form/switch" %>
-                  <% end %>
                 <% end %>
               <% end %>
             <% end %>
@@ -162,12 +153,9 @@
             <% group.item do %>
               <%= f.check_box :media_only, class: "peer", data: {behavior: "auto_submit"}, id: "subscription_media_only" %>
               <%= f.label :media_only, class: "group" do %>
-                <%= component "settings/control_row" do |row| %>
+                <%= component "settings/control_row_switch" do |row| %>
                   <% row.title { "Media Only" } %>
                   <% row.description { "Only show tweets that contain links or images" } %>
-                  <% row.control do %>
-                    <%= component "form/switch" %>
-                  <% end %>
                 <% end %>
               <% end %>
             <% end %>
