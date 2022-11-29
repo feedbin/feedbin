@@ -37,10 +37,10 @@
             <li class="flex items-center relative border-b border-x gap-2 last:rounded-b-lg">
 
               <div class="shrink-0 w-[32px] self-stretch flex">
-                  <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "peer", data: {action: "toggle-checkboxes#toggleActions", toggle_checkboxes_target: "checkbox"} %>
-                  <label class="group w-full h-full flex justify-end pt-[16px]" for="<%= "subscription_checkbox_#{subscription.id}" %>">
-                    <%= component "form/check_box" %>
-                  </label>
+                <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "peer", data: {action: "toggle-checkboxes#toggleActions", toggle_checkboxes_target: "checkbox"} %>
+                <label class="group w-full h-full flex justify-end pt-[16px]" for="<%= "subscription_checkbox_#{subscription.id}" %>">
+                  <%= component "form/check_box" %>
+                </label>
               </div>
 
               <%= link_to edit_settings_subscription_path(subscription), class: "flex grow items-center overflow-hidden gap-2 px-4 py-3 pl-2 !text-600 hover:no-underline" do %>
