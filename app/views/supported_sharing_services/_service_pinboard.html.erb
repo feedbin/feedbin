@@ -12,7 +12,7 @@
         <label for="pinboard_token">API Token</label>
       <% end %>
       <% text.input do %>
-        <%= password_field_tag "password", "", id: "pinboard_token", class: "peer" %>
+        <%= password_field_tag "password", "", id: "pinboard_token", class: "peer", tabindex: "-1" %>
       <% end %>
     <% end %>
 
