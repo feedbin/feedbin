@@ -81,7 +81,7 @@
     </div>
 
     <div data-stacked="true" class="group">
-      <% @migration.account_migration_items.failed.each do |item| %>
+      <% @migration.account_migration_items.failed.order(updated_at: :asc).each do |item| %>
         <%= component "settings/expandable", capsule: true do |expandable| %>
           <% expandable.description do %>
             <%= component "settings/control_row" do |row| %>

@@ -9392,11 +9392,6 @@ button.close {
   }
 }
 
-.modal.fade .modal-dialog {
-  transition: transform 0.3s ease-out, height 0.15s ease-in;
-  transform: translate(0, -25%);
-}
-
 @media screen and (prefers-reduced-motion: reduce) {
   .modal.fade .modal-dialog {
     transition: none;
