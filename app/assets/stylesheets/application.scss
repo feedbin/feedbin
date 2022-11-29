@@ -3689,8 +3689,8 @@ $feed-title-width: 115px;
     .icon-next,
     .icon-previous {
       display: inline-block;
-      width: 11px;
-      height: 18px;
+      width: 7.6px;
+      height: 14px;
       svg * {
         @include fill($color-icons);
       }
@@ -4297,8 +4297,17 @@ $feed-title-width: 115px;
     margin-left: 0;
   }
 
+  ol, ul {
+    padding-left: 40px !important;
+  }
+
   li {
-    margin: 0 0 0.2em 0;
+    list-style: disc !important;
+    margin: 0 0 0.2em 0  !important;
+  }
+
+  ol li {
+    list-style: decimal !important;
   }
 
   pre {
@@ -7543,6 +7552,9 @@ button.reset {
 /*------------------------------------------------------------------------------
 Link Viewer
 ------------------------------------------------------------------------------*/
+.placeholder-content * {
+  margin-bottom: 16px;
+}
 .placeholder-content h1:empty,
 .placeholder-content p:empty {
   @include background($color-contrast-300);
