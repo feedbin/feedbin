@@ -928,7 +928,7 @@ $.extend feedbin,
   fullWidthImage: (img) ->
     load = ->
       width = img.get(0).naturalWidth
-      if width > 528 && img.parents(".modal").length == 0
+      if width > 528 && img.parents(".modal").length == 0  && img.parents("table").length == 0  && img.parents("blockquote").length == 0  && img.parents("table").length == 0  && img.parents("li").length == 0
         img.addClass("full-width")
       img.addClass("show")
 
@@ -1265,7 +1265,7 @@ $.extend feedbin,
       $('.field-cluster input').blur()
       $('.entry-basement').removeClass('open')
     ), timeout
-    
+
     $('body').removeClass('has-entry-basement')
     $('.entry-basement').removeClass('foreground')
     $('.entry-content').each ->

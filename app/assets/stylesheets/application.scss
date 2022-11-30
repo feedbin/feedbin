@@ -4514,7 +4514,7 @@ $feed-title-width: 115px;
       @extend .table;
       @extend .table-bordered;
       img {
-        max-width: none;
+        max-width: 100%;
         display: inline;
       }
     }
