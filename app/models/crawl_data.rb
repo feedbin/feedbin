@@ -42,7 +42,8 @@ class CrawlData
   end
 
   def ignore_http_caching?
-    @ignore_http_caching ||= last_uncached_download.before?(rand(8..16).hours.ago)
+    return @ignore_http_caching if defined?(@ignore_http_caching)
+    @ignore_http_caching = last_uncached_download.before?(rand(8..16).hours.ago)
   end
 
   def download_success(feed_id)
