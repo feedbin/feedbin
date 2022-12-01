@@ -104,6 +104,22 @@ module FeedCrawler
       assert_equal({new: 2, unchanged: 1}, filter.stats)
     end
 
+    def test_should_find_updated_entries_with_old_articles_if_check_for_changes_true
+      entries = sample_entries(published: (Date.today - 3).to_time)
+
+      entries.each do |entry|
+        data = entry.to_entry
+        data[:fingerprint] = SecureRandom.hex
+        @feed.entries.create!(data)
+      end
+
+      filter = EntryFilter.new(entries, check_for_changes: true, always_check_recent: true)
+      results = filter.filter
+
+      assert_equal 1, results.length
+      assert_equal({updated: 1}, filter.stats)
+    end
+
     private
 
     def sample_entries(published: Time.now)

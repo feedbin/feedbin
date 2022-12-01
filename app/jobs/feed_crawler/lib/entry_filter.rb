@@ -49,10 +49,10 @@ module FeedCrawler
 
     # always check for changes made to articles published within the last 24 hours if @always_check_recent == true
     def check_for_changes?(entry)
+      return true if @check_for_changes
+
       if @always_check_recent && entry.published.present?
         entry.published.after?(24.hours.ago)
-      else
-        @check_for_changes
       end
     end
 
