@@ -1,5 +1,6 @@
-<%= form_for(@action, as: :action_params, remote: true) do |form| %>
+<%= render partial: "push_data" %>
 
+<%= form_for(@action, as: :action_params, remote: true) do |form| %>
   <div class="mb-8">
     <%= component "settings/section_header" do %>
       <%= form.label :title, "Name" %>
@@ -74,7 +75,7 @@
     <% end %>
 
     <%= form.collection_check_boxes(:actions, Feedbin::Application.config.action_names, :value, :label) do |builder| %>
-      <% group.item do %>
+      <% group.item data: {behavior: "action_#{builder.value}"} do %>
         <%= builder.check_box class: "peer" %>
         <%= builder.label class: "group" do %>
           <%= component "settings/control_row_switch" do |row| %>

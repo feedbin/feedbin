@@ -44,8 +44,8 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/grocer-pushpackager.git
-  revision: 6b01b4e4e71af26edf55f095251366294527afaf
-  ref: 6b01b4e
+  revision: 6309711a3dc007a322a0d84eb729dc60af8eda1e
+  branch: feedbin
   specs:
     grocer-pushpackager (0.0.1)
       rubyzip
@@ -560,7 +560,7 @@ GEM
     standard (1.18.1)
       rubocop (= 1.39.0)
       rubocop-performance (= 1.15.1)
-    stimulus-rails (1.2.0)
+    stimulus-rails (1.2.1)
       railties (>= 6.0.0)
     stripe (5.55.0)
     stripe_event (2.7.0)

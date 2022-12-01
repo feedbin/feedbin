@@ -26,16 +26,18 @@
     Export
   <% end %>
   <% group.item do %>
-    <%= component "settings/control_row" do |row| %>
-      <% row.title { "Subscriptions" } %>
-      <% row.control do %>
-        <%= render "shared/input" do %>
-          <%= select_tag :tag, options_for_select(@download_options), class: "select" %>
-          <span class="accessory right">
-            <%= svg_tag "icon-caret" %>
-          </span>
+    <%= form_tag subscriptions_path(format: :xml), method: :get do %>
+      <%= component "settings/control_row" do |row| %>
+        <% row.title { "Subscriptions" } %>
+        <% row.control do %>
+          <%= render "shared/input" do %>
+            <%= select_tag :tag, options_for_select(@download_options), class: "select" %>
+            <span class="accessory right">
+              <%= svg_tag "icon-caret" %>
+            </span>
+          <% end %>
+          <button class="button">Download</button>
         <% end %>
-        <button class="button">Download</button>
       <% end %>
     <% end %>
   <% end %>

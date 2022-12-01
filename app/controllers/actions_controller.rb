@@ -4,16 +4,17 @@ class ActionsController < ApplicationController
   before_action :set_action, only: [:edit, :update, :destroy]
 
   def index
-    @authentication_token = authentication_token(@user)
-    @web_service_url = "#{ENV["PUSH_URL"]}/apple_push_notifications"
     @actions = @user.actions.where("action_type <> ?", Action.action_types[:notifier]).natural_sort_by { |action| action.title }
+    push_data
   end
 
   def new
     @action = @user.actions.new
+    push_data
   end
 
   def edit
+    push_data
   end
 
   def create
@@ -51,6 +52,11 @@ class ActionsController < ApplicationController
   end
 
   private
+
+  def push_data
+    @authentication_token = authentication_token(@user)
+    @web_service_url = "#{ENV["PUSH_URL"]}/apple_push_notifications"
+  end
 
   def authentication_token(user)
     verifier = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)

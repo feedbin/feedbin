@@ -2254,10 +2254,10 @@ $.extend feedbin,
       if "safari" of window and "pushNotification" of window.safari
         $('body').addClass('supports-push')
         if $('#push-data').length > 0
-          $('.push-options').removeClass('hide')
+          # $('.push-options').removeClass('hide')
           data = $('#push-data').data()
           permissionData = window.safari.pushNotification.permission(data.websiteId)
-          feedbin.checkPushPermission(permissionData )
+          feedbin.checkPushPermission(permissionData)
 
     enablePush: ->
       $(document).on 'click', '[data-behavior~=enable_push]', (event) ->
