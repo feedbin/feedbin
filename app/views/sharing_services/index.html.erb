@@ -1,9 +1,9 @@
-<%= component "settings/header" do %>
+<%= component "settings/h1" do %>
   Share & Save
 <% end %>
 
 <% if @active_sharing_services.present? %>
-  <%= component "settings/section_header" do %>
+  <%= component "settings/h2" do %>
     Active Services
   <% end %>
 
@@ -15,7 +15,7 @@
 <% end %>
 
 <% unless @active_sharing_services.count == @available_sharing_services.count %>
-  <%= component "settings/section_header" do %>
+  <%= component "settings/h2" do %>
     Available Services
   <% end %>
 

@@ -1,7 +1,7 @@
 <%= form_for @user, url: settings_update_user_path(@user) do |f| %>
   <%= hidden_field_tag :redirect_to, settings_billing_url %>
 
-  <%= component "settings/section_header" do %>
+  <%= component "settings/h2" do %>
     <%= f.label :receipt_info, "Receipt Info" %>
   <% end %>
   <%= component "form/text_input" do |text| %>

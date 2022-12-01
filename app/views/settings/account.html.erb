@@ -1,10 +1,10 @@
-<%= component "settings/header" do %>
+<%= component "settings/h1" do %>
   Account
 <% end %>
 
-<%= form_for(@user) do |f| %>
+<%= form_for(@user, html: {class: "mb-14"}) do |f| %>
 
-  <%= component "settings/section_header" do %>
+  <%= component "settings/h2" do %>
     <%= f.label :email, "Email" %>
   <% end %>
 
@@ -19,8 +19,8 @@
   </div>
 <% end %>
 
-<%= form_for(@user) do |f| %>
-  <%= component "settings/section_header" do %>
+<%= form_for(@user, html: {class: "mb-14"}) do |f| %>
+  <%= component "settings/h2" do %>
     Update Password
   <% end %>
 
@@ -49,8 +49,8 @@
   </div>
 <% end %>
 
-<%= form_for(@user, method: :delete, id: "delete_user") do |f| %>
-  <%= component "settings/section_header" do %>
+<%= form_for(@user, method: :delete, id: "delete_user", html: {class: "mb-14"}) do |f| %>
+  <%= component "settings/h2" do %>
     Cancel Account
   <% end %>
 
