@@ -2168,6 +2168,7 @@ $hamburger-dot: 4px;
       }
       .count {
         @include color($color-contrast-500);
+        line-height: 1.3;
       }
       .tag-link .count-wrap {
         margin-left: 0;
@@ -5280,6 +5281,7 @@ img.responsive {
   .tweet-meta {
     @include font-size(16);
     @include color($color-contrast-500);
+    margin-bottom: base-units(2);
     img {
       position: relative;
       border-radius: 16px;
