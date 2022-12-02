@@ -4,7 +4,11 @@ class CrawlDataType < ActiveModel::Type::Value
   end
 
   def cast(value)
-    CrawlData.new(value)
+    if CrawlData === value
+      value
+    else
+      CrawlData.new(value)
+    end
   end
 
   def deserialize(value)
