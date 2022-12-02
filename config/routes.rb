@@ -2,19 +2,18 @@ require "sidekiq/web"
 Sidekiq::Web.app_url = ENV["FEEDBIN_URL"]
 
 Rails.application.routes.draw do
-  # The priority is based upon order of creation: first created -> highest priority.
-  # See how all your routes lay out with "rake routes".
-
   root to: "site#index"
 
-  if Rails.env.development?
+  mount StripeEvent::Engine, at: "/stripe"
+
+  constraints lambda { |request| AuthConstraint.admin?(request) } do
     mount Lookbook::Engine, at: "/lookbook"
   end
 
-  mount StripeEvent::Engine, at: "/stripe"
   constraints lambda { |request| AuthConstraint.admin?(request) } do
-    mount Sidekiq::Web => "sidekiq"
+    mount Sidekiq::Web, at: "/sidekiq"
   end
+
   get :health_check, to: proc { |env| [200, {}, ["OK"]] }
   get :version, to: proc { |env| [200, {}, [File.read("REVISION")]] }
   get :subscribe, to: "site#subscribe"
