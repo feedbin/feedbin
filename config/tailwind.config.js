@@ -17,7 +17,7 @@ module.exports = {
       'sm': '480px',
       'md': '700px',
       'lg': '992px',
-      'xl': '1200px',
+      'xl': '1100px',
     },
     extend: {
       borderColor: {
