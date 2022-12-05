@@ -1,6 +1,5 @@
-<%= form_with model: subscription, url: settings_subscription_path, html: {class: 'settings'}, data: {remote: true} do |f| %>
+<%= form_with model: subscription, url: settings_subscription_path, data: {remote: true} do |f| %>
     <% present subscription do |subscription_presenter| %>
-
         <div class="border rounded-lg text-lg p-4 flex items-center gap-2 mb-14">
           <%= subscription_presenter.favicon(subscription.feed) %>
           <span data-behavior="user_title" class="truncate"><%= subscription.title %></span>
@@ -161,9 +160,11 @@
             <% end %>
 
           <% else %>
-            <%= component "settings/control_row" do |row| %>
-              <% row.title do %>
-                <%= link_to "Refresh Favicon", refresh_favicon_settings_subscription_path(subscription), remote: true, method: :post %>
+            <% group.item do %>
+              <%= component "settings/control_row" do |row| %>
+                <% row.title do %>
+                  <%= link_to "Refresh Favicon", refresh_favicon_settings_subscription_path(subscription), remote: true, method: :post %>
+                <% end %>
               <% end %>
             <% end %>
           <% end %>
