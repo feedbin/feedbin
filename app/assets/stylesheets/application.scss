@@ -9406,6 +9406,11 @@ button.close {
   }
 }
 
+.modal.fade .modal-dialog {
+  transition: transform 0.1s ease-in;
+  transform: scale(0.95);
+}
+
 @media screen and (prefers-reduced-motion: reduce) {
   .modal.fade .modal-dialog {
     transition: none;
@@ -9413,7 +9418,7 @@ button.close {
 }
 
 .modal.show .modal-dialog {
-  transform: translate(0, 0);
+  transform: scale(1);
 }
 
 .modal-dialog-centered {
@@ -9449,7 +9454,7 @@ button.close {
   left: 0;
   z-index: 1040;
   opacity: 0;
-  transition: opacity 0.15s linear;
+  transition: opacity 0.15s ease-in;
   .native & {
     transition: none;
   }
@@ -9457,7 +9462,7 @@ button.close {
 
 .modal-backdrop,
 .theme-color-overlay {
-  background-color: rgba(map-get($color-base, dusk), 0.5);
+  background-color: rgba(map-get($color-base, dusk), 0.7);
 }
 
 .modal-header {
