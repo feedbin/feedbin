@@ -31,7 +31,15 @@ class Source::KnownPattern < Source
       feed_url = "https://www.youtube.com/feeds/videos.xml?channel_id=#{channel_id}"
       feed = create_from_url!(feed_url)
       feeds.push(feed) if feed
+    elsif document? && mastodon_server?
+      feed_url = "#{response.url}.rss"
+      feed = create_from_url!(feed_url)
+      feeds.push(feed) if feed
     end
+  end
+
+  def mastodon_server?
+    response.headers.get(:server).find { _1 =~ /mastodon/i }
   end
 
   def youtube_domain?

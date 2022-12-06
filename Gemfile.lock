@@ -31,7 +31,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: ed9de85b65c8550505783c71478d60c9c833bd69
+  revision: 58c1ac9f8754d00ab5a1a7efdbb63c457732e5a4
   branch: master
   specs:
     feedkit (0.1.0)
@@ -450,7 +450,7 @@ GEM
     public_suffix (5.0.0)
     puma (6.0.0)
       nio4r (~> 2.0)
-    racc (1.6.0)
+    racc (1.6.1)
     rack (2.2.4)
     rack-test (2.0.2)
       rack (>= 1.3)
