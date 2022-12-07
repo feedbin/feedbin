@@ -14,11 +14,12 @@ class MicropostsController < ApplicationController
     items = replies["items"] || []
     items.reverse.map do |item|
       data = {
-        micropost: Micropost.new(item, nil),
+        micropost: Micropost.new(item),
         fully_qualified_url: item["url"],
         published: Time.parse(item["date_published"]),
         content: item["content_html"],
-        id: item["id"]
+        id: item["id"],
+        media: []
       }
       OpenStruct.new(data)
     end

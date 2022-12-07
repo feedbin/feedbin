@@ -65,7 +65,7 @@ class Entry < ApplicationRecord
   def micropost
     @micropost ||= begin
       if data.respond_to?(:has_key?)
-        post = Micropost.new(self, feed)
+        post = Micropost.new(self.data, title, feed: feed)
         post.valid? ? post : nil
       end
     end

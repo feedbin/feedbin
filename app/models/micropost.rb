@@ -1,31 +1,35 @@
 class Micropost
   attr_reader :data
 
-  def initialize(entry, feed)
-    @entry = entry
+  def initialize(data, title = nil, feed: nil)
+    @data = data
+    unless @data&.dig("json_feed").nil?
+      @data = @data.dig("json_feed")
+    end
+    @title = title
     @feed = feed
   end
 
   def valid?
-    @entry.data&.respond_to?(:dig) && author_profile? && !title?
+    @data&.respond_to?(:dig) && author_profile? && !title?
   end
 
   def author_avatar
-    @entry.data.dig("json_feed", "author", "avatar") || @entry.data.dig("json_feed", "authors", 0, "avatar") || @feed.options&.dig("image", "url")
+    @data.dig("author", "avatar") || @data.dig("authors", 0, "avatar") || @feed&.options&.dig("image", "url")
   end
 
   def author_url
-    @entry.data.dig("json_feed", "author", "url") || @entry.data.dig("json_feed", "authors", 0, "url") || @feed.options&.dig("image", "link")
+    @data.dig("author", "url") || @data.dig("authors", 0, "url") || @feed&.options&.dig("image", "link")
   end
 
   def author_name
-    @entry.data.dig("json_feed", "author", "name") || @entry.data.dig("json_feed", "authors", 0, "name") || @feed.options&.dig("image", "title")
+    @data.dig("author", "name") || @data.dig("authors", 0, "name") || @feed&.options&.dig("image", "title")
   rescue
     nil
   end
 
   def author_username
-    @entry.data.dig("json_feed", "author", "_microblog", "username") || @entry.data.dig("json_feed", "author", "_instagram", "username") || @entry.data.dig("json_feed", "authors", 0, "_instagram", "username") || feed_username
+    @data.dig("author", "_microblog", "username") || @data.dig("author", "_instagram", "username") || @data.dig("authors", 0, "_instagram", "username") || feed_username
   rescue
     nil
   end
@@ -39,9 +43,9 @@ class Micropost
   end
 
   def source
-    if @entry.data.dig("json_feed", "author", "_microblog")
+    if @data.dig("author", "_microblog")
       :microblog
-    elsif @entry.data.dig("json_feed", "author", "_instagram") || @entry.data.dig("json_feed", "authors", 0, "_instagram")
+    elsif @data.dig("author", "_instagram") || @data.dig("authors", 0, "_instagram")
       :instagram
     end
   end
@@ -57,7 +61,7 @@ class Micropost
   private
 
   def feed_username
-    link = @feed.options&.dig("image", "link")
+    link = @feed&.options&.dig("image", "link")
     return if link.nil?
     link = link.split("/").find { _1.start_with?("@") }
     return if link.nil?
@@ -65,7 +69,7 @@ class Micropost
   end
 
   def id
-    @entry.data.dig("json_feed", "id")
+    @data.dig("id")
   end
 
   def author_profile?
