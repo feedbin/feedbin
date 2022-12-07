@@ -16,4 +16,10 @@ class ApplicationRecord < ActiveRecord::Base
     where(id: ids).update_all(column => condition)
   end
 
+  def self.where_lower(options = {})
+    value = Arel::Nodes::NamedFunction.new("LOWER", [Arel::Nodes.build_quoted(options.values.first)])
+    expression = Arel::Nodes::NamedFunction.new("LOWER", [arel_table[options.keys.first]]).eq(value)
+    where(expression)
+  end
+
 end

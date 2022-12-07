@@ -26,7 +26,7 @@ class IframeEmbed::Twitter
   end
 
   def profile_image_url
-    TwitterUser.where("lower(screen_name) = ?", user.downcase).take&.profile_image || ActionController::Base.helpers.image_url("favicon-profile-default.png")
+    TwitterUser.where_lower(screen_name: user).take&.profile_image || ActionController::Base.helpers.image_url("favicon-profile-default.png")
   end
 
   def author_url
