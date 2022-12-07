@@ -19,7 +19,7 @@
           <% if @import.percentage == 100 %>
             <%= svg_tag "icon-check", class: "fill-green-600" %>
           <% end %>
-          <span><%= number_to_percentage(@import.percentage, precision: 0) %></span>
+          <span><%= number_to_percentage(@import.percentage.floor, precision: 0) %></span>
         </span>
       </div>
 
