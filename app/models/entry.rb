@@ -65,7 +65,7 @@ class Entry < ApplicationRecord
   def micropost
     @micropost ||= begin
       if data.respond_to?(:has_key?)
-        post = Micropost.new(data["json_feed"], title)
+        post = Micropost.new(self, feed)
         post.valid? ? post : nil
       end
     end
@@ -415,6 +415,18 @@ class Entry < ApplicationRecord
     order(condition)
   end
 
+  def media
+    items = data&.dig("media").respond_to?(:each) && data&.dig("media") || []
+    items.filter_map do |item|
+      next unless item.respond_to?(:dig)
+      url = item.dig("url")
+      type = item.dig("type")
+      next unless url.present? && type.present?
+      next unless url.start_with?("http")
+      OpenStruct.new(url: url, type: type)
+    end
+  end
+
   private
 
   def base_url
@@ -549,6 +561,7 @@ class Entry < ApplicationRecord
   def skip_images?
     if ENV["SKIP_IMAGES"].present?
       Rails.logger.info("SKIP_IMAGES is present, no images will be processed")
+      true
     end
   end
 end

@@ -2532,8 +2532,6 @@ $.extend feedbin,
         if !feedbin.isRelated('.embed-link', event.target)
           iframe = $("<iframe>").attr
             "src": $(@).data("iframe-src")
-            "width": $(@).data("iframe-width")
-            "height": $(@).data("iframe-height")
             "allowfullscreen": true
             "frameborder": 0
 

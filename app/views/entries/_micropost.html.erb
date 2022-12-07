@@ -48,6 +48,15 @@
                 end
                 %>
             </div>
+            <% micropost.media.each do |media| %>
+              <% if media.type =~ /image/i %>
+                <%= link_to media.url do %>
+                  <%= image_tag camo_link(media.url), class: "responsive full-width-candidate" %>
+                <% end %>
+              <% elsif media.type =~ /video/i %>
+                <%= video_tag media.url, preload: "none"  %>
+              <% end %>
+            <% end %>
         </div>
     </div>
 </div>

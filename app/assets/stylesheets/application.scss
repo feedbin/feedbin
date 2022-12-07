@@ -4965,6 +4965,9 @@ img.responsive {
   &.hide {
     display: none;
   }
+  &[rel="emoji"] {
+    display: inline;
+  }
 }
 
 .inline-diff {

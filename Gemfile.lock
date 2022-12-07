@@ -22,7 +22,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedjira.git
-  revision: da48b21c09604c797854e095504626ac25d0892a
+  revision: 4bb28ab2aaf561167dff9cd03b1430be5cc1d907
   branch: f2
   specs:
     feedjira (2.1.2)
@@ -31,7 +31,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: 58c1ac9f8754d00ab5a1a7efdbb63c457732e5a4
+  revision: 4f8ea014cfa7a3acb36ce0a8270e538509d6b1f3
   branch: master
   specs:
     feedkit (0.1.0)
@@ -447,7 +447,7 @@ GEM
     pry (0.14.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    public_suffix (5.0.0)
+    public_suffix (5.0.1)
     puma (6.0.0)
       nio4r (~> 2.0)
     racc (1.6.1)

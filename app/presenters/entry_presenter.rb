@@ -169,7 +169,7 @@ class EntryPresenter < BasePresenter
         ContentFormatter.text_email(entry.content)
       elsif youtube?
         @template.capture do
-          @template.concat @template.content_tag(:iframe, "", width: entry.data["media_width"], height: entry.data["media_height"], src: "https://www.youtube-nocookie.com/embed/#{entry.data["youtube_video_id"]}?rel=0&amp;showinfo=0", frameborder: 0, allowfullscreen: true)
+          @template.concat @template.content_tag(:iframe, "", src: "https://www.youtube-nocookie.com/embed/#{entry.data["youtube_video_id"]}?rel=0&amp;showinfo=0", frameborder: 0, allowfullscreen: true)
           @template.concat ContentFormatter.text_email(entry.content)
         end
       else
@@ -567,6 +567,18 @@ class EntryPresenter < BasePresenter
         @template.strip_tags(entry.feed.title)
       end
     end
+  end
+
+  def embedded_image
+    return unless data&.dig("media_type") =~ /^image/i
+    return unless data&.dig("media_url") =~ /^http/i
+    @template.camo_link(data&.dig("media_url"))
+  end
+
+  def embedded_video
+    return unless data&.dig("media_type") =~ /^video/i
+    return unless data&.dig("media_url") =~ /^http/i
+    @template.camo_link(data&.dig("media_url"))
   end
 
   def title?

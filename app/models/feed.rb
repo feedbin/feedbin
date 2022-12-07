@@ -82,6 +82,12 @@ class Feed < ApplicationRecord
     options.dig("json_feed", "icon") || custom_icon
   end
 
+  def feed_image
+    return unless url = options.dig("image", "url")
+    return url if url&.start_with?("http")
+    URI.join(feed_url, url) rescue nil
+  end
+
   def self.create_from_parsed_feed(parsed_feed)
     record = parsed_feed.to_feed
     create_with(record).create_or_find_by!(feed_url: record[:feed_url]).tap do |new_feed|
