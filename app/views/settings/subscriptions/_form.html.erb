@@ -106,7 +106,7 @@
             <%= component "settings/control_row" do |row| %>
               <% row.title { "Source" } %>
               <% row.control do %>
-                <a href="<%= subscription.feed.site_url %>" class="!text-500 truncate">
+                <a href="<%= subscription.feed.feed_url %>" class="!text-500 truncate">
                   <%= short_url(subscription.feed.feed_url) %>
                 </a>
               <% end %>
