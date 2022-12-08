@@ -1,1 +1,1 @@
-Feedbin::Application.config.trial_days = 14
+Feedbin::Application.config.trial_days = 30
