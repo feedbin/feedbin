@@ -9,6 +9,11 @@ class UsersController < ApplicationController
     @user = User.new.with_params(params)
   end
 
+  def new_next
+    session[:feed_wrangler_token] = params[:feed_wrangler_token]
+    @user = User.new.with_params(params)
+  end
+
   def create
     @user = User.new(user_params).with_params(user_params)
     if @user.save
@@ -21,7 +26,6 @@ class UsersController < ApplicationController
       else
         redirect_to root_url
       end
-
     else
       render "new"
     end

@@ -10,9 +10,9 @@
         <div data-behavior="stripe_error" class="alert alert-error hide"></div>
         <h3 class="box-header">
             <% if session[:feed_wrangler_token].present? %>
-                Howdy, Feed Wrangler! Import your account and get a 14 day free trial.
+                Howdy, Feed Wrangler! Import your account and get a <%= Feedbin::Application.config.trial_days %>-day free trial.
             <% else %>
-                Create your <strong>Free 14-Day Trial</strong> Account
+                Create your <strong>Free <%= Feedbin::Application.config.trial_days %>-Day Trial</strong> Account
             <% end %>
         </h3>
         <%= form_for @user, html: { class: 'combined-form', data: { behavior: 'credit_card_form' }, novalidate: true } do |f| %>
