@@ -53,9 +53,11 @@ class Entry < ApplicationRecord
   end
 
   def tweet
-    @tweet ||= Twitter::Tweet.new(data["tweet"].deep_symbolize_keys)
-  rescue
-    nil
+    @tweet ||= Tweet.new(data, image)
+  end
+
+  def twitter_id
+    data&.dig("tweet", "id")
   end
 
   def micropost?
@@ -90,138 +92,6 @@ class Entry < ApplicationRecord
     nil
   end
 
-  def twitter_thread_ids
-    thread.map do |t|
-      t.dig("id")
-    end
-  end
-
-  def twitter_id
-    data&.dig("tweet", "id")
-  end
-
-  def main_tweet
-    if tweet?
-      @main_tweet ||= tweet.retweeted_status? ? tweet.retweeted_status : tweet
-    end
-  end
-
-  def twitter_media?
-    media = false
-    if tweet?
-      tweets = [main_tweet]
-      tweets.push(main_tweet.quoted_status) if main_tweet.quoted_status?
-
-      media = tweets.find do |tweet|
-        return true if tweet.media?
-        urls = tweet.urls.reject { |url| url.expanded_url.host == "twitter.com" }
-        return true unless urls.empty?
-      rescue
-        false
-      end
-    end
-    !!media
-  end
-
-  def retweet?
-    tweet? ? tweet.retweeted_status? : false
-  end
-
-  def link_tweet?
-    return false unless tweet?
-    return false if main_tweet.quoted_status?
-    main_tweet.urls.length == 1
-  end
-
-  def strip_trailing_link?
-    hash = main_tweet.to_h
-    link_preview? && main_tweet.urls.first.indices.last == hash[:full_text].length
-  end
-
-  def link_preview?
-    return false unless link_tweet?
-    return false if image.present?
-    return false unless data.dig("saved_pages", main_tweet.urls.first.expanded_url.to_s).present?
-    return false if data.dig("saved_pages", main_tweet.urls.first.expanded_url.to_s, "result", "error")
-    data.dig("twitter_link_image_processed").present?
-  end
-
-  def tweet_summary(tweet = nil, strip_trailing_link = false)
-    tweet ||= main_tweet
-    hash = tweet.to_h
-
-    text = trim_text(hash, true)
-    tweet.urls.reverse_each do |url|
-      range = Range.new(*url.indices, true)
-      if strip_trailing_link && strip_trailing_link?
-        text[range] = ""
-      else
-        text[range] = url.display_url
-      end
-    rescue
-    end
-    text
-  end
-
-  def tweet_text(tweet, options = {})
-    hash = tweet.to_h
-    if hash[:entities]
-      hash = remove_entities(hash)
-      text = trim_text(hash, false, true)
-      text = Twitter::TwitterText::Autolink.auto_link_with_json(text, hash[:entities], options).html_safe
-    else
-      text = hash[:full_text]
-    end
-    if text.respond_to?(:strip)
-      text.strip
-    else
-      text
-    end
-  rescue
-    hash[:full_text]
-  end
-
-  def remove_entities(hash)
-    if hash[:display_text_range]
-      text_start = hash[:display_text_range].first
-      text_end = hash[:display_text_range].last
-      hash[:entities].each do |entity, values|
-        hash[:entities][entity] = values.reject { |value|
-          value[:indices].last < text_start || value[:indices].first > text_end
-        }
-        hash[:entities][entity].each_with_index do |value, index|
-          hash[:entities][entity][index][:indices] = [
-            value[:indices][0] - text_start,
-            value[:indices][1] - text_start
-          ]
-        end
-      end
-    end
-    hash
-  end
-
-  def thread
-    data&.dig("thread") || []
-  end
-
-  def tweet_thread
-    @tweet_thread ||= begin
-      thread.map { |part| Twitter::Tweet.new(part.deep_symbolize_keys) }
-    end
-  rescue
-    []
-  end
-
-  def trim_text(hash, exclude_end = false, trim_start = false)
-    text = hash[:full_text]
-    if range = hash[:display_text_range]
-      start = trim_start ? range.first : 0
-      range = Range.new(start, range.last, exclude_end)
-      text = text.codepoints[range].pack("U*")
-    end
-    text
-  end
-
   def has_content
     if [title, url, entry_id, content].compact.count == 0
       errors.add(:base, "entry has no content")
@@ -229,7 +99,7 @@ class Entry < ApplicationRecord
   end
 
   def self.entries_with_feed(entry_ids, sort)
-    Entry.where(id: entry_ids).order_by_ids(entry_ids).includes(feed: [:favicon])
+    Entry.in_order_of(:id, entry_ids).includes(feed: [:favicon])
   end
 
   def self.entries_list
@@ -245,19 +115,14 @@ class Entry < ApplicationRecord
   end
 
   def fully_qualified_url
-    entry_url = url
-    entry_url = if entry_url.present? && is_fully_qualified(entry_url)
-      entry_url
-    elsif entry_url.present?
-      URI.join(base_url, entry_url).to_s
-    else
-      feed.site_url
+    return nil if url.blank? || !url.respond_to?(:strip)
+    return url.strip if url.strip.downcase.start_with?("http")
+
+    result = feed.site_relative_url(url)
+    if result.blank?
+      result = feed.feed_relative_url(url)
     end
-    entry_url = Addressable::URI.unescape(entry_url)
-    entry_url = Addressable::URI.escape(entry_url)
-    entry_url.gsub(Feedbin::Application.config.entities_regex, Feedbin::Application.config.entities_map)
-  rescue
-    feed.site_url
+    result
   end
 
   def rebase_url(original_url)
@@ -312,25 +177,6 @@ class Entry < ApplicationRecord
     end
   end
 
-  def tweet_link_image
-    if data && data["twitter_link_image_processed"]
-      image_url = data["twitter_link_image_processed"]
-
-      host = ENV["ENTRY_IMAGE_HOST"]
-
-      url = URI(image_url)
-      url.host = host if host
-      url.scheme = "https"
-      url.to_s
-    end
-  end
-
-  def tweet_link_image_placeholder_color
-    if data && data["twitter_link_image_placeholder_color"].respond_to?(:length) && data["twitter_link_image_placeholder_color"].length == 6
-      data["twitter_link_image_placeholder_color"]
-    end
-  end
-
   def update_content
     original = content
     if tweet?
@@ -341,11 +187,9 @@ class Entry < ApplicationRecord
   end
 
   def tweet_metadata
-    if main_tweet
-      self.url = main_tweet.uri.to_s
-      self.main_tweet_id = main_tweet.id
-    end
-  rescue
+    return unless tweet? && tweet.main_tweet
+    self.url = tweet.main_tweet.uri.to_s
+    self.main_tweet_id = tweet.main_tweet.id
   end
 
   def content_diff
@@ -406,15 +250,6 @@ class Entry < ApplicationRecord
     duration
   end
 
-  def self.order_by_ids(ids)
-    table = Entry.arel_table
-    condition = Arel::Nodes::Case.new(table[:id])
-    ids.each_with_index do |id, index|
-      condition.when(id).then(index)
-    end
-    order(condition)
-  end
-
   def media
     items = data&.dig("media").respond_to?(:each) && data&.dig("media") || []
     items.filter_map do |item|
@@ -427,20 +262,25 @@ class Entry < ApplicationRecord
     end
   end
 
-  private
+  def thread
+    data&.dig("thread") || []
+  end
 
-  def base_url
-    parent_feed = feed
-    if is_fully_qualified(parent_feed.site_url)
-      parent_feed.site_url
-    else
-      parent_feed.feed_url
+  def twitter_thread_ids
+    thread.map do |t|
+      t.dig("id")
     end
   end
 
-  def is_fully_qualified(url_string)
-    url_string.respond_to?(:start_with?) && url_string.start_with?("http")
+  def tweet_thread
+    @tweet_thread ||= begin
+      thread.map { |part| Twitter::Tweet.new(part.deep_symbolize_keys) }
+    end
+  rescue
+    []
   end
+
+  private
 
   def ensure_published
     now = Time.now
@@ -462,8 +302,8 @@ class Entry < ApplicationRecord
         hash[:active] = true
         hash[:muted] = false
         if tweet?
-          hash[:show_retweets] = true if retweet?
-          hash[:media_only] = false unless twitter_media?
+          hash[:show_retweets] = true if tweet.retweet?
+          hash[:media_only] = false unless tweet.twitter_media?
         end
       end
 
@@ -512,7 +352,7 @@ class Entry < ApplicationRecord
   def create_summary
     if tweet?
       begin
-        self.summary = tweet_summary
+        self.summary = tweet.tweet_summary
       rescue
         self.summary = ""
       end

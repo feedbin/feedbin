@@ -14,9 +14,9 @@ class ArticleTest < ApplicationSystemTestCase
 
     login_as(@user)
 
-    click_link(entry.tweet_summary)
+    click_link(entry.tweet.tweet_summary)
 
-    assert_selector ".tweet-text", text: entry.tweet_summary
+    assert_selector ".tweet-text", text: entry.tweet.tweet_summary
   end
 
   test "star" do

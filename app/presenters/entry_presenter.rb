@@ -51,7 +51,7 @@ class EntryPresenter < BasePresenter
 
   def published_date
     if entry.tweet?
-      entry.main_tweet.created_at.to_formatted_s(:full_human)
+      entry.tweet.main_tweet.created_at.to_formatted_s(:full_human)
     else
       if entry.published
         entry.published.to_formatted_s(:full_human)
@@ -63,7 +63,7 @@ class EntryPresenter < BasePresenter
 
   def datetime
     if entry.tweet?
-      entry.main_tweet.created_at.to_formatted_s(:datetime)
+      entry.tweet.main_tweet.created_at.to_formatted_s(:datetime)
     else
       if entry.published
         entry.published.to_formatted_s(:datetime)
@@ -195,7 +195,7 @@ class EntryPresenter < BasePresenter
   end
 
   def retweet_text
-    HTMLEntities.new.decode(entry.tweet_summary(entry.main_tweet.quoted_status))
+    HTMLEntities.new.decode(entry.tweet.tweet_summary(entry.tweet.main_tweet.quoted_status))
   end
 
   def entry_view_title
@@ -275,7 +275,7 @@ class EntryPresenter < BasePresenter
       classes.push("no-title")
     end
 
-    if entry.retweet?
+    if entry.tweet? && entry.tweet.retweet?
       classes.push("re-tweet")
     end
 
@@ -464,7 +464,7 @@ class EntryPresenter < BasePresenter
   def profile_image
     if entry.tweet?
       @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image" do
-        url = tweet_profile_image_uri(entry.main_tweet)
+        url = tweet_profile_image_uri(entry.tweet.main_tweet)
         fallback = @template.image_url("favicon-profile-default.png")
         @template.image_tag_with_fallback(fallback, url, alt: "")
       end
@@ -481,7 +481,7 @@ class EntryPresenter < BasePresenter
 
   def summary
     if entry.tweet?
-      text = entry.tweet_summary(nil, true).html_safe
+      text = entry.tweet.tweet_summary(nil, true).html_safe
       summary = @template.truncate(text, length: 280, omission: "", escape: false)
       @template.content_tag(:div, class: "summary light") do
         @template.content_tag(:span, summary)
@@ -510,7 +510,7 @@ class EntryPresenter < BasePresenter
     length = 240
     if entry.tweet?
       @template.content_tag(:span, "", class: "title-inner") do
-        "#{tweet_name(entry.main_tweet)} #{@template.content_tag(:span, tweet_screen_name(entry.main_tweet), class: "light")}".html_safe
+        "#{tweet_name(entry.tweet.main_tweet)} #{@template.content_tag(:span, tweet_screen_name(entry.tweet.main_tweet), class: "light")}".html_safe
       end
     elsif entry.micropost?
       @template.content_tag(:span, "", class: "title-inner") do
@@ -587,7 +587,7 @@ class EntryPresenter < BasePresenter
 
   def tweet_classes(tweet)
     classes = ["tweet-author-#{tweet.user.id}"]
-    parent = @locals[:parent] || entry.main_tweet
+    parent = @locals[:parent] || entry.tweet.main_tweet
     if @locals[:tweet_counter].present? && tweet.user.id == parent.user.id
       if tweet.in_reply_to_user_id? && tweet.in_reply_to_user_id != parent.user.id && tweet.id != parent.id
         classes.push("tweet-author-reply")
@@ -604,7 +604,7 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_in_reply_to(tweet)
-    tweet ||= entry.main_tweet
+    tweet ||= entry.tweet.main_tweet
     if tweet.to_h[:display_text_range] && tweet.in_reply_to_status_id?
       range = tweet.to_h[:display_text_range]
       content_start = range.last
@@ -651,18 +651,18 @@ class EntryPresenter < BasePresenter
 
   def all_tweets
     [].tap do |array|
-      array.push(entry.main_tweet)
-      array.push(entry.main_tweet.quoted_status) if entry.main_tweet.quoted_status?
+      array.push(entry.tweet.main_tweet)
+      array.push(entry.tweet.main_tweet.quoted_status) if entry.tweet.main_tweet.quoted_status?
     end
   end
 
   def tweet_retweeted_message
-    "Retweeted by " + (entry.tweet.user.name || "@" + entry.tweet.user.screen_name)
+    "Retweeted by " + (entry.tweet.tweet.user.name || "@" + entry.tweet.tweet.user.screen_name)
   end
 
   def tweet_retweeted_image
-    if entry.tweet.user.profile_image_uri? && entry.tweet.user.profile_image_uri_https("normal")
-      @template.camo_link(entry.tweet.user.profile_image_uri_https("normal"))
+    if entry.tweet.tweet.user.profile_image_uri? && entry.tweet.tweet.user.profile_image_uri_https("normal")
+      @template.camo_link(entry.tweet.tweet.user.profile_image_uri_https("normal"))
     else
       @template.image_url("favicon-profile-default.png")
     end
@@ -768,7 +768,7 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_text(tweet, tag = true, options = {})
-    text = entry.tweet_text(tweet, options)
+    text = entry.tweet.tweet_text(tweet, options)
     if text.present?
       if tag
         @template.content_tag(:p, class: "tweet-text") do
@@ -816,32 +816,32 @@ class EntryPresenter < BasePresenter
   end
 
   def quoted_status?
-    entry.main_tweet.quoted_status?
+    entry.tweet.main_tweet.quoted_status?
   end
 
   def quoted_status
-    entry.main_tweet.quoted_status
+    entry.tweet.main_tweet.quoted_status
   end
 
   def tweet_link_title
-    saved_page(entry.main_tweet.urls.first.expanded_url.to_s)&.title
+    saved_page(entry.tweet.main_tweet.urls.first.expanded_url.to_s)&.title
   end
 
   def tweet_link_host
-    saved_page(entry.main_tweet.urls.first.expanded_url.to_s)&.domain
+    saved_page(entry.tweet.main_tweet.urls.first.expanded_url.to_s)&.domain
   end
 
   def quoted_tweet
     return unless quoted_tweet?
     @template.content_tag :div, class: "quoted-tweet light" do
-      @template.concat @template.content_tag(:strong) { tweet_name(entry.main_tweet.quoted_status) }
+      @template.concat @template.content_tag(:strong) { tweet_name(entry.tweet.main_tweet.quoted_status) }
       @template.concat " – "
       @template.concat retweet_text
     end
   end
 
   def quoted_tweet?
-    entry.tweet? && entry.main_tweet.quoted_status?
+    entry.tweet? && entry.tweet.main_tweet.quoted_status?
   end
 
   def feed_wrapper(subscriptions, &block)

@@ -14,8 +14,8 @@ class SafariPushNotificationSend
     feed = entry.feed
 
     if entry.tweet?
-      body = entry.main_tweet.full_text
-      title = format_text(entry.main_tweet.user.name, 36)
+      body = entry.tweet.main_tweet.full_text
+      title = format_text(entry.tweet.main_tweet.user.name, 36)
       titles = {}
     else
       body = entry.title || entry.summary

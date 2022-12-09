@@ -26,8 +26,8 @@ module ImageCrawler
       preset_name = "primary"
       if @entry.tweet?
         tweets = []
-        tweets.push(@entry.main_tweet)
-        tweets.push(@entry.main_tweet.quoted_status) if @entry.main_tweet.quoted_status?
+        tweets.push(@entry.tweet.main_tweet)
+        tweets.push(@entry.tweet.main_tweet.quoted_status) if @entry.tweet.main_tweet.quoted_status?
         tweet = tweets.find do |tweet|
           tweet.media?
         end

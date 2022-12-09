@@ -19,11 +19,11 @@ class SearchData
       hash[:word_count]     = hash[:content]&.split&.length || 0
 
       if @entry.tweet?
-        hash[:twitter_screen_name] = "#{@entry.main_tweet.user.screen_name} @#{@entry.main_tweet.user.screen_name}"
-        hash[:twitter_name]        = @entry.main_tweet.user.name
+        hash[:twitter_screen_name] = "#{@entry.tweet.main_tweet.user.screen_name} @#{@entry.tweet.main_tweet.user.screen_name}"
+        hash[:twitter_name]        = @entry.tweet.main_tweet.user.name
         hash[:twitter_retweet]     = @entry.tweet.retweeted_status?
         hash[:twitter_quoted]      = @entry.tweet.quoted_status?
-        hash[:twitter_media]       = @entry.twitter_media?
+        hash[:twitter_media]       = @entry.tweet.twitter_media?
         hash[:twitter_image]       = twitter_image
         hash[:twitter_link]        = twitter_link
       end
@@ -57,8 +57,8 @@ class SearchData
   def tweets
     @tweets ||= begin
       [].tap do |array|
-        array.push(@entry.main_tweet)
-        array.push(@entry.main_tweet.quoted_status) if @entry.main_tweet.quoted_status?
+        array.push(@entry.tweet.main_tweet)
+        array.push(@entry.tweet.main_tweet.quoted_status) if @entry.tweet.main_tweet.quoted_status?
       end
     end
   end
