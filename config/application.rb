@@ -30,6 +30,8 @@ module Feedbin
 
     config.active_record.schema_format = :sql
 
+    config.action_dispatch.x_sendfile_header = "X-Accel-Redirect"
+
     config.sass.line_comments = true
     config.assets.compress = true
     config.action_view.automatically_disable_submit_tag = false
