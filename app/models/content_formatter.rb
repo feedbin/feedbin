@@ -121,7 +121,7 @@ class ContentFormatter
       filters.unshift(HTML::Pipeline::AbsoluteHrefFilter)
 
       context[:image_base_url]    = base_url || entry.feed.site_url
-      context[:image_subpage_url] = base_url || entry.url || ""
+      context[:image_subpage_url] = base_url || entry.fully_qualified_url || ""
       context[:href_base_url]     = base_url || entry.feed.site_url
       context[:href_subpage_url]  = base_url || entry.url || ""
 

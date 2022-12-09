@@ -14,7 +14,9 @@ class Entry < ApplicationRecord
   before_create :create_summary
   before_create :update_content
   before_create :tweet_metadata
+
   before_update :create_summary
+
   after_commit :cache_public_id, on: [:create, :update]
   after_commit :find_images, on: :create, unless: :skip_images?
   after_commit :mark_as_unread, on: :create
@@ -32,16 +34,24 @@ class Entry < ApplicationRecord
 
   self.per_page = 100
 
-  def archived_images?
-    !!archived_images
+  def self.entries_with_feed(entry_ids, sort)
+    in_order_of(:id, entry_ids).includes(feed: [:favicon])
+  end
+
+  def self.entries_list
+    select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings)
+  end
+
+  def self.sort_preference(sort)
+    if sort == "ASC"
+      order("published ASC")
+    else
+      order("published DESC")
+    end
   end
 
   def newsletter?
     feed.newsletter?
-  end
-
-  def tweet?
-    tweet.present?
   end
 
   def youtube?
@@ -52,29 +62,12 @@ class Entry < ApplicationRecord
     data && ["audio/mp3", "audio/mpeg"].include?(data["enclosure_type"])
   end
 
-  def tweet
-    @tweet ||= Tweet.new(data, image) rescue nil
-  end
-
-  def twitter_id
-    data&.dig("tweet", "id")
+  def tweet?
+    tweet.present?
   end
 
   def micropost?
     micropost.present?
-  end
-
-  def micropost
-    @micropost ||= begin
-      if data.respond_to?(:has_key?)
-        post = Micropost.new(self.data, title, feed: feed)
-        post.valid? ? post : nil
-      end
-    end
-  end
-
-  def json_feed
-    data&.respond_to?(:dig) && data&.dig("json_feed")
   end
 
   def author
@@ -92,28 +85,6 @@ class Entry < ApplicationRecord
     nil
   end
 
-  def has_content
-    if [title, url, entry_id, content].compact.count == 0
-      errors.add(:base, "entry has no content")
-    end
-  end
-
-  def self.entries_with_feed(entry_ids, sort)
-    Entry.in_order_of(:id, entry_ids).includes(feed: [:favicon])
-  end
-
-  def self.entries_list
-    select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings)
-  end
-
-  def self.sort_preference(sort)
-    if sort == "ASC"
-      order("published ASC")
-    else
-      order("published DESC")
-    end
-  end
-
   def fully_qualified_url
     return nil if url.blank? || !url.respond_to?(:strip)
     return url.strip if url.strip.downcase.start_with?("http")
@@ -129,18 +100,6 @@ class Entry < ApplicationRecord
     base_url = Addressable::URI.heuristic_parse(fully_qualified_url)
     original_url = Addressable::URI.heuristic_parse(original_url)
     Addressable::URI.join(base_url, original_url)
-  end
-
-  def content_format
-    data && data["format"] || "default"
-  end
-
-  def search_data
-    SearchData.new(self).to_h
-  end
-
-  def public_id_alt
-    data && data["public_id_alt"]
   end
 
   def processed_image
@@ -177,21 +136,6 @@ class Entry < ApplicationRecord
     end
   end
 
-  def update_content
-    original = content
-    if tweet?
-      self.content = ApplicationController.render(template: "entries/_tweet_default", formats: :html, locals: {entry: self}, layout: nil)
-    end
-  rescue
-    self.content = original
-  end
-
-  def tweet_metadata
-    return unless tweet? && tweet.main_tweet
-    self.url = tweet.main_tweet.uri.to_s
-    self.main_tweet_id = tweet.main_tweet.id
-  end
-
   def content_diff
     @content_diff ||= begin
       result = nil
@@ -206,29 +150,6 @@ class Entry < ApplicationRecord
       end
       result
     end
-  end
-
-  def newsletter_url
-    URI::HTTPS.build(
-      host: ENV["NEWSLETTER_HOST"],
-      path: "/#{public_id[0..2]}/#{public_id}.html"
-    ).to_s
-  end
-
-  def extracted_content_url
-    MercuryParser.new(fully_qualified_url).service_url
-  rescue
-    nil
-  end
-
-  def hostname
-    URI(url).host
-  rescue
-    nil
-  end
-
-  def published_recently?
-    published > 7.days.ago
   end
 
   def audio_duration
@@ -262,6 +183,52 @@ class Entry < ApplicationRecord
     end
   end
 
+  def micropost
+    @micropost ||= begin
+      if data.respond_to?(:has_key?)
+        post = Micropost.new(self.data, title, feed: feed)
+        post.valid? ? post : nil
+      end
+    end
+  end
+
+  def archived_images?
+    !!archived_images
+  end
+
+  def newsletter_url
+    URI::HTTPS.build(
+      host: ENV["NEWSLETTER_HOST"],
+      path: "/#{public_id[0..2]}/#{public_id}.html"
+    ).to_s
+  end
+
+  def extracted_content_url
+    MercuryParser.new(fully_qualified_url).service_url rescue nil
+  end
+
+  def hostname
+    URI(url).host
+  rescue
+    nil
+  end
+
+  def content_format
+    data && data["format"] || "default"
+  end
+
+  def search_data
+    SearchData.new(self).to_h
+  end
+
+  def public_id_alt
+    data && data["public_id_alt"]
+  end
+
+  def published_recently?
+    published > 7.days.ago
+  end
+
   def thread
     data&.dig("thread") || []
   end
@@ -280,7 +247,40 @@ class Entry < ApplicationRecord
     []
   end
 
+  def twitter_id
+    data&.dig("tweet", "id")
+  end
+
+  def tweet
+    @tweet ||= Tweet.new(data, image) rescue nil
+  end
+
+  def json_feed
+    data&.respond_to?(:dig) && data&.dig("json_feed")
+  end
+
   private
+
+  def tweet_metadata
+    return unless tweet? && tweet.main_tweet
+    self.url = tweet.main_tweet.uri.to_s
+    self.main_tweet_id = tweet.main_tweet.id
+  end
+
+  def update_content
+    original = content
+    if tweet?
+      self.content = ApplicationController.render(template: "entries/_tweet_default", formats: :html, locals: {entry: self}, layout: nil)
+    end
+  rescue
+    self.content = original
+  end
+
+  def has_content
+    if [title, url, entry_id, content].compact.count == 0
+      errors.add(:base, "entry has no content")
+    end
+  end
 
   def ensure_published
     now = Time.now
@@ -292,7 +292,6 @@ class Entry < ApplicationRecord
 
   def cache_public_id
     FeedbinUtils.update_public_id_cache(public_id, content, public_id_alt)
-    true
   end
 
   def mark_as_unread
