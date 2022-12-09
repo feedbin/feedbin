@@ -15,6 +15,9 @@ gem "html_diff",           github: "feedbin/html_diff",           ref: "013e1bb"
 gem "twitter",             github: "feedbin/twitter",             branch: "feedbin"
 gem "down",                github: "feedbin/down",                branch: "normalize"
 
+# https://github.com/mikel/mail/issues/1521
+gem "mail", "< 2.8"
+
 gem "activerecord-import"
 gem "addressable", require: "addressable/uri"
 gem "apnotic", github: "ostinelli/apnotic", branch: "master"
