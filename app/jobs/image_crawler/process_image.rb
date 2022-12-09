@@ -10,16 +10,15 @@ module ImageCrawler
       @preset_name = preset_name
       Sidekiq.logger.info "ProcessImage: public_id=#{public_id} image_url=#{image_url}"
       image = ImageProcessor.new(original_path, target_width: preset.width, target_height: preset.height)
-      if image.valid?
+
+      if image.valid? || !preset.validate
         processed_path = image.send(preset.crop)
         UploadImage.perform_async(public_id, @preset_name, processed_path, original_url, image_url, image.color)
       else
         FindImageCritical.perform_async(public_id, @preset_name, candidate_urls) unless candidate_urls.empty?
       end
-      begin
-        File.unlink(original_path)
-      rescue Errno::ENOENT
-      end
+    ensure
+      File.unlink(original_path) rescue Errno::ENOENT
     end
   end
 end

@@ -54,6 +54,16 @@ module ImageCrawler
       persisted_path
     end
 
+    def limit_crop
+      ImageProcessing::Vips
+        .source(source)
+        .resize_to_limit(@target_width, @target_height)
+        .convert("jpg")
+        .saver(strip: true, quality: 90)
+        .call(destination: persisted_path)
+      persisted_path
+    end
+
     def smart_crop
       return fill_crop if resize_too_small? || resize_just_right?
 

@@ -1259,7 +1259,8 @@ CREATE TABLE public.twitter_users (
     screen_name text NOT NULL,
     data jsonb NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    profile_image_url text
 );
 
 
@@ -2944,6 +2945,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220909105317'),
 ('20220916104628'),
 ('20220926154041'),
-('20221004142045');
+('20221004142045'),
+('20221208231846');
 
 

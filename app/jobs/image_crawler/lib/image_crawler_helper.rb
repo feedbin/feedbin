@@ -12,6 +12,7 @@ module ImageCrawler
         height: 304,
         minimum_size: 20_000,
         crop: :smart_crop,
+        validate: true,
         job_class: EntryImage
       },
       twitter: {
@@ -19,6 +20,7 @@ module ImageCrawler
         height: 304,
         minimum_size: 10_000,
         crop: :smart_crop,
+        validate: true,
         job_class: TwitterLinkImage
       },
       youtube: {
@@ -26,6 +28,7 @@ module ImageCrawler
         height: 304,
         minimum_size: nil,
         crop: :fill_crop,
+        validate: true,
         job_class: EntryImage
       },
       podcast: {
@@ -33,6 +36,7 @@ module ImageCrawler
         height: 200,
         minimum_size: nil,
         crop: :fill_crop,
+        validate: true,
         job_class: ItunesImage
       },
       podcast_feed: {
@@ -40,7 +44,17 @@ module ImageCrawler
         height: 200,
         minimum_size: nil,
         crop: :fill_crop,
+        validate: true,
         job_class: ItunesFeedImage
+      },
+      profile: {
+        width: 400,
+        height: 400,
+        minimum_size: nil,
+        crop: :limit_crop,
+        directory: "profile",
+        validate: false,
+        job_class: TwitterProfileImage
       }
     }
 
@@ -59,7 +73,11 @@ module ImageCrawler
     end
 
     def image_name
-      File.join(@public_id[0..6], "#{@public_id}.jpg")
+      path = File.join(@public_id[0..6], "#{@public_id}.jpg")
+      if preset.directory
+        path = File.join(preset.directory, path)
+      end
+      path
     end
 
     def storage_options
