@@ -17,8 +17,8 @@ class ThreaderTest < ActiveSupport::TestCase
       assert(threader.thread)
     end
 
-    assert_equal(@parent_entry.reload.thread_id, entry_hash["thread_id"])
-    assert_equal(@parent_entry.reload.thread.length, 1)
+    assert_equal(entry_hash["thread_id"], @parent_entry.reload.thread_id)
+    assert_equal(1, @parent_entry.reload.thread.length)
   end
 
   test "should not create more than one entry" do
@@ -38,6 +38,7 @@ class ThreaderTest < ActiveSupport::TestCase
       "tweet" => {
         "id" => thread_id,
         "user" => {
+          "id" => Random.new.rand(10000),
           "screen_name" => "bsaid"
         }
       }

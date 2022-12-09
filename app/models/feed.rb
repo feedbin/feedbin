@@ -68,16 +68,6 @@ class Feed < ApplicationRecord
     taggings
   end
 
-  def host_letter
-    letter = "default"
-    if host
-      if segment = host.split(".")[-2]
-        letter = segment[0].downcase
-      end
-    end
-    letter
-  end
-
   def icon
     options.dig("json_feed", "icon") || custom_icon
   end
@@ -227,10 +217,24 @@ class Feed < ApplicationRecord
     "refresher_redirect_stable_%d" % id
   end
 
-  def rebase_url(original_url)
-    base_url = Addressable::URI.heuristic_parse(site_url)
-    original_url = Addressable::URI.heuristic_parse(original_url)
-    Addressable::URI.join(base_url, original_url)
+  def feed_relative_url(url)
+    root = crawl_data.redirected_to || feed_url
+    rebase_url(root, url).to_s
+  end
+
+  def site_relative_url(url)
+    root = site_url
+    rebase_url(root, url).to_s
+  end
+
+  def rebase_url(root, relative)
+    return nil if relative.blank? || !relative.respond_to?(:strip)
+    return relative.strip if relative.strip.downcase.start_with?("http")
+    return nil if root.blank?
+
+    root = Addressable::URI.heuristic_parse(root)
+    relative = Addressable::URI.heuristic_parse(relative)
+    Addressable::URI.join(root, relative)
   end
 
   private

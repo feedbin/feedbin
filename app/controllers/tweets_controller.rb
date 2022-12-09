@@ -7,8 +7,8 @@ class TweetsController < ApplicationController
       replies = load_replies(parents)
       tweets = load_author_replies(replies, parents)
 
-      unless tweets.find { |tweet| tweet.id == @entry.main_tweet.id }
-        tweets = tweets.unshift(@entry.main_tweet)
+      unless tweets.find { |tweet| tweet.id == @entry.tweet.main_tweet.id }
+        tweets = tweets.unshift(@entry.tweet.main_tweet)
       end
       tweets = parents.concat(tweets)
       tweets.uniq { |tweet| tweet.id }
@@ -40,7 +40,7 @@ class TweetsController < ApplicationController
   end
 
   def load_replies(parents)
-    parent = parents.first || @entry.main_tweet
+    parent = parents.first || @entry.tweet.main_tweet
     query = "to:#{parent.user.screen_name} AND filter:replies"
     options = {
       since_id: parent.id,
@@ -60,7 +60,7 @@ class TweetsController < ApplicationController
   end
 
   def load_author_replies(replies, parents)
-    parent = parents.first || @entry.main_tweet
+    parent = parents.first || @entry.tweet.main_tweet
     options = {
       include_rts: false,
       max_id: replies.search_metadata[:max_id],
@@ -94,7 +94,7 @@ class TweetsController < ApplicationController
 
   def load_parent(parent)
     if parent.nil?
-      parent = @entry.main_tweet
+      parent = @entry.tweet.main_tweet
     end
     if parent.in_reply_to_status_id?
       client.status(parent.in_reply_to_status_id, tweet_mode: "extended")
