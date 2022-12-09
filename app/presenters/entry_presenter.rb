@@ -657,12 +657,12 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_retweeted_message
-    "Retweeted by " + (entry.tweet.tweet.user.name || "@" + entry.tweet.tweet.user.screen_name)
+    "Retweeted by " + (entry.tweet.user.name || "@" + entry.tweet.user.screen_name)
   end
 
   def tweet_retweeted_image
-    if entry.tweet.tweet.user.profile_image_uri? && entry.tweet.tweet.user.profile_image_uri_https("normal")
-      @template.camo_link(entry.tweet.tweet.user.profile_image_uri_https("normal"))
+    if entry.tweet.user.profile_image_uri? && entry.tweet.user.profile_image_uri_https("normal")
+      @template.camo_link(entry.tweet.user.profile_image_uri_https("normal"))
     else
       @template.image_url("favicon-profile-default.png")
     end

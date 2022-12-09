@@ -53,7 +53,7 @@ class Entry < ApplicationRecord
   end
 
   def tweet
-    @tweet ||= Tweet.new(data, image)
+    @tweet ||= Tweet.new(data, image) rescue nil
   end
 
   def twitter_id
