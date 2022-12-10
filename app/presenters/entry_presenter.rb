@@ -342,14 +342,12 @@ class EntryPresenter < BasePresenter
   end
 
   def has_enclosure?
-    entry.data.respond_to?(:[]) && entry.data["enclosure_url"].present?
+    enclosure_url.present?
   end
 
   def enclosure_url
-    if has_enclosure?
-      base = Addressable::URI.parse(entry.fully_qualified_url)
-      base.join(entry.data["enclosure_url"]).to_s
-    end
+    base = Addressable::URI.parse(entry.fully_qualified_url)
+    base.join(entry.data["enclosure_url"]).to_s
   rescue
     nil
   end
