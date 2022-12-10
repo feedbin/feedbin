@@ -46,7 +46,7 @@ module ImageCrawler
     end
 
     def same_domain?
-      entry_host = Addressable::URI.heuristic_parse(@entry.fully_qualified_url).host
+      entry_host = Addressable::URI.heuristic_parse(@entry.fully_qualified_url)&.host
       feed_host = @entry.feed.host
       entry_host == feed_host
     end

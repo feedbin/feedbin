@@ -97,9 +97,13 @@ class Entry < ApplicationRecord
   end
 
   def rebase_url(original_url)
+    return nil if fully_qualified_url.nil? || original_url.nil?
     base_url = Addressable::URI.heuristic_parse(fully_qualified_url)
     original_url = Addressable::URI.heuristic_parse(original_url)
     Addressable::URI.join(base_url, original_url)
+  rescue Addressable::URI::InvalidURIError
+    Rails.logger.error("Invalid uri original_url=#{original_url} fully_qualified_url=#{fully_qualified_url}")
+    nil
   end
 
   def processed_image

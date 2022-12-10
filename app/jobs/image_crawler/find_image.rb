@@ -55,7 +55,7 @@ module ImageCrawler
       end
       found
     rescue => exception
-      download.delete!
+      download&.delete!
       Sidekiq.logger.info "Download failed: exception=#{exception.inspect} original_url=#{original_url}"
       false
     end
