@@ -246,6 +246,9 @@ class Feed < ApplicationRecord
     root = Addressable::URI.heuristic_parse(root)
     relative = Addressable::URI.heuristic_parse(relative)
     Addressable::URI.join(root, relative)
+  rescue Addressable::URI::InvalidURIError
+    Rails.logger.error("Invalid uri feed=#{id} root=#{root} relative=#{relative}")
+    nil
   end
 
   private

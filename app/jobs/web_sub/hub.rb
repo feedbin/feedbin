@@ -40,6 +40,8 @@ module WebSub
         "hub.secret"   => @feed.web_sub_secret,
         "hub.callback" => @feed.web_sub_callback
       })
+    rescue HTTP::TimeoutError, HTTP::ConnectionError => exception
+      Rails.logger.error("WebSub HTTP Error exception=#{exception.inspect}")
     end
   end
 end
