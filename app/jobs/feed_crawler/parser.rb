@@ -40,6 +40,10 @@ module FeedCrawler
         "entries" => entries
       }
 
+      unless parsed.entries.find { _1.title.present? }
+        data["feed"]["custom_icon_format"] = "round"
+      end
+
       if video_ids.present?
         HarvestEmbeds.new.add_missing_to_queue(video_ids)
         job_id = YoutubeReceiver.perform_in(2.minutes, data)

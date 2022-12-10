@@ -28,7 +28,7 @@ class Feed < ApplicationRecord
 
   enum feed_type: {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3, pages: 4}
 
-  store :settings, accessors: [:custom_icon, :current_feed_url, :custom_icon_format], coder: JSON
+  store :settings, accessors: [:custom_icon, :current_feed_url, :custom_icon_format], coder: JsonConverter
 
   def twitter_user?
     twitter_user.present?
@@ -68,18 +68,25 @@ class Feed < ApplicationRecord
     taggings
   end
 
-  def icon
-    options.dig("json_feed", "icon") || custom_icon
+  def icons
+    {
+      custom_icon                                  => "round",
+      options.dig("image", "url")                  => "square",
+      options.dig("json_feed", "icon")             => "square",
+      options.dig("json_feed", "author", "avatar") => "round",
+    }
   end
 
-  def feed_image
-    url = options.dig("image", "url")
-    if url.nil?
-      url = options.dig("json_feed", "author", "avatar")
-    end
-    return if url.nil?
-    return url if url&.start_with?("http")
-    URI.join(feed_url, url) rescue nil
+  def icon
+    base = icons.keys.find { !_1.nil? }
+    return nil if base.nil?
+    feed_relative_url(base)
+  end
+
+  def default_icon_format
+    base = icons.keys.find { !_1.nil? }
+    return nil if base.nil?
+    icons[base]
   end
 
   def self.create_from_parsed_feed(parsed_feed)
@@ -91,6 +98,10 @@ class Feed < ApplicationRecord
         unless threader.thread
           new_feed.entries.create_with(entry_hash).create_or_find_by(public_id: entry_hash[:public_id])
         end
+      end
+      # for micropost feeds
+      if parsed_feed.entries.filter_map(&:title).blank?
+        new_feed.update!(custom_icon_format: "round")
       end
     end
   end

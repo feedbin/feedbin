@@ -18,14 +18,8 @@ class BasePresenter
           @template.image_tag_with_fallback(fallback, url, alt: "")
         end
       elsif feed.icon
-        content = @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image icon-format-#{feed.custom_icon_format || "round"}" do
+        content = @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image icon-format-#{feed.custom_icon_format || feed.default_icon_format}" do
           url = @template.camo_link(feed.icon)
-          fallback = @template.image_url("favicon-profile-default.png")
-          @template.image_tag_with_fallback(fallback, url, alt: "")
-        end
-      elsif feed.feed_image
-        content = @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image icon-format-square" do
-          url = @template.camo_link(feed.feed_image)
           fallback = @template.image_url("favicon-profile-default.png")
           @template.image_tag_with_fallback(fallback, url, alt: "")
         end

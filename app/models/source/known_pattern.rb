@@ -39,7 +39,7 @@ class Source::KnownPattern < Source
   end
 
   def mastodon_server?
-    response.headers.get(:server).find { _1 =~ /mastodon/i }
+    response.headers.find { _2 =~ /mastodon/i }
   end
 
   def youtube_domain?
