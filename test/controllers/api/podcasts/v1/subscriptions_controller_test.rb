@@ -15,11 +15,11 @@ class Api::Podcasts::V1::SubscriptionsControllerTest < ApiControllerTestCase
 
     subscription = @user.podcast_subscriptions.first
     feed = subscription.feed
-    assert_equal(subscription.id, data.first.dig("id"))
-    assert_equal(feed.id, data.first.dig("feed_id"))
-    assert_equal(feed.title, data.first.dig("title"))
-    assert_equal(feed.feed_url, data.first.dig("feed_url"))
-    assert_equal("subscribed", data.first.dig("status"))
+    assert_equal(subscription.id, data.first.safe_dig("id"))
+    assert_equal(feed.id, data.first.safe_dig("feed_id"))
+    assert_equal(feed.title, data.first.safe_dig("title"))
+    assert_equal(feed.feed_url, data.first.safe_dig("feed_url"))
+    assert_equal("subscribed", data.first.safe_dig("status"))
   end
 
   test "should create" do
@@ -35,7 +35,7 @@ class Api::Podcasts::V1::SubscriptionsControllerTest < ApiControllerTestCase
     end
 
     data = parse_json
-    assert_equal(feed_url, data.dig("feed_url"))
+    assert_equal(feed_url, data.safe_dig("feed_url"))
 
     assert PodcastSubscription.last.reload.subscribed?, "Subscription should be subscribed"
   end

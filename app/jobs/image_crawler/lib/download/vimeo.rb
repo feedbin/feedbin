@@ -14,7 +14,7 @@ module ImageCrawler
     end
 
     def image_url
-      data.dig("thumbnail_url").gsub(/_\d+.jpg/, ".jpg")
+      data.safe_dig("thumbnail_url").gsub(/_\d+.jpg/, ".jpg")
     end
 
     private

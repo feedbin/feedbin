@@ -85,10 +85,10 @@
         <%= component "settings/expandable", capsule: true do |expandable| %>
           <% expandable.description do %>
             <%= component "settings/control_row" do |row| %>
-              <% row.title { item.fw_feed.dig("title") } %>
+              <% row.title { item.fw_feed.safe_dig("title") } %>
                 <% row.description do %>
-                  <%= link_to item.fw_feed.dig("feed_url"), target: :_blank, rel: "noopener noreferrer", class: "extra-muted" do  %>
-                    <%= short_url(item.fw_feed.dig("feed_url")) %>
+                  <%= link_to item.fw_feed.safe_dig("feed_url"), target: :_blank, rel: "noopener noreferrer", class: "extra-muted" do  %>
+                    <%= short_url(item.fw_feed.safe_dig("feed_url")) %>
                   <% end %>
                 <% end %>
             <% end %>

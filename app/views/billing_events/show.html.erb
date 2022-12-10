@@ -67,9 +67,9 @@
             <% else %>
             <tr>
                 <td>
-                    <%= @billing_event.event_object.dig("calculated_statement_descriptor") %> <%= @billing_event.event_object.dig("description") %>
+                    <%= @billing_event.event_object.safe_dig("calculated_statement_descriptor") %> <%= @billing_event.event_object.safe_dig("description") %>
                 </td>
-                <td align="right"><%= @billing_event.event_object.dig("currency").upcase %> <%= number_to_currency(@billing_event.event_object.dig("amount").to_f / 100) %></td>
+                <td align="right"><%= @billing_event.event_object.safe_dig("currency").upcase %> <%= number_to_currency(@billing_event.event_object.safe_dig("amount").to_f / 100) %></td>
             </tr>
             <% end %>
         </table>

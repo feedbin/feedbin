@@ -7,7 +7,7 @@ class Embed < ApplicationRecord
   end
 
   def duration_in_seconds
-    return unless duration = data.dig("contentDetails", "duration")
+    return unless duration = data.safe_dig("contentDetails", "duration")
 
     parts = duration.match(/^
       (?<sign>\+|-)?

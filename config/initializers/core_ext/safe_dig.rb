@@ -16,3 +16,9 @@ class Array
     nil
   end
 end
+
+class NilClass
+  def safe_dig(*args)
+    nil
+  end
+end

@@ -3,7 +3,7 @@ class Threader
     @entry_hash = ActiveSupport::HashWithIndifferentAccess.new(entry_hash)
     @feed = feed
     @thread_id = @entry_hash["thread_id"]
-    @reply_to = @entry_hash.dig("data", "tweet", "in_reply_to_status_id")
+    @reply_to = @entry_hash.safe_dig("data", "tweet", "in_reply_to_status_id")
   end
 
   def thread
@@ -49,6 +49,6 @@ class Threader
 
   def same_user?(parents)
     parent = parents.first
-    parent.data.dig("tweet", "user", "screen_name") == @entry_hash.dig("data", "tweet", "user", "screen_name")
+    parent.data.safe_dig("tweet", "user", "screen_name") == @entry_hash.safe_dig("data", "tweet", "user", "screen_name")
   end
 end

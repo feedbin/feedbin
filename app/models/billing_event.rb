@@ -12,7 +12,7 @@ class BillingEvent < ApplicationRecord
     self.event_type = info["type"]
     self.event_id = info["id"]
 
-    customer = event_object.dig("customer")
+    customer = event_object.safe_dig("customer")
     if event_object["object"] == "customer"
       customer = event_object["id"]
     end
@@ -56,7 +56,7 @@ class BillingEvent < ApplicationRecord
   def subscription_reactivated?
     event_type == "customer.subscription.updated" &&
       event_object["status"] == "active" &&
-      info.dig("data", "previous_attributes", "status") == "unpaid"
+      info.safe_dig("data", "previous_attributes", "status") == "unpaid"
   end
 
   def invoice

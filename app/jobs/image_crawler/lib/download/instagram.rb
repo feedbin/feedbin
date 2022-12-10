@@ -13,7 +13,7 @@ module ImageCrawler
     end
 
     def image_url
-      data.dig("thumbnail_url")
+      data.safe_dig("thumbnail_url")
     end
 
     private

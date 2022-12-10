@@ -10,7 +10,7 @@ class AppStoreNotification < ApplicationRecord
   end
 
   def receipt_date
-    ms_to_date(data.dig("data", "signedTransactionInfo", "purchaseDate")).to_formatted_s(:date)
+    ms_to_date(data.safe_dig("data", "signedTransactionInfo", "purchaseDate")).to_formatted_s(:date)
   end
 
   def receipt_description
@@ -26,7 +26,7 @@ class AppStoreNotification < ApplicationRecord
   end
 
   def purchase_date
-    ms_to_date data.dig("data", "signedTransactionInfo", "purchaseDate")
+    ms_to_date data.safe_dig("data", "signedTransactionInfo", "purchaseDate")
   end
 
   def ms_to_date(ms)
@@ -34,6 +34,6 @@ class AppStoreNotification < ApplicationRecord
   end
 
   def plan
-    data.dig("data", "signedTransactionInfo", "productId")
+    data.safe_dig("data", "signedTransactionInfo", "productId")
   end
 end

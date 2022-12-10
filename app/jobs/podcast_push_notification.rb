@@ -33,7 +33,7 @@ class PodcastPushNotification
   end
 
   def find_summary(entry)
-    options = [entry.data.dig("itunes_subtitle"), entry.data.dig("itunes_summary")]
+    options = [entry.data.safe_dig("itunes_subtitle"), entry.data.safe_dig("itunes_summary")]
     options = options.compact
     return options.first if options.count == 1
     options.min_by(&:length)

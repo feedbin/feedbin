@@ -71,9 +71,9 @@ class Feed < ApplicationRecord
   def icons
     {
       custom_icon                                  => "round",
-      options.dig("image", "url")                  => "square",
-      options.dig("json_feed", "icon")             => "square",
-      options.dig("json_feed", "author", "avatar") => "round",
+      options.safe_dig("image", "url")                  => "square",
+      options.safe_dig("json_feed", "icon")             => "square",
+      options.safe_dig("json_feed", "author", "avatar") => "round",
     }
   end
 
@@ -152,7 +152,7 @@ class Feed < ApplicationRecord
   end
 
   def list_unsubscribe
-    options.dig("email_headers", "List-Unsubscribe")
+    options.safe_dig("email_headers", "List-Unsubscribe")
   end
 
   def self.search(url)
@@ -160,7 +160,7 @@ class Feed < ApplicationRecord
   end
 
   def json_feed
-    options&.respond_to?(:dig) && options&.dig("json_feed")
+    options&.respond_to?(:dig) && options&.safe_dig("json_feed")
   end
 
   def has_subscribers?

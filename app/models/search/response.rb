@@ -7,11 +7,11 @@ module Search
     end
 
     def total
-      @data.dig("hits", "total", "value") || 0
+      @data.safe_dig("hits", "total", "value") || 0
     end
 
     def ids
-      @data.dig("hits", "hits")&.map {|hit| hit["_id"].to_i } || []
+      @data.safe_dig("hits", "hits")&.map {|hit| hit["_id"].to_i } || []
     end
 
     def records(klass)

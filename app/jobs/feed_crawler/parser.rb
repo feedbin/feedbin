@@ -31,7 +31,7 @@ module FeedCrawler
 
       filter    = EntryFilter.new(parsed.entries, check_for_changes: check_for_changes?, always_check_recent: true)
       entries   = filter.filter
-      video_ids = entries.filter_map { _1.dig(:data, :youtube_video_id) }
+      video_ids = entries.filter_map { _1.safe_dig(:data, :youtube_video_id) }
 
       parsed_feed = parsed.to_feed
       parsed_feed.delete(:title) if video_ids.present? && web_sub

@@ -26,9 +26,9 @@ module AccountMigrator
         AccountMigrator::Setup.new.perform(@migration.id)
       end
 
-      assert_equal("Daring Fireball", @migration.account_migration_items.first.fw_feed.dig("title"))
-      assert_equal(290, @migration.account_migration_items.first.fw_feed.dig("feed_id"))
-      assert_equal("http://daringfireball.net/index.xml", @migration.account_migration_items.first.fw_feed.dig("feed_url"))
+      assert_equal("Daring Fireball", @migration.account_migration_items.first.fw_feed.safe_dig("title"))
+      assert_equal(290, @migration.account_migration_items.first.fw_feed.safe_dig("feed_id"))
+      assert_equal("http://daringfireball.net/index.xml", @migration.account_migration_items.first.fw_feed.safe_dig("feed_url"))
       assert_equal({290=>["Videos", "Favorites"]}, @migration.reload.streams)
     end
 

@@ -16,12 +16,12 @@ class AppStoreNotificationProcessor
     @token = token
     @user = User.find_by_id(user_id)
     notification = user.app_store_notifications.create_with(
-      notification_type: data.dig("notificationType"),
-      subtype: data.dig("subtype"),
+      notification_type: data.safe_dig("notificationType"),
+      subtype: data.safe_dig("subtype"),
       original_transaction_id: original_transaction_id,
-      version: data.dig("version"),
+      version: data.safe_dig("version"),
       data: data
-    ).find_or_create_by!(notification_id: data.dig("notificationUUID"))
+    ).find_or_create_by!(notification_id: data.safe_dig("notificationUUID"))
 
     return unless notification.processed_at.nil?
 
@@ -68,15 +68,15 @@ class AppStoreNotificationProcessor
   end
 
   def original_transaction_id
-    data.dig("data", "signedTransactionInfo", "originalTransactionId")
+    data.safe_dig("data", "signedTransactionInfo", "originalTransactionId")
   end
 
   def app_account_token
-    data.dig("data", "signedTransactionInfo", "appAccountToken")
+    data.safe_dig("data", "signedTransactionInfo", "appAccountToken")
   end
 
   def product_id
-    data.dig("data", "signedTransactionInfo", "productId")
+    data.safe_dig("data", "signedTransactionInfo", "productId")
   end
 
   def decode(data)

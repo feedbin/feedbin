@@ -45,7 +45,7 @@ class IframeEmbed::Youtube < IframeEmbed
   end
 
   def channel_name
-    channel && channel.data.dig("snippet", "title")
+    channel && channel.data.safe_dig("snippet", "title")
   end
 
   def duration
@@ -61,7 +61,7 @@ class IframeEmbed::Youtube < IframeEmbed
   end
 
   def profile_image
-    channel && channel.data.dig("snippet", "thumbnails", "medium", "url")
+    channel && channel.data.safe_dig("snippet", "thumbnails", "medium", "url")
   end
 
   def cache_key

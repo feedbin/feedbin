@@ -17,12 +17,12 @@ class AccountMigration < ApplicationRecord
   end
 
   def streams
-    fw_streams.dig("streams").filter do |stream|
-      stream.dig("search_term").nil? && stream.dig("feeds").count > 0
+    fw_streams.safe_dig("streams").filter do |stream|
+      stream.safe_dig("search_term").nil? && stream.safe_dig("feeds").count > 0
     end.each_with_object({}) do |stream, streams|
-      stream.dig("feeds").each do |feed|
+      stream.safe_dig("feeds").each do |feed|
         streams[feed["feed_id"]] ||= []
-        streams[feed["feed_id"]].push(stream.dig("title"))
+        streams[feed["feed_id"]].push(stream.safe_dig("title"))
       end
     end
   rescue

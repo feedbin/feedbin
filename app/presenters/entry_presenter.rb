@@ -142,7 +142,7 @@ class EntryPresenter < BasePresenter
   end
 
   def newsletter_from
-    from = entry.newsletter_from || entry.data && entry.data.dig("newsletter", "data", "from")
+    from = entry.newsletter_from || entry.data && entry.data.safe_dig("newsletter", "data", "from")
     name, address = from.split(/[<>]/).map(&:strip)
     OpenStruct.new(name: name.delete('"'), address: address)
   rescue
@@ -215,8 +215,8 @@ class EntryPresenter < BasePresenter
   def author
     if entry.author
       clean_author = @template.strip_tags(entry.author)
-    elsif entry.data&.dig("json_feed", "authors").respond_to?(:map)
-      authors = entry.data.dig("json_feed", "authors").map {|a| @template.strip_tags(a["name"]) }
+    elsif entry.data&.safe_dig("json_feed", "authors").respond_to?(:map)
+      authors = entry.data.safe_dig("json_feed", "authors").map {|a| @template.strip_tags(a["name"]) }
       if authors.length > 1
         authors[-1] = "and #{authors[-1]}"
       end
@@ -570,15 +570,15 @@ class EntryPresenter < BasePresenter
   end
 
   def embedded_image
-    return unless data&.dig("media_type") =~ /^image/i
-    return unless data&.dig("media_url") =~ /^http/i
-    @template.camo_link(data&.dig("media_url"))
+    return unless data&.safe_dig("media_type") =~ /^image/i
+    return unless data&.safe_dig("media_url") =~ /^http/i
+    @template.camo_link(data&.safe_dig("media_url"))
   end
 
   def embedded_video
-    return unless data&.dig("media_type") =~ /^video/i
-    return unless data&.dig("media_url") =~ /^http/i
-    @template.camo_link(data&.dig("media_url"))
+    return unless data&.safe_dig("media_type") =~ /^video/i
+    return unless data&.safe_dig("media_url") =~ /^http/i
+    @template.camo_link(data&.safe_dig("media_url"))
   end
 
   def title?
@@ -781,7 +781,7 @@ class EntryPresenter < BasePresenter
   end
 
   def tweet_author_description(tweet)
-    entities = tweet.to_h.dig(:user, :entities, :description)
+    entities = tweet.to_h.safe_dig(:user, :entities, :description)
     @template.content_tag(:p, class: "tweet-text") do
       if entities
         Twitter::TwitterText::Autolink.auto_link_usernames_or_lists(Twitter::TwitterText::Autolink.auto_link_with_json(tweet.user.description, entities)).html_safe

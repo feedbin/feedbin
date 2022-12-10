@@ -17,7 +17,7 @@ module ImageCrawler
         UploadImage.new.perform(public_id, "primary", path, url, url, placeholder_color)
       end
 
-      saved_public_id, options = EntryImage.jobs.last.dig("args")
+      saved_public_id, options = EntryImage.jobs.last.safe_dig("args")
 
       download_cache = DownloadCache.new(url, public_id: public_id, preset_name: "primary")
       assert_equal(url, download_cache.image_url)

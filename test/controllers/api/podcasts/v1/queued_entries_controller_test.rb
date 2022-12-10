@@ -12,13 +12,13 @@ class Api::Podcasts::V1::QueuedEntriesControllerTest < ApiControllerTestCase
     get :index, format: :json
     assert_response :success
     data = parse_json
-    assert_equal(@entry.id, data.first.dig("entry_id"))
-    assert_equal(@entry.feed.id, data.first.dig("feed_id"))
-    assert_not_nil data.first.dig("id")
-    assert_not_nil data.first.dig("order")
-    assert_not_nil data.first.dig("progress")
-    assert_not_nil data.first.dig("created_at")
-    assert_not_nil data.first.dig("updated_at")
+    assert_equal(@entry.id, data.first.safe_dig("entry_id"))
+    assert_equal(@entry.feed.id, data.first.safe_dig("feed_id"))
+    assert_not_nil data.first.safe_dig("id")
+    assert_not_nil data.first.safe_dig("order")
+    assert_not_nil data.first.safe_dig("progress")
+    assert_not_nil data.first.safe_dig("created_at")
+    assert_not_nil data.first.safe_dig("updated_at")
   end
 
   test "should create" do

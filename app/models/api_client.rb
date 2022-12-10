@@ -29,7 +29,7 @@ class ApiClient
     all = []
     loop do
       response = request(path: path, params: params)
-      result = response.dig("feed_items")
+      result = response.safe_dig("feed_items")
       break if result.count == 0
       all += result
       params[:offset] += 100
@@ -49,8 +49,8 @@ class ApiClient
     raise ApiClient::Error.new(response.status.reason) unless response.status.success?
 
     result = response.parse
-    error_message = result.dig("error")
-    status = result.dig("result")
+    error_message = result.safe_dig("error")
+    status = result.safe_dig("result")
 
     if !error_message.nil? || status == "error"
       raise ApiClient::Error.new(error_message || "Unknown API error.")

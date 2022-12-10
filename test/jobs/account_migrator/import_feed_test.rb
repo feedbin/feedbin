@@ -14,7 +14,7 @@ module AccountMigrator
     end
 
     test "should import feed" do
-      stub_request_file("atom.xml", @item.fw_feed&.dig("feed_url"))
+      stub_request_file("atom.xml", @item.fw_feed&.safe_dig("feed_url"))
       stub_request_file("migration_ids_response.json", /#{ENV['ACCOUNT_HOST']}\/api\/v2\/feed_items\/list.*?offset=0.*?read=false/,
         headers: {
           "Content-Type" => "application/json; charset=utf-8"
@@ -45,7 +45,7 @@ module AccountMigrator
     end
 
     test "API error should mark as failed" do
-      stub_request_file("atom.xml", @item.fw_feed&.dig("feed_url"))
+      stub_request_file("atom.xml", @item.fw_feed&.safe_dig("feed_url"))
       stub_request_file("migration_error_response.json", /#{ENV['ACCOUNT_HOST']}\/api\/v2\/feed_items\/list/,
         headers: {
           "Content-Type" => "application/json; charset=utf-8"

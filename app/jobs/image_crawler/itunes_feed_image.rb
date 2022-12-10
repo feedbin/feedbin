@@ -17,7 +17,7 @@ module ImageCrawler
     end
 
     def schedule
-      if url = @feed.options&.dig("itunes_image")
+      if url = @feed.options&.safe_dig("itunes_image")
         name = Digest::SHA1.hexdigest(url)
         url = @feed.site_relative_url(url)
         FindImage.perform_async("#{@feed.id}-#{name}-itunes", "podcast_feed", [url])

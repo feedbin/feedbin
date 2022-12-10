@@ -74,9 +74,9 @@ class Entry < ApplicationRecord
     return self[:author] unless self[:author].nil?
     return if json_feed.nil?
 
-    authors = json_feed.dig("authors")
+    authors = json_feed.safe_dig("authors")
     return authors unless authors.respond_to?(:filter_map)
-    authors = authors.filter_map { _1&.dig("name") }
+    authors = authors.filter_map { _1&.safe_dig("name") }
     if authors.length > 1
       authors[-1] = "and #{authors[-1]}"
     end
@@ -172,11 +172,11 @@ class Entry < ApplicationRecord
   end
 
   def media
-    items = data&.dig("media").respond_to?(:each) && data&.dig("media") || []
+    items = data&.safe_dig("media").respond_to?(:each) && data&.safe_dig("media") || []
     items.filter_map do |item|
       next unless item.respond_to?(:dig)
-      url = item.dig("url")
-      type = item.dig("type")
+      url = item.safe_dig("url")
+      type = item.safe_dig("type")
       next unless url.present? && type.present?
       next unless url.start_with?("http")
       OpenStruct.new(url: url, type: type)
@@ -230,12 +230,12 @@ class Entry < ApplicationRecord
   end
 
   def thread
-    data&.dig("thread") || []
+    data&.safe_dig("thread") || []
   end
 
   def twitter_thread_ids
     thread.map do |t|
-      t.dig("id")
+      t.safe_dig("id")
     end
   end
 
@@ -248,7 +248,7 @@ class Entry < ApplicationRecord
   end
 
   def twitter_id
-    data&.dig("tweet", "id")
+    data&.safe_dig("tweet", "id")
   end
 
   def tweet
@@ -256,7 +256,7 @@ class Entry < ApplicationRecord
   end
 
   def json_feed
-    data&.respond_to?(:dig) && data&.dig("json_feed")
+    data&.respond_to?(:dig) && data&.safe_dig("json_feed")
   end
 
   private

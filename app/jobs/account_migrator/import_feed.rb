@@ -9,10 +9,10 @@ module AccountMigrator
       @user = @migration.user
       @client = ApiClient.new(@migration.api_token)
 
-      starred_items = @client.feed_items_list(params: {feed_id: @item.fw_feed&.dig("feed_id"), starred: true})
+      starred_items = @client.feed_items_list(params: {feed_id: @item.fw_feed&.safe_dig("feed_id"), starred: true})
 
       feeds = begin
-        FeedFinder.feeds(@item.fw_feed&.dig("feed_url"), import_mode: true)
+        FeedFinder.feeds(@item.fw_feed&.safe_dig("feed_url"), import_mode: true)
       rescue Feedkit::Error => exception
         @item.message = "No feed found: #{exception.message}"
         []
@@ -22,15 +22,15 @@ module AccountMigrator
 
       if @feed.blank? && starred_items.present?
         @feed = Feed.create(
-          title: @item.fw_feed&.dig("title")&.strip,
-          feed_url: @item.fw_feed&.dig("feed_url")&.strip,
-          site_url: @item.fw_feed&.dig("site_url")&.strip,
+          title: @item.fw_feed&.safe_dig("title")&.strip,
+          feed_url: @item.fw_feed&.safe_dig("feed_url")&.strip,
+          site_url: @item.fw_feed&.safe_dig("site_url")&.strip,
         )
         @item.message = nil
       end
 
       if @feed.present?
-        @user.subscriptions.create_with(title: @item.fw_feed&.dig("title")).find_or_create_by(feed: @feed)
+        @user.subscriptions.create_with(title: @item.fw_feed&.safe_dig("title")).find_or_create_by(feed: @feed)
       else
         failed! @item.message || "No feed found."
         return
@@ -41,7 +41,7 @@ module AccountMigrator
       message += import_unreads
 
       if @migration.streams.respond_to?(:[])
-        if names = @migration.streams[@item.fw_feed&.dig("feed_id")]
+        if names = @migration.streams[@item.fw_feed&.safe_dig("feed_id")]
           @feed.tag(names, @user, false)
         end
       end
@@ -91,13 +91,13 @@ module AccountMigrator
 
     def build_entry(feed_item)
       {
-        title:               feed_item.dig("title")&.strip,
-        url:                 feed_item.dig("url")&.strip,
-        author:              feed_item.dig("author")&.strip,
-        content:             feed_item.dig("body")&.strip,
-        published:           Time.at(feed_item.dig("published_at"))&.utc,
-        updated:             Time.at(feed_item.dig("updated_at"))&.utc,
-        entry_id:            generated?(feed_item) ? nil : feed_item.dig("guid"),
+        title:               feed_item.safe_dig("title")&.strip,
+        url:                 feed_item.safe_dig("url")&.strip,
+        author:              feed_item.safe_dig("author")&.strip,
+        content:             feed_item.safe_dig("body")&.strip,
+        published:           Time.at(feed_item.safe_dig("published_at"))&.utc,
+        updated:             Time.at(feed_item.safe_dig("updated_at"))&.utc,
+        entry_id:            generated?(feed_item) ? nil : feed_item.safe_dig("guid"),
         public_id:           public_id(feed_item),
         source:              "import",
         skip_mark_as_unread: true,
@@ -105,7 +105,7 @@ module AccountMigrator
     end
 
     def import_unreads
-      feed_items = @client.feed_items_list(params: {feed_id: @item.fw_feed&.dig("feed_id"), read: false}, limit: 400)
+      feed_items = @client.feed_items_list(params: {feed_id: @item.fw_feed&.safe_dig("feed_id"), read: false}, limit: 400)
 
       @user.unread_entries.where(feed: @feed).delete_all
 

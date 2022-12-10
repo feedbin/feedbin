@@ -92,9 +92,9 @@ class Tweet
   def link_preview?
     return false unless link_tweet?
     return false if @image.present?
-    return false unless data.dig("saved_pages", main_tweet.urls.first.expanded_url.to_s).present?
-    return false if data.dig("saved_pages", main_tweet.urls.first.expanded_url.to_s, "result", "error")
-    data.dig("twitter_link_image_processed").present?
+    return false unless data.safe_dig("saved_pages", main_tweet.urls.first.expanded_url.to_s).present?
+    return false if data.safe_dig("saved_pages", main_tweet.urls.first.expanded_url.to_s, "result", "error")
+    data.safe_dig("twitter_link_image_processed").present?
   end
 
   private

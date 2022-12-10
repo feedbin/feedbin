@@ -34,7 +34,7 @@ class AppStoreNotificationData
     original_transaction_id = JWT
       .decode(response["signedTransactions"].first, nil, false, algorithm: "ES256")
       .first
-      .dig("originalTransactionId")
+      .safe_dig("originalTransactionId")
 
     body = {
       startDate: format_date(most_recent_possible_start),
@@ -62,15 +62,15 @@ class AppStoreNotificationData
   end
 
   def original_transaction_id
-    data.dig("data", "signedTransactionInfo", "originalTransactionId")
+    data.safe_dig("data", "signedTransactionInfo", "originalTransactionId")
   end
 
   def app_account_token
-    data.dig("data", "signedTransactionInfo", "appAccountToken")
+    data.safe_dig("data", "signedTransactionInfo", "appAccountToken")
   end
 
   def product_id
-    data.dig("data", "signedTransactionInfo", "productId")
+    data.safe_dig("data", "signedTransactionInfo", "productId")
   end
 
   private

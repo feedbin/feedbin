@@ -54,7 +54,7 @@ module Search
         body: prepare_bulk_request(records)
       }
       path = PATHS[:msearch] % {index:}
-      request(:post, path, options).dig("responses")&.map do |data|
+      request(:post, path, options).safe_dig("responses")&.map do |data|
         Response.new(data)
       end
     end
@@ -62,13 +62,13 @@ module Search
     def validate(index, query:)
       path = PATHS[:validate] % {index:}
       result = request(:get, path, json: query)
-      result.dig("valid")
+      result.safe_dig("valid")
     end
 
     def count(index)
       path = PATHS[:count] % {index:}
       result = request(:get, path)
-      result.dig("count")
+      result.safe_dig("count")
     end
 
     def refresh

@@ -9,7 +9,7 @@ module AccountMigrator
       streams = client.streams_list
       @migration.update(fw_streams: streams)
       subscriptions = client.subscriptions_list
-      subscriptions.dig("feeds").natural_sort_by {|feed| feed["title"] }.each do |feed|
+      subscriptions.safe_dig("feeds").natural_sort_by {|feed| feed["title"] }.each do |feed|
         @migration.account_migration_items.create!(fw_feed: feed)
       end
       @migration.processing!
