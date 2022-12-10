@@ -35,6 +35,8 @@ class NewslettersController < ApplicationController
       end
     end
     body
+  rescue JSON::GeneratorError
+    body.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: "?")
   end
 
   def authorize

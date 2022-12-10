@@ -4,6 +4,8 @@ class EmbedsController < ApplicationController
     @dom_id = params[:dom_id]
     @media = IframeEmbed::Twitter.new(@url)
     render "embed", locals: {source: "twitter"}, formats: :js
+  rescue JSON::ParserError
+    head :ok
   end
 
   def instagram
@@ -11,6 +13,8 @@ class EmbedsController < ApplicationController
     @dom_id = params[:dom_id]
     @media = IframeEmbed::Instagram.new(@url)
     render "embed", locals: {source: "instagram"}, formats: :js
+  rescue JSON::ParserError
+    head :ok
   end
 
   def iframe
@@ -18,5 +22,7 @@ class EmbedsController < ApplicationController
     @dom_id = params[:dom_id]
     @media = IframeEmbed.fetch(@url)
     render "embed", locals: {source: "iframe"}, formats: :js
+  rescue JSON::ParserError
+    head :ok
   end
 end

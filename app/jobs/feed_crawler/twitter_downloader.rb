@@ -13,8 +13,10 @@ module FeedCrawler
           feed = Feedkit::Tweets.new(recognized_url, key["twitter_access_token"], key["twitter_access_secret"]).feed
         rescue Twitter::Error::TooManyRequests => error
           Sidekiq.logger.info "Twitter::Error::TooManyRequests twitter_url=#{feed_url} key=#{key["twitter_access_token"]} limit=#{error.rate_limit.limit} remaining=#{error.rate_limit.remaining} reset_at=#{error.rate_limit.reset_at} reset_in=#{error.rate_limit.reset_in}"
-        rescue Twitter::Error::Unauthorized
-          Sidekiq.logger.info "Twitter::Error::Unauthorized twitter_url=#{feed_url}"
+        rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden, Twitter::Error::NotFound => error
+          Sidekiq.logger.info "Twitter::Error twitter_url=#{feed_url} exception=#{error.inspect}"
+        rescue HTTP::TimeoutError, HTTP::ConnectionError
+          Sidekiq.logger.info "HTTP Error twitter_url=#{feed_url}"
         end
       end
 

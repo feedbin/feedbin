@@ -15,6 +15,7 @@ class HarvestLinks
     end
     entry.content = ApplicationController.render template: "entries/_tweet_default", formats: :html, locals: {entry: entry}, layout: nil
     entry.save!
+  rescue HTTP::TimeoutError, HTTP::ConnectionError
   end
 
   def find_urls(tweets)

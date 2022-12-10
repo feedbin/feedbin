@@ -11,6 +11,8 @@ module Api
         else
           status_bad_request([{pages: "Missing required key: url"}])
         end
+      rescue HTTP::TimeoutError
+        status_not_found
       end
     end
   end
