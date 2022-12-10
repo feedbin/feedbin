@@ -85,7 +85,7 @@ class Feed < ApplicationRecord
   def feed_image
     url = options.dig("image", "url")
     if url.nil?
-      url = options.dig("json_feed", "author", "avatar")
+      url = options.dig("json_feed", "author", "avatar") rescue nil
     end
     return if url.nil?
     return url if url&.start_with?("http")
