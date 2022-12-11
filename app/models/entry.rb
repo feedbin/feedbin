@@ -97,7 +97,10 @@ class Entry < ApplicationRecord
   end
 
   def rebase_url(original_url)
-    return nil if fully_qualified_url.nil? || original_url.nil?
+    return nil if original_url.nil?
+    return original_url.strip if original_url.strip.downcase.start_with?("http")
+    return nil if fully_qualified_url.nil?
+
     base_url = Addressable::URI.heuristic_parse(fully_qualified_url)
     original_url = Addressable::URI.heuristic_parse(original_url)
     Addressable::URI.join(base_url, original_url)

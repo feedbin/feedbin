@@ -346,8 +346,7 @@ class EntryPresenter < BasePresenter
   end
 
   def enclosure_url
-    base = Addressable::URI.parse(entry.fully_qualified_url)
-    base.join(entry.data["enclosure_url"]).to_s
+    entry.rebase_url(entry.data["enclosure_url"])
   rescue
     nil
   end
