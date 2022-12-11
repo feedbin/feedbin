@@ -66,7 +66,7 @@ class ContentFormatter
 
   ALLOWLIST_DEFAULT = ALLOWLIST_BASE.clone.tap do |hash|
     transformers = Transformers.new
-    hash[:transformers] = [transformers.class_allowlist, transformers.table_elements, transformers.top_level_li, transformers.video]
+    hash[:transformers] = [transformers.class_allowlist, transformers.table_elements, transformers.top_level_li, transformers.video, transformers.links]
   end
 
   ALLOWLIST_NEWSLETTER = ALLOWLIST_BASE.clone.tap do |hash|

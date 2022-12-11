@@ -5,6 +5,7 @@ class Transformers
   TABLE = "table".freeze
   TABLE_SECTIONS = Set.new(%w[thead tbody tfoot].freeze)
   VIDEO = "video".freeze
+  ANCHOR = "a".freeze
 
   def class_allowlist
     lambda do |env|
@@ -57,6 +58,17 @@ class Transformers
       name, node = env[:node_name], env[:node]
       if name == VIDEO
         node["preload"] = "none"
+      end
+    end
+  end
+
+  def links
+    lambda do |env|
+      name, node = env[:node_name], env[:node]
+      if name == ANCHOR && node["href"] == node.text
+        if shortened = node["href"].gsub(/https?:\/\//, "").truncate(40, omission: "…") rescue nil
+          node.content = shortened
+        end
       end
     end
   end
