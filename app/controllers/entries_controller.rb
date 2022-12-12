@@ -67,11 +67,15 @@ class EntriesController < ApplicationController
 
   def preload
     @user = current_user
-    ids = params[:ids].split(",").map { |i| i.to_i }
-    ids = @user.can_read_filter(ids)
-    ViewLinkCacheMultiple.perform_async(@user.id, ids)
-    entries = entries_by_id(ids)
-    render json: entries.to_json
+    if params[:ids].respond_to?(:split)
+      ids = params[:ids].split(",").map { |i| i.to_i }
+      ids = @user.can_read_filter(ids)
+      ViewLinkCacheMultiple.perform_async(@user.id, ids)
+      entries = entries_by_id(ids)
+      render json: entries.to_json
+    else
+      head :ok
+    end
   end
 
   def mark_as_read

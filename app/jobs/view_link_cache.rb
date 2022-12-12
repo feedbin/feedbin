@@ -3,8 +3,8 @@ class ViewLinkCache
   sidekiq_options queue: :network_default, retry: false
 
   def perform(url, expires_at = nil)
-    unless Expires.expired?(expires_at)
-      MercuryParser.parse(url).content
-    end
+    MercuryParser.parse(url).content unless Expires.expired?(expires_at)
+  rescue HTTP::TimeoutError, HTTP::ConnectionError
+    true
   end
 end

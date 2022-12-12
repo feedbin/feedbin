@@ -135,7 +135,8 @@ module ImageCrawler
 
       return nil if faces.nil?
 
-      result = faces.flat_map { |face| face.safe_dig("face") }.map do |face|
+      result = faces.filter_map { |face| face.safe_dig("face") }.map do |face|
+        next if face[axis].nil? || face["size"].nil?
         face[axis] + face["size"] / 2
       end
 

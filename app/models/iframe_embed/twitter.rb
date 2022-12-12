@@ -1,6 +1,12 @@
 class IframeEmbed::Twitter
   attr_reader :url
 
+  def self.download(*args)
+    instance = new(*args)
+    instance.name
+    instance
+  end
+
   def initialize(url)
     @url = url
   end

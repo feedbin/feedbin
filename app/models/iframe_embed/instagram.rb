@@ -1,6 +1,12 @@
 class IframeEmbed::Instagram
   attr_reader :url
 
+  def self.download(*args)
+    instance = new(*args)
+    instance.screen_name
+    instance
+  end
+
   def initialize(url)
     @url = url
   end
