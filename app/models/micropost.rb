@@ -58,6 +58,12 @@ class Micropost
     source == :instagram
   end
 
+  def link_preview?
+    return false unless data.safe_dig("saved_pages", data.safe_dig("urls")&.first).present?
+    return false if data.safe_dig("saved_pages", data.safe_dig("urls")&.first, "result", "error")
+    data.safe_dig("twitter_link_image_processed").present?
+  end
+
   private
 
   def feed_username

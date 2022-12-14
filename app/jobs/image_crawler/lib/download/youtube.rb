@@ -11,7 +11,7 @@ module ImageCrawler
         %r{.*?//www\.youtube\.com/watch\?v=(.*?)(&|#|$)},
         %r{.*?//youtube-nocookie\.com/embed/(.*?)(\?|$)},
         %r{.*?//youtube\.com/embed/(.*?)(\?|$)},
-        %r{.*?//youtu\.be/(.+)}
+        %r{.*?//youtu\.be/(.*?)(\?|$)}
       ]
     end
 

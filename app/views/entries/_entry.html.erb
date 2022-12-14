@@ -15,17 +15,19 @@
                     <%= entry_presenter.summary %>
                     <%= entry_presenter.quoted_tweet %>
 
-                    <% if entry.tweet? && entry.tweet.link_preview? %>
+                    <% if entry.processed_image? %>
+                        <%= entry_presenter.attached_image %>
+                    <% elsif (entry.tweet? && entry.tweet.link_preview?) || (entry.micropost? && entry.micropost.link_preview?) %>
                         <div class="link-preview">
-                            <%= entry_presenter.image entry.tweet.tweet_link_image, entry.tweet.tweet_link_image_placeholder_color %>
+                            <%= entry_presenter.image entry.link_image, entry.link_image_placeholder_color %>
                             <div class="link-preview-content">
-                                <div class="light"><%= entry_presenter.tweet_link_title %></div>
-                                <div class="link-host extra-light"><%= entry_presenter.tweet_link_host %></div>
+                                <div class="light"><%= entry_presenter.saved_page_title(entry.link_preview_url) %></div>
+                                <div class="link-host extra-light"><%= entry_presenter.saved_page_host(entry.link_preview_url) %></div>
                             </div>
                         </div>
                     <% end %>
 
-                    <%= entry_presenter.attached_image %>
+
 
                     <div class="summary-status light">
                         <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: "time timeago") %>
