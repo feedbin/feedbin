@@ -70,7 +70,7 @@ class Feed < ApplicationRecord
 
   def icons
     {
-      custom_icon                                  => "round",
+      custom_icon                                       => "round",
       options.safe_dig("image", "url")                  => "square",
       options.safe_dig("json_feed", "icon")             => "square",
       options.safe_dig("json_feed", "author", "avatar") => "round",
