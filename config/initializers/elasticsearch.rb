@@ -165,8 +165,14 @@ Rails.application.reloader.to_prepare do
   end
 
   unless Rails.env.production?
-    Search.client(mirror: true) { _1.request(:put, Entry.table_name, json: entries_mapping) }
-    Search.client(mirror: true) { _1.request(:put, Action.table_name, json: actions_mapping) }
+    begin
+      Search.client(mirror: true) { _1.request(:put, Entry.table_name, json: entries_mapping) }
+      Search.client(mirror: true) { _1.request(:put, Action.table_name, json: actions_mapping) }
+    rescue => exception
+      Rails.logger.error("---------------------------")
+      Rails.logger.error("Error initializing search: #{exception.inspect}")
+      Rails.logger.error("---------------------------")
+    end
   end
 
 end

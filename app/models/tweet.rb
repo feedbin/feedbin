@@ -70,25 +70,6 @@ class Tweet
     hash[:full_text]
   end
 
-  def tweet_link_image
-    if data && data["twitter_link_image_processed"]
-      image_url = data["twitter_link_image_processed"]
-
-      host = ENV["ENTRY_IMAGE_HOST"]
-
-      url = URI(image_url)
-      url.host = host if host
-      url.scheme = "https"
-      url.to_s
-    end
-  end
-
-  def tweet_link_image_placeholder_color
-    if data && data["twitter_link_image_placeholder_color"].respond_to?(:length) && data["twitter_link_image_placeholder_color"].length == 6
-      data["twitter_link_image_placeholder_color"]
-    end
-  end
-
   def link_preview?
     return false unless link_tweet?
     return false if @image.present?

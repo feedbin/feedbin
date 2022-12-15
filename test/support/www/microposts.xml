@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:webfeeds="http://webfeeds.org/rss/1.0" xmlns:media="http://search.yahoo.com/mrss/" version="2.0">
+  <channel>
+    <title>Chris Coyier</title>
+    <description>Public posts from @chriscoyier@front-end.social</description>
+    <link>https://front-end.social/@chriscoyier</link>
+    <image>
+      <url>https://cdn.masto.host/frontendsocial/accounts/avatars/109/304/655/908/819/292/original/014aaccec467a555.jpg</url>
+      <title>Chris Coyier</title>
+      <link>https://front-end.social/@chriscoyier</link>
+    </image>
+    <lastBuildDate>Wed, 14 Dec 2022 21:28:41 +0000</lastBuildDate>
+    <webfeeds:icon>https://cdn.masto.host/frontendsocial/accounts/avatars/109/304/655/908/819/292/original/014aaccec467a555.jpg</webfeeds:icon>
+    <generator>Mastodon v4.0.2</generator>
+    <item>
+      <guid isPermaLink="true">https://front-end.social/@chriscoyier/109514150488399327</guid>
+      <link>https://front-end.social/@chriscoyier/109514150488399327</link>
+      <pubDate>Wed, 14 Dec 2022 21:28:41 +0000</pubDate>
+      <description>&lt;p&gt;Behooves &lt;a href="https://chriscoyier.net/2022/12/14/behooves/" target="_blank" rel="nofollow noopener noreferrer"&gt;&lt;span class="invisible"&gt;https://&lt;/span&gt;&lt;span class="ellipsis"&gt;chriscoyier.net/2022/12/14/beh&lt;/span&gt;&lt;span class="invisible"&gt;ooves/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <guid isPermaLink="true">https://front-end.social/@chriscoyier/109480363768443971</guid>
+      <link>https://front-end.social/@chriscoyier/109480363768443971</link>
+      <pubDate>Thu, 08 Dec 2022 22:16:17 +0000</pubDate>
+      <description>&lt;p&gt;What’s Good About the Arc Browser &lt;a href="https://chriscoyier.net/2022/12/08/whats-good-about-the-arc-browser/" target="_blank" rel="nofollow noopener noreferrer"&gt;&lt;span class="invisible"&gt;https://&lt;/span&gt;&lt;span class="ellipsis"&gt;chriscoyier.net/2022/12/08/wha&lt;/span&gt;&lt;span class="invisible"&gt;ts-good-about-the-arc-browser/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;</description>
+      <media:content url="https://cdn.masto.host/frontendsocial/media_attachments/files/109/480/363/100/027/057/original/94aa051201c933c6.png" type="image/png" fileSize="411674" medium="image">
+        <media:rating scheme="urn:simple">nonadult</media:rating>
+      </media:content>
+      <media:content url="https://cdn.masto.host/frontendsocial/media_attachments/files/109/480/363/321/232/707/original/fd91baf5af1de4eb.png" type="image/png" fileSize="442455" medium="image">
+        <media:rating scheme="urn:simple">nonadult</media:rating>
+      </media:content>
+      <media:content url="https://cdn.masto.host/frontendsocial/media_attachments/files/109/480/363/513/928/252/original/005201b20fde9798.png" type="image/png" fileSize="347537" medium="image">
+        <media:rating scheme="urn:simple">nonadult</media:rating>
+      </media:content>
+      <media:content url="https://cdn.masto.host/frontendsocial/media_attachments/files/109/480/363/695/960/503/original/497e8246c3f92664.mp4" type="video/mp4" fileSize="508908" medium="image">
+        <media:rating scheme="urn:simple">nonadult</media:rating>
+      </media:content>
+    </item>
+</rss>

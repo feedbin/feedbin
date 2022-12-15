@@ -484,7 +484,11 @@ class EntryPresenter < BasePresenter
         @template.content_tag(:span, summary)
       end
     elsif entry.micropost?
-      summary = entry.summary.truncate(250, separator: " ", omission: "…")
+      summary = entry.summary
+      if entry.micropost.link_preview?
+        summary = summary.sub(entry.urls.first.to_s, "")
+      end
+      summary = summary.truncate(250, separator: " ", omission: "…")
       @template.content_tag(:div, class: "summary light") do
         @template.content_tag(:span, summary)
       end
@@ -682,8 +686,8 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def tweet_youtube_embed(url, tag = :iframe)
-    url = url.expanded_url.to_s
+  def youtube_embed(url, tag = :iframe)
+    url = url.to_s
     if YOUTUBE_URLS.find { |format| url =~ format } && $1
       youtube_id = $1
       iframe_embed("https://www.youtube.com/embed/#{youtube_id}", tag)
@@ -692,14 +696,39 @@ class EntryPresenter < BasePresenter
     end
   end
 
-  def tweet_vimeo_embed(url, tag = :iframe)
-    url = url.expanded_url.to_s
+  def vimeo_embed(url, tag = :iframe)
+    url = url.to_s
     if VIMEO_URLS.find { |format| url =~ format } && $1
       vimeo_id = $1
       iframe_embed("https://player.vimeo.com/video/#{vimeo_id}", tag)
     else
       false
     end
+  end
+
+  def instagram_embed(url)
+    url = url.to_s
+    if INSTAGRAM_URLS.find { |format| url =~ format } && $1
+      instagram_id = $1
+      @template.content_tag :div, data: {behavior: "entry_content_wrap"} do
+        @template.content_tag :blockquote, class: "instagram-media", data: {instgrm_permalink: "https://instagram.com/p/#{instagram_id}/"} do
+          @template.link_to url, target: "_blank" do
+            @template.image_tag(@template.camo_link("https://instagram.com/p/#{instagram_id}/media/?size=l"), class: "responsive")
+          end
+        end
+      end
+    else
+      false
+    end
+  end
+
+  def page_content(page)
+    content = begin
+      ContentFormatter.format!(page.content, nil, true, page.url)
+    rescue
+      nil
+    end
+    (content && content.length > 400) ? content : nil
   end
 
   def iframe_embed(url, tag)
@@ -713,22 +742,6 @@ class EntryPresenter < BasePresenter
       filter = HTML::Pipeline::IframeFilter.new("", context)
       attributes = filter.iframe_attributes(url, 16, 9)
       @template.content_tag(:div, "", attributes).html_safe
-    end
-  end
-
-  def tweet_instagram_embed(url)
-    url = url.expanded_url.to_s
-    if INSTAGRAM_URLS.find { |format| url =~ format } && $1
-      instagram_id = $1
-      @template.content_tag :div, data: {behavior: "entry_content_wrap"} do
-        @template.content_tag :blockquote, class: "instagram-media", data: {instgrm_permalink: "https://instagram.com/p/#{instagram_id}/"} do
-          @template.link_to url, target: "_blank" do
-            @template.image_tag(@template.camo_link("https://instagram.com/p/#{instagram_id}/media/?size=l"), class: "responsive")
-          end
-        end
-      end
-    else
-      false
     end
   end
 
@@ -820,12 +833,12 @@ class EntryPresenter < BasePresenter
     entry.tweet.main_tweet.quoted_status
   end
 
-  def tweet_link_title
-    saved_page(entry.tweet.main_tweet.urls.first.expanded_url.to_s)&.title
+  def saved_page_title(url)
+    saved_page(url)&.title
   end
 
-  def tweet_link_host
-    saved_page(entry.tweet.main_tweet.urls.first.expanded_url.to_s)&.domain
+  def saved_page_host(url)
+    saved_page(url)&.domain
   end
 
   def quoted_tweet

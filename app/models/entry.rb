@@ -266,6 +266,40 @@ class Entry < ApplicationRecord
     data&.respond_to?(:dig) && data&.safe_dig("json_feed")
   end
 
+  def urls
+    array = data&.safe_dig("urls")&.map do |url|
+      Addressable::URI.heuristic_parse(url)
+    end
+    array || []
+  end
+
+  def link_image
+    if data && data["twitter_link_image_processed"]
+      image_url = data["twitter_link_image_processed"]
+
+      host = ENV["ENTRY_IMAGE_HOST"]
+
+      url = URI(image_url)
+      url.host = host if host
+      url.scheme = "https"
+      url.to_s
+    end
+  end
+
+  def link_image_placeholder_color
+    if data && data["twitter_link_image_placeholder_color"].respond_to?(:length) && data["twitter_link_image_placeholder_color"].length == 6
+      data["twitter_link_image_placeholder_color"]
+    end
+  end
+
+  def link_preview_url
+    if tweet?
+      tweet.main_tweet.urls.first.expanded_url.to_s
+    elsif micropost?
+      urls.first.to_s
+    end
+  end
+
   private
 
   def tweet_metadata
@@ -384,6 +418,7 @@ class Entry < ApplicationRecord
 
   def has_embeds?
     return true if youtube?
+    return true if micropost?
     return true if content.respond_to?(:include?) && content.include?("iframe")
     return false
   end
@@ -393,7 +428,7 @@ class Entry < ApplicationRecord
   end
 
   def harvest_links
-    HarvestLinks.perform_async(id) if tweet?
+    HarvestLinks.perform_async(id) if tweet? || micropost?
   end
 
   def cache_views

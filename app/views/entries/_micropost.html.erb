@@ -60,3 +60,11 @@
         </div>
     </div>
 </div>
+
+<% if micropost.respond_to?(:urls) %>
+  <div class="tweet-wrap">
+    <% micropost.urls.each do |url| %>
+      <%= render partial: "shared/link_embed", locals: {url: url, entry: micropost} %>
+    <% end %>
+  </div>
+<% end %>

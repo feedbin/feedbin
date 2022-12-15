@@ -15,8 +15,9 @@ class HarvestEmbeds
   def find_embeds(entry_id)
     entry = Entry.find(entry_id)
 
-    want = Nokogiri::HTML5(entry.content).css("iframe").each_with_object([]) do |iframe, array|
-      if match = IframeEmbed::Youtube.recognize_url?(iframe["src"])
+    want = Nokogiri::HTML5(entry.content).css("iframe, a").each_with_object([]) do |element, array|
+      url = element["src"] || element["href"]
+      if match = IframeEmbed::Youtube.recognize_url?(url)
         array.push(match[1])
       end
     end

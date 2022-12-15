@@ -33,12 +33,12 @@
             </p>
         <% end %>
         <% entry_presenter.tweet_urls.each do |url| %>
-            <% if entry_presenter.tweet_youtube_embed(url) %>
-                <div class="feedbin--embed-wrap"><%= entry_presenter.tweet_youtube_embed(url) %></div>
-            <% elsif entry_presenter.tweet_vimeo_embed(url) %>
-                <div class="feedbin--embed-wrap"><%= entry_presenter.tweet_vimeo_embed(url) %></div>
-            <% elsif entry_presenter.tweet_instagram_embed(url) %>
-                <div class="feedbin--embed-wrap"><%= entry_presenter.tweet_instagram_embed(url) %></div>
+            <% if entry_presenter.youtube_embed(url.expanded_url) %>
+                <div class="feedbin--embed-wrap"><%= entry_presenter.youtube_embed(url.expanded_url) %></div>
+            <% elsif entry_presenter.vimeo_embed(url.expanded_url) %>
+                <div class="feedbin--embed-wrap"><%= entry_presenter.vimeo_embed(url.expanded_url) %></div>
+            <% elsif entry_presenter.instagram_embed(url.expanded_url) %>
+                <div class="feedbin--embed-wrap"><%= entry_presenter.instagram_embed(url.expanded_url) %></div>
             <% elsif page = entry_presenter.saved_page(url.expanded_url.to_s) %>
                 <%
                   begin
