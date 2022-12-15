@@ -15,6 +15,9 @@ module FeedCrawler
     rescue Feedkit::NotFeed => exception
       @feed.crawl_data.download_error(exception)
       Sidekiq.logger.info "Feedkit::NotFeed: feed_id=#{@feed.id} url=#{@feed.feed_url}"
+    rescue => exception
+      Sidekiq.logger.info "Exception: feed_id=#{@feed.id} url=#{@feed.feed_url} exception=#{exception.inspect}"
+      ErrorService.notify(exception)
     ensure
       File.unlink(path) rescue Errno::ENOENT
       @feed.save!
