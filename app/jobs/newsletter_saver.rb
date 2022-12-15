@@ -10,7 +10,13 @@ class NewsletterSaver
       content = "<h1>#{entry.title}</h1>#{content}"
     end
 
-    Fog::Storage.new(STORAGE).put_object(ENV["AWS_S3_BUCKET_NEWSLETTERS"], File.join(entry.public_id[0..2], "#{entry.public_id}.html"), content, s3_options)
+    response = Fog::Storage.new(STORAGE).put_object(ENV["AWS_S3_BUCKET_NEWSLETTERS"], File.join(entry.public_id[0..2], "#{entry.public_id}.html"), content, s3_options)
+    host = ENV["NEWSLETTER_HOST"] || response.data[:host]
+    url = URI::HTTPS.build(
+      host: host,
+      path: response.data[:path]
+    ).to_s
+    entry.update(url: url)
   end
 
   def s3_options
