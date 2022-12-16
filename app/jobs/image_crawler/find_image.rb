@@ -50,7 +50,7 @@ module ImageCrawler
         Sidekiq.logger.info "Download valid: public_id=#{@public_id} image_url=#{download.image_url}"
       else
         download.delete!
-        download_cache.save(storage_url: false, image_url: false)
+        download_cache.save(storage_url: false, image_url: false, placeholder_color: nil)
         Sidekiq.logger.info "Download invalid: public_id=#{@public_id} original_url=#{original_url}"
       end
       found

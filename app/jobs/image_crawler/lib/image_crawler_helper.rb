@@ -55,6 +55,15 @@ module ImageCrawler
         directory: "profile",
         validate: false,
         job_class: TwitterProfileImage
+      },
+      icon: {
+        width: 400,
+        height: 400,
+        minimum_size: nil,
+        crop: :limit_crop,
+        bucket: RemoteFile::BUCKET,
+        validate: false,
+        job_class: CacheRemoteFile
       }
     }
 
@@ -73,11 +82,15 @@ module ImageCrawler
     end
 
     def image_name
-      path = File.join(@public_id[0..6], "#{@public_id}.jpg")
+      path = File.join(@public_id[0..2], "#{@public_id}.jpg")
       if preset.directory
         path = File.join(preset.directory, path)
       end
       path
+    end
+
+    def bucket
+      preset.bucket || IMAGE_STORAGE
     end
 
     def storage_options

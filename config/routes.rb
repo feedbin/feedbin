@@ -115,12 +115,6 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :icons, only: [] do
-    collection do
-      get "profile/:signature/:url", action: :profile
-    end
-  end
-
   resources :users, id: /.*/ do
     member do
       patch :settings_update, controller: :settings
@@ -247,6 +241,12 @@ Rails.application.routes.draw do
     collection do
       get :modal
       get :cache
+    end
+  end
+
+  resources :remote_files, path: :files, only: [] do
+    collection do
+      get "icons/:signature/:url", action: :icon, as: :icon
     end
   end
 
