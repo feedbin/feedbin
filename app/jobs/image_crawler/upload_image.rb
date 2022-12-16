@@ -25,7 +25,9 @@ module ImageCrawler
 
     def upload
       File.open(@image_path) do |file|
-        response = Fog::Storage.new(STORAGE).put_object(bucket, image_name, file, storage_options)
+        options = STORAGE.dup
+        options = options.merge(region: preset.region) unless preset.region.nil?
+        response = Fog::Storage.new(options).put_object(bucket, image_name, file, storage_options)
         URI::HTTPS.build(
           host: response.data[:host],
           path: response.data[:path]

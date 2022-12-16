@@ -1,5 +1,6 @@
 class RemoteFile < ApplicationRecord
   BUCKET = ENV["AWS_S3_BUCKET_ICONS"]
+  REGION = ENV["AWS_S3_BUCKET_ICONS_REGION"]
   HOST = ENV["FILES_HOST"]
 
   def self.fingerprint(data)

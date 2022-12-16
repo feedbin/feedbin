@@ -62,6 +62,7 @@ module ImageCrawler
         minimum_size: nil,
         crop: :limit_crop,
         bucket: RemoteFile::BUCKET,
+        region: RemoteFile::REGION,
         validate: false,
         job_class: CacheRemoteFile
       }
