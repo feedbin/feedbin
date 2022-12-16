@@ -47,6 +47,7 @@ class RemoteFilesControllerTest < ActionController::TestCase
 
     assert_equal "#{ENV["CAMO_HOST"]}/#{signature}/#{encoded_url}", response.header[RemoteFilesController::URL_HEADER]
     assert_equal "400", response.header[RemoteFilesController::SIZE_HEADER]
+    assert_equal "example.com", response.header[RemoteFilesController::HOST_HEADER]
     assert response.header[RemoteFilesController::SENDFILE_HEADER].start_with?(RemoteFilesController::PROXY_PATH)
   end
 
@@ -63,6 +64,7 @@ class RemoteFilesControllerTest < ActionController::TestCase
 
     assert_equal storage_url, response.header[RemoteFilesController::URL_HEADER]
     assert_equal "400", response.header[RemoteFilesController::SIZE_HEADER]
+    assert_equal "aws.amazonaws.com", response.header[RemoteFilesController::HOST_HEADER]
     assert response.header[RemoteFilesController::SENDFILE_HEADER].start_with?(RemoteFilesController::PROXY_PATH)
   end
 

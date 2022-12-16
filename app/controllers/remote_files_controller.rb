@@ -4,6 +4,7 @@ class RemoteFilesController < ApplicationController
   AUTH_KEY        = ENV["FILES_AUTH_KEY"]
   AUTH_HEADER     = "X-Pull".freeze
   URL_HEADER      = "X-File-URL".freeze
+  HOST_HEADER     = "X-File-Host".freeze
   SIZE_HEADER     = "X-Image-Size".freeze
   PROXY_PATH      = "/remote_image".freeze
   SENDFILE_HEADER = Rails.application.config.action_dispatch.x_sendfile_header
@@ -33,12 +34,16 @@ class RemoteFilesController < ApplicationController
     response.headers[SIZE_HEADER] = size
     response.headers[SENDFILE_HEADER] = PROXY_PATH
 
-    if icon = RemoteFile.find_by(fingerprint: RemoteFile.fingerprint(url))
-      response.headers[URL_HEADER] = icon.storage_url
+    proxy_url = if icon = RemoteFile.find_by(fingerprint: RemoteFile.fingerprint(url))
+      icon.storage_url
     else
-      response.headers[URL_HEADER] = camo_url
       ImageCrawler::CacheRemoteFile.schedule(url)
+      camo_url
     end
+    
+    parsed = URI(proxy_url)
+    response.headers[HOST_HEADER] = parsed.host
+    response.headers[URL_HEADER] = proxy_url
 
     http_cache_forever(public: true) do
       head :ok
