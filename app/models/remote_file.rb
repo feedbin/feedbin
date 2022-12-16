@@ -1,6 +1,6 @@
 class RemoteFile < ApplicationRecord
   BUCKET = ENV["AWS_S3_BUCKET_ICONS"]
-  HOST = ENV["ICONS_HOST"]
+  HOST = ENV["FILES_HOST"]
 
   def self.fingerprint(data)
     Digest::MD5.hexdigest(data)

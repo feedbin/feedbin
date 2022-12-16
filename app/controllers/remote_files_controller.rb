@@ -1,10 +1,11 @@
 class RemoteFilesController < ApplicationController
   skip_before_action :authorize
 
-  AUTH_HEADER     = "X-Pull"
+  AUTH_KEY        = ENV["FILES_AUTH_KEY"]
+  AUTH_HEADER     = "X-Pull".freeze
   URL_HEADER      = "X-File-URL".freeze
   SIZE_HEADER     = "X-Image-Size".freeze
-  PROXY_PATH      = "/remote_image"
+  PROXY_PATH      = "/remote_image".freeze
   SENDFILE_HEADER = Rails.application.config.action_dispatch.x_sendfile_header
 
   def icon
@@ -12,7 +13,7 @@ class RemoteFilesController < ApplicationController
     signature = params[:signature]
     url = RemoteFile.decode(params[:url])
 
-    unless ENV["ICON_AUTH_KEY"] == request.headers[AUTH_HEADER]
+    unless AUTH_KEY == request.headers[AUTH_HEADER]
       head :not_found and return
     end
 

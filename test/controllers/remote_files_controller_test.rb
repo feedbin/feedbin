@@ -89,6 +89,6 @@ class RemoteFilesControllerTest < ActionController::TestCase
   private
 
   def authorize
-    @request.headers[RemoteFilesController::AUTH_HEADER] = ENV["ICON_AUTH_KEY"]
+    @request.headers[RemoteFilesController::AUTH_HEADER] = RemoteFilesController::AUTH_KEY
   end
 end
