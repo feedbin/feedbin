@@ -9,7 +9,7 @@
                 <div class="input-group-wrap">
                     <label for="mastodon_status">Status</label>
                     <%= render "shared/input" do %>
-                        <%= text_area_tag :status, "", class: "combined-placeholder", id: "mastodon_status" %>
+                        <%= text_area_tag :status, "", class: "combined-placeholder", id: "mastodon_status", rows: 4 %>
                     <% end %>
                 </div>
                 <div class="input-group-wrap">

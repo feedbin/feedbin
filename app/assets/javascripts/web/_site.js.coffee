@@ -1269,7 +1269,7 @@ $.extend feedbin,
   closeEntryBasement: (timeout = 200) ->
     feedbin.closeEntryBasementTimeount = setTimeout ( ->
       $('.basement-panel').addClass('hide')
-      $('.field-cluster input').blur()
+      $('.field-cluster input, .field-cluster textarea').blur()
       $('.entry-basement').removeClass('open')
     ), timeout
 
@@ -1283,7 +1283,7 @@ $.extend feedbin,
   openEntryBasement: (selectedPanel) ->
     feedbin.openEntryBasementTimeount = setTimeout ( ->
       $('.entry-basement').addClass('foreground')
-      $('.field-cluster input', selectedPanel).first().select()
+      $('.field-cluster input, .field-cluster textarea', selectedPanel).first().select()
     ), 200
 
     clearTimeout(feedbin.closeEntryBasementTimeount)

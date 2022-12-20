@@ -107,7 +107,7 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
     assert_difference -> { OauthServer.count }, +1 do
       post :create, params: {mastodon_url: mastodon_host, supported_sharing_service: {service_id: service_id, operation: "authorize"}}
       assert_response :redirect
-      assert_match %r{^https://example.social/oauth/authorize}, @response.redirect_url
+      assert_match %r{^https://#{mastodon_host}/oauth/authorize}, @response.redirect_url
     end
 
     stub_request(:post, "https://#{mastodon_host}/oauth/token")
@@ -132,13 +132,13 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
       visibility: "public"
     }
 
-    stub_request(:post, "https://example.social/api/v1/statuses").
-      with(
+    stub_request(:post, "https://#{mastodon_host}/api/v1/statuses")
+      .with(
         body: JSON.dump(share_data),
         headers: {
-          'Authorization'=>'Bearer access_token',
-        }).
-        to_return(status: 200, body: "", headers: {})
+          "Authorization" => "Bearer #{access_token}",
+        })
+        .to_return(status: 200)
 
     entry = create_entry(Feed.first)
     share = SupportedSharingService.last
