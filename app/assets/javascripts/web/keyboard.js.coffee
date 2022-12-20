@@ -251,10 +251,8 @@ class feedbin.Keyboard
       event.preventDefault()
 
     # Open original article
-    Mousetrap.bind 'V', (event, combo) =>
-      href = $('#source_link').attr('href')
-      if href
-        feedbin.openLinkInBackground(href)
+    Mousetrap.bind 'shift+v', (event, combo) =>
+      content = $('#source_link')[0].click()
       event.preventDefault()
 
     # Expand tag
