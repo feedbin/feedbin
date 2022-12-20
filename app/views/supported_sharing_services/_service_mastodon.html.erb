@@ -1,0 +1,22 @@
+<% record = (status == :active) ? sharing_service : record %>
+
+<%= render "supported_sharing_services/type_xauth", sharing_service: sharing_service, status: status, record: record do %>
+  <%= form_for(record, html: {autocomplete: "off", novalidate: true}) do |f| %>
+    <%= f.hidden_field :service_id, value: sharing_service.service_id %>
+    <%= f.hidden_field :operation, value: "authorize" %>
+
+    <%= component "form/text_input" do |text| %>
+      <% text.label do %>
+        <label for="mastodon_url">Server URL</label>
+      <% end %>
+      <% text.input do %>
+        <%= url_field_tag(:mastodon_url, record.respond_to?(:mastodon_host) ? record.mastodon_host : "", placeholder: 'For example: mastodon.social', autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, class: "peer", tabindex: "-1") %>
+      <% end %>
+    <% end %>
+
+    <div class="button-wrap">
+      <%= button_tag "Cancel", type: "button", class: "button button-tertiary button-inline", data: {action: "expandable#toggle"}, tabindex: "-1" %>
+      <%= button_tag "Sign In", type: "submit", class: "button button-primary-plain", tabindex: "-1" %>
+    </div>
+  <% end %>
+<% end %>

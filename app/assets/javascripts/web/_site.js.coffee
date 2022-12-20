@@ -564,7 +564,7 @@ $.extend feedbin,
       container.removeClass('fade-out')
     setTimeout callback, 200
 
-  showNotification: (text, error = false) ->
+  showNotification: (text, error = false, url = null) ->
     clearTimeout(feedbin.notificationTimeout)
 
     container = $('[data-behavior~=notification_container]')
@@ -581,7 +581,12 @@ $.extend feedbin,
     container.addClass('visible')
     container.addClass('error') if error
 
-    content.text(text)
+    if url && url != ""
+      link = $('<a>').attr('href', url)
+      link.text(text)
+      content.html(link)
+    else
+      content.text(text)
 
     feedbin.notificationTimeout = setTimeout feedbin.hideNotification, 3000
 
@@ -1223,12 +1228,14 @@ $.extend feedbin,
     title = $('.entry-header h1').first().text()
     $('.share-form .title-placeholder').val(title)
 
-    url = $('.entry-header a').first().attr('href')
+    url = $('#source_link').attr('href')
     $('.share-form .url-placeholder').val(url)
 
     description = feedbin.getSelectedText()
-    url = $('#source_link').attr('href')
     $('.share-form .description-placeholder').val("#{description}")
+
+    parts = _.compact([title, url])
+    $('.share-form .combined-placeholder').val(parts.join(" "))
 
     if description != ""
       $('[data-basement-panel-target="micro_blog_share_panel"] .share-form .description-placeholder').val("#{description} #{url}")

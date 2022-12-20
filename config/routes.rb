@@ -100,6 +100,7 @@ Rails.application.routes.draw do
   resources :supported_sharing_services, only: [:create, :destroy, :update] do
     member do
       get :oauth_response
+      get :oauth2_response
       get :autocomplete
       match "share/:entry_id", to: "supported_sharing_services#share", as: :share, via: [:get, :post]
     end

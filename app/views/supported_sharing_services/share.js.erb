@@ -1,9 +1,7 @@
-<% if @response[:url].present? %>
-    feedbin.showNotification("<%= j @response[:message] %>", true);
-<% elsif @response[:error].present? %>
-    feedbin.showNotification("<%= j @response[:error] %>", true);
+<% if @response[:error].present? %>
+    feedbin.showNotification("<%= j @response[:error] %>", true, "<%= j @response[:url] %>");
 <% elsif @response[:message].present? %>
-    feedbin.showNotification("<%= j @response[:message] %>");
+    feedbin.showNotification("<%= j @response[:message] %>", false, "<%= j @response[:url] %>");
 <% else %>
     <%= @response[:text].html_safe %>
 <% end %>

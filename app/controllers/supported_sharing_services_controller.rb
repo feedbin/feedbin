@@ -60,6 +60,7 @@ class SupportedSharingServicesController < ApplicationController
       if supported_sharing_service.errors.present?
         redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join(". ")
       else
+        supported_sharing_service.ok!
         supported_sharing_service.try(:after_activate)
         redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
       end
@@ -75,6 +76,26 @@ class SupportedSharingServicesController < ApplicationController
     redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
   end
 
+  def oauth2_response
+    @user = current_user
+    service_info = SupportedSharingService.info!(params[:id])
+    klass = service_info[:klass].constantize.new
+    if params[:code]
+      data = klass.request_access(params)
+      supported_sharing_service = @user.supported_sharing_services.where(service_id: params[:id]).first_or_initialize
+      supported_sharing_service.update(data)
+      if supported_sharing_service.errors.present?
+        redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join(". ")
+      else
+        supported_sharing_service.ok!
+        supported_sharing_service.try(:after_activate)
+        redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
+      end
+    else
+      redirect_to sharing_services_url, alert: "Feedbin needs your permission to activate #{service_info[:label]}."
+    end
+  end
+
   private
 
   def supported_sharing_service_params
@@ -87,6 +108,8 @@ class SupportedSharingServicesController < ApplicationController
       oauth_request(service_id)
     elsif service_info[:service_type] == "xauth" || service_info[:service_type] == "pinboard"
       xauth_request(service_id)
+    elsif service_info[:service_type] == "oauth2"
+      oauth2_request(service_id)
     end
   end
 
@@ -103,6 +126,7 @@ class SupportedSharingServicesController < ApplicationController
         if supported_sharing_service.errors.present?
           redirect_to sharing_services_url, alert: supported_sharing_service.errors.full_messages.join(". ")
         else
+          supported_sharing_service.ok!
           redirect_to sharing_services_url, notice: "#{supported_sharing_service.label} has been activated!"
         end
       else
@@ -138,5 +162,25 @@ class SupportedSharingServicesController < ApplicationController
       parameters: {exception: e}
     )
     redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
+  end
+
+
+  def oauth2_request(service_id)
+    service_info = SupportedSharingService.info!(service_id)
+    klass = service_info[:klass].constantize.new
+    redirect_to klass.authorize_redirect(params)
+  rescue Share::Service::AuthError => exception
+    redirect_to sharing_services_url, alert: exception.message
+  rescue => exception
+    ErrorService.notify(
+      error_class: "SupportedSharingServicesController#oauth2_request",
+      error_message: "#{service_info[:label]} failure #{exception.message}",
+      parameters: {exception: exception}
+    )
+    if Rails.env.production?
+      redirect_to sharing_services_url, alert: "Unknown #{service_info[:label]} error."
+    else
+      raise exception
+    end
   end
 end

@@ -11,6 +11,14 @@ class SharingService < ApplicationRecord
     true
   end
 
+  def ok?
+    true
+  end
+
+  def auth_error?
+    false
+  end
+
   def service_id
     "custom"
   end

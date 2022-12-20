@@ -7,7 +7,7 @@
       <% row.title { sharing_service.label } %>
       <% if status == :issue %>
         <% row.description do %>
-          Feedbin can no longer access <%= sharing_service.label %>, <a href="#" data-behavior="toggle_service_options">reactivate</a>?
+          Feedbin can no longer access <%= sharing_service.label %>, <a href="#" data-action="expandable#toggle">reactivate</a>?
         <% end %>
       <% end %>
 
@@ -15,6 +15,7 @@
         <% if status == :active %>
           <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
         <% elsif status == :issue %>
+          <%= svg_tag "icon-error-message", title: "Authentication Error", data: {toggle: "tooltip"} %>
           <%= render partial: "supported_sharing_services/delete_supported_service", locals: {sharing_service: sharing_service} %>
         <% else %>
           <%= button_tag 'Activate', class: 'button button-secondary', data: {action: "expandable#toggle"} %>

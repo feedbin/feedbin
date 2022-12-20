@@ -1,4 +1,7 @@
 class Share::Service
+
+  class AuthError < StandardError; end
+
   def authenticated_share(klass, params)
     response = {}
     entry = Entry.find(params[:entry_id])
@@ -7,9 +10,9 @@ class Share::Service
       # child classes using this need to implement add
       status = add(params)
       if status == 200
-        response[:message] = "Saved to #{klass.label}."
+        response[:message] = "Sent to #{klass.label}."
       elsif status == 401
-        klass.remove_access!
+        klass.auth_error!
         response[:url] = Rails.application.routes.url_helpers.sharing_services_path
         response[:error] = "#{klass.label} authentication error."
       else
@@ -21,6 +24,10 @@ class Share::Service
       response[:error] = "#{klass.label} authentication error."
     end
     response
+  rescue => exception
+    raise unless Rails.env.production?
+    ErrorService.notify(exception)
+    response[:error] = "Unknown share error."
   end
 
   def determine_content(params)

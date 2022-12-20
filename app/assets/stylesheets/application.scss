@@ -5466,6 +5466,10 @@ img.responsive {
     color: white;
     text-overflow: ellipsis;
     overflow: hidden;
+    a {
+      color: white;
+      text-decoration: none;
+    }
   }
   .icon-container {
     height: $height;

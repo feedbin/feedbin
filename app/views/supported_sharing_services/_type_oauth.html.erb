@@ -7,7 +7,7 @@
       <% row.title { sharing_service.label } %>
       <% if status == :issue %>
         <% row.description do %>
-          Feedbin can no longer access <%= sharing_service.label %>, <%= link_to 'reactivate', supported_sharing_service_path(sharing_service, supported_sharing_service: {operation: 'authorize'}), method: :patch %>?
+          Feedbin can no longer access <%= sharing_service.label %>, <%= link_to 'reactivate', supported_sharing_services_path(supported_sharing_service: {service_id: sharing_service.service_id, operation: 'authorize'}), method: :post %>?
         <% end %>
       <% end %>
 
@@ -15,6 +15,7 @@
         <% if status == :active %>
           <%= render partial: "supported_sharing_services/delete_supported_service", locals: {editable: false, sharing_service: sharing_service} %>
         <% elsif status == :issue %>
+          <%= svg_tag "icon-error-message", title: "Authentication Error", data: {toggle: "tooltip"} %>
           <%= render partial: "supported_sharing_services/delete_supported_service", locals: {editable: false, sharing_service: sharing_service} %>
         <% else %>
           <%= link_to 'Activate', supported_sharing_services_path(supported_sharing_service: {service_id: sharing_service.service_id, operation: 'authorize'}), class: 'button button-secondary', method: :post %>

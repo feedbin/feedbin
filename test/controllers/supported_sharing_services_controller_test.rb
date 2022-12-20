@@ -66,6 +66,86 @@ class SupportedSharingServicesControllerTest < ActionController::TestCase
     assert_equal token, pocket.settings["access_token"]
   end
 
+  test "should authorize with oauth2" do
+    code = "code"
+    token = "access_token"
+    service_id = "mastodon"
+    mastodon_host = "example.social"
+    client_id = "client_id"
+    client_secret = "client_secret"
+    access_token = "access_token"
+    redirect = Rails.application.routes.url_helpers.oauth2_response_supported_sharing_service_url(service_id, host: ENV["PUSH_URL"], mastodon_host: mastodon_host)
+
+    server_response = {
+      id:            "1",
+      website:       ENV["PUSH_URL"],
+      client_id:     client_id,
+      client_secret: client_secret,
+      redirect_uri:  redirect,
+    }
+
+    token_response = {
+      token_type:    "Bearer",
+      scope:         "write:statuses",
+      created_at:    Time.now.utc.to_i,
+      access_token:  access_token,
+      refresh_token: nil,
+      expires_at:    nil
+    }
+
+    login_as @user
+
+    stub_request(:post, "https://#{mastodon_host}/api/v1/apps")
+      .with(body: {
+        client_name:   "Feedbin",
+        redirect_uris: redirect,
+        scopes:        "write:statuses",
+        website:       ENV["PUSH_URL"]
+      })
+      .to_return(status: 200, body: server_response.to_json, headers: {content_type: "application/json"})
+
+    assert_difference -> { OauthServer.count }, +1 do
+      post :create, params: {mastodon_url: mastodon_host, supported_sharing_service: {service_id: service_id, operation: "authorize"}}
+      assert_response :redirect
+      assert_match %r{^https://example.social/oauth/authorize}, @response.redirect_url
+    end
+
+    stub_request(:post, "https://#{mastodon_host}/oauth/token")
+      .with(body: {
+        client_id:     client_id,
+        client_secret: client_secret,
+        code:          code,
+        redirect_uri:  redirect,
+        grant_type:    "authorization_code",
+        scope:         "write:statuses"
+      })
+      .to_return(status: 200, body: token_response.to_json, headers: {content_type: "application/json"})
+
+    assert_difference -> { SupportedSharingService.count }, +1 do
+      get :oauth2_response, params: {id: service_id, code: code, mastodon_host: mastodon_host}
+      assert_redirected_to sharing_services_url
+    end
+
+    share_data = {
+      status: "status",
+      spoiler_text: "spoiler_text",
+      visibility: "public"
+    }
+
+    stub_request(:post, "https://example.social/api/v1/statuses").
+      with(
+        body: JSON.dump(share_data),
+        headers: {
+          'Authorization'=>'Bearer access_token',
+        }).
+        to_return(status: 200, body: "", headers: {})
+
+    entry = create_entry(Feed.first)
+    share = SupportedSharingService.last
+    post :share, params: {id: share, entry_id: entry.id}.merge(share_data), xhr: true
+    assert_response :success
+  end
+
   test "should share" do
     Sidekiq::Worker.clear_all
     @service.update(kindle_address: "example@example.com")
