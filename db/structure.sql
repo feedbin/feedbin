@@ -489,7 +489,9 @@ CREATE TABLE public.entries (
     main_tweet_id text,
     queued_entries_count bigint DEFAULT 0 NOT NULL,
     fingerprint uuid,
-    guid uuid
+    guid uuid,
+    provider bigint,
+    provider_id text
 );
 
 
@@ -2211,6 +2213,13 @@ CREATE INDEX index_entries_on_main_tweet_id ON public.entries USING btree (main_
 
 
 --
+-- Name: index_entries_on_provider_and_provider_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_entries_on_provider_and_provider_id ON public.entries USING btree (provider, provider_id) WHERE ((provider IS NOT NULL) AND (provider_id IS NOT NULL));
+
+
+--
 -- Name: index_entries_on_public_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3061,6 +3070,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221208231846'),
 ('20221215200606'),
 ('20221219141006'),
-('20221220140655');
+('20221220140655'),
+('20221222204921');
 
 

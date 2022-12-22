@@ -5,6 +5,8 @@ class Entry < ApplicationRecord
 
   store :settings, accessors: [:archived_images, :media_image, :newsletter, :newsletter_from, :embed_duration], coder: JSON
 
+  enum provider: [:twitter, :youtube], _prefix: true
+
   belongs_to :feed
   has_many :unread_entries, dependent: :delete_all
   has_many :starred_entries
