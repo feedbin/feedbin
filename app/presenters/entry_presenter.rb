@@ -194,7 +194,7 @@ class EntryPresenter < BasePresenter
     if entry.tweet?
       true
     else
-      has_content? && sanitized_title.present?
+      has_content? && title?
     end
   end
 
@@ -214,6 +214,10 @@ class EntryPresenter < BasePresenter
 
   def sanitized_title
     @sanitized_title ||= @template.raw(@template.strip_tags(entry.title))
+  end
+
+  def title?
+    sanitized_title.present?
   end
 
   def author
@@ -275,7 +279,7 @@ class EntryPresenter < BasePresenter
       classes.push("media")
     end
 
-    if entry.tweet? || entry.micropost?
+    if entry.tweet? || entry.micropost? || !title?
       classes.push("no-title")
     end
 
@@ -503,8 +507,9 @@ class EntryPresenter < BasePresenter
         @template.concat @template.content_tag(:span, summary, class: "summary-inner")
       end
     else
+      summary = entry.summary.truncate(250, separator: " ", omission: "…")
       @template.content_tag(:div, class: "summary light") do
-        @template.concat @template.content_tag(:span, title, class: "inline-title")
+        @template.content_tag(:span, summary)
       end
     end
   rescue
@@ -521,16 +526,13 @@ class EntryPresenter < BasePresenter
       @template.content_tag(:span, "", class: "title-inner") do
         "#{entry.micropost.author_name} #{@template.content_tag(:span, entry.micropost.author_display_username, class: "light")}".html_safe
       end
-    else
-      if sanitized_title.present?
-        text = sanitized_title
-      elsif !entry.summary.blank?
-        text = entry.summary
-      end
-      if text.blank?
-        text = "--".html_safe
-      end
+    elsif title?
+      text = sanitized_title
       @template.truncate(text, length: length, omission: "…", escape: false)
+    else
+      @template.content_tag(:span, "", class: "title-inner", data: {behavior: "user_title", feed_id: entry.feed.id}) do
+        entry.feed.title
+      end
     end
   end
 
@@ -539,18 +541,12 @@ class EntryPresenter < BasePresenter
   end
 
   def feed_title
-    if entry.tweet? || entry.micropost?
+    if entry.tweet? || entry.micropost? || entry.title.blank?
       ""
     elsif entry.feed.pages?
       @template.content_tag(:div, class: "feed-title") do
         @template.content_tag(:span, "", class: "title-inner") do
           entry.hostname
-        end
-      end
-    elsif entry.title.blank? && entry.author.present?
-      @template.content_tag(:div, class: "feed-title") do
-        @template.content_tag(:span, "", class: "title-inner") do
-          entry.author
         end
       end
     else
@@ -584,10 +580,6 @@ class EntryPresenter < BasePresenter
     return unless data&.safe_dig("media_type") =~ /^video/i
     return unless data&.safe_dig("media_url") =~ /^http/i
     @template.camo_link(data&.safe_dig("media_url"))
-  end
-
-  def title?
-    entry.title.present?
   end
 
   def tweet_classes(tweet)
