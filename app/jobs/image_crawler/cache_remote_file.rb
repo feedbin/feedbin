@@ -13,7 +13,9 @@ module ImageCrawler
       RemoteFile.create!(
         fingerprint: fingerprint,
         original_url: image["original_url"],
-        storage_url: image["processed_url"]
+        storage_url: image["processed_url"],
+        width: image["width"],
+        height: image["height"],
       )
     end
   end

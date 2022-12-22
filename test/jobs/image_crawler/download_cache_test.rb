@@ -10,9 +10,11 @@ module ImageCrawler
       storage_url = "http://s3.com/example/example.jpg"
       public_id = SecureRandom.hex
       placeholder_color = SecureRandom.hex.first(6)
+      width = 300
+      height = 200
 
       cache = DownloadCache.new(image_url, public_id: public_id, preset_name: "primary")
-      cache.save(storage_url:, image_url:, placeholder_color:)
+      cache.save(storage_url:, image_url:, placeholder_color:, width:, height:)
 
       cache = DownloadCache.new(image_url, public_id: public_id, preset_name: "primary")
       assert_equal(storage_url, cache.storage_url)
@@ -25,17 +27,21 @@ module ImageCrawler
       storage_url = "http://s3.com/example/example.jpg"
       public_id = SecureRandom.hex
       placeholder_color = SecureRandom.hex.first(6)
+      width = 300
+      height = 200
 
       stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
 
       cache = DownloadCache.new(image_url, public_id: public_id, preset_name: "primary")
       refute cache.copied?
 
-      cache.save(storage_url:, image_url:, placeholder_color:)
+      cache.save(storage_url:, image_url:, placeholder_color:, width:, height:)
       cache.copy
 
       assert cache.copied?
       assert cache.storage_url.include?(public_id)
+      assert_equal(width, cache.width)
+      assert_equal(height, cache.height)
     end
 
     def test_should_fail_to_copy_missing_image
@@ -44,11 +50,13 @@ module ImageCrawler
       public_id = SecureRandom.hex
       s3_host = /s3\.amazonaws\.com/
       placeholder_color = SecureRandom.hex.first(6)
+      width = 300
+      height = 200
 
       stub_request(:put, s3_host).to_return(status: 404)
 
       cache = DownloadCache.new(image_url, public_id: public_id, preset_name: "primary")
-      cache.save(storage_url:, image_url:, placeholder_color:)
+      cache.save(storage_url:, image_url:, placeholder_color:, width:, height:)
       cache.copy
       refute cache.copied?
       assert_requested :put, s3_host

@@ -19,7 +19,7 @@ class BasePresenter
         end
       elsif feed.icon
         content = @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image icon-format-#{feed.custom_icon_format || feed.default_icon_format}" do
-          url = @template.camo_link(feed.icon)
+          url = RemoteFile.signed_url(feed.icon)
           fallback = @template.image_url("favicon-profile-default.png")
           @template.image_tag_with_fallback(fallback, url, alt: "")
         end

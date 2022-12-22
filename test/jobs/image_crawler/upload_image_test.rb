@@ -10,11 +10,13 @@ module ImageCrawler
       path = copy_support_file("image.jpeg")
       url = "http://example.com/image.jpg"
       placeholder_color = "0867e2"
+      width = 300
+      height = 200
 
       stub_request(:put, /s3\.amazonaws\.com/)
 
       assert_difference -> { EntryImage.jobs.size }, +1 do
-        UploadImage.new.perform(public_id, "primary", path, url, url, placeholder_color)
+        UploadImage.new.perform(public_id, "primary", path, url, url, placeholder_color, width, height)
       end
 
       saved_public_id, options = EntryImage.jobs.last.safe_dig("args")
@@ -26,6 +28,8 @@ module ImageCrawler
       assert_equal(public_id, saved_public_id)
       assert_equal(url, options["original_url"])
       assert_equal("https:", options["processed_url"])
+      assert_equal(width, options["width"])
+      assert_equal(height, options["height"])
     end
   end
 end

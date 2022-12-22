@@ -23,6 +23,19 @@ module ImageCrawler
       source.width
     end
 
+    def final_width
+      processed_image&.width
+    end
+
+    def final_height
+      processed_image&.height
+    end
+
+    def processed_image
+      return unless File.exist?(persisted_path)
+      @processed_image ||= Vips::Image.new_from_file(persisted_path)
+    end
+
     def color
       hex = nil
       file = ImageProcessing::Vips

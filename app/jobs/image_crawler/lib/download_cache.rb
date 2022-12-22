@@ -37,6 +37,14 @@ module ImageCrawler
       @placeholder_color ||= cache[:placeholder_color]
     end
 
+    def width
+      @width ||= cache[:width]
+    end
+
+    def height
+      @height ||= cache[:height]
+    end
+
     def download?
       !previously_attempted? && storage_url != false
     end
@@ -45,8 +53,8 @@ module ImageCrawler
       !cache.empty?
     end
 
-    def save(storage_url:, image_url:, placeholder_color:)
-      @cache = {storage_url:, image_url:, placeholder_color:}
+    def save(storage_url:, image_url:, placeholder_color:, width:, height:)
+      @cache = {storage_url:, image_url:, placeholder_color:, width:, height:}
       Cache.write(cache_key, @cache, options: {expires_in: 7 * 24 * 60 * 60})
     end
 

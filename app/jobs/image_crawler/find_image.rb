@@ -29,7 +29,7 @@ module ImageCrawler
 
         download_cache = DownloadCache.copy(original_url, public_id: @public_id, preset_name: @preset_name)
         if download_cache.copied?
-          send_to_feedbin(original_url: download_cache.image_url, storage_url: download_cache.storage_url, placeholder_color: download_cache.placeholder_color)
+          send_to_feedbin(original_url: download_cache.image_url, storage_url: download_cache.storage_url, placeholder_color: download_cache.placeholder_color, width: download_cache.width, height: download_cache.height)
           Sidekiq.logger.info "Copied image: public_id=#{@public_id} image_url=#{download_cache.image_url} storage_url=#{download_cache.storage_url}"
           break
         elsif download_cache.download?
@@ -50,7 +50,7 @@ module ImageCrawler
         Sidekiq.logger.info "Download valid: public_id=#{@public_id} image_url=#{download.image_url}"
       else
         download.delete!
-        download_cache.save(storage_url: false, image_url: false, placeholder_color: nil)
+        download_cache.save(storage_url: false, image_url: false, placeholder_color: nil, width: nil, height: nil)
         Sidekiq.logger.info "Download invalid: public_id=#{@public_id} original_url=#{original_url}"
       end
       found

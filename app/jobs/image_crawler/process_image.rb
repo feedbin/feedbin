@@ -13,7 +13,7 @@ module ImageCrawler
 
       if image.valid? || !preset.validate
         processed_path = image.send(preset.crop)
-        UploadImage.perform_async(public_id, @preset_name, processed_path, original_url, image_url, image.color)
+        UploadImage.perform_async(public_id, @preset_name, processed_path, original_url, image_url, image.color, image.final_width, image.final_height)
       else
         FindImageCritical.perform_async(public_id, @preset_name, candidate_urls) unless candidate_urls.empty?
       end

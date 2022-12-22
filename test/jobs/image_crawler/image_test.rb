@@ -21,6 +21,18 @@ module ImageCrawler
       file = copy_support_file("image.jpeg")
       image = ImageProcessor.new(file, target_width: 542, target_height: 304)
       cropped_path = image.smart_crop
+      assert_equal(542, image.final_width)
+      assert_equal(304, image.final_height)
+      assert cropped_path.include?(".jpg")
+      FileUtils.rm cropped_path
+    end
+
+    def test_should_crop
+      file = copy_support_file("image.jpeg")
+      image = ImageProcessor.new(file, target_width: 400, target_height: 400)
+      cropped_path = image.limit_crop
+      assert_equal(309, image.final_width)
+      assert_equal(400, image.final_height)
       assert cropped_path.include?(".jpg")
       FileUtils.rm cropped_path
     end
@@ -29,6 +41,8 @@ module ImageCrawler
       file = copy_support_file("image.jpeg")
       image = ImageProcessor.new(file, target_width: 640, target_height: 828)
       cropped_path = image.smart_crop
+      assert_equal(640, image.final_width)
+      assert_equal(828, image.final_height)
       assert cropped_path.include?(".jpg")
     end
   end

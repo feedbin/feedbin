@@ -3,6 +3,8 @@ class RemoteFile < ApplicationRecord
   REGION = ENV["AWS_S3_BUCKET_ICONS_REGION"]
   HOST = ENV["FILES_HOST"]
 
+  store_accessor :settings, :width, :height
+
   def self.fingerprint(data)
     Digest::MD5.hexdigest(data)
   end
