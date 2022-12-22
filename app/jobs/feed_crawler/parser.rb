@@ -19,7 +19,6 @@ module FeedCrawler
       Sidekiq.logger.info "Exception: feed_id=#{@feed.id} url=#{@feed.feed_url} exception=#{exception.inspect}"
       ErrorService.notify(exception)
     ensure
-      File.unlink(path) rescue Errno::ENOENT
       @feed.save!
     end
 
@@ -60,6 +59,8 @@ module FeedCrawler
       filter.stats.each do |stat, count|
         Librato.increment("feed.parser", source: stat, by: count)
       end
+    ensure
+      File.unlink(path) rescue Errno::ENOENT
     end
 
     private
