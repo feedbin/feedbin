@@ -1,6 +1,6 @@
 present entry do |entry_presenter|
   json.extract! entry, :id, :feed_id, :title, :author, :summary
-  json.content entry_presenter.api_content
+  json.content entry_presenter.api_content.clean
   json.url entry.fully_qualified_url
   json.extracted_content_url entry.extracted_content_url
   json.published entry.published.iso8601(6)

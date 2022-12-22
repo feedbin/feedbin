@@ -123,7 +123,7 @@ class ContentFormatter
       context[:image_base_url]    = base_url || entry.feed.site_url
       context[:image_subpage_url] = base_url || entry.fully_qualified_url || ""
       context[:href_base_url]     = base_url || entry.feed.site_url
-      context[:href_subpage_url]  = base_url || entry.url || ""
+      context[:href_subpage_url]  = base_url || entry.fully_qualified_url || ""
 
       if entry && entry.feed.newsletter?
         context[:whitelist] = ALLOWLIST_NEWSLETTER
@@ -175,9 +175,9 @@ class ContentFormatter
     filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter]
     context = {
       image_base_url:    base_url || entry.feed.site_url,
-      image_subpage_url: base_url || entry.url            || "",
+      image_subpage_url: base_url || entry.fully_qualified_url || "",
       href_base_url:     base_url || entry.feed.site_url,
-      href_subpage_url:  base_url || entry.url            || ""
+      href_subpage_url:  base_url || entry.fully_qualified_url || ""
     }
     pipeline = HTML::Pipeline.new filters, context
     result = pipeline.call(content)
@@ -191,15 +191,15 @@ class ContentFormatter
   end
 
   def _api_format(content, entry)
-    filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter]
+    filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, HTML::Pipeline::SanitizationFilter]
     context = {
       image_base_url: entry.feed.site_url,
-      image_subpage_url: entry.url || "",
+      image_subpage_url: entry.fully_qualified_url || "",
       href_base_url: entry.feed.site_url,
-      href_subpage_url: entry.url || ""
+      href_subpage_url: entry.fully_qualified_url || ""
     }
+    context[:whitelist] = ALLOWLIST_DEFAULT
     if entry.feed.newsletter?
-      filters.push(HTML::Pipeline::SanitizationFilter)
       context[:whitelist] = ALLOWLIST_NEWSLETTER
     end
     pipeline = HTML::Pipeline.new filters, context
@@ -217,9 +217,9 @@ class ContentFormatter
     filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, HTML::Pipeline::ImagePlaceholderFilter]
     context = {
       image_base_url: entry.feed.site_url,
-      image_subpage_url: entry.url || "",
+      image_subpage_url: entry.fully_qualified_url || "",
       href_base_url: entry.feed.site_url,
-      href_subpage_url: entry.url || "",
+      href_subpage_url: entry.fully_qualified_url || "",
       placeholder_url: "",
       placeholder_attribute: "data-feedbin-src"
     }
@@ -239,9 +239,9 @@ class ContentFormatter
     context = {
       whitelist: ALLOWLIST_EVERNOTE,
       image_base_url: entry.feed.site_url,
-      image_subpage_url: entry.url || "",
+      image_subpage_url: entry.fully_qualified_url || "",
       href_base_url: entry.feed.site_url,
-      href_subpage_url: entry.url || ""
+      href_subpage_url: entry.fully_qualified_url || ""
     }
 
     pipeline = HTML::Pipeline.new filters, context

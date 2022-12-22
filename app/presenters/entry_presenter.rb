@@ -150,7 +150,11 @@ class EntryPresenter < BasePresenter
   end
 
   def api_content
-    ContentFormatter.api_format(formatted_content, entry)
+    string = ContentFormatter.api_format(formatted_content, entry)
+    if entry.micropost?
+      string = ApplicationController.render template: "entries/_micropost_api", formats: :html, locals: {content: string, entry: entry}, layout: nil
+    end
+    string
   rescue => e
     Rails.logger.info { e.inspect }
     @template.content_tag(:p, "&ndash;&ndash;".html_safe)
@@ -731,16 +735,26 @@ class EntryPresenter < BasePresenter
     (content && content.length > 400) ? content : nil
   end
 
+  def page_content_api(page)
+    ContentFormatter.absolute_source(page.content, nil, page.url)
+    content = begin
+      ContentFormatter.absolute_source(page.content, nil, page.url)
+    rescue
+      nil
+    end
+    (content && content.length > 400) ? content : nil
+  end
+
   def iframe_embed(url, tag)
     if tag == :iframe
-      @template.content_tag(:iframe, "", src: url, height: 9, width: 16, frameborder: 0, allowfullscreen: true).html_safe
+      @template.content_tag(:iframe, "", src: url, height: 720, width: 1280, frameborder: 0, allowfullscreen: true).html_safe
     else
       context = {
         embed_url: Rails.application.routes.url_helpers.iframe_embeds_path,
         embed_classes: "iframe-placeholder entry-callout system-content"
       }
       filter = HTML::Pipeline::IframeFilter.new("", context)
-      attributes = filter.iframe_attributes(url, 16, 9)
+      attributes = filter.iframe_attributes(url, 720, 1280)
       @template.content_tag(:div, "", attributes).html_safe
     end
   end
