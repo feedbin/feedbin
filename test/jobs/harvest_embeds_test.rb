@@ -25,11 +25,27 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
   end
 
   test "should create embed records" do
-    Sidekiq.redis {|r| r.sadd?(HarvestEmbeds::SET_NAME, "id") }
+    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.provider_youtube!
+
+    Sidekiq.redis {|r| r.sadd?(HarvestEmbeds::SET_NAME, "video_id") }
     stub_youtube_api
     assert_difference "Embed.count", +2 do
       HarvestEmbeds.new.perform(nil, true)
     end
+
+    assert_equal("channel_id", @entry.reload.data.dig("youtube_channel_id"))
+  end
+
+  test "should add youtube_channel_id from existing embed" do
+    Embed.youtube_video.create!(provider_id: "video_id", parent_id: "channel_id", data: {})
+
+    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.provider_youtube!
+    @entry.send(:provider_metadata)
+    @entry.save!
+
+    assert_equal("channel_id", @entry.reload.data.dig("youtube_channel_id"))
   end
 
   def stub_youtube_api

@@ -15,7 +15,7 @@ class Entry < ApplicationRecord
   before_create :ensure_published
   before_create :create_summary
   before_create :update_content
-  before_create :tweet_metadata
+  before_create :provider_metadata
 
   before_update :create_summary
 
@@ -304,10 +304,19 @@ class Entry < ApplicationRecord
 
   private
 
-  def tweet_metadata
-    return unless tweet? && tweet.main_tweet
-    self.url = tweet.main_tweet.uri.to_s
-    self.main_tweet_id = tweet.main_tweet.id
+  def provider_metadata
+    if tweet? && tweet.main_tweet
+      self.url = tweet.main_tweet.uri.to_s
+      self.main_tweet_id = tweet.main_tweet.id
+      self.provider = self.class.providers[:twitter]
+      self.provider_id = tweet.main_tweet.id
+    elsif youtube?
+      self.provider = self.class.providers[:youtube]
+      self.provider_id = data["youtube_video_id"]
+      if embed = Embed.youtube_video.find_by_provider_id(self.provider_id)
+        data["youtube_channel_id"] = embed.parent_id
+      end
+    end
   end
 
   def update_content

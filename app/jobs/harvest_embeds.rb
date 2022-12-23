@@ -58,6 +58,7 @@ class HarvestEmbeds
     Embed.import(items, on_duplicate_key_update: {conflict_target: [:source, :provider_id], columns: [:data]}) if items.present?
 
     update_feed_icons(ids)
+    update_entry_channels(ids)
   end
 
   def update_feed_icons(ids)
@@ -66,6 +67,16 @@ class HarvestEmbeds
     channels.each do |channel|
       if feed = Feed.find_by_feed_url("https://www.youtube.com/feeds/videos.xml?channel_id=#{channel.provider_id}")
         feed.update(custom_icon: channel.data.safe_dig("snippet", "thumbnails", "default", "url"))
+      end
+    end
+  end
+
+  def update_entry_channels(ids)
+    channel_map = Embed.youtube_video.where(provider_id: ids).pluck(:provider_id, :parent_id).to_h
+    Entry.provider_youtube.where(provider_id: ids).each do |entry|
+      if channel = channel_map[entry.provider_id]
+        entry.data["youtube_channel_id"] = channel
+        entry.save
       end
     end
   end
