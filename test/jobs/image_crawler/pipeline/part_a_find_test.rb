@@ -1,6 +1,6 @@
 require "test_helper"
 module ImageCrawler
-  class FindImageTest < ActiveSupport::TestCase
+  class FindTest < ActiveSupport::TestCase
     def setup
       flush_redis
     end
@@ -13,10 +13,10 @@ module ImageCrawler
       stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
 
       Sidekiq::Testing.inline! do
-        FindImage.perform_async(SecureRandom.hex, "primary", [original_url])
+        Find.perform_async(SecureRandom.hex, "primary", [original_url])
       end
 
-      FindImage.new.perform(SecureRandom.hex, "primary", [original_url])
+      Find.new.perform(SecureRandom.hex, "primary", [original_url])
       assert_equal(image_url, EntryImage.jobs.first["args"][1]["original_url"])
     end
 
@@ -34,14 +34,14 @@ module ImageCrawler
       stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
 
       Sidekiq::Testing.inline! do
-        FindImage.perform_async(SecureRandom.hex, "primary", urls, page_url)
+        Find.perform_async(SecureRandom.hex, "primary", urls, page_url)
       end
 
       assert_requested :get, "http://example.com/image/og_image.jpg"
       assert_requested :get, "http://example.com/image/twitter_image.jpg"
 
       assert_equal 0, EntryImage.jobs.size
-      FindImage.new.perform(SecureRandom.hex, "primary", urls, nil)
+      Find.new.perform(SecureRandom.hex, "primary", urls, nil)
       assert_equal 1, EntryImage.jobs.size
     end
 
@@ -51,11 +51,11 @@ module ImageCrawler
 
       stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
 
-      assert_equal 0, ProcessImage.jobs.size
-      FindImage.new.perform(SecureRandom.hex, "primary", [image_url], "https://www.youtube.com/watch?v=id")
-      assert_equal 1, ProcessImage.jobs.size
+      assert_equal 0, Process.jobs.size
+      Find.new.perform(SecureRandom.hex, "primary", [image_url], "https://www.youtube.com/watch?v=id")
+      assert_equal 1, Process.jobs.size
 
-      effective_image_url = ProcessImage.jobs.first["args"][4]
+      effective_image_url = Process.jobs.first["args"][4]
 
       assert_equal(url, effective_image_url)
 
@@ -75,7 +75,7 @@ module ImageCrawler
       end
 
       Sidekiq::Testing.inline! do
-        FindImage.perform_async(SecureRandom.hex, "primary", urls, nil)
+        Find.perform_async(SecureRandom.hex, "primary", urls, nil)
       end
 
       assert_requested :get, urls[0]

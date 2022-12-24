@@ -1,6 +1,6 @@
 require "test_helper"
 module ImageCrawler
-  class UploadImageTest < ActiveSupport::TestCase
+  class UploadTest < ActiveSupport::TestCase
     def setup
       flush_redis
     end
@@ -16,7 +16,7 @@ module ImageCrawler
       stub_request(:put, /s3\.amazonaws\.com/)
 
       assert_difference -> { EntryImage.jobs.size }, +1 do
-        UploadImage.new.perform(public_id, "primary", path, url, url, placeholder_color, width, height)
+        Upload.new.perform(public_id, "primary", path, url, url, placeholder_color, width, height)
       end
 
       saved_public_id, options = EntryImage.jobs.last.safe_dig("args")
