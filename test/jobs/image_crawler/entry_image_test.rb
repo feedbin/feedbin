@@ -15,7 +15,7 @@ module ImageCrawler
     end
 
     test "should enqueue Find" do
-      assert_difference -> { Find.jobs.size }, +1 do
+      assert_difference -> { Pipeline::Find.jobs.size }, +1 do
         EntryImage.new.perform(@entry.public_id)
       end
     end
@@ -36,13 +36,13 @@ module ImageCrawler
 
       EntryImage.new.perform(entry.public_id)
 
-      extracted_urls = Find.jobs.first["args"][2]
+      extracted_urls = Pipeline::Find.jobs.first["args"][2]
       assert extracted_urls.include?("http://example.com/iframe")
       assert extracted_urls.include?("http://example.com/img")
       assert extracted_urls.include?("http://example.com/video")
 
-      assert_equal(entry.public_id, Find.jobs.first["args"].first)
-      assert_equal(entry.fully_qualified_url, Find.jobs.first["args"].last)
+      assert_equal(entry.public_id, Pipeline::Find.jobs.first["args"].first)
+      assert_equal(entry.fully_qualified_url, Pipeline::Find.jobs.first["args"].last)
     end
 
     test "should enqueue Find with youtube url" do
@@ -50,14 +50,14 @@ module ImageCrawler
       @entry.reload
       EntryImage.new.perform(@entry.public_id)
 
-      extracted_urls = Find.jobs.first["args"][2]
+      extracted_urls = Pipeline::Find.jobs.first["args"][2]
       assert_equal([@entry.url], extracted_urls)
     end
 
     test "should enqueue Find with tweet url" do
       entry = create_tweet_entry(Feed.first, "two")
       EntryImage.new.perform(entry.public_id)
-      extracted_urls = Find.jobs.first["args"][2]
+      extracted_urls = Pipeline::Find.jobs.first["args"][2]
       assert_equal(["https://pbs.twimg.com/media/EwDoQHMVIAAGbaP.jpg"], extracted_urls)
     end
 
@@ -79,7 +79,7 @@ module ImageCrawler
         "width" => 542,
         "height" => 304
       })
-      assert_no_difference -> { Find.jobs.size } do
+      assert_no_difference -> { Pipeline::Find.jobs.size } do
         EntryImage.new.perform(@entry.public_id)
       end
     end
