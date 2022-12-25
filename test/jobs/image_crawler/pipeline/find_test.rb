@@ -51,14 +51,20 @@ module ImageCrawler
         image_url = "http://example.com/image.jpg"
 
         stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
+        id = SecureRandom.hex
+        assert_difference -> { Process.jobs.size }, +1 do
+          Find.new.perform(id, "primary", [image_url], "https://www.youtube.com/watch?v=id")
+        end
 
-        assert_equal 0, Process.jobs.size
-        Find.new.perform(SecureRandom.hex, "primary", [image_url], "https://www.youtube.com/watch?v=id")
-        assert_equal 1, Process.jobs.size
+        image = Image.new_from_hash(Process.jobs.first["args"][0])
 
-        effective_image_url = Process.jobs.first["args"][4]
-
-        assert_equal(url, effective_image_url)
+        assert image.download_path
+        assert_equal "https://www.youtube.com/watch?v=id", image.entry_url
+        assert_equal "https://i.ytimg.com/vi/id/maxresdefault.jpg", image.final_url
+        assert_equal id, image.id
+        assert_equal ["http://example.com/image.jpg"], image.image_urls
+        assert_equal "https://www.youtube.com/watch?v=id", image.original_url
+        assert_equal "primary", image.preset_name
 
         assert_requested :get, url
         refute_requested :get, image_url

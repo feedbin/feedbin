@@ -1,12 +1,38 @@
+# processor = ImageProcessor.new(@image.download_path,
+#   target_width: @image.target_width,
+#   target_height: @image.target_height,
+#   crop: @image.preset.crop
+# )
+# pp "----------------------"
+# pp "@image.validate? #{@image.validate?} : #{processor.valid?}"
+# if !@image.validate? || processor.valid?
+#   pp "valid?!"
+#   path = processor.crop!
+#
+#   @image.processed_path    = path
+#   @image.width             = processor.final_width
+#   @image.height            = processor.final_height
+#   @image.placeholder_color = processor.placeholder_color
+#
+
 module ImageCrawler
   class ImageProcessor
-    attr_reader :path
-    include ImageCrawlerHelper
+    CASCADE = Rails.root.join("lib/cascade/facefinder")
+    PIGO = ENV["PIGO_PATH"] || `which pigo`.chomp
+    PIGO_INSTALLED = File.executable?(PIGO)
+    puts "Pigo missing. Add it to your path or set ENV['PIGO_PATH']. From https://github.com/esimov/pigo" unless PIGO_INSTALLED
 
-    def initialize(file, target_width:, target_height:)
-      @file = file
-      @target_width = target_width
+    attr_reader :path
+
+    def initialize(file, target_width:, target_height:, crop:)
+      @file          = file
+      @target_width  = target_width
       @target_height = target_height
+      @crop          = crop
+    end
+
+    def crop!
+      send(@crop)
     end
 
     def valid?
@@ -36,7 +62,7 @@ module ImageCrawler
       @processed_image ||= Vips::Image.new_from_file(persisted_path)
     end
 
-    def color
+    def placeholder_color
       hex = nil
       file = ImageProcessing::Vips
         .source(source)

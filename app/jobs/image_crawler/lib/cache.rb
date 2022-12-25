@@ -56,7 +56,7 @@ module ImageCrawler
     def write_key_expiry(key, options)
       if options[:expires_in]
         Sidekiq.redis do |redis|
-          redis.expire key, options[:expires_in]
+          redis.expire key, options[:expires_in].to_i
         end
       end
     end

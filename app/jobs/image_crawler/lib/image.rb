@@ -1,12 +1,14 @@
 module ImageCrawler
-  module ImageCrawlerHelper
-    CASCADE = Rails.root.join("lib/cascade/facefinder")
-    PIGO = ENV["PIGO_PATH"] || `which pigo`.chomp
-    PIGO_INSTALLED = File.executable?(PIGO)
-    puts "Pigo missing. Add it to your path or set ENV['PIGO_PATH']. From https://github.com/esimov/pigo" unless PIGO_INSTALLED
+  class Image
+    ATTRIBUTES = %i[id preset_name image_urls entry_url download_path
+                    original_url final_url storage_url processed_path
+                    file_extension width height placeholder_color]
 
-    IMAGE_STORAGE = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
-    IMAGE_PRESETS = {
+
+    attr_accessor *ATTRIBUTES
+
+    STORAGE = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
+    PRESETS = {
       primary: {
         width: 542,
         height: 304,
@@ -68,22 +70,45 @@ module ImageCrawler
       }
     }
 
-    def preset
-      OpenStruct.new(IMAGE_PRESETS[@preset_name.to_sym])
+    def self.new_from_hash(data = {})
+      new.tap do |instance|
+        data.each do |key, value|
+          setter = "#{key}=".to_sym
+          if instance.respond_to?(setter)
+            instance.send(setter, value)
+          end
+        end
+      end
     end
 
-    def send_to_feedbin(original_url:, storage_url:, placeholder_color:, width:, height:)
-      preset.job_class.perform_async(@public_id, {
-        "original_url"      => original_url,
+    def to_h
+      {}.tap do |hash|
+        ATTRIBUTES.each do |attribute|
+          hash[attribute] = self.send(attribute)
+        end
+      end
+    end
+
+    def preset
+      OpenStruct.new(PRESETS[preset_name.to_sym])
+    end
+
+    def validate?
+      preset.validate || false
+    end
+
+    def send_to_feedbin
+      preset.job_class.perform_async(id, {
+        "original_url"      => final_url,
         "processed_url"     => storage_url,
-        "width"             => width || preset.width,
-        "height"            => height || preset.height,
+        "width"             => width,
+        "height"            => height,
         "placeholder_color" => placeholder_color
       })
     end
 
     def image_name
-      path = File.join(@public_id[0..2], "#{@public_id}.jpg")
+      path = File.join(id[0..2], "#{id}.jpg")
       if preset.directory
         path = File.join(preset.directory, path)
       end
@@ -91,7 +116,7 @@ module ImageCrawler
     end
 
     def bucket
-      preset.bucket || IMAGE_STORAGE
+      preset.bucket || STORAGE
     end
 
     def storage_options
@@ -102,5 +127,6 @@ module ImageCrawler
         "x-amz-acl" => "public-read"
       }
     end
+
   end
 end

@@ -44,9 +44,9 @@ module ImageCrawler
     end
 
     def valid?
-      valid = @file && @file.content_type&.start_with?("image")
-      valid &&= @file.size >= @minimum_size unless @minimum_size.nil?
-      valid
+      return false if @file.nil?
+      return true if @minimum_size.nil?
+      @file.size >= @minimum_size
     end
 
     def provider_identifier

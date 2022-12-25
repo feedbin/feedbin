@@ -2,24 +2,34 @@ module ImageCrawler
   module Pipeline
     class Process
       include Sidekiq::Worker
-      include ImageCrawlerHelper
       include SidekiqHelper
 
       sidekiq_options queue: local_queue("parse"), retry: false
 
-      def perform(public_id, preset_name, original_path, original_url, image_url, candidate_urls)
-        @preset_name = preset_name
-        Sidekiq.logger.info "Process: public_id=#{public_id} image_url=#{image_url}"
-        image = ImageProcessor.new(original_path, target_width: preset.width, target_height: preset.height)
+      def perform(image_hash)
+        @image = Image.new_from_hash(image_hash)
+        Sidekiq.logger.info "Process: public_id=#{@image.id} final_url=#{@image.final_url}"
 
-        if image.valid? || !preset.validate
-          processed_path = image.send(preset.crop)
-          Upload.perform_async(public_id, @preset_name, processed_path, original_url, image_url, image.color, image.final_width, image.final_height)
+        processor = ImageProcessor.new(@image.download_path,
+          target_width: @image.preset.width,
+          target_height: @image.preset.height,
+          crop: @image.preset.crop
+        )
+
+        if !@image.validate? || processor.valid?
+          path = processor.crop!
+
+          @image.processed_path    = path
+          @image.width             = processor.final_width
+          @image.height            = processor.final_height
+          @image.placeholder_color = processor.placeholder_color
+
+          Upload.perform_async(@image.to_h)
         else
-          FindCritical.perform_async(public_id, @preset_name, candidate_urls) unless candidate_urls.empty?
+          FindCritical.perform_async(@image.id, @image.preset_name, @image.image_urls) unless @image.image_urls.empty?
         end
       ensure
-        File.unlink(original_path) rescue Errno::ENOENT
+        File.unlink(@image.download_path) rescue Errno::ENOENT
       end
     end
   end
