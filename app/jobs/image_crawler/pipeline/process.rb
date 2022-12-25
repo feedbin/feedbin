@@ -16,12 +16,12 @@ module ImageCrawler
           crop: @image.preset.crop
         )
 
-        if !@image.validate? || processor.valid?
+        if processor.valid?(@image.validate?)
           path = processor.crop!
 
           @image.processed_path    = path
-          @image.width             = processor.final_width
-          @image.height            = processor.final_height
+          @image.width             = processor.resized_width
+          @image.height            = processor.resized_height
           @image.placeholder_color = processor.placeholder_color
 
           Upload.perform_async(@image.to_h)
