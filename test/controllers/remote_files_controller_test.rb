@@ -40,7 +40,7 @@ class RemoteFilesControllerTest < ActionController::TestCase
     url = "http://example.com/image.jpeg"
     signature, encoded_url = RemoteFile.signed_url(url).split("/").last(2)
 
-    assert_difference -> { ImageCrawler::FindImage.jobs.size }, +1 do
+    assert_difference -> { ImageCrawler::Pipeline::Find.jobs.size }, +1 do
       get :icon, params: {signature: signature, url: encoded_url}
       assert_response :success
     end

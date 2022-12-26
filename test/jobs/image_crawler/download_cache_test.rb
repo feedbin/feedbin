@@ -5,59 +5,61 @@ module ImageCrawler
       flush_redis
     end
 
+    def build_image
+      cache_key         = SecureRandom.hex
+      id                = SecureRandom.hex
+      download_path     = copy_support_file("image.jpeg")
+      processed_path    = download_path
+      original_url      = "http://example.com/image.jpg"
+      final_url         = "http://example.com/redirect/image.jpg"
+      placeholder_color = "0867e2"
+      width             = 300
+      height            = 200
+      storage_url       = "http://s3.com/example/example.jpg"
+      preset_name       = "primary"
+      Image.new_from_hash(id:, preset_name:, download_path:, original_url:, final_url:, processed_path:, width:, height:, placeholder_color:, storage_url:)
+    end
+
     def test_should_save_data
-      image_url = "http://example.com/example/example.jpg"
-      storage_url = "http://s3.com/example/example.jpg"
-      public_id = SecureRandom.hex
-      placeholder_color = SecureRandom.hex.first(6)
-      width = 300
-      height = 200
+      image = build_image
+      cache = DownloadCache.save(image)
 
-      cache = DownloadCache.new(image_url, public_id: public_id, preset_name: "primary")
-      cache.save(storage_url:, image_url:, placeholder_color:, width:, height:)
-
-      cache = DownloadCache.new(image_url, public_id: public_id, preset_name: "primary")
-      assert_equal(storage_url, cache.storage_url)
-      assert_equal(image_url, cache.image_url)
-      assert_equal(placeholder_color, cache.placeholder_color)
+      cache = DownloadCache.new(image.original_url, image.preset_name)
+      assert_equal(image.storage_url, cache.image.storage_url)
+      assert_equal(image.final_url, cache.image.final_url)
+      assert_equal(image.placeholder_color, cache.image.placeholder_color)
     end
 
     def test_should_copy_existing_image
-      image_url = "http://example.com/example/example.jpg"
-      storage_url = "http://s3.com/example/example.jpg"
-      public_id = SecureRandom.hex
-      placeholder_color = SecureRandom.hex.first(6)
-      width = 300
-      height = 200
-
       stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
 
-      cache = DownloadCache.new(image_url, public_id: public_id, preset_name: "primary")
+      image = build_image
+      cache = DownloadCache.new(image.original_url, image.preset_name)
       refute cache.copied?
 
-      cache.save(storage_url:, image_url:, placeholder_color:, width:, height:)
+      cache.save(image)
+
+      cache = DownloadCache.new(image.original_url, image.preset_name)
       cache.copy
 
       assert cache.copied?
-      assert cache.storage_url.include?(public_id)
-      assert_equal(width, cache.width)
-      assert_equal(height, cache.height)
+      assert cache.storage_url.include?(image.id)
+      assert_equal(image.width, cache.image.width)
+      assert_equal(image.height, cache.image.height)
     end
 
     def test_should_fail_to_copy_missing_image
-      image_url = "http://example.com/example/example.jpg"
-      storage_url = "http://s3.com/example/example.jpg"
-      public_id = SecureRandom.hex
       s3_host = /s3\.amazonaws\.com/
-      placeholder_color = SecureRandom.hex.first(6)
-      width = 300
-      height = 200
 
       stub_request(:put, s3_host).to_return(status: 404)
 
-      cache = DownloadCache.new(image_url, public_id: public_id, preset_name: "primary")
-      cache.save(storage_url:, image_url:, placeholder_color:, width:, height:)
+      image = build_image
+
+      DownloadCache.save(image)
+
+      cache = DownloadCache.new(image.original_url, image.preset_name)
       cache.copy
+
       refute cache.copied?
       assert_requested :put, s3_host
     end

@@ -40,13 +40,27 @@ module ImageCrawler
     end
 
     def persisted_path
-      @persisted_path ||= File.join(Dir.tmpdir, ["image_original_", SecureRandom.hex].join)
+      @persisted_path ||= File.join(Dir.tmpdir, ["image_original_", SecureRandom.hex, ".#{file_extension}"].join)
+    end
+
+    def file_extension
+      content_type = @file.headers["Content-Type"]
+
+      return unless content_type.respond_to?(:start_with?)
+
+      if content_type.start_with?("image/png")
+        "png"
+      elsif content_type.start_with?("image/jpg") || content_type.start_with?("image/jpeg")
+        "jpg"
+      else
+        "unknown"
+      end
     end
 
     def valid?
-      valid = @file && @file.content_type&.start_with?("image")
-      valid &&= @file.size >= @minimum_size unless @minimum_size.nil?
-      valid
+      return false if @file.nil?
+      return true if @minimum_size.nil?
+      @file.size >= @minimum_size
     end
 
     def provider_identifier

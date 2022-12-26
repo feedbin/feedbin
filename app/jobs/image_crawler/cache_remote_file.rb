@@ -5,7 +5,7 @@ module ImageCrawler
 
     def self.schedule(url)
       fingerprint = RemoteFile.fingerprint(url)
-      FindImage.perform_async("#{fingerprint}-icon", "icon", [url])
+      Pipeline::Find.perform_async("#{fingerprint}-icon", "icon", [url])
     end
 
     def perform(url, image)

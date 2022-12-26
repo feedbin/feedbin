@@ -17,7 +17,7 @@ module ImageCrawler
     end
 
     def schedule
-      FindImage.perform_async("#{@entry.public_id}-itunes", "podcast", [@entry.rebase_url(@entry.data["itunes_image"])])
+      Pipeline::Find.perform_async("#{@entry.public_id}-itunes", "podcast", [@entry.rebase_url(@entry.data["itunes_image"])])
     end
 
     def receive

@@ -22,13 +22,6 @@ module ImageCrawler
       assert download.valid?
     end
 
-    def test_should_be_wrong_content_type
-      url = "http://example.com/image.jpg"
-      stub_request(:get, url).to_return(headers: {content_type: "text/html"})
-      download = Download.download!(url, minimum_size: nil)
-      refute download.valid?
-    end
-
     def test_should_persist_file
       url = "http://example.com/image.jpg"
       body = "body"

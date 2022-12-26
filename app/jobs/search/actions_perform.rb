@@ -62,7 +62,7 @@ module Search
       job = ImageCrawler::EntryImage.new
       job.entry = @entry
       if job_args = job.build_job
-        ImageCrawler::FindImageCritical.perform_async(*job_args)
+        ImageCrawler::Pipeline::FindCritical.perform_async(*job_args)
       end
       DevicePushNotificationSend.perform_in(1.minute, user_ids, @entry.id, true)
     end

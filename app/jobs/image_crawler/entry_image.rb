@@ -16,7 +16,7 @@ module ImageCrawler
 
     def schedule
       if job = build_job
-        FindImage.perform_async(*job)
+        Pipeline::Find.perform_async(*job)
       end
     end
 

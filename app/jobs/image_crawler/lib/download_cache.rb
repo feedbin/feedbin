@@ -1,77 +1,67 @@
 module ImageCrawler
   class DownloadCache
-    include ImageCrawlerHelper
 
-    attr_reader :storage_url
+    attr_reader :storage_url, :image
 
-    def initialize(url, public_id:, preset_name:)
+    def initialize(url, preset_name)
       @url = url
-      @public_id = public_id
       @preset_name = preset_name
-      @storage_url = nil
+      @image = from_cache
     end
 
-    def self.copy(url, **args)
-      instance = new(url, **args)
+    def from_cache
+      data = Cache.read(cache_key)
+      data.present? ? Image.new_from_hash(data) : nil
+    end
+
+    def self.copy(*args)
+      instance = new(*args)
       instance.copy
       instance
     end
 
+    def self.save(image)
+      new(image.original_url, image.preset_name).save(image)
+    end
+
     def copy
-      @storage_url = copy_image unless storage_url.nil? || storage_url == false
+      copy_image unless @image.nil?
     end
 
     def copied?
       !!@storage_url
     end
 
-    def storage_url
-      @storage_url ||= cache[:storage_url]
-    end
-
-    def image_url
-      @image_url ||= cache[:image_url]
-    end
-
-    def placeholder_color
-      @placeholder_color ||= cache[:placeholder_color]
-    end
-
-    def width
-      @width ||= cache[:width]
-    end
-
-    def height
-      @height ||= cache[:height]
-    end
-
     def download?
-      !previously_attempted? && storage_url != false
+      !previously_attempted?
+    end
+
+    def save(image)
+      Cache.write(cache_key, image.to_h, options: {expires_in: 1.week})
     end
 
     def previously_attempted?
-      !cache.empty?
+      Cache.read(attempt_cache_key)[:attempted] == true
     end
 
-    def save(storage_url:, image_url:, placeholder_color:, width:, height:)
-      @cache = {storage_url:, image_url:, placeholder_color:, width:, height:}
-      Cache.write(cache_key, @cache, options: {expires_in: 7 * 24 * 60 * 60})
-    end
-
-    def cache
-      @cache ||= Cache.read(cache_key)
+    def failed!
+      Cache.write(attempt_cache_key, {attempted: true}, options: {expires_in: 1.month})
     end
 
     def cache_key
-      "image_download_#{@preset_name}_#{Digest::SHA1.hexdigest(@url)}"
+      "image_download_#{@preset_name}_#{Digest::SHA1.hexdigest(@url)}_v2"
+    end
+
+    def attempt_cache_key
+      "#{cache_key}_attempt"
     end
 
     def copy_image
-      url = URI.parse(storage_url)
+      url = URI.parse(@image.storage_url)
       source_object_name = url.path[1..-1]
-      Fog::Storage.new(STORAGE).copy_object(bucket, source_object_name, bucket, image_name, storage_options)
-      final_url = url.path = "/#{image_name}"
-      url.to_s
+      Fog::Storage.new(STORAGE).copy_object(@image.bucket, source_object_name, @image.bucket, @image.image_name, @image.storage_options)
+      final_url = url.path = "/#{@image.image_name}"
+      @storage_url = url.to_s
     rescue Excon::Error::NotFound
       false
     end

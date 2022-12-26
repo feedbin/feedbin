@@ -15,7 +15,7 @@ module ImageCrawler
       name = Digest::SHA1.hexdigest(@twitter_user.profile_image)
 
       unless @twitter_user.profile_image_url&.include?(name)
-        FindImage.perform_async("#{@twitter_user.id}-#{name}", "profile", [@twitter_user.profile_image])
+        Pipeline::Find.perform_async("#{@twitter_user.id}-#{name}", "profile", [@twitter_user.profile_image])
       end
     end
 
