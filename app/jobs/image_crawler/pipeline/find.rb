@@ -60,9 +60,10 @@ module ImageCrawler
         if download.valid?
           found = true
 
-          @image.download_path = download.persist!
-          @image.final_url     = download.image_url
-          @image.original_url  = original_url
+          @image.download_path      = download.persist!
+          @image.final_url          = download.image_url
+          @image.original_url       = original_url
+          @image.original_extension = download.file_extension
 
           Process.perform_async(@image.to_h)
           Sidekiq.logger.info "Download valid: public_id=#{@image.id} image_url=#{@image.final_url}"

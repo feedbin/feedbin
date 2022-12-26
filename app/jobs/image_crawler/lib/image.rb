@@ -1,8 +1,9 @@
 module ImageCrawler
   class Image
     ATTRIBUTES = %i[id preset_name image_urls entry_url download_path
-                    original_url final_url storage_url processed_path
-                    file_extension width height placeholder_color]
+                    original_extension original_url final_url
+                    storage_url processed_path processed_extension
+                    width height placeholder_color]
 
 
     attr_accessor *ATTRIBUTES
@@ -108,7 +109,7 @@ module ImageCrawler
     end
 
     def image_name
-      path = File.join(id[0..2], "#{id}.jpg")
+      path = File.join(id[0..2], "#{id}.#{processed_extension}")
       if preset.directory
         path = File.join(preset.directory, path)
       end

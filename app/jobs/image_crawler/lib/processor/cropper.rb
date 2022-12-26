@@ -8,11 +8,12 @@ module ImageCrawler
 
       attr_reader :path
 
-      def initialize(file, target_width:, target_height:, crop:)
-        @file          = file
-        @target_width  = target_width
-        @target_height = target_height
-        @crop          = crop
+      def initialize(file, crop:, extension:, width:, height:)
+        @file      = file
+        @crop      = crop
+        @extension = extension
+        @width     = width
+        @height    = height
       end
 
       def crop!
@@ -23,41 +24,15 @@ module ImageCrawler
         @source ||= Vips::Image.new_from_file(@file)
       end
 
+      def size
+        File.size(@file)
+      end
+
       def valid?(validate)
         source.avg
-        validate ? (original_width >= @target_width && original_height >= @target_height) : true
+        validate ? (source.width >= @width && source.height >= @height) : true
       rescue ::Vips::Error
         false
-      end
-
-      def original_width
-        source.width
-      end
-
-      def original_height
-        source.height
-      end
-
-      def resized_width
-        processed_image&.width
-      end
-
-      def resized_height
-        processed_image&.height
-      end
-
-      def placeholder_color
-        hex = nil
-        file = ImageProcessing::Vips
-          .source(source)
-          .resize_to_fill(1, 1, sharpen: false)
-          .custom { |image|
-            image.tap do |data|
-              hex = data.getpoint(0, 0).map { |value| "%02x" % value }.first(3).join
-            end
-          }.call
-        file.unlink
-        hex
       end
 
       def pipeline(width, height)
@@ -68,19 +43,26 @@ module ImageCrawler
           .saver(strip: true, quality: 90)
       end
 
-      def fill_crop
-        pipeline(@target_width, @target_height).call(destination: persisted_path)
-        persisted_path
+      def limit_crop
+        extension = source.has_alpha? ? "png" : "jpg"
+        image = ImageProcessing::Vips
+          .source(source)
+          .resize_to_limit(@width, @height)
+          .convert(extension)
+          .saver(strip: true, quality: 90)
+
+        result = Processed.from_pipeline(image)
+
+        # if the original is smaller than the resized, just use that one
+        if result.size > size && source.width <= @width && source.height <= @height && ["png", "jpg"].include?(@extension)
+          return Processed.from_file(@file, @extension)
+        end
+        result
       end
 
-      def limit_crop
-        ImageProcessing::Vips
-          .source(source)
-          .resize_to_limit(@target_width, @target_height)
-          .convert("jpg")
-          .saver(strip: true, quality: 90)
-          .call(destination: persisted_path)
-        persisted_path
+      def fill_crop
+        image = pipeline(@width, @height)
+        Processed.from_pipeline(image)
       end
 
       def smart_crop
@@ -88,14 +70,14 @@ module ImageCrawler
 
         image = pipeline(proposed_size.width, proposed_size.height)
 
-        if proposed_size.width > @target_width
+        if proposed_size.width > @width
           axis = "x"
-          contraint = @target_width
-          max = proposed_size.width - @target_width
+          contraint = @width
+          max = proposed_size.width - @width
         else
           axis = "y"
-          contraint = @target_height
-          max = proposed_size.height - @target_height
+          contraint = @height
+          max = proposed_size.height - @height
         end
 
         if PIGO_INSTALLED && center = average_face_position(axis, image.call)
@@ -108,26 +90,25 @@ module ImageCrawler
             point[axis] = max
           end
 
-          image = image.crop(point["x"], point["y"], @target_width, @target_height)
+          image = image.crop(point["x"], point["y"], @width, @height)
         else
-          image = image.resize_to_fill(@target_width, @target_height, crop: :attention)
+          image = image.resize_to_fill(@width, @height, crop: :attention)
         end
 
-        image.call(destination: persisted_path)
-        persisted_path
+        Processed.from_pipeline(image)
       end
 
       def proposed_size
         @proposed_size ||= begin
-          proposed_width = @target_width.to_f
+          proposed_width = @width.to_f
 
-          width_proportion = original_width.to_f / original_height.to_f
-          height_proportion = original_height.to_f / original_width.to_f
+          width_proportion = source.width.to_f / source.height.to_f
+          height_proportion = source.height.to_f / source.width.to_f
 
           proposed_height = proposed_width * height_proportion
 
-          if proposed_height < @target_height
-            proposed_height = @target_height.to_f
+          if proposed_height < @height
+            proposed_height = @height.to_f
             proposed_width = proposed_height * width_proportion
           end
           OpenStruct.new({width: proposed_width.to_i, height: proposed_height.to_i})
@@ -162,21 +143,12 @@ module ImageCrawler
         (result.sum(0.0) / result.size).to_i
       end
 
-      def processed_image
-        return unless File.exist?(persisted_path)
-        @processed_image ||= Vips::Image.new_from_file(persisted_path)
-      end
-
-      def persisted_path
-        @persisted_path ||= File.join(Dir.tmpdir, ["image_processed_", SecureRandom.hex, ".jpg"].join)
-      end
-
       def resize_too_small?
-        proposed_size.width < @target_width || proposed_size.height < @target_height
+        proposed_size.width < @width || proposed_size.height < @height
       end
 
       def resize_just_right?
-        proposed_size.width == @target_width && proposed_size.height == @target_height
+        proposed_size.width == @width && proposed_size.height == @height
       end
     end
   end
