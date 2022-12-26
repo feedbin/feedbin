@@ -71,9 +71,10 @@ class RemoteFilesControllerTest < ActionController::TestCase
   test "should create an icon" do
     authorize
     image_url = "http://example.com/image.jpg"
+    camo_url = RemoteFile.camo_url(image_url)
     signature, encoded_url = RemoteFile.signed_url(image_url).split("/").last(2)
 
-    stub_request_file("image.jpeg", image_url, headers: {content_type: "image/jpeg"})
+    stub_request_file("image.jpeg", camo_url, headers: {content_type: "image/jpeg"})
     stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
 
     Sidekiq::Testing.inline! do
@@ -87,7 +88,7 @@ class RemoteFilesControllerTest < ActionController::TestCase
     assert_equal(309, icon.width)
     assert_equal(400, icon.height)
 
-    assert_requested :get, image_url
+    assert_requested :get, camo_url
   end
 
   private

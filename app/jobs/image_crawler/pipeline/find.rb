@@ -4,9 +4,9 @@ module ImageCrawler
       include Sidekiq::Worker
       sidekiq_options queue: :crawl_images, retry: false
 
-      def perform(id, preset_name, image_urls, entry_url = nil)
+      def perform(id, preset_name, image_urls, entry_url = nil, camo = false)
         image_urls = combine_urls(image_urls, entry_url)
-        @image = Image.new_from_hash(id:, preset_name:, image_urls:, entry_url:)
+        @image = Image.new_from_hash(id:, preset_name:, image_urls:, entry_url:, camo:)
 
         timer = Timer.new(45)
         count = 0
@@ -49,7 +49,7 @@ module ImageCrawler
         found = false
 
         download = begin
-          Download.download!(original_url, minimum_size: @image.preset.minimum_size)
+          Download.download!(original_url, camo: @image.camo, minimum_size: @image.preset.minimum_size)
         rescue => e
           Sidekiq.logger.info "Download failed: exception=#{exception.inspect} original_url=#{original_url}"
           false

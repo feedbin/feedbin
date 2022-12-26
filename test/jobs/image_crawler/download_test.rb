@@ -32,5 +32,12 @@ module ImageCrawler
       refute path == download.path
       FileUtils.rm download.path
     end
+
+    def test_should_use_camo
+      url = "http://example.com/image.jpg"
+      stub_request(:get, RemoteFile.camo_url(url)).to_return(headers: {content_type: "image/jpg"}, body: "12345678")
+      download = Download.download!(url, camo: true, minimum_size: 8)
+      assert download.valid?
+    end
   end
 end

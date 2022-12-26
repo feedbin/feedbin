@@ -89,6 +89,17 @@ module ImageCrawler
         assert_requested :get, urls[1]
         assert_requested :get, urls[2]
       end
+
+      def test_should_use_camo
+        image_url = "http://example.com/image.jpg"
+        camo_url = RemoteFile.camo_url(image_url)
+
+        stub_request_file("image.jpeg", camo_url, headers: {content_type: "image/jpeg"})
+
+        Find.new.perform(SecureRandom.hex, "primary", [image_url], nil, true)
+
+        assert_requested :get, camo_url
+      end
     end
   end
 end

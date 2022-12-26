@@ -34,6 +34,17 @@ class RemoteFile < ApplicationRecord
     signature == OpenSSL::HMAC.hexdigest("sha1", secret_key, data)
   end
 
+  def self.camo_url(url)
+    host = URI(ENV["CAMO_HOST"]).host
+    signature = OpenSSL::HMAC.hexdigest("sha1", secret_key, url)
+    hex_url = url.to_enum(:each_byte).map { |byte| "%02x" % byte }.join
+
+    URI::HTTPS.build(
+      host: host,
+      path: "/#{signature}/#{hex_url}"
+    ).to_s
+  end
+
   def signed_url
     self.class.signed_url(original_url)
   end

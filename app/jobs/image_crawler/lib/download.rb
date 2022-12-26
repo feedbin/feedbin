@@ -2,10 +2,11 @@ module ImageCrawler
   class Download
     attr_reader :path
 
-    def initialize(url, minimum_size: 20_000)
+    def initialize(url, camo: false, minimum_size: 20_000)
       @url = url
       @valid = false
       @minimum_size = minimum_size
+      @camo = camo
     end
 
     def self.download!(url, **args)
@@ -20,6 +21,7 @@ module ImageCrawler
     end
 
     def download_file(url)
+      url = @camo ? RemoteFile.camo_url(url) : url
       @file = Down.download(url, max_size: 10 * 1024 * 1024, timeout_options: {read_timeout: 20, write_timeout: 5, connect_timeout: 5})
       @path = @file.path
     end
