@@ -50,7 +50,7 @@ module ImageCrawler
 
         download = begin
           Download.download!(original_url, camo: @image.camo, minimum_size: @image.preset.minimum_size)
-        rescue => e
+        rescue => exception
           Sidekiq.logger.info "Download failed: exception=#{exception.inspect} original_url=#{original_url}"
           false
         end
