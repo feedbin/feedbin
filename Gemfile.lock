@@ -244,6 +244,7 @@ GEM
       addressable
     dante (0.2.0)
     date (3.3.3)
+    debug (1.7.1)
     debug_inspector (1.1.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
@@ -640,6 +641,7 @@ DEPENDENCIES
   clockwork
   coffee-rails
   connection_pool
+  debug
   dotenv-rails
   down!
   evernote_oauth
