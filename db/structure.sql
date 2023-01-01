@@ -491,7 +491,8 @@ CREATE TABLE public.entries (
     fingerprint uuid,
     guid uuid,
     provider bigint,
-    provider_id text
+    provider_id text,
+    provider_parent_id text
 );
 
 
@@ -3071,6 +3072,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221215200606'),
 ('20221219141006'),
 ('20221220140655'),
-('20221222204921');
+('20221222204921'),
+('20230101160218');
 
 

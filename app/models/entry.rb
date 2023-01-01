@@ -314,7 +314,7 @@ class Entry < ApplicationRecord
       self.provider = self.class.providers[:youtube]
       self.provider_id = data["youtube_video_id"]
       if embed = Embed.youtube_video.find_by_provider_id(self.provider_id)
-        data["youtube_channel_id"] = embed.parent_id
+        self.provider_parent_id = embed.parent_id
       end
     end
   end
