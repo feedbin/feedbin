@@ -65,7 +65,7 @@ class HarvestEmbeds
     channel_ids = Embed.youtube_video.where(provider_id: ids).pluck(:parent_id)
     channels = Embed.youtube_channel.where(provider_id: channel_ids).distinct
     channels.each do |channel|
-      if feed = Feed.find_by_feed_url("https://www.youtube.com/feeds/videos.xml?channel_id=#{channel.provider_id}")
+      if feed = Feed.where(feed_url: ["https://www.youtube.com/feeds/videos.xml?channel_id=#{channel.provider_id}", "http://www.youtube.com/feeds/videos.xml?channel_id=#{channel.provider_id}"])
         feed.update(custom_icon: channel.data.safe_dig("snippet", "thumbnails", "default", "url"))
       end
     end
