@@ -81,7 +81,8 @@ group :development, :test do
   gem "stripe-ruby-mock", github: "feedbin/stripe-ruby-mock", branch: "feedbin", require: "stripe_mock"
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]
   gem "capybara", github: "teamcapybara/capybara"
-  gem "debug"
+  # Debug currently breaks github actions: https://github.com/ruby/debug/issues/852
+  # gem "debug", ">= 1.0.0"
   gem "faker"
   gem "minitest"
   gem "minitest-stub-const"

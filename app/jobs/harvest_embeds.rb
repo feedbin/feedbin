@@ -74,9 +74,8 @@ class HarvestEmbeds
   def update_entry_channels(ids)
     channel_map = Embed.youtube_video.where(provider_id: ids).pluck(:provider_id, :parent_id).to_h
     Entry.provider_youtube.where(provider_id: ids).each do |entry|
-      if channel = channel_map[entry.provider_id]
-        entry.data["youtube_channel_id"] = channel
-        entry.save
+      if channel_id = channel_map[entry.provider_id]
+        entry.update(provider_parent_id: channel_id)
       end
     end
   end
