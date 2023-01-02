@@ -14,13 +14,13 @@ module FaviconCrawler
       body = <<-eot
       <html>
           <head>
-              <link rel="icon" href="#{@icon_url.path}">
+              <link rel="icon" href="icon">
+              <link rel="Shortcut Icon" href="shortcut-icon">
+              <link rel="apple-touch-icon" href="apple-touch-icon">
+              <link rel="apple-touch-icon-precomposed" href="apple-touch-icon-precomposed">
           </head>
       </html>
       eot
-
-      stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-      stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
 
       stub_request(:get, @page_url)
         .to_return(body: body, status: 200)
@@ -29,71 +29,15 @@ module FaviconCrawler
 
       Build.new.perform(@page_url.host)
 
-      assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
-    end
+      image = ImageCrawler::Image.new(ImageCrawler::Pipeline::Find.jobs.first["args"].first)
+      assert_equal(@page_url.host, image.favicon_host)
+      assert_equal("favicon", image.icon_provider)
+      assert_equal(["http://example.com/icon", "http://example.com/shortcut-icon", "http://example.com/favicon.ico"], image.image_urls)
 
-    # test "should get favicon from shortcut icon link" do
-    #   body = <<-eot
-    #   <html>
-    #       <head>
-    #           <link rel="shortcut icon" href="#{@icon_url}">
-    #       </head>
-    #   </html>
-    #   eot
-    #
-    #   stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-    #   stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-    #
-    #   stub_request(:get, @page_url)
-    #     .to_return(body: body, status: 200)
-    #
-    #   stub_request_file("favicon.ico", @icon_url)
-    #
-    #   Finder.new.perform(@page_url.host)
-    #
-    #   assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
-    # end
-    #
-    # test "should get favicon from default location" do
-    #   body = <<-eot
-    #   <html>
-    #       <head>
-    #       </head>
-    #   </html>
-    #   eot
-    #
-    #   stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-    #   stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-    #
-    #   stub_request(:get, @page_url)
-    #     .to_return(body: body, status: 200)
-    #
-    #   stub_request_file("favicon.ico", @default_url)
-    #
-    #   Finder.new.perform(@page_url.host)
-    #
-    #   assert_not_nil Favicon.unscoped.where(host: @page_url.host).take!.favicon
-    # end
-    #
-    # test "should skip blank favicon" do
-    #   body = <<-eot
-    #   <html>
-    #       <head>
-    #       </head>
-    #   </html>
-    #   eot
-    #
-    #   stub_request(:any, "https://s3.amazonaws.com/public-favicons/c7a9/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-    #   stub_request(:any, "https://s3.amazonaws.com/c7a/c7a91374735634df325fbcfda3f4119278d36fc2.png")
-    #
-    #   stub_request(:get, @page_url)
-    #     .to_return(body: body, status: 200)
-    #
-    #   stub_request_file("favicon-blank.ico", @default_url)
-    #
-    #   Finder.new.perform(@page_url.host)
-    #
-    #   assert_nil Favicon.unscoped.where(host: @page_url.host).take
-    # end
+      image = ImageCrawler::Image.new(ImageCrawler::Pipeline::Find.jobs.last["args"].first)
+      assert_equal(@page_url.host, image.favicon_host)
+      assert_equal("touch_icon", image.icon_provider)
+      assert_equal(["http://example.com/apple-touch-icon", "http://example.com/apple-touch-icon"], image.image_urls)
+    end
   end
 end

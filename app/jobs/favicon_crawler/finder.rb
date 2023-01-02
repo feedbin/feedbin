@@ -4,6 +4,8 @@ module FaviconCrawler
     sidekiq_options retry: false
 
     def perform(host, force = false)
+      Build.perform_async(host, force)
+      return
       @favicon = Favicon.unscoped.where(host: host).first_or_initialize
       @force = force
       update if should_update?

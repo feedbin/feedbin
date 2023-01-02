@@ -76,9 +76,11 @@ module ImageCrawler
 
         return unless layer.present?
 
+        smallest = [layer.width, layer.height, @width, @height].min
+
         image = ImageProcessing::Vips
           .source(layer)
-          .resize_to_fit(@width, @height)
+          .resize_to_fill(smallest, smallest)
           .saver(strip: true)
           .convert("png")
 
@@ -182,6 +184,21 @@ module ImageCrawler
           .uniq       { _1.size }
           .sort_by    { _1.size.first * -1 }
           .find       { !INVALID_COLORS.include?(color(_1)) }
+      end
+
+      def color(source)
+        hex = nil
+        file = ImageProcessing::Vips
+          .source(source)
+          .resize_to_fill(1, 1, sharpen: false)
+          .custom { |image|
+            image.tap do |data|
+              hex = data.getpoint(0, 0).map { "%02x" % _1 }.join
+            end
+          }
+          .call
+        file.unlink
+        hex
       end
     end
   end

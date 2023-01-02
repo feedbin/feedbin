@@ -77,7 +77,7 @@ module ImageCrawler
         bucket: RemoteFile::BUCKET,
         region: RemoteFile::REGION,
         validate: false,
-        job_class: Favicon::Receive,
+        job_class: FaviconCrawler::Receive,
         job_args: :image
       }
     }

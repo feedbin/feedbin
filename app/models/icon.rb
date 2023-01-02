@@ -3,7 +3,9 @@ class Icon < ApplicationRecord
   after_commit :cache_file, on: [:create, :update]
 
   def cache_file
-    ImageCrawler::CacheRemoteFile.schedule(url) if url_previously_changed?
+    return if provider_favicon? || provider_touch_icon?
+    return unless url_previously_changed?
+    ImageCrawler::CacheRemoteFile.schedule(url)
   end
 
   def signed_url

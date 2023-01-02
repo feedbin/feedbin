@@ -17,13 +17,15 @@ module ImageCrawler
 
     def perform(url, image)
       fingerprint = url.split("-").first
-      RemoteFile.create!(
+      update = {
         fingerprint: fingerprint,
         original_url: image["original_url"],
         storage_url: image["processed_url"],
         width: image["width"],
         height: image["height"],
-      )
+      }
+      file = RemoteFile.create_with(update).find_or_create_by(fingerprint: fingerprint)
+      file.update(update)
     end
   end
 end

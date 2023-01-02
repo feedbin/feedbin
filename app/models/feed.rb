@@ -15,9 +15,9 @@ class Feed < ApplicationRecord
   has_one :favicon, foreign_key: "host", primary_key: "host"
   has_one :newsletter_sender
 
-  before_create :provider_metadata
 
   before_create :set_host
+  before_create :provider_metadata
   before_save :set_hubs
   after_create :refresh_favicon
 
@@ -156,8 +156,8 @@ class Feed < ApplicationRecord
   end
 
   def set_host
-    Addressable::URI.heuristic_parse(site_url).host
-  rescue Exception
+    self.host = Addressable::URI.heuristic_parse(site_url)&.host || Addressable::URI.heuristic_parse(feed_url)&.host
+  rescue
     Rails.logger.info { "Failed to set host for feed: %s" % site_url }
   end
 
@@ -284,12 +284,16 @@ class Feed < ApplicationRecord
 
   def provider_metadata
     if twitter_user?
-      self.provider = self.class.providers[:twitter]
-      self.provider_id = twitter_user.screen_name
+      self.provider           = self.class.providers[:twitter]
+      self.provider_id        = twitter_user.screen_name
       self.provider_parent_id = self.provider_id
     elsif youtube_channel?
-      self.provider = self.class.providers[:youtube]
-      self.provider_id = youtube_channel_id
+      self.provider           = self.class.providers[:youtube]
+      self.provider_id        = youtube_channel_id
+      self.provider_parent_id = self.provider_id
+    else
+      self.provider           = self.class.providers[:favicon]
+      self.provider_id        = host
       self.provider_parent_id = self.provider_id
     end
   end
