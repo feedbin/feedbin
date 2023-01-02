@@ -4,6 +4,7 @@ module ImageCrawler
       CASCADE = Rails.root.join("lib/cascade/facefinder")
       PIGO = ENV["PIGO_PATH"] || `which pigo`.chomp
       PIGO_INSTALLED = File.executable?(PIGO)
+      INVALID_COLORS = ["00000000", "ffffffff", nil]
       puts "Pigo missing. Add it to your path or set ENV['PIGO_PATH']. From https://github.com/esimov/pigo" unless PIGO_INSTALLED
 
       attr_reader :path
@@ -22,6 +23,16 @@ module ImageCrawler
 
       def source
         @source ||= Vips::Image.new_from_file(@file)
+      end
+
+      def load_layer(page)
+        begin
+          Vips::Image.new_from_file(@file, page: page)
+        rescue Vips::Error
+          Vips::Image.new_from_file(@file)
+        end
+      rescue Vips::Error
+        nil
       end
 
       def size
@@ -58,6 +69,20 @@ module ImageCrawler
           return Processed.from_file(@file, @extension)
         end
         result
+      end
+
+      def favicon_crop
+        layer = best_layer
+
+        return unless layer.present?
+
+        image = ImageProcessing::Vips
+          .source(layer)
+          .resize_to_fit(@width, @height)
+          .saver(strip: true)
+          .convert("png")
+
+        Processed.from_pipeline(image)
       end
 
       def fill_crop
@@ -149,6 +174,14 @@ module ImageCrawler
 
       def resize_just_right?
         proposed_size.width == @width && proposed_size.height == @height
+      end
+
+      def best_layer
+        (0..4)
+          .filter_map { load_layer(_1) }
+          .uniq       { _1.size }
+          .sort_by    { _1.size.first * -1 }
+          .find       { !INVALID_COLORS.include?(color(_1)) }
       end
     end
   end

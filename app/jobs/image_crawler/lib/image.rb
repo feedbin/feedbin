@@ -3,7 +3,8 @@ module ImageCrawler
     ATTRIBUTES = %i[id preset_name image_urls entry_url download_path
                     original_extension original_url final_url
                     storage_url processed_path processed_extension
-                    width height placeholder_color camo]
+                    width height placeholder_color camo favicon_host
+                    icon_provider]
 
 
     attr_accessor *ATTRIBUTES
@@ -68,6 +69,17 @@ module ImageCrawler
         region: RemoteFile::REGION,
         validate: false,
         job_class: CacheRemoteFile
+      },
+      favicon: {
+        width: 180,
+        height: 180,
+        minimum_size: nil,
+        crop: :favicon_crop,
+        bucket: RemoteFile::BUCKET,
+        region: RemoteFile::REGION,
+        validate: false,
+        job_class: Favicon::Receive,
+        job_args: :image
       }
     }
 
@@ -99,13 +111,17 @@ module ImageCrawler
     end
 
     def send_to_feedbin
-      preset.job_class.perform_async(id, {
-        "original_url"      => final_url,
-        "processed_url"     => storage_url,
-        "width"             => width,
-        "height"            => height,
-        "placeholder_color" => placeholder_color
-      })
+      if preset.job_args == :image
+        preset.job_class.perform_async(to_h)
+      else
+        preset.job_class.perform_async(id, {
+          "original_url"      => final_url,
+          "processed_url"     => storage_url,
+          "width"             => width,
+          "height"            => height,
+          "placeholder_color" => placeholder_color
+        })
+      end
     end
 
     def image_name
