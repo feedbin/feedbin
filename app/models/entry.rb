@@ -1,11 +1,11 @@
 class Entry < ApplicationRecord
   include Searchable
+  include Iconable
 
   attr_accessor :fully_qualified_url, :read, :starred, :skip_mark_as_unread, :skip_recent_post_check
 
   store :settings, accessors: [:archived_images, :media_image, :newsletter, :newsletter_from, :embed_duration], coder: JSON
 
-  enum provider: [:twitter, :youtube], _prefix: true
 
   belongs_to :feed
   has_many :unread_entries, dependent: :delete_all
@@ -305,11 +305,12 @@ class Entry < ApplicationRecord
   private
 
   def provider_metadata
-    if tweet? && tweet.main_tweet
+    if tweet?
       self.url = tweet.main_tweet.uri.to_s
       self.main_tweet_id = tweet.main_tweet.id
       self.provider = self.class.providers[:twitter]
-      self.provider_id = tweet.main_tweet.id
+      self.provider_id = tweet.main_tweet.user.screen_name
+      self.provider_parent_id = self.provider_id
     elsif youtube?
       self.provider = self.class.providers[:youtube]
       self.provider_id = data["youtube_video_id"]

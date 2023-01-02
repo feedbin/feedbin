@@ -606,7 +606,10 @@ CREATE TABLE public.feeds (
     settings jsonb,
     standalone_request_at timestamp(6) without time zone,
     last_change_check timestamp(6) without time zone,
-    crawl_data jsonb
+    crawl_data jsonb,
+    provider bigint,
+    provider_id text,
+    provider_parent_id text
 );
 
 
@@ -627,6 +630,39 @@ CREATE SEQUENCE public.feeds_id_seq
 --
 
 ALTER SEQUENCE public.feeds_id_seq OWNED BY public.feeds.id;
+
+
+--
+-- Name: icons; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.icons (
+    id bigint NOT NULL,
+    provider bigint NOT NULL,
+    provider_id text NOT NULL,
+    url text NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: icons_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.icons_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: icons_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.icons_id_seq OWNED BY public.icons.id;
 
 
 --
@@ -1579,6 +1615,13 @@ ALTER TABLE ONLY public.feeds ALTER COLUMN id SET DEFAULT nextval('public.feeds_
 
 
 --
+-- Name: icons id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.icons ALTER COLUMN id SET DEFAULT nextval('public.icons_id_seq'::regclass);
+
+
+--
 -- Name: import_items id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1872,6 +1915,14 @@ ALTER TABLE ONLY public.feed_stats
 
 ALTER TABLE ONLY public.feeds
     ADD CONSTRAINT feeds_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: icons icons_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.icons
+    ADD CONSTRAINT icons_pkey PRIMARY KEY (id);
 
 
 --
@@ -2309,6 +2360,13 @@ CREATE INDEX index_feeds_on_push_expiration ON public.feeds USING btree (push_ex
 --
 
 CREATE INDEX index_feeds_on_standalone_request_at ON public.feeds USING btree (standalone_request_at DESC) WHERE (standalone_request_at IS NOT NULL);
+
+
+--
+-- Name: index_icons_on_provider_id_and_provider; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_icons_on_provider_id_and_provider ON public.icons USING btree (provider_id, provider);
 
 
 --
@@ -3073,6 +3131,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221219141006'),
 ('20221220140655'),
 ('20221222204921'),
-('20230101160218');
+('20230101160218'),
+('20230101193743'),
+('20230101230510');
 
 

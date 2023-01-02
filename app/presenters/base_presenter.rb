@@ -11,15 +11,9 @@ class BasePresenter
         content = @template.content_tag :span, "", class: "favicon-wrap collection-favicon" do
           @template.svg_tag("favicon-newsletter", size: "16x16")
         end
-      elsif feed.twitter_user?
-        content = @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image" do
-          url = RemoteFile.signed_url(feed.twitter_user.profile_image_uri_https(:original))
-          fallback = @template.image_url("favicon-profile-default.png")
-          @template.image_tag_with_fallback(fallback, url, alt: "")
-        end
       elsif feed.icon
         content = @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image icon-format-#{feed.custom_icon_format || feed.default_icon_format}" do
-          url = RemoteFile.signed_url(feed.icon)
+          url = feed.icon
           fallback = @template.image_url("favicon-profile-default.png")
           @template.image_tag_with_fallback(fallback, url, alt: "")
         end

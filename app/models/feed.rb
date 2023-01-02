@@ -1,4 +1,6 @@
 class Feed < ApplicationRecord
+  include Iconable
+
   has_many :subscriptions
   has_many :podcast_subscriptions
   has_many :entries
@@ -13,12 +15,15 @@ class Feed < ApplicationRecord
   has_one :favicon, foreign_key: "host", primary_key: "host"
   has_one :newsletter_sender
 
+  before_create :provider_metadata
+
   before_create :set_host
   before_save :set_hubs
   after_create :refresh_favicon
 
   after_commit :web_sub_subscribe, on: :create
   after_commit :update_youtube_videos, on: :create
+
 
   attribute :crawl_data, CrawlDataType.new
   attr_accessor :count, :tags
@@ -29,6 +34,10 @@ class Feed < ApplicationRecord
   enum feed_type: {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3, pages: 4}
 
   store :settings, accessors: [:custom_icon, :current_feed_url, :custom_icon_format], coder: JsonConverter
+
+  def youtube_channel?
+    youtube_channel_id.present?
+  end
 
   def twitter_user?
     twitter_user.present?
@@ -68,25 +77,45 @@ class Feed < ApplicationRecord
     taggings
   end
 
-  def icons
-    {
-      custom_icon                                       => "round",
-      options.safe_dig("image", "url")                  => "square",
-      options.safe_dig("json_feed", "icon")             => "square",
-      options.safe_dig("json_feed", "author", "avatar") => "round",
-    }
+  def icon
+    if twitter_user?
+      icons.to_a.find { _1.provider_twitter? }&.signed_url
+    elsif youtube_channel?
+      icons.to_a.find { _1.provider_youtube? }&.signed_url
+    elsif source = source_icon
+      RemoteFile.signed_url(source)
+    else
+      icons.to_a.find { _1.provider_favicon? }&.signed_url
+    end
   end
 
-  def icon
-    base = icons.keys.find { !_1.nil? }
+  def source_icon
+    base = source_icons.keys.find { !_1.nil? }
     return nil if base.nil?
     feed_relative_url(base)
   end
 
   def default_icon_format
-    base = icons.keys.find { !_1.nil? }
-    return nil if base.nil?
-    icons[base]
+    if twitter_user?
+      "round"
+    elsif youtube_channel?
+      "round"
+    elsif source = source_icon
+      base = source_icons.keys.find { !_1.nil? }
+      return nil if base.nil?
+      source_icons[base]
+    else
+      "square"
+    end
+  end
+
+  def source_icons
+    {
+      options.safe_dig("itunes_image")                  => "square",
+      options.safe_dig("image", "url")                  => "square",
+      options.safe_dig("json_feed", "icon")             => "square",
+      options.safe_dig("json_feed", "author", "avatar") => "round",
+    }
   end
 
   def self.create_from_parsed_feed(parsed_feed)
@@ -127,7 +156,7 @@ class Feed < ApplicationRecord
   end
 
   def set_host
-    self.host = URI.parse(site_url).host
+    Addressable::URI.heuristic_parse(site_url).host
   rescue Exception
     Rails.logger.info { "Failed to set host for feed: %s" % site_url }
   end
@@ -196,7 +225,7 @@ class Feed < ApplicationRecord
   end
 
   def self_url
-    if youtube_channel_id
+    if youtube_channel?
       "https://www.youtube.com/xml/feeds/videos.xml?channel_id=#{youtube_channel_id}"
     else
       self[:self_url]
@@ -204,7 +233,7 @@ class Feed < ApplicationRecord
   end
 
   def known_hubs
-    if youtube_channel_id
+    if youtube_channel?
       ["https://pubsubhubbub.appspot.com"]
     end
   end
@@ -252,6 +281,18 @@ class Feed < ApplicationRecord
   end
 
   private
+
+  def provider_metadata
+    if twitter_user?
+      self.provider = self.class.providers[:twitter]
+      self.provider_id = twitter_user.screen_name
+      self.provider_parent_id = self.provider_id
+    elsif youtube_channel?
+      self.provider = self.class.providers[:youtube]
+      self.provider_id = youtube_channel_id
+      self.provider_parent_id = self.provider_id
+    end
+  end
 
   def update_youtube_videos
     if youtube_channel_id
