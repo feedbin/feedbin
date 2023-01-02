@@ -7,7 +7,7 @@ module ImageCrawler
       sidekiq_options queue: local_queue("crawl"), retry: false
 
       def perform(image_hash)
-        @image = Image.new_from_hash(image_hash)
+        @image = Image.new(image_hash)
         @image.storage_url = upload
         @image.send_to_feedbin
 

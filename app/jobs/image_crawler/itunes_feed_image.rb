@@ -20,7 +20,13 @@ module ImageCrawler
       if url = @feed.options&.safe_dig("itunes_image")
         name = Digest::SHA1.hexdigest(url)
         url = @feed.site_relative_url(url)
-        Pipeline::Find.perform_async("#{@feed.id}-#{name}-itunes", "podcast_feed", [url])
+
+        image = Image.new({
+          id: "#{@feed.id}-#{name}-itunes",
+          preset_name: "podcast_feed",
+          image_urls: [url]
+        })
+        Pipeline::Find.perform_async(image.to_h)
       end
     end
 

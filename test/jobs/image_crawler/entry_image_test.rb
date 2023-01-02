@@ -36,13 +36,15 @@ module ImageCrawler
 
       EntryImage.new.perform(entry.public_id)
 
-      extracted_urls = Pipeline::Find.jobs.first["args"][2]
+      image = Image.new(Pipeline::Find.jobs.first["args"].first)
+      extracted_urls = image.image_urls
+
       assert extracted_urls.include?("http://example.com/iframe")
       assert extracted_urls.include?("http://example.com/img")
       assert extracted_urls.include?("http://example.com/video")
 
-      assert_equal(entry.public_id, Pipeline::Find.jobs.first["args"].first)
-      assert_equal(entry.fully_qualified_url, Pipeline::Find.jobs.first["args"].last)
+      assert_equal(entry.public_id, image.id)
+      assert_equal(entry.fully_qualified_url, image.entry_url)
     end
 
     test "should enqueue Find with youtube url" do
@@ -50,14 +52,16 @@ module ImageCrawler
       @entry.reload
       EntryImage.new.perform(@entry.public_id)
 
-      extracted_urls = Pipeline::Find.jobs.first["args"][2]
+      image = Image.new(Pipeline::Find.jobs.first["args"].first)
+      extracted_urls = image.image_urls
       assert_equal([@entry.url], extracted_urls)
     end
 
     test "should enqueue Find with tweet url" do
       entry = create_tweet_entry(Feed.first, "two")
       EntryImage.new.perform(entry.public_id)
-      extracted_urls = Pipeline::Find.jobs.first["args"][2]
+      image = Image.new(Pipeline::Find.jobs.first["args"].first)
+      extracted_urls = image.image_urls
       assert_equal(["https://pbs.twimg.com/media/EwDoQHMVIAAGbaP.jpg"], extracted_urls)
     end
 

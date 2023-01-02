@@ -4,9 +4,9 @@ module ImageCrawler
       include Sidekiq::Worker
       sidekiq_options queue: :crawl_images, retry: false
 
-      def perform(id, preset_name, image_urls, entry_url = nil, camo = false)
-        image_urls = combine_urls(image_urls, entry_url)
-        @image = Image.new_from_hash(id:, preset_name:, image_urls:, entry_url:, camo:)
+      def perform(image_hash)
+        @image = Image.new(image_hash)
+        @image.image_urls = combine_urls(@image.image_urls, @image.entry_url)
 
         timer = Timer.new(45)
         count = 0
@@ -87,7 +87,7 @@ module ImageCrawler
         end
 
         page_urls ||= []
-        page_urls.concat(image_urls)
+        page_urls.concat(image_urls || [])
       end
     end
   end

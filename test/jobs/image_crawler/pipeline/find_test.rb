@@ -13,11 +13,13 @@ module ImageCrawler
         stub_request_file("image.jpeg", image_url, headers: {content_type: "image/jpeg"})
         stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
 
+        image = Image.new(id: SecureRandom.hex, preset_name: "primary", image_urls: [original_url])
         Sidekiq::Testing.inline! do
-          Find.perform_async(SecureRandom.hex, "primary", [original_url])
+          Find.perform_async(image.to_h)
         end
 
-        Find.new.perform(SecureRandom.hex, "primary", [original_url])
+        Find.new.perform(image.to_h)
+
         assert_equal(image_url, EntryImage.jobs.first["args"][1]["original_url"])
       end
 
@@ -34,15 +36,17 @@ module ImageCrawler
 
         stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
 
+        image = Image.new(id: SecureRandom.hex, preset_name: "primary", image_urls: urls, entry_url: page_url)
         Sidekiq::Testing.inline! do
-          Find.perform_async(SecureRandom.hex, "primary", urls, page_url)
+          Find.perform_async(image.to_h)
         end
 
         assert_requested :get, "http://example.com/image/og_image.jpg"
         assert_requested :get, "http://example.com/image/twitter_image.jpg"
 
         assert_equal 0, EntryImage.jobs.size
-        Find.new.perform(SecureRandom.hex, "primary", urls, nil)
+        image = Image.new(id: SecureRandom.hex, preset_name: "primary", image_urls: urls)
+        Find.new.perform(image.to_h)
         assert_equal 1, EntryImage.jobs.size
       end
 
@@ -52,11 +56,14 @@ module ImageCrawler
 
         stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
         id = SecureRandom.hex
+
+        image = Image.new(id: id, preset_name: "primary", image_urls: [image_url], entry_url: "https://www.youtube.com/watch?v=id")
+
         assert_difference -> { Process.jobs.size }, +1 do
-          Find.new.perform(id, "primary", [image_url], "https://www.youtube.com/watch?v=id")
+          Find.new.perform(image.to_h)
         end
 
-        image = Image.new_from_hash(Process.jobs.first["args"][0])
+        image = Image.new(Process.jobs.first["args"][0])
 
         assert image.download_path
         assert_equal "https://www.youtube.com/watch?v=id", image.entry_url
@@ -81,8 +88,9 @@ module ImageCrawler
           stub_request(:get, url).to_return(headers: {content_type: "image/jpg"}, body: ("lorem " * 3_500))
         end
 
+        image = Image.new(id: SecureRandom.hex, preset_name: "primary", image_urls: urls)
         Sidekiq::Testing.inline! do
-          Find.perform_async(SecureRandom.hex, "primary", urls, nil)
+          Find.perform_async(image.to_h)
         end
 
         assert_requested :get, urls[0]
@@ -96,7 +104,8 @@ module ImageCrawler
 
         stub_request_file("image.jpeg", camo_url, headers: {content_type: "image/jpeg"})
 
-        Find.new.perform(SecureRandom.hex, "primary", [image_url], nil, true)
+        image = Image.new(id: SecureRandom.hex, preset_name: "primary", image_urls: [image_url], camo: true)
+        Find.new.perform(image.to_h)
 
         assert_requested :get, camo_url
       end

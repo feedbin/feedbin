@@ -18,7 +18,12 @@ module ImageCrawler
     end
 
     def schedule
-      Pipeline::Find.perform_async("#{@entry.public_id}-twitter", "twitter", [], @page_url)
+      image = Image.new({
+        id: "#{@entry.public_id}-twitter",
+        preset_name: "twitter",
+        entry_url: @page_url
+      })
+      Pipeline::Find.perform_async(image.to_h)
     end
 
     def receive

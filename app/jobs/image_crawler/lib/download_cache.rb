@@ -11,7 +11,7 @@ module ImageCrawler
 
     def from_cache
       data = Cache.read(cache_key)
-      data.present? ? Image.new_from_hash(data) : nil
+      data.present? ? Image.new(data) : nil
     end
 
     def self.copy(*args)

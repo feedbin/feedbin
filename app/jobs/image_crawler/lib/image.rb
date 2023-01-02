@@ -71,13 +71,12 @@ module ImageCrawler
       }
     }
 
-    def self.new_from_hash(data = {})
-      new.tap do |instance|
-        data.each do |key, value|
-          setter = "#{key}=".to_sym
-          if instance.respond_to?(setter)
-            instance.send(setter, value)
-          end
+    def initialize(data = {})
+      data.each do |name, value|
+        if ATTRIBUTES.include?(name.to_sym)
+          instance_variable_set("@#{name}", value)
+        else
+          raise ArgumentError.new("Unknown #{self.class.name} attribute: #{name}")
         end
       end
     end
