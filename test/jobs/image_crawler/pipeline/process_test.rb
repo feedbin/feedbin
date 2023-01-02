@@ -12,13 +12,13 @@ module ImageCrawler
         url = "http://example.com/image.jpg"
         cache_key = "cache_key"
 
-        image = Image.new_from_hash(id: id, preset_name: "primary", download_path: path, original_url: url, final_url: url, image_urls: [])
+        image = Image.new(id: id, preset_name: "primary", download_path: path, original_url: url, final_url: url, image_urls: [])
 
         assert_difference -> { Upload.jobs.size }, +1 do
           Process.new.perform(image.to_h)
         end
 
-        image = Image.new_from_hash(Upload.jobs.first["args"].first)
+        image = Image.new(Upload.jobs.first["args"].first)
 
         assert_equal(id, image.id)
         assert_equal("primary", image.preset_name)
@@ -34,13 +34,17 @@ module ImageCrawler
         url = "http://example.com/image.jpg"
         all_urls = ["http://example.com/image_2.jpg", "http://example.com/image_3.jpg"]
 
-        image = Image.new_from_hash(id: id, preset_name: "primary", download_path: path, original_url: url, final_url: url, image_urls: all_urls)
+        image = Image.new(id: id, preset_name: "primary", download_path: path, original_url: url, final_url: url, image_urls: all_urls)
 
         assert_difference -> { FindCritical.jobs.size }, +1 do
           Process.new.perform(image.to_h)
         end
 
-        assert_equal([id, "primary", all_urls], FindCritical.jobs.first["args"])
+        image = Image.new(FindCritical.jobs.first["args"].first)
+
+        assert_equal(id, image.id)
+        assert_equal("primary", image.preset_name)
+        assert_equal(all_urls, image.image_urls)
       end
     end
   end

@@ -5,7 +5,14 @@ module ImageCrawler
 
     def self.schedule(url)
       fingerprint = RemoteFile.fingerprint(url)
-      Pipeline::Find.perform_in(rand(1..10).seconds, "#{fingerprint}-icon", "icon", [url], nil, true)
+      image = Image.new({
+        id: "#{fingerprint}-icon",
+        preset_name: "icon",
+        image_urls: [url],
+        camo: true
+      })
+
+      Pipeline::Find.perform_in(rand(1..10).seconds, image.to_h)
     end
 
     def perform(url, image)

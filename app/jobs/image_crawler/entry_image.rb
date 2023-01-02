@@ -16,7 +16,7 @@ module ImageCrawler
 
     def schedule
       if job = build_job
-        Pipeline::Find.perform_async(*job)
+        Pipeline::Find.perform_async(job)
       end
     end
 
@@ -41,7 +41,12 @@ module ImageCrawler
       end
 
       if image_urls.present? || entry_url.present?
-        [@entry.public_id, preset_name, image_urls, entry_url]
+        Image.new({
+          id: @entry.public_id,
+          preset_name: preset_name,
+          image_urls: image_urls,
+          entry_url: entry_url
+        }).to_h
       end
     end
 

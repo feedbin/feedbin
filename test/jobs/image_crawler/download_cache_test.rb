@@ -17,7 +17,7 @@ module ImageCrawler
       height            = 200
       storage_url       = "http://s3.com/example/example.jpg"
       preset_name       = "primary"
-      Image.new_from_hash(id:, preset_name:, download_path:, original_url:, final_url:, processed_path:, width:, height:, placeholder_color:, storage_url:)
+      Image.new(id:, preset_name:, download_path:, original_url:, final_url:, processed_path:, width:, height:, placeholder_color:, storage_url:)
     end
 
     def test_should_save_data

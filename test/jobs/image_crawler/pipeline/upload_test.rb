@@ -18,7 +18,7 @@ module ImageCrawler
         height = 200
 
 
-        image = Image.new_from_hash(id:, preset_name: "primary", download_path:, original_url:, final_url:, processed_path:, width:, height:, placeholder_color:)
+        image = Image.new(id:, preset_name: "primary", download_path:, original_url:, final_url:, processed_path:, width:, height:, placeholder_color:)
 
         stub_request(:put, /s3\.amazonaws\.com/)
 

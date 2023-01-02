@@ -7,7 +7,7 @@ module ImageCrawler
       sidekiq_options queue: local_queue("parse"), retry: false
 
       def perform(image_hash)
-        @image = Image.new_from_hash(image_hash)
+        @image = Image.new(image_hash)
         Sidekiq.logger.info "Process: public_id=#{@image.id} final_url=#{@image.final_url}"
 
         processor = Processor::Cropper.new(@image.download_path,
@@ -28,7 +28,8 @@ module ImageCrawler
 
           Upload.perform_async(@image.to_h)
         else
-          FindCritical.perform_async(@image.id, @image.preset_name, @image.image_urls) unless @image.image_urls.empty?
+          image = Image.new(id: @image.id, preset_name: @image.preset_name, image_urls: @image.image_urls)
+          FindCritical.perform_async(image.to_h) unless @image.image_urls.empty?
         end
       ensure
         File.unlink(@image.download_path) rescue Errno::ENOENT
