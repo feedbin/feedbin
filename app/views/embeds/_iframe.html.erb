@@ -26,7 +26,7 @@
             </span>
             <% if media.profile_image %>
             <span class="embed-profile-image">
-                <%= image_tag(RemoteFile.signed_url(media.profile_image), class: "responsive", alt: "") %>
+                <%= image_tag(RemoteFile.icon_url(media.profile_image), class: "responsive", alt: "") %>
             </span>
             <% else %>
             <span class="embed-icon" href="<%= media.canonical_url %>">

@@ -1,5 +1,4 @@
 class RemoteFilesController < ApplicationController
-  skip_before_action :authorize
 
   AUTH_KEY        = ENV["FILES_AUTH_KEY"]
   AUTH_HEADER     = "X-Pull".freeze
@@ -10,40 +9,45 @@ class RemoteFilesController < ApplicationController
   SENDFILE_HEADER = Rails.application.config.action_dispatch.x_sendfile_header
 
   def icon
-    size = params[:size]
-    signature = params[:signature]
-    url = RemoteFile.decode(params[:url])
-
-    unless AUTH_KEY == request.headers[AUTH_HEADER]
-      head :not_found and return
-    end
-
-    unless RemoteFile.signature_valid?(params[:signature], url)
-      head :not_found and return
-    end
-
-    unless url.start_with?("http")
+    unless @url.start_with?("http")
       head :not_found and return
     end
 
     unless RemoteFile::BUCKET
-      redirect_to url and return
+      redirect_to @url and return
     end
 
     size = %w(32 64 128 200 400).include?(params[:size]) ? params[:size] : "400"
-    response.headers[SIZE_HEADER] = size
-    response.headers[SENDFILE_HEADER] = PROXY_PATH
-
-    proxy_url = if icon = RemoteFile.find_by(fingerprint: RemoteFile.fingerprint(url))
+    proxy_url = if icon = RemoteFile.find_by(fingerprint: RemoteFile.fingerprint(@url))
       icon.storage_url
     else
-      ImageCrawler::CacheRemoteFile.schedule(url)
+      ImageCrawler::CacheRemoteFile.schedule(@url)
       camo_url
     end
-    
+
+
+    proxy_response(proxy_url:, size:)
+  end
+
+  def favicon
+    icon = RemoteFile.find_by(fingerprint: RemoteFile.fingerprint(@url))
+
+    if icon.nil?
+      head :not_found and return
+    end
+
+    size      = %w(32 64 128 180).include?(params[:size]) ? params[:size] : "180"
+    proxy_url = icon.storage_url
+
+    proxy_response(proxy_url:, size:)
+  end
+
+  def proxy_response(proxy_url:, size:)
     parsed = URI(proxy_url)
-    response.headers[HOST_HEADER] = parsed.host
-    response.headers[URL_HEADER] = proxy_url
+    response.headers[SENDFILE_HEADER] = PROXY_PATH
+    response.headers[SIZE_HEADER]     = size
+    response.headers[HOST_HEADER]     = parsed.host
+    response.headers[URL_HEADER]      = proxy_url
 
     http_cache_forever(public: true) do
       head :ok
@@ -51,6 +55,18 @@ class RemoteFilesController < ApplicationController
   end
 
   private
+
+  def authorize
+    @url = RemoteFile.decode(params[:url])
+
+    unless AUTH_KEY == request.headers[AUTH_HEADER]
+      head :not_found and return
+    end
+
+    unless RemoteFile.signature_valid?(params[:signature], @url)
+      head :not_found and return
+    end
+  end
 
   def camo_url
     "#{ENV["CAMO_HOST"]}/#{params[:signature]}/#{params[:url]}"

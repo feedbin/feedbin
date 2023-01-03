@@ -248,6 +248,7 @@ Rails.application.routes.draw do
   resources :remote_files, path: :files, only: [] do
     collection do
       get "icons/:signature/:url", action: :icon, as: :icon
+      get "favicons/:fingerprint/:signature/:url", action: :favicon, as: :favicon
     end
   end
 

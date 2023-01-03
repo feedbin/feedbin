@@ -79,13 +79,13 @@ class Feed < ApplicationRecord
 
   def icon
     if twitter_user?
-      icons.to_a.find { _1.provider_twitter? }&.signed_url
+      icons.to_a.find { _1.provider_twitter? }&.icon_url
     elsif youtube_channel?
-      icons.to_a.find { _1.provider_youtube? }&.signed_url
+      icons.to_a.find { _1.provider_youtube? }&.icon_url
     elsif source = source_icon
-      RemoteFile.signed_url(source)
+      RemoteFile.icon_url(source)
     else
-      icons.to_a.find { _1.provider_favicon? }&.signed_url
+      icons.to_a.find { _1.provider_favicon? }&.icon_url
     end
   end
 

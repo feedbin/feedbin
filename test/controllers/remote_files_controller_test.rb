@@ -20,7 +20,7 @@ class RemoteFilesControllerTest < ActionController::TestCase
   test "should be unauthorized without http url" do
     authorize
     url = "example.com/image.jpeg"
-    signature, encoded_url = RemoteFile.signed_url(url).split("/").last(2)
+    signature, encoded_url = RemoteFile.icon_url(url).split("/").last(2)
     get :icon, params: {signature: signature, url: encoded_url}
     assert_response :not_found
   end
@@ -29,7 +29,7 @@ class RemoteFilesControllerTest < ActionController::TestCase
     RemoteFile.stub_const(:BUCKET, nil) do
       authorize
       url = "http://example.com/image.jpeg"
-      signature, encoded_url = RemoteFile.signed_url(url).split("/").last(2)
+      signature, encoded_url = RemoteFile.icon_url(url).split("/").last(2)
       get :icon, params: {signature: signature, url: encoded_url}
       assert_redirected_to url
     end
@@ -38,7 +38,7 @@ class RemoteFilesControllerTest < ActionController::TestCase
   test "should get proxy redirect" do
     authorize
     url = "http://example.com/image.jpeg"
-    signature, encoded_url = RemoteFile.signed_url(url).split("/").last(2)
+    signature, encoded_url = RemoteFile.icon_url(url).split("/").last(2)
 
     assert_difference -> { ImageCrawler::Pipeline::Find.jobs.size }, +1 do
       get :icon, params: {signature: signature, url: encoded_url}
@@ -57,7 +57,7 @@ class RemoteFilesControllerTest < ActionController::TestCase
     storage_url = "http://aws.amazonaws.com/asdf/asdfasf"
     icon = RemoteFile.create!(fingerprint: RemoteFile.fingerprint(url), original_url: url, storage_url: storage_url)
 
-    signature, encoded_url = RemoteFile.signed_url(url).split("/").last(2)
+    signature, encoded_url = RemoteFile.icon_url(url).split("/").last(2)
 
     get :icon, params: {signature: signature, url: encoded_url}
     assert_response :success
@@ -72,7 +72,7 @@ class RemoteFilesControllerTest < ActionController::TestCase
     authorize
     image_url = "http://example.com/image.jpg"
     camo_url = RemoteFile.camo_url(image_url)
-    signature, encoded_url = RemoteFile.signed_url(image_url).split("/").last(2)
+    signature, encoded_url = RemoteFile.icon_url(image_url).split("/").last(2)
 
     stub_request_file("image.jpeg", camo_url, headers: {content_type: "image/jpeg"})
     stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)

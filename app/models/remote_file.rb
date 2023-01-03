@@ -1,7 +1,7 @@
 class RemoteFile < ApplicationRecord
   BUCKET = ENV["AWS_S3_BUCKET_ICONS"]
   REGION = ENV["AWS_S3_BUCKET_ICONS_REGION"]
-  HOST = ENV["FILES_HOST"]
+  HOST = ENV["FILES_HOST"] || ENV["PUSH_URL"]
 
   store_accessor :settings, :width, :height
 
@@ -9,17 +9,23 @@ class RemoteFile < ApplicationRecord
     Digest::MD5.hexdigest(data)
   end
 
-  def self.signed_url(url)
+  def self.icon_url(url, params: {})
+    encoded = encode(url)
+    host = URI(HOST)
+    Rails.application.routes.url_helpers.icon_remote_files_url(encoded.signature, encoded.url, protocol: host.scheme, host: host.host, params: params)
+  end
+
+  def self.favicon_url(url, fingerprint, params: {})
+    encoded = encode(url)
+    host = URI(HOST)
+    Rails.application.routes.url_helpers.favicon_remote_files_url(fingerprint, encoded.signature, encoded.url, protocol: host.scheme, host: host.host, params: params)
+  end
+
+  def self.encode(url)
     url = url.to_s
     signature = OpenSSL::HMAC.hexdigest("sha1", secret_key, url)
     url = url.to_enum(:each_byte).map { |byte| "%02x" % byte }.join
-
-    if HOST
-      host = URI(HOST)
-      Rails.application.routes.url_helpers.icon_remote_files_url(signature, url, protocol: host.scheme, host: host.host)
-    else
-      Rails.application.routes.url_helpers.icon_remote_files_path(signature, url)
-    end
+    OpenStruct.new(url:, signature:)
   end
 
   def self.decode(string)
@@ -45,7 +51,7 @@ class RemoteFile < ApplicationRecord
     ).to_s
   end
 
-  def signed_url
-    self.class.signed_url(original_url)
+  def icon_url
+    self.class.icon_url(original_url)
   end
 end

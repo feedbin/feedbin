@@ -26,6 +26,7 @@ module ImageCrawler
         assert_equal(url, image.original_url)
         assert_equal(url, image.final_url)
         assert_equal(6, image.placeholder_color.length)
+        assert_equal(32, image.fingerprint.length)
       end
 
       def test_should_enqueue_find

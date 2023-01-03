@@ -17,14 +17,13 @@ module ImageCrawler
           height:    @image.preset.height
         )
 
-        if processor.valid?(@image.validate?)
-          cropped = processor.crop!
-
+        if processor.valid?(@image.validate?) && cropped = processor.crop!
           @image.processed_path      = cropped.file
           @image.width               = cropped.width
           @image.height              = cropped.height
           @image.placeholder_color   = cropped.placeholder_color
           @image.processed_extension = cropped.extension
+          @image.fingerprint         = cropped.fingerprint
 
           Upload.perform_async(@image.to_h)
         else

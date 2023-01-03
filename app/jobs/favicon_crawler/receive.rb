@@ -6,12 +6,14 @@ module FaviconCrawler
     def perform(image_hash)
       @image = ImageCrawler::Image.new(image_hash)
 
-      icon = Icon.create_with(
+      update = {
         provider_id: @image.favicon_host,
         provider: Icon.providers[@image.icon_provider],
-        url: @image.final_url,
-      ).find_or_create_by(provider_id: @image.favicon_host, provider: Icon.providers[@image.icon_provider])
-      icon.update(url: @image.final_url)
+        fingerprint: @image.fingerprint,
+        url: @image.final_url
+      }
+      icon = Icon.create_with(update).find_or_create_by(provider_id: @image.favicon_host, provider: Icon.providers[@image.icon_provider])
+      icon.update(update)
 
       fingerprint = RemoteFile.fingerprint(@image.final_url)
       update = {

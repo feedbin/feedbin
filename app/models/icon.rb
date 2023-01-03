@@ -8,7 +8,11 @@ class Icon < ApplicationRecord
     ImageCrawler::CacheRemoteFile.schedule(url)
   end
 
-  def signed_url
-    RemoteFile.signed_url(url)
+  def icon_url
+    if provider_favicon? || provider_touch_icon?
+      RemoteFile.favicon_url(url, fingerprint, params: {size: 32})
+    else
+      RemoteFile.icon_url(url, params: {size: 32})
+    end
   end
 end

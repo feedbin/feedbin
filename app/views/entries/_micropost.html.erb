@@ -4,7 +4,7 @@
       <div class="profile-wrap">
         <div class="profile-image-wrap">
           <%= link_to micropost.micropost.author_url, target: "_blank", title: "Author’s Website", class: "profile-image" do %>
-            <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), RemoteFile.signed_url(micropost.micropost.author_avatar), size: "47x47", alt: "") %>
+            <%= image_tag_with_fallback(image_url("favicon-profile-default.png"), RemoteFile.icon_url(micropost.micropost.author_avatar), size: "47x47", alt: "") %>
           <% end %>
         </div>
         <div class="profile-info">

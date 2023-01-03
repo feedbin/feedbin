@@ -68,6 +68,8 @@ class HarvestEmbeds
       if feed = Feed.where(feed_url: ["https://www.youtube.com/feeds/videos.xml?channel_id=#{channel.provider_id}", "http://www.youtube.com/feeds/videos.xml?channel_id=#{channel.provider_id}"])
         feed.update(custom_icon: channel.data.safe_dig("snippet", "thumbnails", "default", "url"))
       end
+      # make sure callbacks run
+      channel.touch
     end
   end
 

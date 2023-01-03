@@ -17,17 +17,45 @@ module ImageCrawler
         assert_equal(462, image.average_face_position("y", File.new(file)))
       end
 
-      def test_should_crop
+      def test_should_smart_crop
         file = copy_support_file("image.jpeg")
         cropper = Processor::Cropper.new(file, crop: :smart_crop, extension: "jpeg", width: 542, height: 304)
         image = cropper.crop!
         assert_equal(542, image.width)
         assert_equal(304, image.height)
         assert image.file.include?(".jpg")
+
+        fingerprint1 = Digest::SHA1.hexdigest(File.read(image.file))
+
         FileUtils.rm image.file
       end
 
-      def test_should_crop
+      def test_should_favicon_crop
+        file = copy_support_file("favicon.ico")
+        cropper = Processor::Cropper.new(file, crop: :favicon_crop, extension: "ico", width: 180, height: 180)
+        image = cropper.crop!
+        assert_equal(32, image.width)
+        assert_equal(32, image.height)
+        assert image.file.include?(".png")
+        fingerprint1 = image.fingerprint
+
+        file = copy_support_file("favicon.ico")
+        cropper = Processor::Cropper.new(file, crop: :favicon_crop, extension: "ico", width: 180, height: 180)
+        image = cropper.crop!
+        fingerprint2 = image.fingerprint
+
+        assert_equal(fingerprint1, fingerprint1)
+      end
+
+      def test_should_skip_blank_favicon
+        file = copy_support_file("favicon-blank.ico")
+        cropper = Processor::Cropper.new(file, crop: :favicon_crop, extension: "ico", width: 180, height: 180)
+        image = cropper.crop!
+
+        assert_nil(image)
+      end
+
+      def test_should_limit_crop
         file = copy_support_file("image.jpeg")
         cropper = Processor::Cropper.new(file, crop: :limit_crop, extension: "jpeg", width: 400, height: 400)
         image = cropper.crop!

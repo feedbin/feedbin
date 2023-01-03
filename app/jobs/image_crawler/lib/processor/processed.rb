@@ -42,6 +42,10 @@ module ImageCrawler
         source.height
       end
 
+      def fingerprint
+        Digest::MD5.hexdigest(File.read(@file))
+      end
+
       def placeholder_color
         hex = nil
         file = ImageProcessing::Vips
@@ -49,7 +53,7 @@ module ImageCrawler
           .resize_to_fill(1, 1, sharpen: false)
           .custom { |image|
             image.tap do |data|
-              hex = data.getpoint(0, 0).map { |value| "%02x" % value }.first(3).join
+              hex = data.getpoint(0, 0).map { "%02x" % _1 }.first(3).join
             end
           }.call
         file.unlink

@@ -75,7 +75,7 @@ class ArticleTest < ApplicationSystemTestCase
     sleep 1
     wait_for_ajax
 
-    url = RemoteFile.signed_url("https://pbs.twimg.com/profile_images/659486593649012736/-TGFT8rs.png")
+    url = RemoteFile.icon_url("https://pbs.twimg.com/profile_images/659486593649012736/-TGFT8rs.png")
 
     assert_selector ".profile-image img[src='#{url}']"
     assert_selector ".tweet-body", text: "iOS 14 will let you"

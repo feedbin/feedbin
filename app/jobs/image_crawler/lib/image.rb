@@ -3,7 +3,8 @@ module ImageCrawler
     ATTRIBUTES = %i[id preset_name image_urls entry_url camo favicon_host
                     icon_provider download_path original_extension
                     original_url final_url storage_url processed_path
-                    processed_extension width height placeholder_color ]
+                    processed_extension width height placeholder_color 
+                    fingerprint]
 
 
     attr_accessor *ATTRIBUTES

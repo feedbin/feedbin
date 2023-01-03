@@ -4,7 +4,7 @@ module ImageCrawler
       CASCADE = Rails.root.join("lib/cascade/facefinder")
       PIGO = ENV["PIGO_PATH"] || `which pigo`.chomp
       PIGO_INSTALLED = File.executable?(PIGO)
-      INVALID_COLORS = ["00000000", "ffffffff", nil]
+      INVALID_COLORS = ["000000", "ffffff", nil]
       puts "Pigo missing. Add it to your path or set ENV['PIGO_PATH']. From https://github.com/esimov/pigo" unless PIGO_INSTALLED
 
       attr_reader :path
@@ -193,7 +193,7 @@ module ImageCrawler
           .resize_to_fill(1, 1, sharpen: false)
           .custom { |image|
             image.tap do |data|
-              hex = data.getpoint(0, 0).map { "%02x" % _1 }.join
+              hex = data.getpoint(0, 0).map { "%02x" % _1 }.first(3).join
             end
           }
           .call
