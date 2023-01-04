@@ -95,7 +95,6 @@ module ImageCrawler
         cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "png", width: 400, height: 400)
         image = cropper.crop!
 
-        pp image.file
         assert image.file.end_with?(".png")
         FileUtils.rm image.file
       end

@@ -19,7 +19,7 @@ class Feed < ApplicationRecord
   before_create :set_host
   before_create :provider_metadata
   before_save :set_hubs
-  after_create :refresh_favicon
+  after_create :refresh_icons
 
   after_commit :web_sub_subscribe, on: :create
   after_commit :update_youtube_videos, on: :create
@@ -299,14 +299,14 @@ class Feed < ApplicationRecord
   end
 
   def update_youtube_videos
-    if youtube_channel_id
-      FeedCrawler::UpdateYoutubeVideos.perform_in(2.minutes, id)
+    if youtube_channel?
+      HarvestEmbeds.perform_in(5.seconds, nil, true)
+      FeedCrawler::UpdateYoutubeVideos.perform_in(10.seconds, id)
     end
   end
 
-  def refresh_favicon
-    FaviconCrawler::Finder.perform_async(host)
-    ImageCrawler::ItunesFeedImage.perform_async(id)
+  def refresh_icons
+    IconCrawler::Build.perform_async(id)
   end
 
   def default_values

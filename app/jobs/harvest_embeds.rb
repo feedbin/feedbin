@@ -1,7 +1,7 @@
 class HarvestEmbeds
   include Sidekiq::Worker
   include SidekiqHelper
-  sidekiq_options retry: false
+  sidekiq_options retry: false, queue: :default_critical
   SET_NAME = "#{name}-ids"
 
   def perform(entry_id, process = false)

@@ -223,7 +223,6 @@ GEM
       msgpack (~> 1.2)
     buftok (0.2.0)
     builder (3.2.4)
-    byebug (11.1.3)
     clockwork (3.0.1)
       activesupport
       tzinfo
@@ -634,7 +633,6 @@ DEPENDENCIES
   better_errors
   binding_of_caller
   bootsnap
-  byebug
   capybara!
   carrierwave!
   clockwork

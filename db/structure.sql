@@ -640,7 +640,7 @@ CREATE TABLE public.icons (
     id bigint NOT NULL,
     provider bigint NOT NULL,
     provider_id text NOT NULL,
-    fingerprint uuid NOT NULL,
+    fingerprint uuid,
     url text NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL

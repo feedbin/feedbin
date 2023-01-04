@@ -3,7 +3,7 @@ class CreateIcons < ActiveRecord::Migration[7.0]
     create_table :icons do |t|
       t.bigint :provider, null: false
       t.text :provider_id, null: false
-      t.uuid :fingerprint, null: false
+      t.uuid :fingerprint
       t.text :url, null: false
 
       t.timestamps

@@ -8,17 +8,17 @@ module IconCrawler
 
       update = {
         provider_id: @image.icon_provider_id,
-        provider: Icon.providers[@image.icon_provider],
+        provider: @image.icon_provider,
         fingerprint: @image.fingerprint,
-        url: @image.final_url
+        url: @image.original_url
       }
-      icon = Icon.create_with(update).find_or_create_by(provider_id: @image.icon_provider_id, provider: Icon.providers[@image.icon_provider])
+      icon = Icon.create_with(update).find_or_create_by(provider_id: @image.icon_provider_id, provider: @image.icon_provider)
       icon.update(update)
 
-      fingerprint = RemoteFile.fingerprint(@image.final_url)
+      fingerprint = RemoteFile.fingerprint(@image.original_url)
       update = {
         fingerprint: fingerprint,
-        original_url: @image.final_url,
+        original_url: @image.original_url,
         storage_url: @image.storage_url,
         width: @image.width,
         height: @image.height,

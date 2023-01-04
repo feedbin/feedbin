@@ -48,6 +48,24 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     assert_equal("channel_id", @entry.reload.provider_parent_id)
   end
 
+  test "should enqueue ImageCrawler for icon" do
+    @entry.update(data: {youtube_video_id: "video_id"}, provider_id: "video_id")
+    @entry.provider_youtube!
+
+    Sidekiq.redis {|r| r.sadd?(HarvestEmbeds::SET_NAME, "video_id") }
+    stub_youtube_api
+
+    assert_difference -> {ImageCrawler::Pipeline::Find.jobs.count}, +1 do
+      HarvestEmbeds.new.perform(nil, true)
+    end
+
+    image = ImageCrawler::Image.new(ImageCrawler::Pipeline::Find.jobs.first["args"].first)
+    assert_equal("channel_id", image.icon_provider_id)
+    assert_equal(1, image.icon_provider)
+    assert_equal(["http://example.com/icon"], image.image_urls)
+    assert_equal("favicon", image.preset_name)
+  end
+
   def stub_youtube_api
     videos = {
       items: [
@@ -65,7 +83,14 @@ class HarvestEmbedsTest < ActiveSupport::TestCase
     channels = {
       items: [
         {
-          id: "channel_id"
+          id: "channel_id",
+          snippet: {
+            thumbnails: {
+              high: {
+                url: "http://example.com/icon"
+              }
+            }
+          }
         }
       ]
     }
