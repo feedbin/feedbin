@@ -9,12 +9,24 @@ module FaviconCrawler
 
       urls = find_meta_links(["icon", "shortcut icon"]).push(default_favicon_location)
 
-      image = ImageCrawler::Image.new(id: "#{SecureRandom.hex}-favicon", preset_name: "favicon", image_urls: urls, favicon_host: @host, icon_provider: "favicon")
+      image = ImageCrawler::Image.new(
+        id: "#{SecureRandom.hex}-favicon",
+        preset_name: "favicon",
+        image_urls: urls,
+        icon_provider_id: @host,
+        icon_provider: Icon.providers[:favicon]
+      )
       ImageCrawler::Pipeline::Find.perform_async(image.to_h)
 
       urls = find_meta_links(["apple-touch-icon", "apple-touch-icon-precomposed"])
       if urls.present?
-        image = ImageCrawler::Image.new(id: "#{SecureRandom.hex}-touch-icon", preset_name: "favicon", image_urls: urls, favicon_host: @host, icon_provider: "touch_icon")
+        image = ImageCrawler::Image.new(
+          id: "#{SecureRandom.hex}-touch-icon",
+          preset_name: "favicon",
+          image_urls: urls,
+          icon_provider_id: @host,
+          icon_provider: Icon.providers[:touch_icon]
+        )
         ImageCrawler::Pipeline::Find.perform_async(image.to_h)
       end
     end

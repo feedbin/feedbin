@@ -85,7 +85,7 @@ class RemoteFilesControllerTest < ActionController::TestCase
     icon = RemoteFile.find_by!(fingerprint: RemoteFile.fingerprint(image_url))
     assert_equal(image_url, icon.original_url)
     assert_equal("https:", icon.storage_url)
-    assert_equal(309, icon.width)
+    assert_equal(400, icon.width)
     assert_equal(400, icon.height)
 
     assert_requested :get, camo_url

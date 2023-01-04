@@ -30,12 +30,12 @@ module FaviconCrawler
       Build.new.perform(@page_url.host)
 
       image = ImageCrawler::Image.new(ImageCrawler::Pipeline::Find.jobs.first["args"].first)
-      assert_equal(@page_url.host, image.favicon_host)
-      assert_equal("favicon", image.icon_provider)
+      assert_equal(@page_url.host, image.icon_provider_id)
+      assert_equal(2, image.icon_provider)
       assert_equal(["http://example.com/icon", "http://example.com/shortcut-icon", "http://example.com/favicon.ico"], image.image_urls)
 
       image = ImageCrawler::Image.new(ImageCrawler::Pipeline::Find.jobs.last["args"].first)
-      assert_equal(@page_url.host, image.favicon_host)
+      assert_equal(@page_url.host, image.icon_provider_id)
       assert_equal("touch_icon", image.icon_provider)
       assert_equal(["http://example.com/apple-touch-icon", "http://example.com/apple-touch-icon"], image.image_urls)
     end

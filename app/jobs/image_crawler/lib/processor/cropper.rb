@@ -54,24 +54,7 @@ module ImageCrawler
           .saver(strip: true, quality: 90)
       end
 
-      def limit_crop
-        extension = source.has_alpha? ? "png" : "jpg"
-        image = ImageProcessing::Vips
-          .source(source)
-          .resize_to_limit(@width, @height)
-          .convert(extension)
-          .saver(strip: true, quality: 90)
-
-        result = Processed.from_pipeline(image)
-
-        # if the original is smaller than the resized, just use that one
-        if result.size > size && source.width <= @width && source.height <= @height && ["png", "jpg"].include?(@extension)
-          return Processed.from_file(@file, @extension)
-        end
-        result
-      end
-
-      def favicon_crop
+      def icon_crop
         layer = best_layer
 
         return unless layer.present?
@@ -81,10 +64,16 @@ module ImageCrawler
         image = ImageProcessing::Vips
           .source(layer)
           .resize_to_fill(smallest, smallest)
-          .saver(strip: true)
-          .convert("png")
+          .convert(default_extension)
+          .saver(strip: true, quality: 90)
 
-        Processed.from_pipeline(image)
+        result = Processed.from_pipeline(image)
+
+        # if the original is smaller than the resized, just use that one
+        if result.size > size && source.width <= @width && source.height <= @height && ["png", "jpg"].include?(@extension)
+          return Processed.from_file(@file, @extension)
+        end
+        result
       end
 
       def fill_crop
@@ -184,6 +173,17 @@ module ImageCrawler
           .uniq       { _1.size }
           .sort_by    { _1.size.first * -1 }
           .find       { !INVALID_COLORS.include?(color(_1)) }
+      end
+
+      def default_extension
+        case @extension
+        when "gif", "png", "webp", "ico"
+          "png"
+        when "jpeg", "jpg"
+          "jpg"
+        else
+          source.has_alpha? ? "png" : "jpg"
+        end
       end
 
       def color(source)

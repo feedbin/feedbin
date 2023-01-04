@@ -1,9 +1,9 @@
 module ImageCrawler
   class Image
-    ATTRIBUTES = %i[id preset_name image_urls entry_url camo favicon_host
+    ATTRIBUTES = %i[id preset_name image_urls entry_url camo icon_provider_id
                     icon_provider download_path original_extension
                     original_url final_url storage_url processed_path
-                    processed_extension width height placeholder_color 
+                    processed_extension width height placeholder_color
                     fingerprint]
 
 
@@ -55,7 +55,7 @@ module ImageCrawler
         width: 400,
         height: 400,
         minimum_size: nil,
-        crop: :limit_crop,
+        crop: :icon_crop,
         directory: "profile",
         validate: false,
         job_class: TwitterProfileImage
@@ -64,17 +64,17 @@ module ImageCrawler
         width: 400,
         height: 400,
         minimum_size: nil,
-        crop: :limit_crop,
+        crop: :icon_crop,
         bucket: RemoteFile::BUCKET,
         region: RemoteFile::REGION,
         validate: false,
         job_class: CacheRemoteFile
       },
       favicon: {
-        width: 180,
-        height: 180,
+        width: 400,
+        height: 400,
         minimum_size: nil,
-        crop: :favicon_crop,
+        crop: :icon_crop,
         bucket: RemoteFile::BUCKET,
         region: RemoteFile::REGION,
         validate: false,

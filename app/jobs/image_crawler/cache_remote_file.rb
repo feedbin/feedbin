@@ -5,6 +5,9 @@ module ImageCrawler
 
     def self.schedule(url)
       fingerprint = RemoteFile.fingerprint(url)
+
+      return if RemoteFile.where(fingerprint: fingerprint).exists?
+
       image = Image.new({
         id: "#{fingerprint}-icon",
         preset_name: "icon",

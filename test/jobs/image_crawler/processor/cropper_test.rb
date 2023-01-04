@@ -30,9 +30,9 @@ module ImageCrawler
         FileUtils.rm image.file
       end
 
-      def test_should_favicon_crop
+      def test_should_icon_crop
         file = copy_support_file("favicon.ico")
-        cropper = Processor::Cropper.new(file, crop: :favicon_crop, extension: "ico", width: 180, height: 180)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", width: 180, height: 180)
         image = cropper.crop!
         assert_equal(32, image.width)
         assert_equal(32, image.height)
@@ -40,7 +40,7 @@ module ImageCrawler
         fingerprint1 = image.fingerprint
 
         file = copy_support_file("favicon.ico")
-        cropper = Processor::Cropper.new(file, crop: :favicon_crop, extension: "ico", width: 180, height: 180)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", width: 180, height: 180)
         image = cropper.crop!
         fingerprint2 = image.fingerprint
 
@@ -49,18 +49,18 @@ module ImageCrawler
 
       def test_should_skip_blank_favicon
         file = copy_support_file("favicon-blank.ico")
-        cropper = Processor::Cropper.new(file, crop: :favicon_crop, extension: "ico", width: 180, height: 180)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "ico", width: 180, height: 180)
         image = cropper.crop!
 
         assert_nil(image)
       end
 
-      def test_should_limit_crop
+      def test_should_resize_to_smallest_dimension
         file = copy_support_file("image.jpeg")
-        cropper = Processor::Cropper.new(file, crop: :limit_crop, extension: "jpeg", width: 400, height: 400)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "jpeg", width: 10_000, height: 10_000)
         image = cropper.crop!
-        assert_equal(309, image.width)
-        assert_equal(400, image.height)
+        assert_equal(640, image.width)
+        assert_equal(640, image.height)
         assert image.file.include?(".jpg")
         FileUtils.rm image.file
       end
@@ -84,23 +84,25 @@ module ImageCrawler
 
       def test_should_return_png
         file = copy_support_file("image.png")
-        cropper = Processor::Cropper.new(file, crop: :limit_crop, extension: "png", width: 400, height: 400)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "png", width: 400, height: 400)
         image = cropper.crop!
         assert image.file.end_with?(".png")
         FileUtils.rm image.file
       end
 
-      def test_should_return_jpg
+      def test_should_return_png
         file = copy_support_file("image.jpeg")
-        cropper = Processor::Cropper.new(file, crop: :limit_crop, extension: "png", width: 400, height: 400)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "png", width: 400, height: 400)
         image = cropper.crop!
-        assert image.file.end_with?(".jpg")
+
+        pp image.file
+        assert image.file.end_with?(".png")
         FileUtils.rm image.file
       end
 
       def test_should_return_original
         file = copy_support_file("image.png")
-        cropper = Processor::Cropper.new(file, crop: :limit_crop, extension: "png", width: 6000, height: 6000)
+        cropper = Processor::Cropper.new(file, crop: :icon_crop, extension: "png", width: 6000, height: 6000)
         image = cropper.crop!
 
         original_fingerprint = Digest::SHA1.hexdigest(File.read(file))
