@@ -1,4 +1,4 @@
-module FaviconCrawler
+module IconCrawler
   class Receive
     include Sidekiq::Worker
     sidekiq_options retry: false

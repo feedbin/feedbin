@@ -1,6 +1,6 @@
 require "test_helper"
 
-module FaviconCrawler
+module IconCrawler
   class BuildTest < ActiveSupport::TestCase
     setup do
       @page_url = URI.parse("http://example.com")
@@ -36,8 +36,8 @@ module FaviconCrawler
 
       image = ImageCrawler::Image.new(ImageCrawler::Pipeline::Find.jobs.last["args"].first)
       assert_equal(@page_url.host, image.icon_provider_id)
-      assert_equal("touch_icon", image.icon_provider)
-      assert_equal(["http://example.com/apple-touch-icon", "http://example.com/apple-touch-icon"], image.image_urls)
+      assert_equal(3, image.icon_provider)
+      assert_equal(["http://example.com/apple-touch-icon", "http://example.com/apple-touch-icon-precomposed"], image.image_urls)
     end
   end
 end
