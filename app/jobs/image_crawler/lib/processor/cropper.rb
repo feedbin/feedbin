@@ -51,7 +51,7 @@ module ImageCrawler
           .source(source)
           .resize_to_fill(width, height)
           .convert("jpg")
-          .saver(strip: true, quality: 90)
+          .saver(strip: true, quality: 90, background: 255)
       end
 
       def icon_crop

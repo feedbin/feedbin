@@ -16,6 +16,7 @@ class Entry < ApplicationRecord
   before_create :create_summary
   before_create :update_content
   before_create :provider_metadata
+  before_create :refresh_icons
 
   before_update :create_summary
 
@@ -41,7 +42,7 @@ class Entry < ApplicationRecord
   end
 
   def self.entries_list
-    select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings)
+    select(:id, :feed_id, :title, :summary, :published, :image, :data, :author, :url, :updated_at, :settings, :provider, :provider_parent_id)
   end
 
   def self.sort_preference(sort)
@@ -302,6 +303,18 @@ class Entry < ApplicationRecord
     end
   end
 
+  def icon
+    if tweet?
+      icons.to_a.find { _1.provider_twitter? }&.icon_url || RemoteFile.icon_url(tweet.main_tweet.user.profile_image_uri_https(:original))
+    elsif youtube?
+      icons.to_a.find { _1.provider_youtube? }&.icon_url
+    elsif micropost?
+      micropost.author_avatar
+    elsif feed.pages?
+      icons.to_a.find { _1.provider_favicon? }&.icon_url
+    end
+  end
+
   private
 
   def provider_metadata
@@ -317,7 +330,16 @@ class Entry < ApplicationRecord
       if embed = Embed.youtube_video.find_by_provider_id(self.provider_id)
         self.provider_parent_id = embed.parent_id
       end
+    elsif feed.pages?
+      self.provider = self.class.providers[:favicon]
+      self.provider_id = hostname
+      self.provider_parent_id = self.provider_id
     end
+  end
+
+  def refresh_icons
+    return unless tweet?
+    IconCrawler::Provider::Twitter.perform_async(tweet.main_tweet.user.screen_name, tweet.main_tweet.user.profile_image_uri_https(:original))
   end
 
   def update_content

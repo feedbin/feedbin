@@ -8,7 +8,7 @@ module ImageCrawler
       @image = image
       if @image
         receive
-      elsif !@entry.processed_image?
+      else
         schedule
       end
     rescue ActiveRecord::RecordNotFound

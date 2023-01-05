@@ -2521,6 +2521,11 @@ $hamburger-dot: 4px;
     background-image: image-url("replacement-favicon-twitter.svg") !important;
   }
 }
+.host-www-youtube-com {
+  &.favicon {
+    background-image: image-url("replacement-favicon-youtube.svg") !important;
+  }
+}
 
 .theme-day {
   .favicon-wrap {

@@ -15,7 +15,6 @@ class Feed < ApplicationRecord
   has_one :favicon, foreign_key: "host", primary_key: "host"
   has_one :newsletter_sender
 
-
   before_create :set_host
   before_create :provider_metadata
   before_save :set_hubs
@@ -23,7 +22,6 @@ class Feed < ApplicationRecord
 
   after_commit :web_sub_subscribe, on: :create
   after_commit :update_youtube_videos, on: :create
-
 
   attribute :crawl_data, CrawlDataType.new
   attr_accessor :count, :tags
@@ -84,8 +82,6 @@ class Feed < ApplicationRecord
       icons.to_a.find { _1.provider_youtube? }&.icon_url
     elsif source = source_icon
       RemoteFile.icon_url(source)
-    else
-      icons.to_a.find { _1.provider_favicon? }&.icon_url
     end
   end
 

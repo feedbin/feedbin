@@ -466,24 +466,6 @@ class EntryPresenter < BasePresenter
     nil
   end
 
-  def profile_image
-    if entry.tweet?
-      @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image" do
-        url = tweet_profile_image_uri(entry.tweet.main_tweet)
-        fallback = @template.image_url("favicon-profile-default.png")
-        @template.image_tag_with_fallback(fallback, url, alt: "")
-      end
-    elsif entry.micropost?
-      @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image" do
-        fallback = @template.image_url("favicon-profile-default.png")
-        url = RemoteFile.icon_url(entry.micropost.author_avatar)
-        @template.image_tag_with_fallback(fallback, url, alt: "")
-      end
-    else
-      favicon(entry.feed, entry)
-    end
-  end
-
   def summary
     if entry.tweet?
       text = entry.tweet.tweet_summary(nil, true).html_safe

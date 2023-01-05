@@ -10,7 +10,7 @@ class SavePage
     @title = title
     entry = create_webpage_entry
     ImageSaver.perform_async(entry.id)
-    FaviconCrawler::Finder.perform_async(host, true)
+    IconCrawler::Provider::Favicon.perform_async(host, true)
     entry
   end
 

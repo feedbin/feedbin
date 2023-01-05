@@ -3,11 +3,11 @@
         <%= entry_presenter.entry_link do %>
             <div class="entry-summary-inner">
                 <div class="feed-title-inline">
-                    <%= entry_presenter.profile_image %>
+                    <%= entry_presenter.favicon(entry.feed, entry) %>
                     <%= entry_presenter.feed_title %>
                 </div>
                 <div class="title-wrap">
-                    <%= entry_presenter.profile_image %>
+                    <%= entry_presenter.favicon(entry.feed, entry) %>
                     <div class="title"><%= entry_presenter.title %></div>
                 </div>
                 <div class="summary-content">
