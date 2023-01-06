@@ -13,4 +13,15 @@ class Api::V2::PagesControllerTest < ApiControllerTestCase
       assert_response :created
     end
   end
+
+  test "should enqueue retry" do
+    login_as @user
+    stub_request(:get, /extract\.example\.com/).to_return(status: 500)
+    url = "http://example.com/saved_page"
+    Sidekiq::Worker.clear_all
+    assert_difference -> {SavePage.jobs.size}, +1 do
+      post :create, params: {url: "http://example.com"}, format: :json
+      assert_response :created
+    end
+  end
 end

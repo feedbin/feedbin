@@ -11,8 +11,10 @@ module Api
         else
           status_bad_request([{pages: "Missing required key: url"}])
         end
-      rescue HTTP::TimeoutError
-        status_not_found
+      rescue SavePage::MissingPage => exception
+        SavePage.perform_async(current_user.id, params[:url], params[:title])
+        @entry = exception.entry
+        render status: :created
       end
     end
   end
