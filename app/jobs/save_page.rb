@@ -1,4 +1,12 @@
 class SavePage
+  class MissingPage < StandardError
+    attr_reader :entry
+    def initialize(message, entry)
+      @entry = entry
+      super(message)
+    end
+  end
+
   include Sidekiq::Worker
   sidekiq_options queue: :default_critical
 
@@ -9,14 +17,22 @@ class SavePage
     @url = url
     @title = title
     entry = create_webpage_entry
+
     ImageSaver.perform_async(entry.id)
-    FaviconCrawler::Finder.perform_async(host, true)
+    FaviconCrawler::Finder.perform_async(host)
+
+    if parsed_result.nil?
+      raise MissingPage.new("Missing page, retrying", entry)
+    end
+
     entry
   end
 
   def create_webpage_entry
     user.subscriptions.create_with(kind: Subscription.kinds[:generated]).find_or_create_by!(feed: pages_feed)
-    pages_feed.entries.create_with(build_entry).find_or_create_by!(public_id: public_id)
+    entry = pages_feed.entries.create_with(build_entry).find_or_create_by!(public_id: public_id)
+    entry.update(build_entry)
+    entry
   end
 
   def feed_url
@@ -28,9 +44,12 @@ class SavePage
   end
 
   def parsed_result
-    @parsed_result ||= MercuryParser.parse(url)
-  rescue
-    nil
+    return @parsed_result if defined?(@parsed_result)
+    @parsed_result = begin
+      MercuryParser.parse(url)
+    rescue
+      nil
+    end
   end
 
   def host

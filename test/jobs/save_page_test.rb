@@ -26,4 +26,13 @@ class SavePageTest < ActiveSupport::TestCase
     entry = @user.feeds.pages.first.entries.first
     assert entry.tweet?
   end
+
+  test "should raise MissingPage error and enqueue retry" do
+    stub_request(:get, /extract\.example\.com/).to_return(status: 500)
+    url = "http://example.com/saved_page"
+    Sidekiq::Worker.clear_all
+    assert_raises(SavePage::MissingPage) do
+      SavePage.new.perform(@user.id, url, "Title")
+    end
+  end
 end

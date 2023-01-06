@@ -9,7 +9,9 @@ class MercuryParser
 
   def self.parse(*args)
     Librato.increment "readability.first_parse"
-    new(*args)
+    instance = new(*args)
+    instance.result
+    instance
   end
 
   def title
@@ -60,14 +62,14 @@ class MercuryParser
     end
   end
 
-  private
-
   def result
     @result ||= begin
       response = HTTP.timeout(write: 5, connect: 5, read: 5).use(:auto_inflate).headers("Accept-Encoding" => "gzip").get(service_url)
       response.parse
     end
   end
+
+  private
 
   def marshal_dump
     to_h
