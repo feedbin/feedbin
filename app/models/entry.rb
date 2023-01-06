@@ -90,6 +90,7 @@ class Entry < ApplicationRecord
   def fully_qualified_url
     return nil if url.blank? || !url.respond_to?(:strip)
     return url.strip if url.strip.downcase.start_with?("http")
+    return url if feed.pages?
 
     result = feed.site_relative_url(url)
     if result.blank?
@@ -103,12 +104,16 @@ class Entry < ApplicationRecord
     return original_url.strip if original_url.strip.downcase.start_with?("http")
     return nil if fully_qualified_url.nil?
 
-    base_url = Addressable::URI.heuristic_parse(fully_qualified_url)
+    base = Addressable::URI.heuristic_parse(fully_qualified_url)
     original_url = Addressable::URI.heuristic_parse(original_url)
-    Addressable::URI.join(base_url, original_url)
+    Addressable::URI.join(base, original_url)
   rescue Addressable::URI::InvalidURIError
     Rails.logger.error("Invalid uri original_url=#{original_url} fully_qualified_url=#{fully_qualified_url}")
     nil
+  end
+  
+  def base_url
+    feed.pages? ? url : feed.site_url
   end
 
   def processed_image
