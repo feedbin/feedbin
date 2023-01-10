@@ -1,5 +1,8 @@
 ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
 
+Fixnum = Integer
+Bignum = Integer
+
 class File
   class << self
     alias_method :exists?, :exist?
