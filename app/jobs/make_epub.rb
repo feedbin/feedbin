@@ -86,7 +86,7 @@ class MakeEpub
     max_size = 9.megabytes
     document.css("img").each do |image|
       src = image["src"]
-      unless src.start_with?("http")
+      if src.nil? || !src.start_with?("http")
         image.remove
         next
       end
