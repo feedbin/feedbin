@@ -2,7 +2,7 @@ class Source::MetaLinks < Source
   def find
     return unless document?
 
-    urls = document.css("link[rel=alternate]").each_with_object([]) do |link, array|
+    urls = document.css("link[rel~=alternate]").each_with_object([]) do |link, array|
       if link_valid?(link)
         array.push join_url(response.url, link["href"])
       end
