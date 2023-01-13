@@ -11,10 +11,10 @@ module ImageCrawler
         @image.storage_url = upload
         @image.send_to_feedbin
 
-        File.unlink(image_path) rescue Errno::ENOENT
-
         DownloadCache.save(@image)
         Sidekiq.logger.info "Upload: id=#{@image.id} original_url=#{@image.original_url} storage_url=#{@image.storage_url} width=#{@image.width} height=#{@image.height}"
+      ensure
+        File.unlink(@image.processed_path)
       end
 
       def upload
