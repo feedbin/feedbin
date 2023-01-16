@@ -35,7 +35,7 @@
               <%= f.label :email_name, "Full Name"%>
             <% end %>
             <% text.input do %>
-              <% f.text_field :email_name, class: "peer", tabindex: "-1"  %>
+              <% f.text_field :email_name, class: "peer"  %>
             <% end %>
           <% end %>
         </div>
@@ -45,13 +45,13 @@
             <%= f.label :email_address, "Reply-To" %>
           <% end %>
           <% text.input do %>
-            <% f.email_field :email_address, class: "peer", tabindex: "-1" %>
+            <% f.email_field :email_address, class: "peer" %>
           <% end %>
         <% end %>
 
         <div class="button-wrap">
-          <%= button_tag "Cancel", type: "button", class: "button button-tertiary", data: {action: "expandable#toggle"}, tabindex: "-1" %>
-          <%= button_tag "Save", type: "submit", class: "button button-primary-plain", tabindex: "-1" %>
+          <%= button_tag "Cancel", type: "button", class: "button button-tertiary", data: {action: "expandable#toggle"} %>
+          <%= button_tag "Save", type: "submit", class: "button button-primary-plain" %>
         </div>
       <% end %>
     </div>

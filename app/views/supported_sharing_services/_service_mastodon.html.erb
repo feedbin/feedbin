@@ -10,13 +10,13 @@
         <label for="mastodon_url">Server URL</label>
       <% end %>
       <% text.input do %>
-        <%= url_field_tag(:mastodon_url, record.respond_to?(:mastodon_host) ? record.mastodon_host : "", placeholder: 'For example: mastodon.social', autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, class: "peer", tabindex: "-1") %>
+        <%= url_field_tag(:mastodon_url, record.respond_to?(:mastodon_host) ? record.mastodon_host : "", placeholder: 'For example: mastodon.social', autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, class: "peer") %>
       <% end %>
     <% end %>
 
     <div class="button-wrap">
-      <%= button_tag "Cancel", type: "button", class: "button button-tertiary button-inline", data: {action: "expandable#toggle"}, tabindex: "-1" %>
-      <%= button_tag "Sign In", type: "submit", class: "button button-primary-plain", tabindex: "-1" %>
+      <%= button_tag "Cancel", type: "button", class: "button button-tertiary button-inline", data: {action: "expandable#toggle"} %>
+      <%= button_tag "Sign In", type: "submit", class: "button button-primary-plain" %>
     </div>
   <% end %>
 <% end %>

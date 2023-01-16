@@ -8,8 +8,8 @@
     <%= description %>
   <% end %>
   <% group.item do %>
-    <div data-expandable-target="container" class="max-h-0 duration-200 transition-all overflow-hidden">
-      <ul data-expandable-target="content" class="border-t transition opacity-100 group-data-[expandable-open-value=false]:opacity-0">
+    <div class="grid [grid-template-rows:0fr] group-data-[expandable-open-value=true]:[grid-template-rows:1fr] transition-[grid-template-rows] duration-200 overflow-hidden">
+      <ul class="min-h-0 border-t transition transition-[visibility,opacity] opacity-100 group-data-[expandable-open-value=false]:opacity-0 group-data-[expandable-open-value=false]:invisible">
         <% items.each do |item| %>
           <li class="border-b last:border-b-0">
             <%= item %>
