@@ -9408,9 +9408,9 @@ button.close {
   pointer-events: none;
   box-shadow: 0 20px 40px 0 rgba(0, 0, 0, 0.4);
   border-radius: $modal-border-radius;
-  margin-bottom: env(safe-area-inset-bottom);
   .native & {
     box-shadow: none;
+    margin-bottom: 100px;
   }
 }
 
@@ -9551,6 +9551,7 @@ button.close {
   align-items: center;
   justify-content: flex-end;
   padding: 16px 24px;
+  z-index: 10;
   @include border-top($color-borders);
   &.hide {
     display: none;
@@ -9579,7 +9580,9 @@ button.close {
 @media (min-width: 576px) {
   .modal-dialog {
     max-width: 500px;
-    margin: 2.6rem auto 1.75rem auto;
+    margin-top: 2.6rem;
+    margin-left: auto;
+    margin-right: auto;
   }
   .modal-dialog-centered {
     min-height: calc(100% - (1.75rem * 2));
@@ -9622,7 +9625,6 @@ button.close {
 .modal-purpose-edit {
   .modal-footer {
     bottom: 0;
-    z-index: 2;
     border-bottom-left-radius: $modal-border-radius;
     border-bottom-right-radius: $modal-border-radius;
     @include background-color($color-base);
