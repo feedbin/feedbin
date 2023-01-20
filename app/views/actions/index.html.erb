@@ -21,16 +21,14 @@
 <%= link_to "+ Add Action", new_action_path, class: "button button-huge" %>
 
 <% if @actions.find { _1.broken? } %>
-  <% @actions.select { _1.broken? }.each do |action| %>
-    <%= component "settings/control_group" do |group| %>
-      <% group.header do %>
-        Saved Actions
-      <% end %>
+  <%= component "settings/control_group" do |group| %>
+    <% group.header do %>
+      Invalid Actions
+    <% end %>
 
-      <% @actions.reject { _1.broken? }.each do |action| %>
-        <% group.item do %>
-          <%= render partial: "action", locals: {action:} %>
-        <% end %>
+    <% @actions.select { _1.broken? }.each do |action| %>
+      <% group.item do %>
+        <%= render partial: "action", locals: {action: action, summary: true} %>
       <% end %>
     <% end %>
   <% end %>
@@ -44,7 +42,7 @@
 
     <% @actions.reject { _1.broken? }.each do |action| %>
       <% group.item do %>
-        <%= render partial: "action", locals: {action:} %>
+        <%= render partial: "action", locals: {action: action, summary: true} %>
       <% end %>
     <% end %>
   <% end %>

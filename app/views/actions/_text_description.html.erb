@@ -3,7 +3,7 @@
 <% tag_ids = action.tag_ids.reject{ |tag_id| tag_id.blank? } %>
 If an article is published
 <% if action.query.present? %>
-    that matches the search <strong><%= action.query %></strong>
+    that matches the search <strong><%= action.query&.truncate(250, separator: " ", omission: "…") %></strong>
 <% end %>
 <% if action.all_feeds %>
     in <strong>any</strong> feed
