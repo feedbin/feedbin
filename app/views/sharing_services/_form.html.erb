@@ -1,4 +1,4 @@
-<%= form_for record, html: {novalidate: 'novalidate'} do |f| %>
+<%= form_for record, namespace: record.id, html: {novalidate: 'novalidate'} do |f| %>
   <div class="py-3 px-4">
     <div class="mb-4">
       <%= component "form/text_input" do |text| %>
@@ -6,7 +6,7 @@
           <%= f.label :label, "Label" %>
         <% end %>
         <% text.input do %>
-          <% f.text_field :label, class: "peer" %>
+          <% f.text_field :label, class: "peer text-input" %>
         <% end %>
       <% end %>
     </div>
@@ -17,7 +17,7 @@
           <%= f.label :url, "URL" %>
         <% end %>
         <% text.input do %>
-          <%= f.url_field :url, class: "peer" %>
+          <%= f.url_field :url, class: "peer  text-input" %>
         <% end %>
       <% end %>
     </div>
@@ -26,13 +26,13 @@
       <p class="mb-4 text-500">Create your own sharing service. <a href="/help/sharing-read-it-later-services/" target="_blank">How does this work</a>?</p>
     <% end %>
 
-    <div class="button-wrap">
+    <%= component "settings/button_row" do %>
       <% if record.new_record? %>
         <%= button_tag "Add Service", type: "submit", class: "button" %>
       <% else %>
         <%= button_tag "Cancel", type: "button", class: "button button-tertiary", data: {action: "expandable#toggle"} %>
         <%= button_tag "Save", type: "submit", class: "button" %>
       <% end %>
-    </div>
+    <% end %>
   </div>
 <% end %>

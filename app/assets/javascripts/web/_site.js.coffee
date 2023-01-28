@@ -1226,27 +1226,27 @@ $.extend feedbin,
     $('.sharing-controls [type="checkbox"]').attr('checked', false);
 
     title = $('.entry-header h1').first().text()
-    $('.share-form .title-placeholder').val(title)
+    $('[data-behavior~=share_form] .title-placeholder').val(title)
 
     url = $('#source_link').attr('href')
-    $('.share-form .url-placeholder').val(url)
+    $('[data-behavior~=share_form] .url-placeholder').val(url)
 
     description = feedbin.getSelectedText()
-    $('.share-form .description-placeholder').val("#{description}")
+    $('[data-behavior~=share_form] .description-placeholder').val("#{description}")
 
     parts = _.compact([title, url])
-    $('.share-form .combined-placeholder').val(parts.join(" "))
+    $('[data-behavior~=share_form] .combined-placeholder').val(parts.join(" "))
 
     if description != ""
-      $('[data-basement-panel-target="micro_blog_share_panel"] .share-form .description-placeholder').val("#{description} #{url}")
+      $('[data-basement-panel-target="micro_blog_share_panel"] [data-behavior~=share_form] .description-placeholder').val("#{description} #{url}")
     else
-      $('[data-basement-panel-target="micro_blog_share_panel"] .share-form .description-placeholder').val("#{url}")
+      $('[data-basement-panel-target="micro_blog_share_panel"] [data-behavior~=share_form] .description-placeholder').val("#{url}")
 
 
     source = $('.entry-header .author').first().text()
     if source == ""
       source = $('.entry-header .feed-title').first().text()
-    $('.share-form .source-placeholder').val(source)
+    $('[data-behavior~=share_form] .source-placeholder').val(source)
 
     if feedbin.readabilityActive()
       $('.readability-placeholder').val('on')
@@ -2117,7 +2117,7 @@ $.extend feedbin,
         event.preventDefault()
         return
 
-      $(document).on 'submit', '.share-form form', (event, xhr) ->
+      $(document).on 'submit', '[data-behavior~=share_form] form', (event, xhr) ->
         feedbin.closeEntryBasement()
         return
 
@@ -2240,11 +2240,11 @@ $.extend feedbin,
 
     formProcessing: ->
       $(document).on 'submit', '[data-behavior~=spinner], [data-behavior~=subscription_form], [data-behavior~=search_form], [data-behavior~=feeds_search]', ->
-        $(@).find('input').addClass('processing')
+        $(@).attr('data-processing', 'true')
         return
 
       $(document).on 'ajax:complete', '[data-behavior~=spinner], [data-behavior~=subscription_form], [data-behavior~=search_form], [data-behavior~=feeds_search]', ->
-        $(@).find('input').removeClass('processing')
+        $(@).attr('data-processing', 'false')
         if feedbin.closeSubcription
           setTimeout ( ->
             feedbin.hideSubscribe()
@@ -2401,14 +2401,14 @@ $.extend feedbin,
         description = $(@).find("option:selected").data('description-name')
         typeText = $(@).find("option:selected").text()
         if type == 'quote'
-          $('.share-form .source-placeholder-wrap').removeClass('hide')
-          $('.share-form .title-placeholder-wrap').addClass('hide')
+          $('[data-behavior~=share_form] .source-placeholder-wrap').removeClass('hide')
+          $('[data-behavior~=share_form] .title-placeholder-wrap').addClass('hide')
         else
-          $('.share-form .source-placeholder-wrap').addClass('hide')
-          $('.share-form .title-placeholder-wrap').removeClass('hide')
+          $('[data-behavior~=share_form] .source-placeholder-wrap').addClass('hide')
+          $('[data-behavior~=share_form] .title-placeholder-wrap').removeClass('hide')
 
-        $('.share-form .type-text').text(typeText)
-        $('.share-form .description-placeholder').attr('placeholder', description)
+        $('[data-behavior~=share_form] .type-text').text(typeText)
+        $('[data-behavior~=share_form] .description-placeholder').attr('placeholder', description)
 
     dragAndDrop: ->
       feedbin.droppable()
@@ -2825,7 +2825,7 @@ $.extend feedbin,
         target = event.currentTarget
         controller = $(target).closest('[data-behavior~=tooltip_controller]')
         tooltipTarget = $('[data-behavior~=tooltip_target]', controller)
-        tooltipTarget.addClass("hide")
+        tooltipTarget.attr("data-visible", "false")
 
       $(document).on 'mouseover', '[data-behavior~=show_tooltip]', (event) ->
         bar = event.currentTarget
@@ -2836,7 +2836,7 @@ $.extend feedbin,
         dayTarget = $('[data-behavior~=tooltip_day]', tooltipTarget)
         countTarget = $('[data-behavior~=tooltip_count]', tooltipTarget)
 
-        tooltipTarget.removeClass('hide')
+        tooltipTarget.attr("data-visible", "true")
         dayTarget.text(bar.dataset.day)
         countTarget.text(bar.dataset.count)
 
@@ -2848,10 +2848,11 @@ $.extend feedbin,
           left: 'auto'
 
         if bar.offsetLeft < parentWidth / 2
-          tooltipTarget.removeClass("right")
+          tooltipTarget.attr("data-position", "left")
           tooltipTarget.css
             left: "#{bar.offsetLeft - 14}px"
         else
+          tooltipTarget.attr("data-position", "right")
           tooltipTarget.addClass("right")
           tooltipTarget.css
             right: "#{parentWidth - bar.offsetLeft - 18}px"

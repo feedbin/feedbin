@@ -7,7 +7,7 @@
     <% end %>
     <%= component "form/text_input" do |text| %>
       <% text.input do %>
-        <%= form.text_field :title, class: "peer" %>
+        <%= form.text_field :title, class: "peer text-input" %>
       <% end %>
     <% end %>
   </div>
@@ -17,7 +17,7 @@
     <% end %>
     <%= component "form/text_input" do |text| %>
       <% text.input do %>
-        <%= form.text_area :query, rows: @action&.query&.length.to_i > 70 ? 3 : 1, placeholder: 'For example: title.exact:"[Sponsor]"', autocorrect: "off", autocapitalize: "off", spellcheck: false, class: "peer" %>
+        <%= form.text_area :query, rows: @action&.query&.length.to_i > 70 ? 3 : 1, placeholder: 'For example: title.exact:"[Sponsor]"', autocorrect: "off", autocapitalize: "off", spellcheck: false, class: "peer text-input" %>
       <% end %>
     <% end %>
     <p class="text-sm text-500 mt-2">Actions support the same <a href="/help/search-syntax" target="_blank">syntax as searches</a>.</p>
@@ -28,11 +28,11 @@
       <%= component "settings/h2" do %>
         Article is in Tag
       <% end %>
-      <ul class="rounded-lg border max-h-[240px] overflow-scroll resize-y">
+      <ul class="border-y max-h-[240px] overflow-scroll resize-y">
         <%= form.collection_check_boxes(:tag_ids, @user.feed_tags, :id, :name) do |builder| %>
           <li class="group">
             <%= builder.check_box class: "peer" %>
-            <%= builder.label class: "group flex gap-2 items-center py-3 px-4 border-b group-last:border-b-0" do %>
+            <%= builder.label class: "group flex gap-2 items-center py-3 border-b group-last:border-b-0" do %>
               <%= component "form/check_box" %>
               <%= builder.text %>
             <% end %>
@@ -47,20 +47,21 @@
       Article is in Feed
     <% end %>
 
-    <div class="flex py-3 px-4 rounded-t-lg border border-b-0">
-      <div class="checkbox">
-        <%= form.check_box :all_feeds, id: "include_all_feeds", data: {behavior: 'check_feeds'} %>
-        <label for="include_all_feeds"><%= svg_tag "icon-check" %>Include all</label>
-      </div>
+    <div class="flex py-3 border-y border-b-0">
+      <%= form.check_box :all_feeds, id: "include_all_feeds", class: "peer", data: {behavior: 'check_feeds'} %>
+      <label class="group flex items-center gap-2" for="include_all_feeds">
+        <%= component "form/check_box" %> Include all
+      </label>
+
       <%= render "shared/input", class: "ml-auto" do %>
-        <input type="text" class="small-field" data-behavior="feed_search" placeholder="Filter" />
+        <input type="text" class="text-input" data-behavior="feed_search" placeholder="Filter" />
       <% end %>
     </div>
-    <ul class="rounded-b-lg border max-h-[240px] overflow-scroll resize-y" data-behavior="search_results">
+    <ul class="border-y max-h-[240px] overflow-scroll resize-y" data-behavior="search_results">
       <%= form.collection_check_boxes(:feed_ids, @user.feeds.include_user_title, :string_id, :title) do |builder| %>
         <li class="group" data-sort-name="<%= builder.text.downcase %>">
           <%= builder.check_box feed_checkbox_options(form).merge(class: "peer") %>
-          <%= builder.label title: builder.object.feed_url, class: "group flex gap-2 items-center py-3 px-4 border-b group-last:border-b-0" do %>
+          <%= builder.label title: builder.object.feed_url, class: "group flex gap-2 items-center py-3 border-b group-last:border-b-0" do %>
             <%= component "form/check_box" %>
             <%= builder.text %>
           <% end %>
@@ -69,7 +70,7 @@
     </ul>
   </div>
 
-  <%= component "settings/control_group" do |group| %>
+  <%= component "settings/control_group", class: "mb-14" do |group| %>
     <% group.header do %>
       Actions
     <% end %>
@@ -87,7 +88,7 @@
 
   <% end %>
 
-  <%= component "settings/control_group" do |group| %>
+  <%= component "settings/control_group", class: "mb-14" do |group| %>
     <% group.header do %>
       Options
     <% end %>
@@ -102,15 +103,14 @@
 
   <% end %>
 
-  <div class="description-inset">
-    <div class="button-wrap">
-      <%= form.submit "Save", name: 'commit', class: "button ui-helper-hidden-accessible", tabindex: "-1" %>
-      <% if @action.persisted? %>
-        <%= link_to 'Delete', @action, method: :delete, class: 'button button-secondary' , data: { confirm: 'Are you sure you want to delete this action?' } %>
-      <% end %>
-      <button type="submit" name="preview" class="button button-secondary">View Results</button>
-      <button type="submit" name="commit" class="button">Save</button>
-    </div>
-  </div>
+  <%= component "settings/button_row" do %>
+    <%= form.submit "Save", name: 'commit', class: "button ui-helper-hidden-accessible", tabindex: "-1" %>
+    <% if @action.persisted? %>
+      <%= link_to 'Delete', @action, method: :delete, class: 'button button-secondary' , data: { confirm: 'Are you sure you want to delete this action?' } %>
+    <% end %>
+    <button type="submit" name="preview" class="button button-secondary">View Results</button>
+    <button type="submit" name="commit" class="button">Save</button>
+  <% end %>
+
 
 <% end %>

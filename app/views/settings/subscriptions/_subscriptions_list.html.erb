@@ -1,7 +1,7 @@
 <div data-behavior="subscriptions_list">
   <%= form_tag update_multiple_settings_subscriptions_path, method: :patch, autocomplete: "off", class: "group", data: {controller: "toggle-checkboxes", toggle_checkboxes_include_all_visible_value: "false"} do |update_form| %>
     <%= hidden_field_tag :q, params[:q] %>
-    <div class="p-4 flex border rounded-t-lg items-baseline justify-between">
+    <div class="py-4 flex border-y items-center justify-between">
       <input type="checkbox" class="peer" data-action="toggle-checkboxes#toggle" id="select_all_feeds" />
       <label for="select_all_feeds" class="group flex gap-2 items-center">
         <%= component "form/check_box" %>
@@ -17,7 +17,7 @@
       </div>
     </div>
     <% if @subscriptions.total_entries > @subscriptions.count  %>
-      <div class="border border-t-0 py-3 px-4 block group-data-[toggle-checkboxes-include-all-visible-value=false]:hidden">
+      <div class="border-b py-3 block group-data-[toggle-checkboxes-include-all-visible-value=false]:hidden">
         <%= check_box_tag "include_all", 1, false, data: {action: "toggle-checkboxes#includeAll", toggle_checkboxes_target: "includeAll"}, class: "peer", id: "include_all_feeds" %>
         <label for="include_all_feeds" class="group flex gap-2 items-center">
           <%= component "form/check_box" %>
@@ -30,21 +30,21 @@
       </div>
     <% end %>
 
-    <ul class="mb-4">
+    <ul class="mb-14">
       <% @subscriptions.each do |subscription| %>
         <% present subscription do |subscription_presenter| %>
           <%= fields_for "subscriptions[]", subscription do |f| %>
-            <li class="flex items-center relative border-b border-x gap-2 last:rounded-b-lg">
+            <li class="flex items-center relative border-b">
 
               <div class="shrink-0 w-[32px] self-stretch flex">
                 <%= check_box_tag "subscription_ids[]", subscription.id, false, id: "subscription_checkbox_#{subscription.id}", class: "peer", data: {action: "toggle-checkboxes#toggleActions", toggle_checkboxes_target: "checkbox"} %>
-                <label class="group w-full h-full flex justify-end pt-[16px]" for="<%= "subscription_checkbox_#{subscription.id}" %>">
+                <label class="group w-full h-full flex items-center" for="<%= "subscription_checkbox_#{subscription.id}" %>">
                   <%= component "form/check_box" %>
                 </label>
               </div>
 
-              <%= link_to edit_settings_subscription_path(subscription), class: "flex grow items-center overflow-hidden gap-2 px-4 py-3 pl-2 !text-600 hover:no-underline" do %>
-                <span class="self-start block mt-[2px]">
+              <%= link_to edit_settings_subscription_path(subscription), class: "flex grow items-center overflow-hidden gap-3 py-3 !text-600 hover:no-underline" do %>
+                <span class="block">
                   <%= subscription_presenter.favicon(subscription.feed) %>
                 </span>
 
@@ -73,7 +73,5 @@
     </ul>
   <% end %>
 
-  <div class="settings">
-    <%= will_paginate @subscriptions, previous_label: "Previous", next_label: "Next" %>
-  </div>
+  <%= will_paginate @subscriptions, previous_label: "Previous", next_label: "Next", inner_window: 1 %>
 </div>

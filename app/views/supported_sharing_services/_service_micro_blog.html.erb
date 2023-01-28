@@ -12,14 +12,14 @@
         <label for="micro_blog_password">App Token</label>
       <% end %>
       <% text.input do %>
-        <%= text_field_tag :password, "", id: "micro_blog_password", class: "peer" %>
+        <%= text_field_tag :password, "", id: "micro_blog_password", class: "peer text-input" %>
       <% end %>
     <% end %>
 
-    <div class="button-wrap">
+    <%= component "settings/button_row" do %>
       <%= button_tag "Cancel", type: "button", class: "button button-tertiary button-inline", data: {action: "expandable#toggle"} %>
       <%= button_tag "Save", type: "submit", class: "button button-primary-plain" %>
-    </div>
+    <% end %>
   <% end %>
 
 <% end %>

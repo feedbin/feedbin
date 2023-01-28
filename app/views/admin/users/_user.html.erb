@@ -8,7 +8,7 @@
   <% end %>
   <% row.control do %>
     <% unless user.deleted? %>
-      <%= link_to "Delete", admin_user_path(user), remote: true, data: { confirm: "Are you sure?" }, method: :delete, class: "pull-right danger" %>
+      <%= link_to "Delete", admin_user_path(user), remote: true, data: { confirm: "Are you sure?" }, method: :delete, class: "!text-red-600" %>
     <% end %>
   <% end %>
 <% end %>

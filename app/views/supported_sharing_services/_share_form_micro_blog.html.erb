@@ -1,28 +1,32 @@
-<div class="share-form">
-    <div class="share-form-inner icon-share-micro-blog">
-        <div class="sharing-header">
-            <h2>Post to Micro.blog</h2>
-            <%= svg_tag "icon-share-micro_blog" %>
-        </div>
-        <%= form_tag("", remote: true) do %>
-            <div class="field-cluster">
-                <div class="input-group-wrap">
-                    <label for="micro_blog_title">Title</label>
-                    <%= render "shared/input" do %>
-                        <%= text_field_tag :name, "", placeholder: "optional", class: "title-placeholder", id: "micro_blog_title" %>
-                    <% end %>
-                </div>
-                <div class="input-group-wrap">
-                    <label for="micro_blog_description">Description</label>
-                    <%= render "shared/input" do %>
-                        <%= text_area_tag :content, "", rows: 5, class: "description-placeholder", id: "micro_blog_description" %>
-                    <% end %>
-                </div>
-            </div>
-            <div class="button-wrap">
-                <%= button_tag "Cancel", type: "button", class: "button button-secondary", data: {behavior: "close_entry_basement"} %>
-                <%= button_tag "Post", type: "submit", class: "button" %>
-            </div>
+<%= component "app/share_form", title: "Post to Micro.blog", icon: "icon-share-micro_blog" do %>
+  <%= form_tag("", remote: true) do %>
+
+    <div class="mb-4">
+      <%= component "form/text_input" do |text| %>
+        <% text.label do %>
+          <label for="micro_blog_title">Title</label>
         <% end %>
+        <% text.input do %>
+          <%= text_field_tag :name, "", placeholder: "optional", class: "title-placeholder peer text-input", id: "micro_blog_title" %>
+        <% end %>
+      <% end %>
     </div>
-</div>
+
+    <div class="mb-4">
+      <%= component "form/text_input" do |text| %>
+        <% text.label do %>
+          <label for="micro_blog_description">Description</label>
+        <% end %>
+        <% text.input do %>
+          <%= text_area_tag :content, "", rows: 5, class: "description-placeholder peer text-input", id: "micro_blog_description" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%= component "settings/button_row" do %>
+      <%= button_tag "Cancel", type: "button", class: "button button-secondary", data: {behavior: "close_entry_basement"} %>
+      <%= button_tag "Post", type: "submit", class: "button" %>
+    <% end %>
+
+  <% end %>
+<% end %>

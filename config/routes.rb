@@ -29,7 +29,6 @@ Rails.application.routes.draw do
   post "/starred/export", to: "starred_entries#export"
 
   get :signup, to: "users#new", as: "signup"
-  get :signup_next, to: "users#new_next", as: "signup2"
   get :login, to: "sessions#new", as: "login"
   delete :logout, to: "sessions#destroy", as: "logout"
 

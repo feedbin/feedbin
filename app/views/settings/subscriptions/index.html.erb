@@ -8,7 +8,7 @@
     <div class="md:max-w-[250px]">
       <%= component "form/text_input" do |input| %>
         <% input.input do %>
-          <input type="search" class="feed-search peer" placeholder="Search Feeds" data-behavior="autosubmit" name="q" value="<%= params[:q] %>" />
+          <input type="search" class="feed-search peer text-input" placeholder="Search Feeds" data-behavior="autosubmit" name="q" value="<%= params[:q] %>" />
         <% end %>
         <% input.accessory_leading do %>
           <%= svg_tag "icon-search", class: "fill-400 pg-focus:fill-blue-600" %>

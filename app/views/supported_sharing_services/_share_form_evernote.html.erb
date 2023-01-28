@@ -1,40 +1,43 @@
-<div class="share-form">
-    <div class="share-form-inner icon-share-evernote">
-        <div class="sharing-header">
-            <h2>Save to Evernote</h2>
-            <%= svg_tag "icon-share-evernote" %>
-        </div>
-        <%= form_tag("", remote: true) do %>
-            <%= hidden_field_tag :readability, "off", class: "readability-placeholder" %>
-            <div class="field-cluster">
-                <div class="input-group-wrap">
-                    <label for="evernote_title">Title</label>
-                    <%= render "shared/input" do %>
-                        <%= text_field_tag :title, "", class: "title-placeholder", id: "evernote_title" %>
-                    <% end %>
-                </div>
-                <div class="input-group-wrap">
-                    <label for="evernote_tags">Tags</label>
-                    <%= render "shared/input" do %>
-                        <%= text_field_tag :tags, "", placeholder: "Tags (comma separated)", id: "evernote_tags" %>
-                    <% end %>
-                </div>
-            </div>
-            <div class="sharing-controls">
-                <div class="input-group-wrap">
-                    <label for="evernote_notebook">Notebook</label>
-                    <%= render "shared/input" do %>
-                        <%= select_tag "notebook_guid", options_for_select(service.service_options, service.default_option), class: "select", id: "evernote_notebook" %>
-                        <span class="accessory right">
-                            <%= svg_tag "icon-caret" %>
-                        </span>
-                    <% end %>
-                </div>
-            </div>
-            <div class="button-wrap">
-                <%= button_tag "Cancel", type: "button", class: "button button-secondary", data: {behavior: "close_entry_basement"} %>
-                <%= button_tag "Save", type: "submit", class: "button" %>
-            </div>
+<%= component "app/share_form", title: "Save to Evernote", icon: "icon-share-evernote" do %>
+  <%= form_tag("", remote: true) do %>
+    <%= hidden_field_tag :readability, "off", class: "readability-placeholder" %>
+
+    <div class="mb-4">
+      <%= component "form/text_input" do |text| %>
+        <% text.label do %>
+          <label for="evernote_title">Title</label>
         <% end %>
+        <% text.input do %>
+          <%= text_field_tag :title, "", class: "title-placeholder peer text-input", id: "evernote_title" %>
+        <% end %>
+      <% end %>
     </div>
-</div>
+
+    <div class="mb-4">
+      <%= component "form/text_input" do |text| %>
+        <% text.label do %>
+          <label for="evernote_tags">Tags</label>
+        <% end %>
+        <% text.input do %>
+          <%= text_field_tag :tags, "", class: "peer text-input", placeholder: "Tags (comma separated)", id: "evernote_tags" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="mb-4">
+      <%= component "form/select_input" do |text| %>
+        <% text.label do %>
+          <label for="evernote_notebook">Notebook</label>
+        <% end %>
+        <% text.input do %>
+          <%= select_tag "notebook_guid", options_for_select(service.service_options, service.default_option), class: "peer", id: "evernote_notebook" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%= component "settings/button_row" do %>
+      <%= button_tag "Cancel", type: "button", class: "button button-secondary", data: {behavior: "close_entry_basement"} %>
+      <%= button_tag "Save", type: "submit", class: "button" %>
+    <% end %>
+  <% end %>
+<% end %>

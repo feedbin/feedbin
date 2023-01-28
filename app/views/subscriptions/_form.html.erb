@@ -13,10 +13,10 @@
             <% end %>
 
             <% content_for :modal_body do %>
-                <div class="inset">
-                    <h4 class="group-header">Tags</h4>
-                    <%= render partial: "shared/tag_fields", locals: {tag_editor: tag_editor} %>
-                </div>
+              <%= component "settings/h2" do %>
+                Tags
+              <% end %>
+              <%= render partial: "shared/tag_fields", locals: {tag_editor: tag_editor} %>
             <% end %>
 
             <% content_for :modal_footer do %>

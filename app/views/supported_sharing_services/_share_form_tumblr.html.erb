@@ -1,84 +1,101 @@
-<div class="share-form">
-    <div class="share-form-inner icon-share-tumblr">
-        <div class="sharing-header">
-            <h2>Post <span class="type-text">Link</span> to Tumblr</h2>
-            <%= svg_tag "icon-share-tumblr" %>
-        </div>
-        <%= form_tag("", remote: true) do %>
-            <%= hidden_field_tag :url, "", class: "url-placeholder" %>
-            <div class="field-cluster">
-                <div class="input-group-wrap" class="title-placeholder-wrap">
-                    <label for="tumblr_title">Title</label>
-                    <%= render "shared/input" do %>
-                        <%= text_field_tag :title, "", class: "title-placeholder", id: "tumblr_title" %>
-                    <% end %>
-                </div>
-                <div class="input-group-wrap">
-                    <label for="tumblr_description">Description</label>
-                    <%= render "shared/input" do %>
-                        <%= text_area_tag :description, "", rows: 5, class: "description-placeholder", id: "tumblr_description" %>
-                    <% end %>
-                </div>
-                <div class="input-group-wrap" class="source-placeholder-wrap hide">
-                    <label for="tumblr_source">Source</label>
-                    <%= render "shared/input" do %>
-                        <%= text_field_tag :source, "", class: "source-placeholder", id: "tumblr_source" %>
-                    <% end %>
-                </div>
-                <div class="input-group-wrap">
-                    <label for="tumblr_tags">Tags</label>
-                    <%= render "shared/input" do %>
-                        <%= text_field_tag :tags, "", placeholder: "comma separated", id: "tumblr_tags" %>
-                    <% end %>
-                </div>
-            </div>
-            <div class="sharing-controls">
-                <div class="input-group-wrap">
-                    <label for="type">Type</label>
-                    <%= render "shared/input" do %>
-                        <select id="type" name="type" data-behavior="tumblr_type" class="select">
-                            <option selected="selected" value="link" data-description-name="Description">Link</option>
-                            <option value="quote" data-description-name="Quote">Quote</option>
-                        </select>
-                        <span class="accessory right">
-                            <%= svg_tag "icon-caret" %>
-                        </span>
-                    <% end %>
-                </div>
-                <div class="input-group-wrap">
-                    <label for="format">Format</label>
-                    <%= render "shared/input" do %>
-                        <%= select_tag "format", options_for_select({"Markdown" => "markdown", "HTML" => "html"}, "markdown"), class: "select" %>
-                        <span class="accessory right">
-                            <%= svg_tag "icon-caret" %>
-                        </span>
-                    <% end %>
-                </div>
-                <% if service.service_options.present? %>
-                    <div class="input-group-wrap">
-                        <label for="site">Site</label>
-                        <%= render "shared/input" do %>
-                            <%= select_tag "site", options_for_select(service.service_options, service.default_option), class: "select" %>
-                            <span class="accessory right">
-                                <%= svg_tag "icon-caret" %>
-                            </span>
-                        <% end %>
-                    </div>
-                <% end %>
-                <div class="input-group-wrap">
-                    <label for="state">Status</label>
-                    <%= render "shared/input" do %>
-                        <%= select_tag "state", options_for_select({"Published" => "published", "Draft" => "draft", "Queue" => "queue", "Private" => "private"}, "published"), class: "select" %>
-                        <span class="accessory right">
-                            <%= svg_tag "icon-caret" %>
-                        </span>
-                    <% end %>
-                </div>
-            </div>
-            <div class="button-wrap">
-                <%= button_tag "Cancel", type: "button", class: "button button-secondary", data: {behavior: "close_entry_basement"} %>
-                <%= submit_tag "Post", class: "button" %>
-            </div>
+<%= component "app/share_form", title: "Post to Tumblr", icon: "icon-share-tumblr" do %>
+  <%= form_tag("", remote: true) do %>
+    <%= hidden_field_tag :url, "", class: "url-placeholder" %>
+    <div class="mb-4">
+      <%= component "form/text_input" do |text| %>
+        <% text.label do %>
+          <label for="tumblr_title">Title</label>
         <% end %>
+        <% text.input do %>
+          <%= text_field_tag :title, "", class: "title-placeholder peer text-input", id: "tumblr_title" %>
+        <% end %>
+      <% end %>
     </div>
-</div>
+
+    <div class="mb-4">
+      <%= component "form/text_input" do |text| %>
+        <% text.label do %>
+          <label for="tumblr_description">Description</label>
+        <% end %>
+        <% text.input do %>
+          <%= text_area_tag :description, "", class: "peer text-input", rows: 5, class: "description-placeholder", id: "tumblr_description" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="mb-4">
+      <%= component "form/text_input" do |text| %>
+        <% text.label do %>
+          <label for="tumblr_source">Source</label>
+        <% end %>
+        <% text.input do %>
+          <%= text_field_tag :source, "", class: "source-placeholder peer text-input", id: "tumblr_source" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="mb-4">
+      <%= component "form/text_input" do |text| %>
+        <% text.label do %>
+          <label for="tumblr_tags">Tags</label>
+        <% end %>
+        <% text.input do %>
+          <%= text_field_tag :tags, "", class: "peer text-input", placeholder: "comma separated", id: "tumblr_tags" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="mb-4 flex gap-4">
+      <div class="grow">
+        <%= component "form/select_input" do |text| %>
+          <% text.label do %>
+            <label for="tumblr_type">Type</label>
+          <% end %>
+          <% text.input do %>
+            <select id="tumblr_type" name="type" data-behavior="tumblr_type" class="peer">
+                <option selected="selected" value="link" data-description-name="Description">Link</option>
+                <option value="quote" data-description-name="Quote">Quote</option>
+            </select>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="grow">
+        <%= component "form/select_input" do |text| %>
+          <% text.label do %>
+            <label for="format">Format</label>
+          <% end %>
+          <% text.input do %>
+            <%= select_tag "format", options_for_select({"Markdown" => "markdown", "HTML" => "html"}, "markdown"), class: "peer" %>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="grow">
+        <%= component "form/select_input" do |text| %>
+          <% text.label do %>
+            <label for="state">Status</label>
+          <% end %>
+          <% text.input do %>
+            <%= select_tag "state", options_for_select({"Published" => "published", "Draft" => "draft", "Queue" => "queue", "Private" => "private"}, "published"), class: "peer" %>
+          <% end %>
+        <% end %>
+      </div>
+      <% if service.service_options.present? %>
+      <div class="grow">
+        <%= component "form/select_input" do |text| %>
+          <% text.label do %>
+            <label for="site">Site</label>
+          <% end %>
+          <% text.input do %>
+            <%= select_tag "site", options_for_select(service.service_options, service.default_option), class: "peer" %>
+          <% end %>
+        <% end %>
+      </div>
+      <% end %>
+    </div>
+
+    <%= component "settings/button_row" do %>
+      <%= button_tag "Cancel", type: "button", class: "button button-secondary", data: {behavior: "close_entry_basement"} %>
+      <%= submit_tag "Post", class: "button" %>
+    <% end %>
+  <% end %>
+<% end %>

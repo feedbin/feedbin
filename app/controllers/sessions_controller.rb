@@ -16,7 +16,7 @@ class SessionsController < ApplicationController
         redirect_back_or root_url
       end
     else
-      flash.now.alert = "Invalid email or password"
+      flash.now[:error] = "Invalid email or password"
       render "new", status: :unauthorized
     end
   end

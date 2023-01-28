@@ -8,11 +8,11 @@
     <%= @migration.message %>
   <% end %>
 <% elsif @migration.started? || @migration.processing? || @migration.complete? %>
-  <%= component "settings/control_group", class: "group", data: {capsule: "true"} do |group| %>
+  <%= component "settings/control_group", class: "group mb-14", data: {capsule: "true"} do |group| %>
     <% group.item do %>
       <div class="py-3 px-4">
         <div class="flex justify-between">
-          <strong class="text-bold">Progress</strong>
+          <strong class="font-bold">Progress</strong>
           <div class="text-500"><%= number_with_delimiter(@migration.account_migration_items.where.not(status: :pending).count) %> of <%= number_with_delimiter(@migration.account_migration_items.count) %> processed</div>
         </div>
 
@@ -26,7 +26,7 @@
   <% if @migration.started? %>
       Initializing…
   <% else %>
-    <%= component "settings/control_group" do |group| %>
+    <%= component "settings/control_group", class: "mb-14" do |group| %>
       <% group.header do %>
         Stats
       <% end %>
@@ -80,9 +80,8 @@
       </div>
     </div>
 
-    <div data-stacked="true" class="group">
       <% @migration.account_migration_items.failed.order(updated_at: :asc).each do |item| %>
-        <%= component "settings/expandable", capsule: true do |expandable| %>
+        <%= component "settings/expandable", class: "mb-4", data: {capsule: true} do |expandable| %>
           <% expandable.description do %>
             <%= component "settings/control_row" do |row| %>
               <% row.title { item.fw_feed.safe_dig("title") } %>
@@ -95,6 +94,5 @@
           <% end %>
         <% end %>
       <% end %>
-    </div>
   <% end %>
 <% end %>

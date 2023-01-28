@@ -49,9 +49,10 @@
                     <button class="search-button" data-behavior="toggle_search"><%= svg_tag "icon-search", size: "16x16" %></button>
                 </div>
                 <div class="search-wrap">
-                    <%= form_tag search_entries_path, class: 'search-form', remote: true, method: :get, data: {behavior: 'search_form'} do %>
+                    <%= form_tag search_entries_path, class: 'search-form group', remote: true, method: :get, data: {behavior: 'search_form'} do %>
                         <div class="icon-wrap"><%= svg_tag "icon-search" %></div>
                         <%= search_field_tag :query, params[:query], placeholder: 'Search', autocorrect: "off", autocapitalize: "off", spellcheck: false %>
+                        <%= component "app/spinner" %>
                     <% end %>
                     <div class="search-control">
                         <div class="search-toolbar">
@@ -85,7 +86,11 @@
                     <% @user.supported_sharing_services.each do |service| %>
                         <% if service.has_share_sheet? %>
                             <div class="basement-panel hide" data-basement-panel-target="<%= service.service_id %>_share_panel">
-                                <%= render partial: "supported_sharing_services/share_form_#{service.service_id}", locals: {service: service} %>
+                                <div class="py-6 px-8">
+                                  <div class="max-w-[620px] mx-auto" data-behavior="share_form">
+                                    <%= render partial: "supported_sharing_services/share_form_#{service.service_id}", locals: {service: service} %>
+                                  </div>
+                                </div>
                             </div>
                         <% end %>
                     <% end %>

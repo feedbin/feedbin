@@ -12,14 +12,14 @@
         <label for="pinboard_token">API Token</label>
       <% end %>
       <% text.input do %>
-        <%= password_field_tag "password", "", id: "pinboard_token", class: "peer" %>
+        <%= password_field_tag "password", "", id: "pinboard_token", class: "peer text-input" %>
       <% end %>
     <% end %>
 
-    <div class="button-wrap">
+    <%= component "settings/button_row" do %>
       <%= button_tag "Cancel", type: "button", class: "button button-tertiary button-inline", data: {action: "expandable#toggle"} %>
       <%= button_tag "Save", type: "submit", class: "button button-primary-plain" %>
-    </div>
+    <% end %>
   <% end %>
 
 <% end %>

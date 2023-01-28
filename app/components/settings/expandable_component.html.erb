@@ -1,4 +1,4 @@
-<%= component "settings/control_group", class: "group [&_[data-item]]:border-0", data: {controller: "expandable", expandable_open_value: "false", capsule: @capsule} do |group| %>
+<%= component "settings/control_group", options do |group| %>
   <% if header? %>
     <% group.header do %>
       <%= header %>

@@ -1,0 +1,24 @@
+<% @class = "theme-auto" %>
+
+<% content_for :content do %>
+<div class="flex flex-col min-h-full min-w-full p-4">
+  <div class="grow flex items-center justify-center">
+    <div class="max-w-[480px] grow mx-auto">
+      <a href="/" class="block flex justify-center items-center mb-6 md:mb-12">
+          <%= svg_tag "logo-full", inline: true, class: "logo-full w-[140px] h-[38px]" %>
+      </a>
+
+      <% if content_for?(:form_content) %>
+          <%= yield :form_content %>
+      <% end %>
+    </div>
+  </div>
+  <div class="text-center text-sm text-500 pt-4">
+    <a href="/privacy-policy" class="!text-500">Privacy Policy</a> | <a href="mailto:support@feedbin.com" class="!text-500">Support</a>
+  </div>
+</div>
+<% end %>
+
+
+<%= render partial: "shared/svg" %>
+<%= render template: "layouts/application" %>

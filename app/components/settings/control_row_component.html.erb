@@ -1,6 +1,6 @@
 <div class="py-4 flex items-center gap-4 group group-data-[capsule=true]:px-4">
   <% if icon? %>
-    <div class="inset-y-0 self-stretch shrink-0">
+    <div class="inset-y-0 self-stretch shrink-0 flex items-center">
       <%= icon %>
     </div>
   <% end %>
@@ -9,7 +9,7 @@
       <%= title %>
     </div>
     <% if description? %>
-      <div class="text-500 text-sm mt-2">
+      <div class="text-500 text-sm">
         <%= description %>
       </div>
     <% end %>

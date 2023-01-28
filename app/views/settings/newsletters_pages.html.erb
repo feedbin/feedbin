@@ -1,7 +1,7 @@
 <%= component "settings/h1" do %>
   Sources
 <% end %>
-<%= component "settings/control_group" do |group| %>
+<%= component "settings/control_group", class: "mb-14" do |group| %>
   <% group.header do %>
     Twitter
   <% end %>
@@ -13,11 +13,8 @@
           You are logged in to Twitter as <strong>@<%= @user.twitter_screen_name %></strong>.
         <% end %>
         <% row.control do %>
-          <%= render "shared/input", class: "accessory-left" do %>
-            <%= link_to "Log Out", delete_twitter_authentications_path, method: :delete, class: "button button-secondary", data: {confirm: "Are you sure? This will deactivate your Twitter subscriptions."} %>
-            <span class="accessory">
-              <%= svg_tag "icon-twitter-logo" %>
-            </span>
+          <%= link_to delete_twitter_authentications_path, method: :delete, class: "button button-secondary", data: {confirm: "Are you sure? This will deactivate your Twitter subscriptions."} do %>
+            <%= svg_tag "icon-twitter-logo", class: "fill-500" %> Sign Out
           <% end %>
         <% end %>
       <% end %>
@@ -30,11 +27,8 @@
           Sign in to enable <a href="/blog/2018/01/11/feedbin-is-the-best-way-to-read-twitter/">Twitter subscriptions</a>.
         <% end %>
         <% row.control do %>
-          <%= render "shared/input", class: "last-control accessory-left" do %>
-            <%= link_to "Sign In", new_twitter_authentication_path({mode: "settings"}), class: "button button-secondary" %>
-            <span class="accessory">
-              <%= svg_tag "icon-twitter-logo" %>
-            </span>
+          <%= link_to new_twitter_authentication_path({mode: "settings"}), class: "button button-secondary" do %>
+            <%= svg_tag "icon-twitter-logo", class: "fill-500" %> Sign In
           <% end %>
         <% end %>
       <% end %>
@@ -42,25 +36,31 @@
   <% end %>
 <% end %>
 <%= form_for @user, remote: true, url: settings_update_user_path(@user) do |f| %>
-  <%= component "settings/control_group" do |group| %>
+  <%= component "settings/control_group", class: "mb-14" do |group| %>
     <% group.header do %>
       Newsletters
     <% end %>
     <% group.item do %>
-      <%= component "settings/control_row" do |row| %>
-        <% row.title { "Newsletter Address" } %>
-        <% row.description do %>
+      <div class="py-4">
+        <div class="text-600">
+          Newsletter Address
+        </div>
+        <div class="text-500 text-sm mb-2">
           Use this address to <a href="/blog/2016/02/03/subscribe-to-email-newsletters-in-feedbin/">receive emails</a> in Feedbin.
-        <% end %>
-        <% row.control do %>
-          <%= render "shared/input", class: "accessory-right" do %>
-            <input type="text" value="<%= @user.newsletter_address %>" readonly />
-            <button class="accessory right icon" data-behavior="copy" title="Copy to clipboard" data-toggle="tooltip">
-              <%= svg_tag "icon-clipboard" %>
-            </button>
+        </div>
+
+        <%= component "form/text_input" do |text| %>
+          <% text.input do %>
+            <input type="text" value="<%= @user.newsletter_address %>" readonly class="text-input" />
+          <% end %>
+          <% text.accessory_trailing_cap position: "trailing" do %>
+            <%= button_tag data: {controller: "copyable", action: "copyable#copy", copyable_data_value: @user.newsletter_address, copyable_success_value: false }, class: "px-6 inset-y-0 group" do %>
+              <span class="group-data-[copyable-success-value=true]:tw-hidden">Copy</span>
+              <span class="group-data-[copyable-success-value=false]:tw-hidden flex items-center gap-2 fill-green-600"><%= svg_tag "icon-check" %> Copied</span>
+            <% end %>
           <% end %>
         <% end %>
-      <% end %>
+      </div>
     <% end %>
     <% group.item do %>
       <%= component "settings/control_row" do |row| %>
@@ -73,13 +73,16 @@
             <% input.input do %>
               <%= f.select :newsletter_tag, tag_options, {}, {class: "peer", data: {behavior: "auto_submit"}} %>
             <% end %>
+            <% input.accessory_leading do %>
+              <%= svg_tag "favicon-tag", class: "fill-500" %>
+            <% end %>
           <% end %>
         <% end %>
       <% end %>
     <% end %>
   <% end %>
 <% end %>
-<%= component "settings/control_group" do |group| %>
+<%= component "settings/control_group", class: "mb-14" do |group| %>
   <% group.header do %>
     Pages
   <% end %>
@@ -90,14 +93,10 @@
         Drag this to your bookmarks bar. Use it to <a href="/blog/2019/08/20/save-webpages-to-read-later/">save articles from the web</a> to Feedbin.
       <% end %>
       <% row.control do %>
-        <%= render "shared/input", class: "accessory-left accessory-right grabber-wrap" do %>
-          <%= bookmarklet %>
-          <span class="accessory">
-            <%= svg_tag "favicon-saved" %>
-          </span>
-          <span class="accessory right grabber-icon">
-            <%= svg_tag "icon-grabber" %>
-          </span>
+        <%= link_to bookmarklet, onclick: "return false;", class: "button-secondary cursor-move" do %>
+          <%= svg_tag "favicon-saved", class: "fill-500" %>
+          Send to Feedbin
+          <%= svg_tag "icon-grabber", class: "ml-6 fill-700" %>
         <% end %>
       <% end %>
     <% end %>
@@ -121,9 +120,9 @@
     <% end %>
     <% @user.newsletter_senders.each do |newsletter_sender| %>
       <% expandable.item do %>
-        <%= form_with(model: newsletter_sender, url: newsletter_senders_settings_subscription_path(newsletter_sender.feed_id), data: {remote: true}) do |f| %>
-          <%= f.check_box :feed_id, {id: "newsletter_sender_#{newsletter_sender.feed_id}", checked: @subscription_ids.include?(newsletter_sender.feed_id), class: "peer", data: {behavior: "auto_submit"}} %>
-          <%= f.label :feed_id, for: "newsletter_sender_#{newsletter_sender.feed_id}", class: "group" do %>
+        <%= form_with(model: newsletter_sender, url: newsletter_senders_settings_subscription_path(newsletter_sender.feed_id), namespace: newsletter_sender.feed_id, data: {remote: true}) do |f| %>
+          <%= f.check_box :feed_id, {checked: @subscription_ids.include?(newsletter_sender.feed_id), class: "peer", data: {behavior: "auto_submit"}} %>
+          <%= f.label :feed_id, class: "group" do %>
             <%= component "settings/control_row_switch" do |row| %>
               <% row.title do %>
                 <%= newsletter_sender.name %> <span class="text-500">&lt;<%= newsletter_sender.email %>&gt;</span>

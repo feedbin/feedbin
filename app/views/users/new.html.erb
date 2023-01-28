@@ -1,51 +1,63 @@
 <% content_for :head do %>
     <%= javascript_include_tag "https://js.stripe.com/v3/" %>
 <% end %>
-<% @class = 'login theme-auto' %>
-<div class="login-wrap">
-    <a href="/" class="logo">
-        <%= svg_tag "logo-full", inline: true %>
-    </a>
-    <div class="box">
-        <div data-behavior="stripe_error" class="alert alert-error hide"></div>
-        <h3 class="box-header">
-            <% if session[:feed_wrangler_token].present? %>
-                Howdy, Feed Wrangler! Import your account and get a <%= Feedbin::Application.config.trial_days %>-day free trial.
-            <% else %>
-                Create your <strong>Free <%= Feedbin::Application.config.trial_days %>-Day Trial</strong> Account
-            <% end %>
-        </h3>
-        <%= form_for @user, html: { class: 'combined-form', data: { behavior: 'credit_card_form' }, novalidate: true } do |f| %>
-            <% if @user.errors.present? %>
-                <div class="alert alert-error">
-                    <%= @user.errors.full_messages.join('. ') %>.
-                </div>
-            <% end %>
-            <% if @user.plan_id %>
-                <%= f.hidden_field :plan_id %>
-            <% end %>
-            <% if @user.coupon_valid %>
-                <%= f.hidden_field :coupon_code %>
-                <div class="alert alert-success">
-                    Your coupon gets you a free account.
-                </div>
-            <% elsif @user.coupon_valid == false %>
-                <div class="alert alert-error">
-                    Invalid coupon.
-                </div>
-            <% end %>
-            <%= f.hidden_field :stripe_token, data: { behavior: 'stripe_token' } %>
+<% @class = "theme-auto" %>
 
-            <%= render "shared/input" do %>
-                <%= f.email_field :email, autofocus: true, placeholder: 'Email', tabindex: 1 %>
-            <% end %>
-            <%= render "shared/input" do %>
-                <%= f.password_field :password, placeholder: 'Password', tabindex: 2 %>
-            <% end %>
+<% content_for :form_content do %>
+  <div class="border rounded-md p-6 md:p-12 mb-8">
+    <h1 class="font-bold text-lg mb-4">
+      Sign up for a <%= Feedbin::Application.config.trial_days %>-day free trial
+    </h1>
 
-            <button type="submit" class="button flex" tabindex="3">Sign Up</button>
+    <%= form_for @user, html: { class: "combined-form", data: { behavior: "credit_card_form" }, novalidate: true } do |f| %>
+      <% if @user.errors.present? %>
+        <div class="alert alert-error">
+          <%= @user.errors.full_messages.join(". ") %>.
+        </div>
+      <% end %>
+      <% if @user.plan_id %>
+          <%= f.hidden_field :plan_id %>
+      <% end %>
+      <% if @user.coupon_valid %>
+        <%= f.hidden_field :coupon_code %>
+        <div class="alert alert-success">
+          Your coupon gets you a free account.
+        </div>
+      <% elsif @user.coupon_valid == false %>
+        <div class="alert alert-error">
+          Invalid coupon.
+        </div>
+      <% end %>
+      <%= f.hidden_field :stripe_token, data: { behavior: "stripe_token" } %>
+
+      <%= render partial: "shared/flash", locals: {flash: flash} %>
+
+      <div class="mb-4">
+        <%= component "form/text_input" do |text| %>
+          <% text.label do %>
+            <%= f.label :email, "Email" %>
+          <% end %>
+          <% text.input do %>
+            <%= f.email_field :email, autofocus: true, tabindex: 1, class: "text-input" %>
+          <% end %>
         <% end %>
-    </div>
-    <p class="align-center x-large extra-muted">Already have an account? <%= link_to "Log In", login_path %></p>
-</div>
-<%= render partial: 'shared/svg' %>
+      </div>
+      <div class="mb-8">
+        <%= component "form/text_input" do |text| %>
+          <% text.label do %>
+            <%= f.label :password, "Password" %>
+          <% end %>
+          <% text.input do %>
+            <%= f.password_field :password, tabindex: 2, class: "text-input" %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <button type="submit" class="button flex w-full" tabindex="2">Sign Up</button>
+    <% end %>
+  </div>
+  <p class="text-center text-500">Already have an account?</p>
+  <p class="text-center"><%= link_to "Log In", login_path, class: "font-medium" %></p>
+<% end %>
+
+<%= render template: "layouts/form_page" %>

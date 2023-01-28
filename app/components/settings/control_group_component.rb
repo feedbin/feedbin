@@ -7,6 +7,12 @@ class Settings::ControlGroupComponent < BaseComponent
     @options = options
   end
 
+  def options
+    {
+      class: [@options.delete(:class)].reject(&:blank?).join(" "),
+    }.merge(@options)
+  end
+
   class ItemComponent < BaseComponent
     def initialize(options = {})
       @options = options

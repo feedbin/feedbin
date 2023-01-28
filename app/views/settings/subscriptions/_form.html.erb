@@ -6,42 +6,44 @@
           <%= link_to "Edit", edit_subscription_path(subscription.feed), remote: true, class: "button button-secondary !ml-auto", data: {behavior: "open_settings_modal feed_settings", modal_target: "edit"} %>
         </div>
 
-        <div class="chart-wrap">
-            <div class="graph-wrap">
-                <div class="graph-lines">
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
+        <div class="chart-wrap leading-none flex mb-8 pb-[21px]">
+            <div class="flex grow pt-[20%] border-b mr-[5px] relative">
+                <div class="flex shrink-0 flex-col justify-between text-right absolute top-0 left-0 right-0 bottom-[2px]">
+                    <div class="w-full border-t border-200 border-dashed"></div>
+                    <div class="w-full border-t border-200 border-dashed"></div>
+                    <div class="w-full border-t border-200 border-dashed"></div>
+                    <div class="w-full border-t border-200 border-dashed"></div>
+                    <div class="w-full border-t border-200 border-dashed invisible"></div>
                 </div>
-                <div class="graph" data-behavior="hide_tooltip tooltip_controller">
-                    <div class="tooltip-large hide" data-behavior="tooltip_target">
-                        <div class="date" data-behavior="tooltip_day"></div>
-                        <div class="count" data-behavior="tooltip_count"></div>
+                <div class="flex items-stretch flex-nowrap absolute top-0 left-0 right-0 bottom-[2px]" data-behavior="hide_tooltip tooltip_controller">
+                    <div class="absolute top-[10px] left-[10px] bg-100 border p-1 leading-none text-[10px] rounded whitespace-nowrap transition group opacity-0 data-[visible=true]:opacity-100" data-visible="false" data-behavior="tooltip_target" data-position="left">
+                        <div class="w-0 h-0 border-x-transparent border-l-[4px] border-t-[4px] border-r-[4px] block absolute bottom-[-4px] group-data-[position=left]:left-[13px] group-data-[position=right]:right-[9px]"></div>
+                        <div class="w-0 h-0 border-x-transparent border-l-[3px] border-t-[3px] border-r-[3px] block absolute bottom-[-3px] group-data-[position=left]:left-[14px] group-data-[position=right]:right-[10px] border-100"></div>
+                        <div class="uppercase text-500 mb-1" data-behavior="tooltip_day"></div>
+                        <div class="text-600 font-bold" data-behavior="tooltip_count"></div>
                     </div>
                     <% subscription_presenter.graph_bars.each do |data| %>
-                        <div class="bar-sleeve" data-day="<%= data.day %>" data-count="<%= subscription_presenter.bar_count(data) %>" data-behavior="show_tooltip">
-                            <div style="height: <%= data.percent %>%;" class="bar <%= subscription_presenter.bar_class(data) %>"></div>
+                        <div class="bar-sleeve flex-nowrap flex items-end grow first:m-0" data-day="<%= data.day %>" data-count="<%= subscription_presenter.bar_count(data) %>" data-behavior="show_tooltip">
+                            <div style="height: <%= data.percent %>%;" class="ml-[2px] min-h-[1px] content-[''] grow bg-green-600 <%= data.count == 0 ? "rounded-t-none" : "rounded-t" %>"></div>
                         </div>
                     <% end %>
                 </div>
-                <div class="x-axis">
+                <div class="absolute inset-x-0 bottom-[-18px] justify-between flex text-400 text-xs leading-none">
                     <div><%= subscription_presenter.graph_date_start %></div>
                     <div><%= subscription_presenter.graph_date_mid %></div>
                     <div><%= subscription_presenter.graph_date_end %></div>
                 </div>
             </div>
-            <div class="y-axis">
-                <div><%= subscription_presenter.graph_quarter(4) %></div>
-                <div><%= subscription_presenter.graph_quarter(3) %></div>
-                <div><%= subscription_presenter.graph_quarter(2) %></div>
-                <div><%= subscription_presenter.graph_quarter(1) %></div>
-                <div>0</div>
+            <div class="flex shrink-0 flex-col justify-between text-right text-400 text-xs leading-none">
+                <div class="relative top-[-5px]"><%= subscription_presenter.graph_quarter(4) %></div>
+                <div class="relative top-[-3px]"><%= subscription_presenter.graph_quarter(3) %></div>
+                <div class="relative top-[-1px]"><%= subscription_presenter.graph_quarter(2) %></div>
+                <div class="relative top-[1px]"><%= subscription_presenter.graph_quarter(1) %></div>
+                <div class="relative top-[3px]">0</div>
             </div>
         </div>
 
-        <%= component "settings/control_group" do |group| %>
+        <%= component "settings/control_group", class: "mb-14" do |group| %>
           <% group.header do %>
             Stats
           <% end %>
@@ -115,7 +117,7 @@
         <% end %>
 
 
-        <%= component "settings/control_group" do |group| %>
+        <%= component "settings/control_group", class: "mb-14" do |group| %>
           <% group.header do %>
             Options
           <% end %>

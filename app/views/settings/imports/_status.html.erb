@@ -1,8 +1,8 @@
-<%= component "settings/control_group", class: "group", data: {capsule: "true"} do |group| %>
+<%= component "settings/control_group", class: "group mb-14", data: {capsule: "true"} do |group| %>
   <% group.item do %>
     <div class="py-3 px-4">
       <div class="flex justify-between">
-        <strong class="text-bold">Progress</strong>
+        <strong class="font-bold">Progress</strong>
         <div class="text-500"><%= number_with_delimiter(@import.import_items.where.not(status: :pending).count) %> of <%= number_with_delimiter(@import.import_items.count) %></div>
       </div>
 
@@ -37,9 +37,7 @@
     </div>
   </div>
 
-  <div data-stacked="true" class="group">
-    <% @failed_items.each do |import_item| %>
-      <%= render import_item %>
-    <% end %>
-  </div>
+  <% @failed_items.each do |import_item| %>
+    <%= render import_item %>
+  <% end %>
 <% end %>

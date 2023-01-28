@@ -8,16 +8,14 @@
         <% end %>
 
         <% content_for :modal_body do %>
-            <div class="inset">
-                <h4 class="group-header">Query</h4>
-                <ul class="control-group no-border">
-                    <li class="text no-border">
-                        <%= render "shared/input" do %>
-                            <%= f.text_field :query, placeholder: saved_search.query %>
-                        <% end %>
-                    </li>
-                </ul>
-            </div>
+          <%= component "settings/h2" do %>
+            Query
+          <% end %>
+          <%= component "form/text_input" do |text| %>
+            <% text.input do %>
+              <%= f.text_field :query, placeholder: saved_search.query, class: "peer text-input" %>
+            <% end %>
+          <% end %>
         <% end %>
 
         <% content_for :modal_footer do %>

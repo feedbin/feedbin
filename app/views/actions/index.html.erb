@@ -18,10 +18,10 @@
   </div>
 </div>
 
-<%= link_to "+ Add Action", new_action_path, class: "button button-huge" %>
+<%= link_to "+ Add Action", new_action_path, class: "button button-huge mb-8" %>
 
 <% if @actions.find { _1.broken? } %>
-  <%= component "settings/control_group" do |group| %>
+  <%= component "settings/control_group", class: "mb-14" do |group| %>
     <% group.header do %>
       Invalid Actions
     <% end %>
@@ -35,7 +35,7 @@
 <% end %>
 
 <% if @actions.find { !_1.broken? } %>
-  <%= component "settings/control_group" do |group| %>
+  <%= component "settings/control_group", class: "mb-14" do |group| %>
     <% group.header do %>
       Saved Actions
     <% end %>

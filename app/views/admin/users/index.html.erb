@@ -6,7 +6,7 @@
   <%= form_tag(admin_users_path, method: "get") do %>
     <%= component "form/text_input" do |text| %>
       <% text.input do %>
-        <input name="q" type="text" class="peer" data-behavior="user_search" placeholder="Search Customers" />
+        <input name="q" type="text" class="peer text-input" data-behavior="user_search" placeholder="Search Customers" />
       <% end %>
       <% text.accessory_leading do %>
         <%= svg_tag "icon-search", class: "fill-400 pg-focus:fill-blue-600" %>
@@ -15,7 +15,7 @@
   <% end %>
 </div>
 
-<%= component "settings/control_group" do |group| %>
+<%= component "settings/control_group", class: "mb-14" do |group| %>
   <% @users.each do |user| %>
     <% group.item do %>
       <div data-behavior="<%= user.customer_id %>">

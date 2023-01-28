@@ -10,13 +10,13 @@
 
   <%= component "form/text_input" do |text| %>
     <% text.input do %>
-      <%= f.email_field :email, placeholder: "Email", class: "peer" %>
+      <%= f.email_field :email, placeholder: "Email", class: "peer text-input" %>
     <% end %>
   <% end %>
 
-  <div class="button-wrap">
+  <%= component "settings/button_row" do %>
     <button type="submit" class="button">Update</button>
-  </div>
+  <% end %>
 <% end %>
 
 <%= form_for(@user, html: {class: "mb-14"}) do |f| %>
@@ -30,7 +30,7 @@
         <%= f.label :old_password, "Old Password" %>
       <% end %>
       <% text.input do %>
-        <%= f.password_field :old_password, class: "peer" %>
+        <%= f.password_field :old_password, class: "peer text-input" %>
       <% end %>
     <% end %>
   </div>
@@ -40,13 +40,14 @@
       <%= f.label :password, "New Password" %>
     <% end %>
     <% text.input do %>
-      <%= f.password_field :password, class: "peer" %>
+      <%= f.password_field :password, class: "peer text-input" %>
     <% end %>
   <% end %>
 
-  <div class="button-wrap">
+
+  <%= component "settings/button_row" do %>
     <button type="submit" class="button">Update</button>
-  </div>
+  <% end %>
 <% end %>
 
 <%= form_for(@user, method: :delete, id: "delete_user", html: {class: "mb-14"}) do |f| %>
@@ -57,8 +58,7 @@
   <p class="mb-4">Canceling your account will end your subscription immediately. All of your data will be deleted. You will receive a confirmation email with your feed subscriptions attached. <strong>You cannot undo this</strong>.</p>
 
   <% if @last_payment %>
-    <div data-stacked="true" class="group">
-      <%= component "settings/control_group" do |group| %>
+      <%= component "settings/control_group", class: "mb-4" do |group| %>
         <% group.item do %>
           <%= check_box_tag :billing_event_id, Rails.application.message_verifier(:billing_event_id).generate(@last_payment.id), false, class: "peer" %>
           <%= label_tag :billing_event_id, class: "group" do %>
@@ -70,10 +70,9 @@
           <% end %>
         <% end %>
       <% end %>
-    </div>
   <% end %>
 
-  <div class="button-wrap">
-    <p><%= f.submit "Cancel Account", class: "button button-secondary", data: { confirm: "Are you sure?" } %></p>
-  </div>
+  <%= component "settings/button_row" do %>
+    <%= f.submit "Cancel Account", class: "button button-secondary", data: { confirm: "Are you sure?" } %>
+  <% end %>
 <% end %>

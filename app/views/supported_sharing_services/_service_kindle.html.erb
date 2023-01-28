@@ -1,17 +1,12 @@
 <% record = (status == :active) ? sharing_service : record %>
-<%= component "settings/expandable", capsule: true do |expandable| %>
+<%= component "settings/expandable", class: "mb-4", data: {capsule: true} do |expandable| %>
   <% expandable.description do %>
     <%= component "settings/control_row" do |row| %>
       <% row.icon do %>
         <%= render "icon", sharing_service: sharing_service %>
       <% end %>
-      <% row.title { sharing_service.label } %>
 
-      <% if status == :active %>
-        <% row.description do %>
-          Articles will be sent to <%= sharing_service.kindle_address %>
-        <% end %>
-      <% end %>
+      <% row.title { sharing_service.label } %>
 
       <% row.control do %>
         <% if status == :active %>
@@ -25,7 +20,7 @@
 
   <% expandable.item do %>
     <div class="py-3 px-4">
-      <p class="mb-4 text-500"><strong class="text-bold">How to activate:</strong> Add <em>kindle@feedbin.com</em> to your <a href="https://www.amazon.com/hz/mycd/myx#/home/settings/payment" target="_blank">Approved Personal Document E-mail List</a>. You can get your Kindle email address from the <a href="https://www.amazon.com/gp/digital/fiona/manage?&amp;#manageDevices" target="_blank">Manage your devices</a> page.</p>
+      <p class="mb-4 text-500"><strong class="font-bold">How to activate:</strong> Add <em>kindle@feedbin.com</em> to your <a href="https://www.amazon.com/hz/mycd/myx#/home/settings/payment" target="_blank">Approved Personal Document E-mail List</a>. You can get your Kindle email address from the <a href="https://www.amazon.com/gp/digital/fiona/manage?&amp;#manageDevices" target="_blank">Manage your devices</a> page.</p>
 
       <%= form_for(record) do |f| %>
         <%= f.hidden_field :service_id, value: sharing_service.service_id %>
@@ -36,14 +31,14 @@
             <%= f.label :kindle_address, "Kindle Email Address" %>
           <% end %>
           <% text.input do %>
-            <%= f.text_field :kindle_address, class: "peer" %>
+            <%= f.text_field :kindle_address, class: "peer text-input" %>
           <% end %>
         <% end %>
 
-        <div class="button-wrap">
+        <%= component "settings/button_row" do %>
           <%= button_tag "Cancel", type: "button", class: "button button-tertiary", data: {action: "expandable#toggle"} %>
           <%= button_tag "Save", type: "submit", class: "button button-primary-plain" %>
-        </div>
+        <% end %>
       <% end %>
     </div>
   <% end %>

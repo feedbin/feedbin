@@ -43,7 +43,7 @@ class FormatTest < ApplicationSystemTestCase
 
     find("a[href='/settings/appearance']").click
     wait_for_ajax
-    assert_selector ".group-header", text: "Interface Elements"
+    assert_selector "h2", text: "Interface Elements"
 
   end
 end

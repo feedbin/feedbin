@@ -1,20 +1,28 @@
-<% @class = 'login theme-auto' %>
-<div class="login-wrap">
-    <a href="/" class="logo">
-        <%= svg_tag "logo-full", inline: true %>
-    </a>
-    <div class="box">
-        <%= render partial: 'shared/flash', locals: {flash: flash} %>
-        <h3 class="box-header">Reset Password</h3>
-        <%= form_tag password_resets_path, novalidate: 'novalidate' do %>
-            <div class="input-group-wrap">
-                <label for="email">Account email</label>
-                <%= render "shared/input" do %>
-                    <%= email_field_tag :email, params[:email] %>
-                <% end %>
-            </div>
-            <button class="button flex">Send</button>
+<% @class = "theme-auto" %>
+
+<% content_for :form_content do %>
+  <div class="border rounded-md p-6 md:p-12 mb-8">
+    <%= form_tag password_resets_path, novalidate: "novalidate" do %>
+      <h1 class="font-bold text-lg mb-4">Reset Password</h1>
+      <%= render partial: "shared/flash", locals: {flash: flash} %>
+
+      <div class="mb-8">
+        <%= component "form/text_input" do |text| %>
+          <% text.label do %>
+            <label for="email">Account email</label>
+          <% end %>
+          <% text.input do %>
+            <%= email_field_tag :email, params[:email], class: "text-input", tabindex: 1, autofocus: true %>
+          <% end %>
         <% end %>
-    </div>
-</div>
-<%= render partial: 'shared/svg' %>
+      </div>
+
+      <button type="submit" class="button flex w-full" tabindex="2">Send Reset Link</button>
+    <% end %>
+  </div>
+  <p class="text-center text-500">Already have an account?</p>
+  <p class="text-center"><%= link_to "Log In", login_path, class: "font-medium" %></p>
+<% end %>
+
+<%= render template: "layouts/form_page" %>
+

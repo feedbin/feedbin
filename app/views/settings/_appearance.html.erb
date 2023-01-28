@@ -7,47 +7,58 @@
         <% end %>
 
         <% content_for :modal_body do %>
-            <div class="inset settings">
+          <%= component "settings/control_group", class: "mb-14" do |group| %>
+            <% group.header do %>
+              Display
+            <% end %>
+            <% group.item do %>
+              <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block', data: {behavior: 'appearance_radio auto_submit', setting: 'entries-display'}, class: "peer"}) %>
+              <%= f.label :entries_display_block, class: "group" do %>
+                <%= component "settings/control_row_radio" do |row| %>
+                  <% row.title { "Default" } %>
+                <% end %>
+              <% end %>
+            <% end %>
+            <% group.item do %>
+              <%= f.radio_button(:entries_display, "inline", {data: {behavior: 'appearance_radio auto_submit', setting: 'entries-display'}, class: "peer"}) %>
+              <%= f.label :entries_display_inline, class: "group" do %>
+                <%= component "settings/control_row_radio" do |row| %>
+                  <% row.title { "Inline" } %>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
 
-                <h4 class="group-header">Display</h4>
-                <ul class="control-group">
-                    <li>
-                        <%= f.radio_button(:entries_display, "block", {checked: @user.entries_display.nil? || @user.entries_display === 'block', data: {behavior: 'appearance_radio auto_submit', setting: 'entries-display'}}) %>
-                        <%= f.label :entries_display_block do %>
-                            Default <%= radio_button_control %>
-                        <% end %>
-                    </li>
-                    <li>
-                        <%= f.radio_button(:entries_display, "inline", {data: {behavior: 'appearance_radio auto_submit', setting: 'entries-display'}}) %>
-                        <%= f.label :entries_display_inline do %>
-                            Inline <%= radio_button_control %>
-                        <% end %>
-                    </li>
-                </ul>
-                <h4 class="group-header">Interface Elements</h4>
-                <ul class="control-group">
-                    <li>
-                        <%= f.check_box :entries_feed, {checked: @user.entries_feed.nil? || @user.setting_on?(:entries_feed), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-feed'} } %>
-                        <%= f.label :entries_feed do %>
-                            Feed <%= toggle_switch %>
-                        <% end %>
-                    </li>
-                    <li>
-                        <%= f.check_box :entries_body, {checked: @user.entries_body.nil? || @user.setting_on?(:entries_body), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-body'} } %>
-                        <%= f.label :entries_body do %>
-                            Summary <%= toggle_switch %>
-                        <% end %>
-                    </li>
-                    <li>
-                        <%= f.check_box :entries_image, {checked: @user.entries_image.nil? || @user.setting_on?(:entries_image), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-image'} } %>
-                        <%= f.label :entries_image do %>
-                            Media <%= toggle_switch %>
-                        <% end %>
-                    </li>
-                </ul>
-            </div>
+          <%= component "settings/control_group", class: "mb-14" do |group| %>
+            <% group.header do %>
+              Interface Elements
+            <% end %>
+            <% group.item do %>
+              <%= f.check_box :entries_feed, {checked: @user.entries_feed.nil? || @user.setting_on?(:entries_feed), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-feed'}, class: "peer" } %>
+              <%= f.label :entries_feed, class: "group" do %>
+                <%= component "settings/control_row_switch" do |row| %>
+                  <% row.title { "Feed" } %>
+                <% end %>
+              <% end %>
+            <% end %>
+            <% group.item do %>
+              <%= f.check_box :entries_body, {checked: @user.entries_body.nil? || @user.setting_on?(:entries_body), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-body'}, class: "peer" } %>
+              <%= f.label :entries_body, class: "group" do %>
+                <%= component "settings/control_row_switch" do |row| %>
+                  <% row.title { "Summary" } %>
+                <% end %>
+              <% end %>
+            <% end %>
+            <% group.item do %>
+              <%= f.check_box :entries_image, {checked: @user.entries_image.nil? || @user.setting_on?(:entries_image), data: {behavior: 'appearance_checkbox auto_submit', setting: 'entries-image'}, class: "peer" } %>
+              <%= f.label :entries_image, class: "group" do %>
+                <%= component "settings/control_row_switch" do |row| %>
+                  <% row.title { "Media" } %>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
         <% end %>
-
         <%= render template: "layouts/modal_inner", locals: {purpose: "edit"} %>
 
       <% end %>
