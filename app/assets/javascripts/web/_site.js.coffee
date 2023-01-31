@@ -2257,22 +2257,6 @@ $.extend feedbin,
         feedbin.showNotification('Search error.', true);
         return
 
-    showPushOptions: ->
-      if "safari" of window and "pushNotification" of window.safari
-        $('body').addClass('supports-push')
-        if $('#push-data').length > 0
-          # $('.push-options').removeClass('hide')
-          data = $('#push-data').data()
-          permissionData = window.safari.pushNotification.permission(data.websiteId)
-          feedbin.checkPushPermission(permissionData)
-
-    enablePush: ->
-      $(document).on 'click', '[data-behavior~=enable_push]', (event) ->
-        data = $('#push-data').data()
-        window.safari.pushNotification.requestPermission(data.webServiceUrl, data.websiteId, {authentication_token: data.authenticationToken}, feedbin.checkPushPermission)
-        event.preventDefault()
-        return
-
     deleteAssociatedRecord: ->
       $(document).on 'click', '.remove_fields', (event) ->
         $(@).parents('[data-behavior~=associated_record]').hide(200)

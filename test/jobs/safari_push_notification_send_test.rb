@@ -18,7 +18,7 @@ class SafariPushNotificationSendTest < ActiveSupport::TestCase
     SafariPushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
       assert_no_difference "Device.count" do
         assert_difference -> { pool.count }, +count do
-          SafariPushNotificationSend.new.perform(user_ids, @entries.first.id)
+          SafariPushNotificationSend.new.perform(user_ids, @entries.first.id, false)
         end
       end
     end
@@ -30,7 +30,7 @@ class SafariPushNotificationSendTest < ActiveSupport::TestCase
     count = Device.where(user_id: user_ids).count
     SafariPushNotificationSend.stub_const(:APNOTIC_POOL, pool) do
       assert_difference "Device.count", -count do
-        SafariPushNotificationSend.new.perform(user_ids, @entries.first.id)
+        SafariPushNotificationSend.new.perform(user_ids, @entries.first.id, false)
       end
     end
   end

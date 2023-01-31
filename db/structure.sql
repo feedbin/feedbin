@@ -400,7 +400,8 @@ CREATE TABLE public.devices (
     updated_at timestamp without time zone,
     application text,
     operating_system text,
-    active boolean DEFAULT true
+    active boolean DEFAULT true,
+    data jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -3073,6 +3074,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221219141006'),
 ('20221220140655'),
 ('20221222204921'),
-('20230101160218');
+('20230101160218'),
+('20230130211416');
 
 

@@ -310,6 +310,7 @@ GEM
     hashdiff (1.0.1)
     hashie (5.0.0)
     hetchy (1.0.0)
+    hkdf (1.0.0)
     honeybadger (5.0.2)
     htmlbeautifier (1.4.2)
     htmlentities (4.3.4)
@@ -436,6 +437,7 @@ GEM
       rack (>= 1.2, < 4)
       snaky_hash (~> 2.0)
       version_gem (~> 1.1)
+    openssl (3.1.0)
     parallel (1.22.1)
     parser (3.2.0.0)
       ast (~> 2.4.1)
@@ -608,6 +610,10 @@ GEM
       activesupport (>= 5.2.0, < 8.0)
       concurrent-ruby (~> 1.0)
       method_source (~> 1.0)
+    web-push (3.0.0)
+      hkdf (~> 1.0)
+      jwt (~> 2.0)
+      openssl (~> 3.0)
     webmock (3.8.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -709,6 +715,7 @@ DEPENDENCIES
   uglifier
   unicorn
   view_component
+  web-push
   webmock (= 3.8.0)
   will_paginate
 

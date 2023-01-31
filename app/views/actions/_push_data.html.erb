@@ -1,1 +1,16 @@
-<div id="push-data" data-website-id="<%= ENV["APPLE_PUSH_WEBSITE_ID"] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>"></div>
+<div class="tw-hidden" id="push-data" data-website-id="<%= ENV["APPLE_PUSH_WEBSITE_ID"] %>" data-authentication-token="<%= @authentication_token %>" data-web-service-url="<%= @web_service_url %>"></div>
+
+<%= content_tag :div, class: "group text-sm text-500 mt-2", data: {controller: "web-push", web_push_permission_value: "", web_push_url_value: Rails.application.routes.url_helpers.devices_path(format: :json), web_push_vapid_value: Base64.urlsafe_decode64(Feedbin::Application.config.vapid_key&.public_key || "").bytes } do %>
+  <div class="tw-hidden group-data-[web-push-permission-value='']:block">
+    Push notifications are not supported in this browser.
+  </div>
+  <div class="tw-hidden group-data-[web-push-permission-value=default]:block">
+    Push notifications are disabled for this browser. <button class="text-blue-600" data-action="web-push#activate">Enable push notifications</button>.
+  </div>
+  <div class="tw-hidden group-data-[web-push-permission-value=granted]:block">
+    Push notifications are <span class="text-green-600 font-bold">enabled</span> for this browser. You can disable them in your browser‘s preferences.
+  </div>
+  <div class="tw-hidden group-data-[web-push-permission-value=denied]:block">
+    Push notifications are <span class="text-red-600 font-bold">disabled</span> for this browser. You can enable them in your browser‘s preferences.
+  </div>
+<% end %>

@@ -4,20 +4,6 @@
 
 <p class="text-500 mb-4">Actions can be performed on articles when they are published. Start by writing the keywords to match, just like you would when <a href="/help/search-syntax/">searching</a> for something. Then select the feeds to include. Finally check the actions you would like to perform on the matched incoming articles.</p>
 
-<%= render partial: "push_data" %>
-
-<div class="push-options hide">
-  <div class="push-enable hide">
-    <p>Push notifications can be enabled as an action. <a href="#" data-behavior="enable_push">Enable push notifications</a>.</p>
-  </div>
-  <div class="push-disable hide">
-    <p>Push notifications are <span class="highlight-positive">enabled</span>. You can disable them in preferences under Notifications.</p>
-  </div>
-  <div class="push-disabled hide">
-    <p>Push notifications are <span class="highlight-negative">disabled</span>. You can enable them in Safari preferences under Notifications.</p>
-  </div>
-</div>
-
 <%= link_to "+ Add Action", new_action_path, class: "button button-huge mb-8" %>
 
 <% if @actions.find { _1.broken? } %>

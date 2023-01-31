@@ -25,9 +25,7 @@ module Search
 
         queues.each do |action_name, user_ids|
           user_ids = user_ids.to_a
-          if !update && action_name == "send_push_notification"
-            SafariPushNotificationSend.perform_async(user_ids, entry_id)
-          elsif !update && action_name == "star"
+          if !update && action_name == "star"
             star(user_ids, user_actions)
           elsif action_name == "mark_read"
             UnreadEntry.where(user_id: user_ids, entry_id: entry_id).delete_all
@@ -35,7 +33,11 @@ module Search
               UpdatedEntry.where(user_id: user_ids, entry_id: entry_id).delete_all
             end
           elsif !update && action_name == "send_ios_notification"
-            send_ios_notification(user_ids)
+            priority_image_crawl
+            DevicePushNotificationSend.perform_in(1.minute, user_ids, entry_id, true)
+          elsif !update && action_name == "send_push_notification"
+            priority_image_crawl
+            SafariPushNotificationSend.perform_in(1.minute, user_ids, entry_id, true)
           end
         end
         Librato.increment "actions_performed", by: 1
@@ -58,13 +60,12 @@ module Search
       end
     end
 
-    def send_ios_notification(user_ids)
+    def priority_image_crawl
       job = ImageCrawler::EntryImage.new
       job.entry = @entry
       if job_args = job.build_job
         ImageCrawler::Pipeline::FindCritical.perform_async(job_args)
       end
-      DevicePushNotificationSend.perform_in(1.minute, user_ids, @entry.id, true)
     end
   end
 end

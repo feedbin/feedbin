@@ -4940,8 +4940,6 @@ Settings
   }
 }
 
-
-
 .modal-purpose-action_preview {
   .action-description {
     border-radius: 8px;
@@ -4978,21 +4976,6 @@ Settings
   }
 }
 
-.control-group-description,
-.control-description {
-  padding-top: 0;
-  @include font-size(14px);
-  @include color($color-contrast-500);
-  white-space: normal;
-  margin: 0;
-  a {
-    text-decoration: underline;
-  }
-}
-
-.control-group-description {
-  margin: 8px 0 0 0;
-}
 
 @keyframes spin {
   0% {
@@ -5059,21 +5042,6 @@ Settings
   }
 }
 
-label.text-field {
-  display: block;
-  font-weight: bold;
-  @include font-size(16);
-  input {
-    display: block;
-    margin-top: 10px;
-  }
-  margin-bottom: 30px;
-}
-
-.has-description {
-  margin-bottom: 32px;
-}
-
 .card-meta {
   display: flex;
   > * {
@@ -5091,199 +5059,7 @@ label.text-field {
   }
 }
 
-.settings-feeds {
-  .alert {
-    display: none;
-  }
-}
 
-table.small td {
-  font-size: 13px;
-}
-
-.action-item {
-  position: relative;
-  .action-description {
-    padding-right: 100px;
-  }
-  .action-links {
-    position: absolute;
-    text-align: right;
-    position: absolute;
-    top: 11px;
-    right: 35px;
-  }
-  .action-destroy {
-    color: red;
-  }
-}
-
-.filter-search {
-  input[type="search"] {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 0;
-    margin: 0;
-  }
-}
-
-.filter-search-preview {
-  .autocomplete-suggestions {
-    @include border-left($color-borders);
-    @include border-right($color-borders);
-    @include border-bottom($color-borders);
-  }
-  .autocomplete-suggestion {
-    color: black;
-    padding: 5px;
-    pointer-events: none;
-    border-bottom: none;
-  }
-}
-
-.filter-feeds-include-all {
-  border-top: 1px solid map-get($color-borders, day);
-  padding: 8px 30px;
-  background: map-get($color-contrast-100, day);
-  position: relative;
-  display: flex;
-  align-items: baseline;
-  @media (max-width: $small-breakpoint) {
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-}
-
-.filter-wrap {
-  @include border($color-borders);
-  border-radius: 8px;
-  margin-bottom: 32px;
-  &.separate-header {
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-  }
-  @media (max-width: $small-breakpoint) {
-    border: none;
-    &.separate-header {
-      .pill-list {
-        border-top: none;
-      }
-    }
-  }
-}
-.filter {
-  overflow-y: auto;
-  overflow-x: hidden;
-  resize: vertical;
-  height: 200px;
-  padding-bottom: 8px;
-  .pill-list {
-    margin: 0;
-    border: none;
-    li {
-      padding-left: 16px;
-      padding-right: 16px;
-    }
-    li:first-child {
-      border-top: none;
-    }
-  }
-  @media (max-width: $small-breakpoint) {
-    .pill-list {
-      @include border-top($color-borders);
-      @include border-bottom($color-borders);
-      li {
-        padding-left: 0;
-        padding-right: 0;
-      }
-    }
-  }
-}
-
-[data-behavior="action_send_push_notification"] {
-  display: none;
-  .supports-push & {
-    display: block;
-  }
-  .push-off &,
-  .push-disabled & {
-    display: none;
-  }
-}
-
-.push-options {
-  font-size: 13px;
-  @include color($color-contrast-600);
-  line-height: 1.2;
-  @include border($color-borders);
-  @include background-color($color-contrast-100);
-  margin: 0 0 15px 0;
-  padding: 8px 6px;
-  button {
-    font-size: 13px !important;
-    display: inline !important;
-  }
-  p {
-    margin-bottom: 0;
-  }
-}
-
-.push-off {
-  .push-enable {
-    display: block;
-  }
-}
-
-.push-on {
-  .push-disable {
-    display: block;
-  }
-}
-
-.push-disabled {
-  .push-disabled {
-    display: block;
-  }
-}
-
-.push-feed-settings {
-  font-size: 14px;
-  line-height: 1.5;
-  .radio {
-    float: left;
-    margin-right: 15px;
-    input {
-      margin-top: 2px;
-    }
-  }
-}
-.highlight-positive {
-  color: $color-accent-green-600;
-  font-weight: bold;
-}
-
-.highlight-negative {
-  color: red;
-  font-weight: bold;
-}
-
-.sharing-table {
-  td:last-child {
-    text-align: right;
-  }
-  .has-message {
-    td {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-  }
-  .message {
-    td:last-child {
-      padding-top: 0;
-      text-align: left;
-    }
-  }
-}
 /*------------------------------------------------------------------------------
 Billing/Subscribe
 ------------------------------------------------------------------------------*/

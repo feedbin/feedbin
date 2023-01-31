@@ -1,5 +1,3 @@
-<%= render partial: "push_data" %>
-
 <%= form_for(@action, as: :action_params, remote: true) do |form| %>
   <div class="mb-8">
     <%= component "settings/h2" do %>
@@ -86,6 +84,10 @@
       <% end %>
     <% end %>
 
+    <% group.description do %>
+      <%= render partial: "push_data" %>
+    <% end %>
+
   <% end %>
 
   <%= component "settings/control_group", class: "mb-14" do |group| %>
@@ -100,7 +102,6 @@
         <% end %>
       <% end %>
     <% end %>
-
   <% end %>
 
   <%= component "settings/button_row" do %>

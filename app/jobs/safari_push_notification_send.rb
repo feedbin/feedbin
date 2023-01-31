@@ -8,10 +8,14 @@ class SafariPushNotificationSend
     connection.on(:error) { |exception| ErrorService.notify(exception) }
   }
 
-  def perform(user_ids, entry_id)
-    tokens = Device.where(user_id: user_ids).safari.pluck(:user_id, :token)
+  def perform(user_ids, entry_id, skip_read)
+    devices = Device.where(user_id: user_ids, device_type: [:safari, :browser])
     entry = Entry.find(entry_id)
     feed = entry.feed
+
+    if skip_read
+      user_ids = UnreadEntry.where(entry: entry, user_id: user_ids).pluck(:user_id)
+    end
 
     if entry.tweet?
       body = entry.tweet.main_tweet.full_text
@@ -24,29 +28,36 @@ class SafariPushNotificationSend
     end
     body = format_text(body, 90)
 
-    notifications = tokens.each_with_object({}) { |(user_id, token), hash|
-      if user_title = titles[user_id]
+    safari_notifications = {}
+    devices.each do |device|
+      if user_title = titles[device.user_id]
         title = format_text(user_title, 36)
       end
-      notification = build_notification(token, title, body, entry_id, user_id)
-      hash[notification.apns_id] = notification
-    }
+
+      if device.safari?
+        notification = build_notification(device.token, title, body, entry_id, device.user_id)
+        safari_notifications[notification.apns_id] = notification
+      elsif device.browser?
+        send_browser_notification(device, title, body, entry)
+      end
+    end
 
     APNOTIC_POOL.with do |connection|
-      notifications.each do |_, notification|
+      safari_notifications.each do |_, notification|
         push = connection.prepare_push(notification)
         push.on(:response) do |response|
           Librato.increment("apns.safari.sent", source: response.status)
           if response.status == "410" || (response.status == "400" && response.body["reason"] == "BadDeviceToken")
             apns_id = response.headers["apns-id"]
-            token = notifications[apns_id].token
-            Device.where("lower(token) = ?", token.downcase).take&.destroy
+            token = safari_notifications[apns_id].token
+            Device.where_lower(token: token).take&.destroy
           end
         end
         connection.push_async(push)
       end
       connection.join
     end
+
   end
 
   def subscription_titles(user_ids, feed)
@@ -69,6 +80,52 @@ class SafariPushNotificationSend
       string = CGI.unescapeHTML(string)
     end
     string
+  end
+
+  def view_url(entry_id, user_id)
+    Rails.application.routes.url_helpers.push_view_entry_url(entry_id,
+      user: CGI.escape(VERIFIER.generate(user_id)),
+      host: ENV["PUSH_URL"]
+    )
+  end
+
+  def send_browser_notification(device, title, body, entry)
+    message = {
+      title: body,
+      payload: {
+        body: title,
+        data: {
+          defaultAction: view_url(entry.id, device.user_id)
+        }
+      }
+    }
+
+    if entry.processed_image?
+      message[:payload][:icon] = entry.processed_image
+    end
+
+    response = WebPush.payload_send(
+      endpoint: device.data["endpoint"],
+      message: JSON.generate(message),
+      p256dh: device.data["keys"]["p256dh"],
+      auth: device.data["keys"]["auth"],
+      urgency: "high",
+      ttl: 1.hour.to_i,
+      vapid: {
+        subject: "mailto:#{ENV["FROM_ADDRESS"]}",
+        pem: Feedbin::Application.config.vapid_key.to_pem
+      }
+    )
+
+    if response.code&.to_i != 201
+      ErrorService.notify(
+        error_class: "SafariPushNotificationSend#send_browser_notification",
+        error_message: "HTTP Error",
+        parameters: {status: response.code, body: response.body, user_id: device.user_id, entry_id: entry.id}
+      )
+    end
+  rescue => exception
+    ErrorService.notify(exception)
   end
 
   def build_notification(device_token, title, body, entry_id, user_id)

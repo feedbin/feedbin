@@ -29,7 +29,7 @@ module Api
         @user = current_user
         subscription = @user.subscriptions.order(Arel.sql("RANDOM()")).limit(1).first
         entry = Entry.where(feed_id: subscription.feed_id).order(Arel.sql("RANDOM()")).limit(1).first
-        SafariPushNotificationSend.perform_async([@user.id], entry.id)
+        SafariPushNotificationSend.perform_async([@user.id], entry.id, false)
         head :ok
       end
 
