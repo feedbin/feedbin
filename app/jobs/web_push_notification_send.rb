@@ -1,4 +1,4 @@
-class SafariPushNotificationSend
+class WebPushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :default_critical
 
@@ -119,7 +119,7 @@ class SafariPushNotificationSend
 
     if response.code&.to_i != 201
       ErrorService.notify(
-        error_class: "SafariPushNotificationSend#send_browser_notification",
+        error_class: "WebPushNotificationSend#send_browser_notification",
         error_message: "HTTP Error",
         parameters: {status: response.code, body: response.body, user_id: device.user_id, entry_id: entry.id}
       )
