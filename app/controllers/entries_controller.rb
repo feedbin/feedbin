@@ -193,6 +193,7 @@ class EntriesController < ApplicationController
   def search
     @user = current_user
     @escaped_query = params[:query].tr("\"", "'").html_safe if params[:query]
+    params[:query] = "#{params[:query]} #{params[:query_extra]}"
 
     @saved_search_path = new_saved_search_path(query: params[:query])
     result = Entry.scoped_search(params, @user)

@@ -3,6 +3,6 @@ feedbin.updateEntries('', '');
 feedbin.updateEntryContent('');
 $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
 feedbin.disableMarkRead()
-feedbin.hideSearch()
+window.dispatchEvent(new CustomEvent("hide-search"))
 $('.modal').modal('hide')
 feedbin.showPanel(1)

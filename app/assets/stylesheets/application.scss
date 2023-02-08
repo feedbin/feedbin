@@ -11,7 +11,7 @@ Variables
 
 $small-breakpoint: 700px;
 
-$toolbar-height: 41px;
+$toolbar-height: 44px;
 $font-stack: -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial,
   sans-serif;
 $audio-player-height: 115px;
@@ -516,149 +516,7 @@ Structure
   }
 }
 
-.search-wrap {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  flex-direction: column;
-  z-index: 0;
-  display: none;
-  .search & {
-    display: flex;
-  }
-  .show-search-options & {
-    z-index: 10;
-  }
-  .has-offscreen-panels & {
-    top: $toolbar-height;
-  }
-}
-
-.search-form {
-  margin: 0;
-  @include background-color($color-base);
-  transition: opacity 0.3s ease-in;
-  opacity: 0;
-  position: relative;
-  display: none;
-  height: $toolbar-height;
-  @include border-bottom($color-borders);
-  .search & {
-    opacity: 1;
-    display: flex;
-  }
-  .icon-wrap {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-bottom: 1px;
-  }
-  svg {
-    width: 14px;
-    height: 14px;
-    @include fill($color-contrast-400);
-  }
-  input[type="search"] {
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    margin: 0;
-    padding: 0 36px 0 36px;
-    @include font-size(14);
-    border: none;
-    background-color: transparent;
-    @include color($color-contrast-700);
-    line-height: auto;
-    &:focus {
-      border: none;
-      background: transparent;
-    }
-    &.processing {
-      background-repeat: no-repeat;
-      background-position: right 8px top ($base-button-position + 2);
-      background-size: 16px 16px;
-      @include background-image($image-spinners);
-    }
-  }
-}
-
-.search-control {
-  @include background-color($color-contrast-100);
-  @include border-bottom($color-borders);
-  @include font-size(12);
-  line-height: 14px;
-  height: $toolbar-height;
-  position: absolute;
-  top: $toolbar-height;
-  left: 0;
-  right: 0;
-  display: none;
-  .show-search-options & {
-    display: block;
-  }
-  .search-toolbar {
-    height: $toolbar-height;
-    display: flex;
-    justify-content: center;
-    transition: opacity 0.3s ease-in;
-    opacity: 0;
-    .show-search-options & {
-      opacity: 1;
-    }
-  }
-  .save-search {
-    font-weight: bold;
-    cursor: pointer;
-    user-select: none;
-    @include color($color-contrast-700);
-    display: flex;
-    align-items: center;
-    padding-right: 8px;
-    &:hover {
-      text-decoration: none;
-    }
-  }
-  .dropdown-wrap {
-    margin-right: auto;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-  }
-  .sort-order {
-    @include background-color($color-contrast-100);
-    border-radius: 12px;
-    margin: 0 0 0 8px;
-    @include color($color-contrast-700);
-    display: inline-block;
-    position: relative;
-    cursor: pointer;
-    user-select: none;
-    &:after {
-      width: 0px;
-      height: 0px;
-      border-style: solid;
-      border-width: 5px 4px 0 4px;
-      border-color: black transparent transparent transparent;
-      @include theme("border-top-color", $color-contrast-700);
-      content: "";
-      position: absolute;
-      right: -13px;
-      bottom: 4px;
-    }
-  }
-  .dropdown-wrap {
-    .dropdown-content {
-      top: 35px;
-      left: 8px;
-    }
-  }
-}
+$search-height: 47px;
 
 .subscribe-promo {
   position: absolute;
@@ -1785,11 +1643,6 @@ li.selected > a .favicon-wrap,
   @include background-color($color-base);
   flex: 1;
   z-index: 4;
-  .search & {
-    transform: translateY($toolbar-height);
-    padding-bottom: $toolbar-height;
-    @include border-color($color-borders);
-  }
   .has-offscreen-panels &.loading {
     .entries-target {
       display: none;
@@ -1800,8 +1653,8 @@ li.selected > a .favicon-wrap,
     @include background-color($color-base, true);
   }
   .search.show-search-options & {
-    transform: translateY($toolbar-height * 2);
-    padding-bottom: $toolbar-height * 2;
+    transform: translateY($search-height * 2);
+    padding-bottom: $search-height * 2;
   }
   ul {
     margin: 0;
@@ -2320,7 +2173,7 @@ $feed-title-width: 115px;
 }
 
 .basement-panel {
-  max-height: calc(100vh - 41px);
+  max-height: calc(100vh - $toolbar-height);
   overflow-y: scroll;
 }
 
@@ -2978,11 +2831,11 @@ $feed-title-width: 115px;
   }
   ul {
     margin: 0;
-    padding: base-units(1) 0;
+    padding: base-units(0.5) 0;
     list-style: none;
     li {
       margin: 0;
-      padding: 0 base-units(1);
+      padding: 0 base-units(0.5);
       > a,
       > span,
       > button {
@@ -4595,16 +4448,6 @@ img.responsive {
   }
 }
 
-.jump-search-empty {
-  .modal-purpose-search {
-    .modal-body {
-      display: none;
-    }
-    .modal-header-input input {
-      border-radius: 8px;
-    }
-  }
-}
 .modal-purpose-search {
   .modal-body {
     overflow-y: scroll;
@@ -4623,14 +4466,6 @@ img.responsive {
   }
   .feed-list {
     padding-bottom: 22px;
-  }
-}
-.jump-options {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  li {
-    padding-left: 16px;
   }
 }
 
@@ -6455,11 +6290,7 @@ Media Queries
   }
   .entries {
     top: -1px;
-    transform: translateY($toolbar-height);
     z-index: 0;
-  }
-  &.hide-search .entries {
-    transform: translateY(0);
   }
   .entry-basement {
     top: $toolbar-height;
@@ -6601,7 +6432,7 @@ button.close {
           background-color: transparent;
         }
       }
-      .twitter-profile-image {
+      .twitter-profile-image:not(.icon-format-square) {
         height: 34px;
         width: 34px;
         img {
@@ -6811,7 +6642,7 @@ button.close {
   .subscribe-tags-autocomplete {
     z-index: 2;
     position: absolute;
-    top: 41px;
+    top: $toolbar-height;
     left: 0;
     width: 200px;
   }

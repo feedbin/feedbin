@@ -19,4 +19,14 @@ class Tag < ApplicationRecord
     Tagging.where(tag: tag, user: user).destroy_all
     Search::ActionTags.perform_async(user.id, nil, tag.id)
   end
+
+  def sourceable
+    Sourceable.new(
+      type: self.class.name,
+      id: id,
+      title: name,
+      section: "Tags",
+      jumpable: true
+    )
+  end
 end

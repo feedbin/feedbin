@@ -1,4 +1,4 @@
-<% cache [tag, tag.user_feeds, "v2"] do %>
+<% cache [tag, tag.user_feeds, "v4"] do %>
     <li class="tag" data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" data-behavior="droppable">
         <%= link_to tag_path(tag.id),
             remote: true,
@@ -6,7 +6,9 @@
             data: {
                 behavior: 'selectable show_entries open_item feed_link renamable has_settings',
                 mark_read: {type: 'tag', data: tag.id, message: "Mark #{tag.name} as read?"}.to_json,
-                jumpable: {title: tag.name, section: "Tags"},
+                sourceable_target: "source",
+                action: "sourceable#selected",
+                sourceable_payload_param: tag.sourceable.to_h,
                 settings_path: edit_tag_path(tag)
             } do
         %>

@@ -81,6 +81,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: "npm"
+
+      - name: Install npm Dependencies
+        run: npm install
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -102,6 +106,9 @@ jobs:
           psql -c 'create database feedbin_test;' -U postgres
           bundle exec rake db:setup
           bundle exec rails test:system test
+
+      - name: Lint JS
+        run: npm run lint
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2

@@ -5,7 +5,7 @@ export default class extends Controller {
   static values = {
     vapid: Array,
     permission: String,
-    url: String
+    url: String,
   }
 
   connect() {
@@ -15,8 +15,10 @@ export default class extends Controller {
   checkPermissions() {
     let checkWebPush = true
     if ("safari" in window && "pushNotification" in window.safari) {
-      const data = $("#push-data").data()
-      let permissionData = window.safari.pushNotification.permission(data.websiteId)
+      const data = window.$("#push-data").data()
+      let permissionData = window.safari.pushNotification.permission(
+        data.websiteId
+      )
 
       if (permissionData.permission == "granted") {
         this.permissionValue = permissionData.permission
@@ -30,18 +32,26 @@ export default class extends Controller {
   }
 
   activate(event) {
-    const key = new Uint8Array(this.vapidValue);
-    let result = navigator.serviceWorker.ready.then((serviceWorkerRegistration) => {
-      serviceWorkerRegistration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: key
-      }).then((pushSubscription) => {
-        $.post(this.urlValue, {device: {data: pushSubscription.toJSON()}})
-        this.checkPermissions()
-      }, (error) => {
-        this.checkPermissions()
-      });
-    });
+    const key = new Uint8Array(this.vapidValue)
+    navigator.serviceWorker.ready.then((serviceWorkerRegistration) => {
+      serviceWorkerRegistration.pushManager
+        .subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: key,
+        })
+        .then(
+          (pushSubscription) => {
+            window.$.post(this.urlValue, {
+              device: { data: pushSubscription.toJSON() },
+            })
+            this.checkPermissions()
+          },
+          (error) => {
+            console.log(error)
+            this.checkPermissions()
+          }
+        )
+    })
     event.preventDefault()
   }
 }

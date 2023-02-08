@@ -112,7 +112,7 @@ class feedbin.CountsBehavior
       if _.contains specialCollections, feedID
         selectFirst = true
       else
-        $("[data-behavior~=feed_link]", selected).first().click()
+        $("[data-behavior~=feed_link]", selected).first()[0]?.click()
         feedbin.hideQueue.push(feedID) if !selected.is(":visible")
     feedbin.applyCounts(false)
 

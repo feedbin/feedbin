@@ -251,6 +251,16 @@ class Feed < ApplicationRecord
     nil
   end
 
+  def sourceable
+    Sourceable.new(
+      type: self.class.name,
+      id: id,
+      title: title,
+      section: "Feeds",
+      jumpable: true
+    )
+  end
+
   private
 
   def update_youtube_videos
