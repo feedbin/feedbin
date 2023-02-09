@@ -85,6 +85,34 @@
   --color-red-600:   #D40C35;
 }
 
+/*
+this needs to be copied from both prefers-dark to prevent
+a flash of the default theme before prefers-dark class is applied
+*/
+@media (prefers-color-scheme: dark) {
+  .theme-auto {
+    --color-base: #262626;
+    --color-100:  #2d2d2d;
+    --color-200:  #353535;
+    --color-300:  #4d4d4d;
+    --color-400:  #707070;
+    --color-500:  #8c8c8c;
+    --color-600:  #d4d4d4;
+    --color-700:  #f6f6f6;
+
+    --border-color: #000000;
+
+    --color-light-100:  var(--color-600);
+    --color-sidebar:    var(--color-base);
+    --color-shadow-100: rgba(0,0,0,0.5);
+    --color-link:       #ffffff;
+
+    --color-blue-600:  #0974FF;
+    --color-green-600: #08C451;
+    --color-red-600:   #D40C35;
+  }
+}
+
 .StripeElement--focus {
   @apply border-blue-600 shadow-[0_0_0_1px_theme(colors.blue.600)];
 }
