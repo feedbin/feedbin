@@ -16,11 +16,13 @@ module ImageCrawler
       if exists?(processed_url)
         Sidekiq.logger.info "Skipping, image exists public_id=#{entry.public_id} processed_url=#{processed_url}"
         return
-      else
-        Sidekiq.logger.info "Attempting to fix image public_id=#{entry.public_id} processed_url=#{processed_url}"
       end
 
       entry.update(image: nil)
+
+      return unless UnreadEntry.where(entry_id: entry.id).exists?
+
+      Sidekiq.logger.info "Attempting to fix image public_id=#{entry.public_id} processed_url=#{processed_url}"
 
       ImageCrawler::EntryImage.perform_async(entry.public_id)
     end
@@ -32,5 +34,12 @@ module ImageCrawler
         response.status.success?
       end
     end
+
+    def schedule
+
+    end
   end
 end
+
+
+Sidekiq::Client.push_bulk("args" => ids.map {[_1]}, "class" => ImageCrawler::FixImage); true
