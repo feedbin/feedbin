@@ -18,9 +18,11 @@ module ImageCrawler
           Find.perform_async(image.to_h)
         end
 
-        Find.new.perform(image.to_h)
+        image_two = Image.new(id: SecureRandom.hex, preset_name: "primary", image_urls: [original_url])
+        Find.new.perform(image_two.to_h)
 
         assert_equal(image_url, EntryImage.jobs.first["args"][1]["original_url"])
+        assert_equal("https:/#{image_two.image_name}jpg", EntryImage.jobs.first["args"][1]["processed_url"])
       end
 
       def test_should_process_an_image
