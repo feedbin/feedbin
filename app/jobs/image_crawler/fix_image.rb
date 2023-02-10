@@ -1,9 +1,9 @@
 module ImageCrawler
   class FixImage
     include Sidekiq::Worker
-    sidekiq_options retry: false
+    sidekiq_options retry: false, queue: :utility
 
-    POOL = ConnectionPool.new(size: 15) {
+    POOL = ConnectionPool.new(size: 2) {
       HTTP.persistent("https://#{ImageCrawler::Image::BUCKET}.s3.amazonaws.com")
     }
 
