@@ -3,6 +3,10 @@ module ImageCrawler
     include Sidekiq::Worker
     sidekiq_options retry: false
 
+    POOL = ConnectionPool.new(size: 15) {
+      Fog::Storage.new(STORAGE.merge(persistent: true))
+    }
+
     def perform(entry_id)
       entry = Entry.find(entry_id)
       processed_url = entry.image.safe_dig("processed_url")
@@ -23,14 +27,12 @@ module ImageCrawler
 
     def exists?(url)
       url = URI.parse(url)
-      response = client.head_object(ImageCrawler::Image::BUCKET, url.path.delete_prefix("/"))
-      response.status == 200
+      POOL.with do |client|
+        response = client.head_object(ImageCrawler::Image::BUCKET, url.path.delete_prefix("/"))
+        response.status == 200
+      end
     rescue Excon::Error::NotFound
       false
-    end
-
-    def client
-      @client ||= Fog::Storage.new(STORAGE)
     end
   end
 end
