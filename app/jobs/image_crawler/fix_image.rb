@@ -3,7 +3,7 @@ module ImageCrawler
     include Sidekiq::Worker
     sidekiq_options retry: false, queue: :utility
 
-    POOL = ConnectionPool.new(size: 2) {
+    POOL = ConnectionPool.new(size: 10) {
       HTTP.persistent("https://#{ImageCrawler::Image::BUCKET}.s3.amazonaws.com")
     }
 
