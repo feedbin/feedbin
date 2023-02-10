@@ -34,12 +34,5 @@ module ImageCrawler
         response.status.success?
       end
     end
-
-    def schedule
-
-    end
   end
 end
-
-
-Sidekiq::Client.push_bulk("args" => ids.map {[_1]}, "class" => ImageCrawler::FixImage); true
