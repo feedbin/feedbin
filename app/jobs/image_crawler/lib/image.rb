@@ -8,7 +8,7 @@ module ImageCrawler
 
     attr_accessor *ATTRIBUTES
 
-    STORAGE = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
+    BUCKET = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
     PRESETS = {
       primary: {
         width: 542,
@@ -116,7 +116,7 @@ module ImageCrawler
     end
 
     def bucket
-      preset.bucket || STORAGE
+      preset.bucket || BUCKET
     end
 
     def storage_options
