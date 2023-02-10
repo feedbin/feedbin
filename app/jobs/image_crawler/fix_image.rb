@@ -4,7 +4,7 @@ module ImageCrawler
     sidekiq_options retry: false
 
     POOL = ConnectionPool.new(size: 15) {
-      Fog::Storage.new(STORAGE.merge(persistent: true))
+      HTTP.persistent("https://#{ImageCrawler::Image::BUCKET}.s3.amazonaws.com")
     }
 
     def perform(entry_id)
@@ -28,11 +28,9 @@ module ImageCrawler
     def exists?(url)
       url = URI.parse(url)
       POOL.with do |client|
-        response = client.head_object(ImageCrawler::Image::BUCKET, url.path.delete_prefix("/"))
-        response.status == 200
+        response = client.head(url.path).flush
+        response.status.success?
       end
-    rescue Excon::Error::NotFound
-      false
     end
   end
 end
