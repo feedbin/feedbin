@@ -4,8 +4,21 @@ class WebPushNotificationSend
 
   VERIFIER = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)
 
-  APNOTIC_POOL = Apnotic::ConnectionPool.new({cert_path: ENV["APPLE_PUSH_CERT"], cert_pass: ENV["APPLE_PUSH_CERT_PASSWORD"]}, size: 5) { |connection|
-    connection.on(:error) { |exception| ErrorService.notify(exception) }
+  apnotic_options = {
+    auth_method: :token,
+    cert_path: ENV["APPLE_AUTH_KEY"],
+    team_id: ENV["APPLE_TEAM_ID"],
+    key_id: ENV["APPLE_KEY_ID"]
+  }
+  APNOTIC_POOL = Apnotic::ConnectionPool.new(apnotic_options, size: 5) { |connection|
+    connection.on(:error) { |exception|
+      Sidekiq.logger.info "ConnectionError exception=#{exception.message}"
+      ErrorService.notify(
+        error_class: "WebPushNotificationSend#ConnectionError",
+        error_message: exception.message,
+        parameters: {exception: exception}
+      )
+    }
   }
 
   def perform(user_ids, entry_id, skip_read)
