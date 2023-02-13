@@ -1,93 +1,60 @@
 <div class="flex h-full w-full items-stretch snap-x snap-mandatory overflow-x-auto scroll-smooth hide-scrollbar md:overflow-hidden">
-  <div class="flex snap-align-none scroll-smooth hide-scrollbar md:w-[300px] md:border-r md:shrink-0 md:overflow-x-scroll md:snap-x md:snap-mandatory lg:w-auto">
+  <div data-controller="selectable" class="flex snap-align-none scroll-smooth hide-scrollbar select-none md:w-[300px] md:border-r md:shrink-0 md:overflow-x-scroll md:snap-x md:snap-mandatory lg:w-auto">
     <div class="shrink-0 w-[100vw] snap-center md:w-full lg:w-[250px] lg:border-r" id="one">
-      <div class="flex flex-col h-full" data-controller="expandable" data-expandable-open-value="true">
-        <div class="overflow-hidden transition-all min-h-auto max-h-auto shrink-0" data-expandable-target="container">
-          <div class="bg-100 p-4" data-expandable-target="content">
-            Header
+      <div class="flex flex-col h-full">
+        <div class="shrink-0">
+          <div class="p-4 pt-6 font-bold text-2xl">
+            Unread
           </div>
         </div>
-        <div class="p-4 grow overflow-y-scroll overscroll-y-contain" data-action="click->expandable#toggle">
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
-          <p class="mb-2">Lorem ipsum dolor sit amet</p>
+        <div class="grow overflow-y-scroll overscroll-y-contain" data-selectable-parent>
+          <% 1000.times do |index| %>
+            <button data-action="selectable#select" data-selected="false" class="group px-2 text-left w-full data-[selected=true]:text-white" onclick="document.getElementById('two').scrollIntoView()">
+              <div class="p-2 py-2.5 md:py-2 flex gap-2 items-center rounded group-data-[selected=true]:bg-blue-600">
+                <div class="bg-200 rounded-[2px] w-[16px] h-[16px] shrink-0"></div>
+                Feed <%= index %>
+              </div>
+            </button>
+          <% end %>
         </div>
-        <div class="bg-100 shrink-0 p-4">
-          Footer
+        <div class="shrink-0 p-4-fixed flex items-center justify-center">
+          <%= svg_tag "icon-edit" %>
         </div>
       </div>
     </div>
-    <div class="shrink-0 w-[100vw] snap-center md:w-full lg:w-[300px] overflow-y-scroll overscroll-y-contain" id="two">
-      <div class="p-4">
-        <button onclick="document.getElementById('three').scrollIntoView()">Article</button>
-      </div>
+    <div class="shrink-0 w-[100vw] snap-center md:w-full lg:w-[350px] overflow-y-scroll overscroll-y-contain" id="two" data-selectable-parent>
+      <% 1000.times do |index| %>
+        <button data-action="selectable#select" data-selected="false" class="p-2 w-full group data-[selected=true]:text-white" onclick="document.getElementById('three').scrollIntoView()">
+          <div class="flex text-left gap-2 p-2 rounded group-data-[selected=true]:bg-blue-600">
+            <div class="md:mt-1 mt-1.5">
+              <div class="bg-200 rounded-[2px] w-[16px] h-[16px] shrink-0"></div>
+            </div>
+            <div>
+              <h2 class="md:text-base text-lg font-bold mb-1">Lorem ipsum dolor sit amet, consectetur adipisicing</h2>
+              <p class="mb-1">Feed <%= index %></p>
+              <p class="text-500 group-data-[selected=true]:text-white/80 mb-1">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deser…</p>
+              <p class="text-500 group-data-[selected=true]:text-white/80"><%= index %>h</p>
+            </div>
+          </div>
+        </button>
+      <% end %>
     </div>
   </div>
-  <div class="shrink-0 w-[100vw] snap-center md:grow md:shrink md:w-auto overflow-y-scroll overscroll-y-contain" id="three">
-    <div class="p-4">
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
-      <p class="mb-2">Lorem ipsum dolor sit amet</p>
+  <div class="shrink-0 w-[100vw] flex flex-col h-full snap-center md:grow md:shrink md:w-auto" id="three">
+    <div class="shrink-0 border-b h-[44px] flex items-center px-4">
+      <div class="leading-none">Feed 1</div>
+      <%= svg_tag "icon-star-on", class: "fill-600 ml-auto" %>
+    </div>
+
+    <div class="overflow-y-scroll overscroll-y-contain">
+      <div class="px-4 py-8 max-w-[600px] mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi</h1>
+        <% 100.times do |index| %>
+          <p class="mb-8 text-lg">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <% end %>
+      </div>
     </div>
   </div>
 </div>
+
+<%= render partial: 'shared/svg' %>

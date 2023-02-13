@@ -2,10 +2,9 @@
 <html class="w-full h-full">
 <head>
   <meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no,viewport-fit=cover" />
-
   <%= stylesheet_link_tag "tailwind" %>
 </head>
-<body class="w-full h-full antialiased [text-size-adjust:none]">
+<body class="w-full h-full antialiased text-base md:text-sm [text-size-adjust:100%]">
   <%= yield %>
   <%= javascript_importmap_tags %>
   <%= render partial: "shared/svg" %>

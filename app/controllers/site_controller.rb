@@ -20,6 +20,10 @@ class SiteController < ApplicationController
   def service_worker
   end
 
+  def next
+    render layout: "next"
+  end
+
   def manifest
     @color = Colors.fetch(params[:theme])
     @icons = [
