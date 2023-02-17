@@ -42,7 +42,7 @@ Requirements
 ------------
 
  - Linux or macOS
- - [Ruby 3.1](http://www.ruby-lang.org/en/)
+ - [Ruby 3.2](http://www.ruby-lang.org/en/)
  - [Postgres 11](http://www.postgresql.org/)
  - [Redis 6](http://redis.io/)
  - [Elasticsearch 8.5](https://www.elastic.co/downloads/past-releases/#elasticsearch)
