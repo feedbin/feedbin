@@ -28,7 +28,7 @@ module.exports = {
         DEFAULT: "var(--border-color)",
       },
       colors: {
-        base:    "var(--color-base)",
+        0:       "var(--color-0)",
         100:     "var(--color-100)",
         200:     "var(--color-200)",
         300:     "var(--color-300)",

@@ -22,7 +22,7 @@
     <%= hidden_field_tag :query_extra, "", data: {search_token_target: "queryExtra"} %>
     <button type="submit" class="visually-hidden"></button>
     <%= content_tag :div, class: "text-sm text-600 group relative" do %>
-      <div class="border-b bg-base z-10">
+      <div class="border-b bg-0 z-10">
         <div class="flex flex-row-reverse items-stretch rounded">
           <div class="mr-2">
             <%= component "app/spinner" %>
@@ -61,7 +61,7 @@
         </div>
       </div>
 
-      <div class="absolute z-50 inset-x-0 top-full w-full origin-top-left p-1 rounded-b bg-base shadow-two focus:outline-none group-data-[search-token-autocomplete-visible-value=false]:tw-hidden">
+      <div class="absolute z-50 inset-x-0 top-full w-full origin-top-left p-1 rounded-b bg-0 shadow-two focus:outline-none group-data-[search-token-autocomplete-visible-value=false]:tw-hidden">
         <%= component "app/search_token_result" do |item| %>
           <% item.icon do %>
             <%= svg_tag "icon-search", class: "fill-400" %>

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root, .theme-day, .theme-auto.prefers-light {
-    --color-base: #ffffff;
+    --color-0: #ffffff;
     --color-100:  #f5f5f7;
     --color-200:  #e9e9eb;
     --color-300:  #bdbfc3;
@@ -16,7 +16,7 @@
 }
 
 .theme-sunset {
-    --color-base: #f5f2eb;
+    --color-0: #f5f2eb;
     --color-100:  #ebe8e2;
     --color-200:  #dfdcd6;
     --color-300:  #b8b6b0;
@@ -29,7 +29,7 @@
 }
 
 .theme-dusk, .theme-auto.prefers-dark {
-    --color-base: #262626;
+    --color-0: #262626;
     --color-100:  #2d2d2d;
     --color-200:  #353535;
     --color-300:  #4d4d4d;
@@ -42,7 +42,7 @@
 }
 
 .theme-midnight {
-    --color-base: #000000;
+    --color-0: #000000;
     --color-100:  #141414;
     --color-200:  #242424;
     --color-300:  #3b3b3b;
@@ -76,7 +76,7 @@
 
 .theme-dusk, .theme-midnight, .theme-auto.prefers-dark {
   --color-light-100:  var(--color-600);
-  --color-sidebar:    var(--color-base);
+  --color-sidebar:    var(--color-0);
   --color-shadow-100: rgba(0,0,0,0.5);
   --color-link:       #ffffff;
 
@@ -91,7 +91,7 @@ a flash of the default theme before prefers-dark class is applied
 */
 @media (prefers-color-scheme: dark) {
   .theme-auto {
-    --color-base: #262626;
+    --color-0: #262626;
     --color-100:  #2d2d2d;
     --color-200:  #353535;
     --color-300:  #4d4d4d;
@@ -103,7 +103,7 @@ a flash of the default theme before prefers-dark class is applied
     --border-color: #000000;
 
     --color-light-100:  var(--color-600);
-    --color-sidebar:    var(--color-base);
+    --color-sidebar:    var(--color-0);
     --color-shadow-100: rgba(0,0,0,0.5);
     --color-link:       #ffffff;
 
