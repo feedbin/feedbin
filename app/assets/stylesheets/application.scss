@@ -2758,6 +2758,11 @@ $feed-title-width: 115px;
     }
   }
 }
+
+.button-toggle-content.active * {
+   fill: $color-accent-green-600 !important;
+}
+
 .has-entry-basement .button-toggle-share-menu {
   &:after,
   &:before {
