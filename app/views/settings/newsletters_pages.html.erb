@@ -1,40 +1,7 @@
 <%= component "settings/h1" do %>
   Sources
 <% end %>
-<%= component "settings/control_group", class: "mb-14" do |group| %>
-  <% group.header do %>
-    Twitter
-  <% end %>
-  <% if @user.twitter_enabled? %>
-    <% group.item do %>
-      <%= component "settings/control_row" do |row| %>
-        <% row.title { "Account" } %>
-        <% row.description do %>
-          You are logged in to Twitter as <strong>@<%= @user.twitter_screen_name %></strong>.
-        <% end %>
-        <% row.control do %>
-          <%= link_to delete_twitter_authentications_path, method: :delete, class: "button button-secondary", data: {confirm: "Are you sure? This will deactivate your Twitter subscriptions."} do %>
-            <%= svg_tag "icon-twitter-logo", class: "fill-500" %> Sign Out
-          <% end %>
-        <% end %>
-      <% end %>
-    <% end %>
-  <% else %>
-    <% group.item do %>
-      <%= component "settings/control_row" do |row| %>
-        <% row.title { "Account" } %>
-        <% row.description do %>
-          Sign in to enable <a href="/blog/2018/01/11/feedbin-is-the-best-way-to-read-twitter/">Twitter subscriptions</a>.
-        <% end %>
-        <% row.control do %>
-          <%= link_to new_twitter_authentication_path({mode: "settings"}), class: "button button-secondary" do %>
-            <%= svg_tag "icon-twitter-logo", class: "fill-500" %> Sign In
-          <% end %>
-        <% end %>
-      <% end %>
-    <% end %>
-  <% end %>
-<% end %>
+
 <%= form_for @user, remote: true, url: settings_update_user_path(@user) do |f| %>
   <%= component "settings/control_group", class: "mb-14" do |group| %>
     <% group.header do %>

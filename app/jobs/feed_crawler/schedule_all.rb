@@ -11,7 +11,6 @@ module FeedCrawler
       queues = [Downloader, Parser, Receiver]
       if queues.all? {|queue| queue_empty?(queue.get_sidekiq_options["queue"]) }
         refresh_feeds
-        TwitterSchedule.perform_async if queue_empty?("twitter")
       end
     end
 

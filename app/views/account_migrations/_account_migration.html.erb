@@ -1,5 +1,5 @@
 <% if @migration.pending? %>
-  <p class="mb-4">Welcome to Feedbin. You can migrate your subscriptions, unread and starred articles. Besides following your favorite feeds, you can now add Twitter, newsletters and more.</p>
+  <p class="mb-4">Welcome to Feedbin. You can migrate your subscriptions, unread and starred articles. Besides following your favorite feeds, you can now add newsletters and more.</p>
   <%= form_with model: @migration, url: start_account_migration_path(@migration) do |f| %>
     <%= button_tag "Begin Migration", type: "submit", class: "button button-huge" %>
   <% end %>
