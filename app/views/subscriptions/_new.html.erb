@@ -26,7 +26,7 @@
               <% end %>
             </div>
           </div>
-          <p class="text-sm text-500 pl-2" title="Feed URL"><%= pretty_url(feed.feed_url) %></p>
+          <p class="text-sm text-500 pl-2 truncate" title="Feed URL"><%= pretty_url(feed.feed_url) %></p>
         </div>
 
         <% if feed.twitter_feed? %>
