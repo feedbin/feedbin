@@ -13,6 +13,9 @@ class SearchTest < ApplicationSystemTestCase
     assert find("[data-controller=search-form]").visible?
 
     find("[data-search-token-target~=query]").fill_in with: @feed.title
+
+    wait_for_ajax
+
     find("[data-search-token-index-param='1']").click
 
     wait_for_ajax
