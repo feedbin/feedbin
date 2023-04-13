@@ -21,7 +21,8 @@ module FeedCrawler
         .where("subscriptions_count > ?", count)
 
       standalone = Feed
-        .where(id: feed_ids - active, standalone_request_at: 1.month.ago..)
+        .where(id: feed_ids - active)
+        .where.not(standalone_request_at: nil)
 
       jobs = (subscriptions + standalone).filter_map do |feed|
         if feed.crawl_data.ok?(feed.feed_url)
