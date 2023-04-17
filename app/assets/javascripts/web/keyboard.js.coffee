@@ -331,9 +331,8 @@ class feedbin.Keyboard
     @scrollTop = @selectedColumn.prop('scrollTop')
 
   clickItem: _.debounce( ->
-    element = @item.find('[data-behavior~=open_item]:first')
+    element = @item.find('[data-behavior~=open_item]:first').last()
     element[0]?.click()
-
   50)
 
   selectItem: ->
