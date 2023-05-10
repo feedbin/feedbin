@@ -13,14 +13,6 @@ GIT
       ssrf_filter (~> 1.0)
 
 GIT
-  remote: https://github.com/feedbin/down.git
-  revision: df69f03b65453bbbabc99678c3f6a3a1c4d1a0b2
-  branch: normalize
-  specs:
-    down (5.3.1)
-      addressable (~> 2.8)
-
-GIT
   remote: https://github.com/feedbin/feedjira.git
   revision: 4bb28ab2aaf561167dff9cd03b1430be5cc1d907
   branch: f2
@@ -41,14 +33,6 @@ GIT
       rchardet (~> 1.8.0)
       twitter (~> 7.0)
       twitter-text (~> 3.1.0)
-
-GIT
-  remote: https://github.com/feedbin/grocer-pushpackager.git
-  revision: 6309711a3dc007a322a0d84eb729dc60af8eda1e
-  branch: feedbin
-  specs:
-    grocer-pushpackager (0.0.1)
-      rubyzip
 
 GIT
   remote: https://github.com/feedbin/html-pipeline.git
@@ -243,6 +227,8 @@ GEM
     dotenv-rails (2.8.1)
       dotenv (= 2.8.1)
       railties (>= 3.2)
+    down (5.4.0)
+      addressable (~> 2.8)
     equalizer (0.0.11)
     erubi (1.12.0)
     evernote-thrift (1.25.2)
@@ -395,8 +381,6 @@ GEM
     multi_xml (0.6.0)
     multipart-post (2.3.0)
     naught (1.1.0)
-    net-http-persistent (4.0.2)
-      connection_pool (~> 2.2)
     net-http2 (0.18.5)
       http-2 (~> 0.11)
     net-imap (0.3.4)
@@ -650,14 +634,13 @@ DEPENDENCIES
   connection_pool
   debug
   dotenv-rails
-  down!
+  down
   evernote_oauth
   faker
   feedjira!
   feedkit!
   fog-aws
   foreman
-  grocer-pushpackager!
   honeybadger
   html-pipeline!
   html_diff!
@@ -678,7 +661,6 @@ DEPENDENCIES
   minitest
   minitest-stub-const
   minitest-stub_any_instance
-  net-http-persistent
   oauth
   oauth2
   pg
