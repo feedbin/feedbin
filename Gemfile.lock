@@ -112,29 +112,6 @@ GIT
       naught (~> 1.0)
       simple_oauth (~> 0.3.0)
 
-GIT
-  remote: https://github.com/ostinelli/apnotic.git
-  revision: 5e804cd0c9b394472e17c84f679727ec4501766f
-  branch: master
-  specs:
-    apnotic (1.7.0)
-      connection_pool (~> 2)
-      net-http2 (>= 0.18.3, < 2)
-
-GIT
-  remote: https://github.com/teamcapybara/capybara.git
-  revision: c8d3ff5f9b768428d5b2013931cc92ffa324b88b
-  specs:
-    capybara (3.39.0)
-      addressable
-      matrix
-      mini_mime (>= 0.1.3)
-      nokogiri (~> 1.11)
-      rack (>= 1.6.0)
-      rack-test (>= 0.6.3)
-      regexp_parser (>= 1.5, < 3.0)
-      xpath (~> 3.2)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -208,15 +185,18 @@ GEM
     addressable (2.8.4)
       public_suffix (>= 2.0.2, < 6.0)
     aggregate (0.2.3)
+    apnotic (1.7.1)
+      connection_pool (~> 2)
+      net-http2 (>= 0.18.3, < 2)
     ast (2.4.2)
     autoprefixer-rails (10.4.13.0)
       execjs (~> 2)
     bcrypt (3.1.18)
     benchmark-ips (2.12.0)
-    better_errors (2.9.1)
-      coderay (>= 1.0.0)
+    better_errors (2.10.0)
       erubi (>= 1.0.0)
       rack (>= 0.9.0)
+      rouge (>= 1.0.0)
     binding_of_caller (1.0.0)
       debug_inspector (>= 0.0.1)
     bootsnap (1.16.0)
@@ -224,6 +204,15 @@ GEM
     buftok (0.2.0)
     builder (3.2.4)
     byebug (11.1.3)
+    capybara (3.39.0)
+      addressable
+      matrix
+      mini_mime (>= 0.1.3)
+      nokogiri (~> 1.8)
+      rack (>= 1.6.0)
+      rack-test (>= 0.6.3)
+      regexp_parser (>= 1.5, < 3.0)
+      xpath (~> 3.2)
     clockwork (3.0.2)
       activesupport
       tzinfo
@@ -244,6 +233,9 @@ GEM
       addressable
     dante (0.2.0)
     date (3.3.3)
+    debug (1.8.0)
+      irb (>= 1.5.0)
+      reline (>= 0.3.1)
     debug_inspector (1.1.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
@@ -259,7 +251,7 @@ GEM
       oauth (>= 0.4.1)
     excon (0.99.0)
     execjs (2.8.1)
-    faker (3.1.1)
+    faker (3.2.0)
       i18n (>= 1.8.11, < 2)
     faraday (1.10.3)
       faraday-em_http (~> 1.0)
@@ -322,15 +314,18 @@ GEM
     httparty (0.21.0)
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
-    i18n (1.12.0)
+    i18n (1.13.0)
       concurrent-ruby (~> 1.0)
     idn-ruby (0.1.5)
     image_processing (1.12.2)
       mini_magick (>= 4.9.5, < 5)
       ruby-vips (>= 2.0.17, < 3)
-    importmap-rails (1.1.5)
+    importmap-rails (1.1.6)
       actionpack (>= 6.0.0)
       railties (>= 6.0.0)
+    io-console (0.6.0)
+    irb (1.6.4)
+      reline (>= 0.3.0)
     jbuilder (2.11.5)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
@@ -353,6 +348,7 @@ GEM
       activesupport (>= 3.0)
       librato-rack (~> 1.1.0)
       railties (>= 3.0)
+    lint_roller (1.0.0)
     listen (3.8.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -364,20 +360,19 @@ GEM
       activesupport (>= 4)
       railties (>= 4)
       request_store (~> 1.0)
-    loofah (2.20.0)
+    loofah (2.21.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
-    lookbook (1.5.3)
-      actioncable
+    lookbook (2.0.2)
       activemodel
       css_parser
       htmlbeautifier (~> 1.3)
       htmlentities (~> 4.3.4)
-      listen (~> 3.0)
+      marcel (~> 1.0)
       railties (>= 5.0)
       redcarpet (~> 3.5)
       rouge (>= 3.26, < 5.0)
-      view_component (> 2.0, < 4)
+      view_component (>= 2.0)
       yard (~> 0.9.25)
       zeitwerk (~> 2.5)
     mail (2.7.1)
@@ -392,7 +387,6 @@ GEM
     mime-types-data (3.2023.0218.1)
     mini_magick (4.12.0)
     mini_mime (1.1.2)
-    mini_portile2 (2.8.1)
     minitest (5.18.0)
     minitest-stub-const (0.6)
     minitest-stub_any_instance (1.0.3)
@@ -415,9 +409,6 @@ GEM
     net-smtp (0.3.3)
       net-protocol
     nio4r (2.5.9)
-    nokogiri (1.14.3)
-      mini_portile2 (~> 2.8.0)
-      racc (~> 1.4)
     nokogiri (1.14.3-arm64-darwin)
       racc (~> 1.4)
     nokogiri (1.14.3-x86_64-darwin)
@@ -438,10 +429,10 @@ GEM
       snaky_hash (~> 2.0)
       version_gem (~> 1.1)
     openssl (3.1.0)
-    parallel (1.22.1)
-    parser (3.2.2.0)
+    parallel (1.23.0)
+    parser (3.2.2.1)
       ast (~> 2.4.1)
-    pg (1.4.6)
+    pg (1.5.3)
     postmark (1.24.0)
       json
     postmark-rails (0.22.1)
@@ -459,10 +450,10 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (5.0.1)
-    puma (6.2.1)
+    puma (6.2.2)
       nio4r (~> 2.0)
     racc (1.6.2)
-    rack (2.2.6.4)
+    rack (2.2.7)
     rack-test (2.1.0)
       rack (>= 1.3)
     rails (7.0.4.3)
@@ -504,7 +495,9 @@ GEM
     rchardet (1.8.0)
     redcarpet (3.6.0)
     redis (4.8.1)
-    regexp_parser (2.7.0)
+    regexp_parser (2.8.0)
+    reline (0.3.3)
+      io-console (~> 0.5)
     request_store (1.5.1)
       rack (>= 1.4)
     responders (3.1.0)
@@ -514,17 +507,17 @@ GEM
       nokogiri
     rexml (3.2.5)
     rouge (4.1.0)
-    rubocop (1.48.1)
+    rubocop (1.50.2)
       json (~> 2.3)
       parallel (~> 1.10)
       parser (>= 3.2.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml (>= 3.2.5, < 4.0)
-      rubocop-ast (>= 1.26.0, < 2.0)
+      rubocop-ast (>= 1.28.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 3.0)
-    rubocop-ast (1.28.0)
+    rubocop-ast (1.28.1)
       parser (>= 3.2.1.0)
     rubocop-performance (1.16.0)
       rubocop (>= 1.7.0, < 2.0)
@@ -547,7 +540,7 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
-    selenium-webdriver (4.8.6)
+    selenium-webdriver (4.9.1)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
@@ -567,9 +560,16 @@ GEM
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
     ssrf_filter (1.1.1)
-    standard (1.26.0)
+    standard (1.28.2)
       language_server-protocol (~> 3.17.0.2)
-      rubocop (~> 1.48.1)
+      lint_roller (~> 1.0)
+      rubocop (~> 1.50.2)
+      standard-custom (~> 1.0.0)
+      standard-performance (~> 1.0.1)
+    standard-custom (1.0.0)
+      lint_roller (~> 1.0)
+    standard-performance (1.0.1)
+      lint_roller (~> 1.0)
       rubocop-performance (~> 1.16.0)
     stimulus-rails (1.2.1)
       railties (>= 6.0.0)
@@ -579,13 +579,11 @@ GEM
       stripe (>= 2.8, < 9)
     strong_migrations (1.4.4)
       activerecord (>= 5.2)
-    tailwindcss-rails (2.0.27)
+    tailwindcss-rails (2.0.29-arm64-darwin)
       railties (>= 6.0.0)
-    tailwindcss-rails (2.0.27-arm64-darwin)
+    tailwindcss-rails (2.0.29-x86_64-darwin)
       railties (>= 6.0.0)
-    tailwindcss-rails (2.0.27-x86_64-darwin)
-      railties (>= 6.0.0)
-    tailwindcss-rails (2.0.27-x86_64-linux)
+    tailwindcss-rails (2.0.29-x86_64-linux)
       railties (>= 6.0.0)
     thor (1.2.1)
     thread_safe (0.3.6)
@@ -626,18 +624,18 @@ GEM
     xpath (3.2.0)
       nokogiri (~> 1.8)
     yard (0.9.34)
-    zeitwerk (2.6.7)
+    zeitwerk (2.6.8)
 
 PLATFORMS
   arm64-darwin-20
-  ruby
+  arm64-darwin-22
   x86_64-darwin-20
   x86_64-linux
 
 DEPENDENCIES
   activerecord-import
   addressable
-  apnotic!
+  apnotic
   autoprefixer-rails
   bcrypt
   benchmark-ips
@@ -645,11 +643,12 @@ DEPENDENCIES
   binding_of_caller
   bootsnap
   byebug
-  capybara!
+  capybara
   carrierwave!
   clockwork
   coffee-rails
   connection_pool
+  debug
   dotenv-rails
   down!
   evernote_oauth
@@ -712,7 +711,7 @@ DEPENDENCIES
   twitter-text
   uglifier
   unicorn
-  view_component
+  view_component (< 3.0)
   web-push
   webmock (= 3.8.0)
   will_paginate

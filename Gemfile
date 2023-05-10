@@ -20,7 +20,7 @@ gem "mail", "< 2.8"
 
 gem "activerecord-import"
 gem "addressable", require: "addressable/uri"
-gem "apnotic", github: "ostinelli/apnotic", branch: "master"
+gem "apnotic"
 gem "autoprefixer-rails"
 gem "bcrypt"
 gem "bootsnap", require: false
@@ -65,7 +65,7 @@ gem "tailwindcss-rails"
 gem "twitter-text"
 gem "uglifier"
 gem "unicorn"
-gem "view_component"
+gem "view_component", "< 3.0"
 gem "web-push"
 
 group :development do
@@ -81,9 +81,8 @@ end
 group :development, :test do
   gem "stripe-ruby-mock", github: "feedbin/stripe-ruby-mock", branch: "feedbin", require: "stripe_mock"
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]
-  gem "capybara", github: "teamcapybara/capybara"
-  # Debug currently breaks github actions: https://github.com/ruby/debug/issues/852
-  # gem "debug", ">= 1.0.0"
+  gem "capybara"
+  gem "debug"
   gem "faker"
   gem "minitest"
   gem "minitest-stub-const"
