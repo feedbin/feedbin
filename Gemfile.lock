@@ -96,6 +96,20 @@ GIT
       naught (~> 1.0)
       simple_oauth (~> 0.3.0)
 
+GIT
+  remote: https://github.com/teamcapybara/capybara.git
+  revision: 43e32a84954817caeba2313db7a7599417893f9f
+  specs:
+    capybara (3.39.0)
+      addressable
+      matrix
+      mini_mime (>= 0.1.3)
+      nokogiri (~> 1.11)
+      rack (>= 1.6.0)
+      rack-test (>= 0.6.3)
+      regexp_parser (>= 1.5, < 3.0)
+      xpath (~> 3.2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -188,15 +202,6 @@ GEM
     buftok (0.2.0)
     builder (3.2.4)
     byebug (11.1.3)
-    capybara (3.39.0)
-      addressable
-      matrix
-      mini_mime (>= 0.1.3)
-      nokogiri (~> 1.8)
-      rack (>= 1.6.0)
-      rack-test (>= 0.6.3)
-      regexp_parser (>= 1.5, < 3.0)
-      xpath (~> 3.2)
     clockwork (3.0.2)
       activesupport
       tzinfo
@@ -627,7 +632,7 @@ DEPENDENCIES
   binding_of_caller
   bootsnap
   byebug
-  capybara
+  capybara!
   carrierwave!
   clockwork
   coffee-rails

@@ -16,7 +16,7 @@ class HarvestLinks
       @entry.data["saved_pages"] = {url => page.to_h}
       @entry.data["urls"] = urls
       @entry.save!
-      if (@entry.tweet? && @entry.tweet.link_tweet?) || (@entry.micropost? && @entry.urls.length == 1)
+      if @entry.micropost? && @entry.urls.length == 1
         ImageCrawler::TwitterLinkImage.perform_async(@entry.public_id, nil, url)
       end
     end

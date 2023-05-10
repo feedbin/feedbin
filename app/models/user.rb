@@ -589,32 +589,4 @@ class User < ApplicationRecord
       hash[item.entry_id] = {progress: progress, duration: item.duration}
     end
   end
-
-  def twitter_auth
-    if twitter_enabled?
-      TwitterAuth.new(screen_name: twitter_screen_name, token: twitter_access_token, secret: twitter_access_secret)
-    else
-      nil
-    end
-  end
-
-  def twitter_log_out
-    update(
-      twitter_access_token: nil,
-      twitter_access_secret: nil,
-      twitter_screen_name: nil,
-      twitter_auth_failures: nil
-    )
-  end
-
-  def twitter_client
-    if twitter_enabled?
-      @twitter_client ||= ::Twitter::REST::Client.new { |config|
-        config.consumer_key = ENV["TWITTER_KEY"]
-        config.consumer_secret = ENV["TWITTER_SECRET"]
-        config.access_token = twitter_access_token
-        config.access_token_secret = twitter_access_secret
-      }
-    end
-  end
 end

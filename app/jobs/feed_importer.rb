@@ -8,7 +8,7 @@ class FeedImporter
     user = import.user
 
     feeds = begin
-      FeedFinder.feeds(import_item.details[:xml_url], import_mode: true, twitter_auth: user.twitter_auth)
+      FeedFinder.feeds(import_item.details[:xml_url], import_mode: true)
     rescue => exception
       import_item.update(status: :failed, error_class: exception.class.name, error_message: exception.message)
       []

@@ -23,7 +23,7 @@ class FeedsController < ApplicationController
 
   def search
     @user = current_user
-    @feeds = FeedFinder.feeds(params[:q], twitter_auth: @user.twitter_auth, username: params[:username], password: params[:password])
+    @feeds = FeedFinder.feeds(params[:q], username: params[:username], password: params[:password])
     @feeds.map { |feed| feed.priority_refresh(@user) }
     @tag_editor = TagEditor.new(@user, nil)
   rescue Feedkit::Unauthorized => exception
@@ -38,11 +38,6 @@ class FeedsController < ApplicationController
   end
 
   private
-
-  def twitter_feed?(url)
-    url = url.strip
-    url.start_with?("@", "#", "http://twitter.com", "https://twitter.com", "http://mobile.twitter.com", "https://mobile.twitter.com", "twitter.com", "mobile.twitter.com")
-  end
 
   def correct_user
     unless current_user.subscribed_to?(params[:id])

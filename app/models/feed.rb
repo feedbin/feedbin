@@ -94,10 +94,7 @@ class Feed < ApplicationRecord
     create_with(record).create_or_find_by!(feed_url: record[:feed_url]).tap do |new_feed|
       parsed_feed.entries.each do |parsed_entry|
         entry_hash = parsed_entry.to_entry
-        threader = Threader.new(entry_hash, new_feed)
-        unless threader.thread
-          new_feed.entries.create_with(entry_hash).create_or_find_by(public_id: entry_hash[:public_id])
-        end
+        new_feed.entries.create_with(entry_hash).create_or_find_by(public_id: entry_hash[:public_id])
       end
       # for micropost feeds
       if parsed_feed.entries.filter_map(&:title).blank?

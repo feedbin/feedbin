@@ -79,7 +79,7 @@ end
 group :development, :test do
   gem "stripe-ruby-mock", github: "feedbin/stripe-ruby-mock", branch: "feedbin", require: "stripe_mock"
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]
-  gem "capybara"
+  gem "capybara", github: "teamcapybara/capybara"
   gem "debug"
   gem "faker"
   gem "minitest"

@@ -41,13 +41,8 @@ module FeedCrawler
       if alternate_exists?(item)
         Librato.increment("entry.alternate_exists")
       else
-        threader = Threader.new(item, feed)
-        if !threader.thread
-          feed.entries.create!(item)
-          Librato.increment("entry.create")
-        else
-          Librato.increment("entry.thread")
-        end
+        feed.entries.create!(item)
+        Librato.increment("entry.create")
         Sidekiq.logger.info "Creating entry=#{item["public_id"]}"
       end
     end

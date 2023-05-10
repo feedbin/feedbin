@@ -1,11 +1,10 @@
 class FeedFinder
 
-  attr_reader :url, :twitter_auth, :response, :import_mode
+  attr_reader :url, :response, :import_mode
 
-  def initialize(url, import_mode: false, twitter_auth: nil, username: nil, password: nil)
+  def initialize(url, import_mode: false, username: nil, password: nil)
     @url          = url
     @import_mode  = import_mode
-    @twitter_auth = twitter_auth
     @username     = username
     @password     = password
   end

@@ -28,7 +28,6 @@ class Entry < ApplicationRecord
   after_commit :harvest_links, on: :create
   after_commit :harvest_embeds, on: [:create, :update]
   after_commit :cache_views, on: [:create, :update]
-  after_commit :save_twitter_users, on: [:create]
   after_commit :search_index_store_update, on: [:update]
 
   validate :has_content
@@ -111,7 +110,7 @@ class Entry < ApplicationRecord
     Rails.logger.error("Invalid uri original_url=#{original_url} fully_qualified_url=#{fully_qualified_url}")
     nil
   end
-  
+
   def base_url
     feed.pages? ? url : feed.site_url
   end
@@ -357,18 +356,10 @@ class Entry < ApplicationRecord
         hash[:feed_id] = feed_id
         hash[:active] = true
         hash[:muted] = false
-        if tweet?
-          hash[:show_retweets] = true if tweet.retweet?
-          hash[:media_only] = false unless tweet.twitter_media?
-        end
       end
 
       user_ids = Subscription.where(filters).pluck(:user_id)
       unread_entries = user_ids.each_with_object([]) { |user_id, array|
-        if tweet?
-          has_tweet = User.where(id: user_id).take&.has_tweet?(main_tweet_id)
-          Librato.increment("user.has_tweet", source: has_tweet.to_s)
-        end
         array << UnreadEntry.new(user_id: user_id, feed_id: feed_id, entry_id: id, published: published, entry_created_at: created_at)
       }
       UnreadEntry.import(unread_entries, validate: false, on_duplicate_key_ignore: true)
@@ -444,15 +435,11 @@ class Entry < ApplicationRecord
   end
 
   def harvest_links
-    HarvestLinks.perform_async(id) if tweet? || micropost?
+    HarvestLinks.perform_async(id) if micropost?
   end
 
   def cache_views
     CacheEntryViews.new.perform(id)
-  end
-
-  def save_twitter_users
-    SaveTwitterUsers.perform_async(id) if tweet?
   end
 
   def skip_images?

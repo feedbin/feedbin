@@ -36,22 +36,6 @@ Rails.application.routes.draw do
   get ".well-known/apple-developer-merchantid-domain-association", to: "well_known#apple_pay"
   get ".well-known/change-password", to: "well_known#change_password"
 
-  # Apple Push
-
-  # When a user allows permission to receive push notifications
-  post "apple_push_notifications/:version/pushPackages/:website_push_id", as: :apple_push_notifications_package, to: "apple_push_notifications#create", website_push_id: /.*/
-
-  # POST When users first grant permission, or later change their permission
-  # levels for your website
-  post "apple_push_notifications/:version/devices/:device_token/registrations/:website_push_id", as: :apple_push_notifications_update, to: "apple_push_notifications#update", website_push_id: /.*/
-
-  # DELETE If a user removes permission of a website in Safari preferences, a
-  # DELETE request is sent
-  delete "apple_push_notifications/:version/devices/:device_token/registrations/:website_push_id", as: :apple_push_notifications_delete, to: "apple_push_notifications#delete", website_push_id: /.*/
-
-  # Error log
-  post "apple_push_notifications/:version/log", as: :apple_push_notifications_log, to: "apple_push_notifications#log"
-
   # WebSub
   get  "web_sub/:id/:signature", as: :web_sub_verify,  to: "web_sub#verify"
   post "web_sub/:id/:signature", as: :web_sub_publish, to: "web_sub#publish"
@@ -200,19 +184,6 @@ Rails.application.routes.draw do
 
   post "settings/sticky/:feed_id", as: :settings_sticky, to: "settings#sticky"
   post "settings/subscription_view_mode/:feed_id", as: :settings_subscription_view_mode, to: "settings#subscription_view_mode"
-
-  resources :twitter_authentications, only: [:new] do
-    collection do
-      get :save
-      delete :delete
-    end
-  end
-
-  resources :tweets, only: [] do
-    member do
-      get :thread
-    end
-  end
 
   resources :microposts, only: [] do
     member do

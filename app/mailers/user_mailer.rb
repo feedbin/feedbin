@@ -53,9 +53,4 @@ class UserMailer < ApplicationMailer
     attachments["subscriptions.xml"] = opml
     mail to: @user.email, subject: "[Feedbin] Account Closed"
   end
-
-  def twitter_connection_error(user_id)
-    @user = User.find(user_id)
-    mail to: @user.email, subject: "[Feedbin] Twitter Connection Error"
-  end
 end

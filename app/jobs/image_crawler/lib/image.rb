@@ -50,15 +50,6 @@ module ImageCrawler
         validate: true,
         job_class: ItunesFeedImage
       },
-      profile: {
-        width: 400,
-        height: 400,
-        minimum_size: nil,
-        crop: :limit_crop,
-        directory: "profile",
-        validate: false,
-        job_class: TwitterProfileImage
-      },
       icon: {
         width: 400,
         height: 400,
