@@ -837,6 +837,39 @@ ALTER SEQUENCE public.plans_id_seq OWNED BY public.plans.id;
 
 
 --
+-- Name: playlists; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.playlists (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    title text NOT NULL,
+    sort_order bigint DEFAULT 0 NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: playlists_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.playlists_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: playlists_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.playlists_id_seq OWNED BY public.playlists.id;
+
+
+--
 -- Name: podcast_subscriptions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -847,7 +880,8 @@ CREATE TABLE public.podcast_subscriptions (
     status bigint DEFAULT 0 NOT NULL,
     title text,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    playlist_id bigint
 );
 
 
@@ -883,7 +917,8 @@ CREATE TABLE public.queued_entries (
     progress bigint DEFAULT 0 NOT NULL,
     duration bigint DEFAULT 0 NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    playlist_id bigint
 );
 
 
@@ -1622,6 +1657,13 @@ ALTER TABLE ONLY public.plans ALTER COLUMN id SET DEFAULT nextval('public.plans_
 
 
 --
+-- Name: playlists id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.playlists ALTER COLUMN id SET DEFAULT nextval('public.playlists_id_seq'::regclass);
+
+
+--
 -- Name: podcast_subscriptions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1921,6 +1963,14 @@ ALTER TABLE ONLY public.oauth_servers
 
 ALTER TABLE ONLY public.plans
     ADD CONSTRAINT plans_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: playlists playlists_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.playlists
+    ADD CONSTRAINT playlists_pkey PRIMARY KEY (id);
 
 
 --
@@ -2359,6 +2409,20 @@ CREATE INDEX index_newsletter_senders_on_token ON public.newsletter_senders USIN
 --
 
 CREATE UNIQUE INDEX index_oauth_servers_on_host ON public.oauth_servers USING btree (host);
+
+
+--
+-- Name: index_playlists_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_playlists_on_user_id ON public.playlists USING btree (user_id);
+
+
+--
+-- Name: index_playlists_on_user_id_and_title; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_playlists_on_user_id_and_title ON public.playlists USING btree (user_id, title);
 
 
 --
@@ -2887,6 +2951,14 @@ ALTER TABLE ONLY public.authentication_tokens
 
 
 --
+-- Name: playlists fk_rails_d67ef1eb45; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.playlists
+    ADD CONSTRAINT fk_rails_d67ef1eb45 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -3075,6 +3147,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221220140655'),
 ('20221222204921'),
 ('20230101160218'),
-('20230130211416');
+('20230130211416'),
+('20230510215256');
 
 
