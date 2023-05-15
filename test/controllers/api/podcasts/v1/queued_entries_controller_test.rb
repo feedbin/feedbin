@@ -2,18 +2,22 @@ require "test_helper"
 class Api::Podcasts::V1::QueuedEntriesControllerTest < ApiControllerTestCase
   setup do
     @user = users(:ben)
-    @feed = @user.podcast_subscriptions.first.feed
+    @subscription = @user.podcast_subscriptions.first
+    @feed = @subscription.feed
     @entry = create_entry(@feed)
     @queued_entry = @user.queued_entries.first
   end
 
   test "should get index" do
     login_as @user
+    playlist = @user.playlists.create!(title: "Favorites")
+    @queued_entry.update!(playlist: playlist)
     get :index, format: :json
     assert_response :success
     data = parse_json
     assert_equal(@entry.id, data.first.safe_dig("entry_id"))
     assert_equal(@entry.feed.id, data.first.safe_dig("feed_id"))
+    assert_equal(playlist.id, data.first.safe_dig("playlist_id"))
     assert_not_nil data.first.safe_dig("id")
     assert_not_nil data.first.safe_dig("order")
     assert_not_nil data.first.safe_dig("progress")
@@ -47,10 +51,13 @@ class Api::Podcasts::V1::QueuedEntriesControllerTest < ApiControllerTestCase
 
     progress = 10
 
-    patch :update, params: {id: @queued_entry.entry_id, progress: progress, progress_updated_at: Time.now.iso8601(6)}, format: :json
+    playlist = @user.playlists.create!(title: "Favorites")
+
+    patch :update, params: {id: @queued_entry.entry_id, progress: progress, progress_updated_at: Time.now.iso8601(6), playlist_id: playlist.id, playlist_id_updated_at: Time.now.iso8601(6)}, format: :json
     assert_response :success
 
     assert @queued_entry.reload.progress, progress
+    assert @queued_entry.reload.playlist, playlist
     assert_equal("progress", @queued_entry.attribute_changes.first.name)
   end
 
@@ -61,10 +68,14 @@ class Api::Podcasts::V1::QueuedEntriesControllerTest < ApiControllerTestCase
 
     progress = 10
 
-    patch :update, params: {id: @queued_entry.entry_id, progress: progress, progress_updated_at: 1.second.ago.iso8601(6)}, format: :json
+    playlist = @user.playlists.create!(title: "Favorites")
+
+    patch :update, params: {id: @queued_entry.entry_id, progress: progress, progress_updated_at: 1.second.ago.iso8601(6), playlist_id: playlist.id, playlist_id_updated_at: 1.second.ago.iso8601(6)}, format: :json
     assert_response :success
 
     assert_equal 0, @queued_entry.reload.progress
+    assert_nil(@queued_entry.reload.playlist)
+
   end
 
 end

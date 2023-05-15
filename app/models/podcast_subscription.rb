@@ -1,9 +1,10 @@
 class PodcastSubscription < ApplicationRecord
   include TrackableAttributes
-  track :status
+  track :status, :playlist_id
 
   belongs_to :user
   belongs_to :feed, counter_cache: :subscriptions_count
+  belongs_to :playlist
   enum status: {hidden: 0, subscribed: 1, bookmarked: 2}
 
   before_destroy :removed_queued_entries

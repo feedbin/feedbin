@@ -67,6 +67,7 @@ class User < ApplicationRecord
   has_many :recently_read_entries, dependent: :delete_all
   has_many :recently_played_entries, dependent: :delete_all
   has_many :queued_entries, dependent: :delete_all
+  has_many :playlists, dependent: :delete_all
   has_many :updated_entries, dependent: :delete_all
   has_many :devices, dependent: :delete_all
   has_many :authentication_tokens, dependent: :delete_all

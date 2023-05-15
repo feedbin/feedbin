@@ -251,6 +251,7 @@ Rails.application.routes.draw do
             resource :bulk, controller: :bulk, only: [:update]
           end
           resources :queued_entries, only: [:index, :create, :update, :destroy]
+          resources :playlists, only: [:index, :create, :update, :destroy]
           post :authentication, to: "authentication#index"
         end
       end
