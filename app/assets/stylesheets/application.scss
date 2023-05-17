@@ -329,8 +329,10 @@ body {
     -webkit-font-smoothing: antialiased;
     font-smoothing: antialiased;
   }
-  &.native.app {
+  &.app {
     overflow: hidden;
+  }
+  &.native.app {
     display: flex;
   }
   &.touch.app {
@@ -3888,7 +3890,7 @@ $feed-title-width: 115px;
 .content-styles img,
 img.responsive {
   max-width: 100%;
-  display: block;
+  display: inline-block;
   height: auto;
   margin: 0 0 10px 0;
   vertical-align: middle;
