@@ -31,10 +31,19 @@ module Api
         end
       end
 
+      def update
+        @user = current_user
+        @user.update(user_update_params)
+      end
+
       private
 
       def user_params
         params.require(:user).permit(:email, :password)
+      end
+
+      def user_update_params
+        params.require(:user).permit(:podcast_sort_order)
       end
     end
   end

@@ -47,7 +47,8 @@ class User < ApplicationRecord
     :newsletter_tag,
     :feeds_width,
     :entries_width,
-    :billing_issue
+    :billing_issue,
+    :podcast_sort_order
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
