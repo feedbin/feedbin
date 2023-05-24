@@ -48,7 +48,8 @@ class User < ApplicationRecord
     :feeds_width,
     :entries_width,
     :billing_issue,
-    :podcast_sort_order
+    :podcast_sort_order,
+    :playlist_migration
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -570,6 +571,22 @@ class User < ApplicationRecord
 
   def trialing?
     plan == Plan.find_by_stripe_id("trial")
+  end
+
+  def migrate_playlists!
+    return unless playlist_migration.nil?
+
+    migrate_playlist!(title: "Subscriptions", subs: podcast_subscriptions.subscribed)
+    migrate_playlist!(title: "Bookmarks", subs: podcast_subscriptions.bookmarked)
+    update(playlist_migration: 1)
+  end
+
+  def migrate_playlist!(title:, subs:)
+    return unless subs.exists?
+
+    playlist = playlists.create_or_find_by(title: title)
+    subs.update_all(playlist_id: playlist.id)
+    queued_entries.where(feed_id: subs.pluck(:feed_id)).update_all(playlist_id: playlist.id)
   end
 
   def has_tweet?(main_tweet_id)

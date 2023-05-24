@@ -7,6 +7,7 @@ module Api
 
         def index
           @user = current_user
+          @user.migrate_playlists!
           @playlists = @user.playlists
         end
 
