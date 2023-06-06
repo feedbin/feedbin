@@ -238,7 +238,7 @@ class Feed < ApplicationRecord
   end
 
   def rebase_url(root, relative)
-    return nil if relative.blank? || !relative.respond_to?(:strip)
+    return root if relative.blank? || !relative.respond_to?(:strip)
     return relative.strip if relative.strip.downcase.start_with?("http")
     return nil if root.blank?
 

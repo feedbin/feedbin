@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "= 7.0.4.3"
+gem "rails", "= 7.0.5"
 gem "will_paginate"
 
 gem "http",                github: "feedbin/http",                branch: "feedbin"
@@ -51,7 +51,7 @@ gem "redis", "< 5"
 gem "responders"
 gem "reverse_markdown"
 gem "ruby-vips"
-gem "rubyzip"
+gem "rubyzip", require: "zip"
 gem "sanitize"
 gem "sass-rails"
 gem "sidekiq", "= 6.5.7"
