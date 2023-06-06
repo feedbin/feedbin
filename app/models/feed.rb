@@ -223,6 +223,10 @@ class Feed < ApplicationRecord
     "refresher_redirect_stable_%d" % id
   end
 
+  def site_url
+    feed_relative_url(self[:site_url])
+  end
+
   def feed_relative_url(url)
     root = crawl_data.redirected_to || feed_url
     rebase_url(root, url).to_s
