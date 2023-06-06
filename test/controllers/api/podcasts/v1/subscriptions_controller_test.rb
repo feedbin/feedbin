@@ -63,12 +63,14 @@ class Api::Podcasts::V1::SubscriptionsControllerTest < ApiControllerTestCase
     subscription = @user.podcast_subscriptions.first
 
     playlist = @user.playlists.create!(title: "Favorites")
+    entry = create_entry(subscription.feed)
 
     patch :update, params: {id: subscription.feed_id, status: "bookmarked", status_updated_at: Time.now.iso8601(6), playlist_id: playlist.id, playlist_id_updated_at: Time.now.iso8601(6)}, format: :json
     assert_response :success
 
     assert subscription.reload.bookmarked?, "Subscription should be bookmarked"
     assert subscription.attribute_changes.present?
+    assert_equal(playlist.id, @user.queued_entries.first.playlist_id)
     changes = subscription.attribute_changes.pluck(:name).to_set
     assert_equal(["playlist_id", "status"].to_set, changes)
   end
