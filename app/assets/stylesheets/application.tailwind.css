@@ -144,7 +144,7 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 
 .pagination [aria-label]:nth-child(2) {
-  @apply border-l rounded-l-md;
+  @apply border-l rounded-l-md border-l-400;
 }
 
 .pagination [aria-label]:nth-last-child(2) {
