@@ -36,7 +36,8 @@ class Share::Raindrop < Share::Service
         json: {
           title: entry.title,
           link: entry.fully_qualified_url,
-          pleaseParse: {}
+          pleaseParse: {},
+          collectionId: -1
         })
 
     response.status.code
