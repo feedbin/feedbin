@@ -152,7 +152,7 @@ class Entry < ApplicationRecord
   def content_diff
     @content_diff ||= begin
       result = nil
-      if original && original["content"].present? && original["content"].length != content.length
+      if content && original && original["content"].present? && original["content"].length != content.length
         begin
           before = ContentFormatter.format!(original["content"], self)
           after = ContentFormatter.format!(content, self)
