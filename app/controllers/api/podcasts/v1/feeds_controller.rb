@@ -20,6 +20,8 @@ module Api
 
           if @feed.present?
             @feed.touch(:standalone_request_at)
+          else
+            status_not_found
           end
         rescue => exception
           if Rails.env.production?
