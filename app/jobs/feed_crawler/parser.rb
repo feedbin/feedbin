@@ -59,6 +59,19 @@ module FeedCrawler
       filter.stats.each do |stat, count|
         Librato.increment("feed.parser", source: stat, by: count)
       end
+
+      urls = parsed.entries.each_with_object([]) do |entry, array|
+        alternate = entry.try(:entry).try(:url_alt)
+        original = entry.try(:entry).try(:url)
+        if alternate.present? && original != alternate
+          array.push("alternate=#{alternate} original=#{original}")
+        end
+      end
+
+      if urls.present?
+        Sidekiq.logger.info "Different alternate URL: url=#{@feed.feed_url} feed_id=#{@feed.id} count=#{urls.count} #{urls.join(" ")}"
+        Librato.increment("feed.parser.alternate_mismatch")
+      end
     ensure
       File.unlink(path) rescue Errno::ENOENT
     end
