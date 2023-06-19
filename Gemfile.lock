@@ -14,7 +14,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedjira.git
-  revision: c14ffddfee64590091fe7a7a33fd6b1ba86b2a59
+  revision: 67807b0bce0244f7220eaa0f0819c72a3ea85180
   branch: f2
   specs:
     feedjira (2.1.2)
@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: 9d48100919539c7ac42c6bd8f611e19c542ca3da
+  revision: 73e04904ae901fd919215fc2b384eb0de73395dd
   branch: master
   specs:
     feedkit (0.1.0)
