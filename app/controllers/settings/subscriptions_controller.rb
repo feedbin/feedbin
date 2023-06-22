@@ -53,13 +53,13 @@ class Settings::SubscriptionsController < ApplicationController
         subscriptions.destroy_all
         notice = "You have unsubscribed."
       elsif params[:operation] == "show_updates"
-        subscriptions.update_all(show_updates: true)
+        subscriptions.update_all(show_updates: true, updated_at: Time.now)
       elsif params[:operation] == "hide_updates"
-        subscriptions.update_all(show_updates: false)
+        subscriptions.update_all(show_updates: false, updated_at: Time.now)
       elsif params[:operation] == "mute"
-        subscriptions.update_all(muted: true)
+        subscriptions.update_all(muted: true, updated_at: Time.now)
       elsif params[:operation] == "unmute"
-        subscriptions.update_all(muted: false)
+        subscriptions.update_all(muted: false, updated_at: Time.now)
       end
     end
     redirect_to settings_subscriptions_url, notice: notice
@@ -88,8 +88,7 @@ class Settings::SubscriptionsController < ApplicationController
 
   def subscriptions_with_sort_data
     dates = @user.subscriptions.order(updated_at: :asc).pluck(:updated_at)
-    Rails.logger.info(dates.join(","))
-    key = Digest::SHA1.hexdigest(dates.join(","))
+    key = Digest::SHA1.hexdigest(dates.join)
 
     subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}", expires_in: 24.hours) {
       tags = @user.tags_on_feed
