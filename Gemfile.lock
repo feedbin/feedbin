@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedkit.git
-  revision: 73e04904ae901fd919215fc2b384eb0de73395dd
+  revision: 8f5359967d34bca4b459f2c7102aae5d3948a42f
   branch: master
   specs:
     feedkit (0.1.0)
@@ -189,7 +189,7 @@ GEM
     ast (2.4.2)
     autoprefixer-rails (10.4.13.0)
       execjs (~> 2)
-    bcrypt (3.1.18)
+    bcrypt (3.1.19)
     benchmark-ips (2.12.0)
     better_errors (2.10.1)
       erubi (>= 1.0.0)
@@ -579,7 +579,7 @@ GEM
     thor (1.2.2)
     thread_safe (0.3.6)
     tilt (2.2.0)
-    timeout (0.3.2)
+    timeout (0.4.0)
     twitter-text (3.1.0)
       idn-ruby
       unf (~> 0.1.0)
