@@ -51,9 +51,14 @@
         <%= render Form::CheckboxComponent.new %> Include all
       </label>
 
-      <%= render "shared/input", class: "ml-auto" do %>
-        <input type="text" class="text-input" data-behavior="feed_search" placeholder="Filter" />
-      <% end %>
+
+      <div class="max-w-[150px] ml-auto">
+        <%= render Form::TextInputComponent.new do |text| %>
+          <% text.input do %>
+            <input type="text" class="text-input" data-behavior="feed_search" placeholder="Filter" />
+          <% end %>
+        <% end %>
+      </div>
     </div>
     <ul class="border-y max-h-[240px] overflow-scroll resize-y" data-behavior="search_results">
       <%= form.collection_check_boxes(:feed_ids, @user.feeds.include_user_title, :string_id, :title) do |builder| %>
