@@ -6,6 +6,8 @@ class SearchTest < ApplicationSystemTestCase
 
     login_as(@user)
 
+    wait_for_ajax
+
     find("[data-event-identifier-param=toggle-search]").click
 
     wait_for_ajax
