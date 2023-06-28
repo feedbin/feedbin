@@ -52,7 +52,7 @@ module Settings
                 end
               end
 
-              unsafe_raw helpers.will_paginate @subscriptions, previous_label: "Previous", next_label: "Next", inner_window: 1
+              plain helpers.will_paginate @subscriptions, previous_label: "Previous", next_label: "Next", inner_window: 1
             end
           end
         end
