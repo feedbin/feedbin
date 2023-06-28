@@ -4,7 +4,7 @@
             <input type="checkbox" class="visually-hidden peer" id="diff_view" data-behavior="change_content_view" data-view-mode="diff">
             <label class="content-option-switch system-content entry-callout group flex gap-2" for="diff_view">
                 <%= svg_tag 'favicon-updated' %>
-                View changes since original <span class="ml-auto"><%= component "form/switch" %></span>
+                View changes since original <span class="ml-auto"><%= render Form::SwitchComponent.new %></span>
             </label>
         </form>
     <% end %>
@@ -14,7 +14,7 @@
             <input name="subscription[view_mode]" type="checkbox" value="newsletter" class="visually-hidden peer" id="newsletter_view" data-behavior="change_content_view auto_submit" data-view-mode="newsletter">
             <label class="content-option-switch system-content entry-callout group flex gap-2" for="newsletter_view">
                 <%= svg_tag 'favicon-newsletter' %>
-                View as rich text <span class="ml-auto"><%= component "form/switch" %></span>
+                View as rich text <span class="ml-auto"><%= render Form::SwitchComponent.new %></span>
             </label>
         </form>
     <% end %>
@@ -43,7 +43,7 @@
                 <script>
                     if (feedbin.hasShadowDOM) {
                         const newsletter = document.getElementById("<%= newsletter_id %>").attachShadow({mode: 'open'});;
-                		newsletter.innerHTML = "<%= j entry_presenter.newsletter_content %>";
+                        newsletter.innerHTML = "<%= j entry_presenter.newsletter_content %>";
                         feedbin.newsletterLoad(newsletter);
                     }
                 </script>

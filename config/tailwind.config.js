@@ -3,9 +3,10 @@ const plugin = require("tailwindcss/plugin")
 
 module.exports = {
   content: [
+    './app/views/**/*.rb',
     "./app/helpers/**/*.rb",
     "./app/javascript/**/*.js",
-    "./app/views/**/*.{erb,html}",
+    "./app/views/**/*.{erb,html,rb}",
     "./app/components/**/*.{erb,html,rb}",
     "./test/components/**/*.{erb,html,rb}"
   ],
@@ -63,7 +64,7 @@ module.exports = {
   plugins: [
     plugin(function ({ addVariant }) {
       let pseudoVariants = [
-        "checked", "focus", "active", "disabled"
+        "checked", "focus", "active", "disabled", "checked:disabled"
       ].map((variant) =>
         Array.isArray(variant) ? variant : [variant, `&:${variant}`],
       );

@@ -7,18 +7,12 @@
     <%= javascript_importmap_tags %>
 </head>
 <body>
-  <div class="theme-day bg-day p-2 text-600">
+  <% %w[day dusk sunset midnight].each do |theme| %>
+  <h2 class="font-bold my-4 mx-6"><%= theme.titleize %></h2>
+  <div class="theme-<%= theme %> bg-0 p-6 shadow-xl m-6 border rounded-xl text-600">
     <%= yield %>
   </div>
-  <div class="theme-dusk bg-dusk p-2 text-600">
-    <%= yield %>
-  </div>
-  <div class="theme-sunset bg-sunset p-2 text-600">
-    <%= yield %>
-  </div>
-  <div class="theme-midnight bg-midnight p-2 text-600">
-    <%= yield %>
-  </div>
+  <% end %>
   <%= render partial: "shared/svg" %>
 </body>
 </html>

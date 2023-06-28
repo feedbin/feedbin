@@ -185,7 +185,8 @@ input[type="search"]::-webkit-search-cancel-button {
     @apply leading-[42px] py-0 px-2 shadow-one bg-transparent w-full text-sm rounded-md text-600 ring-0 block grow appearance-none border border-400 transition-[border,box_shadow] duration-200
     placeholder:text-500
     disabled:bg-100 disabled:text-400 disabled:border-200 disabled:shadow-none
-    focus:outline-none focus:outline-transparent focus:text-700 focus:border-blue-600 focus:shadow-[0_0_0_1px_theme(colors.blue.600)];
+    focus:outline-none focus:outline-transparent focus:text-700 focus:border-blue-600 focus:shadow-[0_0_0_1px_theme(colors.blue.600)]
+    data-[focused]:text-700 data-[focused]:border-blue-600 data-[focused]:shadow-[0_0_0_1px_theme(colors.blue.600)];
   }
   textarea:focus,
   select:focus,
@@ -207,7 +208,7 @@ input[type="search"]::-webkit-search-cancel-button {
     @apply text-sm font-medium relative inline-flex items-center justify-center gap-2 border border-blue-600 whitespace-nowrap leading-[42px] px-6 rounded-md !text-white bg-blue-600 transition transition-[box_shadow]
            disabled:bg-100 disabled:!text-400 disabled:border-100
            before:content-[""] before:opacity-0 before:block before:border-2 before:border-blue-400 before:absolute before:pointer-events-none before:top-[-4px] before:right-[-4px] before:bottom-[-4px] before:left-[-4px] before:rounded-[8px] before:transition before:duration-200
-           focus:before:opacity-100 [-webkit-tap-highlight-color:transparent];
+           focus:before:opacity-100 data-[focused]:before:opacity-100 [-webkit-tap-highlight-color:transparent];
   }
   .button:hover, .button-secondary:hover {
     @apply shadow-one no-underline disabled:shadow-none;

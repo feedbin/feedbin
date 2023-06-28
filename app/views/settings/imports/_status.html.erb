@@ -1,4 +1,4 @@
-<%= component "settings/control_group", class: "group mb-14", data: {capsule: "true"} do |group| %>
+<%= render Settings::ControlGroupComponent.new class: "group mb-14", data: {capsule: "true"} do |group| %>
   <% group.item do %>
     <div class="py-3 px-4">
       <div class="flex justify-between">
@@ -29,7 +29,7 @@
 
 <% if @failed_items.present? %>
   <div class="flex justify-between items-baseline">
-    <%= component "settings/h2" do %>
+    <%= render Settings::H2Component.new do %>
       Missing Feeds
     <% end %>
     <div class="text-500">

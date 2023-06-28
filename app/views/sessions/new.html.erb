@@ -5,7 +5,7 @@
     <h1 class="font-bold text-lg mb-4">Log in to Feedbin</h1>
     <%= render partial: "shared/flash", locals: {flash: flash} %>
     <div class="mb-4">
-      <%= component "form/text_input" do |text| %>
+      <%= render Form::TextInputComponent.new do |text| %>
         <% text.label do %>
           <label for="email">Email</label>
         <% end %>
@@ -15,7 +15,7 @@
       <% end %>
     </div>
     <div class="mb-8">
-      <%= component "form/text_input" do |text| %>
+      <%= render Form::TextInputComponent.new do |text| %>
         <% text.label do %>
           <div class="flex items-center">
             <label for="password">Password</label>

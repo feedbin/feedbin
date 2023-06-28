@@ -1,8 +1,8 @@
-<%= component "app/share_form", title: "Save to Pinboard", icon: "icon-share-pinboard" do %>
+<%= render App::ShareFormComponent.new title: "Save to Pinboard", icon: "icon-share-pinboard" do %>
   <%= form_tag("", remote: true) do %>
     <%= hidden_field_tag :url, "", class: "url-placeholder" %>
     <div class="mb-4">
-      <%= component "form/text_input" do |text| %>
+      <%= render Form::TextInputComponent.new do |text| %>
         <% text.label do %>
           <label for="pinboard_title">Title</label>
         <% end %>
@@ -13,7 +13,7 @@
     </div>
 
     <div class="mb-4">
-      <%= component "form/text_input" do |text| %>
+      <%= render Form::TextInputComponent.new do |text| %>
         <% text.label do %>
           <label for="pinboard_description">Description</label>
         <% end %>
@@ -24,7 +24,7 @@
     </div>
 
     <div class="mb-4">
-      <%= component "form/text_input" do |text| %>
+      <%= render Form::TextInputComponent.new do |text| %>
         <% text.label do %>
           <label for="pinboard_tags">Tags</label>
         <% end %>
@@ -38,20 +38,20 @@
       <div>
         <%= check_box_tag :shared, "no", false, class: "peer" %>
         <label for="shared" class="group flex gap-2 items-center">
-          <%= component "form/check_box" %>
+          <%= render Form::CheckboxComponent.new %>
           Private
         </label>
       </div>
       <div>
         <%= check_box_tag :toread, "yes", false, class: "peer" %>
         <label for="toread" class="group flex gap-2 items-center">
-          <%= component "form/check_box" %>
+          <%= render Form::CheckboxComponent.new %>
           Read Later
         </label>
       </div>
     </div>
 
-    <%= component "settings/button_row" do %>
+    <%= render Settings::ButtonRowComponent.new do %>
       <%= button_tag "Cancel", type: "button", class: "button button-secondary", data: {behavior: "close_entry_basement"} %>
       <%= button_tag "Save", type: "submit", class: "button" %>
     <% end %>

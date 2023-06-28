@@ -3,7 +3,7 @@
         <label for="q">+ Add</label><%= url_field_tag(:q, "", placeholder: 'Feed or Website URL', autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: false, data: { behavior: 'feeds_search_field autofocus'}) %>
         <span data-behavior="feeds_search_favicon_target" class="favicon-target"></span>
         <div class="absolute right-6 inset-y-0">
-          <%= component "app/spinner" %>
+          <%= render App::SpinnerComponent.new %>
         </div>
     <% end %>
 <% end %>

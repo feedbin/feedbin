@@ -1,4 +1,4 @@
-<%= component "settings/control_row" do |row| %>
+<%= render Settings::ControlRowComponent.new do |row| %>
   <% if action.title.present? %>
     <% row.title do %>
       <strong class="font-bold"><%= action.title %></strong>

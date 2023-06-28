@@ -8,7 +8,7 @@
     <%= @migration.message %>
   <% end %>
 <% elsif @migration.started? || @migration.processing? || @migration.complete? %>
-  <%= component "settings/control_group", class: "group mb-14", data: {capsule: "true"} do |group| %>
+  <%= render Settings::ControlGroupComponent.new class: "group mb-14", data: {capsule: "true"} do |group| %>
     <% group.item do %>
       <div class="py-3 px-4">
         <div class="flex justify-between">
@@ -26,13 +26,13 @@
   <% if @migration.started? %>
       Initializing…
   <% else %>
-    <%= component "settings/control_group", class: "mb-14" do |group| %>
+    <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
       <% group.header do %>
         Stats
       <% end %>
 
       <% group.item do %>
-        <%= component "settings/control_row" do |row| %>
+        <%= render Settings::ControlRowComponent.new do |row| %>
           <% row.title { "Subscriptions" } %>
           <% row.control do %>
             <span class="text-500">
@@ -43,7 +43,7 @@
       <% end %>
 
       <% group.item do %>
-        <%= component "settings/control_row" do |row| %>
+        <%= render Settings::ControlRowComponent.new do |row| %>
           <% row.title { "Starred Articles" } %>
           <% row.control do %>
             <span class="text-500">
@@ -54,7 +54,7 @@
       <% end %>
 
       <% group.item do %>
-        <%= component "settings/control_row" do |row| %>
+        <%= render Settings::ControlRowComponent.new do |row| %>
           <% row.title { "Unread Articles" } %>
           <% row.control do %>
             <span class="text-500">
@@ -72,7 +72,7 @@
 
   <% if @migration.account_migration_items.failed.exists? %>
     <div class="flex justify-between items-baseline">
-      <%= component "settings/h2" do %>
+      <%= render Settings::H2Component.new do %>
         Missing Feeds
       <% end %>
       <div class="text-500">
@@ -81,9 +81,9 @@
     </div>
 
       <% @migration.account_migration_items.failed.order(updated_at: :asc).each do |item| %>
-        <%= component "settings/expandable", class: "mb-4", data: {capsule: true} do |expandable| %>
+        <%= render Settings::ExpandableComponent.new class: "mb-4", data: {capsule: "true"} do |expandable| %>
           <% expandable.description do %>
-            <%= component "settings/control_row" do |row| %>
+            <%= render Settings::ControlRowComponent.new do |row| %>
               <% row.title { item.fw_feed.safe_dig("title") } %>
                 <% row.description do %>
                   <%= link_to item.fw_feed.safe_dig("feed_url"), target: :_blank, rel: "noopener noreferrer", class: "extra-muted" do  %>

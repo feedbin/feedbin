@@ -1,11 +1,11 @@
-<%= component "settings/control_group", class: "mb-14" do |group| %>
+<%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
   <% group.header do %>
     Payment History
   <% end %>
 
   <% if @next_payment_date %>
     <% group.item do %>
-      <%= component "settings/control_row" do |row| %>
+      <%= render Settings::ControlRowComponent.new do |row| %>
         <% row.title do %>
           <time datetime="<%= @next_payment_date.to_formatted_s(:date) %>"><%= @next_payment_date.to_formatted_s(:date) %></time>
         <% end %>
@@ -18,7 +18,7 @@
 
   <% @billing_events.first(limit).each do |invoice| %>
     <% group.item do %>
-      <%= component "settings/control_row" do |row| %>
+      <%= render Settings::ControlRowComponent.new do |row| %>
         <% row.title do %>
           <%= invoice.receipt_date %>
         <% end %>

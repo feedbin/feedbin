@@ -1,8 +1,8 @@
-<%= component "app/share_form", title: "Post to Mastodon", icon: "icon-share-mastodon" do %>
+<%= render App::ShareFormComponent.new title: "Post to Mastodon", icon: "icon-share-mastodon" do %>
   <%= form_tag("", remote: true) do %>
 
     <div class="mb-4">
-      <%= component "form/text_input" do |text| %>
+      <%= render Form::TextInputComponent.new do |text| %>
         <% text.label do %>
           <label for="mastodon_status">Status</label>
         <% end %>
@@ -13,7 +13,7 @@
     </div>
 
     <div class="mb-4">
-      <%= component "form/text_input" do |text| %>
+      <%= render Form::TextInputComponent.new do |text| %>
         <% text.label do %>
           <label for="mastodon_spoiler_text">Content Warning</label>
         <% end %>
@@ -24,7 +24,7 @@
     </div>
 
     <div class="mb-4">
-      <%= component "form/select_input" do |text| %>
+      <%= render Form::SelectInputComponent.new do |text| %>
         <% text.label do %>
           <label for="mastodon_visibility">Visibility</label>
         <% end %>
@@ -34,7 +34,7 @@
       <% end %>
     </div>
 
-    <%= component "settings/button_row" do %>
+    <%= render Settings::ButtonRowComponent.new do %>
       <%= button_tag "Cancel", type: "button", class: "button button-secondary", data: {behavior: "close_entry_basement"} %>
       <%= button_tag "Post", type: "submit", class: "button" %>
     <% end %>

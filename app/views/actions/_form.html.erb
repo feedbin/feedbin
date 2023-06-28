@@ -1,19 +1,19 @@
 <%= form_for(@action, as: :action_params, remote: true) do |form| %>
   <div class="mb-8">
-    <%= component "settings/h2" do %>
+    <%= render Settings::H2Component.new do %>
       <%= form.label :title, "Name" %>
     <% end %>
-    <%= component "form/text_input" do |text| %>
+    <%= render Form::TextInputComponent.new do |text| %>
       <% text.input do %>
         <%= form.text_field :title, class: "peer text-input" %>
       <% end %>
     <% end %>
   </div>
   <div class="mb-8">
-    <%= component "settings/h2" do %>
+    <%= render Settings::H2Component.new do %>
       <%= form.label :query, "Search Terms" %>
     <% end %>
-    <%= component "form/text_input" do |text| %>
+    <%= render Form::TextInputComponent.new do |text| %>
       <% text.input do %>
         <%= form.text_area :query, rows: @action&.query&.length.to_i > 70 ? 3 : 1, placeholder: 'For example: title.exact:"[Sponsor]"', autocorrect: "off", autocapitalize: "off", spellcheck: false, class: "peer text-input" %>
       <% end %>
@@ -23,7 +23,7 @@
 
   <% if @user.taggings.present? %>
     <div class="mb-8">
-      <%= component "settings/h2" do %>
+      <%= render Settings::H2Component.new do %>
         Article is in Tag
       <% end %>
       <ul class="border-y max-h-[240px] overflow-scroll resize-y">
@@ -31,7 +31,7 @@
           <li class="group">
             <%= builder.check_box class: "peer" %>
             <%= builder.label class: "group flex gap-2 items-center py-3 border-b group-last:border-b-0" do %>
-              <%= component "form/check_box" %>
+              <%= render Form::CheckboxComponent.new %>
               <%= builder.text %>
             <% end %>
           </li>
@@ -41,14 +41,14 @@
   <% end %>
 
   <div class="mb-8">
-    <%= component "settings/h2" do %>
+    <%= render Settings::H2Component.new do %>
       Article is in Feed
     <% end %>
 
     <div class="flex py-3 border-y border-b-0">
       <%= form.check_box :all_feeds, id: "include_all_feeds", class: "peer", data: {behavior: 'check_feeds'} %>
       <label class="group flex items-center gap-2" for="include_all_feeds">
-        <%= component "form/check_box" %> Include all
+        <%= render Form::CheckboxComponent.new %> Include all
       </label>
 
       <%= render "shared/input", class: "ml-auto" do %>
@@ -60,7 +60,7 @@
         <li class="group" data-sort-name="<%= builder.text.downcase %>">
           <%= builder.check_box feed_checkbox_options(form).merge(class: "peer") %>
           <%= builder.label title: builder.object.feed_url, class: "group flex gap-2 items-center py-3 border-b group-last:border-b-0" do %>
-            <%= component "form/check_box" %>
+            <%= render Form::CheckboxComponent.new %>
             <%= builder.text %>
           <% end %>
         </li>
@@ -68,7 +68,8 @@
     </ul>
   </div>
 
-  <%= component "settings/control_group", class: "mb-14" do |group| %>
+
+  <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
     <% group.header do %>
       Actions
     <% end %>
@@ -77,8 +78,9 @@
       <% group.item data: {behavior: "action_#{builder.value}"} do %>
         <%= builder.check_box class: "peer" %>
         <%= builder.label class: "group" do %>
-          <%= component "settings/control_row_switch" do |row| %>
+          <%= render Settings::ControlRowComponent.new do |row| %>
             <% row.title { builder.text } %>
+            <% row.control { render Form::SwitchComponent.new } %>
           <% end %>
         <% end %>
       <% end %>
@@ -90,21 +92,23 @@
 
   <% end %>
 
-  <%= component "settings/control_group", class: "mb-14" do |group| %>
+  <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
     <% group.header do %>
       Options
     <% end %>
     <% group.item do %>
       <%= form.check_box :apply_action, class: "peer" %>
       <%= form.label :apply_action, class: "group" do %>
-        <%= component "settings/control_row_switch" do |row| %>
-          <% row.title { "Mark existing matches as read" } %>
-        <% end %>
+
+      <%= render Settings::ControlRowComponent.new do |row| %>
+        <% row.title { "Mark existing matches as read" } %>
+        <% row.control { render Form::SwitchComponent.new } %>
+      <% end %>
       <% end %>
     <% end %>
   <% end %>
 
-  <%= component "settings/button_row" do %>
+  <%= render Settings::ButtonRowComponent.new do %>
     <%= form.submit "Save", name: 'commit', class: "button ui-helper-hidden-accessible", tabindex: "-1" %>
     <% if @action.persisted? %>
       <%= link_to 'Delete', @action, method: :delete, class: 'button button-secondary' , data: { confirm: 'Are you sure you want to delete this action?' } %>

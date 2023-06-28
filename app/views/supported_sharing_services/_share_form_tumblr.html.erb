@@ -1,8 +1,8 @@
-<%= component "app/share_form", title: "Post to Tumblr", icon: "icon-share-tumblr" do %>
+<%= render App::ShareFormComponent.new title: "Post to Tumblr", icon: "icon-share-tumblr" do %>
   <%= form_tag("", remote: true) do %>
     <%= hidden_field_tag :url, "", class: "url-placeholder" %>
     <div class="mb-4">
-      <%= component "form/text_input" do |text| %>
+      <%= render Form::TextInputComponent.new do |text| %>
         <% text.label do %>
           <label for="tumblr_title">Title</label>
         <% end %>
@@ -13,7 +13,7 @@
     </div>
 
     <div class="mb-4">
-      <%= component "form/text_input" do |text| %>
+      <%= render Form::TextInputComponent.new do |text| %>
         <% text.label do %>
           <label for="tumblr_description">Description</label>
         <% end %>
@@ -24,7 +24,7 @@
     </div>
 
     <div class="mb-4">
-      <%= component "form/text_input" do |text| %>
+      <%= render Form::TextInputComponent.new do |text| %>
         <% text.label do %>
           <label for="tumblr_source">Source</label>
         <% end %>
@@ -35,7 +35,7 @@
     </div>
 
     <div class="mb-4">
-      <%= component "form/text_input" do |text| %>
+      <%= render Form::TextInputComponent.new do |text| %>
         <% text.label do %>
           <label for="tumblr_tags">Tags</label>
         <% end %>
@@ -47,7 +47,7 @@
 
     <div class="mb-4 flex gap-4">
       <div class="grow">
-        <%= component "form/select_input" do |text| %>
+        <%= render Form::SelectInputComponent.new do |text| %>
           <% text.label do %>
             <label for="tumblr_type">Type</label>
           <% end %>
@@ -60,7 +60,7 @@
         <% end %>
       </div>
       <div class="grow">
-        <%= component "form/select_input" do |text| %>
+        <%= render Form::SelectInputComponent.new do |text| %>
           <% text.label do %>
             <label for="format">Format</label>
           <% end %>
@@ -70,7 +70,7 @@
         <% end %>
       </div>
       <div class="grow">
-        <%= component "form/select_input" do |text| %>
+        <%= render Form::SelectInputComponent.new do |text| %>
           <% text.label do %>
             <label for="state">Status</label>
           <% end %>
@@ -81,7 +81,7 @@
       </div>
       <% if service.service_options.present? %>
       <div class="grow">
-        <%= component "form/select_input" do |text| %>
+        <%= render Form::SelectInputComponent.new do |text| %>
           <% text.label do %>
             <label for="site">Site</label>
           <% end %>
@@ -93,7 +93,7 @@
       <% end %>
     </div>
 
-    <%= component "settings/button_row" do %>
+    <%= render Settings::ButtonRowComponent.new do %>
       <%= button_tag "Cancel", type: "button", class: "button button-secondary", data: {behavior: "close_entry_basement"} %>
       <%= submit_tag "Post", class: "button" %>
     <% end %>

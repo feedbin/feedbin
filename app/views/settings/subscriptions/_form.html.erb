@@ -43,13 +43,13 @@
             </div>
         </div>
 
-        <%= component "settings/control_group", class: "mb-14" do |group| %>
+        <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
           <% group.header do %>
             Stats
           <% end %>
 
           <% group.item do %>
-            <%= component "settings/control_row" do |row| %>
+            <%= render Settings::ControlRowComponent.new do |row| %>
               <% row.title { "Subscribed" } %>
               <% row.control do %>
                 <span class="text-500"><%= subscription.created_at.to_formatted_s(:date) %></span>
@@ -58,7 +58,7 @@
           <% end %>
 
           <% group.item do %>
-            <%= component "settings/control_row" do |row| %>
+            <%= render Settings::ControlRowComponent.new do |row| %>
               <% row.title do %>
               Latest
                 <% if subscription.feed.twitter_feed? %>
@@ -76,7 +76,7 @@
           <% end %>
 
           <% group.item do %>
-            <%= component "settings/control_row" do |row| %>
+            <%= render Settings::ControlRowComponent.new do |row| %>
               <% row.title { "Volume" } %>
               <% row.control do %>
                 <span class="text-500">
@@ -93,7 +93,7 @@
 
           <% unless subscription.feed.twitter_feed? %>
             <% group.item do %>
-              <%= component "settings/control_row" do |row| %>
+              <%= render Settings::ControlRowComponent.new do |row| %>
                 <% row.title { "Website" } %>
                 <% row.control do %>
                   <a href="<%= subscription.feed.site_url %>" class="!text-500 truncate">
@@ -105,7 +105,7 @@
           <% end %>
 
           <% group.item do %>
-            <%= component "settings/control_row" do |row| %>
+            <%= render Settings::ControlRowComponent.new do |row| %>
               <% row.title { "Source" } %>
               <% row.control do %>
                 <a href="<%= subscription.feed.feed_url %>" class="!text-500 truncate">
@@ -117,7 +117,7 @@
         <% end %>
 
 
-        <%= component "settings/control_group", class: "mb-14" do |group| %>
+        <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
           <% group.header do %>
             Options
           <% end %>
@@ -125,8 +125,9 @@
           <% group.item do %>
             <%= f.check_box :muted, class: "peer", data: {behavior: "auto_submit"}, id: "subscription_muted" %>
             <%= f.label :muted, class: "group" do %>
-              <%= component "settings/control_row_switch" do |row| %>
-                <% row.title { "Muted" } %>
+              <%= render Settings::ControlRowComponent.new do |row| %>
+                <% row.title { "Muted"} %>
+                <% row.control { render Form::SwitchComponent.new } %>
               <% end %>
             <% end %>
           <% end %>
@@ -134,9 +135,10 @@
           <% group.item do %>
             <%= f.check_box :show_updates, class: "peer", data: {behavior: "auto_submit"}, id: "subscription_show_updates" %>
             <%= f.label :show_updates, class: "group" do %>
-              <%= component "settings/control_row_switch" do |row| %>
-                <% row.title { "Show updates" } %>
+              <%= render Settings::ControlRowComponent.new do |row| %>
+                <% row.title { "Show Updates"} %>
                 <% row.description { "Tells you when an article has been changed after being published" } %>
+                <% row.control { render Form::SwitchComponent.new } %>
               <% end %>
             <% end %>
           <% end %>
@@ -145,8 +147,9 @@
             <% group.item do %>
               <%= f.check_box :show_retweets, class: "peer", data: {behavior: "auto_submit"}, id: "subscription_show_retweets" %>
               <%= f.label :show_retweets, class: "group" do %>
-                <%= component "settings/control_row_switch" do |row| %>
-                  <% row.title { "Show Retweets" } %>
+                <%= render Settings::ControlRowComponent.new do |row| %>
+                  <% row.title { "Show Retweets"} %>
+                  <% row.control { render Form::SwitchComponent.new } %>
                 <% end %>
               <% end %>
             <% end %>
@@ -154,16 +157,17 @@
             <% group.item do %>
               <%= f.check_box :media_only, class: "peer", data: {behavior: "auto_submit"}, id: "subscription_media_only" %>
               <%= f.label :media_only, class: "group" do %>
-                <%= component "settings/control_row_switch" do |row| %>
-                  <% row.title { "Media Only" } %>
+                <%= render Settings::ControlRowComponent.new do |row| %>
+                  <% row.title { "Media Only"} %>
                   <% row.description { "Only show tweets that contain links or images" } %>
+                  <% row.control { render Form::SwitchComponent.new } %>
                 <% end %>
               <% end %>
             <% end %>
 
           <% else %>
             <% group.item do %>
-              <%= component "settings/control_row" do |row| %>
+              <%= render Settings::ControlRowComponent.new do |row| %>
                 <% row.title do %>
                   <%= link_to "Refresh Favicon", refresh_favicon_settings_subscription_path(subscription), remote: true, method: :post %>
                 <% end %>

@@ -149,7 +149,7 @@ Rails.application.routes.draw do
     end
   end
 
-  get :settings, to: "settings#settings"
+  get :settings, to: "settings#index"
   namespace :settings do
     resources :subscriptions, only: [:index, :edit, :destroy, :update] do
       collection do

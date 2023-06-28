@@ -2,7 +2,7 @@
   <% valid_feed_ids = Rails.application.message_verifier(:valid_feed_ids).generate(feeds.map(&:id)) %>
   <%= hidden_field_tag "valid_feed_ids", valid_feed_ids %>
 
-  <%= component "settings/h2" do %>
+  <%= render Settings::H2Component.new do %>
     <%= "Feed".pluralize(feeds.length) %>
   <% end %>
 
@@ -13,7 +13,7 @@
         <div class="mb-4" data-behavior="subscription_option">
           <div class="flex items-center gap-4 mb-1">
             <div class="grow">
-              <%= component "form/text_input" do |input| %>
+              <%= render Form::TextInputComponent.new do |input| %>
                 <% input.input do %>
                   <%= pf.text_field :title, placeholder: feed.title, class: "peer text-input" %>
                 <% end %>
@@ -22,7 +22,7 @@
             <div class="<%= class_names(hide: feeds.length == 1) %>">
               <%= pf.check_box :subscribe, checked: index == 0 ? true : false, class: "peer", data: {behavior: "check_toggle"} %>
               <%= pf.label :subscribe, class: "group" do %>
-                <%= component "form/switch" %>
+                <%= render Form::SwitchComponent.new %>
               <% end %>
             </div>
           </div>
@@ -30,12 +30,13 @@
         </div>
 
         <% if feed.twitter_feed? %>
-          <%= component "settings/control_group", class: "group [&_[data-item-container]]:!border-0 [&_[data-item]]:!border-0" do |group| %>
+          <%= render Settings::ControlGroupComponent.new class: "group [&_[data-item-container]]:!border-0 [&_[data-item]]:!border-0" do |group| %>
             <% group.item do %>
               <%= pf.check_box :media_only, checked: false, class: "peer" %>
               <%= pf.label :media_only, class: "group text-right" do %>
-                <%= component "settings/control_row_switch" do |row| %>
-                  <% row.title { "Tweets with media and links only" } %>
+                <%= render Settings::ControlRowComponent.new do |row| %>
+                  <% row.title { "Tweets with media and links only"} %>
+                  <% row.control { render Form::SwitchComponent.new } %>
                 <% end %>
               <% end %>
             <% end %>
@@ -45,7 +46,7 @@
     <% end %>
   </div>
 
-  <%= component "settings/h2" do %>
+  <%= render Settings::H2Component.new do %>
     Tags
   <% end %>
   <%= render partial: "shared/tag_fields", locals: {tag_editor: tag_editor} %>

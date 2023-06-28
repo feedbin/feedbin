@@ -1,7 +1,7 @@
 <% record = (status == :active) ? sharing_service : record %>
-<%= component "settings/expandable", class: "mb-4", data: {capsule: true} do |expandable| %>
+<%= render Settings::ExpandableComponent.new class: "mb-4", data: {capsule: "true"} do |expandable| %>
   <% expandable.description do %>
-    <%= component "settings/control_row" do |row| %>
+    <%= render Settings::ControlRowComponent.new do |row| %>
       <% row.icon do %>
         <%= render "icon", sharing_service: sharing_service %>
       <% end %>
@@ -25,7 +25,7 @@
         <%= f.hidden_field :operation, value: "" %>
 
         <div class="mb-4">
-          <%= component "form/text_input" do |text| %>
+          <%= render Form::TextInputComponent.new do |text| %>
             <% text.label do %>
               <%= f.label :email_name, "Full Name"%>
             <% end %>
@@ -35,7 +35,7 @@
           <% end %>
         </div>
 
-        <%= component "form/text_input" do |text| %>
+        <%= render Form::TextInputComponent.new do |text| %>
           <% text.label do %>
             <%= f.label :email_address, "Reply-To" %>
           <% end %>
@@ -44,7 +44,7 @@
           <% end %>
         <% end %>
 
-        <%= component "settings/button_row" do %>
+        <%= render Settings::ButtonRowComponent.new do %>
           <%= button_tag "Cancel", type: "button", class: "button button-tertiary", data: {action: "expandable#toggle"} %>
           <%= button_tag "Save", type: "submit", class: "button button-primary-plain" %>
         <% end %>

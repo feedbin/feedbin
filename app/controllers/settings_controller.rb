@@ -1,7 +1,7 @@
 class SettingsController < ApplicationController
 
-  def settings
-    @user = current_user
+  def index
+    render Settings::IndexView.new(user: current_user), layout: "settings"
   end
 
   def account
@@ -117,8 +117,7 @@ class SettingsController < ApplicationController
   end
 
   def newsletters_pages
-    @user = current_user
-    @subscription_ids = @user.subscriptions.pluck(:feed_id)
+    render Settings::NewslettersPagesView.new(user: current_user, subscription_ids: @user.subscriptions.pluck(:feed_id)), layout: "settings"
   end
 
   private

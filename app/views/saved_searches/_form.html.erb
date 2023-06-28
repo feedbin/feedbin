@@ -8,10 +8,10 @@
         <% end %>
 
         <% content_for :modal_body do %>
-          <%= component "settings/h2" do %>
+          <%= render Settings::H2Component.new do %>
             Query
           <% end %>
-          <%= component "form/text_input" do |text| %>
+          <%= render Form::TextInputComponent.new do |text| %>
             <% text.input do %>
               <%= f.text_field :query, placeholder: saved_search.query, class: "peer text-input" %>
             <% end %>

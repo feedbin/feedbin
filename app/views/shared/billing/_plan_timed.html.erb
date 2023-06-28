@@ -1,9 +1,9 @@
-<%= component "settings/control_group", class: "mb-14" do |group| %>
+<%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
   <% group.header do %>
     Your Plan
   <% end %>
   <% group.item do %>
-    <%= component "settings/control_row" do |row| %>
+    <%= render Settings::ControlRowComponent.new do |row| %>
       <% row.title do %>
         Prepaid
       <% end %>

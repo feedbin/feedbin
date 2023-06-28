@@ -1,23 +1,31 @@
-<%= render(Settings::ExpandableComponent.new(capsule: true)) do |expandable| %>
-  <% expandable.header do %>
-    Advanced
-  <% end %>
+<%=
+demo = Class.new(ApplicationComponent) do
+  def template(&)
+    render Settings::ExpandableComponent.new(class: "mb-14") do |expandable|
+      expandable.header do
+        "Header"
+      end
+      expandable.description do
+        render Settings::ControlRowComponent.new do |row|
+          row.title { "Title" }
+          row.description { "Description" }
+          row.control do
+            button(data: {action: "expandable#toggle", toggle_text: "Hide"}) do
+              "Show"
+            end
+          end
 
-  <% expandable.description do %>
-    <%= render(Settings::ControlRowComponent.new) do |row| %>
-      <% row.title { "Section" } %>
-      <% row.description do %>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      <% end %>
-      <% row.control do %>
-        <%= button_tag "Show", data: {action: "expandable#toggle", toggle_text: "Hide"} %>
-      <% end %>
-    <% end %>
-  <% end %>
+        end
+      end
+      expandable.item do
+        div class: "py-2" do
+          "Content"
+        end
+      end
+    end
+  end
+end
+render demo.new
+%>
 
-  <% expandable.item do %>
-    <div class="py-3 px-4">
-      Hello
-    </div>
-  <% end %>
-<% end %>
+

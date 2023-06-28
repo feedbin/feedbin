@@ -1,10 +1,10 @@
-<%= component "settings/h1" do %>
+<%= render Settings::H1Component.new do %>
   Customer Admin
 <% end %>
 
 <div class="mb-4">
   <%= form_tag(admin_users_path, method: "get") do %>
-    <%= component "form/text_input" do |text| %>
+    <%= render Form::TextInputComponent.new do |text| %>
       <% text.input do %>
         <input name="q" type="text" class="peer text-input" data-behavior="user_search" placeholder="Search Customers" />
       <% end %>
@@ -15,7 +15,7 @@
   <% end %>
 </div>
 
-<%= component "settings/control_group", class: "mb-14" do |group| %>
+<%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
   <% @users.each do |user| %>
     <% group.item do %>
       <div data-behavior="<%= user.customer_id %>">

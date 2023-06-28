@@ -1,6 +1,6 @@
-<%= component "settings/expandable", class: "mb-4", data: {capsule: true} do |expandable| %>
+<%= render Settings::ExpandableComponent.new class: "mb-4", data: {capsule: "true"} do |expandable| %>
   <% expandable.description do %>
-    <%= component "settings/control_row" do |row| %>
+    <%= render Settings::ControlRowComponent.new do |row| %>
       <% row.icon do %>
         <div class="mt-[2px]">
           <%= favicon_with_host(import_item.host, generated: true) %>

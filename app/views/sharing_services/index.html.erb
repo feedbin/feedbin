@@ -1,10 +1,10 @@
-<%= component "settings/h1" do %>
+<%= render Settings::H1Component.new do %>
   Share & Save
 <% end %>
 
 <% if @active_sharing_services.present? %>
   <div class="mb-14">
-    <%= component "settings/h2" do %>
+    <%= render Settings::H2Component.new do %>
       Active Services
     <% end %>
 
@@ -16,7 +16,7 @@
 
 <% unless @active_sharing_services.count == @available_sharing_services.count %>
   <div class="mb-14">
-    <%= component "settings/h2" do %>
+    <%= render Settings::H2Component.new do %>
       Available Services
     <% end %>
 
@@ -28,7 +28,7 @@
   </div>
 <% end %>
 
-<%= component "settings/control_group", class: "group", data: {capsule: "true"} do |group| %>
+<%= render Settings::ControlGroupComponent.new class: "group", data: {capsule: "true"} do |group| %>
   <% group.header do %>
     Custom Services
   <% end %>

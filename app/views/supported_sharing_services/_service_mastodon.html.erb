@@ -5,7 +5,7 @@
     <%= f.hidden_field :service_id, value: sharing_service.service_id %>
     <%= f.hidden_field :operation, value: "authorize" %>
 
-    <%= component "form/text_input" do |text| %>
+    <%= render Form::TextInputComponent.new do |text| %>
       <% text.label do %>
         <label for="mastodon_url">Server URL</label>
       <% end %>
@@ -14,7 +14,7 @@
       <% end %>
     <% end %>
 
-    <%= component "settings/button_row" do %>
+    <%= render Settings::ButtonRowComponent.new do %>
       <%= button_tag "Cancel", type: "button", class: "button button-tertiary button-inline", data: {action: "expandable#toggle"} %>
       <%= button_tag "Sign In", type: "submit", class: "button button-primary-plain" %>
     <% end %>

@@ -47,7 +47,7 @@
                     </button>
                     <span class="feed-title-wrap"><span data-behavior="user_title"></span></span>
                     <div class="search-button">
-                      <%= component "app/search_button" %>
+                      <%= render App::SearchButtonComponent.new %>
                     </div>
                 </div>
                 <%= render partial: "shared/search_form" %>

@@ -13,7 +13,7 @@
 </div>
 
 <div data-behavior="payment_method">
-  <%= component "settings/control_group", class: "mb-14" do |group| %>
+  <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
     <% group.header do %>
       Payment Method
     <% end %>
@@ -21,8 +21,9 @@
     <% group.item(data: {behavior: "billing_option_apple_pay"}) do %>
       <%= radio_button_tag("billing_method", "apple_pay", false, { data: {behavior: "billing_method_radio"}, class: "peer"}) %>
       <%= label_tag("billing_method_apple_pay", class: "group") do %>
-        <%= component "settings/control_row_radio" do |row| %>
-          <% row.title { "Apple Pay" } %>
+        <%= render Settings::ControlRowComponent.new do |row| %>
+          <% row.title { "Apple Pay"} %>
+          <% row.control { render Form::RadioComponent.new } %>
         <% end %>
       <% end %>
     <% end %>
@@ -30,8 +31,9 @@
     <% group.item(data: {behavior: "billing_option_payment_request"}) do %>
       <%= radio_button_tag("billing_method", "pay_with_google", false, { data: {behavior: "billing_method_radio"}, class: "peer"}) %>
       <%= label_tag("billing_method_pay_with_google", class: "group") do %>
-        <%= component "settings/control_row_radio" do |row| %>
-          <% row.title { "Pay with browser" } %>
+        <%= render Settings::ControlRowComponent.new do |row| %>
+          <% row.title { "Pay with browser"} %>
+          <% row.control { render Form::RadioComponent.new } %>
         <% end %>
       <% end %>
     <% end %>
@@ -39,8 +41,9 @@
     <% group.item do %>
       <%= radio_button_tag("billing_method", "credit_card", false, { data: {behavior: "billing_method_radio"}, class: "peer"}) %>
       <%= label_tag("billing_method_credit_card", class: "group") do %>
-        <%= component "settings/control_row_radio" do |row| %>
-          <% row.title { "Credit card" } %>
+        <%= render Settings::ControlRowComponent.new do |row| %>
+          <% row.title { "Credit Card"} %>
+          <% row.control { render Form::RadioComponent.new } %>
         <% end %>
       <% end %>
     <% end %>
@@ -49,13 +52,13 @@
 </div>
 
 <div id="credit_card_payment" data-behavior="credit_card_details">
-  <%= component "settings/h2" do %>
+  <%= render Settings::H2Component.new do %>
     Card Details
   <% end %>
 
   <div class="flex gap-4 mb-4">
     <div class="grow">
-      <%= component "form/text_input" do |text| %>
+      <%= render Form::TextInputComponent.new do |text| %>
         <% text.label do %>
           <label for="billing_name">Name on card</label>
         <% end %>
@@ -65,7 +68,7 @@
       <% end %>
     </div>
     <div class="grow max-w-[300px]">
-      <%= component "form/select_input" do |input| %>
+      <%= render Form::SelectInputComponent.new do |input| %>
         <% input.label do %>
           <label for="billing_country">Country</label>
         <% end %>

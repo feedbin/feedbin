@@ -41,7 +41,7 @@
         </div>
     </div>
     <div class="toggle-search">
-      <%= component "app/search_button" do %>
+      <%= render App::SearchButtonComponent.new do %>
         <%= svg_tag "icon-search", size: "16x16" %>
       <% end %>
     </div>

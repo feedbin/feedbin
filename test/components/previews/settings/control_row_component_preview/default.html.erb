@@ -1,7 +1,14 @@
-<%= render(Settings::ControlRowComponent.new) do |control| %>
-  <% control.title { "Title" } %>
-  <% control.description { "Description" } %>
-  <% control.control do %>
-    Details
-  <% end %>
-<% end %>
+<%=
+demo = Class.new(ApplicationComponent) do
+  def template(&)
+    render Settings::ControlRowComponent.new do |row|
+      row.title { "Title" }
+      row.description { "Description" }
+      row.control { "Control" }
+    end
+  end
+end
+render demo.new
+%>
+
+

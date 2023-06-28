@@ -25,7 +25,7 @@
       <div class="border-b bg-0 z-10">
         <div class="flex flex-row-reverse items-stretch rounded">
           <div class="mr-2">
-            <%= component "app/spinner" %>
+            <%= render App::SpinnerComponent.new %>
           </div>
 
           <%=
@@ -62,9 +62,9 @@
       </div>
 
       <div class="absolute z-50 inset-x-0 top-full w-full origin-top-left p-1 rounded-b bg-0 shadow-two focus:outline-none group-data-[search-token-autocomplete-visible-value=false]:tw-hidden">
-        <%= component "app/search_token_result" do |item| %>
+        <%= render App::SearchTokenResultComponent.new do |item| %>
           <% item.icon do %>
-            <%= svg_tag "icon-search", class: "fill-400" %>
+            <%= render SvgComponent.new "icon-search", class: "fill-400" %>
           <% end %>
           <% item.text do %>
             Search for <span class="font-bold" data-search-token-target="preview"></span> <span class="font-bold before:content-['_in_'] before:font-normal empty:before:tw-hidden" data-search-token-target="previewSource"></span>
@@ -75,9 +75,9 @@
       </div>
 
       <template data-search-token-target="resultTemplate">
-        <%= component "app/search_token_result" do |item| %>
+        <%= render App::SearchTokenResultComponent.new do |item| %>
           <% item.icon do %>
-            <%= svg_tag "favicon-tag", class: "fill-400" %>
+            <%= render SvgComponent.new "favicon-tag", class: "fill-400" %>
           <% end %>
         <% end %>
       </template>

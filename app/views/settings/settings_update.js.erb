@@ -1,2 +1,2 @@
-<%= render partial: 'shared/message_flash', locals: {flash: flash} %>
-$('[data-behavior~=starred_feed_url]').html('<%= j render partial: 'shared/starred_feed_url', locals: {user: @user} %>')
+<%= render partial: "shared/message_flash", locals: {flash: flash} %>
+$("[data-behavior~=starred_feed_url]").html("<%= j render(Settings::Shared::StarredFeedUrl.new(user: @user)) %>")

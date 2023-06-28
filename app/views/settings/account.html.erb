@@ -1,31 +1,31 @@
-<%= component "settings/h1" do %>
+<%= render Settings::H1Component.new do %>
   Account
 <% end %>
 
 <%= form_for(@user, html: {class: "mb-14"}) do |f| %>
 
-  <%= component "settings/h2" do %>
+  <%= render Settings::H2Component.new do %>
     <%= f.label :email, "Email" %>
   <% end %>
 
-  <%= component "form/text_input" do |text| %>
+  <%= render Form::TextInputComponent.new do |text| %>
     <% text.input do %>
       <%= f.email_field :email, placeholder: "Email", class: "peer text-input" %>
     <% end %>
   <% end %>
 
-  <%= component "settings/button_row" do %>
+  <%= render Settings::ButtonRowComponent.new do %>
     <button type="submit" class="button">Update</button>
   <% end %>
 <% end %>
 
 <%= form_for(@user, html: {class: "mb-14"}) do |f| %>
-  <%= component "settings/h2" do %>
+  <%= render Settings::H2Component.new do %>
     Update Password
   <% end %>
 
   <div class="mb-4">
-    <%= component "form/text_input" do |text| %>
+    <%= render Form::TextInputComponent.new do |text| %>
       <% text.label do %>
         <%= f.label :old_password, "Old Password" %>
       <% end %>
@@ -35,7 +35,7 @@
     <% end %>
   </div>
 
-  <%= component "form/text_input" do |text| %>
+  <%= render Form::TextInputComponent.new do |text| %>
     <% text.label do %>
       <%= f.label :password, "New Password" %>
     <% end %>
@@ -45,34 +45,35 @@
   <% end %>
 
 
-  <%= component "settings/button_row" do %>
+  <%= render Settings::ButtonRowComponent.new do %>
     <button type="submit" class="button">Update</button>
   <% end %>
 <% end %>
 
 <%= form_for(@user, method: :delete, id: "delete_user", html: {class: "mb-14"}) do |f| %>
-  <%= component "settings/h2" do %>
+  <%= render Settings::H2Component.new do %>
     Cancel Account
   <% end %>
 
   <p class="mb-4">Canceling your account will end your subscription immediately. All of your data will be deleted. You will receive a confirmation email with your feed subscriptions attached. <strong>You cannot undo this</strong>.</p>
 
   <% if @last_payment %>
-      <%= component "settings/control_group", class: "mb-4" do |group| %>
+      <%= render Settings::ControlGroupComponent.new class: "mb-4" do |group| %>
         <% group.item do %>
           <%= check_box_tag :billing_event_id, Rails.application.message_verifier(:billing_event_id).generate(@last_payment.id), false, class: "peer" %>
           <%= label_tag :billing_event_id, class: "group" do %>
-            <%= component "settings/control_row_switch" do |row| %>
+            <%= render Settings::ControlRowComponent.new do |row| %>
               <% row.title do %>
                 Also refund my recent <strong><%= number_to_currency((@last_payment.event_object["amount"].to_f / 100), precision: 0) %></strong> payment
               <% end %>
+              <% row.control { render Form::SwitchComponent.new } %>
             <% end %>
           <% end %>
         <% end %>
       <% end %>
   <% end %>
 
-  <%= component "settings/button_row" do %>
+  <%= render Settings::ButtonRowComponent.new do %>
     <%= f.submit "Cancel Account", class: "button button-secondary", data: { confirm: "Are you sure?" } %>
   <% end %>
 <% end %>

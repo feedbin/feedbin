@@ -1,20 +1,33 @@
-<div class="flex gap-4">
-  <label>
-    <input type="checkbox" class="peer">
-    <%= render(Settings::ControlRowComponent.new) do |row| %>
-      <% row.title { "Title" } %>
-      <% row.control do %>
-        <%= render(Form::SwitchComponent.new) %>
-      <% end %>
-    <% end %>
-  </label>
-  <label>
-    <input type="checkbox" class="peer" checked>
-    <%= render(Settings::ControlRowComponent.new) do |row| %>
-      <% row.title { "Title" } %>
-      <% row.control do %>
-        <%= render(Form::SwitchComponent.new) %>
-      <% end %>
-    <% end %>
-  </label>
-</div>
+<%=
+demo = Class.new(Phlex::HTML) do
+
+  def template(&)
+    div class: "flex gap-4" do
+      div do
+        input type: "checkbox", class: "peer", id: "checkbox"
+        label for: "checkbox", class: "group flex gap-2 items-center" do
+          render Form::SwitchComponent.new
+          plain "Switch"
+        end
+      end
+
+      div do
+        input type: "checkbox", class: "peer", id: "checkbox", checked: true
+        label for: "checkbox", class: "group flex gap-2 items-center" do
+          render Form::SwitchComponent.new
+          plain "Switch"
+        end
+      end
+
+      div do
+        input type: "checkbox", class: "peer", id: "checkbox"
+        label for: "checkbox", class: "group flex gap-2 items-center", data: {focused: true} do
+          render Form::SwitchComponent.new
+          plain "Switch"
+        end
+      end
+    end
+  end
+end
+render demo.new
+%>

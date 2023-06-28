@@ -67,7 +67,7 @@ module ApplicationHelper
     get_icon(name).present?
   end
 
-  def svg_tag(name, options = {})
+  def svg_options(name, options = {})
     options = options.symbolize_keys
 
     name = name.sub(".svg", "")
@@ -84,11 +84,15 @@ module ApplicationHelper
 
     options[:class] = [name, options[:class]].compact.join(" ")
 
-    inline = options.delete(:inline)
+    OpenStruct.new(icon:, options:)
+  end
 
-    content_tag :svg, options do
+  def svg_tag(name, options = {})
+    result = svg_options(name, options)
+    inline = result.options.delete(:inline)
+    content_tag :svg, result.options do
       if inline
-        icon.markup.html_safe
+        result.icon.markup.html_safe
       else
         content_tag :use, "", "href": "##{name}"
       end

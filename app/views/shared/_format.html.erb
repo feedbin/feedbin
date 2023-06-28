@@ -27,7 +27,7 @@
                         <div class="option">
                             <%= b.radio_button class: "peer", data: {behavior: "auto_submit change_font"} %>
                             <%= b.label class: "group flex !flex-row gap-2 items-center leading-[40px]" do %>
-                                <%= component "form/radio_button" %>
+                                <%= render Form::RadioComponent.new %>
                                 <%= b.text %>
                             <% end %>
                         </div>
@@ -45,17 +45,17 @@
             <div class="mobile-hide">
               <h3>Display</h3>
               <div class="control">
-                <%= component "settings/control_group", class: "mb-4" do |group| %>
+                <%= render Settings::ControlGroupComponent.new class: "mb-4" do |group| %>
                   <% group.item do %>
                     <input type="checkbox" id="toggle_full_screen" data-behavior="toggle_full_screen" class="peer">
                     <label for="toggle_full_screen" class="group">
-                      <%= component "settings/control_row_switch" do |row| %>
+                      <%= render Settings::ControlRowComponent.new do |row| %>
                         <% row.title do %>
                           <span class="flex items-center text-sm">
                             Full screen <span class="ml-auto text-500 text-sm">shift&nbsp;&nbsp;F</span>
                           </span>
-
                         <% end %>
+                        <% row.control { render Form::SwitchComponent.new } %>
                       <% end %>
                     </label>
                   <% end %>
@@ -63,10 +63,11 @@
                   <% group.item do %>
                     <%= f.check_box :entry_width, data: {behavior: "auto_submit entry_width"}, class: "peer" %>
                     <%= f.label :entry_width, class: "group" do %>
-                      <%= component "settings/control_row_switch" do |row| %>
+                      <%= render Settings::ControlRowComponent.new do |row| %>
                         <% row.title do %>
                           <span class="text-sm">Fluid width</span>
                         <% end %>
+                        <% row.control { render Form::SwitchComponent.new } %>
                       <% end %>
                     <% end %>
                   <% end %>
