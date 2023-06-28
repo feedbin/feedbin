@@ -4,6 +4,7 @@ require "minitest"
 require "minitest/mock"
 require "socket"
 require "connection_pool"
+require "capybara/cuprite"
 
 unless ENV["CI"]
   socket = Socket.new(:INET, :STREAM, 0)

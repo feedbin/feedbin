@@ -221,6 +221,9 @@ GEM
     crass (1.0.6)
     css_parser (1.14.0)
       addressable
+    cuprite (0.14.3)
+      capybara (~> 3.0)
+      ferrum (~> 0.13.0)
     dante (0.2.0)
     date (3.3.3)
     debug (1.8.0)
@@ -270,6 +273,11 @@ GEM
     faraday-patron (1.0.0)
     faraday-rack (1.0.0)
     faraday-retry (1.0.3)
+    ferrum (0.13)
+      addressable (~> 2.5)
+      concurrent-ruby (~> 1.1)
+      webrick (~> 1.7)
+      websocket-driver (>= 0.6, < 0.8)
     ffi (1.15.5)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
@@ -544,10 +552,6 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
-    selenium-webdriver (4.10.0)
-      rexml (~> 3.2, >= 3.2.5)
-      rubyzip (>= 1.2.2, < 3.0)
-      websocket (~> 1.0)
     sidekiq (6.5.7)
       connection_pool (>= 2.2.5)
       rack (~> 2.0)
@@ -620,7 +624,7 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    websocket (1.2.9)
+    webrick (1.8.1)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -652,6 +656,7 @@ DEPENDENCIES
   clockwork
   coffee-rails
   connection_pool
+  cuprite
   debug
   dotenv-rails
   down
@@ -702,7 +707,6 @@ DEPENDENCIES
   sanitize
   sass-rails
   sax-machine!
-  selenium-webdriver
   sidekiq (= 6.5.7)
   standard
   stimulus-rails

@@ -1,7 +1,7 @@
 require "test_helper"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  driven_by :selenium, using: :headless_chrome, screen_size: [1400, 1400]
+  driven_by :cuprite, screen_size: [1400, 1400]
 
   def login_as(user)
     visit login_path
@@ -25,7 +25,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   def wait_for_ajax
-    sleep 0.5
+    sleep 0.01
   end
 
   def finished_all_ajax_requests?
