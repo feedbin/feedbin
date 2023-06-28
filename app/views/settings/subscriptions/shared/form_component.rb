@@ -36,8 +36,8 @@ module Settings
 
         def twitter_notice
           div(class: "border-t flex gap-2 p-4") do
-            div(class: "pt-0.5") do
-              render SvgComponent.new "icon-error-message"
+            div(class: "pt-1") do
+              render SvgComponent.new "icon-error-message-small", class: "fill-red-600"
             end
             div do
               p(class: "text-red-600") { "Twitter Not Supported" }
