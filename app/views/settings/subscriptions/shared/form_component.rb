@@ -140,10 +140,10 @@ module Settings
                   span(class: "text-500") do
                     plain subscription_presenter.graph_volume
                     if subscription.feed.twitter_feed?
-                      plain "tweet".pluralize(subscription_presenter.graph_volume)
+                      plain " tweet".pluralize(subscription_presenter.graph_volume)
                       plain " / month "
                     else
-                      plain "article".pluralize(subscription_presenter.total_posts)
+                      plain " article".pluralize(subscription_presenter.total_posts)
                       plain " / month "
                     end
                   end
@@ -175,7 +175,7 @@ module Settings
           end
 
           render Settings::ControlGroupComponent.new class: "mb-14" do |group|
-            group.header { plain " Options " }
+            group.header { "Options" }
 
             group.item do
               f.check_box :muted, class: "peer", data: { behavior: "auto_submit" }, id: "subscription_muted"
