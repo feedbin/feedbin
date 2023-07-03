@@ -1,0 +1,71 @@
+{
+  "created": 1326853478,
+  "livemode": false,
+  "id": "evt_00000000000000",
+  "type": "invoice.upcoming",
+  "status": "draft",
+  "object": "event",
+  "data": {
+    "object": {
+      "created": 1380674206,
+      "period_start": 1378082075,
+      "period_end": 1380674075,
+      "lines": {
+        "count": 1,
+        "object": "list",
+        "url": "/v1/invoices/upcoming/lines?customer=cus_00000000000000",
+        "data": [
+          {
+            "id": "su_2hksGtIPylSBg2",
+            "object": "line_item",
+            "type": "subscription",
+            "livemode": true,
+            "amount": 100,
+            "currency": "usd",
+            "proration": false,
+            "period": {
+              "start": 1383759042,
+              "end": 1386351042
+            },
+            "quantity": 1,
+            "plan": {
+              "interval": "month",
+              "amount": 100,
+              "currency": "usd",
+              "id": "fkx0AFo",
+              "object": "plan",
+              "livemode": false,
+              "interval_count": 1,
+              "trial_period_days": null,
+              "product": "pr_00000000000000",
+              "metadata": {}
+            },
+            "description": null,
+            "metadata": null
+          }
+        ]
+      },
+      "subtotal": 2000,
+      "total": 2000,
+      "customer": "cus_00000000000000",
+      "object": "invoice",
+      "attempted": false,
+      "closed": false,
+      "paid": false,
+      "livemode": false,
+      "attempt_count": 0,
+      "amount_due": 2000,
+      "amount_remaining" : 2000,
+      "currency": "usd",
+      "starting_balance": 0,
+      "ending_balance": 0,
+      "next_payment_attempt": null,
+      "charge": null,
+      "discount": null,
+      "application_fee": null,
+      "subscription": "sub_00000000000000",
+      "metadata": {},
+      "description": null
+    }
+  }
+}

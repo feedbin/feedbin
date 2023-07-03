@@ -4,6 +4,7 @@ class BillingEventTest < ActiveSupport::TestCase
   setup do
     StripeMock.start
     @user = users(:ben)
+    ActionMailer::Base.deliveries.clear
   end
 
   teardown do
@@ -47,6 +48,15 @@ class BillingEventTest < ActiveSupport::TestCase
     event = StripeMock.mock_webhook_event("customer.subscription.updated-custom", webhook_defaults.merge(status: "active"))
     BillingEvent.create(info: event.as_json)
     assert @user.reload.active?
+  end
+
+  test "subscription_reminder?" do
+    event = StripeMock.mock_webhook_event("invoice.upcoming-custom", webhook_defaults)
+    assert_difference "ActionMailer::Base.deliveries.count", +1 do
+      Sidekiq::Testing.inline! do
+        BillingEvent.create(info: event.as_json)
+      end
+    end
   end
 
   private
