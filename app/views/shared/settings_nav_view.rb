@@ -21,6 +21,22 @@ module Shared
           classes: "md:hidden"
         ))
         render(::SettingsNav::NavComponent.new(
+          title: "Account",
+          subtitle: "Update email & password",
+          url: helpers.settings_account_path,
+          selected: helpers.is_active?("settings", "account"),
+          icon: "menu-icon-account"
+        ))
+        if ENV["STRIPE_API_KEY"]
+          render(::SettingsNav::NavComponent.new(
+            title: "Billing",
+            subtitle: "Payment method & plan",
+            url: helpers.settings_billing_path,
+            selected: helpers.is_active?(["settings/billings"], %w[index edit payment_history]),
+            icon: "menu-icon-billing"
+          ))
+        end
+        render(::SettingsNav::NavComponent.new(
           title: "Settings",
           subtitle: "General preferences",
           url: helpers.settings_path,
@@ -85,30 +101,16 @@ module Shared
       end
 
       render ::SettingsNav::HeaderComponent.new do
-        plain " Admin"
+        if @user.try(:admin?)
+          plain "Admin and management"
+        end  
       end
 
       div(class: "px-4 pl-10 tw-hidden group-data-[nav=dropdown]:block") do
         hr(class: "m-0")
       end
 
-      ul do
-        render(::SettingsNav::NavComponent.new(
-          title: "Account",
-          subtitle: "Update email & password",
-          url: helpers.settings_account_path,
-          selected: helpers.is_active?("settings", "account"),
-          icon: "menu-icon-account"
-        ))
-        if ENV["STRIPE_API_KEY"]
-          render(::SettingsNav::NavComponent.new(
-            title: "Billing",
-            subtitle: "Payment method & plan",
-            url: helpers.settings_billing_path,
-            selected: helpers.is_active?(["settings/billings"], %w[index edit payment_history]),
-            icon: "menu-icon-billing"
-          ))
-        end
+      ul 
         if @user.try(:admin?)
           render(::SettingsNav::NavComponent.new(
             title: "Customers",
@@ -130,7 +132,6 @@ module Shared
             icon: "menu-icon-lookbook"
           ))
         end
-      end
 
       div(class: "px-4 pl-10 tw-hidden group-data-[nav=dropdown]:block") do
         hr(class: "m-0")
