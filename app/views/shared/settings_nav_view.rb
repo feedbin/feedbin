@@ -13,13 +13,14 @@ module Shared
       end
 
       ul do
-        render(::SettingsNav::NavComponent.new(
-          title: "Feedbin",
-          subtitle: "Back to the app",
-          url: helpers.root_path,
-          icon: "menu-icon-app",
-          classes: "md:hidden"
-        ))
+        # unneccessary code
+        # render(::SettingsNav::NavComponent.new(
+        #   title: "Feedbin",
+        #   subtitle: "Back to the app",
+        #   url: helpers.root_path,
+        #   icon: "menu-icon-app",
+        #   classes: "md:hidden"
+        # ))
         render(::SettingsNav::NavComponent.new(
           title: "Account",
           subtitle: "Update email & password",
@@ -100,11 +101,11 @@ module Shared
         end
       end
 
-      render ::SettingsNav::HeaderComponent.new do
-        if @user.try(:admin?)
+      if @user.try(:admin?)
+        render ::SettingsNav::HeaderComponent.new do
           plain "Admin and management"
-        end  
-      end
+        end
+      end  
 
       div(class: "px-4 pl-10 tw-hidden group-data-[nav=dropdown]:block") do
         hr(class: "m-0")
