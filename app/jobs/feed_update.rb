@@ -3,7 +3,6 @@ class FeedUpdate
   sidekiq_options queue: :utility
 
   def perform(feed_id)
-    byebug
     feed = Feed.find(feed_id)
     parsed_url = Feedkit::BasicAuth.parse(feed.feed_url)
     url = feed.current_feed_url ? feed.current_feed_url : parsed_url.url
