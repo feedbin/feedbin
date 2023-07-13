@@ -1,0 +1,2 @@
+class RUsersProfile < ApplicationRecord
+end

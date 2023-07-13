@@ -905,6 +905,37 @@ ALTER SEQUENCE public.podcast_subscriptions_id_seq OWNED BY public.podcast_subsc
 
 
 --
+-- Name: profiles; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.profiles (
+    id bigint NOT NULL,
+    profile_name character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: profiles_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.profiles_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: profiles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.profiles_id_seq OWNED BY public.profiles.id;
+
+
+--
 -- Name: queued_entries; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -939,6 +970,66 @@ CREATE SEQUENCE public.queued_entries_id_seq
 --
 
 ALTER SEQUENCE public.queued_entries_id_seq OWNED BY public.queued_entries.id;
+
+
+--
+-- Name: r_profiles_tags; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.r_profiles_tags (
+    id bigint NOT NULL,
+    profile_id bigint NOT NULL,
+    tag_id bigint NOT NULL
+);
+
+
+--
+-- Name: r_profiles_tags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.r_profiles_tags_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: r_profiles_tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.r_profiles_tags_id_seq OWNED BY public.r_profiles_tags.id;
+
+
+--
+-- Name: r_users_profiles; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.r_users_profiles (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    profile_id bigint NOT NULL
+);
+
+
+--
+-- Name: r_users_profiles_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.r_users_profiles_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: r_users_profiles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.r_users_profiles_id_seq OWNED BY public.r_users_profiles.id;
 
 
 --
@@ -1671,10 +1762,31 @@ ALTER TABLE ONLY public.podcast_subscriptions ALTER COLUMN id SET DEFAULT nextva
 
 
 --
+-- Name: profiles id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.profiles ALTER COLUMN id SET DEFAULT nextval('public.profiles_id_seq'::regclass);
+
+
+--
 -- Name: queued_entries id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.queued_entries ALTER COLUMN id SET DEFAULT nextval('public.queued_entries_id_seq'::regclass);
+
+
+--
+-- Name: r_profiles_tags id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.r_profiles_tags ALTER COLUMN id SET DEFAULT nextval('public.r_profiles_tags_id_seq'::regclass);
+
+
+--
+-- Name: r_users_profiles id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.r_users_profiles ALTER COLUMN id SET DEFAULT nextval('public.r_users_profiles_id_seq'::regclass);
 
 
 --
@@ -1982,11 +2094,35 @@ ALTER TABLE ONLY public.podcast_subscriptions
 
 
 --
+-- Name: profiles profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.profiles
+    ADD CONSTRAINT profiles_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: queued_entries queued_entries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.queued_entries
     ADD CONSTRAINT queued_entries_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: r_profiles_tags r_profiles_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.r_profiles_tags
+    ADD CONSTRAINT r_profiles_tags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: r_users_profiles r_users_profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.r_users_profiles
+    ADD CONSTRAINT r_users_profiles_pkey PRIMARY KEY (id);
 
 
 --
@@ -2482,6 +2618,34 @@ CREATE INDEX index_queued_entries_on_user_id_and_order ON public.queued_entries 
 
 
 --
+-- Name: index_r_profiles_tags_on_profile_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_r_profiles_tags_on_profile_id ON public.r_profiles_tags USING btree (profile_id);
+
+
+--
+-- Name: index_r_profiles_tags_on_tag_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_r_profiles_tags_on_tag_id ON public.r_profiles_tags USING btree (tag_id);
+
+
+--
+-- Name: index_r_users_profiles_on_profile_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_r_users_profiles_on_profile_id ON public.r_users_profiles USING btree (profile_id);
+
+
+--
+-- Name: index_r_users_profiles_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_r_users_profiles_on_user_id ON public.r_users_profiles USING btree (user_id);
+
+
+--
 -- Name: index_recently_played_entries_on_entry_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2911,11 +3075,27 @@ ALTER TABLE ONLY public.newsletter_senders
 
 
 --
+-- Name: r_users_profiles fk_rails_1f5344ee72; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.r_users_profiles
+    ADD CONSTRAINT fk_rails_1f5344ee72 FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- Name: podcast_subscriptions fk_rails_4bb4824ec6; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.podcast_subscriptions
     ADD CONSTRAINT fk_rails_4bb4824ec6 FOREIGN KEY (feed_id) REFERENCES public.feeds(id) ON DELETE CASCADE;
+
+
+--
+-- Name: r_profiles_tags fk_rails_5de5d4d1d4; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.r_profiles_tags
+    ADD CONSTRAINT fk_rails_5de5d4d1d4 FOREIGN KEY (profile_id) REFERENCES public.profiles(id);
 
 
 --
@@ -2951,11 +3131,27 @@ ALTER TABLE ONLY public.authentication_tokens
 
 
 --
+-- Name: r_profiles_tags fk_rails_b905fcdd19; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.r_profiles_tags
+    ADD CONSTRAINT fk_rails_b905fcdd19 FOREIGN KEY (tag_id) REFERENCES public.tags(id);
+
+
+--
 -- Name: playlists fk_rails_d67ef1eb45; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.playlists
     ADD CONSTRAINT fk_rails_d67ef1eb45 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: r_users_profiles fk_rails_f3845cc758; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.r_users_profiles
+    ADD CONSTRAINT fk_rails_f3845cc758 FOREIGN KEY (profile_id) REFERENCES public.profiles(id);
 
 
 --
@@ -3148,6 +3344,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221222204921'),
 ('20230101160218'),
 ('20230130211416'),
-('20230510215256');
+('20230510215256'),
+('20230713083752'),
+('20230713083843'),
+('20230713083919');
 
 
