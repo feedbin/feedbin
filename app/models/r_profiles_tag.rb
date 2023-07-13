@@ -1,0 +1,2 @@
+class RProfilesTag < ApplicationRecord
+end
