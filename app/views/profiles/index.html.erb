@@ -1,5 +1,8 @@
-<div>
-  <h1 class="font-bold text-4xl">Profiles#index</h1>
-  <h2> <%= @profiles %> <h2>
-  <p>Find me in app/views/profiles/index.html.erb</p>
-</div>
+<h1><%= @user.email %></h1> 
+
+<% @profiles.each do |profile| %>
+  <h1><%= profile.profile_name %></h1>
+  <% profile.tags.each do |tag| %>
+    <li><%= tag.name %></li>
+  <% end %>
+<% end %>
