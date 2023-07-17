@@ -25,9 +25,16 @@
     <%= render partial: "saved_searches/saved_search", collection: saved_searches %>
 <% end %>
 
-<% if tags.present? %>
+<% if profiles.present? %>
     <li class="source-section section-tags">
         Profiles
+    </li>
+    <%= render partial: "profiles/profile", collection: profiles  %>
+<% end %>
+
+<% if tags.present? %>
+    <li class="source-section section-tags">
+        Tags
     </li>
     <%= render partial: "tags/tag", collection: tags  %>
 <% end %>
