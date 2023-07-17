@@ -1,8 +1,0 @@
-<h1><%= @user.email %></h1> 
-
-<% @profiles.each do |profile| %>
-  <h1><%= profile.profile_name %></h1>
-  <% profile.tags.each do |tag| %>
-    <li><%= tag.name %></li>
-  <% end %>
-<% end %>
