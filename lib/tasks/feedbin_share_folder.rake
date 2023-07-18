@@ -1,8 +1,22 @@
 namespace :feeds do
     desc "Share Folder to another user"
     task :share_folder, [:user_id, :tag_id] => :environment do |_, args|
+      # Verify that this user exist
       user_id = args[:user_id]
+      begin
+        User.find(user_id)
+      rescue => ActiveRecord::RecordNotFound
+        puts "\e[31mUser with {user_id : #{user_id}} does not exist} \e[0m"
+        exit
+      end
+      # Verify that tag exist
       tag_id = args[:tag_id]
+      begin
+        Tag.find(tag_id)
+      rescue => ActiveRecord::RecordNotFound
+        puts "\e[31mTag with {tag_id : #{tag_id}} does not exist} \e[0m"
+        exit
+      end
 
       # Selects all feeds on specific tag
       feeds_ids = Tag.find(tag_id).feeds.pluck(:id)
