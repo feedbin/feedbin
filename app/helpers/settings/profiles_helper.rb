@@ -1,0 +1,2 @@
+module Settings::ProfilesHelper
+end

@@ -5,6 +5,10 @@ module ApplicationHelper
     yield presenter if block_given?
     presenter
   end
+  
+  def profiles_path
+    "/settings/profiles"
+  end
 
   def component(name, *args, **kwargs, &block)
     component = "#{name}_component".camelize.constantize
