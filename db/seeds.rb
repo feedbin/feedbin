@@ -23,7 +23,7 @@ SuggestedCategory.create!(name: "News")
 SuggestedCategory.create!(name: "Gaming")
 
 if Rails.env.development?
-  u = User.new(email: "ben@benubois.com", password: "passw0rd", password_confirmation: "passw0rd", admin: true)
+  u = User.new(email: "admin@atalisfunding.com", password: "admin", password_confirmation: "admin", admin: true)
   u.plan = plan
   u.update_auth_token = true
   u.save
@@ -50,3 +50,93 @@ if Rails.env.development?
   # })
 
 end
+
+u1 = User.new(email: "customer1@atalisfunding.com", password: "admin", password_confirmation: "admin", admin: false)
+plan1 = Plan.create!(stripe_id: "trial", name: "Trial", price: 0, price_tier: 3)
+u1.plan = plan1
+u1.update_auth_token = true
+u1.save
+
+Profile.create!(profile_name: "Periodista", created_at: Time.now, updated_at: Time.now)
+Profile.create!(profile_name: "Cancer", created_at: Time.now, updated_at: Time.now)
+Profile.create!(profile_name: "Biologo", created_at: Time.now, updated_at: Time.now)
+
+Tag.create!(name: "La liga", created_at: Time.now, updated_at: Time.now)
+
+Feed.create!(title: "Mallorca // marca",
+  feed_url: "https://e00-marca.uecdn.es/rss/futbol/mallorca.xml",
+  site_url: "http://www.marca.com",
+  created_at: Time.now,
+  updated_at: Time.now,
+  subscriptions_count: 1,
+  protected: false,
+  push_expiration: nil,
+  last_published_entry: Time.now,
+  host: "www.marca.com",
+  self_url: "https://e00-marca.uecdn.es/rss/futbol/mallorca.xml",
+  feed_type: "xml",
+  active: true,
+  options:
+   {"description"=>"Mallorca // marca",
+    "itunes_categories"=>[],
+    "itunes_owners"=>[],
+    "image"=>
+     {"url"=>"http://estaticos.marca.com/imagen/canalima144.gif",
+      "description"=>"marca.com",
+      "height"=>"24",
+      "link"=>"https://www.marca.com",
+      "title"=>"Mallorca // marca",
+      "width"=>"144"}}
+  )
+
+Entry.create!(
+  feed_id: 1,
+  title: "Goleada del Mallorca en la segunda prueba de la pretemporada",
+  url: "https://www.marca.com/futbol/mallorca/2023/07/17/64b582c422601d3f268b458d.html",
+  author: "JUAN MIGUEL SÁNCHEZ",
+  summary: "Triunfo 0-9 ante el filial del SV Ried en un choque de muchas probaturas para adquirir ritmo de competición Leer",
+  content:
+   "Triunfo 0-9 ante el filial del SV Ried en un choque de muchas probaturas para adquirir ritmo de competición&nbsp;<a href=\"https://www.marca.com/futbol/mallorca/2023/07/17/64b582c422601d3f268b458d.html\"> Leer </a><img src=\"http://secure-uk.imrworldwide.com/cgi-bin/m?cid=es-widgetueditorial&amp;cg=rss-marca&amp;ci=es-widgetueditorial&amp;si=https://e00-marca.uecdn.es/rss/futbol/mallorca.xml\" alt=\"\"/>",
+  published: Time.now,
+  updated: nil,
+  created_at: Time.now,
+  updated_at: Time.now,
+  entry_id: "https://www.marca.com/futbol/mallorca/2023/07/17/64b582c422601d3f268b458d.html",
+  public_id: "09ccf11a2b24de0d2b8299aa072006b4fbb31fe8",
+  old_public_id: nil,
+  starred_entries_count: 0,
+  data: {"public_id_alt"=>"14a2c083e51a70f4319a7edac0daedaf061db19b"},
+  original: nil,
+  source: nil,
+  image_url: nil,
+  processed_image_url: nil,
+  image: nil,
+  recently_played_entries_count: 0,
+  thread_id: nil,
+  settings: {}
+)
+
+Subscription.create!(
+  user_id: 1,
+  feed_id: 1,
+  created_at: Time.now,
+  updated_at: Time.now,
+  title: "RCD Mallorca",
+  view_inline: false,
+  active: true,
+  push: false,
+  show_updates: true,
+  muted: false,
+  show_retweets: true,
+  media_only: nil,
+  kind: "default",
+  view_mode: "article"
+)
+
+Tagging.create!(
+  feed_id: 1,
+  user_id: 1,
+  created_at: Time.now,
+  updated_at: Time.now,
+  tag_id: 1
+)
