@@ -37,11 +37,25 @@ class FeedsController < ApplicationController
     @feeds = nil
   end
 
+  def assign_new_feeds(tag_id, user_id)
+    feeds_ids = get_all_feeds_on_specifi_tag(tag_id)
+    # Insert operations
+    feeds_ids.each do |feed_id|
+      Subscription.new(user_id: user_id, feed_id: feed_id).save # Subcribe to all new feeds
+      Tagging.new(feed_id: feed_id, user_id: user_id, tag_id: tag_id).save # Insert new feed to the folder
+    end
+  end
+
   private
 
   def correct_user
     unless current_user.subscribed_to?(params[:id])
       render_404
     end
+  end
+
+  def get_all_feeds_on_specifi_tag(tag_id)
+    # Selects all feeds on specific tag
+    feeds_ids = Tag.find(tag_id).feeds.pluck(:id)
   end
 end

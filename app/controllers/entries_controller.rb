@@ -243,6 +243,14 @@ class EntriesController < ApplicationController
     end
   end
 
+  def mark_unread_entries_from_tag(tag_id, user_id)
+    entries = get_all_entries_for_specific_tag(tag_id)
+    # Mark all this new entries like unread
+    entries.each do |entry_id, feed_id|
+      UnreadEntry.new(user_id: user_id, feed_id: feed_id, entry_id: entry_id, published: Time.now, entry_created_at: Time.now ).save
+    end
+  end
+
   private
 
   def entries_by_id(entry_ids)
@@ -267,5 +275,9 @@ class EntriesController < ApplicationController
   def matched_search_ids(params)
     query = Entry.build_query(user: @user, query: params[:query])
     Search.client { _1.all_matches(Entry.table_name, query: query) }
+  end
+
+  def get_all_entries_for_specific_tag(tag_id)
+    entries = Entry.where(feed_id: Tag.find(tag_id).feeds.pluck(:id)).pluck(:id, :feed_id)
   end
 end
