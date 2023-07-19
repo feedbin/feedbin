@@ -4,9 +4,7 @@ class ProfilesController < ApplicationController
         @profiles = @user.profiles
     end
 
-    def get_tags_by_profile
-        profile = Profile.find(params[:profile_id])
-        tags = profile.tags
-        render json: tags
+    def show
+        @profile = Profile.find(params[:id])
     end
 end
