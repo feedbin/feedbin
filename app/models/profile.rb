@@ -8,6 +8,6 @@ class Profile < ApplicationRecord
 
     def get_tags
         # Profile.find(profile_id).get_tags
-        tags.pluck(:id, :name) 
+        tags
     end
 end

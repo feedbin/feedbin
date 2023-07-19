@@ -31,4 +31,9 @@ class Tag < ApplicationRecord
       jumpable: true
     )
   end
+
+  def get_feeds
+    feeds = Feed.where(id: taggings.pluck(:feed_id))
+    feeds
+  end
 end
