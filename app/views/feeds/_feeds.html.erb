@@ -29,7 +29,7 @@
     <li class="source-section section-tags">
         Profiles
     </li>
-    <%= render partial: "profiles/profile", collection: profiles  %>
+    <%= render partial: "profiles/profile", collection: profiles, cache: true  %>
 <% end %>
 
 <% if tags.present? %>
