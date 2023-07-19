@@ -51,6 +51,8 @@ class User < ApplicationRecord
     :podcast_sort_order,
     :playlist_migration
 
+  has_many :r_users_profiles
+  has_many :profiles, through: :r_users_profiles
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
   has_many :podcast_subscriptions, dependent: :delete_all

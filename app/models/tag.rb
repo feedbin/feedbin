@@ -1,6 +1,8 @@
 class Tag < ApplicationRecord
   attr_accessor :count, :user_feeds
 
+  has_many :r_profiles_tags
+  has_many :profiles, through: :r_profiles_tags
   has_many :taggings
   has_many :feeds, through: :taggings
 
