@@ -10,7 +10,7 @@ class Profile < ApplicationRecord
         RUsersProfile( user_id: user_id, profile_id: profile_id).save
     end
 
-    def assign_profile_to_tag(user_id, tag_id)
+    def assign_tag_to_profile(user_id, tag_id)
         RProfilesTag( profile_id: user_id, tag_id: tag_id).save
     end
 end
