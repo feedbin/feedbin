@@ -317,7 +317,7 @@ class Entry < ApplicationRecord
   private
 
   def get_all_entries_for_specific_tag(tag_id)
-    entries = Entry.where(feed_id: Tag.find(tag_id).feeds.pluck(:id)).pluck(:id, :feed_id)
+    Entry.where(feed_id: Tag.find(tag_id).feeds.pluck(:id)).pluck(:id, :feed_id)
   end
 
   def provider_metadata
