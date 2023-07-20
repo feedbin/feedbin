@@ -58,10 +58,11 @@ u1.update_auth_token = true
 u1.save
 
 Profile.create!(profile_name: "Periodista", created_at: Time.now, updated_at: Time.now)
-Profile.create!(profile_name: "Cancer", created_at: Time.now, updated_at: Time.now)
-Profile.create!(profile_name: "Biologo", created_at: Time.now, updated_at: Time.now)
 
 Tag.create!(name: "La liga", created_at: Time.now, updated_at: Time.now)
+
+RUsersProfile.create!(user_id: 2, profile_id: 1)
+RProfilesTag.create!(profile_id: 1, tag_id: 1)
 
 Feed.create!(title: "Mallorca // marca",
   feed_url: "https://e00-marca.uecdn.es/rss/futbol/mallorca.xml",
@@ -142,3 +143,49 @@ Tagging.create!(
 )
 
 
+Profile.create!(profile_name: "Biotech")
+Profile.create!(profile_name: "Cancer")
+Profile.create!(profile_name: "Motor")
+
+Tag.create!(name: "Biomaterials")
+Tag.create!(name: "Stem Cell")
+Tag.create!(name: "Nanobiotechnology")
+
+
+Tag.create!(name: "Cancer Advances")
+Tag.create!(name: "Prostate Cancer")
+Tag.create!(name: "Breast Cancer")
+
+Tag.create!(name: "Formula 1")
+Tag.create!(name: "Le Mans")
+Tag.create!(name: "GT")
+
+biotech_id = Profile.find_by(profile_name: "Biotech").id
+
+RUsersProfile.create!(user_id: 1, profile_id: biotech_id)
+
+RProfilesTag.create!(profile_id: biotech_id, tag_id: Tag.find_by(name: "Biomaterials").id)
+RProfilesTag.create!(profile_id: biotech_id, tag_id: Tag.find_by(name: "Stem Cell").id)
+RProfilesTag.create!(profile_id: biotech_id, tag_id: Tag.find_by(name: "Nanobiotechnology").id)
+
+
+cancer_id = Profile.find_by(profile_name: "Cancer").id
+
+RUsersProfile.create!(user_id: 1, profile_id: cancer_id)
+
+RProfilesTag.create!(profile_id: cancer_id, tag_id: Tag.find_by(name: "Cancer Advances").id)
+RProfilesTag.create!(profile_id: cancer_id, tag_id: Tag.find_by(name: "Prostate Cancer").id)
+RProfilesTag.create!(profile_id: cancer_id, tag_id: Tag.find_by(name: "Breast Cancer").id)
+
+motor_id = Profile.find_by(profile_name: "Motor").id
+
+RUsersProfile.create!(user_id: 1, profile_id: motor_id)
+
+RProfilesTag.create!(profile_id: motor_id, tag_id: Tag.find_by(name: "Formula 1").id)
+RProfilesTag.create!(profile_id: motor_id, tag_id: Tag.find_by(name: "Le Mans").id)
+RProfilesTag.create!(profile_id: motor_id, tag_id: Tag.find_by(name: "GT").id)
+
+
+periodista_id = Profile.find_by(profile_name: "Periodista").id
+
+RUsersProfile.create!(user_id: 1, profile_id: periodista_id)
