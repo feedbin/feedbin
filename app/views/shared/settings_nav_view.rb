@@ -45,46 +45,53 @@ module Shared
           selected: helpers.is_active?("settings", "index")
         ))
         render(::SettingsNav::NavComponent.new(
-          title: "Subscriptions",
-          subtitle: "Manage feeds",
-          url: helpers.settings_subscriptions_path,
-          icon: "menu-icon-subscriptions",
-          selected: helpers.is_active?(["settings/subscriptions"], %w[index edit])
-        ))
-        render(::SettingsNav::NavComponent.new(
           title: "Sources",
           subtitle: "Newsletters & pages",
           url: helpers.settings_newsletters_pages_path,
           icon: "menu-icon-newsletters",
           selected: helpers.is_active?("settings", "newsletters_pages")
-        ))
-      end
-
-      render ::SettingsNav::HeaderComponent.new do
-        plain " Tools"
-      end
-
-      div(class: "px-4 pl-10 tw-hidden group-data-[nav=dropdown]:block") do
-        hr(class: "m-0")
-      end
-
-      ul do
-        render(::SettingsNav::NavComponent.new(
-          title: "Actions",
-          subtitle: "Filters & more",
-          url: helpers.actions_path,
-          selected: helpers.is_active?(["actions"], %w[index new edit]),
-          icon: "menu-icon-actions"
-        ))
-        render(::SettingsNav::NavComponent.new(
-          title: "Share & Save",
-          subtitle: "Social plugins",
-          url: helpers.sharing_services_path,
-          selected: helpers.is_active?("sharing_services", "index"),
-          icon: "menu-icon-share-save"
-        ))
-        render(::SettingsNav::NavComponent.new(
-          title: "Import & Export",
+          ))
+        end
+        
+        render ::SettingsNav::HeaderComponent.new do
+          plain " Tools"
+        end
+        
+        div(class: "px-4 pl-10 tw-hidden group-data-[nav=dropdown]:block") do
+          hr(class: "m-0")
+        end
+        
+        ul do
+          render(::SettingsNav::NavComponent.new(
+            title: "Subscriptions",
+            subtitle: "Manage feeds",
+            url: helpers.settings_subscriptions_path,
+            icon: "menu-icon-subscriptions",
+            selected: helpers.is_active?(["settings/subscriptions"], %w[index edit])
+          ))
+          render(::SettingsNav::NavComponent.new(
+            title: "Manage Profiles",
+            subtitle: "Manage profiles, tags and feeds",
+            url: helpers.profiles_path,
+            icon: "menu-icon-subscriptions",
+            selected: helpers.is_active?(["settings/profiles"], %w[index edit])
+          ))
+          render(::SettingsNav::NavComponent.new(
+            title: "Actions",
+            subtitle: "Filters & more",
+            url: helpers.actions_path,
+            selected: helpers.is_active?(["actions"], %w[index new edit]),
+            icon: "menu-icon-actions"
+            ))
+            render(::SettingsNav::NavComponent.new(
+              title: "Share & Save",
+              subtitle: "Social plugins",
+              url: helpers.sharing_services_path,
+              selected: helpers.is_active?("sharing_services", "index"),
+              icon: "menu-icon-share-save"
+              ))
+              render(::SettingsNav::NavComponent.new(
+                title: "Import & Export",
           subtitle: "Bring your OPML",
           url: helpers.settings_import_export_path,
           selected: helpers.is_active?(["settings/imports"], %w[index show]),

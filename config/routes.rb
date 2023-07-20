@@ -3,10 +3,9 @@ Sidekiq::Web.app_url = ENV["FEEDBIN_URL"]
 
 Rails.application.routes.draw do
   get 'profiles/index'
+
   get 'profiles/subscribe/:profile_id', to: 'profiles#subscribe', as: 'subscribe'
   resources :profiles
-
-
 
   root to: "site#index"
 
@@ -154,6 +153,14 @@ Rails.application.routes.draw do
       post :mark_direction_as_read
     end
   end
+  
+  namespace :settings do
+    get 'profiles/index'
+    get 'profiles/show'
+    get 'profiles/edit'
+    get 'profiles', to: 'profiles#index', as: 'profiles'
+  end
+  
 
   get :settings, to: "settings#index"
   namespace :settings do

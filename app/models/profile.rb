@@ -5,7 +5,7 @@ class Profile < ApplicationRecord
 
     has_many :r_profiles_tags
     has_many :tags, through: :r_profiles_tags
-
+  
     def assing_profile_to_user(user_id)
         RUsersProfile.new( user_id: user_id, profile_id: self.id).save
     end

@@ -27,16 +27,9 @@
 
 <% if profiles.present? %>
     <li class="source-section section-tags">
-        Profiles
+        Your Profiles
     </li>
     <%= render partial: "profiles/profile", collection: profiles  %>
-<% end %>
-
-<% if tags.present? %>
-    <li class="source-section section-tags">
-        Tags
-    </li>
-    <%= render partial: "tags/tag", collection: tags  %>
 <% end %>
 
 <% if feeds.present? %>
