@@ -3,6 +3,10 @@ Sidekiq::Web.app_url = ENV["FEEDBIN_URL"]
 
 Rails.application.routes.draw do
   get 'profiles/index'
+
+  get 'profiles/subscribe/:profile_id', to: 'profiles#subscribe', as: 'subscribe'
+  resources :profiles
+
   root to: "site#index"
 
   mount StripeEvent::Engine, at: "/stripe"
