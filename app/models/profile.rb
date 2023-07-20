@@ -6,11 +6,35 @@ class Profile < ApplicationRecord
     has_many :r_profiles_tags
     has_many :tags, through: :r_profiles_tags
   
+    # Desc: This method is used to assign a profile to users.
+    #       First, try to find out if the user has the profile.
+    #           -If the user has the profile, it will do nothing.
+    #           -If the relationship between user and profile 
+    #            is not found, then do insert
+    #
+    # input parameters: 
+    #       @params[:user_id] [int]: id of User
+    #
     def assing_profile_to_user(user_id)
-        RUsersProfile.new( user_id: user_id, profile_id: self.id).save
+        if 0 == RUsersProfile.where(user_id: user_id, profile_id: self.id).length
+            # Insert new connection
+            RUsersProfile.new( user_id: user_id, profile_id: self.id).save
+        end
     end
 
-    def assign_tag_to_profile(user_id, tag_id)
-        RProfilesTag.new( profile_id: user_id, tag_id: tag_id).save
+    # Desc: This method is used to assign a profile to users.
+    #       First, try to find out if the user has the profile.
+    #           -If the user has the profile, it will do nothing.
+    #           -If the relationship between user and profile 
+    #            is not found, then do insert
+    #
+    # input parameters: 
+    #       @params[:tag_id] [int]: id of Tag
+    #
+    def assign_tag_to_profile(tag_id)
+        if 0 == RProfilesTag.where(profile_id: self.id, tag_id: tag_id).length
+            # Insert new connection
+            RProfilesTag.new( profile_id: self.id, tag_id: tag_id).save
+        end
     end
 end
