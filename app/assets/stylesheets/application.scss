@@ -19,14 +19,24 @@ $audio-player-height-minimized: 54px;
 $base-button-position: 10px;
 
 /*-- Colors --*/
+// $theme-color-base: white;
+// $theme-color-100: #f5f5f7;
+// $theme-color-200: #e9e9eb;
+// $theme-color-300: #b2c9d9; // blue
+// $theme-color-400: #8eb7d3; // blue
+// $theme-color-500: #6ea5cd; // blue
+// $theme-color-600: #3b82b9; // blue
+// $theme-color-700: #0f5ea5; // blue
+
 $theme-color-base: white;
 $theme-color-100: #f5f5f7;
 $theme-color-200: #e9e9eb;
-$theme-color-300: #b2c9d9; // blue
-$theme-color-400: #8eb7d3; // blue
-$theme-color-500: #6ea5cd; // blue
-$theme-color-600: #3b82b9; // blue
-$theme-color-700: #0f5ea5; // blue
+$theme-color-300: #9db9cc; // Blue, slightly darker
+$theme-color-400: #789cab; // Blue, slightly darker
+$theme-color-500: #57758a; // Blue, slightly darker
+$theme-color-600: #1f5277; // Blue, slightly darker
+$theme-color-700: #114069; // Blue, slightly darker
+
 
 $theme-color-sunset-base: #1d2738;
 $theme-color-sunset-100: #35405e;
@@ -1331,24 +1341,6 @@ $hamburger-dot: 4px;
           margin: 0;
         }
       }
-      .profile-visibility-control {
-        padding: 0;
-        margin: 0;
-        .tag-action-expand {
-          padding: 0;
-          position: absolute;
-          top: 0;
-          left: 0;
-          bottom: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          appearance: none;
-          background: none;
-          border: none;
-          margin: 0;
-        }
-      }
       &.selected {
         .feed-action-expand {
           svg {
@@ -1468,6 +1460,9 @@ $hamburger-dot: 4px;
         margin-right: 6px;
         flex-shrink: 0;
       }
+      .profile-label-color{
+        @include color($theme-color-base);
+      }
       .collection-label-wrap {
         min-width: 0;
         flex: 1 1 auto;
@@ -1522,6 +1517,13 @@ $hamburger-dot: 4px;
     padding: 0 $outer-padding;
     &.selected .link-inner {
       color: white !important;
+    }
+  }
+  .profile-link {
+    margin-bottom: 10px;
+    .link-inner {
+      // padding-left: $inner-padding + $favicon-width;
+      @include background-color($color-selected);  
     }
   }
   .source-section {
