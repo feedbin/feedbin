@@ -8,7 +8,11 @@ class ProfilesController < ApplicationController
         @profiles = Profile.all
     end
 
-    def subscribe(profile_id)
-        @test = profile_id
+    def subscribe
+        puts Profile.find(params[:profile_id]).assing_profile_to_user(@user.id)
+
+        redirect_to profiles_path
     end
+
+
 end

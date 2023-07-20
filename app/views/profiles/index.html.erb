@@ -10,7 +10,6 @@
 <h1>Add profiles</h1>
 <br/>
 <% @profiles.each do |profile| %>
-  <h1><%= profile.profile_name %></h1>
-  <h1><%= button_to "Subscribe", subscribe_profile_path(profile), method: :post %></h1>
+  <h1><%= link_to profile.profile_name, subscribe_path(profile_id: profile.id), method: :get, class: 'btn btn-primary' %>
 
 <% end %>
