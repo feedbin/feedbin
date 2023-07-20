@@ -1,24 +1,26 @@
-<% cache [profile, profile.get_tags, "v4"] do %>
-    <li class="tag" data-tag-id="<%= profile.id %>" data-feed-id="tag-<%= profile.id %>" data-count-type="tag" data-behavior="droppable">
-        <span class="link-inner">
-                <div style="height: 20px; width: 0;"></div>
-                <%= form_for @user, url: view_settings_update_user_path(@user), remote: 'true', html: { data: {behavior: "toggle_drawer feed_action_parent"} } do |f| %>
+<% cache ["profile_#{profile.id}", "v4"] do %>
+    <li class="profile" data-profile-id="<%= profile.id %>" data-tag-id="profile-<%= profile.id %>" data-count-type="profile" data-behavior="droppable">
+        <div class="feed-link tag-link">
+            <span class="link-inner">
+                <div style="height: 25px; width: 0;"></div>
+                <%= form_for @user, url: view_settings_update_user_path(@user), remote: 'true', html: {  class: 'tag-visibility-control', data: {behavior: "toggle_drawer"} } do |f| %>
                     <%= hidden_field_tag 'tag_visibility', 'tag_visibility' %>
                     <%= hidden_field_tag 'tag', profile.id %>
-                    <%= f.button class: "feed-action-button feed-action-expand", data: { behavior: 'feed_action' } do %>
+                    <%= f.button class: "feed-action-button feed-action-expand" do %>
                         <%= svg_tag "icon-caret", size: "12x7" %>
                     <% end %>
                 <% end %>
-                <span class="collection-label-wrap" data-behavior="rename_target" data-input-name="profile[profile_name]" data-title="<%= profile.profile_name %>", data-original-title="<%= profile.profile_name %>">
+                <span class="collection-label-wrap" data-behavior="rename_target" data-input-name="<%= profile.profile_name %>" data-title="<%= profile.profile_name %>", data-original-title="<%= profile.profile_name %>">
                     <span class="collection-label" data-behavior="rename_title"><%= profile.profile_name %></span>
                 </span>
                 <span class="count-wrap">
-                    <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byTag', count_group_id: profile.id} %>
+                    <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byTag' } %>
                 </span>
-        </span>
+            </span>
+        </div>
         <div class="drawer feed-drawer" data-behavior="feed_drawer expandable">
             <ul>
-                <%= render partial: "tags/tag", collection: profile.get_tags, cached: true %>
+                <%= render partial: "tags/tag", collection: profile.tags, cached: true %>
             </ul>
         </div>
     </li>

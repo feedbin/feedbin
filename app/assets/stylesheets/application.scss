@@ -1255,6 +1255,35 @@ $hamburger-dot: 4px;
       .tag-link {
         position: relative;
       }
+      &.profile {
+        .drawer {
+          height: 0;
+          opacity: 0;
+        }
+        .icon-caret {
+          @include fill($color-contrast-500);
+          transform: rotate(-90deg);
+          position: relative;
+          left: -3px;
+        }
+        &.open {
+          .drawer {
+            height: auto;
+            opacity: 1;
+          }
+          .icon-caret {
+            transform: rotate(0deg);
+          }
+        }
+        &.animate {
+          .drawer {
+            transition: opacity 0.3s linear;
+          }
+          .icon-caret {
+            transition: transform 0.15s linear;
+          }
+        }
+      }
       &.tag {
         .drawer {
           height: 0;
@@ -1288,6 +1317,24 @@ $hamburger-dot: 4px;
         padding: 0;
         margin: 0;
         .feed-action-expand {
+          padding: 0;
+          position: absolute;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          appearance: none;
+          background: none;
+          border: none;
+          margin: 0;
+        }
+      }
+      .profile-visibility-control {
+        padding: 0;
+        margin: 0;
+        .tag-action-expand {
           padding: 0;
           position: absolute;
           top: 0;
@@ -1440,7 +1487,7 @@ $hamburger-dot: 4px;
       }
     }
     &.source-section {
-      @include font-size(12);
+      @include font-size(16);
       @include size-in-rems(padding-top, 22);
       @include color($color-contrast-500);
       font-weight: bold;

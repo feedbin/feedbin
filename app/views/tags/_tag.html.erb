@@ -1,4 +1,4 @@
-<% cache [tag, tag.user_feeds, "v4"] do %>
+<% cache ["tag_#{tag.id}", "v4"] do %>
     <li class="tag" data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" data-behavior="droppable">
         <%= link_to tag_path(tag.id),
             remote: true,
@@ -31,7 +31,7 @@
         <% end %>
         <div class="drawer feed-drawer" data-behavior="feed_drawer expandable">
             <ul>
-                <%= render partial: "feeds/feed", collection: tag.get_feeds, cached: true %>
+                <%= render partial: "feeds/feed", collection: tag.feeds, cached: true %>
             </ul>
         </div>
     </li>
