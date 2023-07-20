@@ -1,8 +1,8 @@
-<% cache ["tag_#{tag.id}", "v4"] do %>
+<% cache ["tag_#{tag.id}_#{tag.name}", "v4"] do %>
     <li class="tag" data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" data-behavior="droppable">
         <%= link_to tag_path(tag.id),
             remote: true,
-            class: 'feed-link tag-link',
+            class: 'feed-link tag-link tag-link-padding',
             data: {
                 behavior: 'selectable show_entries open_item feed_link renamable has_settings',
                 mark_read: {type: 'tag', data: tag.id, message: "Mark #{tag.name} as read?"}.to_json,
@@ -18,7 +18,8 @@
                     <%= hidden_field_tag 'tag_visibility', 'tag_visibility' %>
                     <%= hidden_field_tag 'tag', tag.id %>
                     <%= f.button class: "feed-action-button feed-action-expand", data: { behavior: 'feed_action' } do %>
-                        <%= svg_tag "icon-caret", size: "12x7" %>
+                        <%# <%= svg_tag "icon-caret", size: "12x7" %>
+                        <%= svg_tag "icon-arrow", size: "12x7" %>
                     <% end %>
                 <% end %>
                 <span class="collection-label-wrap" data-behavior="rename_target" data-form-action="<%= tag_path(tag) %>" data-input-name="tag[name]" data-title="<%= tag.name %>", data-original-title="<%= tag.name %>">
@@ -31,7 +32,7 @@
         <% end %>
         <div class="drawer feed-drawer" data-behavior="feed_drawer expandable">
             <ul>
-                <%= render partial: "feeds/feed", collection: tag.feeds, cached: true %>
+                <%= render partial: "feeds/feed", collection: tag.feeds %>
             </ul>
         </div>
     </li>

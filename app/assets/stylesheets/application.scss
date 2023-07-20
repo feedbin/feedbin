@@ -1299,6 +1299,28 @@ $hamburger-dot: 4px;
           height: 0;
           opacity: 0;
         }
+        .icon-arrow {
+          @include fill($color-contrast-500);
+          transform: rotate(180deg);
+          position: relative;
+          left: -3px;
+        }&.open {
+          .drawer {
+            height: auto;
+            opacity: 1;
+          }
+          .icon-arrow {
+            transform: rotate(270deg);
+          }
+        }
+        &.animate {
+          .drawer {
+            transition: opacity 0.3s linear;
+          }
+          .icon-arrow {
+            transition: transform 0.15s linear;
+          }
+        }
         .icon-caret {
           @include fill($color-contrast-500);
           transform: rotate(-90deg);
@@ -1509,6 +1531,7 @@ $hamburger-dot: 4px;
 
   $outer-padding: 8px;
   $inner-padding: 8px;
+  $tag-left-margin: 8px;
   $favicon-width: 26px; /* width + margin */
   $favicon-padding: 2px;
 
@@ -1525,6 +1548,10 @@ $hamburger-dot: 4px;
       // padding-left: $inner-padding + $favicon-width;
       @include background-color($color-selected);  
     }
+  }
+
+  .tag-link-padding {
+    margin-left: $tag-left-margin;
   }
   .source-section {
     padding-left: $outer-padding + $inner-padding + $favicon-padding;

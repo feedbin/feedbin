@@ -1,12 +1,12 @@
-<% cache ["profile_#{profile.id}", "v4"] do %>
+<% cache ["profile_#{profile.id}_#{profile.profile_name}", "v4"] do %>
     <li class="profile" data-profile-id="<%= profile.id %>" data-tag-id="profile-<%= profile.id %>" data-count-type="profile" data-behavior="droppable">
         <div class="feed-link profile-link tag-link">
             <span class="link-inner">
-                <div style="height: 25px; width: 0;"></div>
-                <%= form_for @user, url: view_settings_update_user_path(@user), remote: 'true', html: {  class: 'tag-visibility-control', data: {behavior: "toggle_drawer"} } do |f| %>
+                <div style="height: 20px; width: 0;"></div>
+                <%= form_for @user, url: view_settings_update_user_path(@user), remote: 'true', html: {  class: 'tag-visibility-control', data: {behavior: "profile_drawer"} } do |f| %>
                     <%= hidden_field_tag 'tag_visibility', 'tag_visibility' %>
                     <%= hidden_field_tag 'tag', profile.id %>
-                    <%= f.button class: "feed-action-button feed-action-expand" do %>
+                    <%= f.button class: "feed-action-button feed-action-expand", data: { behavior: 'profile_action' } do %>
                     <%= svg_tag "icon-caret", size: "12x7", style: "fill: white !important" %>
                     <% end %>
                 <% end %>
@@ -18,9 +18,9 @@
                 </span>
             </span>
         </div>
-        <div class="drawer feed-drawer" data-behavior="feed_drawer expandable">
+        <div class="drawer feed-drawer" data-behavior="tag_drawer expandable">
             <ul>
-                <%= render partial: "tags/tag", collection: profile.tags, cached: true %>
+                <%= render partial: "tags/tag", collection: profile.tags %>
             </ul>
         </div>
     </li>
