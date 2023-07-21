@@ -32,6 +32,5 @@ class Profile < ApplicationRecord
     def assign_tag_to_profile(tag_id)
         RProfilesTag.where(profile_id: self.id, tag_id: tag_id).empty? ?
             RProfilesTag.create( profile_id: self.id, tag_id: tag_id) : "Tag already assigned to profile"
-        end
     end
 end
