@@ -1,6 +1,5 @@
 class ProfilesController < ApplicationController
-    include ExampleConcern
-
+    
     def index
         @user = current_user
         @my_profiles = @user.profiles
