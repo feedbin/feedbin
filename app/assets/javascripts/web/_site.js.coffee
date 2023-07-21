@@ -1328,6 +1328,34 @@ $.extend feedbin,
             feedbin.draggable()
           ), 20
 
+    profileDroppable: ->
+    $('[data-behavior~=droppable]:not(.ui-droppable)').droppable
+      hoverClass: 'drop-hover'
+      greedy: true
+      drop: (event, ui) ->
+        if !feedbin.dragOwner.get(0).isEqualNode(event.target)
+
+          tagId = parseInt(ui.draggable.data('profile-id'))
+          url = ui.draggable.data('profile-path')
+          target = $(event.target)
+          profile = $("> a", event.target).find("[data-behavior~=rename_title]").text()
+
+          if profile?
+            profileId = $(event.target).data('profile-id')
+          else
+            profile = ""
+            profileId = null
+
+          feedbin.Counts.get().updateTagMap(tagId, profileId)
+          feedbin.tagFeed(url, profile)
+          feedbin.appendTag(target, ui)
+          feedbin.hideEmptyTags()
+          feedbin.applyCounts(false)
+          setTimeout ( ->
+            feedbin.draggable()
+          ), 20
+
+
   refreshRetry: (xhr) ->
     $.get(feedbin.data.refresh_sessions_path).success(->
       $.ajax(xhr)
@@ -1901,15 +1929,15 @@ $.extend feedbin,
 
     drawer: ->
       feedbin.setTagVisibility()
-      # Para el profile_drawer
+
       $(document).on 'submit', '[data-behavior="profile_drawer"]', (event) =>
         container = $(event.currentTarget).closest('[data-profile-id]')
         open = !container.hasClass("open")
         id = container.data('profile-id')
 
-        visibility = feedbin.profileVisibility() # Agrega una función específica para el profile_drawer
+        visibility = feedbin.profileVisibility()
         visibility[id] = open
-        feedbin.profileVisibility(visibility) # Agrega una función específica para el profile_drawer
+        feedbin.profileVisibility(visibility) 
 
         container.toggleClass('open')
         container.addClass('animate')
@@ -1943,6 +1971,7 @@ $.extend feedbin,
       $(document).on 'submit', '[data-behavior~=toggle_drawer]', (event) =>
         container = $(event.currentTarget).closest('[data-tag-id]')
         open = !container.hasClass("open")
+        console.log("next", open)
         id = container.data('tag-id')
 
         visibility = feedbin.tagVisibility()

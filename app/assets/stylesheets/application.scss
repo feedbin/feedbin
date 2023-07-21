@@ -1532,6 +1532,7 @@ $hamburger-dot: 4px;
   $outer-padding: 8px;
   $inner-padding: 8px;
   $tag-left-margin: 8px;
+  $tag-bottom-margin: 8px;
   $favicon-width: 26px; /* width + margin */
   $favicon-padding: 2px;
 
@@ -1543,11 +1544,13 @@ $hamburger-dot: 4px;
     }
   }
   .profile-link {
-    margin-bottom: 10px;
     .link-inner {
       // padding-left: $inner-padding + $favicon-width;
       @include background-color($color-selected);  
     }
+  }
+  .tag-link {
+    margin-bottom: $tag-bottom-margin;
   }
 
   .tag-link-padding {

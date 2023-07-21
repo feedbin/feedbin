@@ -207,7 +207,6 @@ class ApplicationController < ActionController::Base
       entry_sort: @user.entry_sort
     }
     @feed_data = {
-      user: @user,
       feeds: @feeds,
       page_feed: @page_feed,
       collections: get_collections,

@@ -31,6 +31,12 @@
     </li>
     <%= render partial: "profiles/profile", collection: profiles  %>
 <% end %>
+<% if tags.present? %>
+    <li class="source-section section-tags">
+        Suggested profiles
+    </li>
+    <div>To implement a list of profiles here</div>
+<% end %>
 
 <% if feeds.present? %>
     <li class="source-section section-feeds">
