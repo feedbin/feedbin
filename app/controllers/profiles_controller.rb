@@ -9,7 +9,7 @@ class ProfilesController < ApplicationController
     end
 
     def subscribe
-        Profile.find(params[:profile_id]).assing_profile_to_user(@user.id)
+        Profile.find(params[:profile_id]).assign_profile_to_user(@user.id)
 
         redirect_to profiles_path
     end
