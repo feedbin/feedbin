@@ -16,8 +16,7 @@ class Profile < ApplicationRecord
     #       @params[:user_id] [int]: id of User
     #
     def assign_profile_to_user(user_id)
-        RUsersProfile.where(user_id: user_id, profile_id: self.id).empty? ? 
-            RUsersProfile.create(user_id: user_id, profile_id: self.id) : "Profile already assigned to user"
+        RUsersProfile.new(user_id: user_id, profile_id: self.id).save ? "Profile assigned to user" : "Profile already assigned to user"
     end
 
     # Desc: This method is used to assign a profile to users.
@@ -30,7 +29,6 @@ class Profile < ApplicationRecord
     #       @params[:tag_id] [int]: id of Tag
     #
     def assign_tag_to_profile(tag_id)
-        RProfilesTag.where(profile_id: self.id, tag_id: tag_id).empty? ?
-            RProfilesTag.create( profile_id: self.id, tag_id: tag_id) : "Tag already assigned to profile"
+        RProfilesTag.new(profile_id: self.id, tag_id: tag_id).save ? "Tag assigned to profile" : "Tag already assigned to profile"
     end
 end
