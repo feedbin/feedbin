@@ -15,11 +15,9 @@ class Profile < ApplicationRecord
     # input parameters: 
     #       @params[:user_id] [int]: id of User
     #
-    def assing_profile_to_user(user_id)
-        if 0 == RUsersProfile.where(user_id: user_id, profile_id: self.id).length
-            # Insert new connection
-            RUsersProfile.new( user_id: user_id, profile_id: self.id).save
-        end
+    def assign_profile_to_user(user_id)
+        RUsersProfile.where(user_id: user_id, profile_id: self.id).empty? ? 
+            RUsersProfile.create(user_id: user_id, profile_id: self.id) : "Profile already assigned to user"
     end
 
     # Desc: This method is used to assign a profile to users.
@@ -32,9 +30,8 @@ class Profile < ApplicationRecord
     #       @params[:tag_id] [int]: id of Tag
     #
     def assign_tag_to_profile(tag_id)
-        if 0 == RProfilesTag.where(profile_id: self.id, tag_id: tag_id).length
-            # Insert new connection
-            RProfilesTag.new( profile_id: self.id, tag_id: tag_id).save
+        RProfilesTag.where(profile_id: self.id, tag_id: tag_id).empty? ?
+            RProfilesTag.create( profile_id: self.id, tag_id: tag_id) : "Tag already assigned to profile"
         end
     end
 end
