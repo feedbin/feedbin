@@ -32,11 +32,13 @@
     <%= render partial: "profiles/profile", collection: profiles  %>
 <% end %>
 
-<% if tags.present? %>
+<% if profile_list.present? %>
     <li class="source-section section-tags">
         Suggested profiles
     </li>
-    <div>To implement a list of profiles here</div>
+    <%= profile_list.each do |profile| %>
+        <p><%= profile.profile_name %></p>
+    <% end %>
 <% end %>
 
 <% if feeds.present? %>

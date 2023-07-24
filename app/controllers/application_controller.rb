@@ -193,6 +193,7 @@ class ApplicationController < ActionController::Base
     @page_feed = @user.feeds.pages.first
 
     @profiles = @user.profiles.order("created_at DESC")
+    @profile_list = Profile.all
 
     excluded_feeds = @user.taggings.distinct.pluck(:feed_id)
     excluded_feeds += [@page_feed&.id]
@@ -212,6 +213,7 @@ class ApplicationController < ActionController::Base
       collections: get_collections,
       tags: @user.tag_group,
       profiles: @profiles,
+      profile_list: @profile_list,
       saved_searches: @user.saved_searches.order(Arel.sql("lower(name)")),
       count_data: @count_data,
       feed_order: @user.feed_order
