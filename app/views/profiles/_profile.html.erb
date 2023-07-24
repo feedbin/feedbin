@@ -18,7 +18,11 @@
         </div>
         <div class="drawer feed-drawer" data-behavior="tag_drawer expandable">
             <ul>
-                <%= render partial: "tags/tag", collection: profile.tags %>
+                <% if profile.tags.present? %>
+                    <%= render partial: "tags/tag", collection: profile.tags %>
+                <% else %>
+                    <p class="no-content-message" >No content at the moment</p>   
+                <% end %>
             </ul>
         </div>
     </li>
