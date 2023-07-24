@@ -1,0 +1,6 @@
+<% cache [profile_item_list, "v7"] do %>
+    <%= link_to subscribe_path(profile_id: profile_item_list.id), method: :get, class: "profile-item" do %>
+        <p class="add-icon">+</p>
+        <%= profile_item_list.profile_name %>
+    <% end %>
+<% end %>

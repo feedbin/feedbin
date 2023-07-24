@@ -578,6 +578,41 @@ table {
 /*------------------------------------------------------------------------------
 Structure
 ------------------------------------------------------------------------------*/
+.profile-list{
+  margin-right: 8px;
+  margin-left: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  .profile-item {
+    @include color($theme-color-base);
+    @include background-color($color-selected);  
+    @include font-size(12);
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: min-content;
+    height: min-content;
+    white-space: nowrap;
+    padding: 5px 10px 5px 10px;
+    border-radius: 5px;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      @include background-color($color-selected-hover);
+    }
+    
+    .add-icon{
+      font-weight: bolder;
+      @include font-size(14);
+    }
+  }
+}
+
 .container {
   margin-right: auto;
   margin-left: auto;
@@ -1550,7 +1585,7 @@ $hamburger-dot: 4px;
     }
   }
   .tag-link {
-    margin-bottom: $tag-bottom-margin;
+    margin-bottom: $tag-bottom-margin !important;
   }
 
   .tag-link-padding {
