@@ -1,29 +1,23 @@
 <% cache ["profile_#{profile.id}_#{profile.profile_name}", "v4"] do %>
-    <li class="profile" data-profile-id="<%= profile.id %>" data-tag-id="profile-<%= profile.id %>" data-count-type="profile" data-behavior="profileDroppable">
-        <div class="feed-link profile-link tag-link">
+    <details class="profile">
+        <summary class="feed-link profile-link tag-link" >
             <span class="link-inner">
                 <div style="height: 20px; width: 0;"></div>
-                <%= form_for @user, html: {  class: 'tag-visibility-control', data: {behavior: "profile_drawer"} } do |f| %>
-                    <%= f.button class: "feed-action-button feed-action-expand", data: { behavior: 'profile_action' } do %>
-                    <%= svg_tag "icon-caret", size: "12x7", style: "fill: white !important" %>
-                    <% end %>
-                <% end %>
-                <span class="collection-label-wrap profile-label-color" data-behavior="rename_target" data-input-name="profile[profile_name]" data-title="<%= profile.profile_name %>", data-original-title="<%= profile.profile_name %>">
-                    <span class="collection-label" data-behavior="rename_title"><%= profile.profile_name %></span>
+                <div class="tag-visibility-control">
+                    <%= svg_tag "icon-caret", class: "feed-action-button feed-action-expand", size: "12x7", style: "fill: white !important" %>
+                </div>
+                <span class="collection-label-wrap profile-label-color">
+                    <span class="collection-label" ><%= profile.profile_name %></span>
                 </span>
                 <span class="count-wrap">
                     <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byTag', count_group_id: profile.id } %>
                 </span>
             </span>
-        </div>
-        <div class="drawer feed-drawer" data-behavior="tag_drawer expandable">
+        </summary>
+        <div class="drawer feed-drawer">
             <ul>
-                <% if profile.tags.present? %>
-                    <%= render partial: "tags/tag", collection: profile.tags %>
-                <% else %>
-                    <p class="no-content-message" >No content at the moment</p>   
-                <% end %>
+                <%= render partial: "tags/tag", collection: profile.tags %>
             </ul>
         </div>
-    </li>
+    </details>
 <% end %>

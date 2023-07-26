@@ -1,4 +1,4 @@
-<% cache ["feed_#{feed.id}_v7"] do %>
+<% cache [feed, "v7"] do %>
     <% present feed do |feed_presenter| %>
         <%= content_tag :li, data: {feed_id: feed.id, behavior: 'draggable sort_feed', sort_id: feed.id, feed_path: feed_path(feed) } do %>
             <%= feed_presenter.feed_link do %>

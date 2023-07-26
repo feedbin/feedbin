@@ -27,14 +27,21 @@
 
 <% if profiles.present? %>
     <li class="source-section section-tags">
-        Your Profiles
+        Profiles
     </li>
     <%= render partial: "profiles/profile", collection: profiles  %>
 <% end %>
 
+<% if tags.present? %>
+    <li class="source-section section-tags">
+        Tags
+    </li>
+    <%= render partial: "tags/tag", collection: tags  %>
+<% end %>
+
 <% if profile_list.present? %>
     <li class="source-section">
-        Suggested profile packages
+        Suggested profiles
     </li>
     <section class="profile-list">
         <%= render partial: "profiles/profile_item_list", collection: profile_list %>

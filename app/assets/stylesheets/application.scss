@@ -1319,20 +1319,14 @@ $hamburger-dot: 4px;
           position: relative;
           left: -3px;
         }
-        &.open {
+        &[open]{
           .drawer {
             height: auto;
             opacity: 1;
-          }
-          .icon-caret {
-            transform: rotate(0deg);
-          }
-        }
-        &.animate {
-          .drawer {
             transition: opacity 0.3s linear;
           }
           .icon-caret {
+            transform: rotate(0deg);
             transition: transform 0.15s linear;
           }
         }
@@ -1586,12 +1580,40 @@ $hamburger-dot: 4px;
       color: white !important;
     }
   }
-  .profile-link {
-    .link-inner {
-      // padding-left: $inner-padding + $favicon-width;
-      @include background-color($color-selected);  
+  .profile {
+    .profile-link {
+      cursor: pointer;
+      transition: max-height 0.3s ease;
+      .link-inner {
+        @include background-color($color-selected);  
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        min-height: 32px;
+        height: min-content;
+        width: 100%;
+        border-radius: 5px;
+        padding-left: 0 !important;
+      }
     }
   }
+    // Transición para el dropdown
+  details.profile[open] {
+    transition: height 0.3s ease;
+  }
+
+  // Estilo para el contenido del dropdown
+  details.profile > div {
+    overflow: hidden;
+  }
+
+  // Transición de desvanecimiento
+  details.profile:not([open]) > div {
+    height: 0;
+    opacity: 0;
+    visibility: hidden;
+  }
+
   .tag-link {
     margin-bottom: $tag-bottom-margin !important;
   }

@@ -239,32 +239,22 @@ $.extend feedbin,
       localStorage.setItem(feedbin.data.visibility_key, JSON.stringify(values))
       values
     else
+      console.log(JSON.parse(localStorage.getItem(feedbin.data.visibility_key)))
       JSON.parse(localStorage.getItem(feedbin.data.visibility_key)) || {}
-
-  profileVisibility: (values = null) ->
-    if values
-      localStorage.setItem(feedbin.data.visibility_key + "profile", JSON.stringify(values))
-      values
-    else
-      JSON.parse(localStorage.getItem(feedbin.data.visibility_key + "profile")) || {}
 
   setTagVisibility: ->
     visibility = feedbin.tagVisibility()
     if Object.keys(visibility).length == 0
       visibility = feedbin.tagVisibility(feedbin.data.tag_visibility)
-    for id, open of visibility
-      tag = $(".feeds [data-tag-id=#{id}]")
-      if open
-        tag.addClass('open')
 
-  setProfileVisibility: ->
-    visibility = feedbin.profileVisibility()
-    if Object.keys(visibility).length == 0
-      visibility = feedbin.profileVisibility(feedbin.data.tag_visibility)
     for id, open of visibility
-      tag = $(".feeds [data-profile-id=#{id}]")
-      if open
-        tag.addClass('open')
+      console.warn(id)
+      tag = $(".feeds [data-tag-id='#{id}']")
+      if tag.length > 0
+        if open
+          tag.addClass('open')
+        else
+          tag.removeClass('open')
 
   reselect: ->
     if feedbin.selectedSource && feedbin.selectedTag
@@ -1328,34 +1318,6 @@ $.extend feedbin,
             feedbin.draggable()
           ), 20
 
-    profileDroppable: ->
-    $('[data-behavior~=droppable]:not(.ui-droppable)').droppable
-      hoverClass: 'drop-hover'
-      greedy: true
-      drop: (event, ui) ->
-        if !feedbin.dragOwner.get(0).isEqualNode(event.target)
-
-          tagId = parseInt(ui.draggable.data('profile-id'))
-          url = ui.draggable.data('profile-path')
-          target = $(event.target)
-          profile = $("> a", event.target).find("[data-behavior~=rename_title]").text()
-
-          if profile?
-            profileId = $(event.target).data('profile-id')
-          else
-            profile = ""
-            profileId = null
-
-          feedbin.Counts.get().updateTagMap(tagId, profileId)
-          feedbin.tagFeed(url, profile)
-          feedbin.appendTag(target, ui)
-          feedbin.hideEmptyTags()
-          feedbin.applyCounts(false)
-          setTimeout ( ->
-            feedbin.draggable()
-          ), 20
-
-
   refreshRetry: (xhr) ->
     $.get(feedbin.data.refresh_sessions_path).success(->
       $.ajax(xhr)
@@ -1929,49 +1891,9 @@ $.extend feedbin,
 
     drawer: ->
       feedbin.setTagVisibility()
-
-      $(document).on 'submit', '[data-behavior="profile_drawer"]', (event) =>
-        container = $(event.currentTarget).closest('[data-profile-id]')
-        open = !container.hasClass("open")
-        id = container.data('profile-id')
-
-        visibility = feedbin.profileVisibility()
-        visibility[id] = open
-        feedbin.profileVisibility(visibility) 
-
-        container.toggleClass('open')
-        container.addClass('animate')
-
-        drawer = container.find('[data-behavior~=tag_drawer]')
-
-        if open
-          windowHeight = window.innerHeight
-          targetHeight = $('ul', drawer).height()
-          if windowHeight < targetHeight
-            targetHeight = windowHeight - drawer.offset().top
-          height = targetHeight
-        else
-          height = 0
-          drawer.css
-            height: targetHeight
-
-        drawer.animate {
-          height: height
-        }, 150, ->
-          container.removeClass('animate')
-          if height > 0
-            drawer.css
-              height: 'auto'
-
-        event.stopPropagation()
-        event.preventDefault()
-        return
-
-
       $(document).on 'submit', '[data-behavior~=toggle_drawer]', (event) =>
         container = $(event.currentTarget).closest('[data-tag-id]')
         open = !container.hasClass("open")
-        console.log("next", open)
         id = container.data('tag-id')
 
         visibility = feedbin.tagVisibility()
@@ -2008,13 +1930,6 @@ $.extend feedbin,
 
     feedAction: ->
       $(document).on 'click', '[data-behavior~=feed_action]', (event) =>
-        $(event.currentTarget).closest('form').submit()
-        event.currentTarget.blur()
-        event.stopPropagation()
-        event.preventDefault()
-
-    profileAction: ->
-      $(document).on 'click', '[data-behavior~=profile_action]', (event) =>
         $(event.currentTarget).closest('form').submit()
         event.currentTarget.blur()
         event.stopPropagation()

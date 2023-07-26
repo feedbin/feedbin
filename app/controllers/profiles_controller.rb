@@ -10,6 +10,6 @@ class ProfilesController < ApplicationController
 
     def subscribe
         Profile.find(params[:profile_id]).assing_profile_to_user(@user.id)
-        redirect_to '/'
+        redirect_to root_path
     end
 end

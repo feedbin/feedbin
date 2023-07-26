@@ -1,5 +1,5 @@
-<% cache ["tag_#{tag.id}_#{tag.name}", "v4"] do %>
-    <li class="tag" data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" data-behavior="droppable">
+<% cache [tag, "v4"] do %>
+    <li class="tag" data-tag-id="<%= tag.id %>" data-feed-id="<%= tag.id %>" data-count-type="tag" data-behavior="droppable">
         <%= link_to tag_path(tag.id),
             remote: true,
             class: 'feed-link tag-link tag-link-padding',
@@ -37,4 +37,3 @@
         </div>
     </li>
 <% end %>
-
