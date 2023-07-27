@@ -260,21 +260,7 @@ class Feed < ApplicationRecord
     )
   end
 
-  def assign_new_feeds(tag_id, user_id)
-    feeds_ids = get_all_feeds_on_specifi_tag(tag_id)
-    # Insert operations
-    feeds_ids.each do |feed_id|
-      Subscription.new(user_id: user_id, feed_id: feed_id).save # Subcribe to all new feeds
-      Tagging.new(feed_id: feed_id, user_id: user_id, tag_id: tag_id).save # Insert new feed to the folder
-    end
-  end
-  
   private
-
-  def get_all_feeds_on_specifi_tag(tag_id)
-    # Selects all feeds on specific tag
-    feeds_ids = Tag.find(tag_id).feeds.pluck(:id)
-  end
 
   def update_youtube_videos
     if youtube_channel_id
