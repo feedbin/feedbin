@@ -27,12 +27,12 @@ class FeedFinder
       feeds = Source::Xml.find(response)
     end
 
-    if feeds.empty?
-      feeds = Source::KnownPattern.find(response)
-    end
-
     if feeds.empty? && !import_mode?
       feeds = Source::MetaLinks.find(response)
+    end
+
+    if feeds.empty?
+      feeds = Source::KnownPattern.find(response)
     end
 
     if feeds.empty? && !import_mode?
