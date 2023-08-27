@@ -1,5 +1,5 @@
 json.id            @feed.id
-json.title         strip_tags(@feed.try(:title).clean)
+json.title         @feed.try(:title).clean(transform: [:to_plain_text])
 json.home_page_url @feed.try(:site_url).clean
 json.feed_url      @feed.try(:feed_url).clean
 json.description   @feed.options&.safe_dig("description").clean(transform: [:to_plain_text])
@@ -21,7 +21,7 @@ end
 
 json.items @feed.entries.order(published: :desc) do |entry|
   json.id             entry.id
-  json.title          strip_tags(entry.try(:title).clean)
+  json.title          entry.try(:title).clean(transform: [:to_plain_text])
   json.url            entry.try(:url).clean
   json.date_published entry.published.iso8601(6)
 
