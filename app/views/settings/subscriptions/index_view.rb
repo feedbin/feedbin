@@ -11,7 +11,7 @@ module Settings
       def template
         form_tag helpers.settings_subscriptions_path, method: :get, remote: true, class: "feed-settings", data: {behavior: "spinner"} do
           render Settings::H1Component.new do
-            "Settings"
+            "Subscriptions"
           end
           div class: "flex flex-col md:flex-row justify-between mb-6 gap-2" do
             div class: "md:max-w-[250px]" do
