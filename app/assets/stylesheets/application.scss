@@ -3006,11 +3006,14 @@ $feed-title-width: 115px;
     align-items: baseline;
   }
   .share-keyboard {
-    @include font-size(14);
+    @include font-size(12);
     margin-left: auto;
     font-style: normal;
     margin-top: 2px;
-    color: map-get($color-contrast-500, day);
+    @include color($color-contrast-500);
+  }
+  .share-option a:hover .share-keyboard {
+    @include color($color-contrast-700);
   }
 }
 
@@ -7170,19 +7173,29 @@ $tooltip-arrow-height: 6px;
     )
   );
   margin-left: 16px;
-  display: inline-block;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   font-style: normal;
-  font-weight: bold;
-  padding: 2px 5px;
+  height: 18px;
+  width: 18px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
   border-radius: 2px;
   font-family: $font-stack;
   line-height: 1;
   min-width: 16px;
-  color: white;
+  @include color(
+    (
+      day: $theme-color-200,
+      sunset: $theme-color-sunset-200,
+      dusk: $theme-color-dusk-600,
+      midnight: $theme-color-midnight-600,
+    )
+  );
   font-size: 12px;
   text-align: center;
   text-transform: capitalize;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
 }
 
 .key-group {
@@ -7220,6 +7233,10 @@ $tooltip-arrow-height: 6px;
   text-transform: capitalize;
   &.wide {
     width: 72px;
+  }
+  &.small {
+    height: 18px;
+    width: 18px;
   }
 }
 

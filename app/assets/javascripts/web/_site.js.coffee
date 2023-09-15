@@ -54,7 +54,7 @@ $.extend feedbin,
 
       li       = $('<li>').addClass('share-option')
       label    = $('<div>').addClass('label').text(item.label)
-      keyboard = $('<i>').addClass('share-keyboard').text(index)
+      keyboard = $('<i>').addClass('share-keyboard key small').text(index)
       link     = $('<a>').attr('href', href)
 
       if "html_options" of item
