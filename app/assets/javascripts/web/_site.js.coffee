@@ -1865,6 +1865,7 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=toggle_dropdown]', (event) ->
         $(".dropdown-wrap li").removeClass('selected')
         parent = $(@).closest('.dropdown-wrap')
+        $('.dropdown-wrap.open').not(parent).removeClass('open')
         if parent.hasClass('open')
           parent.removeClass('open')
         else
