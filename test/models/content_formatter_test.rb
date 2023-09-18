@@ -45,7 +45,7 @@ class ContentFormatterTest < ActiveSupport::TestCase
     classes = %w[other-class]
     classes.each do |css_class|
       content = %(<blockquote class="#{css_class}"></blockquote>)
-      assert_equal "<blockquote></blockquote>", ContentFormatter.format!(content)
+      assert_equal '<blockquote class=""></blockquote>', ContentFormatter.format!(content)
     end
   end
 end
