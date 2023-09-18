@@ -36,11 +36,13 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/html-pipeline.git
-  revision: 9600e9192ae882c3cca0eb86c3b339240caa3634
+  revision: a90dac09c0f6a21a2f469bdd97f7878baf8c5cf8
   branch: feedbin
   specs:
     html-pipeline (2.4.2)
       activesupport (>= 2)
+      addressable
+      loofah
       nokogiri (>= 1.4)
 
 GIT
@@ -180,7 +182,7 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
-    addressable (2.8.4)
+    addressable (2.8.5)
       public_suffix (>= 2.0.2, < 6.0)
     aggregate (0.2.3)
     apnotic (1.7.1)
@@ -381,7 +383,7 @@ GEM
     mime-types-data (3.2023.0218.1)
     mini_magick (4.12.0)
     mini_mime (1.1.2)
-    minitest (5.18.1)
+    minitest (5.20.0)
     minitest-stub-const (0.6)
     minitest-stub_any_instance (1.0.3)
     msgpack (1.7.2)
@@ -403,11 +405,11 @@ GEM
     net-smtp (0.3.3)
       net-protocol
     nio4r (2.5.9)
-    nokogiri (1.15.3-arm64-darwin)
+    nokogiri (1.15.4-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.15.3-x86_64-darwin)
+    nokogiri (1.15.4-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.15.3-x86_64-linux)
+    nokogiri (1.15.4-x86_64-linux)
       racc (~> 1.4)
     oauth (1.1.0)
       oauth-tty (~> 1.0, >= 1.0.1)

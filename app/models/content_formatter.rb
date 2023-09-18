@@ -103,17 +103,21 @@ class ContentFormatter
 
   def _format!(content, entry = nil, image_proxy_enabled = true, base_url = nil)
     context = {
-      whitelist: ALLOWLIST_DEFAULT,
+      scrub_mode: :default,
       embed_url: Rails.application.routes.url_helpers.iframe_embeds_path,
       embed_classes: "iframe-placeholder entry-callout system-content"
     }
-    filters = [HTML::Pipeline::SmileyFilter, HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer, HTML::Pipeline::IframeFilter]
+    if entry && entry.feed.newsletter?
+      context[:scrub_mode] = :newsletter
+    end
+
+    filters = [HTML::Pipeline::SmileyFilter, ContentFilters::Scrub, ContentFilters::Attributes, HTML::Pipeline::SrcFixer, HTML::Pipeline::IframeFilter]
 
     if ENV["CAMO_HOST"] && ENV["CAMO_KEY"] && image_proxy_enabled
       context[:asset_proxy] = ENV["CAMO_HOST"]
       context[:asset_proxy_secret_key] = ENV["CAMO_KEY"]
       context[:asset_src_attribute] = "data-camo-src"
-      filters = filters << HTML::Pipeline::CamoFilter
+      filters.push(HTML::Pipeline::CamoFilter)
     end
 
     if entry || base_url
@@ -124,10 +128,6 @@ class ContentFormatter
       context[:image_subpage_url] = base_url || entry.fully_qualified_url || ""
       context[:href_base_url]     = base_url || entry.base_url
       context[:href_subpage_url]  = base_url || entry.fully_qualified_url || ""
-
-      if entry && entry.feed.newsletter?
-        context[:whitelist] = ALLOWLIST_NEWSLETTER
-      end
     end
 
     filters.unshift(HTML::Pipeline::LazyLoadFilter)
@@ -191,7 +191,7 @@ class ContentFormatter
   end
 
   def _api_format(content, entry)
-    filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, HTML::Pipeline::SanitizationFilter]
+    filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, ContentFilters::Scrub]
     context = {
       image_base_url: entry.base_url,
       image_subpage_url: entry.fully_qualified_url || "",
