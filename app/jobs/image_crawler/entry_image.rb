@@ -3,6 +3,12 @@ module ImageCrawler
     include Sidekiq::Worker
     sidekiq_options retry: false
 
+    IMAGE_SELECTORS = %w[
+      meta[property="twitter:image"]
+      meta[property="og:image"]
+      img iframe video
+    ]
+
     def perform(public_id, image = nil)
       @entry = Entry.find_by_public_id!(public_id)
       @image = image
@@ -61,17 +67,21 @@ module ImageCrawler
     end
 
     def find_image_urls
-      Nokogiri::HTML5(@entry.content).css("img, iframe, video").each_with_object([]) do |element, array|
-        source = case element.name
-        when "img" then element["src"]
-        when "iframe" then element["src"]
-        when "video" then element["poster"]
+      Nokogiri::HTML5(@entry.content)
+        .css(IMAGE_SELECTORS.join(","))
+        .sort_by do |element|
+          IMAGE_SELECTORS.index { element.matches?(_1) }
         end
+        .each_with_object([]) do |element, array|
+          source =      case element.name
+          when "img"    then element["src"]
+          when "iframe" then element["src"]
+          when "video"  then element["poster"]
+          when "meta"   then element["content"]
+          end
 
-        if source.present?
-          array.push @entry.rebase_url(source)
+          array.push(@entry.rebase_url(source)) if source.present?
         end
-      end
     end
 
     def entry=(entry)
