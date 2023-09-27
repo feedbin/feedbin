@@ -193,14 +193,15 @@ class ContentFormatter
   def _api_format(content, entry)
     filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, ContentFilters::Scrub]
     context = {
+      scrub_mode: :default,
       image_base_url: entry.base_url,
       image_subpage_url: entry.fully_qualified_url || "",
       href_base_url: entry.base_url,
       href_subpage_url: entry.fully_qualified_url || ""
     }
-    context[:whitelist] = ALLOWLIST_DEFAULT
+
     if entry.feed.newsletter?
-      context[:whitelist] = ALLOWLIST_NEWSLETTER
+      context[:scrub_mode] = :newsletter
     end
     pipeline = HTML::Pipeline.new filters, context
     result = pipeline.call(content)

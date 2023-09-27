@@ -16,7 +16,6 @@ module ContentFilters
     def tables
       Loofah::Scrubber.new do |node|
         if TABLE_ELEMENTS.include?(node.name)
-          node.name = "div"
           node.keys.each do |attribute|
             node.delete attribute
           end
