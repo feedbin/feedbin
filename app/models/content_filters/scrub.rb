@@ -1,7 +1,8 @@
 module ContentFilters
-  TABLE_ELEMENTS = %w[table thead tbody tfoot tr td]
-
   class Scrub < HTML::Pipeline::Filter
+
+    TABLE_ELEMENTS = %w[table thead tbody tfoot tr td]
+
     def call
       doc
         .scrub!(:prune)
@@ -16,6 +17,7 @@ module ContentFilters
     def tables
       Loofah::Scrubber.new do |node|
         if TABLE_ELEMENTS.include?(node.name)
+          node.name = "div"
           node.keys.each do |attribute|
             node.delete attribute
           end
