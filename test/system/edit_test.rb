@@ -25,6 +25,8 @@ class EditTest < ApplicationSystemTestCase
       click_link feed_name
     end
 
+    wait_for_ajax
+
     assert_equal feed_name, @user.subscriptions.where(feed: @feed).first.title
   end
 
@@ -76,6 +78,8 @@ class EditTest < ApplicationSystemTestCase
     wait_for_ajax
 
     click_link new_search_name
+
+    wait_for_ajax
 
     assert_equal new_search_name, search.reload.name
   end

@@ -18,7 +18,7 @@ class SearchTest < ApplicationSystemTestCase
 
     wait_for_ajax
 
-    find("[data-search-token-index-param='1']").click
+    all("[data-search-token-index-param]")[1].click
 
     wait_for_ajax
 
