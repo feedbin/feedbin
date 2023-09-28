@@ -191,7 +191,7 @@ class ContentFormatter
   end
 
   def _api_format(content, entry)
-    filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, ContentFilters::Scrub]
+    filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, ContentFilters::Scrub, ContentFilters::Attributes]
     context = {
       scrub_mode: :default,
       image_base_url: entry.base_url,
