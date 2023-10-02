@@ -425,6 +425,41 @@ ALTER SEQUENCE public.devices_id_seq OWNED BY public.devices.id;
 
 
 --
+-- Name: discovered_feeds; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.discovered_feeds (
+    id bigint NOT NULL,
+    title text,
+    site_url text,
+    feed_url text,
+    host text,
+    verified_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: discovered_feeds_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.discovered_feeds_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: discovered_feeds_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.discovered_feeds_id_seq OWNED BY public.discovered_feeds.id;
+
+
+--
 -- Name: embeds; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -642,7 +677,9 @@ CREATE TABLE public.import_items (
     updated_at timestamp without time zone NOT NULL,
     item_type character varying(255),
     status bigint DEFAULT 0 NOT NULL,
-    error jsonb
+    error jsonb,
+    site_url text,
+    host text
 );
 
 
@@ -1172,7 +1209,8 @@ CREATE TABLE public.subscriptions (
     media_only boolean DEFAULT false,
     kind bigint DEFAULT 0,
     view_mode bigint DEFAULT 0,
-    show_status bigint DEFAULT 0 NOT NULL
+    show_status bigint DEFAULT 0 NOT NULL,
+    fix_status bigint DEFAULT 0
 );
 
 
@@ -1580,6 +1618,13 @@ ALTER TABLE ONLY public.devices ALTER COLUMN id SET DEFAULT nextval('public.devi
 
 
 --
+-- Name: discovered_feeds id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.discovered_feeds ALTER COLUMN id SET DEFAULT nextval('public.discovered_feeds_id_seq'::regclass);
+
+
+--
 -- Name: embeds id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1875,6 +1920,14 @@ ALTER TABLE ONLY public.deleted_users
 
 ALTER TABLE ONLY public.devices
     ADD CONSTRAINT devices_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: discovered_feeds discovered_feeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.discovered_feeds
+    ADD CONSTRAINT discovered_feeds_pkey PRIMARY KEY (id);
 
 
 --
@@ -2234,6 +2287,13 @@ CREATE UNIQUE INDEX index_devices_on_lower_tokens ON public.devices USING btree 
 --
 
 CREATE INDEX index_devices_on_user_id ON public.devices USING btree (user_id);
+
+
+--
+-- Name: index_discovered_feeds_on_site_url_and_feed_url; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_discovered_feeds_on_site_url_and_feed_url ON public.discovered_feeds USING btree (site_url, feed_url);
 
 
 --
@@ -3148,6 +3208,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221222204921'),
 ('20230101160218'),
 ('20230130211416'),
-('20230510215256');
+('20230510215256'),
+('20230706165756'),
+('20230706174643'),
+('20230715134526');
 
 
