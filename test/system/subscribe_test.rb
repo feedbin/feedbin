@@ -12,6 +12,7 @@ class SubscribeTest < ApplicationSystemTestCase
 
     within(".modal-purpose-subscribe") do
       page.execute_script("$('.modal-purpose-subscribe [data-behavior~=feeds_search]').submit()")
+      wait_for_ajax
       find("[data-behavior~=subscription_options]")
       click_button "Add"
     end

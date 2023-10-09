@@ -50,7 +50,7 @@
                       <%= render App::SearchButtonComponent.new %>
                     </div>
                 </div>
-                <%= render partial: "shared/search_form" %>
+                <%= render App::SearchFormComponent.new(params: params) %>
                 <div class="entries">
                     <ul data-behavior="entries_target" class="entries-target"></ul>
                 </div>

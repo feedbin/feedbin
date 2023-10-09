@@ -49,7 +49,9 @@ class User < ApplicationRecord
     :entries_width,
     :billing_issue,
     :podcast_sort_order,
-    :playlist_migration
+    :playlist_migration,
+    :fix_feeds_flag,
+    :fix_feeds_available
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -57,6 +59,7 @@ class User < ApplicationRecord
   has_many :feeds, through: :subscriptions
   has_many :entries, through: :feeds
   has_many :imports, dependent: :destroy
+  has_many :import_items, through: :imports
   has_many :billing_events, as: :billable, dependent: :delete_all
   has_many :taggings, dependent: :delete_all
   has_many :tags, through: :taggings
@@ -173,6 +176,14 @@ class User < ApplicationRecord
 
   def setting_on?(setting_symbol)
     send(setting_symbol) == "1"
+  end
+
+  def setting_on!(setting_symbol)
+    update(setting_symbol => "1")
+  end
+
+  def setting_off!(setting_symbol)
+    update(setting_symbol => "0")
   end
 
   def subscribed_to_emails?

@@ -12,6 +12,11 @@ class Source
     source.feeds
   end
 
+  def self.options(*args)
+    source = new(*args)
+    source.options
+  end
+
   def document
     @document ||= begin
       parsed = response.parse(validate: false)

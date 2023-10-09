@@ -32,7 +32,8 @@ module Shared
           subtitle: "Manage feeds",
           url: helpers.settings_subscriptions_path,
           icon: "menu-icon-subscriptions",
-          selected: helpers.is_active?(["settings/subscriptions"], %w[index edit])
+          selected: helpers.is_active?(["settings/subscriptions", "fix_feeds"], %w[index edit]),
+          notification: helpers.current_user.setting_on?(:fix_feeds_available)
         ))
         render(::SettingsNav::NavComponent.new(
           title: "Sources",
@@ -73,15 +74,6 @@ module Shared
           selected: helpers.is_active?(["settings/imports"], %w[index show]),
           icon: "menu-icon-import-export"
         ))
-        if @user.try(:account_migrations)&.exists?
-          render(::SettingsNav::NavComponent.new(
-            title: "Account Migration",
-            subtitle: "Howdy, Feed Wrangler",
-            url: helpers.account_migrations_path,
-            selected: helpers.is_active?("account_migrations", "index"),
-            icon: "menu-icon-migration"
-          ))
-        end
       end
 
       render ::SettingsNav::HeaderComponent.new do

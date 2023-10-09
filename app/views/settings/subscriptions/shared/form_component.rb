@@ -10,12 +10,10 @@ module Settings
         end
 
         def template
-          form_with model: subscription, url: settings_subscription_path, data: { remote: true } do |f|
-            helpers.present subscription do |subscription_presenter|
-              feed_profile(subscription_presenter)
-              chart(subscription_presenter)
-              settings(subscription_presenter, f)
-            end
+          helpers.present subscription do |subscription_presenter|
+            feed_profile(subscription_presenter)
+            chart(subscription_presenter)
+            settings(subscription_presenter)
           end
         end
 
@@ -23,21 +21,23 @@ module Settings
           div(class: "border rounded-lg mb-14") do
             div(class: "flex items-center gap-2 p-4") do
               plain subscription_presenter.favicon(subscription.feed)
-              span(data_behavior: "user_title", class: "truncate text-lg") do
+              span(data_behavior: "user_title", class: "truncate text-lg mr-6") do
                 subscription.title
               end
               link_to "Edit", edit_subscription_path(subscription.feed), remote: true, class: "button button-secondary !ml-auto", data: { behavior: "open_settings_modal feed_settings", modal_target: "edit" }
             end
             if subscription.feed.twitter_feed?
               twitter_notice
+            elsif subscription.feed.crawl_error? && @subscription.user.setting_on?(:fix_feeds_flag)
+              error_notice
             end
           end
         end
 
         def twitter_notice
           div(class: "border-t flex gap-2 p-4") do
-            div(class: "pt-1") do
-              render SvgComponent.new "icon-error-message-small", class: "fill-red-600"
+            div(class: "pt-1 shrink-0 flex flex-center w-[20px] h-[20px]") do
+              render SvgComponent.new "menu-icon-skull", class: "fill-600"
             end
             div do
               p(class: "text-red-600") { "Twitter Not Supported" }
@@ -45,6 +45,54 @@ module Settings
                 plain "Feedbin "
                 a( href: "https://feedbin.com/blog/2023/03/30/twitter-access-revoked/" ) { "no longer has access" }
                 plain " to the Twitter API."
+              end
+            end
+          end
+        end
+
+        def error_notice
+          div(class: "border-t p-4", id: helpers.dom_id(@subscription, :fixable)) do
+            div(class: "flex gap-2") do
+              div(class: "pt-1 shrink-0 flex flex-center w-[20px] h-[20px]") do
+                if @subscription.feed.discovered_feeds.present?
+                  render SvgComponent.new "menu-icon-fix-feeds", class: "fill-600 mt-0.5"
+                else
+                  render SvgComponent.new "menu-icon-skull", class: "fill-600"
+                end
+              end
+              div(class: "grow") do
+                p(class: "flex gap-2 items-baseline") do
+                  span class: "block grow" do
+                    span(title: @subscription.feed.crawl_error_message, data: {toggle: "tooltip"}) do
+                      if @subscription.feed.discovered_feeds.present?
+                        "Fixable Feed"
+                      else
+                        span(class: "text-red-600") do
+                          "Crawl Error"
+                        end
+                      end
+                    end
+                  end
+
+                  if !@subscription.feed.discovered_feeds.present? && @subscription.feed.last_published_entry.respond_to?(:to_formatted_s)
+                    span(class: "text-500 text-sm") do
+                      plain "Last worked: "
+                      plain @subscription.feed.last_published_entry&.to_formatted_s(:month_year)
+                    end
+                  end
+                end
+                p(class: "text-500 text-sm") do
+                  plain "Feedbin is unable to download this feed."
+                  if @subscription.feed.discovered_feeds.present?
+                    plain " However, it looks like there may be a working alternative available."
+                  end
+                end
+
+                if @subscription.feed.discovered_feeds.present?
+                  div(class: "mt-4") do
+                    render FixFeeds::SuggestionComponent.new(replaceable: @subscription, source: @subscription.feed, redirect: helpers.edit_settings_subscription_url(@subscription), remote: false)
+                  end
+                end
               end
             end
           end
@@ -97,142 +145,145 @@ module Settings
           end
         end
 
-        def settings(subscription_presenter, f)
-          render Settings::ControlGroupComponent.new class: "mb-14" do |group|
-            group.header { plain " Stats " }
+        def settings(subscription_presenter)
+          form_with model: subscription, url: settings_subscription_path, data: { remote: true } do |form|
 
-            group.item do
-              render Settings::ControlRowComponent.new do |row|
-                row.title { "Subscribed" }
+            render Settings::ControlGroupComponent.new class: "mb-14" do |group|
+              group.header { plain " Stats " }
 
-                row.control do
-                  span(class: "text-500") do
-                    subscription.created_at.to_formatted_s(:date)
-                  end
-                end
-              end
-            end
-
-            group.item do
-              render Settings::ControlRowComponent.new do |row|
-                row.title do
-                  plain " Latest "
-                  if subscription.feed.twitter_feed?
-                    plain " Tweet "
-                  else
-                    plain " Article "
-                  end
-                end
-
-                row.control do
-                  span(class: "text-500") do
-                    plain subscription.feed.try(:last_published_entry).try(:to_s, :date) || "N/A"
-                  end
-                end
-              end
-            end
-
-            group.item do
-              render Settings::ControlRowComponent.new do |row|
-                row.title { "Volume" }
-
-                row.control do
-                  span(class: "text-500") do
-                    plain subscription_presenter.graph_volume
-                    if subscription.feed.twitter_feed?
-                      plain " tweet".pluralize(subscription_presenter.graph_volume)
-                      plain " / month "
-                    else
-                      plain " article".pluralize(subscription_presenter.total_posts)
-                      plain " / month "
-                    end
-                  end
-                end
-              end
-            end
-
-            unless subscription.feed.twitter_feed?
               group.item do
                 render Settings::ControlRowComponent.new do |row|
-                  row.title { "Website" }
+                  row.title { "Subscribed" }
 
                   row.control do
-                    a(href: subscription.feed.site_url, class: "!text-500 truncate" ) { helpers.short_url(subscription.feed.site_url) }
-                  end
-                end
-              end
-            end
-
-            group.item do
-              render Settings::ControlRowComponent.new do |row|
-                row.title { "Source" }
-
-                row.control do
-                  a( href: subscription.feed.feed_url, class: "!text-500 truncate" ) { helpers.short_url(subscription.feed.feed_url) }
-                end
-              end
-            end
-          end
-
-          render Settings::ControlGroupComponent.new class: "mb-14" do |group|
-            group.header { "Options" }
-
-            group.item do
-              f.check_box :muted, class: "peer", data: { behavior: "auto_submit" }, id: "subscription_muted"
-              f.label :muted, class: "group" do
-                render Settings::ControlRowComponent.new do |row|
-                  row.title { "Muted" }
-                  row.control { render Form::SwitchComponent.new }
-                end
-              end
-            end
-
-            group.item do
-              f.check_box :show_updates, class: "peer", data: { behavior: "auto_submit" }, id: "subscription_show_updates"
-              f.label :show_updates, class: "group" do
-                render Settings::ControlRowComponent.new do |row|
-                  row.title { "Show Updates" }
-
-                  row.description do
-                    "Tells you when an article has been changed after being published"
-                  end
-
-                  row.control { render Form::SwitchComponent.new }
-                end
-              end
-            end
-
-            if subscription.feed.twitter_feed?
-              group.item do
-                f.check_box :show_retweets, class: "peer", data: { behavior: "auto_submit" }, id: "subscription_show_retweets"
-
-                f.label :show_retweets, class: "group" do
-                  render Settings::ControlRowComponent.new do |row|
-                    row.title { "Show Retweets" }
-                    row.control { render Form::SwitchComponent.new }
-                  end
-                end
-              end
-
-              group.item do
-                f.check_box :media_only, class: "peer", data: { behavior: "auto_submit" }, id: "subscription_media_only"
-                f.label :media_only, class: "group" do
-                  render Settings::ControlRowComponent.new do |row|
-                    row.title { "Media Only" }
-
-                    row.description do
-                      "Only show tweets that contain links or images"
+                    span(class: "text-500") do
+                      subscription.created_at.to_formatted_s(:date)
                     end
-
-                    row.control { render Form::SwitchComponent.new }
                   end
                 end
               end
-            else
+
               group.item do
                 render Settings::ControlRowComponent.new do |row|
                   row.title do
-                    link_to "Refresh Favicon", refresh_favicon_settings_subscription_path( subscription ), remote: true, method: :post
+                    plain " Latest "
+                    if subscription.feed.twitter_feed?
+                      plain " Tweet "
+                    else
+                      plain " Article "
+                    end
+                  end
+
+                  row.control do
+                    span(class: "text-500") do
+                      plain subscription.feed.try(:last_published_entry).try(:to_s, :date) || "N/A"
+                    end
+                  end
+                end
+              end
+
+              group.item do
+                render Settings::ControlRowComponent.new do |row|
+                  row.title { "Volume" }
+
+                  row.control do
+                    span(class: "text-500") do
+                      plain subscription_presenter.graph_volume
+                      if subscription.feed.twitter_feed?
+                        plain " tweet".pluralize(subscription_presenter.graph_volume)
+                        plain " / month "
+                      else
+                        plain " article".pluralize(subscription_presenter.total_posts)
+                        plain " / month "
+                      end
+                    end
+                  end
+                end
+              end
+
+              unless subscription.feed.twitter_feed?
+                group.item do
+                  render Settings::ControlRowComponent.new do |row|
+                    row.title { "Website" }
+
+                    row.control do
+                      a(href: subscription.feed.site_url, class: "!text-500 truncate" ) { helpers.short_url(subscription.feed.site_url) }
+                    end
+                  end
+                end
+              end
+
+              group.item do
+                render Settings::ControlRowComponent.new do |row|
+                  row.title { "Source" }
+
+                  row.control do
+                    a( href: subscription.feed.feed_url, class: "!text-500 truncate" ) { helpers.short_url(subscription.feed.feed_url) }
+                  end
+                end
+              end
+            end
+
+            render Settings::ControlGroupComponent.new class: "mb-14" do |group|
+              group.header { "Options" }
+
+              group.item do
+                form.check_box :muted, class: "peer", data: { behavior: "auto_submit" }, id: "subscription_muted"
+                form.label :muted, class: "group" do
+                  render Settings::ControlRowComponent.new do |row|
+                    row.title { "Muted" }
+                    row.control { render Form::SwitchComponent.new }
+                  end
+                end
+              end
+
+              group.item do
+                form.check_box :show_updates, class: "peer", data: { behavior: "auto_submit" }, id: "subscription_show_updates"
+                form.label :show_updates, class: "group" do
+                  render Settings::ControlRowComponent.new do |row|
+                    row.title { "Show Updates" }
+
+                    row.description do
+                      "Tells you when an article has been changed after being published"
+                    end
+
+                    row.control { render Form::SwitchComponent.new }
+                  end
+                end
+              end
+
+              if subscription.feed.twitter_feed?
+                group.item do
+                  form.check_box :show_retweets, class: "peer", data: { behavior: "auto_submit" }, id: "subscription_show_retweets"
+
+                  form.label :show_retweets, class: "group" do
+                    render Settings::ControlRowComponent.new do |row|
+                      row.title { "Show Retweets" }
+                      row.control { render Form::SwitchComponent.new }
+                    end
+                  end
+                end
+
+                group.item do
+                  form.check_box :media_only, class: "peer", data: { behavior: "auto_submit" }, id: "subscription_media_only"
+                  form.label :media_only, class: "group" do
+                    render Settings::ControlRowComponent.new do |row|
+                      row.title { "Media Only" }
+
+                      row.description do
+                        "Only show tweets that contain links or images"
+                      end
+
+                      row.control { render Form::SwitchComponent.new }
+                    end
+                  end
+                end
+              else
+                group.item do
+                  render Settings::ControlRowComponent.new do |row|
+                    row.title do
+                      link_to "Refresh Favicon", refresh_favicon_settings_subscription_path( subscription ), remote: true, method: :post
+                    end
                   end
                 end
               end

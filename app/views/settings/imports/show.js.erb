@@ -1,4 +1,5 @@
-$("[data-content-src='<%= j settings_import_path(@import) %>']").html('<%= j render partial: "status" %>');
+$("[data-content-src='<%= j settings_import_path(@import) %>']").html("<%= j render Settings::Imports::StatusComponent.new(import: @import) %>");
+
 feedbin.faviconColors()
 <% if @import.complete? %>
 clearInterval(feedbin.remoteContentIntervals["<%= j request.path_info %>"]);

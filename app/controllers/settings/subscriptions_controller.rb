@@ -1,6 +1,7 @@
 class Settings::SubscriptionsController < ApplicationController
   def index
     @user = current_user
+    @user.setting_off!(:fix_feeds_available)
     @subscriptions = subscriptions_with_sort_data.paginate(page: params[:page], per_page: 50)
     store_location
 
@@ -100,11 +101,17 @@ class Settings::SubscriptionsController < ApplicationController
 
   def subscriptions_with_sort_data
     dates = @user.subscriptions.order(updated_at: :asc).pluck(:updated_at)
+    dates += @user.feeds.includes(:discovered_feeds).map { _1.discovered_feeds.pluck(:updated_at).flatten.sort }
     key = Digest::SHA1.hexdigest(dates.join)
 
     subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}", expires_in: 24.hours) {
       tags = @user.tags_on_feed
-      subscriptions = @user.subscriptions.default.select("subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host").joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}").includes(feed: [:favicon])
+      subscriptions = @user
+        .subscriptions
+        .default
+        .select("subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host")
+        .joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}")
+        .includes(feed: [:favicon, :discovered_feeds])
       feed_ids = subscriptions.map(&:feed_id)
 
       start_date = 29.days.ago

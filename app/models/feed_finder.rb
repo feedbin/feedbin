@@ -63,6 +63,20 @@ class FeedFinder
     end
   end
 
+  def find_options
+    feeds = []
+
+    if feeds.empty?
+      feeds = Source::MetaLinks.options(response)
+    end
+
+    if feeds.empty?
+      feeds = Source::BodyLinks.options(response)
+    end
+
+    feeds
+  end
+
   def import_mode?
     import_mode
   end

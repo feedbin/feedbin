@@ -12,7 +12,7 @@ module Settings
       div(**@options) do
         render(@header) if @header
         if @items.present?
-          div(class: "border-y group-data-[capsule=true]:border group-data-[capsule=true]:rounded-lg", data: {item_container: "true"}) do
+          div(class: "border-y flex flex-col group-data-[capsule=true]:border group-data-[capsule=true]:rounded-lg group-data-[item-capsule=true]:border-0 group-data-[item-capsule=true]:gap-2", data: {item_container: "true"}) do
             @items.each {render _1}
           end
         end
@@ -40,7 +40,7 @@ module Settings
       private
 
       def attributes
-        mix({class: "border-b last:border-b-0", data: {item: "true"}}, @attributes)
+        mix({class: "border-b last:border-b-0 group-data-[item-capsule=true]:border-0", data: {item: "true"}}, @attributes)
       end
     end
   end

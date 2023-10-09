@@ -1,13 +1,14 @@
 module SettingsNav
   class NavComponent < ApplicationComponent
 
-    def initialize(title:, subtitle: nil, url:, icon:, selected: false, classes: nil)
+    def initialize(title:, subtitle: nil, url:, icon:, selected: false, classes: nil, notification: false)
       @title = title
       @subtitle = subtitle
       @url = url
       @icon = icon
       @selected = selected
       @classes = classes
+      @notification = notification
     end
 
     def template(&)
@@ -17,12 +18,15 @@ module SettingsNav
             render SvgComponent.new(@icon, inline: true, class: "fill-600 group-data-selected:fill-white")
           end
           span do
-            span(class: "block leading-[17px] mb-1 group-data-selected:text-white") do
-              plain @title
+            span(class: "flex gap-1 leading-[17px] mb-1 group-data-selected:text-white") do
+              span  { @title }
+              if @notification
+                span class: "block rounded-full h-[8px] w-[8px] bg-red-600 group-data-selected:bg-white"
+              end
             end
             if @subtitle.present?
               span(class: "block text-sm text-500 group-data-selected:text-white/70 group-data-[nav=dropdown]:text-xs" ) do
-                plain @subtitle
+                @subtitle
               end
             end
           end

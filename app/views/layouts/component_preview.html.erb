@@ -9,7 +9,7 @@
 <body>
   <% %w[day dusk sunset midnight].each do |theme| %>
   <h2 class="font-bold my-4 mx-6"><%= theme.titleize %></h2>
-  <div class="theme-<%= theme %> bg-0 p-6 shadow-xl m-6 border rounded-xl text-600">
+  <div class="theme-<%= theme %> bg-base p-6 shadow-xl m-6 border rounded-xl text-600">
     <%= yield %>
   </div>
   <% end %>

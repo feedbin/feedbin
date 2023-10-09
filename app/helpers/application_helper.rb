@@ -106,6 +106,10 @@ module ApplicationHelper
 
   def favicon_with_host(host, generated: false)
     record = Favicon.find_by(host: host)
+    favicon_with_record(record, host: host, generated: generated)
+  end
+
+  def favicon_with_record(record, host:, generated: false)
     if record && record.url.present?
       favicon_template(record.cdn_url)
     elsif generated

@@ -24,12 +24,13 @@ module.exports = {
       boxShadow: {
         "one": "0 1px 1px 0 var(--color-shadow-100)",
         "two": "0px 4px 6px 2px var(--color-shadow-100)",
+        "selected": "0px 0px 0px 1px var(--color-blue-600)",
       },
       borderColor: {
         DEFAULT: "var(--border-color)",
       },
       colors: {
-        0:       "var(--color-0)",
+        base:    "var(--color-base)",
         100:     "var(--color-100)",
         200:     "var(--color-200)",
         300:     "var(--color-300)",

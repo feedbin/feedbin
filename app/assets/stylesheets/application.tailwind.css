@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root, .theme-day, .theme-auto.prefers-light {
-    --color-0: #ffffff;
+    --color-base: #ffffff;
     --color-100:  #f5f5f7;
     --color-200:  #e9e9eb;
     --color-300:  #bdbfc3;
@@ -16,7 +16,7 @@
 }
 
 .theme-sunset {
-    --color-0: #f5f2eb;
+    --color-base: #f5f2eb;
     --color-100:  #ebe8e2;
     --color-200:  #dfdcd6;
     --color-300:  #b8b6b0;
@@ -29,7 +29,7 @@
 }
 
 .theme-dusk, .theme-auto.prefers-dark {
-    --color-0: #262626;
+    --color-base: #262626;
     --color-100:  #2d2d2d;
     --color-200:  #353535;
     --color-300:  #4d4d4d;
@@ -42,7 +42,7 @@
 }
 
 .theme-midnight {
-    --color-0: #000000;
+    --color-base: #000000;
     --color-100:  #141414;
     --color-200:  #242424;
     --color-300:  #3b3b3b;
@@ -76,7 +76,7 @@
 
 .theme-dusk, .theme-midnight, .theme-auto.prefers-dark {
   --color-light-100:  var(--color-600);
-  --color-sidebar:    var(--color-0);
+  --color-sidebar:    var(--color-base);
   --color-shadow-100: rgba(0,0,0,0.5);
   --color-link:       #ffffff;
 
@@ -91,7 +91,7 @@ a flash of the default theme before prefers-dark class is applied
 */
 @media (prefers-color-scheme: dark) {
   .theme-auto {
-    --color-0: #262626;
+    --color-base: #262626;
     --color-100:  #2d2d2d;
     --color-200:  #353535;
     --color-300:  #4d4d4d;
@@ -103,7 +103,7 @@ a flash of the default theme before prefers-dark class is applied
     --border-color: #000000;
 
     --color-light-100:  var(--color-600);
-    --color-sidebar:    var(--color-0);
+    --color-sidebar:    var(--color-base);
     --color-shadow-100: rgba(0,0,0,0.5);
     --color-link:       #ffffff;
 
@@ -114,7 +114,7 @@ a flash of the default theme before prefers-dark class is applied
 }
 
 .StripeElement--focus {
-  @apply border-blue-600 shadow-[0_0_0_1px_theme(colors.blue.600)];
+  @apply border-blue-600 shadow-selected
 }
 
 input[type="search"]::-webkit-search-decoration,
@@ -182,11 +182,11 @@ input[type="search"]::-webkit-search-cancel-button {
   textarea,
   select,
   .text-input {
-    @apply leading-[42px] py-0 px-2 shadow-one bg-transparent w-full text-sm rounded-md text-600 ring-0 block grow appearance-none border border-400 transition-[border,box_shadow] duration-200
+    @apply leading-[42px] py-0 px-2 shadow-one bg-transparent w-full text-sm rounded-md text-600 ring-base block grow appearance-none border border-400 transition-[border,box_shadow] duration-200
     placeholder:text-500
     disabled:bg-100 disabled:text-400 disabled:border-200 disabled:shadow-none
-    focus:outline-none focus:outline-transparent focus:text-700 focus:border-blue-600 focus:shadow-[0_0_0_1px_theme(colors.blue.600)]
-    data-[focused]:text-700 data-[focused]:border-blue-600 data-[focused]:shadow-[0_0_0_1px_theme(colors.blue.600)];
+    focus:outline-none focus:outline-transparent focus:text-700 focus:border-blue-600 focus:shadow-selected
+    data-[focused]:text-700 data-[focused]:border-blue-600 data-[focused]:shadow-selected
   }
   textarea:focus,
   select:focus,
@@ -202,9 +202,9 @@ input[type="search"]::-webkit-search-cancel-button {
     @apply leading-normal py-[10px] pb-[11px];
   }
   select option {
-    @apply bg-0 text-700;
+    @apply bg-base text-700;
   }
-  .button, .button-secondary, .button-tertiary, .button-huge {
+  .button, .button-secondary, .button-tertiary, .button-huge, .tab {
     @apply text-sm font-medium relative inline-flex items-center justify-center gap-2 border border-blue-600 whitespace-nowrap leading-[42px] px-6 rounded-md !text-white bg-blue-600 transition transition-[box_shadow]
            disabled:bg-100 disabled:!text-400 disabled:border-100
            before:content-[""] before:opacity-0 before:block before:border-2 before:border-blue-400 before:absolute before:pointer-events-none before:top-[-4px] before:right-[-4px] before:bottom-[-4px] before:left-[-4px] before:rounded-[8px] before:transition before:duration-200
@@ -217,10 +217,10 @@ input[type="search"]::-webkit-search-cancel-button {
     @apply shadow-none bg-blue-700 border-blue-700 scale-[0.99] disabled:!bg-100 disabled:!border-100 disabled:!scale-100;
   }
 
-  .button-secondary {
+  .button-secondary, .tab {
     @apply border border-400 bg-transparent !text-700;
   }
-  .button-secondary:active, .button-huge:active  {
+  .button-secondary:active, .button-huge:active, .tab:active  {
     @apply bg-100 border-400;
   }
   .button-tertiary {
@@ -237,6 +237,11 @@ input[type="search"]::-webkit-search-cancel-button {
   }
   .button-text {
     @apply !no-underline;
+  }
+  .tab {
+    @apply rounded-none rounded-t-md border-200 border-b-0 !text-500 leading-[40px] relative top-[2px] px-8 border-400 !text-600
+           data-selected:border-b data-selected:border-b-base data-selected:!text-700
+           data-selected:leading-[42px] data-selected:top-[1px];
   }
 }
 

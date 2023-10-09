@@ -60,6 +60,11 @@ Rails.application.routes.draw do
       patch :start
     end
   end
+  resources :fix_feeds, path: "settings/subscriptions/fix" do
+    collection do
+      post :replace_all
+    end
+  end
   resources :saved_searches, only: [:show, :update, :destroy, :create, :edit, :new] do
     collection do
       get :count
@@ -161,7 +166,13 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :imports, only: [:create, :show]
+    resources :imports, only: [:create, :show] do
+      member do
+        post :replace_all
+      end
+    end
+
+    resources :import_items, only: [:update]
     get :import_export, to: "imports#index"
 
     get :billing, to: "billings#index"
