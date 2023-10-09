@@ -75,6 +75,8 @@ class FeedFixer
     end
 
     option if option.valid? && valid_entries.present?
+  rescue
+    false
   end
 
   def build
