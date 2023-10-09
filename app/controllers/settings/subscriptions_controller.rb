@@ -104,7 +104,7 @@ class Settings::SubscriptionsController < ApplicationController
     dates += @user.feeds.includes(:discovered_feeds).map { _1.discovered_feeds.pluck(:updated_at).flatten.sort }
     key = Digest::SHA1.hexdigest(dates.join)
 
-    subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}", expires_in: 24.hours) {
+    subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}:v2", expires_in: 24.hours) {
       tags = @user.tags_on_feed
       subscriptions = @user
         .subscriptions
