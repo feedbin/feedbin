@@ -627,8 +627,12 @@ $.extend feedbin,
     else
       innerContent.html(content)
 
-  updateFeeds: (feeds) ->
-    $('[data-behavior~=feeds_target]').html(feeds)
+  updateFeeds: (feeds, digest) ->
+    if feedbin.feedsDigest != digest
+      feedbin.feedsDigest = digest
+      $('[data-behavior~=feeds_target]').html(feeds)
+    else
+      false
 
   clearEntries: ->
     $('[data-behavior~=entries_target]').html('')
