@@ -225,10 +225,7 @@ class EntryPresenter < BasePresenter
       clean_author = @template.strip_tags(entry.author)
     elsif entry.data&.safe_dig("json_feed", "authors").respond_to?(:map)
       authors = entry.data.safe_dig("json_feed", "authors").map {|a| @template.strip_tags(a["name"]) }
-      if authors.length > 1
-        authors[-1] = "and #{authors[-1]}"
-      end
-      clean_author = authors.join(", ")
+      clean_author = authors.to_sentence
     else
       clean_author = ""
     end
