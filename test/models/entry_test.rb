@@ -64,4 +64,13 @@ class EntryTest < ActiveSupport::TestCase
     @entry.url = "/test"
     assert_equal("http://daringfireball.net/test", @entry.fully_qualified_url)
   end
+
+  test "should use JSON feed author" do
+    @entry.update(data: {
+      json_feed: {
+        authors: [{name: "Robert Nemiroff"}, {name: "Jerry Bonnell"}]
+      }
+    })
+    assert_equal("Robert Nemiroff and Jerry Bonnell", @entry.reload.author)
+  end
 end
