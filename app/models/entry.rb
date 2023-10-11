@@ -78,10 +78,7 @@ class Entry < ApplicationRecord
     authors = json_feed.safe_dig("authors")
     return authors unless authors.respond_to?(:filter_map)
     authors = authors.filter_map { _1&.safe_dig("name") }
-    if authors.length > 1
-      authors[-1] = "and #{authors[-1]}"
-    end
-    authors.join(", ")
+    authors.to_sentence
   rescue
     nil
   end
