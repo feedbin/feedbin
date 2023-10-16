@@ -14,7 +14,7 @@ module Searchable
 
     def self.saved_search_count(user)
       saved_searches = user.saved_searches
-      if saved_searches.length < 10
+      if saved_searches.length < 50
         unread_entries = user.unread_entries.pluck(:entry_id)
         searches = build_multi_search(user, saved_searches)
         records = searches.map { Search::MultiSearchRecord.new(query: _1.query) }
