@@ -37,7 +37,7 @@ module SidekiqHelper
   end
 
   def add_to_queue(queue, id)
-    Sidekiq.redis { |redis| redis.sadd?(queue, id) }
+    Sidekiq.redis { _1.sadd(queue, id) } == 1
   end
 
   def dequeue_ids(queue)
@@ -52,7 +52,7 @@ module SidekiqHelper
     end
 
     ids
-  rescue Redis::CommandError => exception
+  rescue RedisClient::CommandError => exception
     if exception.message =~ /no such key/i
       logger.info("Nothing to do")
       return nil

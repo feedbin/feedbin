@@ -33,7 +33,7 @@ module FeedCrawler
 
     def increment
       Librato.increment "refresh_feeds"
-      Sidekiq.redis { |client| client.incr(COUNT_KEY) }
+      Sidekiq.redis { _1.incr(COUNT_KEY) }
     end
 
     def report
@@ -44,7 +44,7 @@ module FeedCrawler
 
     def count
       @count ||= begin
-        result = Sidekiq.redis { |client| client.get(COUNT_KEY) } || 0
+        result = Sidekiq.redis { _1.get(COUNT_KEY) } || 0
         result.to_i
       end
     end

@@ -58,7 +58,7 @@ class SendStats
   end
 
   def redis_stats
-    redis_info = Sidekiq.redis { |c| c.info }
+    redis_info = Sidekiq.redis { _1.info }
     Librato.group "redis" do |group|
       group.measure("connected_clients", redis_info["connected_clients"].to_f)
       group.measure("used_memory", redis_info["used_memory"].to_f / MEGABYTE)

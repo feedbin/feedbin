@@ -304,7 +304,7 @@ class User < ApplicationRecord
     token = generate_token(:password_reset_token, nil, true)
     self.password_reset_sent_at = Time.now
     save!
-    UserMailer.delay(queue: :default_critical).password_reset(id, token)
+    UserMailer.password_reset(id, token).deliver_later
   end
 
   def create_customer

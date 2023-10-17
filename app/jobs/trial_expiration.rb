@@ -10,7 +10,7 @@ class TrialExpiration
   def expire_prepaid_users
     user_ids = expire_plan("timed")
     user_ids.each do |user_id|
-      UserMailer.delay.timed_plan_expiration(user_id)
+      UserMailer.timed_plan_expiration(user_id).deliver_later
     end
   end
 
