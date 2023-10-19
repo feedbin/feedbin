@@ -6,6 +6,9 @@ module ContentFilters
       doc.search("[style]").each do |element|
         element.delete("style")
       end
+      doc.search("[align]").each do |element|
+        element.delete("align")
+      end
       doc.search("[class]").each do |element|
         classes = (element["class"] || "").split
         classes = classes & ALLOWED_CLASSES
