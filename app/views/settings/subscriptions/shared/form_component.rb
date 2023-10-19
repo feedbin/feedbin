@@ -176,7 +176,7 @@ module Settings
 
                   row.control do
                     span(class: "text-500") do
-                      plain subscription.feed.try(:last_published_entry).try(:to_s, :date) || "N/A"
+                      plain subscription.feed.try(:last_published_entry).try(:to_formatted_s, :date) || "N/A"
                     end
                   end
                 end

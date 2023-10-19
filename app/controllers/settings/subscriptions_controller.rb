@@ -104,7 +104,7 @@ class Settings::SubscriptionsController < ApplicationController
     dates += @user.feeds.includes(:discovered_feeds).map { _1.discovered_feeds.pluck(:updated_at).flatten.sort }
     key = Digest::SHA1.hexdigest(dates.join)
 
-    subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}:v2", expires_in: 24.hours) {
+    subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}:v8", expires_in: 24.hours) {
       tags = @user.tags_on_feed
       subscriptions = @user
         .subscriptions
@@ -116,7 +116,7 @@ class Settings::SubscriptionsController < ApplicationController
 
       start_date = 29.days.ago
 
-      entry_counts = Rails.cache.fetch("#{@user.id}:entry_counts:#{feed_ids.join}", expires_in: 24.hours) { FeedStat.get_entry_counts(feed_ids, start_date) }
+      entry_counts = FeedStat.get_entry_counts(feed_ids, start_date)
 
       subscriptions.each do |subscription|
         counts = entry_counts[subscription.feed_id]
@@ -137,6 +137,7 @@ class Settings::SubscriptionsController < ApplicationController
 
         subscription.sort_data = feed_search_data(subscription)
       end
+      subscriptions
     }
 
     if ["updated", "volume", "tag", "name"].include?(params[:sort])

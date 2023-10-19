@@ -2,7 +2,7 @@ class WebPushNotificationSend
   include Sidekiq::Worker
   sidekiq_options retry: false, queue: :default_critical
 
-  VERIFIER = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)
+  VERIFIER = ActiveSupport::MessageVerifier.new(Rails.application.secret_key_base)
 
   apnotic_options = {
     auth_method: :token,

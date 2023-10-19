@@ -265,7 +265,7 @@ class ApplicationController < ActionController::Base
 
   def verify_push_token(authentication_token)
     authentication_token = CGI.unescape(authentication_token)
-    verifier = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)
+    verifier = ActiveSupport::MessageVerifier.new(Rails.application.secret_key_base)
     verifier.verify(authentication_token)
   end
 

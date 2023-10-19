@@ -164,7 +164,7 @@ class Feed < ApplicationRecord
   end
 
   def web_sub_secret
-    Digest::SHA256.hexdigest([id, Rails.application.secrets.secret_key_base].join("-"))
+    Digest::SHA256.hexdigest([id, Rails.application.secret_key_base].join("-"))
   end
 
   def web_sub_callback(debug: false)

@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "= 7.0.8"
+gem "rails", github: "feedbin/rails", branch: "7-1-stable-invalid-cache-entries"
 gem "will_paginate"
 
 gem "http",                github: "feedbin/http",                branch: "feedbin"
@@ -47,6 +47,8 @@ gem "pg"
 gem "phlex-rails"
 gem "postmark-rails"
 gem "premailer-rails"
+# Unicorn is not yet compatible with rack 3
+gem "rack", "< 3"
 gem "raindrops"
 gem "redcarpet"
 gem "redis", "< 5"

@@ -4,7 +4,7 @@
     <title><%= @title || 'Feedbin' %><%= branch_info if Rails.env.development? %></title>
     <meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no,viewport-fit=cover" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <link rel="manifest" href="<%= manifest_path(current_user&.theme || "day") %>">
+    <link rel="manifest" href="<%= manifest_path(current_user&.theme.present? ? current_user.theme : "day") %>">
     <link rel="apple-touch-icon" href="<%= asset_path('icon-manifest.png') %>" sizes="192x192" />
     <link rel="shortcut icon" href="<%= asset_path('favicon.ico') %>" type="image/vnd.microsoft.icon" />
     <%= stylesheet_link_tag "tailwind" %>

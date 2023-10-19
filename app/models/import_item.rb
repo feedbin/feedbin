@@ -1,5 +1,5 @@
 class ImportItem < ApplicationRecord
-  serialize :details, Hash
+  serialize :details, type: Hash
   belongs_to :import
   enum status: [:pending, :complete, :failed, :fixable]
   store_accessor :error, :class, :message, prefix: true

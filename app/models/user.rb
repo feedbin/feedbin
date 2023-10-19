@@ -123,13 +123,14 @@ class User < ApplicationRecord
   end
 
   def theme
-    if settings
+    preference = if settings
       if settings["theme"] == "night"
         "dusk"
       else
         settings["theme"]
       end
     end
+    preference.present? ? preference : "day"
   end
 
   def twitter_enabled?
