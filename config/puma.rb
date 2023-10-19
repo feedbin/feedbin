@@ -11,6 +11,7 @@ web_concurrency   = ENV.fetch("WEB_CONCURRENCY")   { Etc.nprocessors }
 workers     web_concurrency
 threads     min_threads_count, max_threads_count
 environment rails_environment
+directory   working_directory
 plugin      :tmp_restart
 
 if rails_environment == "production"
