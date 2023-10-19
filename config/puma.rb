@@ -1,5 +1,4 @@
 require "etc"
-require "dotenv"
 require "honeybadger"
 
 working_directory = File.expand_path("..", __dir__)
@@ -14,16 +13,16 @@ environment rails_environment
 directory   working_directory
 plugin      :tmp_restart
 
+# For phased restart
+prune_bundler
+preload_app!(false)
+
 if rails_environment == "production"
   pidfile File.join(working_directory, "tmp", "pids", "puma.pid")
   bind    File.join("unix://", working_directory, "tmp", "sockets", "puma.sock")
 else
   port ENV.fetch("PORT") { 3000 }
 end
-
-# on_booted do
-#   ENV.update Dotenv.load
-# end
 
 lowlevel_error_handler do |exception|
   Honeybadger.notify(exception)
