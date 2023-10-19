@@ -13,10 +13,6 @@ environment rails_environment
 directory   working_directory
 plugin      :tmp_restart
 
-# For phased restart
-prune_bundler
-preload_app!(false)
-
 if rails_environment == "production"
   pidfile File.join(working_directory, "tmp", "pids", "puma.pid")
   bind    File.join("unix://", working_directory, "tmp", "sockets", "puma.sock")
