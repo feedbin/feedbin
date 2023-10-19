@@ -9,6 +9,8 @@ workers ENV.fetch("WEB_CONCURRENCY") { "2" }
 threads min_threads_count, max_threads_count
 environment ENV.fetch("RAILS_ENV", "development")
 
+pp ENV
+
 if @options[:environment] == "production"
   shared_directory = File.join(File.expand_path("..", ENV["PWD"]), "shared")
   shared_directory = File.directory?(shared_directory) ? shared_directory : ENV["PWD"]
