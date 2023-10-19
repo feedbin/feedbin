@@ -20,9 +20,9 @@ else
   port ENV.fetch("PORT") { 3000 }
 end
 
-on_booted do
-  ENV.update Dotenv.load
-end
+# on_booted do
+#   ENV.update Dotenv.load
+# end
 
 lowlevel_error_handler do |exception|
   Honeybadger.notify(exception)
