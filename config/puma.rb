@@ -13,10 +13,9 @@ pp File.expand_path("..", __dir__)
 pp ENV
 
 if @options[:environment] == "production"
-  shared_directory = File.join(File.expand_path("..", ENV["PWD"]), "shared")
-  shared_directory = File.directory?(shared_directory) ? shared_directory : ENV["PWD"]
-  pidfile File.join(shared_directory, "tmp", "puma.pid")
-  bind    File.join("unix://", shared_directory, "tmp", "puma.sock")
+  tmp_directory = File.join(ENV["PWD"], "tmp")
+  pidfile File.join(tmp_directory, "pids", "puma.pid")
+  bind    File.join("unix://", tmp_directory, "sockets", "puma.sock")
 else
   port ENV.fetch("PORT") { 3000 }
 end
