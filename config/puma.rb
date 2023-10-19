@@ -2,25 +2,23 @@ require "etc"
 require "dotenv"
 require "honeybadger"
 
+working_directory = File.expand_path("..", __dir__)
 max_threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }
 min_threads_count = ENV.fetch("RAILS_MIN_THREADS") { max_threads_count }
+rails_environment = ENV.fetch("RAILS_ENV")         { "development" }
+web_concurrency   = ENV.fetch("WEB_CONCURRENCY")   { Etc.nprocessors }
 
-workers ENV.fetch("WEB_CONCURRENCY") { "2" }
-threads min_threads_count, max_threads_count
-environment ENV.fetch("RAILS_ENV", "development")
+workers     web_concurrency
+threads     min_threads_count, max_threads_count
+environment rails_environment
+plugin      :tmp_restart
 
-pp File.expand_path("..", __dir__)
-pp ENV
-
-if @options[:environment] == "production"
-  tmp_directory = File.join(ENV["PWD"], "tmp")
-  pidfile File.join(tmp_directory, "pids", "puma.pid")
-  bind    File.join("unix://", tmp_directory, "sockets", "puma.sock")
+if rails_environment == "production"
+  pidfile File.join(working_directory, "tmp", "pids", "puma.pid")
+  bind    File.join("unix://", working_directory, "tmp", "sockets", "puma.sock")
 else
   port ENV.fetch("PORT") { 3000 }
 end
-
-plugin :tmp_restart
 
 on_booted do
   ENV.update Dotenv.load
