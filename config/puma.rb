@@ -9,6 +9,7 @@ workers ENV.fetch("WEB_CONCURRENCY") { "2" }
 threads min_threads_count, max_threads_count
 environment ENV.fetch("RAILS_ENV", "development")
 
+pp File.expand_path("..", __dir__)
 pp ENV
 
 if @options[:environment] == "production"
