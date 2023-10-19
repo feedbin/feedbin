@@ -14,6 +14,10 @@ Rails.application.routes.draw do
     mount Sidekiq::Web, at: "/sidekiq"
   end
 
+  constraints lambda { |request| AuthConstraint.admin?(request) } do
+    get :env, to: "site#env"
+  end
+
   get :health_check, to: proc { |env| [200, {}, ["OK"]] }
   get :version, to: proc { |env| [200, {}, [File.read("REVISION")]] }
   get :subscribe, to: "site#subscribe"
