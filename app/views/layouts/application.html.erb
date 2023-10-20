@@ -24,6 +24,7 @@
     </style>
     <%= javascript_include_tag "lib/lib"  %>
     <%= javascript_include_tag "web" %>
+    <%= javascript_include_tag "https://js.stripe.com/v3/" %>
     <%= javascript_importmap_tags %>
     <% if current_user %>
         <% present current_user do |user_presenter| %>

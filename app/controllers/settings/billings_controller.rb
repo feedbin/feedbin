@@ -65,6 +65,23 @@ class Settings::BillingsController < ApplicationController
     redirect_to edit_settings_billing_url, alert: exception.message
   end
 
+  def checkout_session
+    @user = current_user
+    session = Stripe::Checkout::Session.create({
+      customer: @user.customer_id,
+      ui_mode: "embedded",
+      line_items: [{
+        price: "price_0GyJf5DAn4dcDyiPfpucvuC5",
+        quantity: 1,
+      }],
+      mode: "subscription",
+      return_url: "http://example.com/return.html?session_id={CHECKOUT_SESSION_ID}",
+    })
+
+    render json: {clientSecret: session.client_secret}
+  end
+
+
   private
 
   def payments

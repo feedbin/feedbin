@@ -4,7 +4,8 @@
 
 <% if ENV["STRIPE_API_KEY"] %>
   <% if @user.plan.stripe_id == "trial" %>
-    <%= render partial: "shared/billing/billing_subscribe", locals: {subscribe_title: "Plan"} %>
+    <%# render partial: "shared/billing/billing_subscribe", locals: {subscribe_title: "Plan"} %>
+    <%= render Shared::Billing::BillingSubscribeView.new  %>
   <% else %>
     <%= render partial: "shared/billing/billing_status" %>
   <% end %>
