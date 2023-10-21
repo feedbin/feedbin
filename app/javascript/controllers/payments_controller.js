@@ -11,20 +11,17 @@ export default class extends Controller {
   connect(event) {
     const stripe = Stripe(this.stripePublicKeyValue);
 
-    const request = window.$.post(this.urlValue)
+    const elements = stripe.elements({
+      mode: "subscription",
+      amount: 0,
+      currency: "usd",
+    });
 
-    request.done((response) => {
-      const { clientSecret } = response
-      console.log(stripe);
-
-      const checkout = stripe.initEmbeddedCheckout({
-        clientSecret,
-      })
-      .then((x) => {
-        // // Mount Checkout
-        x.mount(`#${this.checkoutIdValue}`);
-        console.log(`#${this.checkoutIdValue}`);
-      })
-    })
+    const paymentElement = elements.create("payment", {
+      layout: {
+        type: "accordion"
+      }
+    });
+    paymentElement.mount(`#${this.checkoutIdValue}`);
   }
 }
