@@ -183,7 +183,7 @@ Rails.application.routes.draw do
         get :payment_details
         post :update_credit_card
         post :update_plan
-        post :checkout_session
+        post :subscribe
       end
     end
 
