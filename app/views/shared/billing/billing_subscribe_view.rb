@@ -5,6 +5,7 @@ module Shared
       def initialize
         @checkout_id = "checkout"
         @stimulus_controller = :payments
+        @expandable_outlet = "#{@stimulus_controller}-expandable"
       end
 
       def template
@@ -16,13 +17,16 @@ module Shared
           p class: "group-data-[payments-ready-value=true]:tw-hidden" do
             "Loading…"
           end
-          div data: stimulus_item(target: :payment_container, for: @stimulus_controller), class: "grid [grid-template-rows:0fr] group-data-[payments-ready-value=true]:[grid-template-rows:1fr] transition-[grid-template-rows] duration-200 overflow-hidden group-data-[payments-visible-value=true]:overflow-visible" do
-            div class: "min-h-0 transition transition-[visibility,opacity] opacity-100 group-data-[payments-ready-value=false]:opacity-0 group-data-[payments-ready-value=false]:invisible" do
-              div class: "mb-8", id: @checkout_id
 
-              render Settings::ButtonRowComponent.new do
-                button class: "button", data: stimulus_item(target: :submit_button, actions: {click: :submit}, for: @stimulus_controller) do
-                  "Subscribe"
+          div data: stimulus_item(target: :payment_container, for: @stimulus_controller) do
+            render App::ExpandableContainerComponent.new(selector: @expandable_outlet) do |expandable|
+              expandable.content do
+                div class: "mb-8", id: @checkout_id
+
+                render Settings::ButtonRowComponent.new do
+                  button class: "button", data: stimulus_item(target: :submit_button, actions: {click: :submit}, for: @stimulus_controller) do
+                    "Subscribe"
+                  end
                 end
               end
             end
@@ -40,6 +44,9 @@ module Shared
             stripe_public_key: ENV["STRIPE_PUBLIC_KEY"],
             ready: "false",
             visible: "false"
+          },
+          outlets: {
+            expandable_container: "[data-#{@expandable_outlet}]"
           }
         )
       end
