@@ -119,6 +119,17 @@ GIT
       simple_oauth (~> 0.3.0)
 
 GIT
+  remote: https://github.com/sidekiq/sidekiq.git
+  revision: 7f83b2afca8fdfff87ebbb1742826e4fd9887be0
+  branch: main
+  specs:
+    sidekiq (7.1.6)
+      concurrent-ruby (< 2)
+      connection_pool (>= 2.3.0)
+      rack (>= 2.2.4)
+      redis-client (>= 0.14.0)
+
+GIT
   remote: https://github.com/teamcapybara/capybara.git
   revision: 6267ff65a294a7dcbe9d7281c30cc2d91b08b093
   specs:
@@ -585,11 +596,6 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
-    sidekiq (7.1.6)
-      concurrent-ruby (< 2)
-      connection_pool (>= 2.3.0)
-      rack (>= 2.2.4)
-      redis-client (>= 0.14.0)
     simple_oauth (0.3.1)
     snaky_hash (2.0.1)
       hashie
@@ -745,7 +751,7 @@ DEPENDENCIES
   sass-rails
   sax-machine!
   selenium-webdriver
-  sidekiq
+  sidekiq!
   standard
   stimulus-rails
   stripe (~> 5.55.0)

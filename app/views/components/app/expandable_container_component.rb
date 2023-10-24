@@ -1,6 +1,5 @@
 module App
   class ExpandableContainerComponent < ApplicationComponent
-
     def initialize(selector: nil, open: false)
       @stimulus_controller = :expandable
       @selector = selector
@@ -29,6 +28,3 @@ module App
     end
   end
 end
-
-
-
