@@ -11,7 +11,8 @@ class UserPresenter < BasePresenter
   end
 
   def entry_width
-    result = settings["entry_width"] || user.entry_width || "fixed"
+    result = settings["entry_width"].present? ? settings["entry_width"] : nil
+    result = result || user.entry_width || "fixed"
     if result == "fluid"
       result = "1"
     elsif result == ""
@@ -21,19 +22,23 @@ class UserPresenter < BasePresenter
   end
 
   def font
-    settings["font"] || user.font || "default"
+    result = settings["font"].present? ? settings["font"] : nil
+    result || user.font || "default"
   end
 
   def font_size
-    settings["font_size"] || user.font_size || "5"
+    result = settings["font_size"].present? ? settings["font_size"] : nil
+    result || user.font_size || "5"
   end
 
   def theme
-    settings["theme"] || user.theme || "auto"
+    result = settings["theme"].present? ? settings["theme"] : nil
+    result || user.theme || "auto"
   end
 
   def view_mode
-    settings["view_mode"] || "view_unread"
+    result = settings["view_mode"].present? ? settings["view_mode"] : nil
+    result || "view_unread"
   end
 
   def entries_display
