@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { afterTransition } from "helpers"
 
-// Connects to data-controller="expandable-container"
+// Connects to data-controller="expandable"
 export default class extends Controller {
   static targets = ["transitionContainer"]
   static values = {

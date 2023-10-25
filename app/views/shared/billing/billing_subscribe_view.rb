@@ -46,7 +46,7 @@ module Shared
             visible: "false"
           },
           outlets: {
-            expandable_container: "[data-#{@expandable_outlet}]"
+            expandable: "[data-#{@expandable_outlet}]"
           }
         )
       end

@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 // Connects to data-controller="payments"
 export default class extends Controller {
   static targets = ["paymentContainer", "submitButton"]
-  static outlets = [ "expandable-container" ]
+  static outlets = [ "expandable" ]
   static values = {
     submitUrl: String,
     confirmationUrl: String,
@@ -17,9 +17,6 @@ export default class extends Controller {
   elements = null
 
   connect(event) {
-
-
-
     this.stripe = Stripe(this.stripePublicKeyValue)
 
     this.elements = this.stripe.elements({
@@ -33,7 +30,7 @@ export default class extends Controller {
 
     paymentElement.on("ready", (event) => {
       this.readyValue = true
-      this.expandableContainerOutlet.toggle()
+      this.expandableOutlet.toggle()
     })
 
     paymentElement.mount(`#${this.checkoutIdValue}`)
