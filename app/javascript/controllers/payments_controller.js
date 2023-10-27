@@ -2,15 +2,16 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="payments"
 export default class extends Controller {
-  static targets = ["paymentContainer", "submitButton"]
-  static outlets = [ "expandable" ]
+  static targets = ["paymentElement", "submitButton"]
+  static outlets = ["expandable"]
   static values = {
+    ready: Boolean,
+    visible: Boolean,
+    trialing: Boolean,
     submitUrl: String,
     confirmationUrl: String,
-    checkoutId: String,
     stripePublicKey: String,
-    ready: Boolean,
-    visible: Boolean
+    defaultPlanPrice: Number,
   }
 
   stripe = null
@@ -21,23 +22,28 @@ export default class extends Controller {
 
     this.elements = this.stripe.elements({
       mode: "subscription",
-      amount: 0,
+      amount: this.trialing ? 0 : this.defaultPlanPriceValue,
       currency: "usd",
       appearance: this.appearance(),
+      setupFutureUsage: "off_session",
     })
 
     const paymentElement = this.elements.create("payment")
-
+    paymentElement.mount(this.paymentElementTarget)
     paymentElement.on("ready", (event) => {
       this.readyValue = true
       this.expandableOutlet.toggle()
     })
+  }
 
-    paymentElement.mount(`#${this.checkoutIdValue}`)
+  updateAmount(event) {
+    if (this.trialingValue) return
+    this.elements.update({
+      amount: event.params.amount
+    })
   }
 
   async submit(event) {
-    console.log(event)
     event.preventDefault()
 
     if (this.submitButtonTarget.disabled) {

@@ -187,6 +187,8 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :payments
+
     get :account
     get :appearance
     get :newsletters_pages

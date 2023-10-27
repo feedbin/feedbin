@@ -65,27 +65,6 @@ class Settings::BillingsController < ApplicationController
     redirect_to edit_settings_billing_url, alert: exception.message
   end
 
-  def subscribe
-    @user = current_user
-
-    subscription = Stripe::Subscription.create(
-      customer: @user.customer_id,
-      items: [{
-        price: "price_0GyJf5DAn4dcDyiPfpucvuC5",
-      }],
-      payment_behavior: "default_incomplete",
-      payment_settings: {save_default_payment_method: "on_subscription"},
-      expand: ["latest_invoice.payment_intent", "pending_setup_intent"]
-    )
-
-    if subscription.pending_setup_intent.nil?
-      render json: { type: "payment", clientSecret: subscription.latest_invoice.payment_intent.client_secret }.to_json
-    else
-      render json: { type: "setup", clientSecret: subscription.pending_setup_intent.client_secret }
-    end
-  end
-
-
   private
 
   def payments
