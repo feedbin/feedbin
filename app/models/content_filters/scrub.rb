@@ -1,7 +1,7 @@
 module ContentFilters
   class Scrub < HTML::Pipeline::Filter
 
-    TABLE_ELEMENTS = %w[table thead tbody tfoot tr td]
+    NEWSLETTER_ELEMENTS = %w[table thead tbody tfoot tr td center]
 
     def call
       doc
@@ -9,14 +9,14 @@ module ContentFilters
         .scrub!(video)
         .scrub!(links)
       if context[:scrub_mode] == :newsletter
-        doc.scrub!(tables)
+        doc.scrub!(newsletter_elements)
       end
       doc
     end
 
-    def tables
+    def newsletter_elements
       Loofah::Scrubber.new do |node|
-        if TABLE_ELEMENTS.include?(node.name)
+        if NEWSLETTER_ELEMENTS.include?(node.name)
           node.name = "div"
           node.keys.each do |attribute|
             node.delete attribute
