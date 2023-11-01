@@ -34,6 +34,10 @@ export default class extends Controller {
       this.readyValue = true
       this.expandableOutlet.toggle()
     })
+
+    paymentElement.on("change", function(event) {
+      console.log(event);
+    });
   }
 
   updateAmount(event) {

@@ -41,7 +41,9 @@ module Shared
                 button class: "button", data: stimulus_item(target: :submit_button, actions: {click: :submit}, for: @stimulus_controller) do
                   "Subscribe"
                 end
+                button class: "inline-block [-webkit-appearance:-apple-pay-button] [-apple-pay-button-type:subscribe]"
               end
+
             end
           end
         end
