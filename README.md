@@ -78,4 +78,4 @@ Rename [.env.example](.env.example) to `.env` and customize it with your setting
 
 Status Badges
 -------------
-![Ruby CI](https://github.com/feedbin/feedbin/workflows/Ruby%20CI/badge.svg)
+![Ruby CI](https://github.com/feedbin/feedbin/workflows/ci/badge.svg)
