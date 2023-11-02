@@ -24,8 +24,12 @@ module FixFeeds
       end
 
       @subscriptions.each do |subscription|
-        div class: "border rounded-lg mb-4 p-4 opacity-100 transition", id: helpers.dom_id(subscription, :fixable) do
-          render SuggestionComponent.new(replaceable: subscription, source: subscription.feed, redirect: helpers.fix_feeds_url, include_ignore: true)
+        render App::ExpandableContainerComponent.new(open: true) do |expandable|
+          expandable.content do
+            div class: "border rounded-lg mb-4 p-4" do
+              render SuggestionComponent.new(replaceable: subscription, source: subscription.feed, redirect: helpers.fix_feeds_url, include_ignore: true)
+            end
+          end
         end
       end
     end

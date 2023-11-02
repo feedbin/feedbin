@@ -1554,7 +1554,9 @@ $.extend feedbin,
         feedbin.showPanel(panel, false)
 
     userTitles: ->
-      feedbin.applyUserTitles()
+      try
+        feedbin.applyUserTitles()
+      catch error
 
     renameFeed: ->
       $(document).on 'dblclick', '[data-behavior~=renamable]', (event) ->

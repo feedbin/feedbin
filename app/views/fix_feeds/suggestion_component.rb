@@ -32,7 +32,7 @@ module FixFeeds
             end
           end
           feed.subhead do
-            a(href: @source.feed_url, class: "!text-500 truncate" ) do
+            span(class: "!text-500 truncate" ) do
               helpers.short_url(@source.feed_url)
             end
           end
@@ -48,7 +48,7 @@ module FixFeeds
     end
 
     def form
-      form_with(model: @replaceable, url: @replaceable.replaceable_path, data: @remote ? {remote: true, behavior: "disable_on_submit"} : {}) do |form|
+      form_with(model: @replaceable, url: @replaceable.replaceable_path, data: {remote: @remote, behavior: "disable_on_submit"}) do |form|
         form.hidden_field :redirect_to, value: @redirect
         render Settings::ControlGroupComponent.new class: "group", data: {item_capsule: "true"} do |group|
           @source.discovered_feeds.order(created_at: :asc).each_with_index do |discovered_feed, index|
@@ -65,10 +65,12 @@ module FixFeeds
 
         div(class: "flex gap-4 pt-4 justify-end") do
           if @include_ignore
-            link_to "Ignore", @replaceable.replaceable_path, method: :delete, remote: true, class: "button-tertiary"
+            link_to "Ignore", @replaceable.replaceable_path, method: :delete, remote: true, class: "button-tertiary", data: stimulus_item(actions: {click: :toggle}, for: :expandable)
           end
 
-          button(class: "button-secondary", type: "submit") { "Replace Feed" }
+          button class: "button-secondary", type: "submit", data: stimulus_item(actions: {click: :toggle}, for: :expandable) do
+            "Replace Feed"
+          end
         end
       end
     end
@@ -89,7 +91,7 @@ module FixFeeds
                   end
                 end
                 feed.subhead do
-                  a(href: discovered_feed.feed_url, class: "!text-500 truncate" ) { helpers.short_url(discovered_feed.feed_url) }
+                  span(class: "!text-500 truncate" ) { helpers.short_url(discovered_feed.feed_url) }
                 end
               end
             end
@@ -107,10 +109,10 @@ module FixFeeds
     def timeline_item(index)
       div class: "flex flex-col w-[8px] inset-y-0 self-stretch shrink-0" do
         div class: "h-1/2 flex flex-col items-center w-[8px] " do
-          div class: "h-full w-[1px] bg-200 #{index != 0 ? "invisible" : ""}" do
+          div class: "h-full w-[1px] bg-600 #{index != 0 ? "invisible" : ""}" do
           end
           div class: "flex w-[8px] h-[8px] items-start justify-center shrink-0 #{index != 0 ? "invisible" : ""}" do
-            render SvgComponent.new("icon-down-arrow", class: "fill-200")
+            render SvgComponent.new("icon-down-arrow", class: "fill-600")
           end
           div class: "h-[8px] w-[8px] relative top-[-7px] mt-[8px] bg-green-600 rounded-full shrink-0"
         end
@@ -122,7 +124,7 @@ module FixFeeds
         div class: "flex w-[8px] h-[8px] flex-center mt-[8px] mb-[4px] shrink-0" do
           div class: "h-[8px] w-[8px] bg-200 rounded-full"
         end
-        div class: "h-full w-[1px] bg-200" do
+        div class: "h-full w-[1px] bg-600" do
         end
       end
     end

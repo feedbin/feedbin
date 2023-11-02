@@ -261,6 +261,18 @@ class Feed < ApplicationRecord
     )
   end
 
+  def fixable_error?
+    return false unless crawl_error?
+
+    irrecoverable_errors = [
+      "Feedkit::ConnectionError",
+      "Feedkit::SSLError",
+      "Feedkit::TimeoutError"
+    ]
+    return false if irrecoverable_errors.include?(crawl_data.last_error.safe_dig("class"))
+    return true
+  end
+
   def crawl_error?
     crawl_data.error_count > 23
   end
