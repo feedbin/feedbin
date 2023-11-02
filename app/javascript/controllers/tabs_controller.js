@@ -9,15 +9,15 @@ export default class extends Controller {
   }
 
   select(event) {
-    const selectedIndex = event.params.tab;
+    const selectedIndex = event.params.tab
 
     this.indicator(this.tabButtonTargets[selectedIndex])
 
     this.tabContentTargets.forEach((element, index) => {
-      element.dataset["ui"] = (selectedIndex === index) ? "selected" : ""
+      element.dataset["ui"] = selectedIndex === index ? "selected" : ""
     })
     this.tabButtonTargets.forEach((element, index) => {
-      element.dataset["ui"] = (selectedIndex === index) ? "selected" : ""
+      element.dataset["ui"] = selectedIndex === index ? "selected" : ""
     })
   }
 
