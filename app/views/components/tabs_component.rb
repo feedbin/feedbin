@@ -7,12 +7,13 @@ class TabsComponent < ApplicationComponent
 
   def template
     div data: stimulus(controller: :tabs) do
-      div class: "flex gap-2 border-b border-400 items-baseline mb-8" do
+      div class: "flex gap-8 border-b border-300 items-baseline mb-8 relative" do
         @tabs.each_with_index do |tab, index|
-          button class: "tab", data: button_data(index) do
+          button class: "inline-flex border-0 leading-[42px] text-500 data-selected:text-700", data: button_data(index) do
             tab[:title]
           end
         end
+        div data: stimulus_item(target: :indicator, for: :tabs), style: "left: 0; width: 0", class: "absolute bottom-[-1px] h-[4px] w-3 bg-blue-600 transition-position duration-200 ease-in-out"
       end
       @tabs.each_with_index do |tab, index|
         div class: "tw-hidden data-selected:block", data: tab_data(index) do

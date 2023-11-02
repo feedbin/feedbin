@@ -1,3 +1,1 @@
-$('#<%= dom_id(@import_item, :fixable) %>').css({opacity: 0});
-$('#<%= dom_id(@import_item, :fixable) %>').slideUp(200);
 $('[data-behavior~=status_component]').replaceWith('<%= j render FixFeeds::StatusComponent.new(count: @import_item.import.import_items.fixable.count, replace_path: replace_all_settings_import_path) %>')

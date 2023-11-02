@@ -1,3 +1,1 @@
-$('#<%= dom_id(@subscription, :fixable) %>').css({opacity: 0});
-$('#<%= dom_id(@subscription, :fixable) %>').slideUp(200);
 $('[data-behavior~=status_component]').replaceWith('<%= j render FixFeeds::StatusComponent.new(count: @subscriptions.count, replace_path: replace_all_fix_feeds_path) %>')
