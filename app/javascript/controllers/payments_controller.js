@@ -18,8 +18,8 @@ export default class extends Controller {
   stripe = null
   elements = null
 
-  connect(event) {
-    this.stripe = Stripe(this.stripePublicKeyValue)
+  connect() {
+    this.stripe = window.Stripe(this.stripePublicKeyValue)
     this.elements = this.stripe.elements({
       mode: "subscription",
       amount: this.trialingValue ? 0 : this.defaultPlanPriceValue,
@@ -30,19 +30,19 @@ export default class extends Controller {
 
     const paymentElement = this.elements.create("payment")
     paymentElement.mount(this.paymentElementTarget)
-    paymentElement.on("ready", (event) => {
+    paymentElement.on("ready", () => {
       this.readyValue = true
       this.expandableOutlet.toggle()
     })
     paymentElement.on("change", (event) => {
       this.paymentMethodValue = event.value.type.replaceAll("_", "-")
-    });
+    })
   }
 
   updateAmount(event) {
     if (this.trialingValue) return
     this.elements.update({
-      amount: event.params.amount
+      amount: event.params.amount,
     })
   }
 
@@ -53,9 +53,9 @@ export default class extends Controller {
       return
     }
 
-    this.submitButtonTargets.forEach((element) => element.disabled = true)
+    this.submitButtonTargets.forEach((element) => (element.disabled = true))
 
-    const {error: submitError} = await this.elements.submit()
+    const { error: submitError } = await this.elements.submit()
     if (submitError) {
       this.handleError(submitError)
       return
@@ -65,16 +65,17 @@ export default class extends Controller {
     try {
       response = await window.$.post(this.submitUrlValue)
     } catch (e) {
-      this.handleError({message: "An unknown error occurred."})
+      this.handleError({ message: "An unknown error occurred." })
       return
     }
 
-    console.log(response);
+    console.log(response)
 
-    const {type, clientSecret} = response
-    const confirmIntent = type === "setup" ? this.stripe.confirmSetup : this.stripe.confirmPayment
+    const { type, clientSecret } = response
+    const confirmIntent =
+      type === "setup" ? this.stripe.confirmSetup : this.stripe.confirmPayment
 
-    const {error} = await confirmIntent({
+    const { error } = await confirmIntent({
       clientSecret,
       elements: this.elements,
       confirmParams: {
@@ -95,7 +96,7 @@ export default class extends Controller {
 
   handleError(error) {
     window.feedbin.showNotification(error.message, true)
-    this.submitButtonTargets.forEach((element) => element.disabled = false)
+    this.submitButtonTargets.forEach((element) => (element.disabled = false))
   }
 
   appearance() {
@@ -112,8 +113,6 @@ export default class extends Controller {
         colorText:            window.getComputedStyle(document.body).getPropertyValue("--color-600"),
         colorTextSecondary:   window.getComputedStyle(document.body).getPropertyValue("--color-500"),
         colorBackground:      window.getComputedStyle(document.body).getPropertyValue("--color-base"),
-        colorDanger:          window.getComputedStyle(document.body).getPropertyValue("--color-red-600"),
-        colorDanger:          window.getComputedStyle(document.body).getPropertyValue("--color-red-600"),
         colorDanger:          window.getComputedStyle(document.body).getPropertyValue("--color-red-600"),
         colorIconTab:         window.getComputedStyle(document.body).getPropertyValue("--color-500"),
         colorIconTabSelected: window.getComputedStyle(document.body).getPropertyValue("--color-700"),
