@@ -13,6 +13,7 @@
     --color-700:  #0d1623;
 
     --border-color: var(--color-200);
+    --apple-pay-button-style: black;
 }
 
 .theme-sunset {
@@ -83,6 +84,8 @@
   --color-blue-600:  #0974FF;
   --color-green-600: #08C451;
   --color-red-600:   #D40C35;
+
+  --apple-pay-button-style: white;
 }
 
 /*
@@ -110,6 +113,8 @@ a flash of the default theme before prefers-dark class is applied
     --color-blue-600:  #0974FF;
     --color-green-600: #08C451;
     --color-red-600:   #D40C35;
+
+    --apple-pay-button-style: white;
   }
 }
 

@@ -7,10 +7,12 @@ class Customer
 
   def self.create(email, plan, trial_end)
     new_customer = new(Stripe::Customer.create({email: email}))
+
     Stripe::Subscription.create(
       customer: new_customer.id,
       plan: plan,
-      trial_end: trial_end.to_i
+      trial_end: trial_end.to_i,
+      payment_behavior: "default_incomplete",
     )
     new_customer
   end

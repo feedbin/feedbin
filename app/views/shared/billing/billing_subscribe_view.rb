@@ -38,10 +38,11 @@ module Shared
               div class: "mb-8", data: stimulus_item(target: :payment_element, for: @stimulus_controller)
 
               render Settings::ButtonRowComponent.new do
-                button class: "button", data: stimulus_item(target: :submit_button, actions: {click: :submit}, for: @stimulus_controller) do
+                button data: submit_data, class: "button group-data-[payments-payment-method-value=apple-pay]:tw-hidden"  do
                   "Subscribe"
                 end
-                button class: "inline-block [-webkit-appearance:-apple-pay-button] [-apple-pay-button-type:subscribe]"
+
+                button data: submit_data, class: "tw-hidden group-data-[payments-payment-method-value=apple-pay]:inline-block [-webkit-appearance:-apple-pay-button] [-apple-pay-button-type:subscribe] [-apple-pay-button-style:var(--apple-pay-button-style)]"
               end
 
             end
@@ -76,6 +77,10 @@ module Shared
         end
       end
 
+      def submit_data
+        stimulus_item(target: :submit_button, actions: {click: :submit}, for: @stimulus_controller)
+      end
+
       def stimulus_controller
         stimulus(
           controller: @stimulus_controller,
@@ -86,7 +91,8 @@ module Shared
             ready: "false",
             visible: "false",
             default_plan_price: @default_plan.price_in_cents,
-            trialing: @user.days_left > 0,
+            trialing: (@user.days_left > 0).to_s,
+            payment_method: nil,
           },
           outlets: {
             expandable: "[data-#{@expandable_outlet}]"

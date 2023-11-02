@@ -12,6 +12,7 @@ export default class extends Controller {
     confirmationUrl: String,
     stripePublicKey: String,
     defaultPlanPrice: Number,
+    paymentMethod: String,
   }
 
   stripe = null
@@ -19,10 +20,9 @@ export default class extends Controller {
 
   connect(event) {
     this.stripe = Stripe(this.stripePublicKeyValue)
-
     this.elements = this.stripe.elements({
       mode: "subscription",
-      amount: this.trialing ? 0 : this.defaultPlanPriceValue,
+      amount: this.trialingValue ? 0 : this.defaultPlanPriceValue,
       currency: "usd",
       appearance: this.appearance(),
       setupFutureUsage: "off_session",
@@ -34,9 +34,8 @@ export default class extends Controller {
       this.readyValue = true
       this.expandableOutlet.toggle()
     })
-
-    paymentElement.on("change", function(event) {
-      console.log(event);
+    paymentElement.on("change", (event) => {
+      this.paymentMethodValue = event.value.type.replaceAll("_", "-")
     });
   }
 
@@ -51,14 +50,11 @@ export default class extends Controller {
     event.preventDefault()
 
     if (this.submitButtonTarget.disabled) {
-      console.log("disabled")
       return
     }
 
-    // Disable form submission while loading
-    this.submitButtonTarget.disabled = true
+    this.submitButtonTargets.forEach((element) => element.disabled = true)
 
-    // Trigger form validation and wallet collection
     const {error: submitError} = await this.elements.submit()
     if (submitError) {
       this.handleError(submitError)
@@ -66,10 +62,8 @@ export default class extends Controller {
     }
 
     let response
-
     try {
       response = await window.$.post(this.submitUrlValue)
-      console.log(response);
     } catch (e) {
       this.handleError({message: "An unknown error occurred."})
       return
@@ -101,7 +95,7 @@ export default class extends Controller {
 
   handleError(error) {
     window.feedbin.showNotification(error.message, true)
-    this.submitButtonTarget.disabled = false
+    this.submitButtonTargets.forEach((element) => element.disabled = false)
   }
 
   appearance() {
