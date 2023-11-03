@@ -48,6 +48,8 @@ class SearchData
     @document ||= begin
       filters = [ContentFilters::Scrub]
       HTML::Pipeline.new(filters).call(@entry.content)[:output]
+    rescue HTML::Pipeline::Filter::InvalidDocumentException
+      Loofah.html5_fragment(nil)
     end
   end
 
