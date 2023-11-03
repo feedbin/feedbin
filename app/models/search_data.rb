@@ -45,7 +45,10 @@ class SearchData
   end
 
   def document
-    @document ||= Loofah.fragment(@entry.content).scrub!(:prune)
+    @document ||= begin
+      filters = [ContentFilters::Scrub]
+      HTML::Pipeline.new(filters).call(@entry.content)[:output]
+    end
   end
 
   def text

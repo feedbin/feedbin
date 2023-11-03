@@ -256,16 +256,16 @@ class ContentFormatter
     new._summary(*args)
   end
 
-  def _summary(text, length = nil)
-    text = Loofah.fragment(text)
-      .scrub!(:prune)
-      .to_text(encode_special_chars: false)
-      .gsub(/\s+/, " ")
-      .squish
+  def _summary(content, length = nil)
+    return "" if content.nil?
 
-    text = text.truncate(length, separator: " ", omission: "") if length
-
-    text
+    content = HTML::Pipeline.new([ContentFilters::Scrub])
+      .call(content)[:output]
+      .to_text(encode_special_chars: false).gsub(/\s+/, " ").squish
+    content = content.truncate(length, separator: " ", omission: "") if length
+    content
+  rescue HTML::Pipeline::Filter::InvalidDocumentException
+    ""
   end
 
   def self.text_email(*args)
