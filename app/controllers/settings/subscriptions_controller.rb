@@ -173,6 +173,7 @@ class Settings::SubscriptionsController < ApplicationController
       array.push subscription.site_url
       array.push subscription.feed_url
       array.push subscription.muted_status
+      array.push subscription.health_status
       array.push subscription.tag_names
       if subscription.feed.newsletter?
         array.push "newsletter"
