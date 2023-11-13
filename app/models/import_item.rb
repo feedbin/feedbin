@@ -35,6 +35,7 @@ class ImportItem < ApplicationRecord
 
   def host
     self.host = Addressable::URI.heuristic_parse(details[:html_url])&.host&.downcase
+  rescue
   end
 
   def title
