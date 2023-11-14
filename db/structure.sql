@@ -918,7 +918,11 @@ CREATE TABLE public.podcast_subscriptions (
     title text,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    playlist_id bigint
+    playlist_id bigint,
+    chapter_filter character varying,
+    chapter_filter_type bigint DEFAULT 0 NOT NULL,
+    download_filter character varying,
+    download_filter_type bigint DEFAULT 0 NOT NULL
 );
 
 
@@ -955,7 +959,8 @@ CREATE TABLE public.queued_entries (
     duration bigint DEFAULT 0 NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    playlist_id bigint
+    playlist_id bigint,
+    skipped_chapters jsonb DEFAULT '[]'::jsonb NOT NULL
 );
 
 
@@ -3025,6 +3030,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20231113211123'),
 ('20231017104045'),
 ('20231017104044'),
 ('20231017104043'),
