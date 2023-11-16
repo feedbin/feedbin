@@ -369,19 +369,32 @@ class Entry < ApplicationRecord
   end
 
   def mark_as_unplayed
-    if skip_mark_as_unread.blank? && recent_post
-      subscriptions = PodcastSubscription.subscribed.where(feed_id: feed_id)
-      entries = subscriptions.filter_map do |subscription|
-        unless subscription.filtered?([title, data&.safe_dig("itunes_author"), content].join)
-          QueuedEntry.new(user_id: subscription.user_id, feed_id: feed_id, entry_id: id, order: Time.now.to_i, progress: 0, duration: audio_duration)
-        end
-      end
-      QueuedEntry.import(entries, validate: false, on_duplicate_key_ignore: true)
-      increment!(:queued_entries_count, entries.count)
+    return if skip_mark_as_unread.present? || !recent_post
 
-      notification_ids = PodcastSubscription.where(feed_id: feed_id, status: [:subscribed, :bookmarked]).pluck(:user_id)
-      Sidekiq::Client.push_bulk("args" => notification_ids.map {|user_id| [user_id, id]}, "class" => PodcastPushNotification)
+    subscriptions = PodcastSubscription.where(feed_id: feed_id, status: [:subscribed, :bookmarked])
+
+    queued_entries = []
+    notification_ids = []
+
+    subscriptions.each do |subscription|
+      if subscription.subscribed? && !subscription.filtered?(podcast_search_data)
+        queued_entries.push QueuedEntry.new(user_id: subscription.user_id, feed_id: feed_id, entry_id: id, order: Time.now.to_i, progress: 0, duration: audio_duration)
+        notification_ids.push subscription.user_id
+      elsif subscription.bookmarked?
+        notification_ids.push subscription.user_id
+      end
     end
+
+    if queued_entries.present?
+      QueuedEntry.import(queued_entries, validate: false, on_duplicate_key_ignore: true)
+      increment!(:queued_entries_count, queued_entries.count)
+    end
+
+    Sidekiq::Client.push_bulk("args" => notification_ids.map {|user_id| [user_id, id]}, "class" => PodcastPushNotification)
+  end
+
+  def podcast_search_data
+    [title, data&.safe_dig("itunes_author"), content].join
   end
 
   def recent_post

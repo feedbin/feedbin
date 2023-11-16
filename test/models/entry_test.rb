@@ -50,7 +50,9 @@ class EntryTest < ActiveSupport::TestCase
 
   test "should create queued entry" do
     assert_difference -> {QueuedEntry.count}, +1 do
-      @entry.save
+      assert_difference -> {PodcastPushNotification.jobs.size}, +1 do
+        @entry.save
+      end
     end
   end
 
@@ -59,8 +61,28 @@ class EntryTest < ActiveSupport::TestCase
     podcast_subscription.download_filter_exclude!
     podcast_subscription.update(download_filter: "Filter me")
 
-    assert_no_difference -> {QueuedEntry.count}, +1 do
-      @entry.update!(title: "filter me")
+    assert_no_difference -> {QueuedEntry.count} do
+      assert_no_difference -> {PodcastPushNotification.jobs.size} do
+        @entry.update!(title: "filter Me")
+      end
+    end
+  end
+
+  test "should notify for bookmark" do
+    podcast_subscription = podcast_subscriptions(:ben_daring_fireball)
+    podcast_subscription.bookmarked!
+
+    assert_difference -> {PodcastPushNotification.jobs.size}, +1 do
+      @entry.save
+    end
+  end
+
+  test "should not notify for hidden" do
+    podcast_subscription = podcast_subscriptions(:ben_daring_fireball)
+    podcast_subscription.hidden!
+
+    assert_no_difference -> {PodcastPushNotification.jobs.size} do
+      @entry.save
     end
   end
 
