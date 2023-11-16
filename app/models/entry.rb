@@ -370,9 +370,11 @@ class Entry < ApplicationRecord
 
   def mark_as_unplayed
     if skip_mark_as_unread.blank? && recent_post
-      user_ids = PodcastSubscription.subscribed.where(feed_id: feed_id).pluck(:user_id)
-      entries = user_ids.map do |user_id|
-        QueuedEntry.new(user_id: user_id, feed_id: feed_id, entry_id: id, order: Time.now.to_i, progress: 0, duration: audio_duration)
+      subscriptions = PodcastSubscription.subscribed.where(feed_id: feed_id)
+      entries = subscriptions.filter_map do |subscription|
+        unless subscription.filtered?([title, data&.safe_dig("itunes_author"), content].join)
+          QueuedEntry.new(user_id: subscription.user_id, feed_id: feed_id, entry_id: id, order: Time.now.to_i, progress: 0, duration: audio_duration)
+        end
       end
       QueuedEntry.import(entries, validate: false, on_duplicate_key_ignore: true)
       increment!(:queued_entries_count, entries.count)
