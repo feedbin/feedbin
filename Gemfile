@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", github: "feedbin/rails", branch: "7-1-stable-invalid-cache-entries"
+gem "rails", "7.1.2"
 gem "will_paginate"
 
 gem "http",                github: "feedbin/http",                branch: "feedbin"
@@ -58,7 +58,7 @@ gem "ruby-vips"
 gem "rubyzip", require: "zip"
 gem "sanitize"
 gem "sass-rails"
-gem "sidekiq", github: "sidekiq/sidekiq", branch: "main"
+gem "sidekiq"
 gem "stimulus-rails"
 gem "stripe", "~> 5.55.0"
 gem "stripe_event"
