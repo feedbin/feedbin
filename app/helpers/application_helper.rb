@@ -166,6 +166,11 @@ module ApplicationHelper
     url
   end
 
+  def short_url_alt(url)
+    url = pretty_url(url)
+    url.truncate(40, omission: "…#{url.last(10)}")
+  end
+
   def strip_basic_auth(url)
     Feedkit::BasicAuth.parse(url).url
   rescue

@@ -89,9 +89,7 @@ module Settings
                 end
 
                 if @subscription.feed.discovered_feeds.present?
-                  div(class: "mt-4") do
-                    render FixFeeds::SuggestionComponent.new(replaceable: @subscription, source: @subscription.feed, redirect: helpers.edit_settings_subscription_url(@subscription), remote: false)
-                  end
+                  render FixFeeds::SuggestionComponent.new(replaceable: @subscription, source: @subscription.feed, redirect: helpers.edit_settings_subscription_url(@subscription), remote: false)
                 end
               end
             end
