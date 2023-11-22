@@ -20,7 +20,7 @@ class Entry < ApplicationRecord
   before_update :create_summary
 
   after_commit :cache_public_id, on: [:create, :update]
-  after_commit :find_images, on: :create, unless: :skip_images?
+  after_commit :find_images, on: :create
   after_commit :mark_as_unread, on: :create
   after_commit :mark_as_unplayed, on: :create
   after_commit :increment_feed_stat, on: :create
@@ -371,6 +371,10 @@ class Entry < ApplicationRecord
   def mark_as_unplayed
     return if skip_mark_as_unread.present? || !recent_post
 
+    if data.safe_dig("enclosure_url").present?
+      ChapterParser.perform_async(id)
+    end
+
     subscriptions = PodcastSubscription.where(feed_id: feed_id, status: [:subscribed, :bookmarked])
 
     queued_entries = []
@@ -452,12 +456,5 @@ class Entry < ApplicationRecord
 
   def cache_views
     CacheEntryViews.new.perform(id)
-  end
-
-  def skip_images?
-    if ENV["SKIP_IMAGES"].present?
-      Rails.logger.info("SKIP_IMAGES is present, no images will be processed")
-      true
-    end
   end
 end
