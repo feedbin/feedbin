@@ -1,7 +1,7 @@
 class ChapterParser
   include Sidekiq::Worker
 
-  MAX_SIZE = 5 * 1024 * 1024
+  MAX_SIZE = 5.megabytes
 
   def perform(entry_id)
     @entry = Entry.find(entry_id)
