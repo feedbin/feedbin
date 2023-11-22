@@ -26,7 +26,8 @@ class ChapterParser
     arguments = { file: Shellwords.escape(tempfile.path) }
     out, _, status = Open3.capture3(command % arguments)
     data = JSON.load(out)
-    if chapters = data.safe_dig("chapters") && chapters.count > 0
+    chapters = data.safe_dig("chapters")
+    if chapters && chapters.count > 0
       Sidekiq.logger.info "Found chapters entry=#{@entry.id}"
       @entry.update(chapters:)
     end
