@@ -1,6 +1,6 @@
 class ChapterParser
   include Sidekiq::Worker
-  sidekiq_options queue: :network_default
+  sidekiq_options queue: :network_default, retry: false
 
   MAX_SIZE = 5.megabytes
 
@@ -27,6 +27,7 @@ class ChapterParser
     out, _, status = Open3.capture3(command % arguments)
     data = JSON.load(out)
     if chapters = data.safe_dig("chapters")
+      Sidekiq.logger.info "Found chapters entry=#{@entry.id}"
       @entry.update(chapters:)
     end
   end
