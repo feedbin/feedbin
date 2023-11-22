@@ -371,10 +371,6 @@ class Entry < ApplicationRecord
   def mark_as_unplayed
     return if skip_mark_as_unread.present? || !recent_post
 
-    if data.safe_dig("enclosure_url").present?
-      ChapterParser.perform_async(id)
-    end
-
     subscriptions = PodcastSubscription.where(feed_id: feed_id, status: [:subscribed, :bookmarked])
 
     queued_entries = []
@@ -395,6 +391,10 @@ class Entry < ApplicationRecord
     end
 
     Sidekiq::Client.push_bulk("args" => notification_ids.map {|user_id| [user_id, id]}, "class" => PodcastPushNotification)
+
+    if data.safe_dig("enclosure_url").present? && data.safe_dig("enclosure_type") =~ /audio/i
+      ChapterParser.perform_async(id)
+    end
   end
 
   def podcast_search_data
