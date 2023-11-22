@@ -1,5 +1,6 @@
 class ChapterParser
   include Sidekiq::Worker
+  sidekiq_options queue: :network_default
 
   MAX_SIZE = 5.megabytes
 
