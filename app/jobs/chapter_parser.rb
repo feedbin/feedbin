@@ -7,9 +7,21 @@ class ChapterParser
   def perform(entry_id)
     @entry = Entry.find(entry_id)
     @url = @entry.data.safe_dig("enclosure_url")
+    @url = @entry.rebase_url(@url)
 
     return if @url.nil?
 
+    chapters = Rails.cache.fetch("chapters:#{Digest::SHA1.hexdigest(@url)}") do
+      parse_chapters
+    end
+
+    if chapters && chapters.count > 0
+      Sidekiq.logger.info "Found chapters entry=#{@entry.id}"
+      @entry.update(chapters:)
+    end
+  end
+
+  def parse_chapters
     response = request
     tempfile = Tempfile.new("podcast", binmode: true)
     response.body.each do |chunk|
@@ -27,14 +39,9 @@ class ChapterParser
     out, _, status = Open3.capture3(command % arguments)
     data = JSON.load(out)
     chapters = data.safe_dig("chapters")
-    if chapters && chapters.count > 0
-      Sidekiq.logger.info "Found chapters entry=#{@entry.id}"
-      @entry.update(chapters:)
-    end
   end
 
   def request
-    @url = @entry.rebase_url(@url)
     @url = Addressable::URI.heuristic_parse(@url)
 
     basic_auth = {}
