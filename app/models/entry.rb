@@ -303,6 +303,11 @@ class Entry < ApplicationRecord
     end
   end
 
+  def chapter_titles
+    return [] unless chapters.respond_to?(:map)
+    chapters.map {_1.safe_dig("tags", "title")}
+  end
+
   private
 
   def provider_metadata

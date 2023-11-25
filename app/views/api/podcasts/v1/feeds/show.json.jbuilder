@@ -42,5 +42,6 @@ json.items @feed.entries.order(published: :desc) do |entry|
     json.order            entry.data&.safe_dig("itunes_order").clean
     json.summary          entry.data&.safe_dig("itunes_subtitle").clean(transform: :to_plain_text) || entry.summary
     json.content          entry.content.clean
+    json.chapter_titles   entry.chapter_titles.map(&:clean)
   end
 end
