@@ -17,7 +17,6 @@ class Feed < ApplicationRecord
   before_create :set_host
   before_save :set_hubs
   after_create :refresh_favicon
-  before_save :update_discovered_feeds, if: -> { site_url_changed? }
 
   after_commit :web_sub_subscribe, on: :create
   after_commit :update_youtube_videos, on: :create
@@ -31,12 +30,6 @@ class Feed < ApplicationRecord
   enum feed_type: {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3, pages: 4}
 
   store :settings, accessors: [:custom_icon, :current_feed_url, :custom_icon_format], coder: JsonConverter
-
-  def update_discovered_feeds
-    new_site_url = site_url
-    self[:site_url] = new_site_url
-    FeedFixer.perform_in(2.seconds, id, true)
-  end
 
   def twitter_user?
     twitter_user.present?
