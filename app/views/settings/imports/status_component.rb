@@ -5,26 +5,17 @@ module Settings
       def initialize(import:)
         @import = import
 
-        if @import.user.setting_on?(:fix_feeds_flag)
-          @failed_items = @import
-            .import_items
-            .failed
-            .includes(:discovered_feeds, :favicon)
-            .sort_by { _1.title }
+        @failed_items = @import
+          .import_items
+          .failed
+          .includes(:discovered_feeds, :favicon)
+          .sort_by { _1.title }
 
-          @fixable_items = @import
-            .import_items
-            .fixable
-            .includes(:discovered_feeds, :favicon)
-            .sort_by { _1.title }
-        else
-          @fixable_items = []
-          @failed_items = @import
-            .import_items
-            .where(status: [:failed, :fixable])
-            .includes(:favicon)
-            .sort_by { _1.title }
-        end
+        @fixable_items = @import
+          .import_items
+          .fixable
+          .includes(:discovered_feeds, :favicon)
+          .sort_by { _1.title }
       end
 
       def template

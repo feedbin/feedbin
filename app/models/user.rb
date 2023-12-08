@@ -50,7 +50,6 @@ class User < ApplicationRecord
     :billing_issue,
     :podcast_sort_order,
     :playlist_migration,
-    :fix_feeds_flag,
     :fix_feeds_available
 
   has_one :coupon

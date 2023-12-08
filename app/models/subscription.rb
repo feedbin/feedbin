@@ -96,11 +96,11 @@ class Subscription < ApplicationRecord
   end
 
   def fixable?
-    user.setting_on?(:fix_feeds_flag) && feed.crawl_error? && feed.discovered_feeds.present?
+    feed.crawl_error? && feed.discovered_feeds.present?
   end
 
   def dead?
-    user.setting_on?(:fix_feeds_flag) && feed.crawl_error? && !feed.discovered_feeds.present?
+    feed.crawl_error? && !feed.discovered_feeds.present?
   end
 
   def protected?

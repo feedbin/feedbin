@@ -28,7 +28,7 @@ module Settings
             end
             if subscription.feed.twitter_feed?
               twitter_notice
-            elsif subscription.feed.crawl_error? && @subscription.user.setting_on?(:fix_feeds_flag)
+            elsif subscription.feed.crawl_error?
               error_notice
             end
           end

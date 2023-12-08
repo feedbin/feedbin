@@ -10,7 +10,7 @@ module Settings
         render App::ExpandableContainerComponent.new(open: true) do |expandable|
           expandable.content do
             div class: "border rounded-lg mb-4 px-4 pb-4" do
-              if helpers.current_user.setting_on?(:fix_feeds_flag) && @import_item.discovered_feeds.present?
+              if @import_item.discovered_feeds.present?
                 render FixFeeds::SuggestionComponent.new(replaceable: @import_item, source: @import_item, redirect: helpers.fix_feeds_url)
               else
                 div class: "pt-4" do

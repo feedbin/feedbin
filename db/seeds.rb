@@ -26,18 +26,16 @@ if Rails.env.development?
   u = User.new(email: "ben@benubois.com", password: "passw0rd", password_confirmation: "passw0rd", admin: true)
   u.plan = plan
   u.update_auth_token = true
-  u.fix_feeds_flag = "1"
   u.save
 
   u2 = User.new(email: "components", password: "components", password_confirmation: "components", admin: true)
   u2.plan = plan
   u2.update_auth_token = true
-  u2.fix_feeds_flag = "1"
   u2.save
 
   feed = Feed.create!(title: "Daring Fireball", feed_url: "https://daringfireball.net/index.xml", site_url: "https://daringfireball.net/")
   subscription = u2.subscriptions.create(feed: feed)
-  
+
   DiscoveredFeed.create!(site_url: feed.site_url, feed_url: "https://daringfireball.net/two.xml")
   DiscoveredFeed.create!(site_url: feed.site_url, feed_url: "https://daringfireball.net/three.xml")
 

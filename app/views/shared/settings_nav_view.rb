@@ -33,7 +33,7 @@ module Shared
           url: helpers.settings_subscriptions_path,
           icon: "menu-icon-subscriptions",
           selected: helpers.is_active?(["settings/subscriptions", "fix_feeds"], %w[index edit]),
-          notification: helpers.current_user.setting_on?(:fix_feeds_available) && helpers.current_user.setting_on?(:fix_feeds_flag)
+          notification: helpers.current_user.setting_on?(:fix_feeds_available)
         ))
         render(::SettingsNav::NavComponent.new(
           title: "Sources",
