@@ -14,7 +14,7 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/feedjira.git
-  revision: 67807b0bce0244f7220eaa0f0819c72a3ea85180
+  revision: 91fef5098f97a00a209aa3441e8c037d83e939d9
   branch: f2
   specs:
     feedjira (2.1.2)
@@ -100,7 +100,7 @@ GIT
 
 GIT
   remote: https://github.com/teamcapybara/capybara.git
-  revision: 6267ff65a294a7dcbe9d7281c30cc2d91b08b093
+  revision: 52eaecea6d154b7d664b0032cd1cbcad4788fe65
   specs:
     capybara (3.40.0)
       addressable
@@ -191,23 +191,23 @@ GEM
       minitest (>= 5.1)
       mutex_m
       tzinfo (~> 2.0)
-    addressable (2.8.5)
+    addressable (2.8.6)
       public_suffix (>= 2.0.2, < 6.0)
     aggregate (0.2.4)
     apnotic (1.7.1)
       connection_pool (~> 2)
       net-http2 (>= 0.18.3, < 2)
     ast (2.4.2)
-    autoprefixer-rails (10.4.15.0)
+    autoprefixer-rails (10.4.16.0)
       execjs (~> 2)
     base64 (0.2.0)
     bcrypt (3.1.20)
-    benchmark-ips (2.12.0)
+    benchmark-ips (2.13.0)
     better_errors (2.10.1)
       erubi (>= 1.0.0)
       rack (>= 0.9.0)
       rouge (>= 1.0.0)
-    bigdecimal (3.1.4)
+    bigdecimal (3.1.5)
     binding_of_caller (1.0.0)
       debug_inspector (>= 0.0.1)
     bootsnap (1.17.0)
@@ -215,7 +215,7 @@ GEM
     buftok (0.2.0)
     builder (3.2.4)
     byebug (11.1.3)
-    cgi (0.4.0)
+    cgi (0.4.1)
     clockwork (3.0.2)
       activesupport
       tzinfo
@@ -236,10 +236,10 @@ GEM
       addressable
     dante (0.2.0)
     date (3.3.4)
-    debug (1.8.0)
-      irb (>= 1.5.0)
-      reline (>= 0.3.1)
-    debug_inspector (1.1.0)
+    debug (1.9.0)
+      irb (~> 1.10)
+      reline (>= 0.3.8)
+    debug_inspector (1.2.0)
     domain_name (0.6.20231109)
     dotenv (2.8.1)
     dotenv-rails (2.8.1)
@@ -257,7 +257,7 @@ GEM
     evernote_oauth (0.2.3)
       evernote-thrift
       oauth (>= 0.4.1)
-    excon (0.104.0)
+    excon (0.106.0)
     execjs (2.9.1)
     faker (3.2.2)
       i18n (>= 1.8.11, < 2)
@@ -310,7 +310,7 @@ GEM
     hashdiff (1.0.1)
     hashie (5.0.0)
     hetchy (1.0.0)
-    honeybadger (5.3.0)
+    honeybadger (5.4.0)
     htmlbeautifier (1.4.2)
     htmlentities (4.3.4)
     http-2 (0.11.0)
@@ -331,8 +331,8 @@ GEM
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
-    io-console (0.6.0)
-    irb (1.9.0)
+    io-console (0.7.0)
+    irb (1.10.1)
       rdoc
       reline (>= 0.3.8)
     jbuilder (2.11.5)
@@ -342,7 +342,7 @@ GEM
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    json (2.6.3)
+    json (2.7.1)
     jwt (2.7.1)
     kgio (2.11.4)
     language_server-protocol (3.17.0.3)
@@ -372,7 +372,7 @@ GEM
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    lookbook (2.1.1)
+    lookbook (2.2.0)
       activemodel
       css_parser
       htmlbeautifier (~> 1.3)
@@ -393,10 +393,9 @@ GEM
     method_source (1.0.0)
     mime-types (3.5.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2023.1003)
+    mime-types-data (3.2023.1205)
     mini_magick (4.12.0)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.5)
     minitest (5.20.0)
     minitest-stub-const (0.6)
     minitest-stub_any_instance (1.0.3)
@@ -410,7 +409,7 @@ GEM
       connection_pool (~> 2.2)
     net-http2 (0.18.5)
       http-2 (~> 0.11)
-    net-imap (0.4.5)
+    net-imap (0.4.8)
       date
       net-protocol
     net-pop (0.1.2)
@@ -419,7 +418,7 @@ GEM
       timeout
     net-smtp (0.4.0)
       net-protocol
-    nio4r (2.6.0)
+    nio4r (2.7.0)
     nokogiri (1.15.5-arm64-darwin)
       racc (~> 1.4)
     nokogiri (1.15.5-x86_64-darwin)
@@ -445,13 +444,13 @@ GEM
       ast (~> 2.4.1)
       racc
     pg (1.5.4)
-    phlex (1.8.1)
+    phlex (1.9.0)
       concurrent-ruby (~> 1.2)
       erb (>= 4)
       zeitwerk (~> 2.6)
-    phlex-rails (1.0.0)
-      phlex (~> 1.7)
-      rails (>= 6.1, < 8)
+    phlex-rails (1.1.1)
+      phlex (~> 1.9)
+      railties (>= 6.1, < 8)
       zeitwerk (~> 2.6)
     postmark (1.25.0)
       json
@@ -476,7 +475,7 @@ GEM
       nio4r (~> 2.0)
     racc (1.7.3)
     rack (2.2.8)
-    rack-session (1.0.1)
+    rack-session (1.0.2)
       rack (< 3)
     rack-test (2.1.0)
       rack (>= 1.3)
@@ -523,14 +522,14 @@ GEM
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     rchardet (1.8.0)
-    rdoc (6.6.0)
+    rdoc (6.6.1)
       psych (>= 4.0.0)
     redcarpet (3.6.0)
     redis (4.8.1)
-    redis-client (0.18.0)
+    redis-client (0.19.0)
       connection_pool
-    regexp_parser (2.8.2)
-    reline (0.4.0)
+    regexp_parser (2.8.3)
+    reline (0.4.1)
       io-console (~> 0.5)
     request_store (1.5.1)
       rack (>= 1.4)
@@ -575,7 +574,7 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
-    selenium-webdriver (4.15.0)
+    selenium-webdriver (4.16.0)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
@@ -596,7 +595,7 @@ GEM
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
     ssrf_filter (1.1.2)
-    standard (1.32.0)
+    standard (1.32.1)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
       rubocop (~> 1.57.2)
@@ -610,18 +609,18 @@ GEM
       rubocop-performance (~> 1.19.1)
     stimulus-rails (1.3.0)
       railties (>= 6.0.0)
-    stringio (3.0.9)
+    stringio (3.1.0)
     stripe (5.55.0)
     stripe_event (2.7.0)
       activesupport (>= 3.1)
       stripe (>= 2.8, < 9)
     strong_migrations (1.6.4)
       activerecord (>= 5.2)
-    tailwindcss-rails (2.0.32-arm64-darwin)
+    tailwindcss-rails (2.0.33-arm64-darwin)
       railties (>= 6.0.0)
-    tailwindcss-rails (2.0.32-x86_64-darwin)
+    tailwindcss-rails (2.0.33-x86_64-darwin)
       railties (>= 6.0.0)
-    tailwindcss-rails (2.0.32-x86_64-linux)
+    tailwindcss-rails (2.0.33-x86_64-linux)
       railties (>= 6.0.0)
     thor (1.3.0)
     thread_safe (0.3.6)
@@ -642,7 +641,7 @@ GEM
       kgio (~> 2.6)
       raindrops (~> 0.7)
     version_gem (1.1.3)
-    view_component (3.7.0)
+    view_component (3.8.0)
       activesupport (>= 5.2.0, < 8.0)
       concurrent-ruby (~> 1.0)
       method_source (~> 1.0)
