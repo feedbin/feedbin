@@ -236,7 +236,7 @@ GEM
       addressable
     dante (0.2.0)
     date (3.3.4)
-    debug (1.9.0)
+    debug (1.9.1)
       irb (~> 1.10)
       reline (>= 0.3.8)
     debug_inspector (1.2.0)
@@ -257,7 +257,7 @@ GEM
     evernote_oauth (0.2.3)
       evernote-thrift
       oauth (>= 0.4.1)
-    excon (0.106.0)
+    excon (0.108.0)
     execjs (2.9.1)
     faker (3.2.2)
       i18n (>= 1.8.11, < 2)
@@ -307,10 +307,10 @@ GEM
     formatador (1.1.0)
     globalid (1.2.1)
       activesupport (>= 6.1)
-    hashdiff (1.0.1)
+    hashdiff (1.1.0)
     hashie (5.0.0)
     hetchy (1.0.0)
-    honeybadger (5.4.0)
+    honeybadger (5.4.1)
     htmlbeautifier (1.4.2)
     htmlentities (4.3.4)
     http-2 (0.11.0)
@@ -331,8 +331,8 @@ GEM
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
-    io-console (0.7.0)
-    irb (1.10.1)
+    io-console (0.7.1)
+    irb (1.11.0)
       rdoc
       reline (>= 0.3.8)
     jbuilder (2.11.5)
@@ -396,6 +396,7 @@ GEM
     mime-types-data (3.2023.1205)
     mini_magick (4.12.0)
     mini_mime (1.1.5)
+    mini_portile2 (2.8.5)
     minitest (5.20.0)
     minitest-stub-const (0.6)
     minitest-stub_any_instance (1.0.3)
@@ -409,7 +410,7 @@ GEM
       connection_pool (~> 2.2)
     net-http2 (0.18.5)
       http-2 (~> 0.11)
-    net-imap (0.4.8)
+    net-imap (0.4.9)
       date
       net-protocol
     net-pop (0.1.2)
@@ -419,11 +420,8 @@ GEM
     net-smtp (0.4.0)
       net-protocol
     nio4r (2.7.0)
-    nokogiri (1.15.5-arm64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.15.5-x86_64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.15.5-x86_64-linux)
+    nokogiri (1.15.5)
+      mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     oauth (1.1.0)
       oauth-tty (~> 1.0, >= 1.0.1)
@@ -439,7 +437,7 @@ GEM
       snaky_hash (~> 2.0)
       version_gem (~> 1.1)
     openssl (3.2.0)
-    parallel (1.23.0)
+    parallel (1.24.0)
     parser (3.2.2.4)
       ast (~> 2.4.1)
       racc
@@ -468,7 +466,7 @@ GEM
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    psych (5.1.1.1)
+    psych (5.1.2)
       stringio
     public_suffix (5.0.4)
     puma (6.4.0)
@@ -522,11 +520,11 @@ GEM
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     rchardet (1.8.0)
-    rdoc (6.6.1)
+    rdoc (6.6.2)
       psych (>= 4.0.0)
     redcarpet (3.6.0)
     redis (4.8.1)
-    redis-client (0.19.0)
+    redis-client (0.19.1)
       connection_pool
     regexp_parser (2.8.3)
     reline (0.4.1)
@@ -616,11 +614,11 @@ GEM
       stripe (>= 2.8, < 9)
     strong_migrations (1.6.4)
       activerecord (>= 5.2)
-    tailwindcss-rails (2.0.33-arm64-darwin)
+    tailwindcss-rails (2.1.0-arm64-darwin)
       railties (>= 6.0.0)
-    tailwindcss-rails (2.0.33-x86_64-darwin)
+    tailwindcss-rails (2.1.0-x86_64-darwin)
       railties (>= 6.0.0)
-    tailwindcss-rails (2.0.33-x86_64-linux)
+    tailwindcss-rails (2.1.0-x86_64-linux)
       railties (>= 6.0.0)
     thor (1.3.0)
     thread_safe (0.3.6)
@@ -666,6 +664,7 @@ GEM
 PLATFORMS
   arm64-darwin-20
   arm64-darwin-22
+  arm64-darwin-23
   x86_64-darwin-20
   x86_64-linux
 
