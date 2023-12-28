@@ -8,7 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04]
-        ruby: [3.2.2]
+        ruby: [3.3.0]
 
     runs-on: ${{ matrix.os }}
 
