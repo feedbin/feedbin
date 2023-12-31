@@ -14,6 +14,7 @@ class SendStats
       clear_empty_jobs
       sidekiq_queue_depth
       sidekiq_latency
+      yjit_stats
     end
   end
 
