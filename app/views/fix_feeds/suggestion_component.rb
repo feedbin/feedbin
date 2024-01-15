@@ -58,8 +58,8 @@ module FixFeeds
       form_with(model: @replaceable, url: @replaceable.replaceable_path, data: {remote: @remote, behavior: "disable_on_submit"}) do |form|
         form.hidden_field :redirect_to, value: @redirect
         render Settings::ControlGroupComponent.new class: "group", data: {item_capsule: "true"} do |group|
-          discovered_feeds = @source.discovered_feeds
-          discovered_feeds.order(created_at: :asc).each_with_index do |discovered_feed, index|
+          discovered_feeds = @source.discovered_feeds.order(created_at: :asc)
+          discovered_feeds.each_with_index do |discovered_feed, index|
             group.item do
               div class: "flex gap-4" do
                 render Timeline.new(color: "bg-green-600", options: {last: discovered_feed == discovered_feeds.last, middle: index != 0}) do
