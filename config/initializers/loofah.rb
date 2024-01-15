@@ -11,4 +11,5 @@ Loofah::HTML5::WhiteList::ACCEPTABLE_PROTOCOLS.merge %w[
   pocket
   things
   todoist
+  winstonapp
 ]
