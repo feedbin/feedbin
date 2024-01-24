@@ -1,6 +1,6 @@
-<p class="error-message">
-  <span class="icon-container">
-    <%= svg_tag "icon-error-message" %>
+<p class="flex p-2 bg-red-200 gap-2 rounded-lg mb-4">
+  <%= svg_tag "icon-error-message" %>
+  <span>
+    <%= yield %>
   </span>
-  <span><%= yield %></span>
 </p>
