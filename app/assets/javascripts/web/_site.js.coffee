@@ -2719,6 +2719,10 @@ $.extend feedbin,
 
         feedbin.remoteContentIntervals[src] = setInterval callback, 3000
 
+    # workaround for app showing another panel on launch
+    showFirstPanel: ->
+      feedbin.showPanel(1)
+
     copy: ->
       $(document).on 'click', '[data-behavior~=copy]', (event) ->
         button = $(@)
