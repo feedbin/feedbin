@@ -27,7 +27,7 @@ Rails.application.reloader.to_prepare do
         stemmed: {
           type: "custom",
           tokenizer: "standard",
-          filter: ["lowercase", "asciifolding", "english_stemmer"]
+          filter: ["lowercase", "asciifolding", "stemmer"]
         }
       },
       filter: {
