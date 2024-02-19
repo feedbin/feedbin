@@ -359,8 +359,11 @@ Rails.application.routes.draw do
     end
   end
 
-  namespace :admin do
-    resources :users
+  constraints lambda { |request| AuthConstraint.admin?(request) } do
+    namespace :admin do
+      resources :users
+      resources :feeds
+    end
   end
 
   namespace :app_store do

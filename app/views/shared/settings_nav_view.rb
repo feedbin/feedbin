@@ -110,6 +110,13 @@ module Shared
             icon: "menu-icon-customers"
           ))
           render(::SettingsNav::NavComponent.new(
+            title: "Feeds",
+            subtitle: "Feed info",
+            url: helpers.admin_feeds_path,
+            selected: helpers.is_active?("admin/feeds", "index"),
+            icon: "menu-icon-customers"
+          ))
+          render(::SettingsNav::NavComponent.new(
             title: "Sidekiq",
             subtitle: "Background jobs",
             url: helpers.sidekiq_web_path,

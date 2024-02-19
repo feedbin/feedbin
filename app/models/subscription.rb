@@ -96,11 +96,11 @@ class Subscription < ApplicationRecord
   end
 
   def fixable?
-    feed.crawl_error? && feed.discovered_feeds.present?
+    feed.fixable?
   end
 
   def dead?
-    feed.crawl_error? && !feed.discovered_feeds.present?
+    feed.dead?
   end
 
   def protected?

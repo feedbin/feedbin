@@ -289,6 +289,15 @@ class Feed < ApplicationRecord
     message
   end
 
+  def fixable?
+    crawl_error? && discovered_feeds.present?
+  end
+
+  def dead?
+    crawl_error? && !discovered_feeds.present?
+  end
+
+
   private
 
   def update_youtube_videos
