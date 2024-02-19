@@ -28,16 +28,16 @@ if Rails.env.development?
   u.update_auth_token = true
   u.save
 
-  u2 = User.new(email: "components", password: "components", password_confirmation: "components", admin: true)
-  u2.plan = plan
-  u2.update_auth_token = true
-  u2.save
-
-  feed = Feed.create!(title: "Daring Fireball", feed_url: "https://daringfireball.net/index.xml", site_url: "https://daringfireball.net/")
-  subscription = u2.subscriptions.create(feed: feed)
-
-  DiscoveredFeed.create!(site_url: feed.site_url, feed_url: "https://daringfireball.net/two.xml")
-  DiscoveredFeed.create!(site_url: feed.site_url, feed_url: "https://daringfireball.net/three.xml")
+  # u2 = User.new(email: "components", password: "components", password_confirmation: "components", admin: true)
+  # u2.plan = plan
+  # u2.update_auth_token = true
+  # u2.save
+  #
+  # feed = Feed.create!(title: "Daring Fireball", feed_url: "https://daringfireball.net/index.xml", site_url: "https://daringfireball.net/")
+  # subscription = u2.subscriptions.create(feed: feed)
+  #
+  # DiscoveredFeed.create!(site_url: feed.site_url, feed_url: "https://daringfireball.net/two.xml")
+  # DiscoveredFeed.create!(site_url: feed.site_url, feed_url: "https://daringfireball.net/three.xml")
 
 
   # migration = u.account_migrations.create!(api_token: "asdf")
