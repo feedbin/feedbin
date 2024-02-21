@@ -130,7 +130,7 @@ class ContentFormatter
       context[:href_subpage_url]  = base_url || entry.fully_qualified_url || ""
     end
 
-    if entry&.newsletter_from =~ /@substack.com/
+    if entry&.newsletter_from =~ /@substack\.com/
       filters.unshift(ContentFilters::Substack)
     end
 
