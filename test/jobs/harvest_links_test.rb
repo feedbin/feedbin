@@ -43,4 +43,18 @@ class HarvestLinksTest < ActiveSupport::TestCase
       assert page.key?(key), "page is missing #{key}"
     end
   end
+
+  test "should ignore links to itself" do
+    xml = File.read(support_file("microposts.xml"))
+    parsed = Feedkit::Parser::XMLFeed.new(xml, "http://example.com")
+    feed = Feed.create_from_parsed_feed(parsed)
+
+    host = "chriscoyier.net"
+
+    entry = feed.entries.first
+    entry.update(url: "http://#{host}/example")
+
+    # if hostname filter is not present, this will raise an error when it tries to download the url
+    HarvestLinks.new.perform(entry.id)
+  end
 end

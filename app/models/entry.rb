@@ -218,7 +218,7 @@ class Entry < ApplicationRecord
   end
 
   def hostname
-    URI(url).host
+    Addressable::URI.heuristic_parse(url).host
   rescue
     nil
   end
