@@ -21,7 +21,7 @@ class Api::Podcasts::V1::SubscriptionsControllerTest < ApiControllerTestCase
     assert_equal(subscription.id, data.first.safe_dig("id"))
     assert_equal(feed.id, data.first.safe_dig("feed_id"))
     assert_equal(playlist.id, data.first.safe_dig("playlist_id"))
-    assert_equal(feed.title, data.first.safe_dig("title"))
+    assert_nil(data.first.safe_dig("title"))
     assert_equal(feed.feed_url, data.first.safe_dig("feed_url"))
     assert_equal("subscribed", data.first.safe_dig("status"))
   end
@@ -65,14 +65,15 @@ class Api::Podcasts::V1::SubscriptionsControllerTest < ApiControllerTestCase
     playlist = @user.playlists.create!(title: "Favorites")
     entry = create_entry(subscription.feed)
 
-    patch :update, params: {id: subscription.feed_id, status: "bookmarked", status_updated_at: Time.now.iso8601(6), playlist_id: playlist.id, playlist_id_updated_at: Time.now.iso8601(6)}, format: :json
+    patch :update, params: {id: subscription.feed_id, status: "bookmarked", status_updated_at: Time.now.iso8601(6), playlist_id: playlist.id, playlist_id_updated_at: Time.now.iso8601(6), title: "Title", title_updated_at: Time.now.iso8601(6)}, format: :json
     assert_response :success
 
     assert subscription.reload.bookmarked?, "Subscription should be bookmarked"
     assert subscription.attribute_changes.present?
     assert_equal(playlist.id, @user.queued_entries.first.playlist_id)
+    assert_equal(subscription.reload.title, "Title")
     changes = subscription.attribute_changes.pluck(:name).to_set
-    assert_equal(["playlist_id", "status"].to_set, changes)
+    assert_equal(["playlist_id", "status", "title"].to_set, changes)
   end
 
   test "should not update" do
