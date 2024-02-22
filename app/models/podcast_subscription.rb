@@ -1,6 +1,6 @@
 class PodcastSubscription < ApplicationRecord
   include TrackableAttributes
-  track :status, :playlist_id,
+  track :status, :playlist_id, :title,
     :chapter_filter, :chapter_filter_type,
     :download_filter, :download_filter_type
 
