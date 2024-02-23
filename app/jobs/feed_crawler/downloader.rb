@@ -37,6 +37,9 @@ module FeedCrawler
     rescue Feedkit::Error => exception
       @crawl_data.download_error(exception)
       Sidekiq.logger.info "Feedkit::Error: attempts=#{@crawl_data.error_count} exception=#{exception.inspect} id=#{@feed_id} url=#{@feed_url}"
+      if exception.respond_to?(:response) && exception.response.headers[:retry_after].present?
+        Sidekiq.logger.info "Feedkit::Error: retry_after=#{exception.response.headers[:retry_after]}"
+      end
     end
 
     def request(auto_inflate: true)
