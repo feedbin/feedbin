@@ -4,7 +4,9 @@ class Api::Podcasts::V1::SubscriptionsControllerTest < ApiControllerTestCase
     @user = users(:ben)
     @feeds = create_feeds(@user)
     @entries = @user.entries
-    @user.podcast_subscriptions.first.subscribed!
+    subscription = @user.podcast_subscriptions.first
+    subscription.subscribed!
+    @queued_entry = @user.queued_entries.create!(feed: subscription.feed, entry: @entries.first)
   end
 
   test "should get index" do
@@ -50,9 +52,11 @@ class Api::Podcasts::V1::SubscriptionsControllerTest < ApiControllerTestCase
     api_content_type
     login_as @user
 
-    assert_difference "PodcastSubscription.count", -1 do
-      post :destroy, params: {id: @user.subscriptions.first.feed_id}, format: :json
-      assert_response :success
+    assert_difference -> { QueuedEntry.count }, -1 do
+      assert_difference -> { PodcastSubscription.count }, -1 do
+        post :destroy, params: {id: @user.subscriptions.first.feed_id}, format: :json
+        assert_response :success
+      end
     end
   end
 
