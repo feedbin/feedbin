@@ -10,4 +10,13 @@ class EntryDeleterSchedulerTest < ActiveSupport::TestCase
       EntryDeleterScheduler.new.perform
     end
   end
+
+  test "should not schedule jobs" do
+    Sidekiq::Testing.disable! do
+      Search::SearchServerSetup.perform_async(1)
+      assert_no_difference -> { EntryDeleter.jobs.size } do
+        EntryDeleterScheduler.new.perform
+      end
+    end
+  end
 end

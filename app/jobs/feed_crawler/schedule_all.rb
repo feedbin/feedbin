@@ -1,4 +1,3 @@
-require "sidekiq/api"
 module FeedCrawler
   class ScheduleAll
     include Sidekiq::Worker
@@ -47,12 +46,6 @@ module FeedCrawler
         result = Sidekiq.redis { _1.get(COUNT_KEY) } || 0
         result.to_i
       end
-    end
-
-    def queue_empty?(queue)
-      queue = queue.to_s
-      @queues ||= Sidekiq::Stats.new.queues
-      @queues[queue].blank? || @queues[queue] == 0
     end
   end
 end
