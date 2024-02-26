@@ -30,3 +30,7 @@ end
 after_fork do |server, worker|
   defined?(ActiveRecord::Base) && ActiveRecord::Base.establish_connection
 end
+
+before_exec do |server|
+  ENV.update Dotenv.load
+end
