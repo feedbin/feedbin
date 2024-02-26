@@ -529,7 +529,8 @@ CREATE TABLE public.entries (
     provider bigint,
     provider_id text,
     provider_parent_id text,
-    chapters jsonb
+    chapters jsonb,
+    categories jsonb
 );
 
 
@@ -3031,6 +3032,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240226114227'),
 ('20231122160929'),
 ('20231113211123'),
 ('20231017104045'),

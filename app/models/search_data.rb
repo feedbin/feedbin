@@ -17,6 +17,7 @@ class SearchData
       hash[:type]           = type
       hash[:media_duration] = @entry.media_duration
       hash[:word_count]     = hash[:content]&.split&.length || 0
+      hash[:category]       = @entry.categories
 
       if @entry.tweet?
         hash[:twitter_screen_name] = "#{@entry.tweet.main_tweet.user.screen_name} @#{@entry.tweet.main_tweet.user.screen_name}"

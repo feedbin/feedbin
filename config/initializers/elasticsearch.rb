@@ -59,6 +59,10 @@ Rails.application.reloader.to_prepare do
         link: {
           type: "keyword"
         },
+        category: {
+          type: "text",
+          analyzer: "lower_exact"
+        },
         published: {
           type: "date"
         },
