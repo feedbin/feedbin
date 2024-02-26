@@ -135,7 +135,7 @@ Rails.application.reloader.to_prepare do
       }
     }
 
-    if ENV["ELASTICSEARCH_ALT_URL"]
+    if ENV["ELASTICSEARCH_ALT_URL"].present?
       hash[:servers][:secondary] = ConnectionPool.new(size: ENV.fetch("DB_POOL", 1)) {
         Search::Connection.new(ENV.fetch("ELASTICSEARCH_ALT_URL", "http://localhost:9200"),
           username: ENV["ELASTICSEARCH_ALT_USERNAME"],
