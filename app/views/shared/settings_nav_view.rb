@@ -101,7 +101,17 @@ module Shared
             icon: "menu-icon-billing"
           ))
         end
-        if @user.try(:admin?)
+      end
+
+      if @user.try(:admin?)
+        render ::SettingsNav::HeaderComponent.new do
+          plain " Internal"
+        end
+
+        div(class: "px-4 pl-10 tw-hidden group-data-[nav=dropdown]:block") do
+          hr(class: "m-0")
+        end
+        ul do
           render(::SettingsNav::NavComponent.new(
             title: "Customers",
             subtitle: "Manage customers",
@@ -114,7 +124,7 @@ module Shared
             subtitle: "Feed info",
             url: helpers.admin_feeds_path,
             selected: helpers.is_active?("admin/feeds", "index"),
-            icon: "menu-icon-customers"
+            icon: "menu-icon-feeds"
           ))
           render(::SettingsNav::NavComponent.new(
             title: "Sidekiq",
