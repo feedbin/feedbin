@@ -446,7 +446,7 @@ GEM
       ast (~> 2.4.1)
       racc
     pg (1.5.5)
-    phlex (1.9.0)
+    phlex (1.9.1)
       concurrent-ruby (~> 1.2)
       erb (>= 4)
       zeitwerk (~> 2.6)
@@ -758,4 +758,4 @@ DEPENDENCIES
   will_paginate
 
 BUNDLED WITH
-   2.5.3
+   2.5.6
