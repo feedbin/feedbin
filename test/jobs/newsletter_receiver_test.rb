@@ -19,7 +19,7 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
     assert !feed.newsletter_sender.active?, "Sender should not be active."
   end
 
-  test "creates newsletters with new feed" do
+  test "creates newsletters with new feed and receiver" do
     assert_difference "Subscription.count", +1 do
       assert_difference "NewsletterSaver.jobs.size", +1 do
         assert_difference("NewsletterSender.count", 1) do

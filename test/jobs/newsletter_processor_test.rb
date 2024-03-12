@@ -9,7 +9,7 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
     @newsletter_html = File.read(support_file("email_html.eml"))
   end
 
-  test "creates newsletters with new feed" do
+  test "creates newsletters with new feed and processor" do
     file_url = "https://bucket.s3.amazonaws.com/path.to.email"
     stub_request_file("email_html.eml", file_url)
     stub_request(:delete, file_url)
