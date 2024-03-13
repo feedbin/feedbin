@@ -138,7 +138,7 @@ class ContentFormatter
 
     pipeline = HTML::Pipeline.new filters, context
 
-    result = pipeline.call(content)
+    result = pipeline.call(self.class.document(content))
 
     if entry&.archived_images?
       result[:output] = ImageFallback.new(result[:output]).add_fallbacks
@@ -166,7 +166,7 @@ class ContentFormatter
 
     pipeline = HTML::Pipeline.new filters, context
 
-    result = pipeline.call(content)
+    result = pipeline.call(self.class.document(content))
 
     result[:output].to_s
   end
@@ -184,7 +184,7 @@ class ContentFormatter
       href_subpage_url:  base_url || entry.fully_qualified_url || ""
     }
     pipeline = HTML::Pipeline.new filters, context
-    result = pipeline.call(content)
+    result = pipeline.call(self.class.document(content))
     result[:output].to_s
   rescue
     content
@@ -208,7 +208,7 @@ class ContentFormatter
       context[:scrub_mode] = :newsletter
     end
     pipeline = HTML::Pipeline.new filters, context
-    result = pipeline.call(content)
+    result = pipeline.call(self.class.document(content))
     result[:output].to_s
   rescue
     content
@@ -229,7 +229,7 @@ class ContentFormatter
       placeholder_attribute: "data-feedbin-src"
     }
     pipeline = HTML::Pipeline.new filters, context
-    result = pipeline.call(content)
+    result = pipeline.call(self.class.document(content))
     result[:output].to_s
   rescue
     content
@@ -250,7 +250,7 @@ class ContentFormatter
     }
 
     pipeline = HTML::Pipeline.new filters, context
-    result = pipeline.call(content)
+    result = pipeline.call(self.class.document(content))
     result[:output].to_xml
   rescue
     content
@@ -264,7 +264,7 @@ class ContentFormatter
     return "" if content.nil?
 
     content = HTML::Pipeline.new([ContentFilters::Scrub])
-      .call(content)[:output]
+      .call(self.class.document(content))[:output]
       .to_text(encode_special_chars: false).gsub(/\s+/, " ").squish
     content = content.truncate(length, separator: " ", omission: "") if length
     content
@@ -282,5 +282,9 @@ class ContentFormatter
     Sanitize.fragment(content, ALLOWLIST_DEFAULT).html_safe
   rescue
     content
+  end
+
+  def self.document(html)
+    Loofah::HTML5::DocumentFragment.new(Loofah::HTML5::Document.new, html, nil, {max_tree_depth: 2_000, max_attributes: 2_000})
   end
 end
