@@ -42,3 +42,9 @@ every(1.day, "clockwork.daily", at: "7:00", tz: "UTC") do
     WebSub::Maintenance.perform_async
   end
 end
+
+every(1.week, "clockwork.weekly", at: "Sunday 16:00", tz: "UTC") do
+  if RedisLock.acquire("clockwork:feed_fixer_scheduler")
+    FeedFixerScheduler.perform_async
+  end
+end

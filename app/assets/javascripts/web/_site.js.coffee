@@ -26,6 +26,7 @@ $.extend feedbin,
   scrollStarted: false
   loadingMore: false
   remoteContentIntervals: {}
+  fastAnimation: 200
 
   hideFormatMenu: (event) ->
     menu = $('.format-palette')
@@ -458,7 +459,7 @@ $.extend feedbin,
     offset = $(selector)[0].offsetLeft
 
     if animate
-      timeout = 200
+      timeout = feedbin.fastAnimation
       feedbin.panelScrollComplete = false
       $(containerClass).css {'scroll-snap-type': 'unset'} if feedbin.aspectRatio
       $(containerClass).animate({scrollLeft: offset}, {duration: timeout})
@@ -472,27 +473,30 @@ $.extend feedbin,
     else
       $(containerClass).prop 'scrollLeft', offset
 
+  animateScroll: ->
+    feedbin.swipe && $('body').hasClass('has-offscreen-panels')
+
   showPanel: (panel, state = true) ->
     feedbin.panel = panel
     if panel == 1
       if state && feedbin.mobileView()
         window.history.pushState({panel: 1}, "", "/");
       $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
-      if feedbin.swipe && $('body').hasClass('has-offscreen-panels')
+      if feedbin.animateScroll()
         feedbin.scrollToPanel('.feeds-column')
 
     else if panel == 2
       if state && feedbin.mobileView()
         window.history.pushState({panel: 2}, "", "/");
       $('body').addClass('feed-selected').removeClass('nothing-selected entry-selected')
-      if feedbin.swipe && $('body').hasClass('has-offscreen-panels')
+      if feedbin.animateScroll()
         feedbin.scrollToPanel('.entries-column')
 
     else if panel == 3
       if state && feedbin.mobileView()
         window.history.pushState({panel: 3}, "", "/");
       $('body').addClass('entry-selected').removeClass('nothing-selected feed-selected')
-      if feedbin.swipe && $('body').hasClass('has-offscreen-panels')
+      if feedbin.animateScroll()
         feedbin.scrollToPanel('.entry-column')
 
   hideNotification: (animated = true) ->
@@ -506,7 +510,7 @@ $.extend feedbin,
       container.addClass('hide')
       container.removeClass('visible')
       container.removeClass('fade-out')
-    setTimeout callback, 200
+    setTimeout callback, feedbin.fastAnimation
 
   showNotification: (text, error = false, url = null) ->
     clearTimeout(feedbin.notificationTimeout)
@@ -592,7 +596,7 @@ $.extend feedbin,
       next.removeClass("previous-entry")
       next.attr("data-behavior", "inner_content_target")
       innerContent.remove()
-    ), 200
+    ), feedbin.fastAnimation
 
   shouldAnimate: ->
     offset = $('.entry-column')[0].offsetLeft
@@ -950,21 +954,28 @@ $.extend feedbin,
     if readability
       feedbin.readability()
     try
-      feedbin.removeOuterLinks()
-      feedbin.formatIframes($("[data-iframe-src]").not("[data-behavior~=iframe_placeholder]"))
-      feedbin.playState()
-      feedbin.timeRemaining(entryId, true)
-      feedbin.syntaxHighlight()
-      feedbin.footnotes()
-      feedbin.nextEntryPreview()
-      feedbin.audioVideo()
       feedbin.entryTime()
       feedbin.applyUserTitles()
-      feedbin.formatTweets()
-      feedbin.formatInstagram()
       feedbin.formatImages()
+      feedbin.removeOuterLinks()
+      feedbin.formatIframes($("[data-iframe-src]").not("[data-behavior~=iframe_placeholder]"))
       feedbin.checkType()
-      feedbin.preloadSiblings()
+
+      callback = ->
+        feedbin.preloadSiblings()
+        feedbin.formatTweets()
+        feedbin.formatInstagram()
+        feedbin.syntaxHighlight()
+        feedbin.playState()
+        feedbin.timeRemaining(entryId, true)
+        feedbin.footnotes()
+        feedbin.nextEntryPreview()
+        feedbin.audioVideo()
+
+      animate = feedbin.animateScroll() && $('body').hasClass('one-up')
+      delay = if animate then feedbin.fastAnimation else 0
+      setTimeout callback, delay
+
     catch error
       if 'console' of window
         console.log error
@@ -1107,7 +1118,7 @@ $.extend feedbin,
     scroll = item.offset().top - container.offset().top + container.scrollTop()
     container.animate {
       scrollTop: scroll
-    }, 200
+    }, feedbin.fastAnimation
 
   sortByLastUpdated: (a, b) ->
     aTimestamp = $(a).data('sort-last-updated') * 1
@@ -1193,7 +1204,7 @@ $.extend feedbin,
       top = Math.round((winHeight / 2) - (height / 2))
     window.open(url, 'intent', "#{windowOptions},width=#{width},height=#{height},left=#{left},top=#{top}")
 
-  closeEntryBasement: (timeout = 200) ->
+  closeEntryBasement: (timeout = feedbin.fastAnimation) ->
     feedbin.closeEntryBasementTimeount = setTimeout ( ->
       $('.basement-panel').addClass('hide')
       $('.field-cluster input, .field-cluster textarea').blur()
@@ -1211,7 +1222,7 @@ $.extend feedbin,
     feedbin.openEntryBasementTimeount = setTimeout ( ->
       $('.entry-basement').addClass('foreground')
       $('.field-cluster input, .field-cluster textarea', selectedPanel).first().select()
-    ), 200
+    ), feedbin.fastAnimation
 
     clearTimeout(feedbin.closeEntryBasementTimeount)
 
@@ -1328,7 +1339,7 @@ $.extend feedbin,
     $('.modal-purpose-subscribe [data-behavior~=subscribe_target]').html('')
 
   showSubscribeResults: ->
-    $('.modal-purpose-subscribe .modal-body, .modal-purpose-subscribe .modal-footer').slideDown(200)
+    $('.modal-purpose-subscribe .modal-body, .modal-purpose-subscribe .modal-footer').slideDown(feedbin.fastAnimation)
     $('.modal-purpose-subscribe .modal-dialog').addClass('done');
     $('.modal-purpose-subscribe [data-behavior~=submit_add]').removeAttr('disabled');
     $('.modal-purpose-subscribe .title').first().find("input").focus();
@@ -1337,7 +1348,7 @@ $.extend feedbin,
 
   showAuthField: (html) ->
     $('.modal-purpose-subscribe [data-behavior~=subscribe_target]').html(html);
-    $('.modal-purpose-subscribe .modal-body, .modal-purpose-subscribe .modal-footer').slideDown(200)
+    $('.modal-purpose-subscribe .modal-body, .modal-purpose-subscribe .modal-footer').slideDown(feedbin.fastAnimation)
     $('.modal-purpose-subscribe .modal-dialog').addClass('done');
     $('.modal-purpose-subscribe .password-footer').removeClass('hide')
     $('.modal-purpose-subscribe .subscribe-footer').addClass('hide')
@@ -2183,7 +2194,7 @@ $.extend feedbin,
 
     deleteAssociatedRecord: ->
       $(document).on 'click', '.remove_fields', (event) ->
-        $(@).parents('[data-behavior~=associated_record]').hide(200)
+        $(@).parents('[data-behavior~=associated_record]').hide(feedbin.fastAnimation)
 
     editAction: ->
       $(document).on 'click', '[data-behavior~=edit_action]', (event) ->
@@ -2205,7 +2216,7 @@ $.extend feedbin,
     serviceOptions: ->
       open = (container, height) ->
         callback = -> container.addClass('fully-open')
-        setTimeout callback, 200
+        setTimeout callback, feedbin.fastAnimation
         container.addClass('open').css
           height: height
 
@@ -2380,7 +2391,7 @@ $.extend feedbin,
 
         if link.text().trim().length > 0 && !$(@).has('.mejs__container').length > 0 && !link.closest(".system-content").length && !link.closest(".bigfoot-footnote").length
           if event.type == "mouseleave"
-            setTimeout((-> feedbin.hideLinkAction(url)), 200)
+            setTimeout((-> feedbin.hideLinkAction(url)), feedbin.fastAnimation)
 
           if event.type == "mouseenter"
             unless url of feedbin.linkActions
@@ -2718,6 +2729,10 @@ $.extend feedbin,
           $.get(src)
 
         feedbin.remoteContentIntervals[src] = setInterval callback, 3000
+
+    # workaround for app showing another panel on launch
+    showFirstPanel: ->
+      feedbin.showPanel(1)
 
     copy: ->
       $(document).on 'click', '[data-behavior~=copy]', (event) ->

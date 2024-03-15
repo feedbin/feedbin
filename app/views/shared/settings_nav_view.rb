@@ -33,7 +33,7 @@ module Shared
           url: helpers.settings_subscriptions_path,
           icon: "menu-icon-subscriptions",
           selected: helpers.is_active?(["settings/subscriptions", "fix_feeds"], %w[index edit]),
-          notification: helpers.current_user.setting_on?(:fix_feeds_available) && helpers.current_user.setting_on?(:fix_feeds_flag)
+          notification: helpers.current_user.setting_on?(:fix_feeds_available)
         ))
         render(::SettingsNav::NavComponent.new(
           title: "Sources",
@@ -101,13 +101,30 @@ module Shared
             icon: "menu-icon-billing"
           ))
         end
-        if @user.try(:admin?)
+      end
+
+      if @user.try(:admin?)
+        render ::SettingsNav::HeaderComponent.new do
+          plain " Internal"
+        end
+
+        div(class: "px-4 pl-10 tw-hidden group-data-[nav=dropdown]:block") do
+          hr(class: "m-0")
+        end
+        ul do
           render(::SettingsNav::NavComponent.new(
             title: "Customers",
             subtitle: "Manage customers",
             url: helpers.admin_users_path,
             selected: helpers.is_active?("admin/users", "index"),
             icon: "menu-icon-customers"
+          ))
+          render(::SettingsNav::NavComponent.new(
+            title: "Feeds",
+            subtitle: "Feed info",
+            url: helpers.admin_feeds_path,
+            selected: helpers.is_active?("admin/feeds", "index"),
+            icon: "menu-icon-feeds"
           ))
           render(::SettingsNav::NavComponent.new(
             title: "Sidekiq",

@@ -11,8 +11,13 @@ module FixFeeds
 
     def template
       div(class: "items-start") do
-        div class: "flex gap-6" do
-          timeline_header
+        div class: "flex gap-4" do
+          div class: "flex inset-y-0 self-stretch" do
+            render Timeline.new(color: "bg-orange-600", options: {first: true}, tooltip: @source.crawl_error_message) do
+              render SvgComponent.new("icon-exclamation", class: "fill-white")
+            end
+          end
+
           header
         end
 
@@ -21,19 +26,21 @@ module FixFeeds
     end
 
     def header
-      div class: "pl-4 pb-4 grow" do
+      div class: "p-4 grow border border-transparent" do
         render App::FeedComponent do |feed|
           feed.icon do
             helpers.favicon_with_record(@source.favicon, host: @source.host, generated: true)
           end
           feed.title do
-            div(data_behavior: "user_title", class: "truncate") do
-              @replaceable.title
+            link_to(@source.site_url, target: :blank, class: "!text-600") do
+              span(data_behavior: "user_title", class: "truncate") do
+                @replaceable.title
+              end
             end
           end
           feed.subhead do
-            span(class: "!text-500 truncate" ) do
-              helpers.short_url(@source.feed_url)
+            link_to(@source.feed_url, class: "!text-500 truncate", target: :blank) do
+              helpers.short_url_alt(@source.feed_url)
             end
           end
 
@@ -51,11 +58,15 @@ module FixFeeds
       form_with(model: @replaceable, url: @replaceable.replaceable_path, data: {remote: @remote, behavior: "disable_on_submit"}) do |form|
         form.hidden_field :redirect_to, value: @redirect
         render Settings::ControlGroupComponent.new class: "group", data: {item_capsule: "true"} do |group|
-          @source.discovered_feeds.order(created_at: :asc).each_with_index do |discovered_feed, index|
+          discovered_feeds = @source.discovered_feeds.order(created_at: :asc)
+          discovered_feeds.each_with_index do |discovered_feed, index|
             group.item do
-              div class: "flex gap-6" do
-                timeline_item(index)
-                div class: "grow" do
+              div class: "flex gap-4" do
+                render Timeline.new(color: "bg-green-600", options: {last: discovered_feed == discovered_feeds.last, middle: index != 0}) do
+                  render SvgComponent.new("icon-check-small", class: "fill-white")
+                end
+
+                div class: "grow #{index != 0 ? "mt-[8px]" : ""}" do
                   suggestion(discovered_feed: discovered_feed, checked: index == 0, show_radio: @source.discovered_feeds.count > 1)
                 end
               end
@@ -86,12 +97,14 @@ module FixFeeds
                   helpers.favicon_with_host(discovered_feed.host, generated: true)
                 end
                 feed.title do
-                  div(class: "font-bold") do
+                  link_to(discovered_feed.site_url, target: :blank, class: "!text-600 font-bold") do
                     discovered_feed.title
                   end
                 end
                 feed.subhead do
-                  span(class: "!text-500 truncate" ) { helpers.short_url(discovered_feed.feed_url) }
+                  link_to(discovered_feed.feed_url, class: "!text-500 truncate", target: :blank) do
+                    helpers.short_url_alt(discovered_feed.feed_url)
+                  end
                 end
               end
             end
@@ -106,26 +119,36 @@ module FixFeeds
       end
     end
 
-    def timeline_item(index)
-      div class: "flex flex-col w-[8px] inset-y-0 self-stretch shrink-0" do
-        div class: "h-1/2 flex flex-col items-center w-[8px] " do
-          div class: "h-full w-[1px] bg-600 #{index != 0 ? "invisible" : ""}" do
+
+    class Timeline < ApplicationComponent
+      def initialize(color:, options: {}, tooltip: nil)
+        @options = options
+        @color = color
+        @tooltip = tooltip
+      end
+
+      def template
+        div class: "flex flex-col items-center w-[16px] inset-y-0 self-stretch shrink-0"  do
+          div class: "w-[1px] shrink-0 bg-500 #{middle? ? "h-[21px]" : "h-[13px]"} #{first? ? "invisible" : ""}"
+          div class: "flex w-[16px] h-[16px] flex-center my-[8px] shrink-0" do
+            div class: "#{@color} h-[16px] w-[16px] rounded-full flex flex-center", title: @tooltip, data: {toggle: @tooltip.present? ? "tooltip" : ""} do
+              yield
+            end
           end
-          div class: "flex w-[8px] h-[8px] items-start justify-center shrink-0 #{index != 0 ? "invisible" : ""}" do
-            render SvgComponent.new("icon-down-arrow", class: "fill-600")
-          end
-          div class: "h-[8px] w-[8px] relative top-[-7px] mt-[8px] bg-green-600 rounded-full shrink-0"
+          div class: "h-full w-[1px] bg-500 #{last? ? "invisible" : ""}"
         end
       end
-    end
 
-    def timeline_header
-      div class: "flex flex-col items-center w-[8px] inset-y-0 self-stretch shrink-0" do
-        div class: "flex w-[8px] h-[8px] flex-center mt-[8px] mb-[4px] shrink-0" do
-          div class: "h-[8px] w-[8px] bg-200 rounded-full"
-        end
-        div class: "h-full w-[1px] bg-600" do
-        end
+      def first?
+        !!@options[:first]
+      end
+
+      def last?
+        !!@options[:last]
+      end
+
+      def middle?
+        !!@options[:middle]
       end
     end
   end

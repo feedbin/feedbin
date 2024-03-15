@@ -35,6 +35,7 @@ class ImportItem < ApplicationRecord
 
   def host
     self.host = Addressable::URI.heuristic_parse(details[:html_url])&.host&.downcase
+  rescue
   end
 
   def title
@@ -49,9 +50,9 @@ class ImportItem < ApplicationRecord
     details[:xml_url]
   end
 
-  def human_error
+  def crawl_error_message
     return unless failed? || fixable?
-    ERRORS[error_class] || "Connection error"
+    CrawlingError.message(error_class)
   end
 
   def replaceable_path

@@ -8,6 +8,7 @@ class FixFeedsController < ApplicationController
       .fix_suggestion_present
       .includes(feed: [:discovered_feeds])
       .sort_by { _1.title || _1.feed.title }
+      .reject {_1.feed.discovered_feeds.empty?}
 
     view = FixFeeds::IndexView.new(
       user: @user,

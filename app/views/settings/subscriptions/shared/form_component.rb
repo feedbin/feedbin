@@ -28,7 +28,7 @@ module Settings
             end
             if subscription.feed.twitter_feed?
               twitter_notice
-            elsif subscription.feed.crawl_error? && @subscription.user.setting_on?(:fix_feeds_flag)
+            elsif subscription.feed.crawl_error?
               error_notice
             end
           end
@@ -89,9 +89,7 @@ module Settings
                 end
 
                 if @subscription.feed.discovered_feeds.present?
-                  div(class: "mt-4") do
-                    render FixFeeds::SuggestionComponent.new(replaceable: @subscription, source: @subscription.feed, redirect: helpers.edit_settings_subscription_url(@subscription), remote: false)
-                  end
+                  render FixFeeds::SuggestionComponent.new(replaceable: @subscription, source: @subscription.feed, redirect: helpers.edit_settings_subscription_url(@subscription), remote: false)
                 end
               end
             end

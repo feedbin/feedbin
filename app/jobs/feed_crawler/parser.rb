@@ -59,6 +59,9 @@ module FeedCrawler
       filter.stats.each do |stat, count|
         Librato.increment("feed.parser", source: stat, by: count)
       end
+
+      post_id_count = parsed.entries.count { _1.entry.respond_to?(:post_id) && _1.entry.post_id.present? }
+      Librato.increment("feed.post_id", by: post_id_count)
     ensure
       File.unlink(path) rescue Errno::ENOENT
     end

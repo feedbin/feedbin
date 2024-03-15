@@ -111,9 +111,11 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
 
   def create_newsletter(user)
     signature = Newsletter.new(newsletter_params("asdf", "asdf")).send(:signature)
+
+    mail = Mail.from_source(File.read(support_file("email_html.eml")))
     token = user.newsletter_authentication_token.token
 
-    newsletter = Newsletter.new(newsletter_params(token, signature, SecureRandom.hex, SecureRandom.hex))
+    newsletter = EmailNewsletter.new(mail, token)
     NewsletterEntry.create(newsletter, user)
   end
 end

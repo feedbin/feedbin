@@ -3,6 +3,7 @@ require_relative "boot"
 require "rails/all"
 require_relative "../lib/basic_authentication"
 require_relative "../lib/conditional_sass_compressor"
+require_relative "../lib/yjit_stats"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -31,6 +32,8 @@ module Feedbin
     config.middleware.use Rack::ContentLength
 
     config.middleware.use BasicAuthentication
+
+    config.middleware.use YjitStats
 
     config.exceptions_app = routes
 

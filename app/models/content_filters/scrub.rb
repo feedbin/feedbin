@@ -2,9 +2,11 @@ module ContentFilters
   class Scrub < HTML::Pipeline::Filter
 
     NEWSLETTER_ELEMENTS = %w[table thead tbody tfoot tr td center]
+    DASHED_ELEMENT_PARENTS = %w[svg math]
 
     def call
       doc
+        .scrub!(custom_elements)
         .scrub!(:prune)
         .scrub!(video)
         .scrub!(links)
@@ -12,6 +14,16 @@ module ContentFilters
         doc.scrub!(newsletter_elements)
       end
       doc
+    end
+
+    def custom_elements
+      Loofah::Scrubber.new do |node|
+        if DASHED_ELEMENT_PARENTS.include?(node.name)
+          Loofah::Scrubber::STOP
+        elsif node.name.include?("-")
+          node.name = "div"
+        end
+      end
     end
 
     def newsletter_elements

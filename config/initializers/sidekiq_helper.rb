@@ -1,4 +1,6 @@
 module SidekiqHelper
+  require "sidekiq/api"
+
   BATCH_SIZE = 5_000
 
   def self.included(base)
@@ -58,6 +60,12 @@ module SidekiqHelper
       return nil
     end
     raise
+  end
+
+  def queue_empty?(queue)
+    queue = queue.to_s
+    @queues ||= Sidekiq::Stats.new.queues
+    @queues[queue].blank? || @queues[queue] == 0
   end
 
   module ClassMethods

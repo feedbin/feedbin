@@ -5,7 +5,9 @@
     <% end %>
   <% end %>
   <% row.description do %>
-    <%= render(partial: "actions/text_description", locals: {action: action, summary: summary}) %>
+    <div class="break-words">
+      <%= render(partial: "actions/text_description", locals: {action: action, summary: summary}) %>
+    </div>
   <% end %>
   <% row.control do %>
     <% if action.broken? %>

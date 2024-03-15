@@ -19,6 +19,8 @@ class FeedFixer
 
     urls = begin
       FeedFinder.new(@feed.site_url).find_options
+    rescue
+      []
     end
 
     existing = @feed.subscriptions.where.not(fix_status: Subscription.fix_statuses[:none])

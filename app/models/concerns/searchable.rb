@@ -79,7 +79,7 @@ module Searchable
         query = query.gsub("emoji:", "")
         query = query.gsub("_missing_:", "NOT _exists_:")
 
-        colon_regex = /(?<!title|title.exact|feed_id|content|content.exact|author|_missing_|_exists_|twitter_screen_name|twitter_name|twitter_retweet|twitter_media|twitter_image|twitter_link|emoji|url|url.exact|link|type):(?=.*)/
+        colon_regex = /(?<!title|title.exact|feed_id|content|content.exact|author|_missing_|_exists_|twitter_screen_name|twitter_name|twitter_retweet|twitter_media|twitter_image|twitter_link|emoji|url|url.exact|link|type|category):(?=.*)/
         query = query.gsub(colon_regex, '\:')
 
         extracted_fields.push(query).join(" ")

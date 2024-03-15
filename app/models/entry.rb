@@ -20,7 +20,7 @@ class Entry < ApplicationRecord
   before_update :create_summary
 
   after_commit :cache_public_id, on: [:create, :update]
-  after_commit :find_images, on: :create, unless: :skip_images?
+  after_commit :find_images, on: :create
   after_commit :mark_as_unread, on: :create
   after_commit :mark_as_unplayed, on: :create
   after_commit :increment_feed_stat, on: :create
@@ -218,7 +218,7 @@ class Entry < ApplicationRecord
   end
 
   def hostname
-    URI(url).host
+    Addressable::URI.heuristic_parse(url).host
   rescue
     nil
   end
@@ -303,6 +303,11 @@ class Entry < ApplicationRecord
     end
   end
 
+  def chapter_titles
+    return [] unless chapters.respond_to?(:map)
+    chapters.map {_1.safe_dig("tags", "title")}
+  end
+
   private
 
   def provider_metadata
@@ -369,17 +374,36 @@ class Entry < ApplicationRecord
   end
 
   def mark_as_unplayed
-    if skip_mark_as_unread.blank? && recent_post
-      user_ids = PodcastSubscription.subscribed.where(feed_id: feed_id).pluck(:user_id)
-      entries = user_ids.map do |user_id|
-        QueuedEntry.new(user_id: user_id, feed_id: feed_id, entry_id: id, order: Time.now.to_i, progress: 0, duration: audio_duration)
-      end
-      QueuedEntry.import(entries, validate: false, on_duplicate_key_ignore: true)
-      increment!(:queued_entries_count, entries.count)
+    return if skip_mark_as_unread.present? || !recent_post
 
-      notification_ids = PodcastSubscription.where(feed_id: feed_id, status: [:subscribed, :bookmarked]).pluck(:user_id)
-      Sidekiq::Client.push_bulk("args" => notification_ids.map {|user_id| [user_id, id]}, "class" => PodcastPushNotification)
+    subscriptions = PodcastSubscription.where(feed_id: feed_id, status: [:subscribed, :bookmarked])
+
+    queued_entries = []
+    notification_ids = []
+
+    subscriptions.each do |subscription|
+      if subscription.subscribed? && !subscription.filtered?(podcast_search_data)
+        queued_entries.push QueuedEntry.new(user_id: subscription.user_id, feed_id: feed_id, entry_id: id, order: Time.now.to_i, progress: 0, duration: audio_duration)
+        notification_ids.push subscription.user_id
+      elsif subscription.bookmarked?
+        notification_ids.push subscription.user_id
+      end
     end
+
+    if queued_entries.present?
+      QueuedEntry.import(queued_entries, validate: false, on_duplicate_key_ignore: true)
+      increment!(:queued_entries_count, queued_entries.count)
+    end
+
+    Sidekiq::Client.push_bulk("args" => notification_ids.map {|user_id| [user_id, id]}, "class" => PodcastPushNotification)
+
+    if data.safe_dig("enclosure_url").present? && data.safe_dig("enclosure_type") =~ /audio/i
+      ChapterParser.perform_async(id)
+    end
+  end
+
+  def podcast_search_data
+    [title, data&.safe_dig("itunes_author"), content].join
   end
 
   def recent_post
@@ -437,12 +461,5 @@ class Entry < ApplicationRecord
 
   def cache_views
     CacheEntryViews.new.perform(id)
-  end
-
-  def skip_images?
-    if ENV["SKIP_IMAGES"].present?
-      Rails.logger.info("SKIP_IMAGES is present, no images will be processed")
-      true
-    end
   end
 end

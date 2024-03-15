@@ -57,7 +57,7 @@ module Api
         private
 
         def subscription_params
-          params.require(:podcast_subscription).permit(:status, :playlist_id)
+          params.require(:podcast_subscription).permit(:status, :playlist_id, :title, :chapter_filter, :chapter_filter_type, :download_filter, :download_filter_type)
         end
 
         def set_subscription

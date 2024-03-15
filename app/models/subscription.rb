@@ -84,15 +84,29 @@ class Subscription < ApplicationRecord
   end
 
   def muted_status
-    if muted
-      "muted"
+    "is:muted" if muted
+  end
+
+  def health_status
+    if fixable?
+      "is:fixable"
+    elsif dead?
+      "is:dead"
     end
+  end
+
+  def fixable?
+    feed.fixable?
+  end
+
+  def dead?
+    feed.dead?
   end
 
   def protected?
     generated?
   end
-  
+
   def replaceable_path
     Rails.application.routes.url_helpers.fix_feed_path(self)
   end

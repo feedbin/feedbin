@@ -14,6 +14,13 @@ class SendStats
       clear_empty_jobs
       sidekiq_queue_depth
       sidekiq_latency
+      yjit_stats
+    end
+  end
+
+  def yjit_stats
+    RubyVM::YJIT.runtime_stats.each do |name, value|
+      Librato.measure "yjit.jobs.#{name}", value, source: Socket.gethostname
     end
   end
 

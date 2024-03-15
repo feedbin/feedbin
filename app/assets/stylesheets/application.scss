@@ -12,8 +12,7 @@ Variables
 $small-breakpoint: 700px;
 
 $toolbar-height: 44px;
-$font-stack: -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial,
-  sans-serif;
+$font-stack: -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
 $audio-player-height: 115px;
 $audio-player-height-minimized: 54px;
 $base-button-position: 10px;
@@ -2379,6 +2378,9 @@ $feed-title-width: 115px;
     .option svg {
       margin-left: 1px;
     }
+    label[for="user_font_default"] {
+      font-family: ui-sans-serif, system-ui, $font-stack;
+    }
     label[for="user_font_sans-serif-1"] {
       /* whitney */
       font-family: "Sans Serif 1";
@@ -2396,7 +2398,7 @@ $feed-title-width: 115px;
       font-family: "Serif 2";
     }
     label[for="user_font_serif-3"] {
-      font-family: Georgia, serif;
+      font-family: ui-serif, Georgia, serif;
     }
   }
   .font-size {
@@ -3737,6 +3739,12 @@ $feed-title-width: 115px;
   }
 }
 
+.font-default {
+  .content-styles {
+    font-family: ui-sans-serif, system-ui, $font-stack;
+  }
+}
+
 .font-serif-1 {
   .content-styles {
     font-family: "Sentinel SSm A", "Sentinel SSm B", $font-stack;
@@ -3795,7 +3803,7 @@ $feed-title-width: 115px;
 
 .font-serif-3 {
   .content-styles {
-    font-family: Georgia, $font-stack;
+    font-family: ui-serif, Georgia, serif;
     font-weight: 400;
     font-style: normal;
     strong {
@@ -3810,8 +3818,8 @@ $feed-title-width: 115px;
     }
   }
   .entry-header h1 {
-    font-weight: 400;
-    font-family: Georgia, $font-stack;
+    font-weight: 700;
+    font-family: ui-sans-serif, system-ui, $font-stack;
   }
 }
 
@@ -3895,6 +3903,9 @@ $feed-title-width: 115px;
       max-width: unset;
       width: auto;
     }
+  }
+  center .system-content {
+    text-align: left;
   }
 }
 
@@ -4801,6 +4812,7 @@ Settings
   }
   .content {
     padding: 16px;
+    word-wrap: break-word;
   }
 }
 .action-description {

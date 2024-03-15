@@ -20,8 +20,6 @@ Rails.application.routes.draw do
   get :service_worker, to: "site#service_worker"
   get "manifest/:theme", to: "site#manifest", as: "manifest"
 
-  post "/newsletters" => "newsletters#create"
-  post "/newsletters/:token" => "newsletters#raw"
   get "bookmarklet/:cache_buster", to: "bookmarklet#script", as: "bookmarklet"
 
   match "/404", to: "errors#not_found", via: :all
@@ -47,6 +45,7 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :newsletters, only: :create
   resources :tags, only: [:index, :show, :update, :destroy, :edit]
   resources :billing_events, only: [:show]
   resources :in_app_purchases, only: [:show]
@@ -362,8 +361,11 @@ Rails.application.routes.draw do
     end
   end
 
-  namespace :admin do
-    resources :users
+  constraints lambda { |request| AuthConstraint.admin?(request) } do
+    namespace :admin do
+      resources :users
+      resources :feeds
+    end
   end
 
   namespace :app_store do

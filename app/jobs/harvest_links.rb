@@ -59,6 +59,7 @@ class HarvestLinks
     parsed = Addressable::URI.heuristic_parse(url)
     return false if parsed.path.length < 2 && parsed.query.nil?
     return false if parsed.host =~ /(twitter.com)/
+    return false if parsed.host =~ /#{Regexp.escape(@entry.hostname)}/
     true
   end
 

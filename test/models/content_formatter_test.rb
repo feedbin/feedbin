@@ -48,4 +48,21 @@ class ContentFormatterTest < ActiveSupport::TestCase
       assert_equal '<blockquote></blockquote>', ContentFormatter.format!(content)
     end
   end
+
+  test "should replace unknown dashed elemnents" do
+    content = <<~EOD
+    <math>
+      <annotation-xml></annotation-xml>
+    </math>
+    <custom-element>Hello</custom-element>
+    EOD
+
+    expected = <<~EOD
+    <math>
+      <annotation-xml></annotation-xml>
+    </math>
+    <div>Hello</div>
+    EOD
+    assert_equal expected, ContentFormatter.format!(content)
+  end
 end
