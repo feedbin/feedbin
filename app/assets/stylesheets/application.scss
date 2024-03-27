@@ -1353,7 +1353,7 @@ $hamburger-dot: 4px;
         display: block;
         text-overflow: ellipsis;
         overflow: hidden;
-        line-height: 1.3;
+        line-height: normal;
         white-space: nowrap;
         &.hide {
           display: none;
