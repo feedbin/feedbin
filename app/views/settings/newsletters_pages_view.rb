@@ -8,18 +8,16 @@ module Settings
 
     def template
       render Settings::H1Component.new do
-        "Sources"
+        "Newsletters"
       end
 
       newsletters
-      pages
       newsletter_senders
     end
 
     def newsletters
       form_for @user, remote: true, url: settings_update_user_path(@user) do |f|
         render Settings::ControlGroupComponent.new class: "mb-14" do |group|
-          group.header { "Newsletters " }
 
           group.item do
             div(class: "py-4") do

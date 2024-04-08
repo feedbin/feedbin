@@ -165,6 +165,22 @@ Rails.application.routes.draw do
       end
     end
 
+    resource :newsletters do
+      scope module: "newsletters" do
+        resources :addresses do
+          member do
+            patch :activate
+          end
+          collection do
+            get :inactive
+          end
+        end
+        resources :senders
+      end
+    end
+
+    get :newsletters_pages, to: redirect("/settings/newsletters")
+
     resources :imports, only: [:create, :show] do
       member do
         post :replace_all
@@ -187,7 +203,6 @@ Rails.application.routes.draw do
 
     get :account
     get :appearance
-    get :newsletters_pages
     post :now_playing
     post :audio_panel_size
   end

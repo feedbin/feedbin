@@ -1,0 +1,7 @@
+$("[data-behavior~=senders_list]").html("<%= j render(Settings::Newsletters::Senders::ListComponent.new(user: current_user, query: params[:q])) %>");
+
+<% if params[:q].present? || params[:sort].present? %>
+    window.history.replaceState({}, document.title, window.location.pathname + "?<%= j params.permit(:sort, :q).to_query %>");
+<% else %>
+    window.history.replaceState({}, document.title, window.location.pathname);
+<% end %>

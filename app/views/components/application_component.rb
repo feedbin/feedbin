@@ -13,6 +13,7 @@ class ApplicationComponent < Phlex::HTML
   include Phlex::Rails::Helpers::RadioButton
   include Phlex::Rails::Helpers::Routes
   include Phlex::Rails::Helpers::SelectTag
+  include Phlex::Rails::Helpers::TextFieldTag
 
   def self.slots(*items)
     include Phlex::DeferredRender
@@ -66,6 +67,20 @@ class ApplicationComponent < Phlex::HTML
     end
 
     defaults
+  end
+
+  def multi_stimulus(items)
+    action = []
+    attributes = items.each_with_object({}) do |(key, value), hash|
+      item = stimulus_item(target: value.fetch(:target, nil), actions: value.fetch(:actions, {}), params: value.fetch(:params, {}), data: value.fetch(:data, {}), for: key)
+      action.push(item.delete(:action))
+      hash.merge!(item)
+    end
+    action = action.compact.join(" ")
+    if action.present?
+      attributes[:action] = action
+    end
+    attributes
   end
 
   if Rails.env.development?

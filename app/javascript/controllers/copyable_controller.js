@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="expandable"
+// Connects to data-controller="copyable"
 export default class extends Controller {
   static values = {
     data: String,
