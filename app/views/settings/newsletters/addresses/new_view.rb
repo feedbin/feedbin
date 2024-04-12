@@ -31,10 +31,12 @@ module Settings::Newsletters::Addresses
                       form.text_field :token, data: {behavior: "autosubmit"}
                     end
                     text.accessory_leading do
-                      render SvgComponent.new "favicon-newsletter", class: "fill-400 pg-focus:fill-blue-600"
+                      div class: "pl-2" do
+                        render SvgComponent.new "favicon-newsletter", class: "fill-400 pg-focus:fill-blue-600"
+                      end
                     end
                     text.accessory_trailing do
-                      span data: {behavior: "token_suffix"} do
+                      div class: "flex h-full", data: {behavior: "token_suffix"} do
                       end
                     end
                   end
@@ -72,7 +74,7 @@ module Settings::Newsletters::Addresses
       end
 
       def template
-        span class: "text-500 text-sm border-l pl-2", data: {behavior: "token_suffix"} do
+        span class: "bg-100 border-l border-300 text-400 rounded-r-[5px] flex flex-center w-[75px] h-full" do
           plain @suffix
         end
       end

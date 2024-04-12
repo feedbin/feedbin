@@ -24,7 +24,7 @@ module Settings
 
       def senders
         render Settings::ControlGroupComponent.new class: "mb-14" do |group|
-          group.header { "Senders" }
+          group.header { "General" }
           group.item do
             render Settings::ControlRowComponent.new do |row|
               row.title { "Newsletter Senders" }
@@ -35,6 +35,22 @@ module Settings
 
               row.control do
                 link_to "Manage", settings_newsletters_senders_path, class: "button button-tertiary"
+              end
+            end
+          end
+
+          if @user.inactive_newsletter_addresses.exists?
+            group.item do
+              render Settings::ControlRowComponent.new do |row|
+                row.title { "Inactive Addresses" }
+
+                row.description do
+                  "View deactivated newsletter addresses."
+                end
+
+                row.control do
+                  link_to "View", inactive_settings_newsletters_addresses_path, class: "button button-tertiary"
+                end
               end
             end
           end
@@ -54,7 +70,7 @@ module Settings
             end
           end
 
-          @user.newsletter_addresses.each do |address|
+          @user.newsletter_addresses.order(token: :asc).each do |address|
             group.item do
               render Settings::ControlRowComponent.new do |row|
                 row.title do
@@ -69,22 +85,6 @@ module Settings
 
                 row.control do
                   link_to "Manage", settings_newsletters_address_path(address), class: "button button-tertiary"
-                end
-              end
-            end
-          end
-
-          if @user.inactive_newsletter_addresses.exists?
-            group.item do
-              render Settings::ControlRowComponent.new do |row|
-                row.title { "Inactive Addresses" }
-
-                row.description do
-                  "View deactivated newsletter addresses."
-                end
-
-                row.control do
-                  link_to "View", inactive_settings_newsletters_addresses_path, class: "button button-tertiary"
                 end
               end
             end

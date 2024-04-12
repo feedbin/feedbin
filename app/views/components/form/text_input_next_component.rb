@@ -6,7 +6,7 @@ module Form
     def template
       div(class: "mb-2 text-600", &@label_slot) if label_slot?
 
-      label class: "flex text-input-next  items-center gap-2 group items-stretch cursor-text" do
+      label data: {accessories: helpers.class_names(leading: accessory_leading?, trailing: accessory_trailing?)}, class: "flex text-input-next items-center gap-2 group items-stretch cursor-text" do
         if accessory_leading?
           render AccessoryComponent.new(&@accessory_leading)
         end
