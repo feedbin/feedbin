@@ -3,19 +3,19 @@ class NewsletterReceiver
   include Sidekiq::Worker
   sidekiq_options queue: :parse
 
-  def perform(full_token, email)
-    token = EmailNewsletter.token(full_token)
-    @user = AuthenticationToken.newsletters.active.where(token: token).take&.user
-    if @user
-      email = Mail.from_source(email)
-      @newsletter = EmailNewsletter.new(email, full_token)
-      entry = create
-      Sidekiq.logger.info "Newsletter created public_id=#{entry.public_id}"
+  def perform(address, url)
+    @address = Mail::Address.new(address)
+    @url = Addressable::URI.parse(url)
+    if @user = AuthenticationToken.newsletters.active.where(token: token).take&.user
+      @newsletter = parse_newsletter
+      if entry = create
+        Sidekiq.logger.info "Newsletter created public_id=#{entry.public_id}"
+      end
     end
-    active = @user ? !@user.suspended : false
-    Librato.increment "newsletter.user_active.#{active}"
-  rescue ActiveRecord::RecordNotUnique
+    storage_client.delete_object(@url.host, storage_path)
   end
+
+  private
 
   def create
     create_feed
@@ -24,6 +24,7 @@ class NewsletterReceiver
       tag
     end
     create_entry
+  rescue ActiveRecord::RecordNotUnique
   end
 
   def subscribe
@@ -51,6 +52,26 @@ class NewsletterReceiver
     active?
     feed
     sender
+  end
+
+  def parse_newsletter
+    email = storage_client.get_object(@url.host, storage_path)
+    email = Mail.from_source(email.body)
+    EmailNewsletter.new(email, @address.local)
+  end
+
+  def token
+    EmailNewsletter.token(@address.local)
+  end
+
+  def storage_path
+    @url.path.delete_prefix("/")
+  end
+
+  def storage_client
+    @storage_client ||= begin
+      Fog::Storage.new(STORAGE)
+    end
   end
 
   def sender
