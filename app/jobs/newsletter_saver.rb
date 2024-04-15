@@ -25,7 +25,7 @@ class NewsletterSaver
       Nokogiri::HTML5(entry.content)
     end
 
-    if document.title == nil
+    if document.title.blank?
       document.title = entry.title
     end
 
