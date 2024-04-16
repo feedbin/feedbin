@@ -9,7 +9,7 @@ class AuthenticationToken < ApplicationRecord
 
   scope :active, -> { where(active: true) }
 
-  before_create :generate_token, unless: -> { skip_generate }
+  before_create :generate_token, unless: -> { skip_generate || token.present? }
 
   has_many :newsletter_senders, foreign_key: :token, primary_key: :token
 

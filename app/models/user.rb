@@ -489,7 +489,7 @@ class User < ApplicationRecord
   end
 
   def newsletter_authentication_token
-    authentication_tokens.newsletters.active.take
+    authentication_tokens.newsletters.active.order(created_at: :desc).take
   end
 
   def newsletter_addresses

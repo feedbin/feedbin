@@ -20,6 +20,19 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
     @s3_url_text = "s3://bucket/path.to.text.email"
   end
 
+  test "creates newsletters with new feed and receiver" do
+    assert_difference "Subscription.count", +1 do
+      assert_difference "NewsletterSaver.jobs.size", +1 do
+        assert_difference("NewsletterSender.count", 1) do
+          assert_difference("Entry.count", 1) do
+            NewsletterReceiver.new.perform(@token, @s3_url_html)
+          end
+        end
+      end
+    end
+    assert @user.feeds.newsletter.exists?
+  end
+
   test "creates newsletters with new feed and processor" do
     Sidekiq::Worker.clear_all
     user = users(:ben)
@@ -46,19 +59,6 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
       NewsletterReceiver.new.perform(@token, @s3_url_html)
     end
     assert !feed.newsletter_sender.active?, "Sender should not be active."
-  end
-
-  test "creates newsletters with new feed and receiver" do
-    assert_difference "Subscription.count", +1 do
-      assert_difference "NewsletterSaver.jobs.size", +1 do
-        assert_difference("NewsletterSender.count", 1) do
-          assert_difference("Entry.count", 1) do
-            NewsletterReceiver.new.perform(@token, @s3_url_html)
-          end
-        end
-      end
-    end
-    assert @user.feeds.newsletter.exists?
   end
 
   test "creates newsletters with old token" do

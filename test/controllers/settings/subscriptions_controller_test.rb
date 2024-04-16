@@ -83,11 +83,10 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
   end
 
   test "should unsubscribe from newsletter" do
-    user = users(:new)
+    user = users(:ben)
     login_as user
 
-    create_newsletter(user)
-
+    user.newsletter_senders.create!(feed: user.feeds.first, full_token: user.newsletter_authentication_token, email: "example@example.com")
     feed_id = user.newsletter_senders.first.feed_id
 
     assert user.subscriptions.where(feed_id: feed_id).exists?
@@ -107,15 +106,5 @@ class Settings::SubscriptionsControllerTest < ActionController::TestCase
     assert_no_difference "Subscription.count", +1 do
       patch :newsletter_senders, params: {id: subscription.feed_id, newsletter_sender: {feed_id: "0"}}, xhr: true
     end
-  end
-
-  def create_newsletter(user)
-    signature = Newsletter.new(newsletter_params("asdf", "asdf")).send(:signature)
-
-    mail = Mail.from_source(File.read(support_file("email_html.eml")))
-    token = user.newsletter_authentication_token.token
-
-    newsletter = EmailNewsletter.new(mail, token)
-    NewsletterEntry.create(newsletter, user)
   end
 end

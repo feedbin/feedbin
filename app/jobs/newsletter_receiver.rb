@@ -6,7 +6,9 @@ class NewsletterReceiver
   def perform(address, url)
     @address = Mail::Address.new(address)
     @url = Addressable::URI.parse(url)
-    if @user = AuthenticationToken.newsletters.active.where(token: token).take&.user
+    @user = original_authentication_token&.user
+
+    if @user && full_authentication_token&.active?
       @newsletter = parse_newsletter
       if entry = create
         Sidekiq.logger.info "Newsletter created public_id=#{entry.public_id}"
@@ -60,12 +62,22 @@ class NewsletterReceiver
     EmailNewsletter.new(email, @address.local)
   end
 
-  def token
+  def parsed_token
     EmailNewsletter.token(@address.local)
   end
 
   def storage_path
     @url.path.delete_prefix("/")
+  end
+
+  def full_authentication_token
+    return @full_authentication_token if defined?(@full_authentication_token)
+    @full_authentication_token = user.authentication_tokens.newsletters.find_or_create_by(token: @address.local)
+  end
+
+  def original_authentication_token
+    return @original_authentication_token if defined?(@original_authentication_token)
+    @original_authentication_token = AuthenticationToken.newsletters.where(token: parsed_token).take
   end
 
   def storage_client
