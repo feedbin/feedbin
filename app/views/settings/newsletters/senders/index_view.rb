@@ -6,7 +6,7 @@ module Settings::Newsletters::Senders
       @feed_ids = @user.subscriptions.pluck(:feed_id)
     end
 
-    def template
+    def view_template
       render Settings::H1Component.new do
         "Newsletter Senders"
       end

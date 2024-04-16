@@ -7,7 +7,7 @@ module Settings
           @subscription = subscription
         end
 
-        def template
+        def view_template
           helpers.present @subscription do |subscription_presenter|
             fields_for "subscriptions[]", @subscription do |f|
               li class: "flex items-center relative border-b" do

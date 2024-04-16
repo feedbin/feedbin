@@ -5,7 +5,7 @@ module Shared
       @user = user
     end
 
-    def template
+    def view_template
       div(class: "group-data-[nav=modal]:-mt-4") do
         render ::SettingsNav::HeaderComponent.new do
           plain " General "

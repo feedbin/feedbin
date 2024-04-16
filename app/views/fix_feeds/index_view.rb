@@ -6,7 +6,7 @@ module FixFeeds
       @subscriptions = subscriptions
     end
 
-    def template
+    def view_template
       render Settings::H1Component.new do
         "Fix Feeds"
       end

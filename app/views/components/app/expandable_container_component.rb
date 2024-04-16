@@ -6,7 +6,7 @@ module App
       @open = open
     end
 
-    def template(&block)
+    def view_template(&block)
       div class: "group", data: stimulus(controller: @stimulus_controller, values: { open: @open.to_s, visible: @open.to_s }, data: {@selector.to_s.to_sym => @selector.present?}), &block
     end
 

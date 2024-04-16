@@ -5,7 +5,7 @@ module Settings
       @user = user
     end
 
-    def template
+    def view_template
       form_for @user, remote: true, url: helpers.settings_update_user_path(@user) do |f|
         render Settings::H1Component.new do
           "Settings"

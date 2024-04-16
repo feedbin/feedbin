@@ -3,7 +3,7 @@ class CopyableComponent < ApplicationComponent
     @data = data
   end
 
-  def template(&block)
+  def view_template(&block)
     span data: stimulus(controller: :copyable, values: {data: @data}) do
       button class: "flex items-center gap-2 group focus-border", data: stimulus_item(actions: {click: :copy}, for: :copyable) do
         span &block

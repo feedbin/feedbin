@@ -6,7 +6,7 @@ module FixFeeds
       @replace_path = replace_path
     end
 
-    def template
+    def view_template
       div(class: "flex gap-4 justify-between items-center mb-8", data: {behavior: "status_component"}) do
         div do
           h3 class: "text-700 font-bold" do

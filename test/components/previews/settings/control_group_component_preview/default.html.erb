@@ -1,6 +1,6 @@
 <%=
 demo = Class.new(ApplicationComponent) do
-  def template(&)
+  def view_template(&)
     render Settings::ControlGroupComponent.new(class: "mb-14") do |group|
       group.header do
         "Header"

@@ -6,7 +6,7 @@ module Settings
       @subscription_ids = subscription_ids
     end
 
-    def template
+    def view_template
       render Settings::H1Component.new do
         "Newsletters"
       end

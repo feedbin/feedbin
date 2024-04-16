@@ -4,7 +4,7 @@ module Settings::Newsletters::Addresses
       @addresses = addresses
     end
 
-    def template
+    def view_template
       render Settings::H1Component.new do
         "Newsletters"
       end

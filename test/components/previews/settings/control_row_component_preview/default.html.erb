@@ -1,6 +1,6 @@
 <%=
 demo = Class.new(ApplicationComponent) do
-  def template(&)
+  def view_template(&)
     render Settings::ControlRowComponent.new do |row|
       row.title { "Title" }
       row.description { "Description" }

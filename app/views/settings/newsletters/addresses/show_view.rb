@@ -7,7 +7,7 @@ module Settings
           @address = address
         end
 
-        def template
+        def view_template
           form_with(model: @address, url: settings_newsletters_address_path(@address), data: {remote: true}) do |form|
 
             render H1Component.new do

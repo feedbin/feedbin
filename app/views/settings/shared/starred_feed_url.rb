@@ -5,7 +5,7 @@ module Settings
         @user = user
       end
 
-      def template
+      def view_template
         if @user.setting_on?(:starred_feed_enabled)
           div class: "truncate" do
             plain "Feed URL: "

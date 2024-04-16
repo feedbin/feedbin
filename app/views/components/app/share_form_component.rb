@@ -6,7 +6,7 @@ module App
       @title = title
     end
 
-    def template
+    def view_template
       div(class: "flex items-center gap-2 mb-4") do
         h2(class: "font-bold") { @title }
         render SvgComponent.new @icon, class: "ml-auto"

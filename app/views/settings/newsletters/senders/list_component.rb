@@ -10,7 +10,7 @@ module Settings::Newsletters::Senders
       @feed_ids = @user.subscriptions.pluck(:feed_id)
     end
 
-    def template
+    def view_template
       if @query.present?
         search_results
       else
@@ -57,7 +57,7 @@ module Settings::Newsletters::Senders
       @active = active
     end
 
-    def template
+    def view_template
       @user.newsletter_addresses.each do |address|
         div class: "mb-14" do
           div class: "flex items-center pb-4" do

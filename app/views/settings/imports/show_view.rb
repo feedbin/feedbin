@@ -5,7 +5,7 @@ module Settings
         @import = import
       end
 
-      def template
+      def view_template
         render Settings::H1Component.new do
           "Import Status"
         end

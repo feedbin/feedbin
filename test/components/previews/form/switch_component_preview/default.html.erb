@@ -1,7 +1,7 @@
 <%=
 demo = Class.new(Phlex::HTML) do
 
-  def template(&)
+  def view_template(&)
     div class: "flex gap-4" do
       div do
         input type: "checkbox", class: "peer", id: "checkbox"

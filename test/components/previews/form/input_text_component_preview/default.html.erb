@@ -5,7 +5,7 @@ demo = Class.new(ApplicationComponent) do
     @leading_accessory = leading_accessory
   end
 
-  def template(&)
+  def view_template(&)
     div class: "flex gap-4" do
       render Form::TextInputComponent.new do |input|
         input.input do

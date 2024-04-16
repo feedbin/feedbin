@@ -5,7 +5,7 @@ class TabsComponent < ApplicationComponent
     @tabs = []
   end
 
-  def template
+  def view_template
     div data: stimulus(controller: :tabs) do
       div class: "flex gap-8 border-b border-300 items-baseline mb-8 relative" do
         @tabs.each_with_index do |tab, index|

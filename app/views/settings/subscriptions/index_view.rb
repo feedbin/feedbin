@@ -8,7 +8,7 @@ module Settings
         @params = params
       end
 
-      def template
+      def view_template
         form_tag helpers.settings_subscriptions_path, method: :get, remote: true, class: "feed-settings", data: {behavior: "spinner"} do
           render Settings::H1Component.new do
             "Subscriptions"

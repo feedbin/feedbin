@@ -3,7 +3,7 @@ module Form
 
     slots :input, :label_slot, :accessory_leading, :accessory_trailing
 
-    def template
+    def view_template
       div(class: "mb-2 text-600", &@label_slot) if label_slot?
 
       label data: {accessories: helpers.class_names(leading: accessory_leading?, trailing: accessory_trailing?)}, class: "flex text-input-next items-center gap-2 group items-stretch cursor-text" do
@@ -20,7 +20,7 @@ module Form
     end
 
     class AccessoryComponent < ApplicationComponent
-      def template(&block)
+      def view_template(&block)
         div class: "pointer-events-none flex flex-center" do
           yield
         end

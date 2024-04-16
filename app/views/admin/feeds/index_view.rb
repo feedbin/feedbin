@@ -7,7 +7,7 @@ module Admin
         @feed = feed
       end
 
-      def template
+      def view_template
         render Settings::H1Component.new do
           "Feed Admin"
         end
@@ -51,7 +51,7 @@ module Admin
         @feed = feed
       end
 
-      def template
+      def view_template
         div class: "p-4 grow border rounded-lg mb-8" do
 
           div class: "flex items-center mb-8" do

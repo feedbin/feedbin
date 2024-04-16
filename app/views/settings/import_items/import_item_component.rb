@@ -6,7 +6,7 @@ module Settings
         @import_item = import_item
       end
 
-      def template
+      def view_template
         render App::ExpandableContainerComponent.new(open: true) do |expandable|
           expandable.content do
             div class: "border rounded-lg mb-4 px-4 pb-4" do

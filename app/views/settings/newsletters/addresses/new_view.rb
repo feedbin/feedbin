@@ -4,7 +4,7 @@ module Settings::Newsletters::Addresses
       @user = user
     end
 
-    def template
+    def view_template
       form_with(model: AuthenticationToken.new, url: settings_newsletters_addresses_path, data: { remote: true, behavior: "disable_on_submit" }) do |form|
         form.hidden_field :verified_token
         render Settings::H1Component.new do
@@ -73,7 +73,7 @@ module Settings::Newsletters::Addresses
         @suffix = suffix
       end
 
-      def template
+      def view_template
         span class: "bg-100 border-l border-300 text-400 rounded-r-[5px] flex flex-center w-[75px] h-full" do
           plain @suffix
         end
@@ -85,7 +85,7 @@ module Settings::Newsletters::Addresses
         @address = address
       end
 
-      def template
+      def view_template
         div(class: "text-500 text-sm pt-2 break-all") do
           if @address.present?
             "#{@address}@#{ENV["NEWSLETTER_ADDRESS_HOST"]}"

@@ -8,7 +8,7 @@ module Settings
       @items = []
     end
 
-    def template
+    def view_template
       div(**@options) do
         yield_content &@custom_header
         render(@header) if @header
@@ -34,7 +34,7 @@ module Settings
         @attributes = attributes
       end
 
-      def template(&)
+      def view_template(&)
         div(**attributes, &)
       end
 

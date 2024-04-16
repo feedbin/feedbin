@@ -3,7 +3,7 @@ module Form
 
     slots :input, :label, :accessory_leading
 
-    def template
+    def view_template
       render Form::TextInputComponent.new do |input|
         input.label(&@label) if label?
         input.input(&@input)

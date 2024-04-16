@@ -4,7 +4,7 @@ module Settings
       @attributes = attributes
     end
 
-    def template(&)
+    def view_template(&)
       h2(**mix({class: "mb-4 text-700 font-bold"}, @attributes), &)
     end
   end

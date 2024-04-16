@@ -5,7 +5,7 @@ module Settings::Newsletters::Senders
       @feed_ids = feed_ids
     end
 
-    def template
+    def view_template
       form_with(model: @sender, url: settings_newsletters_sender_path(@sender), namespace: @sender.id, data: { remote: true } ) do |f|
         f.hidden_field :token
         f.check_box :active, { checked: @feed_ids.include?(@sender.feed_id), class: "peer", data: { behavior: "auto_submit" } }
