@@ -56,13 +56,21 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
 
 
   test "doesn't create subscription if unsubscribed" do
-  newsletter = EmailNewsletter.new(Mail.from_source(@newsletter_text), @token)
+    newsletter = EmailNewsletter.new(Mail.from_source(@newsletter_text), @token)
     feed = Feed.create!(feed_url: newsletter.feed_url)
 
     assert_no_difference("Subscription.count") do
       NewsletterReceiver.new.perform(@token, @s3_url_html)
     end
     assert !feed.newsletter_sender.active?, "Sender should not be active."
+  end
+
+  test "doesn't create newsletter if deactivated" do
+    newsletter = EmailNewsletter.new(Mail.from_source(@newsletter_text), @token)
+    @user.newsletter_authentication_token.update(active: false)
+    assert_no_difference("Entry.count") do
+      NewsletterReceiver.new.perform(@token, @s3_url_html)
+    end
   end
 
   test "creates newsletters with old token" do

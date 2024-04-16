@@ -37,10 +37,8 @@ class Settings::Newsletters::AddressesController < ApplicationController
       @address = if params[:authentication_token][:type] == "random"
         user.authentication_tokens.newsletters.create_with(address_params).create
       else
-        record = user.authentication_tokens.newsletters.new
-        record.skip_generate = true
-        record.token = Rails.application.message_verifier(:address_token).verify(params[:authentication_token][:verified_token])
-        record.save
+        token = Rails.application.message_verifier(:address_token).verify(params[:authentication_token][:verified_token])
+        record = user.authentication_tokens.newsletters.create(token: token)
         record.update(address_params)
         record
       end
