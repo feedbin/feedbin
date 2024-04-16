@@ -1,9 +1,9 @@
-Loofah::HTML5::WhiteList::ALLOWED_ELEMENTS_WITH_LIBXML2.merge %w[
+Loofah::HTML5::SafeList::ALLOWED_ELEMENTS_WITH_LIBXML2.merge %w[
   iframe
   picture
   source
 ]
-Loofah::HTML5::WhiteList::ACCEPTABLE_PROTOCOLS.merge %w[
+Loofah::HTML5::SafeList::ACCEPTABLE_PROTOCOLS.merge %w[
   apollo
   drafts
   ivory

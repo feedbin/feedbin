@@ -1,5 +1,5 @@
 # Guardfile
-guard :minitest do
+guard :minitest, all_on_start: false do
   # Run everything within 'test' if the test helper changes
   watch(%r{^test/test_helper\.rb$}) { 'test' }
 
