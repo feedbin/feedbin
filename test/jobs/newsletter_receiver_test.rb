@@ -36,17 +36,21 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
   test "creates newsletters with new feed and processor" do
     Sidekiq::Worker.clear_all
     user = users(:ben)
-
+    full_token = "#{@token}+miscexample.com"
     assert_difference "Subscription.count", +1 do
       assert_difference "NewsletterSaver.jobs.size", +1 do
         assert_difference("NewsletterSender.count", 1) do
           assert_difference("Entry.count", 1) do
-            NewsletterReceiver.new.perform("#{@token}+miscexample.com", @s3_url_html)
+            assert_difference("AuthenticationToken.count", 1) do
+              NewsletterReceiver.new.perform("#{@token}+miscexample.com", @s3_url_html)
+            end
           end
         end
       end
     end
+
     assert user.feeds.newsletter.exists?
+    assert AuthenticationToken.find_by_token(full_token).present?
     assert_requested :delete, @file_url_html
   end
 

@@ -77,6 +77,8 @@ group :development do
   gem "listen"
   gem "foreman"
   gem "pry"
+  gem "guard"
+  gem "guard-minitest"
 end
 
 group :development, :test do
