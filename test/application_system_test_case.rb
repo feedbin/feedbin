@@ -24,8 +24,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     click_link(@entries.first.title)
   end
 
-  def wait_for_ajax
-    sleep 0.1
+  def wait_for_ajax(duration: 0.1)
+    sleep duration
   end
 
   def finished_all_ajax_requests?
