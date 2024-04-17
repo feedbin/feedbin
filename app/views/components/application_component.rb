@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ApplicationComponent < Phlex::HTML
-  include Phlex::Rails::Helpers::CheckboxTag
+  include Phlex::Rails::Helpers::CheckBoxTag
   include Phlex::Rails::Helpers::SearchFieldTag
   include Phlex::Rails::Helpers::FieldsFor
   include Phlex::Rails::Helpers::FormFor
