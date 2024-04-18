@@ -128,7 +128,7 @@ class NewsletterReceiver
         public_id: newsletter.entry_id,
         newsletter: newsletter.to_s,
         newsletter_from: newsletter.from,
-        data: {newsletter_text: newsletter.text, type: "newsletter", format: newsletter.format}
+        data: {newsletter_text: newsletter.text, type: "newsletter", format: newsletter.format, newsletter_to: newsletter.full_token}
       }
       feed.entries.create!(attributes).tap do |record|
         NewsletterSaver.perform_async(record.id)
