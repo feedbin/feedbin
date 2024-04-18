@@ -18,8 +18,13 @@ class NewsletterSaver
   def build_document(entry)
     document = if entry.content_format == "text"
       document = Nokogiri::HTML5(ContentFormatter.text_email(entry.content))
+
       title = document.create_element("h1", entry.title)
       document.at("body").prepend_child(title)
+
+      style = document.create_element("style", text_email_css)
+      document.at("head").add_child(style)
+
       document
     else
       Nokogiri::HTML5(entry.content)
@@ -30,6 +35,20 @@ class NewsletterSaver
     end
 
     document
+  end
+
+  def text_email_css
+    %Q(
+      html {
+        font-family: system-ui;
+      }
+      body {
+        max-width: 30rem;
+        margin: 2rem auto;
+        padding: 1rem;
+        line-height: 1.5;
+      }
+    )
   end
 
   def s3_options
