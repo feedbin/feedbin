@@ -89,7 +89,7 @@ class NewsletterReceiver
   def sender
     @sender ||= begin
       attributes = {
-        token: newsletter.token,
+        token: newsletter.full_token,
         full_token: newsletter.full_token,
         email: newsletter.from_email,
         name: newsletter.name,
