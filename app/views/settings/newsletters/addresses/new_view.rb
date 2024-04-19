@@ -28,7 +28,7 @@ module Settings::Newsletters::Addresses
                 div class: "pb-4" do
                   render Form::TextInputNextComponent.new do |text|
                     text.input do
-                      form.text_field :token, data: {behavior: "autosubmit"}
+                      form.text_field :token, data: {behavior: "autosubmit"}, autocomplete: "off", autocorrect: "off", autocapitalize: "off", spellcheck: "false"
                     end
                     text.accessory_leading do
                       div class: "pl-2" do

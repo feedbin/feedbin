@@ -56,7 +56,7 @@ module Settings
                   end
 
                   row.control do
-                    link_to "Manage", settings_newsletters_senders_path, class: "button button-tertiary"
+                    link_to "Manage", settings_newsletters_senders_path(q: "to:#{@address.title}"), class: "button button-tertiary"
                   end
                 end
               end

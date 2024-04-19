@@ -2,9 +2,17 @@ class Settings::Newsletters::SendersController < ApplicationController
   layout "settings"
 
   def index
+    feed_ids = @user.subscriptions.pluck(:feed_id)
+
+    @senders = if params[:q].present?
+      search_senders
+    end
+
+    @feed_ids = @user.subscriptions.pluck(:feed_id)
+
     respond_to do |format|
       format.html do
-        render Settings::Newsletters::Senders::IndexView.new(user: current_user, params:)
+        render Settings::Newsletters::Senders::IndexView.new(user: current_user, feed_ids: @feed_ids, senders: @senders)
       end
       format.js {}
     end
@@ -21,6 +29,21 @@ class Settings::Newsletters::SendersController < ApplicationController
 
     flash[:notice] = "Settings updated."
     flash.discard
+  end
+
+  private
+
+  def search_senders
+    query = params[:q]
+    tokens = if query.include?("to:")
+      query = query.delete("to:").split("@").first.strip
+      @user.newsletter_addresses.where(token: query).pluck(:token)
+    else
+      @user.newsletter_addresses.pluck(:token)
+    end
+    NewsletterSender.where(token: tokens).select { |sender|
+      sender.search_data.include?(query.to_s.downcase.gsub(/\s+/, ""))
+    }
   end
 
 end

@@ -1,9 +1,9 @@
 module Settings::Newsletters::Senders
   class IndexView < ApplicationView
-    def initialize(user:, params:)
+    def initialize(user:, feed_ids:, senders:)
       @user = user
-      @params = params
-      @feed_ids = @user.subscriptions.pluck(:feed_id)
+      @feed_ids = feed_ids
+      @senders = senders
     end
 
     def view_template
@@ -21,7 +21,11 @@ module Settings::Newsletters::Senders
                 placeholder: "Search Senders",
                 data_behavior: "autosubmit",
                 name: "q",
-                value: @params[:q]
+                value: helpers.params[:q],
+                autocomplete: "off",
+                autocorrect: "off",
+                autocapitalize: "off",
+                spellcheck: "false"
               )
             end
             text.accessory_leading do
@@ -32,7 +36,7 @@ module Settings::Newsletters::Senders
       end
 
       div data_behavior: "senders_list" do
-        render Settings::Newsletters::Senders::ListComponent.new(user: @user, query: @params[:q])
+        render Settings::Newsletters::Senders::ListComponent.new(user: @user, feed_ids: @feed_ids, senders: @senders)
       end
     end
   end

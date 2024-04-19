@@ -1,20 +1,16 @@
 module Settings::Newsletters::Senders
   class ListComponent < ApplicationComponent
-    def initialize(user:, query:)
+    def initialize(user:, feed_ids:, senders:)
       @user = user
-      @query = query
-      tokens = @user.newsletter_addresses.pluck(:token)
-      @senders = NewsletterSender.where(token: tokens).select { |sender|
-        sender.search_data.include?(query.to_s.downcase.gsub(/\s+/, ""))
-      }
-      @feed_ids = @user.subscriptions.pluck(:feed_id)
+      @feed_ids = feed_ids
+      @senders = senders
     end
 
     def view_template
-      if @query.present?
-        search_results
-      else
+      if @senders.nil?
         tabs
+      else
+        search_results
       end
     end
 
@@ -62,7 +58,14 @@ module Settings::Newsletters::Senders
         div class: "mb-14" do
           div class: "flex items-center pb-4" do
             div class: "grow" do
-              render Settings::H2Component.new(class: "!mb-0") { address.title }
+
+              render CopyableComponent.new(data: address.title) do
+                render Settings::H2Component.new(class: "!mb-0") do
+                  address.title
+                end
+              end
+
+
               if address.description.present?
                 p(class: "text-500") { address.description }
               end
