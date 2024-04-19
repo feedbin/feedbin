@@ -58,13 +58,11 @@ module Settings::Newsletters::Senders
         div class: "mb-14" do
           div class: "flex items-center pb-4" do
             div class: "grow" do
-
               render CopyableComponent.new(data: address.title) do
                 render Settings::H2Component.new(class: "!mb-0") do
                   address.title
                 end
               end
-
 
               if address.description.present?
                 p(class: "text-500") { address.description }

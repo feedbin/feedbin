@@ -36,7 +36,7 @@ class Settings::Newsletters::SendersController < ApplicationController
   def search_senders
     query = params[:q]
     tokens = if query.include?("to:")
-      query = query.delete("to:").split("@").first.strip
+      query = query.delete_prefix("to:").split("@").first.strip
       @user.newsletter_addresses.where(token: query).pluck(:token)
     else
       @user.newsletter_addresses.pluck(:token)
