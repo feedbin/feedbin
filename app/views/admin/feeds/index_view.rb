@@ -24,7 +24,7 @@ module Admin
               )
             end
             input.accessory_leading do
-              render SvgComponent.new "icon-search", class: "fill-400 pg-focus:fill-blue-600"
+              render SvgComponent.new "icon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600"
             end
           end
         end

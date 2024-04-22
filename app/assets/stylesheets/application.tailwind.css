@@ -180,7 +180,8 @@ input[type="search"]::-webkit-search-cancel-button {
     @apply sr-only;
   }
   .input-container {
-    @apply py-0 px-2 rounded-md border border-400 transition-[border,box_shadow] duration-200 shadow-one;
+    @apply py-0 px-2 rounded-md border border-400 transition-[border,box_shadow] duration-200 shadow-one
+           has-[[disabled]]:border-200 has-[[disabled]]:shadow-none;
   }
   .input-container-focus {
     @apply text-700 border-blue-600 shadow-selected;
@@ -188,32 +189,39 @@ input[type="search"]::-webkit-search-cancel-button {
   .input {
     @apply leading-[42px] bg-transparent w-full text-sm text-600 ring-base block grow appearance-none
     placeholder:text-500
-    disabled:bg-100 disabled:text-400 disabled:border-200 disabled:shadow-none
+    disabled:bg-100 disabled:text-400
     data-[focused]:text-700 data-[focused]:border-blue-600 data-[focused]:shadow-selected;
   }
-  textarea,
-  select,
-  .text-input,
+  .select-wrap,
   .text-input-next {
     @apply input-container;
   }
   textarea,
   select,
-  .text-input,
   .text-input-next input {
     @apply input;
   }
-  textarea:focus,
-  select:focus,
-  .text-input:focus,
+  .select-wrap:focus-within,
   .text-input-next:focus-within {
     @apply input-container-focus;
   }
-  textarea, textarea.text-input {
-    @apply leading-normal py-[10px] pb-[11px];
+  .text-input-next:has(textarea) {
+    @apply p-[4px];
+  }
+  textarea {
+    @apply leading-normal p-1 min-h-[32px];
   }
   .text-input-next {
     @apply data-[accessories~=leading]:!pl-0 data-[accessories~=leading]:!pr-0;
+  }
+  .select-wrap {
+    @apply p-0;
+  }
+  .select-wrap select {
+    @apply px-2;
+  }
+  .select-wrap:has(select[disabled]) {
+
   }
   select option {
     @apply bg-base text-700;
