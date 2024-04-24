@@ -1,4 +1,4 @@
-<input placeholder="+ New Tag" type="text" name="tag_name[]" class="text-input mb-4 cursor-pointer placeholder:font-bold placeholder:text-center placeholder:text-700 focus:placeholder:text-500 focus:placeholder:text-left focus:placeholder:font-normal">
+<input placeholder="+ New Tag" type="text" name="tag_name[]" class="text-input-next w-full py-[8px] px-[8px] mb-4 cursor-pointer placeholder:font-bold placeholder:text-center placeholder:text-700 focus:placeholder:text-500 focus:placeholder:text-left focus:placeholder:font-normal">
 
 <%= render Settings::ControlGroupComponent.new class: "group [&_[data-item-container]]:!border-0 [&_[data-item]]:!border-0" do |group| %>
   <% tag_editor.tags.each do |tag| %>
