@@ -242,10 +242,10 @@ GEM
       reline (>= 0.3.8)
     debug_inspector (1.2.0)
     domain_name (0.6.20240107)
-    dotenv (3.1.0)
-    dotenv-rails (3.1.0)
-      dotenv (= 3.1.0)
-      railties (>= 6.1)
+    dotenv (2.8.1)
+    dotenv-rails (2.8.1)
+      dotenv (= 2.8.1)
+      railties (>= 3.2)
     down (5.4.1)
       addressable (~> 2.8)
     drb (2.2.1)
@@ -703,7 +703,7 @@ DEPENDENCIES
   coffee-rails
   connection_pool
   debug
-  dotenv-rails
+  dotenv-rails (= 2.8.1)
   down
   evernote_oauth
   faker

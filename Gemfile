@@ -25,7 +25,7 @@ gem "bootsnap", require: false
 gem "clockwork"
 gem "coffee-rails"
 gem "connection_pool"
-gem "dotenv-rails"
+gem "dotenv-rails", "= 2.8.1"
 gem "down"
 gem "evernote_oauth"
 gem "fog-aws"
