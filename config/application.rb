@@ -33,7 +33,7 @@ module Feedbin
 
     config.middleware.use BasicAuthentication
 
-    config.middleware.use YjitStats
+    # config.middleware.use YjitStats
 
     config.exceptions_app = routes
 
