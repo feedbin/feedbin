@@ -66,7 +66,14 @@ module Settings
                   "Addresses"
                 end
               end
-              link_to "New Address", new_settings_newsletters_address_path, class: "button button-secondary"
+              if @user.trialing?
+                button(disabled: "true", class: "button button-secondary", title: "Disabled during trial", data: {toggle: "tooltip"}) do
+                  "New Address"
+                end
+              else
+                link_to "New Address", new_settings_newsletters_address_path, class: "button button-secondary"
+              end
+
             end
           end
 

@@ -48,7 +48,7 @@ module Settings
         def status_icon(subscription_presenter)
           if @subscription.fixable?
             span class: "w-[16px] h-[16px] flex flex-center" do
-              render SvgComponent.new "menu-icon-fix-feeds", class: "fill-600", title: "Fixable feeed", data: {toggle: "tooltip"}
+              render SvgComponent.new "menu-icon-fix-feeds", class: "fill-600", title: "Fixable feed", data: {toggle: "tooltip"}
             end
           elsif @subscription.dead?
             span class: "w-[16px] h-[16px] flex flex-center" do

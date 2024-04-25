@@ -75,7 +75,7 @@ module Admin
 
 
             if @feed.fixable?
-              render SvgComponent.new "menu-icon-fix-feeds", class: "fill-600", title: "Fixable feeed", data: {toggle: "tooltip"}
+              render SvgComponent.new "menu-icon-fix-feeds", class: "fill-600", title: "Fixable feed", data: {toggle: "tooltip"}
             elsif @feed.dead?
               render SvgComponent.new "menu-icon-skull", class: "fill-600", title: "#{@feed.crawl_data.error_count} #{"Error".pluralize(@feed.crawl_data.error_count)}", data: {toggle: "tooltip"}
             elsif @feed.crawl_data.error_count > 0
