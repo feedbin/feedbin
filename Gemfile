@@ -68,6 +68,7 @@ gem "twitter-text"
 gem "uglifier"
 gem "unicorn"
 gem "web-push"
+gem "autotuner"
 
 group :development do
   gem "benchmark-ips"
