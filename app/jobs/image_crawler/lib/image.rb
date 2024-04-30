@@ -1,15 +1,14 @@
 module ImageCrawler
   class Image
-    ATTRIBUTES = %i[id preset_name image_urls entry_url camo icon_provider_id
-                    icon_provider download_path original_extension
-                    original_url final_url storage_url processed_path
-                    processed_extension width height placeholder_color
-                    fingerprint]
+    ATTRIBUTES = %i[id preset_name image_urls entry_url download_path
+                    original_extension original_url final_url
+                    storage_url processed_path processed_extension
+                    width height placeholder_color camo]
 
 
     attr_accessor *ATTRIBUTES
 
-    STORAGE = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
+    BUCKET = ENV["AWS_S3_BUCKET_IMAGES"] || ENV["AWS_S3_BUCKET"]
     PRESETS = {
       primary: {
         width: 542,
@@ -110,17 +109,13 @@ module ImageCrawler
     end
 
     def send_to_feedbin
-      if preset.job_args == :image
-        preset.job_class.perform_async(to_h)
-      else
-        preset.job_class.perform_async(id, {
-          "original_url"      => final_url,
-          "processed_url"     => storage_url,
-          "width"             => width,
-          "height"            => height,
-          "placeholder_color" => placeholder_color
-        })
-      end
+      preset.job_class.perform_async(id, {
+        "original_url"      => final_url,
+        "processed_url"     => storage_url,
+        "width"             => width,
+        "height"            => height,
+        "placeholder_color" => placeholder_color
+      })
     end
 
     def image_name
@@ -132,7 +127,7 @@ module ImageCrawler
     end
 
     def bucket
-      preset.bucket || STORAGE
+      preset.bucket || BUCKET
     end
 
     def storage_options

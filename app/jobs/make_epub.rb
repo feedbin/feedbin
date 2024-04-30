@@ -51,7 +51,7 @@ class MakeEpub
     )
 
     mimetype = "mimetype"
-    Zip::File.open(epub_path, Zip::File::CREATE) do |zip_file|
+    ::Zip::File.open(epub_path, ::Zip::File::CREATE) do |zip_file|
       # mimetype goes first, uncompressed
       zip_file.add_stored(mimetype, File.join(@directory, mimetype))
       Dir[File.join(@directory, "**", "**")].each do |file|
@@ -86,7 +86,7 @@ class MakeEpub
     max_size = 9.megabytes
     document.css("img").each do |image|
       src = image["src"]
-      unless src.start_with?("http")
+      if src.nil? || !src.start_with?("http")
         image.remove
         next
       end

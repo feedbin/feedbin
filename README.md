@@ -10,7 +10,7 @@ Support
 
 Support is available to Feedbin customers by emailing [support@feedbin.com](mailto:support@feedbin.com). This is also the best way to [submit feature requests](https://feedbin.com/help/making-a-feature-request/).
 
-No support is provided for installing/running Feedbin.
+No support is provided for installing the open-source project.
 
 Introduction
 ------------
@@ -27,7 +27,7 @@ If you're looking for a self-hosted RSS reader check out:
 
 And if you really want to run the whole Feedbin stack, take a look at this [Docker version](https://github.com/angristan/feedbin-docker). If you would like to try Feedbin out you can [sign up](https://feedbin.com/) for an account.
 
-The main Feedbin project is a [Rails 7](https://rubyonrails.org/) application. In addition to the main project there are several other services that provide additional functionality. None of these services are required to get Feedbin running locally.
+The main Feedbin project is a [Ruby on Rails](https://rubyonrails.org/) application. In addition to the main project there are several other services that provide additional functionality. None of these services are required to get Feedbin running locally.
 
 **Optional Extras**
 
@@ -42,7 +42,7 @@ Requirements
 ------------
 
  - Linux or macOS
- - [Ruby 3.1](http://www.ruby-lang.org/en/)
+ - [Ruby 3.3](http://www.ruby-lang.org/en/)
  - [Postgres 11](http://www.postgresql.org/)
  - [Redis 6](http://redis.io/)
  - [Elasticsearch 8.5](https://www.elastic.co/downloads/past-releases/#elasticsearch)
@@ -74,8 +74,3 @@ Rename [.env.example](.env.example) to `.env` and customize it with your setting
 **Start the processes**
 
     bundle exec foreman start
-
-
-Status Badges
--------------
-![Ruby CI](https://github.com/feedbin/feedbin/workflows/Ruby%20CI/badge.svg)

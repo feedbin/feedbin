@@ -1,9 +1,0 @@
-<%= component "settings/h1" do %>
-  Import Status
-<% end %>
-
-<p class="mb-8 -mt-6 text-500"><%= @import.created_at.to_formatted_s(:date) %></p>
-
-<%= content_tag :div, data: {content_src: settings_import_path(@import)} do %>
-  <%= render partial: "status" %>
-<% end %>

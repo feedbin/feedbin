@@ -12,9 +12,9 @@
           <a href="/" class="block pt-4">
               <%= svg_tag "logo-full", inline: true, class: "w-[140px] h-[38px]" %>
           </a>
-          <%= render partial: "shared/settings_nav" %>
+          <%= render Shared::SettingsNavView.new(user: @user) %>
       </div>
-      <div class="basis-[700px] shrink-[4] relative bg-base min-w-0 mb-8">
+      <div class="basis-[700px] shrink-[4] relative min-w-0 mb-8">
           <button class="flex h-[36px] w-[36px] absolute top-[45px] right-[16px] items-center justify-end md:hidden" data-behavior="open_modal" data-modal-target="settings_nav">
               <%= svg_tag "icon-menu", class: "fill-600" %>
           </button>
@@ -25,5 +25,6 @@
   </div>
   <%= render partial: "shared/svg" %>
   <%= render partial: "shared/modals/settings_modal" %>
+  <%= render partial: "shared/modals/add_form" %>
 <% end %>
 <%= render template: "layouts/application" %>

@@ -17,6 +17,7 @@ logger Logger.new($stdout)
 
 before_fork do |server, worker|
   defined?(ActiveRecord::Base) && ActiveRecord::Base.connection.disconnect!
+
   old_pid = "#{server.config[:pid]}.oldbin"
   if old_pid != server.pid
     begin
@@ -25,6 +26,10 @@ before_fork do |server, worker|
     rescue Errno::ENOENT, Errno::ESRCH
     end
   end
+
+  # Autotuner recommendation. Run compaction at boot time, which reduces fragmentation inside of the Ruby heap.
+  3.times { GC.start }
+  GC.compact
 end
 
 after_fork do |server, worker|

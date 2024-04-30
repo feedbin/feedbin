@@ -1,25 +1,25 @@
 <% record = (status == :active) ? sharing_service : record %>
 
 <%= render "supported_sharing_services/type_xauth", sharing_service: sharing_service, status: status, record: record do %>
-  <p class="mb-4 text-500">You can find your API token on the <a href="https://pinboard.in/settings/password" target="_blank" rel="noopener noreferrer" tabindex="-1">Pinboard Password page</a>.</p>
+  <p class="mb-4 text-500">You can find your API token on the <a href="https://pinboard.in/settings/password" target="_blank" rel="noopener noreferrer">Pinboard Password page</a>.</p>
 
   <%= form_for(record) do |f| %>
     <%= f.hidden_field :service_id, value: sharing_service.service_id %>
     <%= f.hidden_field :operation, value: "authorize" %>
 
-    <%= component "form/text_input" do |text| %>
+    <%= render Form::TextInputComponent.new do |text| %>
       <% text.label do %>
         <label for="pinboard_token">API Token</label>
       <% end %>
       <% text.input do %>
-        <%= password_field_tag "password", "", id: "pinboard_token", class: "peer", tabindex: "-1" %>
+        <%= password_field_tag "password", "", id: "pinboard_token", class: "peer text-input" %>
       <% end %>
     <% end %>
 
-    <div class="button-wrap">
-      <%= button_tag "Cancel", type: "button", class: "button button-tertiary button-inline", data: {action: "expandable#toggle"}, tabindex: "-1" %>
-      <%= button_tag "Save", type: "submit", class: "button button-primary-plain", tabindex: "-1" %>
-    </div>
+    <%= render Settings::ButtonRowComponent.new do %>
+      <%= button_tag "Cancel", type: "button", class: "button button-tertiary button-inline", data: {action: "expandable#toggle"} %>
+      <%= button_tag "Save", type: "submit", class: "button button-primary-plain" %>
+    <% end %>
   <% end %>
 
 <% end %>

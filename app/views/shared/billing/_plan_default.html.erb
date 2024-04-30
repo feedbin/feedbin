@@ -1,9 +1,9 @@
-<%= component "settings/control_group" do |group| %>
+<%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
   <% group.header do %>
     Payment Information
   <% end %>
   <% group.item do %>
-    <%= component "settings/control_row" do |row| %>
+    <%= render Settings::ControlRowComponent.new do |row| %>
       <% row.title do %>
         <span data-behavior="billing_details" class="text">Loading…</span>
       <% end %>
@@ -15,13 +15,13 @@
 <% end %>
 
 
-<%= component "settings/control_group" do |group| %>
+<%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
   <% group.header do %>
     Change Your Plan
   <% end %>
   <% @plans.each do |plan| %>
     <% group.item do %>
-      <%= component "settings/control_row" do |row| %>
+      <%= render Settings::ControlRowComponent.new do |row| %>
         <% row.title do %>
           <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
         <% end %>
@@ -31,7 +31,7 @@
           <% else %>
               <%= form_tag update_plan_settings_billing_path, data: { behavior: "change_plan" }, class: "no-margin" do %>
                   <%= hidden_field_tag "plan", plan.id %>
-                  <%= button_tag "Switch to this plan", class: "button-text large", data: { confirm: "Are you sure you want to switch to #{plan.name.downcase} billing?" } %>
+                  <%= button_tag "Switch to this plan", class: "button-text text-normal text-blue-600", data: { confirm: "Are you sure you want to switch to #{plan.name.downcase} billing?" } %>
               <% end %>
           <% end %>
         <% end %>

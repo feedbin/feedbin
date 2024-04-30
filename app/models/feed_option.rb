@@ -13,7 +13,7 @@ class FeedOption
       result = @href.strip
       result = result.gsub(/^feed:/, "http:")
       unless result.start_with?("http")
-        result = URI.join(@base_url, result).to_s
+        result = Addressable::URI.join(@base_url, result).to_s
       end
       result
     end

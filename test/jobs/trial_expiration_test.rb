@@ -22,8 +22,10 @@ class TrialExpirationTest < ActiveSupport::TestCase
     user.save(validate: false)
 
     assert_not user.suspended
-    assert_difference -> { Sidekiq::Extensions::DelayedMailer.jobs.size }, +1 do
-      TrialExpiration.new.perform
+    Sidekiq::Testing.inline! do
+      assert_difference -> { ActionMailer::Base.deliveries.count }, +1 do
+        TrialExpiration.new.perform
+      end
     end
     assert user.reload.suspended
 

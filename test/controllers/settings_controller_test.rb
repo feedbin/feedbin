@@ -7,7 +7,7 @@ class SettingsControllerTest < ActionController::TestCase
 
   test "should get settings" do
     login_as @user
-    get :settings
+    get :index
     assert_response :success
   end
 

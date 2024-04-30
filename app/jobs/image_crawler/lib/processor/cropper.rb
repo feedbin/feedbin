@@ -71,6 +71,7 @@ module ImageCrawler
 
         # if the original is smaller than the resized, just use that one
         if result.size > size && source.width <= @width && source.height <= @height && ["png", "jpg"].include?(@extension)
+          File.unlink(result.file)
           return Processed.from_file(@file, @extension)
         end
         result

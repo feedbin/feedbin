@@ -1,15 +1,15 @@
-<%= content_tag :ul, class: "control-group no-margin" do  -%>
-    <li class="text">
-        <%= render "shared/input", class: "tag-input" do %>
-            <input placeholder="+ New Tag" type="text" name="tag_name[]">
+<input placeholder="+ New Tag" type="text" name="tag_name[]" class="text-input-next w-full py-[8px] px-[8px] mb-4 cursor-pointer placeholder:font-bold placeholder:text-center placeholder:text-700 focus:placeholder:text-500 focus:placeholder:text-left focus:placeholder:font-normal">
+
+<%= render Settings::ControlGroupComponent.new class: "group [&_[data-item-container]]:!border-0 [&_[data-item]]:!border-0" do |group| %>
+  <% tag_editor.tags.each do |tag| %>
+    <% group.item do %>
+      <%= check_box_tag "tag_id[#{tag.id}]", tag.name, tag_editor.checked?(tag), class: "peer" %>
+      <%= label_tag "tag_id[#{tag.id}]", class: "group" do %>
+        <%= render Settings::ControlRowComponent.new do |row| %>
+          <% row.title { tag.name } %>
+          <% row.control { render Form::SwitchComponent.new } %>
         <% end %>
-    </li>
-    <% tag_editor.tags.each do |tag| %>
-    <li>
-        <%= check_box_tag "tag_id[#{tag.id}]", tag.name, tag_editor.checked?(tag) %>
-        <%= label_tag "tag_id[#{tag.id}]" do %>
-            <%= tag.name %> <%= toggle_switch %>
-        <% end %>
-    </li>
+      <% end %>
     <% end %>
-<%- end -%>
+  <% end %>
+<% end %>

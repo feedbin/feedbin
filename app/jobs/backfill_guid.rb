@@ -29,8 +29,7 @@ class BackfillGuid
     parts.push(@feed.feed_url)
     parts.push(entry_id)
     unless entry.entry_id
-      parts.push(entry.url)
-      parts.push(entry.title)
+      parts.push(entry.url || entry.title)
     end
     parts.compact.join
   end

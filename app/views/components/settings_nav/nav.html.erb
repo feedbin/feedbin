@@ -1,0 +1,17 @@
+<li class="mb-1 <%= @classes %>" >
+  <%= link_to *[*@url] do %>
+    <span class="grid place-items-center shrink-0 w-[16px] h-[17px]">
+      <%= svg_tag @icon, inline: true, class: "fill-600 group-data-selected:fill-white" %>
+    </span>
+    <span>
+      <span class="block leading-[17px] mb-1 group-data-selected:text-white">
+        <%= @title %>
+      </span>
+      <% if @subtitle.present? %>
+        <span class="block text-sm text-500 group-data-selected:text-white/70 group-data-[nav=dropdown]:text-xs">
+          <%= @subtitle %>
+        </span>
+      <% end %>
+    </span>
+  <% end %>
+</li>

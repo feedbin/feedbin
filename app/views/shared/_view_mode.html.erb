@@ -40,5 +40,9 @@
             </ul>
         </div>
     </div>
-    <button class="toggle-search" data-behavior="toggle_search" title="Search <i>/</i>" data-toggle="tooltip" data-html="true"><%= svg_tag "icon-search", size: "16x16" %></button>
+    <div class="toggle-search">
+      <%= render App::SearchButtonComponent.new do %>
+        <%= svg_tag "icon-search", size: "16x16" %>
+      <% end %>
+    </div>
 </div>

@@ -1,4 +1,4 @@
-class Settings::ExpandableComponentPreview < ViewComponent::Preview
+class Settings::ExpandableComponentPreview < Lookbook::Preview
   def default
   end
 end

@@ -12,7 +12,7 @@
             <%= svg_tag "icon-menu" %>
         </button>
         <div class="dropdown-content group" data-nav="dropdown">
-            <%= render partial: "shared/settings_nav" %>
+            <%= render Shared::SettingsNavView.new(user: current_user) %>
         </div>
     </div>
 </div>

@@ -1,14 +1,16 @@
 class Source::MetaLinks < Source
-  def find
+  def options
     return unless document?
 
-    urls = document.css("link[rel=alternate]").each_with_object([]) do |link, array|
+    document.css("link[rel~=alternate]").each_with_object([]) do |link, array|
       if link_valid?(link)
         array.push join_url(response.url, link["href"])
       end
     end
+  end
 
-    urls.uniq.each do |url|
+  def find
+    options.uniq.each do |url|
       feed = create_from_url!(url)
       feeds.push(feed) if feed
     rescue Feedkit::Error

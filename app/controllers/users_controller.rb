@@ -1,15 +1,10 @@
 class UsersController < ApplicationController
-  skip_before_action :authorize, only: [:new, :create, :new_next]
+  skip_before_action :authorize, only: [:new, :create]
 
   before_action :set_user, only: [:update, :destroy]
   before_action :ensure_permission, only: [:update, :destroy]
 
   def new
-    session[:feed_wrangler_token] = params[:feed_wrangler_token]
-    @user = User.new.with_params(params)
-  end
-
-  def new_next
     session[:feed_wrangler_token] = params[:feed_wrangler_token]
     @user = User.new.with_params(params)
   end

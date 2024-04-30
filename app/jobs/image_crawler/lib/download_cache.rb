@@ -1,12 +1,12 @@
 module ImageCrawler
   class DownloadCache
 
-    attr_reader :storage_url, :image
+    attr_reader :storage_url, :cached_image
 
-    def initialize(url, preset_name)
+    def initialize(url, image)
       @url = url
-      @preset_name = preset_name
-      @image = from_cache
+      @image = image
+      @cached_image = from_cache
     end
 
     def from_cache
@@ -21,11 +21,11 @@ module ImageCrawler
     end
 
     def self.save(image)
-      new(image.original_url, image.preset_name).save(image)
+      new(image.original_url, image).save(image)
     end
 
     def copy
-      copy_image unless @image.nil?
+      copy_image unless @cached_image.nil?
     end
 
     def copied?
@@ -49,7 +49,7 @@ module ImageCrawler
     end
 
     def cache_key
-      "image_download_#{@preset_name}_#{Digest::SHA1.hexdigest(@url)}_v2"
+      "image_download_#{@image.preset_name}_#{Digest::SHA1.hexdigest(@url)}_v3"
     end
 
     def attempt_cache_key
@@ -57,10 +57,11 @@ module ImageCrawler
     end
 
     def copy_image
-      url = URI.parse(@image.storage_url)
+      url = URI.parse(@cached_image.storage_url)
       source_object_name = url.path[1..-1]
-      Fog::Storage.new(STORAGE).copy_object(@image.bucket, source_object_name, @image.bucket, @image.image_name, @image.storage_options)
-      final_url = url.path = "/#{@image.image_name}"
+      copied_image_name = "#{@image.image_name}#{@cached_image.processed_extension}"
+      Fog::Storage.new(STORAGE).copy_object(@cached_image.bucket, source_object_name, @cached_image.bucket, copied_image_name, @cached_image.storage_options)
+      url.path = "/#{copied_image_name}"
       @storage_url = url.to_s
     rescue Excon::Error::NotFound
       false

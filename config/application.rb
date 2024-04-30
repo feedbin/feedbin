@@ -10,6 +10,12 @@ Bundler.require(*Rails.groups)
 
 module Feedbin
   class Application < Rails::Application
+    config.autoload_paths << "#{root}/app/views"
+    config.autoload_paths << "#{root}/app/layouts"
+    config.autoload_paths << "#{root}/app"
+
+    config.eager_load_paths += %W(#{root}/app #{root}/app/views #{root}/app/views/components #{root}/app/views/layouts)
+
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.1
 
@@ -39,8 +45,9 @@ module Feedbin
     config.action_view.default_enforce_utf8 = true
     config.active_record.yaml_column_permitted_classes = [Symbol]
     config.assets.css_compressor = ConditionalSassCompressor.new
-    config.view_component.default_preview_layout = "component_preview"
+    config.active_support.cache_format_version = 7.1
 
+    config.lookbook.preview_layout = "component_preview"
     config.lookbook.project_name = "Feedkit"
     config.lookbook.ui_theme_overrides = {
       header_bg: "#000000"

@@ -6,46 +6,60 @@ module ImageCrawler
     end
 
     def build_image
-      cache_key         = SecureRandom.hex
-      id                = SecureRandom.hex
-      download_path     = copy_support_file("image.jpeg")
-      processed_path    = download_path
-      original_url      = "http://example.com/image.jpg"
-      final_url         = "http://example.com/redirect/image.jpg"
-      placeholder_color = "0867e2"
-      width             = 300
-      height            = 200
-      storage_url       = "http://s3.com/example/example.jpg"
-      preset_name       = "primary"
-      Image.new(id:, preset_name:, download_path:, original_url:, final_url:, processed_path:, width:, height:, placeholder_color:, storage_url:)
+      cache_key           = SecureRandom.hex
+      id                  = SecureRandom.hex
+      download_path       = copy_support_file("image.jpeg")
+      processed_path      = download_path
+      original_url        = "http://example.com/image.jpg"
+      final_url           = "http://example.com/redirect/image.jpg"
+      placeholder_color   = "0867e2"
+      width               = 300
+      height              = 200
+      storage_url         = "http://s3.com/example/example.jpg"
+      preset_name         = "primary"
+      processed_extension = "jpg"
+      Image.new(id:, preset_name:, download_path:, original_url:, final_url:, processed_path:, width:, height:, placeholder_color:, storage_url:, processed_extension:)
+    end
+
+    def build_duplicate_image(original_url)
+      Image.new({
+        id: SecureRandom.hex,
+        preset_name: "primary",
+        image_urls: [original_url]
+      })
     end
 
     def test_should_save_data
       image = build_image
       cache = DownloadCache.save(image)
 
-      cache = DownloadCache.new(image.original_url, image.preset_name)
-      assert_equal(image.storage_url, cache.image.storage_url)
-      assert_equal(image.final_url, cache.image.final_url)
-      assert_equal(image.placeholder_color, cache.image.placeholder_color)
+      image_two = build_duplicate_image(image.original_url)
+
+      cache = DownloadCache.new(image.original_url, image_two)
+      assert_equal(image.storage_url, cache.cached_image.storage_url)
+      assert_equal(image.final_url, cache.cached_image.final_url)
+      assert_equal(image.placeholder_color, cache.cached_image.placeholder_color)
     end
 
     def test_should_copy_existing_image
       stub_request(:put, /s3\.amazonaws\.com/).to_return(status: 200, body: aws_copy_body)
 
       image = build_image
-      cache = DownloadCache.new(image.original_url, image.preset_name)
+
+      image_two = build_duplicate_image(image.original_url)
+
+      cache = DownloadCache.new(image.original_url, image_two)
       refute cache.copied?
 
       cache.save(image)
 
-      cache = DownloadCache.new(image.original_url, image.preset_name)
+      cache = DownloadCache.new(image.original_url, image_two)
       cache.copy
 
       assert cache.copied?
-      assert cache.storage_url.include?(image.id)
-      assert_equal(image.width, cache.image.width)
-      assert_equal(image.height, cache.image.height)
+      assert cache.storage_url.include?(image_two.id)
+      assert_equal(image.width, cache.cached_image.width)
+      assert_equal(image.height, cache.cached_image.height)
     end
 
     def test_should_fail_to_copy_missing_image
@@ -55,9 +69,11 @@ module ImageCrawler
 
       image = build_image
 
+      image_two = build_duplicate_image(image.original_url)
+
       DownloadCache.save(image)
 
-      cache = DownloadCache.new(image.original_url, image.preset_name)
+      cache = DownloadCache.new(image.original_url, image_two)
       cache.copy
 
       refute cache.copied?

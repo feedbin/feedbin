@@ -12,7 +12,7 @@
   <%= f.hidden_field :stripe_token, id: 'stripe_token' %>
   <%= hidden_field_tag :redirect_to, settings_billing_url %>
 
-  <%= component "settings/control_group" do |group| %>
+  <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
     <% group.header do %>
       <%= subscribe_title %>
     <% end %>
@@ -36,10 +36,11 @@
       <% group.item do %>
         <%= f.radio_button :plan_id, plan.id, options %>
         <%= label_tag nil, for: dom_id(plan), class: "group" do %>
-          <%= component "settings/control_row_radio" do |row| %>
+          <%= render Settings::ControlRowComponent.new do |row| %>
             <% row.title do %>
               <%= number_to_currency(plan.price, precision: 0) %>/<%= plan.period %>
             <% end %>
+            <% row.control { render Form::RadioComponent.new } %>
           <% end %>
         <% end %>
       <% end %>
@@ -74,10 +75,8 @@
     <% end %>
   </div>
 
-  <div class="description-inset">
-      <div class="button-wrap">
-          <div id="payment_request_button"><small>Loading…</small></div>
-          <button type="submit" class="button no-margin" id="credit_card_button" disabled data-disable-with="false">Subscribe</button>
-      </div>
-  </div>
+  <%= render Settings::ButtonRowComponent.new do %>
+    <div id="payment_request_button"><small>Loading…</small></div>
+    <button type="submit" class="button no-margin" id="credit_card_button" disabled data-disable-with="false">Subscribe</button>
+  <% end %>
 <% end %>

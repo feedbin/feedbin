@@ -7,7 +7,7 @@ class Share::Email < Share::Service
     reply_to = @klass.email_address.present? ? @klass.email_address : @klass.user.email
     from_name = @klass.email_name.present? ? @klass.email_name : @klass.user.email
     update_completions(params[:to])
-    EntryMailer.delay(queue: :default_critical).mailer(params[:entry_id], params[:to], params[:subject], params[:body], reply_to, from_name, params[:readability])
+    EntryMailer.mailer(params[:entry_id], params[:to], params[:subject], params[:body], reply_to, from_name, params[:readability]).deliver_later
     {message: "Email sent to #{params[:to]}."}
   end
 

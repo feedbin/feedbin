@@ -23,9 +23,11 @@ module ImageCrawler
     test "should enqueue Find with parsed urls" do
 
       content = <<-EOT
-      <iframe src="/iframe"></iframe>
-      <img src="/img">
       <video poster="/video">
+      <iframe src="/iframe"></iframe>
+      <meta property="og:image" content="/og">
+      <meta property="twitter:image" content="/twitter">
+      <img src="/img">
       EOT
 
       entry = Feed.first.entries.create(
@@ -39,9 +41,12 @@ module ImageCrawler
       image = Image.new(Pipeline::Find.jobs.first["args"].first)
       extracted_urls = image.image_urls
 
-      assert extracted_urls.include?("http://example.com/iframe")
-      assert extracted_urls.include?("http://example.com/img")
-      assert extracted_urls.include?("http://example.com/video")
+      # should come back in the order of ImageCrawler::EntryImage::IMAGE_SELECTORS
+      assert_equal "http://example.com/twitter", extracted_urls[0]
+      assert_equal "http://example.com/og",      extracted_urls[1]
+      assert_equal "http://example.com/img",     extracted_urls[2]
+      assert_equal "http://example.com/iframe",  extracted_urls[3]
+      assert_equal "http://example.com/video",   extracted_urls[4]
 
       assert_equal(entry.public_id, image.id)
       assert_equal(entry.fully_qualified_url, image.entry_url)

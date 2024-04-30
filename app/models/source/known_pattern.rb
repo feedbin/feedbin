@@ -14,7 +14,7 @@ class Source::KnownPattern < Source
     },
     {
       template: "https://www.reddit.com/r/%s.rss".freeze,
-      regex: Regexp.new(/https:\/\/www\.reddit\.com\/r\/([^\/#\?]*)/)
+      regex: Regexp.new(/https?:\/\/(?:www\.)?reddit\.com\/r\/([^\/#\?]*)/)
     },
     {
       template: "https://vimeo.com/%s/videos/rss".freeze,
@@ -39,7 +39,7 @@ class Source::KnownPattern < Source
   end
 
   def mastodon_server?
-    response.headers.find { _2 =~ /mastodon/i }
+    response.headers.respond_to?(:find) && response.headers.find { _2 =~ /mastodon/i }
   end
 
   def youtube_domain?
@@ -51,6 +51,8 @@ class Source::KnownPattern < Source
       id = document.css("meta[itemprop='channelId']")
       if id.present?
         id.first["content"]
+      elsif match = response.body.match(/"channelId":"(.*?)"/)&.captures&.first
+        match
       end
     end
   end

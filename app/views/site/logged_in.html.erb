@@ -31,7 +31,7 @@
                 </div>
                 <div class="feeds showing-audio-player" data-behavior="droppable">
                     <%= render partial: 'shared/view_mode' %>
-                    <ul data-behavior="feeds_target" class="feeds-target feed-list">
+                    <ul data-behavior="feeds_target" data-controller="sourceable" class="feeds-target feed-list">
                         <%= render partial: 'feeds/feeds', locals: {collections: @feed_data[:collections], saved_searches: @feed_data[:saved_searches], tags: @feed_data[:tags], feeds: @feed_data[:feeds], page_feed: @feed_data[:page_feed]} %>
                     </ul>
                 </div>
@@ -46,28 +46,11 @@
                         <%= svg_tag "icon-arrow", size: "9x15" %>
                     </button>
                     <span class="feed-title-wrap"><span data-behavior="user_title"></span></span>
-                    <button class="search-button" data-behavior="toggle_search"><%= svg_tag "icon-search", size: "16x16" %></button>
-                </div>
-                <div class="search-wrap">
-                    <%= form_tag search_entries_path, class: 'search-form', remote: true, method: :get, data: {behavior: 'search_form'} do %>
-                        <div class="icon-wrap"><%= svg_tag "icon-search" %></div>
-                        <%= search_field_tag :query, params[:query], placeholder: 'Search', autocorrect: "off", autocapitalize: "off", spellcheck: false %>
-                    <% end %>
-                    <div class="search-control">
-                        <div class="search-toolbar">
-                            <div class="dropdown-wrap">
-                                <span class="sort-order" data-behavior="toggle_dropdown">Sort by date</span>
-                                <div class="dropdown-content">
-                                    <ul>
-                                        <li data-sort-option="desc"><span>Sort by date</span></li>
-                                        <li data-sort-option="relevance"><span>Sort by relevance</span></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <%= link_to "Save Search", new_saved_search_path, remote: true, class: "save-search", data: {behavior: "new_saved_search open_settings_modal"} %>
-                        </div>
+                    <div class="search-button">
+                      <%= render App::SearchButtonComponent.new %>
                     </div>
                 </div>
+                <%= render App::SearchFormComponent.new(params: params) %>
                 <div class="entries">
                     <ul data-behavior="entries_target" class="entries-target"></ul>
                 </div>
@@ -85,7 +68,11 @@
                     <% @user.supported_sharing_services.each do |service| %>
                         <% if service.has_share_sheet? %>
                             <div class="basement-panel hide" data-basement-panel-target="<%= service.service_id %>_share_panel">
-                                <%= render partial: "supported_sharing_services/share_form_#{service.service_id}", locals: {service: service} %>
+                                <div class="py-6 px-8">
+                                  <div class="max-w-[620px] mx-auto" data-behavior="share_form">
+                                    <%= render partial: "supported_sharing_services/share_form_#{service.service_id}", locals: {service: service} %>
+                                  </div>
+                                </div>
                             </div>
                         <% end %>
                     <% end %>
@@ -132,7 +119,6 @@
     <%= render partial: "shared/modals/generic" %>
     <%= render partial: "shared/modals/edit" %>
     <%= render partial: "shared/modals/appearance" %>
-    <%= render partial: "shared/modals/search" %>
     <%= render partial: "shared/readability_loading" %>
     <%= render partial: "shared/saved_searches_count" %>
     <%= render partial: "shared/format" %>
@@ -157,7 +143,7 @@
             }
             $.extend(feedbin.entries, <%= @entries.to_json.html_safe %>);
             feedbin.showEntry(<%= params[:id] %>);
-            $('[data-behavior~=toggle_full_screen]').click()
+            $('[data-behavior~=toggle_full_screen]')[0]?.click()
         })
     </script>
     <% end %>

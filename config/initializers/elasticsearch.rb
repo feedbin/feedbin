@@ -27,13 +27,7 @@ Rails.application.reloader.to_prepare do
         stemmed: {
           type: "custom",
           tokenizer: "standard",
-          filter: ["lowercase", "asciifolding", "english_stemmer"]
-        }
-      },
-      filter: {
-        english_stemmer: {
-          type: "stemmer",
-          name: "english"
+          filter: ["lowercase", "asciifolding", "stemmer"]
         }
       }
     }
@@ -64,6 +58,10 @@ Rails.application.reloader.to_prepare do
         },
         link: {
           type: "keyword"
+        },
+        category: {
+          type: "text",
+          analyzer: "lower_exact"
         },
         published: {
           type: "date"
@@ -137,7 +135,7 @@ Rails.application.reloader.to_prepare do
       }
     }
 
-    if ENV["ELASTICSEARCH_ALT_URL"]
+    if ENV["ELASTICSEARCH_ALT_URL"].present?
       hash[:servers][:secondary] = ConnectionPool.new(size: ENV.fetch("DB_POOL", 1)) {
         Search::Connection.new(ENV.fetch("ELASTICSEARCH_ALT_URL", "http://localhost:9200"),
           username: ENV["ELASTICSEARCH_ALT_USERNAME"],
@@ -165,9 +163,15 @@ Rails.application.reloader.to_prepare do
   end
 
   unless Rails.env.production?
+    entry_index = "#{Entry.table_name}-01"
+    action_index = "#{Action.table_name}-01"
+
     begin
-      Search.client(mirror: true) { _1.request(:put, Entry.table_name, json: entries_mapping) }
-      Search.client(mirror: true) { _1.request(:put, Action.table_name, json: actions_mapping) }
+      Search.client(mirror: true) { _1.request(:put, entry_index, json: entries_mapping) }
+      Search.client(mirror: true) { _1.request(:put, action_index, json: actions_mapping) }
+
+      Search.client(mirror: true) { _1.add_alias(entry_index, alias_name: Entry.table_name) }
+      Search.client(mirror: true) { _1.add_alias(action_index, alias_name: Action.table_name) }
     rescue => exception
       Rails.logger.error("---------------------------")
       Rails.logger.error("Error initializing search: #{exception.inspect}")

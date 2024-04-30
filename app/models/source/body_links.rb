@@ -1,5 +1,6 @@
 class Source::BodyLinks < Source
-  def find
+
+  def options
     return unless document?
 
     urls = document.css("a").each_with_object([]) do |anchor, array|
@@ -8,7 +9,11 @@ class Source::BodyLinks < Source
       end
     end
 
-    urls.first(4).each do |url|
+    urls.first(4)
+  end
+
+  def find
+    options.each do |url|
       feed = create_from_url!(url)
       feeds.push(feed) if feed
     rescue Feedkit::Error

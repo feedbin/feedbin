@@ -1,39 +1,43 @@
-<div class="share-form">
-    <div class="share-form-inner icon-share-mastodon">
-        <div class="sharing-header">
-            <h2>Post to Mastodon</h2>
-            <%= svg_tag "icon-share-mastodon" %>
-        </div>
-        <%= form_tag("", remote: true) do %>
-            <div class="field-cluster">
-                <div class="input-group-wrap">
-                    <label for="mastodon_status">Status</label>
-                    <%= render "shared/input" do %>
-                        <%= text_area_tag :status, "", class: "combined-placeholder", id: "mastodon_status", rows: 4 %>
-                    <% end %>
-                </div>
-                <div class="input-group-wrap">
-                    <label for="mastodon_spoiler_text">Content Warning</label>
-                    <%= render "shared/input" do %>
-                        <%= text_field_tag :spoiler_text, "", placeholder: "optional", id: "mastodon_spoiler_text" %>
-                    <% end %>
-                </div>
-            </div>
-            <div class="sharing-controls">
-                <div class="input-group-wrap">
-                    <label for="mastodon_visibility">Visibility</label>
-                    <%= render "shared/input" do %>
-                        <%= select_tag "visibility", options_for_select({"Public" => "public", "Unlisted" => "unlisted", "Followers only" => "private", "Mentioned people only" => "direct"}), class: "select", id: "mastodon_visibility" %>
-                        <span class="accessory right">
-                            <%= svg_tag "icon-caret" %>
-                        </span>
-                    <% end %>
-                </div>
-            </div>
-            <div class="button-wrap">
-                <%= button_tag "Cancel", type: "button", class: "button button-secondary", data: {behavior: "close_entry_basement"} %>
-                <%= button_tag "Post", type: "submit", class: "button" %>
-            </div>
+<%= render App::ShareFormComponent.new title: "Post to Mastodon", icon: "icon-share-mastodon" do %>
+  <%= form_tag("", remote: true) do %>
+
+    <div class="mb-4">
+      <%= render Form::TextInputComponent.new do |text| %>
+        <% text.label do %>
+          <label for="mastodon_status">Status</label>
         <% end %>
+        <% text.input do %>
+          <%= text_area_tag :status, "", class: "combined-placeholder peer text-input", id: "mastodon_status", rows: 4 %>
+        <% end %>
+      <% end %>
     </div>
-</div>
+
+    <div class="mb-4">
+      <%= render Form::TextInputComponent.new do |text| %>
+        <% text.label do %>
+          <label for="mastodon_spoiler_text">Content Warning</label>
+        <% end %>
+        <% text.input do %>
+          <%= text_field_tag :spoiler_text, "", class:"peer text-input", placeholder: "optional", id: "mastodon_spoiler_text" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="mb-4">
+      <%= render Form::SelectInputComponent.new do |text| %>
+        <% text.label do %>
+          <label for="mastodon_visibility">Visibility</label>
+        <% end %>
+        <% text.input do %>
+          <%= select_tag "visibility", options_for_select({"Public" => "public", "Unlisted" => "unlisted", "Followers only" => "private", "Mentioned people only" => "direct"}), class: "peer", id: "mastodon_visibility" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%= render Settings::ButtonRowComponent.new do %>
+      <%= button_tag "Cancel", type: "button", class: "button button-secondary", data: {behavior: "close_entry_basement"} %>
+      <%= button_tag "Post", type: "submit", class: "button" %>
+    <% end %>
+
+  <% end %>
+<% end %>

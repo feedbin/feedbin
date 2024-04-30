@@ -37,12 +37,16 @@ every(1.day, "clockwork.daily", at: "7:00", tz: "UTC") do
   if RedisLock.acquire("clockwork:trial_expiration:v2")
     TrialExpiration.perform_async if Rails.env.production?
   end
-
-  if RedisLock.acquire("clockwork:twitter_validate_credentials")
-    TwitterValidateCredentials.perform_async if Rails.env.production?
-  end
+end
 
   if RedisLock.acquire("clockwork:web_sub_maintenance")
-    WebSub::Maintenance.perform_async if Rails.env.production?
+    WebSub::Maintenance.perform_async
+  end
+end
+
+
+every(1.week, "clockwork.weekly", at: "Sunday 16:00", tz: "UTC") do
+  if RedisLock.acquire("clockwork:feed_fixer_scheduler")
+    FeedFixerScheduler.perform_async
   end
 end

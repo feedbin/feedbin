@@ -20,8 +20,6 @@ Rails.application.routes.draw do
   get :service_worker, to: "site#service_worker"
   get "manifest/:theme", to: "site#manifest", as: "manifest"
 
-  post "/newsletters" => "newsletters#create"
-  post "/newsletters/:token" => "newsletters#raw"
   get "bookmarklet/:cache_buster", to: "bookmarklet#script", as: "bookmarklet"
 
   match "/404", to: "errors#not_found", via: :all
@@ -29,29 +27,12 @@ Rails.application.routes.draw do
   post "/starred/export", to: "starred_entries#export"
 
   get :signup, to: "users#new", as: "signup"
-  get :signup_next, to: "users#new_next", as: "signup2"
   get :login, to: "sessions#new", as: "login"
   delete :logout, to: "sessions#destroy", as: "logout"
 
   get ".well-known/apple-app-site-association", to: "well_known#apple_site_association"
   get ".well-known/apple-developer-merchantid-domain-association", to: "well_known#apple_pay"
   get ".well-known/change-password", to: "well_known#change_password"
-
-  # Apple Push
-
-  # When a user allows permission to receive push notifications
-  post "apple_push_notifications/:version/pushPackages/:website_push_id", as: :apple_push_notifications_package, to: "apple_push_notifications#create", website_push_id: /.*/
-
-  # POST When users first grant permission, or later change their permission
-  # levels for your website
-  post "apple_push_notifications/:version/devices/:device_token/registrations/:website_push_id", as: :apple_push_notifications_update, to: "apple_push_notifications#update", website_push_id: /.*/
-
-  # DELETE If a user removes permission of a website in Safari preferences, a
-  # DELETE request is sent
-  delete "apple_push_notifications/:version/devices/:device_token/registrations/:website_push_id", as: :apple_push_notifications_delete, to: "apple_push_notifications#delete", website_push_id: /.*/
-
-  # Error log
-  post "apple_push_notifications/:version/log", as: :apple_push_notifications_log, to: "apple_push_notifications#log"
 
   # WebSub
   get  "web_sub/:id/:signature", as: :web_sub_verify,  to: "web_sub#verify"
@@ -64,6 +45,7 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :newsletters, only: :create
   resources :tags, only: [:index, :show, :update, :destroy, :edit]
   resources :billing_events, only: [:show]
   resources :in_app_purchases, only: [:show]
@@ -71,9 +53,15 @@ Rails.application.routes.draw do
   resources :password_resets
   resources :sharing_services, path: "settings/sharing", only: [:index, :create, :update, :destroy]
   resources :actions, path: "settings/actions", only: [:index, :create, :new, :update, :destroy, :edit]
+  resources :devices, only: [:create]
   resources :account_migrations, path: "settings/account_migrations" do
     member do
       patch :start
+    end
+  end
+  resources :fix_feeds, path: "settings/subscriptions/fix" do
+    collection do
+      post :replace_all
     end
   end
   resources :saved_searches, only: [:show, :update, :destroy, :create, :edit, :new] do
@@ -165,7 +153,7 @@ Rails.application.routes.draw do
     end
   end
 
-  get :settings, to: "settings#settings"
+  get :settings, to: "settings#index"
   namespace :settings do
     resources :subscriptions, only: [:index, :edit, :destroy, :update] do
       collection do
@@ -177,7 +165,29 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :imports, only: [:create, :show]
+    resource :newsletters do
+      scope module: "newsletters" do
+        resources :addresses do
+          member do
+            patch :activate
+          end
+          collection do
+            get :inactive
+          end
+        end
+        resources :senders
+      end
+    end
+
+    get :newsletters_pages, to: redirect("/settings/newsletters")
+
+    resources :imports, only: [:create, :show] do
+      member do
+        post :replace_all
+      end
+    end
+
+    resources :import_items, only: [:update]
     get :import_export, to: "imports#index"
 
     get :billing, to: "billings#index"
@@ -193,26 +203,12 @@ Rails.application.routes.draw do
 
     get :account
     get :appearance
-    get :newsletters_pages
     post :now_playing
     post :audio_panel_size
   end
 
   post "settings/sticky/:feed_id", as: :settings_sticky, to: "settings#sticky"
   post "settings/subscription_view_mode/:feed_id", as: :settings_subscription_view_mode, to: "settings#subscription_view_mode"
-
-  resources :twitter_authentications, only: [:new] do
-    collection do
-      get :save
-      delete :delete
-    end
-  end
-
-  resources :tweets, only: [] do
-    member do
-      get :thread
-    end
-  end
 
   resources :microposts, only: [] do
     member do
@@ -281,6 +277,7 @@ Rails.application.routes.draw do
             resource :bulk, controller: :bulk, only: [:update]
           end
           resources :queued_entries, only: [:index, :create, :update, :destroy]
+          resources :playlists, only: [:index, :create, :update, :destroy]
           post :authentication, to: "authentication#index"
         end
       end
@@ -315,6 +312,7 @@ Rails.application.routes.draw do
         resources :users, only: [:create] do
           collection do
             get :info
+            patch :update
             delete :destroy
           end
         end
@@ -376,8 +374,11 @@ Rails.application.routes.draw do
     end
   end
 
-  namespace :admin do
-    resources :users
+  constraints lambda { |request| AuthConstraint.admin?(request) } do
+    namespace :admin do
+      resources :users
+      resources :feeds
+    end
   end
 
   namespace :app_store do

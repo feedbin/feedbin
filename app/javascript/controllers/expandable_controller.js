@@ -1,20 +1,22 @@
 import { Controller } from "@hotwired/stimulus"
+import { afterTransition } from "helpers"
 
 // Connects to data-controller="expandable"
 export default class extends Controller {
-  static targets = ["container", "content"];
+  static targets = ["transitionContainer"]
   static values = {
-    open: Boolean
+    open: Boolean,
+    visible: Boolean,
   }
 
   toggle(event) {
-    this.openValue = !this.openValue;
-    const height = this.openValue ? this.contentTarget.getBoundingClientRect().height : 0
-    this.containerTarget.style["max-height"] = `${height}px`
-    const tabTargets = this.contentTarget.querySelectorAll("[tabindex]")
+    if (event.target.type === "radio") {
+      this.openValue = !(event.params.toggleTarget)
+    }
 
-    tabTargets.forEach((element) => {
-      element.tabIndex = this.openValue ? "0" : "-1"
+    this.openValue = !this.openValue
+    afterTransition(this.transitionContainerTarget, this.openValue, () => {
+      this.visibleValue = this.openValue
     })
   }
 }

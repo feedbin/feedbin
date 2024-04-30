@@ -1,9 +1,22 @@
 class Settings::SubscriptionsController < ApplicationController
   def index
     @user = current_user
+    @user.setting_off!(:fix_feeds_available)
     @subscriptions = subscriptions_with_sort_data.paginate(page: params[:page], per_page: 50)
     store_location
-    render layout: "settings"
+
+    respond_to do |format|
+      format.html do
+        view = Settings::Subscriptions::IndexView.new(
+          user: @user,
+          subscriptions: @subscriptions,
+          params: params
+        )
+        render view, layout: "settings"
+      end
+      # default index.js.erb
+      format.js {}
+    end
   end
 
   def destroy
@@ -53,13 +66,13 @@ class Settings::SubscriptionsController < ApplicationController
         subscriptions.destroy_all
         notice = "You have unsubscribed."
       elsif params[:operation] == "show_updates"
-        subscriptions.update_all(show_updates: true)
+        subscriptions.update_all(show_updates: true, updated_at: Time.now)
       elsif params[:operation] == "hide_updates"
-        subscriptions.update_all(show_updates: false)
+        subscriptions.update_all(show_updates: false, updated_at: Time.now)
       elsif params[:operation] == "mute"
-        subscriptions.update_all(muted: true)
+        subscriptions.update_all(muted: true, updated_at: Time.now)
       elsif params[:operation] == "unmute"
-        subscriptions.update_all(muted: false)
+        subscriptions.update_all(muted: false, updated_at: Time.now)
       end
     end
     redirect_to settings_subscriptions_url, notice: notice
@@ -88,17 +101,22 @@ class Settings::SubscriptionsController < ApplicationController
 
   def subscriptions_with_sort_data
     dates = @user.subscriptions.order(updated_at: :asc).pluck(:updated_at)
-    Rails.logger.info(dates.join(","))
-    key = Digest::SHA1.hexdigest(dates.join(","))
+    dates += @user.feeds.includes(:discovered_feeds).map { _1.discovered_feeds.pluck(:updated_at).flatten.sort }
+    key = Digest::SHA1.hexdigest(dates.join)
 
-    subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}", expires_in: 24.hours) {
+    subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}:v8", expires_in: 24.hours) {
       tags = @user.tags_on_feed
-      subscriptions = @user.subscriptions.default.select("subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host").joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}").includes(feed: [:favicon])
+      subscriptions = @user
+        .subscriptions
+        .default
+        .select("subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host")
+        .joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}")
+        .includes(feed: [:favicon, :discovered_feeds])
       feed_ids = subscriptions.map(&:feed_id)
 
       start_date = 29.days.ago
 
-      entry_counts = Rails.cache.fetch("#{@user.id}:entry_counts", expires_in: 24.hours) { FeedStat.get_entry_counts(feed_ids, start_date) }
+      entry_counts = FeedStat.get_entry_counts(feed_ids, start_date)
 
       subscriptions.each do |subscription|
         counts = entry_counts[subscription.feed_id]
@@ -119,6 +137,7 @@ class Settings::SubscriptionsController < ApplicationController
 
         subscription.sort_data = feed_search_data(subscription)
       end
+      subscriptions
     }
 
     if ["updated", "volume", "tag", "name"].include?(params[:sort])
@@ -154,6 +173,7 @@ class Settings::SubscriptionsController < ApplicationController
       array.push subscription.site_url
       array.push subscription.feed_url
       array.push subscription.muted_status
+      array.push subscription.health_status
       array.push subscription.tag_names
       if subscription.feed.newsletter?
         array.push "newsletter"

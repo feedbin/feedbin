@@ -9,7 +9,7 @@ class Throttle
       end
     end
 
-    Sidekiq.redis {|client| client.expire(key, period.to_i) } if expiration == -1
+    Sidekiq.redis { _1.expire(key, period.to_i) } if expiration == -1
 
     if count <= limit
       block_given? ? yield : true

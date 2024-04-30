@@ -1,4 +1,4 @@
-class Form::SwitchComponentPreview < ViewComponent::Preview
+class Form::SwitchComponentPreview < Lookbook::Preview
   def default
   end
 end

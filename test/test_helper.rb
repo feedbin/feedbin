@@ -5,19 +5,19 @@ require "minitest/mock"
 require "socket"
 require "connection_pool"
 
-unless ENV["CI"]
-  socket = Socket.new(:INET, :STREAM, 0)
-  socket.bind(Addrinfo.tcp("127.0.0.1", 0))
-  port = socket.local_address.ip_port
-  socket.close
-
-  ENV["REDIS_URL"] = "redis://localhost:%d" % port
-  redis_test_instance = IO.popen("redis-server --port %d --save '' --appendonly no" % port)
-
-  Minitest.after_run do
-    Process.kill("INT", redis_test_instance.pid)
-  end
-end
+# unless ENV["CI"]
+#   socket = Socket.new(:INET, :STREAM, 0)
+#   socket.bind(Addrinfo.tcp("127.0.0.1", 0))
+#   port = socket.local_address.ip_port
+#   socket.close
+#
+#   ENV["REDIS_URL"] = "redis://localhost:%d" % port
+#   redis_test_instance = IO.popen("redis-server --port %d --save '' --appendonly no" % port)
+#
+#   Minitest.after_run do
+#     Process.kill("INT", redis_test_instance.pid)
+#   end
+# end
 
 $redis = {
   entries: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) },
@@ -123,38 +123,11 @@ class ActiveSupport::TestCase
   end
 
   def newsletter_params(recipient, signature, title = nil, from = nil)
-    title = SecureRandom.hex if title.nil?
     {
-      "timestamp" => "timestamp",
-      "token" => "token",
-      "signature" => signature,
-      "recipient" => "#{recipient}@development.newsletters.feedbin.com",
-      "sender" => "#{title}@feedbin.com",
-      "subject" => "#{title} This is the subject",
-      "from" => "#{title} <#{from || "ben"}@feedbin.com>",
-      "X-Mailgun-Incoming" => "Yes",
-      "X-Envelope-From" => "<ben@feedbin.com>",
-      "Received" => "XYZ",
-      "Dkim-Signature" => "XYZ",
-      "X-Google-Dkim-Signature" => "XYZ",
-      "X-Gm-Message-State" => "XYZ",
-      "X-Received" => "XYZ",
-      "Return-Path" => "<ben@feedbin.com>",
-      "From" => "Ben Ubois <#{title}@feedbin.com>",
-      "Content-Type" => "multipart/alternative; boundary=\"Apple-Mail=_8AB713F4-14C8-48B5-AD4B-B694CA436A93\"",
-      "Subject" => "This is the subject",
-      "Message-Id" => "<0B507DA2-3174-4575-8987-C2064F3D532C@feedbin.com>",
-      "Date" => "Thu, 28 Jul 2016 18:44:38 -0700",
-      "To" => "#{recipient}@development.newsletters.feedbin.com",
-      "Mime-Version" => "1.0 (Mac OS X Mail 9.3 \\(3124\\))",
-      "X-Mailer" => "Apple Mail (2.3124)",
-      "message-headers" => "XYZ",
-      "body-plain" => "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation .",
-      "body-html" => "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html charset=us-ascii\"></head><body style=\"word-wrap: break-word; -webkit-nbsp-mode: space; -webkit-line-break: after-white-space;\" class=\"\"><div style=\"margin: 0px; line-height: normal;\" class=\"\"><b class=\"\">Lorem ipsum</b> dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</div></body></html>",
-      "stripped-html" => "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html charset=us-ascii\"></head><body style=\"word-wrap: break-word; -webkit-nbsp-mode: space; -webkit-line-break: after-white-space;\" class=\"\"><div style=\"margin: 0px; line-height: normal;\" class=\"\"><b class=\"\">Lorem ipsum</b> dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</div></body></html>",
-      "stripped-text" => "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation .",
-      "stripped-signature" => "",
-      "List-Unsubscribe" => "<http://www.host.com/list.cgi?cmd=unsub&lst=list>, <mailto:list-request@host.com?subject=unsubscribe>"
+      newsletter: {
+        to: recipient,
+        url: "s3://bucket/path.to.email"
+      }
     }
   end
 end

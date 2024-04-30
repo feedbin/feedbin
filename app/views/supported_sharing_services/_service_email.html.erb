@@ -1,17 +1,12 @@
 <% record = (status == :active) ? sharing_service : record %>
-<%= component "settings/expandable", capsule: true do |expandable| %>
+<%= render Settings::ExpandableComponent.new class: "mb-4", data: {capsule: "true"} do |expandable| %>
   <% expandable.description do %>
-    <%= component "settings/control_row" do |row| %>
+    <%= render Settings::ControlRowComponent.new do |row| %>
       <% row.icon do %>
         <%= render "icon", sharing_service: sharing_service %>
       <% end %>
-      <% row.title { sharing_service.label } %>
 
-      <% if status == :active %>
-        <% row.description do %>
-          Sender: <%= sharing_service.email_name %> &lt;<%= (sharing_service.email_address.present?) ? sharing_service.email_address : @user.email %>&gt;
-        <% end %>
-      <% end %>
+      <% row.title { sharing_service.label } %>
 
       <% row.control do %>
         <% if status == :active %>
@@ -30,29 +25,29 @@
         <%= f.hidden_field :operation, value: "" %>
 
         <div class="mb-4">
-          <%= component "form/text_input" do |text| %>
+          <%= render Form::TextInputComponent.new do |text| %>
             <% text.label do %>
               <%= f.label :email_name, "Full Name"%>
             <% end %>
             <% text.input do %>
-              <% f.text_field :email_name, class: "peer", tabindex: "-1"  %>
+              <% f.text_field :email_name, class: "peer text-input"  %>
             <% end %>
           <% end %>
         </div>
 
-        <%= component "form/text_input" do |text| %>
+        <%= render Form::TextInputComponent.new do |text| %>
           <% text.label do %>
             <%= f.label :email_address, "Reply-To" %>
           <% end %>
           <% text.input do %>
-            <% f.email_field :email_address, class: "peer", tabindex: "-1" %>
+            <% f.email_field :email_address, class: "peer text-input" %>
           <% end %>
         <% end %>
 
-        <div class="button-wrap">
-          <%= button_tag "Cancel", type: "button", class: "button button-tertiary", data: {action: "expandable#toggle"}, tabindex: "-1" %>
-          <%= button_tag "Save", type: "submit", class: "button button-primary-plain", tabindex: "-1" %>
-        </div>
+        <%= render Settings::ButtonRowComponent.new do %>
+          <%= button_tag "Cancel", type: "button", class: "button button-tertiary", data: {action: "expandable#toggle"} %>
+          <%= button_tag "Save", type: "submit", class: "button button-primary-plain" %>
+        <% end %>
       <% end %>
     </div>
   <% end %>

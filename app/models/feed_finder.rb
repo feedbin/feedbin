@@ -1,11 +1,10 @@
 class FeedFinder
 
-  attr_reader :url, :twitter_auth, :response, :import_mode
+  attr_reader :url, :response, :import_mode
 
-  def initialize(url, import_mode: false, twitter_auth: nil, username: nil, password: nil)
+  def initialize(url, import_mode: false, username: nil, password: nil)
     @url          = url
     @import_mode  = import_mode
-    @twitter_auth = twitter_auth
     @username     = username
     @password     = password
   end
@@ -21,10 +20,6 @@ class FeedFinder
     existing_feed = Feed.xml.where(feed_url: url).take
 
     if feeds.empty?
-      feeds = Source::TwitterData.find(url, twitter_auth)
-    end
-
-    if feeds.empty?
       feeds = Source::ExistingFeed.find(response)
     end
 
@@ -32,12 +27,12 @@ class FeedFinder
       feeds = Source::Xml.find(response)
     end
 
-    if feeds.empty?
-      feeds = Source::KnownPattern.find(response)
-    end
-
     if feeds.empty? && !import_mode?
       feeds = Source::MetaLinks.find(response)
+    end
+
+    if feeds.empty?
+      feeds = Source::KnownPattern.find(response)
     end
 
     if feeds.empty? && !import_mode?
@@ -66,6 +61,20 @@ class FeedFinder
       ErrorService.notify(exception)
       feeds
     end
+  end
+
+  def find_options
+    feeds = []
+
+    if feeds.empty?
+      feeds = Source::MetaLinks.options(response)
+    end
+
+    if feeds.empty?
+      feeds = Source::BodyLinks.options(response)
+    end
+
+    feeds
   end
 
   def import_mode?

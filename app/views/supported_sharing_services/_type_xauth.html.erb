@@ -1,15 +1,11 @@
-<%= component "settings/expandable", capsule: true do |expandable| %>
+<%= render Settings::ExpandableComponent.new class: "mb-4", data: {capsule: "true"} do |expandable| %>
   <% expandable.description do %>
-    <%= component "settings/control_row" do |row| %>
+    <%= render Settings::ControlRowComponent.new do |row| %>
       <% row.icon do %>
         <%= render "icon", sharing_service: sharing_service %>
       <% end %>
+
       <% row.title { sharing_service.label } %>
-      <% if status == :issue %>
-        <% row.description do %>
-          Feedbin can no longer access <%= sharing_service.label %>, <a href="#" data-action="expandable#toggle">reactivate</a>?
-        <% end %>
-      <% end %>
 
       <% row.control do %>
         <% if status == :active %>

@@ -1,4 +1,4 @@
-<%= component "settings/h1" do %>
+<%= render Settings::H1Component.new do %>
   Billing
 <% end %>
 
@@ -7,8 +7,8 @@
 
   <%= render partial: "shared/credit_card_form" %>
 
-  <div class="button-wrap">
+  <%= render Settings::ButtonRowComponent.new do %>
     <div id="payment_request_button"><small>Loading&hellip;</small></div>
     <button type="submit" class="button" id="credit_card_button" disabled>Update</button>
-  </div>
+  <% end %>
 <% end %>

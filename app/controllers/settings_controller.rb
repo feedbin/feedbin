@@ -1,7 +1,7 @@
 class SettingsController < ApplicationController
 
-  def settings
-    @user = current_user
+  def index
+    render Settings::IndexView.new(user: current_user), layout: "settings"
   end
 
   def account
@@ -114,11 +114,6 @@ class SettingsController < ApplicationController
       user.update(audio_panel_size: params[:audio_panel_size])
     end
     head :ok
-  end
-
-  def newsletters_pages
-    @user = current_user
-    @subscription_ids = @user.subscriptions.pluck(:feed_id)
   end
 
   private

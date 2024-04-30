@@ -15,6 +15,12 @@ class UserMailer < ApplicationMailer
     mail to: @user.email, subject: "[Feedbin] Please Update Your Billing Information"
   end
 
+  def subscription_reminder(billing_event)
+    @billing_event = BillingEvent.find(billing_event)
+    @user = @billing_event.billable
+    mail to: @user.email, subject: "[Feedbin] Your Subscription Will Renew Soon"
+  end
+
   def password_reset(user_id, reset_token)
     @user = User.find(user_id)
     @reset_token = reset_token
@@ -52,10 +58,5 @@ class UserMailer < ApplicationMailer
     @user = User.find(user_id)
     attachments["subscriptions.xml"] = opml
     mail to: @user.email, subject: "[Feedbin] Account Closed"
-  end
-
-  def twitter_connection_error(user_id)
-    @user = User.find(user_id)
-    mail to: @user.email, subject: "[Feedbin] Twitter Connection Error"
   end
 end

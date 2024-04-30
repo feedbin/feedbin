@@ -1,13 +1,13 @@
-<%= component "settings/h1" do %>
+<%= render Settings::H1Component.new do %>
   Share & Save
 <% end %>
 
 <% if @active_sharing_services.present? %>
-  <%= component "settings/h2" do %>
-    Active Services
-  <% end %>
+  <div class="mb-14">
+    <%= render Settings::H2Component.new do %>
+      Active Services
+    <% end %>
 
-  <div data-stacked="true" class="group mb-14">
     <% @active_sharing_services.each do |sharing_service| %>
       <%= render sharing_service %>
     <% end %>
@@ -15,11 +15,11 @@
 <% end %>
 
 <% unless @active_sharing_services.count == @available_sharing_services.count %>
-  <%= component "settings/h2" do %>
-    Available Services
-  <% end %>
+  <div class="mb-14">
+    <%= render Settings::H2Component.new do %>
+      Available Services
+    <% end %>
 
-  <div data-stacked="true" class="group mb-14">
     <% @available_sharing_services.each do |sharing_service| %>
       <% unless @active_service_ids.include?(sharing_service.service_id) %>
         <%= render partial: "supported_sharing_services/service_#{sharing_service.service_id}", locals: {sharing_service: sharing_service, record: SupportedSharingService.new, status: :inactive} %>
@@ -28,7 +28,7 @@
   </div>
 <% end %>
 
-<%= component "settings/control_group", class: "group", data: {capsule: "true"} do |group| %>
+<%= render Settings::ControlGroupComponent.new class: "group", data: {capsule: "true"} do |group| %>
   <% group.header do %>
     Custom Services
   <% end %>

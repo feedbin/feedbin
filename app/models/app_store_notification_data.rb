@@ -52,6 +52,13 @@ class AppStoreNotificationData
     end
   end
 
+  def self.apps
+    response = HTTP
+      .auth("Bearer %<token>s" % {token: token})
+      .get("https://api.appstoreconnect.apple.com/v1/apps")
+      .parse
+  end
+
   def data
     @data ||= begin
       decode(@notification).tap do |hash|
@@ -99,7 +106,7 @@ class AppStoreNotificationData
     payload = {
       iss: ENV["APPLE_STORE_ISSUER_ID"],
       iat: Time.now.utc.to_i,
-      exp: Time.now.utc.to_i + 1800,
+      exp: Time.now.utc.to_i + 300,
       aud: "appstoreconnect-v1",
       bid: ENV["APPLE_STORE_BUNDLE_ID"]
     }

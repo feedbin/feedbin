@@ -4,6 +4,11 @@ module ImageCrawler
     sidekiq_options retry: false
 
     def perform(public_id, image = nil)
+      if ENV["SKIP_IMAGES"].present?
+        Rails.logger.info("SKIP_IMAGES is present, no images will be processed")
+        return
+      end
+
       public_id = public_id.split("-").first
       @entry = Entry.find_by_public_id(public_id)
       @image = image

@@ -103,38 +103,42 @@ class ContentFormatter
 
   def _format!(content, entry = nil, image_proxy_enabled = true, base_url = nil)
     context = {
-      whitelist: ALLOWLIST_DEFAULT,
+      scrub_mode: :default,
       embed_url: Rails.application.routes.url_helpers.iframe_embeds_path,
       embed_classes: "iframe-placeholder entry-callout system-content"
     }
-    filters = [HTML::Pipeline::SmileyFilter, HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer, HTML::Pipeline::IframeFilter]
+    if entry && entry.feed.newsletter?
+      context[:scrub_mode] = :newsletter
+    end
+
+    filters = [HTML::Pipeline::SmileyFilter, ContentFilters::Scrub, ContentFilters::Attributes, HTML::Pipeline::SrcFixer, HTML::Pipeline::IframeFilter]
 
     if ENV["CAMO_HOST"] && ENV["CAMO_KEY"] && image_proxy_enabled
       context[:asset_proxy] = ENV["CAMO_HOST"]
       context[:asset_proxy_secret_key] = ENV["CAMO_KEY"]
       context[:asset_src_attribute] = "data-camo-src"
-      filters = filters << HTML::Pipeline::CamoFilter
+      filters.push(HTML::Pipeline::CamoFilter)
     end
 
     if entry || base_url
       filters.unshift(HTML::Pipeline::AbsoluteSourceFilter)
       filters.unshift(HTML::Pipeline::AbsoluteHrefFilter)
 
-      context[:image_base_url]    = base_url || entry.feed.site_url
+      context[:image_base_url]    = base_url || entry.base_url
       context[:image_subpage_url] = base_url || entry.fully_qualified_url || ""
-      context[:href_base_url]     = base_url || entry.feed.site_url
+      context[:href_base_url]     = base_url || entry.base_url
       context[:href_subpage_url]  = base_url || entry.fully_qualified_url || ""
+    end
 
-      if entry && entry.feed.newsletter?
-        context[:whitelist] = ALLOWLIST_NEWSLETTER
-      end
+    if entry&.newsletter_from =~ /@substack\.com/
+      filters.unshift(ContentFilters::Substack)
     end
 
     filters.unshift(HTML::Pipeline::LazyLoadFilter)
 
     pipeline = HTML::Pipeline.new filters, context
 
-    result = pipeline.call(content)
+    result = pipeline.call(self.class.document(content))
 
     if entry&.archived_images?
       result[:output] = ImageFallback.new(result[:output]).add_fallbacks
@@ -162,7 +166,7 @@ class ContentFormatter
 
     pipeline = HTML::Pipeline.new filters, context
 
-    result = pipeline.call(content)
+    result = pipeline.call(self.class.document(content))
 
     result[:output].to_s
   end
@@ -174,13 +178,13 @@ class ContentFormatter
   def _absolute_source(content, entry, base_url = nil)
     filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter]
     context = {
-      image_base_url:    base_url || entry.feed.site_url,
+      image_base_url:    base_url || entry.base_url,
       image_subpage_url: base_url || entry.fully_qualified_url || "",
-      href_base_url:     base_url || entry.feed.site_url,
+      href_base_url:     base_url || entry.base_url,
       href_subpage_url:  base_url || entry.fully_qualified_url || ""
     }
     pipeline = HTML::Pipeline.new filters, context
-    result = pipeline.call(content)
+    result = pipeline.call(self.class.document(content))
     result[:output].to_s
   rescue
     content
@@ -191,19 +195,20 @@ class ContentFormatter
   end
 
   def _api_format(content, entry)
-    filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, HTML::Pipeline::SanitizationFilter]
+    filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, ContentFilters::Scrub, ContentFilters::Attributes]
     context = {
-      image_base_url: entry.feed.site_url,
+      scrub_mode: :default,
+      image_base_url: entry.base_url,
       image_subpage_url: entry.fully_qualified_url || "",
-      href_base_url: entry.feed.site_url,
+      href_base_url: entry.base_url,
       href_subpage_url: entry.fully_qualified_url || ""
     }
-    context[:whitelist] = ALLOWLIST_DEFAULT
+
     if entry.feed.newsletter?
-      context[:whitelist] = ALLOWLIST_NEWSLETTER
+      context[:scrub_mode] = :newsletter
     end
     pipeline = HTML::Pipeline.new filters, context
-    result = pipeline.call(content)
+    result = pipeline.call(self.class.document(content))
     result[:output].to_s
   rescue
     content
@@ -216,15 +221,15 @@ class ContentFormatter
   def _app_format(content, entry)
     filters = [HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter, HTML::Pipeline::ImagePlaceholderFilter]
     context = {
-      image_base_url: entry.feed.site_url,
+      image_base_url: entry.base_url,
       image_subpage_url: entry.fully_qualified_url || "",
-      href_base_url: entry.feed.site_url,
+      href_base_url: entry.base_url,
       href_subpage_url: entry.fully_qualified_url || "",
       placeholder_url: "",
       placeholder_attribute: "data-feedbin-src"
     }
     pipeline = HTML::Pipeline.new filters, context
-    result = pipeline.call(content)
+    result = pipeline.call(self.class.document(content))
     result[:output].to_s
   rescue
     content
@@ -238,14 +243,14 @@ class ContentFormatter
     filters = [HTML::Pipeline::SanitizationFilter, HTML::Pipeline::SrcFixer, HTML::Pipeline::AbsoluteSourceFilter, HTML::Pipeline::AbsoluteHrefFilter, HTML::Pipeline::ProtocolFilter]
     context = {
       whitelist: ALLOWLIST_EVERNOTE,
-      image_base_url: entry.feed.site_url,
+      image_base_url: entry.base_url,
       image_subpage_url: entry.fully_qualified_url || "",
-      href_base_url: entry.feed.site_url,
+      href_base_url: entry.base_url,
       href_subpage_url: entry.fully_qualified_url || ""
     }
 
     pipeline = HTML::Pipeline.new filters, context
-    result = pipeline.call(content)
+    result = pipeline.call(self.class.document(content))
     result[:output].to_xml
   rescue
     content
@@ -255,16 +260,16 @@ class ContentFormatter
     new._summary(*args)
   end
 
-  def _summary(text, length = nil)
-    text = Loofah.fragment(text)
-      .scrub!(:prune)
-      .to_text(encode_special_chars: false)
-      .gsub(/\s+/, " ")
-      .squish
+  def _summary(content, length = nil)
+    return "" if content.nil?
 
-    text = text.truncate(length, separator: " ", omission: "") if length
-
-    text
+    content = HTML::Pipeline.new([ContentFilters::Scrub])
+      .call(self.class.document(content))[:output]
+      .to_text(encode_special_chars: false).gsub(/\s+/, " ").squish
+    content = content.truncate(length, separator: " ", omission: "") if length
+    content
+  rescue HTML::Pipeline::Filter::InvalidDocumentException
+    ""
   end
 
   def self.text_email(*args)
@@ -277,5 +282,9 @@ class ContentFormatter
     Sanitize.fragment(content, ALLOWLIST_DEFAULT).html_safe
   rescue
     content
+  end
+
+  def self.document(html)
+    Loofah::HTML5::DocumentFragment.new(Loofah::HTML5::Document.new, html, nil, {max_tree_depth: 2_000, max_attributes: 2_000})
   end
 end

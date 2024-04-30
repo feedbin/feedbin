@@ -13,7 +13,7 @@ module ImageCrawler
 
       def self.from_file(file, extension)
         destination = persisted_path(extension)
-        path = FileUtils.cp file, destination
+        FileUtils.cp file, destination
         new(destination, extension)
       end
 

@@ -400,7 +400,8 @@ CREATE TABLE public.devices (
     updated_at timestamp without time zone,
     application text,
     operating_system text,
-    active boolean DEFAULT true
+    active boolean DEFAULT true,
+    data jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -421,6 +422,41 @@ CREATE SEQUENCE public.devices_id_seq
 --
 
 ALTER SEQUENCE public.devices_id_seq OWNED BY public.devices.id;
+
+
+--
+-- Name: discovered_feeds; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.discovered_feeds (
+    id bigint NOT NULL,
+    title text,
+    site_url text,
+    feed_url text,
+    host text,
+    verified_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: discovered_feeds_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.discovered_feeds_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: discovered_feeds_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.discovered_feeds_id_seq OWNED BY public.discovered_feeds.id;
 
 
 --
@@ -492,7 +528,9 @@ CREATE TABLE public.entries (
     guid uuid,
     provider bigint,
     provider_id text,
-    provider_parent_id text
+    provider_parent_id text,
+    chapters jsonb,
+    categories jsonb
 );
 
 
@@ -678,7 +716,9 @@ CREATE TABLE public.import_items (
     updated_at timestamp without time zone NOT NULL,
     item_type character varying(255),
     status bigint DEFAULT 0 NOT NULL,
-    error jsonb
+    error jsonb,
+    site_url text,
+    host text
 );
 
 
@@ -873,6 +913,39 @@ ALTER SEQUENCE public.plans_id_seq OWNED BY public.plans.id;
 
 
 --
+-- Name: playlists; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.playlists (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    title text NOT NULL,
+    sort_order bigint DEFAULT 0 NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: playlists_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.playlists_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: playlists_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.playlists_id_seq OWNED BY public.playlists.id;
+
+
+--
 -- Name: podcast_subscriptions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -883,7 +956,12 @@ CREATE TABLE public.podcast_subscriptions (
     status bigint DEFAULT 0 NOT NULL,
     title text,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    playlist_id bigint,
+    chapter_filter character varying,
+    chapter_filter_type bigint DEFAULT 0 NOT NULL,
+    download_filter character varying,
+    download_filter_type bigint DEFAULT 0 NOT NULL
 );
 
 
@@ -919,7 +997,9 @@ CREATE TABLE public.queued_entries (
     progress bigint DEFAULT 0 NOT NULL,
     duration bigint DEFAULT 0 NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    playlist_id bigint,
+    skipped_chapters jsonb DEFAULT '[]'::jsonb NOT NULL
 );
 
 
@@ -1173,7 +1253,8 @@ CREATE TABLE public.subscriptions (
     media_only boolean DEFAULT false,
     kind bigint DEFAULT 0,
     view_mode bigint DEFAULT 0,
-    show_status bigint DEFAULT 0 NOT NULL
+    show_status bigint DEFAULT 0 NOT NULL,
+    fix_status bigint DEFAULT 0
 );
 
 
@@ -1581,6 +1662,13 @@ ALTER TABLE ONLY public.devices ALTER COLUMN id SET DEFAULT nextval('public.devi
 
 
 --
+-- Name: discovered_feeds id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.discovered_feeds ALTER COLUMN id SET DEFAULT nextval('public.discovered_feeds_id_seq'::regclass);
+
+
+--
 -- Name: embeds id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1662,6 +1750,13 @@ ALTER TABLE ONLY public.oauth_servers ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 ALTER TABLE ONLY public.plans ALTER COLUMN id SET DEFAULT nextval('public.plans_id_seq'::regclass);
+
+
+--
+-- Name: playlists id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.playlists ALTER COLUMN id SET DEFAULT nextval('public.playlists_id_seq'::regclass);
 
 
 --
@@ -1879,6 +1974,14 @@ ALTER TABLE ONLY public.devices
 
 
 --
+-- Name: discovered_feeds discovered_feeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.discovered_feeds
+    ADD CONSTRAINT discovered_feeds_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: embeds embeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1972,6 +2075,14 @@ ALTER TABLE ONLY public.oauth_servers
 
 ALTER TABLE ONLY public.plans
     ADD CONSTRAINT plans_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: playlists playlists_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.playlists
+    ADD CONSTRAINT playlists_pkey PRIMARY KEY (id);
 
 
 --
@@ -2238,6 +2349,13 @@ CREATE INDEX index_devices_on_user_id ON public.devices USING btree (user_id);
 
 
 --
+-- Name: index_discovered_feeds_on_site_url_and_feed_url; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_discovered_feeds_on_site_url_and_feed_url ON public.discovered_feeds USING btree (site_url, feed_url);
+
+
+--
 -- Name: index_embeds_on_parent_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2417,6 +2535,20 @@ CREATE INDEX index_newsletter_senders_on_token ON public.newsletter_senders USIN
 --
 
 CREATE UNIQUE INDEX index_oauth_servers_on_host ON public.oauth_servers USING btree (host);
+
+
+--
+-- Name: index_playlists_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_playlists_on_user_id ON public.playlists USING btree (user_id);
+
+
+--
+-- Name: index_playlists_on_user_id_and_title; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_playlists_on_user_id_and_title ON public.playlists USING btree (user_id, title);
 
 
 --
@@ -2945,13 +3077,211 @@ ALTER TABLE ONLY public.authentication_tokens
 
 
 --
+-- Name: playlists fk_rails_d67ef1eb45; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.playlists
+    ADD CONSTRAINT fk_rails_d67ef1eb45 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20121010042043'),
+('20240226114227'),
+('20231122160929'),
+('20231113211123'),
+('20231017104045'),
+('20231017104044'),
+('20231017104043'),
+('20230715134526'),
+('20230706174643'),
+('20230706165756'),
+('20230510215256'),
+('20230130211416'),
+('20230101160218'),
+('20221222204921'),
+('20221220140655'),
+('20221219141006'),
+('20221215200606'),
+('20221208231846'),
+('20221004142045'),
+('20220926154041'),
+('20220916104628'),
+('20220909105317'),
+('20220806155622'),
+('20220804145624'),
+('20220719142811'),
+('20220715154209'),
+('20220505093250'),
+('20220422075327'),
+('20220302204713'),
+('20220302204617'),
+('20220209131258'),
+('20220208094739'),
+('20220204194100'),
+('20220204142012'),
+('20220204123745'),
+('20220128221704'),
+('20210601200027'),
+('20210102005228'),
+('20201230004844'),
+('20200810160825'),
+('20200730134217'),
+('20200708130351'),
+('20200113101112'),
+('20200110142059'),
+('20200109204853'),
+('20200103141053'),
+('20200102115516'),
+('20190820134157'),
+('20190725121939'),
+('20190715152451'),
+('20190710112843'),
+('20190516210058'),
+('20190516024925'),
+('20190225200600'),
+('20190220004135'),
+('20190201020722'),
+('20180717001048'),
+('20180714072623'),
+('20180607200816'),
+('20180204093407'),
+('20180106031725'),
+('20180102071024'),
+('20170816220409'),
+('20170812121620'),
+('20170427001830'),
+('20161110045909'),
+('20160822194302'),
+('20160817165958'),
+('20160709063934'),
+('20160504184656'),
+('20160126003712'),
+('20151207224028'),
+('20151110044837'),
+('20151019200512'),
+('20151011143618'),
+('20150827230751'),
+('20150817230441'),
+('20150714000523'),
+('20150713230754'),
+('20150707202540'),
+('20150626223113'),
+('20150602223929'),
+('20150520213553'),
+('20150425060924'),
+('20150424224723'),
+('20141215195928'),
+('20141208231955'),
+('20141202203934'),
+('20141117192421'),
+('20141110225053'),
+('20141022031229'),
+('20140823094323'),
+('20140823091357'),
+('20140505062817'),
+('20140416025157'),
+('20140326173619'),
+('20140321203637'),
+('20140227001243'),
+('20140223114030'),
+('20140218235831'),
+('20140116101303'),
+('20131231084130'),
+('20131228183918'),
+('20131205095630'),
+('20131205004751'),
+('20131202012915'),
+('20131201051809'),
+('20131106060451'),
+('20131105035905'),
+('20131101063139'),
+('20131101024758'),
+('20131025172652'),
+('20131024055750'),
+('20131017013531'),
+('20131011204115'),
+('20130826053351'),
+('20130820123435'),
+('20130801194304'),
+('20130731234248'),
+('20130730090745'),
+('20130720194025'),
+('20130713170339'),
+('20130709054041'),
+('20130701042440'),
+('20130619222820'),
+('20130616031049'),
+('20130616023624'),
+('20130531231556'),
+('20130520012402'),
+('20130517164043'),
+('20130515203825'),
+('20130514072924'),
+('20130508034554'),
+('20130429154717'),
+('20130429152153'),
+('20130429063608'),
+('20130424132435'),
+('20130420171357'),
+('20130420171308'),
+('20130420122821'),
+('20130408045541'),
+('20130407192646'),
+('20130403032846'),
+('20130403032414'),
+('20130403032020'),
+('20130327174832'),
+('20130326034638'),
+('20130302033514'),
+('20130301095638'),
+('20130228151024'),
+('20130228150343'),
+('20130227065820'),
+('20130226191831'),
+('20130226190942'),
+('20130218221354'),
+('20130218220024'),
+('20130204000143'),
+('20130203185241'),
+('20130203182936'),
+('20130202145544'),
+('20130126044222'),
+('20130124151206'),
+('20130124144546'),
+('20130124141157'),
+('20130124120921'),
+('20130121162825'),
+('20130121162410'),
+('20130121161637'),
+('20130108022157'),
+('20130107050848'),
+('20130101205608'),
+('20121220044158'),
+('20121220043916'),
+('20121202173023'),
+('20121125051935'),
+('20121125043913'),
+('20121124070242'),
+('20121124070158'),
+('20121117225703'),
+('20121117212752'),
+('20121115044716'),
+('20121109200937'),
+('20121106123418'),
+('20121029015723'),
+('20121023224542'),
+('20121019231945'),
+('20121019150248'),
+('20121019045613'),
+('20121013082327'),
+('20121012075009'),
+('20121012074155'),
+('20121011035933'),
 ('20121011035904'),
 ('20121011035933'),
 ('20121012074155'),
@@ -3132,8 +3462,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221219141006'),
 ('20221220140655'),
 ('20221222204921'),
-('20230101160218'),
-('20230101193743'),
-('20230101230510');
+('20230101160218');
 
 

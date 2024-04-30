@@ -1,25 +1,25 @@
 <% record = (status == :active) ? sharing_service : record %>
 
 <%= render "supported_sharing_services/type_xauth", sharing_service: sharing_service, status: status, record: record do %>
-  <p class="mb-4 text-500">You can create a new app token on the <a href="https://micro.blog/account/apps" target="_blank" rel="noopener noreferrer" tabindex="-1">Micro.blog account page</a>.</p>
+  <p class="mb-4 text-500">You can create a new app token on the <a href="https://micro.blog/account/apps" target="_blank" rel="noopener noreferrer">Micro.blog account page</a>.</p>
 
   <%= form_for(record) do |f| %>
     <%= f.hidden_field :service_id, value: sharing_service.service_id %>
     <%= f.hidden_field :operation, value: "authorize" %>
 
-    <%= component "form/text_input" do |text| %>
+    <%= render Form::TextInputComponent.new do |text| %>
       <% text.label do %>
         <label for="micro_blog_password">App Token</label>
       <% end %>
       <% text.input do %>
-        <%= text_field_tag :password, "", id: "micro_blog_password", class: "peer", tabindex: "-1" %>
+        <%= text_field_tag :password, "", id: "micro_blog_password", class: "peer text-input" %>
       <% end %>
     <% end %>
 
-    <div class="button-wrap">
-      <%= button_tag "Cancel", type: "button", class: "button button-tertiary button-inline", data: {action: "expandable#toggle"}, tabindex: "-1" %>
-      <%= button_tag "Save", type: "submit", class: "button button-primary-plain", tabindex: "-1" %>
-    </div>
+    <%= render Settings::ButtonRowComponent.new do %>
+      <%= button_tag "Cancel", type: "button", class: "button button-tertiary button-inline", data: {action: "expandable#toggle"} %>
+      <%= button_tag "Save", type: "submit", class: "button button-primary-plain" %>
+    <% end %>
   <% end %>
 
 <% end %>

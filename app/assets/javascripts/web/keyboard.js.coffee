@@ -108,25 +108,8 @@ class feedbin.Keyboard
         if @columns['feeds'].find('.selected').length > 0
           @selectColumn('feeds')
         else
-          $("[data-feed-id=#{feedbin.feedCandidates[0]}]").find('[data-behavior~=open_item]').click()
+          $("[data-feed-id=#{feedbin.feedCandidates[0]}]").find('[data-behavior~=open_item]')[0]?.click()
           feedbin.feedCandidates = []
-
-  navigateJumpMenu: (combo) ->
-
-    target = $('.modal [data-behavior~=results_target]')
-    selected = $('.selected', target)
-
-    if selected.length == 0
-      next = $('[data-behavior~=jump_to]', target).first()
-    else
-      next = []
-      if combo == 'up'
-        next = selected.prevAll('[data-behavior~=jump_to]').first()
-      else if combo == 'down'
-        next = selected.nextAll('[data-behavior~=jump_to]').first()
-
-    if next.length > 0
-      next.trigger('mouseenter')
 
   navigateEntryContent: (combo) ->
     @selectColumn('entries')
@@ -151,9 +134,7 @@ class feedbin.Keyboard
       return
 
     Mousetrap.bind ['pageup', 'pagedown', 'up', 'down', 'left', 'right', 'j', 'k', 'h', 'l', 'shift+j', 'shift+k'], (event, combo) =>
-      if feedbin.jumpOpen()
-        @navigateJumpMenu(combo)
-      else if feedbin.shareOpen()
+      if feedbin.shareOpen()
         @navigateShareMenu(combo)
       else if feedbin.isFullScreen()
         @navigateEntryContent(combo)
@@ -192,21 +173,21 @@ class feedbin.Keyboard
     # Go to unread
     Mousetrap.bind ['g 1', 'g u'], (event, combo) =>
       $('body').removeClass('full-screen')
-      $('[data-behavior~=change_view_mode][data-view-mode=view_unread]').click()
+      $('[data-behavior~=change_view_mode][data-view-mode=view_unread]')[0]?.click()
       $('.dropdown-wrap').removeClass('open')
       event.preventDefault()
 
     # Go to starred
     Mousetrap.bind ['g 2', 'g s'], (event, combo) =>
       $('body').removeClass('full-screen')
-      $('[data-behavior~=change_view_mode][data-view-mode=view_starred]').click()
+      $('[data-behavior~=change_view_mode][data-view-mode=view_starred]')[0]?.click()
       $('.dropdown-wrap').removeClass('open')
       event.preventDefault()
 
     # Go to all
     Mousetrap.bind ['g 3', 'g a'], (event, combo) =>
       $('body').removeClass('full-screen')
-      $('[data-behavior~=change_view_mode][data-view-mode=view_all]').click()
+      $('[data-behavior~=change_view_mode][data-view-mode=view_all]')[0]?.click()
       $('.dropdown-wrap').removeClass('open')
       event.preventDefault()
 
@@ -217,18 +198,13 @@ class feedbin.Keyboard
       @alternateEntryCandidates.push currentEntry.next() if currentEntry.next().length
       @alternateEntryCandidates.push currentEntry.prev() if currentEntry.prev().length
 
-      $('[data-behavior~=mark_all_as_read]').first().click()
+      $('[data-behavior~=mark_all_as_read]').first()[0]?.click()
       event.preventDefault()
 
     # Add subscription
     Mousetrap.bind 'a', (event, combo) =>
       $('body').removeClass('full-screen')
-      $('[data-behavior~=show_subscribe]').click()
-      event.preventDefault()
-
-    # Add subscription
-    Mousetrap.bind ';', (event, combo) =>
-      feedbin.jumpMenu()
+      $('[data-behavior~=show_subscribe]')[0]?.click()
       event.preventDefault()
 
     # Show Keyboard shortcuts
@@ -242,7 +218,7 @@ class feedbin.Keyboard
     # Focus search
     Mousetrap.bind '/', (event, combo) =>
       $('body').removeClass('full-screen')
-      feedbin.showSearch()
+      window.dispatchEvent(new CustomEvent("show-search"))
       event.preventDefault()
 
     # Open original article
@@ -262,7 +238,7 @@ class feedbin.Keyboard
 
     # Edit
     Mousetrap.bind 'shift+e', (event, combo) =>
-      $('[data-behavior~=feed_settings]').click()
+      $('[data-behavior~=feed_settings]')[0]?.click()
       event.preventDefault()
 
     # refresh
@@ -274,7 +250,7 @@ class feedbin.Keyboard
     Mousetrap.bind 'f', (event, combo) =>
       shareButton = $("[data-behavior~=toggle_share_menu]")
       if shareButton.length > 0
-        shareButton.click()
+        shareButton[0]?.click()
         event.preventDefault()
 
     # sharing hotkeys
@@ -288,7 +264,7 @@ class feedbin.Keyboard
     # Full Screen
     Mousetrap.bind 'F', (event, combo) =>
       if $('[data-behavior~=entry_content_target]').html().length > 0
-        $('[data-behavior~=toggle_full_screen]').click()
+        $('[data-behavior~=toggle_full_screen]')[0]?.click()
       event.preventDefault()
 
     Mousetrap.bind 'enter', (event, combo) =>
@@ -302,7 +278,7 @@ class feedbin.Keyboard
       $('.dropdown-wrap.open').removeClass('open')
       $('.modal').modal('hide')
       feedbin.hideFormatMenu()
-      feedbin.hideSearch()
+      window.dispatchEvent(new CustomEvent("hide-search"))
       feedbin.closeEntryBasement()
       if $('[name="subscription[feeds][feed_url]"]').is(':focus')
         $('[name="subscription[feeds][feed_url]"]').blur()
@@ -329,15 +305,6 @@ class feedbin.Keyboard
             console.log error
       event.preventDefault()
 
-    $(document).on 'keydown', '[data-behavior~=jump_menu]', (event) =>
-      keys = {
-        38: "up"
-        40: "down"
-      }
-      if keys[event.keyCode]
-        @navigateJumpMenu(keys[event.keyCode])
-        event.preventDefault()
-
     $(window).on 'keydown', (event) =>
       keys = {
         UIKeyInputUpArrow: "up",
@@ -347,9 +314,7 @@ class feedbin.Keyboard
       }
 
       if keys[event.key]
-        if feedbin.jumpOpen()
-          @navigateJumpMenu(keys[event.key])
-        else if feedbin.shareOpen()
+        if feedbin.shareOpen()
           @navigateShareMenu(keys[event.key])
         else if feedbin.isFullScreen()
           @navigateEntryContent(keys[event.key])
@@ -366,7 +331,8 @@ class feedbin.Keyboard
     @scrollTop = @selectedColumn.prop('scrollTop')
 
   clickItem: _.debounce( ->
-    @item.find('[data-behavior~=open_item]:first').click()
+    element = @item.find('[data-behavior~=open_item]:first').last()
+    element[0]?.click()
   50)
 
   selectItem: ->
@@ -387,7 +353,7 @@ class feedbin.Keyboard
     @selectColumn('entries')
     selectedEntry = @columns['entries'].find('.selected')
     unless selectedEntry.length > 0
-      @selectedColumn.find('li:first-child [data-behavior~=open_item]').click()
+      @selectedColumn.find('li:first-child [data-behavior~=open_item]')[0]?.click()
 
   selectedColumnName: ->
     if @selectedColumn.hasClass 'feeds'

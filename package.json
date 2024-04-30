@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "lint": "eslint --fix app/javascript/**/*.js"
+  },
+  "devDependencies": {
+    "eslint":"^8.33.0",
+    "eslint-plugin-prettier":"^4.2.1",
+    "prettier":"2.8.3"
+  }
+}

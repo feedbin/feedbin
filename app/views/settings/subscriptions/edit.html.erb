@@ -1,6 +1,6 @@
-<%= component "settings/h1" do %>
+<%= render Settings::H1Component.new do %>
   Subscriptions
 <% end %>
 
-<%= render partial: 'form', locals: {subscription: @subscription, tag_editor: @tag_editor} %>
+<%= render Settings::Subscriptions::Shared::FormComponent.new(subscription: @subscription, tag_editor: @tag_editor) %>
 <%= render partial: "shared/modals/edit" %>

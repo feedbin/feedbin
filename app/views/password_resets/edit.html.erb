@@ -1,25 +1,33 @@
-<% @class = 'login theme-auto' %>
-<div class="login-wrap">
-    <a href="/" class="logo">
-        <%= svg_tag "logo-full", inline: true %>
-    </a>
-    <div class="box">
-        <%= render partial: 'shared/flash', locals: {flash: flash} %>
-        <h3 class="box-header">Reset Password</h3>
-        <%= form_for @user, url: password_reset_path(params[:id]) do |f| %>
-            <% if @user.errors.present? %>
-                <div class="alert alert-error">
-                    <%= @user.errors.full_messages.join('. ') %>.
-                </div>
-            <% end %>
-            <div class="input-group-wrap">
-                <%= f.label :password, "Password" %>
-                <%= render "shared/input" do %>
-                    <%= f.password_field :password %>
-                <% end %>
-            </div>
-            <button type="submit" class="button flex">Reset Password</button>
+<% @class = "theme-auto" %>
+
+<% content_for :form_content do %>
+
+  <div class="border rounded-md p-6 md:p-12 mb-8">
+    <%= form_for @user, url: password_reset_path(params[:id]) do |f| %>
+      <h1 class="font-bold text-lg mb-4">Reset Password</h1>
+      <%= render partial: "shared/flash", locals: {flash: flash} %>
+      <% if @user.errors.present? %>
+        <div class="alert alert-error">
+          <%= @user.errors.full_messages.join('. ') %>.
+        </div>
+      <% end %>
+
+      <div class="mb-8">
+        <%= render Form::TextInputComponent.new do |text| %>
+          <% text.label do %>
+            <%= f.label :password, "Password" %>
+          <% end %>
+          <% text.input do %>
+            <%= f.password_field :password, class: "text-input" %>
+          <% end %>
         <% end %>
-    </div>
-</div>
-<%= render partial: 'shared/svg' %>
+      </div>
+
+      <button type="submit" class="button flex w-full" tabindex="3">Reset Password</button>
+    <% end %>
+  </div>
+  <p class="text-center text-500">Already have an account?</p>
+  <p class="text-center"><%= link_to "Log In", login_path, class: "font-medium" %></p>
+<% end %>
+
+<%= render template: "layouts/form_page" %>

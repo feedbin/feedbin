@@ -6,7 +6,7 @@
 
 <% content_for :modal_body, flush: true do %>
 <div data-nav="modal" class="group">
-    <%= render partial: 'shared/settings_nav' %>
+    <%= render Shared::SettingsNavView.new(user: current_user) %>
 </div>
 <% end %>
 

@@ -5,10 +5,8 @@ module FeedCrawler
     test "should enqueue FeedRefresher" do
       flush_redis
       assert_difference -> { ScheduleBatch.jobs.size }, +1 do
-        assert_difference -> { TwitterSchedule.jobs.size }, +1 do
-          job = perform
-          assert job.priority?
-        end
+        job = perform
+        assert job.priority?
       end
 
       assert_not perform.priority?

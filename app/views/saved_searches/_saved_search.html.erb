@@ -6,7 +6,9 @@
             data: {
                 behavior: "selectable show_entries open_item feed_link has_settings",
                 mark_read: {type: "saved_search", data: saved_search.id, message: "Mark #{saved_search.name} as read?"}.to_json,
-                jumpable: {title: saved_search_presenter.name, section: "Saved Searches"},
+                sourceable_target: "source",
+                action: "sourceable#selected",
+                sourceable_payload_param: saved_search.sourceable.to_h,
                 settings_path: edit_saved_search_path(saved_search)
             } do
         %>

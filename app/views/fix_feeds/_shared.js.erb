@@ -1,0 +1,1 @@
+$('[data-behavior~=status_component]').replaceWith('<%= j render FixFeeds::StatusComponent.new(count: @subscriptions.count, replace_path: replace_all_fix_feeds_path) %>')

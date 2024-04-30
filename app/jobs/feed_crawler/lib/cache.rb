@@ -33,24 +33,24 @@ module FeedCrawler
       values = values.compact
       unless values.empty?
         Sidekiq.redis do |redis|
-          redis.mapped_hmset(key, values)
+          redis.call("HMSET", key, values)
         end
       end
       write_key_expiry(key, options)
     end
 
     def delete(*keys)
-      Sidekiq.redis {|redis| redis.unlink(*keys) }
+      Sidekiq.redis { _1.unlink(*keys) }
     end
 
     def increment(key, options: {})
-      count = Sidekiq.redis {|redis| redis.incr(key) }
+      count = Sidekiq.redis { _1.incr(key) }
       write_key_expiry(key, options)
       count
     end
 
     def count(key)
-      Sidekiq.redis {|redis| redis.get(key) }.to_i
+      Sidekiq.redis { _1.get(key) }.to_i
     end
 
     def write_key_expiry(key, options)

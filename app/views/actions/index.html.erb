@@ -1,50 +1,34 @@
-<%= component "settings/h1" do %>
+<%= render Settings::H1Component.new do %>
   Actions
 <% end %>
 
 <p class="text-500 mb-4">Actions can be performed on articles when they are published. Start by writing the keywords to match, just like you would when <a href="/help/search-syntax/">searching</a> for something. Then select the feeds to include. Finally check the actions you would like to perform on the matched incoming articles.</p>
 
-<%= render partial: "push_data" %>
-
-<div class="push-options hide">
-  <div class="push-enable hide">
-    <p>Push notifications can be enabled as an action. <a href="#" data-behavior="enable_push">Enable push notifications</a>.</p>
-  </div>
-  <div class="push-disable hide">
-    <p>Push notifications are <span class="highlight-positive">enabled</span>. You can disable them in preferences under Notifications.</p>
-  </div>
-  <div class="push-disabled hide">
-    <p>Push notifications are <span class="highlight-negative">disabled</span>. You can enable them in Safari preferences under Notifications.</p>
-  </div>
-</div>
-
-<%= link_to "+ Add Action", new_action_path, class: "button button-huge" %>
+<%= link_to "+ Add Action", new_action_path, class: "button button-huge mb-8" %>
 
 <% if @actions.find { _1.broken? } %>
-  <% @actions.select { _1.broken? }.each do |action| %>
-    <%= component "settings/control_group" do |group| %>
-      <% group.header do %>
-        Saved Actions
-      <% end %>
+  <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
+    <% group.header do %>
+      Invalid Actions
+    <% end %>
 
-      <% @actions.reject { _1.broken? }.each do |action| %>
-        <% group.item do %>
-          <%= render partial: "action", locals: {action:} %>
-        <% end %>
+    <% @actions.select { _1.broken? }.each do |action| %>
+      <% group.item do %>
+        <%= render partial: "action", locals: {action: action, summary: true} %>
       <% end %>
     <% end %>
   <% end %>
 <% end %>
 
 <% if @actions.find { !_1.broken? } %>
-  <%= component "settings/control_group" do |group| %>
+  <%= render Settings::ControlGroupComponent.new class: "mb-14" do |group| %>
     <% group.header do %>
       Saved Actions
     <% end %>
 
     <% @actions.reject { _1.broken? }.each do |action| %>
       <% group.item do %>
-        <%= render partial: "action", locals: {action:} %>
+        <%= render partial: "action", locals: {action: action, summary: true} %>
       <% end %>
     <% end %>
   <% end %>

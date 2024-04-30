@@ -1,0 +1,11 @@
+Hi <%= @user.email %>,
+
+Your Feedbin subscription will automatically renew on <%= @billing_event.period_end.to_formatted_s(:date) %>.
+
+The payment method you have on file will be charged <%= number_to_currency(@billing_event.event_object.safe_dig("amount_remaining").to_f / 100) %> <%= @billing_event.event_object.safe_dig("currency").upcase %>.
+
+You can change your payment method and plan here: <%= settings_billing_url %>, or cancel your account here: <%= settings_account_url %>.
+
+Thanks for your business!
+
+Feedbin

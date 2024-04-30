@@ -1,1 +1,13 @@
 <%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
+
+(function() {
+  const css = "<%= asset_url("tailwind.css") %>";
+  const element = $(`link[href='${css}']`);
+  if (element.length == 0) {
+    const tag = $("<link />").attr({
+      href: css,
+      rel: "stylesheet"
+    });
+    $('head').append(tag);
+  }
+})();

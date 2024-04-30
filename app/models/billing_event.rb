@@ -24,11 +24,15 @@ class BillingEvent < ApplicationRecord
 
   def process_event
     if charge_succeeded?
-      UserMailer.delay(queue: :default_critical).payment_receipt(id)
+      UserMailer.payment_receipt(id).deliver_later
     end
 
     if charge_failed?
-      UserMailer.delay(queue: :default_critical).payment_failed(id)
+      UserMailer.payment_failed(id).deliver_later
+    end
+
+    if subscription_reminder?
+      UserMailer.subscription_reminder(id).deliver_later
     end
 
     if subscription_deactivated?
@@ -57,6 +61,13 @@ class BillingEvent < ApplicationRecord
     event_type == "customer.subscription.updated" &&
       event_object["status"] == "active" &&
       info.safe_dig("data", "previous_attributes", "status") == "unpaid"
+  end
+
+  def subscription_reminder?
+    event_type == "invoice.upcoming" &&
+      event_object["amount_remaining"].present? &&
+      event_object["amount_remaining"] >= 2_000 &&
+      !billable.suspended?
   end
 
   def invoice
@@ -101,5 +112,9 @@ class BillingEvent < ApplicationRecord
 
   def purchase_date
     Time.at(event_object["created"])
+  end
+
+  def period_end
+    Time.at(event_object["period_end"])
   end
 end

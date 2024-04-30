@@ -1,4 +1,4 @@
-$('[data-behavior~=subscriptions_list]').replaceWith('<%= j render partial: "subscriptions_list" %>');
+$("[data-behavior~=subscriptions_list]").replaceWith("<%= j render(Settings::Subscriptions::Shared::List.new(subscriptions: @subscriptions, params: params)) %>");
 feedbin.timeago();
 feedbin.faviconColors();
 <% if params[:q].present? || params[:sort].present? %>

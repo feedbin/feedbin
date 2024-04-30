@@ -8,11 +8,12 @@ class Feed < ApplicationRecord
   has_many :unread_entries
   has_many :starred_entries
   has_many :feed_stats
+  has_many :discovered_feeds, foreign_key: :site_url, primary_key: :site_url
 
   has_many :taggings
   has_many :tags, through: :taggings
 
-  has_one :favicon, foreign_key: "host", primary_key: "host"
+  has_one :favicon, foreign_key: :host, primary_key: :host
   has_one :newsletter_sender
 
   before_create :set_host
@@ -119,10 +120,7 @@ class Feed < ApplicationRecord
     create_with(record).create_or_find_by!(feed_url: record[:feed_url]).tap do |new_feed|
       parsed_feed.entries.each do |parsed_entry|
         entry_hash = parsed_entry.to_entry
-        threader = Threader.new(entry_hash, new_feed)
-        unless threader.thread
-          new_feed.entries.create_with(entry_hash).create_or_find_by(public_id: entry_hash[:public_id])
-        end
+        new_feed.entries.create_with(entry_hash).create_or_find_by(public_id: entry_hash[:public_id])
       end
       # for micropost feeds
       if parsed_feed.entries.filter_map(&:title).blank?
@@ -152,7 +150,7 @@ class Feed < ApplicationRecord
   end
 
   def set_host
-    self.host = Addressable::URI.heuristic_parse(site_url)&.host || Addressable::URI.heuristic_parse(feed_url)&.host
+    self.host = Addressable::URI.heuristic_parse(site_url)&.host&.downcase
   rescue
     Rails.logger.info { "Failed to set host for feed: %s" % site_url }
   end
@@ -168,9 +166,7 @@ class Feed < ApplicationRecord
 
   def priority_refresh(user = nil)
     if twitter_feed?
-      if 10.minutes.ago > updated_at
-        FeedCrawler::TwitterSchedule.new.enqueue_feed(self, user)
-      end
+      return
     else
       FeedCrawler::DownloaderCritical.perform_async(id, feed_url, subscriptions_count, crawl_data.to_h)
     end
@@ -193,7 +189,7 @@ class Feed < ApplicationRecord
   end
 
   def web_sub_secret
-    Digest::SHA256.hexdigest([id, Rails.application.secrets.secret_key_base].join("-"))
+    Digest::SHA256.hexdigest([id, Rails.application.secret_key_base].join("-"))
   end
 
   def web_sub_callback(debug: false)
@@ -253,6 +249,10 @@ class Feed < ApplicationRecord
     "refresher_redirect_stable_%d" % id
   end
 
+  def site_url
+    feed_relative_url(self[:site_url])
+  end
+
   def feed_relative_url(url)
     root = crawl_data.redirected_to || feed_url
     rebase_url(root, url).to_s
@@ -264,7 +264,7 @@ class Feed < ApplicationRecord
   end
 
   def rebase_url(root, relative)
-    return nil if relative.blank? || !relative.respond_to?(:strip)
+    return root if relative.blank? || !relative.respond_to?(:strip)
     return relative.strip if relative.strip.downcase.start_with?("http")
     return nil if root.blank?
 
@@ -275,6 +275,53 @@ class Feed < ApplicationRecord
     Rails.logger.error("Invalid uri feed=#{id} root=#{root} relative=#{relative}")
     nil
   end
+
+  def sourceable
+    Sourceable.new(
+      type: self.class.name,
+      id: id,
+      title: title,
+      section: "Feeds",
+      jumpable: true
+    )
+  end
+
+  def fixable_error?
+    return false unless crawl_error?
+
+    irrecoverable_errors = [
+      "Feedkit::ConnectionError",
+      "Feedkit::SSLError",
+      "Feedkit::TimeoutError"
+    ]
+    return false if irrecoverable_errors.include?(crawl_data.last_error.safe_dig("class"))
+    return true
+  end
+
+  def crawl_error?
+    crawl_data.error_count > 23
+  end
+
+  def crawl_error_message
+    message = CrawlingError.message(crawl_data.last_error.safe_dig("class"))
+    date = Time.at(crawl_data.downloaded_at) rescue nil
+    if date.present? && date != Time.at(0)
+      message = "#{date.to_formatted_s(:date)}: #{message}"
+    else
+      message = "Error: #{message}"
+    end
+
+    message
+  end
+
+  def fixable?
+    crawl_error? && discovered_feeds.present?
+  end
+
+  def dead?
+    crawl_error? && !discovered_feeds.present?
+  end
+
 
   private
 

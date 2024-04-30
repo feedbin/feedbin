@@ -67,7 +67,7 @@ module ApplicationHelper
     get_icon(name).present?
   end
 
-  def svg_tag(name, options = {})
+  def svg_options(name, options = {})
     options = options.symbolize_keys
 
     name = name.sub(".svg", "")
@@ -84,11 +84,15 @@ module ApplicationHelper
 
     options[:class] = [name, options[:class]].compact.join(" ")
 
-    inline = options.delete(:inline)
+    OpenStruct.new(icon:, options:)
+  end
 
-    content_tag :svg, options do
+  def svg_tag(name, options = {})
+    result = svg_options(name, options)
+    inline = result.options.delete(:inline)
+    content_tag :svg, result.options do
       if inline
-        icon.markup.html_safe
+        result.icon.markup.html_safe
       else
         content_tag :use, "", "href": "##{name}"
       end
@@ -102,6 +106,10 @@ module ApplicationHelper
 
   def favicon_with_host(host, generated: false)
     record = Favicon.find_by(host: host)
+    favicon_with_record(record, host: host, generated: generated)
+  end
+
+  def favicon_with_record(record, host:, generated: false)
     if record && record.url.present?
       favicon_template(record.cdn_url)
     elsif generated
@@ -156,6 +164,11 @@ module ApplicationHelper
   rescue => exception
     ErrorService.notify(exception)
     url
+  end
+
+  def short_url_alt(url)
+    url = pretty_url(url)
+    url.truncate(40, omission: "…#{url.last(10)}")
   end
 
   def strip_basic_auth(url)

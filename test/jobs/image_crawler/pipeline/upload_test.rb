@@ -28,12 +28,12 @@ module ImageCrawler
 
         saved_id, options = EntryImage.jobs.last.safe_dig("args")
 
-        download_cache = DownloadCache.new(original_url, "primary")
+        download_cache = DownloadCache.new(original_url, image)
         assert_equal(id, saved_id)
 
-        assert_equal(original_url,      download_cache.image.final_url)
-        assert_equal("https:",          download_cache.image.storage_url)
-        assert_equal(placeholder_color, download_cache.image.placeholder_color)
+        assert_equal(original_url,      download_cache.cached_image.final_url)
+        assert_equal("https:",          download_cache.cached_image.storage_url)
+        assert_equal(placeholder_color, download_cache.cached_image.placeholder_color)
 
         assert_equal(original_url, options["original_url"])
         assert_equal("https:",     options["processed_url"])

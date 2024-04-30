@@ -8,6 +8,7 @@ module Search
       count:    "/%{index}/_count",
       refresh:  "/_refresh",
       bulk:     "/_bulk",
+      aliases:  "/_aliases",
     }
 
     def initialize(url, username: nil, password: nil)
@@ -83,6 +84,18 @@ module Search
       2.upto(result.pagination.total_pages).each_with_object(result.ids) do |page, ids|
         ids.concat callback.call(page).ids
       end
+    end
+
+    def add_alias(index, alias_name:)
+      data = {
+        actions: [{
+          add: {
+            index: index,
+            alias: alias_name
+          }
+        }]
+      }
+      request(:post, PATHS[:aliases], json: data)
     end
 
     def request(method, path, options = {})

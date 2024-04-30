@@ -1,10 +1,14 @@
 class ImportItem < ApplicationRecord
-  serialize :details, Hash
+  serialize :details, type: Hash
   belongs_to :import
-  enum status: [:pending, :complete, :failed]
+  enum status: [:pending, :complete, :failed, :fixable]
   store_accessor :error, :class, :message, prefix: true
+  has_many :discovered_feeds, foreign_key: :site_url, primary_key: :site_url
+  has_one :favicon, foreign_key: :host, primary_key: :host
 
   after_commit :import_feed, on: :create
+  before_create :set_site_url
+  before_create :host
 
   ERRORS = {
     "Addressable::URI::InvalidURIError" => "Invalid URL",
@@ -25,12 +29,33 @@ class ImportItem < ApplicationRecord
     FeedImporter.perform_async(id)
   end
 
-  def host
-    URI.parse(details[:html_url])&.host rescue nil
+  def set_site_url
+    self.site_url = details[:html_url]
   end
 
-  def human_error
-    return unless failed?
-    ERRORS[error_class] || "Connection error"
+  def host
+    self.host = Addressable::URI.heuristic_parse(details[:html_url])&.host&.downcase
+  rescue
+  end
+
+  def title
+    details[:title]
+  end
+
+  def last_published_entry
+    nil
+  end
+
+  def feed_url
+    details[:xml_url]
+  end
+
+  def crawl_error_message
+    return unless failed? || fixable?
+    CrawlingError.message(error_class)
+  end
+
+  def replaceable_path
+    Rails.application.routes.url_helpers.settings_import_item_path(self)
   end
 end

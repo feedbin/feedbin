@@ -18,7 +18,7 @@ module Search
 
     test "should send_push_notification" do
       Sidekiq::Worker.clear_all
-      assert_difference "SafariPushNotificationSend.jobs.size", +1 do
+      assert_difference "WebPushNotificationSend.jobs.size", +1 do
         Throttle.stub :throttle!, true do
           ActionsPerform.new.perform(@entry.id, [@action.id])
         end

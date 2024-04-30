@@ -8,4 +8,12 @@ class SavedSearch < ApplicationRecord
     end
     letter
   end
+
+  def sourceable
+    Sourceable.new(
+      type: self.class.name,
+      id: id,
+      title: name
+    )
+  end
 end

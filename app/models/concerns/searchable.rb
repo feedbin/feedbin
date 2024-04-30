@@ -14,7 +14,7 @@ module Searchable
 
     def self.saved_search_count(user)
       saved_searches = user.saved_searches
-      if saved_searches.length < 10
+      if saved_searches.length < 50
         unread_entries = user.unread_entries.pluck(:entry_id)
         searches = build_multi_search(user, saved_searches)
         records = searches.map { Search::MultiSearchRecord.new(query: _1.query) }
@@ -79,7 +79,7 @@ module Searchable
         query = query.gsub("emoji:", "")
         query = query.gsub("_missing_:", "NOT _exists_:")
 
-        colon_regex = /(?<!title|title.exact|feed_id|content|content.exact|author|_missing_|_exists_|twitter_screen_name|twitter_name|twitter_retweet|twitter_media|twitter_image|twitter_link|emoji|url|url.exact|link|type):(?=.*)/
+        colon_regex = /(?<!title|title.exact|feed_id|content|content.exact|author|_missing_|_exists_|twitter_screen_name|twitter_name|twitter_retweet|twitter_media|twitter_image|twitter_link|emoji|url|url.exact|link|type|category):(?=.*)/
         query = query.gsub(colon_regex, '\:')
 
         extracted_fields.push(query).join(" ")

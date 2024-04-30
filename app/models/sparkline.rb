@@ -4,7 +4,7 @@ class Sparkline
   def initialize(width:, height:, stroke:, percentages:)
     @width = width.to_f
     @height = height.to_f
-    @percentages = percentages
+    @percentages = percentages || []
     @stroke = stroke
   end
 

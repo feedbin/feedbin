@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SettingsNav::HeaderComponentPreview < ViewComponent::Preview
+class SettingsNav::HeaderComponentPreview < Lookbook::Preview
   def default
     render(SettingsNav::HeaderComponent.new) do
       "Header"

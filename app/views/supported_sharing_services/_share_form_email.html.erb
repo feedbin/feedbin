@@ -1,41 +1,46 @@
-<div class="share-form">
-    <div class="share-form-inner">
-        <div class="sharing-header">
-            <h2>Send Article via Email</h2>
-            <%= svg_tag "icon-share-email" %>
-        </div>
-        <%= form_tag("", remote: true) do %>
-            <%= hidden_field_tag :readability, "off", class: "readability-placeholder" %>
-            <div class="field-cluster">
-                <div class="input-group-wrap">
-                    <label for="email_to">To</label>
-                    <div class="autocomplete-parent" data-behavior="autocomplete_parent">
-                        <%= render "shared/input" do %>
-                            <%= text_field_tag :to, "", placeholder: "Comma-separate multiple recipients", data: {behavior: "autocomplete_field", autocomplete_path: autocomplete_supported_sharing_service_path(service)}, id: "email_to" %>
-                        <% end %>
-                        <div class="share-autocomplete" data-behavior="autocomplete_target"></div>
-                    </div>
-                </div>
+<%= render App::ShareFormComponent.new title: "Send Article via Email", icon: "icon-share-email" do %>
+  <%= form_tag("", remote: true) do %>
+    <%= hidden_field_tag :readability, "off", class: "readability-placeholder" %>
 
-                <div class="input-group-wrap">
-                    <label for="email_subject">Subject</label>
-                    <%= render "shared/input" do %>
-                        <%= text_field_tag :subject, "", class: "title-placeholder", id: "email_subject" %>
-                    <% end %>
-                </div>
-                <div class="input-group-wrap">
-                    <label for="email_body">Message</label>
-                    <%= render "shared/input" do %>
-                        <%= text_area_tag :body, "", rows: 5, placeholder: "Message appears above article contents", class: "description-placeholder", id: "email_body" %>
-                    <% end %>
-                </div>
-            </div>
-            <div class="button-wrap">
-                <%= button_tag "Cancel", type: "button", class: "button button-secondary", data: {behavior: "close_entry_basement"} %>
-                <%= button_tag "Send", type: "submit", class: "button" %>
-            </div>
+    <div class="mb-4">
+      <%= render Form::TextInputComponent.new do |text| %>
+        <% text.label do %>
+          <label for="email_to">To</label>
         <% end %>
+        <% text.input do %>
+          <div class="autocomplete-parent w-full" data-behavior="autocomplete_parent">
+              <%= text_field_tag :to, "", placeholder: "Comma-separate multiple recipients", class: "peer text-input", data: {behavior: "autocomplete_field", autocomplete_path: autocomplete_supported_sharing_service_path(service)}, id: "email_to" %>
+              <div class="share-autocomplete" data-behavior="autocomplete_target"></div>
+          </div>
+        <% end %>
+      <% end %>
     </div>
-</div>
 
+    <div class="mb-4">
+      <%= render Form::TextInputComponent.new do |text| %>
+        <% text.label do %>
+          <label for="email_subject">Subject</label>
+        <% end %>
+        <% text.input do %>
+          <%= text_field_tag :subject, "", class: "title-placeholder peer text-input", id: "email_subject" %>
+        <% end %>
+      <% end %>
+    </div>
 
+    <div class="mb-4">
+      <%= render Form::TextInputComponent.new do |text| %>
+        <% text.label do %>
+          <label for="email_body">Message</label>
+        <% end %>
+        <% text.input do %>
+          <%= text_area_tag :body, "", rows: 3, placeholder: "Message appears above article contents", class: "description-placeholder peer text-input", id: "email_body" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%= render Settings::ButtonRowComponent.new do %>
+      <%= button_tag "Cancel", type: "button", class: "button button-secondary", data: {behavior: "close_entry_basement"} %>
+      <%= button_tag "Send", type: "submit", class: "button" %>
+    <% end %>
+  <% end %>
+<% end %>

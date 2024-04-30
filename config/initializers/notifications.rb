@@ -15,7 +15,7 @@ ActiveSupport::Notifications.subscribe("process_action.action_controller") do |n
       Librato.timing "controller.#{controller}.#{action}.time.db", payload[:db_runtime], percentile: [95]
     end
     if payload[:view_runtime]
-      Librato.timing "controller.#{controller}.#{action}.time.view", payload[:view_runtime], percentile: [95]
+      Librato.timing "controller.#{controller}.#{action}.time.view", payload[:view_runtime], percentile: [95], source: Socket.gethostname
     end
   end
 end

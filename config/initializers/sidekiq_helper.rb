@@ -1,4 +1,6 @@
 module SidekiqHelper
+  require "sidekiq/api"
+
   BATCH_SIZE = 5_000
 
   def self.included(base)
@@ -37,7 +39,7 @@ module SidekiqHelper
   end
 
   def add_to_queue(queue, id)
-    Sidekiq.redis { |redis| redis.sadd?(queue, id) }
+    Sidekiq.redis { _1.sadd(queue, id) } == 1
   end
 
   def dequeue_ids(queue)
@@ -52,12 +54,18 @@ module SidekiqHelper
     end
 
     ids
-  rescue Redis::CommandError => exception
+  rescue RedisClient::CommandError => exception
     if exception.message =~ /no such key/i
       logger.info("Nothing to do")
       return nil
     end
     raise
+  end
+
+  def queue_empty?(queue)
+    queue = queue.to_s
+    @queues ||= Sidekiq::Stats.new.queues
+    @queues[queue].blank? || @queues[queue] == 0
   end
 
   module ClassMethods

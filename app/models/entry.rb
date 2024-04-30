@@ -21,7 +21,7 @@ class Entry < ApplicationRecord
   before_update :create_summary
 
   after_commit :cache_public_id, on: [:create, :update]
-  after_commit :find_images, on: :create, unless: :skip_images?
+  after_commit :find_images, on: :create
   after_commit :mark_as_unread, on: :create
   after_commit :mark_as_unplayed, on: :create
   after_commit :increment_feed_stat, on: :create
@@ -29,7 +29,6 @@ class Entry < ApplicationRecord
   after_commit :harvest_links, on: :create
   after_commit :harvest_embeds, on: [:create, :update]
   after_commit :cache_views, on: [:create, :update]
-  after_commit :save_twitter_users, on: [:create]
   after_commit :search_index_store_update, on: [:update]
 
   validate :has_content
@@ -80,10 +79,7 @@ class Entry < ApplicationRecord
     authors = json_feed.safe_dig("authors")
     return authors unless authors.respond_to?(:filter_map)
     authors = authors.filter_map { _1&.safe_dig("name") }
-    if authors.length > 1
-      authors[-1] = "and #{authors[-1]}"
-    end
-    authors.join(", ")
+    authors.to_sentence
   rescue
     nil
   end
@@ -91,6 +87,7 @@ class Entry < ApplicationRecord
   def fully_qualified_url
     return nil if url.blank? || !url.respond_to?(:strip)
     return url.strip if url.strip.downcase.start_with?("http")
+    return url if feed.pages?
 
     result = feed.site_relative_url(url)
     if result.blank?
@@ -104,12 +101,16 @@ class Entry < ApplicationRecord
     return original_url.strip if original_url.strip.downcase.start_with?("http")
     return nil if fully_qualified_url.nil?
 
-    base_url = Addressable::URI.heuristic_parse(fully_qualified_url)
+    base = Addressable::URI.heuristic_parse(fully_qualified_url)
     original_url = Addressable::URI.heuristic_parse(original_url)
-    Addressable::URI.join(base_url, original_url)
+    Addressable::URI.join(base, original_url)
   rescue Addressable::URI::InvalidURIError
     Rails.logger.error("Invalid uri original_url=#{original_url} fully_qualified_url=#{fully_qualified_url}")
     nil
+  end
+
+  def base_url
+    feed.pages? ? url : feed.site_url
   end
 
   def processed_image
@@ -149,7 +150,7 @@ class Entry < ApplicationRecord
   def content_diff
     @content_diff ||= begin
       result = nil
-      if original && original["content"].present? && original["content"].length != content.length
+      if content && original && original["content"].present? && original["content"].length != content.length
         begin
           before = ContentFormatter.format!(original["content"], self)
           after = ContentFormatter.format!(content, self)
@@ -218,7 +219,7 @@ class Entry < ApplicationRecord
   end
 
   def hostname
-    URI(url).host
+    Addressable::URI.heuristic_parse(url).host
   rescue
     nil
   end
@@ -315,6 +316,11 @@ class Entry < ApplicationRecord
     end
   end
 
+    def chapter_titles
+    return [] unless chapters.respond_to?(:map)
+    chapters.map {_1.safe_dig("tags", "title")}
+  end
+
   private
 
   def provider_metadata
@@ -375,18 +381,10 @@ class Entry < ApplicationRecord
         hash[:feed_id] = feed_id
         hash[:active] = true
         hash[:muted] = false
-        if tweet?
-          hash[:show_retweets] = true if tweet.retweet?
-          hash[:media_only] = false unless tweet.twitter_media?
-        end
       end
 
       user_ids = Subscription.where(filters).pluck(:user_id)
       unread_entries = user_ids.each_with_object([]) { |user_id, array|
-        if tweet?
-          has_tweet = User.where(id: user_id).take&.has_tweet?(main_tweet_id)
-          Librato.increment("user.has_tweet", source: has_tweet.to_s)
-        end
         array << UnreadEntry.new(user_id: user_id, feed_id: feed_id, entry_id: id, published: published, entry_created_at: created_at)
       }
       UnreadEntry.import(unread_entries, validate: false, on_duplicate_key_ignore: true)
@@ -399,17 +397,36 @@ class Entry < ApplicationRecord
   end
 
   def mark_as_unplayed
-    if skip_mark_as_unread.blank? && recent_post
-      user_ids = PodcastSubscription.subscribed.where(feed_id: feed_id).pluck(:user_id)
-      entries = user_ids.map do |user_id|
-        QueuedEntry.new(user_id: user_id, feed_id: feed_id, entry_id: id, order: Time.now.to_i, progress: 0, duration: audio_duration)
-      end
-      QueuedEntry.import(entries, validate: false, on_duplicate_key_ignore: true)
-      increment!(:queued_entries_count, entries.count)
+    return if skip_mark_as_unread.present? || !recent_post
 
-      notification_ids = PodcastSubscription.where(feed_id: feed_id, status: [:subscribed, :bookmarked]).pluck(:user_id)
-      Sidekiq::Client.push_bulk("args" => notification_ids.map {|user_id| [user_id, id]}, "class" => PodcastPushNotification)
+    subscriptions = PodcastSubscription.where(feed_id: feed_id, status: [:subscribed, :bookmarked])
+
+    queued_entries = []
+    notification_ids = []
+
+    subscriptions.each do |subscription|
+      if subscription.subscribed? && !subscription.filtered?(podcast_search_data)
+        queued_entries.push QueuedEntry.new(user_id: subscription.user_id, feed_id: feed_id, entry_id: id, order: Time.now.to_i, progress: 0, duration: audio_duration)
+        notification_ids.push subscription.user_id
+      elsif subscription.bookmarked?
+        notification_ids.push subscription.user_id
+      end
     end
+
+    if queued_entries.present?
+      QueuedEntry.import(queued_entries, validate: false, on_duplicate_key_ignore: true)
+      increment!(:queued_entries_count, queued_entries.count)
+    end
+
+    Sidekiq::Client.push_bulk("args" => notification_ids.map {|user_id| [user_id, id]}, "class" => PodcastPushNotification)
+
+    if data.safe_dig("enclosure_url").present? && data.safe_dig("enclosure_type") =~ /audio/i
+      ChapterParser.perform_async(id)
+    end
+  end
+
+  def podcast_search_data
+    [title, data&.safe_dig("itunes_author"), content].join
   end
 
   def recent_post
@@ -462,21 +479,10 @@ class Entry < ApplicationRecord
   end
 
   def harvest_links
-    HarvestLinks.perform_async(id) if tweet? || micropost?
+    HarvestLinks.perform_async(id) if micropost?
   end
 
   def cache_views
     CacheEntryViews.new.perform(id)
-  end
-
-  def save_twitter_users
-    SaveTwitterUsers.perform_async(id) if tweet?
-  end
-
-  def skip_images?
-    if ENV["SKIP_IMAGES"].present?
-      Rails.logger.info("SKIP_IMAGES is present, no images will be processed")
-      true
-    end
   end
 end

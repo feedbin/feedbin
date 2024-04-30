@@ -47,7 +47,11 @@ class User < ApplicationRecord
     :newsletter_tag,
     :feeds_width,
     :entries_width,
-    :billing_issue
+    :billing_issue,
+    :podcast_sort_order,
+    :playlist_migration,
+    :fix_feeds_available,
+    :addresses_available
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -55,6 +59,7 @@ class User < ApplicationRecord
   has_many :feeds, through: :subscriptions
   has_many :entries, through: :feeds
   has_many :imports, dependent: :destroy
+  has_many :import_items, through: :imports
   has_many :billing_events, as: :billable, dependent: :delete_all
   has_many :taggings, dependent: :delete_all
   has_many :tags, through: :taggings
@@ -67,6 +72,7 @@ class User < ApplicationRecord
   has_many :recently_read_entries, dependent: :delete_all
   has_many :recently_played_entries, dependent: :delete_all
   has_many :queued_entries, dependent: :delete_all
+  has_many :playlists, dependent: :delete_all
   has_many :updated_entries, dependent: :delete_all
   has_many :devices, dependent: :delete_all
   has_many :authentication_tokens, dependent: :delete_all
@@ -84,6 +90,8 @@ class User < ApplicationRecord
   before_save :strip_email
   before_save :activate_subscriptions
   before_save { reset_auth_token }
+
+  after_create :schedule_trial_jobs
 
   before_create :create_customer, unless: -> { !ENV["STRIPE_API_KEY"] }
   before_create { generate_tokens }
@@ -115,13 +123,14 @@ class User < ApplicationRecord
   end
 
   def theme
-    if settings
+    preference = if settings
       if settings["theme"] == "night"
         "dusk"
       else
         settings["theme"]
       end
     end
+    preference.present? ? preference : "day"
   end
 
   def twitter_enabled?
@@ -158,15 +167,24 @@ class User < ApplicationRecord
   end
 
   def schedule_trial_jobs
-    OnboardingMessage.perform_async(id, MarketingMailer.method(:onboarding_1_welcome).name.to_s)
-    OnboardingMessage.perform_in(3.days, id, MarketingMailer.method(:onboarding_2_mobile).name.to_s)
-    OnboardingMessage.perform_in(5.days, id, MarketingMailer.method(:onboarding_3_subscribe).name.to_s)
-    OnboardingMessage.perform_in(Feedbin::Application.config.trial_days.days - 1.days, id, MarketingMailer.method(:onboarding_4_expiring).name.to_s)
-    OnboardingMessage.perform_at(Feedbin::Application.config.trial_days.days.from_now + 1.days, id, MarketingMailer.method(:onboarding_5_expired).name.to_s)
+    # OnboardingMessage.perform_async(id, MarketingMailer.method(:onboarding_1_welcome).name.to_s)
+    # OnboardingMessage.perform_in(3.days, id, MarketingMailer.method(:onboarding_2_mobile).name.to_s)
+    # OnboardingMessage.perform_in(5.days, id, MarketingMailer.method(:onboarding_3_subscribe).name.to_s)
+    # OnboardingMessage.perform_in(Feedbin::Application.config.trial_days.days - 1.days, id, MarketingMailer.method(:onboarding_4_expiring).name.to_s)
+    # OnboardingMessage.perform_at(Feedbin::Application.config.trial_days.days.from_now + 1.days, id, MarketingMailer.method(:onboarding_5_expired).name.to_s)
+    TrialSendExpiration.perform_in(Feedbin::Application.config.trial_days.days - 1.days, id)
   end
 
   def setting_on?(setting_symbol)
     send(setting_symbol) == "1"
+  end
+
+  def setting_on!(setting_symbol)
+    update(setting_symbol => "1")
+  end
+
+  def setting_off!(setting_symbol)
+    update(setting_symbol => "0")
   end
 
   def subscribed_to_emails?
@@ -287,7 +305,7 @@ class User < ApplicationRecord
     token = generate_token(:password_reset_token, nil, true)
     self.password_reset_sent_at = Time.now
     save!
-    UserMailer.delay(queue: :default_critical).password_reset(id, token)
+    UserMailer.password_reset(id, token).deliver_later
   end
 
   def create_customer
@@ -471,7 +489,15 @@ class User < ApplicationRecord
   end
 
   def newsletter_authentication_token
-    authentication_tokens.newsletters.active.take
+    authentication_tokens.newsletters.active.order(created_at: :desc).take
+  end
+
+  def newsletter_addresses
+    authentication_tokens.newsletters.active
+  end
+
+  def inactive_newsletter_addresses
+    authentication_tokens.newsletters.where(active: false)
   end
 
   def stripe_url
@@ -570,6 +596,22 @@ class User < ApplicationRecord
     plan == Plan.find_by_stripe_id("trial")
   end
 
+  def migrate_playlists!
+    return unless playlist_migration.nil?
+
+    migrate_playlist!(title: "Subscriptions", subs: podcast_subscriptions.subscribed)
+    migrate_playlist!(title: "Bookmarks", subs: podcast_subscriptions.bookmarked)
+    update(playlist_migration: 1)
+  end
+
+  def migrate_playlist!(title:, subs:)
+    return unless subs.exists?
+
+    playlist = playlists.create_or_find_by(title: title)
+    subs.update_all(playlist_id: playlist.id)
+    queued_entries.where(feed_id: subs.pluck(:feed_id)).update_all(playlist_id: playlist.id)
+  end
+
   def has_tweet?(main_tweet_id)
     entries.where(main_tweet_id: main_tweet_id).limit(2).count > 1
   end
@@ -587,34 +629,6 @@ class User < ApplicationRecord
         progress = [existing[:progress], progress].max
       end
       hash[item.entry_id] = {progress: progress, duration: item.duration}
-    end
-  end
-
-  def twitter_auth
-    if twitter_enabled?
-      TwitterAuth.new(screen_name: twitter_screen_name, token: twitter_access_token, secret: twitter_access_secret)
-    else
-      nil
-    end
-  end
-
-  def twitter_log_out
-    update(
-      twitter_access_token: nil,
-      twitter_access_secret: nil,
-      twitter_screen_name: nil,
-      twitter_auth_failures: nil
-    )
-  end
-
-  def twitter_client
-    if twitter_enabled?
-      @twitter_client ||= ::Twitter::REST::Client.new { |config|
-        config.consumer_key = ENV["TWITTER_KEY"]
-        config.consumer_secret = ENV["TWITTER_SECRET"]
-        config.access_token = twitter_access_token
-        config.access_token_secret = twitter_access_secret
-      }
     end
   end
 end

@@ -11,7 +11,7 @@ class PagesEntriesController < ApplicationController
       @page_query = @entries
     elsif view_mode == "view_starred"
       starred_entries = @user.starred_entries.select(:entry_id).where(feed_id: @feed.id).page(params[:page]).order("created_at DESC")
-      @entries = Entry.entries_with_feed(starred_entries, "DESC").entries_list
+      @entries = Entry.where(id: starred_entries).includes(feed: [:favicon]).order("created_at DESC").entries_list
       @page_query = starred_entries
     else
       @all_unread = "true"

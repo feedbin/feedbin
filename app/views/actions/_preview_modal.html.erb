@@ -9,7 +9,7 @@
 <% content_for :modal_body, flush: true do %>
     <div class="action-description">
         <div class="content">
-            <%= render partial: 'text_description', locals: {action: action} %>
+            <%= render partial: 'text_description', locals: {action: action, summary: false} %>
         </div>
     </div>
     <p><%= number_to_human(results.total, precision: 2).downcase %> <%= 'match'.pluralize(results.total) %></p>

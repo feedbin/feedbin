@@ -1,4 +1,6 @@
-class Settings::H2ComponentPreview < ViewComponent::Preview
+# frozen_string_literal: true
+
+class Settings::H2ComponentPreview < Lookbook::Preview
   def default
     render(Settings::H2Component.new) do
       "Header Two"

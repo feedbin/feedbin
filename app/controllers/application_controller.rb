@@ -174,7 +174,18 @@ class ApplicationController < ActionController::Base
         clear: {path: destroy_all_recently_played_entries_path, message: "Clear all recently played?"}
       }
     end
-    collections
+    collections.map do |collection|
+      collection[:data].merge!({
+        sourceable_target: "source",
+        action: "sourceable#selected",
+        sourceable_payload_param: Sourceable.new(
+          type: "collection",
+          id: collection[:id],
+          title: collection[:title]
+        ).to_h
+      })
+      collection
+    end
   end
 
   def get_feeds_list
@@ -254,7 +265,7 @@ class ApplicationController < ActionController::Base
 
   def verify_push_token(authentication_token)
     authentication_token = CGI.unescape(authentication_token)
-    verifier = ActiveSupport::MessageVerifier.new(Rails.application.secrets.secret_key_base)
+    verifier = ActiveSupport::MessageVerifier.new(Rails.application.secret_key_base)
     verifier.verify(authentication_token)
   end
 

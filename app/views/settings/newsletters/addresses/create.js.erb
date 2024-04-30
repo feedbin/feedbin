@@ -1,0 +1,22 @@
+<% if @token %>
+  $("[data-behavior~=token_suffix]").html("<%= j render Settings::Newsletters::Addresses::NewView::TokenSuffixComponent.new(suffix: @numbers) %>");
+  $("[data-behavior~=token_message]").html("<%= j render Settings::Newsletters::Addresses::NewView::MessageComponent.new(address: @token) %>");
+  $("#authentication_token_verified_token").val("<%= j @message %>");
+  feedbin.formValid = true;
+  clearTimeout(feedbin.createTimeout);
+  feedbin.createTimeout = setTimeout(function() {
+    if (feedbin.formValid) {
+      $("[type=submit]").removeAttr("disabled");
+    }
+  }, 500);
+<% elsif @random %>
+  feedbin.formValid = true;
+  $("[type=submit]").removeAttr("disabled");
+<% elsif @address %>
+  window.location = "<%= j settings_newsletters_address_path(@address) %>";
+<% else %>
+  feedbin.formValid = false;
+  $("[data-behavior~=token_suffix]").html("");
+  $("[type=submit]").attr("disabled", "disabled");
+  $("[data-behavior~=token_message]").html("<%= j render Settings::Newsletters::Addresses::NewView::MessageComponent.new() %>");
+<% end %>

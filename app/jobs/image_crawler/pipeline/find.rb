@@ -26,10 +26,10 @@ module ImageCrawler
 
           Sidekiq.logger.info "Candidate: public_id=#{@image.id} original_url=#{original_url} count=#{count}"
 
-          download_cache = DownloadCache.copy(original_url, @image.preset_name)
+          download_cache = DownloadCache.copy(original_url, @image)
 
           if download_cache.copied?
-            image             = download_cache.image
+            image             = download_cache.cached_image
             image.storage_url = download_cache.storage_url
             image.id          = @image.id
 

@@ -1,13 +1,37 @@
-<div class="flex gap-4">
-  <div class="grow">
-    <label for="input" class="text-600 mb-2 block">Input</label>
-    <%= render(Form::SelectInputComponent.new) do |text| %>
-      <% text.input do %>
-        <select name="some_name" id="some_name">
-          <option value="option1">option1</option>
-          <option value="option2">option2</option>
-        </select>
-      <% end %>
-    <% end %>
-  </div>
-</div>
+<%=
+demo = Class.new(ApplicationComponent) do
+  def view_template(&)
+    div class: "flex gap-4" do
+      render Form::SelectInputComponent.new do |input|
+        input.input do
+          select_tag(:sort,
+            helpers.options_for_select([["Option 1", "1"], ["Option 2", "2"]], "1"),
+            class: "peer"
+          )
+        end
+      end
+
+      render Form::SelectInputComponent.new do |input|
+        input.input do
+          select_tag(:sort,
+            helpers.options_for_select([["Option 1", "1"], ["Option 2", "2"]], "1"),
+            class: "peer",
+            data: {focused: true}
+          )
+        end
+      end
+
+      render Form::SelectInputComponent.new do |input|
+        input.input do
+          select_tag(:sort,
+            helpers.options_for_select([["Option 1", "1"], ["Option 2", "2"]], "1"),
+            class: "peer",
+            disabled: true
+          )
+        end
+      end
+    end
+  end
+end
+render demo.new
+%>

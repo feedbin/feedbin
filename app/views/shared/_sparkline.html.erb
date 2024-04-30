@@ -1,7 +1,7 @@
 <svg class="tw-hidden md:block" width="<%= sparkline.width %>" height="<%= sparkline.height %>" stroke-width="<%= sparkline.stroke %>">
     <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="1">
-        <stop class="[stop-color:var(--color-green-600)]" offset="0%" stop-opacity="0.8"/>
-        <stop class="[stop-color:var(--color-green-600)]" offset="100%" stop-opacity="0"/>
+        <stop class="[stop-color:theme(colors.green.600)]" offset="0%" stop-opacity="0.8"/>
+        <stop class="[stop-color:theme(colors.green.600)]" offset="100%" stop-opacity="0"/>
     </linearGradient>
     <polygon points="<%= sparkline.fill %>" fill="url(#gradient)"></polygon>
     <polyline class="fill-transparent stroke-green-600 [stroke-linejoin:round] [stroke-linecap:round]" points="<%= sparkline.line %>"></polyline>
