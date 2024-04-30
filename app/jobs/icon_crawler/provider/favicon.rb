@@ -44,7 +44,7 @@ module IconCrawler
 
       def document
         return @document if defined?(@document)
-        @document = Nokogiri::HTML5(homepage)
+        @document = Nokogiri::HTML5(homepage.to_s)
       rescue => exception
         Sidekiq.logger.info "find_meta_links exception=#{exception.inspect} host=#{@host}"
         @document = nil
@@ -53,7 +53,7 @@ module IconCrawler
       def homepage
         return @homepage if defined?(@homepage)
         url = URI::HTTP.build(host: @host)
-        HTTP.timeout(write: 5, connect: 5, read: 5).follow.get(url)
+        @homepage = HTTP.timeout(write: 5, connect: 5, read: 5).follow.get(url)
       rescue => exception
         Sidekiq.logger.info "homepage exception=#{exception.inspect} host=#{@host}"
         @homepage = nil

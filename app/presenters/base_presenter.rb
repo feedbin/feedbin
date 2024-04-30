@@ -34,7 +34,7 @@ class BasePresenter
         end
         if url = feed.icons.to_a.find { _1.provider_favicon? }&.icon_url
           markup = <<-eos
-            <span class="favicon #{feed.favicon.host_class}" style="background-image: url(#{url});"></span>
+            <span class="favicon" style="background-image: url(#{url});"></span>
           eos
         end
         content = <<-eos

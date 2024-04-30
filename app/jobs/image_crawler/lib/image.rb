@@ -1,9 +1,25 @@
 module ImageCrawler
   class Image
-    ATTRIBUTES = %i[id preset_name image_urls entry_url download_path
-                    original_extension original_url final_url
-                    storage_url processed_path processed_extension
-                    width height placeholder_color camo]
+    ATTRIBUTES = %i[
+      camo
+      download_path
+      entry_url
+      final_url
+      fingerprint
+      height
+      icon_provider
+      icon_provider_id
+      id
+      image_urls
+      original_extension
+      original_url
+      placeholder_color
+      preset_name
+      processed_extension
+      processed_path
+      storage_url
+      width
+    ]
 
 
     attr_accessor *ATTRIBUTES
@@ -49,15 +65,6 @@ module ImageCrawler
         crop: :fill_crop,
         validate: true,
         job_class: ItunesFeedImage
-      },
-      profile: {
-        width: 400,
-        height: 400,
-        minimum_size: nil,
-        crop: :icon_crop,
-        directory: "profile",
-        validate: false,
-        job_class: TwitterProfileImage
       },
       icon: {
         width: 400,
@@ -109,13 +116,17 @@ module ImageCrawler
     end
 
     def send_to_feedbin
-      preset.job_class.perform_async(id, {
-        "original_url"      => final_url,
-        "processed_url"     => storage_url,
-        "width"             => width,
-        "height"            => height,
-        "placeholder_color" => placeholder_color
-      })
+      if preset.job_args == :image
+        preset.job_class.perform_async(to_h)
+      else
+        preset.job_class.perform_async(id, {
+          "original_url"      => final_url,
+          "processed_url"     => storage_url,
+          "width"             => width,
+          "height"            => height,
+          "placeholder_color" => placeholder_color
+        })
+      end
     end
 
     def image_name
