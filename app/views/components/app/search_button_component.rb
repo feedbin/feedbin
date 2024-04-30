@@ -1,7 +1,7 @@
 module App
   class SearchButtonComponent < ApplicationComponent
 
-    def template(&)
+    def view_template(&)
       button class: "w-full h-full flex flex-center", data: {
         controller: "event",
         action: "event#dispatch",

@@ -25,7 +25,7 @@ gem "bootsnap", require: false
 gem "clockwork"
 gem "coffee-rails"
 gem "connection_pool"
-gem "dotenv-rails"
+gem "dotenv-rails", "= 2.8.1"
 gem "down"
 gem "evernote_oauth"
 gem "fog-aws"
@@ -68,6 +68,7 @@ gem "twitter-text"
 gem "uglifier"
 gem "unicorn"
 gem "web-push"
+gem "autotuner"
 
 group :development do
   gem "benchmark-ips"
@@ -77,6 +78,8 @@ group :development do
   gem "listen"
   gem "foreman"
   gem "pry"
+  gem "guard"
+  gem "guard-minitest"
 end
 
 group :development, :test do

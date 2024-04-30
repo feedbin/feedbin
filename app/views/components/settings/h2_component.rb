@@ -1,7 +1,11 @@
 module Settings
   class H2Component < ApplicationComponent
-    def template(&)
-      h2(class: "mb-4 text-700 font-bold", &)
+    def initialize(attributes = {})
+      @attributes = attributes
+    end
+
+    def view_template(&)
+      h2(**mix({class: "mb-4 text-700 font-bold"}, @attributes), &)
     end
   end
 end

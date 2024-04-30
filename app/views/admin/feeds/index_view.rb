@@ -7,7 +7,7 @@ module Admin
         @feed = feed
       end
 
-      def template
+      def view_template
         render Settings::H1Component.new do
           "Feed Admin"
         end
@@ -24,7 +24,7 @@ module Admin
               )
             end
             input.accessory_leading do
-              render SvgComponent.new "icon-search", class: "fill-400 pg-focus:fill-blue-600"
+              render SvgComponent.new "icon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600"
             end
           end
         end
@@ -51,7 +51,7 @@ module Admin
         @feed = feed
       end
 
-      def template
+      def view_template
         div class: "p-4 grow border rounded-lg mb-8" do
 
           div class: "flex items-center mb-8" do
@@ -75,7 +75,7 @@ module Admin
 
 
             if @feed.fixable?
-              render SvgComponent.new "menu-icon-fix-feeds", class: "fill-600", title: "Fixable feeed", data: {toggle: "tooltip"}
+              render SvgComponent.new "menu-icon-fix-feeds", class: "fill-600", title: "Fixable feed", data: {toggle: "tooltip"}
             elsif @feed.dead?
               render SvgComponent.new "menu-icon-skull", class: "fill-600", title: "#{@feed.crawl_data.error_count} #{"Error".pluralize(@feed.crawl_data.error_count)}", data: {toggle: "tooltip"}
             elsif @feed.crawl_data.error_count > 0

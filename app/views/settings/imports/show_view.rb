@@ -5,11 +5,11 @@ module Settings
         @import = import
       end
 
-      def template
+      def view_template
         render Settings::H1Component.new do
           "Import Status"
         end
-        p class: "mb-8 -mt-6 text-500" do
+        render SubtitleComponent.new do
           @import.created_at.to_formatted_s(:date)
         end
         div data: @import.complete? ? {} : {content_src: helpers.settings_import_path(@import)} do

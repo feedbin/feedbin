@@ -5,7 +5,7 @@ module Settings
       @user = user
     end
 
-    def template
+    def view_template
       form_for @user, remote: true, url: helpers.settings_update_user_path(@user) do |f|
         render Settings::H1Component.new do
           "Settings"
@@ -129,6 +129,31 @@ module Settings
           end
         end
 
+        render Settings::ControlGroupComponent.new class: "mb-14" do |group|
+          group.header { "Pages" }
+
+          group.item do
+            render Settings::ControlRowComponent.new do |row|
+              row.title { "Bookmarklet" }
+
+              row.description do
+                plain "Drag this to your bookmarks bar. Use it to "
+                a(href: "/blog/2019/08/20/save-webpages-to-read-later/") do
+                  "save articles from the web"
+                end
+                plain " to Feedbin."
+              end
+
+              row.control do
+                link_to helpers.bookmarklet, onclick: "return false;", class: "button-secondary cursor-move" do
+                  render SvgComponent.new "favicon-saved", class: "fill-500"
+                  plain " Send to Feedbin "
+                  render SvgComponent.new "icon-grabber", class: "ml-6 fill-700"
+                end
+              end
+            end
+          end
+        end
 
         render Settings::ControlGroupComponent.new(class: "mb-14") do |group|
           group.header do

@@ -1,6 +1,6 @@
 <%=
 demo = Class.new(ApplicationComponent) do
-  def template(&)
+  def view_template(&)
     render Settings::ExpandableComponent.new(class: "mb-14") do |expandable|
       expandable.header do
         "Header"

@@ -9,7 +9,7 @@ module Settings
           @tag_editor = tag_editor
         end
 
-        def template
+        def view_template
           helpers.present subscription do |subscription_presenter|
             feed_profile(subscription_presenter)
             chart(subscription_presenter)

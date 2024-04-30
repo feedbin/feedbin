@@ -960,6 +960,7 @@ $.extend feedbin,
       feedbin.removeOuterLinks()
       feedbin.formatIframes($("[data-iframe-src]").not("[data-behavior~=iframe_placeholder]"))
       feedbin.checkType()
+      feedbin.audioVideo()
 
       callback = ->
         feedbin.preloadSiblings()
@@ -970,7 +971,6 @@ $.extend feedbin,
         feedbin.timeRemaining(entryId, true)
         feedbin.footnotes()
         feedbin.nextEntryPreview()
-        feedbin.audioVideo()
 
       animate = feedbin.animateScroll() && $('body').hasClass('one-up')
       delay = if animate then feedbin.fastAnimation else 0
@@ -2338,8 +2338,10 @@ $.extend feedbin,
         $(@).find('[data-behavior~=categories]').toggleClass('hide')
 
     settingsCheckbox: ->
-      $(document).on 'change', '[data-behavior~=auto_submit]', (event) ->
+      callback = (event) ->
         $(@).parents("form").submit()
+
+      $(document).on 'change', '[data-behavior~=auto_submit]', callback
 
     submitAdd: ->
       $(document).on 'submit', '[data-behavior~=subscription_options]', (event) ->
@@ -2448,7 +2450,7 @@ $.extend feedbin,
     autoSubmit: ->
       throttled = _.throttle((item)->
         item.closest('form').submit();
-      800);
+      400);
 
       $(document).on 'input', '[data-behavior~=autosubmit]', (event) ->
         throttled($(@))

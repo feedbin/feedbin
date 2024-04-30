@@ -2,7 +2,7 @@ class NewslettersController < ApplicationController
   skip_before_action :verify_authenticity_token
 
   def create
-    NewsletterProcessor.perform_async(params[:newsletter][:to], params[:newsletter][:url])
+    NewsletterReceiver.perform_async(params[:newsletter][:to], params[:newsletter][:url])
     head :ok
   end
 

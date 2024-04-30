@@ -9,7 +9,7 @@ module FixFeeds
       @include_ignore = include_ignore
     end
 
-    def template
+    def view_template
       div(class: "items-start") do
         div class: "flex gap-4" do
           div class: "flex inset-y-0 self-stretch" do
@@ -127,7 +127,7 @@ module FixFeeds
         @tooltip = tooltip
       end
 
-      def template
+      def view_template
         div class: "flex flex-col items-center w-[16px] inset-y-0 self-stretch shrink-0"  do
           div class: "w-[1px] shrink-0 bg-500 #{middle? ? "h-[21px]" : "h-[13px]"} #{first? ? "invisible" : ""}"
           div class: "flex w-[16px] h-[16px] flex-center my-[8px] shrink-0" do

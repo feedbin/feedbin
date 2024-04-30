@@ -8,7 +8,7 @@ module Settings
       @items = []
     end
 
-    def template
+    def view_template
       render App::ExpandableContainerComponent.new do |expandable|
         render Settings::ControlGroupComponent.new(**attributes) do |group|
           group.header(&@header)
@@ -35,7 +35,7 @@ module Settings
     end
 
     class ItemComponent < ApplicationComponent
-      def template(&)
+      def view_template(&)
         li(class: "border-b last:border-b-0", &)
       end
     end

@@ -116,10 +116,6 @@ class SettingsController < ApplicationController
     head :ok
   end
 
-  def newsletters_pages
-    render Settings::NewslettersPagesView.new(user: current_user, subscription_ids: @user.subscriptions.pluck(:feed_id)), layout: "settings"
-  end
-
   private
 
   def user_settings_params

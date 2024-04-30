@@ -5,7 +5,7 @@ module Shared
       @user = user
     end
 
-    def template
+    def view_template
       div(class: "group-data-[nav=modal]:-mt-4") do
         render ::SettingsNav::HeaderComponent.new do
           plain " General "
@@ -36,11 +36,11 @@ module Shared
           notification: helpers.current_user.setting_on?(:fix_feeds_available)
         ))
         render(::SettingsNav::NavComponent.new(
-          title: "Sources",
-          subtitle: "Newsletters & pages",
-          url: helpers.settings_newsletters_pages_path,
+          title: "Newsletters",
+          subtitle: "Addresses & senders",
+          url: helpers.settings_newsletters_path,
           icon: "menu-icon-newsletters",
-          selected: helpers.is_active?("settings", "newsletters_pages")
+          selected: helpers.is_active?(["settings/newsletters", "settings/newsletters/senders", "settings/newsletters/addresses"], %w[index show new])
         ))
       end
 

@@ -169,14 +169,14 @@ Rails.application.reloader.to_prepare do
     begin
       Search.client(mirror: true) { _1.request(:put, entry_index, json: entries_mapping) }
       Search.client(mirror: true) { _1.request(:put, action_index, json: actions_mapping) }
+
+      Search.client(mirror: true) { _1.add_alias(entry_index, alias_name: Entry.table_name) }
+      Search.client(mirror: true) { _1.add_alias(action_index, alias_name: Action.table_name) }
     rescue => exception
       Rails.logger.error("---------------------------")
       Rails.logger.error("Error initializing search: #{exception.inspect}")
       Rails.logger.error("---------------------------")
     end
-
-    Search.client(mirror: true) { _1.add_alias(entry_index, alias_name: Entry.table_name) }
-    Search.client(mirror: true) { _1.add_alias(action_index, alias_name: Action.table_name) }
   end
 
 end

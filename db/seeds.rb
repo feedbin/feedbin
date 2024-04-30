@@ -26,7 +26,16 @@ if Rails.env.development?
   u = User.new(email: "ben@benubois.com", password: "passw0rd", password_confirmation: "passw0rd", admin: true)
   u.plan = plan
   u.update_auth_token = true
+  u.addresses_available = 1
   u.save
+
+  feed = Feed.create!(title: "Example", feed_url: "https://example.com/index.xml", site_url: "https://example.com/")
+  feed2 = Feed.create!(title: "Example 2", feed_url: "https://example.com/index.xml?2", site_url: "https://example.com/")
+
+  token = u.authentication_tokens.newsletters.create!
+
+  token.newsletter_senders.create!(feed: feed, full_token: "full_token", email: "hello@blanccreatives.com", name: "Blanc Creatives")
+  token.newsletter_senders.create!(feed: feed2, full_token: "full_token", email: "news@changelog.com", name: "Changelog News")
 
   # u2 = User.new(email: "components", password: "components", password_confirmation: "components", admin: true)
   # u2.plan = plan

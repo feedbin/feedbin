@@ -9,7 +9,11 @@ export default class extends Controller {
     visible: Boolean,
   }
 
-  toggle() {
+  toggle(event) {
+    if (event.target.type === "radio") {
+      this.openValue = !(event.params.toggleTarget)
+    }
+
     this.openValue = !this.openValue
     afterTransition(this.transitionContainerTarget, this.openValue, () => {
       this.visibleValue = this.openValue

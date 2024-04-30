@@ -4,7 +4,7 @@ module App
       @params = params
     end
 
-    def template
+    def view_template
       div data: search_component_data, class: "search-wrap grid overflow-hidden min-h-0 group opacity-0 [grid-template-rows:0fr] data-[search-form-visible-value=true]:[grid-template-rows:1fr] data-[search-form-visible-value=true]:opacity-100 data-[search-form-foreground-value=true]:overflow-visible transition-[grid-template-rows]" do
         form_with url: search_entries_path, class: "search-form group min-h-0", remote: true, method: :get, autocomplete: "off", novalidate: true, data: search_form_data do |form|
           form.hidden_field :query_extra, value: "", data: stimulus_item(target: "queryExtra", for: :search_token)

@@ -18,7 +18,7 @@ module Settings
           .sort_by { _1.title }
       end
 
-      def template
+      def view_template
         render Settings::ControlGroupComponent.new class: "group mb-8", data: { capsule: "true" } do |group|
           group.item do
             div(class: "py-3 px-4") do

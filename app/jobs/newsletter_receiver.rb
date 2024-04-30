@@ -3,19 +3,21 @@ class NewsletterReceiver
   include Sidekiq::Worker
   sidekiq_options queue: :parse
 
-  def perform(full_token, email)
-    token = EmailNewsletter.token(full_token)
-    @user = AuthenticationToken.newsletters.active.where(token: token).take&.user
-    if @user
-      email = Mail.from_source(email)
-      @newsletter = EmailNewsletter.new(email, full_token)
-      entry = create
-      Sidekiq.logger.info "Newsletter created public_id=#{entry.public_id}"
+  def perform(address, url)
+    @address = Mail::Address.new(address)
+    @url = Addressable::URI.parse(url)
+    @user = original_authentication_token&.user
+
+    if @user && full_authentication_token&.active?
+      @newsletter = parse_newsletter
+      if entry = create
+        Sidekiq.logger.info "Newsletter created public_id=#{entry.public_id}"
+      end
     end
-    active = @user ? !@user.suspended : false
-    Librato.increment "newsletter.user_active.#{active}"
-  rescue ActiveRecord::RecordNotUnique
+    storage_client.delete_object(@url.host, storage_path)
   end
+
+  private
 
   def create
     create_feed
@@ -24,6 +26,7 @@ class NewsletterReceiver
       tag
     end
     create_entry
+  rescue ActiveRecord::RecordNotUnique
   end
 
   def subscribe
@@ -53,10 +56,40 @@ class NewsletterReceiver
     sender
   end
 
+  def parse_newsletter
+    email = storage_client.get_object(@url.host, storage_path)
+    email = Mail.from_source(email.body)
+    EmailNewsletter.new(email, @address.local)
+  end
+
+  def parsed_token
+    EmailNewsletter.token(@address.local)
+  end
+
+  def storage_path
+    @url.path.delete_prefix("/")
+  end
+
+  def full_authentication_token
+    return @full_authentication_token if defined?(@full_authentication_token)
+    @full_authentication_token = user.authentication_tokens.newsletters.find_or_create_by(token: @address.local)
+  end
+
+  def original_authentication_token
+    return @original_authentication_token if defined?(@original_authentication_token)
+    @original_authentication_token = AuthenticationToken.newsletters.where(token: parsed_token).take
+  end
+
+  def storage_client
+    @storage_client ||= begin
+      Fog::Storage.new(STORAGE)
+    end
+  end
+
   def sender
     @sender ||= begin
       attributes = {
-        token: newsletter.token,
+        token: newsletter.full_token,
         full_token: newsletter.full_token,
         email: newsletter.from_email,
         name: newsletter.name,
@@ -95,7 +128,7 @@ class NewsletterReceiver
         public_id: newsletter.entry_id,
         newsletter: newsletter.to_s,
         newsletter_from: newsletter.from,
-        data: {newsletter_text: newsletter.text, type: "newsletter", format: newsletter.format}
+        data: {newsletter_text: newsletter.text, type: "newsletter", format: newsletter.format, newsletter_to: newsletter.full_token}
       }
       feed.entries.create!(attributes).tap do |record|
         NewsletterSaver.perform_async(record.id)

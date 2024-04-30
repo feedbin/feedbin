@@ -50,7 +50,8 @@ class User < ApplicationRecord
     :billing_issue,
     :podcast_sort_order,
     :playlist_migration,
-    :fix_feeds_available
+    :fix_feeds_available,
+    :addresses_available
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -488,7 +489,15 @@ class User < ApplicationRecord
   end
 
   def newsletter_authentication_token
-    authentication_tokens.newsletters.active.take
+    authentication_tokens.newsletters.active.order(created_at: :desc).take
+  end
+
+  def newsletter_addresses
+    authentication_tokens.newsletters.active
+  end
+
+  def inactive_newsletter_addresses
+    authentication_tokens.newsletters.where(active: false)
   end
 
   def stripe_url

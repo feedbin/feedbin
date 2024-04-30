@@ -1,15 +1,16 @@
 module Settings
   class ControlGroupComponent < ApplicationComponent
 
-    slots :description
+    slots :description, :custom_header
 
     def initialize(options = {})
       @options = options
       @items = []
     end
 
-    def template
+    def view_template
       div(**@options) do
+        yield_content &@custom_header
         render(@header) if @header
         if @items.present?
           div(class: "border-y flex flex-col group-data-[capsule=true]:border group-data-[capsule=true]:rounded-lg group-data-[item-capsule=true]:border-0", data: {item_container: "true"}) do
@@ -33,7 +34,7 @@ module Settings
         @attributes = attributes
       end
 
-      def template(&)
+      def view_template(&)
         div(**attributes, &)
       end
 

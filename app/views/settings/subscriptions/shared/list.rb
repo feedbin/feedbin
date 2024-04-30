@@ -8,7 +8,7 @@ module Settings
           @params = params
         end
 
-        def template
+        def view_template
           div data_behavior: "subscriptions_list" do
             form_tag helpers.update_multiple_settings_subscriptions_path, method: :patch, autocomplete: "off", class: "group", data: {controller: "toggle-checkboxes", toggle_checkboxes_include_all_visible_value: "false"} do |update_form|
               hidden_field_tag :q, @params[:q]

@@ -11,7 +11,7 @@ module SettingsNav
       @notification = notification
     end
 
-    def template(&)
+    def view_template(&)
       li(class: %(mb-1 #{@classes})) do
         link_to *[*link_attributes] do
           span(class: "grid place-items-center shrink-0 w-[16px] h-[17px]") do
