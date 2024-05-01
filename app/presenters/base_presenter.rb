@@ -36,6 +36,10 @@ class BasePresenter
           markup = <<-eos
             <span class="favicon" style="background-image: url(#{url});"></span>
           eos
+        elsif feed.favicon&.cdn_url
+          markup = <<-eos
+            <span class="favicon #{feed.favicon.host_class}" style="background-image: url(#{feed.favicon.cdn_url});"></span>
+          eos
         end
         content = <<-eos
           <span class="favicon-wrap">
