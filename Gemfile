@@ -96,5 +96,6 @@ group :development, :test do
   gem "selenium-webdriver"
   gem "standard"
   gem "webmock", "= 3.8.0"
+  gem "phlex-testing-nokogiri"
 end
 

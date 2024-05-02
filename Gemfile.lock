@@ -465,6 +465,9 @@ GEM
     phlex-rails (1.2.1)
       phlex (~> 1.10.0)
       railties (>= 6.1, < 8)
+    phlex-testing-nokogiri (0.1.0)
+      nokogiri (~> 1.13)
+      phlex (>= 0.5)
     postmark (1.25.0)
       json
     postmark-rails (0.22.1)
@@ -738,6 +741,7 @@ DEPENDENCIES
   oauth2
   pg
   phlex-rails
+  phlex-testing-nokogiri
   postmark-rails
   premailer-rails
   pry
