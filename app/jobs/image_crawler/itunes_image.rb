@@ -22,11 +22,13 @@ module ImageCrawler
     end
 
     def schedule
-      image = Image.new({
+      image = Image.new_with_attributes(
         id: "#{@entry.public_id}-itunes",
         preset_name: "podcast",
-        image_urls: [@entry.rebase_url(@entry.data["itunes_image"])]
-      })
+        image_urls: [@entry.rebase_url(@entry.data["itunes_image"])],
+        provider: ::Image.providers[:entry_podcast],
+        provider_id: @entry.id
+      )
       Pipeline::Find.perform_async(image.to_h)
     end
 
