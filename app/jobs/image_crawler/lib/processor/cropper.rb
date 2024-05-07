@@ -40,7 +40,7 @@ module ImageCrawler
           .source(source)
           .resize_to_fill(width, height)
           .convert("jpg")
-          .saver(strip: true, quality: 90, background: 255)
+          .saver(strip: true, quality: 80, background: 255)
       end
 
       def limit_crop
@@ -49,7 +49,7 @@ module ImageCrawler
           .source(source)
           .resize_to_limit(@width, @height)
           .convert(extension)
-          .saver(strip: true, quality: 90)
+          .saver(strip: true, quality: 80)
 
         result = Processed.from_pipeline(image)
 
