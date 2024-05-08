@@ -270,7 +270,7 @@ class ApplicationController < ActionController::Base
   end
 
   def rate_limited?(count, period)
-    slug = ["limit", request.method, params[:controller], params[:action], current_user.id]
+    slug = ["limit", request.method, params[:controller], params[:action], current_user&.id, request.remote_ip]
     !Throttle.throttle!(slug.join(":"), count, period)
   end
 end
