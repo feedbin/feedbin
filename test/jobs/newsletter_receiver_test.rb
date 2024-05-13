@@ -90,7 +90,7 @@ class NewsletterReceiverTest < ActiveSupport::TestCase
     newsletter = EmailNewsletter.new(Mail.from_source(@newsletter_text), @token)
 
     tag = "Newsletters"
-    @user.update(newsletter_tag: tag)
+    @user.newsletter_authentication_token.update(newsletter_tag: tag)
 
     feed = Feed.create!(feed_url: newsletter.feed_url)
     @user.subscriptions.find_or_create_by(feed: feed)
