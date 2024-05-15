@@ -8,7 +8,7 @@ module FeedCrawler
     attr_accessor :force_refresh
 
     def perform(batch, priority_refresh)
-      feed_ids = build_ids(batch)
+      feed_ids = build_ids(batch).shuffle
       count = priority_refresh ? 1 : 0
 
       active = Subscription.select(:feed_id)
