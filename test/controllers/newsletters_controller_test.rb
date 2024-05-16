@@ -55,7 +55,9 @@ class NewslettersControllerTest < ActionController::TestCase
     authorize
     user = users(:ben)
     tag = "Newsletters"
-    user.update(newsletter_tag: tag)
+
+    token = user.newsletter_authentication_token
+    token.update(newsletter_tag: tag)
 
     Sidekiq::Testing.inline! do
       assert_difference("Tag.count", 1) do
@@ -73,7 +75,8 @@ class NewslettersControllerTest < ActionController::TestCase
     user = users(:ben)
     newsletter = EmailNewsletter.new(@newsletter_html, user.newsletter_authentication_token.token)
     tag = "Newsletters"
-    user.update(newsletter_tag: tag)
+    token = user.newsletter_authentication_token
+    token.update(newsletter_tag: tag)
 
     feed = Feed.create!(feed_url: newsletter.feed_url)
     user.subscriptions.find_or_create_by(feed: feed)
