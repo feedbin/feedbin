@@ -26,6 +26,14 @@ class CrawlData
     FeedCrawler::Throttle.throttled?(feed_url, downloaded_at)
   end
 
+  def downloaded_ago
+    if downloaded_at == 0
+      "never"
+    else
+      Time.now.to_i - downloaded_at
+    end
+  end
+
   def downloaded_at
     @data.downloaded_at.to_i
   end

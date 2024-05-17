@@ -20,6 +20,8 @@ module FeedCrawler
     end
 
     def download
+      Sidekiq.logger.info "Downloading url=#{@feed_url} last_download=#{@crawl_data.downloaded_ago}"
+
       @crawl_data.log_download
 
       @response = begin
