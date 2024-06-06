@@ -1,5 +1,19 @@
 module ContentFilters
-  ALLOWED_CLASSES = ["twitter-tweet", "instagram-media", "imgur-embed-pub"]
+  ALLOWED_CLASSES = %w[
+    twitter-tweet
+    instagram-media
+    imgur-embed-pub
+    kg-bookmark-card
+    kg-bookmark-author
+    kg-bookmark-container
+    kg-bookmark-content
+    kg-bookmark-description
+    kg-bookmark-icon
+    kg-bookmark-metadata
+    kg-bookmark-publisher
+    kg-bookmark-thumbnail
+    kg-bookmark-title
+  ]
 
   class Attributes < HTML::Pipeline::Filter
     def call
