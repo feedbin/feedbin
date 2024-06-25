@@ -4,7 +4,7 @@ module ImageCrawler
       include Sidekiq::Worker
       include SidekiqHelper
 
-      sidekiq_options queue: local_queue("parse"), retry: false
+      sidekiq_options queue: local_queue("process"), retry: false
 
       def perform(image_hash)
         @image = Image.new(image_hash)
