@@ -15,6 +15,8 @@ class ApplicationComponent < Phlex::HTML
   include Phlex::Rails::Helpers::SelectTag
   include Phlex::Rails::Helpers::TextFieldTag
 
+  include Common
+
   def self.slots(*items)
     include Phlex::DeferredRender
     items.each do |item|
