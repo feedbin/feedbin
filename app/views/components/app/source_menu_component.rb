@@ -38,6 +38,22 @@ module App
               end
 
               li do
+                button data: {behavior: "source_menu_mute", feed_id: @source_target} do
+                  span class: "icon-wrap" do
+                    render SvgComponent.new("menu-icon-mute")
+                  end
+                  span class: "menu-text" do
+                    span class: "title" do
+                      "Mute"
+                    end
+                  end
+                  form_with url: helpers.toggle_mute_subscription_path(@feed), method: :patch, data: {remote: true} do |form|
+                    form.submit type: "submit", class: "ui-helper-hidden-accessible", tabindex: "-1"
+                  end
+                end
+              end
+
+              li do
                 button data: {behavior: "source_menu_unsubscribe"} do
                   span class: "icon-wrap" do
                     render SvgComponent.new("menu-icon-delete")
@@ -52,26 +68,6 @@ module App
                   end
                 end
               end
-              # render(::SettingsNav::NavComponent.new(
-              #   title: "Mark Read",
-              #   url: helpers.settings_subscriptions_path,
-              #   icon: "menu-icon-mark-read",
-              # ))
-              # render(::SettingsNav::NavComponent.new(
-              #   title: "Edit",
-              #   url: helpers.settings_path,
-              #   icon: "menu-icon-edit",
-              # ))
-              # render(::SettingsNav::NavComponent.new(
-              #   title: "Mute",
-              #   url: helpers.settings_subscriptions_path,
-              #   icon: "menu-icon-mute",
-              # ))
-              # render(::SettingsNav::NavComponent.new(
-              #   title: "Unsubscribe",
-              #   url: helpers.settings_newsletters_path,
-              #   icon: "menu-icon-delete",
-              # ))
             end
           end
         end

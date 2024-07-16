@@ -84,7 +84,8 @@ class ApplicationController < ActionController::Base
       tag_visibility: @user.tag_visibility,
       visibility_key: "tag_visibility",
       sharing: @user.combined_sharing_services,
-      sharing_path: sharing_services_path
+      sharing_path: sharing_services_path,
+      muted_feeds: @user.subscriptions.where(muted: true).pluck(:feed_id)
     }
 
     render "site/logged_in"

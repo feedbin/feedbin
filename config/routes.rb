@@ -97,6 +97,7 @@ Rails.application.routes.draw do
   resources :subscriptions, only: [:index, :edit, :create, :destroy, :update] do
     member do
       delete :destroy_from_feed
+      patch :toggle_mute
     end
   end
 

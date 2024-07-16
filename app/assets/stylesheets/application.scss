@@ -1397,6 +1397,25 @@ $hamburger-dot: 4px;
         }
       }
     }
+    .muted-icon {
+      @include fill($color-contrast-500)
+      display: none;
+    }
+    &.muted-source {
+      .link-inner {
+        @include color($color-contrast-500);
+      }
+      .muted-icon {
+        display: block;
+      }
+      .count {
+        display: none;
+      }
+      .favicon-wrap {
+        filter: grayscale(100%);
+        opacity: 0.7;
+      }
+    }
     &.source-section {
       @include font-size(12);
       @include size-in-rems(padding-top, 22);

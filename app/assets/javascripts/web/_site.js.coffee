@@ -29,6 +29,16 @@ $.extend feedbin,
   remoteContentIntervals: {}
   fastAnimation: 200
 
+  toggleItemInArray: (array, item) ->
+    index = array.indexOf(item)
+
+    if index isnt -1
+      array.splice(index, 1)
+    else
+      array.push(item)
+
+    array
+
   sharedMarkRead: ->
     unless $(@).attr('disabled')
       $('.entries li').map ->
@@ -653,6 +663,12 @@ $.extend feedbin,
       feedbin.animateEntryContent(content)
     else
       innerContent.html(content)
+
+  formatFeeds: () ->
+    cssClass = "muted-source"
+    $("[data-feed-id].#{cssClass}").removeClass(cssClass)
+    $.each feedbin.data.muted_feeds, (index, feedId) ->
+      $("[data-feed-id=#{feedId}]").addClass(cssClass)
 
   updateFeeds: (feeds, digest) ->
     if feedbin.feedsDigest != digest
@@ -1645,6 +1661,14 @@ $.extend feedbin,
         unless $(event.target).is('[data-behavior~=rename_input]')
           $('[data-behavior~=rename_input]').each ->
             $(@).blur()
+
+    menuToggleMute: ->
+      $(document).on 'click', '[data-behavior~=source_menu_mute]', (event) ->
+        feedbin.hideSourceMenu(event, true)
+        feedId = $(@).data('feedId')
+        feedbin.data.muted_feeds = feedbin.toggleItemInArray(feedbin.data.muted_feeds, feedId)
+        feedbin.formatFeeds()
+        $("form", @).submit()
 
     menuUnsubscribe: ->
       $(document).on 'click', '[data-behavior~=source_menu_unsubscribe]', (event) ->
