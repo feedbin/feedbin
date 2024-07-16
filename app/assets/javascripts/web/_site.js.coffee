@@ -1890,17 +1890,14 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=toggle_source_menu]', (event) ->
         button = $(event.currentTarget)
         menu = $('.source-menu-container')
-
-        $(@).closest('.feed-link').addClass('showing-source-menu')
-
         currentMenu = null
+
         if feedbin.sourceMenu
           currentMenu = $(feedbin.sourceMenu.reference)
-          feedbin.sourceMenu.destroy()
-          feedbin.sourceMenu = null
-          menu.addClass('hide')
+          feedbin.hideSourceMenu(event, true)
 
         if !currentMenu || !currentMenu.is(button)
+          $(@).closest('.feed-link').addClass('showing-source-menu')
           content = $('template', button).html()
           menu.html(content)
           menu.css
@@ -1922,7 +1919,6 @@ $.extend feedbin,
           }
           feedbin.sourceMenu = new Popper(button, menu, options)
           menu.removeClass('hide')
-          event.stopPropagation()
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=add_to_pages]', (event) ->
@@ -2460,6 +2456,9 @@ $.extend feedbin,
 
       $(document).on 'click', '[data-behavior~=open_item]', (event) ->
         feedbin.hideLinkActions()
+        feedbin.hideSourceMenu(null, true)
+        feedbin.hideFormatMenu(null, true)
+
 
       $(document).on 'mouseleave', '[data-behavior~=link_actions]', (event) ->
         url = $(@).data('url')

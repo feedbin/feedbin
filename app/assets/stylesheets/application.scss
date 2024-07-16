@@ -1158,7 +1158,7 @@ $hamburger-dot: 4px;
           display: flex;
         }
         .count-wrap {
-          display: none;
+          visibility: hidden;
         }
       }
       a.showing-source-menu {
@@ -1166,7 +1166,7 @@ $hamburger-dot: 4px;
           display: flex;
         }
         .count-wrap {
-          display: none;
+          visibility: hidden;
         }
       }
       .feed-action-form {
@@ -1384,6 +1384,7 @@ $hamburger-dot: 4px;
         line-height: 1;
         display: flex;
         align-items: center;
+        padding-right: 16px;
       }
       .collection-label {
         display: block;
