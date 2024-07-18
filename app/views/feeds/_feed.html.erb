@@ -14,7 +14,7 @@
                         </span>
                     </span>
 
-                    <%= render App::SourceMenuComponent.new(feed: feed, source_target: feed.id) %>
+                    <%= render SourceMenu::Feed.new(feed: feed, source_target: feed.id) %>
                 </span>
             <% end %>
         <% end %>
