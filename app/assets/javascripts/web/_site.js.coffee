@@ -1674,8 +1674,9 @@ $.extend feedbin,
       $(document).on 'click', '[data-behavior~=source_menu_unsubscribe]', (event) ->
         feedbin.hideSourceMenu(event, true)
         link = $(@)
+        message = link.data('message')
         callback = ->
-          confirmation = confirm("Are you sure you want to unsubscribe?")
+          confirmation = confirm(message)
           if confirmation
             $("form", link).submit()
         setTimeout callback, 10

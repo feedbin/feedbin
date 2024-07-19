@@ -7,31 +7,9 @@ module SourceMenu
 
     def view_template
       render(Wrapper.new) do
-        li do
-          button data: {behavior: "menu_mark_read", source_target: @source_target} do
-            span class: "icon-wrap" do
-              render SvgComponent.new("menu-icon-mark-read")
-            end
-            span class: "menu-text" do
-              span class: "title" do
-                "Mark as read"
-              end
-            end
-          end
-        end
+        render ActionMarkRead.new(source_target: @source_target)
+        render ActionEdit.new(href: helpers.edit_subscription_path(@feed, app: true))
 
-        li do
-          a href: helpers.edit_subscription_path(@feed, app: true), data: {behavior: "open_settings_modal feed_settings close_source_menu", remote: true} do
-            span class: "icon-wrap" do
-              render SvgComponent.new("menu-icon-edit")
-            end
-            span class: "menu-text" do
-              span class: "title" do
-                "Edit"
-              end
-            end
-          end
-        end
 
         li do
           button data: {behavior: "source_menu_mute", feed_id: @source_target} do
@@ -50,7 +28,7 @@ module SourceMenu
         end
 
         li do
-          button data: {behavior: "source_menu_unsubscribe"} do
+          button data: {behavior: "source_menu_unsubscribe", message: "Are you sure you want to unsubscribe?"} do
             span class: "icon-wrap" do
               render SvgComponent.new("menu-icon-delete")
             end
