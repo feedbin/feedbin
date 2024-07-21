@@ -1156,9 +1156,15 @@ $hamburger-dot: 4px;
       a:has(.source-menu):hover {
         .source-menu {
           display: flex;
+          .touch & {
+            display: none;
+          }
         }
         .count-wrap {
           visibility: hidden;
+          .touch & {
+            visibility: visible;
+          }
         }
       }
       a.showing-source-menu {
