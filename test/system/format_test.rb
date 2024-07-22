@@ -10,7 +10,7 @@ class FormatTest < ApplicationSystemTestCase
 
     click_link(@entries.first.title)
 
-    find("[data-behavior~=show_format_menu]").click
+    find("[data-behavior~=toggle_format_menu]").click
 
     assert find(".format-palette").visible?
 

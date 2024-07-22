@@ -4,7 +4,7 @@ module ImageCrawler
       include Sidekiq::Worker
       include SidekiqHelper
 
-      sidekiq_options queue: local_queue("parse"), retry: false
+      sidekiq_options queue: local_queue("process"), retry: false
 
       def perform(image_hash)
         @image = Image.new(image_hash)
@@ -25,10 +25,11 @@ module ImageCrawler
           @image.height              = cropped.height
           @image.placeholder_color   = cropped.placeholder_color
           @image.processed_extension = cropped.extension
+          @image.fingerprint         = cropped.fingerprint
 
           Upload.perform_async(@image.to_h)
         else
-          image = Image.new(id: @image.id, preset_name: @image.preset_name, image_urls: @image.image_urls)
+          image = Image.new_with_attributes(id: @image.id, preset_name: @image.preset_name, image_urls: @image.image_urls, provider: @image.provider, provider_id: @image.provider_id)
           FindCritical.perform_async(image.to_h) unless @image.image_urls.empty?
         end
       ensure

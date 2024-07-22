@@ -1,4 +1,4 @@
-<% cache [tag, tag.user_feeds, "v4"] do %>
+<% cache [tag, tag.user_feeds, "v5"] do %>
     <li class="tag" data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" data-behavior="droppable">
         <%= link_to tag_path(tag.id),
             remote: true,
@@ -27,6 +27,7 @@
                 <span class="count-wrap">
                     <%= content_tag :span, '', class: 'count', data: {behavior: 'needs_count', count_group: 'byTag', count_group_id: tag.id} %>
                 </span>
+                <%= render SourceMenu::Tag.new(tag: tag, source_target: "tag-#{tag.id}") %>
             </span>
         <% end %>
         <div class="drawer feed-drawer" data-behavior="feed_drawer expandable">

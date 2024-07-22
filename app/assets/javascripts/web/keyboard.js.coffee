@@ -76,10 +76,10 @@ class feedbin.Keyboard
     @setEnvironment()
     if 'pagedown' == combo || 'shift+j' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
-        @scrollContent(@contentHeight() - 100, 'down')
+        @scrollContent(@contentHeight() - 100, 'down', true)
     else if 'pageup' == combo || 'shift+k' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
-        @scrollContent(@contentHeight() - 100, 'up')
+        @scrollContent(@contentHeight() - 100, 'up', true)
     else if 'down' == combo || 'j' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
         @scrollContent(30, 'down')
@@ -114,10 +114,10 @@ class feedbin.Keyboard
   navigateEntryContent: (combo) ->
     @selectColumn('entries')
     @setEnvironment()
-    if 'pagedown' == combo
-      @scrollContent(@contentHeight() - 100, 'down')
-    else if 'pageup' == combo
-      @scrollContent(@contentHeight() - 100, 'up')
+    if 'pagedown' == combo || 'shift+j' == combo
+      @scrollContent(@contentHeight() - 100, 'down', true)
+    else if 'pageup' == combo || 'shift+k' == combo
+      @scrollContent(@contentHeight() - 100, 'up', true)
     else if 'down' == combo
       @scrollContent(30, 'down')
     else if 'up' == combo
@@ -146,8 +146,8 @@ class feedbin.Keyboard
       @setEnvironment()
       if @hasEntryContent()
         @selectColumn('entry-content')
-        interval = $('.entry-content').height() - 20
-        @scrollContent(interval, 'down')
+        interval = $('.entry-content').height() - 40
+        @scrollContent(interval, 'down', true)
       else if @hasUnreadEntries()
         @selectNextUnreadEntry()
       else if @hasUnreadFeeds()
@@ -482,14 +482,20 @@ class feedbin.Keyboard
   hasEntryContent: ->
     @entryScrollHeight() - $('.entry-content').prop('scrollTop') > 2
 
-  scrollContent: (interval, direction) ->
+  scrollContent: (interval, direction, animate = false) ->
+    container = $('.entry-content')
+    scrollTop = container.prop('scrollTop')
     if 'down' == direction
-      newPosition = $('.entry-content').prop('scrollTop') + interval
+      newPosition = scrollTop + interval
     else if 'up' == direction
-      newPosition = $('.entry-content').prop('scrollTop') - interval
+      newPosition = scrollTop - interval
     if newPosition > @entryScrollHeight()
       newPosition = @entryScrollHeight()
-    $('.entry-content').prop 'scrollTop', newPosition
+
+    if animate
+      container.stop(true).animate({scrollTop: newPosition}, {duration: 300, easing: "easeOutQuad"})
+    else
+      container.prop 'scrollTop', newPosition
 
   entryScrollHeight: ->
     $('.entry-content').prop('scrollHeight') - $('.entry-content').prop('offsetHeight') - @nextEntryPreviewHeight()

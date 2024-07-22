@@ -52,12 +52,14 @@ module ImageCrawler
       end
 
       if image_urls.present? || entry_url.present?
-        Image.new({
-          id: @entry.public_id,
+        Image.new_with_attributes(
+          id:          @entry.public_id,
           preset_name: preset_name,
-          image_urls: image_urls,
-          entry_url: entry_url
-        }).to_h
+          image_urls:  image_urls,
+          provider:    ::Image.providers[:entry_content],
+          provider_id: @entry.id,
+          entry_url:   entry_url
+        ).to_h
       end
     end
 

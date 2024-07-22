@@ -34,8 +34,9 @@ class NewsletterReceiver
   end
 
   def tag
-    if user.newsletter_tag.present? && !already_tagged?
-      feed.tag(user.newsletter_tag, user)
+    tag = full_authentication_token.newsletter_tag || original_authentication_token.newsletter_tag
+    if tag.present? && !already_tagged?
+      feed.tag(tag, user)
     end
   end
 

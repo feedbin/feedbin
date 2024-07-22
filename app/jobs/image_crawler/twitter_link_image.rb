@@ -18,11 +18,14 @@ module ImageCrawler
     end
 
     def schedule
-      image = Image.new({
+      image = Image.new_with_attributes(
         id: "#{@entry.public_id}-twitter",
         preset_name: "twitter",
-        entry_url: @page_url
-      })
+        image_urls: [],
+        provider: ::Image.providers[:entry_link],
+        provider_id: @entry.id,
+        entry_url: @page_url,
+      )
       Pipeline::Find.perform_async(image.to_h)
     end
 

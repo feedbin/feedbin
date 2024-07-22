@@ -21,6 +21,7 @@ $.extend feedbin,
   extractCache: {}
   previousContentView: 'default'
   formatMenu: null
+  sourceMenu: null
   hasShadowDOM: typeof(document.createElement("div").attachShadow) == "function"
   colorHash: new ColorHash
   scrollStarted: false
@@ -28,19 +29,51 @@ $.extend feedbin,
   remoteContentIntervals: {}
   fastAnimation: 200
 
-  hideFormatMenu: (event) ->
-    menu = $('.format-palette')
-    button = $('[data-behavior~=show_format_menu]')
+  toggleItemInArray: (array, item) ->
+    index = array.indexOf(item)
+
+    if index isnt -1
+      array.splice(index, 1)
+    else
+      array.push(item)
+
+    array
+
+  sharedMarkRead: ->
+    unless $(@).attr('disabled')
+      $('.entries li').map ->
+        entry_id = $(@).data('entry-id') * 1
+
+      if feedbin.data.mark_as_read_confirmation
+        result = confirm(feedbin.markReadData.message)
+        if result
+          feedbin.markRead()
+      else
+        feedbin.markRead()
+    return
+
+  hideMenu: (event, content, button, menu, force = false) ->
     hide = ->
-      if feedbin.formatMenu
-        feedbin.formatMenu.destroy()
-        feedbin.formatMenu = null
-        menu.addClass('hide')
-    if event
-      if !feedbin.isRelated(menu, event.target) && !feedbin.isRelated(button, event.target)
+      if feedbin[menu]
+        feedbin[menu].destroy()
+        feedbin[menu] = null
+        content.addClass('hide')
+    if event && !force
+      if !feedbin.isRelated($('[data-behavior~=menu_content]'), event.target) && !feedbin.isRelated(button, event.target)
         hide()
     else
       hide()
+
+  hideSourceMenu: (event, force = false) ->
+    content = $('.source-menu-container')
+    button = $('[data-behavior~=toggle_source_menu]')
+    $('.showing-source-menu').removeClass('showing-source-menu')
+    feedbin.hideMenu(event, content, button, "sourceMenu", force)
+
+  hideFormatMenu: (event, force = false) ->
+    content = $('.format-palette')
+    button = $('[data-behavior~=toggle_format_menu]')
+    feedbin.hideMenu(event, content, button, "formatMenu", force)
 
   prepareShareMenu: (data) ->
     buildLink = (item, data, index) ->
@@ -631,6 +664,12 @@ $.extend feedbin,
     else
       innerContent.html(content)
 
+  formatFeeds: () ->
+    cssClass = "muted-source"
+    $("[data-feed-id].#{cssClass}").removeClass(cssClass)
+    $.each feedbin.data.muted_feeds, (index, feedId) ->
+      $("[data-feed-id=#{feedId}]").addClass(cssClass)
+
   updateFeeds: (feeds, digest) ->
     if feedbin.feedsDigest != digest
       feedbin.feedsDigest = digest
@@ -881,7 +920,7 @@ $.extend feedbin,
   fullWidthImage: (img) ->
     load = ->
       width = img.get(0).naturalWidth
-      if width > 528 && img.parents(".modal").length == 0  && img.parents("table").length == 0  && img.parents("blockquote").length == 0  && img.parents("table").length == 0  && img.parents("li").length == 0
+      if width > 528 && img.parents(".system-content").length == 0 && img.parents(".modal").length == 0  && img.parents("table").length == 0  && img.parents("blockquote").length == 0  && img.parents("table").length == 0  && img.parents("li").length == 0
         img.addClass("full-width")
       img.addClass("show")
 
@@ -1623,6 +1662,37 @@ $.extend feedbin,
           $('[data-behavior~=rename_input]').each ->
             $(@).blur()
 
+    menuToggleMute: ->
+      $(document).on 'click', '[data-behavior~=source_menu_mute]', (event) ->
+        feedbin.hideSourceMenu(event, true)
+        feedId = $(@).data('feedId')
+        feedbin.data.muted_feeds = feedbin.toggleItemInArray(feedbin.data.muted_feeds, feedId)
+        feedbin.formatFeeds()
+        $("form", @).submit()
+
+    menuUnsubscribe: ->
+      $(document).on 'click', '[data-behavior~=source_menu_unsubscribe]', (event) ->
+        feedbin.hideSourceMenu(event, true)
+        link = $(@)
+        message = link.data('message')
+        callback = ->
+          confirmation = confirm(message)
+          if confirmation
+            $("form", link).submit()
+        setTimeout callback, 10
+
+    menuMarkRead: ->
+      $(document).on 'click', '[data-behavior~=menu_mark_read]', (event) ->
+        targetSelector = $(@).data('source-target')
+        target = $("[data-feed-id=#{targetSelector}]")
+        feedbin.markReadData = $('[data-mark-read]', target).data('mark-read')
+        feedbin.hideSourceMenu(event, true)
+
+        callback = ->
+          feedbin.sharedMarkRead()
+        setTimeout callback, 10
+
+        event.preventDefault()
 
     markRead: ->
       $(document).on 'click', '[data-mark-read]', ->
@@ -1631,17 +1701,7 @@ $.extend feedbin,
         return
 
       $(document).on 'click', '[data-behavior~=mark_all_as_read]', ->
-        unless $(@).attr('disabled')
-          $('.entries li').map ->
-            entry_id = $(@).data('entry-id') * 1
-
-          if feedbin.data.mark_as_read_confirmation
-            result = confirm(feedbin.markReadData.message)
-            if result
-              feedbin.markRead()
-          else
-            feedbin.markRead()
-        return
+        feedbin.sharedMarkRead()
 
     selectable: ->
       $(document).on 'click', '[data-behavior~=selectable]', ->
@@ -1684,6 +1744,11 @@ $.extend feedbin,
       $(document).on 'ajax:beforeSend', '[data-behavior~=show_entries]', (event) ->
         unless $(event.target).is('[data-behavior~=feed_action_parent]')
           feedbin.clearEntry()
+        return
+
+    nullForm: ->
+      $(document).on 'ajax:beforeSend', '[data-behavior~=null_form]', (event, xhr) ->
+        xhr.abort()
         return
 
     cancelFeedRequest: ->
@@ -1813,7 +1878,7 @@ $.extend feedbin,
       $(document).on 'click', (event) ->
         feedbin.hideFormatMenu(event)
 
-      $(document).on 'click', '[data-behavior~=show_format_menu]', (event) ->
+      $(document).on 'click', '[data-behavior~=toggle_format_menu]', (event) ->
         $('.dropdown-wrap.open').removeClass('open')
         button = $(event.currentTarget)
         menu = $('.format-palette')
@@ -1839,6 +1904,46 @@ $.extend feedbin,
           feedbin.formatMenu = new Popper(button, menu, options)
           menu.removeClass('hide')
           event.stopPropagation()
+
+    showSourceMenu: ->
+      $(document).on 'click', (event) ->
+        feedbin.hideSourceMenu(event)
+
+      $(document).on 'click', '[data-behavior~=close_source_menu]', (event) ->
+        feedbin.hideSourceMenu(event)
+
+      $(document).on 'click', '[data-behavior~=toggle_source_menu]', (event) ->
+        button = $(event.currentTarget)
+        menu = $('.source-menu-container')
+        currentMenu = null
+
+        if feedbin.sourceMenu
+          currentMenu = $(feedbin.sourceMenu.reference)
+          feedbin.hideSourceMenu(event, true)
+
+        if !currentMenu || !currentMenu.is(button)
+          $(@).closest('.feed-link').addClass('showing-source-menu')
+          content = $('template', button).html()
+          menu.html(content)
+          menu.css
+            display: "block"
+
+          options = {
+            placement: 'bottom',
+            modifiers: {
+              preventOverflow: {
+                padding: 7
+              },
+              offset: {
+                offset: "0, -5"
+              },
+              flip: {
+                enabled: false
+              },
+            }
+          }
+          feedbin.sourceMenu = new Popper(button, menu, options)
+          menu.removeClass('hide')
 
     linkActions: ->
       $(document).on 'click', '[data-behavior~=add_to_pages]', (event) ->
@@ -2187,8 +2292,6 @@ $.extend feedbin,
     searchError: ->
       $(document).on 'ajax:error', '[data-behavior~=search_form]', (event, xhr) ->
         window.xhrEvent = xhr
-        console.log event
-        console.log xhr
         feedbin.showNotification('Search error.', true);
         return
 
@@ -2378,6 +2481,9 @@ $.extend feedbin,
 
       $(document).on 'click', '[data-behavior~=open_item]', (event) ->
         feedbin.hideLinkActions()
+        feedbin.hideSourceMenu(null, true)
+        feedbin.hideFormatMenu(null, true)
+
 
       $(document).on 'mouseleave', '[data-behavior~=link_actions]', (event) ->
         url = $(@).data('url')
@@ -2599,9 +2705,9 @@ $.extend feedbin,
         feedbin.hideNotification(false)
 
     unsubscribe: ->
-      $(document).on 'click', '[data-behavior~=unsubscribe]', (event) ->
+      callback = (item) ->
         $('.modal').modal('hide')
-        feed = $(@).data('feed-id')
+        feed = item.data('feed-id')
         if (feedbin.data.viewMode != 'view_starred')
           $(".feeds [data-feed-id=#{feed}]").remove()
         $(".entries .feed-id-#{feed}").remove()
@@ -2613,6 +2719,12 @@ $.extend feedbin,
         window.dispatchEvent(new CustomEvent("hide-search"))
         $('[data-behavior~=feed_settings]').attr('disabled', 'disabled')
         $('body').addClass('nothing-selected').removeClass('feed-selected entry-selected')
+
+      $(document).on 'click', '[data-behavior~=unsubscribe]', (event) ->
+        callback($(@))
+
+      $(document).on 'submit', '[data-behavior~=unsubscribe]', (event) ->
+        callback($(@))
 
     profiles: ->
       $(document).on 'click', (event, xhr) ->
@@ -2640,7 +2752,6 @@ $.extend feedbin,
       feedbin.setThemeColor()
       darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
       darkModeMediaQuery.addListener (event) ->
-        console.log "called"
         feedbin.setThemeColor()
         setTimeout feedbin.setNativeTheme, 300
 

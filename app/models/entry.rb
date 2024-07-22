@@ -12,6 +12,8 @@ class Entry < ApplicationRecord
   has_many :starred_entries
   has_many :recently_read_entries
 
+  has_many :images, -> { where(provider: [:entry_content, :entry_podcast, :entry_link]) }, foreign_key: :provider_id, primary_key: :id
+
   before_create :ensure_published
   before_create :create_summary
   before_create :update_content

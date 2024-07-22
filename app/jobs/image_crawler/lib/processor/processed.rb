@@ -42,6 +42,10 @@ module ImageCrawler
         source.height
       end
 
+      def fingerprint
+        Digest::MD5.file(@file).hexdigest
+      end
+
       def placeholder_color
         hex = nil
         file = ImageProcessing::Vips

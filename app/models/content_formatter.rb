@@ -111,7 +111,7 @@ class ContentFormatter
       context[:scrub_mode] = :newsletter
     end
 
-    filters = [HTML::Pipeline::SmileyFilter, ContentFilters::Scrub, ContentFilters::Attributes, HTML::Pipeline::SrcFixer, HTML::Pipeline::IframeFilter]
+    filters = [HTML::Pipeline::SmileyFilter, ContentFilters::Scrub, ContentFilters::Attributes, HTML::Pipeline::SrcFixer, HTML::Pipeline::IframeFilter, ContentFilters::GhostCard]
 
     if ENV["CAMO_HOST"] && ENV["CAMO_KEY"] && image_proxy_enabled
       context[:asset_proxy] = ENV["CAMO_HOST"]

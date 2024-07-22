@@ -38,3 +38,7 @@
     </li>
     <%= render partial: "feeds/feed", collection: feeds, cached: -> (feed) { [feed, feed.favicon, "v2"] } %>
 <% end %>
+
+<script>
+  feedbin.formatFeeds();
+</script>

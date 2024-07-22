@@ -84,7 +84,8 @@ class ApplicationController < ActionController::Base
       tag_visibility: @user.tag_visibility,
       visibility_key: "tag_visibility",
       sharing: @user.combined_sharing_services,
-      sharing_path: sharing_services_path
+      sharing_path: sharing_services_path,
+      muted_feeds: @user.subscriptions.where(muted: true).pluck(:feed_id)
     }
 
     render "site/logged_in"
@@ -270,7 +271,7 @@ class ApplicationController < ActionController::Base
   end
 
   def rate_limited?(count, period)
-    slug = ["limit", request.method, params[:controller], params[:action], current_user.id]
+    slug = ["limit", request.method, params[:controller], params[:action], current_user&.id, request.remote_ip]
     !Throttle.throttle!(slug.join(":"), count, period)
   end
 end

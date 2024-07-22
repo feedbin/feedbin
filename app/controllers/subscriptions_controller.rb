@@ -55,6 +55,16 @@ class SubscriptionsController < ApplicationController
     destroy_subscription(subscription.id)
   end
 
+  def destroy_from_feed
+    subscription = @user.subscriptions.where(feed_id: params[:id]).take!
+    destroy_subscription(subscription.id)
+  end
+
+  def toggle_mute
+    subscription = @user.subscriptions.where(feed_id: params[:id]).take!
+    subscription.toggle!(:muted)
+  end
+
   private
 
   def destroy_subscription(subscription_id)

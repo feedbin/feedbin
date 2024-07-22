@@ -29,12 +29,15 @@ require File.expand_path("../../config/environment", __FILE__)
 require "rails/test_help"
 require "sidekiq/testing"
 require "webmock/minitest"
+require "phlex/testing/nokogiri"
+require "phlex/testing/rails/view_helper"
 
 require "support/login_helper"
 require "support/factory_helper"
 require "support/assertions"
 require "support/api_controller_test_case"
 require "support/push_server_mock"
+require "component_test_case"
 
 ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
 StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
