@@ -93,10 +93,10 @@ $.extend feedbin,
       else
         message = "#{minutes} minutes left"
       durationElement.text(message)
-    if reload
-      $.get(feedbin.data.progress_path).success (data) ->
-        feedbin.data.progress = data
-        feedbin.timeRemaining(entryId)
+    # if reload
+    #   $.get(feedbin.data.progress_path).success (data) ->
+    #     feedbin.data.progress = data
+    #     feedbin.timeRemaining(entryId)
 
   playState: ->
     if typeof(window.player) != "undefined"
