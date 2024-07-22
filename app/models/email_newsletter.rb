@@ -60,7 +60,7 @@ class EmailNewsletter
   end
 
   def entry_id
-    @entry_id ||= Digest::SHA1.hexdigest("#{feed_id}#{subject}#{timestamp}")
+    @entry_id ||= Digest::SHA1.hexdigest("#{feed_id}#{subject}#{content}")
   end
 
   def domain
