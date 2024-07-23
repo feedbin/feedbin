@@ -32,7 +32,7 @@ class ApplicationController < ActionController::Base
     get_feeds_list
     subscriptions = @user.subscriptions
 
-    user_titles = subscriptions.each_with_object({}) { |subscription, hash|
+    user_titles = subscriptions.includes(:feed).each_with_object({}) { |subscription, hash|
       if subscription.title.present?
         hash[subscription.feed_id] = ERB::Util.html_escape_once(subscription.title)
       end
