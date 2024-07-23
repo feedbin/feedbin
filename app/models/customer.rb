@@ -66,19 +66,7 @@ class Customer
 
   def subscription
     @subscription ||= begin
-      Stripe::Subscription.retrieve(
-        id: customer.subscriptions.first.id,
-        expand: ["latest_invoice.payment_intent", "pending_setup_intent"]
-      )
-    end
-  end
-
-  def subscription
-    @subscription ||= begin
-      Stripe::Subscription.retrieve(
-        id: customer.subscriptions.first.id,
-        expand: ["latest_invoice.payment_intent", "pending_setup_intent"]
-      )
+      Stripe::Subscription.list(customer: customer.id, limit: 1).first
     end
   end
 end

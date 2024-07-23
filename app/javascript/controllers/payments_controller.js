@@ -13,6 +13,7 @@ export default class extends Controller {
     stripePublicKey: String,
     defaultPlanPrice: Number,
     paymentMethod: String,
+    planPeriod: String
   }
 
   stripe = null
@@ -22,7 +23,7 @@ export default class extends Controller {
     this.stripe = window.Stripe(this.stripePublicKeyValue)
     this.elements = this.stripe.elements({
       mode: "subscription",
-      amount: this.trialingValue ? 0 : this.defaultPlanPriceValue,
+      amount: this.defaultPlanPriceValue,
       currency: "usd",
       appearance: this.appearance(),
       setupFutureUsage: "off_session",
@@ -39,8 +40,8 @@ export default class extends Controller {
     })
   }
 
-  updateAmount(event) {
-    if (this.trialingValue) return
+  updatePlan(event) {
+    this.planPeriodValue = event.params.period
     this.elements.update({
       amount: event.params.amount,
     })

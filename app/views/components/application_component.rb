@@ -51,7 +51,9 @@ class ApplicationComponent < Phlex::HTML
     stimulus_controller = binding.local_variable_get(:for).to_s.dasherize
 
     action = actions.map do |event, function|
-      "#{event}->#{stimulus_controller}##{function.to_s.camelize(:lower)}"
+      [*function].map do |function|
+        "#{event}->#{stimulus_controller}##{function.to_s.camelize(:lower)}"
+      end
     end.join(" ").presence
 
     params.transform_keys! do |key|

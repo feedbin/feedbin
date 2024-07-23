@@ -11,7 +11,19 @@ module Shared
         @expandable_outlet = "#{@stimulus_controller}-expandable"
       end
 
-      def template
+      def view_template
+        p class: "mb-8" do
+          if @user.plan.stripe_id == "trial"
+            if @user.days_left <= 0
+              "Your trial has ended. Subscribe now to continue using Feedbin."
+            else
+              plain "Your trial period will end in "
+              strong { helpers.pluralize(@user.days_left, 'day') }
+              plain ". Subscribe now to continue using Feedbin uninterrupted."
+            end
+          end
+        end
+
         div class: "group", data: stimulus_controller do
           form_for @user do |form|
             render Settings::ControlGroupComponent.new class: "mb-14" do |group|
@@ -35,7 +47,9 @@ module Shared
 
           render App::ExpandableContainerComponent.new(selector: @expandable_outlet) do |expandable|
             expandable.content do
-              div class: "mb-8", data: stimulus_item(target: :payment_element, for: @stimulus_controller)
+              div class: "mb-4", data: stimulus_item(target: :payment_element, for: @stimulus_controller)
+
+              payment_info
 
               render Settings::ButtonRowComponent.new do
                 button data: submit_data, class: "button group-data-[payments-payment-method-value=apple-pay]:tw-hidden"  do
@@ -50,6 +64,24 @@ module Shared
         end
       end
 
+      def payment_info
+        @plans.each do |plan|
+          p class: "text-sm text-500 #{plan.period == "year" ? "group-data-[payments-plan-period-value=month]:tw-hidden" : "group-data-[payments-plan-period-value=year]:tw-hidden"}" do
+            plain "Subscribing will charge you "
+            strong { helpers.number_to_currency(plan.price, precision: 0) }
+
+            if @user.trial_end.future?
+              plain " on "
+              strong { @user.trial_end.to_formatted_s(:date) }
+            else
+              plain " immediately"
+            end
+
+            plain " and again each #{plan.period} thereafter. Full refunds are available at any time, no questions asked."
+          end
+        end
+      end
+
       def plan_row(plan:, form:, group:)
         group.item do
           form.radio_button(:plan_id, plan.id, {
@@ -58,10 +90,11 @@ module Shared
             checked: plan == @default_plan,
             data: stimulus_item(
               actions: {
-                change: :update_amount
+                change: :update_plan
               },
               params: {
                 amount: plan.price_in_cents,
+                period: plan.period
               },
               for: @stimulus_controller
             )
@@ -93,6 +126,7 @@ module Shared
             default_plan_price: @default_plan.price_in_cents,
             trialing: (@user.days_left > 0).to_s,
             payment_method: nil,
+            plan_period: @default_plan.period
           },
           outlets: {
             expandable: "[data-#{@expandable_outlet}]"
