@@ -1417,9 +1417,14 @@ $hamburger-dot: 4px;
       .count {
         display: none;
       }
-      .favicon-wrap {
+      .favicon-wrap * {
         filter: grayscale(100%);
         opacity: 0.7;
+      }
+      &.selected {
+        .muted-icon {
+          fill: white;
+        }
       }
     }
     &.source-section {

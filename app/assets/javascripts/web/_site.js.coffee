@@ -2433,6 +2433,7 @@ $.extend feedbin,
         $('[data-behavior~=share_form] .description-placeholder').attr('placeholder', description)
 
     dragAndDrop: ->
+      return if feedbin.native
       feedbin.droppable()
       feedbin.draggable()
 
