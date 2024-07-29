@@ -147,7 +147,10 @@ module FeedCrawler
     end
 
     def test_should_not_be_ok_after_error
-      stub_request(:get, @feed.feed_url).to_return(status: 429)
+      retry_after = 1000
+      time = Time.now.to_i + retry_after
+
+      stub_request(:get, @feed.feed_url).to_return(status: 429, headers: {"Retry-After" => retry_after})
 
       Downloader.new.perform(@feed.id, @feed.feed_url, 10, {})
       migration = PersistCrawlData.new
@@ -155,6 +158,7 @@ module FeedCrawler
       migration.perform
 
       refute @feed.reload.crawl_data.ok?(@feed.feed_url), "Should not be ok?"
+      assert_equal(time, @feed.reload.crawl_data.last_error["retry_after"])
 
       job = Downloader.new
       job.critical = true
