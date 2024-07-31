@@ -1208,7 +1208,7 @@ $hamburger-dot: 4px;
         .feed-action-clear {
           @include color(white);
         }
-        .source-menu {
+        > a .source-menu {
           @include fill(white);
         }
         .clear-form {
