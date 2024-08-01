@@ -271,6 +271,7 @@ class User < ApplicationRecord
   end
 
   def trial_plan_valid
+    return if free_ok == true
     trial_plan = Plan.find_by_stripe_id("trial")
     if plan_id == trial_plan.id && plan_id_was != trial_plan.id && !plan_id_was.nil?
       errors.add(:plan_id, "is invalid")
