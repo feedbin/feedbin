@@ -88,7 +88,7 @@ module FeedCrawler
     end
 
     def ignore_http_caching?
-      critical || @crawl_data.ignore_http_caching?
+      critical
     end
   end
 end
