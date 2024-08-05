@@ -716,6 +716,7 @@ DEPENDENCIES
   carrierwave!
   clockwork
   coffee-rails
+  concurrent-ruby
   connection_pool
   debug
   dotenv-rails (= 2.8.1)

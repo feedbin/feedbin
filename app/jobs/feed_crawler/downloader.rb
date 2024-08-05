@@ -36,6 +36,8 @@ module FeedCrawler
       Sidekiq.logger.info "Downloaded modified=#{modified} http_status=\"#{@response.status}\" url=#{@feed_url} ignore_http_caching=#{@crawl_data.ignore_http_caching?}"
 
       parse if modified
+    rescue ConcurrencyLimit::TimeoutError => exception
+      Sidekiq.logger.info "Download timed out url=#{@feed_url} exception=#{exception.inspect}"
     rescue Feedkit::Error => exception
       @crawl_data.download_error(exception)
       message = "Feedkit::Error: attempts=#{@crawl_data.error_count} exception=#{exception.inspect} id=#{@feed_id} url=#{@feed_url}"
@@ -49,15 +51,18 @@ module FeedCrawler
       parsed_url = Feedkit::BasicAuth.parse(@feed_url)
       url = @crawl_data.redirected_to ? @crawl_data.redirected_to : parsed_url.url
       Sidekiq.logger.info "Redirect: from=#{@feed_url} to=#{@crawl_data.redirected_to} id=#{@feed_id}" if @crawl_data.redirected_to
-      Feedkit::Request.download(url,
-        on_redirect:   on_redirect,
-        username:      parsed_url.username,
-        password:      parsed_url.password,
-        last_modified: ignore_http_caching? ? nil : @crawl_data.last_modified,
-        etag:          ignore_http_caching? ? nil : @crawl_data.etag,
-        auto_inflate:  auto_inflate,
-        user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
-      )
+
+      ConcurrencyLimit.acquire(@feed_url, timeout: 5) do
+        Feedkit::Request.download(url,
+          on_redirect:   on_redirect,
+          username:      parsed_url.username,
+          password:      parsed_url.password,
+          last_modified: ignore_http_caching? ? nil : @crawl_data.last_modified,
+          etag:          ignore_http_caching? ? nil : @crawl_data.etag,
+          auto_inflate:  auto_inflate,
+          user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
+        )
+      end
     end
 
     def on_redirect
