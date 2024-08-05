@@ -27,8 +27,8 @@ module FeedCrawler
     end
 
     def throttled_hosts
-      (ENV["THROTTLED_HOSTS"] || "").split("\s").map {_1.split("=")}.each_with_object({}) do |(host, weight), hash|
-        hash[host] = weight&.to_i || 1
+      FeedbinUtils.key_value_parser(ENV["THROTTLED_HOSTS"]) do |weight|
+        weight&.to_i || 1
       end
     end
 
