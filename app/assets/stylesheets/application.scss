@@ -2144,6 +2144,10 @@ $feed-title-width: 115px;
   @include border-bottom($color-borders);
   transition: transform 0.2s ease;
   transform: translate3d(0, 0, 0);
+  .feature-flag-floaty-true & {
+    @include border($color-borders);
+    border-radius: 8px;
+  }
   &.animate {
     transform: translate3d(0, 0, 0);
   }
@@ -2535,7 +2539,15 @@ $feed-title-width: 115px;
   .has-content & {
     display: block;
   }
+  .feature-flag-floaty-true & {
+    max-width: 700px;
+    margin: 16px auto 0 auto;
+    width: 100%;
+    padding: 0 16px;
+  }
 }
+
+
 
 .entry-content-wrap {
   z-index: 0;

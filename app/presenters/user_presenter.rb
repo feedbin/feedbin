@@ -108,6 +108,7 @@ class UserPresenter < BasePresenter
         array << "entries-image-#{entries_image}"
         array << "entries-display-#{entries_display}"
         array << "setting-view-link-#{view_links_in_app}"
+        array << "feature-flag-floaty-#{user.floaty.to_s}"
       end.flatten.join(" ")
     end
   end

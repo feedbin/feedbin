@@ -51,7 +51,8 @@ class User < ApplicationRecord
     :podcast_sort_order,
     :playlist_migration,
     :fix_feeds_available,
-    :addresses_available
+    :addresses_available,
+    :floaty
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
