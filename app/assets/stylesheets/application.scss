@@ -2145,7 +2145,7 @@ $feed-title-width: 115px;
   transition: transform 0.2s ease;
   transform: translate3d(0, 0, 0);
   .feature-flag-floaty-true & {
-    @include border($color-borders);
+    @include border($color-borders, $root: true);
     border-radius: 8px;
   }
   &.animate {
