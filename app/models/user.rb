@@ -487,7 +487,7 @@ class User < ApplicationRecord
   end
 
   def newsletter_address
-    "#{newsletter_authentication_token.token}@newsletters.feedbin.com"
+    "#{newsletter_authentication_token.token}@#{ENV["NEWSLETTER_ADDRESS_HOST"]}"
   end
 
   def newsletter_authentication_token
