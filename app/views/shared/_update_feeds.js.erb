@@ -1,24 +1,25 @@
-<%
+<%-
 feeds = j(render(partial: "feeds/feeds", locals: {collections: @feed_data[:collections], saved_searches: @feed_data[:saved_searches], tags: @feed_data[:tags], feeds: @feed_data[:feeds], page_feed: @feed_data[:page_feed]}))
 digest = Digest::SHA1.hexdigest(feeds)
 %>
 
-var position = $(".feeds").prop("scrollTop");
-var result = feedbin.updateFeeds("<%= feeds %>", "<%= digest %>");
+<% if digest != params[:feed_digest] %>
+feedbin.feedsDigest = "<%= digest %>";
+$('[data-behavior~=feeds_target]').html("<%= feeds %>")
+
+let position = $(".feeds").prop("scrollTop");
+feedbin.resort(<%= @feed_data[:feed_order].to_json.html_safe %>)
+feedbin.applyUserTitles();
+feedbin.draggable();
+feedbin.droppable();
+feedbin.faviconColors($(".feeds-column"));
+feedbin.reselect();
+feedbin.setTagVisibility()
+$(".feeds").prop("scrollTop", position);
+<% end %>
 
 feedbin.count_data = <%= @feed_data[:count_data].to_json.html_safe %>;
-feedbin.resort(<%= @feed_data[:feed_order].to_json.html_safe %>)
 feedbin.Counts.get().update(feedbin.count_data);
 feedbin.applyCounts(false);
-
-if (result !== false) {
-  feedbin.applyUserTitles();
-  feedbin.draggable();
-  feedbin.droppable();
-  feedbin.faviconColors($(".feeds-column"));
-  feedbin.reselect();
-  feedbin.setTagVisibility()
-  $(".feeds").prop("scrollTop", position);
-}
 
 $.get(feedbin.data.saved_searches_count_path);

@@ -670,13 +670,6 @@ $.extend feedbin,
     $.each feedbin.data.muted_feeds, (index, feedId) ->
       $("[data-feed-id=#{feedId}]").addClass(cssClass)
 
-  updateFeeds: (feeds, digest) ->
-    if feedbin.feedsDigest != digest
-      feedbin.feedsDigest = digest
-      $('[data-behavior~=feeds_target]').html(feeds)
-    else
-      false
-
   clearEntries: ->
     $('[data-behavior~=entries_target]').html('')
 
@@ -1038,7 +1031,7 @@ $.extend feedbin,
 
   refresh: ->
     if feedbin.data
-      $.get(feedbin.data.auto_update_path)
+      $.get(feedbin.data.auto_update_path, {feed_digest: feedbin.feedsDigest})
 
   shareOpen: ->
     $('[data-behavior~=toggle_share_menu]').parents('.dropdown-wrap').hasClass('open')
