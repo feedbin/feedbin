@@ -18,6 +18,7 @@ class FeedsController < ApplicationController
   end
 
   def auto_update
+    expires_now
     get_feeds_list
   end
 
