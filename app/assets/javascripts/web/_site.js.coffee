@@ -1826,6 +1826,11 @@ $.extend feedbin,
         event.preventDefault()
         return
 
+    sourceable: ->
+      $(document).on 'click', '[data-sourceable-payload-param]', (event) ->
+        custom = new CustomEvent("sourceable:selected", {detail: {data: $(@).data("sourceablePayloadParam"), target: event.currentTarget}})
+        window.dispatchEvent(custom)
+
     entriesLoading: ->
       $(document).on 'click', '[data-behavior~=feed_link]', (event) ->
         feedId = $(@).data('feed-id')

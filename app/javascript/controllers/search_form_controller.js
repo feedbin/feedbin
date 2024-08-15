@@ -30,6 +30,7 @@ export default class extends Controller {
       this.optionsVisibleValue = false
     } else {
       this.queryTarget.focus()
+      this.searchTokenOutlet.buildJumpable()
     }
 
     if (!this.visibleValue && this.hasSearchTokenOutlet) {
