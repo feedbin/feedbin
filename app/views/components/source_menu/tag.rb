@@ -20,7 +20,7 @@ module SourceMenu
                 "Delete"
               end
             end
-            form_with url: helpers.tag_path(@tag), method: :delete, data: {remote: true} do |form|
+            form_with url: helpers.tag_path(@tag), method: :delete, local: false do |form|
               form.submit type: "submit", class: "ui-helper-hidden-accessible", tabindex: "-1"
             end
           end
