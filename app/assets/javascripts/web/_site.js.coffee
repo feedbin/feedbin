@@ -29,15 +29,15 @@ $.extend feedbin,
   remoteContentIntervals: {}
   fastAnimation: 200
 
-  toggleItemInArray: (array, item) ->
-    index = array.indexOf(item)
+  updateStyles: (url) ->
+    element = $("link[href='#{url}']")
 
-    if index isnt -1
-      array.splice(index, 1)
-    else
-      array.push(item)
-
-    array
+    if element.length == 0
+      tag = $("<link />").attr(
+        href: url
+        rel: "stylesheet"
+      )
+      $('head').append(tag)
 
   sharedMarkRead: ->
     unless $(@).attr('disabled')
