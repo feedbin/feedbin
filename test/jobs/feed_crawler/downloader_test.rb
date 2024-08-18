@@ -38,6 +38,41 @@ module FeedCrawler
       assert_equal 0, Parser.jobs.size, "should be empty because fingerprint will match"
     end
 
+    def test_should_persist_crawl_data_on_changed_conditional_headers_and_unchanged_fingerprint
+      new_etag = "new_etag"
+      new_last_modified = "new_last_modified"
+      download_fingerprint = "694b08e" # unchanged
+
+      existing_crawl_data = CrawlData.new({
+        etag: "old_etag",
+        last_modified: "old_last_modified",
+        checksum: download_fingerprint,
+        last_uncached_download: 1.hour.ago.to_i  # recent to not invoke ignore_http_caching?
+      })
+      refute existing_crawl_data.ignore_http_caching?, "should be false to test correctly"
+
+      stub_request(:get, /dhy5vgj5baket\.cloudfront\.net/).to_return(status: 404)
+      stub_request_file("atom.xml", @feed.feed_url,{
+        headers: {
+          "Etag" => new_etag,
+          "Last-Modified" => new_last_modified
+        }
+      })
+
+      Sidekiq::Testing.inline! do
+        Downloader.perform_async(@feed.id, @feed.feed_url, 10, existing_crawl_data.to_h)
+      end
+
+      assert_equal 0, Parser.jobs.size, "should be empty because fingerprint will match"
+
+      crawl_data = @feed.reload.crawl_data
+      assert_equal(new_etag, crawl_data.etag)
+      assert_equal(new_last_modified, crawl_data.last_modified)
+      assert_equal(download_fingerprint, crawl_data.download_fingerprint) # should not change
+      assert_delta(Time.now.to_i, crawl_data.last_uncached_download, 1.0)
+      assert_delta(Time.now.to_i, crawl_data.downloaded_at, 1.0)
+    end
+
     def test_should_not_persist_crawl_before_parse
       stub_request(:get, /dhy5vgj5baket\.cloudfront\.net/).to_return(status: 404)
       stub_request_file("atom.xml", @feed.feed_url)
