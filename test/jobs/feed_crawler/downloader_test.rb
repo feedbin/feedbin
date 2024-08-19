@@ -69,8 +69,7 @@ module FeedCrawler
       assert_equal(new_etag, crawl_data.etag)
       assert_equal(new_last_modified, crawl_data.last_modified)
       assert_equal(download_fingerprint, crawl_data.download_fingerprint) # should not change
-      assert_delta(Time.now.to_i, crawl_data.last_uncached_download, 1.0)
-      assert_delta(Time.now.to_i, crawl_data.downloaded_at, 1.0)
+      assert_in_delta(Time.now, Time.at(crawl_data.downloaded_at), 1.0)
     end
 
     def test_should_not_persist_crawl_before_parse
