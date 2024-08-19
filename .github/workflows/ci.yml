@@ -91,7 +91,7 @@ jobs:
           ruby -v
           psql -c 'create database feedbin_test;' -U postgres
           bundle exec rake db:setup
-          bundle exec rails test:system test
+          bundle exec rails test:all
 
       - name: Lint JS
         run: npm run lint
