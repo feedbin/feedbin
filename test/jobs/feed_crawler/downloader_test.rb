@@ -46,7 +46,7 @@ module FeedCrawler
       old_crawl_data = CrawlData.new({
         etag: "old_etag",
         last_modified: "old_last_modified",
-        checksum: download_fingerprint,
+        download_fingerprint: download_fingerprint,
         downloaded_at: 1.hour.ago.to_i,
         last_uncached_download: 1.hour.ago.to_i, # recent to not invoke ignore_http_caching?
       })
@@ -60,11 +60,11 @@ module FeedCrawler
         }
       })
 
-      Sidekiq::Testing.inline! do
-        Downloader.perform_async(@feed.id, @feed.feed_url, 10, old_crawl_data.to_h)
-      end
+      Downloader.new.perform(@feed.id, @feed.feed_url, 10, old_crawl_data.to_h)
 
       assert_equal 0, Parser.jobs.size, "should be empty because fingerprint will match"
+
+      FeedCrawler::PersistCrawlData.new.perform # crawl-data written to redis, but job is not enqueued, so run it now
 
       crawl_data = @feed.reload.crawl_data
       assert_equal(new_etag, crawl_data.etag)
@@ -145,7 +145,7 @@ module FeedCrawler
       data = CrawlData.new({
         etag: etag,
         last_modified: last_modified,
-        checksum: nil,
+        download_fingerprint: nil,
         last_uncached_download: Time.now.to_i
       })
 
