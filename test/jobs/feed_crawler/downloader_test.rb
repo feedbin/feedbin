@@ -63,8 +63,7 @@ module FeedCrawler
       Downloader.new.perform(@feed.id, @feed.feed_url, 10, old_crawl_data.to_h)
 
       assert_equal 0, Parser.jobs.size, "should be empty because fingerprint will match"
-
-      FeedCrawler::PersistCrawlData.new.perform # crawl-data written to redis, but job is not enqueued, so run it now
+      PersistCrawlData.new.perform
 
       crawl_data = @feed.reload.crawl_data
       assert_equal(new_etag, crawl_data.etag)
