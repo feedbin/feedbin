@@ -32,10 +32,13 @@ module FeedCrawler
 
       @crawl_data.download_success(@feed_id)
 
-      modified = !@response.not_modified?(@crawl_data.download_fingerprint)
-      Sidekiq.logger.info "Downloaded modified=#{modified} http_status=\"#{@response.status}\" url=#{@feed_url} ignore_http_caching=#{@crawl_data.ignore_http_caching?}"
+      conditionally_identical = @response.status == 304
+      content_identical = conditionally_identical || @response.checksum == @crawl_data.download_fingerprint
 
-      parse if modified
+      Sidekiq.logger.info "Downloaded modified=#{!content_identical} http_status=\"#{@response.status}\" url=#{@feed_url} ignore_http_caching=#{@crawl_data.ignore_http_caching?}"
+
+      @crawl_data.save(@response) unless conditionally_identical
+      parse unless content_identical
     rescue ConcurrencyLimit::TimeoutError => exception
       Sidekiq.logger.info "Download timed out url=#{@feed_url} exception=#{exception.inspect}"
     rescue Feedkit::Error => exception
@@ -74,7 +77,6 @@ module FeedCrawler
     def parse
       @parsing = true
       @response.persist!
-      @crawl_data.save(@response)
       job_class = critical ? ParserCritical : Parser
       job_id = job_class.perform_async(@feed_id, @response.path, @response.encoding.to_s, @crawl_data.to_h)
       Sidekiq.logger.info "Parse enqueued job_id=#{job_id} path=#{@response.path}"
