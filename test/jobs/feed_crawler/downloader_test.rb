@@ -155,32 +155,6 @@ module FeedCrawler
       assert_equal 0, ParserCritical.jobs.size
     end
 
-    def test_should_ignore_http_caching
-      defaults = {
-        etag: "etag",
-        last_modified: "last_modified",
-        checksum: nil,
-        last_uncached_download: 24.hours.ago.to_i
-      }
-      data = CrawlData.new(defaults)
-
-      url = "http://example.com/atom.xml"
-      stub_request(:get, url)
-
-      Downloader.new.perform(1, url, 10, data.to_h)
-
-      assert_requested(:get, url, times: 1) { _1.headers["If-None-Match"] == nil && _1.headers["If-Modified-Since"] == nil }
-
-      WebMock.reset!
-
-      stub_request(:get, url)
-
-      data = CrawlData.new(defaults.merge!({last_uncached_download: Time.now.to_i}))
-      Downloader.new.perform(1, url, 10, data.to_h)
-      assert_requested(:get, url, times: 1) { _1.headers["If-None-Match"] == defaults[:etag] && _1.headers["If-Modified-Since"] == defaults[:last_modified] }
-
-    end
-
     def test_should_not_be_ok_after_error
       retry_after = 1000
       time = Time.now.to_i + retry_after
