@@ -31,12 +31,11 @@ module FeedCrawler
       end
 
       content_changed = !@response.not_modified?(@crawl_data.download_fingerprint)
-      headers_changed = @crawl_data.etag != @response.etag || @crawl_data.last_modified != @response.last_modified
 
-      Sidekiq.logger.info "Downloaded headers_changed=#{headers_changed} content_changed=#{content_changed} http_status=\"#{@response.status}\" url=#{@feed_url}"
+      Sidekiq.logger.info "Downloaded content_changed=#{content_changed} http_status=\"#{@response.status}\" url=#{@feed_url}"
 
       @crawl_data.download_success(@feed_id)
-      @crawl_data.save(@response) if headers_changed
+      @crawl_data.save(@response)
 
       parse if content_changed
     rescue ConcurrencyLimit::TimeoutError => exception
