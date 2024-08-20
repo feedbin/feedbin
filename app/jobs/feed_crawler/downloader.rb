@@ -30,15 +30,12 @@ module FeedCrawler
         request(auto_inflate: false)
       end
 
+      Sidekiq.logger.info "Downloaded headers_changed=#{headers_changed?} content_changed=#{content_changed?} http_status=\"#{@response.status}\" url=#{@feed_url}"
+
       @crawl_data.download_success(@feed_id)
+      @crawl_data.save(@response) if headers_changed?
 
-      conditionally_identical = @response.status == 304
-      content_identical = conditionally_identical || @response.checksum == @crawl_data.download_fingerprint
-
-      Sidekiq.logger.info "Downloaded modified=#{!content_identical} http_status=\"#{@response.status}\" url=#{@feed_url} ignore_http_caching=#{@crawl_data.ignore_http_caching?}"
-
-      @crawl_data.save(@response) unless conditionally_identical
-      parse unless content_identical
+      parse if content_changed?
     rescue ConcurrencyLimit::TimeoutError => exception
       Sidekiq.logger.info "Download timed out url=#{@feed_url} exception=#{exception.inspect}"
     rescue Feedkit::Error => exception
@@ -60,8 +57,8 @@ module FeedCrawler
           on_redirect:   on_redirect,
           username:      parsed_url.username,
           password:      parsed_url.password,
-          last_modified: ignore_http_caching? ? nil : @crawl_data.last_modified,
-          etag:          ignore_http_caching? ? nil : @crawl_data.etag,
+          last_modified: @crawl_data.last_modified,
+          etag:          @crawl_data.etag,
           auto_inflate:  auto_inflate,
           user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
         )
@@ -89,8 +86,12 @@ module FeedCrawler
       }.to_json)
     end
 
-    def ignore_http_caching?
-      critical
+    def headers_changed?
+      @crawl_data.etag != @response.etag || @crawl_data.last_modified != @response.last_modified
+    end
+
+    def content_changed?
+      !@response.not_modified?(@crawl_data.download_fingerprint)
     end
   end
 end

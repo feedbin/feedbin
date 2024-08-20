@@ -40,18 +40,6 @@ class CrawlData
 
   def log_download
     @data.downloaded_at = Time.now.to_i
-    if ignore_http_caching?
-      @data.last_uncached_download = Time.now.to_i
-    end
-  end
-
-  def last_uncached_download
-    Time.at(@data.last_uncached_download.to_i)
-  end
-
-  def ignore_http_caching?
-    return @ignore_http_caching if defined?(@ignore_http_caching)
-    @ignore_http_caching = last_uncached_download.before?(rand(8..16).hours.ago)
   end
 
   def download_success(feed_id)

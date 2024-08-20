@@ -29,10 +29,8 @@ module FeedCrawler
       assert_equal(etag, crawl_data.etag)
       assert_equal(last_modified, crawl_data.last_modified)
       assert_equal(download_fingerprint, crawl_data.download_fingerprint)
-      assert_not_nil(crawl_data.last_uncached_download)
       assert_not_nil(crawl_data.downloaded_at)
 
-      refute crawl_data.ignore_http_caching?, "should be false with recent uncached download"
 
       Downloader.new.perform(@feed.id, @feed.feed_url, 10, @feed.reload.crawl_data.to_h)
       assert_equal 0, Parser.jobs.size, "should be empty because fingerprint will match"
@@ -48,11 +46,8 @@ module FeedCrawler
         last_modified: "old_last_modified",
         download_fingerprint: download_fingerprint,
         downloaded_at: 1.hour.ago.to_i,
-        last_uncached_download: 1.hour.ago.to_i, # recent to not invoke ignore_http_caching?
       })
-      refute old_crawl_data.ignore_http_caching?, "should be false to test correctly"
 
-      stub_request(:get, /dhy5vgj5baket\.cloudfront\.net/).to_return(status: 404)
       stub_request_file("atom.xml", @feed.feed_url,{
         headers: {
           "Etag" => new_etag,
@@ -73,7 +68,6 @@ module FeedCrawler
     end
 
     def test_should_not_persist_crawl_before_parse
-      stub_request(:get, /dhy5vgj5baket\.cloudfront\.net/).to_return(status: 404)
       stub_request_file("atom.xml", @feed.feed_url)
       Downloader.new.perform(@feed.id, @feed.feed_url, 10, {})
       PersistCrawlData.new.perform
@@ -145,7 +139,6 @@ module FeedCrawler
         etag: etag,
         last_modified: last_modified,
         download_fingerprint: nil,
-        last_uncached_download: Time.now.to_i
       })
 
       url = "http://example.com/atom.xml"
