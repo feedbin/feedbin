@@ -604,6 +604,7 @@ $.extend feedbin,
 
   animateEntryContent: (content) ->
     innerContent = $('[data-behavior~=inner_content_target]')
+    $('.entry-content').removeClass('current')
 
     if $(feedbin.selectedEntry.container.closest("li")).isAfter(feedbin.previousEntry.container.closest("li"))
       next = $('<div class="next-entry load-next-entry"></div>')
@@ -615,6 +616,7 @@ $.extend feedbin,
     $('.entry-toolbar').addClass("animate")
 
     next.html(content)
+    $('.entry-content', next).addClass('current')
 
     next.insertAfter(innerContent)
 
@@ -1273,12 +1275,45 @@ $.extend feedbin,
     if feedbin.Counts.get().isStarred(entryId)
       $('[data-behavior~=selected_entry_data]').addClass('starred')
 
+  entryScroll: ->
+    lastScrollPosition = 0
+    scrollClass = "entry-scrolling-up"
+
+    $(".entry-meta").addClass("no-transition")
+    $("body").removeClass(scrollClass)
+    callback = ->
+      $(".entry-meta").removeClass("no-transition")
+    setTimeout callback, 150
+
+    scrolled = (element) ->
+      maxScrollHeight = $(element).prop('scrollHeight') - $(element).prop('offsetHeight')
+      currentScrollPosition = $(element).prop('scrollTop')
+
+      if maxScrollHeight < $('.entry-meta').outerHeight()
+        $("body").removeClass(scrollClass)
+      else if currentScrollPosition <= 0
+        $("body").removeClass(scrollClass)
+      else if currentScrollPosition >= maxScrollHeight
+        $("body").addClass(scrollClass)
+      else if currentScrollPosition > lastScrollPosition
+        $("body").addClass(scrollClass)
+      else if currentScrollPosition < lastScrollPosition
+        $("body").removeClass(scrollClass)
+
+      lastScrollPosition = currentScrollPosition
+
+    $('.feature-flag-floaty-true .entry-content').off 'scroll'
+
+    $('.feature-flag-floaty-true .entry-content.current').on 'scroll', (event) ->
+      scrolled(@)
+
   showEntry: (entryId) ->
     try
       entry = feedbin.entries[entryId]
       $('body').removeClass('extract-active')
       feedbin.updateEntryContent(entry.content, entry.inner_content)
       feedbin.formatEntryContent(entryId, true)
+      feedbin.entryScroll()
       if feedbin.viewType == 'updated'
         $('[data-behavior~=change_content_view][data-view-mode=diff]').prop('checked', true).change()
       else if feedbin.data.subscription_view_mode[entry.feed_id] == "newsletter"

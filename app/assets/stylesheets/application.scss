@@ -618,12 +618,14 @@ $search-height: 47px;
     width: 280px;
     @include background-color($color-base);
   }
-  .inner-column {
+  .inner-column, .entry-inner-column {
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
+  }
+  .inner-column {
     display: flex;
     flex-direction: column;
   }
@@ -2147,6 +2149,12 @@ $feed-title-width: 115px;
   .feature-flag-floaty-true & {
     @include border($color-borders, $root: true);
     border-radius: 8px;
+    margin-top: 16px;
+    width: 100%;
+    flex: 1;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
   }
   &.animate {
     transform: translate3d(0, 0, 0);
@@ -2247,6 +2255,7 @@ $feed-title-width: 115px;
 .basement-panel {
   max-height: calc(100vh - $toolbar-height);
   overflow-y: scroll;
+  @include background-color($color-base);
 }
 
 .basement-toolbar {
@@ -2536,17 +2545,32 @@ $feed-title-width: 115px;
   z-index: 2;
   @include background-color($color-base);
   display: none;
+  position: absolute;
+  top: 0;
+  bottom: $toolbar-height;
+  left: 0;
+  right: 0;
+  align-content: stretch;
+  transition: transform 0.15s ease-out;
+  .toolbar-wrap {
+    flex: 1;
+  }
   .has-content & {
-    display: block;
+    display: flex;
   }
   .feature-flag-floaty-true & {
-    max-width: 700px;
-    margin: 16px auto 0 auto;
-    width: 100%;
+    height: $toolbar-height + 16px;
+    bottom: $toolbar-height + 16px;
     padding: 0 16px;
+  }
+  .entry-scrolling-up.feature-flag-floaty-true & {
+    transform: translateY(-$toolbar-height - 16px);
   }
 }
 
+.no-transition {
+   transition: none !important;
+}
 
 
 .entry-content-wrap {
@@ -2603,6 +2627,7 @@ $feed-title-width: 115px;
 .entry-inner {
   min-height: 100%;
   transition: max-width 0.3s linear;
+
 }
 
 .feeds-target,
@@ -2616,6 +2641,7 @@ $feed-title-width: 115px;
 .entry-inner,
 .next-entry-preview {
   padding: 40px 20px 40px 20px;
+  padding-top: 40px + $toolbar-height;
   margin: 0 auto;
   max-width: 660px;
 }
@@ -6588,6 +6614,7 @@ Media Queries
   }
   .entry-inner {
     padding: base-units(2);
+    padding-top: 16px + $toolbar-height;
     .modal & {
       padding-left: 0;
       padding-right: 0;
@@ -6602,6 +6629,9 @@ Media Queries
       display: none;
     }
   }
+}
+.one-up.feature-flag-floaty-true .entry-inner {
+  padding-top: 40px + $toolbar-height;
 }
 
 /*------------------------------------------------------------------------------
