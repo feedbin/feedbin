@@ -2146,16 +2146,6 @@ $feed-title-width: 115px;
   @include border-bottom($color-borders);
   transition: transform 0.2s ease;
   transform: translate3d(0, 0, 0);
-  .feature-flag-floaty-true & {
-    @include border($color-borders, $root: true);
-    border-radius: 8px;
-    margin-top: 16px;
-    width: 100%;
-    flex: 1;
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
-  }
   &.animate {
     transform: translate3d(0, 0, 0);
   }
@@ -2551,20 +2541,18 @@ $feed-title-width: 115px;
   left: 0;
   right: 0;
   align-content: stretch;
-  transition: transform 0.15s ease-out;
+  transition: transform 0.2s ease-out;
   .toolbar-wrap {
     flex: 1;
   }
   .has-content & {
     display: flex;
   }
-  .feature-flag-floaty-true & {
-    height: $toolbar-height + 16px;
-    bottom: $toolbar-height + 16px;
-    padding: 0 16px;
+  .hide-entry-toolbar.feature-flag-floaty-true & {
+    transform: translateY(-$toolbar-height);
   }
-  .entry-scrolling-up.feature-flag-floaty-true & {
-    transform: translateY(-$toolbar-height - 16px);
+  .one-up.native.hide-entry-toolbar.feature-flag-floaty-true & {
+    transform: translateY(-$toolbar-height + 1);
   }
 }
 
@@ -6629,9 +6617,6 @@ Media Queries
       display: none;
     }
   }
-}
-.one-up.feature-flag-floaty-true .entry-inner {
-  padding-top: 40px + $toolbar-height;
 }
 
 /*------------------------------------------------------------------------------
