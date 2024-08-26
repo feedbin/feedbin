@@ -1,7 +1,7 @@
 class AccountMigration < ApplicationRecord
   belongs_to :user
   has_many :account_migration_items
-  enum status: [:pending, :started, :processing, :complete, :failed]
+  enum :status, [:pending, :started, :processing, :complete, :failed]
 
   store :data, accessors: [:fw_streams], coder: JSON
 

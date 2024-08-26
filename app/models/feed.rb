@@ -27,7 +27,7 @@ class Feed < ApplicationRecord
 
   after_initialize :default_values
 
-  enum feed_type: {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3, pages: 4}
+  enum :feed_type, {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3, pages: 4}
 
   store :settings, accessors: [:custom_icon, :current_feed_url, :custom_icon_format], coder: JsonConverter
 

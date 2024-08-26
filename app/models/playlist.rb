@@ -4,7 +4,7 @@ class Playlist < ApplicationRecord
 
   belongs_to :user
 
-  enum sort_order: {custom: 0, newest_first: 1, oldest_first: 2}
+  enum :sort_order, {custom: 0, newest_first: 1, oldest_first: 2}
 
   has_many :podcast_subscriptions, dependent: :nullify
   has_many :queued_entries, dependent: :nullify

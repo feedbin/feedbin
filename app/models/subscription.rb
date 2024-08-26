@@ -23,10 +23,10 @@ class Subscription < ApplicationRecord
     errors[:title] << "can not be changed" if title_changed?
   end
 
-  enum kind: {default: 0, generated: 1}
-  enum view_mode: {article: 0, extract: 1, newsletter: 2}
-  enum show_status: {not_show: 0, hidden: 1, subscribed: 2, bookmarked: 3}
-  enum fix_status: {none: 0, present: 1, ignored: 2}, _prefix: :fix_suggestion
+  enum :kind, {default: 0, generated: 1}
+  enum :view_mode, {article: 0, extract: 1, newsletter: 2}
+  enum :show_status, {not_show: 0, hidden: 1, subscribed: 2, bookmarked: 3}
+  enum :fix_status, {none: 0, present: 1, ignored: 2}, prefix: :fix_suggestion
 
   def self.create_multiple(feeds, user, valid_feed_ids)
     @subscriptions = feeds.each_with_object([]) { |(feed_id, subscription), array|

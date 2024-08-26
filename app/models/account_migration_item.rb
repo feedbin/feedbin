@@ -3,7 +3,7 @@ class AccountMigrationItem < ApplicationRecord
 
   after_commit :process, on: :create
 
-  enum status: [:pending, :complete, :failed]
+  enum :status, [:pending, :complete, :failed]
 
   store :data, accessors: [:fw_feed], coder: JSON
 

@@ -11,7 +11,7 @@
 # t.jsonb  :settings,          null: false, default: {}
 
 class Image < ApplicationRecord
-  enum provider: [:entry_content, :entry_podcast, :entry_link, :feed_podcast, :remote_file]
+  enum :provider, [:entry_content, :entry_podcast, :entry_link, :feed_podcast, :remote_file]
 
   normalizes :url, with: -> url { url.strip }
 

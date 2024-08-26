@@ -102,7 +102,7 @@ class EmailNewsletter
   end
 
   def parsed_from
-    @email[:from].address_list.addresses.first
+    @email[:from].element.addresses.first
   end
 
 end

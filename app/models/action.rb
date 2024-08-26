@@ -2,8 +2,8 @@ class Action < ApplicationRecord
   attr_accessor :automatic_modification, :apply_action
 
   belongs_to :user
-  enum action_type: {standard: 0, notifier: 1}
-  enum status: {active: 0, suspended: 1, broken: 2}
+  enum :action_type, {standard: 0, notifier: 1}
+  enum :status, {active: 0, suspended: 1, broken: 2}
 
   validate do |action|
     if computed_feed_ids.empty? && automatic_modification.blank?

@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "7.1.3.4"
+gem "rails", "7.2.1"
 gem "will_paginate"
 
 gem "http",                github: "feedbin/http",                branch: "feedbin"
@@ -12,9 +12,6 @@ gem "feedkit",             github: "feedbin/feedkit",             branch: "maste
 gem "html-pipeline",       github: "feedbin/html-pipeline",       branch: "feedbin"
 gem "html_diff",           github: "feedbin/html_diff",           ref: "013e1bb"
 gem "twitter",             github: "feedbin/twitter",             branch: "feedbin"
-
-# https://github.com/mikel/mail/issues/1521
-gem "mail", "< 2.8"
 
 gem "activerecord-import"
 gem "addressable", require: "addressable/uri"
@@ -41,6 +38,7 @@ gem "jwt"
 gem "librato-rails", "~> 1.4.2"
 gem "lograge"
 gem "lookbook"
+gem "mail"
 gem "net-http-persistent"
 gem "oauth"
 gem "oauth2"
