@@ -1549,30 +1549,13 @@ $.extend feedbin,
 
   ONE_DAY: 60 * 60 * 1000 * 24
 
-  mouseMovingTowardsTop: (event, element = null, threshold = 50) ->
+  mouseMovingTowardsTop: (event, threshold = 50) ->
     if !feedbin.lastMouseY
       feedbin.lastMouseY = event.clientY
       return false
-
     movingTowardsTop = event.clientY < feedbin.lastMouseY
-
-    if element
-      rect = element.getBoundingClientRect()
-
-      withinElement = (
-        event.clientX >= rect.left &&
-        event.clientX <= rect.right &&
-        event.clientY >= rect.top &&
-        event.clientY <= rect.bottom
-      )
-
-      relativeThreshold = rect.top + threshold
-      closeToTop = event.clientY < relativeThreshold && withinElement
-    else
-      closeToTop = event.clientY < threshold
-
+    closeToTop = event.clientY < threshold
     feedbin.lastMouseY = event.clientY
-
     return movingTowardsTop && closeToTop
 
 $.extend feedbin,
@@ -2927,9 +2910,8 @@ $.extend feedbin,
         event.preventDefault()
 
     hideToolbarBehavior:  ->
-      element = $('.entry-column')
-      $(document).on 'mousemove', (event) ->
-        if $('body').hasClass(feedbin.hideToolbarClass) && feedbin.mouseMovingTowardsTop(event, element[0], 150)
+      $(document).on 'mousemove', '.entry-column', (event) ->
+        if $('body').hasClass(feedbin.hideToolbarClass) && feedbin.mouseMovingTowardsTop(event, 150)
           $('body').removeClass(feedbin.hideToolbarClass)
 
       $(document).on 'click', '.entry-content', (event) ->
