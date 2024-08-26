@@ -28,16 +28,17 @@ $.extend feedbin,
   loadingMore: false
   remoteContentIntervals: {}
   fastAnimation: 200
+  hideToolbarClass: "hide-entry-toolbar"
 
-  toggleItemInArray: (array, item) ->
-    index = array.indexOf(item)
+  updateStyles: (url) ->
+    element = $("link[href='#{url}']")
 
-    if index isnt -1
-      array.splice(index, 1)
-    else
-      array.push(item)
-
-    array
+    if element.length == 0
+      tag = $("<link />").attr(
+        href: url
+        rel: "stylesheet"
+      )
+      $('head').append(tag)
 
   sharedMarkRead: ->
     unless $(@).attr('disabled')
@@ -604,6 +605,7 @@ $.extend feedbin,
 
   animateEntryContent: (content) ->
     innerContent = $('[data-behavior~=inner_content_target]')
+    $('.entry-content').removeClass('current')
 
     if $(feedbin.selectedEntry.container.closest("li")).isAfter(feedbin.previousEntry.container.closest("li"))
       next = $('<div class="next-entry load-next-entry"></div>')
@@ -615,6 +617,7 @@ $.extend feedbin,
     $('.entry-toolbar').addClass("animate")
 
     next.html(content)
+    $('.entry-content', next).addClass('current')
 
     next.insertAfter(innerContent)
 
@@ -669,13 +672,6 @@ $.extend feedbin,
     $("[data-feed-id].#{cssClass}").removeClass(cssClass)
     $.each feedbin.data.muted_feeds, (index, feedId) ->
       $("[data-feed-id=#{feedId}]").addClass(cssClass)
-
-  updateFeeds: (feeds, digest) ->
-    if feedbin.feedsDigest != digest
-      feedbin.feedsDigest = digest
-      $('[data-behavior~=feeds_target]').html(feeds)
-    else
-      false
 
   clearEntries: ->
     $('[data-behavior~=entries_target]').html('')
@@ -1038,7 +1034,7 @@ $.extend feedbin,
 
   refresh: ->
     if feedbin.data
-      $.get(feedbin.data.auto_update_path)
+      $.get(feedbin.data.auto_update_path, {feed_digest: feedbin.feedsDigest})
 
   shareOpen: ->
     $('[data-behavior~=toggle_share_menu]').parents('.dropdown-wrap').hasClass('open')
@@ -1275,10 +1271,44 @@ $.extend feedbin,
       "top": "#{newTop}px"
     selectedPanel.prop('scrollTop', 0)
     $('body').addClass('has-entry-basement')
+    $('body').removeClass(feedbin.hideToolbarClass)
 
   applyStarred: (entryId) ->
     if feedbin.Counts.get().isStarred(entryId)
       $('[data-behavior~=selected_entry_data]').addClass('starred')
+
+  entryScroll: ->
+    lastScrollPosition = 0
+
+    $(".entry-meta").addClass("no-transition")
+    $("body").removeClass(feedbin.hideToolbarClass)
+    callback = ->
+      $(".entry-meta").removeClass("no-transition")
+    setTimeout callback, 200
+
+    scrolled = (element) ->
+      maxScrollHeight = $(element).prop('scrollHeight') - $(element).prop('offsetHeight')
+      currentScrollPosition = $(element).prop('scrollTop')
+
+      if feedbin.shareOpen()
+        $("body").removeClass(feedbin.hideToolbarClass)
+      else if maxScrollHeight < $('.entry-meta').outerHeight()
+        $("body").removeClass(feedbin.hideToolbarClass)
+      else if currentScrollPosition <= 0
+        $("body").removeClass(feedbin.hideToolbarClass)
+      else if currentScrollPosition >= maxScrollHeight
+        $("body").addClass(feedbin.hideToolbarClass)
+      else if currentScrollPosition > lastScrollPosition
+        $("body").addClass(feedbin.hideToolbarClass)
+      else if currentScrollPosition < lastScrollPosition
+        $("body").removeClass(feedbin.hideToolbarClass)
+
+      lastScrollPosition = currentScrollPosition
+
+    $('.feature-flag-floaty-true .entry-content').off 'scroll'
+
+    $('.feature-flag-floaty-true .entry-content.current').on 'scroll', (event) ->
+      scrolled(@)
 
   showEntry: (entryId) ->
     try
@@ -1286,6 +1316,7 @@ $.extend feedbin,
       $('body').removeClass('extract-active')
       feedbin.updateEntryContent(entry.content, entry.inner_content)
       feedbin.formatEntryContent(entryId, true)
+      feedbin.entryScroll()
       if feedbin.viewType == 'updated'
         $('[data-behavior~=change_content_view][data-view-mode=diff]').prop('checked', true).change()
       else if feedbin.data.subscription_view_mode[entry.feed_id] == "newsletter"
@@ -1512,9 +1543,37 @@ $.extend feedbin,
 
   linkActions: {}
 
+  lastMouseY: null
+
   ONE_HOUR: 60 * 60 * 1000
 
   ONE_DAY: 60 * 60 * 1000 * 24
+
+  mouseMovingTowardsTop: (event, element = null, threshold = 50) ->
+    if !feedbin.lastMouseY
+      feedbin.lastMouseY = event.clientY
+      return false
+
+    movingTowardsTop = event.clientY < feedbin.lastMouseY
+
+    if element
+      rect = element.getBoundingClientRect()
+
+      withinElement = (
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom
+      )
+
+      relativeThreshold = rect.top + threshold
+      closeToTop = event.clientY < relativeThreshold && withinElement
+    else
+      closeToTop = event.clientY < threshold
+
+    feedbin.lastMouseY = event.clientY
+
+    return movingTowardsTop && closeToTop
 
 $.extend feedbin,
   preInit:
@@ -1832,6 +1891,11 @@ $.extend feedbin,
         nextScreenshot.find('a')[0]?.click()
         event.preventDefault()
         return
+
+    sourceable: ->
+      $(document).on 'click', '[data-sourceable-payload-param]', (event) ->
+        custom = new CustomEvent("sourceable:selected", {detail: {data: $(@).data("sourceablePayloadParam"), target: event.currentTarget}})
+        window.dispatchEvent(custom)
 
     entriesLoading: ->
       $(document).on 'click', '[data-behavior~=feed_link]', (event) ->
@@ -2433,6 +2497,7 @@ $.extend feedbin,
         $('[data-behavior~=share_form] .description-placeholder').attr('placeholder', description)
 
     dragAndDrop: ->
+      return if feedbin.native
       feedbin.droppable()
       feedbin.draggable()
 
@@ -2860,6 +2925,18 @@ $.extend feedbin,
             if 'console' of window
               console.log error
         event.preventDefault()
+
+    hideToolbarBehavior:  ->
+      element = $('.entry-column')
+      $(document).on 'mousemove', (event) ->
+        if $('body').hasClass(feedbin.hideToolbarClass) && feedbin.mouseMovingTowardsTop(event, element[0], 150)
+          $('body').removeClass(feedbin.hideToolbarClass)
+
+      $(document).on 'click', '.entry-content', (event) ->
+        $('body').removeClass(feedbin.hideToolbarClass)
+
+      $(document).on 'click', '[data-behavior~=toggle_share_menu]', (event) ->
+        $('body').removeClass(feedbin.hideToolbarClass)
 
 
 $.each feedbin.preInit, (i, item) ->

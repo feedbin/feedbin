@@ -58,7 +58,7 @@
             </div>
         </div>
         <div class="entry-column app-panel" data-behavior="content_column">
-            <div class="inner-column">
+            <div class="entry-inner-column">
                 <div class="account-toolbar">
                     <div class="entry-buttons">
                         <%= render partial: 'shared/app_settings' %>
@@ -78,34 +78,36 @@
                     <% end %>
                 </div>
                 <div class="entry-meta" data-behavior="entry_meta_target"></div>
-                <div class="entry-content-wrap <%= user_presenter.content_classes %>" data-font-size="<%= user_presenter.font_size %>"  data-font="<%= user_presenter.font %>" data-behavior="entry_content_target">
-                        <div class="splash">
-                            <div class="splash-inner">
-                                <%= svg_tag "logo", inline: true %>
-                                <% if signed_in? && current_user.plan.stripe_id == 'trial' %>
-                                <div class="trial-time">
-                                    <div class="remaining-time"><%= pluralize(current_user.days_left, 'day') %> left</div>
-                                    <%= link_to settings_billing_path, class: 'button' do %>
-                                        Subscribe Now
+                <div class="inner-column">
+                    <div class="entry-content-wrap <%= user_presenter.content_classes %>" data-font-size="<%= user_presenter.font_size %>"  data-font="<%= user_presenter.font %>" data-behavior="entry_content_target">
+                            <div class="splash">
+                                <div class="splash-inner">
+                                    <%= svg_tag "logo", inline: true %>
+                                    <% if signed_in? && current_user.plan.stripe_id == 'trial' %>
+                                    <div class="trial-time">
+                                        <div class="remaining-time"><%= pluralize(current_user.days_left, 'day') %> left</div>
+                                        <%= link_to settings_billing_path, class: 'button' do %>
+                                            Subscribe Now
+                                        <% end %>
+                                    </div>
                                     <% end %>
                                 </div>
-                                <% end %>
                             </div>
-                        </div>
 
-                    <div data-behavior="inner_content_target"></div>
-                </div>
-                <div class="bottom-toolbar entry-bottom-toolbar">
-                    <button class="navigation-button button-previous" data-behavior="open_previous_entry needs_previous">
-                        <div class="icon-previous">
-                            <%= svg_tag "icon-arrow", size: "9x15" %>
-                        </div>
-                    </button>
-                    <button class="navigation-button button-next" data-behavior="open_next_entry needs_next">
-                        <div class="icon-next">
-                            <%= svg_tag "icon-arrow", size: "9x15" %>
-                        </div>
-                    </button>
+                        <div data-behavior="inner_content_target"></div>
+                    </div>
+                    <div class="bottom-toolbar entry-bottom-toolbar">
+                        <button class="navigation-button button-previous" data-behavior="open_previous_entry needs_previous">
+                            <div class="icon-previous">
+                                <%= svg_tag "icon-arrow", size: "9x15" %>
+                            </div>
+                        </button>
+                        <button class="navigation-button button-next" data-behavior="open_next_entry needs_next">
+                            <div class="icon-next">
+                                <%= svg_tag "icon-arrow", size: "9x15" %>
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

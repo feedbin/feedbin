@@ -30,12 +30,16 @@ module FeedCrawler
         request(auto_inflate: false)
       end
 
+      content_changed = !@response.not_modified?(@crawl_data.download_fingerprint)
+
+      Sidekiq.logger.info "Downloaded content_changed=#{content_changed} http_status=\"#{@response.status}\" url=#{@feed_url}"
+
       @crawl_data.download_success(@feed_id)
+      @crawl_data.save(@response)
 
-      modified = !@response.not_modified?(@crawl_data.download_fingerprint)
-      Sidekiq.logger.info "Downloaded modified=#{modified} http_status=\"#{@response.status}\" url=#{@feed_url} ignore_http_caching=#{@crawl_data.ignore_http_caching?}"
-
-      parse if modified
+      parse if content_changed
+    rescue ConcurrencyLimit::TimeoutError => exception
+      Sidekiq.logger.info "Download timed out url=#{@feed_url} exception=#{exception.inspect}"
     rescue Feedkit::Error => exception
       @crawl_data.download_error(exception)
       message = "Feedkit::Error: attempts=#{@crawl_data.error_count} exception=#{exception.inspect} id=#{@feed_id} url=#{@feed_url}"
@@ -49,15 +53,18 @@ module FeedCrawler
       parsed_url = Feedkit::BasicAuth.parse(@feed_url)
       url = @crawl_data.redirected_to ? @crawl_data.redirected_to : parsed_url.url
       Sidekiq.logger.info "Redirect: from=#{@feed_url} to=#{@crawl_data.redirected_to} id=#{@feed_id}" if @crawl_data.redirected_to
-      Feedkit::Request.download(url,
-        on_redirect:   on_redirect,
-        username:      parsed_url.username,
-        password:      parsed_url.password,
-        last_modified: ignore_http_caching? ? nil : @crawl_data.last_modified,
-        etag:          ignore_http_caching? ? nil : @crawl_data.etag,
-        auto_inflate:  auto_inflate,
-        user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
-      )
+
+      ConcurrencyLimit.acquire(@feed_url, timeout: 5) do
+        Feedkit::Request.download(url,
+          on_redirect:   on_redirect,
+          username:      parsed_url.username,
+          password:      parsed_url.password,
+          last_modified: @crawl_data.last_modified,
+          etag:          @crawl_data.etag,
+          auto_inflate:  auto_inflate,
+          user_agent:    "Feedbin feed-id:#{@feed_id} - #{@subscribers} subscribers"
+        )
+      end
     end
 
     def on_redirect
@@ -69,7 +76,6 @@ module FeedCrawler
     def parse
       @parsing = true
       @response.persist!
-      @crawl_data.save(@response)
       job_class = critical ? ParserCritical : Parser
       job_id = job_class.perform_async(@feed_id, @response.path, @response.encoding.to_s, @crawl_data.to_h)
       Sidekiq.logger.info "Parse enqueued job_id=#{job_id} path=#{@response.path}"
@@ -80,10 +86,6 @@ module FeedCrawler
         id: @feed_id,
         crawl_data: @crawl_data.to_h
       }.to_json)
-    end
-
-    def ignore_http_caching?
-      critical || @crawl_data.ignore_http_caching?
     end
   end
 end

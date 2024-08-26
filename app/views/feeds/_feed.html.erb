@@ -1,4 +1,4 @@
-<% cache [feed, "v9"] do %>
+<% cache [feed, "v11"] do %>
     <% present feed do |feed_presenter| %>
         <%= content_tag :li, data: {feed_id: feed.id, behavior: 'draggable sort_feed', sort_id: feed.id, feed_path: feed_path(feed) } do %>
             <%= feed_presenter.feed_link do %>
@@ -13,8 +13,7 @@
                           <%= render SvgComponent.new("menu-icon-mute")%>
                         </span>
                     </span>
-
-                    <%# render SourceMenu::Feed.new(feed: feed, source_target: feed.id) %>
+                    <%= render SourceMenu::Feed.new(feed: feed, source_target: feed.id) %>
                 </span>
             <% end %>
         <% end %>

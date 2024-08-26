@@ -24,6 +24,7 @@ gem "bcrypt"
 gem "bootsnap", require: false
 gem "clockwork"
 gem "coffee-rails"
+gem "concurrent-ruby"
 gem "connection_pool"
 gem "dotenv-rails", "= 2.8.1"
 gem "down"

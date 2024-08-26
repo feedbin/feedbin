@@ -20,13 +20,13 @@ class FaviconComponentTest < ComponentTestCase
   test "newsletter favicon" do
     @feed.newsletter!
     output = render FaviconComponent.new(feed: @feed)
-    assert_equal %(<span class="favicon-wrap collection-favicon"><svg width="16" height="12" class="favicon-newsletter"><use href="#favicon-newsletter"></use></svg></span>), output.to_s
+    assert_equal %(<span class="favicon-wrap collection-favicon"><svg width="16.0" height="12.0" class="favicon-newsletter"><use href="#favicon-newsletter"></use></svg></span>), output.to_s
   end
 
   test "pages default favicon" do
     @feed.pages!
     output = render FaviconComponent.new(feed: @feed)
-    assert_equal %(<span class="favicon-wrap collection-favicon"><svg width="14" height="16" class="favicon-saved"><use href="#favicon-saved"></use></svg></span>), output.to_s
+    assert_equal %(<span class="favicon-wrap collection-favicon"><svg width="14.0" height="16.0" class="favicon-saved"><use href="#favicon-saved"></use></svg></span>), output.to_s
   end
 
   test "pages article favicon" do

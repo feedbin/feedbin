@@ -137,9 +137,7 @@ module App
           "keydown.up"                                   => "navigate",
           "keydown.down"                                 => "navigate",
           "submit"                                       => "search",
-          "sourceable:selected@window"                   => "updateToken",
-          "sourceable:source-target-connected@window"    => "buildJumpable",
-          "sourceable:source-target-disconnected@window" => "buildJumpable",
+          "sourceable:selected@window"                   => "updateToken"
         },
         values: {
           token_visible: "false",

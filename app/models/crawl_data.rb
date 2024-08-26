@@ -40,18 +40,6 @@ class CrawlData
 
   def log_download
     @data.downloaded_at = Time.now.to_i
-    if ignore_http_caching?
-      @data.last_uncached_download = Time.now.to_i
-    end
-  end
-
-  def last_uncached_download
-    Time.at(@data.last_uncached_download.to_i)
-  end
-
-  def ignore_http_caching?
-    return @ignore_http_caching if defined?(@ignore_http_caching)
-    @ignore_http_caching = last_uncached_download.before?(rand(8..16).hours.ago)
   end
 
   def download_success(feed_id)
@@ -95,8 +83,34 @@ class CrawlData
   private
 
   def error_data(exception)
-    status = exception.respond_to?(:response) ? exception.response.status.code : nil
-    {"date" => Time.now.to_i, "class" => exception.class.name, "message" => exception.message, "status" => status}
+    {
+      "date"        => Time.now.to_i,
+      "class"       => exception.class.name,
+      "message"     => exception.message,
+      "status"      => status(exception),
+      "retry_after" => parse_retry_after(exception).to_i
+    }
+  end
+
+  def status(exception)
+    exception.respond_to?(:response) ? exception.response.status.code : nil
+  end
+
+  def parse_retry_after(exception)
+    return unless exception.respond_to?(:response)
+    retry_after = exception.response.headers[:retry_after]
+    return if retry_after.nil?
+    retry_after = retry_after.strip
+
+    retry_after = if retry_after.include?(" ")
+      Time.parse(retry_after)
+    else
+      Time.at(Time.now.to_i + retry_after.to_i)
+    end
+
+    [retry_after, 8.hours.from_now].min
+  rescue
+    nil
   end
 
   def backoff

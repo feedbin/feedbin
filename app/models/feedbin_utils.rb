@@ -30,4 +30,11 @@ class FeedbinUtils
     end
     hash.transform_keys(&:to_sym)
   end
+  
+  def self.key_value_parser(string, &block)
+    (string || "").split("\s").map {_1.split("=")}.each_with_object({}) do |(item, weight), hash|
+      hash[item] = yield(weight)
+    end
+  end
+  
 end

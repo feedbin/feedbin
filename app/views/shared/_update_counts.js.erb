@@ -1,0 +1,5 @@
+feedbin.count_data = <%= feed_data[:count_data].to_json.html_safe %>;
+feedbin.Counts.get().update(feedbin.count_data);
+feedbin.applyCounts(false);
+
+$.get(feedbin.data.saved_searches_count_path);

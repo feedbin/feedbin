@@ -51,7 +51,8 @@ class User < ApplicationRecord
     :podcast_sort_order,
     :playlist_migration,
     :fix_feeds_available,
-    :addresses_available
+    :addresses_available,
+    :floaty
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all
@@ -271,6 +272,7 @@ class User < ApplicationRecord
   end
 
   def trial_plan_valid
+    return if free_ok == true
     trial_plan = Plan.find_by_stripe_id("trial")
     if plan_id == trial_plan.id && plan_id_was != trial_plan.id && !plan_id_was.nil?
       errors.add(:plan_id, "is invalid")
@@ -485,7 +487,7 @@ class User < ApplicationRecord
   end
 
   def newsletter_address
-    "#{newsletter_authentication_token.token}@newsletters.feedbin.com"
+    "#{newsletter_authentication_token.token}@#{ENV["NEWSLETTER_ADDRESS_HOST"]}"
   end
 
   def newsletter_authentication_token

@@ -148,6 +148,10 @@ Rails.application.reloader.to_prepare do
       mappings: {
         entries: entries_mapping,
         actions: actions_mapping
+      },
+      aliases: {
+        entries: "#{Entry.table_name}-01",
+        actions: "#{Action.table_name}-01"
       }
     }
   end
@@ -160,23 +164,25 @@ Rails.application.reloader.to_prepare do
       $search[:servers][:primary].with(&block)
     end
     module_function :client
+
+    def setup
+      begin
+        Search.client(mirror: true) { _1.request(:put, $search[:config][:aliases][:entries], json: $search[:config][:mappings][:entries]) }
+        Search.client(mirror: true) { _1.request(:put, $search[:config][:aliases][:actions], json: $search[:config][:mappings][:actions]) }
+
+        Search.client(mirror: true) { _1.add_alias($search[:config][:aliases][:entries], alias_name: Entry.table_name) }
+        Search.client(mirror: true) { _1.add_alias($search[:config][:aliases][:actions], alias_name: Action.table_name) }
+      rescue => exception
+        Rails.logger.error("---------------------------")
+        Rails.logger.error("Error initializing search: #{exception.inspect}")
+        Rails.logger.error("---------------------------")
+      end
+    end
+    module_function :setup
   end
 
   unless Rails.env.production?
-    entry_index = "#{Entry.table_name}-01"
-    action_index = "#{Action.table_name}-01"
-
-    begin
-      Search.client(mirror: true) { _1.request(:put, entry_index, json: entries_mapping) }
-      Search.client(mirror: true) { _1.request(:put, action_index, json: actions_mapping) }
-
-      Search.client(mirror: true) { _1.add_alias(entry_index, alias_name: Entry.table_name) }
-      Search.client(mirror: true) { _1.add_alias(action_index, alias_name: Action.table_name) }
-    rescue => exception
-      Rails.logger.error("---------------------------")
-      Rails.logger.error("Error initializing search: #{exception.inspect}")
-      Rails.logger.error("---------------------------")
-    end
+    Search.setup
   end
 
 end

@@ -618,12 +618,14 @@ $search-height: 47px;
     width: 280px;
     @include background-color($color-base);
   }
-  .inner-column {
+  .inner-column, .entry-inner-column {
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
+  }
+  .inner-column {
     display: flex;
     flex-direction: column;
   }
@@ -1208,7 +1210,7 @@ $hamburger-dot: 4px;
         .feed-action-clear {
           @include color(white);
         }
-        .source-menu {
+        > a .source-menu {
           @include fill(white);
         }
         .clear-form {
@@ -1417,9 +1419,14 @@ $hamburger-dot: 4px;
       .count {
         display: none;
       }
-      .favicon-wrap {
+      .favicon-wrap * {
         filter: grayscale(100%);
         opacity: 0.7;
+      }
+      &.selected {
+        .muted-icon {
+          fill: white;
+        }
       }
     }
     &.source-section {
@@ -2238,6 +2245,7 @@ $feed-title-width: 115px;
 .basement-panel {
   max-height: calc(100vh - $toolbar-height);
   overflow-y: scroll;
+  @include background-color($color-base);
 }
 
 .basement-toolbar {
@@ -2527,10 +2535,31 @@ $feed-title-width: 115px;
   z-index: 2;
   @include background-color($color-base);
   display: none;
+  position: absolute;
+  top: 0;
+  bottom: $toolbar-height;
+  left: 0;
+  right: 0;
+  align-content: stretch;
+  transition: transform 0.2s ease-out;
+  .toolbar-wrap {
+    flex: 1;
+  }
   .has-content & {
-    display: block;
+    display: flex;
+  }
+  .hide-entry-toolbar.feature-flag-floaty-true & {
+    transform: translateY(-$toolbar-height);
+  }
+  .one-up.native.hide-entry-toolbar.feature-flag-floaty-true & {
+    transform: translateY(-$toolbar-height + 1);
   }
 }
+
+.no-transition {
+   transition: none !important;
+}
+
 
 .entry-content-wrap {
   z-index: 0;
@@ -2586,6 +2615,7 @@ $feed-title-width: 115px;
 .entry-inner {
   min-height: 100%;
   transition: max-width 0.3s linear;
+
 }
 
 .feeds-target,
@@ -2599,6 +2629,7 @@ $feed-title-width: 115px;
 .entry-inner,
 .next-entry-preview {
   padding: 40px 20px 40px 20px;
+  padding-top: 40px + $toolbar-height;
   margin: 0 auto;
   max-width: 660px;
 }
@@ -6571,6 +6602,7 @@ Media Queries
   }
   .entry-inner {
     padding: base-units(2);
+    padding-top: 16px + $toolbar-height;
     .modal & {
       padding-left: 0;
       padding-right: 0;
