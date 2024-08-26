@@ -1034,7 +1034,7 @@ $.extend feedbin,
 
   refresh: ->
     if feedbin.data
-      $.get(feedbin.data.auto_update_path, {feed_digest: feedbin.feedsDigest})
+      $.get(feedbin.data.auto_update_path, {subscriptions_hash: feedbin.data.subscriptions_hash})
 
   shareOpen: ->
     $('[data-behavior~=toggle_share_menu]').parents('.dropdown-wrap').hasClass('open')
