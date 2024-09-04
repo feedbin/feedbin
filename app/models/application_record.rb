@@ -1,5 +1,6 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
+  self.attributes_for_inspect = :all
 
   # data should look like [{model_id => "value"}]
   def self.update_multiple(column:, data:)
