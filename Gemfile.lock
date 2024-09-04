@@ -285,7 +285,8 @@ GEM
     ffi-compiler (1.3.2)
       ffi (>= 1.15.5)
       rake
-    fog-aws (3.24.0)
+    fog-aws (3.25.0)
+      base64 (~> 0.2.0)
       fog-core (~> 2.1)
       fog-json (~> 1.1)
       fog-xml (~> 0.1)
@@ -377,7 +378,7 @@ GEM
     llhttp-ffi (0.4.0)
       ffi-compiler (~> 1.0)
       rake (~> 13.0)
-    logger (1.6.0)
+    logger (1.6.1)
     lograge (0.14.0)
       actionpack (>= 4)
       activesupport (>= 4)
@@ -411,7 +412,7 @@ GEM
     method_source (1.1.0)
     mime-types (3.5.2)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2024.0820)
+    mime-types-data (3.2024.0903)
     mini_magick (4.13.2)
     mini_mime (1.1.5)
     minitest (5.25.1)
@@ -428,7 +429,7 @@ GEM
       connection_pool (~> 2.2)
     net-http2 (0.18.5)
       http-2 (~> 0.11)
-    net-imap (0.4.14)
+    net-imap (0.4.15)
       date
       net-protocol
     net-pop (0.1.2)
@@ -462,7 +463,7 @@ GEM
       version_gem (~> 1.1)
     openssl (3.2.0)
     parallel (1.26.3)
-    parser (3.3.4.2)
+    parser (3.3.5.0)
       ast (~> 2.4.1)
       racc
     pg (1.5.7)
@@ -478,7 +479,7 @@ GEM
     postmark-rails (0.22.1)
       actionmailer (>= 3.0.0)
       postmark (>= 1.21.3, < 2.0)
-    premailer (1.26.0)
+    premailer (1.27.0)
       addressable
       css_parser (>= 1.19.0)
       htmlentities (>= 4.0.0)
@@ -559,8 +560,7 @@ GEM
       railties (>= 5.2)
     reverse_markdown (2.1.1)
       nokogiri
-    rexml (3.3.6)
-      strscan
+    rexml (3.3.7)
     rouge (4.3.0)
     rubocop (1.65.1)
       json (~> 2.3)
@@ -573,7 +573,7 @@ GEM
       rubocop-ast (>= 1.31.1, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 3.0)
-    rubocop-ast (1.32.1)
+    rubocop-ast (1.32.2)
       parser (>= 3.3.1.0)
     rubocop-performance (1.21.1)
       rubocop (>= 1.48.1, < 2.0)
@@ -598,7 +598,7 @@ GEM
       sprockets-rails
       tilt
     securerandom (0.3.1)
-    selenium-webdriver (4.23.0)
+    selenium-webdriver (4.24.0)
       base64 (~> 0.2)
       logger (~> 1.4)
       rexml (~> 3.2, >= 3.2.5)
@@ -644,14 +644,13 @@ GEM
       stripe (>= 2.8, < 13)
     strong_migrations (2.0.0)
       activerecord (>= 6.1)
-    strscan (3.1.0)
     tailwindcss-rails (2.7.3-arm64-darwin)
       railties (>= 7.0.0)
     tailwindcss-rails (2.7.3-x86_64-darwin)
       railties (>= 7.0.0)
     tailwindcss-rails (2.7.3-x86_64-linux)
       railties (>= 7.0.0)
-    thor (1.3.1)
+    thor (1.3.2)
     thread_safe (0.3.6)
     tilt (2.4.0)
     timeout (0.4.1)
@@ -671,7 +670,7 @@ GEM
       raindrops (~> 0.7)
     useragent (0.16.10)
     version_gem (1.1.4)
-    view_component (3.13.0)
+    view_component (3.14.0)
       activesupport (>= 5.2.0, < 8.0)
       concurrent-ruby (~> 1.0)
       method_source (~> 1.0)
@@ -690,8 +689,8 @@ GEM
     will_paginate (4.0.1)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    yard (0.9.36)
-    zeitwerk (2.6.17)
+    yard (0.9.37)
+    zeitwerk (2.6.18)
 
 PLATFORMS
   arm64-darwin-20
