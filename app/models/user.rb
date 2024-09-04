@@ -598,6 +598,10 @@ class User < ApplicationRecord
     plan == Plan.find_by_stripe_id("trial")
   end
 
+  def subscriptions_hash
+    Digest::SHA1.hexdigest(subscription_ids.join)
+  end
+
   def migrate_playlists!
     return unless playlist_migration.nil?
 
