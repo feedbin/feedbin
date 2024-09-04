@@ -90,11 +90,14 @@ class MakeEpub
         image.remove
         next
       end
+
       if file = download(src)
-        total_size = @images.sum(&:size) + file.size
-        break if total_size > max_size
+        unless @images.find { _1.filename == file.filename }
+          total_size = @images.sum(&:size) + file.size
+          break if total_size > max_size
+          @images.push(file)
+        end
         image["src"] = "images/#{file.filename}"
-        @images.push(file)
       else
         image.remove
       end
