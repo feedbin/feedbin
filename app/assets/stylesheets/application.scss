@@ -2632,6 +2632,9 @@ $feed-title-width: 115px;
   padding-top: 40px + $toolbar-height;
   margin: 0 auto;
   max-width: 660px;
+  .modal & {
+    padding-top: 40px;
+  }
 }
 
 .next-entry-preview {
