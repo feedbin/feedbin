@@ -72,7 +72,7 @@ class MakeEpub
   def select_content
     content = @entry
     if @extract
-      content = MercuryParser.parse(@entry.fully_qualified_url) rescue nil
+      content = MercuryParser.parse(@entry.fully_qualified_url) rescue content
       @feed_title = content&.domain || @feed_title
     end
     content
