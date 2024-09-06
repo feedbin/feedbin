@@ -1751,6 +1751,10 @@ $.extend feedbin,
         $(@).parent('li').addClass('selected')
         return
 
+    shareHelper: ->
+      $(document).on 'ajax:beforeSend', '[data-behavior~=needs_extract]', (event, xhr, settings) ->
+        settings.url = "#{settings.url}?extract=#{feedbin.readabilityActive()}"
+
     choicesSubmit: ->
       $(document).on 'ajax:beforeSend', '[data-choice-form]', ->
         $('.modal').modal('hide')

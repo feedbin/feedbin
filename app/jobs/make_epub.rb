@@ -1,41 +1,43 @@
 class MakeEpub
   include Sidekiq::Worker
 
-  def perform(entry_id, user_id, address)
+  def perform(entry_id, user_id, address, extract = false)
     @entry = Entry.find(entry_id)
     @user = User.find(user_id)
-    @subscription = @user.subscriptions.where(feed: @entry.feed).take
-    @feed_title = @subscription&.title || @entry.feed.title
     @address = address
-    @directory = Dir.mktmpdir
-    @image_path = File.join(@directory, "OEBPS", "images")
-    @images = []
+    @extract = extract
     build
   end
 
   def build
+    @subscription = @user.subscriptions.where(feed: @entry.feed).take
+    @feed_title = @subscription&.title || @entry.feed.title
+    @content = select_content
+    @directory = Dir.mktmpdir
+    @image_path = File.join(@directory, "OEBPS", "images")
+    @images = []
+
     FileUtils.mkdir File.join(@directory, "META-INF")
     FileUtils.mkdir File.join(@directory, "OEBPS")
     FileUtils.mkdir @image_path
 
     epub_path = File.join(Dir.tmpdir, "#{SecureRandom.hex}.epub")
 
-    content = format_content
-    write_file(path: ["OEBPS", "article.xhtml"], content: content)
+    write_file(path: ["OEBPS", "article.xhtml"], content: formatted_content)
     write_file(path: ["mimetype"], content: "application/epub+zip")
 
     render_to_file(
       path: ["OEBPS", "package.opf"],
       template: "epub/package",
       formats: :xml,
-      locals: {feed_title: @feed_title, entry: @entry, images: @images}
+      locals: {feed_title: @feed_title, entry: @content, images: @images}
     )
 
     render_to_file(
       path: ["OEBPS", "toc.xhtml"],
       template: "epub/toc",
       formats: :html,
-      locals: {entry: @entry}
+      locals: {entry: @content}
     )
 
     render_to_file(
@@ -61,10 +63,19 @@ class MakeEpub
       end
     end
 
-    UserMailer.kindle(@address, @entry.title, epub_path).deliver_now
+    UserMailer.kindle(@address, @content.title, epub_path).deliver_now
   ensure
     FileUtils.remove_entry(@directory)
     FileUtils.remove_entry(epub_path) rescue Errno::ENOENT
+  end
+
+  def select_content
+    content = @entry
+    if @extract
+      content = MercuryParser.parse(@entry.fully_qualified_url) rescue nil
+      @feed_title = content&.domain || @feed_title
+    end
+    content
   end
 
   def render_to_file(path:, template:, formats:, locals: {})
@@ -78,8 +89,8 @@ class MakeEpub
     File.write(File.join(@directory, *path), content)
   end
 
-  def format_content
-    content = ContentFormatter.evernote_format(@entry.content, @entry)
+  def formatted_content
+    content = ApplicationController.render(Epub::ArticleView.new(entry: @content, source: @feed_title), layout: nil)
     document = Nokogiri::HTML5(content)
 
     # max size for a postmark email is 10MB
@@ -103,8 +114,7 @@ class MakeEpub
       end
     end
 
-    content = ApplicationController.render template: "epub/article", formats: :html, locals: {feed_title: @feed_title, entry: @entry, content: document.to_html}, layout: nil
-    Nokogiri::HTML5(content).to_xhtml
+    document.to_xhtml
   end
 
   def download(src)

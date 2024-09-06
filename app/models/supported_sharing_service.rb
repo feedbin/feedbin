@@ -37,7 +37,8 @@ class SupportedSharingService < ApplicationRecord
       label: "Kindle",
       requires_auth: false,
       service_type: "kindle",
-      klass: "Share::Kindle"
+      klass: "Share::Kindle",
+      html_options: {"data-remote" => true, "data-behavior" => "needs_extract" }
     }),
     OpenStruct.new({
       service_id: "pinboard",
