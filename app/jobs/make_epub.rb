@@ -23,6 +23,8 @@ class MakeEpub
 
     epub_path = File.join(Dir.tmpdir, "#{SecureRandom.hex}.epub")
 
+    @cover = generate_cover
+
     write_file(path: ["OEBPS", "article.xhtml"], content: formatted_content)
     write_file(path: ["mimetype"], content: "application/epub+zip")
 
@@ -30,7 +32,7 @@ class MakeEpub
       path: ["OEBPS", "package.opf"],
       template: "epub/package",
       formats: :xml,
-      locals: {feed_title: @feed_title, entry: @content, images: @images}
+      locals: {feed_title: @feed_title, entry: @content, images: @images, cover: @cover}
     )
 
     render_to_file(
@@ -115,6 +117,57 @@ class MakeEpub
     end
 
     document.to_xhtml
+  end
+
+  def generate_cover
+    canvas = Vips::Image.new_from_file(Rails.root.join("app", "views", "epub", "background.png").to_s)
+
+    margin = 120
+    title_text = text_layer(
+      format_text(@content.title, 120),
+      width: canvas.width - (margin * 2),
+      opacity: 0.8,
+      font: "Helvetica Bold 16"
+    )
+
+    title_y = 400 + margin
+    canvas = canvas.composite(title_text, :over, x: margin, y: title_y)
+
+    subtitle_y = title_y + title_text.height + 120
+
+    subtitle = [@content.author, @feed_title].compact.map { format_text(_1, 25) }.join(", ")
+    subtitle_text = text_layer(
+      subtitle,
+      width: canvas.width - (margin * 2),
+      opacity: 0.5,
+      font: "Helvetica 16"
+    )
+
+    canvas = canvas.composite(subtitle_text, :over, x: margin, y: subtitle_y)
+
+    canvas.write_to_file(File.join(@directory, "OEBPS", "cover.png"))
+
+    true
+  rescue => exception
+    ErrorService.notify(exception, context: {entry_id: @entry.id})
+    nil
+  end
+
+  def text_layer(text, width:, opacity:, font:)
+    image = Vips::Image.text(
+      text,
+      font: font,
+      width: width,
+      dpi: 600,
+      rgba: true,
+      spacing: 24
+    )
+    transparency = image.new_from_image([0, 0, 0, 255 * opacity])
+    image.ifthenelse(transparency, [0, 0, 0, 0], blend: true)
+  end
+
+  def format_text(text, limit)
+    HTMLEntities.new.encode(text.to_plain_text.truncate(limit, separator: " ", omission: "…"), :basic)
   end
 
   def download(src)

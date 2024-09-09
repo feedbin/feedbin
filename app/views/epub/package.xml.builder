@@ -9,6 +9,9 @@ xml.package "xmlns" => "http://www.idpf.org/2007/opf", "version" => "3.0", "uniq
     xml.meta Time.now.utc.iso8601, "property" => "dcterms:modified"
   end
   xml.manifest do
+    unless cover.nil?
+      xml.item "id" => "cover-image", "href" => "cover.png",     "media-type" => "image/png",             "properties" => "cover-image"
+    end
     xml.item "id" => "htmltoc",     "href" => "toc.xhtml",     "media-type" => "application/xhtml+xml", "properties" => "nav"
     xml.item "id" => "article",     "href" => "article.xhtml", "media-type" => "application/xhtml+xml"
     xml.item "id" => "css",         "href" => "css.css",       "media-type" => "text/css"
