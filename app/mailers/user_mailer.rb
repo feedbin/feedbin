@@ -45,7 +45,7 @@ class UserMailer < ApplicationMailer
 
   def kindle(kindle_address, title, epub)
     filename = title || "epub"
-    attachments["article.epub"] = File.read(epub)
+    attachments["#{filename}.epub"] = File.read(epub)
     mail to: kindle_address, subject: "Kindle Content", body: ".", from: ENV["KINDLE_EMAIL"]
   end
 
