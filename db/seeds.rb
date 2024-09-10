@@ -27,6 +27,7 @@ if Rails.env.development?
   u.plan = plan
   u.update_auth_token = true
   u.addresses_available = 1
+  u.floaty = true
   u.save
 
   feed = Feed.create!(title: "Example", feed_url: "https://example.com/index.xml", site_url: "https://example.com/")

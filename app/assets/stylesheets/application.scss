@@ -2549,10 +2549,10 @@ $feed-title-width: 115px;
     display: flex;
   }
   .hide-entry-toolbar.feature-flag-floaty-true & {
-    transform: translateY(-$toolbar-height);
+    transform: translateY(-100%);
   }
   .one-up.native.hide-entry-toolbar.feature-flag-floaty-true & {
-    transform: translateY(-$toolbar-height + 1);
+    transform: translateY(calc(-100% + (1px)));
   }
 }
 
