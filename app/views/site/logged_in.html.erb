@@ -22,14 +22,14 @@
         <%= svg_tag "logo", inline: true %>
     </div>
     <div class="app-wrap fade">
-        <div class="feeds-column app-panel" data-behavior="content_column" data-resizable-name="feeds" style="<%= user_presenter.feeds_width_style %>">
+        <div class="feeds-column app-panel" data-behavior="content_column" data-resizable-name="feeds" style="<%= user_presenter.feeds_width_style %>" data-controller="toolbar" data-toolbar-section-value="feeds-column" data-action="click->toolbar#show">
             <div class="inner-column">
                 <div class="top-toolbar">
                     <button type="button" class="show-subscribe" data-behavior="show_subscribe open_modal" data-modal-target="subscribe"><%= svg_tag "icon-plus", size: "16x16" %></button>
                     <%= render partial: 'shared/view_mode' %>
                     <%= render partial: 'shared/hamburger_menu_button' %>
                 </div>
-                <div class="feeds showing-audio-player" data-behavior="droppable">
+                <div class="feeds showing-audio-player" data-behavior="droppable" data-action="scroll->toolbar#scroll">
                     <%= render partial: 'shared/view_mode' %>
                     <ul data-behavior="feeds_target" data-controller="sourceable" class="feeds-target feed-list">
                         <%= render partial: 'feeds/feeds', locals: {collections: @feed_data[:collections], saved_searches: @feed_data[:saved_searches], tags: @feed_data[:tags], feeds: @feed_data[:feeds], page_feed: @feed_data[:page_feed]} %>
@@ -39,7 +39,7 @@
                 <%= render partial: 'shared/feeds_toolbar' %>
             </div>
         </div>
-        <div class="entries-column app-panel" data-behavior="content_column" data-resizable-name="entries" style="<%= user_presenter.entries_width_style %>">
+        <div class="entries-column app-panel" data-behavior="content_column" data-resizable-name="entries" style="<%= user_presenter.entries_width_style %>" data-controller="toolbar"  data-toolbar-section-value="entries-column" data-action="click->toolbar#show">
             <div class="inner-column">
                 <div class="entries-header" data-behavior="entries_header">
                     <button class="back-button" data-behavior="show_feeds">
@@ -51,13 +51,13 @@
                     </div>
                 </div>
                 <%= render App::SearchFormComponent.new(params: params) %>
-                <div class="entries">
+                <div class="entries" data-action="scroll->toolbar#scroll">
                     <ul data-behavior="entries_target" class="entries-target"></ul>
                 </div>
                 <%= render partial: 'shared/feeds_toolbar' %>
             </div>
         </div>
-        <div class="entry-column app-panel" data-behavior="content_column">
+        <div class="entry-column app-panel" data-behavior="content_column" data-controller="toolbar" data-toolbar-section-value="entry-column" data-action="click->toolbar#show">
             <div class="entry-inner-column">
                 <div class="account-toolbar">
                     <div class="entry-buttons">

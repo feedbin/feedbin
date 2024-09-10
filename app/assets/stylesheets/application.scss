@@ -279,6 +279,10 @@ $color-control-border: (
 /*------------------------------------------------------------------------------
 HTML Elements
 ------------------------------------------------------------------------------*/
+:root {
+  --toolbar-height: #{$toolbar-height};
+}
+
 *,
 *:before,
 *:after {
@@ -2243,7 +2247,7 @@ $feed-title-width: 115px;
 }
 
 .basement-panel {
-  max-height: calc(100vh - $toolbar-height);
+  max-height: calc(100vh - var(--toolbar-height));
   overflow-y: scroll;
   @include background-color($color-base);
 }
@@ -2548,10 +2552,10 @@ $feed-title-width: 115px;
   .has-content & {
     display: flex;
   }
-  .hide-entry-toolbar.feature-flag-floaty-true & {
+  .hide-entry-column-toolbar.feature-flag-floaty-true & {
     transform: translateY(-100%);
   }
-  .one-up.native.hide-entry-toolbar.feature-flag-floaty-true & {
+  .one-up.native.hide-entry-column-toolbar.feature-flag-floaty-true & {
     transform: translateY(calc(-100% + (1px)));
   }
 }
@@ -2565,6 +2569,13 @@ $feed-title-width: 115px;
   z-index: 0;
   flex: 1;
   position: relative;
+  .one-up & {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+  }
 }
 
 .entry-content {
@@ -2589,6 +2600,9 @@ $feed-title-width: 115px;
   &.slide-down {
     transform: translate3d(0, 100vh, 0);
     opacity: 0;
+  }
+  .one-up & {
+    padding-bottom: calc(env(safe-area-inset-bottom) + var(--toolbar-height));
   }
 }
 
@@ -2705,6 +2719,11 @@ $feed-title-width: 115px;
   justify-content: center;
   flex-shrink: 0;
   padding: 0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transition: transform 0.2s ease-out;
   .navigation-button {
     @include color($color-contrast-700);
     padding: 11px 0;
@@ -2766,6 +2785,12 @@ $feed-title-width: 115px;
   }
   .icon-previous {
     transform: rotate(90deg);
+  }
+  .hide-entry-column-toolbar.feature-flag-floaty-true & {
+    transform: translateY(100%);
+  }
+  .one-up.native.hide-entry-column-toolbar.feature-flag-floaty-true & {
+    transform: translateY(calc(100% - (1px)));
   }
 }
 
