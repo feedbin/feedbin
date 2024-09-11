@@ -1271,7 +1271,7 @@ $.extend feedbin,
       "top": "#{newTop}px"
     selectedPanel.prop('scrollTop', 0)
     $('body').addClass('has-entry-basement')
-    $('body').removeClass(feedbin.hideToolbarClass)
+    window.dispatchEvent(new CustomEvent("open-entry-basement"))
 
   applyStarred: (entryId) ->
     if feedbin.Counts.get().isStarred(entryId)
@@ -1284,6 +1284,7 @@ $.extend feedbin,
       $('body').removeClass('extract-active')
       feedbin.updateEntryContent(entry.content, entry.inner_content)
       feedbin.formatEntryContent(entryId, true)
+      window.dispatchEvent(new CustomEvent("show-entry"))
       if feedbin.viewType == 'updated'
         $('[data-behavior~=change_content_view][data-view-mode=diff]').prop('checked', true).change()
       else if feedbin.data.subscription_view_mode[entry.feed_id] == "newsletter"

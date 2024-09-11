@@ -2790,7 +2790,7 @@ $feed-title-width: 115px;
     transform: translateY(100%);
   }
   .one-up.native.hide-entry-column-toolbar.feature-flag-floaty-true & {
-    transform: translateY(calc(100% - (1px)));
+    transform: translateY(100%);
   }
 }
 

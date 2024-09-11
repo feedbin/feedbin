@@ -57,7 +57,7 @@
                 <%= render partial: 'shared/feeds_toolbar' %>
             </div>
         </div>
-        <div class="entry-column app-panel" data-behavior="content_column" data-controller="toolbar" data-toolbar-section-value="entry-column" data-action="click->toolbar#show">
+        <div class="entry-column app-panel" data-behavior="content_column" data-controller="toolbar" data-toolbar-section-value="entry-column" data-action="click->toolbar#show show-entry-basement@window->toolbar#show show-entry@window->toolbar#showWithoutAnimation mousemove->toolbar#mousing" >
             <div class="entry-inner-column">
                 <div class="account-toolbar">
                     <div class="entry-buttons">
@@ -77,7 +77,7 @@
                         <% end %>
                     <% end %>
                 </div>
-                <div class="entry-meta" data-behavior="entry_meta_target"></div>
+                <div class="entry-meta" data-behavior="entry_meta_target" data-toolbar-target="toolbar"></div>
                 <div class="inner-column">
                     <div class="entry-content-wrap <%= user_presenter.content_classes %>" data-font-size="<%= user_presenter.font_size %>"  data-font="<%= user_presenter.font %>" data-behavior="entry_content_target">
                             <div class="splash">
@@ -96,7 +96,7 @@
 
                         <div data-behavior="inner_content_target"></div>
                     </div>
-                    <div class="bottom-toolbar entry-bottom-toolbar">
+                    <div class="bottom-toolbar entry-bottom-toolbar" data-toolbar-target="toolbar">
                         <button class="navigation-button button-previous" data-behavior="open_previous_entry needs_previous">
                             <div class="icon-previous">
                                 <%= svg_tag "icon-arrow", size: "9x15" %>
