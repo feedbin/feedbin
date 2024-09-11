@@ -28,7 +28,6 @@ $.extend feedbin,
   loadingMore: false
   remoteContentIntervals: {}
   fastAnimation: 200
-  hideToolbarClass: "hide-entry-column-toolbar"
 
   updateStyles: (url) ->
     element = $("link[href='#{url}']")
