@@ -46,8 +46,7 @@ gem "pg"
 gem "phlex-rails"
 gem "postmark-rails"
 gem "premailer-rails"
-# Unicorn is not yet compatible with rack 3
-gem "rack", "< 3"
+gem "rack", "< 3" # Unicorn is not yet compatible with rack 3
 gem "raindrops"
 gem "redcarpet"
 gem "redis", "< 5"
@@ -59,6 +58,7 @@ gem "sanitize"
 gem "sass-rails"
 gem "sidekiq"
 gem "stimulus-rails"
+gem "stringio", "= 3.1.0" # https://stackoverflow.com/questions/77570131
 gem "stripe", "~> 5.55.0"
 gem "stripe_event"
 gem "strong_migrations"
