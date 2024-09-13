@@ -49,6 +49,7 @@ class User < ApplicationRecord
     :entries_width,
     :billing_issue,
     :podcast_sort_order,
+    :podcast_download_limit,
     :playlist_migration,
     :fix_feeds_available,
     :addresses_available,
