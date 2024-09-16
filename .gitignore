@@ -28,3 +28,4 @@ coverage
 /app/assets/builds/*
 !/app/assets/builds/.keep
 .nova
+.zed

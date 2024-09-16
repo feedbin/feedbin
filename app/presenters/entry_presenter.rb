@@ -462,7 +462,7 @@ class EntryPresenter < BasePresenter
         fallback = @template.image_url("favicon-profile-default.png")
         @template.image_tag_with_fallback(fallback, url, alt: "")
       end
-    elsif entry.micropost?
+    elsif entry.micropost? && entry.micropost.author_avatar
       @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image" do
         fallback = @template.image_url("favicon-profile-default.png")
         url = RemoteFile.signed_url(entry.micropost.author_avatar)
