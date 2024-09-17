@@ -229,7 +229,7 @@ class Feed < ApplicationRecord
   end
 
   def feed_relative_url(url)
-    root = crawl_data.redirected_to || feed_url
+    root = crawl_data&.redirected_to || feed_url
     rebase_url(root, url).to_s
   end
 

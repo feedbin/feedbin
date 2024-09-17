@@ -114,6 +114,40 @@ Rails.application.reloader.to_prepare do
     }
   }
 
+  feeds_mapping = {
+    settings: shared_settings,
+    mappings: {
+      _source: {
+        enabled: Rails.env.development? ? true : false
+      },
+      properties: {
+        id: {
+          type: "keyword"
+        },
+        title: {
+          type: "text"
+        },
+        site_url: {
+          type: "text",
+          analyzer: "lower_exact"
+        },
+        feed_url: {
+          type: "text",
+          analyzer: "lower_exact"
+        },
+        self_url: {
+          type: "keyword"
+        },
+        description: {
+          type: "text",
+        },
+        subscriptions_count: {
+          type: "long",
+        },
+      }
+    }
+  }
+
   actions_mapping = {
     settings: shared_settings,
     mappings: {
@@ -147,11 +181,13 @@ Rails.application.reloader.to_prepare do
     hash[:config] = {
       mappings: {
         entries: entries_mapping,
-        actions: actions_mapping
+        actions: actions_mapping,
+        feeds: feeds_mapping
       },
       aliases: {
         entries: "#{Entry.table_name}-01",
-        actions: "#{Action.table_name}-01"
+        actions: "#{Action.table_name}-01",
+        feeds: "#{Feed.table_name}-01"
       }
     }
   end
@@ -169,9 +205,11 @@ Rails.application.reloader.to_prepare do
       begin
         Search.client(mirror: true) { _1.request(:put, $search[:config][:aliases][:entries], json: $search[:config][:mappings][:entries]) }
         Search.client(mirror: true) { _1.request(:put, $search[:config][:aliases][:actions], json: $search[:config][:mappings][:actions]) }
+        Search.client(mirror: true) { _1.request(:put, $search[:config][:aliases][:feeds], json: $search[:config][:mappings][:feeds]) }
 
         Search.client(mirror: true) { _1.add_alias($search[:config][:aliases][:entries], alias_name: Entry.table_name) }
         Search.client(mirror: true) { _1.add_alias($search[:config][:aliases][:actions], alias_name: Action.table_name) }
+        Search.client(mirror: true) { _1.add_alias($search[:config][:aliases][:feeds], alias_name: Feed.table_name) }
       rescue => exception
         Rails.logger.error("---------------------------")
         Rails.logger.error("Error initializing search: #{exception.inspect}")
