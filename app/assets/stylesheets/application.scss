@@ -768,10 +768,6 @@ $hamburger-dot: 4px;
 }
 
 .feed-toolbar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
   padding-bottom: 0;
   z-index: 2;
   padding: 16px 0 20px 0;
@@ -853,7 +849,14 @@ $hamburger-dot: 4px;
       @include fill($color-base);
     }
   }
-  .one-up.hide-entries-column-toolbar.feature-flag-floaty-true & {
+  .one-up &, .two-up & {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+  .one-up.hide-entries-column-toolbar.feature-flag-floaty-true &,
+  .two-up.hide-entries-column-toolbar.feature-flag-floaty-true & {
     transform: translateY(100%);
   }
 }
