@@ -5,7 +5,7 @@ module App
     end
 
     def view_template
-      div data: search_component_data, class: "search-wrap grid overflow-hidden min-h-0 group opacity-0 [grid-template-rows:0fr] data-[search-form-visible-value=true]:[grid-template-rows:1fr] data-[search-form-visible-value=true]:opacity-100 data-[search-form-foreground-value=true]:overflow-visible transition-[grid-template-rows]" do
+      div data: search_component_data, class: "search-wrap grid overflow-hidden min-h-0 group opacity-0 [grid-template-rows:0fr] data-[search-form-visible-value=true]:[grid-template-rows:1fr] data-[search-form-visible-value=true]:opacity-100 data-[search-form-foreground-value=true]:overflow-visible data-[search-form-foreground-value=true]:z-10 transition-[grid-template-rows] sticky top-[44px] group-[.hide-entries-column-toolbar]/body:opacity-0" do
         form_with url: search_entries_path, class: "search-form group min-h-0", remote: true, method: :get, autocomplete: "off", novalidate: true, data: search_form_data do |form|
           form.hidden_field :query_extra, value: "", data: stimulus_item(target: "queryExtra", for: :search_token)
           form.button type: "submit", class: "visually-hidden"
@@ -77,7 +77,7 @@ module App
     end
 
     def search_options
-      div class: "grid overflow-hidden min-h-0 opacity-0 transition-[grid-template-rows] [grid-template-rows:0fr] group-data-[search-form-options-visible-value=true]:[grid-template-rows:1fr] group-data-[search-form-options-visible-value=true]:opacity-100 group-data-[search-form-options-visible-value=true]:overflow-visible" do
+      div class: "grid bg-base overflow-hidden min-h-0 opacity-0 transition-[grid-template-rows] [grid-template-rows:0fr] group-data-[search-form-options-visible-value=true]:[grid-template-rows:1fr] group-data-[search-form-options-visible-value=true]:opacity-100 group-data-[search-form-options-visible-value=true]:overflow-visible" do
         div class: "min-h-0" do
           div class: "border-b flex gap-2 text-sm p-1 items-stretch" do
             div class: "dropdown-wrap" do

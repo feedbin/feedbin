@@ -40,22 +40,20 @@
             </div>
         </div>
         <div class="entries-column app-panel" data-behavior="content_column" data-resizable-name="entries" style="<%= user_presenter.entries_width_style %>" data-controller="toolbar"  data-toolbar-section-value="entries-column" data-action="click->toolbar#show">
-            <div class="inner-column">
-                <div class="entries-header" data-behavior="entries_header">
-                    <button class="back-button" data-behavior="show_feeds">
-                        <%= svg_tag "icon-arrow", size: "9x15" %>
-                    </button>
-                    <span class="feed-title-wrap"><span data-behavior="user_title"></span></span>
-                    <div class="search-button">
-                      <%= render App::SearchButtonComponent.new %>
-                    </div>
+            <div class="entries-header" data-behavior="entries_header">
+                <button class="back-button" data-behavior="show_feeds">
+                    <%= svg_tag "icon-arrow", size: "9x15" %>
+                </button>
+                <span class="feed-title-wrap"><span data-behavior="user_title"></span></span>
+                <div class="search-button">
+                  <%= render App::SearchButtonComponent.new %>
                 </div>
-                <%= render App::SearchFormComponent.new(params: params) %>
-                <div class="entries" data-action="scroll->toolbar#scroll">
-                    <ul data-behavior="entries_target" class="entries-target"></ul>
-                </div>
-                <%= render partial: 'shared/feeds_toolbar' %>
             </div>
+            <div class="entries" data-action="scroll->toolbar#scroll" data-toolbar-section-value="entries-column" data-action="click->toolbar#show mousemove->toolbar#mousing" >
+                <%= render App::SearchFormComponent.new(params: params) %>
+                <ul data-behavior="entries_target" class="entries-target"></ul>
+            </div>
+            <%= render partial: 'shared/feeds_toolbar' %>
         </div>
         <div class="entry-column app-panel" data-behavior="content_column" data-controller="toolbar" data-toolbar-section-value="entry-column" data-action="click->toolbar#show show-entry-basement@window->toolbar#show show-entry@window->toolbar#showWithoutAnimation mousemove->toolbar#mousing" >
             <div class="entry-inner-column">
