@@ -776,6 +776,7 @@ $hamburger-dot: 4px;
   z-index: 2;
   padding: 16px 0 20px 0;
   transition: transform 0.2s ease-out;
+  will-change: transform;
   .entries-column & {
     padding: 8px 0;
   }
@@ -1683,6 +1684,7 @@ li.selected > a .favicon-wrap,
   flex-shrink: 0;
   z-index: 5;
   transition: transform 0.2s ease-out;
+  will-change: transform;
   .one-up & {
     @include border-bottom($color-borders-alt, $root: true);
   }
@@ -2578,6 +2580,7 @@ $feed-title-width: 115px;
   right: 0;
   align-content: stretch;
   transition: transform 0.2s ease-out;
+  will-change: transform;
   .toolbar-wrap {
     flex: 1;
   }
@@ -2756,6 +2759,7 @@ $feed-title-width: 115px;
   left: 0;
   right: 0;
   transition: transform 0.2s ease-out;
+  will-change: transform;
   .navigation-button {
     @include color($color-contrast-700);
     padding: 11px 0;
