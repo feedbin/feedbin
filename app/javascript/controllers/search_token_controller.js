@@ -249,7 +249,9 @@ export default class extends Controller {
   }
 
   buildJumpable() {
-    let sourceableTargets = [...document.querySelectorAll('[data-sourceable-target]')]
+    let sourceableTargets = [
+      ...document.querySelectorAll("[data-sourceable-target]"),
+    ]
     if (this.sourceableTargetCount === sourceableTargets.length) {
       return
     }
