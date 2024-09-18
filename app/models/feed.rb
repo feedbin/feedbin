@@ -297,6 +297,9 @@ class Feed < ApplicationRecord
     crawl_error? && !discovered_feeds.present?
   end
 
+  def search_data
+    FeedSearchData.new(self).to_h
+  end
 
   private
 

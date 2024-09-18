@@ -9,6 +9,7 @@ module Search
       refresh:  "/_refresh",
       bulk:     "/_bulk",
       aliases:  "/_aliases",
+      alias:    "/_alias/%{name}",
     }
 
     def initialize(url, username: nil, password: nil)
@@ -76,6 +77,10 @@ module Search
       request(:post, PATHS[:refresh])
     end
 
+    def delete_index(index)
+      request(:delete, "/#{index}")
+    end
+
     def all_matches(index, query:)
       callback = proc do |page|
         search(index, query: query, page: page, per_page: 1_000)
@@ -94,6 +99,25 @@ module Search
             alias: alias_name
           }
         }]
+      }
+      request(:post, PATHS[:aliases], json: data)
+    end
+
+    def get_index_from_alias(alias_name:)
+      path = PATHS[:alias] % {name: alias_name}
+      request(:get, path).keys.first
+    end
+
+    def update_alias(alias_name:, old_index:, new_index:)
+      data = {
+        actions: [
+          {
+            remove: { index: old_index, alias: alias_name }
+          },
+          {
+            add: { index: new_index, alias: alias_name }
+          }
+        ]
       }
       request(:post, PATHS[:aliases], json: data)
     end
