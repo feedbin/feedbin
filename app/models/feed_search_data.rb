@@ -1,5 +1,5 @@
 class FeedSearchData
-  EXCLUDE = ["", "http:", "https:", "com", "net", "co", "index", "rss", "xml", "www", "org", "de", "feed", "youtube", "me"]
+  EXCLUDE = ["", "http:", "https:", "com", "net", "co", "index", "rss", "xml", "www", "org", "de", "me"]
   def initialize(feed)
     @feed = feed
   end
