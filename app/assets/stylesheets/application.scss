@@ -1765,11 +1765,8 @@ li.selected > a .favicon-wrap,
     margin: 0;
     padding: 0 0 17px 0;
     list-style: none;
-    .one-up.feature-flag-floaty-true &,
-    .two-up.feature-flag-floaty-true & {
-      padding-top: $toolbar-height;
-    }
     .one-up &, .two-up & {
+      padding-top: $toolbar-height;
       padding-bottom: calc(76px + env(safe-area-inset-bottom));
     }
   }
