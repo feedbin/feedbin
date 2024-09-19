@@ -29,7 +29,7 @@ class Feed < ApplicationRecord
 
   enum :feed_type, {xml: 0, newsletter: 1, twitter: 2, twitter_home: 3, pages: 4}
 
-  store :settings, accessors: [:custom_icon, :current_feed_url, :custom_icon_format], coder: JsonConverter
+  store :settings, accessors: [:custom_icon, :current_feed_url, :custom_icon_format, :meta_title, :meta_description, :meta_crawled_at], coder: JsonConverter
 
   def twitter_user?
     twitter_user.present?
@@ -274,7 +274,7 @@ class Feed < ApplicationRecord
   end
 
   def crawl_error?
-    crawl_data.error_count > 23
+    crawl_data.respond_to?(:error_count) && crawl_data.error_count > 23
   end
 
   def crawl_error_message

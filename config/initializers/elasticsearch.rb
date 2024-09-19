@@ -118,7 +118,7 @@ Rails.application.reloader.to_prepare do
     settings: shared_settings,
     mappings: {
       _source: {
-        enabled: Rails.env.development? ? true : false
+        enabled: true
       },
       properties: {
         id: {
@@ -139,6 +139,12 @@ Rails.application.reloader.to_prepare do
           type: "keyword"
         },
         description: {
+          type: "text",
+        },
+        meta_title: {
+          type: "text",
+        },
+        meta_description: {
           type: "text",
         },
         subscriptions_count: {

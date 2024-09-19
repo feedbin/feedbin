@@ -1,0 +1,64 @@
+class Subscriptions::NewView < ApplicationView
+  def initialize(feeds:, tag_editor:)
+    @feeds = feeds
+    @tag_editor = tag_editor
+    @valid_feed_ids = Rails.application.message_verifier(:valid_feed_ids).generate(@feeds.map(&:id))
+  end
+
+  def view_template
+    form_tag(subscriptions_path, method: :post, remote: true, data: { behavior: "subscription_options" }) do
+      hidden_field_tag "valid_feed_ids", @valid_feed_ids
+
+      render Settings::H2Component.new do
+        "Feed".pluralize(@feeds.length)
+      end
+
+      div(class: "mb-12") do
+        @feeds.each_with_index do |feed, index|
+          fields_for "feeds[]", feed do |pf|
+            div(class: "mb-4", data: { behavior: "subscription_option" }) do
+              div(class: "flex items-center gap-4 mb-1") do
+                div(class: "grow") do
+                  render Form::TextInputComponent.new do |input|
+                    input.input do
+                      pf.text_field :title, placeholder: feed.title, class: "peer text-input"
+                    end
+                  end
+                end
+                div(class: helpers.class_names(hide: @feeds.length == 1)) do
+                  pf.check_box :subscribe, checked: index == 0 ? true : false, class: "peer", data: { behavior: "check_toggle" }
+                  pf.label :subscribe, class: "group" do
+                    render Form::SwitchComponent.new
+                  end
+                end
+              end
+              p(class: "text-sm text-500 pl-2 truncate", title: "Feed URL") do
+                helpers.pretty_url(feed.feed_url)
+              end
+            end
+
+            if feed.twitter_feed?
+              render Settings::ControlGroupComponent.new(class: "group [&_[data-item-container]]:!border-0 [&_[data-item]]:!border-0") do |group|
+                group.item do
+                  pf.check_box :media_only, checked: false, class: "peer"
+                  pf.label :media_only, class: "group text-right" do
+                    render Settings::ControlRowComponent.new do |row|
+                      row.title { "Tweets with media and links only" }
+                      row.control { render Form::SwitchComponent.new }
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+
+      render Settings::H2Component.new do
+        "Tags"
+      end
+      render "shared/tag_fields", tag_editor: @tag_editor
+      submit_tag("Submit", class: "visually-hidden", tabindex: "-1", data: { behavior: "submit_add" })
+    end
+  end
+end

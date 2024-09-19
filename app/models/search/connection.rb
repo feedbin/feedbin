@@ -103,23 +103,30 @@ module Search
       request(:post, PATHS[:aliases], json: data)
     end
 
-    def get_index_from_alias(alias_name:)
+    def get_indexes_from_alias(alias_name)
       path = PATHS[:alias] % {name: alias_name}
-      request(:get, path).keys.first
+      request(:get, path).keys
     end
 
-    def update_alias(alias_name:, old_index:, new_index:)
-      data = {
-        actions: [
-          {
-            remove: { index: old_index, alias: alias_name }
-          },
-          {
-            add: { index: new_index, alias: alias_name }
-          }
-        ]
-      }
-      request(:post, PATHS[:aliases], json: data)
+    def update_alias(alias_name:, old_indexes:, new_index:)
+      actions = old_indexes.map do |old_index|
+        {
+          remove: { index: old_index, alias: alias_name }
+        }
+      end
+      actions.push({
+        add: { index: new_index, alias: alias_name }
+      })
+      request(:post, PATHS[:aliases], json: { actions: actions })
+    end
+
+    def reindex(index, mappings:, &block)
+      old_indexes = get_indexes_from_alias(index)
+      new_index = "#{index}_#{Time.now.to_i}"
+      request(:put, new_index, json: mappings)
+      yield(new_index)
+      update_alias(alias_name: index, old_indexes: old_indexes, new_index: new_index)
+      old_indexes.each { delete_index(_1) }
     end
 
     def request(method, path, options = {})

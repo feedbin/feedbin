@@ -12,6 +12,8 @@ class FeedSearchData
       hash[:feed_url]            = format_url(@feed.self_url || @feed.feed_url)
       hash[:self_url]            = @feed.self_url
       hash[:description]         = description
+      hash[:meta_title]          = @feed.meta_title
+      hash[:meta_description]    = @feed.meta_description
       hash[:subscriptions_count] = @feed.subscriptions_count
     end
   end
