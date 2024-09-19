@@ -105,7 +105,12 @@ module Search
 
     def get_indexes_from_alias(alias_name)
       path = PATHS[:alias] % {name: alias_name}
-      request(:get, path).keys
+      response = request(:get, path)
+      if response.key?("error") && response.safe_dig("status") == 404
+        []
+      else
+        reponse.keys
+      end
     end
 
     def update_alias(alias_name:, old_indexes:, new_index:)

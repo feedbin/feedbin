@@ -25,7 +25,7 @@ class FeedsController < ApplicationController
     @user = current_user
     @feeds = if !params[:q].include?(".") && @user.feed_search
       @search = true
-      query
+      Feed.search(params[:q])
     else
       FeedFinder.feeds(params[:q], username: params[:username], password: params[:password])
     end
@@ -48,28 +48,5 @@ class FeedsController < ApplicationController
     unless current_user.subscribed_to?(params[:id])
       render_404
     end
-  end
-
-  def query
-    query = {
-      query: {
-        function_score: {
-          query: {
-            simple_query_string: {
-              query: params[:q],
-              fields: ["title", "site_url", "feed_url", "description", "meta_title", "meta_description"],
-              default_operator: "and"
-            }
-          },
-          field_value_factor: {
-            field: "subscriptions_count",
-            factor: 1,
-          },
-          boost_mode: "sum"
-        }
-      }
-    }
-    response = Search.client { _1.search(Feed.table_name, query: query) }
-    response.records(Feed)
   end
 end

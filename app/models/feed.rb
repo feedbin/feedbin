@@ -151,10 +151,6 @@ class Feed < ApplicationRecord
     options.safe_dig("email_headers", "List-Unsubscribe")
   end
 
-  def self.search(url)
-    where("feed_url ILIKE :query", query: "%#{url}%")
-  end
-
   def json_feed
     options&.respond_to?(:dig) && options&.safe_dig("json_feed")
   end
@@ -299,6 +295,10 @@ class Feed < ApplicationRecord
 
   def search_data
     FeedSearchData.new(self).to_h
+  end
+
+  def self.search(query)
+    FeedSearch.new(query).search
   end
 
   private
