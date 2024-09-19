@@ -109,7 +109,7 @@ module Search
       if response.key?("error") && response.safe_dig("status") == 404
         []
       else
-        reponse.keys
+        response.keys
       end
     end
 
