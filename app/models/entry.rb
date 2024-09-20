@@ -37,6 +37,20 @@ class Entry < ApplicationRecord
 
   self.per_page = 100
 
+  scope :last_n_per_feed, -> (n, feed_ids) {
+     select_sql = <<-SQL
+       entries.*, ROW_NUMBER() OVER (
+         PARTITION BY feed_id
+         ORDER BY published DESC
+       ) AS entries_rank
+     SQL
+
+     ranked_posts = select(select_sql)
+     from(ranked_posts, "entries")
+       .where("entries_rank <= ?", n)
+       .where(feed_id: feed_ids)
+   }
+
   def self.entries_with_feed(entry_ids, sort)
     in_order_of(:id, entry_ids).includes(feed: [:favicon])
   end

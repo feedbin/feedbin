@@ -141,6 +141,9 @@ Rails.application.reloader.to_prepare do
         description: {
           type: "text",
         },
+        author: {
+          type: "text",
+        },
         meta_title: {
           type: "text",
         },
