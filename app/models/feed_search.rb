@@ -10,7 +10,7 @@ class FeedSearch
           query: {
             simple_query_string: {
               query: @query,
-              fields: ["title^2", "site_url", "feed_url", "description", "meta_title"],
+              fields: ["title^2", "site_url", "feed_url", "description", "meta_title", "author"],
               default_operator: "and"
             }
           },
