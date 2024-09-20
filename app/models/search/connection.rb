@@ -9,6 +9,7 @@ module Search
       refresh:  "/_refresh",
       bulk:     "/_bulk",
       aliases:  "/_aliases",
+      alias:    "/_alias/%{name}",
     }
 
     def initialize(url, username: nil, password: nil)
@@ -76,6 +77,10 @@ module Search
       request(:post, PATHS[:refresh])
     end
 
+    def delete_index(index)
+      request(:delete, "/#{index}")
+    end
+
     def all_matches(index, query:)
       callback = proc do |page|
         search(index, query: query, page: page, per_page: 1_000)
@@ -96,6 +101,42 @@ module Search
         }]
       }
       request(:post, PATHS[:aliases], json: data)
+    end
+
+    def get_indexes_from_alias(alias_name)
+      path = PATHS[:alias] % {name: alias_name}
+      response = request(:get, path)
+      if response.key?("error") && response.safe_dig("status") == 404
+        []
+      else
+        response.keys
+      end
+    end
+
+    def update_alias(alias_name:, old_indexes:, new_index:)
+      actions = old_indexes.map do |old_index|
+        {
+          remove: { index: old_index, alias: alias_name }
+        }
+      end
+      actions.push({
+        add: { index: new_index, alias: alias_name }
+      })
+      request(:post, PATHS[:aliases], json: { actions: actions })
+    end
+
+    def reindex(index, mappings:, &block)
+      old_indexes = get_indexes_from_alias(index)
+      new_index = "#{index}-#{Time.now.to_i}"
+      request(:put, new_index, json: mappings)
+      begin
+        yield(new_index)
+      rescue => exception
+        delete_index(new_index)
+        raise
+      end
+      update_alias(alias_name: index, old_indexes: old_indexes, new_index: new_index)
+      old_indexes.each { delete_index(_1) }
     end
 
     def request(method, path, options = {})

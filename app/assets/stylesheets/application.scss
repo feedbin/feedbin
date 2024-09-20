@@ -7524,6 +7524,13 @@ $tooltip-arrow-height: 6px;
   }
 }
 
+.two-lines {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .spacer {
   margin-left: base-units(1);
 }

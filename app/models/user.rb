@@ -53,7 +53,8 @@ class User < ApplicationRecord
     :playlist_migration,
     :fix_feeds_available,
     :addresses_available,
-    :floaty
+    :floaty,
+    :feed_search
 
   has_one :coupon
   has_many :subscriptions, dependent: :delete_all

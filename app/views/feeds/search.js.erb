@@ -7,15 +7,12 @@
     feedbin.basicAuthForm();
 <% elsif @feeds.present? %>
     <% present @feeds.first do |feed_presenter| %>
-        <% if @feeds.first.twitter_user? %>
-            $('.modal-purpose-subscribe [data-behavior~=feeds_search_favicon_target]').html('<%= j feed_presenter.favicon(@feeds.first) %>');
-        <% else %>
-            $('.modal-purpose-subscribe [data-behavior~=feeds_search_favicon_target]').html('<%= j favicon_with_host(@feeds.first.host) %>');
-        <% end %>
-        $('.modal-purpose-subscribe [data-behavior~=subscribe_target]').html('<%= j render partial: "subscriptions/new", locals: {feeds: @feeds, tag_editor: @tag_editor} %>');
+        $('.modal-purpose-subscribe [data-behavior~=feeds_search_favicon_target]').html('<%= j(@search ? svg_tag("icon-search", class: "fill-400") : favicon_with_host(@feeds.first.host) ) %>');
+        $('.modal-purpose-subscribe [data-behavior~=subscribe_target]').html('<%= j render Subscriptions::NewView.new(feeds: @feeds, tag_editor: @tag_editor, search: @search) %>');
         feedbin.showSubscribeResults()
         window.history.replaceState({}, document.title, "/");
         feedbin.updateFeedSearchMessage();
+        feedbin.faviconColors(".modal");
     <% end %>
 <% else %>
     feedbin.showNotification('No feed found.', true);

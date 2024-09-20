@@ -5,19 +5,19 @@ require "minitest/mock"
 require "socket"
 require "connection_pool"
 
-# unless ENV["CI"]
-#   socket = Socket.new(:INET, :STREAM, 0)
-#   socket.bind(Addrinfo.tcp("127.0.0.1", 0))
-#   port = socket.local_address.ip_port
-#   socket.close
-#
-#   ENV["REDIS_URL"] = "redis://localhost:%d" % port
-#   redis_test_instance = IO.popen("redis-server --port %d --save '' --appendonly no" % port)
-#
-#   Minitest.after_run do
-#     Process.kill("INT", redis_test_instance.pid)
-#   end
-# end
+unless ENV["CI"]
+  socket = Socket.new(:INET, :STREAM, 0)
+  socket.bind(Addrinfo.tcp("127.0.0.1", 0))
+  port = socket.local_address.ip_port
+  socket.close
+
+  ENV["REDIS_URL"] = "redis://localhost:%d" % port
+  redis_test_instance = IO.popen("redis-server --port %d --save '' --appendonly no" % port)
+
+  Minitest.after_run do
+    Process.kill("INT", redis_test_instance.pid)
+  end
+end
 
 $redis = {
   entries: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) },
@@ -120,6 +120,7 @@ class ActiveSupport::TestCase
   def clear_search
     Search.client { _1.request(:delete, $search[:config][:aliases][:entries]) }
     Search.client { _1.request(:delete, $search[:config][:aliases][:actions]) }
+    Search.client { _1.request(:delete, $search[:config][:aliases][:feeds]) }
 
     Search.setup
   end
