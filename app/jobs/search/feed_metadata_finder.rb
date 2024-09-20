@@ -1,7 +1,7 @@
 module Search
   class FeedMetadataFinder
     include Sidekiq::Worker
-    sidekiq_options queue: :network_default
+    sidekiq_options queue: :network_default, retry: false
 
     def perform(feed_id)
       @feed = Feed.find(feed_id)
