@@ -52,7 +52,7 @@ class Subscriptions::NewView < ApplicationView
       end
       div class: tokens("pr-[50px]", -> { @search } => "pl-[30px]") do
         if feed.meta_description
-          p(class: "text-sm text-600 two-lines", title: "Description") do
+          p(class: "text-sm text-600 two-lines", title: feed.meta_description) do
             feed.meta_description
           end
         end
