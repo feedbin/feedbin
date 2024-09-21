@@ -15,8 +15,9 @@ module Search
     def reindex(new_index)
       threshold = ENV.fetch("FEEDS_SEARCHABLE_THRESHOLD") { 0 }.to_i
       feeds = Feed.order(subscriptions_count: :desc).where("subscriptions_count > ?", threshold).reject { _1.crawl_error? }
-      feeds = feeds.uniq { _1.self_url.nil? ? SecureRandom.hex : _1.self_url }
-      feeds = feeds.uniq { "#{_1.title}#{_1.site_url&.delete_suffix("/")}" }
+      feeds.uniq! { _1.self_url.nil? ? SecureRandom.hex : _1.self_url }
+      feeds.uniq! { "#{_1.title}#{_1.site_url&.delete_suffix("/")}" }
+      feeds.reject! { _1.feed_url.include?("feedbin.com/starred") ||  _1.feed_url.include?("feedbin.me/starred")}
 
       feeds.each_slice(100) do |feeds|
         authors = Entry.last_n_per_feed(50, feeds.map(&:id)).pluck(:feed_id, :author).each_with_object({}) do |(feed_id, author), hash|
