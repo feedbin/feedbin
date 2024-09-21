@@ -126,7 +126,6 @@ module Search
     end
 
     def reindex(index, mappings:, &block)
-      old_indexes = get_indexes_from_alias(index)
       new_index = "#{index}-#{Time.now.to_i}"
       request(:put, new_index, json: mappings)
       begin
@@ -135,6 +134,7 @@ module Search
         delete_index(new_index)
         raise
       end
+      old_indexes = get_indexes_from_alias(index)
       update_alias(alias_name: index, old_indexes: old_indexes, new_index: new_index)
       old_indexes.each { delete_index(_1) }
     end

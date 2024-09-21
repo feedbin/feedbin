@@ -19,10 +19,13 @@ module Search
       feeds = feeds.uniq { "#{_1.title}#{_1.site_url&.delete_suffix("/")}" }
 
       feeds.each_slice(100) do |feeds|
-        authors  = Entry.where(feed_id: feeds.map(&:id)).group(:feed_id).pluck(:feed_id, "array_agg(author)").to_h
+        authors = Entry.last_n_per_feed(50, feeds.map(&:id)).pluck(:feed_id, :author).each_with_object({}) do |(feed_id, author), hash|
+          hash[feed_id] ||= Set.new
+          hash[feed_id].add(author.to_s.downcase.to_plain_text)
+        end
         records = feeds.map do |feed|
           document = feed.search_data
-          document[:author] = authors.fetch(feed.id) { [] }.map { _1.to_s.downcase.to_plain_text }.uniq
+          document[:author] = authors.fetch(feed.id) { [] }.to_a
           Search::BulkRecord.new(
             action: :index,
             index: new_index,
