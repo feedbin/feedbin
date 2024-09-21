@@ -14,7 +14,7 @@ module Search
 
     def reindex(new_index)
       threshold = ENV.fetch("FEEDS_SEARCHABLE_THRESHOLD") { 0 }.to_i
-      feeds = Feed.order(subscriptions_count: :desc).where("subscriptions_count > ?", threshold).reject { _1.crawl_error? }
+      feeds = Feed.xml.order(subscriptions_count: :desc).where("subscriptions_count > ?", threshold).reject { _1.crawl_error? }
       feeds.uniq! { _1.self_url.nil? ? SecureRandom.hex : _1.self_url }
       feeds.uniq! { "#{_1.title}#{_1.site_url&.delete_suffix("/")}" }
       feeds.reject! { _1.feed_url.include?("feedbin.com/starred") ||  _1.feed_url.include?("feedbin.me/starred")}
