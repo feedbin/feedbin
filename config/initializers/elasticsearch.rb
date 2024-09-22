@@ -125,7 +125,8 @@ Rails.application.reloader.to_prepare do
           type: "keyword"
         },
         title: {
-          type: "text"
+          type: "text",
+          analyzer: "stemmed"
         },
         site_url: {
           type: "text",
@@ -140,15 +141,18 @@ Rails.application.reloader.to_prepare do
         },
         description: {
           type: "text",
+          analyzer: "stemmed"
         },
         author: {
           type: "text",
         },
         meta_title: {
           type: "text",
+          analyzer: "stemmed"
         },
         meta_description: {
           type: "text",
+          analyzer: "stemmed"
         },
         subscriptions_count: {
           type: "long",
