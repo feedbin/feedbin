@@ -33,11 +33,14 @@ class Subscriptions::NewView < ApplicationView
   def feed_row(feed, index, form_builder)
     div(class: "mb-4", data: { behavior: "subscription_option" }) do
       div(class: "flex items-center gap-2 mb-1") do
-        if @search
-          render FaviconComponent.new(feed: feed)
-        end
         div(class: "grow") do
           render Form::TextInputComponent.new do |input|
+            if @search
+              input.accessory_leading do
+                span(class: "pl-2") {render FaviconComponent.new(feed: feed)}
+              end
+            end
+
             input.input do
               form_builder.text_field :title, placeholder: feed.title, class: "peer text-input"
             end
@@ -50,14 +53,18 @@ class Subscriptions::NewView < ApplicationView
           end
         end
       end
-      div class: tokens("pr-[50px]", -> { @search } => "pl-[30px]") do
+      div class: tokens(-> { @feeds.length > 1 } => "pr-[50px]") do
+        p(class: "text-sm text-500 truncate", title: "Feed URL") do
+          parts = helpers.pretty_url_parts(feed.feed_url)
+          span class: "text-600 font-bold" do
+            parts[0]
+          end
+          plain parts[1]
+        end
         if feed.meta_description
-          p(class: "text-sm text-600 two-lines", title: feed.meta_description) do
+          p(class: "text-sm text-500 mt-1 two-lines", title: feed.meta_description) do
             feed.meta_description
           end
-        end
-        p(class: "text-sm text-500 truncate", title: "Feed URL") do
-          helpers.pretty_url(feed.feed_url)
         end
       end
     end

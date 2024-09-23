@@ -166,6 +166,17 @@ module ApplicationHelper
     url
   end
 
+  def pretty_url_parts(url)
+    parts = pretty_url(url).split("/")
+    host = parts.shift
+    if parts.length > 0
+      path = "/#{parts.join("/")}"
+    else
+      path = nil
+    end
+    [host, path]
+  end
+
   def short_url_alt(url)
     url = pretty_url(url)
     url.truncate(40, omission: "…#{url.last(10)}")
