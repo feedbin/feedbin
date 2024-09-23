@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { afterTransition } from "helpers"
+import { Layout, Config } from "helpers"
 
 export default class extends Controller {
   static targets = ["toolbar"]
@@ -13,18 +14,24 @@ export default class extends Controller {
   }
 
   scroll(event) {
+    if (!this.shouldRun()) {
+      return
+    }
+
     const element = event.target
     const maxScrollHeight = element.scrollHeight - element.offsetHeight
     const currentScrollPosition = element.scrollTop
 
     if (window.feedbin.shareOpen()) {
       this.show(event)
-    } else if (maxScrollHeight < 40) {
+    } else if (maxScrollHeight < 44) {
       this.show(event)
     } else if (currentScrollPosition <= 0) {
       this.show(event)
-    } else if (currentScrollPosition >= maxScrollHeight) {
+    } else if (currentScrollPosition >= maxScrollHeight && Layout.oneUp) {
       this.show(event)
+    } else if (currentScrollPosition >= maxScrollHeight) {
+      this.hide(event)
     } else if (currentScrollPosition > this.lastScrollPosition) {
       this.hide(event)
     } else if (currentScrollPosition < this.lastScrollPosition) {
@@ -42,14 +49,21 @@ export default class extends Controller {
     document.body.classList.remove(this.cssClass)
   }
 
+  shouldRun() {
+    if (Layout.oneUp || Layout.fullScreen) {
+      return true
+    }
+    return false
+  }
+
   showWithoutAnimation(event) {
     if (this.hasToolbarTarget) {
       this.toolbarTargets.forEach((element) =>
-        element.classList.add("no-transition")
+        element.classList.add(Config.noTransitionClass)
       )
       afterTransition(this.toolbarTarget, this.openValue, () => {
         this.toolbarTargets.forEach((element) =>
-          element.classList.remove("no-transition")
+          element.classList.remove(Config.noTransitionClass)
         )
       })
     }
