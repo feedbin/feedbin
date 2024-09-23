@@ -855,8 +855,8 @@ $hamburger-dot: 4px;
     left: 0;
     right: 0;
   }
-  .one-up.hide-entries-column-toolbar.feature-flag-floaty-true &,
-  .two-up.hide-entries-column-toolbar.feature-flag-floaty-true & {
+  .one-up.hide-entries-column-toolbar &,
+  .two-up.hide-entries-column-toolbar & {
     transform: translateY(100%);
   }
 }
@@ -1726,10 +1726,10 @@ li.selected > a .favicon-wrap,
     left: 0;
     top: -2px;
   }
-  .hide-entries-column-toolbar.feature-flag-floaty-true & {
+  .hide-entries-column-toolbar & {
     transform: translateY(-100%);
   }
-  .one-up.native.hide-entries-column-toolbar.feature-flag-floaty-true & {
+  .one-up.native.hide-entries-column-toolbar & {
     transform: translateY(calc(-100% + (1px)));
   }
 }
@@ -2588,10 +2588,10 @@ $feed-title-width: 115px;
   .has-content & {
     display: flex;
   }
-  .hide-entry-column-toolbar.feature-flag-floaty-true & {
+  .hide-entry-column-toolbar & {
     transform: translateY(-100%);
   }
-  .one-up.native.hide-entry-column-toolbar.feature-flag-floaty-true & {
+  .one-up.native.hide-entry-column-toolbar & {
     transform: translateY(calc(-100% + (1px)));
   }
 }
@@ -2823,7 +2823,7 @@ $feed-title-width: 115px;
   .icon-previous {
     transform: rotate(90deg);
   }
-  .hide-entry-column-toolbar.feature-flag-floaty-true & {
+  .hide-entry-column-toolbar & {
     transform: translateY(100%);
   }
 }
