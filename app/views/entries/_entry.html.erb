@@ -14,7 +14,6 @@
                     <%= entry_presenter.feed_title %>
                     <%= entry_presenter.summary %>
                     <%= entry_presenter.quoted_tweet %>
-
                     <% if entry.processed_image? %>
                         <%= entry_presenter.attached_image %>
                     <% elsif (entry.tweet? && entry.tweet.link_preview?) || (entry.micropost? && entry.micropost.link_preview?) %>
@@ -26,9 +25,6 @@
                             </div>
                         </div>
                     <% end %>
-
-
-
                     <div class="summary-status light">
                         <%= content_tag(:time, entry.published, datetime: entry.published.iso8601, class: "time timeago") %>
                         <%= svg_tag "icon-retweet", class: "light" %>
