@@ -1,5 +1,5 @@
-<% cache [tag, tag.user_feeds, "v8"] do %>
-    <li class="tag" data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" data-behavior="droppable">
+<% cache [tag, tag.user_feeds, "v9"] do %>
+    <li class="tag" data-tag-id="<%= tag.id %>" data-feed-id="tag-<%= tag.id %>" data-count-type="tag" data-behavior="droppable keyboard_navigable">
         <%= link_to tag_path(tag.id),
             remote: true,
             class: 'feed-link tag-link',

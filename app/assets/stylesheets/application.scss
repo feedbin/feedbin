@@ -3070,6 +3070,7 @@ $feed-title-width: 115px;
         }
         &.selected {
           @include background-color($color-selected, $extra: !important);
+          color: white !important;
           &.with-icon {
             svg {
               @include fill(white);

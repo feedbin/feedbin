@@ -23,7 +23,7 @@ class EntryPresenter < BasePresenter
   def entry_summary(&block)
     options = {
       class: entry_summary_class,
-      data: {entry_id: entry.id}
+      data: {entry_id: entry.id, behavior: "keyboard_navigable"}
     }
     options[:dir] = "rtl" if @template.rtl?(entry.summary)
     @template.content_tag :li, options do

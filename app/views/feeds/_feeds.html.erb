@@ -2,7 +2,7 @@
 
 <% if page_feed.present? %>
     <% present page_feed do |feed_presenter| %>
-        <%= content_tag :li, class: "collection-pages collection-source", data: {feed_id: page_feed.id } do %>
+        <%= content_tag :li, class: "collection-pages collection-source", data: {feed_id: page_feed.id, behavior: "keyboard_navigable" } do %>
             <%= feed_presenter.feed_link(link: pages_feed_path(page_feed), behavior: "selectable show_entries open_item feed_link") do %>
                 <span class="link-inner">
                     <%= feed_presenter.favicon(page_feed) %>
@@ -36,7 +36,7 @@
     <li class="source-section section-feeds">
         Feeds
     </li>
-    <%= render partial: "feeds/feed", collection: feeds, cached: -> (feed) { [feed, feed.favicon, "v2"] } %>
+    <%= render partial: "feeds/feed", collection: feeds, cached: -> (feed) { [feed, feed.favicon, "v3"] } %>
 <% end %>
 
 <script>

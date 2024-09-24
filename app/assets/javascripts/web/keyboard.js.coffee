@@ -69,8 +69,9 @@ class feedbin.Keyboard
           nextShare = $('li:last-child', dropdown)
 
       if nextShare
-        $('li.selected', dropdown).removeClass('selected')
+        $('.selected', dropdown).removeClass('selected')
         nextShare.addClass('selected')
+        nextShare.find('a').addClass('selected')
 
   navigateFeedbin: (combo) ->
     @setEnvironment()
@@ -353,7 +354,7 @@ class feedbin.Keyboard
     @selectColumn('entries')
     selectedEntry = @columns['entries'].find('.selected')
     unless selectedEntry.length > 0
-      @selectedColumn.find('li:first-child [data-behavior~=open_item]')[0]?.click()
+      @selectedColumn.find('[data-behavior~=keyboard_navigable]:first-child [data-behavior~=open_item]')[0]?.click()
 
   selectedColumnName: ->
     if @selectedColumn.hasClass 'feeds'
@@ -392,7 +393,7 @@ class feedbin.Keyboard
           return false
 
       unless selectedItem.length
-        selectedItem = $('[data-behavior~=feeds_target] li:visible').eq(0)
+        selectedItem = $('[data-behavior~=feeds_target] [data-behavior~=keyboard_navigable]:visible').eq(0)
 
     selectedItem
 
@@ -402,9 +403,9 @@ class feedbin.Keyboard
       if @inDrawer()
         prev = @selected.prevAll().not(":hidden, .source-section").first();
         if prev.length == 0
-          prev = @selected.parents('li[data-tag-id]');
+          prev = @selected.parents('[data-behavior~=keyboard_navigable][data-tag-id]');
       else if @hasDrawer()
-        prev = $('ul li', @drawer).not(":hidden, .source-section").last();
+        prev = $('ul [data-behavior~=keyboard_navigable]', @drawer).not(":hidden, .source-section").last();
       else
         prev = @selected.prevAll().not(":hidden, .source-section").first();
     else
@@ -417,9 +418,9 @@ class feedbin.Keyboard
       if @inDrawer()
         next = @selected.nextAll().not(":hidden, .source-section").first();
         if next.length == 0
-          next = @selected.parents('li[data-tag-id]').nextAll().not(":hidden, .source-section").first();
+          next = @selected.parents('[data-behavior~=keyboard_navigable][data-tag-id]').nextAll().not(":hidden, .source-section").first();
       else if @hasDrawer()
-        next = $('ul li', @drawer).not(":hidden, .source-section").first();
+        next = $('ul [data-behavior~=keyboard_navigable]', @drawer).not(":hidden, .source-section").first();
       else
         next = @selected.nextAll().not(":hidden, .source-section").first();
     else
@@ -456,26 +457,26 @@ class feedbin.Keyboard
 
   # Space bar nav
   hasUnreadFeeds: ->
-    @columns['feeds'].find('.selected').nextAll('li').find('.count').not('.hide').length
+    @columns['feeds'].find('.selected').nextAll('[data-behavior~=keyboard_navigable]').find('.count').not('.hide').length
 
   selectNextUnreadFeed: ->
-    @item = @columns['feeds'].find('.selected').nextAll('li').find('.count').not(':hidden, .source-section').first().parents('li')
+    @item = @columns['feeds'].find('.selected').nextAll('[data-behavior~=keyboard_navigable]').find('.count').not(':hidden, .source-section').first().parents('[data-behavior~=keyboard_navigable]')
     @selectItem()
 
   hasUnreadEntries: ->
     if 'feeds' == @selectedColumnName()
-      @columns['entries'].find('li').not('.read').first().length
+      @columns['entries'].find('[data-behavior~=keyboard_navigable]').not('.read').first().length
     else
-      @columns['entries'].find('.selected').nextAll('li').not('.read').first().length
+      @columns['entries'].find('.selected').nextAll('[data-behavior~=keyboard_navigable]').not('.read').first().length
 
   selectNextUnreadEntry: ->
     if 'feeds' == @selectedColumnName()
       @selectColumn('entries')
-      @item = @columns['entries'].find('li').not('.read').first()
+      @item = @columns['entries'].find('[data-behavior~=keyboard_navigable]').not('.read').first()
     else
       @selectColumn('entries')
       @setEnvironment()
-      @item = @columns['entries'].find('.selected').nextAll('li').not('.read').first()
+      @item = @columns['entries'].find('.selected').nextAll('[data-behavior~=keyboard_navigable]').not('.read').first()
     @selected = @item
     @selectItem()
 

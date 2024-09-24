@@ -103,7 +103,7 @@ class ApplicationController < ActionController::Base
       favicon_class: "favicon-unread",
       favicon_alt_class: "favicon-unread-active",
       parent_class: "collection-unread",
-      parent_data: {behavior: "all_unread", feed_id: "collection_unread", count_type: "unread"},
+      parent_data: {behavior: "all_unread keyboard_navigable", feed_id: "collection_unread", count_type: "unread"},
       data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "unread", message: "Mark all items as read?"}.to_json}
     }
     collections << {
@@ -113,7 +113,7 @@ class ApplicationController < ActionController::Base
       id: "collection_all",
       favicon_class: "favicon-all",
       parent_class: "collection-all",
-      parent_data: {behavior: "all_unread", feed_id: "collection_all", count_type: "unread"},
+      parent_data: {behavior: "all_unread keyboard_navigable", feed_id: "collection_all", count_type: "unread"},
       data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "all", message: "Mark all items as read?"}.to_json}
     }
     collections << {
@@ -123,7 +123,7 @@ class ApplicationController < ActionController::Base
       id: "collection_starred",
       favicon_class: "favicon-star",
       parent_class: "collection-starred",
-      parent_data: {behavior: "starred", feed_id: "collection_starred", count_type: "starred"},
+      parent_data: {behavior: "starred keyboard_navigable", feed_id: "collection_starred", count_type: "starred"},
       data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "starred", message: "Mark starred items as read?"}.to_json}
     }
     if user.queued_entries.exists? && !user.setting_on?(:hide_airshow)
@@ -134,7 +134,7 @@ class ApplicationController < ActionController::Base
         id: "collection_queued_entries",
         favicon_class: "favicon-queued-entries",
         parent_class: "collection-queued-entries",
-        parent_data: {behavior: "queued_entries", feed_id: "collection_queued_entries", count_type: "queued_entries"},
+        parent_data: {behavior: "queued_entries keyboard_navigable", feed_id: "collection_queued_entries", count_type: "queued_entries"},
         data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "queued_entries", message: "Mark queued entries as read?"}.to_json},
       }
     end
@@ -146,7 +146,7 @@ class ApplicationController < ActionController::Base
         id: "collection_recently_read",
         favicon_class: "favicon-recently-read",
         parent_class: "collection-recently-read",
-        parent_data: {behavior: "recently_read", feed_id: "collection_recently_read", count_type: "recently_read"},
+        parent_data: {behavior: "recently_read keyboard_navigable", feed_id: "collection_recently_read", count_type: "recently_read"},
         data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "recently_read", message: "Mark recently read items as read?"}.to_json},
         clear: {path: destroy_all_recently_read_entries_path, message: "Clear all recently read?"}
       }
@@ -159,7 +159,7 @@ class ApplicationController < ActionController::Base
         id: "collection_updated",
         favicon_class: "favicon-updated",
         parent_class: "collection-updated",
-        parent_data: {behavior: "updated", feed_id: "collection_updated", count_type: "updated"},
+        parent_data: {behavior: "updated keyboard_navigable", feed_id: "collection_updated", count_type: "updated"},
         data: {behavior: "selectable show_entries open_item feed_link", special_collection: "updated", mark_read: {type: "updated", message: "Mark updated items as read?"}.to_json}
       }
     end
@@ -171,7 +171,7 @@ class ApplicationController < ActionController::Base
         id: "collection_recently_played",
         favicon_class: "favicon-recently-played",
         parent_class: "collection-recently-played",
-        parent_data: {behavior: "recently_played", feed_id: "collection_recently_played", count_type: "recently_played"},
+        parent_data: {behavior: "recently_played keyboard_navigable", feed_id: "collection_recently_played", count_type: "recently_played"},
         data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "recently_played", message: "Mark recently played items as read?"}.to_json},
         clear: {path: destroy_all_recently_played_entries_path, message: "Clear all recently played?"}
       }

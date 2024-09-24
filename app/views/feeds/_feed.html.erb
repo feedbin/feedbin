@@ -1,6 +1,6 @@
-<% cache [feed, "v11"] do %>
+<% cache [feed, "v12"] do %>
     <% present feed do |feed_presenter| %>
-        <%= content_tag :li, data: {feed_id: feed.id, behavior: 'draggable sort_feed', sort_id: feed.id, feed_path: feed_path(feed) } do %>
+        <%= content_tag :li, data: {feed_id: feed.id, behavior: 'draggable sort_feed keyboard_navigable', sort_id: feed.id, feed_path: feed_path(feed) } do %>
             <%= feed_presenter.feed_link do %>
                 <span class="link-inner">
                     <%= feed_presenter.favicon(feed) %>
