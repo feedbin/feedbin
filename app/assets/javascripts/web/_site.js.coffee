@@ -995,6 +995,7 @@ $.extend feedbin,
       feedbin.formatIframes($("[data-iframe-src]").not("[data-behavior~=iframe_placeholder]"))
       feedbin.checkType()
       feedbin.audioVideo()
+      feedbin.nextEntryPreview()
 
       callback = ->
         feedbin.preloadSiblings()
@@ -1004,7 +1005,6 @@ $.extend feedbin,
         feedbin.playState()
         feedbin.timeRemaining(entryId, true)
         feedbin.footnotes()
-        feedbin.nextEntryPreview()
 
       animate = feedbin.animateScroll() && $('body').hasClass('one-up')
       delay = if animate then feedbin.fastAnimation else 0
