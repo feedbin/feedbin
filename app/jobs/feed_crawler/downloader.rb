@@ -32,7 +32,7 @@ module FeedCrawler
 
       content_changed = !@response.not_modified?(@crawl_data.download_fingerprint)
 
-      Sidekiq.logger.info "Downloaded content_changed=#{content_changed} http_status=\"#{@response.status}\" url=#{@feed_url}"
+      Sidekiq.logger.info "Downloaded content_changed=#{content_changed} http_status=\"#{@response.status}\" url=#{@feed_url} server=\"#{@response.headers[:server]}\""
 
       @crawl_data.download_success(@feed_id)
       @crawl_data.save(@response)
@@ -45,6 +45,9 @@ module FeedCrawler
       message = "Feedkit::Error: attempts=#{@crawl_data.error_count} exception=#{exception.inspect} id=#{@feed_id} url=#{@feed_url}"
       if exception.respond_to?(:response) && exception.response.headers[:retry_after].present?
         message = "#{message} retry_after=#{exception.response.headers[:retry_after]}"
+      end
+      if exception.respond_to?(:response)
+        message = "#{message} server=#{exception.response.headers[:server]}"
       end
       Sidekiq.logger.info message
     end
