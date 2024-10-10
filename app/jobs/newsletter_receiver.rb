@@ -10,13 +10,13 @@ class NewsletterReceiver
 
     Sidekiq.logger.info "Newsletter processing user_id=#{@user&.id} address=#{address} url=#{url}"
 
-    if @user && address_active?
+    if @user && full_authentication_token&.active?
       @newsletter = parse_newsletter
       if entry = create
         Sidekiq.logger.info "Newsletter created public_id=#{entry.public_id}"
       end
     else
-      Sidekiq.logger.info "Newsletter skipped user=#{@user.present?} active=#{address_active?}"
+      Sidekiq.logger.info "Newsletter skipped user=#{@user.present?} active=#{full_authentication_token&.active?}"
     end
     storage_client.delete_object(@url.host, storage_path)
   end
@@ -73,10 +73,6 @@ class NewsletterReceiver
 
   def storage_path
     @url.path.delete_prefix("/")
-  end
-
-  def address_active?
-    !!full_authentication_token&.active?
   end
 
   def full_authentication_token
