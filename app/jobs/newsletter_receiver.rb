@@ -68,7 +68,7 @@ class NewsletterReceiver
   end
 
   def storage_path
-    @url.path.delete_prefix("/")
+    @url.path.delete_prefix("/").sub("+", " ")
   end
 
   def full_authentication_token
