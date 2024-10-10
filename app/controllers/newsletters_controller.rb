@@ -2,8 +2,8 @@ class NewslettersController < ApplicationController
   skip_before_action :verify_authenticity_token
 
   def create
-    NewsletterReceiver.perform_async(params[:newsletter][:to], params[:newsletter][:url])
-    head :ok
+    job = NewsletterReceiver.perform_async(params[:newsletter][:to], params[:newsletter][:url])
+    render plain: job
   end
 
   private
