@@ -16,7 +16,7 @@ class NewsletterReceiver
         Sidekiq.logger.info "Newsletter created public_id=#{entry.public_id}"
       end
     else
-      Sidekiq.logger.info "Newsletter skipped user=#{@user.present?} active=#{full_authentication_token&.active?}"
+      Sidekiq.logger.info "Newsletter skipped user_id=#{@user&.id} address=#{address} url=#{url}"
     end
     storage_client.delete_object(@url.host, storage_path)
   end
