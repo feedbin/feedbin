@@ -87,13 +87,9 @@ class CrawlData
       "date"        => Time.now.to_i,
       "class"       => exception.class.name,
       "message"     => exception.message,
-      "status"      => status(exception),
+      "status"      => exception.try(:response).try(:status).try(:code),
       "retry_after" => parse_retry_after(exception).to_i
     }
-  end
-
-  def status(exception)
-    exception.respond_to?(:response) ? exception.response.status.code : nil
   end
 
   def parse_retry_after(exception)
