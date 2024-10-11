@@ -32,7 +32,7 @@ module FeedCrawler
 
       content_changed = !@response.not_modified?(@crawl_data.download_fingerprint)
 
-      Sidekiq.logger.info "Downloaded content_changed=#{content_changed} http_status=\"#{@response.status}\" url=#{@feed_url} server=\"#{@response.headers[:server]}\""
+      Sidekiq.logger.info "Downloaded content_changed=#{content_changed} http_status=\"#{@response.status}\" url=#{@feed_url} server=\"#{@response.headers.get(:server).last}\""
 
       @crawl_data.download_success(@feed_id)
       @crawl_data.save(@response)
