@@ -19,6 +19,7 @@ class ChapterParser
       Sidekiq.logger.info "Found chapters entry=#{@entry.id}"
       @entry.update(chapters:)
     end
+  rescue HTTP::TimeoutError, HTTP::ConnectionError
   end
 
   def parse_chapters
@@ -51,7 +52,7 @@ class ChapterParser
     @url = Addressable::URI.new(scheme: @url.scheme, host: @url.host, port: @url.port, path: @url.path, query: @url.query, fragment: @url.fragment).to_s
 
     http= HTTP
-      .follow(max_hops: 4)
+      .follow(max_hops: 10)
       .timeout(connect: 10, write: 10, read: 30)
       .encoding(Encoding::BINARY)
       .headers(
