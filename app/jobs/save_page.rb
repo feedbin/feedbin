@@ -25,6 +25,17 @@ class SavePage
       raise MissingPage.new("Missing page, retrying", entry)
     end
 
+    if match = IframeEmbed::Youtube.recognize_url?(url)
+      embed = Embed.where(provider_id: match[1]).take
+      unless embed.present?
+        HarvestEmbeds.new.perform(entry.id, true)
+        embed = Embed.where(provider_id: match[1]).take
+      end
+      if embed.present?
+        entry.update(content: embed.data.safe_dig("snippet", "description"), title: embed.data.safe_dig("snippet", "title"), author: embed.data.safe_dig("snippet", "channelTitle"))
+      end
+    end
+
     entry
   end
 
@@ -78,6 +89,10 @@ class SavePage
   end
 
   def build_entry
+    data = TweetPage.tweet(url, user) || {}
+    if match = IframeEmbed::Youtube.recognize_url?(url)
+      data[:youtube_video_id] = match[1]
+    end
     {
       author: parsed_result&.author,
       content: parsed_result&.content,
@@ -86,7 +101,7 @@ class SavePage
       published: parsed_result&.published || Time.now,
       public_id: public_id,
       skip_recent_post_check: true,
-      data: TweetPage.tweet(url, user)
+      data: data
     }
   end
 end

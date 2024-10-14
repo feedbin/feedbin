@@ -5,10 +5,12 @@ class HarvestEmbeds
   SET_NAME = "#{name}-ids"
 
   def perform(entry_id, process = false)
+    if entry_id
+      find_embeds(entry_id)
+    end
+
     if process
       cache_embeds
-    else
-      find_embeds(entry_id)
     end
   end
 
