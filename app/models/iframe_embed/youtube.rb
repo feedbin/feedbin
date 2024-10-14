@@ -6,6 +6,7 @@ class IframeEmbed::Youtube < IframeEmbed
       %r{.*?//www\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b},
       %r{.*?//www\.youtube\.com/v/(.*?)(#|\?|$)},
       %r{.*?//www\.youtube\.com/watch\?v=(.*?)(&|#|$)},
+      %r{.*?//m\.youtube\.com/watch\?v=(.*?)(&|#|$)},
       %r{.*?//youtube-nocookie\.com/embed/(.*?)(\?|$)},
       %r{.*?//youtube\.com/embed/(.*?)(\?|$)},
       %r{.*?//youtu\.be/(.*?)(\?|$)}
