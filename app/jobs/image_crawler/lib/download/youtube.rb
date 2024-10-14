@@ -3,16 +3,7 @@ module ImageCrawler
     attr_reader :image_url
 
     def self.supported_urls
-      [
-        %r{.*?//www\.youtube-nocookie\.com/embed/(.*?)(\?|$)},
-        %r{.*?//www\.youtube\.com/embed/(.*?)(\?|$)},
-        %r{.*?//www\.youtube\.com/user/.*?#\w/\w/\w/\w/(.+)\b},
-        %r{.*?//www\.youtube\.com/v/(.*?)(#|\?|$)},
-        %r{.*?//www\.youtube\.com/watch\?v=(.*?)(&|#|$)},
-        %r{.*?//youtube-nocookie\.com/embed/(.*?)(\?|$)},
-        %r{.*?//youtube\.com/embed/(.*?)(\?|$)},
-        %r{.*?//youtu\.be/(.*?)(\?|$)}
-      ]
+      Feedbin::Application.config.youtube_embed_urls
     end
 
     def download
