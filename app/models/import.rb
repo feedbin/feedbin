@@ -23,10 +23,9 @@ class Import < ApplicationRecord
 
   def flatten_feeds(feeds)
     feeds.each_with_object({}) do |feed, hash|
-      if hash[feed[:xml_url]] && feed[:tag]
+      hash[feed[:xml_url]] ||= feed.merge({tags: []})
+      if feed[:tag]
         hash[feed[:xml_url]][:tags].push(feed[:tag])
-      else
-        hash[feed[:xml_url]] = feed.merge({tags: []})
       end
     end.map do |_, feed|
       tags = feed.delete(:tags)

@@ -4,7 +4,10 @@
     <title>Subscriptions</title>
   </head>
   <body>
-    <outline text="Tag" title="Tag">
+    <outline text="Tag One" title="Tag One">
+      <outline text="Example" title="Example" type="rss" xmlUrl="http://example.com/atom.xml" htmlUrl="http://example.com/"/>
+    </outline>
+    <outline text="Tag Two" title="Tag Two">
       <outline text="Example" title="Example" type="rss" xmlUrl="http://example.com/atom.xml" htmlUrl="http://example.com/"/>
     </outline>
   </body>
