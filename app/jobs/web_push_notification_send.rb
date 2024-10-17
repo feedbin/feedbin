@@ -55,6 +55,8 @@ class WebPushNotificationSend
       end
     end
 
+    return unless safari_notifications.present?
+
     APNOTIC_POOL.with do |connection|
       safari_notifications.each do |_, notification|
         push = connection.prepare_push(notification)
@@ -130,15 +132,11 @@ class WebPushNotificationSend
       }
     )
 
-    if response.code&.to_i != 201
-      ErrorService.notify(
-        error_class: "WebPushNotificationSend#send_browser_notification",
-        error_message: "HTTP Error",
-        parameters: {status: response.code, body: response.body, user_id: device.user_id, entry_id: entry.id}
-      )
-    end
+  rescue WebPush::ExpiredSubscription, WebPush::InvalidSubscription, WebPush::Unauthorized, WebPush::ExpiredSubscription
+    device.destroy
   rescue => exception
     ErrorService.notify(exception)
+    raise unless Rails.env.production?
   end
 
   def build_notification(device_token, title, body, entry_id, user_id)
