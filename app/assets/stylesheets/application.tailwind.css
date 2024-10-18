@@ -57,13 +57,13 @@
   --color-red-600:    #BB0B2F;
   --color-orange-600: #E96A0E;
 
-  /* dark accents (more vibrant)*/
+  /* dark accents */
   --color-blue-600-dark-mode:  #0974FF;
   --color-green-600-dark-mode: #08C451;
   --color-red-600-dark-mode:   #D40C35;
 }
 
-:root, .theme-day, .theme-auto.prefers-light {
+:root, .theme-day {
   --color-base:   var(--day-color-base);
   --color-100:    var(--day-color-100);
   --color-200:    var(--day-color-200);
@@ -87,7 +87,7 @@
   --border-color: var(--sunset-border-color);
 }
 
-.theme-dusk, .theme-auto.prefers-dark {
+.theme-dusk {
   --color-base:   var(--dusk-color-base);
   --color-100:    var(--dusk-color-100);
   --color-200:    var(--dusk-color-200);
@@ -111,14 +111,14 @@
   --border-color: var(--midnight-border-color);
 }
 
-:root, .theme-day, .theme-sunset, .theme-auto.prefers-light {
+:root, .theme-day, .theme-sunset {
   --color-light-100:  var(--color-100);
   --color-sidebar:    var(--color-100);
   --color-shadow-100: rgba(0,0,0,0.1);
   --color-link:       var(--color-blue-600);
 }
 
-.theme-dusk, .theme-midnight, .theme-auto.prefers-dark {
+.theme-dusk, .theme-midnight {
   --color-light-100:  var(--color-600);
   --color-sidebar:    var(--color-base);
   --color-shadow-100: rgba(0,0,0,0.5);
