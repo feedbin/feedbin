@@ -11,7 +11,7 @@
   <% end %>
   <% row.control do %>
     <% if action.broken? %>
-      <%= svg_tag "icon-error-message" %>
+      <%= svg_tag "icon-error-message-small", class: "fill-red-600" %>
     <% end %>
     <%= link_to "Edit", edit_action_path(action), class: "button button-secondary", title: action.broken? ? "Invalid Action" : ""  %>
   <% end %>
