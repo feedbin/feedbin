@@ -148,8 +148,9 @@ class Settings::SubscriptionsController < ApplicationController
     end
 
     if params[:q].present?
+      parts = params[:q].split
       subscriptions = subscriptions.select { |subscription|
-        subscription.sort_data[:name].include?(params[:q].downcase)
+        parts.all? { |part| subscription.sort_data[:name].include?(part) }
       }
     end
 
