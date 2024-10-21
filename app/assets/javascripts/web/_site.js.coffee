@@ -500,6 +500,9 @@ $.extend feedbin,
     feedbin.swipe && $('body').hasClass('has-offscreen-panels')
 
   showPanel: (panel, state = true) ->
+    if !$('body').hasClass('app')
+      return
+
     feedbin.panel = panel
     if panel == 1
       if state && feedbin.mobileView()
