@@ -37,7 +37,8 @@ class SupportedSharingService < ApplicationRecord
       label: "Kindle",
       requires_auth: false,
       service_type: "kindle",
-      klass: "Share::Kindle"
+      klass: "Share::Kindle",
+      html_options: {"data-remote" => true, "data-behavior" => "needs_extract" }
     }),
     OpenStruct.new({
       service_id: "pinboard",
@@ -125,7 +126,7 @@ class SupportedSharingService < ApplicationRecord
   store_accessor :settings, :access_token, :access_secret, :email_name, :email_address,
     :kindle_address, :default_option, :api_token, :oauth2_token, :mastodon_host
 
-  enum status: [:ok, :auth_error]
+  enum :status, [:ok, :auth_error]
 
   validates :service_id, presence: true, uniqueness: {scope: :user_id}, inclusion: {in: SERVICES.collect { |s| s.service_id }}
   belongs_to :user

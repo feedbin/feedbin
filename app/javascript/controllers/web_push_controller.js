@@ -6,6 +6,7 @@ export default class extends Controller {
     vapid: Array,
     permission: String,
     url: String,
+    tokens: Array,
   }
 
   connect() {
@@ -28,10 +29,18 @@ export default class extends Controller {
 
     if (checkWebPush && "Notification" in window) {
       this.permissionValue = Notification.permission
+      if (this.permissionValue === "granted") {
+        this.register()
+      }
     }
   }
 
   activate(event) {
+    this.register()
+    event.preventDefault()
+  }
+
+  register() {
     const key = new Uint8Array(this.vapidValue)
     navigator.serviceWorker.ready.then((serviceWorkerRegistration) => {
       serviceWorkerRegistration.pushManager
@@ -39,19 +48,19 @@ export default class extends Controller {
           userVisibleOnly: true,
           applicationServerKey: key,
         })
-        .then(
-          (pushSubscription) => {
-            window.$.post(this.urlValue, {
-              device: { data: pushSubscription.toJSON() },
-            })
-            this.checkPermissions()
+        .then((pushSubscription) => {
+            if (!this.tokensValue.includes(pushSubscription.endpoint)) {
+              window.$.post(this.urlValue, {
+                device: { data: pushSubscription.toJSON() },
+              })
+            }
+            this.permissionValue = Notification.permission
           },
           (error) => {
             console.log(error)
-            this.checkPermissions()
+            this.permissionValue = Notification.permission
           }
         )
     })
-    event.preventDefault()
   }
 }

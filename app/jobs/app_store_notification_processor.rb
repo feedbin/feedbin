@@ -53,7 +53,7 @@ class AppStoreNotificationProcessor
   def user
     @user ||= begin
       match = AppStoreNotification.where(original_transaction_id: original_transaction_id).take
-      return match.user unless match.nil?
+      return match&.user unless match&.user.nil?
       AuthenticationToken.app.active.where(uuid: app_account_token).sole.user
     end
   end

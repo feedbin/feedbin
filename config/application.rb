@@ -43,6 +43,7 @@ module Feedbin
     config.action_view.automatically_disable_submit_tag = false
     config.active_record.belongs_to_required_by_default = false
     config.action_view.default_enforce_utf8 = true
+    config.action_view.embed_authenticity_token_in_remote_forms = false
     config.active_record.yaml_column_permitted_classes = [Symbol]
     config.assets.css_compressor = ConditionalSassCompressor.new
     config.active_support.cache_format_version = 7.1

@@ -10,9 +10,9 @@ class PodcastSubscription < ApplicationRecord
 
   has_many :queued_entries, -> (subscription) { unscope(:where).where(user_id: subscription.user_id, feed_id: subscription.feed_id) }, dependent: :destroy
 
-  enum status: {hidden: 0, subscribed: 1, bookmarked: 2}
-  enum chapter_filter_type: {include: 0, exclude: 1}, _prefix: :chapter_filter
-  enum download_filter_type: {include: 0, exclude: 1}, _prefix: :download_filter
+  enum :status, {hidden: 0, subscribed: 1, bookmarked: 2}
+  enum :chapter_filter_type, {include: 0, exclude: 1}, prefix: :chapter_filter
+  enum :download_filter_type, {include: 0, exclude: 1}, prefix: :download_filter
 
   before_save :update_queued_entries, if: :will_save_change_to_playlist_id?
 

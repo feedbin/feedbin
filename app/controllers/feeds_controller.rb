@@ -23,7 +23,12 @@ class FeedsController < ApplicationController
 
   def search
     @user = current_user
-    @feeds = FeedFinder.feeds(params[:q], username: params[:username], password: params[:password])
+    @feeds = if params[:q].include?(".")
+      FeedFinder.feeds(params[:q], username: params[:username], password: params[:password])
+    else
+      @search = true
+      Feed.search(params[:q])
+    end
     @feeds.map { |feed| feed.priority_refresh(@user) }
     @tag_editor = TagEditor.new(@user, nil)
   rescue Feedkit::Unauthorized => exception

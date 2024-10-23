@@ -30,9 +30,36 @@ class SavePageTest < ActiveSupport::TestCase
   test "should raise MissingPage error and enqueue retry" do
     stub_request(:get, /extract\.example\.com/).to_return(status: 500)
     url = "http://example.com/saved_page"
-    Sidekiq::Worker.clear_all
     assert_raises(SavePage::MissingPage) do
       SavePage.new.perform(@user.id, url, "Title")
     end
+  end
+
+  test "should save YouTube video" do
+    stub_request_file("parsed_page.json", /extract\.example\.com/, headers: {"Content-Type" => "application/json; charset=utf-8"})
+    youtube_video_id = "video_id"
+    videos = {
+      items: [
+        {
+          id: youtube_video_id,
+          snippet: {title: "Title", description: "Description", channelTitle: "Author"}
+        }
+      ]
+    }
+    stub_request(:get, %r{www.googleapis.com/youtube/v3/videos})
+      .to_return body: videos.to_json, headers: {content_type: "application/json"}
+
+    stub_request(:get, %r{www.googleapis.com/youtube/v3/channels})
+      .to_return body: { items: [ { id: "channel_id" } ] }.to_json, headers: {content_type: "application/json"}
+
+
+    url = "https://www.youtube.com/watch?v=#{youtube_video_id}"
+    assert_difference "Entry.count", +1 do
+      SavePage.new.perform(@user.id, url, nil)
+    end
+    entry = Entry.find_by_url url
+    assert_equal "Title", entry.title
+    assert_equal "Description", entry.content
+    assert_equal "Author", entry.author
   end
 end

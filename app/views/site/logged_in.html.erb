@@ -22,14 +22,14 @@
         <%= svg_tag "logo", inline: true %>
     </div>
     <div class="app-wrap fade">
-        <div class="feeds-column app-panel" data-behavior="content_column" data-resizable-name="feeds" style="<%= user_presenter.feeds_width_style %>">
+        <div class="feeds-column app-panel" data-behavior="content_column" data-resizable-name="feeds" style="<%= user_presenter.feeds_width_style %>" data-controller="toolbar" data-toolbar-section-value="feeds-column" data-action="click->toolbar#show">
             <div class="inner-column">
                 <div class="top-toolbar">
                     <button type="button" class="show-subscribe" data-behavior="show_subscribe open_modal" data-modal-target="subscribe"><%= svg_tag "icon-plus", size: "16x16" %></button>
                     <%= render partial: 'shared/view_mode' %>
                     <%= render partial: 'shared/hamburger_menu_button' %>
                 </div>
-                <div class="feeds showing-audio-player" data-behavior="droppable">
+                <div class="feeds showing-audio-player" data-behavior="droppable" data-action="scroll->toolbar#scroll">
                     <%= render partial: 'shared/view_mode' %>
                     <ul data-behavior="feeds_target" data-controller="sourceable" class="feeds-target feed-list">
                         <%= render partial: 'feeds/feeds', locals: {collections: @feed_data[:collections], saved_searches: @feed_data[:saved_searches], tags: @feed_data[:tags], feeds: @feed_data[:feeds], page_feed: @feed_data[:page_feed]} %>
@@ -39,26 +39,24 @@
                 <%= render partial: 'shared/feeds_toolbar' %>
             </div>
         </div>
-        <div class="entries-column app-panel" data-behavior="content_column" data-resizable-name="entries" style="<%= user_presenter.entries_width_style %>">
-            <div class="inner-column">
-                <div class="entries-header" data-behavior="entries_header">
-                    <button class="back-button" data-behavior="show_feeds">
-                        <%= svg_tag "icon-arrow", size: "9x15" %>
-                    </button>
-                    <span class="feed-title-wrap"><span data-behavior="user_title"></span></span>
-                    <div class="search-button">
-                      <%= render App::SearchButtonComponent.new %>
-                    </div>
+        <div class="entries-column app-panel" data-behavior="content_column" data-resizable-name="entries" style="<%= user_presenter.entries_width_style %>" data-controller="toolbar"  data-toolbar-section-value="entries-column" data-action="click->toolbar#show">
+            <div class="entries-header" data-behavior="entries_header">
+                <button class="back-button" data-behavior="show_feeds">
+                    <%= svg_tag "icon-arrow", size: "9x15" %>
+                </button>
+                <span class="feed-title-wrap"><span data-behavior="user_title"></span></span>
+                <div class="search-button">
+                  <%= render App::SearchButtonComponent.new %>
                 </div>
-                <%= render App::SearchFormComponent.new(params: params) %>
-                <div class="entries">
-                    <ul data-behavior="entries_target" class="entries-target"></ul>
-                </div>
-                <%= render partial: 'shared/feeds_toolbar' %>
             </div>
+            <div class="entries" data-action="scroll->toolbar#scroll" data-toolbar-section-value="entries-column" data-action="click->toolbar#show mousemove->toolbar#mousing" >
+                <%= render App::SearchFormComponent.new(params: params) %>
+                <ul data-behavior="entries_target" class="entries-target"></ul>
+            </div>
+            <%= render partial: 'shared/feeds_toolbar' %>
         </div>
-        <div class="entry-column app-panel" data-behavior="content_column">
-            <div class="inner-column">
+        <div class="entry-column app-panel" data-behavior="content_column" data-controller="toolbar" data-toolbar-section-value="entry-column" data-action="click->toolbar#show show-entry-basement@window->toolbar#show show-entry@window->toolbar#showWithoutAnimation mousemove->toolbar#mousing" >
+            <div class="entry-inner-column">
                 <div class="account-toolbar">
                     <div class="entry-buttons">
                         <%= render partial: 'shared/app_settings' %>
@@ -77,35 +75,37 @@
                         <% end %>
                     <% end %>
                 </div>
-                <div class="entry-meta" data-behavior="entry_meta_target"></div>
-                <div class="entry-content-wrap <%= user_presenter.content_classes %>" data-font-size="<%= user_presenter.font_size %>"  data-font="<%= user_presenter.font %>" data-behavior="entry_content_target">
-                        <div class="splash">
-                            <div class="splash-inner">
-                                <%= svg_tag "logo", inline: true %>
-                                <% if signed_in? && current_user.plan.stripe_id == 'trial' %>
-                                <div class="trial-time">
-                                    <div class="remaining-time"><%= pluralize(current_user.days_left, 'day') %> left</div>
-                                    <%= link_to settings_billing_path, class: 'button' do %>
-                                        Subscribe Now
+                <div class="entry-meta" data-behavior="entry_meta_target" data-toolbar-target="toolbar"></div>
+                <div class="inner-column">
+                    <div class="entry-content-wrap <%= user_presenter.content_classes %>" data-font-size="<%= user_presenter.font_size %>"  data-font="<%= user_presenter.font %>" data-behavior="entry_content_target">
+                            <div class="splash">
+                                <div class="splash-inner">
+                                    <%= svg_tag "logo", inline: true %>
+                                    <% if signed_in? && current_user.plan.stripe_id == 'trial' %>
+                                    <div class="trial-time">
+                                        <div class="remaining-time"><%= pluralize(current_user.days_left, 'day') %> left</div>
+                                        <%= link_to settings_billing_path, class: 'button' do %>
+                                            Subscribe Now
+                                        <% end %>
+                                    </div>
                                     <% end %>
                                 </div>
-                                <% end %>
                             </div>
-                        </div>
 
-                    <div data-behavior="inner_content_target"></div>
-                </div>
-                <div class="bottom-toolbar entry-bottom-toolbar">
-                    <button class="navigation-button button-previous" data-behavior="open_previous_entry needs_previous">
-                        <div class="icon-previous">
-                            <%= svg_tag "icon-arrow", size: "9x15" %>
-                        </div>
-                    </button>
-                    <button class="navigation-button button-next" data-behavior="open_next_entry needs_next">
-                        <div class="icon-next">
-                            <%= svg_tag "icon-arrow", size: "9x15" %>
-                        </div>
-                    </button>
+                        <div data-behavior="inner_content_target"></div>
+                    </div>
+                    <div class="bottom-toolbar entry-bottom-toolbar" data-toolbar-target="toolbar">
+                        <button class="navigation-button button-previous" data-behavior="open_previous_entry needs_previous">
+                            <div class="icon-previous">
+                                <%= svg_tag "icon-arrow", size: "9x15" %>
+                            </div>
+                        </button>
+                        <button class="navigation-button button-next" data-behavior="open_next_entry needs_next">
+                            <div class="icon-next">
+                                <%= svg_tag "icon-arrow", size: "9x15" %>
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

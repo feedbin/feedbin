@@ -1,13 +1,10 @@
-<%= render partial: 'shared/update_feeds', locals: {feed_data: @feed_data} %>
+<% if params[:subscriptions_hash] && current_user.subscriptions_hash != params[:subscriptions_hash] %>
+  feedbin.data.subscriptions_hash = "<%= current_user.subscriptions_hash %>";
+  <%= render partial: "shared/update_feeds", locals: {feed_data: @feed_data} %>
+<% else %>
+  <%= render partial: "shared/update_counts", locals: {feed_data: @feed_data} %>
+<% end %>
 
-(function() {
-  const css = "<%= asset_url("tailwind.css") %>";
-  const element = $(`link[href='${css}']`);
-  if (element.length == 0) {
-    const tag = $("<link />").attr({
-      href: css,
-      rel: "stylesheet"
-    });
-    $('head').append(tag);
-  }
-})();
+if ("updateStyles" in feedbin) {
+  feedbin.updateStyles("<%= asset_url("tailwind.css") %>");
+}

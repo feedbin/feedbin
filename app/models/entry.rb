@@ -6,11 +6,14 @@ class Entry < ApplicationRecord
 
   store :settings, accessors: [:archived_images, :media_image, :newsletter, :newsletter_from, :embed_duration], coder: JSON
 
+  enum :provider, [:twitter, :youtube], prefix: true
 
   belongs_to :feed
   has_many :unread_entries, dependent: :delete_all
   has_many :starred_entries
   has_many :recently_read_entries
+
+  has_many :images, -> { where(provider: [:entry_content, :entry_podcast, :entry_link]) }, foreign_key: :provider_id, primary_key: :id
 
   before_create :ensure_published
   before_create :create_summary
@@ -35,6 +38,20 @@ class Entry < ApplicationRecord
   validates :feed, :public_id, presence: true
 
   self.per_page = 100
+
+  scope :last_n_per_feed, -> (n, feed_ids) {
+     select_sql = <<-SQL
+       entries.*, ROW_NUMBER() OVER (
+         PARTITION BY feed_id
+         ORDER BY published DESC
+       ) AS entries_rank
+     SQL
+
+     ranked_posts = select(select_sql)
+     from(ranked_posts, "entries")
+       .where("entries_rank <= ?", n)
+       .where(feed_id: feed_ids)
+   }
 
   def self.entries_with_feed(entry_ids, sort)
     in_order_of(:id, entry_ids).includes(feed: [:favicon])

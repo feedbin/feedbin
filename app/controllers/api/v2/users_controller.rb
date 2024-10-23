@@ -43,7 +43,7 @@ module Api
       end
 
       def user_update_params
-        params.require(:user).permit(:podcast_sort_order)
+        params.require(:user).permit(:podcast_sort_order, :podcast_download_limit)
       end
     end
   end

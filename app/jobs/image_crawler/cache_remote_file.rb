@@ -5,15 +5,15 @@ module ImageCrawler
 
     def self.schedule(url)
       fingerprint = RemoteFile.fingerprint(url)
-
       return if RemoteFile.where(fingerprint: fingerprint).exists?
-
-      image = Image.new({
+      image = Image.new_with_attributes(
         id: "#{fingerprint}-icon",
         preset_name: "icon",
         image_urls: [url],
+        provider: ::Image.providers[:remote_file],
+        provider_id: fingerprint,
         camo: true
-      })
+      )
 
       Pipeline::Find.perform_in(rand(1..10).seconds, image.to_h)
     end

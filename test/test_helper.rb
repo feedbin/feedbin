@@ -5,19 +5,19 @@ require "minitest/mock"
 require "socket"
 require "connection_pool"
 
-# unless ENV["CI"]
-#   socket = Socket.new(:INET, :STREAM, 0)
-#   socket.bind(Addrinfo.tcp("127.0.0.1", 0))
-#   port = socket.local_address.ip_port
-#   socket.close
-#
-#   ENV["REDIS_URL"] = "redis://localhost:%d" % port
-#   redis_test_instance = IO.popen("redis-server --port %d --save '' --appendonly no" % port)
-#
-#   Minitest.after_run do
-#     Process.kill("INT", redis_test_instance.pid)
-#   end
-# end
+unless ENV["CI"]
+  socket = Socket.new(:INET, :STREAM, 0)
+  socket.bind(Addrinfo.tcp("127.0.0.1", 0))
+  port = socket.local_address.ip_port
+  socket.close
+
+  ENV["REDIS_URL"] = "redis://localhost:%d" % port
+  redis_test_instance = IO.popen("redis-server --port %d --save '' --appendonly no" % port)
+
+  Minitest.after_run do
+    Process.kill("INT", redis_test_instance.pid)
+  end
+end
 
 $redis = {
   entries: ConnectionPool.new(size: 10) { Redis.new(url: ENV["REDIS_URL"]) },
@@ -29,12 +29,15 @@ require File.expand_path("../../config/environment", __FILE__)
 require "rails/test_help"
 require "sidekiq/testing"
 require "webmock/minitest"
+require "phlex/testing/nokogiri"
+require "phlex/testing/rails/view_helper"
 
 require "support/login_helper"
 require "support/factory_helper"
 require "support/assertions"
 require "support/api_controller_test_case"
 require "support/push_server_mock"
+require "component_test_case"
 
 ActiveRecord::FixtureSet.context_class.send :include, LoginHelper
 StripeMock.webhook_fixture_path = "./test/fixtures/stripe_webhooks/"
@@ -115,11 +118,11 @@ class ActiveSupport::TestCase
   end
 
   def clear_search
-    Search.client { _1.request(:delete, Entry.table_name) }
-    Search.client { _1.request(:delete, Action.table_name) }
+    Search.client { _1.request(:delete, $search[:config][:aliases][:entries]) }
+    Search.client { _1.request(:delete, $search[:config][:aliases][:actions]) }
+    Search.client { _1.request(:delete, $search[:config][:aliases][:feeds]) }
 
-    Search.client { _1.request(:put, Entry.table_name, json: $search[:config][:mappings][:entries]) }
-    Search.client { _1.request(:put, Action.table_name, json: $search[:config][:mappings][:actions]) }
+    Search.setup
   end
 
   def newsletter_params(recipient, signature, title = nil, from = nil)

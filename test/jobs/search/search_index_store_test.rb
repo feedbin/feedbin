@@ -27,7 +27,7 @@ module Search
       end
 
       entry_id, action_ids = ActionsPerform.jobs.first["args"]
-      assert_equal entry_id, @entry.id
+      assert_equal @entry.id, entry_id
       assert_equal action_ids, [action.id]
     end
   end

@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "7.1.3.2"
+gem "rails", "7.2.1.1"
 gem "will_paginate"
 
 gem "http",                github: "feedbin/http",                branch: "feedbin"
@@ -13,9 +13,6 @@ gem "html-pipeline",       github: "feedbin/html-pipeline",       branch: "feedb
 gem "html_diff",           github: "feedbin/html_diff",           ref: "013e1bb"
 gem "twitter",             github: "feedbin/twitter",             branch: "feedbin"
 
-# https://github.com/mikel/mail/issues/1521
-gem "mail", "< 2.8"
-
 gem "activerecord-import"
 gem "addressable", require: "addressable/uri"
 gem "apnotic"
@@ -24,6 +21,7 @@ gem "bcrypt"
 gem "bootsnap", require: false
 gem "clockwork"
 gem "coffee-rails"
+gem "concurrent-ruby"
 gem "connection_pool"
 gem "dotenv-rails", "= 2.8.1"
 gem "down"
@@ -40,6 +38,7 @@ gem "jwt"
 gem "librato-rails", "~> 1.4.2"
 gem "lograge"
 gem "lookbook"
+gem "mail"
 gem "net-http-persistent"
 gem "oauth"
 gem "oauth2"
@@ -47,8 +46,7 @@ gem "pg"
 gem "phlex-rails"
 gem "postmark-rails"
 gem "premailer-rails"
-# Unicorn is not yet compatible with rack 3
-gem "rack", "< 3"
+gem "rack", "< 3" # Unicorn is not yet compatible with rack 3
 gem "raindrops"
 gem "redcarpet"
 gem "redis", "< 5"
@@ -60,6 +58,7 @@ gem "sanitize"
 gem "sass-rails"
 gem "sidekiq"
 gem "stimulus-rails"
+gem "stringio", "= 3.1.0" # https://stackoverflow.com/questions/77570131
 gem "stripe", "~> 5.55.0"
 gem "stripe_event"
 gem "strong_migrations"
@@ -96,5 +95,6 @@ group :development, :test do
   gem "selenium-webdriver"
   gem "standard"
   gem "webmock", "= 3.8.0"
+  gem "phlex-testing-nokogiri"
 end
 

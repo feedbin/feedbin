@@ -10,6 +10,7 @@ module Settings
 
       def view_template
         form_tag helpers.settings_subscriptions_path, method: :get, remote: true, class: "feed-settings", data: {behavior: "spinner"} do
+          input type: "submit", class: "ui-helper-hidden-accessible", tabindex: "-1"
           render Settings::H1Component.new do
             "Subscriptions"
           end
@@ -17,22 +18,71 @@ module Settings
           fix_feeds_notice
 
           div class: "flex flex-col md:flex-row justify-between mb-6 gap-2" do
-            div class: "md:max-w-[250px]" do
-              render Form::TextInputComponent.new do |input|
-                input.input do
-                  input(
-                    type: "search",
-                    class: "feed-search peer text-input",
-                    placeholder: "Search Feeds",
-                    data_behavior: "autosubmit",
-                    name: "q",
-                    value: @params[:q]
-                  )
-                end
-                input.accessory_leading do
-                  render SvgComponent.new "icon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600"
+            div data: stimulus(controller: :input_filter), class: "flex items-center md:max-w-[250px]" do
+              div class: "grow" do
+                render Form::TextInputComponent.new do |input|
+                  input.input do
+                    input(
+                      type: "search",
+                      class: "feed-search peer text-input",
+                      placeholder: "Search Feeds",
+                      data_behavior: "autosubmit",
+                      name: "q",
+                      value: @params[:q],
+                      data: stimulus_item(target: "input", data: {behavior: "autosubmit"}, for: :input_filter)
+                    )
+                  end
+                  input.accessory_leading do
+                    render SvgComponent.new "icon-search", class: "ml-2 fill-400 pg-focus:fill-blue-600"
+                  end
                 end
               end
+              div class: "dropdown-wrap dropdown-right shrink-0" do
+                button class: "flex flex-center w-[40px] h-[40px]", data_behavior: "toggle_dropdown", title: "Filter by status" do
+                  render SvgComponent.new "icon-filter", class: "fill-500"
+                end
+                div class: "dropdown-content" do
+                  ul do
+                    li do
+                      button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:fixable"}, for: :input_filter) do
+                        span class: "icon-wrap" do
+                          render SvgComponent.new("menu-icon-fix-feeds")
+                        end
+                        span class: "menu-text" do
+                          span class: "title" do
+                            "Fixable"
+                          end
+                        end
+                      end
+                    end
+                    li do
+                      button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:muted"}, for: :input_filter) do
+                        span class: "icon-wrap" do
+                          render SvgComponent.new("menu-icon-mute")
+                        end
+                        span class: "menu-text" do
+                          span class: "title" do
+                            "Muted"
+                          end
+                        end
+                      end
+                    end
+                    li do
+                      button data: stimulus_item(target: "filterOption", actions: {"click" => "updateFilter"}, params: {filter: "is:dead"}, for: :input_filter) do
+                        span class: "icon-wrap" do
+                          render SvgComponent.new("menu-icon-skull")
+                        end
+                        span class: "menu-text" do
+                          span class: "title" do
+                            "Dead"
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+
             end
             div class: "md:max-w-[250px]" do
               render Form::SelectInputComponent.new do |input|

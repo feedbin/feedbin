@@ -94,7 +94,12 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :subscriptions, only: [:index, :edit, :create, :destroy, :update]
+  resources :subscriptions, only: [:index, :edit, :create, :destroy, :update] do
+    member do
+      delete :destroy_from_feed
+      patch :toggle_mute
+    end
+  end
 
   resources :embeds, only: [] do
     collection do

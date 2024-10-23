@@ -17,6 +17,15 @@ class PasswordResetsControllerTest < ActionController::TestCase
       end
       assert_not_equal @user.password_reset_token, @user.reload.password_reset_token
     end
+
+    # should not allow twice in a row
+    assert_no_difference -> { ActionMailer::Base.deliveries.count } do
+      assert_no_difference -> { @user.password_reset_sent_at } do
+        Sidekiq::Testing.inline! do
+          post :create, params: {email: @user.email}
+        end
+      end
+    end
   end
 
   test "should get edit" do

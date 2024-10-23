@@ -23,7 +23,7 @@ class EntryPresenter < BasePresenter
   def entry_summary(&block)
     options = {
       class: entry_summary_class,
-      data: {entry_id: entry.id}
+      data: {entry_id: entry.id, behavior: "keyboard_navigable"}
     }
     options[:dir] = "rtl" if @template.rtl?(entry.summary)
     @template.content_tag :li, options do
@@ -174,7 +174,7 @@ class EntryPresenter < BasePresenter
       elsif youtube?
         @template.capture do
           @template.concat @template.content_tag(:iframe, "", src: "https://www.youtube-nocookie.com/embed/#{entry.data["youtube_video_id"]}?rel=0&amp;showinfo=0", frameborder: 0, allowfullscreen: true)
-          @template.concat ContentFormatter.text_email(entry.content)
+          @template.concat ContentFormatter.text_email(entry.content)&.html_safe
         end
       else
         entry.content
@@ -453,6 +453,24 @@ class EntryPresenter < BasePresenter
     "#{minutes} #{'minute'.pluralize(minutes)}"
   rescue
     nil
+  end
+
+  def profile_image
+    if entry.tweet?
+      @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image" do
+        url = tweet_profile_image_uri(entry.tweet.main_tweet)
+        fallback = @template.image_url("favicon-profile-default.png")
+        @template.image_tag_with_fallback(fallback, url, alt: "")
+      end
+    elsif entry.micropost?&& entry.micropost.author_avatar
+      @template.content_tag :span, "", class: "favicon-wrap twitter-profile-image" do
+        fallback = @template.image_url("favicon-profile-default.png")
+        url = RemoteFile.signed_url(entry.micropost.author_avatar)
+        @template.image_tag_with_fallback(fallback, url, alt: "")
+      end
+    else
+      favicon(entry.feed, entry)
+    end
   end
 
   def summary

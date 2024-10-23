@@ -22,11 +22,18 @@ module FeedCrawler
     end
 
     def random_timeout
-      rand(TIMEOUT..(TIMEOUT * 2))
+      base = TIMEOUT * weight
+      rand(base..(base * 2))
     end
 
     def throttled_hosts
-      ENV["THROTTLED_HOSTS"]&.split(",") || []
+      FeedbinUtils.key_value_parser(ENV["THROTTLED_HOSTS"]) do |weight|
+        weight&.to_i || 1
+      end
+    end
+
+    def weight
+      throttled_hosts[host] || 1
     end
 
     def host

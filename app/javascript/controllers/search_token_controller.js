@@ -22,14 +22,8 @@ export default class extends Controller {
     autocompleteVisible: Boolean,
   }
 
-  static outlets = ["sourceable"]
-
   initialize() {
     this.sourceableTargetCount = 0
-  }
-
-  sourceableOutletConnected() {
-    this.buildJumpable()
   }
 
   search() {
@@ -90,10 +84,10 @@ export default class extends Controller {
   }
 
   updateToken(event) {
-    const detail = event.detail
+    const detail = event.detail.data
     if (detail.jumpable) {
       this.deleteToken(false)
-      let item = this.buildItem(detail, event.target)
+      let item = this.buildItem(detail, event.detail.target)
       setTimeout(() => {
         this.fillToken(item)
       }, 150)
@@ -255,7 +249,9 @@ export default class extends Controller {
   }
 
   buildJumpable() {
-    let sourceableTargets = this.sourceableOutlet.sourceTargets
+    let sourceableTargets = [
+      ...document.querySelectorAll("[data-sourceable-target]"),
+    ]
     if (this.sourceableTargetCount === sourceableTargets.length) {
       return
     }

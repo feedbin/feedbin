@@ -42,6 +42,11 @@ class MercuryParser
     result["domain"]
   end
 
+  def fully_qualified_url
+    @url
+  end
+  alias_method :base_url, :fully_qualified_url
+
   def to_h
     {
       result: result,

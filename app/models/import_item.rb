@@ -1,7 +1,7 @@
 class ImportItem < ApplicationRecord
   serialize :details, type: Hash
   belongs_to :import
-  enum status: [:pending, :complete, :failed, :fixable]
+  enum :status, [:pending, :complete, :failed, :fixable]
   store_accessor :error, :class, :message, prefix: true
   has_many :discovered_feeds, foreign_key: :site_url, primary_key: :site_url
   has_one :favicon, foreign_key: :host, primary_key: :host

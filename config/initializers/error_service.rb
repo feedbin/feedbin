@@ -1,14 +1,11 @@
 class ErrorService
-  def self.notify(params)
-    Honeybadger.notify(params)
-
-    return unless Rails.env.development?
-
-    exception = params
-
-    unless exception.is_a?(Exception)
-      Rails.logger.error params
-      exception = params.respond_to?(:safe_dig) && params.safe_dig(:parameters, :exception)
+  def self.notify(exception, options = {})
+    if exception.is_a?(Exception)
+      Honeybadger.notify(exception, options)
+    else
+      Honeybadger.notify(exception)
+      Rails.logger.error exception
+      exception = exception.respond_to?(:safe_dig) && exception.safe_dig(:parameters, :exception)
     end
 
     return unless exception.respond_to?(:message) && exception.respond_to?(:backtrace)

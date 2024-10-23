@@ -32,6 +32,8 @@ module ImageCrawler
             image             = download_cache.cached_image
             image.storage_url = download_cache.storage_url
             image.id          = @image.id
+            image.provider    = @image.provider
+            image.provider_id = @image.provider_id
 
             image.send_to_feedbin
 

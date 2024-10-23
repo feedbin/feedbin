@@ -1,5 +1,5 @@
 <% present saved_search do |saved_search_presenter| %>
-    <li data-saved-search-id="<%= saved_search.id %>" data-feed-id="saved-search-<%= saved_search.id %>" class="collection-saved-search">
+    <li data-saved-search-id="<%= saved_search.id %>" data-feed-id="saved-search-<%= saved_search.id %>" class="collection-saved-search" data-behavior="keyboard_navigable">
         <%= link_to saved_search_path(saved_search.id),
             remote: true,
             class: "feed-link saved-search-link",
@@ -21,6 +21,7 @@
                 <span class="count-wrap">
                     <%= content_tag :span, "", class: "count", data: {behavior: "needs_count", count_group: "bySavedSearch", count_group_id: saved_search.id} %>
                 </span>
+                <%= render SourceMenu::Search.new(saved_search: saved_search, source_target: "saved-search-#{saved_search.id}") %>
             </span>
         <% end %>
     </li>

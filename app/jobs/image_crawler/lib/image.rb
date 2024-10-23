@@ -1,25 +1,26 @@
 module ImageCrawler
   class Image
-    ATTRIBUTES = %i[
-      camo
-      download_path
-      entry_url
-      final_url
-      fingerprint
-      height
-      icon_provider
-      icon_provider_id
-      id
-      image_urls
-      original_extension
-      original_url
-      placeholder_color
-      preset_name
-      processed_extension
-      processed_path
-      storage_url
-      width
-    ]
+    ATTRIBUTES = %i[camo
+download_path
+entry_url
+final_url
+fingerprint
+height
+icon_provider
+icon_provider_id
+id
+image_urls
+original_extension
+original_url
+placeholder_color
+preset_name
+processed_extension
+processed_path
+provider
+provider_id
+storage_url
+width
+]
 
 
     attr_accessor *ATTRIBUTES
@@ -89,6 +90,13 @@ module ImageCrawler
       }
     }
 
+    def self.new_with_attributes(id:, preset_name:, image_urls:, provider:, provider_id:, **other)
+      arguments = Hash[binding.local_variables.map{ [_1, binding.local_variable_get(_1)]}]
+      arguments.delete(:arguments)
+      other = arguments.delete(:other)
+      new(other.merge(arguments))
+    end
+
     def initialize(data = {})
       data.each do |name, value|
         if ATTRIBUTES.include?(name.to_sym)
@@ -127,6 +135,23 @@ module ImageCrawler
           "placeholder_color" => placeholder_color
         })
       end
+
+      # create_image
+    end
+
+    def create_image
+      data = {
+        provider: provider,
+        provider_id: provider_id,
+        url: original_url,
+        storage_url: storage_url,
+        image_fingerprint: fingerprint,
+        width: width,
+        height: height,
+        placeholder_color:
+      }
+      record = ::Image.create_with(data).find_or_create_by(provider:, provider_id:)
+      record.update(data)
     end
 
     def image_name

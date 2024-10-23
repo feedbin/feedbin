@@ -11,7 +11,7 @@ export default class extends Controller {
 
   toggle(event) {
     if (event.target.type === "radio") {
-      this.openValue = !(event.params.toggleTarget)
+      this.openValue = !event.params.toggleTarget
     }
 
     this.openValue = !this.openValue

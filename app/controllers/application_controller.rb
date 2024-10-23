@@ -32,7 +32,7 @@ class ApplicationController < ActionController::Base
     get_feeds_list
     subscriptions = @user.subscriptions
 
-    user_titles = subscriptions.each_with_object({}) { |subscription, hash|
+    user_titles = subscriptions.includes(:feed).each_with_object({}) { |subscription, hash|
       if subscription.title.present?
         hash[subscription.feed_id] = ERB::Util.html_escape_once(subscription.title)
       end
@@ -84,7 +84,9 @@ class ApplicationController < ActionController::Base
       tag_visibility: @user.tag_visibility,
       visibility_key: "tag_visibility",
       sharing: @user.combined_sharing_services,
-      sharing_path: sharing_services_path
+      sharing_path: sharing_services_path,
+      muted_feeds: @user.subscriptions.where(muted: true).pluck(:feed_id),
+      subscriptions_hash: @user.subscriptions_hash
     }
 
     render "site/logged_in"
@@ -101,7 +103,7 @@ class ApplicationController < ActionController::Base
       favicon_class: "favicon-unread",
       favicon_alt_class: "favicon-unread-active",
       parent_class: "collection-unread",
-      parent_data: {behavior: "all_unread", feed_id: "collection_unread", count_type: "unread"},
+      parent_data: {behavior: "all_unread keyboard_navigable", feed_id: "collection_unread", count_type: "unread"},
       data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "unread", message: "Mark all items as read?"}.to_json}
     }
     collections << {
@@ -111,7 +113,7 @@ class ApplicationController < ActionController::Base
       id: "collection_all",
       favicon_class: "favicon-all",
       parent_class: "collection-all",
-      parent_data: {behavior: "all_unread", feed_id: "collection_all", count_type: "unread"},
+      parent_data: {behavior: "all_unread keyboard_navigable", feed_id: "collection_all", count_type: "unread"},
       data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "all", message: "Mark all items as read?"}.to_json}
     }
     collections << {
@@ -121,7 +123,7 @@ class ApplicationController < ActionController::Base
       id: "collection_starred",
       favicon_class: "favicon-star",
       parent_class: "collection-starred",
-      parent_data: {behavior: "starred", feed_id: "collection_starred", count_type: "starred"},
+      parent_data: {behavior: "starred keyboard_navigable", feed_id: "collection_starred", count_type: "starred"},
       data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "starred", message: "Mark starred items as read?"}.to_json}
     }
     if user.queued_entries.exists? && !user.setting_on?(:hide_airshow)
@@ -132,7 +134,7 @@ class ApplicationController < ActionController::Base
         id: "collection_queued_entries",
         favicon_class: "favicon-queued-entries",
         parent_class: "collection-queued-entries",
-        parent_data: {behavior: "queued_entries", feed_id: "collection_queued_entries", count_type: "queued_entries"},
+        parent_data: {behavior: "queued_entries keyboard_navigable", feed_id: "collection_queued_entries", count_type: "queued_entries"},
         data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "queued_entries", message: "Mark queued entries as read?"}.to_json},
       }
     end
@@ -144,7 +146,7 @@ class ApplicationController < ActionController::Base
         id: "collection_recently_read",
         favicon_class: "favicon-recently-read",
         parent_class: "collection-recently-read",
-        parent_data: {behavior: "recently_read", feed_id: "collection_recently_read", count_type: "recently_read"},
+        parent_data: {behavior: "recently_read keyboard_navigable", feed_id: "collection_recently_read", count_type: "recently_read"},
         data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "recently_read", message: "Mark recently read items as read?"}.to_json},
         clear: {path: destroy_all_recently_read_entries_path, message: "Clear all recently read?"}
       }
@@ -157,7 +159,7 @@ class ApplicationController < ActionController::Base
         id: "collection_updated",
         favicon_class: "favicon-updated",
         parent_class: "collection-updated",
-        parent_data: {behavior: "updated", feed_id: "collection_updated", count_type: "updated"},
+        parent_data: {behavior: "updated keyboard_navigable", feed_id: "collection_updated", count_type: "updated"},
         data: {behavior: "selectable show_entries open_item feed_link", special_collection: "updated", mark_read: {type: "updated", message: "Mark updated items as read?"}.to_json}
       }
     end
@@ -169,7 +171,7 @@ class ApplicationController < ActionController::Base
         id: "collection_recently_played",
         favicon_class: "favicon-recently-played",
         parent_class: "collection-recently-played",
-        parent_data: {behavior: "recently_played", feed_id: "collection_recently_played", count_type: "recently_played"},
+        parent_data: {behavior: "recently_played keyboard_navigable", feed_id: "collection_recently_played", count_type: "recently_played"},
         data: {behavior: "selectable show_entries open_item feed_link", mark_read: {type: "recently_played", message: "Mark recently played items as read?"}.to_json},
         clear: {path: destroy_all_recently_played_entries_path, message: "Clear all recently played?"}
       }
@@ -270,7 +272,7 @@ class ApplicationController < ActionController::Base
   end
 
   def rate_limited?(count, period)
-    slug = ["limit", request.method, params[:controller], params[:action], current_user.id]
+    slug = ["limit", request.method, params[:controller], params[:action], current_user&.id, request.remote_ip]
     !Throttle.throttle!(slug.join(":"), count, period)
   end
 end

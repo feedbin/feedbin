@@ -29,7 +29,7 @@ class Micropost
   end
 
   def author_username
-    @data.safe_dig("author", "_microblog", "username") || @data.safe_dig("author", "_instagram", "username") || @data.safe_dig("authors", 0, "_instagram", "username") || feed_username
+    @data.safe_dig("author", "_microblog", "username") || @data.safe_dig("author", "_instagram", "username") || @data.safe_dig("authors", 0, "_instagram", "username") || @data.safe_dig("authors", 0, "_social", "username") || feed_username
   rescue
     nil
   end
@@ -47,6 +47,8 @@ class Micropost
       :microblog
     elsif @data.safe_dig("author", "_instagram") || @data.safe_dig("authors", 0, "_instagram")
       :instagram
+    elsif @data.safe_dig("authors", 0, "_social")
+      :social
     end
   end
 
@@ -56,6 +58,10 @@ class Micropost
 
   def instagram?
     source == :instagram
+  end
+
+  def social?
+    source == :social
   end
 
   def link_preview?

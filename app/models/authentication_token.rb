@@ -3,7 +3,7 @@ class AuthenticationToken < ApplicationRecord
 
   attr_accessor :length, :skip_generate
 
-  enum purpose: {cookies: 0, feeds: 1, newsletters: 2, pages: 3, app: 4, icloud: 5}
+  enum :purpose, {cookies: 0, feeds: 1, newsletters: 2, pages: 3, app: 4, icloud: 5}
 
   store_accessor :data, :description, :newsletter_tag
 

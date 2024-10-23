@@ -8,7 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04]
-        ruby: [3.3.0]
+        ruby: [3.3.5]
 
     runs-on: ${{ matrix.os }}
 
@@ -91,13 +91,14 @@ jobs:
           ruby -v
           psql -c 'create database feedbin_test;' -U postgres
           bundle exec rake db:setup
-          bundle exec rails test:system test
+          bundle exec rails test
+          bundle exec rails test:system
 
       - name: Lint JS
         run: npm run lint
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: screenshots ${{ matrix.os }}-${{ matrix.ruby }}

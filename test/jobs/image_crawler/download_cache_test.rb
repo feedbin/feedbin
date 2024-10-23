@@ -18,15 +18,19 @@ module ImageCrawler
       storage_url         = "http://s3.com/example/example.jpg"
       preset_name         = "primary"
       processed_extension = "jpg"
-      Image.new(id:, preset_name:, download_path:, original_url:, final_url:, processed_path:, width:, height:, placeholder_color:, storage_url:, processed_extension:)
+      provider            = ::Image.providers[:entry_content]
+      provider_id         = 1
+      Image.new(id:, preset_name:, download_path:, original_url:, final_url:, processed_path:, width:, height:, placeholder_color:, storage_url:, processed_extension:, provider:, provider_id:)
     end
 
     def build_duplicate_image(original_url)
-      Image.new({
+      Image.new_with_attributes(
         id: SecureRandom.hex,
         preset_name: "primary",
-        image_urls: [original_url]
-      })
+        image_urls: [original_url],
+        provider: ::Image.providers[:entry_content],
+        provider_id: 1
+      )
     end
 
     def test_should_save_data
