@@ -77,10 +77,10 @@ class feedbin.Keyboard
     @setEnvironment()
     if 'pagedown' == combo || 'shift+j' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
-        @scrollContent(@contentHeight() - 100, 'down', true)
+        @scrollContent(@contentHeight() - @scrollOffset(), 'down', true)
     else if 'pageup' == combo || 'shift+k' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
-        @scrollContent(@contentHeight() - 100, 'up', true)
+        @scrollContent(@contentHeight() - @scrollOffset(), 'up', true)
     else if 'down' == combo || 'j' == combo
       if 'entry-content' == @selectedColumnName() || feedbin.isFullScreen()
         @scrollContent(30, 'down')
@@ -116,9 +116,9 @@ class feedbin.Keyboard
     @selectColumn('entries')
     @setEnvironment()
     if 'pagedown' == combo || 'shift+j' == combo
-      @scrollContent(@contentHeight() - 100, 'down', true)
+      @scrollContent(@contentHeight() - @scrollOffset(), 'down', true)
     else if 'pageup' == combo || 'shift+k' == combo
-      @scrollContent(@contentHeight() - 100, 'up', true)
+      @scrollContent(@contentHeight() - @scrollOffset(), 'up', true)
     else if 'down' == combo
       @scrollContent(30, 'down')
     else if 'up' == combo
@@ -147,8 +147,7 @@ class feedbin.Keyboard
       @setEnvironment()
       if @hasEntryContent()
         @selectColumn('entry-content')
-        interval = $('.entry-content').height() - 40
-        @scrollContent(interval, 'down', true)
+        @scrollContent(@contentHeight() - @scrollOffset(), 'down', true)
       else if @hasUnreadEntries()
         @selectNextUnreadEntry()
       else if @hasUnreadFeeds()
@@ -482,6 +481,11 @@ class feedbin.Keyboard
 
   hasEntryContent: ->
     @entryScrollHeight() - $('.entry-content').prop('scrollTop') > 2
+
+  scrollOffset: ->
+    lineHeight = parseInt(window.getComputedStyle($('.entry-content')[0]).lineHeight)
+    toolbarHeight = if feedbin.isFullScreen() then 0 else 44
+    (lineHeight * 1.5) + toolbarHeight
 
   scrollContent: (interval, direction, animate = false) ->
     container = $('.entry-content')
