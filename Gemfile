@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "7.2.1.1"
+gem "rails", "7.2.1.2"
 gem "will_paginate"
 
 gem "http",                github: "feedbin/http",                branch: "feedbin"
@@ -42,6 +42,7 @@ gem "mail"
 gem "net-http-persistent"
 gem "oauth"
 gem "oauth2"
+gem "ostruct"
 gem "pg"
 gem "phlex-rails"
 gem "postmark-rails"

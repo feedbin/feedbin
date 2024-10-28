@@ -5,7 +5,7 @@ module Epub
       @source = source
     end
 
-    def template
+    def view_template
       html do
         head do
           title { @entry.title.to_plain_text }

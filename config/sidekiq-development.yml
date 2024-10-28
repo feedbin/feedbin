@@ -12,5 +12,6 @@
   - [parse,                                  1]
   - [parse_<%= `hostname`.strip %>,          1]
   - [parse_critical_<%= `hostname`.strip %>, 2]
+  - [process_<%= `hostname`.strip %>,        2]
   - [utility,                                1]
   - [utility_critical,                       2]
