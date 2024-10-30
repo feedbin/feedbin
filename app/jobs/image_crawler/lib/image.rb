@@ -132,7 +132,7 @@ module ImageCrawler
         image_fingerprint: fingerprint,
         width: width,
         height: height,
-        placeholder_color:
+        placeholder_color: placeholder_color
       }
       record = ::Image.create_with(data).find_or_create_by(provider:, provider_id:)
       record.update(data)

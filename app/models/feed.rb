@@ -31,6 +31,8 @@ class Feed < ApplicationRecord
 
   store :settings, accessors: [:custom_icon, :current_feed_url, :custom_icon_format, :meta_title, :meta_description, :meta_crawled_at], coder: JsonConverter
 
+  has_many :icons,  -> { feed_icons }, foreign_key: :provider_id, primary_key: :provider_id, class_name: "Image"
+
   def twitter_user?
     twitter_user.present?
   end
@@ -69,7 +71,7 @@ class Feed < ApplicationRecord
     taggings
   end
 
-  def icons
+  def icon_options
     items = {}
     items[custom_icon] = "round"
     if custom_icon_format == "round"
@@ -81,15 +83,15 @@ class Feed < ApplicationRecord
   end
 
   def icon
-    base = icons.keys.find { !_1.nil? }
+    base = icon_options.keys.find { !_1.nil? }
     return nil if base.nil?
     feed_relative_url(base)
   end
 
   def default_icon_format
-    base = icons.keys.find { !_1.nil? }
+    base = icon_options.keys.find { !_1.nil? }
     return nil if base.nil?
-    icons[base]
+    icon_options[base]
   end
 
   def self.create_from_parsed_feed(parsed_feed)

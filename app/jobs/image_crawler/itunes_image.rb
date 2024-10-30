@@ -26,14 +26,18 @@ module ImageCrawler
         id: "#{@entry.public_id}-itunes",
         preset_name: "podcast",
         image_urls: [@entry.rebase_url(@entry.data["itunes_image"])],
-        provider: ::Image.providers[:entry_podcast],
+        provider: ::Image.providers[:entry_icon],
         provider_id: @entry.id
       )
       Pipeline::Find.perform_async(image.to_h)
     end
 
     def receive
-      @entry.update(media_image: @image["processed_url"])
+      @entry.update(
+        media_image: @image["processed_url"],
+        provider: Entry.providers[:entry_icon],
+        provider_id: @entry.id
+      )
     end
   end
 end

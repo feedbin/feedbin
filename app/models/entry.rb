@@ -5,14 +5,15 @@ class Entry < ApplicationRecord
 
   store :settings, accessors: [:archived_images, :media_image, :newsletter, :newsletter_from, :embed_duration], coder: JSON
 
-  enum :provider, [:twitter, :youtube], prefix: true
+  enum :provider, [:twitter, :youtube, :favicon, :entry_icon], prefix: true
 
   belongs_to :feed
   has_many :unread_entries, dependent: :delete_all
   has_many :starred_entries
   has_many :recently_read_entries
 
-  has_many :images, -> { where(provider: [:entry_content, :entry_podcast, :entry_link]) }, foreign_key: :provider_id, primary_key: :id
+  has_many :images, -> { entry_images }, foreign_key: :provider_id, primary_key: :id
+  has_many :icons,  -> { entry_icons },  foreign_key: :provider_id, primary_key: :provider_id, class_name: "Image"
 
   before_create :ensure_published
   before_create :create_summary
@@ -338,6 +339,10 @@ class Entry < ApplicationRecord
       if embed = Embed.youtube_video.find_by_provider_id(self.provider_id)
         self.provider_parent_id = embed.parent_id
       end
+    elsif feed.pages?
+      self.provider = self.class.providers[:favicon]
+      self.provider_id = hostname
+      self.provider_parent_id = self.provider_id
     end
   end
 
