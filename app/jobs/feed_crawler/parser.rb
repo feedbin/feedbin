@@ -42,7 +42,9 @@ module FeedCrawler
         "entries" => entries
       }
 
-      unless parsed.entries.find { _1.title.present? }
+      if parsed.entries.find { _1.title.present? }
+        data["feed"]["custom_icon_format"] = nil
+      else
         data["feed"]["custom_icon_format"] = "round"
       end
 

@@ -70,12 +70,14 @@ class Feed < ApplicationRecord
   end
 
   def icons
-    {
-      custom_icon                                       => "round",
-      options.safe_dig("image", "url")                  => "square",
-      options.safe_dig("json_feed", "icon")             => "square",
-      options.safe_dig("json_feed", "author", "avatar") => "round",
-    }
+    items = {}
+    items[custom_icon] = "round"
+    if custom_icon_format == "round"
+      items[options.safe_dig("image", "url")] = "square"
+    end
+    items[options.safe_dig("json_feed", "icon")] = "square"
+    items[options.safe_dig("json_feed", "author", "avatar")] = "round"
+    items
   end
 
   def icon
