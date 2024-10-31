@@ -29,7 +29,6 @@ class WebSubController < ApplicationController
       path = File.join(Dir.tmpdir, "web_sub_#{SecureRandom.hex}")
       Rails.logger.info("web_sub content_type=#{content_type} path=#{path}")
       File.write(path, body)
-      File.write(File.join(Dir.tmpdir, "tmp_web_sub_#{SecureRandom.hex}"), body)
       FeedCrawler::Parser.new.parse_and_save(@feed, path, encoding: encoding, web_sub: true)
     end
     head :ok
