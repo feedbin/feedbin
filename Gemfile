@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "7.2.1.2"
+gem "rails", "7.2.2"
 gem "will_paginate"
 
 gem "http",                github: "feedbin/http",                branch: "feedbin"
@@ -62,7 +62,7 @@ gem "stimulus-rails"
 gem "stringio", "= 3.1.0" # https://stackoverflow.com/questions/77570131
 gem "stripe", "~> 5.55.0"
 gem "stripe_event"
-gem "strong_migrations", "< 2.0"
+gem "strong_migrations", "< 2"
 gem "tailwindcss-rails"
 gem "twitter-text"
 gem "uglifier"
