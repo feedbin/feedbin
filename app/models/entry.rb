@@ -13,7 +13,7 @@ class Entry < ApplicationRecord
   has_many :recently_read_entries
 
   has_many :images, -> { entry_images }, foreign_key: :provider_id, primary_key: :id
-  has_many :icons,  -> { entry_icons },  foreign_key: :provider_id, primary_key: :provider_id, class_name: "Image"
+  has_many :icons, foreign_key: [:provider, :provider_id], primary_key: [:image_provider, :image_provider_id], class_name: "Image"
 
   before_create :ensure_published
   before_create :create_summary
@@ -330,19 +330,19 @@ class Entry < ApplicationRecord
   def provider_metadata
     if tweet? && tweet.main_tweet
       self.url = tweet.main_tweet.uri.to_s
-      self.main_tweet_id = tweet.main_tweet.id
       self.provider = self.class.providers[:twitter]
       self.provider_id = tweet.main_tweet.id
+      self.image_provider_id = tweet.main_tweet.user.screen_name
     elsif youtube?
       self.provider = self.class.providers[:youtube]
       self.provider_id = data["youtube_video_id"]
       if embed = Embed.youtube_video.find_by_provider_id(self.provider_id)
         self.provider_parent_id = embed.parent_id
+        self.image_provider_id = embed.parent_id
       end
     elsif feed.pages?
       self.provider = self.class.providers[:favicon]
-      self.provider_id = hostname
-      self.provider_parent_id = self.provider_id
+      self.image_provider_id = hostname
     end
   end
 

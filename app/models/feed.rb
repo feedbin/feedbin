@@ -307,6 +307,16 @@ class Feed < ApplicationRecord
 
   private
 
+  def provider_metadata
+    if twitter_user?
+      self.image_provider_id = twitter_user.screen_name
+    elsif youtube_channel?
+      self.image_provider_id = youtube_channel_id
+    else
+      self.image_provider_id = host
+    end
+  end
+
   def update_youtube_videos
     if youtube_channel_id
       FeedCrawler::UpdateYoutubeVideos.perform_in(2.minutes, id)

@@ -643,8 +643,8 @@ GEM
     stripe_event (2.11.0)
       activesupport (>= 3.1)
       stripe (>= 2.8, < 14)
-    strong_migrations (2.0.1)
-      activerecord (>= 6.1)
+    strong_migrations (1.8.0)
+      activerecord (>= 5.2)
     tailwindcss-rails (3.0.0)
       railties (>= 7.0.0)
       tailwindcss-ruby
@@ -781,7 +781,7 @@ DEPENDENCIES
   stripe (~> 5.55.0)
   stripe-ruby-mock!
   stripe_event
-  strong_migrations
+  strong_migrations (< 2.0)
   tailwindcss-rails
   twitter!
   twitter-text

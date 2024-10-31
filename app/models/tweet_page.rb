@@ -12,7 +12,7 @@ class TweetPage
 
   def from_entry
     return nil unless tweet?
-    Entry.where(main_tweet_id: tweet_id).take&.tweet&.main_tweet&.to_h
+    Entry.provider_twitter.where(provider_id: tweet_id).take&.tweet&.main_tweet&.to_h
   end
 
   def tweet?

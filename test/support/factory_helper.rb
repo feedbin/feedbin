@@ -41,7 +41,8 @@ module FactoryHelper
     tweet = load_tweet(option)
     entry = create_entry(feed)
     entry.data["tweet"] = tweet
-    entry.main_tweet_id = tweet["id"]
+    entry.provider = Entry.providers[:twitter]
+    entry.provider_id = tweet["id"]
     entry.save!
     entry
   end

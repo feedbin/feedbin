@@ -530,7 +530,9 @@ CREATE TABLE public.entries (
     provider_id text,
     provider_parent_id text,
     chapters jsonb,
-    categories jsonb
+    categories jsonb,
+    image_provider bigint,
+    image_provider_id text
 );
 
 
@@ -644,7 +646,9 @@ CREATE TABLE public.feeds (
     settings jsonb,
     standalone_request_at timestamp(6) without time zone,
     last_change_check timestamp(6) without time zone,
-    crawl_data jsonb
+    crawl_data jsonb,
+    image_provider bigint,
+    image_provider_id text
 );
 
 
@@ -3102,6 +3106,7 @@ ALTER TABLE ONLY public.playlists
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20241031110936'),
 ('20240502090914'),
 ('20240226114227'),
 ('20231122160929'),

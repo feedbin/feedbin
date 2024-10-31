@@ -620,10 +620,6 @@ class User < ApplicationRecord
     queued_entries.where(feed_id: subs.pluck(:feed_id)).update_all(playlist_id: playlist.id)
   end
 
-  def has_tweet?(main_tweet_id)
-    entries.where(main_tweet_id: main_tweet_id).limit(2).count > 1
-  end
-
   def twitter_credentials_valid?
     twitter_client.verify_credentials && true
   rescue Twitter::Error::Unauthorized

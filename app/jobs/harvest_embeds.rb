@@ -77,7 +77,10 @@ class HarvestEmbeds
     channel_map = Embed.youtube_video.where(provider_id: ids).pluck(:provider_id, :parent_id).to_h
     Entry.provider_youtube.where(provider_id: ids).each do |entry|
       if channel_id = channel_map[entry.provider_id]
-        entry.update(provider_parent_id: channel_id)
+        entry.update(
+          provider_parent_id: channel_id,
+          image_provider_id: channel_id
+        )
       end
     end
   end
