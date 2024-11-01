@@ -49,7 +49,7 @@ module ImageCrawler
     end
 
     def cache_key
-      "image_download_#{@image.preset_name}_#{Digest::SHA1.hexdigest(@url)}_v4"
+      "image_download_#{@image.preset_name}_#{Digest::SHA1.hexdigest(@url)}_v5"
     end
 
     def attempt_cache_key

@@ -16,6 +16,7 @@ module ImageCrawler
       processed_extension
       processed_path
       storage_url
+      original_storage_url
       provider
       provider_id
       fingerprint
@@ -120,7 +121,7 @@ module ImageCrawler
         "placeholder_color" => placeholder_color
       })
 
-      # create_image
+      create_image
     end
 
     def create_image
@@ -128,7 +129,7 @@ module ImageCrawler
         provider: provider,
         provider_id: provider_id,
         url: original_url,
-        storage_url: storage_url,
+        storage_url: original_storage_url,
         image_fingerprint: fingerprint,
         width: width,
         height: height,

@@ -8,7 +8,9 @@ module ImageCrawler
 
       def perform(image_hash)
         @image = Image.new(image_hash)
-        @image.storage_url = upload
+        storage_url = upload
+        @image.storage_url = storage_url
+        @image.original_storage_url = storage_url
         @image.send_to_feedbin
 
         DownloadCache.save(@image)

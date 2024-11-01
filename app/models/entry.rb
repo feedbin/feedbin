@@ -13,7 +13,7 @@ class Entry < ApplicationRecord
   has_many :recently_read_entries
 
   has_many :images, -> { entry_images }, foreign_key: :provider_id, primary_key: :id
-  has_many :icons, foreign_key: [:provider, :provider_id], primary_key: [:image_provider, :image_provider_id], class_name: "Image"
+  has_many :icons,  -> { entry_icons },  foreign_key: :provider_id, primary_key: :provider_id, class_name: "Image"
 
   before_create :ensure_published
   before_create :create_summary
@@ -336,10 +336,8 @@ class Entry < ApplicationRecord
     elsif youtube?
       self.provider = self.class.providers[:youtube]
       self.provider_id = data["youtube_video_id"]
-      if embed = Embed.youtube_video.find_by_provider_id(self.provider_id)
-        self.provider_parent_id = embed.parent_id
-        self.image_provider_id = embed.parent_id
-      end
+      self.provider_parent_id = data["youtube_channel_id"]
+      self.image_provider_id = data["youtube_channel_id"]
     elsif feed.pages?
       self.provider = self.class.providers[:favicon]
       self.image_provider_id = hostname

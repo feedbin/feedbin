@@ -29,11 +29,11 @@ module ImageCrawler
           download_cache = DownloadCache.copy(original_url, @image)
 
           if download_cache.copied?
-            image             = download_cache.cached_image
-            image.storage_url = download_cache.storage_url
-            image.id          = @image.id
-            image.provider    = @image.provider
-            image.provider_id = @image.provider_id
+            image                      = download_cache.cached_image
+            image.storage_url          = download_cache.storage_url
+            image.id                   = @image.id
+            image.provider             = @image.provider
+            image.provider_id          = @image.provider_id
 
             image.send_to_feedbin
 
