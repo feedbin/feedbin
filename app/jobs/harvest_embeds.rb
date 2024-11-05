@@ -52,7 +52,7 @@ class HarvestEmbeds
     })
 
     channel_ids = videos.safe_dig("items")&.map { |video| video.safe_dig("snippet", "channelId") }.uniq
-    channels = youtube_api(type: "channels", ids: channel_ids, parts: ["snippet"])
+    channels = youtube_api(type: "channels", ids: channel_ids, parts: ["snippet", "statistics", "brandingSettings"])
     items.concat(channels.safe_dig("items")&.map { |item|
       Embed.new(data: item, provider_id: item.safe_dig("id"), source: :youtube_channel)
     })
