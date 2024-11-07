@@ -21,18 +21,21 @@ class Image < ApplicationRecord
     website_touch_icon: 6,     # apple touch icon
   }, prefix: true
 
-  normalizes :url, with: -> url { url.strip }
+
+  def self.generate_composite_id(provider, provider_id)
+    Digest::MD5.hexdigest([provider.to_s, provider_id.to_s].join(":"))
+  end
 
   scope :feed_icons,   -> { where(provider: %i[feed_icon website_favicon website_touch_icon]) }
   scope :entry_icons,  -> { where(provider: %i[entry_icon website_favicon website_touch_icon]) }
   scope :entry_images, -> { where(provider: %i[entry_link_preview entry_preview]) }
 
-  before_save :fingerprint_url
+  before_validation :generate_columns
 
   private
 
-  def fingerprint_url
+  def generate_columns
     self[:url_fingerprint] = Digest::MD5.hexdigest(url)
+    self[:composite_id]    = self.class.generate_composite_id(provider, provider_id)
   end
-
 end

@@ -689,7 +689,8 @@ CREATE TABLE public.images (
     data jsonb DEFAULT '{}'::jsonb NOT NULL,
     settings jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    composite_id uuid NOT NULL
 );
 
 
@@ -2490,10 +2491,10 @@ CREATE INDEX index_feeds_on_standalone_request_at ON public.feeds USING btree (s
 
 
 --
--- Name: index_images_on_provider_and_provider_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_images_on_composite_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_images_on_provider_and_provider_id ON public.images USING btree (provider, provider_id);
+CREATE UNIQUE INDEX index_images_on_composite_id ON public.images USING btree (composite_id);
 
 
 --

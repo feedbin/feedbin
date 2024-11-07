@@ -68,6 +68,16 @@ class Entry < ApplicationRecord
     end
   end
 
+  def image_ids
+    if image_provider_id
+      Image.entry_image_providers.map do |provider|
+        Image.generate_composite_id(provider, image_provider_id)
+      end
+    else
+      []
+    end
+  end
+
   def newsletter?
     feed.newsletter?
   end
