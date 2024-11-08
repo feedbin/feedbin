@@ -42,6 +42,10 @@ class BillingEvent < ApplicationRecord
     if subscription_reactivated?
       billable.activate
     end
+
+    if invoice_created?
+      UpdateStatementDescriptor.perform_async(id)
+    end
   end
 
   def charge_succeeded?
@@ -68,6 +72,10 @@ class BillingEvent < ApplicationRecord
       event_object["amount_remaining"].present? &&
       event_object["amount_remaining"] >= 2_000 &&
       !billable.suspended?
+  end
+
+  def invoice_created?
+    event_type == "invoice.created"
   end
 
   def invoice
