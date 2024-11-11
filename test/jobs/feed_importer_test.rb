@@ -3,13 +3,14 @@ require "test_helper"
 class FeedImporterTest < ActiveSupport::TestCase
   setup do
     @user = users(:new)
-    import = @user.imports.create
+    import = @user.imports.new
     details = {
       xml_url: "http://www.example.com/atom.xml",
       tag: "Favorites",
       title: "My Title"
     }
-    @import_item = import.import_items.create(details: details)
+    @import_item = import.import_items.new(details: details)
+    import.save
     stub_request_file("atom.xml", @import_item.details[:xml_url])
   end
 
@@ -27,9 +28,10 @@ class FeedImporterTest < ActiveSupport::TestCase
   end
 
   test "should mark failed" do
-    import = @user.imports.create
+    import = @user.imports.new
     details = {xml_url: "http://www.example.com/atom.xml"}
-    import_item = import.import_items.create(details: details)
+    import_item = import.import_items.new(details: details)
+    import.save
     stub_request(:get, import_item.details[:xml_url]).to_return(status: 404)
     FeedImporter.new.perform(import_item.id)
     assert_equal("failed", import_item.reload.status)

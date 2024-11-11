@@ -25,7 +25,9 @@ class Api::V2::ImportsControllerTest < ApiControllerTestCase
 
   test "should get imports" do
     login_as @user
-    @user.imports.create!
+    import = @user.imports.new
+    import.import_items.new
+    import.save
     get :index, format: :json
     imports = parse_json
     assert_equal(1, imports.length)
@@ -34,7 +36,9 @@ class Api::V2::ImportsControllerTest < ApiControllerTestCase
 
   test "should get import" do
     login_as @user
-    import = @user.imports.create!
+    import = @user.imports.new
+    import.import_items.new
+    import.save
     get :show, params: {id: import}, format: :json
     import = parse_json
     assert_response :success

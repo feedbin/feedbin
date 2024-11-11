@@ -8,8 +8,8 @@ class Settings::ImportItemsControllerTest < ActionController::TestCase
   test "replace feed" do
     login_as @user
 
-    import = @user.imports.create!()
-    item = import.import_items.create!(
+    import = @user.imports.new
+    item = import.import_items.new(
       status: :fixable,
       details: {
         title: "Example",
@@ -17,6 +17,7 @@ class Settings::ImportItemsControllerTest < ActionController::TestCase
         html_url: "http://example.com/"
       }
     )
+    import.save
     discovered_feed = DiscoveredFeed.create!(
       site_url: item.site_url,
       feed_url: item.feed_url

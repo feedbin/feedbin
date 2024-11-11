@@ -3,13 +3,14 @@ require "test_helper"
 class FeedImportFixerTest < ActiveSupport::TestCase
   setup do
     @user = users(:new)
-    import = @user.imports.create
+    import = @user.imports.new
     details = {
       xml_url: "http://www.example.com/atom.xml",
       tag: "Favorites",
       title: "My Title"
     }
-    @import_item = import.import_items.create(details: details)
+    @import_item = import.import_items.new(details: details)
+    import.save
     @discovered_feed = DiscoveredFeed.create!(
       site_url: @import_item.site_url,
       feed_url: @import_item.feed_url
