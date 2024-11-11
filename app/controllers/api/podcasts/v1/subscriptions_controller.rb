@@ -37,7 +37,7 @@ module Api
         rescue => exception
           if Rails.env.production?
             status_not_found
-            ErrorService.notify(e)
+            ErrorService.notify(exception)
           else
             raise exception
           end
