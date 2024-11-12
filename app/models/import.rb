@@ -1,7 +1,11 @@
 class Import < ApplicationRecord
   belongs_to :user
   has_many :import_items, dependent: :delete_all
-  before_create :parse
+  before_validation :parse
+
+  validate do |import|
+    import.errors.add(:base, "No feeds found") if import.import_items.empty?
+  end
 
   attr_accessor :xml
 
@@ -13,7 +17,6 @@ class Import < ApplicationRecord
     feeds.each do |feed|
       import_items << ImportItem.new(details: feed)
     end
-    complete = true if import_items.empty?
   end
 
   def create_tags(feeds)

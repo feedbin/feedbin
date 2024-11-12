@@ -44,4 +44,19 @@ class Settings::ImportsControllerTest < ActionController::TestCase
     assert_redirected_to settings_import_export_url
     assert_equal "No file uploaded.", flash[:alert]
   end
+
+  test "should show empty import error" do
+    login_as @user
+
+    assert_no_difference -> { Import.count } do
+      post :create, params: {
+        import: {
+          upload: fixture_file_upload("empty.xml", "application/xml")
+        }
+      }
+    end
+
+    assert_redirected_to settings_import_export_url
+    assert_equal "No feeds found.", flash[:error].strip
+  end
 end

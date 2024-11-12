@@ -59,6 +59,14 @@ class BillingEventTest < ActiveSupport::TestCase
     end
   end
 
+  test "invoice_created?" do
+    event = StripeMock.mock_webhook_event("invoice.created", webhook_defaults)
+    billing_event = assert_difference -> {UpdateStatementDescriptor.jobs.size}, +1 do
+      BillingEvent.create(info: event.as_json)
+    end
+    assert_equal(billing_event.id, UpdateStatementDescriptor.jobs.first["args"].first)
+  end
+
   private
 
   def webhook_defaults
