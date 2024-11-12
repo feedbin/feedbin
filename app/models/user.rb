@@ -489,7 +489,11 @@ class User < ApplicationRecord
   end
 
   def newsletter_address
-    "#{newsletter_authentication_token.token}@#{ENV["NEWSLETTER_ADDRESS_HOST"]}"
+    if newsletter_authentication_token
+      "#{newsletter_authentication_token.token}@#{ENV["NEWSLETTER_ADDRESS_HOST"]}"
+    else
+      ""
+    end
   end
 
   def newsletter_authentication_token
