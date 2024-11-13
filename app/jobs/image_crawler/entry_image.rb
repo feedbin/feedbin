@@ -46,6 +46,10 @@ module ImageCrawler
       elsif @entry.youtube?
         image_urls = [@entry.fully_qualified_url]
         preset_name = "youtube"
+      elsif @entry.micropost?
+        image_urls = @entry.media.filter_map do |media|
+          media.url if media.type =~ /image/i
+        end
       else
         entry_url = @entry.fully_qualified_url if same_domain?
         image_urls = find_image_urls

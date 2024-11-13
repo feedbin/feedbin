@@ -70,6 +70,18 @@ module ImageCrawler
       assert_equal(["https://pbs.twimg.com/media/EwDoQHMVIAAGbaP.jpg"], extracted_urls)
     end
 
+    test "should enqueue Find with media url" do
+      xml = File.read(support_file("microposts.xml"))
+      parsed = Feedkit::Parser::XMLFeed.new(xml, "http://example.com")
+      feed = Feed.create_from_parsed_feed(parsed)
+      entry = feed.entries.last
+      pp entry.micropost?
+      EntryImage.new.perform(entry.public_id)
+      image = Image.new(Pipeline::Find.jobs.first["args"].first)
+      extracted_urls = image.image_urls
+      assert_equal(["https://cdn.masto.host/frontendsocial/media_attachments/files/109/480/363/100/027/057/original/94aa051201c933c6.png", "https://cdn.masto.host/frontendsocial/media_attachments/files/109/480/363/321/232/707/original/fd91baf5af1de4eb.png", "https://cdn.masto.host/frontendsocial/media_attachments/files/109/480/363/513/928/252/original/005201b20fde9798.png"], extracted_urls)
+    end
+
     test "should add image to entry" do
       image = {
         "original_url" => "http://example.com/image.jpg",
