@@ -16,6 +16,7 @@ module ImageCrawler
       processed_extension
       processed_path
       storage_url
+      storage_url_next
       original_storage_url
       provider
       provider_id
@@ -128,12 +129,13 @@ module ImageCrawler
       data = {
         provider: provider,
         provider_id: provider_id,
-        url: original_url,
-        storage_url: original_storage_url,
+        url: final_url,
+        storage_url: storage_url_next,
         image_fingerprint: fingerprint,
         width: width,
         height: height,
-        placeholder_color: placeholder_color
+        placeholder_color: placeholder_color,
+        storage_fingerprint: storage_fingerprint
       }
       record = ::Image.create_with(data).find_or_create_by(provider:, provider_id:)
       record.update(data)
@@ -145,6 +147,14 @@ module ImageCrawler
         path = File.join(preset.directory, path)
       end
       path
+    end
+
+    def storage_fingerprint
+      ::Image.fingerprint(data: [provider, final_url])
+    end
+
+    def storage_path
+      File.join(storage_fingerprint[0..2], storage_fingerprint)
     end
 
     def bucket

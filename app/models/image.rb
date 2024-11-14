@@ -22,12 +22,12 @@ class Image < ApplicationRecord
   }, prefix: true
 
 
-  def self.generate_composite_id(provider, provider_id)
-    Digest::MD5.hexdigest([provider.to_s, provider_id.to_s].join(":"))
+  def self.fingerprint(data:)
+    Digest::MD5.hexdigest(data.map(&:to_s).join(":"))
   end
 
   scope :feed_icons,   -> { where(provider: %i[feed_icon website_favicon website_touch_icon]) }
-  scope :entry_icons,  -> { where(provider: %i[entry_icon website_favicon website_touch_icon]) }
+  scope :entry_icons,  -> { where(provider: %i[entry_icon]) }
   scope :entry_images, -> { where(provider: %i[entry_link_preview entry_preview]) }
 
   before_validation :generate_columns
@@ -36,6 +36,6 @@ class Image < ApplicationRecord
 
   def generate_columns
     self[:url_fingerprint] = Digest::MD5.hexdigest(url)
-    self[:composite_id]    = self.class.generate_composite_id(provider, provider_id)
+    # self[:storage_fingerprint]      = self.class.fingerprint([provider.to_s, url])
   end
 end

@@ -9,8 +9,10 @@ module ImageCrawler
       def perform(image_hash)
         @image = Image.new(image_hash)
         storage_url = upload
+        storage_url_next = upload_next
         @image.storage_url = storage_url
         @image.original_storage_url = storage_url
+        @image.storage_url_next = storage_url_next
         @image.send_to_feedbin
 
         DownloadCache.save(@image)
@@ -24,6 +26,17 @@ module ImageCrawler
           options = STORAGE.dup
           options = options.merge(region: @image.preset.region) unless @image.preset.region.nil?
           response = Fog::Storage.new(options).put_object(@image.bucket, @image.image_name, file, @image.storage_options)
+          URI::HTTPS.build(
+            host: response.data[:host],
+            path: response.data[:path]
+          ).to_s
+        end
+      end
+
+      def upload_next
+        File.open(@image.processed_path) do |file|
+          options = STORAGE.dup
+          response = Fog::Storage.new(options).put_object(@image.bucket, @image.storage_path, file, @image.storage_options)
           URI::HTTPS.build(
             host: response.data[:host],
             path: response.data[:path]
