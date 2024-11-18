@@ -150,6 +150,12 @@ module ApplicationHelper
     options["onerror"] = "this.onerror=null;this.src='%s';" % fallback
     image_tag(image_args.first, options)
   end
+  
+  def display_url(url)
+    url = Addressable::URI.heuristic_parse(url)
+    parts = ([url.host] + url.path.split("/")).filter { _1.present? }
+    parts.join(" › ")
+  end
 
   def short_url(url)
     pretty_url(url).truncate(40, omission: "…") if url

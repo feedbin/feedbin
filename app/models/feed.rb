@@ -148,6 +148,7 @@ class Feed < ApplicationRecord
       return
     else
       FeedCrawler::DownloaderCritical.perform_async(id, feed_url, subscriptions_count, crawl_data.to_h)
+      Search::FeedMetadataFinder.perform_async(id)
     end
   end
 
@@ -303,6 +304,10 @@ class Feed < ApplicationRecord
 
   def self.search(query)
     FeedSearch.new(query).search
+  end
+
+  def feed_description
+    options&.safe_dig("description") || meta_description
   end
 
   private

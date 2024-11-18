@@ -119,7 +119,7 @@ module Admin
           end
         end
 
-        plain helpers.render partial: "shared/sparkline", locals: {sparkline: Sparkline.new(width: 80, height: 15, stroke: 2, percentages: counts) }
+        Sparkline(sparkline: ::Sparkline.new(width: 80, height: 15, stroke: 2, percentages: counts), theme: true)
       end
 
       def last_crawled

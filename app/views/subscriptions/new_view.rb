@@ -1,6 +1,7 @@
 class Subscriptions::NewView < ApplicationView
   def initialize(feeds:, tag_editor:, search:)
     @feeds = feeds
+    @stats = FeedStat.daily_counts(feed_ids: @feeds.map(&:id))
     @tag_editor = tag_editor
     @search = search
     @valid_feed_ids = Rails.application.message_verifier(:valid_feed_ids).generate(@feeds.map(&:id))
@@ -32,7 +33,13 @@ class Subscriptions::NewView < ApplicationView
 
   def feed_row(feed, index, form_builder)
     div(class: "mb-4", data: { behavior: "subscription_option" }) do
-      div(class: "flex items-center gap-2 mb-1") do
+      div(class: "flex items-center mb-2") do
+        div(class: tokens("self-stretch", -> { @feeds.length == 1 } => "hide")) do
+          form_builder.check_box :subscribe, checked: index == 0 ? true : false, class: "peer"
+          form_builder.label :subscribe, class: "group flex flex-center h-full pr-3" do
+            render Form::CheckboxComponent.new
+          end
+        end
         div(class: "grow") do
           render Form::TextInputComponent.new do |input|
             if @search
@@ -46,24 +53,23 @@ class Subscriptions::NewView < ApplicationView
             end
           end
         end
-        div(class: tokens("ml-2", -> { @feeds.length == 1 } => "hide")) do
-          form_builder.check_box :subscribe, checked: index == 0 ? true : false, class: "peer", data: { behavior: "check_toggle" }
-          form_builder.label :subscribe, class: "group" do
-            render Form::SwitchComponent.new
-          end
-        end
       end
-      div class: tokens(-> { @feeds.length > 1 } => "pr-[50px]") do
-        p(class: "text-sm text-500 truncate", title: "Feed URL") do
-          parts = helpers.pretty_url_parts(feed.feed_url)
-          span class: "text-600 font-bold" do
-            parts[0]
+      div class: tokens("text-500", -> { @feeds.length > 1 } => "pl-[28px]") do
+        div class: "flex gap-4 items-baseline" do
+          p(class: "grow text-sm truncate", title: feed.feed_url) do
+            helpers.display_url(feed.feed_url)
           end
-          plain parts[1]
+          div class: "" do
+            Sparkline(sparkline: ::Sparkline.new(width: 80, height: 15, stroke: 2, percentages: @stats[feed.id].percentages), theme: true)
+          end
         end
-        if feed.meta_description
-          p(class: "text-sm text-500 mt-1 two-lines", title: feed.meta_description) do
-            feed.meta_description
+
+        div class: "flex gap-4 items-baseline text-xs mt-1" do
+          p(class: "truncate grow min-w-0", title: feed.feed_description) do
+            feed.feed_description
+          end
+          p(class: "shrink-0") do
+            "30/month, 1d ago"
           end
         end
       end

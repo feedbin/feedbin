@@ -59,7 +59,7 @@ module Settings
               render SvgComponent.new "menu-icon-mute", class: "fill-600", title: "Muted", data: {toggle: "tooltip"}
             end
           else
-            plain helpers.render partial: "shared/sparkline", locals: {sparkline: subscription_presenter.sparkline}
+            Sparkline(sparkline: subscription_presenter.sparkline, theme: false)
           end
         end
       end

@@ -116,12 +116,10 @@ class Settings::SubscriptionsController < ApplicationController
 
       start_date = 29.days.ago
 
-      entry_counts = FeedStat.get_entry_counts(feed_ids, start_date)
+      entry_counts = FeedStat.daily_counts(feed_ids: feed_ids)
 
       subscriptions.each do |subscription|
         counts = entry_counts[subscription.feed_id]
-        percentages = counts.present? ? calculate_percentages(counts) : nil
-        volume = counts.present? ? counts.sum : 0
 
         subscription.title = if subscription.title
           subscription.title
@@ -131,8 +129,8 @@ class Settings::SubscriptionsController < ApplicationController
           "(No title)"
         end
 
-        subscription.entries_count = percentages
-        subscription.post_volume = volume
+        subscription.entries_count = counts&.percentages
+        subscription.post_volume = counts&.volume
         subscription.tag_names = get_tag_names(tags, subscription.feed_id)
 
         subscription.sort_data = feed_search_data(subscription)
@@ -148,24 +146,13 @@ class Settings::SubscriptionsController < ApplicationController
     end
 
     if params[:q].present?
-      parts = params[:q].split
+      parts = params[:q].downcase.split
       subscriptions = subscriptions.select { |subscription|
         parts.all? { |part| subscription.sort_data[:name].include?(part) }
       }
     end
 
     subscriptions
-  end
-
-  def calculate_percentages(counts)
-    max = counts.max.to_i
-    counts.map do |count|
-      if count == 0
-        0.to_f
-      else
-        count.to_f / max.to_f
-      end
-    end
   end
 
   def feed_search_data(subscription)
