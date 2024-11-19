@@ -56,7 +56,7 @@ module Settings
           else
             div class: "flex flex-col gap-2 items-end" do
               Sparkline(sparkline: subscription_presenter.sparkline, theme: false)
-              div class: "text-500 text-sm" do
+              div class: "text-500 text-sm whitespace-nowrap" do
                 plain helpers.timeago(@subscription.last_published_entry, prefix: "Latest article:")
                 plain ", #{helpers.number_with_delimiter(@subscription.post_volume)}/mo"
               end
