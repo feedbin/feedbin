@@ -70,7 +70,7 @@ class SubscriptionPresenter < BasePresenter
   private
 
   def counts
-    @counts ||= FeedStat.get_entry_counts([subscription.feed.id], days.ago).values.first
+    @counts ||= FeedStat.daily_counts(feed_ids: [subscription.feed.id], interval: days.inspect).values.first.counts
   end
 
   def days

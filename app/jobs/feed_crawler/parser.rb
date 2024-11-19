@@ -22,8 +22,9 @@ module FeedCrawler
       @feed.save!
     end
 
-    def parse_and_save(feed, path, encoding: nil, web_sub: false)
+    def parse_and_save(feed, path, encoding: nil, web_sub: false, import: false)
       @feed ||= feed
+      @import = import
 
       parsed = Feedkit::Parser.parse!(
         File.read(path, binmode: true),
@@ -52,6 +53,8 @@ module FeedCrawler
         HarvestEmbeds.new.add_missing_to_queue(video_ids)
         job_id = YoutubeReceiver.perform_in(2.minutes, data)
         Sidekiq.logger.info "Enqueued YoutubeReceiver job_id=#{job_id} feed_id=#{@feed.id}"
+      elsif import
+        Receiver.new.perform(data)
       else
         job_id = Receiver.perform_async(data)
         Sidekiq.logger.info "Enqueued Receiver job_id=#{job_id} feed_id=#{@feed.id}"
@@ -72,6 +75,11 @@ module FeedCrawler
 
     def check_for_changes?
       return @check_for_changes if defined?(@check_for_changes)
+      if @import
+        @check_for_changes = false
+        return
+      end
+
       last_check = @feed.last_change_check
 
       if last_check.nil?

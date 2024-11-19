@@ -1,7 +1,9 @@
 class Settings::SubscriptionsController < ApplicationController
   def index
     @user = current_user
-    @user.setting_off!(:fix_feeds_available)
+    if @user.setting_on?(:fix_feeds_available)
+      @user.setting_off!(:fix_feeds_available)
+    end
     @subscriptions = subscriptions_with_sort_data.paginate(page: params[:page], per_page: 50)
     store_location
 
@@ -104,41 +106,36 @@ class Settings::SubscriptionsController < ApplicationController
     dates += @user.feeds.includes(:discovered_feeds).map { _1.discovered_feeds.pluck(:updated_at).flatten.sort }
     key = Digest::SHA1.hexdigest(dates.join)
 
-    subscriptions = Rails.cache.fetch("#{@user.id}:subscriptions:#{key}:v8", expires_in: 24.hours) {
-      tags = @user.tags_on_feed
-      subscriptions = @user
-        .subscriptions
-        .default
-        .select("subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host")
-        .joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}")
-        .includes(feed: [:favicon, :discovered_feeds])
-      feed_ids = subscriptions.map(&:feed_id)
+    tags = @user.tags_on_feed
+    subscriptions = @user
+      .subscriptions
+      .default
+      .select("subscriptions.*, feeds.title AS original_title, feeds.last_published_entry AS last_published_entry, feeds.feed_url, feeds.site_url, feeds.host")
+      .joins("INNER JOIN feeds ON subscriptions.feed_id = feeds.id AND subscriptions.user_id = #{@user.id}")
+      .includes(feed: [:favicon, :discovered_feeds])
+    feed_ids = subscriptions.map(&:feed_id)
 
-      start_date = 29.days.ago
+    start_date = 29.days.ago
 
-      entry_counts = FeedStat.get_entry_counts(feed_ids, start_date)
+    entry_counts = FeedStat.daily_counts(feed_ids: feed_ids)
 
-      subscriptions.each do |subscription|
-        counts = entry_counts[subscription.feed_id]
-        percentages = counts.present? ? calculate_percentages(counts) : nil
-        volume = counts.present? ? counts.sum : 0
+    subscriptions.each do |subscription|
+      counts = entry_counts[subscription.feed_id]
 
-        subscription.title = if subscription.title
-          subscription.title
-        elsif subscription.original_title
-          subscription.original_title
-        else
-          "(No title)"
-        end
-
-        subscription.entries_count = percentages
-        subscription.post_volume = volume
-        subscription.tag_names = get_tag_names(tags, subscription.feed_id)
-
-        subscription.sort_data = feed_search_data(subscription)
+      subscription.title = if subscription.title
+        subscription.title
+      elsif subscription.original_title
+        subscription.original_title
+      else
+        "(No title)"
       end
-      subscriptions
-    }
+
+      subscription.entries_count = counts&.percentages
+      subscription.post_volume = counts&.volume
+      subscription.tag_names = get_tag_names(tags, subscription.feed_id)
+
+      subscription.sort_data = feed_search_data(subscription)
+    end
 
     if ["updated", "volume", "tag", "name"].include?(params[:sort])
       key = params[:sort].to_sym
@@ -148,24 +145,13 @@ class Settings::SubscriptionsController < ApplicationController
     end
 
     if params[:q].present?
-      parts = params[:q].split
+      parts = params[:q].downcase.split
       subscriptions = subscriptions.select { |subscription|
         parts.all? { |part| subscription.sort_data[:name].include?(part) }
       }
     end
 
     subscriptions
-  end
-
-  def calculate_percentages(counts)
-    max = counts.max.to_i
-    counts.map do |count|
-      if count == 0
-        0.to_f
-      else
-        count.to_f / max.to_f
-      end
-    end
   end
 
   def feed_search_data(subscription)

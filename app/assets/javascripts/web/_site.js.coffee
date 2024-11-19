@@ -29,6 +29,14 @@ $.extend feedbin,
   remoteContentIntervals: {}
   fastAnimation: 200
 
+  toggleItemInArray: (array, item) ->
+    index = array.indexOf(item)
+    if index isnt -1
+      array.splice(index, 1)
+    else
+      array.push(item)
+    array
+
   updateStyles: (url) ->
     element = $("link[href='#{url}']")
 

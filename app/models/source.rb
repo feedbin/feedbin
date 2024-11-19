@@ -32,10 +32,13 @@ class Source
     create_from_request!(Feedkit::Request.download(url))
   end
 
-  def create_from_request!(result)
-    feed = Feed.xml.where(feed_url: result.url).take
-    if feed.nil?
-      feed = Feed.create_from_parsed_feed(result.parse)
+  def create_from_request!(response)
+    feed = Feed.xml.where(feed_url: response.url).take
+    if feed.present? && (feed.last_download.nil? || feed.last_download.before?(1.day.ago))
+      response.persist!
+      FeedCrawler::Parser.new.parse_and_save(feed, response.path, encoding: response.encoding.to_s, import: true)
+    else
+      feed = Feed.create_from_parsed_feed(response.parse)
     end
     feed
   rescue

@@ -25,14 +25,9 @@ module Settings
                   span class: "truncate" do
                     span class: "block truncate" do
                       plain @subscription.title
-                      plain " "
-                      span class: "text-500 text-sm" do
-                        plain helpers.timeago(@subscription.last_published_entry)
-                        plain ", #{helpers.number_with_delimiter(@subscription.post_volume)}/mo"
-                      end
                     end
-                    span class: "block truncate !text-500 text-sm" do
-                      plain helpers.short_url(@subscription.feed_url)
+                    span class: "block truncate !text-500 text-sm", title: @subscription.feed_url do
+                      plain helpers.display_url(@subscription.feed_url)
                     end
                   end
                   span class: "ml-auto flex items-center gap-4" do
@@ -59,7 +54,13 @@ module Settings
               render SvgComponent.new "menu-icon-mute", class: "fill-600", title: "Muted", data: {toggle: "tooltip"}
             end
           else
-            plain helpers.render partial: "shared/sparkline", locals: {sparkline: subscription_presenter.sparkline}
+            div class: "flex flex-col gap-2 items-end" do
+              Sparkline(sparkline: subscription_presenter.sparkline, theme: false)
+              div class: "text-500 text-sm" do
+                plain helpers.timeago(@subscription.last_published_entry, prefix: "Latest article:")
+                plain ", #{helpers.number_with_delimiter(@subscription.post_volume)}/mo"
+              end
+            end
           end
         end
       end

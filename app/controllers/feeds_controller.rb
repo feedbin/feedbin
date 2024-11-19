@@ -23,11 +23,12 @@ class FeedsController < ApplicationController
 
   def search
     @user = current_user
-    @feeds = if params[:q].include?(".")
+    query = params[:q].strip
+    @feeds = if query.include?(".") && !query.include?(" ")
       FeedFinder.feeds(params[:q], username: params[:username], password: params[:password])
     else
       @search = true
-      Feed.search(params[:q])
+      Feed.search(query)
     end
     @feeds.map { |feed| feed.priority_refresh(@user) }
     @tag_editor = TagEditor.new(@user, nil)

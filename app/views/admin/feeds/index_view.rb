@@ -107,7 +107,7 @@ module Admin
       end
 
       def sparkline
-        counts = FeedStat.get_entry_counts([@feed.id], 89.days.ago).values.first
+        counts = FeedStat.daily_counts(feed_ids: [@feed.id], interval: 89.days.inspect).values.first.counts
         if counts.present?
           max = counts.max.to_i
           counts = counts.map do |count|
@@ -119,7 +119,7 @@ module Admin
           end
         end
 
-        plain helpers.render partial: "shared/sparkline", locals: {sparkline: Sparkline.new(width: 80, height: 15, stroke: 2, percentages: counts) }
+        Sparkline(sparkline: ::Sparkline.new(width: 80, height: 15, stroke: 2, percentages: counts), theme: true)
       end
 
       def last_crawled
