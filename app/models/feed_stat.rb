@@ -2,6 +2,7 @@ class FeedStat < ApplicationRecord
   belongs_to :feed
 
   def self.daily_counts(feed_ids:, interval: "29 days")
+    return {} if feed_ids.empty?
     sql = <<-SQL
     WITH dates AS (
       SELECT generate_series(
