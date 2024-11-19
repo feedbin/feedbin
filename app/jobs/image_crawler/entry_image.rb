@@ -53,6 +53,7 @@ module ImageCrawler
         end
       else
         entry_url = @entry.fully_qualified_url if same_domain?
+        image_urls = find_image_urls
       end
 
       if image_urls.present? || entry_url.present?
