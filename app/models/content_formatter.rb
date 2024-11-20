@@ -285,6 +285,11 @@ class ContentFormatter
   end
 
   def self.document(html)
-    Loofah::HTML5::DocumentFragment.new(Loofah::HTML5::Document.new, html, nil, {max_tree_depth: 2_000, max_attributes: 2_000})
+    Loofah.html5_fragment(html)
+  rescue => exception
+    if exception.message =~ /Document tree depth limit exceeded|stack level too deep/i
+      return Loofah.html4_fragment(html)
+    end
+    raise
   end
 end
