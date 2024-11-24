@@ -56,7 +56,7 @@ class Subscriptions::NewView < ApplicationView
       end
       div class: tokens("text-500", -> { @feeds.length > 1 } => "pl-[28px]") do
         div class: "flex gap-4 items-baseline" do
-          p(class: "grow text-sm truncate", title: feed.feed_url) do
+          p(class: "grow text-sm truncate text-600", title: feed.feed_url) do
             helpers.display_url(feed.feed_url)
           end
           div class: "" do
