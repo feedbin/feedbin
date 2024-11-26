@@ -91,7 +91,7 @@ group :development, :test do
   gem "minitest"
   gem "minitest-stub-const"
   gem "minitest-stub_any_instance"
-  gem "puma", github: "puma/puma" # until https://github.com/puma/puma/pull/3532 lands
+  gem "puma"
   gem "rails-controller-testing"
   gem "selenium-webdriver"
   gem "standard"

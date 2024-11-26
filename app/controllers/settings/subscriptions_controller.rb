@@ -102,10 +102,6 @@ class Settings::SubscriptionsController < ApplicationController
   end
 
   def subscriptions_with_sort_data
-    dates = @user.subscriptions.order(updated_at: :asc).pluck(:updated_at)
-    dates += @user.feeds.includes(:discovered_feeds).map { _1.discovered_feeds.pluck(:updated_at).flatten.sort }
-    key = Digest::SHA1.hexdigest(dates.join)
-
     tags = @user.tags_on_feed
     subscriptions = @user
       .subscriptions
