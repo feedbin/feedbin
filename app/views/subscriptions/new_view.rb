@@ -26,7 +26,7 @@ class Subscriptions::NewView < ApplicationView
       render Settings::H2Component.new do
         "Tags"
       end
-      render "shared/tag_fields", tag_editor: @tag_editor
+      render App::TagFieldsComponent.new(tag_editor: @tag_editor)
       submit_tag("Submit", class: "visually-hidden", tabindex: "-1", data: { behavior: "submit_add" })
     end
   end
@@ -60,7 +60,7 @@ class Subscriptions::NewView < ApplicationView
             helpers.display_url(feed.feed_url)
           end
           div class: "" do
-            Sparkline(sparkline: ::Sparkline.new(width: 80, height: 15, stroke: 2, percentages: @stats[feed.id].percentages), theme: true)
+            Sparkline(sparkline: ::Sparkline.new(width: 80, height: 15, stroke: 1, percentages: @stats[feed.id].percentages), theme: true)
           end
         end
 

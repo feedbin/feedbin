@@ -16,7 +16,7 @@
               <%= render Settings::H2Component.new do %>
                 Tags
               <% end %>
-              <%= render partial: "shared/tag_fields", locals: {tag_editor: tag_editor} %>
+              <%= render App::TagFieldsComponent.new(tag_editor: tag_editor) %>
             <% end %>
 
             <% content_for :modal_footer do %>

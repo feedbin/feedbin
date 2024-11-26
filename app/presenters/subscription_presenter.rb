@@ -64,7 +64,7 @@ class SubscriptionPresenter < BasePresenter
   end
 
   def sparkline
-    Sparkline.new(width: 80, height: 15, stroke: 2, percentages: subscription.entries_count)
+    Sparkline.new(width: 80, height: 15, stroke: 1, percentages: subscription.entries_count)
   end
 
   private
