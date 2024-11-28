@@ -4,7 +4,7 @@ class Common::Sparkline < Phlex::SVG
     @theme = theme
   end
 
-  def template
+  def view_template
     svg(width: @sparkline.width, height: @sparkline.height, stroke_width: @sparkline.stroke) do
       linearGradient(id: "gradient", x1: "0", x2: "0", y1: "0", y2: "1") do
         stop(class: @theme ? "[stop-color:var(--color-500)]" : "[stop-color:var(--color-green-600)]", offset: "0%", stop_opacity: "0.75")

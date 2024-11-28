@@ -4,7 +4,7 @@ module App
       @tag_editor = tag_editor
     end
 
-    def template
+    def view_template
       label(class: "flex text-input-next items-center gap-2 group items-stretch cursor-text mb-6") do
         input(
           placeholder: "+ New Tag",
