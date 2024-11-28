@@ -1,3 +1,11 @@
+def summary(entry)
+  default = entry.data&.safe_dig("itunes_subtitle").clean(transform: :to_plain_text)
+  if default && default.length < 4
+    default = entry.summary
+  end
+  default
+end
+
 json.id            @feed.id
 json.title         @feed.try(:title).clean(transform: [:to_plain_text])
 json.home_page_url @feed.try(:site_url).clean
@@ -40,8 +48,8 @@ json.items @feed.entries.order(published: :desc) do |entry|
     json.image            entry.data&.safe_dig("itunes_image").clean
     json.keywords         entry.data&.safe_dig("itunes_keywords").clean
     json.order            entry.data&.safe_dig("itunes_order").clean
-    json.summary          entry.data&.safe_dig("itunes_subtitle").clean(transform: :to_plain_text) || entry.summary
+    json.summary          summary(entry)
     json.content          entry.content.clean
-    json.chapter_titles   entry.chapter_titles.map(&:clean)
+    json.chapter_titles   entry.chapter_titles
   end
 end
