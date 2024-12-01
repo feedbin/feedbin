@@ -17,7 +17,7 @@ module App
       @tag_editor.tags.each do |tag|
         div do
           check_box_tag("tag_id[#{tag.id}]", tag.name, checked: @tag_editor.checked?(tag), class: "peer")
-          label_tag "tag_id[#{tag.id}]", class: "group block flex items-center border rounded-lg mt-2 py-3 px-4 gap-3 select-none transition-[border,box_shadow] duration-200 peer-checked:border-blue-600 peer-checked:shadow-selected" do
+          label_tag "tag_id[#{tag.id}]", class: "cursor-pointer group block flex items-center border rounded-lg mt-2 py-3 px-4 gap-3 select-none transition-[border,box_shadow,background] duration-200 peer-checked:border-blue-600 peer-checked:shadow-selected hover:bg-100" do
             div class: "shrink-0" do
               render Form::CheckboxComponent.new
             end
