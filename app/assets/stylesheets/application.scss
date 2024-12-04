@@ -7108,7 +7108,7 @@ button.close {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 12px 24px 12px 24px;
+  padding: 16px 24px;
   border-top-left-radius: $modal-border-radius;
   border-top-right-radius: $modal-border-radius;
   @include border-bottom($color-borders);
@@ -7121,11 +7121,8 @@ button.close {
     padding-right: 16px;
   }
   h5 {
-    font-size: 24px;
+    font-size: 15px;
     margin: 0;
-    @media (max-width: $small-breakpoint) {
-      font-size: 20px;
-    }
   }
 }
 
@@ -7149,7 +7146,8 @@ button.close {
   }
   svg {
     position: relative;
-    top: 2px;
+    top: 1px;
+    right: -3px;
   }
 }
 
