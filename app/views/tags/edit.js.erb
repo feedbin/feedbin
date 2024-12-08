@@ -1,1 +1,1 @@
-feedbin.replaceModal("modal-purpose-edit", "<%= j render partial: 'form', locals: {tag: @tag} %>");
+feedbin.replaceModal("modal-purpose-edit", "<%= j render ::Tags::FormComponent.new(tag: @tag) %>");

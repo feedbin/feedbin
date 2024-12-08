@@ -24,7 +24,7 @@
       </div>
   </div>
   <%= render partial: "shared/svg" %>
-  <%= render partial: "shared/modals/settings_modal" %>
-  <%= render partial: "shared/modals/add_form" %>
+  <%= render Shared::Modals::SettingsComponent.new %>
+  <%= render Shared::Modals::AddFormComponent.new %>
 <% end %>
 <%= render template: "layouts/application" %>

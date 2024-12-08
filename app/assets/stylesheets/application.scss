@@ -7178,9 +7178,12 @@ button.close {
   justify-content: flex-end;
   padding: 16px 24px;
   z-index: 10;
-  @include border-top($color-borders);
+  @include border-top(transparent);
   &.hide {
     display: none;
+  }
+  .modal-bottom & {
+    @include border-top($color-borders, $root: true);
   }
   @media (max-width: $small-breakpoint) {
     padding: 16px;
@@ -7205,7 +7208,7 @@ button.close {
 
 @media (min-width: 576px) {
   .modal-dialog {
-    max-width: 500px;
+    max-width: 540px;
     margin-top: 2.6rem;
     margin-left: auto;
     margin-right: auto;
@@ -7284,7 +7287,10 @@ button.close {
     padding-bottom: 32px;
   }
   .modal-body + .modal-footer {
-    @include border-top($color-borders);
+      @include border-top(transparent);
+  }
+  .modal-bottom & .modal-body + .modal-footer {
+    @include border-top($color-borders, $root: true);
   }
   .control-group {
     margin-bottom: 0;

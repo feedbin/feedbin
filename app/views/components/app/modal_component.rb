@@ -6,8 +6,8 @@ module App
     end
 
     def view_template(&block)
-      div class: "hide", data: {behavior: "modal_content", purpose: @purpose} do
-        div class: class_names("modal-dialog", @classes), role: "document" do
+      div class: "hide", data: {behavior: "modal_content", modal_purpose: @purpose} do
+        div class: tokens("modal-dialog", @classes), role: "document" do
           render ModalInnerComponent.new(&block)
         end
       end

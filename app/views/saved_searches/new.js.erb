@@ -1,2 +1,2 @@
-feedbin.replaceModal("modal-purpose-edit", "<%= j render partial: 'form', locals: {saved_search: @saved_search} %>");
+feedbin.replaceModal("modal-purpose-edit", "<%= j render SavedSearches::FormComponent.new(saved_search: @saved_search) %>");
 $('.modal #saved_search_name').focus();
