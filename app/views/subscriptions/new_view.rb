@@ -1,7 +1,6 @@
 class Subscriptions::NewView < ApplicationView
   def initialize(feeds:, tag_editor:, search:)
     @feeds = feeds
-    @stats = FeedStat.daily_counts(feed_ids: @feeds.map(&:id))
     @tag_editor = tag_editor
     @search = search
     @valid_feed_ids = Rails.application.message_verifier(:valid_feed_ids).generate(@feeds.map(&:id))
@@ -15,7 +14,7 @@ class Subscriptions::NewView < ApplicationView
         "Feed".pluralize(@feeds.length)
       end
 
-      div(class: "mb-12") do
+      div(class: "mb-6") do
         @feeds.each_with_index do |feed, index|
           fields_for "feeds[]", feed do |form_builder|
             feed_row(feed, index, form_builder)
@@ -55,24 +54,7 @@ class Subscriptions::NewView < ApplicationView
         end
       end
       div class: tokens("text-500", -> { @feeds.length > 1 } => "pl-[28px]") do
-        div class: "flex gap-4 items-baseline" do
-          p(class: "grow text-sm truncate text-600", title: feed.feed_url) do
-            helpers.display_url(feed.feed_url)
-          end
-          div class: "" do
-            Sparkline(sparkline: ::Sparkline.new(width: 80, height: 15, stroke: 1, percentages: @stats[feed.id].percentages), theme: true)
-          end
-        end
-
-        div class: "flex gap-4 items-baseline text-xs mt-1" do
-          p(class: "truncate grow min-w-0", title: feed.feed_description) do
-            feed.feed_description
-          end
-          p(class: "shrink-0") do
-            plain helpers.timeago(feed.last_published_entry, prefix: "Latest article:")
-            plain ", #{helpers.number_with_delimiter(@stats[feed.id].volume)}/mo"
-          end
-        end
+        render App::FeedStatsComponent.new(feed: feed, stats: FeedStat.daily_counts(feed_ids: @feeds.map(&:id)))
       end
     end
   end
