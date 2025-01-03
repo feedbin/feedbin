@@ -121,6 +121,14 @@
     <%= render Shared::Modals::EditComponent.new %>
     <%= render Shared::Modals::AppearanceComponent.new %>
 
+
+    <%=
+    render App::DialogComponent.new(purpose: "edit_subscription") do |dialog|
+      dialog.title { "Edit Subscription" }
+    end
+    %>
+
+
     <%= render partial: "shared/readability_loading" %>
     <%= render partial: "shared/saved_searches_count" %>
     <%= render partial: "shared/format" %>

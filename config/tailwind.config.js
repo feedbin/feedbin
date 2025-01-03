@@ -22,8 +22,8 @@ module.exports = {
     },
     extend: {
       boxShadow: {
-        "one": "0 1px 1px 0          rgb(var(--color-shadow-100))",
-        "two": "0px 4px 6px 2px      rgb(var(--color-shadow-100))",
+        "one": "0 1px 1px 0          var(--color-shadow-100)",
+        "two": "0px 4px 6px 2px      var(--color-shadow-100)",
         "selected": "0px 0px 0px 1px rgb(var(--color-blue-600))",
       },
       borderColor: {
@@ -80,9 +80,9 @@ module.exports = {
       },
       animation: {
         "slide-in": "slide-in 0.2s ease-in",
-        "slide-out": "slide-out 0.15s ease-out",
+        "slide-out": "slide-out 0.2s ease-out",
         "fade-in": "fade-in 0.2s ease-in",
-        "fade-out": "fade-out 0.15s ease-out",
+        "fade-out": "fade-out 0.2s ease-out",
       },
     },
   },

@@ -168,7 +168,7 @@ GEM
       activemodel (= 7.2.2)
       activesupport (= 7.2.2)
       timeout (>= 0.4.0)
-    activerecord-import (1.8.1)
+    activerecord-import (2.0.0)
       activerecord (>= 4.2)
     activestorage (7.2.2)
       actionpack (= 7.2.2)
@@ -231,11 +231,11 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
-    css_parser (1.19.1)
+    css_parser (1.21.0)
       addressable
-    csv (3.3.0)
+    csv (3.3.1)
     dante (0.2.0)
-    date (3.4.0)
+    date (3.4.1)
     debug (1.9.2)
       irb (~> 1.10)
       reline (>= 0.3.8)
@@ -254,7 +254,7 @@ GEM
     evernote_oauth (0.2.3)
       evernote-thrift
       oauth (>= 0.4.1)
-    excon (1.2.1)
+    excon (1.2.2)
     execjs (2.10.0)
     faker (3.5.1)
       i18n (>= 1.8.11, < 2)
@@ -323,13 +323,13 @@ GEM
     hashdiff (1.1.2)
     hashie (5.0.0)
     hetchy (1.0.0)
-    honeybadger (5.24.0)
+    honeybadger (5.26.0)
       logger
     htmlbeautifier (1.4.3)
     htmlentities (4.3.4)
     http-2 (0.12.0)
       base64
-    http-cookie (1.0.7)
+    http-cookie (1.0.8)
       domain_name (~> 0.5)
     http-form_data (2.3.0)
     http_parser.rb (0.6.0)
@@ -347,8 +347,8 @@ GEM
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
-    io-console (0.7.2)
-    irb (1.14.1)
+    io-console (0.8.0)
+    irb (1.14.2)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jbuilder (2.13.0)
@@ -358,7 +358,7 @@ GEM
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    json (2.8.2)
+    json (2.9.0)
     jwt (2.9.3)
       base64
     kgio (2.11.4)
@@ -381,7 +381,7 @@ GEM
     llhttp-ffi (0.4.0)
       ffi-compiler (~> 1.0)
       rake (~> 13.0)
-    logger (1.6.1)
+    logger (1.6.3)
     lograge (0.14.0)
       actionpack (>= 4)
       activesupport (>= 4)
@@ -416,10 +416,10 @@ GEM
     mime-types (3.6.0)
       logger
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2024.1105)
+    mime-types-data (3.2024.1203)
     mini_magick (4.13.2)
     mini_mime (1.1.5)
-    minitest (5.25.2)
+    minitest (5.25.4)
     minitest-stub-const (0.6)
     minitest-stub_any_instance (1.0.3)
     msgpack (1.7.5)
@@ -429,7 +429,7 @@ GEM
     multipart-post (2.4.1)
     naught (1.1.0)
     nenv (0.3.0)
-    net-http-persistent (4.0.4)
+    net-http-persistent (4.0.5)
       connection_pool (~> 2.2)
     net-http2 (0.18.5)
       http-2 (~> 0.11)
@@ -443,11 +443,11 @@ GEM
     net-smtp (0.5.0)
       net-protocol
     nio4r (2.7.4)
-    nokogiri (1.16.7-arm64-darwin)
+    nokogiri (1.17.2-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.16.7-x86_64-darwin)
+    nokogiri (1.17.2-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.16.7-x86_64-linux)
+    nokogiri (1.17.2-x86_64-linux)
       racc (~> 1.4)
     notiffany (0.1.3)
       nenv (~> 0.1)
@@ -495,7 +495,8 @@ GEM
     pry (0.15.0)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    psych (5.2.0)
+    psych (5.2.1)
+      date
       stringio
     public_suffix (6.0.1)
     puma (6.5.0)
@@ -531,9 +532,9 @@ GEM
       activesupport (>= 5.0.0)
       minitest
       nokogiri (>= 1.6)
-    rails-html-sanitizer (1.6.0)
+    rails-html-sanitizer (1.6.2)
       loofah (~> 2.21)
-      nokogiri (~> 1.14)
+      nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
     railties (7.2.2)
       actionpack (= 7.2.2)
       activesupport (= 7.2.2)
@@ -549,14 +550,14 @@ GEM
     rb-inotify (0.11.1)
       ffi (~> 1.0)
     rchardet (1.8.0)
-    rdoc (6.8.1)
+    rdoc (6.9.0)
       psych (>= 4.0.0)
     redcarpet (3.6.0)
     redis (4.8.1)
-    redis-client (0.22.2)
+    redis-client (0.23.0)
       connection_pool
-    regexp_parser (2.9.2)
-    reline (0.5.11)
+    regexp_parser (2.9.3)
+    reline (0.5.12)
       io-console (~> 0.5)
     request_store (1.7.0)
       rack (>= 1.4)
@@ -565,21 +566,21 @@ GEM
       railties (>= 5.2)
     reverse_markdown (3.0.0)
       nokogiri
-    rexml (3.3.9)
+    rexml (3.4.0)
     rouge (4.5.1)
-    rubocop (1.68.0)
+    rubocop (1.69.2)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
       parser (>= 3.3.0.2)
       rainbow (>= 2.2.2, < 4.0)
-      regexp_parser (>= 2.4, < 3.0)
-      rubocop-ast (>= 1.32.2, < 2.0)
+      regexp_parser (>= 2.9.3, < 3.0)
+      rubocop-ast (>= 1.36.2, < 2.0)
       ruby-progressbar (~> 1.7)
-      unicode-display_width (>= 2.4.0, < 3.0)
-    rubocop-ast (1.36.1)
+      unicode-display_width (>= 2.4.0, < 4.0)
+    rubocop-ast (1.37.0)
       parser (>= 3.3.1.0)
-    rubocop-performance (1.22.1)
+    rubocop-performance (1.23.0)
       rubocop (>= 1.48.1, < 2.0)
       rubocop-ast (>= 1.31.1, < 2.0)
     ruby-progressbar (1.13.0)
@@ -601,7 +602,7 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
-    securerandom (0.3.2)
+    securerandom (0.4.0)
     selenium-webdriver (4.27.0)
       base64 (~> 0.2)
       logger (~> 1.4)
@@ -626,21 +627,21 @@ GEM
       activesupport (>= 6.1)
       sprockets (>= 3.0.0)
     ssrf_filter (1.2.0)
-    standard (1.42.1)
+    standard (1.43.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
-      rubocop (~> 1.68.0)
+      rubocop (~> 1.69.1)
       standard-custom (~> 1.0.0)
-      standard-performance (~> 1.5)
+      standard-performance (~> 1.6)
     standard-custom (1.0.2)
       lint_roller (~> 1.0)
       rubocop (~> 1.50)
-    standard-performance (1.5.0)
+    standard-performance (1.6.0)
       lint_roller (~> 1.1)
-      rubocop-performance (~> 1.22.0)
+      rubocop-performance (~> 1.23.0)
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
-    stringio (3.1.0)
+    stringio (3.1.2)
     stripe (5.55.0)
     stripe_event (2.11.0)
       activesupport (>= 3.1)
@@ -650,9 +651,9 @@ GEM
     tailwindcss-rails (3.0.0)
       railties (>= 7.0.0)
       tailwindcss-ruby
-    tailwindcss-ruby (3.4.15-arm64-darwin)
-    tailwindcss-ruby (3.4.15-x86_64-darwin)
-    tailwindcss-ruby (3.4.15-x86_64-linux)
+    tailwindcss-ruby (3.4.16-arm64-darwin)
+    tailwindcss-ruby (3.4.16-x86_64-darwin)
+    tailwindcss-ruby (3.4.16-x86_64-linux)
     thor (1.3.2)
     thread_safe (0.3.6)
     tilt (2.4.0)
@@ -667,11 +668,13 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.9.1)
-    unicode-display_width (2.6.0)
+    unicode-display_width (3.1.2)
+      unicode-emoji (~> 4.0, >= 4.0.4)
+    unicode-emoji (4.0.4)
     unicorn (6.1.0)
       kgio (~> 2.6)
       raindrops (~> 0.7)
-    useragent (0.16.10)
+    useragent (0.16.11)
     version_gem (1.1.4)
     view_component (3.20.0)
       activesupport (>= 5.2.0, < 8.1)
@@ -684,7 +687,7 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    webrick (1.9.0)
+    webrick (1.9.1)
     websocket (1.2.11)
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
@@ -699,6 +702,7 @@ PLATFORMS
   arm64-darwin-20
   arm64-darwin-22
   arm64-darwin-23
+  arm64-darwin-24
   x86_64-darwin-20
   x86_64-linux
 
@@ -779,7 +783,7 @@ DEPENDENCIES
   sidekiq
   standard
   stimulus-rails
-  stringio (= 3.1.0)
+  stringio
   stripe (~> 5.55.0)
   stripe-ruby-mock!
   stripe_event
@@ -794,4 +798,4 @@ DEPENDENCIES
   will_paginate
 
 BUNDLED WITH
-   2.5.6
+   2.5.23

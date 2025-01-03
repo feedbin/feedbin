@@ -1,34 +1,52 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["dialog", "content", "headerBorder", "footerBorder"]
+  static targets = ["content", "headerBorder", "footerBorder"]
+  static outlets = ["expandable"]
   static values = {
     closing: Boolean,
     headerBorder: Boolean,
     footerBorder: Boolean,
+    purpose: String
   }
 
   connect() {
     this.checkScroll()
-    console.log(this.element);
     window.addEventListener("resize", () => this.checkScroll())
+
+    this.boundCancel = this.cancel.bind(this)
+    this.element.addEventListener("cancel", this.boundCancel)
+  }
+
+  disconnect() {
+    this.element.removeEventListener("cancel", this.boundCancel)
+  }
+
+  openWithPurpose(event) {
+    console.log(event);
+    console.log(this.purposeValue);
+    if (event?.detail?.purpose == this.purposeValue) {
+      console.log("yes");
+      this.open()
+    }
   }
 
   open() {
-    const showEvent = this.dispatchDialogEvent("dialog:willShow")
-    this.element.showModal()
-    this.checkScroll()
-
-    this.element.addEventListener(
-      "animationend", () => {
-        this.dispatchDialogEvent("dialog:shown")
-      },
-      { once: true }
-    )
+    const showEvent = this.dispatch("willShow")
+    if (!showEvent.defaultPrevented) {
+      this.element.showModal()
+      this.checkScroll()
+      this.element.addEventListener(
+        "animationend", () => {
+          this.dispatch("shown")
+        },
+        { once: true }
+      )
+    }
   }
 
   close() {
-    const hideEvent = this.dispatchDialogEvent("dialog:willHide")
+    const hideEvent = this.dispatch("willHide")
 
     if (!hideEvent.defaultPrevented) {
       this.closingValue = true
@@ -38,11 +56,16 @@ export default class extends Controller {
           this.element.removeAttribute("closing")
           this.closingValue = false
           this.element.close()
-          this.dispatchDialogEvent("dialog:hidden")
+          this.dispatch("hidden")
         },
         { once: true }
       )
     }
+  }
+
+  cancel(event) {
+    event.preventDefault();
+    this.close();
   }
 
   clickOutside(event) {
@@ -68,18 +91,6 @@ export default class extends Controller {
     } else {
       this.footerBorderValue = false
     }
-  }
-
-  dispatchDialogEvent(eventName) {
-    const event = new CustomEvent(eventName, {
-      bubbles: true,
-      cancelable: true,
-      detail: {
-        dialogId: this.element.id,
-      },
-    })
-    document.dispatchEvent(event)
-    return event
   }
 }
 

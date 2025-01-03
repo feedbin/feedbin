@@ -59,7 +59,7 @@ gem "sanitize"
 gem "sass-rails"
 gem "sidekiq"
 gem "stimulus-rails"
-gem "stringio", "= 3.1.0" # https://stackoverflow.com/questions/77570131
+gem "stringio"
 gem "stripe", "~> 5.55.0"
 gem "stripe_event"
 gem "strong_migrations", "< 2"
