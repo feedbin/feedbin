@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "7.2.2"
+gem "rails", "7.2.2.1"
 gem "will_paginate"
 
 gem "http",                github: "feedbin/http",                branch: "feedbin"
@@ -95,7 +95,7 @@ group :development, :test do
   gem "rails-controller-testing"
   gem "selenium-webdriver"
   gem "standard"
-  gem "webmock", "= 3.8.0"
+  gem "webmock"
   gem "phlex-testing-nokogiri"
 end
 
