@@ -13,6 +13,7 @@ gem "html-pipeline",       github: "feedbin/html-pipeline",       branch: "feedb
 gem "html_diff",           github: "feedbin/html_diff",           ref: "013e1bb"
 gem "twitter",             github: "feedbin/twitter",             branch: "feedbin"
 
+gem "net-protocol"
 gem "activerecord-import"
 gem "addressable", require: "addressable/uri"
 gem "apnotic"

@@ -758,6 +758,7 @@ DEPENDENCIES
   minitest-stub-const
   minitest-stub_any_instance
   net-http-persistent
+  net-protocol
   oauth
   oauth2
   ostruct
