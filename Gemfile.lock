@@ -47,10 +47,10 @@ GIT
 
 GIT
   remote: https://github.com/feedbin/html_diff.git
-  revision: 013e1bbd9cdaa905dd7727ebee8a4efcc8b47f3f
-  ref: 013e1bb
+  revision: c1107c09cd5ba243424fd724f1bcd9918a944eeb
+  ref: c1107c0
   specs:
-    html_diff (1.0.0)
+    html_diff (1.0.1)
       nokogiri
 
 GIT

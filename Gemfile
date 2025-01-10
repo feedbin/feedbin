@@ -10,7 +10,7 @@ gem "sax-machine",         github: "feedbin/sax-machine",         branch: "feedb
 gem "feedjira",            github: "feedbin/feedjira",            branch: "f2"
 gem "feedkit",             github: "feedbin/feedkit",             branch: "master"
 gem "html-pipeline",       github: "feedbin/html-pipeline",       branch: "feedbin"
-gem "html_diff",           github: "feedbin/html_diff",           ref: "013e1bb"
+gem "html_diff",           github: "feedbin/html_diff",           ref: "c1107c0"
 gem "twitter",             github: "feedbin/twitter",             branch: "feedbin"
 
 gem "net-protocol"
