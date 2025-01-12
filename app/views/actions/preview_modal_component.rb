@@ -20,8 +20,10 @@ module Actions
             plain " match".pluralize(@action.results.total)
           end
 
-          div(class: "entries action-preview-entries") do
-            ul { render partial: "entries/entry", collection: @action.results.records }
+          if @action.results.records.present?
+            div(class: "entries action-preview-entries") do
+              ul { render partial: "entries/entry", collection: @action.results.records }
+            end
           end
 
           script do
