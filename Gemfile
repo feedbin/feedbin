@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |name| "https://github.com/#{name}.git" }
 
-gem "rails", "7.2.2"
+gem "rails", "7.2.2.1"
 gem "will_paginate"
 
 gem "http",                github: "feedbin/http",                branch: "feedbin"
@@ -10,9 +10,10 @@ gem "sax-machine",         github: "feedbin/sax-machine",         branch: "feedb
 gem "feedjira",            github: "feedbin/feedjira",            branch: "f2"
 gem "feedkit",             github: "feedbin/feedkit",             branch: "master"
 gem "html-pipeline",       github: "feedbin/html-pipeline",       branch: "feedbin"
-gem "html_diff",           github: "feedbin/html_diff",           ref: "013e1bb"
+gem "html_diff",           github: "feedbin/html_diff",           ref: "c1107c0"
 gem "twitter",             github: "feedbin/twitter",             branch: "feedbin"
 
+gem "net-protocol"
 gem "activerecord-import"
 gem "addressable", require: "addressable/uri"
 gem "apnotic"
@@ -95,7 +96,7 @@ group :development, :test do
   gem "rails-controller-testing"
   gem "selenium-webdriver"
   gem "standard"
-  gem "webmock", "= 3.8.0"
+  gem "webmock"
   gem "phlex-testing-nokogiri"
 end
 
