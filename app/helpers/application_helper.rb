@@ -99,6 +99,16 @@ module ApplicationHelper
     end
   end
 
+  def timeago(time, prefix: nil)
+    if time.nil?
+      "N/A"
+    else
+      content_tag(:time, datetime: time.utc.iso8601, title: [prefix, time.to_formatted_s(:feed)].compact.join(" ")) do
+        [distance_of_time_in_words(time, Time.now, scope: 'datetime.distance_in_words.short'), time.future? ? "from now" : "ago"].join(" ")
+      end
+    end
+  end
+
   def branch_info
     branch_name = `git rev-parse --abbrev-ref HEAD`
     " [#{branch_name.chomp}]"
@@ -149,6 +159,12 @@ module ApplicationHelper
     options = image_args.length > 1 ? image_args.last : {}
     options["onerror"] = "this.onerror=null;this.src='%s';" % fallback
     image_tag(image_args.first, options)
+  end
+
+  def display_url(url)
+    url = Addressable::URI.heuristic_parse(url)
+    parts = ([url.host] + url.path.split("/")).filter { _1.present? }
+    parts.join(" › ")
   end
 
   def short_url(url)

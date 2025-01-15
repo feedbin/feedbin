@@ -111,14 +111,16 @@
         </div>
     </div>
     <div class="hide" data-behavior="pagination"></div>
-    <%= render partial: "shared/modals/add_form" %>
-    <%= render partial: "shared/modals/keyboard_shortcuts_wrap" %>
-    <%= render partial: "shared/modals/view_link" %>
-    <%= render partial: "shared/modals/settings_modal" %>
-    <%= render partial: "shared/modals/conversation" %>
-    <%= render partial: "shared/modals/generic" %>
-    <%= render partial: "shared/modals/edit" %>
-    <%= render partial: "shared/modals/appearance" %>
+
+    <%= render Shared::Modals::AddFormComponent.new %>
+    <%= render Shared::Modals::KeyboardShortcutsComponent.new %>
+    <%= render Shared::Modals::ViewLinkComponent.new %>
+    <%= render Shared::Modals::SettingsComponent.new %>
+    <%= render Shared::Modals::ConversationComponent.new %>
+    <%= render Shared::Modals::GenericComponent.new %>
+    <%= render Shared::Modals::EditComponent.new %>
+    <%= render Shared::Modals::AppearanceComponent.new %>
+
     <%= render partial: "shared/readability_loading" %>
     <%= render partial: "shared/saved_searches_count" %>
     <%= render partial: "shared/format" %>

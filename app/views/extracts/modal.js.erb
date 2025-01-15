@@ -1,6 +1,6 @@
 target = $('.modal-purpose-view_link .modal-body')
 <% if @content %>
-    feedbin.replaceModal("modal-purpose-view_link", "<%= j render partial: 'modal', locals: {page: @content_info, content: @content, user: @user} %>");
+    feedbin.replaceModal("modal-purpose-view_link", "<%= j render Extracts::ModalComponent.new(page: @content_info, content: @content) %>");
 <% else %>
     target.html("<%= j render partial: 'modal_error', locals: {url: @url} %>")
 <% end %>

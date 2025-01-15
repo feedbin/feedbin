@@ -15,6 +15,8 @@ class ApplicationComponent < Phlex::HTML
   include Phlex::Rails::Helpers::SelectTag
   include Phlex::Rails::Helpers::TextFieldTag
   include Phlex::Rails::Helpers::SubmitTag
+  include Phlex::Rails::Helpers::LabelTag
+  include Phlex::Rails::Helpers::CollectionCheckBoxes
 
   include Common
 

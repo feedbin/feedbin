@@ -1,0 +1,61 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Feedbin</title>
+    <subtitle>A fast, simple RSS feed reader that delivers a great reading experience.</subtitle>
+    <link rel="hub" href="http://pubsubhubbub.superfeedr.com/" />
+    <link href="https://feedbin.com/blog/atom.xml" rel="self" />
+    <link href="https://feedbin.com" />
+    <updated>2024-10-09T15:37:23+00:00</updated>
+    <id>https://feedbin.com</id>
+    <author>
+        <name>Feedbin</name>
+        <email>support@feedbin.com</email>
+    </author>
+
+
+    <entry>
+        <title>Custom Newsletter Addresses</title>
+        <author>
+            <name>Ben Ubois</name>
+        </author>
+        <link href="https://feedbin.com/blog/2024/04/25/custom-newsletter-addresses/" />
+
+            <published>2024-04-25T14:25:00+00:00</published>
+
+
+            <updated>2024-04-25T14:25:00+00:00</updated>
+
+        <id>/2024/04/25/custom-newsletter-addresses</id>
+        <summary>There’s a few new features for your newsletter address. Create unlimited addresses. First up, you can now create newsletter addresses. There’s a couple reasons you might want to do this: Automatic categorization with a different default tag. To prevent spam. More on this later. If you’re familiar with Apple’s Hide...</summary>
+        <content type="html">&lt;p&gt;&lt;img src=&quot;https://assets.feedbin.com/assets-site/images/blog/2024/addresses.png?923ef586f1f80c13395b94c954744418&quot; width=&quot;1420&quot; height=&quot;744&quot; class=&quot;img-regular&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;There’s a few new features for your newsletter address.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;strong&gt;Create unlimited addresses&lt;/strong&gt;. First up, you can now create newsletter addresses. There’s a couple reasons you might want to do this:
+    &lt;ul&gt;
+      &lt;li&gt;Automatic categorization with a different default tag.&lt;/li&gt;
+      &lt;li&gt;To prevent spam. More on this later.&lt;/li&gt;
+    &lt;/ul&gt;
+
+    &lt;p&gt;If you’re familiar with &lt;a href=&quot;https://support.apple.com/en-us/105078&quot;&gt;Apple’s Hide My Email&lt;/a&gt; or &lt;a href=&quot;https://www.fastmail.help/hc/en-us/articles/4406536368911-Masked-Email&quot;&gt;Fastmail’s Masked Email&lt;/a&gt;, then it’s like that, but for your newsletters.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Customizable addresses&lt;/strong&gt;. You can now choose a custom prefix for your address. This can help with making something more memorable or as a note to yourself what the address was created for.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;A new domain&lt;/strong&gt;. All Feedbin newsletter addresses now use an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@feedb.in&lt;/code&gt; domain. This was changed because it’s much shorter and nicer looking. Newsletters addressed to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@newsletters.feedbin.com&lt;/code&gt; will continue to work too.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;There is an unfortunate reality of email newsletters. Since running a fairly large inbound email service, it’s come to my attention that newsletter addresses accidentally leak (or get sold?) to spammers. To combat this, you can now deactivate an address entirely. I consider it good email hygiene to use a unique address for every newsletter you sign up for.&lt;/p&gt;
+
+&lt;p&gt;There’s a couple ways to do this:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Generate a custom (or random address) &lt;a href=&quot;/settings/newsletters&quot;&gt;on the website&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;Use a “plus hack”. Say you have the email address &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;abc@feedb.in&lt;/code&gt;. You can also receive newsletters at &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;abc+1@feedb.in&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;abc+anything@feedb.in&lt;/code&gt;. This way you don’t have to create a new address ahead of time. If this address ever gets out, you can disable it entirely.&lt;/li&gt;
+&lt;/ol&gt;
+</content>
+    </entry>
+
+</feed>

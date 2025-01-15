@@ -5,6 +5,34 @@ class FeedsControllerTest < ActionController::TestCase
     @user = users(:ben)
   end
 
+  test "gets feed by url" do
+    login_as @user
+    stub_request_file("atom.xml", "http://example.com/")
+    post :search, params: {q: "example.com"}, xhr: true
+    assert_equal("Feedbin", assigns(:feeds).first.title)
+
+    # should also update the feed when changed
+    stub_request_file("atom_update.xml", "http://example.com/")
+    post :search, params: {q: "example.com"}, xhr: true
+
+    assert_equal("Custom Newsletter Addresses", assigns(:feeds).first.entries.order(published: :desc).first.title)
+  end
+
+  test "gets feed by search" do
+    login_as @user
+    clear_search
+    @user = users(:new)
+    @feeds = create_feeds(@user)
+    Feed.update_all(subscriptions_count: 101)
+
+    Search::ReindexFeeds.new.perform
+    Search.client { _1.refresh }
+
+    post :search, params: {q: @feeds.first.title}, xhr: true
+
+    assert_equal(@feeds.first.title, assigns(:feeds).first.title)
+  end
+
   test "update feed" do
     login_as @user
 

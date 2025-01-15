@@ -14,7 +14,7 @@ class Subscriptions::NewView < ApplicationView
         "Feed".pluralize(@feeds.length)
       end
 
-      div(class: "mb-12") do
+      div(class: "mb-6") do
         @feeds.each_with_index do |feed, index|
           fields_for "feeds[]", feed do |form_builder|
             feed_row(feed, index, form_builder)
@@ -25,14 +25,20 @@ class Subscriptions::NewView < ApplicationView
       render Settings::H2Component.new do
         "Tags"
       end
-      render "shared/tag_fields", tag_editor: @tag_editor
+      render App::TagFieldsComponent.new(tag_editor: @tag_editor)
       submit_tag("Submit", class: "visually-hidden", tabindex: "-1", data: { behavior: "submit_add" })
     end
   end
 
   def feed_row(feed, index, form_builder)
     div(class: "mb-4", data: { behavior: "subscription_option" }) do
-      div(class: "flex items-center gap-2 mb-1") do
+      div(class: "flex items-center mb-2") do
+        div(class: tokens("self-stretch", -> { @feeds.length == 1 } => "hide")) do
+          form_builder.check_box :subscribe, checked: index == 0 ? true : false, class: "peer", data: { behavior: "check_toggle" }
+          form_builder.label :subscribe, class: "group flex flex-center h-full pr-3" do
+            render Form::CheckboxComponent.new
+          end
+        end
         div(class: "grow") do
           render Form::TextInputComponent.new do |input|
             if @search
@@ -46,26 +52,9 @@ class Subscriptions::NewView < ApplicationView
             end
           end
         end
-        div(class: tokens("ml-2", -> { @feeds.length == 1 } => "hide")) do
-          form_builder.check_box :subscribe, checked: index == 0 ? true : false, class: "peer", data: { behavior: "check_toggle" }
-          form_builder.label :subscribe, class: "group" do
-            render Form::SwitchComponent.new
-          end
-        end
       end
-      div class: tokens(-> { @feeds.length > 1 } => "pr-[50px]") do
-        p(class: "text-sm text-500 truncate", title: "Feed URL") do
-          parts = helpers.pretty_url_parts(feed.feed_url)
-          span class: "text-600 font-bold" do
-            parts[0]
-          end
-          plain parts[1]
-        end
-        if feed.meta_description
-          p(class: "text-sm text-500 mt-1 two-lines", title: feed.meta_description) do
-            feed.meta_description
-          end
-        end
+      div class: tokens("text-500", -> { @feeds.length > 1 } => "pl-[28px]") do
+        render App::FeedStatsComponent.new(feed: feed, stats: FeedStat.daily_counts(feed_ids: @feeds.map(&:id)))
       end
     end
   end

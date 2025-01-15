@@ -332,7 +332,7 @@ class Entry < ApplicationRecord
 
   def chapter_titles
     return [] unless chapters.respond_to?(:map)
-    chapters.map {_1.safe_dig("tags", "title")}
+    chapters.filter_map {_1.safe_dig("tags", "title")}.filter(&:present?).map(&:clean)
   end
 
   private

@@ -77,7 +77,7 @@ class SubscribeTest < ApplicationSystemTestCase
       fill_in "password", with: password
       page.execute_script("$('.modal-purpose-subscribe [data-behavior~=submit_add]').submit()")
       wait_for_ajax
-      assert_selector "p", text: feed_url
+      assert_selector "p", text: "A fast, simple RSS feed reader that delivers a great reading"
     end
 
   end

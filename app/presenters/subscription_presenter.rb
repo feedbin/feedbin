@@ -64,13 +64,13 @@ class SubscriptionPresenter < BasePresenter
   end
 
   def sparkline
-    Sparkline.new(width: 80, height: 15, stroke: 2, percentages: subscription.entries_count)
+    Sparkline.new(width: 80, height: 15, stroke: 1, percentages: subscription.entries_count)
   end
 
   private
 
   def counts
-    @counts ||= FeedStat.get_entry_counts([subscription.feed.id], days.ago).values.first
+    @counts ||= FeedStat.daily_counts(feed_ids: [subscription.feed.id], interval: days.inspect).values.first.counts
   end
 
   def days
