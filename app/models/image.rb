@@ -35,9 +35,8 @@ class Image < ApplicationRecord
   private
 
   def generate_columns
-    self[:url]                 = url.strip
-    self[:url_fingerprint]     = Digest::MD5.hexdigest(self[:url])
-    self[:storage_fingerprint] = self.class.fingerprint([self.class.providers[provider], self[:url]])
+    self[:url_fingerprint]     = Digest::MD5.hexdigest(url)
+    self[:storage_fingerprint] = self.class.fingerprint([self.class.providers[provider], url])
   end
 
   def self.fingerprint(data)

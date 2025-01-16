@@ -121,7 +121,8 @@ module ImageCrawler
         "height"            => height,
         "placeholder_color" => placeholder_color
       })
-      preset.job_class.const_get(:Receiver).perform_async(create_image.id)
+      image_record = create_image
+      preset.job_class.const_get(:Receiver).perform_async(provider_id, image_record.id)
     end
 
     def create_image

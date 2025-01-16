@@ -39,9 +39,9 @@ module ImageCrawler
     class Receiver
       include Sidekiq::Worker
 
-      def perform(image_id)
+      def perform(feed_id, image_id)
         image = ::Image.find(image_id)
-        feed = Feed.find(image.provider_id)
+        feed = Feed.find(feed_id)
         feed.images.push(image) rescue ActiveRecord::RecordNotUnique
       end
     end
