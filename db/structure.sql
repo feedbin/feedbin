@@ -690,6 +690,8 @@ CREATE TABLE public.images (
     settings jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
+    original_storage_url text,
+    final_url text NOT NULL,
     storage_fingerprint uuid NOT NULL
 );
 
@@ -2501,7 +2503,7 @@ CREATE UNIQUE INDEX index_images_on_provider_and_provider_id ON public.images US
 -- Name: index_images_on_storage_fingerprint; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_images_on_storage_fingerprint ON public.images USING btree (storage_fingerprint);
+CREATE UNIQUE INDEX index_images_on_storage_fingerprint ON public.images USING btree (storage_fingerprint);
 
 
 --

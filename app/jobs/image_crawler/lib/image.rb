@@ -129,8 +129,10 @@ module ImageCrawler
       data = {
         provider: provider,
         provider_id: provider_id,
-        url: final_url,
+        url: original_url,
+        final_url: final_url,
         storage_url: storage_url_next,
+        original_storage_url: storage_url,
         image_fingerprint: fingerprint,
         width: width,
         height: height,
@@ -150,7 +152,7 @@ module ImageCrawler
     end
 
     def storage_fingerprint
-      ::Image.fingerprint(data: [provider, final_url])
+      ::Image.fingerprint(data: [provider, original_url])
     end
 
     def storage_path
