@@ -37,7 +37,7 @@ class Image < ApplicationRecord
   def generate_columns
     self[:url]                 = url.strip
     self[:url_fingerprint]     = Digest::MD5.hexdigest(self[:url])
-    self[:storage_fingerprint] = self.class.fingerprint([provider, self[:url]])
+    self[:storage_fingerprint] = self.class.fingerprint([self.class.providers[provider], self[:url]])
   end
 
   def self.fingerprint(data)
@@ -46,10 +46,8 @@ class Image < ApplicationRecord
 
   def self.create_from_pipeline(data)
     fingerprint = fingerprint([data[:provider], data[:url]])
-    record = create_with(data).create_or_find_by(
-      provider: data[:provider],
-      storage_fingerprint: fingerprint
-    )
+    record = create_with(data).create_or_find_by!(storage_fingerprint: fingerprint)
     record.update(data)
+    record
   end
 end

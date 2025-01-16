@@ -114,7 +114,6 @@ module ImageCrawler
     end
 
     def send_to_feedbin
-      image_record = create_image
       preset.job_class.perform_async(id, {
         "original_url"      => final_url,
         "processed_url"     => storage_url,
@@ -122,7 +121,7 @@ module ImageCrawler
         "height"            => height,
         "placeholder_color" => placeholder_color
       })
-      preset.job_class.const_get(:Receiver)
+      preset.job_class.const_get(:Receiver).perform_async(create_image.id)
     end
 
     def create_image

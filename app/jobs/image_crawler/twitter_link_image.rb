@@ -39,7 +39,8 @@ module ImageCrawler
       include Sidekiq::Worker
       sidekiq_options retry: false
 
-      def perform(image)
+      def perform(image_id)
+        image = ::Image.find(image_id)
         entry = Entry.find(image.provider_id)
         entry.images.push(image) rescue ActiveRecord::RecordNotUnique
       end

@@ -37,7 +37,7 @@ class BackfillProviderIds
         if channel_id = channel_map[video_id]
           provider_parent_id_data[entry_id] = channel_id
           image_provider_id_data[entry_id]  = channel_id
-          image_provider_data[entry.id]     = Image.providers[:avatar_provider]
+          image_provider_data[entry_id]     = Image.providers[:avatar_provider]
         end
       end
     end
