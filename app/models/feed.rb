@@ -31,7 +31,10 @@ class Feed < ApplicationRecord
 
   store :settings, accessors: [:custom_icon, :current_feed_url, :custom_icon_format, :meta_title, :meta_description, :meta_crawled_at], coder: JsonConverter
 
-  has_many :icons,  -> { feed_icons }, foreign_key: :provider_id, primary_key: :provider_id, class_name: "Image"
+  has_many :image_tags, as: :imageable
+  has_many :images, through: :image_tags
+
+  has_many :avatars, -> { avatars }, foreign_key: :provider_id, primary_key: :provider_id, class_name: "Image"
 
   def twitter_user?
     twitter_user.present?

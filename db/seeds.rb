@@ -28,6 +28,22 @@ if Rails.env.development?
   u.update_auth_token = true
   u.save
 
+  Image.create(
+    provider: 1, # Example provider ID
+    provider_id: "12345", # Example unique identifier from the provider
+    url: "https://example.com/images/sample.jpg",
+    url_fingerprint: SecureRandom.uuid,
+    storage_url: "https://storage.example.com/sample.jpg",
+    image_fingerprint: SecureRandom.uuid,
+    width: 1920,
+    height: 1080,
+    placeholder_color: "#FFFFFF",
+    data: { description: "A sample image", tags: ["sample", "image", "example"] },
+    original_storage_url: "https://original.example.com/sample.jpg",
+    final_url: "https://final.example.com/sample.jpg",
+    storage_fingerprint: SecureRandom.uuid
+  )
+
   # feed = Feed.create!(title: "Example", feed_url: "https://example.com/index.xml", site_url: "https://example.com/")
   # feed2 = Feed.create!(title: "Example 2", feed_url: "https://example.com/index.xml?2", site_url: "https://example.com/")
   #

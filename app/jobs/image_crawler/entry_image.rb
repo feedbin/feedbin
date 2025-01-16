@@ -61,7 +61,7 @@ module ImageCrawler
           id:          @entry.public_id,
           preset_name: preset_name,
           image_urls:  image_urls,
-          provider:    ::Image.providers[:entry_preview],
+          provider:    ::Image.providers[:preview_entry],
           provider_id: @entry.id,
           entry_url:   entry_url
         ).to_h

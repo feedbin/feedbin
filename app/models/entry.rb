@@ -12,8 +12,10 @@ class Entry < ApplicationRecord
   has_many :starred_entries
   has_many :recently_read_entries
 
-  has_many :images, -> { entry_images }, foreign_key: :provider_id, primary_key: :id
-  has_many :icons,  -> { entry_icons },  foreign_key: :provider_id, primary_key: :provider_id, class_name: "Image"
+  has_many :image_tags, as: :imageable
+  has_many :images, through: :image_tags
+
+  has_many :avatars,  -> { avatars },  foreign_key: :provider_id, primary_key: :provider_id, class_name: "Image"
 
   before_create :ensure_published
   before_create :create_summary
@@ -65,16 +67,6 @@ class Entry < ApplicationRecord
       order("published ASC")
     else
       order("published DESC")
-    end
-  end
-
-  def image_ids
-    if image_provider_id
-      Image.entry_image_providers.map do |provider|
-        Image.generate_composite_id(provider, image_provider_id)
-      end
-    else
-      []
     end
   end
 

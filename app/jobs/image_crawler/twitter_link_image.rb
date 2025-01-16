@@ -22,7 +22,7 @@ module ImageCrawler
         id: "#{@entry.public_id}-twitter",
         preset_name: "twitter",
         image_urls: [],
-        provider: ::Image.providers[:entry_link_preview],
+        provider: ::Image.providers[:preview_link],
         provider_id: @entry.id,
         entry_url: @page_url,
       )
