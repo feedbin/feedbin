@@ -34,5 +34,15 @@ module ImageCrawler
       @entry.data["twitter_link_image_placeholder_color"] = @image["placeholder_color"]
       @entry.save!
     end
+
+    class Receiver
+      include Sidekiq::Worker
+      sidekiq_options retry: false
+
+      def perform(image)
+        entry = Entry.find(image.provider_id)
+        entry.images.push(image) rescue ActiveRecord::RecordNotUnique
+      end
+    end
   end
 end

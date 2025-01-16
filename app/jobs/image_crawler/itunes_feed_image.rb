@@ -35,5 +35,14 @@ module ImageCrawler
     def receive
       @feed.update(custom_icon: @image["processed_url"], custom_icon_format: "square")
     end
+
+    class Receiver
+      include Sidekiq::Worker
+
+      def perform(image)
+        feed = Feed.find(image.provider_id)
+        feed.images.push(image) rescue ActiveRecord::RecordNotUnique
+      end
+    end
   end
 end

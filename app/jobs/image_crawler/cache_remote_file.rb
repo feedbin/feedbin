@@ -27,5 +27,13 @@ module ImageCrawler
         height: image["height"],
       )
     end
+
+    class Receiver
+      include Sidekiq::Worker
+      sidekiq_options retry: false
+
+      def perform(image)
+      end
+    end
   end
 end

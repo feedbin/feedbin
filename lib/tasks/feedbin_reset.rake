@@ -1,7 +1,8 @@
 namespace :feedbin do
   desc "run db:reset, flush redis and restart pow"
   task :reset do
-    db_name = "#{File.basename(Rails.root)}_#{Rails.env}"
+    db_name = "feedbin_"
+
     sh = "ps xa | grep postgres: | grep #{db_name} | grep -v grep | awk '{print $1}' | xargs kill"
     puts `#{sh}`
 

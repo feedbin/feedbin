@@ -39,5 +39,14 @@ module ImageCrawler
         provider_id: @entry.id
       )
     end
+
+    class Receiver
+      include Sidekiq::Worker
+
+      def perform(image)
+        entry = Entry.find(image.provider_id)
+        entry.images.push(image) rescue ActiveRecord::RecordNotUnique
+      end
+    end
   end
 end

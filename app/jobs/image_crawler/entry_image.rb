@@ -99,5 +99,15 @@ module ImageCrawler
     def entry=(entry)
       @entry = entry
     end
+
+    class Receiver
+      include Sidekiq::Worker
+      sidekiq_options retry: false
+
+      def perform(image)
+        entry = Entry.find(image.provider_id)
+        entry.images.push(image) rescue ActiveRecord::RecordNotUnique
+      end
+    end
   end
 end
